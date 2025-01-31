@@ -140,6 +140,13 @@ public class DriverStationJNI extends JNIWrapper {
   }
 
   /**
+   * Gets the current operating mode of the driver station.
+   *
+   * @return the current operating mode
+   */
+  public static native String getOpMode();
+
+  /**
    * Gets the current alliance station ID.
    *
    * @return the alliance station ID int

@@ -55,6 +55,7 @@ struct JoystickDataCache {
   HAL_AllianceStationID allianceStation;
   float matchTime;
   HAL_ControlWord controlWord;
+  std::string opMode;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -213,10 +214,10 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
   controlWord.dsAttached = data.ControlWord.DsConnected;
   controlWord.eStop = data.ControlWord.EStop;
 
-  auto mode = data.GetOpMode();
-  if (mode == "Test") {
+  opMode = data.GetOpMode();
+  if (opMode == "Test") {
     controlWord.test = true;
-  } else if (mode == "Auton") {
+  } else if (opMode == "Auton") {
     controlWord.autonomous = true;
   }
 
@@ -430,6 +431,15 @@ int32_t HAL_SendConsoleLine(const char* line) {
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   std::scoped_lock lock{cacheMutex};
   *controlWord = newestControlWord;
+  return 0;
+}
+
+int32_t HAL_GetOpMode(char* buf, int32_t* len) {
+  std::scoped_lock lock{cacheMutex};
+  *len = std::min(static_cast<size_t>(*len), currentRead->opMode.length());
+  if (*len != 0) {
+    std::memcpy(buf, currentRead->opMode.data(), *len);
+  }
   return 0;
 }
 

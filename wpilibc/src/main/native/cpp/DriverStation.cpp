@@ -461,6 +461,21 @@ bool DriverStation::IsEStopped() {
   return controlWord.eStop;
 }
 
+std::string DriverStation::GetMode() {
+  char buf[128];
+  int32_t len = 128;
+  HAL_GetOpMode(buf, &len);
+  return {buf, static_cast<size_t>(len)};
+}
+
+bool DriverStation::IsOpMode(std::string_view mode) {
+  return GetMode() == mode;
+}
+
+bool DriverStation::IsOpModeEnabled(std::string_view mode) {
+  return IsEnabled() && IsOpMode(mode);
+}
+
 bool DriverStation::IsAutonomous() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);

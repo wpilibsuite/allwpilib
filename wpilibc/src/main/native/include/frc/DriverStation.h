@@ -195,6 +195,30 @@ class DriverStation final {
   static bool IsEStopped();
 
   /**
+   * Get the current operating mode.
+   *
+   * @return Operating mode
+   */
+  static std::string GetMode();
+
+  /**
+   * Check to see if the current operating mode is a particular value.
+   *
+   * @param mode operating mode
+   * @return True if that mode is the current mode
+   */
+  static bool IsOpMode(std::string_view mode);
+
+  /**
+   * Check to see if the current operating mode is a particular value and the
+   * robot is enabled.
+   *
+   * @param mode operating mode
+   * @return True if that mode is the current mode and the robot is enabled
+   */
+  static bool IsOpModeEnabled(std::string_view mode);
+
+  /**
    * Check if the DS is commanding autonomous mode.
    *
    * @return True if the robot is being commanded to be in autonomous mode

@@ -45,6 +45,7 @@ struct JoystickDataCache {
   HAL_AllianceStationID allianceStation;
   double matchTime;
   HAL_ControlWord controlWord;
+  std::string opMode;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -77,6 +78,8 @@ void JoystickDataCache::Update() {
   tmpControlWord.fmsAttached = SimDriverStationData->fmsAttached;
   tmpControlWord.dsAttached = SimDriverStationData->dsAttached;
   this->controlWord = tmpControlWord;
+
+  opMode = SimDriverStationData->GetOpMode();
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
@@ -224,6 +227,18 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   }
   std::scoped_lock lock{driverStation->cacheMutex};
   *controlWord = newestControlWord;
+  return 0;
+}
+
+int32_t HAL_GetOpMode(char* buf, int32_t* len) {
+  if (gShutdown) {
+    return INCOMPATIBLE_STATE;
+  }
+  std::scoped_lock lock{driverStation->cacheMutex};
+  *len = std::min(static_cast<size_t>(*len), currentRead->opMode.length());
+  if (*len != 0) {
+    std::memcpy(buf, currentRead->opMode.data(), *len);
+  }
   return 0;
 }
 

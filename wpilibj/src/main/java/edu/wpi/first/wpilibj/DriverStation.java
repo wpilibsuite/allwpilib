@@ -390,6 +390,7 @@ public final class DriverStation {
   private static HALJoystickButtons[] m_joystickButtons = new HALJoystickButtons[kJoystickPorts];
   private static MatchInfoData m_matchInfo = new MatchInfoData();
   private static ControlWord m_controlWord = new ControlWord();
+  private static String m_opMode = "";
   private static EventVector m_refreshEvents = new EventVector();
 
   // Joystick Cached Data
@@ -401,6 +402,7 @@ public final class DriverStation {
       new HALJoystickButtons[kJoystickPorts];
   private static MatchInfoData m_matchInfoCache = new MatchInfoData();
   private static ControlWord m_controlWordCache = new ControlWord();
+  private static String m_opModeCache = "";
 
   // Joystick button rising/falling edge flags
   private static int[] m_joystickButtonsPressed = new int[kJoystickPorts];
@@ -888,6 +890,46 @@ public final class DriverStation {
   }
 
   /**
+   * Get the current operating mode.
+   *
+   * @return Operating mode
+   */
+  public static String getMode() {
+    m_cacheDataMutex.lock();
+    try {
+      return m_opMode;
+    } finally {
+      m_cacheDataMutex.unlock();
+    }
+  }
+
+  /**
+   * Check to see if the current operating mode is a particular value.
+   *
+   * @param mode operating mode
+   * @return True if that mode is the current mode
+   */
+  public static boolean isOpMode(String mode) {
+    return getMode().equals(mode);
+  }
+
+  /**
+   * Check to see if the current operating mode is a particular value and the
+   * robot is enabled.
+   *
+   * @param mode operating mode
+   * @return True if that mode is the current mode and the robot is enabled
+   */
+  public static boolean isOpModeEnabled(String mode) {
+    m_cacheDataMutex.lock();
+    try {
+      return m_controlWord.getEnabled() && m_opMode.equals(mode);
+    } finally {
+      m_cacheDataMutex.unlock();
+    }
+  }
+
+  /**
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * autonomous mode.
    *
@@ -1253,6 +1295,8 @@ public final class DriverStation {
 
     DriverStationJNI.getControlWord(m_controlWordCache);
 
+    m_opModeCache = DriverStationJNI.getOpMode();
+
     DataLogSender dataLogSender;
     // lock joystick mutex to swap cache data
     m_cacheDataMutex.lock();
@@ -1291,6 +1335,10 @@ public final class DriverStation {
       ControlWord currentWord = m_controlWord;
       m_controlWord = m_controlWordCache;
       m_controlWordCache = currentWord;
+
+      String currentOpMode = m_opMode;
+      m_opMode = m_opModeCache;
+      m_opModeCache = currentOpMode;
 
       dataLogSender = m_dataLogSender;
     } finally {

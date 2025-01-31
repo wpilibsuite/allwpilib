@@ -138,6 +138,21 @@ Java_edu_wpi_first_hal_DriverStationJNI_nativeGetControlWord
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Method:    getOpMode
+ * Signature: ()java/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_getOpMode
+  (JNIEnv* env, jclass)
+{
+  char buf[128];
+  int32_t len = 128;
+  HAL_GetOpMode(buf, &len);
+  return MakeJString(env, std::string_view{buf, static_cast<size_t>(len)});
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DriverStationJNI
  * Method:    nativeGetAllianceStation
  * Signature: ()I
  */

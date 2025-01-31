@@ -5,6 +5,8 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <string_view>
 
 #include <wpi/spinlock.h>
 
@@ -23,6 +25,7 @@ class DriverStationData {
   HAL_SIMDATAVALUE_DEFINE_NAME(DsAttached)
   HAL_SIMDATAVALUE_DEFINE_NAME(AllianceStationId)
   HAL_SIMDATAVALUE_DEFINE_NAME(MatchTime)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(OpMode)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickAxes)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickPOVs)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickButtons)
@@ -39,6 +42,12 @@ class DriverStationData {
  public:
   DriverStationData();
   void ResetData();
+
+  int32_t RegisterOpModeCallback(HAL_OpModeCallback callback, void* param,
+                                 HAL_Bool initialNotify);
+  void CancelOpModeCallback(int32_t uid);
+  std::string GetOpMode();
+  void SetOpMode(std::string_view opMode);
 
   int32_t RegisterJoystickAxesCallback(int32_t joystickNum,
                                        HAL_JoystickAxesCallback callback,
@@ -129,6 +138,7 @@ class DriverStationData {
   SimDataValue<double, HAL_MakeDouble, GetMatchTimeName> matchTime{-1.0};
 
  private:
+  SimCallbackRegistry<HAL_OpModeCallback, GetOpModeName> m_opModeCallbacks;
   SimCallbackRegistry<HAL_JoystickAxesCallback, GetJoystickAxesName>
       m_joystickAxesCallbacks;
   SimCallbackRegistry<HAL_JoystickPOVsCallback, GetJoystickPOVsName>
@@ -163,6 +173,9 @@ class DriverStationData {
 
   wpi::spinlock m_matchInfoMutex;
   HAL_MatchInfo m_matchInfo;
+
+  wpi::spinlock m_opModeMutex;
+  std::string m_opMode;
 };
 extern DriverStationData* SimDriverStationData;
 }  // namespace hal

@@ -12,6 +12,8 @@
 #include "hal/Types.h"
 #include "hal/simulation/NotifyListener.h"
 
+typedef void (*HAL_OpModeCallback)(const char* name, void* param,
+                                   const char* opMode);
 typedef void (*HAL_JoystickAxesCallback)(const char* name, void* param,
                                          int32_t joystickNum,
                                          const HAL_JoystickAxes* axes);
@@ -87,6 +89,12 @@ int32_t HALSIM_RegisterDriverStationMatchTimeCallback(
 void HALSIM_CancelDriverStationMatchTimeCallback(int32_t uid);
 double HALSIM_GetDriverStationMatchTime(void);
 void HALSIM_SetDriverStationMatchTime(double matchTime);
+
+int32_t HALSIM_RegisterOpModeCallback(HAL_OpModeCallback callback, void* param,
+                                      HAL_Bool initialNotify);
+void HALSIM_CancelOpModeCallback(int32_t uid);
+void HALSIM_GetOpMode(char* buf, int32_t* len);
+void HALSIM_SetOpMode(const char* opMode);
 
 int32_t HALSIM_RegisterJoystickAxesCallback(int32_t joystickNum,
                                             HAL_JoystickAxesCallback callback,
