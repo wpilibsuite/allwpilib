@@ -26,7 +26,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
   // The length of the arm.
   private final double m_armLenMeters;
 
-  // The minimum angle that the arm is capable of.
+  // The minimum angle that the arm is capable of.  
   private final double m_minAngle;
 
   // The maximum angle that the arm is capable of.
@@ -44,10 +44,10 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
    * @param armLengthMeters The length of the arm.
-   * @param minAngleRads The minimum angle that the arm is capable of.
-   * @param maxAngleRads The maximum angle that the arm is capable of.
+   * @param minAngleRads The minimum angle that the arm is capable of, with 0 radians being horizontal.
+   * @param maxAngleRads The maximum angle that the arm is capable of, with 0 radians being horizontal.
    * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingAngleRads The initial position of the Arm simulation in radians.
+   * @param startingAngleRads The initial position of the Arm simulation in radians, with 0 radians being horizontal.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
    */
@@ -80,10 +80,10 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
    * @param jKgMetersSquared The moment of inertia of the arm; can be calculated from CAD software.
    * @param armLengthMeters The length of the arm.
-   * @param minAngleRads The minimum angle that the arm is capable of.
-   * @param maxAngleRads The maximum angle that the arm is capable of.
+   * @param minAngleRads The minimum angle that the arm is capable of, with 0 radians being horizontal.
+   * @param maxAngleRads The maximum angle that the arm is capable of, with 0 radians being horizontal.
    * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingAngleRads The initial position of the Arm simulation in radians.
+   * @param startingAngleRads The initial position of the Arm simulation in radians, with 0 radians being horizontal.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
    */
