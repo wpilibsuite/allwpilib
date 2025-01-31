@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 namespace hal {
+constexpr int32_t kNumCanBuses = 2;
 constexpr int32_t kAccelerometers = 1;
 constexpr int32_t kNumAccumulators = 2;
 constexpr int32_t kNumAnalogInputs = 8;

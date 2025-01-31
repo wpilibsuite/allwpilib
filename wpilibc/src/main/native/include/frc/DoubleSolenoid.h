@@ -46,7 +46,7 @@ class DoubleSolenoid : public wpi::Sendable,
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
-  DoubleSolenoid(int module, PneumaticsModuleType moduleType,
+  DoubleSolenoid(int busId, int module, PneumaticsModuleType moduleType,
                  int forwardChannel, int reverseChannel);
 
   /**
@@ -57,7 +57,7 @@ class DoubleSolenoid : public wpi::Sendable,
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
-  DoubleSolenoid(PneumaticsModuleType moduleType, int forwardChannel,
+  DoubleSolenoid(int busId, PneumaticsModuleType moduleType, int forwardChannel,
                  int reverseChannel);
 
   ~DoubleSolenoid() override;

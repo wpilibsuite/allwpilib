@@ -26,8 +26,8 @@ public class Solenoid implements Sendable, AutoCloseable {
    * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
-  public Solenoid(final PneumaticsModuleType moduleType, final int channel) {
-    this(PneumaticsBase.getDefaultForType(moduleType), moduleType, channel);
+  public Solenoid(final int busId, final PneumaticsModuleType moduleType, final int channel) {
+    this(busId, PneumaticsBase.getDefaultForType(moduleType), moduleType, channel);
   }
 
   /**
@@ -38,8 +38,9 @@ public class Solenoid implements Sendable, AutoCloseable {
    * @param channel The channel the solenoid is on.
    */
   @SuppressWarnings("this-escape")
-  public Solenoid(final int module, final PneumaticsModuleType moduleType, final int channel) {
-    m_module = PneumaticsBase.getForType(module, moduleType);
+  public Solenoid(
+      final int busId, final int module, final PneumaticsModuleType moduleType, final int channel) {
+    m_module = PneumaticsBase.getForType(busId, module, moduleType);
 
     m_mask = 1 << channel;
     m_channel = channel;

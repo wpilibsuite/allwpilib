@@ -11,10 +11,10 @@
 
 namespace hal {
 struct CANTestStore {
-  CANTestStore(int32_t deviceId, int32_t* status) {
+  CANTestStore(int32_t busId, int32_t deviceId, int32_t* status) {
     this->deviceId = deviceId;
     handle = HAL_InitializeCAN(
-        HAL_CANManufacturer::HAL_CAN_Man_kTeamUse, deviceId,
+        busId, HAL_CANManufacturer::HAL_CAN_Man_kTeamUse, deviceId,
         HAL_CANDeviceType::HAL_CAN_Dev_kMiscellaneous, status);
   }
 
@@ -43,28 +43,31 @@ struct CANSendCallbackStore {
 TEST(CANTest, CanIdPacking) {
   int32_t status = 0;
   int32_t deviceId = 12;
-  CANTestStore testStore(deviceId, &status);
+  CANTestStore testStore(0, deviceId, &status);
   ASSERT_EQ(0, status);
 
   std::pair<int32_t, bool> storePair;
   storePair.second = false;
 
   auto cbHandle = HALSIM_RegisterCanSendMessageCallback(
-      [](const char* name, void* param, uint32_t messageID, const uint8_t* data,
-         uint8_t dataSize, int32_t periodMs, int32_t* status) {
+      [](const char* name, void* param, int32_t busId, uint32_t messageId,
+         const struct HAL_CANMessage* message, int32_t periodMs,
+         int32_t* status) {
         std::pair<int32_t, bool>* paramI =
             reinterpret_cast<std::pair<int32_t, bool>*>(param);
-        paramI->first = messageID;
+        paramI->first = messageId;
         paramI->second = true;
       },
       &storePair);
 
   CANSendCallbackStore cbStore(cbHandle);
-  uint8_t data[8];
+  HAL_CANMessage message;
+  std::memset(&message, 0, sizeof(message));
+  message.dataSize = 8;
 
   int32_t apiId = 42;
 
-  HAL_WriteCANPacket(testStore.handle, data, 8, 42, &status);
+  HAL_WriteCANPacket(testStore.handle, apiId, &message, &status);
 
   ASSERT_EQ(0, status);
 

@@ -42,8 +42,16 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    * @param reverseChannel The reverse channel on the module to control.
    */
   public DoubleSolenoid(
-      final PneumaticsModuleType moduleType, final int forwardChannel, final int reverseChannel) {
-    this(PneumaticsBase.getDefaultForType(moduleType), moduleType, forwardChannel, reverseChannel);
+      final int busId,
+      final PneumaticsModuleType moduleType,
+      final int forwardChannel,
+      final int reverseChannel) {
+    this(
+        busId,
+        PneumaticsBase.getDefaultForType(moduleType),
+        moduleType,
+        forwardChannel,
+        reverseChannel);
   }
 
   /**
@@ -56,11 +64,12 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    */
   @SuppressWarnings({"PMD.UseTryWithResources", "this-escape"})
   public DoubleSolenoid(
+      final int busId,
       final int module,
       final PneumaticsModuleType moduleType,
       final int forwardChannel,
       final int reverseChannel) {
-    m_module = PneumaticsBase.getForType(module, moduleType);
+    m_module = PneumaticsBase.getForType(busId, module, moduleType);
     boolean allocatedSolenoids = false;
     boolean successfulCompletion = false;
 

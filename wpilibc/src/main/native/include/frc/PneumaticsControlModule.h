@@ -18,14 +18,14 @@ namespace frc {
 class PneumaticsControlModule : public PneumaticsBase {
  public:
   /** Constructs a PneumaticsControlModule with the default ID (0). */
-  PneumaticsControlModule();
+  explicit PneumaticsControlModule(int busId);
 
   /**
    * Constructs a PneumaticsControlModule.
    *
    * @param module module number to construct
    */
-  explicit PneumaticsControlModule(int module);
+  PneumaticsControlModule(int busId, int module);
 
   ~PneumaticsControlModule() override = default;
 
@@ -196,17 +196,17 @@ class PneumaticsControlModule : public PneumaticsBase {
   class DataStore;
   friend class DataStore;
   friend class PneumaticsBase;
-  PneumaticsControlModule(HAL_CTREPCMHandle handle, int module);
+  PneumaticsControlModule(int busId, HAL_CTREPCMHandle handle, int module);
 
-  static std::shared_ptr<PneumaticsBase> GetForModule(int module);
+  static std::shared_ptr<PneumaticsBase> GetForModule(int busId, int module);
 
   std::shared_ptr<DataStore> m_dataStore;
   HAL_CTREPCMHandle m_handle;
   int m_module;
 
   static wpi::mutex m_handleLock;
-  static std::unique_ptr<wpi::DenseMap<int, std::weak_ptr<DataStore>>>
-      m_handleMap;
-  static std::weak_ptr<DataStore>& GetDataStore(int module);
+  static std::unique_ptr<wpi::DenseMap<int, std::weak_ptr<DataStore>>[]>
+      m_handleMaps;
+  static std::weak_ptr<DataStore>& GetDataStore(int busId, int module);
 };
 }  // namespace frc

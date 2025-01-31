@@ -40,14 +40,14 @@ class Compressor : public wpi::Sendable,
    * @param module The module ID to use.
    * @param moduleType The module type to use.
    */
-  Compressor(int module, PneumaticsModuleType moduleType);
+  Compressor(int busId, int module, PneumaticsModuleType moduleType);
 
   /**
    * Constructs a compressor for a default module and specified type.
    *
    * @param moduleType The module type to use.
    */
-  explicit Compressor(PneumaticsModuleType moduleType);
+  explicit Compressor(int busId, PneumaticsModuleType moduleType);
 
   ~Compressor() override;
 

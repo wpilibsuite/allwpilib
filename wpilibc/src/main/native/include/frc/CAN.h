@@ -9,14 +9,6 @@
 #include <hal/CANAPI.h>
 
 namespace frc {
-struct CANData {
-  /** Contents of the CAN packet. */
-  uint8_t data[8];
-  /** Length of packet in bytes. */
-  int32_t length;
-  /** CAN frame timestamp in milliseconds. */
-  uint64_t timestamp;
-};
 
 /**
  * High level class for interfacing with CAN devices conforming to
@@ -35,20 +27,22 @@ class CAN {
    * This uses the team manufacturer and device types.
    * The device ID is 6 bits (0-63)
    *
+   * @param busId    The bus id
    * @param deviceId The device id
    */
-  explicit CAN(int deviceId);
+  CAN(int busId, int deviceId);
 
   /**
    * Create a new CAN communication interface with a specific device ID,
    * manufacturer and device type. The device ID is 6 bits, the
    * manufacturer is 8 bits, and the device type is 5 bits.
    *
+   * @param busId              The bus id
    * @param deviceId           The device ID
    * @param deviceManufacturer The device manufacturer
    * @param deviceType         The device type
    */
-  CAN(int deviceId, int deviceManufacturer, int deviceType);
+  CAN(int busId, int deviceId, int deviceManufacturer, int deviceType);
 
   CAN(CAN&&) = default;
   CAN& operator=(CAN&&) = default;
@@ -56,23 +50,21 @@ class CAN {
   /**
    * Write a packet to the CAN device with a specific ID. This ID is 10 bits.
    *
-   * @param data The data to write (8 bytes max)
-   * @param length The data length to write
    * @param apiId The API ID to write.
+   * @param message the CAN message.
    */
-  void WritePacket(const uint8_t* data, int length, int apiId);
+  void WritePacket(int apiId, const HAL_CANMessage& message);
 
   /**
    * Write a repeating packet to the CAN device with a specific ID. This ID is
    * 10 bits. The RoboRIO will automatically repeat the packet at the specified
    * interval
    *
-   * @param data The data to write (8 bytes max)
-   * @param length The data length to write
    * @param apiId The API ID to write.
+   * @param message the CAN message.
    * @param repeatMs The period to repeat the packet at.
    */
-  void WritePacketRepeating(const uint8_t* data, int length, int apiId,
+  void WritePacketRepeating(int apiId, const HAL_CANMessage& message,
                             int repeatMs);
 
   /**
@@ -80,31 +72,29 @@ class CAN {
    * bits. The length by spec must match what is returned by the responding
    * device
    *
-   * @param length The length to request (0 to 8)
    * @param apiId The API ID to write.
+   * @param message the CAN message.
    */
-  void WriteRTRFrame(int length, int apiId);
+  void WriteRTRFrame(int apiId, const HAL_CANMessage& message);
 
   /**
    * Write a packet to the CAN device with a specific ID. This ID is 10 bits.
    *
-   * @param data The data to write (8 bytes max)
-   * @param length The data length to write
    * @param apiId The API ID to write.
+   * @param message the CAN message.
    */
-  int WritePacketNoError(const uint8_t* data, int length, int apiId);
+  int WritePacketNoError(int apiId, const HAL_CANMessage& message);
 
   /**
    * Write a repeating packet to the CAN device with a specific ID. This ID is
    * 10 bits. The RoboRIO will automatically repeat the packet at the specified
    * interval
    *
-   * @param data The data to write (8 bytes max)
-   * @param length The data length to write
    * @param apiId The API ID to write.
+   * @param message the CAN message.
    * @param repeatMs The period to repeat the packet at.
    */
-  int WritePacketRepeatingNoError(const uint8_t* data, int length, int apiId,
+  int WritePacketRepeatingNoError(int apiId, const HAL_CANMessage& message,
                                   int repeatMs);
 
   /**
@@ -112,10 +102,10 @@ class CAN {
    * bits. The length by spec must match what is returned by the responding
    * device
    *
-   * @param length The length to request (0 to 8)
    * @param apiId The API ID to write.
+   * @param message the CAN message.
    */
-  int WriteRTRFrameNoError(int length, int apiId);
+  int WriteRTRFrameNoError(int apiId, const HAL_CANMessage& message);
 
   /**
    * Stop a repeating packet with a specific ID. This ID is 10 bits.
@@ -133,7 +123,7 @@ class CAN {
    * @param data Storage for the received data.
    * @return True if the data is valid, otherwise false.
    */
-  bool ReadPacketNew(int apiId, CANData* data);
+  bool ReadPacketNew(int apiId, HAL_CANReceiveMessage* data);
 
   /**
    * Read a CAN packet. The will continuously return the last packet received,
@@ -143,7 +133,7 @@ class CAN {
    * @param data Storage for the received data.
    * @return True if the data is valid, otherwise false.
    */
-  bool ReadPacketLatest(int apiId, CANData* data);
+  bool ReadPacketLatest(int apiId, HAL_CANReceiveMessage* data);
 
   /**
    * Read a CAN packet. The will return the last packet received until the
@@ -154,16 +144,7 @@ class CAN {
    * @param data Storage for the received data.
    * @return True if the data is valid, otherwise false.
    */
-  bool ReadPacketTimeout(int apiId, int timeoutMs, CANData* data);
-
-  /**
-   * Reads the current value of the millisecond-resolution timer that CANData
-   * timestamps are based on
-   *
-   * @return Current value of timer used as a base time for CANData timestamps
-   * in milliseconds
-   */
-  static uint64_t GetTimestampBaseTime();
+  bool ReadPacketTimeout(int apiId, int timeoutMs, HAL_CANReceiveMessage* data);
 
   /// Team manufacturer.
   static constexpr HAL_CANManufacturer kTeamManufacturer = HAL_CAN_Man_kTeamUse;
