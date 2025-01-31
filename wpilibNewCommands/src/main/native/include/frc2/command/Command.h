@@ -270,8 +270,8 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   CommandPtr Repeatedly() &&;
 
   /**
-   * Decorates this command to run repeatedly, restarting it when it ends, 
-   * until this command is run the specified number of times or is interrupted. 
+   * Decorates this command to run repeatedly, restarting it when it ends,
+   * until this command is run the specified number of times or is interrupted.
    * The decorated command can still be canceled.
    *
    * @param repetitions the number of times to run the command
