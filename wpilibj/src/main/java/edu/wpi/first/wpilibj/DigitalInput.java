@@ -18,7 +18,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * elsewhere will automatically allocate digital inputs and outputs as required. This class is only
  * for devices like switches etc. that aren't implemented anywhere else.
  */
-public class DigitalInput extends DigitalSource implements Sendable {
+public class DigitalInput implements AutoCloseable, Sendable {
   private final int m_channel;
   private int m_handle;
 
@@ -40,7 +40,6 @@ public class DigitalInput extends DigitalSource implements Sendable {
 
   @Override
   public void close() {
-    super.close();
     SendableRegistry.remove(this);
     DIOJNI.freeDIOPort(m_handle);
     m_handle = 0;
@@ -61,39 +60,8 @@ public class DigitalInput extends DigitalSource implements Sendable {
    *
    * @return The GPIO channel number that this object represents.
    */
-  @Override
   public int getChannel() {
     return m_channel;
-  }
-
-  /**
-   * Get the analog trigger type.
-   *
-   * @return false
-   */
-  @Override
-  public int getAnalogTriggerTypeForRouting() {
-    return 0;
-  }
-
-  /**
-   * Is this an analog trigger.
-   *
-   * @return true if this is an analog trigger
-   */
-  @Override
-  public boolean isAnalogTrigger() {
-    return false;
-  }
-
-  /**
-   * Get the HAL Port Handle.
-   *
-   * @return The HAL Handle to the specified source.
-   */
-  @Override
-  public int getPortHandleForRouting() {
-    return m_handle;
   }
 
   /**

@@ -21,7 +21,6 @@ extern void InitializeREVPH();
 extern void InitializeAddressableLED();
 extern void InitializeAnalogInput();
 extern void InitializeAnalogInternal();
-extern void InitializeAnalogTrigger();
 extern void InitializeCAN();
 extern void InitializeCANAPI();
 extern void InitializeConstants();

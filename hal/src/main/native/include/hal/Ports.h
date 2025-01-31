@@ -17,13 +17,6 @@ extern "C" {
 #endif
 
 /**
- * Gets the number of analog triggers in the current system.
- *
- * @return the number of analog triggers
- */
-int32_t HAL_GetNumAnalogTriggers(void);
-
-/**
  * Gets the number of analog inputs in the current system.
  *
  * @return the number of analog inputs

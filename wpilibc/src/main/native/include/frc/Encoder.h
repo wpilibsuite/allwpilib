@@ -14,9 +14,6 @@
 #include "frc/CounterBase.h"
 
 namespace frc {
-
-class DigitalSource;
-
 /**
  * Class to read quad encoders.
  *

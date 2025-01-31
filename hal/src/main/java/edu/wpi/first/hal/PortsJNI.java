@@ -11,14 +11,6 @@ package edu.wpi.first.hal;
  */
 public class PortsJNI extends JNIWrapper {
   /**
-   * Gets the number of analog triggers in the current system.
-   *
-   * @return the number of analog triggers
-   * @see "HAL_GetNumAnalogTriggers"
-   */
-  public static native int getNumAnalogTriggers();
-
-  /**
    * Gets the number of analog inputs in the current system.
    *
    * @return the number of analog inputs

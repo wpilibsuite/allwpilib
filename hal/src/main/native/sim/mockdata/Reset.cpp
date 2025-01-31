@@ -4,7 +4,6 @@
 
 #include <hal/simulation/AddressableLEDData.h>
 #include <hal/simulation/AnalogInData.h>
-#include <hal/simulation/AnalogTriggerData.h>
 #include <hal/simulation/CTREPCMData.h>
 #include <hal/simulation/CanData.h>
 #include <hal/simulation/DIOData.h>
@@ -28,10 +27,6 @@ extern "C" void HALSIM_ResetAllSimData(void) {
 
   for (int32_t i = 0; i < hal::kNumAnalogInputs; i++) {
     HALSIM_ResetAnalogInData(i);
-  }
-
-  for (int32_t i = 0; i < hal::kNumAnalogTriggers; i++) {
-    HALSIM_ResetAnalogTriggerData(i);
   }
 
   HALSIM_ResetCanData();

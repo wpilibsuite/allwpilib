@@ -50,7 +50,6 @@ void InitializeHAL() {
   InitializeREVPH();
   InitializeAddressableLED();
   InitializeAnalogInput();
-  InitializeAnalogTrigger();
   InitializeCAN();
   InitializeCANAPI();
   InitializeConstants();

@@ -15,19 +15,6 @@ using namespace hal;
 extern "C" {
 /*
  * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumAnalogTriggers
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumAnalogTriggers
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumAnalogTriggers();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumAnalogInputs
  * Signature: ()I
  */
