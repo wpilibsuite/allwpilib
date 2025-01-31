@@ -52,14 +52,9 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
   auto system = frc::LinearSystem<1, 1, 1>(
       Eigen::Matrix<double, 1, 1>{0.0}, Eigen::Matrix<double, 1, 1>{1.0},
       Eigen::Matrix<double, 1, 1>{1.0}, Eigen::Matrix<double, 1, 1>{0.0});
-
-  alignas(double)
-  auto Q = frc::MakeCostMatrix(params.qv);
-  alignas(double)
-  auto R = frc::MakeCostMatrix(params.r);
   // Create an LQR with one state -- position.
-  frc::LinearQuadraticRegulator<1, 1> controller{system.A(), system.B(), Q, R,
-                                                 preset.period};
+  frc::LinearQuadraticRegulator<1, 1> controller{
+      system, {params.qp}, {params.r}, preset.period};
   // Compensate for any latency from sensor measurements, filtering, etc.
   controller.LatencyCompensate(system, preset.period, preset.measurementDelay);
 
@@ -84,13 +79,9 @@ FeedbackGains sysid::CalculateVelocityFeedbackGains(
   frc::LinearSystem<1, 1, 1> system{
       frc::Matrixd<1, 1>{-Kv / Ka}, frc::Matrixd<1, 1>{1.0 / Ka},
       frc::Matrixd<1, 1>{1.0}, frc::Matrixd<1, 1>{0.0}};
-  alignas(double)
-  auto Q = frc::MakeCostMatrix(params.qv);
-  alignas(double)
-  auto R = frc::MakeCostMatrix(params.r);
   // Create an LQR controller with 1 state -- velocity.
-  frc::LinearQuadraticRegulator<1, 1> controller{system.A(), system.B(), Q, R,
-                                                 preset.period};
+  frc::LinearQuadraticRegulator<1, 1> controller{
+      system, {params.qv}, {params.r}, preset.period};
   // Compensate for any latency from sensor measurements, filtering, etc.
   controller.LatencyCompensate(system, preset.period, preset.measurementDelay);
 
