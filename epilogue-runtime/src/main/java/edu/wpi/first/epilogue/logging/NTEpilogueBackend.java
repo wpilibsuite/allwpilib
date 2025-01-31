@@ -19,6 +19,8 @@ import edu.wpi.first.networktables.StringArrayPublisher;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.util.struct.Struct;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +34,7 @@ public class NTEpilogueBackend implements EpilogueBackend {
 
   private final Map<String, Publisher> m_publishers = new HashMap<>();
   private final Map<String, NestedBackend> m_nestedBackends = new HashMap<>();
+  private final Map<String, Unit> m_units = new HashMap<>();
 
   /**
    * Creates a logging backend that sends information to NetworkTables.
@@ -163,5 +166,18 @@ public class NTEpilogueBackend implements EpilogueBackend {
             m_publishers.computeIfAbsent(
                 identifier, k -> m_nt.getStructArrayTopic(k, struct).publish()))
         .set(value);
+  }
+
+  @Override
+  public <U extends Unit> void log(String identifier, Measure<U> value, U unit) {
+    DoublePublisher pub =
+        (DoublePublisher)
+            m_publishers.computeIfAbsent(identifier, k -> m_nt.getDoubleTopic(k).publish());
+    pub.set(value.in(unit));
+    Unit cachedUnit = m_units.get(identifier);
+    if (cachedUnit == null || !cachedUnit.equivalent(unit)) {
+      pub.getTopic().setProperty(identifier, identifier);
+      m_units.put(identifier, unit);
+    }
   }
 }
