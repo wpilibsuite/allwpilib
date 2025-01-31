@@ -45,12 +45,12 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
    * @param armLengthMeters The length of the arm.
    * @param minAngleRads The minimum angle that the arm is capable of, with 0 radians being
-   * horizontal.
+   *     horizontal.
    * @param maxAngleRads The maximum angle that the arm is capable of, with 0 radians being
-   * horizontal.
+   *     horizontal.
    * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingAngleRads The initial position of the Arm simulation in radians, with 0
-   * radians being horizontal.
+   * @param startingAngleRads The initial position of the Arm simulation in radians, with 0 radians
+   *     being horizontal.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
    */
@@ -84,12 +84,12 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * @param jKgMetersSquared The moment of inertia of the arm; can be calculated from CAD software.
    * @param armLengthMeters The length of the arm.
    * @param minAngleRads The minimum angle that the arm is capable of, with 0 radians being
-   * horizontal.
+   *     horizontal.
    * @param maxAngleRads The maximum angle that the arm is capable of, with 0 radians being
-   * horizontal.
+   *     horizontal.
    * @param simulateGravity Whether gravity should be simulated or not.
-   * @param startingAngleRads The initial position of the Arm simulation in radians, with 0
-   * radians being horizontal.
+   * @param startingAngleRads The initial position of the Arm simulation in radians, with 0 radians
+   *     being horizontal.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
    */
