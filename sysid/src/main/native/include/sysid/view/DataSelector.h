@@ -7,6 +7,7 @@
 #include <functional>
 #include <future>
 #include <map>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -75,21 +76,13 @@ class DataSelector : public glass::View {
   int m_selectedAnalysis = 0;
   std::future<TestData> m_testdataFuture;
   std::vector<std::string> m_testdataStats;
-  std::map<std::string, bool, std::less<std::string>> kValidTests = {
-      {"quasistatic-forward", true},
-      {"quasistatic-reverse", true},
-      {"dynamic-forward", true},
-      {"dynamic-reverse", true}
-  };
-  std::map<std::string, bool, std::less<std::string>> executedTests; //= {
-  //     {"quasistatic-forward", false},
-  //     {"quasistatic-reverse", false},
-  //     {"dynamic-forward", false},
-  //     {"dynamic-reverse", false}
-  // };
+  std::set<std::string, std::less<std::string>> kValidTests = {
+      "quasistatic-forward", "quasistatic-reverse", "dynamic-forward",
+      "dynamic-reverse"};
+  std::set<std::string, std::less<std::string>> executedTests;
+  bool m_testCountValidated = false;
 
   static Tests LoadTests(const glass::DataLogReaderEntry& testStateEntry);
   TestData BuildTestData();
-  
 };
 }  // namespace sysid

@@ -5,7 +5,6 @@
 #include "sysid/view/DataSelector.h"
 
 #include <algorithm>
-#include <iterator>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -113,7 +112,7 @@ void DataSelector::Display() {
           continue;
         }
         WPI_INFO(m_logger, "Loaded test state {}", it2->first);
-        executedTests[it2->first] = true;
+        executedTests.insert(it2->first);
         ++it2;
       }
       if (it->second.empty()) {
@@ -134,20 +133,14 @@ void DataSelector::Display() {
     }
     return;
   }
-  
 
-  if (executedTests.size() < 4) {
-    std::vector<std::string> executedKeys{}, validKeys{};
-
+  if (executedTests.size() < 4 && !m_testCountValidated) {
     for (auto test : kValidTests) {
-      validKeys.push_back(test.first);
+      if (!executedTests.contains(test)) {
+        m_missingTests.push_back(test);
+        m_testCountValidated = true;
+      }
     }
-    for (auto test : executedTests) {
-      executedKeys.push_back(test.first);
-    }
-
-    std::ranges::set_difference(executedKeys, validKeys,
-                                std::back_inserter(m_missingTests));
   }
 
 #if 0
