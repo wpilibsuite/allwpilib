@@ -82,25 +82,6 @@ uint64_t GetDSInitializeTime() {
 
 extern "C" {
 
-HAL_PortHandle HAL_GetPort(int32_t channel) {
-  // Dont allow a number that wouldn't fit in a uint8_t
-  if (channel < 0 || channel >= 255) {
-    return HAL_kInvalidHandle;
-  }
-  return createPortHandle(channel, 1);
-}
-
-HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel) {
-  // Dont allow a number that wouldn't fit in a uint8_t
-  if (channel < 0 || channel >= 255) {
-    return HAL_kInvalidHandle;
-  }
-  if (module < 0 || module >= 255) {
-    return HAL_kInvalidHandle;
-  }
-  return createPortHandle(channel, module);
-}
-
 const char* HAL_GetErrorMessage(int32_t code) {
   switch (code) {
     case 0:

@@ -28,7 +28,7 @@ extern "C" {
  * @param[out] status            Error status variable. 0 on success.
  * @return the created digital handle
  */
-HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
+HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel,
                                         HAL_Bool input,
                                         const char* allocationLocation,
                                         int32_t* status);

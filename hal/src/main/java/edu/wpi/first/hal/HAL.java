@@ -212,31 +212,6 @@ public final class HAL extends JNIWrapper {
   public static native boolean getSystemTimeValid();
 
   /**
-   * Gets a port handle for a specific channel and module.
-   *
-   * <p>This is expected to be used for PCMs, as the roboRIO does not work with modules anymore.
-   *
-   * <p>The created handle does not need to be freed.
-   *
-   * @param module the module number
-   * @param channel the channel number
-   * @return the created port
-   * @see "HAL_GetPortWithModule"
-   */
-  public static native int getPortWithModule(byte module, byte channel);
-
-  /**
-   * Gets a port handle for a specific channel.
-   *
-   * <p>The created handle does not need to be freed.
-   *
-   * @param channel the channel number
-   * @return the created port
-   * @see "HAL_GetPort"
-   */
-  public static native int getPort(byte channel);
-
-  /**
    * Report the usage of a resource of interest.
    *
    * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const

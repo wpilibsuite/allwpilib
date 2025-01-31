@@ -26,7 +26,7 @@ extern "C" {
  * @param[out] status Error status variable. 0 on success.
  * @return the created duty cycle handle
  */
-HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_PortHandle portHandle,
+HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
                                             const char* allocationLocation,
                                             int32_t* status);
 

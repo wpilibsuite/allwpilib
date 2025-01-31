@@ -27,7 +27,7 @@ DigitalInput::DigitalInput(int channel) {
 
   int32_t status = 0;
   std::string stackTrace = wpi::GetStackTrace(1);
-  m_handle = HAL_InitializeDIOPort(HAL_GetPort(channel), true,
+  m_handle = HAL_InitializeDIOPort(channel, true,
                                    stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 

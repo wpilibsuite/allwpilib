@@ -26,11 +26,11 @@ extern "C" {
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_PWMJNI_initializePWMPort
-  (JNIEnv* env, jclass, jint id)
+  (JNIEnv* env, jclass, jint channel)
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  auto pwm = HAL_InitializePWMPort((HAL_PortHandle)id, stack.c_str(), &status);
+  auto pwm = HAL_InitializePWMPort(channel, stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return (jint)pwm;
 }

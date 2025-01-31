@@ -27,7 +27,7 @@ extern "C" {
  * @param[out] status             Error status variable. 0 on success.
  * @return the created pwm handle
  */
-HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
+HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
                                         const char* allocationLocation,
                                         int32_t* status);
 
