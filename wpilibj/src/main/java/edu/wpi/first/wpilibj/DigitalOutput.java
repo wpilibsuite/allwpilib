@@ -16,7 +16,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * Class to write digital outputs. This class will write digital outputs. Other devices that are
  * implemented elsewhere will automatically allocate digital inputs and outputs as required.
  */
-public class DigitalOutput extends DigitalSource implements Sendable {
+public class DigitalOutput implements AutoCloseable, Sendable {
   private static final int invalidPwmGenerator = 0;
   private int m_pwmGenerator = invalidPwmGenerator;
 
@@ -42,7 +42,6 @@ public class DigitalOutput extends DigitalSource implements Sendable {
 
   @Override
   public void close() {
-    super.close();
     SendableRegistry.remove(this);
     // Disable the pwm only if we have allocated it
     if (m_pwmGenerator != invalidPwmGenerator) {
@@ -75,7 +74,6 @@ public class DigitalOutput extends DigitalSource implements Sendable {
    *
    * @return The GPIO channel number.
    */
-  @Override
   public int getChannel() {
     return m_channel;
   }
@@ -198,35 +196,5 @@ public class DigitalOutput extends DigitalSource implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Digital Output");
     builder.addBooleanProperty("Value", this::get, this::set);
-  }
-
-  /**
-   * Is this an analog trigger.
-   *
-   * @return true if this is an analog trigger
-   */
-  @Override
-  public boolean isAnalogTrigger() {
-    return false;
-  }
-
-  /**
-   * Get the analog trigger type.
-   *
-   * @return false
-   */
-  @Override
-  public int getAnalogTriggerTypeForRouting() {
-    return 0;
-  }
-
-  /**
-   * Get the HAL Port Handle.
-   *
-   * @return The HAL Handle to the specified source.
-   */
-  @Override
-  public int getPortHandleForRouting() {
-    return m_handle;
   }
 }

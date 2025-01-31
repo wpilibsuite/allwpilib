@@ -15,7 +15,6 @@
 
 namespace frc {
 class DutyCycle;
-class DigitalSource;
 
 /**
  * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with

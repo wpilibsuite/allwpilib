@@ -14,7 +14,6 @@
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 
-#include "frc/DigitalSource.h"
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
 

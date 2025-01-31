@@ -14,8 +14,6 @@
 #include "EdgeConfiguration.h"
 
 namespace frc {
-class DigitalSource;
-
 /** Up Down Counter.
  *
  * This class can count edges on a single digital input or count up based on an

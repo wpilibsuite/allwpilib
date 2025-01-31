@@ -15,7 +15,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * Class to read a duty cycle PWM input.
  *
  * <p>PWM input signals are specified with a frequency and a ratio of high to low in that frequency.
- * There are 8 of these in the roboRIO, and they can be attached to any {@link DigitalSource}.
+ * There are 8 of these in the roboRIO, and they can be attached to any SmartIO Channel.
  *
  * <p>These can be combined as the input of an AnalogTrigger to a Counter in order to implement
  * rollover checking.

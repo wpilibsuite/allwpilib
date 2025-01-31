@@ -27,8 +27,6 @@ namespace frc {
  */
 class AnalogInput : public wpi::Sendable,
                     public wpi::SendableHelper<AnalogInput> {
-  friend class AnalogTrigger;
-
  public:
   /**
    * Construct an analog input.
