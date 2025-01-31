@@ -11,7 +11,7 @@
 
 TEST(FileLoggerTest, BufferSingleLine) {
   std::vector<std::string> buf;
-  auto func = wpi::FileLogger::Buffer(
+  auto func = wpi::log::FileLogger::Buffer(
       [&buf](std::string_view line) { buf.emplace_back(line); });
   func("qwertyuiop\n");
   EXPECT_EQ("qwertyuiop", buf[0]);
@@ -19,7 +19,7 @@ TEST(FileLoggerTest, BufferSingleLine) {
 
 TEST(FileLoggerTest, BufferMultiLine) {
   std::vector<std::string> buf;
-  auto func = wpi::FileLogger::Buffer(
+  auto func = wpi::log::FileLogger::Buffer(
       [&buf](std::string_view line) { buf.emplace_back(line); });
   func("line 1\nline 2\nline 3\n");
   EXPECT_EQ("line 1\nline 2\nline 3", buf[0]);
@@ -27,7 +27,7 @@ TEST(FileLoggerTest, BufferMultiLine) {
 
 TEST(FileLoggerTest, BufferPartials) {
   std::vector<std::string> buf;
-  auto func = wpi::FileLogger::Buffer(
+  auto func = wpi::log::FileLogger::Buffer(
       [&buf](std::string_view line) { buf.emplace_back(line); });
   func("part 1");
   func("part 2\npart 3");
@@ -38,7 +38,7 @@ TEST(FileLoggerTest, BufferPartials) {
 
 TEST(FileLoggerTest, BufferMultiplePartials) {
   std::vector<std::string> buf;
-  auto func = wpi::FileLogger::Buffer(
+  auto func = wpi::log::FileLogger::Buffer(
       [&buf](std::string_view line) { buf.emplace_back(line); });
   func("part 1");
   func("part 2");
@@ -48,7 +48,7 @@ TEST(FileLoggerTest, BufferMultiplePartials) {
 }
 TEST(FileLoggerTest, BufferMultipleMultiLinePartials) {
   std::vector<std::string> buf;
-  auto func = wpi::FileLogger::Buffer(
+  auto func = wpi::log::FileLogger::Buffer(
       [&buf](std::string_view line) { buf.emplace_back(line); });
   func("part 1");
   func("part 2\npart 3");

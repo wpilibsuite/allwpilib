@@ -10,7 +10,7 @@
 
 #include <wpi/datalog/DataLog.h>
 
-namespace wpi {
+namespace wpi::log {
 /**
  * A class version of `tail -f`, otherwise known as `tail -f` at home.  Watches
  * a file and puts the data somewhere else. Only works on Linux-based platforms.

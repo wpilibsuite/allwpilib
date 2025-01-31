@@ -202,7 +202,7 @@ struct Thread final : public wpi::SafeThread {
   NT_DataLogger m_ntEntryLogger = 0;
   NT_ConnectionDataLogger m_ntConnLogger = 0;
   bool m_consoleLoggerEnabled = false;
-  wpi::FileLogger m_consoleLogger;
+  wpi::log::FileLogger m_consoleLogger;
   wpi::log::StringLogEntry m_messageLog;
 };
 

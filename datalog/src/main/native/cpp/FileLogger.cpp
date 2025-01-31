@@ -19,7 +19,7 @@
 #include <wpi/StringExtras.h>
 #include <wpi/datalog/FileLogger.h>
 
-namespace wpi {
+namespace wpi::log {
 FileLogger::FileLogger(std::string_view file,
                        std::function<void(std::string_view)> callback)
 #ifdef __linux__

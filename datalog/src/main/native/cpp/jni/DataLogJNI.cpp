@@ -708,7 +708,7 @@ Java_edu_wpi_first_datalog_DataLogJNI_createFileLogger
     return 0;
   }
   return reinterpret_cast<jlong>(
-      new wpi::FileLogger{JStringRef{env, file}, *f, JStringRef{env, key}});
+      new wpi::log::FileLogger{JStringRef{env, file}, *f, JStringRef{env, key}});
 }
 
 /*
@@ -720,6 +720,6 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_datalog_DataLogJNI_freeFileLogger
   (JNIEnv* env, jclass, jlong fileTail)
 {
-  delete reinterpret_cast<wpi::FileLogger*>(fileTail);
+  delete reinterpret_cast<wpi::log::FileLogger*>(fileTail);
 }
 }  // extern "C"
