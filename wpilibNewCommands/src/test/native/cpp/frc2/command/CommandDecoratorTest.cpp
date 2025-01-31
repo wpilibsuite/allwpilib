@@ -408,7 +408,7 @@ TEST_F(CommandDecoratorTest, RepeatedlyCount) {
   auto command = InstantCommand([&counter] { counter++; }, {}).Repeatedly(3);
 
   scheduler.Schedule(command);
-  EXPECT_TRUE(scheduler.IsScheduled(command));
+  EXPECT_EQ(1, counter);
   for (int i = 1; i < 3; i++) {
     scheduler.Run();
     EXPECT_EQ(i, counter);
