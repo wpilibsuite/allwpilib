@@ -62,6 +62,7 @@ def run_global_replacements(wpiutil_llvm_files):
         content = content.replace("LLVM_ADT_", "WPIUTIL_WPI_")
         content = content.replace("LLVM_SUPPORT_", "WPIUTIL_WPI_")
         content = content.replace("LLVM_DEFINED_HAS_FEATURE", "WPI_DEFINED_HAS_FEATURE")
+        content = content.replace("LLVM_USE_CONSTEXPR_CTOR", "WPI_USE_CONSTEXPR_CTOR")
 
         content = content.replace("const std::string_view &", "std::string_view ")
         content = content.replace("sys::fs::openFileForRead", "fs::OpenFileForRead")
@@ -73,6 +74,8 @@ def run_global_replacements(wpiutil_llvm_files):
 
         # Replace llvm_unreachable() with wpi_unreachable()
         content = content.replace("llvm_unreachable", "wpi_unreachable")
+        # Replace llvm_shutdown() with wpi_shutdown()
+        content = content.replace("llvm_shutdown", "wpi_shutdown")
 
         content = content.replace("llvm_is_multithreaded()", "1")
 

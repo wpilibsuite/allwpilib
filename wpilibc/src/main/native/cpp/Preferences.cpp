@@ -15,6 +15,7 @@
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTableListener.h>
 #include <networktables/StringTopic.h>
+#include <wpi/ManagedStatic.h>
 #include <wpi/json.h>
 
 using namespace frc;
@@ -36,18 +37,11 @@ struct Instance {
 };
 }  // namespace
 
-static Instance& GetInstance() {
-  static Instance instance;
-  return instance;
-}
+static wpi::ManagedStatic<Instance> gInst;
 
-#ifndef __FRC_ROBORIO__
-namespace frc::impl {
-void ResetPreferencesInstance() {
-  GetInstance() = Instance();
+static inline Instance& GetInstance() {
+  return *gInst;
 }
-}  // namespace frc::impl
-#endif
 
 std::vector<std::string> Preferences::GetKeys() {
   return ::GetInstance().table->GetKeys();

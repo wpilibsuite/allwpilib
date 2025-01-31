@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 17 Sep 2024 21:19:52 -0700
-Subject: [PATCH 19/37] Remove call to RtlGetLastNtStatus()
+Subject: [PATCH 19/38] Remove call to RtlGetLastNtStatus()
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 23 -----------------------

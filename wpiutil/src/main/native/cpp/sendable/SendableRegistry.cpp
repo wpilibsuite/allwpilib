@@ -11,6 +11,7 @@
 #include <fmt/format.h>
 
 #include "wpi/DenseMap.h"
+#include "wpi/ManagedStatic.h"
 #include "wpi/SmallVector.h"
 #include "wpi/UidVector.h"
 #include "wpi/mutex.h"
@@ -61,23 +62,11 @@ Component& SendableRegistryInst::GetOrAdd(void* sendable,
   return *components[compUid - 1];
 }
 
-static std::unique_ptr<SendableRegistryInst>& GetInstanceHolder() {
-  static std::unique_ptr<SendableRegistryInst> instance =
-      std::make_unique<SendableRegistryInst>();
-  return instance;
-}
+static wpi::ManagedStatic<SendableRegistryInst> gInst;
 
-static SendableRegistryInst& GetInstance() {
-  return *GetInstanceHolder();
+static inline SendableRegistryInst& GetInstance() {
+  return *gInst;
 }
-
-#ifndef __FRC_ROBORIO__
-namespace wpi::impl {
-void ResetSendableRegistry() {
-  std::make_unique<SendableRegistryInst>().swap(GetInstanceHolder());
-}
-}  // namespace wpi::impl
-#endif
 
 void SendableRegistry::EnsureInitialized() {
   GetInstance();

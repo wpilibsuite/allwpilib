@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:16:10 -0400
-Subject: [PATCH 12/37] Extra collections features
+Subject: [PATCH 12/38] Extra collections features
 
 ---
  llvm/lib/Support/raw_ostream.cpp | 8 ++++++++

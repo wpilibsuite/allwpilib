@@ -11,6 +11,7 @@
 
 #include <fmt/format.h>
 #include <hal/Notifier.h>
+#include <wpi/ManagedStatic.h>
 #include <wpi/mutex.h>
 #include <wpi/priority_queue.h>
 
@@ -237,6 +238,6 @@ bool Watchdog::operator>(const Watchdog& rhs) const {
 }
 
 Watchdog::Impl* Watchdog::GetImpl() {
-  static Impl inst;
-  return &inst;
+  static wpi::ManagedStatic<Watchdog::Impl> inst;
+  return &*inst;
 }

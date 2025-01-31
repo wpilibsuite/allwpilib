@@ -4,6 +4,7 @@
 
 #include "frc/smartdashboard/SmartDashboard.h"
 
+#include <atomic>
 #include <memory>
 #include <string>
 #include <utility>
@@ -12,6 +13,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/ManagedStatic.h>
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -29,27 +31,15 @@ struct Instance {
       nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard");
   wpi::StringMap<wpi::SendableRegistry::UID> tablesToData;
   wpi::mutex tablesToDataMutex;
+  std::atomic_bool reported = false;
 };
 }  // namespace
 
-static std::unique_ptr<Instance>& GetInstanceHolder() {
-  static std::unique_ptr<Instance> instance = std::make_unique<Instance>();
-  return instance;
-}
+static wpi::ManagedStatic<Instance> gInst;
 
-static Instance& GetInstance() {
-  return *GetInstanceHolder();
+static inline Instance& GetInstance() {
+  return *gInst;
 }
-
-#ifndef __FRC_ROBORIO__
-namespace frc::impl {
-void ResetSmartDashboardInstance() {
-  std::make_unique<Instance>().swap(GetInstanceHolder());
-}
-}  // namespace frc::impl
-#endif
-
-static bool gReported = false;
 
 void SmartDashboard::init() {
   GetInstance();
@@ -76,24 +66,23 @@ bool SmartDashboard::IsPersistent(std::string_view key) {
 }
 
 nt::NetworkTableEntry SmartDashboard::GetEntry(std::string_view key) {
-  if (!gReported) {
+  auto& inst = GetInstance();
+  if (!inst.reported.exchange(true)) {
     HAL_Report(HALUsageReporting::kResourceType_SmartDashboard,
                HALUsageReporting::kSmartDashboard_Instance);
-    gReported = true;
   }
-  return GetInstance().table->GetEntry(key);
+  return inst.table->GetEntry(key);
 }
 
 void SmartDashboard::PutData(std::string_view key, wpi::Sendable* data) {
   if (!data) {
     throw FRC_MakeError(err::NullParameter, "value");
   }
-  if (!gReported) {
+  auto& inst = GetInstance();
+  if (!inst.reported.exchange(true)) {
     HAL_Report(HALUsageReporting::kResourceType_SmartDashboard,
                HALUsageReporting::kSmartDashboard_Instance);
-    gReported = true;
   }
-  auto& inst = GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
   auto& uid = inst.tablesToData[key];
   wpi::Sendable* sddata = wpi::SendableRegistry::GetSendable(uid);
