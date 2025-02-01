@@ -58,4 +58,4 @@ class FileLogger {
   std::thread m_thread;
 #endif
 };
-}  // namespace wpi
+}  // namespace wpi::log

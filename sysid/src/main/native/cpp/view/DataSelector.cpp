@@ -11,10 +11,10 @@
 
 #include <fmt/format.h>
 #include <imgui.h>
-#include <wpi/datalog/DataLogReader.h>
-#include <wpi/datalog/DataLogReaderThread.h>
 #include <wpi/Logger.h>
 #include <wpi/StringExtras.h>
+#include <wpi/datalog/DataLogReader.h>
+#include <wpi/datalog/DataLogReaderThread.h>
 
 #include "sysid/Util.h"
 #include "sysid/analysis/AnalysisType.h"

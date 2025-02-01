@@ -24,12 +24,12 @@
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
 #include <portable-file-dialogs.h>
-#include <wpi/datalog/DataLogReaderThread.h>
 #include <wpi/DenseMap.h>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/SmallVector.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
+#include <wpi/datalog/DataLogReaderThread.h>
 #include <wpi/fmt/raw_ostream.h>
 #include <wpi/fs.h>
 #include <wpi/mutex.h>

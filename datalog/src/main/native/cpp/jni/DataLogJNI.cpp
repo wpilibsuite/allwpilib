@@ -11,10 +11,10 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/datalog/FileLogger.h>
 #include <wpi/datalog/DataLog.h>
 #include <wpi/datalog/DataLogBackgroundWriter.h>
 #include <wpi/datalog/DataLogWriter.h>
+#include <wpi/datalog/FileLogger.h>
 #include <wpi/jni_util.h>
 
 #include "edu_wpi_first_datalog_DataLogJNI.h"
@@ -707,8 +707,8 @@ Java_edu_wpi_first_datalog_DataLogJNI_createFileLogger
     wpi::ThrowNullPointerException(env, "key is null");
     return 0;
   }
-  return reinterpret_cast<jlong>(
-      new wpi::log::FileLogger{JStringRef{env, file}, *f, JStringRef{env, key}});
+  return reinterpret_cast<jlong>(new wpi::log::FileLogger{
+      JStringRef{env, file}, *f, JStringRef{env, key}});
 }
 
 /*

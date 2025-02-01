@@ -15,11 +15,11 @@
 #include <fmt/chrono.h>
 #include <hal/UsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/SafeThread.h>
+#include <wpi/StringExtras.h>
 #include <wpi/datalog/DataLog.h>
 #include <wpi/datalog/DataLogBackgroundWriter.h>
 #include <wpi/datalog/FileLogger.h>
-#include <wpi/SafeThread.h>
-#include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>

@@ -12,8 +12,8 @@
 #include <vector>
 
 #include <glass/View.h>
-#include <wpi/datalog/DataLogReaderThread.h>
 #include <wpi/StringMap.h>
+#include <wpi/datalog/DataLogReaderThread.h>
 
 #include "sysid/analysis/Storage.h"
 

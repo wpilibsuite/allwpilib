@@ -99,4 +99,4 @@ std::function<void(std::string_view)> FileLogger::Buffer(
     buf.append(leftover.begin(), leftover.end());
   };
 }
-}  // namespace wpi
+}  // namespace wpi::log
