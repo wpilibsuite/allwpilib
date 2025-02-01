@@ -26,6 +26,7 @@ java_library(
     deps = [
         "//cameraserver:cameraserver-java",
         "//cscore:cscore-java",
+        "//datalog:datalog-java",
         "//hal:hal-java",
         "//ntcore:networktables-java",
         "//wpimath:wpimath-java",

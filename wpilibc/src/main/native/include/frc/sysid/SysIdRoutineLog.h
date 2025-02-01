@@ -15,7 +15,7 @@
 #include <units/length.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/DataLog.h>
+#include <wpi/datalog/DataLog.h>
 
 namespace frc::sysid {
 

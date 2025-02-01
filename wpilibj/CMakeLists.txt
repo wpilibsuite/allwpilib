@@ -41,6 +41,7 @@ if(WITH_JAVA)
             wpimath_jar
             wpiunits_jar
             wpiutil_jar
+            datalog_jar
         OUTPUT_NAME wpilibj
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )

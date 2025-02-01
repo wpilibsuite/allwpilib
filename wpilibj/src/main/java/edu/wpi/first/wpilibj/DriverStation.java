@@ -4,6 +4,11 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.datalog.BooleanArrayLogEntry;
+import edu.wpi.first.datalog.BooleanLogEntry;
+import edu.wpi.first.datalog.DataLog;
+import edu.wpi.first.datalog.FloatArrayLogEntry;
+import edu.wpi.first.datalog.IntegerArrayLogEntry;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.hal.DriverStationJNI;
@@ -16,11 +21,6 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.util.EventVector;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.util.datalog.BooleanArrayLogEntry;
-import edu.wpi.first.util.datalog.BooleanLogEntry;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.FloatArrayLogEntry;
-import edu.wpi.first.util.datalog.IntegerArrayLogEntry;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Optional;

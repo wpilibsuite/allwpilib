@@ -26,7 +26,7 @@ target_include_directories(
 )
 wpilib_target_warnings(ntcore)
 target_compile_features(ntcore PUBLIC cxx_std_20)
-target_link_libraries(ntcore PUBLIC wpinet wpiutil)
+target_link_libraries(ntcore PUBLIC wpinet wpiutil datalog)
 
 set_property(TARGET ntcore PROPERTY FOLDER "libraries")
 
@@ -53,7 +53,7 @@ if(WITH_JAVA)
     add_jar(
         ntcore_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS wpiutil_jar ${QUICKBUF_JAR}
+        INCLUDE_JARS wpiutil_jar ${QUICKBUF_JAR} datalog_jar
         OUTPUT_NAME ntcore
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS ntcore_jni_headers

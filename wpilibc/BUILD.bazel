@@ -40,6 +40,7 @@ cc_library(
         ":generated_cc_headers",
         "//cameraserver:cameraserver.static",
         "//cscore:cscore.static",
+        "//datalog:datalog.static",
         "//hal:wpiHal.static",
         "//ntcore:ntcore.static",
         "//wpimath:wpimath.static",
