@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ryan Blue <ryanzblue@gmail.com>
 Date: Fri, 23 Aug 2024 02:50:24 -0400
-Subject: [PATCH 8/8] Remove GCC diagnostic pragmas on windows
+Subject: [PATCH 08/17] Remove GCC diagnostic pragmas on windows
 
 ---
  common/pthreads_cross.c | 3 ---
