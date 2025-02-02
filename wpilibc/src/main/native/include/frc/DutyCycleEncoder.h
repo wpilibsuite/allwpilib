@@ -22,7 +22,7 @@ class DigitalSource;
  * PWM Output, the CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag
  * Encoder.
  *
- * @warning By default, position readings from Get() will be innacurate for up
+ * @warning By default, position readings from Get() will be inaccurate for up
  * to 2 seconds after this object is initialized. Setting the frequency of the
  * encoder's output using {@link #setAssumedFrequency(double)} can be used to
  * mitigate this, though users should verify the true frequency of the specific
@@ -199,12 +199,12 @@ class DutyCycleEncoder : public wpi::Sendable,
   void SetConnectedFrequencyThreshold(int frequency);
 
   /**
-   * Get the encoder value in rotations.
+   * Get the encoder value.
    *
    * @warning This will return inaccurate values for up to 2 seconds after this
    * encoder is initialized unless SetAssumedFrequency() is used.
    *
-   * @return the encoder value in rotations
+   * @return the encoder value scaled by the full range input
    */
   double Get() const;
 

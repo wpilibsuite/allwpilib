@@ -16,7 +16,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with PWM Output, the
  * CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag Encoder.
  *
- * <p><b>Warning: By default, position readings from {@link #get()} will be innacurate for up to 2
+ * <p><b>Warning: By default, position readings from {@link #get()} will be inaccurate for up to 2
  * seconds after this encoder is initialized.</b> Setting the frequency of the encoder's output
  * using {@link #setAssumedFrequency(double)} can be used to mitigate this, though users should
  * verify the true frequency of the specific encoder in use as it can vary between devices.
@@ -142,12 +142,12 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get the encoder value in rotations.
+   * Get the encoder value.
    *
    * <p><b> Warning: This will return inaccurate values for up to 2 seconds after this encoder is
    * initialized unless {@link #setAssumedFrequency(double)} is used.</b>
    *
-   * @return the encoder value in rotations
+   * @return the encoder value scaled by the full range input
    */
   public double get() {
     if (m_simPosition != null) {
