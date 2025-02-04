@@ -18,9 +18,6 @@ runs:
         wget https://github.com/HebiRobotics/QuickBuffers/releases/download/1.3.3/protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
         chmod +x protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
       shell: bash
-    - name: Regenerate hal
-      run: ./hal/generate_usage_reporting.py
-      shell: bash
 
     - name: Regenerate ntcore
       run: ./ntcore/generate_topics.py

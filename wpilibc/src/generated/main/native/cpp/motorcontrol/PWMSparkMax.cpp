@@ -6,7 +6,7 @@
 
 #include "frc/motorcontrol/PWMSparkMax.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 using namespace frc;
 
@@ -16,5 +16,5 @@ PWMSparkMax::PWMSparkMax(int channel) : PWMMotorController("PWMSparkMax", channe
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_RevSparkMaxPWM, GetChannel() + 1);
+  HAL_ReportUsage("RevSparkMaxPWM", GetChannel() + 1, "");
 }

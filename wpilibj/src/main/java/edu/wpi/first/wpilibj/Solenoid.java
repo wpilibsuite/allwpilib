@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
@@ -56,7 +55,7 @@ public class Solenoid implements Sendable, AutoCloseable {
       throw new AllocationException("Solenoid already allocated");
     }
 
-    HAL.report(tResourceType.kResourceType_Solenoid, channel + 1, m_module.getModuleNumber() + 1);
+    HAL.reportUsage("Solenoid[" + m_module.getModuleNumber() + "][" + channel + "]", "");
     SendableRegistry.add(this, "Solenoid", m_module.getModuleNumber(), channel);
   }
 

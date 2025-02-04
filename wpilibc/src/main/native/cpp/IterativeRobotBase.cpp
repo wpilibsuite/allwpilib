@@ -7,7 +7,6 @@
 #include <frc/DriverStation.h>
 
 #include <hal/DriverStation.h>
-#include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/print.h>
 

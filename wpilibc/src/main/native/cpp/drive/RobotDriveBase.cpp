@@ -8,8 +8,6 @@
 #include <cmath>
 #include <cstddef>
 
-#include <hal/FRCUsageReporting.h>
-
 #include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;

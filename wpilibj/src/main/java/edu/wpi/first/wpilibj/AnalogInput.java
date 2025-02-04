@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.AnalogJNI;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.util.sendable.Sendable;
@@ -40,7 +39,7 @@ public class AnalogInput implements Sendable, AutoCloseable {
 
     m_port = AnalogJNI.initializeAnalogInputPort(channel);
 
-    HAL.report(tResourceType.kResourceType_AnalogChannel, channel + 1);
+    HAL.reportUsage("AnalogInput", channel, "");
     SendableRegistry.add(this, "AnalogInput", channel);
   }
 

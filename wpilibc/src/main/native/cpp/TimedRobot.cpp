@@ -10,8 +10,8 @@
 #include <utility>
 
 #include <hal/DriverStation.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/Notifier.h>
+#include <hal/UsageReporting.h>
 
 #include "frc/Errors.h"
 
@@ -87,8 +87,7 @@ TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   FRC_CheckErrorStatus(status, "InitializeNotifier");
   HAL_SetNotifierName(m_notifier, "TimedRobot", &status);
 
-  HAL_Report(HALUsageReporting::kResourceType_Framework,
-             HALUsageReporting::kFramework_Timed);
+  HAL_ReportUsage("Framework", "TimedRobot");
 }
 
 TimedRobot::~TimedRobot() {

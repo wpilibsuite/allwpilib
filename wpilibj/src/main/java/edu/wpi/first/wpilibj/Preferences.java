@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
@@ -51,7 +50,7 @@ public final class Preferences {
 
   static {
     setNetworkTableInstance(NetworkTableInstance.getDefault());
-    HAL.report(tResourceType.kResourceType_Preferences, 0);
+    HAL.reportUsage("Preferences", "");
   }
 
   /**

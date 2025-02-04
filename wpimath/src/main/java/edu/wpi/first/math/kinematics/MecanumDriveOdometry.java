@@ -5,7 +5,6 @@
 package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
@@ -31,7 +30,7 @@ public class MecanumDriveOdometry extends Odometry<MecanumDriveWheelPositions> {
       MecanumDriveWheelPositions wheelPositions,
       Pose2d initialPoseMeters) {
     super(kinematics, gyroAngle, wheelPositions, initialPoseMeters);
-    MathSharedStore.reportUsage(MathUsageId.kOdometry_MecanumDrive, 1);
+    MathSharedStore.reportUsage("Odometry_MecanumDrive", "");
   }
 
   /**

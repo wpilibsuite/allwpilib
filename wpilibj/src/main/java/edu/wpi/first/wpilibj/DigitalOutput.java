@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DIOJNI;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.util.sendable.Sendable;
@@ -36,7 +35,7 @@ public class DigitalOutput implements AutoCloseable, Sendable {
 
     m_handle = DIOJNI.initializeDIOPort(channel, false);
 
-    HAL.report(tResourceType.kResourceType_DigitalOutput, channel + 1);
+    HAL.reportUsage("DigitalOutput", channel, "");
     SendableRegistry.add(this, "DigitalOutput", channel);
   }
 

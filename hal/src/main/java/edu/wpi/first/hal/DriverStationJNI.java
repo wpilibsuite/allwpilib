@@ -10,7 +10,6 @@ import java.nio.ByteBuffer;
  * Driver Station JNI Functions.
  *
  * @see "hal/DriverStation.h"
- * @see "hal/FRCUsageReporting.h"
  */
 public class DriverStationJNI extends JNIWrapper {
   /**
@@ -61,53 +60,6 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_ObserveUserProgramTest"
    */
   public static native void observeUserProgramTest();
-
-  /**
-   * Report the usage of a resource of interest.
-   *
-   * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
-   * char*)</code>
-   *
-   * @param resource one of the values in the tResourceType above.
-   * @param instanceNumber an index that identifies the resource instance.
-   * @see "HAL_Report"
-   */
-  public static void report(int resource, int instanceNumber) {
-    report(resource, instanceNumber, 0, "");
-  }
-
-  /**
-   * Report the usage of a resource of interest.
-   *
-   * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
-   * char*)</code>
-   *
-   * @param resource one of the values in the tResourceType above.
-   * @param instanceNumber an index that identifies the resource instance.
-   * @param context an optional additional context number for some cases (such as module number).
-   *     Set to 0 to omit.
-   * @see "HAL_Report"
-   */
-  public static void report(int resource, int instanceNumber, int context) {
-    report(resource, instanceNumber, context, "");
-  }
-
-  /**
-   * Report the usage of a resource of interest.
-   *
-   * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
-   * char*)</code>
-   *
-   * @param resource one of the values in the tResourceType above.
-   * @param instanceNumber an index that identifies the resource instance.
-   * @param context an optional additional context number for some cases (such as module number).
-   *     Set to 0 to omit.
-   * @param feature a string to be included describing features in use on a specific resource.
-   *     Setting the same resource more than once allows you to change the feature string.
-   * @return the index of the added value in NetComm
-   * @see "HAL_Report"
-   */
-  public static native int report(int resource, int instanceNumber, int context, String feature);
 
   /**
    * Gets the current control word of the driver station.

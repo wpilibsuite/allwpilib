@@ -6,7 +6,7 @@
 
 #include "frc/motorcontrol/PWMVictorSPX.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 using namespace frc;
 
@@ -16,5 +16,5 @@ PWMVictorSPX::PWMVictorSPX(int channel) : PWMMotorController("PWMVictorSPX", cha
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_PWMVictorSPX, GetChannel() + 1);
+  HAL_ReportUsage("PWMVictorSPX", GetChannel() + 1, "");
 }

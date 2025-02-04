@@ -7,7 +7,6 @@ package edu.wpi.first.math.kinematics;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.proto.DifferentialDriveKinematicsProto;
 import edu.wpi.first.math.kinematics.struct.DifferentialDriveKinematicsStruct;
@@ -47,7 +46,7 @@ public class DifferentialDriveKinematics
    */
   public DifferentialDriveKinematics(double trackWidthMeters) {
     this.trackWidthMeters = trackWidthMeters;
-    MathSharedStore.reportUsage(MathUsageId.kKinematics_DifferentialDrive, 1);
+    MathSharedStore.reportUsage("Kinematics_DifferentialDrive", "");
   }
 
   /**

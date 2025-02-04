@@ -6,7 +6,7 @@
 
 #include "frc/motorcontrol/Victor.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 using namespace frc;
 
@@ -16,5 +16,5 @@ Victor::Victor(int channel) : PWMMotorController("Victor", channel) {
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_Victor, GetChannel() + 1);
+  HAL_ReportUsage("Victor", GetChannel() + 1, "");
 }

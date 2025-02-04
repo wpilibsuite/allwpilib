@@ -6,7 +6,7 @@
 
 #include "frc/motorcontrol/Talon.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 using namespace frc;
 
@@ -16,5 +16,5 @@ Talon::Talon(int channel) : PWMMotorController("Talon", channel) {
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_Talon, GetChannel() + 1);
+  HAL_ReportUsage("Talon", GetChannel() + 1, "");
 }
