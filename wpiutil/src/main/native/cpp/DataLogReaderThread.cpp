@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/support/DataLogReaderThread.h"
-
-#include <string>
-#include <utility>
+#include "wpi/DataLogReaderThread.h"
 
 #include <wpi/StringExtras.h>
 #include <wpi/print.h>
 
-using namespace glass;
+#include <string>
+#include <utility>
+
+using namespace wpi;
 
 DataLogReaderThread::~DataLogReaderThread() {
   if (m_thread.joinable()) {
