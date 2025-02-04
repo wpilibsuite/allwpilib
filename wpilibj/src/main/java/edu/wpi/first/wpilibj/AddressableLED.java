@@ -24,7 +24,7 @@ import edu.wpi.first.hal.PWMJNI;
 public class AddressableLED implements AutoCloseable {
 
   /** Order that color data is sent over the wire. */
-  enum ColorOrder {
+  public enum ColorOrder {
     /** RGB order. */
     kRGB(AddressableLEDJNI.COLOR_ORDER_RGB),
     /** RBG order. */
