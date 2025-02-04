@@ -106,8 +106,10 @@ void Application(std::string_view saveDir) {
   auto analyzer = std::make_unique<sysid::Analyzer>(storage, gLogger);
 
   logLoader->unload.connect([ds = dataSelector.get()] { ds->Reset(); });
-  dataSelector->testdata = [_analyzer = analyzer.get()](auto data) {
+  dataSelector->testdata = [_analyzer = analyzer.get(),
+                            ds = dataSelector.get()](auto data) {
     _analyzer->m_data = data;
+    _analyzer->SetMissingTests(ds->m_missingTests);
     _analyzer->AnalyzeData();
   };
 

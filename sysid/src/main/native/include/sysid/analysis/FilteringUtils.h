@@ -4,15 +4,16 @@
 
 #pragma once
 
-#include <cmath>
 #include <exception>
 #include <functional>
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 #include <frc/filter/LinearFilter.h>
 #include <units/time.h>
 #include <wpi/StringMap.h>
@@ -66,6 +67,25 @@ class NoQuasistaticDataError : public std::exception {
            "your units and test data to make sure that the robot is reporting "
            "reasonable values.";
   }
+};
+
+/**
+ * Exception for not all tests being present.
+ */
+class MissingTestsError : public std::exception {
+ public:
+  explicit MissingTestsError(std::vector<std::string> MissingTests)
+      : missingTests(std::move(MissingTests)) {
+    errorString = fmt::format(
+        "The following tests were not detected: {}. Make sure to perform all "
+        "four tests as described in the SysId documentation.",
+        fmt::join(missingTests, ", "));
+  }
+  const char* what() const noexcept override { return errorString.c_str(); }
+
+ private:
+  std::vector<std::string> missingTests;
+  std::string errorString;
 };
 
 /**
