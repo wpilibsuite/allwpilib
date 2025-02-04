@@ -8,7 +8,7 @@
 {%- endmacro %}
 #include "frc/{{ ConsoleName }}Controller.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/event/BooleanEvent.h"
@@ -16,7 +16,7 @@
 using namespace frc;
 
 {{ ConsoleName }}Controller::{{ ConsoleName }}Controller(int port) : GenericHID(port) {
-  {{ "// " if SkipReporting }}HAL_Report(HALUsageReporting::kResourceType_{{ ConsoleName }}Controller, port + 1);
+  HAL_ReportUsage("{{ ConsoleName }}Controller", port + 1, "");
 }
 {% for stick in sticks %}
 double {{ ConsoleName }}Controller::Get{{ stick.NameParts|map("capitalize")|join }}() const {

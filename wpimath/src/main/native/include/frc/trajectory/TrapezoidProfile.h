@@ -69,8 +69,8 @@ class TrapezoidProfile {
      */
     constexpr Constraints() {
       if (!std::is_constant_evaluated()) {
-        wpi::math::MathSharedStore::ReportUsage(
-            wpi::math::MathUsageId::kTrajectory_TrapezoidProfile, 1);
+        wpi::math::MathSharedStore::ReportUsage("Trajectory_TrapezoidProfile",
+                                                "");
       }
     }
 
@@ -84,8 +84,8 @@ class TrapezoidProfile {
                           Acceleration_t maxAcceleration)
         : maxVelocity{maxVelocity}, maxAcceleration{maxAcceleration} {
       if (!std::is_constant_evaluated()) {
-        wpi::math::MathSharedStore::ReportUsage(
-            wpi::math::MathUsageId::kTrajectory_TrapezoidProfile, 1);
+        wpi::math::MathSharedStore::ReportUsage("Trajectory_TrapezoidProfile",
+                                                "");
       }
     }
   };

@@ -5,7 +5,6 @@
 package edu.wpi.first.math.filter;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.util.DoubleCircularBuffer;
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
@@ -73,7 +72,7 @@ public class LinearFilter {
     m_outputGains = Arrays.copyOf(fbGains, fbGains.length);
 
     instances++;
-    MathSharedStore.reportUsage(MathUsageId.kFilter_Linear, instances);
+    MathSharedStore.reportUsageCount("Filter_Linear", instances);
   }
 
   /**

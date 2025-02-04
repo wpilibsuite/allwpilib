@@ -6,10 +6,10 @@
 
 #include <utility>
 
-#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
+#include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -37,7 +37,7 @@ PWM::PWM(int channel, bool registerSendable) {
   HAL_SetPWMEliminateDeadband(m_handle, false, &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
-  HAL_Report(HALUsageReporting::kResourceType_PWM, channel + 1);
+  HAL_ReportUsage("PWM", channel, "");
   if (registerSendable) {
     wpi::SendableRegistry::Add(this, "PWM", channel);
   }

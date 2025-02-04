@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 #include "frc/event/BooleanEvent.h"
 
@@ -19,7 +19,7 @@ Joystick::Joystick(int port) : GenericHID(port) {
   m_axes[Axis::kTwist] = kDefaultTwistChannel;
   m_axes[Axis::kThrottle] = kDefaultThrottleChannel;
 
-  HAL_Report(HALUsageReporting::kResourceType_Joystick, port + 1);
+  HAL_ReportUsage("Joystick", port, "");
 }
 
 void Joystick::SetXChannel(int channel) {

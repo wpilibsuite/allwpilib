@@ -6,8 +6,7 @@
 
 package edu.wpi.first.wpilibj;
 
-// import edu.wpi.first.hal.FRCNetComm.tResourceType;
-// import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
@@ -123,7 +122,7 @@ public class StadiaController extends GenericHID implements Sendable {
    */
   public StadiaController(final int port) {
     super(port);
-    // HAL.report(tResourceType.kResourceType_StadiaController, port + 1);
+    HAL.reportUsage("StadiaController", port + 1, "");
   }
 
   /**

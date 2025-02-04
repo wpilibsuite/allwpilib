@@ -8,7 +8,7 @@
 #include <utility>
 
 #include <hal/Encoder.h>
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -172,8 +172,9 @@ void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
       static_cast<HAL_EncoderEncodingType>(encodingType), &status);
   FRC_CheckErrorStatus(status, "InitEncoder");
 
-  HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex() + 1,
-             encodingType);
+  HAL_ReportUsage(
+      fmt::format("Encoder[{},{}]", aChannel, bChannel),
+      fmt::format("{{\"type\":{}}}", static_cast<int>(encodingType)));
   // wpi::SendableRegistry::Add(this, "Encoder", m_aSource->GetChannel());
 }
 

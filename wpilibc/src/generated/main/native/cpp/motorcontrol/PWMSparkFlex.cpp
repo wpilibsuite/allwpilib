@@ -6,7 +6,7 @@
 
 #include "frc/motorcontrol/PWMSparkFlex.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 using namespace frc;
 
@@ -16,5 +16,5 @@ PWMSparkFlex::PWMSparkFlex(int channel) : PWMMotorController("PWMSparkFlex", cha
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_RevSparkFlexPWM, GetChannel() + 1);
+  HAL_ReportUsage("RevSparkFlexPWM", GetChannel() + 1, "");
 }

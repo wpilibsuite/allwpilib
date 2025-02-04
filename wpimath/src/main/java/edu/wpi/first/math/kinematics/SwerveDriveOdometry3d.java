@@ -5,7 +5,6 @@
 package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -46,7 +45,7 @@ public class SwerveDriveOdometry3d extends Odometry3d<SwerveModulePosition[]> {
 
     m_numModules = modulePositions.length;
 
-    MathSharedStore.reportUsage(MathUsageId.kOdometry_SwerveDrive, 1);
+    MathSharedStore.reportUsage("Odometry_SwerveDrive", "");
   }
 
   /**

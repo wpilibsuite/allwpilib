@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -25,7 +24,7 @@ public class AnalogAccelerometer implements Sendable, AutoCloseable {
 
   /** Common initialization. */
   private void initAccelerometer() {
-    HAL.report(tResourceType.kResourceType_Accelerometer, m_analogChannel.getChannel() + 1);
+    HAL.reportUsage("Accelerometer", m_analogChannel.getChannel(), "");
     SendableRegistry.add(this, "Accelerometer", m_analogChannel.getChannel());
   }
 

@@ -13,28 +13,14 @@
 
 namespace wpi::math {
 
-enum class MathUsageId {
-  kKinematics_DifferentialDrive,
-  kKinematics_MecanumDrive,
-  kKinematics_SwerveDrive,
-  kTrajectory_TrapezoidProfile,
-  kFilter_Linear,
-  kOdometry_DifferentialDrive,
-  kOdometry_SwerveDrive,
-  kOdometry_MecanumDrive,
-  kController_PIDController2,
-  kController_ProfiledPIDController,
-  kController_BangBangController,
-  kTrajectory_PathWeaver,
-};
-
 class WPILIB_DLLEXPORT MathShared {
  public:
   virtual ~MathShared() = default;
   virtual void ReportErrorV(fmt::string_view format, fmt::format_args args) = 0;
   virtual void ReportWarningV(fmt::string_view format,
                               fmt::format_args args) = 0;
-  virtual void ReportUsage(MathUsageId id, int count) = 0;
+  virtual void ReportUsage(std::string_view resource, std::string_view data) = 0;
+  virtual void ReportUsageCount(std::string_view resource, int count) = 0;
   virtual units::second_t GetTimestamp() = 0;
 
   template <typename S, typename... Args>
@@ -72,8 +58,12 @@ class WPILIB_DLLEXPORT MathSharedStore {
     ReportWarningV(format, fmt::make_format_args(args...));
   }
 
-  static void ReportUsage(MathUsageId id, int count) {
-    GetMathShared().ReportUsage(id, count);
+  static void ReportUsage(std::string_view resource, std::string_view data) {
+    GetMathShared().ReportUsage(resource, data);
+  }
+
+  static void ReportUsageCount(std::string_view resource, int count) {
+    GetMathShared().ReportUsageCount(resource, count);
   }
 
   static units::second_t GetTimestamp() {

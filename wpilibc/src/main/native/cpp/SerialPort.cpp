@@ -6,8 +6,8 @@
 
 #include <string>
 
-#include <hal/FRCUsageReporting.h>
 #include <hal/SerialPort.h>
+#include <hal/UsageReporting.h>
 
 #include "frc/Errors.h"
 
@@ -39,8 +39,7 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
 
   DisableTermination();
 
-  HAL_Report(HALUsageReporting::kResourceType_SerialPort,
-             static_cast<uint8_t>(port) + 1);
+  HAL_ReportUsage("SerialPort", static_cast<int>(port), "");
 }
 
 SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
@@ -70,8 +69,7 @@ SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
 
   DisableTermination();
 
-  HAL_Report(HALUsageReporting::kResourceType_SerialPort,
-             static_cast<uint8_t>(port) + 1);
+  HAL_ReportUsage("SerialPort", static_cast<int>(port), "");
 }
 
 void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {

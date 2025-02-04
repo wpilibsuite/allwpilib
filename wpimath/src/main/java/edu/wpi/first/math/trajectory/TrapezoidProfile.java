@@ -5,7 +5,6 @@
 package edu.wpi.first.math.trajectory;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
 import java.util.Objects;
 
 /**
@@ -66,7 +65,7 @@ public class TrapezoidProfile {
     public Constraints(double maxVelocity, double maxAcceleration) {
       this.maxVelocity = maxVelocity;
       this.maxAcceleration = maxAcceleration;
-      MathSharedStore.reportUsage(MathUsageId.kTrajectory_TrapezoidProfile, 1);
+      MathSharedStore.reportUsage("Trajectory_TrapezoidProfile", "");
     }
   }
 

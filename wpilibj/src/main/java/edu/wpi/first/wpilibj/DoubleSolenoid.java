@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
@@ -95,10 +94,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
       }
       allocatedSolenoids = true;
 
-      HAL.report(
-          tResourceType.kResourceType_Solenoid, forwardChannel + 1, m_module.getModuleNumber() + 1);
-      HAL.report(
-          tResourceType.kResourceType_Solenoid, reverseChannel + 1, m_module.getModuleNumber() + 1);
+      HAL.reportUsage("DoubleSolenoid[" + m_module.getModuleNumber() + "][" + forwardChannel + "," + reverseChannel + "]", "");
       SendableRegistry.add(this, "DoubleSolenoid", m_module.getModuleNumber(), forwardChannel);
       successfulCompletion = true;
     } finally {

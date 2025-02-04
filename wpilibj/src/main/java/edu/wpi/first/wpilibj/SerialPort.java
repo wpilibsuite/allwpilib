@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SerialPortJNI;
 import java.nio.charset.StandardCharsets;
@@ -134,7 +133,7 @@ public class SerialPort implements AutoCloseable {
 
     disableTermination();
 
-    HAL.report(tResourceType.kResourceType_SerialPort, port.value + 1);
+    HAL.reportUsage("SerialPort", port.value, "");
   }
 
   /**

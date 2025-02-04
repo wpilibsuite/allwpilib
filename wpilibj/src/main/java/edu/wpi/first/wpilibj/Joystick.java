@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
@@ -84,7 +83,7 @@ public class Joystick extends GenericHID {
     m_axes[AxisType.kTwist.value] = kDefaultTwistChannel;
     m_axes[AxisType.kThrottle.value] = kDefaultThrottleChannel;
 
-    HAL.report(tResourceType.kResourceType_Joystick, port + 1);
+    HAL.reportUsage("Joystick", port, "");
   }
 
   /**
