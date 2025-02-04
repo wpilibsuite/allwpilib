@@ -11,7 +11,8 @@
 // Timing info
 // https://developer.arm.com/documentation/ddi0409/i/instruction-timing/instruction-specific-scheduling/advanced-simd-load-store-instructions?lang=en
 
-namespace {
+namespace hal::detail {
+
 using namespace Simd::Neon;
 
 template <typename T>
@@ -269,4 +270,4 @@ void ConvertPixels(const uint8_t* src, uint8_t* dst, size_t pixelCount) {
     ConvertPixels<order, false, false>(src, dst, pixelCount);
   }
 }
-}  // namespace
+} // namespace hal::detail

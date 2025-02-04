@@ -22,6 +22,7 @@
 #include "hal/handles/LimitedHandleResource.h"
 
 using namespace hal;
+using namespace hal::detail;
 
 namespace {
 struct AddressableLED {
