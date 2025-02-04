@@ -171,4 +171,47 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
           }
         });
   }
+
+  /**
+   * Constructs a SendableChooser for an enum type. The returned chooser contains an option for each
+   * value of the enum.
+   *
+   * <p>Example:
+   *
+   * <pre>
+   * {@code SendableChooser<MyEnum> chooser = SendableChooser.forEnum(MyEnum.class); }
+   * </pre>
+   *
+   * @param <V> The enum type
+   * @param cls The class of the enum type
+   * @return A sendable chooser containing an options for each enum value.
+   */
+  public static <V extends Enum<V>> SendableChooser<V> forEnum(Class<V> cls) {
+    SendableChooser<V> chooser = new SendableChooser<>();
+    for (V value : cls.getEnumConstants()) {
+      chooser.addOption(value.name(), value);
+    }
+    return chooser;
+  }
+
+  /**
+   * Constructs a SendableChooser for an enum type, with a default option set. The returned chooser
+   * contains an option for each value of the enum.
+   *
+   * <p>Example:
+   *
+   * <pre>
+   * {@code SendableChooser<MyEnum> chooser = SendableChooser.forEnum(MyEnum.class, MyEnum.kOne); }
+   * </pre>
+   *
+   * @param <V> The enum type
+   * @param cls The class of the enum type
+   * @param defaultValue the default option
+   * @return A sendable chooser containing options for each enum value.
+   */
+  public static <V extends Enum<V>> SendableChooser<V> forEnum(Class<V> cls, V defaultValue) {
+    SendableChooser<V> chooser = forEnum(cls);
+    chooser.setDefaultOption(defaultValue.name(), defaultValue);
+    return chooser;
+  }
 }
