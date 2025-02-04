@@ -24,7 +24,7 @@ namespace frc {
  * By default, the timing supports WS2812B and WS2815 LEDs, but is configurable
  * using SetBitTiming()
  *
- * Some LEDs use a different color order than the default RGB. The color order
+ * Some LEDs use a different color order than the default GRB. The color order
  * is configurable using SetColorOrder().
  *
  * <p>Only 1 LED driver is currently supported by the roboRIO. However,

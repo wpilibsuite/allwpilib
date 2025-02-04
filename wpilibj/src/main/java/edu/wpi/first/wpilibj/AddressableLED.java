@@ -15,7 +15,7 @@ import edu.wpi.first.hal.PWMJNI;
  * <p>By default, the timing supports WS2812B and WS2815 LEDs, but is configurable using {@link
  * #setBitTiming(int, int, int, int)}
  *
- * <p>Some LEDs use a different color order than the default RGB. The color order is configurable
+ * <p>Some LEDs use a different color order than the default GRB. The color order is configurable
  * using {@link #setColorOrder(ColorOrder)}.
  *
  * <p>Only 1 LED driver is currently supported by the roboRIO. However, multiple LED strips can be
@@ -58,7 +58,7 @@ public class AddressableLED implements AutoCloseable {
         case AddressableLEDJNI.COLOR_ORDER_GRB -> kGRB;
         case AddressableLEDJNI.COLOR_ORDER_GBR -> kGBR;
         case AddressableLEDJNI.COLOR_ORDER_RGB -> kRGB;
-        default -> kRGB;
+        default -> kGRB;
       };
     }
   }
