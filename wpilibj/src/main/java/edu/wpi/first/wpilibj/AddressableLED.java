@@ -22,7 +22,6 @@ import edu.wpi.first.hal.PWMJNI;
  * connected in series and controlled from the single driver.
  */
 public class AddressableLED implements AutoCloseable {
-
   /** Order that color data is sent over the wire. */
   public enum ColorOrder {
     /** RGB order. */
@@ -90,6 +89,8 @@ public class AddressableLED implements AutoCloseable {
 
   /**
    * Sets the color order for this AddressableLED. The default order is GRB.
+   *
+   * <p>This will take effect on the next call to {@link #setData(AddressableLEDBuffer)}.
    *
    * @param order the color order
    */

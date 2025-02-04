@@ -38,7 +38,7 @@ void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle);
 
 /**
  * Sets the color order for the addressable LED output. The default order is
- * GRB.
+ * GRB. This will take effect on the next call to HAL_WriteAddressableLEDData().
  * @param[in] handle the Addressable LED handle
  * @param[in] colorOrder the color order
  * @param[out] status the error code, or 0 for success

@@ -113,6 +113,8 @@ class AddressableLED {
   /**
    * Sets the color order for this AddressableLED. The default order is GRB.
    *
+   * This will take effect on the next call to SetData().
+   *
    * @param order the color order
    */
   void SetColorOrder(ColorOrder order);

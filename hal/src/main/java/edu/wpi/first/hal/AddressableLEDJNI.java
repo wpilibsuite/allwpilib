@@ -37,6 +37,8 @@ public class AddressableLEDJNI extends JNIWrapper {
   /**
    * Sets the color order for the addressable LED output. The default order is GRB.
    *
+   * <p> This will take effect on the next call to {@link #setData(int, byte[])}.
+   *
    * @param handle the Addressable LED handle
    * @param colorOrder the color order
    */
