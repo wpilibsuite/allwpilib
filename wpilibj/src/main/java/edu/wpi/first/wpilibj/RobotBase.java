@@ -41,8 +41,6 @@ public abstract class RobotBase implements AutoCloseable {
 
   private final int m_connListenerHandle;
 
-  private boolean m_dashboardDetected;
-
   private static void setupCameraServerShared() {
     CameraServerShared shared =
         new CameraServerShared() {
@@ -145,31 +143,7 @@ public abstract class RobotBase implements AutoCloseable {
             false,
             event -> {
               if (event.is(NetworkTableEvent.Kind.kConnected)) {
-                if (event.connInfo.remote_id.startsWith("glass")
-                    || event.connInfo.remote_id.startsWith("SmartDashboard")
-                    || event.connInfo.remote_id.startsWith("shuffleboard")
-                    || event.connInfo.remote_id.startsWith("elastic")
-                    || event.connInfo.remote_id.startsWith("Elastic")
-                    || event.connInfo.remote_id.startsWith("Dashboard")
-                    || event.connInfo.remote_id.startsWith("AdvantageScope")
-                    || event.connInfo.remote_id.startsWith("QFRCDashboard")
-                    || event.connInfo.remote_id.startsWith("FRC Web Components")) {
-                  HAL.reportUsage("Dashboard", event.connInfo.remote_id);
-                  m_dashboardDetected = true;
-                } else {
-                  // Only report unknown if there wasn't another dashboard already reported
-                  // (unknown could also be another device)
-                  if (!m_dashboardDetected) {
-                    int delim = event.connInfo.remote_id.indexOf('@');
-                    if (delim != -1) {
-                      HAL.reportUsage(
-                          "Dashboard",
-                          event.connInfo.remote_id.substring(0, delim));
-                    } else {
-                      HAL.reportUsage("Dashboard", event.connInfo.remote_id);
-                    }
-                  }
-                }
+                HAL.reportUsage("NT/" + event.connInfo.remote_id, "");
               }
             });
   }

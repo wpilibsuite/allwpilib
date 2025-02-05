@@ -221,28 +221,7 @@ RobotBase::RobotBase() {
       inst.AddConnectionListener(false, [&](const nt::Event& event) {
         if (event.Is(nt::EventFlags::kConnected)) {
           auto connInfo = event.GetConnectionInfo();
-          if (connInfo->remote_id.starts_with("glass") ||
-              connInfo->remote_id.starts_with("SmartDashboard") ||
-              connInfo->remote_id.starts_with("shuffleboard") ||
-              connInfo->remote_id.starts_with("elastic") ||
-              connInfo->remote_id.starts_with("Elastic") ||
-              connInfo->remote_id.starts_with("Dashboard") ||
-              connInfo->remote_id.starts_with("AdvantageScope") ||
-              connInfo->remote_id.starts_with("QFRCDashboard") ||
-              connInfo->remote_id.starts_with("FRC Web Components")) {
-            HAL_ReportUsage("Dashboard", connInfo->remote_id);
-            m_dashboardDetected = true;
-          } else {
-            if (!m_dashboardDetected) {
-              size_t delim = connInfo->remote_id.find('@');
-              if (delim != std::string::npos) {
-                HAL_ReportUsage("Dashboard",
-                                connInfo->remote_id.substr(0, delim).c_str());
-              } else {
-                HAL_ReportUsage("Dashboard", connInfo->remote_id.c_str());
-              }
-            }
-          }
+          HAL_ReportUsage(fmt::format("NT/{}", connInfo->remote_id), "");
         }
       });
 
