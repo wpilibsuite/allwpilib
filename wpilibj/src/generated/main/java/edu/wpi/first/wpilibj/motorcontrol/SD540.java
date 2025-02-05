@@ -42,6 +42,6 @@ public class SD540 extends PWMMotorController {
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();
 
-    HAL.reportUsage("MindsensorsSD540", getChannel() + 1, "");
+    HAL.reportUsage("MindsensorsSD540", getChannel(), "");
   }
 }

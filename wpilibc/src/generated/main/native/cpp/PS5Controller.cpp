@@ -14,7 +14,7 @@
 using namespace frc;
 
 PS5Controller::PS5Controller(int port) : GenericHID(port) {
-  HAL_ReportUsage("PS5Controller", port + 1, "");
+  HAL_ReportUsage("PS5Controller", port, "");
 }
 
 double PS5Controller::GetLeftX() const {

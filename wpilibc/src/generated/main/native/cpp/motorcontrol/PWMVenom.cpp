@@ -16,5 +16,5 @@ PWMVenom::PWMVenom(int channel) : PWMMotorController("PWMVenom", channel) {
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_ReportUsage("FusionVenom", GetChannel() + 1, "");
+  HAL_ReportUsage("FusionVenom", GetChannel(), "");
 }

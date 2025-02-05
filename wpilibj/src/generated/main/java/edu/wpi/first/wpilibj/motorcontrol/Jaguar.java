@@ -42,6 +42,6 @@ public class Jaguar extends PWMMotorController {
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();
 
-    HAL.reportUsage("Jaguar", getChannel() + 1, "");
+    HAL.reportUsage("Jaguar", getChannel(), "");
   }
 }

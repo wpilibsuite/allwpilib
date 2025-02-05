@@ -16,5 +16,5 @@ Koors40::Koors40(int channel) : PWMMotorController("Koors40", channel) {
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_ReportUsage("Koors40", GetChannel() + 1, "");
+  HAL_ReportUsage("Koors40", GetChannel(), "");
 }

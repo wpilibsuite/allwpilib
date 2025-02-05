@@ -16,5 +16,5 @@ DMC60::DMC60(int channel) : PWMMotorController("DMC60", channel) {
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_ReportUsage("DigilentDMC60", GetChannel() + 1, "");
+  HAL_ReportUsage("DigilentDMC60", GetChannel(), "");
 }

@@ -16,7 +16,7 @@
 using namespace frc;
 
 {{ ConsoleName }}Controller::{{ ConsoleName }}Controller(int port) : GenericHID(port) {
-  HAL_ReportUsage("{{ ConsoleName }}Controller", port + 1, "");
+  HAL_ReportUsage("{{ ConsoleName }}Controller", port, "");
 }
 {% for stick in sticks %}
 double {{ ConsoleName }}Controller::Get{{ stick.NameParts|map("capitalize")|join }}() const {
