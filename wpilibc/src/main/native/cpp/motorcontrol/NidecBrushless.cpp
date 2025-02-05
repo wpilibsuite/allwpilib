@@ -7,7 +7,7 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -26,7 +26,7 @@ NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
   m_dio.SetPWMRate(15625);
   m_dio.EnablePWM(0.5);
 
-  HAL_Report(HALUsageReporting::kResourceType_NidecBrushless, pwmChannel + 1);
+  HAL_ReportUsage("NidecBrushless", pwmChannel, fmt::format("{}", dioChannel));
   wpi::SendableRegistry::Add(this, "Nidec Brushless", pwmChannel);
 }
 

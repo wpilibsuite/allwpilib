@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.sendable.Sendable;
@@ -28,7 +27,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
 
   /** Initialize the gyro. Calibration is handled by calibrate(). */
   private void initGyro() {
-    HAL.report(tResourceType.kResourceType_Gyro, m_analog.getChannel() + 1);
+    HAL.reportUsage("AnalogGyro", m_analog.getChannel(), "");
     SendableRegistry.add(this, "AnalogGyro", m_analog.getChannel());
   }
 

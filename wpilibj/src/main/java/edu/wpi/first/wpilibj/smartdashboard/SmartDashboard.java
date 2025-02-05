@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -67,7 +65,7 @@ public final class SmartDashboard {
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public static synchronized void putData(String key, Sendable data) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_SmartDashboard, tInstances.kSmartDashboard_Instance);
+      HAL.reportUsage("SmartDashboard", "");
       m_reported = true;
     }
     Sendable sddata = tablesToData.get(key);
@@ -121,7 +119,7 @@ public final class SmartDashboard {
    */
   public static NetworkTableEntry getEntry(String key) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_SmartDashboard, tInstances.kSmartDashboard_Instance);
+      HAL.reportUsage("SmartDashboard", "");
       m_reported = true;
     }
     return table.getEntry(key);

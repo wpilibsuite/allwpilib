@@ -5,7 +5,6 @@
 package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.Sendable;
@@ -66,7 +65,7 @@ public class ProfiledPIDController implements Sendable {
     instances++;
 
     SendableRegistry.add(this, "ProfiledPIDController", instances);
-    MathSharedStore.reportUsage(MathUsageId.kController_ProfiledPIDController, instances);
+    MathSharedStore.reportUsageCount("ProfiledPIDController", instances);
   }
 
   /**

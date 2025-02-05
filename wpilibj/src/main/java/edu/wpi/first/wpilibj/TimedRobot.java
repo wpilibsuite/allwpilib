@@ -7,8 +7,6 @@ package edu.wpi.first.wpilibj;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.units.measure.Time;
@@ -92,7 +90,7 @@ public class TimedRobot extends IterativeRobotBase {
     addPeriodic(this::loopFunc, period);
     NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
-    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
+    HAL.reportUsage("Framework", "TimedRobot");
   }
 
   @Override

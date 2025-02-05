@@ -5,7 +5,6 @@
 package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -45,7 +44,7 @@ public class BangBangController implements Sendable {
 
     SendableRegistry.add(this, "BangBangController", instances);
 
-    MathSharedStore.reportUsage(MathUsageId.kController_BangBangController, instances);
+    MathSharedStore.reportUsageCount("BangBangController", instances);
   }
 
   /**

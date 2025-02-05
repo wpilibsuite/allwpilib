@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.PowerDistributionFaults;
 import edu.wpi.first.hal.PowerDistributionJNI;
@@ -53,9 +51,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     if (moduleType == ModuleType.kCTRE) {
-      HAL.report(tResourceType.kResourceType_PDP, tInstances.kPDP_CTRE);
+      HAL.reportUsage("PowerDistribution", m_module, "CTRE");
     } else {
-      HAL.report(tResourceType.kResourceType_PDP, tInstances.kPDP_REV);
+      HAL.reportUsage("PowerDistribution", m_module, "Rev");
     }
     SendableRegistry.add(this, "PowerDistribution", m_module);
   }
@@ -71,9 +69,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     if (PowerDistributionJNI.getType(m_handle) == PowerDistributionJNI.CTRE_TYPE) {
-      HAL.report(tResourceType.kResourceType_PDP, tInstances.kPDP_CTRE);
+      HAL.reportUsage("PowerDistribution", m_module, "CTRE");
     } else {
-      HAL.report(tResourceType.kResourceType_PDP, tInstances.kPDP_REV);
+      HAL.reportUsage("PowerDistribution", m_module, "Rev");
     }
 
     SendableRegistry.add(this, "PowerDistribution", m_module);

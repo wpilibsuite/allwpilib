@@ -53,8 +53,7 @@ class SwerveDriveOdometry3d
       : SwerveDriveOdometry3d::Odometry3d(m_kinematicsImpl, gyroAngle,
                                           modulePositions, initialPose),
         m_kinematicsImpl(kinematics) {
-    wpi::math::MathSharedStore::ReportUsage(
-        wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);
+    wpi::math::MathSharedStore::ReportUsage("Odometry_SwerveDrive", "");
   }
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic pop

@@ -45,8 +45,8 @@ class WPILIB_DLLEXPORT BangBangController
       : m_tolerance(tolerance) {
     if (!std::is_constant_evaluated()) {
       ++instances;
-      wpi::math::MathSharedStore::ReportUsage(
-          wpi::math::MathUsageId::kController_BangBangController, instances);
+      wpi::math::MathSharedStore::ReportUsageCount("BangBangController",
+                                                   instances);
     }
   }
 

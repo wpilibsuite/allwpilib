@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.EncoderJNI;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.util.sendable.Sendable;
@@ -47,7 +46,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
     m_encoder = EncoderJNI.initializeEncoder(aChannel, bChannel, reverseDirection, type.value);
 
     int fpgaIndex = getFPGAIndex();
-    HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex + 1, type.value + 1);
+    HAL.reportUsage("Encoder[" + aChannel + "," + bChannel + "]", "{\"type\":" + type.value + "}");
     SendableRegistry.add(this, "Encoder", fpgaIndex);
   }
 
