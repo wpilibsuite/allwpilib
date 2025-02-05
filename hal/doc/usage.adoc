@@ -31,6 +31,7 @@ The WPILib HAL usage reporting API is a single function that takes two strings: 
 == Resource Names
 
 Resource names are UTF-8 strings, structured into the following components:
+
 - Abbreviated vendor name, followed by a forward slash (``/``). This component is not present for WPILib resources (no name or slash).
 - Optional short package name, followed by a colon (``:``). This should be 10 characters or less, and should only be present if required for disambiguation in very large libraries.
 - Core resource name
