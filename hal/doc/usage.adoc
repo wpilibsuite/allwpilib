@@ -58,7 +58,7 @@ A common use case for a data value is a count of the number of times a particula
 |SwerveDriveKinematics class|``SwerveDriveKinematics``|Empty
 |Java programming language|``Language``|``Java``
 |PID Controller (4th instantiation)|``PIDController``|``4``
-|XBox Controller attached to port 3|``Joystick[3]``|``XboxController``
+|XBox Controller attached to port 3|``HID[3]``|``XboxController``
 |Digital input on DIO 2|``DIO[2]``|``DigitalInput``
 |Quadrature Encoder on DIO 3 and 4|``DIO[3,4]``|``Encoder``
 |PCM Solenoid, CAN bus 0, ID 3, port 2|``PCM[0][3]/Solenoid[2]``|Empty

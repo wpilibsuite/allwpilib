@@ -16,5 +16,5 @@ PWMTalonSRX::PWMTalonSRX(int channel) : PWMMotorController("PWMTalonSRX", channe
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_ReportUsage("PWMTalonSRX", GetChannel(), "");
+  HAL_ReportUsage("DIO", GetChannel(), "PWMTalonSRX");
 }

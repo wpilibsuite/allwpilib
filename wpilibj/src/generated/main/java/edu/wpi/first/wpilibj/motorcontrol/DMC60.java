@@ -42,6 +42,6 @@ public class DMC60 extends PWMMotorController {
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();
 
-    HAL.reportUsage("DigilentDMC60", getChannel(), "");
+    HAL.reportUsage("DIO", getChannel(), "DigilentDMC60");
   }
 }

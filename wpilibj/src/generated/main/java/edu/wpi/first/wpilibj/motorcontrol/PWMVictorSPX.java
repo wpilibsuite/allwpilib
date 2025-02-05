@@ -42,6 +42,6 @@ public class PWMVictorSPX extends PWMMotorController {
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();
 
-    HAL.reportUsage("PWMVictorSPX", getChannel(), "");
+    HAL.reportUsage("DIO", getChannel(), "PWMVictorSPX");
   }
 }

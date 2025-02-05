@@ -14,7 +14,7 @@
 using namespace frc;
 
 PS4Controller::PS4Controller(int port) : GenericHID(port) {
-  HAL_ReportUsage("PS4Controller", port, "");
+  HAL_ReportUsage("HID", port, "PS4Controller");
 }
 
 double PS4Controller::GetLeftX() const {

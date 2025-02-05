@@ -122,7 +122,7 @@ public class StadiaController extends GenericHID implements Sendable {
    */
   public StadiaController(final int port) {
     super(port);
-    HAL.reportUsage("StadiaController", port, "");
+    HAL.reportUsage("HID", port, "StadiaController");
   }
 
   /**

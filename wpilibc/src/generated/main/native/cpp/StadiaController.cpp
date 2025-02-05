@@ -14,7 +14,7 @@
 using namespace frc;
 
 StadiaController::StadiaController(int port) : GenericHID(port) {
-  HAL_ReportUsage("StadiaController", port, "");
+  HAL_ReportUsage("HID", port, "StadiaController");
 }
 
 double StadiaController::GetLeftX() const {

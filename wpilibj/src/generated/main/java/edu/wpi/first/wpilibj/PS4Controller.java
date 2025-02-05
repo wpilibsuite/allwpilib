@@ -124,7 +124,7 @@ public class PS4Controller extends GenericHID implements Sendable {
    */
   public PS4Controller(final int port) {
     super(port);
-    HAL.reportUsage("PS4Controller", port, "");
+    HAL.reportUsage("HID", port, "PS4Controller");
   }
 
   /**

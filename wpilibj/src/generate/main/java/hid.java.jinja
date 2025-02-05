@@ -98,7 +98,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    */
   public {{ ConsoleName }}Controller(final int port) {
     super(port);
-    HAL.reportUsage("{{ ConsoleName }}Controller", port, "");
+    HAL.reportUsage("HID", port, "{{ ConsoleName }}Controller");
   }
 {% for stick in sticks %}
   /**

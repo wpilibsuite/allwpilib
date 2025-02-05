@@ -15,14 +15,7 @@
 
 using namespace frc;
 
-CAN::CAN(int deviceId) {
-  int32_t status = 0;
-  m_handle =
-      HAL_InitializeCAN(kTeamManufacturer, deviceId, kTeamDeviceType, &status);
-  FRC_CheckErrorStatus(status, "device id {}", deviceId);
-
-  HAL_ReportUsage("CAN", deviceId, "");
-}
+CAN::CAN(int deviceId) : CAN{kTeamManufacturer, deviceId, kTeamDeviceType} {}
 
 CAN::CAN(int deviceId, int deviceManufacturer, int deviceType) {
   int32_t status = 0;
@@ -32,9 +25,9 @@ CAN::CAN(int deviceId, int deviceManufacturer, int deviceType) {
   FRC_CheckErrorStatus(status, "device id {} mfg {} type {}", deviceId,
                        deviceManufacturer, deviceType);
 
-  HAL_ReportUsage("CAN", deviceId,
-                  fmt::format("{{\"mfg\":{},\"type\":{}}}", deviceManufacturer,
-                              deviceType));
+  HAL_ReportUsage(
+      fmt::format("CAN[{}][{}][{}]", deviceType, deviceManufacturer, deviceId),
+      "");
 }
 
 void CAN::WritePacket(const uint8_t* data, int length, int apiId) {

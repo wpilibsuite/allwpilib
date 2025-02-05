@@ -24,7 +24,7 @@ Tachometer::Tachometer(int channel, EdgeConfiguration configuration)
       stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "{}", channel);
 
-  HAL_ReportUsage("Counter", channel, "Tachometer");
+  HAL_ReportUsage("DIO", channel, "Tachometer");
   wpi::SendableRegistry::Add(this, "Tachometer", channel);
 }
 

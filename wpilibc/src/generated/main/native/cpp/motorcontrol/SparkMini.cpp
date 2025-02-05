@@ -16,5 +16,5 @@ SparkMini::SparkMini(int channel) : PWMMotorController("SparkMini", channel) {
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_ReportUsage("RevSPARK", GetChannel(), "");
+  HAL_ReportUsage("DIO", GetChannel(), "RevSPARK");
 }

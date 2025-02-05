@@ -116,7 +116,7 @@ public class XboxController extends GenericHID implements Sendable {
    */
   public XboxController(final int port) {
     super(port);
-    HAL.reportUsage("XboxController", port, "");
+    HAL.reportUsage("HID", port, "XboxController");
   }
 
   /**

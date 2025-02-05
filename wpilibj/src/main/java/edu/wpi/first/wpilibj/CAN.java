@@ -36,8 +36,7 @@ public class CAN implements Closeable {
    * @param deviceId The device id
    */
   public CAN(int deviceId) {
-    m_handle = CANAPIJNI.initializeCAN(kTeamManufacturer, deviceId, kTeamDeviceType);
-    HAL.reportUsage("CAN", deviceId, "");
+    this(kTeamManufacturer, deviceId, kTeamDeviceType);
   }
 
   /**
@@ -50,7 +49,7 @@ public class CAN implements Closeable {
    */
   public CAN(int deviceId, int deviceManufacturer, int deviceType) {
     m_handle = CANAPIJNI.initializeCAN(deviceManufacturer, deviceId, deviceType);
-    HAL.reportUsage("CAN", deviceId, "{\"mfg\":" + deviceManufacturer + ",\"type\":" + deviceType + "}");
+    HAL.reportUsage("CAN[" + deviceType + "][" + deviceManufacturer + "][" + deviceId + "]", "");
   }
 
   /** Closes the CAN communication. */

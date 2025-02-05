@@ -14,7 +14,7 @@
 using namespace frc;
 
 XboxController::XboxController(int port) : GenericHID(port) {
-  HAL_ReportUsage("XboxController", port, "");
+  HAL_ReportUsage("HID", port, "XboxController");
 }
 
 double XboxController::GetLeftX() const {
