@@ -124,7 +124,7 @@ public class PS5Controller extends GenericHID implements Sendable {
    */
   public PS5Controller(final int port) {
     super(port);
-    HAL.reportUsage("PS5Controller", port + 1, "");
+    HAL.reportUsage("PS5Controller", port, "");
   }
 
   /**

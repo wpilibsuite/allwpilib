@@ -42,6 +42,6 @@ public class SparkMini extends PWMMotorController {
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();
 
-    HAL.reportUsage("RevSPARK", getChannel() + 1, "");
+    HAL.reportUsage("RevSPARK", getChannel(), "");
   }
 }

@@ -16,5 +16,5 @@ PWMSparkFlex::PWMSparkFlex(int channel) : PWMMotorController("PWMSparkFlex", cha
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_ReportUsage("RevSparkFlexPWM", GetChannel() + 1, "");
+  HAL_ReportUsage("RevSparkFlexPWM", GetChannel(), "");
 }

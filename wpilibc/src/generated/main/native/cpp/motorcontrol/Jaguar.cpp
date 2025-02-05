@@ -16,5 +16,5 @@ Jaguar::Jaguar(int channel) : PWMMotorController("Jaguar", channel) {
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_ReportUsage("Jaguar", GetChannel() + 1, "");
+  HAL_ReportUsage("Jaguar", GetChannel(), "");
 }

@@ -30,7 +30,7 @@ DigitalInput::DigitalInput(int channel) {
   m_handle = HAL_InitializeDIOPort(channel, true, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
-  HAL_ReportUsage("DigitalInput", channel + 1, "");
+  HAL_ReportUsage("DigitalInput", channel, "");
   wpi::SendableRegistry::Add(this, "DigitalInput", channel);
 }
 
