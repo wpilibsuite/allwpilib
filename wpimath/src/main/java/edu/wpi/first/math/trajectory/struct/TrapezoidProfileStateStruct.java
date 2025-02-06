@@ -13,7 +13,7 @@ public class TrapezoidProfileStateStruct implements Struct<TrapezoidProfile.Stat
 	
 	@Override
 	public String getTypeName() {
-		return "TrapezoidProfile.State";
+		return "TrapezoidProfileState";
 	}
 	
 	@Override

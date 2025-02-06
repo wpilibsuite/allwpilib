@@ -130,7 +130,7 @@ public class ExponentialProfile {
   }
 
   /** Profile state. */
-  public static class State {
+  public static class State implements StructSerializable {
     /** The struct used for serializing this class. */
     public static final ExponentialProfileStateStruct struct = new ExponentialProfileStateStruct();
     

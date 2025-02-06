@@ -13,7 +13,7 @@ public class ExponentialProfileStateStruct implements Struct<ExponentialProfile.
 	
 	@Override
 	public String getTypeName() {
-		return "TrapezoidProfile.State";
+		return "ExponentialProfileState";
 	}
 	
 	@Override
