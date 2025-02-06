@@ -172,7 +172,8 @@ public class MecanumControllerCommand extends Command {
    * @param outputDriveVoltages A MecanumDriveMotorVoltages object containing the output motor
    *     voltages.
    * @param requirements The subsystems to require.
-   * @deprecated Use {@link MecanumVoltagesConsumer} instead of {@code Consumer<MecanumDriveMotorVoltages}.
+   * @deprecated Use {@link MecanumVoltagesConsumer} instead of {@code
+   *     Consumer<MecanumDriveMotorVoltages}.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public MecanumControllerCommand(
@@ -309,7 +310,8 @@ public class MecanumControllerCommand extends Command {
    * @param outputDriveVoltages A MecanumDriveMotorVoltages object containing the output motor
    *     voltages.
    * @param requirements The subsystems to require.
-   * @deprecated Use {@link MecanumVoltagesConsumer} instead of {@code Consumer<MecanumDriveMotorVoltages>}.
+   * @deprecated Use {@link MecanumVoltagesConsumer} instead of {@code
+   *     Consumer<MecanumDriveMotorVoltages>}.
    */
   @Deprecated(since = "2025", forRemoval = true)
   public MecanumControllerCommand(
