@@ -11,6 +11,7 @@
 
 #include <fmt/format.h>
 #include <hal/REVPH.h>
+#include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>
 
@@ -439,6 +440,10 @@ DoubleSolenoid PneumaticHub::MakeDoubleSolenoid(int forwardChannel,
 
 Compressor PneumaticHub::MakeCompressor() {
   return Compressor{m_module, PneumaticsModuleType::REVPH};
+}
+
+void PneumaticHub::ReportUsage(std::string_view device, std::string_view data) {
+  HAL_ReportUsage(fmt::format("PH[{}]/{}", m_module, device), data);
 }
 
 std::shared_ptr<PneumaticsBase> PneumaticHub::GetForModule(int module) {

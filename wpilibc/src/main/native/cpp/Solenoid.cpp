@@ -6,7 +6,6 @@
 
 #include <utility>
 
-#include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -28,9 +27,7 @@ Solenoid::Solenoid(int module, PneumaticsModuleType moduleType, int channel)
     throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channel {}", m_channel);
   }
 
-  HAL_ReportUsage(
-      fmt::format("Solenoid[{}][{}]", m_module->GetModuleNumber(), m_channel),
-      "");
+  m_module->ReportUsage(fmt::format("Solenoid[{}]", m_channel), "Solenoid");
   wpi::SendableRegistry::Add(this, "Solenoid", m_module->GetModuleNumber(),
                              m_channel);
 }

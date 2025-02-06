@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.CTREPCMJNI;
+import edu.wpi.first.hal.HAL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -343,5 +344,10 @@ public class PneumaticsControlModule implements PneumaticsBase {
   @Override
   public double getPressure(int channel) {
     return 0;
+  }
+
+  @Override
+  public void reportUsage(String device, String data) {
+    HAL.reportUsage("PCM[" + m_dataStore.m_module + "]/" + device, data);
   }
 }

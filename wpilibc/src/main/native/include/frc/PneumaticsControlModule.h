@@ -190,6 +190,8 @@ class PneumaticsControlModule : public PneumaticsBase {
                                     int reverseChannel) override;
   Compressor MakeCompressor() override;
 
+  void ReportUsage(std::string_view device, std::string_view data) override;
+
  private:
   class DataStore;
   friend class DataStore;

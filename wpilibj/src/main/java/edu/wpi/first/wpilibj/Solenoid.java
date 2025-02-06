@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -55,7 +54,7 @@ public class Solenoid implements Sendable, AutoCloseable {
       throw new AllocationException("Solenoid already allocated");
     }
 
-    HAL.reportUsage("Solenoid[" + m_module.getModuleNumber() + "][" + channel + "]", "");
+    m_module.reportUsage("Solenoid[" + channel + "]", "Solenoid");
     SendableRegistry.add(this, "Solenoid", m_module.getModuleNumber(), channel);
   }
 

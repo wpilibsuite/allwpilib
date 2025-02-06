@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -43,7 +42,7 @@ public class Compressor implements Sendable, AutoCloseable {
 
     m_module.enableCompressorDigital();
 
-    HAL.reportUsage("Compressor", module, "");
+    m_module.reportUsage("Compressor", "");
     SendableRegistry.add(this, "Compressor", module);
   }
 

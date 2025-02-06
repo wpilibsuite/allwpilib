@@ -7,7 +7,6 @@
 #include <frc/PneumaticHub.h>
 
 #include <hal/Ports.h>
-#include <hal/UsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -24,7 +23,7 @@ Compressor::Compressor(int module, PneumaticsModuleType moduleType)
 
   m_module->EnableCompressorDigital();
 
-  HAL_ReportUsage("Compressor", module, "");
+  m_module->ReportUsage("Compressor", "");
   wpi::SendableRegistry::Add(this, "Compressor", module);
 }
 
