@@ -540,9 +540,7 @@ public final class CameraServer {
    * @return The USB camera capturing images.
    */
   public static UsbCamera startAutomaticCapture() {
-    UsbCamera camera = startAutomaticCapture(m_defaultUsbDevice.getAndIncrement());
-    CameraServerSharedStore.getCameraServerShared().reportUsbCamera(camera.getHandle());
-    return camera;
+    return startAutomaticCapture(m_defaultUsbDevice.getAndIncrement());
   }
 
   /**
@@ -557,7 +555,7 @@ public final class CameraServer {
   public static UsbCamera startAutomaticCapture(int dev) {
     UsbCamera camera = new UsbCamera("USB Camera " + dev, dev);
     startAutomaticCapture(camera);
-    CameraServerSharedStore.getCameraServerShared().reportUsbCamera(camera.getHandle());
+    CameraServerSharedStore.reportUsage("UsbCamera[" + dev + "]", "auto");
     return camera;
   }
 
@@ -571,7 +569,7 @@ public final class CameraServer {
   public static UsbCamera startAutomaticCapture(String name, int dev) {
     UsbCamera camera = new UsbCamera(name, dev);
     startAutomaticCapture(camera);
-    CameraServerSharedStore.getCameraServerShared().reportUsbCamera(camera.getHandle());
+    CameraServerSharedStore.reportUsage("UsbCamera[" + dev + "]", "named");
     return camera;
   }
 
@@ -585,7 +583,7 @@ public final class CameraServer {
   public static UsbCamera startAutomaticCapture(String name, String path) {
     UsbCamera camera = new UsbCamera(name, path);
     startAutomaticCapture(camera);
-    CameraServerSharedStore.getCameraServerShared().reportUsbCamera(camera.getHandle());
+    CameraServerSharedStore.reportUsage("UsbCamera[" + path + "]", "path");
     return camera;
   }
 

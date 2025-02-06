@@ -471,11 +471,7 @@ Instance::Instance() {
 }
 
 cs::UsbCamera CameraServer::StartAutomaticCapture() {
-  cs::UsbCamera camera =
-      StartAutomaticCapture(::GetInstance().m_defaultUsbDevice++);
-  auto csShared = GetCameraServerShared();
-  csShared->ReportUsbCamera(camera.GetHandle());
-  return camera;
+  return StartAutomaticCapture(::GetInstance().m_defaultUsbDevice++);
 }
 
 cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
@@ -483,7 +479,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
   cs::UsbCamera camera{fmt::format("USB Camera {}", dev), dev};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
-  csShared->ReportUsbCamera(camera.GetHandle());
+  csShared->ReportUsage(fmt::format("UsbCamera[{}]", dev), "auto");
   return camera;
 }
 
@@ -493,7 +489,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
   cs::UsbCamera camera{name, dev};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
-  csShared->ReportUsbCamera(camera.GetHandle());
+  csShared->ReportUsage(fmt::format("UsbCamera[{}]", dev), "name");
   return camera;
 }
 
@@ -503,7 +499,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
   cs::UsbCamera camera{name, path};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
-  csShared->ReportUsbCamera(camera.GetHandle());
+  csShared->ReportUsage(fmt::format("UsbCamera[{}]", path), "path");
   return camera;
 }
 

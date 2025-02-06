@@ -12,9 +12,7 @@
 namespace {
 class DefaultCameraServerShared : public frc::CameraServerShared {
  public:
-  void ReportUsbCamera(int id) override {}
-  void ReportAxisCamera(int id) override {}
-  void ReportVideoServer(int id) override {}
+  void ReportUsage(std::string_view resource, std::string_view data) override {}
   void SetCameraServerErrorV(fmt::string_view format,
                              fmt::format_args args) override {}
   void SetVisionRunnerErrorV(fmt::string_view format,

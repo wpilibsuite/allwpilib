@@ -45,23 +45,13 @@ public abstract class RobotBase implements AutoCloseable {
     CameraServerShared shared =
         new CameraServerShared() {
           @Override
-          public void reportVideoServer(int id) {
-            HAL.reportUsage("CameraServer", String.valueOf(id + 1));
-          }
-
-          @Override
-          public void reportUsbCamera(int id) {
-            HAL.reportUsage("UsbCamera", String.valueOf(id + 1));
+          public void reportUsage(String resource, String data) {
+            HAL.reportUsage(resource, data);
           }
 
           @Override
           public void reportDriverStationError(String error) {
             DriverStation.reportError(error, true);
-          }
-
-          @Override
-          public void reportAxisCamera(int id) {
-            HAL.reportUsage("AxisCamera", String.valueOf(id + 1));
           }
 
           @Override

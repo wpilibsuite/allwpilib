@@ -62,14 +62,8 @@ std::thread::id RobotBase::m_threadId;
 namespace {
 class WPILibCameraServerShared : public frc::CameraServerShared {
  public:
-  void ReportUsbCamera(int id) override {
-    HAL_ReportUsage("UsbCamera", std::to_string(id));
-  }
-  void ReportAxisCamera(int id) override {
-    HAL_ReportUsage("AxisCamera", std::to_string(id));
-  }
-  void ReportVideoServer(int id) override {
-    HAL_ReportUsage("VideoServer", std::to_string(id));
+  void ReportUsage(std::string_view resource, std::string_view data) override {
+    HAL_ReportUsage(resource, data);
   }
   void SetCameraServerErrorV(fmt::string_view format,
                              fmt::format_args args) override {
