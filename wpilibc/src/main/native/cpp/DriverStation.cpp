@@ -25,6 +25,7 @@
 #include <networktables/StringTopic.h>
 #include <wpi/DataLog.h>
 #include <wpi/EventVector.h>
+#include <wpi/ManagedStatic.h>
 #include <wpi/condition_variable.h>
 #include <wpi/json.h>
 #include <wpi/mutex.h>
@@ -150,9 +151,10 @@ struct Instance {
 
 static constexpr auto kJoystickUnpluggedMessageInterval = 1_s;
 
-static Instance& GetInstance() {
-  static Instance instance;
-  return instance;
+static wpi::ManagedStatic<Instance> gInst;
+
+static inline Instance& GetInstance() {
+  return *gInst;
 }
 
 static void SendMatchData();
