@@ -44,8 +44,8 @@ int32_t HAL_ReportUsage(const struct WPI_String* resource,
 
 }  // extern "C"
 
-namespace hal {
+namespace hal::init {
 void InitializeUsageReporting() {
   systemServerUsage = new ::SystemServerUsageReporting{hal::GetSystemServer()};
 }
-}  // namespace hal
+}  // namespace hal::init
