@@ -19,7 +19,6 @@ target_include_directories(
     hal
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/hal>
 )
 target_link_libraries(hal PUBLIC ntcore wpiutil)
@@ -29,7 +28,6 @@ set_property(TARGET hal PROPERTY FOLDER "libraries")
 install(TARGETS hal EXPORT hal)
 export(TARGETS hal FILE hal.cmake NAMESPACE hal::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/hal")
-install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/hal")
 
 configure_file(hal-config.cmake.in ${WPILIB_BINARY_DIR}/hal-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/hal-config.cmake DESTINATION share/hal)
@@ -41,7 +39,7 @@ if(WITH_JAVA)
 
     file(GLOB_RECURSE hal_shared_jni_src src/main/native/cpp/jni/*.cpp)
 
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
+    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     set(CMAKE_JNI_TARGET true)
 
     add_jar(
@@ -79,7 +77,6 @@ if(WITH_JAVA_SOURCE)
         hal_src_jar
         BASE_DIRECTORIES
             ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/java
         OUTPUT_NAME wpiHal-sources
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
