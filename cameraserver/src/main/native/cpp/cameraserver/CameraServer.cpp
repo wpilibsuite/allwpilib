@@ -507,63 +507,6 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
   return camera;
 }
 
-WPI_IGNORE_DEPRECATED
-cs::AxisCamera CameraServer::AddAxisCamera(std::string_view host) {
-  return AddAxisCamera("Axis Camera", host);
-}
-
-cs::AxisCamera CameraServer::AddAxisCamera(const char* host) {
-  return AddAxisCamera("Axis Camera", host);
-}
-
-cs::AxisCamera CameraServer::AddAxisCamera(const std::string& host) {
-  return AddAxisCamera("Axis Camera", host);
-}
-
-cs::AxisCamera CameraServer::AddAxisCamera(std::span<const std::string> hosts) {
-  return AddAxisCamera("Axis Camera", hosts);
-}
-
-cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
-                                           std::string_view host) {
-  ::GetInstance();
-  cs::AxisCamera camera{name, host};
-  StartAutomaticCapture(camera);
-  auto csShared = GetCameraServerShared();
-  csShared->ReportAxisCamera(camera.GetHandle());
-  return camera;
-}
-
-cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
-                                           const char* host) {
-  ::GetInstance();
-  cs::AxisCamera camera{name, host};
-  StartAutomaticCapture(camera);
-  auto csShared = GetCameraServerShared();
-  csShared->ReportAxisCamera(camera.GetHandle());
-  return camera;
-}
-
-cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
-                                           const std::string& host) {
-  ::GetInstance();
-  cs::AxisCamera camera{name, host};
-  StartAutomaticCapture(camera);
-  auto csShared = GetCameraServerShared();
-  csShared->ReportAxisCamera(camera.GetHandle());
-  return camera;
-}
-
-cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
-                                           std::span<const std::string> hosts) {
-  ::GetInstance();
-  cs::AxisCamera camera{name, hosts};
-  StartAutomaticCapture(camera);
-  auto csShared = GetCameraServerShared();
-  csShared->ReportAxisCamera(camera.GetHandle());
-  return camera;
-}
-WPI_UNIGNORE_DEPRECATED
 cs::MjpegServer CameraServer::AddSwitchedCamera(std::string_view name) {
   auto& inst = ::GetInstance();
   // create a dummy CvSource
