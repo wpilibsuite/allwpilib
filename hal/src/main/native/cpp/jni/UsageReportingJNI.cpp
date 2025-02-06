@@ -12,7 +12,6 @@
 #include "edu_wpi_first_hal_UsageReportingJNI.h"
 #include "hal/UsageReporting.h"
 
-
 using namespace wpi::java;
 
 extern "C" {
