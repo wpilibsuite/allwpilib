@@ -21,7 +21,6 @@ class DefaultMathShared : public MathShared {
   void ReportWarningV(fmt::string_view format, fmt::format_args args) override {
   }
   void ReportUsage(std::string_view resource, std::string_view data) override {}
-  void ReportUsageCount(std::string_view resource, int count) override {}
   units::second_t GetTimestamp() override {
     return units::second_t{wpi::Now() * 1.0e-6};
   }

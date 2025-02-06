@@ -65,7 +65,7 @@ public class ProfiledPIDController implements Sendable {
     instances++;
 
     SendableRegistry.add(this, "ProfiledPIDController", instances);
-    MathSharedStore.reportUsageCount("ProfiledPIDController", instances);
+    MathSharedStore.reportUsage("ProfiledPIDController", String.valueOf(instances));
   }
 
   /**

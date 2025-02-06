@@ -110,7 +110,7 @@ public class PIDController implements Sendable, AutoCloseable {
     instances++;
     SendableRegistry.add(this, "PIDController", instances);
 
-    MathSharedStore.reportUsageCount("PIDController", instances);
+    MathSharedStore.reportUsage("PIDController", String.valueOf(instances));
   }
 
   @Override

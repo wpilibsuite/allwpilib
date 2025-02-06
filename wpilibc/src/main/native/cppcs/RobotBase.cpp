@@ -63,13 +63,13 @@ namespace {
 class WPILibCameraServerShared : public frc::CameraServerShared {
  public:
   void ReportUsbCamera(int id) override {
-    HAL_ReportUsageCount("UsbCamera", id);
+    HAL_ReportUsage("UsbCamera", std::to_string(id));
   }
   void ReportAxisCamera(int id) override {
-    HAL_ReportUsageCount("AxisCamera", id);
+    HAL_ReportUsage("AxisCamera", std::to_string(id));
   }
   void ReportVideoServer(int id) override {
-    HAL_ReportUsageCount("VideoServer", id);
+    HAL_ReportUsage("VideoServer", std::to_string(id));
   }
   void SetCameraServerErrorV(fmt::string_view format,
                              fmt::format_args args) override {
@@ -102,10 +102,6 @@ class WPILibMathShared : public wpi::math::MathShared {
 
   void ReportUsage(std::string_view resource, std::string_view data) override {
     HAL_ReportUsage(resource, data);
-  }
-
-  void ReportUsageCount(std::string_view resource, int count) override {
-    HAL_ReportUsageCount(resource, count);
   }
 
   units::second_t GetTimestamp() override {

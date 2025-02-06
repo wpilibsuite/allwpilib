@@ -23,14 +23,6 @@ public interface MathShared {
   void reportUsage(String resource, String data);
 
   /**
-   * Report usage.
-   *
-   * @param resource the resource name
-   * @param count the usage count
-   */
-  void reportUsageCount(String resource, int count);
-
-  /**
    * Get the current time.
    *
    * @return Time in seconds

@@ -28,9 +28,6 @@ public final class MathSharedStore {
             public void reportUsage(String resource, String data) {}
 
             @Override
-            public void reportUsageCount(String resource, int count) {}
-
-            @Override
             public double getTimestamp() {
               return WPIUtilJNI.now() * 1.0e-6;
             }
@@ -66,16 +63,6 @@ public final class MathSharedStore {
    */
   public static void reportUsage(String resource, String data) {
     getMathShared().reportUsage(resource, data);
-  }
-
-  /**
-   * Report usage.
-   *
-   * @param resource the resource name
-   * @param count the usage count
-   */
-  public static void reportUsageCount(String resource, int count) {
-    getMathShared().reportUsageCount(resource, count);
   }
 
   /**

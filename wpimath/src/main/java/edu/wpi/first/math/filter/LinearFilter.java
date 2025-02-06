@@ -72,7 +72,7 @@ public class LinearFilter {
     m_outputGains = Arrays.copyOf(fbGains, fbGains.length);
 
     instances++;
-    MathSharedStore.reportUsageCount("Filter_Linear", instances);
+    MathSharedStore.reportUsage("LinearFilter", String.valueOf(instances));
   }
 
   /**

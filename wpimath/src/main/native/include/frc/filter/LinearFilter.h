@@ -96,7 +96,8 @@ class LinearFilter {
 
     if (!std::is_constant_evaluated()) {
       ++instances;
-      wpi::math::MathSharedStore::ReportUsageCount("Filter_Linear", instances);
+      wpi::math::MathSharedStore::ReportUsage("LinearFilter",
+                                              std::to_string(instances));
     }
   }
 

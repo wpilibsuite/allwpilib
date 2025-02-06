@@ -46,12 +46,12 @@ public abstract class RobotBase implements AutoCloseable {
         new CameraServerShared() {
           @Override
           public void reportVideoServer(int id) {
-            HAL.reportUsageCount("CameraServer", id + 1);
+            HAL.reportUsage("CameraServer", String.valueOf(id + 1));
           }
 
           @Override
           public void reportUsbCamera(int id) {
-            HAL.reportUsageCount("UsbCamera", id + 1);
+            HAL.reportUsage("UsbCamera", String.valueOf(id + 1));
           }
 
           @Override
@@ -61,7 +61,7 @@ public abstract class RobotBase implements AutoCloseable {
 
           @Override
           public void reportAxisCamera(int id) {
-            HAL.reportUsageCount("AxisCamera", id + 1);
+            HAL.reportUsage("AxisCamera", String.valueOf(id + 1));
           }
 
           @Override
@@ -89,11 +89,6 @@ public abstract class RobotBase implements AutoCloseable {
           @Override
           public void reportUsage(String resource, String data) {
             HAL.reportUsage(resource, data);
-          }
-
-          @Override
-          public void reportUsageCount(String resource, int count) {
-            HAL.reportUsageCount(resource, count);
           }
 
           @Override

@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @see "hal/HALBase.h"
  * @see "hal/Main.h"
- * @see "hal/FRCUsageReporting.h"
+ * @see "hal/UsageReporting.h"
  */
 public final class HAL extends JNIWrapper {
   /**
@@ -234,31 +234,6 @@ public final class HAL extends JNIWrapper {
    */
   public static int reportUsage(String resource, int instanceNumber, String data) {
     return reportUsage(resource + "[" + instanceNumber + "]", data);
-  }
-
-  /**
-   * Reports usage of a resource of interest.  Repeated calls for the same
-   * resource name replace the previous report.
-   *
-   * @param resource       the used resource name
-   * @param count          number of times this resource has been used
-   * @return               a handle
-   */
-  public static int reportUsageCount(String resource, int count) {
-    return reportUsage(resource, String.valueOf(count));
-  }
-
-  /**
-   * Reports usage of a resource of interest.  Repeated calls for the same
-   * resource name replace the previous report.
-   *
-   * @param resource       the used resource name
-   * @param instanceNumber an index that identifies the resource instance
-   * @param count          number of times this resource has been used
-   * @return               a handle
-   */
-  public static int reportUsageCount(String resource, int instanceNumber, int count) {
-    return reportUsage(resource, instanceNumber, String.valueOf(count));
   }
 
   private HAL() {}

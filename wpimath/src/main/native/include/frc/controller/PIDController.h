@@ -74,7 +74,8 @@ class WPILIB_DLLEXPORT PIDController
     if (!std::is_constant_evaluated()) {
       ++instances;
 
-      wpi::math::MathSharedStore::ReportUsageCount("PIDController", instances);
+      wpi::math::MathSharedStore::ReportUsage("PIDController",
+                                              std::to_string(instances));
       wpi::SendableRegistry::Add(this, "PIDController", instances);
     }
   }

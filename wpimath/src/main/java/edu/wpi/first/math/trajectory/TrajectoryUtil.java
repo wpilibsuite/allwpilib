@@ -79,8 +79,8 @@ public final class TrajectoryUtil {
    * @throws IOException if reading from the file fails.
    */
   public static Trajectory fromPathweaverJson(Path path) throws IOException {
-    MathSharedStore.reportUsageCount(
-        "Trajectory_PathWeaver", ++pathWeaverTrajectoryInstances);
+    MathSharedStore.reportUsage(
+        "Trajectory_PathWeaver", String.valueOf(++pathWeaverTrajectoryInstances));
     return createTrajectoryFromElements(TrajectoryUtilJNI.fromPathweaverJson(path.toString()));
   }
 

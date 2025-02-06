@@ -44,7 +44,7 @@ public class BangBangController implements Sendable {
 
     SendableRegistry.add(this, "BangBangController", instances);
 
-    MathSharedStore.reportUsageCount("BangBangController", instances);
+    MathSharedStore.reportUsage("BangBangController", String.valueOf(instances));
   }
 
   /**

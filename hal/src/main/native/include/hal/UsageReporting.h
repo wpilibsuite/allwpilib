@@ -63,27 +63,4 @@ inline int32_t HAL_ReportUsage(std::string_view resource,
 int32_t HAL_ReportUsage(std::string_view resource, int instanceNumber,
                         std::string_view data);
 
-/**
- * Reports usage of a resource of interest.  Repeated calls for the same
- * resource name replace the previous report.
- *
- * @param resource       the used resource name; convention is to suffix with
- *                       "[instanceNum]" for multiple instances of the same
- *                       resource
- * @param count          number of times this resource has been used
- * @return               a handle
- */
-int32_t HAL_ReportUsageCount(std::string_view resource, int count);
-
-/**
- * Reports usage of a resource of interest.  Repeated calls for the same
- * resource name replace the previous report.
- *
- * @param resource       the used resource name
- * @param instanceNumber an index that identifies the resource instance
- * @param count          number of times this resource has been used
- * @return               a handle
- */
-int32_t HAL_ReportUsageCount(std::string_view resource, int instanceNumber,
-                             int count);
 #endif

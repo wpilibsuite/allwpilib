@@ -63,8 +63,8 @@ class ProfiledPIDController
         m_profile{m_constraints} {
     if (!std::is_constant_evaluated()) {
       int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
-      wpi::math::MathSharedStore::ReportUsageCount("ProfiledPIDController",
-                                                   instances);
+      wpi::math::MathSharedStore::ReportUsage("ProfiledPIDController",
+                                              std::to_string(instances));
       wpi::SendableRegistry::Add(this, "ProfiledPIDController", instances);
     }
   }
