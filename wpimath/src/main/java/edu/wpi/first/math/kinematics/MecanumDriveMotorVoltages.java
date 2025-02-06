@@ -7,7 +7,7 @@ package edu.wpi.first.math.kinematics;
 /**
  * Represents the motor voltages for a mecanum drive drivetrain.
  *
- * @deprecated use a fuctional interface intead.
+ * @deprecated Use {@link MecanumControllerCommand.MecanumVoltagesConsumer}
  */
 @Deprecated(since = "2025", forRemoval = true)
 public class MecanumDriveMotorVoltages {
