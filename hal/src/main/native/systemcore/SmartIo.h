@@ -6,10 +6,11 @@
 
 #include <string>
 
+#include <networktables/IntegerTopic.h>
+
 #include "PortsInternal.h"
 #include "hal/handles/DigitalHandleResource.h"
 #include "hal/handles/HandlesInternal.h"
-#include "networktables/IntegerTopic.h"
 
 namespace hal {
 

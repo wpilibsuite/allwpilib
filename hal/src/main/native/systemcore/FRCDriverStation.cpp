@@ -2,12 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <networktables/BooleanTopic.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/ProtobufTopic.h>
-#include <networktables/StringArrayTopic.h>
-#include <networktables/StringTopic.h>
-
 #include <atomic>
 #include <chrono>
 #include <cstdio>
@@ -19,6 +13,11 @@
 #include <utility>
 
 #include <fmt/format.h>
+#include <networktables/BooleanTopic.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/ProtobufTopic.h>
+#include <networktables/StringArrayTopic.h>
+#include <networktables/StringTopic.h>
 #include <wpi/EventVector.h>
 #include <wpi/SafeThread.h>
 #include <wpi/SmallVector.h>

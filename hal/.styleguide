@@ -37,6 +37,8 @@ includeOtherLibs {
   ^gtest/
   ^i2clib/
   ^llvm/
+  ^networktables/
+  ^ntcore
   ^opencv2/
   ^spilib/
   ^support/
