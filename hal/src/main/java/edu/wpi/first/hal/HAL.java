@@ -212,25 +212,25 @@ public final class HAL extends JNIWrapper {
   public static native boolean getSystemTimeValid();
 
   /**
-   * Reports usage of a resource of interest.  Repeated calls for the same
-   * resource name replace the previous report.
+   * Reports usage of a resource of interest. Repeated calls for the same resource name replace the
+   * previous report.
    *
-   * @param resource       the used resource name
-   * @param data           arbitrary associated data string
-   * @return               a handle
+   * @param resource the used resource name
+   * @param data arbitrary associated data string
+   * @return a handle
    */
   public static int reportUsage(String resource, String data) {
     return UsageReportingJNI.report(resource, data);
   }
 
   /**
-   * Reports usage of a resource of interest.  Repeated calls for the same
-   * resource name replace the previous report.
+   * Reports usage of a resource of interest. Repeated calls for the same resource name replace the
+   * previous report.
    *
-   * @param resource       the used resource name
+   * @param resource the used resource name
    * @param instanceNumber an index that identifies the resource instance
-   * @param data           arbitrary associated data string
-   * @return               a handle
+   * @param data arbitrary associated data string
+   * @return a handle
    */
   public static int reportUsage(String resource, int instanceNumber, String data) {
     return reportUsage(resource + "[" + instanceNumber + "]", data);

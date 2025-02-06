@@ -11,12 +11,12 @@ package edu.wpi.first.hal;
  */
 public class UsageReportingJNI extends JNIWrapper {
   /**
-   * Reports usage of a resource of interest.  Repeated calls for the same
-   * resource name replace the previous report.
+   * Reports usage of a resource of interest. Repeated calls for the same resource name replace the
+   * previous report.
    *
-   * @param resource       the used resource name
-   * @param data           arbitrary associated data string
-   * @return               a handle
+   * @param resource the used resource name
+   * @param data arbitrary associated data string
+   * @return a handle
    */
   public static native int report(String resource, String data);
 
