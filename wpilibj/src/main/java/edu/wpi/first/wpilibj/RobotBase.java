@@ -379,7 +379,8 @@ public abstract class RobotBase implements AutoCloseable {
     // Force refresh DS data
     DriverStation.refreshData();
 
-    HAL.reportUsage("Language", "{\"language\":\"java\",\"version\":\"" + WPILibVersion.Version + "\"}");
+    HAL.reportUsage("Language", "Java");
+    HAL.reportUsage("WPILibVersion", WPILibVersion.Version);
 
     if (!Notifier.setHALThreadPriority(true, 40)) {
       DriverStation.reportWarning("Setting HAL Notifier RT priority to 40 failed", false);

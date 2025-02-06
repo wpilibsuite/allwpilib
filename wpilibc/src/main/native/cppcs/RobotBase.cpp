@@ -45,9 +45,8 @@ int frc::RunHALInitialization() {
     return -1;
   }
   DriverStation::RefreshData();
-  HAL_ReportUsage("Language",
-                  fmt::format("{{\"language\":\"C++\",\"version\":\"{}\"}}",
-                              GetWPILibVersion()));
+  HAL_ReportUsage("Language", "C++");
+  HAL_ReportUsage("WPILibVersion", GetWPILibVersion());
 
   if (!frc::Notifier::SetHALThreadPriority(true, 40)) {
     FRC_ReportWarning("Setting HAL Notifier RT priority to 40 failed\n");
