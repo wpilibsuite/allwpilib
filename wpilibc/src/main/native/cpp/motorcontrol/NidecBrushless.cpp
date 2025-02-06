@@ -26,7 +26,8 @@ NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
   m_dio.SetPWMRate(15625);
   m_dio.EnablePWM(0.5);
 
-  HAL_ReportUsage("NidecBrushless", pwmChannel, fmt::format("{}", dioChannel));
+  HAL_ReportUsage(fmt::format("DIO[{},{}]", pwmChannel, dioChannel),
+                  "NidecBrushless");
   wpi::SendableRegistry::Add(this, "Nidec Brushless", pwmChannel);
 }
 

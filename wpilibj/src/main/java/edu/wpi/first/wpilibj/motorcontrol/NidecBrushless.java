@@ -44,7 +44,7 @@ public class NidecBrushless extends MotorSafety
     m_pwm = new PWM(pwmChannel);
     SendableRegistry.addChild(this, m_pwm);
 
-    HAL.reportUsage("NidecBrushless", pwmChannel, String.valueOf(dioChannel));
+    HAL.reportUsage("DIO[" + pwmChannel + "],[" + dioChannel + "]", "NidecBrushless");
     SendableRegistry.add(this, "Nidec Brushless", pwmChannel);
   }
 
