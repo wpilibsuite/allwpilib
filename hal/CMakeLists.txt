@@ -75,8 +75,7 @@ if(WITH_JAVA_SOURCE)
     include(CreateSourceJar)
     add_source_jar(
         hal_src_jar
-        BASE_DIRECTORIES
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
+        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
         OUTPUT_NAME wpiHal-sources
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
