@@ -569,7 +569,7 @@ public final class CameraServer {
   public static UsbCamera startAutomaticCapture(String name, int dev) {
     UsbCamera camera = new UsbCamera(name, dev);
     startAutomaticCapture(camera);
-    CameraServerSharedStore.reportUsage("UsbCamera[" + dev + "]", "named");
+    CameraServerSharedStore.reportUsage("UsbCamera[" + dev + "]", "name");
     return camera;
   }
 
