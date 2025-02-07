@@ -5,7 +5,6 @@
 package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.proto.MecanumDriveKinematicsProto;
@@ -82,7 +81,7 @@ public class MecanumDriveKinematics
         frontLeftWheelMeters, frontRightWheelMeters, rearLeftWheelMeters, rearRightWheelMeters);
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
 
-    MathSharedStore.reportUsage(MathUsageId.kKinematics_MecanumDrive, 1);
+    MathSharedStore.reportUsage("MecanumDriveKinematics", "");
   }
 
   /**

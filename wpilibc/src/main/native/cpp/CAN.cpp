@@ -9,20 +9,13 @@
 #include <hal/CAN.h>
 #include <hal/CANAPI.h>
 #include <hal/Errors.h>
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 #include "frc/Errors.h"
 
 using namespace frc;
 
-CAN::CAN(int deviceId) {
-  int32_t status = 0;
-  m_handle =
-      HAL_InitializeCAN(kTeamManufacturer, deviceId, kTeamDeviceType, &status);
-  FRC_CheckErrorStatus(status, "device id {}", deviceId);
-
-  HAL_Report(HALUsageReporting::kResourceType_CAN, deviceId + 1);
-}
+CAN::CAN(int deviceId) : CAN{kTeamManufacturer, deviceId, kTeamDeviceType} {}
 
 CAN::CAN(int deviceId, int deviceManufacturer, int deviceType) {
   int32_t status = 0;
@@ -32,7 +25,9 @@ CAN::CAN(int deviceId, int deviceManufacturer, int deviceType) {
   FRC_CheckErrorStatus(status, "device id {} mfg {} type {}", deviceId,
                        deviceManufacturer, deviceType);
 
-  HAL_Report(HALUsageReporting::kResourceType_CAN, deviceId + 1);
+  HAL_ReportUsage(
+      fmt::format("CAN[{}][{}][{}]", deviceType, deviceManufacturer, deviceId),
+      "");
 }
 
 void CAN::WritePacket(const uint8_t* data, int length, int apiId) {

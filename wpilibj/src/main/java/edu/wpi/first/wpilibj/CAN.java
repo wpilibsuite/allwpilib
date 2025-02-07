@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.CANAPIJNI;
 import edu.wpi.first.hal.CANAPITypes;
 import edu.wpi.first.hal.CANData;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import java.io.Closeable;
 
@@ -37,8 +36,7 @@ public class CAN implements Closeable {
    * @param deviceId The device id
    */
   public CAN(int deviceId) {
-    m_handle = CANAPIJNI.initializeCAN(kTeamManufacturer, deviceId, kTeamDeviceType);
-    HAL.report(tResourceType.kResourceType_CAN, deviceId + 1);
+    this(kTeamManufacturer, deviceId, kTeamDeviceType);
   }
 
   /**
@@ -51,7 +49,7 @@ public class CAN implements Closeable {
    */
   public CAN(int deviceId, int deviceManufacturer, int deviceType) {
     m_handle = CANAPIJNI.initializeCAN(deviceManufacturer, deviceId, deviceType);
-    HAL.report(tResourceType.kResourceType_CAN, deviceId + 1);
+    HAL.reportUsage("CAN[" + deviceType + "][" + deviceManufacturer + "][" + deviceId + "]", "");
   }
 
   /** Closes the CAN communication. */

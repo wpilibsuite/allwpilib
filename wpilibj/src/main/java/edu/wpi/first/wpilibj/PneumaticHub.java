@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.PortsJNI;
 import edu.wpi.first.hal.REVPHFaults;
 import edu.wpi.first.hal.REVPHJNI;
@@ -437,5 +438,10 @@ public class PneumaticHub implements PneumaticsBase {
    */
   public double getSolenoidsVoltage() {
     return REVPHJNI.getSolenoidVoltage(m_handle);
+  }
+
+  @Override
+  public void reportUsage(String device, String data) {
+    HAL.reportUsage("PH[" + m_dataStore.m_module + "]/" + device, data);
   }
 }

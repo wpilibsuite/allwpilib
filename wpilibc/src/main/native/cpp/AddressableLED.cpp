@@ -5,10 +5,10 @@
 #include "frc/AddressableLED.h"
 
 #include <hal/AddressableLED.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
+#include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
 
 #include "frc/Errors.h"
@@ -31,7 +31,7 @@ AddressableLED::AddressableLED(int port) : m_port{port} {
     HAL_FreePWMPort(m_pwmHandle);
   }
 
-  HAL_Report(HALUsageReporting::kResourceType_AddressableLEDs, port + 1);
+  HAL_ReportUsage("IO", port, "AddressableLED");
 }
 
 void AddressableLED::SetLength(int length) {

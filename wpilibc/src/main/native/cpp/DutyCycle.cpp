@@ -8,8 +8,8 @@
 #include <utility>
 
 #include <hal/DutyCycle.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
+#include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
@@ -31,7 +31,7 @@ void DutyCycle::InitDutyCycle() {
   std::string stackTrace = wpi::GetStackTrace(1);
   m_handle = HAL_InitializeDutyCycle(m_channel, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  HAL_Report(HALUsageReporting::kResourceType_DutyCycle, m_channel + 1);
+  HAL_ReportUsage("IO", m_channel, "DutyCycle");
   wpi::SendableRegistry::Add(this, "Duty Cycle", m_channel);
 }
 

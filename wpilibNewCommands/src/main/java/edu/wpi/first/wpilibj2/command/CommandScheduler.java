@@ -6,8 +6,6 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -99,7 +97,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> {});
 
   CommandScheduler() {
-    HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
+    HAL.reportUsage("CommandScheduler", "");
     SendableRegistry.add(this, "Scheduler");
   }
 

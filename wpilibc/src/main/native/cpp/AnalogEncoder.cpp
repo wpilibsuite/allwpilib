@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 
@@ -66,6 +67,8 @@ void AnalogEncoder::Init(double fullRange, double expectedZero) {
 
   m_fullRange = fullRange;
   m_expectedZero = expectedZero;
+
+  HAL_ReportUsage("IO", m_analogInput->GetChannel(), "AnalogEncoder");
 
   wpi::SendableRegistry::Add(this, "Analog Encoder",
                              m_analogInput->GetChannel());

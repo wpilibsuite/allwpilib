@@ -7,9 +7,9 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/Ports.h>
 #include <hal/PowerDistribution.h>
+#include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -41,11 +41,9 @@ PowerDistribution::PowerDistribution() {
 
   if (HAL_GetPowerDistributionType(m_handle, &status) ==
       HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
-    HAL_Report(HALUsageReporting::kResourceType_PDP,
-               HALUsageReporting::kPDP_CTRE);
+    HAL_ReportUsage("PDP", m_module, "");
   } else {
-    HAL_Report(HALUsageReporting::kResourceType_PDP,
-               HALUsageReporting::kPDP_REV);
+    HAL_ReportUsage("PDH", m_module, "");
   }
   wpi::SendableRegistry::Add(this, "PowerDistribution", m_module);
 }
@@ -62,11 +60,9 @@ PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
   FRC_ReportError(status, "Module {}", module);
 
   if (moduleType == ModuleType::kCTRE) {
-    HAL_Report(HALUsageReporting::kResourceType_PDP,
-               HALUsageReporting::kPDP_CTRE);
+    HAL_ReportUsage("PDP_CTRE", m_module, "");
   } else {
-    HAL_Report(HALUsageReporting::kResourceType_PDP,
-               HALUsageReporting::kPDP_REV);
+    HAL_ReportUsage("PDH_REV", m_module, "");
   }
   wpi::SendableRegistry::Add(this, "PowerDistribution", m_module);
 }

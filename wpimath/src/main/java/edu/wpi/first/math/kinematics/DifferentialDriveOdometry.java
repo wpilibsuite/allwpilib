@@ -7,7 +7,6 @@ package edu.wpi.first.math.kinematics;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Distance;
@@ -41,7 +40,7 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
         gyroAngle,
         new DifferentialDriveWheelPositions(leftDistanceMeters, rightDistanceMeters),
         initialPoseMeters);
-    MathSharedStore.reportUsage(MathUsageId.kOdometry_DifferentialDrive, 1);
+    MathSharedStore.reportUsage("DifferentialDriveOdometry", "");
   }
 
   /**

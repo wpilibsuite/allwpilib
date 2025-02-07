@@ -119,6 +119,8 @@ class PneumaticHub : public PneumaticsBase {
                                     int reverseChannel) override;
   Compressor MakeCompressor() override;
 
+  void ReportUsage(std::string_view device, std::string_view data) override;
+
   /** Version and device data received from a REV PH. */
   struct Version {
     /** The firmware major version. */

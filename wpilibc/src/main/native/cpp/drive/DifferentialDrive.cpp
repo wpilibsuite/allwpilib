@@ -9,7 +9,7 @@
 #include <string>
 #include <utility>
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -42,8 +42,7 @@ void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
                                     bool squareInputs) {
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
-               HALUsageReporting::kRobotDrive2_DifferentialArcade, 2);
+    HAL_ReportUsage("RobotDrive", "DifferentialArcade");
     reported = true;
   }
 
@@ -65,8 +64,7 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
                                        bool allowTurnInPlace) {
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
-               HALUsageReporting::kRobotDrive2_DifferentialCurvature, 2);
+    HAL_ReportUsage("RobotDrive", "DifferentialCurvature");
     reported = true;
   }
 
@@ -88,8 +86,7 @@ void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
                                   bool squareInputs) {
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
-               HALUsageReporting::kRobotDrive2_DifferentialTank, 2);
+    HAL_ReportUsage("RobotDrive", "DifferentialTank");
     reported = true;
   }
 

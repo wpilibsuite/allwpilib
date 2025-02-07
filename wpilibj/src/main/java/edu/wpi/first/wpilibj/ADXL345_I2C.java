@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
@@ -134,7 +132,7 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
 
     setRange(range);
 
-    HAL.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C);
+    HAL.reportUsage("I2C[" + port.value + "][" + deviceAddress + "]", "ADXL345");
     SendableRegistry.add(this, "ADXL345_I2C", port.value);
   }
 

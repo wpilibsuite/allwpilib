@@ -5,6 +5,7 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 
 #include <units/current.h>
 #include <units/pressure.h>
@@ -254,6 +255,14 @@ class PneumaticsBase {
    * @return Compressor object
    */
   virtual Compressor MakeCompressor() = 0;
+
+  /**
+   * Report usage.
+   *
+   * @param device device and channel as appropriate
+   * @param data arbitrary usage data
+   */
+  virtual void ReportUsage(std::string_view device, std::string_view data) = 0;
 
   /**
    * For internal use to get a module for a specific type.

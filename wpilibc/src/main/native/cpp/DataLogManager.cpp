@@ -13,7 +13,7 @@
 #include <vector>
 
 #include <fmt/chrono.h>
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/DataLog.h>
 #include <wpi/DataLogBackgroundWriter.h>
@@ -79,8 +79,7 @@ static std::string MakeLogDir(std::string_view dir) {
       (s.permissions() & fs::perms::others_write) != fs::perms::none) {
     fs::create_directory("/u/logs", ec);
     return "/u/logs";
-    HAL_Report(HALUsageReporting::kResourceType_DataLogManager,
-               HALUsageReporting::kDataLogLocation_USB);
+    HAL_ReportUsage("DataLogManager", "USB");
   }
   if (RobotBase::GetRuntimeType() == kRoboRIO) {
     FRC_ReportWarning(
@@ -88,8 +87,7 @@ static std::string MakeLogDir(std::string_view dir) {
         "not recommended! Plug in a FAT32 formatted flash drive!");
   }
   fs::create_directory("/home/lvuser/logs", ec);
-  HAL_Report(HALUsageReporting::kResourceType_DataLogManager,
-             HALUsageReporting::kDataLogLocation_Onboard);
+  HAL_ReportUsage("DataLogManager", "Onboard");
   return "/home/lvuser/logs";
 #else
   std::string logDir = filesystem::GetOperatingDirectory() + "/logs";

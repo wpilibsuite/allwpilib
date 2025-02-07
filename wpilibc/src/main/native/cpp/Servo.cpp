@@ -4,7 +4,7 @@
 
 #include "frc/Servo.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -23,7 +23,7 @@ Servo::Servo(int channel) : PWM(channel) {
   // Assign defaults for period multiplier for the servo PWM control signal
   SetPeriodMultiplier(kPeriodMultiplier_4X);
 
-  HAL_Report(HALUsageReporting::kResourceType_Servo, channel + 1);
+  HAL_ReportUsage("IO", channel, "Servo");
   wpi::SendableRegistry::SetName(this, "Servo", channel);
 }
 

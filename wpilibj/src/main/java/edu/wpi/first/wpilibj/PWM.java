@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.PWMConfigDataResult;
 import edu.wpi.first.hal.PWMJNI;
@@ -65,7 +64,7 @@ public class PWM implements Sendable, AutoCloseable {
 
     PWMJNI.setPWMEliminateDeadband(m_handle, false);
 
-    HAL.report(tResourceType.kResourceType_PWM, channel + 1);
+    HAL.reportUsage("IO", channel, "PWM");
     if (registerSendable) {
       SendableRegistry.add(this, "PWM", channel);
     }

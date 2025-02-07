@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.counter;
 
 import edu.wpi.first.hal.CounterJNI;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -33,7 +32,7 @@ public class Tachometer implements Sendable, AutoCloseable {
   public Tachometer(int channel, EdgeConfiguration configuration) {
     m_handle = CounterJNI.initializeCounter(channel, configuration.rising);
 
-    HAL.report(tResourceType.kResourceType_Counter, channel + 1);
+    HAL.reportUsage("IO", channel, "Tachometer");
     SendableRegistry.add(this, "Tachometer", channel);
   }
 

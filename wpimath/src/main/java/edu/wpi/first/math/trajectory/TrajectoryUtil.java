@@ -5,7 +5,6 @@
 package edu.wpi.first.math.trajectory;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.jni.TrajectoryUtilJNI;
@@ -81,7 +80,7 @@ public final class TrajectoryUtil {
    */
   public static Trajectory fromPathweaverJson(Path path) throws IOException {
     MathSharedStore.reportUsage(
-        MathUsageId.kTrajectory_PathWeaver, ++pathWeaverTrajectoryInstances);
+        "Trajectory.PathWeaver", String.valueOf(++pathWeaverTrajectoryInstances));
     return createTrajectoryFromElements(TrajectoryUtilJNI.fromPathweaverJson(path.toString()));
   }
 
