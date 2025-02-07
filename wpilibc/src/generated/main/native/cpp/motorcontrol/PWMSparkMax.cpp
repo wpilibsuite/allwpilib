@@ -16,5 +16,5 @@ PWMSparkMax::PWMSparkMax(int channel) : PWMMotorController("PWMSparkMax", channe
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_ReportUsage("DIO", GetChannel(), "RevSparkMaxPWM");
+  HAL_ReportUsage("IO", GetChannel(), "RevSparkMaxPWM");
 }

@@ -31,7 +31,7 @@ void DutyCycle::InitDutyCycle() {
   std::string stackTrace = wpi::GetStackTrace(1);
   m_handle = HAL_InitializeDutyCycle(m_channel, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  HAL_ReportUsage("DutyCycle", m_channel, "");
+  HAL_ReportUsage("IO", m_channel, "DutyCycle");
   wpi::SendableRegistry::Add(this, "Duty Cycle", m_channel);
 }
 

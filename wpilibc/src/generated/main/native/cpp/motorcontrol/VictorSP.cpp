@@ -16,5 +16,5 @@ VictorSP::VictorSP(int channel) : PWMMotorController("VictorSP", channel) {
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_ReportUsage("DIO", GetChannel(), "VictorSP");
+  HAL_ReportUsage("IO", GetChannel(), "VictorSP");
 }

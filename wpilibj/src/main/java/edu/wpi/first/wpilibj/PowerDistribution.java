@@ -51,9 +51,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     if (moduleType == ModuleType.kCTRE) {
-      HAL.reportUsage("PowerDistribution", m_module, "CTRE");
+      HAL.reportUsage("PDP", m_module, "");
     } else {
-      HAL.reportUsage("PowerDistribution", m_module, "Rev");
+      HAL.reportUsage("PDH", m_module, "");
     }
     SendableRegistry.add(this, "PowerDistribution", m_module);
   }

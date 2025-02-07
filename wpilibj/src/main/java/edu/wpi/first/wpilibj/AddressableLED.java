@@ -29,7 +29,7 @@ public class AddressableLED implements AutoCloseable {
   public AddressableLED(int port) {
     m_pwmHandle = PWMJNI.initializePWMPort(port);
     m_handle = AddressableLEDJNI.initialize(m_pwmHandle);
-    HAL.reportUsage("AddressableLED", port, "");
+    HAL.reportUsage("IO", port, "AddressableLED");
   }
 
   @Override

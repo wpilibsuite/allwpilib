@@ -49,7 +49,7 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
         gyroAngle,
         new DifferentialDriveWheelPositions(leftDistanceMeters, rightDistanceMeters),
         initialPoseMeters);
-    MathSharedStore.reportUsage("Odometry_DifferentialDrive", "");
+    MathSharedStore.reportUsage("DifferentialDriveOdometry3d", "");
   }
 
   /**

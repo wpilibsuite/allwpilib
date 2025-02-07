@@ -65,7 +65,7 @@ public class TrapezoidProfile {
     public Constraints(double maxVelocity, double maxAcceleration) {
       this.maxVelocity = maxVelocity;
       this.maxAcceleration = maxAcceleration;
-      MathSharedStore.reportUsage("Trajectory_TrapezoidProfile", "");
+      MathSharedStore.reportUsage("TrapezoidProfile", "");
     }
   }
 

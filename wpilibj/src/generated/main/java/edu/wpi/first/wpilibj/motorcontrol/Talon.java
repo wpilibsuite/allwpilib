@@ -42,6 +42,6 @@ public class Talon extends PWMMotorController {
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();
 
-    HAL.reportUsage("DIO", getChannel(), "Talon");
+    HAL.reportUsage("IO", getChannel(), "Talon");
   }
 }

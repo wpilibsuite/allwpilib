@@ -48,7 +48,7 @@ class SwerveDriveOdometry
       : SwerveDriveOdometry::Odometry(m_kinematicsImpl, gyroAngle,
                                       modulePositions, initialPose),
         m_kinematicsImpl(kinematics) {
-    wpi::math::MathSharedStore::ReportUsage("Odometry_SwerveDrive", "");
+    wpi::math::MathSharedStore::ReportUsage("SwerveDriveOdometry", "");
   }
 
  private:

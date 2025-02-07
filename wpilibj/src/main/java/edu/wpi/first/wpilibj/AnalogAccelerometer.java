@@ -24,7 +24,7 @@ public class AnalogAccelerometer implements Sendable, AutoCloseable {
 
   /** Common initialization. */
   private void initAccelerometer() {
-    HAL.reportUsage("Accelerometer", m_analogChannel.getChannel(), "");
+    HAL.reportUsage("IO", m_analogChannel.getChannel(), "Accelerometer");
     SendableRegistry.add(this, "Accelerometer", m_analogChannel.getChannel());
   }
 

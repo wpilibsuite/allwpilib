@@ -81,7 +81,7 @@ public class MecanumDriveKinematics
         frontLeftWheelMeters, frontRightWheelMeters, rearLeftWheelMeters, rearRightWheelMeters);
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
 
-    MathSharedStore.reportUsage("Kinematics_MecanumDrive", "");
+    MathSharedStore.reportUsage("MecanumDriveKinematics", "");
   }
 
   /**

@@ -45,7 +45,7 @@ public class SwerveDriveOdometry3d extends Odometry3d<SwerveModulePosition[]> {
 
     m_numModules = modulePositions.length;
 
-    MathSharedStore.reportUsage("Odometry_SwerveDrive", "");
+    MathSharedStore.reportUsage("SwerveDriveOdometry3d", "");
   }
 
   /**

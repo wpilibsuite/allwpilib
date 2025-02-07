@@ -31,7 +31,7 @@ AnalogInput::AnalogInput(int channel) {
   m_port = HAL_InitializeAnalogInputPort(channel, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
-  HAL_ReportUsage("AnalogInput", channel, "");
+  HAL_ReportUsage("IO", channel, "AnalogInput");
 
   wpi::SendableRegistry::Add(this, "AnalogInput", channel);
 }

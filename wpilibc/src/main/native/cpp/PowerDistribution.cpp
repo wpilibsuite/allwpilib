@@ -41,9 +41,9 @@ PowerDistribution::PowerDistribution() {
 
   if (HAL_GetPowerDistributionType(m_handle, &status) ==
       HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
-    HAL_ReportUsage("PowerDistribution", m_module, "CTRE");
+    HAL_ReportUsage("PDP", m_module, "");
   } else {
-    HAL_ReportUsage("PowerDistribution", m_module, "Rev");
+    HAL_ReportUsage("PDH", m_module, "");
   }
   wpi::SendableRegistry::Add(this, "PowerDistribution", m_module);
 }

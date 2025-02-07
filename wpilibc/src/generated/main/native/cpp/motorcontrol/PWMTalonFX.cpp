@@ -16,5 +16,5 @@ PWMTalonFX::PWMTalonFX(int channel) : PWMMotorController("PWMTalonFX", channel) 
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_ReportUsage("DIO", GetChannel(), "TalonFX");
+  HAL_ReportUsage("IO", GetChannel(), "TalonFX");
 }

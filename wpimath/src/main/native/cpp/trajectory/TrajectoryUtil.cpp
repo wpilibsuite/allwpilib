@@ -37,7 +37,7 @@ Trajectory TrajectoryUtil::FromPathweaverJson(std::string_view path) {
   wpi::json json = wpi::json::parse(fileBuffer.value()->GetCharBuffer());
 
   wpi::math::MathSharedStore::ReportUsage(
-      "Trajectory_PathWeaver", std::to_string(++pathWeaverTrajectoryInstances));
+      "Trajectory.PathWeaver", std::to_string(++pathWeaverTrajectoryInstances));
 
   return Trajectory{json.get<std::vector<Trajectory::State>>()};
 }

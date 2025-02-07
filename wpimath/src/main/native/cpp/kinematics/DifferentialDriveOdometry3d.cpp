@@ -13,5 +13,5 @@ DifferentialDriveOdometry3d::DifferentialDriveOdometry3d(
     units::meter_t rightDistance, const Pose3d& initialPose)
     : Odometry3d(m_kinematicsImpl, gyroAngle, {leftDistance, rightDistance},
                  initialPose) {
-  wpi::math::MathSharedStore::ReportUsage("Odometry_DifferentialDrive", "");
+  wpi::math::MathSharedStore::ReportUsage("DifferentialDriveOdometry3d", "");
 }

@@ -34,7 +34,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
     m_handle = DutyCycleJNI.initialize(channel);
 
     m_channel = channel;
-    HAL.reportUsage("DutyCycle", channel, "");
+    HAL.reportUsage("IO", channel, "DutyCycle");
     SendableRegistry.add(this, "Duty Cycle", channel);
   }
 

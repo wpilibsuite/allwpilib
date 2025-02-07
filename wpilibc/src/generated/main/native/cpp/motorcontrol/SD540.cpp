@@ -16,5 +16,5 @@ SD540::SD540(int channel) : PWMMotorController("SD540", channel) {
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_ReportUsage("DIO", GetChannel(), "MindsensorsSD540");
+  HAL_ReportUsage("IO", GetChannel(), "MindsensorsSD540");
 }

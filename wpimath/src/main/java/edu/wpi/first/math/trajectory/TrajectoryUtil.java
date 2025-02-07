@@ -80,7 +80,7 @@ public final class TrajectoryUtil {
    */
   public static Trajectory fromPathweaverJson(Path path) throws IOException {
     MathSharedStore.reportUsage(
-        "Trajectory_PathWeaver", String.valueOf(++pathWeaverTrajectoryInstances));
+        "Trajectory.PathWeaver", String.valueOf(++pathWeaverTrajectoryInstances));
     return createTrajectoryFromElements(TrajectoryUtilJNI.fromPathweaverJson(path.toString()));
   }
 

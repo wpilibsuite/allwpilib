@@ -13,5 +13,5 @@ MecanumDriveOdometry::MecanumDriveOdometry(
     const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose)
     : Odometry(m_kinematicsImpl, gyroAngle, wheelPositions, initialPose),
       m_kinematicsImpl(kinematics) {
-  wpi::math::MathSharedStore::ReportUsage("Odometry_MecanumDrive", "");
+  wpi::math::MathSharedStore::ReportUsage("MecanumDriveOdometry", "");
 }

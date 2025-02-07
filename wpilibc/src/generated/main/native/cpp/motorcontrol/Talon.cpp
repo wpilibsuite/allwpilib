@@ -16,5 +16,5 @@ Talon::Talon(int channel) : PWMMotorController("Talon", channel) {
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_ReportUsage("DIO", GetChannel(), "Talon");
+  HAL_ReportUsage("IO", GetChannel(), "Talon");
 }

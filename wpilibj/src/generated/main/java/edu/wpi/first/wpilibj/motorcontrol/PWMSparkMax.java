@@ -42,6 +42,6 @@ public class PWMSparkMax extends PWMMotorController {
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();
 
-    HAL.reportUsage("DIO", getChannel(), "RevSparkMaxPWM");
+    HAL.reportUsage("IO", getChannel(), "RevSparkMaxPWM");
   }
 }

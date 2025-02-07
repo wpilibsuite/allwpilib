@@ -80,7 +80,7 @@ public class SwerveDriveKinematics
     }
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
 
-    MathSharedStore.reportUsage("Kinematics_SwerveDrive", "");
+    MathSharedStore.reportUsage("SwerveDriveKinematics", "");
   }
 
   /**

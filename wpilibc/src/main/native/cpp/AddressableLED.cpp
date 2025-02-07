@@ -31,7 +31,7 @@ AddressableLED::AddressableLED(int port) : m_port{port} {
     HAL_FreePWMPort(m_pwmHandle);
   }
 
-  HAL_ReportUsage("AddressableLED", port, "");
+  HAL_ReportUsage("IO", port, "AddressableLED");
 }
 
 void AddressableLED::SetLength(int length) {

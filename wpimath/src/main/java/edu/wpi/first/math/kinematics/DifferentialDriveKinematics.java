@@ -46,7 +46,7 @@ public class DifferentialDriveKinematics
    */
   public DifferentialDriveKinematics(double trackWidthMeters) {
     this.trackWidthMeters = trackWidthMeters;
-    MathSharedStore.reportUsage("Kinematics_DifferentialDrive", "");
+    MathSharedStore.reportUsage("DifferentialDriveKinematics", "");
   }
 
   /**

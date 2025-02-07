@@ -23,7 +23,7 @@ Servo::Servo(int channel) : PWM(channel) {
   // Assign defaults for period multiplier for the servo PWM control signal
   SetPeriodMultiplier(kPeriodMultiplier_4X);
 
-  HAL_ReportUsage("Servo", channel, "");
+  HAL_ReportUsage("IO", channel, "Servo");
   wpi::SendableRegistry::SetName(this, "Servo", channel);
 }
 

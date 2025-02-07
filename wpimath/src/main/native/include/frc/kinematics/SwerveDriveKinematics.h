@@ -78,7 +78,7 @@ class SwerveDriveKinematics
 
     m_forwardKinematics = m_inverseKinematics.householderQr();
 
-    wpi::math::MathSharedStore::ReportUsage("Kinematics_SwerveDrive", "");
+    wpi::math::MathSharedStore::ReportUsage("SwerveDriveKinematics", "");
   }
 
   explicit SwerveDriveKinematics(

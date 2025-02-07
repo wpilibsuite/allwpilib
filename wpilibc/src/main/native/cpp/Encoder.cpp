@@ -172,9 +172,19 @@ void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
       static_cast<HAL_EncoderEncodingType>(encodingType), &status);
   FRC_CheckErrorStatus(status, "InitEncoder");
 
-  HAL_ReportUsage(
-      fmt::format("Encoder[{},{}]", aChannel, bChannel),
-      fmt::format("{{\"type\":{}}}", static_cast<int>(encodingType)));
+  const char* type = "Encoder";
+  switch (encodingType) {
+    case k1X:
+      type = "Encoder:1x";
+      break;
+    case k2X:
+      type = "Encoder:2x";
+      break;
+    case k4X:
+      type = "Encoder:4x";
+      break;
+  }
+  HAL_ReportUsage(fmt::format("IO[{},{}]", aChannel, bChannel), type);
   // wpi::SendableRegistry::Add(this, "Encoder", m_aSource->GetChannel());
 }
 

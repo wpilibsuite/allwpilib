@@ -35,7 +35,7 @@ public class DigitalOutput implements AutoCloseable, Sendable {
 
     m_handle = DIOJNI.initializeDIOPort(channel, false);
 
-    HAL.reportUsage("DigitalOutput", channel, "");
+    HAL.reportUsage("IO", channel, "DigitalOutput");
     SendableRegistry.add(this, "DigitalOutput", channel);
   }
 

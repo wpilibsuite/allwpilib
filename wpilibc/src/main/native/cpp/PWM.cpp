@@ -37,7 +37,7 @@ PWM::PWM(int channel, bool registerSendable) {
   HAL_SetPWMEliminateDeadband(m_handle, false, &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
-  HAL_ReportUsage("PWM", channel, "");
+  HAL_ReportUsage("IO", channel, "PWM");
   if (registerSendable) {
     wpi::SendableRegistry::Add(this, "PWM", channel);
   }

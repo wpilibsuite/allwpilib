@@ -33,7 +33,7 @@ public class DigitalInput implements AutoCloseable, Sendable {
 
     m_handle = DIOJNI.initializeDIOPort(channel, true);
 
-    HAL.reportUsage("DigitalInput", channel, "");
+    HAL.reportUsage("IO", channel, "DigitalInput");
     SendableRegistry.add(this, "DigitalInput", channel);
   }
 

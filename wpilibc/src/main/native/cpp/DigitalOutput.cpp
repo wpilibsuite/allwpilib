@@ -31,7 +31,7 @@ DigitalOutput::DigitalOutput(int channel) {
   m_handle = HAL_InitializeDIOPort(channel, false, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
-  HAL_ReportUsage("DigitalOutput", channel, "");
+  HAL_ReportUsage("IO", channel, "DigitalOutput");
   wpi::SendableRegistry::Add(this, "DigitalOutput", channel);
 }
 

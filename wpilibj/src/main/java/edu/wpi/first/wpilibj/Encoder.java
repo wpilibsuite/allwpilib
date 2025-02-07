@@ -45,8 +45,15 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
       int aChannel, int bChannel, boolean reverseDirection, final EncodingType type) {
     m_encoder = EncoderJNI.initializeEncoder(aChannel, bChannel, reverseDirection, type.value);
 
+    String typeStr = switch (type) {
+      case k1X -> "Encoder:1x";
+      case k2X -> "Encoder:2x";
+      case k4X -> "Encoder:4x";
+      default -> "Encoder";
+    };
+    HAL.reportUsage("IO[" + aChannel + "," + bChannel + "]", typeStr);
+
     int fpgaIndex = getFPGAIndex();
-    HAL.reportUsage("Encoder[" + aChannel + "," + bChannel + "]", "{\"type\":" + type.value + "}");
     SendableRegistry.add(this, "Encoder", fpgaIndex);
   }
 

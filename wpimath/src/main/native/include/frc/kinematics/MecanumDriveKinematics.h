@@ -66,7 +66,7 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
     SetInverseKinematics(frontLeftWheel, frontRightWheel, rearLeftWheel,
                          rearRightWheel);
     m_forwardKinematics = m_inverseKinematics.householderQr();
-    wpi::math::MathSharedStore::ReportUsage("Kinematics_MecanumDrive", "");
+    wpi::math::MathSharedStore::ReportUsage("MecanumDriveKinematics", "");
   }
 
   MecanumDriveKinematics(const MecanumDriveKinematics&) = default;

@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
@@ -89,6 +90,7 @@ public class SharpIR implements Sendable, AutoCloseable {
     m_minCM = minCM;
     m_maxCM = maxCM;
 
+    HAL.reportUsage("IO", channel, "SharpIR");
     SendableRegistry.add(this, "SharpIR", channel);
 
     m_simDevice = SimDevice.create("SharpIR", m_sensor.getChannel());
