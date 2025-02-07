@@ -32,7 +32,7 @@ public class Tachometer implements Sendable, AutoCloseable {
   public Tachometer(int channel, EdgeConfiguration configuration) {
     m_handle = CounterJNI.initializeCounter(channel, configuration.rising);
 
-    HAL.reportUsage("DIO", channel, "Tachometer");
+    HAL.reportUsage("IO", channel, "Tachometer");
     SendableRegistry.add(this, "Tachometer", channel);
   }
 
