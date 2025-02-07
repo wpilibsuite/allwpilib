@@ -13,7 +13,6 @@
 #include <hal/Ports.h>
 #include <hal/REVPH.h>
 #include <hal/UsageReporting.h>
-#include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>
 

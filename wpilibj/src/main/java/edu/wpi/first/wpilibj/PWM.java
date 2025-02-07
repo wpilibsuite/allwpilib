@@ -62,6 +62,8 @@ public class PWM implements Sendable, AutoCloseable {
 
     setDisabled();
 
+    PWMJNI.setPWMEliminateDeadband(m_handle, false);
+
     HAL.reportUsage("IO", channel, "PWM");
     if (registerSendable) {
       SendableRegistry.add(this, "PWM", channel);

@@ -4,11 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.datalog.DataLog;
-import edu.wpi.first.datalog.DataLogBackgroundWriter;
-import edu.wpi.first.datalog.FileLogger;
-import edu.wpi.first.datalog.IntegerLogEntry;
-import edu.wpi.first.datalog.StringLogEntry;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.WPIUtilJNI;
@@ -246,7 +241,6 @@ public final class DataLogManager {
             // ignored
           }
           HAL.reportUsage("DataLogManager", "USB");
-          HAL.reportUsage("DataLogManager", "USB");
           return "/u/logs";
         }
       } catch (IOException ex) {
@@ -261,7 +255,6 @@ public final class DataLogManager {
       if (!new File("/home/lvuser/logs").mkdir()) {
         // ignored
       }
-      HAL.reportUsage("DataLogManager", "Onboard");
       HAL.reportUsage("DataLogManager", "Onboard");
       return "/home/lvuser/logs";
     }
