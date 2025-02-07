@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @see "hal/HALBase.h"
  * @see "hal/Main.h"
- * @see "hal/FRCUsageReporting.h"
+ * @see "hal/UsageReporting.h"
  */
 public final class HAL extends JNIWrapper {
   /**
@@ -212,52 +212,28 @@ public final class HAL extends JNIWrapper {
   public static native boolean getSystemTimeValid();
 
   /**
-   * Report the usage of a resource of interest.
+   * Reports usage of a resource of interest. Repeated calls for the same resource name replace the
+   * previous report.
    *
-   * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
-   * char*)</code>
-   *
-   * @param resource one of the values in the tResourceType above.
-   * @param instanceNumber an index that identifies the resource instance.
-   * @see "HAL_Report"
+   * @param resource the used resource name
+   * @param data arbitrary associated data string
+   * @return a handle
    */
-  public static void report(int resource, int instanceNumber) {
-    report(resource, instanceNumber, 0, "");
+  public static int reportUsage(String resource, String data) {
+    return UsageReportingJNI.report(resource, data);
   }
 
   /**
-   * Report the usage of a resource of interest.
+   * Reports usage of a resource of interest. Repeated calls for the same resource name replace the
+   * previous report.
    *
-   * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
-   * char*)</code>
-   *
-   * @param resource one of the values in the tResourceType above.
-   * @param instanceNumber an index that identifies the resource instance.
-   * @param context an optional additional context number for some cases (such as module number).
-   *     Set to 0 to omit.
-   * @see "HAL_Report"
+   * @param resource the used resource name
+   * @param instanceNumber an index that identifies the resource instance
+   * @param data arbitrary associated data string
+   * @return a handle
    */
-  public static void report(int resource, int instanceNumber, int context) {
-    report(resource, instanceNumber, context, "");
-  }
-
-  /**
-   * Report the usage of a resource of interest.
-   *
-   * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
-   * char*)</code>
-   *
-   * @param resource one of the values in the tResourceType above.
-   * @param instanceNumber an index that identifies the resource instance.
-   * @param context an optional additional context number for some cases (such as module number).
-   *     Set to 0 to omit.
-   * @param feature a string to be included describing features in use on a specific resource.
-   *     Setting the same resource more than once allows you to change the feature string.
-   * @return the index of the added value in NetComm
-   * @see "HAL_Report"
-   */
-  public static int report(int resource, int instanceNumber, int context, String feature) {
-    return DriverStationJNI.report(resource, instanceNumber, context, feature);
+  public static int reportUsage(String resource, int instanceNumber, String data) {
+    return reportUsage(resource + "[" + instanceNumber + "]", data);
   }
 
   private HAL() {}

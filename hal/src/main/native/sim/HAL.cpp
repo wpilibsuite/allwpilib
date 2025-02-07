@@ -458,8 +458,8 @@ void HALSIM_CancelAllSimPeriodicCallbacks(void) {
   gSimPeriodicAfter.Reset();
 }
 
-int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
-                   const char* feature) {
+int32_t HAL_ReportUsage(const struct WPI_String* resource,
+                        const struct WPI_String* data) {
   return 0;  // Do nothing for now
 }
 

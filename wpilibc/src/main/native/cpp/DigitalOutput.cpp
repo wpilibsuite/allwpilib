@@ -7,9 +7,9 @@
 #include <string>
 
 #include <hal/DIO.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
+#include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -31,7 +31,7 @@ DigitalOutput::DigitalOutput(int channel) {
   m_handle = HAL_InitializeDIOPort(channel, false, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
-  HAL_Report(HALUsageReporting::kResourceType_DigitalOutput, channel + 1);
+  HAL_ReportUsage("IO", channel, "DigitalOutput");
   wpi::SendableRegistry::Add(this, "DigitalOutput", channel);
 }
 

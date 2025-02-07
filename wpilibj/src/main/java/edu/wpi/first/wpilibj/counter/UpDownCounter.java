@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.counter;
 
 import edu.wpi.first.hal.CounterJNI;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -32,7 +31,7 @@ public class UpDownCounter implements Sendable, AutoCloseable {
 
     reset();
 
-    HAL.report(tResourceType.kResourceType_Counter, channel);
+    HAL.reportUsage("IO", channel, "UpDownCounter");
     SendableRegistry.add(this, "UpDown Counter", channel);
   }
 

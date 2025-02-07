@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
@@ -82,6 +83,8 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
     m_fullRange = fullRange;
     m_expectedZero = expectedZero;
+
+    HAL.reportUsage("IO", m_analogInput.getChannel(), "AnalogEncoder");
 
     SendableRegistry.add(this, "Analog Encoder", m_analogInput.getChannel());
   }

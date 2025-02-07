@@ -6,7 +6,7 @@
 
 #include "frc/motorcontrol/Jaguar.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 using namespace frc;
 
@@ -16,5 +16,5 @@ Jaguar::Jaguar(int channel) : PWMMotorController("Jaguar", channel) {
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_Jaguar, GetChannel() + 1);
+  HAL_ReportUsage("IO", GetChannel(), "Jaguar");
 }

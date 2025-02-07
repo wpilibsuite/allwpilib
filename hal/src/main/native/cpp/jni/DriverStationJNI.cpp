@@ -12,7 +12,6 @@
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_DriverStationJNI.h"
 #include "hal/DriverStation.h"
-#include "hal/FRCUsageReporting.h"
 #include "hal/HALBase.h"
 
 static_assert(edu_wpi_first_hal_DriverStationJNI_kUnknownAllianceStation ==
@@ -100,22 +99,6 @@ Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramTest
   (JNIEnv*, jclass)
 {
   HAL_ObserveUserProgramTest();
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    report
- * Signature: (IIILjava/lang/String;)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_report
-  (JNIEnv* paramEnv, jclass, jint paramResource, jint paramInstanceNumber,
-   jint paramContext, jstring paramFeature)
-{
-  JStringRef featureStr{paramEnv, paramFeature};
-  jint returnValue = HAL_Report(paramResource, paramInstanceNumber,
-                                paramContext, featureStr.c_str());
-  return returnValue;
 }
 
 /*

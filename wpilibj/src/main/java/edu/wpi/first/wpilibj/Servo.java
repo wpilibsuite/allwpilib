@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -37,7 +36,7 @@ public class Servo extends PWM {
     setBoundsMicroseconds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
     setPeriodMultiplier(PeriodMultiplier.k4X);
 
-    HAL.report(tResourceType.kResourceType_Servo, getChannel() + 1);
+    HAL.reportUsage("IO", getChannel(), "Servo");
     SendableRegistry.setName(this, "Servo", getChannel());
   }
 

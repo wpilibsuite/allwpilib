@@ -6,7 +6,7 @@
 
 #include "frc/motorcontrol/PWMVenom.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 using namespace frc;
 
@@ -16,5 +16,5 @@ PWMVenom::PWMVenom(int channel) : PWMMotorController("PWMVenom", channel) {
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_FusionVenom, GetChannel() + 1);
+  HAL_ReportUsage("IO", GetChannel(), "FusionVenom");
 }

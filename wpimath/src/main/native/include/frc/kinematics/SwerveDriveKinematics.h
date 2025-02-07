@@ -78,8 +78,7 @@ class SwerveDriveKinematics
 
     m_forwardKinematics = m_inverseKinematics.householderQr();
 
-    wpi::math::MathSharedStore::ReportUsage(
-        wpi::math::MathUsageId::kKinematics_SwerveDrive, 1);
+    wpi::math::MathSharedStore::ReportUsage("SwerveDriveKinematics", "");
   }
 
   explicit SwerveDriveKinematics(
@@ -95,8 +94,7 @@ class SwerveDriveKinematics
 
     m_forwardKinematics = m_inverseKinematics.householderQr();
 
-    wpi::math::MathSharedStore::ReportUsage(
-        wpi::math::MathUsageId::kKinematics_SwerveDrive, 1);
+    wpi::math::MathSharedStore::ReportUsage("Kinematics_SwerveDrive", "");
   }
 
   SwerveDriveKinematics(const SwerveDriveKinematics&) = default;

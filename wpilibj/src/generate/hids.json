@@ -2,7 +2,6 @@
   {
     "ConsoleName": "Xbox",
     "Manufacturer": "Microsoft",
-    "SkipReporting": false,
     "AxisNameSuffix": "Trigger",
     "buttons": [
       {
@@ -106,7 +105,6 @@
   {
     "ConsoleName": "PS4",
     "Manufacturer": "Sony",
-    "SkipReporting": false,
     "AxisNameSuffix": "2",
     "buttons": [
       {
@@ -225,7 +223,6 @@
   {
     "ConsoleName": "PS5",
     "Manufacturer": "Sony",
-    "SkipReporting": true,
     "AxisNameSuffix": "2",
     "buttons": [
       {
@@ -344,7 +341,6 @@
   {
     "ConsoleName": "Stadia",
     "Manufacturer": "Google",
-    "SkipReporting": true,
     "AxisNameSuffix": "Trigger",
     "buttons": [
       {

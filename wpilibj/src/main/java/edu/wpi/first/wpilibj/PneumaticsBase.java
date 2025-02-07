@@ -245,4 +245,12 @@ public interface PneumaticsBase extends AutoCloseable {
    * @return Compressor object
    */
   Compressor makeCompressor();
+
+  /**
+   * Report usage.
+   *
+   * @param device device and channel as appropriate
+   * @param data arbitrary usage data
+   */
+  void reportUsage(String device, String data);
 }

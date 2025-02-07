@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -81,7 +80,7 @@ public class SwerveDriveKinematics
     }
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
 
-    MathSharedStore.reportUsage(MathUsageId.kKinematics_SwerveDrive, 1);
+    MathSharedStore.reportUsage("SwerveDriveKinematics", "");
   }
 
   /**

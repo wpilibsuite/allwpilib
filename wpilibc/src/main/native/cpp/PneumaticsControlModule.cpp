@@ -7,7 +7,9 @@
 #include <memory>
 #include <string>
 
+#include <fmt/format.h>
 #include <hal/CTREPCM.h>
+#include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>
 
@@ -287,6 +289,11 @@ DoubleSolenoid PneumaticsControlModule::MakeDoubleSolenoid(int forwardChannel,
 
 Compressor PneumaticsControlModule::MakeCompressor() {
   return Compressor{m_module, PneumaticsModuleType::CTREPCM};
+}
+
+void PneumaticsControlModule::ReportUsage(std::string_view device,
+                                          std::string_view data) {
+  HAL_ReportUsage(fmt::format("PCM[{}]/{}", m_module, device), data);
 }
 
 std::shared_ptr<PneumaticsBase> PneumaticsControlModule::GetForModule(

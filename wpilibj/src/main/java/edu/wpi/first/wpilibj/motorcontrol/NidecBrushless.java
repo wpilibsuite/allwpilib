@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -45,7 +44,7 @@ public class NidecBrushless extends MotorSafety
     m_pwm = new PWM(pwmChannel);
     SendableRegistry.addChild(this, m_pwm);
 
-    HAL.report(tResourceType.kResourceType_NidecBrushless, pwmChannel + 1);
+    HAL.reportUsage("IO[" + pwmChannel + "," + dioChannel + "]", "NidecBrushless");
     SendableRegistry.add(this, "Nidec Brushless", pwmChannel);
   }
 

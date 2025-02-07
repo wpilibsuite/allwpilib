@@ -6,8 +6,6 @@
 
 #include <utility>
 
-#include <hal/FRCUsageReporting.h>
-#include <hal/HALBase.h>
 #include <hal/Ports.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
@@ -50,10 +48,9 @@ DoubleSolenoid::DoubleSolenoid(int module, PneumaticsModuleType moduleType,
     }
   }
 
-  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_forwardChannel + 1,
-             m_module->GetModuleNumber() + 1);
-  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel + 1,
-             m_module->GetModuleNumber() + 1);
+  m_module->ReportUsage(
+      fmt::format("Solenoid[{},{}]", m_forwardChannel, m_reverseChannel),
+      "DoubleSolenoid");
 
   wpi::SendableRegistry::Add(this, "DoubleSolenoid",
                              m_module->GetModuleNumber(), m_forwardChannel);

@@ -21,25 +21,12 @@ public interface CameraServerShared {
   void reportDriverStationError(String error);
 
   /**
-   * Report an video server usage.
+   * Report usage.
    *
-   * @param id the usage id
+   * @param resource the resource name
+   * @param data arbitrary string data
    */
-  void reportVideoServer(int id);
-
-  /**
-   * Report a usb camera usage.
-   *
-   * @param id the usage id
-   */
-  void reportUsbCamera(int id);
-
-  /**
-   * Report an axis camera usage.
-   *
-   * @param id the usage id
-   */
-  void reportAxisCamera(int id);
+  void reportUsage(String resource, String data);
 
   /**
    * Get if running on a roboRIO.

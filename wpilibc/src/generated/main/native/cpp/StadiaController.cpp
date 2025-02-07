@@ -6,7 +6,7 @@
 
 #include "frc/StadiaController.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/event/BooleanEvent.h"
@@ -14,7 +14,7 @@
 using namespace frc;
 
 StadiaController::StadiaController(int port) : GenericHID(port) {
-  // HAL_Report(HALUsageReporting::kResourceType_StadiaController, port + 1);
+  HAL_ReportUsage("HID", port, "StadiaController");
 }
 
 double StadiaController::GetLeftX() const {

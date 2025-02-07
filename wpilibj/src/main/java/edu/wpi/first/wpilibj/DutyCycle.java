@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DutyCycleJNI;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -35,7 +34,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
     m_handle = DutyCycleJNI.initialize(channel);
 
     m_channel = channel;
-    HAL.report(tResourceType.kResourceType_DutyCycle, channel + 1);
+    HAL.reportUsage("IO", channel, "DutyCycle");
     SendableRegistry.add(this, "Duty Cycle", channel);
   }
 

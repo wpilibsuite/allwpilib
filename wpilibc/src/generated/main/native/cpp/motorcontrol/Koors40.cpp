@@ -6,7 +6,7 @@
 
 #include "frc/motorcontrol/Koors40.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 using namespace frc;
 
@@ -16,5 +16,5 @@ Koors40::Koors40(int channel) : PWMMotorController("Koors40", channel) {
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_Koors40, GetChannel() + 1);
+  HAL_ReportUsage("IO", GetChannel(), "Koors40");
 }

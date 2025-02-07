@@ -6,6 +6,7 @@
 
 #include <algorithm>
 
+#include <hal/UsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -31,6 +32,7 @@ SharpIR SharpIR::GP2Y0A51SK0F(int channel) {
 
 SharpIR::SharpIR(int channel, double a, double b, double minCM, double maxCM)
     : m_sensor(channel), m_A(a), m_B(b), m_minCM(minCM), m_maxCM(maxCM) {
+  HAL_ReportUsage("IO", channel, "SharpIR");
   wpi::SendableRegistry::Add(this, "SharpIR", channel);
 
   m_simDevice = hal::SimDevice("SharpIR", m_sensor.GetChannel());

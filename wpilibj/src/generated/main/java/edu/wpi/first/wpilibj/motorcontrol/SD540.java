@@ -6,7 +6,6 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PWM;
 
@@ -43,6 +42,6 @@ public class SD540 extends PWMMotorController {
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();
 
-    HAL.report(tResourceType.kResourceType_MindsensorsSD540, getChannel() + 1);
+    HAL.reportUsage("IO", getChannel(), "MindsensorsSD540");
   }
 }
