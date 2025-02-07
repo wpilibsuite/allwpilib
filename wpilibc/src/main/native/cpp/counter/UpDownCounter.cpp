@@ -27,7 +27,7 @@ UpDownCounter::UpDownCounter(int channel, EdgeConfiguration configuration)
 
   Reset();
 
-  HAL_ReportUsage("DIO", channel, "UpDownCounter");
+  HAL_ReportUsage("IO", channel, "UpDownCounter");
   wpi::SendableRegistry::Add(this, "UpDown Counter", channel);
 }
 
