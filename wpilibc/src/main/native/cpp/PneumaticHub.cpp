@@ -453,8 +453,7 @@ void PneumaticHub::ReportUsage(std::string_view device, std::string_view data) {
   HAL_ReportUsage(fmt::format("PH[{}]/{}", m_module, device), data);
 }
 
-std::shared_ptr<PneumaticsBase> PneumaticHub::GetForModule(int busId,
-                                                           int module) {
+std::shared_ptr<PneumaticsBase> PneumaticHub::GetForModule(int module) {
   std::string stackTrace = wpi::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
   auto& res = GetDataStore(busId, module);

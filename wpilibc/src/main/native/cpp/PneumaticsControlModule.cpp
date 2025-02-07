@@ -9,7 +9,6 @@
 
 #include <fmt/format.h>
 #include <hal/CTREPCM.h>
-#include <hal/Ports.h>
 #include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>

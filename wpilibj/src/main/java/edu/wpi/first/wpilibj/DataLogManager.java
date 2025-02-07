@@ -4,11 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.datalog.DataLog;
-import edu.wpi.first.datalog.DataLogBackgroundWriter;
-import edu.wpi.first.datalog.FileLogger;
-import edu.wpi.first.datalog.IntegerLogEntry;
-import edu.wpi.first.datalog.StringLogEntry;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.WPIUtilJNI;

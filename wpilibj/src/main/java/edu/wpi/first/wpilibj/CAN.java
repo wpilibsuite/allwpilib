@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.CANAPIJNI;
 import edu.wpi.first.hal.CANAPITypes;
+import edu.wpi.first.hal.CANData;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.can.CANReceiveMessage;
 import java.io.Closeable;
@@ -36,8 +37,8 @@ public class CAN implements Closeable {
    * @param busId The bus ID
    * @param deviceId The device id
    */
-  public CAN(int busId, int deviceId) {
-    this(busId, deviceId, kTeamManufacturer, kTeamDeviceType);
+  public CAN(int deviceId) {
+    this(kTeamManufacturer, deviceId, kTeamDeviceType);
   }
 
   /**
@@ -49,8 +50,8 @@ public class CAN implements Closeable {
    * @param deviceManufacturer The device manufacturer
    * @param deviceType The device type
    */
-  public CAN(int busId, int deviceId, int deviceManufacturer, int deviceType) {
-    m_handle = CANAPIJNI.initializeCAN(busId, deviceManufacturer, deviceId, deviceType);
+  public CAN(int deviceId, int deviceManufacturer, int deviceType) {
+    m_handle = CANAPIJNI.initializeCAN(deviceManufacturer, deviceId, deviceType);
     HAL.reportUsage("CAN[" + deviceType + "][" + deviceManufacturer + "][" + deviceId + "]", "");
   }
 

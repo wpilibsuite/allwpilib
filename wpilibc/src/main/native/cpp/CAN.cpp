@@ -15,10 +15,9 @@
 
 using namespace frc;
 
-CAN::CAN(int busId, int deviceId)
-    : CAN{busId, deviceId, kTeamManufacturer, kTeamDeviceType} {}
+CAN::CAN(int deviceId) : CAN{kTeamManufacturer, deviceId, kTeamDeviceType} {}
 
-CAN::CAN(int busId, int deviceId, int deviceManufacturer, int deviceType) {
+CAN::CAN(int deviceId, int deviceManufacturer, int deviceType) {
   int32_t status = 0;
   m_handle = HAL_InitializeCAN(
       busId, static_cast<HAL_CANManufacturer>(deviceManufacturer), deviceId,

@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.CTREPCMJNI;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.PortsJNI;
 import java.util.HashMap;
 import java.util.Map;
 

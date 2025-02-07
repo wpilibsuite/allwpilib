@@ -76,6 +76,7 @@ void InitializeHAL() {
   InitializeSerialPort();
   InitializeSmartIo();
   InitializeThreads();
+  InitializeUsageReporting();
 }
 }  // namespace init
 
@@ -364,17 +365,5 @@ void HAL_Shutdown(void) {}
 void HAL_SimPeriodicBefore(void) {}
 
 void HAL_SimPeriodicAfter(void) {}
-
-int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
-                   const char* feature) {
-  if (feature == nullptr) {
-    feature = "";
-  }
-
-  return 0;
-
-  // return FRC_NetworkCommunication_nUsageReporting_report(
-  //     resource, instanceNumber, context, feature);
-}
 
 }  // extern "C"
