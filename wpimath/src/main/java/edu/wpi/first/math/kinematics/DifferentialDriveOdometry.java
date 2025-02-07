@@ -35,8 +35,8 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
     super(
         new DifferentialDriveKinematics(1),
         gyroAngle,
-        new DifferentialDriveWheelPositions(leftDistance, rightDistance),
-        initialPose);
+        new DifferentialDriveWheelPositions(leftDistanceMeters, rightDistanceMeters),
+        initialPoseMeters);
     MathSharedStore.reportUsage("DifferentialDriveOdometry", "");
   }
 
