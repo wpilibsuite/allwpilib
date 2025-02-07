@@ -44,8 +44,8 @@ public class DifferentialDriveKinematics
    *     distance between the left wheels and right wheels. However, the empirical value may be
    *     larger than the physical measured value due to scrubbing effects.
    */
-  public DifferentialDriveKinematics(double trackwidth) {
-    this.trackwidth = trackwidth;
+  public DifferentialDriveKinematics(double trackWidthMeters) {
+    this.trackWidthMeters = trackWidthMeters;
     MathSharedStore.reportUsage("DifferentialDriveKinematics", "");
   }
 
