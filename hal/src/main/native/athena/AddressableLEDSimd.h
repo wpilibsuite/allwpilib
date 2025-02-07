@@ -270,4 +270,4 @@ void ConvertPixels(const uint8_t* src, uint8_t* dst, size_t pixelCount) {
     ConvertPixels<order, false, false>(src, dst, pixelCount);
   }
 }
-} // namespace hal::detail
+}  // namespace hal::detail
