@@ -9,7 +9,7 @@
 #include <string>
 
 #include <hal/Counter.h>
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 
@@ -35,7 +35,7 @@ UpDownCounter::UpDownCounter(int channel, EdgeConfiguration configuration)
 
   Reset();
 
-  HAL_Report(HALUsageReporting::kResourceType_Counter, channel + 1);
+  HAL_ReportUsage("IO", channel, "UpDownCounter");
   wpi::SendableRegistry::Add(this, "UpDown Counter", channel);
 }
 

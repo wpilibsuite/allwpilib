@@ -10,6 +10,7 @@
 #include <hal/CANAPI.h>
 #include <hal/Errors.h>
 #include <hal/UsageReporting.h>
+#include <hal/UsageReporting.h>
 
 #include "frc/Errors.h"
 
@@ -25,6 +26,9 @@ CAN::CAN(int deviceId, int deviceManufacturer, int deviceType) {
   FRC_CheckErrorStatus(status, "device id {} mfg {} type {}", deviceId,
                        deviceManufacturer, deviceType);
 
+  HAL_ReportUsage(
+      fmt::format("CAN[{}][{}][{}]", deviceType, deviceManufacturer, deviceId),
+      "");
   HAL_ReportUsage(
       fmt::format("CAN[{}][{}][{}]", deviceType, deviceManufacturer, deviceId),
       "");

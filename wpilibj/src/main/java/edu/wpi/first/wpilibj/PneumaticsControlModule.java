@@ -366,4 +366,9 @@ public class PneumaticsControlModule implements PneumaticsBase {
   public void reportUsage(String device, String data) {
     HAL.reportUsage("PCM[" + m_dataStore.m_module + "]/" + device, data);
   }
+
+  @Override
+  public void reportUsage(String device, String data) {
+    HAL.reportUsage("PCM[" + m_dataStore.m_module + "]/" + device, data);
+  }
 }
