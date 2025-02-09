@@ -13,6 +13,7 @@ import java.util.function.BiConsumer;
 /** Global registry for telemetry handlers (type handlers and telemetry backends). */
 public final class TelemetryRegistry {
   private static record TypeHandler(Class<?> cls, BiConsumer<Object, TelemetryEntry> handler) {}
+
   private static final List<TypeHandler> s_typeHandlers = new ArrayList<>();
   private static final PrefixMap<TelemetryBackend> s_backends = new StringPrefixMap<>();
 
@@ -46,11 +47,14 @@ public final class TelemetryRegistry {
       i++;
     }
 
-    TypeHandler typeHandler = new TypeHandler(cls, (v, entry) -> {
-      @SuppressWarnings("unchecked")
-      T value = (T) v;
-      handler.accept(value, entry);
-    });
+    TypeHandler typeHandler =
+        new TypeHandler(
+            cls,
+            (v, entry) -> {
+              @SuppressWarnings("unchecked")
+              T value = (T) v;
+              handler.accept(value, entry);
+            });
     if (replace) {
       s_typeHandlers.set(i, typeHandler);
     } else {
