@@ -36,6 +36,8 @@ modifiableFileExclude {
 
 licenseUpdateExclude {
   cscore/src/main/native/cpp/default_init_allocator\.hpp$
+  wpiutil/src/main/java/org/wpilib/util/collections/PrefixMap\.java$
+  wpiutil/src/main/java/org/wpilib/util/collections/prefixmap/
   wpiutil/src/main/native/cpp/Base64\.cpp$
   wpiutil/src/main/native/cpp/sha1\.cpp$
   wpiutil/src/main/native/include/wpi/util/sha1\.hpp$
