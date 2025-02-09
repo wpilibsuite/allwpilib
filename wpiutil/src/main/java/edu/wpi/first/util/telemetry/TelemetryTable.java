@@ -61,14 +61,14 @@ public final class TelemetryTable {
   }
 
   /**
-   * Sets metadata for a value. Metadata is a key/value map.
+   * Sets property for a value. Properties are stored as a key/value map.
    *
    * @param name the name
-   * @param key metadata key
-   * @param value metadata value
+   * @param key property key
+   * @param value property value
    */
-  public void setMetadata(String name, String key, String value) {
-    getEntry(name).setMetadata(key, value);
+  public void setProperty(String name, String key, String value) {
+    getEntry(name).setProperty(key, value);
   }
 
   /**
