@@ -11,5 +11,5 @@ public interface TelemetryLoggable {
    *
    * @param table telemetry table
    */
-  void logTelemetry(TelemetryTable table);
+  void log(TelemetryTable table);
 }
