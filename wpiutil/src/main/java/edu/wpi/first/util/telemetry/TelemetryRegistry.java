@@ -6,15 +6,14 @@ package edu.wpi.first.util.telemetry;
 
 import edu.wpi.first.util.collections.PrefixMap;
 import edu.wpi.first.util.collections.prefixmap.StringPrefixMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 /** Global registry for telemetry handlers (type handlers and telemetry backends). */
 public final class TelemetryRegistry {
-  // FIXME: this is unordered, and really should be ordered in class hierarchy order
-  private static final ConcurrentMap<Class<?>, BiConsumer<Object, TelemetryEntry>> s_typeHandlers =
-      new ConcurrentHashMap<>();
+  private static record TypeHandler(Class<?> cls, BiConsumer<Object, TelemetryEntry> handler) {}
+  private static final List<TypeHandler> s_typeHandlers = new ArrayList<>();
   private static final PrefixMap<TelemetryBackend> s_backends = new StringPrefixMap<>();
 
   private TelemetryRegistry() {
@@ -30,13 +29,33 @@ public final class TelemetryRegistry {
    * @param handler handler (accepts object and TelemetryEntry)
    */
   public static <T> void registerType(Class<T> cls, BiConsumer<T, TelemetryEntry> handler) {
-    s_typeHandlers.put(
-        cls,
-        (v, entry) -> {
-          @SuppressWarnings("unchecked")
-          T value = (T) v;
-          handler.accept(value, entry);
-        });
+    // we want this ordered such that the more specific types come before the less specific ones
+    // this is O(N^2) but N should be small
+    boolean replace = false;
+    int i = 0;
+    for (var entry : s_typeHandlers) {
+      if (entry.cls.equals(cls)) {
+        // replace existing
+        replace = true;
+        break;
+      }
+      if (entry.cls.isAssignableFrom(cls)) {
+        // superclass; insert before
+        break;
+      }
+      i++;
+    }
+
+    TypeHandler typeHandler = new TypeHandler(cls, (v, entry) -> {
+      @SuppressWarnings("unchecked")
+      T value = (T) v;
+      handler.accept(value, entry);
+    });
+    if (replace) {
+      s_typeHandlers.set(i, typeHandler);
+    } else {
+      s_typeHandlers.add(i, typeHandler);
+    }
   }
 
   /**
@@ -59,9 +78,9 @@ public final class TelemetryRegistry {
    * @return handler or null if no match
    */
   public static BiConsumer<Object, TelemetryEntry> getHandler(Object value) {
-    for (var entry : s_typeHandlers.entrySet()) {
-      if (entry.getKey().isInstance(value)) {
-        return entry.getValue();
+    for (var entry : s_typeHandlers) {
+      if (entry.cls.isInstance(value)) {
+        return entry.handler;
       }
     }
     return null;
