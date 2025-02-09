@@ -13,12 +13,12 @@ public interface TelemetryEntry {
   void keepDuplicates();
 
   /**
-   * Sets metadata for a value. Metadata is a key/value map.
+   * Sets property for a value. Properties are stored as a key/value map.
    *
-   * @param key metadata key
-   * @param value metadata value
+   * @param key property key
+   * @param value property value
    */
-  void setMetadata(String key, String value);
+  void setProperty(String key, String value);
 
   /**
    * Sets custom data type for a value. Generally not necessary.

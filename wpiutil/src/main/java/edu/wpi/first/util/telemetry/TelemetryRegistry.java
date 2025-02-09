@@ -94,12 +94,12 @@ public final class TelemetryRegistry {
    * Get a telemetry entry for a particular name. This is not cached internally; a new entry is
    * created on each call. Callers are responsible for saving/caching the return value.
    *
-   * @param name name
+   * @param path full name
    * @return telemetry entry
    */
-  public static TelemetryEntry getEntry(String name) {
+  public static TelemetryEntry getEntry(String path) {
     synchronized (s_backends) {
-      return s_backends.getLongestMatch(name).getEntry(name);
+      return s_backends.getLongestMatch(path).getEntry(path);
     }
   }
 
