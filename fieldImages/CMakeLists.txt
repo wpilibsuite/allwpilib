@@ -42,7 +42,7 @@ generate_resources(
     field_images_resources_src
 )
 
-add_library(fieldImages ${field_images_resources_src} src/main/native/cpp/fields.cpp )
+add_library(fieldImages ${field_images_resources_src} src/main/native/cpp/fields.cpp)
 set_target_properties(fieldImages PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET fieldImages PROPERTY FOLDER "libraries")
