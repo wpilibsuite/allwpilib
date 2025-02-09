@@ -89,7 +89,7 @@ public final class TelemetryTable {
    */
   public void log(String name, Object value) {
     if (value instanceof TelemetryLoggable) {
-      ((TelemetryLoggable) value).logTelemetry(getTable(name));
+      ((TelemetryLoggable) value).log(getTable(name));
     } else if (value instanceof StructSerializable) {
       // TODO: introspection
       // getEntry(name).logStruct((StructSerializable) value);
