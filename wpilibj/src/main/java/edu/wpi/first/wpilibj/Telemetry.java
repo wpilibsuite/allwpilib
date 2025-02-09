@@ -1,0 +1,240 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package edu.wpi.first.wpilibj;
+
+import edu.wpi.first.util.telemetry.TelemetryTable;
+
+/**
+ * Telemetry sends information from the robot program to dashboards, debug tools, or log files.
+ *
+ * <p>For more advanced use cases, use the NetworkTables or DataLog APIs directly.
+ */
+public final class Telemetry {
+  /** The root {@link TelemetryTable}. */
+  private static final TelemetryTable m_root = new TelemetryTable("/");
+
+  private Telemetry() {
+    throw new UnsupportedOperationException("This is a utility class!");
+  }
+
+  /**
+   * Gets a child telemetry table.
+   * @param name table name
+   * @return table
+   */
+  public static TelemetryTable getTable(String name) {
+    return m_root.getTable(name);
+  }
+
+  /**
+   * Indicates duplicate values should be preserved. Normally duplicate values are ignored.
+   *
+   * @param name the name
+   */
+  public static void keepDuplicates(String name) {
+    m_root.keepDuplicates(name);
+  }
+
+  /**
+   * Sets metadata for a value. Metadata is a key/value map.
+   *
+   * @param name the name
+   * @param key metadata key
+   * @param value metadata value
+   */
+  public static void setMetadata(String name, String key, String value) {
+    m_root.setMetadata(name, key, value);
+  }
+
+  /**
+   * Sets custom data type for a value. Generally not necessary.
+   *
+   * @param name the name
+   * @param typeString type string
+   */
+  public static void setTypeString(String name, String typeString) {
+    m_root.setTypeString(name, typeString);
+  }
+
+  /**
+   * Logs a generic object.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, Object value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a generic array.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, Object[] value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a boolean.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, boolean value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a byte.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, byte value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a short.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, short value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs an int.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, int value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a long.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, long value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a float.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, float value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a double.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, double value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a String.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, String value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a boolean array.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, boolean[] value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a byte array (raw value).
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, byte[] value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a short array.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, short[] value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs an int array.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, int[] value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a long array.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, long[] value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a float array.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, float[] value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a double array.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, double[] value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a String array.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, String[] value) {
+    m_root.log(name, value);
+  }
+}
