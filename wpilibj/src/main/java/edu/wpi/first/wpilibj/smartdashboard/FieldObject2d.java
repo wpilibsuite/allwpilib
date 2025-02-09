@@ -6,9 +6,7 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.networktables.DoubleArrayEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,11 +23,7 @@ public class FieldObject2d implements AutoCloseable {
   }
 
   @Override
-  public void close() {
-    if (m_entry != null) {
-      m_entry.close();
-    }
-  }
+  public void close() {}
 
   /**
    * Set the pose from a Pose object.
@@ -57,7 +51,6 @@ public class FieldObject2d implements AutoCloseable {
    * @return 2D pose
    */
   public synchronized Pose2d getPose() {
-    updateFromEntry();
     if (m_poses.isEmpty()) {
       return Pose2d.kZero;
     }
@@ -72,7 +65,6 @@ public class FieldObject2d implements AutoCloseable {
   public synchronized void setPoses(List<Pose2d> poses) {
     m_poses.clear();
     m_poses.addAll(poses);
-    updateEntry();
   }
 
   /**
@@ -83,7 +75,6 @@ public class FieldObject2d implements AutoCloseable {
   public synchronized void setPoses(Pose2d... poses) {
     m_poses.clear();
     Collections.addAll(m_poses, poses);
-    updateEntry();
   }
 
   /**
@@ -96,7 +87,6 @@ public class FieldObject2d implements AutoCloseable {
     for (Trajectory.State state : trajectory.getStates()) {
       m_poses.add(state.pose);
     }
-    updateEntry();
   }
 
   /**
@@ -105,55 +95,9 @@ public class FieldObject2d implements AutoCloseable {
    * @return list of 2D poses
    */
   public synchronized List<Pose2d> getPoses() {
-    updateFromEntry();
     return new ArrayList<>(m_poses);
   }
 
-  void updateEntry() {
-    updateEntry(false);
-  }
-
-  synchronized void updateEntry(boolean setDefault) {
-    if (m_entry == null) {
-      return;
-    }
-
-    double[] arr = new double[m_poses.size() * 3];
-    int ndx = 0;
-    for (Pose2d pose : m_poses) {
-      Translation2d translation = pose.getTranslation();
-      arr[ndx + 0] = translation.getX();
-      arr[ndx + 1] = translation.getY();
-      arr[ndx + 2] = pose.getRotation().getDegrees();
-      ndx += 3;
-    }
-
-    if (setDefault) {
-      m_entry.setDefault(arr);
-    } else {
-      m_entry.set(arr);
-    }
-  }
-
-  private synchronized void updateFromEntry() {
-    if (m_entry == null) {
-      return;
-    }
-
-    double[] arr = m_entry.get(null);
-    if (arr != null) {
-      if ((arr.length % 3) != 0) {
-        return;
-      }
-
-      m_poses.clear();
-      for (int i = 0; i < arr.length; i += 3) {
-        m_poses.add(new Pose2d(arr[i], arr[i + 1], Rotation2d.fromDegrees(arr[i + 2])));
-      }
-    }
-  }
-
-  String m_name;
-  DoubleArrayEntry m_entry;
-  private final List<Pose2d> m_poses = new ArrayList<>();
+  final String m_name;
+  final List<Pose2d> m_poses = new ArrayList<>();
 }

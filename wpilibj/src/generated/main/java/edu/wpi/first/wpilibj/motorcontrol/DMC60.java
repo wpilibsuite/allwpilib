@@ -35,7 +35,7 @@ public class DMC60 extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public DMC60(final int channel) {
-    super("DMC60", channel);
+    super(channel);
 
     setBoundsMicroseconds(2004, 1520, 1500, 1480, 997);
     m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);

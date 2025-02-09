@@ -10,7 +10,6 @@
 #include <string_view>
 #include <vector>
 
-#include <networktables/DoubleArrayTopic.h>
 #include <units/length.h>
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
@@ -98,12 +97,8 @@ class FieldObject2d {
   std::span<const Pose2d> GetPoses(wpi::SmallVectorImpl<Pose2d>& out) const;
 
  private:
-  void UpdateEntry(bool setDefault = false);
-  void UpdateFromEntry() const;
-
   mutable wpi::mutex m_mutex;
   std::string m_name;
-  nt::DoubleArrayEntry m_entry;
   mutable wpi::SmallVector<Pose2d, 1> m_poses;
 };
 

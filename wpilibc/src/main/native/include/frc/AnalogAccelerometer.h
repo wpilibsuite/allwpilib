@@ -6,10 +6,10 @@
 
 #include <memory>
 
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc/AnalogInput.h"
+#include "wpi/telemetry/TelemetryTable.h"
 
 namespace frc {
 
@@ -20,8 +20,7 @@ namespace frc {
  * sensors have multiple axis and can be treated as multiple devices. Each is
  * calibrated by finding the center value over a period of time.
  */
-class AnalogAccelerometer : public wpi::Sendable,
-                            public wpi::SendableHelper<AnalogAccelerometer> {
+class AnalogAccelerometer : public wpi::TelemetryLoggable {
  public:
   /**
    * Create a new instance of an accelerometer.
@@ -92,7 +91,7 @@ class AnalogAccelerometer : public wpi::Sendable,
    */
   void SetZero(double zero);
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
  private:
   /**

@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj2.command;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.telemetry.TelemetryTable;
 
 /**
  * A subsystem that uses a {@link PIDController} to control an output. The controller is run
@@ -34,7 +35,6 @@ public abstract class PIDSubsystem extends SubsystemBase {
   public PIDSubsystem(PIDController controller, double initialPosition) {
     m_controller = requireNonNullParam(controller, "controller", "PIDSubsystem");
     setSetpoint(initialPosition);
-    addChild("PID Controller", m_controller);
   }
 
   /**
@@ -114,5 +114,10 @@ public abstract class PIDSubsystem extends SubsystemBase {
    */
   public boolean isEnabled() {
     return m_enabled;
+  }
+
+  @Override
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("PID Controller", m_controller);
   }
 }

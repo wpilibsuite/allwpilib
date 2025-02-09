@@ -10,10 +10,10 @@
 #include <frc/simulation/SimHooks.h>
 #include <frc/smartdashboard/Mechanism2d.h>
 #include <frc/smartdashboard/MechanismLigament2d.h>
-#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/util/Color.h>
 #include <frc/util/Color8Bit.h>
 #include <units/angle.h>
+#include <wpi/telemetry/Telemetry.h>
 
 /**
  * This sample program shows how to use Mechanism2d - a visual representation of
@@ -32,9 +32,6 @@ class Robot : public frc::TimedRobot {
  public:
   Robot() {
     m_elevatorEncoder.SetDistancePerPulse(kMetersPerPulse);
-
-    // publish to dashboard
-    frc::SmartDashboard::PutData("Mech2d", &m_mech);
   }
 
   void RobotPeriodic() override {
@@ -42,6 +39,9 @@ class Robot : public frc::TimedRobot {
     m_elevator->SetLength(kElevatorMinimumLength +
                           m_elevatorEncoder.GetDistance());
     m_wrist->SetAngle(units::degree_t{m_wristPotentiometer.Get()});
+
+    // publish to telemetry
+    wpi::Telemetry::Log("Mech2d", m_mech);
   }
 
   void TeleopPeriodic() override {

@@ -16,7 +16,6 @@
 #include <frc/simulation/DifferentialDrivetrainSim.h>
 #include <frc/simulation/EncoderSim.h>
 #include <frc/smartdashboard/Field2d.h>
-#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/system/plant/LinearSystemId.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
@@ -51,8 +50,6 @@ class Drivetrain {
     m_rightEncoder.Reset();
 
     m_rightLeader.SetInverted(true);
-
-    frc::SmartDashboard::PutData("Field", &m_fieldSim);
   }
 
   static constexpr units::meters_per_second_t kMaxSpeed =

@@ -7,8 +7,7 @@
 #include <memory>
 
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc/geometry/Rotation2d.h"
 
@@ -29,8 +28,7 @@ class AnalogInput;
  *
  * This class is for gyro sensors that connect to an analog input.
  */
-class AnalogGyro : public wpi::Sendable,
-                   public wpi::SendableHelper<AnalogGyro> {
+class AnalogGyro : public wpi::TelemetryLoggable {
  public:
   /**
    * %Gyro constructor using the Analog Input channel number.
@@ -210,7 +208,7 @@ class AnalogGyro : public wpi::Sendable,
    */
   std::shared_ptr<AnalogInput> GetAnalogInput() const { return nullptr; }
 
-  void InitSendable(wpi::SendableBuilder& builder) override {}
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override {}
 };
 
 }  // namespace frc

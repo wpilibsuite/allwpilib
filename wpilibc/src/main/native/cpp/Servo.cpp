@@ -5,8 +5,7 @@
 #include "frc/Servo.h"
 
 #include <hal/UsageReporting.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 using namespace frc;
 
@@ -17,7 +16,6 @@ Servo::Servo(int channel) : m_pwm(channel, false) {
   m_pwm.SetOutputPeriod(PWM::kOutputPeriod_20Ms);
 
   HAL_ReportUsage("IO", channel, "Servo");
-  wpi::SendableRegistry::SetName(this, "Servo", channel);
 
   m_simDevice = hal::SimDevice{"Servo", channel};
   if (m_simDevice) {
@@ -64,11 +62,11 @@ double Servo::GetAngle() const {
   return Get() * GetServoAngleRange() + kMinServoAngle;
 }
 
-void Servo::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Servo");
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return Get(); },
-      [=, this](double value) { Set(value); });
+void Servo::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  if (!table.SetType("Servo")) {
+    return;
+  }
+  table.Log("Value", Get());
 }
 
 double Servo::GetServoAngleRange() {

@@ -88,7 +88,7 @@ class Servo : public wpi::Sendable, public wpi::SendableHelper<Servo> {
 
   int GetChannel() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
  private:
   static double GetServoAngleRange();

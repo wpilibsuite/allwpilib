@@ -7,8 +7,7 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/RobotController.h"
 
@@ -94,11 +93,10 @@ void PWMMotorController::AddFollower(PWMMotorController& follower) {
   m_nonowningFollowers.emplace_back(&follower);
 }
 
-WPI_IGNORE_DEPRECATED
+PWMMotorController::PWMMotorController(int channel) : m_pwm{channel} {}
 
 PWMMotorController::PWMMotorController(std::string_view name, int channel)
-    : m_pwm(channel, false) {
-  wpi::SendableRegistry::Add(this, name, channel);
+    : m_pwm(channel) {
 
   m_simDevice = hal::SimDevice{"PWMMotorController", channel};
   if (m_simDevice) {
@@ -109,12 +107,11 @@ PWMMotorController::PWMMotorController(std::string_view name, int channel)
 
 WPI_UNIGNORE_DEPRECATED
 
-void PWMMotorController::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Motor Controller");
-  builder.SetActuator(true);
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return Get(); },
-      [=, this](double value) { Set(value); });
+void PWMMotorController::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  if (!table.SetType("Motor Controller")) {
+    return;
+  }
+  table.Log("Value", Get());
 }
 
 units::microsecond_t PWMMotorController::GetMinPositivePwm() const {

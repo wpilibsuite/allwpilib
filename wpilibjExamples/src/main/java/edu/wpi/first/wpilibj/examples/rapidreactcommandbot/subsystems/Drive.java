@@ -9,7 +9,6 @@ import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -63,9 +62,6 @@ public class Drive extends SubsystemBase {
 
   /** Creates a new Drive subsystem. */
   public Drive() {
-    SendableRegistry.addChild(m_drive, m_leftLeader);
-    SendableRegistry.addChild(m_drive, m_rightLeader);
-
     m_leftLeader.addFollower(m_leftFollower);
     m_rightLeader.addFollower(m_rightFollower);
 
