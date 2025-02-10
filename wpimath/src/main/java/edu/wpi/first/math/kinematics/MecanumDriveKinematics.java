@@ -40,10 +40,10 @@ public class MecanumDriveKinematics
   private final SimpleMatrix m_inverseKinematics;
   private final SimpleMatrix m_forwardKinematics;
 
-  private final Translation2d m_frontLeftWheelMeters;
-  private final Translation2d m_frontRightWheelMeters;
-  private final Translation2d m_rearLeftWheelMeters;
-  private final Translation2d m_rearRightWheelMeters;
+  private final Translation2d m_frontLeftWheel;
+  private final Translation2d m_frontRightWheel;
+  private final Translation2d m_rearLeftWheel;
+  private final Translation2d m_rearRightWheel;
 
   private Translation2d m_prevCoR = Translation2d.kZero;
 
@@ -56,29 +56,28 @@ public class MecanumDriveKinematics
   /**
    * Constructs a mecanum drive kinematics object.
    *
-   * @param frontLeftWheelMeters The location of the front-left wheel relative to the physical
-   *     center of the robot.
-   * @param frontRightWheelMeters The location of the front-right wheel relative to the physical
-   *     center of the robot.
-   * @param rearLeftWheelMeters The location of the rear-left wheel relative to the physical center
-   *     of the robot.
-   * @param rearRightWheelMeters The location of the rear-right wheel relative to the physical
-   *     center of the robot.
+   * @param frontLeftWheel The location of the front-left wheel relative to the physical center of
+   *     the robot, in meters.
+   * @param frontRightWheel The location of the front-right wheel relative to the physical center of
+   *     the robot, in meters.
+   * @param rearLeftWheel The location of the rear-left wheel relative to the physical center of the
+   *     robot, in meters.
+   * @param rearRightWheel The location of the rear-right wheel relative to the physical center of
+   *     the robot, in meters.
    */
   public MecanumDriveKinematics(
-      Translation2d frontLeftWheelMeters,
-      Translation2d frontRightWheelMeters,
-      Translation2d rearLeftWheelMeters,
-      Translation2d rearRightWheelMeters) {
-    m_frontLeftWheelMeters = frontLeftWheelMeters;
-    m_frontRightWheelMeters = frontRightWheelMeters;
-    m_rearLeftWheelMeters = rearLeftWheelMeters;
-    m_rearRightWheelMeters = rearRightWheelMeters;
+      Translation2d frontLeftWheel,
+      Translation2d frontRightWheel,
+      Translation2d rearLeftWheel,
+      Translation2d rearRightWheel) {
+    m_frontLeftWheel = frontLeftWheel;
+    m_frontRightWheel = frontRightWheel;
+    m_rearLeftWheel = rearLeftWheel;
+    m_rearRightWheel = rearRightWheel;
 
     m_inverseKinematics = new SimpleMatrix(4, 3);
 
-    setInverseKinematics(
-        frontLeftWheelMeters, frontRightWheelMeters, rearLeftWheelMeters, rearRightWheelMeters);
+    setInverseKinematics(frontLeftWheel, frontRightWheel, rearLeftWheel, rearRightWheel);
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
 
     MathSharedStore.reportUsage("MecanumDriveKinematics", "");
@@ -94,33 +93,28 @@ public class MecanumDriveKinematics
    * for evasive maneuvers, vision alignment, or for any other use case, you can do so.
    *
    * @param chassisSpeeds The desired chassis speed.
-   * @param centerOfRotationMeters The center of rotation. For example, if you set the center of
-   *     rotation at one corner of the robot and provide a chassis speed that only has a dtheta
-   *     component, the robot will rotate around that corner.
+   * @param centerOfRotation The center of rotation. For example, if you set the center of rotation
+   *     at one corner of the robot and provide a chassis speed that only has a dtheta component,
+   *     the robot will rotate around that corner.
    * @return The wheel speeds. Use caution because they are not normalized. Sometimes, a user input
    *     may cause one of the wheel speeds to go above the attainable max velocity. Use the {@link
    *     MecanumDriveWheelSpeeds#desaturate(double)} function to rectify this issue.
    */
   public MecanumDriveWheelSpeeds toWheelSpeeds(
-      ChassisSpeeds chassisSpeeds, Translation2d centerOfRotationMeters) {
+      ChassisSpeeds chassisSpeeds, Translation2d centerOfRotation) {
     // We have a new center of rotation. We need to compute the matrix again.
-    if (!centerOfRotationMeters.equals(m_prevCoR)) {
-      var fl = m_frontLeftWheelMeters.minus(centerOfRotationMeters);
-      var fr = m_frontRightWheelMeters.minus(centerOfRotationMeters);
-      var rl = m_rearLeftWheelMeters.minus(centerOfRotationMeters);
-      var rr = m_rearRightWheelMeters.minus(centerOfRotationMeters);
+    if (!centerOfRotation.equals(m_prevCoR)) {
+      var fl = m_frontLeftWheel.minus(centerOfRotation);
+      var fr = m_frontRightWheel.minus(centerOfRotation);
+      var rl = m_rearLeftWheel.minus(centerOfRotation);
+      var rr = m_rearRightWheel.minus(centerOfRotation);
 
       setInverseKinematics(fl, fr, rl, rr);
-      m_prevCoR = centerOfRotationMeters;
+      m_prevCoR = centerOfRotation;
     }
 
     var chassisSpeedsVector = new SimpleMatrix(3, 1);
-    chassisSpeedsVector.setColumn(
-        0,
-        0,
-        chassisSpeeds.vxMetersPerSecond,
-        chassisSpeeds.vyMetersPerSecond,
-        chassisSpeeds.omegaRadiansPerSecond);
+    chassisSpeedsVector.setColumn(0, 0, chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega);
 
     var wheelsVector = m_inverseKinematics.mult(chassisSpeedsVector);
     return new MecanumDriveWheelSpeeds(
@@ -156,10 +150,10 @@ public class MecanumDriveKinematics
     wheelSpeedsVector.setColumn(
         0,
         0,
-        wheelSpeeds.frontLeftMetersPerSecond,
-        wheelSpeeds.frontRightMetersPerSecond,
-        wheelSpeeds.rearLeftMetersPerSecond,
-        wheelSpeeds.rearRightMetersPerSecond);
+        wheelSpeeds.frontLeft,
+        wheelSpeeds.frontRight,
+        wheelSpeeds.rearLeft,
+        wheelSpeeds.rearRight);
     var chassisSpeedsVector = m_forwardKinematics.mult(wheelSpeedsVector);
 
     return new ChassisSpeeds(
@@ -174,10 +168,10 @@ public class MecanumDriveKinematics
     wheelDeltasVector.setColumn(
         0,
         0,
-        end.frontLeftMeters - start.frontLeftMeters,
-        end.frontRightMeters - start.frontRightMeters,
-        end.rearLeftMeters - start.rearLeftMeters,
-        end.rearRightMeters - start.rearRightMeters);
+        end.frontLeft - start.frontLeft,
+        end.frontRight - start.frontRight,
+        end.rearLeft - start.rearLeft,
+        end.rearRight - start.rearRight);
     var twist = m_forwardKinematics.mult(wheelDeltasVector);
     return new Twist2d(twist.get(0, 0), twist.get(1, 0), twist.get(2, 0));
   }
@@ -195,10 +189,10 @@ public class MecanumDriveKinematics
     wheelDeltasVector.setColumn(
         0,
         0,
-        wheelDeltas.frontLeftMeters,
-        wheelDeltas.frontRightMeters,
-        wheelDeltas.rearLeftMeters,
-        wheelDeltas.rearRightMeters);
+        wheelDeltas.frontLeft,
+        wheelDeltas.frontRight,
+        wheelDeltas.rearLeft,
+        wheelDeltas.rearRight);
     var twist = m_forwardKinematics.mult(wheelDeltasVector);
     return new Twist2d(twist.get(0, 0), twist.get(1, 0), twist.get(2, 0));
   }
@@ -225,7 +219,7 @@ public class MecanumDriveKinematics
    * @return The front-left wheel translation.
    */
   public Translation2d getFrontLeft() {
-    return m_frontLeftWheelMeters;
+    return m_frontLeftWheel;
   }
 
   /**
@@ -234,7 +228,7 @@ public class MecanumDriveKinematics
    * @return The front-right wheel translation.
    */
   public Translation2d getFrontRight() {
-    return m_frontRightWheelMeters;
+    return m_frontRightWheel;
   }
 
   /**
@@ -243,7 +237,7 @@ public class MecanumDriveKinematics
    * @return The rear-left wheel translation.
    */
   public Translation2d getRearLeft() {
-    return m_rearLeftWheelMeters;
+    return m_rearLeftWheel;
   }
 
   /**
@@ -252,24 +246,21 @@ public class MecanumDriveKinematics
    * @return The rear-right wheel translation.
    */
   public Translation2d getRearRight() {
-    return m_rearRightWheelMeters;
+    return m_rearRightWheel;
   }
 
   @Override
   public MecanumDriveWheelPositions copy(MecanumDriveWheelPositions positions) {
     return new MecanumDriveWheelPositions(
-        positions.frontLeftMeters,
-        positions.frontRightMeters,
-        positions.rearLeftMeters,
-        positions.rearRightMeters);
+        positions.frontLeft, positions.frontRight, positions.rearLeft, positions.rearRight);
   }
 
   @Override
   public void copyInto(MecanumDriveWheelPositions positions, MecanumDriveWheelPositions output) {
-    output.frontLeftMeters = positions.frontLeftMeters;
-    output.frontRightMeters = positions.frontRightMeters;
-    output.rearLeftMeters = positions.rearLeftMeters;
-    output.rearRightMeters = positions.rearRightMeters;
+    output.frontLeft = positions.frontLeft;
+    output.frontRight = positions.frontRight;
+    output.rearLeft = positions.rearLeft;
+    output.rearRight = positions.rearRight;
   }
 
   @Override

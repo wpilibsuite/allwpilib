@@ -13,7 +13,7 @@ message ProtobufChassisSpeeds {
 }
 
 message ProtobufDifferentialDriveKinematics {
-  double track_width = 1;
+  double trackwidth = 1;
 }
 
 message ProtobufDifferentialDriveWheelSpeeds {

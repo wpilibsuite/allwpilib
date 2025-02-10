@@ -158,10 +158,10 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status);
  * single pulse going at any time.
  *
  * @param[in] dioPortHandle the digital port handle
- * @param[in] pulseLengthSeconds   the active length of the pulse (in seconds)
+ * @param[in] pulseLength   the active length of the pulse in seconds
  * @param[out] status       Error status variable. 0 on success.
  */
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
+void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
                int32_t* status);
 
 /**
@@ -171,10 +171,10 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
  * single pulse going at any time.
  *
  * @param[in] channelMask the channel mask
- * @param[in] pulseLengthSeconds   the active length of the pulse (in seconds)
- * @param[out] status       Error status variable. 0 on success.
+ * @param[in] pulseLength the active length of the pulse in seconds
+ * @param[out] status     Error status variable. 0 on success.
  */
-void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
+void HAL_PulseMultiple(uint32_t channelMask, double pulseLength,
                        int32_t* status);
 
 /**

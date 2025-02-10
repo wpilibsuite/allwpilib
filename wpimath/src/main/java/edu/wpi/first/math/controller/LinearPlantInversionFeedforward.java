@@ -40,11 +40,10 @@ public class LinearPlantInversionFeedforward<
    * Constructs a feedforward with the given plant.
    *
    * @param plant The plant being controlled.
-   * @param dtSeconds Discretization timestep.
+   * @param dt Discretization timestep in seconds.
    */
-  public LinearPlantInversionFeedforward(
-      LinearSystem<States, Inputs, Outputs> plant, double dtSeconds) {
-    this(plant.getA(), plant.getB(), dtSeconds);
+  public LinearPlantInversionFeedforward(LinearSystem<States, Inputs, Outputs> plant, double dt) {
+    this(plant.getA(), plant.getB(), dt);
   }
 
   /**
@@ -52,11 +51,11 @@ public class LinearPlantInversionFeedforward<
    *
    * @param A Continuous system matrix of the plant being controlled.
    * @param B Continuous input matrix of the plant being controlled.
-   * @param dtSeconds Discretization timestep.
+   * @param dt Discretization timestep in seconds.
    */
   public LinearPlantInversionFeedforward(
-      Matrix<States, States> A, Matrix<States, Inputs> B, double dtSeconds) {
-    var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
+      Matrix<States, States> A, Matrix<States, Inputs> B, double dt) {
+    var discABPair = Discretization.discretizeAB(A, B, dt);
     this.m_A = discABPair.getFirst();
     this.m_B = discABPair.getSecond();
 

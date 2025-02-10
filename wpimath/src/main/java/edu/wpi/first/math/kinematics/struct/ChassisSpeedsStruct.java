@@ -39,8 +39,8 @@ public class ChassisSpeedsStruct implements Struct<ChassisSpeeds> {
 
   @Override
   public void pack(ByteBuffer bb, ChassisSpeeds value) {
-    bb.putDouble(value.vxMetersPerSecond);
-    bb.putDouble(value.vyMetersPerSecond);
-    bb.putDouble(value.omegaRadiansPerSecond);
+    bb.putDouble(value.vx);
+    bb.putDouble(value.vy);
+    bb.putDouble(value.omega);
   }
 }

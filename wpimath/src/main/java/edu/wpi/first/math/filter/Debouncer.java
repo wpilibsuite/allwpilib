@@ -21,11 +21,11 @@ public class Debouncer {
     kBoth
   }
 
-  private final double m_debounceTimeSeconds;
+  private final double m_debounceTime;
   private final DebounceType m_debounceType;
   private boolean m_baseline;
 
-  private double m_prevTimeSeconds;
+  private double m_prevTime;
 
   /**
    * Creates a new Debouncer.
@@ -35,7 +35,7 @@ public class Debouncer {
    * @param type Which type of state change the debouncing will be performed on.
    */
   public Debouncer(double debounceTime, DebounceType type) {
-    m_debounceTimeSeconds = debounceTime;
+    m_debounceTime = debounceTime;
     m_debounceType = type;
 
     resetTimer();
@@ -58,11 +58,11 @@ public class Debouncer {
   }
 
   private void resetTimer() {
-    m_prevTimeSeconds = MathSharedStore.getTimestamp();
+    m_prevTime = MathSharedStore.getTimestamp();
   }
 
   private boolean hasElapsed() {
-    return MathSharedStore.getTimestamp() - m_prevTimeSeconds >= m_debounceTimeSeconds;
+    return MathSharedStore.getTimestamp() - m_prevTime >= m_debounceTime;
   }
 
   /**

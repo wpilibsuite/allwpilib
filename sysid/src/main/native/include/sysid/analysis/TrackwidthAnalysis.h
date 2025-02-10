@@ -10,14 +10,14 @@
 namespace sysid {
 
 /**
- * Calculates the track width given the left distance, right distance, and
+ * Calculates the trackwidth given the left distance, right distance, and
  * accumulated gyro angle.
  *
  * @param l     The distance traveled by the left side of the drivetrain.
  * @param r     The distance traveled by the right side of the drivetrain.
  * @param accum The accumulated gyro angle.
  */
-constexpr double CalculateTrackWidth(double l, double r,
+constexpr double CalculateTrackwidth(double l, double r,
                                      units::radian_t accum) {
   // The below comes from solving ω = (vr − vl) / 2r for 2r.
   return (gcem::abs(r) + gcem::abs(l)) / gcem::abs(accum.value());

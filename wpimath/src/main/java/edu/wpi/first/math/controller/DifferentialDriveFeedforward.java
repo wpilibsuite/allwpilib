@@ -71,7 +71,7 @@ public class DifferentialDriveFeedforward implements ProtobufSerializable, Struc
    * @param currentRightVelocity The current right velocity of the differential drive in
    *     meters/second.
    * @param nextRightVelocity The next right velocity of the differential drive in meters/second.
-   * @param dtSeconds Discretization timestep.
+   * @param dt Discretization timestep in seconds.
    * @return A DifferentialDriveWheelVoltages object containing the computed feedforward voltages.
    */
   public DifferentialDriveWheelVoltages calculate(
@@ -79,8 +79,8 @@ public class DifferentialDriveFeedforward implements ProtobufSerializable, Struc
       double nextLeftVelocity,
       double currentRightVelocity,
       double nextRightVelocity,
-      double dtSeconds) {
-    var feedforward = new LinearPlantInversionFeedforward<>(m_plant, dtSeconds);
+      double dt) {
+    var feedforward = new LinearPlantInversionFeedforward<>(m_plant, dt);
     var r = VecBuilder.fill(currentLeftVelocity, currentRightVelocity);
     var nextR = VecBuilder.fill(nextLeftVelocity, nextRightVelocity);
     var u = feedforward.calculate(r, nextR);

@@ -36,23 +36,23 @@ class DCMotorSimTest {
 
         // ------ SimulationPeriodic() happens after user code -------
         RoboRioSim.setVInVoltage(
-            BatterySim.calculateDefaultBatteryLoadedVoltage(sim.getCurrentDrawAmps()));
+            BatterySim.calculateDefaultBatteryLoadedVoltage(sim.getCurrentDraw()));
         sim.setInputVoltage(motor.get() * RobotController.getBatteryVoltage());
         sim.update(0.020);
-        encoderSim.setRate(sim.getAngularVelocityRadPerSec());
+        encoderSim.setRate(sim.getAngularVelocity());
       }
 
-      assertEquals(gearbox.KvRadPerSecPerVolt * 12, encoder.getRate(), 0.1);
+      assertEquals(gearbox.Kv * 12, encoder.getRate(), 0.1);
 
       for (int i = 0; i < 100; i++) {
         motor.setVoltage(0);
 
         // ------ SimulationPeriodic() happens after user code -------
         RoboRioSim.setVInVoltage(
-            BatterySim.calculateDefaultBatteryLoadedVoltage(sim.getCurrentDrawAmps()));
+            BatterySim.calculateDefaultBatteryLoadedVoltage(sim.getCurrentDraw()));
         sim.setInputVoltage(motor.get() * RobotController.getBatteryVoltage());
         sim.update(0.020);
-        encoderSim.setRate(sim.getAngularVelocityRadPerSec());
+        encoderSim.setRate(sim.getAngularVelocity());
       }
 
       assertEquals(0, encoder.getRate(), 0.1);
@@ -78,11 +78,11 @@ class DCMotorSimTest {
 
         // ------ SimulationPeriodic() happens after user code -------
         RoboRioSim.setVInVoltage(
-            BatterySim.calculateDefaultBatteryLoadedVoltage(sim.getCurrentDrawAmps()));
+            BatterySim.calculateDefaultBatteryLoadedVoltage(sim.getCurrentDraw()));
         sim.setInputVoltage(motor.get() * RobotController.getBatteryVoltage());
         sim.update(0.020);
-        encoderSim.setDistance(sim.getAngularPositionRad());
-        encoderSim.setRate(sim.getAngularVelocityRadPerSec());
+        encoderSim.setDistance(sim.getAngularPosition());
+        encoderSim.setRate(sim.getAngularVelocity());
       }
 
       assertEquals(750, encoder.getDistance(), 1.0);

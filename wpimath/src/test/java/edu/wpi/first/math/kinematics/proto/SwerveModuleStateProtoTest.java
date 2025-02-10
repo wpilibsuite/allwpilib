@@ -20,7 +20,7 @@ class SwerveModuleStateProtoTest {
     SwerveModuleState.proto.pack(proto, DATA);
 
     SwerveModuleState data = SwerveModuleState.proto.unpack(proto);
-    assertEquals(DATA.speedMetersPerSecond, data.speedMetersPerSecond);
+    assertEquals(DATA.speed, data.speed);
     assertEquals(DATA.angle, data.angle);
   }
 }

@@ -50,8 +50,8 @@ public class Elevator implements AutoCloseable {
           Constants.kElevatorGearing,
           Constants.kCarriageMass,
           Constants.kElevatorDrumRadius,
-          Constants.kMinElevatorHeightMeters,
-          Constants.kMaxElevatorHeightMeters,
+          Constants.kMinElevatorHeight,
+          Constants.kMaxElevatorHeight,
           true,
           0,
           0.01,
@@ -63,8 +63,7 @@ public class Elevator implements AutoCloseable {
   private final Mechanism2d m_mech2d = new Mechanism2d(20, 50);
   private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("Elevator Root", 10, 0);
   private final MechanismLigament2d m_elevatorMech2d =
-      m_mech2dRoot.append(
-          new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90));
+      m_mech2dRoot.append(new MechanismLigament2d("Elevator", m_elevatorSim.getPosition(), 90));
 
   /** Subsystem constructor. */
   public Elevator() {
@@ -85,10 +84,10 @@ public class Elevator implements AutoCloseable {
     m_elevatorSim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-    m_encoderSim.setDistance(m_elevatorSim.getPositionMeters());
+    m_encoderSim.setDistance(m_elevatorSim.getPosition());
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
+        BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDraw()));
   }
 
   /**

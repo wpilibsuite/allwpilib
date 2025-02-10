@@ -33,13 +33,13 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
   /**
    * Constructs a differential drive kinematics object.
    *
-   * @param trackWidth The track width of the drivetrain. Theoretically, this is
+   * @param trackwidth The trackwidth of the drivetrain. Theoretically, this is
    * the distance between the left wheels and right wheels. However, the
    * empirical value may be larger than the physical measured value due to
    * scrubbing effects.
    */
-  constexpr explicit DifferentialDriveKinematics(units::meter_t trackWidth)
-      : trackWidth(trackWidth) {
+  constexpr explicit DifferentialDriveKinematics(units::meter_t trackwidth)
+      : trackwidth(trackwidth) {
     if (!std::is_constant_evaluated()) {
       wpi::math::MathSharedStore::ReportUsage("DifferentialDriveKinematics",
                                               "");
@@ -56,7 +56,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
   constexpr ChassisSpeeds ToChassisSpeeds(
       const DifferentialDriveWheelSpeeds& wheelSpeeds) const override {
     return {(wheelSpeeds.left + wheelSpeeds.right) / 2.0, 0_mps,
-            (wheelSpeeds.right - wheelSpeeds.left) / trackWidth * 1_rad};
+            (wheelSpeeds.right - wheelSpeeds.left) / trackwidth * 1_rad};
   }
 
   /**
@@ -69,8 +69,8 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    */
   constexpr DifferentialDriveWheelSpeeds ToWheelSpeeds(
       const ChassisSpeeds& chassisSpeeds) const override {
-    return {chassisSpeeds.vx - trackWidth / 2 * chassisSpeeds.omega / 1_rad,
-            chassisSpeeds.vx + trackWidth / 2 * chassisSpeeds.omega / 1_rad};
+    return {chassisSpeeds.vx - trackwidth / 2 * chassisSpeeds.omega / 1_rad,
+            chassisSpeeds.vx + trackwidth / 2 * chassisSpeeds.omega / 1_rad};
   }
 
   /**
@@ -84,7 +84,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
   constexpr Twist2d ToTwist2d(const units::meter_t leftDistance,
                               const units::meter_t rightDistance) const {
     return {(leftDistance + rightDistance) / 2, 0_m,
-            (rightDistance - leftDistance) / trackWidth * 1_rad};
+            (rightDistance - leftDistance) / trackwidth * 1_rad};
   }
 
   constexpr Twist2d ToTwist2d(
@@ -100,7 +100,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
   }
 
   /// Differential drive trackwidth.
-  units::meter_t trackWidth;
+  units::meter_t trackwidth;
 };
 }  // namespace frc
 

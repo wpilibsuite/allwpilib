@@ -20,7 +20,7 @@ class DifferentialDriveFeedforwardTest {
   private static final double kVAngular = 1.0;
   private static final double kAAngular = 1.0;
   private static final double trackwidth = 1.0;
-  private static final double dtSeconds = 0.02;
+  private static final double dt = 0.02;
 
   @Test
   void testCalculateWithTrackwidth() {
@@ -39,12 +39,12 @@ class DifferentialDriveFeedforwardTest {
                     nextLeftVelocity,
                     currentRightVelocity,
                     nextRightVelocity,
-                    dtSeconds);
+                    dt);
             Matrix<N2, N1> nextX =
                 plant.calculateX(
                     VecBuilder.fill(currentLeftVelocity, currentRightVelocity),
                     VecBuilder.fill(u.left, u.right),
-                    dtSeconds);
+                    dt);
             assertEquals(nextX.get(0, 0), nextLeftVelocity, 1e-6);
             assertEquals(nextX.get(1, 0), nextRightVelocity, 1e-6);
           }
@@ -69,12 +69,12 @@ class DifferentialDriveFeedforwardTest {
                     nextLeftVelocity,
                     currentRightVelocity,
                     nextRightVelocity,
-                    dtSeconds);
+                    dt);
             Matrix<N2, N1> nextX =
                 plant.calculateX(
                     VecBuilder.fill(currentLeftVelocity, currentRightVelocity),
                     VecBuilder.fill(u.left, u.right),
-                    dtSeconds);
+                    dt);
             assertEquals(nextX.get(0, 0), nextLeftVelocity, 1e-6);
             assertEquals(nextX.get(1, 0), nextRightVelocity, 1e-6);
           }

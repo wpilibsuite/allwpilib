@@ -34,6 +34,6 @@ class SingleJointedArmSimTest {
     }
 
     // the arm should swing down
-    assertEquals(-Math.PI / 2.0, m_sim.getAngleRads(), 0.1);
+    assertEquals(-Math.PI / 2.0, m_sim.getAngle(), 0.1);
   }
 }

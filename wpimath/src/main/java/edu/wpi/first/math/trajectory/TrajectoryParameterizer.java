@@ -46,10 +46,10 @@ public final class TrajectoryParameterizer {
    *
    * @param points Reference to the spline points.
    * @param constraints A vector of various velocity and acceleration. constraints.
-   * @param startVelocityMetersPerSecond The start velocity for the trajectory.
-   * @param endVelocityMetersPerSecond The end velocity for the trajectory.
-   * @param maxVelocityMetersPerSecond The max velocity for the trajectory.
-   * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
+   * @param startVelocity The start velocity for the trajectory in m/s.
+   * @param endVelocity The end velocity for the trajectory in m/s.
+   * @param maxVelocity The max velocity for the trajectory in m/s.
+   * @param maxAcceleration The max acceleration for the trajectory in m/s².
    * @param reversed Whether the robot should move backwards. Note that the robot will still move
    *     from a -&gt; b -&gt; ... -&gt; z as defined in the waypoints.
    * @return The trajectory.
@@ -57,19 +57,14 @@ public final class TrajectoryParameterizer {
   public static Trajectory timeParameterizeTrajectory(
       List<PoseWithCurvature> points,
       List<TrajectoryConstraint> constraints,
-      double startVelocityMetersPerSecond,
-      double endVelocityMetersPerSecond,
-      double maxVelocityMetersPerSecond,
-      double maxAccelerationMetersPerSecondSq,
+      double startVelocity,
+      double endVelocity,
+      double maxVelocity,
+      double maxAcceleration,
       boolean reversed) {
     var constrainedStates = new ArrayList<ConstrainedState>(points.size());
     var predecessor =
-        new ConstrainedState(
-            points.get(0),
-            0,
-            startVelocityMetersPerSecond,
-            -maxAccelerationMetersPerSecondSq,
-            maxAccelerationMetersPerSecondSq);
+        new ConstrainedState(points.get(0), 0, startVelocity, -maxAcceleration, maxAcceleration);
 
     // Forward pass
     for (int i = 0; i < points.size(); i++) {
@@ -81,36 +76,36 @@ public final class TrajectoryParameterizer {
       double ds =
           constrainedState
               .pose
-              .poseMeters
+              .pose
               .getTranslation()
-              .getDistance(predecessor.pose.poseMeters.getTranslation());
-      constrainedState.distanceMeters = predecessor.distanceMeters + ds;
+              .getDistance(predecessor.pose.pose.getTranslation());
+      constrainedState.distance = predecessor.distance + ds;
 
       // We may need to iterate to find the maximum end velocity and common
       // acceleration, since acceleration limits may be a function of velocity.
       while (true) {
         // Enforce global max velocity and max reachable velocity by global
         // acceleration limit. v_f = √(v_i² + 2ad).
-        constrainedState.maxVelocityMetersPerSecond =
+        constrainedState.maxVelocity =
             Math.min(
-                maxVelocityMetersPerSecond,
+                maxVelocity,
                 Math.sqrt(
-                    predecessor.maxVelocityMetersPerSecond * predecessor.maxVelocityMetersPerSecond
-                        + predecessor.maxAccelerationMetersPerSecondSq * ds * 2.0));
+                    predecessor.maxVelocity * predecessor.maxVelocity
+                        + predecessor.maxAcceleration * ds * 2.0));
 
-        constrainedState.minAccelerationMetersPerSecondSq = -maxAccelerationMetersPerSecondSq;
-        constrainedState.maxAccelerationMetersPerSecondSq = maxAccelerationMetersPerSecondSq;
+        constrainedState.minAcceleration = -maxAcceleration;
+        constrainedState.maxAcceleration = maxAcceleration;
 
         // At this point, the constrained state is fully constructed apart from
         // all the custom-defined user constraints.
         for (final var constraint : constraints) {
-          constrainedState.maxVelocityMetersPerSecond =
+          constrainedState.maxVelocity =
               Math.min(
-                  constrainedState.maxVelocityMetersPerSecond,
-                  constraint.getMaxVelocityMetersPerSecond(
-                      constrainedState.pose.poseMeters,
-                      constrainedState.pose.curvatureRadPerMeter,
-                      constrainedState.maxVelocityMetersPerSecond));
+                  constrainedState.maxVelocity,
+                  constraint.getMaxVelocity(
+                      constrainedState.pose.pose,
+                      constrainedState.pose.curvature,
+                      constrainedState.maxVelocity));
         }
 
         // Now enforce all acceleration limits.
@@ -124,22 +119,19 @@ public final class TrajectoryParameterizer {
         // acceleration that we applied, then we need to reduce the max
         // acceleration of the predecessor and try again.
         double actualAcceleration =
-            (constrainedState.maxVelocityMetersPerSecond
-                        * constrainedState.maxVelocityMetersPerSecond
-                    - predecessor.maxVelocityMetersPerSecond
-                        * predecessor.maxVelocityMetersPerSecond)
+            (constrainedState.maxVelocity * constrainedState.maxVelocity
+                    - predecessor.maxVelocity * predecessor.maxVelocity)
                 / (ds * 2.0);
 
         // If we violate the max acceleration constraint, let's modify the
         // predecessor.
-        if (constrainedState.maxAccelerationMetersPerSecondSq < actualAcceleration - 1E-6) {
-          predecessor.maxAccelerationMetersPerSecondSq =
-              constrainedState.maxAccelerationMetersPerSecondSq;
+        if (constrainedState.maxAcceleration < actualAcceleration - 1E-6) {
+          predecessor.maxAcceleration = constrainedState.maxAcceleration;
         } else {
           // Constrain the predecessor's max acceleration to the current
           // acceleration.
-          if (actualAcceleration > predecessor.minAccelerationMetersPerSecondSq) {
-            predecessor.maxAccelerationMetersPerSecondSq = actualAcceleration;
+          if (actualAcceleration > predecessor.minAcceleration) {
+            predecessor.maxAcceleration = actualAcceleration;
           }
           // If the actual acceleration is less than the predecessor's min
           // acceleration, it will be repaired in the backward pass.
@@ -152,30 +144,30 @@ public final class TrajectoryParameterizer {
     var successor =
         new ConstrainedState(
             points.get(points.size() - 1),
-            constrainedStates.get(constrainedStates.size() - 1).distanceMeters,
-            endVelocityMetersPerSecond,
-            -maxAccelerationMetersPerSecondSq,
-            maxAccelerationMetersPerSecondSq);
+            constrainedStates.get(constrainedStates.size() - 1).distance,
+            endVelocity,
+            -maxAcceleration,
+            maxAcceleration);
 
     // Backward pass
     for (int i = points.size() - 1; i >= 0; i--) {
       var constrainedState = constrainedStates.get(i);
-      double ds = constrainedState.distanceMeters - successor.distanceMeters; // negative
+      double ds = constrainedState.distance - successor.distance; // negative
 
       while (true) {
         // Enforce max velocity limit (reverse)
         // v_f = √(v_i² + 2ad), where v_i = successor.
         double newMaxVelocity =
             Math.sqrt(
-                successor.maxVelocityMetersPerSecond * successor.maxVelocityMetersPerSecond
-                    + successor.minAccelerationMetersPerSecondSq * ds * 2.0);
+                successor.maxVelocity * successor.maxVelocity
+                    + successor.minAcceleration * ds * 2.0);
 
         // No more limits to impose! This state can be finalized.
-        if (newMaxVelocity >= constrainedState.maxVelocityMetersPerSecond) {
+        if (newMaxVelocity >= constrainedState.maxVelocity) {
           break;
         }
 
-        constrainedState.maxVelocityMetersPerSecond = newMaxVelocity;
+        constrainedState.maxVelocity = newMaxVelocity;
 
         // Check all acceleration constraints with the new max velocity.
         enforceAccelerationLimits(reversed, constraints, constrainedState);
@@ -188,16 +180,14 @@ public final class TrajectoryParameterizer {
         // acceleration, then we need to lower the min acceleration of the
         // successor and try again.
         double actualAcceleration =
-            (constrainedState.maxVelocityMetersPerSecond
-                        * constrainedState.maxVelocityMetersPerSecond
-                    - successor.maxVelocityMetersPerSecond * successor.maxVelocityMetersPerSecond)
+            (constrainedState.maxVelocity * constrainedState.maxVelocity
+                    - successor.maxVelocity * successor.maxVelocity)
                 / (ds * 2.0);
 
-        if (constrainedState.minAccelerationMetersPerSecondSq > actualAcceleration + 1E-6) {
-          successor.minAccelerationMetersPerSecondSq =
-              constrainedState.minAccelerationMetersPerSecondSq;
+        if (constrainedState.minAcceleration > actualAcceleration + 1E-6) {
+          successor.minAcceleration = constrainedState.minAcceleration;
         } else {
-          successor.minAccelerationMetersPerSecondSq = actualAcceleration;
+          successor.minAcceleration = actualAcceleration;
           break;
         }
       }
@@ -207,52 +197,49 @@ public final class TrajectoryParameterizer {
     // Now we can integrate the constrained states forward in time to obtain our
     // trajectory states.
     var states = new ArrayList<Trajectory.State>(points.size());
-    double timeSeconds = 0.0;
-    double distanceMeters = 0.0;
-    double velocityMetersPerSecond = 0.0;
+    double time = 0.0;
+    double distance = 0.0;
+    double velocity = 0.0;
 
     for (int i = 0; i < constrainedStates.size(); i++) {
       final var state = constrainedStates.get(i);
 
       // Calculate the change in position between the current state and the previous
       // state.
-      double ds = state.distanceMeters - distanceMeters;
+      double ds = state.distance - distance;
 
       // Calculate the acceleration between the current state and the previous
       // state.
-      double accel =
-          (state.maxVelocityMetersPerSecond * state.maxVelocityMetersPerSecond
-                  - velocityMetersPerSecond * velocityMetersPerSecond)
-              / (ds * 2);
+      double accel = (state.maxVelocity * state.maxVelocity - velocity * velocity) / (ds * 2);
 
       // Calculate dt
       double dt = 0.0;
       if (i > 0) {
-        states.get(i - 1).accelerationMetersPerSecondSq = reversed ? -accel : accel;
+        states.get(i - 1).acceleration = reversed ? -accel : accel;
         if (Math.abs(accel) > 1E-6) {
           // v_f = v_0 + a * t
-          dt = (state.maxVelocityMetersPerSecond - velocityMetersPerSecond) / accel;
-        } else if (Math.abs(velocityMetersPerSecond) > 1E-6) {
+          dt = (state.maxVelocity - velocity) / accel;
+        } else if (Math.abs(velocity) > 1E-6) {
           // delta_x = v * t
-          dt = ds / velocityMetersPerSecond;
+          dt = ds / velocity;
         } else {
           throw new TrajectoryGenerationException(
               "Something went wrong at iteration " + i + " of time parameterization.");
         }
       }
 
-      velocityMetersPerSecond = state.maxVelocityMetersPerSecond;
-      distanceMeters = state.distanceMeters;
+      velocity = state.maxVelocity;
+      distance = state.distance;
 
-      timeSeconds += dt;
+      time += dt;
 
       states.add(
           new Trajectory.State(
-              timeSeconds,
-              reversed ? -velocityMetersPerSecond : velocityMetersPerSecond,
+              time,
+              reversed ? -velocity : velocity,
               reversed ? -accel : accel,
-              state.pose.poseMeters,
-              state.pose.curvatureRadPerMeter));
+              state.pose.pose,
+              state.pose.curvature));
     }
 
     return new Trajectory(states);
@@ -263,51 +250,44 @@ public final class TrajectoryParameterizer {
     for (final var constraint : constraints) {
       double factor = reverse ? -1.0 : 1.0;
       final var minMaxAccel =
-          constraint.getMinMaxAccelerationMetersPerSecondSq(
-              state.pose.poseMeters,
-              state.pose.curvatureRadPerMeter,
-              state.maxVelocityMetersPerSecond * factor);
+          constraint.getMinMaxAcceleration(
+              state.pose.pose, state.pose.curvature, state.maxVelocity * factor);
 
-      if (minMaxAccel.minAccelerationMetersPerSecondSq
-          > minMaxAccel.maxAccelerationMetersPerSecondSq) {
+      if (minMaxAccel.minAcceleration > minMaxAccel.maxAcceleration) {
         throw new TrajectoryGenerationException(
             "Infeasible trajectory constraint: " + constraint.getClass().getName() + "\n");
       }
 
-      state.minAccelerationMetersPerSecondSq =
+      state.minAcceleration =
           Math.max(
-              state.minAccelerationMetersPerSecondSq,
-              reverse
-                  ? -minMaxAccel.maxAccelerationMetersPerSecondSq
-                  : minMaxAccel.minAccelerationMetersPerSecondSq);
+              state.minAcceleration,
+              reverse ? -minMaxAccel.maxAcceleration : minMaxAccel.minAcceleration);
 
-      state.maxAccelerationMetersPerSecondSq =
+      state.maxAcceleration =
           Math.min(
-              state.maxAccelerationMetersPerSecondSq,
-              reverse
-                  ? -minMaxAccel.minAccelerationMetersPerSecondSq
-                  : minMaxAccel.maxAccelerationMetersPerSecondSq);
+              state.maxAcceleration,
+              reverse ? -minMaxAccel.minAcceleration : minMaxAccel.maxAcceleration);
     }
   }
 
   private static class ConstrainedState {
     PoseWithCurvature pose;
-    double distanceMeters;
-    double maxVelocityMetersPerSecond;
-    double minAccelerationMetersPerSecondSq;
-    double maxAccelerationMetersPerSecondSq;
+    double distance;
+    double maxVelocity;
+    double minAcceleration;
+    double maxAcceleration;
 
     ConstrainedState(
         PoseWithCurvature pose,
-        double distanceMeters,
-        double maxVelocityMetersPerSecond,
-        double minAccelerationMetersPerSecondSq,
-        double maxAccelerationMetersPerSecondSq) {
+        double distance,
+        double maxVelocity,
+        double minAcceleration,
+        double maxAcceleration) {
       this.pose = pose;
-      this.distanceMeters = distanceMeters;
-      this.maxVelocityMetersPerSecond = maxVelocityMetersPerSecond;
-      this.minAccelerationMetersPerSecondSq = minAccelerationMetersPerSecondSq;
-      this.maxAccelerationMetersPerSecondSq = maxAccelerationMetersPerSecondSq;
+      this.distance = distance;
+      this.maxVelocity = maxVelocity;
+      this.minAcceleration = minAcceleration;
+      this.maxAcceleration = maxAcceleration;
     }
 
     ConstrainedState() {
