@@ -29,10 +29,10 @@ class SwerveDriveKinematicsTest {
     var moduleStates = m_kinematics.toSwerveModuleStates(speeds);
 
     assertAll(
-        () -> assertEquals(5.0, moduleStates[0].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(5.0, moduleStates[1].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(5.0, moduleStates[2].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(5.0, moduleStates[3].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(5.0, moduleStates[0].speed, kEpsilon),
+        () -> assertEquals(5.0, moduleStates[1].speed, kEpsilon),
+        () -> assertEquals(5.0, moduleStates[2].speed, kEpsilon),
+        () -> assertEquals(5.0, moduleStates[3].speed, kEpsilon),
         () -> assertEquals(0.0, moduleStates[0].angle.getRadians(), kEpsilon),
         () -> assertEquals(0.0, moduleStates[1].angle.getRadians(), kEpsilon),
         () -> assertEquals(0.0, moduleStates[2].angle.getRadians(), kEpsilon),
@@ -45,9 +45,9 @@ class SwerveDriveKinematicsTest {
     var chassisSpeeds = m_kinematics.toChassisSpeeds(state, state, state, state);
 
     assertAll(
-        () -> assertEquals(5.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
+        () -> assertEquals(5.0, chassisSpeeds.vx, kEpsilon),
+        () -> assertEquals(0.0, chassisSpeeds.vy, kEpsilon),
+        () -> assertEquals(0.0, chassisSpeeds.omega, kEpsilon));
   }
 
   @Test
@@ -68,10 +68,10 @@ class SwerveDriveKinematicsTest {
     var moduleStates = m_kinematics.toSwerveModuleStates(speeds);
 
     assertAll(
-        () -> assertEquals(5.0, moduleStates[0].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(5.0, moduleStates[1].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(5.0, moduleStates[2].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(5.0, moduleStates[3].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(5.0, moduleStates[0].speed, kEpsilon),
+        () -> assertEquals(5.0, moduleStates[1].speed, kEpsilon),
+        () -> assertEquals(5.0, moduleStates[2].speed, kEpsilon),
+        () -> assertEquals(5.0, moduleStates[3].speed, kEpsilon),
         () -> assertEquals(90.0, moduleStates[0].angle.getDegrees(), kEpsilon),
         () -> assertEquals(90.0, moduleStates[1].angle.getDegrees(), kEpsilon),
         () -> assertEquals(90.0, moduleStates[2].angle.getDegrees(), kEpsilon),
@@ -84,9 +84,9 @@ class SwerveDriveKinematicsTest {
     var chassisSpeeds = m_kinematics.toChassisSpeeds(state, state, state, state);
 
     assertAll(
-        () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
-        () -> assertEquals(5.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
+        () -> assertEquals(0.0, chassisSpeeds.vx, kEpsilon),
+        () -> assertEquals(5.0, chassisSpeeds.vy, kEpsilon),
+        () -> assertEquals(0.0, chassisSpeeds.omega, kEpsilon));
   }
 
   @Test
@@ -109,10 +109,10 @@ class SwerveDriveKinematicsTest {
     // Robot is stationary, but module angles are preserved.
 
     assertAll(
-        () -> assertEquals(0.0, moduleStates[0].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, moduleStates[1].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, moduleStates[2].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, moduleStates[3].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[0].speed, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[1].speed, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[2].speed, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[3].speed, kEpsilon),
         () -> assertEquals(135.0, moduleStates[0].angle.getDegrees(), kEpsilon),
         () -> assertEquals(45.0, moduleStates[1].angle.getDegrees(), kEpsilon),
         () -> assertEquals(-135.0, moduleStates[2].angle.getDegrees(), kEpsilon),
@@ -131,10 +131,10 @@ class SwerveDriveKinematicsTest {
     // Robot is stationary, but module angles are preserved.
 
     assertAll(
-        () -> assertEquals(0.0, moduleStates[0].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, moduleStates[1].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, moduleStates[2].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, moduleStates[3].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[0].speed, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[1].speed, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[2].speed, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[3].speed, kEpsilon),
         () -> assertEquals(0.0, moduleStates[0].angle.getDegrees(), kEpsilon),
         () -> assertEquals(90.0, moduleStates[1].angle.getDegrees(), kEpsilon),
         () -> assertEquals(180.0, moduleStates[2].angle.getDegrees(), kEpsilon),
@@ -154,10 +154,10 @@ class SwerveDriveKinematicsTest {
       */
 
     assertAll(
-        () -> assertEquals(106.63, moduleStates[0].speedMetersPerSecond, 0.1),
-        () -> assertEquals(106.63, moduleStates[1].speedMetersPerSecond, 0.1),
-        () -> assertEquals(106.63, moduleStates[2].speedMetersPerSecond, 0.1),
-        () -> assertEquals(106.63, moduleStates[3].speedMetersPerSecond, 0.1),
+        () -> assertEquals(106.63, moduleStates[0].speed, 0.1),
+        () -> assertEquals(106.63, moduleStates[1].speed, 0.1),
+        () -> assertEquals(106.63, moduleStates[2].speed, 0.1),
+        () -> assertEquals(106.63, moduleStates[3].speed, 0.1),
         () -> assertEquals(135.0, moduleStates[0].angle.getDegrees(), kEpsilon),
         () -> assertEquals(45.0, moduleStates[1].angle.getDegrees(), kEpsilon),
         () -> assertEquals(-135.0, moduleStates[2].angle.getDegrees(), kEpsilon),
@@ -174,9 +174,9 @@ class SwerveDriveKinematicsTest {
     var chassisSpeeds = m_kinematics.toChassisSpeeds(flState, frState, blState, brState);
 
     assertAll(
-        () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(2 * Math.PI, chassisSpeeds.omegaRadiansPerSecond, 0.1));
+        () -> assertEquals(0.0, chassisSpeeds.vx, kEpsilon),
+        () -> assertEquals(0.0, chassisSpeeds.vy, kEpsilon),
+        () -> assertEquals(2 * Math.PI, chassisSpeeds.omega, 0.1));
   }
 
   @Test
@@ -209,10 +209,10 @@ class SwerveDriveKinematicsTest {
     */
 
     assertAll(
-        () -> assertEquals(0.0, moduleStates[0].speedMetersPerSecond, 0.1),
-        () -> assertEquals(150.796, moduleStates[1].speedMetersPerSecond, 0.1),
-        () -> assertEquals(150.796, moduleStates[2].speedMetersPerSecond, 0.1),
-        () -> assertEquals(213.258, moduleStates[3].speedMetersPerSecond, 0.1),
+        () -> assertEquals(0.0, moduleStates[0].speed, 0.1),
+        () -> assertEquals(150.796, moduleStates[1].speed, 0.1),
+        () -> assertEquals(150.796, moduleStates[2].speed, 0.1),
+        () -> assertEquals(213.258, moduleStates[3].speed, 0.1),
         () -> assertEquals(0.0, moduleStates[0].angle.getDegrees(), kEpsilon),
         () -> assertEquals(0.0, moduleStates[1].angle.getDegrees(), kEpsilon),
         () -> assertEquals(-90.0, moduleStates[2].angle.getDegrees(), kEpsilon),
@@ -238,9 +238,9 @@ class SwerveDriveKinematicsTest {
     */
 
     assertAll(
-        () -> assertEquals(75.398, chassisSpeeds.vxMetersPerSecond, 0.1),
-        () -> assertEquals(-75.398, chassisSpeeds.vyMetersPerSecond, 0.1),
-        () -> assertEquals(2 * Math.PI, chassisSpeeds.omegaRadiansPerSecond, 0.1));
+        () -> assertEquals(75.398, chassisSpeeds.vx, 0.1),
+        () -> assertEquals(-75.398, chassisSpeeds.vy, 0.1),
+        () -> assertEquals(2 * Math.PI, chassisSpeeds.omega, 0.1));
   }
 
   @Test
@@ -270,11 +270,7 @@ class SwerveDriveKinematicsTest {
   private void assertModuleState(
       SwerveModuleState expected, SwerveModuleState actual, SwerveModuleState tolerance) {
     assertAll(
-        () ->
-            assertEquals(
-                expected.speedMetersPerSecond,
-                actual.speedMetersPerSecond,
-                tolerance.speedMetersPerSecond),
+        () -> assertEquals(expected.speed, actual.speed, tolerance.speed),
         () ->
             assertEquals(
                 expected.angle.getDegrees(),
@@ -326,9 +322,9 @@ class SwerveDriveKinematicsTest {
     */
 
     assertAll(
-        () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, 0.1),
-        () -> assertEquals(-33.0, chassisSpeeds.vyMetersPerSecond, 0.1),
-        () -> assertEquals(1.5, chassisSpeeds.omegaRadiansPerSecond, 0.1));
+        () -> assertEquals(0.0, chassisSpeeds.vx, 0.1),
+        () -> assertEquals(-33.0, chassisSpeeds.vy, 0.1),
+        () -> assertEquals(1.5, chassisSpeeds.omega, 0.1));
   }
 
   @Test
@@ -368,10 +364,10 @@ class SwerveDriveKinematicsTest {
     double factor = 5.5 / 7.0;
 
     assertAll(
-        () -> assertEquals(5.0 * factor, arr[0].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(6.0 * factor, arr[1].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(4.0 * factor, arr[2].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(7.0 * factor, arr[3].speedMetersPerSecond, kEpsilon));
+        () -> assertEquals(5.0 * factor, arr[0].speed, kEpsilon),
+        () -> assertEquals(6.0 * factor, arr[1].speed, kEpsilon),
+        () -> assertEquals(4.0 * factor, arr[2].speed, kEpsilon),
+        () -> assertEquals(7.0 * factor, arr[3].speed, kEpsilon));
   }
 
   @Test
@@ -388,10 +384,10 @@ class SwerveDriveKinematicsTest {
     double factor = 5.5 / 7.0;
 
     assertAll(
-        () -> assertEquals(5.0 * factor, arr[0].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(6.0 * factor, arr[1].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(4.0 * factor, arr[2].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(7.0 * factor, arr[3].speedMetersPerSecond, kEpsilon));
+        () -> assertEquals(5.0 * factor, arr[0].speed, kEpsilon),
+        () -> assertEquals(6.0 * factor, arr[1].speed, kEpsilon),
+        () -> assertEquals(4.0 * factor, arr[2].speed, kEpsilon),
+        () -> assertEquals(7.0 * factor, arr[3].speed, kEpsilon));
   }
 
   @Test
@@ -405,9 +401,9 @@ class SwerveDriveKinematicsTest {
     SwerveDriveKinematics.desaturateWheelSpeeds(arr, 1);
 
     assertAll(
-        () -> assertEquals(0.5, arr[0].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.5, arr[1].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(-1.0, arr[2].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(-1.0, arr[3].speedMetersPerSecond, kEpsilon));
+        () -> assertEquals(0.5, arr[0].speed, kEpsilon),
+        () -> assertEquals(0.5, arr[1].speed, kEpsilon),
+        () -> assertEquals(-1.0, arr[2].speed, kEpsilon),
+        () -> assertEquals(-1.0, arr[3].speed, kEpsilon));
   }
 }

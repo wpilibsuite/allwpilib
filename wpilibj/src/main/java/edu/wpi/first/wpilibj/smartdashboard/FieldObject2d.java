@@ -43,12 +43,12 @@ public class FieldObject2d implements AutoCloseable {
   /**
    * Set the pose from x, y, and rotation.
    *
-   * @param xMeters X location, in meters
-   * @param yMeters Y location, in meters
+   * @param x X location, in meters
+   * @param y Y location, in meters
    * @param rotation rotation
    */
-  public synchronized void setPose(double xMeters, double yMeters, Rotation2d rotation) {
-    setPose(new Pose2d(xMeters, yMeters, rotation));
+  public synchronized void setPose(double x, double y, Rotation2d rotation) {
+    setPose(new Pose2d(x, y, rotation));
   }
 
   /**
@@ -94,7 +94,7 @@ public class FieldObject2d implements AutoCloseable {
   public synchronized void setTrajectory(Trajectory trajectory) {
     m_poses.clear();
     for (Trajectory.State state : trajectory.getStates()) {
-      m_poses.add(state.poseMeters);
+      m_poses.add(state.pose);
     }
     updateEntry();
   }

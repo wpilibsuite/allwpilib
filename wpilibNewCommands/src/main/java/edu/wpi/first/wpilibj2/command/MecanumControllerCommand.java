@@ -48,7 +48,7 @@ public class MecanumControllerCommand extends Command {
   private final MecanumDriveKinematics m_kinematics;
   private final HolonomicDriveController m_controller;
   private final Supplier<Rotation2d> m_desiredRotation;
-  private final double m_maxWheelVelocityMetersPerSecond;
+  private final double m_maxWheelVelocity;
   private final PIDController m_frontLeftController;
   private final PIDController m_rearLeftController;
   private final PIDController m_frontRightController;
@@ -79,7 +79,7 @@ public class MecanumControllerCommand extends Command {
    * @param thetaController The Trajectory Tracker PID controller for angle for the robot.
    * @param desiredRotation The angle that the robot should be facing. This is sampled at each time
    *     step.
-   * @param maxWheelVelocityMetersPerSecond The maximum velocity of a drivetrain wheel.
+   * @param maxWheelVelocity The maximum velocity of a drivetrain wheel in m/s.
    * @param frontLeftController The front left wheel velocity PID.
    * @param rearLeftController The rear left wheel velocity PID.
    * @param frontRightController The front right wheel velocity PID.
@@ -98,7 +98,7 @@ public class MecanumControllerCommand extends Command {
       PIDController yController,
       ProfiledPIDController thetaController,
       Supplier<Rotation2d> desiredRotation,
-      double maxWheelVelocityMetersPerSecond,
+      double maxWheelVelocity,
       PIDController frontLeftController,
       PIDController rearLeftController,
       PIDController frontRightController,
@@ -120,7 +120,7 @@ public class MecanumControllerCommand extends Command {
     m_desiredRotation =
         requireNonNullParam(desiredRotation, "desiredRotation", "MecanumControllerCommand");
 
-    m_maxWheelVelocityMetersPerSecond = maxWheelVelocityMetersPerSecond;
+    m_maxWheelVelocity = maxWheelVelocity;
 
     m_frontLeftController =
         requireNonNullParam(frontLeftController, "frontLeftController", "MecanumControllerCommand");
@@ -266,8 +266,7 @@ public class MecanumControllerCommand extends Command {
         xController,
         yController,
         thetaController,
-        () ->
-            trajectory.getStates().get(trajectory.getStates().size() - 1).poseMeters.getRotation(),
+        () -> trajectory.getStates().get(trajectory.getStates().size() - 1).pose.getRotation(),
         maxWheelVelocityMetersPerSecond,
         frontLeftController,
         rearLeftController,
@@ -299,7 +298,7 @@ public class MecanumControllerCommand extends Command {
    * @param xController The Trajectory Tracker PID controller for the robot's x position.
    * @param yController The Trajectory Tracker PID controller for the robot's y position.
    * @param thetaController The Trajectory Tracker PID controller for angle for the robot.
-   * @param maxWheelVelocityMetersPerSecond The maximum velocity of a drivetrain wheel.
+   * @param maxWheelVelocity The maximum velocity of a drivetrain wheel in m/s.
    * @param frontLeftController The front left wheel velocity PID.
    * @param rearLeftController The rear left wheel velocity PID.
    * @param frontRightController The front right wheel velocity PID.
@@ -318,7 +317,7 @@ public class MecanumControllerCommand extends Command {
       PIDController xController,
       PIDController yController,
       ProfiledPIDController thetaController,
-      double maxWheelVelocityMetersPerSecond,
+      double maxWheelVelocity,
       PIDController frontLeftController,
       PIDController rearLeftController,
       PIDController frontRightController,
@@ -334,7 +333,7 @@ public class MecanumControllerCommand extends Command {
         xController,
         yController,
         thetaController,
-        maxWheelVelocityMetersPerSecond,
+        maxWheelVelocity,
         frontLeftController,
         rearLeftController,
         frontRightController,
@@ -362,7 +361,7 @@ public class MecanumControllerCommand extends Command {
    * @param thetaController The Trajectory Tracker PID controller for angle for the robot.
    * @param desiredRotation The angle that the robot should be facing. This is sampled at each time
    *     step.
-   * @param maxWheelVelocityMetersPerSecond The maximum velocity of a drivetrain wheel.
+   * @param maxWheelVelocity The maximum velocity of a drivetrain wheel in m/s.
    * @param outputWheelSpeeds A MecanumDriveWheelSpeeds object containing the output wheel speeds.
    * @param requirements The subsystems to require.
    */
@@ -375,7 +374,7 @@ public class MecanumControllerCommand extends Command {
       PIDController yController,
       ProfiledPIDController thetaController,
       Supplier<Rotation2d> desiredRotation,
-      double maxWheelVelocityMetersPerSecond,
+      double maxWheelVelocity,
       Consumer<MecanumDriveWheelSpeeds> outputWheelSpeeds,
       Subsystem... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumControllerCommand");
@@ -392,7 +391,7 @@ public class MecanumControllerCommand extends Command {
     m_desiredRotation =
         requireNonNullParam(desiredRotation, "desiredRotation", "MecanumControllerCommand");
 
-    m_maxWheelVelocityMetersPerSecond = maxWheelVelocityMetersPerSecond;
+    m_maxWheelVelocity = maxWheelVelocity;
 
     m_frontLeftController = null;
     m_rearLeftController = null;
@@ -430,7 +429,7 @@ public class MecanumControllerCommand extends Command {
    * @param xController The Trajectory Tracker PID controller for the robot's x position.
    * @param yController The Trajectory Tracker PID controller for the robot's y position.
    * @param thetaController The Trajectory Tracker PID controller for angle for the robot.
-   * @param maxWheelVelocityMetersPerSecond The maximum velocity of a drivetrain wheel.
+   * @param maxWheelVelocity The maximum velocity of a drivetrain wheel.
    * @param outputWheelSpeeds A MecanumDriveWheelSpeeds object containing the output wheel speeds.
    * @param requirements The subsystems to require.
    */
@@ -441,7 +440,7 @@ public class MecanumControllerCommand extends Command {
       PIDController xController,
       PIDController yController,
       ProfiledPIDController thetaController,
-      double maxWheelVelocityMetersPerSecond,
+      double maxWheelVelocity,
       Consumer<MecanumDriveWheelSpeeds> outputWheelSpeeds,
       Subsystem... requirements) {
     this(
@@ -451,9 +450,8 @@ public class MecanumControllerCommand extends Command {
         xController,
         yController,
         thetaController,
-        () ->
-            trajectory.getStates().get(trajectory.getStates().size() - 1).poseMeters.getRotation(),
-        maxWheelVelocityMetersPerSecond,
+        () -> trajectory.getStates().get(trajectory.getStates().size() - 1).pose.getRotation(),
+        maxWheelVelocity,
         outputWheelSpeeds,
         requirements);
   }
@@ -462,18 +460,16 @@ public class MecanumControllerCommand extends Command {
   public void initialize() {
     var initialState = m_trajectory.sample(0);
 
-    var initialXVelocity =
-        initialState.velocityMetersPerSecond * initialState.poseMeters.getRotation().getCos();
-    var initialYVelocity =
-        initialState.velocityMetersPerSecond * initialState.poseMeters.getRotation().getSin();
+    var initialXVelocity = initialState.velocity * initialState.pose.getRotation().getCos();
+    var initialYVelocity = initialState.velocity * initialState.pose.getRotation().getSin();
 
     MecanumDriveWheelSpeeds prevSpeeds =
         m_kinematics.toWheelSpeeds(new ChassisSpeeds(initialXVelocity, initialYVelocity, 0.0));
 
-    m_prevFrontLeftSpeedSetpoint = prevSpeeds.frontLeftMetersPerSecond;
-    m_prevRearLeftSpeedSetpoint = prevSpeeds.rearLeftMetersPerSecond;
-    m_prevFrontRightSpeedSetpoint = prevSpeeds.frontRightMetersPerSecond;
-    m_prevRearRightSpeedSetpoint = prevSpeeds.rearRightMetersPerSecond;
+    m_prevFrontLeftSpeedSetpoint = prevSpeeds.frontLeft;
+    m_prevRearLeftSpeedSetpoint = prevSpeeds.rearLeft;
+    m_prevFrontRightSpeedSetpoint = prevSpeeds.frontRight;
+    m_prevRearRightSpeedSetpoint = prevSpeeds.rearRight;
 
     m_timer.restart();
   }
@@ -488,12 +484,12 @@ public class MecanumControllerCommand extends Command {
         m_controller.calculate(m_pose.get(), desiredState, m_desiredRotation.get());
     var targetWheelSpeeds = m_kinematics.toWheelSpeeds(targetChassisSpeeds);
 
-    targetWheelSpeeds = targetWheelSpeeds.desaturate(m_maxWheelVelocityMetersPerSecond);
+    targetWheelSpeeds = targetWheelSpeeds.desaturate(m_maxWheelVelocity);
 
-    double frontLeftSpeedSetpoint = targetWheelSpeeds.frontLeftMetersPerSecond;
-    double rearLeftSpeedSetpoint = targetWheelSpeeds.rearLeftMetersPerSecond;
-    double frontRightSpeedSetpoint = targetWheelSpeeds.frontRightMetersPerSecond;
-    double rearRightSpeedSetpoint = targetWheelSpeeds.rearRightMetersPerSecond;
+    double frontLeftSpeedSetpoint = targetWheelSpeeds.frontLeft;
+    double rearLeftSpeedSetpoint = targetWheelSpeeds.rearLeft;
+    double frontRightSpeedSetpoint = targetWheelSpeeds.frontRight;
+    double rearRightSpeedSetpoint = targetWheelSpeeds.rearRight;
 
     double frontLeftOutput;
     double rearLeftOutput;
@@ -516,22 +512,22 @@ public class MecanumControllerCommand extends Command {
       frontLeftOutput =
           frontLeftFeedforward
               + m_frontLeftController.calculate(
-                  m_currentWheelSpeeds.get().frontLeftMetersPerSecond, frontLeftSpeedSetpoint);
+                  m_currentWheelSpeeds.get().frontLeft, frontLeftSpeedSetpoint);
 
       rearLeftOutput =
           rearLeftFeedforward
               + m_rearLeftController.calculate(
-                  m_currentWheelSpeeds.get().rearLeftMetersPerSecond, rearLeftSpeedSetpoint);
+                  m_currentWheelSpeeds.get().rearLeft, rearLeftSpeedSetpoint);
 
       frontRightOutput =
           frontRightFeedforward
               + m_frontRightController.calculate(
-                  m_currentWheelSpeeds.get().frontRightMetersPerSecond, frontRightSpeedSetpoint);
+                  m_currentWheelSpeeds.get().frontRight, frontRightSpeedSetpoint);
 
       rearRightOutput =
           rearRightFeedforward
               + m_rearRightController.calculate(
-                  m_currentWheelSpeeds.get().rearRightMetersPerSecond, rearRightSpeedSetpoint);
+                  m_currentWheelSpeeds.get().rearRight, rearRightSpeedSetpoint);
 
       m_outputDriveVoltages.accept(
           frontLeftOutput, frontRightOutput, rearLeftOutput, rearRightOutput);
@@ -553,7 +549,7 @@ public class MecanumControllerCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
+    return m_timer.hasElapsed(m_trajectory.getTotalTime());
   }
 
   /** A consumer to represent an operation on the voltages of a mecanum drive. */

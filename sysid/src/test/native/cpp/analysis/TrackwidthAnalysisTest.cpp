@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include "sysid/analysis/TrackWidthAnalysis.h"
+#include "sysid/analysis/TrackwidthAnalysis.h"
 
-TEST(TrackWidthAnalysisTest, Calculate) {
-  double result = sysid::CalculateTrackWidth(-0.5386, 0.5386, 90_deg);
+TEST(TrackwidthAnalysisTest, Calculate) {
+  double result = sysid::CalculateTrackwidth(-0.5386, 0.5386, 90_deg);
   EXPECT_NEAR(result, 0.6858, 1E-4);
 }

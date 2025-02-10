@@ -31,9 +31,9 @@ class SharpIRSim {
   /**
    * Set the range returned by the distance sensor.
    *
-   * @param rng range of the target returned by the sensor
+   * @param range range of the target returned by the sensor
    */
-  void SetRange(units::centimeter_t rng);
+  void SetRange(units::meter_t range);
 
  private:
   hal::SimDouble m_simRange;

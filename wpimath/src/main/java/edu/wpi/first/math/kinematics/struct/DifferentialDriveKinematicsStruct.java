@@ -26,17 +26,17 @@ public class DifferentialDriveKinematicsStruct implements Struct<DifferentialDri
 
   @Override
   public String getSchema() {
-    return "double track_width";
+    return "double trackwidth";
   }
 
   @Override
   public DifferentialDriveKinematics unpack(ByteBuffer bb) {
-    double trackWidth = bb.getDouble();
-    return new DifferentialDriveKinematics(trackWidth);
+    double trackwidth = bb.getDouble();
+    return new DifferentialDriveKinematics(trackwidth);
   }
 
   @Override
   public void pack(ByteBuffer bb, DifferentialDriveKinematics value) {
-    bb.putDouble(value.trackWidthMeters);
+    bb.putDouble(value.trackwidth);
   }
 }

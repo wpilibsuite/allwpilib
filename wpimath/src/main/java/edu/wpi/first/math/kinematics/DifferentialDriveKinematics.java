@@ -26,8 +26,8 @@ public class DifferentialDriveKinematics
     implements Kinematics<DifferentialDriveWheelSpeeds, DifferentialDriveWheelPositions>,
         ProtobufSerializable,
         StructSerializable {
-  /** Differential drive trackwidth. */
-  public final double trackWidthMeters;
+  /** Differential drive trackwidth in meters. */
+  public final double trackwidth;
 
   /** DifferentialDriveKinematics protobuf for serialization. */
   public static final DifferentialDriveKinematicsProto proto =
@@ -40,24 +40,24 @@ public class DifferentialDriveKinematics
   /**
    * Constructs a differential drive kinematics object.
    *
-   * @param trackWidthMeters The track width of the drivetrain. Theoretically, this is the distance
-   *     between the left wheels and right wheels. However, the empirical value may be larger than
-   *     the physical measured value due to scrubbing effects.
+   * @param trackwidth The trackwidth of the drivetrain in meters. Theoretically, this is the
+   *     distance between the left wheels and right wheels. However, the empirical value may be
+   *     larger than the physical measured value due to scrubbing effects.
    */
-  public DifferentialDriveKinematics(double trackWidthMeters) {
-    this.trackWidthMeters = trackWidthMeters;
+  public DifferentialDriveKinematics(double trackwidth) {
+    this.trackwidth = trackwidth;
     MathSharedStore.reportUsage("DifferentialDriveKinematics", "");
   }
 
   /**
    * Constructs a differential drive kinematics object.
    *
-   * @param trackWidth The track width of the drivetrain. Theoretically, this is the distance
-   *     between the left wheels and right wheels. However, the empirical value may be larger than
-   *     the physical measured value due to scrubbing effects.
+   * @param trackwidth The trackwidth of the drivetrain in meters. Theoretically, this is the
+   *     distance between the left wheels and right wheels. However, the empirical value may be
+   *     larger than the physical measured value due to scrubbing effects.
    */
-  public DifferentialDriveKinematics(Distance trackWidth) {
-    this(trackWidth.in(Meters));
+  public DifferentialDriveKinematics(Distance trackwidth) {
+    this(trackwidth.in(Meters));
   }
 
   /**
@@ -69,9 +69,9 @@ public class DifferentialDriveKinematics
   @Override
   public ChassisSpeeds toChassisSpeeds(DifferentialDriveWheelSpeeds wheelSpeeds) {
     return new ChassisSpeeds(
-        (wheelSpeeds.leftMetersPerSecond + wheelSpeeds.rightMetersPerSecond) / 2,
+        (wheelSpeeds.left + wheelSpeeds.right) / 2,
         0,
-        (wheelSpeeds.rightMetersPerSecond - wheelSpeeds.leftMetersPerSecond) / trackWidthMeters);
+        (wheelSpeeds.right - wheelSpeeds.left) / trackwidth);
   }
 
   /**
@@ -84,16 +84,14 @@ public class DifferentialDriveKinematics
   @Override
   public DifferentialDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
     return new DifferentialDriveWheelSpeeds(
-        chassisSpeeds.vxMetersPerSecond
-            - trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond,
-        chassisSpeeds.vxMetersPerSecond
-            + trackWidthMeters / 2 * chassisSpeeds.omegaRadiansPerSecond);
+        chassisSpeeds.vx - trackwidth / 2 * chassisSpeeds.omega,
+        chassisSpeeds.vx + trackwidth / 2 * chassisSpeeds.omega);
   }
 
   @Override
   public Twist2d toTwist2d(
       DifferentialDriveWheelPositions start, DifferentialDriveWheelPositions end) {
-    return toTwist2d(end.leftMeters - start.leftMeters, end.rightMeters - start.rightMeters);
+    return toTwist2d(end.left - start.left, end.right - start.right);
   }
 
   /**
@@ -101,27 +99,25 @@ public class DifferentialDriveKinematics
    * distance deltas. This method is often used for odometry -- determining the robot's position on
    * the field using changes in the distance driven by each wheel on the robot.
    *
-   * @param leftDistanceMeters The distance measured by the left side encoder.
-   * @param rightDistanceMeters The distance measured by the right side encoder.
+   * @param leftDistance The distance measured by the left side encoder in meters.
+   * @param rightDistance The distance measured by the right side encoder in meters.
    * @return The resulting Twist2d.
    */
-  public Twist2d toTwist2d(double leftDistanceMeters, double rightDistanceMeters) {
+  public Twist2d toTwist2d(double leftDistance, double rightDistance) {
     return new Twist2d(
-        (leftDistanceMeters + rightDistanceMeters) / 2,
-        0,
-        (rightDistanceMeters - leftDistanceMeters) / trackWidthMeters);
+        (leftDistance + rightDistance) / 2, 0, (rightDistance - leftDistance) / trackwidth);
   }
 
   @Override
   public DifferentialDriveWheelPositions copy(DifferentialDriveWheelPositions positions) {
-    return new DifferentialDriveWheelPositions(positions.leftMeters, positions.rightMeters);
+    return new DifferentialDriveWheelPositions(positions.left, positions.right);
   }
 
   @Override
   public void copyInto(
       DifferentialDriveWheelPositions positions, DifferentialDriveWheelPositions output) {
-    output.leftMeters = positions.leftMeters;
-    output.rightMeters = positions.rightMeters;
+    output.left = positions.left;
+    output.right = positions.right;
   }
 
   @Override

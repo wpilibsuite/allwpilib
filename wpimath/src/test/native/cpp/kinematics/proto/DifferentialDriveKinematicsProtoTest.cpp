@@ -24,6 +24,6 @@ TEST(DifferentialDriveKinematicsProtoTest, Roundtrip) {
   auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.trackWidth.value(),
-            unpacked_data->trackWidth.value());
+  EXPECT_EQ(kExpectedData.trackwidth.value(),
+            unpacked_data->trackwidth.value());
 }

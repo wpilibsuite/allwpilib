@@ -157,10 +157,10 @@ class AddressableLED {
    * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing
    * needs to be set for those.
    *
-   * @param highTime0 high time for 0 bit (default 400ns)
-   * @param lowTime0 low time for 0 bit (default 900ns)
-   * @param highTime1 high time for 1 bit (default 900ns)
-   * @param lowTime1 low time for 1 bit (default 600ns)
+   * @param highTime0 high time for 0 bit (default 400 ns)
+   * @param lowTime0 low time for 0 bit (default 900 ns)
+   * @param highTime1 high time for 1 bit (default 900 ns)
+   * @param lowTime1 low time for 1 bit (default 600 ns)
    */
   void SetBitTiming(units::nanosecond_t highTime0, units::nanosecond_t lowTime0,
                     units::nanosecond_t highTime1,

@@ -30,18 +30,18 @@ public class TimedRobot extends IterativeRobotBase {
      * Construct a callback container.
      *
      * @param func The callback to run.
-     * @param startTimeUs The common starting point for all callback scheduling in microseconds.
-     * @param periodUs The period at which to run the callback in microseconds.
-     * @param offsetUs The offset from the common starting time in microseconds.
+     * @param startTime The common starting point for all callback scheduling in microseconds.
+     * @param period The period at which to run the callback in microseconds.
+     * @param offset The offset from the common starting time in microseconds.
      */
-    Callback(Runnable func, long startTimeUs, long periodUs, long offsetUs) {
+    Callback(Runnable func, long startTime, long period, long offset) {
       this.func = func;
-      this.period = periodUs;
+      this.period = period;
       this.expirationTime =
-          startTimeUs
-              + offsetUs
+          startTime
+              + offset
               + this.period
-              + (RobotController.getFPGATime() - startTimeUs) / this.period * this.period;
+              + (RobotController.getFPGATime() - startTime) / this.period * this.period;
     }
 
     @Override
@@ -177,10 +177,10 @@ public class TimedRobot extends IterativeRobotBase {
    * synchronously. Interactions between them are thread-safe.
    *
    * @param callback The callback to run.
-   * @param periodSeconds The period at which to run the callback in seconds.
+   * @param period The period at which to run the callback in seconds.
    */
-  public final void addPeriodic(Runnable callback, double periodSeconds) {
-    m_callbacks.add(new Callback(callback, m_startTimeUs, (long) (periodSeconds * 1e6), 0));
+  public final void addPeriodic(Runnable callback, double period) {
+    m_callbacks.add(new Callback(callback, m_startTimeUs, (long) (period * 1e6), 0));
   }
 
   /**
@@ -190,14 +190,13 @@ public class TimedRobot extends IterativeRobotBase {
    * synchronously. Interactions between them are thread-safe.
    *
    * @param callback The callback to run.
-   * @param periodSeconds The period at which to run the callback in seconds.
-   * @param offsetSeconds The offset from the common starting time in seconds. This is useful for
+   * @param period The period at which to run the callback in seconds.
+   * @param offset The offset from the common starting time in seconds. This is useful for
    *     scheduling a callback in a different timeslot relative to TimedRobot.
    */
-  public final void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
+  public final void addPeriodic(Runnable callback, double period, double offset) {
     m_callbacks.add(
-        new Callback(
-            callback, m_startTimeUs, (long) (periodSeconds * 1e6), (long) (offsetSeconds * 1e6)));
+        new Callback(callback, m_startTimeUs, (long) (period * 1e6), (long) (offset * 1e6)));
   }
 
   /**

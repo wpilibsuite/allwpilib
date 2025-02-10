@@ -18,11 +18,11 @@ using namespace frc;
 using namespace frc::sim;
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
-    LinearSystem<2, 2, 2> plant, units::meter_t trackWidth, DCMotor driveMotor,
+    LinearSystem<2, 2, 2> plant, units::meter_t trackwidth, DCMotor driveMotor,
     double gearRatio, units::meter_t wheelRadius,
     const std::array<double, 7>& measurementStdDevs)
     : m_plant(std::move(plant)),
-      m_rb(trackWidth / 2.0),
+      m_rb(trackwidth / 2.0),
       m_wheelRadius(wheelRadius),
       m_motor(driveMotor),
       m_originalGearing(gearRatio),
@@ -36,11 +36,11 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
     frc::DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
     units::kilogram_t mass, units::meter_t wheelRadius,
-    units::meter_t trackWidth, const std::array<double, 7>& measurementStdDevs)
+    units::meter_t trackwidth, const std::array<double, 7>& measurementStdDevs)
     : DifferentialDrivetrainSim(
           frc::LinearSystemId::DrivetrainVelocitySystem(
-              driveMotor, mass, wheelRadius, trackWidth / 2.0, J, gearing),
-          trackWidth, driveMotor, gearing, wheelRadius, measurementStdDevs) {}
+              driveMotor, mass, wheelRadius, trackwidth / 2.0, J, gearing),
+          trackwidth, driveMotor, gearing, wheelRadius, measurementStdDevs) {}
 
 Eigen::Vector2d DifferentialDrivetrainSim::ClampInput(
     const Eigen::Vector2d& u) {

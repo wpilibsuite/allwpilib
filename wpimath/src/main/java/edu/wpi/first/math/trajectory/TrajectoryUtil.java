@@ -58,13 +58,13 @@ public final class TrajectoryUtil {
 
     for (int i = 0; i < trajectory.getStates().size() * 7; i += 7) {
       var state = trajectory.getStates().get(i / 7);
-      elements[i] = state.timeSeconds;
-      elements[i + 1] = state.velocityMetersPerSecond;
-      elements[i + 2] = state.accelerationMetersPerSecondSq;
-      elements[i + 3] = state.poseMeters.getX();
-      elements[i + 4] = state.poseMeters.getY();
-      elements[i + 5] = state.poseMeters.getRotation().getRadians();
-      elements[i + 6] = state.curvatureRadPerMeter;
+      elements[i] = state.time;
+      elements[i + 1] = state.velocity;
+      elements[i + 2] = state.acceleration;
+      elements[i + 3] = state.pose.getX();
+      elements[i + 4] = state.pose.getY();
+      elements[i + 5] = state.pose.getRotation().getRadians();
+      elements[i + 6] = state.curvature;
     }
     return elements;
   }

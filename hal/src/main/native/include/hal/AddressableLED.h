@@ -92,17 +92,15 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
  * needs to be set for those.
  *
  * @param[in] handle the Addressable LED handle
- * @param[in] highTime0NanoSeconds high time for 0 bit (default 400ns)
- * @param[in] lowTime0NanoSeconds low time for 0 bit (default 900ns)
- * @param[in] highTime1NanoSeconds high time for 1 bit (default 900ns)
- * @param[in] lowTime1NanoSeconds low time for 1 bit (default 600ns)
+ * @param[in] highTime0 high time for 0 bit in nanoseconds (default 400 ns)
+ * @param[in] lowTime0 low time for 0 bit in nanoseconds (default 900 ns)
+ * @param[in] highTime1 high time for 1 bit in nanoseconds (default 900 ns)
+ * @param[in] lowTime1 low time for 1 bit in nanoseconds (default 600 ns)
  * @param[out] status the error code, or 0 for success
  */
 void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
-                                    int32_t highTime0NanoSeconds,
-                                    int32_t lowTime0NanoSeconds,
-                                    int32_t highTime1NanoSeconds,
-                                    int32_t lowTime1NanoSeconds,
+                                    int32_t highTime0, int32_t lowTime0,
+                                    int32_t highTime1, int32_t lowTime1,
                                     int32_t* status);
 
 /**
@@ -112,12 +110,11 @@ void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
  * WS2812B and WS2815.
  *
  * @param[in] handle the Addressable LED handle
- * @param[in] syncTimeMicroSeconds the sync time (default 280us)
+ * @param[in] syncTime the sync time in microseconds (default 280 μs)
  * @param[out] status the error code, or 0 for success
  */
 void HAL_SetAddressableLEDSyncTime(HAL_AddressableLEDHandle handle,
-                                   int32_t syncTimeMicroSeconds,
-                                   int32_t* status);
+                                   int32_t syncTime, int32_t* status);
 
 /**
  * Starts the output.

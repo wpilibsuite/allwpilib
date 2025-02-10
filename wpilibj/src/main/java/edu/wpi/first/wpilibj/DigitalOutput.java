@@ -83,10 +83,10 @@ public class DigitalOutput implements AutoCloseable, Sendable {
    * <p>Send a single pulse on the digital output line where the pulse duration is specified in
    * seconds. Maximum of 65535 microseconds.
    *
-   * @param pulseLengthSeconds The pulse length in seconds
+   * @param pulseLength The pulse length in seconds
    */
-  public void pulse(final double pulseLengthSeconds) {
-    DIOJNI.pulse(m_handle, pulseLengthSeconds);
+  public void pulse(final double pulseLength) {
+    DIOJNI.pulse(m_handle, pulseLength);
   }
 
   /**

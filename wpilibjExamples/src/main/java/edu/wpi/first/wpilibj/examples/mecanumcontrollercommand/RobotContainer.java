@@ -80,9 +80,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Create config for trajectory
     TrajectoryConfig config =
-        new TrajectoryConfig(
-                AutoConstants.kMaxSpeedMetersPerSecond,
-                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+        new TrajectoryConfig(AutoConstants.kMaxSpeed, AutoConstants.kMaxAcceleration)
             // Add kinematics to ensure max speed is actually obeyed
             .setKinematics(DriveConstants.kDriveKinematics);
 
@@ -111,7 +109,7 @@ public class RobotContainer {
                 AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints),
 
             // Needed for normalizing wheel speeds
-            AutoConstants.kMaxSpeedMetersPerSecond,
+            AutoConstants.kMaxSpeed,
 
             // Velocity PID's
             new PIDController(DriveConstants.kPFrontLeftVel, 0, 0),

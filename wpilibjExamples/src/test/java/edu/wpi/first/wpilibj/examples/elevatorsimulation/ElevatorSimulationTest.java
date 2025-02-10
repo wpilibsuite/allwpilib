@@ -88,12 +88,12 @@ class ElevatorSimulationTest {
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(Constants.kSetpointMeters, m_encoderSim.getDistance(), 0.05);
+      assertEquals(Constants.kSetpoint, m_encoderSim.getDistance(), 0.05);
 
       // advance 25 timesteps to see setpoint is held.
       SimHooks.stepTiming(0.5);
 
-      assertEquals(Constants.kSetpointMeters, m_encoderSim.getDistance(), 0.05);
+      assertEquals(Constants.kSetpoint, m_encoderSim.getDistance(), 0.05);
     }
 
     {
@@ -115,12 +115,12 @@ class ElevatorSimulationTest {
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(Constants.kSetpointMeters, m_encoderSim.getDistance(), 0.05);
+      assertEquals(Constants.kSetpoint, m_encoderSim.getDistance(), 0.05);
 
       // advance 25 timesteps to see setpoint is held.
       SimHooks.stepTiming(0.5);
 
-      assertEquals(Constants.kSetpointMeters, m_encoderSim.getDistance(), 0.05);
+      assertEquals(Constants.kSetpoint, m_encoderSim.getDistance(), 0.05);
     }
 
     {

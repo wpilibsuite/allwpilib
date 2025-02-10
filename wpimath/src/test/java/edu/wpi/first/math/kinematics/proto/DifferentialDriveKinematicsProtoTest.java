@@ -19,6 +19,6 @@ class DifferentialDriveKinematicsProtoTest {
     DifferentialDriveKinematics.proto.pack(proto, DATA);
 
     DifferentialDriveKinematics data = DifferentialDriveKinematics.proto.unpack(proto);
-    assertEquals(DATA.trackWidthMeters, data.trackWidthMeters);
+    assertEquals(DATA.trackwidth, data.trackwidth);
   }
 }

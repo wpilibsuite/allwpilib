@@ -26,11 +26,11 @@ public class Constants {
   public static final double kElevatorDrumRadius = Units.inchesToMeters(1.0);
   public static final double kCarriageMass = Units.lbsToKilograms(12); // kg
 
-  public static final double kSetpointMeters = Units.inchesToMeters(42.875);
-  public static final double kLowerkSetpointMeters = Units.inchesToMeters(15);
+  public static final double kSetpoint = Units.inchesToMeters(42.875);
+  public static final double kLowerkSetpoint = Units.inchesToMeters(15);
   // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
-  public static final double kMinElevatorHeightMeters = 0.0;
-  public static final double kMaxElevatorHeightMeters = Units.inchesToMeters(50);
+  public static final double kMinElevatorHeight = 0.0; // m
+  public static final double kMaxElevatorHeight = Units.inchesToMeters(50);
 
   // distance per pulse = (distance per revolution) / (pulses per revolution)
   //  = (Pi * D) / ppr

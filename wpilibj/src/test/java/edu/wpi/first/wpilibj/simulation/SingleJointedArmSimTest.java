@@ -34,24 +34,6 @@ class SingleJointedArmSimTest {
     }
 
     // the arm should swing down
-    assertEquals(-Math.PI / 2.0, sim.getAngleRads(), 0.1);
-  }
-
-  @Test
-  void testInitialState() {
-    double startingAngleRads = Math.PI / 4.0;
-    SingleJointedArmSim sim =
-        new SingleJointedArmSim(
-            DCMotor.getKrakenX60(2),
-            125,
-            3.0,
-            Units.inchesToMeters(30.0),
-            0,
-            Math.PI / 2.0,
-            true,
-            startingAngleRads);
-
-    assertEquals(startingAngleRads, sim.getAngleRads());
-    assertEquals(0, sim.getVelocityRadPerSec());
+    assertEquals(-Math.PI / 2.0, m_sim.getAngle(), 0.1);
   }
 }

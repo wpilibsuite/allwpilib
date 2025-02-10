@@ -29,14 +29,14 @@ import java.util.Objects;
  * will often have all three components.
  */
 public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
-  /** Velocity along the x-axis. (Fwd is +) */
-  public double vxMetersPerSecond;
+  /** Velocity along the x-axis in meters per second. (Fwd is +) */
+  public double vx;
 
-  /** Velocity along the y-axis. (Left is +) */
-  public double vyMetersPerSecond;
+  /** Velocity along the y-axis in meters per second. (Left is +) */
+  public double vy;
 
-  /** Represents the angular velocity of the robot frame. (CCW is +) */
-  public double omegaRadiansPerSecond;
+  /** Angular velocity of the robot frame in radians per second. (CCW is +) */
+  public double omega;
 
   /** ChassisSpeeds protobuf for serialization. */
   public static final ChassisSpeedsProto proto = new ChassisSpeedsProto();
@@ -50,15 +50,14 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   /**
    * Constructs a ChassisSpeeds object.
    *
-   * @param vxMetersPerSecond Forward velocity.
-   * @param vyMetersPerSecond Sideways velocity.
-   * @param omegaRadiansPerSecond Angular velocity.
+   * @param vx Forward velocity in meters per second.
+   * @param vy Sideways velocity in meters per second.
+   * @param omega Angular velocity in radians per second.
    */
-  public ChassisSpeeds(
-      double vxMetersPerSecond, double vyMetersPerSecond, double omegaRadiansPerSecond) {
-    this.vxMetersPerSecond = vxMetersPerSecond;
-    this.vyMetersPerSecond = vyMetersPerSecond;
-    this.omegaRadiansPerSecond = omegaRadiansPerSecond;
+  public ChassisSpeeds(double vx, double vy, double omega) {
+    this.vx = vx;
+    this.vy = vy;
+    this.omega = omega;
   }
 
   /**
@@ -75,14 +74,11 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   /**
    * Creates a Twist2d from ChassisSpeeds.
    *
-   * @param dtSeconds The duration of the timestep.
+   * @param dt The duration of the timestep in seconds.
    * @return Twist2d.
    */
-  public Twist2d toTwist2d(double dtSeconds) {
-    return new Twist2d(
-        vxMetersPerSecond * dtSeconds,
-        vyMetersPerSecond * dtSeconds,
-        omegaRadiansPerSecond * dtSeconds);
+  public Twist2d toTwist2d(double dt) {
+    return new Twist2d(vx * dt, vy * dt, omega * dt);
   }
 
   /**
@@ -99,22 +95,20 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * in the opposite direction of rotational velocity, introducing a different translational skew
    * which is not accounted for by discretization.
    *
-   * @param dtSeconds The duration of the timestep the speeds should be applied for.
+   * @param dt The duration of the timestep in seconds the speeds should be applied for.
    * @return Discretized ChassisSpeeds.
    */
-  public ChassisSpeeds discretize(double dtSeconds) {
-    var desiredDeltaPose =
-        new Pose2d(
-            vxMetersPerSecond * dtSeconds,
-            vyMetersPerSecond * dtSeconds,
-            new Rotation2d(omegaRadiansPerSecond * dtSeconds));
+  public ChassisSpeeds discretize(double dt) {
+    // Construct the desired pose after a timestep, relative to the current pose. The desired pose
+    // has decoupled translation and rotation.
+    var desiredDeltaPose = new Pose2d(vx * dt, vy * dt, new Rotation2d(omega * dt));
 
     // Find the chassis translation/rotation deltas in the robot frame that move the robot from its
     // current pose to the desired pose
     var twist = Pose2d.kZero.log(desiredDeltaPose);
 
     // Turn the chassis translation/rotation deltas into average velocities
-    return new ChassisSpeeds(twist.dx / dtSeconds, twist.dy / dtSeconds, twist.dtheta / dtSeconds);
+    return new ChassisSpeeds(twist.dx / dt, twist.dy / dt, twist.dtheta / dt);
   }
 
   /**
@@ -127,9 +121,8 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    */
   public ChassisSpeeds toRobotRelative(Rotation2d robotAngle) {
     // CW rotation into chassis frame
-    var rotated =
-        new Translation2d(vxMetersPerSecond, vyMetersPerSecond).rotateBy(robotAngle.unaryMinus());
-    return new ChassisSpeeds(rotated.getX(), rotated.getY(), omegaRadiansPerSecond);
+    var rotated = new Translation2d(vx, vy).rotateBy(robotAngle.unaryMinus());
+    return new ChassisSpeeds(rotated.getX(), rotated.getY(), omega);
   }
 
   /**
@@ -142,8 +135,8 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    */
   public ChassisSpeeds toFieldRelative(Rotation2d robotAngle) {
     // CCW rotation out of chassis frame
-    var rotated = new Translation2d(vxMetersPerSecond, vyMetersPerSecond).rotateBy(robotAngle);
-    return new ChassisSpeeds(rotated.getX(), rotated.getY(), omegaRadiansPerSecond);
+    var rotated = new Translation2d(vx, vy).rotateBy(robotAngle);
+    return new ChassisSpeeds(rotated.getX(), rotated.getY(), omega);
   }
 
   /**
@@ -156,10 +149,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return The sum of the ChassisSpeeds.
    */
   public ChassisSpeeds plus(ChassisSpeeds other) {
-    return new ChassisSpeeds(
-        vxMetersPerSecond + other.vxMetersPerSecond,
-        vyMetersPerSecond + other.vyMetersPerSecond,
-        omegaRadiansPerSecond + other.omegaRadiansPerSecond);
+    return new ChassisSpeeds(vx + other.vx, vy + other.vy, omega + other.omega);
   }
 
   /**
@@ -172,10 +162,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return The difference between the two ChassisSpeeds.
    */
   public ChassisSpeeds minus(ChassisSpeeds other) {
-    return new ChassisSpeeds(
-        vxMetersPerSecond - other.vxMetersPerSecond,
-        vyMetersPerSecond - other.vyMetersPerSecond,
-        omegaRadiansPerSecond - other.omegaRadiansPerSecond);
+    return new ChassisSpeeds(vx - other.vx, vy - other.vy, omega - other.omega);
   }
 
   /**
@@ -185,7 +172,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return The inverse of the current ChassisSpeeds.
    */
   public ChassisSpeeds unaryMinus() {
-    return new ChassisSpeeds(-vxMetersPerSecond, -vyMetersPerSecond, -omegaRadiansPerSecond);
+    return new ChassisSpeeds(-vx, -vy, -omega);
   }
 
   /**
@@ -197,8 +184,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return The scaled ChassisSpeeds.
    */
   public ChassisSpeeds times(double scalar) {
-    return new ChassisSpeeds(
-        vxMetersPerSecond * scalar, vyMetersPerSecond * scalar, omegaRadiansPerSecond * scalar);
+    return new ChassisSpeeds(vx * scalar, vy * scalar, omega * scalar);
   }
 
   /**
@@ -210,28 +196,23 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * @return The scaled ChassisSpeeds.
    */
   public ChassisSpeeds div(double scalar) {
-    return new ChassisSpeeds(
-        vxMetersPerSecond / scalar, vyMetersPerSecond / scalar, omegaRadiansPerSecond / scalar);
+    return new ChassisSpeeds(vx / scalar, vy / scalar, omega / scalar);
   }
 
   @Override
   public final int hashCode() {
-    return Objects.hash(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
+    return Objects.hash(vx, vy, omega);
   }
 
   @Override
   public boolean equals(Object o) {
     return o == this
-        || o instanceof ChassisSpeeds c
-            && vxMetersPerSecond == c.vxMetersPerSecond
-            && vyMetersPerSecond == c.vyMetersPerSecond
-            && omegaRadiansPerSecond == c.omegaRadiansPerSecond;
+        || o instanceof ChassisSpeeds c && vx == c.vx && vy == c.vy && omega == c.omega;
   }
 
   @Override
   public String toString() {
     return String.format(
-        "ChassisSpeeds(Vx: %.2f m/s, Vy: %.2f m/s, Omega: %.2f rad/s)",
-        vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
+        "ChassisSpeeds(Vx: %.2f m/s, Vy: %.2f m/s, Omega: %.2f rad/s)", vx, vy, omega);
   }
 }

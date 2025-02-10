@@ -62,7 +62,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
   private final Matrix<States, States> m_contQ;
   private final Matrix<Outputs, Outputs> m_contR;
   private Matrix<States, ?> m_sigmasF;
-  private double m_dtSeconds;
+  private double m_dt;
 
   private final MerweScaledSigmaPoints<States> m_pts;
 
@@ -79,7 +79,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param h A vector-valued function of x and u that returns the measurement vector.
    * @param stateStdDevs Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
-   * @param nominalDtSeconds Nominal discretization timestep.
+   * @param nominalDt Nominal discretization timestep in seconds.
    */
   public UnscentedKalmanFilter(
       Nat<States> states,
@@ -88,7 +88,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> h,
       Matrix<States, N1> stateStdDevs,
       Matrix<Outputs, N1> measurementStdDevs,
-      double nominalDtSeconds) {
+      double nominalDt) {
     this(
         states,
         outputs,
@@ -101,7 +101,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
         Matrix::minus,
         Matrix::minus,
         Matrix::plus,
-        nominalDtSeconds);
+        nominalDt);
   }
 
   /**
@@ -128,7 +128,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param residualFuncY A function that computes the residual of two measurement vectors (i.e. it
    *     subtracts them.)
    * @param addFuncX A function that adds two state vectors.
-   * @param nominalDtSeconds Nominal discretization timestep.
+   * @param nominalDt Nominal discretization timestep in seconds.
    */
   public UnscentedKalmanFilter(
       Nat<States> states,
@@ -142,7 +142,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
       BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> residualFuncX,
       BiFunction<Matrix<Outputs, N1>, Matrix<Outputs, N1>, Matrix<Outputs, N1>> residualFuncY,
       BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> addFuncX,
-      double nominalDtSeconds) {
+      double nominalDt) {
     this.m_states = states;
     this.m_outputs = outputs;
 
@@ -155,7 +155,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     m_residualFuncY = residualFuncY;
     m_addFuncX = addFuncX;
 
-    m_dtSeconds = nominalDtSeconds;
+    m_dt = nominalDt;
 
     m_contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
     m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
@@ -362,14 +362,14 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * Project the model into the future with a new control input u.
    *
    * @param u New control input from controller.
-   * @param dtSeconds Timestep for prediction.
+   * @param dt Timestep for prediction in seconds.
    */
   @Override
-  public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
+  public void predict(Matrix<Inputs, N1> u, double dt) {
     // Discretize Q before projecting mean and covariance forward
     Matrix<States, States> contA =
         NumericalJacobian.numericalJacobianX(m_states, m_states, m_f, m_xHat, u);
-    var discQ = Discretization.discretizeAQ(contA, m_contQ, dtSeconds).getSecond();
+    var discQ = Discretization.discretizeAQ(contA, m_contQ, dt).getSecond();
     var squareRootDiscQ = discQ.lltDecompose(true);
 
     // Generate sigma points around the state mean
@@ -387,7 +387,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     for (int i = 0; i < m_pts.getNumSigmas(); ++i) {
       Matrix<States, N1> x = sigmas.extractColumnVector(i);
 
-      m_sigmasF.setColumn(i, NumericalIntegration.rk4(m_f, x, u, dtSeconds));
+      m_sigmasF.setColumn(i, NumericalIntegration.rk4(m_f, x, u, dt));
     }
 
     // Pass the predicted sigmas (𝒳) through the Unscented Transform
@@ -407,7 +407,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
 
     m_xHat = ret.getFirst();
     m_S = ret.getSecond();
-    m_dtSeconds = dtSeconds;
+    m_dt = dt;
   }
 
   /**
@@ -495,7 +495,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
       BiFunction<Matrix<R, N1>, Matrix<R, N1>, Matrix<R, N1>> residualFuncY,
       BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> residualFuncX,
       BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> addFuncX) {
-    final var discR = Discretization.discretizeR(R, m_dtSeconds);
+    final var discR = Discretization.discretizeR(R, m_dt);
     final var squareRootDiscR = discR.lltDecompose(true);
 
     // Generate new sigma points from the prior mean and covariance

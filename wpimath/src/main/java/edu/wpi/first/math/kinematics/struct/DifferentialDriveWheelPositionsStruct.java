@@ -39,7 +39,7 @@ public class DifferentialDriveWheelPositionsStruct
 
   @Override
   public void pack(ByteBuffer bb, DifferentialDriveWheelPositions value) {
-    bb.putDouble(value.leftMeters);
-    bb.putDouble(value.rightMeters);
+    bb.putDouble(value.left);
+    bb.putDouble(value.right);
   }
 }

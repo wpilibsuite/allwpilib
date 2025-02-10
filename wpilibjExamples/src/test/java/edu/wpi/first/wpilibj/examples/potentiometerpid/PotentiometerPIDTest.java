@@ -53,7 +53,7 @@ class PotentiometerPIDTest {
             kCarriageMassKg,
             kElevatorDrumRadius,
             0.0,
-            Robot.kFullHeightMeters,
+            Robot.kFullHeight,
             true,
             0);
     m_analogSim = new AnalogInputSim(Robot.kPotChannel);
@@ -74,7 +74,7 @@ class PotentiometerPIDTest {
                */
               m_analogSim.setVoltage(
                   RobotController.getVoltage5V()
-                      * (m_elevatorSim.getPositionMeters() / Robot.kFullHeightMeters));
+                      * (m_elevatorSim.getPosition() / Robot.kFullHeight));
             });
 
     m_thread.start();
@@ -113,7 +113,7 @@ class PotentiometerPIDTest {
       // advance 50 timesteps
       SimHooks.stepTiming(1);
 
-      assertEquals(Robot.kSetpointsMeters[0], m_elevatorSim.getPositionMeters(), 0.1);
+      assertEquals(Robot.kSetpoints[0], m_elevatorSim.getPosition(), 0.1);
     }
 
     // second setpoint
@@ -125,7 +125,7 @@ class PotentiometerPIDTest {
       // advance 50 timesteps
       SimHooks.stepTiming(1);
 
-      assertEquals(Robot.kSetpointsMeters[1], m_elevatorSim.getPositionMeters(), 0.1);
+      assertEquals(Robot.kSetpoints[1], m_elevatorSim.getPosition(), 0.1);
     }
 
     // we need to unpress the button
@@ -146,7 +146,7 @@ class PotentiometerPIDTest {
       // advance 50 timesteps
       SimHooks.stepTiming(1);
 
-      assertEquals(Robot.kSetpointsMeters[2], m_elevatorSim.getPositionMeters(), 0.1);
+      assertEquals(Robot.kSetpoints[2], m_elevatorSim.getPosition(), 0.1);
     }
 
     // we need to unpress the button
@@ -167,7 +167,7 @@ class PotentiometerPIDTest {
       // advance 60 timesteps
       SimHooks.stepTiming(1.2);
 
-      assertEquals(Robot.kSetpointsMeters[0], m_elevatorSim.getPositionMeters(), 0.1);
+      assertEquals(Robot.kSetpoints[0], m_elevatorSim.getPosition(), 0.1);
     }
   }
 }

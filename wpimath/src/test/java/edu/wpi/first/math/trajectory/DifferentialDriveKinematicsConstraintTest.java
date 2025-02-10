@@ -24,24 +24,20 @@ class DifferentialDriveKinematicsConstraintTest {
     Trajectory trajectory =
         TrajectoryGeneratorTest.getTrajectory(Collections.singletonList(constraint));
 
-    var duration = trajectory.getTotalTimeSeconds();
+    var duration = trajectory.getTotalTime();
     var t = 0.0;
     var dt = 0.02;
 
     while (t < duration) {
       var point = trajectory.sample(t);
-      var chassisSpeeds =
-          new ChassisSpeeds(
-              point.velocityMetersPerSecond,
-              0,
-              point.velocityMetersPerSecond * point.curvatureRadPerMeter);
+      var chassisSpeeds = new ChassisSpeeds(point.velocity, 0, point.velocity * point.curvature);
 
       var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
 
       t += dt;
       assertAll(
-          () -> assertTrue(wheelSpeeds.leftMetersPerSecond <= maxVelocity + 0.05),
-          () -> assertTrue(wheelSpeeds.rightMetersPerSecond <= maxVelocity + 0.05));
+          () -> assertTrue(wheelSpeeds.left <= maxVelocity + 0.05),
+          () -> assertTrue(wheelSpeeds.right <= maxVelocity + 0.05));
     }
   }
 }
