@@ -96,15 +96,13 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
    * in the opposite direction of rotational velocity, introducing a different translational skew
    * which is not accounted for by discretization.
    *
-   * @param dtSeconds The duration of the timestep the speeds should be applied for.
+   * @param dt The duration of the timestep in seconds the speeds should be applied for.
    * @return Discretized ChassisSpeeds.
    */
-  public ChassisSpeeds discretize(double dtSeconds) {
-    var desiredDeltaPose =
-        new Pose2d(
-            vxMetersPerSecond * dtSeconds,
-            vyMetersPerSecond * dtSeconds,
-            new Rotation2d(omegaRadiansPerSecond * dtSeconds));
+  public ChassisSpeeds discretize(double dt) {
+    // Construct the desired pose after a timestep, relative to the current pose. The desired pose
+    // has decoupled translation and rotation.
+    var desiredDeltaPose = new Pose2d(vx * dt, vy * dt, new Rotation2d(omega * dt));
 
     // Find the chassis translation/rotation deltas in the robot frame that move the robot from its
     // current pose to the desired pose
@@ -141,8 +139,8 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   public ChassisSpeeds toFieldRelative(Rotation2d robotAngle) {
   public ChassisSpeeds toFieldRelative(Rotation2d robotAngle) {
     // CCW rotation out of chassis frame
-    var rotated = new Translation2d(vxMetersPerSecond, vyMetersPerSecond).rotateBy(robotAngle);
-    return new ChassisSpeeds(rotated.getX(), rotated.getY(), omegaRadiansPerSecond);
+    var rotated = new Translation2d(vx, vy).rotateBy(robotAngle);
+    return new ChassisSpeeds(rotated.getX(), rotated.getY(), omega);
   }
 
   /**
