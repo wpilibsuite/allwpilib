@@ -74,8 +74,8 @@ class UnscentedKalmanFilterTest {
   }
 
   @Test
-  void testDriveInit() {
-    var dtSeconds = 0.005;
+  void testInit() {
+    var dt = 0.005;
     assertDoesNotThrow(
         () -> {
           UnscentedKalmanFilter<N5, N2, N3> observer =
@@ -117,9 +117,9 @@ class UnscentedKalmanFilterTest {
   }
 
   @Test
-  void testDriveConvergence() {
-    final double dtSeconds = 0.005;
-    final double rbMeters = 0.8382 / 2.0; // Robot radius
+  void testConvergence() {
+    double dt = 0.005;
+    double rb = 0.8382 / 2.0; // Robot radius
 
     UnscentedKalmanFilter<N5, N2, N3> observer =
         new UnscentedKalmanFilter<>(
@@ -164,11 +164,11 @@ class UnscentedKalmanFilterTest {
 
     var trueXhat = observer.getXhat();
 
-    double totalTime = trajectory.getTotalTimeSeconds();
-    for (int i = 0; i < (totalTime / dtSeconds); ++i) {
-      var ref = trajectory.sample(dtSeconds * i);
-      double vl = ref.velocityMetersPerSecond * (1 - (ref.curvatureRadPerMeter * rbMeters));
-      double vr = ref.velocityMetersPerSecond * (1 + (ref.curvatureRadPerMeter * rbMeters));
+    double totalTime = trajectory.getTotalTime();
+    for (int i = 0; i < (totalTime / dt); i++) {
+      var ref = trajectory.sample(dt * i);
+      double vl = ref.velocity * (1 - (ref.curvature * rb));
+      double vr = ref.velocity * (1 + (ref.curvature * rb));
 
       var nextR =
           VecBuilder.fill(
@@ -184,15 +184,13 @@ class UnscentedKalmanFilterTest {
 
       observer.correct(u, localY.plus(StateSpaceUtil.makeWhiteNoiseVector(noiseStdDev)));
 
-      var rdot = nextR.minus(r).div(dtSeconds);
-      u = new Matrix<>(B.solve(rdot.minus(driveDynamics(r, new Matrix<>(Nat.N2(), Nat.N1())))));
+      var rdot = nextR.minus(r).div(dt);
+      u = new Matrix<>(B.solve(rdot.minus(getDynamics(r, new Matrix<>(Nat.N2(), Nat.N1())))));
 
       observer.predict(u, dt);
 
       r = nextR;
-      trueXhat =
-          NumericalIntegration.rk4(
-              UnscentedKalmanFilterTest::driveDynamics, trueXhat, u, dtSeconds);
+      trueXhat = NumericalIntegration.rk4(UnscentedKalmanFilterTest::getDynamics, trueXhat, u, dt);
     }
 
     var localY = driveLocalMeasurementModel(trueXhat, u);

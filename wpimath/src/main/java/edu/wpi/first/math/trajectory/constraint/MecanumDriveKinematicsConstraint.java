@@ -50,8 +50,7 @@ public class MecanumDriveKinematicsConstraint implements TrajectoryConstraint {
     var chassisSpeeds = new ChassisSpeeds(xdVelocity, ydVelocity, velocity * curvature);
 
     // Get the wheel speeds and normalize them to within the max velocity.
-    var wheelSpeeds =
-        m_kinematics.toWheelSpeeds(chassisSpeeds).desaturate(m_maxSpeedMetersPerSecond);
+    var wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds).desaturate(m_maxSpeed);
 
     // Convert normalized wheel speeds back to chassis speeds
     var normSpeeds = m_kinematics.toChassisSpeeds(wheelSpeeds);

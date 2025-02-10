@@ -73,7 +73,7 @@ class PotentiometerPIDTest {
               5v * (meters / range) = v
                */
               m_analogSim.setVoltage(
-                  RobotController.getVoltage3V3()
+                  RobotController.getVoltage5V()
                       * (m_elevatorSim.getPosition() / Robot.kFullHeight));
             });
 
