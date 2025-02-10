@@ -60,7 +60,7 @@ Java_edu_wpi_first_hal_SPIJNI_spiInitialize
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiTransaction
   (JNIEnv* env, jclass, jint port, jobject dataToSend, jobject dataReceived,
-   jbyte size)
+   jint size)
 {
   uint8_t* dataToSendPtr = nullptr;
   if (dataToSend != nullptr) {
@@ -82,7 +82,7 @@ Java_edu_wpi_first_hal_SPIJNI_spiTransaction
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiTransactionB
   (JNIEnv* env, jclass, jint port, jbyteArray dataToSend,
-   jbyteArray dataReceived, jbyte size)
+   jbyteArray dataReceived, jint size)
 {
   if (size < 0) {
     ThrowIllegalArgumentException(env, "SPIJNI.spiTransactionB() size < 0");
@@ -108,7 +108,7 @@ Java_edu_wpi_first_hal_SPIJNI_spiTransactionB
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiWrite
-  (JNIEnv* env, jclass, jint port, jobject dataToSend, jbyte size)
+  (JNIEnv* env, jclass, jint port, jobject dataToSend, jint size)
 {
   uint8_t* dataToSendPtr = nullptr;
   if (dataToSend != nullptr) {
@@ -127,7 +127,7 @@ Java_edu_wpi_first_hal_SPIJNI_spiWrite
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiWriteB
-  (JNIEnv* env, jclass, jint port, jbyteArray dataToSend, jbyte size)
+  (JNIEnv* env, jclass, jint port, jbyteArray dataToSend, jint size)
 {
   jint retVal = HAL_WriteSPI(static_cast<HAL_SPIPort>(port),
                              reinterpret_cast<const uint8_t*>(
@@ -144,7 +144,7 @@ Java_edu_wpi_first_hal_SPIJNI_spiWriteB
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiRead
   (JNIEnv* env, jclass, jint port, jboolean initiate, jobject dataReceived,
-   jbyte size)
+   jint size)
 {
   if (size < 0) {
     ThrowIllegalArgumentException(env, "SPIJNI.spiRead() size < 0");
@@ -174,7 +174,7 @@ Java_edu_wpi_first_hal_SPIJNI_spiRead
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiReadB
   (JNIEnv* env, jclass, jint port, jboolean initiate, jbyteArray dataReceived,
-   jbyte size)
+   jint size)
 {
   if (size < 0) {
     ThrowIllegalArgumentException(env, "SPIJNI.spiReadB() size < 0");
