@@ -73,7 +73,6 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    * Updates the simulation.
    *
    * @param dt The time between updates in seconds.
-   * @param dt The time between updates in seconds.
    */
   public void update(double dt) {
     // Update X. By default, this is the linear system dynamics X = Ax + Bu
@@ -178,12 +177,9 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    * @param currentXhat The current state estimate.
    * @param u The system inputs (usually voltage).
    * @param dt The time difference between controller updates in seconds.
-   * @param dt The time difference between controller updates in seconds.
    * @return The new state.
    */
   protected Matrix<States, N1> updateX(
-      Matrix<States, N1> currentXhat, Matrix<Inputs, N1> u, double dt) {
-    return m_plant.calculateX(currentXhat, u, dt);
       Matrix<States, N1> currentXhat, Matrix<Inputs, N1> u, double dt) {
     return m_plant.calculateX(currentXhat, u, dt);
   }

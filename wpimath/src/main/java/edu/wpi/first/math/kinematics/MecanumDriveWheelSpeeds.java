@@ -79,28 +79,23 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
    * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
    * absolute threshold, while maintaining the ratio of speeds between wheels.
    *
-   * @param attainableMaxSpeedMetersPerSecond The absolute max speed that a wheel can reach.
+   * @param attainableMaxSpeed The absolute max speed in meters per second that a wheel can reach.
    * @return Desaturated MecanumDriveWheelSpeeds.
    */
-  public MecanumDriveWheelSpeeds desaturate(double attainableMaxSpeedMetersPerSecond) {
-    double realMaxSpeed =
-        Math.max(Math.abs(frontLeftMetersPerSecond), Math.abs(frontRightMetersPerSecond));
-    realMaxSpeed = Math.max(realMaxSpeed, Math.abs(rearLeftMetersPerSecond));
-    realMaxSpeed = Math.max(realMaxSpeed, Math.abs(rearRightMetersPerSecond));
+  public MecanumDriveWheelSpeeds desaturate(double attainableMaxSpeed) {
+    double realMaxSpeed = Math.max(Math.abs(frontLeft), Math.abs(frontRight));
+    realMaxSpeed = Math.max(realMaxSpeed, Math.abs(rearLeft));
+    realMaxSpeed = Math.max(realMaxSpeed, Math.abs(rearRight));
 
-    if (realMaxSpeed > attainableMaxSpeedMetersPerSecond) {
+    if (realMaxSpeed > attainableMaxSpeed) {
       return new MecanumDriveWheelSpeeds(
-          frontLeftMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond,
-          frontRightMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond,
-          rearLeftMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond,
-          rearRightMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond);
+          frontLeft / realMaxSpeed * attainableMaxSpeed,
+          frontRight / realMaxSpeed * attainableMaxSpeed,
+          rearLeft / realMaxSpeed * attainableMaxSpeed,
+          rearRight / realMaxSpeed * attainableMaxSpeed);
     }
 
-    return new MecanumDriveWheelSpeeds(
-        frontLeftMetersPerSecond,
-        frontRightMetersPerSecond,
-        rearLeftMetersPerSecond,
-        rearRightMetersPerSecond);
+    return new MecanumDriveWheelSpeeds(frontLeft, frontRight, rearLeft, rearRight);
   }
 
   /**
