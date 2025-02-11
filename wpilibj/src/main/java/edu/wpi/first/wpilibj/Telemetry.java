@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.util.telemetry.TelemetryRegistry;
 import edu.wpi.first.util.telemetry.TelemetryTable;
 
 /**
@@ -13,7 +14,7 @@ import edu.wpi.first.util.telemetry.TelemetryTable;
  */
 public final class Telemetry {
   /** The root {@link TelemetryTable}. */
-  private static final TelemetryTable m_root = new TelemetryTable("/");
+  private static final TelemetryTable m_root = TelemetryRegistry.getTable("/");
 
   private Telemetry() {
     throw new UnsupportedOperationException("This is a utility class!");

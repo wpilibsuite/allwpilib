@@ -8,7 +8,7 @@ import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import us.hebi.quickbuf.ProtoMessage;
 
-public interface TelemetryEntry {
+public interface TelemetryEntry extends AutoCloseable {
   /** Indicates duplicate values should be preserved. Normally duplicate values are ignored. */
   void keepDuplicates();
 

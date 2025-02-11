@@ -43,6 +43,12 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
+    public void close() {
+      var entry = m_entry.getAndSet(null);
+      entry.finish();
+    }
+
+    @Override
     public void keepDuplicates() {
       m_keepDuplicates.set(true);
     }

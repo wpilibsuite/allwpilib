@@ -27,8 +27,13 @@ public final class TelemetryTable {
    *
    * @param path path with trailing "/".
    */
-  public TelemetryTable(String path) {
+  TelemetryTable(String path) {
     m_path = path;
+  }
+
+  /** Clears the table's cached entries. */
+  void reset() {
+    m_entriesMap.clear();
   }
 
   /**
@@ -38,7 +43,7 @@ public final class TelemetryTable {
    * @return table
    */
   public TelemetryTable getTable(String name) {
-    return m_tablesMap.computeIfAbsent(name, k -> new TelemetryTable(m_path + k + "/"));
+    return m_tablesMap.computeIfAbsent(name, k -> TelemetryRegistry.getTable(m_path + k + "/"));
   }
 
   /**
@@ -90,22 +95,22 @@ public final class TelemetryTable {
   public void log(String name, Object value) {
     if (value instanceof TelemetryLoggable) {
       ((TelemetryLoggable) value).log(getTable(name));
-    } else if (value instanceof StructSerializable) {
+    } else if (value instanceof StructSerializable v) {
       // TODO: introspection
-      // getEntry(name).logStruct((StructSerializable) value);
-    } else if (value instanceof ProtobufSerializable) {
+      // getEntry(name).logStruct(v);
+    } else if (value instanceof ProtobufSerializable v) {
       // TODO: introspection
-      // getEntry(name).logProtobuf((ProtobufSerializable) value);
-    } else if (value instanceof Boolean) {
-      log(name, ((Boolean) value).booleanValue());
-    } else if (value instanceof Float) {
-      log(name, ((Float) value).floatValue());
-    } else if (value instanceof Double) {
-      log(name, ((Double) value).doubleValue());
-    } else if (value instanceof Number) {
-      log(name, ((Number) value).longValue());
-    } else if (value instanceof String) {
-      log(name, (String) value);
+      // getEntry(name).logProtobuf(v);
+    } else if (value instanceof Boolean v) {
+      log(name, v.booleanValue());
+    } else if (value instanceof Float v) {
+      log(name, v.floatValue());
+    } else if (value instanceof Double v) {
+      log(name, v.doubleValue());
+    } else if (value instanceof Number v) {
+      log(name, v.longValue());
+    } else if (value instanceof String v) {
+      log(name, v);
     } else {
       // try other handlers
       var handler = TelemetryRegistry.getHandler(value);
@@ -147,22 +152,23 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, Object[] value) {
-    if (value instanceof StructSerializable[]) {
+    if (value instanceof StructSerializable[] v) {
       // TODO: introspection
-      // getEntry(name).logStructArray((StructSerializable[]) value);
+      // getEntry(name).logStructArray(v);
       /* TODO:
-      } else if (value instanceof Boolean[]) {
-        log(name, ((Boolean[]) value).booleanValue());
-      } else if (value instanceof Float[]) {
-        log(name, ((Float[]) value).floatValue());
-      } else if (value instanceof Double[]) {
-        log(name, ((Double[]) value).doubleValue());
-      } else if (value instanceof Number[]) {
-        log(name, ((Number[]) value).longValue());
+      } else if (value instanceof Boolean[] v) {
+        log(name, v.booleanValue());
+      } else if (value instanceof Float[] v) {
+        log(name, v.floatValue());
+      } else if (value instanceof Double[] v) {
+        log(name, v.doubleValue());
+      } else if (value instanceof Number[] v) {
+        log(name, v.longValue());
       */
-    } else if (value instanceof String[]) {
-      log(name, (String[]) value);
+    } else if (value instanceof String[] v) {
+      log(name, v);
     } else {
+      // TODO: use other Object handler?
       // fall back to string array
       String[] strs = new String[value.length];
       for (int i = 0; i < value.length; i++) {

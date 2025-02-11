@@ -6,5 +6,11 @@ package edu.wpi.first.util.telemetry;
 
 /** Interface for telemetry backends. */
 public interface TelemetryBackend {
-  TelemetryEntry getEntry(String name);
+  /**
+   * Create an entry for the given path.
+   *
+   * @param path
+   * @return
+   */
+  TelemetryEntry getEntry(String path);
 }
