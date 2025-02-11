@@ -7,7 +7,11 @@ package edu.wpi.first.util.telemetry;
 import edu.wpi.first.util.collections.PrefixMap;
 import edu.wpi.first.util.collections.prefixmap.StringPrefixMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
 
 /** Global registry for telemetry handlers (type handlers and telemetry backends). */
@@ -16,6 +20,8 @@ public final class TelemetryRegistry {
 
   private static final List<TypeHandler> s_typeHandlers = new ArrayList<>();
   private static final PrefixMap<TelemetryBackend> s_backends = new StringPrefixMap<>();
+  private static final Map<String, TelemetryEntry> s_entries = new HashMap<>();
+  private static final ConcurrentMap<String, TelemetryTable> s_tables = new ConcurrentHashMap<>();
 
   private TelemetryRegistry() {
     throw new UnsupportedOperationException("This is a utility class!");
@@ -81,7 +87,7 @@ public final class TelemetryRegistry {
    * @param value object
    * @return handler or null if no match
    */
-  public static BiConsumer<Object, TelemetryEntry> getHandler(Object value) {
+  static BiConsumer<Object, TelemetryEntry> getHandler(Object value) {
     for (var entry : s_typeHandlers) {
       if (entry.cls.isInstance(value)) {
         return entry.handler;
@@ -91,23 +97,48 @@ public final class TelemetryRegistry {
   }
 
   /**
-   * Get a telemetry entry for a particular name. This is not cached internally; a new entry is
-   * created on each call. Callers are responsible for saving/caching the return value.
+   * Get a telemetry entry for a particular name.
    *
    * @param path full name
    * @return telemetry entry
    */
-  public static TelemetryEntry getEntry(String path) {
+  static TelemetryEntry getEntry(String path) {
     synchronized (s_backends) {
-      return s_backends.getLongestMatch(path).getEntry(path);
+      return s_entries.computeIfAbsent(path, p -> s_backends.getLongestMatch(p).getEntry(p));
     }
   }
 
-  /** Clear all registered types and backends. */
-  public static void clear() {
+  /**
+   * Get a telemetry table for a particular name.
+   *
+   * @param path full name
+   * @return telemetry table
+   */
+  public static TelemetryTable getTable(String path) {
+    return s_tables.computeIfAbsent(path, p -> new TelemetryTable(p));
+  }
+
+  /**
+   * Clear all registered types and backends and closes all entries. Should typically only be used
+   * by unit test code.
+   */
+  public static void reset() {
     s_typeHandlers.clear();
     synchronized (s_backends) {
+      for (var entry : s_entries.values()) {
+        try {
+          entry.close();
+        } catch (Exception e) {
+          System.out.println("Unexpected exception when closing entry: " + e);
+        }
+      }
+      s_entries.clear();
       s_backends.clear();
+    }
+
+    // reset cached entries in tables
+    for (var table : s_tables.values()) {
+      table.reset();
     }
   }
 }
