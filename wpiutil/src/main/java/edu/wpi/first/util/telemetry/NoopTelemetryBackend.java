@@ -6,7 +6,6 @@ package edu.wpi.first.util.telemetry;
 
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
-import us.hebi.quickbuf.ProtoMessage;
 
 /** A telemetry backend that discards all logged data. */
 public class NoopTelemetryBackend implements TelemetryBackend {
@@ -29,14 +28,13 @@ public class NoopTelemetryBackend implements TelemetryBackend {
     public void setTypeString(String typeString) {}
 
     @Override
-    public void logStruct(Object value, Struct<?> struct) {}
+    public <T> void logStruct(T value, Struct<T> struct) {}
 
     @Override
-    public <MessageType extends ProtoMessage<?>> void logProtobuf(
-        Object value, Protobuf<?, MessageType> protobuf) {}
+    public <T> void logProtobuf(T value, Protobuf<T, ?> proto) {}
 
     @Override
-    public void logStructArray(Object[] value, Struct<?> struct) {}
+    public <T> void logStructArray(T[] value, Struct<T> struct) {}
 
     @Override
     public void logBoolean(boolean value) {}

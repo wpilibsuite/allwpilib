@@ -6,7 +6,6 @@ package edu.wpi.first.util.telemetry;
 
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
-import us.hebi.quickbuf.ProtoMessage;
 
 public interface TelemetryEntry extends AutoCloseable {
   /** Indicates duplicate values should be preserved. Normally duplicate values are ignored. */
@@ -33,16 +32,15 @@ public interface TelemetryEntry extends AutoCloseable {
    * @param value the value
    * @param struct struct serializer
    */
-  void logStruct(Object value, Struct<?> struct);
+  <T> void logStruct(T value, Struct<T> struct);
 
   /**
    * Logs an object with protobuf serialization.
    *
    * @param value the value
-   * @param protobuf protobuf serializer
+   * @param proto protobuf serializer
    */
-  <MessageType extends ProtoMessage<?>> void logProtobuf(
-      Object value, Protobuf<?, MessageType> protobuf);
+  <T> void logProtobuf(T value, Protobuf<T, ?> proto);
 
   /**
    * Logs an array of objects with struct serialization.
@@ -50,7 +48,7 @@ public interface TelemetryEntry extends AutoCloseable {
    * @param value the value
    * @param struct struct serializer
    */
-  void logStructArray(Object[] value, Struct<?> struct);
+  <T> void logStructArray(T[] value, Struct<T> struct);
 
   /**
    * Logs a boolean.
