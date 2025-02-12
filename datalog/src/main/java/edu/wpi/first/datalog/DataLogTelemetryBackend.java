@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import us.hebi.quickbuf.ProtoMessage;
 
 public class DataLogTelemetryBackend implements TelemetryBackend {
   private final DataLog m_log;
@@ -36,6 +35,8 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     private final AtomicBoolean m_keepDuplicates = new AtomicBoolean();
     private final Map<String, String> m_propertiesMap = new HashMap<>();
     private String m_properties = "{}";
+    Struct<?> m_struct;
+    Protobuf<?, ?> m_proto;
 
     Entry(DataLog log, String path) {
       m_log = log;
@@ -90,15 +91,94 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       }
     }
 
-    @Override
-    public void logStruct(Object value, Struct<?> struct) {}
+    private synchronized <T> StructLogEntry<T> initStruct(Struct<T> struct) {
+      DataLogEntry entry = m_entry.get();
+      if (entry == null) {
+        StructLogEntry<T> e = StructLogEntry.create(m_log, m_path, struct, m_properties);
+        m_struct = struct;
+        m_entry.set(e);
+        return e;
+      } else if (entry instanceof StructLogEntry<?> && struct.equals(m_struct)) {
+        @SuppressWarnings("unchecked")
+        StructLogEntry<T> e = (StructLogEntry<T>) entry;
+        return e;
+      } else {
+        return null;
+      }
+    }
 
     @Override
-    public <MessageType extends ProtoMessage<?>> void logProtobuf(
-        Object value, Protobuf<?, MessageType> protobuf) {}
+    public <T> void logStruct(T value, Struct<T> struct) {
+      StructLogEntry<T> entry = initStruct(struct);
+      if (entry != null) {
+        if (m_keepDuplicates.get()) {
+          entry.append(value);
+        } else {
+          entry.update(value);
+        }
+      } else {
+        // TODO: warn?
+      }
+    }
+
+    private synchronized <T> ProtobufLogEntry<T> initProtobuf(Protobuf<T, ?> proto) {
+      DataLogEntry entry = m_entry.get();
+      if (entry == null) {
+        ProtobufLogEntry<T> e = ProtobufLogEntry.create(m_log, m_path, proto, m_properties);
+        m_proto = proto;
+        m_entry.set(e);
+        return e;
+      } else if (entry instanceof ProtobufLogEntry<?> && proto.equals(m_proto)) {
+        @SuppressWarnings("unchecked")
+        ProtobufLogEntry<T> e = (ProtobufLogEntry<T>) entry;
+        return e;
+      } else {
+        return null;
+      }
+    }
 
     @Override
-    public void logStructArray(Object[] value, Struct<?> struct) {}
+    public <T> void logProtobuf(T value, Protobuf<T, ?> proto) {
+      ProtobufLogEntry<T> entry = initProtobuf(proto);
+      if (entry != null) {
+        if (m_keepDuplicates.get()) {
+          entry.append(value);
+        } else {
+          entry.update(value);
+        }
+      } else {
+        // TODO: warn?
+      }
+    }
+
+    private synchronized <T> StructArrayLogEntry<T> initStructArray(Struct<T> struct) {
+      DataLogEntry entry = m_entry.get();
+      if (entry == null) {
+        StructArrayLogEntry<T> e = StructArrayLogEntry.create(m_log, m_path, struct, m_properties);
+        m_entry.set(e);
+        return e;
+      } else if (entry instanceof StructArrayLogEntry<?> && struct.equals(m_struct)) {
+        @SuppressWarnings("unchecked")
+        StructArrayLogEntry<T> e = (StructArrayLogEntry<T>) entry;
+        return e;
+      } else {
+        return null;
+      }
+    }
+
+    @Override
+    public <T> void logStructArray(T[] value, Struct<T> struct) {
+      StructArrayLogEntry<T> entry = initStructArray(struct);
+      if (entry != null) {
+        if (m_keepDuplicates.get()) {
+          entry.append(value);
+        } else {
+          entry.update(value);
+        }
+      } else {
+        // TODO: warn?
+      }
+    }
 
     @Override
     public void logBoolean(boolean value) {
@@ -208,7 +288,12 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           // double-check
           entry = m_entry.get();
           if (entry == null) {
-            entry = new StringLogEntry(m_log, m_path, m_properties);
+            entry =
+                new StringLogEntry(
+                    m_log,
+                    m_path,
+                    m_properties,
+                    m_typeString != null ? m_typeString : StringLogEntry.kDataType);
             m_entry.set(entry);
           }
         }
@@ -258,7 +343,12 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           // double-check
           entry = m_entry.get();
           if (entry == null) {
-            entry = new RawLogEntry(m_log, m_path, m_properties);
+            entry =
+                new RawLogEntry(
+                    m_log,
+                    m_path,
+                    m_properties,
+                    m_typeString != null ? m_typeString : RawLogEntry.kDataType);
             m_entry.set(entry);
           }
         }

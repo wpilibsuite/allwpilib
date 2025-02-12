@@ -10,7 +10,6 @@ import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import us.hebi.quickbuf.ProtoMessage;
 
 /**
  * Telemetry sends information from the robot program to dashboards, debug tools, or log files.
@@ -141,11 +140,10 @@ public final class TelemetryTable {
    *
    * @param name the name
    * @param value the value
-   * @param protobuf protobuf serializer
+   * @param proto protobuf serializer
    */
-  public <T, MessageType extends ProtoMessage<?>> void log(
-      String name, T value, Protobuf<T, MessageType> protobuf) {
-    getEntry(name).logProtobuf(value, protobuf);
+  public <T> void log(String name, T value, Protobuf<T, ?> proto) {
+    getEntry(name).logProtobuf(value, proto);
   }
 
   /**
