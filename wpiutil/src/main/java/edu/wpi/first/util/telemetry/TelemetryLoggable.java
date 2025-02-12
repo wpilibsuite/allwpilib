@@ -5,6 +5,7 @@
 package edu.wpi.first.util.telemetry;
 
 /** The base interface for complex telemetry objects. */
+@FunctionalInterface
 public interface TelemetryLoggable {
   /**
    * Logs the object to a {@link TelemetryTable}.
