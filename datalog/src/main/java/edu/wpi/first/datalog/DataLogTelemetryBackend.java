@@ -35,8 +35,8 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     private final AtomicBoolean m_keepDuplicates = new AtomicBoolean();
     private final Map<String, String> m_propertiesMap = new HashMap<>();
     private String m_properties = "{}";
-    Struct<?> m_struct;
-    Protobuf<?, ?> m_proto;
+    private Struct<?> m_struct;
+    private Protobuf<?, ?> m_proto;
 
     Entry(DataLog log, String path) {
       m_log = log;
@@ -46,7 +46,9 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     @Override
     public void close() {
       var entry = m_entry.getAndSet(null);
-      entry.finish();
+      if (entry != null) {
+        entry.finish();
+      }
     }
 
     @Override
