@@ -8,9 +8,7 @@ import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import us.hebi.quickbuf.ProtoMessage;
 
-/**
- * A telemetry backend that discards all logged data.
- */
+/** A telemetry backend that discards all logged data. */
 public class NoopTelemetryBackend implements TelemetryBackend {
   @Override
   public TelemetryEntry getEntry(String path) {
