@@ -21,6 +21,15 @@ public final class Telemetry {
   }
 
   /**
+   * Gets the root telemetry table.
+   *
+   * @return table
+   */
+  public static TelemetryTable getRootTable() {
+    return m_root;
+  }
+
+  /**
    * Gets a child telemetry table.
    * @param name table name
    * @return table
