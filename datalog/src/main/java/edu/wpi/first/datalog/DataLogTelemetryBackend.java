@@ -25,10 +25,10 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
   @Override
   public TelemetryEntry getEntry(String name) {
-    return new DataLogTelemetryEntry(m_log, m_prefix + name);
+    return new Entry(m_log, m_prefix + name);
   }
 
-  private static class DataLogTelemetryEntry implements TelemetryEntry {
+  private static class Entry implements TelemetryEntry {
     private final DataLog m_log;
     private final String m_path;
     private final AtomicReference<DataLogEntry> m_entry = new AtomicReference<>();
@@ -37,7 +37,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     private final Map<String, String> m_propertiesMap = new HashMap<>();
     private String m_properties = "{}";
 
-    DataLogTelemetryEntry(DataLog log, String path) {
+    Entry(DataLog log, String path) {
       m_log = log;
       m_path = path;
     }
@@ -91,17 +91,14 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logStruct(Object value, Struct<?> struct) {
-    }
+    public void logStruct(Object value, Struct<?> struct) {}
 
     @Override
     public <MessageType extends ProtoMessage<?>> void logProtobuf(
-        Object value, Protobuf<?, MessageType> protobuf) {
-    }
+        Object value, Protobuf<?, MessageType> protobuf) {}
 
     @Override
-    public void logStructArray(Object[] value, Struct<?> struct) {
-    }
+    public void logStructArray(Object[] value, Struct<?> struct) {}
 
     @Override
     public void logBoolean(boolean value) {
@@ -117,64 +114,275 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (!(entry instanceof BooleanLogEntry)) {
-        // TODO: warn?
-        return;
-      }
-
-      if (m_keepDuplicates.get()) {
-        ((BooleanLogEntry) entry).append(value);
+      if (entry instanceof BooleanLogEntry e) {
+        if (m_keepDuplicates.get()) {
+          e.append(value);
+        } else {
+          e.update(value);
+        }
       } else {
-        ((BooleanLogEntry) entry).update(value);
+        // TODO: warn?
       }
     }
 
     @Override
     public void logLong(long value) {
+      DataLogEntry entry = m_entry.get();
+      if (entry == null) {
+        synchronized (this) {
+          // double-check
+          entry = m_entry.get();
+          if (entry == null) {
+            entry = new IntegerLogEntry(m_log, m_path, m_properties);
+            m_entry.set(entry);
+          }
+        }
+      }
+
+      if (entry instanceof IntegerLogEntry e) {
+        if (m_keepDuplicates.get()) {
+          e.append(value);
+        } else {
+          e.update(value);
+        }
+      } else {
+        // TODO: warn?
+      }
     }
 
     @Override
     public void logFloat(float value) {
+      DataLogEntry entry = m_entry.get();
+      if (entry == null) {
+        synchronized (this) {
+          // double-check
+          entry = m_entry.get();
+          if (entry == null) {
+            entry = new FloatLogEntry(m_log, m_path, m_properties);
+            m_entry.set(entry);
+          }
+        }
+      }
+
+      if (entry instanceof FloatLogEntry e) {
+        if (m_keepDuplicates.get()) {
+          e.append(value);
+        } else {
+          e.update(value);
+        }
+      } else {
+        // TODO: warn?
+      }
     }
 
     @Override
     public void logDouble(double value) {
+      DataLogEntry entry = m_entry.get();
+      if (entry == null) {
+        synchronized (this) {
+          // double-check
+          entry = m_entry.get();
+          if (entry == null) {
+            entry = new DoubleLogEntry(m_log, m_path, m_properties);
+            m_entry.set(entry);
+          }
+        }
+      }
+
+      if (entry instanceof DoubleLogEntry e) {
+        if (m_keepDuplicates.get()) {
+          e.append(value);
+        } else {
+          e.update(value);
+        }
+      } else {
+        // TODO: warn?
+      }
     }
 
     @Override
     public void logString(String value) {
+      DataLogEntry entry = m_entry.get();
+      if (entry == null) {
+        synchronized (this) {
+          // double-check
+          entry = m_entry.get();
+          if (entry == null) {
+            entry = new StringLogEntry(m_log, m_path, m_properties);
+            m_entry.set(entry);
+          }
+        }
+      }
+
+      if (entry instanceof StringLogEntry e) {
+        if (m_keepDuplicates.get()) {
+          e.append(value);
+        } else {
+          e.update(value);
+        }
+      } else {
+        // TODO: warn?
+      }
     }
 
     @Override
     public void logBooleanArray(boolean[] value) {
+      DataLogEntry entry = m_entry.get();
+      if (entry == null) {
+        synchronized (this) {
+          // double-check
+          entry = m_entry.get();
+          if (entry == null) {
+            entry = new BooleanArrayLogEntry(m_log, m_path, m_properties);
+            m_entry.set(entry);
+          }
+        }
+      }
+
+      if (entry instanceof BooleanArrayLogEntry e) {
+        if (m_keepDuplicates.get()) {
+          e.append(value);
+        } else {
+          e.update(value);
+        }
+      } else {
+        // TODO: warn?
+      }
     }
 
     @Override
     public void logByteArray(byte[] value) {
+      DataLogEntry entry = m_entry.get();
+      if (entry == null) {
+        synchronized (this) {
+          // double-check
+          entry = m_entry.get();
+          if (entry == null) {
+            entry = new RawLogEntry(m_log, m_path, m_properties);
+            m_entry.set(entry);
+          }
+        }
+      }
+
+      if (entry instanceof RawLogEntry e) {
+        if (m_keepDuplicates.get()) {
+          e.append(value);
+        } else {
+          e.update(value);
+        }
+      } else {
+        // TODO: warn?
+      }
     }
 
     @Override
     public void logShortArray(short[] value) {
+      // TODO
     }
 
     @Override
     public void logIntArray(int[] value) {
+      // TODO
     }
 
     @Override
     public void logLongArray(long[] value) {
+      DataLogEntry entry = m_entry.get();
+      if (entry == null) {
+        synchronized (this) {
+          // double-check
+          entry = m_entry.get();
+          if (entry == null) {
+            entry = new IntegerArrayLogEntry(m_log, m_path, m_properties);
+            m_entry.set(entry);
+          }
+        }
+      }
+
+      if (entry instanceof IntegerArrayLogEntry e) {
+        if (m_keepDuplicates.get()) {
+          e.append(value);
+        } else {
+          e.update(value);
+        }
+      } else {
+        // TODO: warn?
+      }
     }
 
     @Override
     public void logFloatArray(float[] value) {
+      DataLogEntry entry = m_entry.get();
+      if (entry == null) {
+        synchronized (this) {
+          // double-check
+          entry = m_entry.get();
+          if (entry == null) {
+            entry = new FloatArrayLogEntry(m_log, m_path, m_properties);
+            m_entry.set(entry);
+          }
+        }
+      }
+
+      if (entry instanceof FloatArrayLogEntry e) {
+        if (m_keepDuplicates.get()) {
+          e.append(value);
+        } else {
+          e.update(value);
+        }
+      } else {
+        // TODO: warn?
+      }
     }
 
     @Override
     public void logDoubleArray(double[] value) {
+      DataLogEntry entry = m_entry.get();
+      if (entry == null) {
+        synchronized (this) {
+          // double-check
+          entry = m_entry.get();
+          if (entry == null) {
+            entry = new DoubleArrayLogEntry(m_log, m_path, m_properties);
+            m_entry.set(entry);
+          }
+        }
+      }
+
+      if (entry instanceof DoubleArrayLogEntry e) {
+        if (m_keepDuplicates.get()) {
+          e.append(value);
+        } else {
+          e.update(value);
+        }
+      } else {
+        // TODO: warn?
+      }
     }
 
     @Override
     public void logStringArray(String[] value) {
+      DataLogEntry entry = m_entry.get();
+      if (entry == null) {
+        synchronized (this) {
+          // double-check
+          entry = m_entry.get();
+          if (entry == null) {
+            entry = new StringArrayLogEntry(m_log, m_path, m_properties);
+            m_entry.set(entry);
+          }
+        }
+      }
+
+      if (entry instanceof StringArrayLogEntry e) {
+        if (m_keepDuplicates.get()) {
+          e.append(value);
+        } else {
+          e.update(value);
+        }
+      } else {
+        // TODO: warn?
+      }
     }
   }
 }
