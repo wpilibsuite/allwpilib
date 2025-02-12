@@ -16,7 +16,10 @@ import java.util.function.BiConsumer;
 
 /** Global registry for telemetry handlers (type handlers and telemetry backends). */
 public final class TelemetryRegistry {
-  private static record TypeHandler(Class<?> cls, BiConsumer<Object, TelemetryEntry> handler) {}
+  static record TypeHandler(
+      Class<?> cls,
+      BiConsumer<Object, TelemetryEntry> entryHandler,
+      BiConsumer<Object, TelemetryTable> tableHandler) {}
 
   private static final List<TypeHandler> s_typeHandlers = new ArrayList<>();
   private static final PrefixMap<TelemetryBackend> s_backends = new StringPrefixMap<>();
@@ -27,45 +30,71 @@ public final class TelemetryRegistry {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
+  private static void registerTypeHandler(TypeHandler typeHandler) {
+    synchronized (s_typeHandlers) {
+      // we want this ordered such that the more specific types come before the less specific ones
+      // this is O(N^2) but N should be small
+      boolean replace = false;
+      int i = 0;
+      for (var entry : s_typeHandlers) {
+        if (entry.cls.equals(typeHandler.cls)) {
+          // replace existing
+          replace = true;
+          break;
+        }
+        if (entry.cls.isAssignableFrom(typeHandler.cls)) {
+          // superclass; insert before
+          break;
+        }
+        i++;
+      }
+
+      if (replace) {
+        s_typeHandlers.set(i, typeHandler);
+      } else {
+        s_typeHandlers.add(i, typeHandler);
+      }
+    }
+  }
+
   /**
-   * Registers a handler for logging objects of a particular type. The handler should populate the
-   * provided TelemetryEntry as appropriate for the object's data.
+   * Registers a handler for logging objects of a particular type to a single entry. The handler
+   * should populate the provided TelemetryEntry as appropriate for the object's data.
    *
    * @param <T> class
    * @param cls class object
    * @param handler handler (accepts object and TelemetryEntry)
    */
-  public static <T> void registerType(Class<T> cls, BiConsumer<T, TelemetryEntry> handler) {
-    // we want this ordered such that the more specific types come before the less specific ones
-    // this is O(N^2) but N should be small
-    boolean replace = false;
-    int i = 0;
-    for (var entry : s_typeHandlers) {
-      if (entry.cls.equals(cls)) {
-        // replace existing
-        replace = true;
-        break;
-      }
-      if (entry.cls.isAssignableFrom(cls)) {
-        // superclass; insert before
-        break;
-      }
-      i++;
-    }
-
-    TypeHandler typeHandler =
+  public static <T> void registerTypeEntry(Class<T> cls, BiConsumer<T, TelemetryEntry> handler) {
+    registerTypeHandler(
         new TypeHandler(
             cls,
             (v, entry) -> {
               @SuppressWarnings("unchecked")
               T value = (T) v;
               handler.accept(value, entry);
-            });
-    if (replace) {
-      s_typeHandlers.set(i, typeHandler);
-    } else {
-      s_typeHandlers.add(i, typeHandler);
-    }
+            },
+            null));
+  }
+
+  /**
+   * Registers a handler for logging objects of a particular type to a table. The handler should
+   * populate the provided TelemetryTable as appropriate for the object's data.
+   *
+   * @param <T> class
+   * @param cls class object
+   * @param handler handler (accepts object and TelemetryTable)
+   */
+  public static <T> void registerTypeTable(Class<T> cls, BiConsumer<T, TelemetryTable> handler) {
+    registerTypeHandler(
+        new TypeHandler(
+            cls,
+            null,
+            (v, table) -> {
+              @SuppressWarnings("unchecked")
+              T value = (T) v;
+              handler.accept(value, table);
+            }));
   }
 
   /**
@@ -87,13 +116,15 @@ public final class TelemetryRegistry {
    * @param value object
    * @return handler or null if no match
    */
-  static BiConsumer<Object, TelemetryEntry> getHandler(Object value) {
-    for (var entry : s_typeHandlers) {
-      if (entry.cls.isInstance(value)) {
-        return entry.handler;
+  static TypeHandler getTypeHandler(Object value) {
+    synchronized (s_typeHandlers) {
+      for (var entry : s_typeHandlers) {
+        if (entry.cls.isInstance(value)) {
+          return entry;
+        }
       }
+      return null;
     }
-    return null;
   }
 
   /**
@@ -115,7 +146,7 @@ public final class TelemetryRegistry {
    * @return telemetry table
    */
   public static TelemetryTable getTable(String path) {
-    return s_tables.computeIfAbsent(path, p -> new TelemetryTable(p));
+    return s_tables.computeIfAbsent(path, TelemetryTable::new);
   }
 
   /**

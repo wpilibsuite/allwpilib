@@ -113,12 +113,15 @@ public final class TelemetryTable {
       log(name, v);
     } else {
       // try other handlers
-      var handler = TelemetryRegistry.getHandler(value);
-      if (handler != null) {
-        handler.accept(value, getEntry(name));
+      var handler = TelemetryRegistry.getTypeHandler(value);
+      if (handler.entryHandler() != null) {
+        handler.entryHandler().accept(value, getEntry(name));
+      } else if (handler.tableHandler() != null) {
+        handler.tableHandler().accept(value, getTable(name));
+      } else {
+        // fall back to string
+        log(name, value.toString());
       }
-      // fall back to string
-      log(name, value.toString());
     }
   }
 
