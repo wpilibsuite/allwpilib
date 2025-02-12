@@ -91,15 +91,47 @@ public final class TelemetryTable {
    * @param name the name
    * @param value the value
    */
-  public void log(String name, Object value) {
+  public <T> void log(String name, T value) {
     if (value instanceof TelemetryLoggable) {
       ((TelemetryLoggable) value).log(getTable(name));
     } else if (value instanceof StructSerializable v) {
-      // TODO: introspection
-      // getEntry(name).logStruct(v);
+      // use introspection to get "struct" static variable
+      Object obj;
+      try {
+        obj = v.getClass().getField("struct").get(null);
+      } catch (NoSuchFieldException e) {
+        // TODO: warn
+        return;
+      } catch (IllegalAccessException e) {
+        // TODO: warn
+        return;
+      }
+      if (obj instanceof Struct<?> s && s.getTypeClass().equals(value.getClass())) {
+        @SuppressWarnings("unchecked")
+        Struct<T> s2 = (Struct<T>) s;
+        log(name, value, s2);
+      } else {
+        // TODO: warn
+      }
     } else if (value instanceof ProtobufSerializable v) {
-      // TODO: introspection
-      // getEntry(name).logProtobuf(v);
+      // use introspection to get "proto" static variable
+      Object obj;
+      try {
+        obj = v.getClass().getField("proto").get(null);
+      } catch (NoSuchFieldException e) {
+        // TODO: warn
+        return;
+      } catch (IllegalAccessException e) {
+        // TODO: warn
+        return;
+      }
+      if (obj instanceof Protobuf<?, ?> s && s.getTypeClass().equals(value.getClass())) {
+        @SuppressWarnings("unchecked")
+        Protobuf<T, ?> s2 = (Protobuf<T, ?>) s;
+        log(name, value, s2);
+      } else {
+        // TODO: warn
+      }
     } else if (value instanceof Boolean v) {
       log(name, v.booleanValue());
     } else if (value instanceof Float v) {
@@ -152,10 +184,27 @@ public final class TelemetryTable {
    * @param name the name
    * @param value the value
    */
-  public void log(String name, Object[] value) {
+  public <T> void log(String name, T[] value) {
     if (value instanceof StructSerializable[] v) {
-      // TODO: introspection
-      // getEntry(name).logStructArray(v);
+      // use introspection to get "struct" static variable
+      Object obj;
+      try {
+        obj = v.getClass().getField("struct").get(null);
+      } catch (NoSuchFieldException e) {
+        // TODO: warn
+        return;
+      } catch (IllegalAccessException e) {
+        // TODO: warn
+        return;
+      }
+      if (obj instanceof Struct<?> s
+          && s.getTypeClass().equals(value.getClass().getComponentType())) {
+        @SuppressWarnings("unchecked")
+        Struct<T> s2 = (Struct<T>) s;
+        log(name, value, s2);
+      } else {
+        // TODO: warn
+      }
       /* TODO:
       } else if (value instanceof Boolean[] v) {
         log(name, v.booleanValue());
@@ -166,8 +215,6 @@ public final class TelemetryTable {
       } else if (value instanceof Number[] v) {
         log(name, v.longValue());
       */
-    } else if (value instanceof String[] v) {
-      log(name, v);
     } else {
       // TODO: use other Object handler?
       // fall back to string array
