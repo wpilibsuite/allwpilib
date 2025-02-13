@@ -23,14 +23,23 @@ namespace frc::sysid {
  * Possible state of a SysId routine.
  */
 enum class State {
-  /// Sweep forward test.
+  /// Forward sweep test.
   kSweepForward,
-  /// Sweep reverse test.
+  /// Reverse sweep test.
   kSweepReverse,
-  /// Dynamic forward test.
+  /// Forward step test.
   kStepForward,
-  /// Dynamic reverse test.
+  /// Reverse step test.
   kStepReverse,
+  // TODO: How do I do deprecated labels for enums?
+  /// Quasistatic forward test.
+  kQuasistaticForward = kSweepForward,
+  /// Quasistatic reverse test.
+  kQuasistaticReverse = kSweepReverse,
+  /// Dynamic forward test.
+  kDynamicForward = kStepForward,
+  /// Dynamic reverse test.
+  kDynamicReverse = kStepReverse,
   /// No test.
   kNone
 };

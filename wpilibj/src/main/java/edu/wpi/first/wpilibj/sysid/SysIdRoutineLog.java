@@ -48,14 +48,42 @@ public class SysIdRoutineLog {
 
   /** Possible state of a SysId routine. */
   public enum State {
-    /** Quasistatic forward test. */
+    /** Forward sweep test. */
     kSweepForward("sweep-forward"),
-    /** Quasistatic reverse test. */
+    /** Reverse sweep test. */
     kSweepReverse("sweep-reverse"),
-    /** Dynamic forward test. */
+    /** Forward step test. */
     kStepForward("step-forward"),
-    /** Dynamic reverse test. */
+    /** Reverse step test. */
     kStepReverse("step-reverse"),
+    /**
+     * Quasistatic forward test.
+     *
+     * @deprecated Use {@link State#kSweepForward} instead
+     */
+    @Deprecated(forRemoval = true, since = "2026")
+    kQuasistaticForward("sweep-forward"),
+    /**
+     * Quasistatic reverse test.
+     *
+     * @deprecated Use {@link State#kSweepReverse} instead
+     */
+    @Deprecated(forRemoval = true, since = "2026")
+    kQuasistaticReverse("sweep-reverse"),
+    /**
+     * Dynamic forward test.
+     *
+     * @deprecated Use {@link State#kStepForward} instead
+     */
+    @Deprecated(forRemoval = true, since = "2026")
+    kDynamicForward("step-forward"),
+    /**
+     * Dynamic reverse test.
+     *
+     * @deprecated Use {@link State#kStepReverse} instead
+     */
+    @Deprecated(forRemoval = true, since = "2026")
+    kDynamicReverse("step-reverse"),
     /** No test. */
     kNone("none");
 
