@@ -31,15 +31,16 @@ enum class State {
   kStepForward,
   /// Reverse step test.
   kStepReverse,
-  // TODO: How do I do deprecated labels for enums?
   /// Quasistatic forward test.
-  kQuasistaticForward = kSweepForward,
+  kQuasistaticForward [[deprecated("Use kSweepForward instead")]] =
+      kSweepForward,
   /// Quasistatic reverse test.
-  kQuasistaticReverse = kSweepReverse,
+  kQuasistaticReverse [[deprecated("Use kSweepReverse instead")]] =
+      kSweepReverse,
   /// Dynamic forward test.
-  kDynamicForward = kStepForward,
+  kDynamicForward [[deprecated("Use kStepForward instead")]] = kStepForward,
   /// Dynamic reverse test.
-  kDynamicReverse = kStepReverse,
+  kDynamicReverse [[deprecated("Use kStepReverse instead")]] = kStepReverse,
   /// No test.
   kNone
 };
