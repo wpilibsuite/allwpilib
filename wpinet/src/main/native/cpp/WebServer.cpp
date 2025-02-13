@@ -289,39 +289,51 @@ void MyHttpConnection::ProcessRequest() {
             wpi::json{{"dirs", std::move(dirs)}, {"files", std::move(files)}}
                 .dump());
       } else {
-        wpi::StringMap<std::string> dirs;
-        wpi::StringMap<std::string> files;
-        for (auto&& entry : fs::directory_iterator{fullpath}) {
-          bool subdir = entry.is_directory(ec);
-          std::string name = entry.path().filename().string();
-          wpi::SmallString<128> nameUriBuf, nameHtmlBuf;
-          if (subdir) {
-            dirs.emplace(
-                name, fmt::format(
-                          "<tr><td><a href=\"{}/\">{}/</a></td><td></td></tr>",
-                          EscapeURI(name, nameUriBuf),
-                          EscapeHTML(name, nameHtmlBuf)));
-          } else {
-            files.emplace(
-                name, fmt::format(
-                          "<tr><td><a href=\"{}\">{}</a></td><td>{}</td></tr>",
-                          EscapeURI(name, nameUriBuf),
-                          EscapeHTML(name, nameHtmlBuf), entry.file_size(ec)));
+        fs::path indexpath = fmt::format("{}index.html", fullpath);
+        if (fs::exists(indexpath)) {
+          wpi::SmallString<128> extraHeadersBuf;
+          wpi::raw_svector_ostream os{extraHeadersBuf};
+          os << "Content-Disposition: filename=\"";
+          os.write_escaped(indexpath.filename().string());
+          os << "\"\r\n";
+          SendFileResponse(200, "OK", GetMimeType("html"), indexpath, os.str());
+        } else {
+          wpi::StringMap<std::string> dirs;
+          wpi::StringMap<std::string> files;
+          for (auto&& entry : fs::directory_iterator{fullpath}) {
+            bool subdir = entry.is_directory(ec);
+            std::string name = entry.path().filename().string();
+            wpi::SmallString<128> nameUriBuf, nameHtmlBuf;
+            if (subdir) {
+              dirs.emplace(
+                  name,
+                  fmt::format(
+                      "<tr><td><a href=\"{}/\">{}/</a></td><td></td></tr>",
+                      EscapeURI(name, nameUriBuf),
+                      EscapeHTML(name, nameHtmlBuf)));
+            } else {
+              files.emplace(
+                  name,
+                  fmt::format(
+                      "<tr><td><a href=\"{}\">{}</a></td><td>{}</td></tr>",
+                      EscapeURI(name, nameUriBuf),
+                      EscapeHTML(name, nameHtmlBuf), entry.file_size(ec)));
+            }
           }
-        }
 
-        std::string html = fmt::format(
-            "<html><head><title>{}</title></head><body>"
-            "<table><tr><th>Name</th><th>Size</th></tr>\n",
-            path);
-        for (auto&& str : dirs) {
-          html += str.second;
+          std::string html = fmt::format(
+              "<html><head><title>{}</title></head><body>"
+              "<table><tr><th>Name</th><th>Size</th></tr>\n",
+              path);
+          for (auto&& str : dirs) {
+            html += str.second;
+          }
+          for (auto&& str : files) {
+            html += str.second;
+          }
+          html += "</table></body></html>";
+          SendResponse(200, "OK", "text/html", html);
         }
-        for (auto&& str : files) {
-          html += str.second;
-        }
-        html += "</table></body></html>";
-        SendResponse(200, "OK", "text/html", html);
       }
     } else {
       wpi::SmallString<128> extraHeadersBuf;
