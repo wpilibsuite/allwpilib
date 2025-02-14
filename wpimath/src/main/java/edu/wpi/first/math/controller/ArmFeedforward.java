@@ -16,16 +16,16 @@ import edu.wpi.first.util.struct.StructSerializable;
  */
 public class ArmFeedforward implements ProtobufSerializable, StructSerializable {
   /** The static gain, in volts. */
-  private final double ks;
+  private double ks;
 
   /** The gravity gain, in volts. */
-  private final double kg;
+  private double kg;
 
   /** The velocity gain, in V/(rad/s). */
-  private final double kv;
+  private double kv;
 
   /** The acceleration gain, in V/(rad/s²). */
-  private final double ka;
+  private double ka;
 
   /** The period, in seconds. */
   private final double m_dt;
@@ -96,12 +96,30 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
+   * Sets the static gain.
+   *
+   * @param ks The static gain in volts.
+   */
+  public void setKs(double ks) {
+    this.ks = ks;
+  }
+
+  /**
    * Returns the gravity gain in volts.
    *
    * @return The gravity gain in volts.
    */
   public double getKg() {
     return kg;
+  }
+
+  /**
+   * Sets the gravity gain.
+   *
+   * @param kg The gravity gain in volts.
+   */
+  public void setKg(double kg) {
+    this.kg = kg;
   }
 
   /**
@@ -114,12 +132,30 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
+   * Sets the velocity gain.
+   *
+   * @param kv The velocity gain in V/(rad/s).
+   */
+  public void setKv(double kv) {
+    this.kv = kv;
+  }
+
+  /**
    * Returns the acceleration gain in V/(rad/s²).
    *
    * @return The acceleration gain.
    */
   public double getKa() {
     return ka;
+  }
+
+  /**
+   * Sets the acceleration gain.
+   *
+   * @param ka The acceleration gain in V/(rad/2²).
+   */
+  public void setKa(double ka) {
+    this.ka = ka;
   }
 
   /**
