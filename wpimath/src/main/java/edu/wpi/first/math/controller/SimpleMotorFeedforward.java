@@ -104,7 +104,7 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   /**
    * Sets the acceleration gain.
    *
-   * @param ka The acceleration gain in V/(units/2²).
+   * @param ka The acceleration gain in V/(units/s²).
    */
   public void setKa(double ka) {
     this.ka = ka;
