@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.util.telemetry.TelemetryRegistry;
 import edu.wpi.first.util.telemetry.TelemetryTable;
 
 /**
@@ -14,10 +13,19 @@ import edu.wpi.first.util.telemetry.TelemetryTable;
  */
 public final class Telemetry {
   /** The root {@link TelemetryTable}. */
-  private static final TelemetryTable m_root = TelemetryRegistry.getTable("/");
+  private static TelemetryTable m_root = new TelemetryTable("/");
 
   private Telemetry() {
     throw new UnsupportedOperationException("This is a utility class!");
+  }
+
+  /**
+   * Sets the root telemetry table. Use with caution--not thread safe!
+   *
+   * @param table telemetry table
+   */
+  public static void setTable(TelemetryTable table) {
+    m_root = table;
   }
 
   /**
@@ -25,7 +33,7 @@ public final class Telemetry {
    *
    * @return table
    */
-  public static TelemetryTable getRootTable() {
+  public static TelemetryTable getTable() {
     return m_root;
   }
 
