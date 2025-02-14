@@ -195,18 +195,32 @@ class SimpleMotorFeedforward {
   }
 
   /**
+   * Sets the static gain.
+   *
+   * @param kS The static gain.
+   */
+  constexpr void SetKs(units::volt_t kS) { this->kS = kS; }
+
+  /**
+   * Sets the velocity gain.
+   *
+   * @param kV The velocity gain.
+   */
+  constexpr void SetKv(units::unit_t<kv_unit> kV) { this->kV = kV; }
+
+  /**
+   * Sets the acceleration gain.
+   *
+   * @param kA The acceleration gain.
+   */
+  constexpr void SetKa(units::unit_t<ka_unit> kA) { this->kA = kA; }
+
+  /**
    * Returns the static gain.
    *
    * @return The static gain.
    */
   constexpr units::volt_t GetKs() const { return kS; }
-
-  /**
-   * Returns the static gain.
-   *
-   * @param kS The static gain.
-   */
-  constexpr void SetKs(units::volt_t kS) { this->kS = kS; }
 
   /**
    * Returns the velocity gain.
@@ -216,25 +230,11 @@ class SimpleMotorFeedforward {
   constexpr units::unit_t<kv_unit> GetKv() const { return kV; }
 
   /**
-   * Returns the velocity gain.
-   *
-   * @param kV The velocity gain.
-   */
-  constexpr void SetKv(units::unit_t<kv_unit> kV) { this->kV = kV; }
-
-  /**
    * Returns the acceleration gain.
    *
    * @return The acceleration gain.
    */
   constexpr units::unit_t<ka_unit> GetKa() const { return kA; }
-
-  /**
-   * Returns the acceleration gain.
-   *
-   * @param kA The acceleration gain.
-   */
-  constexpr void SetKa(units::unit_t<ka_unit> kA) { this->kA = kA; }
 
   /**
    * Returns the period.
