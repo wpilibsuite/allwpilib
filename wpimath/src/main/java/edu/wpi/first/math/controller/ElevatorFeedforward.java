@@ -116,7 +116,7 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
   /**
    * Sets the acceleration gain.
    *
-   * @param ka The acceleration gain in V/(rad/2²).
+   * @param ka The acceleration gain in V/(rad/s²).
    */
   public void setKa(double ka) {
     this.ka = ka;
