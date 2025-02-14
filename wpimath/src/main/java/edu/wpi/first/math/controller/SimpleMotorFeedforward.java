@@ -84,21 +84,39 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Returns the static gain in volts.
-   *
-   * @return The static gain in volts.
-   */
-  public double getKs() {
-    return ks;
-  }
-
-  /**
    * Sets the static gain.
    *
    * @param ks The static gain in volts.
    */
   public void setKs(double ks) {
     this.ks = ks;
+  }
+
+  /**
+   * Sets the velocity gain.
+   *
+   * @param kv The velocity gain in V/(units/s).
+   */
+  public void setKv(double kv) {
+    this.kv = kv;
+  }
+
+  /**
+   * Sets the acceleration gain.
+   *
+   * @param ka The acceleration gain in V/(units/2²).
+   */
+  public void setKa(double ka) {
+    this.ka = ka;
+  }
+
+  /**
+   * Returns the static gain in volts.
+   *
+   * @return The static gain in volts.
+   */
+  public double getKs() {
+    return ks;
   }
 
   /**
@@ -113,15 +131,6 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Sets the velocity gain.
-   *
-   * @param kv The velocity gain in V/(rad/s).
-   */
-  public void setKv(double kv) {
-    this.kv = kv;
-  }
-
-  /**
    * Returns the acceleration gain in V/(units/s²).
    *
    * <p>The units should be radians for angular systems and meters for linear systems.
@@ -130,15 +139,6 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    */
   public double getKa() {
     return ka;
-  }
-
-  /**
-   * Sets the acceleration gain.
-   *
-   * @param ka The acceleration gain in V/(rad/2²).
-   */
-  public void setKa(double ka) {
-    this.ka = ka;
   }
 
   /**

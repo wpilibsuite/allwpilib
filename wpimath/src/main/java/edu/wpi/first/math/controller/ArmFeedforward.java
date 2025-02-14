@@ -87,30 +87,12 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
-   * Returns the static gain in volts.
-   *
-   * @return The static gain in volts.
-   */
-  public double getKs() {
-    return ks;
-  }
-
-  /**
    * Sets the static gain.
    *
    * @param ks The static gain in volts.
    */
   public void setKs(double ks) {
     this.ks = ks;
-  }
-
-  /**
-   * Returns the gravity gain in volts.
-   *
-   * @return The gravity gain in volts.
-   */
-  public double getKg() {
-    return kg;
   }
 
   /**
@@ -123,15 +105,6 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
-   * Returns the velocity gain in V/(rad/s).
-   *
-   * @return The velocity gain.
-   */
-  public double getKv() {
-    return kv;
-  }
-
-  /**
    * Sets the velocity gain.
    *
    * @param kv The velocity gain in V/(rad/s).
@@ -141,21 +114,48 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
+   * Sets the acceleration gain.
+   *
+   * @param ka The acceleration gain in V/(rad/s²).
+   */
+  public void setKa(double ka) {
+    this.ka = ka;
+  }
+
+  /**
+   * Returns the static gain in volts.
+   *
+   * @return The static gain in volts.
+   */
+  public double getKs() {
+    return ks;
+  }
+
+  /**
+   * Returns the gravity gain in volts.
+   *
+   * @return The gravity gain in volts.
+   */
+  public double getKg() {
+    return kg;
+  }
+
+  /**
+   * Returns the velocity gain in V/(rad/s).
+   *
+   * @return The velocity gain.
+   */
+  public double getKv() {
+    return kv;
+  }
+
+  /**
    * Returns the acceleration gain in V/(rad/s²).
    *
    * @return The acceleration gain.
    */
   public double getKa() {
     return ka;
-  }
-
-  /**
-   * Sets the acceleration gain.
-   *
-   * @param ka The acceleration gain in V/(rad/2²).
-   */
-  public void setKa(double ka) {
-    this.ka = ka;
   }
 
   /**
