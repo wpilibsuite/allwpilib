@@ -10,8 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.WeakHashMap;
 import java.util.function.BiConsumer;
 
 /** Global registry for telemetry handlers (type handlers and telemetry backends). */
@@ -24,7 +23,7 @@ public final class TelemetryRegistry {
   private static final List<TypeHandler> s_typeHandlers = new ArrayList<>();
   private static final PrefixMap<TelemetryBackend> s_backends = new StringPrefixMap<>();
   private static final Map<String, TelemetryEntry> s_entries = new HashMap<>();
-  private static final ConcurrentMap<String, TelemetryTable> s_tables = new ConcurrentHashMap<>();
+  private static final Map<TelemetryTable, Object> s_tables = new WeakHashMap<>();
 
   private TelemetryRegistry() {
     throw new UnsupportedOperationException("This is a utility class!");
@@ -111,12 +110,12 @@ public final class TelemetryRegistry {
   }
 
   /**
-   * Get the handler for logging an object.
+   * Get the handler for logging an object. Should generally only be used by TelemetryTable.
    *
    * @param value object
    * @return handler or null if no match
    */
-  static TypeHandler getTypeHandler(Object value) {
+  public static TypeHandler getTypeHandler(Object value) {
     synchronized (s_typeHandlers) {
       for (var entry : s_typeHandlers) {
         if (entry.cls.isInstance(value)) {
@@ -128,12 +127,12 @@ public final class TelemetryRegistry {
   }
 
   /**
-   * Get a telemetry entry for a particular name.
+   * Get a telemetry entry for a particular name. Should generally only be used by TelemetryTable.
    *
    * @param path full name
    * @return telemetry entry
    */
-  static TelemetryEntry getEntry(String path) {
+  public static TelemetryEntry getEntry(String path) {
     synchronized (s_backends) {
       return s_entries.computeIfAbsent(path, p -> s_backends.getLongestMatch(p).getEntry(p));
     }
@@ -145,8 +144,10 @@ public final class TelemetryRegistry {
    * @param path full name
    * @return telemetry table
    */
-  public static TelemetryTable getTable(String path) {
-    return s_tables.computeIfAbsent(path, TelemetryTable::new);
+  public static void addTable(TelemetryTable table) {
+    synchronized (s_tables) {
+      s_tables.put(table, null);
+    }
   }
 
   /**
@@ -168,7 +169,7 @@ public final class TelemetryRegistry {
     }
 
     // reset cached entries in tables
-    for (var table : s_tables.values()) {
+    for (var table : s_tables.keySet()) {
       table.reset();
     }
   }
