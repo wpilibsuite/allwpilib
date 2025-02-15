@@ -106,7 +106,33 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public <T> void logStruct(T value, Struct<T> struct) {}
+    public <T> void logStruct(T value, Struct<T> struct) {
+      Publisher pub = m_pub.get();
+      if (pub == null) {
+        synchronized (this) {
+          // double-check
+          pub = m_pub.get();
+          if (pub == null) {
+            pub =
+                m_inst
+                    .getStructTopic(m_path, struct)
+                    .publishEx(
+                        m_properties,
+                        PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+            m_struct = struct;
+            m_pub.set(pub);
+          }
+        }
+      }
+
+      if (pub instanceof StructPublisher<?> && struct.equals(m_struct)) {
+        @SuppressWarnings("unchecked")
+        StructPublisher<T> e = (StructPublisher<T>) pub;
+        e.set(value);
+      } else {
+        // TODO: warn?
+      }
+    }
 
     @Override
     public <T> void logProtobuf(T value, Protobuf<T, ?> proto) {}
@@ -142,22 +168,166 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logLong(long value) {}
+    public void logLong(long value) {
+      Publisher pub = m_pub.get();
+      if (pub == null) {
+        synchronized (this) {
+          // double-check
+          pub = m_pub.get();
+          if (pub == null) {
+            pub =
+                m_inst
+                    .getIntegerTopic(m_path)
+                    .publishEx(
+                        m_typeString != null ? m_typeString : IntegerTopic.kTypeString,
+                        m_properties,
+                        PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+            m_pub.set(pub);
+          }
+        }
+      }
+
+      if (pub instanceof IntegerPublisher e) {
+        e.set(value);
+      } else {
+        // TODO: warn?
+      }
+    }
 
     @Override
-    public void logFloat(float value) {}
+    public void logFloat(float value) {
+      Publisher pub = m_pub.get();
+      if (pub == null) {
+        synchronized (this) {
+          // double-check
+          pub = m_pub.get();
+          if (pub == null) {
+            pub =
+                m_inst
+                    .getFloatTopic(m_path)
+                    .publishEx(
+                        m_typeString != null ? m_typeString : FloatTopic.kTypeString,
+                        m_properties,
+                        PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+            m_pub.set(pub);
+          }
+        }
+      }
+
+      if (pub instanceof FloatPublisher e) {
+        e.set(value);
+      } else {
+        // TODO: warn?
+      }
+    }
 
     @Override
-    public void logDouble(double value) {}
+    public void logDouble(double value) {
+      Publisher pub = m_pub.get();
+      if (pub == null) {
+        synchronized (this) {
+          // double-check
+          pub = m_pub.get();
+          if (pub == null) {
+            pub =
+                m_inst
+                    .getDoubleTopic(m_path)
+                    .publishEx(
+                        m_typeString != null ? m_typeString : DoubleTopic.kTypeString,
+                        m_properties,
+                        PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+            m_pub.set(pub);
+          }
+        }
+      }
+
+      if (pub instanceof DoublePublisher e) {
+        e.set(value);
+      } else {
+        // TODO: warn?
+      }
+    }
 
     @Override
-    public void logString(String value) {}
+    public void logString(String value) {
+      Publisher pub = m_pub.get();
+      if (pub == null) {
+        synchronized (this) {
+          // double-check
+          pub = m_pub.get();
+          if (pub == null) {
+            pub =
+                m_inst
+                    .getStringTopic(m_path)
+                    .publishEx(
+                        m_typeString != null ? m_typeString : StringTopic.kTypeString,
+                        m_properties,
+                        PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+            m_pub.set(pub);
+          }
+        }
+      }
+
+      if (pub instanceof StringPublisher e) {
+        e.set(value);
+      } else {
+        // TODO: warn?
+      }
+    }
 
     @Override
-    public void logBooleanArray(boolean[] value) {}
+    public void logBooleanArray(boolean[] value) {
+      Publisher pub = m_pub.get();
+      if (pub == null) {
+        synchronized (this) {
+          // double-check
+          pub = m_pub.get();
+          if (pub == null) {
+            pub =
+                m_inst
+                    .getBooleanArrayTopic(m_path)
+                    .publishEx(
+                        m_typeString != null ? m_typeString : BooleanArrayTopic.kTypeString,
+                        m_properties,
+                        PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+            m_pub.set(pub);
+          }
+        }
+      }
+
+      if (pub instanceof BooleanArrayPublisher e) {
+        e.set(value);
+      } else {
+        // TODO: warn?
+      }
+    }
 
     @Override
-    public void logByteArray(byte[] value) {}
+    public void logByteArray(byte[] value) {
+      Publisher pub = m_pub.get();
+      if (pub == null) {
+        synchronized (this) {
+          // double-check
+          pub = m_pub.get();
+          if (pub == null) {
+            pub =
+                m_inst
+                    .getRawTopic(m_path)
+                    .publishEx(
+                        m_typeString != null ? m_typeString : "raw",
+                        m_properties,
+                        PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+            m_pub.set(pub);
+          }
+        }
+      }
+
+      if (pub instanceof RawPublisher e) {
+        e.set(value);
+      } else {
+        // TODO: warn?
+      }
+    }
 
     @Override
     public void logShortArray(short[] value) {}
@@ -166,15 +336,111 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     public void logIntArray(int[] value) {}
 
     @Override
-    public void logLongArray(long[] value) {}
+    public void logLongArray(long[] value) {
+      Publisher pub = m_pub.get();
+      if (pub == null) {
+        synchronized (this) {
+          // double-check
+          pub = m_pub.get();
+          if (pub == null) {
+            pub =
+                m_inst
+                    .getIntegerArrayTopic(m_path)
+                    .publishEx(
+                        m_typeString != null ? m_typeString : IntegerArrayTopic.kTypeString,
+                        m_properties,
+                        PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+            m_pub.set(pub);
+          }
+        }
+      }
+
+      if (pub instanceof IntegerArrayPublisher e) {
+        e.set(value);
+      } else {
+        // TODO: warn?
+      }
+    }
 
     @Override
-    public void logFloatArray(float[] value) {}
+    public void logFloatArray(float[] value) {
+      Publisher pub = m_pub.get();
+      if (pub == null) {
+        synchronized (this) {
+          // double-check
+          pub = m_pub.get();
+          if (pub == null) {
+            pub =
+                m_inst
+                    .getFloatArrayTopic(m_path)
+                    .publishEx(
+                        m_typeString != null ? m_typeString : FloatArrayTopic.kTypeString,
+                        m_properties,
+                        PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+            m_pub.set(pub);
+          }
+        }
+      }
+
+      if (pub instanceof FloatArrayPublisher e) {
+        e.set(value);
+      } else {
+        // TODO: warn?
+      }
+    }
 
     @Override
-    public void logDoubleArray(double[] value) {}
+    public void logDoubleArray(double[] value) {
+      Publisher pub = m_pub.get();
+      if (pub == null) {
+        synchronized (this) {
+          // double-check
+          pub = m_pub.get();
+          if (pub == null) {
+            pub =
+                m_inst
+                    .getDoubleArrayTopic(m_path)
+                    .publishEx(
+                        m_typeString != null ? m_typeString : DoubleArrayTopic.kTypeString,
+                        m_properties,
+                        PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+            m_pub.set(pub);
+          }
+        }
+      }
+
+      if (pub instanceof DoubleArrayPublisher e) {
+        e.set(value);
+      } else {
+        // TODO: warn?
+      }
+    }
 
     @Override
-    public void logStringArray(String[] value) {}
+    public void logStringArray(String[] value) {
+      Publisher pub = m_pub.get();
+      if (pub == null) {
+        synchronized (this) {
+          // double-check
+          pub = m_pub.get();
+          if (pub == null) {
+            pub =
+                m_inst
+                    .getStringArrayTopic(m_path)
+                    .publishEx(
+                        m_typeString != null ? m_typeString : StringArrayTopic.kTypeString,
+                        m_properties,
+                        PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+            m_pub.set(pub);
+          }
+        }
+      }
+
+      if (pub instanceof StringArrayPublisher e) {
+        e.set(value);
+      } else {
+        // TODO: warn?
+      }
+    }
   }
 }
