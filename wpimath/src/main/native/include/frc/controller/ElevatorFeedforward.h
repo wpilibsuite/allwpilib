@@ -139,7 +139,7 @@ class ElevatorFeedforward {
       double A = -kV.value() / kA.value();
       double B = 1.0 / kA.value();
       double A_d = gcem::exp(A * m_dt.value());
-      double B_d = 1.0 / A * (A_d - 1.0) * B;
+      double B_d = A == 0.0 ? B * m_dt.value() : 1.0 / A * (A_d - 1.0) * B;
       return kG + kS * wpi::sgn(currentVelocity) +
              units::volt_t{
                  1.0 / B_d *

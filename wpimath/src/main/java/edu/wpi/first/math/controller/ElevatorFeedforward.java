@@ -208,7 +208,7 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
       double A = -kv / ka;
       double B = 1.0 / ka;
       double A_d = Math.exp(A * m_dt);
-      double B_d = 1.0 / A * (A_d - 1.0) * B;
+      double B_d = A == 0.0 ? B * m_dt : 1.0 / A * (A_d - 1.0) * B;
       return kg
           + ks * Math.signum(currentVelocity)
           + 1.0 / B_d * (nextVelocity - A_d * currentVelocity);
