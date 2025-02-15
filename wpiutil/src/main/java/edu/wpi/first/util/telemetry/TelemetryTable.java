@@ -26,7 +26,14 @@ public class TelemetryTable {
    *
    * @param path path with trailing "/".
    */
+  @SuppressWarnings("this-escape")
   public TelemetryTable(String path) {
+    if (!path.startsWith("/")) {
+      path = "/" + path;
+    }
+    if (!path.endsWith("/")) {
+      path = path + "/";
+    }
     m_path = path;
     TelemetryRegistry.addTable(this);
   }

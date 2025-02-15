@@ -7,7 +7,6 @@ package edu.wpi.first.util.telemetry;
 import edu.wpi.first.util.collections.PrefixMap;
 import edu.wpi.first.util.collections.prefixmap.StringPrefixMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -15,14 +14,13 @@ import java.util.function.BiConsumer;
 
 /** Global registry for telemetry handlers (type handlers and telemetry backends). */
 public final class TelemetryRegistry {
-  static record TypeHandler(
+  record TypeHandler(
       Class<?> cls,
       BiConsumer<Object, TelemetryEntry> entryHandler,
       BiConsumer<Object, TelemetryTable> tableHandler) {}
 
   private static final List<TypeHandler> s_typeHandlers = new ArrayList<>();
   private static final PrefixMap<TelemetryBackend> s_backends = new StringPrefixMap<>();
-  private static final Map<String, TelemetryEntry> s_entries = new HashMap<>();
   private static final Map<TelemetryTable, Object> s_tables = new WeakHashMap<>();
 
   private TelemetryRegistry() {
@@ -110,7 +108,7 @@ public final class TelemetryRegistry {
   }
 
   /**
-   * Get the handler for logging an object. Should generally only be used by TelemetryTable.
+   * Gets the handler for logging an object. Should generally only be used by TelemetryTable.
    *
    * @param value object
    * @return handler or null if no match
@@ -127,22 +125,31 @@ public final class TelemetryRegistry {
   }
 
   /**
+   * Gets the backend for logging an object. Should generally only be used internally.
+   *
+   * @param path full name
+   * @return telemetry backend, or null if no match
+   */
+  public static TelemetryBackend getBackend(String path) {
+    synchronized (s_backends) {
+      return s_backends.getLongestMatch(path);
+    }
+  }
+
+  /**
    * Get a telemetry entry for a particular name. Should generally only be used by TelemetryTable.
    *
    * @param path full name
    * @return telemetry entry
    */
   public static TelemetryEntry getEntry(String path) {
-    synchronized (s_backends) {
-      return s_entries.computeIfAbsent(path, p -> s_backends.getLongestMatch(p).getEntry(p));
-    }
+    return getBackend(path).getEntry(path);
   }
 
   /**
-   * Get a telemetry table for a particular name.
+   * Registers a telemetry table for later cleanup by reset().
    *
-   * @param path full name
-   * @return telemetry table
+   * @param table telemetry table
    */
   public static void addTable(TelemetryTable table) {
     synchronized (s_tables) {
@@ -154,23 +161,27 @@ public final class TelemetryRegistry {
    * Clear all registered types and backends and closes all entries. Should typically only be used
    * by unit test code.
    */
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public static void reset() {
-    s_typeHandlers.clear();
+    synchronized (s_typeHandlers) {
+      s_typeHandlers.clear();
+    }
     synchronized (s_backends) {
-      for (var entry : s_entries.values()) {
+      for (TelemetryBackend backend : s_backends.values()) {
         try {
-          entry.close();
+          backend.close();
         } catch (Exception e) {
-          System.out.println("Unexpected exception when closing entry: " + e);
+          System.out.println("Unexpected exception when closing backend: " + e);
         }
       }
-      s_entries.clear();
       s_backends.clear();
     }
 
     // reset cached entries in tables
-    for (var table : s_tables.keySet()) {
-      table.reset();
+    synchronized (s_tables) {
+      for (var table : s_tables.keySet()) {
+        table.reset();
+      }
     }
   }
 }

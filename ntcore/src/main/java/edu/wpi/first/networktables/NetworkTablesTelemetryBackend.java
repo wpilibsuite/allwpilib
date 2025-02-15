@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class NetworkTablesTelemetryBackend implements TelemetryBackend {
   private final NetworkTableInstance m_inst;
   private final String m_prefix;
+  private static final Map<String, Entry> s_entries = new HashMap<>();
 
   public NetworkTablesTelemetryBackend(NetworkTableInstance inst, String prefix) {
     m_inst = inst;
@@ -23,11 +24,23 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
   }
 
   @Override
-  public TelemetryEntry getEntry(String name) {
-    return new Entry(m_inst, m_prefix + name);
+  public void close() {
+    synchronized (s_entries) {
+      for (Entry entry : s_entries.values()) {
+        entry.close();
+      }
+      s_entries.clear();
+    }
   }
 
-  private static class Entry implements TelemetryEntry {
+  @Override
+  public TelemetryEntry getEntry(String name) {
+    synchronized (s_entries) {
+      return s_entries.computeIfAbsent(name, k -> new Entry(m_inst, m_prefix + k));
+    }
+  }
+
+  private static final class Entry implements TelemetryEntry {
     private final NetworkTableInstance m_inst;
     private final String m_path;
     private final AtomicReference<Publisher> m_pub = new AtomicReference<>();
@@ -43,7 +56,6 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       m_path = path;
     }
 
-    @Override
     public void close() {
       var pub = m_pub.getAndSet(null);
       if (pub != null) {
@@ -54,7 +66,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     @Override
     public void keepDuplicates() {
       m_keepDuplicates.set(true);
-      // TODO: update publisher
+      // TODO: update publisher while not losing last value
     }
 
     synchronized void refreshProperties() {
@@ -62,19 +74,11 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       sb.append('{');
       m_propertiesMap.forEach(
           (k, v) -> {
-            sb.append('"');
-            sb.append(k.replace("\"", "\\\""));
-            sb.append("\":");
-            sb.append(v);
-            sb.append(',');
+            sb.append('"').append(k.replace("\"", "\\\"")).append("\":").append(v).append(',');
           });
       // replace the trailing comma with a }
       sb.setCharAt(sb.length() - 1, '}');
       m_properties = sb.toString();
-      Publisher pub = m_pub.get();
-      if (pub != null) {
-        pub.getTopic().setProperties(m_properties);
-      }
     }
 
     @Override
@@ -83,6 +87,10 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
         String oldValue = m_propertiesMap.put(key, value);
         if (!value.equals(oldValue)) {
           refreshProperties();
+          Publisher pub = m_pub.get();
+          if (pub != null) {
+            pub.getTopic().setProperties(m_properties);
+          }
         }
       }
     }
@@ -90,7 +98,10 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     @Override
     public void setTypeString(String typeString) {
       synchronized (this) {
-        m_typeString = typeString;
+        if (!typeString.equals(m_typeString)) {
+          m_typeString = typeString;
+          // TODO: update publisher while not losing last value
+        }
       }
     }
 
