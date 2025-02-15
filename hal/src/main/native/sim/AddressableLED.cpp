@@ -91,6 +91,10 @@ void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
   SimAddressableLEDData[led->index].initialized = false;
 }
 
+void HAL_SetAddressableLEDColorOrder(HAL_AddressableLEDHandle handle,
+                                     HAL_AddressableLEDColorOrder colorOrder,
+                                     int32_t* status) {}
+
 void HAL_SetAddressableLEDOutputPort(HAL_AddressableLEDHandle handle,
                                      HAL_DigitalHandle outputPort,
                                      int32_t* status) {

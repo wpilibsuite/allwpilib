@@ -7,6 +7,7 @@
 #include <functional>
 #include <future>
 #include <map>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -55,6 +56,7 @@ class DataSelector : public glass::View {
    * Called when new test data is loaded.
    */
   std::function<void(TestData)> testdata;
+  std::vector<std::string> m_missingTests;
 
  private:
   wpi::Logger& m_logger;
@@ -74,6 +76,11 @@ class DataSelector : public glass::View {
   int m_selectedAnalysis = 0;
   std::future<TestData> m_testdataFuture;
   std::vector<std::string> m_testdataStats;
+  std::set<std::string> kValidTests = {"quasistatic-forward",
+                                       "quasistatic-reverse", "dynamic-forward",
+                                       "dynamic-reverse"};
+  std::set<std::string> m_executedTests;
+  bool m_testCountValidated = false;
 
   static Tests LoadTests(const glass::DataLogReaderEntry& testStateEntry);
   TestData BuildTestData();

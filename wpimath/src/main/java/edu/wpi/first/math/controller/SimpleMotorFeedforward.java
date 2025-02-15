@@ -12,13 +12,13 @@ import edu.wpi.first.util.struct.StructSerializable;
 /** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
 public class SimpleMotorFeedforward implements ProtobufSerializable, StructSerializable {
   /** The static gain, in volts. */
-  private final double ks;
+  private double ks;
 
   /** The velocity gain, in V/(units/s). */
-  private final double kv;
+  private double kv;
 
   /** The acceleration gain, in V/(units/s²). */
-  private final double ka;
+  private double ka;
 
   /** The period, in seconds. */
   private final double m_dt;
@@ -81,6 +81,33 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    */
   public SimpleMotorFeedforward(double ks, double kv) {
     this(ks, kv, 0);
+  }
+
+  /**
+   * Sets the static gain.
+   *
+   * @param ks The static gain in volts.
+   */
+  public void setKs(double ks) {
+    this.ks = ks;
+  }
+
+  /**
+   * Sets the velocity gain.
+   *
+   * @param kv The velocity gain in V/(units/s).
+   */
+  public void setKv(double kv) {
+    this.kv = kv;
+  }
+
+  /**
+   * Sets the acceleration gain.
+   *
+   * @param ka The acceleration gain in V/(units/s²).
+   */
+  public void setKa(double ka) {
+    this.ka = ka;
   }
 
   /**

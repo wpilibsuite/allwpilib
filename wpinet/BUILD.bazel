@@ -121,6 +121,10 @@ cc_library(
     ] + ["native-srcs"],
     hdrs = glob(["src/main/native/include/**/*"]),
     includes = ["src/main/native/include"],
+    linkopts = select({
+        "@bazel_tools//src/conditions:linux": ["-ldl"],
+        "//conditions:default": [],
+    }),
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [

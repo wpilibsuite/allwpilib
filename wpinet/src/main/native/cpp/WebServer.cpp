@@ -270,6 +270,7 @@ void MyHttpConnection::ProcessRequest() {
       }
       // generate directory listing
       wpi::SmallString<64> formatBuf;
+      fs::path indexpath = fs::path{fullpath} / "index.html";
       if (qmap.Get("format", formatBuf).value_or("") == "json") {
         wpi::json dirs = wpi::json::array();
         wpi::json files = wpi::json::array();
@@ -288,6 +289,9 @@ void MyHttpConnection::ProcessRequest() {
             200, "OK", "text/json",
             wpi::json{{"dirs", std::move(dirs)}, {"files", std::move(files)}}
                 .dump());
+      } else if (fs::exists(indexpath)) {
+        SendFileResponse(200, "OK", GetMimeType("html"), indexpath,
+                         "Content-Disposition: filename=\"index.html\"\r\n");
       } else {
         wpi::StringMap<std::string> dirs;
         wpi::StringMap<std::string> files;

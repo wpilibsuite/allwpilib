@@ -14,14 +14,16 @@ public enum AprilTagFields {
   k2023ChargedUp("2023-chargedup.json"),
   /** 2024 Crescendo. */
   k2024Crescendo("2024-crescendo.json"),
-  /** 2025 Reefscape. */
-  k2025Reefscape("2025-reefscape.json");
+  /** 2025 Reefscape Welded (see TU 12). */
+  k2025ReefscapeWelded("2025-reefscape-welded.json"),
+  /** 2025 Reefscape AndyMark (see TU 12). */
+  k2025ReefscapeAndyMark("2025-reefscape-andymark.json");
 
   /** Base resource directory. */
   public static final String kBaseResourceDir = "/edu/wpi/first/apriltag/";
 
   /** Alias to the current game. */
-  public static final AprilTagFields kDefaultField = k2025Reefscape;
+  public static final AprilTagFields kDefaultField = k2025ReefscapeWelded;
 
   /** Resource filename. */
   public final String m_resourceFile;

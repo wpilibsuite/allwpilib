@@ -8,6 +8,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <vector>
 
 #include <glass/View.h>
 #include <implot.h>
@@ -46,6 +47,7 @@ class Analyzer : public glass::View {
     kVelocityThresholdError,
     kTestDurationError,
     kGeneralDataError,
+    kMissingTestsError,
     kFileError
   };
   /**
@@ -90,6 +92,11 @@ class Analyzer : public glass::View {
    * Analyzes the selected data.
    */
   void AnalyzeData();
+
+  /**
+   * Used by DataSelector to import any missing tests.
+   */
+  void SetMissingTests(const std::vector<std::string>& missingTests);
 
  private:
   /**
@@ -199,6 +206,7 @@ class Analyzer : public glass::View {
 
   // Stores the exception message.
   std::string m_exception;
+  std::vector<std::string> m_missingTests;
 
   bool m_calcDefaults = false;
 
