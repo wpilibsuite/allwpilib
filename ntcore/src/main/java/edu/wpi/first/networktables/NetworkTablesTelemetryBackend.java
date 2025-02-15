@@ -105,40 +105,92 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       }
     }
 
-    @Override
-    public <T> void logStruct(T value, Struct<T> struct) {
+    private synchronized <T> StructPublisher<T> initStruct(Struct<T> struct) {
       Publisher pub = m_pub.get();
       if (pub == null) {
-        synchronized (this) {
-          // double-check
-          pub = m_pub.get();
-          if (pub == null) {
-            pub =
-                m_inst
-                    .getStructTopic(m_path, struct)
-                    .publishEx(
-                        m_properties,
-                        PubSubOption.keepDuplicates(m_keepDuplicates.get()));
-            m_struct = struct;
-            m_pub.set(pub);
-          }
-        }
-      }
-
-      if (pub instanceof StructPublisher<?> && struct.equals(m_struct)) {
+        StructPublisher<T> p =
+            m_inst
+                .getStructTopic(m_path, struct)
+                .publishEx(m_properties, PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+        m_struct = struct;
+        m_pub.set(p);
+        return p;
+      } else if (pub instanceof StructPublisher<?> && struct.equals(m_struct)) {
         @SuppressWarnings("unchecked")
-        StructPublisher<T> e = (StructPublisher<T>) pub;
-        e.set(value);
+        StructPublisher<T> p = (StructPublisher<T>) pub;
+        return p;
+      } else {
+        return null;
+      }
+    }
+
+    @Override
+    public <T> void logStruct(T value, Struct<T> struct) {
+      StructPublisher<T> pub = initStruct(struct);
+      if (pub != null) {
+        pub.set(value);
       } else {
         // TODO: warn?
       }
     }
 
-    @Override
-    public <T> void logProtobuf(T value, Protobuf<T, ?> proto) {}
+    private synchronized <T> ProtobufPublisher<T> initProtobuf(Protobuf<T, ?> proto) {
+      Publisher pub = m_pub.get();
+      if (pub == null) {
+        ProtobufPublisher<T> p =
+            m_inst
+                .getProtobufTopic(m_path, proto)
+                .publishEx(m_properties, PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+        m_proto = proto;
+        m_pub.set(p);
+        return p;
+      } else if (pub instanceof ProtobufPublisher<?> && proto.equals(m_proto)) {
+        @SuppressWarnings("unchecked")
+        ProtobufPublisher<T> p = (ProtobufPublisher<T>) pub;
+        return p;
+      } else {
+        return null;
+      }
+    }
 
     @Override
-    public <T> void logStructArray(T[] value, Struct<T> struct) {}
+    public <T> void logProtobuf(T value, Protobuf<T, ?> proto) {
+      ProtobufPublisher<T> pub = initProtobuf(proto);
+      if (pub != null) {
+        pub.set(value);
+      } else {
+        // TODO: warn?
+      }
+    }
+
+    private synchronized <T> StructArrayPublisher<T> initStructArray(Struct<T> struct) {
+      Publisher pub = m_pub.get();
+      if (pub == null) {
+        StructArrayPublisher<T> p =
+            m_inst
+                .getStructArrayTopic(m_path, struct)
+                .publishEx(m_properties, PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+        m_struct = struct;
+        m_pub.set(p);
+        return p;
+      } else if (pub instanceof StructArrayPublisher<?> && struct.equals(m_struct)) {
+        @SuppressWarnings("unchecked")
+        StructArrayPublisher<T> p = (StructArrayPublisher<T>) pub;
+        return p;
+      } else {
+        return null;
+      }
+    }
+
+    @Override
+    public <T> void logStructArray(T[] value, Struct<T> struct) {
+      StructArrayPublisher<T> pub = initStructArray(struct);
+      if (pub != null) {
+        pub.set(value);
+      } else {
+        // TODO: warn?
+      }
+    }
 
     @Override
     public void logBoolean(boolean value) {
@@ -330,10 +382,14 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logShortArray(short[] value) {}
+    public void logShortArray(short[] value) {
+      // TODO
+    }
 
     @Override
-    public void logIntArray(int[] value) {}
+    public void logIntArray(int[] value) {
+      // TODO
+    }
 
     @Override
     public void logLongArray(long[] value) {
