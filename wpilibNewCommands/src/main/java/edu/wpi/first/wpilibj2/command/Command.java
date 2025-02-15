@@ -486,6 +486,30 @@ public abstract class Command implements Sendable {
   }
 
   /**
+   * Decorates this command to have additional subsystem requirements.
+   *
+   * @param requirements the requirements to add
+   * @return the decorated command
+   * @see Command#addRequirements(Subsystem...)
+   */
+  public Command withRequirements(Subsystem... requirements) {
+    addRequirements(requirements);
+    return this;
+  }
+
+  /**
+   * Decorates this command to have additional subsystem requirements.
+   *
+   * @param requirements the requirements to add
+   * @return the decorated command
+   * @see Command#addRequirements(Collection)
+   */
+  public Command withRequirements(Collection<Subsystem> requirements) {
+    addRequirements(requirements);
+    return this;
+  }
+
+  /**
    * Decorates this command with a lambda to call on interrupt or end, following the command's
    * inherent {@link #end(boolean)} method.
    *
