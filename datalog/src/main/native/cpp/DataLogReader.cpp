@@ -6,8 +6,9 @@
 #include <utility>
 
 #include <wpi/Endian.h>
-#include <wpi/datalog/DataLog.h>
-#include <wpi/datalog/DataLogReader.h>
+
+#include "wpi/datalog/DataLog.h"
+#include "wpi/datalog/DataLogReader.h"
 
 using namespace wpi::log;
 

@@ -11,13 +11,13 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/datalog/DataLog.h>
-#include <wpi/datalog/DataLogBackgroundWriter.h>
-#include <wpi/datalog/DataLogWriter.h>
-#include <wpi/datalog/FileLogger.h>
 #include <wpi/jni_util.h>
 
 #include "edu_wpi_first_datalog_DataLogJNI.h"
+#include "wpi/datalog/DataLog.h"
+#include "wpi/datalog/DataLogBackgroundWriter.h"
+#include "wpi/datalog/DataLogWriter.h"
+#include "wpi/datalog/FileLogger.h"
 
 using namespace wpi::java;
 using namespace wpi::log;

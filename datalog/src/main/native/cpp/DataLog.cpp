@@ -14,9 +14,10 @@
 #include <wpi/Endian.h>
 #include <wpi/Logger.h>
 #include <wpi/SmallString.h>
-#include <wpi/datalog/DataLog.h>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
+
+#include "wpi/datalog/DataLog.h"
 
 using namespace wpi::log;
 

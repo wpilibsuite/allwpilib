@@ -15,9 +15,10 @@
 
 #include <wpi/DenseMap.h>
 #include <wpi/Signal.h>
-#include <wpi/datalog/DataLogReader.h>
 #include <wpi/mutex.h>
 #include <wpi/struct/DynamicStruct.h>
+
+#include "wpi/datalog/DataLogReader.h"
 
 #ifndef NO_PROTOBUF
 #include <wpi/protobuf/ProtobufMessageDatabase.h>

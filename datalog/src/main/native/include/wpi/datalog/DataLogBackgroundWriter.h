@@ -13,8 +13,9 @@
 #include <thread>
 
 #include <wpi/condition_variable.h>
-#include <wpi/datalog/DataLog.h>
 #include <wpi/mutex.h>
+
+#include "wpi/datalog/DataLog.h"
 
 namespace wpi {
 class Logger;

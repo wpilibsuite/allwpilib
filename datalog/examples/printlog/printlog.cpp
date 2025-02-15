@@ -11,8 +11,9 @@
 #include <fmt/ranges.h>
 #include <wpi/DenseMap.h>
 #include <wpi/MemoryBuffer.h>
-#include <wpi/datalog/DataLogReader.h>
 #include <wpi/print.h>
+
+#include "wpi/datalog/DataLogReader.h"
 
 int main(int argc, const char** argv) {
   if (argc != 2) {

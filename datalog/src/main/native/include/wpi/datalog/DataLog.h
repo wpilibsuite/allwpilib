@@ -22,12 +22,13 @@
 #include <wpi/DenseMap.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringMap.h>
-#include <wpi/datalog/DataLog_c.h>
 #include <wpi/mutex.h>
 #include <wpi/protobuf/Protobuf.h>
 #include <wpi/string.h>
 #include <wpi/struct/Struct.h>
 #include <wpi/timestamp.h>
+
+#include "wpi/datalog/DataLog_c.h"
 
 namespace wpi {
 class Logger;
