@@ -7,7 +7,7 @@ package edu.wpi.first.util.telemetry;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 
-public interface TelemetryEntry extends AutoCloseable {
+public interface TelemetryEntry {
   /** Indicates duplicate values should be preserved. Normally duplicate values are ignored. */
   void keepDuplicates();
 

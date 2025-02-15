@@ -9,15 +9,17 @@ import edu.wpi.first.util.struct.Struct;
 
 /** A telemetry backend that discards all logged data. */
 public class NoopTelemetryBackend implements TelemetryBackend {
+  static final Entry s_entry = new Entry();
+
+  @Override
+  public void close() {}
+
   @Override
   public TelemetryEntry getEntry(String path) {
-    return new Entry();
+    return s_entry;
   }
 
-  private static class Entry implements TelemetryEntry {
-    @Override
-    public void close() {}
-
+  private static final class Entry implements TelemetryEntry {
     @Override
     public void keepDuplicates() {}
 

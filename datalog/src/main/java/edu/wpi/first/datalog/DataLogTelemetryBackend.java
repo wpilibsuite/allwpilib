@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class DataLogTelemetryBackend implements TelemetryBackend {
   private final DataLog m_log;
   private final String m_prefix;
+  private static final Map<String, Entry> s_entries = new HashMap<>();
 
   public DataLogTelemetryBackend(DataLog log, String prefix) {
     m_log = log;
@@ -23,11 +24,23 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
   }
 
   @Override
-  public TelemetryEntry getEntry(String name) {
-    return new Entry(m_log, m_prefix + name);
+  public void close() {
+    synchronized (s_entries) {
+      for (Entry entry : s_entries.values()) {
+        entry.close();
+      }
+      s_entries.clear();
+    }
   }
 
-  private static class Entry implements TelemetryEntry {
+  @Override
+  public TelemetryEntry getEntry(String name) {
+    synchronized (s_entries) {
+      return s_entries.computeIfAbsent(name, k -> new Entry(m_log, m_prefix + k));
+    }
+  }
+
+  private static final class Entry implements TelemetryEntry {
     private final DataLog m_log;
     private final String m_path;
     private final AtomicReference<DataLogEntry> m_entry = new AtomicReference<>();
@@ -43,7 +56,6 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       m_path = path;
     }
 
-    @Override
     public void close() {
       var entry = m_entry.getAndSet(null);
       if (entry != null) {
@@ -61,19 +73,11 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       sb.append('{');
       m_propertiesMap.forEach(
           (k, v) -> {
-            sb.append('"');
-            sb.append(k.replace("\"", "\\\""));
-            sb.append("\":");
-            sb.append(v);
-            sb.append(',');
+            sb.append('"').append(k.replace("\"", "\\\"")).append("\":").append(v).append(',');
           });
       // replace the trailing comma with a }
       sb.setCharAt(sb.length() - 1, '}');
       m_properties = sb.toString();
-      DataLogEntry entry = m_entry.get();
-      if (entry != null) {
-        entry.setMetadata(m_properties);
-      }
     }
 
     @Override
@@ -82,6 +86,10 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         String oldValue = m_propertiesMap.put(key, value);
         if (!value.equals(oldValue)) {
           refreshProperties();
+          DataLogEntry entry = m_entry.get();
+          if (entry != null) {
+            entry.setMetadata(m_properties);
+          }
         }
       }
     }
@@ -89,7 +97,10 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     @Override
     public void setTypeString(String typeString) {
       synchronized (this) {
-        m_typeString = typeString;
+        if (!typeString.equals(m_typeString)) {
+          m_typeString = typeString;
+          close(); // force re-init
+        }
       }
     }
 

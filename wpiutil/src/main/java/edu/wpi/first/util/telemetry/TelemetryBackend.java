@@ -5,12 +5,12 @@
 package edu.wpi.first.util.telemetry;
 
 /** Interface for telemetry backends. */
-public interface TelemetryBackend {
+public interface TelemetryBackend extends AutoCloseable {
   /**
    * Create an entry for the given path.
    *
-   * @param path
-   * @return
+   * @param path full name
+   * @return telemetry entry
    */
   TelemetryEntry getEntry(String path);
 }
