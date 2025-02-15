@@ -8,8 +8,8 @@ import edu.wpi.first.util.collections.PrefixMap;
 import edu.wpi.first.util.collections.prefixmap.StringPrefixMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
 
 /** Global registry for telemetry handlers (type handlers and telemetry backends). */
@@ -21,7 +21,7 @@ public final class TelemetryRegistry {
 
   private static final List<TypeHandler> s_typeHandlers = new ArrayList<>();
   private static final PrefixMap<TelemetryBackend> s_backends = new StringPrefixMap<>();
-  private static final Map<TelemetryTable, Object> s_tables = new WeakHashMap<>();
+  private static final ConcurrentMap<String, TelemetryTable> s_tables = new ConcurrentHashMap<>();
 
   private TelemetryRegistry() {
     throw new UnsupportedOperationException("This is a utility class!");
@@ -125,7 +125,8 @@ public final class TelemetryRegistry {
   }
 
   /**
-   * Gets the backend for logging an object. Should generally only be used internally.
+   * Gets the backend for logging an object. Should generally only be used internally or by custom
+   * backends.
    *
    * @param path full name
    * @return telemetry backend, or null if no match
@@ -137,24 +138,23 @@ public final class TelemetryRegistry {
   }
 
   /**
-   * Get a telemetry entry for a particular name. Should generally only be used by TelemetryTable.
+   * Get a telemetry entry for a particular name.
    *
    * @param path full name
    * @return telemetry entry
    */
-  public static TelemetryEntry getEntry(String path) {
+  static TelemetryEntry getEntry(String path) {
     return getBackend(path).getEntry(path);
   }
 
   /**
-   * Registers a telemetry table for later cleanup by reset().
+   * Get a telemetry table for a particular name.
    *
-   * @param table telemetry table
+   * @param path full name
+   * @return telemetry table
    */
-  public static void addTable(TelemetryTable table) {
-    synchronized (s_tables) {
-      s_tables.put(table, null);
-    }
+  public static TelemetryTable getTable(String path) {
+    return s_tables.computeIfAbsent(path, TelemetryTable::new);
   }
 
   /**
@@ -178,10 +178,8 @@ public final class TelemetryRegistry {
     }
 
     // reset cached entries in tables
-    synchronized (s_tables) {
-      for (var table : s_tables.keySet()) {
-        table.reset();
-      }
+    for (var table : s_tables.values()) {
+      table.reset();
     }
   }
 }

@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentMap;
  *
  * <p>For more advanced use cases, use the NetworkTables or DataLog APIs.
  */
-public class TelemetryTable {
+public final class TelemetryTable {
   private final String m_path;
   private final ConcurrentMap<String, TelemetryTable> m_tablesMap = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, TelemetryEntry> m_entriesMap = new ConcurrentHashMap<>();
@@ -26,16 +26,8 @@ public class TelemetryTable {
    *
    * @param path path with trailing "/".
    */
-  @SuppressWarnings("this-escape")
-  public TelemetryTable(String path) {
-    if (!path.startsWith("/")) {
-      path = "/" + path;
-    }
-    if (!path.endsWith("/")) {
-      path = path + "/";
-    }
+  TelemetryTable(String path) {
     m_path = path;
-    TelemetryRegistry.addTable(this);
   }
 
   /** Clears the table's cached entries. */
@@ -60,7 +52,7 @@ public class TelemetryTable {
    * @return table
    */
   public TelemetryTable getTable(String name) {
-    return m_tablesMap.computeIfAbsent(name, k -> new TelemetryTable(m_path + k + "/"));
+    return m_tablesMap.computeIfAbsent(name, k -> TelemetryRegistry.getTable(m_path + k + "/"));
   }
 
   /**
@@ -69,7 +61,7 @@ public class TelemetryTable {
    * @param name name
    * @return entry
    */
-  protected TelemetryEntry getEntry(String name) {
+  private TelemetryEntry getEntry(String name) {
     return m_entriesMap.computeIfAbsent(name, k -> TelemetryRegistry.getEntry(m_path + k));
   }
 
