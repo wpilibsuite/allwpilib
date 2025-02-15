@@ -154,7 +154,7 @@ void Application(std::string_view saveDir) {
   gui::Initialize("Datalog Tool", 925, 510);
 
   gDownloadVisible =
-      &glass::GetStorageRoot().GetChild("download").GetBool("visible", true);
+      &glass::GetStorageRoot().GetChild("download").Get<bool>("visible", true);
 
   gui::Main();
 

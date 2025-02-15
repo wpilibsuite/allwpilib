@@ -52,7 +52,7 @@ GLFWAPI void glfwSetWindowSize(GLFWwindow* window, int width, int height);
 
 struct TeamNumberRefHolder {
   explicit TeamNumberRefHolder(glass::Storage& storage)
-      : teamNumber{storage.GetInt("TeamNumber", 0)} {}
+      : teamNumber{storage.Get<int>("TeamNumber", 0)} {}
   int& teamNumber;
 };
 

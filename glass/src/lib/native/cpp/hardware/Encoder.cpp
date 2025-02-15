@@ -70,7 +70,7 @@ void glass::DisplayEncoder(EncoderModel* model) {
   int chB = model->GetChannelB();
 
   // build header label
-  std::string& name = GetStorage().GetString("name");
+  std::string& name = GetStorage().Get<std::string>("name");
   char label[128];
   if (!name.empty()) {
     wpi::format_to_n_c_str(label, sizeof(label), "{} [{},{}]###header", name,

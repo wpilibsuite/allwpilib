@@ -345,14 +345,14 @@ static bool InputPose(frc::Pose2d* pose) {
 }
 
 FieldInfo::FieldInfo(Storage& storage)
-    : m_builtin{storage.GetString("builtin", "2024 Crescendo")},
-      m_filename{storage.GetString("image")},
-      m_width{storage.GetFloat("width", kDefaultWidth.to<float>())},
-      m_height{storage.GetFloat("height", kDefaultHeight.to<float>())},
-      m_top{storage.GetInt("top", 0)},
-      m_left{storage.GetInt("left", 0)},
-      m_bottom{storage.GetInt("bottom", -1)},
-      m_right{storage.GetInt("right", -1)} {}
+    : m_builtin{storage.Get<std::string>("builtin", "2024 Crescendo")},
+      m_filename{storage.Get<std::string>("image")},
+      m_width{storage.Get<float>("width", kDefaultWidth.to<float>())},
+      m_height{storage.Get<float>("height", kDefaultHeight.to<float>())},
+      m_top{storage.Get<int>("top", 0)},
+      m_left{storage.Get<int>("left", 0)},
+      m_bottom{storage.Get<int>("bottom", -1)},
+      m_right{storage.Get<int>("right", -1)} {}
 
 void FieldInfo::DisplaySettings() {
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 10);
@@ -626,26 +626,26 @@ void FieldInfo::Draw(ImDrawList* drawList, const FieldFrameData& ffd) const {
 }
 
 ObjectInfo::ObjectInfo(Storage& storage)
-    : m_width{storage.GetFloat("width",
-                               DisplayOptions::kDefaultWidth.to<float>())},
-      m_length{storage.GetFloat("length",
-                                DisplayOptions::kDefaultLength.to<float>())},
-      m_style{storage.GetString("style"),
+    : m_width{storage.Get<float>("width",
+                                 DisplayOptions::kDefaultWidth.to<float>())},
+      m_length{storage.Get<float>("length",
+                                  DisplayOptions::kDefaultLength.to<float>())},
+      m_style{storage.Get<std::string>("style"),
               DisplayOptions::kDefaultStyle,
               {"Box/Image", "Line", "Line (Closed)", "Track", "Hidden"}},
-      m_weight{storage.GetFloat("weight", DisplayOptions::kDefaultWeight)},
-      m_color{
-          storage.GetFloatArray("color", DisplayOptions::kDefaultColorFloat)},
-      m_arrows{storage.GetBool("arrows", DisplayOptions::kDefaultArrows)},
+      m_weight{storage.Get<float>("weight", DisplayOptions::kDefaultWeight)},
+      m_color{storage.Get<std::vector<float>>(
+          "color", DisplayOptions::kDefaultColorFloat)},
+      m_arrows{storage.Get<bool>("arrows", DisplayOptions::kDefaultArrows)},
       m_arrowSize{
-          storage.GetInt("arrowSize", DisplayOptions::kDefaultArrowSize)},
-      m_arrowWeight{
-          storage.GetFloat("arrowWeight", DisplayOptions::kDefaultArrowWeight)},
-      m_arrowColor{storage.GetFloatArray(
+          storage.Get<int>("arrowSize", DisplayOptions::kDefaultArrowSize)},
+      m_arrowWeight{storage.Get<float>("arrowWeight",
+                                       DisplayOptions::kDefaultArrowWeight)},
+      m_arrowColor{storage.Get<std::vector<float>>(
           "arrowColor", DisplayOptions::kDefaultArrowColorFloat)},
       m_selectable{
-          storage.GetBool("selectable", DisplayOptions::kDefaultSelectable)},
-      m_filename{storage.GetString("image")} {}
+          storage.Get<bool>("selectable", DisplayOptions::kDefaultSelectable)},
+      m_filename{storage.Get<std::string>("image")} {}
 
 DisplayOptions ObjectInfo::GetDisplayOptions() const {
   DisplayOptions rv{m_texture};
@@ -944,7 +944,7 @@ void glass::DisplayField2DSettings(Field2DModel* model) {
     field = storage.GetData<FieldInfo>();
   }
 
-  EnumSetting displayUnits{GetStorage().GetString("units"),
+  EnumSetting displayUnits{GetStorage().Get<std::string>("units"),
                            kDisplayMeters,
                            {"meters", "feet", "inches"}};
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);

@@ -133,7 +133,7 @@ class KeyboardJoystick : public SystemJoystick {
     float& maxAbsValue;
   };
 
-  std::vector<std::unique_ptr<glass::Storage>>& m_axisStorage;
+  std::vector<glass::Storage::Child>& m_axisStorage;
   std::vector<AxisConfig> m_axisConfig;
 
   static constexpr int kMaxButtonCount = 32;
@@ -152,7 +152,7 @@ class KeyboardJoystick : public SystemJoystick {
     int& key315;
   };
 
-  std::vector<std::unique_ptr<glass::Storage>>& m_povStorage;
+  std::vector<glass::Storage::Child>& m_povStorage;
   std::vector<PovConfig> m_povConfig;
 };
 
@@ -485,11 +485,11 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
 }
 
 KeyboardJoystick::AxisConfig::AxisConfig(glass::Storage& storage)
-    : incKey{storage.GetInt("incKey", -1)},
-      decKey{storage.GetInt("decKey", -1)},
-      keyRate{storage.GetFloat("keyRate", 0.05f)},
-      decayRate{storage.GetFloat("decayRate", 0.05f)},
-      maxAbsValue{storage.GetFloat("maxAbsValue", 1.0f)} {
+    : incKey{storage.Get<int>("incKey", -1)},
+      decKey{storage.Get<int>("decKey", -1)},
+      keyRate{storage.Get<float>("keyRate", 0.05f)},
+      decayRate{storage.Get<float>("decayRate", 0.05f)},
+      maxAbsValue{storage.Get<float>("maxAbsValue", 1.0f)} {
   // sanity check the key ranges
   if (incKey < -1 || incKey >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
     incKey = -1;
@@ -500,14 +500,14 @@ KeyboardJoystick::AxisConfig::AxisConfig(glass::Storage& storage)
 }
 
 KeyboardJoystick::PovConfig::PovConfig(glass::Storage& storage)
-    : key0{storage.GetInt("key0", -1)},
-      key45{storage.GetInt("key45", -1)},
-      key90{storage.GetInt("key90", -1)},
-      key135{storage.GetInt("key135", -1)},
-      key180{storage.GetInt("key180", -1)},
-      key225{storage.GetInt("key225", -1)},
-      key270{storage.GetInt("key270", -1)},
-      key315{storage.GetInt("key315", -1)} {
+    : key0{storage.Get<int>("key0", -1)},
+      key45{storage.Get<int>("key45", -1)},
+      key90{storage.Get<int>("key90", -1)},
+      key135{storage.Get<int>("key135", -1)},
+      key180{storage.Get<int>("key180", -1)},
+      key225{storage.Get<int>("key225", -1)},
+      key270{storage.Get<int>("key270", -1)},
+      key315{storage.Get<int>("key315", -1)} {
   // sanity check the key ranges
   if (key0 < -1 || key0 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
     key0 = -1;
@@ -537,11 +537,11 @@ KeyboardJoystick::PovConfig::PovConfig(glass::Storage& storage)
 
 KeyboardJoystick::KeyboardJoystick(glass::Storage& storage, int index)
     : m_index{index},
-      m_axisCount{storage.GetInt("axisCount", -1)},
-      m_buttonCount{storage.GetInt("buttonCount", -1)},
-      m_povCount{storage.GetInt("povCount", -1)},
+      m_axisCount{storage.Get<int>("axisCount", -1)},
+      m_buttonCount{storage.Get<int>("buttonCount", -1)},
+      m_povCount{storage.Get<int>("povCount", -1)},
       m_axisStorage{storage.GetChildArray("axisConfig")},
-      m_buttonKey{storage.GetIntArray("buttonKeys")},
+      m_buttonKey{storage.Get<std::vector<int>>("buttonKeys")},
       m_povStorage{storage.GetChildArray("povConfig")} {
   wpi::format_to_n_c_str(m_name, sizeof(m_name), "Keyboard {}", index);
   wpi::format_to_n_c_str(m_guid, sizeof(m_guid), "Keyboard{}", index);
@@ -624,7 +624,7 @@ void KeyboardJoystick::SettingsDisplay() {
       }
     }
     while (m_axisCount > static_cast<int>(m_axisConfig.size())) {
-      m_axisStorage.emplace_back(std::make_unique<glass::Storage>());
+      m_axisStorage.emplace_back(std::make_shared<glass::Storage>());
       m_axisConfig.emplace_back(*m_axisStorage.back());
     }
     for (int i = 0; i < m_axisCount; ++i) {
@@ -681,7 +681,7 @@ void KeyboardJoystick::SettingsDisplay() {
       }
     }
     while (m_povCount > static_cast<int>(m_povConfig.size())) {
-      m_povStorage.emplace_back(std::make_unique<glass::Storage>());
+      m_povStorage.emplace_back(std::make_shared<glass::Storage>());
       m_povConfig.emplace_back(*m_povStorage.back());
     }
     for (int i = 0; i < m_povCount; ++i) {
@@ -863,7 +863,7 @@ GlfwKeyboardJoystick::GlfwKeyboardJoystick(glass::Storage& storage, int index)
     if (m_axisCount == -1 && m_axisStorage.empty()) {
       m_axisCount = 3;
       for (int i = 0; i < 3; ++i) {
-        m_axisStorage.emplace_back(std::make_unique<glass::Storage>());
+        m_axisStorage.emplace_back(std::make_shared<glass::Storage>());
         m_axisConfig.emplace_back(*m_axisStorage.back());
       }
       m_axisConfig[0].incKey = GLFW_KEY_D;
@@ -885,7 +885,7 @@ GlfwKeyboardJoystick::GlfwKeyboardJoystick(glass::Storage& storage, int index)
     }
     if (m_povCount == -1 && m_povStorage.empty()) {
       m_povCount = 1;
-      m_povStorage.emplace_back(std::make_unique<glass::Storage>());
+      m_povStorage.emplace_back(std::make_shared<glass::Storage>());
       m_povConfig.emplace_back(*m_povStorage.back());
       m_povConfig[0].key0 = GLFW_KEY_KP_8;
       m_povConfig[0].key45 = GLFW_KEY_KP_9;
@@ -900,7 +900,7 @@ GlfwKeyboardJoystick::GlfwKeyboardJoystick(glass::Storage& storage, int index)
     if (m_axisCount == -1 && m_axisStorage.empty()) {
       m_axisCount = 2;
       for (int i = 0; i < 2; ++i) {
-        m_axisStorage.emplace_back(std::make_unique<glass::Storage>());
+        m_axisStorage.emplace_back(std::make_shared<glass::Storage>());
         m_axisConfig.emplace_back(*m_axisStorage.back());
       }
       m_axisConfig[0].incKey = GLFW_KEY_L;
@@ -920,7 +920,7 @@ GlfwKeyboardJoystick::GlfwKeyboardJoystick(glass::Storage& storage, int index)
     if (m_axisCount == -1 && m_axisStorage.empty()) {
       m_axisCount = 2;
       for (int i = 0; i < 2; ++i) {
-        m_axisStorage.emplace_back(std::make_unique<glass::Storage>());
+        m_axisStorage.emplace_back(std::make_shared<glass::Storage>());
         m_axisConfig.emplace_back(*m_axisStorage.back());
       }
       m_axisConfig[0].incKey = GLFW_KEY_RIGHT;
@@ -976,9 +976,9 @@ const char* GlfwKeyboardJoystick::GetKeyName(int key) const {
 }
 
 RobotJoystick::RobotJoystick(glass::Storage& storage)
-    : name{storage.GetString("name")},
-      guid{storage.GetString("guid")},
-      useGamepad{storage.GetBool("useGamepad")} {}
+    : name{storage.Get<std::string>("name")},
+      guid{storage.Get<std::string>("guid")},
+      useGamepad{storage.Get<bool>("useGamepad")} {}
 
 void RobotJoystick::Update() {
   Clear();
@@ -1429,18 +1429,18 @@ void DriverStationGui::GlobalInit() {
   wpi::gui::AddEarlyExecute(DriverStationExecute);
 
   storageRoot.SetCustomApply([&storageRoot] {
-    gpDisableDS = &storageRoot.GetBool("disable", false);
+    gpDisableDS = &storageRoot.Get<bool>("disable", false);
     gpZeroDisconnectedJoysticks =
-        &storageRoot.GetBool("zeroDisconnectedJoysticks", true);
+        &storageRoot.Get<bool>("zeroDisconnectedJoysticks", true);
     gpUseEnableDisableHotkeys =
-        &storageRoot.GetBool("useEnableDisableHotkeys", false);
-    gpUseEstopHotkey = &storageRoot.GetBool("useEstopHotkey", false);
+        &storageRoot.Get<bool>("useEnableDisableHotkeys", false);
+    gpUseEstopHotkey = &storageRoot.Get<bool>("useEstopHotkey", false);
 
     auto& keyboardStorage = storageRoot.GetChildArray("keyboardJoysticks");
     keyboardStorage.resize(4);
     for (int i = 0; i < 4; ++i) {
       if (!keyboardStorage[i]) {
-        keyboardStorage[i] = std::make_unique<glass::Storage>();
+        keyboardStorage[i] = std::make_shared<glass::Storage>();
       }
       gKeyboardJoysticks.emplace_back(
           std::make_unique<GlfwKeyboardJoystick>(*keyboardStorage[i], i));
@@ -1450,7 +1450,7 @@ void DriverStationGui::GlobalInit() {
     robotJoystickStorage.resize(HAL_kMaxJoysticks);
     for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
       if (!robotJoystickStorage[i]) {
-        robotJoystickStorage[i] = std::make_unique<glass::Storage>();
+        robotJoystickStorage[i] = std::make_shared<glass::Storage>();
       }
       gRobotJoysticks.emplace_back(*robotJoystickStorage[i]);
     }
