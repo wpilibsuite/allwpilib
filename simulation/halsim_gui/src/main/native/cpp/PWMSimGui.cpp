@@ -13,7 +13,6 @@
 #include <hal/simulation/PWMData.h>
 
 #include "HALDataSource.h"
-#include "HALSimGui.h"
 
 using namespace halsimgui;
 
@@ -47,7 +46,7 @@ class PWMsSimModel : public glass::PWMsModel {
 
   void Update() override;
 
-  bool Exists() override { return true; }
+  bool Exists() override;
 
   void ForEachPWM(
       wpi::function_ref<void(glass::PWMModel& model, int index)> func) override;
@@ -83,6 +82,15 @@ void PWMsSimModel::Update() {
   }
 }
 
+bool PWMsSimModel::Exists() {
+  for (auto&& model : m_sources) {
+    if (model && model->GetAddressableLED() == -1) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void PWMsSimModel::ForEachPWM(
     wpi::function_ref<void(glass::PWMModel& model, int index)> func) {
   const int32_t numPWM = m_sources.size();
@@ -93,26 +101,6 @@ void PWMsSimModel::ForEachPWM(
   }
 }
 
-static bool PWMsAnyInitialized() {
-  static const int32_t num = HAL_GetNumPWMChannels();
-  for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetPWMInitialized(i)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-void PWMSimGui::Initialize() {
-  HALSimGui::halProvider->Register(
-      "PWM Outputs", PWMsAnyInitialized,
-      [] { return std::make_unique<PWMsSimModel>(); },
-      [](glass::Window* win, glass::Model* model) {
-        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-        win->SetDefaultPos(910, 20);
-        return glass::MakeFunctionView([=] {
-          glass::DisplayPWMs(static_cast<PWMsSimModel*>(model),
-                             HALSimGui::halProvider->AreOutputsEnabled());
-        });
-      });
+glass::PWMsModel* halsimgui::CreatePWMsModel() {
+  return glass::CreateModel<PWMsSimModel>();
 }

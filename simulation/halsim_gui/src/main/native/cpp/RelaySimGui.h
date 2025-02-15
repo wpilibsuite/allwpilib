@@ -4,11 +4,12 @@
 
 #pragma once
 
+namespace glass {
+class RelaysModel;
+}  // namespace glass
+
 namespace halsimgui {
 
-class RelaySimGui {
- public:
-  static void Initialize();
-};
+glass::RelaysModel* CreateRelaysModel();
 
 }  // namespace halsimgui

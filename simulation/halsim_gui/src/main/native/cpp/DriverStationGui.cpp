@@ -12,10 +12,12 @@
 #include <string_view>
 #include <vector>
 
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
 #include <glass/Context.h>
 #include <glass/Storage.h>
+#include <glass/Window.h>
 #include <glass/other/FMS.h>
 #include <glass/support/ExtraGuiWidgets.h>
 #include <glass/support/NameSetting.h>
@@ -276,10 +278,13 @@ static std::vector<RobotJoystick> gRobotJoysticks;
 static std::unique_ptr<JoystickModel> gJoystickSources[HAL_kMaxJoysticks];
 
 // FMS
-static std::unique_ptr<FMSSimModel> gFMSModel;
+static FMSSimModel* gFMSModel;
 
 // Window management
-std::unique_ptr<DSManager> DriverStationGui::dsManager;
+static glass::Window* gFMSWindow;
+static glass::Window* gJoysticksWindow;
+static std::vector<glass::Window*> gKeyboardJoystickWindows;
+static glass::Window* gSystemJoysticksWindow;
 
 static bool* gpDisableDS = nullptr;
 static bool* gpZeroDisconnectedJoysticks = nullptr;
@@ -1261,8 +1266,8 @@ static void DisplaySystemJoysticks() {
       wpi::format_to_n_c_str(buf, sizeof(buf), "{} Settings", joy->GetName());
 
       if (ImGui::MenuItem(buf)) {
-        if (auto win = DriverStationGui::dsManager->GetWindow(buf)) {
-          win->SetVisible(true);
+        if (i < gKeyboardJoystickWindows.size()) {
+          gKeyboardJoystickWindows[i]->SetVisible(true);
         }
         ImGui::CloseCurrentPopup();
       }
@@ -1387,7 +1392,7 @@ static void DisplayJoysticks() {
   ImGui::Columns(1);
 }
 
-void DSManager::DisplayMenu() {
+void halsimgui::DisplayDSMenu() {
   if (gpDSSocketConnected && *gpDSSocketConnected) {
     ImGui::MenuItem("Turn off DS (real DS connected)", nullptr, true, false);
   } else {
@@ -1408,25 +1413,68 @@ void DSManager::DisplayMenu() {
   }
   ImGui::Separator();
 
-  for (auto&& window : m_windows) {
+  gFMSWindow->DisplayMenuItem();
+  gJoysticksWindow->DisplayMenuItem();
+  for (auto window : gKeyboardJoystickWindows) {
     window->DisplayMenuItem();
   }
+  gSystemJoysticksWindow->DisplayMenuItem();
 }
 
-void DriverStationGui::GlobalInit() {
-  auto& storageRoot = glass::GetStorageRoot("ds");
-  dsManager = std::make_unique<DSManager>(storageRoot);
+void halsimgui::DisplayDS() {
+  if (glass::imm::BeginWindow(gFMSWindow)) {
+    if (HALSIM_GetDriverStationDsAttached()) {
+      DisplayFMSReadOnly(gFMSModel);
+    } else {
+      DisplayFMS(gFMSModel, false);
+    }
+  }
+  glass::imm::EndWindow();
 
+  if (glass::imm::BeginWindow(gJoysticksWindow)) {
+    DisplayJoysticks();
+  }
+  glass::imm::EndWindow();
+
+  for (size_t i = 0, end = gKeyboardJoystickWindows.size(); i < end; ++i) {
+    if (glass::imm::BeginWindow(gKeyboardJoystickWindows[i])) {
+      gKeyboardJoysticks[i]->SettingsDisplay();
+    }
+    glass::imm::EndWindow();
+  }
+
+  if (glass::imm::BeginWindow(gSystemJoysticksWindow)) {
+    DisplaySystemJoysticks();
+  }
+  glass::imm::EndWindow();
+}
+
+void halsimgui::InitializeDS() {
   // set up system joysticks (both GLFW and keyboard)
   for (int i = 0; i <= GLFW_JOYSTICK_LAST; ++i) {
     gGlfwJoysticks.emplace_back(std::make_unique<GlfwSystemJoystick>(i));
   }
 
-  dsManager->GlobalInit();
-
-  gFMSModel = std::make_unique<FMSSimModel>();
+  gFMSModel = glass::CreateModel<FMSSimModel>();
 
   wpi::gui::AddEarlyExecute(DriverStationExecute);
+
+  gFMSWindow = glass::imm::CreateWindow("FMS");
+  gFMSWindow->DisableRenamePopup();
+  gFMSWindow->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+  gFMSWindow->SetDefaultPos(5, 540);
+
+  gSystemJoysticksWindow = glass::imm::CreateWindow("System Joysticks");
+  gSystemJoysticksWindow->DisableRenamePopup();
+  gSystemJoysticksWindow->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+  gSystemJoysticksWindow->SetDefaultPos(5, 350);
+
+  gJoysticksWindow = glass::imm::CreateWindow("Joysticks");
+  gJoysticksWindow->DisableRenamePopup();
+  gJoysticksWindow->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+  gJoysticksWindow->SetDefaultPos(250, 465);
+
+  auto& storageRoot = glass::GetStorageRoot("ds");
 
   storageRoot.SetCustomApply([&storageRoot] {
     gpDisableDS = &storageRoot.GetBool("disable", false);
@@ -1456,48 +1504,24 @@ void DriverStationGui::GlobalInit() {
     }
 
     int i = 0;
+    gKeyboardJoystickWindows.clear();
+    gKeyboardJoystickWindows.reserve(gKeyboardJoysticks.size());
     for (auto&& joy : gKeyboardJoysticks) {
-      char label[64];
-      wpi::format_to_n_c_str(label, sizeof(label), "{} Settings",
-                             joy->GetName());
-
-      if (auto win = dsManager->AddWindow(
-              label, [j = joy.get()] { j->SettingsDisplay(); },
-              glass::Window::kHide)) {
-        win->DisableRenamePopup();
-        win->SetDefaultPos(10 + 310 * i++, 50);
-        if (i > 3) {
-          i = 0;
-        }
-        win->SetDefaultSize(300, 560);
+      auto win =
+          glass::imm::CreateWindow(fmt::format("{} Settings", joy->GetName()),
+                                   false, glass::Window::kHide);
+      win->DisableRenamePopup();
+      win->SetDefaultPos(10 + 310 * i++, 50);
+      if (i > 3) {
+        i = 0;
       }
-    }
-    if (auto win = dsManager->AddWindow("FMS", [] {
-          if (HALSIM_GetDriverStationDsAttached()) {
-            DisplayFMSReadOnly(gFMSModel.get());
-          } else {
-            DisplayFMS(gFMSModel.get(), false);
-          }
-        })) {
-      win->DisableRenamePopup();
-      win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-      win->SetDefaultPos(5, 540);
-    }
-    if (auto win =
-            dsManager->AddWindow("System Joysticks", DisplaySystemJoysticks)) {
-      win->DisableRenamePopup();
-      win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-      win->SetDefaultPos(5, 350);
-    }
-    if (auto win = dsManager->AddWindow("Joysticks", DisplayJoysticks)) {
-      win->DisableRenamePopup();
-      win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-      win->SetDefaultPos(250, 465);
+      win->SetDefaultSize(300, 560);
+      gKeyboardJoystickWindows.emplace_back(win);
     }
   });
 
   storageRoot.SetCustomClear([&storageRoot] {
-    dsManager->EraseWindows();
+    gKeyboardJoystickWindows.clear();
     gKeyboardJoysticks.clear();
     gRobotJoysticks.clear();
     storageRoot.GetChildArray("keyboardJoysticks").clear();
@@ -1506,6 +1530,6 @@ void DriverStationGui::GlobalInit() {
   });
 }
 
-void DriverStationGui::SetDSSocketExtension(void* data) {
+void halsimgui::SetDSSocketExtension(void* data) {
   gpDSSocketConnected = static_cast<std::atomic<bool>*>(data);
 }
