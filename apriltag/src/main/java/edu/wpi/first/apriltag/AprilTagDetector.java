@@ -5,7 +5,7 @@
 package edu.wpi.first.apriltag;
 
 import edu.wpi.first.apriltag.jni.AprilTagJNI;
-import org.opencv.core.Mat;
+import edu.wpi.first.util.RawFrame;
 
 /**
  * An AprilTag detector engine. This is expensive to set up and tear down, so most use cases should
@@ -293,11 +293,12 @@ public class AprilTagDetector implements AutoCloseable {
    *
    * <p>The image must be grayscale.
    *
-   * @param img 8-bit OpenCV Mat image
+   * @param frame The frame object containing an 8-bit image.
    * @return Results (array of AprilTagDetection)
    */
-  public AprilTagDetection[] detect(Mat img) {
-    return AprilTagJNI.detect(m_native, img.cols(), img.rows(), (int) img.step1(), img.dataAddr());
+  public AprilTagDetection[] detect(RawFrame frame) {
+    return AprilTagJNI.detect(
+        m_native, frame.getWidth(), frame.getHeight(), frame.getWidth(), frame.getDataPtr());
   }
 
   private long m_native;
