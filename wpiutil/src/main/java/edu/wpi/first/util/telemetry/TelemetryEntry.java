@@ -7,6 +7,10 @@ package edu.wpi.first.util.telemetry;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 
+/**
+ * Interface for individual telemetry entries. Intended for use by backends; most users should use
+ * the TelemetryTable class.
+ */
 public interface TelemetryEntry {
   /** Indicates duplicate values should be preserved. Normally duplicate values are ignored. */
   void keepDuplicates();
