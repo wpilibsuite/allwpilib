@@ -478,6 +478,7 @@ void Analyzer::DisplayFeedforwardParameters(float beginX, float beginY) {
       m_settings.stepTestDuration = units::second_t{m_stepTestDuration};
       PrepareData();
     }
+    CreateTooltip("Determines the duration of data considered for the dynamic tests.");
   }
 }
 
