@@ -22,6 +22,13 @@
 namespace wpi {
 
 class TelemetryEntry;
+class TelemetryTable;
+
+namespace impl {
+template <typename T, typename... I>
+concept IsTelemetryLoggableADL = requires(
+    const T& a, TelemetryTable& table, I... info) { Log(a, table, info...); };
+}  // namespace impl
 
 /**
  * Telemetry sends information from the robot program to dashboards, debug
@@ -99,8 +106,10 @@ class TelemetryTable final {
       Log(name, static_cast<int64_t>(value));
     } else if constexpr (std::is_floating_point_v<T>) {
       Log(name, static_cast<double>(value));
-    } else if (std::derived_from<T, TelemetryLoggable>) {
+    } else if constexpr (std::derived_from<T, TelemetryLoggable>) {
       value.Log(GetTable(name));
+    } else if constexpr (impl::IsTelemetryLoggableADL<T, I...>) {
+      Log(value, GetTable(name), info...);
     } else if constexpr (wpi::StructSerializable<T, I...>) {
       using S = wpi::Struct<T, I...>;
       TelemetryRegistry::AddStructSchema<T>(info...);
