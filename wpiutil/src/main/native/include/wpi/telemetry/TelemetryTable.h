@@ -16,7 +16,6 @@
 #include "wpi/mutex.h"
 #include "wpi/protobuf/Protobuf.h"
 #include "wpi/struct/Struct.h"
-#include "wpi/telemetry/TelemetryLoggable.h"
 #include "wpi/telemetry/TelemetryRegistry.h"
 
 namespace wpi {
@@ -26,8 +25,15 @@ class TelemetryTable;
 
 namespace impl {
 template <typename T, typename... I>
-concept IsTelemetryLoggableADL = requires(
-    const T& a, TelemetryTable& table, I... info) { Log(a, table, info...); };
+concept IsTelemetryLoggableADL =
+    requires(TelemetryTable& table, const T& value, I... info) {
+      Log(table, value, info...);
+    };
+
+template <typename T, typename... I>
+inline void TelemetryLogADL(TelemetryTable& table, const T& value, I... info) {
+  Log(table, value, info...);
+}
 }  // namespace impl
 
 /**
@@ -106,10 +112,8 @@ class TelemetryTable final {
       Log(name, static_cast<int64_t>(value));
     } else if constexpr (std::is_floating_point_v<T>) {
       Log(name, static_cast<double>(value));
-    } else if constexpr (std::derived_from<T, TelemetryLoggable>) {
-      value.Log(GetTable(name));
     } else if constexpr (impl::IsTelemetryLoggableADL<T, I...>) {
-      Log(value, GetTable(name), info...);
+      impl::TelemetryLogADL(GetTable(name), value, info...);
     } else if constexpr (wpi::StructSerializable<T, I...>) {
       using S = wpi::Struct<T, I...>;
       TelemetryRegistry::AddStructSchema<T>(info...);
