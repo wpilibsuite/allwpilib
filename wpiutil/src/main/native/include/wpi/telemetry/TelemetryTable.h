@@ -151,7 +151,6 @@ class TelemetryTable final {
       Log(name, static_cast<double>(value));
     } else {
       // TODO: see if it's convertable with fmt::to_string?
-      // TODO: any option for type handlers ala Java?
       static_assert(false, "Don't know how to serialize type");
     }
   }
