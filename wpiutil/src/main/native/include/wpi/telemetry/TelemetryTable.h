@@ -25,14 +25,25 @@ class TelemetryTable;
 
 namespace impl {
 template <typename T, typename... I>
-concept IsTelemetryLoggableADL =
+concept TelemetryTableLoggableADL =
     requires(TelemetryTable& table, const T& value, I... info) {
       Log(table, value, info...);
     };
 
 template <typename T, typename... I>
+concept TelemetryEntryLoggableADL =
+    requires(TelemetryEntry& entry, const T& value, I... info) {
+      Log(entry, value, info...);
+    };
+
+template <typename T, typename... I>
 inline void TelemetryLogADL(TelemetryTable& table, const T& value, I... info) {
   Log(table, value, info...);
+}
+
+template <typename T, typename... I>
+inline void TelemetryLogADL(TelemetryEntry& entry, const T& value, I... info) {
+  Log(entry, value, info...);
 }
 }  // namespace impl
 
@@ -108,12 +119,10 @@ class TelemetryTable final {
    */
   template <typename T, typename... I>
   void Log(std::string_view name, const T& value, I... info) {
-    if constexpr (std::is_integral_v<T>) {
-      Log(name, static_cast<int64_t>(value));
-    } else if constexpr (std::is_floating_point_v<T>) {
-      Log(name, static_cast<double>(value));
-    } else if constexpr (impl::IsTelemetryLoggableADL<T, I...>) {
+    if constexpr (impl::TelemetryTableLoggableADL<T, I...>) {
       impl::TelemetryLogADL(GetTable(name), value, info...);
+    } else if constexpr (impl::TelemetryEntryLoggableADL<T, I...>) {
+      impl::TelemetryLogADL(GetEntry(name), value, info...);
     } else if constexpr (wpi::StructSerializable<T, I...>) {
       using S = wpi::Struct<T, I...>;
       TelemetryRegistry::AddStructSchema<T>(info...);
@@ -135,6 +144,10 @@ class TelemetryTable final {
       wpi::SmallVector<uint8_t, 128> buf;
       msg.Pack(buf, value);
       LogRaw(name, msg.GetTypeString(), buf);
+    } else if constexpr (std::is_integral_v<T>) {
+      Log(name, static_cast<int64_t>(value));
+    } else if constexpr (std::is_floating_point_v<T>) {
+      Log(name, static_cast<double>(value));
     } else {
       // TODO: see if it's convertable with fmt::to_string?
       // TODO: any option for type handlers ala Java?
