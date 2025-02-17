@@ -9,6 +9,7 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
+  src/main/native/assets/
   src/main/native/resources/
   src/main/native/thirdparty/
   src/main/native/win/wpical.ico
@@ -20,6 +21,7 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
+  ^Eigen/
   ^GLFW
   ^ceres/
   ^fmt/
@@ -30,7 +32,7 @@ includeOtherLibs {
   ^mrcal_wrapper\.h$
   ^opencv2\.h$
   ^portable-file-dialogs\.h$
-  ^tagpose\.h$
+  ^units/
   ^wpi/
   ^wpigui
 }
