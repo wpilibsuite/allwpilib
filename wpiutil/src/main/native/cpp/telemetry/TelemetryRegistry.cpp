@@ -49,7 +49,13 @@ std::shared_ptr<TelemetryBackend> TelemetryRegistry::GetBackend(
 }
 
 TelemetryEntry& TelemetryRegistry::GetEntry(std::string_view path) {
-  return GetBackend(path)->GetEntry(path);
+  Instance& inst = GetInstance();
+  std::scoped_lock lock{inst.mutex};
+  auto backendIt = inst.backends.longest_prefix(path);
+  if (backendIt == inst.backends.end()) {
+    throw std::out_of_range(fmt::format("no backend for path '{}'", path));
+  }
+  return backendIt.value()->GetEntry(path);
 }
 
 TelemetryTable& TelemetryRegistry::GetTable(std::string_view path) {
