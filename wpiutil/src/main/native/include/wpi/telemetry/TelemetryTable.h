@@ -32,18 +32,19 @@ concept TelemetryTableLoggableADL =
 
 template <typename T, typename... I>
 concept TelemetryEntryLoggableADL =
-    requires(TelemetryEntry& entry, const T& value, I... info) {
-      Log(entry, value, info...);
-    };
+    requires(TelemetryTable& table, std::string_view name, const T& value,
+             I... info) { LogEntry(table, name, value, info...); };
 
 template <typename T, typename... I>
-inline void TelemetryLogADL(TelemetryTable& table, const T& value, I... info) {
+inline void TelemetryLogTableADL(TelemetryTable& table, const T& value,
+                                 I... info) {
   Log(table, value, info...);
 }
 
 template <typename T, typename... I>
-inline void TelemetryLogADL(TelemetryEntry& entry, const T& value, I... info) {
-  Log(entry, value, info...);
+inline void TelemetryLogEntryADL(TelemetryTable& table, std::string_view name,
+                                 const T& value, I... info) {
+  LogEntry(table, name, value, info...);
 }
 }  // namespace impl
 
@@ -120,9 +121,9 @@ class TelemetryTable final {
   template <typename T, typename... I>
   void Log(std::string_view name, const T& value, I... info) {
     if constexpr (impl::TelemetryTableLoggableADL<T, I...>) {
-      impl::TelemetryLogADL(GetTable(name), value, info...);
+      impl::TelemetryLogTableADL(GetTable(name), value, info...);
     } else if constexpr (impl::TelemetryEntryLoggableADL<T, I...>) {
-      impl::TelemetryLogADL(GetEntry(name), value, info...);
+      impl::TelemetryLogEntryADL(*this, name, value, info...);
     } else if constexpr (wpi::StructSerializable<T, I...>) {
       using S = wpi::Struct<T, I...>;
       TelemetryRegistry::AddStructSchema<T>(info...);
