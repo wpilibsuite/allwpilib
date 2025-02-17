@@ -79,7 +79,7 @@ else()
         -Wno-missing-field-initializers
     )
 endif()
-target_compile_options(wpical PRIVATE ${compile_flags})
+set_target_properties(${wpical_thirdparty_src} PROPERTIES COMPILE_FLAGS ${compile_flags})
 
 find_package(OpenCV REQUIRED)
 find_package(Ceres CONFIG REQUIRED)
@@ -89,6 +89,7 @@ find_package(SuiteSparse_config CONFIG REQUIRED)
 target_link_libraries(
     wpical
     apriltag
+    wpimath
     ${OpenCV_LIBS}
     wpigui
     wpiutil
@@ -126,6 +127,7 @@ if(WITH_TESTS)
         wpical_test
         googletest
         apriltag
+        wpimath
         ${OpenCV_LIBS}
         wpigui
         wpiutil
