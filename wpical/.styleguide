@@ -21,6 +21,7 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
+  ^Eigen/
   ^GLFW
   ^ceres/
   ^fmt/
@@ -31,6 +32,7 @@ includeOtherLibs {
   ^mrcal_wrapper\.h$
   ^opencv2\.h$
   ^portable-file-dialogs\.h$
+  ^units/
   ^wpi/
   ^wpigui
 }
