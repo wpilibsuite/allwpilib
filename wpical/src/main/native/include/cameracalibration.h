@@ -15,19 +15,15 @@ namespace cameracalibration {
 struct CameraModel {
   Eigen::Matrix<double, 3, 3> intrinsicMatrix;
   Eigen::Matrix<double, 8, 1> distortionCoefficients;
-  double avgReprojectionError;
+  double avgReprojectionError = -1;
 };
 
 std::optional<cameracalibration::CameraModel> calibrate(
     const std::string& input_video, float square_width, float marker_width,
     int board_width, int board_height, bool show_debug_window);
-int calibrate(const std::string& input_video, CameraModel& camera_model,
-              float square_width, float marker_width, int board_width,
-              int board_height, double imagerWidthPixels,
-              double imagerHeightPixels, bool show_debug_window);
 std::optional<cameracalibration::CameraModel> calibrate(
     const std::string& input_video, float square_width, int board_width,
-    int board_height, double imagerWidthPixels, double imagerHeightPixels,
+    int board_height, double imageWidthPixels, double imageHeightPixels,
     bool show_debug_window);
 
 void to_json(wpi::json& json, const CameraModel& cameraModel);
