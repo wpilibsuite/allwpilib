@@ -4,12 +4,16 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 
-#include <wpi/json.h>
+#include <frc/apriltag/AprilTagFieldLayout.h>
+
+#include "cameracalibration.h"
 
 namespace fieldcalibration {
-int calibrate(std::string inputDirPath, wpi::json& output_json,
-              std::string camera_model_path, std::string ideal_map_path,
-              int pinnedTagId, bool showDebugWindow);
+std::optional<frc::AprilTagFieldLayout> calibrate(
+    std::string inputDirPath, cameracalibration::CameraModel& cameraModel,
+    const frc::AprilTagFieldLayout& idealLayout, int pinnedTagId,
+    bool showDebugWindow);
 }  // namespace fieldcalibration
