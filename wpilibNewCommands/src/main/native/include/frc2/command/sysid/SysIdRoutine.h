@@ -27,7 +27,7 @@ class Config {
   ramp_rate_t m_rampRate{1_V / 1_s};
 
   /// The step voltage output used for dynamic test routines.
-  units::volt_t m_stepVoltage{7_V};
+  units::volt_t m_stepVoltage{4_V};
 
   /// Safety timeout for the test routine commands.
   units::second_t m_timeout{10_s};
@@ -53,7 +53,7 @@ class Config {
          std::optional<units::volt_t> stepVoltage,
          std::optional<units::second_t> timeout,
          std::function<void(frc::sysid::State)> recordState)
-      : m_recordState{recordState} {
+      : m_recordState{std::move(recordState)} {
     if (rampRate) {
       m_rampRate = rampRate.value();
     }

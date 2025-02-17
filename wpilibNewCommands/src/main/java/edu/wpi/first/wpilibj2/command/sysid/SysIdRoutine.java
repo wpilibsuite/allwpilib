@@ -91,7 +91,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
         Time timeout,
         Consumer<State> recordState) {
       m_rampRate = rampRate != null ? rampRate : Volts.of(1).per(Second);
-      m_stepVoltage = stepVoltage != null ? stepVoltage : Volts.of(7);
+      m_stepVoltage = stepVoltage != null ? stepVoltage : Volts.of(4);
       m_timeout = timeout != null ? timeout : Seconds.of(10);
       m_recordState = recordState;
     }
