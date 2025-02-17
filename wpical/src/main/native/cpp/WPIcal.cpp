@@ -140,6 +140,21 @@ void FieldLoadingError() {
   }
 }
 
+void MissingTagInField() {
+  if (ImGui::BeginPopupModal("Tag ID Not In Field", NULL,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::Text("This tag is not available in the field.");
+    ImGui::TextWrapped(
+        "Drag another field to this tag or select another tag to drag this "
+        "field to.");
+    ImGui::Separator();
+    if (ImGui::Button("OK", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+}
+
 void CameraCalibrationSelectorButton(
     const char* text, cameracalibration::CameraModel& cameraModel) {
   static std::unique_ptr<pfd::open_file> selector;
@@ -196,13 +211,9 @@ void IdealFieldSelectorButton(const char* text) {
 }
 
 void SaveCalibratedField(const frc::AprilTagFieldLayout& field,
-                         std::string outputName) {
-  static std::unique_ptr<pfd::select_folder> saveDirSelector;
+                         std::string outputName,
+                         std::unique_ptr<pfd::select_folder>& saveDirSelector) {
   static std::string saveDir;
-  if (saveDir.empty() && !saveDirSelector) {
-    saveDirSelector =
-        std::make_unique<pfd::select_folder>("Select Download Folder", "");
-  }
   ProcessDirectorySelector(saveDirSelector, saveDir);
   if (!saveDir.empty()) {
     std::cout << "Saving calibration to " << saveDir << std::endl;
@@ -322,6 +333,8 @@ void CalibrateCamera() {
 void CombineCalibrations() {
   static std::unique_ptr<pfd::open_file> calibratedFieldLayoutMultiselector;
   static std::map<std::string, frc::AprilTagFieldLayout> calibratedFieldLayouts;
+  static std::unique_ptr<pfd::select_folder> saveDirSelector;
+  static std::vector<frc::AprilTag> tags;
   // Maps tag IDs to paths to JSON files containing field layouts
   static std::map<int, std::string> combinerMap;
   static int currentCombinerTagId = 0;
@@ -392,11 +405,15 @@ void CombineCalibrations() {
             if (calibratedFieldLayouts.contains(path) &&
                 calibratedFieldLayouts[path].GetTagPose(tagId)) {
               filePath = path;
+            } else {
+              ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
+              ImGui::OpenPopup("Tag ID Not In Field");
             }
           }
           ImGui::EndDragDropTarget();
         }
       }
+      MissingTagInField();
 
       // Allow users to add tags to the combined field layout
       ImGui::InputInt("Tag ID", &currentCombinerTagId);
@@ -418,19 +435,21 @@ void CombineCalibrations() {
     }
     ImGui::SameLine();
     if (ImGui::Button("Download")) {
-      std::vector<frc::AprilTag> tags;
+      tags.clear();
       for (auto& [tagId, layoutPath] : combinerMap) {
-        // TODO: Don't silently drop the tag
-        auto tagPose = calibratedFieldLayouts[layoutPath].GetTagPose(tagId);
-        if (tagPose) {
-          tags.emplace_back(tagId, tagPose.value());
+        if (layoutPath != "") {
+          auto tagPose = calibratedFieldLayouts[layoutPath].GetTagPose(tagId);
+          if (tagPose) {
+            tags.emplace_back(tagId, tagPose.value());
+          }
         }
       }
-      SaveCalibratedField({tags, gIdealFieldLayout.GetFieldLength(),
-                           gIdealFieldLayout.GetFieldWidth()},
-                          "combined_calibration");
+      saveDirSelector =
+          std::make_unique<pfd::select_folder>("Select Download Directory", "");
     }
-
+    SaveCalibratedField({tags, gIdealFieldLayout.GetFieldLength(),
+                         gIdealFieldLayout.GetFieldWidth()},
+                        "combined_calibration", saveDirSelector);
     ImGui::EndPopup();
   }
 }
@@ -524,6 +543,8 @@ static void DisplayGui() {
   }
   ImGui::EndMenuBar();
 
+  static frc::AprilTagFieldLayout calibratedFieldLayout;
+  static std::unique_ptr<pfd::select_folder> saveDirSelector;
   static std::unique_ptr<pfd::select_folder> fieldVideoDirSelector;
   static std::string fieldVideoDir;
   static int pinnedTag = 1;
@@ -568,14 +589,17 @@ static void DisplayGui() {
       auto layout = fieldcalibration::calibrate(
           fieldVideoDir, gCameraModel, gIdealFieldLayout, pinnedTag, showDebug);
       if (layout) {
-        SaveCalibratedField(layout.value(), "field_calibration");
+        calibratedFieldLayout = *layout;
+        saveDirSelector = std::make_unique<pfd::select_folder>(
+            "Select Download Directory", "");
       } else {
         ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
         ImGui::OpenPopup("Field Calibration Error");
       }
     }
   }
-
+  SaveCalibratedField(calibratedFieldLayout, "field_calibration",
+                      saveDirSelector);
   if (ImGui::Button("Visualize")) {
     ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
     ImGui::OpenPopup("Visualize Calibration");
@@ -668,7 +692,7 @@ int main(int argc, char** argv) {
 
   gui::AddLateExecute(DisplayGui);
 
-  gui::Initialize("wpical", 600, 400);
+  gui::Initialize("wpical", 900, 600);
   gui::Main();
 
   gui::DestroyContext();
