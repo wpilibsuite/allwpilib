@@ -12,6 +12,8 @@
 #include "frc/geometry/Translation2d.h"
 #include "units/length.h"
 #include "units/math.h"
+#include "units/velocity.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
@@ -75,6 +77,28 @@ class WPILIB_DLLEXPORT Translation3d {
    */
   constexpr explicit Translation3d(const Translation2d& translation)
       : Translation3d{translation.X(), translation.Y(), 0_m} {}
+
+  /**
+   * Limits translation velocity.
+   * 
+   * @param current Translation at current timestep.
+   * @param next Translation at next timestep.
+   * @param dt Timestep duration.
+   * @param maxVelocity Maximum translation velocity. Must be positive.
+   */
+  static constexpr Translation3d VelocityCappedTranslation(const Translation3d& current, const Translation3d& next, units::second_t dt, units::velocity_unit auto maxVelocity){
+    if(maxVelocity < 0_mps){
+      wpi::math::MathSharedStore::ReportError(
+        "maxVelocity must be a non-negative number, got {}!", maxVelocity);
+    }
+    Translation3d& diff = next - current;
+    Translation3d& diffNormalized = diff.Norm();
+    if(diffNormalized.m_x < 1e-9_m && diffNormalized.m_y < 1e-9_m && diffNormalized.m_z < 1e-9_m){
+      return next; // need to ignore returning a value from constructor
+    }
+    auto velocity = (diffNormalized.m_x + diffNormalized.m_y + diffNormalized.m_z) / dt;
+    return current + diff * (units::math::min(velocity, maxVelocity) / (diffNormalized.m_x + diffNormalized.m_y + diffNormalized.m_z));
+  }
 
   /**
    * Calculates the distance between two translations in 3D space.
