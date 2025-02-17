@@ -10,7 +10,9 @@
 #include <string>
 #include <vector>
 
+#include <Eigen/Core>
 #include <mrcal_wrapper.h>
+#include <opencv2/core/eigen.hpp>
 #include <opencv2/objdetect/aruco_board.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio.hpp>
@@ -49,10 +51,10 @@ std::optional<cameracalibration::CameraModel> cameracalibration::calibrate(
   // ChArUco Board
   cv::aruco::Dictionary aruco_dict =
       cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_1000);
-  cv::Ptr<cv::aruco::CharucoBoard> charuco_board = new cv::aruco::CharucoBoard(
+  cv::aruco::CharucoBoard charuco_board = cv::aruco::CharucoBoard(
       cv::Size(board_width, board_height), square_width * 0.0254,
       marker_width * 0.0254, aruco_dict);
-  cv::aruco::CharucoDetector charuco_detector(*charuco_board);
+  cv::aruco::CharucoDetector charuco_detector(charuco_board);
 
   // Video capture
   cv::VideoCapture video_capture(input_video);
@@ -96,8 +98,8 @@ std::optional<cameracalibration::CameraModel> cameracalibration::calibrate(
       continue;
     }
 
-    charuco_board->matchImagePoints(charuco_corners, charuco_ids, obj_points,
-                                    img_points);
+    charuco_board.matchImagePoints(charuco_corners, charuco_ids, obj_points,
+                                   img_points);
 
     all_charuco_corners.push_back(charuco_corners);
     all_charuco_ids.push_back(charuco_ids);
@@ -124,20 +126,18 @@ std::optional<cameracalibration::CameraModel> cameracalibration::calibrate(
   // Calibrate
   cv::Mat camera_matrix, dist_coeffs;
   std::vector<cv::Mat> r_vecs, t_vecs;
-  std::vector<double> std_dev_intrinsics, std_dev_extrinsics, per_view_errors;
-  double repError;
+  double reprojError;
 
   try {
     // see https://stackoverflow.com/a/75865177
     int flags = cv::CALIB_RATIONAL_MODEL | cv::CALIB_USE_LU;
-    repError = cv::calibrateCamera(
+    reprojError = cv::calibrateCamera(
         all_obj_points, all_img_points, frame_shape, camera_matrix, dist_coeffs,
         r_vecs, t_vecs, cv::noArray(), cv::noArray(), cv::noArray(), flags);
   } catch (...) {
     std::cout << "calibration failed" << std::endl;
     return std::nullopt;
   }
-
   std::vector<double> matrix = {camera_matrix.begin<double>(),
                                 camera_matrix.end<double>()};
 
@@ -145,7 +145,8 @@ std::optional<cameracalibration::CameraModel> cameracalibration::calibrate(
                                     dist_coeffs.end<double>()};
 
   return CameraModel{Eigen::Matrix<double, 3, 3>(matrix.data()),
-                     Eigen::Matrix<double, 8, 1>(distortion.data()), repError};
+                     Eigen::Matrix<double, 8, 1>(distortion.data()),
+                     reprojError};
 }
 
 cameracalibration::CameraModel MrcalResultToCameraModel(mrcal_result& stats) {
@@ -168,123 +169,9 @@ cameracalibration::CameraModel MrcalResultToCameraModel(mrcal_result& stats) {
           stats.rms_error};
 }
 
-int cameracalibration::calibrate(const std::string& input_video,
-                                 CameraModel& camera_model, float square_width,
-                                 float marker_width, int board_width,
-                                 int board_height, double imagerWidthPixels,
-                                 double imagerHeightPixels,
-                                 bool show_debug_window) {
-  // ChArUco Board
-  cv::aruco::Dictionary aruco_dict =
-      cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_1000);
-  cv::Ptr<cv::aruco::CharucoBoard> charuco_board = new cv::aruco::CharucoBoard(
-      cv::Size(board_width, board_height), square_width * 0.0254,
-      marker_width * 0.0254, aruco_dict);
-  cv::aruco::CharucoDetector charuco_detector(*charuco_board);
-
-  // Video capture
-  cv::VideoCapture video_capture(input_video);
-  cv::Size frame_shape;
-
-  // Detection output
-  std::vector<mrcal_point3_t> observation_boards;
-  std::vector<mrcal_pose_t> frames_rt_toref;
-
-  cv::Size boardSize(board_width - 1, board_height - 1);
-  cv::Size imagerSize(imagerWidthPixels, imagerHeightPixels);
-
-  while (video_capture.grab()) {
-    cv::Mat frame;
-    video_capture.retrieve(frame);
-
-    cv::Mat debug_image = frame;
-
-    if (frame.empty()) {
-      break;
-    }
-
-    // Detect
-    cv::Mat frame_gray;
-    cv::cvtColor(frame, frame_gray, cv::COLOR_BGR2GRAY);
-
-    frame_shape = frame_gray.size();
-
-    std::vector<cv::Point2f> charuco_corners;
-    std::vector<int> charuco_ids;
-    std::vector<std::vector<cv::Point2f>> marker_corners;
-    std::vector<int> marker_ids;
-
-    std::vector<cv::Point3f> obj_points;
-    std::vector<cv::Point2f> img_points;
-
-    std::vector<mrcal_point3_t> points((board_width - 1) * (board_height - 1));
-
-    charuco_detector.detectBoard(frame_gray, charuco_corners, charuco_ids,
-                                 marker_corners, marker_ids);
-
-    if (!filter(charuco_corners, charuco_ids, marker_corners, marker_ids,
-                board_width, board_height)) {
-      continue;
-    }
-
-    charuco_board->matchImagePoints(charuco_corners, charuco_ids, obj_points,
-                                    img_points);
-
-    for (int i = 0; i < charuco_ids.size(); i++) {
-      int id = charuco_ids.at(i);
-      points[id].x = img_points.at(i).x;
-      points[id].y = img_points.at(i).y;
-      points[id].z = 1.0f;
-    }
-
-    for (int i = 0; i < points.size(); i++) {
-      if (points[i].z != 1.0f) {
-        points[i].x = -1.0f;
-        points[i].y = -1.0f;
-        points[i].z = -1.0f;
-      }
-    }
-
-    frames_rt_toref.push_back(
-        getSeedPose(points.data(), boardSize, imagerSize, square_width, 1000));
-    observation_boards.insert(observation_boards.end(), points.begin(),
-                              points.end());
-
-    if (show_debug_window) {
-      cv::aruco::drawDetectedMarkers(debug_image, marker_corners, marker_ids);
-      cv::aruco::drawDetectedCornersCharuco(debug_image, charuco_corners,
-                                            charuco_ids);
-      cv::imshow("Frame", debug_image);
-      if (cv::waitKey(1) == 'q') {
-        break;
-      }
-    }
-  }
-
-  video_capture.release();
-  if (show_debug_window) {
-    cv::destroyAllWindows();
-  }
-
-  if (observation_boards.empty()) {
-    std::cout << "calibration failed" << std::endl;
-    return 1;
-  } else {
-    std::cout << "points detected" << std::endl;
-  }
-
-  std::unique_ptr<mrcal_result> cal_result =
-      mrcal_main(observation_boards, frames_rt_toref, boardSize,
-                 square_width * 0.0254, imagerSize, 1000);
-
-  auto& stats = *cal_result;
-  camera_model = MrcalResultToCameraModel(stats);
-  return 0;
-}
-
 std::optional<cameracalibration::CameraModel> cameracalibration::calibrate(
     const std::string& input_video, float square_width, int board_width,
-    int board_height, double imagerWidthPixels, double imagerHeightPixels,
+    int board_height, double imageWidthPixels, double imageHeightPixels,
     bool show_debug_window) {
   // Video capture
   cv::VideoCapture video_capture(input_video);
@@ -294,7 +181,7 @@ std::optional<cameracalibration::CameraModel> cameracalibration::calibrate(
   std::vector<mrcal_pose_t> frames_rt_toref;
 
   cv::Size boardSize(board_width - 1, board_height - 1);
-  cv::Size imagerSize(imagerWidthPixels, imagerHeightPixels);
+  cv::Size imageSize(imageWidthPixels, imageHeightPixels);
 
   while (video_capture.grab()) {
     cv::Mat frame;
@@ -321,7 +208,7 @@ std::optional<cameracalibration::CameraModel> cameracalibration::calibrate(
             mrcal_point3_t{{corners.at(i).x, corners.at(i).y, 1.0f}});
       }
       frames_rt_toref.push_back(getSeedPose(current_points.data(), boardSize,
-                                            imagerSize, square_width * 0.0254,
+                                            imageSize, square_width * 0.0254,
                                             1000));
       observation_boards.insert(observation_boards.end(),
                                 current_points.begin(), current_points.end());
@@ -329,7 +216,7 @@ std::optional<cameracalibration::CameraModel> cameracalibration::calibrate(
     if (show_debug_window) {
       cv::drawChessboardCorners(frame, boardSize, corners, found);
       cv::imshow("Checkerboard Detection", frame);
-      if (cv::waitKey(30) == 'q') {
+      if (cv::waitKey(1) == 'q') {
         break;
       }
     }
@@ -349,21 +236,21 @@ std::optional<cameracalibration::CameraModel> cameracalibration::calibrate(
 
   std::unique_ptr<mrcal_result> calResult =
       mrcal_main(observation_boards, frames_rt_toref, boardSize,
-                 square_width * 0.0254, imagerSize, 1000);
+                 square_width * 0.0254, imageSize, 1000);
 
   return MrcalResultToCameraModel(*calResult);
 }
 
 void cameracalibration::to_json(wpi::json& json,
                                 const CameraModel& cameraModel) {
-  std::vector<double> camera_matrix(
+  std::vector<double> cameraMatrix(
       cameraModel.intrinsicMatrix.data(),
       cameraModel.intrinsicMatrix.data() + cameraModel.intrinsicMatrix.size());
   std::vector<double> distortionCoefficients(
       cameraModel.distortionCoefficients.data(),
       cameraModel.distortionCoefficients.data() +
           cameraModel.distortionCoefficients.size());
-  json = {{"camera_matrix", camera_matrix},
+  json = {{"camera_matrix", cameraMatrix},
           {"distortion_coefficients", distortionCoefficients},
           {"avg_reprojection_error", cameraModel.avgReprojectionError}};
 }
@@ -371,12 +258,12 @@ void cameracalibration::to_json(wpi::json& json,
 void cameracalibration::from_json(const wpi::json& json,
                                   CameraModel& cameraModel) {
   bool isCalibdb = json.contains("camera");
-  Eigen::Matrix<double, 3, 3> cameraMatrix;
+  Eigen::Matrix3d cameraMatrix;
   if (isCalibdb) {
     auto mat = json.at("camera_matrix");
     if (mat.contains("data")) {
       auto data = mat.at("data").get<std::vector<double>>();
-      cameraMatrix = Eigen::Matrix<double, 3, 3>{data.data()};
+      cameraMatrix = Eigen::Matrix3d{data.data()};
     } else {
       for (int i = 0; i < cameraMatrix.rows(); i++) {
         for (int j = 0; j < cameraMatrix.cols(); j++) {
@@ -386,7 +273,7 @@ void cameracalibration::from_json(const wpi::json& json,
     }
   } else {
     auto mat = json.at("camera_matrix").get<std::vector<double>>();
-    cameraMatrix = Eigen::Matrix<double, 3, 3>{mat.data()};
+    cameraMatrix = Eigen::Matrix3d{mat.data()};
   }
   auto distortionCoefficients =
       json.at("distortion_coefficients").get<std::vector<double>>();
