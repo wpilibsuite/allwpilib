@@ -11,13 +11,17 @@
 #include <string_view>
 #include <type_traits>
 
+#include "wpi/SmallVector.h"
 #include "wpi/StringMap.h"
 #include "wpi/mutex.h"
+#include "wpi/protobuf/Protobuf.h"
+#include "wpi/struct/Struct.h"
+#include "wpi/telemetry/TelemetryLoggable.h"
+#include "wpi/telemetry/TelemetryRegistry.h"
 
 namespace wpi {
 
 class TelemetryEntry;
-class TelemetryRegistry;
 
 /**
  * Telemetry sends information from the robot program to dashboards, debug
@@ -81,145 +85,47 @@ class TelemetryTable final {
    * @param typeString type string
    */
   void SetTypeString(std::string_view name, std::string_view typeString);
-#if 0
+
   /**
-   * Logs a generic object.
+   * Logs an object.
    *
    * @param name the name
    * @param value the value
+   * @param info type parameters for struct serializer (optional)
    */
-  public <T> void log(String name, T value) {
-    if (value instanceof TelemetryLoggable) {
-      ((TelemetryLoggable) value).log(getTable(name));
-    } else if (value instanceof StructSerializable v) {
-      // use introspection to get "struct" static variable
-      Object obj;
-      try {
-        obj = v.getClass().getField("struct").get(null);
-      } catch (NoSuchFieldException e) {
-        // TODO: warn
-        return;
-      } catch (IllegalAccessException e) {
-        // TODO: warn
-        return;
+  template <typename T, typename... I>
+  void Log(std::string_view name, const T& value, I... info) {
+    if constexpr (std::is_integral_v<T>) {
+      Log(name, static_cast<int64_t>(value));
+    } else if constexpr (std::is_floating_point_v<T>) {
+      Log(name, static_cast<double>(value));
+    } else if (std::derived_from<T, TelemetryLoggable>) {
+      value.Log(GetTable(name));
+    } else if constexpr (wpi::StructSerializable<T, I...>) {
+      using S = wpi::Struct<T, I...>;
+      TelemetryRegistry::AddStructSchema<T>(info...);
+      if constexpr (sizeof...(I) == 0) {
+        if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
+          uint8_t buf[S::GetSize()];
+          S::Pack(buf, value);
+          LogRaw(name, S::GetTypeString(), buf);
+          return;
+        }
       }
-      if (obj instanceof Struct<?> s && s.getTypeClass().equals(value.getClass())) {
-        @SuppressWarnings("unchecked")
-        Struct<T> s2 = (Struct<T>) s;
-        log(name, value, s2);
-      } else {
-        // TODO: warn
-      }
-    } else if (value instanceof ProtobufSerializable v) {
-      // use introspection to get "proto" static variable
-      Object obj;
-      try {
-        obj = v.getClass().getField("proto").get(null);
-      } catch (NoSuchFieldException e) {
-        // TODO: warn
-        return;
-      } catch (IllegalAccessException e) {
-        // TODO: warn
-        return;
-      }
-      if (obj instanceof Protobuf<?, ?> s && s.getTypeClass().equals(value.getClass())) {
-        @SuppressWarnings("unchecked")
-        Protobuf<T, ?> s2 = (Protobuf<T, ?>) s;
-        log(name, value, s2);
-      } else {
-        // TODO: warn
-      }
-    } else if (value instanceof Boolean v) {
-      log(name, v.booleanValue());
-    } else if (value instanceof Float v) {
-      log(name, v.floatValue());
-    } else if (value instanceof Double v) {
-      log(name, v.doubleValue());
-    } else if (value instanceof Number v) {
-      log(name, v.longValue());
-    } else if (value instanceof String v) {
-      log(name, v);
+      wpi::SmallVector<uint8_t, 128> buf;
+      buf.resize_for_overwrite(S::GetSize(info...));
+      S::Pack(buf, value, info...);
+      LogRaw(name, S::GetTypeString(info...), buf);
+    } else if constexpr (wpi::ProtobufSerializable<T>) {
+      wpi::ProtobufMessage<T> msg;
+      TelemetryRegistry::AddProtobufSchema<T>(msg);
+      wpi::SmallVector<uint8_t, 128> buf;
+      msg.Pack(buf, value);
+      LogRaw(name, msg.GetTypeString(), buf);
     } else {
-      // try other handlers
-      var handler = TelemetryRegistry.getTypeHandler(value);
-      if (handler.entryHandler() != null) {
-        handler.entryHandler().accept(value, getEntry(name));
-      } else if (handler.tableHandler() != null) {
-        handler.tableHandler().accept(value, getTable(name));
-      } else {
-        // fall back to string
-        log(name, value.toString());
-      }
-    }
-  }
-
-  /**
-   * Logs an object with a Struct serializer.
-   *
-   * @param name the name
-   * @param value the value
-   * @param struct struct serializer
-   */
-  public <T> void log(String name, T value, Struct<T> struct) {
-    getEntry(name).logStruct(value, struct);
-  }
-
-  /**
-   * Logs an object with a Protobuf serializer.
-   *
-   * @param name the name
-   * @param value the value
-   * @param proto protobuf serializer
-   */
-  public <T> void log(String name, T value, Protobuf<T, ?> proto) {
-    getEntry(name).logProtobuf(value, proto);
-  }
-
-  /**
-   * Logs a generic array.
-   *
-   * @param name the name
-   * @param value the value
-   */
-  public <T> void log(String name, T[] value) {
-    if (value instanceof StructSerializable[] v) {
-      // use introspection to get "struct" static variable
-      Object obj;
-      try {
-        obj = v.getClass().getField("struct").get(null);
-      } catch (NoSuchFieldException e) {
-        // TODO: warn
-        return;
-      } catch (IllegalAccessException e) {
-        // TODO: warn
-        return;
-      }
-      if (obj instanceof Struct<?> s
-          && s.getTypeClass().equals(value.getClass().getComponentType())) {
-        @SuppressWarnings("unchecked")
-        Struct<T> s2 = (Struct<T>) s;
-        log(name, value, s2);
-      } else {
-        // TODO: warn
-      }
-      /* TODO:
-      } else if (value instanceof Boolean[] v) {
-        log(name, v.booleanValue());
-      } else if (value instanceof Float[] v) {
-        log(name, v.floatValue());
-      } else if (value instanceof Double[] v) {
-        log(name, v.doubleValue());
-      } else if (value instanceof Number[] v) {
-        log(name, v.longValue());
-      */
-    } else {
-      // TODO: use other Object handler?
-      // fall back to string array
-      String[] strs = new String[value.length];
-      for (int i = 0; i < value.length; i++) {
-        strs[i] = value[i].toString();
-      }
-      log(name, strs);
+      // TODO: see if it's convertable with fmt::to_string?
+      // TODO: any option for type handlers ala Java?
+      static_assert(false, "Don't know how to serialize type");
     }
   }
 
@@ -230,16 +136,19 @@ class TelemetryTable final {
    * @param value the value
    * @param struct struct serializer
    */
-  public <T> void log(String name, T[] value, Struct<T> struct) {
-    getEntry(name).logStructArray(value, struct);
-  }
-#endif
-  template <typename T>
-  void Log(std::string_view name, T value) {
-    if constexpr (std::is_integral_v<T>) {
-      Log(name, static_cast<int64_t>(value));
-    } else if constexpr (std::is_floating_point_v<T>) {
-      Log(name, static_cast<double>(value));
+  template <typename T, typename... I>
+  void Log(std::string_view name, std::span<const T> value, I... info) {
+    if constexpr (wpi::StructSerializable<T, I...>) {
+      TelemetryRegistry::AddStructSchema<T>(info...);
+      using S = wpi::Struct<T, I...>;
+      wpi::StructArrayBuffer<T, I...> buf;
+      buf.Write(
+          value,
+          [&](auto bytes) { LogRaw(name, S::GetTypeString(info...), bytes); },
+          info...);
+    } else {
+      // TODO: see if it's convertable with fmt::to_string?
+      static_assert(false, "Don't know how to serialize type");
     }
   }
 
@@ -378,6 +287,16 @@ class TelemetryTable final {
    * @param value the value
    */
   void Log(std::string_view name, std::span<const std::string_view> value);
+
+  /**
+   * Logs a byte array (raw value) with type string matching.
+   *
+   * @param name the name
+   * @param typeString the type string
+   * @param value the value
+   */
+  void LogRaw(std::string_view name, std::string_view typeString,
+              std::span<const uint8_t> value);
 
  private:
   /**

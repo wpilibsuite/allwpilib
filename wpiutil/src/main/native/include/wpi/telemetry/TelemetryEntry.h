@@ -55,27 +55,21 @@ class TelemetryEntry {
    *
    * @param value the value
    */
-  virtual void LogInt8(int8_t value) {
-    LogInt64(value);
-  }
+  virtual void LogInt8(int8_t value) { LogInt64(value); }
 
   /**
    * Logs a short.
    *
    * @param value the value
    */
-  virtual void LogInt16(int16_t value) {
-    LogInt64(value);
-  }
+  virtual void LogInt16(int16_t value) { LogInt64(value); }
 
   /**
    * Logs an int.
    *
    * @param value the value
    */
-  virtual void LogInt32(int32_t value) {
-    LogInt64(value);
-  }
+  virtual void LogInt32(int32_t value) { LogInt64(value); }
 
   /**
    * Logs a long.
@@ -174,6 +168,15 @@ class TelemetryEntry {
    * @param value the value
    */
   virtual void LogStringArray(std::span<const std::string_view> value) = 0;
+
+  /**
+   * Logs a byte array (raw value) with type string matching.
+   *
+   * @param typeString the type string
+   * @param value the value
+   */
+  virtual void LogRaw(std::string_view typeString,
+                      std::span<const uint8_t> value) = 0;
 };
 
 }  // namespace wpi
