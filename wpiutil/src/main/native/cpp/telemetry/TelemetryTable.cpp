@@ -112,6 +112,11 @@ void TelemetryTable::Log(std::string_view name,
   GetEntry(name).LogStringArray(value);
 }
 
+void TelemetryTable::LogRaw(std::string_view name, std::string_view typeString,
+                            std::span<const uint8_t> value) {
+  GetEntry(name).LogRaw(typeString, value);
+}
+
 TelemetryEntry& TelemetryTable::GetEntry(std::string_view name) {
   std::scoped_lock lock{m_mutex};
   auto& entry = m_entriesMap[name];
