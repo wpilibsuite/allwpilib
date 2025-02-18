@@ -11,6 +11,7 @@
 #include <numeric>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <units/time.h>
@@ -35,6 +36,7 @@ class AnalysisManager {
   // This contains data for each test (e.g. quasistatic-forward,
   // quasistatic-backward, etc) indexed by test name
   TestData m_data;
+  int m_selectedRun = 0;
   /**
    * Represents settings for an instance of the analysis manager. This contains
    * information about the feedback controller preset, loop type, velocity
@@ -327,6 +329,22 @@ class AnalysisManager {
 
   bool HasData() const { return !m_originalDataset.empty(); }
 
+  
+
+  /**
+ * Error for if a test contains multiple runs.
+ */
+class MultipleRunsError : public std::exception {
+  public:
+   explicit MultipleRunsError(std::string test, MotorData  data)
+       : testName(std::move(test)), data(std::move(data)) {
+        
+       }
+ 
+   std::string testName;
+   MotorData data;
+ };
+
  private:
   wpi::Logger& m_logger;
 
@@ -345,8 +363,8 @@ class AnalysisManager {
   units::second_t m_maxStepTime{std::numeric_limits<double>::infinity()};
   std::vector<units::second_t> m_positionDelays;
   std::vector<units::second_t> m_velocityDelays;
-  bool m_runSelector = false;
 
   void PrepareGeneralData();
+  std::vector<PreparedData> ConvertToPrepared(const MotorData& data, std::string testName);
 };
 }  // namespace sysid

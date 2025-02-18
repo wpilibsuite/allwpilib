@@ -16,7 +16,6 @@
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 
-#include "imgui.h"
 #include "sysid/analysis/FeedforwardAnalysis.h"
 #include "sysid/analysis/FilteringUtils.h"
 #include "sysid/analysis/Storage.h"
@@ -59,31 +58,16 @@ static double Lerp(units::second_t time,
  *
  * @return A PreparedData vector
  */
-static std::vector<PreparedData> ConvertToPrepared(const MotorData& data, std::string testName) {
+std::vector<PreparedData> AnalysisManager::ConvertToPrepared(const MotorData& data, std::string testName) {
   std::vector<PreparedData> prepared;
-  int selectedRun = 0;
+
   // do we have just one run?
   if (data.runs.size() > 1) {
-    // prompt the user to pick one
-    ImGui::OpenPopup("Test Run Selector");
-  }
-
-  if (ImGui::BeginPopupModal("Test Run Selector")) {
-    ImGui::Text("You have multiple runs of the %s test. Please select a run to use for analysis.", testName.c_str());
-    for (size_t i = 0; i < data.runs.size(); i++) {
-      ImGui::Separator();
-      units::second_t duration = data.runs[i].voltage.end()->time - data.runs[i].voltage.begin()->time;
-      ImGui::Text("Run %zu: Duration: %fs", i, duration.value());
-      if (ImGui::Button("Select Run")) {
-        selectedRun = i;
-        ImGui::CloseCurrentPopup();
-      }
-    }
-    ImGui::EndPopup(); 
+    throw AnalysisManager::MultipleRunsError{testName, data};
   }
 
   // assume we've selected down to a single contiguous run by this point
-  auto run = data.runs[selectedRun];
+  auto run = data.runs[m_selectedRun];
 
   for (int i = 0; i < static_cast<int>(run.voltage.size()) - 1; ++i) {
     const auto& currentVoltage = run.voltage[i];

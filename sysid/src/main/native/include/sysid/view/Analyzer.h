@@ -21,6 +21,7 @@
 #include "sysid/analysis/AnalysisManager.h"
 #include "sysid/analysis/FeedbackAnalysis.h"
 #include "sysid/analysis/FeedbackControllerPreset.h"
+#include "sysid/analysis/Storage.h"
 #include "sysid/view/AnalyzerPlot.h"
 
 struct ImPlotPoint;
@@ -48,7 +49,8 @@ class Analyzer : public glass::View {
     kTestDurationError,
     kGeneralDataError,
     kMissingTestsError,
-    kFileError
+    kFileError,
+    kMultipleRuns
   };
   /**
    * The different motor controller timing presets that can be used.
@@ -201,6 +203,10 @@ class Analyzer : public glass::View {
    */
   void HandleError(std::string_view msg);
 
+  void HandleMultipleRuns(std::string testName, MotorData data, bool multipleRuns);
+
+  double GetRunDuration(MotorData::Run run);
+
   // State of the Display GUI
   AnalyzerState m_state = AnalyzerState::kWaitingForData;
 
@@ -212,6 +218,9 @@ class Analyzer : public glass::View {
 
   // This is true if the error popup needs to be displayed
   bool m_errorPopup = false;
+  bool m_multipleRunsPopup = false;
+  MotorData m_currentData;
+  std::string m_currentTest;
 
   // Everything related to feedback controller calculations.
   AnalysisManager::Settings m_settings;
