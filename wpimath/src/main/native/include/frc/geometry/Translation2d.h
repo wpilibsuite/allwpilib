@@ -65,31 +65,6 @@ class WPILIB_DLLEXPORT Translation2d {
       : m_x{units::meter_t{vector.x()}}, m_y{units::meter_t{vector.y()}} {}
 
   /**
-   * Limits translation velocity.
-   *
-   * @param current Translation at current timestep.
-   * @param next Translation at next timestep.
-   * @param dt Timestep duration.
-   * @param maxVelocity Maximum translation velocity. Must be positive.
-   * @throws IllegalArgumentException for maxVelocity &lt; zero.
-   */
-  static constexpr Translation2d VelocityCappedTranslation(const Translation2d& current,
-                          const Translation2d& next, units::second_t dt,
-                          units::velocity_unit auto maxVelocity) {
-    if (maxVelocity < 0_mps) {
-      wpi::math::MathSharedStore::ReportError(
-          "maxVelocity must be a non-negative number, got {}!", maxVelocity);
-    }
-    Translation2d& diff = next - current;
-    Translation2d& diffNormalized = diff.Norm();
-    if (diffNormalized.m_x < 1e-9_m && diffNormalized.m_y < 1e-9_m) {
-      return next;
-    }
-    auto velocity = (diffNormalized.m_x + diffNormalized.m_y) / dt;
-    return current + diff * (units::math::min(velocity, maxVelocity) / (diffNormalized.m_x + diffNormalized.m_y));
-  }
-
-  /**
    * Calculates the distance between two translations in 2D space.
    *
    * The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²).
@@ -182,6 +157,33 @@ class WPILIB_DLLEXPORT Translation2d {
                 other.X(),
             (m_x - other.X()) * rot.Sin() + (m_y - other.Y()) * rot.Cos() +
                 other.Y()};
+  }
+
+  /**
+   * Limits translation velocity.
+   *
+   * @param current Translation at current timestep.
+   * @param next Translation at next timestep.
+   * @param dt Timestep duration.
+   * @param maxVelocity Maximum translation velocity.
+   */
+  static constexpr Translation2d SlewRateLimit(const Translation2d& current,
+                              const Translation2d& next, units::second_t dt,
+                              units::velocity_unit auto maxVelocity) {
+    if (maxVelocity < 0_mps) {
+      wpi::math::MathSharedStore::ReportError(
+        "maxVelocity must be a non-negative number, got {}!", maxVelocity);
+    }
+
+    auto diff = next - current;
+    auto norm = diff.Norm();
+
+    if (norm < 1e-9_m) {
+      return next;
+    }
+
+    auto velocity = norm / dt;
+    return current + diff * (units::math::min(velocity, maxVelocity).value() / norm.value());
   }
 
   /**

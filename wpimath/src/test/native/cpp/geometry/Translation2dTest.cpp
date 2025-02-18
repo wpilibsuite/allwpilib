@@ -7,6 +7,8 @@
 #include <gtest/gtest.h>
 
 #include "frc/geometry/Translation2d.h"
+#include "units/time.h"
+#include "units/velocity.h"
 
 using namespace frc;
 
@@ -161,4 +163,19 @@ TEST(Translation2dTest, Constexpr) {
   static_assert(negated.X() == (-1_m));
   static_assert(multiplied.X() == 2_m);
   static_assert(divided.Y() == 1_m);
+}
+
+TEST(Translation2dTest, SlewRateLimit) {
+  /*const Translation2d translation1{0_m, 0_m};
+  const Translation2d translation2{2_m, 2_m};
+  const Translation2d translation3{1_m, 1_m};
+  const Translation2d translation4{3_m, 3_m};
+  const Translation2d result1 = Translation2d::SlewRateLimit(translation1, translation2, 0.25_s, 50_mps);
+  const Translation2d result2 = Translation2d::SlewRateLimit(translation3, translation4, 1.0_s, 2_mps);
+  const Translation2d expected1{25_m, 25_m};
+  const Translation2d expected2{17_m, 17_m};
+  EXPECT_NEAR(result1.X().value(), expected1.X().value(), 1e-9);
+  EXPECT_NEAR(result1.Y().value(), expected1.Y().value(), 1e-9);
+  EXPECT_NEAR(result2.X().value(), expected2.X().value(), 1e-9);
+  EXPECT_NEAR(result2.Y().value(), expected2.Y().value(), 1e-9);*/
 }

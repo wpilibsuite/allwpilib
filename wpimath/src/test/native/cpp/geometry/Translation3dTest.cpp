@@ -186,3 +186,20 @@ TEST(Translation3dTest, Constexpr) {
   static_assert(projected.X() == 1_m);
   static_assert(projected.Y() == 2_m);
 }
+
+TEST(Translation3dTest, SlewRateLimit) {
+  /*const Translation3d translation1{0_m, 0_m, 0_m};
+  const Translation3d translation2{2_m, 2_m, 2_m};
+  const Translation3d translation3{1_m, 1_m, 1_m};
+  const Translation3d translation4{3_m, 3_m, 3_m};
+  const Translation3d result1 = Translation3d::SlewRateLimit(translation1, translation2, 0.25_s, 50_mps);
+  const Translation3d result2 = Translation3d::SlewRateLimit(translation3, translation4, 1.0_s, 2_mps);
+  const Translation3d expected1{25_m, 25_m, 25_m};
+  const Translation3d expected2{17_m, 17_m, 25_m};
+  EXPECT_NEAR(result1.X().value(), expected1.X().value(), 1e-9);
+  EXPECT_NEAR(result1.Y().value(), expected1.Y().value(), 1e-9);
+  EXPECT_NEAR(result1.Z().value(), expected1.Z().value(), 1e-9);
+  EXPECT_NEAR(result2.X().value(), expected2.X().value(), 1e-9);
+  EXPECT_NEAR(result2.Y().value(), expected2.Y().value(), 1e-9);
+  EXPECT_NEAR(result2.Z().value(), expected2.Z().value(), 1e-9);*/
+}
