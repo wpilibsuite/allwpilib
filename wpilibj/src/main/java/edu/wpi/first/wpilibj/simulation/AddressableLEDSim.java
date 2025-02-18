@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.AddressableLEDDataJNI;
 import edu.wpi.first.hal.simulation.ConstBufferCallback;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.AddressableLED;
 import java.util.NoSuchElementException;
