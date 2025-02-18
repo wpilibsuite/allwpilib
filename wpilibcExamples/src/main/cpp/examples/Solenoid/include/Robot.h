@@ -49,7 +49,8 @@ class Robot : public frc::TimedRobot {
   // DoubleSolenoid corresponds to a double solenoid.
   // In this case, it's connected to channels 1 and 2 of a PH with the default
   // CAN ID.
-  frc::DoubleSolenoid m_doubleSolenoid{0, frc::PneumaticsModuleType::REVPH, 1, 2};
+  frc::DoubleSolenoid m_doubleSolenoid{0, frc::PneumaticsModuleType::REVPH, 1,
+                                       2};
 
   // Compressor connected to a PH with a default CAN ID
   frc::Compressor m_compressor{0, frc::PneumaticsModuleType::REVPH};
