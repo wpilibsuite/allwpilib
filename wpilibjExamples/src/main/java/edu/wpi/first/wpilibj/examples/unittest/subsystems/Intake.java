@@ -17,6 +17,7 @@ public class Intake implements AutoCloseable {
     m_motor = new PWMSparkMax(IntakeConstants.kMotorPort);
     m_piston =
         new DoubleSolenoid(
+          0,
             PneumaticsModuleType.CTREPCM,
             IntakeConstants.kPistonFwdChannel,
             IntakeConstants.kPistonRevChannel);
