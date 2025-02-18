@@ -42,6 +42,10 @@ model {
                                 into '/'
                             }
 
+                            from(file("$rootDir/wpical/WPICalThirdPartyNotices.txt")) {
+                                into '/'
+                            }
+
                             if (binary.targetPlatform.operatingSystem.isWindows()) {
                                 def exePath = binary.executable.file.absolutePath
                                 exePath = exePath.substring(0, exePath.length() - 4)
