@@ -20,7 +20,7 @@ endif()
 # Set default build type to release with debug info (i.e. release mode optimizations
 # are performed, but debug info still exists).
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "" FORCE)
 endif()
 
 cmake_minimum_required(VERSION 3.21)

@@ -191,6 +191,13 @@ void DataSelector::Reset() {
 
 DataSelector::Tests DataSelector::LoadTests(
     const glass::DataLogReaderEntry& testStateEntry) {
+
+  // struct SysidTestTimeRange {
+  //   std::string state;
+  //   int64_t start;
+  //   int64_t end;
+  // };
+
   Tests tests;
   for (auto&& range : testStateEntry.ranges) {
     std::string_view prevState;

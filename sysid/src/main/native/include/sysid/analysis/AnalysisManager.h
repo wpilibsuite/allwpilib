@@ -345,6 +345,7 @@ class AnalysisManager {
   units::second_t m_maxStepTime{std::numeric_limits<double>::infinity()};
   std::vector<units::second_t> m_positionDelays;
   std::vector<units::second_t> m_velocityDelays;
+  bool m_runSelector = false;
 
   void PrepareGeneralData();
 };
