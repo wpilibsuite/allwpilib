@@ -25,7 +25,7 @@ namespace frc2 {
  * std::unique_ptr<Command>, use CommandPtr::Unwrap to convert.
  * CommandPtr::UnwrapVector does the same for vectors.
  */
-class CommandPtr final {
+class [[nodiscard]] CommandPtr final {
  public:
   explicit CommandPtr(std::unique_ptr<Command>&& command);
 
@@ -46,7 +46,6 @@ class CommandPtr final {
    *
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr Repeatedly() &&;
 
   /**
@@ -60,7 +59,6 @@ class CommandPtr final {
    * @return the decorated command
    * @see ProxyCommand
    */
-  [[nodiscard]]
   CommandPtr AsProxy() &&;
 
   /**
@@ -69,7 +67,6 @@ class CommandPtr final {
    * @param doesRunWhenDisabled true to run when disabled
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr IgnoringDisable(bool doesRunWhenDisabled) &&;
 
   /**
@@ -78,7 +75,6 @@ class CommandPtr final {
    * @param interruptBehavior the desired interrupt behavior
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr WithInterruptBehavior(
       Command::InterruptionBehavior interruptBehavior) &&;
 
@@ -89,7 +85,6 @@ class CommandPtr final {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr AndThen(std::function<void()> toRun,
                      Requirements requirements = {}) &&;
 
@@ -101,7 +96,6 @@ class CommandPtr final {
    * @param next the commands to run next
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr AndThen(CommandPtr&& next) &&;
 
   /**
@@ -111,7 +105,6 @@ class CommandPtr final {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr BeforeStarting(std::function<void()> toRun,
                             Requirements requirements = {}) &&;
 
@@ -122,7 +115,6 @@ class CommandPtr final {
    * @param before the command to run before this one
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr BeforeStarting(CommandPtr&& before) &&;
 
   /**
@@ -133,7 +125,6 @@ class CommandPtr final {
    * @param duration the timeout duration
    * @return the command with the timeout added
    */
-  [[nodiscard]]
   CommandPtr WithTimeout(units::second_t duration) &&;
 
   /**
@@ -144,7 +135,6 @@ class CommandPtr final {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  [[nodiscard]]
   CommandPtr Until(std::function<bool()> condition) &&;
 
   /**
@@ -155,7 +145,6 @@ class CommandPtr final {
    * @param condition the run condition
    * @return the command with the run condition added
    */
-  [[nodiscard]]
   CommandPtr OnlyWhile(std::function<bool()> condition) &&;
 
   /**
@@ -167,7 +156,6 @@ class CommandPtr final {
    * @param condition the condition that will prevent the command from running
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr Unless(std::function<bool()> condition) &&;
 
   /**
@@ -179,7 +167,6 @@ class CommandPtr final {
    * @param condition the condition that will allow the command to run
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr OnlyIf(std::function<bool()> condition) &&;
 
   /**
@@ -201,7 +188,7 @@ class CommandPtr final {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  [[nodiscard]] [[deprecated("Replace with DeadlineFor")]]
+  [[deprecated("Replace with DeadlineFor")]]
   CommandPtr DeadlineWith(CommandPtr&& parallel) &&;
 
   /**
@@ -214,7 +201,6 @@ class CommandPtr final {
    * will be interupted when the deadline command ends
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr DeadlineFor(CommandPtr&& parallel) &&;
   /**
    * Decorates this command with a set of commands to run parallel to it, ending
@@ -224,7 +210,6 @@ class CommandPtr final {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr AlongWith(CommandPtr&& parallel) &&;
 
   /**
@@ -235,7 +220,6 @@ class CommandPtr final {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr RaceWith(CommandPtr&& parallel) &&;
 
   /**
@@ -246,7 +230,6 @@ class CommandPtr final {
    * command was interrupted
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr FinallyDo(std::function<void(bool)> end) &&;
 
   /**
@@ -258,7 +241,6 @@ class CommandPtr final {
    * interrupted.
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr FinallyDo(std::function<void()> end) &&;
 
   /**
@@ -268,7 +250,6 @@ class CommandPtr final {
    * @param handler a lambda to run when the command is interrupted
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
@@ -278,7 +259,6 @@ class CommandPtr final {
    * @param name name
    * @return the decorated Command
    */
-  [[nodiscard]]
   CommandPtr WithName(std::string_view name) &&;
 
   /**
