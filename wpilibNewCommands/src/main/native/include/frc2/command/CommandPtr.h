@@ -25,7 +25,8 @@ namespace frc2 {
  * std::unique_ptr<Command>, use CommandPtr::Unwrap to convert.
  * CommandPtr::UnwrapVector does the same for vectors.
  */
-class [[nodiscard]] CommandPtr final {
+class [[nodiscard]]
+CommandPtr final {
  public:
   explicit CommandPtr(std::unique_ptr<Command>&& command);
 
