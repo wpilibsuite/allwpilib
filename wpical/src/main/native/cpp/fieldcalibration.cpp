@@ -245,8 +245,14 @@ inline bool ProcessVideoFile(
       }
     }
     std::array<double, 8> cornerBuf;
-    Eigen::Matrix4d cameraToTagMin = EstimateTagPose(
-        tagDetectionMin->GetCorners(cornerBuf), cameraModel, tagSize);
+    Eigen::Matrix4d cameraToTagMin;
+    try {
+      cameraToTagMin = EstimateTagPose(tagDetectionMin->GetCorners(cornerBuf),
+                                       cameraModel, tagSize);
+    } catch (...) {
+      // SQPNP failed, probably because the camera model is bad
+      return false;
+    }
 
     // Find transformation from smallest tag ID
     for (auto detection : results) {
@@ -257,9 +263,14 @@ inline bool ProcessVideoFile(
       }
       std::array<double, 8> corners;
       // Estimate camera to tag pose
-      Eigen::Matrix4d cameraToTag =
-          EstimateTagPose(detection->GetCorners(corners), cameraModel, tagSize);
-
+      Eigen::Matrix4d cameraToTag;
+      try {
+        cameraToTag = EstimateTagPose(detection->GetCorners(corners),
+                                      cameraModel, tagSize);
+      } catch (...) {
+        // SQPNP failed, probably because the camera model is bad
+        return false;
+      }
       // Draw debug cube
       if (showDebugWindow) {
         DrawTagCube(frameDebug, cameraToTag, cameraModel, tagSize);
