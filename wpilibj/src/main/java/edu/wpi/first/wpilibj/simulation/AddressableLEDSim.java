@@ -213,7 +213,7 @@ public class AddressableLEDSim {
   /**
    * Change the LED data.
    *
-   * @param data the new data
+   * @param buffer the new data buffer
    */
   public void setData(AddressableLEDBuffer buffer) {
     setData(buffer.getBytes());
