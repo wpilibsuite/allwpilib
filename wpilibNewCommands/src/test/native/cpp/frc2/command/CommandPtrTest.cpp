@@ -38,5 +38,5 @@ TEST_F(CommandPtrTest, MovedFrom) {
 }
 
 TEST_F(CommandPtrTest, NullInitialization) {
-  EXPECT_THROW(CommandPtr{std::unique_ptr<Command>{}}, frc::RuntimeError);
+  EXPECT_THROW(auto cmd = CommandPtr{std::unique_ptr<Command>{}}, frc::RuntimeError);
 }
