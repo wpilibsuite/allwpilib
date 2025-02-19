@@ -124,4 +124,12 @@ public @interface Logged {
    *     for all logged fields and methods in an annotated class
    */
   Naming defaultNaming() default Naming.USE_CODE_NAME;
+
+  /**
+   * Class-level only: if {@link #strategy()} is {@link Strategy#OPT_OUT}, this can be used to quiet
+   * the warnings that are printed for non-loggable fields and methods detected within the class.
+   *
+   * @return true if warnings should be printed, or false if warnings should not be printed
+   */
+  boolean warnForNonLoggableTypes() default false;
 }
