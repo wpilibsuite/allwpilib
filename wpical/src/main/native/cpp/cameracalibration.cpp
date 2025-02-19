@@ -259,11 +259,14 @@ void cameracalibration::from_json(const wpi::json& json,
                                   CameraModel& cameraModel) {
   bool isCalibdb = json.contains("camera");
   Eigen::Matrix3d cameraMatrix;
+  std::vector<double> distortionCoeffs;
+  auto mat = json.at("camera_matrix");
+  auto distortionCoefficients = json.at("distortion_coefficients");
   if (isCalibdb) {
-    auto mat = json.at("camera_matrix");
+    // OpenCV format has data key
     if (mat.contains("data")) {
       auto data = mat.at("data").get<std::vector<double>>();
-      cameraMatrix = Eigen::Matrix3d{data.data()};
+      cameraMatrix = Eigen::Matrix<double, 3, 3, Eigen::RowMajor>{data.data()};
     } else {
       for (int i = 0; i < cameraMatrix.rows(); i++) {
         for (int j = 0; j < cameraMatrix.cols(); j++) {
@@ -271,18 +274,23 @@ void cameracalibration::from_json(const wpi::json& json,
         }
       }
     }
-  } else {
-    auto mat = json.at("camera_matrix").get<std::vector<double>>();
-    cameraMatrix = Eigen::Matrix3d{mat.data()};
-  }
-  auto distortionCoefficients =
-      json.at("distortion_coefficients").get<std::vector<double>>();
-  std::vector<double> vec(8, 0);
-  for (int i = 0; i < vec.size(); i++) {
-    if (i < distortionCoefficients.size()) {
-      vec[i] = distortionCoefficients[i];
+
+    // OpenCV format has data key
+    if (distortionCoefficients.contains("data")) {
+      distortionCoeffs =
+          distortionCoefficients.at("data").get<std::vector<double>>();
+    } else {
+      distortionCoeffs = distortionCoefficients.get<std::vector<double>>();
     }
+  } else {
+    cameraMatrix = Eigen::Matrix<double, 3, 3, Eigen::RowMajor>{
+        mat.get<std::vector<double>>().data()};
+    distortionCoeffs = distortionCoefficients.get<std::vector<double>>();
   }
-  cameraModel = {cameraMatrix, Eigen::Matrix<double, 8, 1>{vec.data()},
+  // CalibDB generates JSONs with 5 values. Just zero out the remaining 3 to get
+  // it to 8
+  distortionCoeffs.resize(8, 0);
+  cameraModel = {cameraMatrix,
+                 Eigen::Matrix<double, 8, 1>{distortionCoeffs.data()},
                  json.at("avg_reprojection_error")};
 }
