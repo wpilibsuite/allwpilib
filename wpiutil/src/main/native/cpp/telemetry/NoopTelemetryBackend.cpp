@@ -10,6 +10,7 @@ using namespace wpi;
 
 namespace {
 class Entry : public TelemetryEntry {
+ public:
   void KeepDuplicates() override {}
 
   void SetProperty(std::string_view key, std::string_view value) override {}
