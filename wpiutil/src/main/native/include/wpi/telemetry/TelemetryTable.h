@@ -10,6 +10,9 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <vector>
+
+#include <fmt/format.h>
 
 #include "wpi/SmallVector.h"
 #include "wpi/StringMap.h"
@@ -34,6 +37,9 @@ template <typename T, typename... I>
 concept TelemetryEntryLoggableADL =
     requires(TelemetryTable& table, std::string_view name, const T& value,
              I... info) { LogEntry(table, name, value, info...); };
+
+template <typename T>
+concept StringConvertible = requires(const T& value) { fmt::to_string(value); };
 
 template <typename T, typename... I>
 inline void TelemetryLogTableADL(TelemetryTable& table, const T& value,
@@ -149,8 +155,9 @@ class TelemetryTable final {
       Log(name, static_cast<int64_t>(value));
     } else if constexpr (std::is_floating_point_v<T>) {
       Log(name, static_cast<double>(value));
+    } else if constexpr (impl::StringConvertible<T>) {
+      Log(name, fmt::to_string(value));
     } else {
-      // TODO: see if it's convertable with fmt::to_string?
       static_assert(false, "Don't know how to serialize type");
     }
   }
@@ -172,8 +179,14 @@ class TelemetryTable final {
           value,
           [&](auto bytes) { LogRaw(name, S::GetTypeString(info...), bytes); },
           info...);
+    } else if constexpr (impl::StringConvertible<T>) {
+      std::vector<std::string> strings;
+      strings.reserve(value.size());
+      for (auto&& v : value) {
+        strings.emplace_back(fmt::to_string(value));
+      }
+      Log(name, strings);
     } else {
-      // TODO: see if it's convertable with fmt::to_string?
       static_assert(false, "Don't know how to serialize type");
     }
   }
