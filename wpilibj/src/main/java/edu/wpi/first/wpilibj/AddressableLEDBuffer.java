@@ -90,7 +90,11 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
     return new AddressableLEDBufferView(this, startingIndex, endingIndex);
   }
 
-  /** Returns the internal byte array of the buffer */
+  /**
+   * Returns the internal byte array of the buffer
+   *
+   * @return internal buffer byte array
+   */
   public byte[] getBytes() {
     return m_buffer;
   }
