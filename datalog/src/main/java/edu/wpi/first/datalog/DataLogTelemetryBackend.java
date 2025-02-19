@@ -13,11 +13,18 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+/** A telemetry backend that sends logged data to a DataLog. */
 public class DataLogTelemetryBackend implements TelemetryBackend {
   private final DataLog m_log;
   private final String m_prefix;
-  private static final Map<String, Entry> s_entries = new HashMap<>();
+  private final Map<String, Entry> m_entries = new HashMap<>();
 
+  /**
+   * Construct.
+   *
+   * @param log datalog
+   * @param prefix prefix to put in front of logged path in data log
+   */
   public DataLogTelemetryBackend(DataLog log, String prefix) {
     m_log = log;
     m_prefix = prefix;
@@ -25,18 +32,18 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
   @Override
   public void close() {
-    synchronized (s_entries) {
-      for (Entry entry : s_entries.values()) {
+    synchronized (m_entries) {
+      for (Entry entry : m_entries.values()) {
         entry.close();
       }
-      s_entries.clear();
+      m_entries.clear();
     }
   }
 
   @Override
   public TelemetryEntry getEntry(String name) {
-    synchronized (s_entries) {
-      return s_entries.computeIfAbsent(name, k -> new Entry(m_log, m_prefix + k));
+    synchronized (m_entries) {
+      return m_entries.computeIfAbsent(name, k -> new Entry(m_log, m_prefix + k));
     }
   }
 
