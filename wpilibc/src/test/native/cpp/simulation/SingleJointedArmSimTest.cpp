@@ -21,3 +21,12 @@ TEST(SingleJointedArmTest, Disabled) {
   // The arm should swing down.
   EXPECT_NEAR(sim.GetAngle().value(), -std::numbers::pi / 2, 0.01);
 }
+
+TEST(SingleJointedArmTest, InitialState) {
+  constexpr auto startingAngle = 45_deg;
+  frc::sim::SingleJointedArmSim sim(frc::DCMotor::KrakenX60(2), 125, 3_kg_sq_m,
+                                    30_in, 0_deg, 90_deg, true, startingAngle);
+
+  EXPECT_EQ(startingAngle, sim.GetAngle());
+  EXPECT_DOUBLE_EQ(0, sim.GetVelocity().value());
+}
