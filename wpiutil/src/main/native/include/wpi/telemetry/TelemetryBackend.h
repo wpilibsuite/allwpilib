@@ -16,6 +16,7 @@ class TelemetryEntry;
 /** Interface for telemetry backends. */
 class TelemetryBackend {
  public:
+  TelemetryBackend() = default;
   virtual ~TelemetryBackend() = default;
   TelemetryBackend(const TelemetryBackend&) = delete;
   TelemetryBackend& operator=(const TelemetryBackend&) = delete;
