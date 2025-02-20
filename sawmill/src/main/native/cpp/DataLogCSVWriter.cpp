@@ -16,7 +16,7 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include <wpi/DataLogReaderThread.h>
+#include <wpi/datalog/DataLogReaderThread.h>
 #include <wpi/DenseMap.h>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/SmallVector.h>

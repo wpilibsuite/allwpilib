@@ -13,8 +13,8 @@
 #include <vector>
 
 #include <fmt/base.h>
-#include <wpi/DataLogReader.h>
-#include <wpi/DataLogReaderThread.h>
+#include <wpi/datalog/DataLogReader.h>
+#include <wpi/datalog/DataLogReaderThread.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
@@ -42,7 +42,7 @@ void LogLoader::Load(fs::path logPath) {
     return;
   }
   unload();  // release the actual file, we have the data in the reader now
-  m_reader = std::make_unique<wpi::DataLogReaderThread>(std::move(reader));
+  m_reader = std::make_unique<wpi::log::DataLogReaderThread>(std::move(reader));
 
   // Handle Errors
   fmt::println("{}", m_error);

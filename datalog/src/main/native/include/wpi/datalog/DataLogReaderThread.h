@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/DataLogReader.h>
+#include <wpi/datalog/DataLogReader.h>
 #include <wpi/DenseMap.h>
 #include <wpi/Signal.h>
 #include <wpi/mutex.h>

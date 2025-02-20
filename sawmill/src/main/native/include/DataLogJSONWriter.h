@@ -8,7 +8,7 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/DataLogReaderThread.h>
+#include <wpi/datalog/DataLogReaderThread.h>
 #include <wpi/fs.h>
 
 #include "DataLogExport.h"

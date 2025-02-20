@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <wpi/DataLogReaderThread.h>
+#include <wpi/datalog/DataLogReaderThread.h>
 
 namespace sawmill {
 struct Entry {

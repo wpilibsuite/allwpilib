@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include <wpi/DataLogReader.h>
+#include <wpi/datalog/DataLogReader.h>
 #include <wpi/Signal.h>
 #include <wpi/fs.h>
 
@@ -20,7 +20,7 @@ namespace glass {
 class Storage;
 }  // namespace glass
 
-namespace wpi {
+namespace wpi::log {
 class DataLogReaderEntry;
 class DataLogReaderThread;
 class Logger;
@@ -53,7 +53,7 @@ class LogLoader {
 
  private:
   std::string m_filename;
-  std::unique_ptr<wpi::DataLogReaderThread> m_reader;
+  std::unique_ptr<wpi::log::DataLogReaderThread> m_reader;
 
   std::string m_error;
 

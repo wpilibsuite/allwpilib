@@ -24,7 +24,7 @@ add_executable(sawmill ${sawmill_src} ${sawmill_resources_src} ${sawmill_rc} ${A
 
 target_include_directories(sawmill PUBLIC src/main/native/include)
 
-target_link_libraries(sawmill PRIVATE wpiutil)
+target_link_libraries(sawmill PRIVATE wpiutil datalog)
 
 if(WIN32)
     set_target_properties(sawmill PROPERTIES WIN32_EXECUTABLE YES)

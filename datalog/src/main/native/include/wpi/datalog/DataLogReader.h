@@ -9,7 +9,6 @@
 #include <iterator>
 #include <memory>
 #include <span>
-#include <utility>
 #include <vector>
 
 #include <wpi/MemoryBuffer.h>

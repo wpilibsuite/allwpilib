@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include <wpi/DataLogReaderThread.h>
+#include <wpi/datalog/DataLogReaderThread.h>
 #include <wpi/fs.h>
 #include <wpi/json.h>
 
