@@ -261,10 +261,7 @@ constexpr Translation3d SlewRateLimit(
   if (dist < 1e-9_m) {
     return next;
   }
-  units::meters_per_second_t velocity = dist / dt;
-  if (velocity > maxVelocity) {
-    velocity = maxVelocity;
-  }
+  units::meters_per_second_t = units::math::min(dist / dt, maxVelocity);
   return current + diff * (velocity.value() / dist.value());
 }
 
