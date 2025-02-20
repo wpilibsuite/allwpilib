@@ -231,8 +231,7 @@ constexpr Translation2d SlewRateLimit(const Translation2d& current,
   }
   Translation2d diff = next - current;
   units::meter_t dist = diff.Norm();
-  diff.m_x /= dist.value();
-  diff.m_y /= dist.value();
+  Translation2d unitTranslation{diff.X() / dist.value(), diff.Y() / dist.value()};
   if (dist < 1e-9_m) {
     return next;
   }
@@ -241,9 +240,7 @@ constexpr Translation2d SlewRateLimit(const Translation2d& current,
     velocity = maxVelocity;
   }
   dist = velocity * dt;
-  diff.m_x *= dist.value() / 2;
-  diff.m_y *= dist.value() / 2;
-  return diff;
+  return Translation2d{unitTranslation.X() * (dist.value() / 2), unitTranslation.Y() * (dist.value() / 2)};
 }
 
 /**
@@ -263,9 +260,7 @@ constexpr Translation3d SlewRateLimit(
   }
   Translation3d diff = next - current;
   units::meter_t dist = diff.Norm();
-  diff.m_x /= dist.value();
-  diff.m_y /= dist.value();
-  diff.m_z /= dist.value();
+  Translation3d unitTranslation{diff.X() / dist.value(), diff.Y() / dist.value(), diff.Z() / dist.value()};
   if (dist < 1e-9_m) {
     return next;
   }
@@ -274,10 +269,7 @@ constexpr Translation3d SlewRateLimit(
     velocity = maxVelocity;
   }
   dist = velocity * dt;
-  diff.m_x *= dist.value() / 3;
-  diff.m_y *= dist.value() / 3;
-  diff.m_z *= dist.value() / 3;
-  return diff;
+  return Translation3d{unitTranslation.X() * (dist.value() / 3), unitTranslation.Y() * (dist.value() / 3), unitTranslation.Z() * (dist.value() / 3)};
 }
 
 }  // namespace frc
