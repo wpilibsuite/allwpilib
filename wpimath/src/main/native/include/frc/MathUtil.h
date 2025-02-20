@@ -234,10 +234,7 @@ constexpr Translation2d SlewRateLimit(const Translation2d& current,
   if (dist < 1e-9_m) {
     return next;
   }
-  units::meters_per_second_t velocity = dist / dt;
-  if (velocity > maxVelocity) {
-    velocity = maxVelocity;
-  }
+  units::meters_per_second_t velocity = units::math::min(dist / dt, maxVelocity);
   return current + diff * (velocity.value() / dist.value());
 }
 

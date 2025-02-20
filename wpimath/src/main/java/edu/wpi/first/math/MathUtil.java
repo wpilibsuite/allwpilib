@@ -257,10 +257,7 @@ public final class MathUtil {
     if (dist < 1e-9) {
       return next;
     }
-    double velocity = dist / dt;
-    if (velocity > maxVelocity) {
-      velocity = maxVelocity;
-    }
+    double velocity = Math.min(dist / dt, maxVelocity);
     return current.plus(diff.times(velocity / dist));
   }
 }
