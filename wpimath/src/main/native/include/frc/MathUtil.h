@@ -259,7 +259,7 @@ constexpr Translation3d SlewRateLimit(
     return next;
   }
   units::meters_per_second_t = units::math::min(dist / dt, maxVelocity);
-  return current + diff * (velocity.value() / dist.value());
+  return current + diff * (velocity / dist).value();
 }
 
 }  // namespace frc
