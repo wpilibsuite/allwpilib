@@ -231,7 +231,6 @@ constexpr Translation2d SlewRateLimit(const Translation2d& current,
   }
   Translation2d diff = next - current;
   units::meter_t dist = diff.Norm();
-  Translation2d unitTranslation{diff.X() / dist.value(), diff.Y() / dist.value()};
   if (dist < 1e-9_m) {
     return next;
   }
@@ -239,8 +238,7 @@ constexpr Translation2d SlewRateLimit(const Translation2d& current,
   if (velocity > maxVelocity) {
     velocity = maxVelocity;
   }
-  dist = velocity * dt;
-  return Translation2d{unitTranslation.X() * (dist.value() / 2), unitTranslation.Y() * (dist.value() / 2)};
+  return current + diff * (velocity.value() / dist.value());
 }
 
 /**
@@ -260,7 +258,6 @@ constexpr Translation3d SlewRateLimit(
   }
   Translation3d diff = next - current;
   units::meter_t dist = diff.Norm();
-  Translation3d unitTranslation{diff.X() / dist.value(), diff.Y() / dist.value(), diff.Z() / dist.value()};
   if (dist < 1e-9_m) {
     return next;
   }
@@ -268,8 +265,7 @@ constexpr Translation3d SlewRateLimit(
   if (velocity > maxVelocity) {
     velocity = maxVelocity;
   }
-  dist = velocity * dt;
-  return Translation3d{unitTranslation.X() * (dist.value() / 3), unitTranslation.Y() * (dist.value() / 3), unitTranslation.Z() * (dist.value() / 3)};
+  return current + diff * (velocity.value() / dist.value());
 }
 
 }  // namespace frc
