@@ -164,14 +164,3 @@ TEST(Translation2dTest, Constexpr) {
   static_assert(multiplied.X() == 2_m);
   static_assert(divided.Y() == 1_m);
 }
-
-TEST(Translation2dTest, SlewRateLimit) {
-  const Translation2d translation1{0_m, 0_m};
-  const Translation2d translation2{2_m, 2_m};
-  const Translation2d result1 = Translation2d::SlewRateLimit(translation1, translation2, 0.25_s, 50_mps);
-  const Translation2d result2 = Translation2d::SlewRateLimit(translation1, translation2, 1_s, 2_mps);
-  const Translation2d expected1{2_m, 2_m};
-  const Translation2d expected2{1_m, 1_m};
-  //EXPECT_EQ(result1, expected1);
-  //EXPECT_EQ(result2, expected2);
-}

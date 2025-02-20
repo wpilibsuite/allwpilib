@@ -7,6 +7,11 @@
 #include <gtest/gtest.h>
 
 #include "frc/MathUtil.h"
+#include "frc/geometry/Translation3d.h"
+#include "frc/geometry/Translation2d.h"
+#include "units/time.h"
+#include "units/velocity.h"
+#include "units/length.h"
 #include "units/angle.h"
 
 #define EXPECT_UNITS_EQ(a, b) EXPECT_DOUBLE_EQ((a).value(), (b).value())
@@ -163,4 +168,28 @@ TEST(MathUtilTest, IsNear) {
   EXPECT_FALSE(frc::IsNear(400, -315, 5, 0, 360));
   EXPECT_FALSE(frc::IsNear(400, 395, 5, 0, 360));
   EXPECT_FALSE(frc::IsNear(0_deg, -4_deg, 2.5_deg, 0_deg, 360_deg));
+}
+
+TEST(MathUtilTest, Translation2dSlewRateLimit) {
+  const Translation2d translation1{0_m, 0_m};
+  const Translation2d translation2{2_m, 2_m};
+  const Translation2d result1 = Translation2d::SlewRateLimit(translation1, translation2, 0.25_s, 50_mps);
+  const Translation2d result2 = Translation2d::SlewRateLimit(translation1, translation2, 1_s, 2_mps);
+  const Translation2d expected1{2_m, 2_m};
+  const Translation2d expected2{1_m, 1_m};
+  //EXPECT_EQ(result1, expected1);
+  //EXPECT_EQ(result2, expected2);
+}
+
+TEST(MathUtilTest, Translation3dSlewRateLimit) {
+  const Translation3d translation1{0_m, 0_m, 0_m};
+  const Translation3d translation2{2_m, 2_m, 2_m};
+  const Translation3d translation3{1_m, 1_m, 1_m};
+  const Translation3d translation4{3_m, 3_m, 3_m};
+  const Translation3d result1 = Translation3d::SlewRateLimit(translation1, translation2, 0.25_s, 50.0_mps);
+  const Translation3d result2 = Translation3d::SlewRateLimit(translation3, translation4, 1.0_s, 2.0_mps);
+  const Translation3d expected1{2_m, 2_m, 2_m};
+  const Translation3d expected2{0.666666666666666666667_m, 0.666666666666666666667_m, 0.666666666666666666667_m};
+  //EXPECT_EQ(result1, expected1);
+  //EXPECT_EQ(result2, expected2);
 }

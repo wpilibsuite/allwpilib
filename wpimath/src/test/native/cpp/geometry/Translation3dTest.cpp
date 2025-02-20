@@ -186,16 +186,3 @@ TEST(Translation3dTest, Constexpr) {
   static_assert(projected.X() == 1_m);
   static_assert(projected.Y() == 2_m);
 }
-
-TEST(Translation3dTest, SlewRateLimit) {
-  const Translation3d translation1{0_m, 0_m, 0_m};
-  const Translation3d translation2{2_m, 2_m, 2_m};
-  const Translation3d translation3{1_m, 1_m, 1_m};
-  const Translation3d translation4{3_m, 3_m, 3_m};
-  const Translation3d result1 = Translation3d::SlewRateLimit(translation1, translation2, 0.25_s, 50.0_mps);
-  const Translation3d result2 = Translation3d::SlewRateLimit(translation3, translation4, 1.0_s, 2.0_mps);
-  const Translation3d expected1{2_m, 2_m, 2_m};
-  const Translation3d expected2{0.666666666666666666667_m, 0.666666666666666666667_m, 0.666666666666666666667_m};
-  //EXPECT_EQ(result1, expected1);
-  //EXPECT_EQ(result2, expected2);
-}
