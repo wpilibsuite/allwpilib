@@ -178,10 +178,10 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
   Translation3d translation4 = new Translation3d(3, 3, 3);
   Translation3d result1 = MathUtil.SlewRateLimit(translation1, translation2, 0.25, 50);
   Translation3d result2 = MathUtil.SlewRateLimit(translation3, translation4, 1, 2);
-  Translation3d expected1 = new Translation3d(2, 2, 2);
-  Translation3d expected2 = new Translation3d(0.666666666666666666667, 0.666666666666666666667, 0.666666666666666666667);
-  assertEquals(result1, expected1);
-  assertEquals(result2, expected2);
+  Translation3d expected1 = new Translation3d(8, 8, 8);
+  Translation3d expected2 = new Translation3d(2.154700538, 2.154700538, 2.154700538);
+  assertEquals(expected1, result1);
+  assertEquals(expected2, result2);
   }
 
   @Test
@@ -192,9 +192,9 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
     Translation2d translation4 = new Translation2d(3, 3);
     Translation2d result1 = MathUtil.SlewRateLimit(translation1, translation2, 0.25, 50);
     Translation2d result2 = MathUtil.SlewRateLimit(translation3, translation4, 1, 2);
-    Translation2d expected1 = new Translation2d(2, 2);
-    Translation2d expected2 = new Translation2d(1, 1);
-    assertEquals(result1, expected1);
-    assertEquals(result2, expected2);
+    Translation2d expected1 = new Translation2d(8, 8);
+    Translation2d expected2 = new Translation2d(2.414213562, 2.414213562);
+    assertEquals(expected1, result1);
+    assertEquals(expected2, result2);
   }
 }

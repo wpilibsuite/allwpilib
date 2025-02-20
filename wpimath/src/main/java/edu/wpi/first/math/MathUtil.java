@@ -219,17 +219,13 @@ public final class MathUtil {
  * @param dt Timestep duration.
  * @param maxVelocity Maximum translation velocity.
  */
-  public static Translation2d SlewRateLimit(Translation2d current,
-                                      Translation2d next,
-                                      double dt,
-                                      double maxVelocity) {
+  public static Translation2d SlewRateLimit(Translation2d current, Translation2d next, double dt, double maxVelocity) {
   if (maxVelocity < 0) {
     Exception e = new IllegalArgumentException();
     MathSharedStore.reportError("maxVelocity must be a non-negative number, got " + maxVelocity, e.getStackTrace());
   }
   Translation2d diff = next.minus(current);
   double dist = diff.getNorm();
-  Translation2d unitTranslation = new Translation2d(diff.getX() / dist, diff.getY() / dist);
   if (dist < 1e-9) {
     return next;
   }
@@ -237,9 +233,8 @@ public final class MathUtil {
   if (velocity > maxVelocity) {
     velocity = maxVelocity;
   }
-  dist = velocity * dt;
-  return new Translation2d(unitTranslation.getX() * (dist / 2), unitTranslation.getY() * (dist / 2));
-}
+  return current.plus(diff.times(velocity / dist));
+  }
 
   /**
  * Limits translation velocity.
@@ -249,26 +244,21 @@ public final class MathUtil {
  * @param dt Timestep duration.
  * @param maxVelocity Maximum translation velocity.
  */
-  public static Translation3d SlewRateLimit(Translation3d current,
-  Translation3d next,
-  double dt,
-  double maxVelocity) {
+  public static Translation3d SlewRateLimit(Translation3d current, Translation3d next, double dt, double maxVelocity) {
   if (maxVelocity < 0) {
-  Exception e = new IllegalArgumentException();
-  MathSharedStore.reportError("maxVelocity must be a non-negative number, got " + maxVelocity, e.getStackTrace());
+    Exception e = new IllegalArgumentException();
+    MathSharedStore.reportError("maxVelocity must be a non-negative number, got " + maxVelocity, e.getStackTrace());
   }
   Translation3d diff = next.minus(current);
   double dist = diff.getNorm();
-  Translation3d unitTranslation = new Translation3d(diff.getX() / dist, diff.getY() / dist, diff.getZ() / dist);
   if (dist < 1e-9) {
-  return next;
+    return next;
   }
   double velocity = dist / dt;
   if (velocity > maxVelocity) {
-  velocity = maxVelocity;
+    velocity = maxVelocity;
   }
-  dist = velocity * dt;
-  return new Translation3d(unitTranslation.getX() * (dist / 3), unitTranslation.getY() * (dist / 3), unitTranslation.getZ() * (dist / 3));
+  return current.plus(diff.times(velocity / dist));
   }
 
 }
