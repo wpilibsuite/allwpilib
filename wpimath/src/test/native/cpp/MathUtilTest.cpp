@@ -173,8 +173,8 @@ TEST(MathUtilTest, IsNear) {
 TEST(MathUtilTest, Translation2dSlewRateLimit) {
   const frc::Translation2d translation1{0_m, 0_m};
   const frc::Translation2d translation2{2_m, 2_m};
-  const frc::Translation3d translation3{1_m, 1_m};
-  const frc::Translation3d translation4{3_m, 3_m};
+  const frc::Translation2d translation3{1_m, 1_m};
+  const frc::Translation2d translation4{3_m, 3_m};
   const frc::Translation2d result1 = frc::SlewRateLimit(translation1, translation2, 0.25_s, 50_mps);
   const frc::Translation2d result2 = frc::SlewRateLimit(translation3, translation4, 1_s, 2_mps);
   const frc::Translation2d expected1{8_m, 8_m};
