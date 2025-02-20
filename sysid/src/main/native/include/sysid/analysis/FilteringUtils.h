@@ -41,7 +41,7 @@ class InvalidDataError : public std::exception {
    */
   explicit InvalidDataError(std::string_view message) {
     m_message = fmt::format(
-        "{}. Please verify that your units and data is reasonable and then "
+        "{} Please verify that your units and data is reasonable and then "
         "adjust your velocity threshold, test duration, and/or window size to "
         "try to fix this issue.",
         message);
