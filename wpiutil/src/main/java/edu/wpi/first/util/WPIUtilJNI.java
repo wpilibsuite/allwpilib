@@ -222,24 +222,6 @@ public class WPIUtilJNI {
   public static native int[] waitForObjectsTimeout(int[] handles, double timeout)
       throws InterruptedException;
 
-  /**
-   * Create a native FileLogger. When the specified file is modified, appended data will be appended
-   * to the specified data log.
-   *
-   * @param file path to the file
-   * @param log data log implementation handle
-   * @param key log key to append data to
-   * @return The FileLogger handle.
-   */
-  public static native long createFileLogger(String file, long log, String key);
-
-  /**
-   * Free a native FileLogger. This causes the FileLogger to stop appending data to the log.
-   *
-   * @param fileTail The FileLogger handle.
-   */
-  public static native void freeFileLogger(long fileTail);
-
   /** Utility class. */
   protected WPIUtilJNI() {}
 }

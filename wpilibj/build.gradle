@@ -69,6 +69,7 @@ dependencies {
     implementation project(':wpimath')
     implementation project(':ntcore')
     implementation project(':cscore')
+    api project(':datalog')
     implementation project(':cameraserver')
     testImplementation 'org.mockito:mockito-core:4.1.0'
     devImplementation sourceSets.main.output
