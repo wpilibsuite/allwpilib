@@ -34,19 +34,10 @@ class DataLogTelemetryBackend::Entry : public TelemetryEntry {
     // TODO
   }
 
-  void SetTypeString(std::string_view typeString) override {
-    std::scoped_lock lock{m_mutex};
-    if (m_typeString == typeString) {
-      return;
-    }
-    // TODO
-  }
-
   template <typename EntryType, typename T>
   void Log(T value) {
     std::scoped_lock lock{m_mutex};
     if (std::holds_alternative<std::monostate>(m_entry)) {
-      m_typeString = EntryType::kDataType;
       m_entry = EntryType{m_log, m_path, m_properties};
     }
     if (auto entry = std::get_if<EntryType>(&m_entry)) {
@@ -64,9 +55,7 @@ class DataLogTelemetryBackend::Entry : public TelemetryEntry {
   void LogTypeString(T value, std::string_view typeString) {
     std::scoped_lock lock{m_mutex};
     if (std::holds_alternative<std::monostate>(m_entry)) {
-      if (m_typeString.empty()) {
-        m_typeString = typeString;
-      }
+      m_typeString = typeString;
       m_entry = EntryType{m_log, m_path, m_properties, m_typeString};
     }
     if (auto entry = std::get_if<EntryType>(&m_entry);
@@ -95,9 +84,8 @@ class DataLogTelemetryBackend::Entry : public TelemetryEntry {
     Log<wpi::log::DoubleLogEntry>(value);
   }
 
-  void LogString(std::string_view value) override {
-    LogTypeString<wpi::log::StringLogEntry>(
-        value, wpi::log::StringLogEntry::kDataType);
+  void LogString(std::string_view value, std::string_view typeString) override {
+    LogTypeString<wpi::log::StringLogEntry>(value, typeString);
   }
 
   void LogBooleanArray(std::span<const bool> value) override {
@@ -106,11 +94,6 @@ class DataLogTelemetryBackend::Entry : public TelemetryEntry {
 
   void LogBooleanArray(std::span<const int> value) override {
     Log<wpi::log::BooleanArrayLogEntry>(value);
-  }
-
-  void LogByteArray(std::span<const uint8_t> value) override {
-    LogTypeString<wpi::log::RawLogEntry>(value,
-                                         wpi::log::RawLogEntry::kDataType);
   }
 
   void LogInt16Array(std::span<const int16_t> value) override {
@@ -141,8 +124,8 @@ class DataLogTelemetryBackend::Entry : public TelemetryEntry {
     Log<wpi::log::StringArrayLogEntry>(value);
   }
 
-  void LogRaw(std::string_view typeString,
-              std::span<const uint8_t> value) override {
+  void LogRaw(std::span<const uint8_t> value,
+              std::string_view typeString) override {
     LogTypeString<wpi::log::RawLogEntry>(value, typeString);
   }
 

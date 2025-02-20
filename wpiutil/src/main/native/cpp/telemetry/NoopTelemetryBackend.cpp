@@ -15,8 +15,6 @@ class Entry : public TelemetryEntry {
 
   void SetProperty(std::string_view key, std::string_view value) override {}
 
-  void SetTypeString(std::string_view typeString) override {}
-
   void LogBoolean(bool value) override {}
 
   void LogInt64(int64_t value) override {}
@@ -25,13 +23,12 @@ class Entry : public TelemetryEntry {
 
   void LogDouble(double value) override {}
 
-  void LogString(std::string_view value) override {}
+  void LogString(std::string_view value, std::string_view typeString) override {
+  }
 
   void LogBooleanArray(std::span<const bool> value) override {}
 
   void LogBooleanArray(std::span<const int> value) override {}
-
-  void LogByteArray(std::span<const uint8_t> value) override {}
 
   void LogInt16Array(std::span<const int16_t> value) override {}
 
@@ -47,8 +44,8 @@ class Entry : public TelemetryEntry {
 
   void LogStringArray(std::span<const std::string_view> value) override {}
 
-  void LogRaw(std::string_view typeString,
-              std::span<const uint8_t> value) override {}
+  void LogRaw(std::span<const uint8_t> value,
+              std::string_view typeString) override {}
 };
 }  // namespace
 

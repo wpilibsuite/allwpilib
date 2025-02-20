@@ -110,14 +110,6 @@ class TelemetryTable final {
                    std::string_view value);
 
   /**
-   * Sets custom data type for a value. Generally not necessary.
-   *
-   * @param name the name
-   * @param typeString type string
-   */
-  void SetTypeString(std::string_view name, std::string_view typeString);
-
-  /**
    * Logs an object.
    *
    * @param name the name
@@ -137,20 +129,20 @@ class TelemetryTable final {
         if constexpr (wpi::is_constexpr([] { S::GetSize(); })) {
           uint8_t buf[S::GetSize()];
           S::Pack(buf, value);
-          LogRaw(name, S::GetTypeString(), buf);
+          Log(name, buf, S::GetTypeString());
           return;
         }
       }
       wpi::SmallVector<uint8_t, 128> buf;
       buf.resize_for_overwrite(S::GetSize(info...));
       S::Pack(buf, value, info...);
-      LogRaw(name, S::GetTypeString(info...), buf);
+      Log(name, buf, S::GetTypeString(info...));
     } else if constexpr (wpi::ProtobufSerializable<T>) {
       wpi::ProtobufMessage<T> msg;
       TelemetryRegistry::AddProtobufSchema<T>(msg);
       wpi::SmallVector<uint8_t, 128> buf;
       msg.Pack(buf, value);
-      LogRaw(name, msg.GetTypeString(), buf);
+      Log(name, buf, msg.GetTypeString());
     } else if constexpr (std::is_integral_v<T>) {
       Log(name, static_cast<int64_t>(value));
     } else if constexpr (std::is_floating_point_v<T>) {
@@ -177,7 +169,7 @@ class TelemetryTable final {
       wpi::StructArrayBuffer<T, I...> buf;
       buf.Write(
           value,
-          [&](auto bytes) { LogRaw(name, S::GetTypeString(info...), bytes); },
+          [&](auto bytes) { Log(name, bytes, S::GetTypeString(info...)); },
           info...);
     } else if constexpr (impl::StringConvertible<T>) {
       std::vector<std::string> strings;
@@ -256,20 +248,22 @@ class TelemetryTable final {
   void Log(std::string_view name, std::string_view value);
 
   /**
+   * Logs a String with a custom type string.
+   *
+   * @param name the name
+   * @param value the value
+   * @param typeString the type string
+   */
+  void Log(std::string_view name, std::string_view value,
+           std::string_view typeString);
+
+  /**
    * Logs a boolean array.
    *
    * @param name the name
    * @param value the value
    */
   void Log(std::string_view name, std::span<const bool> value);
-
-  /**
-   * Logs a byte array (raw value).
-   *
-   * @param name the name
-   * @param value the value
-   */
-  void Log(std::string_view name, std::span<const uint8_t> value);
 
   /**
    * Logs a short array.
@@ -328,14 +322,22 @@ class TelemetryTable final {
   void Log(std::string_view name, std::span<const std::string_view> value);
 
   /**
-   * Logs a byte array (raw value) with type string matching.
+   * Logs a raw value (byte array).
    *
    * @param name the name
-   * @param typeString the type string
    * @param value the value
    */
-  void LogRaw(std::string_view name, std::string_view typeString,
-              std::span<const uint8_t> value);
+  void Log(std::string_view name, std::span<const uint8_t> value);
+
+  /**
+   * Logs a raw value (byte array) with custom type string.
+   *
+   * @param name the name
+   * @param value the value
+   * @param typeString the type string
+   */
+  void Log(std::string_view name, std::span<const uint8_t> value,
+           std::string_view typeString);
 
  private:
   /**

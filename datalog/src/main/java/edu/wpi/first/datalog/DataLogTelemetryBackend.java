@@ -101,16 +101,6 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       }
     }
 
-    @Override
-    public void setTypeString(String typeString) {
-      synchronized (this) {
-        if (!typeString.equals(m_typeString)) {
-          m_typeString = typeString;
-          close(); // force re-init
-        }
-      }
-    }
-
     private synchronized <T> StructLogEntry<T> initStruct(Struct<T> struct) {
       DataLogEntry entry = m_entry.get();
       if (entry == null) {
@@ -301,25 +291,26 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logString(String value) {
+    public void logString(String value, String typeString) {
       DataLogEntry entry = m_entry.get();
       if (entry == null) {
         synchronized (this) {
           // double-check
           entry = m_entry.get();
           if (entry == null) {
-            entry =
-                new StringLogEntry(
-                    m_log,
-                    m_path,
-                    m_properties,
-                    m_typeString != null ? m_typeString : StringLogEntry.kDataType);
+            m_typeString = typeString;
+            entry = new StringLogEntry(m_log, m_path, m_properties, m_typeString);
             m_entry.set(entry);
           }
         }
       }
 
-      if (entry instanceof StringLogEntry e) {
+      String curTypeString;
+      synchronized (this) {
+        curTypeString = m_typeString;
+      }
+
+      if (entry instanceof StringLogEntry e && curTypeString.equals(typeString)) {
         if (m_keepDuplicates.get()) {
           e.append(value);
         } else {
@@ -345,36 +336,6 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       }
 
       if (entry instanceof BooleanArrayLogEntry e) {
-        if (m_keepDuplicates.get()) {
-          e.append(value);
-        } else {
-          e.update(value);
-        }
-      } else {
-        // TODO: warn?
-      }
-    }
-
-    @Override
-    public void logByteArray(byte[] value) {
-      DataLogEntry entry = m_entry.get();
-      if (entry == null) {
-        synchronized (this) {
-          // double-check
-          entry = m_entry.get();
-          if (entry == null) {
-            entry =
-                new RawLogEntry(
-                    m_log,
-                    m_path,
-                    m_properties,
-                    m_typeString != null ? m_typeString : RawLogEntry.kDataType);
-            m_entry.set(entry);
-          }
-        }
-      }
-
-      if (entry instanceof RawLogEntry e) {
         if (m_keepDuplicates.get()) {
           e.append(value);
         } else {
@@ -485,6 +446,37 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       }
 
       if (entry instanceof StringArrayLogEntry e) {
+        if (m_keepDuplicates.get()) {
+          e.append(value);
+        } else {
+          e.update(value);
+        }
+      } else {
+        // TODO: warn?
+      }
+    }
+
+    @Override
+    public void logRaw(byte[] value, String typeString) {
+      DataLogEntry entry = m_entry.get();
+      if (entry == null) {
+        synchronized (this) {
+          // double-check
+          entry = m_entry.get();
+          if (entry == null) {
+            m_typeString = typeString;
+            entry = new RawLogEntry(m_log, m_path, m_properties, m_typeString);
+            m_entry.set(entry);
+          }
+        }
+      }
+
+      String curTypeString;
+      synchronized (this) {
+        curTypeString = m_typeString;
+      }
+
+      if (entry instanceof RawLogEntry e && curTypeString.equals(typeString)) {
         if (m_keepDuplicates.get()) {
           e.append(value);
         } else {
