@@ -13,6 +13,11 @@
 #include "units/angle.h"
 #include "units/base.h"
 #include "units/math.h"
+#include "frc/geometry/Translation3d.h"
+#include "frc/geometry/Translation2d.h"
+#include "units/time.h"
+#include "units/velocity.h"
+#include "units/length.h"
 
 namespace frc {
 
