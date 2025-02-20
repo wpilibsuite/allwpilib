@@ -7,8 +7,6 @@
 #include <gtest/gtest.h>
 
 #include "frc/MathUtil.h"
-#include "frc/geometry/Translation3d.h"
-#include "frc/geometry/Translation2d.h"
 #include "units/time.h"
 #include "units/velocity.h"
 #include "units/length.h"

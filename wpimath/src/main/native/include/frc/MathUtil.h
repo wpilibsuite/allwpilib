@@ -207,4 +207,72 @@ constexpr std::signed_integral auto FloorMod(std::signed_integral auto x,
                                              std::signed_integral auto y) {
   return x - FloorDiv(x, y) * y;
 }
+
+/**
+ * Limits translation velocity.
+ *
+ * @param current Translation at current timestep.
+ * @param next Translation at next timestep.
+ * @param dt Timestep duration.
+ * @param maxVelocity Maximum translation velocity.
+ */
+constexpr Translation2d SlewRateLimit(const Translation2d& current,
+                                      const Translation2d& next,
+                                      units::second_t dt,
+                                      units::meters_per_second_t maxVelocity) {
+  if (maxVelocity < 0_mps) {
+    wpi::math::MathSharedStore::ReportError(
+        "maxVelocity must be a non-negative number, got {}!", maxVelocity);
+  }
+  Translation2d diff = next - current;
+  units::meter_t dist = diff.Norm();
+  diff.m_x /= dist.value();
+  diff.m_y /= dist.value();
+  if (dist < 1e-9_m) {
+    return next;
+  }
+  units::meters_per_second_t velocity = dist / dt;
+  if (velocity > maxVelocity) {
+    velocity = maxVelocity;
+  }
+  dist = velocity * dt;
+  diff.m_x *= dist.value() / 2;
+  diff.m_y *= dist.value() / 2;
+  return diff;
+}
+
+/**
+ * Limits translation velocity.
+ *
+ * @param current Translation at current timestep.
+ * @param next Translation at next timestep.
+ * @param dt Timestep duration.
+ * @param maxVelocity Maximum translation velocity.
+ */
+constexpr Translation3d SlewRateLimit(
+    const Translation3d& current, const Translation3d& next, units::second_t dt,
+    units::meters_per_second_t maxVelocity) {
+  if (maxVelocity < 0_mps) {
+    wpi::math::MathSharedStore::ReportError(
+        "maxVelocity must be a non-negative number, got {}!", maxVelocity);
+  }
+  Translation3d diff = next - current;
+  units::meter_t dist = diff.Norm();
+  diff.m_x /= dist.value();
+  diff.m_y /= dist.value();
+  diff.m_z /= dist.value();
+  if (dist < 1e-9_m) {
+    return next;
+  }
+  units::meters_per_second_t velocity = dist / dt;
+  if (velocity > maxVelocity) {
+    velocity = maxVelocity;
+  }
+  dist = velocity * dt;
+  diff.m_x *= dist.value() / 3;
+  diff.m_y *= dist.value() / 3;
+  diff.m_z *= dist.value() / 3;
+  return diff;
+}
+
 }  // namespace frc
