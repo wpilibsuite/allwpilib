@@ -169,24 +169,31 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param next Translation at next timestep.
    * @param dt Timestep duration.
    * @param maxVelocity Maximum translation velocity.
-  */
-  static constexpr Translation3d SlewRateLimit(const Translation3d& current,
-    const Translation3d& next, units::second_t dt,
-    units::velocity_unit auto maxVelocity) {
-  if (maxVelocity < 0_mps) {
-    wpi::math::MathSharedStore::ReportError(
-      "maxVelocity must be a non-negative number, got {}!", maxVelocity);
-  }
-
-  auto diff = next - current;
-  auto norm = diff.Norm();
-
-  if (norm < 1e-9_m) {
-  return next;
-  }
-
-  auto velocity = norm / dt;
-  return current + diff * (units::math::min(velocity, maxVelocity).value() / norm.value());
+   */
+  static constexpr Translation3d SlewRateLimit(
+      const Translation3d& current, const Translation3d& next,
+      units::second_t dt, units::meters_per_second_t maxVelocity) {
+    if (maxVelocity < 0_mps) {
+      wpi::math::MathSharedStore::ReportError(
+          "maxVelocity must be a non-negative number, got {}!", maxVelocity);
+    }
+    Translation3d diff = next - current;
+    units::meter_t dist = diff.Norm();
+    diff.m_x /= dist;
+    diff.m_y /= dist;
+    diff.m_z /= dist;
+    if (dist < 1e-9_m) {
+      return next;
+    }
+    units::meters_per_second_t velocity = dist / dt;
+    if (velocity > maxVelocity) {
+      velocity = maxVelocity;
+    }
+    dist = velocity * dt;
+    diff.m_x *= dist / 3;
+    diff.m_y *= dist / 3;
+    diff.m_z *= dist / 3
+    return diff;
   }
 
   /**
