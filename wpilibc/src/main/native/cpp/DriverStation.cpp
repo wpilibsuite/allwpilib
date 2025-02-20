@@ -23,9 +23,9 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringTopic.h>
-#include <wpi/DataLog.h>
 #include <wpi/EventVector.h>
 #include <wpi/condition_variable.h>
+#include <wpi/datalog/DataLog.h>
 #include <wpi/json.h>
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
