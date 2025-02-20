@@ -91,7 +91,7 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
   }
 
   /**
-   * Returns the internal byte array of the buffer
+   * Returns the internal byte array of the buffer.
    *
    * @return internal buffer byte array
    */
