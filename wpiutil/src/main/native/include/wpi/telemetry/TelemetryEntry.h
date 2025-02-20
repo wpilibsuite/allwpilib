@@ -18,8 +18,8 @@ namespace wpi {
  */
 class TelemetryEntry {
  public:
- TelemetryEntry() = default;
- virtual ~TelemetryEntry() = default;
+  TelemetryEntry() = default;
+  virtual ~TelemetryEntry() = default;
   TelemetryEntry(const TelemetryEntry&) = delete;
   TelemetryEntry& operator=(const TelemetryEntry&) = delete;
 
