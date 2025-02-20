@@ -4,18 +4,16 @@
 
 #pragma once
 
-#include "wpi/mutex.h"
-#include "wpi/telemetry/TelemetryBackend.h"
-#include "wpi/StringMap.h"
+#include <wpi/mutex.h>
+#include <wpi/telemetry/TelemetryBackend.h>
+#include <wpi/StringMap.h>
 
-namespace wpi {
+namespace wpi::log {
 
-namespace log {
 class DataLog;
-}  // namespace log
 
 /** A telemetry backend that sends logged data to a DataLog. */
-class DataLogTelemetryBackend : public TelemetryBackend {
+class DataLogTelemetryBackend : public wpi::TelemetryBackend {
  public:
   /**
    * Construct.
@@ -23,7 +21,7 @@ class DataLogTelemetryBackend : public TelemetryBackend {
    * @param log datalog
    * @param prefix prefix to put in front of logged path in data log
    */
-  DataLogTelemetryBackend(wpi::log::DataLog& log, std::string_view prefix);
+  DataLogTelemetryBackend(DataLog& log, std::string_view prefix);
 
   ~DataLogTelemetryBackend() override;
 
@@ -33,7 +31,7 @@ class DataLogTelemetryBackend : public TelemetryBackend {
    * @param path full name
    * @return telemetry entry
    */
-  TelemetryEntry& GetEntry(std::string_view path) override;
+  wpi::TelemetryEntry& GetEntry(std::string_view path) override;
 
   /**
    * Returns whether there is a data schema already registered with the given
@@ -83,10 +81,10 @@ class DataLogTelemetryBackend : public TelemetryBackend {
  private:
   class Entry;
 
-  wpi::log::DataLog& m_log;
+  DataLog& m_log;
   std::string m_prefix;
   wpi::mutex m_mutex;
   wpi::StringMap<Entry> m_entries;
 };
 
-}  // namespace wpi
+}  // namespace wpi::log
