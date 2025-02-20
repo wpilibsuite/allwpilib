@@ -136,6 +136,9 @@ If you have installed the FRC Toolchain to a directory other than the default, o
 
 Once a PR has been submitted, formatting can be run in CI by commenting `/format` on the PR. A new commit will be pushed with the formatting changes.
 
+> [!NOTE]
+> The `/format` action has been temporarily disabled. The individual formatting commands can be run locally as shown below. Alternately, the Lint and Format action for a PR will upload a patch file that can be downloaded and applied manually.
+
 #### wpiformat
 
 wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on Windows or `python3 -m wpiformat` on other platforms.
