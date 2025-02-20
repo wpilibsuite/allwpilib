@@ -4,28 +4,27 @@
 
 #pragma once
 
-#include "wpi/mutex.h"
-#include "wpi/telemetry/TelemetryBackend.h"
-#include "wpi/StringMap.h"
+#include <wpi/mutex.h>
+#include <wpi/telemetry/TelemetryBackend.h>
+#include <wpi/StringMap.h>
 
-namespace wpi {
+namespace nt {
 
-namespace log {
-class DataLog;
-}  // namespace log
+class NetworkTableInstance;
 
 /** A telemetry backend that sends logged data to a DataLog. */
-class DataLogTelemetryBackend : public TelemetryBackend {
+class NetworkTablesTelemetryBackend : public wpi::TelemetryBackend {
  public:
   /**
    * Construct.
    *
-   * @param log datalog
-   * @param prefix prefix to put in front of logged path in data log
+   * @param inst NetworkTables instance
+   * @param prefix prefix to put in front of logged path in NT
    */
-  DataLogTelemetryBackend(wpi::log::DataLog& log, std::string_view prefix);
+  NetworkTablesTelemetryBackend(NetworkTableInstance& inst,
+                                std::string_view prefix);
 
-  ~DataLogTelemetryBackend() override;
+  ~NetworkTablesTelemetryBackend() override;
 
   /**
    * Create an entry for the given path.
@@ -33,7 +32,7 @@ class DataLogTelemetryBackend : public TelemetryBackend {
    * @param path full name
    * @return telemetry entry
    */
-  TelemetryEntry& GetEntry(std::string_view path) override;
+  wpi::TelemetryEntry& GetEntry(std::string_view path) override;
 
   /**
    * Returns whether there is a data schema already registered with the given
@@ -83,10 +82,10 @@ class DataLogTelemetryBackend : public TelemetryBackend {
  private:
   class Entry;
 
-  wpi::log::DataLog& m_log;
+  NetworkTableInstance& m_inst;
   std::string m_prefix;
   wpi::mutex m_mutex;
   wpi::StringMap<Entry> m_entries;
 };
 
-}  // namespace wpi
+}  // namespace nt

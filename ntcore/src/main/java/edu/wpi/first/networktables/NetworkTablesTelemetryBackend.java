@@ -18,6 +18,12 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
   private final String m_prefix;
   private static final Map<String, Entry> s_entries = new HashMap<>();
 
+  /**
+   * Construct.
+   *
+   * @param inst NetworkTables instance
+   * @param prefix prefix to put in front of logged path in NT
+   */
   public NetworkTablesTelemetryBackend(NetworkTableInstance inst, String prefix) {
     m_inst = inst;
     m_prefix = prefix;
