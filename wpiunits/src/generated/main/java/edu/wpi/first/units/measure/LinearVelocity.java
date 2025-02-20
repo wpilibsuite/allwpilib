@@ -87,11 +87,6 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
     return (LinearVelocity) div(divisor);
   }
 
-  @Override
-  default LinearAcceleration per(TimeUnit period) {
-    return div(period.of(1));
-  }
-
 
   @Override
   default Mult<LinearVelocityUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
@@ -113,6 +108,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   @Override
   default Per<LinearVelocityUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<LinearVelocityUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -138,6 +138,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<LinearVelocityUnit, AngleUnit> per(AngleUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<LinearVelocityUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
@@ -159,6 +164,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   @Override
   default Per<LinearVelocityUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<LinearVelocityUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -184,6 +194,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<LinearVelocityUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<LinearVelocityUnit, AngularVelocityUnit> times(AngularVelocity multiplier) {
@@ -207,6 +222,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<LinearVelocityUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<LinearVelocityUnit, CurrentUnit> times(Current multiplier) {
@@ -228,6 +248,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   @Override
   default Per<LinearVelocityUnit, CurrentUnit> divide(Current divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<LinearVelocityUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
   @Override
@@ -275,6 +300,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<LinearVelocityUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<LinearVelocityUnit, EnergyUnit> times(Energy multiplier) {
@@ -296,6 +326,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   @Override
   default Per<LinearVelocityUnit, EnergyUnit> divide(Energy divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<LinearVelocityUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -321,6 +356,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<LinearVelocityUnit, ForceUnit> per(ForceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default LinearAcceleration times(Frequency multiplier) {
@@ -342,6 +382,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   @Override
   default Per<LinearVelocityUnit, FrequencyUnit> divide(Frequency divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<LinearVelocityUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -367,6 +412,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<LinearVelocityUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<LinearVelocityUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
@@ -388,6 +438,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   @Override
   default Per<LinearVelocityUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<LinearVelocityUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -413,6 +468,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Dimensionless per(LinearVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<LinearVelocityUnit, MassUnit> times(Mass multiplier) {
@@ -434,6 +494,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   @Override
   default Per<LinearVelocityUnit, MassUnit> divide(Mass divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<LinearVelocityUnit, MassUnit> per(MassUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -459,6 +524,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<LinearVelocityUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<LinearVelocityUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
@@ -480,6 +550,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   @Override
   default Per<LinearVelocityUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<LinearVelocityUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
   }
 
 
@@ -505,6 +580,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<LinearVelocityUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
+  }
+
 
   @Override
   default Mult<LinearVelocityUnit, PowerUnit> times(Power multiplier) {
@@ -526,6 +606,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   @Override
   default Per<LinearVelocityUnit, PowerUnit> divide(Power divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<LinearVelocityUnit, PowerUnit> per(PowerUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -551,6 +636,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<LinearVelocityUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<LinearVelocityUnit, TemperatureUnit> times(Temperature multiplier) {
@@ -572,6 +662,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   @Override
   default Per<LinearVelocityUnit, TemperatureUnit> divide(Temperature divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<LinearVelocityUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -597,6 +692,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default LinearAcceleration per(TimeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<LinearVelocityUnit, TorqueUnit> times(Torque multiplier) {
@@ -618,6 +718,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   @Override
   default Per<LinearVelocityUnit, TorqueUnit> divide(Torque divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<LinearVelocityUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -643,6 +748,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<LinearVelocityUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<LinearVelocityUnit, VoltageUnit> times(Voltage multiplier) {
@@ -664,6 +774,11 @@ public interface LinearVelocity extends Measure<LinearVelocityUnit> {
   @Override
   default Per<LinearVelocityUnit, VoltageUnit> divide(Voltage divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<LinearVelocityUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 }

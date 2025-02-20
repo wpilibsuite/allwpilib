@@ -3,7 +3,7 @@
     {
       "aql": {
         "items.find": {
-          "repo": "wpilib-mvn-development",
+          "repo": "wpilib-mvn-development-local",
           "path": { "$nmatch":"*edu/wpi/first/thirdparty*" },
           "$or":[
             {

@@ -87,11 +87,6 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
     return (AngularVelocity) div(divisor);
   }
 
-  @Override
-  default AngularAcceleration per(TimeUnit period) {
-    return div(period.of(1));
-  }
-
 
   @Override
   default Mult<AngularVelocityUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
@@ -113,6 +108,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   default Per<AngularVelocityUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -138,6 +138,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<AngularVelocityUnit, AngleUnit> per(AngleUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<AngularVelocityUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
@@ -159,6 +164,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   default Per<AngularVelocityUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -184,6 +194,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<AngularVelocityUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<AngularVelocityUnit, AngularVelocityUnit> times(AngularVelocity multiplier) {
@@ -207,6 +222,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Dimensionless per(AngularVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<AngularVelocityUnit, CurrentUnit> times(Current multiplier) {
@@ -228,6 +248,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   default Per<AngularVelocityUnit, CurrentUnit> divide(Current divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
   @Override
@@ -275,6 +300,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<AngularVelocityUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<AngularVelocityUnit, EnergyUnit> times(Energy multiplier) {
@@ -296,6 +326,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   default Per<AngularVelocityUnit, EnergyUnit> divide(Energy divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -321,6 +356,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<AngularVelocityUnit, ForceUnit> per(ForceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default AngularAcceleration times(Frequency multiplier) {
@@ -342,6 +382,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   default Per<AngularVelocityUnit, FrequencyUnit> divide(Frequency divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -367,6 +412,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<AngularVelocityUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<AngularVelocityUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
@@ -388,6 +438,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   default Per<AngularVelocityUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -413,6 +468,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<AngularVelocityUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<AngularVelocityUnit, MassUnit> times(Mass multiplier) {
@@ -434,6 +494,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   default Per<AngularVelocityUnit, MassUnit> divide(Mass divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, MassUnit> per(MassUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -459,6 +524,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<AngularVelocityUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<AngularVelocityUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
@@ -480,6 +550,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   default Per<AngularVelocityUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
   }
 
 
@@ -505,6 +580,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<AngularVelocityUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
+  }
+
 
   @Override
   default Mult<AngularVelocityUnit, PowerUnit> times(Power multiplier) {
@@ -526,6 +606,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   default Per<AngularVelocityUnit, PowerUnit> divide(Power divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, PowerUnit> per(PowerUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -551,6 +636,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<AngularVelocityUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<AngularVelocityUnit, TemperatureUnit> times(Temperature multiplier) {
@@ -572,6 +662,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   default Per<AngularVelocityUnit, TemperatureUnit> divide(Temperature divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -597,6 +692,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default AngularAcceleration per(TimeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<AngularVelocityUnit, TorqueUnit> times(Torque multiplier) {
@@ -618,6 +718,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   default Per<AngularVelocityUnit, TorqueUnit> divide(Torque divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -643,6 +748,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<AngularVelocityUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<AngularVelocityUnit, VoltageUnit> times(Voltage multiplier) {
@@ -664,6 +774,11 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   default Per<AngularVelocityUnit, VoltageUnit> divide(Voltage divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<AngularVelocityUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 default Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
 }

@@ -87,11 +87,6 @@ public interface Energy extends Measure<EnergyUnit> {
     return (Energy) div(divisor);
   }
 
-  @Override
-  default Power per(TimeUnit period) {
-    return div(period.of(1));
-  }
-
 
   @Override
   default Mult<EnergyUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
@@ -113,6 +108,11 @@ public interface Energy extends Measure<EnergyUnit> {
   @Override
   default Per<EnergyUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<EnergyUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -138,6 +138,11 @@ public interface Energy extends Measure<EnergyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<EnergyUnit, AngleUnit> per(AngleUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<EnergyUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
@@ -159,6 +164,11 @@ public interface Energy extends Measure<EnergyUnit> {
   @Override
   default Per<EnergyUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<EnergyUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -184,6 +194,11 @@ public interface Energy extends Measure<EnergyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<EnergyUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<EnergyUnit, AngularVelocityUnit> times(AngularVelocity multiplier) {
@@ -207,6 +222,11 @@ public interface Energy extends Measure<EnergyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<EnergyUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<EnergyUnit, CurrentUnit> times(Current multiplier) {
@@ -228,6 +248,11 @@ public interface Energy extends Measure<EnergyUnit> {
   @Override
   default Per<EnergyUnit, CurrentUnit> divide(Current divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<EnergyUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
   @Override
@@ -275,6 +300,11 @@ public interface Energy extends Measure<EnergyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<EnergyUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<EnergyUnit, EnergyUnit> times(Energy multiplier) {
@@ -296,6 +326,11 @@ public interface Energy extends Measure<EnergyUnit> {
   @Override
   default Dimensionless divide(Energy divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Dimensionless per(EnergyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -321,6 +356,11 @@ public interface Energy extends Measure<EnergyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<EnergyUnit, ForceUnit> per(ForceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Power times(Frequency multiplier) {
@@ -342,6 +382,11 @@ public interface Energy extends Measure<EnergyUnit> {
   @Override
   default Per<EnergyUnit, FrequencyUnit> divide(Frequency divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<EnergyUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -367,6 +412,11 @@ public interface Energy extends Measure<EnergyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<EnergyUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<EnergyUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
@@ -388,6 +438,11 @@ public interface Energy extends Measure<EnergyUnit> {
   @Override
   default Per<EnergyUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<EnergyUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -413,6 +468,11 @@ public interface Energy extends Measure<EnergyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<EnergyUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<EnergyUnit, MassUnit> times(Mass multiplier) {
@@ -434,6 +494,11 @@ public interface Energy extends Measure<EnergyUnit> {
   @Override
   default Per<EnergyUnit, MassUnit> divide(Mass divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<EnergyUnit, MassUnit> per(MassUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -459,6 +524,11 @@ public interface Energy extends Measure<EnergyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<EnergyUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<EnergyUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
@@ -480,6 +550,11 @@ public interface Energy extends Measure<EnergyUnit> {
   @Override
   default Per<EnergyUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<EnergyUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
   }
 
 
@@ -505,6 +580,11 @@ public interface Energy extends Measure<EnergyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<EnergyUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
+  }
+
 
   @Override
   default Mult<EnergyUnit, PowerUnit> times(Power multiplier) {
@@ -526,6 +606,11 @@ public interface Energy extends Measure<EnergyUnit> {
   @Override
   default Per<EnergyUnit, PowerUnit> divide(Power divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<EnergyUnit, PowerUnit> per(PowerUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -551,6 +636,11 @@ public interface Energy extends Measure<EnergyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<EnergyUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<EnergyUnit, TemperatureUnit> times(Temperature multiplier) {
@@ -572,6 +662,11 @@ public interface Energy extends Measure<EnergyUnit> {
   @Override
   default Per<EnergyUnit, TemperatureUnit> divide(Temperature divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<EnergyUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -597,6 +692,11 @@ public interface Energy extends Measure<EnergyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Power per(TimeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<EnergyUnit, TorqueUnit> times(Torque multiplier) {
@@ -618,6 +718,11 @@ public interface Energy extends Measure<EnergyUnit> {
   @Override
   default Per<EnergyUnit, TorqueUnit> divide(Torque divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<EnergyUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -643,6 +748,11 @@ public interface Energy extends Measure<EnergyUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<EnergyUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<EnergyUnit, VoltageUnit> times(Voltage multiplier) {
@@ -664,6 +774,11 @@ public interface Energy extends Measure<EnergyUnit> {
   @Override
   default Per<EnergyUnit, VoltageUnit> divide(Voltage divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<EnergyUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 }

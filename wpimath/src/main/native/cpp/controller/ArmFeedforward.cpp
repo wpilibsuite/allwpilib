@@ -20,6 +20,13 @@ units::volt_t ArmFeedforward::Calculate(
     units::unit_t<Velocity> nextVelocity) const {
   using VarMat = sleipnir::VariableMatrix;
 
+  // Small kₐ values make the solver ill-conditioned
+  if (kA < units::unit_t<ka_unit>{1e-1}) {
+    auto acceleration = (nextVelocity - currentVelocity) / m_dt;
+    return kS * wpi::sgn(currentVelocity.value()) + kV * currentVelocity +
+           kA * acceleration + kG * units::math::cos(currentAngle);
+  }
+
   // Arm dynamics
   Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
   Matrixd<2, 1> B{{0.0}, {1.0 / kA.value()}};

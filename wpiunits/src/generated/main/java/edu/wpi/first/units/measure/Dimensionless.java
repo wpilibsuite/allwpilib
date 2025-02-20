@@ -87,11 +87,6 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return (Dimensionless) div(divisor);
   }
 
-  @Override
-  default Frequency per(TimeUnit period) {
-    return div(period.of(1));
-  }
-
 
   @Override
   default Mult<DimensionlessUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
@@ -113,6 +108,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<DimensionlessUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -138,6 +138,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<DimensionlessUnit, AngleUnit> per(AngleUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default AngularAcceleration times(AngularAcceleration multiplier) {
@@ -159,6 +164,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<DimensionlessUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -184,6 +194,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<DimensionlessUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default AngularVelocity times(AngularVelocity multiplier) {
@@ -207,6 +222,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<DimensionlessUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Current times(Current multiplier) {
@@ -228,6 +248,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, CurrentUnit> divide(Current divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<DimensionlessUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
   @Override
@@ -275,6 +300,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<DimensionlessUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Energy times(Energy multiplier) {
@@ -296,6 +326,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, EnergyUnit> divide(Energy divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<DimensionlessUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -321,6 +356,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<DimensionlessUnit, ForceUnit> per(ForceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Frequency times(Frequency multiplier) {
@@ -342,6 +382,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, FrequencyUnit> divide(Frequency divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<DimensionlessUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -367,6 +412,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<DimensionlessUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default LinearMomentum times(LinearMomentum multiplier) {
@@ -388,6 +438,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<DimensionlessUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -413,6 +468,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<DimensionlessUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mass times(Mass multiplier) {
@@ -434,6 +494,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, MassUnit> divide(Mass divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<DimensionlessUnit, MassUnit> per(MassUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -459,6 +524,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<DimensionlessUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<DimensionlessUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
@@ -480,6 +550,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<DimensionlessUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
   }
 
 
@@ -505,6 +580,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<DimensionlessUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
+  }
+
 
   @Override
   default Power times(Power multiplier) {
@@ -526,6 +606,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, PowerUnit> divide(Power divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<DimensionlessUnit, PowerUnit> per(PowerUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -551,6 +636,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<DimensionlessUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Temperature times(Temperature multiplier) {
@@ -572,6 +662,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, TemperatureUnit> divide(Temperature divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<DimensionlessUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -597,6 +692,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Frequency per(TimeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Torque times(Torque multiplier) {
@@ -618,6 +718,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, TorqueUnit> divide(Torque divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<DimensionlessUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -643,6 +748,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<DimensionlessUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Voltage times(Voltage multiplier) {
@@ -664,6 +774,11 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   default Per<DimensionlessUnit, VoltageUnit> divide(Voltage divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<DimensionlessUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 }
