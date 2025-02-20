@@ -15,7 +15,6 @@
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <portable-file-dialogs.h>
-#include <wpi/DataLogReaderThread.h>
 #include <wpi/SmallVector.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
