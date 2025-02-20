@@ -167,15 +167,15 @@ public final class Commands {
   }
 
   /**
-   * Runs a command if the boolean selector function is true.
+   * Runs a command if the boolean condition function is true.
    *
-   * @param selector the selector function
-   * @param onTrue the command to run if the selector function returns true
+   * @param condition the condition function
+   * @param onTrue the command to run if the condition function returns true
    * @return the command
    * @see ConditionalCommand
    */
-  public static Command runIf(BooleanSupplier selector, Command onTrue){
-    return onTrue.onlyIf(selector);
+  public static Command runIf(BooleanSupplier condition, Command onTrue){
+    return onTrue.onlyIf(condition);
   }
 
   /**
