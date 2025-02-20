@@ -179,9 +179,9 @@ class WPILIB_DLLEXPORT Translation3d {
     }
     Translation3d diff = next - current;
     units::meter_t dist = diff.Norm();
-    diff.m_x /= dist;
-    diff.m_y /= dist;
-    diff.m_z /= dist;
+    diff.m_x /= dist.value();
+    diff.m_y /= dist.value();
+    diff.m_z /= dist.value();
     if (dist < 1e-9_m) {
       return next;
     }
@@ -190,9 +190,9 @@ class WPILIB_DLLEXPORT Translation3d {
       velocity = maxVelocity;
     }
     dist = velocity * dt;
-    diff.m_x *= dist / 3;
-    diff.m_y *= dist / 3;
-    diff.m_z *= dist / 3
+    diff.m_x *= dist.value() / 3;
+    diff.m_y *= dist.value() / 3;
+    diff.m_z *= dist.value() / 3;
     return diff;
   }
 

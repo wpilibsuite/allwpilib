@@ -177,8 +177,8 @@ class WPILIB_DLLEXPORT Translation2d {
     }
     Translation2d diff = next - current;
     units::meter_t dist = diff.Norm();
-    diff.m_x /= dist;
-    diff.m_y /= dist;
+    diff.m_x /= dist.value();
+    diff.m_y /= dist.value();
     if (dist < 1e-9_m) {
       return next;
     }
@@ -187,8 +187,8 @@ class WPILIB_DLLEXPORT Translation2d {
       velocity = maxVelocity;
     }
     dist = velocity * dt;
-    diff.m_x *= dist / 2;
-    diff.m_y *= dist / 2;
+    diff.m_x *= dist.value() / 2;
+    diff.m_y *= dist.value() / 2;
     return diff;
   }
 
