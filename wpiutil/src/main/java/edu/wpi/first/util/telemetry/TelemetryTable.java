@@ -86,16 +86,6 @@ public final class TelemetryTable {
   }
 
   /**
-   * Sets custom data type for a value. Generally not necessary.
-   *
-   * @param name the name
-   * @param typeString type string
-   */
-  public void setTypeString(String name, String typeString) {
-    getEntry(name).setTypeString(typeString);
-  }
-
-  /**
    * Logs a generic object.
    *
    * @param name the name
@@ -324,7 +314,18 @@ public final class TelemetryTable {
    * @param value the value
    */
   public void log(String name, String value) {
-    getEntry(name).logString(value);
+    getEntry(name).logString(value, "string");
+  }
+
+  /**
+   * Logs a String with a custom type string.
+   *
+   * @param name the name
+   * @param value the value
+   * @param typeString the type string
+   */
+  public void log(String name, String value, String typeString) {
+    getEntry(name).logString(value, typeString);
   }
 
   /**
@@ -335,16 +336,6 @@ public final class TelemetryTable {
    */
   public void log(String name, boolean[] value) {
     getEntry(name).logBooleanArray(value);
-  }
-
-  /**
-   * Logs a byte array (raw value).
-   *
-   * @param name the name
-   * @param value the value
-   */
-  public void log(String name, byte[] value) {
-    getEntry(name).logByteArray(value);
   }
 
   /**
@@ -405,5 +396,26 @@ public final class TelemetryTable {
    */
   public void log(String name, String[] value) {
     getEntry(name).logStringArray(value);
+  }
+
+  /**
+   * Logs a raw value (byte array).
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public void log(String name, byte[] value) {
+    getEntry(name).logRaw(value, "raw");
+  }
+
+  /**
+   * Logs a raw value (byte array) with a custom type string.
+   *
+   * @param name the name
+   * @param value the value
+   * @param typeString the type string
+   */
+  public void log(String name, byte[] value, String typeString) {
+    getEntry(name).logRaw(value, typeString);
   }
 }

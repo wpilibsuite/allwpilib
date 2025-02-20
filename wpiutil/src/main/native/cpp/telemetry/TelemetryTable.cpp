@@ -33,11 +33,6 @@ void TelemetryTable::SetProperty(std::string_view name, std::string_view key,
   GetEntry(name).SetProperty(key, value);
 }
 
-void TelemetryTable::SetTypeString(std::string_view name,
-                                   std::string_view typeString) {
-  GetEntry(name).SetTypeString(typeString);
-}
-
 void TelemetryTable::Log(std::string_view name, bool value) {
   GetEntry(name).LogBoolean(value);
 }
@@ -67,16 +62,16 @@ void TelemetryTable::Log(std::string_view name, double value) {
 }
 
 void TelemetryTable::Log(std::string_view name, std::string_view value) {
-  GetEntry(name).LogString(value);
+  GetEntry(name).LogString(value, "string");
+}
+
+void TelemetryTable::Log(std::string_view name, std::string_view value,
+                         std::string_view typeString) {
+  GetEntry(name).LogString(value, typeString);
 }
 
 void TelemetryTable::Log(std::string_view name, std::span<const bool> value) {
   GetEntry(name).LogBooleanArray(value);
-}
-
-void TelemetryTable::Log(std::string_view name,
-                         std::span<const uint8_t> value) {
-  GetEntry(name).LogByteArray(value);
 }
 
 void TelemetryTable::Log(std::string_view name,
@@ -112,9 +107,14 @@ void TelemetryTable::Log(std::string_view name,
   GetEntry(name).LogStringArray(value);
 }
 
-void TelemetryTable::LogRaw(std::string_view name, std::string_view typeString,
-                            std::span<const uint8_t> value) {
-  GetEntry(name).LogRaw(typeString, value);
+void TelemetryTable::Log(std::string_view name,
+                         std::span<const uint8_t> value) {
+  GetEntry(name).LogRaw(value, "raw");
+}
+
+void TelemetryTable::Log(std::string_view name, std::span<const uint8_t> value,
+                         std::string_view typeString) {
+  GetEntry(name).LogRaw(value, typeString);
 }
 
 TelemetryEntry& TelemetryTable::GetEntry(std::string_view name) {

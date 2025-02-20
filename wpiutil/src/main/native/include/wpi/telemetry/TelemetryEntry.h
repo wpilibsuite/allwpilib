@@ -38,13 +38,6 @@ class TelemetryEntry {
   virtual void SetProperty(std::string_view key, std::string_view value) = 0;
 
   /**
-   * Sets custom data type for a value. Generally not necessary.
-   *
-   * @param typeString type string
-   */
-  virtual void SetTypeString(std::string_view typeString) = 0;
-
-  /**
    * Logs a boolean.
    *
    * @param value the value
@@ -97,8 +90,10 @@ class TelemetryEntry {
    * Logs a String.
    *
    * @param value the value
+   * @param typeString the type string
    */
-  virtual void LogString(std::string_view value) = 0;
+  virtual void LogString(std::string_view value,
+                         std::string_view typeString) = 0;
 
   /**
    * Logs a boolean array.
@@ -113,13 +108,6 @@ class TelemetryEntry {
    * @param value the value
    */
   virtual void LogBooleanArray(std::span<const int> value) = 0;
-
-  /**
-   * Logs a byte array (raw value).
-   *
-   * @param value the value
-   */
-  virtual void LogByteArray(std::span<const uint8_t> value) = 0;
 
   /**
    * Logs a short array.
@@ -171,13 +159,13 @@ class TelemetryEntry {
   virtual void LogStringArray(std::span<const std::string_view> value) = 0;
 
   /**
-   * Logs a byte array (raw value) with type string matching.
+   * Logs a raw value (byte array).
    *
-   * @param typeString the type string
    * @param value the value
+   * @param typeString the type string
    */
-  virtual void LogRaw(std::string_view typeString,
-                      std::span<const uint8_t> value) = 0;
+  virtual void LogRaw(std::span<const uint8_t> value,
+                      std::string_view typeString) = 0;
 };
 
 }  // namespace wpi

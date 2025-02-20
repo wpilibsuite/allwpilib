@@ -24,13 +24,6 @@ public interface TelemetryEntry {
   void setProperty(String key, String value);
 
   /**
-   * Sets custom data type for a value. Generally not necessary.
-   *
-   * @param typeString type string
-   */
-  void setTypeString(String typeString);
-
-  /**
    * Logs an object with struct serialization.
    *
    * @param value the value
@@ -113,8 +106,9 @@ public interface TelemetryEntry {
    * Logs a String.
    *
    * @param value the value
+   * @param typeString the type string
    */
-  void logString(String value);
+  void logString(String value, String typeString);
 
   /**
    * Logs a boolean array.
@@ -122,13 +116,6 @@ public interface TelemetryEntry {
    * @param value the value
    */
   void logBooleanArray(boolean[] value);
-
-  /**
-   * Logs a byte array (raw value).
-   *
-   * @param value the value
-   */
-  void logByteArray(byte[] value);
 
   /**
    * Logs a short array.
@@ -171,4 +158,12 @@ public interface TelemetryEntry {
    * @param value the value
    */
   void logStringArray(String[] value);
+
+  /**
+   * Logs a byte array (raw value).
+   *
+   * @param value the value
+   * @param typeString the type string
+   */
+  void logRaw(byte[] value, String typeString);
 }

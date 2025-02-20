@@ -95,16 +95,6 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       }
     }
 
-    @Override
-    public void setTypeString(String typeString) {
-      synchronized (this) {
-        if (!typeString.equals(m_typeString)) {
-          m_typeString = typeString;
-          // TODO: update publisher while not losing last value
-        }
-      }
-    }
-
     private synchronized <T> StructPublisher<T> initStruct(Struct<T> struct) {
       Publisher pub = m_pub.get();
       if (pub == null) {
@@ -204,7 +194,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getBooleanTopic(m_path)
                     .publishEx(
-                        m_typeString != null ? m_typeString : BooleanTopic.kTypeString,
+                        BooleanTopic.kTypeString,
                         m_properties,
                         PubSubOption.keepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -231,7 +221,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getIntegerTopic(m_path)
                     .publishEx(
-                        m_typeString != null ? m_typeString : IntegerTopic.kTypeString,
+                        IntegerTopic.kTypeString,
                         m_properties,
                         PubSubOption.keepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -258,7 +248,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getFloatTopic(m_path)
                     .publishEx(
-                        m_typeString != null ? m_typeString : FloatTopic.kTypeString,
+                        FloatTopic.kTypeString,
                         m_properties,
                         PubSubOption.keepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -285,7 +275,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getDoubleTopic(m_path)
                     .publishEx(
-                        m_typeString != null ? m_typeString : DoubleTopic.kTypeString,
+                        DoubleTopic.kTypeString,
                         m_properties,
                         PubSubOption.keepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -301,18 +291,19 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logString(String value) {
+    public void logString(String value, String typeString) {
       Publisher pub = m_pub.get();
       if (pub == null) {
         synchronized (this) {
           // double-check
           pub = m_pub.get();
           if (pub == null) {
+            m_typeString = typeString;
             pub =
                 m_inst
                     .getStringTopic(m_path)
                     .publishEx(
-                        m_typeString != null ? m_typeString : StringTopic.kTypeString,
+                        m_typeString,
                         m_properties,
                         PubSubOption.keepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -320,7 +311,12 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
         }
       }
 
-      if (pub instanceof StringPublisher e) {
+      String curTypeString;
+      synchronized (this) {
+        curTypeString = m_typeString;
+      }
+
+      if (pub instanceof StringPublisher e && curTypeString.equals(typeString)) {
         e.set(value);
       } else {
         // TODO: warn?
@@ -339,7 +335,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getBooleanArrayTopic(m_path)
                     .publishEx(
-                        m_typeString != null ? m_typeString : BooleanArrayTopic.kTypeString,
+                        BooleanArrayTopic.kTypeString,
                         m_properties,
                         PubSubOption.keepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -348,33 +344,6 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       }
 
       if (pub instanceof BooleanArrayPublisher e) {
-        e.set(value);
-      } else {
-        // TODO: warn?
-      }
-    }
-
-    @Override
-    public void logByteArray(byte[] value) {
-      Publisher pub = m_pub.get();
-      if (pub == null) {
-        synchronized (this) {
-          // double-check
-          pub = m_pub.get();
-          if (pub == null) {
-            pub =
-                m_inst
-                    .getRawTopic(m_path)
-                    .publishEx(
-                        m_typeString != null ? m_typeString : "raw",
-                        m_properties,
-                        PubSubOption.keepDuplicates(m_keepDuplicates.get()));
-            m_pub.set(pub);
-          }
-        }
-      }
-
-      if (pub instanceof RawPublisher e) {
         e.set(value);
       } else {
         // TODO: warn?
@@ -403,7 +372,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getIntegerArrayTopic(m_path)
                     .publishEx(
-                        m_typeString != null ? m_typeString : IntegerArrayTopic.kTypeString,
+                        IntegerArrayTopic.kTypeString,
                         m_properties,
                         PubSubOption.keepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -430,7 +399,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getFloatArrayTopic(m_path)
                     .publishEx(
-                        m_typeString != null ? m_typeString : FloatArrayTopic.kTypeString,
+                        FloatArrayTopic.kTypeString,
                         m_properties,
                         PubSubOption.keepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -457,7 +426,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getDoubleArrayTopic(m_path)
                     .publishEx(
-                        m_typeString != null ? m_typeString : DoubleArrayTopic.kTypeString,
+                        DoubleArrayTopic.kTypeString,
                         m_properties,
                         PubSubOption.keepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -484,7 +453,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
                 m_inst
                     .getStringArrayTopic(m_path)
                     .publishEx(
-                        m_typeString != null ? m_typeString : StringArrayTopic.kTypeString,
+                        StringArrayTopic.kTypeString,
                         m_properties,
                         PubSubOption.keepDuplicates(m_keepDuplicates.get()));
             m_pub.set(pub);
@@ -493,6 +462,39 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       }
 
       if (pub instanceof StringArrayPublisher e) {
+        e.set(value);
+      } else {
+        // TODO: warn?
+      }
+    }
+
+    @Override
+    public void logRaw(byte[] value, String typeString) {
+      Publisher pub = m_pub.get();
+      if (pub == null) {
+        synchronized (this) {
+          // double-check
+          pub = m_pub.get();
+          if (pub == null) {
+            m_typeString = typeString;
+            pub =
+                m_inst
+                    .getRawTopic(m_path)
+                    .publishEx(
+                        m_typeString,
+                        m_properties,
+                        PubSubOption.keepDuplicates(m_keepDuplicates.get()));
+            m_pub.set(pub);
+          }
+        }
+      }
+
+      String curTypeString;
+      synchronized (this) {
+        curTypeString = m_typeString;
+      }
+
+      if (pub instanceof RawPublisher e && curTypeString.equals(typeString)) {
         e.set(value);
       } else {
         // TODO: warn?

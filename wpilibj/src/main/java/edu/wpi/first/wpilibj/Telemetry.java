@@ -59,16 +59,6 @@ public final class Telemetry {
   }
 
   /**
-   * Sets custom data type for a value. Generally not necessary.
-   *
-   * @param name the name
-   * @param typeString type string
-   */
-  public static void setTypeString(String name, String typeString) {
-    m_root.setTypeString(name, typeString);
-  }
-
-  /**
    * Logs a generic object.
    *
    * @param name the name
@@ -169,22 +159,23 @@ public final class Telemetry {
   }
 
   /**
+   * Logs a String with custom type string.
+   *
+   * @param name the name
+   * @param value the value
+   * @param typeString the type string
+   */
+  public static void log(String name, String value, String typeString) {
+    m_root.log(name, value, typeString);
+  }
+
+  /**
    * Logs a boolean array.
    *
    * @param name the name
    * @param value the value
    */
   public static void log(String name, boolean[] value) {
-    m_root.log(name, value);
-  }
-
-  /**
-   * Logs a byte array (raw value).
-   *
-   * @param name the name
-   * @param value the value
-   */
-  public static void log(String name, byte[] value) {
     m_root.log(name, value);
   }
 
@@ -246,5 +237,25 @@ public final class Telemetry {
    */
   public static void log(String name, String[] value) {
     m_root.log(name, value);
+  }
+
+  /**
+   * Logs a raw value (byte array).
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, byte[] value) {
+    m_root.log(name, value);
+  }
+
+  /**
+   * Logs a raw value (byte array) with custom type string.
+   *
+   * @param name the name
+   * @param value the value
+   */
+  public static void log(String name, byte[] value, String typeString) {
+    m_root.log(name, value, typeString);
   }
 }

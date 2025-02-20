@@ -27,9 +27,6 @@ public class NoopTelemetryBackend implements TelemetryBackend {
     public void setProperty(String key, String value) {}
 
     @Override
-    public void setTypeString(String typeString) {}
-
-    @Override
     public <T> void logStruct(T value, Struct<T> struct) {}
 
     @Override
@@ -51,13 +48,10 @@ public class NoopTelemetryBackend implements TelemetryBackend {
     public void logDouble(double value) {}
 
     @Override
-    public void logString(String value) {}
+    public void logString(String value, String typeString) {}
 
     @Override
     public void logBooleanArray(boolean[] value) {}
-
-    @Override
-    public void logByteArray(byte[] value) {}
 
     @Override
     public void logShortArray(short[] value) {}
@@ -76,5 +70,8 @@ public class NoopTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logStringArray(String[] value) {}
+
+    @Override
+    public void logRaw(byte[] value, String typeString) {}
   }
 }

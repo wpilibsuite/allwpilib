@@ -54,17 +54,6 @@ class Telemetry final {
   }
 
   /**
-   * Sets custom data type for a value. Generally not necessary.
-   *
-   * @param name the name
-   * @param typeString type string
-   */
-  static void SetTypeString(std::string_view name,
-                            std::string_view typeString) {
-    GetTable().SetTypeString(name, typeString);
-  }
-
-  /**
    * Logs an object.
    *
    * @param name the name
@@ -169,22 +158,24 @@ class Telemetry final {
   }
 
   /**
+   * Logs a String with custom type string.
+   *
+   * @param name the name
+   * @param value the value
+   * @param typeString the type string
+   */
+  static void Log(std::string_view name, std::string_view value,
+                  std::string_view typeString) {
+    GetTable().Log(name, value, typeString);
+  }
+
+  /**
    * Logs a boolean array.
    *
    * @param name the name
    * @param value the value
    */
   static void Log(std::string_view name, std::span<const bool> value) {
-    GetTable().Log(name, value);
-  }
-
-  /**
-   * Logs a byte array (raw value).
-   *
-   * @param name the name
-   * @param value the value
-   */
-  static void Log(std::string_view name, std::span<const uint8_t> value) {
     GetTable().Log(name, value);
   }
 
@@ -260,15 +251,25 @@ class Telemetry final {
   }
 
   /**
-   * Logs a byte array (raw value) with type string matching.
+   * Logs a raw value (byte array).
    *
    * @param name the name
-   * @param typeString the type string
    * @param value the value
    */
-  static void LogRaw(std::string_view name, std::string_view typeString,
-                     std::span<const uint8_t> value) {
-    GetTable().Log(name, typeString, value);
+  static void Log(std::string_view name, std::span<const uint8_t> value) {
+    GetTable().Log(name, value);
+  }
+
+  /**
+   * Logs a raw value (byte array) with custom type string.
+   *
+   * @param name the name
+   * @param value the value
+   * @param typeString the type string
+   */
+  static void Log(std::string_view name, std::span<const uint8_t> value,
+                  std::string_view typeString) {
+    GetTable().Log(name, value, typeString);
   }
 };
 
