@@ -174,7 +174,7 @@ public final class Commands {
    * @return the command
    * @see ConditionalCommand
    */
-  public static Command runIf(BooleanSupplier condition, Command onTrue){
+  public static Command runIf(BooleanSupplier condition, Command onTrue) {
     return onTrue.onlyIf(condition);
   }
 
