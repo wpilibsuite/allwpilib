@@ -175,7 +175,7 @@ public final class Commands {
    * @see ConditionalCommand
    */
   public static Command runIf(BooleanSupplier selector, Command onTrue){
-    return Commands.either(onTrue, Commands.none(), selector);
+    return onTrue.onlyIf(selector);
   }
 
   /**
