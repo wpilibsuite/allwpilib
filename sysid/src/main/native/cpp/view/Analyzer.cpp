@@ -297,6 +297,7 @@ void Analyzer::Display() {
       HandleMultipleRuns(m_currentTest, m_currentData, m_multipleRunsPopup);
       if (!m_multipleRunsPopup) {
         m_state = AnalyzerState::kNominalDisplay;
+        PrepareData();
       }
       break;
     }

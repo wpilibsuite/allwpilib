@@ -36,7 +36,7 @@ class AnalysisManager {
   // This contains data for each test (e.g. quasistatic-forward,
   // quasistatic-backward, etc) indexed by test name
   TestData m_data;
-  int m_selectedRun = 0;
+  int m_selectedRun = -1;
   /**
    * Represents settings for an instance of the analysis manager. This contains
    * information about the feedback controller preset, loop type, velocity
@@ -360,7 +360,7 @@ class MultipleRunsError : public std::exception {
   Settings& m_settings;
 
   units::second_t m_minStepTime{0};
-  units::second_t m_maxStepTime{std::numeric_limits<double>::infinity()};
+  units::second_t m_maxStepTime{1000}; //std::numeric_limits<double>::infinity()};
   std::vector<units::second_t> m_positionDelays;
   std::vector<units::second_t> m_velocityDelays;
 

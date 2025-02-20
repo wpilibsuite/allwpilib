@@ -20,6 +20,7 @@
 #include "sysid/analysis/FilteringUtils.h"
 #include "sysid/analysis/Storage.h"
 #include "units/time.h"
+#include "wpi/Logger.h"
 
 using namespace sysid;
 
@@ -62,12 +63,14 @@ std::vector<PreparedData> AnalysisManager::ConvertToPrepared(const MotorData& da
   std::vector<PreparedData> prepared;
 
   // do we have just one run?
-  if (data.runs.size() > 1) {
+  if (data.runs.size() > 1 && m_selectedRun == -1) {
     throw AnalysisManager::MultipleRunsError{testName, data};
   }
 
   // assume we've selected down to a single contiguous run by this point
   auto run = data.runs[m_selectedRun];
+
+  WPI_DEBUG(m_logger, "RUN SELECTED");
 
   for (int i = 0; i < static_cast<int>(run.voltage.size()) - 1; ++i) {
     const auto& currentVoltage = run.voltage[i];
