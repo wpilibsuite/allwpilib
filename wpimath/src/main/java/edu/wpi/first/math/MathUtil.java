@@ -1,7 +1,9 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.math;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 
@@ -212,53 +214,56 @@ public final class MathUtil {
   }
 
   /**
- * Limits translation velocity.
- *
- * @param current Translation at current timestep.
- * @param next Translation at next timestep.
- * @param dt Timestep duration.
- * @param maxVelocity Maximum translation velocity.
- */
-  public static Translation2d SlewRateLimit(Translation2d current, Translation2d next, double dt, double maxVelocity) {
-  if (maxVelocity < 0) {
-    Exception e = new IllegalArgumentException();
-    MathSharedStore.reportError("maxVelocity must be a non-negative number, got " + maxVelocity, e.getStackTrace());
-  }
-  Translation2d diff = next.minus(current);
-  double dist = diff.getNorm();
-  if (dist < 1e-9) {
-    return next;
-  }
-  double velocity = dist / dt;
-  if (velocity > maxVelocity) {
-    velocity = maxVelocity;
-  }
-  return current.plus(diff.times(velocity / dist));
+   * Limits translation velocity.
+   *
+   * @param current Translation at current timestep.
+   * @param next Translation at next timestep.
+   * @param dt Timestep duration.
+   * @param maxVelocity Maximum translation velocity.
+   */
+  public static Translation2d slewRateLimit(
+      Translation2d current, Translation2d next, double dt, double maxVelocity) {
+    if (maxVelocity < 0) {
+      Exception e = new IllegalArgumentException();
+      MathSharedStore.reportError(
+          "maxVelocity must be a non-negative number, got " + maxVelocity, e.getStackTrace());
+    }
+    Translation2d diff = next.minus(current);
+    double dist = diff.getNorm();
+    if (dist < 1e-9) {
+      return next;
+    }
+    double velocity = dist / dt;
+    if (velocity > maxVelocity) {
+      velocity = maxVelocity;
+    }
+    return current.plus(diff.times(velocity / dist));
   }
 
   /**
- * Limits translation velocity.
- *
- * @param current Translation at current timestep.
- * @param next Translation at next timestep.
- * @param dt Timestep duration.
- * @param maxVelocity Maximum translation velocity.
- */
-  public static Translation3d SlewRateLimit(Translation3d current, Translation3d next, double dt, double maxVelocity) {
-  if (maxVelocity < 0) {
-    Exception e = new IllegalArgumentException();
-    MathSharedStore.reportError("maxVelocity must be a non-negative number, got " + maxVelocity, e.getStackTrace());
+   * Limits translation velocity.
+   *
+   * @param current Translation at current timestep.
+   * @param next Translation at next timestep.
+   * @param dt Timestep duration.
+   * @param maxVelocity Maximum translation velocity.
+   */
+  public static Translation3d slewRateLimit(
+      Translation3d current, Translation3d next, double dt, double maxVelocity) {
+    if (maxVelocity < 0) {
+      Exception e = new IllegalArgumentException();
+      MathSharedStore.reportError(
+          "maxVelocity must be a non-negative number, got " + maxVelocity, e.getStackTrace());
+    }
+    Translation3d diff = next.minus(current);
+    double dist = diff.getNorm();
+    if (dist < 1e-9) {
+      return next;
+    }
+    double velocity = dist / dt;
+    if (velocity > maxVelocity) {
+      velocity = maxVelocity;
+    }
+    return current.plus(diff.times(velocity / dist));
   }
-  Translation3d diff = next.minus(current);
-  double dist = diff.getNorm();
-  if (dist < 1e-9) {
-    return next;
-  }
-  double velocity = dist / dt;
-  if (velocity > maxVelocity) {
-    velocity = maxVelocity;
-  }
-  return current.plus(diff.times(velocity / dist));
-  }
-
 }
