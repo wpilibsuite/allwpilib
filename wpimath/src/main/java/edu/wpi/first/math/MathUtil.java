@@ -227,6 +227,7 @@ public final class MathUtil {
       Exception e = new IllegalArgumentException();
       MathSharedStore.reportError(
           "maxVelocity must be a non-negative number, got " + maxVelocity, e.getStackTrace());
+      return next;
     }
     Translation2d diff = next.minus(current);
     double dist = diff.getNorm();
@@ -254,6 +255,7 @@ public final class MathUtil {
       Exception e = new IllegalArgumentException();
       MathSharedStore.reportError(
           "maxVelocity must be a non-negative number, got " + maxVelocity, e.getStackTrace());
+      return next;
     }
     Translation3d diff = next.minus(current);
     double dist = diff.getNorm();
