@@ -37,6 +37,7 @@ extern "C" {
 /**
  * Initializes a Power Distribution Panel.
  *
+ * @param[in] busId              the bus id
  * @param[in] moduleNumber       the module number to initialize
  * @param[in] type               the type of module to initialize
  * @param[in] allocationLocation the location where the allocation is occurring
@@ -44,7 +45,7 @@ extern "C" {
  * @return the created PowerDistribution handle
  */
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
-    int32_t moduleNumber, HAL_PowerDistributionType type,
+    int32_t busId, int32_t moduleNumber, HAL_PowerDistributionType type,
     const char* allocationLocation, int32_t* status);
 
 /**
@@ -412,7 +413,7 @@ void HAL_StartPowerDistributionStream(HAL_PowerDistributionHandle handle,
 typedef struct HAL_PowerDistributionChannelData {
   float current;
   int32_t channel;
-  uint32_t timestamp;
+  uint64_t timestamp;
 } HAL_PowerDistributionChannelData;
 
 HAL_PowerDistributionChannelData* HAL_GetPowerDistributionStreamData(

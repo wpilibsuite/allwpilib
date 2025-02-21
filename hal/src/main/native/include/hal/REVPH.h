@@ -137,13 +137,14 @@ extern "C" {
 /**
  * Initializes a PH.
  *
+ * @param[in] busId              the bus id
  * @param[in] module             the CAN ID to initialize
  * @param[in] allocationLocation the location where the allocation is occurring
  *                               (can be null)
  * @param[out] status            Error status variable. 0 on success.
  * @return the created PH handle
  */
-HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
+HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
                                     const char* allocationLocation,
                                     int32_t* status);
 

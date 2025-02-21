@@ -32,15 +32,15 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_hal_REVPHJNI
  * Method:    initialize
- * Signature: (I)I
+ * Signature: (II)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_REVPHJNI_initialize
-  (JNIEnv* env, jclass, jint module)
+  (JNIEnv* env, jclass, jint busId, jint module)
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  auto handle = HAL_InitializeREVPH(module, stack.c_str(), &status);
+  auto handle = HAL_InitializeREVPH(busId, module, stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return handle;
 }

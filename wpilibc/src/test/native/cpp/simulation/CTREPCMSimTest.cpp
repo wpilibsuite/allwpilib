@@ -22,14 +22,14 @@ TEST(CTREPCMSimTest, InitializedCallback) {
   BooleanCallback callback;
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
 
-  PneumaticsControlModule pcm;
+  PneumaticsControlModule pcm{0};
   EXPECT_TRUE(sim.GetInitialized());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }
 
 TEST(CTREPCMSimTest, SolenoidOutput) {
-  PneumaticsControlModule pcm;
+  PneumaticsControlModule pcm{0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
@@ -80,7 +80,7 @@ TEST(CTREPCMSimTest, SolenoidOutput) {
 }
 
 TEST(CTREPCMSimTest, SetCompressorOn) {
-  PneumaticsControlModule pcm;
+  PneumaticsControlModule pcm{0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
@@ -97,7 +97,7 @@ TEST(CTREPCMSimTest, SetCompressorOn) {
 }
 
 TEST(CTREPCMSimTest, SetEnableDigital) {
-  PneumaticsControlModule pcm;
+  PneumaticsControlModule pcm{0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
@@ -116,7 +116,7 @@ TEST(CTREPCMSimTest, SetEnableDigital) {
 }
 
 TEST(CTREPCMSimTest, SetPressureSwitchEnabled) {
-  PneumaticsControlModule pcm;
+  PneumaticsControlModule pcm{0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
@@ -133,7 +133,7 @@ TEST(CTREPCMSimTest, SetPressureSwitchEnabled) {
 }
 
 TEST(CTREPCMSimTest, SetCompressorCurrent) {
-  PneumaticsControlModule pcm;
+  PneumaticsControlModule pcm{0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 

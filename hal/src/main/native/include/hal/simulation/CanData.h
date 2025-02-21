@@ -8,31 +8,29 @@
 #include "hal/Value.h"
 #include "hal/simulation/NotifyListener.h"
 
-typedef void (*HAL_CAN_SendMessageCallback)(const char* name, void* param,
-                                            uint32_t messageID,
-                                            const uint8_t* data,
-                                            uint8_t dataSize, int32_t periodMs,
-                                            int32_t* status);
+typedef void (*HAL_CAN_SendMessageCallback)(
+    const char* name, void* param, int32_t busId, uint32_t messageId,
+    const struct HAL_CANMessage* message, int32_t periodMs, int32_t* status);
 
 typedef void (*HAL_CAN_ReceiveMessageCallback)(
-    const char* name, void* param, uint32_t* messageID, uint32_t messageIDMask,
-    uint8_t* data, uint8_t* dataSize, uint32_t* timeStamp, int32_t* status);
+    const char* name, void* param, int32_t busId, uint32_t messageId,
+    struct HAL_CANReceiveMessage* message, int32_t* status);
 
 typedef void (*HAL_CAN_OpenStreamSessionCallback)(
-    const char* name, void* param, uint32_t* sessionHandle, uint32_t messageID,
-    uint32_t messageIDMask, uint32_t maxMessages, int32_t* status);
+    const char* name, void* param, HAL_CANStreamHandle* streamHandle,
+    int32_t busId, uint32_t messageId, uint32_t messageIDMask,
+    uint32_t maxMessages, int32_t* status);
 
-typedef void (*HAL_CAN_CloseStreamSessionCallback)(const char* name,
-                                                   void* param,
-                                                   uint32_t sessionHandle);
+typedef void (*HAL_CAN_CloseStreamSessionCallback)(
+    const char* name, void* param, HAL_CANStreamHandle sessionHandle);
 
 typedef void (*HAL_CAN_ReadStreamSessionCallback)(
-    const char* name, void* param, uint32_t sessionHandle,
+    const char* name, void* param, HAL_CANStreamHandle sessionHandle,
     struct HAL_CANStreamMessage* messages, uint32_t messagesToRead,
     uint32_t* messagesRead, int32_t* status);
 
 typedef void (*HAL_CAN_GetCANStatusCallback)(
-    const char* name, void* param, float* percentBusUtilization,
+    const char* name, void* param, int32_t busId, float* percentBusUtilization,
     uint32_t* busOffCount, uint32_t* txFullCount, uint32_t* receiveErrorCount,
     uint32_t* transmitErrorCount, int32_t* status);
 

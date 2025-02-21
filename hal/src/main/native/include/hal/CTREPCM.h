@@ -21,13 +21,14 @@ extern "C" {
 /**
  * Initializes a PCM.
  *
+ * @param[in] busId              the CAN bus ID
  * @param[in] module             the CAN ID to initialize
  * @param[in] allocationLocation the location where the allocation is occurring
  *                               (can be null)
  * @param[out] status            Error status variable. 0 on success.
  * @return the created PH handle
  */
-HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
+HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
                                         const char* allocationLocation,
                                         int32_t* status);
 

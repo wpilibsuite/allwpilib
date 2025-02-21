@@ -35,7 +35,7 @@ void InitializeCTREPCM() {
 }
 }  // namespace hal::init
 
-HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
+HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
                                         const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();

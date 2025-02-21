@@ -20,7 +20,7 @@ using namespace hal;
 extern "C" {
 
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
-    int32_t moduleNumber, HAL_PowerDistributionType type,
+    int32_t busId, int32_t moduleNumber, HAL_PowerDistributionType type,
     const char* allocationLocation, int32_t* status) {
   if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic) {
     if (moduleNumber != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
@@ -46,7 +46,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     } while (true);
 
     // Try PDP first
-    auto pdpHandle = HAL_InitializePDP(0, allocationLocation, status);
+    auto pdpHandle = HAL_InitializePDP(busId, 0, allocationLocation, status);
     if (pdpHandle != HAL_kInvalidHandle) {
       *status = 0;
       HAL_GetPDPVoltage(pdpHandle, status);
@@ -56,7 +56,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
       HAL_CleanPDP(pdpHandle);
     }
     *status = 0;
-    auto pdhHandle = HAL_InitializeREVPDH(1, allocationLocation, status);
+    auto pdhHandle = HAL_InitializeREVPDH(busId, 1, allocationLocation, status);
     return static_cast<HAL_PowerDistributionHandle>(pdhHandle);
   }
 
@@ -65,13 +65,13 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
       moduleNumber = 0;
     }
     return static_cast<HAL_PowerDistributionHandle>(
-        HAL_InitializePDP(moduleNumber, allocationLocation, status));
+        HAL_InitializePDP(busId, moduleNumber, allocationLocation, status));
   } else {
     if (moduleNumber == HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
       moduleNumber = 1;
     }
     return static_cast<HAL_PowerDistributionHandle>(
-        HAL_InitializeREVPDH(moduleNumber, allocationLocation, status));
+        HAL_InitializeREVPDH(busId, moduleNumber, allocationLocation, status));
   }
 }
 

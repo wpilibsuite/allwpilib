@@ -9,7 +9,7 @@
 using namespace HatchConstants;
 
 HatchSubsystem::HatchSubsystem()
-    : m_hatchSolenoid{frc::PneumaticsModuleType::CTREPCM,
+    : m_hatchSolenoid{0, frc::PneumaticsModuleType::CTREPCM,
                       kHatchSolenoidPorts[0], kHatchSolenoidPorts[1]} {}
 
 void HatchSubsystem::GrabHatch() {

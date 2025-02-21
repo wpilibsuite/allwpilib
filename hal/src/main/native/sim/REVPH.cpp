@@ -35,7 +35,7 @@ void InitializeREVPH() {
 }
 }  // namespace hal::init
 
-HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
+HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
                                     const char* allocationLocation,
                                     int32_t* status) {
   hal::init::CheckInit();

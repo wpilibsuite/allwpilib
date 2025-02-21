@@ -12,7 +12,7 @@
 namespace frc {
 
 TEST(DoubleSolenoidCTRETest, ValidInitialization) {
-  DoubleSolenoid solenoid{3, frc::PneumaticsModuleType::CTREPCM, 2, 3};
+  DoubleSolenoid solenoid{0, 3, frc::PneumaticsModuleType::CTREPCM, 2, 3};
   solenoid.Set(DoubleSolenoid::kReverse);
   EXPECT_EQ(DoubleSolenoid::kReverse, solenoid.Get());
 
@@ -25,29 +25,29 @@ TEST(DoubleSolenoidCTRETest, ValidInitialization) {
 
 TEST(DoubleSolenoidCTRETest, ThrowForwardPortAlreadyInitialized) {
   // Single solenoid that is reused for forward port
-  Solenoid solenoid{5, frc::PneumaticsModuleType::CTREPCM, 2};
-  EXPECT_THROW(DoubleSolenoid(5, frc::PneumaticsModuleType::CTREPCM, 2, 3),
+  Solenoid solenoid{0, 5, frc::PneumaticsModuleType::CTREPCM, 2};
+  EXPECT_THROW(DoubleSolenoid(0, 5, frc::PneumaticsModuleType::CTREPCM, 2, 3),
                std::runtime_error);
 }
 
 TEST(DoubleSolenoidCTRETest, ThrowReversePortAlreadyInitialized) {
   // Single solenoid that is reused for forward port
-  Solenoid solenoid{6, frc::PneumaticsModuleType::CTREPCM, 3};
+  Solenoid solenoid{0, 6, frc::PneumaticsModuleType::CTREPCM, 3};
   EXPECT_THROW(DoubleSolenoid(6, frc::PneumaticsModuleType::CTREPCM, 2, 3),
                std::runtime_error);
 }
 
 TEST(DoubleSolenoidCTRETest, ThrowBothPortsAlreadyInitialized) {
-  PneumaticsControlModule pcm{6};
+  PneumaticsControlModule pcm{0, 6};
   // Single solenoid that is reused for forward port
-  Solenoid solenoid0(6, frc::PneumaticsModuleType::CTREPCM, 2);
-  Solenoid solenoid1(6, frc::PneumaticsModuleType::CTREPCM, 3);
+  Solenoid solenoid0(0, 6, frc::PneumaticsModuleType::CTREPCM, 2);
+  Solenoid solenoid1(0, 6, frc::PneumaticsModuleType::CTREPCM, 3);
   EXPECT_THROW(DoubleSolenoid(6, frc::PneumaticsModuleType::CTREPCM, 2, 3),
                std::runtime_error);
 }
 
 TEST(DoubleSolenoidCTRETest, Toggle) {
-  DoubleSolenoid solenoid{4, frc::PneumaticsModuleType::CTREPCM, 2, 3};
+  DoubleSolenoid solenoid{0, 4, frc::PneumaticsModuleType::CTREPCM, 2, 3};
   // Bootstrap it into reverse
   solenoid.Set(DoubleSolenoid::kReverse);
 
@@ -64,12 +64,12 @@ TEST(DoubleSolenoidCTRETest, Toggle) {
 }
 
 TEST(DoubleSolenoidCTRETest, InvalidForwardPort) {
-  EXPECT_THROW(DoubleSolenoid(0, frc::PneumaticsModuleType::CTREPCM, 100, 1),
+  EXPECT_THROW(DoubleSolenoid(0, 0, frc::PneumaticsModuleType::CTREPCM, 100, 1),
                std::runtime_error);
 }
 
 TEST(DoubleSolenoidCTRETest, InvalidReversePort) {
-  EXPECT_THROW(DoubleSolenoid(0, frc::PneumaticsModuleType::CTREPCM, 0, 100),
+  EXPECT_THROW(DoubleSolenoid(0, 0, frc::PneumaticsModuleType::CTREPCM, 0, 100),
                std::runtime_error);
 }
 }  // namespace frc

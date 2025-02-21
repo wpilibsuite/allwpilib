@@ -4,10 +4,7 @@
 
 package edu.wpi.first.hal.can;
 
-import edu.wpi.first.hal.CANStreamMessage;
 import edu.wpi.first.hal.JNIWrapper;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 
 /**
  * CAN API HAL JNI Functions.
@@ -34,47 +31,52 @@ public class CANJNI extends JNIWrapper {
   /**
    * Sends a CAN message.
    *
-   * @param messageID The ID of the CAN message.
-   * @param data The data bytes to be sent.
+   * @param busId The bus ID.
+   * @param messageId The ID of the CAN message.
+   * @param data the data to send.
+   * @param dataLength the length of data to send
+   * @param flags the message flags
    * @param periodMs The period in milliseconds at which to send the message, use {@link
    *     #CAN_SEND_PERIOD_NO_REPEAT} for a single send.
+   * @return send status, 0 on success.
    */
-  public static native void FRCNetCommCANSessionMuxSendMessage(
-      int messageID, byte[] data, int periodMs);
+  public static native int sendMessage(
+      int busId, int messageId, byte[] data, int dataLength, int flags, int periodMs);
 
   /**
    * Receives a CAN message.
    *
-   * @param messageID store for the received message ID (output parameter).
-   * @param messageIDMask the message ID mask to look for
-   * @param timeStamp the packet received timestamp (based off of CLOCK_MONOTONIC) (output
-   *     parameter).
-   * @return The data bytes of the received message.
+   * @param busId The bus ID.
+   * @param messageId message id to look for.
+   * @param message The message.
+   * @return receive status, 0 on success.
    */
-  public static native byte[] FRCNetCommCANSessionMuxReceiveMessage(
-      IntBuffer messageID, int messageIDMask, ByteBuffer timeStamp);
+  public static native int receiveMessage(int busId, int messageId, CANReceiveMessage message);
 
   /**
    * Retrieves the current status of the CAN bus.
    *
+   * @param busId The bus ID.
    * @param status The CANStatus object to hold the retrieved status.
    */
-  public static native void getCANStatus(CANStatus status);
+  public static native void getCANStatus(int busId, CANStatus status);
 
   /**
    * Opens a new CAN stream session for receiving CAN messages with specified filters.
    *
-   * @param messageID The CAN messageID to match against. The bits of the messageID are bitwise
+   * @param busId The bus ID.
+   * @param messageId The CAN messageId to match against. The bits of the messageId are bitwise
    *     ANDed with the messageIDMask.
-   * @param messageIDMask The CAN messageIDMask is a bit-wise mask of bits in the messageID to match
-   *     against. This allows matching against multiple frames. For example, providing an messageID
+   * @param messageIDMask The CAN messageIDMask is a bit-wise mask of bits in the messageId to match
+   *     against. This allows matching against multiple frames. For example, providing an messageId
    *     of 0x2050001 and a mask of 0x1FFF003F would match all REV motor controller frames for a
-   *     device with CAN ID 1. Providing a mask of 0x1FFFFFFF means that only the exact messageID
+   *     device with CAN ID 1. Providing a mask of 0x1FFFFFFF means that only the exact messageId
    *     will be matched. Providing a mask of 0 would match any frame of any type.
    * @param maxMessages The maximum number of messages that can be buffered in the session.
    * @return The handle to the opened CAN stream session.
    */
-  public static native int openCANStreamSession(int messageID, int messageIDMask, int maxMessages);
+  public static native int openCANStreamSession(
+      int busId, int messageId, int messageIDMask, int maxMessages);
 
   /**
    * Closes a CAN stream session.

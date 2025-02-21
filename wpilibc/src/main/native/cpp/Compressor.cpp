@@ -14,8 +14,8 @@
 
 using namespace frc;
 
-Compressor::Compressor(int module, PneumaticsModuleType moduleType)
-    : m_module{PneumaticsBase::GetForType(module, moduleType)},
+Compressor::Compressor(int busId, int module, PneumaticsModuleType moduleType)
+    : m_module{PneumaticsBase::GetForType(busId, module, moduleType)},
       m_moduleType{moduleType} {
   if (!m_module->ReserveCompressor()) {
     throw FRC_MakeError(err::ResourceAlreadyAllocated, "{}", module);
@@ -27,8 +27,9 @@ Compressor::Compressor(int module, PneumaticsModuleType moduleType)
   wpi::SendableRegistry::Add(this, "Compressor", module);
 }
 
-Compressor::Compressor(PneumaticsModuleType moduleType)
-    : Compressor{PneumaticsBase::GetDefaultForType(moduleType), moduleType} {}
+Compressor::Compressor(int busId, PneumaticsModuleType moduleType)
+    : Compressor{busId, PneumaticsBase::GetDefaultForType(moduleType),
+                 moduleType} {}
 
 Compressor::~Compressor() {
   if (m_module) {

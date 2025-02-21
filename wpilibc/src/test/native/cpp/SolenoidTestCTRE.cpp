@@ -11,7 +11,7 @@
 
 namespace frc {
 TEST(SolenoidCTRETest, ValidInitialization) {
-  Solenoid solenoid{3, frc::PneumaticsModuleType::CTREPCM, 2};
+  Solenoid solenoid{0, 3, frc::PneumaticsModuleType::CTREPCM, 2};
   EXPECT_EQ(2, solenoid.GetChannel());
 
   solenoid.Set(true);
@@ -22,24 +22,24 @@ TEST(SolenoidCTRETest, ValidInitialization) {
 }
 
 TEST(SolenoidCTRETest, DoubleInitialization) {
-  Solenoid solenoid{3, frc::PneumaticsModuleType::CTREPCM, 2};
-  EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::CTREPCM, 2),
+  Solenoid solenoid{0, 3, frc::PneumaticsModuleType::CTREPCM, 2};
+  EXPECT_THROW(Solenoid(0, 3, frc::PneumaticsModuleType::CTREPCM, 2),
                std::runtime_error);
 }
 
 TEST(SolenoidCTRETest, DoubleInitializationFromDoubleSolenoid) {
-  DoubleSolenoid solenoid{3, frc::PneumaticsModuleType::CTREPCM, 2, 3};
-  EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::CTREPCM, 2),
+  DoubleSolenoid solenoid{0, 3, frc::PneumaticsModuleType::CTREPCM, 2, 3};
+  EXPECT_THROW(Solenoid(0, 3, frc::PneumaticsModuleType::CTREPCM, 2),
                std::runtime_error);
 }
 
 TEST(SolenoidCTRETest, InvalidChannel) {
-  EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::CTREPCM, 100),
+  EXPECT_THROW(Solenoid(0, 3, frc::PneumaticsModuleType::CTREPCM, 100),
                std::runtime_error);
 }
 
 TEST(SolenoidCTRETest, Toggle) {
-  Solenoid solenoid{3, frc::PneumaticsModuleType::CTREPCM, 2};
+  Solenoid solenoid{0, 3, frc::PneumaticsModuleType::CTREPCM, 2};
   solenoid.Set(true);
   EXPECT_TRUE(solenoid.Get());
 

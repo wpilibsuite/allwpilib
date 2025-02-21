@@ -145,33 +145,37 @@ void InitializeCTREPCM() {
 }
 }  // namespace hal::init
 
-#define READ_PACKET(type, frame, failureValue)                             \
-  auto pcm = pcmHandles->Get(handle);                                      \
-  if (pcm == nullptr) {                                                    \
-    *status = HAL_HANDLE_ERROR;                                            \
-    return failureValue;                                                   \
-  }                                                                        \
-  type pcmStatus;                                                          \
-  int32_t length = 0;                                                      \
-  uint64_t receivedTimestamp = 0;                                          \
-  HAL_ReadCANPacketTimeout(pcm->canHandle, frame, pcmStatus.data, &length, \
-                           &receivedTimestamp, TimeoutMs, status);         \
-  if (*status != 0) {                                                      \
-    return failureValue;                                                   \
-  }
+#define READ_PACKET(type, frame, failureValue)                         \
+  auto pcm = pcmHandles->Get(handle);                                  \
+  if (pcm == nullptr) {                                                \
+    *status = HAL_HANDLE_ERROR;                                        \
+    return failureValue;                                               \
+  }                                                                    \
+  HAL_CANReceiveMessage message;                                       \
+  type pcmStatus;                                                      \
+  HAL_ReadCANPacketTimeout(pcm->canHandle, frame, &message, TimeoutMs, \
+                           status);                                    \
+  if (*status != 0) {                                                  \
+    return failureValue;                                               \
+  }                                                                    \
+  std::memcpy(pcmStatus.data, message.message.data, sizeof(pcmStatus.data));
 
 #define READ_STATUS(failureValue) READ_PACKET(PcmStatus, Status1, failureValue)
 #define READ_SOL_FAULTS(failureValue) \
   READ_PACKET(PcmStatusFault, StatusSolFaults, failureValue)
 
 static void SendControl(PCM* pcm, int32_t* status) {
-  HAL_WriteCANPacketRepeating(pcm->canHandle, pcm->control.data, 8, Control1,
-                              SendPeriod, status);
+  HAL_CANMessage message;
+  std::memset(&message, 0, sizeof(message));
+  message.dataSize = 8;
+  std::memcpy(message.data, pcm->control.data, 8);
+  HAL_WriteCANPacketRepeating(pcm->canHandle, Control1, &message, SendPeriod,
+                              status);
 }
 
 extern "C" {
 
-HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
+HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
                                         const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
@@ -190,7 +194,8 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
 
-  pcm->canHandle = HAL_InitializeCAN(manufacturer, module, deviceType, status);
+  pcm->canHandle =
+      HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
   if (*status != 0) {
     pcmHandles->Free(handle);
     return HAL_kInvalidHandle;
@@ -344,9 +349,11 @@ void HAL_ClearAllCTREPCMStickyFaults(HAL_CTREPCMHandle handle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  uint8_t controlData[] = {0, 0, 0, 0x80};
-  HAL_WriteCANPacket(pcm->canHandle, controlData, sizeof(controlData), Control2,
-                     status);
+  HAL_CANMessage message;
+  std::memset(&message, 0, sizeof(message));
+  message.dataSize = 4;
+  message.data[3] = 0x80;
+  HAL_WriteCANPacket(pcm->canHandle, Control2, &message, status);
 }
 
 void HAL_FireCTREPCMOneShot(HAL_CTREPCMHandle handle, int32_t index,
@@ -397,11 +404,16 @@ void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
     return;
   }
 
+  HAL_CANMessage message;
+  std::memset(&message, 0, sizeof(message));
+  message.dataSize = 8;
+
   std::scoped_lock lock{pcm->lock};
   pcm->oneShot.sol10MsPerUnit[index] = (std::min)(
       static_cast<uint32_t>(durMs) / 10, static_cast<uint32_t>(0xFF));
-  HAL_WriteCANPacketRepeating(pcm->canHandle, pcm->oneShot.sol10MsPerUnit, 8,
-                              Control3, SendPeriod, status);
+  std::memcpy(message.data, pcm->oneShot.sol10MsPerUnit, 8);
+  HAL_WriteCANPacketRepeating(pcm->canHandle, Control3, &message, SendPeriod,
+                              status);
 }
 
 }  // extern "C"

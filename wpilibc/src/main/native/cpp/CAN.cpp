@@ -15,12 +15,13 @@
 
 using namespace frc;
 
-CAN::CAN(int deviceId) : CAN{kTeamManufacturer, deviceId, kTeamDeviceType} {}
+CAN::CAN(int busId, int deviceId)
+    : CAN{busId, deviceId, kTeamManufacturer, kTeamDeviceType} {}
 
-CAN::CAN(int deviceId, int deviceManufacturer, int deviceType) {
+CAN::CAN(int busId, int deviceId, int deviceManufacturer, int deviceType) {
   int32_t status = 0;
   m_handle = HAL_InitializeCAN(
-      static_cast<HAL_CANManufacturer>(deviceManufacturer), deviceId,
+      busId, static_cast<HAL_CANManufacturer>(deviceManufacturer), deviceId,
       static_cast<HAL_CANDeviceType>(deviceType), &status);
   FRC_CheckErrorStatus(status, "device id {} mfg {} type {}", deviceId,
                        deviceManufacturer, deviceType);
@@ -30,41 +31,41 @@ CAN::CAN(int deviceId, int deviceManufacturer, int deviceType) {
       "");
 }
 
-void CAN::WritePacket(const uint8_t* data, int length, int apiId) {
+void CAN::WritePacket(int apiId, const HAL_CANMessage& message) {
   int32_t status = 0;
-  HAL_WriteCANPacket(m_handle, data, length, apiId, &status);
+  HAL_WriteCANPacket(m_handle, apiId, &message, &status);
   FRC_CheckErrorStatus(status, "WritePacket");
 }
 
-void CAN::WritePacketRepeating(const uint8_t* data, int length, int apiId,
+void CAN::WritePacketRepeating(int apiId, const HAL_CANMessage& message,
                                int repeatMs) {
   int32_t status = 0;
-  HAL_WriteCANPacketRepeating(m_handle, data, length, apiId, repeatMs, &status);
+  HAL_WriteCANPacketRepeating(m_handle, apiId, &message, repeatMs, &status);
   FRC_CheckErrorStatus(status, "WritePacketRepeating");
 }
 
-void CAN::WriteRTRFrame(int length, int apiId) {
+void CAN::WriteRTRFrame(int apiId, const HAL_CANMessage& message) {
   int32_t status = 0;
-  HAL_WriteCANRTRFrame(m_handle, length, apiId, &status);
+  HAL_WriteCANRTRFrame(m_handle, apiId, &message, &status);
   FRC_CheckErrorStatus(status, "WriteRTRFrame");
 }
 
-int CAN::WritePacketNoError(const uint8_t* data, int length, int apiId) {
+int CAN::WritePacketNoError(int apiId, const HAL_CANMessage& message) {
   int32_t status = 0;
-  HAL_WriteCANPacket(m_handle, data, length, apiId, &status);
+  HAL_WriteCANPacket(m_handle, apiId, &message, &status);
   return status;
 }
 
-int CAN::WritePacketRepeatingNoError(const uint8_t* data, int length, int apiId,
+int CAN::WritePacketRepeatingNoError(int apiId, const HAL_CANMessage& message,
                                      int repeatMs) {
   int32_t status = 0;
-  HAL_WriteCANPacketRepeating(m_handle, data, length, apiId, repeatMs, &status);
+  HAL_WriteCANPacketRepeating(m_handle, apiId, &message, repeatMs, &status);
   return status;
 }
 
-int CAN::WriteRTRFrameNoError(int length, int apiId) {
+int CAN::WriteRTRFrameNoError(int apiId, const HAL_CANMessage& message) {
   int32_t status = 0;
-  HAL_WriteCANRTRFrame(m_handle, length, apiId, &status);
+  HAL_WriteCANRTRFrame(m_handle, apiId, &message, &status);
   return status;
 }
 
@@ -74,10 +75,9 @@ void CAN::StopPacketRepeating(int apiId) {
   FRC_CheckErrorStatus(status, "StopPacketRepeating");
 }
 
-bool CAN::ReadPacketNew(int apiId, CANData* data) {
+bool CAN::ReadPacketNew(int apiId, HAL_CANReceiveMessage* data) {
   int32_t status = 0;
-  HAL_ReadCANPacketNew(m_handle, apiId, data->data, &data->length,
-                       &data->timestamp, &status);
+  HAL_ReadCANPacketNew(m_handle, apiId, data, &status);
   if (status == HAL_ERR_CANSessionMux_MessageNotFound) {
     return false;
   }
@@ -89,10 +89,9 @@ bool CAN::ReadPacketNew(int apiId, CANData* data) {
   }
 }
 
-bool CAN::ReadPacketLatest(int apiId, CANData* data) {
+bool CAN::ReadPacketLatest(int apiId, HAL_CANReceiveMessage* data) {
   int32_t status = 0;
-  HAL_ReadCANPacketLatest(m_handle, apiId, data->data, &data->length,
-                          &data->timestamp, &status);
+  HAL_ReadCANPacketLatest(m_handle, apiId, data, &status);
   if (status == HAL_ERR_CANSessionMux_MessageNotFound) {
     return false;
   }
@@ -104,10 +103,10 @@ bool CAN::ReadPacketLatest(int apiId, CANData* data) {
   }
 }
 
-bool CAN::ReadPacketTimeout(int apiId, int timeoutMs, CANData* data) {
+bool CAN::ReadPacketTimeout(int apiId, int timeoutMs,
+                            HAL_CANReceiveMessage* data) {
   int32_t status = 0;
-  HAL_ReadCANPacketTimeout(m_handle, apiId, data->data, &data->length,
-                           &data->timestamp, timeoutMs, &status);
+  HAL_ReadCANPacketTimeout(m_handle, apiId, data, timeoutMs, &status);
   if (status == HAL_CAN_TIMEOUT ||
       status == HAL_ERR_CANSessionMux_MessageNotFound) {
     return false;
@@ -118,8 +117,4 @@ bool CAN::ReadPacketTimeout(int apiId, int timeoutMs, CANData* data) {
   } else {
     return true;
   }
-}
-
-uint64_t CAN::GetTimestampBaseTime() {
-  return HAL_GetCANPacketBaseTime();
 }

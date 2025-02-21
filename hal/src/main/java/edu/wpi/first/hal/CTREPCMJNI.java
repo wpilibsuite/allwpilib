@@ -13,11 +13,12 @@ public class CTREPCMJNI extends JNIWrapper {
   /**
    * Initializes a PCM.
    *
+   * @param busId the bus id
    * @param module the CAN ID to initialize
    * @return the created PH handle
    * @see "HAL_InitializeCTREPCM"
    */
-  public static native int initialize(int module);
+  public static native int initialize(int busId, int module);
 
   /**
    * Frees a PCM handle.

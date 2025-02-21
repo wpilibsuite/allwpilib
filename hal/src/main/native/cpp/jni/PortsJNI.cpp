@@ -15,6 +15,19 @@ using namespace hal;
 extern "C" {
 /*
  * Class:     edu_wpi_first_hal_PortsJNI
+ * Method:    getNumCanBuses
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PortsJNI_getNumCanBuses
+  (JNIEnv*, jclass)
+{
+  jint value = HAL_GetNumCanBuses();
+  return value;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumAnalogInputs
  * Signature: ()I
  */

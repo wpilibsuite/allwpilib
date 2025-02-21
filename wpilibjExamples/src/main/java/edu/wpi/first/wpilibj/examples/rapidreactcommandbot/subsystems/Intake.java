@@ -9,6 +9,7 @@ import static edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.Inta
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.IntakeConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,6 +21,7 @@ public class Intake extends SubsystemBase {
   // Double solenoid connected to two channels of a PCM with the default CAN ID
   private final DoubleSolenoid m_pistons =
       new DoubleSolenoid(
+          0,
           PneumaticsModuleType.CTREPCM,
           IntakeConstants.kSolenoidPorts[0],
           IntakeConstants.kSolenoidPorts[1]);

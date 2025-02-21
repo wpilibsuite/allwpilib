@@ -42,15 +42,6 @@ inline bool CheckStatusForceThrow(JNIEnv* env, int32_t status) {
   return status == 0;
 }
 
-void ReportCANError(JNIEnv* env, int32_t status, int32_t message_id);
-
-inline bool CheckCANStatus(JNIEnv* env, int32_t status, int32_t message_id) {
-  if (status != 0) {
-    ReportCANError(env, status, message_id);
-  }
-  return status == 0;
-}
-
 void ThrowNullPointerException(JNIEnv* env, std::string_view msg);
 void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages,
                                      jint length);
@@ -75,11 +66,12 @@ void SetCanStatusObject(JNIEnv* env, jobject canStatus,
 void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
                         const HAL_MatchInfo& matchInfo);
 
-jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
-                            uint64_t timestamp);
+jbyteArray SetCANReceiveMessageObject(JNIEnv* env, jobject canData,
+                                      int32_t length, int32_t flags,
+                                      uint64_t timestamp);
 
 jbyteArray SetCANStreamObject(JNIEnv* env, jobject canStreamData,
-                              int32_t length, uint32_t messageID,
+                              int32_t length, uint32_t messageId,
                               uint64_t timestamp);
 
 jobject CreateHALValue(JNIEnv* env, const HAL_Value& value);
