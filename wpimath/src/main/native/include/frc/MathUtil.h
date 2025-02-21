@@ -237,7 +237,7 @@ constexpr Translation2d SlewRateLimit(const Translation2d& current,
   }
   if (dist > maxVelocity * dt) {
     // Move maximum allowed amount in direction of the difference
-    return current + diff * (maxVelocity * dt).value() / dist.value() ;
+    return current + diff * (maxVelocity * dt / dist).value();
   }
   return next;
 }
