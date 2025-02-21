@@ -191,7 +191,7 @@ TEST(MathUtilTest, Translation3dSlewRateLimit) {
   const frc::Translation3d result1 = frc::SlewRateLimit(translation1, translation2, 1_s, 50.0_mps);
   const frc::Translation3d result2 = frc::SlewRateLimit(translation3, translation4, 0.25_s, 2.0_mps);
   const frc::Translation3d expected1{2_m, 2_m, 2_m};
-  const frc::Translation3d expected2{1.288675135_m, 1.288675135_m, 1.288675135_m}; // 1 + 1/sqrt(12)
+  const frc::Translation3d expected2{units::meter_t{1.0 + 0.5 * std::numbers::inv_sqrt3}, units::meter_t{1.0 + 0.5 * std::numbers::inv_sqrt3}, units::meter_t{1.0 + 0.5 * std::numbers::inv_sqrt3}};
   EXPECT_EQ(result1, expected1);
   EXPECT_EQ(result2, expected2);
 }
