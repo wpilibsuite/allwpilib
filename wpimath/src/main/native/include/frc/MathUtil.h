@@ -264,7 +264,7 @@ constexpr Translation3d SlewRateLimit(
   }
   if (dist > maxVelocity * dt) {
     // Move maximum allowed amount in direction of the difference
-    return current + diff * (maxVelocity * dt).value() / dist.value() ;
+    return current + diff * (maxVelocity * dt / dist).value();
   }
   return next;
 }
