@@ -175,10 +175,10 @@ TEST(MathUtilTest, Translation2dSlewRateLimit) {
   const frc::Translation2d translation2{2_m, 2_m};
   const frc::Translation2d translation3{1_m, 1_m};
   const frc::Translation2d translation4{3_m, 3_m};
-  const frc::Translation2d result1 = frc::SlewRateLimit(translation1, translation2, 0.25_s, 50_mps);
-  const frc::Translation2d result2 = frc::SlewRateLimit(translation3, translation4, 1_s, 2_mps);
-  const frc::Translation2d expected1{8_m, 8_m};
-  const frc::Translation2d expected2{2.414213562_m, 2.414213562_m};
+  const frc::Translation2d result1 = frc::SlewRateLimit(translation1, translation2, 1_s, 50_mps);
+  const frc::Translation2d result2 = frc::SlewRateLimit(translation3, translation4, 0.25_s, 2_mps);
+  const frc::Translation2d expected1{2_m, 2_m};
+  const frc::Translation2d expected2{1.353553391_m, 1.353553391_m}; // 1 + 1/sqrt(8)
   EXPECT_EQ(result1, expected1);
   EXPECT_EQ(result2, expected2);
 }
@@ -188,10 +188,10 @@ TEST(MathUtilTest, Translation3dSlewRateLimit) {
   const frc::Translation3d translation2{2_m, 2_m, 2_m};
   const frc::Translation3d translation3{1_m, 1_m, 1_m};
   const frc::Translation3d translation4{3_m, 3_m, 3_m};
-  const frc::Translation3d result1 = frc::SlewRateLimit(translation1, translation2, 0.25_s, 50.0_mps);
-  const frc::Translation3d result2 = frc::SlewRateLimit(translation3, translation4, 1.0_s, 2.0_mps);
-  const frc::Translation3d expected1{8_m, 8_m, 8_m};
-  const frc::Translation3d expected2{2.154700538_m, 2.154700538_m, 2.154700538_m};
+  const frc::Translation3d result1 = frc::SlewRateLimit(translation1, translation2, 1_s, 50.0_mps);
+  const frc::Translation3d result2 = frc::SlewRateLimit(translation3, translation4, 0.25_s, 2.0_mps);
+  const frc::Translation3d expected1{2_m, 2_m, 2_m};
+  const frc::Translation3d expected2{1.288675135_m, 1.288675135_m, 1.288675135_m}; // 1 + 1/sqrt(12)
   EXPECT_EQ(result1, expected1);
   EXPECT_EQ(result2, expected2);
 }

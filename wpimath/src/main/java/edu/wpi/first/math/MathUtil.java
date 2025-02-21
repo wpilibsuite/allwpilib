@@ -233,8 +233,11 @@ public final class MathUtil {
     if (dist < 1e-9) {
       return next;
     }
-    double velocity = Math.min(dist / dt, maxVelocity);
-    return current.plus(diff.times(velocity / dist));
+    if (dist > maxVelocity * dt) {
+      // Move maximum allowed amount in direction of the difference
+      return current.plus(diff.times(maxVelocity * dt).div(dist));
+    }
+    return next;
   }
 
   /**
@@ -257,7 +260,10 @@ public final class MathUtil {
     if (dist < 1e-9) {
       return next;
     }
-    double velocity = Math.min(dist / dt, maxVelocity);
-    return current.plus(diff.times(velocity / dist));
+    if (dist > maxVelocity * dt) {
+      // Move maximum allowed amount in direction of the difference
+      return current.plus(diff.times(maxVelocity * dt).div(dist));
+    }
+    return next;
   }
 }
