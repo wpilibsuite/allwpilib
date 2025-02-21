@@ -440,7 +440,9 @@ void CombineCalibrations() {
         if (layoutPath != "") {
           auto tagPose = calibratedFieldLayouts[layoutPath].GetTagPose(tagId);
           if (tagPose) {
-            tags.emplace_back(tagId, tagPose.value());
+            // TODO: remove variable when clang 16 is available on Mac
+            frc::AprilTag tag{tagId, tagPose.value()};
+            tags.emplace_back(tag);
           }
         }
       }
