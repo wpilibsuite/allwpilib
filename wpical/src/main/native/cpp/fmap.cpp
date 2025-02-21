@@ -19,8 +19,10 @@ Fieldmap::Fieldmap(std::string type, std::vector<Fiducial> fiducials)
 Fieldmap::Fieldmap(const frc::AprilTagFieldLayout& layout) : type("frc") {
   // https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-map-specification
   for (auto tag : layout.GetTags()) {
-    fiducials.emplace_back("apriltag3_36h11_classic", tag.ID, 165.1,
-                           tag.pose.ToMatrix(), 1);
+    // TODO: remove variable when clang 16 is available on Mac
+    Fiducial fiducial{"apriltag3_36h11_classic", tag.ID, 165.1,
+                      tag.pose.ToMatrix(), 1};
+    fiducials.emplace_back(fiducial);
   }
 }
 

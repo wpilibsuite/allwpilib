@@ -417,7 +417,8 @@ std::optional<frc::AprilTagFieldLayout> fieldcalibration::calibrate(
     // Transformation from world
     Eigen::Matrix4d correctedTransform =
         pinnedTagTransform * correctionA * transform * correctionB;
-    tags.emplace_back(tagId, frc::Pose3d{correctedTransform});
+    frc::AprilTag tag{tagId, frc::Pose3d{correctedTransform}};
+    tags.emplace_back(tag);
   }
   return frc::AprilTagFieldLayout{tags, idealLayout.GetFieldLength(),
                                   idealLayout.GetFieldWidth()};
