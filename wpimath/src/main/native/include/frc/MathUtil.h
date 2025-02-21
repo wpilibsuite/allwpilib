@@ -18,6 +18,7 @@
 #include "units/time.h"
 #include "units/velocity.h"
 #include "units/length.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
