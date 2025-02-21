@@ -179,7 +179,7 @@ TEST(MathUtilTest, Translation2dSlewRateLimit) {
   const frc::Translation2d result1 = frc::SlewRateLimit(translation1, translation2, 1_s, 50_mps);
   const frc::Translation2d result2 = frc::SlewRateLimit(translation3, translation4, 0.25_s, 2_mps);
   const frc::Translation2d expected1{2_m, 2_m};
-  const frc::Translation2d expected2{units::meter_t{1.0 + 0.5 * (std::numbers::sqrt2 / 2)}, units::meter_t{1.0 + 0.5 * (std::numbers::sqrt2 / 2)}, units::meter_t{1.0 + 0.5 * (std::numbers::sqrt2 / 2)}};
+  const frc::Translation2d expected2{units::meter_t{1.0 + 0.5 * (std::numbers::sqrt2 / 2)}, units::meter_t{1.0 + 0.5 * (std::numbers::sqrt2 / 2)}};
   EXPECT_EQ(result1, expected1);
   EXPECT_EQ(result2, expected2);
 }
