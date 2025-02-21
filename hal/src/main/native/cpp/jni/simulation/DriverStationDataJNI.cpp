@@ -426,6 +426,33 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setMatchTime
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    getOpMode
+ * Signature: ()java/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getOpMode
+  (JNIEnv* env, jclass)
+{
+  char buf[128];
+  int32_t len = 128;
+  HALSIM_GetOpMode(buf, &len);
+  return MakeJString(env, std::string_view{buf, static_cast<size_t>(len)});
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setOpMode
+ * Signature: (java/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setOpMode
+  (JNIEnv* env, jclass, jstring value)
+{
+  HALSIM_SetOpMode(JStringRef{env, value}.c_str());
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickAxes
  * Signature: (B[F)V
  */
