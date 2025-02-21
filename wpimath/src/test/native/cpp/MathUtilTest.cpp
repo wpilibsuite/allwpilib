@@ -13,6 +13,7 @@
 #include "units/velocity.h"
 #include "units/length.h"
 #include "units/angle.h"
+#include <numbers>
 
 #define EXPECT_UNITS_EQ(a, b) EXPECT_DOUBLE_EQ((a).value(), (b).value())
 
