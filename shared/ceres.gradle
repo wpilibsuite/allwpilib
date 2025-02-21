@@ -1,12 +1,12 @@
 nativeUtils {
     nativeDependencyContainer {
         ceres(getNativeDependencyTypeClass('WPIStaticMavenDependency')) {
-            groupId = "edu.wpi.first.thirdparty.frc2024.ceres"
+            groupId = "edu.wpi.first.thirdparty.frc2025.ceres"
             artifactId = "ceres-cpp"
             headerClassifier = "headers"
             sourceClassifier = "sources"
             ext = "zip"
-            version = '2.2-3'
+            version = '2.2-1'
             targetPlatforms.addAll(nativeUtils.wpi.platforms.desktopPlatforms)
         }
     }
