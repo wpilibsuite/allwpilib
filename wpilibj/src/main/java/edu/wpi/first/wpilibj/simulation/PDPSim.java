@@ -67,6 +67,39 @@ public class PDPSim {
   }
 
   /**
+   * Register a callback to be run whenever the PowerDistribution channel count changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public CallbackStore registerChannelCountCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid =
+        PowerDistributionDataJNI.registerChannelCountCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, PowerDistributionDataJNI::cancelChannelCountCallback);
+  }
+
+  /**
+   * Check the channel count of the PowerDistribution.
+   *
+   * @return the PowerDistribution channel count
+   */
+  public int getChannelCount() {
+    return PowerDistributionDataJNI.getChannelCount(m_index);
+  }
+
+  /**
+   * Define the PowerDistribution channel count.
+   *
+   * @param channelCount the new PowerDistribution channel count
+   */
+  public void setChannelCount(int channelCount) {
+    PowerDistributionDataJNI.setChannelCount(m_index, channelCount);
+  }
+
+  /**
    * Register a callback to be run whenever the PDP temperature changes.
    *
    * @param callback the callback
