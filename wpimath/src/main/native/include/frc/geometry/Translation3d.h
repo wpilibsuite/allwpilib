@@ -12,8 +12,6 @@
 #include "frc/geometry/Translation2d.h"
 #include "units/length.h"
 #include "units/math.h"
-#include "units/velocity.h"
-#include "wpimath/MathShared.h"
 
 namespace frc {
 
