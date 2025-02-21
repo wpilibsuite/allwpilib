@@ -34,13 +34,28 @@ public class LoggableHandler extends ElementHandler {
 
   @Override
   public boolean isLoggable(Element element) {
-    return m_processingEnv.getTypeUtils().asElement(dataType(element)) instanceof TypeElement t
+    return isLoggableType(dataType(element));
+  }
+
+  public boolean isLoggableType(TypeMirror typeMirror) {
+    return m_processingEnv.getTypeUtils().asElement(typeMirror) instanceof TypeElement t
         && m_loggedTypes.contains(t);
   }
 
   @Override
   public String logInvocation(Element element) {
-    TypeMirror dataType = dataType(element);
+    return logInvocation(element, dataType(element), elementAccess(element));
+  }
+
+  /**
+   * Creates a log invocation with a custom data type/element access.
+   *
+   * @param element The base element of the type to log
+   * @param dataType The base type of the element
+   * @param elementAccess A code string that fetches the value when created in java
+   * @return A log call that logs the element
+   */
+  public String logInvocation(Element element, TypeMirror dataType, String elementAccess) {
     var declaredType =
         m_processingEnv
             .getElementUtils()
@@ -61,7 +76,7 @@ public class LoggableHandler extends ElementHandler {
 
     // If there are no known loggable subtypes, return just the single logger call
     if (size == 1) {
-      return generateLoggerCall(element, declaredType, elementAccess(element));
+      return generateLoggerCall(element, declaredType, elementAccess);
     }
 
     // Otherwise, generate an if-else chain to compare the element with its known loggable subtypes
@@ -73,7 +88,7 @@ public class LoggableHandler extends ElementHandler {
     StringBuilder builder = new StringBuilder();
 
     // Cache the value in a variable so it's only read once
-    builder.append("var %s = %s;\n".formatted(varName, elementAccess(element)));
+    builder.append("var %s = %s;\n".formatted(varName, elementAccess));
 
     for (int i = 0; i < size; i++) {
       TypeElement type = loggableSubtypes.get(i);
@@ -129,9 +144,7 @@ public class LoggableHandler extends ElementHandler {
   private Comparator<TypeElement> inheritanceComparatorFor(TypeElement declaredType) {
     Comparator<TypeElement> byDistance =
         Comparator.comparingInt(
-            inheritor -> {
-              return inheritanceDistance(inheritor.asType(), declaredType.asType());
-            });
+            inheritor -> inheritanceDistance(inheritor.asType(), declaredType.asType()));
 
     return byDistance
         .reversed()
