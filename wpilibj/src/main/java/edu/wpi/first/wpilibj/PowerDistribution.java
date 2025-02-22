@@ -42,6 +42,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   /**
    * Constructs a PowerDistribution object.
    *
+   * @param busId The bus ID
    * @param module The CAN ID of the PDP/PDH.
    * @param moduleType Module type (CTRE or REV).
    */
@@ -62,6 +63,8 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * Constructs a PowerDistribution object.
    *
    * <p>Detects the connected PDP/PDH using the default CAN ID (0 for CTRE and 1 for REV).
+   *
+   * @param busId The bus ID
    */
   @SuppressWarnings("this-escape")
   public PowerDistribution(int busId) {

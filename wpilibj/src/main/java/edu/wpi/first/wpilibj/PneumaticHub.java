@@ -136,7 +136,11 @@ public class PneumaticHub implements PneumaticsBase {
   private final DataStore m_dataStore;
   private final int m_handle;
 
-  /** Constructs a PneumaticHub with the default ID (1). */
+  /**
+   * Constructs a PneumaticHub with the default ID (1).
+   *
+   * @param busId The bus ID
+   */
   public PneumaticHub(int busId) {
     this(busId, SensorUtil.getDefaultREVPHModule());
   }
@@ -144,6 +148,7 @@ public class PneumaticHub implements PneumaticsBase {
   /**
    * Constructs a PneumaticHub.
    *
+   * @param busId The bus ID
    * @param module module number to construct
    */
   public PneumaticHub(int busId, int module) {

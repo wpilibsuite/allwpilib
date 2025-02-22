@@ -78,7 +78,11 @@ public class PneumaticsControlModule implements PneumaticsBase {
   private final DataStore m_dataStore;
   private final int m_handle;
 
-  /** Constructs a PneumaticsControlModule with the default ID (0). */
+  /**
+   * Constructs a PneumaticsControlModule with the default ID (0).
+   *
+   * @param busId The bus ID
+   */
   public PneumaticsControlModule(int busId) {
     this(busId, SensorUtil.getDefaultCTREPCMModule());
   }
@@ -86,6 +90,7 @@ public class PneumaticsControlModule implements PneumaticsBase {
   /**
    * Constructs a PneumaticsControlModule.
    *
+   * @param busId The bus ID
    * @param module module number to construct
    */
   public PneumaticsControlModule(int busId, int module) {

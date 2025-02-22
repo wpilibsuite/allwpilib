@@ -9,6 +9,7 @@ public interface PneumaticsBase extends AutoCloseable {
   /**
    * For internal use to get a module for a specific type.
    *
+   * @param busId The bus ID
    * @param module module number
    * @param type module type
    * @return module
