@@ -259,8 +259,7 @@ constexpr Translation3d SlewRateLimit(const Translation3d& current,
                                       units::meters_per_second_t maxVelocity) {
   if (maxVelocity < 0_mps) {
     wpi::math::MathSharedStore::ReportError(
-        "maxVelocity must be a non-negative number, got {}!",
-        maxVelocity.value());
+        "maxVelocity must be a non-negative number, got {}!", maxVelocity);
     return next;
   }
   Translation3d diff = next - current;
