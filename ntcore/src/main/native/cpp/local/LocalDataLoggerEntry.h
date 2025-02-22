@@ -9,7 +9,7 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/DataLog.h>
+#include <wpi/datalog/DataLog.h>
 
 #include "ntcore_c.h"
 

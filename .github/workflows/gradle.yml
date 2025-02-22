@@ -283,7 +283,7 @@ jobs:
     needs: [combine]
     strategy:
       matrix:
-        repo: ['SmartDashboard', 'PathWeaver', 'Shuffleboard', 'RobotBuilder']
+        repo: ["SmartDashboard", "Shuffleboard", "RobotBuilder"]
     runs-on: ubuntu-24.04
     steps:
       - uses: peter-evans/repository-dispatch@v3

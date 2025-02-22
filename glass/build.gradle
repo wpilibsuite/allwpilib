@@ -93,11 +93,12 @@ model {
                     it.buildable = false
                     return
                 }
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':fieldImages', library: 'fieldImages', linkage: 'shared'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -123,11 +124,11 @@ model {
                 lib library: nativeName, linkage: 'static'
                 project(':ntcore').addNtcoreDependency(it, 'shared')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':fieldImages', library: 'fieldImages', linkage: 'shared'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -162,12 +163,12 @@ model {
                 lib library: nativeName, linkage: 'static'
                 project(':ntcore').addNtcoreDependency(it, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':fieldImages', library: 'fieldImages', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                     it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'

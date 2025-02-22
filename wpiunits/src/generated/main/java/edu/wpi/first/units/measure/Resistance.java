@@ -87,11 +87,6 @@ public interface Resistance extends Measure<ResistanceUnit> {
     return (Resistance) div(divisor);
   }
 
-  @Override
-  default Velocity<ResistanceUnit> per(TimeUnit period) {
-    return div(period.of(1));
-  }
-
 
   @Override
   default Mult<ResistanceUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
@@ -113,6 +108,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   default Per<ResistanceUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ResistanceUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -138,6 +138,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ResistanceUnit, AngleUnit> per(AngleUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ResistanceUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
@@ -159,6 +164,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   default Per<ResistanceUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ResistanceUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -184,6 +194,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ResistanceUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ResistanceUnit, AngularVelocityUnit> times(AngularVelocity multiplier) {
@@ -207,6 +222,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ResistanceUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Voltage times(Current multiplier) {
@@ -228,6 +248,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   default Per<ResistanceUnit, CurrentUnit> divide(Current divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ResistanceUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
   @Override
@@ -275,6 +300,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ResistanceUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ResistanceUnit, EnergyUnit> times(Energy multiplier) {
@@ -296,6 +326,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   default Per<ResistanceUnit, EnergyUnit> divide(Energy divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ResistanceUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -321,6 +356,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ResistanceUnit, ForceUnit> per(ForceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ResistanceUnit, FrequencyUnit> times(Frequency multiplier) {
@@ -342,6 +382,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   default Per<ResistanceUnit, FrequencyUnit> divide(Frequency divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ResistanceUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -367,6 +412,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ResistanceUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ResistanceUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
@@ -388,6 +438,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   default Per<ResistanceUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ResistanceUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -413,6 +468,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ResistanceUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ResistanceUnit, MassUnit> times(Mass multiplier) {
@@ -434,6 +494,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   default Per<ResistanceUnit, MassUnit> divide(Mass divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ResistanceUnit, MassUnit> per(MassUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -459,6 +524,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ResistanceUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ResistanceUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
@@ -480,6 +550,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   default Per<ResistanceUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ResistanceUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
   }
 
 
@@ -505,6 +580,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ResistanceUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
+  }
+
 
   @Override
   default Mult<ResistanceUnit, PowerUnit> times(Power multiplier) {
@@ -526,6 +606,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   default Per<ResistanceUnit, PowerUnit> divide(Power divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ResistanceUnit, PowerUnit> per(PowerUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -551,6 +636,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Dimensionless per(ResistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ResistanceUnit, TemperatureUnit> times(Temperature multiplier) {
@@ -572,6 +662,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   default Per<ResistanceUnit, TemperatureUnit> divide(Temperature divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ResistanceUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -597,6 +692,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Velocity<ResistanceUnit> per(TimeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ResistanceUnit, TorqueUnit> times(Torque multiplier) {
@@ -618,6 +718,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   default Per<ResistanceUnit, TorqueUnit> divide(Torque divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ResistanceUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -643,6 +748,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<ResistanceUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<ResistanceUnit, VoltageUnit> times(Voltage multiplier) {
@@ -664,6 +774,11 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   default Per<ResistanceUnit, VoltageUnit> divide(Voltage divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<ResistanceUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 }

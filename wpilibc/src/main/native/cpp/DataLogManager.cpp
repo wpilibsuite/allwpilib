@@ -15,11 +15,11 @@
 #include <fmt/chrono.h>
 #include <hal/UsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/DataLog.h>
-#include <wpi/DataLogBackgroundWriter.h>
-#include <wpi/FileLogger.h>
 #include <wpi/SafeThread.h>
 #include <wpi/StringExtras.h>
+#include <wpi/datalog/DataLog.h>
+#include <wpi/datalog/DataLogBackgroundWriter.h>
+#include <wpi/datalog/FileLogger.h>
 #include <wpi/fs.h>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
@@ -51,7 +51,7 @@ struct Thread final : public wpi::SafeThread {
   NT_DataLogger m_ntEntryLogger = 0;
   NT_ConnectionDataLogger m_ntConnLogger = 0;
   bool m_consoleLoggerEnabled = false;
-  wpi::FileLogger m_consoleLogger;
+  wpi::log::FileLogger m_consoleLogger;
   wpi::log::StringLogEntry m_messageLog;
 };
 

@@ -1,0 +1,32 @@
+ext {
+    useJava = true
+    useCpp = true
+    baseId = 'datalog'
+    groupId = 'edu.wpi.first.datalog'
+
+    nativeName = 'datalog'
+    devMain = 'edu.wpi.first.datalog.DevMain'
+}
+
+apply from: "${rootDir}/shared/jni/setupBuild.gradle"
+
+nativeUtils.exportsConfigs {
+    datalog {
+    }
+}
+
+model {
+    components {
+        all {
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/main/native/include'
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    api project(":wpiutil")
+}

@@ -24,12 +24,27 @@ namespace frc {
  * By default, the timing supports WS2812B and WS2815 LEDs, but is configurable
  * using SetBitTiming()
  *
+ * Some LEDs use a different color order than the default GRB. The color order
+ * is configurable using SetColorOrder().
+ *
  * <p>Only 1 LED driver is currently supported by the roboRIO. However,
  * multiple LED strips can be connected in series and controlled from the
  * single driver.
  */
 class AddressableLED {
  public:
+  /**
+   * Order that color data is sent over the wire.
+   */
+  enum ColorOrder {
+    kRGB = HAL_ALED_RGB,  ///< RGB order
+    kRBG = HAL_ALED_RBG,  ///< RBG order
+    kBGR = HAL_ALED_BGR,  ///< BGR order
+    kBRG = HAL_ALED_BRG,  ///< BRG order
+    kGBR = HAL_ALED_GBR,  ///< GBR order
+    kGRB = HAL_ALED_GRB   ///< GRB order. This is the default order.
+  };
+
   class LEDData : public HAL_AddressableLEDData {
    public:
     LEDData() : LEDData(0, 0, 0) {}
@@ -94,6 +109,15 @@ class AddressableLED {
 
   AddressableLED(AddressableLED&&) = default;
   AddressableLED& operator=(AddressableLED&&) = default;
+
+  /**
+   * Sets the color order for this AddressableLED. The default order is GRB.
+   *
+   * This will take effect on the next call to SetData().
+   *
+   * @param order the color order
+   */
+  void SetColorOrder(ColorOrder order);
 
   /**
    * Sets the length of the LED strip.
@@ -169,4 +193,9 @@ class AddressableLED {
   hal::Handle<HAL_AddressableLEDHandle, HAL_FreeAddressableLED> m_handle;
   int m_port;
 };
+
+constexpr auto format_as(AddressableLED::ColorOrder order) {
+  return static_cast<int32_t>(order);
+}
+
 }  // namespace frc
