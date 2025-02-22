@@ -10,14 +10,14 @@
 #include <gcem.hpp>
 #include <wpi/SymbolExports.h>
 
+#include "frc/geometry/Translation2d.h"
+#include "frc/geometry/Translation3d.h"
 #include "units/angle.h"
 #include "units/base.h"
+#include "units/length.h"
 #include "units/math.h"
-#include "frc/geometry/Translation3d.h"
-#include "frc/geometry/Translation2d.h"
 #include "units/time.h"
 #include "units/velocity.h"
-#include "units/length.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -229,7 +229,8 @@ constexpr Translation2d SlewRateLimit(const Translation2d& current,
                                       units::meters_per_second_t maxVelocity) {
   if (maxVelocity < 0_mps) {
     wpi::math::MathSharedStore::ReportError(
-        "maxVelocity must be a non-negative number, got {}!", maxVelocity.value());
+        "maxVelocity must be a non-negative number, got {}!",
+        maxVelocity.value());
     return next;
   }
   Translation2d diff = next - current;
@@ -253,12 +254,14 @@ constexpr Translation2d SlewRateLimit(const Translation2d& current,
  * @param maxVelocity Maximum translation velocity.
  * @return Returns the next Translation3d limited to maxVelocity
  */
-constexpr Translation3d SlewRateLimit(
-    const Translation3d& current, const Translation3d& next, units::second_t dt,
-    units::meters_per_second_t maxVelocity) {
+constexpr Translation3d SlewRateLimit(const Translation3d& current,
+                                      const Translation3d& next,
+                                      units::second_t dt,
+                                      units::meters_per_second_t maxVelocity) {
   if (maxVelocity < 0_mps) {
     wpi::math::MathSharedStore::ReportError(
-        "maxVelocity must be a non-negative number, got {}!", maxVelocity.value());
+        "maxVelocity must be a non-negative number, got {}!",
+        maxVelocity.value());
     return next;
   }
   Translation3d diff = next - current;

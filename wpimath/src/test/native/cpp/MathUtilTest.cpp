@@ -3,17 +3,17 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <limits>
+#include <numbers>
 
 #include <gtest/gtest.h>
 
 #include "frc/MathUtil.h"
-#include "frc/geometry/Translation3d.h"
 #include "frc/geometry/Translation2d.h"
+#include "frc/geometry/Translation3d.h"
+#include "units/angle.h"
+#include "units/length.h"
 #include "units/time.h"
 #include "units/velocity.h"
-#include "units/length.h"
-#include "units/angle.h"
-#include <numbers>
 
 #define EXPECT_UNITS_EQ(a, b) EXPECT_DOUBLE_EQ((a).value(), (b).value())
 
@@ -175,7 +175,8 @@ TEST(MathUtilTest, Translation2dSlewRateLimitUnchanged) {
   const frc::Translation2d translation1{0_m, 0_m};
   const frc::Translation2d translation2{2_m, 2_m};
 
-  const frc::Translation2d result1 = frc::SlewRateLimit(translation1, translation2, 1_s, 50_mps);
+  const frc::Translation2d result1 =
+      frc::SlewRateLimit(translation1, translation2, 1_s, 50_mps);
 
   const frc::Translation2d expected1{2_m, 2_m};
 
@@ -186,9 +187,12 @@ TEST(MathUtilTest, Translation2dSlewRateLimitChanged) {
   const frc::Translation2d translation3{1_m, 1_m};
   const frc::Translation2d translation4{3_m, 3_m};
 
-  const frc::Translation2d result2 = frc::SlewRateLimit(translation3, translation4, 0.25_s, 2_mps);
+  const frc::Translation2d result2 =
+      frc::SlewRateLimit(translation3, translation4, 0.25_s, 2_mps);
 
-  const frc::Translation2d expected2{units::meter_t{1.0 + 0.5 * (std::numbers::sqrt2 / 2)}, units::meter_t{1.0 + 0.5 * (std::numbers::sqrt2 / 2)}};
+  const frc::Translation2d expected2{
+      units::meter_t{1.0 + 0.5 * (std::numbers::sqrt2 / 2)},
+      units::meter_t{1.0 + 0.5 * (std::numbers::sqrt2 / 2)}};
 
   EXPECT_EQ(result2, expected2);
 }
@@ -197,7 +201,8 @@ TEST(MathUtilTest, Translation3dSlewRateLimitUnchanged) {
   const frc::Translation3d translation1{0_m, 0_m, 0_m};
   const frc::Translation3d translation2{2_m, 2_m, 2_m};
 
-  const frc::Translation3d result1 = frc::SlewRateLimit(translation1, translation2, 1_s, 50.0_mps);
+  const frc::Translation3d result1 =
+      frc::SlewRateLimit(translation1, translation2, 1_s, 50.0_mps);
 
   const frc::Translation3d expected1{2_m, 2_m, 2_m};
 
@@ -208,9 +213,13 @@ TEST(MathUtilTest, Translation3dSlewRateLimitChanged) {
   const frc::Translation3d translation3{1_m, 1_m, 1_m};
   const frc::Translation3d translation4{3_m, 3_m, 3_m};
 
-  const frc::Translation3d result2 = frc::SlewRateLimit(translation3, translation4, 0.25_s, 2.0_mps);
+  const frc::Translation3d result2 =
+      frc::SlewRateLimit(translation3, translation4, 0.25_s, 2.0_mps);
 
-  const frc::Translation3d expected2{units::meter_t{1.0 + 0.5 * std::numbers::inv_sqrt3}, units::meter_t{1.0 + 0.5 * std::numbers::inv_sqrt3}, units::meter_t{1.0 + 0.5 * std::numbers::inv_sqrt3}};
-  
+  const frc::Translation3d expected2{
+      units::meter_t{1.0 + 0.5 * std::numbers::inv_sqrt3},
+      units::meter_t{1.0 + 0.5 * std::numbers::inv_sqrt3},
+      units::meter_t{1.0 + 0.5 * std::numbers::inv_sqrt3}};
+
   EXPECT_EQ(result2, expected2);
 }
