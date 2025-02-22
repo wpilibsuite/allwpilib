@@ -31,12 +31,19 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
 
   void SetProperty(std::string_view key, std::string_view value) override {
     std::scoped_lock lock{m_mutex};
-    auto& curValue = m_properties[key];
-    if (curValue == value) {
-      return;
+    auto it = m_properties.find(key);
+    if (it == m_properties.end()) {
+      m_properties.emplace(key, value);
+    } else {
+      auto& curVal = it.value().get_ref<std::string&>();
+      if (curVal == value) {
+        return;
+      }
+      curVal = value;
     }
-    curValue = value;
-    // TODO
+    if (m_pub) {
+      m_pub.GetTopic().SetProperties(m_properties);
+    }
   }
 
   void LogBoolean(bool value) override {

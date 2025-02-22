@@ -10,6 +10,7 @@
 #include <variant>
 
 #include <fmt/format.h>
+#include <wpi/json.h>
 #include <wpi/mutex.h>
 #include <wpi/telemetry/TelemetryEntry.h>
 
@@ -26,19 +27,29 @@ class DataLogTelemetryBackend::Entry : public wpi::TelemetryEntry {
 
   void SetProperty(std::string_view key, std::string_view value) override {
     std::scoped_lock lock{m_mutex};
-    auto& curValue = m_propertiesMap[key];
-    if (curValue == value) {
-      return;
+    auto it = m_properties.find(key);
+    if (it == m_properties.end()) {
+      m_properties.emplace(key, value);
+    } else {
+      auto& curVal = it.value().get_ref<std::string&>();
+      if (curVal == value) {
+        return;
+      }
+      curVal = value;
     }
-    curValue = value;
-    // TODO
+    m_propertiesStr = m_properties.dump();
+    if (m_entryIndex != 0) {
+      m_log.SetMetadata(m_entryIndex, m_propertiesStr);
+    }
   }
 
   template <typename EntryType, typename T>
   void Log(T value) {
     std::scoped_lock lock{m_mutex};
     if (std::holds_alternative<std::monostate>(m_entry)) {
-      m_entry = EntryType{m_log, m_path, m_properties};
+      EntryType entry{m_log, m_path, m_propertiesStr};
+      m_entryIndex = entry.GetIndex();
+      m_entry = std::move(entry);
     }
     if (auto entry = std::get_if<EntryType>(&m_entry)) {
       if (m_keepDuplicates) {
@@ -56,7 +67,9 @@ class DataLogTelemetryBackend::Entry : public wpi::TelemetryEntry {
     std::scoped_lock lock{m_mutex};
     if (std::holds_alternative<std::monostate>(m_entry)) {
       m_typeString = typeString;
-      m_entry = EntryType{m_log, m_path, m_properties, m_typeString};
+      EntryType entry{m_log, m_path, m_propertiesStr, m_typeString};
+      m_entryIndex = entry.GetIndex();
+      m_entry = std::move(entry);
     }
     if (auto entry = std::get_if<EntryType>(&m_entry);
         entry && m_typeString == typeString) {
@@ -127,6 +140,7 @@ class DataLogTelemetryBackend::Entry : public wpi::TelemetryEntry {
   DataLog& m_log;
   std::string m_path;
   wpi::mutex m_mutex;
+  int m_entryIndex = 0;
   std::variant<std::monostate, BooleanLogEntry, IntegerLogEntry, FloatLogEntry,
                DoubleLogEntry, StringLogEntry, BooleanArrayLogEntry,
                IntegerArrayLogEntry, FloatArrayLogEntry, DoubleArrayLogEntry,
@@ -134,8 +148,8 @@ class DataLogTelemetryBackend::Entry : public wpi::TelemetryEntry {
       m_entry;
   std::string m_typeString;
   std::atomic_bool m_keepDuplicates{false};
-  wpi::StringMap<std::string> m_propertiesMap;
-  std::string m_properties = "{}";
+  wpi::json m_properties;
+  std::string m_propertiesStr = "{}";
 };
 
 DataLogTelemetryBackend::DataLogTelemetryBackend(DataLog& log,
