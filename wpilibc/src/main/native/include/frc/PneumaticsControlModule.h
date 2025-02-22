@@ -27,6 +27,7 @@ class PneumaticsControlModule : public PneumaticsBase {
   /**
    * Constructs a PneumaticsControlModule.
    *
+   * @param busId The bus ID.
    * @param module module number to construct
    */
   PneumaticsControlModule(int busId, int module);

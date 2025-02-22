@@ -27,9 +27,10 @@ class PneumaticHub : public PneumaticsBase {
   /**
    * Constructs a PneumaticHub.
    *
+   * @param busId The bus ID.
    * @param module module number to construct
    */
-  explicit PneumaticHub(int busId, int module);
+  PneumaticHub(int busId, int module);
 
   ~PneumaticHub() override = default;
 
