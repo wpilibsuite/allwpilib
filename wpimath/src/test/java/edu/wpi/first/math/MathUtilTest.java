@@ -190,7 +190,7 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
     Translation2d result2 = MathUtil.slewRateLimit(translation3, translation4, 0.25, 2);
 
     Translation2d expected2 =
-    new Translation2d(1.0 + 1.0 / Math.sqrt(8.0), 1.0 + 1.0 / Math.sqrt(8.0));
+        new Translation2d(1.0 + 1.0 / Math.sqrt(8.0), 1.0 + 1.0 / Math.sqrt(8.0));
 
     assertEquals(expected2, result2);
   }
@@ -208,15 +208,15 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
   }
 
   @Test
-  void testSlewRateTranslation3dChanged(){
+  void testSlewRateTranslation3dChanged() {
     Translation3d translation3 = new Translation3d(1, 1, 1);
     Translation3d translation4 = new Translation3d(3, 3, 3);
 
     Translation3d result2 = MathUtil.slewRateLimit(translation3, translation4, 0.25, 2);
 
     Translation3d expected2 =
-    new Translation3d(
-        1.0 + 1.0 / Math.sqrt(12.0), 1.0 + 1.0 / Math.sqrt(12.0), 1.0 + 1.0 / Math.sqrt(12.0));
+        new Translation3d(
+            1.0 + 1.0 / Math.sqrt(12.0), 1.0 + 1.0 / Math.sqrt(12.0), 1.0 + 1.0 / Math.sqrt(12.0));
 
     assertEquals(expected2, result2);
   }
