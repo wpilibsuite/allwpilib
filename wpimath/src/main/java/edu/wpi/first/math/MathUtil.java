@@ -220,6 +220,7 @@ public final class MathUtil {
    * @param next Translation at next timestep.
    * @param dt Timestep duration.
    * @param maxVelocity Maximum translation velocity.
+   * @return Returns the next Translation2d limited to maxVelocity
    */
   public static Translation2d slewRateLimit(
       Translation2d current, Translation2d next, double dt, double maxVelocity) {
@@ -248,6 +249,7 @@ public final class MathUtil {
    * @param next Translation at next timestep.
    * @param dt Timestep duration.
    * @param maxVelocity Maximum translation velocity.
+   * @return Returns the next Translation3d limited to maxVelocity
    */
   public static Translation3d slewRateLimit(
       Translation3d current, Translation3d next, double dt, double maxVelocity) {

@@ -221,6 +221,7 @@ constexpr std::signed_integral auto FloorMod(std::signed_integral auto x,
  * @param next Translation at next timestep.
  * @param dt Timestep duration.
  * @param maxVelocity Maximum translation velocity.
+ * @return Returns the next Translation2d limited to maxVelocity
  */
 constexpr Translation2d SlewRateLimit(const Translation2d& current,
                                       const Translation2d& next,
@@ -250,6 +251,7 @@ constexpr Translation2d SlewRateLimit(const Translation2d& current,
  * @param next Translation at next timestep.
  * @param dt Timestep duration.
  * @param maxVelocity Maximum translation velocity.
+ * @return Returns the next Translation3d limited to maxVelocity
  */
 constexpr Translation3d SlewRateLimit(
     const Translation3d& current, const Translation3d& next, units::second_t dt,
