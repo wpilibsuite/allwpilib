@@ -266,7 +266,7 @@ public final class MathUtil {
     }
     if (dist > maxVelocity * dt) {
       // Move maximum allowed amount in direction of the difference
-      return current.plus(diff.times(maxVelocity * dt).div(dist));
+      return current.plus(diff.times(maxVelocity * dt / dist));
     }
     return next;
   }
