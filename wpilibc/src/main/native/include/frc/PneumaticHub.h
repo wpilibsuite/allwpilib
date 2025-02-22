@@ -17,7 +17,11 @@ namespace frc {
 /** Module class for controlling a REV Robotics Pneumatic Hub. */
 class PneumaticHub : public PneumaticsBase {
  public:
-  /** Constructs a PneumaticHub with the default ID (1). */
+  /**
+   * Constructs a PneumaticHub with the default ID (1).
+   *
+   * @param busId The bus ID.
+   */
   explicit PneumaticHub(int busId);
 
   /**

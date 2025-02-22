@@ -65,7 +65,8 @@ void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
  * Receives a CAN message.
  *
  * @param[in] busId       The CAN bus number
- * @param[inout] message  The CAN message
+ * @param[in] messageId the message id
+ * @param[out] message  The CAN message
  * @param[out] status     Error status variable. 0 on success.
  */
 void HAL_CAN_ReceiveMessage(int32_t busId, uint32_t messageId,
@@ -74,7 +75,7 @@ void HAL_CAN_ReceiveMessage(int32_t busId, uint32_t messageId,
 /**
  * Gets CAN status information.
  *
- * @param[in]  busId                   the bus number
+ * @param[in]  busId                 the bus number
  * @param[out] percentBusUtilization the bus utilization
  * @param[out] busOffCount           the number of bus off errors
  * @param[out] txFullCount           the number of tx full errors

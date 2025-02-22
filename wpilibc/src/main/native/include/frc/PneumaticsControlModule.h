@@ -17,7 +17,11 @@ namespace frc {
  * Module. */
 class PneumaticsControlModule : public PneumaticsBase {
  public:
-  /** Constructs a PneumaticsControlModule with the default ID (0). */
+  /**
+   * Constructs a PneumaticsControlModule with the default ID (0).
+   *
+   * @param busId The bus ID.
+   */
   explicit PneumaticsControlModule(int busId);
 
   /**

@@ -336,7 +336,7 @@ class RobotController {
   /**
    * Get the current status of the CAN bus.
    *
-   * @param param The bus id
+   * @param busId The bus ID.
    * @return The status of the CAN bus
    */
   static CANStatus GetCANStatus(int busId);

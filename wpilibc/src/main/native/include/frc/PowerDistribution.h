@@ -39,13 +39,14 @@ class PowerDistribution : public wpi::Sendable,
    * Detects the connected PDP/PDH using the default CAN ID (0 for CTRE and 1
    * for REV).
    *
-   * @param busId The bus id.
+   * @param busId The bus ID.
    */
   explicit PowerDistribution(int busId);
 
   /**
    * Constructs a PowerDistribution object.
    *
+   * @param busId The bus ID.
    * @param module The CAN ID of the PDP/PDH
    * @param moduleType The type of module
    */
