@@ -72,3 +72,7 @@ CommandPtr Subsystem::StartRun(std::function<void()> start,
 CommandPtr Subsystem::Defer(wpi::unique_function<CommandPtr()> supplier) {
   return cmd::Defer(std::move(supplier), {this});
 }
+
+CommandPtr Subsystem::Idle() {
+  return cmd::Idle({this});
+}

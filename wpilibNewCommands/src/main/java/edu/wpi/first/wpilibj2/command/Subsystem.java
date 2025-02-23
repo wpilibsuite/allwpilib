@@ -169,4 +169,13 @@ public interface Subsystem {
   default Command defer(Supplier<Command> supplier) {
     return Commands.defer(supplier, Set.of(this));
   }
+
+  /**
+   * Constructs a command does nothing until interrupted. Requires this subsystem.
+   *
+   * @return the command
+   */
+  default Command idle() {
+    return Commands.idle(this);
+  }
 }

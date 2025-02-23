@@ -178,5 +178,14 @@ class Subsystem {
    */
   [[nodiscard]]
   CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier);
+
+  /**
+   * Constructs a command does nothing until interrupted. Requires this
+   * subsystem.
+   *
+   * @return the command
+   */
+  [[nodiscard]]
+  CommandPtr Idle();
 };
 }  // namespace frc2
