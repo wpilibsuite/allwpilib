@@ -9,6 +9,6 @@
 using namespace frc;
 
 wpi::TelemetryTable& Telemetry::GetTable() {
-  static wpi::TelemetryTable& root = wpi::TelemetryRegistry::GetTable("/");
+  static wpi::TelemetryTable& root = wpi::TelemetryRegistry::GetTable("");
   return root;
 }
