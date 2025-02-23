@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/RobotBase.h"
+#include "networktables/NetworkTablesTelemetryBackend.h"
+#include "wpi/telemetry/TelemetryRegistry.h"
 
 #ifdef __FRC_ROBORIO__
 #include <dlfcn.h>
@@ -18,7 +20,9 @@
 #include <hal/UsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
+#include <networktables/NetworkTablesTelemetryBackend.h>
 #include <wpi/print.h>
+#include <wpi/telemetry/TelemetryRegistry.h>
 #include <wpi/timestamp.h>
 #include <wpimath/MathShared.h>
 
@@ -193,6 +197,10 @@ RobotBase::RobotBase() {
   } else {
     inst.StartServer();
   }
+
+  wpi::TelemetryRegistry::RegisterBackend(
+      "",
+      std::make_shared<nt::NetworkTablesTelemetryBackend>(inst, "/Telemetry/"));
 
   // wait for the NT server to actually start
   int count = 0;
