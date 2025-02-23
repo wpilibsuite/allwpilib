@@ -6,6 +6,7 @@ package edu.wpi.first.util.telemetry;
 
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
+import java.util.function.BiConsumer;
 
 /** A telemetry backend that discards all logged data. */
 public class NoopTelemetryBackend implements TelemetryBackend {
@@ -18,6 +19,9 @@ public class NoopTelemetryBackend implements TelemetryBackend {
   public TelemetryEntry getEntry(String path) {
     return s_entry;
   }
+
+  @Override
+  public void setReportWarning(BiConsumer<String, StackTraceElement[]> func) {}
 
   private static final class Entry implements TelemetryEntry {
     @Override

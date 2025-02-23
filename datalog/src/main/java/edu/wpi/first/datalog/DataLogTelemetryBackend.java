@@ -12,12 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 
 /** A telemetry backend that sends logged data to a DataLog. */
 public class DataLogTelemetryBackend implements TelemetryBackend {
   private final DataLog m_log;
   private final String m_prefix;
   private final Map<String, Entry> m_entries = new HashMap<>();
+  private BiConsumer<String, StackTraceElement[]> m_reportWarning;
 
   /**
    * Construct.
@@ -47,7 +49,22 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
   }
 
-  private static final class Entry implements TelemetryEntry {
+  @Override
+  public void setReportWarning(BiConsumer<String, StackTraceElement[]> func) {
+    synchronized (this) {
+      m_reportWarning = func;
+    }
+  }
+
+  private void reportWarning(String msg, StackTraceElement[] stackTrace) {
+    synchronized (this) {
+      if (m_reportWarning != null) {
+        m_reportWarning.accept(msg, stackTrace);
+      }
+    }
+  }
+
+  private final class Entry implements TelemetryEntry {
     private final DataLog m_log;
     private final String m_path;
     private final AtomicReference<DataLogEntry> m_entry = new AtomicReference<>();
@@ -127,7 +144,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           entry.update(value);
         }
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -157,7 +174,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           entry.update(value);
         }
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -186,7 +203,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           entry.update(value);
         }
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -211,7 +228,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           e.update(value);
         }
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -236,7 +253,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           e.update(value);
         }
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -261,7 +278,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           e.update(value);
         }
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -286,7 +303,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           e.update(value);
         }
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -317,7 +334,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           e.update(value);
         }
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -342,7 +359,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           e.update(value);
         }
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -377,7 +394,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           e.update(value);
         }
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -402,7 +419,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           e.update(value);
         }
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -427,7 +444,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           e.update(value);
         }
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -452,7 +469,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           e.update(value);
         }
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -483,7 +500,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           e.update(value);
         }
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
   }

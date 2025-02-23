@@ -20,9 +20,11 @@ using namespace nt;
 
 class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
  public:
-  Entry(NetworkTableInstance& inst, std::string_view prefix,
-        std::string_view path)
-      : m_inst{inst}, m_path{fmt::format("{}{}", prefix, path)} {}
+  Entry(NetworkTablesTelemetryBackend& backend, NetworkTableInstance& inst,
+        std::string_view prefix, std::string_view path)
+      : m_backend{backend},
+        m_inst{inst},
+        m_path{fmt::format("{}{}", prefix, path)} {}
 
   void KeepDuplicates() override {
     m_keepDuplicates = true;
@@ -53,7 +55,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "boolean", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetBoolean(value)) {
-      // TODO: warn?
+      ReportWarning(fmt::format("'{}' type mismatch", m_path));
     }
   }
 
@@ -64,7 +66,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "int", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetInteger(value)) {
-      // TODO: warn?
+      ReportWarning(fmt::format("'{}' type mismatch", m_path));
     }
   }
 
@@ -75,7 +77,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "float", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetFloat(value)) {
-      // TODO: warn?
+      ReportWarning(fmt::format("'{}' type mismatch", m_path));
     }
   }
 
@@ -86,7 +88,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "double", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetDouble(value)) {
-      // TODO: warn?
+      ReportWarning(fmt::format("'{}' type mismatch", m_path));
     }
   }
 
@@ -98,7 +100,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           typeString, m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (m_typeString != typeString || !m_pub.SetString(value)) {
-      // TODO: warn?
+      ReportWarning(fmt::format("'{}' type mismatch", m_path));
     }
   }
 
@@ -109,7 +111,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "boolean[]", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetBooleanArray(value)) {
-      // TODO: warn?
+      ReportWarning(fmt::format("'{}' type mismatch", m_path));
     }
   }
 
@@ -120,7 +122,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "boolean[]", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetBooleanArray(value)) {
-      // TODO: warn?
+      ReportWarning(fmt::format("'{}' type mismatch", m_path));
     }
   }
 
@@ -139,7 +141,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "int[]", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetIntegerArray(value)) {
-      // TODO: warn?
+      ReportWarning(fmt::format("'{}' type mismatch", m_path));
     }
   }
 
@@ -150,7 +152,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "float[]", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetFloatArray(value)) {
-      // TODO: warn?
+      ReportWarning(fmt::format("'{}' type mismatch", m_path));
     }
   }
 
@@ -161,7 +163,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "double[]", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetDoubleArray(value)) {
-      // TODO: warn?
+      ReportWarning(fmt::format("'{}' type mismatch", m_path));
     }
   }
 
@@ -172,7 +174,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "string[]", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetStringArray(value)) {
-      // TODO: warn?
+      ReportWarning(fmt::format("'{}' type mismatch", m_path));
     }
   }
 
@@ -189,11 +191,19 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           typeString, m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (m_typeString != typeString || !m_pub.SetRaw(value)) {
-      // TODO: warn?
+      ReportWarning(fmt::format("'{}' type mismatch", m_path));
     }
   }
 
  private:
+  void ReportWarning(std::string_view msg) {
+    std::scoped_lock lock{m_backend.m_mutex};
+    if (m_backend.m_reportWarning) {
+      m_backend.m_reportWarning(msg);
+    }
+  }
+
+  NetworkTablesTelemetryBackend& m_backend;
   NetworkTableInstance& m_inst;
   std::string m_path;
   wpi::mutex m_mutex;
@@ -212,7 +222,14 @@ NetworkTablesTelemetryBackend::~NetworkTablesTelemetryBackend() = default;
 wpi::TelemetryEntry& NetworkTablesTelemetryBackend::GetEntry(
     std::string_view path) {
   std::scoped_lock lock{m_mutex};
-  return m_entries.try_emplace(path, m_inst, m_prefix, path).first->second;
+  return m_entries.try_emplace(path, *this, m_inst, m_prefix, path)
+      .first->second;
+}
+
+void NetworkTablesTelemetryBackend::SetReportWarning(
+    std::function<void(std::string_view msg)> func) {
+  std::scoped_lock lock{m_mutex};
+  m_reportWarning = std::move(func);
 }
 
 bool NetworkTablesTelemetryBackend::HasSchema(
