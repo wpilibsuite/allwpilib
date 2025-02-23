@@ -180,7 +180,7 @@ class Subsystem {
   CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier);
 
   /**
-   * Constructs a command does nothing until interrupted. Requires this
+   * Constructs a command that does nothing until interrupted. Requires this
    * subsystem.
    *
    * @return the command

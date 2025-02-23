@@ -171,7 +171,7 @@ public interface Subsystem {
   }
 
   /**
-   * Constructs a command does nothing until interrupted. Requires this subsystem.
+   * Constructs a command that does nothing until interrupted. Requires this subsystem.
    *
    * @return the command
    */
