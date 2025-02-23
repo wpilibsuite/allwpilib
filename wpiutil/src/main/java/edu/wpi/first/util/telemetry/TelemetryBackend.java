@@ -4,6 +4,8 @@
 
 package edu.wpi.first.util.telemetry;
 
+import java.util.function.BiConsumer;
+
 /** Interface for telemetry backends. */
 public interface TelemetryBackend extends AutoCloseable {
   /**
@@ -13,4 +15,11 @@ public interface TelemetryBackend extends AutoCloseable {
    * @return telemetry entry
    */
   TelemetryEntry getEntry(String path);
+
+  /**
+   * Set function used for reporting warning messages (e.g. type mismatches).
+   *
+   * @param func reporting function
+   */
+  void setReportWarning(BiConsumer<String, StackTraceElement[]> func);
 }

@@ -20,6 +20,14 @@ class NoopTelemetryBackend : public TelemetryBackend {
   TelemetryEntry& GetEntry(std::string_view path) override;
 
   /**
+   * Set function used for reporting warning messages (e.g. type mismatches).
+   *
+   * @param func reporting function
+   */
+  void SetReportWarning(
+      std::function<void(std::string_view msg)> func) override;
+
+  /**
    * Returns whether there is a data schema already registered with the given
    * name. This does NOT perform a check as to whether the schema has already
    * been published by another node on the network.

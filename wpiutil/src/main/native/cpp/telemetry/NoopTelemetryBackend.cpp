@@ -54,6 +54,9 @@ TelemetryEntry& NoopTelemetryBackend::GetEntry(std::string_view path) {
   return entry;
 }
 
+void NoopTelemetryBackend::SetReportWarning(
+    std::function<void(std::string_view msg)> func) {}
+
 bool NoopTelemetryBackend::HasSchema(std::string_view schemaName) const {
   return true;
 }

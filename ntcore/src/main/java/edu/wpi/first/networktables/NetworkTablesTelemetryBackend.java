@@ -12,11 +12,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 
 public class NetworkTablesTelemetryBackend implements TelemetryBackend {
   private final NetworkTableInstance m_inst;
   private final String m_prefix;
-  private static final Map<String, Entry> s_entries = new HashMap<>();
+  private final Map<String, Entry> m_entries = new HashMap<>();
+  private BiConsumer<String, StackTraceElement[]> m_reportWarning;
 
   /**
    * Construct.
@@ -31,22 +33,37 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
 
   @Override
   public void close() {
-    synchronized (s_entries) {
-      for (Entry entry : s_entries.values()) {
+    synchronized (m_entries) {
+      for (Entry entry : m_entries.values()) {
         entry.close();
       }
-      s_entries.clear();
+      m_entries.clear();
     }
   }
 
   @Override
   public TelemetryEntry getEntry(String name) {
-    synchronized (s_entries) {
-      return s_entries.computeIfAbsent(name, k -> new Entry(m_inst, m_prefix + k));
+    synchronized (m_entries) {
+      return m_entries.computeIfAbsent(name, k -> new Entry(m_inst, m_prefix + k));
     }
   }
 
-  private static final class Entry implements TelemetryEntry {
+  @Override
+  public void setReportWarning(BiConsumer<String, StackTraceElement[]> func) {
+    synchronized (this) {
+      m_reportWarning = func;
+    }
+  }
+
+  private void reportWarning(String msg, StackTraceElement[] stackTrace) {
+    synchronized (this) {
+      if (m_reportWarning != null) {
+        m_reportWarning.accept(msg, stackTrace);
+      }
+    }
+  }
+
+  private final class Entry implements TelemetryEntry {
     private final NetworkTableInstance m_inst;
     private final String m_path;
     private final AtomicReference<Publisher> m_pub = new AtomicReference<>();
@@ -126,7 +143,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub != null) {
         pub.set(value);
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -155,7 +172,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub != null) {
         pub.set(value);
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -184,7 +201,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub != null) {
         pub.set(value);
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -211,7 +228,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof BooleanPublisher e) {
         e.set(value);
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -238,7 +255,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof IntegerPublisher e) {
         e.set(value);
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -265,7 +282,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof FloatPublisher e) {
         e.set(value);
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -292,7 +309,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof DoublePublisher e) {
         e.set(value);
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -325,7 +342,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof StringPublisher e && curTypeString.equals(typeString)) {
         e.set(value);
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -352,7 +369,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof BooleanArrayPublisher e) {
         e.set(value);
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -389,7 +406,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof IntegerArrayPublisher e) {
         e.set(value);
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -416,7 +433,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof FloatArrayPublisher e) {
         e.set(value);
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -443,7 +460,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof DoubleArrayPublisher e) {
         e.set(value);
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -470,7 +487,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof StringArrayPublisher e) {
         e.set(value);
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
 
@@ -503,7 +520,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof RawPublisher e && curTypeString.equals(typeString)) {
         e.set(value);
       } else {
-        // TODO: warn?
+        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
       }
     }
   }
