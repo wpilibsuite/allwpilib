@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
 
 /** Global registry for telemetry handlers (type handlers and telemetry backends). */
 public final class TelemetryRegistry {
-  record TypeHandler(
+  public record TypeHandler(
       Class<?> cls,
       BiConsumer<Object, TelemetryEntry> entryHandler,
       BiConsumer<Object, TelemetryTable> tableHandler) {}
