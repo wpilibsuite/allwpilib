@@ -37,10 +37,12 @@ TEST_F(TelemetryTableTest, LogADL) {
   table.Log("testadl", val);
   auto actions = mock->GetActions();
   ASSERT_EQ(actions.size(), 2u);
+
   ASSERT_EQ(actions[0].path, "/testadl/x");
-  ASSERT_EQ(actions[1].path, "/testadl/y");
   ASSERT_TRUE(std::holds_alternative<double>(actions[0].value));
-  ASSERT_TRUE(std::holds_alternative<double>(actions[1].value));
   ASSERT_EQ(std::get<double>(actions[0].value), 1);
+
+  ASSERT_EQ(actions[1].path, "/testadl/y");
+  ASSERT_TRUE(std::holds_alternative<double>(actions[1].value));
   ASSERT_EQ(std::get<double>(actions[1].value), 2);
 }
