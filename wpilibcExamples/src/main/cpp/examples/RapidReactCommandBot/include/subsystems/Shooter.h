@@ -28,8 +28,7 @@ class Shooter : public frc2::SubsystemBase {
    *
    * @param setpointRotationsPerSecond The desired shooter velocity
    */
-  [[nodiscard]]
-  frc2::CommandPtr ShootCommand(units::turns_per_second_t setpoint);
+    frc2::CommandPtr ShootCommand(units::turns_per_second_t setpoint);
 
  private:
   frc::PWMSparkMax m_shooterMotor{ShooterConstants::kShooterMotorPort};
