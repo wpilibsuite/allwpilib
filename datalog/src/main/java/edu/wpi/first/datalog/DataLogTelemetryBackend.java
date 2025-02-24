@@ -43,9 +43,9 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
   }
 
   @Override
-  public TelemetryEntry getEntry(String name) {
+  public TelemetryEntry getEntry(String path) {
     synchronized (m_entries) {
-      return m_entries.computeIfAbsent(name, k -> new Entry(m_log, m_prefix + k));
+      return m_entries.computeIfAbsent(path, k -> new Entry(m_log, m_prefix + k));
     }
   }
 
