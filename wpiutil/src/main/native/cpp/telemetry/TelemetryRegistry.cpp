@@ -6,6 +6,8 @@
 
 #include <memory>
 #include <stdexcept>
+#include <string>
+#include <string_view>
 
 #include <fmt/format.h>
 
@@ -13,6 +15,7 @@
 #include "wpi/mutex.h"
 #include "wpi/telemetry/TelemetryBackend.h"
 #include "wpi/telemetry/TelemetryTable.h"
+#include "wpi/StringExtras.h"
 #include "wpi/StringMap.h"
 
 using namespace wpi;
@@ -28,6 +31,40 @@ struct Instance {
 static Instance& GetInstance() {
   static Instance inst;
   return inst;
+}
+
+static std::string_view NormalizeName(std::string_view path, std::string& buf) {
+  // common case is a well formatted name, so check first
+  if (wpi::starts_with(path, '/') && !wpi::contains(path, "//")) {
+    return path;
+  }
+  buf.clear();
+  buf.reserve(path.size() + 2);
+  if (!wpi::starts_with(path, '/')) {
+    buf.push_back('/');
+  }
+  char prevCh = '\0';
+  for (auto ch : path) {
+    if (ch != '/' || prevCh != '/') {
+      buf.push_back(ch);
+    }
+    prevCh = ch;
+  }
+  return buf;
+}
+
+static std::string_view NormalizeTableName(std::string_view path,
+                                           std::string& buf) {
+  // common case is a well formatted name, so check first
+  if (wpi::starts_with(path, '/') && wpi::ends_with(path, '/') &&
+      !wpi::contains(path, "//")) {
+    return path;
+  }
+  NormalizeName(path, buf);
+  if (!wpi::ends_with(path, '/')) {
+    buf.push_back('/');
+  }
+  return buf;
 }
 
 void TelemetryRegistry::RegisterBackend(
@@ -49,6 +86,8 @@ std::shared_ptr<TelemetryBackend> TelemetryRegistry::GetBackend(
 }
 
 TelemetryEntry& TelemetryRegistry::GetEntry(std::string_view path) {
+  std::string buf;
+  path = NormalizeName(path, buf);
   Instance& inst = GetInstance();
   std::scoped_lock lock{inst.mutex};
   auto backendIt = inst.backends.longest_prefix(path);
@@ -59,6 +98,8 @@ TelemetryEntry& TelemetryRegistry::GetEntry(std::string_view path) {
 }
 
 TelemetryTable& TelemetryRegistry::GetTable(std::string_view path) {
+  std::string buf;
+  path = NormalizeTableName(path, buf);
   Instance& inst = GetInstance();
   std::scoped_lock lock{inst.mutex};
   return inst.tables.try_emplace(path, path, TelemetryTable::private_init{})

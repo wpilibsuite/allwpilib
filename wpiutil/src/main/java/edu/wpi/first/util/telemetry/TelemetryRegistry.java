@@ -144,7 +144,8 @@ public final class TelemetryRegistry {
    * @return telemetry entry
    */
   static TelemetryEntry getEntry(String path) {
-    return getBackend(path).getEntry(path);
+    String normalized = normalizeName(path);
+    return getBackend(normalized).getEntry(normalized);
   }
 
   /**
@@ -154,7 +155,7 @@ public final class TelemetryRegistry {
    * @return telemetry table
    */
   public static TelemetryTable getTable(String path) {
-    return s_tables.computeIfAbsent(path, TelemetryTable::new);
+    return s_tables.computeIfAbsent(normalizeTableName(path), TelemetryTable::new);
   }
 
   /**
@@ -181,5 +182,20 @@ public final class TelemetryRegistry {
     for (var table : s_tables.values()) {
       table.reset();
     }
+  }
+
+  private static String normalizeTableName(String path) {
+    path = normalizeName(path);
+    if (path.charAt(path.length() - 1) != '/') {
+      path = path + '/';
+    }
+    return path;
+  }
+
+  private static String normalizeName(String path) {
+    if (path.isEmpty() || path.charAt(0) != '/') {
+      path = '/' + path;
+    }
+    return path.replace("//", "/");
   }
 }

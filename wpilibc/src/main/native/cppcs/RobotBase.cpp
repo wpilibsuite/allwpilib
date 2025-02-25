@@ -200,7 +200,7 @@ RobotBase::RobotBase() {
 
   wpi::TelemetryRegistry::RegisterBackend(
       "",
-      std::make_shared<nt::NetworkTablesTelemetryBackend>(inst, "/Telemetry/"));
+      std::make_shared<nt::NetworkTablesTelemetryBackend>(inst, "/Telemetry"));
 
   // wait for the NT server to actually start
   int count = 0;
