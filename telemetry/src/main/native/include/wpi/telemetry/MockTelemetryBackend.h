@@ -53,6 +53,10 @@ class MockTelemetryBackend : public TelemetryBackend {
 
   /** A logged action. */
   struct Action {
+    template <typename T>
+    Action(std::string_view path_, T value_)
+        : path{path_}, value{std::move(value_)} {}
+
     std::string path;
     std::variant<KeepDuplicatesValue, SetPropertyValue, bool, int16_t, int32_t,
                  int64_t, float, double, LogStringValue, LogBooleanArrayValue,
