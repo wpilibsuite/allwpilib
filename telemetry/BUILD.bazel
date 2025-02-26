@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 

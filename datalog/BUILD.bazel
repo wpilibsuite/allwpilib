@@ -18,7 +18,7 @@ cc_library(
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
-	"//telemetry:telemetry.static",
+        "//telemetry:telemetry.static",
         "//wpiutil:wpiutil.static",
     ],
 )
@@ -39,7 +39,7 @@ wpilib_jni_java_library(
     native_libs = [":datalogjni"],
     visibility = ["//visibility:public"],
     deps = [
-	"//telemetry:telemetry-java",
+        "//telemetry:telemetry-java",
         "//wpiutil:wpiutil-java",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
@@ -93,7 +93,7 @@ cc_test(
     deps = [
         ":datalog.static",
         "//thirdparty/googletest:googletest.static",
-	"//telemetry:telemetry-testlib",
+        "//telemetry:telemetry-testlib",
         "//wpiutil:wpiutil-testlib",
     ],
 )
@@ -104,7 +104,7 @@ wpilib_java_junit5_test(
     tags = ["exclusive"],
     deps = [
         ":datalog-java",
-	"//telemetry:telemetry-java",
+        "//telemetry:telemetry-java",
         "//wpiutil:wpiutil-java",
     ],
 )
