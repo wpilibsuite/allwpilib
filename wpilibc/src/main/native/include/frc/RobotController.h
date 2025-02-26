@@ -336,9 +336,10 @@ class RobotController {
   /**
    * Get the current status of the CAN bus.
    *
+   * @param busId The bus ID.
    * @return The status of the CAN bus
    */
-  static CANStatus GetCANStatus();
+  static CANStatus GetCANStatus(int busId);
 
  private:
   static std::function<uint64_t()> m_timeSource;

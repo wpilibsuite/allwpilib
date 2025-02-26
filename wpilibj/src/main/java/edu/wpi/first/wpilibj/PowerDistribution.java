@@ -42,12 +42,13 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   /**
    * Constructs a PowerDistribution object.
    *
+   * @param busId The bus ID
    * @param module The CAN ID of the PDP/PDH.
    * @param moduleType Module type (CTRE or REV).
    */
   @SuppressWarnings("this-escape")
-  public PowerDistribution(int module, ModuleType moduleType) {
-    m_handle = PowerDistributionJNI.initialize(module, moduleType.value);
+  public PowerDistribution(int busId, int module, ModuleType moduleType) {
+    m_handle = PowerDistributionJNI.initialize(busId, module, moduleType.value);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     if (moduleType == ModuleType.kCTRE) {
@@ -62,10 +63,13 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * Constructs a PowerDistribution object.
    *
    * <p>Detects the connected PDP/PDH using the default CAN ID (0 for CTRE and 1 for REV).
+   *
+   * @param busId The bus ID
    */
   @SuppressWarnings("this-escape")
-  public PowerDistribution() {
-    m_handle = PowerDistributionJNI.initialize(kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
+  public PowerDistribution(int busId) {
+    m_handle =
+        PowerDistributionJNI.initialize(busId, kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     if (PowerDistributionJNI.getType(m_handle) == PowerDistributionJNI.CTRE_TYPE) {

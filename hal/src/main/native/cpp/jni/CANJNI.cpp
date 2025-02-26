@@ -11,68 +11,98 @@
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_can_CANJNI.h"
 #include "hal/CAN.h"
+#include "hal/Errors.h"
 
 using namespace hal;
 using namespace wpi::java;
 
 extern "C" {
 
-/*
- * Class:     edu_wpi_first_hal_can_CANJNI
- * Method:    FRCNetCommCANSessionMuxSendMessage
- * Signature: (I[BI)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_can_CANJNI_FRCNetCommCANSessionMuxSendMessage
-  (JNIEnv* env, jclass, jint messageID, jbyteArray data, jint periodMs)
-{
-  JSpan<const jbyte> dataArray{env, data};
+static bool PackCANMessage(JNIEnv* env, jbyteArray data, jint dataLength,
+                           jint flags, HAL_CANMessage* message) {
+  if (data == nullptr) {
+    ThrowNullPointerException(env, "data array cannot be null");
+    return false;
+  }
 
-  const uint8_t* dataBuffer =
-      reinterpret_cast<const uint8_t*>(dataArray.data());
-  uint8_t dataSize = dataArray.size();
+  auto arrLen = env->GetArrayLength(data);
+  if (arrLen < dataLength) {
+    ThrowIllegalArgumentException(env, "array length less than data length");
+    return false;
+  }
 
-  int32_t status = 0;
-  HAL_CAN_SendMessage(messageID, dataBuffer, dataSize, periodMs, &status);
-  CheckCANStatus(env, status, messageID);
+  if ((flags & HAL_CAN_FD_DATALENGTH) && dataLength > 64) {
+    ThrowIllegalArgumentException(env, "FD frame has max length of 64 bytes");
+    return false;
+  } else if (!(flags & HAL_CAN_FD_DATALENGTH) && dataLength > 8) {
+    ThrowIllegalArgumentException(env,
+                                  "Non FD frame has max length of 8 bytes");
+    return false;
+  }
+
+  std::memset(message, 0, sizeof(*message));
+  message->dataSize = dataLength;
+  message->flags = flags;
+  JSpan<const jbyte> arr{env, data, static_cast<size_t>(dataLength)};
+  std::memcpy(message->data, arr.data(), dataLength);
+  return true;
 }
 
 /*
  * Class:     edu_wpi_first_hal_can_CANJNI
- * Method:    FRCNetCommCANSessionMuxReceiveMessage
- * Signature: (Ljava/lang/Object;ILjava/lang/Object;)[B
+ * Method:    sendMessage
+ * Signature: (II[BIII)I
  */
-JNIEXPORT jbyteArray JNICALL
-Java_edu_wpi_first_hal_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage
-  (JNIEnv* env, jclass, jobject messageID, jint messageIDMask,
-   jobject timeStamp)
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_can_CANJNI_sendMessage
+  (JNIEnv* env, jclass, jint busId, jint messageId, jbyteArray data,
+   jint dataLength, jint flags, jint periodMs)
 {
-  uint32_t* messageIDPtr =
-      reinterpret_cast<uint32_t*>(env->GetDirectBufferAddress(messageID));
-  uint32_t* timeStampPtr =
-      reinterpret_cast<uint32_t*>(env->GetDirectBufferAddress(timeStamp));
-
-  uint8_t dataSize = 0;
-  uint8_t buffer[8];
+  HAL_CANMessage message;
+  if (!PackCANMessage(env, data, dataLength, flags, &message)) {
+    return PARAMETER_OUT_OF_RANGE;
+  }
 
   int32_t status = 0;
-  HAL_CAN_ReceiveMessage(messageIDPtr, messageIDMask, buffer, &dataSize,
-                         timeStampPtr, &status);
+  HAL_CAN_SendMessage(busId, messageId, &message, periodMs, &status);
+  return status;
+}
 
-  if (!CheckCANStatus(env, status, *messageIDPtr)) {
-    return nullptr;
+/*
+ * Class:     edu_wpi_first_hal_can_CANJNI
+ * Method:    receiveMessage
+ * Signature: (IILjava/lang/Object;)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_can_CANJNI_receiveMessage
+  (JNIEnv* env, jclass, jint busId, jint messageId, jobject data)
+{
+  HAL_CANReceiveMessage message;
+  std::memset(&message, 0, sizeof(message));
+  int32_t status = 0;
+  HAL_CAN_ReceiveMessage(busId, messageId, &message, &status);
+  jbyteArray toSetArray =
+      SetCANReceiveMessageObject(env, data, message.message.dataSize,
+                                 message.message.flags, message.timeStamp);
+  auto javaLen = env->GetArrayLength(toSetArray);
+  if (javaLen < message.message.dataSize) {
+    ThrowIllegalArgumentException(env,
+                                  "Message buffer not long enough for message");
+    return status;
   }
-  return MakeJByteArray(env, {buffer, static_cast<size_t>(dataSize)});
+  env->SetByteArrayRegion(toSetArray, 0, message.message.dataSize,
+                          reinterpret_cast<jbyte*>(message.message.data));
+  return status;
 }
 
 /*
  * Class:     edu_wpi_first_hal_can_CANJNI
  * Method:    getCANStatus
- * Signature: (Ljava/lang/Object;)V
+ * Signature: (ILjava/lang/Object;)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_can_CANJNI_getCANStatus
-  (JNIEnv* env, jclass, jobject canStatus)
+  (JNIEnv* env, jclass, jint busId, jobject canStatus)
 {
   float percentBusUtilization = 0;
   uint32_t busOffCount = 0;
@@ -80,8 +110,9 @@ Java_edu_wpi_first_hal_can_CANJNI_getCANStatus
   uint32_t receiveErrorCount = 0;
   uint32_t transmitErrorCount = 0;
   int32_t status = 0;
-  HAL_CAN_GetCANStatus(&percentBusUtilization, &busOffCount, &txFullCount,
-                       &receiveErrorCount, &transmitErrorCount, &status);
+  HAL_CAN_GetCANStatus(busId, &percentBusUtilization, &busOffCount,
+                       &txFullCount, &receiveErrorCount, &transmitErrorCount,
+                       &status);
 
   if (!CheckStatus(env, status)) {
     return;
@@ -94,17 +125,18 @@ Java_edu_wpi_first_hal_can_CANJNI_getCANStatus
 /*
  * Class:     edu_wpi_first_hal_can_CANJNI
  * Method:    openCANStreamSession
- * Signature: (III)I
+ * Signature: (IIII)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_can_CANJNI_openCANStreamSession
-  (JNIEnv* env, jclass, jint messageID, jint messageIDMask, jint maxMessages)
+  (JNIEnv* env, jclass, jint busId, jint messageId, jint messageIDMask,
+   jint maxMessages)
 {
-  uint32_t handle = 0;
   int32_t status = 0;
-  HAL_CAN_OpenStreamSession(&handle, static_cast<uint32_t>(messageID),
-                            static_cast<uint32_t>(messageIDMask),
-                            static_cast<uint32_t>(maxMessages), &status);
+  HAL_CANStreamHandle handle =
+      HAL_CAN_OpenStreamSession(busId, static_cast<uint32_t>(messageId),
+                                static_cast<uint32_t>(messageIDMask),
+                                static_cast<uint32_t>(maxMessages), &status);
 
   if (!CheckStatus(env, status)) {
     return static_cast<jint>(0);
@@ -182,14 +214,17 @@ Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
       }
     }
     JLocal<jbyteArray> toSetArray{
-        env, SetCANStreamObject(env, elem, msg->dataSize, msg->messageID,
-                                msg->timeStamp)};
+        env, SetCANStreamObject(env, elem, msg->message.message.dataSize,
+                                msg->messageId, msg->message.timeStamp)};
     auto javaLen = env->GetArrayLength(toSetArray);
-    if (javaLen < msg->dataSize) {
-      msg->dataSize = javaLen;
+    if (javaLen < msg->message.message.dataSize) {
+      ThrowIllegalArgumentException(
+          env, "Message buffer not long enough for message");
+      return PARAMETER_OUT_OF_RANGE;
     }
-    env->SetByteArrayRegion(toSetArray, 0, msg->dataSize,
-                            reinterpret_cast<jbyte*>(msg->data));
+    env->SetByteArrayRegion(
+        toSetArray, 0, msg->message.message.dataSize,
+        reinterpret_cast<jbyte*>(msg->message.message.data));
   }
 
   if (status == HAL_ERR_CANSessionMux_SessionOverrun) {

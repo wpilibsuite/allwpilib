@@ -51,7 +51,7 @@ class Robot : public frc::TimedRobot {
 
  private:
   // Object for dealing with the Power Distribution Panel (PDP).
-  frc::PowerDistribution m_pdp;
+  frc::PowerDistribution m_pdp{0};
 };
 
 #ifndef RUNNING_FRC_TESTS

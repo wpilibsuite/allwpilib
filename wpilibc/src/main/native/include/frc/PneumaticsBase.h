@@ -267,12 +267,13 @@ class PneumaticsBase {
   /**
    * For internal use to get a module for a specific type.
    *
+   * @param busId The bus ID.
    * @param module module number
    * @param moduleType module type
    * @return module
    */
   static std::shared_ptr<PneumaticsBase> GetForType(
-      int module, PneumaticsModuleType moduleType);
+      int busId, int module, PneumaticsModuleType moduleType);
 
   /**
    * For internal use to get the default for a specific type.

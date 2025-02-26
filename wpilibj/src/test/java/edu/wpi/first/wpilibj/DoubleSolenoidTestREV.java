@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 class DoubleSolenoidTestREV {
   @Test
   void testValidInitialization() {
-    try (DoubleSolenoid solenoid = new DoubleSolenoid(3, PneumaticsModuleType.REVPH, 2, 3)) {
+    try (DoubleSolenoid solenoid = new DoubleSolenoid(0, 3, PneumaticsModuleType.REVPH, 2, 3)) {
       solenoid.set(DoubleSolenoid.Value.kReverse);
       assertEquals(DoubleSolenoid.Value.kReverse, solenoid.get());
 
@@ -29,9 +29,10 @@ class DoubleSolenoidTestREV {
   void testThrowForwardPortAlreadyInitialized() {
     try (
     // Single solenoid that is reused for forward port
-    Solenoid solenoid = new Solenoid(5, PneumaticsModuleType.REVPH, 2)) {
+    Solenoid solenoid = new Solenoid(0, 5, PneumaticsModuleType.REVPH, 2)) {
       assertThrows(
-          AllocationException.class, () -> new DoubleSolenoid(5, PneumaticsModuleType.REVPH, 2, 3));
+          AllocationException.class,
+          () -> new DoubleSolenoid(0, 5, PneumaticsModuleType.REVPH, 2, 3));
     }
   }
 
@@ -39,9 +40,10 @@ class DoubleSolenoidTestREV {
   void testThrowReversePortAlreadyInitialized() {
     try (
     // Single solenoid that is reused for forward port
-    Solenoid solenoid = new Solenoid(6, PneumaticsModuleType.REVPH, 3)) {
+    Solenoid solenoid = new Solenoid(0, 6, PneumaticsModuleType.REVPH, 3)) {
       assertThrows(
-          AllocationException.class, () -> new DoubleSolenoid(6, PneumaticsModuleType.REVPH, 2, 3));
+          AllocationException.class,
+          () -> new DoubleSolenoid(0, 6, PneumaticsModuleType.REVPH, 2, 3));
     }
   }
 
@@ -49,16 +51,17 @@ class DoubleSolenoidTestREV {
   void testThrowBothPortsAlreadyInitialized() {
     try (
     // Single solenoid that is reused for forward port
-    Solenoid solenoid0 = new Solenoid(6, PneumaticsModuleType.REVPH, 2);
-        Solenoid solenoid1 = new Solenoid(6, PneumaticsModuleType.REVPH, 3)) {
+    Solenoid solenoid0 = new Solenoid(0, 6, PneumaticsModuleType.REVPH, 2);
+        Solenoid solenoid1 = new Solenoid(0, 6, PneumaticsModuleType.REVPH, 3)) {
       assertThrows(
-          AllocationException.class, () -> new DoubleSolenoid(6, PneumaticsModuleType.REVPH, 2, 3));
+          AllocationException.class,
+          () -> new DoubleSolenoid(0, 6, PneumaticsModuleType.REVPH, 2, 3));
     }
   }
 
   @Test
   void testToggle() {
-    try (DoubleSolenoid solenoid = new DoubleSolenoid(4, PneumaticsModuleType.REVPH, 2, 3)) {
+    try (DoubleSolenoid solenoid = new DoubleSolenoid(0, 4, PneumaticsModuleType.REVPH, 2, 3)) {
       // Bootstrap it into reverse
       solenoid.set(DoubleSolenoid.Value.kReverse);
 
@@ -79,13 +82,13 @@ class DoubleSolenoidTestREV {
   void testInvalidForwardPort() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 100, 1));
+        () -> new DoubleSolenoid(0, 1, PneumaticsModuleType.REVPH, 100, 1));
   }
 
   @Test
   void testInvalidReversePort() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 0, 100));
+        () -> new DoubleSolenoid(0, 1, PneumaticsModuleType.REVPH, 0, 100));
   }
 }

@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.CTREPCMJNI;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.PortsJNI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,21 +15,23 @@ public class PneumaticsControlModule implements PneumaticsBase {
   private static class DataStore implements AutoCloseable {
     public final int m_module;
     public final int m_handle;
+    private final int m_busId;
     private int m_refCount;
     private int m_reservedMask;
     private boolean m_compressorReserved;
     private final Object m_reserveLock = new Object();
 
-    DataStore(int module) {
-      m_handle = CTREPCMJNI.initialize(module);
+    DataStore(int busId, int module) {
+      m_handle = CTREPCMJNI.initialize(busId, module);
       m_module = module;
-      m_handleMap.put(module, this);
+      m_busId = busId;
+      m_handleMaps[busId].put(module, this);
     }
 
     @Override
     public void close() {
       CTREPCMJNI.free(m_handle);
-      m_handleMap.remove(m_module);
+      m_handleMaps[m_busId].remove(m_module);
     }
 
     public void addRef() {
@@ -43,14 +46,23 @@ public class PneumaticsControlModule implements PneumaticsBase {
     }
   }
 
-  private static final Map<Integer, DataStore> m_handleMap = new HashMap<>();
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private static final Map<Integer, DataStore>[] m_handleMaps =
+      (Map<Integer, DataStore>[]) new Map[PortsJNI.getNumCanBuses()];
+
   private static final Object m_handleLock = new Object();
 
-  private static DataStore getForModule(int module) {
+  private static DataStore getForModule(int busId, int module) {
     synchronized (m_handleLock) {
-      DataStore pcm = m_handleMap.get(module);
+      Map<Integer, DataStore> handleMap = m_handleMaps[busId];
+      if (handleMap == null) {
+        handleMap = new HashMap<>();
+        m_handleMaps[busId] = handleMap;
+      }
+
+      DataStore pcm = handleMap.get(module);
       if (pcm == null) {
-        pcm = new DataStore(module);
+        pcm = new DataStore(busId, module);
       }
       pcm.addRef();
       return pcm;
@@ -66,18 +78,23 @@ public class PneumaticsControlModule implements PneumaticsBase {
   private final DataStore m_dataStore;
   private final int m_handle;
 
-  /** Constructs a PneumaticsControlModule with the default ID (0). */
-  public PneumaticsControlModule() {
-    this(SensorUtil.getDefaultCTREPCMModule());
+  /**
+   * Constructs a PneumaticsControlModule with the default ID (0).
+   *
+   * @param busId The bus ID
+   */
+  public PneumaticsControlModule(int busId) {
+    this(busId, SensorUtil.getDefaultCTREPCMModule());
   }
 
   /**
    * Constructs a PneumaticsControlModule.
    *
+   * @param busId The bus ID
    * @param module module number to construct
    */
-  public PneumaticsControlModule(int module) {
-    m_dataStore = getForModule(module);
+  public PneumaticsControlModule(int busId, int module) {
+    m_dataStore = getForModule(busId, module);
     m_handle = m_dataStore.m_handle;
   }
 

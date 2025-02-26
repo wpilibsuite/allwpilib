@@ -17,15 +17,20 @@ namespace frc {
 /** Module class for controlling a REV Robotics Pneumatic Hub. */
 class PneumaticHub : public PneumaticsBase {
  public:
-  /** Constructs a PneumaticHub with the default ID (1). */
-  PneumaticHub();
+  /**
+   * Constructs a PneumaticHub with the default ID (1).
+   *
+   * @param busId The bus ID.
+   */
+  explicit PneumaticHub(int busId);
 
   /**
    * Constructs a PneumaticHub.
    *
+   * @param busId The bus ID.
    * @param module module number to construct
    */
-  explicit PneumaticHub(int module);
+  PneumaticHub(int busId, int module);
 
   ~PneumaticHub() override = default;
 
@@ -296,17 +301,17 @@ class PneumaticHub : public PneumaticsBase {
   class DataStore;
   friend class DataStore;
   friend class PneumaticsBase;
-  PneumaticHub(HAL_REVPHHandle handle, int module);
+  PneumaticHub(int busId, HAL_REVPHHandle handle, int module);
 
-  static std::shared_ptr<PneumaticsBase> GetForModule(int module);
+  static std::shared_ptr<PneumaticsBase> GetForModule(int busId, int module);
 
   std::shared_ptr<DataStore> m_dataStore;
   HAL_REVPHHandle m_handle;
   int m_module;
 
   static wpi::mutex m_handleLock;
-  static std::unique_ptr<wpi::DenseMap<int, std::weak_ptr<DataStore>>>
-      m_handleMap;
-  static std::weak_ptr<DataStore>& GetDataStore(int module);
+  static std::unique_ptr<wpi::DenseMap<int, std::weak_ptr<DataStore>>[]>
+      m_handleMaps;
+  static std::weak_ptr<DataStore>& GetDataStore(int busId, int module);
 };
 }  // namespace frc
