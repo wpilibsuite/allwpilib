@@ -22,9 +22,7 @@ def copy_upstream_src(wpilib_root):
     wpiutil_htrie_root = os.path.join(
         wpiutil, "src/main/native/thirdparty/htrie/include/wpi"
     )
-    dest_include_files = [
-        os.path.join(wpiutil_htrie_root, f) for f in files
-    ]
+    dest_include_files = [os.path.join(wpiutil_htrie_root, f) for f in files]
 
     # Copy htrie header files into allwpilib
     for i in range(len(src_include_files)):
