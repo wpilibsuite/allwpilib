@@ -18,12 +18,20 @@ std::string_view TelemetryTable::GetPath() const {
 }
 
 TelemetryTable& TelemetryTable::GetTable(std::string_view name) const {
-  std::scoped_lock lock{m_mutex};
-  auto& table = m_tablesMap[name];
-  if (!table) {
-    table = &TelemetryRegistry::GetTable(fmt::format("{}{}/", m_path, name));
+  std::unique_lock lock{m_mutex};
+  TelemetryTable* table = m_tablesMap[name];
+  if (table) {
+    return *table;
   }
-  return *table;
+  lock.unlock();  // avoid lock inversion
+  TelemetryTable* newTable =
+      &TelemetryRegistry::GetTable(fmt::format("{}{}/", m_path, name));
+  lock.lock();
+  auto& table2 = m_tablesMap[name];
+  if (!table2) {
+    table2 = newTable;
+  }
+  return *table2;
 }
 
 void TelemetryTable::KeepDuplicates(std::string_view name) {
