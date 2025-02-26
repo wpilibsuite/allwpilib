@@ -11,10 +11,10 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <wpi/htrie_map.h>
-#include <wpi/mutex.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
+#include <wpi/htrie_map.h>
+#include <wpi/mutex.h>
 
 #include "wpi/telemetry/TelemetryBackend.h"
 #include "wpi/telemetry/TelemetryTable.h"
