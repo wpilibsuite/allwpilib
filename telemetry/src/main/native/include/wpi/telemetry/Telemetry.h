@@ -71,7 +71,7 @@ class Telemetry final {
    *
    * @param name the name
    * @param value the value
-   * @param struct struct serializer
+   * @param info type parameters for struct serializer (optional)
    */
   template <typename T, typename... I>
   static void Log(std::string_view name, std::span<const T> value, I... info) {
