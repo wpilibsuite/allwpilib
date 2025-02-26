@@ -73,6 +73,7 @@ class TelemetryRegistry final {
    * name. This does NOT perform a check as to whether the schema has already
    * been published by another node on the network.
    *
+   * @param backend Backend
    * @param schemaName Name (the string passed as the data type for topics using
    * this schema)
    * @return True if schema already registered
@@ -88,6 +89,7 @@ class TelemetryRegistry final {
    * provided name: "/.schema/<name>".  Duplicate calls to this function with
    * the same name are silently ignored.
    *
+   * @param backend Backend
    * @param schemaName Name (the string passed as the data type for topics using
    * this schema)
    * @param type Type of schema (e.g. "protobuf", "struct", etc)
@@ -105,6 +107,7 @@ class TelemetryRegistry final {
    * provided name: "/.schema/<name>".  Duplicate calls to this function with
    * the same name are silently ignored.
    *
+   * @param backend Backend
    * @param schemaName Name (the string passed as the data type for topics using
    * this schema)
    * @param type Type of schema (e.g. "protobuf", "struct", etc)
@@ -118,6 +121,7 @@ class TelemetryRegistry final {
    * name are silently ignored.
    *
    * @tparam T protobuf serializable type
+   * @param backend Backend
    * @param msg protobuf message
    */
   template <wpi::ProtobufSerializable T>
@@ -135,6 +139,7 @@ class TelemetryRegistry final {
    * name are silently ignored.
    *
    * @tparam T struct serializable type
+   * @param backend Backend
    * @param info optional struct type info
    */
   template <typename T, typename... I>
