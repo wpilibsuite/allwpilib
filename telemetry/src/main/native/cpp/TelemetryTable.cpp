@@ -4,6 +4,8 @@
 
 #include "wpi/telemetry/TelemetryTable.h"
 
+#include <string>
+
 #include <fmt/format.h>
 
 #include "wpi/telemetry/TelemetryEntry.h"

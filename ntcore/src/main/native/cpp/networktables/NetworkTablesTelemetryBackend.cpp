@@ -7,6 +7,7 @@
 #include <atomic>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <fmt/format.h>
 #include <wpi/json.h>

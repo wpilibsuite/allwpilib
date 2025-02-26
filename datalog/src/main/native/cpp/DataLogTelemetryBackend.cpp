@@ -7,6 +7,7 @@
 #include <atomic>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <variant>
 
 #include <fmt/format.h>

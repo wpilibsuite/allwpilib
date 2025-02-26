@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <string>
 #include <string_view>
 
 #include "wpi/telemetry/TelemetryTable.h"
