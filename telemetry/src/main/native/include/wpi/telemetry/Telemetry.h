@@ -6,7 +6,7 @@
 
 #include <string_view>
 
-#include <wpi/telemetry/TelemetryTable.h>
+#include "wpi/telemetry/TelemetryTable.h"
 
 namespace frc {
 

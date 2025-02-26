@@ -1,17 +1,12 @@
 ext {
-    useJava = true
-    useCpp = true
-    baseId = 'datalog'
-    groupId = 'edu.wpi.first.datalog'
-
-    nativeName = 'datalog'
-    devMain = 'edu.wpi.first.datalog.DevMain'
+    nativeName = 'telemetry'
+    devMain = 'edu.wpi.first.telemetry.DevMain'
 }
 
-apply from: "${rootDir}/shared/jni/setupBuild.gradle"
+apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
 nativeUtils.exportsConfigs {
-    datalog {
+    telemetry {
     }
 }
 
@@ -30,15 +25,11 @@ model {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {
                 return
             }
-            if (it.component.name != "${nativeName}JNI") {
-                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
-            }
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
         }
     }
 }
 
 dependencies {
-    implementation project(":telemetry")
-    implementation project(":wpiutil")
+    api project(":wpiutil")
 }

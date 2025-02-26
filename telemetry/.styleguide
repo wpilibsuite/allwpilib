@@ -1,0 +1,21 @@
+cppHeaderFileInclude {
+  \.h$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+repoRootNameOverride {
+  telemetry
+}
+
+includeOtherLibs {
+  ^fmt/
+  ^gtest/
+  ^wpi/(?!telemetry)
+}
+
+includeProject {
+  ^wpi/telemetry/
+}

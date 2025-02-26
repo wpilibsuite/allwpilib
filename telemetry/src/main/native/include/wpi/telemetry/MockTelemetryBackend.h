@@ -10,9 +10,10 @@
 #include <variant>
 #include <vector>
 
-#include "wpi/mutex.h"
+#include <wpi/mutex.h>
+#include <wpi/StringMap.h>
+
 #include "wpi/telemetry/TelemetryBackend.h"
-#include "wpi/StringMap.h"
 
 namespace wpi {
 
