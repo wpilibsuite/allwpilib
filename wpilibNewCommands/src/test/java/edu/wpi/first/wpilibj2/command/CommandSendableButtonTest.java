@@ -55,7 +55,7 @@ class CommandSendableButtonTest extends CommandTestBase {
   @Test
   void trueAndScheduledNoOp() {
     // Scheduled and true -> no-op
-    m_command.schedule();
+    CommandScheduler.getInstance().schedule(m_command);
     CommandScheduler.getInstance().run();
     SmartDashboard.updateValues();
     assertTrue(m_command.isScheduled());
@@ -90,7 +90,7 @@ class CommandSendableButtonTest extends CommandTestBase {
   @Test
   void falseAndScheduledCancel() {
     // Scheduled and false -> cancel
-    m_command.schedule();
+    CommandScheduler.getInstance().schedule(m_command);
     CommandScheduler.getInstance().run();
     SmartDashboard.updateValues();
     assertTrue(m_command.isScheduled());
