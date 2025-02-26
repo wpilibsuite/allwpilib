@@ -129,7 +129,7 @@ doxygen {
         exclude 'fmt/**'
 
         // htrie
-        exclude 'htrie/**'
+        exclude 'wpi/array-hash/**'
 
         // libuv
         exclude 'uv.h'
