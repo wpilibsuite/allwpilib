@@ -13,12 +13,12 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <wpi/mutex.h>
+#include <wpi/protobuf/Protobuf.h>
+#include <wpi/struct/Struct.h>
+#include <wpi/SmallVector.h>
+#include <wpi/StringMap.h>
 
-#include "wpi/SmallVector.h"
-#include "wpi/StringMap.h"
-#include "wpi/mutex.h"
-#include "wpi/protobuf/Protobuf.h"
-#include "wpi/struct/Struct.h"
 #include "wpi/telemetry/TelemetryRegistry.h"
 
 namespace wpi {

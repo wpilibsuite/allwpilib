@@ -10,8 +10,8 @@
 #include <span>
 #include <string_view>
 
-#include "wpi/protobuf/Protobuf.h"
-#include "wpi/struct/Struct.h"
+#include <wpi/protobuf/Protobuf.h>
+#include <wpi/struct/Struct.h>
 
 namespace wpi {
 

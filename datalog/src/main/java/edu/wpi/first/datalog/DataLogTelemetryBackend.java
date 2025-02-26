@@ -4,10 +4,10 @@
 
 package edu.wpi.first.datalog;
 
+import edu.wpi.first.telemetry.TelemetryBackend;
+import edu.wpi.first.telemetry.TelemetryEntry;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
-import edu.wpi.first.util.telemetry.TelemetryBackend;
-import edu.wpi.first.util.telemetry.TelemetryEntry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
