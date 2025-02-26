@@ -22,18 +22,18 @@ TEST(REVPHSimTest, InitializedCallback) {
   BooleanCallback callback;
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
 
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   EXPECT_TRUE(sim.GetInitialized());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }
 
 TEST(REVPHSimTest, SolenoidOutput) {
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   REVPHSim sim(ph);
   sim.ResetData();
 
-  DoubleSolenoid doubleSolenoid{1, frc::PneumaticsModuleType::REVPH, 3, 4};
+  DoubleSolenoid doubleSolenoid{0, 1, frc::PneumaticsModuleType::REVPH, 3, 4};
 
   BooleanCallback callback3;
   BooleanCallback callback4;
@@ -80,7 +80,7 @@ TEST(REVPHSimTest, SolenoidOutput) {
 }
 
 TEST(REVPHSimTest, SetCompressorOn) {
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -97,7 +97,7 @@ TEST(REVPHSimTest, SetCompressorOn) {
 }
 
 TEST(REVPHSimTest, SetEnableDigital) {
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -118,7 +118,7 @@ TEST(REVPHSimTest, SetEnableDigital) {
 }
 
 TEST(REVPHSimTest, SetEnableAnalog) {
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -139,7 +139,7 @@ TEST(REVPHSimTest, SetEnableAnalog) {
 }
 
 TEST(REVPHSimTest, SetEnableHybrid) {
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -160,7 +160,7 @@ TEST(REVPHSimTest, SetEnableHybrid) {
 }
 
 TEST(REVPHSimTest, SetPressureSwitchEnabled) {
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -177,7 +177,7 @@ TEST(REVPHSimTest, SetPressureSwitchEnabled) {
 }
 
 TEST(REVPHSimTest, SetCompressorCurrent) {
-  PneumaticHub ph;
+  PneumaticHub ph{0};
   REVPHSim sim(ph);
   sim.ResetData();
 

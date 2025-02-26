@@ -15,7 +15,7 @@ class PowerDistributionTest {
   @Test
   void testGetAllCurrents() {
     HAL.initialize(500, 0);
-    PowerDistribution pdp = new PowerDistribution(1, ModuleType.kRev);
+    PowerDistribution pdp = new PowerDistribution(0, 1, ModuleType.kRev);
     PDPSim sim = new PDPSim(pdp);
 
     for (int i = 0; i < pdp.getNumChannels(); i++) {

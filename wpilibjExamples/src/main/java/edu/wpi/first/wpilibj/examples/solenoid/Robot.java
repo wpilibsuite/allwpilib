@@ -28,15 +28,15 @@ public class Robot extends TimedRobot {
 
   // Solenoid corresponds to a single solenoid.
   // In this case, it's connected to channel 0 of a PH with the default CAN ID.
-  private final Solenoid m_solenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
+  private final Solenoid m_solenoid = new Solenoid(0, PneumaticsModuleType.REVPH, 0);
 
   // DoubleSolenoid corresponds to a double solenoid.
   // In this case, it's connected to channels 1 and 2 of a PH with the default CAN ID.
   private final DoubleSolenoid m_doubleSolenoid =
-      new DoubleSolenoid(PneumaticsModuleType.REVPH, 1, 2);
+      new DoubleSolenoid(0, PneumaticsModuleType.REVPH, 1, 2);
 
   // Compressor connected to a PH with a default CAN ID (1)
-  private final Compressor m_compressor = new Compressor(PneumaticsModuleType.REVPH);
+  private final Compressor m_compressor = new Compressor(0, PneumaticsModuleType.REVPH);
 
   static final int kSolenoidButton = 1;
   static final int kDoubleSolenoidForwardButton = 2;

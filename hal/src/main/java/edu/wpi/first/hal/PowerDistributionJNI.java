@@ -25,12 +25,13 @@ public class PowerDistributionJNI extends JNIWrapper {
   /**
    * Initializes a Power Distribution Panel.
    *
+   * @param busId the bus id
    * @param module the module number to initialize
    * @param type the type of module to initialize
    * @return the created PowerDistribution handle
    * @see "HAL_InitializePowerDistribution"
    */
-  public static native int initialize(int module, int type);
+  public static native int initialize(int busId, int module, int type);
 
   /**
    * Cleans a PowerDistribution module.

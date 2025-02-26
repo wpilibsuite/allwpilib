@@ -27,17 +27,17 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_hal_PowerDistributionJNI
  * Method:    initialize
- * Signature: (II)I
+ * Signature: (III)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_PowerDistributionJNI_initialize
-  (JNIEnv* env, jclass, jint module, jint type)
+  (JNIEnv* env, jclass, jint busId, jint module, jint type)
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
   auto handle = HAL_InitializePowerDistribution(
-      module, static_cast<HAL_PowerDistributionType>(type), stack.c_str(),
-      &status);
+      busId, module, static_cast<HAL_PowerDistributionType>(type),
+      stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return static_cast<jint>(handle);
 }

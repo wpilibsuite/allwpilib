@@ -9,6 +9,7 @@
 
 #include <fmt/format.h>
 #include <hal/CTREPCM.h>
+#include <hal/Ports.h>
 #include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>
@@ -23,28 +24,32 @@ using namespace frc;
 
 wpi::mutex PneumaticsControlModule::m_handleLock;
 std::unique_ptr<
-    wpi::DenseMap<int, std::weak_ptr<PneumaticsControlModule::DataStore>>>
-    PneumaticsControlModule::m_handleMap = nullptr;
+    wpi::DenseMap<int, std::weak_ptr<PneumaticsControlModule::DataStore>>[]>
+    PneumaticsControlModule::m_handleMaps = nullptr;
 
 // Always called under lock, so we can avoid the double lock from the magic
 // static
 std::weak_ptr<PneumaticsControlModule::DataStore>&
-PneumaticsControlModule::GetDataStore(int module) {
-  if (!m_handleMap) {
-    m_handleMap = std::make_unique<wpi::DenseMap<
-        int, std::weak_ptr<PneumaticsControlModule::DataStore>>>();
+PneumaticsControlModule::GetDataStore(int busId, int module) {
+  int32_t numBuses = HAL_GetNumCanBuses();
+  FRC_AssertMessage(busId >= 0 && busId < numBuses,
+                    "Bus {} out of range. Must be [0-{}).", busId, numBuses);
+  if (!m_handleMaps) {
+    m_handleMaps = std::make_unique<wpi::DenseMap<
+        int, std::weak_ptr<PneumaticsControlModule::DataStore>>[]>(numBuses);
   }
-  return (*m_handleMap)[module];
+
+  return m_handleMaps[busId][module];
 }
 
 class PneumaticsControlModule::DataStore {
  public:
-  explicit DataStore(int module, const char* stackTrace) {
+  explicit DataStore(int busId, int module, const char* stackTrace) {
     int32_t status = 0;
     HAL_CTREPCMHandle handle =
-        HAL_InitializeCTREPCM(module, stackTrace, &status);
+        HAL_InitializeCTREPCM(busId, module, stackTrace, &status);
     FRC_CheckErrorStatus(status, "Module {}", module);
-    m_moduleObject = PneumaticsControlModule{handle, module};
+    m_moduleObject = PneumaticsControlModule{busId, handle, module};
     m_moduleObject.m_dataStore =
         std::shared_ptr<DataStore>{this, wpi::NullDeleter<DataStore>()};
   }
@@ -59,26 +64,28 @@ class PneumaticsControlModule::DataStore {
   uint32_t m_reservedMask{0};
   bool m_compressorReserved{false};
   wpi::mutex m_reservedLock;
-  PneumaticsControlModule m_moduleObject{HAL_kInvalidHandle, 0};
+  PneumaticsControlModule m_moduleObject{0, HAL_kInvalidHandle, 0};
 };
 
-PneumaticsControlModule::PneumaticsControlModule()
-    : PneumaticsControlModule{SensorUtil::GetDefaultCTREPCMModule()} {}
+PneumaticsControlModule::PneumaticsControlModule(int busId)
+    : PneumaticsControlModule{busId, SensorUtil::GetDefaultCTREPCMModule()} {}
 
-PneumaticsControlModule::PneumaticsControlModule(int module) {
+PneumaticsControlModule::PneumaticsControlModule(int busId, int module) {
   std::string stackTrace = wpi::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
-  auto& res = GetDataStore(module);
+  auto& res = GetDataStore(busId, module);
   m_dataStore = res.lock();
   if (!m_dataStore) {
-    m_dataStore = std::make_shared<DataStore>(module, stackTrace.c_str());
+    m_dataStore =
+        std::make_shared<DataStore>(busId, module, stackTrace.c_str());
     res = m_dataStore;
   }
   m_handle = m_dataStore->m_moduleObject.m_handle;
   m_module = module;
 }
 
-PneumaticsControlModule::PneumaticsControlModule(HAL_CTREPCMHandle handle,
+PneumaticsControlModule::PneumaticsControlModule(int /* busId */,
+                                                 HAL_CTREPCMHandle handle,
                                                  int module)
     : m_handle{handle}, m_module{module} {}
 
@@ -297,13 +304,13 @@ void PneumaticsControlModule::ReportUsage(std::string_view device,
 }
 
 std::shared_ptr<PneumaticsBase> PneumaticsControlModule::GetForModule(
-    int module) {
+    int busId, int module) {
   std::string stackTrace = wpi::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
-  auto& res = GetDataStore(module);
+  auto& res = GetDataStore(busId, module);
   std::shared_ptr<DataStore> dataStore = res.lock();
   if (!dataStore) {
-    dataStore = std::make_shared<DataStore>(module, stackTrace.c_str());
+    dataStore = std::make_shared<DataStore>(busId, module, stackTrace.c_str());
     res = dataStore;
   }
 

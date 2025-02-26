@@ -6,8 +6,8 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.CANAPIJNI;
 import edu.wpi.first.hal.CANAPITypes;
-import edu.wpi.first.hal.CANData;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.can.CANReceiveMessage;
 import java.io.Closeable;
 
 /**
@@ -33,22 +33,24 @@ public class CAN implements Closeable {
    * Create a new CAN communication interface with the specific device ID. This uses the team
    * manufacturer and device types. The device ID is 6 bits (0-63).
    *
+   * @param busId The bus ID
    * @param deviceId The device id
    */
-  public CAN(int deviceId) {
-    this(kTeamManufacturer, deviceId, kTeamDeviceType);
+  public CAN(int busId, int deviceId) {
+    this(busId, deviceId, kTeamManufacturer, kTeamDeviceType);
   }
 
   /**
    * Create a new CAN communication interface with a specific device ID, manufacturer and device
    * type. The device ID is 6 bits, the manufacturer is 8 bits, and the device type is 5 bits.
    *
+   * @param busId The bus ID
    * @param deviceId The device ID
    * @param deviceManufacturer The device manufacturer
    * @param deviceType The device type
    */
-  public CAN(int deviceId, int deviceManufacturer, int deviceType) {
-    m_handle = CANAPIJNI.initializeCAN(deviceManufacturer, deviceId, deviceType);
+  public CAN(int busId, int deviceId, int deviceManufacturer, int deviceType) {
+    m_handle = CANAPIJNI.initializeCAN(busId, deviceManufacturer, deviceId, deviceType);
     HAL.reportUsage("CAN[" + deviceType + "][" + deviceManufacturer + "][" + deviceId + "]", "");
   }
 
@@ -63,70 +65,85 @@ public class CAN implements Closeable {
   /**
    * Write a packet to the CAN device with a specific ID. This ID is 10 bits.
    *
-   * @param data The data to write (8 bytes max)
    * @param apiId The API ID to write.
+   * @param data The data to write
+   * @param dataLength The data length
+   * @param flags The flags
    */
-  public void writePacket(byte[] data, int apiId) {
-    CANAPIJNI.writeCANPacket(m_handle, data, apiId);
+  public void writePacket(int apiId, byte[] data, int dataLength, int flags) {
+    CANAPIJNI.writeCANPacket(m_handle, apiId, data, dataLength, flags);
   }
 
   /**
    * Write a repeating packet to the CAN device with a specific ID. This ID is 10 bits. The RoboRIO
    * will automatically repeat the packet at the specified interval
    *
-   * @param data The data to write (8 bytes max)
    * @param apiId The API ID to write.
+   * @param data The data to write
+   * @param dataLength The data length
+   * @param flags The flags
    * @param repeatMs The period to repeat the packet at.
    */
-  public void writePacketRepeating(byte[] data, int apiId, int repeatMs) {
-    CANAPIJNI.writeCANPacketRepeating(m_handle, data, apiId, repeatMs);
+  public void writePacketRepeating(
+      int apiId, byte[] data, int dataLength, int flags, int repeatMs) {
+    CANAPIJNI.writeCANPacketRepeating(m_handle, apiId, data, dataLength, flags, repeatMs);
   }
 
   /**
    * Write an RTR frame to the CAN device with a specific ID. This ID is 10 bits. The length by spec
    * must match what is returned by the responding device
    *
-   * @param length The length to request (0 to 8)
    * @param apiId The API ID to write.
+   * @param data The data to write
+   * @param dataLength The data length
+   * @param flags The flags
    */
-  public void writeRTRFrame(int length, int apiId) {
-    CANAPIJNI.writeCANRTRFrame(m_handle, length, apiId);
+  public void writeRTRFrame(int apiId, byte[] data, int dataLength, int flags) {
+    CANAPIJNI.writeCANRTRFrame(m_handle, apiId, data, dataLength, flags);
   }
 
   /**
    * Write a packet to the CAN device with a specific ID. This ID is 10 bits.
    *
-   * @param data The data to write (8 bytes max)
    * @param apiId The API ID to write.
+   * @param data The data to write
+   * @param dataLength The data length
+   * @param flags The flags
    * @return TODO
    */
-  public int writePacketNoThrow(byte[] data, int apiId) {
-    return CANAPIJNI.writeCANPacketNoThrow(m_handle, data, apiId);
+  public int writePacketNoThrow(int apiId, byte[] data, int dataLength, int flags) {
+    return CANAPIJNI.writeCANPacketNoThrow(m_handle, apiId, data, dataLength, flags);
   }
 
   /**
    * Write a repeating packet to the CAN device with a specific ID. This ID is 10 bits. The RoboRIO
    * will automatically repeat the packet at the specified interval
    *
-   * @param data The data to write (8 bytes max)
    * @param apiId The API ID to write.
+   * @param data The data to write
+   * @param dataLength The data length
+   * @param flags The flags
    * @param repeatMs The period to repeat the packet at.
    * @return TODO
    */
-  public int writePacketRepeatingNoThrow(byte[] data, int apiId, int repeatMs) {
-    return CANAPIJNI.writeCANPacketRepeatingNoThrow(m_handle, data, apiId, repeatMs);
+  public int writePacketRepeatingNoThrow(
+      int apiId, byte[] data, int dataLength, int flags, int repeatMs) {
+    return CANAPIJNI.writeCANPacketRepeatingNoThrow(
+        m_handle, apiId, data, dataLength, flags, repeatMs);
   }
 
   /**
    * Write an RTR frame to the CAN device with a specific ID. This ID is 10 bits. The length by spec
    * must match what is returned by the responding device
    *
-   * @param length The length to request (0 to 8)
    * @param apiId The API ID to write.
+   * @param data The data to write
+   * @param dataLength The data length
+   * @param flags The flags
    * @return TODO
    */
-  public int writeRTRFrameNoThrow(int length, int apiId) {
-    return CANAPIJNI.writeCANRTRFrameNoThrow(m_handle, length, apiId);
+  public int writeRTRFrameNoThrow(int apiId, byte[] data, int dataLength, int flags) {
+    return CANAPIJNI.writeCANRTRFrameNoThrow(m_handle, apiId, data, dataLength, flags);
   }
 
   /**
@@ -146,7 +163,7 @@ public class CAN implements Closeable {
    * @param data Storage for the received data.
    * @return True if the data is valid, otherwise false.
    */
-  public boolean readPacketNew(int apiId, CANData data) {
+  public boolean readPacketNew(int apiId, CANReceiveMessage data) {
     return CANAPIJNI.readCANPacketNew(m_handle, apiId, data);
   }
 
@@ -158,7 +175,7 @@ public class CAN implements Closeable {
    * @param data Storage for the received data.
    * @return True if the data is valid, otherwise false.
    */
-  public boolean readPacketLatest(int apiId, CANData data) {
+  public boolean readPacketLatest(int apiId, CANReceiveMessage data) {
     return CANAPIJNI.readCANPacketLatest(m_handle, apiId, data);
   }
 
@@ -171,18 +188,7 @@ public class CAN implements Closeable {
    * @param data Storage for the received data.
    * @return True if the data is valid, otherwise false.
    */
-  public boolean readPacketTimeout(int apiId, int timeoutMs, CANData data) {
-    return CANAPIJNI.readCANPacketTimeout(m_handle, apiId, timeoutMs, data);
-  }
-
-  /**
-   * Reads the current value of the millisecond-resolution timer that {@link CANData} timestamps are
-   * based on.
-   *
-   * @return Current value of timer used as a base time for {@link CANData} timestamps in
-   *     milliseconds
-   */
-  public static long getTimestampBaseTime() {
-    return CANAPIJNI.getCANPacketBaseTime();
+  public boolean readPacketTimeout(int apiId, CANReceiveMessage data, int timeoutMs) {
+    return CANAPIJNI.readCANPacketTimeout(m_handle, apiId, data, timeoutMs);
   }
 }
