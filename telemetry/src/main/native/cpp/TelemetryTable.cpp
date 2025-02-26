@@ -128,12 +128,20 @@ void TelemetryTable::Log(std::string_view name, std::span<const uint8_t> value,
 }
 
 TelemetryEntry& TelemetryTable::GetEntry(std::string_view name) {
-  std::scoped_lock lock{m_mutex};
-  auto& entry = m_entriesMap[name];
-  if (!entry) {
-    entry = &TelemetryRegistry::GetEntry(fmt::format("{}{}", m_path, name));
+  std::unique_lock lock{m_mutex};
+  TelemetryEntry* entry = m_entriesMap[name];
+  if (entry) {
+    return *entry;
   }
-  return *entry;
+  lock.unlock();  // avoid lock inversion
+  TelemetryEntry* newEntry =
+      &TelemetryRegistry::GetEntry(fmt::format("{}{}", m_path, name));
+  lock.lock();
+  auto& entry2 = m_entriesMap[name];
+  if (!entry2) {
+    entry2 = newEntry;
+  }
+  return *entry2;
 }
 
 void TelemetryTable::Reset() {
