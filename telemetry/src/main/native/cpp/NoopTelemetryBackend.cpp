@@ -4,6 +4,8 @@
 
 #include "wpi/telemetry/NoopTelemetryBackend.h"
 
+#include <string>
+
 #include "wpi/telemetry/TelemetryEntry.h"
 
 using namespace wpi;
