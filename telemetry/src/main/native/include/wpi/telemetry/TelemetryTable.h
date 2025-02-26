@@ -52,6 +52,9 @@ inline void TelemetryLogEntryADL(TelemetryTable& table, std::string_view name,
                                  const T& value, I... info) {
   LogEntry(table, name, value, info...);
 }
+
+template <typename T>
+struct always_false : std::false_type {};
 }  // namespace impl
 
 /**
@@ -150,7 +153,8 @@ class TelemetryTable final {
     } else if constexpr (impl::StringConvertible<T>) {
       Log(name, fmt::to_string(value));
     } else {
-      static_assert(false, "Don't know how to serialize type");
+      static_assert(impl::always_false<T>::value,
+                    "Don't know how to serialize type");
     }
   }
 
@@ -179,7 +183,8 @@ class TelemetryTable final {
       }
       Log(name, strings);
     } else {
-      static_assert(false, "Don't know how to serialize type");
+      static_assert(impl::always_false<T>::value,
+                    "Don't know how to serialize type");
     }
   }
 
