@@ -61,8 +61,8 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
   public Rectangle2d(Translation2d cornerA, Translation2d cornerB) {
     this(
         new Pose2d(cornerA.plus(cornerB).div(2.0), Rotation2d.kZero),
-        Math.abs(cornerA.getX() - cornerB.getX()),
-        Math.abs(cornerA.getY() - cornerB.getY()));
+        Math.abs(cornerA.x() - cornerB.x()),
+        Math.abs(cornerA.y() - cornerB.y()));
   }
 
   /**
@@ -150,12 +150,12 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
     point = point.minus(m_center.getTranslation());
     point = point.rotateBy(m_center.getRotation().unaryMinus());
 
-    if (Math.abs(Math.abs(point.getX()) - m_xWidth / 2.0) <= 1E-9) {
+    if (Math.abs(Math.abs(point.x()) - m_xWidth / 2.0) <= 1E-9) {
       // Point rests on left/right perimeter
-      return Math.abs(point.getY()) <= m_yWidth / 2.0;
-    } else if (Math.abs(Math.abs(point.getY()) - m_yWidth / 2.0) <= 1E-9) {
+      return Math.abs(point.y()) <= m_yWidth / 2.0;
+    } else if (Math.abs(Math.abs(point.y()) - m_yWidth / 2.0) <= 1E-9) {
       // Point rests on top/bottom perimeter
-      return Math.abs(point.getX()) <= m_xWidth / 2.0;
+      return Math.abs(point.x()) <= m_xWidth / 2.0;
     }
 
     return false;
@@ -173,10 +173,10 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
     point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
 
     // Check if within bounding box
-    return point.getX() >= (m_center.getX() - m_xWidth / 2.0)
-        && point.getX() <= (m_center.getX() + m_xWidth / 2.0)
-        && point.getY() >= (m_center.getY() - m_yWidth / 2.0)
-        && point.getY() <= (m_center.getY() + m_yWidth / 2.0);
+    return point.x() >= (m_center.getX() - m_xWidth / 2.0)
+        && point.x() <= (m_center.getX() + m_xWidth / 2.0)
+        && point.y() >= (m_center.getY() - m_yWidth / 2.0)
+        && point.y() <= (m_center.getY() + m_yWidth / 2.0);
   }
 
   /**
@@ -218,9 +218,9 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
     point =
         new Translation2d(
             MathUtil.clamp(
-                point.getX(), m_center.getX() - m_xWidth / 2.0, m_center.getX() + m_xWidth / 2.0),
+                point.x(), m_center.getX() - m_xWidth / 2.0, m_center.getX() + m_xWidth / 2.0),
             MathUtil.clamp(
-                point.getY(), m_center.getY() - m_yWidth / 2.0, m_center.getY() + m_yWidth / 2.0));
+                point.y(), m_center.getY() - m_yWidth / 2.0, m_center.getY() + m_yWidth / 2.0));
 
     // Undo rotation
     return point.rotateAround(m_center.getTranslation(), m_center.getRotation());

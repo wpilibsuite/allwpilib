@@ -100,7 +100,7 @@ public class Translation3d
    * @see Transform3d#Transform3d(Transform2d)
    */
   public Translation3d(Translation2d translation) {
-    this(translation.getX(), translation.getY(), 0.0);
+    this(translation.x(), translation.y(), 0.0);
   }
 
   /**

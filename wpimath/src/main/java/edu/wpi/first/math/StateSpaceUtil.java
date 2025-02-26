@@ -189,8 +189,8 @@ public final class StateSpaceUtil {
   @Deprecated(forRemoval = true, since = "2025")
   public static Matrix<N4, N1> poseTo4dVector(Pose2d pose) {
     return VecBuilder.fill(
-        pose.getTranslation().getX(),
-        pose.getTranslation().getY(),
+        pose.getTranslation().x(),
+        pose.getTranslation().y(),
         pose.getRotation().getCos(),
         pose.getRotation().getSin());
   }
@@ -206,8 +206,6 @@ public final class StateSpaceUtil {
   @Deprecated(forRemoval = true, since = "2025")
   public static Matrix<N3, N1> poseTo3dVector(Pose2d pose) {
     return VecBuilder.fill(
-        pose.getTranslation().getX(),
-        pose.getTranslation().getY(),
-        pose.getRotation().getRadians());
+        pose.getTranslation().y(), pose.getTranslation().x(), pose.getRotation().getRadians());
   }
 }

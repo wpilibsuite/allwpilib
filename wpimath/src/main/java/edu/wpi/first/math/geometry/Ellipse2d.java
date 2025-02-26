@@ -232,8 +232,8 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
         m_center.getRotation().getRadians(),
         m_xSemiAxis,
         m_ySemiAxis,
-        point.getX(),
-        point.getY(),
+        point.x(),
+        point.y(),
         nearestPoint);
     return new Translation2d(nearestPoint[0], nearestPoint[1]);
   }
@@ -281,8 +281,8 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
     // Rotate the point by the inverse of the ellipse's rotation
     point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
 
-    double x = point.getX() - m_center.getX();
-    double y = point.getY() - m_center.getY();
+    double x = point.x() - m_center.getX();
+    double y = point.y() - m_center.getY();
 
     return (x * x) / (m_xSemiAxis * m_xSemiAxis) + (y * y) / (m_ySemiAxis * m_ySemiAxis);
   }

@@ -36,8 +36,8 @@ public class Transform2dProto implements Protobuf<Transform2d, ProtobufTransform
 
   @Override
   public void pack(ProtobufTransform2d msg, Transform2d value) {
-    Translation2d.proto.pack(msg.getMutableTranslation(), value.getTranslation());
-    Rotation2d.proto.pack(msg.getMutableRotation(), value.getRotation());
+    Translation2d.proto.pack(msg.getMutableTranslation(), value.translation());
+    Rotation2d.proto.pack(msg.getMutableRotation(), value.rotation());
   }
 
   @Override

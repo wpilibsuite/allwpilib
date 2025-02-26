@@ -129,24 +129,24 @@ public final class SplineHelper {
       c[c.length - 1] = 0.0;
 
       // populate rhs vectors
-      dx[0] = 3 * (newWaypts[2].getX() - newWaypts[0].getX()) - xInitial[1];
-      dy[0] = 3 * (newWaypts[2].getY() - newWaypts[0].getY()) - yInitial[1];
+      dx[0] = 3 * (newWaypts[2].x() - newWaypts[0].x()) - xInitial[1];
+      dy[0] = 3 * (newWaypts[2].y() - newWaypts[0].y()) - yInitial[1];
 
       if (newWaypts.length > 4) {
         for (int i = 1; i <= newWaypts.length - 4; i++) {
           // dx and dy represent the derivatives of the internal waypoints. The derivative
           // of the second internal waypoint should involve the third and first internal waypoint,
           // which have indices of 1 and 3 in the newWaypts list (which contains ALL waypoints).
-          dx[i] = 3 * (newWaypts[i + 2].getX() - newWaypts[i].getX());
-          dy[i] = 3 * (newWaypts[i + 2].getY() - newWaypts[i].getY());
+          dx[i] = 3 * (newWaypts[i + 2].x() - newWaypts[i].x());
+          dy[i] = 3 * (newWaypts[i + 2].y() - newWaypts[i].y());
         }
       }
 
       dx[dx.length - 1] =
-          3 * (newWaypts[newWaypts.length - 1].getX() - newWaypts[newWaypts.length - 3].getX())
+          3 * (newWaypts[newWaypts.length - 1].x() - newWaypts[newWaypts.length - 3].x())
               - xFinal[1];
       dy[dy.length - 1] =
-          3 * (newWaypts[newWaypts.length - 1].getY() - newWaypts[newWaypts.length - 3].getY())
+          3 * (newWaypts[newWaypts.length - 1].y() - newWaypts[newWaypts.length - 3].y())
               - yFinal[1];
 
       // Compute solution to tridiagonal system
@@ -166,17 +166,17 @@ public final class SplineHelper {
       for (int i = 0; i < newFx.length - 1; i++) {
         splines[i] =
             new CubicHermiteSpline(
-                new double[] {newWaypts[i].getX(), newFx[i]},
-                new double[] {newWaypts[i + 1].getX(), newFx[i + 1]},
-                new double[] {newWaypts[i].getY(), newFy[i]},
-                new double[] {newWaypts[i + 1].getY(), newFy[i + 1]});
+                new double[] {newWaypts[i].x(), newFx[i]},
+                new double[] {newWaypts[i + 1].x(), newFx[i + 1]},
+                new double[] {newWaypts[i].y(), newFy[i]},
+                new double[] {newWaypts[i + 1].y(), newFy[i + 1]});
       }
     } else if (waypoints.length == 1) {
       final var xDeriv = (3 * (xFinal[0] - xInitial[0]) - xFinal[1] - xInitial[1]) / 4.0;
       final var yDeriv = (3 * (yFinal[0] - yInitial[0]) - yFinal[1] - yInitial[1]) / 4.0;
 
-      double[] midXControlVector = {waypoints[0].getX(), xDeriv};
-      double[] midYControlVector = {waypoints[0].getY(), yDeriv};
+      double[] midXControlVector = {waypoints[0].x(), xDeriv};
+      double[] midYControlVector = {waypoints[0].y(), yDeriv};
 
       splines[0] =
           new CubicHermiteSpline(

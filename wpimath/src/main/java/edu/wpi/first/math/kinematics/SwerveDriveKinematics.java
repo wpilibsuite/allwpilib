@@ -75,8 +75,8 @@ public class SwerveDriveKinematics
     m_inverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
 
     for (int i = 0; i < m_numModules; i++) {
-      m_inverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0, -m_modules[i].getY());
-      m_inverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, +m_modules[i].getX());
+      m_inverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0, -m_modules[i].y());
+      m_inverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, +m_modules[i].x());
     }
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
 
@@ -134,9 +134,9 @@ public class SwerveDriveKinematics
     if (!centerOfRotation.equals(m_prevCoR)) {
       for (int i = 0; i < m_numModules; i++) {
         m_inverseKinematics.setRow(
-            i * 2 + 0, 0, /* Start Data */ 1, 0, -m_modules[i].getY() + centerOfRotation.getY());
+            i * 2 + 0, 0, /* Start Data */ 1, 0, -m_modules[i].y() + centerOfRotation.y());
         m_inverseKinematics.setRow(
-            i * 2 + 1, 0, /* Start Data */ 0, 1, +m_modules[i].getX() - centerOfRotation.getX());
+            i * 2 + 1, 0, /* Start Data */ 0, 1, +m_modules[i].x() - centerOfRotation.x());
       }
       m_prevCoR = centerOfRotation;
     }
