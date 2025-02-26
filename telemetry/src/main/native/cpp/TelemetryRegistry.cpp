@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <fmt/format.h>
 #include <wpi/htrie_map.h>

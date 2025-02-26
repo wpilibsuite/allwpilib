@@ -4,6 +4,9 @@
 
 #include "wpi/telemetry/MockTelemetryBackend.h"
 
+#include <string>
+#include <vector>
+
 #include "wpi/telemetry/TelemetryEntry.h"
 
 using namespace wpi;

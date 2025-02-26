@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <string>
+
 #include <wpi/mutex.h>
 #include <wpi/telemetry/TelemetryBackend.h>
 #include <wpi/StringMap.h>

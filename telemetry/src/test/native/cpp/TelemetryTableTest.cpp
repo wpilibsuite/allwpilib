@@ -5,8 +5,10 @@
 #include "wpi/telemetry/TelemetryRegistry.h"
 #include "wpi/telemetry/TelemetryTable.h"  // NOLINT(build/include_order)
 
-#include <gtest/gtest.h>
+#include <memory>
 #include <variant>
+
+#include <gtest/gtest.h>
 
 #include "wpi/telemetry/MockTelemetryBackend.h"
 
