@@ -3,8 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/RobotBase.h"
-#include "networktables/NetworkTablesTelemetryBackend.h"
-#include "wpi/telemetry/TelemetryRegistry.h"
 
 #ifdef __FRC_ROBORIO__
 #include <dlfcn.h>
