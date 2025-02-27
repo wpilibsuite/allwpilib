@@ -55,6 +55,31 @@ void DriverStationData::ResetData() {
   m_newDataCallbacks.Reset();
 }
 
+int32_t DriverStationData::RegisterOpModeCallback(HAL_OpModeCallback callback,
+                                                  void* param,
+                                                  HAL_Bool initialNotify) {
+  std::scoped_lock lock(m_opModeMutex);
+  int32_t uid = m_opModeCallbacks.Register(callback, param);
+  if (initialNotify) {
+    callback(DriverStationData::GetOpModeName(), param, m_opMode.c_str());
+  }
+  return uid;
+}
+
+void DriverStationData::CancelOpModeCallback(int32_t uid) {
+  m_opModeCallbacks.Cancel(uid);
+}
+
+std::string DriverStationData::GetOpMode() {
+  std::scoped_lock lock{m_opModeMutex};
+  return m_opMode;
+}
+
+void DriverStationData::SetOpMode(std::string_view opMode) {
+  std::scoped_lock lock{m_opModeMutex};
+  m_opMode = opMode;
+}
+
 #define DEFINE_CPPAPI_CALLBACKS(name, data, data2)                             \
   int32_t DriverStationData::RegisterJoystick##name##Callback(                 \
       int32_t joystickNum, HAL_Joystick##name##Callback callback, void* param, \
@@ -414,6 +439,28 @@ DEFINE_CAPI(HAL_Bool, FmsAttached, fmsAttached)
 DEFINE_CAPI(HAL_Bool, DsAttached, dsAttached)
 DEFINE_CAPI(HAL_AllianceStationID, AllianceStationId, allianceStationId)
 DEFINE_CAPI(double, MatchTime, matchTime)
+
+int32_t HALSIM_RegisterOpModeCallback(HAL_OpModeCallback callback, void* param,
+                                      HAL_Bool initialNotify) {
+  return SimDriverStationData->RegisterOpModeCallback(callback, param,
+                                                      initialNotify);
+}
+
+void HALSIM_CancelOpModeCallback(int32_t uid) {
+  SimDriverStationData->CancelOpModeCallback(uid);
+}
+
+void HALSIM_GetOpMode(char* buf, int32_t* len) {
+  std::string str = SimDriverStationData->GetOpMode();
+  *len = std::min(static_cast<size_t>(*len), str.length());
+  if (*len != 0) {
+    std::memcpy(buf, str.data(), *len);
+  }
+}
+
+void HALSIM_SetOpMode(const char* opMode) {
+  SimDriverStationData->SetOpMode(opMode);
+}
 
 #undef DEFINE_CAPI
 #define DEFINE_CAPI(name, data)                                                \
