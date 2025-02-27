@@ -92,7 +92,6 @@ cc_test(
     ],
     deps = [
         ":datalog.static",
-        "//telemetry:telemetry-testlib",
         "//thirdparty/googletest:googletest.static",
         "//wpiutil:wpiutil-testlib",
     ],

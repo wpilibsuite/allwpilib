@@ -91,7 +91,6 @@ cc_test(
     ],
     deps = [
         ":ntcore.static",
-        "//telemetry:telemetry-testlib",
         "//thirdparty/googletest:googletest.static",
         "//wpiutil:wpiutil-testlib",
     ],
