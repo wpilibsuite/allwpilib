@@ -175,7 +175,7 @@ public final class Commands {
    * @see ConditionalCommand
    * @see {@link Commands#none()}
    */
-  public static Command runIf(BooleanSupplier condition, Command onTrue){
+  public static Command runIf(BooleanSupplier condition, Command onTrue) {
     return onTrue.onlyIf(condition);
   }
 
