@@ -43,6 +43,7 @@ cc_library(
         "//datalog:datalog.static",
         "//hal:wpiHal.static",
         "//ntcore:ntcore.static",
+        "//telemetry:telemetry.static",
         "//wpimath:wpimath.static",
         "//wpinet:wpinet.static",
         "//wpiutil:wpiutil.static",

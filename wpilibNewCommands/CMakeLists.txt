@@ -18,11 +18,12 @@ if(WITH_JAVA)
             ${JACKSON_JARS}
             cscore_jar
             cameraserver_jar
+            datalog_jar
+            telemetry_jar
             wpimath_jar
             wpiunits_jar
             wpiutil_jar
             wpilibj_jar
-            datalog_jar
         OUTPUT_NAME wpilibNewCommands
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
