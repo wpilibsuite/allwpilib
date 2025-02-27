@@ -23,7 +23,3 @@ includeOtherLibs {
   ^gtest/
   ^wpi/(?!datalog)
 }
-
-includeProject {
-  ^wpi/datalog/
-}
