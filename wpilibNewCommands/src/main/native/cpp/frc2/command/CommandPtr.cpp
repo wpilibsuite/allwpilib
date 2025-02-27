@@ -76,6 +76,14 @@ CommandPtr CommandPtr::IgnoringDisable(bool doesRunWhenDisabled) && {
   return std::move(*this);
 }
 
+CommandPtr CommandPtr::IgnoreDisable() && {
+  return std::move(*this).IgnoringDisable(true);
+}
+
+CommandPtr CommandPtr::RespectDisable() && {
+  return std::move(*this).IgnoringDisable(false);
+}
+
 using InterruptionBehavior = Command::InterruptionBehavior;
 class InterruptBehaviorCommand : public WrapperCommand {
  public:
