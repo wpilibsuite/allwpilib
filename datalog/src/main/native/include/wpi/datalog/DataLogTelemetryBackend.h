@@ -6,9 +6,9 @@
 
 #include <string>
 
+#include <wpi/StringMap.h>
 #include <wpi/mutex.h>
 #include <wpi/telemetry/TelemetryBackend.h>
-#include <wpi/StringMap.h>
 
 namespace wpi::log {
 
@@ -41,9 +41,9 @@ class DataLogTelemetryBackend : public wpi::TelemetryBackend {
    * @param func reporting function
    */
   void SetReportWarning(
-    std::function<void(std::string_view msg)> func) override;
+      std::function<void(std::string_view msg)> func) override;
 
-/**
+  /**
    * Returns whether there is a data schema already registered with the given
    * name. This does NOT perform a check as to whether the schema has already
    * been published by another node on the network.
