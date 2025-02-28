@@ -196,7 +196,7 @@ class CommandScheduler final : public wpi::Sendable,
    * @brief Get all registered subsytems as an immutable vector
    * 
    */
-  std::vector<Subsystem*> GetAllRegisteredSubsystems();
+  const std::vector<Subsystem*> GetAllRegisteredSubsystems();
 
   /**
    * Un-registers all registered Subsystems with the scheduler. All currently

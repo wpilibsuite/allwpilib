@@ -288,14 +288,15 @@ void CommandScheduler::UnregisterSubsystem(
   }
 }
 
-std::vector<Subsystem*> CommandScheduler::GetAllRegisteredSubsystems(){
+const std::vector<Subsystem*> CommandScheduler::GetAllRegisteredSubsystems(){
   std::vector<frc2::Subsystem*> subsystems;
   subsystems.reserve(m_impl->subsystems.size());
   for(wpi::DenseMap<frc2::Subsystem*, std::unique_ptr<Command>>::iterator it = m_impl->subsystems.begin();
   it != m_impl->subsystems.end(); ++it){
     subsystems.push_back(it->first);
   }
-  return subsystems;
+  const std::vector<frc2::Subsystem*> ret = subsystems;
+  return ret;
 }
 
 void CommandScheduler::UnregisterAllSubsystems() {
