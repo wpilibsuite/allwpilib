@@ -4,7 +4,9 @@
 
 As members, contributors, and leaders, we commit to fostering a community where everyone feels safe, respected, and valued. We are dedicated to ensuring that participation in this community is harassment-free, inclusive, and welcoming, regardless of age, body type, abilities (visible or invisible), ethnicity, gender identity or expression, sexual orientation, socioeconomic background, education, nationality, personal appearance, race, or religion.
 
-Above all, we pledge to act with integrity, kindness, and empathy—striving to be not only good participants but also good humans.
+We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.
+
+We pledge to act with integrity, kindness, and empathy—striving to be not only good participants but also good humans.
 
 
 ## Our Standards
