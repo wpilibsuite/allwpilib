@@ -300,6 +300,8 @@ if(WITH_NTCORE)
     add_subdirectory(ntcore)
 endif()
 
+add_subdirectory(sawmill)
+
 if(WITH_WPIMATH)
     if(WITH_JAVA)
         set(WPIUNITS_DEP_REPLACE ${WPIUNITS_DEP_REPLACE_IMPL})

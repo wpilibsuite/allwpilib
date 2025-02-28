@@ -4,6 +4,12 @@
 
 #pragma once
 
+#include <wpi/datalog/DataLogReader.h>
+#include <wpi/DenseMap.h>
+#include <wpi/Signal.h>
+#include <wpi/mutex.h>
+#include <wpi/struct/DynamicStruct.h>
+
 #include <atomic>
 #include <functional>
 #include <map>
