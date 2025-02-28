@@ -14,8 +14,8 @@ import edu.wpi.first.math.MathUtil;
  * edu.wpi.first.math.trajectory.TrapezoidProfile} instead.
  */
 public class SlewRateLimiter {
-  private final double m_positiveRateLimit;
-  private final double m_negativeRateLimit;
+  private double m_positiveRateLimit;
+  private double m_negativeRateLimit;
   private double m_prevVal;
   private double m_prevTime;
 
@@ -81,5 +81,29 @@ public class SlewRateLimiter {
   public void reset(double value) {
     m_prevVal = value;
     m_prevTime = MathSharedStore.getTimestamp();
+  }
+
+  /**
+   * Sets the rate-of-change limit.
+   *
+   * @param positiveRateLimit The rate-of-change limit in the positive direction, in units per
+   *     second. This is expected to be positive.
+   * @param negativeRateLimit The rate-of-change limit in the negative direction, in units per
+   *     second. This is expected to be negative.
+   */
+  public void setLimit(double positiveRateLimit, double negativeRateLimit) {
+    m_positiveRateLimit = positiveRateLimit;
+    m_negativeRateLimit = negativeRateLimit;
+  }
+
+  /**
+   * Sets the rate-of-change limit in both directions.
+   *
+   * @param rateLimit The rate-of-change limit in both directions, in units per second. This is
+   *     expected to be positive.
+   */
+  public void setLimit(double rateLimit) {
+    m_positiveRateLimit = rateLimit;
+    m_negativeRateLimit = rateLimit;
   }
 }
