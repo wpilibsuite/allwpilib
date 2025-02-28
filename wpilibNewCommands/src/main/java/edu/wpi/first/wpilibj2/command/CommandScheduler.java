@@ -370,9 +370,9 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     m_subsystems.keySet().removeAll(Set.of(subsystems));
   }
 
-  /** 
+  /**
    * Get all registered subsystems.
-   * 
+   *
    * @return Returns the list of registered subsystems as an immutable collection.
   */
   public Set<Subsystem> getAllRegisteredSubsystems() {
