@@ -64,7 +64,7 @@ class WPILIB_DLLEXPORT Debouncer {
    * @return The number of seconds the value must change from baseline
    *             for the filtered value to change.
    */
-  constexpr units::second_t GetDebounceTime() const { return tm_debounceTime; }
+  constexpr units::second_t GetDebounceTime() const { return m_debounceTime; }
 
   /**
    * Set the debounce type.
