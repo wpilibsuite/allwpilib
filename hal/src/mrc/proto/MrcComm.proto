@@ -15,7 +15,9 @@ message ProtobufControlData {
     uint32 ControlWord = 1;
     float MatchTime = 2;
     repeated ProtobufJoystickData Joysticks = 3;
-    string OpMode = 4;
+    string CurrentOpMode = 4;
+    string SelectedTeleopOpMode = 5;
+    string SelectedAutonOpMode = 6;
 }
 
 message ProtobufJoystickDescriptor {
@@ -31,12 +33,6 @@ message ProtobufJoystickOutputData {
     fixed32 HidOutputs = 1;
     float LeftRumble = 2;
     float RightRumble = 3;
-}
-
-message ProtobufVersionInfo {
-    fixed32 DeviceId = 1;
-    string Name = 2;
-    string Version = 3;
 }
 
 message ProtobufMatchInfo {

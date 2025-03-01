@@ -34,7 +34,9 @@ typedef struct _mrc_proto_ProtobufControlData {
     uint32_t ControlWord;
     float MatchTime;
     pb_callback_t Joysticks;
-    pb_callback_t OpMode;
+    pb_callback_t CurrentOpMode;
+    pb_callback_t SelectedTeleopOpMode;
+    pb_callback_t SelectedAutonOpMode;
 } mrc_proto_ProtobufControlData;
 
 typedef struct _mrc_proto_ProtobufJoystickDescriptor {
@@ -59,16 +61,6 @@ typedef struct _mrc_proto_ProtobufJoystickOutputData {
     float LeftRumble;
     float RightRumble;
 } mrc_proto_ProtobufJoystickOutputData;
-
-typedef struct _mrc_proto_ProtobufVersionInfo {
-    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
-    static std::string_view msg_name(void) noexcept;
-    static pb_filedesc_t file_descriptor(void) noexcept;
-
-    uint32_t DeviceId;
-    pb_callback_t Name;
-    pb_callback_t Version;
-} mrc_proto_ProtobufVersionInfo;
 
 typedef struct _mrc_proto_ProtobufMatchInfo {
     static const pb_msgdesc_t* msg_descriptor(void) noexcept;
@@ -96,17 +88,15 @@ typedef struct _mrc_proto_ProtobufErrorInfo {
 
 /* Initializer values for message structs */
 #define mrc_proto_ProtobufJoystickData_init_default {0, 0, {{NULL}, NULL}, {{NULL}, NULL}}
-#define mrc_proto_ProtobufControlData_init_default {0, 0, {{NULL}, NULL}, {{NULL}, NULL}}
+#define mrc_proto_ProtobufControlData_init_default {0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickDescriptor_init_default {{{NULL}, NULL}, {{NULL}, NULL}, 0, 0, 0, 0}
 #define mrc_proto_ProtobufJoystickOutputData_init_default {0, 0, 0}
-#define mrc_proto_ProtobufVersionInfo_init_default {0, {{NULL}, NULL}, {{NULL}, NULL}}
 #define mrc_proto_ProtobufMatchInfo_init_default {{{NULL}, NULL}, 0, 0, 0}
 #define mrc_proto_ProtobufErrorInfo_init_default {0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickData_init_zero {0, 0, {{NULL}, NULL}, {{NULL}, NULL}}
-#define mrc_proto_ProtobufControlData_init_zero  {0, 0, {{NULL}, NULL}, {{NULL}, NULL}}
+#define mrc_proto_ProtobufControlData_init_zero  {0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 #define mrc_proto_ProtobufJoystickDescriptor_init_zero {{{NULL}, NULL}, {{NULL}, NULL}, 0, 0, 0, 0}
 #define mrc_proto_ProtobufJoystickOutputData_init_zero {0, 0, 0}
-#define mrc_proto_ProtobufVersionInfo_init_zero  {0, {{NULL}, NULL}, {{NULL}, NULL}}
 #define mrc_proto_ProtobufMatchInfo_init_zero    {{{NULL}, NULL}, 0, 0, 0}
 #define mrc_proto_ProtobufErrorInfo_init_zero    {0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 
@@ -118,7 +108,9 @@ typedef struct _mrc_proto_ProtobufErrorInfo {
 #define mrc_proto_ProtobufControlData_ControlWord_tag 1
 #define mrc_proto_ProtobufControlData_MatchTime_tag 2
 #define mrc_proto_ProtobufControlData_Joysticks_tag 3
-#define mrc_proto_ProtobufControlData_OpMode_tag 4
+#define mrc_proto_ProtobufControlData_CurrentOpMode_tag 4
+#define mrc_proto_ProtobufControlData_SelectedTeleopOpMode_tag 5
+#define mrc_proto_ProtobufControlData_SelectedAutonOpMode_tag 6
 #define mrc_proto_ProtobufJoystickDescriptor_JoystickName_tag 1
 #define mrc_proto_ProtobufJoystickDescriptor_AxisTypes_tag 2
 #define mrc_proto_ProtobufJoystickDescriptor_IsXbox_tag 3
@@ -128,9 +120,6 @@ typedef struct _mrc_proto_ProtobufErrorInfo {
 #define mrc_proto_ProtobufJoystickOutputData_HidOutputs_tag 1
 #define mrc_proto_ProtobufJoystickOutputData_LeftRumble_tag 2
 #define mrc_proto_ProtobufJoystickOutputData_RightRumble_tag 3
-#define mrc_proto_ProtobufVersionInfo_DeviceId_tag 1
-#define mrc_proto_ProtobufVersionInfo_Name_tag   2
-#define mrc_proto_ProtobufVersionInfo_Version_tag 3
 #define mrc_proto_ProtobufMatchInfo_EventName_tag 1
 #define mrc_proto_ProtobufMatchInfo_MatchNumber_tag 2
 #define mrc_proto_ProtobufMatchInfo_ReplayNumber_tag 3
@@ -154,7 +143,9 @@ X(a, CALLBACK, REPEATED, SINT32,   POVs,              4)
 X(a, STATIC,   SINGULAR, UINT32,   ControlWord,       1) \
 X(a, STATIC,   SINGULAR, FLOAT,    MatchTime,         2) \
 X(a, CALLBACK, REPEATED, MESSAGE,  Joysticks,         3) \
-X(a, CALLBACK, SINGULAR, STRING,   OpMode,            4)
+X(a, CALLBACK, SINGULAR, STRING,   CurrentOpMode,     4) \
+X(a, CALLBACK, SINGULAR, STRING,   SelectedTeleopOpMode,   5) \
+X(a, CALLBACK, SINGULAR, STRING,   SelectedAutonOpMode,   6)
 #define mrc_proto_ProtobufControlData_CALLBACK pb_default_field_callback
 #define mrc_proto_ProtobufControlData_DEFAULT NULL
 #define mrc_proto_ProtobufControlData_Joysticks_MSGTYPE mrc_proto_ProtobufJoystickData
@@ -175,13 +166,6 @@ X(a, STATIC,   SINGULAR, FLOAT,    LeftRumble,        2) \
 X(a, STATIC,   SINGULAR, FLOAT,    RightRumble,       3)
 #define mrc_proto_ProtobufJoystickOutputData_CALLBACK NULL
 #define mrc_proto_ProtobufJoystickOutputData_DEFAULT NULL
-
-#define mrc_proto_ProtobufVersionInfo_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, FIXED32,  DeviceId,          1) \
-X(a, CALLBACK, SINGULAR, STRING,   Name,              2) \
-X(a, CALLBACK, SINGULAR, STRING,   Version,           3)
-#define mrc_proto_ProtobufVersionInfo_CALLBACK pb_default_field_callback
-#define mrc_proto_ProtobufVersionInfo_DEFAULT NULL
 
 #define mrc_proto_ProtobufMatchInfo_FIELDLIST(X, a) \
 X(a, CALLBACK, SINGULAR, STRING,   EventName,         1) \
@@ -204,7 +188,6 @@ X(a, CALLBACK, SINGULAR, STRING,   CallStack,         5)
 /* mrc_proto_ProtobufJoystickData_size depends on runtime parameters */
 /* mrc_proto_ProtobufControlData_size depends on runtime parameters */
 /* mrc_proto_ProtobufJoystickDescriptor_size depends on runtime parameters */
-/* mrc_proto_ProtobufVersionInfo_size depends on runtime parameters */
 /* mrc_proto_ProtobufMatchInfo_size depends on runtime parameters */
 /* mrc_proto_ProtobufErrorInfo_size depends on runtime parameters */
 #define MRC_PROTO_MRCCOMM_NPB_H_MAX_SIZE         mrc_proto_ProtobufJoystickOutputData_size

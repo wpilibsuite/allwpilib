@@ -62,10 +62,7 @@ struct SystemServerDriverStation {
   nt::NetworkTableInstance ntInst;
   nt::BooleanPublisher robotProgramPublisher;
   nt::BooleanPublisher codeStartedPublisher;
-  nt::BooleanPublisher userCodeDisabledPublisher;
-  nt::BooleanPublisher userCodeAutonomousPublisher;
-  nt::BooleanPublisher userCodeTeleopPublisher;
-  nt::BooleanPublisher userCodeTestPublisher;
+  nt::StringPublisher currentOpModePublisher;
 
   nt::ProtobufSubscriber<mrc::ControlData> controlDataSubscriber;
   nt::ProtobufSubscriber<mrc::MatchInfo> matchInfoSubscriber;
@@ -99,14 +96,8 @@ struct SystemServerDriverStation {
 
     codeStartedPublisher =
         ntInst.GetBooleanTopic(ROBOT_CODE_STARTED_PATH).Publish(options);
-    userCodeDisabledPublisher =
-        ntInst.GetBooleanTopic(ROBOT_DISABLED_TRACE_PATH).Publish(options);
-    userCodeAutonomousPublisher =
-        ntInst.GetBooleanTopic(ROBOT_AUTON_TRACE_PATH).Publish(options);
-    userCodeTeleopPublisher =
-        ntInst.GetBooleanTopic(ROBOT_TELEOP_TRACE_PATH).Publish(options);
-    userCodeTestPublisher =
-        ntInst.GetBooleanTopic(ROBOT_TEST_TRACE_PATH).Publish(options);
+    currentOpModePublisher =
+        ntInst.GetStringTopic(ROBOT_CURRENT_OPMODE_TRACE_PATH).Publish(options);
 
     for (size_t count = 0; count < joystickOutputsTopics.size(); count++) {
       std::string name = ROBOT_JOYSTICK_OUTPUTS_PATH;
@@ -212,7 +203,7 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
   controlWord.dsAttached = data.ControlWord.DsConnected;
   controlWord.eStop = data.ControlWord.EStop;
 
-  auto mode = data.GetOpMode();
+  auto mode = data.GetCurrentOpMode();
   if (mode == "Test") {
     controlWord.test = true;
   } else if (mode == "Auton") {
@@ -546,19 +537,19 @@ void HAL_ObserveUserProgramStarting(void) {
 }
 
 void HAL_ObserveUserProgramDisabled(void) {
-  systemServerDs->userCodeDisabledPublisher.Set(true);
+  systemServerDs->currentOpModePublisher.Set("");
 }
 
 void HAL_ObserveUserProgramAutonomous(void) {
-  systemServerDs->userCodeAutonomousPublisher.Set(true);
+  systemServerDs->currentOpModePublisher.Set("Auton");
 }
 
 void HAL_ObserveUserProgramTeleop(void) {
-  systemServerDs->userCodeTeleopPublisher.Set(true);
+  systemServerDs->currentOpModePublisher.Set("Teleop");
 }
 
 void HAL_ObserveUserProgramTest(void) {
-  systemServerDs->userCodeTestPublisher.Set(true);
+  systemServerDs->currentOpModePublisher.Set("Test");
 }
 
 HAL_Bool HAL_RefreshDSData(void) {

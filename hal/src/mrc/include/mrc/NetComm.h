@@ -103,35 +103,93 @@ struct ControlData {
         (std::min)(NewCount, static_cast<uint8_t>(MRC_MAX_NUM_JOYSTICKS));
   }
 
-  void SetOpMode(std::string_view Mode) {
+  void SetCurrentOpMode(std::string_view Mode) {
     if (Mode.size() > MRC_MAX_OPMODE_LEN) {
       Mode = Mode.substr(0, MRC_MAX_OPMODE_LEN);
     }
-    OpMode = Mode;
+    CurrentOpMode = Mode;
   }
 
-  void MoveOpMode(std::string&& Mode) {
-    OpMode = std::move(Mode);
-    if (OpMode.size() > MRC_MAX_OPMODE_LEN) {
-      OpMode.resize(MRC_MAX_OPMODE_LEN);
+  void MoveCurrentOpMode(std::string&& Mode) {
+    CurrentOpMode = std::move(Mode);
+    if (CurrentOpMode.size() > MRC_MAX_OPMODE_LEN) {
+      CurrentOpMode.resize(MRC_MAX_OPMODE_LEN);
     }
   }
 
-  std::string_view GetOpMode() const { return OpMode; }
+  std::string_view GetCurrentOpMode() const { return CurrentOpMode; }
 
-  std::span<uint8_t> WritableOpModeBuffer(size_t Len) {
+  std::span<uint8_t> WritableCurrentOpModeBuffer(size_t Len) {
     if (Len > MRC_MAX_OPMODE_LEN) {
       Len = MRC_MAX_OPMODE_LEN;
     }
-    OpMode.resize(Len);
-    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(OpMode.data()),
-                              OpMode.size()};
+    CurrentOpMode.resize(Len);
+    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(CurrentOpMode.data()),
+                              CurrentOpMode.size()};
+  }
+
+  void SetSelectedAutonOpMode(std::string_view Mode) {
+    if (Mode.size() > MRC_MAX_OPMODE_LEN) {
+      Mode = Mode.substr(0, MRC_MAX_OPMODE_LEN);
+    }
+    SelectedAutonOpMode = Mode;
+  }
+
+  void MoveSelectedAutonOpMode(std::string&& Mode) {
+    SelectedAutonOpMode = std::move(Mode);
+    if (SelectedAutonOpMode.size() > MRC_MAX_OPMODE_LEN) {
+      SelectedAutonOpMode.resize(MRC_MAX_OPMODE_LEN);
+    }
+  }
+
+  std::string_view GetSelectedAutonOpMode() const {
+    return SelectedAutonOpMode;
+  }
+
+  std::span<uint8_t> WritableSelectedAutonOpModeBuffer(size_t Len) {
+    if (Len > MRC_MAX_OPMODE_LEN) {
+      Len = MRC_MAX_OPMODE_LEN;
+    }
+    SelectedAutonOpMode.resize(Len);
+    return std::span<uint8_t>{
+        reinterpret_cast<uint8_t*>(SelectedAutonOpMode.data()),
+        SelectedAutonOpMode.size()};
+  }
+
+  void SetSelectedTeleopOpMode(std::string_view Mode) {
+    if (Mode.size() > MRC_MAX_OPMODE_LEN) {
+      Mode = Mode.substr(0, MRC_MAX_OPMODE_LEN);
+    }
+    SelectedTeleopOpMode = Mode;
+  }
+
+  void MoveSelectedTeleopOpMode(std::string&& Mode) {
+    SelectedTeleopOpMode = std::move(Mode);
+    if (SelectedTeleopOpMode.size() > MRC_MAX_OPMODE_LEN) {
+      SelectedTeleopOpMode.resize(MRC_MAX_OPMODE_LEN);
+    }
+  }
+
+  std::string_view GetSelectedTeleopOpMode() const {
+    return SelectedTeleopOpMode;
+  }
+
+  std::span<uint8_t> WritableSelectedTeleopOpModeBuffer(size_t Len) {
+    if (Len > MRC_MAX_OPMODE_LEN) {
+      Len = MRC_MAX_OPMODE_LEN;
+    }
+    SelectedTeleopOpMode.resize(Len);
+    return std::span<uint8_t>{
+        reinterpret_cast<uint8_t*>(SelectedTeleopOpMode.data()),
+        SelectedTeleopOpMode.size()};
   }
 
  private:
   std::array<Joystick, MRC_MAX_NUM_JOYSTICKS> JoysticksStore;
   uint8_t JoystickCount{0};
-  std::string OpMode;
+  std::string CurrentOpMode;
+  std::string SelectedTeleopOpMode;
+  std::string SelectedAutonOpMode;
 };
 
 struct JoystickOutputData {
@@ -251,64 +309,6 @@ struct JoystickDescriptor {
   uint8_t AxesCount{0};
   uint8_t ButtonCount{0};
   uint8_t PovCount{0};
-};
-
-struct VersionInfo {
-  uint32_t DeviceId{0};
-
-  void SetName(std::string_view NewName) {
-    if (NewName.size() > MRC_MAX_VERSION_SIZE) {
-      NewName = NewName.substr(0, MRC_MAX_VERSION_SIZE);
-    }
-    Name = NewName;
-  }
-
-  void MoveName(std::string&& NewName) {
-    Name = std::move(NewName);
-    if (Name.size() > MRC_MAX_VERSION_SIZE) {
-      Name.resize(MRC_MAX_VERSION_SIZE);
-    }
-  }
-
-  std::string_view GetName() const { return Name; }
-
-  std::span<uint8_t> WritableNameBuffer(size_t Len) {
-    if (Len > MRC_MAX_VERSION_SIZE) {
-      Len = MRC_MAX_VERSION_SIZE;
-    }
-    Name.resize(Len);
-    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Name.data()),
-                              Name.size()};
-  }
-
-  void SetVersion(std::string_view NewVersion) {
-    if (NewVersion.size() > MRC_MAX_VERSION_SIZE) {
-      NewVersion = NewVersion.substr(0, MRC_MAX_VERSION_SIZE);
-    }
-    Version = NewVersion;
-  }
-
-  void MoveVersion(std::string&& NewVersion) {
-    Version = std::move(NewVersion);
-    if (Version.size() > MRC_MAX_VERSION_SIZE) {
-      Version.resize(MRC_MAX_VERSION_SIZE);
-    }
-  }
-
-  std::string_view GetVersion() const { return Version; }
-
-  std::span<uint8_t> WritableVersionBuffer(size_t Len) {
-    if (Len > MRC_MAX_VERSION_SIZE) {
-      Len = MRC_MAX_VERSION_SIZE;
-    }
-    Version.resize(Len);
-    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Version.data()),
-                              Version.size()};
-  }
-
- private:
-  std::string Name;
-  std::string Version;
 };
 
 struct ErrorInfo {
