@@ -108,7 +108,7 @@ int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
 }
 
 void HAL_SetPWMOutputPeriod(HAL_DigitalHandle pwmPortHandle, int32_t period,
-                           int32_t* status) {
+                            int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;

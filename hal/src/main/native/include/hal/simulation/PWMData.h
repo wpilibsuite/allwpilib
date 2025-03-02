@@ -29,9 +29,9 @@ int32_t HALSIM_GetPWMPulseMicrosecond(int32_t index);
 void HALSIM_SetPWMPulseMicrosecond(int32_t index, int32_t microsecondPulseTime);
 
 int32_t HALSIM_RegisterPWMOutputPeriodCallback(int32_t index,
-    HAL_NotifyCallback callback,
-    void* param,
-    HAL_Bool initialNotify);
+                                               HAL_NotifyCallback callback,
+                                               void* param,
+                                               HAL_Bool initialNotify);
 void HALSIM_CancelPWMOutputPeriodCallback(int32_t index, int32_t uid);
 int32_t HALSIM_GetPWMOutputPeriod(int32_t index);
 void HALSIM_SetPWMOutputPeriod(int32_t index, int32_t periodScale);

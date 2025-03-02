@@ -136,9 +136,8 @@ int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
   return microseconds;
 }
 
-
 void HAL_SetPWMOutputPeriod(HAL_DigitalHandle pwmPortHandle, int32_t period,
-                           int32_t* status) {
+                            int32_t* status) {
   auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;

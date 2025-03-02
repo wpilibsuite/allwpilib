@@ -92,56 +92,6 @@ class PWMSim {
   void SetPulseMicrosecond(int32_t microsecondPulseTime);
 
   /**
-   * Register a callback to be run when the PWM speed changes.
-   *
-   * @param callback the callback
-   * @param initialNotify whether to run the callback with the initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterSpeedCallback(NotifyCallback callback,
-                                                       bool initialNotify);
-
-  /**
-   * Get the PWM speed.
-   *
-   * @return the PWM speed (-1.0 to 1.0)
-   */
-  double GetSpeed() const;
-
-  /**
-   * Set the PWM speed.
-   *
-   * @param speed the PWM speed (-1.0 to 1.0)
-   */
-  void SetSpeed(double speed);
-
-  /**
-   * Register a callback to be run when the PWM position changes.
-   *
-   * @param callback the callback
-   * @param initialNotify whether to run the callback with the initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterPositionCallback(
-      NotifyCallback callback, bool initialNotify);
-
-  /**
-   * Get the PWM position.
-   *
-   * @return the PWM position (0.0 to 1.0)
-   */
-  double GetPosition() const;
-
-  /**
-   * Set the PWM position.
-   *
-   * @param position the PWM position (0.0 to 1.0)
-   */
-  void SetPosition(double position);
-
-  /**
    * Register a callback to be run when the PWM period scale changes.
    *
    * @param callback the callback
@@ -149,7 +99,7 @@ class PWMSim {
    * @return the CallbackStore object associated with this callback
    */
   [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterPeriodScaleCallback(
+  std::unique_ptr<CallbackStore> RegisterOutputPeriodCallback(
       NotifyCallback callback, bool initialNotify);
 
   /**
@@ -157,39 +107,14 @@ class PWMSim {
    *
    * @return the PWM period scale
    */
-  int GetPeriodScale() const;
+  int GetOutputPeriod() const;
 
   /**
    * Set the PWM period scale.
    *
-   * @param periodScale the PWM period scale
+   * @param period the PWM period scale
    */
-  void SetPeriodScale(int periodScale);
-
-  /**
-   * Register a callback to be run when the PWM zero latch state changes.
-   *
-   * @param callback the callback
-   * @param initialNotify whether to run the callback with the initial state
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterZeroLatchCallback(
-      NotifyCallback callback, bool initialNotify);
-
-  /**
-   * Check whether the PWM is zero latched.
-   *
-   * @return true if zero latched
-   */
-  bool GetZeroLatch() const;
-
-  /**
-   * Define whether the PWM has been zero latched.
-   *
-   * @param zeroLatch true to indicate zero latched
-   */
-  void SetZeroLatch(bool zeroLatch);
+  void SetOutputPeriod(int period);
 
   /**
    * Reset all simulation data.
