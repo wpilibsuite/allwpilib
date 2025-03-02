@@ -26,41 +26,14 @@ public class PWMDataJNI extends JNIWrapper {
 
   public static native void setPulseMicrosecond(int index, int microsecondPulseTime);
 
-  public static native int registerSpeedCallback(
+  public static native int registerOutputPeriodCallback(
       int index, NotifyCallback callback, boolean initialNotify);
 
-  public static native void cancelSpeedCallback(int index, int uid);
+  public static native void cancelOutputPeriodCallback(int index, int uid);
 
-  public static native double getSpeed(int index);
+  public static native int getOutputPeriod(int index);
 
-  public static native void setSpeed(int index, double speed);
-
-  public static native int registerPositionCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelPositionCallback(int index, int uid);
-
-  public static native double getPosition(int index);
-
-  public static native void setPosition(int index, double position);
-
-  public static native int registerPeriodScaleCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelPeriodScaleCallback(int index, int uid);
-
-  public static native int getPeriodScale(int index);
-
-  public static native void setPeriodScale(int index, int periodScale);
-
-  public static native int registerZeroLatchCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelZeroLatchCallback(int index, int uid);
-
-  public static native boolean getZeroLatch(int index);
-
-  public static native void setZeroLatch(int index, boolean zeroLatch);
+  public static native void setOutputPeriod(int index, int period);
 
   public static native void resetData(int index);
 
