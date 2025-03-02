@@ -34,36 +34,11 @@ public final class HALUtil extends JNIWrapper {
   /** A parameter is out of range. */
   public static final int PARAMETER_OUT_OF_RANGE = -1028;
 
-  /** roboRIO 1.0. */
-  public static final int RUNTIME_ROBORIO = 0;
-
-  /** roboRIO 2.0. */
-  public static final int RUNTIME_ROBORIO2 = 1;
+  /** SystemCore runtime. */
+  public static final int RUNTIME_SYSTEMCORE = 0;
 
   /** Simulation runtime. */
-  public static final int RUNTIME_SIMULATION = 2;
-
-  /**
-   * Returns the FPGA Version number.
-   *
-   * <p>For now, expect this to be competition year.
-   *
-   * @return FPGA Version number.
-   * @see "HAL_GetFPGAVersion"
-   */
-  public static native short getFPGAVersion();
-
-  /**
-   * Returns the FPGA Revision number.
-   *
-   * <p>The format of the revision is 3 numbers. The 12 most significant bits are the Major
-   * Revision. the next 8 bits are the Minor Revision. The 12 least significant bits are the Build
-   * Number.
-   *
-   * @return FPGA Revision number.
-   * @see "HAL_GetFPGARevision"
-   */
-  public static native int getFPGARevision();
+  public static final int RUNTIME_SIMULATION = 1;
 
   /**
    * Returns the roboRIO serial number.
@@ -100,24 +75,11 @@ public final class HALUtil extends JNIWrapper {
    * Returns the runtime type of the HAL.
    *
    * @return HAL Runtime Type
-   * @see RUNTIME_ROBORIO
-   * @see RUNTIME_ROBORIO2
+   * @see RUNTIME_SYSTEMCORE
    * @see RUNTIME_SIMULATION
    * @see "HAL_GetRuntimeType"
    */
   public static native int getHALRuntimeType();
-
-  /**
-   * Gets the state of the "USER" button on the roboRIO.
-   *
-   * <p>Warning: the User Button is used to stop user programs from automatically loading if it is
-   * held for more then 5 seconds. Because of this, it's not recommended to be used by teams for any
-   * other purpose.
-   *
-   * @return true if the button is currently pressed down
-   * @see "HAL_GetFPGAButton"
-   */
-  public static native boolean getFPGAButton();
 
   /**
    * Gets the error message for a specific status code.

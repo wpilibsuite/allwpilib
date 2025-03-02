@@ -8,37 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.RobotController.RadioLEDState;
 import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
-import edu.wpi.first.wpilibj.simulation.testutils.EnumCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.IntCallback;
 import org.junit.jupiter.api.Test;
 
 class RoboRioSimTest {
-  @Test
-  void testFPGAButton() {
-    RoboRioSim.resetData();
-
-    BooleanCallback callback = new BooleanCallback();
-    try (CallbackStore cb = RoboRioSim.registerFPGAButtonCallback(callback, false)) {
-      RoboRioSim.setFPGAButton(true);
-      assertTrue(RoboRioSim.getFPGAButton());
-      assertTrue(HALUtil.getFPGAButton());
-      assertTrue(callback.wasTriggered());
-      assertTrue(callback.getSetValue());
-
-      callback.reset();
-      RoboRioSim.setFPGAButton(false);
-      assertFalse(RoboRioSim.getFPGAButton());
-      assertFalse(HALUtil.getFPGAButton());
-      assertTrue(callback.wasTriggered());
-      assertFalse(callback.getSetValue());
-    }
-  }
-
   @Test
   void testSetVin() {
     RoboRioSim.resetData();
@@ -78,92 +54,6 @@ class RoboRioSimTest {
       assertEquals(kTestVoltage, voltageCallback.getSetValue());
       assertEquals(kTestVoltage, RoboRioSim.getBrownoutVoltage());
       assertEquals(kTestVoltage, RobotController.getBrownoutVoltage());
-    }
-  }
-
-  @Test
-  void test6V() {
-    RoboRioSim.resetData();
-
-    DoubleCallback voltageCallback = new DoubleCallback();
-    DoubleCallback currentCallback = new DoubleCallback();
-    BooleanCallback activeCallback = new BooleanCallback();
-    IntCallback faultCallback = new IntCallback();
-    try (CallbackStore voltageCb =
-            RoboRioSim.registerUserVoltage6VCallback(voltageCallback, false);
-        CallbackStore currentCb = RoboRioSim.registerUserCurrent6VCallback(currentCallback, false);
-        CallbackStore activeCb = RoboRioSim.registerUserActive6VCallback(activeCallback, false);
-        CallbackStore faultsCb = RoboRioSim.registerUserFaults6VCallback(faultCallback, false)) {
-      final double kTestVoltage = 22.9;
-      final double kTestCurrent = 174;
-      final int kTestFaults = 229;
-
-      RoboRioSim.setUserVoltage6V(kTestVoltage);
-      assertTrue(voltageCallback.wasTriggered());
-      assertEquals(kTestVoltage, voltageCallback.getSetValue());
-      assertEquals(kTestVoltage, RoboRioSim.getUserVoltage6V());
-      assertEquals(kTestVoltage, RobotController.getVoltage6V());
-
-      RoboRioSim.setUserCurrent6V(kTestCurrent);
-      assertTrue(currentCallback.wasTriggered());
-      assertEquals(kTestCurrent, currentCallback.getSetValue());
-      assertEquals(kTestCurrent, RoboRioSim.getUserCurrent6V());
-      assertEquals(kTestCurrent, RobotController.getCurrent6V());
-
-      RoboRioSim.setUserActive6V(false);
-      assertTrue(activeCallback.wasTriggered());
-      assertFalse(activeCallback.getSetValue());
-      assertFalse(RoboRioSim.getUserActive6V());
-      assertFalse(RobotController.getEnabled6V());
-
-      RoboRioSim.setUserFaults6V(kTestFaults);
-      assertTrue(faultCallback.wasTriggered());
-      assertEquals(kTestFaults, faultCallback.getSetValue());
-      assertEquals(kTestFaults, RoboRioSim.getUserFaults6V());
-      assertEquals(kTestFaults, RobotController.getFaultCount6V());
-    }
-  }
-
-  @Test
-  void test5V() {
-    RoboRioSim.resetData();
-
-    DoubleCallback voltageCallback = new DoubleCallback();
-    DoubleCallback currentCallback = new DoubleCallback();
-    BooleanCallback activeCallback = new BooleanCallback();
-    IntCallback faultCallback = new IntCallback();
-    try (CallbackStore voltageCb =
-            RoboRioSim.registerUserVoltage5VCallback(voltageCallback, false);
-        CallbackStore currentCb = RoboRioSim.registerUserCurrent5VCallback(currentCallback, false);
-        CallbackStore activeCb = RoboRioSim.registerUserActive5VCallback(activeCallback, false);
-        CallbackStore faultsCb = RoboRioSim.registerUserFaults5VCallback(faultCallback, false)) {
-      final double kTestVoltage = 22.9;
-      final double kTestCurrent = 174;
-      final int kTestFaults = 229;
-
-      RoboRioSim.setUserVoltage5V(kTestVoltage);
-      assertTrue(voltageCallback.wasTriggered());
-      assertEquals(kTestVoltage, voltageCallback.getSetValue());
-      assertEquals(kTestVoltage, RoboRioSim.getUserVoltage5V());
-      assertEquals(kTestVoltage, RobotController.getVoltage5V());
-
-      RoboRioSim.setUserCurrent5V(kTestCurrent);
-      assertTrue(currentCallback.wasTriggered());
-      assertEquals(kTestCurrent, currentCallback.getSetValue());
-      assertEquals(kTestCurrent, RoboRioSim.getUserCurrent5V());
-      assertEquals(kTestCurrent, RobotController.getCurrent5V());
-
-      RoboRioSim.setUserActive5V(false);
-      assertTrue(activeCallback.wasTriggered());
-      assertFalse(activeCallback.getSetValue());
-      assertFalse(RoboRioSim.getUserActive5V());
-      assertFalse(RobotController.getEnabled5V());
-
-      RoboRioSim.setUserFaults5V(kTestFaults);
-      assertTrue(faultCallback.wasTriggered());
-      assertEquals(kTestFaults, faultCallback.getSetValue());
-      assertEquals(kTestFaults, RoboRioSim.getUserFaults5V());
-      assertEquals(kTestFaults, RobotController.getFaultCount5V());
     }
   }
 
@@ -280,27 +170,5 @@ class RoboRioSimTest {
     RoboRioSim.setComments(kCommentsOverflow);
     assertEquals(kCommentsTruncated, RoboRioSim.getComments());
     assertEquals(kCommentsTruncated, RobotController.getComments());
-  }
-
-  @Test
-  void testRadioLEDState() {
-    RoboRioSim.resetData();
-
-    EnumCallback callback = new EnumCallback();
-    try (CallbackStore cb = RoboRioSim.registerRadioLEDStateCallback(callback, false)) {
-      RobotController.setRadioLEDState(RadioLEDState.kGreen);
-      assertTrue(callback.wasTriggered());
-      assertEquals(RadioLEDState.kGreen.value, callback.getSetValue());
-      assertEquals(RadioLEDState.kGreen, RoboRioSim.getRadioLEDState());
-      assertEquals(RadioLEDState.kGreen, RobotController.getRadioLEDState());
-
-      callback.reset();
-
-      RoboRioSim.setRadioLEDState(RadioLEDState.kOrange);
-      assertTrue(callback.wasTriggered());
-      assertEquals(RadioLEDState.kOrange.value, callback.getSetValue());
-      assertEquals(RadioLEDState.kOrange, RoboRioSim.getRadioLEDState());
-      assertEquals(RadioLEDState.kOrange, RobotController.getRadioLEDState());
-    }
   }
 }

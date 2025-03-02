@@ -52,14 +52,12 @@ void InitializeHAL() {
   InitializeAnalogInput();
   InitializeCAN();
   InitializeCANAPI();
-  InitializeConstants();
   InitializeCounter();
   InitializeDIO();
   InitializeDutyCycle();
   InitializeEncoder();
   InitializeFRCDriverStation();
   InitializeI2C();
-  InitializeLEDs();
   InitializeMain();
   InitializeNotifier();
   InitializeCTREPDP();
@@ -167,18 +165,6 @@ HAL_RuntimeType HAL_GetRuntimeType(void) {
   return runtimeType;
 }
 
-int32_t HAL_GetFPGAVersion(int32_t* status) {
-  hal::init::CheckInit();
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-int64_t HAL_GetFPGARevision(int32_t* status) {
-  hal::init::CheckInit();
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
 void HAL_GetSerialNumber(struct WPI_String* serialNumber) {
   const char* serialNum = std::getenv("serialnum");
   if (!serialNum) {
@@ -226,36 +212,6 @@ int32_t HAL_GetTeamNumber(void) {
 uint64_t HAL_GetFPGATime(int32_t* status) {
   hal::init::CheckInit();
   return wpi::NowDefault();
-}
-
-uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
-  // Capture the current FPGA time.  This will give us the upper half of the
-  // clock.
-  uint64_t fpgaTime = HAL_GetFPGATime(status);
-  if (*status != 0) {
-    return 0;
-  }
-
-  // Now, we need to detect the case where the lower bits rolled over after we
-  // sampled.  In that case, the upper bits will be 1 bigger than they should
-  // be.
-
-  // Break it into lower and upper portions.
-  uint32_t lower = fpgaTime & 0xffffffffull;
-  uint64_t upper = (fpgaTime >> 32) & 0xffffffff;
-
-  // The time was sampled *before* the current time, so roll it back.
-  if (lower < unexpandedLower) {
-    --upper;
-  }
-
-  return (upper << 32) + static_cast<uint64_t>(unexpandedLower);
-}
-
-HAL_Bool HAL_GetFPGAButton(int32_t* status) {
-  hal::init::CheckInit();
-  *status = HAL_HANDLE_ERROR;
-  return false;
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {

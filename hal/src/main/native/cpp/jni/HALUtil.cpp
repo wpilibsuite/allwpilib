@@ -30,11 +30,10 @@ using namespace wpi::java;
 #define kRIOStatusFeatureNotSupported (kRioStatusOffset - 193)
 #define kRIOStatusResourceNotInitialized -52010
 
-static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_ROBORIO == HAL_Runtime_RoboRIO);
-static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_ROBORIO2 ==
-              HAL_Runtime_RoboRIO2);
 static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_SIMULATION ==
               HAL_Runtime_Simulation);
+static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_SYSTEMCORE ==
+              HAL_Runtime_SystemCore);
 
 static JavaVM* jvm = nullptr;
 static JException illegalArgExCls;
@@ -369,36 +368,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 
 /*
  * Class:     edu_wpi_first_hal_HALUtil
- * Method:    getFPGAVersion
- * Signature: ()S
- */
-JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGAVersion
-  (JNIEnv* env, jclass)
-{
-  int32_t status = 0;
-  jshort returnValue = HAL_GetFPGAVersion(&status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_HALUtil
- * Method:    getFPGARevision
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGARevision
-  (JNIEnv* env, jclass)
-{
-  int32_t status = 0;
-  jint returnValue = HAL_GetFPGARevision(&status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getSerialNumber
  * Signature: ()Ljava/lang/String;
  */
@@ -466,21 +435,6 @@ Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType
   (JNIEnv* env, jclass)
 {
   jint returnValue = HAL_GetRuntimeType();
-  return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_HALUtil
- * Method:    getFPGAButton
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGAButton
-  (JNIEnv* env, jclass)
-{
-  int32_t status = 0;
-  jboolean returnValue = HAL_GetFPGAButton(&status);
-  CheckStatus(env, status);
   return returnValue;
 }
 

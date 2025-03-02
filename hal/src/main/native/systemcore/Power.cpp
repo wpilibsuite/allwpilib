@@ -37,66 +37,6 @@ double HAL_GetVinCurrent(int32_t* status) {
   return 0;
 }
 
-double HAL_GetUserVoltage6V(int32_t* status) {
-  initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-double HAL_GetUserCurrent6V(int32_t* status) {
-  initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-HAL_Bool HAL_GetUserActive6V(int32_t* status) {
-  initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-int32_t HAL_GetUserCurrentFaults6V(int32_t* status) {
-  initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-void HAL_SetUserRailEnabled6V(HAL_Bool enabled, int32_t* status) {
-  initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-double HAL_GetUserVoltage5V(int32_t* status) {
-  initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-double HAL_GetUserCurrent5V(int32_t* status) {
-  initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-HAL_Bool HAL_GetUserActive5V(int32_t* status) {
-  initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-int32_t HAL_GetUserCurrentFaults5V(int32_t* status) {
-  initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-void HAL_SetUserRailEnabled5V(HAL_Bool enabled, int32_t* status) {
-  initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
 double HAL_GetUserVoltage3V3(int32_t* status) {
   initializePower(status);
   *status = HAL_HANDLE_ERROR;
