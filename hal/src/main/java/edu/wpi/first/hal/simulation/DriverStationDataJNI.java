@@ -77,6 +77,10 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setMatchTime(double matchTime);
 
+  public static native String getOpMode();
+
+  public static native void setOpMode(String opMode);
+
   public static native void setJoystickAxes(byte joystickNum, float[] axesArray);
 
   public static native void setJoystickPOVs(byte joystickNum, short[] povsArray);

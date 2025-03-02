@@ -22,9 +22,6 @@ DriverStationData::DriverStationData() {
 }
 
 void DriverStationData::ResetData() {
-  enabled.Reset(false);
-  autonomous.Reset(false);
-  test.Reset(false);
   eStop.Reset(false);
   fmsAttached.Reset(false);
   dsAttached.Reset(false);
@@ -52,7 +49,43 @@ void DriverStationData::ResetData() {
     m_matchInfoCallbacks.Reset();
     m_matchInfo = HAL_MatchInfo{};
   }
+  {
+    std::scoped_lock lock{m_opModeMutex};
+    m_opModeCallbacks.Reset();
+    m_selectedAutoOpModeCallbacks.Reset();
+    m_selectedTeleopOpModeCallbacks.Reset();
+    m_opModeOptionsCallbacks.Reset();
+    m_opMode.clear();
+    m_selectedAutoOpMode.clear();
+    m_selectedTeleopOpMode.clear();
+    // do not clear m_opModeOptions as it comes from robot code
+  }
   m_newDataCallbacks.Reset();
+}
+
+int32_t DriverStationData::RegisterOpModeCallback(HAL_OpModeCallback callback,
+                                                  void* param,
+                                                  HAL_Bool initialNotify) {
+  std::scoped_lock lock(m_opModeMutex);
+  int32_t uid = m_opModeCallbacks.Register(callback, param);
+  if (initialNotify) {
+    callback(DriverStationData::GetOpModeName(), param, m_opMode.c_str());
+  }
+  return uid;
+}
+
+void DriverStationData::CancelOpModeCallback(int32_t uid) {
+  m_opModeCallbacks.Cancel(uid);
+}
+
+std::string DriverStationData::GetOpMode() {
+  std::scoped_lock lock{m_opModeMutex};
+  return m_opMode;
+}
+
+void DriverStationData::SetOpMode(std::string_view opMode) {
+  std::scoped_lock lock{m_opModeMutex};
+  m_opMode = opMode;
 }
 
 #define DEFINE_CPPAPI_CALLBACKS(name, data, data2)                             \
@@ -414,6 +447,28 @@ DEFINE_CAPI(HAL_Bool, FmsAttached, fmsAttached)
 DEFINE_CAPI(HAL_Bool, DsAttached, dsAttached)
 DEFINE_CAPI(HAL_AllianceStationID, AllianceStationId, allianceStationId)
 DEFINE_CAPI(double, MatchTime, matchTime)
+
+int32_t HALSIM_RegisterOpModeCallback(HAL_OpModeCallback callback, void* param,
+                                      HAL_Bool initialNotify) {
+  return SimDriverStationData->RegisterOpModeCallback(callback, param,
+                                                      initialNotify);
+}
+
+void HALSIM_CancelOpModeCallback(int32_t uid) {
+  SimDriverStationData->CancelOpModeCallback(uid);
+}
+
+void HALSIM_GetOpMode(char* buf, int32_t* len) {
+  std::string str = SimDriverStationData->GetOpMode();
+  *len = std::min(static_cast<size_t>(*len), str.length());
+  if (*len != 0) {
+    std::memcpy(buf, str.data(), *len);
+  }
+}
+
+void HALSIM_SetOpMode(const char* opMode) {
+  SimDriverStationData->SetOpMode(opMode);
+}
 
 #undef DEFINE_CAPI
 #define DEFINE_CAPI(name, data)                                                \
