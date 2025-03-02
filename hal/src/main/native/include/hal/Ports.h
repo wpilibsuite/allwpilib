@@ -24,67 +24,11 @@ extern "C" {
 int32_t HAL_GetNumCanBuses(void);
 
 /**
- * Gets the number of analog inputs in the current system.
+ * Gets the number of smart IO channels in the current system.
  *
- * @return the number of analog inputs
+ * @return the number of SmartIO
  */
-int32_t HAL_GetNumAnalogInputs(void);
-
-/**
- * Gets the number of counters in the current system.
- *
- * @return the number of counters
- */
-int32_t HAL_GetNumCounters(void);
-
-/**
- * Gets the number of digital headers in the current system.
- *
- * @return the number of digital headers
- */
-int32_t HAL_GetNumDigitalHeaders(void);
-
-/**
- * Gets the number of PWM headers in the current system.
- *
- * @return the number of PWM headers
- */
-int32_t HAL_GetNumPWMHeaders(void);
-
-/**
- * Gets the number of digital channels in the current system.
- *
- * @return the number of digital channels
- */
-int32_t HAL_GetNumDigitalChannels(void);
-
-/**
- * Gets the number of PWM channels in the current system.
- *
- * @return the number of PWM channels
- */
-int32_t HAL_GetNumPWMChannels(void);
-
-/**
- * Gets the number of digital IO PWM outputs in the current system.
- *
- * @return the number of digital IO PWM outputs
- */
-int32_t HAL_GetNumDigitalPWMOutputs(void);
-
-/**
- * Gets the number of quadrature encoders in the current system.
- *
- * @return the number of quadrature encoders
- */
-int32_t HAL_GetNumEncoders(void);
-
-/**
- * Gets the number of interrupts in the current system.
- *
- * @return the number of interrupts
- */
-int32_t HAL_GetNumInterrupts(void);
+int32_t HAL_GetNumSmartIo(void);
 
 /**
  * Gets the number of PCM modules in the current system.
@@ -141,13 +85,6 @@ int32_t HAL_GetNumREVPHModules(void);
  * @return the number of PH channels
  */
 int32_t HAL_GetNumREVPHChannels(void);
-
-/**
- * Gets the number of duty cycle inputs in the current system.
- *
- * @return the number of Duty Cycle inputs
- */
-int32_t HAL_GetNumDutyCycles(void);
 
 /**
  * Gets the number of addressable LED generators in the current system.

@@ -21,9 +21,6 @@ using namespace frc;
 
 DigitalOutput::DigitalOutput(int channel) {
   m_pwmGenerator = HAL_kInvalidHandle;
-  if (!SensorUtil::CheckDigitalChannel(channel)) {
-    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
-  }
   m_channel = channel;
 
   int32_t status = 0;
@@ -123,9 +120,6 @@ void DigitalOutput::DisablePWM() {
 
   int32_t status = 0;
 
-  // Disable the output by routing to a dead bit.
-  HAL_SetDigitalPWMOutputChannel(m_pwmGenerator,
-                                 SensorUtil::GetNumDigitalChannels(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 
   HAL_FreeDigitalPWM(m_pwmGenerator);

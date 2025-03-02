@@ -89,7 +89,7 @@ class AnalogPotentiometerTest {
       assertEquals(90, pot.get());
 
       // Simulate a lower battery voltage
-      RoboRioSim.setUserVoltage5V(2.5);
+      RoboRioSim.setUserVoltage3V3(2.5);
 
       sim.setVoltage(2.5);
       assertEquals(270, pot.get());

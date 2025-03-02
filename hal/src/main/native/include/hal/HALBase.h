@@ -28,14 +28,10 @@
  * Runtime type.
  */
 HAL_ENUM(HAL_RuntimeType) {
-  /** roboRIO 1.0 */
-  HAL_Runtime_RoboRIO,
-  /** roboRIO 2.0 */
-  HAL_Runtime_RoboRIO2,
+  /** SystemCore runtime */
+  HAL_Runtime_SystemCore,
   /** Simulation runtime */
   HAL_Runtime_Simulation,
-  /** SystemCore */
-  HAL_Runtime_SystemCore,
 };
 
 #ifdef __cplusplus
@@ -64,29 +60,6 @@ const char* HAL_GetLastError(int32_t* status);
 const char* HAL_GetErrorMessage(int32_t code);
 
 /**
- * Returns the FPGA Version number.
- *
- * For now, expect this to be competition year.
- *
- * @param[out] status the error code, or 0 for success
- * @return FPGA Version number.
- */
-int32_t HAL_GetFPGAVersion(int32_t* status);
-
-/**
- * Returns the FPGA Revision number.
- *
- * The format of the revision is 3 numbers.
- * The 12 most significant bits are the Major Revision.
- * the next 8 bits are the Minor Revision.
- * The 12 least significant bits are the Build Number.
- *
- * @param[out] status the error code, or 0 for success
- * @return FPGA Revision number.
- */
-int64_t HAL_GetFPGARevision(int32_t* status);
-
-/**
  * Returns the roboRIO serial number.
  *
  * @param[out] serialNumber The roboRIO serial number. Free with WPI_FreeString
@@ -112,18 +85,6 @@ int32_t HAL_GetTeamNumber(void);
  * @return HAL Runtime Type
  */
 HAL_RuntimeType HAL_GetRuntimeType(void);
-
-/**
- * Gets the state of the "USER" button on the roboRIO.
- *
- * @warning the User Button is used to stop user programs from automatically
- * loading if it is held for more then 5 seconds. Because of this, it's not
- * recommended to be used by teams for any other purpose.
- *
- * @param[out] status the error code, or 0 for success
- * @return true if the button is currently pressed down
- */
-HAL_Bool HAL_GetFPGAButton(int32_t* status);
 
 /**
  * Gets if the system outputs are currently active.
@@ -156,22 +117,6 @@ int32_t HAL_GetCommsDisableCount(int32_t* status);
  * reset).
  */
 uint64_t HAL_GetFPGATime(int32_t* status);
-
-/**
- * Given an 32 bit FPGA time, expand it to the nearest likely 64 bit FPGA time.
- *
- * Note: This is making the assumption that the timestamp being converted is
- * always in the past.  If you call this with a future timestamp, it probably
- * will make it in the past.  If you wait over 70 minutes between capturing the
- * bottom 32 bits of the timestamp and expanding it, you will be off by
- * multiples of 1<<32 microseconds.
- *
- * @param[in] unexpandedLower 32 bit FPGA time
- * @param[out] status the error code, or 0 for success
- * @return The current time in microseconds according to the FPGA (since FPGA
- *         reset) as a 64 bit number.
- */
-uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status);
 
 /**
  * Gets the current state of the Robot Signal Light (RSL).

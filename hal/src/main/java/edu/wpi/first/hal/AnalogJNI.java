@@ -56,77 +56,6 @@ public class AnalogJNI extends JNIWrapper {
   public static native void setAnalogInputSimDevice(int handle, int device);
 
   /**
-   * Sets the sample rate.
-   *
-   * <p>This is a global setting for the Athena and effects all channels.
-   *
-   * @param samplesPerSecond The number of samples per channel per second.
-   * @see "HAL_SetAnalogSampleRate"
-   */
-  public static native void setAnalogSampleRate(double samplesPerSecond);
-
-  /**
-   * Gets the current sample rate.
-   *
-   * <p>This assumes one entry in the scan list. This is a global setting for the Athena and effects
-   * all channels.
-   *
-   * @return Sample rate.
-   * @see "HAL_GetAnalogSampleRate"
-   */
-  public static native double getAnalogSampleRate();
-
-  /**
-   * Sets the number of averaging bits.
-   *
-   * <p>This sets the number of averaging bits. The actual number of averaged samples is 2**bits.
-   * Use averaging to improve the stability of your measurement at the expense of sampling rate. The
-   * averaging is done automatically in the FPGA.
-   *
-   * @param analogPortHandle Handle to the analog port to configure.
-   * @param bits Number of bits to average.
-   * @see "HAL_SetAnalogAverageBits"
-   */
-  public static native void setAnalogAverageBits(int analogPortHandle, int bits);
-
-  /**
-   * Gets the number of averaging bits.
-   *
-   * <p>This gets the number of averaging bits from the FPGA. The actual number of averaged samples
-   * is 2**bits. The averaging is done automatically in the FPGA.
-   *
-   * @param analogPortHandle Handle to the analog port to use.
-   * @return Bits to average.
-   * @see "HAL_GetAnalogAverageBits"
-   */
-  public static native int getAnalogAverageBits(int analogPortHandle);
-
-  /**
-   * Sets the number of oversample bits.
-   *
-   * <p>This sets the number of oversample bits. The actual number of oversampled values is 2**bits.
-   * Use oversampling to improve the resolution of your measurements at the expense of sampling
-   * rate. The oversampling is done automatically in the FPGA.
-   *
-   * @param analogPortHandle Handle to the analog port to use.
-   * @param bits Number of bits to oversample.
-   * @see "HAL_SetAnalogOversampleBits"
-   */
-  public static native void setAnalogOversampleBits(int analogPortHandle, int bits);
-
-  /**
-   * Gets the number of oversample bits.
-   *
-   * <p>This gets the number of oversample bits from the FPGA. The actual number of oversampled
-   * values is 2**bits. The oversampling is done automatically in the FPGA.
-   *
-   * @param analogPortHandle Handle to the analog port to use.
-   * @return Bits to oversample.
-   * @see "HAL_GetAnalogOversampleBits"
-   */
-  public static native int getAnalogOversampleBits(int analogPortHandle);
-
-  /**
    * Gets a sample straight from the channel on this module.
    *
    * <p>The sample is a 12-bit value representing the 0V to 5V range of the A/D converter in the
@@ -138,21 +67,6 @@ public class AnalogJNI extends JNIWrapper {
    * @see "HAL_GetAnalogValue"
    */
   public static native short getAnalogValue(int analogPortHandle);
-
-  /**
-   * Gets a sample from the output of the oversample and average engine for the channel.
-   *
-   * <p>The sample is 12-bit + the value configured in SetOversampleBits(). The value configured in
-   * SetAverageBits() will cause this value to be averaged 2**bits number of samples. This is not a
-   * sliding window. The sample will not change until 2**(OversampleBits + AverageBits) samples have
-   * been acquired from the module on this channel. Use GetAverageVoltage() to get the analog value
-   * in calibrated units.
-   *
-   * @param analogPortHandle Handle to the analog port to use.
-   * @return A sample from the oversample and average engine for the channel.
-   * @see "HAL_GetAnalogAverageValue"
-   */
-  public static native int getAnalogAverageValue(int analogPortHandle);
 
   /**
    * Converts a voltage to a raw value for a specified channel.
@@ -189,45 +103,6 @@ public class AnalogJNI extends JNIWrapper {
    * @see "HAL_GetAnalogVoltage"
    */
   public static native double getAnalogVoltage(int analogPortHandle);
-
-  /**
-   * Gets a scaled sample from the output of the oversample and average engine for the channel.
-   *
-   * <p>The value is scaled to units of Volts using the calibrated scaling data from GetLSBWeight()
-   * and GetOffset(). Using oversampling will cause this value to be higher resolution, but it will
-   * update more slowly. Using averaging will cause this value to be more stable, but it will update
-   * more slowly.
-   *
-   * @param analogPortHandle Handle to the analog port to use.
-   * @return A scaled sample from the output of the oversample and average engine for the channel.
-   * @see "HAL_GetAnalogAverageVoltage"
-   */
-  public static native double getAnalogAverageVoltage(int analogPortHandle);
-
-  /**
-   * Gets the factory scaling least significant bit weight constant. The least significant bit
-   * weight constant for the channel that was calibrated in manufacturing and stored in an eeprom in
-   * the module.
-   *
-   * <p>Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
-   *
-   * @param analogPortHandle Handle to the analog port to use.
-   * @return Least significant bit weight.
-   * @see "HAL_GetAnalogLSBWeight"
-   */
-  public static native int getAnalogLSBWeight(int analogPortHandle);
-
-  /**
-   * Gets the factory scaling offset constant. The offset constant for the channel that was
-   * calibrated in manufacturing and stored in an eeprom in the module.
-   *
-   * <p>Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
-   *
-   * @param analogPortHandle Handle to the analog port to use.
-   * @return Offset constant.
-   * @see "HAL_GetAnalogOffset"
-   */
-  public static native int getAnalogOffset(int analogPortHandle);
 
   /** Utility class. */
   private AnalogJNI() {}

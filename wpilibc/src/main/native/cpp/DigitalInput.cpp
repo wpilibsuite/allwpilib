@@ -20,9 +20,6 @@
 using namespace frc;
 
 DigitalInput::DigitalInput(int channel) {
-  if (!SensorUtil::CheckDigitalChannel(channel)) {
-    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
-  }
   m_channel = channel;
 
   int32_t status = 0;

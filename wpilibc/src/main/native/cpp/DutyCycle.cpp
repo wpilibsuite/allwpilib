@@ -20,9 +20,6 @@
 using namespace frc;
 
 DutyCycle::DutyCycle(int channel) : m_channel{channel} {
-  if (!SensorUtil::CheckDigitalChannel(channel)) {
-    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
-  }
   InitDutyCycle();
 }
 

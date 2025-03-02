@@ -28,10 +28,8 @@
 #include "frc/Notifier.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
-static_assert(frc::RuntimeType::kRoboRIO ==
-              static_cast<frc::RuntimeType>(HAL_Runtime_RoboRIO));
-static_assert(frc::RuntimeType::kRoboRIO2 ==
-              static_cast<frc::RuntimeType>(HAL_Runtime_RoboRIO2));
+static_assert(frc::RuntimeType::kSystemCore ==
+              static_cast<frc::RuntimeType>(HAL_Runtime_SystemCore));
 static_assert(frc::RuntimeType::kSimulation ==
               static_cast<frc::RuntimeType>(HAL_Runtime_Simulation));
 

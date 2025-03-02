@@ -19,26 +19,6 @@ int SensorUtil::GetDefaultREVPHModule() {
   return 1;
 }
 
-bool SensorUtil::CheckDigitalChannel(int channel) {
-  return HAL_CheckDIOChannel(channel);
-}
-
-bool SensorUtil::CheckPWMChannel(int channel) {
-  return HAL_CheckPWMChannel(channel);
-}
-
-bool SensorUtil::CheckAnalogInputChannel(int channel) {
-  return HAL_CheckAnalogInputChannel(channel);
-}
-
-int SensorUtil::GetNumDigitalChannels() {
-  return HAL_GetNumDigitalChannels();
-}
-
-int SensorUtil::GetNumAnalogInputs() {
-  return HAL_GetNumAnalogInputs();
-}
-
-int SensorUtil::GetNumPwmChannels() {
-  return HAL_GetNumPWMChannels();
+int SensorUtil::GetNumSmartIoPorts() {
+  return HAL_GetNumSmartIo();
 }
