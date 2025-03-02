@@ -206,7 +206,7 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
   auto mode = data.GetCurrentOpMode();
   if (mode == "Test") {
     controlWord.test = true;
-  } else if (mode == "Auton") {
+  } else if (mode == "Auto") {
     controlWord.autonomous = true;
   }
 
@@ -541,7 +541,7 @@ void HAL_ObserveUserProgramDisabled(void) {
 }
 
 void HAL_ObserveUserProgramAutonomous(void) {
-  systemServerDs->currentOpModePublisher.Set("Auton");
+  systemServerDs->currentOpModePublisher.Set("Auto");
 }
 
 void HAL_ObserveUserProgramTeleop(void) {

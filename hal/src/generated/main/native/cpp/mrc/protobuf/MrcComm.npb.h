@@ -36,7 +36,7 @@ typedef struct _mrc_proto_ProtobufControlData {
     pb_callback_t Joysticks;
     pb_callback_t CurrentOpMode;
     pb_callback_t SelectedTeleopOpMode;
-    pb_callback_t SelectedAutonOpMode;
+    pb_callback_t SelectedAutoOpMode;
 } mrc_proto_ProtobufControlData;
 
 typedef struct _mrc_proto_ProtobufJoystickDescriptor {
@@ -110,7 +110,7 @@ typedef struct _mrc_proto_ProtobufErrorInfo {
 #define mrc_proto_ProtobufControlData_Joysticks_tag 3
 #define mrc_proto_ProtobufControlData_CurrentOpMode_tag 4
 #define mrc_proto_ProtobufControlData_SelectedTeleopOpMode_tag 5
-#define mrc_proto_ProtobufControlData_SelectedAutonOpMode_tag 6
+#define mrc_proto_ProtobufControlData_SelectedAutoOpMode_tag 6
 #define mrc_proto_ProtobufJoystickDescriptor_JoystickName_tag 1
 #define mrc_proto_ProtobufJoystickDescriptor_AxisTypes_tag 2
 #define mrc_proto_ProtobufJoystickDescriptor_IsXbox_tag 3
@@ -145,7 +145,7 @@ X(a, STATIC,   SINGULAR, FLOAT,    MatchTime,         2) \
 X(a, CALLBACK, REPEATED, MESSAGE,  Joysticks,         3) \
 X(a, CALLBACK, SINGULAR, STRING,   CurrentOpMode,     4) \
 X(a, CALLBACK, SINGULAR, STRING,   SelectedTeleopOpMode,   5) \
-X(a, CALLBACK, SINGULAR, STRING,   SelectedAutonOpMode,   6)
+X(a, CALLBACK, SINGULAR, STRING,   SelectedAutoOpMode,   6)
 #define mrc_proto_ProtobufControlData_CALLBACK pb_default_field_callback
 #define mrc_proto_ProtobufControlData_DEFAULT NULL
 #define mrc_proto_ProtobufControlData_Joysticks_MSGTYPE mrc_proto_ProtobufJoystickData

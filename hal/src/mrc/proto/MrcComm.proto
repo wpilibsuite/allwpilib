@@ -17,7 +17,7 @@ message ProtobufControlData {
     repeated ProtobufJoystickData Joysticks = 3;
     string CurrentOpMode = 4;
     string SelectedTeleopOpMode = 5;
-    string SelectedAutonOpMode = 6;
+    string SelectedAutoOpMode = 6;
 }
 
 message ProtobufJoystickDescriptor {

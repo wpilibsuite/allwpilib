@@ -61,7 +61,7 @@ std::optional<mrc::ControlData> wpi::Protobuf<mrc::ControlData>::Unpack(
   wpi::UnpackCallback<mrc::Joystick, MRC_MAX_NUM_JOYSTICKS> JoystickCb;
   wpi::UnpackCallback<std::string> CurrentOpModeCb;
   wpi::UnpackCallback<std::string> SelectedTeleopOpModeCb;
-  wpi::UnpackCallback<std::string> SelectedAutonOpModeCb;
+  wpi::UnpackCallback<std::string> SelectedAutoOpModeCb;
 
   mrc_proto_ProtobufControlData Msg{
       .ControlWord = 0,
@@ -69,7 +69,7 @@ std::optional<mrc::ControlData> wpi::Protobuf<mrc::ControlData>::Unpack(
       .Joysticks = JoystickCb.Callback(),
       .CurrentOpMode = CurrentOpModeCb.Callback(),
       .SelectedTeleopOpMode = SelectedTeleopOpModeCb.Callback(),
-      .SelectedAutonOpMode = SelectedTeleopOpModeCb.Callback(),
+      .SelectedAutoOpMode = SelectedTeleopOpModeCb.Callback(),
   };
 
   if (!Stream.Decode(Msg)) {
@@ -79,7 +79,7 @@ std::optional<mrc::ControlData> wpi::Protobuf<mrc::ControlData>::Unpack(
   auto Joysticks = JoystickCb.Items();
   auto CurrentOpMode = CurrentOpModeCb.Items();
   auto SelectedTeleopOpMode = SelectedTeleopOpModeCb.Items();
-  auto SelectedAutonOpMode = SelectedAutonOpModeCb.Items();
+  auto SelectedAutoOpMode = SelectedAutoOpModeCb.Items();
 
   mrc::ControlData ControlData;
 
@@ -91,8 +91,8 @@ std::optional<mrc::ControlData> wpi::Protobuf<mrc::ControlData>::Unpack(
     ControlData.MoveSelectedTeleopOpMode(std::move(SelectedTeleopOpMode[0]));
   }
 
-  if (!SelectedAutonOpMode.empty()) {
-    ControlData.MoveSelectedAutonOpMode(std::move(SelectedAutonOpMode[0]));
+  if (!SelectedAutoOpMode.empty()) {
+    ControlData.MoveSelectedAutoOpMode(std::move(SelectedAutoOpMode[0]));
   }
 
   ControlData.ControlWord = ToControlWord(Msg.ControlWord);
@@ -112,8 +112,8 @@ bool wpi::Protobuf<mrc::ControlData>::Pack(OutputStream& Stream,
   wpi::PackCallback CurrentOpModeCb{&CurrentOpMode};
   std::string_view SelectedTeleopOpMode = Value.GetSelectedTeleopOpMode();
   wpi::PackCallback SelectedTeleopOpModeCb{&SelectedTeleopOpMode};
-  std::string_view SelectedAutonOpMode = Value.GetSelectedAutonOpMode();
-  wpi::PackCallback SelectedAutonOpModeCb{&SelectedAutonOpMode};
+  std::string_view SelectedAutoOpMode = Value.GetSelectedAutoOpMode();
+  wpi::PackCallback SelectedAutoOpModeCb{&SelectedAutoOpMode};
   std::span<const mrc::Joystick> Sticks = Value.Joysticks();
   wpi::PackCallback Joysticks{Sticks};
 
@@ -123,7 +123,7 @@ bool wpi::Protobuf<mrc::ControlData>::Pack(OutputStream& Stream,
       .Joysticks = Joysticks.Callback(),
       .CurrentOpMode = CurrentOpModeCb.Callback(),
       .SelectedTeleopOpMode = SelectedTeleopOpModeCb.Callback(),
-      .SelectedAutonOpMode = SelectedAutonOpModeCb.Callback(),
+      .SelectedAutoOpMode = SelectedAutoOpModeCb.Callback(),
   };
 
   return Stream.Encode(Msg);

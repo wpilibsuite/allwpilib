@@ -128,32 +128,32 @@ struct ControlData {
                               CurrentOpMode.size()};
   }
 
-  void SetSelectedAutonOpMode(std::string_view Mode) {
+  void SetSelectedAutoOpMode(std::string_view Mode) {
     if (Mode.size() > MRC_MAX_OPMODE_LEN) {
       Mode = Mode.substr(0, MRC_MAX_OPMODE_LEN);
     }
-    SelectedAutonOpMode = Mode;
+    SelectedAutoOpMode = Mode;
   }
 
-  void MoveSelectedAutonOpMode(std::string&& Mode) {
-    SelectedAutonOpMode = std::move(Mode);
-    if (SelectedAutonOpMode.size() > MRC_MAX_OPMODE_LEN) {
-      SelectedAutonOpMode.resize(MRC_MAX_OPMODE_LEN);
+  void MoveSelectedAutoOpMode(std::string&& Mode) {
+    SelectedAutoOpMode = std::move(Mode);
+    if (SelectedAutoOpMode.size() > MRC_MAX_OPMODE_LEN) {
+      SelectedAutoOpMode.resize(MRC_MAX_OPMODE_LEN);
     }
   }
 
-  std::string_view GetSelectedAutonOpMode() const {
-    return SelectedAutonOpMode;
+  std::string_view GetSelectedAutoOpMode() const {
+    return SelectedAutoOpMode;
   }
 
-  std::span<uint8_t> WritableSelectedAutonOpModeBuffer(size_t Len) {
+  std::span<uint8_t> WritableSelectedAutoOpModeBuffer(size_t Len) {
     if (Len > MRC_MAX_OPMODE_LEN) {
       Len = MRC_MAX_OPMODE_LEN;
     }
-    SelectedAutonOpMode.resize(Len);
+    SelectedAutoOpMode.resize(Len);
     return std::span<uint8_t>{
-        reinterpret_cast<uint8_t*>(SelectedAutonOpMode.data()),
-        SelectedAutonOpMode.size()};
+        reinterpret_cast<uint8_t*>(SelectedAutoOpMode.data()),
+        SelectedAutoOpMode.size()};
   }
 
   void SetSelectedTeleopOpMode(std::string_view Mode) {
@@ -189,7 +189,7 @@ struct ControlData {
   uint8_t JoystickCount{0};
   std::string CurrentOpMode;
   std::string SelectedTeleopOpMode;
-  std::string SelectedAutonOpMode;
+  std::string SelectedAutoOpMode;
 };
 
 struct JoystickOutputData {
