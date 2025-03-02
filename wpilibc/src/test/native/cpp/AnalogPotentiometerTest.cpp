@@ -78,7 +78,7 @@ TEST(AnalogPotentiometerTest, WithModifiedBatteryVoltage) {
   EXPECT_EQ(90, pot.Get());
 
   // Simulate a lower battery voltage
-  RoboRioSim::SetUserVoltage5V(units::volt_t{2.5});
+  RoboRioSim::SetUserVoltage3V3(units::volt_t{2.5});
 
   sim.SetVoltage(2.5);
   EXPECT_EQ(270, pot.Get());

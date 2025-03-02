@@ -27,26 +27,6 @@ class RobotController {
   RobotController() = delete;
 
   /**
-   * Return the FPGA Version number.
-   *
-   * For now, expect this to be competition year.
-   *
-   * @return FPGA Version number.
-   */
-  static int GetFPGAVersion();
-
-  /**
-   * Return the FPGA Revision number.
-   *
-   * The format of the revision is 3 numbers. The 12 most significant bits are
-   * the Major Revision. The next 8 bits are the Minor Revision. The 12 least
-   * significant bits are the Build Number.
-   *
-   * @return FPGA Revision number.
-   */
-  static int64_t GetFPGARevision();
-
-  /**
    * Return the serial number of the roboRIO.
    *
    * @return The serial number of the roboRIO.
@@ -96,17 +76,6 @@ class RobotController {
    *         reset).
    */
   static uint64_t GetFPGATime();
-
-  /**
-   * Get the state of the "USER" button on the roboRIO.
-   *
-   * @warning the User Button is used to stop user programs from automatically
-   * loading if it is held for more then 5 seconds. Because of this, it's not
-   * recommended to be used by teams for any other purpose.
-   *
-   * @return True if the button is currently pressed down
-   */
-  static bool GetUserButton();
 
   /**
    * Read the battery voltage.
@@ -204,82 +173,6 @@ class RobotController {
    * @return The number of faults
    */
   static int GetFaultCount3V3();
-
-  /**
-   * Get the voltage of the 5V rail.
-   *
-   * @return The controller 5V rail voltage value in Volts
-   */
-  static double GetVoltage5V();
-
-  /**
-   * Get the current output of the 5V rail.
-   *
-   * @return The controller 5V rail output current value in Amps
-   */
-  static double GetCurrent5V();
-
-  /**
-   * Enables or disables the 5V rail.
-   *
-   * @param enabled whether to enable the 5V rail.
-   */
-  static void SetEnabled5V(bool enabled);
-
-  /**
-   * Get the enabled state of the 5V rail. The rail may be disabled due to
-   * calling SetEnabled5V(), a controller brownout, a short circuit on the rail,
-   * or controller over-voltage.
-   *
-   * @return The controller 5V rail enabled value. True for enabled.
-   */
-  static bool GetEnabled5V();
-
-  /**
-   * Get the count of the total current faults on the 5V rail since the
-   * code started.
-   *
-   * @return The number of faults
-   */
-  static int GetFaultCount5V();
-
-  /**
-   * Get the voltage of the 6V rail.
-   *
-   * @return The controller 6V rail voltage value in Volts
-   */
-  static double GetVoltage6V();
-
-  /**
-   * Get the current output of the 6V rail.
-   *
-   * @return The controller 6V rail output current value in Amps
-   */
-  static double GetCurrent6V();
-
-  /**
-   * Enables or disables the 6V rail.
-   *
-   * @param enabled whether to enable the 6V rail.
-   */
-  static void SetEnabled6V(bool enabled);
-
-  /**
-   * Get the enabled state of the 6V rail. The rail may be disabled due to
-   * calling SetEnabled6V(), a controller brownout, a short circuit on the rail,
-   * or controller over-voltage.
-   *
-   * @return The controller 6V rail enabled value. True for enabled.
-   */
-  static bool GetEnabled6V();
-
-  /**
-   * Get the count of the total current faults on the 6V rail since the
-   * code started.
-   *
-   * @return The number of faults.
-   */
-  static int GetFaultCount6V();
 
   /** Reset the overcurrent fault counters for all user rails to 0. */
   static void ResetRailFaultCounts();

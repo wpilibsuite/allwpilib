@@ -20,10 +20,6 @@
 using namespace frc;
 
 PWM::PWM(int channel, bool registerSendable) {
-  if (!SensorUtil::CheckPWMChannel(channel)) {
-    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
-  }
-
   auto stack = wpi::GetStackTrace(1);
   int32_t status = 0;
   m_handle = HAL_InitializePWMPort(channel, stack.c_str(), &status);
