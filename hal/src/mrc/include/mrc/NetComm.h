@@ -142,9 +142,7 @@ struct ControlData {
     }
   }
 
-  std::string_view GetSelectedAutoOpMode() const {
-    return SelectedAutoOpMode;
-  }
+  std::string_view GetSelectedAutoOpMode() const { return SelectedAutoOpMode; }
 
   std::span<uint8_t> WritableSelectedAutoOpModeBuffer(size_t Len) {
     if (Len > MRC_MAX_OPMODE_LEN) {
