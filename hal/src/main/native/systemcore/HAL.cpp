@@ -42,7 +42,6 @@ void InitializeHAL() {
   InitializeAnalogInput();
   InitializeCAN();
   InitializeCANAPI();
-  InitializeConstants();
   InitializeCounter();
   InitializeDIO();
   InitializeDutyCycle();
@@ -50,6 +49,7 @@ void InitializeHAL() {
   InitializeFIRSTDriverStation();
   InitializeI2C();
   InitializeIMU();
+  InitializeLEDs();
   InitializeMain();
   InitializeNotifier();
   InitializeCTREPDP();

@@ -24,10 +24,6 @@
 
 using namespace wpi::util::java;
 
-static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO ==
-              HAL_RUNTIME_ROBORIO);
-static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_ROBORIO_2 ==
-              HAL_RUNTIME_ROBORIO_2);
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SIMULATION ==
               HAL_RUNTIME_SIMULATION);
 static_assert(org_wpilib_hardware_hal_HALUtil_RUNTIME_SYSTEMCORE ==
