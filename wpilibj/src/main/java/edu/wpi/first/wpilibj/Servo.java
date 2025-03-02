@@ -5,8 +5,11 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.PWM.OutputPeriod;
 
 /**
  * Standard hobby style servo.
@@ -14,12 +17,17 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * <p>The range parameters default to the appropriate values for the Hitec HS-322HD servo provided
  * in the FIRST Kit of Parts in 2008.
  */
-public class Servo extends PWM {
+public class Servo implements Sendable, AutoCloseable {
   private static final double kMaxServoAngle = 180.0;
   private static final double kMinServoAngle = 0.0;
 
   private static final int kDefaultMaxServoPWM = 2400;
   private static final int kDefaultMinServoPWM = 600;
+
+  private PWM m_pwm;
+
+  private int m_minPwm = kDefaultMinServoPWM;
+  private int m_maxPwm = kDefaultMaxServoPWM;
 
   /**
    * Constructor.
@@ -32,12 +40,19 @@ public class Servo extends PWM {
    */
   @SuppressWarnings("this-escape")
   public Servo(final int channel) {
-    super(channel);
-    setBoundsMicroseconds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
-    setPeriodMultiplier(PeriodMultiplier.k4X);
+    m_pwm = new PWM(channel, false);
+    SendableRegistry.add(this, "Servo", channel);
 
-    HAL.reportUsage("IO", getChannel(), "Servo");
-    SendableRegistry.setName(this, "Servo", getChannel());
+    m_pwm.setOutputPeriod(OutputPeriod.k20Ms);
+
+    HAL.reportUsage("IO", channel, "Servo");
+  }
+
+  /** Free the resource associated with the PWM channel and set the value to 0. */
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
+    m_pwm.close();
   }
 
   /**
@@ -48,7 +63,11 @@ public class Servo extends PWM {
    * @param value Position from 0.0 to 1.0.
    */
   public void set(double value) {
-    setPosition(value);
+    value = MathUtil.clamp(value, 0.0, 1.0);
+
+    int rawValue = (int)((value * getFullRangeScaleFactor()) + m_minPwm);
+
+    m_pwm.setPulseTimeMicroseconds(rawValue);
   }
 
   /**
@@ -61,7 +80,14 @@ public class Servo extends PWM {
    * @return Position from 0.0 to 1.0.
    */
   public double get() {
-    return getPosition();
+    int rawValue = m_pwm.getPulseTimeMicroseconds();
+
+    if (rawValue < m_minPwm) {
+      return 0.0;
+    } else if (rawValue > m_maxPwm) {
+      return 1.0;
+    }
+    return (rawValue - m_minPwm) / getFullRangeScaleFactor();
   }
 
   /**
@@ -83,7 +109,7 @@ public class Servo extends PWM {
       degrees = kMaxServoAngle;
     }
 
-    setPosition((degrees - kMinServoAngle) / getServoAngleRange());
+    set((degrees - kMinServoAngle) / getServoAngleRange());
   }
 
   /**
@@ -95,7 +121,11 @@ public class Servo extends PWM {
    * @return The angle in degrees to which the servo is set.
    */
   public double getAngle() {
-    return getPosition() * getServoAngleRange() + kMinServoAngle;
+    return get() * getServoAngleRange() + kMinServoAngle;
+  }
+
+  private double getFullRangeScaleFactor() {
+    return m_maxPwm - m_minPwm;
   }
 
   private double getServoAngleRange() {

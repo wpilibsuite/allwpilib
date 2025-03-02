@@ -14,10 +14,7 @@ void HALSIM_ResetPWMData(int32_t index) {}
 
 DEFINE_CAPI(HAL_Bool, Initialized, false)
 DEFINE_CAPI(int32_t, PulseMicrosecond, 0)
-DEFINE_CAPI(double, Speed, 0)
-DEFINE_CAPI(double, Position, 0)
-DEFINE_CAPI(int32_t, PeriodScale, 0)
-DEFINE_CAPI(HAL_Bool, ZeroLatch, false)
+DEFINE_CAPI(int32_t, OutputPeriod, 0)
 
 void HALSIM_RegisterPWMAllCallbacks(int32_t index, HAL_NotifyCallback callback,
                                     void* param, HAL_Bool initialNotify) {}

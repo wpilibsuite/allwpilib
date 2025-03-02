@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -21,6 +22,13 @@ public abstract class PWMMotorController extends MotorSafety
 
   /** PWM instances for motor controller. */
   protected PWM m_pwm;
+
+  private boolean m_eliminateDeadband;
+  private int m_minPwm;
+  private int m_deadbandMinPwm;
+  private int m_centerPwm;
+  private int m_deadbandMaxPwm;
+  private int m_maxPwm;
 
   /**
    * Constructor.
@@ -42,6 +50,75 @@ public abstract class PWMMotorController extends MotorSafety
     m_pwm.close();
   }
 
+  private int getMinPositivePwm() {
+    if (m_eliminateDeadband) {
+      return m_deadbandMaxPwm;
+    } else {
+      return m_centerPwm + 1;
+    }
+  }
+
+  private int getMaxNegativePwm() {
+    if (m_eliminateDeadband) {
+      return m_deadbandMinPwm;
+    } else {
+      return m_centerPwm - 1;
+    }
+  }
+
+  private int getPositiveScaleFactor() {
+    return m_maxPwm - getMinPositivePwm();
+  }
+
+  private int getNegativeScaleFactor() {
+    return getMaxNegativePwm() - m_minPwm;
+  }
+
+  protected final void setSpeed(double speed) {
+    if (Double.isFinite(speed)) {
+      speed = MathUtil.clamp(speed, -1.0, 1.0);
+    } else {
+      speed = 0.0;
+    }
+
+    int rawValue;
+    if (speed == 0.0) {
+      rawValue = m_centerPwm;
+    } else if (speed > 0.0) {
+      rawValue = (int)Math.round(speed * getPositiveScaleFactor()) + getMinPositivePwm();
+    } else {
+      rawValue = (int)Math.round(speed * getNegativeScaleFactor()) + getMaxNegativePwm();
+    }
+
+    m_pwm.setPulseTimeMicroseconds(rawValue);
+  }
+
+  protected final double getSpeed() {
+    int rawValue = m_pwm.getPulseTimeMicroseconds();
+
+    if (rawValue == 0) {
+      return 0.0;
+    } else if (rawValue > m_maxPwm) {
+      return 1.0;
+    } else if (rawValue < m_minPwm) {
+      return -1.0;
+    } else if (rawValue > getMinPositivePwm()) {
+      return (rawValue - getMinPositivePwm()) / (double)getPositiveScaleFactor();
+    } else if (rawValue < getMaxNegativePwm()) {
+      return (rawValue - getMaxNegativePwm()) / (double)getNegativeScaleFactor();
+    } else {
+      return 0.0;
+    }
+  }
+
+  protected final void setBoundsMicroseconds(int maxPwm, int deadbandMaxPwm, int centerPwm, int deadbandMinPwm, int minPwm) {
+    m_maxPwm = maxPwm;
+    m_deadbandMaxPwm = deadbandMaxPwm;
+    m_centerPwm = centerPwm;
+    m_deadbandMinPwm = deadbandMinPwm;
+    m_minPwm = minPwm;
+  }
+
   /**
    * Set the PWM value.
    *
@@ -55,7 +132,7 @@ public abstract class PWMMotorController extends MotorSafety
     if (m_isInverted) {
       speed = -speed;
     }
-    m_pwm.setSpeed(speed);
+    setSpeed(speed);
 
     for (var follower : m_followers) {
       follower.set(speed);
@@ -73,7 +150,7 @@ public abstract class PWMMotorController extends MotorSafety
    */
   @Override
   public double get() {
-    return m_pwm.getSpeed() * (m_isInverted ? -1.0 : 1.0);
+    return getSpeed() * (m_isInverted ? -1.0 : 1.0);
   }
 
   /**
@@ -107,7 +184,7 @@ public abstract class PWMMotorController extends MotorSafety
   @Override
   public void stopMotor() {
     // Don't use set(0) as that will feed the watch kitty
-    m_pwm.setSpeed(0);
+    m_pwm.setPulseTimeMicroseconds(0);
 
     for (var follower : m_followers) {
       follower.stopMotor();
@@ -145,7 +222,7 @@ public abstract class PWMMotorController extends MotorSafety
    *     values.
    */
   public void enableDeadbandElimination(boolean eliminateDeadband) {
-    m_pwm.enableDeadbandElimination(eliminateDeadband);
+    m_eliminateDeadband = eliminateDeadband;
   }
 
   /**

@@ -133,10 +133,31 @@ class PWMMotorController : public MotorController,
   /// PWM instances for motor controller.
   PWM m_pwm;
 
+  void SetSpeed(double speed);
+  double GetSpeed() const;
+
+  void SetBounds(units::microsecond_t maxPwm,
+                 units::microsecond_t deadbandMaxPwm,
+                 units::microsecond_t centerPwm,
+                 units::microsecond_t deadbandMinPwm,
+                 units::microsecond_t minPwm);
+
  private:
   bool m_isInverted = false;
   std::vector<PWMMotorController*> m_nonowningFollowers;
   std::vector<std::unique_ptr<PWMMotorController>> m_owningFollowers;
+
+  bool m_eliminateDeadband{0};
+  units::microsecond_t m_minPwm{0};
+  units::microsecond_t m_deadbandMinPwm{0};
+  units::microsecond_t m_centerPwm{0};
+  units::microsecond_t m_deadbandMaxPwm{0};
+  units::microsecond_t m_maxPwm{0};
+
+  units::microsecond_t GetMinPositivePwm() const;
+  units::microsecond_t GetMaxNegativePwm() const;
+  units::microsecond_t GetPositiveScaleFactor() const;
+  units::microsecond_t GetNegativeScaleFactor() const;
 
   PWM* GetPwm() { return &m_pwm; }
 };
