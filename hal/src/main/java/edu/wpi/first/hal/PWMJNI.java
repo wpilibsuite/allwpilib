@@ -33,6 +33,15 @@ public class PWMJNI extends DIOJNI {
    */
   public static native void freePWMPort(int pwmPortHandle);
 
+    /**
+   * Indicates the pwm is used by a simulated device.
+   *
+   * @param handle the pwm handle
+   * @param device simulated device handle
+   * @see "HAL_SetPWMSimDevice"
+   */
+  public static native void setPWMSimDevice(int handle, int device);
+
   /**
    * Sets a PWM channel to the desired pulse width in microseconds.
    *

@@ -47,6 +47,14 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle);
 HAL_Bool HAL_CheckPWMChannel(int32_t channel);
 
 /**
+ * Indicates the pwm is used by a simulated device.
+ *
+ * @param handle the pwm handle
+ * @param device simulated device handle
+ */
+void HAL_SetPWMSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device);
+
+/**
  * Sets a PWM channel to the desired pulse width in microseconds.
  *
  *

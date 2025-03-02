@@ -17,6 +17,7 @@ void InitializePWMData() {
 PWMData* hal::SimPWMData;
 void PWMData::ResetData() {
   initialized.Reset(false);
+  simDevice = 0;
   pulseMicrosecond.Reset(0);
   outputPeriod.Reset(0);
 }
@@ -24,6 +25,10 @@ void PWMData::ResetData() {
 extern "C" {
 void HALSIM_ResetPWMData(int32_t index) {
   SimPWMData[index].ResetData();
+}
+
+HAL_SimDeviceHandle HALSIM_GetPWMSimDevice(int32_t index) {
+  return SimPWMData[index].simDevice;
 }
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \

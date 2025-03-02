@@ -97,6 +97,9 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle) {
   }
 }
 
+void HAL_SetPWMSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
+}
+
 HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
   return channel < kNumSmartIo && channel >= 0;
 }

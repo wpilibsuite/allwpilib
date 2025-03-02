@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.PWMJNI;
+import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -138,6 +139,15 @@ public class PWM implements Sendable, AutoCloseable {
    */
   public int getHandle() {
     return m_handle;
+  }
+
+/**
+   * Indicates this input is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  public void setSimDevice(SimDevice device) {
+    PWMJNI.setPWMSimDevice(m_handle, device.getNativeHandle());
   }
 
   @Override

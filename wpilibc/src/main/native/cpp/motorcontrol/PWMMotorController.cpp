@@ -66,6 +66,10 @@ void PWMMotorController::StopMotor() {
   // Don't use Set(0) as that will feed the watch kitty
   m_pwm.SetPulseTime(0_us);
 
+  if (m_simSpeed) {
+    m_simSpeed.Set(0.0);
+  }
+
   for (auto& follower : m_nonowningFollowers) {
     follower->StopMotor();
   }
@@ -93,8 +97,14 @@ void PWMMotorController::AddFollower(PWMMotorController& follower) {
 WPI_IGNORE_DEPRECATED
 
 PWMMotorController::PWMMotorController(std::string_view name, int channel)
-    : m_pwm(channel, false) {
+    : m_pwm(channel, false), m_name{name} {
   wpi::SendableRegistry::Add(this, name, channel);
+
+  m_simDevice = hal::SimDevice(m_name.c_str(), channel);
+  if (m_simDevice) {
+    m_simSpeed = m_simDevice.CreateDouble("Speed", true, 0.0);
+    m_pwm.SetSimDevice(m_simDevice);
+  }
 }
 
 WPI_UNIGNORE_DEPRECATED
@@ -136,6 +146,10 @@ void PWMMotorController::SetSpeed(double speed) {
     speed = std::clamp(speed, -1.0, 1.0);
   } else {
     speed = 0.0;
+  }
+
+  if (m_simSpeed) {
+    m_simSpeed.Set(speed);
   }
 
   units::microsecond_t rawValue;

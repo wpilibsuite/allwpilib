@@ -100,6 +100,13 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
 
   int GetChannel() const;
 
+  /**
+   * Indicates this input is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  void SetSimDevice(HAL_SimDeviceHandle device);
+
  protected:
   void InitSendable(wpi::SendableBuilder& builder) override;
 

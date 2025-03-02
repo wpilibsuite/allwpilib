@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
+import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -23,6 +26,11 @@ public abstract class PWMMotorController extends MotorSafety
   /** PWM instances for motor controller. */
   protected PWM m_pwm;
 
+  private String m_name;
+
+  private SimDevice m_simDevice;
+  private SimDouble m_simSpeed;
+
   private boolean m_eliminateDeadband;
   private int m_minPwm;
   private int m_deadbandMinPwm;
@@ -41,6 +49,14 @@ public abstract class PWMMotorController extends MotorSafety
   protected PWMMotorController(final String name, final int channel) {
     m_pwm = new PWM(channel, false);
     SendableRegistry.add(this, name, channel);
+
+    m_name = name;
+
+    m_simDevice = SimDevice.create(name, channel);
+    if (m_simDevice != null) {
+      m_simSpeed = m_simDevice.createDouble("Speed", Direction.kOutput, 0.0);
+      m_pwm.setSimDevice(m_simDevice);
+    }
   }
 
   /** Free the resource associated with the PWM channel and set the value to 0. */
@@ -48,6 +64,16 @@ public abstract class PWMMotorController extends MotorSafety
   public void close() {
     SendableRegistry.remove(this);
     m_pwm.close();
+
+    if (m_simDevice != null) {
+      m_simDevice.close();
+      m_simDevice = null;
+      m_simSpeed = null;
+    }
+  }
+
+  public String getName() {
+    return m_name;
   }
 
   private int getMinPositivePwm() {
@@ -79,6 +105,10 @@ public abstract class PWMMotorController extends MotorSafety
       speed = MathUtil.clamp(speed, -1.0, 1.0);
     } else {
       speed = 0.0;
+    }
+
+    if (m_simSpeed != null) {
+      m_simSpeed.set(speed);
     }
 
     int rawValue;
@@ -175,6 +205,10 @@ public abstract class PWMMotorController extends MotorSafety
   @Override
   public void disable() {
     m_pwm.setDisabled();
+
+    if (m_simSpeed != null) {
+      m_simSpeed.set(0.0);
+    }
 
     for (var follower : m_followers) {
       follower.disable();

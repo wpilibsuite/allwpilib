@@ -12,6 +12,7 @@
 #include <utility>
 #include <vector>
 
+#include <hal/SimDevice.h>
 #include <units/voltage.h>
 #include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
@@ -118,6 +119,8 @@ class PWMMotorController : public MotorController,
         std::make_unique<std::decay_t<T>>(std::forward<T>(follower)));
   }
 
+  const std::string& GetName() const { return m_name; }
+
  protected:
   /**
    * Constructor for a PWM Motor %Controller connected via PWM.
@@ -146,6 +149,11 @@ class PWMMotorController : public MotorController,
   bool m_isInverted = false;
   std::vector<PWMMotorController*> m_nonowningFollowers;
   std::vector<std::unique_ptr<PWMMotorController>> m_owningFollowers;
+
+  hal::SimDevice m_simDevice;
+  hal::SimDouble m_simSpeed;
+
+  std::string m_name;
 
   bool m_eliminateDeadband{0};
   units::microsecond_t m_minPwm{0};

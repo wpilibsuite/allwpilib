@@ -16,6 +16,7 @@ class PWMData {
  public:
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
       false};
+  std::atomic<HAL_SimDeviceHandle> simDevice;
   SimDataValue<int32_t, HAL_MakeInt, GetPulseMicrosecondName> pulseMicrosecond{
       0};
   SimDataValue<int32_t, HAL_MakeInt, GetOutputPeriodName> outputPeriod{0};

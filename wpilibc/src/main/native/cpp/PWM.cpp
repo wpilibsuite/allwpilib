@@ -93,6 +93,10 @@ int PWM::GetChannel() const {
   return m_channel;
 }
 
+void PWM::SetSimDevice(HAL_SimDeviceHandle device) {
+  HAL_SetPWMSimDevice(m_handle, device);
+}
+
 void PWM::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PWM");
   builder.SetActuator(true);

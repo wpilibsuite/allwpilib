@@ -62,6 +62,18 @@ Java_edu_wpi_first_hal_PWMJNI_freePWMPort
 }
 
 /*
+ * Class:     edu_wpi_first_hal_AnalogJNI
+ * Method:    setPWMSimDevice
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_AnalogJNI_setPWMSimDevice
+  (JNIEnv* env, jclass, jint handle, jint device)
+{
+  HAL_SetPWMSimDevice((HAL_DigitalHandle)handle, (HAL_SimDeviceHandle)device);
+}
+
+/*
  * Class:     edu_wpi_first_hal_PWMJNI
  * Method:    setPulseTimeMicroseconds
  * Signature: (II)V

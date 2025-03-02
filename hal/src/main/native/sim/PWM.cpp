@@ -85,6 +85,14 @@ HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
   return channel < kNumPWMChannels && channel >= 0;
 }
 
+void HAL_SetPWMSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
+  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::PWM);
+  if (port == nullptr) {
+    return;
+  }
+  SimPWMData[port->channel].simDevice = device;
+}
+
 void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
                                      int32_t value, int32_t* status) {
   auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
