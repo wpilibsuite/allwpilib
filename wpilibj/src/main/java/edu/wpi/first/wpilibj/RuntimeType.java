@@ -8,10 +8,8 @@ import edu.wpi.first.hal.HALUtil;
 
 /** Runtime type. */
 public enum RuntimeType {
-  /** roboRIO 1.0. */
-  kRoboRIO(HALUtil.RUNTIME_ROBORIO),
-  /** roboRIO 2.0. */
-  kRoboRIO2(HALUtil.RUNTIME_ROBORIO2),
+  /** SystemCore runtime. */
+  kSystemCore(HALUtil.RUNTIME_SYSTEMCORE),
   /** Simulation runtime. */
   kSimulation(HALUtil.RUNTIME_SIMULATION);
 
@@ -30,8 +28,7 @@ public enum RuntimeType {
    */
   public static RuntimeType getValue(int type) {
     return switch (type) {
-      case HALUtil.RUNTIME_ROBORIO -> RuntimeType.kRoboRIO;
-      case HALUtil.RUNTIME_ROBORIO2 -> RuntimeType.kRoboRIO2;
+      case HALUtil.RUNTIME_SYSTEMCORE -> RuntimeType.kSystemCore;
       default -> RuntimeType.kSimulation;
     };
   }
