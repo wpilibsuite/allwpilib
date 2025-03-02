@@ -9,6 +9,7 @@
 #include <string_view>
 
 #include <wpi/spinlock.h>
+#include <wpi/StringMap.h>
 
 #include "hal/simulation/DriverStationData.h"
 #include "hal/simulation/SimCallbackRegistry.h"
@@ -17,15 +18,15 @@
 namespace hal {
 
 class DriverStationData {
-  HAL_SIMDATAVALUE_DEFINE_NAME(Enabled)
-  HAL_SIMDATAVALUE_DEFINE_NAME(Autonomous)
-  HAL_SIMDATAVALUE_DEFINE_NAME(Test)
   HAL_SIMDATAVALUE_DEFINE_NAME(EStop)
   HAL_SIMDATAVALUE_DEFINE_NAME(FmsAttached)
   HAL_SIMDATAVALUE_DEFINE_NAME(DsAttached)
   HAL_SIMDATAVALUE_DEFINE_NAME(AllianceStationId)
   HAL_SIMDATAVALUE_DEFINE_NAME(MatchTime)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(OpMode)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(SelectedAutoOpMode)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(SelectedTeleopOpMode)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(OpModeOptions)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickAxes)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickPOVs)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickButtons)
@@ -48,6 +49,25 @@ class DriverStationData {
   void CancelOpModeCallback(int32_t uid);
   std::string GetOpMode();
   void SetOpMode(std::string_view opMode);
+
+  int32_t RegisterSelectedAutoOpModeCallback(HAL_OpModeCallback callback,
+                                             void* param,
+                                             HAL_Bool initialNotify);
+  void CancelSelectedAutoOpModeCallback(int32_t uid);
+  std::string GetSelectedAutoOpMode();
+  void SetSelectedAutoOpMode(std::string_view opMode);
+
+  int32_t RegisterSelectedTelopOpModeCallback(HAL_OpModeCallback callback,
+                                              void* param,
+                                              HAL_Bool initialNotify);
+  void CancelSelectedTeleopOpModeCallback(int32_t uid);
+  std::string GetSelectedTeleopOpMode();
+  void SetSelectedTeleopOpMode(std::string_view opMode);
+
+  int32_t RegisterOpModeOptionsCallback(HAL_OpModeOptionsCallback callback,
+                                        void* param, HAL_Bool initialNotify);
+  void CancelOpModeOptionsCallback(int32_t uid);
+  std::vector<std::string> GetOpModeOptions();
 
   int32_t RegisterJoystickAxesCallback(int32_t joystickNum,
                                        HAL_JoystickAxesCallback callback,
@@ -125,9 +145,6 @@ class DriverStationData {
   void SetMatchNumber(int32_t matchNumber);
   void SetReplayNumber(int32_t replayNumber);
 
-  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetEnabledName> enabled{false};
-  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetAutonomousName> autonomous{false};
-  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetTestName> test{false};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetEStopName> eStop{false};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetFmsAttachedName> fmsAttached{
       false};
@@ -139,6 +156,12 @@ class DriverStationData {
 
  private:
   SimCallbackRegistry<HAL_OpModeCallback, GetOpModeName> m_opModeCallbacks;
+  SimCallbackRegistry<HAL_OpModeCallback, GetSelectedAutoOpModeName>
+      m_selectedAutoOpModeCallbacks;
+  SimCallbackRegistry<HAL_OpModeCallback, GetSelectedTeleopOpModeName>
+      m_selectedTeleopOpModeCallbacks;
+  SimCallbackRegistry<HAL_OpModeOptionsCallback, GetOpModeOptionsName>
+      m_opModeOptionsCallbacks;
   SimCallbackRegistry<HAL_JoystickAxesCallback, GetJoystickAxesName>
       m_joystickAxesCallbacks;
   SimCallbackRegistry<HAL_JoystickPOVsCallback, GetJoystickPOVsName>
@@ -176,6 +199,9 @@ class DriverStationData {
 
   wpi::spinlock m_opModeMutex;
   std::string m_opMode;
+  std::string m_selectedAutoOpMode;
+  std::string m_selectedTeleopOpMode;
+  wpi::StringMap<int32_t> m_opModeOptions;
 };
 extern DriverStationData* SimDriverStationData;
 }  // namespace hal

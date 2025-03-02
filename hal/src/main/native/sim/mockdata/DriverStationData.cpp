@@ -22,9 +22,6 @@ DriverStationData::DriverStationData() {
 }
 
 void DriverStationData::ResetData() {
-  enabled.Reset(false);
-  autonomous.Reset(false);
-  test.Reset(false);
   eStop.Reset(false);
   fmsAttached.Reset(false);
   dsAttached.Reset(false);
@@ -51,6 +48,17 @@ void DriverStationData::ResetData() {
     std::scoped_lock lock(m_matchInfoMutex);
     m_matchInfoCallbacks.Reset();
     m_matchInfo = HAL_MatchInfo{};
+  }
+  {
+    std::scoped_lock lock{m_opModeMutex};
+    m_opModeCallbacks.Reset();
+    m_selectedAutoOpModeCallbacks.Reset();
+    m_selectedTeleopOpModeCallbacks.Reset();
+    m_opModeOptionsCallbacks.Reset();
+    m_opMode.clear();
+    m_selectedAutoOpMode.clear();
+    m_selectedTeleopOpMode.clear();
+    // do not clear m_opModeOptions as it comes from robot code
   }
   m_newDataCallbacks.Reset();
 }

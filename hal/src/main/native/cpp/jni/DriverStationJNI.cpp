@@ -55,50 +55,14 @@ Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramStarting
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    observeUserProgramDisabled
- * Signature: ()V
+ * Method:    observeUserProgramOpMode
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramDisabled
-  (JNIEnv*, jclass)
+Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramOpMode
+  (JNIEnv*, jclass, jint id)
 {
-  HAL_ObserveUserProgramDisabled();
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    observeUserProgramAutonomous
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramAutonomous
-  (JNIEnv*, jclass)
-{
-  HAL_ObserveUserProgramAutonomous();
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    observeUserProgramTeleop
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramTeleop
-  (JNIEnv*, jclass)
-{
-  HAL_ObserveUserProgramTeleop();
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    observeUserProgramTest
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramTest
-  (JNIEnv*, jclass)
-{
-  HAL_ObserveUserProgramTest();
+  HAL_ObserveUserProgramOpMode(id);
 }
 
 /*
@@ -121,18 +85,79 @@ Java_edu_wpi_first_hal_DriverStationJNI_nativeGetControlWord
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getOpMode
- * Signature: ()java/lang/String;
+ * Method:    addOpMode
+ * Signature: (java/lang/String;)I
  */
-JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getOpMode
-  (JNIEnv* env, jclass)
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_addOpMode
+  (JNIEnv* env, jclass, jstring name)
 {
-  char buf[128];
-  int32_t len = 128;
-  HAL_GetOpMode(buf, &len);
-  return MakeJString(env, std::string_view{buf, static_cast<size_t>(len)});
+  JStringRef nameStr{env, name};
+  WPI_String nameWpiStr = wpi::make_string(nameStr);
+  return HAL_AddOpMode(&nameWpiStr);
 }
+
+/*
+ * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Method:    removeOpMode
+ * Signature: (java/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_removeOpMode
+  (JNIEnv* env, jclass, jstring name)
+{
+  JStringRef nameStr{env, name};
+  WPI_String nameWpiStr = wpi::make_string(nameStr);
+  HAL_RemoveOpMode(&nameWpiStr);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Method:    clearOpModes
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_clearOpModes
+  (JNIEnv*, jclass)
+{
+  HAL_ClearOpModes();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Method:    getOpMode
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_getOpMode
+  (JNIEnv*, jclass)
+{
+  return HAL_GetOpMode();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Method:    getSelectedAutonomousOpMode
+ * Signature: ()I
+ */
+ JNIEXPORT jint JNICALL
+ Java_edu_wpi_first_hal_DriverStationJNI_getSelectedAutonomousOpMode
+   (JNIEnv*, jclass)
+ {
+   return HAL_GetSelectedAutonomousOpMode();
+ }
+
+/*
+ * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Method:    getSelectedTeleoperatedOpMode
+ * Signature: ()I
+ */
+ JNIEXPORT jint JNICALL
+ Java_edu_wpi_first_hal_DriverStationJNI_getSelectedTeleoperatedOpMode
+   (JNIEnv*, jclass)
+ {
+   return HAL_GetSelectedTeleoperatedOpMode();
+ }
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI

@@ -16,6 +16,7 @@
 
 #include <fmt/format.h>
 #include <wpi/EventVector.h>
+#include <wpi/StringMap.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
@@ -45,7 +46,9 @@ struct JoystickDataCache {
   HAL_AllianceStationID allianceStation;
   double matchTime;
   HAL_ControlWord controlWord;
-  std::string opMode;
+  int32_t opModeId;
+  int32_t selectedAutoOpModeId;
+  int32_t selectedTeleopOpModeId;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -230,16 +233,12 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   return 0;
 }
 
-int32_t HAL_GetOpMode(char* buf, int32_t* len) {
+int32_t HAL_GetOpMode(void) {
   if (gShutdown) {
-    return INCOMPATIBLE_STATE;
+    return 0;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
-  *len = std::min(static_cast<size_t>(*len), currentRead->opMode.length());
-  if (*len != 0) {
-    std::memcpy(buf, currentRead->opMode.data(), *len);
-  }
-  return 0;
+  return currentRead->opModeId;
 }
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
@@ -363,19 +362,7 @@ void HAL_ObserveUserProgramStarting(void) {
   HALSIM_SetProgramStarted();
 }
 
-void HAL_ObserveUserProgramDisabled(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramAutonomous(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramTeleop(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramTest(void) {
+void HAL_ObserveUserProgramOpMode(int32_t id) {
   // TODO
 }
 

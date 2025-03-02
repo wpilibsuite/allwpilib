@@ -6,6 +6,7 @@
 
 #include <optional>
 #include <string>
+#include <string_view>
 
 #include <units/time.h>
 #include <wpi/Synchronization.h>
@@ -195,11 +196,50 @@ class DriverStation final {
   static bool IsEStopped();
 
   /**
+   * Adds an operating mode option.
+   *
+   * @param name name of the operating mode
+   * @return unique ID used to later identify the operating mode; if an empty
+   *         string is passed, 0 is returned; identical names result in
+   *         identical IDs
+   */
+  static int AddOpMode(std::string_view name);
+
+  /**
+   * Removes an operating mode option.
+   *
+   * @param name name of the operating mode
+   */
+  static void RemoveOpMode(std::string_view name);
+
+  /**
+   * Clears all operating mode options.
+   */
+  static void ClearOpModes();
+
+  /**
    * Get the current operating mode.
    *
-   * @return Operating mode
+   * @return the unique ID provided by the AddOpMode() function, or 0 to
+   *         indicate the robot is disabled (no active operating mode)
    */
-  static std::string GetMode();
+  static int GetOpModeId();
+
+  /**
+   * Get the current operating mode.
+   *
+   * @return Operating mode string, or "" to indicate the robot is disabled (no
+   *         active operating mode).
+   */
+  static std::string GetOpMode();
+
+  /**
+   * Check to see if the current operating mode is a particular value.
+   *
+   * @param mode operating mode
+   * @return True if that mode is the current mode
+   */
+   static bool IsOpMode(int id);
 
   /**
    * Check to see if the current operating mode is a particular value.
@@ -210,59 +250,38 @@ class DriverStation final {
   static bool IsOpMode(std::string_view mode);
 
   /**
-   * Check to see if the current operating mode is a particular value and the
-   * robot is enabled.
+   * Gets the operating mode selected for the autonomous period. Note this does
+   * not mean the autonomous period is running--use GetOpModeId() for that.
    *
-   * @param mode operating mode
-   * @return True if that mode is the current mode and the robot is enabled
+   * @return the unique ID provided by the AddOpMode() function, or 0 to
+   *         indicate no or unknown selection
    */
-  static bool IsOpModeEnabled(std::string_view mode);
+  static int GetSelectedAutonomousOpModeId();
 
   /**
-   * Check if the DS is commanding autonomous mode.
+   * Gets the operating mode selected for the autonomous period. Note this does
+   * not mean the autonomous period is running--use GetOpMode() for that.
    *
-   * @return True if the robot is being commanded to be in autonomous mode
+   * @return Operating mode string, or "" to indicate no or unknown selection
    */
-  static bool IsAutonomous();
+  static std::string GetSelectedAutonomousOpMode();
 
   /**
-   * Check if the DS is commanding autonomous mode and if it has enabled the
-   * robot.
+   * Gets the operating mode selected for the teleoperated period. Note this does
+   * not mean the teleoperated period is running--use GetOpModeId() for that.
    *
-   * @return True if the robot is being commanded to be in autonomous mode and
-   * enabled.
+   * @return the unique ID provided by the AddOpMode() function, or 0 to
+   *         indicate no or unknown selection
    */
-  static bool IsAutonomousEnabled();
+  static int GetSelectedTeleoperatedOpModeId();
 
   /**
-   * Check if the DS is commanding teleop mode.
+   * Gets the operating mode selected for the teleoperated period. Note this does
+   * not mean the teleoperated period is running--use GetOpMode() for that.
    *
-   * @return True if the robot is being commanded to be in teleop mode
+   * @return Operating mode string, or "" to indicate no or unknown selection
    */
-  static bool IsTeleop();
-
-  /**
-   * Check if the DS is commanding teleop mode and if it has enabled the robot.
-   *
-   * @return True if the robot is being commanded to be in teleop mode and
-   * enabled.
-   */
-  static bool IsTeleopEnabled();
-
-  /**
-   * Check if the DS is commanding test mode.
-   *
-   * @return True if the robot is being commanded to be in test mode
-   */
-  static bool IsTest();
-
-  /**
-   * Check if the DS is commanding Test mode and if it has enabled the robot.
-   *
-   * @return True if the robot is being commanded to be in Test mode and
-   * enabled.
-   */
-  static bool IsTestEnabled();
+  static std::string GetSelectedTeleoperatedOpMode();
 
   /**
    * Check if the DS is attached.
