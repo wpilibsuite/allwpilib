@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GGreenix <76048260+GGreenix@users.noreply.github.com>
+Date: Tue, 31 Dec 2024 20:05:39 +0200
+Subject: [PATCH 09/17] ROI for detection
+
+---
+ apriltag.c | 4 ++--
+ apriltag.h | 3 +++
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/apriltag.c b/apriltag.c
+index b7e24c4bc279643f478d810d494345216be991f1..3654ab376a62bf744d99bd89d45f97620a258495 100644
+--- a/apriltag.c
++++ b/apriltag.c
+@@ -1054,8 +1054,8 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
+                 image_u8_t *orig = image_u8_copy(quad_im);
+                 image_u8_gaussian_blur(quad_im, sigma, ksz);
+ 
+-                for (int y = 0; y < orig->height; y++) {
+-                    for (int x = 0; x < orig->width; x++) {
++                for (int y = td->roi_y_coor; y < td->roi_height; y++) {
++                    for (int x = td->roi_x_coor; x < td->roi_width; x++) {
+                         int vorig = orig->buf[y*orig->stride + x];
+                         int vblur = quad_im->buf[y*quad_im->stride + x];
+ 
+diff --git a/apriltag.h b/apriltag.h
+index 895b3459b8a84064989378fe533fd676964a1687..6ac15fae3c4700e25aa7a5f34831079e66abde5c 100644
+--- a/apriltag.h
++++ b/apriltag.h
+@@ -188,6 +188,9 @@ struct apriltag_detector
+ 
+     // Used for thread safety.
+     pthread_mutex_t mutex;
++
++    //ROI used for saving proccesing time
++    double roi_x_coor, roi_y_coor, roi_width, roi_height;
+ };
+ 
+ // Represents the detection of a tag. These are returned to the user
