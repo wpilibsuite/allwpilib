@@ -29,6 +29,7 @@ java_library(
         "//datalog:datalog-java",
         "//hal:hal-java",
         "//ntcore:networktables-java",
+        "//telemetry:telemetry-java",
         "//wpimath:wpimath-java",
         "//wpinet:wpinet-java",
         "//wpiunits",

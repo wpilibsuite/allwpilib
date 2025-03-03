@@ -48,6 +48,7 @@ cc_library(
     deps = [
         ":generated_cc_headers",
         "//datalog:datalog.static",
+        "//telemetry:telemetry.static",
         "//wpinet:wpinet.static",
         "//wpiutil:wpiutil.static",
     ],
@@ -70,6 +71,7 @@ wpilib_jni_java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//datalog:datalog-java",
+        "//telemetry:telemetry-java",
         "//wpiutil:wpiutil-java",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
@@ -100,6 +102,7 @@ wpilib_java_junit5_test(
     tags = ["exclusive"],
     deps = [
         ":networktables-java",
+        "//telemetry:telemetry-java",
         "//wpiutil:wpiutil-java",
     ],
 )
@@ -118,6 +121,7 @@ java_binary(
     main_class = "edu.wpi.first.ntcore.DevMain",
     deps = [
         "networktables-java",
+        "//telemetry:telemetry-java",
         "//wpiutil:wpiutil-java",
     ],
 )
