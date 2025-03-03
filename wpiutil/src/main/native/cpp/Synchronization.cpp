@@ -43,7 +43,7 @@ static HandleManager& GetManager() {
   return manager;
 }
 
-WPI_EventHandle wpi::CreateEvent(bool manualReset, bool initialState) {
+WPI_EventHandle wpi::MakeEvent(bool manualReset, bool initialState) {
   auto& manager = GetManager();
   if (gShutdown) {
     return {};
@@ -92,7 +92,7 @@ void wpi::ResetEvent(WPI_EventHandle handle) {
   ResetSignalObject(handle);
 }
 
-WPI_SemaphoreHandle wpi::CreateSemaphore(int initialCount, int maximumCount) {
+WPI_SemaphoreHandle wpi::MakeSemaphore(int initialCount, int maximumCount) {
   auto& manager = GetManager();
   if (gShutdown) {
     return {};
@@ -325,8 +325,8 @@ void wpi::DestroySignalObject(WPI_Handle handle) {
 
 extern "C" {
 
-WPI_EventHandle WPI_CreateEvent(int manual_reset, int initial_state) {
-  return wpi::CreateEvent(manual_reset != 0, initial_state != 0);
+WPI_EventHandle WPI_MakeEvent(int manual_reset, int initial_state) {
+  return wpi::MakeEvent(manual_reset != 0, initial_state != 0);
 }
 
 void WPI_DestroyEvent(WPI_EventHandle handle) {
@@ -341,8 +341,8 @@ void WPI_ResetEvent(WPI_EventHandle handle) {
   wpi::ResetEvent(handle);
 }
 
-WPI_SemaphoreHandle WPI_CreateSemaphore(int initial_count, int maximum_count) {
-  return wpi::CreateSemaphore(initial_count, maximum_count);
+WPI_SemaphoreHandle WPI_MakeSemaphore(int initial_count, int maximum_count) {
+  return wpi::MakeSemaphore(initial_count, maximum_count);
 }
 
 void WPI_DestroySemaphore(WPI_SemaphoreHandle handle) {
