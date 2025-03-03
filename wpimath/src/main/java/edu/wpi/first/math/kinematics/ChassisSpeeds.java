@@ -122,7 +122,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   public ChassisSpeeds toRobotRelative(Rotation2d robotAngle) {
     // CW rotation into chassis frame
     var rotated = new Translation2d(vx, vy).rotateBy(robotAngle.unaryMinus());
-    return new ChassisSpeeds(rotated.getX(), rotated.getY(), omega);
+    return new ChassisSpeeds(rotated.x(), rotated.y(), omega);
   }
 
   /**
@@ -136,7 +136,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
   public ChassisSpeeds toFieldRelative(Rotation2d robotAngle) {
     // CCW rotation out of chassis frame
     var rotated = new Translation2d(vx, vy).rotateBy(robotAngle);
-    return new ChassisSpeeds(rotated.getX(), rotated.getY(), omega);
+    return new ChassisSpeeds(rotated.x(), rotated.y(), omega);
   }
 
   /**
