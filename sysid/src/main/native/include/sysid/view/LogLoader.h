@@ -9,7 +9,6 @@
 #include <string_view>
 #include <vector>
 
-#include <glass/View.h>
 #include <wpi/Signal.h>
 
 namespace glass {
@@ -30,7 +29,7 @@ namespace sysid {
 /**
  * Helps with loading datalog files.
  */
-class LogLoader : public glass::View {
+class LogLoader {
  public:
   /**
    * Creates a log loader widget
@@ -39,12 +38,12 @@ class LogLoader : public glass::View {
    */
   explicit LogLoader(glass::Storage& storage, wpi::Logger& logger);
 
-  ~LogLoader() override;
+  ~LogLoader();
 
   /**
    * Displays the log loader window.
    */
-  void Display() override;
+  void Display();
 
   /**
    * Signal called when the current file is unloaded (invalidates any
