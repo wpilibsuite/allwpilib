@@ -47,12 +47,16 @@ SquareRootUnscentedTransform(
                                   const Vectord<CovDim>&)>
         residualFunc,
     const Matrixd<CovDim, CovDim>& squareRootR) {
-  // New mean is usually just the sum of the sigmas * weight:
-  //       n
-  // dot = Σ W[k] Xᵢ[k]
-  //      k=1
+  // The mean of the sigmas is usually just:
+  // xhat = sigmas * Wm
+  // but we allow a custom function, usually
+  // for an angle state with some modulus
+  // (Eq. 19/23)
   Vectord<CovDim> x = meanFunc(sigmas, Wm);
 
+  // Form a matrix S_bar as each sigma point - the weighted mean
+  // with the noise matrix appended
+  // (Eq. 20/24)
   Matrixd<CovDim, States * 2 + CovDim> Sbar;
   for (int i = 0; i < States * 2; i++) {
     Sbar.template block<CovDim, 1>(0, i) =
@@ -61,14 +65,20 @@ SquareRootUnscentedTransform(
   }
   Sbar.template block<CovDim, CovDim>(0, States * 2) = squareRootR;
 
-  // Merwe defines the QR decomposition as Aᵀ = QR
+  // Compute the square-root covariance of the sigma points
+  // This is upper triangular, so we need to take the transpose
+  // (Eq. 20/24)
   Matrixd<CovDim, CovDim> S = Sbar.transpose()
                                   .householderQr()
                                   .matrixQR()
                                   .template block<CovDim, CovDim>(0, 0)
-                                  .template triangularView<Eigen::Upper>();
+                                  .template triangularView<Eigen::Upper>()
+                                  .transpose();
 
-  Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(
+  // Update or downdate the square-root covariance with the first sigma
+  // depending on whether its weight (Wc[0]) is positive or negative
+  // (Eq. 21/25)
+  Eigen::internal::llt_inplace<double, Eigen::Lower>::rankUpdate(
       S, residualFunc(sigmas.template block<CovDim, 1>(0, 0), x), Wc[0]);
 
   return std::make_tuple(x, S);

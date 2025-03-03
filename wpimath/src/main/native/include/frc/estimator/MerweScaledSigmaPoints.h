@@ -52,6 +52,8 @@ class MerweScaledSigmaPoints {
   /**
    * Computes the sigma points for an unscented Kalman filter given the mean
    * (x) and square-root covariance(S) of the filter.
+   * 
+   * (Eq. 17)
    *
    * @param x An array of the means.
    * @param S Square-root covariance of the filter.

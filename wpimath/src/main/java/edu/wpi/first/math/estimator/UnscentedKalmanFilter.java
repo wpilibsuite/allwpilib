@@ -105,7 +105,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
   }
 
   /**
-   * Constructs an unscented Kalman filter with custom mean, residual, and addition functions. Using
+   * Constructs an Unscented Kalman filter with custom mean, residual, and addition functions. Using
    * custom functions for arithmetic can be useful if you have angles in the state or measurements,
    * because they allow you to correctly account for the modular nature of angle arithmetic.
    *
@@ -193,12 +193,16 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
           "Wc must be 2 * states + 1 by 1! Got " + Wc.getNumRows() + " by " + Wc.getNumCols());
     }
 
-    // New mean is usually just the sum of the sigmas * weight:
-    //       n
-    // dot = Σ W[k] Xᵢ[k]
-    //      k=1
+    // Compute the mean of the sigmas, usually:
+    // xhat = sigmas * Wm
+    // but we allow a custom function, usually
+    // for a wrapped angle state
+    // (Eq. 19/23)
     Matrix<C, N1> x = meanFunc.apply(sigmas, Wm);
 
+    // Form a matrix S_bar as each sigma point - the weighted mean
+    // with the noise matrix appended
+    // (Eq. 20/24)
     Matrix<C, ?> Sbar = new Matrix<>(new SimpleMatrix(dim.getNum(), 2 * s.getNum() + dim.getNum()));
     for (int i = 0; i < 2 * s.getNum(); i++) {
       Sbar.setColumn(
@@ -214,8 +218,15 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
       throw new RuntimeException("QR decomposition failed! Input matrix:\n" + qrStorage);
     }
 
-    Matrix<C, C> newS = new Matrix<>(new SimpleMatrix(qr.getR(null, true)));
-    newS.rankUpdate(residualFunc.apply(sigmas.extractColumnVector(0), x), Wc.get(0, 0), false);
+    // Compute the square-root covariance of the sigma points
+    // This is upper triangular, so we need to take the transpose
+    // (Eq. 20/24)
+    Matrix<C, C> newS = new Matrix<>(new SimpleMatrix(qr.getR(null, true)).transpose());
+    
+    // Update or downdate the square-root covariance with the first sigma
+    // depending on whether its weight (Wc[0]) is positive or negative
+    // (Eq. 21/25)
+    newS.rankUpdate(residualFunc.apply(sigmas.extractColumnVector(0), x), Wc.get(0, 0), true);
 
     return new Pair<>(x, newS);
   }
@@ -256,7 +267,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    */
   @Override
   public Matrix<States, States> getP() {
-    return m_S.transpose().times(m_S);
+    return m_S.times(m_S.transpose());
   }
 
   /**
@@ -280,7 +291,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    */
   @Override
   public void setP(Matrix<States, States> newP) {
-    m_S = newP.lltDecompose(false);
+    m_S = newP.lltDecompose(true);
   }
 
   /**
@@ -347,14 +358,22 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     var discQ = Discretization.discretizeAQ(contA, m_contQ, dtSeconds).getSecond();
     var squareRootDiscQ = discQ.lltDecompose(true);
 
+    // Generate sigma points around the state mean
+    // (Eq. 17)
     var sigmas = m_pts.squareRootSigmaPoints(m_xHat, m_S);
 
+    // Project each sigma point forward in time according to the
+    // dynamics f(x, u)
+    // (Eq. 18)
     for (int i = 0; i < m_pts.getNumSigmas(); ++i) {
       Matrix<States, N1> x = sigmas.extractColumnVector(i);
 
       m_sigmasF.setColumn(i, NumericalIntegration.rk4(m_f, x, u, dtSeconds));
     }
 
+    // Pass the predicted sigmas through the Unscented Transform
+    // to compute the prior mean and covariance
+    // (Eq. 19, 20, 21)
     var ret =
         squareRootUnscentedTransform(
             m_states,
@@ -459,7 +478,13 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     final var discR = Discretization.discretizeR(R, m_dtSeconds);
     final var squareRootDiscR = discR.lltDecompose(true);
 
-    // Transform sigma points into measurement space
+    // Generate new sigma points from the prior mean and covariance
+    // and transform them into measurement space using h(x, u) 
+    // (Eq. 22)
+    //
+    // This differs from the formulation in Merwe's paper which uses
+    // the prior sigma points, regenerating them allows
+    // multiple measurement updates per time update
     Matrix<R, ?> sigmasH = new Matrix<>(new SimpleMatrix(rows.getNum(), 2 * m_states.getNum() + 1));
     var sigmas = m_pts.squareRootSigmaPoints(m_xHat, m_S);
     for (int i = 0; i < m_pts.getNumSigmas(); i++) {
@@ -467,7 +492,9 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
       sigmasH.setColumn(i, hRet);
     }
 
-    // Mean and covariance of prediction passed through unscented transform
+    // Pass the predicted measurement sigmas through the Unscented Transform
+    // to compute the mean predicted measurement and square root innovation covariance
+    // (Eq. 23, 24, 25)
     var transRet =
         squareRootUnscentedTransform(
             m_states,
@@ -481,7 +508,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     var yHat = transRet.getFirst();
     var Sy = transRet.getSecond();
 
-    // Compute cross covariance of the state and the measurements
+    // Compute cross covariance of the predicted state and measurement sigma points
+    // (Eq. 26)
     Matrix<States, R> Pxy = new Matrix<>(m_states, rows);
     for (int i = 0; i < m_pts.getNumSigmas(); i++) {
       // Pxy += (sigmas_f[:, i] - x̂)(sigmas_h[:, i] - ŷ)ᵀ W_c[i]
@@ -491,20 +519,32 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
       Pxy = Pxy.plus(dx.times(dy).times(m_pts.getWc(i)));
     }
 
-    // K = (P_{xy} / S_yᵀ) / S_y
-    // K = (S_y \ P_{xy}ᵀ)ᵀ / S_y
-    // K = (S_yᵀ \ (S_y \ P_{xy}ᵀ))ᵀ
+    // Compute the Kalman gain, to do this in Eigen we use QR
+    // decomposition to solve, this is equivalent to MATLAB's
+    // \ operator, so we need to rearrange to use that
+    // K = (Pxy / Sy') / Sy
+    // K = (Sy \ Pxy)' / Sy
+    // K = (Sy' \ (Sy \ Pxy'))'
+    // (Eq. 27)
     Matrix<States, R> K =
         Sy.transpose()
             .solveFullPivHouseholderQr(Sy.solveFullPivHouseholderQr(Pxy.transpose()))
             .transpose();
 
+    // Compute the posterior state mean
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − ŷ)
+    // (Eq. 27, step 2)
     m_xHat = addFuncX.apply(m_xHat, K.times(residualFuncY.apply(y, yHat)));
 
+    // Compute the intermediate matrix U for downdating
+    // the square-root covariance
+    // (Eq. 28)
     Matrix<States, R> U = K.times(Sy);
+
+    // Downdate the posterior square-root state covariance
+    // (Eq. 29)
     for (int i = 0; i < rows.getNum(); i++) {
-      m_S.rankUpdate(U.extractColumnVector(i), -1, false);
+      m_S.rankUpdate(U.extractColumnVector(i), -1, true);
     }
   }
 }
