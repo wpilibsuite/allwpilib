@@ -43,7 +43,9 @@ namespace frc {
  * "Stochastic control theory".
  *
  * <p> This class implements a square-root-form unscented Kalman filter
- * (SR-UKF). For more information about the SR-UKF, see
+ * (SR-UKF). The main reason for this is to guarantee that the covariance
+ * matrix remain positive definite.
+ * For more information about the SR-UKF, see
  * https://www.researchgate.net/publication/3908304.
  *
  * @tparam States Number of states.

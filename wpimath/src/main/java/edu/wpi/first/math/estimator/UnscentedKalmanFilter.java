@@ -35,9 +35,11 @@ import org.ejml.simple.SimpleMatrix;
  * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>
  * chapter 9 "Stochastic control theory".
  *
- * <p>This class implements a square-root-form unscented Kalman filter (SR-UKF). For more
- * information about the SR-UKF, see <a
- * href="https://www.researchgate.net/publication/3908304">https://www.researchgate.net/publication/3908304</a>.
+ * <p>This class implements a square-root-form unscented Kalman filter
+ * (SR-UKF). The main reason for this is to guarantee that the covariance
+ * matrix remain positive definite.
+ * For more information about the SR-UKF, see
+ * https://www.researchgate.net/publication/3908304.
  *
  * @param <States> Number of states.
  * @param <Inputs> Number of inputs.
