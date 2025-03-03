@@ -41,23 +41,25 @@ class DoubleSolenoid : public wpi::Sendable,
    * Constructs a double solenoid for a specified module of a specific module
    * type.
    *
+   * @param busId The bus ID.
    * @param module The module of the solenoid module to use.
    * @param moduleType The module type to use.
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
-  DoubleSolenoid(int module, PneumaticsModuleType moduleType,
+  DoubleSolenoid(int busId, int module, PneumaticsModuleType moduleType,
                  int forwardChannel, int reverseChannel);
 
   /**
    * Constructs a double solenoid for a default module of a specific module
    * type.
    *
+   * @param busId The bus ID.
    * @param moduleType The module type to use.
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
-  DoubleSolenoid(PneumaticsModuleType moduleType, int forwardChannel,
+  DoubleSolenoid(int busId, PneumaticsModuleType moduleType, int forwardChannel,
                  int reverseChannel);
 
   ~DoubleSolenoid() override;

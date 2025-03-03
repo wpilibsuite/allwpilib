@@ -10,6 +10,13 @@ package edu.wpi.first.hal;
  * @see "hal/AddressableLED.h"
  */
 public class AddressableLEDJNI extends JNIWrapper {
+  public static final int COLOR_ORDER_RGB = 0;
+  public static final int COLOR_ORDER_RBG = 1;
+  public static final int COLOR_ORDER_BGR = 2;
+  public static final int COLOR_ORDER_BRG = 3;
+  public static final int COLOR_ORDER_GBR = 4;
+  public static final int COLOR_ORDER_GRB = 5;
+
   /**
    * Initialize Addressable LED using a PWM Digital handle.
    *
@@ -26,6 +33,16 @@ public class AddressableLEDJNI extends JNIWrapper {
    * @see "HAL_FreeAddressableLED"
    */
   public static native void free(int handle);
+
+  /**
+   * Sets the color order for the addressable LED output. The default order is GRB.
+   *
+   * <p>This will take effect on the next call to {@link #setData(int, byte[])}.
+   *
+   * @param handle the Addressable LED handle
+   * @param colorOrder the color order
+   */
+  public static native void setColorOrder(int handle, int colorOrder);
 
   /**
    * Sets the length of the LED strip.
@@ -57,18 +74,14 @@ public class AddressableLEDJNI extends JNIWrapper {
    * those.
    *
    * @param handle the Addressable LED handle
-   * @param highTime0NanoSeconds high time for 0 bit (default 400ns)
-   * @param lowTime0NanoSeconds low time for 0 bit (default 900ns)
-   * @param highTime1NanoSeconds high time for 1 bit (default 900ns)
-   * @param lowTime1NanoSeconds low time for 1 bit (default 600ns)
+   * @param highTime0 high time for 0 bit in nanoseconds (default 400 ns)
+   * @param lowTime0 low time for 0 bit in nanoseconds (default 900 ns)
+   * @param highTime1 high time for 1 bit in nanoseconds (default 900 ns)
+   * @param lowTime1 low time for 1 bit in nanoseconds (default 600 ns)
    * @see "HAL_SetAddressableLEDBitTiming"
    */
   public static native void setBitTiming(
-      int handle,
-      int highTime0NanoSeconds,
-      int lowTime0NanoSeconds,
-      int highTime1NanoSeconds,
-      int lowTime1NanoSeconds);
+      int handle, int highTime0, int lowTime0, int highTime1, int lowTime1);
 
   /**
    * Sets the sync time.
@@ -76,10 +89,10 @@ public class AddressableLEDJNI extends JNIWrapper {
    * <p>The sync time is the time to hold output so LEDs enable. Default set for WS2812B and WS2815.
    *
    * @param handle the Addressable LED handle
-   * @param syncTimeMicroSeconds the sync time (default 280us)
+   * @param syncTime the sync time in microseconds (default 280 μs)
    * @see "HAL_SetAddressableLEDSyncTime"
    */
-  public static native void setSyncTime(int handle, int syncTimeMicroSeconds);
+  public static native void setSyncTime(int handle, int syncTime);
 
   /**
    * Starts the output.

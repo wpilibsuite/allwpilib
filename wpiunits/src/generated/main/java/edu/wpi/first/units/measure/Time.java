@@ -87,11 +87,6 @@ public interface Time extends Measure<TimeUnit> {
     return (Time) div(divisor);
   }
 
-  @Override
-  default Dimensionless per(TimeUnit period) {
-    return div(period.of(1));
-  }
-
 
   @Override
   default Mult<TimeUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
@@ -113,6 +108,11 @@ public interface Time extends Measure<TimeUnit> {
   @Override
   default Per<TimeUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<TimeUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -138,6 +138,11 @@ public interface Time extends Measure<TimeUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<TimeUnit, AngleUnit> per(AngleUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default AngularVelocity times(AngularAcceleration multiplier) {
@@ -159,6 +164,11 @@ public interface Time extends Measure<TimeUnit> {
   @Override
   default Per<TimeUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<TimeUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -184,6 +194,11 @@ public interface Time extends Measure<TimeUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<TimeUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Angle times(AngularVelocity multiplier) {
@@ -207,6 +222,11 @@ public interface Time extends Measure<TimeUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<TimeUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<TimeUnit, CurrentUnit> times(Current multiplier) {
@@ -228,6 +248,11 @@ public interface Time extends Measure<TimeUnit> {
   @Override
   default Per<TimeUnit, CurrentUnit> divide(Current divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<TimeUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
   @Override
@@ -275,6 +300,11 @@ public interface Time extends Measure<TimeUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<TimeUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<TimeUnit, EnergyUnit> times(Energy multiplier) {
@@ -296,6 +326,11 @@ public interface Time extends Measure<TimeUnit> {
   @Override
   default Per<TimeUnit, EnergyUnit> divide(Energy divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<TimeUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -321,6 +356,11 @@ public interface Time extends Measure<TimeUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<TimeUnit, ForceUnit> per(ForceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Dimensionless times(Frequency multiplier) {
@@ -342,6 +382,11 @@ public interface Time extends Measure<TimeUnit> {
   @Override
   default Per<TimeUnit, FrequencyUnit> divide(Frequency divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<TimeUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -367,6 +412,11 @@ public interface Time extends Measure<TimeUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<TimeUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<TimeUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
@@ -388,6 +438,11 @@ public interface Time extends Measure<TimeUnit> {
   @Override
   default Per<TimeUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<TimeUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -413,6 +468,11 @@ public interface Time extends Measure<TimeUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<TimeUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<TimeUnit, MassUnit> times(Mass multiplier) {
@@ -434,6 +494,11 @@ public interface Time extends Measure<TimeUnit> {
   @Override
   default Per<TimeUnit, MassUnit> divide(Mass divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<TimeUnit, MassUnit> per(MassUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -459,6 +524,11 @@ public interface Time extends Measure<TimeUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<TimeUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<TimeUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
@@ -480,6 +550,11 @@ public interface Time extends Measure<TimeUnit> {
   @Override
   default Per<TimeUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<TimeUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
   }
 
 
@@ -505,6 +580,11 @@ public interface Time extends Measure<TimeUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<TimeUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
+  }
+
 
   @Override
   default Mult<TimeUnit, PowerUnit> times(Power multiplier) {
@@ -526,6 +606,11 @@ public interface Time extends Measure<TimeUnit> {
   @Override
   default Per<TimeUnit, PowerUnit> divide(Power divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<TimeUnit, PowerUnit> per(PowerUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -551,6 +636,11 @@ public interface Time extends Measure<TimeUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<TimeUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<TimeUnit, TemperatureUnit> times(Temperature multiplier) {
@@ -572,6 +662,11 @@ public interface Time extends Measure<TimeUnit> {
   @Override
   default Per<TimeUnit, TemperatureUnit> divide(Temperature divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<TimeUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -597,6 +692,11 @@ public interface Time extends Measure<TimeUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Dimensionless per(TimeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<TimeUnit, TorqueUnit> times(Torque multiplier) {
@@ -618,6 +718,11 @@ public interface Time extends Measure<TimeUnit> {
   @Override
   default Per<TimeUnit, TorqueUnit> divide(Torque divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<TimeUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -643,6 +748,11 @@ public interface Time extends Measure<TimeUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<TimeUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<TimeUnit, VoltageUnit> times(Voltage multiplier) {
@@ -664,6 +774,11 @@ public interface Time extends Measure<TimeUnit> {
   @Override
   default Per<TimeUnit, VoltageUnit> divide(Voltage divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<TimeUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 default Frequency asFrequency() { return Hertz.of(1 / baseUnitMagnitude()); }
 }

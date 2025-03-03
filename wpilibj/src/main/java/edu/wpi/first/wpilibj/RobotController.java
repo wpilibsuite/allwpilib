@@ -556,11 +556,12 @@ public final class RobotController {
   /**
    * Get the current status of the CAN bus.
    *
+   * @param busId The bus ID
    * @return The status of the CAN bus
    */
-  public static CANStatus getCANStatus() {
+  public static CANStatus getCANStatus(int busId) {
     CANStatus status = new CANStatus();
-    CANJNI.getCANStatus(status);
+    CANJNI.getCANStatus(busId, status);
     return status;
   }
 }

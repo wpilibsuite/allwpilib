@@ -5,6 +5,7 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 
 #include <units/current.h>
 #include <units/pressure.h>
@@ -256,14 +257,23 @@ class PneumaticsBase {
   virtual Compressor MakeCompressor() = 0;
 
   /**
+   * Report usage.
+   *
+   * @param device device and channel as appropriate
+   * @param data arbitrary usage data
+   */
+  virtual void ReportUsage(std::string_view device, std::string_view data) = 0;
+
+  /**
    * For internal use to get a module for a specific type.
    *
+   * @param busId The bus ID.
    * @param module module number
    * @param moduleType module type
    * @return module
    */
   static std::shared_ptr<PneumaticsBase> GetForType(
-      int module, PneumaticsModuleType moduleType);
+      int busId, int module, PneumaticsModuleType moduleType);
 
   /**
    * For internal use to get the default for a specific type.

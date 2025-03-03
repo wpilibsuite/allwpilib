@@ -13,12 +13,12 @@ public class DIOJNI extends JNIWrapper {
   /**
    * Creates a new instance of a digital port.
    *
-   * @param halPortHandle the port handle to create from
+   * @param channel the smartio channel
    * @param input true for input, false for output
    * @return the created digital handle
    * @see "HAL_InitializeDIOPort"
    */
-  public static native int initializeDIOPort(int halPortHandle, boolean input);
+  public static native int initializeDIOPort(int channel, boolean input);
 
   /**
    * Checks if a DIO channel is valid.
@@ -89,10 +89,10 @@ public class DIOJNI extends JNIWrapper {
    * going at any time.
    *
    * @param dioPortHandle the digital port handle
-   * @param pulseLengthSeconds the active length of the pulse (in seconds)
+   * @param pulseLength the active length of the pulse in seconds
    * @see "HAL_Pulse"
    */
-  public static native void pulse(int dioPortHandle, double pulseLengthSeconds);
+  public static native void pulse(int dioPortHandle, double pulseLength);
 
   /**
    * Generates a single digital pulse on multiple channels.
@@ -101,10 +101,10 @@ public class DIOJNI extends JNIWrapper {
    * any time.
    *
    * @param channelMask the channel mask
-   * @param pulseLengthSeconds the active length of the pulse (in seconds)
+   * @param pulseLength the active length of the pulse in seconds
    * @see "HAL_PulseMultiple"
    */
-  public static native void pulseMultiple(long channelMask, double pulseLengthSeconds);
+  public static native void pulseMultiple(long channelMask, double pulseLength);
 
   /**
    * Checks a DIO line to see if it is currently generating a pulse.

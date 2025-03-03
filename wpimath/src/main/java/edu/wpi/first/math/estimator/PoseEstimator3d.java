@@ -81,7 +81,7 @@ public class PoseEstimator3d<T> {
       Matrix<N4, N1> visionMeasurementStdDevs) {
     m_odometry = odometry;
 
-    m_poseEstimate = m_odometry.getPoseMeters();
+    m_poseEstimate = m_odometry.getPose();
 
     for (int i = 0; i < 4; ++i) {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
@@ -128,14 +128,14 @@ public class PoseEstimator3d<T> {
    *
    * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The current encoder readings.
-   * @param poseMeters The position on the field that your robot is at.
+   * @param pose The position on the field that your robot is at.
    */
-  public void resetPosition(Rotation3d gyroAngle, T wheelPositions, Pose3d poseMeters) {
+  public void resetPosition(Rotation3d gyroAngle, T wheelPositions, Pose3d pose) {
     // Reset state estimate and error covariance
-    m_odometry.resetPosition(gyroAngle, wheelPositions, poseMeters);
+    m_odometry.resetPosition(gyroAngle, wheelPositions, pose);
     m_odometryPoseBuffer.clear();
     m_visionUpdates.clear();
-    m_poseEstimate = m_odometry.getPoseMeters();
+    m_poseEstimate = m_odometry.getPose();
   }
 
   /**
@@ -147,7 +147,7 @@ public class PoseEstimator3d<T> {
     m_odometry.resetPose(pose);
     m_odometryPoseBuffer.clear();
     m_visionUpdates.clear();
-    m_poseEstimate = m_odometry.getPoseMeters();
+    m_poseEstimate = m_odometry.getPose();
   }
 
   /**
@@ -159,7 +159,7 @@ public class PoseEstimator3d<T> {
     m_odometry.resetTranslation(translation);
     m_odometryPoseBuffer.clear();
     m_visionUpdates.clear();
-    m_poseEstimate = m_odometry.getPoseMeters();
+    m_poseEstimate = m_odometry.getPose();
   }
 
   /**
@@ -171,7 +171,7 @@ public class PoseEstimator3d<T> {
     m_odometry.resetRotation(rotation);
     m_odometryPoseBuffer.clear();
     m_visionUpdates.clear();
-    m_poseEstimate = m_odometry.getPoseMeters();
+    m_poseEstimate = m_odometry.getPose();
   }
 
   /**
@@ -186,10 +186,10 @@ public class PoseEstimator3d<T> {
   /**
    * Return the pose at a given timestamp, if the buffer is not empty.
    *
-   * @param timestampSeconds The pose's timestamp in seconds.
+   * @param timestamp The pose's timestamp in seconds.
    * @return The pose at the given timestamp (or Optional.empty() if the buffer is empty).
    */
-  public Optional<Pose3d> sampleAt(double timestampSeconds) {
+  public Optional<Pose3d> sampleAt(double timestamp) {
     // Step 0: If there are no odometry updates to sample, skip.
     if (m_odometryPoseBuffer.getInternalBuffer().isEmpty()) {
       return Optional.empty();
@@ -199,20 +199,19 @@ public class PoseEstimator3d<T> {
     // the buffer will always use a timestamp between the first and last timestamps)
     double oldestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().firstKey();
     double newestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().lastKey();
-    timestampSeconds =
-        MathUtil.clamp(timestampSeconds, oldestOdometryTimestamp, newestOdometryTimestamp);
+    timestamp = MathUtil.clamp(timestamp, oldestOdometryTimestamp, newestOdometryTimestamp);
 
     // Step 2: If there are no applicable vision updates, use the odometry-only information.
-    if (m_visionUpdates.isEmpty() || timestampSeconds < m_visionUpdates.firstKey()) {
-      return m_odometryPoseBuffer.getSample(timestampSeconds);
+    if (m_visionUpdates.isEmpty() || timestamp < m_visionUpdates.firstKey()) {
+      return m_odometryPoseBuffer.getSample(timestamp);
     }
 
     // Step 3: Get the latest vision update from before or at the timestamp to sample at.
-    double floorTimestamp = m_visionUpdates.floorKey(timestampSeconds);
+    double floorTimestamp = m_visionUpdates.floorKey(timestamp);
     var visionUpdate = m_visionUpdates.get(floorTimestamp);
 
     // Step 4: Get the pose measured by odometry at the time of the sample.
-    var odometryEstimate = m_odometryPoseBuffer.getSample(timestampSeconds);
+    var odometryEstimate = m_odometryPoseBuffer.getSample(timestamp);
 
     // Step 5: Apply the vision compensation to the odometry pose.
     return odometryEstimate.map(odometryPose -> visionUpdate.compensate(odometryPose));
@@ -251,20 +250,19 @@ public class PoseEstimator3d<T> {
    * recommend only adding vision measurements that are already within one meter or so of the
    * current pose estimate.
    *
-   * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
-   * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
-   *     don't use your own time source by calling {@link
+   * @param visionRobotPose The pose of the robot as measured by the vision camera.
+   * @param timestamp The timestamp of the vision measurement in seconds. Note that if you don't use
+   *     your own time source by calling {@link
    *     PoseEstimator3d#updateWithTime(double,Rotation3d,Object)} then you must use a timestamp
    *     with an epoch since FPGA startup (i.e., the epoch of this timestamp is the same epoch as
    *     {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that you should use
    *     {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source or sync the
    *     epochs.
    */
-  public void addVisionMeasurement(Pose3d visionRobotPoseMeters, double timestampSeconds) {
+  public void addVisionMeasurement(Pose3d visionRobotPose, double timestamp) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
     if (m_odometryPoseBuffer.getInternalBuffer().isEmpty()
-        || m_odometryPoseBuffer.getInternalBuffer().lastKey() - kBufferDuration
-            > timestampSeconds) {
+        || m_odometryPoseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestamp) {
       return;
     }
 
@@ -272,7 +270,7 @@ public class PoseEstimator3d<T> {
     cleanUpVisionUpdates();
 
     // Step 2: Get the pose measured by odometry at the moment the vision measurement was made.
-    var odometrySample = m_odometryPoseBuffer.getSample(timestampSeconds);
+    var odometrySample = m_odometryPoseBuffer.getSample(timestamp);
 
     if (odometrySample.isEmpty()) {
       return;
@@ -280,14 +278,14 @@ public class PoseEstimator3d<T> {
 
     // Step 3: Get the vision-compensated pose estimate at the moment the vision measurement was
     // made.
-    var visionSample = sampleAt(timestampSeconds);
+    var visionSample = sampleAt(timestamp);
 
     if (visionSample.isEmpty()) {
       return;
     }
 
     // Step 4: Measure the twist between the old pose estimate and the vision pose.
-    var twist = visionSample.get().log(visionRobotPoseMeters);
+    var twist = visionSample.get().log(visionRobotPose);
 
     // Step 5: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
@@ -307,14 +305,14 @@ public class PoseEstimator3d<T> {
 
     // Step 7: Calculate and record the vision update.
     var visionUpdate = new VisionUpdate(visionSample.get().exp(scaledTwist), odometrySample.get());
-    m_visionUpdates.put(timestampSeconds, visionUpdate);
+    m_visionUpdates.put(timestamp, visionUpdate);
 
     // Step 8: Remove later vision measurements. (Matches previous behavior)
-    m_visionUpdates.tailMap(timestampSeconds, false).entrySet().clear();
+    m_visionUpdates.tailMap(timestamp, false).entrySet().clear();
 
     // Step 9: Update latest pose estimate. Since we cleared all updates after this vision update,
     // it's guaranteed to be the latest vision update.
-    m_poseEstimate = visionUpdate.compensate(m_odometry.getPoseMeters());
+    m_poseEstimate = visionUpdate.compensate(m_odometry.getPose());
   }
 
   /**
@@ -332,23 +330,20 @@ public class PoseEstimator3d<T> {
    * to apply to future measurements until a subsequent call to {@link
    * PoseEstimator3d#setVisionMeasurementStdDevs(Matrix)} or this method.
    *
-   * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
-   * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
-   *     don't use your own time source by calling {@link #updateWithTime}, then you must use a
-   *     timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the same
-   *     epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}). This means that you
-   *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source in
-   *     this case.
+   * @param visionRobotPose The pose of the robot as measured by the vision camera.
+   * @param timestamp The timestamp of the vision measurement in seconds. Note that if you don't use
+   *     your own time source by calling {@link #updateWithTime}, then you must use a timestamp with
+   *     an epoch since FPGA startup (i.e., the epoch of this timestamp is the same epoch as {@link
+   *     edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}). This means that you should use {@link
+   *     edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source in this case.
    * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
    *     in meters, y position in meters, z position in meters, and angle in radians). Increase
    *     these numbers to trust the vision pose measurement less.
    */
   public void addVisionMeasurement(
-      Pose3d visionRobotPoseMeters,
-      double timestampSeconds,
-      Matrix<N4, N1> visionMeasurementStdDevs) {
+      Pose3d visionRobotPose, double timestamp, Matrix<N4, N1> visionMeasurementStdDevs) {
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
-    addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
+    addVisionMeasurement(visionRobotPose, timestamp);
   }
 
   /**
@@ -367,15 +362,15 @@ public class PoseEstimator3d<T> {
    * Updates the pose estimator with wheel encoder and gyro information. This should be called every
    * loop.
    *
-   * @param currentTimeSeconds Time at which this method was called, in seconds.
+   * @param currentTime Time at which this method was called, in seconds.
    * @param gyroAngle The current gyro angle.
    * @param wheelPositions The current encoder readings.
    * @return The estimated pose of the robot in meters.
    */
-  public Pose3d updateWithTime(double currentTimeSeconds, Rotation3d gyroAngle, T wheelPositions) {
+  public Pose3d updateWithTime(double currentTime, Rotation3d gyroAngle, T wheelPositions) {
     var odometryEstimate = m_odometry.update(gyroAngle, wheelPositions);
 
-    m_odometryPoseBuffer.addSample(currentTimeSeconds, odometryEstimate);
+    m_odometryPoseBuffer.addSample(currentTime, odometryEstimate);
 
     if (m_visionUpdates.isEmpty()) {
       m_poseEstimate = odometryEstimate;

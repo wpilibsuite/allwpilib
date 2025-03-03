@@ -6,7 +6,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -117,11 +116,11 @@ public class XboxController extends GenericHID implements Sendable {
    */
   public XboxController(final int port) {
     super(port);
-    HAL.report(tResourceType.kResourceType_XboxController, port + 1);
+    HAL.reportUsage("HID", port, "XboxController");
   }
 
   /**
-   * Get the X axis value of left side of the controller.
+   * Get the X axis value of left side of the controller. Right is positive.
    *
    * @return The axis value.
    */
@@ -130,7 +129,7 @@ public class XboxController extends GenericHID implements Sendable {
   }
 
   /**
-   * Get the X axis value of right side of the controller.
+   * Get the X axis value of right side of the controller. Right is positive.
    *
    * @return The axis value.
    */
@@ -139,7 +138,7 @@ public class XboxController extends GenericHID implements Sendable {
   }
 
   /**
-   * Get the Y axis value of left side of the controller.
+   * Get the Y axis value of left side of the controller. Back is positive.
    *
    * @return The axis value.
    */
@@ -148,7 +147,7 @@ public class XboxController extends GenericHID implements Sendable {
   }
 
   /**
-   * Get the Y axis value of right side of the controller.
+   * Get the Y axis value of right side of the controller. Back is positive.
    *
    * @return The axis value.
    */

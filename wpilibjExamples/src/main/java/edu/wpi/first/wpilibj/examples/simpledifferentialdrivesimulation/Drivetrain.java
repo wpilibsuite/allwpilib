@@ -30,7 +30,7 @@ public class Drivetrain {
   // 1/2 rotation per second.
   public static final double kMaxAngularSpeed = Math.PI;
 
-  private static final double kTrackWidth = 0.381 * 2;
+  private static final double kTrackwidth = 0.381 * 2;
   private static final double kWheelRadius = 0.0508;
   private static final int kEncoderResolution = -4096;
 
@@ -48,7 +48,7 @@ public class Drivetrain {
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
   private final DifferentialDriveKinematics m_kinematics =
-      new DifferentialDriveKinematics(kTrackWidth);
+      new DifferentialDriveKinematics(kTrackwidth);
   private final DifferentialDriveOdometry m_odometry =
       new DifferentialDriveOdometry(
           m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
@@ -65,7 +65,7 @@ public class Drivetrain {
       LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
   private final DifferentialDrivetrainSim m_drivetrainSimulator =
       new DifferentialDrivetrainSim(
-          m_drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
+          m_drivetrainSystem, DCMotor.getCIM(2), 8, kTrackwidth, kWheelRadius, null);
 
   /** Subsystem constructor. */
   public Drivetrain() {
@@ -92,12 +92,10 @@ public class Drivetrain {
 
   /** Sets speeds to the drivetrain motors. */
   public void setSpeeds(DifferentialDriveWheelSpeeds speeds) {
-    final double leftFeedforward = m_feedforward.calculate(speeds.leftMetersPerSecond);
-    final double rightFeedforward = m_feedforward.calculate(speeds.rightMetersPerSecond);
-    double leftOutput =
-        m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.leftMetersPerSecond);
-    double rightOutput =
-        m_rightPIDController.calculate(m_rightEncoder.getRate(), speeds.rightMetersPerSecond);
+    final double leftFeedforward = m_feedforward.calculate(speeds.left);
+    final double rightFeedforward = m_feedforward.calculate(speeds.right);
+    double leftOutput = m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.left);
+    double rightOutput = m_rightPIDController.calculate(m_rightEncoder.getRate(), speeds.right);
 
     m_leftLeader.setVoltage(leftOutput + leftFeedforward);
     m_rightLeader.setVoltage(rightOutput + rightFeedforward);
@@ -128,7 +126,7 @@ public class Drivetrain {
 
   /** Check the current robot pose. */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return m_odometry.getPose();
   }
 
   /** Update our simulation. This should be run every robot loop in simulation. */
@@ -142,16 +140,16 @@ public class Drivetrain {
         m_rightLeader.get() * RobotController.getInputVoltage());
     m_drivetrainSimulator.update(0.02);
 
-    m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPositionMeters());
-    m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocityMetersPerSecond());
-    m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPositionMeters());
-    m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocityMetersPerSecond());
+    m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPosition());
+    m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocity());
+    m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPosition());
+    m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocity());
     // m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
   }
 
   /** Update odometry - this should be run every robot loop. */
   public void periodic() {
     updateOdometry();
-    m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
+    m_fieldSim.setRobotPose(m_odometry.getPose());
   }
 }

@@ -6,8 +6,8 @@
 
 #include <algorithm>
 
-#include <hal/FRCUsageReporting.h>
 #include <hal/I2C.h>
+#include <hal/UsageReporting.h>
 
 #include "frc/Errors.h"
 
@@ -20,7 +20,8 @@ I2C::I2C(Port port, int deviceAddress)
   HAL_InitializeI2C(m_port, &status);
   FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(port));
 
-  HAL_Report(HALUsageReporting::kResourceType_I2C, deviceAddress);
+  HAL_ReportUsage(
+      fmt::format("I2C[{}][{}]", static_cast<int>(port), deviceAddress), "");
 }
 
 I2C::Port I2C::GetPort() const {

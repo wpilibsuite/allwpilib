@@ -90,14 +90,14 @@ public final class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
 
   @Override
   @SuppressWarnings("unchecked")
-  public Measure<? extends VelocityUnit<D>> zero() {
-    return (Measure<? extends VelocityUnit<D>>) super.zero();
+  public Velocity<D> zero() {
+    return (Velocity<D>) super.zero();
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public Measure<? extends VelocityUnit<D>> one() {
-    return (Measure<? extends VelocityUnit<D>>) super.one();
+  public Velocity<D> one() {
+    return (Velocity<D>) super.one();
   }
 
   @Override

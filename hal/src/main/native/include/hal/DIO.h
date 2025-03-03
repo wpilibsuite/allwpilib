@@ -21,15 +21,14 @@ extern "C" {
 /**
  * Creates a new instance of a digital port.
  *
- * @param[in] portHandle         the port handle to create from
+ * @param[in] channel            the smartio channel
  * @param[in] input              true for input, false for output
  * @param[in] allocationLocation the location where the allocation is occurring
  *                               (can be null)
  * @param[out] status            Error status variable. 0 on success.
  * @return the created digital handle
  */
-HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
-                                        HAL_Bool input,
+HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
                                         const char* allocationLocation,
                                         int32_t* status);
 
@@ -159,10 +158,10 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status);
  * single pulse going at any time.
  *
  * @param[in] dioPortHandle the digital port handle
- * @param[in] pulseLengthSeconds   the active length of the pulse (in seconds)
+ * @param[in] pulseLength   the active length of the pulse in seconds
  * @param[out] status       Error status variable. 0 on success.
  */
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
+void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
                int32_t* status);
 
 /**
@@ -172,10 +171,10 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
  * single pulse going at any time.
  *
  * @param[in] channelMask the channel mask
- * @param[in] pulseLengthSeconds   the active length of the pulse (in seconds)
- * @param[out] status       Error status variable. 0 on success.
+ * @param[in] pulseLength the active length of the pulse in seconds
+ * @param[out] status     Error status variable. 0 on success.
  */
-void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
+void HAL_PulseMultiple(uint32_t channelMask, double pulseLength,
                        int32_t* status);
 
 /**
@@ -194,60 +193,6 @@ HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status);
  * @return true if a pulse on some line is in progress
  */
 HAL_Bool HAL_IsAnyPulsing(int32_t* status);
-
-/**
- * Writes the filter index from the FPGA.
- *
- * Set the filter index used to filter out short pulses.
- *
- * @param[in] dioPortHandle the digital port handle
- * @param[in] filterIndex   the filter index (Must be in the range 0 - 3, where
- *                          0 means "none" and 1 - 3 means filter # filterIndex
- *                          - 1)
- * @param[out] status       Error status variable. 0 on success.
- */
-void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
-                         int32_t* status);
-
-/**
- * Reads the filter index from the FPGA.
- *
- * Gets the filter index used to filter out short pulses.
- *
- * @param[in] dioPortHandle the digital port handle
- * @param[out] status       Error status variable. 0 on success.
- * @return filterIndex  the filter index (Must be in the range 0 - 3, where 0
- *                      means "none" and 1 - 3 means filter # filterIndex - 1)
- */
-int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status);
-
-/**
- * Sets the filter period for the specified filter index.
- *
- * Sets the filter period in FPGA cycles.  Even though there are 2 different
- * filter index domains (MXP vs HDR), ignore that distinction for now since it
- * complicates the interface.  That can be changed later.
- *
- * @param[in] filterIndex the filter index, 0 - 2
- * @param[in] value       the number of cycles that the signal must not
- *                        transition to be counted as a transition.
- * @param[out] status     Error status variable. 0 on success.
- */
-void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status);
-
-/**
- * Gets the filter period for the specified filter index.
- *
- * Gets the filter period in FPGA cycles.  Even though there are 2 different
- * filter index domains (MXP vs HDR), ignore that distinction for now since it
- * complicates the interface.  Set status to NiFpga_Status_SoftwareFault if the
- * filter values mismatch.
- *
- * @param[in] filterIndex the filter index, 0 - 2
- * @param[out] status     Error status variable. 0 on success.
- * @return                The number of FPGA cycles of the filter period.
- */
-int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

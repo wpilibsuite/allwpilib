@@ -149,30 +149,6 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status);
 int32_t HAL_GetCommsDisableCount(int32_t* status);
 
 /**
- * Gets a port handle for a specific channel.
- *
- * The created handle does not need to be freed.
- *
- * @param channel the channel number
- * @return the created port
- */
-HAL_PortHandle HAL_GetPort(int32_t channel);
-
-/**
- * Gets a port handle for a specific channel and module.
- *
- * This is expected to be used for PCMs, as the roboRIO does not work with
- * modules anymore.
- *
- * The created handle does not need to be freed.
- *
- * @param module  the module number
- * @param channel the channel number
- * @return the created port
- */
-HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel);
-
-/**
  * Reads the microsecond-resolution timer on the FPGA.
  *
  * @param[out] status the error code, or 0 for success

@@ -6,7 +6,6 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PWM;
 
@@ -43,6 +42,6 @@ public class Koors40 extends PWMMotorController {
     m_pwm.setSpeed(0.0);
     m_pwm.setZeroLatch();
 
-    HAL.report(tResourceType.kResourceType_Koors40, getChannel() + 1);
+    HAL.reportUsage("IO", getChannel(), "Koors40");
   }
 }

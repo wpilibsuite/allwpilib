@@ -5,7 +5,6 @@
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
 #include <frc/TimedRobot.h>
-#include <frc/Ultrasonic.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/event/BooleanEvent.h>
@@ -18,16 +17,16 @@
 
 static const auto SHOT_VELOCITY = 200_rpm;
 static const auto TOLERANCE = 8_rpm;
-static const auto KICKER_THRESHOLD = 15_mm;
 
 class Robot : public frc::TimedRobot {
  public:
   Robot() {
     m_controller.SetTolerance(TOLERANCE.value());
 
-    frc::BooleanEvent isBallAtKicker{&m_loop, [&kickerSensor = m_kickerSensor] {
-                                       return kickerSensor.GetRange() <
-                                              KICKER_THRESHOLD;
+    frc::BooleanEvent isBallAtKicker{&m_loop, [] {
+                                       return false;
+                                       //    return kickerSensor.GetRange() <
+                                       //           KICKER_THRESHOLD;
                                      }};
     frc::BooleanEvent intakeButton{
         &m_loop, [&joystick = m_joystick] { return joystick.GetRawButton(2); }};
@@ -88,7 +87,6 @@ class Robot : public frc::TimedRobot {
   frc::SimpleMotorFeedforward<units::radians> m_ff{0.1_V, 0.065_V / 1_rpm};
 
   frc::PWMSparkMax m_kicker{1};
-  frc::Ultrasonic m_kickerSensor{2, 3};
 
   frc::PWMSparkMax m_intake{3};
 

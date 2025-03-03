@@ -63,10 +63,11 @@ class SharpIR : public wpi::Sendable, public wpi::SendableHelper<SharpIR> {
    * @param channel Analog input channel the sensor is connected to
    * @param a Constant A
    * @param b Constant B
-   * @param minCM Minimum distance to report in centimeters
-   * @param maxCM Maximum distance to report in centimeters
+   * @param min Minimum distance to report
+   * @param max Maximum distance to report
    */
-  SharpIR(int channel, double a, double b, double minCM, double maxCM);
+  SharpIR(int channel, double a, double b, units::meter_t min,
+          units::meter_t max);
 
   /**
    * Get the analog input channel number.
@@ -80,7 +81,7 @@ class SharpIR : public wpi::Sendable, public wpi::SendableHelper<SharpIR> {
    *
    * @return range of the target returned by the sensor
    */
-  units::centimeter_t GetRange() const;
+  units::meter_t GetRange() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
@@ -92,8 +93,8 @@ class SharpIR : public wpi::Sendable, public wpi::SendableHelper<SharpIR> {
 
   double m_A;
   double m_B;
-  double m_minCM;
-  double m_maxCM;
+  units::meter_t m_min;
+  units::meter_t m_max;
 };
 
 }  // namespace frc

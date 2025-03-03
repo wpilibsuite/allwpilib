@@ -4,17 +4,11 @@
 
 package edu.wpi.first.wpilibj.counter;
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
-
 import edu.wpi.first.hal.CounterJNI;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.DigitalSource;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 /**
  * Tachometer.
@@ -25,38 +19,27 @@ import java.nio.ByteOrder;
  * encoders, this class only needs a single digital input.
  */
 public class Tachometer implements Sendable, AutoCloseable {
-  private final DigitalSource m_source;
   private final int m_handle;
   private int m_edgesPerRevolution = 1;
 
   /**
    * Constructs a new tachometer.
    *
-   * @param source The DigitalSource (e.g. DigitalInput) of the Tachometer.
+   * @param channel The channel of the Tachometer.
+   * @param configuration The edge configuration
    */
   @SuppressWarnings("this-escape")
-  public Tachometer(DigitalSource source) {
-    m_source = requireNonNullParam(source, "source", "Tachometer");
+  public Tachometer(int channel, EdgeConfiguration configuration) {
+    m_handle = CounterJNI.initializeCounter(channel, configuration.rising);
 
-    ByteBuffer index = ByteBuffer.allocateDirect(4);
-    // set the byte order
-    index.order(ByteOrder.LITTLE_ENDIAN);
-    m_handle = CounterJNI.initializeCounter(CounterJNI.TWO_PULSE, index.asIntBuffer());
-
-    CounterJNI.setCounterUpSource(
-        m_handle, source.getPortHandleForRouting(), source.getAnalogTriggerTypeForRouting());
-    CounterJNI.setCounterUpSourceEdge(m_handle, true, false);
-
-    int intIndex = index.getInt();
-    HAL.report(tResourceType.kResourceType_Counter, intIndex + 1);
-    SendableRegistry.addLW(this, "Tachometer", intIndex);
+    HAL.reportUsage("IO", channel, "Tachometer");
+    SendableRegistry.add(this, "Tachometer", channel);
   }
 
   @Override
   public void close() {
     SendableRegistry.remove(this);
     CounterJNI.freeCounter(m_handle);
-    CounterJNI.suppressUnused(m_source);
   }
 
   /**
@@ -139,39 +122,12 @@ public class Tachometer implements Sendable, AutoCloseable {
   }
 
   /**
-   * Gets the number of samples to average.
-   *
-   * @return Samples to average.
-   */
-  public int getSamplesToAverage() {
-    return CounterJNI.getCounterSamplesToAverage(m_handle);
-  }
-
-  /**
-   * Sets the number of samples to average.
-   *
-   * @param samplesToAverage Samples to average.
-   */
-  public void setSamplesToAverage(int samplesToAverage) {
-    CounterJNI.setCounterSamplesToAverage(m_handle, samplesToAverage);
-  }
-
-  /**
    * Sets the maximum period before the tachometer is considered stopped.
    *
    * @param maxPeriod The max period (in seconds).
    */
   public void setMaxPeriod(double maxPeriod) {
     CounterJNI.setCounterMaxPeriod(m_handle, maxPeriod);
-  }
-
-  /**
-   * Sets if to update when empty.
-   *
-   * @param updateWhenEmpty Update when empty if true.
-   */
-  public void setUpdateWhenEmpty(boolean updateWhenEmpty) {
-    CounterJNI.setCounterUpdateWhenEmpty(m_handle, updateWhenEmpty);
   }
 
   @Override

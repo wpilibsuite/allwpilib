@@ -33,7 +33,7 @@ void InitializeDutyCycle() {
 }  // namespace hal::init
 
 extern "C" {
-HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_PortHandle portHandle,
+HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
                                             const char* allocationLocation,
                                             int32_t* status) {
   hal::init::CheckInit();
@@ -51,7 +51,7 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_PortHandle portHandle,
   }
 
   int16_t index = getHandleIndex(handle);
-  SimDutyCycleData[index].digitalChannel = getPortHandleChannel(portHandle);
+  SimDutyCycleData[index].digitalChannel = channel;
   SimDutyCycleData[index].initialized = true;
   SimDutyCycleData[index].simDevice = 0;
   dutyCycle->index = index;
@@ -107,9 +107,8 @@ int32_t HAL_GetDutyCycleHighTime(HAL_DutyCycleHandle dutyCycleHandle,
     return 0;
   }
 
-  double periodSeconds = 1.0 / SimDutyCycleData[dutyCycle->index].frequency;
-  double periodNanoSeconds = periodSeconds * 1e9;
-  return periodNanoSeconds * SimDutyCycleData[dutyCycle->index].output;
+  double period = 1e9 / SimDutyCycleData[dutyCycle->index].frequency;  // ns
+  return period * SimDutyCycleData[dutyCycle->index].output;
 }
 
 int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,

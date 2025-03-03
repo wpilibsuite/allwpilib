@@ -6,15 +6,16 @@
 
 #include <algorithm>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
 #include <fmt/format.h>
-#include <glass/support/DataLogReaderThread.h>
 #include <imgui.h>
-#include <wpi/DataLogReader.h>
 #include <wpi/Logger.h>
 #include <wpi/StringExtras.h>
+#include <wpi/datalog/DataLogReader.h>
+#include <wpi/datalog/DataLogReaderThread.h>
 
 #include "sysid/Util.h"
 #include "sysid/analysis/AnalysisType.h"
@@ -25,7 +26,7 @@ using namespace sysid;
 static constexpr const char* kAnalysisTypes[] = {"Elevator", "Arm", "Simple"};
 
 static bool EmitEntryTarget(const char* name, bool isString,
-                            const glass::DataLogReaderEntry** entry) {
+                            const wpi::log::DataLogReaderEntry** entry) {
   if (*entry) {
     auto text =
         fmt::format("{}: {} ({})", name, (*entry)->name, (*entry)->type);
@@ -38,8 +39,9 @@ static bool EmitEntryTarget(const char* name, bool isString,
   if (ImGui::BeginDragDropTarget()) {
     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(
             isString ? "DataLogEntryString" : "DataLogEntry")) {
-      assert(payload->DataSize == sizeof(const glass::DataLogReaderEntry*));
-      *entry = *static_cast<const glass::DataLogReaderEntry**>(payload->Data);
+      assert(payload->DataSize == sizeof(const wpi::log::DataLogReaderEntry*));
+      *entry =
+          *static_cast<const wpi::log::DataLogReaderEntry**>(payload->Data);
       rv = true;
     }
     ImGui::EndDragDropTarget();
@@ -111,6 +113,7 @@ void DataSelector::Display() {
           continue;
         }
         WPI_INFO(m_logger, "Loaded test state {}", it2->first);
+        m_executedTests.insert(it2->first);
         ++it2;
       }
       if (it->second.empty()) {
@@ -130,6 +133,15 @@ void DataSelector::Display() {
       ImGui::TextUnformatted("No tests found");
     }
     return;
+  }
+
+  if (m_executedTests.size() < 4 && !m_testCountValidated) {
+    for (auto test : kValidTests) {
+      if (!m_executedTests.contains(test)) {
+        m_missingTests.push_back(test);
+        m_testCountValidated = true;
+      }
+    }
   }
 
 #if 0
@@ -179,7 +191,7 @@ void DataSelector::Reset() {
 }
 
 DataSelector::Tests DataSelector::LoadTests(
-    const glass::DataLogReaderEntry& testStateEntry) {
+    const wpi::log::DataLogReaderEntry& testStateEntry) {
   Tests tests;
   for (auto&& range : testStateEntry.ranges) {
     std::string_view prevState;
@@ -245,7 +257,7 @@ static void AddSamples(std::vector<MotorData::Run::Sample<T>>& samples,
 }
 
 static std::vector<std::pair<int64_t, double>> GetData(
-    const glass::DataLogReaderEntry& entry, double scale) {
+    const wpi::log::DataLogReaderEntry& entry, double scale) {
   std::vector<std::pair<int64_t, double>> rv;
   bool isDouble = entry.type == "double";
   for (auto&& range : entry.ranges) {

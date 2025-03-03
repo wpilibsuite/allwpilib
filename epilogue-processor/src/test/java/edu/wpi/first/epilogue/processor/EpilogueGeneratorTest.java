@@ -33,17 +33,13 @@ class EpilogueGeneratorTest {
 
         import static edu.wpi.first.units.Units.Seconds;
 
-        import edu.wpi.first.hal.FRCNetComm;
         import edu.wpi.first.hal.HAL;
 
         import edu.wpi.first.epilogue.ExampleLogger;
 
         public final class Epilogue {
           static {
-            HAL.report(
-              FRCNetComm.tResourceType.kResourceType_LoggingFramework,
-              FRCNetComm.tInstances.kLoggingFramework_Epilogue
-            );
+            HAL.reportUsage("Epilogue", "");
           }
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -92,17 +88,13 @@ class EpilogueGeneratorTest {
 
         import static edu.wpi.first.units.Units.Seconds;
 
-        import edu.wpi.first.hal.FRCNetComm;
         import edu.wpi.first.hal.HAL;
 
         import edu.wpi.first.epilogue.ExampleLogger;
 
         public final class Epilogue {
           static {
-            HAL.report(
-              FRCNetComm.tResourceType.kResourceType_LoggingFramework,
-              FRCNetComm.tInstances.kLoggingFramework_Epilogue
-            );
+            HAL.reportUsage("Epilogue", "");
           }
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -146,17 +138,13 @@ class EpilogueGeneratorTest {
 
         import static edu.wpi.first.units.Units.Seconds;
 
-        import edu.wpi.first.hal.FRCNetComm;
         import edu.wpi.first.hal.HAL;
 
         import edu.wpi.first.epilogue.ExampleLogger;
 
         public final class Epilogue {
           static {
-            HAL.report(
-              FRCNetComm.tResourceType.kResourceType_LoggingFramework,
-              FRCNetComm.tInstances.kLoggingFramework_Epilogue
-            );
+            HAL.reportUsage("Epilogue", "");
           }
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -234,7 +222,6 @@ class EpilogueGeneratorTest {
 
         import static edu.wpi.first.units.Units.Seconds;
 
-        import edu.wpi.first.hal.FRCNetComm;
         import edu.wpi.first.hal.HAL;
 
         import edu.wpi.first.epilogue.AlphaBotLogger;
@@ -242,10 +229,7 @@ class EpilogueGeneratorTest {
 
         public final class Epilogue {
           static {
-            HAL.report(
-              FRCNetComm.tResourceType.kResourceType_LoggingFramework,
-              FRCNetComm.tInstances.kLoggingFramework_Epilogue
-            );
+            HAL.reportUsage("Epilogue", "");
           }
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -371,7 +355,6 @@ class EpilogueGeneratorTest {
 
         import static edu.wpi.first.units.Units.Seconds;
 
-        import edu.wpi.first.hal.FRCNetComm;
         import edu.wpi.first.hal.HAL;
 
         import edu.wpi.first.epilogue.ExampleLogger;
@@ -379,10 +362,7 @@ class EpilogueGeneratorTest {
 
         public final class Epilogue {
           static {
-            HAL.report(
-              FRCNetComm.tResourceType.kResourceType_LoggingFramework,
-              FRCNetComm.tInstances.kLoggingFramework_Epilogue
-            );
+            HAL.reportUsage("Epilogue", "");
           }
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();

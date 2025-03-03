@@ -6,9 +6,9 @@
 
 package edu.wpi.first.networktables;
 
+import edu.wpi.first.datalog.DataLog;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.concurrent.Event;
-import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import java.nio.charset.StandardCharsets;

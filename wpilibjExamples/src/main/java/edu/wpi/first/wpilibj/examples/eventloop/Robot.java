@@ -9,15 +9,13 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 public class Robot extends TimedRobot {
-  public static final int SHOT_VELOCITY = 200; // rpm
-  public static final int TOLERANCE = 8; // rpm
-  public static final int KICKER_THRESHOLD = 15; // mm
+  public static final double SHOT_VELOCITY = 200; // rpm
+  public static final double TOLERANCE = 8; // rpm
 
   private final PWMSparkMax m_shooter = new PWMSparkMax(0);
   private final Encoder m_shooterEncoder = new Encoder(0, 1);
@@ -25,7 +23,6 @@ public class Robot extends TimedRobot {
   private final SimpleMotorFeedforward m_ff = new SimpleMotorFeedforward(0.1, 0.065);
 
   private final PWMSparkMax m_kicker = new PWMSparkMax(1);
-  private final Ultrasonic m_kickerSensor = new Ultrasonic(2, 3);
 
   private final PWMSparkMax m_intake = new PWMSparkMax(2);
 
@@ -37,7 +34,7 @@ public class Robot extends TimedRobot {
     m_controller.setTolerance(TOLERANCE);
 
     BooleanEvent isBallAtKicker =
-        new BooleanEvent(m_loop, () -> m_kickerSensor.getRangeMM() < KICKER_THRESHOLD);
+        new BooleanEvent(m_loop, () -> false); // m_kickerSensor.getRange() < KICKER_THRESHOLD);
     BooleanEvent intakeButton = new BooleanEvent(m_loop, () -> m_joystick.getRawButton(2));
 
     // if the thumb button is held

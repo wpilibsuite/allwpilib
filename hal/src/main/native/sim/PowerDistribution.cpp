@@ -28,7 +28,7 @@ void InitializePowerDistribution() {}
 
 extern "C" {
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
-    int32_t module, HAL_PowerDistributionType type,
+    int32_t busId, int32_t module, HAL_PowerDistributionType type,
     const char* allocationLocation, int32_t* status) {
   if (type == HAL_PowerDistributionType_kAutomatic) {
     if (module != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
@@ -56,7 +56,8 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
   }
   hal::init::CheckInit();
   SimPowerDistributionData[module].initialized = true;
-  auto handle = HAL_InitializeCAN(manufacturer, module, deviceType, status);
+  auto handle =
+      HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
 
   if (*status != 0) {
     HAL_CleanCAN(handle);

@@ -28,11 +28,11 @@ using fstream = std::fstream;
 #if defined(_WIN32)
 // A Win32 HANDLE is a typedef of void*
 using file_t = void*;
+#define WPI_kInvalidFile reinterpret_cast<fs::file_t>(-1)
 #else
 using file_t = int;
+#define WPI_kInvalidFile -1
 #endif
-
-extern const file_t kInvalidFile;
 
 enum CreationDisposition : unsigned {
   /// CD_CreateAlways - When opening a file:
@@ -139,7 +139,7 @@ file_t OpenFile(const path& Path, std::error_code& EC, CreationDisposition Disp,
  *              opened in, for example, read-write or in write-only mode.
  * @param Mode The access permissions of the file, represented in octal.
  * @returns a platform-specific file descriptor if \a Name has been opened,
- *          otherwise kInvalidFile.
+ *          otherwise WPI_kInvalidFile.
  */
 inline file_t OpenFileForWrite(const path& Path, std::error_code& EC,
                                CreationDisposition Disp, OpenFlags Flags,
@@ -162,7 +162,7 @@ inline file_t OpenFileForWrite(const path& Path, std::error_code& EC,
  *              opened in, for example, read-write or in write-only mode.
  * @param Mode The access permissions of the file, represented in octal.
  * @return a platform-specific file descriptor if \a Name has been opened,
- *         otherwise kInvalidFile.
+ *         otherwise WPI_kInvalidFile.
  */
 inline file_t OpenFileForReadWrite(const path& Path, std::error_code& EC,
                                    CreationDisposition Disp, OpenFlags Flags,
@@ -181,7 +181,7 @@ inline file_t OpenFileForReadWrite(const path& Path, std::error_code& EC,
  * @param EC Error code output, set to non-zero on error
  * @param Flags Additional flags
  * @return a platform-specific file descriptor if \a Name has been opened,
- *         otherwise kInvalidFile.
+ *         otherwise WPI_kInvalidFile.
  */
 file_t OpenFileForRead(const path& Path, std::error_code& EC,
                        OpenFlags Flags = OF_None);
@@ -191,7 +191,7 @@ file_t OpenFileForRead(const path& Path, std::error_code& EC,
  * must be closed with ::close() instead of CloseFile().
  *
  * @param F On input, this is the file to convert to a file descriptor.
- *          On output, the file is set to kInvalidFile.
+ *          On output, the file is set to WPI_kInvalidFile.
  * @param EC Error code output, set to non-zero on error
  * @param Flags Flags passed to the OpenFile function that created file_t
  * @return file descriptor, or -1 on error
@@ -202,7 +202,7 @@ int FileToFd(file_t& F, std::error_code& EC, OpenFlags Flags);
  * Closes the file object.
  *
  * @param F On input, this is the file to close.  On output, the file is
- *          set to kInvalidFile.
+ *          set to WPI_kInvalidFile.
  */
 void CloseFile(file_t& F);
 

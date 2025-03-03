@@ -68,7 +68,6 @@ namespace hal::init {
 void InitializeHAL() {
   InitializeAddressableLEDData();
   InitializeAnalogInData();
-  InitializeAnalogTriggerData();
   InitializeCanData();
   InitializeCANAPI();
   InitializeDigitalPWMData();
@@ -86,7 +85,6 @@ void InitializeHAL() {
   InitializeAddressableLED();
   InitializeAnalogInput();
   InitializeAnalogInternal();
-  InitializeAnalogTrigger();
   InitializeCAN();
   InitializeConstants();
   InitializeCounter();
@@ -97,7 +95,6 @@ void InitializeHAL() {
   InitializeEncoder();
   InitializeExtensions();
   InitializeI2C();
-  InitializeInterrupts();
   InitializeMain();
   InitializeMockHooks();
   InitializeNotifier();
@@ -114,25 +111,6 @@ void InitializeHAL() {
 }  // namespace hal::init
 
 extern "C" {
-
-HAL_PortHandle HAL_GetPort(int32_t channel) {
-  // Dont allow a number that wouldn't fit in a uint8_t
-  if (channel < 0 || channel >= 255) {
-    return HAL_kInvalidHandle;
-  }
-  return createPortHandle(channel, 1);
-}
-
-HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel) {
-  // Dont allow a number that wouldn't fit in a uint8_t
-  if (channel < 0 || channel >= 255) {
-    return HAL_kInvalidHandle;
-  }
-  if (module < 0 || module >= 255) {
-    return HAL_kInvalidHandle;
-  }
-  return createPortHandle(channel, module);
-}
 
 const char* HAL_GetErrorMessage(int32_t code) {
   switch (code) {
@@ -480,8 +458,8 @@ void HALSIM_CancelAllSimPeriodicCallbacks(void) {
   gSimPeriodicAfter.Reset();
 }
 
-int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
-                   const char* feature) {
+int32_t HAL_ReportUsage(const struct WPI_String* resource,
+                        const struct WPI_String* data) {
   return 0;  // Do nothing for now
 }
 

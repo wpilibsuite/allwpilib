@@ -1,4 +1,5 @@
 load("@rules_java//java:defs.bzl", "java_library", "java_plugin")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 
 java_library(
     name = "processor",
@@ -18,5 +19,17 @@ java_plugin(
     visibility = ["//visibility:public"],
     deps = [
         ":processor",
+    ],
+)
+
+wpilib_java_junit5_test(
+    name = "processor-test",
+    srcs = glob(["src/test/java/**/*.java"]),
+    plugins = [
+        ":plugin",
+    ],
+    deps = [
+        ":processor",
+        "@maven//:com_google_testing_compile_compile_testing",
     ],
 )

@@ -8,7 +8,7 @@
 #include <utility>
 
 #include <hal/Encoder.h>
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -20,44 +20,7 @@ using namespace frc;
 
 Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
                  EncodingType encodingType) {
-  m_aSource = std::make_shared<DigitalInput>(aChannel);
-  m_bSource = std::make_shared<DigitalInput>(bChannel);
-  InitEncoder(reverseDirection, encodingType);
-  wpi::SendableRegistry::AddChild(this, m_aSource.get());
-  wpi::SendableRegistry::AddChild(this, m_bSource.get());
-}
-
-Encoder::Encoder(DigitalSource* aSource, DigitalSource* bSource,
-                 bool reverseDirection, EncodingType encodingType)
-    : m_aSource(aSource, wpi::NullDeleter<DigitalSource>()),
-      m_bSource(bSource, wpi::NullDeleter<DigitalSource>()) {
-  if (!m_aSource) {
-    throw FRC_MakeError(err::NullParameter, "aSource");
-  }
-  if (!m_bSource) {
-    throw FRC_MakeError(err::NullParameter, "bSource");
-  }
-  InitEncoder(reverseDirection, encodingType);
-}
-
-Encoder::Encoder(DigitalSource& aSource, DigitalSource& bSource,
-                 bool reverseDirection, EncodingType encodingType)
-    : m_aSource(&aSource, wpi::NullDeleter<DigitalSource>()),
-      m_bSource(&bSource, wpi::NullDeleter<DigitalSource>()) {
-  InitEncoder(reverseDirection, encodingType);
-}
-
-Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
-                 std::shared_ptr<DigitalSource> bSource, bool reverseDirection,
-                 EncodingType encodingType)
-    : m_aSource(std::move(aSource)), m_bSource(std::move(bSource)) {
-  if (!m_aSource) {
-    throw FRC_MakeError(err::NullParameter, "aSource");
-  }
-  if (!m_bSource) {
-    throw FRC_MakeError(err::NullParameter, "bSource");
-  }
-  InitEncoder(reverseDirection, encodingType);
+  InitEncoder(aChannel, bChannel, reverseDirection, encodingType);
 }
 
 int Encoder::Get() const {
@@ -172,24 +135,6 @@ int Encoder::GetSamplesToAverage() const {
   return result;
 }
 
-void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
-  // Force digital input if just given an index
-  m_indexSource = std::make_shared<DigitalInput>(channel);
-  wpi::SendableRegistry::AddChild(this, m_indexSource.get());
-  SetIndexSource(*m_indexSource.get(), type);
-}
-
-void Encoder::SetIndexSource(const DigitalSource& source,
-                             Encoder::IndexingType type) {
-  int32_t status = 0;
-  HAL_SetEncoderIndexSource(m_encoder, source.GetPortHandleForRouting(),
-                            static_cast<HAL_AnalogTriggerType>(
-                                source.GetAnalogTriggerTypeForRouting()),
-                            static_cast<HAL_EncoderIndexingType>(type),
-                            &status);
-  FRC_CheckErrorStatus(status, "SetIndexSource");
-}
-
 void Encoder::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetEncoderSimDevice(m_encoder, device);
 }
@@ -219,22 +164,28 @@ void Encoder::InitSendable(wpi::SendableBuilder& builder) {
       nullptr);
 }
 
-void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
+void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
+                          EncodingType encodingType) {
   int32_t status = 0;
   m_encoder = HAL_InitializeEncoder(
-      m_aSource->GetPortHandleForRouting(),
-      static_cast<HAL_AnalogTriggerType>(
-          m_aSource->GetAnalogTriggerTypeForRouting()),
-      m_bSource->GetPortHandleForRouting(),
-      static_cast<HAL_AnalogTriggerType>(
-          m_bSource->GetAnalogTriggerTypeForRouting()),
-      reverseDirection, static_cast<HAL_EncoderEncodingType>(encodingType),
-      &status);
+      aChannel, bChannel, reverseDirection,
+      static_cast<HAL_EncoderEncodingType>(encodingType), &status);
   FRC_CheckErrorStatus(status, "InitEncoder");
 
-  HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex() + 1,
-             encodingType);
-  wpi::SendableRegistry::AddLW(this, "Encoder", m_aSource->GetChannel());
+  const char* type = "Encoder";
+  switch (encodingType) {
+    case k1X:
+      type = "Encoder:1x";
+      break;
+    case k2X:
+      type = "Encoder:2x";
+      break;
+    case k4X:
+      type = "Encoder:4x";
+      break;
+  }
+  HAL_ReportUsage(fmt::format("IO[{},{}]", aChannel, bChannel), type);
+  // wpi::SendableRegistry::Add(this, "Encoder", m_aSource->GetChannel());
 }
 
 double Encoder::DecodingScaleFactor() const {

@@ -93,7 +93,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     m_fullRange = fullRange;
     m_expectedZero = expectedZero;
 
-    SendableRegistry.addLW(this, "DutyCycle Encoder", m_dutyCycle.getSourceChannel());
+    SendableRegistry.add(this, "DutyCycle Encoder", m_dutyCycle.getSourceChannel());
   }
 
   private double mapSensorRange(double pos) {

@@ -22,8 +22,8 @@ class ChassisSpeedsStructTest {
     buffer.rewind();
 
     ChassisSpeeds data = ChassisSpeeds.struct.unpack(buffer);
-    assertEquals(DATA.vxMetersPerSecond, data.vxMetersPerSecond);
-    assertEquals(DATA.vyMetersPerSecond, data.vyMetersPerSecond);
-    assertEquals(DATA.omegaRadiansPerSecond, data.omegaRadiansPerSecond);
+    assertEquals(DATA.vx, data.vx);
+    assertEquals(DATA.vy, data.vy);
+    assertEquals(DATA.omega, data.omega);
   }
 }

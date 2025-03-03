@@ -159,19 +159,19 @@ class KalmanFilterTest {
     var time = 0.0;
     var lastVelocity = VecBuilder.fill(0.0, 0.0, 0.0);
 
-    while (time <= trajectory.getTotalTimeSeconds()) {
+    while (time <= trajectory.getTotalTime()) {
       var sample = trajectory.sample(time);
       var measurement =
           VecBuilder.fill(
-              sample.poseMeters.getTranslation().getX() + random.nextGaussian() / 5d,
-              sample.poseMeters.getTranslation().getY() + random.nextGaussian() / 5d,
-              sample.poseMeters.getRotation().getRadians() + random.nextGaussian() / 3d);
+              sample.pose.getTranslation().getX() + random.nextGaussian() / 5d,
+              sample.pose.getTranslation().getY() + random.nextGaussian() / 5d,
+              sample.pose.getRotation().getRadians() + random.nextGaussian() / 3d);
 
       var velocity =
           VecBuilder.fill(
-              sample.velocityMetersPerSecond * sample.poseMeters.getRotation().getCos(),
-              sample.velocityMetersPerSecond * sample.poseMeters.getRotation().getSin(),
-              sample.curvatureRadPerMeter * sample.velocityMetersPerSecond);
+              sample.velocity * sample.pose.getRotation().getCos(),
+              sample.velocity * sample.pose.getRotation().getSin(),
+              sample.curvature * sample.velocity);
       var u = (velocity.minus(lastVelocity)).div(0.020);
       lastVelocity = velocity;
 
@@ -182,11 +182,11 @@ class KalmanFilterTest {
     }
 
     assertEquals(
-        trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getTranslation().getX(),
+        trajectory.sample(trajectory.getTotalTime()).pose.getTranslation().getX(),
         filter.getXhat(0),
         0.2);
     assertEquals(
-        trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getTranslation().getY(),
+        trajectory.sample(trajectory.getTotalTime()).pose.getTranslation().getY(),
         filter.getXhat(1),
         0.2);
   }

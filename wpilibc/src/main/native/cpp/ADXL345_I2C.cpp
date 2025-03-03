@@ -4,7 +4,7 @@
 
 #include "frc/ADXL345_I2C.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <networktables/DoubleTopic.h>
 #include <networktables/NTSendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -27,10 +27,11 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
   // Specify the data format to read
   SetRange(range);
 
-  HAL_Report(HALUsageReporting::kResourceType_ADXL345,
-             HALUsageReporting::kADXL345_I2C, 0);
+  HAL_ReportUsage(
+      fmt::format("I2C[{}][{}]", static_cast<int>(port), deviceAddress),
+      "ADXL345");
 
-  wpi::SendableRegistry::AddLW(this, "ADXL345_I2C", port);
+  wpi::SendableRegistry::Add(this, "ADXL345_I2C", port);
 }
 
 I2C::Port ADXL345_I2C::GetI2CPort() const {

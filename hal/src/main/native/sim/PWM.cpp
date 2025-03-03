@@ -63,13 +63,12 @@ static inline int32_t GetFullRangeScaleFactor(DigitalPort* port) {
 
 extern "C" {
 
-HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
+HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
                                         const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
 
-  int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex) {
+  if (channel < 0 || channel >= kNumPWMChannels) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
                                      kNumPWMChannels, channel);

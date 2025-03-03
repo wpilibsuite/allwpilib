@@ -6,10 +6,11 @@
 
 #include <string>
 
+#include <networktables/IntegerTopic.h>
+
 #include "PortsInternal.h"
 #include "hal/handles/DigitalHandleResource.h"
 #include "hal/handles/HandlesInternal.h"
-#include "networktables/IntegerTopic.h"
 
 namespace hal {
 
@@ -66,6 +67,8 @@ struct SmartIo {
   int32_t GetPwmMicroseconds(uint16_t* microseconds);
 
   int32_t GetAnalogInput(uint16_t* value);
+
+  int32_t GetCounter(int32_t* count);
 };
 
 extern DigitalHandleResource<HAL_DigitalHandle, SmartIo, kNumSmartIo>*

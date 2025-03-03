@@ -6,8 +6,7 @@
 
 package edu.wpi.first.wpilibj;
 
-// import edu.wpi.first.hal.FRCNetComm.tResourceType;
-// import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
@@ -123,11 +122,11 @@ public class StadiaController extends GenericHID implements Sendable {
    */
   public StadiaController(final int port) {
     super(port);
-    // HAL.report(tResourceType.kResourceType_StadiaController, port + 1);
+    HAL.reportUsage("HID", port, "StadiaController");
   }
 
   /**
-   * Get the X axis value of left side of the controller.
+   * Get the X axis value of left side of the controller. Right is positive.
    *
    * @return The axis value.
    */
@@ -136,7 +135,7 @@ public class StadiaController extends GenericHID implements Sendable {
   }
 
   /**
-   * Get the X axis value of right side of the controller.
+   * Get the X axis value of right side of the controller. Right is positive.
    *
    * @return The axis value.
    */
@@ -145,7 +144,7 @@ public class StadiaController extends GenericHID implements Sendable {
   }
 
   /**
-   * Get the Y axis value of left side of the controller.
+   * Get the Y axis value of left side of the controller. Back is positive.
    *
    * @return The axis value.
    */
@@ -154,7 +153,7 @@ public class StadiaController extends GenericHID implements Sendable {
   }
 
   /**
-   * Get the Y axis value of right side of the controller.
+   * Get the Y axis value of right side of the controller. Back is positive.
    *
    * @return The axis value.
    */

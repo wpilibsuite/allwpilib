@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -29,12 +27,13 @@ public class Compressor implements Sendable, AutoCloseable {
   /**
    * Constructs a compressor for a specified module and type.
    *
+   * @param busId The bus ID
    * @param module The module ID to use.
    * @param moduleType The module type to use.
    */
   @SuppressWarnings("this-escape")
-  public Compressor(int module, PneumaticsModuleType moduleType) {
-    m_module = PneumaticsBase.getForType(module, moduleType);
+  public Compressor(int busId, int module, PneumaticsModuleType moduleType) {
+    m_module = PneumaticsBase.getForType(busId, module, moduleType);
     m_moduleType = moduleType;
 
     if (!m_module.reserveCompressor()) {
@@ -44,17 +43,18 @@ public class Compressor implements Sendable, AutoCloseable {
 
     m_module.enableCompressorDigital();
 
-    HAL.report(tResourceType.kResourceType_Compressor, module + 1);
-    SendableRegistry.addLW(this, "Compressor", module);
+    m_module.reportUsage("Compressor", "");
+    SendableRegistry.add(this, "Compressor", module);
   }
 
   /**
    * Constructs a compressor for a default module and specified type.
    *
+   * @param busId The bus ID
    * @param moduleType The module type to use.
    */
-  public Compressor(PneumaticsModuleType moduleType) {
-    this(PneumaticsBase.getDefaultForType(moduleType), moduleType);
+  public Compressor(int busId, PneumaticsModuleType moduleType) {
+    this(busId, PneumaticsBase.getDefaultForType(moduleType), moduleType);
   }
 
   @Override

@@ -68,7 +68,6 @@
     "tags": [
       "Hardware",
       "Joystick",
-      "Shuffleboard",
       "Pneumatics"
     ],
     "foldername": "solenoid",
@@ -98,34 +97,6 @@
       "EventLoop"
     ],
     "foldername": "eventloop",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "Ultrasonic",
-    "description": "View values from a ping-response ultrasonic sensor.",
-    "tags": [
-      "Hardware",
-      "Ultrasonic",
-      "SmartDashboard",
-      "Shuffleboard"
-    ],
-    "foldername": "ultrasonic",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "Ultrasonic PID",
-    "description": "Maintain a set distance from an obstacle with an ultrasonic sensor and PID control.",
-    "tags": [
-      "Basic Robot",
-      "Ultrasonic",
-      "PID",
-      "Differential Drive"
-    ],
-    "foldername": "ultrasonicpid",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -309,22 +280,6 @@
     "commandversion": 2
   },
   {
-    "name": "Shuffleboard",
-    "description": "Present various data via the Shuffleboard API.",
-    "tags": [
-      "Basic Robot",
-      "Differential Drive",
-      "Elevator",
-      "Analog",
-      "Encoder",
-      "Shuffleboard"
-    ],
-    "foldername": "shuffleboard",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
     "name": "'Traditional' Hatchbot",
     "description": "A fully-functional command-based hatchbot for the 2019 game, written in the 'traditional' style, i.e. commands are given their own classes.",
     "tags": [
@@ -333,7 +288,6 @@
       "Differential Drive",
       "Encoder",
       "Pneumatics",
-      "Shuffleboard",
       "Sendable",
       "DataLog",
       "XboxController"
@@ -352,7 +306,6 @@
       "Differential Drive",
       "Encoder",
       "Pneumatics",
-      "Shuffleboard",
       "Sendable",
       "DataLog",
       "PS4Controller"

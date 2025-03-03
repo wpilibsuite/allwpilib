@@ -24,13 +24,12 @@ void InitializeDutyCycle() {}
 }  // namespace hal::init
 
 extern "C" {
-HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_PortHandle portHandle,
+HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
                                             const char* allocationLocation,
                                             int32_t* status) {
   hal::init::CheckInit();
 
-  int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex || channel >= kNumSmartIo) {
+  if (channel < 0 || channel >= kNumSmartIo) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DutyCycle", 0,
                                      kNumSmartIo, channel);

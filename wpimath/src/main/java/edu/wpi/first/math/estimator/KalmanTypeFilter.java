@@ -76,9 +76,9 @@ public interface KalmanTypeFilter<States extends Num, Inputs extends Num, Output
    * Project the model into the future with a new control input u.
    *
    * @param u New control input from controller.
-   * @param dtSeconds Timestep for prediction.
+   * @param dt Timestep for prediction in seconds.
    */
-  void predict(Matrix<Inputs, N1> u, double dtSeconds);
+  void predict(Matrix<Inputs, N1> u, double dt);
 
   /**
    * Correct the state estimate x-hat using the measurements in y.

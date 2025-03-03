@@ -33,8 +33,7 @@ class AlertsTest : public ::testing::Test {
   std::string GetGroupName() {
     const ::testing::TestInfo* testInfo =
         ::testing::UnitTest::GetInstance()->current_test_info();
-    return fmt::format("{}_{}", testInfo->test_suite_name(),
-                       testInfo->test_case_name());
+    return fmt::format("{}_{}", testInfo->test_suite_name(), testInfo->name());
   }
 
   template <typename... Args>
@@ -80,7 +79,16 @@ class AlertsTest : public ::testing::Test {
 #define EXPECT_STATE(type, ...) \
   EXPECT_EQ(GetActiveAlerts(type), (std::vector<std::string>{__VA_ARGS__}))
 
-TEST_F(AlertsTest, SetUnset) {
+TEST_F(AlertsTest, SetUnsetSingle) {
+  auto one = MakeAlert("one", kInfo);
+  EXPECT_FALSE(IsAlertActive("one", kInfo));
+  one.Set(true);
+  EXPECT_TRUE(IsAlertActive("one", kInfo));
+  one.Set(false);
+  EXPECT_FALSE(IsAlertActive("one", kInfo));
+}
+
+TEST_F(AlertsTest, SetUnsetMultiple) {
   auto one = MakeAlert("one", kError);
   auto two = MakeAlert("two", kInfo);
   EXPECT_FALSE(IsAlertActive("one", kError));

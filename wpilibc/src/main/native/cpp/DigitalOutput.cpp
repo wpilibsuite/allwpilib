@@ -7,9 +7,9 @@
 #include <string>
 
 #include <hal/DIO.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
+#include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -28,12 +28,11 @@ DigitalOutput::DigitalOutput(int channel) {
 
   int32_t status = 0;
   std::string stackTrace = wpi::GetStackTrace(1);
-  m_handle = HAL_InitializeDIOPort(HAL_GetPort(channel), false,
-                                   stackTrace.c_str(), &status);
+  m_handle = HAL_InitializeDIOPort(channel, false, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
-  HAL_Report(HALUsageReporting::kResourceType_DigitalOutput, channel + 1);
-  wpi::SendableRegistry::AddLW(this, "DigitalOutput", channel);
+  HAL_ReportUsage("IO", channel, "DigitalOutput");
+  wpi::SendableRegistry::Add(this, "DigitalOutput", channel);
 }
 
 DigitalOutput::~DigitalOutput() {
@@ -58,18 +57,6 @@ bool DigitalOutput::Get() const {
   bool val = HAL_GetDIO(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
   return val;
-}
-
-HAL_Handle DigitalOutput::GetPortHandleForRouting() const {
-  return m_handle;
-}
-
-AnalogTriggerType DigitalOutput::GetAnalogTriggerTypeForRouting() const {
-  return static_cast<AnalogTriggerType>(0);
-}
-
-bool DigitalOutput::IsAnalogTrigger() const {
-  return false;
 }
 
 int DigitalOutput::GetChannel() const {

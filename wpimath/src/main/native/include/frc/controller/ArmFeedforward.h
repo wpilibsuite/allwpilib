@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <cstdlib>
+
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
 
@@ -241,6 +243,34 @@ class WPILIB_DLLEXPORT ArmFeedforward {
       units::unit_t<Velocity> velocity) {
     return MaxAchievableAcceleration(-maxVoltage, angle, velocity);
   }
+
+  /**
+   * Sets the static gain.
+   *
+   * @param kS The static gain.
+   */
+  constexpr void SetKs(units::volt_t kS) { this->kS = kS; }
+
+  /**
+   * Sets the gravity gain.
+   *
+   * @param kG The gravity gain.
+   */
+  constexpr void SetKg(units::volt_t kG) { this->kG = kG; }
+
+  /**
+   * Sets the velocity gain.
+   *
+   * @param kV The velocity gain.
+   */
+  constexpr void SetKv(units::unit_t<kv_unit> kV) { this->kV = kV; }
+
+  /**
+   * Sets the acceleration gain.
+   *
+   * @param kA The acceleration gain.
+   */
+  constexpr void SetKa(units::unit_t<ka_unit> kA) { this->kA = kA; }
 
   /**
    * Returns the static gain.

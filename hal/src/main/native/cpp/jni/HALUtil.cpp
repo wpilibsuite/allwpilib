@@ -41,17 +41,13 @@ static JException illegalArgExCls;
 static JException boundaryExCls;
 static JException allocationExCls;
 static JException halHandleExCls;
-static JException canInvalidBufferExCls;
-static JException canMessageNotFoundExCls;
-static JException canMessageNotAllowedExCls;
-static JException canNotInitializedExCls;
 static JException uncleanStatusExCls;
 static JException nullPointerEx;
 static JClass powerDistributionVersionCls;
 static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
 static JClass matchInfoDataCls;
-static JClass canDataCls;
+static JClass canReceiveMessageCls;
 static JClass canStreamMessageCls;
 static JClass halValueCls;
 static JClass revPHVersionCls;
@@ -63,8 +59,8 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/hal/PWMConfigDataResult", &pwmConfigDataResultCls},
     {"edu/wpi/first/hal/can/CANStatus", &canStatusCls},
     {"edu/wpi/first/hal/MatchInfoData", &matchInfoDataCls},
-    {"edu/wpi/first/hal/CANData", &canDataCls},
-    {"edu/wpi/first/hal/CANStreamMessage", &canStreamMessageCls},
+    {"edu/wpi/first/hal/can/CANReceiveMessage", &canReceiveMessageCls},
+    {"edu/wpi/first/hal/can/CANStreamMessage", &canStreamMessageCls},
     {"edu/wpi/first/hal/HALValue", &halValueCls},
     {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls},
     {"edu/wpi/first/hal/can/CANStreamOverflowException",
@@ -75,13 +71,6 @@ static const JExceptionInit exceptions[] = {
     {"edu/wpi/first/hal/util/BoundaryException", &boundaryExCls},
     {"edu/wpi/first/hal/util/AllocationException", &allocationExCls},
     {"edu/wpi/first/hal/util/HalHandleException", &halHandleExCls},
-    {"edu/wpi/first/hal/can/CANInvalidBufferException", &canInvalidBufferExCls},
-    {"edu/wpi/first/hal/can/CANMessageNotFoundException",
-     &canMessageNotFoundExCls},
-    {"edu/wpi/first/hal/can/CANMessageNotAllowedException",
-     &canMessageNotAllowedExCls},
-    {"edu/wpi/first/hal/can/CANNotInitializedException",
-     &canNotInitializedExCls},
     {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls},
     {"java/lang/NullPointerException", &nullPointerEx}};
 
@@ -150,64 +139,6 @@ void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
   }
   ThrowUncleanStatusException(
       env, fmt::format(" Code: {}. {}", status, lastError).c_str(), status);
-}
-
-void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
-  if (status >= 0) {
-    return;
-  }
-  switch (status) {
-    case kRioStatusSuccess:
-      // Everything is ok... don't throw.
-      break;
-    case HAL_ERR_CANSessionMux_InvalidBuffer:
-    case kRIOStatusBufferInvalidSize: {
-      static jmethodID invalidBufConstruct = nullptr;
-      if (!invalidBufConstruct) {
-        invalidBufConstruct =
-            env->GetMethodID(canInvalidBufferExCls, "<init>", "()V");
-      }
-      jobject exception =
-          env->NewObject(canInvalidBufferExCls, invalidBufConstruct);
-      env->Throw(static_cast<jthrowable>(exception));
-      break;
-    }
-    case HAL_ERR_CANSessionMux_MessageNotFound:
-    case kRIOStatusOperationTimedOut: {
-      static jmethodID messageNotFoundConstruct = nullptr;
-      if (!messageNotFoundConstruct) {
-        messageNotFoundConstruct =
-            env->GetMethodID(canMessageNotFoundExCls, "<init>", "()V");
-      }
-      jobject exception =
-          env->NewObject(canMessageNotFoundExCls, messageNotFoundConstruct);
-      env->Throw(static_cast<jthrowable>(exception));
-      break;
-    }
-    case HAL_ERR_CANSessionMux_NotAllowed:
-    case kRIOStatusFeatureNotSupported: {
-      canMessageNotAllowedExCls.Throw(
-          env, fmt::format("MessageID = {}", message_id).c_str());
-      break;
-    }
-    case HAL_ERR_CANSessionMux_NotInitialized:
-    case kRIOStatusResourceNotInitialized: {
-      static jmethodID notInitConstruct = nullptr;
-      if (!notInitConstruct) {
-        notInitConstruct =
-            env->GetMethodID(canNotInitializedExCls, "<init>", "()V");
-      }
-      jobject exception =
-          env->NewObject(canNotInitializedExCls, notInitConstruct);
-      env->Throw(static_cast<jthrowable>(exception));
-      break;
-    }
-    default: {
-      uncleanStatusExCls.Throw(
-          env, fmt::format("Fatal status code detected: {}", status).c_str());
-      break;
-    }
-  }
 }
 
 void ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
@@ -302,24 +233,27 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
       static_cast<jint>(matchInfo.matchType));
 }
 
-jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
-                            uint64_t timestamp) {
-  static jmethodID func = env->GetMethodID(canDataCls, "setData", "(IJ)[B");
+jbyteArray SetCANReceiveMessageObject(JNIEnv* env, jobject canData,
+                                      int32_t length, int32_t flags,
+                                      uint64_t timestamp) {
+  static jmethodID func =
+      env->GetMethodID(canReceiveMessageCls, "setReceiveData", "(IIJ)[B");
 
   jbyteArray retVal = static_cast<jbyteArray>(env->CallObjectMethod(
-      canData, func, static_cast<jint>(length), static_cast<jlong>(timestamp)));
+      canData, func, static_cast<jint>(length), static_cast<jint>(flags),
+      static_cast<jlong>(timestamp)));
   return retVal;
 }
 
 jbyteArray SetCANStreamObject(JNIEnv* env, jobject canStreamData,
-                              int32_t length, uint32_t messageID,
+                              int32_t length, uint32_t messageId,
                               uint64_t timestamp) {
   static jmethodID func =
       env->GetMethodID(canStreamMessageCls, "setStreamData", "(IIJ)[B");
 
   jbyteArray retVal = static_cast<jbyteArray>(env->CallObjectMethod(
       canStreamData, func, static_cast<jint>(length),
-      static_cast<jint>(messageID), static_cast<jlong>(timestamp)));
+      static_cast<jint>(messageId), static_cast<jlong>(timestamp)));
   return retVal;
 }
 

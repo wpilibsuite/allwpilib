@@ -6,10 +6,10 @@
 
 #include <utility>
 
-#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
+#include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -26,8 +26,7 @@ PWM::PWM(int channel, bool registerSendable) {
 
   auto stack = wpi::GetStackTrace(1);
   int32_t status = 0;
-  m_handle =
-      HAL_InitializePWMPort(HAL_GetPort(channel), stack.c_str(), &status);
+  m_handle = HAL_InitializePWMPort(channel, stack.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   m_channel = channel;
@@ -38,9 +37,9 @@ PWM::PWM(int channel, bool registerSendable) {
   HAL_SetPWMEliminateDeadband(m_handle, false, &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
-  HAL_Report(HALUsageReporting::kResourceType_PWM, channel + 1);
+  HAL_ReportUsage("IO", channel, "PWM");
   if (registerSendable) {
-    wpi::SendableRegistry::AddLW(this, "PWM", channel);
+    wpi::SendableRegistry::Add(this, "PWM", channel);
   }
 }
 
@@ -174,7 +173,6 @@ int PWM::GetChannel() const {
 void PWM::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PWM");
   builder.SetActuator(true);
-  builder.SetSafeState([=, this] { SetDisabled(); });
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetPulseTime().value(); },
       [=, this](double value) { SetPulseTime(units::millisecond_t{value}); });

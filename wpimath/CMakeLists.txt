@@ -14,7 +14,6 @@ file(
     src/main/native/cpp/jni/Exceptions.cpp
     src/main/native/cpp/jni/Pose3dJNI.cpp
     src/main/native/cpp/jni/StateSpaceUtilJNI.cpp
-    src/main/native/cpp/jni/TrajectoryUtilJNI.cpp
 )
 
 # Java bindings
@@ -189,6 +188,12 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/src>
 )
 
+install(
+    DIRECTORY src/generated/main/native/cpp/
+    DESTINATION "${include_dest}/wpimath"
+    FILES_MATCHING
+    PATTERN "*.h"
+)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
 target_include_directories(
     wpimath

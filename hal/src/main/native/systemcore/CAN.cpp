@@ -21,13 +21,12 @@
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
 
+#include "PortsInternal.h"
 #include "hal/Errors.h"
 #include "hal/Threads.h"
 #include "wpinet/EventLoopRunner.h"
 #include "wpinet/uv/Poll.h"
 #include "wpinet/uv/Timer.h"
-
-#define NUM_CAN_BUSES 1
 
 namespace {
 
@@ -68,20 +67,21 @@ struct FrameStore {
 struct SocketCanState {
   wpi::EventLoopRunner readLoopRunner;
   wpi::EventLoopRunner writeLoopRunner;
-  wpi::mutex writeMutex[NUM_CAN_BUSES];
-  int socketHandle[NUM_CAN_BUSES];
+  wpi::mutex writeMutex[hal::kNumCanBuses];
+  int socketHandle[hal::kNumCanBuses];
   // ms to count/timer map
   wpi::DenseMap<uint16_t, std::pair<size_t, std::weak_ptr<wpi::uv::Timer>>>
       timers;
   // ms to bus mask/packet
-  wpi::DenseMap<uint16_t, std::array<std::optional<canfd_frame>, NUM_CAN_BUSES>>
+  wpi::DenseMap<uint16_t,
+                std::array<std::optional<canfd_frame>, hal::kNumCanBuses>>
       timedFrames;
   // packet to time
-  wpi::DenseMap<uint32_t, std::array<uint16_t, NUM_CAN_BUSES>> packetToTime;
+  wpi::DenseMap<uint32_t, std::array<uint16_t, hal::kNumCanBuses>> packetToTime;
 
-  wpi::mutex readMutex[NUM_CAN_BUSES];
+  wpi::mutex readMutex[hal::kNumCanBuses];
   // TODO(thadhouse) we need a MUCH better way of doing this masking
-  wpi::DenseMap<uint32_t, FrameStore> readFrames[NUM_CAN_BUSES];
+  wpi::DenseMap<uint32_t, FrameStore> readFrames[hal::kNumCanBuses];
 
   bool InitializeBuses();
 
@@ -111,7 +111,7 @@ bool SocketCanState::InitializeBuses() {
       std::printf("Failed to set CAN thread priority\n");
     }
 
-    for (int i = 0; i < NUM_CAN_BUSES; i++) {
+    for (int i = 0; i < hal::kNumCanBuses; i++) {
       std::scoped_lock lock{writeMutex[i]};
       socketHandle[i] = socket(PF_CAN, SOCK_RAW, CAN_RAW);
       if (socketHandle[i] == -1) {
@@ -240,23 +240,21 @@ namespace {}  // namespace
 
 extern "C" {
 
-void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
-                         uint8_t dataSize, int32_t periodMs, int32_t* status) {
-  // TODO(thadhouse) this will become a parameter
-  // isFd will also be a part of this parameter
-  uint8_t busId = 0;
-
-  if (busId >= NUM_CAN_BUSES) {
+void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
+                         const struct HAL_CANMessage* message, int32_t periodMs,
+                         int32_t* status) {
+  if (busId < 0 || busId >= hal::kNumCanBuses) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
 
-  bool isFd = false;
-  messageID = MapMessageIdToSocketCan(messageID);
+  messageId = MapMessageIdToSocketCan(messageId);
 
+  // TODO determine on the real roborio is a non periodic send removes any
+  // periodic send.
   if (periodMs == HAL_CAN_SEND_PERIOD_STOP_REPEATING) {
-    canState->writeLoopRunner.ExecSync([messageID, busId](wpi::uv::Loop&) {
-      canState->RemovePeriodic(busId, messageID);
+    canState->writeLoopRunner.ExecSync([messageId, busId](wpi::uv::Loop&) {
+      canState->RemovePeriodic(busId, messageId);
     });
 
     *status = 0;
@@ -265,15 +263,20 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
 
   canfd_frame frame;
   std::memset(&frame, 0, sizeof(frame));
-  frame.can_id = messageID;
-  frame.flags = isFd ? CANFD_FDF | CANFD_BRS : 0;
-  if (dataSize) {
-    auto size = (std::min)(dataSize, static_cast<uint8_t>(sizeof(frame.data)));
-    std::memcpy(frame.data, data, size);
+  frame.can_id = messageId;
+  frame.flags |=
+      (message->flags & HAL_CANFlags::HAL_CAN_FD_DATALENGTH) ? CANFD_FDF : 0;
+  frame.flags |=
+      (message->flags & HAL_CANFlags::HAL_CAN_FD_BITRATESWITCH) ? CANFD_BRS : 0;
+  if (message->dataSize) {
+    auto size =
+        (std::min)(message->dataSize, static_cast<uint8_t>(sizeof(frame.data)));
+    std::memcpy(frame.data, message->data, size);
     frame.len = size;
   }
 
-  int mtu = isFd ? CANFD_MTU : CAN_MTU;
+  int mtu = (message->flags & HAL_CANFlags::HAL_CAN_FD_DATALENGTH) ? CANFD_MTU
+                                                                   : CAN_MTU;
   {
     std::scoped_lock lock{canState->writeMutex[busId]};
     int result = send(canState->socketHandle[busId], &frame, mtu, 0);
@@ -291,70 +294,62 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
         });
   }
 }
-void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
-                            uint8_t* data, uint8_t* dataSize,
-                            uint32_t* timeStamp, int32_t* status) {
-  uint8_t busId = 0;
-
-  if (busId >= NUM_CAN_BUSES) {
+void HAL_CAN_ReceiveMessage(int32_t busId, uint32_t messageId,
+                            struct HAL_CANReceiveMessage* message,
+                            int32_t* status) {
+  if (busId < 0 || busId >= hal::kNumCanBuses) {
+    message->message.dataSize = 0;
+    message->timeStamp = 0;
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
 
   std::scoped_lock lock{canState->readMutex[busId]};
 
-  // TODO(thadhouse) this is going to be wrong, but we're going to assume that
-  // any lookup without the 11 bit mask set wants to look for a 29 bit frame.
-  // Also, only do fast lookups for 29 bit frames
-
-  // Fast case is the following.
-  // Mask doesn't include 11 bit flag
-  // Mask doesn't include RTR flag
-  // Mask is full
-  if (messageIDMask == CAN_EFF_MASK) {
-    //  We're doing a fast lookup
-    auto& msg = canState->readFrames[busId][*messageID];
-    if (msg.timestamp == 0) {
-      *status = HAL_ERR_CANSessionMux_MessageNotFound;
-      return;
-    }
-    if ((msg.frame.flags & CANFD_FDF) || msg.frame.len > 8) {
-      std::printf("FD frames not supported for read right now\n");
-      *status = HAL_ERR_CANSessionMux_InvalidBuffer;
-      return;
-    }
-    // TODO(thadhouse) this time needs to be fixed up.
-    *timeStamp = msg.timestamp / 1000;
-    std::memcpy(data, msg.frame.data, msg.frame.len);
-    *dataSize = msg.frame.len;
-    *status = 0;
-    msg.timestamp = 0;
+  auto& msg = canState->readFrames[busId][messageId];
+  if (msg.timestamp == 0) {
+    message->message.dataSize = 0;
+    message->timeStamp = 0;
+    *status = HAL_ERR_CANSessionMux_MessageNotFound;
     return;
   }
 
-  std::printf("Slow lookup not supported yet\n");
+  message->message.flags = HAL_CANFlags::HAL_CAN_NO_FLAGS;
+  message->message.flags |= (msg.frame.flags & CANFD_FDF)
+                                ? HAL_CANFlags::HAL_CAN_FD_DATALENGTH
+                                : HAL_CANFlags::HAL_CAN_NO_FLAGS;
+  message->message.flags |= (msg.frame.flags & CANFD_BRS)
+                                ? HAL_CANFlags::HAL_CAN_FD_BITRATESWITCH
+                                : HAL_CANFlags::HAL_CAN_NO_FLAGS;
 
-  // Add support for slow lookup later
-  *status = HAL_ERR_CANSessionMux_NotAllowed;
+  message->message.dataSize = msg.frame.len;
+  if (msg.frame.len > 0) {
+    std::memcpy(message->message.data, msg.frame.data, msg.frame.len);
+  }
+
+  message->timeStamp = msg.timestamp;
+  *status = 0;
+  msg.timestamp = 0;
   return;
 }
-void HAL_CAN_OpenStreamSession(uint32_t* sessionHandle, uint32_t messageID,
-                               uint32_t messageIDMask, uint32_t maxMessages,
-                               int32_t* status) {
-  *sessionHandle = 0;
+HAL_CANStreamHandle HAL_CAN_OpenStreamSession(int32_t busId, uint32_t messageId,
+                                              uint32_t messageIDMask,
+                                              uint32_t maxMessages,
+                                              int32_t* status) {
   *status = HAL_HANDLE_ERROR;
-  return;
+  return 0;
 }
-void HAL_CAN_CloseStreamSession(uint32_t sessionHandle) {}
-void HAL_CAN_ReadStreamSession(uint32_t sessionHandle,
+void HAL_CAN_CloseStreamSession(HAL_CANStreamHandle sessionHandle) {}
+void HAL_CAN_ReadStreamSession(HAL_CANStreamHandle sessionHandle,
                                struct HAL_CANStreamMessage* messages,
                                uint32_t messagesToRead, uint32_t* messagesRead,
                                int32_t* status) {
   *status = HAL_HANDLE_ERROR;
   return;
 }
-void HAL_CAN_GetCANStatus(float* percentBusUtilization, uint32_t* busOffCount,
-                          uint32_t* txFullCount, uint32_t* receiveErrorCount,
+void HAL_CAN_GetCANStatus(int32_t busId, float* percentBusUtilization,
+                          uint32_t* busOffCount, uint32_t* txFullCount,
+                          uint32_t* receiveErrorCount,
                           uint32_t* transmitErrorCount, int32_t* status) {
   *status = HAL_HANDLE_ERROR;
   return;

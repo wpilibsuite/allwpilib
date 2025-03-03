@@ -23,13 +23,13 @@ public class Trajectory implements ProtobufSerializable {
   /** Trajectory protobuf for serialization. */
   public static final TrajectoryProto proto = new TrajectoryProto();
 
-  private final double m_totalTimeSeconds;
+  private final double m_totalTime;
   private final List<State> m_states;
 
   /** Constructs an empty trajectory. */
   public Trajectory() {
     m_states = new ArrayList<>();
-    m_totalTimeSeconds = 0.0;
+    m_totalTime = 0.0;
   }
 
   /**
@@ -45,7 +45,7 @@ public class Trajectory implements ProtobufSerializable {
       throw new IllegalArgumentException("Trajectory manually created with no states.");
     }
 
-    m_totalTimeSeconds = m_states.get(m_states.size() - 1).timeSeconds;
+    m_totalTime = m_states.get(m_states.size() - 1).time;
   }
 
   /**
@@ -78,16 +78,16 @@ public class Trajectory implements ProtobufSerializable {
    * @return The initial pose of the trajectory.
    */
   public Pose2d getInitialPose() {
-    return sample(0).poseMeters;
+    return sample(0).pose;
   }
 
   /**
    * Returns the overall duration of the trajectory.
    *
-   * @return The duration of the trajectory.
+   * @return The duration of the trajectory in seconds.
    */
-  public double getTotalTimeSeconds() {
-    return m_totalTimeSeconds;
+  public double getTotalTime() {
+    return m_totalTime;
   }
 
   /**
@@ -102,19 +102,19 @@ public class Trajectory implements ProtobufSerializable {
   /**
    * Sample the trajectory at a point in time.
    *
-   * @param timeSeconds The point in time since the beginning of the trajectory to sample.
+   * @param time The point in time since the beginning of the trajectory to sample in seconds.
    * @return The state at that point in time.
    * @throws IllegalStateException if the trajectory has no states.
    */
-  public State sample(double timeSeconds) {
+  public State sample(double time) {
     if (m_states.isEmpty()) {
       throw new IllegalStateException("Trajectory cannot be sampled if it has no states.");
     }
 
-    if (timeSeconds <= m_states.get(0).timeSeconds) {
+    if (time <= m_states.get(0).time) {
       return m_states.get(0);
     }
-    if (timeSeconds >= m_totalTimeSeconds) {
+    if (time >= m_totalTime) {
       return m_states.get(m_states.size() - 1);
     }
 
@@ -129,7 +129,7 @@ public class Trajectory implements ProtobufSerializable {
 
     while (low != high) {
       int mid = (low + high) / 2;
-      if (m_states.get(mid).timeSeconds < timeSeconds) {
+      if (m_states.get(mid).time < time) {
         // This index and everything under it are less than the requested
         // timestamp. Therefore, we can discard them.
         low = mid + 1;
@@ -150,13 +150,12 @@ public class Trajectory implements ProtobufSerializable {
     final State prevSample = m_states.get(low - 1);
 
     // If the difference in states is negligible, then we are spot on!
-    if (Math.abs(sample.timeSeconds - prevSample.timeSeconds) < 1E-9) {
+    if (Math.abs(sample.time - prevSample.time) < 1E-9) {
       return sample;
     }
     // Interpolate between the two states for the state that we want.
     return prevSample.interpolate(
-        sample,
-        (timeSeconds - prevSample.timeSeconds) / (sample.timeSeconds - prevSample.timeSeconds));
+        sample, (time - prevSample.time) / (sample.time - prevSample.time));
   }
 
   /**
@@ -169,7 +168,7 @@ public class Trajectory implements ProtobufSerializable {
    */
   public Trajectory transformBy(Transform2d transform) {
     var firstState = m_states.get(0);
-    var firstPose = firstState.poseMeters;
+    var firstPose = firstState.pose;
 
     // Calculate the transformed first pose.
     var newFirstPose = firstPose.plus(transform);
@@ -177,22 +176,22 @@ public class Trajectory implements ProtobufSerializable {
 
     newStates.add(
         new State(
-            firstState.timeSeconds,
-            firstState.velocityMetersPerSecond,
-            firstState.accelerationMetersPerSecondSq,
+            firstState.time,
+            firstState.velocity,
+            firstState.acceleration,
             newFirstPose,
-            firstState.curvatureRadPerMeter));
+            firstState.curvature));
 
     for (int i = 1; i < m_states.size(); i++) {
       var state = m_states.get(i);
       // We are transforming relative to the coordinate frame of the new initial pose.
       newStates.add(
           new State(
-              state.timeSeconds,
-              state.velocityMetersPerSecond,
-              state.accelerationMetersPerSecondSq,
-              newFirstPose.plus(state.poseMeters.minus(firstPose)),
-              state.curvatureRadPerMeter));
+              state.time,
+              state.velocity,
+              state.acceleration,
+              newFirstPose.plus(state.pose.minus(firstPose)),
+              state.curvature));
     }
 
     return new Trajectory(newStates);
@@ -212,11 +211,11 @@ public class Trajectory implements ProtobufSerializable {
             .map(
                 state ->
                     new State(
-                        state.timeSeconds,
-                        state.velocityMetersPerSecond,
-                        state.accelerationMetersPerSecondSq,
-                        state.poseMeters.relativeTo(pose),
-                        state.curvatureRadPerMeter))
+                        state.time,
+                        state.velocity,
+                        state.acceleration,
+                        state.pose.relativeTo(pose),
+                        state.curvature))
             .collect(Collectors.toList()));
   }
 
@@ -241,11 +240,11 @@ public class Trajectory implements ProtobufSerializable {
             .map(
                 state ->
                     new State(
-                        state.timeSeconds,
-                        state.velocityMetersPerSecond,
-                        state.accelerationMetersPerSecondSq,
-                        state.poseMeters,
-                        state.curvatureRadPerMeter))
+                        state.time,
+                        state.velocity,
+                        state.acceleration,
+                        state.pose,
+                        state.curvature))
             .collect(Collectors.toList());
 
     // Here we omit the first state of the other trajectory because we don't want
@@ -254,13 +253,7 @@ public class Trajectory implements ProtobufSerializable {
     // other trajectory.
     for (int i = 1; i < other.getStates().size(); ++i) {
       var s = other.getStates().get(i);
-      states.add(
-          new State(
-              s.timeSeconds + m_totalTimeSeconds,
-              s.velocityMetersPerSecond,
-              s.accelerationMetersPerSecondSq,
-              s.poseMeters,
-              s.curvatureRadPerMeter));
+      states.add(new State(s.time + m_totalTime, s.velocity, s.acceleration, s.pose, s.curvature));
     }
     return new Trajectory(states);
   }
@@ -273,51 +266,46 @@ public class Trajectory implements ProtobufSerializable {
     /** Trajectory.State protobuf for serialization. */
     public static final TrajectoryStateProto proto = new TrajectoryStateProto();
 
-    /** The time elapsed since the beginning of the trajectory. */
+    /** The time elapsed since the beginning of the trajectory in seconds. */
     @JsonProperty("time")
-    public double timeSeconds;
+    public double time;
 
-    /** The speed at that point of the trajectory. */
+    /** The speed at that point of the trajectory in meters per second. */
     @JsonProperty("velocity")
-    public double velocityMetersPerSecond;
+    public double velocity;
 
-    /** The acceleration at that point of the trajectory. */
+    /** The acceleration at that point of the trajectory in m/s². */
     @JsonProperty("acceleration")
-    public double accelerationMetersPerSecondSq;
+    public double acceleration;
 
     /** The pose at that point of the trajectory. */
     @JsonProperty("pose")
-    public Pose2d poseMeters;
+    public Pose2d pose;
 
-    /** The curvature at that point of the trajectory. */
+    /** The curvature at that point of the trajectory in rad/m. */
     @JsonProperty("curvature")
-    public double curvatureRadPerMeter;
+    public double curvature;
 
     /** Default constructor. */
     public State() {
-      poseMeters = Pose2d.kZero;
+      pose = Pose2d.kZero;
     }
 
     /**
      * Constructs a State with the specified parameters.
      *
-     * @param timeSeconds The time elapsed since the beginning of the trajectory.
-     * @param velocityMetersPerSecond The speed at that point of the trajectory.
-     * @param accelerationMetersPerSecondSq The acceleration at that point of the trajectory.
-     * @param poseMeters The pose at that point of the trajectory.
-     * @param curvatureRadPerMeter The curvature at that point of the trajectory.
+     * @param time The time elapsed since the beginning of the trajectory in seconds.
+     * @param velocity The speed at that point of the trajectory in m/s.
+     * @param acceleration The acceleration at that point of the trajectory in m/s².
+     * @param pose The pose at that point of the trajectory.
+     * @param curvature The curvature at that point of the trajectory in rad/m.
      */
-    public State(
-        double timeSeconds,
-        double velocityMetersPerSecond,
-        double accelerationMetersPerSecondSq,
-        Pose2d poseMeters,
-        double curvatureRadPerMeter) {
-      this.timeSeconds = timeSeconds;
-      this.velocityMetersPerSecond = velocityMetersPerSecond;
-      this.accelerationMetersPerSecondSq = accelerationMetersPerSecondSq;
-      this.poseMeters = poseMeters;
-      this.curvatureRadPerMeter = curvatureRadPerMeter;
+    public State(double time, double velocity, double acceleration, Pose2d pose, double curvature) {
+      this.time = time;
+      this.velocity = velocity;
+      this.acceleration = acceleration;
+      this.pose = pose;
+      this.curvature = curvature;
     }
 
     /**
@@ -329,10 +317,10 @@ public class Trajectory implements ProtobufSerializable {
      */
     State interpolate(State endValue, double i) {
       // Find the new t value.
-      final double newT = lerp(timeSeconds, endValue.timeSeconds, i);
+      final double newT = lerp(time, endValue.time, i);
 
       // Find the delta time between the current state and the interpolated state.
-      final double deltaT = newT - timeSeconds;
+      final double deltaT = newT - time;
 
       // If delta time is negative, flip the order of interpolation.
       if (deltaT < 0) {
@@ -340,72 +328,59 @@ public class Trajectory implements ProtobufSerializable {
       }
 
       // Check whether the robot is reversing at this stage.
-      final boolean reversing =
-          velocityMetersPerSecond < 0
-              || Math.abs(velocityMetersPerSecond) < 1E-9 && accelerationMetersPerSecondSq < 0;
+      final boolean reversing = velocity < 0 || Math.abs(velocity) < 1E-9 && acceleration < 0;
 
       // Calculate the new velocity
       // v_f = v_0 + at
-      final double newV = velocityMetersPerSecond + (accelerationMetersPerSecondSq * deltaT);
+      final double newV = velocity + (acceleration * deltaT);
 
       // Calculate the change in position.
       // delta_s = v_0 t + 0.5at²
       final double newS =
-          (velocityMetersPerSecond * deltaT
-                  + 0.5 * accelerationMetersPerSecondSq * Math.pow(deltaT, 2))
-              * (reversing ? -1.0 : 1.0);
+          (velocity * deltaT + 0.5 * acceleration * Math.pow(deltaT, 2)) * (reversing ? -1.0 : 1.0);
 
       // Return the new state. To find the new position for the new state, we need
       // to interpolate between the two endpoint poses. The fraction for
       // interpolation is the change in position (delta s) divided by the total
       // distance between the two endpoints.
       final double interpolationFrac =
-          newS / endValue.poseMeters.getTranslation().getDistance(poseMeters.getTranslation());
+          newS / endValue.pose.getTranslation().getDistance(pose.getTranslation());
 
       return new State(
           newT,
           newV,
-          accelerationMetersPerSecondSq,
-          lerp(poseMeters, endValue.poseMeters, interpolationFrac),
-          lerp(curvatureRadPerMeter, endValue.curvatureRadPerMeter, interpolationFrac));
+          acceleration,
+          lerp(pose, endValue.pose, interpolationFrac),
+          lerp(curvature, endValue.curvature, interpolationFrac));
     }
 
     @Override
     public String toString() {
       return String.format(
           "State(Sec: %.2f, Vel m/s: %.2f, Accel m/s/s: %.2f, Pose: %s, Curvature: %.2f)",
-          timeSeconds,
-          velocityMetersPerSecond,
-          accelerationMetersPerSecondSq,
-          poseMeters,
-          curvatureRadPerMeter);
+          time, velocity, acceleration, pose, curvature);
     }
 
     @Override
     public boolean equals(Object obj) {
       return obj instanceof State state
-          && Double.compare(state.timeSeconds, timeSeconds) == 0
-          && Double.compare(state.velocityMetersPerSecond, velocityMetersPerSecond) == 0
-          && Double.compare(state.accelerationMetersPerSecondSq, accelerationMetersPerSecondSq) == 0
-          && Double.compare(state.curvatureRadPerMeter, curvatureRadPerMeter) == 0
-          && Objects.equals(poseMeters, state.poseMeters);
+          && Double.compare(state.time, time) == 0
+          && Double.compare(state.velocity, velocity) == 0
+          && Double.compare(state.acceleration, acceleration) == 0
+          && Double.compare(state.curvature, curvature) == 0
+          && Objects.equals(pose, state.pose);
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(
-          timeSeconds,
-          velocityMetersPerSecond,
-          accelerationMetersPerSecondSq,
-          poseMeters,
-          curvatureRadPerMeter);
+      return Objects.hash(time, velocity, acceleration, pose, curvature);
     }
   }
 
   @Override
   public String toString() {
     String stateList = m_states.stream().map(State::toString).collect(Collectors.joining(", \n"));
-    return String.format("Trajectory - Seconds: %.2f, States:\n%s", m_totalTimeSeconds, stateList);
+    return String.format("Trajectory - Seconds: %.2f, States:\n%s", m_totalTime, stateList);
   }
 
   @Override

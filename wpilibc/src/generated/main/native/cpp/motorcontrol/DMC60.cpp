@@ -6,7 +6,7 @@
 
 #include "frc/motorcontrol/DMC60.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 using namespace frc;
 
@@ -16,5 +16,5 @@ DMC60::DMC60(int channel) : PWMMotorController("DMC60", channel) {
   m_pwm.SetSpeed(0.0);
   m_pwm.SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_DigilentDMC60, GetChannel() + 1);
+  HAL_ReportUsage("IO", GetChannel(), "DigilentDMC60");
 }

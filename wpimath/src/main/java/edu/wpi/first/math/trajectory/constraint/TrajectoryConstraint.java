@@ -14,45 +14,42 @@ public interface TrajectoryConstraint {
   /**
    * Returns the max velocity given the current pose and curvature.
    *
-   * @param poseMeters The pose at the current point in the trajectory.
-   * @param curvatureRadPerMeter The curvature at the current point in the trajectory.
-   * @param velocityMetersPerSecond The velocity at the current point in the trajectory before
-   *     constraints are applied.
+   * @param pose The pose at the current point in the trajectory.
+   * @param curvature The curvature at the current point in the trajectory rad/m.
+   * @param velocity The velocity at the current point in the trajectory before constraints are
+   *     applied in m/s.
    * @return The absolute maximum velocity.
    */
-  double getMaxVelocityMetersPerSecond(
-      Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond);
+  double getMaxVelocity(Pose2d pose, double curvature, double velocity);
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory given pose,
    * curvature, and speed.
    *
-   * @param poseMeters The pose at the current point in the trajectory.
-   * @param curvatureRadPerMeter The curvature at the current point in the trajectory.
-   * @param velocityMetersPerSecond The speed at the current point in the trajectory.
+   * @param pose The pose at the current point in the trajectory.
+   * @param curvature The curvature at the current point in the trajectory rad/m.
+   * @param velocity The speed at the current point in the trajectory in m/s.
    * @return The min and max acceleration bounds.
    */
-  MinMax getMinMaxAccelerationMetersPerSecondSq(
-      Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond);
+  MinMax getMinMaxAcceleration(Pose2d pose, double curvature, double velocity);
 
   /** Represents a minimum and maximum acceleration. */
   class MinMax {
     /** The minimum acceleration. */
-    public double minAccelerationMetersPerSecondSq = -Double.MAX_VALUE;
+    public double minAcceleration = -Double.MAX_VALUE;
 
     /** The maximum acceleration. */
-    public double maxAccelerationMetersPerSecondSq = Double.MAX_VALUE;
+    public double maxAcceleration = Double.MAX_VALUE;
 
     /**
      * Constructs a MinMax.
      *
-     * @param minAccelerationMetersPerSecondSq The minimum acceleration.
-     * @param maxAccelerationMetersPerSecondSq The maximum acceleration.
+     * @param minAcceleration The minimum acceleration in m/s².
+     * @param maxAcceleration The maximum acceleration in m/s².
      */
-    public MinMax(
-        double minAccelerationMetersPerSecondSq, double maxAccelerationMetersPerSecondSq) {
-      this.minAccelerationMetersPerSecondSq = minAccelerationMetersPerSecondSq;
-      this.maxAccelerationMetersPerSecondSq = maxAccelerationMetersPerSecondSq;
+    public MinMax(double minAcceleration, double maxAcceleration) {
+      this.minAcceleration = minAcceleration;
+      this.maxAcceleration = maxAcceleration;
     }
 
     /** Constructs a MinMax with default values. */

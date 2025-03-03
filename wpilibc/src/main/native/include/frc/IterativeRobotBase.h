@@ -213,19 +213,6 @@ class IterativeRobotBase : public RobotBase {
   void SetNetworkTablesFlushEnabled(bool enabled);
 
   /**
-   * Sets whether LiveWindow operation is enabled during test mode.
-   *
-   * @param testLW True to enable, false to disable. Defaults to false.
-   * @throws if called in test mode.
-   */
-  void EnableLiveWindowInTest(bool testLW);
-
-  /**
-   * Whether LiveWindow operation is enabled during test mode.
-   */
-  bool IsLiveWindowEnabledInTest();
-
-  /**
    * Gets time period between calls to Periodic() functions.
    */
   units::second_t GetPeriod() const;
@@ -260,7 +247,6 @@ class IterativeRobotBase : public RobotBase {
   units::second_t m_period;
   Watchdog m_watchdog;
   bool m_ntFlushEnabled = true;
-  bool m_lwEnabledInTest = false;
   bool m_calledDsConnected = false;
 
   void PrintLoopOverrunMessage();

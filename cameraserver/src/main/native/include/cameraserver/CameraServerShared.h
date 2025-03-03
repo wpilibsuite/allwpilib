@@ -5,6 +5,7 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 #include <thread>
 #include <utility>
 
@@ -14,9 +15,8 @@ namespace frc {
 class CameraServerShared {
  public:
   virtual ~CameraServerShared() = default;
-  virtual void ReportUsbCamera(int id) = 0;
-  virtual void ReportAxisCamera(int id) = 0;
-  virtual void ReportVideoServer(int id) = 0;
+  virtual void ReportUsage(std::string_view resource,
+                           std::string_view data) = 0;
   virtual void SetCameraServerErrorV(fmt::string_view format,
                                      fmt::format_args args) = 0;
   virtual void SetVisionRunnerErrorV(fmt::string_view format,

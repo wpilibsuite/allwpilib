@@ -30,14 +30,13 @@ class ExtendedKalmanFilterTest {
     final var motors = DCMotor.getCIM(2);
 
     final var gr = 7.08; // Gear ratio
-    final var rb = 0.8382 / 2.0; // Wheelbase radius (track width)
+    final var rb = 0.8382 / 2.0; // Wheelbase radius (trackwidth)
     final var r = 0.0746125; // Wheel radius
     final var m = 63.503; // Robot mass
     final var J = 5.6; // Robot moment of inertia
 
-    final var C1 =
-        -Math.pow(gr, 2) * motors.KtNMPerAmp / (motors.KvRadPerSecPerVolt * motors.rOhms * r * r);
-    final var C2 = gr * motors.KtNMPerAmp / (motors.rOhms * r);
+    final var C1 = -Math.pow(gr, 2) * motors.Kt / (motors.Kv * motors.R * r * r);
+    final var C2 = gr * motors.Kt / (motors.R * r);
     final var k1 = 1.0 / m + rb * rb / J;
     final var k2 = 1.0 / m - rb * rb / J;
 
@@ -68,7 +67,7 @@ class ExtendedKalmanFilterTest {
 
   @Test
   void testInit() {
-    double dtSeconds = 0.00505;
+    double dt = 0.00505;
 
     assertDoesNotThrow(
         () -> {
@@ -81,10 +80,10 @@ class ExtendedKalmanFilterTest {
                   ExtendedKalmanFilterTest::getLocalMeasurementModel,
                   VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
                   VecBuilder.fill(0.0001, 0.01, 0.01),
-                  dtSeconds);
+                  dt);
 
           Matrix<N2, N1> u = VecBuilder.fill(12.0, 12.0);
-          observer.predict(u, dtSeconds);
+          observer.predict(u, dt);
 
           var localY = getLocalMeasurementModel(observer.getXhat(), u);
           observer.correct(u, localY);
@@ -98,8 +97,8 @@ class ExtendedKalmanFilterTest {
 
   @Test
   void testConvergence() {
-    double dtSeconds = 0.00505;
-    double rbMeters = 0.8382 / 2.0; // Robot radius
+    double dt = 0.00505;
+    double rb = 0.8382 / 2.0; // Robot radius
 
     ExtendedKalmanFilter<N5, N2, N3> observer =
         new ExtendedKalmanFilter<>(
@@ -110,7 +109,7 @@ class ExtendedKalmanFilterTest {
             ExtendedKalmanFilterTest::getLocalMeasurementModel,
             VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
             VecBuilder.fill(0.001, 0.01, 0.01),
-            dtSeconds);
+            dt);
 
     List<Pose2d> waypoints =
         List.of(
@@ -142,15 +141,15 @@ class ExtendedKalmanFilterTest {
 
     var groundTruthX = observer.getXhat();
 
-    double totalTime = trajectory.getTotalTimeSeconds();
-    for (int i = 0; i < (totalTime / dtSeconds); i++) {
-      var ref = trajectory.sample(dtSeconds * i);
-      double vl = ref.velocityMetersPerSecond * (1 - (ref.curvatureRadPerMeter * rbMeters));
-      double vr = ref.velocityMetersPerSecond * (1 + (ref.curvatureRadPerMeter * rbMeters));
+    double totalTime = trajectory.getTotalTime();
+    for (int i = 0; i < (totalTime / dt); i++) {
+      var ref = trajectory.sample(dt * i);
+      double vl = ref.velocity * (1 - (ref.curvature * rb));
+      double vr = ref.velocity * (1 + (ref.curvature * rb));
 
-      nextR.set(0, 0, ref.poseMeters.getTranslation().getX());
-      nextR.set(1, 0, ref.poseMeters.getTranslation().getY());
-      nextR.set(2, 0, ref.poseMeters.getRotation().getRadians());
+      nextR.set(0, 0, ref.pose.getTranslation().getX());
+      nextR.set(1, 0, ref.pose.getTranslation().getY());
+      nextR.set(2, 0, ref.pose.getRotation().getRadians());
       nextR.set(3, 0, vl);
       nextR.set(4, 0, vr);
 
@@ -158,14 +157,13 @@ class ExtendedKalmanFilterTest {
       var whiteNoiseStdDevs = VecBuilder.fill(0.0001, 0.5, 0.5);
       observer.correct(u, localY.plus(StateSpaceUtil.makeWhiteNoiseVector(whiteNoiseStdDevs)));
 
-      Matrix<N5, N1> rdot = nextR.minus(r).div(dtSeconds);
+      Matrix<N5, N1> rdot = nextR.minus(r).div(dt);
       u = new Matrix<>(B.solve(rdot.minus(getDynamics(r, new Matrix<>(Nat.N2(), Nat.N1())))));
 
-      observer.predict(u, dtSeconds);
+      observer.predict(u, dt);
 
       groundTruthX =
-          NumericalIntegration.rk4(
-              ExtendedKalmanFilterTest::getDynamics, groundTruthX, u, dtSeconds);
+          NumericalIntegration.rk4(ExtendedKalmanFilterTest::getDynamics, groundTruthX, u, dt);
 
       r = nextR;
     }
@@ -177,10 +175,10 @@ class ExtendedKalmanFilterTest {
     var R = StateSpaceUtil.makeCostMatrix(VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
     observer.correct(Nat.N5(), u, globalY, ExtendedKalmanFilterTest::getGlobalMeasurementModel, R);
 
-    var finalPosition = trajectory.sample(trajectory.getTotalTimeSeconds());
-    assertEquals(finalPosition.poseMeters.getTranslation().getX(), observer.getXhat(0), 1.0);
-    assertEquals(finalPosition.poseMeters.getTranslation().getY(), observer.getXhat(1), 1.0);
-    assertEquals(finalPosition.poseMeters.getRotation().getRadians(), observer.getXhat(2), 1.0);
+    var finalPosition = trajectory.sample(trajectory.getTotalTime());
+    assertEquals(finalPosition.pose.getTranslation().getX(), observer.getXhat(0), 1.0);
+    assertEquals(finalPosition.pose.getTranslation().getY(), observer.getXhat(1), 1.0);
+    assertEquals(finalPosition.pose.getRotation().getRadians(), observer.getXhat(2), 1.0);
     assertEquals(0.0, observer.getXhat(3), 1.0);
     assertEquals(0.0, observer.getXhat(4), 1.0);
   }

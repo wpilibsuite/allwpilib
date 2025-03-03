@@ -16,8 +16,6 @@
 
 typedef int32_t HAL_Handle;
 
-typedef HAL_Handle HAL_PortHandle;
-
 typedef HAL_Handle HAL_AnalogInputHandle;
 
 typedef HAL_Handle HAL_AnalogOutputHandle;
@@ -69,6 +67,8 @@ typedef HAL_Handle HAL_CTREPCMHandle;
 typedef HAL_Handle HAL_REVPDHHandle;
 
 typedef HAL_Handle HAL_REVPHHandle;
+
+typedef HAL_Handle HAL_CANStreamHandle;
 
 typedef int32_t HAL_Bool;
 
