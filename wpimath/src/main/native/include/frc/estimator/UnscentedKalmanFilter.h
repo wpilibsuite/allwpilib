@@ -255,6 +255,7 @@ class UnscentedKalmanFilter {
     Eigen::internal::llt_inplace<double, Eigen::Lower>::blocked(discQ);
 
     // Generate sigma points around the state mean
+    //
     // equation (17)
     Matrixd<States, 2 * States + 1> sigmas =
         m_pts.SquareRootSigmaPoints(m_xHat, m_S);
@@ -273,6 +274,7 @@ class UnscentedKalmanFilter {
 
     // Pass the predicted sigmas (𝒳) through the Unscented Transform
     // to compute the prior state mean and covariance
+    //
     // equations (18) (19) and (20)
     auto [xHat, S] = SquareRootUnscentedTransform<States, States>(
         m_sigmasF, m_pts.Wm(), m_pts.Wc(), m_meanFuncX, m_residualFuncX,
@@ -400,6 +402,7 @@ class UnscentedKalmanFilter {
 
     // Pass the predicted measurement sigmas through the Unscented Transform
     // to compute the mean predicted measurement and square-root innovation covariance
+    //
     // equations (23) (24) and (25)
     auto [yHat, Sy] = SquareRootUnscentedTransform<Rows, States>(
         sigmasH, m_pts.Wm(), m_pts.Wc(), meanFuncY, residualFuncY,
@@ -446,10 +449,12 @@ class UnscentedKalmanFilter {
 
     // Compute the intermediate matrix U for downdating
     // the square-root covariance
+    //
     // equation (28)
     Matrixd<States, Rows> U = K * Sy;
 
     // Downdate the posterior square-root state covariance
+    //
     // equation (29)
     for (int i = 0; i < Rows; i++) {
       Eigen::internal::llt_inplace<double, Eigen::Lower>::rankUpdate(

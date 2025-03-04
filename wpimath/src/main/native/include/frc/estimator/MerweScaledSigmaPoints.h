@@ -69,7 +69,7 @@ class MerweScaledSigmaPoints {
 
     Matrixd<States, 2 * States + 1> sigmas;
 
-    // (Eq. 17)
+    // equation (17)
     sigmas.template block<States, 1>(0, 0) = x;
     for (int k = 0; k < States; ++k) {
       sigmas.template block<States, 1>(0, k + 1) =

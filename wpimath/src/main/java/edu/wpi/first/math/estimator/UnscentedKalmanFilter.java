@@ -201,13 +201,13 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     //   x̂ = Σ Wᵢ⁽ᵐ⁾𝒳ᵢ
     //      i=0
     //
-    // equations (19) and (23) show this
+    // equations (19) and (23) in the paper show this,
     // but we allow a custom function, usually for angle wrapping
     Matrix<C, N1> x = meanFunc.apply(sigmas, Wm);
 
-    // Form an intermediate matrix S_bar as:
+    // Form an intermediate matrix S⁻ as:
     //
-    //   [√{W₁⁽ᶜ⁾}*(𝒳_{1:2L} - x̂) √{Rᵛ}]
+    //   [√{W₁⁽ᶜ⁾}(𝒳_{1:2L} - x̂) √{Rᵛ}]
     //
     // the part of equations (20) and (24) within the "qr{}"
     Matrix<C, ?> Sbar = new Matrix<>(new SimpleMatrix(dim.getNum(), 2 * s.getNum() + dim.getNum()));
@@ -226,12 +226,20 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     }
 
     // Compute the square-root covariance of the sigma points
-    // This is upper triangular, so we need to take the transpose
+    //
+    // We transpose S⁻ first because we formed it by horizontally
+    // concatenating each part, it should be vertical so we can take
+    // the QR decomposition.
+    //
+    // The resulting matrix R is the square-root covariance S, but it
+    // is upper triangular, so we need to transpose it.
+    //
     // equations (20) and (24)
     Matrix<C, C> newS = new Matrix<>(new SimpleMatrix(qr.getR(null, true)).transpose());
     
     // Update or downdate the square-root covariance with (𝒳₀-x̂)
-    // depending on whether its weight (W₀⁽ᶜ⁾) is positive or negative
+    // depending on whether its weight (W₀⁽ᶜ⁾) is positive or negative.
+    //
     // equations (21) and (25)
     newS.rankUpdate(residualFunc.apply(sigmas.extractColumnVector(0), x), Wc.get(0, 0), true);
 
@@ -366,6 +374,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     var squareRootDiscQ = discQ.lltDecompose(true);
 
     // Generate sigma points around the state mean
+    //
     // equation (17)
     var sigmas = m_pts.squareRootSigmaPoints(m_xHat, m_S);
 
@@ -384,6 +393,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
 
     // Pass the predicted sigmas (𝒳) through the Unscented Transform
     // to compute the prior state mean and covariance
+    //
     // equations (18) (19) and (20)
     var ret =
         squareRootUnscentedTransform(
@@ -507,6 +517,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
 
     // Pass the predicted measurement sigmas through the Unscented Transform
     // to compute the mean predicted measurement and square-root innovation covariance
+    //
     // equations (23) (24) and (25)
     var transRet =
         squareRootUnscentedTransform(
@@ -559,10 +570,12 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
 
     // Compute the intermediate matrix U for downdating
     // the square-root covariance
+    //
     // equation (28)
     Matrix<States, R> U = K.times(Sy);
 
     // Downdate the posterior square-root state covariance
+    //
     // equation (29)
     for (int i = 0; i < rows.getNum(); i++) {
       m_S.rankUpdate(U.extractColumnVector(i), -1, true);
