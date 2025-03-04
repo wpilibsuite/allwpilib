@@ -46,6 +46,10 @@ void Subsystem::Register() {
   return CommandScheduler::GetInstance().RegisterSubsystem(this);
 }
 
+CommandPtr Subsystem::Idle() {
+  return cmd::Idle({this});
+}
+
 CommandPtr Subsystem::RunOnce(std::function<void()> action) {
   return cmd::RunOnce(std::move(action), {this});
 }
@@ -71,8 +75,4 @@ CommandPtr Subsystem::StartRun(std::function<void()> start,
 
 CommandPtr Subsystem::Defer(wpi::unique_function<CommandPtr()> supplier) {
   return cmd::Defer(std::move(supplier), {this});
-}
-
-CommandPtr Subsystem::Idle() {
-  return cmd::Idle({this});
 }

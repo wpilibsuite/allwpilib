@@ -122,6 +122,15 @@ class Subsystem {
   void Register();
 
   /**
+   * Constructs a command that does nothing until interrupted. Requires this
+   * subsystem.
+   *
+   * @return the command
+   */
+  [[nodiscard]]
+  CommandPtr Idle();
+
+  /**
    * Constructs a command that runs an action once and finishes. Requires this
    * subsystem.
    *
@@ -178,14 +187,5 @@ class Subsystem {
    */
   [[nodiscard]]
   CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier);
-
-  /**
-   * Constructs a command that does nothing until interrupted. Requires this
-   * subsystem.
-   *
-   * @return the command
-   */
-  [[nodiscard]]
-  CommandPtr Idle();
 };
 }  // namespace frc2
