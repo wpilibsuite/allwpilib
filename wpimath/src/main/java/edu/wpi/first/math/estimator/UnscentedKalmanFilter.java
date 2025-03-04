@@ -229,7 +229,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     //
     // We transpose S⁻ first because we formed it by horizontally
     // concatenating each part, it should be vertical so we can take
-    // the QR decomposition.
+    // the QR decomposition as defined in the "QR Decomposition" passage
+    // of section 3. "EFFICIENT SQUARE-ROOT IMPLEMENTATION"
     //
     // The resulting matrix R is the square-root covariance S, but it
     // is upper triangular, so we need to transpose it.
