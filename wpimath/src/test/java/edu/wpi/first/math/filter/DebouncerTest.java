@@ -4,7 +4,9 @@
 
 package edu.wpi.first.math.filter;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.util.WPIUtilJNI;
@@ -66,5 +68,21 @@ class DebouncerTest {
     WPIUtilJNI.setMockTime(2000000L);
 
     assertFalse(debouncer.calculate(false));
+  }
+
+  @Test
+  void debounceParamsTest() {
+    var debouncer = new Debouncer(0.02, Debouncer.DebounceType.kBoth);
+
+    assertEquals(debouncer.getDebounceTime(), 0.02);
+    assertSame(debouncer.getDebounceType(), Debouncer.DebounceType.kBoth);
+
+    debouncer.setDebounceTime(0.1);
+
+    assertEquals(debouncer.getDebounceTime(), 0.1);
+
+    debouncer.setDebounceType(Debouncer.DebounceType.kFalling);
+
+    assertSame(debouncer.getDebounceType(), Debouncer.DebounceType.kFalling);
   }
 }
