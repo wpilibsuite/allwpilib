@@ -10,9 +10,15 @@
 #include <gcem.hpp>
 #include <wpi/SymbolExports.h>
 
+#include "frc/geometry/Translation2d.h"
+#include "frc/geometry/Translation3d.h"
 #include "units/angle.h"
 #include "units/base.h"
+#include "units/length.h"
 #include "units/math.h"
+#include "units/time.h"
+#include "units/velocity.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
@@ -207,4 +213,65 @@ constexpr std::signed_integral auto FloorMod(std::signed_integral auto x,
                                              std::signed_integral auto y) {
   return x - FloorDiv(x, y) * y;
 }
+
+/**
+ * Limits translation velocity.
+ *
+ * @param current Translation at current timestep.
+ * @param next Translation at next timestep.
+ * @param dt Timestep duration.
+ * @param maxVelocity Maximum translation velocity.
+ * @return Returns the next Translation2d limited to maxVelocity
+ */
+constexpr Translation2d SlewRateLimit(const Translation2d& current,
+                                      const Translation2d& next,
+                                      units::second_t dt,
+                                      units::meters_per_second_t maxVelocity) {
+  if (maxVelocity < 0_mps) {
+    wpi::math::MathSharedStore::ReportError(
+        "maxVelocity must be a non-negative number, got {}!", maxVelocity);
+    return next;
+  }
+  Translation2d diff = next - current;
+  units::meter_t dist = diff.Norm();
+  if (dist < 1e-9_m) {
+    return next;
+  }
+  if (dist > maxVelocity * dt) {
+    // Move maximum allowed amount in direction of the difference
+    return current + diff * (maxVelocity * dt / dist);
+  }
+  return next;
+}
+
+/**
+ * Limits translation velocity.
+ *
+ * @param current Translation at current timestep.
+ * @param next Translation at next timestep.
+ * @param dt Timestep duration.
+ * @param maxVelocity Maximum translation velocity.
+ * @return Returns the next Translation3d limited to maxVelocity
+ */
+constexpr Translation3d SlewRateLimit(const Translation3d& current,
+                                      const Translation3d& next,
+                                      units::second_t dt,
+                                      units::meters_per_second_t maxVelocity) {
+  if (maxVelocity < 0_mps) {
+    wpi::math::MathSharedStore::ReportError(
+        "maxVelocity must be a non-negative number, got {}!", maxVelocity);
+    return next;
+  }
+  Translation3d diff = next - current;
+  units::meter_t dist = diff.Norm();
+  if (dist < 1e-9_m) {
+    return next;
+  }
+  if (dist > maxVelocity * dt) {
+    // Move maximum allowed amount in direction of the difference
+    return current + diff * (maxVelocity * dt / dist);
+  }
+  return next;
+}
+
 }  // namespace frc
