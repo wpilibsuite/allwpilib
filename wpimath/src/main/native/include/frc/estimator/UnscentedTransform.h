@@ -48,15 +48,19 @@ SquareRootUnscentedTransform(
         residualFunc,
     const Matrixd<CovDim, CovDim>& squareRootR) {
   // New mean is usually just the sum of the sigmas * weights:
+  //
   //      2n
   //   x̂ = Σ Wᵢ⁽ᵐ⁾𝒳ᵢ
   //      i=0
+  //
   // equations (19) and (23) show this
   // but we allow a custom function, usually for angle wrapping
   Vectord<CovDim> x = meanFunc(sigmas, Wm);
 
   // Form an intermediate matrix S_bar as:
+  //
   //   [√{W₁⁽ᶜ⁾}*(𝒳_{1:2L} - x̂) √{Rᵛ}]
+  //
   // the part of equations (20) and (24) within the "qr{}"
   Matrixd<CovDim, States * 2 + CovDim> Sbar;
   for (int i = 0; i < States * 2; i++) {
