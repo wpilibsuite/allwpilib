@@ -22,7 +22,8 @@
 namespace {
 
 // First test system, differential drive
-frc::Vectord<5> DriveDynamics(const frc::Vectord<5>& x, const frc::Vectord<2>& u) {
+frc::Vectord<5> DriveDynamics(const frc::Vectord<5>& x,
+                              const frc::Vectord<2>& u) {
   auto motors = frc::DCMotor::CIM(2);
 
   // constexpr double Glow = 15.32;    // Low gear ratio
@@ -62,7 +63,6 @@ frc::Vectord<5> DriveGlobalMeasurementModel(
     const frc::Vectord<5>& x, [[maybe_unused]] const frc::Vectord<2>& u) {
   return frc::Vectord<5>{x(0), x(1), x(2), x(3), x(4)};
 }
-
 
 TEST(UnscentedKalmanFilterTest, DriveInit) {
   constexpr auto dt = 5_ms;
@@ -114,8 +114,8 @@ TEST(UnscentedKalmanFilterTest, DriveConvergence) {
   frc::Vectord<5> r = frc::Vectord<5>::Zero();
   frc::Vectord<2> u = frc::Vectord<2>::Zero();
 
-  auto B = frc::NumericalJacobianU<5, 5, 2>(DriveDynamics, frc::Vectord<5>::Zero(),
-                                            frc::Vectord<2>::Zero());
+  auto B = frc::NumericalJacobianU<5, 5, 2>(
+      DriveDynamics, frc::Vectord<5>::Zero(), frc::Vectord<2>::Zero());
 
   observer.SetXhat(frc::Vectord<5>{
       trajectory.InitialPose().Translation().X().value(),
@@ -140,7 +140,8 @@ TEST(UnscentedKalmanFilterTest, DriveConvergence) {
     observer.Correct(u, localY + frc::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
     frc::Vectord<5> rdot = (nextR - r) / dt.value();
-    u = B.householderQr().solve(rdot - DriveDynamics(r, frc::Vectord<2>::Zero()));
+    u = B.householderQr().solve(rdot -
+                                DriveDynamics(r, frc::Vectord<2>::Zero()));
 
     observer.Predict(u, dt);
 
@@ -187,7 +188,8 @@ TEST(UnscentedKalmanFilterTest, RoundTripP) {
 }
 
 // Second system, single motor feedforward estimator
-frc::Vectord<4> MotorDynamics(const frc::Vectord<4>& x, const frc::Vectord<1>& u) {
+frc::Vectord<4> MotorDynamics(const frc::Vectord<4>& x,
+                              const frc::Vectord<1>& u) {
   const double v = x(1);
   const double kV = x(2);
   const double kA = x(3);
@@ -197,7 +199,8 @@ frc::Vectord<4> MotorDynamics(const frc::Vectord<4>& x, const frc::Vectord<1>& u
   return frc::Vectord<4>{v, a, 0, 0};
 }
 
-frc::Vectord<3> MotorMeasurementModel(const frc::Vectord<4>& x, const frc::Vectord<1>& u) {
+frc::Vectord<3> MotorMeasurementModel(const frc::Vectord<4>& x,
+                                      const frc::Vectord<1>& u) {
   const double p = x(0);
   const double v = x(1);
   const double kV = x(2);
@@ -209,12 +212,14 @@ frc::Vectord<3> MotorMeasurementModel(const frc::Vectord<4>& x, const frc::Vecto
 }
 
 double MotorControlInput(const double& t) {
-  double u = 8 * std::sin(std::numbers::pi * std::sqrt(2.0) * t)
-           + 6 * std::sin(std::numbers::pi * std::sqrt(3.0) * t)
-           + 4 * std::sin(std::numbers::pi * std::sqrt(5.0) * t);
+  double u = 8 * std::sin(std::numbers::pi * std::sqrt(2.0) * t) +
+             6 * std::sin(std::numbers::pi * std::sqrt(3.0) * t) +
+             4 * std::sin(std::numbers::pi * std::sqrt(5.0) * t);
 
-  if(u > 12) u = 12;
-  if(u < -12) u = -12;
+  if (u > 12)
+    u = 12;
+  if (u < -12)
+    u = -12;
   return u;
 }
 
@@ -228,11 +233,10 @@ TEST(UnscentedKalmanFilterTest, MotorConvergence) {
   double vel_stddev = 0.1;
   double cur_stddev = 0.1;
 
-  frc::UnscentedKalmanFilter<4, 1, 3> observer{MotorDynamics,
-                                               MotorMeasurementModel,
-                                               wpi::array<double, 4>{0.1, 1.0, 1e-10, 1e-10},
-                                               wpi::array<double, 3>{pos_stddev, vel_stddev, cur_stddev},
-                                               dt};
+  frc::UnscentedKalmanFilter<4, 1, 3> observer{
+      MotorDynamics, MotorMeasurementModel,
+      wpi::array<double, 4>{0.1, 1.0, 1e-10, 1e-10},
+      wpi::array<double, 3>{pos_stddev, vel_stddev, cur_stddev}, dt};
 
   std::vector<frc::Vectord<1>> control_inputs(steps);
   std::vector<frc::Vectord<4>> true_states(steps);
@@ -244,8 +248,11 @@ TEST(UnscentedKalmanFilterTest, MotorConvergence) {
     true_states[i] = frc::RK4(MotorDynamics, (true_states[i - 1]), u, dt);
   }
   for (int i = 0; i < steps; i++) {
-    control_inputs[i] = frc::Vectord<1>{MotorControlInput(i * (dt.value() / 1000))};
-    true_noisy_measurements[i] = MotorMeasurementModel(true_states[i], control_inputs[i]) + frc::MakeWhiteNoiseVector(pos_stddev, vel_stddev, cur_stddev);
+    control_inputs[i] =
+        frc::Vectord<1>{MotorControlInput(i * (dt.value() / 1000))};
+    true_noisy_measurements[i] =
+        MotorMeasurementModel(true_states[i], control_inputs[i]) +
+        frc::MakeWhiteNoiseVector(pos_stddev, vel_stddev, cur_stddev);
   }
 
   frc::Vectord<4> P0{0.001, 0.001, 10, 10};
