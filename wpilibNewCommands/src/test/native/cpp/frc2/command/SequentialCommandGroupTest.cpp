@@ -15,8 +15,6 @@ using namespace frc2;
 class SequentialCommandGroupTest : public CommandTestBase {};
 
 TEST_F(SequentialCommandGroupTest, SequentialGroupSchedule) {
-  CommandScheduler scheduler = GetScheduler();
-
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command3Holder = std::make_unique<MockCommand>();
@@ -54,8 +52,6 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupSchedule) {
 }
 
 TEST_F(SequentialCommandGroupTest, SequentialGroupInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
-
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command3Holder = std::make_unique<MockCommand>();
@@ -93,16 +89,12 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupInterrupt) {
 }
 
 TEST_F(SequentialCommandGroupTest, SequentialGroupNotScheduledCancel) {
-  CommandScheduler scheduler = GetScheduler();
-
   SequentialCommandGroup group{InstantCommand(), InstantCommand()};
 
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
 }
 
 TEST_F(SequentialCommandGroupTest, SequentialGroupCopy) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool finished = false;
 
   auto command = cmd::WaitUntil([&finished] { return finished; });
@@ -117,8 +109,6 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupCopy) {
 }
 
 TEST_F(SequentialCommandGroupTest, SequentialGroupRequirement) {
-  CommandScheduler scheduler = GetScheduler();
-
   TestSubsystem requirement1;
   TestSubsystem requirement2;
   TestSubsystem requirement3;
