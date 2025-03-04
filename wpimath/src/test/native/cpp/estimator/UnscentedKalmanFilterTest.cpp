@@ -212,7 +212,7 @@ double MotorControlInput(const double& t) {
   double u = 8 * std::sin(std::numbers::pi * std::sqrt(2.0) * t)
            + 6 * std::sin(std::numbers::pi * std::sqrt(3.0) * t)
            + 4 * std::sin(std::numbers::pi * std::sqrt(5.0) * t);
-  
+
   if(u > 12) u = 12;
   if(u < -12) u = -12;
   return u;
