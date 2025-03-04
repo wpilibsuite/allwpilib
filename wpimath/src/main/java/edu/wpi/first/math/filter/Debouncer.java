@@ -21,8 +21,8 @@ public class Debouncer {
     kBoth
   }
 
-  private final double m_debounceTime;
-  private final DebounceType m_debounceType;
+  private double m_debounceTimeSeconds;
+  private DebounceType m_debounceType;
   private boolean m_baseline;
 
   private double m_prevTime;
