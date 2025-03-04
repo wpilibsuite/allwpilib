@@ -188,7 +188,6 @@ TEST(UnscentedKalmanFilterTest, RoundTripP) {
 
 // Second system, single motor feedforward estimator
 frc::Vectord<4> MotorDynamics(const frc::Vectord<4>& x, const frc::Vectord<1>& u) {
-  const double p = x(0);
   const double v = x(1);
   const double kV = x(2);
   const double kA = x(3);
