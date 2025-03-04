@@ -433,7 +433,7 @@ class UnscentedKalmanFilter {
     //
     //   K = (P_{xy} / S_{y}ᵀ) / S_{y}
     //   K = (S_{y} \ P_{xy})ᵀ / S_{y}
-    //   K = (S_{y}ᵀ \ (S_{y} \ P_{xu}ᵀ))ᵀ
+    //   K = (S_{y}ᵀ \ (S_{y} \ P_{xy}ᵀ))ᵀ
     //
     // equation (27)
     Matrixd<States, Rows> K =

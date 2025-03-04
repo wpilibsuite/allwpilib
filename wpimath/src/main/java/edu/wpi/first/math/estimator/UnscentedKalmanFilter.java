@@ -554,7 +554,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     //
     //   K = (P_{xy} / S_{y}ᵀ) / S_{y}
     //   K = (S_{y} \ P_{xy})ᵀ / S_{y}
-    //   K = (S_{y}ᵀ \ (S_{y} \ P_{xu}ᵀ))ᵀ
+    //   K = (S_{y}ᵀ \ (S_{y} \ P_{xy}ᵀ))ᵀ
     //
     // equation (27)
     Matrix<States, R> K =
