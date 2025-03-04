@@ -37,7 +37,7 @@ import org.ejml.simple.SimpleMatrix;
  *
  * <p>This class implements a square-root-form unscented Kalman filter
  * (SR-UKF). The main reason for this is to guarantee that the covariance
- * matrix remain positive definite.
+ * matrix remains positive definite.
  * For more information about the SR-UKF, see
  * https://www.researchgate.net/publication/3908304.
  *
