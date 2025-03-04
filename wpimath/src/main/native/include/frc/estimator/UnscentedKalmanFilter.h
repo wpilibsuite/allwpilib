@@ -261,8 +261,10 @@ class UnscentedKalmanFilter {
 
     // Project each sigma point forward in time according to the
     // dynamics f(x, u)
-    // sigmas  = 𝒳ₖ₋₁
-    // sigmasF = 𝒳ₖ,ₖ₋₁ or just 𝒳 for readability
+    //
+    //   sigmas  = 𝒳ₖ₋₁
+    //   sigmasF = 𝒳ₖ,ₖ₋₁ or just 𝒳 for readability
+    //
     // equation (18)
     for (int i = 0; i < m_pts.NumSigmas(); ++i) {
       StateVector x = sigmas.template block<States, 1>(0, i);
@@ -404,9 +406,11 @@ class UnscentedKalmanFilter {
         discR.template triangularView<Eigen::Lower>());
 
     // Compute cross covariance of the predicted state and measurement sigma points given as:
+    //
     //           2n
     //   P_{xy} = Σ Wᵢ⁽ᶜ⁾[𝒳ᵢ - x̂][𝒴ᵢ - ŷ⁻]ᵀ
     //           i=0
+    //
     // equation (26)
     Matrixd<States, Rows> Pxy;
     Pxy.setZero();
@@ -421,9 +425,11 @@ class UnscentedKalmanFilter {
     // Compute the Kalman gain, to do this in Eigen we use QR
     // decomposition to solve, this is equivalent to MATLAB's
     // \ operator, so we need to rearrange to use that
-    // K = (P_{xy} / S_{y}ᵀ) / S_{y}
-    // K = (S_{y} \ P_{xy})ᵀ / S_{y}
-    // K = (S_{y}ᵀ \ (S_{y} \ P_{xu}ᵀ))ᵀ
+    //
+    //   K = (P_{xy} / S_{y}ᵀ) / S_{y}
+    //   K = (S_{y} \ P_{xy})ᵀ / S_{y}
+    //   K = (S_{y}ᵀ \ (S_{y} \ P_{xu}ᵀ))ᵀ
+    //
     // equation (27)
     Matrixd<States, Rows> K =
         Sy.transpose()
@@ -432,7 +438,9 @@ class UnscentedKalmanFilter {
             .transpose();
 
     // Compute the posterior state mean
-    // x̂ = x̂⁻ + K(y − ŷ⁻)
+    //
+    //   x̂ = x̂⁻ + K(y − ŷ⁻)
+    //
     // second part of equation (27)
     m_xHat = addFuncX(m_xHat, K * residualFuncY(y, yHat));
 

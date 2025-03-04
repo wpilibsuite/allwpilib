@@ -196,15 +196,19 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     }
 
     // New mean is usually just the sum of the sigmas * weights:
+    //
     //      2n
     //   x̂ = Σ Wᵢ⁽ᵐ⁾𝒳ᵢ
     //      i=0
+    //
     // equations (19) and (23) show this
     // but we allow a custom function, usually for angle wrapping
     Matrix<C, N1> x = meanFunc.apply(sigmas, Wm);
 
     // Form an intermediate matrix S_bar as:
+    //
     //   [√{W₁⁽ᶜ⁾}*(𝒳_{1:2L} - x̂) √{Rᵛ}]
+    //
     // the part of equations (20) and (24) within the "qr{}"
     Matrix<C, ?> Sbar = new Matrix<>(new SimpleMatrix(dim.getNum(), 2 * s.getNum() + dim.getNum()));
     for (int i = 0; i < 2 * s.getNum(); i++) {
@@ -367,8 +371,10 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
 
     // Project each sigma point forward in time according to the
     // dynamics f(x, u)
-    // sigmas  = 𝒳ₖ₋₁
-    // sigmasF = 𝒳ₖ,ₖ₋₁ or just 𝒳 for readability
+    //
+    //   sigmas  = 𝒳ₖ₋₁
+    //   sigmasF = 𝒳ₖ,ₖ₋₁ or just 𝒳 for readability
+    //
     // equation (18)
     for (int i = 0; i < m_pts.getNumSigmas(); ++i) {
       Matrix<States, N1> x = sigmas.extractColumnVector(i);
@@ -516,9 +522,11 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     var Sy = transRet.getSecond();
 
     // Compute cross covariance of the predicted state and measurement sigma points given as:
+    //
     //           2n
     //   P_{xy} = Σ Wᵢ⁽ᶜ⁾[𝒳ᵢ - x̂][𝒴ᵢ - ŷ⁻]ᵀ
     //           i=0
+    //
     // equation (26)
     Matrix<States, R> Pxy = new Matrix<>(m_states, rows);
     for (int i = 0; i < m_pts.getNumSigmas(); i++) {
@@ -531,9 +539,11 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     // Compute the Kalman gain, to do this in Eigen we use QR
     // decomposition to solve, this is equivalent to MATLAB's
     // \ operator, so we need to rearrange to use that
-    // K = (P_{xy} / S_{y}ᵀ) / S_{y}
-    // K = (S_{y} \ P_{xy})ᵀ / S_{y}
-    // K = (S_{y}ᵀ \ (S_{y} \ P_{xu}ᵀ))ᵀ
+    //
+    //   K = (P_{xy} / S_{y}ᵀ) / S_{y}
+    //   K = (S_{y} \ P_{xy})ᵀ / S_{y}
+    //   K = (S_{y}ᵀ \ (S_{y} \ P_{xu}ᵀ))ᵀ
+    //
     // equation (27)
     Matrix<States, R> K =
         Sy.transpose()
@@ -541,7 +551,9 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
             .transpose();
 
     // Compute the posterior state mean
+    //
     // x̂ = x̂⁻ + K(y − ŷ⁻)
+    //
     // second part of equation (27)
     m_xHat = addFuncX.apply(m_xHat, K.times(residualFuncY.apply(y, yHat)));
 
