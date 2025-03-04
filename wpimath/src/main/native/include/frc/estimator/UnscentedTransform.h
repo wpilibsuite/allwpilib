@@ -47,16 +47,17 @@ SquareRootUnscentedTransform(
                                   const Vectord<CovDim>&)>
         residualFunc,
     const Matrixd<CovDim, CovDim>& squareRootR) {
-  // The mean of the sigmas is usually just:
-  // xhat = sigmas * Wm
-  // but we allow a custom function, usually
-  // for an angle state with some modulus
-  // (Eq. 19/23)
+  // New mean is usually just the sum of the sigmas * weights:
+  //      2n
+  //   x̂ = Σ Wᵢ⁽ᵐ⁾𝒳ᵢ
+  //      i=0
+  // equations (19) and (23) show this
+  // but we allow a custom function, usually for angle wrapping
   Vectord<CovDim> x = meanFunc(sigmas, Wm);
 
-  // Form a matrix S_bar as each sigma point - the weighted mean
-  // with the noise matrix appended
-  // (Eq. 20/24)
+  // Form an intermediate matrix S_bar as:
+  //   [√{W₁⁽ᶜ⁾}*(𝒳_{1:2L} - x̂) √{Rᵛ}]
+  // the part of equations (20) and (24) within the "qr{}"
   Matrixd<CovDim, States * 2 + CovDim> Sbar;
   for (int i = 0; i < States * 2; i++) {
     Sbar.template block<CovDim, 1>(0, i) =
@@ -67,7 +68,7 @@ SquareRootUnscentedTransform(
 
   // Compute the square-root covariance of the sigma points
   // This is upper triangular, so we need to take the transpose
-  // (Eq. 20/24)
+  // equations (20) and (24)
   Matrixd<CovDim, CovDim> S = Sbar.transpose()
                                   .householderQr()
                                   .matrixQR()
@@ -75,9 +76,9 @@ SquareRootUnscentedTransform(
                                   .template triangularView<Eigen::Upper>()
                                   .transpose();
 
-  // Update or downdate the square-root covariance with the first sigma
-  // depending on whether its weight (Wc[0]) is positive or negative
-  // (Eq. 21/25)
+  // Update or downdate the square-root covariance with (𝒳₀-x̂)
+  // depending on whether its weight (W₀⁽ᶜ⁾) is positive or negative
+  // equations (21) and (25)
   Eigen::internal::llt_inplace<double, Eigen::Lower>::rankUpdate(
       S, residualFunc(sigmas.template block<CovDim, 1>(0, 0), x), Wc[0]);
 

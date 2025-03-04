@@ -69,10 +69,8 @@ public class MerweScaledSigmaPoints<S extends Num> {
   }
 
   /**
-   * Computes the sigma points for an unscented Kalman filter given the mean (x) and square root covariance(s)
-   * of the filter.
-   * 
-   * (Eq. 17)
+   * Computes the sigma points for an unscented Kalman filter given the mean
+   * (x) and square-root covariance (s) of the filter.
    *
    * @param x An array of the means.
    * @param s Square-root covariance of the filter.
@@ -88,6 +86,8 @@ public class MerweScaledSigmaPoints<S extends Num> {
     // 2 * states + 1 by states
     Matrix<S, ?> sigmas =
         new Matrix<>(new SimpleMatrix(m_states.getNum(), 2 * m_states.getNum() + 1));
+
+    // equation (17)
     sigmas.setColumn(0, x);
     for (int k = 0; k < m_states.getNum(); k++) {
       var xPlusU = x.plus(U.extractColumnVector(k));
