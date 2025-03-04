@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cmath>
+#include <numbers>
 #include <vector>
 
 #include <Eigen/QR>
@@ -20,7 +21,8 @@
 
 namespace {
 
-frc::Vectord<5> Dynamics(const frc::Vectord<5>& x, const frc::Vectord<2>& u) {
+// First test system, differential drive
+frc::Vectord<5> DriveDynamics(const frc::Vectord<5>& x, const frc::Vectord<2>& u) {
   auto motors = frc::DCMotor::CIM(2);
 
   // constexpr double Glow = 15.32;    // Low gear ratio
@@ -51,22 +53,22 @@ frc::Vectord<5> Dynamics(const frc::Vectord<5>& x, const frc::Vectord<2>& u) {
           k1.value() * ((C1 * vr).value() + (C2 * Vr).value())};
 }
 
-frc::Vectord<3> LocalMeasurementModel(
+frc::Vectord<3> DriveLocalMeasurementModel(
     const frc::Vectord<5>& x, [[maybe_unused]] const frc::Vectord<2>& u) {
   return frc::Vectord<3>{x(2), x(3), x(4)};
 }
 
-frc::Vectord<5> GlobalMeasurementModel(
+frc::Vectord<5> DriveGlobalMeasurementModel(
     const frc::Vectord<5>& x, [[maybe_unused]] const frc::Vectord<2>& u) {
   return frc::Vectord<5>{x(0), x(1), x(2), x(3), x(4)};
 }
-}  // namespace
 
-TEST(UnscentedKalmanFilterTest, Init) {
+
+TEST(UnscentedKalmanFilterTest, DriveInit) {
   constexpr auto dt = 5_ms;
 
-  frc::UnscentedKalmanFilter<5, 2, 3> observer{Dynamics,
-                                               LocalMeasurementModel,
+  frc::UnscentedKalmanFilter<5, 2, 3> observer{DriveDynamics,
+                                               DriveLocalMeasurementModel,
                                                {0.5, 0.5, 10.0, 1.0, 1.0},
                                                {0.0001, 0.01, 0.01},
                                                frc::AngleMean<5, 5>(2),
@@ -78,22 +80,22 @@ TEST(UnscentedKalmanFilterTest, Init) {
   frc::Vectord<2> u{12.0, 12.0};
   observer.Predict(u, dt);
 
-  auto localY = LocalMeasurementModel(observer.Xhat(), u);
+  auto localY = DriveLocalMeasurementModel(observer.Xhat(), u);
   observer.Correct(u, localY);
 
-  auto globalY = GlobalMeasurementModel(observer.Xhat(), u);
+  auto globalY = DriveGlobalMeasurementModel(observer.Xhat(), u);
   auto R = frc::MakeCovMatrix(0.01, 0.01, 0.0001, 0.01, 0.01);
-  observer.Correct<5>(u, globalY, GlobalMeasurementModel, R,
+  observer.Correct<5>(u, globalY, DriveGlobalMeasurementModel, R,
                       frc::AngleMean<5, 5>(2), frc::AngleResidual<5>(2),
                       frc::AngleResidual<5>(2), frc::AngleAdd<5>(2));
 }
 
-TEST(UnscentedKalmanFilterTest, Convergence) {
+TEST(UnscentedKalmanFilterTest, DriveConvergence) {
   constexpr auto dt = 5_ms;
   constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
 
-  frc::UnscentedKalmanFilter<5, 2, 3> observer{Dynamics,
-                                               LocalMeasurementModel,
+  frc::UnscentedKalmanFilter<5, 2, 3> observer{DriveDynamics,
+                                               DriveLocalMeasurementModel,
                                                {0.5, 0.5, 10.0, 1.0, 1.0},
                                                {0.0001, 0.5, 0.5},
                                                frc::AngleMean<5, 5>(2),
@@ -112,7 +114,7 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
   frc::Vectord<5> r = frc::Vectord<5>::Zero();
   frc::Vectord<2> u = frc::Vectord<2>::Zero();
 
-  auto B = frc::NumericalJacobianU<5, 5, 2>(Dynamics, frc::Vectord<5>::Zero(),
+  auto B = frc::NumericalJacobianU<5, 5, 2>(DriveDynamics, frc::Vectord<5>::Zero(),
                                             frc::Vectord<2>::Zero());
 
   observer.SetXhat(frc::Vectord<5>{
@@ -134,24 +136,24 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
         ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
         ref.pose.Rotation().Radians().value(), vl.value(), vr.value()};
 
-    auto localY = LocalMeasurementModel(trueXhat, frc::Vectord<2>::Zero());
+    auto localY = DriveLocalMeasurementModel(trueXhat, frc::Vectord<2>::Zero());
     observer.Correct(u, localY + frc::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
     frc::Vectord<5> rdot = (nextR - r) / dt.value();
-    u = B.householderQr().solve(rdot - Dynamics(r, frc::Vectord<2>::Zero()));
+    u = B.householderQr().solve(rdot - DriveDynamics(r, frc::Vectord<2>::Zero()));
 
     observer.Predict(u, dt);
 
     r = nextR;
-    trueXhat = frc::RK4(Dynamics, trueXhat, u, dt);
+    trueXhat = frc::RK4(DriveDynamics, trueXhat, u, dt);
   }
 
-  auto localY = LocalMeasurementModel(trueXhat, u);
+  auto localY = DriveLocalMeasurementModel(trueXhat, u);
   observer.Correct(u, localY);
 
-  auto globalY = GlobalMeasurementModel(trueXhat, u);
+  auto globalY = DriveGlobalMeasurementModel(trueXhat, u);
   auto R = frc::MakeCovMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
-  observer.Correct<5>(u, globalY, GlobalMeasurementModel, R,
+  observer.Correct<5>(u, globalY, DriveGlobalMeasurementModel, R,
                       frc::AngleMean<5, 5>(2), frc::AngleResidual<5>(2),
                       frc::AngleResidual<5>(2), frc::AngleAdd<5>(2)
 
@@ -183,3 +185,82 @@ TEST(UnscentedKalmanFilterTest, RoundTripP) {
 
   ASSERT_TRUE(observer.P().isApprox(P));
 }
+
+// Second system, single motor feedforward estimator
+frc::Vectord<4> MotorDynamics(const frc::Vectord<4>& x, const frc::Vectord<1>& u) {
+  const double p = x(0);
+  const double v = x(1);
+  const double kV = x(2);
+  const double kA = x(3);
+  const double V = u(0);
+
+  const double a = (V - kV * v) / kA;
+  return frc::Vectord<4>{v, a, 0, 0};
+}
+
+frc::Vectord<3> MotorMeasurementModel(const frc::Vectord<4>& x, const frc::Vectord<1>& u) {
+  const double p = x(0);
+  const double v = x(1);
+  const double kV = x(2);
+  const double kA = x(3);
+  const double V = u(0);
+
+  const double I = (V - kV * v) / kA;
+  return frc::Vectord<3>{p, v, I};
+}
+
+double MotorControlInput(const double& t) {
+  double u = 8 * std::sin(std::numbers::pi * std::sqrt(2.0) * t)
+           + 6 * std::sin(std::numbers::pi * std::sqrt(3.0) * t)
+           + 4 * std::sin(std::numbers::pi * std::sqrt(5.0) * t);
+  
+  if(u > 12) u = 12;
+  if(u < -12) u = -12;
+  return u;
+}
+
+TEST(UnscentedKalmanFilterTest, MotorConvergence) {
+  constexpr auto dt = 10_ms;
+  constexpr int steps = 500;
+  constexpr double true_kV = 3;
+  constexpr double true_kA = 0.2;
+
+  double pos_stddev = 0.02;
+  double vel_stddev = 0.1;
+  double cur_stddev = 0.1;
+
+  frc::UnscentedKalmanFilter<4, 1, 3> observer{MotorDynamics,
+                                               MotorMeasurementModel,
+                                               wpi::array<double, 4>{0.1, 1.0, 1e-10, 1e-10},
+                                               wpi::array<double, 3>{pos_stddev, vel_stddev, cur_stddev},
+                                               dt};
+
+  std::vector<frc::Vectord<1>> control_inputs(steps);
+  std::vector<frc::Vectord<4>> true_states(steps);
+  std::vector<frc::Vectord<3>> true_noisy_measurements(steps);
+  true_states[0] = frc::Vectord<4>{0.0, 0.0, true_kV, true_kA};
+
+  for (int i = 1; i < steps; i++) {
+    const frc::Vectord<1> u{MotorControlInput(i * (dt.value() / 1000))};
+    true_states[i] = frc::RK4(MotorDynamics, (true_states[i - 1]), u, dt);
+  }
+  for (int i = 0; i < steps; i++) {
+    control_inputs[i] = frc::Vectord<1>{MotorControlInput(i * (dt.value() / 1000))};
+    true_noisy_measurements[i] = MotorMeasurementModel(true_states[i], control_inputs[i]) + frc::MakeWhiteNoiseVector(pos_stddev, vel_stddev, cur_stddev);
+  }
+
+  frc::Vectord<4> P0{0.001, 0.001, 10, 10};
+
+  observer.SetXhat(frc::Vectord<4>{0.0, 0.0, 2.0, 2.0});
+  observer.SetP(P0.asDiagonal());
+
+  for (int i = 0; i < steps; i++) {
+    observer.Predict(control_inputs[i], dt);
+    observer.Correct(control_inputs[i], true_noisy_measurements[i]);
+  }
+
+  EXPECT_NEAR(true_kV, observer.Xhat(2), 0.05);
+  EXPECT_NEAR(true_kA, observer.Xhat(3), 0.05);
+}
+
+}  // namespace
