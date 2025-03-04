@@ -228,7 +228,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     // Compute the square-root covariance of the sigma points
     //
     // We transpose S⁻ first because we formed it by horizontally
-    // concatenating each part, it should be vertical so we can take
+    // concatenating each part; it should be vertical so we can take
     // the QR decomposition as defined in the "QR Decomposition" passage
     // of section 3. "EFFICIENT SQUARE-ROOT IMPLEMENTATION"
     //
@@ -505,7 +505,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     //
     //   sigmas  = 𝒳
     //   sigmasH = 𝒴
-    // 
+    //
     // This differs from equation (22) which uses
     // the prior sigma points, regenerating them allows
     // multiple measurement updates per time update
@@ -517,7 +517,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     }
 
     // Pass the predicted measurement sigmas through the Unscented Transform
-    // to compute the mean predicted measurement and square-root innovation covariance
+    // to compute the mean predicted measurement and square-root innovation
+    // covariance.
     //
     // equations (23) (24) and (25)
     var transRet =
@@ -533,7 +534,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     var yHat = transRet.getFirst();
     var Sy = transRet.getSecond();
 
-    // Compute cross covariance of the predicted state and measurement sigma points given as:
+    // Compute cross covariance of the predicted state and measurement sigma
+    // points given as:
     //
     //           2n
     //   P_{xy} = Σ Wᵢ⁽ᶜ⁾[𝒳ᵢ - x̂][𝒴ᵢ - ŷ⁻]ᵀ
@@ -548,9 +550,9 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
       Pxy = Pxy.plus(dx.times(dy).times(m_pts.getWc(i)));
     }
 
-    // Compute the Kalman gain, to do this in Eigen we use QR
-    // decomposition to solve, this is equivalent to MATLAB's
-    // \ operator, so we need to rearrange to use that
+    // Compute the Kalman gain. We use Eigen's QR decomposition to solve. This
+    // is equivalent to MATLAB's \ operator, so we need to rearrange to use
+    // that.
     //
     //   K = (P_{xy} / S_{y}ᵀ) / S_{y}
     //   K = (S_{y} \ P_{xy})ᵀ / S_{y}

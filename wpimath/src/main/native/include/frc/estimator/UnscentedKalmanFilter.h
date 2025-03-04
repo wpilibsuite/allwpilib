@@ -388,7 +388,7 @@ class UnscentedKalmanFilter {
     //
     //   sigmas  = 𝒳
     //   sigmasH = 𝒴
-    // 
+    //
     // This differs from equation (22) which uses
     // the prior sigma points, regenerating them allows
     // multiple measurement updates per time update
@@ -401,14 +401,16 @@ class UnscentedKalmanFilter {
     }
 
     // Pass the predicted measurement sigmas through the Unscented Transform
-    // to compute the mean predicted measurement and square-root innovation covariance
+    // to compute the mean predicted measurement and square-root innovation
+    // covariance.
     //
     // equations (23) (24) and (25)
     auto [yHat, Sy] = SquareRootUnscentedTransform<Rows, States>(
         sigmasH, m_pts.Wm(), m_pts.Wc(), meanFuncY, residualFuncY,
         discR.template triangularView<Eigen::Lower>());
 
-    // Compute cross covariance of the predicted state and measurement sigma points given as:
+    // Compute cross covariance of the predicted state and measurement sigma
+    // points given as:
     //
     //           2n
     //   P_{xy} = Σ Wᵢ⁽ᶜ⁾[𝒳ᵢ - x̂][𝒴ᵢ - ŷ⁻]ᵀ
@@ -425,9 +427,9 @@ class UnscentedKalmanFilter {
               .transpose();
     }
 
-    // Compute the Kalman gain, to do this in Eigen we use QR
-    // decomposition to solve, this is equivalent to MATLAB's
-    // \ operator, so we need to rearrange to use that
+    // Compute the Kalman gain. We use Eigen's QR decomposition to solve. This
+    // is equivalent to MATLAB's \ operator, so we need to rearrange to use
+    // that.
     //
     //   K = (P_{xy} / S_{y}ᵀ) / S_{y}
     //   K = (S_{y} \ P_{xy})ᵀ / S_{y}
