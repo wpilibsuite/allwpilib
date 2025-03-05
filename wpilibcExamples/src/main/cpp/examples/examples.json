@@ -812,5 +812,14 @@
     "foldername": "SysIdRoutine",
     "gradlebase": "cpp",
     "commandversion": 2
+  },
+  {
+    "name": "Resistance",
+    "description": "Demonstrates the use of a ResistanceCalculator to calculate a channel's resistance.",
+    "tags": [],
+    "foldername": "Resistance",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
   }
 ]
