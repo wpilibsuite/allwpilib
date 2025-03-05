@@ -58,8 +58,8 @@ public class HolonomicDriveController {
     final var eRotate = m_rotationError;
     final var tolTranslate = m_poseTolerance.getTranslation();
     final var tolRotate = m_poseTolerance.getRotation();
-    return Math.abs(eTranslate.getX()) < tolTranslate.getX()
-        && Math.abs(eTranslate.getY()) < tolTranslate.getY()
+    return Math.abs(eTranslate.x()) < tolTranslate.x()
+        && Math.abs(eTranslate.y()) < tolTranslate.y()
         && Math.abs(eRotate.getRadians()) < tolRotate.getRadians();
   }
 

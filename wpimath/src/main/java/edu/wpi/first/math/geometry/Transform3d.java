@@ -115,8 +115,8 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
    * @see Translation3d#Translation3d(Translation2d)
    */
   public Transform3d(Transform2d transform) {
-    m_translation = new Translation3d(transform.getTranslation());
-    m_rotation = new Rotation3d(transform.getRotation());
+    m_translation = new Translation3d(transform.translation());
+    m_rotation = new Rotation3d(transform.rotation());
   }
 
   /**
