@@ -8,9 +8,11 @@
 #include <jni.h>
 #include <stdint.h>
 
+#include <span>
 #include <string_view>
 
 struct HAL_MatchInfo;
+struct HAL_OpModeOption;
 struct HAL_Value;
 
 namespace hal {
@@ -84,6 +86,13 @@ jobject CreatePowerDistributionVersion(JNIEnv* env, uint32_t firmwareMajor,
                                        uint32_t uniqueId);
 
 jobject CreateCANStreamMessage(JNIEnv* env);
+
+jobject CreateOpModeOption(JNIEnv* env, std::string_view name,
+                           std::string_view category,
+                           std::string_view description, int32_t flags);
+
+jobjectArray CreateOpModeOptionArray(JNIEnv* env,
+                                     std::span<const HAL_OpModeOption> arr);
 
 JavaVM* GetJVM();
 

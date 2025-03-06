@@ -5,13 +5,18 @@
 #pragma once
 
 #include <functional>
+#include <span>
 #include <string_view>
 
+#include <hal/DriverStationTypes.h>
 #include <hal/Value.h>
 
 namespace frc::sim {
 
 using NotifyCallback = std::function<void(std::string_view, const HAL_Value*)>;
+using OpModeCallback = std::function<void(std::string_view, std::string_view)>;
+using OpModeOptionsCallback =
+    std::function<void(std::string_view, std::span<const HAL_OpModeOption>)>;
 using ConstBufferCallback = std::function<void(
     std::string_view, const unsigned char* buffer, unsigned int count)>;
 using CancelCallbackFunc = void (*)(int32_t index, int32_t uid);
@@ -23,6 +28,11 @@ void CallbackStoreThunk(const char* name, void* param, const HAL_Value* value);
 void ConstBufferCallbackStoreThunk(const char* name, void* param,
                                    const unsigned char* buffer,
                                    unsigned int count);
+void OpModeCallbackStoreThunk(const char* name, void* param,
+                              const struct WPI_String* opMode);
+void OpModeOptionsCallbackStoreThunk(const char* name, void* param,
+                                     int32_t count,
+                                     const HAL_OpModeOption* options);
 
 /**
  * Manages simulation callbacks; each object is associated with a callback.
@@ -46,6 +56,11 @@ class CallbackStore {
   CallbackStore(int32_t i, int32_t c, int32_t u, ConstBufferCallback cb,
                 CancelCallbackChannelFunc ccf);
 
+  CallbackStore(int32_t u, OpModeCallback cb, CancelCallbackNoIndexFunc ccnif);
+
+  CallbackStore(int32_t u, OpModeOptionsCallback cb,
+                CancelCallbackNoIndexFunc ccnif);
+
   CallbackStore(const CallbackStore&) = delete;
   CallbackStore& operator=(const CallbackStore&) = delete;
 
@@ -60,12 +75,21 @@ class CallbackStore {
                                             const unsigned char* buffer,
                                             unsigned int count);
 
+  friend void OpModeCallbackStoreThunk(const char* name, void* param,
+                                       const struct WPI_String* opMode);
+
+  friend void OpModeOptionsCallbackStoreThunk(const char* name, void* param,
+                                              int32_t count,
+                                              const HAL_OpModeOption* options);
+
  private:
   int32_t index;
   int32_t channel;
   int32_t uid;
 
   NotifyCallback callback;
+  OpModeCallback opModeCallback;
+  OpModeOptionsCallback opModeOptionsCallback;
   ConstBufferCallback constBufferCallback;
   union {
     CancelCallbackFunc ccf;

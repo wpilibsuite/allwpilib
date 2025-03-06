@@ -9,6 +9,7 @@ import edu.wpi.first.datalog.BooleanLogEntry;
 import edu.wpi.first.datalog.DataLog;
 import edu.wpi.first.datalog.FloatArrayLogEntry;
 import edu.wpi.first.datalog.IntegerArrayLogEntry;
+import edu.wpi.first.datalog.StringLogEntry;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.hal.DriverStationJNI;
@@ -25,6 +26,8 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Provide access to the network communication data to / from the Driver Station. */
@@ -92,6 +95,17 @@ public final class DriverStation {
   private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
   private static double m_nextMessageTime;
 
+  private static String opModeToString(int id) {
+    if (id == 0) {
+      return "";
+    }
+    String str = m_opModes.get(id);
+    if (str != null) {
+      return str;
+    }
+    return "<" + id + ">";
+  }
+
   @SuppressWarnings("MemberName")
   private static class MatchDataSender {
     private static final String kSmartDashboardType = "FMSInfo";
@@ -104,6 +118,9 @@ public final class DriverStation {
     final BooleanPublisher alliance;
     final IntegerPublisher station;
     final IntegerPublisher controlWord;
+    final StringPublisher opMode;
+    final StringPublisher selectedAutonomousOpMode;
+    final StringPublisher selectedTeleoperatedOpMode;
     boolean oldIsRedAlliance = true;
     int oldStationNumber = 1;
     String oldEventName = "";
@@ -112,6 +129,9 @@ public final class DriverStation {
     int oldReplayNumber;
     int oldMatchType;
     int oldControlWord;
+    int oldOpModeId;
+    int oldSelectedAutonomousOpModeId;
+    int oldSelectedTeleoperatedOpModeId;
 
     MatchDataSender() {
       var table = NetworkTableInstance.getDefault().getTable("FMSInfo");
@@ -136,6 +156,12 @@ public final class DriverStation {
       station.set(1);
       controlWord = table.getIntegerTopic("FMSControlData").publish();
       controlWord.set(0);
+      opMode = table.getStringTopic("OpMode").publish();
+      opMode.set("");
+      selectedAutonomousOpMode = table.getStringTopic("SelectedAutonomousOpMode").publish();
+      selectedAutonomousOpMode.set("");
+      selectedTeleoperatedOpMode = table.getStringTopic("SelectedTeleoperatedOpMode").publish();
+      selectedTeleoperatedOpMode.set("");
     }
 
     private void sendMatchData() {
@@ -157,7 +183,6 @@ public final class DriverStation {
       int currentMatchNumber;
       int currentReplayNumber;
       int currentMatchType;
-      int currentControlWord;
       m_cacheDataMutex.lock();
       try {
         currentEventName = DriverStation.m_matchInfo.eventName;
@@ -168,7 +193,11 @@ public final class DriverStation {
       } finally {
         m_cacheDataMutex.unlock();
       }
-      currentControlWord = DriverStationJNI.nativeGetControlWord();
+      final int currentControlWord = DriverStationJNI.nativeGetControlWord();
+      final int currentOpModeId = DriverStationJNI.getOpMode();
+      final int currentSelectedAutonomousOpModeId = DriverStationJNI.getSelectedAutonomousOpMode();
+      final int currentSelectedTeleoperatedOpModeId =
+          DriverStationJNI.getSelectedTeleoperatedOpMode();
 
       if (oldIsRedAlliance != isRedAlliance) {
         alliance.set(isRedAlliance);
@@ -201,6 +230,18 @@ public final class DriverStation {
       if (currentControlWord != oldControlWord) {
         controlWord.set(currentControlWord);
         oldControlWord = currentControlWord;
+      }
+      if (currentOpModeId != oldOpModeId) {
+        opMode.set(opModeToString(currentOpModeId));
+        oldOpModeId = currentOpModeId;
+      }
+      if (currentSelectedAutonomousOpModeId != oldSelectedAutonomousOpModeId) {
+        selectedAutonomousOpMode.set(opModeToString(currentSelectedAutonomousOpModeId));
+        oldSelectedAutonomousOpModeId = currentSelectedAutonomousOpModeId;
+      }
+      if (currentSelectedTeleoperatedOpModeId != oldSelectedTeleoperatedOpModeId) {
+        selectedTeleoperatedOpMode.set(opModeToString(currentSelectedTeleoperatedOpModeId));
+        oldSelectedTeleoperatedOpModeId = currentSelectedTeleoperatedOpModeId;
       }
     }
   }
@@ -313,21 +354,16 @@ public final class DriverStation {
 
   private static class DataLogSender {
     DataLogSender(DataLog log, boolean logJoysticks, long timestamp) {
-      m_logEnabled = new BooleanLogEntry(log, "DS:enabled", timestamp);
-      m_logAutonomous = new BooleanLogEntry(log, "DS:autonomous", timestamp);
-      m_logTest = new BooleanLogEntry(log, "DS:test", timestamp);
       m_logEstop = new BooleanLogEntry(log, "DS:estop", timestamp);
+      m_logOpMode = new StringLogEntry(log, "DS:opMode", timestamp);
 
       // append initial control word values
-      m_wasEnabled = m_controlWordCache.getEnabled();
-      m_wasAutonomous = m_controlWordCache.getAutonomous();
-      m_wasTest = m_controlWordCache.getTest();
       m_wasEstop = m_controlWordCache.getEStop();
-
-      m_logEnabled.append(m_wasEnabled, timestamp);
-      m_logAutonomous.append(m_wasAutonomous, timestamp);
-      m_logTest.append(m_wasTest, timestamp);
       m_logEstop.append(m_wasEstop, timestamp);
+
+      // append initial opmode value
+      m_prevOpModeId = m_opModeIdCache;
+      m_logOpMode.append(m_opModeCache);
 
       if (logJoysticks) {
         m_joysticks = new JoystickLogSender[kJoystickPorts];
@@ -341,29 +377,18 @@ public final class DriverStation {
 
     public void send(long timestamp) {
       // append control word value changes
-      boolean enabled = m_controlWordCache.getEnabled();
-      if (enabled != m_wasEnabled) {
-        m_logEnabled.append(enabled, timestamp);
-      }
-      m_wasEnabled = enabled;
-
-      boolean autonomous = m_controlWordCache.getAutonomous();
-      if (autonomous != m_wasAutonomous) {
-        m_logAutonomous.append(autonomous, timestamp);
-      }
-      m_wasAutonomous = autonomous;
-
-      boolean test = m_controlWordCache.getTest();
-      if (test != m_wasTest) {
-        m_logTest.append(test, timestamp);
-      }
-      m_wasTest = test;
-
       boolean estop = m_controlWordCache.getEStop();
       if (estop != m_wasEstop) {
         m_logEstop.append(estop, timestamp);
       }
       m_wasEstop = estop;
+
+      // append opmode value changes
+      int opModeId = m_opModeIdCache;
+      if (opModeId != m_prevOpModeId) {
+        m_logOpMode.append(m_opModeCache);
+        m_prevOpModeId = opModeId;
+      }
 
       // append joystick value changes
       for (JoystickLogSender joystick : m_joysticks) {
@@ -371,14 +396,10 @@ public final class DriverStation {
       }
     }
 
-    boolean m_wasEnabled;
-    boolean m_wasAutonomous;
-    boolean m_wasTest;
     boolean m_wasEstop;
-    final BooleanLogEntry m_logEnabled;
-    final BooleanLogEntry m_logAutonomous;
-    final BooleanLogEntry m_logTest;
     final BooleanLogEntry m_logEstop;
+    int m_prevOpModeId;
+    final StringLogEntry m_logOpMode;
 
     final JoystickLogSender[] m_joysticks;
   }
@@ -390,6 +411,12 @@ public final class DriverStation {
   private static HALJoystickButtons[] m_joystickButtons = new HALJoystickButtons[kJoystickPorts];
   private static MatchInfoData m_matchInfo = new MatchInfoData();
   private static ControlWord m_controlWord = new ControlWord();
+  private static int m_opModeId;
+  private static String m_opMode = "";
+  private static int m_selectedAutonomousOpModeId;
+  private static String m_selectedAutonomousOpMode = "";
+  private static int m_selectedTeleoperatedOpModeId;
+  private static String m_selectedTeleoperatedOpMode = "";
   private static EventVector m_refreshEvents = new EventVector();
 
   // Joystick Cached Data
@@ -401,6 +428,12 @@ public final class DriverStation {
       new HALJoystickButtons[kJoystickPorts];
   private static MatchInfoData m_matchInfoCache = new MatchInfoData();
   private static ControlWord m_controlWordCache = new ControlWord();
+  private static int m_opModeIdCache;
+  private static String m_opModeCache = "";
+  private static int m_selectedAutonomousOpModeIdCache;
+  private static String m_selectedAutonomousOpModeCache = "";
+  private static int m_selectedTeleoperatedOpModeIdCache;
+  private static String m_selectedTeleoperatedOpModeCache = "";
 
   // Joystick button rising/falling edge flags
   private static int[] m_joystickButtonsPressed = new int[kJoystickPorts];
@@ -415,6 +448,8 @@ public final class DriverStation {
   private static final ReentrantLock m_cacheDataMutex = new ReentrantLock();
 
   private static boolean m_silenceJoystickWarning;
+
+  private static final ConcurrentMap<Integer, String> m_opModes = new ConcurrentHashMap<>();
 
   /**
    * DriverStation constructor.
@@ -858,7 +893,7 @@ public final class DriverStation {
   public static boolean isEnabled() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.getEnabled() && m_controlWord.getDSAttached();
+      return m_opModeId != 0 && m_controlWord.getDSAttached();
     } finally {
       m_cacheDataMutex.unlock();
     }
@@ -888,87 +923,149 @@ public final class DriverStation {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
-   * autonomous mode.
+   * Adds an operating mode option.
    *
-   * @return True if autonomous mode should be enabled, false otherwise.
+   * @param name name of the operating mode
+   * @param category display category
+   * @param description extended description
+   * @param flags flags
+   * @return unique ID used to later identify the operating mode; if an empty string is passed, 0 is
+   *     returned; identical names result in identical IDs
    */
-  public static boolean isAutonomous() {
+  public static int addOpModeOption(String name, String category, String description, int flags) {
+    if (name.isEmpty()) {
+      return 0;
+    }
+    int id = DriverStationJNI.addOpModeOption(name, category, description, flags);
+    m_opModes.put(id, name);
+    return id;
+  }
+
+  /**
+   * Removes an operating mode option.
+   *
+   * @param name name of the operating mode
+   * @return removed unique ID, or 0 if mode did not exist
+   */
+  public static int removeOpModeOption(String name) {
+    int id = DriverStationJNI.removeOpModeOption(name);
+    m_opModes.remove(id);
+    return id;
+  }
+
+  /** Clears all operating mode options. */
+  public static void clearOpModeOptions() {
+    m_opModes.clear();
+    DriverStationJNI.clearOpModeOptions();
+  }
+
+  /**
+   * Get the current operating mode.
+   *
+   * @return the unique ID provided by the addOpMode() function, or 0 to indicate the robot is
+   *     disabled (no active operating mode)
+   */
+  public static int getOpModeId() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.getAutonomous();
+      return m_opModeId;
     } finally {
       m_cacheDataMutex.unlock();
     }
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
-   * autonomous mode and enabled.
+   * Get the current operating mode.
    *
-   * @return True if autonomous should be set and the robot should be enabled.
+   * @return Operating mode string, or "" to indicate the robot is disabled (no active operating
+   *     mode).
    */
-  public static boolean isAutonomousEnabled() {
+  public static String getOpMode() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.getAutonomous() && m_controlWord.getEnabled();
+      return m_opMode;
     } finally {
       m_cacheDataMutex.unlock();
     }
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
-   * operator-controlled mode.
+   * Check to see if the current operating mode is a particular value.
    *
-   * @return True if operator-controlled mode should be enabled, false otherwise.
+   * @param id operating mode unique ID
+   * @return True if that mode is the current mode
    */
-  public static boolean isTeleop() {
-    return !(isAutonomous() || isTest());
+  public static boolean isOpMode(int id) {
+    return getOpModeId() == id;
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
-   * operator-controller mode and enabled.
+   * Check to see if the current operating mode is a particular value.
    *
-   * @return True if operator-controlled mode should be set and the robot should be enabled.
+   * @param mode operating mode
+   * @return True if that mode is the current mode
    */
-  public static boolean isTeleopEnabled() {
+  public static boolean isOpMode(String mode) {
+    return getOpMode().equals(mode);
+  }
+
+  /**
+   * Gets the operating mode selected for the autonomous period. Note this does not mean the
+   * autonomous period is running--use getOpModeId() for that.
+   *
+   * @return the unique ID provided by the addOpMode() function, or 0 to indicate no or unknown
+   *     selection
+   */
+  public static int getSelectedAutonomousOpModeId() {
     m_cacheDataMutex.lock();
     try {
-      return !m_controlWord.getAutonomous()
-          && !m_controlWord.getTest()
-          && m_controlWord.getEnabled();
+      return m_selectedAutonomousOpModeId;
     } finally {
       m_cacheDataMutex.unlock();
     }
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in Test
-   * mode.
+   * Gets the operating mode selected for the autonomous period. Note this does not mean the
+   * autonomous period is running--use getOpMode() for that.
    *
-   * @return True if test mode should be enabled, false otherwise.
+   * @return Operating mode string, or "" to indicate no or unknown selection
    */
-  public static boolean isTest() {
+  public static String getSelectedAutonomousOpMode() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.getTest();
+      return m_selectedAutonomousOpMode;
     } finally {
       m_cacheDataMutex.unlock();
     }
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in Test
-   * mode and enabled.
+   * Gets the operating mode selected for the teleoperated period. Note this does not mean the
+   * teleoperated period is running--use getOpModeId() for that.
    *
-   * @return True if test mode should be set and the robot should be enabled.
+   * @return the unique ID provided by the addOpMode() function, or 0 to indicate no or unknown
+   *     selection
    */
-  public static boolean isTestEnabled() {
+  public static int getSelectedTeleoperatedOpModeId() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.getTest() && m_controlWord.getEnabled();
+      return m_selectedTeleoperatedOpModeId;
+    } finally {
+      m_cacheDataMutex.unlock();
+    }
+  }
+
+  /**
+   * Gets the operating mode selected for the teleoperated period. Note this does not mean the
+   * teleoperated period is running--use getOpMode() for that.
+   *
+   * @return Operating mode string, or "" to indicate no or unknown selection
+   */
+  public static String getSelectedTeleoperatedOpMode() {
+    m_cacheDataMutex.lock();
+    try {
+      return m_selectedTeleoperatedOpMode;
     } finally {
       m_cacheDataMutex.unlock();
     }
@@ -1253,6 +1350,24 @@ public final class DriverStation {
 
     DriverStationJNI.getControlWord(m_controlWordCache);
 
+    int prevOpModeId = m_opModeIdCache;
+    m_opModeIdCache = DriverStationJNI.getOpMode();
+    if (prevOpModeId != m_opModeIdCache) {
+      m_opModeCache = opModeToString(m_opModeIdCache);
+    }
+
+    int prevSelectedAutonomousOpModeId = m_selectedAutonomousOpModeIdCache;
+    m_selectedAutonomousOpModeIdCache = DriverStationJNI.getSelectedAutonomousOpMode();
+    if (prevSelectedAutonomousOpModeId != m_selectedAutonomousOpModeIdCache) {
+      m_selectedAutonomousOpModeCache = opModeToString(m_selectedAutonomousOpModeIdCache);
+    }
+
+    int prevSelectedTeleoperatedOpModeId = m_selectedTeleoperatedOpModeIdCache;
+    m_selectedTeleoperatedOpModeIdCache = DriverStationJNI.getSelectedTeleoperatedOpMode();
+    if (prevSelectedTeleoperatedOpModeId != m_selectedTeleoperatedOpModeIdCache) {
+      m_selectedTeleoperatedOpModeCache = opModeToString(m_selectedTeleoperatedOpModeIdCache);
+    }
+
     DataLogSender dataLogSender;
     // lock joystick mutex to swap cache data
     m_cacheDataMutex.lock();
@@ -1291,6 +1406,13 @@ public final class DriverStation {
       ControlWord currentWord = m_controlWord;
       m_controlWord = m_controlWordCache;
       m_controlWordCache = currentWord;
+
+      m_opModeId = m_opModeIdCache;
+      m_opMode = m_opModeCache;
+      m_selectedAutonomousOpModeId = m_selectedAutonomousOpModeIdCache;
+      m_selectedAutonomousOpMode = m_selectedAutonomousOpModeCache;
+      m_selectedTeleoperatedOpModeId = m_selectedTeleoperatedOpModeIdCache;
+      m_selectedTeleoperatedOpMode = m_selectedTeleoperatedOpModeCache;
 
       dataLogSender = m_dataLogSender;
     } finally {

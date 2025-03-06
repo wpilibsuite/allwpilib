@@ -33,7 +33,6 @@ void DSCommPacket::SetControl(uint8_t control, uint8_t request) {
   std::memset(&m_control_word, 0, sizeof(m_control_word));
   m_control_word.enabled = (control & kEnabled) != 0;
   m_control_word.autonomous = (control & kAutonomous) != 0;
-  m_control_word.test = (control & kTest) != 0;
   m_control_word.eStop = (control & kEmergencyStop) != 0;
   m_control_word.fmsAttached = (control & kFMS_Attached) != 0;
   m_control_word.dsAttached = (request & kRequestNormalMask) != 0;
@@ -317,9 +316,16 @@ void DSCommPacket::SendUDPToHALSim(void) {
   }
 
   HALSIM_SetDriverStationMatchTime(m_match_time);
-  HALSIM_SetDriverStationEnabled(m_control_word.enabled);
-  HALSIM_SetDriverStationAutonomous(m_control_word.autonomous);
-  HALSIM_SetDriverStationTest(m_control_word.test);
+  // basic mapping
+  WPI_String mode;
+  if (!m_control_word.enabled) {
+    mode = wpi::make_string("");
+  } else if (m_control_word.autonomous) {
+    mode = wpi::make_string("auto");
+  } else {
+    mode = wpi::make_string("teleop");
+  }
+  HALSIM_SetOpMode(&mode);
   HALSIM_SetDriverStationEStop(m_control_word.eStop);
   HALSIM_SetDriverStationFmsAttached(m_control_word.fmsAttached);
   HALSIM_SetDriverStationDsAttached(m_control_word.dsAttached);

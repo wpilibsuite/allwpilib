@@ -107,12 +107,6 @@ void glass::DisplayFMSReadOnly(FMSModel* model) {
     ImGui::SameLine();
     ImGui::TextUnformatted(exists ? (data->GetValue() ? "Yes" : "No") : "?");
   }
-  if (auto data = model->GetTestData()) {
-    ImGui::Selectable("Test Mode: ");
-    data->EmitDrag();
-    ImGui::SameLine();
-    ImGui::TextUnformatted(exists ? (data->GetValue() ? "Yes" : "No") : "?");
-  }
   if (auto data = model->GetAutonomousData()) {
     ImGui::Selectable("Autonomous Mode: ");
     data->EmitDrag();

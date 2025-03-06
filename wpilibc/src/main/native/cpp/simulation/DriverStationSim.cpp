@@ -15,57 +15,6 @@
 using namespace frc;
 using namespace frc::sim;
 
-std::unique_ptr<CallbackStore> DriverStationSim::RegisterEnabledCallback(
-    NotifyCallback callback, bool initialNotify) {
-  auto store = std::make_unique<CallbackStore>(
-      -1, callback, &HALSIM_CancelDriverStationEnabledCallback);
-  store->SetUid(HALSIM_RegisterDriverStationEnabledCallback(
-      &CallbackStoreThunk, store.get(), initialNotify));
-  return store;
-}
-
-bool DriverStationSim::GetEnabled() {
-  return HALSIM_GetDriverStationEnabled();
-}
-
-void DriverStationSim::SetEnabled(bool enabled) {
-  HALSIM_SetDriverStationEnabled(enabled);
-}
-
-std::unique_ptr<CallbackStore> DriverStationSim::RegisterAutonomousCallback(
-    NotifyCallback callback, bool initialNotify) {
-  auto store = std::make_unique<CallbackStore>(
-      -1, callback, &HALSIM_CancelDriverStationAutonomousCallback);
-  store->SetUid(HALSIM_RegisterDriverStationAutonomousCallback(
-      &CallbackStoreThunk, store.get(), initialNotify));
-  return store;
-}
-
-bool DriverStationSim::GetAutonomous() {
-  return HALSIM_GetDriverStationAutonomous();
-}
-
-void DriverStationSim::SetAutonomous(bool autonomous) {
-  HALSIM_SetDriverStationAutonomous(autonomous);
-}
-
-std::unique_ptr<CallbackStore> DriverStationSim::RegisterTestCallback(
-    NotifyCallback callback, bool initialNotify) {
-  auto store = std::make_unique<CallbackStore>(
-      -1, callback, &HALSIM_CancelDriverStationTestCallback);
-  store->SetUid(HALSIM_RegisterDriverStationTestCallback(
-      &CallbackStoreThunk, store.get(), initialNotify));
-  return store;
-}
-
-bool DriverStationSim::GetTest() {
-  return HALSIM_GetDriverStationTest();
-}
-
-void DriverStationSim::SetTest(bool test) {
-  HALSIM_SetDriverStationTest(test);
-}
-
 std::unique_ptr<CallbackStore> DriverStationSim::RegisterEStopCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
@@ -151,6 +100,100 @@ double DriverStationSim::GetMatchTime() {
 
 void DriverStationSim::SetMatchTime(double matchTime) {
   HALSIM_SetDriverStationMatchTime(matchTime);
+}
+
+std::unique_ptr<CallbackStore> DriverStationSim::RegisterOpModeCallback(
+    OpModeCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(-1, callback,
+                                               &HALSIM_CancelOpModeCallback);
+  store->SetUid(HALSIM_RegisterOpModeCallback(&OpModeCallbackStoreThunk,
+                                              store.get(), initialNotify));
+  return store;
+}
+
+std::string DriverStationSim::GetOpMode() {
+  WPI_String modeStr;
+  HALSIM_GetOpMode(&modeStr);
+  std::string mode{wpi::to_string_view(&modeStr)};
+  WPI_FreeString(&modeStr);
+  return mode;
+}
+
+void DriverStationSim::SetOpMode(std::string_view mode) {
+  auto modeStr = wpi::make_string(mode);
+  HALSIM_SetOpMode(&modeStr);
+}
+
+std::unique_ptr<CallbackStore>
+DriverStationSim::RegisterSelectedAutonomousOpModeCallback(
+    OpModeCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelSelectedAutonomousOpModeCallback);
+  store->SetUid(HALSIM_RegisterSelectedAutonomousOpModeCallback(
+      &OpModeCallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+std::string DriverStationSim::GetSelectedAutonomousOpMode() {
+  WPI_String modeStr;
+  HALSIM_GetSelectedAutonomousOpMode(&modeStr);
+  std::string mode{wpi::to_string_view(&modeStr)};
+  WPI_FreeString(&modeStr);
+  return mode;
+}
+
+void DriverStationSim::SetSelectedAutonomousOpMode(std::string_view mode) {
+  auto modeStr = wpi::make_string(mode);
+  HALSIM_SetSelectedAutonomousOpMode(&modeStr);
+}
+
+std::unique_ptr<CallbackStore>
+DriverStationSim::RegisterSelectedTeleoperatedOpModeCallback(
+    OpModeCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelSelectedTeleoperatedOpModeCallback);
+  store->SetUid(HALSIM_RegisterSelectedTeleoperatedOpModeCallback(
+      &OpModeCallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+std::string DriverStationSim::GetSelectedTeleoperatedOpMode() {
+  WPI_String modeStr;
+  HALSIM_GetSelectedTeleoperatedOpMode(&modeStr);
+  std::string mode{wpi::to_string_view(&modeStr)};
+  WPI_FreeString(&modeStr);
+  return mode;
+}
+
+void DriverStationSim::SetSelectedTeleoperatedOpMode(std::string_view mode) {
+  auto modeStr = wpi::make_string(mode);
+  HALSIM_SetSelectedTeleoperatedOpMode(&modeStr);
+}
+
+std::unique_ptr<CallbackStore> DriverStationSim::RegisterOpModeOptionsCallback(
+    OpModeOptionsCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelOpModeOptionsCallback);
+  store->SetUid(HALSIM_RegisterOpModeOptionsCallback(
+      &OpModeOptionsCallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+std::vector<DriverStationSim::OpModeOption>
+DriverStationSim::GetOpModeOptions() {
+  int32_t len;
+  HAL_OpModeOption* modesBuf = HALSIM_GetOpModeOptions(&len);
+  std::vector<OpModeOption> modes;
+  modes.reserve(len);
+  for (int32_t i = 0; i < len; ++i) {
+    modes.emplace_back(
+        std::string{wpi::to_string_view(&modesBuf[i].name)},
+        std::string{wpi::to_string_view(&modesBuf[i].category)},
+        std::string{wpi::to_string_view(&modesBuf[i].description)},
+        modesBuf[i].flags);
+  }
+  HALSIM_FreeOpModeOptions(modesBuf, len);
+  return modes;
 }
 
 void DriverStationSim::NotifyNewData() {

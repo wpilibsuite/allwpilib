@@ -69,11 +69,6 @@ void Robot::TeleopInit() {
  */
 void Robot::TeleopPeriodic() {}
 
-/**
- * This function is called periodically during test mode.
- */
-void Robot::TestPeriodic() {}
-
 #ifndef RUNNING_FRC_TESTS
 int main() {
   return frc::StartRobot<Robot>();

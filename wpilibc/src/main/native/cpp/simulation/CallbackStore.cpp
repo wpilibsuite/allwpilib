@@ -21,6 +21,19 @@ void frc::sim::ConstBufferCallbackStoreThunk(const char* name, void* param,
                                                                count);
 }
 
+void frc::sim::OpModeCallbackStoreThunk(const char* name, void* param,
+                                        const struct WPI_String* opMode) {
+  reinterpret_cast<CallbackStore*>(param)->opModeCallback(
+      name, wpi::to_string_view(opMode));
+}
+
+void frc::sim::OpModeOptionsCallbackStoreThunk(
+    const char* name, void* param, int32_t count,
+    const HAL_OpModeOption* options) {
+  reinterpret_cast<CallbackStore*>(param)->opModeOptionsCallback(
+      name, std::span<const HAL_OpModeOption>{options, options + count});
+}
+
 CallbackStore::CallbackStore(int32_t i, NotifyCallback cb,
                              CancelCallbackNoIndexFunc ccf)
     : index(i), callback(std::move(cb)), cancelType(NoIndex) {
@@ -64,6 +77,18 @@ CallbackStore::CallbackStore(int32_t i, int32_t c, int32_t u,
       constBufferCallback(std::move(cb)),
       cancelType(Channel) {
   this->cccf = ccf;
+}
+
+CallbackStore::CallbackStore(int32_t u, OpModeCallback cb,
+                             CancelCallbackNoIndexFunc ccnif)
+    : uid(u), opModeCallback(std::move(cb)), cancelType(NoIndex) {
+  this->ccnif = ccnif;
+}
+
+CallbackStore::CallbackStore(int32_t u, OpModeOptionsCallback cb,
+                             CancelCallbackNoIndexFunc ccnif)
+    : uid(u), opModeOptionsCallback(std::move(cb)), cancelType(NoIndex) {
+  this->ccnif = ccnif;
 }
 
 CallbackStore::~CallbackStore() {

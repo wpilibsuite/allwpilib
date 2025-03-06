@@ -52,6 +52,7 @@ static JClass canStreamMessageCls;
 static JClass halValueCls;
 static JClass revPHVersionCls;
 static JClass canStreamOverflowExCls;
+static JClass opModeOptionCls;
 
 static const JClassInit classes[] = {
     {"edu/wpi/first/hal/PowerDistributionVersion",
@@ -64,7 +65,9 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/hal/HALValue", &halValueCls},
     {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls},
     {"edu/wpi/first/hal/can/CANStreamOverflowException",
-     &canStreamOverflowExCls}};
+     &canStreamOverflowExCls},
+    {"edu/wpi/first/hal/simulation/DriverStationDataJNI$OpModeOption",
+     &opModeOptionCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
@@ -304,6 +307,34 @@ jobject CreateCANStreamMessage(JNIEnv* env) {
   static jmethodID constructor =
       env->GetMethodID(canStreamMessageCls, "<init>", "()V");
   return env->NewObject(canStreamMessageCls, constructor);
+}
+
+jobject CreateOpModeOption(JNIEnv* env, std::string_view name,
+                           std::string_view category,
+                           std::string_view description, int32_t flags) {
+  static jmethodID constructor =
+      env->GetMethodID(opModeOptionCls, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
+  return env->NewObject(
+      opModeOptionCls, constructor, MakeJString(env, name),
+      MakeJString(env, category), MakeJString(env, description),
+      static_cast<jint>(flags));
+}
+
+jobjectArray CreateOpModeOptionArray(JNIEnv* env,
+                                     std::span<const HAL_OpModeOption> arr) {
+  jobjectArray jarr = env->NewObjectArray(arr.size(), opModeOptionCls, nullptr);
+  if (!jarr) {
+    return nullptr;
+  }
+  for (size_t i = 0; i < arr.size(); ++i) {
+    JLocal<jobject>
+        elem{env, CreateOpModeOption(env, wpi::to_string_view(&arr[i].name),
+                                     wpi::to_string_view(&arr[i].category),
+                                     wpi::to_string_view(&arr[i].description),
+                                     arr[i].flags)};
+    env->SetObjectArrayElement(jarr, i, elem.obj());
+  }
+  return jarr;
 }
 
 JavaVM* GetJVM() {

@@ -10,7 +10,6 @@
 
 #include <cstdio>
 #include <memory>
-#include <string>
 #include <utility>
 
 #include <cameraserver/CameraServerShared.h>
@@ -147,28 +146,12 @@ bool RobotBase::IsDisabled() const {
   return DriverStation::IsDisabled();
 }
 
-bool RobotBase::IsAutonomous() const {
-  return DriverStation::IsAutonomous();
+bool RobotBase::IsOpMode(int mode) const {
+  return DriverStation::IsOpMode(mode);
 }
 
-bool RobotBase::IsAutonomousEnabled() const {
-  return DriverStation::IsAutonomousEnabled();
-}
-
-bool RobotBase::IsTeleop() const {
-  return DriverStation::IsTeleop();
-}
-
-bool RobotBase::IsTeleopEnabled() const {
-  return DriverStation::IsTeleopEnabled();
-}
-
-bool RobotBase::IsTest() const {
-  return DriverStation::IsTest();
-}
-
-bool RobotBase::IsTestEnabled() const {
-  return DriverStation::IsTestEnabled();
+bool RobotBase::IsOpMode(std::string_view mode) const {
+  return DriverStation::IsOpMode(mode);
 }
 
 std::thread::id RobotBase::GetThreadId() {

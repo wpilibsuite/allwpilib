@@ -39,31 +39,27 @@ class SwerveControllerCommandTest : public testing::Test {
 TEST_F(SwerveControllerCommandTest, Match) {
   std::cerr << "autonomous" << std::endl;
   // auto
-  frc::sim::DriverStationSim::SetAutonomous(true);
-  frc::sim::DriverStationSim::SetEnabled(true);
+  frc::sim::DriverStationSim::SetOpMode("auto");
   frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(15_s);
 
   // brief disabled period- exact duration shouldn't matter
   std::cerr << "mid disabled" << std::endl;
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetEnabled(false);
+  frc::sim::DriverStationSim::SetOpMode("");
   frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(3_s);
 
   // teleop
   std::cerr << "teleop" << std::endl;
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetEnabled(true);
+  frc::sim::DriverStationSim::SetOpMode("teleop");
   frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(135_s);
 
   // end of match
   std::cerr << "end of match" << std::endl;
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetEnabled(false);
+  frc::sim::DriverStationSim::SetOpMode("");
   frc::sim::DriverStationSim::NotifyNewData();
 }

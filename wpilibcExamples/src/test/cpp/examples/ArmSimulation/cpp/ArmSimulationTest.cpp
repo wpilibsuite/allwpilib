@@ -57,8 +57,7 @@ TEST_P(ArmSimulationTest, Teleop) {
 
   // teleop init
   {
-    frc::sim::DriverStationSim::SetAutonomous(false);
-    frc::sim::DriverStationSim::SetEnabled(true);
+    frc::sim::DriverStationSim::SetOpMode("teleop");
     frc::sim::DriverStationSim::NotifyNewData();
 
     EXPECT_TRUE(m_motorSim.GetInitialized());
@@ -131,8 +130,7 @@ TEST_P(ArmSimulationTest, Teleop) {
 
   {
     // Disable
-    frc::sim::DriverStationSim::SetAutonomous(false);
-    frc::sim::DriverStationSim::SetEnabled(false);
+    frc::sim::DriverStationSim::SetOpMode("");
     frc::sim::DriverStationSim::NotifyNewData();
 
     frc::sim::StepTiming(3_s);

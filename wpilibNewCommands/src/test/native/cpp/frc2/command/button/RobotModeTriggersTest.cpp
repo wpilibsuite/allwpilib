@@ -9,46 +9,33 @@
 #include "frc2/command/button/RobotModeTriggers.h"
 #include "frc2/command/button/Trigger.h"
 
+using namespace frc;
 using namespace frc2;
 using namespace frc::sim;
 class RobotModeTriggersTest : public CommandTestBase {};
 
-TEST(RobotModeTriggersTest, Autonomous) {
+TEST(RobotModeTriggersTest, OpModeId) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetAutonomous(true);
-  DriverStationSim::SetTest(false);
-  DriverStationSim::SetEnabled(true);
+  int mode = DriverStation::AddOpModeOption("test", "", "", 0);
+  DriverStationSim::SetOpMode("test");
   DriverStationSim::NotifyNewData();
-  Trigger autonomous = RobotModeTriggers::Autonomous();
-  EXPECT_TRUE(autonomous.Get());
+  Trigger trigger = RobotModeTriggers::OpMode(mode);
+  EXPECT_TRUE(trigger.Get());
 }
 
-TEST(RobotModeTriggersTest, Teleop) {
+TEST(RobotModeTriggersTest, OpMode) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetAutonomous(false);
-  DriverStationSim::SetTest(false);
-  DriverStationSim::SetEnabled(true);
+  DriverStation::AddOpModeOption("test", "", "", 0);
+  DriverStationSim::SetOpMode("test");
   DriverStationSim::NotifyNewData();
-  Trigger teleop = RobotModeTriggers::Teleop();
-  EXPECT_TRUE(teleop.Get());
+  Trigger trigger = RobotModeTriggers::OpMode("test");
+  EXPECT_TRUE(trigger.Get());
 }
 
 TEST(RobotModeTriggersTest, Disabled) {
   DriverStationSim::ResetData();
-  DriverStationSim::SetAutonomous(false);
-  DriverStationSim::SetTest(false);
-  DriverStationSim::SetEnabled(false);
+  DriverStation::AddOpModeOption("test", "", "", 0);
   DriverStationSim::NotifyNewData();
   Trigger disabled = RobotModeTriggers::Disabled();
   EXPECT_TRUE(disabled.Get());
-}
-
-TEST(RobotModeTriggersTest, TestMode) {
-  DriverStationSim::ResetData();
-  DriverStationSim::SetAutonomous(false);
-  DriverStationSim::SetTest(true);
-  DriverStationSim::SetEnabled(true);
-  DriverStationSim::NotifyNewData();
-  Trigger test = RobotModeTriggers::Test();
-  EXPECT_TRUE(test.Get());
 }

@@ -48,6 +48,16 @@ class DSCommPacket {
   static const uint8_t kRobotHasCode = 0x20;
 
  private:
+  struct ControlWord {
+    uint32_t enabled : 1;
+    uint32_t autonomous : 1;
+    uint32_t test : 1;
+    uint32_t eStop : 1;
+    uint32_t fmsAttached : 1;
+    uint32_t dsAttached : 1;
+    uint32_t : 26;
+  };
+
   void SendJoysticks(void);
   void SetControl(uint8_t control, uint8_t request);
   void SetAlliance(uint8_t station_code);
@@ -62,7 +72,7 @@ class DSCommPacket {
   uint8_t m_hi;
   uint8_t m_lo;
   uint8_t m_control_sent;
-  HAL_ControlWord m_control_word;
+  ControlWord m_control_word;
   HAL_AllianceStationID m_alliance_station;
   HAL_MatchInfo matchInfo;
   std::array<DSCommJoystickPacket, HAL_kMaxJoysticks> m_joystick_packets;

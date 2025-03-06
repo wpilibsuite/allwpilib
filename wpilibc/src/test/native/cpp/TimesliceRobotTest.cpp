@@ -52,7 +52,7 @@ TEST_F(TimesliceRobotTest, Schedule) {
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
 
-  frc::sim::DriverStationSim::SetEnabled(false);
+  frc::sim::DriverStationSim::SetOpMode("");
   frc::sim::DriverStationSim::NotifyNewData();
   frc::sim::StepTiming(0_ms);  // Wait for Notifiers
 

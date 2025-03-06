@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include "frc2/command/button/Trigger.h"
 
 namespace frc2 {
@@ -17,20 +19,22 @@ class RobotModeTriggers {
   RobotModeTriggers() = delete;
 
   /**
-   * Returns a trigger that is true when the robot is enabled in autonomous
+   * Returns a trigger that is true when the robot is in a particular operation
    * mode.
    *
-   * @return A trigger that is true when the robot is enabled in autonomous
-   * mode.
+   * @param mode operating mode
+   * @return A trigger that is true when the robot is in the provided mode.
    */
-  static Trigger Autonomous();
+  static Trigger OpMode(int mode);
 
   /**
-   * Returns a trigger that is true when the robot is enabled in teleop mode.
+   * Returns a trigger that is true when the robot is in a particular operation
+   * mode.
    *
-   * @return A trigger that is true when the robot is enabled in teleop mode.
+   * @param mode operating mode
+   * @return A trigger that is true when the robot is in the provided mode.
    */
-  static Trigger Teleop();
+  static Trigger OpMode(std::string_view mode);
 
   /**
    * Returns a trigger that is true when the robot is disabled.
@@ -38,13 +42,6 @@ class RobotModeTriggers {
    * @return A trigger that is true when the robot is disabled.
    */
   static Trigger Disabled();
-
-  /**
-   * Returns a trigger that is true when the robot is enabled in test mode.
-   *
-   * @return A trigger that is true when the robot is enabled in test mode.
-   */
-  static Trigger Test();
 };
 
 }  // namespace frc2

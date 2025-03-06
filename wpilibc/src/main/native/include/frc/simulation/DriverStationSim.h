@@ -5,6 +5,8 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <string_view>
 
 #include <hal/DriverStationTypes.h>
 
@@ -18,83 +20,12 @@ namespace frc::sim {
  */
 class DriverStationSim {
  public:
-  /**
-   * Register a callback on whether the DS is enabled.
-   *
-   * @param callback the callback that will be called whenever the enabled
-   *                 state is changed
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  static std::unique_ptr<CallbackStore> RegisterEnabledCallback(
-      NotifyCallback callback, bool initialNotify);
-
-  /**
-   * Check if the DS is enabled.
-   *
-   * @return true if enabled
-   */
-  static bool GetEnabled();
-
-  /**
-   * Change whether the DS is enabled.
-   *
-   * @param enabled the new value
-   */
-  static void SetEnabled(bool enabled);
-
-  /**
-   * Register a callback on whether the DS is in autonomous mode.
-   *
-   * @param callback the callback that will be called on autonomous mode
-   *                 entrance/exit
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  static std::unique_ptr<CallbackStore> RegisterAutonomousCallback(
-      NotifyCallback callback, bool initialNotify);
-
-  /**
-   * Check if the DS is in autonomous.
-   *
-   * @return true if autonomous
-   */
-  static bool GetAutonomous();
-
-  /**
-   * Change whether the DS is in autonomous.
-   *
-   * @param autonomous the new value
-   */
-  static void SetAutonomous(bool autonomous);
-
-  /**
-   * Register a callback on whether the DS is in test mode.
-   *
-   * @param callback the callback that will be called whenever the test mode
-   *                 is entered or left
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  static std::unique_ptr<CallbackStore> RegisterTestCallback(
-      NotifyCallback callback, bool initialNotify);
-
-  /**
-   * Check if the DS is in test.
-   *
-   * @return true if test
-   */
-  static bool GetTest();
-
-  /**
-   * Change whether the DS is in test.
-   *
-   * @param test the new value
-   */
-  static void SetTest(bool test);
+  struct OpModeOption {
+    std::string name;
+    std::string category;
+    std::string description;
+    int32_t flags;
+  };
 
   /**
    * Register a callback on the eStop state.
@@ -225,6 +156,105 @@ class DriverStationSim {
    * @param matchTime the new match time
    */
   static void SetMatchTime(double matchTime);
+
+  /**
+   * Register a callback on the operating mode.
+   *
+   * @param callback the callback that will be called whenever the operating
+   *                 mode changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterOpModeCallback(
+      OpModeCallback callback, bool initialNotify);
+
+  /**
+   * Get the operating mode.
+   *
+   * @return the operating mode
+   */
+  static std::string GetOpMode();
+
+  /**
+   * Change the operating mode.
+   *
+   * @param mode the new operating mode
+   */
+  static void SetOpMode(std::string_view mode);
+
+  /**
+   * Register a callback on the operating mode.
+   *
+   * @param callback the callback that will be called whenever the operating
+   *                 mode changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore>
+  RegisterSelectedAutonomousOpModeCallback(OpModeCallback callback,
+                                           bool initialNotify);
+
+  /**
+   * Get the operating mode selected for the autonomous period.
+   *
+   * @return the operating mode
+   */
+  static std::string GetSelectedAutonomousOpMode();
+
+  /**
+   * Change the operating mode selected for the autonomous period.
+   *
+   * @param mode the new operating mode
+   */
+  static void SetSelectedAutonomousOpMode(std::string_view mode);
+
+  /**
+   * Register a callback on the operating mode.
+   *
+   * @param callback the callback that will be called whenever the operating
+   *                 mode changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore>
+  RegisterSelectedTeleoperatedOpModeCallback(OpModeCallback callback,
+                                             bool initialNotify);
+
+  /**
+   * Get the operating mode selected for the teleoperated period.
+   *
+   * @return the operating mode
+   */
+  static std::string GetSelectedTeleoperatedOpMode();
+
+  /**
+   * Change the operating mode selected for the teleoperated period.
+   *
+   * @param mode the new operating mode
+   */
+  static void SetSelectedTeleoperatedOpMode(std::string_view mode);
+
+  /**
+   * Register a callback on the registered operating modes.
+   *
+   * @param callback the callback that will be called whenever the operating
+   *                 mode list changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterOpModeOptionsCallback(
+      OpModeOptionsCallback callback, bool initialNotify);
+
+  /**
+   * Get the registered operating modes.
+   *
+   * @return the operating modes
+   */
+  static std::vector<OpModeOption> GetOpModeOptions();
 
   /**
    * Updates DriverStation data so that new values are visible to the user

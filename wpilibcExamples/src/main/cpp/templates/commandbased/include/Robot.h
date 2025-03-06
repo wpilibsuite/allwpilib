@@ -21,7 +21,6 @@ class Robot : public frc::TimedRobot {
   void AutonomousPeriodic() override;
   void TeleopInit() override;
   void TeleopPeriodic() override;
-  void TestPeriodic() override;
   void SimulationInit() override;
   void SimulationPeriodic() override;
 

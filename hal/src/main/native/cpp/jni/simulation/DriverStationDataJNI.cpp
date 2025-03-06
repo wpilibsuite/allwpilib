@@ -9,165 +9,15 @@
 
 #include "CallbackStore.h"
 #include "edu_wpi_first_hal_simulation_DriverStationDataJNI.h"
+#include "hal/DriverStationTypes.h"
 #include "hal/simulation/DriverStationData.h"
 #include "hal/simulation/MockHooks.h"
+#include "../HALUtil.h"
 
 using namespace hal;
 using namespace wpi::java;
 
 extern "C" {
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    registerEnabledCallback
- * Signature: (Ljava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerEnabledCallback
-  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateCallbackNoIndex(
-      env, callback, initialNotify,
-      &HALSIM_RegisterDriverStationEnabledCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    cancelEnabledCallback
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelEnabledCallback
-  (JNIEnv* env, jclass, jint handle)
-{
-  return sim::FreeCallbackNoIndex(env, handle,
-                                  &HALSIM_CancelDriverStationEnabledCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    getEnabled
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getEnabled
-  (JNIEnv*, jclass)
-{
-  return HALSIM_GetDriverStationEnabled();
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    setEnabled
- * Signature: (Z)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setEnabled
-  (JNIEnv*, jclass, jboolean value)
-{
-  HALSIM_SetDriverStationEnabled(value);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    registerAutonomousCallback
- * Signature: (Ljava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerAutonomousCallback
-  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateCallbackNoIndex(
-      env, callback, initialNotify,
-      &HALSIM_RegisterDriverStationAutonomousCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    cancelAutonomousCallback
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelAutonomousCallback
-  (JNIEnv* env, jclass, jint handle)
-{
-  return sim::FreeCallbackNoIndex(
-      env, handle, &HALSIM_CancelDriverStationAutonomousCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    getAutonomous
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getAutonomous
-  (JNIEnv*, jclass)
-{
-  return HALSIM_GetDriverStationAutonomous();
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    setAutonomous
- * Signature: (Z)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setAutonomous
-  (JNIEnv*, jclass, jboolean value)
-{
-  HALSIM_SetDriverStationAutonomous(value);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    registerTestCallback
- * Signature: (Ljava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerTestCallback
-  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateCallbackNoIndex(
-      env, callback, initialNotify, &HALSIM_RegisterDriverStationTestCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    cancelTestCallback
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelTestCallback
-  (JNIEnv* env, jclass, jint handle)
-{
-  return sim::FreeCallbackNoIndex(env, handle,
-                                  &HALSIM_CancelDriverStationTestCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    getTest
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getTest
-  (JNIEnv*, jclass)
-{
-  return HALSIM_GetDriverStationTest();
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    setTest
- * Signature: (Z)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setTest
-  (JNIEnv*, jclass, jboolean value)
-{
-  HALSIM_SetDriverStationTest(value);
-}
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
@@ -422,6 +272,113 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setMatchTime
   (JNIEnv*, jclass, jdouble value)
 {
   HALSIM_SetDriverStationMatchTime(value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    getOpMode
+ * Signature: ()java/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getOpMode
+  (JNIEnv* env, jclass)
+{
+  WPI_String str;
+  HALSIM_GetOpMode(&str);
+  jstring rv = MakeJString(env, wpi::to_string_view(&str));
+  WPI_FreeString(&str);
+  return rv;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setOpMode
+ * Signature: (java/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setOpMode
+  (JNIEnv* env, jclass, jstring value)
+{
+  JStringRef valueStr{env, value};
+  WPI_String valueWpiStr = wpi::make_string(valueStr);
+  HALSIM_SetOpMode(&valueWpiStr);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    getSelectedAutonomousOpMode
+ * Signature: ()java/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getSelectedAutonomousOpMode
+  (JNIEnv* env, jclass)
+{
+  WPI_String str;
+  HALSIM_GetSelectedAutonomousOpMode(&str);
+  jstring rv = MakeJString(env, wpi::to_string_view(&str));
+  WPI_FreeString(&str);
+  return rv;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setSelectedAutonomousOpMode
+ * Signature: (java/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setSelectedAutonomousOpMode
+  (JNIEnv* env, jclass, jstring value)
+{
+  JStringRef valueStr{env, value};
+  WPI_String valueWpiStr = wpi::make_string(valueStr);
+  HALSIM_SetSelectedAutonomousOpMode(&valueWpiStr);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    getSelectedTeleoperatedOpMode
+ * Signature: ()java/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getSelectedTeleoperatedOpMode
+  (JNIEnv* env, jclass)
+{
+  WPI_String str;
+  HALSIM_GetSelectedTeleoperatedOpMode(&str);
+  jstring rv = MakeJString(env, wpi::to_string_view(&str));
+  WPI_FreeString(&str);
+  return rv;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setSelectedTeleoperatedOpMode
+ * Signature: (java/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setSelectedTeleoperatedOpMode
+  (JNIEnv* env, jclass, jstring value)
+{
+  JStringRef valueStr{env, value};
+  WPI_String valueWpiStr = wpi::make_string(valueStr);
+  HALSIM_SetSelectedTeleoperatedOpMode(&valueWpiStr);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    getOpModeOptions
+ * Signature: ()[Ledu/wpi/first/hal/simulation/DriverStationDataJNI/OpModeOption;
+ */
+JNIEXPORT jobjectArray JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getOpModeOptions
+  (JNIEnv* env, jclass)
+{
+  int32_t len;
+  HAL_OpModeOption* options = HALSIM_GetOpModeOptions(&len);
+  jobjectArray rv =
+      CreateOpModeOptionArray(env, std::span{options, options + len});
+  HALSIM_FreeOpModeOptions(options, len);
+  return rv;
 }
 
 /*

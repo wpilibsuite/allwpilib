@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
     stateMessage
         .append(allianceString)
         .append(DriverStation.isEnabled() ? "E" : "D")
-        .append(DriverStation.isAutonomous() ? "A" : "T")
+        .append(isAutonomous() ? "A" : "T")
         .append(String.format("%03d", (int) DriverStation.getMatchTime()));
 
     writeString(stateMessage.toString());

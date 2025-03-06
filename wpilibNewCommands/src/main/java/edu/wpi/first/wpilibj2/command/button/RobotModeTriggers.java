@@ -15,21 +15,23 @@ public final class RobotModeTriggers {
   private RobotModeTriggers() {}
 
   /**
-   * Returns a trigger that is true when the robot is enabled in autonomous mode.
+   * Returns a trigger that is true when the robot is in a particular operation mode.
    *
-   * @return A trigger that is true when the robot is enabled in autonomous mode.
+   * @param mode operating mode
+   * @return A trigger that is true when the robot is in the provided mode.
    */
-  public static Trigger autonomous() {
-    return new Trigger(DriverStation::isAutonomousEnabled);
+  public static Trigger opMode(int mode) {
+    return new Trigger(() -> DriverStation.isOpMode(mode));
   }
 
   /**
-   * Returns a trigger that is true when the robot is enabled in teleop mode.
+   * Returns a trigger that is true when the robot is in a particular operation mode.
    *
-   * @return A trigger that is true when the robot is enabled in teleop mode.
+   * @param mode operating mode
+   * @return A trigger that is true when the robot is in the provided mode.
    */
-  public static Trigger teleop() {
-    return new Trigger(DriverStation::isTeleopEnabled);
+  public static Trigger opMode(String mode) {
+    return new Trigger(() -> DriverStation.isOpMode(mode));
   }
 
   /**
@@ -39,14 +41,5 @@ public final class RobotModeTriggers {
    */
   public static Trigger disabled() {
     return new Trigger(DriverStation::isDisabled);
-  }
-
-  /**
-   * Returns a trigger that is true when the robot is enabled in test mode.
-   *
-   * @return A trigger that is true when the robot is enabled in test mode.
-   */
-  public static Trigger test() {
-    return new Trigger(DriverStation::isTestEnabled);
   }
 }

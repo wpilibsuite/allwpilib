@@ -33,7 +33,6 @@ NTFMSModel::NTFMSModel(nt::NetworkTableInstance inst, std::string_view path)
       m_allianceStationId{fmt::format("NT_FMS:AllianceStationID:{}", path)},
       m_estop{fmt::format("NT_FMS:EStop:{}", path)},
       m_enabled{fmt::format("NT_FMS:RobotEnabled:{}", path)},
-      m_test{fmt::format("NT_FMS:TestMode:{}", path)},
       m_autonomous{fmt::format("NT_FMS:AutonomousMode:{}", path)},
       m_gameSpecificMessageData{
           fmt::format("NT_FMS:GameSpecificMessage:{}", path)} {}
@@ -57,7 +56,6 @@ void NTFMSModel::Update() {
     // See HAL_ControlWord definition
     m_enabled.SetValue(((controlWord & 0x01) != 0) ? 1 : 0, v.time);
     m_autonomous.SetValue(((controlWord & 0x02) != 0) ? 1 : 0, v.time);
-    m_test.SetValue(((controlWord & 0x04) != 0) ? 1 : 0, v.time);
     m_estop.SetValue(((controlWord & 0x08) != 0) ? 1 : 0, v.time);
     m_fmsAttached.SetValue(((controlWord & 0x10) != 0) ? 1 : 0, v.time);
     m_dsAttached.SetValue(((controlWord & 0x20) != 0) ? 1 : 0, v.time);

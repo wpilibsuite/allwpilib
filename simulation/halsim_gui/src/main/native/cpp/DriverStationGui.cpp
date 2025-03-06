@@ -222,7 +222,6 @@ class FMSSimModel : public glass::FMSModel {
   glass::DoubleSource* GetMatchTimeData() override { return &m_matchTime; }
   glass::BooleanSource* GetEStopData() override { return &m_estop; }
   glass::BooleanSource* GetEnabledData() override { return &m_enabled; }
-  glass::BooleanSource* GetTestData() override { return &m_test; }
   glass::BooleanSource* GetAutonomousData() override { return &m_autonomous; }
   glass::StringSource* GetGameSpecificMessageData() override {
     return &m_gameMessage;
@@ -236,7 +235,6 @@ class FMSSimModel : public glass::FMSModel {
   void SetMatchTime(double val) override { m_matchTime.SetValue(val); }
   void SetEStop(bool val) override { m_estop.SetValue(val); }
   void SetEnabled(bool val) override { m_enabled.SetValue(val); }
-  void SetTest(bool val) override { m_test.SetValue(val); }
   void SetAutonomous(bool val) override { m_autonomous.SetValue(val); }
   void SetGameSpecificMessage(std::string_view val) override {
     m_gameMessage.SetValue(val);
@@ -257,7 +255,6 @@ class FMSSimModel : public glass::FMSModel {
   glass::DoubleSource m_matchTime{"FMS:MatchTime"};
   glass::BooleanSource m_estop{"FMS:EStop"};
   glass::BooleanSource m_enabled{"FMS:RobotEnabled"};
-  glass::BooleanSource m_test{"FMS:TestMode"};
   glass::BooleanSource m_autonomous{"FMS:AutonomousMode"};
   double m_startMatchTime = -1.0;
   glass::StringSource m_gameMessage{"FMS:GameSpecificMessage"};
@@ -1011,12 +1008,10 @@ static void DriverStationConnect(bool enabled, bool autonomous, bool test) {
     gFMSModel->SetDsAttached(true);
     gFMSModel->SetEnabled(enabled);
     gFMSModel->SetAutonomous(autonomous);
-    gFMSModel->SetTest(test);
     gFMSModel->UpdateHAL();
   } else {
     HALSIM_SetDriverStationEnabled(enabled);
     HALSIM_SetDriverStationAutonomous(autonomous);
-    HALSIM_SetDriverStationTest(test);
   }
 }
 
@@ -1077,7 +1072,6 @@ static void DriverStationExecute() {
   bool isAttached = HALSIM_GetDriverStationDsAttached();
   bool isEnabled = HALSIM_GetDriverStationEnabled();
   bool isAuto = HALSIM_GetDriverStationAutonomous();
-  bool isTest = HALSIM_GetDriverStationTest();
 
   // Robot state
   {
@@ -1121,17 +1115,12 @@ static void DriverStationExecute() {
         disableHotkey) {
       DriverStationConnect(false, false, false);
     }
-    if (ImGui::Selectable("Autonomous",
-                          isAttached && isEnabled && isAuto && !isTest)) {
+    if (ImGui::Selectable("Autonomous", isAttached && isEnabled && isAuto)) {
       DriverStationConnect(true, true, false);
     }
-    if (ImGui::Selectable("Teleoperated",
-                          isAttached && isEnabled && !isAuto && !isTest) ||
+    if (ImGui::Selectable("Teleoperated", isAttached && isEnabled && !isAuto) ||
         enableHotkey) {
       DriverStationConnect(true, false, false);
-    }
-    if (ImGui::Selectable("Test", isEnabled && isTest)) {
-      DriverStationConnect(true, false, true);
     }
     ImGui::End();
   }
@@ -1165,7 +1154,6 @@ void FMSSimModel::UpdateHAL() {
       static_cast<HAL_AllianceStationID>(m_allianceStationId.GetValue()));
   HALSIM_SetDriverStationEStop(m_estop.GetValue());
   HALSIM_SetDriverStationEnabled(m_enabled.GetValue());
-  HALSIM_SetDriverStationTest(m_test.GetValue());
   HALSIM_SetDriverStationAutonomous(m_autonomous.GetValue());
   HALSIM_SetDriverStationMatchTime(m_matchTime.GetValue());
   auto str = wpi::make_string(m_gameMessage.GetValue());
@@ -1180,7 +1168,6 @@ void FMSSimModel::Update() {
   m_allianceStationId.SetValue(HALSIM_GetDriverStationAllianceStationId());
   m_estop.SetValue(HALSIM_GetDriverStationEStop());
   m_enabled.SetValue(enabled);
-  m_test.SetValue(HALSIM_GetDriverStationTest());
   m_autonomous.SetValue(HALSIM_GetDriverStationAutonomous());
 
   double matchTime = HALSIM_GetDriverStationMatchTime();

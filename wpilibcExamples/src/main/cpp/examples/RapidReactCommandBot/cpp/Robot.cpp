@@ -44,13 +44,6 @@ void Robot::TeleopInit() {
 
 void Robot::TeleopPeriodic() {}
 
-void Robot::TestInit() {
-  // Cancels all running commands at the start of test mode.
-  frc2::CommandScheduler::GetInstance().CancelAll();
-}
-
-void Robot::TestPeriodic() {}
-
 #ifndef RUNNING_FRC_TESTS
 int main() {
   return frc::StartRobot<Robot>();

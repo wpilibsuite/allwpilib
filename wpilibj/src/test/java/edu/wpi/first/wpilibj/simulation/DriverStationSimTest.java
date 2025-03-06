@@ -20,57 +20,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 class DriverStationSimTest {
   @Test
-  void testEnabled() {
-    HAL.initialize(500, 0);
-    DriverStationSim.resetData();
-
-    assertFalse(DriverStation.isEnabled());
-    BooleanCallback callback = new BooleanCallback();
-    try (CallbackStore cb = DriverStationSim.registerEnabledCallback(callback, false)) {
-      DriverStationSim.setEnabled(true);
-      DriverStationSim.notifyNewData();
-      assertTrue(DriverStationSim.getEnabled());
-      assertTrue(DriverStation.isEnabled());
-      assertTrue(callback.wasTriggered());
-      assertTrue(callback.getSetValue());
-    }
-  }
-
-  @Test
-  void testAutonomous() {
-    HAL.initialize(500, 0);
-    DriverStationSim.resetData();
-
-    assertFalse(DriverStation.isAutonomous());
-    BooleanCallback callback = new BooleanCallback();
-    try (CallbackStore cb = DriverStationSim.registerAutonomousCallback(callback, false)) {
-      DriverStationSim.setAutonomous(true);
-      DriverStationSim.notifyNewData();
-      assertTrue(DriverStationSim.getAutonomous());
-      assertTrue(DriverStation.isAutonomous());
-      assertTrue(callback.wasTriggered());
-      assertTrue(callback.getSetValue());
-    }
-  }
-
-  @Test
-  void testTest() {
-    HAL.initialize(500, 0);
-    DriverStationSim.resetData();
-
-    assertFalse(DriverStation.isTest());
-    BooleanCallback callback = new BooleanCallback();
-    try (CallbackStore cb = DriverStationSim.registerTestCallback(callback, false)) {
-      DriverStationSim.setTest(true);
-      DriverStationSim.notifyNewData();
-      assertTrue(DriverStationSim.getTest());
-      assertTrue(DriverStation.isTest());
-      assertTrue(callback.wasTriggered());
-      assertTrue(callback.getSetValue());
-    }
-  }
-
-  @Test
   void testEstop() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
@@ -256,6 +205,113 @@ class DriverStationSimTest {
       assertTrue(callback.wasTriggered());
       assertEquals(testTime, callback.getSetValue());
     }
+  }
+
+  @Test
+  void testOpMode() {
+    HAL.initialize(500, 0);
+    DriverStationSim.resetData();
+
+    final int mode1 = DriverStation.addOpModeOption("name", "category", "desc", 0);
+    final int mode2 = DriverStation.addOpModeOption("name2", "category2", "desc2", 1);
+
+    var modes = DriverStationSim.getOpModeOptions();
+    assertEquals(2, modes.length);
+    assertEquals("name", modes[0].name);
+    assertEquals("category", modes[0].category);
+    assertEquals("desc", modes[0].description);
+    assertEquals(0, modes[0].flags);
+    assertEquals("name2", modes[1].name);
+    assertEquals("category2", modes[1].category);
+    assertEquals("desc2", modes[1].description);
+    assertEquals(1, modes[1].flags);
+
+    assertEquals(0, DriverStation.getOpModeId());
+    assertEquals("", DriverStation.getOpMode());
+
+    DriverStationSim.setOpMode("name");
+    DriverStationSim.notifyNewData();
+    assertEquals(mode1, DriverStation.getOpModeId());
+    assertEquals("name", DriverStation.getOpMode());
+
+    DriverStationSim.setOpMode("");
+    DriverStationSim.notifyNewData();
+    assertEquals(0, DriverStation.getOpModeId());
+    assertEquals("", DriverStation.getOpMode());
+
+    DriverStationSim.setOpMode("name2");
+    DriverStationSim.notifyNewData();
+    assertEquals(mode2, DriverStation.getOpModeId());
+    assertEquals("name2", DriverStation.getOpMode());
+
+    DriverStationSim.setOpMode("unknown");
+    DriverStationSim.notifyNewData();
+    assertEquals(0, DriverStation.getOpModeId());
+    assertEquals("", DriverStation.getOpMode());
+  }
+
+  @Test
+  void testSelectedAutonomousOpMode() {
+    HAL.initialize(500, 0);
+    DriverStationSim.resetData();
+
+    final int mode1 = DriverStation.addOpModeOption("name", "category", "desc", 0);
+    final int mode2 = DriverStation.addOpModeOption("name2", "category2", "desc2", 1);
+
+    assertEquals(0, DriverStation.getSelectedAutonomousOpModeId());
+    assertEquals("", DriverStation.getSelectedAutonomousOpMode());
+
+    DriverStationSim.setSelectedAutonomousOpMode("name");
+    DriverStationSim.notifyNewData();
+    assertEquals(mode1, DriverStation.getSelectedAutonomousOpModeId());
+    assertEquals("name", DriverStation.getSelectedAutonomousOpMode());
+
+    DriverStationSim.setSelectedAutonomousOpMode("");
+    DriverStationSim.notifyNewData();
+    assertEquals(0, DriverStation.getSelectedAutonomousOpModeId());
+    assertEquals("", DriverStation.getSelectedAutonomousOpMode());
+
+    DriverStationSim.setSelectedAutonomousOpMode("name2");
+    DriverStationSim.notifyNewData();
+    assertEquals(mode2, DriverStation.getSelectedAutonomousOpModeId());
+    assertEquals("name2", DriverStation.getSelectedAutonomousOpMode());
+
+    DriverStationSim.setSelectedAutonomousOpMode("unknown");
+    DriverStationSim.notifyNewData();
+    assertEquals(0, DriverStation.getSelectedAutonomousOpModeId());
+    assertEquals("", DriverStation.getSelectedAutonomousOpMode());
+  }
+
+  @Test
+  void testSelectedTeleoperatedOpMode() {
+    HAL.initialize(500, 0);
+    DriverStationSim.resetData();
+
+    final int mode1 = DriverStation.addOpModeOption("name", "category", "desc", 0);
+    final int mode2 = DriverStation.addOpModeOption("name2", "category2", "desc2", 1);
+
+    assertEquals(0, DriverStation.getSelectedTeleoperatedOpModeId());
+    assertEquals("", DriverStation.getSelectedTeleoperatedOpMode());
+
+    DriverStationSim.setSelectedTeleoperatedOpMode("name");
+    DriverStationSim.notifyNewData();
+    assertEquals(mode1, DriverStation.getSelectedTeleoperatedOpModeId());
+    assertEquals("name", DriverStation.getSelectedTeleoperatedOpMode());
+
+    DriverStationSim.setSelectedTeleoperatedOpMode("");
+    DriverStationSim.notifyNewData();
+    assertEquals(0, DriverStation.getSelectedTeleoperatedOpModeId());
+    assertEquals("", DriverStation.getSelectedTeleoperatedOpMode());
+
+    DriverStationSim.setSelectedTeleoperatedOpMode("name2");
+    DriverStationSim.notifyNewData();
+    assertEquals(mode2, DriverStation.getSelectedTeleoperatedOpModeId());
+    assertEquals("name2", DriverStation.getSelectedTeleoperatedOpMode());
+
+    DriverStationSim.setSelectedTeleoperatedOpMode("unknown");
+    DriverStationSim.notifyNewData();
+    assertEquals(0, DriverStation.getSelectedTeleoperatedOpModeId());
+    assertEquals("", DriverStation.getSelectedTeleoperatedOpMode());
   }
 
   @Test

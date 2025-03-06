@@ -33,7 +33,6 @@ class NTFMSModel : public FMSModel {
   DoubleSource* GetMatchTimeData() override { return nullptr; }
   BooleanSource* GetEStopData() override { return &m_estop; }
   BooleanSource* GetEnabledData() override { return &m_enabled; }
-  BooleanSource* GetTestData() override { return &m_test; }
   BooleanSource* GetAutonomousData() override { return &m_autonomous; }
   StringSource* GetGameSpecificMessageData() override {
     return &m_gameSpecificMessageData;
@@ -46,7 +45,6 @@ class NTFMSModel : public FMSModel {
   void SetMatchTime(double val) override {}
   void SetEStop(bool val) override {}
   void SetEnabled(bool val) override {}
-  void SetTest(bool val) override {}
   void SetAutonomous(bool val) override {}
   void SetGameSpecificMessage(std::string_view val) override {}
 
@@ -66,7 +64,6 @@ class NTFMSModel : public FMSModel {
   IntegerSource m_allianceStationId;
   BooleanSource m_estop;
   BooleanSource m_enabled;
-  BooleanSource m_test;
   BooleanSource m_autonomous;
   StringSource m_gameSpecificMessageData;
 };

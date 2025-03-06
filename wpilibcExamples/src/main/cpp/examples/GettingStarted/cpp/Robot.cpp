@@ -43,10 +43,6 @@ class Robot : public frc::TimedRobot {
                              m_controller.GetRightX());
   }
 
-  void TestInit() override {}
-
-  void TestPeriodic() override {}
-
  private:
   // Robot drive system
   frc::PWMSparkMax m_left{0};

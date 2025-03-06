@@ -19,8 +19,6 @@ class Robot : public frc::TimesliceRobot {
   void TeleopPeriodic() override;
   void DisabledInit() override;
   void DisabledPeriodic() override;
-  void TestInit() override;
-  void TestPeriodic() override;
 
  private:
   frc::SendableChooser<std::string> m_chooser;

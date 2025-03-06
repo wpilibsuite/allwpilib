@@ -8,30 +8,26 @@ import edu.wpi.first.hal.JNIWrapper;
 
 /** JNI for Driver Station data. */
 public class DriverStationDataJNI extends JNIWrapper {
-  public static native int registerEnabledCallback(NotifyCallback callback, boolean initialNotify);
+  public static class OpModeOption {
+    public OpModeOption(String name, String category, String description, int flags) {
+      this.name = name;
+      this.category = category;
+      this.description = description;
+      this.flags = flags;
+    }
 
-  public static native void cancelEnabledCallback(int uid);
+    @SuppressWarnings("MemberName")
+    public final String name;
 
-  public static native boolean getEnabled();
+    @SuppressWarnings("MemberName")
+    public final String category;
 
-  public static native void setEnabled(boolean enabled);
+    @SuppressWarnings("MemberName")
+    public final String description;
 
-  public static native int registerAutonomousCallback(
-      NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelAutonomousCallback(int uid);
-
-  public static native boolean getAutonomous();
-
-  public static native void setAutonomous(boolean autonomous);
-
-  public static native int registerTestCallback(NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelTestCallback(int uid);
-
-  public static native boolean getTest();
-
-  public static native void setTest(boolean test);
+    @SuppressWarnings("MemberName")
+    public final int flags;
+  }
 
   public static native int registerEStopCallback(NotifyCallback callback, boolean initialNotify);
 
@@ -76,6 +72,20 @@ public class DriverStationDataJNI extends JNIWrapper {
   public static native double getMatchTime();
 
   public static native void setMatchTime(double matchTime);
+
+  public static native String getOpMode();
+
+  public static native void setOpMode(String opMode);
+
+  public static native String getSelectedAutonomousOpMode();
+
+  public static native void setSelectedAutonomousOpMode(String opMode);
+
+  public static native String getSelectedTeleoperatedOpMode();
+
+  public static native void setSelectedTeleoperatedOpMode(String opMode);
+
+  public static native OpModeOption[] getOpModeOptions();
 
   public static native void setJoystickAxes(byte joystickNum, float[] axesArray);
 

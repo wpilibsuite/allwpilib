@@ -12,7 +12,6 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.event.EventLoop;
@@ -190,7 +189,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     // run when disabled, or the command is already scheduled.
     if (m_disabled
         || isScheduled(command)
-        || RobotState.isDisabled() && !command.runsWhenDisabled()) {
+        || DriverStation.isDisabled() && !command.runsWhenDisabled()) {
       return;
     }
 
@@ -270,7 +269,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     m_watchdog.addEpoch("buttons.run()");
 
     m_inRunLoop = true;
-    boolean isDisabled = RobotState.isDisabled();
+    boolean isDisabled = DriverStation.isDisabled();
     // Run scheduled commands, remove finished commands.
     for (Iterator<Command> iterator = m_scheduledCommands.iterator(); iterator.hasNext(); ) {
       Command command = iterator.next();

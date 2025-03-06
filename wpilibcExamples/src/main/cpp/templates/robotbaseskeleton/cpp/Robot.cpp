@@ -17,8 +17,6 @@ void Robot::Autonomous() {}
 
 void Robot::Teleop() {}
 
-void Robot::Test() {}
-
 void Robot::StartCompetition() {
   frc::internal::DriverStationModeThread modeThread;
 
@@ -41,13 +39,6 @@ void Robot::StartCompetition() {
       Autonomous();
       modeThread.InAutonomous(false);
       while (IsAutonomousEnabled()) {
-        wpi::WaitForObject(event.GetHandle());
-      }
-    } else if (IsTest()) {
-      modeThread.InTest(true);
-      Test();
-      modeThread.InTest(false);
-      while (IsTest() && IsEnabled()) {
         wpi::WaitForObject(event.GetHandle());
       }
     } else {

@@ -14,7 +14,6 @@ class Robot : public frc::RobotBase {
   void Disabled();
   void Autonomous();
   void Teleop();
-  void Test();
 
   void StartCompetition() override;
   void EndCompetition() override;

@@ -294,7 +294,7 @@ HAL_Bool HAL_GetFPGAButton(int32_t* status) {
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
-  return HALSIM_GetDriverStationEnabled();
+  return HAL_GetOpMode() != 0;
 }
 
 HAL_Bool HAL_GetBrownedOut(int32_t* status) {

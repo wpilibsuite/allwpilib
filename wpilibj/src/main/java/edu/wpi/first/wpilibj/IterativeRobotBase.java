@@ -54,16 +54,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * </ul>
  */
 public abstract class IterativeRobotBase extends RobotBase {
-  private enum Mode {
-    kNone,
-    kDisabled,
-    kAutonomous,
-    kTeleop,
-    kTest
-  }
-
   private final DSControlWord m_word = new DSControlWord();
-  private Mode m_lastMode = Mode.kNone;
+  private final int m_autonomousMode;
+  private final int m_teleoperatedMode;
+  private final int m_testMode;
+  private int m_lastMode = -1;
   private final double m_period;
   private final Watchdog m_watchdog;
   private boolean m_ntFlushEnabled = true;
@@ -75,6 +70,9 @@ public abstract class IterativeRobotBase extends RobotBase {
    * @param period Period in seconds.
    */
   protected IterativeRobotBase(double period) {
+    m_autonomousMode = DriverStation.addOpModeOption("auto", "", "", 0);
+    m_teleoperatedMode = DriverStation.addOpModeOption("teleop", "", "", 0);
+    m_testMode = DriverStation.addOpModeOption("test", "", "", 0);
     m_period = period;
     m_watchdog = new Watchdog(period, this::printLoopOverrunMessage);
   }
@@ -244,6 +242,33 @@ public abstract class IterativeRobotBase extends RobotBase {
   public void testExit() {}
 
   /**
+   * Returns true if in autonomous mode.
+   *
+   * @return True if autonomous
+   */
+  public boolean isAutonomous() {
+    return DriverStation.getOpModeId() == m_autonomousMode;
+  }
+
+  /**
+   * Returns true if in teleoperated mode.
+   *
+   * @return True if teleoperated
+   */
+  public boolean isTeleoperated() {
+    return DriverStation.getOpModeId() == m_teleoperatedMode;
+  }
+
+  /**
+   * Returns true if in test mode.
+   *
+   * @return True if test
+   */
+  public boolean isTest() {
+    return DriverStation.getOpModeId() == m_testMode;
+  }
+
+  /**
    * Enables or disables flushing NetworkTables every loop iteration. By default, this is enabled.
    *
    * @param enabled True to enable, false to disable
@@ -271,16 +296,7 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_word.refresh();
 
     // Get current mode
-    Mode mode = Mode.kNone;
-    if (m_word.isDisabled()) {
-      mode = Mode.kDisabled;
-    } else if (m_word.isAutonomous()) {
-      mode = Mode.kAutonomous;
-    } else if (m_word.isTeleop()) {
-      mode = Mode.kTeleop;
-    } else if (m_word.isTest()) {
-      mode = Mode.kTest;
-    }
+    int mode = DriverStation.getOpModeId();
 
     if (!m_calledDsConnected && m_word.isDSAttached()) {
       m_calledDsConnected = true;
@@ -290,67 +306,48 @@ public abstract class IterativeRobotBase extends RobotBase {
     // If mode changed, call mode exit and entry functions
     if (m_lastMode != mode) {
       // Call last mode's exit function
-      switch (m_lastMode) {
-        case kDisabled -> disabledExit();
-        case kAutonomous -> autonomousExit();
-        case kTeleop -> teleopExit();
-        case kTest -> testExit();
-        default -> {
-          // NOP
-        }
+      if (m_lastMode == 0) {
+        disabledExit();
+      } else if (m_lastMode == m_autonomousMode) {
+        autonomousExit();
+      } else if (m_lastMode == m_teleoperatedMode) {
+        teleopExit();
+      } else if (m_lastMode == m_testMode) {
+        testExit();
       }
 
       // Call current mode's entry function
-      switch (mode) {
-        case kDisabled -> {
-          disabledInit();
-          m_watchdog.addEpoch("disabledInit()");
-        }
-        case kAutonomous -> {
-          autonomousInit();
-          m_watchdog.addEpoch("autonomousInit()");
-        }
-        case kTeleop -> {
-          teleopInit();
-          m_watchdog.addEpoch("teleopInit()");
-        }
-        case kTest -> {
-          testInit();
-          m_watchdog.addEpoch("testInit()");
-        }
-        default -> {
-          // NOP
-        }
+      if (mode == 0) {
+        disabledInit();
+        m_watchdog.addEpoch("disabledInit()");
+      } else if (mode == m_autonomousMode) {
+        autonomousInit();
+        m_watchdog.addEpoch("autonomousInit()");
+      } else if (mode == m_teleoperatedMode) {
+        teleopInit();
+        m_watchdog.addEpoch("teleopInit()");
+      } else if (mode == m_testMode) {
+        testInit();
+        m_watchdog.addEpoch("testInit()");
       }
 
       m_lastMode = mode;
     }
 
     // Call the appropriate function depending upon the current robot mode
-    switch (mode) {
-      case kDisabled -> {
-        DriverStationJNI.observeUserProgramDisabled();
-        disabledPeriodic();
-        m_watchdog.addEpoch("disabledPeriodic()");
-      }
-      case kAutonomous -> {
-        DriverStationJNI.observeUserProgramAutonomous();
-        autonomousPeriodic();
-        m_watchdog.addEpoch("autonomousPeriodic()");
-      }
-      case kTeleop -> {
-        DriverStationJNI.observeUserProgramTeleop();
-        teleopPeriodic();
-        m_watchdog.addEpoch("teleopPeriodic()");
-      }
-      case kTest -> {
-        DriverStationJNI.observeUserProgramTest();
-        testPeriodic();
-        m_watchdog.addEpoch("testPeriodic()");
-      }
-      default -> {
-        // NOP
-      }
+    DriverStationJNI.observeUserProgramOpMode(mode);
+    if (mode == 0) {
+      disabledPeriodic();
+      m_watchdog.addEpoch("disabledPeriodic()");
+    } else if (mode == m_autonomousMode) {
+      autonomousPeriodic();
+      m_watchdog.addEpoch("autonomousPeriodic()");
+    } else if (mode == m_teleoperatedMode) {
+      teleopPeriodic();
+      m_watchdog.addEpoch("teleopPeriodic()");
+    } else if (mode == m_testMode) {
+      testPeriodic();
+      m_watchdog.addEpoch("testPeriodic()");
     }
 
     robotPeriodic();
