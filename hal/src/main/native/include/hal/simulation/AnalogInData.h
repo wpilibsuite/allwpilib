@@ -22,21 +22,6 @@ void HALSIM_SetAnalogInInitialized(int32_t index, HAL_Bool initialized);
 
 HAL_SimDeviceHandle HALSIM_GetAnalogInSimDevice(int32_t index);
 
-int32_t HALSIM_RegisterAnalogInAverageBitsCallback(int32_t index,
-                                                   HAL_NotifyCallback callback,
-                                                   void* param,
-                                                   HAL_Bool initialNotify);
-void HALSIM_CancelAnalogInAverageBitsCallback(int32_t index, int32_t uid);
-int32_t HALSIM_GetAnalogInAverageBits(int32_t index);
-void HALSIM_SetAnalogInAverageBits(int32_t index, int32_t averageBits);
-
-int32_t HALSIM_RegisterAnalogInOversampleBitsCallback(
-    int32_t index, HAL_NotifyCallback callback, void* param,
-    HAL_Bool initialNotify);
-void HALSIM_CancelAnalogInOversampleBitsCallback(int32_t index, int32_t uid);
-int32_t HALSIM_GetAnalogInOversampleBits(int32_t index);
-void HALSIM_SetAnalogInOversampleBits(int32_t index, int32_t oversampleBits);
-
 int32_t HALSIM_RegisterAnalogInVoltageCallback(int32_t index,
                                                HAL_NotifyCallback callback,
                                                void* param,

@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.hal.simulation.RoboRioDataJNI;
-import edu.wpi.first.wpilibj.RobotController;
 
 /** A utility class to control a simulated RoboRIO. */
 public final class RoboRioSim {

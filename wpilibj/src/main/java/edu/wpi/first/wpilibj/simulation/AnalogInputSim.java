@@ -61,67 +61,6 @@ public class AnalogInputSim {
   }
 
   /**
-   * Register a callback on the number of average bits.
-   *
-   * @param callback the callback that will be called whenever the number of average bits is changed
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public CallbackStore registerAverageBitsCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = AnalogInDataJNI.registerAverageBitsCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, AnalogInDataJNI::cancelAverageBitsCallback);
-  }
-
-  /**
-   * Get the number of average bits.
-   *
-   * @return the number of average bits
-   */
-  public int getAverageBits() {
-    return AnalogInDataJNI.getAverageBits(m_index);
-  }
-
-  /**
-   * Change the number of average bits.
-   *
-   * @param averageBits the new value
-   */
-  public void setAverageBits(int averageBits) {
-    AnalogInDataJNI.setAverageBits(m_index, averageBits);
-  }
-
-  /**
-   * Register a callback on the amount of oversampling bits.
-   *
-   * @param callback the callback that will be called whenever the oversampling bits are changed.
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public CallbackStore registerOversampleBitsCallback(
-      NotifyCallback callback, boolean initialNotify) {
-    int uid = AnalogInDataJNI.registerOversampleBitsCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, AnalogInDataJNI::cancelOversampleBitsCallback);
-  }
-
-  /**
-   * Get the amount of oversampling bits.
-   *
-   * @return the amount of oversampling bits
-   */
-  public int getOversampleBits() {
-    return AnalogInDataJNI.getOversampleBits(m_index);
-  }
-
-  /**
-   * Change the amount of oversampling bits.
-   *
-   * @param oversampleBits the new value
-   */
-  public void setOversampleBits(int oversampleBits) {
-    AnalogInDataJNI.setOversampleBits(m_index, oversampleBits);
-  }
-
-  /**
    * Register a callback on the voltage.
    *
    * @param callback the callback that will be called whenever the voltage is changed.
