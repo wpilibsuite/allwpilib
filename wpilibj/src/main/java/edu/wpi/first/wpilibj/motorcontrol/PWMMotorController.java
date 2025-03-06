@@ -5,8 +5,8 @@
 package edu.wpi.first.wpilibj.motorcontrol;
 
 import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimDevice.Direction;
+import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -26,7 +26,7 @@ public abstract class PWMMotorController extends MotorSafety
   /** PWM instances for motor controller. */
   protected PWM m_pwm;
 
-  private String m_name;
+  private final String m_name;
 
   private SimDevice m_simDevice;
   private SimDouble m_simSpeed;
@@ -115,9 +115,9 @@ public abstract class PWMMotorController extends MotorSafety
     if (speed == 0.0) {
       rawValue = m_centerPwm;
     } else if (speed > 0.0) {
-      rawValue = (int)Math.round(speed * getPositiveScaleFactor()) + getMinPositivePwm();
+      rawValue = (int) Math.round(speed * getPositiveScaleFactor()) + getMinPositivePwm();
     } else {
-      rawValue = (int)Math.round(speed * getNegativeScaleFactor()) + getMaxNegativePwm();
+      rawValue = (int) Math.round(speed * getNegativeScaleFactor()) + getMaxNegativePwm();
     }
 
     m_pwm.setPulseTimeMicroseconds(rawValue);
@@ -133,15 +133,16 @@ public abstract class PWMMotorController extends MotorSafety
     } else if (rawValue < m_minPwm) {
       return -1.0;
     } else if (rawValue > getMinPositivePwm()) {
-      return (rawValue - getMinPositivePwm()) / (double)getPositiveScaleFactor();
+      return (rawValue - getMinPositivePwm()) / (double) getPositiveScaleFactor();
     } else if (rawValue < getMaxNegativePwm()) {
-      return (rawValue - getMaxNegativePwm()) / (double)getNegativeScaleFactor();
+      return (rawValue - getMaxNegativePwm()) / (double) getNegativeScaleFactor();
     } else {
       return 0.0;
     }
   }
 
-  protected final void setBoundsMicroseconds(int maxPwm, int deadbandMaxPwm, int centerPwm, int deadbandMinPwm, int minPwm) {
+  protected final void setBoundsMicroseconds(
+      int maxPwm, int deadbandMaxPwm, int centerPwm, int deadbandMinPwm, int minPwm) {
     m_maxPwm = maxPwm;
     m_deadbandMaxPwm = deadbandMaxPwm;
     m_centerPwm = centerPwm;
@@ -172,9 +173,7 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   /**
-   * Get the recently set value of the PWM. This value is affected by the inversion property. If you
-   * want the value that is sent directly to the MotorController, use {@link
-   * edu.wpi.first.wpilibj.PWM#getSpeed()} instead.
+   * Get the recently set value of the PWM. This value is affected by the inversion property.
    *
    * @return The most recently set value for the PWM between -1.0 and 1.0.
    */

@@ -4,11 +4,14 @@
 
 #pragma once
 
+#include <hal/SimDevice.h>
 #include <units/angle.h>
 
 #include "frc/PWM.h"
 
 namespace frc {
+
+class ServoSim;
 
 /**
  * Standard hobby style servo.
@@ -18,6 +21,8 @@ namespace frc {
  */
 class Servo : public wpi::Sendable, public wpi::SendableHelper<Servo> {
  public:
+  friend class ServoSim;
+
   /**
    * Constructor.
    *
@@ -79,13 +84,15 @@ class Servo : public wpi::Sendable, public wpi::SendableHelper<Servo> {
    */
   double GetAngle() const;
 
+  int GetChannel() const;
+
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  double GetServoAngleRange() const;
+  static double GetServoAngleRange();
   units::microsecond_t GetFullRangeScaleFactor() const;
 
-  static constexpr double kMaxServoAngle = 180.;
+  static constexpr double kMaxServoAngle = 180.0;
   static constexpr double kMinServoAngle = 0.0;
 
   static constexpr units::millisecond_t kDefaultMaxServoPWM = 2.4_ms;
@@ -93,6 +100,9 @@ class Servo : public wpi::Sendable, public wpi::SendableHelper<Servo> {
 
   units::millisecond_t m_maxPwm = kDefaultMaxServoPWM;
   units::millisecond_t m_minPwm = kDefaultMinServoPWM;
+
+  hal::SimDevice m_simDevice;
+  hal::SimDouble m_simPosition;
 
   PWM m_pwm;
 };

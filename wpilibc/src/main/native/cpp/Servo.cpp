@@ -10,12 +10,6 @@
 
 using namespace frc;
 
-constexpr double Servo::kMaxServoAngle;
-constexpr double Servo::kMinServoAngle;
-
-constexpr units::millisecond_t Servo::kDefaultMaxServoPWM;
-constexpr units::millisecond_t Servo::kDefaultMinServoPWM;
-
 Servo::Servo(int channel) : m_pwm(channel, false) {
   wpi::SendableRegistry::Add(this, "Servo", channel);
 
@@ -24,10 +18,19 @@ Servo::Servo(int channel) : m_pwm(channel, false) {
 
   HAL_ReportUsage("IO", channel, "Servo");
   wpi::SendableRegistry::SetName(this, "Servo", channel);
+
+  m_simDevice = hal::SimDevice{"Servo", channel};
+  if (m_simDevice) {
+    m_simPosition = m_simDevice.CreateDouble("Position", true, 0.0);
+    m_pwm.SetSimDevice(m_simDevice);
+  }
 }
 
 void Servo::Set(double value) {
   value = std::clamp(value, 0.0, 1.0);
+  if (m_simPosition) {
+    m_simPosition.Set(value);
+  }
 
   units::microsecond_t rawValue =
       (value * GetFullRangeScaleFactor()) + m_minPwm;
@@ -67,10 +70,14 @@ void Servo::InitSendable(wpi::SendableBuilder& builder) {
       [=, this](double value) { Set(value); });
 }
 
-double Servo::GetServoAngleRange() const {
+double Servo::GetServoAngleRange() {
   return kMaxServoAngle - kMinServoAngle;
 }
 
 units::microsecond_t Servo::GetFullRangeScaleFactor() const {
   return m_maxPwm - m_minPwm;
+}
+
+int Servo::GetChannel() const {
+  return m_pwm.GetChannel();
 }

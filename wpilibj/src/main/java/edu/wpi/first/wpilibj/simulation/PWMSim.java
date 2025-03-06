@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj.simulation;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.hal.simulation.PWMDataJNI;
 import edu.wpi.first.wpilibj.PWM;
-import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
 
 /** Class to control a simulated PWM output. */
 public class PWMSim {
@@ -20,15 +19,6 @@ public class PWMSim {
    */
   public PWMSim(PWM pwm) {
     m_index = pwm.getChannel();
-  }
-
-  /**
-   * Constructs from a PWMMotorController object.
-   *
-   * @param motorctrl PWMMotorController to simulate
-   */
-  public PWMSim(PWMMotorController motorctrl) {
-    m_index = motorctrl.getChannel();
   }
 
   /**
@@ -100,6 +90,7 @@ public class PWMSim {
   public void setPulseMicrosecond(int microsecondPulseTime) {
     PWMDataJNI.setPulseMicrosecond(m_index, microsecondPulseTime);
   }
+
   /**
    * Register a callback to be run when the PWM period scale changes.
    *
@@ -107,7 +98,8 @@ public class PWMSim {
    * @param initialNotify whether to run the callback with the initial value
    * @return the {@link CallbackStore} object associated with this callback.
    */
-  public CallbackStore registerOutputPeriodCallback(NotifyCallback callback, boolean initialNotify) {
+  public CallbackStore registerOutputPeriodCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = PWMDataJNI.registerOutputPeriodCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, PWMDataJNI::cancelOutputPeriodCallback);
   }

@@ -22,6 +22,4 @@ public class PWMMotorControllerSim {
   public double getSpeed() {
     return m_simSpeed.get();
   }
-
-
 }

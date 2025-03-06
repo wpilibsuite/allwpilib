@@ -28,13 +28,6 @@ class PWMSim {
   explicit PWMSim(const PWM& pwm);
 
   /**
-   * Constructs from a PWMMotorController object.
-   *
-   * @param motorctrl PWMMotorController to simulate
-   */
-  explicit PWMSim(const PWMMotorController& motorctrl);
-
-  /**
    * Constructs from a PWM channel number.
    *
    * @param channel Channel number

@@ -16,9 +16,6 @@ using namespace frc::sim;
 
 PWMSim::PWMSim(const PWM& pwm) : m_index{pwm.GetChannel()} {}
 
-PWMSim::PWMSim(const PWMMotorController& motorctrl)
-    : m_index{motorctrl.GetChannel()} {}
-
 PWMSim::PWMSim(int channel) : m_index{channel} {}
 
 std::unique_ptr<CallbackStore> PWMSim::RegisterInitializedCallback(

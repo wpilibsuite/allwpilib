@@ -5,6 +5,9 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDevice.Direction;
+import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -24,10 +27,13 @@ public class Servo implements Sendable, AutoCloseable {
   private static final int kDefaultMaxServoPWM = 2400;
   private static final int kDefaultMinServoPWM = 600;
 
-  private PWM m_pwm;
+  private final PWM m_pwm;
 
-  private int m_minPwm = kDefaultMinServoPWM;
-  private int m_maxPwm = kDefaultMaxServoPWM;
+  private SimDevice m_simDevice;
+  private SimDouble m_simPosition;
+
+  private static final int m_minPwm = kDefaultMinServoPWM;
+  private static final int m_maxPwm = kDefaultMaxServoPWM;
 
   /**
    * Constructor.
@@ -46,6 +52,12 @@ public class Servo implements Sendable, AutoCloseable {
     m_pwm.setOutputPeriod(OutputPeriod.k20Ms);
 
     HAL.reportUsage("IO", channel, "Servo");
+
+    m_simDevice = SimDevice.create("Servo", channel);
+    if (m_simDevice != null) {
+      m_simPosition = m_simDevice.createDouble("Position", Direction.kOutput, 0.0);
+      m_pwm.setSimDevice(m_simDevice);
+    }
   }
 
   /** Free the resource associated with the PWM channel and set the value to 0. */
@@ -53,6 +65,12 @@ public class Servo implements Sendable, AutoCloseable {
   public void close() {
     SendableRegistry.remove(this);
     m_pwm.close();
+
+    if (m_simDevice != null) {
+      m_simDevice.close();
+      m_simDevice = null;
+      m_simPosition = null;
+    }
   }
 
   /**
@@ -65,7 +83,11 @@ public class Servo implements Sendable, AutoCloseable {
   public void set(double value) {
     value = MathUtil.clamp(value, 0.0, 1.0);
 
-    int rawValue = (int)((value * getFullRangeScaleFactor()) + m_minPwm);
+    if (m_simPosition != null) {
+      m_simPosition.set(value);
+    }
+
+    int rawValue = (int) ((value * getFullRangeScaleFactor()) + m_minPwm);
 
     m_pwm.setPulseTimeMicroseconds(rawValue);
   }
@@ -122,6 +144,24 @@ public class Servo implements Sendable, AutoCloseable {
    */
   public double getAngle() {
     return get() * getServoAngleRange() + kMinServoAngle;
+  }
+
+  /**
+   * Gets the backing PWM handle.
+   *
+   * @return The pwm handle.
+   */
+  public int getPwmHandle() {
+    return m_pwm.getHandle();
+  }
+
+  /**
+   * Gets the PWM channel number.
+   *
+   * @return The channel number.
+   */
+  public int getChannel() {
+    return m_pwm.getChannel();
   }
 
   private double getFullRangeScaleFactor() {

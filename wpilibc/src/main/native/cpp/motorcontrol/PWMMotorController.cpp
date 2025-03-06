@@ -100,7 +100,7 @@ PWMMotorController::PWMMotorController(std::string_view name, int channel)
     : m_pwm(channel, false), m_name{name} {
   wpi::SendableRegistry::Add(this, name, channel);
 
-  m_simDevice = hal::SimDevice(m_name.c_str(), channel);
+  m_simDevice = hal::SimDevice{m_name.c_str(), channel};
   if (m_simDevice) {
     m_simSpeed = m_simDevice.CreateDouble("Speed", true, 0.0);
     m_pwm.SetSimDevice(m_simDevice);

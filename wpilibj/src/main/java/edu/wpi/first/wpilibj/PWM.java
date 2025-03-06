@@ -21,11 +21,11 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 public class PWM implements Sendable, AutoCloseable {
   /** Represents the output period in microseconds. */
   public enum OutputPeriod {
-    /** Pulse every 5ms */
+    /** Pulse every 5ms. */
     k5Ms,
-    /** Pulse every 10ms */
+    /** Pulse every 10ms. */
     k10Ms,
-    /** Pulse every 20ms */
+    /** Pulse every 20ms. */
     k20Ms
   }
 
@@ -141,7 +141,7 @@ public class PWM implements Sendable, AutoCloseable {
     return m_handle;
   }
 
-/**
+  /**
    * Indicates this input is used by a simulated device.
    *
    * @param device simulated device handle
