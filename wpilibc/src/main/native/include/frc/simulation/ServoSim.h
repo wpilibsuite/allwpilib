@@ -11,6 +11,9 @@
 
 namespace frc {
 
+class Servo;
+
+namespace sim {
 class ServoSim {
  public:
   explicit ServoSim(const Servo& servo);
@@ -24,4 +27,5 @@ class ServoSim {
  private:
   hal::SimDouble m_simPosition;
 };
+}  // namespace sim
 }  // namespace frc

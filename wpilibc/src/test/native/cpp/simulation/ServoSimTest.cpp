@@ -12,7 +12,7 @@
 namespace frc::sim {
 TEST(ServoSimTest, TestServo) {
   frc::Servo servo{0};
-  frc::ServoSim sim{servo};
+  frc::sim::ServoSim sim{servo};
 
   servo.Set(0);
   EXPECT_EQ(0, sim.GetPosition());

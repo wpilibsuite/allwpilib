@@ -10,6 +10,7 @@
 #include "frc/simulation/SimDeviceSim.h"
 
 using namespace frc;
+using namespace frc::sim;
 
 PWMMotorControllerSim::PWMMotorControllerSim(
     const PWMMotorController& motorctrl)

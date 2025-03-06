@@ -11,6 +11,10 @@
 
 namespace frc {
 
+class PWMMotorController;
+
+namespace sim {
+
 class PWMMotorControllerSim {
  public:
   explicit PWMMotorControllerSim(const PWMMotorController& motorctrl);
@@ -22,4 +26,5 @@ class PWMMotorControllerSim {
  private:
   hal::SimDouble m_simSpeed;
 };
+}  // namespace sim
 }  // namespace frc

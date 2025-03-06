@@ -11,7 +11,9 @@
 
 namespace frc {
 
+namespace sim {
 class ServoSim;
+}
 
 /**
  * Standard hobby style servo.
@@ -21,7 +23,7 @@ class ServoSim;
  */
 class Servo : public wpi::Sendable, public wpi::SendableHelper<Servo> {
  public:
-  friend class ServoSim;
+  friend class frc::sim::ServoSim;
 
   /**
    * Constructor.

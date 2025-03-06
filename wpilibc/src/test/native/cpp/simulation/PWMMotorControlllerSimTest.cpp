@@ -12,7 +12,7 @@
 namespace frc::sim {
 TEST(PWMMotorControllerSimTest, TestMotor) {
   frc::Spark spark{0};
-  frc::PWMMotorControllerSim sim{spark};
+  frc::sim::PWMMotorControllerSim sim{spark};
 
   spark.Set(0);
   EXPECT_EQ(0, sim.GetSpeed());
