@@ -262,11 +262,6 @@ TEST(UnscentedKalmanFilterTest, MotorConvergence) {
   double vel_stddev = 0.1;
   double cur_stddev = 0.1;
 
-  frc::UnscentedKalmanFilter<4, 1, 3> observer{
-      MotorDynamics, MotorMeasurementModel,
-      wpi::array<double, 4>{0.1, 1.0, 1e-10, 1e-10},
-      wpi::array<double, 3>{pos_stddev, vel_stddev, cur_stddev}, dt};
-
   std::vector<frc::Vectord<1>> control_inputs(steps);
   std::vector<frc::Vectord<4>> true_states(steps);
   std::vector<frc::Vectord<3>> true_noisy_measurements(steps);
@@ -285,6 +280,11 @@ TEST(UnscentedKalmanFilterTest, MotorConvergence) {
   }
 
   frc::Vectord<4> P0{0.001, 0.001, 10, 10};
+
+  frc::UnscentedKalmanFilter<4, 1, 3> observer{
+      MotorDynamics, MotorMeasurementModel,
+      wpi::array<double, 4>{0.1, 1.0, 1e-10, 1e-10},
+      wpi::array<double, 3>{pos_stddev, vel_stddev, cur_stddev}, dt};
 
   observer.SetXhat(frc::Vectord<4>{0.0, 0.0, 2.0, 2.0});
   observer.SetP(P0.asDiagonal());

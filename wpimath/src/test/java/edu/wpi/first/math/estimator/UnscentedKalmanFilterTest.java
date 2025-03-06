@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.StateSpaceUtil;
@@ -18,6 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.NumericalIntegration;
@@ -26,6 +28,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -270,5 +274,103 @@ class UnscentedKalmanFilterTest {
     observer.setP(P);
 
     assertTrue(observer.getP().isEqual(P, 1e-9));
+  }
+
+  // Second system, single motor feedforward estimator
+  private static Matrix<N4, N1> motorDynamics(Matrix<N4, N1> x, Matrix<N1, N1> u) {
+    final double v = x.get(1, 0);
+    final double kV = x.get(2, 0);
+    final double kA = x.get(3, 0);
+    final double V = u.get(0, 0);
+
+    final double a = (V - kV * v) / kA;
+    return MatBuilder.fill(Nat.N4(), Nat.N1(), v, a, 0, 0);
+  }
+
+  private static Matrix<N3, N1> motorMeasurementModel(Matrix<N4, N1> x, Matrix<N1, N1> u) {
+    final double p = x.get(0, 0);
+    final double v = x.get(1, 0);
+    final double kV = x.get(2, 0);
+    final double kA = x.get(3, 0);
+    final double V = u.get(0, 0);
+
+    final double I = (V - kV * v) / kA;
+    return MatBuilder.fill(Nat.N3(), Nat.N1(), p, v, I);
+  }
+
+  private static double motorControlInput(double t) {
+    return MathUtil.clamp(
+        8 * Math.sin(Math.PI * Math.sqrt(2.0) * t)
+            + 6 * Math.sin(Math.PI * Math.sqrt(3.0) * t)
+            + 4 * Math.sin(Math.PI * Math.sqrt(5.0) * t),
+        -12.0,
+        12.0);
+  }
+
+  @Test
+  void testMotorConvergence() {
+    double dtSeconds = 0.01;
+    int steps = 500;
+    double true_kV = 3;
+    double true_kA = 0.2;
+
+    double pos_stddev = 0.02;
+    double vel_stddev = 0.1;
+    double cur_stddev = 0.1;
+
+    var control_inputs =
+        new ArrayList<>(Collections.nCopies(steps, MatBuilder.fill(Nat.N1(), Nat.N1(), 0.0)));
+    var true_states =
+        new ArrayList<>(
+            Collections.nCopies(steps, MatBuilder.fill(Nat.N4(), Nat.N1(), 0.0, 0.0, 0.0, 0.0)));
+    var true_noisy_measurements =
+        new ArrayList<>(
+            Collections.nCopies(steps, MatBuilder.fill(Nat.N3(), Nat.N1(), 0.0, 0.0, 0.0)));
+    true_states.set(0, MatBuilder.fill(Nat.N4(), Nat.N1(), 0.0, 0.0, true_kV, true_kA));
+
+    for (int i = 1; i < steps; i++) {
+      var u = MatBuilder.fill(Nat.N1(), Nat.N1(), motorControlInput(i * (dtSeconds / 1000)));
+
+      true_states.set(
+          i,
+          NumericalIntegration.rk4(
+              UnscentedKalmanFilterTest::motorDynamics, true_states.get(i - 1), u, dtSeconds));
+    }
+    for (int i = 0; i < steps; i++) {
+      control_inputs.set(
+          i, MatBuilder.fill(Nat.N1(), Nat.N1(), motorControlInput(i * (dtSeconds / 1000))));
+      true_noisy_measurements.set(
+          i,
+          motorMeasurementModel(true_states.get(i), control_inputs.get(i))
+              .plus(
+                  StateSpaceUtil.makeWhiteNoiseVector(
+                      VecBuilder.fill(pos_stddev, vel_stddev, cur_stddev))));
+    }
+
+    var P0 =
+        MatBuilder.fill(
+            Nat.N4(), Nat.N4(), 0.001, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0, 0.0, 0.0, 0.0, 10, 0.0, 0.0,
+            0.0, 0.0, 10);
+
+    var observer =
+        new UnscentedKalmanFilter<N4, N1, N3>(
+            Nat.N4(),
+            Nat.N3(),
+            UnscentedKalmanFilterTest::motorDynamics,
+            UnscentedKalmanFilterTest::motorMeasurementModel,
+            VecBuilder.fill(0.1, 1.0, 1e-10, 1e-10),
+            VecBuilder.fill(pos_stddev, vel_stddev, cur_stddev),
+            dtSeconds);
+
+    observer.setXhat(MatBuilder.fill(Nat.N4(), Nat.N1(), 0.0, 0.0, 2.0, 2.0));
+    observer.setP(P0);
+
+    for (int i = 0; i < steps; i++) {
+      observer.predict(control_inputs.get(i), dtSeconds);
+      observer.correct(control_inputs.get(i), true_noisy_measurements.get(i));
+    }
+
+    assertEquals(true_kV, observer.getXhat(2), 0.05);
+    assertEquals(true_kA, observer.getXhat(3), 0.05);
   }
 }
