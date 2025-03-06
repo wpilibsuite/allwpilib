@@ -11,10 +11,9 @@
 using namespace frc;
 
 Talon::Talon(int channel) : PWMMotorController("Talon", channel) {
-  m_pwm.SetBounds(2.037_ms, 1.539_ms, 1.513_ms, 1.487_ms, 0.989_ms);
-  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
-  m_pwm.SetSpeed(0.0);
-  m_pwm.SetZeroLatch();
+  SetBounds(2.037_ms, 1.539_ms, 1.513_ms, 1.487_ms, 0.989_ms);
+  m_pwm.SetOutputPeriod(PWM::kOutputPeriod_5Ms);
+  SetSpeed(0.0);
 
   HAL_ReportUsage("IO", GetChannel(), "Talon");
 }
