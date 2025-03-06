@@ -12,8 +12,6 @@
 
 namespace frc::sim {
 
-constexpr double kPWMStepSize = 1.0 / 2000.0;
-
 TEST(PWMSimTest, Initialize) {
   HAL_Initialize(500, 0);
 
