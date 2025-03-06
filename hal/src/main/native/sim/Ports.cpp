@@ -16,32 +16,8 @@ extern "C" {
 int32_t HAL_GetNumCanBuses(void) {
   return kNumCanBuses;
 }
-int32_t HAL_GetNumAnalogInputs(void) {
-  return kNumAnalogInputs;
-}
-int32_t HAL_GetNumCounters(void) {
-  return kNumCounters;
-}
-int32_t HAL_GetNumDigitalHeaders(void) {
-  return kNumDigitalHeaders;
-}
-int32_t HAL_GetNumPWMHeaders(void) {
-  return kNumPWMHeaders;
-}
-int32_t HAL_GetNumDigitalChannels(void) {
-  return kNumDigitalChannels;
-}
-int32_t HAL_GetNumPWMChannels(void) {
-  return kNumPWMChannels;
-}
-int32_t HAL_GetNumDigitalPWMOutputs(void) {
-  return kNumDigitalPWMOutputs;
-}
-int32_t HAL_GetNumEncoders(void) {
-  return kNumEncoders;
-}
-int32_t HAL_GetNumInterrupts(void) {
-  return kNumInterrupts;
+int32_t HAL_GetNumSmartIo(void) {
+  return kNumSmartIo;
 }
 int32_t HAL_GetNumCTREPCMModules(void) {
   return kNumCTREPCMModules;
@@ -66,9 +42,6 @@ int32_t HAL_GetNumREVPHModules(void) {
 }
 int32_t HAL_GetNumREVPHChannels(void) {
   return kNumREVPHChannels;
-}
-int32_t HAL_GetNumDutyCycles(void) {
-  return kNumDutyCycles;
 }
 int32_t HAL_GetNumAddressableLEDs(void) {
   return kNumAddressableLEDs;
