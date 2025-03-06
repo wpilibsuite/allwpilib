@@ -121,8 +121,8 @@ class UnscentedKalmanFilterTest {
 
   @Test
   void testDriveConvergence() {
-    double dtSeconds = 0.005;
-    double rbMeters = 0.8382 / 2.0; // Robot radius
+    final double dtSeconds = 0.005;
+    final double rbMeters = 0.8382 / 2.0; // Robot radius
 
     UnscentedKalmanFilter<N5, N2, N3> observer =
         new UnscentedKalmanFilter<>(
@@ -309,14 +309,14 @@ class UnscentedKalmanFilterTest {
 
   @Test
   void testMotorConvergence() {
-    double dtSeconds = 0.01;
-    int steps = 500;
-    double true_kV = 3;
-    double true_kA = 0.2;
+    final double dtSeconds = 0.01;
+    final int steps = 500;
+    final double true_kV = 3;
+    final double true_kA = 0.2;
 
-    double pos_stddev = 0.02;
-    double vel_stddev = 0.1;
-    double cur_stddev = 0.1;
+    final double pos_stddev = 0.02;
+    final double vel_stddev = 0.1;
+    final double cur_stddev = 0.1;
 
     var control_inputs =
         new ArrayList<>(Collections.nCopies(steps, MatBuilder.fill(Nat.N1(), Nat.N1(), 0.0)));

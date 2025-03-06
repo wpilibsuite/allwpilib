@@ -258,9 +258,9 @@ TEST(UnscentedKalmanFilterTest, MotorConvergence) {
   constexpr double true_kV = 3;
   constexpr double true_kA = 0.2;
 
-  double pos_stddev = 0.02;
-  double vel_stddev = 0.1;
-  double cur_stddev = 0.1;
+  constexpr double pos_stddev = 0.02;
+  constexpr double vel_stddev = 0.1;
+  constexpr double cur_stddev = 0.1;
 
   std::vector<frc::Vectord<1>> control_inputs(steps);
   std::vector<frc::Vectord<4>> true_states(steps);
