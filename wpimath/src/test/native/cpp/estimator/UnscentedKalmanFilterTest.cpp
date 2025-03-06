@@ -14,9 +14,11 @@
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
+#include "frc/system/Discretization.h"
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/NumericalJacobian.h"
 #include "frc/system/plant/DCMotor.h"
+#include "frc/system/plant/LinearSystemId.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "units/moment_of_inertia.h"
 
@@ -170,6 +172,37 @@ TEST(UnscentedKalmanFilterTest, DriveConvergence) {
               0.000005);
   EXPECT_NEAR(0.0, observer.Xhat(3), 0.1);
   EXPECT_NEAR(0.0, observer.Xhat(4), 0.1);
+}
+
+TEST(UnscentedKalmanFilterTest, LinearUKF) {
+  constexpr auto dt = 20_ms;
+  auto plant = frc::LinearSystemId::IdentifyVelocitySystem<units::meters>(
+      0.02_V / 1_mps, 0.006_V / 1_mps_sq);
+  frc::UnscentedKalmanFilter<1, 1, 1> observer{
+      [&](const frc::Vectord<1>& x, const frc::Vectord<1>& u) {
+        return plant.A() * x + plant.B() * u;
+      },
+      [&](const frc::Vectord<1>& x, const frc::Vectord<1>& u) {
+        return plant.CalculateY(x, u);
+      },
+      {0.05},
+      {1.0},
+      dt};
+
+  frc::Matrixd<1, 1> discA;
+  frc::Matrixd<1, 1> discB;
+  frc::DiscretizeAB<1, 1>(plant.A(), plant.B(), dt, &discA, &discB);
+
+  frc::Vectord<1> ref{100.0};
+  frc::Vectord<1> u{0.0};
+
+  for (int i = 0; i < (2.0 / units::second_t{dt}.value()); i++) {
+    observer.Predict(u, dt);
+
+    u = discB.householderQr().solve(ref - discA * ref);
+  }
+
+  EXPECT_NEAR(ref(0, 0), observer.Xhat(0), 5);
 }
 
 TEST(UnscentedKalmanFilterTest, RoundTripP) {

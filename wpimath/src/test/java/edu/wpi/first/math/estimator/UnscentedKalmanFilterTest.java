@@ -30,7 +30,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class UnscentedKalmanFilterTest {
-  private static Matrix<N5, N1> getDynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {
+  private static Matrix<N5, N1> driveDynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {
     var motors = DCMotor.getCIM(2);
 
     // var gLow = 15.32;    // Low gear ratio
@@ -63,17 +63,17 @@ class UnscentedKalmanFilterTest {
   }
 
   @SuppressWarnings("PMD.UnusedFormalParameter")
-  private static Matrix<N3, N1> getLocalMeasurementModel(Matrix<N5, N1> x, Matrix<N2, N1> u) {
+  private static Matrix<N3, N1> driveLocalMeasurementModel(Matrix<N5, N1> x, Matrix<N2, N1> u) {
     return VecBuilder.fill(x.get(2, 0), x.get(3, 0), x.get(4, 0));
   }
 
   @SuppressWarnings("PMD.UnusedFormalParameter")
-  private static Matrix<N5, N1> getGlobalMeasurementModel(Matrix<N5, N1> x, Matrix<N2, N1> u) {
+  private static Matrix<N5, N1> driveGlobalMeasurementModel(Matrix<N5, N1> x, Matrix<N2, N1> u) {
     return x.copy();
   }
 
   @Test
-  void testInit() {
+  void testDriveInit() {
     var dtSeconds = 0.005;
     assertDoesNotThrow(
         () -> {
@@ -81,8 +81,8 @@ class UnscentedKalmanFilterTest {
               new UnscentedKalmanFilter<>(
                   Nat.N5(),
                   Nat.N3(),
-                  UnscentedKalmanFilterTest::getDynamics,
-                  UnscentedKalmanFilterTest::getLocalMeasurementModel,
+                  UnscentedKalmanFilterTest::driveDynamics,
+                  UnscentedKalmanFilterTest::driveLocalMeasurementModel,
                   VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
                   VecBuilder.fill(0.0001, 0.01, 0.01),
                   AngleStatistics.angleMean(2),
@@ -95,10 +95,10 @@ class UnscentedKalmanFilterTest {
           var u = VecBuilder.fill(12.0, 12.0);
           observer.predict(u, dtSeconds);
 
-          var localY = getLocalMeasurementModel(observer.getXhat(), u);
+          var localY = driveLocalMeasurementModel(observer.getXhat(), u);
           observer.correct(u, localY);
 
-          var globalY = getGlobalMeasurementModel(observer.getXhat(), u);
+          var globalY = driveGlobalMeasurementModel(observer.getXhat(), u);
           var R =
               StateSpaceUtil.makeCovarianceMatrix(
                   Nat.N5(), VecBuilder.fill(0.01, 0.01, 0.0001, 0.01, 0.01));
@@ -106,7 +106,7 @@ class UnscentedKalmanFilterTest {
               Nat.N5(),
               u,
               globalY,
-              UnscentedKalmanFilterTest::getGlobalMeasurementModel,
+              UnscentedKalmanFilterTest::driveGlobalMeasurementModel,
               R,
               AngleStatistics.angleMean(2),
               AngleStatistics.angleResidual(2),
@@ -116,7 +116,7 @@ class UnscentedKalmanFilterTest {
   }
 
   @Test
-  void testConvergence() {
+  void testDriveConvergence() {
     double dtSeconds = 0.005;
     double rbMeters = 0.8382 / 2.0; // Robot radius
 
@@ -124,8 +124,8 @@ class UnscentedKalmanFilterTest {
         new UnscentedKalmanFilter<>(
             Nat.N5(),
             Nat.N3(),
-            UnscentedKalmanFilterTest::getDynamics,
-            UnscentedKalmanFilterTest::getLocalMeasurementModel,
+            UnscentedKalmanFilterTest::driveDynamics,
+            UnscentedKalmanFilterTest::driveLocalMeasurementModel,
             VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
             VecBuilder.fill(0.0001, 0.5, 0.5),
             AngleStatistics.angleMean(2),
@@ -149,7 +149,7 @@ class UnscentedKalmanFilterTest {
         NumericalJacobian.numericalJacobianU(
             Nat.N5(),
             Nat.N2(),
-            UnscentedKalmanFilterTest::getDynamics,
+            UnscentedKalmanFilterTest::driveDynamics,
             new Matrix<>(Nat.N5(), Nat.N1()),
             new Matrix<>(Nat.N2(), Nat.N1()));
 
@@ -177,25 +177,27 @@ class UnscentedKalmanFilterTest {
               vl,
               vr);
 
-      Matrix<N3, N1> localY = getLocalMeasurementModel(trueXhat, new Matrix<>(Nat.N2(), Nat.N1()));
+      Matrix<N3, N1> localY =
+          driveLocalMeasurementModel(trueXhat, new Matrix<>(Nat.N2(), Nat.N1()));
       var noiseStdDev = VecBuilder.fill(0.0001, 0.5, 0.5);
 
       observer.correct(u, localY.plus(StateSpaceUtil.makeWhiteNoiseVector(noiseStdDev)));
 
       var rdot = nextR.minus(r).div(dtSeconds);
-      u = new Matrix<>(B.solve(rdot.minus(getDynamics(r, new Matrix<>(Nat.N2(), Nat.N1())))));
+      u = new Matrix<>(B.solve(rdot.minus(driveDynamics(r, new Matrix<>(Nat.N2(), Nat.N1())))));
 
       observer.predict(u, dtSeconds);
 
       r = nextR;
       trueXhat =
-          NumericalIntegration.rk4(UnscentedKalmanFilterTest::getDynamics, trueXhat, u, dtSeconds);
+          NumericalIntegration.rk4(
+              UnscentedKalmanFilterTest::driveDynamics, trueXhat, u, dtSeconds);
     }
 
-    var localY = getLocalMeasurementModel(trueXhat, u);
+    var localY = driveLocalMeasurementModel(trueXhat, u);
     observer.correct(u, localY);
 
-    var globalY = getGlobalMeasurementModel(trueXhat, u);
+    var globalY = driveGlobalMeasurementModel(trueXhat, u);
     var R =
         StateSpaceUtil.makeCovarianceMatrix(
             Nat.N5(), VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
@@ -203,7 +205,7 @@ class UnscentedKalmanFilterTest {
         Nat.N5(),
         u,
         globalY,
-        UnscentedKalmanFilterTest::getGlobalMeasurementModel,
+        UnscentedKalmanFilterTest::driveGlobalMeasurementModel,
         R,
         AngleStatistics.angleMean(2),
         AngleStatistics.angleResidual(2),
