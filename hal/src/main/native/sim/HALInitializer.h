@@ -37,7 +37,6 @@ extern void InitializeAddressableLED();
 extern void InitializeAnalogInput();
 extern void InitializeAnalogInternal();
 extern void InitializeCAN();
-extern void InitializeConstants();
 extern void InitializeCounter();
 extern void InitializeDigitalInternal();
 extern void InitializeDIO();

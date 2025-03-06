@@ -15,28 +15,6 @@
 
 namespace frc::sim {
 
-TEST(RoboRioSimTest, FPGAButton) {
-  RoboRioSim::ResetData();
-
-  int dummyStatus = 0;
-
-  BooleanCallback callback;
-  auto cb =
-      RoboRioSim::RegisterFPGAButtonCallback(callback.GetCallback(), false);
-  RoboRioSim::SetFPGAButton(true);
-  EXPECT_TRUE(RoboRioSim::GetFPGAButton());
-  EXPECT_TRUE(HAL_GetFPGAButton(&dummyStatus));
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
-
-  callback.Reset();
-  RoboRioSim::SetFPGAButton(false);
-  EXPECT_FALSE(RoboRioSim::GetFPGAButton());
-  EXPECT_FALSE(HAL_GetFPGAButton(&dummyStatus));
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_FALSE(callback.GetLastValue());
-}
-
 TEST(RoboRioSimTest, SetVin) {
   RoboRioSim::ResetData();
 
@@ -75,94 +53,6 @@ TEST(RoboRioSimTest, SetBrownout) {
   EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
   EXPECT_EQ(kTestVoltage, RoboRioSim::GetBrownoutVoltage().value());
   EXPECT_EQ(kTestVoltage, RobotController::GetBrownoutVoltage().value());
-}
-
-TEST(RoboRioSimTest, Set6V) {
-  RoboRioSim::ResetData();
-
-  DoubleCallback voltageCallback;
-  DoubleCallback currentCallback;
-  BooleanCallback activeCallback;
-  IntCallback faultCallback;
-  auto voltageCb = RoboRioSim::RegisterUserVoltage6VCallback(
-      voltageCallback.GetCallback(), false);
-  auto currentCb = RoboRioSim::RegisterUserCurrent6VCallback(
-      currentCallback.GetCallback(), false);
-  auto activeCb = RoboRioSim::RegisterUserActive6VCallback(
-      activeCallback.GetCallback(), false);
-  auto faultsCb = RoboRioSim::RegisterUserFaults6VCallback(
-      faultCallback.GetCallback(), false);
-  constexpr double kTestVoltage = 22.9;
-  constexpr double kTestCurrent = 174;
-  constexpr int kTestFaults = 229;
-
-  RoboRioSim::SetUserVoltage6V(units::volt_t{kTestVoltage});
-  EXPECT_TRUE(voltageCallback.WasTriggered());
-  EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
-  EXPECT_EQ(kTestVoltage, RoboRioSim::GetUserVoltage6V().value());
-  EXPECT_EQ(kTestVoltage, RobotController::GetVoltage6V());
-
-  RoboRioSim::SetUserCurrent6V(units::ampere_t{kTestCurrent});
-  EXPECT_TRUE(currentCallback.WasTriggered());
-  EXPECT_EQ(kTestCurrent, currentCallback.GetLastValue());
-  EXPECT_EQ(kTestCurrent, RoboRioSim::GetUserCurrent6V().value());
-  EXPECT_EQ(kTestCurrent, RobotController::GetCurrent6V());
-
-  RoboRioSim::SetUserActive6V(false);
-  EXPECT_TRUE(activeCallback.WasTriggered());
-  EXPECT_FALSE(activeCallback.GetLastValue());
-  EXPECT_FALSE(RoboRioSim::GetUserActive6V());
-  EXPECT_FALSE(RobotController::GetEnabled6V());
-
-  RoboRioSim::SetUserFaults6V(kTestFaults);
-  EXPECT_TRUE(faultCallback.WasTriggered());
-  EXPECT_EQ(kTestFaults, faultCallback.GetLastValue());
-  EXPECT_EQ(kTestFaults, RoboRioSim::GetUserFaults6V());
-  EXPECT_EQ(kTestFaults, RobotController::GetFaultCount6V());
-}
-
-TEST(RoboRioSimTest, Set5V) {
-  RoboRioSim::ResetData();
-
-  DoubleCallback voltageCallback;
-  DoubleCallback currentCallback;
-  BooleanCallback activeCallback;
-  IntCallback faultCallback;
-  auto voltageCb = RoboRioSim::RegisterUserVoltage5VCallback(
-      voltageCallback.GetCallback(), false);
-  auto currentCb = RoboRioSim::RegisterUserCurrent5VCallback(
-      currentCallback.GetCallback(), false);
-  auto activeCb = RoboRioSim::RegisterUserActive5VCallback(
-      activeCallback.GetCallback(), false);
-  auto faultsCb = RoboRioSim::RegisterUserFaults5VCallback(
-      faultCallback.GetCallback(), false);
-  constexpr double kTestVoltage = 22.9;
-  constexpr double kTestCurrent = 174;
-  constexpr int kTestFaults = 229;
-
-  RoboRioSim::SetUserVoltage5V(units::volt_t{kTestVoltage});
-  EXPECT_TRUE(voltageCallback.WasTriggered());
-  EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
-  EXPECT_EQ(kTestVoltage, RoboRioSim::GetUserVoltage5V().value());
-  EXPECT_EQ(kTestVoltage, RobotController::GetVoltage5V());
-
-  RoboRioSim::SetUserCurrent5V(units::ampere_t{kTestCurrent});
-  EXPECT_TRUE(currentCallback.WasTriggered());
-  EXPECT_EQ(kTestCurrent, currentCallback.GetLastValue());
-  EXPECT_EQ(kTestCurrent, RoboRioSim::GetUserCurrent5V().value());
-  EXPECT_EQ(kTestCurrent, RobotController::GetCurrent5V());
-
-  RoboRioSim::SetUserActive5V(false);
-  EXPECT_TRUE(activeCallback.WasTriggered());
-  EXPECT_FALSE(activeCallback.GetLastValue());
-  EXPECT_FALSE(RoboRioSim::GetUserActive5V());
-  EXPECT_FALSE(RobotController::GetEnabled5V());
-
-  RoboRioSim::SetUserFaults5V(kTestFaults);
-  EXPECT_TRUE(faultCallback.WasTriggered());
-  EXPECT_EQ(kTestFaults, faultCallback.GetLastValue());
-  EXPECT_EQ(kTestFaults, RoboRioSim::GetUserFaults5V());
-  EXPECT_EQ(kTestFaults, RobotController::GetFaultCount5V());
 }
 
 TEST(RoboRioSimTest, Set3V3) {
@@ -274,28 +164,6 @@ TEST(RoboRioSimTest, SetComments) {
   RoboRioSim::SetComments(kCommentsOverflow);
   EXPECT_EQ(kCommentsTruncated, RoboRioSim::GetComments());
   EXPECT_EQ(kCommentsTruncated, RobotController::GetComments());
-}
-
-TEST(RoboRioSimTest, SetRadioLEDState) {
-  RoboRioSim::ResetData();
-
-  EnumCallback callback;
-  auto cbHandle =
-      RoboRioSim::RegisterRadioLEDStateCallback(callback.GetCallback(), false);
-
-  RobotController::SetRadioLEDState(RadioLEDState::kGreen);
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(RadioLEDState::kGreen, callback.GetLastValue());
-  EXPECT_EQ(RadioLEDState::kGreen, RoboRioSim::GetRadioLEDState());
-  EXPECT_EQ(RadioLEDState::kGreen, RobotController::GetRadioLEDState());
-
-  callback.Reset();
-
-  RoboRioSim::SetRadioLEDState(RadioLEDState::kOrange);
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(RadioLEDState::kOrange, callback.GetLastValue());
-  EXPECT_EQ(RadioLEDState::kOrange, RoboRioSim::GetRadioLEDState());
-  EXPECT_EQ(RadioLEDState::kOrange, RobotController::GetRadioLEDState());
 }
 
 }  // namespace frc::sim

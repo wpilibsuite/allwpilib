@@ -112,7 +112,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     }
 
     double analog = m_analogInput.getVoltage();
-    double pos = analog / RobotController.getVoltage5V();
+    double pos = analog / RobotController.getVoltage3V3();
 
     // Map sensor range if range isn't full
     pos = mapSensorRange(pos);

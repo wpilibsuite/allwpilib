@@ -28,7 +28,6 @@ public class DigitalInput implements AutoCloseable, Sendable {
    */
   @SuppressWarnings("this-escape")
   public DigitalInput(int channel) {
-    SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
 
     m_handle = DIOJNI.initializeDIOPort(channel, true);

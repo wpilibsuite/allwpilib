@@ -35,40 +35,6 @@ void AnalogInputSim::SetInitialized(bool initialized) {
   HALSIM_SetAnalogInInitialized(m_index, initialized);
 }
 
-std::unique_ptr<CallbackStore> AnalogInputSim::RegisterAverageBitsCallback(
-    NotifyCallback callback, bool initialNotify) {
-  auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelAnalogInAverageBitsCallback);
-  store->SetUid(HALSIM_RegisterAnalogInAverageBitsCallback(
-      m_index, &CallbackStoreThunk, store.get(), initialNotify));
-  return store;
-}
-
-int AnalogInputSim::GetAverageBits() const {
-  return HALSIM_GetAnalogInAverageBits(m_index);
-}
-
-void AnalogInputSim::SetAverageBits(int averageBits) {
-  HALSIM_SetAnalogInAverageBits(m_index, averageBits);
-}
-
-std::unique_ptr<CallbackStore> AnalogInputSim::RegisterOversampleBitsCallback(
-    NotifyCallback callback, bool initialNotify) {
-  auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelAnalogInOversampleBitsCallback);
-  store->SetUid(HALSIM_RegisterAnalogInOversampleBitsCallback(
-      m_index, &CallbackStoreThunk, store.get(), initialNotify));
-  return store;
-}
-
-int AnalogInputSim::GetOversampleBits() const {
-  return HALSIM_GetAnalogInOversampleBits(m_index);
-}
-
-void AnalogInputSim::SetOversampleBits(int oversampleBits) {
-  HALSIM_SetAnalogInOversampleBits(m_index, oversampleBits);
-}
-
 std::unique_ptr<CallbackStore> AnalogInputSim::RegisterVoltageCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(

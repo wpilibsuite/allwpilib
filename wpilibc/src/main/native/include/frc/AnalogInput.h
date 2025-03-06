@@ -64,8 +64,6 @@ class AnalogInput : public wpi::Sendable,
    * 2**(OversampleBits + AverageBits) samples have been acquired from the
    * module on this channel.
    *
-   * Use GetAverageVoltage() to get the analog value in calibrated units.
-   *
    * @return A sample from the oversample and average engine for this channel.
    */
   int GetAverageValue() const;
@@ -79,24 +77,6 @@ class AnalogInput : public wpi::Sendable,
    * @return A scaled sample straight from this channel.
    */
   double GetVoltage() const;
-
-  /**
-   * Get a scaled sample from the output of the oversample and average engine
-   * for this channel.
-   *
-   * The value is scaled to units of Volts using the calibrated scaling data
-   * from GetLSBWeight() and GetOffset().
-   *
-   * Using oversampling will cause this value to be higher resolution, but it
-   * will update more slowly.
-   *
-   * Using averaging will cause this value to be more stable, but it will update
-   * more slowly.
-   *
-   * @return A scaled sample from the output of the oversample and average
-   * engine for this channel.
-   */
-  double GetAverageVoltage() const;
 
   /**
    * Get the channel number.
