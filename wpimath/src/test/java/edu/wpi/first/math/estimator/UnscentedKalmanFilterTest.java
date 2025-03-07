@@ -360,7 +360,7 @@ class UnscentedKalmanFilterTest {
     var discB = discABPair.getSecond();
 
     for (int i = 0; i < steps; ++i) {
-      inputs.set(i, motorControlInput(i * (dtSeconds / 1000)));
+      inputs.set(i, motorControlInput(i * dtSeconds));
       states.set(i + 1, discA.times(states.get(i)).plus(discB.times(inputs.get(i))));
       measurements.set(
           i,

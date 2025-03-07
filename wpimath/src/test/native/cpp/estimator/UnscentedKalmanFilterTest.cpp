@@ -281,7 +281,7 @@ TEST(UnscentedKalmanFilterTest, MotorConvergence) {
   frc::DiscretizeAB(A, B, dt, &discA, &discB);
 
   for (int i = 0; i < steps; ++i) {
-    inputs[i] = MotorControlInput(i * (dt.value() / 1000));
+    inputs[i] = MotorControlInput(i * dt.value());
     states[i + 1] = discA * states[i] + discB * inputs[i];
     measurements[i] =
         MotorMeasurementModel(states[i + 1], inputs[i]) +
