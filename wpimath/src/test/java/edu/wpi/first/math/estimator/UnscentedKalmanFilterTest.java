@@ -364,7 +364,7 @@ class UnscentedKalmanFilterTest {
       states.set(i + 1, discA.times(states.get(i)).plus(discB.times(inputs.get(i))));
       measurements.set(
           i,
-          motorMeasurementModel(states.get(i), inputs.get(i))
+          motorMeasurementModel(states.get(i + 1), inputs.get(i))
               .plus(
                   StateSpaceUtil.makeWhiteNoiseVector(
                       VecBuilder.fill(pos_stddev, vel_stddev, accel_stddev))));
