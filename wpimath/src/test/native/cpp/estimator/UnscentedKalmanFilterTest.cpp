@@ -224,25 +224,27 @@ TEST(UnscentedKalmanFilterTest, RoundTripP) {
 // Second system, single motor feedforward estimator
 frc::Vectord<4> MotorDynamics(const frc::Vectord<4>& x,
                               const frc::Vectord<1>& u) {
-  const double v = x(1);
-  const double kV = x(2);
-  const double kA = x(3);
-  const double V = u(0);
+  double v = x(1);
+  double kV = x(2);
+  double kA = x(3);
 
-  const double a = (V - kV * v) / kA;
-  return frc::Vectord<4>{v, a, 0, 0};
+  double V = u(0);
+
+  double a = -kV / kA * v + 1.0 / kA * V;
+  return frc::Vectord<4>{v, a, 0.0, 0.0};
 }
 
 frc::Vectord<3> MotorMeasurementModel(const frc::Vectord<4>& x,
                                       const frc::Vectord<1>& u) {
-  const double p = x(0);
-  const double v = x(1);
-  const double kV = x(2);
-  const double kA = x(3);
-  const double V = u(0);
+  double p = x(0);
+  double v = x(1);
+  double kV = x(2);
+  double kA = x(3);
 
-  const double I = (V - kV * v) / kA;
-  return frc::Vectord<3>{p, v, I};
+  double V = u(0);
+
+  double a = -kV / kA * v + 1 / kA * V;
+  return frc::Vectord<3>{p, v, a};
 }
 
 frc::Vectord<1> MotorControlInput(double t) {

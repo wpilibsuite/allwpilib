@@ -278,33 +278,37 @@ class UnscentedKalmanFilterTest {
 
   // Second system, single motor feedforward estimator
   private static Matrix<N4, N1> motorDynamics(Matrix<N4, N1> x, Matrix<N1, N1> u) {
-    final double v = x.get(1, 0);
-    final double kV = x.get(2, 0);
-    final double kA = x.get(3, 0);
-    final double V = u.get(0, 0);
+    double v = x.get(1, 0);
+    double kV = x.get(2, 0);
+    double kA = x.get(3, 0);
 
-    final double a = (V - kV * v) / kA;
+    double V = u.get(0, 0);
+
+    double a = -kV / kA * v + 1.0 / kA * V;
     return MatBuilder.fill(Nat.N4(), Nat.N1(), v, a, 0, 0);
   }
 
   private static Matrix<N3, N1> motorMeasurementModel(Matrix<N4, N1> x, Matrix<N1, N1> u) {
-    final double p = x.get(0, 0);
-    final double v = x.get(1, 0);
-    final double kV = x.get(2, 0);
-    final double kA = x.get(3, 0);
-    final double V = u.get(0, 0);
+    double p = x.get(0, 0);
+    double v = x.get(1, 0);
+    double kV = x.get(2, 0);
+    double kA = x.get(3, 0);
+    double V = u.get(0, 0);
 
-    final double I = (V - kV * v) / kA;
-    return MatBuilder.fill(Nat.N3(), Nat.N1(), p, v, I);
+    double a = -kV / kA * v + 1.0 / kA * V;
+    return MatBuilder.fill(Nat.N3(), Nat.N1(), p, v, a);
   }
 
-  private static double motorControlInput(double t) {
-    return MathUtil.clamp(
-        8 * Math.sin(Math.PI * Math.sqrt(2.0) * t)
-            + 6 * Math.sin(Math.PI * Math.sqrt(3.0) * t)
-            + 4 * Math.sin(Math.PI * Math.sqrt(5.0) * t),
-        -12.0,
-        12.0);
+  private static Matrix<N1, N1> motorControlInput(double t) {
+    return MatBuilder.fill(
+        Nat.N1(),
+        Nat.N1(),
+        MathUtil.clamp(
+            8 * Math.sin(Math.PI * Math.sqrt(2.0) * t)
+                + 6 * Math.sin(Math.PI * Math.sqrt(3.0) * t)
+                + 4 * Math.sin(Math.PI * Math.sqrt(5.0) * t),
+            -12.0,
+            12.0));
   }
 
   @Test
@@ -330,8 +334,7 @@ class UnscentedKalmanFilterTest {
     true_states.set(0, MatBuilder.fill(Nat.N4(), Nat.N1(), 0.0, 0.0, true_kV, true_kA));
 
     for (int i = 0; i < steps; ++i) {
-      control_inputs.set(
-          i, MatBuilder.fill(Nat.N1(), Nat.N1(), motorControlInput(i * (dtSeconds / 1000))));
+      control_inputs.set(i, motorControlInput(i * (dtSeconds / 1000)));
       true_states.set(
           i + 1,
           NumericalIntegration.rk4(
