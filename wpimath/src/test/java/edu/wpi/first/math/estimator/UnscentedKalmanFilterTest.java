@@ -322,29 +322,49 @@ class UnscentedKalmanFilterTest {
     final double vel_stddev = 0.1;
     final double accel_stddev = 0.1;
 
-    var true_states =
+    var states =
         new ArrayList<>(
             Collections.nCopies(
                 steps + 1, MatBuilder.fill(Nat.N4(), Nat.N1(), 0.0, 0.0, 0.0, 0.0)));
-    var control_inputs =
+    var inputs =
         new ArrayList<>(Collections.nCopies(steps, MatBuilder.fill(Nat.N1(), Nat.N1(), 0.0)));
-    var noisy_measurements =
+    var measurements =
         new ArrayList<>(
-            Collections.nCopies(steps, MatBuilder.fill(Nat.N3(), Nat.N1(), 0.0, 0.0, 0.0)));
-    true_states.set(0, MatBuilder.fill(Nat.N4(), Nat.N1(), 0.0, 0.0, true_kV, true_kA));
+            Collections.nCopies(steps + 1, MatBuilder.fill(Nat.N3(), Nat.N1(), 0.0, 0.0, 0.0)));
+    states.set(0, MatBuilder.fill(Nat.N4(), Nat.N1(), 0.0, 0.0, true_kV, true_kA));
+
+    var A =
+        MatBuilder.fill(
+            Nat.N4(),
+            Nat.N4(),
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            -true_kV / true_kA,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0);
+    var B = MatBuilder.fill(Nat.N4(), Nat.N1(), 0.0, 1.0 / true_kA, 0.0, 0.0);
+
+    var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
+    var discA = discABPair.getFirst();
+    var discB = discABPair.getSecond();
 
     for (int i = 0; i < steps; ++i) {
-      control_inputs.set(i, motorControlInput(i * (dtSeconds / 1000)));
-      true_states.set(
-          i + 1,
-          NumericalIntegration.rk4(
-              UnscentedKalmanFilterTest::motorDynamics,
-              true_states.get(i),
-              control_inputs.get(i),
-              dtSeconds));
-      noisy_measurements.set(
+      inputs.set(i, motorControlInput(i * (dtSeconds / 1000)));
+      states.set(i + 1, discA.times(states.get(i)).plus(discB.times(inputs.get(i))));
+      measurements.set(
           i,
-          motorMeasurementModel(true_states.get(i), control_inputs.get(i))
+          motorMeasurementModel(states.get(i), inputs.get(i))
               .plus(
                   StateSpaceUtil.makeWhiteNoiseVector(
                       VecBuilder.fill(pos_stddev, vel_stddev, accel_stddev))));
@@ -369,8 +389,8 @@ class UnscentedKalmanFilterTest {
     observer.setP(P0);
 
     for (int i = 0; i < steps; ++i) {
-      observer.predict(control_inputs.get(i), dtSeconds);
-      observer.correct(control_inputs.get(i), noisy_measurements.get(i));
+      observer.predict(inputs.get(i), dtSeconds);
+      observer.correct(inputs.get(i), measurements.get(i));
     }
 
     assertEquals(true_kV, observer.getXhat(2), 0.05);

@@ -265,33 +265,41 @@ TEST(UnscentedKalmanFilterTest, MotorConvergence) {
   constexpr double vel_stddev = 0.1;
   constexpr double accel_stddev = 0.1;
 
-  std::vector<frc::Vectord<4>> true_states(steps + 1);
-  std::vector<frc::Vectord<1>> control_inputs(steps);
-  std::vector<frc::Vectord<3>> noisy_measurements(steps);
-  true_states[0] = frc::Vectord<4>{0.0, 0.0, true_kV, true_kA};
+  std::vector<frc::Vectord<4>> states(steps + 1);
+  std::vector<frc::Vectord<1>> inputs(steps);
+  std::vector<frc::Vectord<3>> measurements(steps);
+  states[0] = frc::Vectord<4>{{0.0}, {0.0}, {true_kV}, {true_kA}};
+
+  constexpr frc::Matrixd<4, 4> A{{0.0, 1.0, 0.0, 0.0},
+                                 {0.0, -true_kV / true_kA, 0.0, 0.0},
+                                 {0.0, 0.0, 0.0, 0.0},
+                                 {0.0, 0.0, 0.0, 0.0}};
+  constexpr frc::Matrixd<4, 1> B{{0.0}, {1.0 / true_kA}, {0.0}, {0.0}};
+
+  frc::Matrixd<4, 4> discA;
+  frc::Matrixd<4, 1> discB;
+  frc::DiscretizeAB(A, B, dt, &discA, &discB);
 
   for (int i = 0; i < steps; ++i) {
-    control_inputs[i] = MotorControlInput(i * (dt.value() / 1000));
-    true_states[i + 1] =
-        frc::RK4(MotorDynamics, true_states[i], control_inputs[i], dt);
-    noisy_measurements[i] =
-        MotorMeasurementModel(true_states[i], control_inputs[i]) +
+    inputs[i] = MotorControlInput(i * (dt.value() / 1000));
+    states[i + 1] = discA * states[i] + discB * inputs[i];
+    measurements[i] =
+        MotorMeasurementModel(states[i + 1], inputs[i]) +
         frc::MakeWhiteNoiseVector(pos_stddev, vel_stddev, accel_stddev);
   }
 
   frc::Vectord<4> P0{0.001, 0.001, 10, 10};
 
   frc::UnscentedKalmanFilter<4, 1, 3> observer{
-      MotorDynamics, MotorMeasurementModel,
-      wpi::array<double, 4>{0.1, 1.0, 1e-10, 1e-10},
-      wpi::array<double, 3>{pos_stddev, vel_stddev, accel_stddev}, dt};
+      MotorDynamics, MotorMeasurementModel, wpi::array{0.1, 1.0, 1e-10, 1e-10},
+      wpi::array{pos_stddev, vel_stddev, accel_stddev}, dt};
 
   observer.SetXhat(frc::Vectord<4>{0.0, 0.0, 2.0, 2.0});
   observer.SetP(P0.asDiagonal());
 
   for (int i = 0; i < steps; ++i) {
-    observer.Predict(control_inputs[i], dt);
-    observer.Correct(control_inputs[i], noisy_measurements[i]);
+    observer.Predict(inputs[i], dt);
+    observer.Correct(inputs[i], measurements[i]);
   }
 
   EXPECT_NEAR(true_kV, observer.Xhat(2), 0.05);
