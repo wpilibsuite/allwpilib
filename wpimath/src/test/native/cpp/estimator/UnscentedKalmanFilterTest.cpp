@@ -196,7 +196,7 @@ TEST(UnscentedKalmanFilterTest, LinearUKF) {
   frc::Vectord<1> ref{100.0};
   frc::Vectord<1> u{0.0};
 
-  for (int i = 0; i < 2.0 / dt.value(); i++) {
+  for (int i = 0; i < 2.0 / dt.value(); ++i) {
     observer.Predict(u, dt);
 
     u = discB.householderQr().solve(ref - discA * ref);
@@ -245,11 +245,12 @@ frc::Vectord<3> MotorMeasurementModel(const frc::Vectord<4>& x,
   return frc::Vectord<3>{p, v, I};
 }
 
-double MotorControlInput(const double& t) {
-  return std::clamp(8 * std::sin(std::numbers::pi * std::sqrt(2.0) * t) +
-                        6 * std::sin(std::numbers::pi * std::sqrt(3.0) * t) +
-                        4 * std::sin(std::numbers::pi * std::sqrt(5.0) * t),
-                    -12.0, 12.0);
+frc::Vectord<1> MotorControlInput(double t) {
+  return frc::Vectord<1>{
+      std::clamp(8 * std::sin(std::numbers::pi * std::sqrt(2.0) * t) +
+                     6 * std::sin(std::numbers::pi * std::sqrt(3.0) * t) +
+                     4 * std::sin(std::numbers::pi * std::sqrt(5.0) * t),
+                 -12.0, 12.0)};
 }
 
 TEST(UnscentedKalmanFilterTest, MotorConvergence) {
@@ -262,19 +263,16 @@ TEST(UnscentedKalmanFilterTest, MotorConvergence) {
   constexpr double vel_stddev = 0.1;
   constexpr double cur_stddev = 0.1;
 
+  std::vector<frc::Vectord<4>> true_states(steps + 1);
   std::vector<frc::Vectord<1>> control_inputs(steps);
-  std::vector<frc::Vectord<4>> true_states(steps);
-  std::vector<frc::Vectord<3>> true_noisy_measurements(steps);
+  std::vector<frc::Vectord<3>> noisy_measurements(steps);
   true_states[0] = frc::Vectord<4>{0.0, 0.0, true_kV, true_kA};
 
-  for (int i = 1; i < steps; i++) {
-    const frc::Vectord<1> u{MotorControlInput(i * (dt.value() / 1000))};
-    true_states[i] = frc::RK4(MotorDynamics, (true_states[i - 1]), u, dt);
-  }
-  for (int i = 0; i < steps; i++) {
-    control_inputs[i] =
-        frc::Vectord<1>{MotorControlInput(i * (dt.value() / 1000))};
-    true_noisy_measurements[i] =
+  for (int i = 0; i < steps; ++i) {
+    control_inputs[i] = MotorControlInput(i * (dt.value() / 1000));
+    true_states[i + 1] =
+        frc::RK4(MotorDynamics, true_states[i], control_inputs[i], dt);
+    noisy_measurements[i] =
         MotorMeasurementModel(true_states[i], control_inputs[i]) +
         frc::MakeWhiteNoiseVector(pos_stddev, vel_stddev, cur_stddev);
   }
@@ -289,9 +287,9 @@ TEST(UnscentedKalmanFilterTest, MotorConvergence) {
   observer.SetXhat(frc::Vectord<4>{0.0, 0.0, 2.0, 2.0});
   observer.SetP(P0.asDiagonal());
 
-  for (int i = 0; i < steps; i++) {
+  for (int i = 0; i < steps; ++i) {
     observer.Predict(control_inputs[i], dt);
-    observer.Correct(control_inputs[i], true_noisy_measurements[i]);
+    observer.Correct(control_inputs[i], noisy_measurements[i]);
   }
 
   EXPECT_NEAR(true_kV, observer.Xhat(2), 0.05);
