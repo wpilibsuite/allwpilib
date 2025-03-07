@@ -243,7 +243,7 @@ frc::Vectord<3> MotorMeasurementModel(const frc::Vectord<4>& x,
 
   double V = u(0);
 
-  double a = -kV / kA * v + 1 / kA * V;
+  double a = -kV / kA * v + 1.0 / kA * V;
   return frc::Vectord<3>{p, v, a};
 }
 
