@@ -175,7 +175,7 @@ TEST(UnscentedKalmanFilterTest, DriveConvergence) {
 }
 
 TEST(UnscentedKalmanFilterTest, LinearUKF) {
-  constexpr auto dt = 20_ms;
+  constexpr units::second_t dt = 20_ms;
   auto plant = frc::LinearSystemId::IdentifyVelocitySystem<units::meters>(
       0.02_V / 1_mps, 0.006_V / 1_mps_sq);
   frc::UnscentedKalmanFilter<1, 1, 1> observer{
@@ -196,7 +196,7 @@ TEST(UnscentedKalmanFilterTest, LinearUKF) {
   frc::Vectord<1> ref{100.0};
   frc::Vectord<1> u{0.0};
 
-  for (int i = 0; i < (2.0 / units::second_t{dt}.value()); i++) {
+  for (int i = 0; i < 2.0 / dt.value(); i++) {
     observer.Predict(u, dt);
 
     u = discB.householderQr().solve(ref - discA * ref);
@@ -253,7 +253,7 @@ double MotorControlInput(const double& t) {
 }
 
 TEST(UnscentedKalmanFilterTest, MotorConvergence) {
-  constexpr auto dt = 10_ms;
+  constexpr units::second_t dt = 10_ms;
   constexpr int steps = 500;
   constexpr double true_kV = 3;
   constexpr double true_kA = 0.2;
