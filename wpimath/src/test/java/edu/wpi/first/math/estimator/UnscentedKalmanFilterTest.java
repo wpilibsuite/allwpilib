@@ -320,7 +320,7 @@ class UnscentedKalmanFilterTest {
 
     final double pos_stddev = 0.02;
     final double vel_stddev = 0.1;
-    final double cur_stddev = 0.1;
+    final double accel_stddev = 0.1;
 
     var true_states =
         new ArrayList<>(
@@ -347,7 +347,7 @@ class UnscentedKalmanFilterTest {
           motorMeasurementModel(true_states.get(i), control_inputs.get(i))
               .plus(
                   StateSpaceUtil.makeWhiteNoiseVector(
-                      VecBuilder.fill(pos_stddev, vel_stddev, cur_stddev))));
+                      VecBuilder.fill(pos_stddev, vel_stddev, accel_stddev))));
     }
 
     var P0 =
@@ -362,7 +362,7 @@ class UnscentedKalmanFilterTest {
             UnscentedKalmanFilterTest::motorDynamics,
             UnscentedKalmanFilterTest::motorMeasurementModel,
             VecBuilder.fill(0.1, 1.0, 1e-10, 1e-10),
-            VecBuilder.fill(pos_stddev, vel_stddev, cur_stddev),
+            VecBuilder.fill(pos_stddev, vel_stddev, accel_stddev),
             dtSeconds);
 
     observer.setXhat(MatBuilder.fill(Nat.N4(), Nat.N1(), 0.0, 0.0, 2.0, 2.0));
