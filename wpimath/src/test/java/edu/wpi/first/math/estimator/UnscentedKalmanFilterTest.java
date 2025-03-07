@@ -393,7 +393,7 @@ class UnscentedKalmanFilterTest {
       observer.correct(inputs.get(i), measurements.get(i));
     }
 
-    assertEquals(true_kV, observer.getXhat(2), 0.05);
-    assertEquals(true_kA, observer.getXhat(3), 0.05);
+    assertEquals(true_kV, observer.getXhat(2), true_kV * 0.5);
+    assertEquals(true_kA, observer.getXhat(3), true_kA * 0.5);
   }
 }

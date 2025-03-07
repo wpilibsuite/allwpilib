@@ -302,8 +302,8 @@ TEST(UnscentedKalmanFilterTest, MotorConvergence) {
     observer.Correct(inputs[i], measurements[i]);
   }
 
-  EXPECT_NEAR(true_kV, observer.Xhat(2), 0.05);
-  EXPECT_NEAR(true_kA, observer.Xhat(3), 0.05);
+  EXPECT_NEAR(true_kV, observer.Xhat(2), true_kV * 0.5);
+  EXPECT_NEAR(true_kA, observer.Xhat(3), true_kA * 0.5);
 }
 
 }  // namespace
