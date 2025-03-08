@@ -64,6 +64,21 @@ public final class Commands {
   }
 
   /**
+   * Constructs a command that runs an action every iteration while a specified condition is
+   * true.
+   *
+   * @param run the action to run every iteration
+   * @param while the test to perform every iteration
+   * @param requirements subsystems the action requires
+   * @return the command
+   */
+  public static Command runWhile(Runnable run, Runnable end, BooleanSupplier condition, Subsystem... requirements) {
+    requireNonNullParam(end, "end", "Command.runEnd");
+    return new FunctionalCommand(
+        () -> {}, run, () -> {}, condition, requirements);
+  }
+
+  /**
    * Constructs a command that runs an action once and another action when the command is
    * interrupted.
    *
@@ -90,6 +105,22 @@ public final class Commands {
     requireNonNullParam(end, "end", "Command.runEnd");
     return new FunctionalCommand(
         () -> {}, run, interrupted -> end.run(), () -> false, requirements);
+  }
+
+   /**
+   * Constructs a command that runs an action every iteration while a specified condition is
+   * true, and then runs a second action.
+   *
+   * @param run the action to run every iteration
+   * @param end the action to run on interrupt
+   * @param while the test to perform every iteration
+   * @param requirements subsystems the action requires
+   * @return the command
+   */
+  public static Command runEndWhile(Runnable run, Runnable end, BooleanSupplier condition, Subsystem... requirements) {
+    requireNonNullParam(end, "end", "Command.runEnd");
+    return new FunctionalCommand(
+        () -> {}, run, interrupted -> end.run(), condition, requirements);
   }
 
   /**
