@@ -32,6 +32,9 @@ public class DutyCycleJNI extends JNIWrapper {
   /**
    * Get the frequency of the duty cycle signal.
    *
+   * <p><b>Warning: This will return inaccurate values for up to 2 seconds after the duty cycle
+   * input is initialized.</b>
+   *
    * @param handle the duty cycle handle
    * @return frequency in Hertz
    * @see "HAL_GetDutyCycleFrequency"
