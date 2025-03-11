@@ -18,7 +18,7 @@ struct TestStructADL {
   double y = 0;
 };
 
-void Log(wpi::TelemetryTable& table, const TestStructADL& value) {
+void Log(wpi::TelemetryTable& table, bool first, const TestStructADL& value) {
   table.Log("x", value.x);
   table.Log("y", value.y);
 }

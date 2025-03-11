@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <atomic>
 #include <span>
 #include <string>
 #include <string_view>
@@ -29,8 +30,8 @@ class TelemetryTable;
 namespace impl {
 template <typename T, typename... I>
 concept TelemetryTableLoggableADL =
-    requires(TelemetryTable& table, const T& value, I... info) {
-      Log(table, value, info...);
+    requires(TelemetryTable& table, bool first, const T& value, I... info) {
+      Log(table, first, value, info...);
     };
 
 template <typename T, typename... I>
@@ -42,9 +43,9 @@ template <typename T>
 concept StringConvertible = requires(const T& value) { fmt::to_string(value); };
 
 template <typename T, typename... I>
-inline void TelemetryLogTableADL(TelemetryTable& table, const T& value,
-                                 I... info) {
-  Log(table, value, info...);
+inline void TelemetryLogTableADL(TelemetryTable& table, bool first,
+                                 const T& value, I... info) {
+  Log(table, first, value, info...);
 }
 
 template <typename T, typename... I>
@@ -122,7 +123,9 @@ class TelemetryTable final {
   template <typename T, typename... I>
   void Log(std::string_view name, const T& value, I... info) {
     if constexpr (impl::TelemetryTableLoggableADL<T, I...>) {
-      impl::TelemetryLogTableADL(GetTable(name), value, info...);
+      auto& table = GetTable(name);
+      impl::TelemetryLogTableADL(table, table.m_first.exchange(false), value,
+                                 info...);
     } else if constexpr (impl::TelemetryEntryLoggableADL<T, I...>) {
       impl::TelemetryLogEntryADL(*this, name, value, info...);
     } else if constexpr (wpi::StructSerializable<T, I...>) {
@@ -360,6 +363,7 @@ class TelemetryTable final {
   std::string m_path;
   mutable wpi::StringMap<TelemetryTable*> m_tablesMap;
   mutable wpi::StringMap<TelemetryEntry*> m_entriesMap;
+  std::atomic_bool m_first{true};
 };
 
 }  // namespace wpi

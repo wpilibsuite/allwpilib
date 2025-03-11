@@ -10,6 +10,7 @@ import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Telemetry sends information from the robot program to dashboards, debug tools, or log files.
@@ -20,6 +21,7 @@ public final class TelemetryTable {
   private final String m_path;
   private final ConcurrentMap<String, TelemetryTable> m_tablesMap = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, TelemetryEntry> m_entriesMap = new ConcurrentHashMap<>();
+  private final AtomicBoolean m_first = new AtomicBoolean(true);
 
   /**
    * Constructs a telemetry table.
@@ -93,7 +95,8 @@ public final class TelemetryTable {
    */
   public <T> void log(String name, T value) {
     if (value instanceof TelemetryLoggable) {
-      ((TelemetryLoggable) value).log(getTable(name));
+      TelemetryTable table = getTable(name);
+      ((TelemetryLoggable) value).log(table, table.m_first.getAndSet(false));
     } else if (value instanceof StructSerializable v) {
       // use introspection to get "struct" static variable
       Object obj;

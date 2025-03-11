@@ -5,8 +5,8 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.telemetry.TelemetryLoggable;
+import edu.wpi.first.telemetry.TelemetryTable;
 
 /**
  * Standard hobby style servo.
@@ -14,12 +14,14 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * <p>The range parameters default to the appropriate values for the Hitec HS-322HD servo provided
  * in the FIRST Kit of Parts in 2008.
  */
-public class Servo extends PWM {
+public class Servo implements TelemetryLoggable, AutoCloseable {
   private static final double kMaxServoAngle = 180.0;
   private static final double kMinServoAngle = 0.0;
 
   private static final int kDefaultMaxServoPWM = 2400;
   private static final int kDefaultMinServoPWM = 600;
+
+  protected PWM m_pwm;
 
   /**
    * Constructor.
@@ -30,14 +32,17 @@ public class Servo extends PWM {
    * @param channel The PWM channel to which the servo is attached. 0-9 are on-board, 10-19 are on
    *     the MXP port
    */
-  @SuppressWarnings("this-escape")
   public Servo(final int channel) {
-    super(channel);
-    setBoundsMicroseconds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
-    setPeriodMultiplier(PeriodMultiplier.k4X);
+    m_pwm = new PWM(channel);
+    m_pwm.setBoundsMicroseconds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
+    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k4X);
 
-    HAL.reportUsage("IO", getChannel(), "Servo");
-    SendableRegistry.setName(this, "Servo", getChannel());
+    HAL.reportUsage("IO", channel, "Servo");
+  }
+
+  @Override
+  public void close() {
+    m_pwm.close();
   }
 
   /**
@@ -48,7 +53,7 @@ public class Servo extends PWM {
    * @param value Position from 0.0 to 1.0.
    */
   public void set(double value) {
-    setPosition(value);
+    m_pwm.setPosition(value);
   }
 
   /**
@@ -61,7 +66,7 @@ public class Servo extends PWM {
    * @return Position from 0.0 to 1.0.
    */
   public double get() {
-    return getPosition();
+    return m_pwm.getPosition();
   }
 
   /**
@@ -83,7 +88,7 @@ public class Servo extends PWM {
       degrees = kMaxServoAngle;
     }
 
-    setPosition((degrees - kMinServoAngle) / getServoAngleRange());
+    m_pwm.setPosition((degrees - kMinServoAngle) / getServoAngleRange());
   }
 
   /**
@@ -95,7 +100,7 @@ public class Servo extends PWM {
    * @return The angle in degrees to which the servo is set.
    */
   public double getAngle() {
-    return getPosition() * getServoAngleRange() + kMinServoAngle;
+    return m_pwm.getPosition() * getServoAngleRange() + kMinServoAngle;
   }
 
   private double getServoAngleRange() {
@@ -103,8 +108,10 @@ public class Servo extends PWM {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Servo");
-    builder.addDoubleProperty("Value", this::get, this::set);
+  public void log(TelemetryTable table, boolean first) {
+    if (first) {
+      table.log(".type", "Servo");
+    }
+    table.log("Value", get());
   }
 }
