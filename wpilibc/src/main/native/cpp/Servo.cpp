@@ -16,27 +16,28 @@ constexpr double Servo::kMinServoAngle;
 constexpr units::millisecond_t Servo::kDefaultMaxServoPWM;
 constexpr units::millisecond_t Servo::kDefaultMinServoPWM;
 
-Servo::Servo(int channel) : PWM(channel) {
+Servo::Servo(int channel) : m_pwm(channel) {
   // Set minimum and maximum PWM values supported by the servo
-  SetBounds(kDefaultMaxServoPWM, 0.0_ms, 0.0_ms, 0.0_ms, kDefaultMinServoPWM);
+  m_pwm.SetBounds(kDefaultMaxServoPWM, 0.0_ms, 0.0_ms, 0.0_ms,
+                  kDefaultMinServoPWM);
 
   // Assign defaults for period multiplier for the servo PWM control signal
-  SetPeriodMultiplier(kPeriodMultiplier_4X);
+  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_4X);
 
   HAL_ReportUsage("IO", channel, "Servo");
   wpi::SendableRegistry::SetName(this, "Servo", channel);
 }
 
 void Servo::Set(double value) {
-  SetPosition(value);
+  m_pwm.SetPosition(value);
 }
 
 void Servo::SetOffline() {
-  SetDisabled();
+  m_pwm.SetDisabled();
 }
 
 double Servo::Get() const {
-  return GetPosition();
+  return m_pwm.GetPosition();
 }
 
 void Servo::SetAngle(double degrees) {
@@ -46,11 +47,11 @@ void Servo::SetAngle(double degrees) {
     degrees = kMaxServoAngle;
   }
 
-  SetPosition((degrees - kMinServoAngle) / GetServoAngleRange());
+  m_pwm.SetPosition((degrees - kMinServoAngle) / GetServoAngleRange());
 }
 
 double Servo::GetAngle() const {
-  return GetPosition() * GetServoAngleRange() + kMinServoAngle;
+  return m_pwm.GetPosition() * GetServoAngleRange() + kMinServoAngle;
 }
 
 double Servo::GetMaxAngle() const {

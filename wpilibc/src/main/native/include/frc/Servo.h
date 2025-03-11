@@ -5,6 +5,7 @@
 #pragma once
 
 #include <units/angle.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/PWM.h"
 
@@ -16,7 +17,7 @@ namespace frc {
  * The range parameters default to the appropriate values for the Hitec HS-322HD
  * servo provided in the FIRST Kit of Parts in 2008.
  */
-class Servo : public PWM {
+class Servo : public wpi::Sendable {
  public:
   /**
    * Constructor.
@@ -101,6 +102,9 @@ class Servo : public PWM {
   double GetMinAngle() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
+
+ protected:
+  PWM m_pwm;
 
  private:
   double GetServoAngleRange() const;
