@@ -153,7 +153,7 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   @Override
-  public void log(TelemetryTable table, boolean first) {
+  public void toTelemetry(TelemetryTable table, boolean first) {
     if (first) {
       table.log(".type", "Motor Controller");
     }

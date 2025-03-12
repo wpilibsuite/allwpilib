@@ -202,7 +202,7 @@ public class AnalogInput implements TelemetryLoggable, AutoCloseable {
   }
 
   @Override
-  public void log(TelemetryTable table, boolean first) {
+  public void toTelemetry(TelemetryTable table, boolean first) {
     if (first) {
       table.log(".type", "Analog Input");
     }

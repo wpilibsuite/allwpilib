@@ -335,7 +335,7 @@ public class Encoder implements CounterBase, TelemetryLoggable, AutoCloseable {
   }
 
   @Override
-  public void log(TelemetryTable table, boolean first) {
+  public void toTelemetry(TelemetryTable table, boolean first) {
     if (first) {
       if (EncoderJNI.getEncoderEncodingType(m_encoder) == EncodingType.k4X.value) {
         table.log(".type", "Quadrature Encoder");

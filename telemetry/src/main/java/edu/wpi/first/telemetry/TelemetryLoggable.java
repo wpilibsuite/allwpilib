@@ -11,7 +11,7 @@ public interface TelemetryLoggable {
    * Logs the object to a {@link TelemetryTable}.
    *
    * @param table telemetry table
-   * @param first if this is the first time log() is being called for this table
+   * @param first if this is the first time toTelemetry() is being called for this table
    */
-  void log(TelemetryTable table, boolean first);
+  void toTelemetry(TelemetryTable table, boolean first);
 }
