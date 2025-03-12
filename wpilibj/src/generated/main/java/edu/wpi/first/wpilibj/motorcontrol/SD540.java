@@ -35,7 +35,7 @@ public class SD540 extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public SD540(final int channel) {
-    super("SD540", channel);
+    super(channel);
 
     m_pwm.setBoundsMicroseconds(2050, 1550, 1500, 1440, 940);
     m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);

@@ -35,7 +35,7 @@ public class PWMTalonFX extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public PWMTalonFX(final int channel) {
-    super("PWMTalonFX", channel);
+    super(channel);
 
     m_pwm.setBoundsMicroseconds(2004, 1520, 1500, 1480, 997);
     m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);

@@ -35,7 +35,7 @@ public class VictorSP extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public VictorSP(final int channel) {
-    super("VictorSP", channel);
+    super(channel);
 
     m_pwm.setBoundsMicroseconds(2004, 1520, 1500, 1480, 997);
     m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
