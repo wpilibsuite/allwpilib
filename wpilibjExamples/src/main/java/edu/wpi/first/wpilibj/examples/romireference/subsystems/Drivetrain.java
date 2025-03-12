@@ -112,8 +112,8 @@ public class Drivetrain extends SubsystemBase {
   }
 
   @Override
-  public void toTelemetry(TelemetryTable table, boolean first) {
-    super.toTelemetry(table, first);
+  public void updateTelemetry(TelemetryTable table, boolean first) {
+    super.updateTelemetry(table, first);
     table.log("drive", m_diffDrive);
     table.log("gyro", m_gyro);
     table.log("left distance", getLeftDistanceInch());

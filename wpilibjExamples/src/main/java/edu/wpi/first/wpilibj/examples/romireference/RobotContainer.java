@@ -98,7 +98,7 @@ public class RobotContainer implements TelemetryLoggable {
   }
 
   @Override
-  public void toTelemetry(TelemetryTable table, boolean first) {
+  public void updateTelemetry(TelemetryTable table, boolean first) {
     table.log("drivetrain", m_drivetrain);
   }
 }

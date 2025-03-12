@@ -13,5 +13,5 @@ public interface TelemetryLoggable {
    * @param table telemetry table
    * @param first if this is the first time toTelemetry() is being called for this table
    */
-  void toTelemetry(TelemetryTable table, boolean first);
+  void updateTelemetry(TelemetryTable table, boolean first);
 }

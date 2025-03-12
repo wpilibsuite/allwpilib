@@ -117,7 +117,7 @@ public abstract class PIDSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void toTelemetry(TelemetryTable table, boolean first) {
+  public void updateTelemetry(TelemetryTable table, boolean first) {
     table.log("PID Controller", m_controller);
   }
 }

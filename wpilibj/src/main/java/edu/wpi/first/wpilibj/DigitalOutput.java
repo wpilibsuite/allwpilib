@@ -188,7 +188,7 @@ public class DigitalOutput implements AutoCloseable, TelemetryLoggable {
   }
 
   @Override
-  public void toTelemetry(TelemetryTable table, boolean first) {
+  public void updateTelemetry(TelemetryTable table, boolean first) {
     if (first) {
       table.log(".type", "Digital Output");
     }

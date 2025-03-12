@@ -127,7 +127,7 @@ public class Tachometer implements TelemetryLoggable, AutoCloseable {
   }
 
   @Override
-  public void toTelemetry(TelemetryTable table, boolean first) {
+  public void updateTelemetry(TelemetryTable table, boolean first) {
     if (first) {
       table.log(".type", "Tachometer");
     }

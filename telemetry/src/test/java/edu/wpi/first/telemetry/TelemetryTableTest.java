@@ -29,7 +29,7 @@ class TelemetryTableTest {
 
   record Thing(double x, double y) implements TelemetryLoggable {
     @Override
-    public void toTelemetry(TelemetryTable table, boolean first) {
+    public void updateTelemetry(TelemetryTable table, boolean first) {
       table.log("x", x);
       table.log("y", y);
     }

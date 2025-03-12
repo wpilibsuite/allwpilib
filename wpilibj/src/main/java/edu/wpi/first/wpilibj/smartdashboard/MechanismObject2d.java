@@ -67,7 +67,7 @@ public abstract class MechanismObject2d implements TelemetryLoggable, AutoClosea
   }
 
   @Override
-  public synchronized void toTelemetry(TelemetryTable table, boolean first) {
+  public synchronized void updateTelemetry(TelemetryTable table, boolean first) {
     for (Entry<String, MechanismObject2d> entry : m_objects.entrySet()) {
       table.log(entry.getKey(), entry.getValue());
     }

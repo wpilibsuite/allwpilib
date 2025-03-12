@@ -96,7 +96,7 @@ public final class TelemetryTable {
   public <T> void log(String name, T value) {
     if (value instanceof TelemetryLoggable) {
       TelemetryTable table = getTable(name);
-      ((TelemetryLoggable) value).toTelemetry(table, table.m_first.getAndSet(false));
+      ((TelemetryLoggable) value).updateTelemetry(table, table.m_first.getAndSet(false));
     } else if (value instanceof StructSerializable v) {
       // use introspection to get "struct" static variable
       Object obj;

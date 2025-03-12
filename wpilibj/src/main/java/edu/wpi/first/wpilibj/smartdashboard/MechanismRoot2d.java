@@ -45,9 +45,9 @@ public final class MechanismRoot2d extends MechanismObject2d {
   }
 
   @Override
-  public synchronized void toTelemetry(TelemetryTable table, boolean first) {
+  public synchronized void updateTelemetry(TelemetryTable table, boolean first) {
     table.log("x", m_x);
     table.log("y", m_y);
-    super.toTelemetry(table, first);
+    super.updateTelemetry(table, first);
   }
 }
