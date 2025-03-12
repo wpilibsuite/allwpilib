@@ -12,7 +12,6 @@ import edu.wpi.first.telemetry.TelemetryLoggable;
 import edu.wpi.first.telemetry.TelemetryTable;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
