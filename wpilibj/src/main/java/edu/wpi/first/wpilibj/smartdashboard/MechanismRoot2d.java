@@ -4,8 +4,7 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.telemetry.TelemetryTable;
 
 /**
  * Root Mechanism2d node.
@@ -19,9 +18,7 @@ import edu.wpi.first.networktables.NetworkTable;
  */
 public final class MechanismRoot2d extends MechanismObject2d {
   private double m_x;
-  private DoublePublisher m_xPub;
   private double m_y;
-  private DoublePublisher m_yPub;
 
   /**
    * Package-private constructor for roots.
@@ -36,17 +33,6 @@ public final class MechanismRoot2d extends MechanismObject2d {
     m_y = y;
   }
 
-  @Override
-  public void close() {
-    if (m_xPub != null) {
-      m_xPub.close();
-    }
-    if (m_yPub != null) {
-      m_yPub.close();
-    }
-    super.close();
-  }
-
   /**
    * Set the root's position.
    *
@@ -56,28 +42,12 @@ public final class MechanismRoot2d extends MechanismObject2d {
   public synchronized void setPosition(double x, double y) {
     m_x = x;
     m_y = y;
-    flush();
   }
 
   @Override
-  protected synchronized void updateEntries(NetworkTable table) {
-    if (m_xPub != null) {
-      m_xPub.close();
-    }
-    m_xPub = table.getDoubleTopic("x").publish();
-    if (m_yPub != null) {
-      m_yPub.close();
-    }
-    m_yPub = table.getDoubleTopic("y").publish();
-    flush();
-  }
-
-  private void flush() {
-    if (m_xPub != null) {
-      m_xPub.set(m_x);
-    }
-    if (m_yPub != null) {
-      m_yPub.set(m_y);
-    }
+  public synchronized void toTelemetry(TelemetryTable table, boolean first) {
+    table.log("x", m_x);
+    table.log("y", m_y);
+    super.toTelemetry(table, first);
   }
 }
