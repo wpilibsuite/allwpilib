@@ -75,6 +75,7 @@ public class AnalogGyro implements TelemetryLoggable, AutoCloseable {
    * @param channel The AnalogInput object that the gyro is connected to. Gyros can only be used on
    *     on-board channels 0-1.
    */
+  @SuppressWarnings("this-escape")
   public AnalogGyro(AnalogInput channel) {
     requireNonNullParam(channel, "channel", "AnalogGyro");
 
@@ -106,7 +107,7 @@ public class AnalogGyro implements TelemetryLoggable, AutoCloseable {
    * @param center Preset uncalibrated value to use as the accumulator center value.
    * @param offset Preset uncalibrated value to use as the gyro offset.
    */
-  @SuppressWarnings("PMD.UnusedFormalParameter")
+  @SuppressWarnings({"PMD.UnusedFormalParameter", "this-escape"})
   public AnalogGyro(AnalogInput channel, int center, double offset) {
     requireNonNullParam(channel, "channel", "AnalogGyro");
 
