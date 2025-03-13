@@ -18,7 +18,7 @@
 using namespace halsimgui;
 
 namespace {
-HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PWMSpeed, "PWM");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PWMPulseMicrosecond, "PWM");
 
 class PWMSimModel : public glass::PWMModel {
  public:
@@ -33,12 +33,12 @@ class PWMSimModel : public glass::PWMModel {
 
   glass::DoubleSource* GetSpeedData() override { return &m_speed; }
 
-  void SetSpeed(double val) override { HALSIM_SetPWMSpeed(m_index, val); }
+  void SetSpeed(double val) override { HALSIM_SetPWMPulseMicrosecond(m_index, val); }
 
  private:
   int32_t m_index;
   int m_led = -1;
-  PWMSpeedSource m_speed;
+  PWMPulseMicrosecondSource m_speed;
 };
 
 class PWMsSimModel : public glass::PWMsModel {
