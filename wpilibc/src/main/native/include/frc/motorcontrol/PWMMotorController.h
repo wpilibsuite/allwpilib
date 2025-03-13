@@ -119,8 +119,6 @@ class PWMMotorController : public MotorController,
         std::make_unique<std::decay_t<T>>(std::forward<T>(follower)));
   }
 
-  const std::string& GetName() const { return m_name; }
-
  protected:
   /**
    * Constructor for a PWM Motor %Controller connected via PWM.
@@ -152,8 +150,6 @@ class PWMMotorController : public MotorController,
 
   hal::SimDevice m_simDevice;
   hal::SimDouble m_simSpeed;
-
-  std::string m_name;
 
   bool m_eliminateDeadband{0};
   units::microsecond_t m_minPwm{0};

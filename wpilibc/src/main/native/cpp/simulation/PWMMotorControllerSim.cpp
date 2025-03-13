@@ -14,11 +14,10 @@ using namespace frc::sim;
 
 PWMMotorControllerSim::PWMMotorControllerSim(
     const PWMMotorController& motorctrl)
-    : PWMMotorControllerSim(motorctrl.GetName().c_str(),
-                            motorctrl.GetChannel()) {}
+    : PWMMotorControllerSim(motorctrl.GetChannel()) {}
 
-PWMMotorControllerSim::PWMMotorControllerSim(const char* name, int channel) {
-  frc::sim::SimDeviceSim deviceSim{name, channel};
+PWMMotorControllerSim::PWMMotorControllerSim(int channel) {
+  frc::sim::SimDeviceSim deviceSim{"PWMMotorController", channel};
   m_simSpeed = deviceSim.GetDouble("Speed");
 }
 

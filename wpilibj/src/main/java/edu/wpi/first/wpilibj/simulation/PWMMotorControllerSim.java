@@ -11,11 +11,11 @@ public class PWMMotorControllerSim {
   private final SimDouble m_simSpeed;
 
   public PWMMotorControllerSim(PWMMotorController motorctrl) {
-    this(motorctrl.getName(), motorctrl.getChannel());
+    this(motorctrl.getChannel());
   }
 
-  public PWMMotorControllerSim(String name, int channel) {
-    SimDeviceSim simDevice = new SimDeviceSim(name, channel);
+  public PWMMotorControllerSim(int channel) {
+    SimDeviceSim simDevice = new SimDeviceSim("PWMMotorController", channel);
     m_simSpeed = simDevice.getDouble("Speed");
   }
 

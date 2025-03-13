@@ -19,7 +19,7 @@ class PWMMotorControllerSim {
  public:
   explicit PWMMotorControllerSim(const PWMMotorController& motorctrl);
 
-  PWMMotorControllerSim(const char* name, int channel);
+  explicit PWMMotorControllerSim(int channel);
 
   double GetSpeed() const;
 

@@ -26,8 +26,6 @@ public abstract class PWMMotorController extends MotorSafety
   /** PWM instances for motor controller. */
   protected PWM m_pwm;
 
-  private final String m_name;
-
   private SimDevice m_simDevice;
   private SimDouble m_simSpeed;
 
@@ -50,9 +48,7 @@ public abstract class PWMMotorController extends MotorSafety
     m_pwm = new PWM(channel, false);
     SendableRegistry.add(this, name, channel);
 
-    m_name = name;
-
-    m_simDevice = SimDevice.create(name, channel);
+    m_simDevice = SimDevice.create("PWMMotorController", channel);
     if (m_simDevice != null) {
       m_simSpeed = m_simDevice.createDouble("Speed", Direction.kOutput, 0.0);
       m_pwm.setSimDevice(m_simDevice);
@@ -70,10 +66,6 @@ public abstract class PWMMotorController extends MotorSafety
       m_simDevice = null;
       m_simSpeed = null;
     }
-  }
-
-  public String getName() {
-    return m_name;
   }
 
   private int getMinPositivePwm() {
