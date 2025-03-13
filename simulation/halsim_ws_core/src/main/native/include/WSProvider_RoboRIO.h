@@ -25,17 +25,7 @@ class HALSimWSProviderRoboRIO : public HALSimWSHalProvider {
   void DoCancelCallbacks();
 
  private:
-  int32_t m_fpgaCbKey = 0;
   int32_t m_vinVoltageCbKey = 0;
-  int32_t m_vinCurrentCbKey = 0;
-  int32_t m_6vVoltageCbKey = 0;
-  int32_t m_6vCurrentCbKey = 0;
-  int32_t m_6vActiveCbKey = 0;
-  int32_t m_6vFaultsCbKey = 0;
-  int32_t m_5vVoltageCbKey = 0;
-  int32_t m_5vCurrentCbKey = 0;
-  int32_t m_5vActiveCbKey = 0;
-  int32_t m_5vFaultsCbKey = 0;
   int32_t m_3v3VoltageCbKey = 0;
   int32_t m_3v3CurrentCbKey = 0;
   int32_t m_3v3ActiveCbKey = 0;

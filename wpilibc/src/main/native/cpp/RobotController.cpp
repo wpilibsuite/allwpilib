@@ -9,7 +9,6 @@
 
 #include <hal/CAN.h>
 #include <hal/HALBase.h>
-#include <hal/LEDs.h>
 #include <hal/Power.h>
 
 #include "frc/Errors.h"
@@ -69,13 +68,6 @@ uint64_t RobotController::GetFPGATime() {
   return time;
 }
 
-bool RobotController::GetUserButton() {
-  int32_t status = 0;
-  bool value = HAL_GetFPGAButton(&status);
-  FRC_CheckErrorStatus(status, "GetUserButton");
-  return value;
-}
-
 units::volt_t RobotController::GetBatteryVoltage() {
   int32_t status = 0;
   double retVal = HAL_GetVinVoltage(&status);
@@ -125,13 +117,6 @@ double RobotController::GetInputVoltage() {
   return retVal;
 }
 
-double RobotController::GetInputCurrent() {
-  int32_t status = 0;
-  double retVal = HAL_GetVinCurrent(&status);
-  FRC_CheckErrorStatus(status, "GetInputCurrent");
-  return retVal;
-}
-
 double RobotController::GetVoltage3V3() {
   int32_t status = 0;
   double retVal = HAL_GetUserVoltage3V3(&status);
@@ -166,74 +151,6 @@ int RobotController::GetFaultCount3V3() {
   return retVal;
 }
 
-double RobotController::GetVoltage5V() {
-  int32_t status = 0;
-  double retVal = HAL_GetUserVoltage5V(&status);
-  FRC_CheckErrorStatus(status, "GetVoltage5V");
-  return retVal;
-}
-
-double RobotController::GetCurrent5V() {
-  int32_t status = 0;
-  double retVal = HAL_GetUserCurrent5V(&status);
-  FRC_CheckErrorStatus(status, "GetCurrent5V");
-  return retVal;
-}
-
-void RobotController::SetEnabled5V(bool enabled) {
-  int32_t status = 0;
-  HAL_SetUserRailEnabled5V(enabled, &status);
-  FRC_CheckErrorStatus(status, "SetEnabled5V");
-}
-
-bool RobotController::GetEnabled5V() {
-  int32_t status = 0;
-  bool retVal = HAL_GetUserActive5V(&status);
-  FRC_CheckErrorStatus(status, "GetEnabled5V");
-  return retVal;
-}
-
-int RobotController::GetFaultCount5V() {
-  int32_t status = 0;
-  int retVal = HAL_GetUserCurrentFaults5V(&status);
-  FRC_CheckErrorStatus(status, "GetFaultCount5V");
-  return retVal;
-}
-
-double RobotController::GetVoltage6V() {
-  int32_t status = 0;
-  double retVal = HAL_GetUserVoltage6V(&status);
-  FRC_CheckErrorStatus(status, "GetVoltage6V");
-  return retVal;
-}
-
-double RobotController::GetCurrent6V() {
-  int32_t status = 0;
-  double retVal = HAL_GetUserCurrent6V(&status);
-  FRC_CheckErrorStatus(status, "GetCurrent6V");
-  return retVal;
-}
-
-void RobotController::SetEnabled6V(bool enabled) {
-  int32_t status = 0;
-  HAL_SetUserRailEnabled6V(enabled, &status);
-  FRC_CheckErrorStatus(status, "SetEnabled6V");
-}
-
-bool RobotController::GetEnabled6V() {
-  int32_t status = 0;
-  bool retVal = HAL_GetUserActive6V(&status);
-  FRC_CheckErrorStatus(status, "GetEnabled6V");
-  return retVal;
-}
-
-int RobotController::GetFaultCount6V() {
-  int32_t status = 0;
-  int retVal = HAL_GetUserCurrentFaults6V(&status);
-  FRC_CheckErrorStatus(status, "GetFaultCount6V");
-  return retVal;
-}
-
 void RobotController::ResetRailFaultCounts() {
   int32_t status = 0;
   HAL_ResetUserCurrentFaults(&status);
@@ -258,30 +175,6 @@ units::celsius_t RobotController::GetCPUTemp() {
   double retVal = HAL_GetCPUTemp(&status);
   FRC_CheckErrorStatus(status, "GetCPUTemp");
   return units::celsius_t{retVal};
-}
-
-static_assert(RadioLEDState::kOff ==
-              static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kOff));
-static_assert(
-    RadioLEDState::kGreen ==
-    static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kGreen));
-static_assert(RadioLEDState::kRed ==
-              static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kRed));
-static_assert(
-    RadioLEDState::kOrange ==
-    static_cast<RadioLEDState>(HAL_RadioLEDState::HAL_RadioLED_kOrange));
-
-void RobotController::SetRadioLEDState(RadioLEDState state) {
-  int32_t status = 0;
-  HAL_SetRadioLEDState(static_cast<HAL_RadioLEDState>(state), &status);
-  FRC_CheckErrorStatus(status, "SetRadioLEDState");
-}
-
-RadioLEDState RobotController::GetRadioLEDState() {
-  int32_t status = 0;
-  auto retVal = static_cast<RadioLEDState>(HAL_GetRadioLEDState(&status));
-  FRC_CheckErrorStatus(status, "GetRadioLEDState");
-  return retVal;
 }
 
 CANStatus RobotController::GetCANStatus(int busId) {
