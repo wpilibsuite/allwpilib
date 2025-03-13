@@ -102,9 +102,9 @@ int main(void) {
       case TeleopMode:
         status = 0;
         if (HAL_GetDIO(dio, &status)) {
-          HAL_SetPWMSpeed(pwmPort, 2000, &status);
+          HAL_SetPWMPulseTimeMicroseconds(pwmPort, 2000, &status);
         } else {
-          HAL_SetPWMSpeed(pwmPort, 1500, &status);
+          HAL_SetPWMPulseTimeMicroseconds(pwmPort, 1500, &status);
         }
         break;
       case AutoMode:
