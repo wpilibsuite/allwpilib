@@ -12,9 +12,7 @@
 using namespace frc;
 using namespace frc::sim;
 
-ServoSim::ServoSim(
-    const Servo& servo)
-    : ServoSim(servo.GetChannel()) {}
+ServoSim::ServoSim(const Servo& servo) : ServoSim(servo.GetChannel()) {}
 
 ServoSim::ServoSim(int channel) {
   frc::sim::SimDeviceSim deviceSim{"Servo", channel};
@@ -26,5 +24,5 @@ double ServoSim::GetPosition() const {
 }
 
 double ServoSim::GetAngle() const {
-    return GetPosition() * Servo::GetServoAngleRange() + Servo::kMinServoAngle;
-  }
+  return GetPosition() * Servo::GetServoAngleRange() + Servo::kMinServoAngle;
+}

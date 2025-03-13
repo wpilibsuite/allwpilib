@@ -29,4 +29,4 @@ TEST(ServoSimTest, TestServo) {
   servo.SetAngle(170);
   EXPECT_EQ(170, sim.GetAngle());
 }
-}
+}  // namespace frc::sim

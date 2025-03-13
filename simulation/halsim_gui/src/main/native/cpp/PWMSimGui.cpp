@@ -33,7 +33,9 @@ class PWMSimModel : public glass::PWMModel {
 
   glass::DoubleSource* GetSpeedData() override { return &m_speed; }
 
-  void SetSpeed(double val) override { HALSIM_SetPWMPulseMicrosecond(m_index, val); }
+  void SetSpeed(double val) override {
+    HALSIM_SetPWMPulseMicrosecond(m_index, val);
+  }
 
  private:
   int32_t m_index;

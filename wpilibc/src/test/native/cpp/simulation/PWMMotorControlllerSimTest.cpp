@@ -23,4 +23,4 @@ TEST(PWMMotorControllerSimTest, TestMotor) {
   spark.Set(-0.785);
   EXPECT_EQ(-0.785, sim.GetSpeed());
 }
-}
+}  // namespace frc::sim

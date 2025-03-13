@@ -13,7 +13,7 @@ namespace frc {
 
 namespace sim {
 class ServoSim;
-}
+}  // namespace sim
 
 /**
  * Standard hobby style servo.
