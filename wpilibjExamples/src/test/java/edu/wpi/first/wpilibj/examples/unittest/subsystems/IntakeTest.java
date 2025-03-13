@@ -27,7 +27,8 @@ class IntakeTest {
     assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
     m_intake = new Intake(); // create our intake
     m_simMotor =
-        new PWMMotorControllerSim(IntakeConstants.kMotorPort); // create our simulation PWM motor controller
+        new PWMMotorControllerSim(
+            IntakeConstants.kMotorPort); // create our simulation PWM motor controller
     m_simPiston =
         new DoubleSolenoidSim(
             PneumaticsModuleType.CTREPCM,
