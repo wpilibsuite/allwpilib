@@ -92,6 +92,11 @@ public abstract class PWMMotorController extends MotorSafety
     return getMaxNegativePwm() - m_minPwm;
   }
 
+  /**
+   * Takes a speed from -1 to 1, and outputs it in the microsecond format.
+   *
+   * @param speed the speed to output
+   */
   protected final void setSpeed(double speed) {
     if (Double.isFinite(speed)) {
       speed = MathUtil.clamp(speed, -1.0, 1.0);
@@ -115,6 +120,11 @@ public abstract class PWMMotorController extends MotorSafety
     m_pwm.setPulseTimeMicroseconds(rawValue);
   }
 
+  /**
+   * Gets the speed from -1 to 1, from the currently set pulse time.
+   *
+   * @return motor controller speed
+   */
   protected final double getSpeed() {
     int rawValue = m_pwm.getPulseTimeMicroseconds();
 
@@ -133,6 +143,15 @@ public abstract class PWMMotorController extends MotorSafety
     }
   }
 
+  /**
+   * Sets the bounds in microseconds for the controller
+   *
+   * @param maxPwm maximum
+   * @param deadbandMaxPwm deadband max
+   * @param centerPwm center
+   * @param deadbandMinPwm deadmand min
+   * @param minPwm minimum
+   */
   protected final void setBoundsMicroseconds(
       int maxPwm, int deadbandMaxPwm, int centerPwm, int deadbandMinPwm, int minPwm) {
     m_maxPwm = maxPwm;
