@@ -144,7 +144,7 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   /**
-   * Sets the bounds in microseconds for the controller
+   * Sets the bounds in microseconds for the controller.
    *
    * @param maxPwm maximum
    * @param deadbandMaxPwm deadband max

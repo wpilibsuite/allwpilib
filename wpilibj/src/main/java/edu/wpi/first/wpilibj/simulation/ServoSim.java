@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj.simulation;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.Servo;
 
-/** Class to control a simulated Servo */
+/** Class to control a simulated Servo. */
 public class ServoSim {
   private final SimDouble m_simPosition;
 

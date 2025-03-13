@@ -46,7 +46,8 @@ double Servo::Get() const {
   } else if (rawValue > m_maxPwm) {
     return 1.0;
   }
-  return (rawValue - m_minPwm) / GetFullRangeScaleFactor();
+  return (rawValue - m_minPwm).to<double>() /
+         GetFullRangeScaleFactor().to<double>();
 }
 
 void Servo::SetAngle(double degrees) {
