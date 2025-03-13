@@ -33,7 +33,7 @@ public class PWMJNI extends DIOJNI {
    */
   public static native void freePWMPort(int pwmPortHandle);
 
-    /**
+  /**
    * Indicates the pwm is used by a simulated device.
    *
    * @param handle the pwm handle
