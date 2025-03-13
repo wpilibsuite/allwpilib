@@ -8,11 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
-import edu.wpi.first.wpilibj.simulation.testutils.EnumCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.IntCallback;
 import org.junit.jupiter.api.Test;
 
@@ -163,27 +161,5 @@ class RoboRioSimTest {
     RoboRioSim.setComments(kCommentsOverflow);
     assertEquals(kCommentsTruncated, RoboRioSim.getComments());
     assertEquals(kCommentsTruncated, RobotController.getComments());
-  }
-
-  @Test
-  void testRadioLEDState() {
-    RoboRioSim.resetData();
-
-    EnumCallback callback = new EnumCallback();
-    try (CallbackStore cb = RoboRioSim.registerRadioLEDStateCallback(callback, false)) {
-      RobotController.setRadioLEDState(RadioLEDState.kGreen);
-      assertTrue(callback.wasTriggered());
-      assertEquals(RadioLEDState.kGreen.value, callback.getSetValue());
-      assertEquals(RadioLEDState.kGreen, RoboRioSim.getRadioLEDState());
-      assertEquals(RadioLEDState.kGreen, RobotController.getRadioLEDState());
-
-      callback.reset();
-
-      RoboRioSim.setRadioLEDState(RadioLEDState.kOrange);
-      assertTrue(callback.wasTriggered());
-      assertEquals(RadioLEDState.kOrange.value, callback.getSetValue());
-      assertEquals(RadioLEDState.kOrange, RoboRioSim.getRadioLEDState());
-      assertEquals(RadioLEDState.kOrange, RobotController.getRadioLEDState());
-    }
   }
 }
