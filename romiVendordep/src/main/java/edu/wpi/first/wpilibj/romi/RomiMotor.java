@@ -27,7 +27,7 @@ public class RomiMotor extends PWMMotorController {
    *     right.
    */
   public RomiMotor(final int channel) {
-    super("Romi Motor", channel);
+    super(channel);
     initRomiMotor();
   }
 }

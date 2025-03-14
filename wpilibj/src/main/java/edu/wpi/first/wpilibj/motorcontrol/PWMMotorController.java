@@ -4,18 +4,16 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.telemetry.TelemetryLoggable;
+import edu.wpi.first.telemetry.TelemetryTable;
 import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
 
 /** Common base class for all PWM Motor Controllers. */
-@SuppressWarnings("removal")
 public abstract class PWMMotorController extends MotorSafety
-    implements MotorController, Sendable, AutoCloseable {
+    implements MotorController, TelemetryLoggable, AutoCloseable {
   private boolean m_isInverted;
   private final ArrayList<PWMMotorController> m_followers = new ArrayList<>();
 
@@ -25,20 +23,15 @@ public abstract class PWMMotorController extends MotorSafety
   /**
    * Constructor.
    *
-   * @param name Name to use for SendableRegistry
-   * @param channel The PWM channel that the controller is attached to. 0-9 are on-board, 10-19 are
-   *     on the MXP port
+   * @param channel The PWM channel that the controller is attached to.
    */
-  @SuppressWarnings("this-escape")
-  protected PWMMotorController(final String name, final int channel) {
-    m_pwm = new PWM(channel, false);
-    SendableRegistry.add(this, name, channel);
+  protected PWMMotorController(final int channel) {
+    m_pwm = new PWM(channel);
   }
 
   /** Free the resource associated with the PWM channel and set the value to 0. */
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     m_pwm.close();
   }
 
@@ -158,9 +151,10 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Motor Controller");
-    builder.setActuator(true);
-    builder.addDoubleProperty("Value", this::get, this::set);
+  public void updateTelemetry(TelemetryTable table, boolean first) {
+    if (first) {
+      table.log(".type", "Motor Controller");
+    }
+    table.log("Value", get());
   }
 }

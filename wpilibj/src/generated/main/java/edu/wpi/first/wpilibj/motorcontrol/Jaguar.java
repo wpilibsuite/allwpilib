@@ -35,7 +35,7 @@ public class Jaguar extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public Jaguar(final int channel) {
-    super("Jaguar", channel);
+    super(channel);
 
     m_pwm.setBoundsMicroseconds(2310, 1550, 1507, 1454, 697);
     m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);

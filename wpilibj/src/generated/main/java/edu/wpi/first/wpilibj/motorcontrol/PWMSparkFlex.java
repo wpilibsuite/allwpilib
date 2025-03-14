@@ -35,7 +35,7 @@ public class PWMSparkFlex extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public PWMSparkFlex(final int channel) {
-    super("PWMSparkFlex", channel);
+    super(channel);
 
     m_pwm.setBoundsMicroseconds(2003, 1550, 1500, 1460, 999);
     m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
