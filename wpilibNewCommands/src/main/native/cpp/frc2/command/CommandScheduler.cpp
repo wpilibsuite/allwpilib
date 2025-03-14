@@ -10,8 +10,8 @@
 #include <utility>
 #include <vector>
 
+#include <frc/DriverStation.h>
 #include <frc/RobotBase.h>
-#include <frc/RobotState.h>
 #include <frc/TimedRobot.h>
 #include <hal/HALBase.h>
 #include <hal/UsageReporting.h>
@@ -103,7 +103,7 @@ void CommandScheduler::Schedule(Command* command) {
   RequireUngrouped(command);
 
   if (m_impl->disabled || m_impl->scheduledCommands.contains(command) ||
-      (frc::RobotState::IsDisabled() && !command->RunsWhenDisabled())) {
+      (frc::DriverStation::IsDisabled() && !command->RunsWhenDisabled())) {
     return;
   }
 
@@ -185,7 +185,7 @@ void CommandScheduler::Run() {
   loopCache->Poll();
   m_watchdog.AddEpoch("buttons.Run()");
 
-  bool isDisabled = frc::RobotState::IsDisabled();
+  bool isDisabled = frc::DriverStation::IsDisabled();
   // create a new set to avoid iterator invalidation.
   for (Command* command : wpi::SmallSet(m_impl->scheduledCommands)) {
     if (!IsScheduled(command)) {

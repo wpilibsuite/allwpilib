@@ -100,8 +100,7 @@ class PotentiometerPIDTest {
   void teleopTest() {
     // teleop init
     {
-      DriverStationSim.setAutonomous(false);
-      DriverStationSim.setEnabled(true);
+      DriverStationSim.setOpMode("teleop");
       DriverStationSim.notifyNewData();
 
       assertTrue(m_motorSim.getInitialized());

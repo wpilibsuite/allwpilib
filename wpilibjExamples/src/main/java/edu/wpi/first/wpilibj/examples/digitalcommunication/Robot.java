@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
     m_enabledOutput.set(DriverStation.isEnabled());
 
     // pull auto port high if in autonomous, low if in teleop (or disabled)
-    m_autonomousOutput.set(DriverStation.isAutonomous());
+    m_autonomousOutput.set(isAutonomous());
 
     // pull alert port high if match time remaining is between 30 and 25 seconds
     var matchTime = DriverStation.getMatchTime();

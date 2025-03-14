@@ -26,7 +26,9 @@ CommandScheduler CommandTestBase::GetScheduler() {
 }
 
 void CommandTestBase::SetDSEnabled(bool enabled) {
+  frc::sim::DriverStationSim::ResetData();
+  frc::DriverStation::AddOpModeOption("test", "", "", 0);
   frc::sim::DriverStationSim::SetDsAttached(true);
-  frc::sim::DriverStationSim::SetEnabled(enabled);
+  frc::sim::DriverStationSim::SetOpMode(enabled ? "test" : "");
   frc::sim::DriverStationSim::NotifyNewData();
 }

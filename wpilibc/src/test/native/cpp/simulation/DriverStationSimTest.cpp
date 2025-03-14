@@ -10,63 +10,11 @@
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/DriverStation.h"
 #include "frc/Joystick.h"
-#include "frc/RobotState.h"
 #include "frc/simulation/DriverStationSim.h"
 #include "frc/simulation/SimHooks.h"
 
 using namespace frc;
 using namespace frc::sim;
-
-TEST(DriverStationTest, Enabled) {
-  HAL_Initialize(500, 0);
-  DriverStationSim::ResetData();
-
-  EXPECT_FALSE(DriverStation::IsEnabled());
-  BooleanCallback callback;
-  auto cb =
-      DriverStationSim::RegisterEnabledCallback(callback.GetCallback(), false);
-  DriverStationSim::SetEnabled(true);
-  DriverStationSim::NotifyNewData();
-  EXPECT_TRUE(DriverStationSim::GetEnabled());
-  EXPECT_TRUE(DriverStation::IsEnabled());
-  EXPECT_TRUE(RobotState::IsEnabled());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
-}
-
-TEST(DriverStationTest, AutonomousMode) {
-  HAL_Initialize(500, 0);
-  DriverStationSim::ResetData();
-
-  EXPECT_FALSE(DriverStation::IsAutonomous());
-  BooleanCallback callback;
-  auto cb = DriverStationSim::RegisterAutonomousCallback(callback.GetCallback(),
-                                                         false);
-  DriverStationSim::SetAutonomous(true);
-  DriverStationSim::NotifyNewData();
-  EXPECT_TRUE(DriverStationSim::GetAutonomous());
-  EXPECT_TRUE(DriverStation::IsAutonomous());
-  EXPECT_TRUE(RobotState::IsAutonomous());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
-}
-
-TEST(DriverStationTest, Mode) {
-  HAL_Initialize(500, 0);
-  DriverStationSim::ResetData();
-
-  EXPECT_FALSE(DriverStation::IsTest());
-  BooleanCallback callback;
-  auto cb =
-      DriverStationSim::RegisterTestCallback(callback.GetCallback(), false);
-  DriverStationSim::SetTest(true);
-  DriverStationSim::NotifyNewData();
-  EXPECT_TRUE(DriverStationSim::GetTest());
-  EXPECT_TRUE(DriverStation::IsTest());
-  EXPECT_TRUE(RobotState::IsTest());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
-}
 
 TEST(DriverStationTest, Estop) {
   HAL_Initialize(500, 0);
@@ -80,7 +28,6 @@ TEST(DriverStationTest, Estop) {
   DriverStationSim::NotifyNewData();
   EXPECT_TRUE(DriverStationSim::GetEStop());
   EXPECT_TRUE(DriverStation::IsEStopped());
-  EXPECT_TRUE(RobotState::IsEStopped());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }
@@ -238,6 +185,110 @@ TEST(DriverStationTest, MatchTime) {
   EXPECT_EQ(kTestTime, DriverStation::GetMatchTime().value());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(kTestTime, callback.GetLastValue());
+}
+
+TEST(DriverStationTest, OpMode) {
+  HAL_Initialize(500, 0);
+  DriverStationSim::ResetData();
+
+  int mode1 = DriverStation::AddOpModeOption("name", "category", "desc", 0);
+  int mode2 = DriverStation::AddOpModeOption("name2", "category2", "desc2", 1);
+
+  auto modes = DriverStationSim::GetOpModeOptions();
+  ASSERT_EQ(2u, modes.size());
+  EXPECT_EQ("name", modes[0].name);
+  EXPECT_EQ("category", modes[0].category);
+  EXPECT_EQ("desc", modes[0].description);
+  EXPECT_EQ(0, modes[0].flags);
+  EXPECT_EQ("name2", modes[1].name);
+  EXPECT_EQ("category2", modes[1].category);
+  EXPECT_EQ("desc2", modes[1].description);
+  EXPECT_EQ(1, modes[1].flags);
+
+  EXPECT_EQ(0, DriverStation::GetOpModeId());
+  EXPECT_EQ("", DriverStation::GetOpMode());
+
+  DriverStationSim::SetOpMode("name");
+  DriverStationSim::NotifyNewData();
+  EXPECT_EQ(mode1, DriverStation::GetOpModeId());
+  EXPECT_EQ("name", DriverStation::GetOpMode());
+
+  DriverStationSim::SetOpMode("");
+  DriverStationSim::NotifyNewData();
+  EXPECT_EQ(0, DriverStation::GetOpModeId());
+  EXPECT_EQ("", DriverStation::GetOpMode());
+
+  DriverStationSim::SetOpMode("name2");
+  DriverStationSim::NotifyNewData();
+  EXPECT_EQ(mode2, DriverStation::GetOpModeId());
+  EXPECT_EQ("name2", DriverStation::GetOpMode());
+
+  DriverStationSim::SetOpMode("unknown");
+  DriverStationSim::NotifyNewData();
+  EXPECT_EQ(0, DriverStation::GetOpModeId());
+  EXPECT_EQ("", DriverStation::GetOpMode());
+}
+
+TEST(DriverStationTest, SelectedAutonomousOpMode) {
+  HAL_Initialize(500, 0);
+  DriverStationSim::ResetData();
+
+  int mode1 = DriverStation::AddOpModeOption("name", "category", "desc", 0);
+  int mode2 = DriverStation::AddOpModeOption("name2", "category2", "desc2", 1);
+
+  EXPECT_EQ(0, DriverStation::GetSelectedAutonomousOpModeId());
+  EXPECT_EQ("", DriverStation::GetSelectedAutonomousOpMode());
+
+  DriverStationSim::SetSelectedAutonomousOpMode("name");
+  DriverStationSim::NotifyNewData();
+  EXPECT_EQ(mode1, DriverStation::GetSelectedAutonomousOpModeId());
+  EXPECT_EQ("name", DriverStation::GetSelectedAutonomousOpMode());
+
+  DriverStationSim::SetSelectedAutonomousOpMode("");
+  DriverStationSim::NotifyNewData();
+  EXPECT_EQ(0, DriverStation::GetSelectedAutonomousOpModeId());
+  EXPECT_EQ("", DriverStation::GetSelectedAutonomousOpMode());
+
+  DriverStationSim::SetSelectedAutonomousOpMode("name2");
+  DriverStationSim::NotifyNewData();
+  EXPECT_EQ(mode2, DriverStation::GetSelectedAutonomousOpModeId());
+  EXPECT_EQ("name2", DriverStation::GetSelectedAutonomousOpMode());
+
+  DriverStationSim::SetSelectedAutonomousOpMode("unknown");
+  DriverStationSim::NotifyNewData();
+  EXPECT_EQ(0, DriverStation::GetSelectedAutonomousOpModeId());
+  EXPECT_EQ("", DriverStation::GetSelectedAutonomousOpMode());
+}
+
+TEST(DriverStationTest, SelectedTeleoperatedOpMode) {
+  HAL_Initialize(500, 0);
+  DriverStationSim::ResetData();
+
+  int mode1 = DriverStation::AddOpModeOption("name", "category", "desc", 0);
+  int mode2 = DriverStation::AddOpModeOption("name2", "category2", "desc2", 1);
+
+  EXPECT_EQ(0, DriverStation::GetSelectedTeleoperatedOpModeId());
+  EXPECT_EQ("", DriverStation::GetSelectedTeleoperatedOpMode());
+
+  DriverStationSim::SetSelectedTeleoperatedOpMode("name");
+  DriverStationSim::NotifyNewData();
+  EXPECT_EQ(mode1, DriverStation::GetSelectedTeleoperatedOpModeId());
+  EXPECT_EQ("name", DriverStation::GetSelectedTeleoperatedOpMode());
+
+  DriverStationSim::SetSelectedTeleoperatedOpMode("");
+  DriverStationSim::NotifyNewData();
+  EXPECT_EQ(0, DriverStation::GetSelectedTeleoperatedOpModeId());
+  EXPECT_EQ("", DriverStation::GetSelectedTeleoperatedOpMode());
+
+  DriverStationSim::SetSelectedTeleoperatedOpMode("name2");
+  DriverStationSim::NotifyNewData();
+  EXPECT_EQ(mode2, DriverStation::GetSelectedTeleoperatedOpModeId());
+  EXPECT_EQ("name2", DriverStation::GetSelectedTeleoperatedOpMode());
+
+  DriverStationSim::SetSelectedTeleoperatedOpMode("unknown");
+  DriverStationSim::NotifyNewData();
+  EXPECT_EQ(0, DriverStation::GetSelectedTeleoperatedOpModeId());
+  EXPECT_EQ("", DriverStation::GetSelectedTeleoperatedOpMode());
 }
 
 TEST(DriverStationTest, SetGameSpecificMessage) {

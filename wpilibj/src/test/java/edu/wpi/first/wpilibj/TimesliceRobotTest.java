@@ -60,7 +60,7 @@ class TimesliceRobotTest {
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
-    DriverStationSim.setEnabled(false);
+    DriverStationSim.setOpMode("");
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(0.0); // Wait for Notifiers
 

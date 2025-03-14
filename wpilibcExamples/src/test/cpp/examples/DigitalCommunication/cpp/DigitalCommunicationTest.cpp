@@ -102,7 +102,7 @@ class EnabledTest : public DigitalCommunicationTest<bool> {};
 
 TEST_P(EnabledTest, Enabled) {
   auto enabled = GetParam();
-  frc::sim::DriverStationSim::SetEnabled(enabled);
+  frc::sim::DriverStationSim::SetOpMode(enabled ? "teleop" : "");
   frc::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(m_enabledOutput.GetInitialized());
@@ -120,7 +120,7 @@ class AutonomousTest : public DigitalCommunicationTest<bool> {};
 
 TEST_P(AutonomousTest, Autonomous) {
   auto autonomous = GetParam();
-  frc::sim::DriverStationSim::SetAutonomous(autonomous);
+  frc::sim::DriverStationSim::SetOpMode(autonomous ? "auto" : "teleop");
   frc::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(m_autonomousOutput.GetInitialized());

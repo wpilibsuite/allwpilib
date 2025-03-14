@@ -24,9 +24,6 @@ class Robot : public frc::TimedRobot {
   void TeleopInit() override;
   void TeleopPeriodic() override;
   void TeleopExit() override;
-  void TestInit() override;
-  void TestPeriodic() override;
-  void TestExit() override;
 
  private:
   std::optional<frc2::CommandPtr> m_autonomousCommand;

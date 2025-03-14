@@ -33,11 +33,6 @@ class Robot : public frc::TimedRobot {
   void TeleopPeriodic() override {}
 
   /**
-   * This function is called periodically during test mode
-   */
-  void TestPeriodic() override {}
-
-  /**
    * This function is called periodically during all modes
    */
   void RobotPeriodic() override {}

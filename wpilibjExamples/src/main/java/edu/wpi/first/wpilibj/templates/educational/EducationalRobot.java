@@ -30,7 +30,26 @@ public class EducationalRobot extends RobotBase {
     run();
   }
 
+  public boolean isDisabled() {
+    return DriverStation.getOpModeId() == 0;
+  }
+
+  public boolean isAutonomous() {
+    return DriverStation.getOpModeId() == m_autoMode;
+  }
+
+  public boolean isTeleop() {
+    return DriverStation.getOpModeId() == m_teleopMode;
+  }
+
+  public boolean isTest() {
+    return DriverStation.getOpModeId() == m_testMode;
+  }
+
   private volatile boolean m_exit;
+  private int m_autoMode = -1;
+  private int m_teleopMode = -1;
+  private int m_testMode = -1;
 
   @Override
   public void startCompetition() {
@@ -40,14 +59,18 @@ public class EducationalRobot extends RobotBase {
 
     DriverStation.provideRefreshedDataEventHandle(event);
 
+    m_autoMode = DriverStation.addOpModeOption("auto", "", "", 0);
+    m_teleopMode = DriverStation.addOpModeOption("teleop", "", "", 0);
+    m_testMode = DriverStation.addOpModeOption("test", "", "", 0);
+
     // Tell the DS that the robot is ready to be enabled
     DriverStationJNI.observeUserProgramStarting();
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
+      int mode = DriverStation.getOpModeId();
+      modeThread.inOpMode(mode);
       if (isDisabled()) {
-        modeThread.inDisabled(true);
         disabled();
-        modeThread.inDisabled(false);
         while (isDisabled()) {
           try {
             WPIUtilJNI.waitForObject(event);
@@ -56,10 +79,8 @@ public class EducationalRobot extends RobotBase {
           }
         }
       } else if (isAutonomous()) {
-        modeThread.inAutonomous(true);
         autonomous();
-        modeThread.inAutonomous(false);
-        while (isAutonomousEnabled()) {
+        while (isAutonomous()) {
           try {
             WPIUtilJNI.waitForObject(event);
           } catch (InterruptedException e) {
@@ -67,10 +88,8 @@ public class EducationalRobot extends RobotBase {
           }
         }
       } else if (isTest()) {
-        modeThread.inTest(true);
         test();
-        modeThread.inTest(false);
-        while (isTest() && isEnabled()) {
+        while (isTest()) {
           try {
             WPIUtilJNI.waitForObject(event);
           } catch (InterruptedException e) {
@@ -78,10 +97,8 @@ public class EducationalRobot extends RobotBase {
           }
         }
       } else {
-        modeThread.inTeleop(true);
         teleop();
-        modeThread.inTeleop(false);
-        while (isTeleopEnabled()) {
+        while (isTeleop()) {
           try {
             WPIUtilJNI.waitForObject(event);
           } catch (InterruptedException e) {

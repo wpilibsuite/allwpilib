@@ -20,7 +20,4 @@ class Robot : public frc::TimesliceRobot {
 
   void DisabledInit() override;
   void DisabledPeriodic() override;
-
-  void TestInit() override;
-  void TestPeriodic() override;
 };

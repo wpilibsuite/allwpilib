@@ -195,60 +195,23 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is currently in Autonomous mode as determined by the Driver Station.
+   * Determine if the Robot is in a particular operating mode.
    *
-   * @return True if the robot is currently operating Autonomously.
+   * @param mode operating mode
+   * @return True if the Robot is currently in that operating mode.
    */
-  public boolean isAutonomous() {
-    return DriverStation.isAutonomous();
+  public boolean isOpMode(int mode) {
+    return DriverStation.isOpMode(mode);
   }
 
   /**
-   * Determine if the robot is currently in Autonomous mode and enabled as determined by the Driver
-   * Station.
+   * Determine if the Robot is in a particular operating mode.
    *
-   * @return True if the robot is currently operating autonomously while enabled.
+   * @param mode operating mode
+   * @return True if the Robot is currently in that operating mode.
    */
-  public boolean isAutonomousEnabled() {
-    return DriverStation.isAutonomousEnabled();
-  }
-
-  /**
-   * Determine if the robot is currently in Test mode as determined by the Driver Station.
-   *
-   * @return True if the robot is currently operating in Test mode.
-   */
-  public boolean isTest() {
-    return DriverStation.isTest();
-  }
-
-  /**
-   * Determine if the robot is current in Test mode and enabled as determined by the Driver Station.
-   *
-   * @return True if the robot is currently operating in Test mode while enabled.
-   */
-  public boolean isTestEnabled() {
-    return DriverStation.isTestEnabled();
-  }
-
-  /**
-   * Determine if the robot is currently in Operator Control mode as determined by the Driver
-   * Station.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode.
-   */
-  public boolean isTeleop() {
-    return DriverStation.isTeleop();
-  }
-
-  /**
-   * Determine if the robot is currently in Operator Control mode and enabled as determined by the
-   * Driver Station.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode while enabled.
-   */
-  public boolean isTeleopEnabled() {
-    return DriverStation.isTeleopEnabled();
+  public boolean isOpMode(String mode) {
+    return DriverStation.isOpMode(mode);
   }
 
   /**

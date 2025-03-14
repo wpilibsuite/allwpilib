@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <chrono>
+#include <string_view>
 #include <thread>
 
 #include <hal/DriverStation.h>
@@ -159,52 +159,20 @@ class RobotBase {
   bool IsDisabled() const;
 
   /**
-   * Determine if the robot is currently in Autonomous mode.
+   * Determine if the Robot is in a particular operating mode.
    *
-   * @return True if the robot is currently operating Autonomously as determined
-   *         by the Driver Station.
+   * @param mode operating mode
+   * @return True if the Robot is currently in that operating mode.
    */
-  bool IsAutonomous() const;
+  bool IsOpMode(int mode) const;
 
   /**
-   * Determine if the robot is currently in Autonomous mode and enabled.
+   * Determine if the Robot is in a particular operating mode.
    *
-   * @return True if the robot us currently operating Autonomously while enabled
-   * as determined by the Driver Station.
+   * @param mode operating mode
+   * @return True if the Robot is currently in that operating mode.
    */
-  bool IsAutonomousEnabled() const;
-
-  /**
-   * Determine if the robot is currently in Operator Control mode.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode as
-   *         determined by the Driver Station.
-   */
-  bool IsTeleop() const;
-
-  /**
-   * Determine if the robot is current in Operator Control mode and enabled.
-   *
-   * @return True if the robot is currently operating in Tele-Op mode while
-   * enabled as determined by the Driver Station.
-   */
-  bool IsTeleopEnabled() const;
-
-  /**
-   * Determine if the robot is currently in Test mode.
-   *
-   * @return True if the robot is currently running in Test mode as determined
-   * by the Driver Station.
-   */
-  bool IsTest() const;
-
-  /**
-   * Determine if the robot is current in Test mode and enabled.
-   *
-   * @return True if the robot is currently operating in Test mode while
-   * enabled as determined by the Driver Station.
-   */
-  bool IsTestEnabled() const;
+  bool IsOpMode(std::string_view mode) const;
 
   /**
    * Returns the main thread ID.

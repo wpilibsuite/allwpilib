@@ -92,8 +92,7 @@ class PotentiometerPIDTest : public testing::Test {
 TEST_F(PotentiometerPIDTest, Teleop) {
   // teleop init
   {
-    frc::sim::DriverStationSim::SetAutonomous(false);
-    frc::sim::DriverStationSim::SetEnabled(true);
+    frc::sim::DriverStationSim::SetOpMode("auto");
     frc::sim::DriverStationSim::NotifyNewData();
 
     EXPECT_TRUE(m_motorSim.GetInitialized());

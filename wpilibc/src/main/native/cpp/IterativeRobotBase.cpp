@@ -17,7 +17,9 @@
 using namespace frc;
 
 IterativeRobotBase::IterativeRobotBase(units::second_t period)
-    : m_period(period),
+    : m_autonomousMode(DriverStation::AddOpModeOption("auto", "", "", 0)),
+      m_teleoperatedMode(DriverStation::AddOpModeOption("teleop", "", "", 0)),
+      m_period(period),
       m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
 
 void IterativeRobotBase::RobotInit() {}
@@ -31,8 +33,6 @@ void IterativeRobotBase::DisabledInit() {}
 void IterativeRobotBase::AutonomousInit() {}
 
 void IterativeRobotBase::TeleopInit() {}
-
-void IterativeRobotBase::TestInit() {}
 
 void IterativeRobotBase::RobotPeriodic() {
   static bool firstRun = true;
@@ -74,21 +74,19 @@ void IterativeRobotBase::TeleopPeriodic() {
   }
 }
 
-void IterativeRobotBase::TestPeriodic() {
-  static bool firstRun = true;
-  if (firstRun) {
-    wpi::print("Default {}() method... Override me!\n", __FUNCTION__);
-    firstRun = false;
-  }
-}
-
 void IterativeRobotBase::DisabledExit() {}
 
 void IterativeRobotBase::AutonomousExit() {}
 
 void IterativeRobotBase::TeleopExit() {}
 
-void IterativeRobotBase::TestExit() {}
+bool IterativeRobotBase::IsAutonomous() const {
+  return DriverStation::GetOpModeId() == m_autonomousMode;
+}
+
+bool IterativeRobotBase::IsTeleoperated() const {
+  return DriverStation::GetOpModeId() == m_teleoperatedMode;
+}
 
 void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
   m_ntFlushEnabled = enabled;
@@ -104,16 +102,7 @@ void IterativeRobotBase::LoopFunc() {
 
   // Get current mode
   DSControlWord word;
-  Mode mode = Mode::kNone;
-  if (word.IsDisabled()) {
-    mode = Mode::kDisabled;
-  } else if (word.IsAutonomous()) {
-    mode = Mode::kAutonomous;
-  } else if (word.IsTeleop()) {
-    mode = Mode::kTeleop;
-  } else if (word.IsTest()) {
-    mode = Mode::kTest;
-  }
+  int mode = DriverStation::GetOpModeId();
 
   if (!m_calledDsConnected && word.IsDSAttached()) {
     m_calledDsConnected = true;
@@ -123,51 +112,40 @@ void IterativeRobotBase::LoopFunc() {
   // If mode changed, call mode exit and entry functions
   if (m_lastMode != mode) {
     // Call last mode's exit function
-    if (m_lastMode == Mode::kDisabled) {
+    if (m_lastMode == 0) {
       DisabledExit();
-    } else if (m_lastMode == Mode::kAutonomous) {
+    } else if (m_lastMode == m_autonomousMode) {
       AutonomousExit();
-    } else if (m_lastMode == Mode::kTeleop) {
+    } else if (m_lastMode == m_teleoperatedMode) {
       TeleopExit();
-    } else if (m_lastMode == Mode::kTest) {
-      TestExit();
     }
 
     // Call current mode's entry function
-    if (mode == Mode::kDisabled) {
+    if (mode == 0) {
       DisabledInit();
       m_watchdog.AddEpoch("DisabledInit()");
-    } else if (mode == Mode::kAutonomous) {
+    } else if (mode == m_autonomousMode) {
       AutonomousInit();
       m_watchdog.AddEpoch("AutonomousInit()");
-    } else if (mode == Mode::kTeleop) {
+    } else if (mode == m_teleoperatedMode) {
       TeleopInit();
       m_watchdog.AddEpoch("TeleopInit()");
-    } else if (mode == Mode::kTest) {
-      TestInit();
-      m_watchdog.AddEpoch("TestInit()");
     }
 
     m_lastMode = mode;
   }
 
   // Call the appropriate function depending upon the current robot mode
-  if (mode == Mode::kDisabled) {
-    HAL_ObserveUserProgramDisabled();
+  HAL_ObserveUserProgramOpMode(mode);
+  if (mode == 0) {
     DisabledPeriodic();
     m_watchdog.AddEpoch("DisabledPeriodic()");
-  } else if (mode == Mode::kAutonomous) {
-    HAL_ObserveUserProgramAutonomous();
+  } else if (mode == m_autonomousMode) {
     AutonomousPeriodic();
     m_watchdog.AddEpoch("AutonomousPeriodic()");
-  } else if (mode == Mode::kTeleop) {
-    HAL_ObserveUserProgramTeleop();
+  } else if (mode == m_teleoperatedMode) {
     TeleopPeriodic();
     m_watchdog.AddEpoch("TeleopPeriodic()");
-  } else if (mode == Mode::kTest) {
-    HAL_ObserveUserProgramTest();
-    TestPeriodic();
-    m_watchdog.AddEpoch("TestPeriodic()");
   }
 
   RobotPeriodic();

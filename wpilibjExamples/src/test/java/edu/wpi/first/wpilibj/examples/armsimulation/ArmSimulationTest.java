@@ -75,8 +75,7 @@ class ArmSimulationTest {
     assertEquals(setpoint, Preferences.getDouble(Constants.kArmPositionKey, Double.NaN));
     // teleop init
     {
-      DriverStationSim.setAutonomous(false);
-      DriverStationSim.setEnabled(true);
+      DriverStationSim.setOpMode("auto");
       DriverStationSim.notifyNewData();
 
       assertTrue(m_motorSim.getInitialized());
@@ -136,8 +135,7 @@ class ArmSimulationTest {
 
     {
       // Disable
-      DriverStationSim.setAutonomous(false);
-      DriverStationSim.setEnabled(false);
+      DriverStationSim.setOpMode("");
       DriverStationSim.notifyNewData();
 
       // advance 75 timesteps

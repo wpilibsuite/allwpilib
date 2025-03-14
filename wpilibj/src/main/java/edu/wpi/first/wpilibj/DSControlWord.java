@@ -25,85 +25,12 @@ public class DSControlWord {
   }
 
   /**
-   * Gets a value indicating whether the Driver Station requires the robot to be enabled.
-   *
-   * @return True if the robot is enabled, false otherwise.
-   */
-  public boolean isEnabled() {
-    return m_controlWord.getEnabled() && m_controlWord.getDSAttached();
-  }
-
-  /**
-   * Gets a value indicating whether the Driver Station requires the robot to be disabled.
-   *
-   * @return True if the robot should be disabled, false otherwise.
-   */
-  public boolean isDisabled() {
-    return !isEnabled();
-  }
-
-  /**
    * Gets a value indicating whether the Robot is e-stopped.
    *
    * @return True if the robot is e-stopped, false otherwise.
    */
   public boolean isEStopped() {
     return m_controlWord.getEStop();
-  }
-
-  /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
-   * autonomous mode.
-   *
-   * @return True if autonomous mode should be enabled, false otherwise.
-   */
-  public boolean isAutonomous() {
-    return m_controlWord.getAutonomous();
-  }
-
-  /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
-   * autonomous mode and enabled.
-   *
-   * @return True if autonomous should be set and the robot should be enabled.
-   */
-  public boolean isAutonomousEnabled() {
-    return m_controlWord.getAutonomous()
-        && m_controlWord.getEnabled()
-        && m_controlWord.getDSAttached();
-  }
-
-  /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
-   * operator-controlled mode.
-   *
-   * @return True if operator-controlled mode should be enabled, false otherwise.
-   */
-  public boolean isTeleop() {
-    return !(isAutonomous() || isTest());
-  }
-
-  /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in
-   * operator-controller mode and enabled.
-   *
-   * @return True if operator-controlled mode should be set and the robot should be enabled.
-   */
-  public boolean isTeleopEnabled() {
-    return !m_controlWord.getAutonomous()
-        && !m_controlWord.getTest()
-        && m_controlWord.getEnabled()
-        && m_controlWord.getDSAttached();
-  }
-
-  /**
-   * Gets a value indicating whether the Driver Station requires the robot to be running in test
-   * mode.
-   *
-   * @return True if test mode should be enabled, false otherwise.
-   */
-  public boolean isTest() {
-    return m_controlWord.getTest();
   }
 
   /**

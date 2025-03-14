@@ -37,28 +37,24 @@ class MecanumControllerCommandTest : public testing::Test {
 
 TEST_F(MecanumControllerCommandTest, Match) {
   // auto
-  frc::sim::DriverStationSim::SetAutonomous(true);
-  frc::sim::DriverStationSim::SetEnabled(true);
+  frc::sim::DriverStationSim::SetOpMode("auto");
   frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(15_s);
 
   // brief disabled period- exact duration shouldn't matter
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetEnabled(false);
+  frc::sim::DriverStationSim::SetOpMode("");
   frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(3_s);
 
   // teleop
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetEnabled(true);
+  frc::sim::DriverStationSim::SetOpMode("teleop");
   frc::sim::DriverStationSim::NotifyNewData();
 
   frc::sim::StepTiming(135_s);
 
   // end of match
-  frc::sim::DriverStationSim::SetAutonomous(false);
-  frc::sim::DriverStationSim::SetEnabled(false);
+  frc::sim::DriverStationSim::SetOpMode("");
   frc::sim::DriverStationSim::NotifyNewData();
 }

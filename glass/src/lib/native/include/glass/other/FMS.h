@@ -28,7 +28,6 @@ class FMSModel : public Model {
   virtual DoubleSource* GetMatchTimeData() = 0;
   virtual BooleanSource* GetEStopData() = 0;
   virtual BooleanSource* GetEnabledData() = 0;
-  virtual BooleanSource* GetTestData() = 0;
   virtual BooleanSource* GetAutonomousData() = 0;
   virtual StringSource* GetGameSpecificMessageData() = 0;
 
@@ -38,7 +37,6 @@ class FMSModel : public Model {
   virtual void SetMatchTime(double val) = 0;
   virtual void SetEStop(bool val) = 0;
   virtual void SetEnabled(bool val) = 0;
-  virtual void SetTest(bool val) = 0;
   virtual void SetAutonomous(bool val) = 0;
   virtual void SetGameSpecificMessage(std::string_view val) = 0;
 };

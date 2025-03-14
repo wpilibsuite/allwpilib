@@ -51,8 +51,7 @@ class ElevatorSimulationTest : public testing::Test {
 TEST_F(ElevatorSimulationTest, Teleop) {
   // teleop init
   {
-    frc::sim::DriverStationSim::SetAutonomous(false);
-    frc::sim::DriverStationSim::SetEnabled(true);
+    frc::sim::DriverStationSim::SetOpMode("teleop");
     frc::sim::DriverStationSim::NotifyNewData();
 
     EXPECT_TRUE(m_motorSim.GetInitialized());
@@ -112,8 +111,7 @@ TEST_F(ElevatorSimulationTest, Teleop) {
 
   {
     // Disable
-    frc::sim::DriverStationSim::SetAutonomous(false);
-    frc::sim::DriverStationSim::SetEnabled(false);
+    frc::sim::DriverStationSim::SetOpMode("");
     frc::sim::DriverStationSim::NotifyNewData();
 
     // advance 75 timesteps

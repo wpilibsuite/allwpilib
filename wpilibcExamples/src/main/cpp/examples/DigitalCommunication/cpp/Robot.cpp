@@ -15,7 +15,7 @@ void Robot::RobotPeriodic() {
   m_enabledOutput.Set(frc::DriverStation::IsEnabled());
 
   // pull auto port high if in autonomous, low if in teleop (or disabled)
-  m_autonomousOutput.Set(frc::DriverStation::IsAutonomous());
+  m_autonomousOutput.Set(IsAutonomous());
 
   // pull alert port high if match time remaining is between 30 and 25 seconds
   auto matchTime = frc::DriverStation::GetMatchTime();

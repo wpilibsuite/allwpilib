@@ -48,7 +48,8 @@ public abstract class MotorSafety {
       }
       if (!timedOut) {
         DriverStationJNI.getControlWord(controlWord);
-        if (!(controlWord.getEnabled() && controlWord.getDSAttached())) {
+        int opMode = DriverStationJNI.getOpMode();
+        if (!(opMode != 0 && controlWord.getDSAttached())) {
           safetyCounter = 0;
         }
         if (++safetyCounter >= 4) {
@@ -132,7 +133,7 @@ public abstract class MotorSafety {
       stopTime = m_stopTime;
     }
 
-    if (!enabled || RobotState.isDisabled() || RobotState.isTest()) {
+    if (!enabled || DriverStation.isDisabled()) {
       return;
     }
 

@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <wpi/string.h>
+
 #include "hal/Types.h"
 
 /**
@@ -30,15 +32,21 @@
 #define HALFRC_NetworkCommunication_DynamicType_Kinect_Custom 25
 
 struct HAL_ControlWord {
-  uint32_t enabled : 1;
-  uint32_t autonomous : 1;
-  uint32_t test : 1;
+  uint32_t : 3;
   uint32_t eStop : 1;
   uint32_t fmsAttached : 1;
   uint32_t dsAttached : 1;
-  uint32_t control_reserved : 26;
+  uint32_t : 26;
 };
 typedef struct HAL_ControlWord HAL_ControlWord;
+
+struct HAL_OpModeOption {
+  struct WPI_String name;
+  struct WPI_String category;
+  struct WPI_String description;
+  int32_t flags;
+};
+typedef struct HAL_OpModeOption HAL_OpModeOption;
 
 HAL_ENUM(HAL_AllianceStationID) {
   /** Unknown Alliance Station */

@@ -83,7 +83,7 @@ class I2CCommunicationTest {
   @ValueSource(booleans = {true, false})
   @ParameterizedTest(name = "enabled[{index}]: {0}")
   void enabledTest(boolean enabled) {
-    DriverStationSim.setEnabled(enabled);
+    DriverStationSim.setOpMode(enabled ? "teleop" : "");
     DriverStationSim.notifyNewData();
 
     assertTrue(m_i2c.getInitialized());
@@ -99,7 +99,7 @@ class I2CCommunicationTest {
   @ValueSource(booleans = {true, false})
   @ParameterizedTest(name = "autonomous[{index}]: {0}")
   void autonomousTest(boolean autonomous) {
-    DriverStationSim.setAutonomous(autonomous);
+    DriverStationSim.setOpMode(autonomous ? "auto" : "teleop");
     DriverStationSim.notifyNewData();
 
     assertTrue(m_i2c.getInitialized());

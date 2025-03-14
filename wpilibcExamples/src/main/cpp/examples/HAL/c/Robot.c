@@ -17,34 +17,15 @@ that want even more control over what code runs on their robot.
 
 #include <hal/HAL.h>
 
-enum DriverStationMode {
-  DisabledMode,
-  TeleopMode,
-  TestMode,
-  AutoMode,
-};
-
-enum DriverStationMode getDSMode(void) {
+int getDSMode(void) {
   // Get Robot State
   HAL_ControlWord word;
   HAL_GetControlWord(&word);
+  int mode = HAL_GetOpMode();
 
   // We send the observes, otherwise the DS disables
-  if (!word.enabled) {
-    HAL_ObserveUserProgramDisabled();
-    return DisabledMode;
-  } else {
-    if (word.autonomous) {
-      HAL_ObserveUserProgramAutonomous();
-      return AutoMode;
-    } else if (word.test) {
-      HAL_ObserveUserProgramTest();
-      return TestMode;
-    } else {
-      HAL_ObserveUserProgramTeleop();
-      return TeleopMode;
-    }
-  }
+  HAL_ObserveUserProgramOpMode(mode);
+  return mode;
 }
 
 int main(void) {
@@ -56,6 +37,17 @@ int main(void) {
   }
 
   int32_t status = 0;
+
+  // Create a couple of opmodes
+  struct WPI_String name, category, description;
+  WPI_InitString(&name, "teleop");
+  WPI_InitString(&category, "");
+  WPI_InitString(&description, "");
+  int teleopMode = HAL_AddOpModeOption(&name, &category, &description, 0);
+  WPI_InitString(&name, "auto");
+  WPI_InitString(&category, "");
+  WPI_InitString(&description, "");
+  int autoMode = HAL_AddOpModeOption(&name, &category, &description, 0);
 
   // For DS to see valid robot code
   HAL_ObserveUserProgramStarting();
@@ -98,24 +90,18 @@ int main(void) {
 
     HAL_RefreshDSData();
 
-    enum DriverStationMode dsMode = getDSMode();
-    switch (dsMode) {
-      case DisabledMode:
-        break;
-      case TeleopMode:
-        status = 0;
-        if (HAL_GetDIO(dio, &status)) {
-          HAL_SetPWMSpeed(pwmPort, 1.0, &status);
-        } else {
-          HAL_SetPWMSpeed(pwmPort, 0, &status);
-        }
-        break;
-      case AutoMode:
-        break;
-      case TestMode:
-        break;
-      default:
-        break;
+    int dsMode = getDSMode();
+    if (dsMode == 0) {
+      // disabled
+    } else if (dsMode == teleopMode) {
+      status = 0;
+      if (HAL_GetDIO(dio, &status)) {
+        HAL_SetPWMSpeed(pwmPort, 1.0, &status);
+      } else {
+        HAL_SetPWMSpeed(pwmPort, 0, &status);
+      }
+    } else if (dsMode == autoMode) {
+      // auto
     }
   }
 

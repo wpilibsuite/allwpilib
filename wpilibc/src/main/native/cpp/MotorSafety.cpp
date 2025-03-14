@@ -35,7 +35,8 @@ void Thread::Main() {
       HAL_ControlWord controlWord;
       std::memset(&controlWord, 0, sizeof(controlWord));
       HAL_GetControlWord(&controlWord);
-      if (!(controlWord.enabled && controlWord.dsAttached)) {
+      int32_t opMode = HAL_GetOpMode();
+      if (!(opMode != 0 && controlWord.dsAttached)) {
         safetyCounter = 0;
       }
       if (++safetyCounter >= 4) {
@@ -154,7 +155,7 @@ void MotorSafety::Check() {
     stopTime = m_stopTime;
   }
 
-  if (!enabled || DriverStation::IsDisabled() || DriverStation::IsTest()) {
+  if (!enabled || DriverStation::IsDisabled()) {
     return;
   }
 

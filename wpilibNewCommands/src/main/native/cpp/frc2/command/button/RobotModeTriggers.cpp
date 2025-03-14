@@ -8,18 +8,14 @@
 
 using namespace frc2;
 
-Trigger RobotModeTriggers::Autonomous() {
-  return Trigger{&frc::DriverStation::IsAutonomousEnabled};
+Trigger RobotModeTriggers::OpMode(int mode) {
+  return Trigger{[=] { return frc::DriverStation::IsOpMode(mode); }};
 }
 
-Trigger RobotModeTriggers::Teleop() {
-  return Trigger{&frc::DriverStation::IsTeleopEnabled};
+Trigger RobotModeTriggers::OpMode(std::string_view mode) {
+  return Trigger{[=] { return frc::DriverStation::IsOpMode(mode); }};
 }
 
 Trigger RobotModeTriggers::Disabled() {
   return Trigger{&frc::DriverStation::IsDisabled};
-}
-
-Trigger RobotModeTriggers::Test() {
-  return Trigger{&frc::DriverStation::IsTestEnabled};
 }

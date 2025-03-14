@@ -112,14 +112,6 @@ class IterativeRobotBase : public RobotBase {
   virtual void TeleopInit();
 
   /**
-   * Initialization code for test mode should go here.
-   *
-   * Users should override this method for initialization code which will be
-   * called each time the robot enters test mode.
-   */
-  virtual void TestInit();
-
-  /**
    * Periodic code for all modes should go here.
    *
    * This function is called each time a new packet is received from the driver
@@ -162,15 +154,6 @@ class IterativeRobotBase : public RobotBase {
   virtual void TeleopPeriodic();
 
   /**
-   * Periodic code for test mode should go here.
-   *
-   * Users should override this method for code which will be called each time a
-   * new packet is received from the driver station and the robot is in test
-   * mode.
-   */
-  virtual void TestPeriodic();
-
-  /**
    * Exit code for disabled mode should go here.
    *
    * Users should override this method for code which will be called each time
@@ -195,12 +178,18 @@ class IterativeRobotBase : public RobotBase {
   virtual void TeleopExit();
 
   /**
-   * Exit code for test mode should go here.
+   * Returns true if in autonomous mode.
    *
-   * Users should override this method for code which will be called each time
-   * the robot exits test mode.
+   * @return True if autonomous
    */
-  virtual void TestExit();
+  bool IsAutonomous() const;
+
+  /**
+   * Returns true if in teleoperated mode.
+   *
+   * @return True if teleoperated
+   */
+  bool IsTeleoperated() const;
 
   /**
    * Enables or disables flushing NetworkTables every loop iteration.
@@ -241,9 +230,9 @@ class IterativeRobotBase : public RobotBase {
   void LoopFunc();
 
  private:
-  enum class Mode { kNone, kDisabled, kAutonomous, kTeleop, kTest };
-
-  Mode m_lastMode = Mode::kNone;
+  int m_autonomousMode;
+  int m_teleoperatedMode;
+  int m_lastMode = -1;
   units::second_t m_period;
   Watchdog m_watchdog;
   bool m_ntFlushEnabled = true;

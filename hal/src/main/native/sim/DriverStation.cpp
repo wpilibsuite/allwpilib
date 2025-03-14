@@ -45,6 +45,9 @@ struct JoystickDataCache {
   HAL_AllianceStationID allianceStation;
   double matchTime;
   HAL_ControlWord controlWord;
+  int32_t opModeId;
+  int32_t selectedAutonomousOpModeId;
+  int32_t selectedTeleoperatedOpModeId;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -70,13 +73,16 @@ void JoystickDataCache::Update() {
 
   HAL_ControlWord tmpControlWord;
   std::memset(&tmpControlWord, 0, sizeof(tmpControlWord));
-  tmpControlWord.enabled = SimDriverStationData->enabled;
-  tmpControlWord.autonomous = SimDriverStationData->autonomous;
-  tmpControlWord.test = SimDriverStationData->test;
   tmpControlWord.eStop = SimDriverStationData->eStop;
   tmpControlWord.fmsAttached = SimDriverStationData->fmsAttached;
   tmpControlWord.dsAttached = SimDriverStationData->dsAttached;
   this->controlWord = tmpControlWord;
+
+  opModeId = SimDriverStationData->GetOpModeId();
+  selectedAutonomousOpModeId =
+      SimDriverStationData->GetSelectedAutonomousOpModeId();
+  selectedTeleoperatedOpModeId =
+      SimDriverStationData->GetSelectedTeleoperatedOpModeId();
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
@@ -84,6 +90,7 @@ void JoystickDataCache::Update() {
   return PARAMETER_OUT_OF_RANGE
 
 static HAL_ControlWord newestControlWord;
+static int32_t newestOpModeId = 0;
 static JoystickDataCache caches[3];
 static JoystickDataCache* currentRead = &caches[0];
 static JoystickDataCache* currentReadLocal = &caches[0];
@@ -227,6 +234,56 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   return 0;
 }
 
+int32_t HAL_AddOpModeOption(const struct WPI_String* name,
+                      const struct WPI_String* category,
+                      const struct WPI_String* description, int32_t flags) {
+  if (gShutdown) {
+    return 0;
+  }
+  return SimDriverStationData->AddOpModeOption(DriverStationData::OpModeOption{
+      std::string{wpi::to_string_view(name)},
+      std::string{wpi::to_string_view(category)},
+      std::string{wpi::to_string_view(description)}, flags});
+}
+
+int32_t HAL_RemoveOpModeOption(const struct WPI_String* name) {
+  if (gShutdown) {
+    return 0;
+  }
+  return SimDriverStationData->RemoveOpModeOption(wpi::to_string_view(name));
+}
+
+void HAL_ClearOpModeOptions(void) {
+  if (gShutdown) {
+    return;
+  }
+  SimDriverStationData->ClearOpModeOptions();
+}
+
+int32_t HAL_GetOpMode(void) {
+  if (gShutdown) {
+    return 0;
+  }
+  std::scoped_lock lock{driverStation->cacheMutex};
+  return currentRead->opModeId;
+}
+
+int32_t HAL_GetSelectedAutonomousOpMode(void) {
+  if (gShutdown) {
+    return 0;
+  }
+  std::scoped_lock lock{driverStation->cacheMutex};
+  return currentRead->selectedAutonomousOpModeId;
+}
+
+int32_t HAL_GetSelectedTeleoperatedOpMode(void) {
+  if (gShutdown) {
+    return 0;
+  }
+  std::scoped_lock lock{driverStation->cacheMutex};
+  return currentRead->selectedTeleoperatedOpModeId;
+}
+
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
   if (gShutdown) {
     return HAL_AllianceStationID_kUnknown;
@@ -348,19 +405,7 @@ void HAL_ObserveUserProgramStarting(void) {
   HALSIM_SetProgramStarted();
 }
 
-void HAL_ObserveUserProgramDisabled(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramAutonomous(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramTeleop(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramTest(void) {
+void HAL_ObserveUserProgramOpMode(int32_t id) {
   // TODO
 }
 
@@ -397,6 +442,7 @@ HAL_Bool HAL_RefreshDSData(void) {
                   sizeof(currentRead->controlWord));
     }
     newestControlWord = currentRead->controlWord;
+    newestOpModeId = currentRead->opModeId;
   }
 
   {
@@ -428,7 +474,7 @@ HAL_Bool HAL_GetOutputsEnabled(void) {
     return false;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
-  return newestControlWord.enabled && newestControlWord.dsAttached;
+  return newestOpModeId != 0 && newestControlWord.dsAttached;
 }
 
 }  // extern "C"

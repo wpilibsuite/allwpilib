@@ -64,8 +64,7 @@ class ElevatorSimulationTest {
   void teleopTest() {
     // teleop init
     {
-      DriverStationSim.setAutonomous(false);
-      DriverStationSim.setEnabled(true);
+      DriverStationSim.setOpMode("teleop");
       DriverStationSim.notifyNewData();
 
       assertTrue(m_motorSim.getInitialized());
@@ -125,8 +124,7 @@ class ElevatorSimulationTest {
 
     {
       // Disable
-      DriverStationSim.setAutonomous(false);
-      DriverStationSim.setEnabled(false);
+      DriverStationSim.setOpMode("");
       DriverStationSim.notifyNewData();
 
       // advance 75 timesteps

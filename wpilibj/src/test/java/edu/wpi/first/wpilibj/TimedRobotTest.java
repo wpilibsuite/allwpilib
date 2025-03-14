@@ -138,7 +138,7 @@ class TimedRobotTest {
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
-    DriverStationSim.setEnabled(false);
+    DriverStationSim.setOpMode("");
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(0.0); // Wait for Notifiers
 
@@ -221,9 +221,7 @@ class TimedRobotTest {
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
-    DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(true);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setOpMode("auto");
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(0.0); // Wait for Notifiers
 
@@ -306,9 +304,7 @@ class TimedRobotTest {
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
-    DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setOpMode("teleop");
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(0.0); // Wait for Notifiers
 
@@ -391,9 +387,7 @@ class TimedRobotTest {
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
-    DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(true);
+    DriverStationSim.setOpMode("test");
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(0.0); // Wait for Notifiers
 
@@ -458,9 +452,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_teleopExitCount.get());
     assertEquals(0, robot.m_testExitCount.get());
 
-    DriverStationSim.setEnabled(false);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setOpMode("");
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(0.02);
@@ -503,9 +495,7 @@ class TimedRobotTest {
     robotThread.start();
 
     // Start in disabled
-    DriverStationSim.setEnabled(false);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setOpMode("");
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(0.0); // Wait for Notifiers
 
@@ -532,9 +522,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_testExitCount.get());
 
     // Transition to autonomous
-    DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(true);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setOpMode("auto");
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(kPeriod);
@@ -550,9 +538,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_testExitCount.get());
 
     // Transition to teleop
-    DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setOpMode("teleop");
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(kPeriod);
@@ -568,9 +554,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_testExitCount.get());
 
     // Transition to test
-    DriverStationSim.setEnabled(true);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(true);
+    DriverStationSim.setOpMode("test");
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(kPeriod);
@@ -586,9 +570,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_testExitCount.get());
 
     // Transition to disabled
-    DriverStationSim.setEnabled(false);
-    DriverStationSim.setAutonomous(false);
-    DriverStationSim.setTest(false);
+    DriverStationSim.setOpMode("");
     DriverStationSim.notifyNewData();
 
     SimHooks.stepTiming(kPeriod);
@@ -624,7 +606,7 @@ class TimedRobotTest {
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
-    DriverStationSim.setEnabled(false);
+    DriverStationSim.setOpMode("");
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(0.0); // Wait for Notifiers
 
@@ -674,7 +656,7 @@ class TimedRobotTest {
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
 
-    DriverStationSim.setEnabled(false);
+    DriverStationSim.setOpMode("");
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(0.0); // Wait for Notifiers
 

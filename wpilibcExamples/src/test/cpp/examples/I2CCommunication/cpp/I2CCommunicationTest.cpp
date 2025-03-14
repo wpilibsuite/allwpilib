@@ -111,7 +111,7 @@ class EnabledTest : public I2CCommunicationTest<bool> {};
 
 TEST_P(EnabledTest, Enabled) {
   auto enabled = GetParam();
-  frc::sim::DriverStationSim::SetEnabled(enabled);
+  frc::sim::DriverStationSim::SetOpMode(enabled ? "teleop" : "");
   frc::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(HALSIM_GetI2CInitialized(m_port));
@@ -129,7 +129,7 @@ class AutonomousTest : public I2CCommunicationTest<bool> {};
 
 TEST_P(AutonomousTest, Autonomous) {
   auto autonomous = GetParam();
-  frc::sim::DriverStationSim::SetAutonomous(autonomous);
+  frc::sim::DriverStationSim::SetOpMode(autonomous ? "auto" : "teleop");
   frc::sim::DriverStationSim::NotifyNewData();
 
   EXPECT_TRUE(HALSIM_GetI2CInitialized(m_port));

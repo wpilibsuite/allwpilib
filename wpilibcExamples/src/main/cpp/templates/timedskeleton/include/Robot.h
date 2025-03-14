@@ -20,9 +20,6 @@ class Robot : public frc::TimedRobot {
   void DisabledInit() override;
   void DisabledPeriodic() override;
 
-  void TestInit() override;
-  void TestPeriodic() override;
-
   void SimulationInit() override;
   void SimulationPeriodic() override;
 };

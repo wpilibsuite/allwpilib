@@ -22,44 +22,14 @@ public class DriverStationJNI extends JNIWrapper {
   public static native void observeUserProgramStarting();
 
   /**
-   * Sets the disabled flag in the DS.
+   * Sets the active op mode returned to the DS.
    *
    * <p>This is used for the DS to ensure the robot is properly responding to its state request.
    * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
    *
-   * @see "HAL_ObserveUserProgramDisabled"
+   * @param id operating mode unique ID returned by HAL_AddOpMode(), or 0 for disabled
    */
-  public static native void observeUserProgramDisabled();
-
-  /**
-   * Sets the autonomous enabled flag in the DS.
-   *
-   * <p>This is used for the DS to ensure the robot is properly responding to its state request.
-   * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
-   *
-   * @see "HAL_ObserveUserProgramAutonomous"
-   */
-  public static native void observeUserProgramAutonomous();
-
-  /**
-   * Sets the teleoperated enabled flag in the DS.
-   *
-   * <p>This is used for the DS to ensure the robot is properly responding to its state request.
-   * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
-   *
-   * @see "HAL_ObserveUserProgramTeleop"
-   */
-  public static native void observeUserProgramTeleop();
-
-  /**
-   * Sets the test mode flag in the DS.
-   *
-   * <p>This is used for the DS to ensure the robot is properly responding to its state request.
-   * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
-   *
-   * @see "HAL_ObserveUserProgramTest"
-   */
-  public static native void observeUserProgramTest();
+  public static native void observeUserProgramOpMode(int id);
 
   /**
    * Gets the current control word of the driver station.
@@ -82,14 +52,57 @@ public class DriverStationJNI extends JNIWrapper {
    */
   public static void getControlWord(ControlWord controlWord) {
     int word = nativeGetControlWord();
-    controlWord.update(
-        (word & 1) != 0,
-        ((word >> 1) & 1) != 0,
-        ((word >> 2) & 1) != 0,
-        ((word >> 3) & 1) != 0,
-        ((word >> 4) & 1) != 0,
-        ((word >> 5) & 1) != 0);
+    controlWord.update(((word >> 3) & 1) != 0, ((word >> 4) & 1) != 0, ((word >> 5) & 1) != 0);
   }
+
+  /**
+   * Adds an operating mode option.
+   *
+   * @param name unique name of the operating mode
+   * @param category display category
+   * @param description extended description
+   * @param flags flags
+   * @return unique ID used to later identify the operating mode; if an empty string is passed, 0 is
+   *     returned; identical names result in replacing the other data and identical IDs
+   */
+  public static native int addOpModeOption(
+      String name, String category, String description, int flags);
+
+  /**
+   * Removes an operating mode option.
+   *
+   * @param name name of the operating mode
+   */
+  public static native int removeOpModeOption(String name);
+
+  /** Clears all operating mode options. */
+  public static native void clearOpModeOptions();
+
+  /**
+   * Gets the current operating mode of the driver station.
+   *
+   * @return the unique ID provided by the addOpMode() function, or 0 to indicate the robot is
+   *     disabled (no active operating mode)
+   */
+  public static native int getOpMode();
+
+  /**
+   * Gets the operating mode selected for the autonomous period. Note this does not mean the
+   * autonomous period is running--use getOpMode() for that.
+   *
+   * @return the unique ID provided by the addOpMode() function, or 0 to indicate no or unknown
+   *     selection
+   */
+  public static native int getSelectedAutonomousOpMode();
+
+  /**
+   * Gets the operating mode selected for the teleoperated period. Note this does not mean the
+   * teleoperated period is running--use getOpMode() for that.
+   *
+   * @return the unique ID provided by the addOpMode() function, or 0 to indicate no or unknown
+   *     selection
+   */
+  public static native int getSelectedTeleoperatedOpMode();
 
   /**
    * Gets the current alliance station ID.

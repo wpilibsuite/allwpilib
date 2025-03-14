@@ -136,7 +136,10 @@ static void SetupUdp(wpi::uv::Loop& loop) {
     }
   }
   auto autoDisableTimer = Timer::Create(loop);
-  autoDisableTimer->timeout.connect([] { HALSIM_SetDriverStationEnabled(0); });
+  autoDisableTimer->timeout.connect([] {
+    WPI_String mode = wpi::make_string("");
+    HALSIM_SetOpMode(&mode);
+  });
 
   // UDP Receive then send
   udp->received.connect(

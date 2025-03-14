@@ -29,9 +29,10 @@ public class CommandTestBase {
   }
 
   public void setDSEnabled(boolean enabled) {
+    DriverStationSim.resetData();
+    DriverStation.addOpModeOption("test", "", "", 0);
     DriverStationSim.setDsAttached(true);
-
-    DriverStationSim.setEnabled(enabled);
+    DriverStationSim.setOpMode(enabled ? "test" : "");
     DriverStationSim.notifyNewData();
     while (DriverStation.isEnabled() != enabled) {
       try {

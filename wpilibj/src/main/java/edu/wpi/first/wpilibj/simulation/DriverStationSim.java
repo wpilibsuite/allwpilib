@@ -18,98 +18,6 @@ public final class DriverStationSim {
   }
 
   /**
-   * Register a callback on whether the DS is enabled.
-   *
-   * @param callback the callback that will be called whenever the enabled state is changed
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public static CallbackStore registerEnabledCallback(
-      NotifyCallback callback, boolean initialNotify) {
-    int uid = DriverStationDataJNI.registerEnabledCallback(callback, initialNotify);
-    return new CallbackStore(uid, DriverStationDataJNI::cancelEnabledCallback);
-  }
-
-  /**
-   * Check if the DS is enabled.
-   *
-   * @return true if enabled
-   */
-  public static boolean getEnabled() {
-    return DriverStationDataJNI.getEnabled();
-  }
-
-  /**
-   * Change whether the DS is enabled.
-   *
-   * @param enabled the new value
-   */
-  public static void setEnabled(boolean enabled) {
-    DriverStationDataJNI.setEnabled(enabled);
-  }
-
-  /**
-   * Register a callback on whether the DS is in autonomous mode.
-   *
-   * @param callback the callback that will be called on autonomous mode entrance/exit
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public static CallbackStore registerAutonomousCallback(
-      NotifyCallback callback, boolean initialNotify) {
-    int uid = DriverStationDataJNI.registerAutonomousCallback(callback, initialNotify);
-    return new CallbackStore(uid, DriverStationDataJNI::cancelAutonomousCallback);
-  }
-
-  /**
-   * Check if the DS is in autonomous.
-   *
-   * @return true if autonomous
-   */
-  public static boolean getAutonomous() {
-    return DriverStationDataJNI.getAutonomous();
-  }
-
-  /**
-   * Change whether the DS is in autonomous.
-   *
-   * @param autonomous the new value
-   */
-  public static void setAutonomous(boolean autonomous) {
-    DriverStationDataJNI.setAutonomous(autonomous);
-  }
-
-  /**
-   * Register a callback on whether the DS is in test mode.
-   *
-   * @param callback the callback that will be called whenever the test mode is entered or left
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public static CallbackStore registerTestCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = DriverStationDataJNI.registerTestCallback(callback, initialNotify);
-    return new CallbackStore(uid, DriverStationDataJNI::cancelTestCallback);
-  }
-
-  /**
-   * Check if the DS is in test.
-   *
-   * @return true if test
-   */
-  public static boolean getTest() {
-    return DriverStationDataJNI.getTest();
-  }
-
-  /**
-   * Change whether the DS is in test.
-   *
-   * @param test the new value
-   */
-  public static void setTest(boolean test) {
-    DriverStationDataJNI.setTest(test);
-  }
-
-  /**
    * Register a callback on the eStop state.
    *
    * @param callback the callback that will be called whenever the eStop state changes
@@ -281,6 +189,69 @@ public final class DriverStationSim {
    */
   public static void setMatchTime(double matchTime) {
     DriverStationDataJNI.setMatchTime(matchTime);
+  }
+
+  /**
+   * Get the current operating mode.
+   *
+   * @return the operating mode
+   */
+  public static String getOpMode() {
+    return DriverStationDataJNI.getOpMode();
+  }
+
+  /**
+   * Change the operating mode.
+   *
+   * @param mode the new operating mode
+   */
+  public static void setOpMode(String mode) {
+    DriverStationDataJNI.setOpMode(mode);
+  }
+
+  /**
+   * Get the operating mode selected for the autonomous period.
+   *
+   * @return the operating mode
+   */
+  public static String getSelectedAutonomousOpMode() {
+    return DriverStationDataJNI.getSelectedAutonomousOpMode();
+  }
+
+  /**
+   * Change the operating mode selected for the autonomous period.
+   *
+   * @param mode the new operating mode
+   */
+  public static void setSelectedAutonomousOpMode(String mode) {
+    DriverStationDataJNI.setSelectedAutonomousOpMode(mode);
+  }
+
+  /**
+   * Get the current operating mode selected for the teleoperated period.
+   *
+   * @return the operating mode
+   */
+  public static String getSelectedTeleoperatedOpMode() {
+    return DriverStationDataJNI.getSelectedTeleoperatedOpMode();
+  }
+
+  /**
+   * Change the operating mode selected for the teleoperated period.
+   *
+   * @param mode the new operating mode
+   */
+  public static void setSelectedTeleoperatedOpMode(String mode) {
+    DriverStationDataJNI.setSelectedTeleoperatedOpMode(mode);
+  }
+
+  /**
+   * Get the registered operating modes.
+   *
+   * @return the operating modes
+   */
+  public static DriverStationDataJNI.OpModeOption[] getOpModeOptions() {
+    return DriverStationDataJNI.getOpModeOptions();
   }
 
   /** Updates DriverStation data so that new values are visible to the user program. */

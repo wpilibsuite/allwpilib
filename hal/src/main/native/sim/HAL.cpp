@@ -290,7 +290,7 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
-  return HALSIM_GetDriverStationEnabled();
+  return HAL_GetOpMode() != 0;
 }
 
 HAL_Bool HAL_GetBrownedOut(int32_t* status) {
