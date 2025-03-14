@@ -32,8 +32,8 @@ public class Translation2dProto implements Protobuf<Translation2d, ProtobufTrans
 
   @Override
   public void pack(ProtobufTranslation2d msg, Translation2d value) {
-    msg.setX(value.getX());
-    msg.setY(value.getY());
+    msg.setX(value.x());
+    msg.setY(value.y());
   }
 
   @Override

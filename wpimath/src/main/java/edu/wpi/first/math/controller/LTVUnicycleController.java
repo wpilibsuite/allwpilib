@@ -79,8 +79,8 @@ public class LTVUnicycleController {
     final var eRotate = m_poseError.getRotation();
     final var tolTranslate = m_poseTolerance.getTranslation();
     final var tolRotate = m_poseTolerance.getRotation();
-    return Math.abs(eTranslate.getX()) < tolTranslate.getX()
-        && Math.abs(eTranslate.getY()) < tolTranslate.getY()
+    return Math.abs(eTranslate.x()) < tolTranslate.x()
+        && Math.abs(eTranslate.y()) < tolTranslate.y()
         && Math.abs(eRotate.getRadians()) < tolRotate.getRadians();
   }
 
