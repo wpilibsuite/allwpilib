@@ -24,11 +24,8 @@ class HALSimWSProviderPWM : public HALSimWSHalChanProvider {
 
  private:
   int32_t m_initCbKey = 0;
-  int32_t m_speedCbKey = 0;
-  int32_t m_positionCbKey = 0;
   int32_t m_rawCbKey = 0;
-  int32_t m_periodScaleCbKey = 0;
-  int32_t m_zeroLatchCbKey = 0;
+  int32_t m_outputPeriodCbKey = 0;
 };
 
 }  // namespace wpilibws

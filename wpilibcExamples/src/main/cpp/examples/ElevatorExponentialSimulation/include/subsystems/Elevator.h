@@ -11,7 +11,7 @@
 #include <frc/simulation/BatterySim.h>
 #include <frc/simulation/ElevatorSim.h>
 #include <frc/simulation/EncoderSim.h>
-#include <frc/simulation/PWMSim.h>
+#include <frc/simulation/PWMMotorControllerSim.h>
 #include <frc/simulation/RoboRioSim.h>
 #include <frc/smartdashboard/Mechanism2d.h>
 #include <frc/smartdashboard/MechanismLigament2d.h>
@@ -50,7 +50,7 @@ class Elevator {
   frc::Encoder m_encoder{Constants::kEncoderAChannel,
                          Constants::kEncoderBChannel};
   frc::PWMSparkMax m_motor{Constants::kMotorPort};
-  frc::sim::PWMSim m_motorSim{m_motor};
+  frc::sim::PWMMotorControllerSim m_motorSim{m_motor};
 
   // Simulation classes help us simulate what's going on, including gravity.
   frc::sim::ElevatorSim m_elevatorSim{m_elevatorGearbox,

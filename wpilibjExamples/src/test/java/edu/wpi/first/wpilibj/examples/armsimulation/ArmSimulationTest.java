@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.JoystickSim;
-import edu.wpi.first.wpilibj.simulation.PWMSim;
+import edu.wpi.first.wpilibj.simulation.PWMMotorControllerSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import org.junit.jupiter.api.AfterEach;
@@ -27,7 +27,7 @@ class ArmSimulationTest {
   private Robot m_robot;
   private Thread m_thread;
 
-  private PWMSim m_motorSim;
+  private PWMMotorControllerSim m_motorSim;
   private EncoderSim m_encoderSim;
   private JoystickSim m_joystickSim;
 
@@ -39,7 +39,7 @@ class ArmSimulationTest {
     m_robot = new Robot();
     m_thread = new Thread(m_robot::startCompetition);
     m_encoderSim = EncoderSim.createForChannel(Constants.kEncoderAChannel);
-    m_motorSim = new PWMSim(Constants.kMotorPort);
+    m_motorSim = new PWMMotorControllerSim(Constants.kMotorPort);
     m_joystickSim = new JoystickSim(Constants.kJoystickPort);
 
     m_thread.start();
@@ -57,7 +57,6 @@ class ArmSimulationTest {
     }
     m_robot.close();
     m_encoderSim.resetData();
-    m_motorSim.resetData();
     Preferences.remove(Constants.kArmPKey);
     Preferences.remove(Constants.kArmPositionKey);
     Preferences.removeAll();
@@ -79,7 +78,6 @@ class ArmSimulationTest {
       DriverStationSim.setEnabled(true);
       DriverStationSim.notifyNewData();
 
-      assertTrue(m_motorSim.getInitialized());
       assertTrue(m_encoderSim.getInitialized());
     }
 

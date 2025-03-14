@@ -7,7 +7,7 @@
 
 #include <frc/simulation/DriverStationSim.h>
 #include <frc/simulation/JoystickSim.h>
-#include <frc/simulation/PWMSim.h>
+#include <frc/simulation/PWMMotorControllerSim.h>
 #include <frc/simulation/SimHooks.h>
 #include <gtest/gtest.h>
 #include <hal/simulation/MockHooks.h>
@@ -25,7 +25,7 @@ class ElevatorSimulationTest : public testing::Test {
   std::optional<std::thread> m_thread;
 
  protected:
-  frc::sim::PWMSim m_motorSim{Constants::kMotorPort};
+  frc::sim::PWMMotorControllerSim m_motorSim{Constants::kMotorPort};
   frc::sim::EncoderSim m_encoderSim =
       frc::sim::EncoderSim::CreateForChannel(Constants::kEncoderAChannel);
   frc::sim::JoystickSim m_joystickSim{Constants::kJoystickPort};
@@ -43,7 +43,6 @@ class ElevatorSimulationTest : public testing::Test {
     m_thread->join();
 
     m_encoderSim.ResetData();
-    m_motorSim.ResetData();
     frc::sim::DriverStationSim::ResetData();
   }
 };
@@ -55,7 +54,6 @@ TEST_F(ElevatorSimulationTest, Teleop) {
     frc::sim::DriverStationSim::SetEnabled(true);
     frc::sim::DriverStationSim::NotifyNewData();
 
-    EXPECT_TRUE(m_motorSim.GetInitialized());
     EXPECT_TRUE(m_encoderSim.GetInitialized());
   }
 

@@ -4,11 +4,16 @@
 
 #pragma once
 
+#include <hal/SimDevice.h>
 #include <units/angle.h>
 
 #include "frc/PWM.h"
 
 namespace frc {
+
+namespace sim {
+class ServoSim;
+}  // namespace sim
 
 /**
  * Standard hobby style servo.
@@ -16,8 +21,10 @@ namespace frc {
  * The range parameters default to the appropriate values for the Hitec HS-322HD
  * servo provided in the FIRST Kit of Parts in 2008.
  */
-class Servo : public PWM {
+class Servo : public wpi::Sendable, public wpi::SendableHelper<Servo> {
  public:
+  friend class frc::sim::ServoSim;
+
   /**
    * Constructor.
    *
@@ -41,13 +48,6 @@ class Servo : public PWM {
    * @param value Position from 0.0 to 1.0.
    */
   void Set(double value);
-
-  /**
-   * Set the servo to offline.
-   *
-   * Set the servo raw value to 0 (undriven)
-   */
-  void SetOffline();
 
   /**
    * Get the servo position.
@@ -86,30 +86,27 @@ class Servo : public PWM {
    */
   double GetAngle() const;
 
-  /**
-   * Get the maximum angle of the servo.
-   *
-   * @return The maximum angle of the servo in degrees.
-   */
-  double GetMaxAngle() const;
-
-  /**
-   * Get the minimum angle of the servo.
-   *
-   * @return The minimum angle of the servo in degrees.
-   */
-  double GetMinAngle() const;
+  int GetChannel() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  double GetServoAngleRange() const;
+  static double GetServoAngleRange();
+  units::microsecond_t GetFullRangeScaleFactor() const;
 
-  static constexpr double kMaxServoAngle = 180.;
+  static constexpr double kMaxServoAngle = 180.0;
   static constexpr double kMinServoAngle = 0.0;
 
   static constexpr units::millisecond_t kDefaultMaxServoPWM = 2.4_ms;
   static constexpr units::millisecond_t kDefaultMinServoPWM = 0.6_ms;
+
+  units::millisecond_t m_maxPwm = kDefaultMaxServoPWM;
+  units::millisecond_t m_minPwm = kDefaultMinServoPWM;
+
+  hal::SimDevice m_simDevice;
+  hal::SimDouble m_simPosition;
+
+  PWM m_pwm;
 };
 
 }  // namespace frc

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.examples.unittest.Constants.IntakeConstants;
 import edu.wpi.first.wpilibj.simulation.DoubleSolenoidSim;
-import edu.wpi.first.wpilibj.simulation.PWMSim;
+import edu.wpi.first.wpilibj.simulation.PWMMotorControllerSim;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 class IntakeTest {
   static final double DELTA = 1e-2; // acceptable deviation range
   Intake m_intake;
-  PWMSim m_simMotor;
+  PWMMotorControllerSim m_simMotor;
   DoubleSolenoidSim m_simPiston;
 
   @BeforeEach // this method will run before each test
@@ -27,7 +27,8 @@ class IntakeTest {
     assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
     m_intake = new Intake(); // create our intake
     m_simMotor =
-        new PWMSim(IntakeConstants.kMotorPort); // create our simulation PWM motor controller
+        new PWMMotorControllerSim(
+            IntakeConstants.kMotorPort); // create our simulation PWM motor controller
     m_simPiston =
         new DoubleSolenoidSim(
             PneumaticsModuleType.CTREPCM,
