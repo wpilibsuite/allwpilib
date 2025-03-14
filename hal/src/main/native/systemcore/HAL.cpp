@@ -59,7 +59,6 @@ void InitializeHAL() {
   InitializeEncoder();
   InitializeFRCDriverStation();
   InitializeI2C();
-  InitializeLEDs();
   InitializeMain();
   InitializeNotifier();
   InitializeCTREPDP();
@@ -250,12 +249,6 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
   }
 
   return (upper << 32) + static_cast<uint64_t>(unexpandedLower);
-}
-
-HAL_Bool HAL_GetFPGAButton(int32_t* status) {
-  hal::init::CheckInit();
-  *status = HAL_HANDLE_ERROR;
-  return false;
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
