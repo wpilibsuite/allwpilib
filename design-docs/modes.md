@@ -611,6 +611,8 @@ Use SendableChooser for more modes (teleop and test as well as autonomous); down
 
 - For matches, should we construct teleop at the same time as auto?  If we do that, we probably need a disabledStart() or 2015 FTC opmode style init(), and don't run disabledPeriodic for both.
 
+- Is it actually likely that team robots will have a mix of command-based modes and non-command-based?  If not, restricting command-based robots to *only* command-based modes might enable greater integration and ease-of-use for the typical command-based robot?
+
 # Unresolved Questions
 
 - FRC SendableChooser has a "default" option set by robot code.  Do we want something similar here or should it be 100% DS driven?  It's kind of nice to be able to set a default (e.g. via a `setDefaultAutonomousMode(String)` function in `Robot`), but also might be a little fragile since it's name based. If it's done via annotation, what happens if multiple annotations are marked as default?
