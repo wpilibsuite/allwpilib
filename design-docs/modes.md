@@ -534,8 +534,11 @@ public class Robot extends RobotBase {
     storage.hasCargo.onTrue(intake.retractCommand());
 
     // Add a couple of autonomous modes
-    CommandModes.addAutonomous("Simple Auto").whileTrue(Autos.simpleAuto());
-    CommandModes.addAutonomous("Complex Auto", "Complex").whileTrue(Autos.complexAuto());
+    CommandModes.addAutonomous("Simple Auto").running.whileTrue(Autos.simpleAuto());
+
+    var complexAuto = CommandModes.addAutonomous("Complex Auto", "Complex");
+    complexAuto.selected.onTrue(Paths::loadComplexPath);
+    complexAuto.running.whileTrue(Autos.complexAuto());
 
     // Create a teleop mode with joystick and button controls
     var teleop = CommandModes.addTeleoperated("teleop");
