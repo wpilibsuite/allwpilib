@@ -605,6 +605,12 @@ Use SendableChooser for more modes (teleop and test as well as autonomous); down
 
 # Trades
 
+- Overall naming: mode? routine? opmode?
+
+- Naming of mode functions? start-periodic-end, vs init-periodic-exit (2015 FRC PeriodicRobot), vs init-execute-end (2015 FRC Command), vs init-start-loop-stop (2015 FTC OpMode; note init behaves like the constructor here)
+
+- For matches, should we construct teleop at the same time as auto?  If we do that, we probably need a disabledStart() or 2015 FTC opmode style init(), and don't run disabledPeriodic for both.
+
 # Unresolved Questions
 
 - FRC SendableChooser has a "default" option set by robot code.  Do we want something similar here or should it be 100% DS driven?  It's kind of nice to be able to set a default (e.g. via a `setDefaultAutonomousMode(String)` function in `Robot`), but also might be a little fragile since it's name based. If it's done via annotation, what happens if multiple annotations are marked as default?
