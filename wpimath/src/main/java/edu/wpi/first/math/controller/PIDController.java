@@ -355,7 +355,7 @@ public class PIDController implements Sendable, AutoCloseable {
   public void setIntegratorRange( double intergralRange ) {
     intergralRange = Math.abs( intergralRange );
     m_maximumIntegral = intergralRange;
-    m_minimumIntegral = intergralRange;
+    m_minimumIntegral = -intergralRange;
   }
 
   /**
