@@ -609,7 +609,7 @@ Use SendableChooser for more modes (teleop and test as well as autonomous); down
 
 - Naming of mode functions? start-periodic-end, vs init-periodic-exit (2015 FRC PeriodicRobot), vs init-execute-end (2015 FRC Command), vs init-start-loop-stop (2015 FTC OpMode; note init behaves like the constructor here)
 
-- For matches, should we construct teleop at the same time as auto?  If we do that, we probably need a disabledStart() or 2015 FTC opmode style init(), and don't run disabledPeriodic for both.
+- For matches, should we construct teleop at the same time as auto?  If we do that, we probably need a disabledStart() or 2015 FTC opmode style init() that's run on teleop after auto completes, and don't run disabledPeriodic for both simultaneously.
 
 - Is it actually likely that team robots will have a mix of command-based modes and non-command-based?  If not, restricting command-based robots to *only* command-based modes might enable greater integration and ease-of-use for the typical command-based robot?
 
