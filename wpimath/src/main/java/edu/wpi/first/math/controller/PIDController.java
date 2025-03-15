@@ -345,17 +345,17 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
-   * Sets the minimum and maximum contributions of the integral term based on a range.
+   * Sets symmetric limits on the integral term's contribution to the controller output.
    * 
-   * <p>The internal integrator is clamped so that the integral term's contribution to the output
-   * stays between minimumIntegral and maximumIntegral. This prevents integral windup.
+   * <p>This method constrains the integral term so that its effect on the output 
+   * remains within the range [-integralRange, integralRange], preventing integral windup.
    * 
-   * @param intergralRaduis The distance above and bellow 0.0 that the maximum and minimum contribution will be set to.
+   * @param integralRange The absolute value of the maximum allowable contribution of the integral term to the output. The integral term will be limited between -integralRange and +integralRange.
    */
-  public void setIntegratorRange( double intergralRange ) {
-    intergralRange = Math.abs( intergralRange );
-    m_maximumIntegral = intergralRange;
-    m_minimumIntegral = -intergralRange;
+  public void setIntegratorRange(double integralRange) {
+    integralRange = Math.abs(integralRange);
+    m_maximumIntegral = integralRange;
+    m_minimumIntegral = -integralRange;
   }
 
   /**
