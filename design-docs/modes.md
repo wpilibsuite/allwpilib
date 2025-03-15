@@ -537,7 +537,7 @@ public class Robot extends RobotBase {
     CommandModes.addAutonomous("Simple Auto").running.whileTrue(Autos.simpleAuto());
 
     var complexAuto = CommandModes.addAutonomous("Complex Auto", "Complex");
-    complexAuto.selected.onTrue(Paths::loadComplexPath);
+    complexAuto.selected.onTrue(Commands.runOnce(Paths::loadComplexPath));
     complexAuto.running.whileTrue(Autos.complexAuto());
 
     // Create a teleop mode with joystick and button controls
