@@ -120,13 +120,13 @@ Providing the top-level teleop, autonomous, and test selection available in the 
 
 - Modes are usually registered via annotation of classes.  These annotations may specify a name (or default to the class name), group name (for grouping of routines in the selection list), and description.  Annotations are used to specify whether the class is a teleop, auto, or test mode.
 
-- Routines may also be registered via annotation of functions (in the Robot class only) or via explicit function calls.  As C++ does not support annotations, function call registration is the only available method in that language.
+- Modes may also be registered via annotation of functions (in the Robot class only) or via explicit function calls.  As C++ does not support annotations, function call registration is the only available method in that language.
 
 - For maximum flexibility, all code in the robot project has access to the enable/disable state, the overall robot teleop/auto/test mode, and the selected modes for teleop, auto, and test (even when the robot is disabled).
 
 - Modes may be periodic or linear (or custom).  The Robot base class handles switching between modes and mode object instance creation.  Mode objects are constructed when the drop-down selection is made in the DS and run when the robot is enabled.
 
-- The command-based framework provides convenience functions to link triggers to specific routines.  These triggers can then be linked to start specific commands (for auto modes).  To support multiple teleop modes, joystick bindings can be configured to only be active in specific routines.
+- The command-based framework provides convenience functions to link triggers to specific modes.  These triggers can then be linked to start specific commands (for auto modes).  To support multiple teleop modes, joystick bindings can be configured to only be active in specific modes.
 
 ## Driver Station
 
@@ -593,6 +593,22 @@ Adding the following functions provides all the required functionality:
 The list of modes (and details thereof) is communicated from the Robot to the DS via the tagged TCP link.
 
 As in the current FRC protocol, the enabled state and teleop/auto/test selection are sent as part of the UDP control word from the DS to the Robot. Additionally, the selected modes for auto, teleop, and test are sent as part of every UDP packet.  This is done via a 64-bit hash of each mode's name.  Hash collisions are extremely low probability given the low quantity of modes, but this can be checked on the robot side when generating the mode list, and spaces appended as necessary to the provided names to uniquify the hashes.
+
+# Migration from 2025 FRC (WPILib)
+
+Key differences from 2025 FRC:
+- The per-mode overrideable functions in Robot are replaced with either separate annotated per-mode classes (non-command-based) or `CommandMode` triggers returned by factory functions in the `CommandModes` class
+- `SendableChooser` is no longer required for selecting autonomous routines; instead this functionality is integrated into modes, as users can create/register multiple autonomous modes classes, and it's been extended to support multiple teleoperated and multiple test modes
+- Selection of autonomous modes is integrated into the DS instead of being performed by the dashboard
+- Modes are no longer limited to just timed (periodic); a mix of different mode functionality/approaches across different robot modes is possible (e.g. teleop can be periodic and autonomous linear)
+- Linear modes are now available; these are improved versions of the old SimpleRobot/SampleRobot
+
+# Migration from 2025 FTC (FTC SDK)
+
+Key differences from 2025 FTC:
+- There is no hardware map.  Hardware objects are instead directly instantiated inside a top-level Robot class.  This Robot class is provided as a parameter to the mode constructor.
+- Init is integrated into the mode constructor.  There is no equivalent to the the enabled init step; the mode constructor is run as soon as the mode is selected on the DS, while the robot is still disabled.  Match periods will start as soon as the robot is enabled.
+- There is no `@Disabled` annotation for modes; the mode annotation can simply be commented out to achieve the same result.
 
 # Drawbacks
 
