@@ -88,7 +88,7 @@ The library contains an opmode manager that is responsible for registering and s
 
 Opmode classes are constructed when the user taps the Init button in the DS.  This works because hardware initialization processes never take more than a few seconds, and there's always a human lag between tapping Init and tapping Start.
 
-Hardware configuration is stored in an xml file that is consumed on APK startup, or when a different configuration is selected by the operator.  Consuming the xml file instantiates all objects (sensors, motors, servos, etc...) and stores them in a dictionary.  This dictionary then persists until either the robot is power cycled, or the operator selects a different configuration.  User code pulls items out of the dictionary, typically in an initialization portion of an opmode, and then use throughout the opmode.  Notably, when the opmode finishes, or is stopped, the dictionary persists.
+Hardware configuration is stored in an XML file that is consumed on APK startup, or when a different configuration is selected by the operator.  Consuming the XML file instantiates all objects (sensors, motors, servos, etc...) and stores them in a dictionary.  This dictionary then persists until either the robot is power cycled, or the operator selects a different configuration.  User code pulls items out of the dictionary, typically in an initialization portion of an opmode, and then use throughout the opmode.  Notably, when the opmode finishes, or is stopped, the dictionary persists.
 
 As opmodes are separate classes and there is no top-level robot class in the standard template, sharing state between opmodes is often a challenge for teams.
 
