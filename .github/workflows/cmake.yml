@@ -22,7 +22,7 @@ jobs:
             flags: "--preset with-java-and-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
           - os: ubuntu-22.04-arm
             name: Linux ARM
-            container: buildpack-deps:bookworm
+            container: wpilib/debian-base:arm64-bookworm
             flags: "--preset with-java-and-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
           - os: macOS-14
             name: macOS
