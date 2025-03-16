@@ -165,9 +165,9 @@ public abstract class RobotBase {
   }
 
   // these functions allow users to add modes without annotations
-  public void addAutonomousMode(Supplier<Mode> factory, String name, String category, String description) {...}
-  public void addTeleoperatedMode(Supplier<Mode> factory, String name, String category, String description) {...}
-  public void addTestMode(Supplier<Mode> factory, String name, String category, String description) {...}
+  public void addAutonomousMode(Supplier<Mode> factory, String name, String group, String description) {...}
+  public void addTeleoperatedMode(Supplier<Mode> factory, String name, String group, String description) {...}
+  public void addTestMode(Supplier<Mode> factory, String name, String group, String description) {...}
 }
 ```
 
@@ -361,7 +361,7 @@ public final class DriverStation {
   public static String getSelectedTestMode() {...}
 
   // add/remove modes
-  public static int addModeOption(String name, String category, String description, int flags) {...}
+  public static int addModeOption(String name, String group, String description, int flags) {...}
   public static int removeModeOption(String name) {...}
   public static void clearModeOptions() {...}
 }
@@ -489,10 +489,10 @@ The `CommandModes` class provides factory functions for creating command-based m
 ```java
 public final class CommandModes {
   // these register the mode and return a new CommandMode object for it
-  // (also includes default versions so category and description are optional)
-  public static CommandMode autonomousMode(String name, String category, String description) {...}
-  public static CommandMode teleoperatedMode(String name, String category, String description) {...}
-  public static CommandMode autonomousMode(String name, String category, String description) {...}
+  // (also includes default versions so group and description are optional)
+  public static CommandMode autonomousMode(String name, String group, String description) {...}
+  public static CommandMode teleoperatedMode(String name, String group, String description) {...}
+  public static CommandMode autonomousMode(String name, String group, String description) {...}
 }
 ```
 
@@ -580,7 +580,7 @@ Should be able to be annotation (decorator) based, similar to Java.
 At the HAL level, Control Word bits indicate enabled state and teleop/auto/test selection (identical to current WPILib).  What needs to be added are functions to maintain the list of available modes and get the selected/active modes as communicated by the DS.
 
 Adding the following functions provides all the required functionality:
-- `int AddModeOption(string name, string category, string description, int flags)` – returns a unique ID identifying the mode (1:1 mapping to name).  Flags indicates which list the mode appears on.
+- `int AddModeOption(string name, string group, string description, int flags)` – returns a unique ID identifying the mode (1:1 mapping to name).  Flags indicates which list the mode appears on.
 - `int RemoveModeOption(string name)` – returns the unique ID previously associated to that mode name
 - `void ClearModeOptions()` – clears all modes
 - `int GetActiveMode()` - gets the currently active mode ID; returns 0 when the robot is disabled
