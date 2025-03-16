@@ -63,11 +63,7 @@ void glass::DisplayLog(LogData* data, bool autoScroll) {
   }
 }
 
-void LogView::Display() {
-  DisplayLog(m_data, m_autoScroll);
-}
-
-void LogView::Settings() {
+void LogSettings::DisplayMenu() {
   ImGui::Checkbox("Auto-scroll", &m_autoScroll);
   if (ImGui::Selectable("Clear")) {
     m_data->Clear();
@@ -77,8 +73,4 @@ void LogView::Settings() {
                         buf.empty() ? ImGuiSelectableFlags_Disabled : 0)) {
     ImGui::SetClipboardText(buf.c_str());
   }
-}
-
-bool LogView::HasSettings() {
-  return true;
 }
