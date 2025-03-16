@@ -343,23 +343,23 @@ public class PIDController implements Sendable, AutoCloseable {
   public boolean isContinuousInputEnabled() {
     return m_continuous;
   }
-  
+
   /**
    * Sets an absolute limit on the integral term's contribution to the controller output.
-   * 
-   * <p>This method constrains the integral term so that its effect on the output 
-   * remains within the range [-integralLimit, integralLimit], preventing integral windup.
-   * 
-   * @param integralLimit The absolute value of the maximum allowable contribution 
-   *                      of the integral term to the output. The integral term will be 
-   *                      constrained between -integralLimit and +integralLimit.
+   *
+   * <p>This method constrains the integral term so that its effect on the output remains within
+   * the range [-integralLimit, integralLimit], preventing integral windup.
+   *
+   * @param integralLimit the absolute value of the maximum allowable contribution of the integral
+   *     term to the output. The integral term will be constrained between -integralLimit and
+   *     +integralLimit.
    */
   public void setIntegratorAbsoluteLimit(double integralLimit) {
     integralLimit = Math.abs(integralLimit);
     m_maximumIntegral = integralLimit;
     m_minimumIntegral = -integralLimit;
   }
-  
+
   /**
    * Sets the minimum and maximum contributions of the integral term.
    *
