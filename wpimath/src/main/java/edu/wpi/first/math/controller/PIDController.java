@@ -347,8 +347,8 @@ public class PIDController implements Sendable, AutoCloseable {
   /**
    * Sets an absolute limit on the integral term's contribution to the controller output.
    *
-   * <p>This method constrains the integral term so that its effect on the output remains within
-   * the range [-integralLimit, integralLimit], preventing integral windup.
+   * <p>This method constrains the integral term so that its effect on the output remains within the
+   * range [-integralLimit, integralLimit], preventing integral windup.
    *
    * @param integralLimit the absolute value of the maximum allowable contribution of the integral
    *     term to the output. The integral term will be constrained between -integralLimit and
