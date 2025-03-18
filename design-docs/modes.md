@@ -18,7 +18,7 @@ Primary use cases for operator-selectable code include:
 
 Notably these use cases span both matches and off-field testing.
 
-Secondarily, some teams may want to use different code structures for different use cases (e.g. linear for autonomous and iterative for test or teleop; or command-based for autonomous and teleop and linear for tests).
+Secondarily, some teams may want to use different code structures for different use cases (e.g. linear for autonomous and iterative for test or teleop).
 
 # Background
 
@@ -54,8 +54,6 @@ Separate from the driver station application, WPILib-provided as well as custom 
 The standard WPILib team code structure derives a single team-written `Robot` class from an "periodic" robot base class.  This `Robot` class is constructed and run by the Java `main()` function.  After construction, the base class implementation runs a periodic loop (typically running on a 20 ms period, although that can be changed by the user) that reads the enabled state and teleop/auto/test mode provided by the DS and calls overrideable functions for each mode (disabled, teleop, auto, and test), as well as a `robotPeriodic` overrideable function that is always called regardless of mode.  Three overrideable functions are provided for each mode: an init function (called when the mode is transitioned into from another mode), a periodic function (called on a fixed period), and an exit function (called when the mode is transitioned out of into another mode).  Teams override these functions in their Robot derived class to implement their robot code.  Because of this code structure, teams generally create their hardware configuration (can be flat or organized into subsystems) and other objects as member variables within the Robot class (constructed at robot start) and share them across all modes of operation.
 
 WPILib provides a class called `SendableChooser` for creating the drop-down lists shown on the dashboard.  This class is a generic/template class that provides a map of string key (shown on the drop-down) and object value (read by robot code).  This is typically displayed by dashboards as a simple list with no categorization.  This feature is most often used by teams for autonomous routine selection, but is not limited to that use case.  Examples and templates show teams how to instantiate this class, add it to the dashboard, and use it for operator selection of different autonomous routines (by reading the chosen value from the object and executing different code).  Examples of how to use `SendableChooser` for operator selection in other modes (e.g. teleop or test) is not provided, and it's generally uncommon for teams to use it in that way–most team code has just a single teleop routine, and the test mode is rarely used (manual testing code is instead usually integrated as part of the teleop routine).
-
-A significant portion of FRC teams use the command-based framework, which builds on top of the periodic model with the concepts of subsystems and commands and a scheduler that provides cooperative multitasking. Subsystem objects are typically member variables of the `Robot` class (or a separate class called `RobotContainer`), and command objects are created and bound to joystick buttons or other triggers during construction.  In this code model, most behaviors are modeled as commands configured during robot construction, and very little is done explicitly iteratively.  Subsystems have a standardized `periodic()` method that is called by the command scheduler, which is most often used for telemetry.  In the provided template code, the command scheduler is set up to run in all modes because it is called by the `robotPeriodic()` method.  Triggers can be configured to run specific commands at the start of disabled/teleop/auto/test modes.  Operator selection of autonomous is still done via `SendableChooser`, with the `SendableChooser` value usually being a `Command` that is started when the auto mode is started.  Notably, this model shares both subsystems and command implementations between all operational modes–only the commands that are being run change; in general this has been seen as a benefit because it enables reuse (e.g. a "set elevator to height" command is useful in both autonomous and teleoperated modes, and a subsystem operates fundamentally the same in both modes).
 
 Historically, WPILib offered a "simple" (later renamed to "sample") robot base class that had single overrideable functions for teleop, auto, and test, with no outer periodic loop (the user was responsible for writing the loop).  This was deprecated and removed circa 2016 as it was common to see teams writing autonomous loops or sleeps without proper exit condition checking (e.g. wait for the robot to drive X feet), resulting in the robot code never exiting autonomous and thus not transitioning to teleoperated in matches.  After removal of this template, this relatively common issue has entirely disappeared.
 
@@ -126,7 +124,7 @@ Providing the top-level teleop, autonomous, and test selection available in the 
 
 - Modes may be periodic or linear (or custom).  The Robot base class handles switching between modes and mode object instance creation.  Mode objects are constructed when the drop-down selection is made in the DS and run when the robot is enabled.
 
-- The command-based framework provides convenience functions to link triggers to specific modes.  These triggers can then be linked to start specific commands (for auto modes).  To support multiple teleop modes, joystick bindings can be configured to only be active in specific modes.
+How modes work with the command-based framework is described in [a separate design document](commandbased-modes.md).
 
 ## Driver Station
 
@@ -367,9 +365,9 @@ public final class DriverStation {
 }
 ```
 
-## Java Robot Code Examples (non-command-based)
+## Java Robot Code Examples
 
-Non-command-based robots will typically use classes to define routines.
+Non-command-based robots will typically use classes to define modes.
 
 The template/example code for non-command-based Java will include the following:
 - Robot class
@@ -474,99 +472,6 @@ public class TestDashboardIndicator extends LinearMode {
 }
 ```
 
-## Robot Code Command-Based Classes
-
-Unlike the non-command-based approach, command-based generally favors a design where commands can be used in all modes and explicit periodic code is discouraged.  In addition, the general approach for "modern" commands eschews classes, preferring a "fluent" method chained builder approach.  To support this, mode registration for command-based is performed with function calls instead of separate annotated classes.
-
-The command scheduler is run periodically in every command-based mode (including during the mode's disabledPeriodic).  The command scheduler runs a `periodic()` function in each command-based subsystem when it is run.
-
-If the trigger-based approach is insufficient for a team's needs, a `PeriodicMode` class can also be used with the command scheduler being run from its `periodic()`.
-
-### CommandModes
-
-The `CommandModes` class provides factory functions for creating command-based modes.
-
-```java
-public final class CommandModes {
-  // these register the mode and return a new CommandMode object for it
-  // (also includes default versions so group and description are optional)
-  public static CommandMode autonomousMode(String name, String group, String description) {...}
-  public static CommandMode teleoperatedMode(String name, String group, String description) {...}
-  public static CommandMode autonomousMode(String name, String group, String description) {...}
-}
-```
-
-### CommandMode
-
-The `CommandMode` class provides triggers to enable users to tie into each section of a mode's lifetime.  Triggers have the ability to be tied to specific commands or actions on both transitions (e.g. false to true, true to false) and while the condition is in a particular state.
-
-```java
-public class CommandMode {
-  // mode is selected on DS (regardless of enabled or disabled)
-  public final Trigger selected;
-
-  // mode is selected, robot is disabled
-  public final Trigger disabled;
-
-  // mode is running, robot is enabled
-  public final Trigger running;
-}
-```
-
-## Java Robot Code Examples (command-based)
-
-The template/example code for command-based Java includes the following:
-- A Robot class with subsystems and constructor that sets up a command-based teleop mode, a couple of auto modes, and a test mode
-
-Robot:
-
-```java
-public class Robot extends RobotBase {
-  // subsystems
-  public final Drive drive = new Drive();
-  public final Intake intake = new Intake();
-  public final Storage storage = new Storage();
-
-  public Robot() {
-    // create command bindings that are active in all command-based modes
-
-    // Automatically disable and retract the intake whenever the ball storage is full.
-    storage.hasCargo.onTrue(intake.retractCommand());
-
-    // Add a couple of autonomous modes
-    CommandModes.addAutonomous("Simple Auto").running.whileTrue(Autos.simpleAuto());
-
-    var complexAuto = CommandModes.addAutonomous("Complex Auto", "Complex");
-    complexAuto.selected.onTrue(Commands.runOnce(Paths::loadComplexPath));
-    complexAuto.running.whileTrue(Autos.complexAuto());
-
-    // Create a teleop mode with joystick and button controls
-    var teleop = CommandModes.addTeleoperated("teleop");
-
-    var driverController = new CommandXboxController(1);
-
-    // Control the drive with split-stick arcade controls
-    teleop.running.whileTrue(
-        drive.arcadeDriveCommand(
-            () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
-
-    // Deploy the intake with the X button
-    teleop.running.and(driverController.x()).onTrue(intake.intakeCommand());
-    // Retract the intake with the Y button
-    teleop.running.and(driverController.y()).onTrue(intake.retractCommand());
-  }
-}
-```
-
-Autos:
-
-```java
-public class Autos {
-  public static Command simpleAuto() {...}
-  public static Command complexAuto() {...}
-}
-```
-
 ## C++ Robot Code
 
 C++ does not support annotations, so explicit registration via `RobotBase` function calls is required.
@@ -597,7 +502,7 @@ As in the current FRC protocol, the enabled state and teleop/auto/test selection
 # Migration from 2025 FRC (WPILib)
 
 Key differences from 2025 FRC:
-- The per-mode overrideable functions in Robot are replaced with either separate annotated per-mode classes (non-command-based) or `CommandMode` triggers returned by factory functions in the `CommandModes` class
+- The per-mode overrideable functions in Robot are replaced with separate annotated per-mode classes (for non-command-based)
 - `SendableChooser` is no longer required for selecting autonomous routines; instead this functionality is integrated into modes, as users can create/register multiple autonomous modes classes, and it's been extended to support multiple teleoperated and multiple test modes
 - Selection of autonomous modes is integrated into the DS instead of being performed by the dashboard
 - Modes are no longer limited to just timed (periodic); a mix of different mode functionality/approaches across different robot modes is possible (e.g. teleop can be periodic and autonomous linear)
@@ -626,8 +531,6 @@ Use SendableChooser for more modes (teleop and test as well as autonomous); down
 - Naming of mode functions? start-periodic-end, vs init-periodic-exit (2025 FRC PeriodicRobot), vs init-execute-end (2025 FRC Command), vs init-start-loop-stop (2025 FTC OpMode; note init behaves like the constructor here)
 
 - For matches, should we construct teleop at the same time as auto?  If we do that, we probably need a disabledStart() or 2025 FTC opmode style init() that's run on teleop after auto completes, and don't run disabledPeriodic for both simultaneously.
-
-- Is it actually likely that team robots will have a mix of command-based modes and non-command-based?  If not, restricting command-based robots to *only* command-based modes might enable greater integration and ease-of-use for the typical command-based robot?
 
 # Unresolved Questions
 
