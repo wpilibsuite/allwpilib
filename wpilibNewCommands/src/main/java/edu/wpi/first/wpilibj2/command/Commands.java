@@ -175,7 +175,7 @@ public final class Commands {
    * @param onTrue the command to run if the condition function returns true
    * @return the command
    * @see ConditionalCommand
-   * @see {@link Commands#none()}
+   * @see Commands#none()
    */
   public static Command runIf(BooleanSupplier condition, Command onTrue) {
     return onTrue.onlyIf(condition);
