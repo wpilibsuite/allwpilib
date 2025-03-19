@@ -24,6 +24,22 @@ The design for multiple modes in the command-based framework extends the current
 
 A unique `RobotBase` class is also provided that always runs the command scheduler periodically in all modes, including disabled.  This means it is not possible to mix command-based modes and non-command-based modes; all modes in a command-based project must be command-based modes.
 
+## CommandModes
+
+The `CommandModes` class provides factory functions for creating modes.
+
+```java
+public final class CommandModes {
+  // these register the mode and return a new CommandMode object for it
+  // (also includes default versions so group and description are optional)
+  //
+  // Calling twice with the same name is a runtime error (exception is thrown)
+  public static CommandMode autonomous(String name, String group, String description) {...}
+  public static CommandMode teleoperated(String name, String group, String description) {...}
+  public static CommandMode test(String name, String group, String description) {...}
+}
+```
+
 ## CommandMode
 
 The `CommandMode` class provides triggers to enable users to tie into each section of a mode's lifetime.  Triggers have the ability to be tied to specific commands or actions on both transitions (e.g. false to true, true to false) and while the condition is in a particular state.  The framework will ensure these triggers always start in false state, even if code is started while attached to the field, so that it's safe to attach an action to the false to true transition of these triggers.
@@ -61,14 +77,6 @@ public abstract class CommandRobot {
     CommandScheduler.run();
     afterScheduler();
   }
-
-  // these register the mode and return a new CommandMode object for it
-  // (also includes default versions so group and description are optional)
-  //
-  // Calling twice with the same name is a runtime error (exception is thrown)
-  public CommandMode autonomous(String name, String group, String description) {...}
-  public CommandMode teleoperated(String name, String group, String description) {...}
-  public CommandMode test(String name, String group, String description) {...}
 }
 ```
 
@@ -114,15 +122,15 @@ public class Robot extends CommandRobot {
     storage.hasCargo.onTrue(intake.retractCommand());
 
     // A simple autonomous mode
-    autonomous("Simple Auto").running.whileTrue(Autos.simpleAuto());
+    CommandModes.autonomous("Simple Auto").running.whileTrue(Autos.simpleAuto());
 
     // A complex autonomous mode that loads a path when selected in the DS while still disabled
-    CommandMode complexAuto = autonomous("Complex Auto", "Complex");
+    CommandMode complexAuto = CommandModes.autonomous("Complex Auto", "Complex");
     complexAuto.selected.onTrue(Commands.runOnce(Paths::loadComplexPath));
     complexAuto.running.whileTrue(Autos.complexAuto());
 
     // A teleop mode with joystick and button controls
-    CommandMode teleop = teleoperated("teleop");
+    CommandMode teleop = CommandModes.teleoperated("teleop");
 
     var driverController = new CommandXboxController(1);
 
