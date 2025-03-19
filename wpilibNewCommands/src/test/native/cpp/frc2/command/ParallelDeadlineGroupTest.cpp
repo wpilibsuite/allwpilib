@@ -16,8 +16,6 @@ using namespace frc2;
 class ParallelDeadlineGroupTest : public CommandTestBase {};
 
 TEST_F(ParallelDeadlineGroupTest, DeadlineGroupSchedule) {
-  CommandScheduler scheduler = GetScheduler();
-
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
   std::unique_ptr<MockCommand> command3Holder = std::make_unique<MockCommand>();
@@ -54,8 +52,6 @@ TEST_F(ParallelDeadlineGroupTest, DeadlineGroupSchedule) {
 }
 
 TEST_F(ParallelDeadlineGroupTest, SequentialGroupInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
-
   TestSubsystem subsystem;
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -93,16 +89,12 @@ TEST_F(ParallelDeadlineGroupTest, SequentialGroupInterrupt) {
 }
 
 TEST_F(ParallelDeadlineGroupTest, DeadlineGroupNotScheduledCancel) {
-  CommandScheduler scheduler = GetScheduler();
-
   auto group = cmd::Deadline(cmd::None(), cmd::None());
 
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(group));
 }
 
 TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineCopy) {
-  CommandScheduler scheduler = GetScheduler();
-
   bool finished = false;
 
   auto command = cmd::WaitUntil([&finished] { return finished; });
@@ -117,8 +109,6 @@ TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineCopy) {
 }
 
 TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineRequirement) {
-  CommandScheduler scheduler = GetScheduler();
-
   TestSubsystem requirement1;
   TestSubsystem requirement2;
   TestSubsystem requirement3;

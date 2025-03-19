@@ -13,8 +13,6 @@ using namespace std::chrono_literals;
 class NotifierCommandTest : public CommandTestBase {};
 
 TEST_F(NotifierCommandTest, NotifierCommandSchedule) {
-  CommandScheduler scheduler = GetScheduler();
-
   frc::sim::PauseTiming();
 
   int counter = 0;
