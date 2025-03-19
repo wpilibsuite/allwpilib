@@ -40,11 +40,7 @@ public class Debouncer {
 
     resetTimer();
 
-    m_baseline =
-        switch (m_debounceType) {
-          case kBoth, kRising -> false;
-          case kFalling -> true;
-        };
+    m_baseline = m_debounceType == DebounceType.kFalling;
   }
 
   /**
@@ -115,11 +111,7 @@ public class Debouncer {
   public void setDebounceType(DebounceType type) {
     m_debounceType = type;
 
-    m_baseline =
-        switch (m_debounceType) {
-          case kBoth, kRising -> false;
-          case kFalling -> true;
-        };
+    m_baseline = m_debounceType == DebounceType.kFalling;
   }
 
   /**

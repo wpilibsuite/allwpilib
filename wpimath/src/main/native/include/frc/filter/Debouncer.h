@@ -73,15 +73,8 @@ class WPILIB_DLLEXPORT Debouncer {
    */
   constexpr void SetDebounceType(DebounceType type) {
     m_debounceType = type;
-    switch (type) {
-      case DebounceType::kBoth:  // fall-through
-      case DebounceType::kRising:
-        m_baseline = false;
-        break;
-      case DebounceType::kFalling:
-        m_baseline = true;
-        break;
-    }
+
+    m_baseline = m_debounceType == DebounceType::kFalling;
   }
 
   /**
