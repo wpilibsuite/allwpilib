@@ -121,29 +121,42 @@ public class Robot extends CommandRobot {
     // Automatically disable and retract the intake whenever the ball storage is full.
     storage.hasCargo.onTrue(intake.retractCommand());
 
+    // Create auto modes
+    addSimpleAuto();
+    addPathAuto("drive and turn");
+
+    // Create teleop modes
+    addArcadeTeleop();
+  }
+
+  private void addSimpleAuto() {
     // A simple autonomous mode
-    CommandModes.autonomous("Simple Auto").running.whileTrue(Autos.simpleAuto());
+    CommandModes.autonomous("Simple Auto").running.whileTrue(Autos.simpleAuto(this));
+  }
 
+  private void addPathAuto(String path) {
     // A complex autonomous mode that loads a path when selected in the DS while still disabled
-    CommandMode complexAuto = CommandModes.autonomous("Complex Auto", "Complex");
-    complexAuto.selected.onTrue(Commands.runOnce(Paths::loadComplexPath));
-    complexAuto.running.whileTrue(Autos.complexAuto());
+    CommandMode mode = CommandModes.autonomous(path, "Follow Path");
+    mode.selected.onTrue(Commands.runOnce(() -> Paths.loadPath(path)));
+    mode.running.whileTrue(Autos.followPath(this, path));
+  }
 
+  private void addArcadeTeleop() {
     // A teleop mode with joystick and button controls
-    CommandMode teleop = CommandModes.teleoperated("teleop");
+    CommandMode mode = CommandModes.teleoperated("teleop");
 
     var driverController = new CommandXboxController(1);
 
     // Control the drive with split-stick arcade controls
     m_drive.setDefaultCommand(
-        teleop,
+        mode,
         drive.arcadeDriveCommand(
             () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
 
     // Deploy the intake with the X button
-    teleop.running.and(driverController.x()).onTrue(intake.intakeCommand());
+    mode.running.and(driverController.x()).onTrue(intake.intakeCommand());
     // Retract the intake with the Y button
-    teleop.running.and(driverController.y()).onTrue(intake.retractCommand());
+    mode.running.and(driverController.y()).onTrue(intake.retractCommand());
   }
 
   @Override
@@ -170,8 +183,8 @@ Autos:
 
 ```java
 public class Autos {
-  public static Command simpleAuto() {...}
-  public static Command complexAuto() {...}
+  public static Command simpleAuto(Robot robot) {...}
+  public static Command followPath(Robot robot, String path) {...}
 }
 ```
 
