@@ -27,9 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Utility for logging data from a SysId test routine. Each complete routine (quasistatic and
- * dynamic, forward and reverse) should have its own SysIdRoutineLog instance, with a unique log
- * name.
+ * Utility for logging data from a SysId test routine. Each complete routine (sweep and step,
+ * forward and reverse) should have its own SysIdRoutineLog instance, with a unique log name.
  */
 public class SysIdRoutineLog {
   private final Map<String, Map<String, DoubleLogEntry>> m_logEntries = new HashMap<>();
@@ -40,9 +39,8 @@ public class SysIdRoutineLog {
    * Create a new logging utility for a SysId test routine.
    *
    * @param logName The name for the test routine in the log. Should be unique between complete test
-   *     routines (quasistatic and dynamic, forward and reverse). The current state of this test
-   *     (e.g. "quasistatic-forward") will appear in WPILog under the "sysid-test-state-logName"
-   *     entry.
+   *     routines (sweep and step, forward and reverse). The current state of this test (e.g.
+   *     "sweep-forward") will appear in WPILog under the "sysid-test-state-logName" entry.
    */
   public SysIdRoutineLog(String logName) {
     m_logName = logName;
@@ -50,14 +48,42 @@ public class SysIdRoutineLog {
 
   /** Possible state of a SysId routine. */
   public enum State {
-    /** Quasistatic forward test. */
-    kQuasistaticForward("quasistatic-forward"),
-    /** Quasistatic reverse test. */
-    kQuasistaticReverse("quasistatic-reverse"),
-    /** Dynamic forward test. */
-    kDynamicForward("dynamic-forward"),
-    /** Dynamic reverse test. */
-    kDynamicReverse("dynamic-reverse"),
+    /** Forward sweep test. */
+    kSweepForward("sweep-forward"),
+    /** Reverse sweep test. */
+    kSweepReverse("sweep-reverse"),
+    /** Forward step test. */
+    kStepForward("step-forward"),
+    /** Reverse step test. */
+    kStepReverse("step-reverse"),
+    /**
+     * Quasistatic forward test.
+     *
+     * @deprecated Use {@link State#kSweepForward} instead
+     */
+    @Deprecated(forRemoval = true, since = "2026")
+    kQuasistaticForward("sweep-forward"),
+    /**
+     * Quasistatic reverse test.
+     *
+     * @deprecated Use {@link State#kSweepReverse} instead
+     */
+    @Deprecated(forRemoval = true, since = "2026")
+    kQuasistaticReverse("sweep-reverse"),
+    /**
+     * Dynamic forward test.
+     *
+     * @deprecated Use {@link State#kStepForward} instead
+     */
+    @Deprecated(forRemoval = true, since = "2026")
+    kDynamicForward("step-forward"),
+    /**
+     * Dynamic reverse test.
+     *
+     * @deprecated Use {@link State#kStepReverse} instead
+     */
+    @Deprecated(forRemoval = true, since = "2026")
+    kDynamicReverse("step-reverse"),
     /** No test. */
     kNone("none");
 

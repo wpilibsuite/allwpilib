@@ -61,8 +61,8 @@ class AnalyzerPlot {
   /**
    * Utility method to plot the raw time series data
    *
-   * @param rawSlow The raw slow (quasistatic) test data
-   * @param rawFast The raw fast (dynamic) test data
+   * @param rawSlow The raw slow (sweep) test data
+   * @param rawFast The raw fast (step) test data
    * @param abort   Aborts analysis early if set to true from another thread
    */
   void SetRawTimeData(const std::vector<PreparedData>& rawSlow,
@@ -194,8 +194,8 @@ class AnalyzerPlot {
   // Logger
   wpi::Logger& m_logger;
 
-  FilteredDataVsTimePlot m_quasistaticData;
-  FilteredDataVsTimePlot m_dynamicData;
+  FilteredDataVsTimePlot m_sweepData;
+  FilteredDataVsTimePlot m_stepData;
   DataWithFitLinePlot m_regressionData;
   DataWithFitLinePlot m_timestepData;
 
