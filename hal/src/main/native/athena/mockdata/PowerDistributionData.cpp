@@ -14,6 +14,7 @@ void HALSIM_ResetPowerDistributionData(int32_t index) {}
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, PowerDistribution##CAPINAME, RETURN)
 
 DEFINE_CAPI(HAL_Bool, Initialized, false)
+DEFINE_CAPI(int, ChannnelCount, 0)
 DEFINE_CAPI(double, Temperature, 0)
 DEFINE_CAPI(double, Voltage, 0)
 HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(double, HALSIM, PowerDistributionCurrent, 0)
