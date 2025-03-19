@@ -369,7 +369,7 @@ public final class DriverStation {
 
 Non-command-based robots will typically use classes to define modes.
 
-The template/example code for non-command-based Java will include the following:
+The following example code for non-command-based Java demonstrates the following:
 - Robot class
 - A periodic autonomous mode
 - A periodic teleop mode
@@ -382,21 +382,6 @@ public class Robot extends RobotBase {
   public final DifferentialDrive drive = new DifferentialDrive(...);
 
   public Robot() {}
-
-  @Override
-  public void disabledStart() {
-    // this code is called when the robot enters disabled mode (including at startup)
-  }
-
-  @Override
-  public void disabledPeriodic() {
-    // this code is called periodically while the robot is disabled
-  }
-
-  @Override
-  public void disabledEnd() {
-    // this code is called when the robot exits disabled mode, prior to a routine starting
-  }
 }
 ```
 
@@ -406,35 +391,25 @@ Autonomous mode:
 @Autonomous(name="Drive straight", group="Drive")
 public class AutoDriveStraight extends PeriodicMode {
   private final Robot robot;
+  private final Timer timer = new Timer();
 
   public AutoDriveStraight(Robot robot) {
-    // the class is constructed when this mode is selected on the DS
     this.robot = robot;
   }
 
   @Override
-  public void disabledPeriodic() {
-    // this code is called periodically while the mode is selected on the DS (robot is disabled)
-  }
-
-  @Override
-  public void close() {
-    // this code is called when this mode is de-selected on the DS
-  }
-
-  @Override
   public void start() {
-    // this code is called when the mode starts (robot is enabled)
+    timer.start();
   }
 
   @Override
   public void periodic() {
-    // this code runs periodically while the mode is running (robot is enabled)
-  }
-
-  @Override
-  public void end() {
-    // this code is called when the mode ends (robot is disabled)
+    // drive forward for 2 seconds at half speed, then stop
+    if (!timer.hasElapsed(2.0)) {
+      robot.drive.arcadeDrive(0.5, 0);
+    } else {
+      robot.drive.arcadeDrive(0, 0);
+    }
   }
 }
 ```
