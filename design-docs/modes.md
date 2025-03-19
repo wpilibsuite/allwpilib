@@ -124,7 +124,7 @@ Providing the top-level teleop, autonomous, and test selection available in the 
 
 - Modes may be periodic or linear (or custom).  The Robot base class handles switching between modes and mode object instance creation.  Mode objects are constructed when the drop-down selection is made in the DS and run when the robot is enabled.
 
-How modes work with the command-based framework is described in [a separate design document](commandbased-modes.md).
+How modes work with the command-based framework is described in [a separate design document](modes-commandbased.md).
 
 ## Driver Station
 
