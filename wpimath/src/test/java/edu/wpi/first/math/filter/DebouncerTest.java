@@ -84,5 +84,6 @@ class DebouncerTest {
     debouncer.setDebounceType(Debouncer.DebounceType.kFalling);
 
     assertSame(debouncer.getDebounceType(), Debouncer.DebounceType.kFalling);
+    assertTrue(debouncer.calculate(false));
   }
 }

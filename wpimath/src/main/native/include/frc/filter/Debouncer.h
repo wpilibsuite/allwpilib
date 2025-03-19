@@ -71,7 +71,18 @@ class WPILIB_DLLEXPORT Debouncer {
    *
    * @param type Which type of state change the debouncing will be performed on.
    */
-  constexpr void SetDebounceType(DebounceType type) { m_debounceType = type; }
+  constexpr void SetDebounceType(DebounceType type) {
+    m_debounceType = type;
+    switch (type) {
+      case DebounceType::kBoth:  // fall-through
+      case DebounceType::kRising:
+        m_baseline = false;
+        break;
+      case DebounceType::kFalling:
+        m_baseline = true;
+        break;
+    }
+  }
 
   /**
    * Get the debounce type.

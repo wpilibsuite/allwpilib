@@ -114,6 +114,12 @@ public class Debouncer {
    */
   public void setDebounceType(DebounceType type) {
     m_debounceType = type;
+
+    m_baseline =
+        switch (m_debounceType) {
+          case kBoth, kRising -> false;
+          case kFalling -> true;
+        };
   }
 
   /**
