@@ -98,6 +98,7 @@ public class GenericHID {
   private int m_outputs;
   private int m_leftRumble;
   private int m_rightRumble;
+  private boolean m_warnWhenDisconnected = true;
   private final Map<EventLoop, Map<Integer, BooleanEvent>> m_buttonCache = new HashMap<>();
   private final Map<EventLoop, Map<Pair<Integer, Double>, BooleanEvent>> m_axisLessThanCache =
       new HashMap<>();
@@ -115,6 +116,21 @@ public class GenericHID {
   }
 
   /**
+   * Specifies whether warnings should be printed to the console when this joystick is disconnected
+   * and a button, axis, or POV is read. This is intended to be used for test controllers that do
+   * not need to be plugged in during a match.
+   *
+   * <p>Unlike {@link DriverStation#silenceJoystickConnectionWarning}, this only applies to this
+   * joystick, is NOT ignored when the FMS is connected, and does not affect warnings when reading a
+   * non-existent button, axis, or POV on a connected joystick.
+   *
+   * @param warn Whether warning messages should be printed.
+   */
+  public void warnWhenDisconnected(boolean warn) {
+    m_warnWhenDisconnected = warn;
+  }
+
+  /**
    * Get the button value (starting at button 1).
    *
    * <p>The buttons are returned in a single 16 bit value with one bit representing the state of
@@ -127,6 +143,9 @@ public class GenericHID {
    * @return The state of the button.
    */
   public boolean getRawButton(int button) {
+    if (!m_warnWhenDisconnected && !isConnected()) {
+      return false;
+    }
     return DriverStation.getStickButton(m_port, (byte) button);
   }
 
@@ -141,6 +160,9 @@ public class GenericHID {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRawButtonPressed(int button) {
+    if (!m_warnWhenDisconnected && !isConnected()) {
+      return false;
+    }
     return DriverStation.getStickButtonPressed(m_port, (byte) button);
   }
 
@@ -155,6 +177,9 @@ public class GenericHID {
    * @return Whether the button was released since the last check.
    */
   public boolean getRawButtonReleased(int button) {
+    if (!m_warnWhenDisconnected && !isConnected()) {
+      return false;
+    }
     return DriverStation.getStickButtonReleased(m_port, button);
   }
 
@@ -179,6 +204,9 @@ public class GenericHID {
    * @return The value of the axis.
    */
   public double getRawAxis(int axis) {
+    if (!m_warnWhenDisconnected && !isConnected()) {
+      return 0.0;
+    }
     return DriverStation.getStickAxis(m_port, axis);
   }
 
@@ -192,6 +220,9 @@ public class GenericHID {
    * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
    */
   public int getPOV(int pov) {
+    if (!m_warnWhenDisconnected && !isConnected()) {
+      return -1;
+    }
     return DriverStation.getStickPOV(m_port, pov);
   }
 

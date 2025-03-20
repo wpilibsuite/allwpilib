@@ -12,6 +12,10 @@ frc::GenericHID& CommandGenericHID::GetHID() {
   return m_hid;
 }
 
+void CommandGenericHID::WarnWhenDisconnected(bool warn) {
+  m_hid.WarnWhenDisconnected(warn);
+}
+
 Trigger CommandGenericHID::Button(int button, frc::EventLoop* loop) const {
   return Trigger(loop, [this, button] { return m_hid.GetRawButton(button); });
 }
