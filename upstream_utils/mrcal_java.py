@@ -6,23 +6,6 @@ import shutil
 from upstream_utils import Lib, walk_cwd_and_copy_if
 
 
-def delete_lines_by_range(file_path, start_line, end_line):
-    # Read all lines from the file
-    with open(file_path, "r") as file:
-        lines = file.readlines()
-
-    # Filter out lines that are within the specified range
-    filtered_lines = [
-        line
-        for i, line in enumerate(lines, start=1)
-        if not (start_line <= i <= end_line)
-    ]
-
-    # Write the remaining lines back to the file
-    with open(file_path, "w") as file:
-        file.writelines(filtered_lines)
-
-
 def copy_upstream_src(wpilib_root):
     wpical = os.path.join(wpilib_root, "wpical")
 
@@ -39,7 +22,7 @@ def copy_upstream_src(wpilib_root):
         os.path.join(wpical, "src/main/native/thirdparty/mrcal_java/include"),
     )
 
-    files = walk_cwd_and_copy_if(
+    files += walk_cwd_and_copy_if(
         lambda dp, f: f.endswith("mrcal_wrapper.cpp"),
         os.path.join(wpical, "src/main/native/thirdparty/mrcal_java/src"),
     )
@@ -48,6 +31,9 @@ def copy_upstream_src(wpilib_root):
         with open(f) as file:
             content = file.read()
             content = content.replace("#include <malloc.h>", "")
+            content = content.replace(
+                "suitesparse/cholmod_core.h", "suitesparse/cholmod.h"
+            )
             content = content.replace(
                 "// mrcal_point3_t *c_observations_point_pool = observations_point;",
                 "mrcal_point3_t *c_observations_point_pool = observations_point;",

@@ -13,39 +13,20 @@
 
 namespace cameracalibration {
 struct CameraModel {
-  Eigen::Matrix<double, 3, 3> intrinsic_matrix;
-  Eigen::Matrix<double, 8, 1> distortion_coefficients;
-  double avg_reprojection_error;
+  Eigen::Matrix<double, 3, 3> intrinsicMatrix;
+  Eigen::Matrix<double, 8, 1> distortionCoefficients;
+  double avgReprojectionError = -1;
 };
 
-int calibrate(const std::string& input_video, CameraModel& camera_model,
-              float square_width, float marker_width, int board_width,
-              int board_height, bool show_debug_window);
-int calibrate(const std::string& input_video, CameraModel& camera_model,
-              float square_width, float marker_width, int board_width,
-              int board_height, double imagerWidthPixels,
-              double imagerHeightPixels, bool show_debug_window);
-int calibrate(const std::string& input_video, CameraModel& camera_model,
-              float square_width, int board_width, int board_height,
-              double imagerWidthPixels, double imagerHeightPixels,
-              bool show_debug_window);
-static void dumpJson(CameraModel& camera_model,
-                     const std::string& output_file_path) {
-  std::vector<double> camera_matrix(camera_model.intrinsic_matrix.data(),
-                                    camera_model.intrinsic_matrix.data() +
-                                        camera_model.intrinsic_matrix.size());
-  std::vector<double> distortion_coefficients(
-      camera_model.distortion_coefficients.data(),
-      camera_model.distortion_coefficients.data() +
-          camera_model.distortion_coefficients.size());
+std::optional<cameracalibration::CameraModel> calibrate(
+    const std::string& input_video, float square_width, float marker_width,
+    int board_width, int board_height, bool show_debug_window);
+std::optional<cameracalibration::CameraModel> calibrate(
+    const std::string& input_video, float square_width, int board_width,
+    int board_height, double imageWidthPixels, double imageHeightPixels,
+    bool show_debug_window);
 
-  wpi::json result = {
-      {"camera_matrix", camera_matrix},
-      {"distortion_coefficients", distortion_coefficients},
-      {"avg_reprojection_error", camera_model.avg_reprojection_error}};
+void to_json(wpi::json& json, const CameraModel& cameraModel);
 
-  std::ofstream output_file(output_file_path);
-  output_file << result.dump(4) << std::endl;
-  output_file.close();
-}
+void from_json(const wpi::json& json, CameraModel& cameraModel);
 }  // namespace cameracalibration
