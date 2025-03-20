@@ -4,9 +4,20 @@
 
 package edu.wpi.first.hal;
 
+import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
+import java.nio.ByteBuffer;
+
 /** Faults for a REV PH. These faults are only active while the condition is active. */
 @SuppressWarnings("MemberName")
-public class REVPHFaults {
+public class REVPHFaults implements StructSerializable {
+  // Encoding and decoding based on the bitfield and not the boolean fields
+  // introduces some invariance concerns with the promise this class makes.
+  // From now on the bitfield is the absolute source of truth for the state of
+  // the object.
+  /** The faults bitfield the object was constructed with. */
+  public final int m_bitfield;
+
   /** Fault on channel 0. */
   public final boolean Channel0Fault;
 
@@ -109,6 +120,8 @@ public class REVPHFaults {
    * @param faults the fault bitfields
    */
   public REVPHFaults(int faults) {
+    m_bitfield = faults;
+
     Channel0Fault = (faults & (1 << 0)) != 0;
     Channel1Fault = (faults & (1 << 1)) != 0;
     Channel2Fault = (faults & (1 << 2)) != 0;
@@ -131,5 +144,65 @@ public class REVPHFaults {
     Brownout = (faults & (1 << 19)) != 0;
     CanWarning = (faults & (1 << 20)) != 0;
     HardwareFault = (faults & (1 << 21)) != 0;
+  }
+
+  public static final REVPHFaultsStruct struct = new REVPHFaultsStruct();
+
+  public static final class REVPHFaultsStruct implements Struct<REVPHFaults> {
+    @Override
+    public Class<REVPHFaults> getTypeClass() {
+      return REVPHFaults.class;
+    }
+
+    @Override
+    public int getSize() {
+      return kSizeInt32;
+    }
+
+    @Override
+    public String getSchema() {
+      return "bool channel0Fault:1; "
+          + "bool channel1Fault:1; "
+          + "bool channel2Fault:1; "
+          + "bool channel3Fault:1; "
+          + "bool channel4Fault:1; "
+          + "bool channel5Fault:1; "
+          + "bool channel6Fault:1; "
+          + "bool channel7Fault:1; "
+          + "bool channel8Fault:1; "
+          + "bool channel9Fault:1; "
+          + "bool channel10Fault:1; "
+          + "bool channel11Fault:1; "
+          + "bool channel12Fault:1; "
+          + "bool channel13Fault:1; "
+          + "bool channel14Fault:1; "
+          + "bool channel15Fault:1; "
+          + "bool compressorOverCurrent:1 "
+          + "bool compressorOpen:1 "
+          + "bool solenoidOverCurrent:1 "
+          + "bool brownout:1; "
+          + "bool canWarning:1; "
+          + "bool hardwareFault:1;";
+    }
+
+    @Override
+    public String getTypeName() {
+      return "REVPHFaults";
+    }
+
+    @Override
+    public void pack(ByteBuffer bb, REVPHFaults value) {
+      bb.putInt(value.m_bitfield);
+    }
+
+    public void pack(ByteBuffer bb, int value) {
+      bb.putInt(value);
+    }
+
+    @Override
+    public REVPHFaults unpack(ByteBuffer bb) {
+      int packed = bb.getInt();
+      return new REVPHFaults(packed);
+    }
   }
 }
