@@ -395,7 +395,8 @@ void CombineCalibrations() {
           auto text = fmt::format("Tag ID {}: {}", tagId, filePath);
           ImGui::TextUnformatted(text.c_str());
         } else {
-          ImGui::Text("Tag ID %i: <none (DROP HERE)>", tagId);
+          ImGui::Text("Tag ID %i: <none, using ideal field layout (DROP HERE)>",
+                      tagId);
         }
         if (ImGui::BeginDragDropTarget()) {
           if (const ImGuiPayload* payload =
@@ -444,6 +445,9 @@ void CombineCalibrations() {
             frc::AprilTag tag{tagId, tagPose.value()};
             tags.emplace_back(tag);
           }
+        } else {
+          frc::AprilTag tag{tagId, gIdealFieldLayout.GetTagPose(tagId).value()};
+          tags.emplace_back(tag);
         }
       }
       saveDirSelector =
