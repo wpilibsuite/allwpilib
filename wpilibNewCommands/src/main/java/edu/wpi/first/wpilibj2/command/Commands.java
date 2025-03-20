@@ -179,6 +179,31 @@ public final class Commands {
     return new SelectCommand<>(commands, selector);
   }
 
+  // Command Groups
+
+  /**
+   * Maps an array of commands by proxying every element using {@link Command#asProxy()}.
+   *
+   * <p>This is useful to ensure that default commands of subsystems withing a command group are
+   * still triggered despite command groups requiring the union of their members' requirements
+   *
+   * <p>Example usage for creating an auto for a robot that has a drivetrain and arm:
+   *
+   * <pre>
+   * {@code var auto = sequence(proxyAll(drive.move(), arm.score()));}
+   * </pre>
+   *
+   * @param commands an array of commands
+   * @return an array of proxied commands
+   */
+  public static Command[] proxyAll(Command... commands) {
+    Command[] out = new Command[commands.length];
+    for (int i = 0; i < commands.length; i++) {
+      out[i] = commands[i].asProxy();
+    }
+    return out;
+  }
+
   /**
    * Runs the command supplied by the supplier.
    *
