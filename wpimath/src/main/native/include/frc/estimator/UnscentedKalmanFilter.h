@@ -43,7 +43,9 @@ namespace frc {
  * "Stochastic control theory".
  *
  * <p> This class implements a square-root-form unscented Kalman filter
- * (SR-UKF). For more information about the SR-UKF, see
+ * (SR-UKF). The main reason for this is to guarantee that the covariance
+ * matrix remains positive definite.
+ * For more information about the SR-UKF, see
  * https://www.researchgate.net/publication/3908304.
  *
  * @tparam States Number of states.
@@ -108,7 +110,7 @@ class UnscentedKalmanFilter {
   }
 
   /**
-   * Constructs an unscented Kalman filter with custom mean, residual, and
+   * Constructs an Unscented Kalman filter with custom mean, residual, and
    * addition functions. Using custom functions for arithmetic can be useful if
    * you have angles in the state or measurements, because they allow you to
    * correctly account for the modular nature of angle arithmetic.
@@ -189,7 +191,7 @@ class UnscentedKalmanFilter {
   /**
    * Returns the reconstructed error covariance matrix P.
    */
-  StateMatrix P() const { return m_S.transpose() * m_S; }
+  StateMatrix P() const { return m_S * m_S.transpose(); }
 
   /**
    * Set the current square-root error covariance matrix S by taking the square
@@ -197,7 +199,7 @@ class UnscentedKalmanFilter {
    *
    * @param P The error covariance matrix P.
    */
-  void SetP(const StateMatrix& P) { m_S = P.llt().matrixU(); }
+  void SetP(const StateMatrix& P) { m_S = P.llt().matrixL(); }
 
   /**
    * Returns the state estimate x-hat.
@@ -252,14 +254,28 @@ class UnscentedKalmanFilter {
     DiscretizeAQ<States>(contA, m_contQ, m_dt, &discA, &discQ);
     Eigen::internal::llt_inplace<double, Eigen::Lower>::blocked(discQ);
 
+    // Generate sigma points around the state mean
+    //
+    // equation (17)
     Matrixd<States, 2 * States + 1> sigmas =
         m_pts.SquareRootSigmaPoints(m_xHat, m_S);
 
+    // Project each sigma point forward in time according to the
+    // dynamics f(x, u)
+    //
+    //   sigmas  = 𝒳ₖ₋₁
+    //   sigmasF = 𝒳ₖ,ₖ₋₁ or just 𝒳 for readability
+    //
+    // equation (18)
     for (int i = 0; i < m_pts.NumSigmas(); ++i) {
       StateVector x = sigmas.template block<States, 1>(0, i);
       m_sigmasF.template block<States, 1>(0, i) = RK4(m_f, x, u, dt);
     }
 
+    // Pass the predicted sigmas (𝒳) through the Unscented Transform
+    // to compute the prior state mean and covariance
+    //
+    // equations (18) (19) and (20)
     auto [xHat, S] = SquareRootUnscentedTransform<States, States>(
         m_sigmasF, m_pts.Wm(), m_pts.Wc(), m_meanFuncX, m_residualFuncX,
         discQ.template triangularView<Eigen::Lower>());
@@ -367,7 +383,15 @@ class UnscentedKalmanFilter {
     Matrixd<Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
     Eigen::internal::llt_inplace<double, Eigen::Lower>::blocked(discR);
 
-    // Transform sigma points into measurement space
+    // Generate new sigma points from the prior mean and covariance
+    // and transform them into measurement space using h(x, u)
+    //
+    //   sigmas  = 𝒳
+    //   sigmasH = 𝒴
+    //
+    // This differs from equation (22) which uses
+    // the prior sigma points, regenerating them allows
+    // multiple measurement updates per time update
     Matrixd<Rows, 2 * States + 1> sigmasH;
     Matrixd<States, 2 * States + 1> sigmas =
         m_pts.SquareRootSigmaPoints(m_xHat, m_S);
@@ -376,16 +400,26 @@ class UnscentedKalmanFilter {
           h(sigmas.template block<States, 1>(0, i), u);
     }
 
-    // Mean and covariance of prediction passed through UT
+    // Pass the predicted measurement sigmas through the Unscented Transform
+    // to compute the mean predicted measurement and square-root innovation
+    // covariance.
+    //
+    // equations (23) (24) and (25)
     auto [yHat, Sy] = SquareRootUnscentedTransform<Rows, States>(
         sigmasH, m_pts.Wm(), m_pts.Wc(), meanFuncY, residualFuncY,
         discR.template triangularView<Eigen::Lower>());
 
-    // Compute cross covariance of the state and the measurements
+    // Compute cross covariance of the predicted state and measurement sigma
+    // points given as:
+    //
+    //           2n
+    //   P_{xy} = Σ Wᵢ⁽ᶜ⁾[𝒳ᵢ - x̂][𝒴ᵢ - ŷ⁻]ᵀ
+    //           i=0
+    //
+    // equation (26)
     Matrixd<States, Rows> Pxy;
     Pxy.setZero();
     for (int i = 0; i < m_pts.NumSigmas(); ++i) {
-      // Pxy += (sigmas_f[:, i] - x̂)(sigmas_h[:, i] - ŷ)ᵀ W_c[i]
       Pxy +=
           m_pts.Wc(i) *
           (residualFuncX(m_sigmasF.template block<States, 1>(0, i), m_xHat)) *
@@ -393,21 +427,39 @@ class UnscentedKalmanFilter {
               .transpose();
     }
 
-    // K = (P_{xy} / S_yᵀ) / S_y
-    // K = (S_y \ P_{xy}ᵀ)ᵀ / S_y
-    // K = (S_yᵀ \ (S_y \ P_{xy}ᵀ))ᵀ
+    // Compute the Kalman gain. We use Eigen's QR decomposition to solve. This
+    // is equivalent to MATLAB's \ operator, so we need to rearrange to use
+    // that.
+    //
+    //   K = (P_{xy} / S_{y}ᵀ) / S_{y}
+    //   K = (S_{y} \ P_{xy})ᵀ / S_{y}
+    //   K = (S_{y}ᵀ \ (S_{y} \ P_{xy}ᵀ))ᵀ
+    //
+    // equation (27)
     Matrixd<States, Rows> K =
         Sy.transpose()
             .fullPivHouseholderQr()
             .solve(Sy.fullPivHouseholderQr().solve(Pxy.transpose()))
             .transpose();
 
-    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − ŷ)
+    // Compute the posterior state mean
+    //
+    //   x̂ = x̂⁻ + K(y − ŷ⁻)
+    //
+    // second part of equation (27)
     m_xHat = addFuncX(m_xHat, K * residualFuncY(y, yHat));
 
+    // Compute the intermediate matrix U for downdating
+    // the square-root covariance
+    //
+    // equation (28)
     Matrixd<States, Rows> U = K * Sy;
+
+    // Downdate the posterior square-root state covariance
+    //
+    // equation (29)
     for (int i = 0; i < Rows; i++) {
-      Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(
+      Eigen::internal::llt_inplace<double, Eigen::Lower>::rankUpdate(
           m_S, U.template block<States, 1>(0, i), -1);
     }
   }
