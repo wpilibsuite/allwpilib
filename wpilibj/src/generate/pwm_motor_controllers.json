@@ -147,7 +147,7 @@
     "Manufacturer": "Vex Robotics",
     "DisplayName": "Victor 888",
     "ResourceName": "Victor",
-    "PeriodMultiplier": 2,
+    "OutputPeriod": 10,
     "pulse_width_ms": {
       "max": 2.027,
       "deadbandMax": 1.525,
@@ -161,6 +161,20 @@
     "Manufacturer": "Vex Robotics",
     "DisplayName": "Victor SP",
     "ResourceName": "VictorSP",
+    "pulse_width_ms": {
+      "max": 2.004,
+      "deadbandMax": 1.520,
+      "center": 1.500,
+      "deadbandMin": 1.480,
+      "min": 0.997
+    }
+  },
+  {
+    "name": "Koors40",
+    "Manufacturer": "AndyMark",
+    "DisplayName": "Koors40",
+    "ResourceName": "Koors40",
+    "OutputPeriod": 20,
     "pulse_width_ms": {
       "max": 2.004,
       "deadbandMax": 1.520,

@@ -192,21 +192,6 @@ Java_edu_wpi_first_hal_DIOJNI_isAnyPulsing
 
 /*
  * Class:     edu_wpi_first_hal_DIOJNI
- * Method:    getLoopTiming
- * Signature: ()S
- */
-JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_hal_DIOJNI_getLoopTiming
-  (JNIEnv* env, jclass)
-{
-  int32_t status = 0;
-  jshort returnValue = HAL_GetPWMLoopTiming(&status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_DIOJNI
  * Method:    allocateDigitalPWM
  * Signature: ()I
  */
