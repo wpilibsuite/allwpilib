@@ -458,21 +458,6 @@ Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType
 
 /*
  * Class:     edu_wpi_first_hal_HALUtil
- * Method:    getFPGAButton
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGAButton
-  (JNIEnv* env, jclass)
-{
-  int32_t status = 0;
-  jboolean returnValue = HAL_GetFPGAButton(&status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_HALUtil
  * Method:    getHALErrorMessage
  * Signature: (I)Ljava/lang/String;
  */

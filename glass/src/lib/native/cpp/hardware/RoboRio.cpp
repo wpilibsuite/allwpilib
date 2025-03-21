@@ -47,9 +47,6 @@ static void DisplayRail(RoboRioRailModel& rail, const char* name) {
 }
 
 void glass::DisplayRoboRio(RoboRioModel* model) {
-  ImGui::Button("User Button");
-  model->SetUserButton(ImGui::IsItemActive());
-
   ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
 
   if (CollapsingHeader("RoboRIO Input")) {
@@ -60,22 +57,9 @@ void glass::DisplayRoboRio(RoboRioModel* model) {
         model->SetVInVoltage(val);
       }
     }
-
-    if (auto data = model->GetVInCurrentData()) {
-      double val = data->GetValue();
-      if (data->InputDouble("Current (A)", &val)) {
-        model->SetVInCurrent(val);
-      }
-    }
     ImGui::PopID();
   }
 
-  if (auto rail = model->GetUser6VRail()) {
-    DisplayRail(*rail, "6V Rail");
-  }
-  if (auto rail = model->GetUser5VRail()) {
-    DisplayRail(*rail, "5V Rail");
-  }
   if (auto rail = model->GetUser3V3Rail()) {
     DisplayRail(*rail, "3.3V Rail");
   }
