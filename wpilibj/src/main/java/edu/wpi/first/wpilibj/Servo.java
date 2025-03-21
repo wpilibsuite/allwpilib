@@ -46,12 +46,31 @@ public class Servo implements Sendable, AutoCloseable {
    */
   @SuppressWarnings("this-escape")
   public Servo(final int channel) {
-    super(channel);
-    setBoundsMicroseconds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
-    setPeriodMultiplier(PeriodMultiplier.k4X);
+    m_pwm = new PWM(channel, false);
+    SendableRegistry.add(this, "Servo", channel);
 
-    HAL.reportUsage("IO", getChannel(), "Servo");
-    SendableRegistry.setName(this, "Servo", getChannel());
+    m_pwm.setOutputPeriod(OutputPeriod.k20Ms);
+
+    HAL.reportUsage("IO", channel, "Servo");
+
+    m_simDevice = SimDevice.create("Servo", channel);
+    if (m_simDevice != null) {
+      m_simPosition = m_simDevice.createDouble("Position", Direction.kOutput, 0.0);
+      m_pwm.setSimDevice(m_simDevice);
+    }
+  }
+
+  /** Free the resource associated with the PWM channel and set the value to 0. */
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
+    m_pwm.close();
+
+    if (m_simDevice != null) {
+      m_simDevice.close();
+      m_simDevice = null;
+      m_simPosition = null;
+    }
   }
 
   /**
