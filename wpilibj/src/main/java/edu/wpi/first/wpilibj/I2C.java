@@ -20,9 +20,9 @@ import java.nio.ByteBuffer;
 public class I2C implements AutoCloseable {
   /** I2C connection ports. */
   public enum Port {
-    /** Onboard I2C port. */
+    /** I2C Port 0. */
     kPort0(0),
-    /** MXP (roboRIO MXP) I2C port. */
+    /** I2C Port 1. */
     kPort1(1);
 
     /** Port value. */
