@@ -31,41 +31,56 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
                                         const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
-  *status = HAL_HANDLE_ERROR;
-  return HAL_kInvalidHandle;
+
+  if (channel < 0 || channel >= kNumSmartIo) {
+    *status = RESOURCE_OUT_OF_RANGE;
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
+                                     kNumSmartIo, channel);
+    return HAL_kInvalidHandle;
+  }
+
+  HAL_DigitalHandle handle;
+
+  auto port =
+      smartIoHandles->Allocate(channel, HAL_HandleEnum::PWM, &handle, status);
+
+  if (*status != 0) {
+    if (port) {
+      hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
+                                           port->previousAllocation);
+    } else {
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
+                                       kNumSmartIo, channel);
+    }
+    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  }
+
+  port->channel = channel;
+
+  *status = port->InitializeMode(SmartIoMode::PwmOutput);
+  if (*status != 0) {
+    smartIoHandles->Free(handle, HAL_HandleEnum::PWM);
+    return HAL_kInvalidHandle;
+  }
+
+  // Disable the PWM output.
+  HAL_SetPWMPulseTimeMicroseconds(handle, 0, status);
+  if (*status != 0) {
+    smartIoHandles->Free(handle, HAL_HandleEnum::PWM);
+    return HAL_kInvalidHandle;
+  }
+
+  port->previousAllocation = allocationLocation ? allocationLocation : "";
+
+  return handle;
 }
 
 void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle) {}
 
+void HAL_SetPWMSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
+}
+
 HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
-  return false;
-}
-
-void HAL_SetPWMConfigMicroseconds(HAL_DigitalHandle pwmPortHandle, int32_t max,
-                                  int32_t deadbandMax, int32_t center,
-                                  int32_t deadbandMin, int32_t min,
-                                  int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-void HAL_GetPWMConfigMicroseconds(HAL_DigitalHandle pwmPortHandle,
-                                  int32_t* maxPwm, int32_t* deadbandMaxPwm,
-                                  int32_t* centerPwm, int32_t* deadbandMinPwm,
-                                  int32_t* minPwm, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-void HAL_SetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
-                                 HAL_Bool eliminateDeadband, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-HAL_Bool HAL_GetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
-                                     int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
   return false;
 }
 
@@ -76,64 +91,35 @@ void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
   return;
 }
 
-void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
-                     int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double pos,
-                        int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
 int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
                                         int32_t* status) {
   *status = HAL_HANDLE_ERROR;
   return 0;
 }
 
-double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
+void HAL_SetPWMOutputPeriod(HAL_DigitalHandle pwmPortHandle, int32_t period,
+                            int32_t* status) {
+  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
 
-double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-void HAL_LatchPWMZero(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
-                           int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-void HAL_SetPWMAlwaysHighMode(HAL_DigitalHandle pwmPortHandle,
-                              int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-int32_t HAL_GetPWMLoopTiming(int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-uint64_t HAL_GetPWMCycleStartTime(int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  switch (period) {
+    case 0:
+      *status = port->SetPwmOutputPeriod(hal::PwmOutputPeriod::k5ms);
+      break;
+    case 1:
+    case 2:
+      *status = port->SetPwmOutputPeriod(hal::PwmOutputPeriod::k10ms);
+      break;
+    case 3:
+      *status = port->SetPwmOutputPeriod(hal::PwmOutputPeriod::k20ms);
+      break;
+    default:
+      *status = PARAMETER_OUT_OF_RANGE;
+      return;
+  }
 }
 
 }  // extern "C"
