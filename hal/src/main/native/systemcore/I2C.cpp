@@ -23,32 +23,39 @@
 
 using namespace hal;
 
-static wpi::mutex digitalI2COnBoardMutex;
-static uint8_t i2COnboardObjCount{0};
-static int i2COnBoardHandle{-1};
+namespace {
+constexpr const char* physicalPorts[] = {"/dev/i2c-1", "/dev/i2c-10"};
+
+struct I2C {
+  std::mutex initMutex;
+  int objCount = 0;
+  int fd = -1;
+};
+
+static I2C i2cObjs[2];
+}  // namespace
 
 namespace hal::init {
 void InitializeI2C() {}
 }  // namespace hal::init
 
 extern "C" {
-
 void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   hal::init::CheckInit();
 
-  if (port != 0) {
+  if (port < 0 || port > 2) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for I2C", 0, 0,
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for I2C", 0, 2,
                                      port);
     return;
   }
 
-  std::scoped_lock lock(digitalI2COnBoardMutex);
-  i2COnboardObjCount++;
-  if (i2COnboardObjCount > 1) {
+  std::scoped_lock lock(i2cObjs[port].initMutex);
+  i2cObjs[port].objCount++;
+  if (i2cObjs[port].objCount > 1) {
     return;
   }
-  int handle = open("/dev/i2c-1", O_RDWR);
+  int handle = open(physicalPorts[port], O_RDWR);
   if (handle < 0) {
     int err = errno;
     *status = NO_AVAILABLE_RESOURCES;
@@ -56,18 +63,18 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
                                           std::strerror(err)));
     wpi::print("Failed to open onboard i2c bus: {}\n", std::strerror(err));
     handle = -1;
-    i2COnboardObjCount--;
+    i2cObjs[port].objCount--;
     return;
   }
-  i2COnBoardHandle = handle;
+  i2cObjs[port].fd = handle;
 }
 
 int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
                            const uint8_t* dataToSend, int32_t sendSize,
                            uint8_t* dataReceived, int32_t receiveSize) {
-  if (port != 0) {
+  if (port < 0 || port > 2) {
     int32_t status = 0;
-    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 0,
+    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 2,
                                      port);
     return -1;
   }
@@ -86,15 +93,15 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
   rdwr.msgs = msgs;
   rdwr.nmsgs = 2;
 
-  std::scoped_lock lock(digitalI2COnBoardMutex);
-  return ioctl(i2COnBoardHandle, I2C_RDWR, &rdwr);
+  std::scoped_lock lock(i2cObjs[port].initMutex);
+  return ioctl(i2cObjs[port].fd, I2C_RDWR, &rdwr);
 }
 
 int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
                      const uint8_t* dataToSend, int32_t sendSize) {
-  if (port != 0) {
+  if (port < 0 || port > 2) {
     int32_t status = 0;
-    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 0,
+    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 2,
                                      port);
     return -1;
   }
@@ -109,15 +116,15 @@ int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
   rdwr.msgs = &msg;
   rdwr.nmsgs = 1;
 
-  std::scoped_lock lock(digitalI2COnBoardMutex);
-  return ioctl(i2COnBoardHandle, I2C_RDWR, &rdwr);
+  std::scoped_lock lock(i2cObjs[port].initMutex);
+  return ioctl(i2cObjs[port].fd, I2C_RDWR, &rdwr);
 }
 
 int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
                     int32_t count) {
-  if (port != 0) {
+  if (port < 0 || port > 2) {
     int32_t status = 0;
-    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 0,
+    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 2,
                                      port);
     return -1;
   }
@@ -132,21 +139,22 @@ int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
   rdwr.msgs = &msg;
   rdwr.nmsgs = 1;
 
-  std::scoped_lock lock(digitalI2COnBoardMutex);
-  return ioctl(i2COnBoardHandle, I2C_RDWR, &rdwr);
+  std::scoped_lock lock(i2cObjs[port].initMutex);
+  return ioctl(i2cObjs[port].fd, I2C_RDWR, &rdwr);
 }
 
 void HAL_CloseI2C(HAL_I2CPort port) {
-  if (port != 0) {
+  if (port < 0 || port > 2) {
     int32_t status = 0;
-    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 0,
+    hal::SetLastErrorIndexOutOfRange(&status, "Invalid Index for I2C", 0, 2,
                                      port);
     return;
   }
 
-  std::scoped_lock lock(digitalI2COnBoardMutex);
-  if (i2COnboardObjCount-- == 0) {
-    close(i2COnBoardHandle);
+  std::scoped_lock lock(i2cObjs[port].initMutex);
+  if (i2cObjs[port].objCount-- == 0) {
+    close(i2cObjs[port].objCount);
+    i2cObjs[port].fd = -1;
   }
 }
 

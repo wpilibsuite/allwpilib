@@ -24,9 +24,9 @@ class I2C {
    */
   enum Port {
     /// Onboard I2C port.
-    kOnboard = 0,
+    kPort0 = 0,
     /// MXP (roboRIO MXP) I2C port.
-    kMXP
+    kPort1
   };
 
   /**

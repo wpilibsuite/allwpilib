@@ -21,9 +21,9 @@ public class I2C implements AutoCloseable {
   /** I2C connection ports. */
   public enum Port {
     /** Onboard I2C port. */
-    kOnboard(0),
+    kPort0(0),
     /** MXP (roboRIO MXP) I2C port. */
-    kMXP(1);
+    kPort1(1);
 
     /** Port value. */
     public final int value;
