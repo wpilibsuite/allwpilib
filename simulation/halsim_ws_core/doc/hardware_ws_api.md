@@ -266,8 +266,7 @@ PWMs may be used to control either motor controllers or servos.  Typically only 
 | ------------------- | ------- | ------------------------------------------ |
 | ``"<init"``         | Boolean | If PWM is initialized in the robot program |
 | ``"<raw"``          | Integer | The pulse time in microseconds             |
-| ``"<period_scale"`` | Integer | Scales the PWM signal by squelching setting a 2-bit mask of outputs to squelch (ex. `1` -> squelch every other value; `3` -> squelch 3 of 4 values) |
-| ``"<zero_latch"``   | Boolean | Whether the PWM should be latched to 0     |
+| ``"<output_period"``| Integer | Scales the PWM signal by squelching setting a 2-bit mask of outputs to squelch (ex. `1` -> squelch every other value; `3` -> squelch 3 of 4 values) |
 
 #### Solenoid Output ("Solenoid")
 
