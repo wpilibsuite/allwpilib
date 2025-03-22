@@ -140,7 +140,7 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
    * @return The x component of the pose's translation.
    */
   public double getX() {
-    return m_translation.getX();
+    return m_translation.x();
   }
 
   /**
@@ -149,7 +149,7 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
    * @return The y component of the pose's translation.
    */
   public double getY() {
-    return m_translation.getY();
+    return m_translation.y();
   }
 
   /**
@@ -219,8 +219,8 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
    */
   public Pose2d transformBy(Transform2d other) {
     return new Pose2d(
-        m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
-        other.getRotation().plus(m_rotation));
+        m_translation.plus(other.translation().rotateBy(m_rotation)),
+        other.rotation().plus(m_rotation));
   }
 
   /**
@@ -235,7 +235,7 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
    */
   public Pose2d relativeTo(Pose2d other) {
     var transform = new Transform2d(other, this);
-    return new Pose2d(transform.getTranslation(), transform.getRotation());
+    return new Pose2d(transform.translation(), transform.rotation());
   }
 
   /**
@@ -321,7 +321,7 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
             .rotateBy(new Rotation2d(halfThetaByTanOfHalfDtheta, -halfDtheta))
             .times(Math.hypot(halfThetaByTanOfHalfDtheta, halfDtheta));
 
-    return new Twist2d(translationPart.getX(), translationPart.getY(), dtheta);
+    return new Twist2d(translationPart.x(), translationPart.y(), dtheta);
   }
 
   /**
