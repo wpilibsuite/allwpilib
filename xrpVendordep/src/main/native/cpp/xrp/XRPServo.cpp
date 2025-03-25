@@ -15,10 +15,8 @@
 
 using namespace frc;
 
-std::map<int, std::string> XRPServo::s_simDeviceMap = {{4, "servo1"},
-                                                       {5, "servo2"},
-                                                       {6, "servo3"},
-                                                       {7, "servo4"}};
+std::map<int, std::string> XRPServo::s_simDeviceMap = {
+    {4, "servo1"}, {5, "servo2"}, {6, "servo3"}, {7, "servo4"}};
 
 std::set<int> XRPServo::s_registeredDevices = {};
 
