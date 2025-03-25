@@ -230,7 +230,7 @@ void SaveCalibratedField(const frc::AprilTagFieldLayout& field,
 void CalibrateCamera() {
   static std::unique_ptr<pfd::open_file> cameraVideoSelector;
   static std::string cameraVideoPath;
-  static bool mrcal = true;
+  static int calibrationMethod = 0;
 
   static double squareWidth = 0.709;
   static double markerWidth = 0.551;
@@ -254,22 +254,17 @@ void CalibrateCamera() {
       ImGui::EndPopup();
     }
 
-    if (ImGui::Button("MRcal")) {
-      mrcal = true;
-    }
+    ImGui::RadioButton("MRcal", &calibrationMethod, 0);
 
     ImGui::SameLine();
     ImGui::Text("or");
     ImGui::SameLine();
-
-    if (ImGui::Button("OpenCV")) {
-      mrcal = false;
-    }
+    ImGui::RadioButton("OpenCV", &calibrationMethod, 1);
 
     SelectFileButton("Select Camera Calibration Video", cameraVideoPath,
                      cameraVideoSelector, "Video Files",
                      "*.mp4 *.mov *.m4v *.mkv *.avi");
-
+    ImGui::Text("%s", cameraVideoPath.c_str());
 #ifndef __linux__
     ImGui::Checkbox("Show Debug Window", &showDebug);
 #endif
@@ -283,7 +278,7 @@ void CalibrateCamera() {
     ImGui::InputInt("Board Height (squares)", &boardHeight);
     std::optional<cameracalibration::CameraModel> model;
     bool calibrateButtonPressed = false;
-    if (mrcal) {
+    if (calibrationMethod == 0) {  // mrcal
       ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
       ImGui::InputDouble("Image Width (pixels)", &imageWidth);
       ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
@@ -297,7 +292,7 @@ void CalibrateCamera() {
             imageHeight, showDebug);
         calibrateButtonPressed = true;
       }
-    } else {
+    } else {  // opencv
       ImGui::Separator();
       if (ImGui::Button("Calibrate") && !cameraVideoPath.empty()) {
         std::cout << "calibration button pressed" << std::endl;
