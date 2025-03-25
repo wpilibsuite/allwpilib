@@ -246,4 +246,38 @@ class TrapezoidProfileTest {
       }
     }
   }
+
+  @Test
+  void asymmetricalProfileReachesTarget() {
+    TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(1.75, 0.75, 0.5);
+    TrapezoidProfile.State goal = new TrapezoidProfile.State(3, 0);
+    TrapezoidProfile.State state = new TrapezoidProfile.State();
+
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
+    for (int i = 0; i < 450; ++i) {
+      state = profile.calculate(kDt, state, goal);
+    }
+    assertEquals(state, goal);
+  }
+
+  @Test
+  void asymmetricalProfileDecelerationOnly() {
+    TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(1.0, 1.0, 0.5);
+    TrapezoidProfile.State goal = new TrapezoidProfile.State(1.0, 0);
+    TrapezoidProfile.State state = new TrapezoidProfile.State(0.0, 1.0);
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
+    profile.calculate(0.0, state, goal);
+    assertNear(2.0, profile.totalTime(), 1e-2);
+  }
+
+  @Test
+  void asymmetricalProfileTimeToTarget() {
+    TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(1.0, 1.0, 0.5);
+    TrapezoidProfile.State goal = new TrapezoidProfile.State(1.5, 0);
+    TrapezoidProfile.State state = new TrapezoidProfile.State();
+
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
+    profile.calculate(0.0, state, goal);
+    assertNear(3.0, profile.totalTime(), 1e-2);
+  }
 }
