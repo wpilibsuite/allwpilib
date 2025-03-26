@@ -82,6 +82,21 @@ class GenericHID {
   GenericHID& operator=(GenericHID&&) = default;
 
   /**
+   * Specifies whether warnings should be printed to the console when this
+   * joystick is disconnected and a button, axis, or POV is read. This is
+   * intended to be used for test controllers that do not need to be plugged in
+   * during a match.
+   *
+   * <p>Unlike DriverStation::SilenceJoystickConnectionWarning(), this only
+   * applies to this joystick, is NOT ignored when the FMS is connected, and
+   * does not affect warnings when reading a non-existent button, axis, or POV
+   * on a connected joystick.
+   *
+   * @param warn Whether warning messages should be printed.
+   */
+  void WarnWhenDisconnected(bool warn);
+
+  /**
    * Get the button value (starting at button 1).
    *
    * The buttons are returned in a single 16 bit value with one bit representing
@@ -372,6 +387,7 @@ class GenericHID {
   int m_outputs = 0;
   uint16_t m_leftRumble = 0;
   uint16_t m_rightRumble = 0;
+  bool m_warnWhenDisconnected = true;
 };
 
 }  // namespace frc
