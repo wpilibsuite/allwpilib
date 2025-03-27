@@ -93,19 +93,13 @@ void PWMMotorController::AddFollower(PWMMotorController& follower) {
   m_nonowningFollowers.emplace_back(&follower);
 }
 
-PWMMotorController::PWMMotorController(int channel) : m_pwm{channel} {}
-
-PWMMotorController::PWMMotorController(std::string_view name, int channel)
-    : m_pwm(channel) {
-
+PWMMotorController::PWMMotorController(int channel) : m_pwm{channel} {
   m_simDevice = hal::SimDevice{"PWMMotorController", channel};
   if (m_simDevice) {
     m_simSpeed = m_simDevice.CreateDouble("Speed", true, 0.0);
     m_pwm.SetSimDevice(m_simDevice);
   }
 }
-
-WPI_UNIGNORE_DEPRECATED
 
 void PWMMotorController::UpdateTelemetry(wpi::TelemetryTable& table) const {
   if (!table.SetType("Motor Controller")) {

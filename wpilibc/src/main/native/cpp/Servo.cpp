@@ -9,9 +9,7 @@
 
 using namespace frc;
 
-Servo::Servo(int channel) : m_pwm(channel, false) {
-  wpi::SendableRegistry::Add(this, "Servo", channel);
-
+Servo::Servo(int channel) : m_pwm(channel) {
   // Assign defaults for period multiplier for the servo PWM control signal
   m_pwm.SetOutputPeriod(PWM::kOutputPeriod_20Ms);
 
