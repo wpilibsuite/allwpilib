@@ -194,5 +194,5 @@ Each entry has an associated metadata string. If not blank, the metadata should 
 [[additional-resources]]
 == Additional Resources
 
-A https://kaitai.io/[Kaitai Struct] definition for the data log format is included in link:./datalog.ksy[datalog.ksy].
+A https://kaitai.io/[Kaitai Struct] definition for the data log format is included in link:./wpilog.ksy[wpilog.ksy].
 Kaitai Struct is a declarative language used to describe various binary data structures.
