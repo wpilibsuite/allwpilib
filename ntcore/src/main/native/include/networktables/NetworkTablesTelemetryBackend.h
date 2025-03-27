@@ -10,9 +10,9 @@
 #include <wpi/mutex.h>
 #include <wpi/telemetry/TelemetryBackend.h>
 
-namespace nt {
+#include "NetworkTableInstance.h"
 
-class NetworkTableInstance;
+namespace nt {
 
 /** A telemetry backend that sends logged data to a DataLog. */
 class NetworkTablesTelemetryBackend : public wpi::TelemetryBackend {
@@ -23,7 +23,7 @@ class NetworkTablesTelemetryBackend : public wpi::TelemetryBackend {
    * @param inst NetworkTables instance
    * @param prefix prefix to put in front of logged path in NT
    */
-  NetworkTablesTelemetryBackend(NetworkTableInstance& inst,
+  NetworkTablesTelemetryBackend(NetworkTableInstance inst,
                                 std::string_view prefix);
 
   ~NetworkTablesTelemetryBackend() override;
@@ -92,7 +92,7 @@ class NetworkTablesTelemetryBackend : public wpi::TelemetryBackend {
  private:
   class Entry;
 
-  NetworkTableInstance& m_inst;
+  NetworkTableInstance m_inst;
   std::string m_prefix;
   wpi::mutex m_mutex;
   wpi::StringMap<Entry> m_entries;

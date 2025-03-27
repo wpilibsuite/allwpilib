@@ -105,6 +105,11 @@ public final class TelemetryRegistry {
     synchronized (s_backends) {
       s_backends.put(prefix, backend);
     }
+
+    // reset cached entries in tables
+    for (var table : s_tables.values()) {
+      table.reset();
+    }
   }
 
   /**

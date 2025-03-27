@@ -21,7 +21,7 @@ using namespace nt;
 
 class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
  public:
-  Entry(NetworkTablesTelemetryBackend& backend, NetworkTableInstance& inst,
+  Entry(NetworkTablesTelemetryBackend& backend, NetworkTableInstance inst,
         std::string_view prefix, std::string_view path)
       : m_backend{backend},
         m_inst{inst},
@@ -205,7 +205,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
   }
 
   NetworkTablesTelemetryBackend& m_backend;
-  NetworkTableInstance& m_inst;
+  NetworkTableInstance m_inst;
   std::string m_path;
   wpi::mutex m_mutex;
   GenericPublisher m_pub;
@@ -215,7 +215,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
 };
 
 NetworkTablesTelemetryBackend::NetworkTablesTelemetryBackend(
-    NetworkTableInstance& inst, std::string_view prefix)
+    NetworkTableInstance inst, std::string_view prefix)
     : m_inst{inst}, m_prefix{prefix} {}
 
 NetworkTablesTelemetryBackend::~NetworkTablesTelemetryBackend() = default;

@@ -72,7 +72,12 @@ void TelemetryRegistry::RegisterBackend(
     std::string_view prefix, std::shared_ptr<TelemetryBackend> backend) {
   Instance& inst = GetInstance();
   std::scoped_lock lock{inst.mutex};
-  inst.backends.emplace(prefix, std::move(backend));
+  inst.backends[prefix] = std::move(backend);
+
+  // reset cached entries in tables
+  for (auto& table : inst.tables) {
+    table.second.Reset();
+  }
 }
 
 std::shared_ptr<TelemetryBackend> TelemetryRegistry::GetBackend(
