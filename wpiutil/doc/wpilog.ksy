@@ -3,6 +3,7 @@ meta:
   title: WPILib Data Log
   file-extension: wpilog
   ks-version: "0.10"
+  encoding: UTF-8
   endian: le
   bit-endian: le
 seq:
@@ -29,7 +30,6 @@ types:
       - id: extra_header
         size: extra_header_length
         type: str
-        encoding: UTF-8
   record:
     seq:
       - id: header_length
@@ -100,19 +100,16 @@ types:
       - id: entry_name
         size: len_entry_name
         type: str
-        encoding: UTF-8
       - id: len_entry_type
         type: u4
       - id: entry_type
         size: len_entry_type
         type: str
-        encoding: UTF-8
       - id: len_entry_metadata
         type: u4
       - id: entry_metadata
         size: len_entry_metadata
         type: str
-        encoding: UTF-8
   control_record_finish_data:
     seq:
       - id: entry_id
@@ -126,7 +123,6 @@ types:
       - id: entry_metadata
         size: len_entry_metadata
         type: str
-        encoding: UTF-8
 enums:
   control_record_type:
     0: start
