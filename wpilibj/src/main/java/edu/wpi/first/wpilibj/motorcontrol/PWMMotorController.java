@@ -41,7 +41,6 @@ public abstract class PWMMotorController extends MotorSafety
    */
   protected PWMMotorController(final int channel) {
     m_pwm = new PWM(channel);
-    SendableRegistry.add(this, name, channel);
 
     m_simDevice = SimDevice.create("PWMMotorController", channel);
     if (m_simDevice != null) {
