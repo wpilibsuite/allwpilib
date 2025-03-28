@@ -109,6 +109,7 @@ public class ADXL345_I2C implements TelemetryLoggable, AutoCloseable {
         return true;
       }
     }
+    public static final AllAxesStruct struct = new AllAxesStruct();
   }
 
   private I2C m_i2c;
