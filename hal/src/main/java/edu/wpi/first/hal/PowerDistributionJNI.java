@@ -222,8 +222,6 @@ public class PowerDistributionJNI extends JNIWrapper {
   /**
    * Gets the current of all channels on the PowerDistribution.
    *
-   * <p>The array must be large enough to hold all channels.
-   *
    * @param handle the module handle
    * @return the currents
    * @see "HAL_GetPowerDistributionAllChannelCurrents"
