@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
+/** A telemetry backend that sends logged data to NetworkTables. */
 public class NetworkTablesTelemetryBackend implements TelemetryBackend {
   private final NetworkTableInstance m_inst;
   private final String m_prefix;

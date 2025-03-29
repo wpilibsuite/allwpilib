@@ -252,6 +252,7 @@ public final class Telemetry {
    *
    * @param name the name
    * @param value the value
+   * @param typeString the type string
    */
   public static void log(String name, byte[] value, String typeString) {
     m_root.log(name, value, typeString);

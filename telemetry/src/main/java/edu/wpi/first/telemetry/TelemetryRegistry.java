@@ -14,6 +14,14 @@ import java.util.function.BiConsumer;
 
 /** Global registry for telemetry handlers (type handlers and telemetry backends). */
 public final class TelemetryRegistry {
+  /**
+   * Handler for logging objects of specific type. Typically only one handler is specified, the
+   * other is null.
+   *
+   * @param cls class this handler applies to
+   * @param entryHandler entry handler for logging
+   * @param tableHandler table handler for logging
+   */
   public record TypeHandler(
       Class<?> cls,
       BiConsumer<Object, TelemetryEntry> entryHandler,

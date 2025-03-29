@@ -120,6 +120,7 @@ public final class TelemetryTable {
   /**
    * Logs a generic object.
    *
+   * @param <T> data type
    * @param name the name
    * @param value the value
    */
@@ -192,6 +193,7 @@ public final class TelemetryTable {
   /**
    * Logs an object with a Struct serializer.
    *
+   * @param <T> data type
    * @param name the name
    * @param value the value
    * @param struct struct serializer
@@ -203,6 +205,7 @@ public final class TelemetryTable {
   /**
    * Logs an object with a Protobuf serializer.
    *
+   * @param <T> data type
    * @param name the name
    * @param value the value
    * @param proto protobuf serializer
@@ -214,6 +217,7 @@ public final class TelemetryTable {
   /**
    * Logs a generic array.
    *
+   * @param <T> data type
    * @param name the name
    * @param value the value
    */
@@ -262,6 +266,7 @@ public final class TelemetryTable {
   /**
    * Logs an array of objects with a Struct serializer.
    *
+   * @param <T> data type
    * @param name the name
    * @param value the value
    * @param struct struct serializer

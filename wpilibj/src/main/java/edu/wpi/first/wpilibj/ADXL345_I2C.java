@@ -66,8 +66,15 @@ public class ADXL345_I2C implements TelemetryLoggable, AutoCloseable {
     }
   }
 
-  /** Container type for accelerations from all axes. */
+  /**
+   * Container type for accelerations from all axes.
+   *
+   * @param x x-axis value
+   * @param y y-axis value
+   * @param z z-axis value
+   */
   public record AllAxes(double x, double y, double z) implements StructSerializable {
+    /** Struct implementation for AllAxes. */
     public static class AllAxesStruct implements Struct<AllAxes> {
       @Override
       public Class<AllAxes> getTypeClass() {

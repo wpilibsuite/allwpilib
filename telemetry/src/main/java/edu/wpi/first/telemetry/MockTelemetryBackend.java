@@ -18,35 +18,77 @@ import java.util.function.BiConsumer;
  * purposes.
  */
 public class MockTelemetryBackend implements TelemetryBackend {
-  /** Value for keepDuplicate() action. */
+  /**
+   * Value for keepDuplicate() action.
+   *
+   * @param value value passed to keepDuplicate()
+   */
   public record KeepDuplicateValue(boolean value) {
   }
 
-  /** Value for setProperty() action. */
+  /**
+   * Value for setProperty() action.
+   *
+   * @param key key passed to setProperty()
+   * @param value value passed to setProperty()
+   */
   public record SetPropertyValue(String key, String value) {
   }
 
-  /** Value for logStruct() action. */
+  /**
+   * Value for logStruct() action.
+   *
+   * @param <T> data type
+   * @param value value passed to logStruct()
+   * @param struct struct passed to logStruct()
+   */
   public record LogStructValue<T>(T value, Struct<T> struct) {
   }
 
-  /** Value for logProtobuf() action. */
+  /**
+   * Value for logProtobuf() action.
+   *
+   * @param <T> data type
+   * @param value value passed to logProtobuf()
+   * @param protobuf protobuf passed to logProtobuf()
+   */
   public record LogProtobufValue<T>(T value, Protobuf<T, ?> protobuf) {
   }
 
-  /** Value for logStructArray() action. */
+  /**
+   * Value for logStructArray() action.
+   *
+   * @param <T> data type
+   * @param value value passed to logStructArray()
+   * @param struct struct passed to logStructArray()
+   */
   public record LogStructArrayValue<T>(T[] value, Struct<T> struct) {
   }
 
-  /** Value for logString() action. */
+  /**
+   * Value for logString() action.
+   *
+   * @param value value passed to logString()
+   * @param typeString type string passed to logString()
+   */
   public record LogStringValue(String value, String typeString) {
   }
 
-  /** Value for logRaw() action. */
+  /**
+   * Value for logRaw() action.
+   *
+   * @param value value passed to logRaw()
+   * @param typeString type string passed to logRaw()
+   */
   public record LogRawValue(byte[] value, String typeString) {
   }
 
-  /** A logged action. */
+  /**
+   * A logged action.
+   *
+   * @param path logged path
+   * @param value logged value
+   */
   public record Action(String path, Object value) {
   }
 

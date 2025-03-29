@@ -14,7 +14,7 @@
 
 namespace nt {
 
-/** A telemetry backend that sends logged data to a DataLog. */
+/** A telemetry backend that sends logged data to NetworkTables. */
 class NetworkTablesTelemetryBackend : public wpi::TelemetryBackend {
  public:
   /**

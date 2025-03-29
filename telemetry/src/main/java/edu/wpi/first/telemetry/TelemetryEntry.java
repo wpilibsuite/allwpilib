@@ -26,6 +26,7 @@ public interface TelemetryEntry {
   /**
    * Logs an object with struct serialization.
    *
+   * @param <T> data type
    * @param value the value
    * @param struct struct serializer
    */
@@ -34,6 +35,7 @@ public interface TelemetryEntry {
   /**
    * Logs an object with protobuf serialization.
    *
+   * @param <T> data type
    * @param value the value
    * @param proto protobuf serializer
    */
@@ -42,6 +44,7 @@ public interface TelemetryEntry {
   /**
    * Logs an array of objects with struct serialization.
    *
+   * @param <T> data type
    * @param value the value
    * @param struct struct serializer
    */
