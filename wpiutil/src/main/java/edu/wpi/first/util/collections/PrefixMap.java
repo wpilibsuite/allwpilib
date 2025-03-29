@@ -37,6 +37,8 @@ import java.util.stream.IntStream;
  * <p>An example use case is where mobile phone device models of a certain brand all start with the
  * same substring. This data structure can be used to efficiently retrieve the best fitting prefix
  * to find the associated value (i.e. the brand of the device).
+ *
+ * @param <V> value type
  */
 public interface PrefixMap<V> extends Map<String, V> {
   /**
