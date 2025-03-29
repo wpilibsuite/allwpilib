@@ -11,6 +11,9 @@ import edu.wpi.first.util.struct.Struct;
 public class DiscardTelemetryBackend implements TelemetryBackend {
   private static final Entry s_entry = new Entry();
 
+  /** Constructor. */
+  public DiscardTelemetryBackend() {}
+
   @Override
   public void close() {}
 

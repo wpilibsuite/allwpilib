@@ -76,6 +76,9 @@ public class ADXL345_I2C implements TelemetryLoggable, AutoCloseable {
   public record AllAxes(double x, double y, double z) implements StructSerializable {
     /** Struct implementation for AllAxes. */
     public static class AllAxesStruct implements Struct<AllAxes> {
+      /** Constructor. */
+      public AllAxesStruct() {}
+
       @Override
       public Class<AllAxes> getTypeClass() {
         return AllAxes.class;

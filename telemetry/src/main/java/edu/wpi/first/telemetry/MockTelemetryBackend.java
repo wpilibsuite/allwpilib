@@ -14,6 +14,9 @@ import java.util.Map;
 
 /** A telemetry backend that saves logged data to an array for unit testing purposes. */
 public class MockTelemetryBackend implements TelemetryBackend {
+  /** Constructor. */
+  public MockTelemetryBackend() {}
+
   /**
    * Value for keepDuplicate() action.
    *
@@ -121,7 +124,9 @@ public class MockTelemetryBackend implements TelemetryBackend {
   /**
    * Get the last action value for a particular path.
    *
+   * @param <T> data type
    * @param path path
+   * @param cls class for desired data type
    * @return Value, or null if no update to that path
    */
   public <T> T getLastValue(String path, Class<T> cls) {
