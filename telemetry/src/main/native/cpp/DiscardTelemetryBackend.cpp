@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/telemetry/NoopTelemetryBackend.h"
+#include "wpi/telemetry/DiscardTelemetryBackend.h"
 
 #include <string>
 
@@ -51,22 +51,22 @@ class Entry : public TelemetryEntry {
 };
 }  // namespace
 
-TelemetryEntry& NoopTelemetryBackend::GetEntry(std::string_view path) {
+TelemetryEntry& DiscardTelemetryBackend::GetEntry(std::string_view path) {
   static Entry entry;
   return entry;
 }
 
-void NoopTelemetryBackend::SetReportWarning(
+void DiscardTelemetryBackend::SetReportWarning(
     std::function<void(std::string_view msg)> func) {}
 
-bool NoopTelemetryBackend::HasSchema(std::string_view schemaName) const {
+bool DiscardTelemetryBackend::HasSchema(std::string_view schemaName) const {
   return true;
 }
 
-void NoopTelemetryBackend::AddSchema(std::string_view schemaName,
+void DiscardTelemetryBackend::AddSchema(std::string_view schemaName,
                                      std::string_view type,
                                      std::span<const uint8_t> schema) {}
 
-void NoopTelemetryBackend::AddSchema(std::string_view schemaName,
+void DiscardTelemetryBackend::AddSchema(std::string_view schemaName,
                                      std::string_view type,
                                      std::string_view schema) {}

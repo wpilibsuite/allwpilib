@@ -9,7 +9,7 @@ import edu.wpi.first.util.struct.Struct;
 import java.util.function.BiConsumer;
 
 /** A telemetry backend that discards all logged data. */
-public class NoopTelemetryBackend implements TelemetryBackend {
+public class DiscardTelemetryBackend implements TelemetryBackend {
   private static final Entry s_entry = new Entry();
 
   @Override

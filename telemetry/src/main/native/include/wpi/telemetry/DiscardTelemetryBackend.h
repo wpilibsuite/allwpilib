@@ -9,7 +9,7 @@
 namespace wpi {
 
 /** A telemetry backend that discards all logged data. */
-class NoopTelemetryBackend : public TelemetryBackend {
+class DiscardTelemetryBackend : public TelemetryBackend {
  public:
   /**
    * Create an entry for the given path.
