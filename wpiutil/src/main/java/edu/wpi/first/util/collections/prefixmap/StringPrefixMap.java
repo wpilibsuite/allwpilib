@@ -35,6 +35,7 @@ public class StringPrefixMap<V> implements PrefixMap<V> {
   private final PrefixTrie<V> m_prefixTrie;
   private final TreeMap<String, V> m_allPrefixes;
 
+  /** Constructor. */
   @SuppressWarnings("this-escape")
   public StringPrefixMap() {
     m_prefixTrie = new StringPrefixTrie<>();
