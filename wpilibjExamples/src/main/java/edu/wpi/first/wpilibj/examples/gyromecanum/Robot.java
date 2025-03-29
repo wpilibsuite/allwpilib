@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.gyromecanum;
 
-import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -46,11 +45,6 @@ public class Robot extends TimedRobot {
     m_robotDrive = new MecanumDrive(frontLeft::set, rearLeft::set, frontRight::set, rearRight::set);
 
     m_gyro.setSensitivity(kVoltsPerDegreePerSecond);
-
-    SendableRegistry.addChild(m_robotDrive, frontLeft);
-    SendableRegistry.addChild(m_robotDrive, rearLeft);
-    SendableRegistry.addChild(m_robotDrive, frontRight);
-    SendableRegistry.addChild(m_robotDrive, rearRight);
   }
 
   /** Mecanum drive is used with the gyro angle as an input. */

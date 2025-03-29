@@ -35,7 +35,7 @@ public class PWMVenom extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public PWMVenom(final int channel) {
-    super("PWMVenom", channel);
+    super(channel);
 
     setBoundsMicroseconds(2004, 1520, 1500, 1480, 997);
     m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);

@@ -27,6 +27,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayEntry;
 import edu.wpi.first.networktables.DoubleArrayTopic;
+import edu.wpi.first.telemetry.Telemetry;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -35,7 +36,6 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Represents a differential drive style drivetrain. */
 public class Drivetrain {
@@ -126,9 +126,6 @@ public class Drivetrain {
 
     m_objectInField =
         AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo).getTagPose(0).get();
-
-    SmartDashboard.putData("Field", m_fieldSim);
-    SmartDashboard.putData("FieldEstimation", m_fieldApproximation);
   }
 
   /**
@@ -262,5 +259,8 @@ public class Drivetrain {
     updateOdometry();
     m_fieldSim.setRobotPose(m_drivetrainSimulator.getPose());
     m_fieldApproximation.setRobotPose(m_poseEstimator.getEstimatedPosition());
+
+    Telemetry.log("Field", m_fieldSim);
+    Telemetry.log("FieldEstimation", m_fieldApproximation);
   }
 }

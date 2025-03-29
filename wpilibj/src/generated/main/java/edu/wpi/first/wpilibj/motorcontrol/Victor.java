@@ -35,7 +35,7 @@ public class Victor extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public Victor(final int channel) {
-    super("Victor", channel);
+    super(channel);
 
     setBoundsMicroseconds(2027, 1525, 1507, 1490, 1026);
     m_pwm.setOutputPeriod(PWM.OutputPeriod.k10Ms);

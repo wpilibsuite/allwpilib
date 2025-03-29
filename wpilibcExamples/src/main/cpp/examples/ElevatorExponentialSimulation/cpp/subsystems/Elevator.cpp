@@ -6,15 +6,10 @@
 
 #include <frc/RobotController.h>
 #include <frc/StateSpaceUtil.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include <wpi/telemetry/Telemetry.h>
 
 Elevator::Elevator() {
   m_encoder.SetDistancePerPulse(Constants::kArmEncoderDistPerPulse);
-
-  // Put Mechanism 2d to SmartDashboard
-  // To view the Elevator visualization, select Network Tables -> SmartDashboard
-  // -> Elevator Sim
-  frc::SmartDashboard::PutData("Elevator Sim", &m_mech2d);
 }
 
 void Elevator::SimulationPeriodic() {
@@ -37,6 +32,11 @@ void Elevator::SimulationPeriodic() {
 void Elevator::UpdateTelemetry() {
   // Update the Elevator length based on the simulated elevator height
   m_elevatorMech2d->SetLength(m_encoder.GetDistance());
+
+  // Put Mechanism 2d to telemetry
+  // To view the Elevator visualization, select Network Tables -> Telemetry
+  // -> Elevator Sim
+  wpi::Telemetry::Log("Elevator Sim", m_mech2d);
 }
 
 void Elevator::ReachGoal(units::meter_t goal) {

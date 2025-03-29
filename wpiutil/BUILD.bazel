@@ -67,6 +67,16 @@ filegroup(
 )
 
 cc_library(
+    name = "htrie-headers",
+    hdrs = glob([
+        "src/main/native/thirdparty/htrie/include/**/*.h",
+    ]),
+    includes = ["src/main/native/thirdparty/htrie/include"],
+    strip_include_prefix = "src/main/native/thirdparty/htrie/include",
+    visibility = ["//wpiutil:__subpackages__"],
+)
+
+cc_library(
     name = "json-headers",
     hdrs = glob([
         "src/main/native/thirdparty/json/include/**/*.h",
@@ -212,6 +222,7 @@ cc_library(
         ":debugging-headers",
         ":expected-headers",
         ":fmtlib-headers",
+        ":htrie-headers",
         ":json-headers",
         ":llvm-headers",
         ":memory-headers",
