@@ -30,6 +30,8 @@ public final class TelemetryRegistry {
   private static final List<TypeHandler> s_typeHandlers = new ArrayList<>();
   private static final PrefixMap<TelemetryBackend> s_backends = new StringPrefixMap<>();
   private static final ConcurrentMap<String, TelemetryTable> s_tables = new ConcurrentHashMap<>();
+  private static BiConsumer<String, String> s_reportWarning =
+      TelemetryRegistry::defaultReportWarning;
 
   private TelemetryRegistry() {
     throw new UnsupportedOperationException("This is a utility class!");
@@ -59,6 +61,55 @@ public final class TelemetryRegistry {
       } else {
         s_typeHandlers.add(i, typeHandler);
       }
+    }
+  }
+
+  private static void defaultReportWarning(String path, String msg) {
+    // TODO: do something smarter here
+    System.err.println(
+        "Telemetry '"
+            + path
+            + "': warning: "
+            + msg
+            + "\n"
+            + Thread.currentThread().getStackTrace());
+  }
+
+  /**
+   * Set function used for reporting warning messages (e.g. type mismatches).
+   *
+   * @param func reporting function; parameters are path and message; pass null to use default
+   */
+  public static void setReportWarning(BiConsumer<String, String> func) {
+    synchronized (TelemetryRegistry.class) {
+      if (func == null) {
+        s_reportWarning = TelemetryRegistry::defaultReportWarning;
+      } else {
+        s_reportWarning = func;
+      }
+    }
+  }
+
+  /**
+   * Get function used for reporting warning messages.
+   *
+   * @return reporting function
+   */
+  public static BiConsumer<String, String> getReportWarning() {
+    synchronized (TelemetryRegistry.class) {
+      return s_reportWarning;
+    }
+  }
+
+  /**
+   * Report a warning message (e.g. type mismatch).
+   *
+   * @param path entry path
+   * @param msg warning message
+   */
+  public static void reportWarning(String path, String msg) {
+    synchronized (TelemetryRegistry.class) {
+      s_reportWarning.accept(path, msg);
     }
   }
 

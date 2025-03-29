@@ -13,6 +13,7 @@
 #include <wpi/json.h>
 #include <wpi/mutex.h>
 #include <wpi/telemetry/TelemetryEntry.h>
+#include <wpi/telemetry/TelemetryRegistry.h>
 
 #include "networktables/GenericEntry.h"
 #include "networktables/NetworkTableInstance.h"
@@ -21,11 +22,9 @@ using namespace nt;
 
 class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
  public:
-  Entry(NetworkTablesTelemetryBackend& backend, NetworkTableInstance inst,
-        std::string_view prefix, std::string_view path)
-      : m_backend{backend},
-        m_inst{inst},
-        m_path{fmt::format("{}{}", prefix, path)} {}
+  Entry(NetworkTableInstance inst, std::string_view prefix,
+        std::string_view path)
+      : m_inst{inst}, m_path{fmt::format("{}{}", prefix, path)} {}
 
   void KeepDuplicates() override {
     m_keepDuplicates = true;
@@ -56,7 +55,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "boolean", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetBoolean(value)) {
-      ReportWarning(fmt::format("'{}' type mismatch", m_path));
+      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -67,7 +66,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "int", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetInteger(value)) {
-      ReportWarning(fmt::format("'{}' type mismatch", m_path));
+      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -78,7 +77,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "float", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetFloat(value)) {
-      ReportWarning(fmt::format("'{}' type mismatch", m_path));
+      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -89,7 +88,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "double", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetDouble(value)) {
-      ReportWarning(fmt::format("'{}' type mismatch", m_path));
+      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -101,7 +100,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           typeString, m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (m_typeString != typeString || !m_pub.SetString(value)) {
-      ReportWarning(fmt::format("'{}' type mismatch", m_path));
+      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -112,7 +111,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "boolean[]", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetBooleanArray(value)) {
-      ReportWarning(fmt::format("'{}' type mismatch", m_path));
+      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -123,7 +122,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "boolean[]", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetBooleanArray(value)) {
-      ReportWarning(fmt::format("'{}' type mismatch", m_path));
+      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -142,7 +141,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "int[]", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetIntegerArray(value)) {
-      ReportWarning(fmt::format("'{}' type mismatch", m_path));
+      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -153,7 +152,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "float[]", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetFloatArray(value)) {
-      ReportWarning(fmt::format("'{}' type mismatch", m_path));
+      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -164,7 +163,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "double[]", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetDoubleArray(value)) {
-      ReportWarning(fmt::format("'{}' type mismatch", m_path));
+      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -175,7 +174,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           "string[]", m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (!m_pub.SetStringArray(value)) {
-      ReportWarning(fmt::format("'{}' type mismatch", m_path));
+      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -192,19 +191,11 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
           typeString, m_properties, {.keepDuplicates = m_keepDuplicates});
     }
     if (m_typeString != typeString || !m_pub.SetRaw(value)) {
-      ReportWarning(fmt::format("'{}' type mismatch", m_path));
+      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
  private:
-  void ReportWarning(std::string_view msg) {
-    std::scoped_lock lock{m_backend.m_mutex};
-    if (m_backend.m_reportWarning) {
-      m_backend.m_reportWarning(msg);
-    }
-  }
-
-  NetworkTablesTelemetryBackend& m_backend;
   NetworkTableInstance m_inst;
   std::string m_path;
   wpi::mutex m_mutex;
@@ -223,14 +214,7 @@ NetworkTablesTelemetryBackend::~NetworkTablesTelemetryBackend() = default;
 wpi::TelemetryEntry& NetworkTablesTelemetryBackend::GetEntry(
     std::string_view path) {
   std::scoped_lock lock{m_mutex};
-  return m_entries.try_emplace(path, *this, m_inst, m_prefix, path)
-      .first->second;
-}
-
-void NetworkTablesTelemetryBackend::SetReportWarning(
-    std::function<void(std::string_view msg)> func) {
-  std::scoped_lock lock{m_mutex};
-  m_reportWarning = std::move(func);
+  return m_entries.try_emplace(path, m_inst, m_prefix, path).first->second;
 }
 
 bool NetworkTablesTelemetryBackend::HasSchema(

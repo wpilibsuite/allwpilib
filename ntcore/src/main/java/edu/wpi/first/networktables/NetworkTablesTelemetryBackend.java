@@ -6,20 +6,19 @@ package edu.wpi.first.networktables;
 
 import edu.wpi.first.telemetry.TelemetryBackend;
 import edu.wpi.first.telemetry.TelemetryEntry;
+import edu.wpi.first.telemetry.TelemetryRegistry;
 import edu.wpi.first.util.protobuf.Protobuf;
 import edu.wpi.first.util.struct.Struct;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
 
 /** A telemetry backend that sends logged data to NetworkTables. */
 public class NetworkTablesTelemetryBackend implements TelemetryBackend {
   private final NetworkTableInstance m_inst;
   private final String m_prefix;
   private final Map<String, Entry> m_entries = new HashMap<>();
-  private BiConsumer<String, StackTraceElement[]> m_reportWarning;
 
   /**
    * Construct.
@@ -49,22 +48,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     }
   }
 
-  @Override
-  public void setReportWarning(BiConsumer<String, StackTraceElement[]> func) {
-    synchronized (this) {
-      m_reportWarning = func;
-    }
-  }
-
-  private void reportWarning(String msg, StackTraceElement[] stackTrace) {
-    synchronized (this) {
-      if (m_reportWarning != null) {
-        m_reportWarning.accept(msg, stackTrace);
-      }
-    }
-  }
-
-  private final class Entry implements TelemetryEntry {
+  private static final class Entry implements TelemetryEntry {
     private final NetworkTableInstance m_inst;
     private final String m_path;
     private final AtomicReference<Publisher> m_pub = new AtomicReference<>();
@@ -144,7 +128,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub != null) {
         pub.set(value);
       } else {
-        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
+        TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -173,7 +157,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub != null) {
         pub.set(value);
       } else {
-        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
+        TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -202,7 +186,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub != null) {
         pub.set(value);
       } else {
-        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
+        TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -229,7 +213,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof BooleanPublisher e) {
         e.set(value);
       } else {
-        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
+        TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -256,7 +240,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof IntegerPublisher e) {
         e.set(value);
       } else {
-        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
+        TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -283,7 +267,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof FloatPublisher e) {
         e.set(value);
       } else {
-        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
+        TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -310,7 +294,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof DoublePublisher e) {
         e.set(value);
       } else {
-        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
+        TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -343,7 +327,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof StringPublisher e && curTypeString.equals(typeString)) {
         e.set(value);
       } else {
-        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
+        TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -370,7 +354,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof BooleanArrayPublisher e) {
         e.set(value);
       } else {
-        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
+        TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -407,7 +391,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof IntegerArrayPublisher e) {
         e.set(value);
       } else {
-        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
+        TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -434,7 +418,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof FloatArrayPublisher e) {
         e.set(value);
       } else {
-        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
+        TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -461,7 +445,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof DoubleArrayPublisher e) {
         e.set(value);
       } else {
-        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
+        TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -488,7 +472,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof StringArrayPublisher e) {
         e.set(value);
       } else {
-        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
+        TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
@@ -521,7 +505,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       if (pub instanceof RawPublisher e && curTypeString.equals(typeString)) {
         e.set(value);
       } else {
-        reportWarning("type mismatch", Thread.currentThread().getStackTrace());
+        TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
   }

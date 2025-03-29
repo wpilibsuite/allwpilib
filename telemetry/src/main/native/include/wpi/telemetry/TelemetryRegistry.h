@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <functional>
 #include <memory>
 #include <span>
 #include <string_view>
@@ -26,6 +27,30 @@ class TelemetryTable;
 class TelemetryRegistry final {
  public:
   TelemetryRegistry() = delete;
+
+  /**
+   * Set function used for reporting warning messages (e.g. type mismatches).
+   *
+   * @param func reporting function; pass nullptr to use default
+   */
+  static void SetReportWarning(
+      std::function<void(std::string_view path, std::string_view msg)> func);
+
+  /**
+   * Get function used for reporting warning messages.
+   *
+   * @return reporting function
+   */
+  static std::function<void(std::string_view path, std::string_view msg)>
+  GetReportWarning();
+
+  /**
+   * Report a warning message (e.g. type mismatch).
+   *
+   * @param path entry path
+   * @param msg warning message
+   */
+  static void ReportWarning(std::string_view path, std::string_view msg);
 
   /**
    * Registers a backend for creating telemetry entries. When calling

@@ -172,9 +172,6 @@ TelemetryEntry& MockTelemetryBackend::GetEntry(std::string_view path) {
   return m_entries.try_emplace(path, path, *this).first->second;
 }
 
-void MockTelemetryBackend::SetReportWarning(
-    std::function<void(std::string_view msg)> func) {}
-
 bool MockTelemetryBackend::HasSchema(std::string_view schemaName) const {
   std::scoped_lock lock{m_mutex};
   return m_schemas.contains(schemaName);

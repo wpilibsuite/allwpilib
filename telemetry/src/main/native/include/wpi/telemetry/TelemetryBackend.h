@@ -6,7 +6,6 @@
 
 #include <stdint.h>
 
-#include <functional>
 #include <span>
 #include <string_view>
 
@@ -29,14 +28,6 @@ class TelemetryBackend {
    * @return telemetry entry
    */
   virtual TelemetryEntry& GetEntry(std::string_view path) = 0;
-
-  /**
-   * Set function used for reporting warning messages (e.g. type mismatches).
-   *
-   * @param func reporting function
-   */
-  virtual void SetReportWarning(
-      std::function<void(std::string_view msg)> func) = 0;
 
   /**
    * Returns whether there is a data schema already registered with the given

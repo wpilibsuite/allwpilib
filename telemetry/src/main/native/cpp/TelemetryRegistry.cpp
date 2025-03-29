@@ -21,11 +21,16 @@
 
 using namespace wpi;
 
+static void DefaultReportWarning(std::string_view path, std::string_view msg);
+
 namespace {
 struct Instance {
   wpi::mutex mutex;
   wpi::htrie_map<char, std::shared_ptr<TelemetryBackend>> backends;
   wpi::StringMap<TelemetryTable> tables;
+  wpi::mutex warningMutex;
+  std::function<void(std::string_view, std::string_view)> reportWarning{
+      DefaultReportWarning};
 };
 }  // namespace
 
@@ -66,6 +71,36 @@ static std::string_view NormalizeTableName(std::string_view path,
     buf.push_back('/');
   }
   return buf;
+}
+
+static void DefaultReportWarning(std::string_view path, std::string_view msg) {
+  // TODO: do something smarter here
+  fmt::print(stderr, "Telemetry '{}': warning: {}\n", path, msg);
+}
+
+void TelemetryRegistry::SetReportWarning(
+    std::function<void(std::string_view path, std::string_view msg)> func) {
+  Instance& inst = GetInstance();
+  std::scoped_lock lock{inst.warningMutex};
+  if (func) {
+    inst.reportWarning = std::move(func);
+  } else {
+    inst.reportWarning = DefaultReportWarning;
+  }
+}
+
+std::function<void(std::string_view path, std::string_view msg)>
+TelemetryRegistry::GetReportWarning() {
+  Instance& inst = GetInstance();
+  std::scoped_lock lock{inst.warningMutex};
+  return inst.reportWarning;
+}
+
+void TelemetryRegistry::ReportWarning(std::string_view path,
+                                      std::string_view msg) {
+  Instance& inst = GetInstance();
+  std::scoped_lock lock{inst.warningMutex};
+  inst.reportWarning(path, msg);
 }
 
 void TelemetryRegistry::RegisterBackend(

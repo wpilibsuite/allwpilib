@@ -56,9 +56,6 @@ TelemetryEntry& DiscardTelemetryBackend::GetEntry(std::string_view path) {
   return entry;
 }
 
-void DiscardTelemetryBackend::SetReportWarning(
-    std::function<void(std::string_view msg)> func) {}
-
 bool DiscardTelemetryBackend::HasSchema(std::string_view schemaName) const {
   return true;
 }

@@ -14,6 +14,7 @@
 #include <wpi/json.h>
 #include <wpi/mutex.h>
 #include <wpi/telemetry/TelemetryEntry.h>
+#include <wpi/telemetry/TelemetryRegistry.h>
 
 #include "wpi/datalog/DataLog.h"
 
@@ -21,11 +22,8 @@ using namespace wpi::log;
 
 class DataLogTelemetryBackend::Entry : public wpi::TelemetryEntry {
  public:
-  Entry(DataLogTelemetryBackend& backend, DataLog& log, std::string_view prefix,
-        std::string_view path)
-      : m_backend{backend},
-        m_log{log},
-        m_path{fmt::format("{}{}", prefix, path)} {}
+  Entry(DataLog& log, std::string_view prefix, std::string_view path)
+      : m_log{log}, m_path{fmt::format("{}{}", prefix, path)} {}
 
   void KeepDuplicates() override { m_keepDuplicates = true; }
 
@@ -62,7 +60,7 @@ class DataLogTelemetryBackend::Entry : public wpi::TelemetryEntry {
         entry->Update(value);
       }
     } else {
-      ReportWarning(fmt::format("'{}' type mismatch", m_path));
+      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -83,7 +81,7 @@ class DataLogTelemetryBackend::Entry : public wpi::TelemetryEntry {
         entry->Update(value);
       }
     } else {
-      ReportWarning(fmt::format("'{}' type mismatch", m_path));
+      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -141,14 +139,6 @@ class DataLogTelemetryBackend::Entry : public wpi::TelemetryEntry {
   }
 
  private:
-  void ReportWarning(std::string_view msg) {
-    std::scoped_lock lock{m_backend.m_mutex};
-    if (m_backend.m_reportWarning) {
-      m_backend.m_reportWarning(msg);
-    }
-  }
-
-  DataLogTelemetryBackend& m_backend;
   DataLog& m_log;
   std::string m_path;
   wpi::mutex m_mutex;
@@ -172,14 +162,7 @@ DataLogTelemetryBackend::~DataLogTelemetryBackend() = default;
 
 wpi::TelemetryEntry& DataLogTelemetryBackend::GetEntry(std::string_view path) {
   std::scoped_lock lock{m_mutex};
-  return m_entries.try_emplace(path, *this, m_log, m_prefix, path)
-      .first->second;
-}
-
-void DataLogTelemetryBackend::SetReportWarning(
-    std::function<void(std::string_view msg)> func) {
-  std::scoped_lock lock{m_mutex};
-  m_reportWarning = std::move(func);
+  return m_entries.try_emplace(path, m_log, m_prefix, path).first->second;
 }
 
 bool DataLogTelemetryBackend::HasSchema(std::string_view schemaName) const {

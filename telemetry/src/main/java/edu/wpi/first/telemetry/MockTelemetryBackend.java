@@ -11,20 +11,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
-/**
- * A telemetry backend that saves logged data to an array for unit testing
- * purposes.
- */
+/** A telemetry backend that saves logged data to an array for unit testing purposes. */
 public class MockTelemetryBackend implements TelemetryBackend {
   /**
    * Value for keepDuplicate() action.
    *
    * @param value value passed to keepDuplicate()
    */
-  public record KeepDuplicateValue(boolean value) {
-  }
+  public record KeepDuplicateValue(boolean value) {}
 
   /**
    * Value for setProperty() action.
@@ -32,8 +27,7 @@ public class MockTelemetryBackend implements TelemetryBackend {
    * @param key key passed to setProperty()
    * @param value value passed to setProperty()
    */
-  public record SetPropertyValue(String key, String value) {
-  }
+  public record SetPropertyValue(String key, String value) {}
 
   /**
    * Value for logStruct() action.
@@ -42,8 +36,7 @@ public class MockTelemetryBackend implements TelemetryBackend {
    * @param value value passed to logStruct()
    * @param struct struct passed to logStruct()
    */
-  public record LogStructValue<T>(T value, Struct<T> struct) {
-  }
+  public record LogStructValue<T>(T value, Struct<T> struct) {}
 
   /**
    * Value for logProtobuf() action.
@@ -52,8 +45,7 @@ public class MockTelemetryBackend implements TelemetryBackend {
    * @param value value passed to logProtobuf()
    * @param protobuf protobuf passed to logProtobuf()
    */
-  public record LogProtobufValue<T>(T value, Protobuf<T, ?> protobuf) {
-  }
+  public record LogProtobufValue<T>(T value, Protobuf<T, ?> protobuf) {}
 
   /**
    * Value for logStructArray() action.
@@ -62,8 +54,7 @@ public class MockTelemetryBackend implements TelemetryBackend {
    * @param value value passed to logStructArray()
    * @param struct struct passed to logStructArray()
    */
-  public record LogStructArrayValue<T>(T[] value, Struct<T> struct) {
-  }
+  public record LogStructArrayValue<T>(T[] value, Struct<T> struct) {}
 
   /**
    * Value for logString() action.
@@ -71,8 +62,7 @@ public class MockTelemetryBackend implements TelemetryBackend {
    * @param value value passed to logString()
    * @param typeString type string passed to logString()
    */
-  public record LogStringValue(String value, String typeString) {
-  }
+  public record LogStringValue(String value, String typeString) {}
 
   /**
    * Value for logRaw() action.
@@ -80,8 +70,7 @@ public class MockTelemetryBackend implements TelemetryBackend {
    * @param value value passed to logRaw()
    * @param typeString type string passed to logRaw()
    */
-  public record LogRawValue(byte[] value, String typeString) {
-  }
+  public record LogRawValue(byte[] value, String typeString) {}
 
   /**
    * A logged action.
@@ -89,8 +78,7 @@ public class MockTelemetryBackend implements TelemetryBackend {
    * @param path logged path
    * @param value logged value
    */
-  public record Action(String path, Object value) {
-  }
+  public record Action(String path, Object value) {}
 
   private final Map<String, Entry> m_entries = new HashMap<>();
   private final List<Action> m_actions = new ArrayList<>();
@@ -160,10 +148,6 @@ public class MockTelemetryBackend implements TelemetryBackend {
     }
   }
 
-  @Override
-  public void setReportWarning(BiConsumer<String, StackTraceElement[]> func) {
-  }
-
   private void log(Entry entry, Object value) {
     synchronized (this) {
       entry.m_last = m_actions.size();
@@ -202,8 +186,7 @@ public class MockTelemetryBackend implements TelemetryBackend {
         log(this, new LogStructValue<T>(clonedValue, struct));
       } else {
         // log it directly, but warn
-        System.err.println(
-            "warning: logging non-immutable and non-cloneable struct to '" + m_path + "'");
+        TelemetryRegistry.reportWarning(m_path, "logging non-immutable and non-cloneable struct");
         log(this, new LogStructValue<T>(value, struct));
       }
     }
@@ -224,8 +207,7 @@ public class MockTelemetryBackend implements TelemetryBackend {
         log(this, new LogProtobufValue<T>(clonedValue, proto));
       } else {
         // log it directly, but warn
-        System.err.println(
-            "warning: logging non-immutable and non-cloneable proto to '" + m_path + "'");
+        TelemetryRegistry.reportWarning(m_path, "logging non-immutable and non-cloneable proto");
         log(this, new LogProtobufValue<T>(value, proto));
       }
     }
@@ -249,8 +231,7 @@ public class MockTelemetryBackend implements TelemetryBackend {
         log(this, new LogStructArrayValue<T>(clonedArray, struct));
       } else {
         // log it directly, but warn
-        System.err.println(
-            "warning: logging non-immutable and non-cloneable struct to '" + m_path + "'");
+        TelemetryRegistry.reportWarning(m_path, "logging non-immutable and non-cloneable struct");
         log(this, new LogStructArrayValue<T>(value.clone(), struct));
       }
     }

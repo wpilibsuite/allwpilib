@@ -21,8 +21,13 @@ bool TelemetryTable::SetType(std::string_view typeString) {
   {
     std::scoped_lock lock{m_mutex};
     if (!m_type.empty()) {
-      // TODO: warn on mismatch
-      return m_type == typeString;
+      if (m_type == typeString) {
+        return true;
+      }
+      TelemetryRegistry::ReportWarning(
+          m_path, fmt::format("table type mismatch, expected '{}', got '{}'",
+                              m_type, typeString));
+      return false;
     }
     m_type = typeString;
   }

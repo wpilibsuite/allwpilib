@@ -47,9 +47,9 @@ public final class TelemetryTable {
   }
 
   /**
-   * Sets the table type.  TelemetryLoggable implementations can use this function to communicate
-   * the type of data in the table.  Callers should check the return value and not log data if
-   * false is returned.
+   * Sets the table type. TelemetryLoggable implementations can use this function to communicate the
+   * type of data in the table. Callers should check the return value and not log data if false is
+   * returned.
    *
    * @param typeString type string
    * @return False if type mismatch.
@@ -57,8 +57,12 @@ public final class TelemetryTable {
   public boolean setType(String typeString) {
     synchronized (this) {
       if (m_type != null) {
-        // TODO: warn on mismatch
-        return m_type.equals(typeString);
+        if (m_type.equals(typeString)) {
+          return true;
+        }
+        TelemetryRegistry.reportWarning(
+            m_path, "table type mismatch, expected '" + m_type + "', got '" + typeString + "'");
+        return false;
       }
       m_type = typeString;
     }
@@ -134,18 +138,32 @@ public final class TelemetryTable {
       try {
         obj = v.getClass().getField("struct").get(null);
       } catch (NoSuchFieldException e) {
-        // TODO: warn
+        TelemetryRegistry.reportWarning(
+            m_path + name, "could not get struct field for " + v.getClass().getName());
         return;
       } catch (IllegalAccessException e) {
-        // TODO: warn
+        TelemetryRegistry.reportWarning(
+            m_path + name, "could not access struct field for " + v.getClass().getName());
         return;
       }
-      if (obj instanceof Struct<?> s && s.getTypeClass().equals(value.getClass())) {
-        @SuppressWarnings("unchecked")
-        Struct<T> s2 = (Struct<T>) s;
-        log(name, value, s2);
+      if (obj instanceof Struct<?> s) {
+        if (s.getTypeClass().equals(value.getClass())) {
+          @SuppressWarnings("unchecked")
+          Struct<T> s2 = (Struct<T>) s;
+          log(name, value, s2);
+        } else {
+          TelemetryRegistry.reportWarning(
+              m_path + name,
+              "type mismatch, expected '"
+                  + s.getTypeClass().getName()
+                  + "', got '"
+                  + value.getClass().getName()
+                  + "'");
+        }
       } else {
-        // TODO: warn
+        TelemetryRegistry.reportWarning(
+            m_path + name,
+            "struct field for " + v.getClass().getName() + " is not of Struct<?> type");
       }
     } else if (value instanceof ProtobufSerializable v) {
       // use introspection to get "proto" static variable
@@ -153,18 +171,32 @@ public final class TelemetryTable {
       try {
         obj = v.getClass().getField("proto").get(null);
       } catch (NoSuchFieldException e) {
-        // TODO: warn
+        TelemetryRegistry.reportWarning(
+            m_path + name, "could not get proto field for " + v.getClass().getName());
         return;
       } catch (IllegalAccessException e) {
-        // TODO: warn
+        TelemetryRegistry.reportWarning(
+            m_path + name, "could not access proto field for " + v.getClass().getName());
         return;
       }
-      if (obj instanceof Protobuf<?, ?> s && s.getTypeClass().equals(value.getClass())) {
-        @SuppressWarnings("unchecked")
-        Protobuf<T, ?> s2 = (Protobuf<T, ?>) s;
-        log(name, value, s2);
+      if (obj instanceof Protobuf<?, ?> s) {
+        if (s.getTypeClass().equals(value.getClass())) {
+          @SuppressWarnings("unchecked")
+          Protobuf<T, ?> s2 = (Protobuf<T, ?>) s;
+          log(name, value, s2);
+        } else {
+          TelemetryRegistry.reportWarning(
+              m_path + name,
+              "type mismatch, expected '"
+                  + s.getTypeClass().getName()
+                  + "', got '"
+                  + value.getClass().getName()
+                  + "'");
+        }
       } else {
-        // TODO: warn
+        TelemetryRegistry.reportWarning(
+            m_path + name,
+            "proto field for " + v.getClass().getName() + " is not of Protobuf<?, ?> type");
       }
     } else if (value instanceof Boolean v) {
       log(name, v.booleanValue());
@@ -228,19 +260,32 @@ public final class TelemetryTable {
       try {
         obj = v.getClass().getField("struct").get(null);
       } catch (NoSuchFieldException e) {
-        // TODO: warn
+        TelemetryRegistry.reportWarning(
+            m_path + name, "could not get struct field for " + v.getClass().getName());
         return;
       } catch (IllegalAccessException e) {
-        // TODO: warn
+        TelemetryRegistry.reportWarning(
+            m_path + name, "could not access struct field for " + v.getClass().getName());
         return;
       }
-      if (obj instanceof Struct<?> s
-          && s.getTypeClass().equals(value.getClass().getComponentType())) {
-        @SuppressWarnings("unchecked")
-        Struct<T> s2 = (Struct<T>) s;
-        log(name, value, s2);
+      if (obj instanceof Struct<?> s) {
+        if (s.getTypeClass().equals(value.getClass().getComponentType())) {
+          @SuppressWarnings("unchecked")
+          Struct<T> s2 = (Struct<T>) s;
+          log(name, value, s2);
+        } else {
+          TelemetryRegistry.reportWarning(
+              m_path + name,
+              "type mismatch, expected '"
+                  + s.getTypeClass().getName()
+                  + "', got '"
+                  + value.getClass().getName()
+                  + "'");
+        }
       } else {
-        // TODO: warn
+        TelemetryRegistry.reportWarning(
+            m_path + name,
+            "struct field for " + v.getClass().getName() + " is not of Struct<?> type");
       }
       /* TODO:
       } else if (value instanceof Boolean[] v) {
