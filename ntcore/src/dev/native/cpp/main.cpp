@@ -51,18 +51,9 @@ int main(int argc, char* argv[]) {
 
   auto myValue = nt::GetEntry(nt::GetDefaultInstance(), "MyValue");
 
-  //nt::SetEntryValue(myValue, nt::Value::MakeString("Hello World"));
-  auto poller = nt::CreateListenerPoller(nt::GetDefaultInstance());
-  nt::AddPolledListener(poller, {{""}}, NT_EVENT_VALUE_ALL | NT_EVENT_IMMEDIATE);
+  nt::SetEntryValue(myValue, nt::Value::MakeString("Hello World"));
 
-  nt::SetEntryValue(myValue, nt::Value::MakeDouble(1));
-
-  auto events = nt::ReadListenerQueue(poller);
-  wpi::print("{}\n", events.size());
-  auto valueData = std::get_if<nt::ValueEventData>(&events[0].data);
-  wpi::print("{}\n", static_cast<int>(nt::GetTopicType(valueData->topic)));
-
-  //wpi::print("{}\n", nt::GetEntryValue(myValue).GetString());
+  wpi::print("{}\n", nt::GetEntryValue(myValue).GetString());
 }
 
 void PrintTimes(std::vector<int64_t>& times) {
