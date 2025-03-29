@@ -61,9 +61,9 @@ bool DiscardTelemetryBackend::HasSchema(std::string_view schemaName) const {
 }
 
 void DiscardTelemetryBackend::AddSchema(std::string_view schemaName,
-                                     std::string_view type,
-                                     std::span<const uint8_t> schema) {}
+                                        std::string_view type,
+                                        std::span<const uint8_t> schema) {}
 
 void DiscardTelemetryBackend::AddSchema(std::string_view schemaName,
-                                     std::string_view type,
-                                     std::string_view schema) {}
+                                        std::string_view type,
+                                        std::string_view schema) {}

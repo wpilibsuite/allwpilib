@@ -7,9 +7,9 @@
 #include <hal/SimDevice.h>
 #include <wpi/struct/Struct.h>
 #include <wpi/telemetry/TelemetryLoggable.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/I2C.h"
-#include "wpi/telemetry/TelemetryTable.h"
 
 namespace frc {
 

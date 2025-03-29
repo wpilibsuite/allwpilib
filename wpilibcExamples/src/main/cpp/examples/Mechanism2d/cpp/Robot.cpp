@@ -30,9 +30,7 @@ class Robot : public frc::TimedRobot {
   static constexpr double kElevatorMinimumLength = 0.5;
 
  public:
-  Robot() {
-    m_elevatorEncoder.SetDistancePerPulse(kMetersPerPulse);
-  }
+  Robot() { m_elevatorEncoder.SetDistancePerPulse(kMetersPerPulse); }
 
   void RobotPeriodic() override {
     // update the dashboard mechanism's state

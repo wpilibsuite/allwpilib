@@ -7,9 +7,9 @@
 #include <memory>
 
 #include <wpi/telemetry/TelemetryLoggable.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/AnalogInput.h"
-#include "wpi/telemetry/TelemetryTable.h"
 
 namespace frc {
 
