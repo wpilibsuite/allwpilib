@@ -36,11 +36,12 @@ model {
             }
             if (it.component.name == "${nativeName}JNI") {
                 lib project: ':datalog', library: 'datalog', linkage: 'static'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'static'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
             } else {
-                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
                 lib project: ':datalog', library: 'datalog', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }

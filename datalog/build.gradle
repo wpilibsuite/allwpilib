@@ -30,9 +30,7 @@ model {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {
                 return
             }
-            if (it.component.name != "${nativeName}JNI") {
-                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
-            }
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
         }
     }
