@@ -3,14 +3,17 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/smartdashboard/Mechanism2d.h>
-#include <frc/smartdashboard/MechanismLigament2d.h>
-#include <frc/util/Color8Bit.h>
+
+#include <memory>
 
 #include <gtest/gtest.h>
 #include <units/angle.h>
 #include <wpi/telemetry/MockTelemetryBackend.h>
 #include <wpi/telemetry/Telemetry.h>
 #include <wpi/telemetry/TelemetryRegistry.h>
+
+#include "frc/smartdashboard/MechanismLigament2d.h"
+#include "frc/util/Color8Bit.h"
 
 struct Mechanism2dTest : public ::testing::Test {
   void SetUp() override {
