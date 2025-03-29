@@ -78,7 +78,7 @@ public class PWM implements TelemetryLoggable, AutoCloseable {
    *
    * @param microsecondPulseTime Microsecond pulse PWM value. Range 0 - 4096.
    */
-  public void setPulseTimeMicroseconds(int microsecondPulseTime) {
+  public final void setPulseTimeMicroseconds(int microsecondPulseTime) {
     PWMJNI.setPulseTimeMicroseconds(m_handle, microsecondPulseTime);
   }
 
@@ -89,7 +89,7 @@ public class PWM implements TelemetryLoggable, AutoCloseable {
    *
    * @return Microsecond pulse PWM control value. Range: 0 - 4096.
    */
-  public int getPulseTimeMicroseconds() {
+  public final int getPulseTimeMicroseconds() {
     return PWMJNI.getPulseTimeMicroseconds(m_handle);
   }
 
