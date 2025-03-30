@@ -43,6 +43,7 @@ java_library(
         "//cscore:cscore-java",
         "//hal:hal-java",
         "//ntcore:networktables-java",
+        "//telemetry:telemetry-java",
         "//wpilibj",
         "//wpimath:wpimath-java",
         "//wpinet:wpinet-java",
