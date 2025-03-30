@@ -66,13 +66,20 @@ public final class TelemetryRegistry {
 
   private static void defaultReportWarning(String path, String msg) {
     // TODO: do something smarter here
+    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+    StringBuilder traceString = new StringBuilder();
+    for (int i = 1; i < stackTrace.length; i++) {
+      String loc = stackTrace[i].toString();
+      traceString.append("\tat ").append(loc).append('\n');
+    }
+
     System.err.println(
         "Telemetry '"
             + path
             + "': warning: "
             + msg
             + "\n"
-            + Thread.currentThread().getStackTrace());
+            + traceString.toString());
   }
 
   /**
