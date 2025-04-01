@@ -84,6 +84,8 @@ class SharpIR : public wpi::TelemetryLoggable {
 
   void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
+  std::string_view GetTelemetryType() const override;
+
  private:
   AnalogInput m_sensor;
 

@@ -92,8 +92,9 @@ void PWM::SetSimDevice(HAL_SimDeviceHandle device) {
 }
 
 void PWM::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("PWM")) {
-    return;
-  }
   table.Log("Value", GetPulseTime().value());
+}
+
+std::string_view PWM::GetTelemetryType() const {
+  return "PWM";
 }

@@ -134,9 +134,11 @@ public class PWM implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("PWM")) {
-      return;
-    }
     table.log("Value", getPulseTimeMicroseconds());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "PWM";
   }
 }

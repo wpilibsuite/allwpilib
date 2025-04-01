@@ -68,8 +68,9 @@ void Solenoid::StartPulse() {
 }
 
 void Solenoid::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("Solenoid")) {
-    return;
-  }
   table.Log("Value", Get());
+}
+
+std::string_view Solenoid::GetTelemetryType() const {
+  return "Solenoid";
 }

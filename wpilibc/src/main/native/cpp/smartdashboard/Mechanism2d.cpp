@@ -31,14 +31,14 @@ void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
 }
 
 void Mechanism2d::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("Mechanism2d")) {
-    return;
-  }
-
   std::scoped_lock lock(m_mutex);
   table.Log(kDims, {m_width, m_height});
   table.Log(kBackgroundColor, m_color);
   for (auto& entry : m_roots) {
     table.Log(entry.first, entry.second);
   }
+}
+
+std::string_view Mechanism2d::GetTelemetryType() const {
+  return "Mechanism2d";
 }

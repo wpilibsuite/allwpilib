@@ -142,8 +142,9 @@ void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {
 }
 
 void DigitalOutput::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("Digital Output")) {
-    return;
-  }
   table.Log("Value", Get());
+}
+
+std::string_view DigitalOutput::GetTelemetryType() const {
+  return "Digital Output";
 }

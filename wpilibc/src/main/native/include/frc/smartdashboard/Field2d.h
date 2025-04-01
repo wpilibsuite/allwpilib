@@ -84,6 +84,8 @@ class Field2d : public wpi::TelemetryLoggable {
 
   void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
+  std::string_view GetTelemetryType() const override;
+
  private:
   mutable wpi::mutex m_mutex;
   std::vector<std::unique_ptr<FieldObject2d>> m_objects;

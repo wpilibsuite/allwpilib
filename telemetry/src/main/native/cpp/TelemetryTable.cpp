@@ -24,9 +24,7 @@ bool TelemetryTable::SetType(std::string_view typeString) {
       if (m_type == typeString) {
         return true;
       }
-      TelemetryRegistry::ReportWarning(
-          m_path, fmt::format("table type mismatch, expected '{}', got '{}'",
-                              m_type, typeString));
+      TypeMismatch(typeString);
       return false;
     }
     m_type = typeString;
@@ -170,6 +168,12 @@ TelemetryEntry& TelemetryTable::GetEntry(std::string_view name) {
     entry2 = newEntry;
   }
   return *entry2;
+}
+
+void TelemetryTable::TypeMismatch(std::string_view typeString) {
+  TelemetryRegistry::ReportWarning(
+      m_path, fmt::format("table type mismatch, expected '{}', got '{}'",
+                          m_type, typeString));
 }
 
 void TelemetryTable::Reset() {

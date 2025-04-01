@@ -128,10 +128,12 @@ public class Tachometer implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Tachometer")) {
-      return;
-    }
     table.log("RPS", getRevolutionsPerSecond());
     table.log("RPM", getRevolutionsPerMinute());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Tachometer";
   }
 }

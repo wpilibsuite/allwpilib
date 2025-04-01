@@ -48,8 +48,9 @@ int DigitalInput::GetChannel() const {
 }
 
 void DigitalInput::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("Digital Input")) {
-    return;
-  }
   table.Log("Value", Get());
+}
+
+std::string_view DigitalInput::GetTelemetryType() const {
+  return "Digital Input";
 }

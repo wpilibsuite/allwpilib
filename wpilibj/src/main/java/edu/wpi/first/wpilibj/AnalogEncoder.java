@@ -166,9 +166,11 @@ public class AnalogEncoder implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("AbsoluteEncoder")) {
-      return;
-    }
     table.log("Position", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "AbsoluteEncoder";
   }
 }

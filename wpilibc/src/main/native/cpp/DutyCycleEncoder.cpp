@@ -157,9 +157,10 @@ int DutyCycleEncoder::GetSourceChannel() const {
 }
 
 void DutyCycleEncoder::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("AbsoluteEncoder")) {
-    return;
-  }
   table.Log("Position", Get());
   table.Log("Is Connected", IsConnected());
+}
+
+std::string_view DutyCycleEncoder::GetTelemetryType() const {
+  return "AbsoluteEncoder";
 }

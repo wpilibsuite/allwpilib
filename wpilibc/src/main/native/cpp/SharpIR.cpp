@@ -59,8 +59,9 @@ units::meter_t SharpIR::GetRange() const {
 }
 
 void SharpIR::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("Ultrasonic")) {
-    return;
-  }
   table.Log("Value", GetRange().value());
+}
+
+std::string_view SharpIR::GetTelemetryType() const {
+  return "Ultrasonic";
 }

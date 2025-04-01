@@ -336,18 +336,17 @@ public class Encoder implements CounterBase, TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (EncoderJNI.getEncoderEncodingType(m_encoder) == EncodingType.k4X.value) {
-      if (!table.setType("Quadrature Encoder")) {
-        return;
-      }
-    } else {
-      if (!table.setType("Encoder")) {
-        return;
-      }
-    }
-
     table.log("Speed", getRate());
     table.log("Distance", getDistance());
     table.log("Distance per Tick", getDistancePerPulse());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    if (EncoderJNI.getEncoderEncodingType(m_encoder) == EncodingType.k4X.value) {
+      return "Quadrature Encoder";
+    } else {
+      return "Encoder";
+    }
   }
 }

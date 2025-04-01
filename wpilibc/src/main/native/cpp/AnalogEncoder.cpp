@@ -119,8 +119,9 @@ double AnalogEncoder::MapSensorRange(double pos) const {
 }
 
 void AnalogEncoder::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("AbsoluteEncoder")) {
-    return;
-  }
   table.Log("Position", Get());
+}
+
+std::string_view AnalogEncoder::GetTelemetryType() const {
+  return "AbsoluteEncoder";
 }

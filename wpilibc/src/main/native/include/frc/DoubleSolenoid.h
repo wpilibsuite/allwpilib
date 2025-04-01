@@ -126,6 +126,8 @@ class DoubleSolenoid : public wpi::TelemetryLoggable {
 
   void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
+  std::string_view GetTelemetryType() const override;
+
  private:
   std::shared_ptr<PneumaticsBase> m_module;
   int m_forwardChannel;  // The forward channel on the module to control.

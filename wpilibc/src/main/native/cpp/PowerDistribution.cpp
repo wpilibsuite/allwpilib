@@ -318,9 +318,6 @@ PowerDistribution::StickyFaults PowerDistribution::GetStickyFaults() const {
 }
 
 void PowerDistribution::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("PowerDistribution")) {
-    return;
-  }
   // Use manual reads to avoid printing errors
   int32_t status = 0;
   int32_t size = GetNumChannels();
@@ -333,4 +330,8 @@ void PowerDistribution::UpdateTelemetry(wpi::TelemetryTable& table) const {
             HAL_GetPowerDistributionTotalCurrent(m_handle, &status));
   table.Log("SwitchableChannel",
             HAL_GetPowerDistributionSwitchableChannel(m_handle, &status));
+}
+
+std::string_view PowerDistribution::GetTelemetryType() const {
+  return "PowerDistribution";
 }

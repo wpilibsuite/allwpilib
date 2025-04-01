@@ -170,9 +170,11 @@ public class Servo implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Servo")) {
-      return;
-    }
     table.log("Value", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Servo";
   }
 }

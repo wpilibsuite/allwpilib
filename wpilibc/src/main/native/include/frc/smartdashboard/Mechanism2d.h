@@ -72,6 +72,8 @@ class Mechanism2d : public wpi::TelemetryLoggable {
 
   void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
+  std::string_view GetTelemetryType() const override;
+
  private:
   double m_width;
   double m_height;

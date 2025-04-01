@@ -36,6 +36,17 @@ class TelemetryTableTest {
     }
   }
 
+  class ThingType extends Thing {
+    ThingType(double x, double y) {
+      super(x, y);
+    }
+
+    @Override
+    public String getTelemetryType() {
+      return "Thing";
+    }
+  }
+
   @Test
   void testLoggable() {
     TelemetryTable table = TelemetryRegistry.getTable("/");
@@ -51,5 +62,19 @@ class TelemetryTableTest {
     assertEquals(actions.get(1).path(), "/test/y");
     assertTrue(actions.get(1).value() instanceof Double);
     assertEquals((Double) actions.get(1).value(), 2);
+  }
+
+  @Test
+  void testLoggableType() {
+    TelemetryTable table = TelemetryRegistry.getTable("/");
+    Thing val = new ThingType(1, 2);
+    table.log("test", val);
+    assertEquals(table.getTable("test").getType(), "Thing");
+    table.log("test", val);
+    List<MockTelemetryBackend.Action> actions = m_mock.getActions();
+    assertEquals(actions.size(), 5);
+
+    var value = m_mock.getLastValue("/test/.type", MockTelemetryBackend.LogStringValue.class);
+    assertEquals(value.getValue(), "Thing");
   }
 }

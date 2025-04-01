@@ -92,9 +92,11 @@ public class MotorControllerGroup implements MotorController, TelemetryLoggable,
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Motor Controller")) {
-      return;
-    }
     table.log("Value", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Motor Controller";
   }
 }

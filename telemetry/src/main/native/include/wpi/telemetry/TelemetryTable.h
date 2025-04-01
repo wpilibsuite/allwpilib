@@ -34,10 +34,10 @@ concept IsTelemetryLoggable = requires(TelemetryTable& table, const T& value) {
 };
 
 template <typename T>
-  requires IsTelemetryLoggable<T>
-inline void TelemetryLogTable(TelemetryTable& table, const T& value) {
-  value.UpdateTelemetry(table);
-}
+concept IsTelemetryLoggableWithType =
+    IsTelemetryLoggable<T> && requires(TelemetryTable& table, const T& value) {
+      { value.GetTelemetryType() } -> std::convertible_to<std::string_view>;
+    };
 
 template <typename T, typename... I>
 concept TelemetryTableLoggableADL =
@@ -167,9 +167,26 @@ class TelemetryTable final {
   template <typename T, typename... I>
     requires(!impl::IsSpan<T>)
   void Log(std::string_view name, const T& value, I... info) {
-    if constexpr (impl::IsTelemetryLoggable<T>) {
+    if constexpr (impl::IsTelemetryLoggableWithType<T>) {
       auto& table = GetTable(name);
-      impl::TelemetryLogTable(table, value);
+      auto typeString = value.GetTelemetryType();
+      bool setType = false;
+      if (!std::string_view{typeString}.empty()) {
+        std::scoped_lock lock{m_mutex};
+        if (table.m_type.empty()) {
+          setType = true;
+        } else if (table.m_type != typeString) {
+          table.TypeMismatch(typeString);
+          return;
+        }
+      }
+      value.UpdateTelemetry(table);
+      if (setType) {
+        table.SetType(typeString);
+      }
+    } else if constexpr (impl::IsTelemetryLoggable<T>) {
+      auto& table = GetTable(name);
+      value.UpdateTelemetry(table);
     } else if constexpr (impl::TelemetryTableLoggableADL<T, I...>) {
       auto& table = GetTable(name);
       impl::TelemetryLogTableADL(table, value, info...);
@@ -471,6 +488,8 @@ class TelemetryTable final {
    * @return entry
    */
   TelemetryEntry& GetEntry(std::string_view name);
+
+  void TypeMismatch(std::string_view typeString);
 
   /** Clears the table's cached entries. */
   void Reset();

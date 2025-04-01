@@ -39,8 +39,9 @@ double AnalogPotentiometer::Get() const {
 }
 
 void AnalogPotentiometer::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("Analog Input")) {
-    return;
-  }
   table.Log("Value", Get());
+}
+
+std::string_view AnalogPotentiometer::GetTelemetryType() const {
+  return "Analog Input";
 }

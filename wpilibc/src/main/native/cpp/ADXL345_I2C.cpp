@@ -83,10 +83,11 @@ ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() const {
 }
 
 void ADXL345_I2C::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("3AxisAccelerometer")) {
-    return;
-  }
   table.Log("Value", GetAccelerations());
+}
+
+std::string_view ADXL345_I2C::GetTelemetryType() const {
+  return "3AxisAccelerometer";
 }
 
 frc::ADXL345_I2C::AllAxes wpi::Struct<frc::ADXL345_I2C::AllAxes>::Unpack(

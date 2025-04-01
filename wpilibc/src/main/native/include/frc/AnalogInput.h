@@ -194,6 +194,8 @@ class AnalogInput : public wpi::TelemetryLoggable {
 
   void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
+  std::string_view GetTelemetryType() const override;
+
  private:
   int m_channel;
   hal::Handle<HAL_AnalogInputHandle, HAL_FreeAnalogInputPort> m_port;

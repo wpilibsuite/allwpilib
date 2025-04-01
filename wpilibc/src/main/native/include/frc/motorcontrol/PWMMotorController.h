@@ -116,6 +116,10 @@ class PWMMotorController : public MotorController,
         std::make_unique<std::decay_t<T>>(std::forward<T>(follower)));
   }
 
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
+
  protected:
   /**
    * Constructor for a PWM Motor %Controller connected via PWM.
@@ -124,8 +128,6 @@ class PWMMotorController : public MotorController,
    *                on-board, 10-19 are on the MXP port
    */
   explicit PWMMotorController(int channel);
-
-  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
   /// PWM instances for motor controller.
   PWM m_pwm;

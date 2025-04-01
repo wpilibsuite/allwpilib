@@ -12,8 +12,6 @@
 
 using namespace frc;
 
-static constexpr std::string_view kSmartDashboardType = "line";
-
 MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
                                          units::degree_t angle,
                                          double lineWeight,
@@ -26,16 +24,16 @@ MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
 }
 
 void MechanismLigament2d::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType(kSmartDashboardType)) {
-    return;
-  }
-
   table.Log("color", m_color);
   table.Log("angle", m_angle);
   table.Log("weight", m_weight);
   table.Log("length", m_length);
 
   MechanismObject2d::UpdateTelemetry(table);
+}
+
+std::string_view MechanismLigament2d::GetTelemetryType() const {
+  return "line";
 }
 
 void MechanismLigament2d::SetColor(const Color8Bit& color) {

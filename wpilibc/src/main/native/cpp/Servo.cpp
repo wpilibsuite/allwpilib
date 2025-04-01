@@ -61,10 +61,11 @@ double Servo::GetAngle() const {
 }
 
 void Servo::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("Servo")) {
-    return;
-  }
   table.Log("Value", Get());
+}
+
+std::string_view Servo::GetTelemetryType() const {
+  return "Servo";
 }
 
 double Servo::GetServoAngleRange() {

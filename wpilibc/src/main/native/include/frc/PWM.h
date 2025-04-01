@@ -105,8 +105,9 @@ class PWM : public wpi::TelemetryLoggable {
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
- protected:
   void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   int m_channel;

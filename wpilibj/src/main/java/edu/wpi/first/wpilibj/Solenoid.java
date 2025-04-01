@@ -143,9 +143,11 @@ public class Solenoid implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Solenoid")) {
-      return;
-    }
     table.log("Value", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Solenoid";
   }
 }

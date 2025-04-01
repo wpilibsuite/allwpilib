@@ -189,9 +189,6 @@ public class Compressor implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Compressor")) {
-      return;
-    }
     table.log("Enabled", isEnabled());
     table.log("Pressure switch", getPressureSwitchValue());
     table.log("Current (A)", getCurrent());
@@ -199,5 +196,10 @@ public class Compressor implements TelemetryLoggable, AutoCloseable {
       table.log("Analog Voltage", getAnalogVoltage());
       table.log("Pressure (PSI)", getPressure());
     }
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Compressor";
   }
 }

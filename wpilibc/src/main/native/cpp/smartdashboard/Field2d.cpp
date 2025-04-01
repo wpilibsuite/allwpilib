@@ -60,13 +60,13 @@ FieldObject2d* Field2d::GetRobotObject() {
 }
 
 void Field2d::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("Field2d")) {
-    return;
-  }
-
   std::scoped_lock lock(m_mutex);
   for (auto&& obj : m_objects) {
     std::scoped_lock lock2(obj->m_mutex);
     table.Log(obj->m_name, obj->m_poses);
   }
+}
+
+std::string_view Field2d::GetTelemetryType() const {
+  return "Field2d";
 }

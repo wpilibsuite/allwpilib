@@ -126,10 +126,12 @@ public class AnalogPotentiometer implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Analog Input")) {
-      return;
-    }
     table.log("Value", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Analog Input";
   }
 
   @Override

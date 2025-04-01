@@ -118,9 +118,6 @@ bool DoubleSolenoid::IsRevSolenoidDisabled() const {
 }
 
 void DoubleSolenoid::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("Double Solenoid")) {
-    return;
-  }
   std::string_view str;
   switch (Get()) {
     case kForward:
@@ -134,4 +131,8 @@ void DoubleSolenoid::UpdateTelemetry(wpi::TelemetryTable& table) const {
       break;
   }
   table.Log("Value", str);
+}
+
+std::string_view DoubleSolenoid::GetTelemetryType() const {
+  return "Double Solenoid";
 }

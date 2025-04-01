@@ -78,9 +78,6 @@ CompressorConfigType Compressor::GetConfigType() const {
 }
 
 void Compressor::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("Compressor")) {
-    return;
-  }
   table.Log("Enabled", IsEnabled());
   table.Log("Pressure switch", GetPressureSwitchValue());
   table.Log("Current (A)", GetCurrent().value());
@@ -89,4 +86,8 @@ void Compressor::UpdateTelemetry(wpi::TelemetryTable& table) const {
     table.Log("Analog Voltage", GetAnalogVoltage().value());
     table.Log("Pressure (PSI)", GetPressure().value());
   }
+}
+
+std::string_view Compressor::GetTelemetryType() const {
+  return "Compressor";
 }

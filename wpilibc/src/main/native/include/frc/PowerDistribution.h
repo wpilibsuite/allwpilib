@@ -343,6 +343,8 @@ class PowerDistribution : public wpi::TelemetryLoggable {
 
   void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
+  std::string_view GetTelemetryType() const override;
+
  private:
   hal::Handle<HAL_PowerDistributionHandle, HAL_CleanPowerDistribution> m_handle;
   int m_module;

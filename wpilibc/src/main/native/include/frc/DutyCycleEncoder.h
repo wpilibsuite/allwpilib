@@ -184,6 +184,8 @@ class DutyCycleEncoder : public wpi::TelemetryLoggable {
 
   void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
+  std::string_view GetTelemetryType() const override;
+
  private:
   void Init(double fullRange, double expectedZero);
   double MapSensorRange(double pos) const;

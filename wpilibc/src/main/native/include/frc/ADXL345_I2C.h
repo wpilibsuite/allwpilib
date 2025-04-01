@@ -127,6 +127,8 @@ class ADXL345_I2C : public wpi::TelemetryLoggable {
 
   void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
+  std::string_view GetTelemetryType() const override;
+
  private:
   mutable I2C m_i2c;
 

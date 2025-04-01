@@ -102,10 +102,12 @@ public class DutyCycle implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Duty Cycle")) {
-      return;
-    }
     table.log("Frequency", getFrequency());
     table.log("Output", getOutput());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Duty Cycle";
   }
 }

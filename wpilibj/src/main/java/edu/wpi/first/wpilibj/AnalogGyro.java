@@ -212,9 +212,11 @@ public class AnalogGyro implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Gyro")) {
-      return;
-    }
     table.log("Value", getAngle());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Gyro";
   }
 }

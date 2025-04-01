@@ -122,8 +122,9 @@ void AnalogInput::SetSimDevice(HAL_SimDeviceHandle device) {
 }
 
 void AnalogInput::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("Analog Input")) {
-    return;
-  }
   table.Log("Value", GetAverageVoltage());
+}
+
+std::string_view AnalogInput::GetTelemetryType() const {
+  return "Analog Input";
 }

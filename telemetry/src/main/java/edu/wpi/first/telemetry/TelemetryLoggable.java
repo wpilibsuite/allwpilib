@@ -13,4 +13,14 @@ public interface TelemetryLoggable {
    * @param table telemetry table
    */
   void updateTelemetry(TelemetryTable table);
+
+  /**
+   * Gets the telemetry table type. Default is no specified table type (null). A mismatch in
+   * type during logging result in a reported warning, so this should always return the same value.
+   *
+   * @return Table type
+   */
+  default String getTelemetryType() {
+    return null;
+  }
 }

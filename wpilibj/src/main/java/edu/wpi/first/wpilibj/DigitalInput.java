@@ -70,9 +70,11 @@ public class DigitalInput implements AutoCloseable, TelemetryLoggable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Digital Input")) {
-      return;
-    }
     table.log("Value", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Digital Input";
   }
 }

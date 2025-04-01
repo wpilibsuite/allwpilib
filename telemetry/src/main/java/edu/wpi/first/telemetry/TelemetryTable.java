@@ -60,14 +60,18 @@ public final class TelemetryTable {
         if (m_type.equals(typeString)) {
           return true;
         }
-        TelemetryRegistry.reportWarning(
-            m_path, "table type mismatch, expected '" + m_type + "', got '" + typeString + "'");
+        typeMismatch(typeString);
         return false;
       }
       m_type = typeString;
     }
     log(".type", typeString);
     return true;
+  }
+
+  private void typeMismatch(String typeString) {
+    TelemetryRegistry.reportWarning(
+        m_path, "table type mismatch, expected '" + m_type + "', got '" + typeString + "'");
   }
 
   /**
@@ -129,9 +133,24 @@ public final class TelemetryTable {
    * @param value the value
    */
   public <T> void log(String name, T value) {
-    if (value instanceof TelemetryLoggable) {
+    if (value instanceof TelemetryLoggable v) {
       TelemetryTable table = getTable(name);
-      ((TelemetryLoggable) value).updateTelemetry(table);
+      String typeString = v.getTelemetryType();
+      boolean setType = false;
+      if (typeString != null) {
+        synchronized (this) {
+          if (table.m_type == null) {
+            setType = true;
+          } else if (!table.m_type.equals(typeString)) {
+            table.typeMismatch(typeString);
+            return;
+          }
+        }
+      }
+      v.updateTelemetry(table);
+      if (setType) {
+        table.setType(typeString);
+      }
     } else if (value instanceof StructSerializable v) {
       // use introspection to get "struct" static variable
       Object obj;

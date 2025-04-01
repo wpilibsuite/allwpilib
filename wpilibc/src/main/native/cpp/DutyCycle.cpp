@@ -73,9 +73,10 @@ int DutyCycle::GetSourceChannel() const {
 }
 
 void DutyCycle::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("Duty Cycle")) {
-    return;
-  }
   table.Log("Frequency", GetFrequency());
   table.Log("Output", GetOutput());
+}
+
+std::string_view DutyCycle::GetTelemetryType() const {
+  return "Duty Cycle";
 }

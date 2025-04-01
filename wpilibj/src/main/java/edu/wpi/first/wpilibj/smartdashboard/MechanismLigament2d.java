@@ -146,13 +146,15 @@ public class MechanismLigament2d extends MechanismObject2d {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("line")) {
-      return;
-    }
     table.log("angle", m_angle);
     table.log("length", m_length);
     table.log("color", m_color);
     table.log("weight", m_weight);
     super.updateTelemetry(table);
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "line";
   }
 }

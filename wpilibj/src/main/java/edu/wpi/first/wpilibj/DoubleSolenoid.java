@@ -212,9 +212,11 @@ public class DoubleSolenoid implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Double Solenoid")) {
-      return;
-    }
     table.log("Value", get().name().substring(1));
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Double Solenoid";
   }
 }

@@ -99,10 +99,6 @@ public class Field2d implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Field2d")) {
-      return;
-    }
-
     synchronized (this) {
       for (FieldObject2d obj : m_objects) {
         synchronized (obj) {
@@ -110,6 +106,11 @@ public class Field2d implements TelemetryLoggable, AutoCloseable {
         }
       }
     }
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Field2d";
   }
 
   private final List<FieldObject2d> m_objects = new ArrayList<>();

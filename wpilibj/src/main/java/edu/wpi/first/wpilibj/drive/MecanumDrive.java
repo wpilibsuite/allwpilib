@@ -299,12 +299,14 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable, A
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("MecanumDrive")) {
-      return;
-    }
     table.log("Front Left Motor Speed", m_frontLeftOutput);
     table.log("Front Right Motor Speed", m_frontRightOutput);
     table.log("Rear Left Motor Speed", m_rearLeftOutput);
     table.log("Rear Right Motor Speed", m_rearRightOutput);
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "MecanumDrive";
   }
 }

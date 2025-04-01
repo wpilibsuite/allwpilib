@@ -102,10 +102,11 @@ PWMMotorController::PWMMotorController(int channel) : m_pwm{channel} {
 }
 
 void PWMMotorController::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("Motor Controller")) {
-    return;
-  }
   table.Log("Value", Get());
+}
+
+std::string_view PWMMotorController::GetTelemetryType() const {
+  return "Motor Controller";
 }
 
 units::microsecond_t PWMMotorController::GetMinPositivePwm() const {

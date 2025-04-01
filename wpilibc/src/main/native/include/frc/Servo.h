@@ -90,6 +90,8 @@ class Servo : public wpi::TelemetryLoggable {
 
   void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
+  std::string_view GetTelemetryType() const override;
+
  private:
   static double GetServoAngleRange();
   units::microsecond_t GetFullRangeScaleFactor() const;

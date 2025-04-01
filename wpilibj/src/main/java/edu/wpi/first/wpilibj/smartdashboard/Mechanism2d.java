@@ -94,9 +94,6 @@ public final class Mechanism2d implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Mechanism2d")) {
-      return;
-    }
     synchronized (this) {
       table.log("dims", m_dims);
       table.log("backgroundColor", m_color);
@@ -104,5 +101,10 @@ public final class Mechanism2d implements TelemetryLoggable, AutoCloseable {
         table.log(entry.getKey(), entry.getValue());
       }
     }
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Mechanism2d";
   }
 }

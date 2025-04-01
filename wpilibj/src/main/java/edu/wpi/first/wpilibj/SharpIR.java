@@ -137,9 +137,11 @@ public class SharpIR implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Ultrasonic")) {
-      return;
-    }
     table.log("Value", getRange());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Ultrasonic";
   }
 }

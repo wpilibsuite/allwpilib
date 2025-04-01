@@ -142,19 +142,17 @@ int Encoder::GetFPGAIndex() const {
 }
 
 void Encoder::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (m_type == EncodingType::k4X) {
-    if (!table.SetType("Quadrature Encoder")) {
-      return;
-    }
-  } else {
-    if (!table.SetType("Encoder")) {
-      return;
-    }
-  }
-
   table.Log("Speed", GetRate());
   table.Log("Distance", GetDistance());
   table.Log("Distance per Tick", GetDistancePerPulse());
+}
+
+std::string_view Encoder::GetTelemetryType() const {
+  if (m_type == EncodingType::k4X) {
+    return "Quadrature Encoder";
+  } else {
+    return "Encoder";
+  }
 }
 
 void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,

@@ -86,8 +86,9 @@ class DutyCycle : public wpi::TelemetryLoggable {
    */
   int GetSourceChannel() const;
 
- protected:
   void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   void InitDutyCycle();

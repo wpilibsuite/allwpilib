@@ -105,9 +105,11 @@ public class AnalogAccelerometer implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Accelerometer")) {
-      return;
-    }
     table.log("Value", getAcceleration());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Accelerometer";
   }
 }

@@ -273,9 +273,11 @@ public abstract class PWMMotorController extends MotorSafety
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Motor Controller")) {
-      return;
-    }
     table.log("Value", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "MotorController";
   }
 }

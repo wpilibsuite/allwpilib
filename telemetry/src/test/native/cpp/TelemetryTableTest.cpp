@@ -32,6 +32,10 @@ struct TestStructLoggable {
     table.Log("y", y);
   }
 };
+
+struct TestStructLoggableType : public TestStructLoggable {
+  std::string_view GetTelemetryType() const { return "TestStructLoggableType"; }
+};
 }  // namespace telemetrytest
 
 struct TelemetryTableTest : public ::testing::Test {
@@ -76,4 +80,18 @@ TEST_F(TelemetryTableTest, LogLoggable) {
   ASSERT_EQ(actions[1].path, "/test/y");
   ASSERT_TRUE(std::holds_alternative<double>(actions[1].value));
   ASSERT_EQ(std::get<double>(actions[1].value), 2);
+}
+
+TEST_F(TelemetryTableTest, LogLoggableType) {
+  wpi::TelemetryTable& table = wpi::TelemetryRegistry::GetTable("/");
+  telemetrytest::TestStructLoggableType val{1, 2};
+  table.Log("test", val);
+  ASSERT_EQ(table.GetTable("test").GetType(), "TestStructLoggableType");
+  table.Log("test", val);
+  auto actions = mock->GetActions();
+  ASSERT_EQ(actions.size(), 5u);
+
+  auto value = mock->GetLastValue<wpi::MockTelemetryBackend::LogStringValue>("/test/.type");
+  ASSERT_TRUE(value);
+  ASSERT_EQ(value->value, "TestStructLoggableType");
 }

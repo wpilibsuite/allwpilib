@@ -300,9 +300,11 @@ public class ADXL345_I2C implements TelemetryLoggable, AutoCloseable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("3AxisAccelerometer")) {
-      return;
-    }
     table.log("Value", getAccelerations());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "3AxisAccelerometer";
   }
 }

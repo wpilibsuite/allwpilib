@@ -44,10 +44,11 @@ void AnalogAccelerometer::SetZero(double zero) {
 }
 
 void AnalogAccelerometer::UpdateTelemetry(wpi::TelemetryTable& table) const {
-  if (!table.SetType("Accelerometer")) {
-    return;
-  }
   table.Log("Value", GetAcceleration());
+}
+
+std::string_view AnalogAccelerometer::GetTelemetryType() const {
+  return "Accelerometer";
 }
 
 void AnalogAccelerometer::InitAccelerometer() {

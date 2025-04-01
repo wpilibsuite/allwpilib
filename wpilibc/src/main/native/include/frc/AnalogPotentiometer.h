@@ -102,6 +102,8 @@ class AnalogPotentiometer : public wpi::TelemetryLoggable {
 
   void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
+  std::string_view GetTelemetryType() const override;
+
  private:
   std::shared_ptr<AnalogInput> m_analog_input;
   double m_fullRange, m_offset;
