@@ -4,15 +4,12 @@
 
 #pragma once
 
-#include <memory>
-
 #include <hal/Counter.h>
 #include <hal/Types.h>
 #include <units/angular_velocity.h>
 #include <units/frequency.h>
 #include <units/time.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "EdgeConfiguration.h"
 
@@ -26,8 +23,7 @@ namespace frc {
  * sensor, or optical sensor detecting tape on a shooter wheel. Unlike
  * encoders, this class only needs a single digital input.
  */
-class Tachometer : public wpi::Sendable,
-                   public wpi::SendableHelper<Tachometer> {
+class Tachometer : public wpi::TelemetryLoggable {
  public:
   /**
    * Constructs a new tachometer.
@@ -109,8 +105,9 @@ class Tachometer : public wpi::Sendable,
    */
   void SetMaxPeriod(units::second_t maxPeriod);
 
- protected:
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   hal::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;

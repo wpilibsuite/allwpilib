@@ -10,8 +10,7 @@
 #include <utility>
 
 #include <hal/UsageReporting.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/MathUtil.h"
 #include "frc/motorcontrol/MotorController.h"
@@ -23,20 +22,13 @@ WPI_IGNORE_DEPRECATED
 DifferentialDrive::DifferentialDrive(MotorController& leftMotor,
                                      MotorController& rightMotor)
     : DifferentialDrive{[&](double output) { leftMotor.Set(output); },
-                        [&](double output) { rightMotor.Set(output); }} {
-  wpi::SendableRegistry::AddChild(this, &leftMotor);
-  wpi::SendableRegistry::AddChild(this, &rightMotor);
-}
+                        [&](double output) { rightMotor.Set(output); }} {}
 
 WPI_UNIGNORE_DEPRECATED
 
 DifferentialDrive::DifferentialDrive(std::function<void(double)> leftMotor,
                                      std::function<void(double)> rightMotor)
-    : m_leftMotor{std::move(leftMotor)}, m_rightMotor{std::move(rightMotor)} {
-  static int instances = 0;
-  ++instances;
-  wpi::SendableRegistry::Add(this, "DifferentialDrive", instances);
-}
+    : m_leftMotor{std::move(leftMotor)}, m_rightMotor{std::move(rightMotor)} {}
 
 void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
                                     bool squareInputs) {
@@ -188,11 +180,11 @@ std::string DifferentialDrive::GetDescription() const {
   return "DifferentialDrive";
 }
 
-void DifferentialDrive::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("DifferentialDrive");
-  builder.SetActuator(true);
-  builder.AddDoubleProperty(
-      "Left Motor Speed", [&] { return m_leftOutput; }, m_leftMotor);
-  builder.AddDoubleProperty(
-      "Right Motor Speed", [&] { return m_rightOutput; }, m_rightMotor);
+void DifferentialDrive::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("Left Motor Speed", m_leftOutput);
+  table.Log("Right Motor Speed", m_rightOutput);
+}
+
+std::string_view DifferentialDrive::GetTelemetryType() const {
+  return "DifferentialDrive";
 }
