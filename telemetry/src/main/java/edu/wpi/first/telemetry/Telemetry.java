@@ -4,6 +4,9 @@
 
 package edu.wpi.first.telemetry;
 
+import edu.wpi.first.util.protobuf.Protobuf;
+import edu.wpi.first.util.struct.Struct;
+
 /**
  * Telemetry sends information from the robot program to dashboards, debug tools, or log files.
  *
@@ -64,6 +67,30 @@ public final class Telemetry {
    */
   public static void log(String name, Object value) {
     m_root.log(name, value);
+  }
+
+  /**
+   * Logs an object with a Struct serializer.
+   *
+   * @param <T> data type
+   * @param name the name
+   * @param value the value
+   * @param struct struct serializer
+   */
+  public <T> void log(String name, T value, Struct<T> struct) {
+    m_root.log(name, value, struct);
+  }
+
+  /**
+   * Logs an object with a Protobuf serializer.
+   *
+   * @param <T> data type
+   * @param name the name
+   * @param value the value
+   * @param proto protobuf serializer
+   */
+  public <T> void log(String name, T value, Protobuf<T, ?> proto) {
+    m_root.log(name, value, proto);
   }
 
   /**
