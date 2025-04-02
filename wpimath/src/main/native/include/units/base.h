@@ -80,6 +80,10 @@
 	#include <string>
 	#include <fmt/format.h>
 #endif
+#if __has_include(<wpi/telemetry/TelemetryTable.h>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)
+  #include <string_view>
+  #include <wpi/telemetry/TelemetryTable.h>
+#endif
 
 #include <gcem.hpp>
 
@@ -219,6 +223,28 @@ namespace units
 #else
     #define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)
 #endif
+/**
+ * @def			UNIT_ADD_TELEMETRY(namespaceName,nameSingular, abbreviation)
+ * @brief		Macro for generating the boiler-plate code needed for telemetry for a new unit.
+ * @details		The macro generates the code to insert units into a TelemetryTable
+ * @param		namespaceName namespace in which the new units will be encapsulated.
+ * @param		nameSingular singular version of the unit name, e.g. 'meter'
+ * @param		abbrev - abbreviated unit name, e.g. 'm'
+ * @note		When UNIT_LIB_DISABLE_TELEMETRY is defined, the macro does not generate any code
+ */
+#if __has_include(<wpi/telemetry/TelemetryTable.h>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)
+  #define UNIT_ADD_TELEMETRY(namespaceName, nameSingular, abbrev)\
+  namespace namespaceName\
+  {\
+	  inline void LogEntry(wpi::TelemetryTable& table, std::string_view name, const nameSingular ## _t& value)\
+	  {\
+			table.SetProperty(name, "unit", " "#nameSingular);\
+			table.Log(name, value.value());\
+	  }\
+  }
+#else
+	 #define UNIT_ADD_TELEMETRY(namespaceName, nameSingular, abbrev)
+#endif
 
  /**
   * @def		UNIT_ADD_NAME(namespaceName,nameSingular,abbreviation)
@@ -292,6 +318,7 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
 	UNIT_ADD_UNIT_DEFINITION(namespaceName,nameSingular)\
 	UNIT_ADD_NAME(namespaceName,nameSingular, abbreviation)\
 	UNIT_ADD_IO(namespaceName,nameSingular, abbreviation)\
+	UNIT_ADD_TELEMETRY(namespaceName,nameSingular, abbreviation)\
 	UNIT_ADD_LITERALS(namespaceName,nameSingular, abbreviation)
 
 /**
@@ -318,6 +345,7 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
 	UNIT_ADD_UNIT_TAGS(namespaceName,nameSingular, namePlural, abbreviation, __VA_ARGS__)\
 	UNIT_ADD_CUSTOM_TYPE_UNIT_DEFINITION(namespaceName,nameSingular,underlyingType)\
 	UNIT_ADD_IO(namespaceName,nameSingular, abbreviation)\
+	UNIT_ADD_TELEMETRY(namespaceName,nameSingular, abbreviation)\
 	UNIT_ADD_LITERALS(namespaceName,nameSingular, abbreviation)
 
 /**
@@ -335,6 +363,7 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
 		/** @name Unit Containers */ /** @{ */ typedef unit_t<nameSingular, UNIT_LIB_DEFAULT_TYPE, units::decibel_scale> abbreviation ## _t; /** @} */\
 	}\
 	UNIT_ADD_IO(namespaceName, abbreviation, abbreviation)\
+	UNIT_ADD_TELEMETRY(namespaceName, abbreviation, abbreviation)\
 	UNIT_ADD_LITERALS(namespaceName, abbreviation, abbreviation)
 
 /**

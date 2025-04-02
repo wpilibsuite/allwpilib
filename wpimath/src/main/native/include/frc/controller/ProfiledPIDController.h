@@ -415,9 +415,9 @@ class ProfiledPIDController : public wpi::TelemetryLoggable {
     table.Log("i", GetI());
     table.Log("d", GetD());
     table.Log("izone", GetIZone());
-    table.Log("maxVelocity", GetConstraints().maxVelocity.value());
-    table.Log("maxAcceleration", GetConstraints().maxAcceleration.value());
-    table.Log("goal", GetGoal().position.value());
+    table.Log("maxVelocity", GetConstraints().maxVelocity);
+    table.Log("maxAcceleration", GetConstraints().maxAcceleration);
+    table.Log("goal", GetGoal().position);
   }
 
   std::string_view GetTelemetryType() const override {
