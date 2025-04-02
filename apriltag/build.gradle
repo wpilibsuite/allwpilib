@@ -106,9 +106,11 @@ model {
 
             if (it.component.name == "${nativeName}JNI") {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
             } else {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
         }
