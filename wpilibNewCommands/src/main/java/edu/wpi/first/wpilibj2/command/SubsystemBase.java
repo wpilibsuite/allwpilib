@@ -54,10 +54,6 @@ public abstract class SubsystemBase implements Subsystem, TelemetryLoggable {
 
   @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (!table.setType("Subsystem")) {
-      return;
-    }
-
     var defaultCommand = getDefaultCommand();
     table.log(".hasDefault", defaultCommand != null);
     table.log(".default", defaultCommand != null ? defaultCommand.getName() : "none");
@@ -65,6 +61,11 @@ public abstract class SubsystemBase implements Subsystem, TelemetryLoggable {
     var currentCommand = getCurrentCommand();
     table.log(".hasCommand", currentCommand != null);
     table.log(".command", currentCommand != null ? currentCommand.getName() : "none");
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Subsystem";
   }
 
   private String m_name;

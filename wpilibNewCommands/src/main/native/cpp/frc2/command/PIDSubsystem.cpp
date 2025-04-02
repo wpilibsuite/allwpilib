@@ -4,6 +4,8 @@
 
 #include "frc2/command/PIDSubsystem.h"
 
+#include <wpi/telemetry/TelemetryTable.h>
+
 #include <utility>
 
 using namespace frc2;
@@ -12,7 +14,6 @@ PIDSubsystem::PIDSubsystem(frc::PIDController controller,
                            double initialPosition)
     : m_controller{std::move(controller)} {
   SetSetpoint(initialPosition);
-  AddChild("PID Controller", &m_controller);
 }
 
 void PIDSubsystem::Periodic() {
@@ -45,4 +46,8 @@ bool PIDSubsystem::IsEnabled() {
 
 frc::PIDController& PIDSubsystem::GetController() {
   return m_controller;
+}
+
+void PIDSubsystem::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("PID Controller", m_controller);
 }

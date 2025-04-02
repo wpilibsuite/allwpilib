@@ -29,6 +29,8 @@ class RobotContainer {
 
   frc2::Command* GetAutonomousCommand();
 
+  void UpdateTelemetry() const;
+
  private:
   // The driver's controller
   frc2::CommandPS4Controller m_driverController{

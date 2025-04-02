@@ -70,6 +70,8 @@ class [[deprecated("Use a PIDController instead")]] PIDSubsystem
    */
   frc::PIDController& GetController();
 
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
  protected:
   /// PID controller.
   frc::PIDController m_controller;
