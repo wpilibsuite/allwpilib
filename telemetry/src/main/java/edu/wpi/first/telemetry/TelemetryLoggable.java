@@ -16,7 +16,7 @@ public interface TelemetryLoggable {
 
   /**
    * Gets the telemetry table type. Default is no specified table type (null). A mismatch in
-   * type during logging result in a reported warning, so this should always return the same value.
+   * type during logging results in a reported warning, so this should always return the same value.
    *
    * @return Table type
    */

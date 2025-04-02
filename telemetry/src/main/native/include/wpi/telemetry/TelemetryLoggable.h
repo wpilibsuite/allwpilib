@@ -28,7 +28,7 @@ class TelemetryLoggable {
 
   /**
    * Gets the telemetry table type. Default is no specified table type (empty).
-   * A mismatch in type during logging result in a reported warning, so this
+   * A mismatch in type during logging results in a reported warning, so this
    * should always return the same value.
    *
    * @return Table type
