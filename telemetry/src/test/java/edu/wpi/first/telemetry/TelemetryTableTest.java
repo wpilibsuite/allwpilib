@@ -69,7 +69,7 @@ class TelemetryTableTest {
   @Test
   void testLoggableType() {
     TelemetryTable table = TelemetryRegistry.getTable("/");
-    Thing val = new ThingType(1, 2);
+    ThingType val = new ThingType(1, 2);
     table.log("test", val);
     assertEquals(table.getTable("test").getType(), "Thing");
     table.log("test", val);
