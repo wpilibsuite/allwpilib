@@ -36,9 +36,11 @@ class TelemetryTableTest {
     }
   }
 
-  class ThingType extends Thing {
-    ThingType(double x, double y) {
-      super(x, y);
+  record ThingType(double x, double y) implements TelemetryLoggable {
+    @Override
+    public void updateTelemetry(TelemetryTable table) {
+      table.log("x", x);
+      table.log("y", y);
     }
 
     @Override
