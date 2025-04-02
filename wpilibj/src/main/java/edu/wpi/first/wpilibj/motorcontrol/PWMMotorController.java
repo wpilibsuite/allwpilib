@@ -278,6 +278,6 @@ public abstract class PWMMotorController extends MotorSafety
 
   @Override
   public String getTelemetryType() {
-    return "MotorController";
+    return "Motor Controller";
   }
 }
