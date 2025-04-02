@@ -77,6 +77,6 @@ class TelemetryTableTest {
     assertEquals(actions.size(), 5);
 
     var value = m_mock.getLastValue("/test/.type", MockTelemetryBackend.LogStringValue.class);
-    assertEquals(value.getValue(), "Thing");
+    assertEquals(value.value(), "Thing");
   }
 }
