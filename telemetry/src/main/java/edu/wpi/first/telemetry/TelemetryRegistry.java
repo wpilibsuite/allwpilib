@@ -159,7 +159,8 @@ public final class TelemetryRegistry {
   /**
    * Gets the handler for logging an object. Should generally only be used by TelemetryTable.
    *
-   * @param cls class object
+   * @param <T> class
+   * @param value value
    * @return handler or null if no match
    */
   public static <T> TypeHandler<T> getTypeHandler(T value) {
