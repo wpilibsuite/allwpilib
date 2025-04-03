@@ -4,9 +4,9 @@
 
 #include "frc2/command/PIDSubsystem.h"
 
-#include <wpi/telemetry/TelemetryTable.h>
-
 #include <utility>
+
+#include <wpi/telemetry/TelemetryTable.h>
 
 using namespace frc2;
 

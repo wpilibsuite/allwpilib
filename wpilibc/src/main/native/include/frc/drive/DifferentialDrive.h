@@ -54,8 +54,7 @@ class MotorController;
  * or curvatureDrive methods should be called periodically to avoid Motor
  * Safety timeouts.
  */
-class DifferentialDrive : public RobotDriveBase,
-                          public wpi::TelemetryLoggable {
+class DifferentialDrive : public RobotDriveBase, public wpi::TelemetryLoggable {
  public:
   /**
    * Wheel speeds for a differential drive.
