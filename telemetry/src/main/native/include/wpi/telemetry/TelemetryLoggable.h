@@ -6,6 +6,8 @@
 
 #include <string_view>
 
+#include <wpi/SymbolExports.h>
+
 namespace wpi {
 
 class TelemetryTable;
@@ -13,7 +15,7 @@ class TelemetryTable;
 /**
  * The base interface for complex telemetry objects.
  */
-class TelemetryLoggable {
+class WPILIB_DLLEXPORT TelemetryLoggable {
   void anchor();  // provide a place for the vtable
 
  public:
