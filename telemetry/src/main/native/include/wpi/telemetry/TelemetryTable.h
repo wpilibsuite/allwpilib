@@ -29,40 +29,20 @@ class TelemetryTable;
 
 namespace impl {
 template <typename T>
-concept IsTelemetryLoggable = requires(TelemetryTable& table, const T& value) {
+concept TelemetryLoggable = requires(TelemetryTable& table, const T& value) {
   value.UpdateTelemetry(table);
 };
 
 template <typename T>
-concept IsTelemetryLoggableWithType =
-    IsTelemetryLoggable<T> && requires(TelemetryTable& table, const T& value) {
+concept TelemetryLoggableWithType =
+    TelemetryLoggable<T> && requires(TelemetryTable& table, const T& value) {
       { value.GetTelemetryType() } -> std::convertible_to<std::string_view>;
     };
 
 template <typename T, typename... I>
-concept TelemetryTableLoggableADL =
-    requires(TelemetryTable& table, const T& value, I... info) {
-      UpdateTelemetry(table, value, info...);
-    };
-
-template <typename T, typename... I>
-  requires TelemetryTableLoggableADL<T, I...>
-inline void TelemetryLogTableADL(TelemetryTable& table, const T& value,
-                                 I... info) {
-  UpdateTelemetry(table, value, info...);
-}
-
-template <typename T, typename... I>
-concept TelemetryEntryLoggableADL =
+concept TelemetryLoggableADL =
     requires(TelemetryTable& table, std::string_view name, const T& value,
-             I... info) { LogEntry(table, name, value, info...); };
-
-template <typename T, typename... I>
-  requires TelemetryEntryLoggableADL<T, I...>
-inline void TelemetryLogEntryADL(TelemetryTable& table, std::string_view name,
-                                 const T& value, I... info) {
-  LogEntry(table, name, value, info...);
-}
+             I... info) { LogTo(table, name, value, info...); };
 
 template <typename T>
 struct always_false : std::false_type {};
@@ -167,7 +147,7 @@ class TelemetryTable final {
   template <typename T, typename... I>
     requires(!impl::IsSpan<T>)
   void Log(std::string_view name, const T& value, I... info) {
-    if constexpr (impl::IsTelemetryLoggableWithType<T>) {
+    if constexpr (impl::TelemetryLoggableWithType<T>) {
       auto& table = GetTable(name);
       auto typeString = value.GetTelemetryType();
       bool setType = false;
@@ -184,14 +164,11 @@ class TelemetryTable final {
       if (setType) {
         table.SetType(typeString);
       }
-    } else if constexpr (impl::IsTelemetryLoggable<T>) {
+    } else if constexpr (impl::TelemetryLoggable<T>) {
       auto& table = GetTable(name);
       value.UpdateTelemetry(table);
-    } else if constexpr (impl::TelemetryTableLoggableADL<T, I...>) {
-      auto& table = GetTable(name);
-      impl::TelemetryLogTableADL(table, value, info...);
-    } else if constexpr (impl::TelemetryEntryLoggableADL<T, I...>) {
-      impl::TelemetryLogEntryADL(*this, name, value, info...);
+    } else if constexpr (impl::TelemetryLoggableADL<T, I...>) {
+      LogTo(*this, name, value, info...);
     } else if constexpr (wpi::StructSerializable<T, I...>) {
       using S = wpi::Struct<T, I...>;
       auto backend = TelemetryRegistry::GetBackend(name);

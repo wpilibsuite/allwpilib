@@ -18,9 +18,11 @@ struct TestStructADL {
   double y = 0;
 };
 
-void UpdateTelemetry(wpi::TelemetryTable& table, const TestStructADL& value) {
-  table.Log("x", value.x);
-  table.Log("y", value.y);
+void LogTo(wpi::TelemetryTable& table, std::string_view name,
+           const TestStructADL& value) {
+  auto& subtable = table.GetTable(name);
+  subtable.Log("x", value.x);
+  subtable.Log("y", value.y);
 }
 
 struct TestStructLoggable {
@@ -91,7 +93,8 @@ TEST_F(TelemetryTableTest, LogLoggableType) {
   auto actions = mock->GetActions();
   ASSERT_EQ(actions.size(), 5u);
 
-  auto value = mock->GetLastValue<wpi::MockTelemetryBackend::LogStringValue>("/test/.type");
+  auto value = mock->GetLastValue<wpi::MockTelemetryBackend::LogStringValue>(
+      "/test/.type");
   ASSERT_TRUE(value);
   ASSERT_EQ(value->value, "TestStructLoggableType");
 }

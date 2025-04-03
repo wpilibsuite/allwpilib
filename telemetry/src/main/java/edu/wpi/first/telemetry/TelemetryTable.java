@@ -230,10 +230,8 @@ public final class TelemetryTable {
     } else {
       // try other handlers
       var handler = TelemetryRegistry.getTypeHandler(value);
-      if (handler.entryHandler() != null) {
-        handler.entryHandler().accept(value, getEntry(name));
-      } else if (handler.tableHandler() != null) {
-        handler.tableHandler().accept(value, getTable(name));
+      if (handler != null) {
+        handler.logTo(this, name, value);
       } else {
         // fall back to string
         log(name, value.toString());

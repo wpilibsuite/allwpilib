@@ -236,9 +236,9 @@ namespace units
   #define UNIT_ADD_TELEMETRY(namespaceName, nameSingular, abbrev)\
   namespace namespaceName\
   {\
-	  inline void LogEntry(wpi::TelemetryTable& table, std::string_view name, const nameSingular ## _t& value)\
+	  inline void LogTo(wpi::TelemetryTable& table, std::string_view name, const nameSingular ## _t& value)\
 	  {\
-			table.SetProperty(name, "unit", " "#nameSingular);\
+			table.SetProperty(name, "unit", #nameSingular);\
 			table.Log(name, value.value());\
 	  }\
   }
