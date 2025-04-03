@@ -130,7 +130,6 @@ public class Arm implements AutoCloseable {
     m_encoder.close();
     m_mech2d.close();
     m_armPivot.close();
-    m_controller.close();
     m_arm.close();
   }
 }
