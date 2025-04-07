@@ -3538,8 +3538,6 @@ TEST_F(UnitTelemetry, Log) {
   auto actions = mock->GetActions();
   ASSERT_EQ(actions.size(), 4u);
 
-  LogTo(table, "testmeter", meter_t(5));
-
   ASSERT_EQ(actions[0].path, "/testmeter");
   ASSERT_TRUE(std::holds_alternative<wpi::MockTelemetryBackend::SetPropertyValue>(actions[0].value));
   ASSERT_EQ(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(actions[0].value).key, "unit");
@@ -3552,7 +3550,7 @@ TEST_F(UnitTelemetry, Log) {
   ASSERT_EQ(actions[2].path, "/testsquaremeter");
   ASSERT_TRUE(std::holds_alternative<wpi::MockTelemetryBackend::SetPropertyValue>(actions[2].value));
   ASSERT_EQ(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(actions[2].value).key, "unit");
-  ASSERT_EQ(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(actions[2].value).value, "meter");
+  ASSERT_EQ(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(actions[2].value).value, "square_meter");
 
   ASSERT_EQ(actions[3].path, "/testsquaremeter");
   ASSERT_TRUE(std::holds_alternative<double>(actions[3].value));
