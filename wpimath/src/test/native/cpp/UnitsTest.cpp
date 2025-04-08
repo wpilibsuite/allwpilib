@@ -3535,8 +3535,9 @@ TEST_F(UnitTelemetry, Log) {
   wpi::TelemetryTable& table = wpi::TelemetryRegistry::GetTable("/");
   table.Log("testmeter", meter_t(5));
   table.Log("testsquaremeter", square_meter_t(3));
+  table.Log("testwatt", watt_t(3));
   auto actions = mock->GetActions();
-  ASSERT_EQ(actions.size(), 4u);
+  ASSERT_EQ(actions.size(), 6u);
 
   ASSERT_EQ(actions[0].path, "/testmeter");
   ASSERT_TRUE(std::holds_alternative<wpi::MockTelemetryBackend::SetPropertyValue>(actions[0].value));
@@ -3555,4 +3556,13 @@ TEST_F(UnitTelemetry, Log) {
   ASSERT_EQ(actions[3].path, "/testsquaremeter");
   ASSERT_TRUE(std::holds_alternative<double>(actions[3].value));
   ASSERT_EQ(std::get<double>(actions[3].value), 3);
+
+  ASSERT_EQ(actions[4].path, "/testwatt");
+  ASSERT_TRUE(std::holds_alternative<wpi::MockTelemetryBackend::SetPropertyValue>(actions[4].value));
+  ASSERT_EQ(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(actions[4].value).key, "unit");
+  ASSERT_EQ(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(actions[4].value).value, "m^2 kg s^-3");
+
+  ASSERT_EQ(actions[5].path, "/testwatt");
+  ASSERT_TRUE(std::holds_alternative<double>(actions[5].value));
+  ASSERT_EQ(std::get<double>(actions[5].value), 3);
 }

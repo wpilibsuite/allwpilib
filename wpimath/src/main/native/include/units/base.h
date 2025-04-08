@@ -3500,28 +3500,28 @@ consteval auto ConcatAbbrev(
 	}
 	return res;
 }
-}  // namespace detail
 
 template<class Units>
 consteval auto ComplexAbbrev() {
   using namespace wpi::literals;
 	using BaseUnit = typename traits::unit_traits<Units>::base_unit_type;
-	auto s1 = detail::ConcatAbbrev<typename BaseUnit::meter_ratio>(""_ct_string, "m"_ct_string);
-	auto s2 = detail::ConcatAbbrev<typename BaseUnit::kilogram_ratio>(s1, "kg"_ct_string);
-	auto s3 = detail::ConcatAbbrev<typename BaseUnit::second_ratio>(s2, "s"_ct_string);
-	auto s4 = detail::ConcatAbbrev<typename BaseUnit::ampere_ratio>(s3, "A"_ct_string);
-	auto s5 = detail::ConcatAbbrev<typename BaseUnit::kelvin_ratio>(s4, "K"_ct_string);
-	auto s6 = detail::ConcatAbbrev<typename BaseUnit::mole_ratio>(s5, "mol"_ct_string);
-	auto s7 = detail::ConcatAbbrev<typename BaseUnit::candela_ratio>(s6, "cd"_ct_string);
-	auto s8 = detail::ConcatAbbrev<typename BaseUnit::radian_ratio>(s7, "rad"_ct_string);
-	auto s9 = detail::ConcatAbbrev<typename BaseUnit::byte_ratio>(s8, "b"_ct_string);
+	auto s1 = ConcatAbbrev<typename BaseUnit::meter_ratio>(""_ct_string, "m"_ct_string);
+	auto s2 = ConcatAbbrev<typename BaseUnit::kilogram_ratio>(s1, "kg"_ct_string);
+	auto s3 = ConcatAbbrev<typename BaseUnit::second_ratio>(s2, "s"_ct_string);
+	auto s4 = ConcatAbbrev<typename BaseUnit::ampere_ratio>(s3, "A"_ct_string);
+	auto s5 = ConcatAbbrev<typename BaseUnit::kelvin_ratio>(s4, "K"_ct_string);
+	auto s6 = ConcatAbbrev<typename BaseUnit::mole_ratio>(s5, "mol"_ct_string);
+	auto s7 = ConcatAbbrev<typename BaseUnit::candela_ratio>(s6, "cd"_ct_string);
+	auto s8 = ConcatAbbrev<typename BaseUnit::radian_ratio>(s7, "rad"_ct_string);
+	auto s9 = ConcatAbbrev<typename BaseUnit::byte_ratio>(s8, "b"_ct_string);
 	return s9;
 }
+}  // namespace detail
 
 template<class Units, typename T, template<typename> class NonLinearScale>
 inline void LogTo(wpi::TelemetryTable& table, std::string_view n, const unit_t<Units, T, NonLinearScale>& value)
 {
-	table.SetProperty(n, "unit", ComplexAbbrev<Units>());
+	table.SetProperty(n, "unit", detail::ComplexAbbrev<Units>());
 	using BaseUnits = unit<std::ratio<1>, typename traits::unit_traits<Units>::base_unit_type>;
 	table.Log(n, convert<Units, BaseUnits>(value()));
 }
