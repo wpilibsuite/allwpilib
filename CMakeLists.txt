@@ -145,7 +145,8 @@ if(WITH_DOCS)
 endif()
 
 if(WITH_WPICAL)
-    find_package(Ceres CONFIG REQUIRED)
+    # find_package(Ceres CONFIG REQUIRED)
+    find_package (SuiteSparse 5.12 NO_MODULE)
 endif()
 
 find_package(LIBSSH CONFIG 0.7.1)
