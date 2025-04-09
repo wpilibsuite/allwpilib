@@ -200,7 +200,8 @@ class TrapezoidProfile {
    * Returns the time left until a target distance in the profile is reached.
    *
    * @param target The target distance.
-   * @return The time left until a target distance in the profile is reached.
+   * @return The time left until a target distance in the profile is reached, or
+   * zero if no goal was set.
    */
   constexpr units::second_t TimeLeftUntil(Distance_t target) const {
     Distance_t position = m_current.position * m_direction;
@@ -271,7 +272,8 @@ class TrapezoidProfile {
   /**
    * Returns the total time the profile takes to reach the goal.
    *
-   * @return The total time the profile takes to reach the goal.
+   * @return The total time the profile takes to reach the goal, or zero if no
+   * goal was set.
    */
   constexpr units::second_t TotalTime() const { return m_endDecel; }
 

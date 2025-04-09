@@ -234,3 +234,10 @@ TEST(TrapezoidProfileTest, TimingBeforeNegativeGoal) {
     }
   }
 }
+
+TEST(TrapezoidProfileTest, InitalizationOfCurrentState) {
+  frc::TrapezoidProfile<units::meter>::Constraints constraints{1_mps, 1_mps_sq};
+  frc::TrapezoidProfile<units::meter> profile{constraints};
+  EXPECT_NEAR_UNITS(profile.TimeLeftUntil(0_m), 0_s, 1e-10_s);
+  EXPECT_NEAR_UNITS(profile.TotalTime(), 0_s, 1e-10_s);
+}
