@@ -3464,41 +3464,20 @@ consteval auto ConcatAbbrev(
 		wpi::ct_string<Char, Traits, N> const& str,
 		wpi::ct_string<Char, Traits, N1> const& abbrev) {
   using namespace wpi::literals;
-	constexpr auto num_str = wpi::NumToCtString<Ratio::num>();
-	constexpr auto den_str = wpi::NumToCtString<Ratio::den>();
-	constexpr int asize =
-		(Ratio::num != 0 ? N1 : 0) +
-		(Ratio::num != 0 && Ratio::num != 1 ? (1 + num_str.size()) : 0) +
-		(Ratio::den != 1 ? (1 + den_str.size()) : 0);
-	constexpr int size = N + (N != 0 && asize != 0 ? 1 : 0) + asize;
-
-	// Need a dummy array to instantiate a ct_string.
-	constexpr Char dummy[1] = {};
-	auto res = wpi::ct_string<Char, Traits, size>{dummy};
-
-	auto p = res.chars.begin();
-  auto append = [&p](auto&& s) {
-    for (auto c : s) {
-      *p++ = c;
+  constexpr auto only_if = []<bool b>(const auto& s) {
+    if constexpr (b) {
+      return s;
     }
+    return ""_ct_string;
   };
-
-	append(str);
-	if constexpr (N != 0 && asize != 0) {
-		append(" "_ct_string);
-	}
-	if constexpr (Ratio::num != 0) {
-		append(abbrev);
-	}
-	if constexpr (Ratio::num != 0 && Ratio::num != 1) {
-		append("^"_ct_string);
-		append(num_str);
-	}
-	if constexpr (Ratio::den != 1) {
-		append("/"_ct_string);
-		append(den_str);
-	}
-	return res;
+  return wpi::Concat(
+    str,
+    only_if<N != 0 && Ratio::num != 0>(" "_ct_string),
+    only_if<Ratio::num != 0>(abbrev),
+    only_if<Ratio::num != 0 && Ratio::num != 1>("^"_ct_string),
+    only_if<Ratio::num != 0 && Ratio::num != 1>(wpi::NumToCtString<Ratio::num>()),
+    only_if<Ratio::den != 1>("/"_ct_string),
+    only_if<Ratio::den != 1>(wpi::NumToCtString<Ratio::den>()));
 }
 
 template<class Units>
