@@ -3459,25 +3459,29 @@ namespace units {
 
 #if __has_include(<wpi/telemetry/TelemetryTable.h>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)
 namespace detail {
+template <bool b>
+constexpr auto only_if(const auto& s) {
+	if constexpr (b) {
+		return s;
+	} else {
+		using namespace wpi::literals;
+		return ""_ct_string;
+	}
+}
+
 template <typename Ratio, typename Char, typename Traits, size_t N, size_t N1>
 consteval auto ConcatAbbrev(
 		wpi::ct_string<Char, Traits, N> const& str,
 		wpi::ct_string<Char, Traits, N1> const& abbrev) {
   using namespace wpi::literals;
-  constexpr auto only_if = []<bool b>(const auto& s) {
-    if constexpr (b) {
-      return s;
-    }
-    return ""_ct_string;
-  };
   return wpi::Concat(
     str,
-    only_if<N != 0 && Ratio::num != 0>(" "_ct_string),
-    only_if<Ratio::num != 0>(abbrev),
-    only_if<Ratio::num != 0 && Ratio::num != 1>("^"_ct_string),
-    only_if<Ratio::num != 0 && Ratio::num != 1>(wpi::NumToCtString<Ratio::num>()),
-    only_if<Ratio::den != 1>("/"_ct_string),
-    only_if<Ratio::den != 1>(wpi::NumToCtString<Ratio::den>()));
+    only_if<(N != 0 && Ratio::num != 0)>(" "_ct_string),
+    only_if<(Ratio::num != 0)>(abbrev),
+    only_if<(Ratio::num != 0 && Ratio::num != 1)>("^"_ct_string),
+    only_if<(Ratio::num != 0 && Ratio::num != 1)>(wpi::NumToCtString<Ratio::num>()),
+    only_if<(Ratio::den != 1)>("/"_ct_string),
+    only_if<(Ratio::den != 1)>(wpi::NumToCtString<Ratio::den>()));
 }
 
 template<class Units>
