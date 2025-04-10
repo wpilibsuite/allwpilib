@@ -7,8 +7,7 @@
 #include <hal/DIO.h>
 #include <hal/Types.h>
 #include <units/time.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 namespace frc {
 
@@ -19,8 +18,7 @@ namespace frc {
  * elsewhere will allocate channels automatically so for those devices it
  * shouldn't be done here.
  */
-class DigitalOutput : public wpi::Sendable,
-                      public wpi::SendableHelper<DigitalOutput> {
+class DigitalOutput : public wpi::TelemetryLoggable {
  public:
   /**
    * Create an instance of a digital output.
@@ -139,7 +137,9 @@ class DigitalOutput : public wpi::Sendable,
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   int m_channel;

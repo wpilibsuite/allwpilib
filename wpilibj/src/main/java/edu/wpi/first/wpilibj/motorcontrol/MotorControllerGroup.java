@@ -4,9 +4,8 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.telemetry.TelemetryLoggable;
+import edu.wpi.first.telemetry.TelemetryTable;
 import java.util.Arrays;
 
 /**
@@ -15,12 +14,10 @@ import java.util.Arrays;
  * @deprecated Use {@link PWMMotorController#addFollower(PWMMotorController)} or if using CAN motor
  *     controllers, use their method of following.
  */
-@SuppressWarnings("removal")
 @Deprecated(forRemoval = true, since = "2024")
-public class MotorControllerGroup implements MotorController, Sendable, AutoCloseable {
+public class MotorControllerGroup implements MotorController, TelemetryLoggable, AutoCloseable {
   private boolean m_isInverted;
   private final MotorController[] m_motorControllers;
-  private static int instances;
 
   /**
    * Create a new MotorControllerGroup with the provided MotorControllers.
@@ -28,13 +25,11 @@ public class MotorControllerGroup implements MotorController, Sendable, AutoClos
    * @param motorController The first MotorController to add
    * @param motorControllers The MotorControllers to add
    */
-  @SuppressWarnings("this-escape")
   public MotorControllerGroup(
       MotorController motorController, MotorController... motorControllers) {
     m_motorControllers = new MotorController[motorControllers.length + 1];
     m_motorControllers[0] = motorController;
     System.arraycopy(motorControllers, 0, m_motorControllers, 1, motorControllers.length);
-    init();
   }
 
   /**
@@ -42,24 +37,12 @@ public class MotorControllerGroup implements MotorController, Sendable, AutoClos
    *
    * @param motorControllers The MotorControllers to add.
    */
-  @SuppressWarnings("this-escape")
   public MotorControllerGroup(MotorController[] motorControllers) {
     m_motorControllers = Arrays.copyOf(motorControllers, motorControllers.length);
-    init();
-  }
-
-  private void init() {
-    for (MotorController controller : m_motorControllers) {
-      SendableRegistry.addChild(this, controller);
-    }
-    instances++;
-    SendableRegistry.add(this, "MotorControllerGroup", instances);
   }
 
   @Override
-  public void close() {
-    SendableRegistry.remove(this);
-  }
+  public void close() {}
 
   @Override
   public void set(double speed) {
@@ -108,9 +91,12 @@ public class MotorControllerGroup implements MotorController, Sendable, AutoClos
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Motor Controller");
-    builder.setActuator(true);
-    builder.addDoubleProperty("Value", this::get, this::set);
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("Value", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Motor Controller";
   }
 }

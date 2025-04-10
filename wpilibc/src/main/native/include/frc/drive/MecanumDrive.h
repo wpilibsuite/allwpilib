@@ -5,13 +5,11 @@
 #pragma once
 
 #include <functional>
-#include <memory>
 #include <string>
 
 #include <units/angle.h>
 #include <wpi/deprecated.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc/drive/RobotDriveBase.h"
 #include "frc/geometry/Rotation2d.h"
@@ -52,9 +50,7 @@ class MotorController;
  * MotorSafety is enabled by default. The DriveCartesian or DrivePolar
  * methods should be called periodically to avoid Motor Safety timeouts.
  */
-class MecanumDrive : public RobotDriveBase,
-                     public wpi::Sendable,
-                     public wpi::SendableHelper<MecanumDrive> {
+class MecanumDrive : public RobotDriveBase, public wpi::TelemetryLoggable {
  public:
   /**
    * Wheel speeds for a mecanum drive.
@@ -165,7 +161,9 @@ class MecanumDrive : public RobotDriveBase,
   void StopMotor() override;
   std::string GetDescription() const override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   std::function<void(double)> m_frontLeftMotor;

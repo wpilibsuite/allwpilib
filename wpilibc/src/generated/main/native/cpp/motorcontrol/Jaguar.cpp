@@ -10,7 +10,7 @@
 
 using namespace frc;
 
-Jaguar::Jaguar(int channel) : PWMMotorController("Jaguar", channel) {
+Jaguar::Jaguar(int channel) : PWMMotorController(channel) {
   SetBounds(2.31_ms, 1.55_ms, 1.507_ms, 1.454_ms, 0.697_ms);
   m_pwm.SetOutputPeriod(PWM::kOutputPeriod_5Ms);
   SetSpeed(0.0);

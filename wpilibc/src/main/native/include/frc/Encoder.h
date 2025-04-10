@@ -4,12 +4,9 @@
 
 #pragma once
 
-#include <memory>
-
 #include <hal/Encoder.h>
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc/CounterBase.h"
 
@@ -29,9 +26,7 @@ namespace frc {
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Encoder : public CounterBase,
-                public wpi::Sendable,
-                public wpi::SendableHelper<Encoder> {
+class Encoder : public CounterBase, public wpi::TelemetryLoggable {
  public:
   /**
    * Encoder constructor.
@@ -247,7 +242,9 @@ class Encoder : public CounterBase,
 
   int GetFPGAIndex() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   /**
@@ -278,6 +275,7 @@ class Encoder : public CounterBase,
   double DecodingScaleFactor() const;
 
   hal::Handle<HAL_EncoderHandle, HAL_FreeEncoder> m_encoder;
+  EncodingType m_type;
 };
 
 }  // namespace frc

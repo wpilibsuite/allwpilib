@@ -4,15 +4,11 @@
 
 #include "frc/DoubleSolenoid.h"
 
-#include <utility>
-
 #include <hal/Ports.h>
 #include <wpi/NullDeleter.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/Errors.h"
-#include "frc/SensorUtil.h"
 
 using namespace frc;
 
@@ -52,9 +48,6 @@ DoubleSolenoid::DoubleSolenoid(int busId, int module,
   m_module->ReportUsage(
       fmt::format("Solenoid[{},{}]", m_forwardChannel, m_reverseChannel),
       "DoubleSolenoid");
-
-  wpi::SendableRegistry::Add(this, "DoubleSolenoid",
-                             m_module->GetModuleNumber(), m_forwardChannel);
 }
 
 DoubleSolenoid::DoubleSolenoid(int busId, PneumaticsModuleType moduleType,
@@ -124,28 +117,22 @@ bool DoubleSolenoid::IsRevSolenoidDisabled() const {
   return (m_module->GetSolenoidDisabledList() & m_reverseMask) != 0;
 }
 
-void DoubleSolenoid::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Double Solenoid");
-  builder.SetActuator(true);
-  builder.AddSmallStringProperty(
-      "Value",
-      [=, this](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
-        switch (Get()) {
-          case kForward:
-            return "Forward";
-          case kReverse:
-            return "Reverse";
-          default:
-            return "Off";
-        }
-      },
-      [=, this](std::string_view value) {
-        Value lvalue = kOff;
-        if (value == "Forward") {
-          lvalue = kForward;
-        } else if (value == "Reverse") {
-          lvalue = kReverse;
-        }
-        Set(lvalue);
-      });
+void DoubleSolenoid::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  std::string_view str;
+  switch (Get()) {
+    case kForward:
+      str = "Forward";
+      break;
+    case kReverse:
+      str = "Reverse";
+      break;
+    default:
+      str = "Off";
+      break;
+  }
+  table.Log("Value", str);
+}
+
+std::string_view DoubleSolenoid::GetTelemetryType() const {
+  return "Double Solenoid";
 }

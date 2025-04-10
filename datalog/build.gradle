@@ -25,8 +25,18 @@ model {
             }
         }
     }
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+        }
+    }
 }
 
 dependencies {
-    api project(":wpiutil")
+    implementation project(":telemetry")
+    implementation project(":wpiutil")
 }

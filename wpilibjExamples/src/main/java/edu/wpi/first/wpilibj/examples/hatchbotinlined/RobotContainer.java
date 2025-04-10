@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.hatchbotinlined;
 
+import edu.wpi.first.telemetry.Telemetry;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.commands.Autos;
@@ -63,10 +64,13 @@ public class RobotContainer {
 
     // Put the chooser on the dashboard
     SmartDashboard.putData("Autonomous", m_chooser);
+  }
 
-    // Put subsystems to dashboard.
-    SmartDashboard.putData("Drivetrain", m_robotDrive);
-    SmartDashboard.putData("HatchSubsystem", m_hatchSubsystem);
+  /** Update telemetry. */
+  public void updateTelemetry() {
+    // Put subsystems to telemetry.
+    Telemetry.log("Drivetrain", m_robotDrive);
+    Telemetry.log("HatchSubsystem", m_hatchSubsystem);
   }
 
   /**

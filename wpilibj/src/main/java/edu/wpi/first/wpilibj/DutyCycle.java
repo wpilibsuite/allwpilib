@@ -6,9 +6,8 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DutyCycleJNI;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.telemetry.TelemetryLoggable;
+import edu.wpi.first.telemetry.TelemetryTable;
 
 /**
  * Class to read a duty cycle PWM input.
@@ -19,7 +18,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * <p>These can be combined as the input of an AnalogTrigger to a Counter in order to implement
  * rollover checking.
  */
-public class DutyCycle implements Sendable, AutoCloseable {
+public class DutyCycle implements TelemetryLoggable, AutoCloseable {
   // Explicitly package private
   final int m_handle;
   private final int m_channel;
@@ -29,19 +28,16 @@ public class DutyCycle implements Sendable, AutoCloseable {
    *
    * @param channel The channel to use.
    */
-  @SuppressWarnings("this-escape")
   public DutyCycle(int channel) {
     m_handle = DutyCycleJNI.initialize(channel);
 
     m_channel = channel;
     HAL.reportUsage("IO", channel, "DutyCycle");
-    SendableRegistry.add(this, "Duty Cycle", channel);
   }
 
   /** Close the DutyCycle and free all resources. */
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     DutyCycleJNI.free(m_handle);
   }
 
@@ -105,9 +101,13 @@ public class DutyCycle implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Duty Cycle");
-    builder.addDoubleProperty("Frequency", this::getFrequency, null);
-    builder.addDoubleProperty("Output", this::getOutput, null);
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("Frequency", getFrequency());
+    table.log("Output", getOutput());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Duty Cycle";
   }
 }

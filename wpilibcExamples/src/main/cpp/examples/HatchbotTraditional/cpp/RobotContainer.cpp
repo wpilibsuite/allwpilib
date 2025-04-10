@@ -6,6 +6,7 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/button/JoystickButton.h>
+#include <wpi/telemetry/Telemetry.h>
 
 #include "commands/DefaultDrive.h"
 #include "commands/GrabHatch.h"
@@ -21,9 +22,6 @@ RobotContainer::RobotContainer() {
 
   // Put the chooser on the dashboard
   frc::SmartDashboard::PutData("Autonomous", &m_chooser);
-  // Put subsystems to dashboard.
-  frc::SmartDashboard::PutData("Drivetrain", &m_drive);
-  frc::SmartDashboard::PutData("HatchSubsystem", &m_hatch);
 
   // Configure the button bindings
   ConfigureButtonBindings();
@@ -55,4 +53,10 @@ void RobotContainer::ConfigureButtonBindings() {
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
   return m_chooser.GetSelected();
+}
+
+void RobotContainer::UpdateTelemetry() const {
+  // Put subsystems to dashboard.
+  wpi::Telemetry::Log("Drivetrain", m_drive);
+  wpi::Telemetry::Log("HatchSubsystem", m_hatch);
 }

@@ -6,9 +6,8 @@ package edu.wpi.first.wpilibj.counter;
 
 import edu.wpi.first.hal.CounterJNI;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.telemetry.TelemetryLoggable;
+import edu.wpi.first.telemetry.TelemetryTable;
 
 /**
  * Up Down Counter.
@@ -16,7 +15,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * <p>This class can count edges on a single digital input or count up based on an edge from one
  * digital input and down on an edge from another digital input.
  */
-public class UpDownCounter implements Sendable, AutoCloseable {
+public class UpDownCounter implements TelemetryLoggable, AutoCloseable {
   private final int m_handle;
 
   /**
@@ -25,19 +24,16 @@ public class UpDownCounter implements Sendable, AutoCloseable {
    * @param channel The up count source (can be null).
    * @param configuration The edge configuration.
    */
-  @SuppressWarnings("this-escape")
   public UpDownCounter(int channel, EdgeConfiguration configuration) {
     m_handle = CounterJNI.initializeCounter(channel, configuration.rising);
 
     reset();
 
     HAL.reportUsage("IO", channel, "UpDownCounter");
-    SendableRegistry.add(this, "UpDown Counter", channel);
   }
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     CounterJNI.freeCounter(m_handle);
   }
 
@@ -65,8 +61,12 @@ public class UpDownCounter implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("UpDown Counter");
-    builder.addDoubleProperty("Count", this::getCount, null);
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("Count", getCount());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "UpDown Counter";
   }
 }

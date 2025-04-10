@@ -9,8 +9,6 @@
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
 
-#include "Constants.h"
-
 class HatchSubsystem : public frc2::SubsystemBase {
  public:
   HatchSubsystem();
@@ -27,7 +25,7 @@ class HatchSubsystem : public frc2::SubsystemBase {
    */
   frc2::CommandPtr ReleaseHatchCommand();
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

@@ -21,7 +21,7 @@ class ServoSim;
  * The range parameters default to the appropriate values for the Hitec HS-322HD
  * servo provided in the FIRST Kit of Parts in 2008.
  */
-class Servo : public wpi::Sendable, public wpi::SendableHelper<Servo> {
+class Servo : public wpi::TelemetryLoggable {
  public:
   friend class frc::sim::ServoSim;
 
@@ -88,7 +88,9 @@ class Servo : public wpi::Sendable, public wpi::SendableHelper<Servo> {
 
   int GetChannel() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   static double GetServoAngleRange();

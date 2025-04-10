@@ -9,7 +9,7 @@
 #include <hal/Counter.h>
 #include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
-#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/Errors.h"
 
@@ -25,7 +25,6 @@ Tachometer::Tachometer(int channel, EdgeConfiguration configuration)
   FRC_CheckErrorStatus(status, "{}", channel);
 
   HAL_ReportUsage("IO", channel, "Tachometer");
-  wpi::SendableRegistry::Add(this, "Tachometer", channel);
 }
 
 void Tachometer::SetEdgeConfiguration(EdgeConfiguration configuration) {
@@ -87,10 +86,11 @@ void Tachometer::SetMaxPeriod(units::second_t maxPeriod) {
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-void Tachometer::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Tachometer");
-  builder.AddDoubleProperty(
-      "RPS", [&] { return GetRevolutionsPerSecond().value(); }, nullptr);
-  builder.AddDoubleProperty(
-      "RPM", [&] { return GetRevolutionsPerMinute().value(); }, nullptr);
+void Tachometer::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("RPS", GetRevolutionsPerSecond().value());
+  table.Log("RPM", GetRevolutionsPerMinute().value());
+}
+
+std::string_view Tachometer::GetTelemetryType() const {
+  return "Tachometer";
 }

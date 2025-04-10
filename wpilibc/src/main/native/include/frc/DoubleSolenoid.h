@@ -7,8 +7,7 @@
 #include <memory>
 
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc/PneumaticsBase.h"
 #include "frc/PneumaticsModuleType.h"
@@ -22,8 +21,7 @@ namespace frc {
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
  */
-class DoubleSolenoid : public wpi::Sendable,
-                       public wpi::SendableHelper<DoubleSolenoid> {
+class DoubleSolenoid : public wpi::TelemetryLoggable {
  public:
   /**
    * Possible values for a DoubleSolenoid.
@@ -126,7 +124,9 @@ class DoubleSolenoid : public wpi::Sendable,
    */
   bool IsRevSolenoidDisabled() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   std::shared_ptr<PneumaticsBase> m_module;

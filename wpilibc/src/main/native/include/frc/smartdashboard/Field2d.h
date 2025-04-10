@@ -8,12 +8,9 @@
 #include <string_view>
 #include <vector>
 
-#include <networktables/NTSendable.h>
-#include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableEntry.h>
 #include <units/length.h>
 #include <wpi/mutex.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -39,7 +36,7 @@ namespace frc {
  * also be shown by using the GetObject() function.  Other objects can
  * also have multiple poses (which will show the object at multiple locations).
  */
-class Field2d : public nt::NTSendable, public wpi::SendableHelper<Field2d> {
+class Field2d : public wpi::TelemetryLoggable {
  public:
   using Entry = size_t;
 
@@ -85,11 +82,11 @@ class Field2d : public nt::NTSendable, public wpi::SendableHelper<Field2d> {
    */
   FieldObject2d* GetRobotObject();
 
-  void InitSendable(nt::NTSendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
-  std::shared_ptr<nt::NetworkTable> m_table;
-
   mutable wpi::mutex m_mutex;
   std::vector<std::unique_ptr<FieldObject2d>> m_objects;
 };

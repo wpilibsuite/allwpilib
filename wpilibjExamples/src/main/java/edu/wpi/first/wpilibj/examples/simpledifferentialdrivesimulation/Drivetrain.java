@@ -15,6 +15,7 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.telemetry.Telemetry;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -22,7 +23,6 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivetrain {
   // 3 meters per second.
@@ -87,7 +87,6 @@ public class Drivetrain {
     m_rightEncoder.reset();
 
     m_rightLeader.setInverted(true);
-    SmartDashboard.putData("Field", m_fieldSim);
   }
 
   /** Sets speeds to the drivetrain motors. */
@@ -151,5 +150,6 @@ public class Drivetrain {
   public void periodic() {
     updateOdometry();
     m_fieldSim.setRobotPose(m_odometry.getPose());
+    Telemetry.log("Field", m_fieldSim);
   }
 }

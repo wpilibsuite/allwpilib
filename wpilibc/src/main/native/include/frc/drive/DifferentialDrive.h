@@ -8,8 +8,7 @@
 #include <string>
 
 #include <wpi/deprecated.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc/drive/RobotDriveBase.h"
 
@@ -55,9 +54,7 @@ class MotorController;
  * or curvatureDrive methods should be called periodically to avoid Motor
  * Safety timeouts.
  */
-class DifferentialDrive : public RobotDriveBase,
-                          public wpi::Sendable,
-                          public wpi::SendableHelper<DifferentialDrive> {
+class DifferentialDrive : public RobotDriveBase, public wpi::TelemetryLoggable {
  public:
   /**
    * Wheel speeds for a differential drive.
@@ -198,7 +195,9 @@ class DifferentialDrive : public RobotDriveBase,
   void StopMotor() override;
   std::string GetDescription() const override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   std::function<void(double)> m_leftMotor;

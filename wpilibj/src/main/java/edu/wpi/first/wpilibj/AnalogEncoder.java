@@ -9,12 +9,11 @@ import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.telemetry.TelemetryLoggable;
+import edu.wpi.first.telemetry.TelemetryTable;
 
 /** Class for supporting continuous analog encoders, such as the US Digital MA3. */
-public class AnalogEncoder implements Sendable, AutoCloseable {
+public class AnalogEncoder implements TelemetryLoggable, AutoCloseable {
   private final AnalogInput m_analogInput;
   private boolean m_ownsAnalogInput;
   private double m_fullRange;
@@ -45,7 +44,6 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
    * @param fullRange the value to report at maximum travel
    * @param expectedZero the reading where you would expect a 0 from get()
    */
-  @SuppressWarnings("this-escape")
   public AnalogEncoder(AnalogInput analogInput, double fullRange, double expectedZero) {
     m_analogInput = analogInput;
     init(fullRange, expectedZero);
@@ -69,7 +67,6 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
    *
    * @param analogInput the analog input to attach to
    */
-  @SuppressWarnings("this-escape")
   public AnalogEncoder(AnalogInput analogInput) {
     this(analogInput, 1.0, 0.0);
   }
@@ -85,8 +82,6 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     m_expectedZero = expectedZero;
 
     HAL.reportUsage("IO", m_analogInput.getChannel(), "AnalogEncoder");
-
-    SendableRegistry.add(this, "Analog Encoder", m_analogInput.getChannel());
   }
 
   private double mapSensorRange(double pos) {
@@ -170,8 +165,12 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("AbsoluteEncoder");
-    builder.addDoubleProperty("Position", this::get, null);
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("Position", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "AbsoluteEncoder";
   }
 }

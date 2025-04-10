@@ -9,6 +9,8 @@
 
 #include <gtest/gtest.h>
 #include <wpi/print.h>
+#include <wpi/telemetry/MockTelemetryBackend.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "units/acceleration.h"
 #include "units/angle.h"
@@ -164,6 +166,19 @@ class CaseStudies : public ::testing::Test {
     using c = unit_value_sqrt<
         unit_value_add<unit_value_power<a, 2>, unit_value_power<b, 2>>>;
   };
+};
+
+class UnitTelemetry : public ::testing::Test {
+ protected:
+  void SetUp() override {
+    wpi::TelemetryRegistry::Reset();
+    wpi::TelemetryRegistry::RegisterBackend("", mock);
+  }
+
+  void TearDown() override { wpi::TelemetryRegistry::Reset(); }
+
+  std::shared_ptr<wpi::MockTelemetryBackend> mock =
+      std::make_shared<wpi::MockTelemetryBackend>();
 };
 }  // namespace
 
@@ -3512,4 +3527,42 @@ TEST_F(CaseStudies, pythagoreanTheorum) {
   EXPECT_TRUE(pow<2>(RightTriangle::a::value()) +
                   pow<2>(RightTriangle::b::value()) ==
               pow<2>(RightTriangle::c::value()));
+}
+
+static_assert(wpi::impl::TelemetryLoggableADL<meter_t>);
+
+TEST_F(UnitTelemetry, Log) {
+  wpi::TelemetryTable& table = wpi::TelemetryRegistry::GetTable("/");
+  table.Log("testmeter", meter_t(5));
+  table.Log("testsquaremeter", square_meter_t(3));
+  table.Log("testwatt", watt_t(3));
+  auto actions = mock->GetActions();
+  ASSERT_EQ(actions.size(), 6u);
+
+  ASSERT_EQ(actions[0].path, "/testmeter");
+  ASSERT_TRUE(std::holds_alternative<wpi::MockTelemetryBackend::SetPropertyValue>(actions[0].value));
+  ASSERT_EQ(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(actions[0].value).key, "unit");
+  ASSERT_EQ(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(actions[0].value).value, "m");
+
+  ASSERT_EQ(actions[1].path, "/testmeter");
+  ASSERT_TRUE(std::holds_alternative<double>(actions[1].value));
+  ASSERT_EQ(std::get<double>(actions[1].value), 5);
+
+  ASSERT_EQ(actions[2].path, "/testsquaremeter");
+  ASSERT_TRUE(std::holds_alternative<wpi::MockTelemetryBackend::SetPropertyValue>(actions[2].value));
+  ASSERT_EQ(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(actions[2].value).key, "unit");
+  ASSERT_EQ(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(actions[2].value).value, "m^2");
+
+  ASSERT_EQ(actions[3].path, "/testsquaremeter");
+  ASSERT_TRUE(std::holds_alternative<double>(actions[3].value));
+  ASSERT_EQ(std::get<double>(actions[3].value), 3);
+
+  ASSERT_EQ(actions[4].path, "/testwatt");
+  ASSERT_TRUE(std::holds_alternative<wpi::MockTelemetryBackend::SetPropertyValue>(actions[4].value));
+  ASSERT_EQ(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(actions[4].value).key, "unit");
+  ASSERT_EQ(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(actions[4].value).value, "m^2 kg s^-3");
+
+  ASSERT_EQ(actions[5].path, "/testwatt");
+  ASSERT_TRUE(std::holds_alternative<double>(actions[5].value));
+  ASSERT_EQ(std::get<double>(actions[5].value), 3);
 }

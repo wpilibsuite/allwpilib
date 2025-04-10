@@ -5,14 +5,13 @@
 #include "frc/DutyCycle.h"
 
 #include <string>
-#include <utility>
 
 #include <hal/DutyCycle.h>
 #include <hal/HALBase.h>
 #include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>
-#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
@@ -32,7 +31,6 @@ void DutyCycle::InitDutyCycle() {
   m_handle = HAL_InitializeDutyCycle(m_channel, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   HAL_ReportUsage("IO", m_channel, "DutyCycle");
-  wpi::SendableRegistry::Add(this, "Duty Cycle", m_channel);
 }
 
 int DutyCycle::GetFPGAIndex() const {
@@ -74,10 +72,11 @@ int DutyCycle::GetSourceChannel() const {
   return m_channel;
 }
 
-void DutyCycle::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Duty Cycle");
-  builder.AddDoubleProperty(
-      "Frequency", [this] { return this->GetFrequency(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Output", [this] { return this->GetOutput(); }, nullptr);
+void DutyCycle::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("Frequency", GetFrequency());
+  table.Log("Output", GetOutput());
+}
+
+std::string_view DutyCycle::GetTelemetryType() const {
+  return "Duty Cycle";
 }

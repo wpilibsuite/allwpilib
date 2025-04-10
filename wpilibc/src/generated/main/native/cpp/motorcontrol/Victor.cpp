@@ -10,7 +10,7 @@
 
 using namespace frc;
 
-Victor::Victor(int channel) : PWMMotorController("Victor", channel) {
+Victor::Victor(int channel) : PWMMotorController(channel) {
   SetBounds(2.027_ms, 1.525_ms, 1.507_ms, 1.49_ms, 1.026_ms);
   m_pwm.SetOutputPeriod(PWM::kOutputPeriod_10Ms);
   SetSpeed(0.0);

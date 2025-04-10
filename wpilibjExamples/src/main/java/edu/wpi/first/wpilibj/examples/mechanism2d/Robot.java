@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.mechanism2d;
 
+import edu.wpi.first.telemetry.Telemetry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
@@ -12,7 +13,6 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
@@ -33,6 +33,7 @@ public class Robot extends TimedRobot {
   private final Encoder m_elevatorEncoder = new Encoder(0, 1);
   private final Joystick m_joystick = new Joystick(0);
 
+  private final Mechanism2d m_mech;
   private final MechanismLigament2d m_elevator;
   private final MechanismLigament2d m_wrist;
 
@@ -41,9 +42,9 @@ public class Robot extends TimedRobot {
     m_elevatorEncoder.setDistancePerPulse(kMetersPerPulse);
 
     // the main mechanism object
-    Mechanism2d mech = new Mechanism2d(3, 3);
+    m_mech = new Mechanism2d(3, 3);
     // the mechanism root node
-    MechanismRoot2d root = mech.getRoot("climber", 2, 0);
+    MechanismRoot2d root = m_mech.getRoot("climber", 2, 0);
 
     // MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
     // off the root node or another ligament object
@@ -51,9 +52,6 @@ public class Robot extends TimedRobot {
     m_wrist =
         m_elevator.append(
             new MechanismLigament2d("wrist", 0.5, 90, 6, new Color8Bit(Color.kPurple)));
-
-    // post the mechanism to the dashboard
-    SmartDashboard.putData("Mech2d", mech);
   }
 
   @Override
@@ -61,6 +59,9 @@ public class Robot extends TimedRobot {
     // update the dashboard mechanism's state
     m_elevator.setLength(kElevatorMinimumLength + m_elevatorEncoder.getDistance());
     m_wrist.setAngle(m_wristPot.get());
+
+    // post the mechanism to telemetry
+    Telemetry.log("Mech2d", m_mech);
   }
 
   @Override

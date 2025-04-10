@@ -6,10 +6,8 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.NTSendable;
-import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.telemetry.TelemetryLoggable;
+import edu.wpi.first.telemetry.TelemetryTable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,14 +27,12 @@ import java.util.List;
  * using the getObject() function. Other objects can also have multiple poses (which will show the
  * object at multiple locations).
  */
-public class Field2d implements NTSendable, AutoCloseable {
+public class Field2d implements TelemetryLoggable, AutoCloseable {
   /** Constructor. */
-  @SuppressWarnings("this-escape")
   public Field2d() {
     FieldObject2d obj = new FieldObject2d("Robot");
     obj.setPose(Pose2d.kZero);
     m_objects.add(obj);
-    SendableRegistry.add(this, "Field");
   }
 
   @Override
@@ -89,11 +85,6 @@ public class Field2d implements NTSendable, AutoCloseable {
     }
     FieldObject2d obj = new FieldObject2d(name);
     m_objects.add(obj);
-    if (m_table != null) {
-      synchronized (obj) {
-        obj.m_entry = m_table.getDoubleArrayTopic(name).getEntry(new double[] {});
-      }
-    }
     return obj;
   }
 
@@ -107,20 +98,20 @@ public class Field2d implements NTSendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(NTSendableBuilder builder) {
-    builder.setSmartDashboardType("Field2d");
-
+  public void updateTelemetry(TelemetryTable table) {
     synchronized (this) {
-      m_table = builder.getTable();
       for (FieldObject2d obj : m_objects) {
         synchronized (obj) {
-          obj.m_entry = m_table.getDoubleArrayTopic(obj.m_name).getEntry(new double[] {});
-          obj.updateEntry(true);
+          table.log(obj.m_name, obj.m_poses.toArray(new Pose2d[0]));
         }
       }
     }
   }
 
-  private NetworkTable m_table;
+  @Override
+  public String getTelemetryType() {
+    return "Field2d";
+  }
+
   private final List<FieldObject2d> m_objects = new ArrayList<>();
 }

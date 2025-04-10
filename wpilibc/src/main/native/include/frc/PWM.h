@@ -9,8 +9,7 @@
 #include <hal/PWM.h>
 #include <hal/Types.h>
 #include <units/time.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 namespace frc {
 class AddressableLED;
@@ -23,7 +22,7 @@ class AddressableLED;
  * (off) to 4096. Changes are immediately sent to the FPGA, and the update
  * occurs at the next FPGA cycle (5.05ms). There is no delay.
  */
-class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
+class PWM : public wpi::TelemetryLoggable {
  public:
   friend class AddressableLED;
   /**
@@ -53,9 +52,8 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    *
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the
    *                MXP port
-   * @param registerSendable If true, adds this instance to SendableRegistry
    */
-  explicit PWM(int channel, bool registerSendable = true);
+  explicit PWM(int channel);
 
   PWM(PWM&&) = default;
   PWM& operator=(PWM&&) = default;
@@ -107,8 +105,9 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
- protected:
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   int m_channel;

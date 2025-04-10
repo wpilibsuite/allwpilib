@@ -11,8 +11,7 @@
 #include <hal/Ports.h>
 #include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
@@ -32,7 +31,6 @@ DigitalOutput::DigitalOutput(int channel) {
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_ReportUsage("IO", channel, "DigitalOutput");
-  wpi::SendableRegistry::Add(this, "DigitalOutput", channel);
 }
 
 DigitalOutput::~DigitalOutput() {
@@ -143,9 +141,10 @@ void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetDIOSimDevice(m_handle, device);
 }
 
-void DigitalOutput::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Digital Output");
-  builder.AddBooleanProperty(
-      "Value", [=, this] { return Get(); },
-      [=, this](bool value) { Set(value); });
+void DigitalOutput::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("Value", Get());
+}
+
+std::string_view DigitalOutput::GetTelemetryType() const {
+  return "Digital Output";
 }
