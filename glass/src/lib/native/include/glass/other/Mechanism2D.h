@@ -7,7 +7,6 @@
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Translation2d.h>
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <wpi/function_ref.h>
 

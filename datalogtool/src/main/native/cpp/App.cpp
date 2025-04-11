@@ -12,7 +12,6 @@
 #include <glass/Storage.h>
 #include <libssh/libssh.h>
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <wpigui.h>
