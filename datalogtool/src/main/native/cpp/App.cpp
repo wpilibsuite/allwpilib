@@ -10,10 +10,9 @@
 #include <glass/Context.h>
 #include <glass/MainMenuBar.h>
 #include <glass/Storage.h>
-#include <libssh/libssh.h>
-
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <libssh/libssh.h>
 #include <wpigui.h>
 #include <wpigui_openurl.h>
 

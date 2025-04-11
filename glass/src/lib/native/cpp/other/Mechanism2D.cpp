@@ -4,6 +4,10 @@
 
 #include "glass/other/Mechanism2D.h"
 
+#include <portable-file-dialogs.h>
+#include <units/angle.h>
+#include <units/length.h>
+
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -17,13 +21,9 @@
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Transform2d.h>
 #include <frc/geometry/Translation2d.h>
-
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
-#include <portable-file-dialogs.h>
-#include <units/angle.h>
-#include <units/length.h>
 #include <wpi/print.h>
 #include <wpigui.h>
 
