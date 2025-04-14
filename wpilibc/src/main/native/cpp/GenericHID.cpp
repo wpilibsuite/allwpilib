@@ -21,15 +21,28 @@ GenericHID::GenericHID(int port) {
   m_port = port;
 }
 
+void GenericHID::WarnWhenDisconnected(bool warn) {
+  m_warnWhenDisconnected = warn;
+}
+
 bool GenericHID::GetRawButton(int button) const {
+  if (!m_warnWhenDisconnected && !IsConnected()) {
+    return false;
+  }
   return DriverStation::GetStickButton(m_port, button);
 }
 
 bool GenericHID::GetRawButtonPressed(int button) {
+  if (!m_warnWhenDisconnected && !IsConnected()) {
+    return false;
+  }
   return DriverStation::GetStickButtonPressed(m_port, button);
 }
 
 bool GenericHID::GetRawButtonReleased(int button) {
+  if (!m_warnWhenDisconnected && !IsConnected()) {
+    return false;
+  }
   return DriverStation::GetStickButtonReleased(m_port, button);
 }
 
@@ -39,10 +52,16 @@ BooleanEvent GenericHID::Button(int button, EventLoop* loop) const {
 }
 
 double GenericHID::GetRawAxis(int axis) const {
+  if (!m_warnWhenDisconnected && !IsConnected()) {
+    return 0.0;
+  }
   return DriverStation::GetStickAxis(m_port, axis);
 }
 
 int GenericHID::GetPOV(int pov) const {
+  if (!m_warnWhenDisconnected && !IsConnected()) {
+    return -1;
+  }
   return DriverStation::GetStickPOV(m_port, pov);
 }
 

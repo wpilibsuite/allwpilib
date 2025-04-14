@@ -46,6 +46,21 @@ public class CommandGenericHID {
   }
 
   /**
+   * Specifies whether warnings should be printed to the console when this joystick is disconnected
+   * and a button, axis, or POV is read. This is intended to be used for test controllers that do
+   * not need to be plugged in during a match.
+   *
+   * <p>Unlike {@link edu.wpi.first.wpilibj.DriverStation#silenceJoystickConnectionWarning}, this
+   * only applies to this joystick, is NOT ignored when the FMS is connected, and does not affect
+   * warnings when reading a non-existent button, axis, or POV on a connected joystick.
+   *
+   * @param warn Whether warning messages should be printed.
+   */
+  public void warnWhenDisconnected(boolean warn) {
+    m_hid.warnWhenDisconnected(warn);
+  }
+
+  /**
    * Constructs an event instance around this button's digital signal.
    *
    * @param button the button index

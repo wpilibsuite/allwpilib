@@ -27,6 +27,21 @@ class CommandGenericHID {
   explicit CommandGenericHID(int port);
 
   /**
+   * Specifies whether warnings should be printed to the console when this
+   * joystick is disconnected and a button, axis, or POV is read. This is
+   * intended to be used for test controllers that do not need to be plugged in
+   * during a match.
+   *
+   * <p>Unlike DriverStation::SilenceJoystickConnectionWarning(), this only
+   * applies to this joystick, is NOT ignored when the FMS is connected, and
+   * does not affect warnings when reading a non-existent button, axis, or POV
+   * on a connected joystick.
+   *
+   * @param warn Whether warning messages should be printed.
+   */
+  void WarnWhenDisconnected(bool warn);
+
+  /**
    * Get the underlying GenericHID object.
    *
    * @return the wrapped GenericHID object
