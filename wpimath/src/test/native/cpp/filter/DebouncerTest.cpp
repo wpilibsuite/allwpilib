@@ -72,4 +72,6 @@ TEST_F(DebouncerTest, DebounceParams) {
 
   EXPECT_TRUE(debouncer.GetDebounceType() ==
               frc::Debouncer::DebounceType::kFalling);
+
+  EXPECT_TRUE(debouncer.Calculate(false));
 }
