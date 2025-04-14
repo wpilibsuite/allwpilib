@@ -204,6 +204,12 @@ public final class Units {
   public static final LinearAccelerationUnit FeetPerSecondPerSecond = FeetPerSecond.per(Second);
 
   /**
+   * A unit of linear acceleration equivalent to accelerating at a rate of one {@link #Inch Inch}
+   * per {@link #Second} every second.
+   */
+  public static final LinearAccelerationUnit InchesPerSecondPerSecond = InchesPerSecond.per(Second);
+
+  /**
    * A unit of angular acceleration equivalent to accelerating at a rate of one {@link #Rotations
    * Rotation} per {@link #Second} every second.
    */
