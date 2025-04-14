@@ -380,22 +380,26 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
              toCheck->height, toCheck->fps);
   std::vector<CameraModeStore>& platformModes =
       sharedThis->objcGetPlatformVideoModes();
-  // Find the matching mode
-  auto match = std::find_if(platformModes.begin(), platformModes.end(),
-                            [&](CameraModeStore& input) {
-                              return input.mode.CompareWithoutFps(*toCheck);
-                            });
+  
+  // Find all matching modes
+  std::vector<CameraModeStore*> matchingModes;
+  for (auto& mode : platformModes) {
+    if (mode.mode.CompareWithoutFps(*toCheck)) {
+      matchingModes.push_back(&mode);
+    }
+  }
 
-  if (match == platformModes.end()) {
+  if (matchingModes.empty()) {
     return nil;
   }
 
   // Check FPS
-  for (CameraFPSRange& range : match->fpsRanges) {
-    OBJCDEBUG3("Checking Range {} {}", range.min, range.max);
-    if (range.IsWithinRange(toCheck->fps)) {
-      *fps = toCheck->fps;
-      return match->format;
+  for (auto mode : matchingModes) {
+    for (CameraFPSRange& range : mode->fpsRanges) {
+      if (range.IsWithinRange(toCheck->fps)) {
+        *fps = toCheck->fps;
+        return mode->format;
+      }
     }
   }
 
