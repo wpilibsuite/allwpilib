@@ -396,6 +396,7 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   // Check FPS
   for (auto mode : matchingModes) {
     for (CameraFPSRange& range : mode->fpsRanges) {
+      OBJCDEBUG3("Checking Range {} {}", range.min, range.max);
       if (range.IsWithinRange(toCheck->fps)) {
         *fps = toCheck->fps;
         return mode->format;
