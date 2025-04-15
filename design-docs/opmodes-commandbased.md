@@ -1,10 +1,10 @@
 # Summary
 
-This document describes how modes are implemented in command-based projects.
+This document describes how opmodes are implemented in command-based projects.
 
 # Motivation
 
-See [modes](modes.md) for the motivation for adding operator selectable modes to the core robot structure.  For command-based programs, the entire robot program is structured around command-based subsystems and commands tied to robot states and inputs, with everything constructed during initialization, so for more natural integration with the rest of the command-based framework, a different approach than the annotation-based approach used for periodic and linear modes is warranted.
+See [opmodes](opmodes.md) for the motivation for adding operator selectable opmodes to the core robot structure.  For command-based programs, the entire robot program is structured around command-based subsystems and commands tied to robot states and inputs, with everything constructed during initialization, so for more natural integration with the rest of the command-based framework, a different approach than the annotation-based approach used for periodic and linear opmodes is warranted.
 
 # Background
 
@@ -16,50 +16,50 @@ The 2025 version of the command-based framework provides a [`RobotModeTriggers`]
 
 # Design
 
-Unlike the non-command-based approach, the command-based framework generally favors a design where commands can be used in all modes and explicit periodic code is discouraged.  In addition, the general approach for "modern" commands eschews classes, preferring a "fluent" method chained builder approach.  To support this, mode registration for command-based is performed with function calls instead of separate annotated classes.
+Unlike the non-command-based approach, the command-based framework generally favors a design where commands can be used in all modes and explicit periodic code is discouraged.  In addition, the general approach for "modern" commands eschews classes, preferring a "fluent" method chained builder approach.  To support this, opmode registration for command-based is performed with function calls instead of separate annotated classes.
 
-The design for multiple modes in the command-based framework extends the current `RobotModeTriggers` approach in two important ways:
-- Instead of fixed modes, modes are explicitly created by the user
-- The modes provide multiple triggers; this makes it possible to tie behaviors to DS selection/initialization as well as the enabled period
+The design for multiple opmodes in the command-based framework extends the current `RobotModeTriggers` approach in two important ways:
+- Instead of fixed modes, opmodes are explicitly created by the user
+- The opmodes provide multiple triggers; this makes it possible to tie behaviors to DS selection/initialization as well as the enabled period
 
-A unique `RobotBase` class is also provided that always runs the command scheduler periodically in all modes, including disabled.  This means it is not possible to mix command-based modes and non-command-based modes; all modes in a command-based project must be command-based modes.
+A unique `RobotBase` class is also provided that always runs the command scheduler periodically in all modes, including disabled.  This means it is not possible to mix command-based opmodes and non-command-based opmodes; all opmodes in a command-based project must be command-based opmodes.
 
-## CommandModes
+## CommandOpModes
 
-The `CommandModes` class provides factory functions for creating modes.
+The `CommandOpModes` class provides factory functions for creating opmodes.
 
 ```java
-public final class CommandModes {
-  // these register the mode and return a new CommandMode object for it
+public final class CommandOpModes {
+  // these register the opmode and return a new CommandOpMode object for it
   // (also includes default versions so group and description are optional)
   //
   // Calling twice with the same name is a runtime error (exception is thrown)
-  public static CommandMode autonomous(String name, String group, String description) {...}
-  public static CommandMode teleoperated(String name, String group, String description) {...}
-  public static CommandMode test(String name, String group, String description) {...}
+  public static CommandOpMode autonomous(String name, String group, String description) {...}
+  public static CommandOpMode teleoperated(String name, String group, String description) {...}
+  public static CommandOpMode test(String name, String group, String description) {...}
 }
 ```
 
-## CommandMode
+## CommandOpMode
 
-The `CommandMode` class provides triggers to enable users to tie into each section of a mode's lifetime.  Triggers have the ability to be tied to specific commands or actions on both transitions (e.g. false to true, true to false) and while the condition is in a particular state.  The framework will ensure these triggers always start in false state, even if code is started while attached to the field, so that it's safe to attach an action to the false to true transition of these triggers.
+The `CommandOpMode` class provides triggers to enable users to tie into each section of a opmode's lifetime.  Triggers have the ability to be tied to specific commands or actions on both transitions (e.g. false to true, true to false) and while the condition is in a particular state.  The framework will ensure these triggers always start in false state, even if code is started while attached to the field, so that it's safe to attach an action to the false to true transition of these triggers.
 
 ```java
-public class CommandMode {
-  // mode is selected on DS (regardless of enabled or disabled)
+public class CommandOpMode {
+  // opmode is selected on DS (regardless of enabled or disabled)
   public final Trigger selected;
 
-  // mode is selected, robot is disabled
+  // opmode is selected, robot is disabled
   public final Trigger disabled;
 
-  // mode is running, robot is enabled
+  // opmode is running, robot is enabled
   public final Trigger running;
 }
 ```
 
 ## CommandRobot
 
-The `CommandRobot` class is the base class for the user's command-based `Robot` class.  It also implements the private library machinery for robot startup and robot execution, and provides factory functions for creating modes.
+The `CommandRobot` class is the base class for the user's command-based `Robot` class.  It also implements the private library machinery for robot startup and robot execution, and provides factory functions for creating opmodes.
 
 ```java
 public abstract class CommandRobot {
@@ -82,20 +82,20 @@ public abstract class CommandRobot {
 
 ## Subsystem enhancements
 
-The `Subsystem` interface adds an overload of `setDefaultCommand` to support creating per-mode default commands, and similarly a new `removeDefaultCommand` overload.  The non-`CommandMode` overloads are applied in all modes where a per-mode default has not been set.
+The `Subsystem` interface adds an overload of `setDefaultCommand` to support creating per-opmode default commands, and similarly a new `removeDefaultCommand` overload.  The non-`CommandOpMode` overloads are applied in all opmodes where a per-opmode default has not been set.
 
 ```java
 class Subsystem {
-  // Sets a default command for this subsystem active only in the given mode.
-  default void setDefaultCommand(CommandMode mode, Command defaultCommand);
+  // Sets a default command for this subsystem active only in the given opmode.
+  default void setDefaultCommand(CommandOpMode opmode, Command defaultCommand);
 
-  // Sets a default command for this subsystem active in all modes where there's no per-mode default command.
+  // Sets a default command for this subsystem active in all opmodes where there's no per-opmode default command.
   default void setDefaultCommand(Command defaultCommand);
 
-  // Removes the default command for the given mode.  No effect if none set.
-  default void removeDefaultCommand(CommandMode mode);
+  // Removes the default command for the given opmode.  No effect if none set.
+  default void removeDefaultCommand(CommandOpMode opmode);
 
-  // Removes the default command for all modes where there's no per-mode default command.
+  // Removes the default command for all opmodes where there's no per-opmode default command.
   default void removeDefaultCommand();
 }
 ```
@@ -103,7 +103,7 @@ class Subsystem {
 ## Java Robot Code Examples
 
 The template/example code for command-based Java includes the following:
-- A Robot class with subsystems and constructor that sets up a command-based teleop mode, a couple of auto modes, and a test mode
+- A Robot class with subsystems and constructor that sets up a command-based teleop opmode, a couple of auto opmodes, and a test opmode
 
 Robot:
 
@@ -121,42 +121,42 @@ public class Robot extends CommandRobot {
     // Automatically disable and retract the intake whenever the ball storage is full.
     storage.hasCargo.onTrue(intake.retractCommand());
 
-    // Create auto modes
+    // Create auto opmodes
     addSimpleAuto();
     addPathAuto("drive and turn");
 
-    // Create teleop modes
+    // Create teleop opmodes
     addArcadeTeleop();
   }
 
   private void addSimpleAuto() {
-    // A simple autonomous mode
-    CommandModes.autonomous("Simple Auto").running.whileTrue(Autos.simpleAuto(this));
+    // A simple autonomous opmode
+    CommandOpModes.autonomous("Simple Auto").running.whileTrue(Autos.simpleAuto(this));
   }
 
   private void addPathAuto(String path) {
-    // A complex autonomous mode that loads a path when selected in the DS while still disabled
-    CommandMode mode = CommandModes.autonomous(path, "Follow Path");
-    mode.selected.onTrue(Commands.runOnce(() -> Paths.loadPath(path)));
-    mode.running.whileTrue(Autos.followPath(this, path));
+    // A complex autonomous opmode that loads a path when selected in the DS while still disabled
+    CommandOpMode opmode = CommandOpModes.autonomous(path, "Follow Path");
+    opmode.selected.onTrue(Commands.runOnce(() -> Paths.loadPath(path)));
+    opmode.running.whileTrue(Autos.followPath(this, path));
   }
 
   private void addArcadeTeleop() {
-    // A teleop mode with joystick and button controls
-    CommandMode mode = CommandModes.teleoperated("teleop");
+    // A teleop opmode with joystick and button controls
+    CommandOpMode opmode = CommandOpModes.teleoperated("teleop");
 
     var driverController = new CommandXboxController(1);
 
     // Control the drive with split-stick arcade controls
     m_drive.setDefaultCommand(
-        mode,
+        opmode,
         drive.arcadeDriveCommand(
             () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
 
     // Deploy the intake with the X button
-    mode.running.and(driverController.x()).onTrue(intake.intakeCommand());
+    opmode.running.and(driverController.x()).onTrue(intake.intakeCommand());
     // Retract the intake with the Y button
-    mode.running.and(driverController.y()).onTrue(intake.retractCommand());
+    opmode.running.and(driverController.y()).onTrue(intake.retractCommand());
   }
 
   @Override
@@ -190,15 +190,15 @@ public class Autos {
 
 # Drawbacks
 
-Command-based modes and non-command-based modes cannot be intermixed in a single project.  The benefit of this is cleaner integration with the rest of the command-based framework, including proper handling of periodic subsystem behaviors in disabled mode, which otherwise might be a common error for teams.  In addition, command-based subsystems would need to expose significant non-command-based behaviors to make them usable in non-command-based modes, which would likely create potential for additional issues in writing normal command-based code (where subsystem implementation details should be black-boxed from commands).
+Command-based opmodes and non-command-based opmodes cannot be intermixed in a single project.  The benefit of this is cleaner integration with the rest of the command-based framework, including proper handling of periodic subsystem behaviors in disabled mode, which otherwise might be a common error for teams.  In addition, command-based subsystems would need to expose significant non-command-based behaviors to make them usable in non-command-based opmodes, which would likely create potential for additional issues in writing normal command-based code (where subsystem implementation details should be black-boxed from commands).
 
 # Alternatives
 
-Make command-based modes interoperate with non-command modes by using the same base class and only having the scheduler run if one of those modes is active.
+Make command-based opmodes interoperate with non-command opmodes by using the same base class and only having the scheduler run if one of those opmodes is active.
 
 # Trades
 
-- Binding teleop joysticks is very verbose if different behavior is desired in different teleop modes.  Maybe add to CommandMode a separate event loop that's only active in that mode?  At the minimum, it may make sense to add CommandMode overloads to joysticks so users could write `driverController.x(teleop)` instead of `teleop.running.and(driverController.x())`?
+- Binding teleop joysticks is very verbose if different behavior is desired in different teleop opmodes.  Maybe add to CommandOpMode a separate event loop that's only active in that opmode?  At the minimum, it may make sense to add CommandOpMode overloads to joysticks so users could write `driverController.x(teleop)` instead of `teleop.running.and(driverController.x())`?
 - Is the `beforeScheduler()` / `afterScheduler()` split beneficial?  Or should we just have `robotPeriodic()` showing the `CommandScheduler.run()` code in it like we do in 2025?
 - Related: should we remove the built-in `periodic()` from the `Subsystem` interface?  Split it into before/after?
 
