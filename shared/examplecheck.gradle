@@ -103,6 +103,24 @@ task checkExamples(type: Task) {
     }
 }
 
+task checkSnippets(type: Task) {
+    doLast {
+        def parsedJson = new groovy.json.JsonSlurper().parseText(snippetsFile.text)
+        fileCheck(parsedJson, snippetsDirectory)
+        parsedJson.each {
+            assert it.name != null
+            assert it.description != null
+            assert it.tags != null
+            assert it.tags.findAll { !tagList.contains(it) }.empty
+            assert it.foldername != null
+            assert it.gradlebase != null
+            if (it.gradlebase == 'java') {
+                assert it.mainclass != null
+            }
+        }
+    }
+}
+
 task checkCommands(type: Task) {
     doLast {
         def parsedJson = new groovy.json.JsonSlurper().parseText(commandFile.text)
@@ -127,3 +145,4 @@ task checkCommands(type: Task) {
 check.dependsOn checkTemplates
 check.dependsOn checkExamples
 check.dependsOn checkCommands
+check.dependsOn checkSnippets
