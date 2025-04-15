@@ -8,6 +8,7 @@
 #include <wpi/MathExtras.h>
 
 #include "units/angle.h"
+#include "units/current.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "units/voltage.h"
