@@ -84,7 +84,8 @@ class Robot : public frc::TimedRobot {
   frc::PWMSparkMax m_shooter{0};
   frc::Encoder m_shooterEncoder{0, 1};
   frc::PIDController m_controller{0.3, 0, 0};
-  frc::SimpleMotorFeedforward<units::radians, units::volts> m_ff{0.1_V, 0.065_V / 1_rpm};
+  frc::SimpleMotorFeedforward<units::radians, units::volts> m_ff{
+      0.1_V, 0.065_V / 1_rpm};
 
   frc::PWMSparkMax m_kicker{1};
 
