@@ -15,30 +15,27 @@
 // frc::SimpleMotorFeedforward<units::meters> or
 // frc::SimpleMotorFeedforward<units::radians>
 
-template <class Distance, class Input>
-  requires(units::length_unit<Distance> || units::angle_unit<Distance>) &&
-          (units::voltage_unit<Input> || units::current_unit<Input>)
-struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance, Input>> {
+template <class Distance>
+  requires units::length_unit<Distance> || units::angle_unit<Distance>
+struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>> {
   using MessageStruct = wpi_proto_ProtobufSimpleMotorFeedforward;
   using InputStream =
-      wpi::ProtoInputStream<frc::SimpleMotorFeedforward<Distance, Input>>;
+      wpi::ProtoInputStream<frc::SimpleMotorFeedforward<Distance>>;
   using OutputStream =
-      wpi::ProtoOutputStream<frc::SimpleMotorFeedforward<Distance, Input>>;
+      wpi::ProtoOutputStream<frc::SimpleMotorFeedforward<Distance>>;
 
-  static std::optional<frc::SimpleMotorFeedforward<Distance, Input>> Unpack(
+  static std::optional<frc::SimpleMotorFeedforward<Distance>> Unpack(
       InputStream& stream) {
-    using BaseDistanceUnit =
+    using BaseUnit =
         units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
-    using BaseInputUnit =
-        units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;    
-    using BaseFeedforward = frc::SimpleMotorFeedforward<BaseDistanceUnit, BaseInputUnit>;
+    using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit>;
     wpi_proto_ProtobufSimpleMotorFeedforward msg;
     if (!stream.Decode(msg)) {
       return {};
     }
 
     return frc::SimpleMotorFeedforward<Distance>{
-        units::unit_t<Input>{msg.ks},
+        units::volt_t{msg.ks},
         units::unit_t<typename BaseFeedforward::kv_unit>{msg.kv},
         units::unit_t<typename BaseFeedforward::ka_unit>{msg.ka},
         units::second_t{msg.dt},
@@ -46,12 +43,10 @@ struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance, Input>> {
   }
 
   static bool Pack(OutputStream& stream,
-                   const frc::SimpleMotorFeedforward<Distance, Input>& value) {
-    using BaseDistanceUnit =
+                   const frc::SimpleMotorFeedforward<Distance>& value) {
+    using BaseUnit =
         units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
-    using BaseInputUnit =
-        units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;    
-    using BaseFeedforward = frc::SimpleMotorFeedforward<BaseDistanceUnit, BaseInputUnit>;
+    using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit>;
     wpi_proto_ProtobufSimpleMotorFeedforward msg{
         .ks = value.GetKs().value(),
         .kv = units::unit_t<typename BaseFeedforward::kv_unit>{value.GetKv()}
