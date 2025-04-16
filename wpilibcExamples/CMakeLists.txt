@@ -71,9 +71,9 @@ foreach(snippet ${SNIPPETS})
         src/main/cpp/snippets/${snippet}/cpp/*.cpp
         src/main/cpp/snippets/${snippet}/c/*.c
     )
-    add_executable(${snippet} ${sources})
+    add_executable(snippet${snippet} ${sources})
     wpilib_target_warnings(${snippet})
-    target_include_directories(${snippet} PUBLIC src/main/cpp/snippets/${snippet}/include)
-    target_link_libraries(${snippet} wpilibc wpilibNewCommands romiVendordep xrpVendordep)
-    add_dependencies(wpilibcExamples ${snippet})
+    target_include_directories(snippet${snippet} PUBLIC src/main/cpp/snippets/${snippet}/include)
+    target_link_libraries(snippet${snippet} wpilibc wpilibNewCommands romiVendordep xrpVendordep)
+    add_dependencies(wpilibcExamples snippet${snippet})
 endforeach()
