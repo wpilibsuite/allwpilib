@@ -119,7 +119,7 @@ class SimpleMotorFeedforward {
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
-   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be supplied to the motor.
    * @param acceleration The acceleration of the motor.
    * @return The maximum possible velocity at the given acceleration.
    */
@@ -137,7 +137,7 @@ class SimpleMotorFeedforward {
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
-   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be supplied to the motor.
    * @param acceleration The acceleration of the motor.
    * @return The minimum possible velocity at the given acceleration.
    */
@@ -155,7 +155,7 @@ class SimpleMotorFeedforward {
    * achievable - enter the velocity constraint, and this will give you
    * a simultaneously-achievable acceleration constraint.
    *
-   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be supplied to the motor.
    * @param velocity The velocity of the motor.
    * @return The maximum possible acceleration at the given velocity.
    */
@@ -171,7 +171,7 @@ class SimpleMotorFeedforward {
    * achievable - enter the velocity constraint, and this will give you
    * a simultaneously-achievable acceleration constraint.
    *
-   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be supplied to the motor.
    * @param velocity The velocity of the motor.
    * @return The minimum possible acceleration at the given velocity.
    */
