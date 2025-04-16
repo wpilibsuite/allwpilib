@@ -60,7 +60,7 @@ class Robot : public frc::TimedRobot {
       kMaxVelocity, kMaxAcceleration};
   frc::ProfiledPIDController<units::meters> m_controller{kP, kI, kD,
                                                          m_constraints, kDt};
-  frc::ElevatorFeedforward m_feedforward{kS, kG, kV};
+  frc::ElevatorFeedforward<units::volt> m_feedforward{kS, kG, kV};
 };
 
 #ifndef RUNNING_FRC_TESTS
