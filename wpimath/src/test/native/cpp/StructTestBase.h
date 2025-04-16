@@ -7,7 +7,7 @@
 #include <gtest/gtest.h>
 #include <wpi/struct/Struct.h>
 
-template <typename T>
+template <typename T, typename I>
 class StructTest : public testing::Test {};
 
 TYPED_TEST_SUITE_P(StructTest);
