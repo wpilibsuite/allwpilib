@@ -684,13 +684,12 @@ public class XboxController extends GenericHID implements TelemetryLoggable {
   }
 
   @Override
+  public String getTelemetryType() {
+    return "HID:Xbox";
+  }
+
+  @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (table.getType() == null) {
-      table.log("ControllerType", "Xbox");
-    }
-    if (!table.setType("HID")) {
-      return;
-    }
     table.log("LeftTrigger", getLeftTriggerAxis());
     table.log("RightTrigger", getRightTriggerAxis());
     table.log("LeftX", getLeftX());

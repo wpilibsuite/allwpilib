@@ -304,13 +304,12 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Telemetry
 {%- endif %}
 
   @Override
+  public String getTelemetryType() {
+    return "HID:{{ ConsoleName }}";
+  }
+
+  @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (table.getType() == null) {
-      table.log("ControllerType", "{{ ConsoleName }}");
-    }
-    if (!table.setType("HID")) {
-      return;
-    }
 {%- for trigger in triggers %}
     table.log("{{ capitalize_first(trigger.name) }}", get{{ capitalize_first(trigger.name) }}Axis());
 {%- endfor -%}

@@ -808,13 +808,12 @@ public class StadiaController extends GenericHID implements TelemetryLoggable {
   }
 
   @Override
+  public String getTelemetryType() {
+    return "HID:Stadia";
+  }
+
+  @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (table.getType() == null) {
-      table.log("ControllerType", "Stadia");
-    }
-    if (!table.setType("HID")) {
-      return;
-    }
     table.log("LeftX", getLeftX());
     table.log("RightX", getRightX());
     table.log("LeftY", getLeftY());

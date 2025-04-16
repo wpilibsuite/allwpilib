@@ -754,13 +754,12 @@ public class PS5Controller extends GenericHID implements TelemetryLoggable {
   }
 
   @Override
+  public String getTelemetryType() {
+    return "HID:PS5";
+  }
+
+  @Override
   public void updateTelemetry(TelemetryTable table) {
-    if (table.getType() == null) {
-      table.log("ControllerType", "PS5");
-    }
-    if (!table.setType("HID")) {
-      return;
-    }
     table.log("L2", getL2Axis());
     table.log("R2", getR2Axis());
     table.log("LeftX", getLeftX());
