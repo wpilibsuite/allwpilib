@@ -17,13 +17,12 @@
 namespace frc {
 
 /**
- * A helper class that computes feedforward values (e.g., volts or amperes) for
- * a simple permanent-magnet DC motor.
+ * A helper class that computes feedforward voltages for a simple
+ * permanent-magnet DC motor.
  */
-
 template <class Distance, class Input>
-  requires(units::length_unit<Distance> || units::angle_unit<Distance>) &&
-          (units::voltage_unit<Input> || units::current_unit<Input>)
+  requires (units::length_unit<Distance> || units::angle_unit<Distance>) &&
+  (units::current_unit<Input> || units::voltage_unit<Input>)
 class SimpleMotorFeedforward {
  public:
   using Velocity =
@@ -31,7 +30,8 @@ class SimpleMotorFeedforward {
   using Acceleration =
       units::compound_unit<Velocity, units::inverse<units::seconds>>;
   using kv_unit = units::compound_unit<Input, units::inverse<Velocity>>;
-  using ka_unit = units::compound_unit<Input, units::inverse<Acceleration>>;
+  using ka_unit =
+      units::compound_unit<Input, units::inverse<Acceleration>>;
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains.
@@ -70,22 +70,6 @@ class SimpleMotorFeedforward {
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming continuous
-   * control.
-   *
-   * @param velocity     The velocity setpoint.
-   * @param acceleration The acceleration setpoint.
-   * @return The computed feedforward, in input units (e.g., volts or amperes).
-   * @deprecated Use the current/next velocity overload instead.
-   */
-  [[deprecated("Use the current/next velocity overload instead.")]]
-  constexpr units::unit_t<Input> Calculate(
-      units::unit_t<Velocity> velocity,
-      units::unit_t<Acceleration> acceleration) const {
-    return kS * wpi::sgn(velocity) + kV * velocity + kA * acceleration;
-  }
-
-  /**
    * Calculates the feedforward from the gains and velocity setpoint assuming
    * discrete control. Use this method when the velocity setpoint does not
    * change.
@@ -93,8 +77,7 @@ class SimpleMotorFeedforward {
    * @param velocity The velocity setpoint.
    * @return The computed feedforward, in input units (e.g., volts or amperes).
    */
-  constexpr units::unit_t<Input> Calculate(
-      units::unit_t<Velocity> velocity) const {
+  constexpr units::unit_t<Input> Calculate(units::unit_t<Velocity> velocity) const {
     return Calculate(velocity, velocity);
   }
 
@@ -112,13 +95,13 @@ class SimpleMotorFeedforward {
       units::unit_t<Velocity> currentVelocity,
       units::unit_t<Velocity> nextVelocity) const {
     // See wpimath/algorithms.md#Simple_motor_feedforward for derivation
-    if (kA < decltype(kA)(1e-9)) {
+    if (kA == decltype(kA)(0)) {
       return kS * wpi::sgn(nextVelocity) + kV * nextVelocity;
     } else {
       double A = -kV.value() / kA.value();
       double B = 1.0 / kA.value();
       double A_d = gcem::exp(A * m_dt.value());
-      double B_d = A > -1e-9 ? B * m_dt.value() : 1.0 / A * (A_d - 1.0) * B;
+      double B_d = 1.0 / A * (A_d - 1.0) * B;
       return kS * wpi::sgn(currentVelocity) +
              units::unit_t<Input>{
                  1.0 / B_d *
@@ -131,13 +114,12 @@ class SimpleMotorFeedforward {
 
   /**
    * Calculates the maximum achievable velocity given a maximum input (e.g.,
-   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
-   * and acceleration constraints for a trapezoidal profile are simultaneously
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity and
+   * acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
    * @param maxInput The maximum input (e.g., volts or amperes) that can be
-   * supplied to the motor.
    * @param acceleration The acceleration of the motor.
    * @return The maximum possible velocity at the given acceleration.
    */
@@ -150,13 +132,12 @@ class SimpleMotorFeedforward {
 
   /**
    * Calculates the minimum achievable velocity given a maximum input (e.g.,
-   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
-   * and acceleration constraints for a trapezoidal profile are simultaneously
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity and
+   * acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
    * @param maxInput The maximum input (e.g., volts or amperes) that can be
-   * supplied to the motor.
    * @param acceleration The acceleration of the motor.
    * @return The minimum possible velocity at the given acceleration.
    */
@@ -169,13 +150,12 @@ class SimpleMotorFeedforward {
 
   /**
    * Calculates the maximum achievable acceleration given a maximum input (e.g.,
-   * volts or amperes) supply and a velocity. Useful for ensuring that velocity
-   * and acceleration constraints for a trapezoidal profile are simultaneously
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity and
+   * acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the velocity constraint, and this will give you
    * a simultaneously-achievable acceleration constraint.
    *
    * @param maxInput The maximum input (e.g., volts or amperes) that can be
-   * supplied to the motor.
    * @param velocity The velocity of the motor.
    * @return The maximum possible acceleration at the given velocity.
    */
@@ -186,13 +166,12 @@ class SimpleMotorFeedforward {
 
   /**
    * Calculates the minimum achievable acceleration given a maximum input (e.g.,
-   * volts or amperes) supply and a velocity. Useful for ensuring that velocity
-   * and acceleration constraints for a trapezoidal profile are simultaneously
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity and
+   * acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the velocity constraint, and this will give you
    * a simultaneously-achievable acceleration constraint.
    *
    * @param maxInput The maximum input (e.g., volts or amperes) that can be
-   * supplied to the motor.
    * @param velocity The velocity of the motor.
    * @return The minimum possible acceleration at the given velocity.
    */
