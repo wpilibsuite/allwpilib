@@ -161,7 +161,7 @@ class Drivetrain {
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  frc::SimpleMotorFeedforward<units::meters> m_feedforward{1_V, 3_V / 1_mps};
+  frc::SimpleMotorFeedforward<units::meters, units::volts> m_feedforward{1_V, 3_V / 1_mps};
 
   // Simulation classes
   frc::sim::EncoderSim m_leftEncoderSim{m_leftEncoder};

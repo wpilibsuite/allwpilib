@@ -14,8 +14,8 @@
 // frc::SimpleMotorFeedforward<units::radians>
 
 template <class Distance, class Input>
-  requires (units::length_unit<Distance> || units::angle_unit<Distance>) &&
-  (units::current_unit<Input> || units::voltage_unit<Input>)
+  requires(units::length_unit<Distance> || units::angle_unit<Distance>) &&
+          (units::current_unit<Input> || units::voltage_unit<Input>)
 struct wpi::Struct<frc::SimpleMotorFeedforward<Distance, Input>> {
   static constexpr std::string_view GetTypeName() {
     return "SimpleMotorFeedforward";
@@ -29,8 +29,8 @@ struct wpi::Struct<frc::SimpleMotorFeedforward<Distance, Input>> {
       std::span<const uint8_t> data) {
     using BaseUnit =
         units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
-    using InputUnit = 
-        units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;        
+    using InputUnit =
+        units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;
     using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit, InputUnit>;
     constexpr size_t kKsOff = 0;
     constexpr size_t kKvOff = kKsOff + 8;
@@ -48,8 +48,8 @@ struct wpi::Struct<frc::SimpleMotorFeedforward<Distance, Input>> {
                    const frc::SimpleMotorFeedforward<Distance, Input>& value) {
     using BaseUnit =
         units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
-    using InputUnit = 
-        units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;        
+    using InputUnit =
+        units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;
     using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit, InputUnit>;
     constexpr size_t kKsOff = 0;
     constexpr size_t kKvOff = kKsOff + 8;
@@ -66,9 +66,9 @@ struct wpi::Struct<frc::SimpleMotorFeedforward<Distance, Input>> {
   }
 };
 
-static_assert(
-    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::meters, units::volts>>);
-static_assert(
-    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::feet, units::volts>>);
-static_assert(
-    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::radians, units::volts>>);
+static_assert(wpi::StructSerializable<
+              frc::SimpleMotorFeedforward<units::meters, units::volts>>);
+static_assert(wpi::StructSerializable<
+              frc::SimpleMotorFeedforward<units::feet, units::volts>>);
+static_assert(wpi::StructSerializable<
+              frc::SimpleMotorFeedforward<units::radians, units::volts>>);

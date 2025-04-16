@@ -63,7 +63,7 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
 }
 
 TEST(DifferentialDriveVoltageConstraintTest, HighCurvature) {
-  SimpleMotorFeedforward<units::meter> feedforward{1_V, 1_V / 1_mps,
+  SimpleMotorFeedforward<units::meter, units::volts> feedforward{1_V, 1_V / 1_mps,
                                                    3_V / 1_mps_sq};
   // Large trackwidth - need to test with radius of curvature less than half of
   // trackwidth

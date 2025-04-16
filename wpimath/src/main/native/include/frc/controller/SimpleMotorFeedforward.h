@@ -21,8 +21,8 @@ namespace frc {
  * permanent-magnet DC motor.
  */
 template <class Distance, class Input>
-  requires (units::length_unit<Distance> || units::angle_unit<Distance>) &&
-  (units::current_unit<Input> || units::voltage_unit<Input>)
+  requires(units::length_unit<Distance> || units::angle_unit<Distance>) &&
+          (units::current_unit<Input> || units::voltage_unit<Input>)
 class SimpleMotorFeedforward {
  public:
   using Velocity =
@@ -30,8 +30,7 @@ class SimpleMotorFeedforward {
   using Acceleration =
       units::compound_unit<Velocity, units::inverse<units::seconds>>;
   using kv_unit = units::compound_unit<Input, units::inverse<Velocity>>;
-  using ka_unit =
-      units::compound_unit<Input, units::inverse<Acceleration>>;
+  using ka_unit = units::compound_unit<Input, units::inverse<Acceleration>>;
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains.
@@ -77,7 +76,8 @@ class SimpleMotorFeedforward {
    * @param velocity The velocity setpoint.
    * @return The computed feedforward, in input units (e.g., volts or amperes).
    */
-  constexpr units::unit_t<Input> Calculate(units::unit_t<Velocity> velocity) const {
+  constexpr units::unit_t<Input> Calculate(
+      units::unit_t<Velocity> velocity) const {
     return Calculate(velocity, velocity);
   }
 
@@ -114,8 +114,8 @@ class SimpleMotorFeedforward {
 
   /**
    * Calculates the maximum achievable velocity given a maximum input (e.g.,
-   * volts or amperes) and an acceleration.  Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
+   * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
@@ -132,8 +132,8 @@ class SimpleMotorFeedforward {
 
   /**
    * Calculates the minimum achievable velocity given a maximum input (e.g.,
-   * volts or amperes) and an acceleration.  Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
+   * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
@@ -150,8 +150,8 @@ class SimpleMotorFeedforward {
 
   /**
    * Calculates the maximum achievable acceleration given a maximum input (e.g.,
-   * volts or amperes) and an acceleration.  Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
+   * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the velocity constraint, and this will give you
    * a simultaneously-achievable acceleration constraint.
    *
@@ -166,8 +166,8 @@ class SimpleMotorFeedforward {
 
   /**
    * Calculates the minimum achievable acceleration given a maximum input (e.g.,
-   * volts or amperes) and an acceleration.  Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
+   * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the velocity constraint, and this will give you
    * a simultaneously-achievable acceleration constraint.
    *

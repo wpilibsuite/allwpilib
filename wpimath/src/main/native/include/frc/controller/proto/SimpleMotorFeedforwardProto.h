@@ -16,8 +16,8 @@
 // frc::SimpleMotorFeedforward<units::radians>
 
 template <class Distance, class Input>
-  requires (units::length_unit<Distance> || units::angle_unit<Distance>) &&
-  (units::current_unit<Input> || units::voltage_unit<Input>)
+  requires(units::length_unit<Distance> || units::angle_unit<Distance>) &&
+          (units::current_unit<Input> || units::voltage_unit<Input>)
 struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance, Input>> {
   using MessageStruct = wpi_proto_ProtobufSimpleMotorFeedforward;
   using InputStream =
@@ -29,7 +29,7 @@ struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance, Input>> {
       InputStream& stream) {
     using BaseUnit =
         units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
-    using InputUnit = 
+    using InputUnit =
         units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;
     using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit, InputUnit>;
     wpi_proto_ProtobufSimpleMotorFeedforward msg;
@@ -49,7 +49,7 @@ struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance, Input>> {
                    const frc::SimpleMotorFeedforward<Distance, Input>& value) {
     using BaseUnit =
         units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
-    using InputUnit = 
+    using InputUnit =
         units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;
     using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit, InputUnit>;
     wpi_proto_ProtobufSimpleMotorFeedforward msg{

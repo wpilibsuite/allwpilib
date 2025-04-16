@@ -17,7 +17,8 @@ struct SimpleMotorFeedforwardProtoTestData {
   using Type = SimpleMotorFeedforward<T, I>;
 
   inline static const Type kTestData = {
-      units::unit_t<I>{0.4}, units::unit_t<I>{4.0} / (units::unit_t<T>{1} / 1_s),
+      units::unit_t<I>{0.4},
+      units::unit_t<I>{4.0} / (units::unit_t<T>{1} / 1_s),
       units::unit_t<I>{0.7} / (units::unit_t<T>{1} / 1_s / 1_s), 25_ms};
 
   static void CheckEq(const Type& testData, const Type& data) {

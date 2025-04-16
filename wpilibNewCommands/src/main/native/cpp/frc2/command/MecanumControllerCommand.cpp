@@ -16,7 +16,7 @@ using kv_unit = units::compound_unit<units::volts,
 
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-    frc::SimpleMotorFeedforward<units::meters> feedforward,
+    frc::SimpleMotorFeedforward<units::meters, units::volts> feedforward,
     frc::MecanumDriveKinematics kinematics, frc::PIDController xController,
     frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
@@ -54,7 +54,7 @@ MecanumControllerCommand::MecanumControllerCommand(
 
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-    frc::SimpleMotorFeedforward<units::meters> feedforward,
+    frc::SimpleMotorFeedforward<units::meters, units::volts> feedforward,
     frc::MecanumDriveKinematics kinematics, frc::PIDController xController,
     frc::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,

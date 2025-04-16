@@ -86,7 +86,7 @@ class MecanumControllerCommand
    */
   MecanumControllerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-      frc::SimpleMotorFeedforward<units::meters> feedforward,
+      frc::SimpleMotorFeedforward<units::meters, units::volts> feedforward,
       frc::MecanumDriveKinematics kinematics, frc::PIDController xController,
       frc::PIDController yController,
       frc::ProfiledPIDController<units::radians> thetaController,
@@ -140,7 +140,7 @@ class MecanumControllerCommand
    */
   MecanumControllerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-      frc::SimpleMotorFeedforward<units::meters> feedforward,
+      frc::SimpleMotorFeedforward<units::meters, units::volts> feedforward,
       frc::MecanumDriveKinematics kinematics, frc::PIDController xController,
       frc::PIDController yController,
       frc::ProfiledPIDController<units::radians> thetaController,
@@ -244,7 +244,7 @@ class MecanumControllerCommand
  private:
   frc::Trajectory m_trajectory;
   std::function<frc::Pose2d()> m_pose;
-  frc::SimpleMotorFeedforward<units::meters> m_feedforward;
+  frc::SimpleMotorFeedforward<units::meters, units::volts> m_feedforward;
   frc::MecanumDriveKinematics m_kinematics;
   frc::HolonomicDriveController m_controller;
   std::function<frc::Rotation2d()> m_desiredRotation;

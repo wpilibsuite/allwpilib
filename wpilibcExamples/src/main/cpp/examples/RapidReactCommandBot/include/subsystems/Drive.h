@@ -75,6 +75,6 @@ class Drive : public frc2::SubsystemBase {
       DriveConstants::kTurnI,
       DriveConstants::kTurnD,
       {DriveConstants::kMaxTurnRate, DriveConstants::kMaxTurnAcceleration}};
-  frc::SimpleMotorFeedforward<units::radians> m_feedforward{
+  frc::SimpleMotorFeedforward<units::radians, units::volts> m_feedforward{
       DriveConstants::ks, DriveConstants::kv, DriveConstants::ka};
 };

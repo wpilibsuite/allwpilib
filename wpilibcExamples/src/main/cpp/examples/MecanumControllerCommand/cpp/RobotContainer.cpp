@@ -69,7 +69,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       frc2::MecanumControllerCommand(
           exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
-          frc::SimpleMotorFeedforward<units::meters>(ks, kv, ka),
+          frc::SimpleMotorFeedforward<units::meters, units::volts>(ks, kv, ka),
           DriveConstants::kDriveKinematics,
 
           frc::PIDController{AutoConstants::kPXController, 0, 0},
