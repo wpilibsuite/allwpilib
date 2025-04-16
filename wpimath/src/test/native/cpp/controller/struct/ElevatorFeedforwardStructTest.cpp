@@ -4,33 +4,36 @@
 
 #include <gtest/gtest.h>
 
+#include "../../StructTestBase.h"
 #include "frc/controller/ElevatorFeedforward.h"
+#include "frc/controller/struct/ElevatorFeedforwardStruct.h"
+#include "units/acceleration.h"
+#include "units/velocity.h"
 
 using namespace frc;
 
-namespace {
+template <typename I>
+struct ElevatorFeedforwardStructTestData {
+  using Type = ElevatorFeedforward<I>;
 
-using StructType = wpi::Struct<frc::ElevatorFeedforward<units::volt>>;
+  inline static const Type kTestData = {
+      units::unit_t<I>{1.91},
+      units::unit_t<I>{2.29},
+      units::unit_t<I>{35.04} / (units::meter_t{1} / 1_s),
+      units::unit_t<I>{1.74} / (units::meter_t{1} / 1_s / 1_s), 25_ms};
 
-static constexpr auto Ks = 1.91_V;
-static constexpr auto Kg = 2.29_V;
-static constexpr auto Kv = 35.04_V * 1_s / 1_m;
-static constexpr auto Ka = 1.74_V * 1_s * 1_s / 1_m;
+  static void CheckEq(const Type& testData, const Type& data) {
+    EXPECT_EQ(testData.GetKs().value(), data.GetKs().value());
+    EXPECT_EQ(testData.GetKg().value(), data.GetKg().value());
+    EXPECT_EQ(testData.GetKv().value(), data.GetKv().value());
+    EXPECT_EQ(testData.GetKa().value(), data.GetKa().value());
+    EXPECT_EQ(testData.GetDt().value(), data.GetDt().value());
+  }
+};
 
-constexpr ElevatorFeedforward<units::volt> kExpectedData{Ks, Kg, Kv, Ka};
-}  // namespace
+using ElevatorFeedforwardStructTestTypes = ::testing::Types<
+    ElevatorFeedforwardStructTestData<units::volt>,
+    ElevatorFeedforwardStructTestData<units::ampere>>;
 
-TEST(ElevatorFeedforwardStructTest, Roundtrip) {
-  uint8_t buffer[StructType::GetSize()];
-  std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
-
-  ElevatorFeedforward<units::volt> unpacked_data = StructType::Unpack(buffer);
-
-  EXPECT_EQ(kExpectedData.GetKs().value(), unpacked_data.GetKs().value());
-  EXPECT_EQ(kExpectedData.GetKg().value(), unpacked_data.GetKg().value());
-  EXPECT_EQ(kExpectedData.GetKv().value(), unpacked_data.GetKv().value());
-  EXPECT_EQ(kExpectedData.GetKa().value(), unpacked_data.GetKa().value());
-  EXPECT_EQ(kExpectedData.GetDt().value(), unpacked_data.GetDt().value());
-
-}
+INSTANTIATE_TYPED_TEST_SUITE_P(ElevatorFeedforward, StructTest,
+                               ElevatorFeedforwardStructTestTypes);
