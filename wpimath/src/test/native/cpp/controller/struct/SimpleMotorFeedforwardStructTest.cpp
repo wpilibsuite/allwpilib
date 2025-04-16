@@ -29,12 +29,10 @@ struct SimpleMotorFeedforwardStructTestData {
   }
 };
 
-INSTANTIATE_TYPED_TEST_SUITE_P(
-    SimpleMotorFeedforwardMeters, StructTest,
-    SimpleMotorFeedforwardStructTestData<units::meters, units::volts>);
-INSTANTIATE_TYPED_TEST_SUITE_P(
-    SimpleMotorFeedforwardFeet, StructTest,
-    SimpleMotorFeedforwardStructTestData<units::feet, units::volts>);
-INSTANTIATE_TYPED_TEST_SUITE_P(
-    SimpleMotorFeedforwardRadians, StructTest,
-    SimpleMotorFeedforwardStructTestData<units::radians, units::volts>);
+using SimpleMotorFeedforwardStructTestTypes = ::testing::Types<
+    SimpleMotorFeedforwardStructTestData<units::meters, units::volts>,
+    SimpleMotorFeedforwardStructTestData<units::feet, units::volts>,
+    SimpleMotorFeedforwardStructTestData<units::radians, units::volts>>;
+
+INSTANTIATE_TYPED_TEST_SUITE_P(SimpleMotorFeedforward, StructTest,
+                               SimpleMotorFeedforwardStructTestTypes);

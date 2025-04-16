@@ -27,7 +27,7 @@ TEST(StateSpaceSimTest, FlywheelSim) {
           0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq);
   frc::sim::FlywheelSim sim{plant, frc::DCMotor::NEO(2)};
   frc::PIDController controller{0.2, 0.0, 0.0};
-  frc::SimpleMotorFeedforward<units::radian> feedforward{
+  frc::SimpleMotorFeedforward<units::radian, units::volts> feedforward{
       0_V, 0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq};
   frc::Encoder encoder{0, 1};
   frc::sim::EncoderSim encoderSim{encoder};
