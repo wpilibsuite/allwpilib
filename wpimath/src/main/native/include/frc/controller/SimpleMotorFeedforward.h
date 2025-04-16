@@ -21,7 +21,7 @@ namespace frc {
  * a simple permanent-magnet DC motor.
  */
 
-template <class Distance, class Input = units::volts>
+template <class Distance, class Input>
   requires(units::length_unit<Distance> || units::angle_unit<Distance>) &&
           (units::voltage_unit<Input> || units::current_unit<Input>)
 class SimpleMotorFeedforward {
