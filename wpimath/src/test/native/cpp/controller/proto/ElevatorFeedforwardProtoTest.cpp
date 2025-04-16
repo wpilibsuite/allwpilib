@@ -32,3 +32,6 @@ TEST(ElevatorFeedforwardProtoTest, Roundtrip) {
   EXPECT_EQ(kExpectedData.GetKv().value(), unpacked_data->GetKv().value());
   EXPECT_EQ(kExpectedData.GetKa().value(), unpacked_data->GetKa().value());
 }
+
+template struct wpi::Struct<frc::ElevatorFeedforward<units::volt>>;
+template struct wpi::Struct<frc::ElevatorFeedforward<units::ampere>>;

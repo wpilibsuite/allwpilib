@@ -9,6 +9,7 @@ constexpr size_t kKsOff = 0;
 constexpr size_t kKgOff = kKsOff + 8;
 constexpr size_t kKvOff = kKgOff + 8;
 constexpr size_t kKaOff = kKvOff + 8;
+constexpr size_t kDtOff = kKaOff + 8;
 }  // namespace
 
 namespace wpi {
@@ -22,21 +23,24 @@ frc::ElevatorFeedforward<Input> Struct<frc::ElevatorFeedforward<Input>>::Unpack(
       units::unit_t<typename frc::ElevatorFeedforward<Input>::kv_unit>{
           UnpackStruct<double, kKvOff>(data)},
       units::unit_t<typename frc::ElevatorFeedforward<Input>::ka_unit>{
-          UnpackStruct<double, kKaOff>(data)}};
+          UnpackStruct<double, kKaOff>(data)},
+      units::second_t{UnpackStruct<double, kDtOff>(data)}};
 }
 
 template <class Input>
   requires(units::current_unit<Input> || units::voltage_unit<Input>)
 void Struct<frc::ElevatorFeedforward<Input>>::Pack(std::span<uint8_t> data,
                                                    const frc::ElevatorFeedforward<Input>& value) {
-  PackStruct<kKsOff>(data, value.ks.value());
-  PackStruct<kKgOff>(data, value.kg.value());
-  PackStruct<kKvOff>(data, value.kv.value());
-  PackStruct<kKaOff>(data, value.ka.value());
+  PackStruct<kKsOff>(data, value.GetKs().value());
+  PackStruct<kKgOff>(data, value.GetKg().value());
+  PackStruct<kKvOff>(data, value.GetKv().value());
+  PackStruct<kKaOff>(data, value.GetKa().value());
+  PackStruct<kDtOff>(data, value.GetDt().value());
 }
 
-// Explicit instantiations
-template struct Struct<frc::ElevatorFeedforward<units::volt_t>>;
-template struct Struct<frc::ElevatorFeedforward<units::ampere_t>>;
+
 
 }  // namespace wpi
+
+template struct wpi::Struct<frc::ElevatorFeedforward<units::volt>>;
+template struct wpi::Struct<frc::ElevatorFeedforward<units::ampere>>;
