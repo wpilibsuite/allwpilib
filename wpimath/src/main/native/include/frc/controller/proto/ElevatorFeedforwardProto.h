@@ -11,11 +11,12 @@
 #include "pb.h"
 #include "wpimath/protobuf/controller.npb.h"
 
-template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::ElevatorFeedforward> {
+template <class Input>
+  requires(units::current_unit<Input> || units::voltage_unit<Input>)
+struct WPILIB_DLLEXPORT wpi::Protobuf<frc::ElevatorFeedforward<Input>> {
   using MessageStruct = wpi_proto_ProtobufElevatorFeedforward;
-  using InputStream = wpi::ProtoInputStream<frc::ElevatorFeedforward>;
-  using OutputStream = wpi::ProtoOutputStream<frc::ElevatorFeedforward>;
-  static std::optional<frc::ElevatorFeedforward> Unpack(InputStream& stream);
-  static bool Pack(OutputStream& stream, const frc::ElevatorFeedforward& value);
+  using InputStream = wpi::ProtoInputStream<frc::ElevatorFeedforward<Input>>;
+  using OutputStream = wpi::ProtoOutputStream<frc::ElevatorFeedforward<Input>>;
+  static std::optional<frc::ElevatorFeedforward<Input>> Unpack(InputStream& stream);
+  static bool Pack(OutputStream& stream, const frc::ElevatorFeedforward<Input>& value);
 };

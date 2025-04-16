@@ -9,8 +9,9 @@
 
 #include "frc/controller/ElevatorFeedforward.h"
 
-template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::ElevatorFeedforward> {
+template <class Input>
+  requires(units::current_unit<Input> || units::voltage_unit<Input>)
+struct WPILIB_DLLEXPORT wpi::Struct<frc::ElevatorFeedforward<Input>> {
   static constexpr std::string_view GetTypeName() {
     return "ElevatorFeedforward";
   }
@@ -19,9 +20,10 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::ElevatorFeedforward> {
     return "double ks;double kg;double kv;double ka";
   }
 
-  static frc::ElevatorFeedforward Unpack(std::span<const uint8_t> data);
+  static frc::ElevatorFeedforward<Input> Unpack(std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
-                   const frc::ElevatorFeedforward& value);
+                   const frc::ElevatorFeedforward<Input>& value);
 };
 
-static_assert(wpi::StructSerializable<frc::ElevatorFeedforward>);
+static_assert(wpi::StructSerializable<frc::ElevatorFeedforward<units::volts>>);
+static_assert(wpi::StructSerializable<frc::ElevatorFeedforward<units::ampere>>);

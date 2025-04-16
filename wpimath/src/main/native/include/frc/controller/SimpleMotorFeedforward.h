@@ -150,7 +150,7 @@ class SimpleMotorFeedforward {
 
   /**
    * Calculates the maximum achievable acceleration given a maximum input (e.g.,
-   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
+   * volts or amperes) and a velocity.  Useful for ensuring that velocity
    * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the velocity constraint, and this will give you
    * a simultaneously-achievable acceleration constraint.
@@ -166,7 +166,7 @@ class SimpleMotorFeedforward {
 
   /**
    * Calculates the minimum achievable acceleration given a maximum input (e.g.,
-   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
+   * volts or amperes) and a velocity.  Useful for ensuring that velocity
    * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the velocity constraint, and this will give you
    * a simultaneously-achievable acceleration constraint.

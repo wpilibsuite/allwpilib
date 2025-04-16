@@ -11,23 +11,32 @@ constexpr size_t kKvOff = kKgOff + 8;
 constexpr size_t kKaOff = kKvOff + 8;
 }  // namespace
 
-using StructType = wpi::Struct<frc::ElevatorFeedforward>;
+namespace wpi {
 
-frc::ElevatorFeedforward StructType::Unpack(std::span<const uint8_t> data) {
-  return frc::ElevatorFeedforward{
-      units::volt_t{wpi::UnpackStruct<double, kKsOff>(data)},
-      units::volt_t{wpi::UnpackStruct<double, kKgOff>(data)},
-      units::unit_t<frc::ElevatorFeedforward::kv_unit>{
-          wpi::UnpackStruct<double, kKvOff>(data)},
-      units::unit_t<frc::ElevatorFeedforward::ka_unit>{
-          wpi::UnpackStruct<double, kKaOff>(data)},
-  };
+template <class Input>
+  requires(units::current_unit<Input> || units::voltage_unit<Input>)
+frc::ElevatorFeedforward<Input> Struct<frc::ElevatorFeedforward<Input>>::Unpack(std::span<const uint8_t> data) {
+  return frc::ElevatorFeedforward<Input>{
+      units::unit_t<Input>{UnpackStruct<double, kKsOff>(data)},
+      units::unit_t<Input>{UnpackStruct<double, kKgOff>(data)},
+      units::unit_t<typename frc::ElevatorFeedforward<Input>::kv_unit>{
+          UnpackStruct<double, kKvOff>(data)},
+      units::unit_t<typename frc::ElevatorFeedforward<Input>::ka_unit>{
+          UnpackStruct<double, kKaOff>(data)}};
 }
 
-void StructType::Pack(std::span<uint8_t> data,
-                      const frc::ElevatorFeedforward& value) {
-  wpi::PackStruct<kKsOff>(data, value.GetKs().value());
-  wpi::PackStruct<kKgOff>(data, value.GetKg().value());
-  wpi::PackStruct<kKvOff>(data, value.GetKv().value());
-  wpi::PackStruct<kKaOff>(data, value.GetKa().value());
+template <class Input>
+  requires(units::current_unit<Input> || units::voltage_unit<Input>)
+void Struct<frc::ElevatorFeedforward<Input>>::Pack(std::span<uint8_t> data,
+                                                   const frc::ElevatorFeedforward<Input>& value) {
+  PackStruct<kKsOff>(data, value.ks.value());
+  PackStruct<kKgOff>(data, value.kg.value());
+  PackStruct<kKvOff>(data, value.kv.value());
+  PackStruct<kKaOff>(data, value.ka.value());
 }
+
+// Explicit instantiations
+template struct Struct<frc::ElevatorFeedforward<units::volt_t>>;
+template struct Struct<frc::ElevatorFeedforward<units::ampere_t>>;
+
+}  // namespace wpi
