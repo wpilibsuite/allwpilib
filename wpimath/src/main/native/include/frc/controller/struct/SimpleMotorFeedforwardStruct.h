@@ -13,9 +13,10 @@
 // frc::SimpleMotorFeedforward<units::meters> or
 // frc::SimpleMotorFeedforward<units::radians>
 
-template <class Distance>
-  requires units::length_unit<Distance> || units::angle_unit<Distance>
-struct wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
+template <class Distance, class Input>
+  requires (units::length_unit<Distance> || units::angle_unit<Distance>) &&
+  (units::current_unit<Input> || units::voltage_unit<Input>)
+struct wpi::Struct<frc::SimpleMotorFeedforward<Distance, Input>> {
   static constexpr std::string_view GetTypeName() {
     return "SimpleMotorFeedforward";
   }
@@ -24,16 +25,18 @@ struct wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
     return "double ks;double kv;double ka;double dt";
   }
 
-  static frc::SimpleMotorFeedforward<Distance> Unpack(
+  static frc::SimpleMotorFeedforward<Distance, Input> Unpack(
       std::span<const uint8_t> data) {
     using BaseUnit =
         units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
-    using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit>;
+    using InputUnit = 
+        units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;        
+    using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit, InputUnit>;
     constexpr size_t kKsOff = 0;
     constexpr size_t kKvOff = kKsOff + 8;
     constexpr size_t kKaOff = kKvOff + 8;
     constexpr size_t kDtOff = kKaOff + 8;
-    return {units::volt_t{wpi::UnpackStruct<double, kKsOff>(data)},
+    return {units::unit_t<Input>{wpi::UnpackStruct<double, kKsOff>(data)},
             units::unit_t<typename BaseFeedforward::kv_unit>{
                 wpi::UnpackStruct<double, kKvOff>(data)},
             units::unit_t<typename BaseFeedforward::ka_unit>{
@@ -42,10 +45,12 @@ struct wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
   }
 
   static void Pack(std::span<uint8_t> data,
-                   const frc::SimpleMotorFeedforward<Distance>& value) {
+                   const frc::SimpleMotorFeedforward<Distance, Input>& value) {
     using BaseUnit =
         units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
-    using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit>;
+    using InputUnit = 
+        units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;        
+    using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit, InputUnit>;
     constexpr size_t kKsOff = 0;
     constexpr size_t kKvOff = kKsOff + 8;
     constexpr size_t kKaOff = kKvOff + 8;
@@ -62,8 +67,8 @@ struct wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
 };
 
 static_assert(
-    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::meters>>);
+    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::meters, units::volts>>);
 static_assert(
-    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::feet>>);
+    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::feet, units::volts>>);
 static_assert(
-    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::radians>>);
+    wpi::StructSerializable<frc::SimpleMotorFeedforward<units::radians, units::volts>>);
