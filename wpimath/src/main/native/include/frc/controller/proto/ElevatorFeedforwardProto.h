@@ -19,15 +19,13 @@ template <class Input>
   requires(units::current_unit<Input> || units::voltage_unit<Input>)
 struct wpi::Protobuf<frc::ElevatorFeedforward<Input>> {
   using MessageStruct = wpi_proto_ProtobufElevatorFeedforward;
-  using InputStream =
-      wpi::ProtoInputStream<frc::ElevatorFeedforward<Input>>;
-  using OutputStream =
-      wpi::ProtoOutputStream<frc::ElevatorFeedforward<Input>>;
+  using InputStream = wpi::ProtoInputStream<frc::ElevatorFeedforward<Input>>;
+  using OutputStream = wpi::ProtoOutputStream<frc::ElevatorFeedforward<Input>>;
 
   static std::optional<frc::ElevatorFeedforward<Input>> Unpack(
       InputStream& stream) {
     using InputUnit =
-        units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;        
+        units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;
     using BaseFeedforward = frc::ElevatorFeedforward<InputUnit>;
     wpi_proto_ProtobufElevatorFeedforward msg;
     if (!stream.Decode(msg)) {
@@ -45,7 +43,8 @@ struct wpi::Protobuf<frc::ElevatorFeedforward<Input>> {
 
   static bool Pack(OutputStream& stream,
                    const frc::ElevatorFeedforward<Input>& value) {
-    using InputUnit = units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;
+    using InputUnit =
+        units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;
     using BaseFeedforward = frc::ElevatorFeedforward<InputUnit>;
     wpi_proto_ProtobufElevatorFeedforward msg{
         .ks = value.GetKs().value(),

@@ -17,8 +17,7 @@ struct ElevatorFeedforwardStructTestData {
   using Type = ElevatorFeedforward<I>;
 
   inline static const Type kTestData = {
-      units::unit_t<I>{1.91},
-      units::unit_t<I>{2.29},
+      units::unit_t<I>{1.91}, units::unit_t<I>{2.29},
       units::unit_t<I>{35.04} / (units::meter_t{1} / 1_s),
       units::unit_t<I>{1.74} / (units::meter_t{1} / 1_s / 1_s), 25_ms};
 
@@ -31,9 +30,9 @@ struct ElevatorFeedforwardStructTestData {
   }
 };
 
-using ElevatorFeedforwardStructTestTypes = ::testing::Types<
-    ElevatorFeedforwardStructTestData<units::volt>,
-    ElevatorFeedforwardStructTestData<units::ampere>>;
+using ElevatorFeedforwardStructTestTypes =
+    ::testing::Types<ElevatorFeedforwardStructTestData<units::volt>,
+                     ElevatorFeedforwardStructTestData<units::ampere>>;
 
 INSTANTIATE_TYPED_TEST_SUITE_P(ElevatorFeedforward, StructTest,
                                ElevatorFeedforwardStructTestTypes);

@@ -30,8 +30,7 @@ class ElevatorFeedforward {
   using Acceleration =
       units::compound_unit<Velocity, units::inverse<units::seconds>>;
   using kv_unit = units::compound_unit<Input, units::inverse<Velocity>>;
-  using ka_unit =
-      units::compound_unit<Input, units::inverse<Acceleration>>;
+  using ka_unit = units::compound_unit<Input, units::inverse<Acceleration>>;
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains.
@@ -46,7 +45,8 @@ class ElevatorFeedforward {
    * @throws IllegalArgumentException for period &le; zero.
    */
   constexpr ElevatorFeedforward(
-      units::unit_t<Input> kS, units::unit_t<Input> kG, units::unit_t<kv_unit> kV,
+      units::unit_t<Input> kS, units::unit_t<Input> kG,
+      units::unit_t<kv_unit> kV,
       units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0),
       units::second_t dt = 20_ms)
       : kS(kS), kG(kG), kV(kV), kA(kA), m_dt(dt) {
@@ -97,8 +97,8 @@ class ElevatorFeedforward {
    */
   [[deprecated("Use the current/next velocity overload instead.")]]
   units::unit_t<Input> Calculate(units::unit_t<Velocity> currentVelocity,
-                          units::unit_t<Velocity> nextVelocity,
-                          units::second_t dt) const {
+                                 units::unit_t<Velocity> nextVelocity,
+                                 units::second_t dt) const {
     // See wpimath/algorithms.md#Elevator_feedforward for derivation
     auto plant = LinearSystemId::IdentifyVelocitySystem<Distance>(kV, kA);
     LinearPlantInversionFeedforward<1, 1> feedforward{plant, dt};
@@ -155,12 +155,13 @@ class ElevatorFeedforward {
 
   /**
    * Calculates the maximum achievable velocity given a maximum input (e.g.,
-   * volts or amperes) and an acceleration.  Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
+   * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
-   * @param maxInput The maximum input (e.g., volts or amperes) that can be supplied to the motor.
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * supplied to the motor.
    * @param acceleration The acceleration of the elevator.
    * @return The maximum possible velocity at the given acceleration.
    */
@@ -172,12 +173,13 @@ class ElevatorFeedforward {
 
   /**
    * Calculates the minimum achievable velocity given a maximum input (e.g.,
-   * volts or amperes) and an acceleration.  Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
+   * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
-   * @param maxInput The maximum input (e.g., volts or amperes) that can be supplied to the motor.
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * supplied to the motor.
    * @param acceleration The acceleration of the elevator.
    * @return The minimum possible velocity at the given acceleration.
    */
@@ -194,7 +196,8 @@ class ElevatorFeedforward {
    * achievable - enter the velocity constraint, and this will give you
    * a simultaneously-achievable acceleration constraint.
    *
-   * @param maxInput The maximum input (e.g., volts or amperes) that can be supplied to the motor.
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * supplied to the motor.
    * @param velocity The velocity of the elevator.
    * @return The maximum possible acceleration at the given velocity.
    */
@@ -210,7 +213,8 @@ class ElevatorFeedforward {
    * achievable - enter the velocity constraint, and this will give you
    * a simultaneously-achievable acceleration constraint.
    *
-   * @param maxInput The maximum input (e.g., volts or amperes) that can be supplied to the motor.
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * supplied to the motor.
    * @param velocity The velocity of the elevator.
    * @return The minimum possible acceleration at the given velocity.
    */
@@ -280,7 +284,7 @@ class ElevatorFeedforward {
    *
    * @return The period.
    */
-  constexpr units::second_t GetDt() const { return m_dt; }  
+  constexpr units::second_t GetDt() const { return m_dt; }
 
  private:
   /// The static gain.

@@ -35,8 +35,7 @@ static constexpr auto kA = 0.43277_V / 1_mps_sq;
 
 frc::ExponentialProfile<units::meter, units::volt>::State CheckDynamics(
     frc::ExponentialProfile<units::meter, units::volt> profile,
-    frc::ExponentialProfile<units::meter, units::volt>::Constraints
-        constraints,
+    frc::ExponentialProfile<units::meter, units::volt>::Constraints constraints,
     frc::SimpleMotorFeedforward<units::meter, units::volt> feedforward,
     frc::ExponentialProfile<units::meter, units::volt>::State current,
     frc::ExponentialProfile<units::meter, units::volt>::State goal) {
@@ -77,8 +76,7 @@ TEST(ExponentialProfileTest, PosContinuousUnderVelChange) {
   for (int i = 0; i < 300; ++i) {
     if (i == 150) {
       constraints.maxInput = 9_V;
-      profile =
-          frc::ExponentialProfile<units::meter, units::volt>{constraints};
+      profile = frc::ExponentialProfile<units::meter, units::volt>{constraints};
     }
 
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
@@ -100,8 +98,7 @@ TEST(ExponentialProfileTest, PosContinuousUnderVelChangeBackward) {
   for (int i = 0; i < 300; ++i) {
     if (i == 150) {
       constraints.maxInput = 9_V;
-      profile =
-          frc::ExponentialProfile<units::meter, units::volt>{constraints};
+      profile = frc::ExponentialProfile<units::meter, units::volt>{constraints};
     }
 
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
@@ -230,7 +227,7 @@ TEST(ExponentialProfileTest, TestHeuristic) {
       frc::ExponentialProfile<units::meter, units::volt>::State,  // initial
       frc::ExponentialProfile<units::meter, units::volt>::State,  // goal
       frc::ExponentialProfile<units::meter, units::volt>::State>  // inflection
-                                                                   // point
+                                                                  // point
               >
       testCases{
           // red > green and purple => always positive => false

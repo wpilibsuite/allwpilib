@@ -24,8 +24,7 @@ struct wpi::Struct<frc::ElevatorFeedforward<Input>> {
     return "double ks;double kg;double kv;double ka;double dt";
   }
 
-  static frc::ElevatorFeedforward<Input> Unpack(
-      std::span<const uint8_t> data) {
+  static frc::ElevatorFeedforward<Input> Unpack(std::span<const uint8_t> data) {
     using InputUnit =
         units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;
     using BaseFeedforward = frc::ElevatorFeedforward<InputUnit>;
@@ -65,7 +64,5 @@ struct wpi::Struct<frc::ElevatorFeedforward<Input>> {
   }
 };
 
-static_assert(wpi::StructSerializable<
-              frc::ElevatorFeedforward<units::volt>>);
-static_assert(wpi::StructSerializable<
-              frc::ElevatorFeedforward<units::ampere>>);
+static_assert(wpi::StructSerializable<frc::ElevatorFeedforward<units::volt>>);
+static_assert(wpi::StructSerializable<frc::ElevatorFeedforward<units::ampere>>);
