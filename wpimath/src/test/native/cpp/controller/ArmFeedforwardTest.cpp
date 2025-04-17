@@ -31,9 +31,11 @@ namespace {
  * @param dt The simulation time.
  * @return The final state as a 2-vector of angle and angular velocity.
  */
+template <class Input>
+  requires(units::current_unit<Input> || units::voltage_unit<Input>)  
 frc::Matrixd<2, 1> Simulate(units::radian_t currentAngle,
                             units::radians_per_second_t currentVelocity,
-                            units::volt_t input, units::second_t dt) {
+                            units::unit_t<Input> input, units::second_t dt) {
   constexpr frc::Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -Kv.value() / Ka.value()}};
   constexpr frc::Matrixd<2, 1> B{{0.0}, {1.0 / Ka.value()}};
 
@@ -57,7 +59,9 @@ frc::Matrixd<2, 1> Simulate(units::radian_t currentAngle,
  * @param input The input voltage.
  * @param dt The simulation time.
  */
-void CalculateAndSimulate(const frc::ArmFeedforward& armFF,
+template <class Input>
+  requires(units::current_unit<Input> || units::voltage_unit<Input>)  
+void CalculateAndSimulate(const frc::ArmFeedforward<Input>& armFF,
                           units::radian_t currentAngle,
                           units::radians_per_second_t currentVelocity,
                           units::radians_per_second_t nextVelocity,

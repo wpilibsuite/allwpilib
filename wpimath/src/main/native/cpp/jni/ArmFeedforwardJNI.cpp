@@ -15,7 +15,7 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_math_jni_ArmFeedforwardJNI
- * Method:    calculate
+ * Method:    calculateVolts
  * Signature: (DDDDDDDD)D
  */
 JNIEXPORT jdouble JNICALL
@@ -24,13 +24,36 @@ Java_edu_wpi_first_math_jni_ArmFeedforwardJNI_calculate
    jdouble currentAngle, jdouble currentVelocity, jdouble nextVelocity,
    jdouble dt)
 {
-  return frc::ArmFeedforward{units::volt_t{ks}, units::volt_t{kg},
-                             units::unit_t<frc::ArmFeedforward::kv_unit>{kv},
-                             units::unit_t<frc::ArmFeedforward::ka_unit>{ka},
+  return frc::ArmFeedforward<units::volt>{units::volt_t{ks}, units::volt_t{kg},
+                             units::unit_t<frc::ArmFeedforward<units::volt>::kv_unit>{kv},
+                             units::unit_t<frc::ArmFeedforward<units::volt>::ka_unit>{ka},
                              units::second_t{dt}}
       .Calculate(units::radian_t{currentAngle},
                  units::radians_per_second_t{currentVelocity},
                  units::radians_per_second_t{nextVelocity})
+      .value();
+}
+
+/*
+ * Class:     edu_wpi_first_math_jni_ArmFeedforwardJNI
+ * Method:    calculateAmps
+ * Signature: (DDDDDDDD)D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_math_jni_ArmFeedforwardJNI_calculateAmps
+  (JNIEnv* /*env*/, jclass /*cls*/, jdouble ks, jdouble kv, jdouble ka, jdouble kg,
+   jdouble currentAngle, jdouble currentVelocity, jdouble nextVelocity,
+   jdouble dt)
+{
+  return frc::ArmFeedforward<units::ampere>{
+      units::ampere_t{ks},
+      units::ampere_t{kg},
+      units::unit_t<frc::ArmFeedforward<units::ampere>::kv_unit>{kv},
+      units::unit_t<frc::ArmFeedforward<units::ampere>::ka_unit>{ka},
+      units::second_t{dt}}.Calculate(
+             units::radian_t{currentAngle},
+             units::radians_per_second_t{currentVelocity},
+             units::radians_per_second_t{nextVelocity})
       .value();
 }
 

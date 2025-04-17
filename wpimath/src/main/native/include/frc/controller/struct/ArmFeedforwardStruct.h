@@ -4,21 +4,65 @@
 
 #pragma once
 
-#include <wpi/SymbolExports.h>
 #include <wpi/struct/Struct.h>
 
 #include "frc/controller/ArmFeedforward.h"
+#include "units/length.h"
 
-template <>
-struct WPILIB_DLLEXPORT wpi::Struct<frc::ArmFeedforward> {
-  static constexpr std::string_view GetTypeName() { return "ArmFeedforward"; }
-  static constexpr size_t GetSize() { return 32; }
+// Everything is converted into units for
+// frc::ArmFeedforward<units::volt> or
+// frc::ArmFeedforward<units::ampere>
+
+template <class Input>
+  requires(units::current_unit<Input> || units::voltage_unit<Input>)
+struct wpi::Struct<frc::ArmFeedforward<Input>> {
+  static constexpr std::string_view GetTypeName() {
+    return "ArmFeedforward";
+  }
+  static constexpr size_t GetSize() { return 40; }
   static constexpr std::string_view GetSchema() {
-    return "double ks;double kg;double kv;double ka";
+    return "double ks;double kg;double kv;double ka;double dt";
   }
 
-  static frc::ArmFeedforward Unpack(std::span<const uint8_t> data);
-  static void Pack(std::span<uint8_t> data, const frc::ArmFeedforward& value);
+  static frc::ArmFeedforward<Input> Unpack(std::span<const uint8_t> data) {
+    using InputUnit =
+        units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;
+    using BaseFeedforward = frc::ArmFeedforward<InputUnit>;
+    constexpr size_t kKsOff = 0;
+    constexpr size_t kKgOff = kKsOff + 8;
+    constexpr size_t kKvOff = kKgOff + 8;
+    constexpr size_t kKaOff = kKvOff + 8;
+    constexpr size_t kDtOff = kKaOff + 8;
+    return {units::unit_t<Input>{wpi::UnpackStruct<double, kKsOff>(data)},
+            units::unit_t<Input>{wpi::UnpackStruct<double, kKgOff>(data)},
+            units::unit_t<typename BaseFeedforward::kv_unit>{
+                wpi::UnpackStruct<double, kKvOff>(data)},
+            units::unit_t<typename BaseFeedforward::ka_unit>{
+                wpi::UnpackStruct<double, kKaOff>(data)},
+            units::second_t{wpi::UnpackStruct<double, kDtOff>(data)}};
+  }
+
+  static void Pack(std::span<uint8_t> data,
+                   const frc::ArmFeedforward<Input>& value) {
+    using InputUnit =
+        units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;
+    using BaseFeedforward = frc::ArmFeedforward<InputUnit>;
+    constexpr size_t kKsOff = 0;
+    constexpr size_t kKgOff = kKsOff + 8;
+    constexpr size_t kKvOff = kKgOff + 8;
+    constexpr size_t kKaOff = kKvOff + 8;
+    constexpr size_t kDtOff = kKaOff + 8;
+    wpi::PackStruct<kKsOff>(data, value.GetKs().value());
+    wpi::PackStruct<kKgOff>(data, value.GetKg().value());
+    wpi::PackStruct<kKvOff>(
+        data, units::unit_t<typename BaseFeedforward::kv_unit>{value.GetKv()}
+                  .value());
+    wpi::PackStruct<kKaOff>(
+        data, units::unit_t<typename BaseFeedforward::ka_unit>{value.GetKa()}
+                  .value());
+    wpi::PackStruct<kDtOff>(data, units::second_t{value.GetDt()}.value());
+  }
 };
 
-static_assert(wpi::StructSerializable<frc::ArmFeedforward>);
+static_assert(wpi::StructSerializable<frc::ArmFeedforward<units::volt>>);
+static_assert(wpi::StructSerializable<frc::ArmFeedforward<units::ampere>>);

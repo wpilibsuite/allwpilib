@@ -37,8 +37,8 @@ class ElevatorFeedforward {
    *
    * @param kS The static gain, in input units (e.g., volts or amperes).
    * @param kG The gravity gain, in input units (e.g., volts or amperes).
-   * @param kV The velocity gain, in input units per (distance/second).
-   * @param kA The acceleration gain, in input units per (distance/second²).
+   * @param kV The velocity gain, in input units per (meters/second).
+   * @param kA The acceleration gain, in input units per (meters/second²).
    * @param dt The period in seconds.
    * @throws IllegalArgumentException for kv &lt; zero.
    * @throws IllegalArgumentException for ka &lt; zero.
@@ -161,7 +161,7 @@ class ElevatorFeedforward {
    * a simultaneously-achievable velocity constraint.
    *
    * @param maxInput The maximum input (e.g., volts or amperes) that can be
-   * supplied to the motor.
+   * supplied to the elevator.
    * @param acceleration The acceleration of the elevator.
    * @return The maximum possible velocity at the given acceleration.
    */
@@ -179,7 +179,7 @@ class ElevatorFeedforward {
    * a simultaneously-achievable velocity constraint.
    *
    * @param maxInput The maximum input (e.g., volts or amperes) that can be
-   * supplied to the motor.
+   * supplied to the elevator.
    * @param acceleration The acceleration of the elevator.
    * @return The minimum possible velocity at the given acceleration.
    */
@@ -197,7 +197,7 @@ class ElevatorFeedforward {
    * a simultaneously-achievable acceleration constraint.
    *
    * @param maxInput The maximum input (e.g., volts or amperes) that can be
-   * supplied to the motor.
+   * supplied to the elevator.
    * @param velocity The velocity of the elevator.
    * @return The maximum possible acceleration at the given velocity.
    */
@@ -214,7 +214,7 @@ class ElevatorFeedforward {
    * a simultaneously-achievable acceleration constraint.
    *
    * @param maxInput The maximum input (e.g., volts or amperes) that can be
-   * supplied to the motor.
+   * supplied to the elevator.
    * @param velocity The velocity of the elevator.
    * @return The minimum possible acceleration at the given velocity.
    */

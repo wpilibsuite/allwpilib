@@ -15,7 +15,10 @@
 
 using namespace frc;
 
-units::volt_t ArmFeedforward::Calculate(
+template <class Input>
+  requires(units::current_unit<Input> || units::voltage_unit<Input>) 
+  
+units::unit_t<Input> ArmFeedforward<Input>::Calculate(
     units::unit_t<Angle> currentAngle, units::unit_t<Velocity> currentVelocity,
     units::unit_t<Velocity> nextVelocity) const {
   using VarMat = sleipnir::VariableMatrix;
@@ -101,5 +104,15 @@ units::volt_t ArmFeedforward::Calculate(
     }
   }
 
-  return units::volt_t{u_k.Value()};
+  return units::unit_t<Input>{u_k.Value()};
 }
+
+template units::volt_t frc::ArmFeedforward<units::volt>::Calculate(
+    units::radian_t,
+    units::radians_per_second_t,
+    units::radians_per_second_t) const;
+
+template units::ampere_t frc::ArmFeedforward<units::ampere>::Calculate(
+    units::radian_t,
+    units::radians_per_second_t,
+    units::radians_per_second_t) const;
