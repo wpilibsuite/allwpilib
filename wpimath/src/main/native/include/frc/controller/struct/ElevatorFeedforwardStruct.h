@@ -9,10 +9,6 @@
 #include "frc/controller/ElevatorFeedforward.h"
 #include "units/length.h"
 
-// Everything is converted into units for
-// frc::ElevatorFeedforward<units::volt> or
-// frc::ElevatorFeedforward<units::ampere>
-
 template <class Input>
   requires(units::current_unit<Input> || units::voltage_unit<Input>)
 struct wpi::Struct<frc::ElevatorFeedforward<Input>> {

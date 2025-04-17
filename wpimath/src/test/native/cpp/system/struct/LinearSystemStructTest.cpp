@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../StructTestBase.h"
+#include "StructTestBase.h"
 #include "frc/system/LinearSystem.h"
 #include "frc/system/struct/LinearSystemStruct.h"
 

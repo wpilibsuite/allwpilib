@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../ProtoTestBase.h"
+#include "ProtoTestBase.h"
 #include "frc/spline/QuinticHermiteSpline.h"
 
 using namespace frc;

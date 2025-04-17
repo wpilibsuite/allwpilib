@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../StructTestBase.h"
+#include "StructTestBase.h"
 #include "frc/EigenCore.h"
 #include "frc/struct/VectorStruct.h"
 

@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../StructTestBase.h"
+#include "StructTestBase.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/kinematics/struct/SwerveDriveKinematicsStruct.h"
 

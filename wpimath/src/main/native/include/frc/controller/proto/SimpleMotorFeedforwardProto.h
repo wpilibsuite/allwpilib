@@ -11,10 +11,6 @@
 #include "units/length.h"
 #include "wpimath/protobuf/controller.npb.h"
 
-// Everything is converted into units for
-// frc::SimpleMotorFeedforward<units::meters> or
-// frc::SimpleMotorFeedforward<units::radians>
-
 template <class Distance, class Input>
   requires(units::length_unit<Distance> || units::angle_unit<Distance>) &&
           (units::current_unit<Input> || units::voltage_unit<Input>)

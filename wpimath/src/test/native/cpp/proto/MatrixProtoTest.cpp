@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../ProtoTestBase.h"
+#include "ProtoTestBase.h"
 #include "frc/EigenCore.h"
 #include "frc/proto/MatrixProto.h"
 

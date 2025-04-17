@@ -11,10 +11,6 @@
 #include "units/length.h"
 #include "wpimath/protobuf/controller.npb.h"
 
-// Everything is converted into units for
-// frc::ElevatorFeedforward<units::volt> or
-// frc::ElevatorFeedforward<units::ampere>
-
 template <class Input>
   requires(units::current_unit<Input> || units::voltage_unit<Input>)
 struct wpi::Protobuf<frc::ElevatorFeedforward<Input>> {
