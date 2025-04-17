@@ -19,7 +19,7 @@ static constexpr auto Ka = 2_V * 1_s * 1_s / 1_m;
 static constexpr auto Kg = 1_V;
 
 TEST(ElevatorFeedforwardTest, Calculate) {
-  frc::ElevatorFeedforward elevatorFF{Ks, Kg, Kv, Ka};
+  frc::ElevatorFeedforward<units::volt> elevatorFF{Ks, Kg, Kv, Ka};
 
   EXPECT_NEAR(elevatorFF.Calculate(0_m / 1_s).value(), Kg.value(), 0.002);
   EXPECT_NEAR(elevatorFF.Calculate(2_m / 1_s).value(), 4.5, 0.002);
@@ -36,7 +36,7 @@ TEST(ElevatorFeedforwardTest, Calculate) {
 }
 
 TEST(ElevatorFeedforwardTest, AchievableVelocity) {
-  frc::ElevatorFeedforward elevatorFF{Ks, Kg, Kv, Ka};
+  frc::ElevatorFeedforward<units::volt> elevatorFF{Ks, Kg, Kv, Ka};
   EXPECT_NEAR(elevatorFF.MaxAchievableVelocity(11_V, 1_m / 1_s / 1_s).value(),
               5, 0.002);
   EXPECT_NEAR(elevatorFF.MinAchievableVelocity(11_V, 1_m / 1_s / 1_s).value(),
@@ -44,7 +44,7 @@ TEST(ElevatorFeedforwardTest, AchievableVelocity) {
 }
 
 TEST(ElevatorFeedforwardTest, AchievableAcceleration) {
-  frc::ElevatorFeedforward elevatorFF{Ks, Kg, Kv, Ka};
+  frc::ElevatorFeedforward<units::volt> elevatorFF{Ks, Kg, Kv, Ka};
   EXPECT_NEAR(elevatorFF.MaxAchievableAcceleration(12_V, 2_m / 1_s).value(),
               3.75, 0.002);
   EXPECT_NEAR(elevatorFF.MaxAchievableAcceleration(12_V, -2_m / 1_s).value(),
@@ -56,7 +56,7 @@ TEST(ElevatorFeedforwardTest, AchievableAcceleration) {
 }
 
 TEST(ElevatorFeedforwardTest, NegativeGains) {
-  frc::ElevatorFeedforward elevatorFF{Ks, Kg, -Kv, -Ka};
+  frc::ElevatorFeedforward<units::volt> elevatorFF{Ks, Kg, -Kv, -Ka};
   EXPECT_EQ(elevatorFF.GetKv().value(), 0);
   EXPECT_EQ(elevatorFF.GetKa().value(), 0);
 }
