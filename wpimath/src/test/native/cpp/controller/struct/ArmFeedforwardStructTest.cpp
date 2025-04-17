@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include "StructTestBase.h"
-#include "../../StructTestBase.h"
 #include "frc/controller/ArmFeedforward.h"
 #include "frc/controller/struct/ArmFeedforwardStruct.h"
 #include "units/acceleration.h"

@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../StructTestBase.h"
+#include "StructTestBase.h"
 #include "frc/controller/DifferentialDriveFeedforward.h"
 
 using namespace frc;
