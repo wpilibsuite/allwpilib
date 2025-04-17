@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/src/test/native/cpp/StructTestBase.h"
+#include "StructTestBase.h"
 #include "../../StructTestBase.h"
 #include "frc/controller/ArmFeedforward.h"
 #include "frc/controller/struct/ArmFeedforwardStruct.h"
