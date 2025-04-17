@@ -56,6 +56,7 @@ typedef struct _wpi_proto_ProtobufSimpleMotorFeedforward {
     static pb_filedesc_t file_descriptor(void) noexcept;
 
     double ks;
+    double kg;
     double kv;
     double ka;
     double dt;
