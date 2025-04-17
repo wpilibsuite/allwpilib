@@ -106,7 +106,7 @@ TEST(ElevatorFeedforwardTest, AchievableAccelerationCurrent) {
   constexpr auto Ka = 2_A * 1_s * 1_s / 1_m;
   constexpr auto Kg = 1_A;
 
-  frc::ElevatorFeedforward<units::volt> elevatorFF{Ks, Kg, Kv, Ka};
+  frc::ElevatorFeedforward<units::ampere> elevatorFF{Ks, Kg, Kv, Ka};
   EXPECT_NEAR(elevatorFF.MaxAchievableAcceleration(12_A, 2_m / 1_s).value(),
               3.75, 0.002);
   EXPECT_NEAR(elevatorFF.MaxAchievableAcceleration(12_A, -2_m / 1_s).value(),
