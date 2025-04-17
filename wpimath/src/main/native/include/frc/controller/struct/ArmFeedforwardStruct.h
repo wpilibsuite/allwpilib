@@ -16,9 +16,7 @@
 template <class Input>
   requires(units::current_unit<Input> || units::voltage_unit<Input>)
 struct wpi::Struct<frc::ArmFeedforward<Input>> {
-  static constexpr std::string_view GetTypeName() {
-    return "ArmFeedforward";
-  }
+  static constexpr std::string_view GetTypeName() { return "ArmFeedforward"; }
   static constexpr size_t GetSize() { return 40; }
   static constexpr std::string_view GetSchema() {
     return "double ks;double kg;double kv;double ka;double dt";

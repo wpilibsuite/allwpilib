@@ -32,7 +32,7 @@ namespace {
  * @return The final state as a 2-vector of angle and angular velocity.
  */
 template <class Input>
-  requires(units::current_unit<Input> || units::voltage_unit<Input>)  
+  requires(units::current_unit<Input> || units::voltage_unit<Input>)
 frc::Matrixd<2, 1> Simulate(units::radian_t currentAngle,
                             units::radians_per_second_t currentVelocity,
                             units::unit_t<Input> input, units::second_t dt) {
@@ -60,7 +60,7 @@ frc::Matrixd<2, 1> Simulate(units::radian_t currentAngle,
  * @param dt The simulation time.
  */
 template <class Input>
-  requires(units::current_unit<Input> || units::voltage_unit<Input>)  
+  requires(units::current_unit<Input> || units::voltage_unit<Input>)
 void CalculateAndSimulate(const frc::ArmFeedforward<Input>& armFF,
                           units::radian_t currentAngle,
                           units::radians_per_second_t currentVelocity,

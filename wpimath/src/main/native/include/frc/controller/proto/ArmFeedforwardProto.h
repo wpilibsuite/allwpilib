@@ -22,8 +22,7 @@ struct wpi::Protobuf<frc::ArmFeedforward<Input>> {
   using InputStream = wpi::ProtoInputStream<frc::ArmFeedforward<Input>>;
   using OutputStream = wpi::ProtoOutputStream<frc::ArmFeedforward<Input>>;
 
-  static std::optional<frc::ArmFeedforward<Input>> Unpack(
-      InputStream& stream) {
+  static std::optional<frc::ArmFeedforward<Input>> Unpack(InputStream& stream) {
     using InputUnit =
         units::unit<std::ratio<1>, units::traits::base_unit_of<Input>>;
     using BaseFeedforward = frc::ArmFeedforward<InputUnit>;

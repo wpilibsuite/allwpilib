@@ -16,8 +16,8 @@
 using namespace frc;
 
 template <class Input>
-  requires(units::current_unit<Input> || units::voltage_unit<Input>) 
-  
+  requires(units::current_unit<Input> || units::voltage_unit<Input>)
+
 units::unit_t<Input> ArmFeedforward<Input>::Calculate(
     units::unit_t<Angle> currentAngle, units::unit_t<Velocity> currentVelocity,
     units::unit_t<Velocity> nextVelocity) const {
@@ -108,11 +108,9 @@ units::unit_t<Input> ArmFeedforward<Input>::Calculate(
 }
 
 template units::volt_t frc::ArmFeedforward<units::volt>::Calculate(
-    units::radian_t,
-    units::radians_per_second_t,
+    units::radian_t, units::radians_per_second_t,
     units::radians_per_second_t) const;
 
 template units::ampere_t frc::ArmFeedforward<units::ampere>::Calculate(
-    units::radian_t,
-    units::radians_per_second_t,
+    units::radian_t, units::radians_per_second_t,
     units::radians_per_second_t) const;

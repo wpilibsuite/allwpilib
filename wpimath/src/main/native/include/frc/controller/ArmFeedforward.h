@@ -11,8 +11,8 @@
 
 #include "units/angle.h"
 #include "units/angular_velocity.h"
-#include "units/math.h"
 #include "units/current.h"
+#include "units/math.h"
 #include "units/voltage.h"
 #include "wpimath/MathShared.h"
 
@@ -22,7 +22,7 @@ namespace frc {
  * a motor acting against the force of gravity on a beam suspended at an angle).
  */
 template <class Input>
-  requires(units::current_unit<Input> || units::voltage_unit<Input>) 
+  requires(units::current_unit<Input> || units::voltage_unit<Input>)
 class WPILIB_DLLEXPORT ArmFeedforward {
  public:
   using Angle = units::radians;
@@ -30,10 +30,8 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   using Acceleration = units::compound_unit<units::radians_per_second,
                                             units::inverse<units::second>>;
   using kv_unit =
-      units::compound_unit<Input,
-                           units::inverse<units::radians_per_second>>;
-  using ka_unit =
-      units::compound_unit<Input, units::inverse<Acceleration>>;
+      units::compound_unit<Input, units::inverse<units::radians_per_second>>;
+  using ka_unit = units::compound_unit<Input, units::inverse<Acceleration>>;
 
   /**
    * Creates a new ArmFeedforward with the specified gains.
@@ -48,7 +46,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @throws IllegalArgumentException for period &le; zero.
    */
   constexpr ArmFeedforward(
-      units::unit_t<Input> kS, units::unit_t<Input> kG, 
+      units::unit_t<Input> kS, units::unit_t<Input> kG,
       units::unit_t<kv_unit> kV,
       units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0),
       units::second_t dt = 20_ms)
@@ -109,9 +107,9 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    */
   [[deprecated("Use the current/next velocity overload instead.")]]
   units::unit_t<Input> Calculate(units::unit_t<Angle> currentAngle,
-                          units::unit_t<Velocity> currentVelocity,
-                          units::unit_t<Velocity> nextVelocity,
-                          units::second_t dt) const {
+                                 units::unit_t<Velocity> currentVelocity,
+                                 units::unit_t<Velocity> nextVelocity,
+                                 units::second_t dt) const {
     return Calculate(currentAngle, currentVelocity, nextVelocity);
   }
 
@@ -146,16 +144,16 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @return The computed feedforward, in input units (e.g., volts or amperes).
    */
   units::unit_t<Input> Calculate(units::unit_t<Angle> currentAngle,
-                          units::unit_t<Velocity> currentVelocity,
-                          units::unit_t<Velocity> nextVelocity) const;
+                                 units::unit_t<Velocity> currentVelocity,
+                                 units::unit_t<Velocity> nextVelocity) const;
 
   // Rearranging the main equation from the calculate() method yields the
   // formulas for the methods below:
 
   /**
    * Calculates the maximum achievable velocity given a maximum input (e.g.,
-   * volts or amperes) and an acceleration.  Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
+   * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
@@ -173,15 +171,14 @@ class WPILIB_DLLEXPORT ArmFeedforward {
       units::unit_t<Input> maxInput, units::unit_t<Angle> angle,
       units::unit_t<Acceleration> acceleration) {
     // Assume max velocity is positive
-    return (maxInput - kS - kG * units::math::cos(angle) -
-            kA * acceleration) /
+    return (maxInput - kS - kG * units::math::cos(angle) - kA * acceleration) /
            kV;
   }
 
   /**
    * Calculates the minimum achievable velocity given a maximum input (e.g.,
-   * volts or amperes) and an acceleration.  Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
+   * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
@@ -199,8 +196,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
       units::unit_t<Input> maxInput, units::unit_t<Angle> angle,
       units::unit_t<Acceleration> acceleration) {
     // Assume min velocity is negative, ks flips sign
-    return (-maxInput + kS - kG * units::math::cos(angle) -
-            kA * acceleration) /
+    return (-maxInput + kS - kG * units::math::cos(angle) - kA * acceleration) /
            kV;
   }
 
@@ -224,8 +220,8 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   constexpr units::unit_t<Acceleration> MaxAchievableAcceleration(
       units::unit_t<Input> maxInput, units::unit_t<Angle> angle,
       units::unit_t<Velocity> velocity) {
-    return (maxInput - kS * wpi::sgn(velocity) -
-            kG * units::math::cos(angle) - kV * velocity) /
+    return (maxInput - kS * wpi::sgn(velocity) - kG * units::math::cos(angle) -
+            kV * velocity) /
            kA;
   }
 
@@ -313,7 +309,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    *
    * @return The period.
    */
-  constexpr units::second_t GetDt() const { return m_dt; }  
+  constexpr units::second_t GetDt() const { return m_dt; }
 
  private:
   /// The static gain, in volts.
