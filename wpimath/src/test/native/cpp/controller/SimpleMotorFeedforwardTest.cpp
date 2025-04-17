@@ -27,7 +27,7 @@ TEST(SimpleMotorFeedforwardTest, CalculateVoltage) {
 
   frc::LinearPlantInversionFeedforward<1, 1> plantInversion{A, B, dt};
   frc::SimpleMotorFeedforward<units::meter, units::volt> simpleMotor{Ks, Kv,
-                                                                      Ka};
+                                                                     Ka};
 
   constexpr Vectord<1> r{{2.0}};
   constexpr Vectord<1> nextR{{3.0}};
@@ -54,7 +54,7 @@ TEST(SimpleMotorFeedforwardTest, CalculateCurrent) {
 
   frc::LinearPlantInversionFeedforward<1, 1> plantInversion{A, B, dt};
   frc::SimpleMotorFeedforward<units::meter, units::ampere> simpleMotor{Ks, Kv,
-                                                                      Ka};
+                                                                       Ka};
 
   constexpr Vectord<1> r{{2.0}};
   constexpr Vectord<1> nextR{{3.0}};
@@ -75,8 +75,8 @@ TEST(SimpleMotorFeedforwardTest, NegativeVoltageGains) {
   constexpr auto Kv = -3_V / 1_mps;
   constexpr auto Ka = -0.6_V / 1_mps_sq;
   constexpr units::second_t dt = 0_ms;
-  frc::SimpleMotorFeedforward<units::meter, units::volt> simpleMotor{Ks, Kv,
-                                                                      Ka, dt};
+  frc::SimpleMotorFeedforward<units::meter, units::volt> simpleMotor{Ks, Kv, Ka,
+                                                                     dt};
   EXPECT_EQ(simpleMotor.GetKv().value(), 0);
   EXPECT_EQ(simpleMotor.GetKa().value(), 0);
   EXPECT_EQ(simpleMotor.GetDt().value(), 0.02);
@@ -88,7 +88,7 @@ TEST(SimpleMotorFeedforwardTest, NegativeCurrentGains) {
   constexpr auto Ka = -0.6_A / 1_mps_sq;
   constexpr units::second_t dt = 0_ms;
   frc::SimpleMotorFeedforward<units::meter, units::ampere> simpleMotor{Ks, Kv,
-                                                                      Ka, dt};
+                                                                       Ka, dt};
   EXPECT_EQ(simpleMotor.GetKv().value(), 0);
   EXPECT_EQ(simpleMotor.GetKa().value(), 0);
   EXPECT_EQ(simpleMotor.GetDt().value(), 0.02);
