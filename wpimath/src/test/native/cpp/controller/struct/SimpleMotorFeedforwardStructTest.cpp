@@ -39,12 +39,18 @@ INSTANTIATE_TYPED_TEST_SUITE_P(SimpleMotorFeedforward, StructTest,
 
 TEST(SimpleMotorFeedforwardStructTest, CheckSize) {
   constexpr size_t expectedSize = 32;
-  EXPECT_EQ((wpi::Struct<SimpleMotorFeedforward<units::meter, units::volt>>::GetSize()),
+  EXPECT_EQ((wpi::Struct<
+                SimpleMotorFeedforward<units::meter, units::volt>>::GetSize()),
             expectedSize);
-  EXPECT_EQ((wpi::Struct<SimpleMotorFeedforward<units::meter, units::ampere>>::GetSize()),
+  EXPECT_EQ(
+      (wpi::Struct<
+          SimpleMotorFeedforward<units::meter, units::ampere>>::GetSize()),
+      expectedSize);
+  EXPECT_EQ((wpi::Struct<
+                SimpleMotorFeedforward<units::radian, units::volt>>::GetSize()),
             expectedSize);
-  EXPECT_EQ((wpi::Struct<SimpleMotorFeedforward<units::radian, units::volt>>::GetSize()),
-            expectedSize);
-  EXPECT_EQ((wpi::Struct<SimpleMotorFeedforward<units::radian, units::ampere>>::GetSize()),
-            expectedSize);            
+  EXPECT_EQ(
+      (wpi::Struct<
+          SimpleMotorFeedforward<units::radian, units::ampere>>::GetSize()),
+      expectedSize);
 }
