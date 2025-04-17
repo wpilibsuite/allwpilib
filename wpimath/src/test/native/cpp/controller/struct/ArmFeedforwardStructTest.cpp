@@ -36,3 +36,10 @@ using ArmFeedforwardStructTestTypes =
 
 INSTANTIATE_TYPED_TEST_SUITE_P(ArmFeedforward, StructTest,
                                ArmFeedforwardStructTestTypes);
+
+TEST(ArmFeedforwardStructTest, CheckSize) {
+  constexpr size_t expectedSize = 40;
+  EXPECT_EQ(wpi::Struct<ArmFeedforward<units::volt>>::GetSize(), expectedSize);
+  EXPECT_EQ(wpi::Struct<ArmFeedforward<units::ampere>>::GetSize(),
+            expectedSize);
+}

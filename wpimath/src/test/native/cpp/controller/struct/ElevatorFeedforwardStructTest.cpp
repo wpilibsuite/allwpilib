@@ -36,3 +36,11 @@ using ElevatorFeedforwardStructTestTypes =
 
 INSTANTIATE_TYPED_TEST_SUITE_P(ElevatorFeedforward, StructTest,
                                ElevatorFeedforwardStructTestTypes);
+
+TEST(ElevatorFeedforwardStructTest, CheckSize) {
+  constexpr size_t expectedSize = 40;
+  EXPECT_EQ(wpi::Struct<ElevatorFeedforward<units::volt>>::GetSize(),
+            expectedSize);
+  EXPECT_EQ(wpi::Struct<ElevatorFeedforward<units::ampere>>::GetSize(),
+            expectedSize);
+}
