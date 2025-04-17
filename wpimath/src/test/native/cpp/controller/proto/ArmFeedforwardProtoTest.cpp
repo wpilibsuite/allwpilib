@@ -6,7 +6,7 @@
 
 #include "../../ProtoTestBase.h"
 #include "frc/controller/ArmFeedforward.h"
-#include "frc/controller/Proto/ArmFeedforwardProto.h"
+#include "frc/controller/proto/ArmFeedforwardProto.h"
 #include "units/acceleration.h"
 #include "units/velocity.h"
 
