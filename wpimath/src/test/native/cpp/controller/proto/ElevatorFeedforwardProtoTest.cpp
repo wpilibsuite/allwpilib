@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../ProtoTestBase.h"
+#include "wpimath/src/test/native/cpp/ProtoTestBase.h"
 #include "frc/controller/ElevatorFeedforward.h"
 #include "frc/controller/proto/ElevatorFeedforwardProto.h"
 #include "units/acceleration.h"

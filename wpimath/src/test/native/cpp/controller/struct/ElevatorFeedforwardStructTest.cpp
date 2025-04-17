@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../StructTestBase.h"
+#include "wpimath/src/test/native/cpp/StructTestBase.h"
 #include "frc/controller/ElevatorFeedforward.h"
 #include "frc/controller/struct/ElevatorFeedforwardStruct.h"
 #include "units/acceleration.h"
