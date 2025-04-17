@@ -8,7 +8,6 @@
 
 #include "frc/controller/ElevatorFeedforward.h"
 #include "pb.h"
-#include "units/length.h"
 #include "wpimath/protobuf/controller.npb.h"
 
 template <class Input>

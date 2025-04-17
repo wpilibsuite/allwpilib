@@ -7,7 +7,6 @@
 #include <wpi/struct/Struct.h>
 
 #include "frc/controller/ElevatorFeedforward.h"
-#include "units/length.h"
 
 template <class Input>
   requires(units::current_unit<Input> || units::voltage_unit<Input>)

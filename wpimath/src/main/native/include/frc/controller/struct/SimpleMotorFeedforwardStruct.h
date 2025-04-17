@@ -7,7 +7,6 @@
 #include <wpi/struct/Struct.h>
 
 #include "frc/controller/SimpleMotorFeedforward.h"
-#include "units/length.h"
 
 template <class Distance, class Input>
   requires(units::length_unit<Distance> || units::angle_unit<Distance>) &&
