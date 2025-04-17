@@ -5,7 +5,7 @@
 #include <google/protobuf/arena.h>
 #include <gtest/gtest.h>
 
-#include "../../ProtoTestBase.h"
+#include "ProtoTestBase.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/kinematics/proto/SwerveDriveKinematicsProto.h"
 

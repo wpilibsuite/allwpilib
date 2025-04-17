@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../StructTestBase.h"
+#include "StructTestBase.h"
 #include "frc/spline/CubicHermiteSpline.h"
 
 using namespace frc;

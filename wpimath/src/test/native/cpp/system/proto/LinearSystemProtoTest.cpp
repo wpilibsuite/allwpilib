@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../ProtoTestBase.h"
+#include "ProtoTestBase.h"
 #include "frc/system/LinearSystem.h"
 #include "frc/system/proto/LinearSystemProto.h"
 

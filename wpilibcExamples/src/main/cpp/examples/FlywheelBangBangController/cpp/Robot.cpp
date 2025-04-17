@@ -80,7 +80,7 @@ class Robot : public frc::TimedRobot {
   static constexpr decltype(1_V / 1_rad_per_s) kFlywheelKv = 0.000195_V / 1_rpm;
   static constexpr decltype(1_V / 1_rad_per_s_sq) kFlywheelKa =
       0.0003_V / 1_rev_per_m_per_s;
-  frc::SimpleMotorFeedforward<units::radians> m_feedforward{
+  frc::SimpleMotorFeedforward<units::radians, units::volts> m_feedforward{
       kFlywheelKs, kFlywheelKv, kFlywheelKa};
 
   // Simulation classes help us simulate our robot

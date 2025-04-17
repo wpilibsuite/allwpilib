@@ -3,32 +3,36 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/SmallVector.h>
 
+#include "ProtoTestBase.h"
 #include "frc/controller/ElevatorFeedforward.h"
+#include "frc/controller/proto/ElevatorFeedforwardProto.h"
+#include "units/acceleration.h"
+#include "units/velocity.h"
 
 using namespace frc;
 
-namespace {
+template <typename I>
+struct ElevatorFeedforwardProtoTestData {
+  using Type = ElevatorFeedforward<I>;
 
-static constexpr auto Ks = 1.91_V;
-static constexpr auto Kg = 2.29_V;
-static constexpr auto Kv = 35.04_V * 1_s / 1_m;
-static constexpr auto Ka = 1.74_V * 1_s * 1_s / 1_m;
+  inline static const Type kTestData = {
+      units::unit_t<I>{1.91}, units::unit_t<I>{2.29},
+      units::unit_t<I>{35.04} / (units::meter_t{1} / 1_s),
+      units::unit_t<I>{1.74} / (units::meter_t{1} / 1_s / 1_s), 25_ms};
 
-constexpr ElevatorFeedforward kExpectedData{Ks, Kg, Kv, Ka};
-}  // namespace
+  static void CheckEq(const Type& testData, const Type& data) {
+    EXPECT_EQ(testData.GetKs().value(), data.GetKs().value());
+    EXPECT_EQ(testData.GetKg().value(), data.GetKg().value());
+    EXPECT_EQ(testData.GetKv().value(), data.GetKv().value());
+    EXPECT_EQ(testData.GetKa().value(), data.GetKa().value());
+    EXPECT_EQ(testData.GetDt().value(), data.GetDt().value());
+  }
+};
 
-TEST(ElevatorFeedforwardProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<decltype(kExpectedData)> message;
-  wpi::SmallVector<uint8_t, 64> buf;
+using ElevatorFeedforwardProtoTestTypes =
+    ::testing::Types<ElevatorFeedforwardProtoTestData<units::volt>,
+                     ElevatorFeedforwardProtoTestData<units::ampere>>;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
-  auto unpacked_data = message.Unpack(buf);
-  ASSERT_TRUE(unpacked_data.has_value());
-
-  EXPECT_EQ(kExpectedData.GetKs().value(), unpacked_data->GetKs().value());
-  EXPECT_EQ(kExpectedData.GetKg().value(), unpacked_data->GetKg().value());
-  EXPECT_EQ(kExpectedData.GetKv().value(), unpacked_data->GetKv().value());
-  EXPECT_EQ(kExpectedData.GetKa().value(), unpacked_data->GetKa().value());
-}
+INSTANTIATE_TYPED_TEST_SUITE_P(ElevatorFeedforward, ProtoTest,
+                               ElevatorFeedforwardProtoTestTypes);

@@ -39,7 +39,7 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
    * voltage (12V) to account for "voltage sag" due to current draw.
    */
   constexpr DifferentialDriveVoltageConstraint(
-      const SimpleMotorFeedforward<units::meter>& feedforward,
+      const SimpleMotorFeedforward<units::meter, units::volts>& feedforward,
       DifferentialDriveKinematics kinematics, units::volt_t maxVoltage)
       : m_feedforward(feedforward),
         m_kinematics(std::move(kinematics)),
@@ -123,7 +123,7 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
   }
 
  private:
-  SimpleMotorFeedforward<units::meter> m_feedforward;
+  SimpleMotorFeedforward<units::meter, units::volts> m_feedforward;
   DifferentialDriveKinematics m_kinematics;
   units::volt_t m_maxVoltage;
 };

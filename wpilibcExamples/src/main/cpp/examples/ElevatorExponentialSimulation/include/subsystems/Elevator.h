@@ -44,7 +44,7 @@ class Elevator {
   frc::PIDController m_controller{
       Constants::kElevatorKp, Constants::kElevatorKi, Constants::kElevatorKd};
 
-  frc::ElevatorFeedforward m_feedforward{
+  frc::ElevatorFeedforward<units::volt> m_feedforward{
       Constants::kElevatorkS, Constants::kElevatorkG, Constants::kElevatorkV,
       Constants::kElevatorkA};
   frc::Encoder m_encoder{Constants::kEncoderAChannel,
