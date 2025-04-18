@@ -6,10 +6,11 @@
 
 #import <AVFoundation/AVFoundation.h>
 #import "UsbCameraDelegate.h"
+#import "UvcControlImpl.h"
+
 #include <memory>
 #include <string_view>
 #include "cscore_cpp.h"
-
 namespace cs {
 class UsbCameraImpl;
 }
@@ -30,6 +31,7 @@ class UsbCameraImpl;
 @property(nonatomic) AVCaptureDevice* videoDevice;
 @property(nonatomic) AVCaptureDeviceInput* videoInput;
 @property(nonatomic) UsbCameraDelegate* callback;
+@property(nonatomic) UvcControlImpl* uvcControl;
 @property(nonatomic) AVCaptureVideoDataOutput* videoOutput;
 @property(nonatomic) AVCaptureSession* session;
 

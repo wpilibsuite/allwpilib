@@ -119,22 +119,88 @@ using namespace cs;
 
 // Standard common camera properties
 - (void)setBrightness:(int)brightness status:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
+  dispatch_async_and_wait(self.sessionQueue, ^{
+    if (self.uvcControl == nil) {
+      *status = CS_INVALID_PROPERTY;
+      return;
+    }
+    
+    int localBrightness = brightness;
+    if (localBrightness < 0) localBrightness = 0;
+    if (localBrightness > 100) localBrightness = 100;
+
+    int32_t min = 0, max = 0, defValue = 0;
+    if (![self.uvcControl getPropertyLimits:CAPPROPID_BRIGHTNESS min:&min max:&max defValue:&defValue status:status]) {
+      return;
+    }
+
+    int32_t realValue = min + (max - min) * localBrightness / 100;
+    if (![self.uvcControl setProperty:CAPPROPID_BRIGHTNESS withValue:realValue status:status]) {
+      return;
+    }
+  });
 }
+
 - (int)getBrightness:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
-  return 0;
+  __block int percent = 0;
+  dispatch_async_and_wait(self.sessionQueue, ^{
+    if (self.uvcControl == nil) {
+      *status = CS_INVALID_PROPERTY;
+      percent = 0;
+      return;
+    }
+    
+    int32_t value = 0;
+    if (![self.uvcControl getProperty:CAPPROPID_BRIGHTNESS withValue:&value status:status]) {
+      *status = CS_INVALID_PROPERTY;
+      percent = 0;
+      return;
+    }
+    
+    int32_t min = 0, max = 0, defValue = 0;
+    if (![self.uvcControl getPropertyLimits:CAPPROPID_BRIGHTNESS min:&min max:&max defValue:&defValue status:status]) {
+      *status = CS_INVALID_PROPERTY;
+      percent = 0;
+      return;
+    }
+
+    if (max == min) {
+      percent = 0;
+      return;
+    }
+    
+    percent = (value - min) * 100 / (max - min);
+    if (percent < 0) percent = 0;
+    if (percent > 100) percent = 100;
+  });
+  return percent;
 }
+
 - (void)setWhiteBalanceAuto:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
+  dispatch_async_and_wait(self.sessionQueue, ^{
+    if (self.uvcControl == nil) {
+      // try AVCaptureDevice when uvc is not available
+      if ([self.videoDevice lockForConfiguration:nil]) {
+        if ([self.videoDevice isWhiteBalanceModeSupported:AVCaptureWhiteBalanceModeAutoWhiteBalance]) {
+          self.videoDevice.whiteBalanceMode = AVCaptureWhiteBalanceModeAutoWhiteBalance;
+          *status = CS_OK;
+        } else {
+        *status = CS_INVALID_PROPERTY;
+      }
+      [self.videoDevice unlockForConfiguration];
+    } else {
+      *status = CS_READ_FAILED;
+    }
+      return;
+    }
+    
+    if (![self.uvcControl setAutoProperty:CAPPROPID_WHITEBALANCE enabled:YES status:status]) {
+      return;
+    }
+  });
 }
+
 - (void)setWhiteBalanceHoldCurrent:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
-}
-- (void)setWhiteBalanceManual:(int)value status:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
-}
-- (void)setExposureAuto:(CS_Status*)status {
   dispatch_async_and_wait(self.sessionQueue, ^{
     if (self.videoDevice == nil) {
       *status = CS_READ_FAILED;
@@ -142,11 +208,11 @@ using namespace cs;
     }
     
     if ([self.videoDevice lockForConfiguration:nil]) {
-      if ([self.videoDevice isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure]) {
-        self.videoDevice.exposureMode = AVCaptureExposureModeContinuousAutoExposure;
+      if ([self.videoDevice isWhiteBalanceModeSupported:AVCaptureWhiteBalanceModeLocked]) {
+        self.videoDevice.whiteBalanceMode = AVCaptureWhiteBalanceModeLocked;
         *status = CS_OK;
       } else {
-        *status = CS_UNSUPPORTED_MODE;
+        *status = CS_INVALID_PROPERTY;
       }
       [self.videoDevice unlockForConfiguration];
     } else {
@@ -154,6 +220,59 @@ using namespace cs;
     }
   });
 }
+
+- (void)setWhiteBalanceManual:(int)value status:(CS_Status*)status {
+  dispatch_async_and_wait(self.sessionQueue, ^{
+    if (self.uvcControl == nil) {
+      *status = CS_INVALID_PROPERTY;
+      return;
+    }
+    
+    // Switch to manual mode first
+    if (![self.uvcControl setAutoProperty:CAPPROPID_WHITEBALANCE enabled:NO status:status]) {
+      return;
+    }
+
+    int localValue = value;
+    if (localValue < 0) localValue = 0;
+    if (localValue > 100) localValue = 100;
+
+    int32_t min = 0, max = 0, defValue = 0;
+    if (![self.uvcControl getPropertyLimits:CAPPROPID_WHITEBALANCE min:&min max:&max defValue:&defValue status:status]) {
+      return;
+    }
+
+    int32_t realValue = min + (max - min) * localValue / 100;
+    if (![self.uvcControl setProperty:CAPPROPID_WHITEBALANCE withValue:realValue status:status]) {
+      return;
+    }
+  });
+}
+
+- (void)setExposureAuto:(CS_Status*)status {
+  dispatch_async_and_wait(self.sessionQueue, ^{
+    if (self.uvcControl == nil) {
+      // try AVCaptureDevice when uvc is not available
+      if ([self.videoDevice lockForConfiguration:nil]) {
+        if ([self.videoDevice isExposureModeSupported:AVCaptureExposureModeAutoExpose]) {
+          self.videoDevice.exposureMode = AVCaptureExposureModeAutoExpose;
+          *status = CS_OK;
+        } else {
+          *status = CS_INVALID_PROPERTY;
+        }
+        [self.videoDevice unlockForConfiguration];
+      } else {
+        *status = CS_READ_FAILED;
+      }
+      return;
+    }
+    
+    if (![self.uvcControl setAutoProperty:CAPPROPID_EXPOSURE enabled:YES status:status]) {
+      return;
+    }
+  });
+}
+
 - (void)setExposureHoldCurrent:(CS_Status*)status {
   dispatch_async_and_wait(self.sessionQueue, ^{
     if (self.videoDevice == nil) {
@@ -166,7 +285,7 @@ using namespace cs;
         self.videoDevice.exposureMode = AVCaptureExposureModeLocked;
         *status = CS_OK;
       } else {
-        *status = CS_UNSUPPORTED_MODE;
+        *status = CS_INVALID_PROPERTY;
       }
       [self.videoDevice unlockForConfiguration];
     } else {
@@ -174,8 +293,31 @@ using namespace cs;
     }
   });
 }
+
 - (void)setExposureManual:(int)value status:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
+  if (self.uvcControl == nil) {
+    *status = CS_UNSUPPORTED_MODE;
+    return;
+  }
+  
+  // Switch to manual mode first
+  if (![self.uvcControl setAutoProperty:CAPPROPID_EXPOSURE enabled:NO status:status]) {
+    return;
+  }
+
+  int localValue = value;
+  if (localValue < 0) localValue = 0;
+  if (localValue > 100) localValue = 100;
+
+  int32_t min = 0, max = 0, defValue = 0;
+  if (![self.uvcControl getPropertyLimits:CAPPROPID_EXPOSURE min:&min max:&max defValue:&defValue status:status]) {
+    return;
+  }
+
+  int32_t realValue = min + (max - min) * localValue / 100;
+  if (![self.uvcControl setProperty:CAPPROPID_EXPOSURE withValue:realValue status:status]) {
+    return;
+  }
 }
 
 - (bool)setVideoMode:(const cs::VideoMode&)mode status:(CS_Status*)status {
@@ -606,6 +748,14 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   if (self.videoInput == nil) {
     OBJCWARNING("Creating AVCaptureDeviceInput failed");
     goto err;
+  }
+
+  CS_Status status;
+  self.uvcControl = [UvcControlImpl createFromAVCaptureDevice:self.videoDevice status:&status];
+  if (self.uvcControl == nil) {
+    OBJCWARNING("Failed to initialize UVC control for camera: {}", status);
+  } else {
+    OBJCINFO("UVC control initialized successfully");
   }
 
   self.callback = [[UsbCameraDelegate alloc] init];

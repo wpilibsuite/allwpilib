@@ -15,9 +15,8 @@
 #include "cscore_cpp.h"
 
 // Status code definition
-#define STATUS_OK 0
-#define STATUS_ERROR -1
-#define STATUS_DEVICE_DISCONNECTED -2
+#define CS_UVC_STATUS_ERROR -3001
+#define CS_UVC_STATUS_DEVICE_DISCONNECTED -3002
 
 // UVC control selector definitions
 #define UVC_INPUT_TERMINAL_ID 0x01

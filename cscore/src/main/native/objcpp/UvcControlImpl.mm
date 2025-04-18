@@ -50,7 +50,7 @@ const propertyInfo_t propertyInfo[] =
 + (instancetype)createFromAVCaptureDevice:(AVCaptureDevice*)device status:(CS_Status*)status {
     if (!device) {
         NSLog(@"[UvcControlImpl] device is nil");
-        *status = STATUS_ERROR;
+        *status = CS_UVC_STATUS_ERROR;
         return nil;
     }
     
@@ -60,14 +60,14 @@ const propertyInfo_t propertyInfo[] =
                                                                            error:&error];
     if (error) {
         NSLog(@"[UvcControlImpl] failed to create regex: %@", error);
-        *status = STATUS_ERROR;
+        *status = CS_UVC_STATUS_ERROR;
         return nil;
     }
     
     NSString* modelID = [device valueForKey:@"modelID"];
     if (!modelID) {
         NSLog(@"[UvcControlImpl] modelID is nil");
-        *status = STATUS_ERROR;
+        *status = CS_UVC_STATUS_ERROR;
         return nil;
     }
     
@@ -76,7 +76,7 @@ const propertyInfo_t propertyInfo[] =
                                                      range:NSMakeRange(0, modelID.length)];
     if (!match || match.numberOfRanges != 3) {
         NSLog(@"[UvcControlImpl] modelID regex match failed");
-        *status = STATUS_ERROR;
+        *status = CS_UVC_STATUS_ERROR;
         return nil;
     }
     
@@ -135,7 +135,7 @@ const propertyInfo_t propertyInfo[] =
         _deviceInterface = [self findDevice:vid productId:pid location:location];
         if (_deviceInterface == nullptr) {
             NSLog(@"[UvcControlImpl] Failed to find device");
-            *status = STATUS_DEVICE_DISCONNECTED;
+            *status = CS_UVC_STATUS_DEVICE_DISCONNECTED;
             return nil;
         }
         
@@ -146,7 +146,7 @@ const propertyInfo_t propertyInfo[] =
         
         if (_controlInterface == nullptr) {
             NSLog(@"[UvcControlImpl] Failed to create control interface");
-            *status = STATUS_DEVICE_DISCONNECTED;
+            *status = CS_UVC_STATUS_DEVICE_DISCONNECTED;
             return nil;
         }
     }
@@ -519,7 +519,7 @@ const propertyInfo_t propertyInfo[] =
 - (bool)setProperty:(uint32_t)propID withValue:(int32_t)value status:(CS_Status*)status {
     if (_controlInterface == nullptr) {
         NSLog(@"[UvcControlImpl] setProperty: control interface is NULL");
-        *status = STATUS_DEVICE_DISCONNECTED;
+        *status = CS_UVC_STATUS_DEVICE_DISCONNECTED;
         return false;
     }
 
@@ -540,7 +540,7 @@ const propertyInfo_t propertyInfo[] =
 - (bool)getProperty:(uint32_t)propID withValue:(int32_t*)value status:(CS_Status*)status {
     if (_controlInterface == nullptr) {
         NSLog(@"[UvcControlImpl] getProperty: control interface is NULL");
-        *status = STATUS_DEVICE_DISCONNECTED;
+        *status = CS_UVC_STATUS_DEVICE_DISCONNECTED;
         return false;
     }
 
@@ -574,7 +574,7 @@ const propertyInfo_t propertyInfo[] =
 - (bool)setAutoProperty:(uint32_t)propID enabled:(bool)enabled status:(CS_Status*)status {
     if (_controlInterface == nullptr) {
         NSLog(@"[UvcControlImpl] setAutoProperty: control interface is NULL");
-        *status = STATUS_DEVICE_DISCONNECTED;
+        *status = CS_UVC_STATUS_DEVICE_DISCONNECTED;
         return false;
     }
 
@@ -597,7 +597,7 @@ const propertyInfo_t propertyInfo[] =
 - (bool)getAutoProperty:(uint32_t)propID enabled:(bool*)enabled status:(CS_Status*)status {
     if (_controlInterface == nullptr) {
         NSLog(@"[UvcControlImpl] getAutoProperty: control interface is NULL");
-        *status = STATUS_DEVICE_DISCONNECTED;
+        *status = CS_UVC_STATUS_DEVICE_DISCONNECTED;
         return false;
     }
 
@@ -641,7 +641,7 @@ const propertyInfo_t propertyInfo[] =
 
 - (bool)getPropertyLimits:(uint32_t)propID min:(int32_t*)min max:(int32_t*)max defValue:(int32_t*)defValue status:(CS_Status*)status {
     if (_controlInterface == nullptr) {
-        *status = STATUS_DEVICE_DISCONNECTED;
+        *status = CS_UVC_STATUS_DEVICE_DISCONNECTED;
         return false;
     }
 
