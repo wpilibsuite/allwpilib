@@ -1,0 +1,13 @@
+nativeUtils {
+    nativeDependencyContainer {
+        gtsam(getNativeDependencyTypeClass('WPIStaticMavenDependency')) {
+            groupId = "edu.wpi.first.thirdparty.frc2025.gtsam"
+            artifactId = "gtsam-cpp"
+            headerClassifier = "headers"
+            sourceClassifier = "sources"
+            ext = "zip"
+            version = '4.3-2'
+            targetPlatforms.addAll(nativeUtils.wpi.platforms.desktopPlatforms)
+        }
+    }
+}
