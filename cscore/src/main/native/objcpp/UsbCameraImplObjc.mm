@@ -135,10 +135,44 @@ using namespace cs;
   *status = CS_INVALID_PROPERTY;
 }
 - (void)setExposureAuto:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
+  dispatch_async_and_wait(self.sessionQueue, ^{
+    if (self.videoDevice == nil) {
+      *status = CS_READ_FAILED;
+      return;
+    }
+    
+    if ([self.videoDevice lockForConfiguration:nil]) {
+      if ([self.videoDevice isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure]) {
+        self.videoDevice.exposureMode = AVCaptureExposureModeContinuousAutoExposure;
+        *status = CS_OK;
+      } else {
+        *status = CS_UNSUPPORTED_MODE;
+      }
+      [self.videoDevice unlockForConfiguration];
+    } else {
+      *status = CS_READ_FAILED;
+    }
+  });
 }
 - (void)setExposureHoldCurrent:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
+  dispatch_async_and_wait(self.sessionQueue, ^{
+    if (self.videoDevice == nil) {
+      *status = CS_READ_FAILED;
+      return;
+    }
+    
+    if ([self.videoDevice lockForConfiguration:nil]) {
+      if ([self.videoDevice isExposureModeSupported:AVCaptureExposureModeLocked]) {
+        self.videoDevice.exposureMode = AVCaptureExposureModeLocked;
+        *status = CS_OK;
+      } else {
+        *status = CS_UNSUPPORTED_MODE;
+      }
+      [self.videoDevice unlockForConfiguration];
+    } else {
+      *status = CS_READ_FAILED;
+    }
+  });
 }
 - (void)setExposureManual:(int)value status:(CS_Status*)status {
   *status = CS_INVALID_PROPERTY;
