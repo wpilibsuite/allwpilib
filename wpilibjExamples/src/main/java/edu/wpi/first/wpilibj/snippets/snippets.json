@@ -1,0 +1,13 @@
+[
+  {
+    "name": "Encoder",
+    "description": "Snippets of Encoder class usage for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Encoder"
+    ],
+    "foldername": "encoder",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  }
+]
