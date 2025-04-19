@@ -21,7 +21,7 @@ public final class Semaphore implements AutoCloseable {
    * @param maximumCount maximum value for the semaphore's internal counter
    */
   public Semaphore(int initialCount, int maximumCount) {
-    m_handle = WPIUtilJNI.createSemaphore(initialCount, maximumCount);
+    m_handle = WPIUtilJNI.makeSemaphore(initialCount, maximumCount);
   }
 
   /**
