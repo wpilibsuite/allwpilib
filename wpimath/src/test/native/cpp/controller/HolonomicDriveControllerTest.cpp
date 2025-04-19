@@ -23,7 +23,7 @@ static constexpr units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
 TEST(HolonomicDriveControllerTest, ReachesReference) {
   frc::HolonomicDriveController controller{
       frc::PIDController{1.0, 0.0, 0.0}, frc::PIDController{1.0, 0.0, 0.0},
-      frc::ProfiledPIDController<units::radian>{
+      frc::TrapezoidPIDController<units::radian>{
           1.0, 0.0, 0.0,
           frc::TrapezoidProfile<units::radian>::Constraints{
               units::radians_per_second_t{2.0 * std::numbers::pi},
@@ -55,7 +55,7 @@ TEST(HolonomicDriveControllerTest, ReachesReference) {
 TEST(HolonomicDriveControllerTest, DoesNotRotateUnnecessarily) {
   frc::HolonomicDriveController controller{
       frc::PIDController{1, 0, 0}, frc::PIDController{1, 0, 0},
-      frc::ProfiledPIDController<units::radian>{
+      frc::TrapezoidPIDController<units::radian>{
           1, 0, 0,
           frc::TrapezoidProfile<units::radian>::Constraints{
               4_rad_per_s, 2_rad_per_s / 1_s}}};

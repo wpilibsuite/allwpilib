@@ -8,18 +8,19 @@ import static edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.TrapezoidPIDController;
 import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 /**
- * A command that controls an output with a {@link ProfiledPIDController}. Runs forever by default -
+ * A command that controls an output with a {@link TrapezoidPIDController}. Runs forever by default -
  * to add exit conditions and/or other behavior, subclass this class. The controller calculation and
  * output are performed synchronously in the command's execute() method.
  *
  * <p>This class is provided by the NewCommands VendorDep
  *
- * @deprecated Use a ProfiledPIDController instead
+ * @deprecated Use a TrapezoidPIDController instead
  */
 @Deprecated(forRemoval = true, since = "2025")
 public class ProfiledPIDCommand extends Command {

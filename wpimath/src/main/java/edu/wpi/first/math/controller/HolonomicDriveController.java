@@ -17,7 +17,7 @@ import edu.wpi.first.math.util.Units;
  * sideways, and angular velocity.
  *
  * <p>The holonomic drive controller takes in one PID controller for each direction, forward and
- * sideways, and one profiled PID controller for the angular direction. Because the heading dynamics
+ * sideways, and one trapezoid profiled PID controller for the angular direction. Because the heading dynamics
  * are decoupled from translations, users can specify a custom heading that the drivetrain should
  * point toward. This heading reference is profiled for smoothness.
  */
@@ -29,7 +29,7 @@ public class HolonomicDriveController {
 
   private final PIDController m_xController;
   private final PIDController m_yController;
-  private final ProfiledPIDController m_thetaController;
+  private final TrapezoidPIDController m_thetaController;
 
   private boolean m_firstRun = true;
 
@@ -38,10 +38,10 @@ public class HolonomicDriveController {
    *
    * @param xController A PID Controller to respond to error in the field-relative x direction.
    * @param yController A PID Controller to respond to error in the field-relative y direction.
-   * @param thetaController A profiled PID controller to respond to error in angle.
+   * @param thetaController A trapezoid profiled PID controller to respond to error in angle.
    */
   public HolonomicDriveController(
-      PIDController xController, PIDController yController, ProfiledPIDController thetaController) {
+      PIDController xController, PIDController yController, TrapezoidPIDController thetaController) {
     m_xController = xController;
     m_yController = yController;
     m_thetaController = thetaController;
@@ -161,9 +161,9 @@ public class HolonomicDriveController {
   /**
    * Returns the heading controller.
    *
-   * @return heading ProfiledPIDController
+   * @return heading TrapezoidPIDController
    */
-  public ProfiledPIDController getThetaController() {
+  public TrapezoidPIDController getThetaController() {
     return m_thetaController;
   }
 }

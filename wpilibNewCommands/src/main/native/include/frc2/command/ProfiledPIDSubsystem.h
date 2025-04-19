@@ -17,10 +17,10 @@ namespace frc2 {
  * This class is provided by the NewCommands VendorDep
  *
  * @see ProfiledPIDController
- * @deprecated Use a ProfiledPIDController instead
+ * @deprecated Use a TrapezoidPIDController instead
  */
 template <class Distance>
-class [[deprecated("Use a ProfiledPIDController instead")]] ProfiledPIDSubsystem
+class [[deprecated("Use a TrapezoidPIDController instead")]] ProfiledPIDSubsystem
     : public SubsystemBase {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =

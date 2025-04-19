@@ -135,7 +135,15 @@ class WPILibMathShared : public wpi::math::MathShared {
       case wpi::math::MathUsageId::kController_PIDController2:
         HAL_Report(HALUsageReporting::kResourceType_PIDController2, count);
         break;
+      case wpi::math::MathUsageId::kController_ExponentialPIDController:
+        HAL_Report(HALUsageReporting::kResourceType_ProfiledPIDController,
+                   count);
+        break;
       case wpi::math::MathUsageId::kController_ProfiledPIDController:
+        HAL_Report(HALUsageReporting::kResourceType_ProfiledPIDController,
+                   count);
+        break;
+      case wpi::math::MathUsageId::kController_TrapezoidPIDController:
         HAL_Report(HALUsageReporting::kResourceType_ProfiledPIDController,
                    count);
         break;

@@ -8,7 +8,7 @@
 
 #include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
-#include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/TrapezoidPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
@@ -70,7 +70,7 @@ class Drive : public frc2::SubsystemBase {
 
   frc::ADXRS450_Gyro m_gyro;
 
-  frc::ProfiledPIDController<units::radians> m_controller{
+  frc::TrapezoidPIDController<units::radians> m_controller{
       DriveConstants::kTurnP,
       DriveConstants::kTurnI,
       DriveConstants::kTurnD,

@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.TrapezoidPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -52,8 +52,8 @@ class MecanumControllerCommandTest {
   private double m_rearRightSpeed;
   private double m_rearRightDistance;
 
-  private final ProfiledPIDController m_rotController =
-      new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(3 * Math.PI, Math.PI));
+  private final TrapezoidPIDController m_rotController =
+      new TrapezoidPIDController(1, 0, 0, new TrapezoidProfile.Constraints(3 * Math.PI, Math.PI));
 
   private static final double kxTolerance = 1 / 12.0;
   private static final double kyTolerance = 1 / 12.0;

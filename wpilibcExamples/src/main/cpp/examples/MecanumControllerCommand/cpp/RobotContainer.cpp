@@ -75,7 +75,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
 
           frc::PIDController{AutoConstants::kPXController, 0, 0},
           frc::PIDController{AutoConstants::kPYController, 0, 0},
-          frc::ProfiledPIDController<units::radians>(
+          frc::TrapezoidPIDController<units::radians>(
               AutoConstants::kPThetaController, 0, 0,
               AutoConstants::kThetaControllerConstraints),
 

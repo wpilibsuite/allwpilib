@@ -8,7 +8,7 @@
 #include <frc/Joystick.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/ElevatorFeedforward.h>
-#include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/TrapezoidPIDController.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <units/acceleration.h>
@@ -58,7 +58,7 @@ class Robot : public frc::TimedRobot {
   // velocity and acceleration constraints.
   frc::TrapezoidProfile<units::meters>::Constraints m_constraints{
       kMaxVelocity, kMaxAcceleration};
-  frc::ProfiledPIDController<units::meters> m_controller{kP, kI, kD,
+  frc::TrapezoidPIDController<units::meters> m_controller{kP, kI, kD,
                                                          m_constraints, kDt};
   frc::ElevatorFeedforward m_feedforward{kS, kG, kV};
 };

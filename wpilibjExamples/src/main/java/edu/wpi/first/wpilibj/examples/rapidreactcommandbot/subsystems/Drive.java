@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.TrapezoidPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -50,8 +50,8 @@ public class Drive extends SubsystemBase {
           DriveConstants.kRightEncoderReversed);
 
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
-  private final ProfiledPIDController m_controller =
-      new ProfiledPIDController(
+  private final TrapezoidPIDController m_controller =
+      new TrapezoidPIDController(
           DriveConstants.kTurnP,
           DriveConstants.kTurnI,
           DriveConstants.kTurnD,

@@ -6,7 +6,7 @@
 
 #include <frc/XboxController.h>
 #include <frc/controller/PIDController.h>
-#include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/TrapezoidPIDController.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandPtr.h>

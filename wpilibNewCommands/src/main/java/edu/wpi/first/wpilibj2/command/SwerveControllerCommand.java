@@ -8,7 +8,7 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.TrapezoidPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -19,8 +19,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * A command that uses two PID controllers ({@link PIDController}) and a ProfiledPIDController
- * ({@link ProfiledPIDController}) to follow a trajectory {@link Trajectory} with a swerve drive.
+ * A command that uses two PID controllers ({@link PIDController}) and a TrapezoidPIDController
+ * ({@link TrapezoidPIDController}) to follow a trajectory {@link Trajectory} with a swerve drive.
  *
  * <p>This command outputs the raw desired Swerve Module States ({@link SwerveModuleState}) in an
  * array. The desired wheel and module rotation velocities should be taken from those and used in
@@ -67,7 +67,7 @@ public class SwerveControllerCommand extends Command {
       SwerveDriveKinematics kinematics,
       PIDController xController,
       PIDController yController,
-      ProfiledPIDController thetaController,
+      TrapezoidPIDController thetaController,
       Supplier<Rotation2d> desiredRotation,
       Consumer<SwerveModuleState[]> outputModuleStates,
       Subsystem... requirements) {
@@ -113,7 +113,7 @@ public class SwerveControllerCommand extends Command {
       SwerveDriveKinematics kinematics,
       PIDController xController,
       PIDController yController,
-      ProfiledPIDController thetaController,
+      TrapezoidPIDController thetaController,
       Consumer<SwerveModuleState[]> outputModuleStates,
       Subsystem... requirements) {
     this(

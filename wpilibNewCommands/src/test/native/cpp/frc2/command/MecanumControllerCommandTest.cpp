@@ -9,7 +9,7 @@
 
 #include <frc/Timer.h>
 #include <frc/controller/PIDController.h>
-#include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/TrapezoidPIDController.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/MecanumDriveKinematics.h>
@@ -41,7 +41,7 @@ class MecanumControllerCommandTest : public ::testing::Test {
   units::meters_per_second_t m_rearRightSpeed = 0.0_mps;
   units::meter_t m_rearRightDistance = 0.0_m;
 
-  frc::ProfiledPIDController<units::radians> m_rotController{
+  frc::TrapezoidPIDController<units::radians> m_rotController{
       1, 0, 0,
       frc::TrapezoidProfile<units::radians>::Constraints{
           9_rad_per_s, units::unit_t<radians_per_second_squared_t>(3)}};

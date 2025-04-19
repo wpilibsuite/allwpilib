@@ -5,8 +5,8 @@
 package edu.wpi.first.wpilibj.examples.swervedriveposeestimator;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.controller.TrapezoidPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -32,8 +32,8 @@ public class SwerveModule {
   private final PIDController m_drivePIDController = new PIDController(1, 0, 0);
 
   // Gains are for example purposes only - must be determined for your own robot!
-  private final ProfiledPIDController m_turningPIDController =
-      new ProfiledPIDController(
+  private final TrapezoidPIDController m_turningPIDController =
+      new TrapezoidPIDController(
           1,
           0,
           0,

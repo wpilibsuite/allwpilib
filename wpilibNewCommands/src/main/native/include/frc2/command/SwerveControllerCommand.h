@@ -9,7 +9,7 @@
 #include <frc/Timer.h>
 #include <frc/controller/HolonomicDriveController.h>
 #include <frc/controller/PIDController.h>
-#include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/TrapezoidPIDController.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
@@ -28,8 +28,8 @@
 namespace frc2 {
 
 /**
- * A command that uses two PID controllers (PIDController) and a profiled PID
- * controller (ProfiledPIDController) to follow a trajectory (Trajectory) with a
+ * A command that uses two PID controllers (PIDController) and a trapezoid profiled PID
+ * controller (TrapezoidPIDController) to follow a trajectory (Trajectory) with a
  * swerve drive.
  *
  * <p>The command handles trajectory-following, Velocity PID calculations, and
@@ -89,7 +89,7 @@ class SwerveControllerCommand
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::SwerveDriveKinematics<NumModules> kinematics,
       frc::PIDController xController, frc::PIDController yController,
-      frc::ProfiledPIDController<units::radians> thetaController,
+      frc::TrapezoidPIDController<units::radians> thetaController,
       std::function<frc::Rotation2d()> desiredRotation,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
@@ -136,7 +136,7 @@ class SwerveControllerCommand
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::SwerveDriveKinematics<NumModules> kinematics,
       frc::PIDController xController, frc::PIDController yController,
-      frc::ProfiledPIDController<units::radians> thetaController,
+      frc::TrapezoidPIDController<units::radians> thetaController,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
       Requirements requirements = {})

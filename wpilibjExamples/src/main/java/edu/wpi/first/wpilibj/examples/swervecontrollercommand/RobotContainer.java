@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.swervecontrollercommand;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.TrapezoidPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -96,7 +96,7 @@ public class RobotContainer {
             config);
 
     var thetaController =
-        new ProfiledPIDController(
+        new TrapezoidPIDController(
             AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 

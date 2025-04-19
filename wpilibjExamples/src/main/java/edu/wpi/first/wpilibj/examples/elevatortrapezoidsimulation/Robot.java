@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.elevatorsimulation;
+package edu.wpi.first.wpilibj.examples.elevatortrapezoidsimulation;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.examples.elevatorsimulation.subsystems.Elevator;
+import edu.wpi.first.wpilibj.examples.elevatortrapezoidsimulation.subsystems.Elevator;
 
 /** This is a sample program to demonstrate the use of elevator simulation. */
 public class Robot extends TimedRobot {

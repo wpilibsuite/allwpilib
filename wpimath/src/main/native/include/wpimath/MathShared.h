@@ -23,7 +23,9 @@ enum class MathUsageId {
   kOdometry_SwerveDrive,
   kOdometry_MecanumDrive,
   kController_PIDController2,
+  kController_ExponentialPIDController,
   kController_ProfiledPIDController,
+  kController_TrapezoidPIDController,
   kController_BangBangController,
   kTrajectory_PathWeaver,
 };

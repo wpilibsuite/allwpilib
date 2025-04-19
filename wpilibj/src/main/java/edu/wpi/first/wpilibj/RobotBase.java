@@ -113,7 +113,11 @@ public abstract class RobotBase implements AutoCloseable {
                   tResourceType.kResourceType_Odometry, tInstances.kOdometry_MecanumDrive);
               case kController_PIDController2 -> HAL.report(
                   tResourceType.kResourceType_PIDController2, count);
+              case kController_ExponentialPIDController -> HAL.report(
+                  tResourceType.kResourceType_ProfiledPIDController, count);
               case kController_ProfiledPIDController -> HAL.report(
+                  tResourceType.kResourceType_ProfiledPIDController, count);
+              case kController_TrapezoidPIDController -> HAL.report(
                   tResourceType.kResourceType_ProfiledPIDController, count);
               case kController_BangBangController -> HAL.report(
                   tResourceType.kResourceType_BangBangController, count);

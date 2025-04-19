@@ -8,7 +8,7 @@
 
 #include <frc/Encoder.h>
 #include <frc/controller/PIDController.h>
-#include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/TrapezoidPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
@@ -43,7 +43,7 @@ class SwerveModule {
   frc::Encoder m_turningEncoder;
 
   frc::PIDController m_drivePIDController{1.0, 0, 0};
-  frc::ProfiledPIDController<units::radians> m_turningPIDController{
+  frc::TrapezoidPIDController<units::radians> m_turningPIDController{
       1.0,
       0.0,
       0.0,

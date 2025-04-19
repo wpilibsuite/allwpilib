@@ -8,7 +8,7 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.TrapezoidPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -22,8 +22,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * A command that uses two PID controllers ({@link PIDController}) and a ProfiledPIDController
- * ({@link ProfiledPIDController}) to follow a trajectory {@link Trajectory} with a mecanum drive.
+ * A command that uses two PID controllers ({@link PIDController}) and a TrapezoidPIDController
+ * ({@link TrapezoidPIDController}) to follow a trajectory {@link Trajectory} with a mecanum drive.
  *
  * <p>The command handles trajectory-following, Velocity PID calculations, and feedforwards
  * internally. This is intended to be a more-or-less "complete solution" that can be used by teams
@@ -96,7 +96,7 @@ public class MecanumControllerCommand extends Command {
       MecanumDriveKinematics kinematics,
       PIDController xController,
       PIDController yController,
-      ProfiledPIDController thetaController,
+      TrapezoidPIDController thetaController,
       Supplier<Rotation2d> desiredRotation,
       double maxWheelVelocityMetersPerSecond,
       PIDController frontLeftController,
@@ -181,7 +181,7 @@ public class MecanumControllerCommand extends Command {
       MecanumDriveKinematics kinematics,
       PIDController xController,
       PIDController yController,
-      ProfiledPIDController thetaController,
+      TrapezoidPIDController thetaController,
       Supplier<Rotation2d> desiredRotation,
       double maxWheelVelocityMetersPerSecond,
       PIDController frontLeftController,
@@ -249,7 +249,7 @@ public class MecanumControllerCommand extends Command {
       MecanumDriveKinematics kinematics,
       PIDController xController,
       PIDController yController,
-      ProfiledPIDController thetaController,
+      TrapezoidPIDController thetaController,
       double maxWheelVelocityMetersPerSecond,
       PIDController frontLeftController,
       PIDController rearLeftController,
@@ -317,7 +317,7 @@ public class MecanumControllerCommand extends Command {
       MecanumDriveKinematics kinematics,
       PIDController xController,
       PIDController yController,
-      ProfiledPIDController thetaController,
+      TrapezoidPIDController thetaController,
       double maxWheelVelocityMetersPerSecond,
       PIDController frontLeftController,
       PIDController rearLeftController,
@@ -373,7 +373,7 @@ public class MecanumControllerCommand extends Command {
       MecanumDriveKinematics kinematics,
       PIDController xController,
       PIDController yController,
-      ProfiledPIDController thetaController,
+      TrapezoidPIDController thetaController,
       Supplier<Rotation2d> desiredRotation,
       double maxWheelVelocityMetersPerSecond,
       Consumer<MecanumDriveWheelSpeeds> outputWheelSpeeds,
@@ -440,7 +440,7 @@ public class MecanumControllerCommand extends Command {
       MecanumDriveKinematics kinematics,
       PIDController xController,
       PIDController yController,
-      ProfiledPIDController thetaController,
+      TrapezoidPIDController thetaController,
       double maxWheelVelocityMetersPerSecond,
       Consumer<MecanumDriveWheelSpeeds> outputWheelSpeeds,
       Subsystem... requirements) {

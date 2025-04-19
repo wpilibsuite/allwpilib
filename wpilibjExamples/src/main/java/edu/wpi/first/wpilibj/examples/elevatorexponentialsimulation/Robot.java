@@ -13,9 +13,7 @@ public class Robot extends TimedRobot {
   private final Joystick m_joystick = new Joystick(Constants.kJoystickPort);
   private final Elevator m_elevator = new Elevator();
 
-  public Robot() {
-    super(0.020);
-  }
+  public Robot() {}
 
   @Override
   public void robotPeriodic() {
@@ -27,11 +25,6 @@ public class Robot extends TimedRobot {
   public void simulationPeriodic() {
     // Update the simulation model.
     m_elevator.simulationPeriodic();
-  }
-
-  @Override
-  public void teleopInit() {
-    m_elevator.reset();
   }
 
   @Override

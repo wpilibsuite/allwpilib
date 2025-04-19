@@ -9,7 +9,7 @@
 #include <wpi/SymbolExports.h>
 
 #include "frc/controller/PIDController.h"
-#include "frc/controller/ProfiledPIDController.h"
+#include "frc/controller/TrapezoidPIDController.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -27,7 +27,7 @@ namespace frc {
  * velocity.
  *
  * The holonomic drive controller takes in one PID controller for each
- * direction, forward and sideways, and one profiled PID controller for the
+ * direction, forward and sideways, and one trapezoid profiled PID controller for the
  * angular direction. Because the heading dynamics are decoupled from
  * translations, users can specify a custom heading that the drivetrain should
  * point toward. This heading reference is profiled for smoothness.
@@ -41,12 +41,12 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
    * field-relative x direction.
    * @param yController     A PID Controller to respond to error in the
    * field-relative y direction.
-   * @param thetaController A profiled PID controller to respond to error in
+   * @param thetaController A trapezoid profiled PID controller to respond to error in
    * angle.
    */
   constexpr HolonomicDriveController(
       PIDController xController, PIDController yController,
-      ProfiledPIDController<units::radian> thetaController)
+      TrapezoidPIDController<units::radian> thetaController)
       : m_xController(std::move(xController)),
         m_yController(std::move(yController)),
         m_thetaController(std::move(thetaController)) {
@@ -177,12 +177,12 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
   }
 
   /**
-   * Returns the rotation ProfiledPIDController
+   * Returns the rotation TrapezoidPIDController
    *
    * @deprecated Use GetThetaController() instead.
    */
   [[deprecated("Use GetThetaController() instead")]]
-  constexpr ProfiledPIDController<units::radian>& getThetaController() {
+  constexpr TrapezoidPIDController<units::radian>& getThetaController() {
     return m_thetaController;
   }
 
@@ -197,9 +197,9 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
   constexpr PIDController& GetYController() { return m_yController; }
 
   /**
-   * Returns the rotation ProfiledPIDController
+   * Returns the rotation TrapezoidPIDController
    */
-  constexpr ProfiledPIDController<units::radian>& GetThetaController() {
+  constexpr TrapezoidPIDController<units::radian>& GetThetaController() {
     return m_thetaController;
   }
 
@@ -211,7 +211,7 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
 
   PIDController m_xController;
   PIDController m_yController;
-  ProfiledPIDController<units::radian> m_thetaController;
+  TrapezoidPIDController<units::radian> m_thetaController;
 
   bool m_firstRun = true;
 };

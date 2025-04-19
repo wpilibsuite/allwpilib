@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.examples.elevatortrapezoidsimulation.Constants;
+import edu.wpi.first.wpilibj.examples.elevatortrapezoidsimulation.Robot;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.JoystickSim;

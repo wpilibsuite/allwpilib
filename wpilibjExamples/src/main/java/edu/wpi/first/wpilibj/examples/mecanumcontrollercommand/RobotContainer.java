@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.mecanumcontrollercommand;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.TrapezoidPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -107,7 +107,7 @@ public class RobotContainer {
             // Position controllers
             new PIDController(AutoConstants.kPXController, 0, 0),
             new PIDController(AutoConstants.kPYController, 0, 0),
-            new ProfiledPIDController(
+            new TrapezoidPIDController(
                 AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints),
 
             // Needed for normalizing wheel speeds

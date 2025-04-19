@@ -5,10 +5,9 @@
 package edu.wpi.first.wpilibj.examples.elevatorexponentialsimulation.subsystems;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ExponentialPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.ExponentialProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.examples.elevatorexponentialsimulation.Constants;
@@ -25,19 +24,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator implements AutoCloseable {
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
-  private final DCMotor m_elevatorGearbox = DCMotor.getNEO(2);
-
-  private final ExponentialProfile m_profile =
-      new ExponentialProfile(
-          ExponentialProfile.Constraints.fromCharacteristics(
-              Constants.kElevatorMaxV, Constants.kElevatorkV, Constants.kElevatorkA));
-
-  private ExponentialProfile.State m_setpoint = new ExponentialProfile.State(0, 0);
+  private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
 
   // Standard classes for controlling our elevator
-  private final PIDController m_pidController =
-      new PIDController(Constants.kElevatorKp, Constants.kElevatorKi, Constants.kElevatorKd);
-
+  private final ExponentialPIDController m_controller =
+      new ExponentialPIDController(
+          Constants.kElevatorKp,
+          Constants.kElevatorKi,
+          Constants.kElevatorKd,
+          ExponentialProfile.Constraints.fromCharacteristics(
+              Constants.kElevatorMaxV, Constants.kElevatorkV, Constants.kElevatorkA));
   ElevatorFeedforward m_feedforward =
       new ElevatorFeedforward(
           Constants.kElevatorkS,
@@ -65,10 +61,8 @@ public class Elevator implements AutoCloseable {
   private final PWMSim m_motorSim = new PWMSim(m_motor);
 
   // Create a Mechanism2d visualization of the elevator
-  private final Mechanism2d m_mech2d =
-      new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(51));
-  private final MechanismRoot2d m_mech2dRoot =
-      m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5), Units.inchesToMeters(0.5));
+  private final Mechanism2d m_mech2d = new Mechanism2d(20, 50);
+  private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("Elevator Root", 10, 0);
   private final MechanismLigament2d m_elevatorMech2d =
       m_mech2dRoot.append(
           new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90));
@@ -104,28 +98,18 @@ public class Elevator implements AutoCloseable {
    * @param goal the position to maintain
    */
   public void reachGoal(double goal) {
-    var goalState = new ExponentialProfile.State(goal, 0);
-
-    var next = m_profile.calculate(0.020, m_setpoint, goalState);
+    m_controller.setGoal(goal);
 
     // With the setpoint value we run PID control like normal
-    double pidOutput = m_pidController.calculate(m_encoder.getDistance(), m_setpoint.position);
-    double feedforwardOutput =
-        m_feedforward.calculateWithVelocities(m_setpoint.velocity, next.velocity);
-
+    double pidOutput = m_controller.calculate(m_encoder.getDistance());
+    double feedforwardOutput = m_feedforward.calculate(m_controller.getSetpoint().velocity);
     m_motor.setVoltage(pidOutput + feedforwardOutput);
-
-    m_setpoint = next;
   }
 
   /** Stop the control loop and motor output. */
   public void stop() {
+    m_controller.setGoal(0.0);
     m_motor.set(0.0);
-  }
-
-  /** Reset Exponential profile to begin from current position on enable. */
-  public void reset() {
-    m_setpoint = new ExponentialProfile.State(m_encoder.getDistance(), 0);
   }
 
   /** Update telemetry, including the mechanism visualization. */

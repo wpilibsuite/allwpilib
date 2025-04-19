@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.elevatorsimulation.subsystems;
+package edu.wpi.first.wpilibj.examples.elevatortrapezoidsimulation.subsystems;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.TrapezoidPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.examples.elevatorsimulation.Constants;
+import edu.wpi.first.wpilibj.examples.elevatortrapezoidsimulation.Constants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -27,8 +27,8 @@ public class Elevator implements AutoCloseable {
   private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
 
   // Standard classes for controlling our elevator
-  private final ProfiledPIDController m_controller =
-      new ProfiledPIDController(
+  private final TrapezoidPIDController m_controller =
+      new TrapezoidPIDController(
           Constants.kElevatorKp,
           Constants.kElevatorKi,
           Constants.kElevatorKd,

@@ -30,7 +30,7 @@ class HolonomicDriveControllerTest {
         new HolonomicDriveController(
             new PIDController(1.0, 0.0, 0.0),
             new PIDController(1.0, 0.0, 0.0),
-            new ProfiledPIDController(
+            new TrapezoidPIDController(
                 1.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2.0 * Math.PI, Math.PI)));
     Pose2d robotPose = new Pose2d(2.7, 23.0, Rotation2d.kZero);
 
@@ -79,7 +79,7 @@ class HolonomicDriveControllerTest {
         new HolonomicDriveController(
             new PIDController(1, 0, 0),
             new PIDController(1, 0, 0),
-            new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(4, 2)));
+            new TrapezoidPIDController(1, 0, 0, new TrapezoidProfile.Constraints(4, 2)));
 
     ChassisSpeeds speeds =
         controller.calculate(

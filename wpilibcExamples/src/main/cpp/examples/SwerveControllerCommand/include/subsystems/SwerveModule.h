@@ -8,7 +8,7 @@
 
 #include <frc/Encoder.h>
 #include <frc/controller/PIDController.h>
-#include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/TrapezoidPIDController.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
@@ -33,7 +33,7 @@ class SwerveModule {
 
  private:
   // We have to use meters here instead of radians due to the fact that
-  // ProfiledPIDController's constraints only take in meters per second and
+  // TrapezoidPIDController's constraints only take in meters per second and
   // meters per second squared.
 
   static constexpr auto kModuleMaxAngularVelocity =
@@ -49,7 +49,7 @@ class SwerveModule {
 
   frc::PIDController m_drivePIDController{
       ModuleConstants::kPModuleDriveController, 0, 0};
-  frc::ProfiledPIDController<units::radians> m_turningPIDController{
+  frc::TrapezoidPIDController<units::radians> m_turningPIDController{
       ModuleConstants::kPModuleTurningController,
       0.0,
       0.0,

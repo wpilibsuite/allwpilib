@@ -9,7 +9,7 @@
 
 #include <frc/Timer.h>
 #include <frc/controller/PIDController.h>
-#include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/TrapezoidPIDController.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
@@ -41,7 +41,7 @@ class SwerveControllerCommandTest : public ::testing::Test {
       frc::SwerveModulePosition{}, frc::SwerveModulePosition{},
       frc::SwerveModulePosition{}, frc::SwerveModulePosition{}};
 
-  frc::ProfiledPIDController<units::radians> m_rotController{
+  frc::TrapezoidPIDController<units::radians> m_rotController{
       1, 0, 0,
       frc::TrapezoidProfile<units::radians>::Constraints{
           9_rad_per_s, units::unit_t<radians_per_second_squared_t>(3)}};

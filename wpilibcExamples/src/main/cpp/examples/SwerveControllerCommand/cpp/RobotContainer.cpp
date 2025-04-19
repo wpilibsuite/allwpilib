@@ -67,7 +67,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       // Pass the config
       config);
 
-  frc::ProfiledPIDController<units::radians> thetaController{
+  frc::TrapezoidPIDController<units::radians> thetaController{
       AutoConstants::kPThetaController, 0, 0,
       AutoConstants::kThetaControllerConstraints};
 

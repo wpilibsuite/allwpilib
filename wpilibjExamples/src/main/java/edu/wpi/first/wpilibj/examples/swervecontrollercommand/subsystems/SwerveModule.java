@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.swervecontrollercommand.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.TrapezoidPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -25,8 +25,8 @@ public class SwerveModule {
       new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
 
   // Using a TrapezoidProfile PIDController to allow for smooth turning
-  private final ProfiledPIDController m_turningPIDController =
-      new ProfiledPIDController(
+  private final TrapezoidPIDController m_turningPIDController =
+      new TrapezoidPIDController(
           ModuleConstants.kPModuleTurningController,
           0,
           0,

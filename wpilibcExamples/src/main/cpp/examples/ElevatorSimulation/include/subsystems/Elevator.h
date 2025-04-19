@@ -7,7 +7,7 @@
 #include <frc/Encoder.h>
 #include <frc/controller/ElevatorFeedforward.h>
 #include <frc/controller/PIDController.h>
-#include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/TrapezoidPIDController.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/simulation/BatterySim.h>
 #include <frc/simulation/ElevatorSim.h>
@@ -36,7 +36,7 @@ class Elevator {
   // Standard classes for controlling our elevator
   frc::TrapezoidProfile<units::meters>::Constraints m_constraints{2.45_mps,
                                                                   2.45_mps_sq};
-  frc::ProfiledPIDController<units::meters> m_controller{
+  frc::TrapezoidPIDController<units::meters> m_controller{
       Constants::kElevatorKp, Constants::kElevatorKi, Constants::kElevatorKd,
       m_constraints};
 

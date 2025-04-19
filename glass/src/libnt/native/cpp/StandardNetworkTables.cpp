@@ -18,6 +18,8 @@
 #include "glass/networktables/NTMotorController.h"
 #include "glass/networktables/NTPIDController.h"
 #include "glass/networktables/NTProfiledPIDController.h"
+#include "glass/networktables/NTTrapezoidPIDController.h"
+#include "glass/networktables/NTExponentialPIDController.h"
 #include "glass/networktables/NTStringChooser.h"
 #include "glass/networktables/NTSubsystem.h"
 #include "glass/networktables/NetworkTablesProvider.h"
@@ -156,6 +158,18 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         });
       });
   provider.Register(
+      NTExponentialPIDControllerModel::kType,
+      [](nt::NetworkTableInstance inst, const char* path) {
+        return std::make_unique<NTExponentialPIDControllerModel>(inst, path);
+      },
+      [](Window* win, Model* model, const char* path) {
+        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+        return MakeFunctionView([=] {
+          DisplayExponentialPIDController(
+              static_cast<NTExponentialPIDControllerModel*>(model));
+        });
+      });
+  provider.Register(
       NTProfiledPIDControllerModel::kType,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTProfiledPIDControllerModel>(inst, path);
@@ -165,6 +179,18 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         return MakeFunctionView([=] {
           DisplayProfiledPIDController(
               static_cast<NTProfiledPIDControllerModel*>(model));
+        });
+      });
+  provider.Register(
+      NTTrapezoidPIDControllerModel::kType,
+      [](nt::NetworkTableInstance inst, const char* path) {
+        return std::make_unique<NTTrapezoidPIDControllerModel>(inst, path);
+      },
+      [](Window* win, Model* model, const char* path) {
+        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+        return MakeFunctionView([=] {
+          DisplayTrapezoidPIDController(
+              static_cast<NTTrapezoidPIDControllerModel*>(model));
         });
       });
   provider.Register(
