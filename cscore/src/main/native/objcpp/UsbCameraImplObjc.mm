@@ -71,6 +71,12 @@ using namespace cs;
 
 @implementation UsbCameraImplObjc
 
++ (int)clampToPercent:(int)value {
+  if (value < 0) return 0;
+  if (value > 100) return 100;
+  return value;
+}
+
 - (void)start {
   switch ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo]) {
     case AVAuthorizationStatusAuthorized:
@@ -111,10 +117,43 @@ using namespace cs;
 - (void)setProperty:(int)property
           withValue:(int)value
              status:(CS_Status*)status {
+  dispatch_async_and_wait(self.sessionQueue, ^{
+    if (self.uvcControl == nil) {
+      *status = CS_INVALID_PROPERTY;
+      return;
+    }
+
+    BOOL isPercent = (property == CAPPROPID_BRIGHTNESS ||
+                      property == CAPPROPID_EXPOSURE ||
+                      property == CAPPROPID_WHITEBALANCE ||
+                      property == CAPPROPID_CONTRAST ||
+                      property == CAPPROPID_SATURATION ||
+                      property == CAPPROPID_HUE ||
+                      property == CAPPROPID_SHARPNESS ||
+                      property == CAPPROPID_GAIN);
+
+    int32_t min = 0, max = 0, defValue = 0;
+    if (![self.uvcControl getPropertyLimits:property min:&min max:&max defValue:&defValue status:status]) {
+      return;
+    }
+
+    int32_t realValue = value;
+    if (isPercent) {
+      int localValue = [UsbCameraImplObjc clampToPercent:value];
+      realValue = min + (max - min) * localValue / 100;
+    }
+
+    if (![self.uvcControl setProperty:property withValue:realValue status:status]) {
+      return;
+    }
+  });
 }
+
 - (void)setStringProperty:(int)property
                 withValue:(std::string_view*)value
                    status:(CS_Status*)status {
+  *status = CS_INVALID_PROPERTY;
+  return;
 }
 
 // Standard common camera properties
@@ -125,9 +164,7 @@ using namespace cs;
       return;
     }
     
-    int localBrightness = brightness;
-    if (localBrightness < 0) localBrightness = 0;
-    if (localBrightness > 100) localBrightness = 100;
+    int localBrightness = [UsbCameraImplObjc clampToPercent:brightness];
 
     int32_t min = 0, max = 0, defValue = 0;
     if (![self.uvcControl getPropertyLimits:CAPPROPID_BRIGHTNESS min:&min max:&max defValue:&defValue status:status]) {
@@ -228,14 +265,11 @@ using namespace cs;
       return;
     }
     
-    // Switch to manual mode first
     if (![self.uvcControl setAutoProperty:CAPPROPID_WHITEBALANCE enabled:NO status:status]) {
       return;
     }
 
-    int localValue = value;
-    if (localValue < 0) localValue = 0;
-    if (localValue > 100) localValue = 100;
+    int localValue = [UsbCameraImplObjc clampToPercent:value];
 
     int32_t min = 0, max = 0, defValue = 0;
     if (![self.uvcControl getPropertyLimits:CAPPROPID_WHITEBALANCE min:&min max:&max defValue:&defValue status:status]) {
@@ -300,14 +334,11 @@ using namespace cs;
     return;
   }
   
-  // Switch to manual mode first
   if (![self.uvcControl setAutoProperty:CAPPROPID_EXPOSURE enabled:NO status:status]) {
     return;
   }
 
-  int localValue = value;
-  if (localValue < 0) localValue = 0;
-  if (localValue > 100) localValue = 100;
+  int localValue = [UsbCameraImplObjc clampToPercent:value];
 
   int32_t min = 0, max = 0, defValue = 0;
   if (![self.uvcControl getPropertyLimits:CAPPROPID_EXPOSURE min:&min max:&max defValue:&defValue status:status]) {
@@ -651,10 +682,10 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
       self.videoDevice.activeFormat = self.currentFormat;
     }
     if (self.currentFPS != 0) {
-      self.videoDevice.activeVideoMinFrameDuration =
-          CMTimeMake(1, self.currentFPS);
-      self.videoDevice.activeVideoMaxFrameDuration =
-          CMTimeMake(1, self.currentFPS);
+      // self.videoDevice.activeVideoMinFrameDuration =
+      //     CMTimeMake(1, self.currentFPS);
+      // self.videoDevice.activeVideoMaxFrameDuration =
+      //     CMTimeMake(1, self.currentFPS);
     }
     [self.videoDevice unlockForConfiguration];
   } else {
