@@ -2,12 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#import "UsbCameraImplObjc.h"
-#include "UsbCameraImpl.h"
+#include <wpi/SmallString.h>
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "Notifier.h"
 #include "Log.h"
+
+#import "UsbCameraImplObjc.h"
+#include "UsbCameraImpl.h"
 
 template <typename S, typename... Args>
 inline void NamedLog(UsbCameraImplObjc* objc, unsigned int level,
@@ -110,6 +112,7 @@ using namespace cs;
                name:AVCaptureDeviceWasDisconnectedNotification
              object:nil];
     [self deviceConnect];
+    [self deviceCacheProperties];
   });
 }
 
@@ -117,36 +120,107 @@ using namespace cs;
 - (void)setProperty:(int)property
           withValue:(int)value
              status:(CS_Status*)status {
-  dispatch_async_and_wait(self.sessionQueue, ^{
-    if (self.uvcControl == nil) {
-      *status = CS_INVALID_PROPERTY;
-      return;
+    auto sharedThis = self.cppImpl.lock();
+    if (!sharedThis) {
+        *status = CS_INVALID_HANDLE;
+        return;
     }
-
-    BOOL isPercent = (property == CAPPROPID_BRIGHTNESS ||
-                      property == CAPPROPID_EXPOSURE ||
-                      property == CAPPROPID_WHITEBALANCE ||
-                      property == CAPPROPID_CONTRAST ||
-                      property == CAPPROPID_SATURATION ||
-                      property == CAPPROPID_HUE ||
-                      property == CAPPROPID_SHARPNESS ||
-                      property == CAPPROPID_GAIN);
-
-    int32_t min = 0, max = 0, defValue = 0;
-    if (![self.uvcControl getPropertyLimits:property min:&min max:&max defValue:&defValue status:status]) {
-      return;
+    
+    // Make sure properties are cached
+    if (!self.propertiesCached) {
+        [self deviceCacheProperties];
     }
-
-    int32_t realValue = value;
-    if (isPercent) {
-      int localValue = [UsbCameraImplObjc clampToPercent:value];
-      realValue = min + (max - min) * localValue / 100;
+    
+    // Get the property name from the property index
+    wpi::SmallString<128> nameBuf;
+    std::string_view propName = sharedThis->GetPropertyName(property, nameBuf, status);
+    if (*status != 0) {
+        OBJCERROR("Failed to get property name for index %d", property);
+        return;
     }
-
-    if (![self.uvcControl setProperty:property withValue:realValue status:status]) {
-      return;
+    
+    std::string nameStr(propName);
+    
+    // Check if it's an auto property
+    auto& propertyAutoCache = sharedThis->GetPropertyAutoCache();
+    auto autoIt = propertyAutoCache.find(nameStr);
+    if (autoIt != propertyAutoCache.end()) {
+        uint32_t propID = autoIt->second;
+        bool enabled = value != 0;
+        
+        OBJCINFO("Setting auto property %s (ID=%u) to %s", 
+                nameStr.c_str(), propID, enabled ? "enabled" : "disabled");
+        
+        dispatch_async_and_wait(self.sessionQueue, ^{
+            if (self.uvcControl == nil) {
+                *status = CS_INVALID_PROPERTY;
+                return;
+            }
+            
+            if (![self.uvcControl setAutoProperty:propID enabled:enabled status:status]) {
+                OBJCERROR("Failed to set auto property %s to %d",
+                        nameStr.c_str(), enabled);
+                return;
+            }
+            
+            // Update property value
+            sharedThis->UpdatePropertyValuePublic(property, false, value, {});
+        });
+        return;
     }
-  });
+    
+    // Handle regular property
+    auto& propertyCache = sharedThis->GetPropertyCache();
+    auto it = propertyCache.find(nameStr);
+    if (it == propertyCache.end()) {
+        OBJCERROR("Property not found in cache: %s", nameStr.c_str());
+        *status = CS_INVALID_PROPERTY;
+        return;
+    }
+    
+    uint32_t propID = it->second;
+    OBJCINFO("Setting property %s (ID=%u) to value %d", 
+            nameStr.c_str(), propID, value);
+    
+    dispatch_async_and_wait(self.sessionQueue, ^{
+        if (self.uvcControl == nil) {
+            *status = CS_INVALID_PROPERTY;
+            return;
+        }
+        
+        // Get the property implementation to access its limits
+        const PropertyImpl* prop = sharedThis->GetPropertyPublic(property);
+        if (!prop) {
+            *status = CS_INVALID_PROPERTY;
+            return;
+        }
+        
+        // Determine if this is a percentage property
+        BOOL isPercent = (propID == CAPPROPID_BRIGHTNESS ||
+                          propID == CAPPROPID_EXPOSURE ||
+                          propID == CAPPROPID_WHITEBALANCE ||
+                          propID == CAPPROPID_CONTRAST ||
+                          propID == CAPPROPID_SATURATION ||
+                          propID == CAPPROPID_HUE ||
+                          propID == CAPPROPID_SHARPNESS ||
+                          propID == CAPPROPID_GAIN);
+
+        int32_t realValue = value;
+        if (isPercent) {
+            // Use property's min/max values for conversion
+            realValue = prop->minimum + (prop->maximum - prop->minimum) * value / 100;
+            OBJCDEBUG("Converting percentage %d to raw value %d (range: [%d,%d])", 
+                    value, realValue, prop->minimum, prop->maximum);
+        }
+
+        if (![self.uvcControl setProperty:propID withValue:realValue status:status]) {
+            OBJCERROR("Failed to set property %s to value %d", nameStr.c_str(), realValue);
+            return;
+        }
+        
+        // Update property value in the container
+        sharedThis->UpdatePropertyValuePublic(property, false, value, {});
+    });
 }
 
 - (void)setStringProperty:(int)property
@@ -158,197 +232,153 @@ using namespace cs;
 
 // Standard common camera properties
 - (void)setBrightness:(int)brightness status:(CS_Status*)status {
-  dispatch_async_and_wait(self.sessionQueue, ^{
-    if (self.uvcControl == nil) {
-      *status = CS_INVALID_PROPERTY;
-      return;
-    }
-    
-    int localBrightness = [UsbCameraImplObjc clampToPercent:brightness];
-
-    int32_t min = 0, max = 0, defValue = 0;
-    if (![self.uvcControl getPropertyLimits:CAPPROPID_BRIGHTNESS min:&min max:&max defValue:&defValue status:status]) {
-      return;
-    }
-
-    int32_t realValue = min + (max - min) * localBrightness / 100;
-    if (![self.uvcControl setProperty:CAPPROPID_BRIGHTNESS withValue:realValue status:status]) {
-      return;
-    }
-  });
-}
-
-- (int)getBrightness:(CS_Status*)status {
-  __block int percent = 0;
-  dispatch_async_and_wait(self.sessionQueue, ^{
-    if (self.uvcControl == nil) {
-      *status = CS_INVALID_PROPERTY;
-      percent = 0;
-      return;
-    }
-    
-    int32_t value = 0;
-    if (![self.uvcControl getProperty:CAPPROPID_BRIGHTNESS withValue:&value status:status]) {
-      *status = CS_INVALID_PROPERTY;
-      percent = 0;
-      return;
-    }
-    
-    int32_t min = 0, max = 0, defValue = 0;
-    if (![self.uvcControl getPropertyLimits:CAPPROPID_BRIGHTNESS min:&min max:&max defValue:&defValue status:status]) {
-      *status = CS_INVALID_PROPERTY;
-      percent = 0;
-      return;
-    }
-
-    if (max == min) {
-      percent = 0;
-      return;
-    }
-    
-    percent = (value - min) * 100 / (max - min);
-    if (percent < 0) percent = 0;
-    if (percent > 100) percent = 100;
-  });
-  return percent;
-}
-
-- (void)setWhiteBalanceAuto:(CS_Status*)status {
-  dispatch_async_and_wait(self.sessionQueue, ^{
-    if (self.uvcControl == nil) {
-      // try AVCaptureDevice when uvc is not available
-      if ([self.videoDevice lockForConfiguration:nil]) {
-        if ([self.videoDevice isWhiteBalanceModeSupported:AVCaptureWhiteBalanceModeAutoWhiteBalance]) {
-          self.videoDevice.whiteBalanceMode = AVCaptureWhiteBalanceModeAutoWhiteBalance;
-          *status = CS_OK;
-        } else {
-        *status = CS_INVALID_PROPERTY;
-      }
-      [self.videoDevice unlockForConfiguration];
-    } else {
-      *status = CS_READ_FAILED;
-    }
-      return;
-    }
-    
-    if (![self.uvcControl setAutoProperty:CAPPROPID_WHITEBALANCE enabled:YES status:status]) {
-      return;
-    }
-  });
-}
-
-- (void)setWhiteBalanceHoldCurrent:(CS_Status*)status {
-  dispatch_async_and_wait(self.sessionQueue, ^{
-    if (self.videoDevice == nil) {
-      *status = CS_READ_FAILED;
-      return;
-    }
-    
-    if ([self.videoDevice lockForConfiguration:nil]) {
-      if ([self.videoDevice isWhiteBalanceModeSupported:AVCaptureWhiteBalanceModeLocked]) {
-        self.videoDevice.whiteBalanceMode = AVCaptureWhiteBalanceModeLocked;
-        *status = CS_OK;
-      } else {
-        *status = CS_INVALID_PROPERTY;
-      }
-      [self.videoDevice unlockForConfiguration];
-    } else {
-      *status = CS_READ_FAILED;
-    }
-  });
-}
-
-- (void)setWhiteBalanceManual:(int)value status:(CS_Status*)status {
-  dispatch_async_and_wait(self.sessionQueue, ^{
-    if (self.uvcControl == nil) {
-      *status = CS_INVALID_PROPERTY;
-      return;
-    }
-    
-    if (![self.uvcControl setAutoProperty:CAPPROPID_WHITEBALANCE enabled:NO status:status]) {
-      return;
-    }
-
-    int localValue = [UsbCameraImplObjc clampToPercent:value];
-
-    int32_t min = 0, max = 0, defValue = 0;
-    if (![self.uvcControl getPropertyLimits:CAPPROPID_WHITEBALANCE min:&min max:&max defValue:&defValue status:status]) {
-      return;
-    }
-
-    int32_t realValue = min + (max - min) * localValue / 100;
-    if (![self.uvcControl setProperty:CAPPROPID_WHITEBALANCE withValue:realValue status:status]) {
-      return;
-    }
-  });
-}
-
-- (void)setExposureAuto:(CS_Status*)status {
-  dispatch_async_and_wait(self.sessionQueue, ^{
-    if (self.uvcControl == nil) {
-      // try AVCaptureDevice when uvc is not available
-      if ([self.videoDevice lockForConfiguration:nil]) {
-        if ([self.videoDevice isExposureModeSupported:AVCaptureExposureModeAutoExpose]) {
-          self.videoDevice.exposureMode = AVCaptureExposureModeAutoExpose;
-          *status = CS_OK;
-        } else {
-          *status = CS_INVALID_PROPERTY;
-        }
-        [self.videoDevice unlockForConfiguration];
-      } else {
-        *status = CS_READ_FAILED;
-      }
-      return;
-    }
-    
-    if (![self.uvcControl setAutoProperty:CAPPROPID_EXPOSURE enabled:YES status:status]) {
-      return;
-    }
-  });
-}
-
-- (void)setExposureHoldCurrent:(CS_Status*)status {
-  dispatch_async_and_wait(self.sessionQueue, ^{
-    if (self.videoDevice == nil) {
-      *status = CS_READ_FAILED;
-      return;
-    }
-    
-    if ([self.videoDevice lockForConfiguration:nil]) {
-      if ([self.videoDevice isExposureModeSupported:AVCaptureExposureModeLocked]) {
-        self.videoDevice.exposureMode = AVCaptureExposureModeLocked;
-        *status = CS_OK;
-      } else {
-        *status = CS_INVALID_PROPERTY;
-      }
-      [self.videoDevice unlockForConfiguration];
-    } else {
-      *status = CS_READ_FAILED;
-    }
-  });
-}
-
-- (void)setExposureManual:(int)value status:(CS_Status*)status {
-  if (self.uvcControl == nil) {
-    *status = CS_UNSUPPORTED_MODE;
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
     return;
   }
   
-  if (![self.uvcControl setAutoProperty:CAPPROPID_EXPOSURE enabled:NO status:status]) {
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  // Get the property index and set it
+  int prop = sharedThis->GetPropertyIndex("brightness");
+  sharedThis->SetProperty(prop, brightness, status);
+}
+
+- (int)getBrightness:(CS_Status*)status {
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  // Get the property index and its value
+  int prop = sharedThis->GetPropertyIndex("brightness");
+  return sharedThis->GetProperty(prop, status);
+}
+
+- (void)setWhiteBalanceAuto:(CS_Status*)status {
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
     return;
   }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  // Set the auto white balance property to enabled (1)
+  int prop = sharedThis->GetPropertyIndex("white_balance_auto");
+  sharedThis->SetProperty(prop, 1, status);
+}
 
-  int localValue = [UsbCameraImplObjc clampToPercent:value];
-
-  int32_t min = 0, max = 0, defValue = 0;
-  if (![self.uvcControl getPropertyLimits:CAPPROPID_EXPOSURE min:&min max:&max defValue:&defValue status:status]) {
+- (void)setWhiteBalanceHoldCurrent:(CS_Status*)status {
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
     return;
   }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  // Set the auto white balance property to disabled (0)
+  int prop = sharedThis->GetPropertyIndex("white_balance_auto");
+  sharedThis->SetProperty(prop, 0, status);
+}
 
-  int32_t realValue = min + (max - min) * localValue / 100;
-  if (![self.uvcControl setProperty:CAPPROPID_EXPOSURE withValue:realValue status:status]) {
+- (void)setWhiteBalanceManual:(int)value status:(CS_Status*)status {
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
     return;
   }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  // First disable auto white balance
+  int autoProp = sharedThis->GetPropertyIndex("white_balance_auto");
+  sharedThis->SetProperty(autoProp, 0, status);
+  if (*status != 0) {
+    return;
+  }
+  
+  // Then set the white balance value
+  int prop = sharedThis->GetPropertyIndex("white_balance");
+  sharedThis->SetProperty(prop, value, status);
+}
+
+- (void)setExposureAuto:(CS_Status*)status {
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  // Set the auto exposure property to enabled (1)
+  int prop = sharedThis->GetPropertyIndex("exposure_auto");
+  sharedThis->SetProperty(prop, 1, status);
+}
+
+- (void)setExposureHoldCurrent:(CS_Status*)status {
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  // Set the auto exposure property to disabled (0)
+  int prop = sharedThis->GetPropertyIndex("exposure_auto");
+  sharedThis->SetProperty(prop, 0, status);
+}
+
+- (void)setExposureManual:(int)value status:(CS_Status*)status {
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  // First disable auto exposure
+  int autoProp = sharedThis->GetPropertyIndex("exposure_auto");
+  sharedThis->SetProperty(autoProp, 0, status);
+  if (*status != 0) {
+    return;
+  }
+  
+  // Then set the exposure value
+  int prop = sharedThis->GetPropertyIndex("exposure");
+  sharedThis->SetProperty(prop, value, status);
 }
 
 - (bool)setVideoMode:(const cs::VideoMode&)mode status:(CS_Status*)status {
@@ -502,10 +532,158 @@ using namespace cs;
 
 // All above are called from C++, must always dispatch to loop
 
+// Property caching methods
 - (void)deviceCacheProperties {
-  if (self.session == nil) {
-    return;
-  }
+    if (self.uvcControl == nil) {
+        OBJCINFO("Cannot cache properties: UVC control is not available");
+        return;
+    }
+
+    auto sharedThis = self.cppImpl.lock();
+    if (!sharedThis) {
+        OBJCERROR("Cannot cache properties: UsbCameraImpl not available");
+        return;
+    }
+
+    auto& propertyCache = sharedThis->GetPropertyCache();
+    auto& propertyAutoCache = sharedThis->GetPropertyAutoCache();
+
+    // Cache basic properties
+    [self cacheProperty:CAPPROPID_BRIGHTNESS withName:@"brightness"];
+    [self cacheProperty:CAPPROPID_WHITEBALANCE withName:@"white_balance"];
+    [self cacheProperty:CAPPROPID_EXPOSURE withName:@"exposure"];
+    [self cacheProperty:CAPPROPID_CONTRAST withName:@"contrast"];
+    [self cacheProperty:CAPPROPID_SATURATION withName:@"saturation"];
+    [self cacheProperty:CAPPROPID_SHARPNESS withName:@"sharpness"];
+    [self cacheProperty:CAPPROPID_GAIN withName:@"gain"];
+    [self cacheProperty:CAPPROPID_GAMMA withName:@"gamma"];
+    [self cacheProperty:CAPPROPID_HUE withName:@"hue"];
+    [self cacheProperty:CAPPROPID_FOCUS withName:@"focus"];
+    [self cacheProperty:CAPPROPID_ZOOM withName:@"zoom"];
+    [self cacheProperty:CAPPROPID_BACKLIGHTCOMP withName:@"backlight_compensation"];
+    [self cacheProperty:CAPPROPID_POWERLINEFREQ withName:@"powerline_frequency"];
+    
+    // Cache auto properties
+    [self cacheAutoProperty:CAPPROPID_EXPOSURE withName:@"exposure"];
+    [self cacheAutoProperty:CAPPROPID_WHITEBALANCE withName:@"white_balance"];
+    [self cacheAutoProperty:CAPPROPID_FOCUS withName:@"focus"];
+    
+    OBJCINFO("Cached %lu camera properties and %lu auto properties", 
+             (unsigned long)propertyCache.size(), 
+             (unsigned long)propertyAutoCache.size());
+    
+    self.propertiesCached = true;
+}
+
+- (void)cacheProperty:(uint32_t)propID withName:(NSString *)name {
+    auto sharedThis = self.cppImpl.lock();
+    if (!sharedThis) {
+        OBJCERROR("Cannot cache property: UsbCameraImpl not available");
+        return;
+    }
+    
+    // Get property limits
+    int32_t minimum = 0, maximum = 0, defaultValue = 0;
+    int32_t value = defaultValue;
+    CS_Status status;
+    
+    if (self.uvcControl != nil) {
+        // Get the property limits
+        if ([self.uvcControl getPropertyLimits:propID 
+                                          min:&minimum 
+                                          max:&maximum 
+                                     defValue:&defaultValue 
+                                       status:&status]) {
+            OBJCDEBUG("Got property limits for %u: min=%d, max=%d, default=%d", 
+                    propID, minimum, maximum, defaultValue);
+        } else {
+            OBJCWARNING("Failed to get property limits for %u, using defaults", propID);
+            return;
+        }
+        
+        // Get current value
+        if ([self.uvcControl getProperty:propID withValue:&value status:&status]) {
+            OBJCDEBUG("Got current value for %u: %d", propID, value);
+        } else {
+            value = defaultValue;
+            OBJCWARNING("Failed to get current value for %u, using default: %d", 
+                      propID, value);
+            return;
+        }
+    }
+    
+    // Create property
+    std::string nameStr = std::string([name UTF8String]);
+    
+    // Store in our local cache for mapping properties
+    auto& propertyCache = sharedThis->GetPropertyCache();
+    propertyCache[nameStr] = propID;
+    
+    // Create the property implementation
+    std::unique_ptr<PropertyImpl> prop;
+    prop = std::make_unique<PropertyImpl>(nameStr);
+    prop->propKind = CS_PROP_INTEGER;
+    prop->value = value;
+    prop->minimum = minimum;
+    prop->maximum = maximum;
+    prop->step = 1;  // Most camera properties use a step of 1
+    prop->defaultValue = defaultValue;
+    
+    // Add the property to the container
+    std::scoped_lock lock(sharedThis->GetMutex());
+    int ndx = sharedThis->CreatePropertyPublic(nameStr, [&] { return std::move(prop); });
+    
+    // Notify that property has been created
+    sharedThis->NotifyPropertyCreatedPublic(ndx, *sharedThis->GetPropertyPublic(ndx));
+    
+    OBJCINFO("Cached property %s (ID=%u, value=%d, range=[%d,%d])", 
+             nameStr.c_str(), propID, value, minimum, maximum);
+}
+
+- (void)cacheAutoProperty:(uint32_t)propID withName:(NSString *)baseName {
+    auto sharedThis = self.cppImpl.lock();
+    if (!sharedThis) {
+        OBJCERROR("Cannot cache auto property: UsbCameraImpl not available");
+        return;
+    }
+    
+    // Build auto mode property name
+    std::string nameStr = std::string([baseName UTF8String]) + "_auto";
+    
+    // Get current auto mode status
+    bool enabled = false;
+    CS_Status status = 0;
+    
+    if (self.uvcControl != nil) {
+       if(![self.uvcControl getAutoProperty:propID enabled:&enabled status:&status]) {
+        OBJCERROR("Failed to get auto property %s", nameStr.c_str());
+        return;
+       }
+    }
+    
+    // Create property
+    std::unique_ptr<PropertyImpl> prop;
+    prop = std::make_unique<PropertyImpl>(nameStr);
+    prop->propKind = CS_PROP_BOOLEAN;
+    prop->value = enabled ? 1 : 0;
+    prop->minimum = 0;
+    prop->maximum = 1;
+    prop->step = 1;
+    prop->defaultValue = 0;  // Default is manual mode
+    
+    // Add property to container
+    std::scoped_lock lock(sharedThis->GetMutex());
+    int ndx = sharedThis->CreatePropertyPublic(nameStr, [&] { return std::move(prop); });
+    
+    // Notify property created
+    sharedThis->NotifyPropertyCreatedPublic(ndx, *sharedThis->GetPropertyPublic(ndx));
+    
+    // Map property name to ID
+    auto& propertyAutoCache = sharedThis->GetPropertyAutoCache();
+    propertyAutoCache[nameStr] = propID;
+    
+    OBJCINFO("Cached auto property %s (ID=%u, value=%d)", 
+             nameStr.c_str(), propID, enabled ? 1 : 0);
 }
 
 static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {

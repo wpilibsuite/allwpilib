@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 #include <optional>
+#include <map>
 
 #include "SourceImpl.h"
 
@@ -88,8 +89,33 @@ class UsbCameraImpl : public SourceImpl {
 
   UsbCameraImplObjc* cppGetObjc() { return m_objc; }
 
+  int CreatePropertyPublic(std::string_view name, std::function<std::unique_ptr<PropertyImpl>()> newFunc) {
+    return CreateProperty(name, newFunc);
+  }
+
+  PropertyImpl* GetPropertyPublic(int property) {
+    return GetProperty(property);
+  }
+
+  void NotifyPropertyCreatedPublic(int propIndex, PropertyImpl& prop) {
+    NotifyPropertyCreated(propIndex, prop);
+  }
+
+  void UpdatePropertyValuePublic(int property, bool setString, int value, std::string_view valueStr) {
+    UpdatePropertyValue(property, setString, value, valueStr);
+  }
+
+  wpi::mutex& GetMutex() { return m_mutex; }
+
+  // Property cache accessors
+  std::map<std::string, uint32_t>& GetPropertyCache() { return m_propertyCache; }
+  std::map<std::string, uint32_t>& GetPropertyAutoCache() { return m_propertyAutoCache; }
+
  private:
   UsbCameraImplObjc* m_objc;
   std::vector<CameraModeStore> m_platformModes;
+  // Property caches
+  std::map<std::string, uint32_t> m_propertyCache;
+  std::map<std::string, uint32_t> m_propertyAutoCache;
 };
 }  // namespace cs

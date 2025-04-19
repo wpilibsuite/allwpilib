@@ -70,4 +70,8 @@ class UsbCameraImpl;
 - (void)getCameraName:(std::string*)name;
 - (void)setNewCameraPath:(std::string_view*)path;
 
+- (void)deviceCacheProperties;
+- (void)cacheProperty:(uint32_t)propID withName:(NSString *)name;
+- (void)cacheAutoProperty:(uint32_t)propID withName:(NSString *)baseName;
+
 @end
