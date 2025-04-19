@@ -7,7 +7,10 @@ package edu.wpi.first.wpilibj.snippets.encoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 
-/** Encoder snippets for frc-docs. */
+/**
+ * Encoder snippets for frc-docs.
+ * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
+ */
 @SuppressWarnings("deprecation")
 public class Robot extends TimedRobot {
   // Initializes an encoder on DIO pins 0 and 1

@@ -11,6 +11,7 @@
 
 /**
  * Encoder snippets for frc-docs.
+ * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
  */
 WPI_IGNORE_DEPRECATED
 class Robot : public frc::TimedRobot {
