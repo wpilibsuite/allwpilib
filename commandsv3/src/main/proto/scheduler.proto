@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package wpi.proto;
+
+option java_package = "edu.wpi.first.wpilibj.commandsv3.proto";
+option java_multiple_files = true;
+
+/*
+allwpilib $ protoc-quickbuf \
+              --quickbuf_out=gen_descriptors=true:commandsv3/src/main/java \
+              commandsv3/src/main/proto/scheduler.proto
+ */
+
+message ProtobufRequireableResource {
+  string name = 1;
+}
+
+message ProtobufCommand {
+  uint32 id = 1;
+  optional uint32 parent_id = 2;
+  string name = 3;
+  int32 priority = 4;
+  repeated ProtobufRequireableResource requirements = 5;
+}
+
+message ProtobufScheduler {
+  // Note: commands are generally queued by triggers, which occurs immediately before they are
+  // promoted and start running. Entries will only appear here when serializing a scheduler
+  // _after_ manually scheduling a command but _before_ calling scheduler.run()
+  repeated ProtobufCommand queued_commands = 1;
+  repeated ProtobufCommand running_commands = 2;
+}
