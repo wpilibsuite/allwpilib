@@ -69,16 +69,10 @@ inline void NamedLog(UsbCameraImplObjc* objc, unsigned int level,
   OBJCLOG(::wpi::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
 #endif
 
+
 using namespace cs;
 
 @implementation UsbCameraImplObjc
-
-+ (int)clampToPercent:(int)value {
-  if (value < 0) return 0;
-  if (value > 100) return 100;
-  return value;
-}
-
 - (void)start {
   switch ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo]) {
     case AVAuthorizationStatusAuthorized:
@@ -116,6 +110,47 @@ using namespace cs;
   });
 }
 
+// Quirk: exposure auto is 3 for on, 1 for off
+- (BOOL)getPropertyEnabled:(int)propID withValue:(int)value {
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    return false;
+  }
+
+  if (propID == sharedThis->GetPropertyIndex(kPropertyAutoExposure)) {
+    return value == kPropertyAutoExposureOn;
+  }
+
+  return value != 0;
+}
+
+
+- (int)clampToPercent:(int)value {
+  if (value < 0) {
+    return 0;
+  }
+  if (value > 100) {
+    return 100;
+  }
+  return value;
+}
+
+- (int)rawToPercentage:(int)propID rawValue:(int)rawValue min:(int)min max:(int)max {
+  if (min == max) {
+    return 0;
+  }
+  return [self clampToPercent:100 * (rawValue - min) / (max - min)];
+}
+
+- (BOOL)isPercentageProperty:(int)propID {
+    return propID == CAPPROPID_BRIGHTNESS ||
+           propID == CAPPROPID_CONTRAST ||
+           propID == CAPPROPID_SATURATION ||
+           propID == CAPPROPID_HUE ||
+           propID == CAPPROPID_SHARPNESS ||
+           propID == CAPPROPID_GAIN;
+}
+
 // Property functions
 - (void)setProperty:(int)property
           withValue:(int)value
@@ -146,7 +181,7 @@ using namespace cs;
     auto autoIt = propertyAutoCache.find(nameStr);
     if (autoIt != propertyAutoCache.end()) {
         uint32_t propID = autoIt->second;
-        bool enabled = value != 0;
+        bool enabled = [self getPropertyEnabled:propID withValue:value];
         
         OBJCINFO("Setting auto property %s (ID=%u) to %s", 
                 nameStr.c_str(), propID, enabled ? "enabled" : "disabled");
@@ -195,20 +230,11 @@ using namespace cs;
             return;
         }
         
-        // Determine if this is a percentage property
-        BOOL isPercent = (propID == CAPPROPID_BRIGHTNESS ||
-                          propID == CAPPROPID_EXPOSURE ||
-                          propID == CAPPROPID_WHITEBALANCE ||
-                          propID == CAPPROPID_CONTRAST ||
-                          propID == CAPPROPID_SATURATION ||
-                          propID == CAPPROPID_HUE ||
-                          propID == CAPPROPID_SHARPNESS ||
-                          propID == CAPPROPID_GAIN);
 
         int32_t realValue = value;
-        if (isPercent) {
+        if ([self isPercentageProperty:propID]) {
             // Use property's min/max values for conversion
-            realValue = prop->minimum + (prop->maximum - prop->minimum) * value / 100;
+            realValue = [self rawToPercentage:propID rawValue:value min:prop->minimum max:prop->maximum];
             OBJCDEBUG("Converting percentage %d to raw value %d (range: [%d,%d])", 
                     value, realValue, prop->minimum, prop->maximum);
         }
@@ -244,7 +270,7 @@ using namespace cs;
   }
   
   // Get the property index and set it
-  int prop = sharedThis->GetPropertyIndex("brightness");
+  int prop = sharedThis->GetPropertyIndex(kPropertyBrightness);
   sharedThis->SetProperty(prop, brightness, status);
 }
 
@@ -261,7 +287,7 @@ using namespace cs;
   }
   
   // Get the property index and its value
-  int prop = sharedThis->GetPropertyIndex("brightness");
+  int prop = sharedThis->GetPropertyIndex(kPropertyBrightness);
   return sharedThis->GetProperty(prop, status);
 }
 
@@ -277,8 +303,7 @@ using namespace cs;
     [self deviceCacheProperties];
   }
   
-  // Set the auto white balance property to enabled (1)
-  int prop = sharedThis->GetPropertyIndex("white_balance_auto");
+  int prop = sharedThis->GetPropertyIndex(kPropertyAutoWhiteBalance);
   sharedThis->SetProperty(prop, 1, status);
 }
 
@@ -294,8 +319,7 @@ using namespace cs;
     [self deviceCacheProperties];
   }
   
-  // Set the auto white balance property to disabled (0)
-  int prop = sharedThis->GetPropertyIndex("white_balance_auto");
+  int prop = sharedThis->GetPropertyIndex(kPropertyAutoWhiteBalance);
   sharedThis->SetProperty(prop, 0, status);
 }
 
@@ -312,14 +336,14 @@ using namespace cs;
   }
   
   // First disable auto white balance
-  int autoProp = sharedThis->GetPropertyIndex("white_balance_auto");
+  int autoProp = sharedThis->GetPropertyIndex(kPropertyAutoWhiteBalance);
   sharedThis->SetProperty(autoProp, 0, status);
   if (*status != 0) {
     return;
   }
   
   // Then set the white balance value
-  int prop = sharedThis->GetPropertyIndex("white_balance");
+  int prop = sharedThis->GetPropertyIndex(kPropertyWhiteBalance);
   sharedThis->SetProperty(prop, value, status);
 }
 
@@ -336,8 +360,8 @@ using namespace cs;
   }
   
   // Set the auto exposure property to enabled (1)
-  int prop = sharedThis->GetPropertyIndex("exposure_auto");
-  sharedThis->SetProperty(prop, 1, status);
+  int prop = sharedThis->GetPropertyIndex(kPropertyAutoExposure);
+  sharedThis->SetProperty(prop, kPropertyAutoExposureOn, status);
 }
 
 - (void)setExposureHoldCurrent:(CS_Status*)status {
@@ -353,8 +377,8 @@ using namespace cs;
   }
   
   // Set the auto exposure property to disabled (0)
-  int prop = sharedThis->GetPropertyIndex("exposure_auto");
-  sharedThis->SetProperty(prop, 0, status);
+  int prop = sharedThis->GetPropertyIndex(kPropertyAutoExposure);
+  sharedThis->SetProperty(prop, kPropertyAutoExposureOff, status);
 }
 
 - (void)setExposureManual:(int)value status:(CS_Status*)status {
@@ -370,14 +394,14 @@ using namespace cs;
   }
   
   // First disable auto exposure
-  int autoProp = sharedThis->GetPropertyIndex("exposure_auto");
-  sharedThis->SetProperty(autoProp, 0, status);
+  int autoProp = sharedThis->GetPropertyIndex(kPropertyAutoExposure);
+  sharedThis->SetProperty(autoProp, kPropertyAutoExposureOff, status);
   if (*status != 0) {
     return;
   }
   
   // Then set the exposure value
-  int prop = sharedThis->GetPropertyIndex("exposure");
+  int prop = sharedThis->GetPropertyIndex(kPropertyExposure);
   sharedThis->SetProperty(prop, value, status);
 }
 
@@ -549,24 +573,24 @@ using namespace cs;
     auto& propertyAutoCache = sharedThis->GetPropertyAutoCache();
 
     // Cache basic properties
-    [self cacheProperty:CAPPROPID_BRIGHTNESS withName:@"brightness"];
-    [self cacheProperty:CAPPROPID_WHITEBALANCE withName:@"white_balance"];
-    [self cacheProperty:CAPPROPID_EXPOSURE withName:@"exposure"];
-    [self cacheProperty:CAPPROPID_CONTRAST withName:@"contrast"];
-    [self cacheProperty:CAPPROPID_SATURATION withName:@"saturation"];
-    [self cacheProperty:CAPPROPID_SHARPNESS withName:@"sharpness"];
-    [self cacheProperty:CAPPROPID_GAIN withName:@"gain"];
-    [self cacheProperty:CAPPROPID_GAMMA withName:@"gamma"];
-    [self cacheProperty:CAPPROPID_HUE withName:@"hue"];
-    [self cacheProperty:CAPPROPID_FOCUS withName:@"focus"];
-    [self cacheProperty:CAPPROPID_ZOOM withName:@"zoom"];
-    [self cacheProperty:CAPPROPID_BACKLIGHTCOMP withName:@"backlight_compensation"];
-    [self cacheProperty:CAPPROPID_POWERLINEFREQ withName:@"powerline_frequency"];
+    [self cacheProperty:CAPPROPID_BRIGHTNESS withName:@kPropertyBrightness];
+    [self cacheProperty:CAPPROPID_WHITEBALANCE withName:@kPropertyWhiteBalance];
+    [self cacheProperty:CAPPROPID_EXPOSURE withName:@kPropertyExposure];
+    [self cacheProperty:CAPPROPID_CONTRAST withName:@kPropertyContrast];
+    [self cacheProperty:CAPPROPID_SATURATION withName:@kPropertySaturation];
+    [self cacheProperty:CAPPROPID_SHARPNESS withName:@kPropertySharpness];
+    [self cacheProperty:CAPPROPID_GAIN withName:@kPropertyGain];
+    [self cacheProperty:CAPPROPID_GAMMA withName:@kPropertyGamma];
+    [self cacheProperty:CAPPROPID_HUE withName:@kPropertyHue];
+    [self cacheProperty:CAPPROPID_FOCUS withName:@kPropertyFocus];
+    [self cacheProperty:CAPPROPID_ZOOM withName:@kPropertyZoom];
+    [self cacheProperty:CAPPROPID_BACKLIGHTCOMP withName:@kPropertyBackLightCompensation];
+    [self cacheProperty:CAPPROPID_POWERLINEFREQ withName:@kPropertyPowerLineFrequency];
     
     // Cache auto properties
-    [self cacheAutoProperty:CAPPROPID_EXPOSURE withName:@"exposure"];
-    [self cacheAutoProperty:CAPPROPID_WHITEBALANCE withName:@"white_balance"];
-    [self cacheAutoProperty:CAPPROPID_FOCUS withName:@"focus"];
+    [self cacheAutoProperty:CAPPROPID_EXPOSURE withName:@kPropertyAutoExposure];
+    [self cacheAutoProperty:CAPPROPID_WHITEBALANCE withName:@kPropertyAutoWhiteBalance];
+    [self cacheAutoProperty:CAPPROPID_FOCUS withName:@kPropertyAutoFocus];
     
     OBJCINFO("Cached %lu camera properties and %lu auto properties", 
              (unsigned long)propertyCache.size(), 
@@ -648,7 +672,7 @@ using namespace cs;
     }
     
     // Build auto mode property name
-    std::string nameStr = std::string([baseName UTF8String]) + "_auto";
+    std::string nameStr = std::string([baseName UTF8String]);
     
     // Get current auto mode status
     bool enabled = false;
