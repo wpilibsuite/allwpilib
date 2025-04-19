@@ -98,7 +98,7 @@ public abstract class RobotBase implements AutoCloseable {
    */
   protected RobotBase() {
     final NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    m_threadId = Thread.currentThread().getId();
+    m_threadId = Thread.currentThread().threadId();
     setupCameraServerShared();
     setupMathShared();
     // subscribe to "" to force persistent values to propagate to local
@@ -321,6 +321,13 @@ public abstract class RobotBase implements AutoCloseable {
     try {
       robot.startCompetition();
     } catch (Throwable throwable) {
+      // TODO: This can do some weird things with the command framework.
+      //       An exception thrown during a command's execution will be wrapped and rethrown as a
+      //       CommandExecutionException, with the cause being that original exception (which may
+      //       in turn also have a cause, etc).
+      //       This bit of code means that an exception thrown by a method called within a command
+      //       will be reported differently than that same exception when called outside a command
+      // TODO: Should we just report every error up the stack, instead of only the first level?
       Throwable cause = throwable.getCause();
       if (cause != null) {
         throwable = cause;
