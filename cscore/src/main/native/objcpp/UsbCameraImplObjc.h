@@ -35,6 +35,7 @@
 #define kPropertyAutoExposure "exposure_auto"
 #define kPropertyAutoWhiteBalance "white_balance_automatic"
 #define kPropertyAutoFocus "focus_auto"
+
 namespace cs {
 class UsbCameraImpl;
 }

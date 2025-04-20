@@ -114,6 +114,7 @@ class UsbCameraImpl : public SourceImpl {
  private:
   UsbCameraImplObjc* m_objc;
   std::vector<CameraModeStore> m_platformModes;
+  
   // Property caches
   std::map<std::string, uint32_t> m_propertyCache;
   std::map<std::string, uint32_t> m_propertyAutoCache;

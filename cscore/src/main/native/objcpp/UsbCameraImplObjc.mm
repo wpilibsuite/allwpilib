@@ -69,10 +69,10 @@ inline void NamedLog(UsbCameraImplObjc* objc, unsigned int level,
   OBJCLOG(::wpi::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
 #endif
 
-
 using namespace cs;
 
 @implementation UsbCameraImplObjc
+
 - (void)start {
   switch ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo]) {
     case AVAuthorizationStatusAuthorized:
