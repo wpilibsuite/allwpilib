@@ -50,7 +50,7 @@ jobs:
         uses: lukka/get-cmake@v3.29.3
 
       - name: Install sccache
-        uses: mozilla-actions/sccache-action@v0.0.5
+        uses: mozilla-actions/sccache-action@v0.0.8
 
       - uses: actions/checkout@v4
 
