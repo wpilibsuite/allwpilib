@@ -5,6 +5,67 @@
 #import "UvcControlImpl.h"
 #import <AVFoundation/AVFoundation.h>
 
+#include "Log.h"
+#include "UsbCameraImpl.h"
+
+template <typename S, typename... Args>
+inline void NamedLog(UvcControlImpl* objc, unsigned int level,
+                     const char* file, unsigned int line, const S& format,
+                     Args&&... args) {
+  auto sharedThis = objc.cppImpl.lock();
+  if (!sharedThis) {
+    return;
+  }
+
+  wpi::Logger& logger = sharedThis->objcGetLogger();
+  std::string_view name = sharedThis->GetName();
+
+  if (logger.HasLogger() && level >= logger.min_level()) {
+    cs::NamedLogV(logger, level, file, line, name, format,
+                  fmt::make_format_args(args...));
+  }
+}
+
+#define UVCLOG(level, format, ...) \
+  NamedLog(self, level, __FILE__, __LINE__, \
+           format __VA_OPT__(, ) __VA_ARGS__)
+
+#define UVCERROR(format, ...) \
+  UVCLOG(::wpi::WPI_LOG_ERROR, format __VA_OPT__(, ) __VA_ARGS__)
+#define UVCWARNING(format, ...) \
+  UVCLOG(::wpi::WPI_LOG_WARNING, format __VA_OPT__(, ) __VA_ARGS__)
+#define UVCINFO(format, ...) \
+  UVCLOG(::wpi::WPI_LOG_INFO, format __VA_OPT__(, ) __VA_ARGS__)
+
+#ifdef NDEBUG
+#define UVCDEBUG(format, ...) \
+  do {                         \
+  } while (0)
+#define UVCDEBUG1(format, ...) \
+  do {                          \
+  } while (0)
+#define UVCDEBUG2(format, ...) \
+  do {                          \
+  } while (0)
+#define UVCDEBUG3(format, ...) \
+  do {                          \
+  } while (0)
+#define UVCDEBUG4(format, ...) \
+  do {                          \
+  } while (0)
+#else
+#define UVCDEBUG(format, ...) \
+  UVCLOG(::wpi::WPI_LOG_DEBUG, format __VA_OPT__(, ) __VA_ARGS__)
+#define UVCDEBUG1(format, ...) \
+  UVCLOG(::wpi::WPI_LOG_DEBUG1, format __VA_OPT__(, ) __VA_ARGS__)
+#define UVCDEBUG2(format, ...) \
+  UVCLOG(::wpi::WPI_LOG_DEBUG2, format __VA_OPT__(, ) __VA_ARGS__)
+#define UVCDEBUG3(format, ...) \
+  UVCLOG(::wpi::WPI_LOG_DEBUG3, format __VA_OPT__(, ) __VA_ARGS__)
+#define UVCDEBUG4(format, ...) \
+  UVCLOG(::wpi::WPI_LOG_DEBUG4, format __VA_OPT__(, ) __VA_ARGS__)
+#endif
+
 // USB descriptor for UVC processing unit
 struct ProcessingUnitDescriptor
 {
@@ -49,7 +110,7 @@ const propertyInfo_t propertyInfo[] =
 
 + (instancetype)createFromAVCaptureDevice:(AVCaptureDevice*)device status:(CS_Status*)status {
     if (!device) {
-        NSLog(@"[UvcControlImpl] device is nil");
+        NSLog(@"UVC: device is nil");
         *status = CS_UVC_STATUS_ERROR;
         return nil;
     }
@@ -59,14 +120,14 @@ const propertyInfo_t propertyInfo[] =
                                                                          options:0 
                                                                            error:&error];
     if (error) {
-        NSLog(@"[UvcControlImpl] failed to create regex: %@", error);
+        NSLog(@"UVC: failed to create regex: %@", error);
         *status = CS_UVC_STATUS_ERROR;
         return nil;
     }
     
     NSString* modelID = [device valueForKey:@"modelID"];
     if (!modelID) {
-        NSLog(@"[UvcControlImpl] modelID is nil");
+        NSLog(@"UVC: modelID is nil");
         *status = CS_UVC_STATUS_ERROR;
         return nil;
     }
@@ -75,7 +136,7 @@ const propertyInfo_t propertyInfo[] =
                                                    options:0 
                                                      range:NSMakeRange(0, modelID.length)];
     if (!match || match.numberOfRanges != 3) {
-        NSLog(@"[UvcControlImpl] modelID regex match failed");
+        NSLog(@"UVC: modelID regex match failed");
         *status = CS_UVC_STATUS_ERROR;
         return nil;
     }
@@ -120,7 +181,7 @@ const propertyInfo_t propertyInfo[] =
                                         location:locationID 
                                            status:status];
     if (!instance) {
-        NSLog(@"[UvcControlImpl] failed to create UvcControlImpl, status=%d", *status);
+        NSLog(@"UVC: failed to create UvcControlImpl, status=%d", *status);
     }
     return instance;
 }
@@ -131,21 +192,20 @@ const propertyInfo_t propertyInfo[] =
                          status:(CS_Status*)status {
     self = [super init];
     if (self) {
-        NSLog(@"[UvcControlImpl] Initializing with VID: 0x%04X, PID: 0x%04X, Location: 0x%08X", vid, pid, location);
+        // UVCINFO("Initializing with VID: 0x{:04X}, PID: 0x{:04X}, Location: 0x{:08X}", vid, pid, location);
         _deviceInterface = [self findDevice:vid productId:pid location:location];
         if (_deviceInterface == nullptr) {
-            NSLog(@"[UvcControlImpl] Failed to find device");
+            // UVCWARNING("Failed to find device");
             *status = CS_UVC_STATUS_DEVICE_DISCONNECTED;
             return nil;
         }
         
         _processingUnitID = [self getProcessingUnitID:_deviceInterface];
-        NSLog(@"[UvcControlImpl] Processing Unit ID: %u", _processingUnitID);
         
         _controlInterface = [self createControlInterface:_deviceInterface];
         
         if (_controlInterface == nullptr) {
-            NSLog(@"[UvcControlImpl] Failed to create control interface");
+            // UVCWARNING("Failed to create control interface");
             *status = CS_UVC_STATUS_DEVICE_DISCONNECTED;
             return nil;
         }
@@ -166,14 +226,13 @@ const propertyInfo_t propertyInfo[] =
 - (IOUSBDeviceInterface**)findDevice:(uint16_t)vid 
                           productId:(uint16_t)pid 
                           location:(uint32_t)location {
-    NSLog(@"[UvcControlImpl] findDevice: called");
 
     CFMutableDictionaryRef dict = IOServiceMatching(kIOUSBDeviceClassName);
     
     io_iterator_t serviceIterator;
     kern_return_t result = IOServiceGetMatchingServices((mach_port_t)NULL, dict, &serviceIterator);
     if (result != kIOReturnSuccess) {
-        NSLog(@"[UvcControlImpl] findDevice: IOServiceGetMatchingServices failed: %d", result);
+        UVCERROR("findDevice: IOServiceGetMatchingServices failed: {}", result);
         return nullptr;
     }
     
@@ -188,7 +247,7 @@ const propertyInfo_t propertyInfo[] =
             kIOCFPlugInInterfaceID, &plugInInterface, &score);
             
         if ((result != kIOReturnSuccess) || (plugInInterface == nullptr)) {
-            NSLog(@"[UvcControlImpl] findDevice: Camera control error: %d", result);
+            UVCERROR("findDevice: Camera control error: {}", result);
             IOObjectRelease(device);
             continue;
         }
@@ -200,7 +259,7 @@ const propertyInfo_t propertyInfo[] =
         if (hr || (deviceInterface == nullptr)) {
             (*plugInInterface)->Release(plugInInterface);
             IOObjectRelease(device);
-            NSLog(@"[UvcControlImpl] findDevice: QueryInterface failed");
+            UVCERROR("findDevice: QueryInterface failed");
             continue;
         }
         
@@ -241,11 +300,11 @@ const propertyInfo_t propertyInfo[] =
         return 0;
     }
 
-    NSLog(@"[UvcControlImpl] getProcessingUnitID: USB descriptor:\n");
-    NSLog(@"  length    = %08X\n", configDesc->bLength);
-    NSLog(@"  type      = %08X\n", configDesc->bDescriptorType);
-    NSLog(@"  totalLen  = %08X\n", configDesc->wTotalLength);
-    NSLog(@"  interfaces = %08X\n", configDesc->bNumInterfaces);
+    UVCDEBUG4("USB descriptor:");
+    UVCDEBUG4("  length    = 0x{:08X}", configDesc->bLength);
+    UVCDEBUG4("  type      = 0x{:08X}", configDesc->bDescriptorType);
+    UVCDEBUG4("  totalLen  = 0x{:08X}", configDesc->wTotalLength);
+    UVCDEBUG4("  interfaces = 0x{:08X}", configDesc->bNumInterfaces);
     
     uint32_t idx = 0;
     uint8_t *ptr = (uint8_t*)configDesc;
@@ -263,25 +322,20 @@ const propertyInfo_t propertyInfo[] =
         switch(hdr->bDescriptorType)
             {
                 case 0x05:  // Endpoint descriptor ID
-                    NSLog(@"[UvcControlImpl] getProcessingUnitID: Endpoint\n");
                     break;
                 case 0x02:  // Configuration descriptor ID
-                    NSLog(@"[UvcControlImpl] getProcessingUnitID: Configuration\n");
                     break;
                 case 0x04: // Interface descriptor ID
-                    NSLog(@"[UvcControlImpl] getProcessingUnitID: Interface");
                     iface = (IOUSBInterfaceDescriptor*)&ptr[idx];
                     if ((iface->bInterfaceClass == 14) && 
                         (iface->bInterfaceSubClass == 1) &&
                         (iface->bInterfaceProtocol == 0))
                     {
                         inVideoControlInterfaceDescriptor = true;
-                        NSLog(@" VIDEO/CONTROL\n");
                     }
                     else
                     {
                         inVideoControlInterfaceDescriptor = false;
-                        NSLog(@"\n");
                     }
                     break;
                 case 0x24: // class-specific ID
@@ -290,15 +344,11 @@ const propertyInfo_t propertyInfo[] =
                     {
                         if (pud->bDescriptorSubtype == 0x05)
                         {
-                            NSLog(@"Processing Unit ID: %d\n", 
-                                pud->bUnitID);
                             return pud->bUnitID;
                         }
                     }
-                    //LOG(LOG_VERBOSE,"\n");
                     break;
                 default:
-                    //LOG(LOG_VERBOSE,"?\n");
                     break;
             }
         idx += hdr->bLength;
@@ -337,7 +387,7 @@ const propertyInfo_t propertyInfo[] =
             
         kr = IOObjectRelease(usbInterface);
         if ((kr != kIOReturnSuccess) || !plugInInterface) {
-            NSLog(@"[UvcControlImpl] createControlInterface: cannot create plug-in %08X",
+            UVCERROR("createControlInterface: cannot create plug-in {:08X}",
                 kr);
             return nullptr;
         }
@@ -349,12 +399,12 @@ const propertyInfo_t propertyInfo[] =
         (*plugInInterface)->Release(plugInInterface);
         
         if (hr || !controlInterface) {
-            NSLog(@"[UvcControlImpl] createControlInterface: cannot create device interface %08X",
+            UVCERROR("createControlInterface: cannot create device interface {:08X}",
                 result);
             return nullptr;
         }
         
-        NSLog(@"[UvcControlImpl] createControlInterface: created control interface");
+        UVCDEBUG3("createControlInterface: created control interface");
         return controlInterface;
     }
     return nullptr;
@@ -362,7 +412,7 @@ const propertyInfo_t propertyInfo[] =
 
 - (bool)sendControlRequest:(IOUSBDevRequest)req {
     if (_controlInterface == nullptr) {
-        NSLog(@"[UvcControlImpl] sendControlRequest: control interface is NULL");
+        UVCERROR("control interface is NULL");
         return false;
     }
 
@@ -372,7 +422,7 @@ const propertyInfo_t propertyInfo[] =
     } else {
         kr = (*_controlInterface)->USBInterfaceOpen(_controlInterface);
         if (kr != kIOReturnSuccess) {
-            NSLog(@"[UvcControlImpl] sendControlRequest: USBInterfaceOpen failed with error: 0x%08X", kr);
+            UVCERROR("USBInterfaceOpen failed with error: 0x{:08X}", kr);
             return false;
         }
     }
@@ -391,27 +441,27 @@ const propertyInfo_t propertyInfo[] =
         switch(kr)
         {
             case kIOUSBUnknownPipeErr:
-                NSLog(@"[UvcControlImpl] sendControlRequest: Pipe ref not recognised");
+                UVCERROR("Pipe ref not recognised");
                 break;
             case kIOUSBTooManyPipesErr:
-                NSLog(@"[UvcControlImpl] sendControlRequest: Too many pipes");
+                UVCERROR("Too many pipes");
                 break;
             case kIOUSBEndpointNotFound:
-                NSLog(@"[UvcControlImpl] sendControlRequest: Endpoint not found");
+                UVCERROR("Endpoint not found");
                 break;
             case kIOUSBConfigNotFound:
-                NSLog(@"[UvcControlImpl] sendControlRequest: USB configuration not found");
+                UVCERROR("USB configuration not found");
                 break;
             case kIOUSBPipeStalled:
                 //Note: we don't report this as an error as this happens when
                 //      an unsupported or locked property is set.            
-                NSLog(@"[UvcControlImpl] sendControlRequest: Pipe has stalled, error needs to be cleared");
+                UVCDEBUG("Pipe has stalled, error needs to be cleared");
                 break;
             case kIOUSBInterfaceNotFound:
-                NSLog(@"[UvcControlImpl] sendControlRequest: USB control interface not found");
+                UVCERROR("USB control interface not found");
                 break;
             default:
-                NSLog(@"[UvcControlImpl] sendControlRequest: ControlRequest failed (KR=sys:sub:code) = %02Xh:%03Xh:%04Xh)", 
+                UVCERROR("ControlRequest failed (KR=sys:sub:code) = {:02Xh}:{:03Xh}:{:04Xh}", 
                     sys, sub, code);
                 break; 
         }
@@ -421,7 +471,7 @@ const propertyInfo_t propertyInfo[] =
         } else {
             kr = (*_controlInterface)->USBInterfaceClose(_controlInterface);
             if (kr != kIOReturnSuccess) {
-                NSLog(@"[UvcControlImpl] sendControlRequest: USBInterfaceClose failed");
+                UVCERROR("USBInterfaceClose failed");
             }
         }
         return false;
@@ -433,7 +483,7 @@ const propertyInfo_t propertyInfo[] =
         kr = (*_controlInterface)->USBInterfaceClose(_controlInterface);
 
         if (kr != kIOReturnSuccess) {
-            NSLog(@"[UvcControlImpl] sendControlRequest: USBInterfaceClose failed");
+            UVCERROR("USBInterfaceClose failed");
         }
     }
 
@@ -518,7 +568,7 @@ const propertyInfo_t propertyInfo[] =
 
 - (bool)setProperty:(uint32_t)propID withValue:(int32_t)value status:(CS_Status*)status {
     if (_controlInterface == nullptr) {
-        NSLog(@"[UvcControlImpl] setProperty: control interface is NULL");
+        UVCERROR("control interface is NULL");
         *status = CS_UVC_STATUS_DEVICE_DISCONNECTED;
         return false;
     }
@@ -526,20 +576,19 @@ const propertyInfo_t propertyInfo[] =
     bool ok = false;
     if (propID < CAPPROPID_LAST) {
         uint32_t unit = (propertyInfo[propID].unit == 0) ? UVC_INPUT_TERMINAL_ID : _processingUnitID;
-        NSLog(@"[UvcControlImpl] Setting property %u to value %d (unit: %u)", propID, value, unit);
         ok = [self setData:propertyInfo[propID].selector unit:unit length:propertyInfo[propID].length data:value];
         if (!ok) {
-            NSLog(@"[UvcControlImpl] Failed to set property %u", propID);
+            UVCWARNING("Failed to set property {}", propID);
         }
     } else {
-        NSLog(@"[UvcControlImpl] Invalid property ID: %u", propID);
+        UVCWARNING("Invalid property ID: {}", propID);
     }
     return ok;
 }
 
 - (bool)getProperty:(uint32_t)propID withValue:(int32_t*)value status:(CS_Status*)status {
     if (_controlInterface == nullptr) {
-        NSLog(@"[UvcControlImpl] getProperty: control interface is NULL");
+        UVCERROR("control interface is NULL");
         *status = CS_UVC_STATUS_DEVICE_DISCONNECTED;
         return false;
     }
@@ -547,7 +596,6 @@ const propertyInfo_t propertyInfo[] =
     bool ok = false;
     if (propID < CAPPROPID_LAST) {
         uint32_t unit = (propertyInfo[propID].unit == 0) ? UVC_INPUT_TERMINAL_ID : _processingUnitID;
-        NSLog(@"[UvcControlImpl] Getting property %u (unit: %u)", propID, unit);
         ok = [self getData:propertyInfo[propID].selector unit:unit length:propertyInfo[propID].length data:value];
 
         switch(propertyInfo[propID].length) {
@@ -560,20 +608,18 @@ const propertyInfo_t propertyInfo[] =
             default:
                 break;
         }
-        if (ok) {
-            NSLog(@"[UvcControlImpl] Property %u value: %d", propID, *value);
-        } else {
-            NSLog(@"[UvcControlImpl] Failed to get property %u", propID);
+        if (!ok) {
+            UVCWARNING("Failed to get property {}", propID);
         }
     } else {
-        NSLog(@"[UvcControlImpl] Invalid property ID: %u", propID);
+        UVCWARNING("Invalid property ID: {}", propID);
     }
     return ok;
 }
 
 - (bool)setAutoProperty:(uint32_t)propID enabled:(bool)enabled status:(CS_Status*)status {
     if (_controlInterface == nullptr) {
-        NSLog(@"[UvcControlImpl] setAutoProperty: control interface is NULL");
+        UVCERROR("control interface is NULL");
         *status = CS_UVC_STATUS_DEVICE_DISCONNECTED;
         return false;
     }
@@ -581,13 +627,10 @@ const propertyInfo_t propertyInfo[] =
     int32_t value = enabled ? 1 : 0;
     switch(propID) {
         case CAPPROPID_EXPOSURE:
-            NSLog(@"[UvcControlImpl] Setting auto property %u to %@", propID, enabled ? @"enabled" : @"disabled");
             return [self setData:CT_AE_MODE_CONTROL unit:UVC_INPUT_TERMINAL_ID length:1 data:enabled ? 0x8 : 0x1];
         case CAPPROPID_WHITEBALANCE:
-            NSLog(@"[UvcControlImpl] Setting auto property %u to %@", propID, enabled ? @"enabled" : @"disabled");
             return [self setData:PU_WHITE_BALANCE_TEMPERATURE_AUTO_CONTROL unit:_processingUnitID length:1 data:value];
         case CAPPROPID_FOCUS:
-            NSLog(@"[UvcControlImpl] Setting auto property %u to %@", propID, enabled ? @"enabled" : @"disabled");
             return [self setData:CT_FOCUS_AUTO_CONTROL unit:UVC_INPUT_TERMINAL_ID length:1 data:value];
         default:
             return false;
@@ -596,18 +639,16 @@ const propertyInfo_t propertyInfo[] =
 
 - (bool)getAutoProperty:(uint32_t)propID enabled:(bool*)enabled status:(CS_Status*)status {
     if (_controlInterface == nullptr) {
-        NSLog(@"[UvcControlImpl] getAutoProperty: control interface is NULL");
+        UVCERROR("control interface is NULL");
         *status = CS_UVC_STATUS_DEVICE_DISCONNECTED;
         return false;
     }
 
     int32_t value;
-    NSLog(@"[UvcControlImpl] Getting auto property %u", propID);
     
     switch(propID) {
         case CAPPROPID_EXPOSURE:
             if ([self getData:CT_AE_MODE_CONTROL unit:UVC_INPUT_TERMINAL_ID length:1 data:&value]) {
-                NSLog(@"[UvcControlImpl] Exposure auto mode: %@", *enabled ? @"enabled" : @"disabled");
                 // value = 1 -> manual mode
                 //         2 -> auto mode (I haven't seen this in the wild)
                 //         4 -> shutter priority mode (haven't seen this)
@@ -621,7 +662,7 @@ const propertyInfo_t propertyInfo[] =
             if ([self getData:PU_WHITE_BALANCE_TEMPERATURE_AUTO_CONTROL unit:_processingUnitID length:1 data:&value]) {
                 value &= 0xFF;
                 *enabled = (value==1) ? true : false;
-                NSLog(@"[UvcControlImpl] White balance auto mode: %@", *enabled ? @"enabled" : @"disabled");
+                UVCDEBUG3("White balance auto mode: {}", *enabled ? "enabled" : "disabled");
                 return true;
             }
             return false;
@@ -629,12 +670,12 @@ const propertyInfo_t propertyInfo[] =
             if ([self getData:CT_FOCUS_AUTO_CONTROL unit:UVC_INPUT_TERMINAL_ID length:1 data:&value]) {
                 value &= 0xFF;
                 *enabled = (value==1) ? true : false;
-                NSLog(@"[UvcControlImpl] Focus auto mode: %@", *enabled ? @"enabled" : @"disabled");
+                UVCDEBUG3("Focus auto mode: {}", *enabled ? "enabled" : "disabled");
                 return true;
             }
             return false;
         default:
-            NSLog(@"[UvcControlImpl] Unsupported auto property ID: %u", propID);
+            UVCWARNING("Unsupported auto property ID: {}", propID);
             return false;
     }
 }
@@ -650,17 +691,14 @@ const propertyInfo_t propertyInfo[] =
         uint32_t unit = (propertyInfo[propID].unit == 0) ? UVC_INPUT_TERMINAL_ID : _processingUnitID;
         
         if (![self getMinData:propertyInfo[propID].selector unit:unit length:propertyInfo[propID].length data:min]) {
-            NSLog(@"[UvcControlImpl] getPropertyLimits: getMinData failed");
             ok = false;
         }
 
         if (![self getMaxData:propertyInfo[propID].selector unit:unit length:propertyInfo[propID].length data:max]) {
-            NSLog(@"[UvcControlImpl] getPropertyLimits: getMaxData failed");
             ok = false;
         }
 
         if (![self getDefault:propertyInfo[propID].selector unit:unit length:propertyInfo[propID].length data:defValue]) {
-            NSLog(@"[UvcControlImpl] getPropertyLimits: getDefault failed");
             ok = false;
         }
 
@@ -679,7 +717,7 @@ const propertyInfo_t propertyInfo[] =
                 break;
         }
     } else {
-        NSLog(@"[UvcControlImpl] getPropertyLimits: property ID out of bounds");
+        UVCWARNING("getPropertyLimits: property ID out of bounds");
         ok = false;
     }
     return ok;
@@ -689,24 +727,24 @@ const propertyInfo_t propertyInfo[] =
     uint32_t info;
     [self getInfo:selector unit:unit data:&info];
     if (info & 0x01) {
-        NSLog(@"GET ");
+        UVCDEBUG4("GET ");
     }
     if (info & 0x02) {
-        NSLog(@"SET ");
+        UVCDEBUG4("SET ");
     }
     if (info & 0x04) {
-        NSLog(@"DISABLED ");
+        UVCDEBUG4("DISABLED ");
     }
     if (info & 0x08) {
-        NSLog(@"AUTO-UPD ");
+        UVCDEBUG4("AUTO-UPD ");
     }
     if (info & 0x10) {
-        NSLog(@"ASYNC ");
+        UVCDEBUG4("ASYNC ");
     }
     if (info & 0x20) {
-        NSLog(@"DISCOMMIT");
+        UVCDEBUG4("DISCOMMIT");
     }
-    NSLog(@"\n");
+    UVCDEBUG4("");
 }
 
 @end 

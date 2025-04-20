@@ -110,14 +110,14 @@ using namespace cs;
   });
 }
 
-// Quirk: exposure auto is 3 for on, 1 for off
-- (BOOL)getPropertyEnabled:(int)propID withValue:(int)value {
+- (BOOL)getEnabledWithProperty:(int)property withValue:(int)value {
   auto sharedThis = self.cppImpl.lock();
   if (!sharedThis) {
     return false;
   }
 
-  if (propID == sharedThis->GetPropertyIndex(kPropertyAutoExposure)) {
+  // Quirk: exposure auto is 3 for on, 1 for off
+  if (property == sharedThis->GetPropertyIndex(kPropertyAutoExposure)) {
     return value == kPropertyAutoExposureOn;
   }
 
@@ -135,11 +135,12 @@ using namespace cs;
   return value;
 }
 
-- (int)rawToPercentage:(int)propID rawValue:(int)rawValue min:(int)min max:(int)max {
+- (int)percentageToRaw:(int)propID percentage:(int)percentage min:(int)min max:(int)max {
   if (min == max) {
-    return 0;
+    return min;
   }
-  return [self clampToPercent:100 * (rawValue - min) / (max - min)];
+
+  return min + (max - min) * percentage / 100;
 }
 
 - (BOOL)isPercentageProperty:(int)propID {
@@ -170,7 +171,7 @@ using namespace cs;
     wpi::SmallString<128> nameBuf;
     std::string_view propName = sharedThis->GetPropertyName(property, nameBuf, status);
     if (*status != 0) {
-        OBJCERROR("Failed to get property name for index %d", property);
+        OBJCERROR("Failed to get property name for index {}", property);
         return;
     }
     
@@ -181,7 +182,7 @@ using namespace cs;
     auto autoIt = propertyAutoCache.find(nameStr);
     if (autoIt != propertyAutoCache.end()) {
         uint32_t propID = autoIt->second;
-        bool enabled = [self getPropertyEnabled:propID withValue:value];
+        bool enabled = [self getEnabledWithProperty:property withValue:value];
         dispatch_async_and_wait(self.sessionQueue, ^{
             if (self.uvcControl == nil) {
                 *status = CS_INVALID_PROPERTY;
@@ -189,8 +190,8 @@ using namespace cs;
             }
             
             if (![self.uvcControl setAutoProperty:propID enabled:enabled status:status]) {
-                OBJCERROR("Failed to set auto property %s to %d",
-                        nameStr.c_str(), enabled);
+                OBJCERROR("Failed to set auto property {} to {}",
+                        nameStr, enabled);
                 return;
             }
             
@@ -204,7 +205,7 @@ using namespace cs;
     auto& propertyCache = sharedThis->GetPropertyCache();
     auto it = propertyCache.find(nameStr);
     if (it == propertyCache.end()) {
-        OBJCERROR("Property not found in cache: %s", nameStr.c_str());
+        OBJCERROR("Property not found in cache: {}", nameStr);
         *status = CS_INVALID_PROPERTY;
         return;
     }
@@ -227,12 +228,15 @@ using namespace cs;
 
         int32_t realValue = value;
         if ([self isPercentageProperty:propID]) {
-            // Use property's min/max values for conversion
-            realValue = [self rawToPercentage:propID rawValue:value min:prop->minimum max:prop->maximum];
+            // Clamp to 0-100
+            realValue = [self clampToPercent:realValue];
+
+            // Scale to min/max
+            realValue = [self percentageToRaw:propID percentage:realValue min:prop->minimum max:prop->maximum];
         }
 
         if (![self.uvcControl setProperty:propID withValue:realValue status:status]) {
-            OBJCERROR("Failed to set property %s to value %d", nameStr.c_str(), realValue);
+            OBJCERROR("Failed to set property {} to value {}", nameStr, realValue);
             return;
         }
         
@@ -595,6 +599,8 @@ using namespace cs;
     int32_t value = defaultValue;
     CS_Status status;
     
+    std::string nameStr = std::string([name UTF8String]);
+    
     if (self.uvcControl != nil) {
         // Get the property limits
         if ([self.uvcControl getPropertyLimits:propID 
@@ -603,23 +609,20 @@ using namespace cs;
                                      defValue:&defaultValue 
                                        status:&status]) {
         } else {
-            OBJCWARNING("Failed to get property limits for %u, using defaults", propID);
+            OBJCWARNING("Failed to get property limits for {}", nameStr);
             return;
         }
         
         // Get current value
         if (![self.uvcControl getProperty:propID withValue:&value status:&status]) {
             value = defaultValue;
-            OBJCWARNING("Failed to get current value for %u, using default: %d", 
-                      propID, value);
+            OBJCWARNING("Failed to get current value for {}: {}", 
+                      nameStr, value);
             return;
         }
     }
     
     // Create property
-    std::string nameStr = std::string([name UTF8String]);
-    
-    // Store in our local cache for mapping properties
     auto& propertyCache = sharedThis->GetPropertyCache();
     propertyCache[nameStr] = propID;
     
@@ -657,7 +660,7 @@ using namespace cs;
     
     if (self.uvcControl != nil) {
        if(![self.uvcControl getAutoProperty:propID enabled:&enabled status:&status]) {
-        OBJCERROR("Failed to get auto property %s", nameStr.c_str());
+        OBJCWARNING("Failed to get auto property {}", nameStr);
         return;
        }
     }
@@ -1006,9 +1009,10 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   self.uvcControl = [UvcControlImpl createFromAVCaptureDevice:self.videoDevice status:&status];
   if (self.uvcControl == nil) {
     OBJCWARNING("Failed to initialize UVC control for camera: {}", status);
-  } else {
-    OBJCINFO("UVC control initialized successfully");
   }
+  
+  OBJCINFO("UVC control initialized successfully");
+  self.uvcControl.cppImpl = self.cppImpl;
 
   self.callback = [[UsbCameraDelegate alloc] init];
   if (self.callback == nil) {

@@ -10,6 +10,8 @@
 #import <IOKit/IOKitLib.h>
 #import <IOKit/IOCFPlugIn.h>
 #import <IOKit/usb/IOUSBLib.h>
+#import "UsbCameraDelegate.h"
+
 #include <memory>
 #include <string_view>
 #include "cscore_cpp.h"
