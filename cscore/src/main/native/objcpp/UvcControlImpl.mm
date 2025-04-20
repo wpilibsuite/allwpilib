@@ -24,8 +24,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#import "UvcControlImpl.h"
 #import <AVFoundation/AVFoundation.h>
+
+#import "UvcControlImpl.h"
 
 #include "Log.h"
 #include "UsbCameraImpl.h"

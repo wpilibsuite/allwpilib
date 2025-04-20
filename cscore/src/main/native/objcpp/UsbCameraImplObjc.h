@@ -5,11 +5,13 @@
 #pragma once
 
 #import <AVFoundation/AVFoundation.h>
-#import "UsbCameraDelegate.h"
-#import "UvcControlImpl.h"
 
 #include <memory>
 #include <string_view>
+
+#import "UsbCameraDelegate.h"
+#import "UvcControlImpl.h"
+
 #include "cscore_cpp.h"
 
 // Quirk: exposure auto is 3 for on, 1 for off

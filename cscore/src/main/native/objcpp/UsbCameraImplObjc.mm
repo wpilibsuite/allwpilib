@@ -5,10 +5,10 @@
 #include <wpi/SmallString.h>
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#import "UsbCameraImplObjc.h"
+
 #include "Notifier.h"
 #include "Log.h"
-
-#import "UsbCameraImplObjc.h"
 #include "UsbCameraImpl.h"
 
 template <typename S, typename... Args>
@@ -886,6 +886,8 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
       nearestDuration = maxDuration;
     }
   }
+
+  OBJCDEBUG("Nearest fps: {}", nearestDuration.timescale / static_cast<double>(nearestDuration.value));
   
   return nearestDuration;
 }
@@ -1009,9 +1011,10 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   self.uvcControl = [UvcControlImpl createFromAVCaptureDevice:self.videoDevice status:&status];
   if (self.uvcControl == nil) {
     OBJCWARNING("Failed to initialize UVC control for camera: {}", status);
+  } else {
+    OBJCINFO("UVC control initialized successfully");
   }
   
-  OBJCINFO("UVC control initialized successfully");
   self.uvcControl.cppImpl = self.cppImpl;
 
   self.callback = [[UsbCameraDelegate alloc] init];
