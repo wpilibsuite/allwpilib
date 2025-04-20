@@ -189,15 +189,31 @@
     "commandversion": 2
   },
   {
-    "name": "Elevator with profiled PID controller",
-    "description": "Reach elevator position setpoints with an encoder and profiled PID control.",
+    "name": "Elevator with an exponential profiled PID controller",
+    "description": "Reach elevator position setpoints with an encoder and exponential profiled PID control.",
     "tags": [
       "Basic Robot",
       "Elevator",
       "Profiled PID",
-      "Joystick"
+      "Joystick",
+      "Exponential Profile"
     ],
-    "foldername": "elevatorprofiledpid",
+    "foldername": "elevatorexponentialpid",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Elevator with a trapezoid profiled PID controller",
+    "description": "Reach elevator position setpoints with an encoder and trapezoid profiled PID control.",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Profiled PID",
+      "Joystick",
+      "Trapezoid Profile"
+    ],
+    "foldername": "elevatortrapezoidpid",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -667,7 +683,7 @@
     "commandversion": 2
   },
   {
-    "name": "ElevatorSimulation",
+    "name": "ElevatorExponentialSimulation",
     "description": "Simulate an elevator.",
     "tags": [
       "Basic Robot",
@@ -675,15 +691,16 @@
       "State-Space",
       "Simulation",
       "Mechanism2d",
-      "Profiled PID"
+      "Profiled PID",
+      "Exponential Profile"
     ],
-    "foldername": "elevatorsimulation",
+    "foldername": "elevatorexponentialsimulation",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
   },
   {
-    "name": "Elevator Exponential Profile Simulation",
+    "name": "ElevatorTrapezoidSimulation",
     "description": "Simulate an elevator.",
     "tags": [
       "Basic Robot",
@@ -691,10 +708,10 @@
       "State-Space",
       "Simulation",
       "Mechanism2d",
-      "PID",
-      "Exponential Profile"
+      "Profiled PID",
+      "Trapezoid Profile"
     ],
-    "foldername": "elevatorexponentialsimulation",
+    "foldername": "elevatortrapezoidsimulation",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2

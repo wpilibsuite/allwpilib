@@ -10,11 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.math.trajectory.ExponentialProfile;
 import org.junit.jupiter.api.Test;
 
-class ProfiledPIDInputOutputTest {
+class ExponentialPIDInputOutputTest {
   @Test
   void continuousInputTest1() {
     var controller =
-        new ExponentialPIDController(0.0, 0.0, 0.0, ExponentialProfile.Constraints.fromCharacteristics(12, 1, 1));
+        new ExponentialPIDController(
+            0.0, 0.0, 0.0, ExponentialProfile.Constraints.fromCharacteristics(12, 1, 1));
 
     controller.setP(1);
     controller.enableContinuousInput(-180, 180);
@@ -33,7 +34,8 @@ class ProfiledPIDInputOutputTest {
   @Test
   void continuousInputTest2() {
     var controller =
-        new ExponentialPIDController(0.0, 0.0, 0.0, ExponentialProfile.Constraints.fromCharacteristics(12, 1, 1));
+        new ExponentialPIDController(
+            0.0, 0.0, 0.0, ExponentialProfile.Constraints.fromCharacteristics(12, 1, 1));
 
     controller.setP(1);
     controller.enableContinuousInput(-Math.PI, Math.PI);
@@ -52,7 +54,8 @@ class ProfiledPIDInputOutputTest {
   @Test
   void continuousInputTest3() {
     var controller =
-        new ExponentialPIDController(0.0, 0.0, 0.0, ExponentialProfile.Constraints.fromCharacteristics(12, 1, 1));
+        new ExponentialPIDController(
+            0.0, 0.0, 0.0, ExponentialProfile.Constraints.fromCharacteristics(12, 1, 1));
 
     controller.setP(1);
     controller.enableContinuousInput(-Math.PI, Math.PI);
@@ -71,7 +74,8 @@ class ProfiledPIDInputOutputTest {
   @Test
   void continuousInputTest4() {
     var controller =
-        new ExponentialPIDController(0.0, 0.0, 0.0, ExponentialProfile.Constraints.fromCharacteristics(12, 1, 1));
+        new ExponentialPIDController(
+            0.0, 0.0, 0.0, ExponentialProfile.Constraints.fromCharacteristics(12, 1, 1));
 
     controller.setP(1);
     controller.enableContinuousInput(0, 2.0 * Math.PI);
@@ -90,7 +94,8 @@ class ProfiledPIDInputOutputTest {
   @Test
   void proportionalGainOutputTest() {
     var controller =
-        new ExponentialPIDController(0.0, 0.0, 0.0, ExponentialProfile.Constraints.fromCharacteristics(12, 1, 1));
+        new ExponentialPIDController(
+            0.0, 0.0, 0.0, ExponentialProfile.Constraints.fromCharacteristics(12, 1, 1));
 
     controller.setP(4);
 
@@ -100,7 +105,8 @@ class ProfiledPIDInputOutputTest {
   @Test
   void integralGainOutputTest() {
     var controller =
-        new ExponentialPIDController(0.0, 0.0, 0.0, ExponentialProfile.Constraints.fromCharacteristics(12, 1, 1));
+        new ExponentialPIDController(
+            0.0, 0.0, 0.0, ExponentialProfile.Constraints.fromCharacteristics(12, 1, 1));
 
     controller.setI(4);
 
@@ -116,7 +122,8 @@ class ProfiledPIDInputOutputTest {
   @Test
   void derivativeGainOutputTest() {
     var controller =
-        new ExponentialPIDController(0.0, 0.0, 0.0, ExponentialProfile.Constraints.fromCharacteristics(12, 1, 1));
+        new ExponentialPIDController(
+            0.0, 0.0, 0.0, ExponentialProfile.Constraints.fromCharacteristics(12, 1, 1));
 
     controller.setD(4);
 

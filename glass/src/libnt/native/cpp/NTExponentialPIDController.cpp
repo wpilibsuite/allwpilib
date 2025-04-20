@@ -14,7 +14,7 @@ using namespace glass;
 NTExponentialPIDControllerModel::NTExponentialPIDControllerModel(
     std::string_view path)
     : NTExponentialPIDControllerModel(nt::NetworkTableInstance::GetDefault(),
-                                   path) {}
+                                      path) {}
 
 NTExponentialPIDControllerModel::NTExponentialPIDControllerModel(
     nt::NetworkTableInstance inst, std::string_view path)
@@ -26,7 +26,8 @@ NTExponentialPIDControllerModel::NTExponentialPIDControllerModel(
       m_i{inst.GetDoubleTopic(fmt::format("{}/i", path)).GetEntry(0)},
       m_d{inst.GetDoubleTopic(fmt::format("{}/d", path)).GetEntry(0)},
       m_iZone{inst.GetDoubleTopic(fmt::format("{}/izone", path)).GetEntry(0)},
-      m_maxInput{inst.GetDoubleTopic(fmt::format("{}/maxinput", path)).GetEntry(0)},
+      m_maxInput{
+          inst.GetDoubleTopic(fmt::format("{}/maxinput", path)).GetEntry(0)},
       m_a{inst.GetDoubleTopic(fmt::format("{}/a", path)).GetEntry(0)},
       m_b{inst.GetDoubleTopic(fmt::format("{}/b", path)).GetEntry(0)},
       m_goal{inst.GetDoubleTopic(fmt::format("{}/goal", path)).GetEntry(0)},

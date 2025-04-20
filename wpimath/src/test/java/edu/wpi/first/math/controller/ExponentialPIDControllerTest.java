@@ -13,7 +13,8 @@ class ExponentialPIDControllerTest {
   @Test
   void testStartFromNonZeroPosition() {
     ExponentialPIDController controller =
-        new ExponentialPIDController(1.0, 0.0, 0.0, ExponentialProfile.Constraints.fromStateSpace(12.0, 1.0, 1.0));
+        new ExponentialPIDController(
+            1.0, 0.0, 0.0, ExponentialProfile.Constraints.fromStateSpace(12.0, 1.0, 1.0));
 
     controller.reset(20);
 

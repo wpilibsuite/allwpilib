@@ -59,7 +59,7 @@ class Robot : public frc::TimedRobot {
   frc::TrapezoidProfile<units::meters>::Constraints m_constraints{
       kMaxVelocity, kMaxAcceleration};
   frc::TrapezoidPIDController<units::meters> m_controller{kP, kI, kD,
-                                                         m_constraints, kDt};
+                                                          m_constraints, kDt};
   frc::ElevatorFeedforward m_feedforward{kS, kG, kV};
 };
 

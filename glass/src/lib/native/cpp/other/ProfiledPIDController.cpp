@@ -12,7 +12,6 @@
 #include "glass/DataSource.h"
 
 using namespace glass;
-[[deprecated("Use a TrapezoidPIDController instead")]]
 void glass::DisplayProfiledPIDController(ProfiledPIDControllerModel* m) {
   if (auto name = m->GetName()) {
     ImGui::Text("%s", name);

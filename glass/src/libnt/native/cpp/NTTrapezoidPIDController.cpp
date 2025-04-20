@@ -14,7 +14,7 @@ using namespace glass;
 NTTrapezoidPIDControllerModel::NTTrapezoidPIDControllerModel(
     std::string_view path)
     : NTTrapezoidPIDControllerModel(nt::NetworkTableInstance::GetDefault(),
-                                   path) {}
+                                    path) {}
 
 NTTrapezoidPIDControllerModel::NTTrapezoidPIDControllerModel(
     nt::NetworkTableInstance inst, std::string_view path)

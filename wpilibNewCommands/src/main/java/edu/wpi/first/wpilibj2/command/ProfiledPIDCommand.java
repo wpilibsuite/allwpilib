@@ -14,9 +14,9 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 /**
- * A command that controls an output with a {@link TrapezoidPIDController}. Runs forever by default -
- * to add exit conditions and/or other behavior, subclass this class. The controller calculation and
- * output are performed synchronously in the command's execute() method.
+ * A command that controls an output with a {@link TrapezoidPIDController}. Runs forever by default
+ * - to add exit conditions and/or other behavior, subclass this class. The controller calculation
+ * and output are performed synchronously in the command's execute() method.
  *
  * <p>This class is provided by the NewCommands VendorDep
  *

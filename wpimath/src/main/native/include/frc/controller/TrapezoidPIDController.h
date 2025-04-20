@@ -56,26 +56,28 @@ class TrapezoidPIDController
    *                    default is 20 milliseconds. Must be positive.
    */
   constexpr TrapezoidPIDController(double Kp, double Ki, double Kd,
-                                  Constraints constraints,
-                                  units::second_t period = 20_ms)
+                                   Constraints constraints,
+                                   units::second_t period = 20_ms)
       : m_controller{Kp, Ki, Kd, period},
         m_constraints{constraints},
         m_profile{m_constraints} {
     if (!std::is_constant_evaluated()) {
       int instances = detail::IncrementAndGetTrapezoidPIDControllerInstances();
       wpi::math::MathSharedStore::ReportUsage(
-          wpi::math::MathUsageId::kController_TrapezoidPIDController, instances);
+          wpi::math::MathUsageId::kController_TrapezoidPIDController,
+          instances);
       wpi::SendableRegistry::Add(this, "TrapezoidPIDController", instances);
     }
   }
 
-  constexpr ~PTrapezoidIDController() override = default;
+  constexpr ~TrapezoidPIDController() override = default;
 
   constexpr TrapezoidPIDController(const TrapezoidPIDController&) = default;
   constexpr TrapezoidPIDController& operator=(const TrapezoidPIDController&) =
       default;
   constexpr TrapezoidPIDController(TrapezoidPIDController&&) = default;
-  constexpr TrapezoidPIDController& operator=(TrapezoidPIDController&&) = default;
+  constexpr TrapezoidPIDController& operator=(TrapezoidPIDController&&) =
+      default;
 
   /**
    * Sets the PID Controller gain parameters.

@@ -8,7 +8,6 @@
 
 namespace glass {
 class DataSource;
-[[deprecated("Use a TrapezoidPIDController instead")]]
 class ProfiledPIDControllerModel : public Model {
  public:
   virtual const char* GetName() const = 0;

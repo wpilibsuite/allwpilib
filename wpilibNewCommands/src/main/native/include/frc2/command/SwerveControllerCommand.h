@@ -28,9 +28,9 @@
 namespace frc2 {
 
 /**
- * A command that uses two PID controllers (PIDController) and a trapezoid profiled PID
- * controller (TrapezoidPIDController) to follow a trajectory (Trajectory) with a
- * swerve drive.
+ * A command that uses two PID controllers (PIDController) and a trapezoid
+ * profiled PID controller (TrapezoidPIDController) to follow a trajectory
+ * (Trajectory) with a swerve drive.
  *
  * <p>The command handles trajectory-following, Velocity PID calculations, and
  * feedforwards internally. This is intended to be a more-or-less "complete

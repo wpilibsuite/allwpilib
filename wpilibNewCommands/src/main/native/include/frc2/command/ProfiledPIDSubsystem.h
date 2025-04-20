@@ -20,7 +20,8 @@ namespace frc2 {
  * @deprecated Use a TrapezoidPIDController instead
  */
 template <class Distance>
-class [[deprecated("Use a TrapezoidPIDController instead")]] ProfiledPIDSubsystem
+class [[deprecated(
+    "Use a TrapezoidPIDController instead")]] ProfiledPIDSubsystem
     : public SubsystemBase {
   using Distance_t = units::unit_t<Distance>;
   using Velocity =

@@ -17,9 +17,9 @@ import edu.wpi.first.math.util.Units;
  * sideways, and angular velocity.
  *
  * <p>The holonomic drive controller takes in one PID controller for each direction, forward and
- * sideways, and one trapezoid profiled PID controller for the angular direction. Because the heading dynamics
- * are decoupled from translations, users can specify a custom heading that the drivetrain should
- * point toward. This heading reference is profiled for smoothness.
+ * sideways, and one trapezoid profiled PID controller for the angular direction. Because the
+ * heading dynamics are decoupled from translations, users can specify a custom heading that the
+ * drivetrain should point toward. This heading reference is profiled for smoothness.
  */
 public class HolonomicDriveController {
   private Pose2d m_poseError = Pose2d.kZero;
@@ -41,7 +41,9 @@ public class HolonomicDriveController {
    * @param thetaController A trapezoid profiled PID controller to respond to error in angle.
    */
   public HolonomicDriveController(
-      PIDController xController, PIDController yController, TrapezoidPIDController thetaController) {
+      PIDController xController,
+      PIDController yController,
+      TrapezoidPIDController thetaController) {
     m_xController = xController;
     m_yController = yController;
     m_thetaController = thetaController;

@@ -59,7 +59,8 @@ void glass::DisplayExponentialPIDController(ExponentialPIDControllerModel* m) {
     }
     if (auto s = m->GetMaxInputData()) {
       double value = s->GetValue();
-      createTuningParameter("MaxInput", &value, [=](auto v) { m->SetMaxInput(v); });
+      createTuningParameter("MaxInput", &value,
+                            [=](auto v) { m->SetMaxInput(v); });
     }
     if (auto s = m->GetAData()) {
       double value = s->GetValue();

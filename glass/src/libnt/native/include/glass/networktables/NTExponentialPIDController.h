@@ -39,8 +39,9 @@ class NTExponentialPIDControllerModel : public ExponentialPIDControllerModel {
   void SetI(double value) override;
   void SetD(double value) override;
   void SetIZone(double value) override;
-  void SetV(double value) override;
+  void SetMaxInput(double value) override;
   void SetA(double value) override;
+  void SetB(double value) override;
   void SetGoal(double value) override;
 
   void Update() override;

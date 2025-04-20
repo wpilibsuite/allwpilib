@@ -7,14 +7,18 @@
 #include <gtest/gtest.h>
 
 #include "frc/controller/ExponentialPIDController.h"
+#include "frc/trajectory/ExponentialProfile.h"
 #include "units/angle.h"
 #include "units/angular_acceleration.h"
 #include "units/angular_velocity.h"
 #include "units/voltage.h"
 
+static constexpr auto kV = 2.5629_V / 1_deg_per_s;
+static constexpr auto kA = 0.43277_V / 1_deg_per_s_sq;
+
 TEST(ExponentialPIDInputOutputTest, ContinuousInput1) {
-  frc::ExponentialPIDController<units::degree,units::volt> controller{
-      0.0, 0.0, 0.0, {12_V, 1, 1}};
+  frc::ExponentialPIDController<units::degree, units::volt> controller{
+      1.0, 0.0, 0.0, {10_V, -kV / kA, 1 / kA}};
 
   controller.SetP(1);
   controller.EnableContinuousInput(-180_deg, 180_deg);
@@ -32,8 +36,8 @@ TEST(ExponentialPIDInputOutputTest, ContinuousInput1) {
 }
 
 TEST(ExponentialPIDInputOutputTest, ContinuousInput2) {
-  frc::ExponentialPIDController<units::degree,units::volt> controller{
-      0.0, 0.0, 0.0, {12_V, 1, 1}};
+  frc::ExponentialPIDController<units::degree, units::volt> controller{
+      1.0, 0.0, 0.0, {10_V, -kV / kA, 1 / kA}};
 
   controller.SetP(1);
   controller.EnableContinuousInput(-units::radian_t{std::numbers::pi},
@@ -52,8 +56,8 @@ TEST(ExponentialPIDInputOutputTest, ContinuousInput2) {
 }
 
 TEST(ExponentialPIDInputOutputTest, ContinuousInput3) {
-  frc::ExponentialPIDController<units::degree,units::volt> controller{
-      0.0, 0.0, 0.0, {12_V, 1, 1}};
+  frc::ExponentialPIDController<units::degree, units::volt> controller{
+      1.0, 0.0, 0.0, {10_V, -kV / kA, 1 / kA}};
 
   controller.SetP(1);
   controller.EnableContinuousInput(-units::radian_t{std::numbers::pi},
@@ -72,8 +76,8 @@ TEST(ExponentialPIDInputOutputTest, ContinuousInput3) {
 }
 
 TEST(ExponentialPIDInputOutputTest, ContinuousInput4) {
-  frc::ExponentialPIDController<units::degree,units::volt> controller{
-      0.0, 0.0, 0.0, {12_V, 1, 1}};
+  frc::ExponentialPIDController<units::degree, units::volt> controller{
+      1.0, 0.0, 0.0, {10_V, -kV / kA, 1 / kA}};
 
   controller.SetP(1);
   controller.EnableContinuousInput(0_rad,
@@ -92,8 +96,8 @@ TEST(ExponentialPIDInputOutputTest, ContinuousInput4) {
 }
 
 TEST(ExponentialPIDInputOutputTest, ContinuousInput5) {
-  frc::ExponentialPIDController<units::degree,units::volt> controller{
-      0.0, 0.0, 0.0, {12_V, 1, 1}};
+  frc::ExponentialPIDController<units::degree, units::volt> controller{
+      1.0, 0.0, 0.0, {10_V, -kV / kA, 1 / kA}};
 
   controller.SetP(4);
 
@@ -101,8 +105,8 @@ TEST(ExponentialPIDInputOutputTest, ContinuousInput5) {
 }
 
 TEST(ExponentialPIDInputOutputTest, IntegralGainOutput) {
-  frc::ExponentialPIDController<units::degree,units::volt> controller{
-      0.0, 0.0, 0.0, {12_V, 1, 1}};
+  frc::ExponentialPIDController<units::degree, units::volt> controller{
+      0.0, 0.0, 0.0, {10_V, -kV / kA, 1 / kA}};
 
   controller.SetI(4);
 
@@ -116,8 +120,8 @@ TEST(ExponentialPIDInputOutputTest, IntegralGainOutput) {
 }
 
 TEST(ExponentialPIDInputOutputTest, DerivativeGainOutput) {
-  frc::ExponentialPIDController<units::degree,units::volt> controller{
-      0.0, 0.0, 0.0, {12_V, 1, 1}};
+  frc::ExponentialPIDController<units::degree, units::volt> controller{
+      0.0, 0.0, 0.0, {10_V, -kV / kA, 1 / kA}};
 
   controller.SetD(4);
 

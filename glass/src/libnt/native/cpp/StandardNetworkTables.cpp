@@ -10,6 +10,7 @@
 #include "glass/networktables/NTDifferentialDrive.h"
 #include "glass/networktables/NTDigitalInput.h"
 #include "glass/networktables/NTDigitalOutput.h"
+#include "glass/networktables/NTExponentialPIDController.h"
 #include "glass/networktables/NTFMS.h"
 #include "glass/networktables/NTField2D.h"
 #include "glass/networktables/NTGyro.h"
@@ -18,10 +19,9 @@
 #include "glass/networktables/NTMotorController.h"
 #include "glass/networktables/NTPIDController.h"
 #include "glass/networktables/NTProfiledPIDController.h"
-#include "glass/networktables/NTTrapezoidPIDController.h"
-#include "glass/networktables/NTExponentialPIDController.h"
 #include "glass/networktables/NTStringChooser.h"
 #include "glass/networktables/NTSubsystem.h"
+#include "glass/networktables/NTTrapezoidPIDController.h"
 #include "glass/networktables/NetworkTablesProvider.h"
 
 using namespace glass;

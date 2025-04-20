@@ -8,8 +8,8 @@
 #include <frc/Timer.h>
 #include <frc/controller/HolonomicDriveController.h>
 #include <frc/controller/PIDController.h>
-#include <frc/controller/TrapezoidPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
+#include <frc/controller/TrapezoidPIDController.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/kinematics/MecanumDriveKinematics.h>
@@ -28,9 +28,9 @@
 
 namespace frc2 {
 /**
- * A command that uses two PID controllers (PIDController) and a trapezoid profiled PID
- * controller (TrapezoidPIDController) to follow a trajectory (Trajectory) with a
- * mecanum drive.
+ * A command that uses two PID controllers (PIDController) and a trapezoid
+ * profiled PID controller (TrapezoidPIDController) to follow a trajectory
+ * (Trajectory) with a mecanum drive.
  *
  * <p>The command handles trajectory-following,
  * Velocity PID calculations, and feedforwards internally. This

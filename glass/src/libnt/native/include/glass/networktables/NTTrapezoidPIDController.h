@@ -22,7 +22,7 @@ class NTTrapezoidPIDControllerModel : public TrapezoidPIDControllerModel {
 
   explicit NTTrapezoidPIDControllerModel(std::string_view path);
   NTTrapezoidPIDControllerModel(nt::NetworkTableInstance inst,
-                               std::string_view path);
+                                std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
 

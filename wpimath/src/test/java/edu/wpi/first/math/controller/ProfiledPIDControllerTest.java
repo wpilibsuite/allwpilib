@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import org.junit.jupiter.api.Test;
 
-@Deprecated(forRemoval = true, since = "2025")
 class ProfiledPIDControllerTest {
   @Test
   void testStartFromNonZeroPosition() {

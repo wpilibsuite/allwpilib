@@ -27,8 +27,8 @@ namespace frc {
  * velocity.
  *
  * The holonomic drive controller takes in one PID controller for each
- * direction, forward and sideways, and one trapezoid profiled PID controller for the
- * angular direction. Because the heading dynamics are decoupled from
+ * direction, forward and sideways, and one trapezoid profiled PID controller
+ * for the angular direction. Because the heading dynamics are decoupled from
  * translations, users can specify a custom heading that the drivetrain should
  * point toward. This heading reference is profiled for smoothness.
  */
@@ -41,8 +41,8 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
    * field-relative x direction.
    * @param yController     A PID Controller to respond to error in the
    * field-relative y direction.
-   * @param thetaController A trapezoid profiled PID controller to respond to error in
-   * angle.
+   * @param thetaController A trapezoid profiled PID controller to respond to
+   * error in angle.
    */
   constexpr HolonomicDriveController(
       PIDController xController, PIDController yController,

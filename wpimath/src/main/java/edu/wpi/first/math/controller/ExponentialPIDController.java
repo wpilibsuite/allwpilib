@@ -13,8 +13,8 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
- * Implements a PID control loop whose setpoint is constrained by a exponential profile. Users should
- * call reset() when they first start running the controller to avoid unwanted behavior.
+ * Implements a PID control loop whose setpoint is constrained by a exponential profile. Users
+ * should call reset() when they first start running the controller to avoid unwanted behavior.
  */
 public class ExponentialPIDController implements Sendable {
   private static int instances;
@@ -402,7 +402,9 @@ public class ExponentialPIDController implements Sendable {
    * @return The controller's next output.
    */
   public double calculate(
-      double measurement, ExponentialProfile.State goal, ExponentialProfile.Constraints constraints) {
+      double measurement,
+      ExponentialProfile.State goal,
+      ExponentialProfile.Constraints constraints) {
     setConstraints(constraints);
     return calculate(measurement, goal);
   }
@@ -458,19 +460,22 @@ public class ExponentialPIDController implements Sendable {
         () -> getConstraints().maxInput,
         maxInput ->
             setConstraints(
-                ExponentialProfile.Constraints.fromStateSpace(maxInput, getConstraints().A, getConstraints().B)));
+                ExponentialProfile.Constraints.fromStateSpace(
+                    maxInput, getConstraints().A, getConstraints().B)));
     builder.addDoubleProperty(
-      "a",
-      () -> getConstraints().A,
-      A ->
-          setConstraints(
-              ExponentialProfile.Constraints.fromStateSpace(getConstraints().maxInput, A, getConstraints().B)));
+        "a",
+        () -> getConstraints().A,
+        A ->
+            setConstraints(
+                ExponentialProfile.Constraints.fromStateSpace(
+                    getConstraints().maxInput, A, getConstraints().B)));
     builder.addDoubleProperty(
-      "b",
-      () -> getConstraints().B,
-      B ->
-          setConstraints(
-              ExponentialProfile.Constraints.fromStateSpace(getConstraints().maxInput, getConstraints().A, B)));
+        "b",
+        () -> getConstraints().B,
+        B ->
+            setConstraints(
+                ExponentialProfile.Constraints.fromStateSpace(
+                    getConstraints().maxInput, getConstraints().A, B)));
     builder.addDoubleProperty("goal", () -> getGoal().position, this::setGoal);
   }
 }

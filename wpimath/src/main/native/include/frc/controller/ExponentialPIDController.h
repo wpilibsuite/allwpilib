@@ -31,7 +31,7 @@ int IncrementAndGetExponentialPIDControllerInstances();
 template <class Distance, class Input>
 class ExponentialPIDController
     : public wpi::Sendable,
-      public wpi::SendableHelper<ExponentialPIDController<Distance>> {
+      public wpi::SendableHelper<ExponentialPIDController<Distance, Input>> {
  public:
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
@@ -48,31 +48,34 @@ class ExponentialPIDController
   using kV_t = units::unit_t<KV>;
   using KA = units::compound_unit<Input, units::inverse<Acceleration>>;
   using kA_t = units::unit_t<KA>;
-  using State = typename ExponentialProfile<Distance,Input>::State;
-  using Constraints = typename ExponentialProfile<Distance,Input>::Constraints;
+  using State = typename ExponentialProfile<Distance, Input>::State;
+  using Constraints = typename ExponentialProfile<Distance, Input>::Constraints;
 
   /**
-   * Allocates an ExponentialPIDController with the given constants for Kp, Ki, and
-   * Kd. Users should call reset() when they first start running the controller
-   * to avoid unwanted behavior.
+   * Allocates an ExponentialPIDController with the given constants for Kp, Ki,
+   * and Kd. Users should call reset() when they first start running the
+   * controller to avoid unwanted behavior.
    *
    * @param Kp          The proportional coefficient. Must be >= 0.
    * @param Ki          The integral coefficient. Must be >= 0.
    * @param Kd          The derivative coefficient. Must be >= 0.
-   * @param constraints Exponential constraints for goal (max input, Kv, and Ka).
+   * @param constraints Exponential constraints for goal (max input, Kv, and
+   * Ka).
    * @param period      The period between controller updates in seconds. The
    *                    default is 20 milliseconds. Must be positive.
    */
   constexpr ExponentialPIDController(double Kp, double Ki, double Kd,
-                                  Constraints constraints,
-                                  units::second_t period = 20_ms)
+                                     Constraints constraints,
+                                     units::second_t period = 20_ms)
       : m_controller{Kp, Ki, Kd, period},
         m_constraints{constraints},
         m_profile{m_constraints} {
     if (!std::is_constant_evaluated()) {
-      int instances = detail::IncrementAndGetExponentialPIDControllerInstances();
+      int instances =
+          detail::IncrementAndGetExponentialPIDControllerInstances();
       wpi::math::MathSharedStore::ReportUsage(
-          wpi::math::MathUsageId::kController_ExponentialPIDController, instances);
+          wpi::math::MathUsageId::kController_ExponentialPIDController,
+          instances);
       wpi::SendableRegistry::Add(this, "ExponentialPIDController", instances);
     }
   }
@@ -80,10 +83,11 @@ class ExponentialPIDController
   constexpr ~ExponentialPIDController() override = default;
 
   constexpr ExponentialPIDController(const ExponentialPIDController&) = default;
-  constexpr ExponentialPIDController& operator=(const ExponentialPIDController&) =
-      default;
+  constexpr ExponentialPIDController& operator=(
+      const ExponentialPIDController&) = default;
   constexpr ExponentialPIDController(ExponentialPIDController&&) = default;
-  constexpr ExponentialPIDController& operator=(ExponentialPIDController&&) = default;
+  constexpr ExponentialPIDController& operator=(ExponentialPIDController&&) =
+      default;
 
   /**
    * Sets the PID Controller gain parameters.
@@ -230,7 +234,7 @@ class ExponentialPIDController
    */
   constexpr void SetConstraints(Constraints constraints) {
     m_constraints = constraints;
-    m_profile = ExponentialProfile<Distance,Input>{m_constraints};
+    m_profile = ExponentialProfile<Distance, Input>{m_constraints};
   }
 
   /**
@@ -333,7 +337,7 @@ class ExponentialPIDController
    * @param measurement The current measurement of the process variable.
    */
   constexpr double Calculate(Distance_t measurement) {
-    if (m_controller.IsContinuousInputEnamax input, Ka, and Kvbled()) {
+    if (m_controller.IsContinuousInputEnabled()) {
       // Get error which is smallest distance between goal and measurement
       auto errorBound = (m_maximumInput - m_minimumInput) / 2.0;
       auto goalMinDistance = frc::InputModulus<Distance_t>(
@@ -386,7 +390,8 @@ class ExponentialPIDController
    */
   constexpr double Calculate(
       Distance_t measurement, Distance_t goal,
-      typename frc::ExponentialProfile<Distance,Input>::Constraints constraints) {
+      typename frc::ExponentialProfile<Distance, Input>::Constraints
+          constraints) {
     SetConstraints(constraints);
     return Calculate(measurement, goal);
   }
@@ -434,25 +439,22 @@ class ExponentialPIDController
         "izone", [this] { return GetIZone(); },
         [this](double value) { SetIZone(value); });
     builder.AddDoubleProperty(
-        "maxinput",
-        [this] { return GetConstraints().maxInput; },
+        "maxinput", [this] { return GetConstraints().maxInput.value(); },
         [this](double value) {
-          SetConstraints(
-              Constraints{Input_t{value}, GetConstraints().A, GetConstraints().B});
+          SetConstraints(Constraints{Input_t{value}, GetConstraints().A,
+                                     GetConstraints().B});
         });
     builder.AddDoubleProperty(
-        "a",
-        [this] { return GetConstraints().A; },
+        "a", [this] { return GetConstraints().A.value(); },
         [this](double value) {
-          SetConstraints(
-              Constraints{GetConstraints().maxInput, A_t{value}, GetConstraints().B});
+          SetConstraints(Constraints{GetConstraints().maxInput, A_t{value},
+                                     GetConstraints().B});
         });
     builder.AddDoubleProperty(
-        "b",
-        [this] { return GetConstraints().B; },
+        "b", [this] { return GetConstraints().B.value(); },
         [this](double value) {
-          SetConstraints(
-              Constraints{GetConstraints().maxInput, GetConstraints().A, B_t{value}});
+          SetConstraints(Constraints{GetConstraints().maxInput,
+                                     GetConstraints().A, B_t{value}});
         });
     builder.AddDoubleProperty(
         "goal", [this] { return GetGoal().position.value(); },
@@ -464,10 +466,10 @@ class ExponentialPIDController
   Distance_t m_minimumInput{0};
   Distance_t m_maximumInput{0};
 
-  typename frc::ExponentialProfile<Distance,Input>::Constraints m_constraints;
-  ExponentialProfile<Distance,Input> m_profile;
-  typename frc::ExponentialProfile<Distance,Input>::State m_goal;
-  typename frc::ExponentialProfile<Distance,Input>::State m_setpoint;
+  typename frc::ExponentialProfile<Distance, Input>::Constraints m_constraints;
+  ExponentialProfile<Distance, Input> m_profile;
+  typename frc::ExponentialProfile<Distance, Input>::State m_goal;
+  typename frc::ExponentialProfile<Distance, Input>::State m_setpoint;
 };
 
 }  // namespace frc
