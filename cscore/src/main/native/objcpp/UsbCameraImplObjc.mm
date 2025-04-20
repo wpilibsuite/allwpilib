@@ -182,10 +182,6 @@ using namespace cs;
     if (autoIt != propertyAutoCache.end()) {
         uint32_t propID = autoIt->second;
         bool enabled = [self getPropertyEnabled:propID withValue:value];
-        
-        OBJCINFO("Setting auto property %s (ID=%u) to %s", 
-                nameStr.c_str(), propID, enabled ? "enabled" : "disabled");
-        
         dispatch_async_and_wait(self.sessionQueue, ^{
             if (self.uvcControl == nil) {
                 *status = CS_INVALID_PROPERTY;
@@ -214,8 +210,6 @@ using namespace cs;
     }
     
     uint32_t propID = it->second;
-    OBJCINFO("Setting property %s (ID=%u) to value %d", 
-            nameStr.c_str(), propID, value);
     
     dispatch_async_and_wait(self.sessionQueue, ^{
         if (self.uvcControl == nil) {
@@ -235,8 +229,6 @@ using namespace cs;
         if ([self isPercentageProperty:propID]) {
             // Use property's min/max values for conversion
             realValue = [self rawToPercentage:propID rawValue:value min:prop->minimum max:prop->maximum];
-            OBJCDEBUG("Converting percentage %d to raw value %d (range: [%d,%d])", 
-                    value, realValue, prop->minimum, prop->maximum);
         }
 
         if (![self.uvcControl setProperty:propID withValue:realValue status:status]) {
@@ -559,7 +551,6 @@ using namespace cs;
 // Property caching methods
 - (void)deviceCacheProperties {
     if (self.uvcControl == nil) {
-        OBJCINFO("Cannot cache properties: UVC control is not available");
         return;
     }
 
@@ -568,9 +559,6 @@ using namespace cs;
         OBJCERROR("Cannot cache properties: UsbCameraImpl not available");
         return;
     }
-
-    auto& propertyCache = sharedThis->GetPropertyCache();
-    auto& propertyAutoCache = sharedThis->GetPropertyAutoCache();
 
     // Cache basic properties
     [self cacheProperty:CAPPROPID_BRIGHTNESS withName:@kPropertyBrightness];
@@ -591,10 +579,6 @@ using namespace cs;
     [self cacheAutoProperty:CAPPROPID_EXPOSURE withName:@kPropertyAutoExposure];
     [self cacheAutoProperty:CAPPROPID_WHITEBALANCE withName:@kPropertyAutoWhiteBalance];
     [self cacheAutoProperty:CAPPROPID_FOCUS withName:@kPropertyAutoFocus];
-    
-    OBJCINFO("Cached %lu camera properties and %lu auto properties", 
-             (unsigned long)propertyCache.size(), 
-             (unsigned long)propertyAutoCache.size());
     
     self.propertiesCached = true;
 }
@@ -618,17 +602,13 @@ using namespace cs;
                                           max:&maximum 
                                      defValue:&defaultValue 
                                        status:&status]) {
-            OBJCDEBUG("Got property limits for %u: min=%d, max=%d, default=%d", 
-                    propID, minimum, maximum, defaultValue);
         } else {
             OBJCWARNING("Failed to get property limits for %u, using defaults", propID);
             return;
         }
         
         // Get current value
-        if ([self.uvcControl getProperty:propID withValue:&value status:&status]) {
-            OBJCDEBUG("Got current value for %u: %d", propID, value);
-        } else {
+        if (![self.uvcControl getProperty:propID withValue:&value status:&status]) {
             value = defaultValue;
             OBJCWARNING("Failed to get current value for %u, using default: %d", 
                       propID, value);
@@ -659,9 +639,6 @@ using namespace cs;
     
     // Notify that property has been created
     sharedThis->NotifyPropertyCreatedPublic(ndx, *sharedThis->GetPropertyPublic(ndx));
-    
-    OBJCINFO("Cached property %s (ID=%u, value=%d, range=[%d,%d])", 
-             nameStr.c_str(), propID, value, minimum, maximum);
 }
 
 - (void)cacheAutoProperty:(uint32_t)propID withName:(NSString *)baseName {
@@ -705,9 +682,6 @@ using namespace cs;
     // Map property name to ID
     auto& propertyAutoCache = sharedThis->GetPropertyAutoCache();
     propertyAutoCache[nameStr] = propID;
-    
-    OBJCINFO("Cached auto property %s (ID=%u, value=%d)", 
-             nameStr.c_str(), propID, enabled ? 1 : 0);
 }
 
 static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
@@ -868,6 +842,51 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   self.deviceValid = true;
 }
 
+- (CMTime)findNearestFrameDuration:(int)fps {
+  if (self.currentFormat == nil) {
+    return CMTimeMake(1, fps);
+  }
+
+  NSArray<AVFrameRateRange*>* frameRates = self.currentFormat.videoSupportedFrameRateRanges;
+  if (frameRates.count == 0) {
+    return CMTimeMake(1, fps);
+  }
+
+  // Find the nearest frame duration
+  CMTime nearestDuration = CMTimeMake(1, fps);
+  double minDiff = DBL_MAX;
+
+  for (AVFrameRateRange* range in frameRates) {
+    CMTime minDuration = range.minFrameDuration;
+    CMTime maxDuration = range.maxFrameDuration;
+    
+    // Calculate frame duration for current fps
+    CMTime targetDuration = CMTimeMake(1, fps);
+    
+    // Check if within range
+    if (CMTimeCompare(targetDuration, minDuration) >= 0 && 
+        CMTimeCompare(targetDuration, maxDuration) <= 0) {
+      return targetDuration;
+    }
+    
+    // Calculate difference with min value
+    double minDiffValue = fabs(CMTimeGetSeconds(targetDuration) - CMTimeGetSeconds(minDuration));
+    if (minDiffValue < minDiff) {
+      minDiff = minDiffValue;
+      nearestDuration = minDuration;
+    }
+    
+    // Calculate difference with max value
+    double maxDiffValue = fabs(CMTimeGetSeconds(targetDuration) - CMTimeGetSeconds(maxDuration));
+    if (maxDiffValue < minDiff) {
+      minDiff = maxDiffValue;
+      nearestDuration = maxDuration;
+    }
+  }
+  
+  return nearestDuration;
+}
+
 - (bool)deviceStreamOn {
   if (self.streaming) {
     return false;
@@ -884,10 +903,10 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
       self.videoDevice.activeFormat = self.currentFormat;
     }
     if (self.currentFPS != 0) {
-      // self.videoDevice.activeVideoMinFrameDuration =
-      //     CMTimeMake(1, self.currentFPS);
-      // self.videoDevice.activeVideoMaxFrameDuration =
-      //     CMTimeMake(1, self.currentFPS);
+      self.videoDevice.activeVideoMinFrameDuration =
+          [self findNearestFrameDuration:self.currentFPS];
+      self.videoDevice.activeVideoMaxFrameDuration =
+          [self findNearestFrameDuration:self.currentFPS];
     }
     [self.videoDevice unlockForConfiguration];
   } else {
