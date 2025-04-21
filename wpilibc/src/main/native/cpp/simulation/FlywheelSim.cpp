@@ -12,7 +12,7 @@ using namespace frc;
 using namespace frc::sim;
 
 FlywheelSim::FlywheelSim(const LinearSystem<1, 1, 1>& plant,
-                         const DCMotor& gearbox,
+                         const Gearbox& gearbox,
                          const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim<1, 1, 1>(plant, measurementStdDevs),
       m_gearbox(gearbox),
@@ -33,9 +33,10 @@ FlywheelSim::FlywheelSim(const LinearSystem<1, 1, 1>& plant,
       //
       //   B = GKₜ/(RJ)
       //   J = GKₜ/(RB)
-      m_gearing(-gearbox.Kv.value() * m_plant.A(0, 0) / m_plant.B(0, 0)),
-      m_j(m_gearing * gearbox.Kt.value() /
-          (gearbox.R.value() * m_plant.B(0, 0))) {}
+      m_gearing(-gearbox.dcMotor.Kv.value() * m_plant.A(0, 0) /
+                m_plant.B(0, 0)),
+      m_j(m_gearing * gearbox.dcMotor.Kt.value() /
+          (gearbox.dcMotor.R.value() * m_plant.B(0, 0))) {}
 
 void FlywheelSim::SetVelocity(units::radians_per_second_t velocity) {
   LinearSystemSim::SetState(Vectord<1>{velocity.value()});
@@ -59,8 +60,10 @@ units::ampere_t FlywheelSim::GetCurrentDraw() const {
   // I = V / R - omega / (Kv * R)
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output.
-  return m_gearbox.Current(units::radians_per_second_t{m_x(0)} * m_gearing,
-                           units::volt_t{m_u(0)}) *
+  return m_gearbox.numMotors *
+         m_gearbox.dcMotor.Current(
+             units::radians_per_second_t{m_x(0)} * m_gearing,
+             units::volt_t{m_u(0)}) *
          wpi::sgn(m_u(0));
 }
 

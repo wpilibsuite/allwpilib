@@ -61,7 +61,8 @@ class WPILIB_DLLEXPORT DCMotor {
    */
   constexpr DCMotor(const units::volt_t nominalVoltage,
                     const units::newton_meter_t stallTorque,
-                    const units::ampere_t stallCurrent, const units::ampere_t freeCurrent,
+                    const units::ampere_t stallCurrent,
+                    const units::ampere_t freeCurrent,
                     const units::radians_per_second_t freeSpeed)
       : nominalVoltage(nominalVoltage),
         stallTorque(stallTorque),
@@ -78,7 +79,8 @@ class WPILIB_DLLEXPORT DCMotor {
    * @param speed        The current angular velocity of the motor.
    * @param inputVoltage The voltage being applied to the motor.
    */
-  [[nodiscard]] constexpr units::ampere_t Current(units::radians_per_second_t speed,
+  [[nodiscard]]
+  constexpr units::ampere_t Current(units::radians_per_second_t speed,
                                     units::volt_t inputVoltage) const {
     return -1.0 / Kv / R * speed + 1.0 / R * inputVoltage;
   }
@@ -88,7 +90,8 @@ class WPILIB_DLLEXPORT DCMotor {
    *
    * @param torque The torque produced by the motor.
    */
-  [[nodiscard]] constexpr units::ampere_t Current(units::newton_meter_t torque) const {
+  [[nodiscard]]
+  constexpr units::ampere_t Current(units::newton_meter_t torque) const {
     return torque / Kt;
   }
 
@@ -97,7 +100,8 @@ class WPILIB_DLLEXPORT DCMotor {
    *
    * @param current     The current drawn by the motor.
    */
-  [[nodiscard]] constexpr units::newton_meter_t Torque(units::ampere_t current) const {
+  [[nodiscard]]
+  constexpr units::newton_meter_t Torque(units::ampere_t current) const {
     return current * Kt;
   }
 
@@ -108,7 +112,8 @@ class WPILIB_DLLEXPORT DCMotor {
    * @param torque      The torque produced by the motor.
    * @param speed       The current angular velocity of the motor.
    */
-  [[nodiscard]] constexpr units::volt_t Voltage(units::newton_meter_t torque,
+  [[nodiscard]]
+  constexpr units::volt_t Voltage(units::newton_meter_t torque,
                                   units::radians_per_second_t speed) const {
     return 1.0 / Kv * speed + 1.0 / Kt * R * torque;
   }
@@ -120,12 +125,11 @@ class WPILIB_DLLEXPORT DCMotor {
    * @param torque        The torque produced by the motor.
    * @param inputVoltage  The input voltage provided to the motor.
    */
-  [[nodiscard]] constexpr units::radians_per_second_t Speed(
+  [[nodiscard]]
+  constexpr units::radians_per_second_t Speed(
       units::newton_meter_t torque, units::volt_t inputVoltage) const {
     return inputVoltage * Kv - 1.0 / Kt * torque * R * Kv;
   }
-
-
 
   /**
    * Returns a gearbox of CIM motors.

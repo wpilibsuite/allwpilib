@@ -13,6 +13,7 @@
 #include "frc/simulation/LinearSystemSim.h"
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/DCMotor.h"
+#include "frc/system/plant/Gearbox.h"
 
 namespace frc::sim {
 /**
@@ -27,11 +28,10 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
    * system can be created with LinearSystemId::DCMotorSystem(). If
    * LinearSystemId::DCMotorSystem(kV, kA) is used, the distance unit must be
    * radians.
-   * @param gearbox            The type of and number of motors in the DC motor
-   * gearbox.
+   * @param gearbox            The system's gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  DCMotorSim(const LinearSystem<2, 1, 2>& plant, const DCMotor& gearbox,
+  DCMotorSim(const LinearSystem<2, 1, 2>& plant, const Gearbox& gearbox,
              const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   using LinearSystemSim::SetState;
@@ -111,7 +111,7 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Returns the gearbox.
    */
-  const DCMotor& GetGearbox() const;
+  const Gearbox& GetGearbox() const;
 
   /**
    * Returns the gearing;
@@ -124,7 +124,7 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   units::kilogram_square_meter_t GetJ() const;
 
  private:
-  DCMotor m_gearbox;
+  Gearbox m_gearbox;
   double m_gearing;
   units::kilogram_square_meter_t m_j;
 };

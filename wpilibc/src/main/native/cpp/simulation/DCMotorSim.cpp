@@ -12,7 +12,7 @@ using namespace frc;
 using namespace frc::sim;
 
 DCMotorSim::DCMotorSim(const LinearSystem<2, 1, 2>& plant,
-                       const DCMotor& gearbox,
+                       const Gearbox& gearbox,
                        const std::array<double, 2>& measurementStdDevs)
     : LinearSystemSim<2, 1, 2>(plant, measurementStdDevs),
       m_gearbox(gearbox),
@@ -33,9 +33,10 @@ DCMotorSim::DCMotorSim(const LinearSystem<2, 1, 2>& plant,
       //
       //   B = GKₜ/(RJ)
       //   J = GKₜ/(RB)
-      m_gearing(-gearbox.Kv.value() * m_plant.A(1, 1) / m_plant.B(1, 0)),
-      m_j(m_gearing * gearbox.Kt.value() /
-          (gearbox.R.value() * m_plant.B(1, 0))) {}
+      m_gearing(-gearbox.dcMotor.Kv.value() * m_plant.A(1, 1) /
+                m_plant.B(1, 0)),
+      m_j(m_gearing * gearbox.dcMotor.Kt.value() /
+          (gearbox.dcMotor.R.value() * m_plant.B(1, 0))) {}
 
 void DCMotorSim::SetState(units::radian_t angularPosition,
                           units::radians_per_second_t angularVelocity) {
@@ -72,8 +73,10 @@ units::ampere_t DCMotorSim::GetCurrentDraw() const {
   // I = V / R - omega / (Kv * R)
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output.
-  return m_gearbox.Current(units::radians_per_second_t{m_x(1)} * m_gearing,
-                           units::volt_t{m_u(0)}) *
+  return m_gearbox.numMotors *
+         m_gearbox.dcMotor.Current(
+             units::radians_per_second_t{m_x(1)} * m_gearing,
+             units::volt_t{m_u(0)}) *
          wpi::sgn(m_u(0));
 }
 
@@ -86,7 +89,7 @@ void DCMotorSim::SetInputVoltage(units::volt_t voltage) {
   ClampInput(frc::RobotController::GetBatteryVoltage().value());
 }
 
-const DCMotor& DCMotorSim::GetGearbox() const {
+const Gearbox& DCMotorSim::GetGearbox() const {
   return m_gearbox;
 }
 

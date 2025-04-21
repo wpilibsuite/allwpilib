@@ -17,7 +17,7 @@ using namespace frc;
 using namespace frc::sim;
 
 SingleJointedArmSim::SingleJointedArmSim(
-    const LinearSystem<2, 1, 2>& system, const DCMotor& gearbox, double gearing,
+    const LinearSystem<2, 1, 2>& system, const Gearbox& gearbox, double gearing,
     units::meter_t armLength, units::radian_t minAngle,
     units::radian_t maxAngle, bool simulateGravity,
     units::radian_t startingAngle,
@@ -33,7 +33,7 @@ SingleJointedArmSim::SingleJointedArmSim(
 }
 
 SingleJointedArmSim::SingleJointedArmSim(
-    const DCMotor& gearbox, double gearing, units::kilogram_square_meter_t moi,
+    const Gearbox& gearbox, double gearing, units::kilogram_square_meter_t moi,
     units::meter_t armLength, units::radian_t minAngle,
     units::radian_t maxAngle, bool simulateGravity,
     units::radian_t startingAngle,
@@ -76,7 +76,8 @@ units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output
   units::radians_per_second_t motorVelocity{m_x(1) * m_gearing};
-  return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) *
+  return m_gearbox.numMotors *
+         m_gearbox.dcMotor.Current(motorVelocity, units::volt_t{m_u(0)}) *
          wpi::sgn(m_u(0));
 }
 

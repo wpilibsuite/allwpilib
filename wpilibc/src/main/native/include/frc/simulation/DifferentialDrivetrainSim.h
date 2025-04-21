@@ -14,6 +14,8 @@
 #include <units/time.h>
 #include <units/voltage.h>
 
+#include "frc/system/plant/Gearbox.h"
+
 namespace frc::sim {
 
 class DifferentialDrivetrainSim {
@@ -26,7 +28,7 @@ class DifferentialDrivetrainSim {
    *              LinearSystemId::DrivetrainVelocitySystem() or
    *              LinearSystemId::IdentifyDrivetrainSystem().
    * @param trackwidth   The robot's trackwidth.
-   * @param driveMotor   A DCMotor representing the left side of the drivetrain.
+   * @param gearbox   A Gearbox representing the left side of the drivetrain.
    * @param gearingRatio The gearingRatio ratio of the left side, as output over
    *                     input. This must be the same ratio as the ratio used to
    *                     identify or create the plant.
@@ -41,14 +43,14 @@ class DifferentialDrivetrainSim {
    *                           starting point.
    */
   DifferentialDrivetrainSim(
-      LinearSystem<2, 2, 2> plant, units::meter_t trackwidth,
-      DCMotor driveMotor, double gearingRatio, units::meter_t wheelRadius,
+      LinearSystem<2, 2, 2> plant, units::meter_t trackwidth, Gearbox gearbox,
+      double gearingRatio, units::meter_t wheelRadius,
       const std::array<double, 7>& measurementStdDevs = {});
 
   /**
    * Creates a simulated differential drivetrain.
    *
-   * @param driveMotor  A DCMotor representing the left side of the drivetrain.
+   * @param gearbox   A Gearbox representing the left side of the drivetrain.
    * @param gearing     The gearing on the drive between motor and wheel, as
    *                    output over input. This must be the same ratio as the
    *                    ratio used to identify or create the plant.
@@ -68,7 +70,7 @@ class DifferentialDrivetrainSim {
    *                           starting point.
    */
   DifferentialDrivetrainSim(
-      frc::DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
+      frc::Gearbox gearbox, double gearing, units::kilogram_square_meter_t J,
       units::kilogram_t mass, units::meter_t wheelRadius,
       units::meter_t trackwidth,
       const std::array<double, 7>& measurementStdDevs = {});
@@ -235,24 +237,29 @@ class DifferentialDrivetrainSim {
   class KitbotMotor {
    public:
     /// One CIM motor per drive side.
-    static constexpr frc::DCMotor SingleCIMPerSide = frc::DCMotor::CIM(1);
+    static constexpr frc::Gearbox SingleCIMPerSide =
+        frc::Gearbox(frc::DCMotor::CIM(), 1);
     /// Two CIM motors per drive side.
-    static constexpr frc::DCMotor DualCIMPerSide = frc::DCMotor::CIM(2);
+    static constexpr frc::Gearbox DualCIMPerSide =
+        frc::Gearbox(frc::DCMotor::CIM(), 2);
     /// One Mini CIM motor per drive side.
-    static constexpr frc::DCMotor SingleMiniCIMPerSide =
-        frc::DCMotor::MiniCIM(1);
+    static constexpr frc::Gearbox SingleMiniCIMPerSide =
+        frc::Gearbox(frc::DCMotor::MiniCIM());
     /// Two Mini CIM motors per drive side.
-    static constexpr frc::DCMotor DualMiniCIMPerSide = frc::DCMotor::MiniCIM(2);
+    static constexpr frc::Gearbox DualMiniCIMPerSide =
+        frc::Gearbox(frc::DCMotor::MiniCIM(), 2);
     /// One Falcon 500 motor per drive side.
-    static constexpr frc::DCMotor SingleFalcon500PerSide =
-        frc::DCMotor::Falcon500(1);
+    static constexpr frc::Gearbox SingleFalcon500PerSide =
+        frc::Gearbox(frc::DCMotor::Falcon500());
     /// Two Falcon 500 motors per drive side.
-    static constexpr frc::DCMotor DualFalcon500PerSide =
-        frc::DCMotor::Falcon500(2);
+    static constexpr frc::Gearbox DualFalcon500PerSide =
+        frc::Gearbox(frc::DCMotor::Falcon500(), 2);
     /// One NEO motor per drive side.
-    static constexpr frc::DCMotor SingleNEOPerSide = frc::DCMotor::NEO(1);
+    static constexpr frc::Gearbox SingleNEOPerSide =
+        frc::Gearbox(frc::DCMotor::NEO());
     /// Two NEO motors per drive side.
-    static constexpr frc::DCMotor DualNEOPerSide = frc::DCMotor::NEO(2);
+    static constexpr frc::Gearbox DualNEOPerSide =
+        frc::Gearbox(frc::DCMotor::NEO(), 2);
   };
 
   /**
@@ -271,7 +278,7 @@ class DifferentialDrivetrainSim {
   /**
    * Create a sim for the standard FRC kitbot.
    *
-   * @param motor     The motors installed in the bot.
+   * @param gearbox   A Gearbox representing the left side of the drivetrain.
    * @param gearing   The gearing reduction used.
    * @param wheelSize The wheel size.
    * @param measurementStdDevs Standard deviations for measurements, in the form
@@ -282,7 +289,7 @@ class DifferentialDrivetrainSim {
    * starting point.
    */
   static DifferentialDrivetrainSim CreateKitbotSim(
-      frc::DCMotor motor, double gearing, units::meter_t wheelSize,
+      frc::Gearbox gearbox, double gearing, units::meter_t wheelSize,
       const std::array<double, 7>& measurementStdDevs = {}) {
     // MOI estimation -- note that I = mr² for point masses
     units::kilogram_square_meter_t batteryMoi = 12.5_lb * 10_in * 10_in;
@@ -291,14 +298,14 @@ class DifferentialDrivetrainSim {
                                                 * (26_in / 2) * (26_in / 2);
 
     return DifferentialDrivetrainSim{
-        motor,           gearing, batteryMoi + gearboxMoi, 60_lb,
+        gearbox,         gearing, batteryMoi + gearboxMoi, 60_lb,
         wheelSize / 2.0, 26_in,   measurementStdDevs};
   }
 
   /**
    * Create a sim for the standard FRC kitbot.
    *
-   * @param motor     The motors installed in the bot.
+   * @param gearbox   A Gearbox representing the left side of the drivetrain.
    * @param gearing   The gearing reduction used.
    * @param wheelSize The wheel size.
    * @param J         The moment of inertia of the drivebase. This can be
@@ -311,11 +318,11 @@ class DifferentialDrivetrainSim {
    * starting point.
    */
   static DifferentialDrivetrainSim CreateKitbotSim(
-      frc::DCMotor motor, double gearing, units::meter_t wheelSize,
+      frc::Gearbox gearbox, double gearing, units::meter_t wheelSize,
       units::kilogram_square_meter_t J,
       const std::array<double, 7>& measurementStdDevs = {}) {
     return DifferentialDrivetrainSim{
-        motor, gearing, J, 60_lb, wheelSize / 2.0, 26_in, measurementStdDevs};
+        gearbox, gearing, J, 60_lb, wheelSize / 2.0, 26_in, measurementStdDevs};
   }
 
  private:
@@ -348,7 +355,7 @@ class DifferentialDrivetrainSim {
   units::meter_t m_rb;
   units::meter_t m_wheelRadius;
 
-  DCMotor m_motor;
+  Gearbox m_gearbox;
 
   double m_originalGearing;
   double m_currentGearing;

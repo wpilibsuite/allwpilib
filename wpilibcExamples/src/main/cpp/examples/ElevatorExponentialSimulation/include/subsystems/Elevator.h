@@ -32,7 +32,7 @@ class Elevator {
 
  private:
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
-  frc::DCMotor m_elevatorGearbox = frc::DCMotor::NEO(2);
+  frc::Gearbox m_elevatorGearbox = frc::Gearbox(frc::DCMotor::NEO(), 2);
 
   // Standard classes for controlling our elevator
   frc::ExponentialProfile<units::meters, units::volts>::Constraints

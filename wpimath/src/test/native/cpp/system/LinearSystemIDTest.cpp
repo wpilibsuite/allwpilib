@@ -15,7 +15,8 @@
 TEST(LinearSystemIDTest, IdentifyDrivetrainVelocitySystem) {
 #if __GNUC__ <= 11
   auto model = frc::LinearSystemId::DrivetrainVelocitySystem(
-      frc::Gearbox(frc::DCMotor::NEO(), 4), 70_kg, 0.05_m, 0.4_m, 6.0_kg_sq_m, 6.0);
+      frc::Gearbox(frc::DCMotor::NEO(), 4), 70_kg, 0.05_m, 0.4_m, 6.0_kg_sq_m,
+      6.0);
 #else
   constexpr auto model = frc::LinearSystemId::DrivetrainVelocitySystem(
       frc::Gearbox(DCMotor::NEO(), 4), 70_kg, 0.05_m, 0.4_m, 6.0_kg_sq_m, 6.0);
@@ -32,8 +33,8 @@ TEST(LinearSystemIDTest, IdentifyDrivetrainVelocitySystem) {
 }
 
 TEST(LinearSystemIDTest, ElevatorSystem) {
-  auto model = frc::LinearSystemId::ElevatorSystem(frc::Gearbox(frc::DCMotor::NEO(), 2), 5_kg,
-                                                   0.05_m, 12)
+  auto model = frc::LinearSystemId::ElevatorSystem(
+                   frc::Gearbox(frc::DCMotor::NEO(), 2), 5_kg, 0.05_m, 12)
                    .Slice(0);
   ASSERT_TRUE(model.A().isApprox(
       frc::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -99.05473}}, 0.001));
@@ -44,11 +45,11 @@ TEST(LinearSystemIDTest, ElevatorSystem) {
 
 TEST(LinearSystemIDTest, FlywheelSystem) {
 #if __GNUC__ <= 11
-  auto model = frc::LinearSystemId::FlywheelSystem(frc::Gearbox(frc::DCMotor::NEO(), 2),
-                                                   0.00032_kg_sq_m, 1.0);
+  auto model = frc::LinearSystemId::FlywheelSystem(
+      frc::Gearbox(frc::DCMotor::NEO(), 2), 0.00032_kg_sq_m, 1.0);
 #else
-    constexpr auto model = frc::LinearSystemId::FlywheelSystem(frc::Gearbox(frc::DCMotor::NEO(), 2),
-                                                     0.00032_kg_sq_m, 1.0);
+  constexpr auto model = frc::LinearSystemId::FlywheelSystem(
+      frc::Gearbox(frc::DCMotor::NEO(), 2), 0.00032_kg_sq_m, 1.0);
 #endif
 
   ASSERT_TRUE(model.A().isApprox(frc::Matrixd<1, 1>{-26.87032}, 0.001));
@@ -59,8 +60,8 @@ TEST(LinearSystemIDTest, FlywheelSystem) {
 
 TEST(LinearSystemIDTest, DCMotorSystem) {
 #if __GNUC__ <= 11
-  auto model = frc::LinearSystemId::DCMotorSystem(frc::Gearbox(frc::DCMotor::NEO(), 2),
-                                                  0.00032_kg_sq_m, 1.0);
+  auto model = frc::LinearSystemId::DCMotorSystem(
+      frc::Gearbox(frc::DCMotor::NEO(), 2), 0.00032_kg_sq_m, 1.0);
 #else
   constexpr auto model = frc::LinearSystemId::DCMotorSystem(
       frc::DCMotor::NEO(2), 0.00032_kg_sq_m, 1.0);

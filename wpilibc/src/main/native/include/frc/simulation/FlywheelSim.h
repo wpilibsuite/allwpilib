@@ -12,6 +12,7 @@
 #include "frc/simulation/LinearSystemSim.h"
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/DCMotor.h"
+#include "frc/system/plant/Gearbox.h"
 
 namespace frc::sim {
 /**
@@ -26,11 +27,10 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    *                           system can be created with
    *                           LinearSystemId::FlywheelSystem() or
    * LinearSystemId::IdentifyVelocitySystem().
-   * @param gearbox            The type of and number of motors in the flywheel
-   *                           gearbox.
+   * @param gearbox            The flywheel gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  FlywheelSim(const LinearSystem<1, 1, 1>& plant, const DCMotor& gearbox,
+  FlywheelSim(const LinearSystem<1, 1, 1>& plant, const Gearbox& gearbox,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   using LinearSystemSim::SetState;
@@ -87,12 +87,12 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   /**
    * Returns the gearbox.
    */
-  DCMotor Gearbox() const { return m_gearbox; }
+  Gearbox GetGearbox() const { return m_gearbox; }
 
   /**
    * Returns the gearing;
    */
-  double Gearing() const { return m_gearing; }
+  double GetGearing() const { return m_gearing; }
 
   /**
    * Returns the moment of inertia
@@ -100,7 +100,7 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   units::kilogram_square_meter_t J() const { return m_j; }
 
  private:
-  DCMotor m_gearbox;
+  Gearbox m_gearbox;
   double m_gearing;
   units::kilogram_square_meter_t m_j;
 };

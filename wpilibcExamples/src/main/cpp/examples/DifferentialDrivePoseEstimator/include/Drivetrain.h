@@ -173,5 +173,6 @@ class Drivetrain {
       frc::LinearSystemId::IdentifyDrivetrainSystem(
           1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
   frc::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
-      m_drivetrainSystem, kTrackwidth, frc::DCMotor::CIM(2), 8, 2_in};
+      m_drivetrainSystem, kTrackwidth, frc::Gearbox(frc::DCMotor::CIM(), 2), 8,
+      2_in};
 };

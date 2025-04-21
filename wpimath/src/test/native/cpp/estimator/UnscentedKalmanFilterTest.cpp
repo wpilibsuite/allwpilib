@@ -33,7 +33,8 @@ frc::Vectord<5> Dynamics(const frc::Vectord<5>& x, const frc::Vectord<2>& u) {
 
   auto C1 = -std::pow(Ghigh, 2) * gearbox.numMotors * gearbox.dcMotor.Kt /
             (gearbox.dcMotor.Kv * gearbox.dcMotor.R * units::math::pow<2>(r));
-  auto C2 = Ghigh * gearbox.numMotors * gearbox.dcMotor.Kt / (gearbox.dcMotor.R * r);
+  auto C2 =
+      Ghigh * gearbox.numMotors * gearbox.dcMotor.Kt / (gearbox.dcMotor.R * r);
   auto k1 = (1 / m + units::math::pow<2>(rb) / J);
   auto k2 = (1 / m - units::math::pow<2>(rb) / J);
 
