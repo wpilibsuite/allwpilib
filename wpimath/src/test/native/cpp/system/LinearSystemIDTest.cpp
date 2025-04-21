@@ -19,7 +19,7 @@ TEST(LinearSystemIDTest, IdentifyDrivetrainVelocitySystem) {
       6.0);
 #else
   constexpr auto model = frc::LinearSystemId::DrivetrainVelocitySystem(
-      frc::Gearbox(DCMotor::NEO(), 4), 70_kg, 0.05_m, 0.4_m, 6.0_kg_sq_m, 6.0);
+      frc::Gearbox(frc::DCMotor::NEO(), 4), 70_kg, 0.05_m, 0.4_m, 6.0_kg_sq_m, 6.0);
 #endif
 
   ASSERT_TRUE(model.A().isApprox(
