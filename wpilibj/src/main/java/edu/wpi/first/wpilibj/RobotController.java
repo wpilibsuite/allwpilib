@@ -11,7 +11,6 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
-import edu.wpi.first.hal.LEDJNI;
 import edu.wpi.first.hal.PowerJNI;
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
@@ -130,19 +129,6 @@ public final class RobotController {
   }
 
   /**
-   * Get the state of the "USER" button on the roboRIO.
-   *
-   * <p>Warning: the User Button is used to stop user programs from automatically loading if it is
-   * held for more then 5 seconds. Because of this, it's not recommended to be used by teams for any
-   * other purpose.
-   *
-   * @return true if the button is currently pressed down
-   */
-  public static boolean getUserButton() {
-    return HALUtil.getFPGAButton();
-  }
-
-  /**
    * Read the battery voltage.
    *
    * @return The battery voltage in Volts.
@@ -226,24 +212,6 @@ public final class RobotController {
   }
 
   /**
-   * Get the input current to the robot controller.
-   *
-   * @return The controller input current value in Amps
-   */
-  public static double getInputCurrent() {
-    return PowerJNI.getVinCurrent();
-  }
-
-  /**
-   * Get the input current to the robot controller in a measure.
-   *
-   * @return The controller input current value in a measure.
-   */
-  public static Current getMeasureInputCurrent() {
-    return Amps.of(PowerJNI.getVinCurrent());
-  }
-
-  /**
    * Get the voltage of the 3.3V rail.
    *
    * @return The controller 3.3V rail voltage value in Volts
@@ -307,134 +275,6 @@ public final class RobotController {
     return PowerJNI.getUserCurrentFaults3V3();
   }
 
-  /**
-   * Get the voltage of the 5V rail.
-   *
-   * @return The controller 5V rail voltage value in Volts
-   */
-  public static double getVoltage5V() {
-    return PowerJNI.getUserVoltage5V();
-  }
-
-  /**
-   * Get the voltage in a measure of the 5V rail.
-   *
-   * @return The controller 5V rail voltage value in a measure.
-   */
-  public static Voltage getMeasureVoltage5V() {
-    return Volts.of(PowerJNI.getUserVoltage5V());
-  }
-
-  /**
-   * Get the current output of the 5V rail.
-   *
-   * @return The controller 5V rail output current value in Amps
-   */
-  public static double getCurrent5V() {
-    return PowerJNI.getUserCurrent5V();
-  }
-
-  /**
-   * Get the current output in a measure of the 5V rail.
-   *
-   * @return The controller 5V rail output current value in a measure.
-   */
-  public static Current getMeasureCurrent5V() {
-    return Amps.of(PowerJNI.getUserCurrent5V());
-  }
-
-  /**
-   * Enables or disables the 5V rail.
-   *
-   * @param enabled whether to enable the 5V rail.
-   */
-  public static void setEnabled5V(boolean enabled) {
-    PowerJNI.setUserEnabled5V(enabled);
-  }
-
-  /**
-   * Get the enabled state of the 5V rail. The rail may be disabled due to a controller brownout, a
-   * short circuit on the rail, or controller over-voltage.
-   *
-   * @return The controller 5V rail enabled value
-   */
-  public static boolean getEnabled5V() {
-    return PowerJNI.getUserActive5V();
-  }
-
-  /**
-   * Get the count of the total current faults on the 5V rail since the code started.
-   *
-   * @return The number of faults
-   */
-  public static int getFaultCount5V() {
-    return PowerJNI.getUserCurrentFaults5V();
-  }
-
-  /**
-   * Get the voltage of the 6V rail.
-   *
-   * @return The controller 6V rail voltage value in Volts
-   */
-  public static double getVoltage6V() {
-    return PowerJNI.getUserVoltage6V();
-  }
-
-  /**
-   * Get the voltage in a measure of the 6V rail.
-   *
-   * @return The controller 6V rail voltage value in a measure.
-   */
-  public static Voltage getMeasureVoltage6V() {
-    return Volts.of(PowerJNI.getUserVoltage6V());
-  }
-
-  /**
-   * Get the current output of the 6V rail.
-   *
-   * @return The controller 6V rail output current value in Amps
-   */
-  public static double getCurrent6V() {
-    return PowerJNI.getUserCurrent6V();
-  }
-
-  /**
-   * Get the current output in a measure of the 6V rail.
-   *
-   * @return The controller 6V rail output current value in a measure.
-   */
-  public static Current getMeasureCurrent6V() {
-    return Amps.of(PowerJNI.getUserCurrent6V());
-  }
-
-  /**
-   * Enables or disables the 6V rail.
-   *
-   * @param enabled whether to enable the 6V rail.
-   */
-  public static void setEnabled6V(boolean enabled) {
-    PowerJNI.setUserEnabled6V(enabled);
-  }
-
-  /**
-   * Get the enabled state of the 6V rail. The rail may be disabled due to a controller brownout, a
-   * short circuit on the rail, or controller over-voltage.
-   *
-   * @return The controller 6V rail enabled value
-   */
-  public static boolean getEnabled6V() {
-    return PowerJNI.getUserActive6V();
-  }
-
-  /**
-   * Get the count of the total current faults on the 6V rail since the code started.
-   *
-   * @return The number of faults
-   */
-  public static int getFaultCount6V() {
-    return PowerJNI.getUserCurrentFaults6V();
-  }
-
   /** Reset the overcurrent fault counters for all user rails to 0. */
   public static void resetRailFaultCounts() {
     PowerJNI.resetUserCurrentFaults();
@@ -496,61 +336,6 @@ public final class RobotController {
    */
   public static Temperature getMeasureCPUTemp() {
     return Celsius.of(PowerJNI.getCPUTemp());
-  }
-
-  /** State for the radio led. */
-  public enum RadioLEDState {
-    /** Off. */
-    kOff(LEDJNI.RADIO_LED_STATE_OFF),
-    /** Green. */
-    kGreen(LEDJNI.RADIO_LED_STATE_GREEN),
-    /** Red. */
-    kRed(LEDJNI.RADIO_LED_STATE_RED),
-    /** Orange. */
-    kOrange(LEDJNI.RADIO_LED_STATE_ORANGE);
-
-    /** The native value for this state. */
-    public final int value;
-
-    RadioLEDState(int value) {
-      this.value = value;
-    }
-
-    /**
-     * Gets a state from an int value.
-     *
-     * @param value int value
-     * @return state
-     */
-    public static RadioLEDState fromValue(int value) {
-      return switch (value) {
-        case LEDJNI.RADIO_LED_STATE_OFF -> RadioLEDState.kOff;
-        case LEDJNI.RADIO_LED_STATE_GREEN -> RadioLEDState.kGreen;
-        case LEDJNI.RADIO_LED_STATE_RED -> RadioLEDState.kRed;
-        case LEDJNI.RADIO_LED_STATE_ORANGE -> RadioLEDState.kOrange;
-        default -> RadioLEDState.kOff;
-      };
-    }
-  }
-
-  /**
-   * Set the state of the "Radio" LED. On the RoboRIO, this writes to sysfs, so this function should
-   * not be called multiple times per loop cycle to avoid overruns.
-   *
-   * @param state The state to set the LED to.
-   */
-  public static void setRadioLEDState(RadioLEDState state) {
-    LEDJNI.setRadioLEDState(state.value);
-  }
-
-  /**
-   * Get the state of the "Radio" LED. On the RoboRIO, this reads from sysfs, so this function
-   * should not be called multiple times per loop cycle to avoid overruns.
-   *
-   * @return The state of the LED.
-   */
-  public static RadioLEDState getRadioLEDState() {
-    return RadioLEDState.fromValue(LEDJNI.getRadioLEDState());
   }
 
   /**

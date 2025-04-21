@@ -37,10 +37,9 @@ public class Victor extends PWMMotorController {
   public Victor(final int channel) {
     super("Victor", channel);
 
-    m_pwm.setBoundsMicroseconds(2027, 1525, 1507, 1490, 1026);
-    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k2X);
-    m_pwm.setSpeed(0.0);
-    m_pwm.setZeroLatch();
+    setBoundsMicroseconds(2027, 1525, 1507, 1490, 1026);
+    m_pwm.setOutputPeriod(PWM.OutputPeriod.k10Ms);
+    setSpeed(0.0);
 
     HAL.reportUsage("IO", getChannel(), "Victor");
   }

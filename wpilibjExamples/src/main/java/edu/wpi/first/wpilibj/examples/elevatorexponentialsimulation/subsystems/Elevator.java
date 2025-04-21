@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.simulation.PWMSim;
+import edu.wpi.first.wpilibj.simulation.PWMMotorControllerSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -62,7 +62,7 @@ public class Elevator implements AutoCloseable {
           0.005,
           0.0);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
-  private final PWMSim m_motorSim = new PWMSim(m_motor);
+  private final PWMMotorControllerSim m_motorSim = new PWMMotorControllerSim(m_motor);
 
   // Create a Mechanism2d visualization of the elevator
   private final Mechanism2d m_mech2d =

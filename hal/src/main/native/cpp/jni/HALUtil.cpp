@@ -44,7 +44,6 @@ static JException halHandleExCls;
 static JException uncleanStatusExCls;
 static JException nullPointerEx;
 static JClass powerDistributionVersionCls;
-static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
 static JClass matchInfoDataCls;
 static JClass canReceiveMessageCls;
@@ -56,7 +55,6 @@ static JClass canStreamOverflowExCls;
 static const JClassInit classes[] = {
     {"edu/wpi/first/hal/PowerDistributionVersion",
      &powerDistributionVersionCls},
-    {"edu/wpi/first/hal/PWMConfigDataResult", &pwmConfigDataResultCls},
     {"edu/wpi/first/hal/can/CANStatus", &canStatusCls},
     {"edu/wpi/first/hal/MatchInfoData", &matchInfoDataCls},
     {"edu/wpi/first/hal/can/CANReceiveMessage", &canReceiveMessageCls},
@@ -178,17 +176,6 @@ void ThrowBoundaryException(JNIEnv* env, double value, double lower,
       static_cast<jdouble>(lower), static_cast<jdouble>(upper));
   jobject ex = env->NewObject(boundaryExCls, constructor, msg);
   env->Throw(static_cast<jthrowable>(ex));
-}
-
-jobject CreatePWMConfigDataResult(JNIEnv* env, int32_t maxPwm,
-                                  int32_t deadbandMaxPwm, int32_t centerPwm,
-                                  int32_t deadbandMinPwm, int32_t minPwm) {
-  static jmethodID constructor =
-      env->GetMethodID(pwmConfigDataResultCls, "<init>", "(IIIII)V");
-  return env->NewObject(
-      pwmConfigDataResultCls, constructor, static_cast<jint>(maxPwm),
-      static_cast<jint>(deadbandMaxPwm), static_cast<jint>(centerPwm),
-      static_cast<jint>(deadbandMinPwm), static_cast<jint>(minPwm));
 }
 
 jobject CreateREVPHVersion(JNIEnv* env, uint32_t firmwareMajor,
@@ -466,21 +453,6 @@ Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType
   (JNIEnv* env, jclass)
 {
   jint returnValue = HAL_GetRuntimeType();
-  return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_HALUtil
- * Method:    getFPGAButton
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGAButton
-  (JNIEnv* env, jclass)
-{
-  int32_t status = 0;
-  jboolean returnValue = HAL_GetFPGAButton(&status);
-  CheckStatus(env, status);
   return returnValue;
 }
 

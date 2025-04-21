@@ -27,18 +27,12 @@ class RoboRioRailModel : public Model {
 
 class RoboRioModel : public Model {
  public:
-  virtual RoboRioRailModel* GetUser6VRail() = 0;
-  virtual RoboRioRailModel* GetUser5VRail() = 0;
   virtual RoboRioRailModel* GetUser3V3Rail() = 0;
 
-  virtual BooleanSource* GetUserButton() = 0;
   virtual DoubleSource* GetVInVoltageData() = 0;
-  virtual DoubleSource* GetVInCurrentData() = 0;
   virtual DoubleSource* GetBrownoutVoltage() = 0;
 
-  virtual void SetUserButton(bool val) = 0;
   virtual void SetVInVoltage(double val) = 0;
-  virtual void SetVInCurrent(double val) = 0;
   virtual void SetBrownoutVoltage(double val) = 0;
 };
 

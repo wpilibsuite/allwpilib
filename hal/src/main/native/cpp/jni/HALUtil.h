@@ -49,10 +49,6 @@ void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg);
 void ThrowBoundaryException(JNIEnv* env, double value, double lower,
                             double upper);
 
-jobject CreatePWMConfigDataResult(JNIEnv* env, int32_t maxPwm,
-                                  int32_t deadbandMaxPwm, int32_t centerPwm,
-                                  int32_t deadbandMinPwm, int32_t minPwm);
-
 jobject CreateREVPHVersion(JNIEnv* env, uint32_t firmwareMajor,
                            uint32_t firmwareMinor, uint32_t firmwareFix,
                            uint32_t hardwareMinor, uint32_t hardwareMajor,
