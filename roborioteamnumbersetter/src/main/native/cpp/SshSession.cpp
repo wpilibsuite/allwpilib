@@ -146,7 +146,7 @@ std::string SshSession::ExecuteResult(std::string_view cmd, int* exitStatus) {
 #if LIBSSH_VERSION_MAJOR == 0 && LIBSSH_VERSION_MINOR >= 11
   ssh_channel_get_exit_state(channel, &exitCode, nullptr, nullptr);
 #else
-  ssh_channel_get_exit_status(channel);
+  exitCode = ssh_channel_get_exit_status(channel);
 #endif
   INFO("{} {}", exitCode, cmd);
 

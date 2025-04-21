@@ -105,15 +105,15 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupCopy) {
 
   bool finished = false;
 
-  WaitUntilCommand command([&finished] { return finished; });
+  auto command = cmd::WaitUntil([&finished] { return finished; });
 
-  SequentialCommandGroup group(command);
-  scheduler.Schedule(&group);
+  auto group = cmd::Sequence(std::move(command));
+  scheduler.Schedule(group);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&group));
+  EXPECT_TRUE(scheduler.IsScheduled(group));
   finished = true;
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  EXPECT_FALSE(scheduler.IsScheduled(group));
 }
 
 TEST_F(SequentialCommandGroupTest, SequentialGroupRequirement) {
@@ -124,17 +124,17 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupRequirement) {
   TestSubsystem requirement3;
   TestSubsystem requirement4;
 
-  InstantCommand command1([] {}, {&requirement1, &requirement2});
-  InstantCommand command2([] {}, {&requirement3});
-  InstantCommand command3([] {}, {&requirement3, &requirement4});
+  auto command1 = cmd::RunOnce([] {}, {&requirement1, &requirement2});
+  auto command2 = cmd::RunOnce([] {}, {&requirement3});
+  auto command3 = cmd::RunOnce([] {}, {&requirement3, &requirement4});
 
-  SequentialCommandGroup group(std::move(command1), std::move(command2));
+  auto group = cmd::Sequence(std::move(command1), std::move(command2));
 
-  scheduler.Schedule(&group);
-  scheduler.Schedule(&command3);
+  scheduler.Schedule(group);
+  scheduler.Schedule(command3);
 
-  EXPECT_TRUE(scheduler.IsScheduled(&command3));
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  EXPECT_TRUE(scheduler.IsScheduled(command3));
+  EXPECT_FALSE(scheduler.IsScheduled(group));
 }
 
 INSTANTIATE_MULTI_COMMAND_COMPOSITION_TEST_SUITE(SequentialCommandGroupTest,

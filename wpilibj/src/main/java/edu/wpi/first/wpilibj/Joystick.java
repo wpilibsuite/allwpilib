@@ -179,7 +179,7 @@ public class Joystick extends GenericHID {
 
   /**
    * Get the X value of the joystick. This depends on the mapping of the joystick connected to the
-   * current port.
+   * current port. On most joysticks, positive is to the right.
    *
    * @return The X value of the joystick.
    */
@@ -189,7 +189,7 @@ public class Joystick extends GenericHID {
 
   /**
    * Get the Y value of the joystick. This depends on the mapping of the joystick connected to the
-   * current port.
+   * current port. On most joysticks, positive is to the back.
    *
    * @return The Y value of the joystick.
    */
@@ -303,8 +303,8 @@ public class Joystick extends GenericHID {
   }
 
   /**
-   * Get the magnitude of the direction vector formed by the joystick's current position relative to
-   * its origin.
+   * Get the magnitude of the vector formed by the joystick's current position relative to its
+   * origin.
    *
    * @return The magnitude of the direction vector
    */
@@ -313,16 +313,26 @@ public class Joystick extends GenericHID {
   }
 
   /**
-   * Get the direction of the vector formed by the joystick and its origin in radians.
+   * Get the direction of the vector formed by the joystick and its origin in radians. 0 is forward
+   * and clockwise is positive. (Straight right is π/2.)
    *
    * @return The direction of the vector in radians
    */
   public double getDirectionRadians() {
+    // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#joystick-and-controller-coordinate-system
+    // A positive rotation around the X axis moves the joystick right, and a
+    // positive rotation around the Y axis moves the joystick backward. When
+    // treating them as translations, 0 radians is measured from the right
+    // direction, and angle increases clockwise.
+    //
+    // It's rotated 90 degrees CCW (y is negated and the arguments are reversed)
+    // so that 0 radians is forward.
     return Math.atan2(getX(), -getY());
   }
 
   /**
-   * Get the direction of the vector formed by the joystick and its origin in degrees.
+   * Get the direction of the vector formed by the joystick and its origin in degrees. 0 is forward
+   * and clockwise is positive. (Straight right is 90.)
    *
    * @return The direction of the vector in degrees
    */

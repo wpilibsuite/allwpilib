@@ -30,7 +30,7 @@ class Ellipse2dTest {
   }
 
   @Test
-  void testIntersectsPoint() {
+  void testIntersects() {
     var center = new Pose2d(1.0, 2.0, new Rotation2d());
     var ellipse = new Ellipse2d(center, 2.0, 1.0);
 
@@ -43,7 +43,7 @@ class Ellipse2dTest {
   }
 
   @Test
-  void testContainsPoint() {
+  void testContains() {
     var center = new Pose2d(-1.0, -2.0, Rotation2d.fromDegrees(45.0));
     var ellipse = new Ellipse2d(center, 2.0, 1.0);
 
@@ -55,7 +55,7 @@ class Ellipse2dTest {
   }
 
   @Test
-  void testDistanceToPoint() {
+  void testDistance() {
     var center = new Pose2d(1.0, 2.0, Rotation2d.fromDegrees(270.0));
     var ellipse = new Ellipse2d(center, 1.0, 2.0);
 
@@ -73,30 +73,30 @@ class Ellipse2dTest {
   }
 
   @Test
-  void testFindNearestPoint() {
+  void testNearest() {
     var center = new Pose2d(1.0, 2.0, Rotation2d.fromDegrees(270.0));
     var ellipse = new Ellipse2d(center, 1.0, 2.0);
 
     var point1 = new Translation2d(2.5, 2.0);
-    var nearestPoint1 = ellipse.findNearestPoint(point1);
+    var nearestPoint1 = ellipse.nearest(point1);
     assertAll(
         () -> assertEquals(2.5, nearestPoint1.getX(), kEpsilon),
         () -> assertEquals(2.0, nearestPoint1.getY(), kEpsilon));
 
     var point2 = new Translation2d(1.0, 2.0);
-    var nearestPoint2 = ellipse.findNearestPoint(point2);
+    var nearestPoint2 = ellipse.nearest(point2);
     assertAll(
         () -> assertEquals(1.0, nearestPoint2.getX(), kEpsilon),
         () -> assertEquals(2.0, nearestPoint2.getY(), kEpsilon));
 
     var point3 = new Translation2d(1.0, 1.0);
-    var nearestPoint3 = ellipse.findNearestPoint(point3);
+    var nearestPoint3 = ellipse.nearest(point3);
     assertAll(
         () -> assertEquals(1.0, nearestPoint3.getX(), kEpsilon),
         () -> assertEquals(1.0, nearestPoint3.getY(), kEpsilon));
 
     var point4 = new Translation2d(-1.0, 2.5);
-    var nearestPoint4 = ellipse.findNearestPoint(point4);
+    var nearestPoint4 = ellipse.nearest(point4);
     assertAll(
         () -> assertEquals(-0.8512799937611617, nearestPoint4.getX(), kEpsilon),
         () -> assertEquals(2.378405333174535, nearestPoint4.getY(), kEpsilon));

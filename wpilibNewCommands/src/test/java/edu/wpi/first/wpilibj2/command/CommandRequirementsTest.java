@@ -45,7 +45,7 @@ class CommandRequirementsTest extends CommandTestBase {
       Subsystem requirement = new SubsystemBase() {};
 
       Command notInterrupted =
-          new RunCommand(() -> {}, requirement)
+          Commands.idle(requirement)
               .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
       MockCommandHolder interrupterHolder = new MockCommandHolder(true, requirement);
       Command interrupter = interrupterHolder.getMock();
@@ -63,7 +63,7 @@ class CommandRequirementsTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       Subsystem system = new SubsystemBase() {};
 
-      Command missingRequirement = new WaitUntilCommand(() -> false);
+      Command missingRequirement = Commands.idle();
 
       assertThrows(
           IllegalArgumentException.class,

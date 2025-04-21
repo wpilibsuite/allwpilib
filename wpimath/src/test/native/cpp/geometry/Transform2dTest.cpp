@@ -13,6 +13,13 @@
 
 using namespace frc;
 
+TEST(Transform2dTest, ToMatrix) {
+  Transform2d before{1_m, 2_m, 20_deg};
+  Transform2d after{before.ToMatrix()};
+
+  EXPECT_EQ(before, after);
+}
+
 TEST(Transform2dTest, Inverse) {
   const Pose2d initial{1_m, 2_m, 45_deg};
   const Transform2d transform{{5_m, 0_m}, 5_deg};

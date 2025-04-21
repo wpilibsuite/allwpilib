@@ -6,6 +6,9 @@
 #include <networktables/NetworkTableInstance.h>
 
 #include "CommandTestBase.h"
+#include "frc2/command/FunctionalCommand.h"
+#include "frc2/command/InstantCommand.h"
+#include "frc2/command/RunCommand.h"
 
 using namespace frc2;
 class CommandScheduleTest : public CommandTestBase {};
@@ -93,6 +96,51 @@ TEST_F(CommandScheduleTest, SchedulerCancel) {
   scheduler.Cancel(&command);
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
+}
+
+TEST_F(CommandScheduleTest, CommandKnowsWhenItEnded) {
+  CommandScheduler scheduler = GetScheduler();
+
+  frc2::FunctionalCommand* commandPtr = nullptr;
+  auto command = frc2::FunctionalCommand(
+      [] {}, [] {},
+      [&](auto isForced) {
+        EXPECT_FALSE(scheduler.IsScheduled(commandPtr))
+            << "Command shouldn't be scheduled when its end is called";
+      },
+      [] { return true; });
+  commandPtr = &command;
+
+  scheduler.Schedule(commandPtr);
+  scheduler.Run();
+  EXPECT_FALSE(scheduler.IsScheduled(commandPtr))
+      << "Command should be removed from scheduler when its isFinished() "
+         "returns true";
+}
+
+TEST_F(CommandScheduleTest, ScheduleCommandInCommand) {
+  CommandScheduler scheduler = GetScheduler();
+  int counter = 0;
+  frc2::InstantCommand commandToGetScheduled{[&counter] { counter++; }};
+
+  auto command =
+      frc2::RunCommand([&counter, &scheduler, &commandToGetScheduled] {
+        scheduler.Schedule(&commandToGetScheduled);
+        EXPECT_EQ(counter, 1)
+            << "Scheduled command's init was not run immediately "
+               "after getting scheduled";
+      });
+
+  scheduler.Schedule(&command);
+  scheduler.Run();
+  EXPECT_EQ(counter, 1) << "Command 2 was not run when it should have been";
+  EXPECT_TRUE(scheduler.IsScheduled(&commandToGetScheduled))
+      << "Command 2 was not added to scheduler";
+
+  scheduler.Run();
+  EXPECT_EQ(counter, 1) << "Command 2 was run when it shouldn't have been";
+  EXPECT_FALSE(scheduler.IsScheduled(&commandToGetScheduled))
+      << "Command 2 did not end when it should have";
 }
 
 TEST_F(CommandScheduleTest, NotScheduledCancel) {

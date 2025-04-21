@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -16,7 +14,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.function.BiConsumer;
@@ -49,10 +46,8 @@ public class RamseteCommand extends Command {
   private final PIDController m_rightController;
   private final BiConsumer<Double, Double> m_output;
   private DifferentialDriveWheelSpeeds m_prevSpeeds = new DifferentialDriveWheelSpeeds();
-  private final MutLinearVelocity m_prevLeftSpeedSetpoint = MetersPerSecond.mutable(0);
-  private final MutLinearVelocity m_prevRightSpeedSetpoint = MetersPerSecond.mutable(0);
-  private final MutLinearVelocity m_leftSpeedSetpoint = MetersPerSecond.mutable(0);
-  private final MutLinearVelocity m_rightSpeedSetpoint = MetersPerSecond.mutable(0);
+  private double m_prevLeftSpeedSetpoint; // m/s
+  private double m_prevRightSpeedSetpoint; // m/s
   private double m_prevTime;
 
   /**
@@ -156,8 +151,8 @@ public class RamseteCommand extends Command {
                 initialState.velocityMetersPerSecond,
                 0,
                 initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
-    m_prevLeftSpeedSetpoint.mut_setMagnitude(m_prevSpeeds.leftMetersPerSecond);
-    m_prevRightSpeedSetpoint.mut_setMagnitude(m_prevSpeeds.rightMetersPerSecond);
+    m_prevLeftSpeedSetpoint = m_prevSpeeds.leftMetersPerSecond;
+    m_prevRightSpeedSetpoint = m_prevSpeeds.rightMetersPerSecond;
     m_timer.restart();
     if (m_usePID) {
       m_leftController.reset();
@@ -179,21 +174,18 @@ public class RamseteCommand extends Command {
         m_kinematics.toWheelSpeeds(
             m_follower.calculate(m_pose.get(), m_trajectory.sample(curTime)));
 
-    var leftSpeedSetpoint = targetWheelSpeeds.leftMetersPerSecond;
-    var rightSpeedSetpoint = targetWheelSpeeds.rightMetersPerSecond;
-
-    m_leftSpeedSetpoint.mut_setMagnitude(targetWheelSpeeds.leftMetersPerSecond);
-    m_rightSpeedSetpoint.mut_setMagnitude(targetWheelSpeeds.rightMetersPerSecond);
+    double leftSpeedSetpoint = targetWheelSpeeds.leftMetersPerSecond;
+    double rightSpeedSetpoint = targetWheelSpeeds.rightMetersPerSecond;
 
     double leftOutput;
     double rightOutput;
 
     if (m_usePID) {
       double leftFeedforward =
-          m_feedforward.calculate(m_prevLeftSpeedSetpoint, m_leftSpeedSetpoint).in(Volts);
+          m_feedforward.calculateWithVelocities(m_prevLeftSpeedSetpoint, leftSpeedSetpoint);
 
       double rightFeedforward =
-          m_feedforward.calculate(m_prevRightSpeedSetpoint, m_rightSpeedSetpoint).in(Volts);
+          m_feedforward.calculateWithVelocities(m_prevRightSpeedSetpoint, rightSpeedSetpoint);
 
       leftOutput =
           leftFeedforward

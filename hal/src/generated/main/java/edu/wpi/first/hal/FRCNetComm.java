@@ -251,6 +251,28 @@ public final class FRCNetComm {
     public static final int kResourceType_RevSparkFlexCAN = 114;
     /** kResourceType_RevSparkFlexPWM = 115. */
     public static final int kResourceType_RevSparkFlexPWM = 115;
+    /** kResourceType_BangBangController = 116. */
+    public static final int kResourceType_BangBangController = 116;
+    /** kResourceType_DataLogManager = 117. */
+    public static final int kResourceType_DataLogManager = 117;
+    /** kResourceType_LoggingFramework = 118. */
+    public static final int kResourceType_LoggingFramework = 118;
+    /** kResourceType_ChoreoTrajectory = 119. */
+    public static final int kResourceType_ChoreoTrajectory = 119;
+    /** kResourceType_ChoreoTrigger = 120. */
+    public static final int kResourceType_ChoreoTrigger = 120;
+    /** kResourceType_PathWeaverTrajectory = 121. */
+    public static final int kResourceType_PathWeaverTrajectory = 121;
+    /** kResourceType_Koors40 = 122. */
+    public static final int kResourceType_Koors40 = 122;
+    /** kResourceType_ThriftyNova = 123. */
+    public static final int kResourceType_ThriftyNova = 123;
+    /** kResourceType_RevServoHub = 124. */
+    public static final int kResourceType_RevServoHub = 124;
+    /** kResourceType_PWFSEN36005 = 125. */
+    public static final int kResourceType_PWFSEN36005 = 125;
+    /** kResourceType_LaserShark = 126. */
+    public static final int kResourceType_LaserShark = 126;
   }
 
   /**
@@ -273,6 +295,8 @@ public final class FRCNetComm {
     public static final int kLanguage_DotNet = 5;
     /** kLanguage_Kotlin = 6. */
     public static final int kLanguage_Kotlin = 6;
+    /** kLanguage_Rust = 7. */
+    public static final int kLanguage_Rust = 7;
     /** kCANPlugin_BlackJagBridge = 1. */
     public static final int kCANPlugin_BlackJagBridge = 1;
     /** kCANPlugin_2CAN = 2. */
@@ -291,6 +315,12 @@ public final class FRCNetComm {
     public static final int kFramework_RobotBuilder = 6;
     /** kFramework_AdvantageKit = 7. */
     public static final int kFramework_AdvantageKit = 7;
+    /** kFramework_MagicBot = 8. */
+    public static final int kFramework_MagicBot = 8;
+    /** kFramework_KitBotTraditional = 9. */
+    public static final int kFramework_KitBotTraditional = 9;
+    /** kFramework_KitBotInline = 10. */
+    public static final int kFramework_KitBotInline = 10;
     /** kRobotDrive_ArcadeStandard = 1. */
     public static final int kRobotDrive_ArcadeStandard = 1;
     /** kRobotDrive_ArcadeButtonSpin = 2. */
@@ -317,6 +347,16 @@ public final class FRCNetComm {
     public static final int kRobotDrive2_KilloughCartesian = 12;
     /** kRobotDrive2_KilloughPolar = 13. */
     public static final int kRobotDrive2_KilloughPolar = 13;
+    /** kRobotDriveSwerve_Other = 14. */
+    public static final int kRobotDriveSwerve_Other = 14;
+    /** kRobotDriveSwerve_YAGSL = 15. */
+    public static final int kRobotDriveSwerve_YAGSL = 15;
+    /** kRobotDriveSwerve_CTRE = 16. */
+    public static final int kRobotDriveSwerve_CTRE = 16;
+    /** kRobotDriveSwerve_MaxSwerve = 17. */
+    public static final int kRobotDriveSwerve_MaxSwerve = 17;
+    /** kRobotDriveSwerve_AdvantageKit = 18. */
+    public static final int kRobotDriveSwerve_AdvantageKit = 18;
     /** kDriverStationCIO_Analog = 1. */
     public static final int kDriverStationCIO_Analog = 1;
     /** kDriverStationCIO_DigitalIn = 2. */
@@ -369,6 +409,44 @@ public final class FRCNetComm {
     public static final int kOdometry_MecanumDrive = 2;
     /** kOdometry_SwerveDrive = 3. */
     public static final int kOdometry_SwerveDrive = 3;
+    /** kDashboard_Unknown = 1. */
+    public static final int kDashboard_Unknown = 1;
+    /** kDashboard_Glass = 2. */
+    public static final int kDashboard_Glass = 2;
+    /** kDashboard_SmartDashboard = 3. */
+    public static final int kDashboard_SmartDashboard = 3;
+    /** kDashboard_Shuffleboard = 4. */
+    public static final int kDashboard_Shuffleboard = 4;
+    /** kDashboard_Elastic = 5. */
+    public static final int kDashboard_Elastic = 5;
+    /** kDashboard_LabVIEW = 6. */
+    public static final int kDashboard_LabVIEW = 6;
+    /** kDashboard_AdvantageScope = 7. */
+    public static final int kDashboard_AdvantageScope = 7;
+    /** kDashboard_QFRCDashboard = 8. */
+    public static final int kDashboard_QFRCDashboard = 8;
+    /** kDashboard_FRCWebComponents = 9. */
+    public static final int kDashboard_FRCWebComponents = 9;
+    /** kDataLogLocation_Onboard = 1. */
+    public static final int kDataLogLocation_Onboard = 1;
+    /** kDataLogLocation_USB = 2. */
+    public static final int kDataLogLocation_USB = 2;
+    /** kLoggingFramework_Other = 1. */
+    public static final int kLoggingFramework_Other = 1;
+    /** kLoggingFramework_Epilogue = 2. */
+    public static final int kLoggingFramework_Epilogue = 2;
+    /** kLoggingFramework_Monologue = 3. */
+    public static final int kLoggingFramework_Monologue = 3;
+    /** kLoggingFramework_AdvantageKit = 4. */
+    public static final int kLoggingFramework_AdvantageKit = 4;
+    /** kLoggingFramework_DogLog = 5. */
+    public static final int kLoggingFramework_DogLog = 5;
+    /** kPDP_CTRE = 1. */
+    public static final int kPDP_CTRE = 1;
+    /** kPDP_REV = 2. */
+    public static final int kPDP_REV = 2;
+    /** kPDP_Unknown = 3. */
+    public static final int kPDP_Unknown = 3;
   }
 
   /** Utility class. */

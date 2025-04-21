@@ -50,6 +50,21 @@ class WPILIB_DLLEXPORT Transform2d {
       : m_translation{x, y}, m_rotation{std::move(rotation)} {}
 
   /**
+   * Constructs a pose with the specified affine transformation matrix.
+   *
+   * @param matrix The affine transformation matrix.
+   * @throws std::domain_error if the affine transformation matrix is invalid.
+   */
+  constexpr explicit Transform2d(const Eigen::Matrix3d& matrix)
+      : m_translation{Eigen::Vector2d{{matrix(0, 2)}, {matrix(1, 2)}}},
+        m_rotation{Eigen::Matrix2d{{matrix(0, 0), matrix(0, 1)},
+                                   {matrix(1, 0), matrix(1, 1)}}} {
+    if (matrix(2, 0) != 0.0 || matrix(2, 1) != 0.0 || matrix(2, 2) != 1.0) {
+      throw std::domain_error("Affine transformation matrix is invalid");
+    }
+  }
+
+  /**
    * Constructs the identity transform -- maps an initial pose to itself.
    */
   constexpr Transform2d() = default;
@@ -74,6 +89,18 @@ class WPILIB_DLLEXPORT Transform2d {
    * @return The y component of the transformation's translation.
    */
   constexpr units::meter_t Y() const { return m_translation.Y(); }
+
+  /**
+   * Returns an affine transformation matrix representation of this
+   * transformation.
+   */
+  constexpr Eigen::Matrix3d ToMatrix() const {
+    auto vec = m_translation.ToVector();
+    auto mat = m_rotation.ToMatrix();
+    return Eigen::Matrix3d{{mat(0, 0), mat(0, 1), vec(0)},
+                           {mat(1, 0), mat(1, 1), vec(1)},
+                           {0.0, 0.0, 1.0}};
+  }
 
   /**
    * Returns the rotational component of the transformation.

@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <frc2/command/Commands.h>
+
 #include <frc/simulation/SimHooks.h>
 
 #include "CommandTestBase.h"
@@ -16,14 +18,14 @@ TEST_F(WaitCommandTest, WaitCommandSchedule) {
 
   CommandScheduler scheduler = GetScheduler();
 
-  WaitCommand command(100_ms);
+  auto command = cmd::Wait(100_ms);
 
-  scheduler.Schedule(&command);
+  scheduler.Schedule(command);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&command));
+  EXPECT_TRUE(scheduler.IsScheduled(command));
   frc::sim::StepTiming(110_ms);
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&command));
+  EXPECT_FALSE(scheduler.IsScheduled(command));
 
   frc::sim::ResumeTiming();
 }

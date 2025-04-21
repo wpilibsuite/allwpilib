@@ -89,19 +89,25 @@ EIGEN_STRONG_INLINE Packet2cf pconj(const Packet2cf& a) {
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet2cf pmul<Packet2cf>(const Packet2cf& a, const Packet2cf& b) {
+EIGEN_STRONG_INLINE Packet2cf pmul(const Packet2cf& a, const Packet2cf& b) {
 #ifdef EIGEN_VECTORIZE_SSE3
-  return Packet2cf(_mm_addsub_ps(_mm_mul_ps(_mm_moveldup_ps(a.v), b.v),
-                                 _mm_mul_ps(_mm_movehdup_ps(a.v), vec4f_swizzle1(b.v, 1, 0, 3, 2))));
-  //   return Packet2cf(_mm_addsub_ps(_mm_mul_ps(vec4f_swizzle1(a.v, 0, 0, 2, 2), b.v),
-  //                                  _mm_mul_ps(vec4f_swizzle1(a.v, 1, 1, 3, 3),
-  //                                             vec4f_swizzle1(b.v, 1, 0, 3, 2))));
+  __m128 tmp1 = _mm_mul_ps(_mm_movehdup_ps(a.v), vec4f_swizzle1(b.v, 1, 0, 3, 2));
+  __m128 tmp2 = _mm_moveldup_ps(a.v);
 #else
-  const __m128 mask = _mm_castsi128_ps(_mm_setr_epi32(0x80000000, 0x00000000, 0x80000000, 0x00000000));
-  return Packet2cf(
-      _mm_add_ps(_mm_mul_ps(vec4f_swizzle1(a.v, 0, 0, 2, 2), b.v),
-                 _mm_xor_ps(_mm_mul_ps(vec4f_swizzle1(a.v, 1, 1, 3, 3), vec4f_swizzle1(b.v, 1, 0, 3, 2)), mask)));
+  __m128 tmp1 = _mm_mul_ps(vec4f_swizzle1(a.v, 1, 1, 3, 3), vec4f_swizzle1(b.v, 1, 0, 3, 2));
+  __m128 tmp2 = vec4f_swizzle1(a.v, 0, 0, 2, 2);
 #endif
+#ifdef EIGEN_VECTORIZE_FMA
+  __m128 result = _mm_fmaddsub_ps(tmp2, b.v, tmp1);
+#else
+#ifdef EIGEN_VECTORIZE_SSE3
+  __m128 result = _mm_addsub_ps(_mm_mul_ps(tmp2, b.v), tmp1);
+#else
+  const __m128 mask = _mm_setr_ps(-0.0f, 0.0f, -0.0f, 0.0f);
+  __m128 result = _mm_add_ps(_mm_mul_ps(tmp2, b.v), _mm_xor_ps(tmp1, mask));
+#endif
+#endif
+  return Packet2cf(result);
 }
 
 template <>
@@ -127,11 +133,11 @@ EIGEN_STRONG_INLINE Packet2cf pandnot<Packet2cf>(const Packet2cf& a, const Packe
 
 template <>
 EIGEN_STRONG_INLINE Packet2cf pload<Packet2cf>(const std::complex<float>* from) {
-  EIGEN_DEBUG_ALIGNED_LOAD return Packet2cf(pload<Packet4f>(&numext::real_ref(*from)));
+  EIGEN_DEBUG_ALIGNED_LOAD return Packet2cf(_mm_load_ps(&numext::real_ref(*from)));
 }
 template <>
 EIGEN_STRONG_INLINE Packet2cf ploadu<Packet2cf>(const std::complex<float>* from) {
-  EIGEN_DEBUG_UNALIGNED_LOAD return Packet2cf(ploadu<Packet4f>(&numext::real_ref(*from)));
+  EIGEN_DEBUG_UNALIGNED_LOAD return Packet2cf(_mm_loadu_ps(&numext::real_ref(*from)));
 }
 
 template <>
@@ -148,11 +154,11 @@ EIGEN_STRONG_INLINE Packet2cf ploaddup<Packet2cf>(const std::complex<float>* fro
 
 template <>
 EIGEN_STRONG_INLINE void pstore<std::complex<float> >(std::complex<float>* to, const Packet2cf& from) {
-  EIGEN_DEBUG_ALIGNED_STORE pstore(&numext::real_ref(*to), Packet4f(from.v));
+  EIGEN_DEBUG_ALIGNED_STORE _mm_store_ps(&numext::real_ref(*to), from.v);
 }
 template <>
 EIGEN_STRONG_INLINE void pstoreu<std::complex<float> >(std::complex<float>* to, const Packet2cf& from) {
-  EIGEN_DEBUG_UNALIGNED_STORE pstoreu(&numext::real_ref(*to), Packet4f(from.v));
+  EIGEN_DEBUG_UNALIGNED_STORE _mm_storeu_ps(&numext::real_ref(*to), from.v);
 }
 
 template <>
@@ -277,15 +283,24 @@ EIGEN_STRONG_INLINE Packet1cd pconj(const Packet1cd& a) {
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet1cd pmul<Packet1cd>(const Packet1cd& a, const Packet1cd& b) {
+EIGEN_STRONG_INLINE Packet1cd pmul(const Packet1cd& a, const Packet1cd& b) {
+  __m128d tmp1 = _mm_mul_pd(_mm_unpackhi_pd(a.v, a.v), vec2d_swizzle1(b.v, 1, 0));
 #ifdef EIGEN_VECTORIZE_SSE3
-  return Packet1cd(_mm_addsub_pd(_mm_mul_pd(_mm_movedup_pd(a.v), b.v),
-                                 _mm_mul_pd(vec2d_swizzle1(a.v, 1, 1), vec2d_swizzle1(b.v, 1, 0))));
+  __m128d tmp2 = _mm_movedup_pd(a.v);
 #else
-  const __m128d mask = _mm_castsi128_pd(_mm_set_epi32(0x0, 0x0, 0x80000000, 0x0));
-  return Packet1cd(_mm_add_pd(_mm_mul_pd(vec2d_swizzle1(a.v, 0, 0), b.v),
-                              _mm_xor_pd(_mm_mul_pd(vec2d_swizzle1(a.v, 1, 1), vec2d_swizzle1(b.v, 1, 0)), mask)));
+  __m128d tmp2 = _mm_unpacklo_pd(a.v, a.v);
 #endif
+#ifdef EIGEN_VECTORIZE_FMA
+  __m128d result = _mm_fmaddsub_pd(tmp2, b.v, tmp1);
+#else
+#ifdef EIGEN_VECTORIZE_SSE3
+  __m128d result = _mm_addsub_pd(_mm_mul_pd(tmp2, b.v), tmp1);
+#else
+  const __m128d mask = _mm_setr_pd(-0.0, 0.0);
+  __m128d result = _mm_add_pd(_mm_mul_pd(tmp2, b.v), _mm_xor_pd(tmp1, mask));
+#endif
+#endif
+  return Packet1cd(result);
 }
 
 template <>
@@ -312,11 +327,11 @@ EIGEN_STRONG_INLINE Packet1cd pandnot<Packet1cd>(const Packet1cd& a, const Packe
 // FIXME force unaligned load, this is a temporary fix
 template <>
 EIGEN_STRONG_INLINE Packet1cd pload<Packet1cd>(const std::complex<double>* from) {
-  EIGEN_DEBUG_ALIGNED_LOAD return Packet1cd(pload<Packet2d>((const double*)from));
+  EIGEN_DEBUG_ALIGNED_LOAD return Packet1cd(_mm_load_pd((const double*)from));
 }
 template <>
 EIGEN_STRONG_INLINE Packet1cd ploadu<Packet1cd>(const std::complex<double>* from) {
-  EIGEN_DEBUG_UNALIGNED_LOAD return Packet1cd(ploadu<Packet2d>((const double*)from));
+  EIGEN_DEBUG_UNALIGNED_LOAD return Packet1cd(_mm_loadu_pd((const double*)from));
 }
 template <>
 EIGEN_STRONG_INLINE Packet1cd
@@ -332,11 +347,11 @@ EIGEN_STRONG_INLINE Packet1cd ploaddup<Packet1cd>(const std::complex<double>* fr
 // FIXME force unaligned store, this is a temporary fix
 template <>
 EIGEN_STRONG_INLINE void pstore<std::complex<double> >(std::complex<double>* to, const Packet1cd& from) {
-  EIGEN_DEBUG_ALIGNED_STORE pstore((double*)to, Packet2d(from.v));
+  EIGEN_DEBUG_ALIGNED_STORE _mm_store_pd((double*)to, from.v);
 }
 template <>
 EIGEN_STRONG_INLINE void pstoreu<std::complex<double> >(std::complex<double>* to, const Packet1cd& from) {
-  EIGEN_DEBUG_UNALIGNED_STORE pstoreu((double*)to, Packet2d(from.v));
+  EIGEN_DEBUG_UNALIGNED_STORE _mm_storeu_pd((double*)to, from.v);
 }
 
 template <>
@@ -430,6 +445,74 @@ EIGEN_STRONG_INLINE Packet2cf pexp<Packet2cf>(const Packet2cf& a) {
   return pexp_complex<Packet2cf>(a);
 }
 
+#ifdef EIGEN_VECTORIZE_FMA
+// std::complex<float>
+template <>
+EIGEN_STRONG_INLINE Packet2cf pmadd(const Packet2cf& a, const Packet2cf& b, const Packet2cf& c) {
+  __m128 a_odd = _mm_movehdup_ps(a.v);
+  __m128 a_even = _mm_moveldup_ps(a.v);
+  __m128 b_swap = _mm_permute_ps(b.v, _MM_SHUFFLE(2, 3, 0, 1));
+  __m128 result = _mm_fmaddsub_ps(a_even, b.v, _mm_fmaddsub_ps(a_odd, b_swap, c.v));
+  return Packet2cf(result);
+}
+template <>
+EIGEN_STRONG_INLINE Packet2cf pmsub(const Packet2cf& a, const Packet2cf& b, const Packet2cf& c) {
+  __m128 a_odd = _mm_movehdup_ps(a.v);
+  __m128 a_even = _mm_moveldup_ps(a.v);
+  __m128 b_swap = _mm_permute_ps(b.v, _MM_SHUFFLE(2, 3, 0, 1));
+  __m128 result = _mm_fmaddsub_ps(a_even, b.v, _mm_fmsubadd_ps(a_odd, b_swap, c.v));
+  return Packet2cf(result);
+}
+template <>
+EIGEN_STRONG_INLINE Packet2cf pnmadd(const Packet2cf& a, const Packet2cf& b, const Packet2cf& c) {
+  __m128 a_odd = _mm_movehdup_ps(a.v);
+  __m128 a_even = _mm_moveldup_ps(a.v);
+  __m128 b_swap = _mm_permute_ps(b.v, _MM_SHUFFLE(2, 3, 0, 1));
+  __m128 result = _mm_fmaddsub_ps(a_odd, b_swap, _mm_fmaddsub_ps(a_even, b.v, c.v));
+  return Packet2cf(result);
+}
+template <>
+EIGEN_STRONG_INLINE Packet2cf pnmsub(const Packet2cf& a, const Packet2cf& b, const Packet2cf& c) {
+  __m128 a_odd = _mm_movehdup_ps(a.v);
+  __m128 a_even = _mm_moveldup_ps(a.v);
+  __m128 b_swap = _mm_permute_ps(b.v, _MM_SHUFFLE(2, 3, 0, 1));
+  __m128 result = _mm_fmaddsub_ps(a_odd, b_swap, _mm_fmsubadd_ps(a_even, b.v, c.v));
+  return Packet2cf(result);
+}
+// std::complex<double>
+template <>
+EIGEN_STRONG_INLINE Packet1cd pmadd(const Packet1cd& a, const Packet1cd& b, const Packet1cd& c) {
+  __m128d a_odd = _mm_permute_pd(a.v, 0x3);
+  __m128d a_even = _mm_movedup_pd(a.v);
+  __m128d b_swap = _mm_permute_pd(b.v, 0x1);
+  __m128d result = _mm_fmaddsub_pd(a_even, b.v, _mm_fmaddsub_pd(a_odd, b_swap, c.v));
+  return Packet1cd(result);
+}
+template <>
+EIGEN_STRONG_INLINE Packet1cd pmsub(const Packet1cd& a, const Packet1cd& b, const Packet1cd& c) {
+  __m128d a_odd = _mm_permute_pd(a.v, 0x3);
+  __m128d a_even = _mm_movedup_pd(a.v);
+  __m128d b_swap = _mm_permute_pd(b.v, 0x1);
+  __m128d result = _mm_fmaddsub_pd(a_even, b.v, _mm_fmsubadd_pd(a_odd, b_swap, c.v));
+  return Packet1cd(result);
+}
+template <>
+EIGEN_STRONG_INLINE Packet1cd pnmadd(const Packet1cd& a, const Packet1cd& b, const Packet1cd& c) {
+  __m128d a_odd = _mm_permute_pd(a.v, 0x3);
+  __m128d a_even = _mm_movedup_pd(a.v);
+  __m128d b_swap = _mm_permute_pd(b.v, 0x1);
+  __m128d result = _mm_fmaddsub_pd(a_odd, b_swap, _mm_fmaddsub_pd(a_even, b.v, c.v));
+  return Packet1cd(result);
+}
+template <>
+EIGEN_STRONG_INLINE Packet1cd pnmsub(const Packet1cd& a, const Packet1cd& b, const Packet1cd& c) {
+  __m128d a_odd = _mm_permute_pd(a.v, 0x3);
+  __m128d a_even = _mm_movedup_pd(a.v);
+  __m128d b_swap = _mm_permute_pd(b.v, 0x1);
+  __m128d result = _mm_fmaddsub_pd(a_odd, b_swap, _mm_fmsubadd_pd(a_even, b.v, c.v));
+  return Packet1cd(result);
+}
+#endif
 }  // end namespace internal
 }  // end namespace Eigen
 

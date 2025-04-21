@@ -246,7 +246,7 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
-   * Returns the error tolerance of this controller.
+   * Returns the error tolerance of this controller. Defaults to 0.05.
    *
    * @return the error tolerance of the controller.
    */
@@ -255,7 +255,7 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
-   * Returns the error derivative tolerance of this controller.
+   * Returns the error derivative tolerance of this controller. Defaults to ∞.
    *
    * @return the error derivative tolerance of the controller.
    */
@@ -301,7 +301,8 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
-   * Returns true if the error is within the tolerance of the setpoint.
+   * Returns true if the error is within the tolerance of the setpoint. The error tolerance defaults
+   * to 0.05, and the error derivative tolerance defaults to ∞.
    *
    * <p>This will return false until at least one input value has been computed.
    *

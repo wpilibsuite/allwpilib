@@ -60,12 +60,12 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
 }
 }  // namespace frc
 
-#define FRC_ReportError(status, format, ...)                             \
-  do {                                                                   \
-    if ((status) != 0) {                                                 \
-      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__,       \
-                         FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__); \
-    }                                                                    \
+#define FRC_ReportError(status, format, ...)                       \
+  do {                                                             \
+    if ((status) != 0) {                                           \
+      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
+                         format __VA_OPT__(, ) __VA_ARGS__);       \
+    }                                                              \
   } while (0)
 
 namespace RobotController {

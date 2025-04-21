@@ -12,6 +12,22 @@ import org.junit.jupiter.api.Test;
 
 class Transform3dTest {
   @Test
+  void testToMatrix() {
+    var before =
+        new Transform3d(
+            1.0,
+            2.0,
+            3.0,
+            new Rotation3d(
+                Units.degreesToRadians(20.0),
+                Units.degreesToRadians(30.0),
+                Units.degreesToRadians(40.0)));
+    var after = new Transform3d(before.toMatrix());
+
+    assertEquals(before, after);
+  }
+
+  @Test
   void testInverse() {
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 

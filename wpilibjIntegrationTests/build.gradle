@@ -15,7 +15,7 @@ application {
     mainClass = 'edu.wpi.first.wpilibj.test.AntJunitLauncher'
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.gradleup.shadow'
 
 repositories {
     maven {

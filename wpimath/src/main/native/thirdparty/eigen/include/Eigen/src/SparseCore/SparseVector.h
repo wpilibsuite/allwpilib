@@ -90,9 +90,9 @@ class SparseVector : public SparseCompressedBase<SparseVector<Scalar_, Options_,
   inline StorageIndex* innerNonZeroPtr() { return 0; }
 
   /** \internal */
-  inline Storage& data() { return m_data; }
+  constexpr Storage& data() { return m_data; }
   /** \internal */
-  inline const Storage& data() const { return m_data; }
+  constexpr const Storage& data() const { return m_data; }
 
   inline Scalar coeff(Index row, Index col) const {
     eigen_assert(IsColVector ? (col == 0 && row >= 0 && row < m_size) : (row == 0 && col >= 0 && col < m_size));
@@ -278,12 +278,21 @@ class SparseVector : public SparseCompressedBase<SparseVector<Scalar_, Options_,
     std::swap(m_size, other.m_size);
     m_data.swap(other.m_data);
   }
+  friend EIGEN_DEVICE_FUNC void swap(SparseVector& a, SparseVector& b) { a.swap(b); }
 
   template <int OtherOptions>
   inline void swap(SparseMatrix<Scalar, OtherOptions, StorageIndex>& other) {
     eigen_assert(other.outerSize() == 1);
     std::swap(m_size, other.m_innerSize);
     m_data.swap(other.m_data);
+  }
+  template <int OtherOptions>
+  friend EIGEN_DEVICE_FUNC void swap(SparseVector& a, SparseMatrix<Scalar, OtherOptions, StorageIndex>& b) {
+    a.swap(b);
+  }
+  template <int OtherOptions>
+  friend EIGEN_DEVICE_FUNC void swap(SparseMatrix<Scalar, OtherOptions, StorageIndex>& a, SparseVector& b) {
+    b.swap(a);
   }
 
   inline SparseVector& operator=(const SparseVector& other) {

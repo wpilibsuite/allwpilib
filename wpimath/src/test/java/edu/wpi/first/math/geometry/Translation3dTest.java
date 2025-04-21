@@ -79,6 +79,40 @@ class Translation3dTest {
   }
 
   @Test
+  void testRotateAround() {
+    var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
+    var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
+    var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
+
+    var translation = new Translation3d(1.0, 2.0, 3.0);
+    var around = new Translation3d(3.0, 2.0, 1.0);
+
+    var rotated1 =
+        translation.rotateAround(around, new Rotation3d(xAxis, Units.degreesToRadians(90.0)));
+
+    assertAll(
+        () -> assertEquals(1.0, rotated1.getX(), kEpsilon),
+        () -> assertEquals(0.0, rotated1.getY(), kEpsilon),
+        () -> assertEquals(1.0, rotated1.getZ(), kEpsilon));
+
+    var rotated2 =
+        translation.rotateAround(around, new Rotation3d(yAxis, Units.degreesToRadians(90.0)));
+
+    assertAll(
+        () -> assertEquals(5.0, rotated2.getX(), kEpsilon),
+        () -> assertEquals(2.0, rotated2.getY(), kEpsilon),
+        () -> assertEquals(3.0, rotated2.getZ(), kEpsilon));
+
+    var rotated3 =
+        translation.rotateAround(around, new Rotation3d(zAxis, Units.degreesToRadians(90.0)));
+
+    assertAll(
+        () -> assertEquals(3.0, rotated3.getX(), kEpsilon),
+        () -> assertEquals(0.0, rotated3.getY(), kEpsilon),
+        () -> assertEquals(3.0, rotated3.getZ(), kEpsilon));
+  }
+
+  @Test
   void testToTranslation2d() {
     var translation = new Translation3d(1.0, 2.0, 3.0);
     var expected = new Translation2d(1.0, 2.0);

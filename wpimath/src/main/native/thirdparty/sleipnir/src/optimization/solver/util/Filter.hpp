@@ -12,6 +12,8 @@
 
 #include "sleipnir/autodiff/Variable.hpp"
 
+// See docs/algorithms.md#Works_cited for citation definitions.
+
 namespace sleipnir {
 
 /**
@@ -32,26 +34,14 @@ struct FilterEntry {
    * @param cost The cost function's value.
    * @param constraintViolation The constraint violation.
    */
-  FilterEntry(double cost, double constraintViolation)
+  constexpr FilterEntry(double cost, double constraintViolation)
       : cost{cost}, constraintViolation{constraintViolation} {}
-
-  /**
-   * Constructs a FilterEntry.
-   *
-   * @param f The cost function.
-   * @param μ The barrier parameter.
-   * @param s The inequality constraint slack variables.
-   * @param c_e The equality constraint values (nonzero means violation).
-   * @param c_i The inequality constraint values (negative means violation).
-   */
-  FilterEntry(Variable& f, double μ, const Eigen::VectorXd& s,
-              const Eigen::VectorXd& c_e, const Eigen::VectorXd& c_i)
-      : cost{f.Value() - μ * s.array().log().sum()},
-        constraintViolation{c_e.lpNorm<1>() + (c_i - s).lpNorm<1>()} {}
 };
 
 /**
- * Interior-point step filter.
+ * Step filter.
+ *
+ * See the section on filters in chapter 15 of [1].
  */
 class Filter {
  public:
@@ -64,11 +54,9 @@ class Filter {
    * Construct an empty filter.
    *
    * @param f The cost function.
-   * @param μ The barrier parameter.
    */
-  explicit Filter(Variable& f, double μ) {
+  explicit Filter(Variable& f) {
     m_f = &f;
-    m_μ = μ;
 
     // Initial filter entry rejects constraint violations above max
     m_filter.emplace_back(std::numeric_limits<double>::infinity(),
@@ -77,11 +65,8 @@ class Filter {
 
   /**
    * Reset the filter.
-   *
-   * @param μ The new barrier parameter.
    */
-  void Reset(double μ) {
-    m_μ = μ;
+  void Reset() {
     m_filter.clear();
 
     // Initial filter entry rejects constraint violations above max
@@ -90,15 +75,26 @@ class Filter {
   }
 
   /**
-   * Creates a new filter entry.
+   * Creates a new Sequential Quadratic Programming filter entry.
+   *
+   * @param c_e The equality constraint values (nonzero means violation).
+   */
+  FilterEntry MakeEntry(const Eigen::VectorXd& c_e) {
+    return FilterEntry{m_f->Value(), c_e.lpNorm<1>()};
+  }
+
+  /**
+   * Creates a new interior-point method filter entry.
    *
    * @param s The inequality constraint slack variables.
    * @param c_e The equality constraint values (nonzero means violation).
    * @param c_i The inequality constraint values (negative means violation).
+   * @param μ The barrier parameter.
    */
   FilterEntry MakeEntry(Eigen::VectorXd& s, const Eigen::VectorXd& c_e,
-                        const Eigen::VectorXd& c_i) {
-    return FilterEntry{*m_f, m_μ, s, c_e, c_i};
+                        const Eigen::VectorXd& c_i, double μ) {
+    return FilterEntry{m_f->Value() - μ * s.array().log().sum(),
+                       c_e.lpNorm<1>() + (c_i - s).lpNorm<1>()};
   }
 
   /**
@@ -181,7 +177,6 @@ class Filter {
 
  private:
   Variable* m_f = nullptr;
-  double m_μ = 0.0;
   wpi::SmallVector<FilterEntry> m_filter;
 };
 

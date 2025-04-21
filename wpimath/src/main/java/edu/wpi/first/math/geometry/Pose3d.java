@@ -10,10 +10,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.proto.Pose3dProto;
 import edu.wpi.first.math.geometry.struct.Pose3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.jni.Pose3dJNI;
+import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
@@ -80,9 +84,28 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   }
 
   /**
+   * Constructs a pose with the specified affine transformation matrix.
+   *
+   * @param matrix The affine transformation matrix.
+   * @throws IllegalArgumentException if the affine transformation matrix is invalid.
+   */
+  public Pose3d(Matrix<N4, N4> matrix) {
+    m_translation = new Translation3d(matrix.get(0, 3), matrix.get(1, 3), matrix.get(2, 3));
+    m_rotation = new Rotation3d(matrix.block(3, 3, 0, 0));
+    if (matrix.get(3, 0) != 0.0
+        || matrix.get(3, 1) != 0.0
+        || matrix.get(3, 2) != 0.0
+        || matrix.get(3, 3) != 1.0) {
+      throw new IllegalArgumentException("Affine transformation matrix is invalid");
+    }
+  }
+
+  /**
    * Constructs a 3D pose from a 2D pose in the X-Y plane.
    *
    * @param pose The 2D pose.
+   * @see Rotation3d#Rotation3d(Rotation2d)
+   * @see Translation3d#Translation3d(Translation2d)
    */
   public Pose3d(Pose2d pose) {
     m_translation = new Translation3d(pose.getX(), pose.getY(), 0.0);
@@ -249,6 +272,17 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   }
 
   /**
+   * Rotates the current pose around a point in 3D space.
+   *
+   * @param point The point in 3D space to rotate around.
+   * @param rot The rotation to rotate the pose by.
+   * @return The new rotated pose.
+   */
+  public Pose3d rotateAround(Translation3d point, Rotation3d rot) {
+    return new Pose3d(m_translation.rotateAround(point, rot), m_rotation.rotateBy(rot));
+  }
+
+  /**
    * Obtain a new Pose3d from a (constant curvature) velocity.
    *
    * <p>The twist is a change in pose in the robot's coordinate frame since the previous pose
@@ -322,6 +356,35 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
         resultArray[3],
         resultArray[4],
         resultArray[5]);
+  }
+
+  /**
+   * Returns an affine transformation matrix representation of this pose.
+   *
+   * @return An affine transformation matrix representation of this pose.
+   */
+  public Matrix<N4, N4> toMatrix() {
+    var vec = m_translation.toVector();
+    var mat = m_rotation.toMatrix();
+    return MatBuilder.fill(
+        Nat.N4(),
+        Nat.N4(),
+        mat.get(0, 0),
+        mat.get(0, 1),
+        mat.get(0, 2),
+        vec.get(0),
+        mat.get(1, 0),
+        mat.get(1, 1),
+        mat.get(1, 2),
+        vec.get(1),
+        mat.get(2, 0),
+        mat.get(2, 1),
+        mat.get(2, 2),
+        vec.get(2),
+        0.0,
+        0.0,
+        0.0,
+        1.0);
   }
 
   /**

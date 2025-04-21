@@ -19,10 +19,10 @@ class ClassSpecificLoggerTest {
       }
 
       @Override
-      protected void update(DataLogger dataLogger, Point2d object) {
-        dataLogger.log("x", object.x);
-        dataLogger.log("y", object.y);
-        dataLogger.log("dim", object.dim);
+      protected void update(EpilogueBackend backend, Point2d object) {
+        backend.log("x", object.x);
+        backend.log("y", object.y);
+        backend.log("dim", object.dim);
       }
     }
   }
@@ -31,14 +31,14 @@ class ClassSpecificLoggerTest {
   void testReadPrivate() {
     var point = new Point2d(1, 4, 2);
     var logger = new Point2d.Logger();
-    var dataLog = new TestLogger();
-    logger.update(dataLog.getSubLogger("Point"), point);
+    var dataLog = new TestBackend();
+    logger.update(dataLog.getNested("Point"), point);
 
     assertEquals(
         List.of(
-            new TestLogger.LogEntry<>("Point/x", 1.0),
-            new TestLogger.LogEntry<>("Point/y", 4.0),
-            new TestLogger.LogEntry<>("Point/dim", 2)),
+            new TestBackend.LogEntry<>("Point/x", 1.0),
+            new TestBackend.LogEntry<>("Point/y", 4.0),
+            new TestBackend.LogEntry<>("Point/dim", 2)),
         dataLog.getEntries());
   }
 }

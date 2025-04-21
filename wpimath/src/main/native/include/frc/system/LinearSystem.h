@@ -55,7 +55,7 @@ class LinearSystem {
       if (std::is_constant_evaluated()) {
         for (int row = 0; row < mat.rows(); ++row) {
           for (int col = 0; col < mat.cols(); ++col) {
-            if (!gcem::internal::is_finite(mat.coeff(row, col))) {
+            if (!gcem::internal::is_finite(mat(row, col))) {
               return false;
             }
           }

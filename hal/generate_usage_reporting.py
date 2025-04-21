@@ -67,6 +67,22 @@ def generate_usage_reporting(output_directory: Path, template_directory: Path):
         )
         usage_reporting_hdr.write_text(contents, encoding="utf-8", newline="\n")
 
+    with (template_directory / "UsageReporting.h.in").open(
+        encoding="utf-8"
+    ) as cpp_usage_reporting:
+        contents = (
+            # fmt: off
+            cpp_usage_reporting.read()
+            .replace(r"${usage_reporting_types_cpp}", "\n".join(usage_reporting_types_cpp))
+            .replace(r"${usage_reporting_instances_cpp}", "\n".join(usage_reporting_instances_cpp))
+            # fmt: on
+        )
+
+        usage_reporting_hdr = (
+            output_directory / "main/native/include/hal/UsageReporting.h"
+        )
+        usage_reporting_hdr.write_text(contents, encoding="utf-8", newline="\n")
+
 
 def main():
     dirname = Path(__file__).parent

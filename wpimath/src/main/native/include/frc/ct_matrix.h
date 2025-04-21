@@ -62,7 +62,7 @@ class ct_matrix {
    * @param col Column index.
    */
   constexpr const Scalar& operator()(int row, int col) const {
-    return m_storage.coeff(row, col);
+    return m_storage(row, col);
   }
 
   /**
@@ -71,9 +71,7 @@ class ct_matrix {
    * @param row Row index.
    * @param col Column index.
    */
-  constexpr Scalar& operator()(int row, int col) {
-    return m_storage.coeffRef(row, col);
-  }
+  constexpr Scalar& operator()(int row, int col) { return m_storage(row, col); }
 
   /**
    * Returns reference to matrix element.
@@ -83,7 +81,7 @@ class ct_matrix {
   constexpr const Scalar& operator()(int index) const
     requires(Rows == 1 || Cols == 1)
   {
-    return m_storage.coeff(index);
+    return m_storage(index);
   }
 
   /**
@@ -94,7 +92,7 @@ class ct_matrix {
   constexpr Scalar& operator()(int index)
     requires(Rows == 1 || Cols == 1)
   {
-    return m_storage.coeffRef(index);
+    return m_storage(index);
   }
 
   /**
@@ -165,8 +163,8 @@ class ct_matrix {
     if (std::is_constant_evaluated()) {
       ct_matrix<Scalar, Rows, Cols> result;
 
-      for (int row = 0; row < 3; ++row) {
-        for (int col = 0; col < 3; ++col) {
+      for (int row = 0; row < rhs.rows(); ++row) {
+        for (int col = 0; col < rhs.cols(); ++col) {
           result(row, col) = lhs(row, col) + rhs(row, col);
         }
       }
@@ -190,8 +188,8 @@ class ct_matrix {
     if (std::is_constant_evaluated()) {
       ct_matrix<Scalar, Rows, Cols> result;
 
-      for (int row = 0; row < 3; ++row) {
-        for (int col = 0; col < 3; ++col) {
+      for (int row = 0; row < rhs.rows(); ++row) {
+        for (int col = 0; col < rhs.cols(); ++col) {
           result(row, col) = lhs(row, col) - rhs(row, col);
         }
       }
@@ -284,8 +282,8 @@ class ct_matrix {
     if (std::is_constant_evaluated()) {
       Scalar sum = 0.0;
 
-      for (int row = 0; row < Rows; ++row) {
-        for (int col = 0; col < Cols; ++col) {
+      for (int row = 0; row < rows(); ++row) {
+        for (int col = 0; col < cols(); ++col) {
           sum += (*this)(row, col) * (*this)(row, col);
         }
       }
@@ -311,6 +309,23 @@ class ct_matrix {
   }
 
   /**
+   * Constexpr version of Eigen's 2x2 matrix determinant member function.
+   *
+   * @return Determinant of matrix.
+   */
+  constexpr Scalar determinant() const
+    requires(Rows == 2 && Cols == 2)
+  {
+    // |a  b|
+    // |c  d| = ad - bc
+    Scalar a = (*this)(0, 0);
+    Scalar b = (*this)(0, 1);
+    Scalar c = (*this)(1, 0);
+    Scalar d = (*this)(1, 1);
+    return a * d - b * c;
+  }
+
+  /**
    * Constexpr version of Eigen's 3x3 matrix determinant member function.
    *
    * @return Determinant of matrix.
@@ -319,7 +334,7 @@ class ct_matrix {
     requires(Rows == 3 && Cols == 3)
   {
     // |a  b  c|
-    // |d  e  f| = aei + bfg + cgh - ceg - bdi - afh
+    // |d  e  f| = aei + bfg + cdh - ceg - bdi - afh
     // |g  h  i|
     Scalar a = (*this)(0, 0);
     Scalar b = (*this)(0, 1);
@@ -330,7 +345,7 @@ class ct_matrix {
     Scalar g = (*this)(2, 0);
     Scalar h = (*this)(2, 1);
     Scalar i = (*this)(2, 2);
-    return a * e * i + b * f * g + c * g * h - c * e * g - b * d * i -
+    return a * e * i + b * f * g + c * d * h - c * e * g - b * d * i -
            a * f * h;
   }
 
@@ -366,7 +381,9 @@ using ct_vector = ct_matrix<Scalar, Rows, 1>;
 template <typename Scalar, int Cols>
 using ct_row_vector = ct_matrix<Scalar, 1, Cols>;
 
+using ct_matrix2d = ct_matrix<double, 2, 2>;
 using ct_matrix3d = ct_matrix<double, 3, 3>;
+using ct_vector2d = ct_vector<double, 2>;
 using ct_vector3d = ct_vector<double, 3>;
 
 }  // namespace frc

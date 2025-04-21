@@ -106,7 +106,7 @@ void Drivetrain::UpdateOdometry() {
   // latency delay -- on a real robot, this must be calculated based either on
   // known latency or timestamps.
   m_poseEstimator.AddVisionMeasurement(visionMeasurement2d,
-                                       frc::Timer::GetFPGATimestamp());
+                                       frc::Timer::GetTimestamp());
 }
 
 void Drivetrain::SimulationPeriodic() {

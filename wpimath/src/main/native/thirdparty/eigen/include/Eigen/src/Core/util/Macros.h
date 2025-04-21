@@ -196,6 +196,13 @@
 #define EIGEN_COMP_PGI 0
 #endif
 
+/// \internal EIGEN_COMP_NVHPC set to NVHPC version if the compiler is nvc++
+#if defined(__NVCOMPILER)
+#define EIGEN_COMP_NVHPC (__NVCOMPILER_MAJOR__ * 100 + __NVCOMPILER_MINOR__)
+#else
+#define EIGEN_COMP_NVHPC 0
+#endif
+
 /// \internal EIGEN_COMP_ARM set to 1 if the compiler is ARM Compiler
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
 #define EIGEN_COMP_ARM 1
@@ -1076,14 +1083,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void ignore_unused_variable(cons
 #define EIGEN_USING_STD(FUNC) using std::FUNC;
 #endif
 
-#if EIGEN_COMP_MSVC_STRICT && EIGEN_COMP_NVCC
-// Wwhen compiling with NVCC, using the base operator is necessary,
-//   otherwise we get duplicate definition errors
-// For later MSVC versions, we require explicit operator= definition, otherwise we get
-//   use of implicitly deleted operator errors.
-// (cf Bugs 920, 1000, 1324, 2291)
-#define EIGEN_INHERIT_ASSIGNMENT_EQUAL_OPERATOR(Derived) using Base::operator=;
-#elif EIGEN_COMP_CLANG  // workaround clang bug (see http://forum.kde.org/viewtopic.php?f=74&t=102653)
+#if EIGEN_COMP_CLANG  // workaround clang bug (see http://forum.kde.org/viewtopic.php?f=74&t=102653)
 #define EIGEN_INHERIT_ASSIGNMENT_EQUAL_OPERATOR(Derived)                                           \
   using Base::operator=;                                                                           \
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator=(const Derived& other) {                 \

@@ -92,7 +92,7 @@ struct unary_evaluator<Inverse<ArgType> > : public evaluator<typename Inverse<Ar
 
   enum { Flags = Base::Flags | EvalBeforeNestingBit };
 
-  unary_evaluator(const InverseType& inv_xpr) : m_result(inv_xpr.rows(), inv_xpr.cols()) {
+  EIGEN_DEVICE_FUNC unary_evaluator(const InverseType& inv_xpr) : m_result(inv_xpr.rows(), inv_xpr.cols()) {
     internal::construct_at<Base>(this, m_result);
     internal::call_assignment_no_alias(m_result, inv_xpr);
   }

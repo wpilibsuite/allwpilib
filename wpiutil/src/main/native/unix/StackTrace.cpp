@@ -4,7 +4,9 @@
 
 #include "wpi/StackTrace.h"
 
+#ifndef __EMSCRIPTEN__
 #include <execinfo.h>
+#endif
 
 #include <string>
 
@@ -16,6 +18,7 @@
 namespace wpi {
 
 std::string GetStackTraceDefault(int offset) {
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
   void* stackTrace[128];
   int stackSize = backtrace(stackTrace, 128);
   char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
@@ -38,6 +41,10 @@ std::string GetStackTraceDefault(int offset) {
   std::free(mangledSymbols);
 
   return std::string{trace.str()};
+#else
+  // backtrace_symbols not supported
+  return "";
+#endif
 }
 
 }  // namespace wpi

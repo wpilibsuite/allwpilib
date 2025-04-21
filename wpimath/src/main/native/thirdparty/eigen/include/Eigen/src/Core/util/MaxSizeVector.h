@@ -116,17 +116,17 @@ class MaxSizeVector {
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool empty() const { return size_ == 0; }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE T* data() { return data_; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr T* data() { return data_; }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const T* data() const { return data_; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const T* data() const { return data_; }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE T* begin() { return data_; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr T* begin() { return data_; }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE T* end() { return data_ + size_; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr T* end() { return data_ + size_; }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const T* begin() const { return data_; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const T* begin() const { return data_; }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const T* end() const { return data_ + size_; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const T* end() const { return data_ + size_; }
 
  private:
   size_t reserve_;

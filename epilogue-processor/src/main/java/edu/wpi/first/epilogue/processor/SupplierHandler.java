@@ -43,7 +43,7 @@ public class SupplierHandler extends ElementHandler {
 
   @Override
   public String logInvocation(Element element) {
-    return "dataLogger.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
+    return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
   }
 
   @Override

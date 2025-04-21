@@ -44,6 +44,8 @@ HAL_ENUM(HAL_CANDeviceType) {
   HAL_CAN_Dev_kMiscellaneous = 10,
   /// IO breakout.
   HAL_CAN_Dev_kIOBreakout = 11,
+  // Servo controller.
+  HAL_CAN_Dev_kServoController = 12,
   /// Firmware update.
   HAL_CAN_Dev_kFirmwareUpdate = 31
 };

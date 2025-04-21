@@ -1,0 +1,10 @@
+
+build:systemcore --config=base_linux
+
+build:systemcore --platforms=@rules_bzlmodrio_toolchains//platforms/systemcore
+build:systemcore --build_tag_filters=-no-bookworm
+build:systemcore --features=compiler_param_file
+build:systemcore --platform_suffix=systemcore
+build:systemcore --incompatible_enable_cc_toolchain_resolution
+
+build:systemcore --cxxopt=-Wno-error=deprecated-declarations

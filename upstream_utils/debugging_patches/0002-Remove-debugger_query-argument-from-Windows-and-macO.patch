@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Thu, 21 Nov 2024 17:23:48 -0800
+Subject: [PATCH 2/4] Remove debugger_query argument from Windows and macOS
+
+---
+ src/macos.cxx   | 2 +-
+ src/windows.cxx | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/macos.cxx b/src/macos.cxx
+index bbcf6f2eec9ea479a2bea0ff06b454dc81b5d356..85dbb5f45d89680e39b4847a9aa2d5472c824f2a 100644
+--- a/src/macos.cxx
++++ b/src/macos.cxx
+@@ -13,7 +13,7 @@ auto exc = std::array<T, EXC_TYPES_COUNT> { {} };
+ 
+ namespace stdx {
+ 
+-bool is_debugger_present(debugger_query q) noexcept
++bool is_debugger_present() noexcept
+ {
+ 		mach_msg_type_number_t count {};
+ 		auto masks = exc<exception_mask_t>;
+diff --git a/src/windows.cxx b/src/windows.cxx
+index eec576f415d52f63d2658012546ead2e691d7415..45d98eb27c5182de7ad11291925275fb4fdb54fb 100644
+--- a/src/windows.cxx
++++ b/src/windows.cxx
+@@ -9,7 +9,7 @@
+ 
+ namespace stdx {
+ 
+-bool is_debugger_present(debugger_query q) noexcept
++bool is_debugger_present() noexcept
+ {
+ 	return ::IsDebuggerPresent();
+ }

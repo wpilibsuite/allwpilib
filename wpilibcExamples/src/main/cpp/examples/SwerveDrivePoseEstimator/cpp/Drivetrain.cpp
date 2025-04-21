@@ -41,5 +41,5 @@ void Drivetrain::UpdateOdometry() {
   m_poseEstimator.AddVisionMeasurement(
       ExampleGlobalMeasurementSensor::GetEstimatedGlobalPose(
           m_poseEstimator.GetEstimatedPosition()),
-      frc::Timer::GetFPGATimestamp() - 0.3_s);
+      frc::Timer::GetTimestamp() - 0.3_s);
 }

@@ -81,7 +81,7 @@ static void FindDevices() {
       if (macKey != data.txt.end()) {
         auto& mac = macKey->second;
         auto& foundDevice = foundDevices[mac];
-        foundDevice = std::make_pair(data.ipv4Address, data.hostName);
+        foundDevice = std::pair{data.ipv4Address, data.hostName};
         auto& deviceStatus = deviceStatuses[mac];
         if (!deviceStatus) {
           deploySession.GetStatus(mac, foundDevice.first);

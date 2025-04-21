@@ -20,6 +20,7 @@
 #include "sleipnir/optimization/SolverIterationInfo.hpp"
 #include "sleipnir/optimization/SolverStatus.hpp"
 #include "sleipnir/optimization/solver/InteriorPoint.hpp"
+#include "sleipnir/optimization/solver/SQP.hpp"
 #include "sleipnir/util/Print.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
@@ -305,10 +306,15 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
     }
 
     // Solve the optimization problem
-    Eigen::VectorXd s = Eigen::VectorXd::Ones(m_inequalityConstraints.size());
-    InteriorPoint(m_decisionVariables, m_equalityConstraints,
-                  m_inequalityConstraints, m_f.value(), m_callback, config,
-                  false, x, s, &status);
+    if (m_inequalityConstraints.empty()) {
+      SQP(m_decisionVariables, m_equalityConstraints, m_f.value(), m_callback,
+          config, x, &status);
+    } else {
+      Eigen::VectorXd s = Eigen::VectorXd::Ones(m_inequalityConstraints.size());
+      InteriorPoint(m_decisionVariables, m_equalityConstraints,
+                    m_inequalityConstraints, m_f.value(), m_callback, config,
+                    false, x, s, &status);
+    }
 
     if (config.diagnostics) {
       sleipnir::println("Exit condition: {}", ToMessage(status.exitCondition));

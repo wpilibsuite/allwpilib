@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math.controller;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,23 +30,23 @@ class SimpleMotorFeedforwardTest {
 
     var r = VecBuilder.fill(2.0);
     var nextR = VecBuilder.fill(3.0);
-    var currentVelocity = RadiansPerSecond.mutable(2.0);
-    var nextVelocity = RadiansPerSecond.mutable(3.0);
+    double currentVelocity = 2.0; // rad/s
+    double nextVelocity = 3.0; // rad/s
 
     assertEquals(
         37.52499583432516 + 0.5,
-        simpleMotor.calculate(currentVelocity, nextVelocity).magnitude(),
+        simpleMotor.calculateWithVelocities(currentVelocity, nextVelocity),
         0.002);
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + Ks,
-        simpleMotor.calculate(currentVelocity, nextVelocity).magnitude(),
+        simpleMotor.calculateWithVelocities(currentVelocity, nextVelocity),
         0.002);
 
     // These won't match exactly. It's just an approximation to make sure they're
     // in the same ballpark.
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + Ks,
-        simpleMotor.calculate(currentVelocity, nextVelocity).magnitude(),
+        simpleMotor.calculateWithVelocities(currentVelocity, nextVelocity),
         2.0);
   }
 

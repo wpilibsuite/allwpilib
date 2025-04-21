@@ -11,9 +11,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -65,7 +68,9 @@ public class AnnotationProcessor extends AbstractProcessor {
               customLoggers.putAll(processCustomLoggers(roundEnv, customLogger));
             });
 
+    // Get all root types (classes and interfaces), excluding packages and modules
     roundEnv.getRootElements().stream()
+        .filter(e -> e instanceof TypeElement)
         .filter(
             e ->
                 processingEnv
@@ -86,9 +91,11 @@ public class AnnotationProcessor extends AbstractProcessor {
                   .getMessager()
                   .printMessage(
                       Diagnostic.Kind.ERROR,
-                      "Custom logger classes should have a @CustomLoggerFor annotation",
+                      "[EPILOGUE] Custom logger classes should have a @CustomLoggerFor annotation",
                       e);
             });
+
+    var loggedTypes = getLoggedTypes(roundEnv);
 
     // Handlers are declared in order of priority. If an element could be logged in more than one
     // way (eg a class implements both Sendable and StructSerializable), the order of the handlers
@@ -96,9 +103,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     m_handlers =
         List.of(
             new LoggableHandler(
-                processingEnv,
-                roundEnv.getElementsAnnotatedWith(
-                    Logged.class)), // prioritize epilogue logging over Sendable
+                processingEnv, loggedTypes), // prioritize epilogue logging over Sendable
             new ConfiguredLoggerHandler(
                 processingEnv, customLoggers), // then customized logging configs
             new ArrayHandler(processingEnv),
@@ -118,10 +123,37 @@ public class AnnotationProcessor extends AbstractProcessor {
         .findAny()
         .ifPresent(
             epilogue -> {
-              processEpilogue(roundEnv, epilogue);
+              processEpilogue(roundEnv, epilogue, loggedTypes);
             });
 
     return false;
+  }
+
+  /**
+   * Gets the set of all loggable types in the compilation unit. A type is considered loggable if it
+   * is directly annotated with {@code @Logged} or contains a field or method with a {@code @Logged}
+   * annotation.
+   *
+   * @param roundEnv the compilation round environment
+   * @return the set of all loggable types
+   */
+  private Set<TypeElement> getLoggedTypes(RoundEnvironment roundEnv) {
+    // Fetches everything annotated with @Logged; classes, methods, values, etc.
+    var annotatedElements = roundEnv.getElementsAnnotatedWith(Logged.class);
+    return Stream.concat(
+            // 1. All type elements (classes, interfaces, or enums) with the @Logged annotation
+            annotatedElements.stream()
+                .filter(e -> e instanceof TypeElement)
+                .map(e -> (TypeElement) e),
+            // 2. All type elements containing a field or method with the @Logged annotation
+            annotatedElements.stream()
+                .filter(e -> e instanceof VariableElement || e instanceof ExecutableElement)
+                .map(Element::getEnclosingElement)
+                .filter(e -> e instanceof TypeElement)
+                .map(e -> (TypeElement) e))
+        .sorted(Comparator.comparing(e -> e.getSimpleName().toString()))
+        .collect(
+            Collectors.toCollection(LinkedHashSet::new)); // Collect to a set to avoid duplicates
   }
 
   private boolean validateFields(Set<? extends Element> annotatedElements) {
@@ -237,12 +269,18 @@ public class AnnotationProcessor extends AbstractProcessor {
       return false;
     }
 
-    processingEnv
-        .getMessager()
-        .printMessage(
-            Diagnostic.Kind.NOTE,
-            "[EPILOGUE] Excluded from logs because " + type + " is not a loggable data type",
-            element);
+    var classConfig = element.getEnclosingElement().getAnnotation(Logged.class);
+
+    if (classConfig == null || classConfig.warnForNonLoggableTypes()) {
+      // Not loggable and not explicitly opted out of logging; print a warning message
+      processingEnv
+          .getMessager()
+          .printMessage(
+              Diagnostic.Kind.NOTE,
+              "[EPILOGUE] Excluded from logs because " + type + " is not a loggable data type",
+              element);
+    }
+
     return true;
   }
 
@@ -284,7 +322,7 @@ public class AnnotationProcessor extends AbstractProcessor {
             .getMessager()
             .printMessage(
                 Diagnostic.Kind.ERROR,
-                "Logger classes must have a public no-argument constructor",
+                "[EPILOGUE] Logger classes must have a public no-argument constructor",
                 annotatedElement);
         continue;
       }
@@ -306,7 +344,17 @@ public class AnnotationProcessor extends AbstractProcessor {
               .getMessager()
               .printMessage(
                   Diagnostic.Kind.ERROR,
-                  "Multiple custom loggers detected for type " + targetType,
+                  "[EPILOGUE] Multiple custom loggers detected for type " + targetType,
+                  annotatedElement);
+          continue;
+        }
+
+        if (annotatedElement instanceof TypeElement t && !t.getTypeParameters().isEmpty()) {
+          processingEnv
+              .getMessager()
+              .printMessage(
+                  Diagnostic.Kind.ERROR,
+                  "[EPILOGUE] Custom logger classes cannot take generic type arguments",
                   annotatedElement);
           continue;
         }
@@ -318,7 +366,7 @@ public class AnnotationProcessor extends AbstractProcessor {
               .getMessager()
               .printMessage(
                   Diagnostic.Kind.ERROR,
-                  "Not a subclass of ClassSpecificLogger<" + targetType + ">",
+                  "[EPILOGUE] Not a subclass of ClassSpecificLogger<" + targetType + ">",
                   annotatedElement);
           continue;
         }
@@ -330,7 +378,8 @@ public class AnnotationProcessor extends AbstractProcessor {
     return customLoggers;
   }
 
-  private void processEpilogue(RoundEnvironment roundEnv, TypeElement epilogueAnnotation) {
+  private void processEpilogue(
+      RoundEnvironment roundEnv, TypeElement epilogueAnnotation, Set<TypeElement> loggedTypes) {
     var annotatedElements = roundEnv.getElementsAnnotatedWith(epilogueAnnotation);
 
     List<String> loggerClassNames = new ArrayList<>();
@@ -348,12 +397,7 @@ public class AnnotationProcessor extends AbstractProcessor {
       return;
     }
 
-    var classes =
-        annotatedElements.stream()
-            .filter(e -> e instanceof TypeElement)
-            .map(e -> (TypeElement) e)
-            .toList();
-    for (TypeElement clazz : classes) {
+    for (TypeElement clazz : loggedTypes) {
       try {
         warnOfNonLoggableElements(clazz);
         m_loggerGenerator.writeLoggerFile(clazz);
@@ -368,7 +412,7 @@ public class AnnotationProcessor extends AbstractProcessor {
             .getMessager()
             .printMessage(
                 Diagnostic.Kind.ERROR,
-                "Could not write logger file for " + clazz.getQualifiedName(),
+                "[EPILOGUE] Could not write logger file for " + clazz.getQualifiedName(),
                 clazz);
         e.printStackTrace(System.err);
       }
@@ -381,7 +425,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
   private void warnOfNonLoggableElements(TypeElement clazz) {
     var config = clazz.getAnnotation(Logged.class);
-    if (config.strategy() == Logged.Strategy.OPT_IN) {
+    if (config == null || config.strategy() == Logged.Strategy.OPT_IN) {
       // field and method validations will have already checked everything
       return;
     }

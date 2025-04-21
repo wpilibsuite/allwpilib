@@ -64,6 +64,17 @@ class ElevatorSimTest {
   }
 
   @Test
+  void testInitialState() {
+    double startingHeightMeters = 0.5;
+    var sim =
+        new ElevatorSim(
+            DCMotor.getKrakenX60(2), 20, 8.0, 0.1, 0.0, 1.0, true, startingHeightMeters, 0.01, 0.0);
+
+    assertEquals(startingHeightMeters, sim.getPositionMeters());
+    assertEquals(0, sim.getVelocityMetersPerSecond());
+  }
+
+  @Test
   void testMinMax() {
     var sim =
         new ElevatorSim(

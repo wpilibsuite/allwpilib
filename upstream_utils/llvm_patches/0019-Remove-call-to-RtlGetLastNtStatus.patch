@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Tue, 17 Sep 2024 21:19:52 -0700
+Subject: [PATCH 19/37] Remove call to RtlGetLastNtStatus()
+
+---
+ llvm/lib/Support/ErrorHandling.cpp | 23 -----------------------
+ 1 file changed, 23 deletions(-)
+
+diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+index 5f53ec03a1c1e91659143f12abec145b95627826..c795f13065c820de772b56be7f59aab63f6ee084 100644
+--- a/llvm/lib/Support/ErrorHandling.cpp
++++ b/llvm/lib/Support/ErrorHandling.cpp
+@@ -214,34 +214,11 @@ void LLVMResetFatalErrorHandler() {
+ #include <ntstatus.h>
+ #include <winerror.h>
+ 
+-// This is equivalent to NtCurrentTeb()->LastStatusValue, but the public
+-// _TEB definition does not expose the LastStatusValue field directly.
+-// Avoid offsetting into this structure by calling RtlGetLastNtStatus
+-// from ntdll.dll.
+-//
+-// The return of this function will roughly match that of
+-// GetLastError, but this lower level API disambiguates some cases
+-// that GetLastError does not.
+-//
+-// For more information, see:
+-// https://www.geoffchappell.com/studies/windows/km/ntoskrnl/inc/api/pebteb/teb/index.htm
+-// https://github.com/llvm/llvm-project/issues/89137
+-extern "C" NTSYSAPI NTSTATUS NTAPI RtlGetLastNtStatus();
+-
+ // This function obtains the last error code and maps it. It may call
+ // RtlGetLastNtStatus, which is a lower level API that can return a
+ // more specific error code than GetLastError.
+ std::error_code llvm::mapLastWindowsError() {
+   unsigned EV = ::GetLastError();
+-  // The mapping of NTSTATUS to Win32 error loses some information; special
+-  // case the generic ERROR_ACCESS_DENIED code to check the underlying
+-  // NTSTATUS and potentially return a more accurate error code.
+-  if (EV == ERROR_ACCESS_DENIED) {
+-    llvm::errc code = RtlGetLastNtStatus() == STATUS_DELETE_PENDING
+-                          ? errc::delete_pending
+-                          : errc::permission_denied;
+-    return make_error_code(code);
+-  }
+   return mapWindowsError(EV);
+ }
+ 

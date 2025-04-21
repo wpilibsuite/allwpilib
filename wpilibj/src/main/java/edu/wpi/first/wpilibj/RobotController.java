@@ -19,9 +19,12 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import java.util.function.LongSupplier;
 
 /** Contains functions for roboRIO functionality. */
 public final class RobotController {
+  private static LongSupplier m_timeSource = RobotController::getFPGATime;
+
   private RobotController() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
@@ -74,6 +77,38 @@ public final class RobotController {
    */
   public static int getTeamNumber() {
     return HALUtil.getTeamNumber();
+  }
+
+  /**
+   * Sets a new source to provide the clock time in microseconds. Changing this affects the return
+   * value of {@code getTime} in Java.
+   *
+   * @param supplier Function to return the time in microseconds.
+   */
+  public static void setTimeSource(LongSupplier supplier) {
+    m_timeSource = supplier;
+  }
+
+  /**
+   * Read the microsecond timestamp. By default, the time is based on the FPGA hardware clock in
+   * microseconds since the FPGA started. However, the return value of this method may be modified
+   * to use any time base, including non-monotonic and non-continuous time bases.
+   *
+   * @return The current time in microseconds.
+   */
+  public static long getTime() {
+    return m_timeSource.getAsLong();
+  }
+
+  /**
+   * Read the microsecond timestamp. By default, the time is based on the FPGA hardware clock in
+   * microseconds since the FPGA started. However, the return value of this method may be modified
+   * to use any time base, including non-monotonic and non-continuous time bases.
+   *
+   * @return The current time in a measure.
+   */
+  public static Time getMeasureTime() {
+    return Microseconds.of(m_timeSource.getAsLong());
   }
 
   /**

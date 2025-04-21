@@ -55,14 +55,6 @@ class CommandScheduler::Impl {
   wpi::SmallVector<InterruptAction, 4> interruptActions;
   wpi::SmallVector<Action, 4> finishActions;
 
-  // Flag and queues for avoiding concurrent modification if commands are
-  // scheduled/canceled during run
-  bool inRunLoop = false;
-  wpi::SmallVector<Command*, 4> toSchedule;
-  wpi::SmallVector<Command*, 4> toCancelCommands;
-  wpi::SmallVector<std::optional<Command*>, 4> toCancelInterruptors;
-  wpi::SmallSet<Command*, 4> endingCommands;
-
   // Map of Command* -> CommandPtr for CommandPtrs transferred to the scheduler
   // via Schedule(CommandPtr&&). These are erased (destroyed) at the very end of
   // the loop cycle when the command lifecycle is complete.
@@ -118,11 +110,6 @@ frc::EventLoop* CommandScheduler::GetDefaultButtonLoop() const {
 }
 
 void CommandScheduler::Schedule(Command* command) {
-  if (m_impl->inRunLoop) {
-    m_impl->toSchedule.emplace_back(command);
-    return;
-  }
-
   RequireUngrouped(command);
 
   if (m_impl->disabled || m_impl->scheduledCommands.contains(command) ||
@@ -208,10 +195,13 @@ void CommandScheduler::Run() {
   loopCache->Poll();
   m_watchdog.AddEpoch("buttons.Run()");
 
-  m_impl->inRunLoop = true;
   bool isDisabled = frc::RobotState::IsDisabled();
-  // Run scheduled commands, remove finished commands.
-  for (Command* command : m_impl->scheduledCommands) {
+  // create a new set to avoid iterator invalidation.
+  for (Command* command : wpi::SmallSet(m_impl->scheduledCommands)) {
+    if (!IsScheduled(command)) {
+      continue;  // skip as the normal scheduledCommands was modified
+    }
+
     if (isDisabled && !command->RunsWhenDisabled()) {
       Cancel(command, std::nullopt);
       continue;
@@ -224,14 +214,12 @@ void CommandScheduler::Run() {
     m_watchdog.AddEpoch(command->GetName() + ".Execute()");
 
     if (command->IsFinished()) {
-      m_impl->endingCommands.insert(command);
+      m_impl->scheduledCommands.erase(command);
       command->End(false);
       for (auto&& action : m_impl->finishActions) {
         action(*command);
       }
-      m_impl->endingCommands.erase(command);
 
-      m_impl->scheduledCommands.erase(command);
       for (auto&& requirement : command->GetRequirements()) {
         m_impl->requirements.erase(requirement);
       }
@@ -241,19 +229,6 @@ void CommandScheduler::Run() {
       m_impl->ownedCommands.erase(command);
     }
   }
-  m_impl->inRunLoop = false;
-
-  for (Command* command : m_impl->toSchedule) {
-    Schedule(command);
-  }
-
-  for (size_t i = 0; i < m_impl->toCancelCommands.size(); i++) {
-    Cancel(m_impl->toCancelCommands[i], m_impl->toCancelInterruptors[i]);
-  }
-
-  m_impl->toSchedule.clear();
-  m_impl->toCancelCommands.clear();
-  m_impl->toCancelInterruptors.clear();
 
   // Add default commands for un-required registered subsystems.
   for (auto&& subsystem : m_impl->subsystems) {
@@ -346,24 +321,14 @@ void CommandScheduler::Cancel(Command* command,
   if (!m_impl) {
     return;
   }
-  if (m_impl->endingCommands.contains(command)) {
-    return;
-  }
-  if (m_impl->inRunLoop) {
-    m_impl->toCancelCommands.emplace_back(command);
-    m_impl->toCancelInterruptors.emplace_back(interruptor);
-    return;
-  }
   if (!IsScheduled(command)) {
     return;
   }
-  m_impl->endingCommands.insert(command);
+  m_impl->scheduledCommands.erase(command);
   command->End(true);
   for (auto&& action : m_impl->interruptActions) {
     action(*command, interruptor);
   }
-  m_impl->endingCommands.erase(command);
-  m_impl->scheduledCommands.erase(command);
   for (auto&& requirement : m_impl->requirements) {
     if (requirement.second == command) {
       m_impl->requirements.erase(requirement.first);

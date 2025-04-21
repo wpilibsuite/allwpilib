@@ -1304,14 +1304,14 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE typename ConstFixedSegmentReturnType<N>::T
 template <int N>
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE typename FixedSegmentReturnType<N>::Type tail(Index n = N) {
   EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived)
-  return typename FixedSegmentReturnType<N>::Type(derived(), size() - n);
+  return typename FixedSegmentReturnType<N>::Type(derived(), size() - n, n);
 }
 
 /// This is the const version of tail<int>.
 template <int N>
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE typename ConstFixedSegmentReturnType<N>::Type tail(Index n = N) const {
   EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived)
-  return typename ConstFixedSegmentReturnType<N>::Type(derived(), size() - n);
+  return typename ConstFixedSegmentReturnType<N>::Type(derived(), size() - n, n);
 }
 
 /// \returns the \a outer -th column (resp. row) of the matrix \c *this if \c *this

@@ -33,13 +33,6 @@ message ProtobufMecanumDriveKinematics {
   ProtobufTranslation2d rear_right = 4;
 }
 
-message ProtobufMecanumDriveMotorVoltages {
-  double front_left = 1;
-  double front_right = 2;
-  double rear_left = 3;
-  double rear_right = 4;
-}
-
 message ProtobufMecanumDriveWheelPositions {
   double front_left = 1;
   double front_right = 2;

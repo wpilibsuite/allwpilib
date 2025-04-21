@@ -425,8 +425,9 @@ public class ADIS16448_IMU implements AutoCloseable, Sendable {
     }
     readRegister(PROD_ID); // Dummy read
     // Validate the product ID
-    if (readRegister(PROD_ID) != 16448) {
-      DriverStation.reportError("Could not find ADIS16448", false);
+    int prodId = readRegister(PROD_ID);
+    if (prodId != 16448) {
+      DriverStation.reportError("Could not find ADIS16448; got product ID " + prodId, false);
       close();
       return false;
     }

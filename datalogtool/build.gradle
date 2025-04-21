@@ -101,7 +101,7 @@ model {
                 lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'libssh')
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'

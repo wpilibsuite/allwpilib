@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/FunctionExtras.h>
 #include <wpi/deprecated.h>
 
 #include "frc2/command/ConditionalCommand.h"
@@ -73,15 +74,21 @@ CommandPtr cmd::Print(std::string_view msg) {
   return PrintCommand(msg).ToPtr();
 }
 
-WPI_IGNORE_DEPRECATED
 CommandPtr cmd::DeferredProxy(wpi::unique_function<Command*()> supplier) {
-  return ProxyCommand(std::move(supplier)).ToPtr();
+  return Defer(
+      [supplier = std::move(supplier)]() mutable {
+        // There is no non-owning version of AsProxy(), so use the non-owning
+        // ProxyCommand constructor instead.
+        return ProxyCommand{supplier()}.ToPtr();
+      },
+      {});
 }
 
 CommandPtr cmd::DeferredProxy(wpi::unique_function<CommandPtr()> supplier) {
-  return ProxyCommand(std::move(supplier)).ToPtr();
+  return Defer([supplier = std::move(
+                    supplier)]() mutable { return supplier().AsProxy(); },
+               {});
 }
-WPI_UNIGNORE_DEPRECATED
 
 CommandPtr cmd::Wait(units::second_t duration) {
   return WaitCommand(duration).ToPtr();

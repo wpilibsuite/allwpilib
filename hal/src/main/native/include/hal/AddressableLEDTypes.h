@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <hal/Types.h>
 #include <stdint.h>
 
 /** max length of LED strip supported by FPGA. */
@@ -16,3 +17,21 @@ struct HAL_AddressableLEDData {
   uint8_t r;  ///< red value
   uint8_t padding;
 };
+
+/**
+ * Order that color data is sent over the wire.
+ */
+HAL_ENUM(HAL_AddressableLEDColorOrder) {
+  HAL_ALED_RGB,
+  HAL_ALED_RBG,
+  HAL_ALED_BGR,
+  HAL_ALED_BRG,
+  HAL_ALED_GBR,
+  HAL_ALED_GRB
+};
+
+#ifdef __cplusplus
+constexpr auto format_as(HAL_AddressableLEDColorOrder order) {
+  return static_cast<int32_t>(order);
+}
+#endif

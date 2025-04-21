@@ -55,6 +55,10 @@ public class EpilogueGenerator {
         out.println("import static edu.wpi.first.units.Units.Seconds;");
         out.println();
 
+        out.println("import edu.wpi.first.hal.FRCNetComm;");
+        out.println("import edu.wpi.first.hal.HAL;");
+        out.println();
+
         loggerClassNames.stream()
             .sorted()
             .forEach(
@@ -80,6 +84,18 @@ public class EpilogueGenerator {
         out.println();
 
         out.println("public final class Epilogue {");
+
+        // Usage reporting
+        out.println(
+            """
+              static {
+                HAL.report(
+                  FRCNetComm.tResourceType.kResourceType_LoggingFramework,
+                  FRCNetComm.tInstances.kLoggingFramework_Epilogue
+                );
+              }
+            """);
+
         out.println(
             "  private static final EpilogueConfiguration config = new EpilogueConfiguration();");
         out.println();
@@ -154,9 +170,9 @@ public class EpilogueGenerator {
             out.println(
                 "    "
                     + StringUtils.loggerFieldName(mainRobotClass)
-                    + ".tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);");
+                    + ".tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);");
             out.println(
-                "    config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);");
+                "    config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);");
             out.println("  }");
 
             out.println();
@@ -176,7 +192,7 @@ public class EpilogueGenerator {
             out.println("      config.loggingPeriod = Seconds.of(robot.getPeriod());");
             out.println("    }");
             out.println("    if (config.loggingPeriodOffset == null) {");
-            out.println("      config.loggingPeriodOffset = config.loggingPeriod.divide(2);");
+            out.println("      config.loggingPeriodOffset = config.loggingPeriod.div(2);");
             out.println("    }");
             out.println();
             out.println("    robot.addPeriodic(() -> {");

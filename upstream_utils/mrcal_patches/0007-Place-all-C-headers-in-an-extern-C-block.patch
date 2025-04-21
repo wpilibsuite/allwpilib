@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Wed, 4 Dec 2024 00:58:21 -0500
+Subject: [PATCH 7/8] Place all C headers in an extern "C" block
+
+---
+ mrcal.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/mrcal.cpp b/mrcal.cpp
+index 1560cd106ff5bcfe49476f785aa8108119318b3a..d4a2415a5730a48671b2716960bc343cdbd01295 100644
+--- a/mrcal.cpp
++++ b/mrcal.cpp
+@@ -14,19 +14,22 @@
+ #include <stdlib.h>
+ #include <inttypes.h>
+ 
++extern "C" {
+ #include <dogleg.h>
++}
+ #include <assert.h>
+ #include <stdbool.h>
+ #include <math.h>
+ #include <string.h>
+ 
++extern "C" {
+ #include "mrcal.h"
+ #include "minimath/minimath.h"
+ #include "cahvore.h"
+ #include "minimath/minimath-extra.h"
+ #include "util.h"
+ #include "scales.h"
+-
++}
+ #define MSG_IF_VERBOSE(...) do { if(verbose) MSG( __VA_ARGS__ ); } while(0)
+ 
+ #define restrict __restrict

@@ -250,6 +250,7 @@ struct NumTraits<std::complex<Real_> > : GenericNumTraits<std::complex<Real_> > 
   typedef typename NumTraits<Real_>::Literal Literal;
   enum {
     IsComplex = 1,
+    IsSigned = NumTraits<Real_>::IsSigned,
     RequireInitialization = NumTraits<Real_>::RequireInitialization,
     ReadCost = 2 * NumTraits<Real_>::ReadCost,
     AddCost = 2 * NumTraits<Real>::AddCost,

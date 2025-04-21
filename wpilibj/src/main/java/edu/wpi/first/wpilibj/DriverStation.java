@@ -1328,7 +1328,7 @@ public final class DriverStation {
    * the DS.
    */
   private static void reportJoystickUnpluggedError(String message) {
-    double currentTime = Timer.getFPGATimestamp();
+    double currentTime = Timer.getTimestamp();
     if (currentTime > m_nextMessageTime) {
       reportError(message, false);
       m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
@@ -1341,7 +1341,7 @@ public final class DriverStation {
    */
   private static void reportJoystickUnpluggedWarning(String message) {
     if (isFMSAttached() || !m_silenceJoystickWarning) {
-      double currentTime = Timer.getFPGATimestamp();
+      double currentTime = Timer.getTimestamp();
       if (currentTime > m_nextMessageTime) {
         reportWarning(message, false);
         m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;

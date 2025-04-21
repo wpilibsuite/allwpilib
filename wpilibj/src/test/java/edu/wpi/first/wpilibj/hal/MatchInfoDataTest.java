@@ -11,6 +11,7 @@ import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.MatchInfoData;
 import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import org.junit.jupiter.api.Test;
 
 class MatchInfoDataTest {
@@ -18,6 +19,8 @@ class MatchInfoDataTest {
   void testSetMatchInfo() {
     MatchType matchType = MatchType.Qualification;
     DriverStationDataJNI.setMatchInfo("Event Name", "Game Message", 174, 191, matchType.ordinal());
+
+    DriverStationSim.notifyNewData();
 
     MatchInfoData outMatchInfo = new MatchInfoData();
     DriverStationJNI.getMatchInfo(outMatchInfo);

@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Thu, 21 Nov 2024 17:51:15 -0800
+Subject: [PATCH 1/4] Guard [[gnu::flatten]] attribute
+
+---
+ include/debugging.hpp | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/include/debugging.hpp b/include/debugging.hpp
+index 70ba724a2b6522a774931af7d7be2cee9408567a..25014a9fc65d06052089058feea7566462c01d60 100644
+--- a/include/debugging.hpp
++++ b/include/debugging.hpp
+@@ -7,13 +7,19 @@ namespace stdx {
+ 
+ bool is_debugger_present() noexcept;
+ 
+-[[gnu::flatten]] inline void breakpoint() noexcept
++#if defined(__GNUC__) && !defined(__clang__)
++[[gnu::flatten]]
++#endif
++inline void breakpoint() noexcept
+ {
+ 	psnip_trap();
+ }
+ 
+ 
+-[[gnu::flatten]] inline void breakpoint_if_debugging() noexcept
++#if defined(__GNUC__) && !defined(__clang__)
++[[gnu::flatten]]
++#endif
++inline void breakpoint_if_debugging() noexcept
+ {
+ 	if (is_debugger_present()) breakpoint();
+ }

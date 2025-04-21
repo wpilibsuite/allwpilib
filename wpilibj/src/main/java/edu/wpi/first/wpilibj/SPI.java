@@ -140,7 +140,7 @@ public class SPI implements AutoCloseable {
     if (dataToSend.length < size) {
       throw new IllegalArgumentException("buffer is too small, must be at least " + size);
     }
-    return SPIJNI.spiWriteB(m_port, dataToSend, (byte) size);
+    return SPIJNI.spiWriteB(m_port, dataToSend, size);
   }
 
   /**
@@ -163,7 +163,7 @@ public class SPI implements AutoCloseable {
     if (dataToSend.capacity() < size) {
       throw new IllegalArgumentException("buffer is too small, must be at least " + size);
     }
-    return SPIJNI.spiWrite(m_port, dataToSend, (byte) size);
+    return SPIJNI.spiWrite(m_port, dataToSend, size);
   }
 
   /**
@@ -184,7 +184,7 @@ public class SPI implements AutoCloseable {
     if (dataReceived.length < size) {
       throw new IllegalArgumentException("buffer is too small, must be at least " + size);
     }
-    return SPIJNI.spiReadB(m_port, initiate, dataReceived, (byte) size);
+    return SPIJNI.spiReadB(m_port, initiate, dataReceived, size);
   }
 
   /**
@@ -211,7 +211,7 @@ public class SPI implements AutoCloseable {
     if (dataReceived.capacity() < size) {
       throw new IllegalArgumentException("buffer is too small, must be at least " + size);
     }
-    return SPIJNI.spiRead(m_port, initiate, dataReceived, (byte) size);
+    return SPIJNI.spiRead(m_port, initiate, dataReceived, size);
   }
 
   /**
@@ -229,7 +229,7 @@ public class SPI implements AutoCloseable {
     if (dataReceived.length < size) {
       throw new IllegalArgumentException("dataReceived is too small, must be at least " + size);
     }
-    return SPIJNI.spiTransactionB(m_port, dataToSend, dataReceived, (byte) size);
+    return SPIJNI.spiTransactionB(m_port, dataToSend, dataReceived, size);
   }
 
   /**
@@ -256,7 +256,7 @@ public class SPI implements AutoCloseable {
     if (dataReceived.capacity() < size) {
       throw new IllegalArgumentException("dataReceived is too small, must be at least " + size);
     }
-    return SPIJNI.spiTransaction(m_port, dataToSend, dataReceived, (byte) size);
+    return SPIJNI.spiTransaction(m_port, dataToSend, dataReceived, size);
   }
 
   /**

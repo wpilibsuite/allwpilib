@@ -78,6 +78,18 @@ TEST(Rotation2dTest, Inequality) {
   EXPECT_NE(rot1, rot2);
 }
 
+TEST(Rotation2dTest, ToMatrix) {
+#if __GNUC__ <= 11
+  Rotation2d before{20_deg};
+  Rotation2d after{before.ToMatrix()};
+#else
+  constexpr Rotation2d before{20_deg};
+  constexpr Rotation2d after{before.ToMatrix()};
+#endif
+
+  EXPECT_EQ(before, after);
+}
+
 TEST(Rotation2dTest, Constexpr) {
   constexpr Rotation2d defaultCtor;
   constexpr Rotation2d radianCtor{5_rad};

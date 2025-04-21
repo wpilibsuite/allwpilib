@@ -69,7 +69,7 @@ static constexpr auto lastp1 = last + fix<1>;
 #else
 // Using a FixedExpr<1> expression is important here to make sure the compiler
 // can fully optimize the computation starting indices with zero overhead.
-static constexpr lastp1_t lastp1(last + fix<1>());
+static constexpr lastp1_t lastp1 = lastp1_t{};
 #endif
 
 /** \var end

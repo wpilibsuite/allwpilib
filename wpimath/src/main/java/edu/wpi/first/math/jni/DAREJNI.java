@@ -32,7 +32,7 @@ public final class DAREJNI extends WPIMathJNI {
    * @param inputs Number of inputs in B matrix.
    * @param S Array storage for DARE solution.
    */
-  public static native void dareDetailABQR(
+  public static native void dareNoPrecondABQR(
       double[] A, double[] B, double[] Q, double[] R, int states, int inputs, double[] S);
 
   /**
@@ -87,7 +87,7 @@ public final class DAREJNI extends WPIMathJNI {
    * @param inputs Number of inputs in B matrix.
    * @param S Array storage for DARE solution.
    */
-  public static native void dareDetailABQRN(
+  public static native void dareNoPrecondABQRN(
       double[] A,
       double[] B,
       double[] Q,

@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.FileLogger;
 import edu.wpi.first.util.WPIUtilJNI;
@@ -244,6 +247,7 @@ public final class DataLogManager {
           if (!new File("/u/logs").mkdir()) {
             // ignored
           }
+          HAL.report(tResourceType.kResourceType_DataLogManager, tInstances.kDataLogLocation_USB);
           return "/u/logs";
         }
       } catch (IOException ex) {
@@ -258,6 +262,7 @@ public final class DataLogManager {
       if (!new File("/home/lvuser/logs").mkdir()) {
         // ignored
       }
+      HAL.report(tResourceType.kResourceType_DataLogManager, tInstances.kDataLogLocation_Onboard);
       return "/home/lvuser/logs";
     }
     String logDir = Filesystem.getOperatingDirectory().getAbsolutePath() + "/logs";

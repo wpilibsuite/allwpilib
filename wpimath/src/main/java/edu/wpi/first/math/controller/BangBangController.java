@@ -45,7 +45,7 @@ public class BangBangController implements Sendable {
 
     SendableRegistry.addLW(this, "BangBangController", instances);
 
-    MathSharedStore.reportUsage(MathUsageId.kController_PIDController2, instances);
+    MathSharedStore.reportUsage(MathUsageId.kController_BangBangController, instances);
   }
 
   /**

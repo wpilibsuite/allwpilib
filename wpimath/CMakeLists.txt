@@ -189,6 +189,12 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/src>
 )
 
+install(
+    DIRECTORY src/generated/main/native/cpp/
+    DESTINATION "${include_dest}/wpimath"
+    FILES_MATCHING
+    PATTERN "*.h"
+)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
 target_include_directories(
     wpimath

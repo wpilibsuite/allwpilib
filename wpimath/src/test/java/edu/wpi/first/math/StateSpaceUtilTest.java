@@ -153,6 +153,7 @@ class StateSpaceUtilTest extends UtilityClassTest<StateSpaceUtil> {
   }
 
   @Test
+  @SuppressWarnings("removal")
   void testPoseToVector() {
     Pose2d pose = new Pose2d(1, 2, new Rotation2d(3));
     var vector = StateSpaceUtil.poseToVector(pose);

@@ -147,7 +147,7 @@ EIGEN_DEVICE_FUNC inline void* handmade_aligned_malloc(std::size_t size,
   check_that_malloc_is_allowed();
   EIGEN_USING_STD(malloc)
   void* original = malloc(size + alignment);
-  if (original == 0) return 0;
+  if (original == nullptr) return nullptr;
   uint8_t offset = static_cast<uint8_t>(alignment - (reinterpret_cast<std::size_t>(original) & (alignment - 1)));
   void* aligned = static_cast<void*>(static_cast<uint8_t*>(original) + offset);
   *(static_cast<uint8_t*>(aligned) - 1) = offset;
@@ -391,7 +391,8 @@ EIGEN_DEVICE_FUNC inline T* move_construct_elements_of_array(T* ptr, T* src, std
 
 template <typename T>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE void check_size_for_overflow(std::size_t size) {
-  if (size > std::size_t(-1) / sizeof(T)) throw_std_bad_alloc();
+  constexpr std::size_t max_elements = (std::numeric_limits<std::ptrdiff_t>::max)() / sizeof(T);
+  if (size > max_elements) throw_std_bad_alloc();
 }
 
 /** \internal Allocates \a size objects of type T. The returned pointer is guaranteed to have 16 bytes alignment.
@@ -473,7 +474,7 @@ EIGEN_DEVICE_FUNC inline T* conditional_aligned_realloc_new(T* pts, std::size_t 
 
 template <typename T, bool Align>
 EIGEN_DEVICE_FUNC inline T* conditional_aligned_new_auto(std::size_t size) {
-  if (size == 0) return 0;  // short-cut. Also fixes Bug 884
+  if (size == 0) return nullptr;  // short-cut. Also fixes Bug 884
   check_size_for_overflow<T>(size);
   T* result = static_cast<T*>(conditional_aligned_malloc<Align>(sizeof(T) * size));
   if (NumTraits<T>::RequireInitialization) {
@@ -765,7 +766,7 @@ void swap(scoped_array<T>& a, scoped_array<T>& b) {
 // We always manually re-align the result of EIGEN_ALLOCA.
 // If alloca is already aligned, the compiler should be smart enough to optimize away the re-alignment.
 
-#if (EIGEN_COMP_GNUC || EIGEN_COMP_CLANG)
+#if ((EIGEN_COMP_GNUC || EIGEN_COMP_CLANG) && !EIGEN_COMP_NVHPC)
 #define EIGEN_ALIGNED_ALLOCA(SIZE) __builtin_alloca_with_align(SIZE, CHAR_BIT* EIGEN_DEFAULT_ALIGN_BYTES)
 #else
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void* eigen_aligned_alloca_helper(void* ptr) {

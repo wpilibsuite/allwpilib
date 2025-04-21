@@ -2,7 +2,7 @@
 name: Question
 about: Ask about features or parts of this project
 title: ''
-labels: ''
+labels: 'type: support'
 assignees: ''
 
 ---

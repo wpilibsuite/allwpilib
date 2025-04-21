@@ -553,8 +553,7 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
    * \deprecated Will be removed in the next major Eigen version. Options should
    * be specified in the \a Options template parameter.
    */
-  // EIGEN_DEPRECATED // this constructor is used to allocate memory in BDCSVD
-  JacobiSVD(Index rows, Index cols, unsigned int computationOptions) {
+  EIGEN_DEPRECATED JacobiSVD(Index rows, Index cols, unsigned int computationOptions) {
     internal::check_svd_options_assertions<MatrixType, Options>(computationOptions, rows, cols);
     allocate(rows, cols, computationOptions);
   }
@@ -612,7 +611,6 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
   using Base::rank;
   using Base::rows;
 
- private:
   void allocate(Index rows_, Index cols_, unsigned int computationOptions) {
     if (Base::allocate(rows_, cols_, computationOptions)) return;
     eigen_assert(!(ShouldComputeThinU && int(QRPreconditioner) == int(FullPivHouseholderQRPreconditioner)) &&
@@ -625,6 +623,7 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
     if (rows() > cols()) m_qr_precond_morerows.allocate(*this);
   }
 
+ private:
   JacobiSVD& compute_impl(const MatrixType& matrix, unsigned int computationOptions);
 
  protected:

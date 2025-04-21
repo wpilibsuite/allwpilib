@@ -42,8 +42,8 @@ namespace frc {
  * acronym for the title of the book it came from in Italian ("Robotica
  * Articolata e Mobile per i SErvizi e le TEcnologie").
  *
- * See <https://file.tavsys.net/control/controls-engineering-in-frc.pdf> section
- * on Ramsete unicycle controller for a derivation and analysis.
+ * See <https://file.tavsys.net/control/ramsete-unicycle-controller.pdf> for a
+ * derivation and analysis.
  */
 class WPILIB_DLLEXPORT RamseteController {
  public:

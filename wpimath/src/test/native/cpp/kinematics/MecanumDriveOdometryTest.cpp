@@ -85,7 +85,7 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
   frc::MecanumDriveWheelPositions wheelPositions;
 
   frc::MecanumDriveOdometry odometry{kinematics, frc::Rotation2d{},
-                                     wheelPositions, frc::Pose2d{}};
+                                     wheelPositions};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
@@ -148,7 +148,7 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingXAxis) {
   frc::MecanumDriveWheelPositions wheelPositions;
 
   frc::MecanumDriveOdometry odometry{kinematics, frc::Rotation2d{},
-                                     wheelPositions, frc::Pose2d{}};
+                                     wheelPositions};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},

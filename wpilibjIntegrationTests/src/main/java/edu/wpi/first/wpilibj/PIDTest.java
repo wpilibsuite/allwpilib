@@ -41,9 +41,9 @@ public class PIDTest extends AbstractComsSetup {
   private PIDController m_controller = null;
   private static MotorEncoderFixture<?> me = null;
 
-  private final Double m_p;
-  private final Double m_i;
-  private final Double m_d;
+  private final double m_p;
+  private final double m_i;
+  private final double m_d;
 
   @Override
   protected Logger getClassLogger() {
@@ -58,7 +58,7 @@ public class PIDTest extends AbstractComsSetup {
    * @param d D gain.
    * @param mef Motor encoder fixture.
    */
-  public PIDTest(Double p, Double i, Double d, MotorEncoderFixture<?> mef) {
+  public PIDTest(double p, double i, double d, MotorEncoderFixture<?> mef) {
     logger.fine("Constructor with: " + mef.getType());
     if (PIDTest.me != null && !PIDTest.me.equals(mef)) {
       PIDTest.me.teardown();

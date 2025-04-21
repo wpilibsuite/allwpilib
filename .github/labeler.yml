@@ -1,0 +1,65 @@
+'2027':
+- base-branch: '2027'
+'component: apriltag':
+- changed-files:
+  - any-glob-to-any-file: apriltag/**
+'component: command-based':
+- changed-files:
+  - any-glob-to-any-file: wpilibNewCommands/**
+'component: cscore':
+- changed-files:
+  - any-glob-to-any-file: cscore/**
+'component: datalogtool':
+- changed-files:
+  - any-glob-to-any-file: datalogtool/**
+'component: epilogue':
+- changed-files:
+  - any-glob-to-any-file: epilogue-*/**
+'component: examples':
+- changed-files:
+  - any-glob-to-any-file: wpilib*Examples/**
+'component: glass':
+- changed-files:
+  - any-glob-to-any-file: glass/**
+'component: hal':
+- changed-files:
+  - any-glob-to-any-file: hal/**
+'component: ntcore':
+- changed-files:
+  - any-glob-to-any-file: ntcore/**
+'component: outlineviewer':
+- changed-files:
+  - any-glob-to-any-file: outlineviewer/**
+'component: sysid':
+- changed-files:
+  - any-glob-to-any-file: sysid/**
+'component: teamnumbersetter':
+- changed-files:
+  - any-glob-to-any-file: roborioteamnumbersetter/**
+'component: wpilibc':
+- changed-files:
+  - any-glob-to-any-file: wpilibc/**
+'component: wpilibj':
+- changed-files:
+  - any-glob-to-any-file: wpilibj/**
+'component: wpimath':
+- changed-files:
+  - any-glob-to-any-file: wpimath/**
+'component: wpinet':
+- changed-files:
+  - any-glob-to-any-file: wpinet/**
+'component: wpiunits':
+- changed-files:
+  - any-glob-to-any-file: wpiunits/**
+'component: wpiutil':
+- changed-files:
+  - any-glob-to-any-file: wpiutil/**
+'component: wpical':
+- changed-files:
+  - any-glob-to-any-file: wpical/**
+'component: usage reporting':
+- changed-files:
+  - any-glob-to-any-file: hal/src/generate/**
+'attn: NI':
+- changed-files:
+  - any-glob-to-any-file: hal/src/generate/**

@@ -319,17 +319,24 @@ template <typename MatrixType>
 MatrixType EigenSolver<MatrixType>::pseudoEigenvalueMatrix() const {
   eigen_assert(m_isInitialized && "EigenSolver is not initialized.");
   const RealScalar precision = RealScalar(2) * NumTraits<RealScalar>::epsilon();
-  Index n = m_eivalues.rows();
+  const Index n = m_eivalues.rows();
   MatrixType matD = MatrixType::Zero(n, n);
-  for (Index i = 0; i < n; ++i) {
-    if (internal::isMuchSmallerThan(numext::imag(m_eivalues.coeff(i)), numext::real(m_eivalues.coeff(i)), precision))
-      matD.coeffRef(i, i) = numext::real(m_eivalues.coeff(i));
-    else {
-      matD.template block<2, 2>(i, i) << numext::real(m_eivalues.coeff(i)), numext::imag(m_eivalues.coeff(i)),
-          -numext::imag(m_eivalues.coeff(i)), numext::real(m_eivalues.coeff(i));
+  Index i = 0;
+  for (; i < n - 1; ++i) {
+    RealScalar real = numext::real(m_eivalues.coeff(i));
+    RealScalar imag = numext::imag(m_eivalues.coeff(i));
+    matD.coeffRef(i, i) = real;
+    if (!internal::isMuchSmallerThan(imag, real, precision)) {
+      matD.coeffRef(i, i + 1) = imag;
+      matD.coeffRef(i + 1, i) = -imag;
+      matD.coeffRef(i + 1, i + 1) = real;
       ++i;
     }
   }
+  if (i == n - 1) {
+    matD.coeffRef(i, i) = numext::real(m_eivalues.coeff(i));
+  }
+
   return matD;
 }
 

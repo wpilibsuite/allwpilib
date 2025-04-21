@@ -1083,8 +1083,13 @@ EIGEN_DECLARE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet patanh(const Packet&
 /** \internal \returns the exp of \a a (coeff-wise) */
 template <typename Packet>
 EIGEN_DECLARE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet pexp(const Packet& a) {
-  EIGEN_USING_STD(exp);
-  return exp(a);
+  return numext::exp(a);
+}
+
+/** \internal \returns the exp2 of \a a (coeff-wise) */
+template <typename Packet>
+EIGEN_DECLARE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet pexp2(const Packet& a) {
+  return numext::exp2(a);
 }
 
 /** \internal \returns the expm1 of \a a (coeff-wise) */
@@ -1113,7 +1118,7 @@ EIGEN_DECLARE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet plog10(const Packet&
   return log10(a);
 }
 
-/** \internal \returns the log10 of \a a (coeff-wise) */
+/** \internal \returns the log2 of \a a (coeff-wise) */
 template <typename Packet>
 EIGEN_DECLARE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet plog2(const Packet& a) {
   using Scalar = typename internal::unpacket_traits<Packet>::type;

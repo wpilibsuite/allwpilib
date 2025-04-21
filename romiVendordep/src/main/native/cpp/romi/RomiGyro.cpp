@@ -24,60 +24,60 @@ RomiGyro::RomiGyro() : m_simDevice("Gyro:RomiGyro") {
   }
 }
 
-double RomiGyro::GetAngle() const {
+units::radian_t RomiGyro::GetAngle() const {
   return GetAngleZ();
 }
 
-double RomiGyro::GetRate() const {
+units::radians_per_second_t RomiGyro::GetRate() const {
   return GetRateZ();
 }
 
-double RomiGyro::GetRateX() const {
+units::radians_per_second_t RomiGyro::GetRateX() const {
   if (m_simRateX) {
-    return m_simRateX.Get();
+    return units::degrees_per_second_t{m_simRateX.Get()};
   }
 
-  return 0.0;
+  return 0.0_rad_per_s;
 }
 
-double RomiGyro::GetRateY() const {
+units::radians_per_second_t RomiGyro::GetRateY() const {
   if (m_simRateY) {
-    return m_simRateY.Get();
+    return units::degrees_per_second_t{m_simRateY.Get()};
   }
 
-  return 0.0;
+  return 0.0_rad_per_s;
 }
 
-double RomiGyro::GetRateZ() const {
+units::radians_per_second_t RomiGyro::GetRateZ() const {
   if (m_simRateZ) {
-    return m_simRateZ.Get();
+    return units::degrees_per_second_t{m_simRateZ.Get()};
   }
 
-  return 0.0;
+  return 0.0_rad_per_s;
 }
 
-double RomiGyro::GetAngleX() const {
+units::radian_t RomiGyro::GetAngleX() const {
   if (m_simAngleX) {
-    return m_simAngleX.Get() - m_angleXOffset;
+    return units::degree_t{m_simAngleX.Get() - m_angleXOffset};
   }
 
-  return 0.0;
+  return 0.0_rad;
 }
 
-double RomiGyro::GetAngleY() const {
+units::radian_t RomiGyro::GetAngleY() const {
   if (m_simAngleY) {
-    return m_simAngleY.Get() - m_angleYOffset;
+    return units::degree_t{m_simAngleY.Get() - m_angleYOffset};
   }
 
-  return 0.0;
+  return 0.0_rad;
 }
 
-double RomiGyro::GetAngleZ() const {
+units::radian_t RomiGyro::GetAngleZ() const {
   if (m_simAngleZ) {
-    return m_simAngleZ.Get() - m_angleZOffset;
+    return units::degree_t{m_simAngleZ.Get() - m_angleZOffset};
   }
 
-  return 0.0;
+  return 0.0_rad;
 }
 
 void RomiGyro::Reset() {

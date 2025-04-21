@@ -39,7 +39,14 @@ PowerDistribution::PowerDistribution() {
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
 
-  HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
+  if (HAL_GetPowerDistributionType(m_handle, &status) ==
+      HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
+    HAL_Report(HALUsageReporting::kResourceType_PDP,
+               HALUsageReporting::kPDP_CTRE);
+  } else {
+    HAL_Report(HALUsageReporting::kResourceType_PDP,
+               HALUsageReporting::kPDP_REV);
+  }
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
 }
 
@@ -54,7 +61,13 @@ PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   FRC_ReportError(status, "Module {}", module);
 
-  HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
+  if (moduleType == ModuleType::kCTRE) {
+    HAL_Report(HALUsageReporting::kResourceType_PDP,
+               HALUsageReporting::kPDP_CTRE);
+  } else {
+    HAL_Report(HALUsageReporting::kResourceType_PDP,
+               HALUsageReporting::kPDP_REV);
+  }
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
 }
 

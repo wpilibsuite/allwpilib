@@ -4,9 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.simpledifferentialdrivesimulation;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -97,10 +94,8 @@ public class Drivetrain {
 
   /** Sets speeds to the drivetrain motors. */
   public void setSpeeds(DifferentialDriveWheelSpeeds speeds) {
-    final double leftFeedforward =
-        m_feedforward.calculate(MetersPerSecond.of(speeds.leftMetersPerSecond)).in(Volts);
-    final double rightFeedforward =
-        m_feedforward.calculate(MetersPerSecond.of(speeds.rightMetersPerSecond)).in(Volts);
+    final double leftFeedforward = m_feedforward.calculate(speeds.leftMetersPerSecond);
+    final double rightFeedforward = m_feedforward.calculate(speeds.rightMetersPerSecond);
     double leftOutput =
         m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.leftMetersPerSecond);
     double rightOutput =

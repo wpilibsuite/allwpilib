@@ -183,10 +183,10 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::FindIf(F func) {
   for (size_t i = 0; i < m_structures.size(); i++) {
     auto& structure = m_structures[i];
     if (structure != nullptr && func(*structure)) {
-      return std::make_pair(MakeHandle(i), structure);
+      return std::pair{MakeHandle(i), structure};
     }
   }
-  return std::make_pair(0, nullptr);
+  return std::pair{0, nullptr};
 }
 
 }  // namespace cs

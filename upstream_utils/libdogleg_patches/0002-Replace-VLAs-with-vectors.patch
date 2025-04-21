@@ -1,0 +1,79 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Fri, 29 Nov 2024 19:54:54 -0500
+Subject: [PATCH 2/3] Replace VLAs with vectors
+
+---
+ dogleg.cpp | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/dogleg.cpp b/dogleg.cpp
+index 7e4259c303e21a9f4c63ba16f1bf5df131935057..9ed95f64b232f41a51fe23d72885ecadd86dc065 100644
+--- a/dogleg.cpp
++++ b/dogleg.cpp
+@@ -6,6 +6,7 @@
+ // Apparently I need this in MSVC to get constants
+ #define _USE_MATH_DEFINES
+ 
++#include <vector>
+ #include <stdio.h>
+ #include <stdarg.h>
+ #include <math.h>
+@@ -1907,7 +1908,7 @@ static bool getOutliernessFactors_dense( // output
+     // where A = Jo inv(JtJ) Jot
+     //
+     // A is symmetric. I store the upper triangle
+-    double A[featureSize*(featureSize+1)/2];
++    std::vector<double> A(featureSize*(featureSize+1)/2);
+     int iA=0;
+     for(int i=0; i<featureSize; i++)
+       for(int j=i; j<featureSize; j++, iA++)
+@@ -1921,7 +1922,7 @@ static bool getOutliernessFactors_dense( // output
+       }
+     accum_outlierness_factor(&factors[i_feature],
+                              &point->x[i_measurement],
+-                             A, featureSize, *scale);
++                             A.data(), featureSize, *scale);
+   }
+ 
+   result = true;
+@@ -2008,7 +2009,7 @@ static bool getOutliernessFactors_sparse( // output
+     // where A = Jo inv(JtJ) Jot
+     //
+     // A is symmetric. I store the upper triangle
+-    double A[featureSize*(featureSize+1)/2];
++    std::vector<double> A(featureSize*(featureSize+1)/2);
+     int iA=0;
+     for(int i=0; i<featureSize; i++)
+       for(int j=i; j<featureSize; j++, iA++)
+@@ -2027,7 +2028,7 @@ static bool getOutliernessFactors_sparse( // output
+       }
+     accum_outlierness_factor(&factors[i_feature],
+                              &point->x[i_measurement],
+-                             A, featureSize, *scale);
++                             A.data(), featureSize, *scale);
+   }
+ 
+   result = true;
+@@ -2212,8 +2213,8 @@ double dogleg_getOutliernessTrace_newFeature_sparse(const double*            Jqu
+ 
+   // This is Jt because cholmod thinks in terms of col-first instead of
+   // row-first
+-  int Jt_p[featureSize+1];
+-  int Jt_i[NstateActive*featureSize];
++  std::vector<int> Jt_p(featureSize+1);
++  std::vector<int> Jt_i(NstateActive*featureSize);
+   for(int i=0; i<=featureSize; i++)
+   {
+     Jt_p[i] = i*NstateActive;
+@@ -2224,8 +2225,8 @@ double dogleg_getOutliernessTrace_newFeature_sparse(const double*            Jqu
+   cholmod_sparse Jt_query_sparse = {.nrow   = ctx->Nstate,
+                                     .ncol   = featureSize,
+                                     .nzmax  = NstateActive*featureSize,
+-                                    .p      = (void*)Jt_p,
+-                                    .i      = (void*)Jt_i,
++                                    .p      = (void*)Jt_p.data(),
++                                    .i      = (void*)Jt_i.data(),
+                                     .x      = (double*)JqueryFeature,
+                                     .sorted = 1,
+                                     .packed = 1,

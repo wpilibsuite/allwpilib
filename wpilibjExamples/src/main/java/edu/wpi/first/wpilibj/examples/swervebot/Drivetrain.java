@@ -57,12 +57,14 @@ public class Drivetrain {
    */
   public void drive(
       double xSpeed, double ySpeed, double rot, boolean fieldRelative, double periodSeconds) {
-    var chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
-    if (fieldRelative) {
-      chassisSpeeds.toRobotRelativeSpeeds(m_gyro.getRotation2d());
-    }
-    chassisSpeeds.discretize(periodSeconds);
-    var swerveModuleStates = m_kinematics.toWheelSpeeds(chassisSpeeds);
+    var swerveModuleStates =
+        m_kinematics.toSwerveModuleStates(
+            ChassisSpeeds.discretize(
+                fieldRelative
+                    ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                        xSpeed, ySpeed, rot, m_gyro.getRotation2d())
+                    : new ChassisSpeeds(xSpeed, ySpeed, rot),
+                periodSeconds));
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);

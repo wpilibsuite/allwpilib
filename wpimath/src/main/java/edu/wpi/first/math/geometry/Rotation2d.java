@@ -10,11 +10,15 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.proto.Rotation2dProto;
 import edu.wpi.first.math.geometry.struct.Rotation2dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
@@ -113,11 +117,11 @@ public class Rotation2d
   public Rotation2d(double x, double y) {
     double magnitude = Math.hypot(x, y);
     if (magnitude > 1e-6) {
-      m_sin = y / magnitude;
       m_cos = x / magnitude;
+      m_sin = y / magnitude;
     } else {
-      m_sin = 0.0;
       m_cos = 1.0;
+      m_sin = 0.0;
       MathSharedStore.reportError(
           "x and y components of Rotation2d are zero\n", Thread.currentThread().getStackTrace());
     }
@@ -131,6 +135,39 @@ public class Rotation2d
    */
   public Rotation2d(Angle angle) {
     this(angle.in(Radians));
+  }
+
+  /**
+   * Constructs a Rotation2d from a rotation matrix.
+   *
+   * @param rotationMatrix The rotation matrix.
+   * @throws IllegalArgumentException if the rotation matrix isn't special orthogonal.
+   */
+  public Rotation2d(Matrix<N2, N2> rotationMatrix) {
+    final var R = rotationMatrix;
+
+    // Require that the rotation matrix is special orthogonal. This is true if
+    // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
+    if (R.times(R.transpose()).minus(Matrix.eye(Nat.N2())).normF() > 1e-9) {
+      var msg = "Rotation matrix isn't orthogonal\n\nR =\n" + R.getStorage().toString() + '\n';
+      MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
+      throw new IllegalArgumentException(msg);
+    }
+    if (Math.abs(R.det() - 1.0) > 1e-9) {
+      var msg =
+          "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n"
+              + R.getStorage().toString()
+              + '\n';
+      MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
+      throw new IllegalArgumentException(msg);
+    }
+
+    // R = [cosθ  −sinθ]
+    //     [sinθ   cosθ]
+    m_cos = R.get(0, 0);
+    m_sin = R.get(1, 0);
+
+    m_value = Math.atan2(m_sin, m_cos);
   }
 
   /**
@@ -236,6 +273,17 @@ public class Rotation2d
   public Rotation2d rotateBy(Rotation2d other) {
     return new Rotation2d(
         m_cos * other.m_cos - m_sin * other.m_sin, m_cos * other.m_sin + m_sin * other.m_cos);
+  }
+
+  /**
+   * Returns matrix representation of this rotation.
+   *
+   * @return Matrix representation of this rotation.
+   */
+  public Matrix<N2, N2> toMatrix() {
+    // R = [cosθ  −sinθ]
+    //     [sinθ   cosθ]
+    return MatBuilder.fill(Nat.N2(), Nat.N2(), m_cos, -m_sin, m_sin, m_cos);
   }
 
   /**

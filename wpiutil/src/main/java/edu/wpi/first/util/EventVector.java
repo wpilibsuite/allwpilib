@@ -48,7 +48,7 @@ public class EventVector {
   public void wakeup() {
     m_lock.lock();
     try {
-      for (Integer eventHandle : m_events) {
+      for (int eventHandle : m_events) {
         WPIUtilJNI.setEvent(eventHandle);
       }
     } finally {

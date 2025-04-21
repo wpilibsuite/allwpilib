@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Thad House <thadhouse1@gmail.com>
 Date: Sun, 18 Aug 2024 22:43:37 -0700
-Subject: [PATCH 13/13] Switch descriptor to not use globals from header inline
+Subject: [PATCH 13/14] Switch descriptor to not use globals from header inline
  functions
 
 ---

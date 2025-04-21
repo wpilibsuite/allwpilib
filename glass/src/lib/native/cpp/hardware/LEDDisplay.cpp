@@ -33,7 +33,7 @@ void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
   int& order = storage.GetInt("order", LEDConfig::RowMajor);
   int& start = storage.GetInt("start", LEDConfig::UpperLeft);
 
-  ImGui::PushItemWidth(ImGui::GetFontSize() * 6);
+  ImGui::PushItemWidth(ImGui::GetFontSize() * 7);
   ImGui::LabelText("Length", "%d", length);
   ImGui::LabelText("Running", "%s", running ? "Yes" : "No");
   ImGui::InputInt("Columns", &numColumns);

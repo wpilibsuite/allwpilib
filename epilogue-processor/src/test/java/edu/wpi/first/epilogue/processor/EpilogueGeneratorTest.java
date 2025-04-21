@@ -33,9 +33,19 @@ class EpilogueGeneratorTest {
 
         import static edu.wpi.first.units.Units.Seconds;
 
+        import edu.wpi.first.hal.FRCNetComm;
+        import edu.wpi.first.hal.HAL;
+
         import edu.wpi.first.epilogue.ExampleLogger;
 
         public final class Epilogue {
+          static {
+            HAL.report(
+              FRCNetComm.tResourceType.kResourceType_LoggingFramework,
+              FRCNetComm.tInstances.kLoggingFramework_Epilogue
+            );
+          }
+
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
           public static final ExampleLogger exampleLogger = new ExampleLogger();
@@ -82,9 +92,19 @@ class EpilogueGeneratorTest {
 
         import static edu.wpi.first.units.Units.Seconds;
 
+        import edu.wpi.first.hal.FRCNetComm;
+        import edu.wpi.first.hal.HAL;
+
         import edu.wpi.first.epilogue.ExampleLogger;
 
         public final class Epilogue {
+          static {
+            HAL.report(
+              FRCNetComm.tResourceType.kResourceType_LoggingFramework,
+              FRCNetComm.tInstances.kLoggingFramework_Epilogue
+            );
+          }
+
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
           public static final ExampleLogger exampleLogger = new ExampleLogger();
@@ -126,9 +146,19 @@ class EpilogueGeneratorTest {
 
         import static edu.wpi.first.units.Units.Seconds;
 
+        import edu.wpi.first.hal.FRCNetComm;
+        import edu.wpi.first.hal.HAL;
+
         import edu.wpi.first.epilogue.ExampleLogger;
 
         public final class Epilogue {
+          static {
+            HAL.report(
+              FRCNetComm.tResourceType.kResourceType_LoggingFramework,
+              FRCNetComm.tInstances.kLoggingFramework_Epilogue
+            );
+          }
+
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
           public static final ExampleLogger exampleLogger = new ExampleLogger();
@@ -155,8 +185,8 @@ class EpilogueGeneratorTest {
            */
           public static void update(edu.wpi.first.epilogue.Example robot) {
             long start = System.nanoTime();
-            exampleLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
-            config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
+            exampleLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
+            config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -172,7 +202,7 @@ class EpilogueGeneratorTest {
               config.loggingPeriod = Seconds.of(robot.getPeriod());
             }
             if (config.loggingPeriodOffset == null) {
-              config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+              config.loggingPeriodOffset = config.loggingPeriod.div(2);
             }
 
             robot.addPeriodic(() -> {
@@ -204,10 +234,20 @@ class EpilogueGeneratorTest {
 
         import static edu.wpi.first.units.Units.Seconds;
 
+        import edu.wpi.first.hal.FRCNetComm;
+        import edu.wpi.first.hal.HAL;
+
         import edu.wpi.first.epilogue.AlphaBotLogger;
         import edu.wpi.first.epilogue.BetaBotLogger;
 
         public final class Epilogue {
+          static {
+            HAL.report(
+              FRCNetComm.tResourceType.kResourceType_LoggingFramework,
+              FRCNetComm.tInstances.kLoggingFramework_Epilogue
+            );
+          }
+
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
           public static final AlphaBotLogger alphaBotLogger = new AlphaBotLogger();
@@ -235,8 +275,8 @@ class EpilogueGeneratorTest {
            */
           public static void update(edu.wpi.first.epilogue.AlphaBot robot) {
             long start = System.nanoTime();
-            alphaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
-            config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
+            alphaBotLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
+            config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -252,7 +292,7 @@ class EpilogueGeneratorTest {
               config.loggingPeriod = Seconds.of(robot.getPeriod());
             }
             if (config.loggingPeriodOffset == null) {
-              config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+              config.loggingPeriodOffset = config.loggingPeriod.div(2);
             }
 
             robot.addPeriodic(() -> {
@@ -267,8 +307,8 @@ class EpilogueGeneratorTest {
            */
           public static void update(edu.wpi.first.epilogue.BetaBot robot) {
             long start = System.nanoTime();
-            betaBotLogger.tryUpdate(config.dataLogger.getSubLogger(config.root), robot, config.errorHandler);
-            config.dataLogger.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
+            betaBotLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
+            config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -284,7 +324,7 @@ class EpilogueGeneratorTest {
               config.loggingPeriod = Seconds.of(robot.getPeriod());
             }
             if (config.loggingPeriodOffset == null) {
-              config.loggingPeriodOffset = config.loggingPeriod.divide(2);
+              config.loggingPeriodOffset = config.loggingPeriod.div(2);
             }
 
             robot.addPeriodic(() -> {
@@ -314,7 +354,7 @@ class EpilogueGeneratorTest {
           public CustomLogger() { super(A.class); }
 
           @Override
-          public void update(DataLogger logger, A object) {} // implementation is irrelevant
+          public void update(EpilogueBackend backend, A object) {} // implementation is irrelevant
         }
 
         @Logged
@@ -331,10 +371,20 @@ class EpilogueGeneratorTest {
 
         import static edu.wpi.first.units.Units.Seconds;
 
+        import edu.wpi.first.hal.FRCNetComm;
+        import edu.wpi.first.hal.HAL;
+
         import edu.wpi.first.epilogue.ExampleLogger;
         import edu.wpi.first.epilogue.CustomLogger;
 
         public final class Epilogue {
+          static {
+            HAL.report(
+              FRCNetComm.tResourceType.kResourceType_LoggingFramework,
+              FRCNetComm.tInstances.kLoggingFramework_Epilogue
+            );
+          }
+
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
 
           public static final ExampleLogger exampleLogger = new ExampleLogger();

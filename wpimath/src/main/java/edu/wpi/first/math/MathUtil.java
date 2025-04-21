@@ -4,6 +4,9 @@
 
 package edu.wpi.first.math;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+
 /** Math utility functions. */
 public final class MathUtil {
   private MathUtil() {
@@ -208,5 +211,63 @@ public final class MathUtil {
     double errorBound = (max - min) / 2.0;
     double error = MathUtil.inputModulus(expected - actual, -errorBound, errorBound);
     return Math.abs(error) < tolerance;
+  }
+
+  /**
+   * Limits translation velocity.
+   *
+   * @param current Translation at current timestep.
+   * @param next Translation at next timestep.
+   * @param dt Timestep duration.
+   * @param maxVelocity Maximum translation velocity.
+   * @return Returns the next Translation2d limited to maxVelocity
+   */
+  public static Translation2d slewRateLimit(
+      Translation2d current, Translation2d next, double dt, double maxVelocity) {
+    if (maxVelocity < 0) {
+      Exception e = new IllegalArgumentException();
+      MathSharedStore.reportError(
+          "maxVelocity must be a non-negative number, got " + maxVelocity, e.getStackTrace());
+      return next;
+    }
+    Translation2d diff = next.minus(current);
+    double dist = diff.getNorm();
+    if (dist < 1e-9) {
+      return next;
+    }
+    if (dist > maxVelocity * dt) {
+      // Move maximum allowed amount in direction of the difference
+      return current.plus(diff.times(maxVelocity * dt / dist));
+    }
+    return next;
+  }
+
+  /**
+   * Limits translation velocity.
+   *
+   * @param current Translation at current timestep.
+   * @param next Translation at next timestep.
+   * @param dt Timestep duration.
+   * @param maxVelocity Maximum translation velocity.
+   * @return Returns the next Translation3d limited to maxVelocity
+   */
+  public static Translation3d slewRateLimit(
+      Translation3d current, Translation3d next, double dt, double maxVelocity) {
+    if (maxVelocity < 0) {
+      Exception e = new IllegalArgumentException();
+      MathSharedStore.reportError(
+          "maxVelocity must be a non-negative number, got " + maxVelocity, e.getStackTrace());
+      return next;
+    }
+    Translation3d diff = next.minus(current);
+    double dist = diff.getNorm();
+    if (dist < 1e-9) {
+      return next;
+    }
+    if (dist > maxVelocity * dt) {
+      // Move maximum allowed amount in direction of the difference
+      return current.plus(diff.times(maxVelocity * dt / dist));
+    }
+    return next;
   }
 }

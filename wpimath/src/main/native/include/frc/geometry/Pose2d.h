@@ -54,6 +54,21 @@ class WPILIB_DLLEXPORT Pose2d {
       : m_translation{x, y}, m_rotation{std::move(rotation)} {}
 
   /**
+   * Constructs a pose with the specified affine transformation matrix.
+   *
+   * @param matrix The affine transformation matrix.
+   * @throws std::domain_error if the affine transformation matrix is invalid.
+   */
+  constexpr explicit Pose2d(const Eigen::Matrix3d& matrix)
+      : m_translation{Eigen::Vector2d{{matrix(0, 2)}, {matrix(1, 2)}}},
+        m_rotation{Eigen::Matrix2d{{matrix(0, 0), matrix(0, 1)},
+                                   {matrix(1, 0), matrix(1, 1)}}} {
+    if (matrix(2, 0) != 0.0 || matrix(2, 1) != 0.0 || matrix(2, 2) != 1.0) {
+      throw std::domain_error("Affine transformation matrix is invalid");
+    }
+  }
+
+  /**
    * Transforms the pose by the given transformation and returns the new
    * transformed pose.
    *
@@ -170,6 +185,19 @@ class WPILIB_DLLEXPORT Pose2d {
   constexpr Pose2d RelativeTo(const Pose2d& other) const;
 
   /**
+   * Rotates the current pose around a point in 2D space.
+   *
+   * @param point The point in 2D space to rotate around.
+   * @param rot The rotation to rotate the pose by.
+   *
+   * @return The new rotated pose.
+   */
+  constexpr Pose2d RotateAround(const Translation2d& point,
+                                const Rotation2d& rot) const {
+    return {m_translation.RotateAround(point, rot), m_rotation.RotateBy(rot)};
+  }
+
+  /**
    * Obtain a new Pose2d from a (constant curvature) velocity.
    *
    * See https://file.tavsys.net/control/controls-engineering-in-frc.pdf section
@@ -201,6 +229,17 @@ class WPILIB_DLLEXPORT Pose2d {
    * @return The twist that maps this to end.
    */
   constexpr Twist2d Log(const Pose2d& end) const;
+
+  /**
+   * Returns an affine transformation matrix representation of this pose.
+   */
+  constexpr Eigen::Matrix3d ToMatrix() const {
+    auto vec = m_translation.ToVector();
+    auto mat = m_rotation.ToMatrix();
+    return Eigen::Matrix3d{{mat(0, 0), mat(0, 1), vec(0)},
+                           {mat(1, 0), mat(1, 1), vec(1)},
+                           {0.0, 0.0, 1.0}};
+  }
 
   /**
    * Returns the nearest Pose2d from a collection of poses

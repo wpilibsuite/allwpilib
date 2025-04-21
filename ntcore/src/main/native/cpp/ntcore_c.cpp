@@ -561,7 +561,7 @@ void NT_SetServerMulti(NT_Inst inst, size_t count,
   servers.reserve(count);
   for (size_t i = 0; i < count; ++i) {
     servers.emplace_back(
-        std::make_pair(wpi::to_string_view(&server_names[i]), ports[i]));
+        std::pair{wpi::to_string_view(&server_names[i]), ports[i]});
   }
   nt::SetServer(inst, servers);
 }

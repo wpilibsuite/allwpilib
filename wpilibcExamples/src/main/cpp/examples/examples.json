@@ -759,11 +759,11 @@
   },
   {
     "name": "SimpleDifferentialDriveSimulation",
-    "description": "Simulate a differential drivetrain and follow trajectories with RamseteController (non-command-based).",
+    "description": "Simulate a differential drivetrain and follow trajectories with LTVUnicycleController (non-command-based).",
     "tags": [
       "Differential Drive",
       "State-Space",
-      "Ramsete",
+      "LTVUnicycleController",
       "Path Following",
       "Trajectory",
       "Encoder",

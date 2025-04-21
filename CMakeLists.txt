@@ -76,6 +76,7 @@ cmake_dependent_option(
 )
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_NTCORE "Build ntcore" ON)
+option(WITH_WPICAL "Build wpical" OFF)
 option(WITH_WPIMATH "Build wpimath" ON)
 cmake_dependent_option(
     WITH_WPIUNITS
@@ -131,10 +132,9 @@ set(java_lib_dest java)
 if(WITH_JAVA OR WITH_JAVA_SOURCE)
     set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
     find_package(Java REQUIRED COMPONENTS Development)
-    find_package(JNI REQUIRED COMPONENTS JVM)
-else()
-    # Protoc requires the java runtime
-    find_package(Java REQUIRED COMPONENTS Runtime)
+    if(NOT ANDROID)
+        find_package(JNI REQUIRED COMPONENTS JVM)
+    endif()
 endif()
 
 if(WITH_DOCS)
@@ -143,6 +143,11 @@ if(WITH_DOCS)
     include(AddDoxygenDocs)
     add_doxygen_docs()
 endif()
+
+if(WITH_WPICAL)
+    find_package(Ceres CONFIG REQUIRED)
+endif()
+
 find_package(LIBSSH CONFIG 0.7.1)
 
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
@@ -315,6 +320,9 @@ if(WITH_GUI)
     add_subdirectory(glass)
     add_subdirectory(outlineviewer)
     add_subdirectory(sysid)
+    if(WITH_WPICAL)
+        add_subdirectory(wpical)
+    endif()
     if(LIBSSH_FOUND)
         add_subdirectory(roborioteamnumbersetter)
         add_subdirectory(datalogtool)

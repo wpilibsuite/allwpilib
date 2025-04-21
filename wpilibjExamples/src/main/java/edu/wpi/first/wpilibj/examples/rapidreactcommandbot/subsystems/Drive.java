@@ -4,9 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems;
 
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -143,9 +140,7 @@ public class Drive extends SubsystemBase {
                     0,
                     m_controller.calculate(m_gyro.getRotation2d().getDegrees(), angleDeg)
                         // Divide feedforward voltage by battery voltage to normalize it to [-1, 1]
-                        + m_feedforward
-                                .calculate(DegreesPerSecond.of(m_controller.getSetpoint().velocity))
-                                .in(Volts)
+                        + m_feedforward.calculate(m_controller.getSetpoint().velocity)
                             / RobotController.getBatteryVoltage()))
         .until(m_controller::atGoal)
         .finallyDo(() -> m_drive.arcadeDrive(0, 0));

@@ -376,53 +376,60 @@ TEST(MecanumDrivePoseEstimatorTest, TestReset) {
       {1.0, 1.0, 1.0}};
 
   // Test initial pose
-  EXPECT_EQ(-1, estimator.GetEstimatedPosition().X().value());
-  EXPECT_EQ(-1, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_EQ(1, estimator.GetEstimatedPosition().Rotation().Radians().value());
+  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      1, estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test reset position
   estimator.ResetPosition(frc::Rotation2d{}, {1_m, 1_m, 1_m, 1_m},
                           frc::Pose2d{1_m, 0_m, frc::Rotation2d{}});
 
-  EXPECT_EQ(1, estimator.GetEstimatedPosition().X().value());
-  EXPECT_EQ(0, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_EQ(0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+  EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      0, estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test orientation and wheel positions
   estimator.Update(frc::Rotation2d{}, {2_m, 2_m, 2_m, 2_m});
 
-  EXPECT_EQ(2, estimator.GetEstimatedPosition().X().value());
-  EXPECT_EQ(0, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_EQ(0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      0, estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test reset rotation
   estimator.ResetRotation(frc::Rotation2d{90_deg});
 
-  EXPECT_EQ(2, estimator.GetEstimatedPosition().X().value());
-  EXPECT_EQ(0, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_EQ(std::numbers::pi / 2,
-            estimator.GetEstimatedPosition().Rotation().Radians().value());
+  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      std::numbers::pi / 2,
+      estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test orientation
   estimator.Update(frc::Rotation2d{}, {3_m, 3_m, 3_m, 3_m});
 
-  EXPECT_EQ(2, estimator.GetEstimatedPosition().X().value());
-  EXPECT_EQ(1, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_EQ(std::numbers::pi / 2,
-            estimator.GetEstimatedPosition().Rotation().Radians().value());
+  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      std::numbers::pi / 2,
+      estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test reset translation
   estimator.ResetTranslation(frc::Translation2d{-1_m, -1_m});
 
-  EXPECT_EQ(-1, estimator.GetEstimatedPosition().X().value());
-  EXPECT_EQ(-1, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_EQ(std::numbers::pi / 2,
-            estimator.GetEstimatedPosition().Rotation().Radians().value());
+  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      std::numbers::pi / 2,
+      estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test reset pose
   estimator.ResetPose(frc::Pose2d{});
 
-  EXPECT_EQ(0, estimator.GetEstimatedPosition().X().value());
-  EXPECT_EQ(0, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_EQ(0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().X().value());
+  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  EXPECT_DOUBLE_EQ(
+      0, estimator.GetEstimatedPosition().Rotation().Radians().value());
 }

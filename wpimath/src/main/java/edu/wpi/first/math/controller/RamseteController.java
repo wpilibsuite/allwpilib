@@ -28,9 +28,8 @@ import edu.wpi.first.math.trajectory.Trajectory;
  * that's the acronym for the title of the book it came from in Italian ("Robotica Articolata e
  * Mobile per i SErvizi e le TEcnologie").
  *
- * <p>See <a href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">Controls
- * Engineering in the FIRST Robotics Competition</a> section on Ramsete unicycle controller for a
- * derivation and analysis.
+ * <p>See <a href="https://file.tavsys.net/control/ramsete-unicycle-controller.pdf">this paper</a>
+ * for a derivation and analysis.
  */
 public class RamseteController {
   private final double m_b;

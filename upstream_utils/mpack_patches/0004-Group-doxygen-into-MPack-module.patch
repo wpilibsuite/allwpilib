@@ -15,7 +15,7 @@ Subject: [PATCH 4/4] Group doxygen into MPack module
  8 files changed, 23 insertions(+), 6 deletions(-)
 
 diff --git a/src/mpack/mpack-common.h b/src/mpack/mpack-common.h
-index 1c6b8d472f9591575973db8f7573ce98c5a6169d..14f7dd05c0f9cdc3689bb357f8aac9c8d0671f45 100644
+index 3e77e07829df769eea03992cd7e8bd232f0804a1..e1ba820c58b6886fed2d8a19aee6df3027b648e2 100644
 --- a/src/mpack/mpack-common.h
 +++ b/src/mpack/mpack-common.h
 @@ -40,7 +40,8 @@ MPACK_EXTERN_C_BEGIN
@@ -43,7 +43,7 @@ index 02a1abc0cbe0250636d4a82c21517fba36484608..e62536e46bcab4fdf6bca1d3ea74ee5d
   * The MPack Expect API allows you to easily read MessagePack data when you
   * expect it to follow a predefined schema.
 diff --git a/src/mpack/mpack-node.h b/src/mpack/mpack-node.h
-index 52142c4f9965c690e4227a6f89354e1e65b9b6a4..4c1289c834398a20f0c25f86e17e57a31832d623 100644
+index 26046e8c191eb44fe9e2b33aa003b9830d4b4b16..b410932b7f01165983b40ac47971039ca077d505 100644
 --- a/src/mpack/mpack-node.h
 +++ b/src/mpack/mpack-node.h
 @@ -36,7 +36,8 @@ MPACK_EXTERN_C_BEGIN
@@ -85,7 +85,7 @@ index 092e2ba2c36f8709b912d24b4d12974e81c82678..f981683512a60c0c2b5363b7f27cbd87
   * The MPack Reader API contains functions for imperatively reading dynamically
   * typed data from a MessagePack stream.
 diff --git a/src/mpack/mpack-writer.h b/src/mpack/mpack-writer.h
-index abeee1a6eb960b0ce61203ae75eb7c7488186860..03fdb7592b0bcaeeeaaf2f8c64c0fb30ba5e1292 100644
+index 5fcd009ccaf24ef2e76c24042167e15d538214d9..325d0db9d7fd66a48ee7564ef39d33100561bdbf 100644
 --- a/src/mpack/mpack-writer.h
 +++ b/src/mpack/mpack-writer.h
 @@ -40,7 +40,8 @@ struct mpack_track_t;

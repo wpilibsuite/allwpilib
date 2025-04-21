@@ -325,7 +325,7 @@ class pointer_based_stl_iterator {
  public:
   typedef Index difference_type;
   typedef typename XprType::Scalar value_type;
-#if __cplusplus >= 202002L
+#if EIGEN_CPLUSPLUS >= 202002L
   typedef std::conditional_t<XprType::InnerStrideAtCompileTime == 1, std::contiguous_iterator_tag,
                              std::random_access_iterator_tag>
       iterator_category;

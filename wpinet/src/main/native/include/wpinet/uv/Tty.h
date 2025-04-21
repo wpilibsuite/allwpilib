@@ -76,7 +76,7 @@ class Tty final : public StreamImpl<Tty, uv_tty_t> {
   std::pair<int, int> GetWindowSize() {
     int width = 0, height = 0;
     Invoke(&uv_tty_get_winsize, GetRaw(), &width, &height);
-    return std::make_pair(width, height);
+    return std::pair{width, height};
   }
 };
 

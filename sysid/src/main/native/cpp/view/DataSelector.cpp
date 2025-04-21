@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -111,6 +112,7 @@ void DataSelector::Display() {
           continue;
         }
         WPI_INFO(m_logger, "Loaded test state {}", it2->first);
+        m_executedTests.insert(it2->first);
         ++it2;
       }
       if (it->second.empty()) {
@@ -130,6 +132,15 @@ void DataSelector::Display() {
       ImGui::TextUnformatted("No tests found");
     }
     return;
+  }
+
+  if (m_executedTests.size() < 4 && !m_testCountValidated) {
+    for (auto test : kValidTests) {
+      if (!m_executedTests.contains(test)) {
+        m_missingTests.push_back(test);
+        m_testCountValidated = true;
+      }
+    }
   }
 
 #if 0

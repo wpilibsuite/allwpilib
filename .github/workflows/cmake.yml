@@ -18,7 +18,7 @@ jobs:
         include:
           - os: ubuntu-22.04
             name: Linux
-            container: wpilib/roborio-cross-ubuntu:2024-22.04
+            container: wpilib/roborio-cross-ubuntu:2025-22.04
             flags: "--preset with-java-and-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
           - os: macOS-14
             name: macOS
@@ -50,7 +50,7 @@ jobs:
         uses: lukka/get-cmake@v3.29.3
 
       - name: Install sccache
-        uses: mozilla-actions/sccache-action@v0.0.5
+        uses: mozilla-actions/sccache-action@v0.0.8
 
       - uses: actions/checkout@v4
 

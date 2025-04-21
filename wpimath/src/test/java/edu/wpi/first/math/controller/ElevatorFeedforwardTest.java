@@ -4,8 +4,6 @@
 
 package edu.wpi.first.math.controller;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,8 +24,8 @@ class ElevatorFeedforwardTest {
 
   @Test
   void testCalculate() {
-    assertEquals(1, m_elevatorFF.calculate(MetersPerSecond.of(0)).in(Volts), 0.002);
-    assertEquals(4.5, m_elevatorFF.calculate(MetersPerSecond.of(2)).in(Volts), 0.002);
+    assertEquals(1, m_elevatorFF.calculate(0.0), 0.002);
+    assertEquals(4.5, m_elevatorFF.calculate(2.0), 0.002);
 
     var A = MatBuilder.fill(Nat.N1(), Nat.N1(), -kv / ka);
     var B = MatBuilder.fill(Nat.N1(), Nat.N1(), 1.0 / ka);
@@ -38,7 +36,7 @@ class ElevatorFeedforwardTest {
     var nextR = VecBuilder.fill(3.0);
     assertEquals(
         plantInversion.calculate(r, nextR).get(0, 0) + ks + kg,
-        m_elevatorFF.calculate(MetersPerSecond.of(2.0), MetersPerSecond.of(3.0)).in(Volts),
+        m_elevatorFF.calculateWithVelocities(2.0, 3.0),
         0.002);
   }
 

@@ -161,7 +161,7 @@ class GeneralizedEigenSolver {
     compute(A, B, computeEigenvectors);
   }
 
-  /* \brief Returns the computed generalized eigenvectors.
+  /** \brief Returns the computed generalized eigenvectors.
    *
    * \returns  %Matrix whose columns are the (possibly complex) right eigenvectors.
    * i.e. the eigenvectors that solve (A - l*B)x = 0. The ordering matches the eigenvalues.

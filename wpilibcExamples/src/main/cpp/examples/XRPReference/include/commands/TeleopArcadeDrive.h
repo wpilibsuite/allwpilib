@@ -14,6 +14,14 @@
 class TeleopArcadeDrive
     : public frc2::CommandHelper<frc2::Command, TeleopArcadeDrive> {
  public:
+  /**
+   * Creates a new ArcadeDrive. This command will drive your robot according to
+   * the speed suppliers. This command does not terminate.
+   *
+   * @param drivetrain The drivetrain subsystem on which this command will run
+   * @param xaxisSpeedSupplier Supplier of forward/backward speed
+   * @param zaxisRotateSupplier Supplier of rotational speed
+   */
   TeleopArcadeDrive(Drivetrain* subsystem,
                     std::function<double()> xaxisSpeedSupplier,
                     std::function<double()> zaxisRotateSupplier);

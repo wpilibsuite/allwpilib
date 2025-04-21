@@ -55,9 +55,10 @@ def copy_to(files, root, rename_c_to_cpp=False):
     for f in files:
         dest_file = os.path.join(root, f)
 
-        # Rename .cc file to .cpp
-        if dest_file.endswith(".cc"):
+        # Rename .cc or .cxx file to .cpp
+        if dest_file.endswith(".cc") or dest_file.endswith(".cxx"):
             dest_file = os.path.splitext(dest_file)[0] + ".cpp"
+
         if rename_c_to_cpp and dest_file.endswith(".c"):
             dest_file = os.path.splitext(dest_file)[0] + ".cpp"
 

@@ -44,6 +44,15 @@ TEST(ElevatorSimTest, StateSpaceSim) {
   EXPECT_NEAR(controller.GetSetpoint(), sim.GetPosition().value(), 0.2);
 }
 
+TEST(ElevatorSimTest, InitialState) {
+  constexpr auto startingHeight = 0.5_m;
+  frc::sim::ElevatorSim sim(frc::DCMotor::KrakenX60(2), 20, 8_kg, 0.1_m, 0_m,
+                            1_m, true, startingHeight, {0.01, 0.0});
+
+  EXPECT_DOUBLE_EQ(startingHeight.value(), sim.GetPosition().value());
+  EXPECT_DOUBLE_EQ(0, sim.GetVelocity().value());
+}
+
 TEST(ElevatorSimTest, MinMax) {
   frc::sim::ElevatorSim sim(frc::DCMotor::Vex775Pro(4), 14.67, 8_kg, 0.75_in,
                             0_m, 1_m, true, 0_m, {0.01});

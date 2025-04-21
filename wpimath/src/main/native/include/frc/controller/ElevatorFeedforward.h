@@ -133,13 +133,13 @@ class ElevatorFeedforward {
       units::unit_t<Velocity> currentVelocity,
       units::unit_t<Velocity> nextVelocity) const {
     // See wpimath/algorithms.md#Elevator_feedforward for derivation
-    if (kA == decltype(kA)(0)) {
+    if (kA < decltype(kA)(1e-9)) {
       return kS * wpi::sgn(nextVelocity) + kG + kV * nextVelocity;
     } else {
       double A = -kV.value() / kA.value();
       double B = 1.0 / kA.value();
       double A_d = gcem::exp(A * m_dt.value());
-      double B_d = 1.0 / A * (A_d - 1.0) * B;
+      double B_d = A > -1e-9 ? B * m_dt.value() : 1.0 / A * (A_d - 1.0) * B;
       return kG + kS * wpi::sgn(currentVelocity) +
              units::volt_t{
                  1.0 / B_d *
@@ -215,6 +215,34 @@ class ElevatorFeedforward {
       units::volt_t maxVoltage, units::unit_t<Velocity> velocity) {
     return MaxAchievableAcceleration(-maxVoltage, velocity);
   }
+
+  /**
+   * Sets the static gain.
+   *
+   * @param kS The static gain.
+   */
+  constexpr void SetKs(units::volt_t kS) { this->kS = kS; }
+
+  /**
+   * Sets the gravity gain.
+   *
+   * @param kG The gravity gain.
+   */
+  constexpr void SetKg(units::volt_t kG) { this->kG = kG; }
+
+  /**
+   * Sets the velocity gain.
+   *
+   * @param kV The velocity gain.
+   */
+  constexpr void SetKv(units::unit_t<kv_unit> kV) { this->kV = kV; }
+
+  /**
+   * Sets the acceleration gain.
+   *
+   * @param kA The acceleration gain.
+   */
+  constexpr void SetKa(units::unit_t<ka_unit> kA) { this->kA = kA; }
 
   /**
    * Returns the static gain.

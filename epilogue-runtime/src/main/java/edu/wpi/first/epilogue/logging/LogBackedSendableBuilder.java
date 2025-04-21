@@ -18,24 +18,24 @@ import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
-/** A sendable builder implementation that sends data to a {@link DataLogger}. */
-@SuppressWarnings("PMD.CouplingBetweenObjects") // most methods simply delegate to the logger
+/** A sendable builder implementation that sends data to a {@link EpilogueBackend}. */
+@SuppressWarnings("PMD.CouplingBetweenObjects") // most methods simply delegate to the backend
 public class LogBackedSendableBuilder implements SendableBuilder {
-  private final DataLogger m_logger;
+  private final EpilogueBackend m_backend;
   private final Collection<Runnable> m_updates = new ArrayList<>();
 
   /**
-   * Creates a new sendable builder that delegates writes to an underlying data logger.
+   * Creates a new sendable builder that delegates writes to an underlying backend.
    *
-   * @param logger the data logger to write the sendable data to
+   * @param backend the backend to write the sendable data to
    */
-  public LogBackedSendableBuilder(DataLogger logger) {
-    this.m_logger = logger;
+  public LogBackedSendableBuilder(EpilogueBackend backend) {
+    this.m_backend = backend;
   }
 
   @Override
   public void setSmartDashboardType(String type) {
-    m_logger.log(".type", type);
+    m_backend.log(".type", type);
   }
 
   @Override
@@ -50,132 +50,132 @@ public class LogBackedSendableBuilder implements SendableBuilder {
 
   @Override
   public void addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter) {
-    m_updates.add(() -> m_logger.log(key, getter.getAsBoolean()));
+    m_updates.add(() -> m_backend.log(key, getter.getAsBoolean()));
   }
 
   @Override
   public void publishConstBoolean(String key, boolean value) {
-    m_logger.log(key, value);
+    m_backend.log(key, value);
   }
 
   @Override
   public void addIntegerProperty(String key, LongSupplier getter, LongConsumer setter) {
-    m_updates.add(() -> m_logger.log(key, getter.getAsLong()));
+    m_updates.add(() -> m_backend.log(key, getter.getAsLong()));
   }
 
   @Override
   public void publishConstInteger(String key, long value) {
-    m_logger.log(key, value);
+    m_backend.log(key, value);
   }
 
   @Override
   public void addFloatProperty(String key, FloatSupplier getter, FloatConsumer setter) {
-    m_updates.add(() -> m_logger.log(key, getter.getAsFloat()));
+    m_updates.add(() -> m_backend.log(key, getter.getAsFloat()));
   }
 
   @Override
   public void publishConstFloat(String key, float value) {
-    m_logger.log(key, value);
+    m_backend.log(key, value);
   }
 
   @Override
   public void addDoubleProperty(String key, DoubleSupplier getter, DoubleConsumer setter) {
-    m_updates.add(() -> m_logger.log(key, getter.getAsDouble()));
+    m_updates.add(() -> m_backend.log(key, getter.getAsDouble()));
   }
 
   @Override
   public void publishConstDouble(String key, double value) {
-    m_logger.log(key, value);
+    m_backend.log(key, value);
   }
 
   @Override
   public void addStringProperty(String key, Supplier<String> getter, Consumer<String> setter) {
     if (getter != null) {
-      m_updates.add(() -> m_logger.log(key, getter.get()));
+      m_updates.add(() -> m_backend.log(key, getter.get()));
     }
   }
 
   @Override
   public void publishConstString(String key, String value) {
-    m_logger.log(key, value);
+    m_backend.log(key, value);
   }
 
   @Override
   public void addBooleanArrayProperty(
       String key, Supplier<boolean[]> getter, Consumer<boolean[]> setter) {
     if (getter != null) {
-      m_updates.add(() -> m_logger.log(key, getter.get()));
+      m_updates.add(() -> m_backend.log(key, getter.get()));
     }
   }
 
   @Override
   public void publishConstBooleanArray(String key, boolean[] value) {
-    m_logger.log(key, value);
+    m_backend.log(key, value);
   }
 
   @Override
   public void addIntegerArrayProperty(
       String key, Supplier<long[]> getter, Consumer<long[]> setter) {
     if (getter != null) {
-      m_updates.add(() -> m_logger.log(key, getter.get()));
+      m_updates.add(() -> m_backend.log(key, getter.get()));
     }
   }
 
   @Override
   public void publishConstIntegerArray(String key, long[] value) {
-    m_logger.log(key, value);
+    m_backend.log(key, value);
   }
 
   @Override
   public void addFloatArrayProperty(
       String key, Supplier<float[]> getter, Consumer<float[]> setter) {
     if (getter != null) {
-      m_updates.add(() -> m_logger.log(key, getter.get()));
+      m_updates.add(() -> m_backend.log(key, getter.get()));
     }
   }
 
   @Override
   public void publishConstFloatArray(String key, float[] value) {
-    m_logger.log(key, value);
+    m_backend.log(key, value);
   }
 
   @Override
   public void addDoubleArrayProperty(
       String key, Supplier<double[]> getter, Consumer<double[]> setter) {
     if (getter != null) {
-      m_updates.add(() -> m_logger.log(key, getter.get()));
+      m_updates.add(() -> m_backend.log(key, getter.get()));
     }
   }
 
   @Override
   public void publishConstDoubleArray(String key, double[] value) {
-    m_logger.log(key, value);
+    m_backend.log(key, value);
   }
 
   @Override
   public void addStringArrayProperty(
       String key, Supplier<String[]> getter, Consumer<String[]> setter) {
     if (getter != null) {
-      m_updates.add(() -> m_logger.log(key, getter.get()));
+      m_updates.add(() -> m_backend.log(key, getter.get()));
     }
   }
 
   @Override
   public void publishConstStringArray(String key, String[] value) {
-    m_logger.log(key, value);
+    m_backend.log(key, value);
   }
 
   @Override
   public void addRawProperty(
       String key, String typeString, Supplier<byte[]> getter, Consumer<byte[]> setter) {
     if (getter != null) {
-      m_updates.add(() -> m_logger.log(key, getter.get()));
+      m_updates.add(() -> m_backend.log(key, getter.get()));
     }
   }
 
   @Override
   public void publishConstRaw(String key, String typeString, byte[] value) {
-    m_logger.log(key, value);
+    m_backend.log(key, value);
   }
 
   @Override

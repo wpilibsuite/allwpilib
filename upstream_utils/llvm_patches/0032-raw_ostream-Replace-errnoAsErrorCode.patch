@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Tue, 17 Sep 2024 15:30:31 -0700
+Subject: [PATCH 32/37] raw_ostream: Replace errnoAsErrorCode()
+
+---
+ llvm/lib/Support/raw_ostream.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index b417bebdef3a2f2e12e46e65ad7885d243b477a7..0330f8da01341a9b78a2e5e73e74d696285fbb51 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -531,7 +531,7 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+       }
+ #endif
+       // Otherwise it's a non-recoverable error. Note it and quit.
+-      error_detected(errnoAsErrorCode());
++      error_detected(std::error_code(errno, std::generic_category()));
+       break;
+     }
+ 
+@@ -561,7 +561,7 @@ uint64_t raw_fd_ostream::seek(uint64_t off) {
+   pos = ::lseek(FD, off, SEEK_SET);
+ #endif
+   if (pos == (uint64_t)-1)
+-    error_detected(errnoAsErrorCode());
++    error_detected(std::error_code(errno, std::generic_category()));
+   return pos;
+ }
+ 

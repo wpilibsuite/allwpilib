@@ -14,6 +14,22 @@ cc_library(
 )
 
 cc_library(
+    name = "debugging-headers",
+    hdrs = glob([
+        "src/main/native/thirdparty/debugging/include/**/*",
+    ]),
+    includes = ["src/main/native/thirdparty/debugging/include"],
+    strip_include_prefix = "src/main/native/thirdparty/debugging/include",
+    visibility = ["//wpiutil:__subpackages__"],
+)
+
+filegroup(
+    name = "debugging-srcs",
+    srcs = glob(["src/main/native/thirdparty/debugging/src/**"]),
+    visibility = ["//wpiutil:__subpackages__"],
+)
+
+cc_library(
     name = "expected-headers",
     hdrs = glob([
         "src/main/native/thirdparty/expected/include/**/*",
@@ -175,14 +191,15 @@ cc_library(
         ["src/main/native/cpp/**"],
         exclude = ["src/main/native/cpp/jni/**"],
     ) + [
+        ":debugging-srcs",
         ":fmtlib-srcs",
         ":generate-resources",
         ":llvm-srcs",
         ":memory-srcs",
         ":mpack-srcs",
+        ":nanopb-srcs",
         ":native-srcs",
         ":protobuf-srcs",
-        ":nanopb-srcs",
     ],
     hdrs = glob(["src/main/native/include/**/*"]),
     includes = ["src/main/native/include"],
@@ -191,14 +208,15 @@ cc_library(
     deps = [
         ":argparse-headers",
         ":concurrentqueue-headers",
+        ":debugging-headers",
         ":expected-headers",
         ":fmtlib-headers",
         ":json-headers",
         ":llvm-headers",
         ":memory-headers",
         ":mpack-headers",
-        ":protobuf-headers",
         ":nanopb-headers",
+        ":protobuf-headers",
         ":sigslot-headers",
     ] + select({
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@bzlmodrio-ni//libraries/cpp/ni:shared"],

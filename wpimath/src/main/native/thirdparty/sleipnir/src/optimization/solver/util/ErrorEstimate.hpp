@@ -12,6 +12,42 @@
 namespace sleipnir {
 
 /**
+ * Returns the error estimate using the KKT conditions for SQP.
+ *
+ * @param g Gradient of the cost function ∇f.
+ * @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
+ *   current iterate.
+ * @param c_e The problem's equality constraints cₑ(x) evaluated at the current
+ *   iterate.
+ * @param y Equality constraint dual variables.
+ */
+inline double ErrorEstimate(const Eigen::VectorXd& g,
+                            const Eigen::SparseMatrix<double>& A_e,
+                            const Eigen::VectorXd& c_e,
+                            const Eigen::VectorXd& y) {
+  int numEqualityConstraints = A_e.rows();
+
+  // Update the error estimate using the KKT conditions from equations (19.5a)
+  // through (19.5d) of [1].
+  //
+  //   ∇f − Aₑᵀy = 0
+  //   cₑ = 0
+  //
+  // The error tolerance is the max of the following infinity norms scaled by
+  // s_d (see equation (5) of [2]).
+  //
+  //   ‖∇f − Aₑᵀy‖_∞ / s_d
+  //   ‖cₑ‖_∞
+
+  // s_d = max(sₘₐₓ, ‖y‖₁ / m) / sₘₐₓ
+  constexpr double s_max = 100.0;
+  double s_d = std::max(s_max, y.lpNorm<1>() / numEqualityConstraints) / s_max;
+
+  return std::max({(g - A_e.transpose() * y).lpNorm<Eigen::Infinity>() / s_d,
+                   c_e.lpNorm<Eigen::Infinity>()});
+}
+
+/**
  * Returns the error estimate using the KKT conditions for the interior-point
  * method.
  *

@@ -30,7 +30,7 @@ class Rectangle2dTest {
   }
 
   @Test
-  void testIntersectsPoint() {
+  void testIntersects() {
     var center = new Pose2d(4.0, 3.0, Rotation2d.fromDegrees(90.0));
     var rect = new Rectangle2d(center, 2.0, 3.0);
 
@@ -42,7 +42,7 @@ class Rectangle2dTest {
   }
 
   @Test
-  void testContainsPoint() {
+  void testContains() {
     var center = new Pose2d(2.0, 3.0, Rotation2d.fromDegrees(45.0));
     var rect = new Rectangle2d(center, 3.0, 1.0);
 
@@ -53,7 +53,7 @@ class Rectangle2dTest {
   }
 
   @Test
-  void testDistanceToPoint() {
+  void testDistance() {
     var center = new Pose2d(1.0, 2.0, Rotation2d.fromDegrees(270.0));
     var rect = new Rectangle2d(center, 1.0, 2.0);
 
@@ -71,18 +71,18 @@ class Rectangle2dTest {
   }
 
   @Test
-  void testFindNearestPoint() {
+  void testNearest() {
     var center = new Pose2d(1.0, 1.0, Rotation2d.fromDegrees(90.0));
     var rect = new Rectangle2d(center, 3.0, 4.0);
 
     var point1 = new Translation2d(1.0, 3.0);
-    var nearestPoint1 = rect.findNearestPoint(point1);
+    var nearestPoint1 = rect.nearest(point1);
     assertAll(
         () -> assertEquals(1.0, nearestPoint1.getX(), kEpsilon),
         () -> assertEquals(2.5, nearestPoint1.getY(), kEpsilon));
 
     var point2 = new Translation2d(0.0, 0.0);
-    var nearestPoint2 = rect.findNearestPoint(point2);
+    var nearestPoint2 = rect.nearest(point2);
     assertAll(
         () -> assertEquals(0.0, nearestPoint2.getX(), kEpsilon),
         () -> assertEquals(0.0, nearestPoint2.getY(), kEpsilon));

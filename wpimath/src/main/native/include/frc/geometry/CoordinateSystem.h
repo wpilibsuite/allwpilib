@@ -35,12 +35,10 @@ class WPILIB_DLLEXPORT CoordinateSystem {
     // the NWU coordinate system. Each column vector in the change of basis
     // matrix is one of the old basis vectors mapped to its representation in
     // the new basis.
-    Eigen::Matrix3d R{{positiveX.m_axis.coeff(0), positiveY.m_axis.coeff(0),
-                       positiveZ.m_axis.coeff(0)},
-                      {positiveX.m_axis.coeff(1), positiveY.m_axis.coeff(1),
-                       positiveZ.m_axis.coeff(1)},
-                      {positiveX.m_axis.coeff(2), positiveY.m_axis.coeff(2),
-                       positiveZ.m_axis.coeff(2)}};
+    Eigen::Matrix3d R{
+        {positiveX.m_axis(0), positiveY.m_axis(0), positiveZ.m_axis(0)},
+        {positiveX.m_axis(1), positiveY.m_axis(1), positiveZ.m_axis(1)},
+        {positiveX.m_axis(2), positiveY.m_axis(2), positiveZ.m_axis(2)}};
 
     // The change of basis matrix should be a pure rotation. The Rotation3d
     // constructor will verify this by checking for special orthogonality.

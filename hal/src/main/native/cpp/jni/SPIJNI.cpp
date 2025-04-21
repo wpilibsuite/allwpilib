@@ -55,12 +55,12 @@ Java_edu_wpi_first_hal_SPIJNI_spiInitialize
 /*
  * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiTransaction
- * Signature: (ILjava/lang/Object;Ljava/lang/Object;B)I
+ * Signature: (ILjava/lang/Object;Ljava/lang/Object;I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiTransaction
   (JNIEnv* env, jclass, jint port, jobject dataToSend, jobject dataReceived,
-   jbyte size)
+   jint size)
 {
   uint8_t* dataToSendPtr = nullptr;
   if (dataToSend != nullptr) {
@@ -77,12 +77,12 @@ Java_edu_wpi_first_hal_SPIJNI_spiTransaction
 /*
  * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiTransactionB
- * Signature: (I[B[BB)I
+ * Signature: (I[B[BI)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiTransactionB
   (JNIEnv* env, jclass, jint port, jbyteArray dataToSend,
-   jbyteArray dataReceived, jbyte size)
+   jbyteArray dataReceived, jint size)
 {
   if (size < 0) {
     ThrowIllegalArgumentException(env, "SPIJNI.spiTransactionB() size < 0");
@@ -104,11 +104,11 @@ Java_edu_wpi_first_hal_SPIJNI_spiTransactionB
 /*
  * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiWrite
- * Signature: (ILjava/lang/Object;B)I
+ * Signature: (ILjava/lang/Object;I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiWrite
-  (JNIEnv* env, jclass, jint port, jobject dataToSend, jbyte size)
+  (JNIEnv* env, jclass, jint port, jobject dataToSend, jint size)
 {
   uint8_t* dataToSendPtr = nullptr;
   if (dataToSend != nullptr) {
@@ -123,11 +123,11 @@ Java_edu_wpi_first_hal_SPIJNI_spiWrite
 /*
  * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiWriteB
- * Signature: (I[BB)I
+ * Signature: (I[BI)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiWriteB
-  (JNIEnv* env, jclass, jint port, jbyteArray dataToSend, jbyte size)
+  (JNIEnv* env, jclass, jint port, jbyteArray dataToSend, jint size)
 {
   jint retVal = HAL_WriteSPI(static_cast<HAL_SPIPort>(port),
                              reinterpret_cast<const uint8_t*>(
@@ -139,12 +139,12 @@ Java_edu_wpi_first_hal_SPIJNI_spiWriteB
 /*
  * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiRead
- * Signature: (IZLjava/lang/Object;B)I
+ * Signature: (IZLjava/lang/Object;I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiRead
   (JNIEnv* env, jclass, jint port, jboolean initiate, jobject dataReceived,
-   jbyte size)
+   jint size)
 {
   if (size < 0) {
     ThrowIllegalArgumentException(env, "SPIJNI.spiRead() size < 0");
@@ -169,12 +169,12 @@ Java_edu_wpi_first_hal_SPIJNI_spiRead
 /*
  * Class:     edu_wpi_first_hal_SPIJNI
  * Method:    spiReadB
- * Signature: (IZ[BB)I
+ * Signature: (IZ[BI)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SPIJNI_spiReadB
   (JNIEnv* env, jclass, jint port, jboolean initiate, jbyteArray dataReceived,
-   jbyte size)
+   jint size)
 {
   if (size < 0) {
     ThrowIllegalArgumentException(env, "SPIJNI.spiReadB() size < 0");

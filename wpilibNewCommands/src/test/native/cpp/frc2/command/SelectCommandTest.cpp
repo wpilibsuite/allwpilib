@@ -48,18 +48,19 @@ TEST_F(SelectCommandTest, SelectCommandRequirement) {
   TestSubsystem requirement3;
   TestSubsystem requirement4;
 
-  InstantCommand command1([] {}, {&requirement1, &requirement2});
-  InstantCommand command2([] {}, {&requirement3});
-  InstantCommand command3([] {}, {&requirement3, &requirement4});
+  auto command1 = cmd::RunOnce([] {}, {&requirement1, &requirement2});
+  auto command2 = cmd::RunOnce([] {}, {&requirement3});
+  auto command3 = cmd::RunOnce([] {}, {&requirement3, &requirement4});
 
-  SelectCommand<int> select([] { return 1; }, std::pair(1, std::move(command1)),
-                            std::pair(2, std::move(command2)));
+  auto select =
+      cmd::Select<int>([] { return 1; }, std::pair(1, std::move(command1)),
+                       std::pair(2, std::move(command2)));
 
-  scheduler.Schedule(&select);
-  scheduler.Schedule(&command3);
+  scheduler.Schedule(select);
+  scheduler.Schedule(command3);
 
-  EXPECT_TRUE(scheduler.IsScheduled(&command3));
-  EXPECT_FALSE(scheduler.IsScheduled(&select));
+  EXPECT_TRUE(scheduler.IsScheduled(command3));
+  EXPECT_FALSE(scheduler.IsScheduled(select));
 }
 
 class TestableSelectCommand : public SelectCommand<int> {
@@ -68,7 +69,7 @@ class TestableSelectCommand : public SelectCommand<int> {
     std::vector<std::pair<int, std::unique_ptr<Command>>> vec;
     int index = 0;
     for (auto&& command : commands) {
-      vec.emplace_back(std::make_pair(index, std::move(command)));
+      vec.emplace_back(std::pair{index, std::move(command)});
       index++;
     }
     return vec;

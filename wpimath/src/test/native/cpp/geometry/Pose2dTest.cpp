@@ -51,6 +51,17 @@ TEST(Pose2dTest, RelativeTo) {
   EXPECT_NEAR(0.0, finalRelativeToInitial.Rotation().Degrees().value(), 1e-9);
 }
 
+TEST(Pose2dTest, RotateAround) {
+  const Pose2d initial{5_m, 0_m, 0_deg};
+  const Translation2d point{0_m, 0_m};
+
+  const auto rotated = initial.RotateAround(point, Rotation2d{180_deg});
+
+  EXPECT_NEAR(-5.0, rotated.X().value(), 1e-9);
+  EXPECT_NEAR(0.0, rotated.Y().value(), 1e-9);
+  EXPECT_NEAR(180.0, rotated.Rotation().Degrees().value(), 1e-9);
+}
+
 TEST(Pose2dTest, Equality) {
   const Pose2d a{0_m, 5_m, 43_deg};
   const Pose2d b{0_m, 5_m, 43_deg};
@@ -139,6 +150,13 @@ TEST(Pose2dTest, Nearest) {
                        .Rotation()
                        .Degrees()
                        .value());
+}
+
+TEST(Pose2dTest, ToMatrix) {
+  Pose2d before{1_m, 2_m, 20_deg};
+  Pose2d after{before.ToMatrix()};
+
+  EXPECT_EQ(before, after);
 }
 
 TEST(Pose2dTest, Constexpr) {

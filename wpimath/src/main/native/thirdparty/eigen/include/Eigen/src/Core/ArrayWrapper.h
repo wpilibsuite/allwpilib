@@ -65,8 +65,8 @@ class ArrayWrapper : public ArrayBase<ArrayWrapper<ExpressionType> > {
     return m_expression.innerStride();
   }
 
-  EIGEN_DEVICE_FUNC inline ScalarWithConstIfNotLvalue* data() { return m_expression.data(); }
-  EIGEN_DEVICE_FUNC inline const Scalar* data() const { return m_expression.data(); }
+  EIGEN_DEVICE_FUNC constexpr ScalarWithConstIfNotLvalue* data() { return m_expression.data(); }
+  EIGEN_DEVICE_FUNC constexpr const Scalar* data() const { return m_expression.data(); }
 
   EIGEN_DEVICE_FUNC inline const Scalar& coeffRef(Index rowId, Index colId) const {
     return m_expression.coeffRef(rowId, colId);
@@ -144,8 +144,8 @@ class MatrixWrapper : public MatrixBase<MatrixWrapper<ExpressionType> > {
     return m_expression.innerStride();
   }
 
-  EIGEN_DEVICE_FUNC inline ScalarWithConstIfNotLvalue* data() { return m_expression.data(); }
-  EIGEN_DEVICE_FUNC inline const Scalar* data() const { return m_expression.data(); }
+  EIGEN_DEVICE_FUNC constexpr ScalarWithConstIfNotLvalue* data() { return m_expression.data(); }
+  EIGEN_DEVICE_FUNC constexpr const Scalar* data() const { return m_expression.data(); }
 
   EIGEN_DEVICE_FUNC inline const Scalar& coeffRef(Index rowId, Index colId) const {
     return m_expression.derived().coeffRef(rowId, colId);

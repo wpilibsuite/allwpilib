@@ -4,8 +4,9 @@
 
 #include "WireEncoder3.h"
 
+#include <bit>
+
 #include <wpi/Endian.h>
-#include <wpi/MathExtras.h>
 #include <wpi/SmallVector.h>
 #include <wpi/leb128.h>
 #include <wpi/raw_ostream.h>
@@ -33,7 +34,7 @@ static void Write32(wpi::raw_ostream& os, uint32_t val) {
 
 static void WriteDouble(wpi::raw_ostream& os, double val) {
   uint8_t buf[8];
-  wpi::support::endian::write64be(buf, wpi::bit_cast<uint64_t>(val));
+  wpi::support::endian::write64be(buf, std::bit_cast<uint64_t>(val));
   os << buf;
 }
 

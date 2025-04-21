@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <functional>
 #include <string>
 
 #include <units/temperature.h>
@@ -77,6 +78,24 @@ class RobotController {
    * @return team number, or 0 if not found.
    */
   static int32_t GetTeamNumber();
+
+  /**
+   * Sets a new source to provide the clock time in microseconds. Changing this
+   * affects the return value of {@code GetTime}.
+   *
+   * @param supplier Function to return the time in microseconds.
+   */
+  static void SetTimeSource(std::function<uint64_t()> supplier);
+
+  /**
+   * Read the microsecond timestamp. By default, the time is based on the FPGA
+   * hardware clock in microseconds since the FPGA started. However, the return
+   * value of this method may be modified to use any time base, including
+   * non-monotonic and non-continuous time bases.
+   *
+   * @return The current time in microseconds.
+   */
+  static uint64_t GetTime();
 
   /**
    * Read the microsecond-resolution timer on the FPGA.
@@ -320,6 +339,9 @@ class RobotController {
    * @return The status of the CAN bus
    */
   static CANStatus GetCANStatus();
+
+ private:
+  static std::function<uint64_t()> m_timeSource;
 };
 
 }  // namespace frc

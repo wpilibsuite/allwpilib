@@ -37,6 +37,17 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle);
 
 /**
+ * Sets the color order for the addressable LED output. The default order is
+ * GRB. This will take effect on the next call to HAL_WriteAddressableLEDData().
+ * @param[in] handle the Addressable LED handle
+ * @param[in] colorOrder the color order
+ * @param[out] status the error code, or 0 for success
+ */
+void HAL_SetAddressableLEDColorOrder(HAL_AddressableLEDHandle handle,
+                                     HAL_AddressableLEDColorOrder colorOrder,
+                                     int32_t* status);
+
+/**
  * Set the Addressable LED PWM Digital port.
  *
  * @param[in] handle the Addressable LED handle
@@ -77,8 +88,8 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
 /**
  * Sets the bit timing.
  *
- * <p>By default, the driver is set up to drive WS2812Bs, so nothing needs to
- * be set for those.
+ * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing
+ * needs to be set for those.
  *
  * @param[in] handle the Addressable LED handle
  * @param[in] highTime0NanoSeconds high time for 0 bit (default 400ns)
@@ -98,7 +109,7 @@ void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
  * Sets the sync time.
  *
  * <p>The sync time is the time to hold output so LEDs enable. Default set for
- * WS2812B.
+ * WS2812B and WS2815.
  *
  * @param[in] handle the Addressable LED handle
  * @param[in] syncTimeMicroSeconds the sync time (default 280us)

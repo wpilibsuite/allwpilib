@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sat, 13 Jul 2024 15:24:30 -0700
+Subject: [PATCH 36/37] Fix AlignedCharArrayUnion for C++23
+
+---
+ llvm/include/llvm/Support/AlignOf.h | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
+
+diff --git a/llvm/include/llvm/Support/AlignOf.h b/llvm/include/llvm/Support/AlignOf.h
+index f586d7f182aab6e56b7fae6ae98a7cd89e63976c..ca98a564733a07a5e16122d31805e970bf76b673 100644
+--- a/llvm/include/llvm/Support/AlignOf.h
++++ b/llvm/include/llvm/Support/AlignOf.h
+@@ -13,20 +13,16 @@
+ #ifndef LLVM_SUPPORT_ALIGNOF_H
+ #define LLVM_SUPPORT_ALIGNOF_H
+ 
+-#include <type_traits>
++#include <algorithm>
++#include <cstddef>
+ 
+ namespace llvm {
+ 
+ /// A suitably aligned and sized character array member which can hold elements
+ /// of any type.
+-///
+-/// This template is equivalent to std::aligned_union_t<1, ...>, but we cannot
+-/// use it due to a bug in the MSVC x86 compiler:
+-/// https://github.com/microsoft/STL/issues/1533
+-/// Using `alignas` here works around the bug.
+-template <typename T, typename... Ts> struct AlignedCharArrayUnion {
+-  using AlignedUnion = std::aligned_union_t<1, T, Ts...>;
+-  alignas(alignof(AlignedUnion)) char buffer[sizeof(AlignedUnion)];
++template <typename... Ts> struct AlignedCharArrayUnion {
++  alignas((std::max)({alignof(Ts)...}))
++      std::byte buffer[(std::max)({static_cast<size_t>(1), sizeof(Ts)...})];
+ };
+ 
+ } // end namespace llvm

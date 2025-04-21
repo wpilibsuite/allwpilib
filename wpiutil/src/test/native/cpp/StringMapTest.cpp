@@ -250,8 +250,7 @@ TEST_F(StringMapTest, Iteration) {
 // Test insert() method.
 TEST_F(StringMapTest, Insert) {
   SCOPED_TRACE("InsertTest");
-  testMap.insert(
-      std::make_pair(std::string_view(testKeyFirst, testKeyLength), 1u));
+  testMap.insert(std::pair{std::string_view(testKeyFirst, testKeyLength), 1u});
   assertSingleItemMap();
 }
 
@@ -260,7 +259,7 @@ TEST_F(StringMapTest, InsertPair) {
   bool Inserted;
   StringMap<uint32_t>::iterator NewIt;
   std::tie(NewIt, Inserted) =
-      testMap.insert(std::make_pair(testKeyFirst, testValue));
+      testMap.insert(std::pair{testKeyFirst, testValue});
   EXPECT_EQ(1u, testMap.size());
   EXPECT_EQ(testValue, testMap[testKeyFirst]);
   EXPECT_EQ(testKeyFirst, NewIt->first);
@@ -269,7 +268,7 @@ TEST_F(StringMapTest, InsertPair) {
 
   StringMap<uint32_t>::iterator ExistingIt;
   std::tie(ExistingIt, Inserted) =
-      testMap.insert(std::make_pair(testKeyFirst, testValue + 1));
+      testMap.insert(std::pair{testKeyFirst, testValue + 1});
   EXPECT_EQ(1u, testMap.size());
   EXPECT_EQ(testValue, testMap[testKeyFirst]);
   EXPECT_FALSE(Inserted);
@@ -306,7 +305,7 @@ struct StringMapTestStruct {
 
 TEST_F(StringMapTest, NonDefaultConstructable) {
   StringMap<StringMapTestStruct> t;
-  t.insert(std::make_pair("Test", StringMapTestStruct(123)));
+  t.insert(std::pair{"Test", StringMapTestStruct(123)});
   StringMap<StringMapTestStruct>::iterator iter = t.find("Test");
   ASSERT_NE(iter, t.end());
   ASSERT_EQ(iter->second.i, 123);
@@ -443,7 +442,7 @@ struct Countable {
 TEST_F(StringMapTest, MoveDtor) {
   int InstanceCount = 0;
   StringMap<Countable> A;
-  A.insert(std::make_pair("x", Countable(42, InstanceCount)));
+  A.insert(std::pair{"x", Countable(42, InstanceCount)});
   ASSERT_EQ(InstanceCount, 1);
   auto I = A.find("x");
   ASSERT_NE(I, A.end());
@@ -474,7 +473,7 @@ TEST_F(StringMapTest, StructuredBindings) {
 
 TEST_F(StringMapTest, StructuredBindingsMoveOnly) {
   StringMap<MoveOnly> A;
-  A.insert(std::make_pair("a", MoveOnly(42)));
+  A.insert(std::pair{"a", MoveOnly(42)});
 
   for (auto&& [Key, Value] : A) {
     EXPECT_EQ("a", Key);

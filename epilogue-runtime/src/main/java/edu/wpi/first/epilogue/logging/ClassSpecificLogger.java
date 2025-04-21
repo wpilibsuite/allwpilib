@@ -42,26 +42,26 @@ public abstract class ClassSpecificLogger<T> {
   /**
    * Updates an object's fields in a data log.
    *
-   * @param dataLogger the logger to update
+   * @param backend the backend to update
    * @param object the object to update in the log
    */
-  protected abstract void update(DataLogger dataLogger, T object);
+  protected abstract void update(EpilogueBackend backend, T object);
 
   /**
    * Attempts to update the data log. Will do nothing if the logger is {@link #disable() disabled}.
    *
-   * @param dataLogger the logger to log data to
+   * @param backend the backend to log data to
    * @param object the data object to log
    * @param errorHandler the handler to use if logging raised an exception
    */
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
-  public final void tryUpdate(DataLogger dataLogger, T object, ErrorHandler errorHandler) {
+  public final void tryUpdate(EpilogueBackend backend, T object, ErrorHandler errorHandler) {
     if (m_disabled) {
       return;
     }
 
     try {
-      update(dataLogger, object);
+      update(backend, object);
     } catch (Exception e) {
       errorHandler.handle(e, this);
     }
@@ -98,10 +98,10 @@ public abstract class ClassSpecificLogger<T> {
   /**
    * Logs a sendable type.
    *
-   * @param dataLogger the logger to log data into
+   * @param backend the backend to log data into
    * @param sendable the sendable object to log
    */
-  protected void logSendable(DataLogger dataLogger, Sendable sendable) {
+  protected void logSendable(EpilogueBackend backend, Sendable sendable) {
     if (sendable == null) {
       return;
     }
@@ -110,7 +110,7 @@ public abstract class ClassSpecificLogger<T> {
         m_sendables.computeIfAbsent(
             sendable,
             s -> {
-              var b = new LogBackedSendableBuilder(dataLogger);
+              var b = new LogBackedSendableBuilder(backend);
               s.initSendable(b);
               return b;
             });

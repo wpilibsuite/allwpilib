@@ -20,6 +20,13 @@ units::volt_t ArmFeedforward::Calculate(
     units::unit_t<Velocity> nextVelocity) const {
   using VarMat = sleipnir::VariableMatrix;
 
+  // Small kₐ values make the solver ill-conditioned
+  if (kA < units::unit_t<ka_unit>{1e-1}) {
+    auto acceleration = (nextVelocity - currentVelocity) / m_dt;
+    return kS * wpi::sgn(currentVelocity.value()) + kV * currentVelocity +
+           kA * acceleration + kG * units::math::cos(currentAngle);
+  }
+
   // Arm dynamics
   Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
   Matrixd<2, 1> B{{0.0}, {1.0 / kA.value()}};
@@ -57,8 +64,14 @@ units::volt_t ArmFeedforward::Calculate(
     sleipnir::Hessian hessianF{cost, xAD};
     Eigen::SparseMatrix<double> H = hessianF.Value();
 
-    double error = std::numeric_limits<double>::infinity();
-    while (error > 1e-8) {
+    double error_k = std::numeric_limits<double>::infinity();
+    double error_k1 = std::abs(g.coeff(0));
+
+    // Loop until error stops decreasing or max iterations is reached
+    for (size_t iteration = 0;
+         iteration < 50 && error_k1 < (1.0 - 1e-10) * error_k; ++iteration) {
+      error_k = error_k1;
+
       // Iterate via Newton's method.
       //
       //   xₖ₊₁ = xₖ − H⁻¹g
@@ -90,7 +103,7 @@ units::volt_t ArmFeedforward::Calculate(
       g = gradientF.Value();
       H = hessianF.Value();
 
-      error = std::abs(g.coeff(0));
+      error_k1 = std::abs(g.coeff(0));
     }
   }
 

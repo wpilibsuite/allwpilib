@@ -83,6 +83,19 @@ TEST(Pose3dTest, RelativeTo) {
   EXPECT_NEAR(0.0, finalRelativeToInitial.Rotation().Z().value(), 1e-9);
 }
 
+TEST(Pose3dTest, RotateAround) {
+  const Pose3d initial{5_m, 0_m, 0_m, Rotation3d{}};
+  const Translation3d point{0_m, 0_m, 0_m};
+
+  const auto rotated =
+      initial.RotateAround(point, Rotation3d{0_deg, 0_deg, 180_deg});
+
+  EXPECT_NEAR(-5.0, rotated.X().value(), 1e-9);
+  EXPECT_NEAR(0.0, rotated.Y().value(), 1e-9);
+  EXPECT_NEAR(units::radian_t{180_deg}.value(), rotated.Rotation().Z().value(),
+              1e-9);
+}
+
 TEST(Pose3dTest, Equality) {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
@@ -110,6 +123,13 @@ TEST(Pose3dTest, Minus) {
   EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), transform.X().value());
   EXPECT_DOUBLE_EQ(0.0, transform.Y().value());
   EXPECT_NEAR(0.0, transform.Rotation().Z().value(), 1e-9);
+}
+
+TEST(Pose3dTest, ToMatrix) {
+  Pose3d before{1_m, 2_m, 3_m, Rotation3d{10_deg, 20_deg, 30_deg}};
+  Pose3d after{before.ToMatrix()};
+
+  EXPECT_EQ(before, after);
 }
 
 TEST(Pose3dTest, ToPose2d) {

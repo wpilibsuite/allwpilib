@@ -241,7 +241,7 @@ class blas_data_mapper<Scalar, Index, StorageOrder, AlignmentType, 1> {
 
   EIGEN_DEVICE_FUNC const Index stride() const { return m_stride; }
   EIGEN_DEVICE_FUNC const Index incr() const { return 1; }
-  EIGEN_DEVICE_FUNC const Scalar* data() const { return m_data; }
+  EIGEN_DEVICE_FUNC constexpr const Scalar* data() const { return m_data; }
 
   EIGEN_DEVICE_FUNC Index firstAligned(Index size) const {
     if (std::uintptr_t(m_data) % sizeof(Scalar)) {
@@ -430,7 +430,7 @@ class blas_data_mapper {
 
   EIGEN_DEVICE_FUNC const Index stride() const { return m_stride; }
   EIGEN_DEVICE_FUNC const Index incr() const { return m_incr.value(); }
-  EIGEN_DEVICE_FUNC Scalar* data() const { return m_data; }
+  EIGEN_DEVICE_FUNC constexpr Scalar* data() const { return m_data; }
 
  protected:
   Scalar* EIGEN_RESTRICT m_data;

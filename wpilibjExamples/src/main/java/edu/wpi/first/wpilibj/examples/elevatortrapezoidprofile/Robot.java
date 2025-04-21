@@ -4,9 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.elevatortrapezoidprofile;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Joystick;
@@ -48,6 +45,6 @@ public class Robot extends TimedRobot {
     m_motor.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition,
         m_setpoint.position,
-        m_feedforward.calculate(MetersPerSecond.of(m_setpoint.velocity)).in(Volts) / 12.0);
+        m_feedforward.calculate(m_setpoint.velocity) / 12.0);
   }
 }

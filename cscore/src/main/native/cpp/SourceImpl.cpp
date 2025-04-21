@@ -29,7 +29,7 @@ SourceImpl::SourceImpl(std::string_view name, wpi::Logger& logger,
       m_notifier(notifier),
       m_telemetry(telemetry),
       m_name{name} {
-  m_frame = Frame{*this, std::string_view{}, 0};
+  m_frame = Frame{*this, std::string_view{}, 0, WPI_TIMESRC_UNKNOWN};
 }
 
 SourceImpl::~SourceImpl() {
@@ -84,13 +84,19 @@ Frame SourceImpl::GetNextFrame() {
   return m_frame;
 }
 
-Frame SourceImpl::GetNextFrame(double timeout) {
+Frame SourceImpl::GetNextFrame(double timeout, Frame::Time lastFrameTime) {
   std::unique_lock lock{m_frameMutex};
-  auto oldTime = m_frame.GetTime();
+
+  if (lastFrameTime == 0) {
+    lastFrameTime = m_frame.GetTime();
+  }
+
+  // Wait unitl m_frame has a timestamp other than lastFrameTime
   if (!m_frameCv.wait_for(
           lock, std::chrono::milliseconds(static_cast<int>(timeout * 1000)),
-          [=, this] { return m_frame.GetTime() != oldTime; })) {
-    m_frame = Frame{*this, "timed out getting frame", wpi::Now()};
+          [=, this] { return m_frame.GetTime() != lastFrameTime; })) {
+    m_frame = Frame{*this, "timed out getting frame", wpi::Now(),
+                    WPI_TIMESRC_UNKNOWN};
   }
   return m_frame;
 }
@@ -98,7 +104,7 @@ Frame SourceImpl::GetNextFrame(double timeout) {
 void SourceImpl::Wakeup() {
   {
     std::scoped_lock lock{m_frameMutex};
-    m_frame = Frame{*this, std::string_view{}, 0};
+    m_frame = Frame{*this, std::string_view{}, 0, WPI_TIMESRC_UNKNOWN};
   }
   m_frameCv.notify_all();
 }
@@ -458,7 +464,8 @@ std::unique_ptr<Image> SourceImpl::AllocImage(
 }
 
 void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
-                          int height, std::string_view data, Frame::Time time) {
+                          int height, std::string_view data, Frame::Time time,
+                          WPI_TimestampSource timeSrc) {
   if (pixelFormat == VideoMode::PixelFormat::kBGRA) {
     // Write BGRA as BGR to save a copy
     auto image =
@@ -475,10 +482,11 @@ void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
           fmt::ptr(data.data()), data.size());
   std::memcpy(image->data(), data.data(), data.size());
 
-  PutFrame(std::move(image), time);
+  PutFrame(std::move(image), time, timeSrc);
 }
 
-void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
+void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time,
+                          WPI_TimestampSource timeSrc) {
   // Update telemetry
   m_telemetry.RecordSourceFrames(*this, 1);
   m_telemetry.RecordSourceBytes(*this, static_cast<int>(image->size()));
@@ -486,7 +494,7 @@ void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
   // Update frame
   {
     std::scoped_lock lock{m_frameMutex};
-    m_frame = Frame{*this, std::move(image), time};
+    m_frame = Frame{*this, std::move(image), time, timeSrc};
   }
 
   // Signal listeners
@@ -497,7 +505,7 @@ void SourceImpl::PutError(std::string_view msg, Frame::Time time) {
   // Update frame
   {
     std::scoped_lock lock{m_frameMutex};
-    m_frame = Frame{*this, msg, time};
+    m_frame = Frame{*this, msg, time, WPI_TIMESRC_UNKNOWN};
   }
 
   // Signal listeners

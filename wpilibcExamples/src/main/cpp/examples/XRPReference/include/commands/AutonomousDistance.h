@@ -15,6 +15,12 @@ class AutonomousDistance
     : public frc2::CommandHelper<frc2::SequentialCommandGroup,
                                  AutonomousDistance> {
  public:
+  /**
+   * Creates a new Autonomous Drive based on distance. This will drive out for a
+   * specified distance, turn around and drive back.
+   *
+   * @param drive The drivetrain subsystem on which this command will run
+   */
   explicit AutonomousDistance(Drivetrain* drive) {
     AddCommands(
         DriveDistance(-0.5, 10_in, drive), TurnDegrees(-0.5, 180_deg, drive),

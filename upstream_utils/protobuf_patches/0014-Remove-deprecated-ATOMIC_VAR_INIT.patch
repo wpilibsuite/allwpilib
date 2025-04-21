@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: braykoff <99614905+Braykoff@users.noreply.github.com>
+Date: Mon, 23 Dec 2024 15:12:02 -0500
+Subject: [PATCH 14/14] Remove deprecated ATOMIC_VAR_INIT
+
+---
+ src/google/protobuf/stubs/common.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/google/protobuf/stubs/common.cc b/src/google/protobuf/stubs/common.cc
+index 1423021b846966eb02d36c10df488f8aa0082a64..a16668a5964398c85c0268d82f652cf3c6aa668e 100644
+--- a/src/google/protobuf/stubs/common.cc
++++ b/src/google/protobuf/stubs/common.cc
+@@ -178,7 +178,7 @@ void NullLogHandler(LogLevel /* level */, const char* /* filename */,
+ }
+ 
+ static LogHandler* log_handler_ = &DefaultLogHandler;
+-static std::atomic<int> log_silencer_count_ = ATOMIC_VAR_INIT(0);
++static std::atomic<int> log_silencer_count_{0};
+ 
+ LogMessage& LogMessage::operator<<(const std::string& value) {
+   message_ += value;

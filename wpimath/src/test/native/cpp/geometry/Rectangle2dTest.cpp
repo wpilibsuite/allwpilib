@@ -18,7 +18,7 @@ TEST(Rectangle2dTest, NewWithCorners) {
   EXPECT_EQ(4.0, rect.Center().Y().value());
 }
 
-TEST(Rectangle2dTest, IntersectsPoint) {
+TEST(Rectangle2dTest, Intersects) {
   constexpr frc::Pose2d center{4_m, 3_m, 90_deg};
   constexpr frc::Rectangle2d rect{center, 2_m, 3_m};
 
@@ -28,7 +28,7 @@ TEST(Rectangle2dTest, IntersectsPoint) {
   EXPECT_FALSE(rect.Intersects(frc::Translation2d{4_m, 3.5_m}));
 }
 
-TEST(Rectangle2dTest, ContainsPoint) {
+TEST(Rectangle2dTest, Contains) {
   constexpr frc::Pose2d center{2_m, 3_m, 45_deg};
   constexpr frc::Rectangle2d rect{center, 3_m, 1_m};
 
@@ -37,7 +37,7 @@ TEST(Rectangle2dTest, ContainsPoint) {
   EXPECT_FALSE(rect.Contains(frc::Translation2d{3_m, 3_m}));
 }
 
-TEST(Rectangle2dTest, DistanceToPoint) {
+TEST(Rectangle2dTest, Distance) {
   constexpr double kEpsilon = 1E-9;
 
   constexpr frc::Pose2d center{1_m, 2_m, 270_deg};
@@ -56,19 +56,19 @@ TEST(Rectangle2dTest, DistanceToPoint) {
   EXPECT_NEAR(1, rect.Distance(point4).value(), kEpsilon);
 }
 
-TEST(Rectangle2dTest, FindNearestPoint) {
+TEST(Rectangle2dTest, Nearest) {
   constexpr double kEpsilon = 1E-9;
 
   constexpr frc::Pose2d center{1_m, 1_m, 90_deg};
   constexpr frc::Rectangle2d rect{center, 3_m, 4_m};
 
   constexpr frc::Translation2d point1{1_m, 3_m};
-  auto nearestPoint1 = rect.FindNearestPoint(point1);
+  auto nearestPoint1 = rect.Nearest(point1);
   EXPECT_NEAR(1.0, nearestPoint1.X().value(), kEpsilon);
   EXPECT_NEAR(2.5, nearestPoint1.Y().value(), kEpsilon);
 
   constexpr frc::Translation2d point2{0_m, 0_m};
-  auto nearestPoint2 = rect.FindNearestPoint(point2);
+  auto nearestPoint2 = rect.Nearest(point2);
   EXPECT_NEAR(0.0, nearestPoint2.X().value(), kEpsilon);
   EXPECT_NEAR(0.0, nearestPoint2.Y().value(), kEpsilon);
 }

@@ -642,6 +642,18 @@ class DenseBase
   EIGEN_DEVICE_FUNC explicit DenseBase(const DenseBase<OtherDerived>&);
 };
 
+/** Free-function swap.
+ */
+template <typename DerivedA, typename DerivedB>
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+    // Use forwarding references to capture all combinations of cv-qualified l+r-value cases.
+    std::enable_if_t<std::is_base_of<DenseBase<std::decay_t<DerivedA>>, std::decay_t<DerivedA>>::value &&
+                         std::is_base_of<DenseBase<std::decay_t<DerivedB>>, std::decay_t<DerivedB>>::value,
+                     void>
+    swap(DerivedA&& a, DerivedB&& b) {
+  a.swap(b);
+}
+
 }  // end namespace Eigen
 
 #endif  // EIGEN_DENSEBASE_H

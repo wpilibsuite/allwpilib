@@ -15,7 +15,7 @@ Subject: [PATCH 3/4] Use namespace for C++
  8 files changed, 15 insertions(+), 2 deletions(-)
 
 diff --git a/src/mpack/mpack-common.c b/src/mpack/mpack-common.c
-index 2c133a3303f7a2a10ac7d11a9eb3ee5a04a8335c..e5b4ab0007df2c4108791534b1aa4f9da4f1742a 100644
+index fb76a432bbe9e0ce6e39ffc29cbae3bc273efa83..1f9c078c2215436cc999a9447abe66250031e775 100644
 --- a/src/mpack/mpack-common.c
 +++ b/src/mpack/mpack-common.c
 @@ -24,6 +24,7 @@
@@ -51,7 +51,7 @@ index 81576d1e0e7b942e93a27a6dd5a75a751dba2384..44f00ffc5387b5646d700b174283dec1
 +}  // namespace mpack
  MPACK_SILENCE_WARNINGS_END
 diff --git a/src/mpack/mpack-node.c b/src/mpack/mpack-node.c
-index 3d4b0f4e69f9e026ad48dec30ac091a024ef30cf..016531360ef27a2003489c1cb4c9aa2f1a7d0865 100644
+index 8af1562d4bc27ec708d3af9e3d3cc03ae9719005..a1fdf4fa00c99ee00bbe36d1ee6911bf8d6be1f2 100644
 --- a/src/mpack/mpack-node.c
 +++ b/src/mpack/mpack-node.c
 @@ -24,6 +24,7 @@
@@ -100,7 +100,7 @@ index 79604c90828ebbeae52eb3d6c13afeec6b861fa9..27a2f9eeb10cc8c6aa274a5e1b0c96be
  #else
      #define MPACK_EXTERN_C_BEGIN /*nothing*/
 diff --git a/src/mpack/mpack-reader.c b/src/mpack/mpack-reader.c
-index c6d2223ef8208f4b918b8890ca81915cb2494bb0..e3cbe7a7086f0fcd0a1ce5e5004ce410fb0e457a 100644
+index dfac4c2dd51e2d6f18b029a729c9929d8356e03d..da49bda12c7b900561460e49edf8382c99b19cae 100644
 --- a/src/mpack/mpack-reader.c
 +++ b/src/mpack/mpack-reader.c
 @@ -24,6 +24,7 @@
@@ -118,7 +118,7 @@ index c6d2223ef8208f4b918b8890ca81915cb2494bb0..e3cbe7a7086f0fcd0a1ce5e5004ce410
 +}  // namespace mpack
  MPACK_SILENCE_WARNINGS_END
 diff --git a/src/mpack/mpack-writer.c b/src/mpack/mpack-writer.c
-index 4d052b14d83851a45a4899b96904ed661664008c..272f861979103495627887b0d3edfad117bff748 100644
+index 029b0651549c783c9c4076244b76fa8f2974d4f8..f72b538659afa39a43359292487ff6fe2370eeb2 100644
 --- a/src/mpack/mpack-writer.c
 +++ b/src/mpack/mpack-writer.c
 @@ -24,6 +24,7 @@
@@ -129,14 +129,14 @@ index 4d052b14d83851a45a4899b96904ed661664008c..272f861979103495627887b0d3edfad1
  
  #if MPACK_WRITER
  
-@@ -1772,4 +1773,5 @@ void mpack_complete_array(mpack_writer_t* writer) {
+@@ -1827,4 +1828,5 @@ void mpack_complete_array(mpack_writer_t* writer) {
  #endif // MPACK_BUILDER
  #endif // MPACK_WRITER
  
 +}  // namespace mpack
  MPACK_SILENCE_WARNINGS_END
 diff --git a/src/mpack/mpack-writer.h b/src/mpack/mpack-writer.h
-index c239ee6441e753cba46f2ab5a6136eead9c30fb4..abeee1a6eb960b0ce61203ae75eb7c7488186860 100644
+index d842a3fc48fbd5693553fcf7693e2dc06f1a2b5e..5fcd009ccaf24ef2e76c24042167e15d538214d9 100644
 --- a/src/mpack/mpack-writer.h
 +++ b/src/mpack/mpack-writer.h
 @@ -1168,6 +1168,7 @@ MPACK_EXTERN_C_END

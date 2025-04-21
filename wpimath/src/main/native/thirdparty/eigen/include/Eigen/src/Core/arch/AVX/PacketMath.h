@@ -124,6 +124,7 @@ struct packet_traits<float> : default_packet_traits {
     HasRsqrt = 1,
     HasTanh = EIGEN_FAST_MATH,
     HasErf = EIGEN_FAST_MATH,
+    HasErfc = EIGEN_FAST_MATH,
     HasBlend = 1
   };
 };
@@ -142,11 +143,14 @@ struct packet_traits<double> : default_packet_traits {
     HasSin = EIGEN_FAST_MATH,
     HasCos = EIGEN_FAST_MATH,
 #endif
+    HasTanh = EIGEN_FAST_MATH,
     HasLog = 1,
+    HasErfc = 1,
     HasExp = 1,
     HasSqrt = 1,
     HasRsqrt = 1,
     HasATan = 1,
+    HasATanh = 1,
     HasBlend = 1
   };
 };
@@ -657,6 +661,16 @@ EIGEN_STRONG_INLINE uint64_t predux<Packet4ul>(const Packet4ul& a) {
   __m128i r = _mm_add_epi64(_mm256_castsi256_si128(a), _mm256_extractf128_si256(a, 1));
   return numext::bit_cast<uint64_t>(_mm_extract_epi64_0(r) + _mm_extract_epi64_1(r));
 }
+
+template <>
+EIGEN_STRONG_INLINE bool predux_any(const Packet4l& a) {
+  return _mm256_movemask_pd(_mm256_castsi256_pd(a)) != 0;
+}
+template <>
+EIGEN_STRONG_INLINE bool predux_any(const Packet4ul& a) {
+  return _mm256_movemask_pd(_mm256_castsi256_pd(a)) != 0;
+}
+
 #define MM256_SHUFFLE_EPI64(A, B, M) _mm256_shuffle_pd(_mm256_castsi256_pd(A), _mm256_castsi256_pd(B), M)
 EIGEN_DEVICE_FUNC inline void ptranspose(PacketBlock<Packet4l, 4>& kernel) {
   __m256d T0 = MM256_SHUFFLE_EPI64(kernel.packet[0], kernel.packet[1], 15);
@@ -2000,12 +2014,26 @@ EIGEN_STRONG_INLINE bool predux_any(const Packet8f& x) {
 }
 
 template <>
+EIGEN_STRONG_INLINE bool predux_any(const Packet4d& x) {
+  return _mm256_movemask_pd(x) != 0;
+}
+
+template <>
 EIGEN_STRONG_INLINE bool predux_any(const Packet8i& x) {
   return _mm256_movemask_ps(_mm256_castsi256_ps(x)) != 0;
 }
 template <>
 EIGEN_STRONG_INLINE bool predux_any(const Packet8ui& x) {
   return _mm256_movemask_ps(_mm256_castsi256_ps(x)) != 0;
+}
+
+template <>
+EIGEN_STRONG_INLINE bool predux_any(const Packet8h& x) {
+  return _mm_movemask_epi8(x) != 0;
+}
+template <>
+EIGEN_STRONG_INLINE bool predux_any(const Packet8bf& x) {
+  return _mm_movemask_epi8(x) != 0;
 }
 
 EIGEN_DEVICE_FUNC inline void ptranspose(PacketBlock<Packet8f, 8>& kernel) {

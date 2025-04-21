@@ -4,6 +4,7 @@
 
 #include "frc/RobotController.h"
 
+#include <functional>
 #include <string>
 
 #include <hal/CAN.h>
@@ -14,6 +15,10 @@
 #include "frc/Errors.h"
 
 using namespace frc;
+
+std::function<uint64_t()> RobotController::m_timeSource = [] {
+  return RobotController::GetFPGATime();
+};
 
 int RobotController::GetFPGAVersion() {
   int32_t status = 0;
@@ -47,6 +52,14 @@ std::string RobotController::GetComments() {
 
 int32_t RobotController::GetTeamNumber() {
   return HAL_GetTeamNumber();
+}
+
+void RobotController::SetTimeSource(std::function<uint64_t()> supplier) {
+  m_timeSource = supplier;
+}
+
+uint64_t RobotController::GetTime() {
+  return m_timeSource();
 }
 
 uint64_t RobotController::GetFPGATime() {

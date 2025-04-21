@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 
@@ -55,9 +56,30 @@ class WPILIB_DLLEXPORT Pose3d {
       : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
 
   /**
+   * Constructs a pose with the specified affine transformation matrix.
+   *
+   * @param matrix The affine transformation matrix.
+   * @throws std::domain_error if the affine transformation matrix is invalid.
+   */
+  constexpr explicit Pose3d(const Eigen::Matrix4d& matrix)
+      : m_translation{Eigen::Vector3d{
+            {matrix(0, 3)}, {matrix(1, 3)}, {matrix(2, 3)}}},
+        m_rotation{
+            Eigen::Matrix3d{{matrix(0, 0), matrix(0, 1), matrix(0, 2)},
+                            {matrix(1, 0), matrix(1, 1), matrix(1, 2)},
+                            {matrix(2, 0), matrix(2, 1), matrix(2, 2)}}} {
+    if (matrix(3, 0) != 0.0 || matrix(3, 1) != 0.0 || matrix(3, 2) != 0.0 ||
+        matrix(3, 3) != 1.0) {
+      throw std::domain_error("Affine transformation matrix is invalid");
+    }
+  }
+
+  /**
    * Constructs a 3D pose from a 2D pose in the X-Y plane.
    *
    * @param pose The 2D pose.
+   * @see Rotation3d(Rotation2d)
+   * @see Translation3d(Translation2d)
    */
   constexpr explicit Pose3d(const Pose2d& pose)
       : m_translation{pose.X(), pose.Y(), 0_m},
@@ -186,6 +208,19 @@ class WPILIB_DLLEXPORT Pose3d {
   constexpr Pose3d RelativeTo(const Pose3d& other) const;
 
   /**
+   * Rotates the current pose around a point in 3D space.
+   *
+   * @param point The point in 3D space to rotate around.
+   * @param rot The rotation to rotate the pose by.
+   *
+   * @return The new rotated pose.
+   */
+  constexpr Pose3d RotateAround(const Translation3d& point,
+                                const Rotation3d& rot) const {
+    return {m_translation.RotateAround(point, rot), m_rotation.RotateBy(rot)};
+  }
+
+  /**
    * Obtain a new Pose3d from a (constant curvature) velocity.
    *
    * The twist is a change in pose in the robot's coordinate frame since the
@@ -215,6 +250,18 @@ class WPILIB_DLLEXPORT Pose3d {
    * @return The twist that maps this to end.
    */
   constexpr Twist3d Log(const Pose3d& end) const;
+
+  /**
+   * Returns an affine transformation matrix representation of this pose.
+   */
+  constexpr Eigen::Matrix4d ToMatrix() const {
+    auto vec = m_translation.ToVector();
+    auto mat = m_rotation.ToMatrix();
+    return Eigen::Matrix4d{{mat(0, 0), mat(0, 1), mat(0, 2), vec(0)},
+                           {mat(1, 0), mat(1, 1), mat(1, 2), vec(1)},
+                           {mat(2, 0), mat(2, 1), mat(2, 2), vec(2)},
+                           {0.0, 0.0, 0.0, 1.0}};
+  }
 
   /**
    * Returns a Pose2d representing this Pose3d projected into the X-Y plane.
@@ -279,9 +326,9 @@ constexpr Eigen::Matrix3d RotationVectorToMatrix(
   //         [ 0 -c  b]
   // Omega = [ c  0 -a]
   //         [-b  a  0]
-  return Eigen::Matrix3d{{0.0, -rotation.coeff(2), rotation.coeff(1)},
-                         {rotation.coeff(2), 0.0, -rotation.coeff(0)},
-                         {-rotation.coeff(1), rotation.coeff(0), 0.0}};
+  return Eigen::Matrix3d{{0.0, -rotation(2), rotation(1)},
+                         {rotation(2), 0.0, -rotation(0)},
+                         {-rotation(1), rotation(0), 0.0}};
 }
 
 }  // namespace detail
@@ -370,7 +417,7 @@ constexpr Twist3d Pose3d::Log(const Pose3d& end) const {
 
     Vector3d u{
         {transform.X().value(), transform.Y().value(), transform.Z().value()}};
-    Vector3d rvec = transform.Rotation().GetQuaternion().ToRotationVector();
+    Vector3d rvec = transform.Rotation().ToVector();
     Matrix3d omega = detail::RotationVectorToMatrix(rvec);
     Matrix3d omegaSq = omega * omega;
     double theta = rvec.norm();

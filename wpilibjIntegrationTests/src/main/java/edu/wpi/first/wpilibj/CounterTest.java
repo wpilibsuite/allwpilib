@@ -26,8 +26,8 @@ public class CounterTest extends AbstractComsSetup {
   private static FakeCounterFixture counter = null;
   private static final Logger logger = Logger.getLogger(CounterTest.class.getName());
 
-  Integer m_input;
-  Integer m_output;
+  int m_input;
+  int m_output;
 
   @Override
   protected Logger getClassLogger() {
@@ -40,10 +40,7 @@ public class CounterTest extends AbstractComsSetup {
    * @param input The input Port
    * @param output The output Port
    */
-  public CounterTest(Integer input, Integer output) {
-    assert input != null;
-    assert output != null;
-
+  public CounterTest(int input, int output) {
     m_input = input;
     m_output = output;
     // System.out.println("Counter Test: Input: " + input + " Output: " +
