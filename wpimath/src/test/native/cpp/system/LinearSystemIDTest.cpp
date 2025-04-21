@@ -65,7 +65,7 @@ TEST(LinearSystemIDTest, DCMotorSystem) {
       frc::Gearbox(frc::DCMotor::NEO(), 2), 0.00032_kg_sq_m, 1.0);
 #else
   constexpr auto model = frc::LinearSystemId::DCMotorSystem(
-      frc::DCMotor::NEO(2), 0.00032_kg_sq_m, 1.0);
+      frc::Gearbox(frc::DCMotor::NEO(), 2), 0.00032_kg_sq_m, 1.0);
 #endif
 
   ASSERT_TRUE(
