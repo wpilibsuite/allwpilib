@@ -12,6 +12,7 @@
 
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/DCMotor.h"
+#include "frc/system/plant/Gearbox.h"
 #include "units/acceleration.h"
 #include "units/angular_acceleration.h"
 #include "units/angular_velocity.h"
@@ -40,13 +41,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * are [position, velocity]ᵀ, inputs are [voltage], and outputs are [position,
    * velocity]ᵀ.
    *
-   * @param motor The motor (or gearbox) attached to the carriage.
+   * @param gearbox The gearbox attached to the carriage.
    * @param mass The mass of the elevator carriage, in kilograms.
    * @param radius The radius of the elevator's driving drum, in meters.
    * @param gearing Gear ratio from motor to carriage.
    * @throws std::domain_error if mass <= 0, radius <= 0, or gearing <= 0.
    */
-  static constexpr LinearSystem<2, 1, 2> ElevatorSystem(DCMotor motor,
+  static constexpr LinearSystem<2, 1, 2> ElevatorSystem(Gearbox gearbox,
                                                         units::kilogram_t mass,
                                                         units::meter_t radius,
                                                         double gearing) {
@@ -62,15 +63,15 @@ class WPILIB_DLLEXPORT LinearSystemId {
 
     Matrixd<2, 2> A{
         {0.0, 1.0},
-        {0.0, (-gcem::pow(gearing, 2) * motor.Kt /
-               (motor.R * units::math::pow<2>(radius) * mass * motor.Kv))
+        {0.0, (-gcem::pow(gearing, 2) * gearbox.numMotors * gearbox.dcMotor.Kt /
+               (gearbox.dcMotor.R * units::math::pow<2>(radius) * mass * gearbox.dcMotor.Kv))
                   .value()}};
     Matrixd<2, 1> B{{0.0},
-                    {(gearing * motor.Kt / (motor.R * radius * mass)).value()}};
+                    {(gearing * gearbox.numMotors * gearbox.dcMotor.Kt / (gearbox.dcMotor.R * radius * mass)).value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
-    return LinearSystem<2, 1, 2>(A, B, C, D);
+    return {A, B, C, D};
   }
 
   /**
@@ -78,13 +79,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * system are [angle, angular velocity]ᵀ, inputs are [voltage], and outputs
    * are [angle, angular velocity]ᵀ.
    *
-   * @param motor The motor (or gearbox) attached to the arm.
+   * @param gearbox The gearbox attached to the arm.
    * @param J The moment of inertia J of the arm.
    * @param gearing Gear ratio from motor to arm.
    * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
   static constexpr LinearSystem<2, 1, 2> SingleJointedArmSystem(
-      DCMotor motor, units::kilogram_square_meter_t J, double gearing) {
+      Gearbox gearbox, units::kilogram_square_meter_t J, double gearing) {
     if (J <= 0_kg_sq_m) {
       throw std::domain_error("J must be greater than zero.");
     }
@@ -94,13 +95,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
 
     Matrixd<2, 2> A{
         {0.0, 1.0},
-        {0.0, (-gcem::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J))
+        {0.0, (-gcem::pow(gearing, 2) * gearbox.numMotors * gearbox.dcMotor.Kt / (gearbox.dcMotor.Kv * gearbox.dcMotor.R * J))
                   .value()}};
-    Matrixd<2, 1> B{{0.0}, {(gearing * motor.Kt / (motor.R * J)).value()}};
+    Matrixd<2, 1> B{{0.0}, {(gearing * gearbox.numMotors * gearbox.dcMotor.Kt / (gearbox.dcMotor.R * J)).value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
-    return LinearSystem<2, 1, 2>(A, B, C, D);
+    return {A, B, C, D};
   }
 
   /**
@@ -312,13 +313,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * are [angular velocity], inputs are [voltage], and outputs are [angular
    * velocity].
    *
-   * @param motor The motor (or gearbox) attached to the flywheel.
+   * @param gearbox The gearbox attached to the carriage.
    * @param J The moment of inertia J of the flywheel.
    * @param gearing Gear ratio from motor to flywheel.
    * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
   static constexpr LinearSystem<1, 1, 1> FlywheelSystem(
-      DCMotor motor, units::kilogram_square_meter_t J, double gearing) {
+      Gearbox gearbox, units::kilogram_square_meter_t J, double gearing) {
     if (J <= 0_kg_sq_m) {
       throw std::domain_error("J must be greater than zero.");
     }
@@ -327,9 +328,9 @@ class WPILIB_DLLEXPORT LinearSystemId {
     }
 
     Matrixd<1, 1> A{
-        {(-gcem::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J))
+        {(-gcem::pow(gearing, 2) * gearbox.numMotors * gearbox.dcMotor.Kt / (gearbox.dcMotor.Kv * gearbox.dcMotor.R * J))
              .value()}};
-    Matrixd<1, 1> B{{(gearing * motor.Kt / (motor.R * J)).value()}};
+    Matrixd<1, 1> B{{(gearing * gearbox.numMotors * gearbox.dcMotor.Kt / (gearbox.dcMotor.R * J)).value()}};
     Matrixd<1, 1> C{{1.0}};
     Matrixd<1, 1> D{{0.0}};
 
@@ -341,7 +342,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * are [angular position, angular velocity]ᵀ, inputs are [voltage], and
    * outputs are [angular position, angular velocity]ᵀ.
    *
-   * @param motor The motor (or gearbox) attached to the system.
+   * @param gearbox The gearbox attached to the carriage.
    * @param J the moment of inertia J of the DC motor.
    * @param gearing Gear ratio from motor to output.
    * @throws std::domain_error if J <= 0 or gearing <= 0.
@@ -349,7 +350,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   static constexpr LinearSystem<2, 1, 2> DCMotorSystem(
-      DCMotor motor, units::kilogram_square_meter_t J, double gearing) {
+      Gearbox gearbox, units::kilogram_square_meter_t J, double gearing) {
     if (J <= 0_kg_sq_m) {
       throw std::domain_error("J must be greater than zero.");
     }
@@ -359,9 +360,9 @@ class WPILIB_DLLEXPORT LinearSystemId {
 
     Matrixd<2, 2> A{
         {0.0, 1.0},
-        {0.0, (-gcem::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J))
+        {0.0, (-gcem::pow(gearing, 2) * gearbox.numMotors * gearbox.dcMotor.Kt / (gearbox.dcMotor.Kv * gearbox.dcMotor.R * J))
                   .value()}};
-    Matrixd<2, 1> B{{0.0}, {(gearing * motor.Kt / (motor.R * J)).value()}};
+    Matrixd<2, 1> B{{0.0}, {(gearing * gearbox.numMotors * gearbox.dcMotor.Kt / (gearbox.dcMotor.R * J)).value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
@@ -416,7 +417,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * voltage, right voltage], and the outputs are [left velocity, right
    * velocity]ᵀ.
    *
-   * @param motor The motor (or gearbox) driving the drivetrain.
+   * @param gearbox The gearbox attached to the carriage.
    * @param mass The mass of the robot in kilograms.
    * @param r The radius of the wheels in meters.
    * @param rb The radius of the base (half of the trackwidth), in meters.
@@ -426,7 +427,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *         gearing <= 0.
    */
   static constexpr LinearSystem<2, 2, 2> DrivetrainVelocitySystem(
-      const DCMotor& motor, units::kilogram_t mass, units::meter_t r,
+      const Gearbox gearbox, units::kilogram_t mass, units::meter_t r,
       units::meter_t rb, units::kilogram_square_meter_t J, double gearing) {
     if (mass <= 0_kg) {
       throw std::domain_error("mass must be greater than zero.");
@@ -444,9 +445,9 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("gearing must be greater than zero.");
     }
 
-    auto C1 = -gcem::pow(gearing, 2) * motor.Kt /
-              (motor.Kv * motor.R * units::math::pow<2>(r));
-    auto C2 = gearing * motor.Kt / (motor.R * r);
+    auto C1 = -gcem::pow(gearing, 2) * gearbox.numMotors * gearbox.dcMotor.Kt /
+              (gearbox.dcMotor.Kv * gearbox.dcMotor.R * units::math::pow<2>(r));
+    auto C2 = gearing *  gearbox.numMotors * gearbox.dcMotor.Kt / (gearbox.dcMotor.R * r);
 
     Matrixd<2, 2> A{{((1 / mass + units::math::pow<2>(rb) / J) * C1).value(),
                      ((1 / mass - units::math::pow<2>(rb) / J) * C1).value()},

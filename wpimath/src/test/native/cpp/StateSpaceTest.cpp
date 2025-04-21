@@ -14,6 +14,7 @@
 #include "frc/system/LinearSystem.h"
 #include "frc/system/LinearSystemLoop.h"
 #include "frc/system/plant/DCMotor.h"
+#include "frc/system/plant/Gearbox.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "units/time.h"
 
@@ -25,7 +26,7 @@ constexpr auto kDt = 0.00505_s;
 class StateSpaceTest : public testing::Test {
  public:
   LinearSystem<2, 1, 1> plant = [] {
-    auto motors = DCMotor::Vex775Pro(2);
+    auto gearbox = Gearbox(DCMotor::Vex775Pro(), 2);
 
     // Carriage mass
     constexpr auto m = 5_kg;
@@ -36,7 +37,7 @@ class StateSpaceTest : public testing::Test {
     // Gear ratio
     constexpr double G = 40.0 / 40.0;
 
-    return frc::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
+    return frc::LinearSystemId::ElevatorSystem(gearbox, m, r, G).Slice(0);
   }();
   LinearQuadraticRegulator<2, 1> controller{plant, {0.02, 0.4}, {12.0}, kDt};
   KalmanFilter<2, 1, 1> observer{plant, {0.05, 1.0}, {0.0001}, kDt};

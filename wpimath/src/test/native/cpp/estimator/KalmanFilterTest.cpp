@@ -10,12 +10,13 @@
 
 #include "frc/estimator/KalmanFilter.h"
 #include "frc/system/plant/DCMotor.h"
+#include "frc/system/plant/Gearbox.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "units/moment_of_inertia.h"
 #include "units/time.h"
 
 TEST(KalmanFilterTest, Flywheel) {
-  auto motor = frc::DCMotor::NEO();
-  auto flywheel = frc::LinearSystemId::FlywheelSystem(motor, 1_kg_sq_m, 1.0);
+  auto gearbox = frc::Gearbox(frc::DCMotor::NEO());
+  auto flywheel = frc::LinearSystemId::FlywheelSystem(gearbox, 1_kg_sq_m, 1.0);
   frc::KalmanFilter<1, 1, 1> kf{flywheel, {1}, {1}, 5_ms};
 }
