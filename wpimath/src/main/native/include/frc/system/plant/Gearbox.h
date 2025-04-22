@@ -18,7 +18,7 @@ namespace frc {
          * Create a gearbox with the given DCMotor, number of motors, gearing
          * reduction, and moment of inertia.
          *
-         * @param DCMotor The DC motor attached to the gearbox.
+         * @param dcMotor The DC motor attached to the gearbox.
          * @param numMotors The number of motors in the gearbox.
          * @param reduction The gearing reduction of the gearbox.
          * @param J The moment of inertia J of the gearbox.

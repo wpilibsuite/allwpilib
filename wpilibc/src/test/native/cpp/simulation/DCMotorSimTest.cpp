@@ -15,10 +15,8 @@
 #include "frc/system/plant/LinearSystemId.h"
 
 TEST(DCMotorSimTest, VoltageSteadyState) {
-  frc::Gearbox gearbox = frc::Gearbox(frc::DCMotor::NEO(), 1);
-  auto plant = frc::LinearSystemId::DCMotorSystem(
-      frc::Gearbox(frc::DCMotor::NEO(), 1),
-      units::kilogram_square_meter_t{0.0005}, 1.0);
+  frc::Gearbox gearbox = frc::Gearbox(frc::DCMotor::NEO(), 1, 1.0, 0.0005_kg_sq_m);
+  auto plant = frc::LinearSystemId::DCMotorSystem(gearbox);
   frc::sim::DCMotorSim sim{plant, gearbox};
 
   frc::Encoder encoder{0, 1};
@@ -62,11 +60,9 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
 }
 
 TEST(DCMotorSimTest, PositionFeedbackControl) {
-  frc::Gearbox gearbox = frc::Gearbox(frc::DCMotor::NEO(), 1);
-  auto plant = frc::LinearSystemId::DCMotorSystem(
-      frc::Gearbox(frc::DCMotor::NEO(), 1),
-      units::kilogram_square_meter_t{0.0005}, 1.0);
-  frc::sim::DCMotorSim sim{plant, gearbox};
+  frc::Gearbox gearbox = frc::Gearbox(frc::DCMotor::NEO(), 1, 1.0, 0.0005_kg_sq_m);
+    auto plant = frc::LinearSystemId::DCMotorSystem(gearbox);
+    frc::sim::DCMotorSim sim{plant, gearbox};
 
   frc::PIDController controller{0.04, 0.0, 0.001};
 

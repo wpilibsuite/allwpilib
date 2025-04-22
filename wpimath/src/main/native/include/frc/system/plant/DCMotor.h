@@ -27,28 +27,28 @@ class WPILIB_DLLEXPORT DCMotor {
                                          units::inverse<units::ampere>>>;
 
   /// Voltage at which the motor constants were measured.
-  units::volt_t nominalVoltage;
+  const units::volt_t nominalVoltage;
 
   /// Torque when stalled.
-  units::newton_meter_t stallTorque;
+  const units::newton_meter_t stallTorque;
 
   /// Current draw when stalled.
-  units::ampere_t stallCurrent;
+  const units::ampere_t stallCurrent;
 
   /// Current draw under no load.
-  units::ampere_t freeCurrent;
+  const units::ampere_t freeCurrent;
 
   /// Angular velocity under no load.
-  units::radians_per_second_t freeSpeed;
+  const units::radians_per_second_t freeSpeed;
 
   /// Motor internal resistance.
-  units::ohm_t R;
+  const units::ohm_t R;
 
   /// Motor velocity constant.
-  radians_per_second_per_volt_t Kv;
+  const radians_per_second_per_volt_t Kv;
 
   /// Motor torque constant.
-  newton_meters_per_ampere_t Kt;
+  const newton_meters_per_ampere_t Kt;
 
   /**
    * Constructs a DC motor.

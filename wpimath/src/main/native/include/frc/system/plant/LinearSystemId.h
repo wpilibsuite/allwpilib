@@ -333,39 +333,25 @@ class WPILIB_DLLEXPORT LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a DC motor system. The states of the system
+   * Create a state-space model of a Gearbox system containing DC motors. The states of the system
    * are [angular position, angular velocity]ᵀ, inputs are [voltage], and
    * outputs are [angular position, angular velocity]ᵀ.
    *
    * @param gearbox The gearbox attached to the carriage.
-   * @param J the moment of inertia J of the DC motor.
-   * @param gearing Gear ratio from motor to output.
-   * @throws std::domain_error if J <= 0 or gearing <= 0.
    * @see <a
    * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  static constexpr LinearSystem<2, 1, 2> DCMotorSystem(
-      Gearbox gearbox, units::kilogram_square_meter_t J, double gearing) {
-    if (J <= 0_kg_sq_m) {
-      throw std::domain_error("J must be greater than zero.");
-    }
-    if (gearing <= 0.0) {
-      throw std::domain_error("gearing must be greater than zero.");
-    }
+  static constexpr LinearSystem<2, 1, 2> DCMotorSystem(const Gearbox& gearbox) {
 
     Matrixd<2, 2> A{
         {0.0, 1.0},
-        {0.0, (-gcem::pow(gearing, 2) * gearbox.numMotors * gearbox.dcMotor.Kt /
-               (gearbox.dcMotor.Kv * gearbox.dcMotor.R * J))
-                  .value()}};
+        {0.0, gearbox.Acceleration(1_rad_per_s, 0_V).value()}};
     Matrixd<2, 1> B{{0.0},
-                    {(gearing * gearbox.numMotors * gearbox.dcMotor.Kt /
-                      (gearbox.dcMotor.R * J))
-                         .value()}};
+                    {gearbox.Acceleration(0_rad_per_s, 1_V).value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
-    return LinearSystem<2, 1, 2>(A, B, C, D);
+    return {A, B, C, D};
   }
 
   /**
