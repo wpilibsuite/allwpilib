@@ -272,6 +272,36 @@ class CommandPtr final {
   CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
+   * Decorates this command to have additional subsystem requirements.
+   *
+   * @param requirements the requirements to add
+   * @return the decorated command
+   * @see addRequirements(Requirements requirements)
+   */
+  [[nodiscard]]
+  CommandPtr WithRequirements(Requirements requirements) &&;
+
+  /**
+   * Decorates this command to have additional subsystem requirements.
+   *
+   * @param requirements the requirements to add
+   * @return the decorated command
+   * @see addRequirements(wpi::SmallSet<Subsystem*, 4> requirements)
+   */
+  [[nodiscard]]
+  CommandPtr WithRequirements(wpi::SmallSet<Subsystem*, 4> requirements) &&;
+
+  /**
+   * Decorates this command to have additional subsystem requirements.
+   *
+   * @param requirements the requirements to add
+   * @return the decorated command
+   * @see addRequirements(Subsystem* requirements)
+   */
+  [[nodiscard]]
+  CommandPtr WithRequirements(Subsystem* requirements) &&;
+
+  /**
    * Decorates this Command with a name. Is an inline function for
    * Command::SetName(std::string_view);
    *

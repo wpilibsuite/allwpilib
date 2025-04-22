@@ -259,6 +259,8 @@ CommandPtr CommandPtr::WithName(std::string_view name) && {
   return std::move(wrapper).ToPtr();
 }
 
+// TODO: Write impls
+
 Command* CommandPtr::get() const& {
   AssertValid();
   return m_ptr.get();
