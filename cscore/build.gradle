@@ -11,17 +11,6 @@ ext {
 // with no support.
 if (OperatingSystem.current().isMacOsX()) {
     apply plugin: 'objective-cpp'
-    model {
-        toolChains {
-            clang(Clang) {
-                eachPlatform {
-                    linker.withArguments { args ->
-                        args << '-framework' << 'IOKit'
-                    }
-                }
-            }
-        }
-    }
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
