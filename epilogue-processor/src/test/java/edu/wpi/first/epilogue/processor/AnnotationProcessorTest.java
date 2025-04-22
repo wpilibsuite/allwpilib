@@ -1772,7 +1772,7 @@ class AnnotationProcessorTest {
         """
         package edu.wpi.first.epilogue;
 
-        @Logged
+        @Logged(warnForNonLoggableTypes = true)
         class Example {
           Throwable t;
         }
