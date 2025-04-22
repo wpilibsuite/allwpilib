@@ -34,7 +34,7 @@ class Arm {
   units::degree_t m_armSetpoint = kDefaultArmSetpoint;
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
-  frc::Gearbox m_armGearbox = frc::Gearbox(frc::DCMotor::Vex775Pro(), 2);
+  frc::Gearbox m_armGearbox = frc::Gearbox(&frc::Vex775Pro, 2);
 
   // Standard classes for controlling our arm
   frc::PIDController m_controller{m_armKp, 0, 0};

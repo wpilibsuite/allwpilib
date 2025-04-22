@@ -94,7 +94,7 @@ Pose2d DifferentialDrivetrainSim::GetPose() const {
 
 units::ampere_t DifferentialDrivetrainSim::GetLeftCurrentDraw() const {
   return m_gearbox.numMotors *
-         m_gearbox.dcMotor.Current(
+         m_gearbox.dcMotor->Current(
              units::radians_per_second_t{m_x(State::kLeftVelocity) *
                                          m_currentGearing /
                                          m_wheelRadius.value()},
@@ -104,7 +104,7 @@ units::ampere_t DifferentialDrivetrainSim::GetLeftCurrentDraw() const {
 
 units::ampere_t DifferentialDrivetrainSim::GetRightCurrentDraw() const {
   return m_gearbox.numMotors *
-         m_gearbox.dcMotor.Current(
+         m_gearbox.dcMotor->Current(
              units::radians_per_second_t{m_x(State::kRightVelocity) *
                                          m_currentGearing /
                                          m_wheelRadius.value()},

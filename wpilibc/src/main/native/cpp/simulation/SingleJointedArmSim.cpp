@@ -77,7 +77,7 @@ units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
   // is spinning 10x faster than the output
   units::radians_per_second_t motorVelocity{m_x(1) * m_gearing};
   return m_gearbox.numMotors *
-         m_gearbox.dcMotor.Current(motorVelocity, units::volt_t{m_u(0)}) *
+         m_gearbox.dcMotor->Current(motorVelocity, units::volt_t{m_u(0)}) *
          wpi::sgn(m_u(0));
 }
 

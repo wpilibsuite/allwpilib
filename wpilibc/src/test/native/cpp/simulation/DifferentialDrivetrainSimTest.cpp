@@ -18,7 +18,7 @@
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 
 TEST(DifferentialDrivetrainSimTest, Convergence) {
-  auto gearbox = frc::Gearbox(frc::DCMotor::NEO(), 2);
+  auto gearbox = frc::Gearbox(&frc::NEO, 2);
   auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
       gearbox, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
 
@@ -70,7 +70,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
 }
 
 TEST(DifferentialDrivetrainSimTest, Current) {
-  auto gearbox = frc::Gearbox(frc::DCMotor::NEO(), 2);
+  auto gearbox = frc::Gearbox(&frc::NEO, 2);
   auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
       gearbox, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
 
@@ -97,7 +97,7 @@ TEST(DifferentialDrivetrainSimTest, Current) {
 }
 
 TEST(DifferentialDrivetrainSimTest, ModelStability) {
-  auto gearbox = frc::Gearbox(frc::DCMotor::NEO(), 2);
+  auto gearbox = frc::Gearbox(&frc::NEO, 2);
   auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
       gearbox, 50_kg, 2_in, 12_in, 2_kg_sq_m, 5.0);
 

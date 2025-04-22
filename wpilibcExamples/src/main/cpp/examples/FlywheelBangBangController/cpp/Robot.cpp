@@ -93,7 +93,7 @@ class Robot : public frc::TimedRobot {
   static constexpr units::kilogram_square_meter_t kFlywheelMomentOfInertia =
       0.5 * 1.5_lb * 4_in * 4_in;
 
-  frc::Gearbox m_gearbox = frc::Gearbox(frc::DCMotor::NEO(), 1);
+  frc::Gearbox m_gearbox = frc::Gearbox(&frc::NEO, 1);
   frc::LinearSystem<1, 1, 1> m_plant{frc::LinearSystemId::FlywheelSystem(
       m_gearbox)};
 

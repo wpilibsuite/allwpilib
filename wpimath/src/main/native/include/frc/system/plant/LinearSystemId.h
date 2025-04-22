@@ -63,13 +63,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
 
     Matrixd<2, 2> A{
         {0.0, 1.0},
-        {0.0, (-gcem::pow(gearing, 2) * gearbox.numMotors * gearbox.dcMotor.Kt /
-               (gearbox.dcMotor.R * units::math::pow<2>(radius) * mass *
-                gearbox.dcMotor.Kv))
+        {0.0, (-gcem::pow(gearing, 2) * gearbox.numMotors * gearbox.dcMotor->Kt /
+               (gearbox.dcMotor->R * units::math::pow<2>(radius) * mass *
+                gearbox.dcMotor->Kv))
                   .value()}};
     Matrixd<2, 1> B{{0.0},
-                    {(gearing * gearbox.numMotors * gearbox.dcMotor.Kt /
-                      (gearbox.dcMotor.R * radius * mass))
+                    {(gearing * gearbox.numMotors * gearbox.dcMotor->Kt /
+                      (gearbox.dcMotor->R * radius * mass))
                          .value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
@@ -98,12 +98,12 @@ class WPILIB_DLLEXPORT LinearSystemId {
 
     Matrixd<2, 2> A{
         {0.0, 1.0},
-        {0.0, (-gcem::pow(gearing, 2) * gearbox.numMotors * gearbox.dcMotor.Kt /
-               (gearbox.dcMotor.Kv * gearbox.dcMotor.R * J))
+        {0.0, (-gcem::pow(gearing, 2) * gearbox.numMotors * gearbox.dcMotor->Kt /
+               (gearbox.dcMotor->Kv * gearbox.dcMotor->R * J))
                   .value()}};
     Matrixd<2, 1> B{{0.0},
-                    {(gearing * gearbox.numMotors * gearbox.dcMotor.Kt /
-                      (gearbox.dcMotor.R * J))
+                    {(gearing * gearbox.numMotors * gearbox.dcMotor->Kt /
+                      (gearbox.dcMotor->R * J))
                          .value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
@@ -430,10 +430,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("gearing must be greater than zero.");
     }
 
-    auto C1 = -gcem::pow(gearing, 2) * gearbox.numMotors * gearbox.dcMotor.Kt /
-              (gearbox.dcMotor.Kv * gearbox.dcMotor.R * units::math::pow<2>(r));
-    auto C2 = gearing * gearbox.numMotors * gearbox.dcMotor.Kt /
-              (gearbox.dcMotor.R * r);
+    auto C1 = -gcem::pow(gearing, 2) * gearbox.numMotors * gearbox.dcMotor->Kt /
+              (gearbox.dcMotor->Kv * gearbox.dcMotor->R * units::math::pow<2>(r));
+    auto C2 = gearing * gearbox.numMotors * gearbox.dcMotor->Kt /
+              (gearbox.dcMotor->R * r);
 
     Matrixd<2, 2> A{{((1 / mass + units::math::pow<2>(rb) / J) * C1).value(),
                      ((1 / mass - units::math::pow<2>(rb) / J) * C1).value()},

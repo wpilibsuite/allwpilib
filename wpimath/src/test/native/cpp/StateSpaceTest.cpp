@@ -26,7 +26,7 @@ constexpr auto kDt = 0.00505_s;
 class StateSpaceTest : public testing::Test {
  public:
   LinearSystem<2, 1, 1> plant = [] {
-    auto gearbox = Gearbox(DCMotor::Vex775Pro(), 2);
+    auto gearbox = Gearbox(&Vex775Pro, 2);
 
     // Carriage mass
     constexpr auto m = 5_kg;

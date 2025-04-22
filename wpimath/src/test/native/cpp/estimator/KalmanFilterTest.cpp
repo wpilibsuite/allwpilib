@@ -16,7 +16,7 @@
 #include "units/time.h"
 
 TEST(KalmanFilterTest, Flywheel) {
-  auto gearbox = frc::Gearbox(frc::DCMotor::NEO());
+  auto gearbox = frc::Gearbox(&frc::NEO);
   auto flywheel = frc::LinearSystemId::FlywheelSystem(gearbox);
   frc::KalmanFilter<1, 1, 1> kf{flywheel, {1}, {1}, 5_ms};
 }

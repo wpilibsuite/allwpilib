@@ -18,7 +18,7 @@ namespace frc {
 
 TEST(LinearQuadraticRegulatorTest, ElevatorGains) {
   LinearSystem<2, 1, 1> plant = [] {
-    auto gearbox = Gearbox(DCMotor::Vex775Pro(), 2);
+    auto gearbox = Gearbox(&Vex775Pro, 2);
 
     // Carriage mass
     constexpr auto m = 5_kg;
@@ -40,7 +40,7 @@ TEST(LinearQuadraticRegulatorTest, ElevatorGains) {
 
 TEST(LinearQuadraticRegulatorTest, ArmGains) {
   LinearSystem<2, 1, 1> plant = [] {
-    auto gearbox = Gearbox(DCMotor::Vex775Pro(), 2);
+    auto gearbox = Gearbox(&Vex775Pro, 2);
 
     // Carriage mass
     constexpr auto m = 4_kg;
@@ -66,7 +66,7 @@ TEST(LinearQuadraticRegulatorTest, ArmGains) {
 
 TEST(LinearQuadraticRegulatorTest, FourMotorElevator) {
   LinearSystem<2, 1, 1> plant = [] {
-    auto gearbox = Gearbox(DCMotor::Vex775Pro(), 4);
+    auto gearbox = Gearbox(&Vex775Pro, 4);
 
     // Carriage mass
     constexpr auto m = 8_kg;
@@ -168,7 +168,7 @@ TEST(LinearQuadraticRegulatorTest, MatrixOverloadsWithDoubleIntegrator) {
 
 TEST(LinearQuadraticRegulatorTest, LatencyCompensate) {
   LinearSystem<2, 1, 1> plant = [] {
-    auto gearbox = Gearbox(DCMotor::Vex775Pro(), 4);
+    auto gearbox = Gearbox(&Vex775Pro, 4);
 
     // Carriage mass
     constexpr auto m = 8_kg;

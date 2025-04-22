@@ -15,7 +15,7 @@
 #include "frc/system/plant/LinearSystemId.h"
 
 TEST(DCMotorSimTest, VoltageSteadyState) {
-  frc::Gearbox gearbox = frc::Gearbox(frc::DCMotor::NEO(), 1, 1.0, 0.0005_kg_sq_m);
+  frc::Gearbox gearbox = frc::Gearbox(&frc::NEO,  1, 1.0, 0.0005_kg_sq_m);
   auto plant = frc::LinearSystemId::DCMotorSystem(gearbox);
   frc::sim::DCMotorSim sim{plant, gearbox};
 
@@ -40,7 +40,7 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }
 
-  EXPECT_NEAR((gearbox.dcMotor.Kv * 12_V).value(), encoder.GetRate(), 0.1);
+  EXPECT_NEAR((gearbox.dcMotor->Kv * 12_V).value(), encoder.GetRate(), 0.1);
 
   // Decay
   for (int i = 0; i < 100; i++) {
@@ -60,7 +60,7 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
 }
 
 TEST(DCMotorSimTest, PositionFeedbackControl) {
-  frc::Gearbox gearbox = frc::Gearbox(frc::DCMotor::NEO(), 1, 1.0, 0.0005_kg_sq_m);
+  frc::Gearbox gearbox = frc::Gearbox(&frc::NEO, 1, 1.0, 0.0005_kg_sq_m);
     auto plant = frc::LinearSystemId::DCMotorSystem(gearbox);
     frc::sim::DCMotorSim sim{plant, gearbox};
 

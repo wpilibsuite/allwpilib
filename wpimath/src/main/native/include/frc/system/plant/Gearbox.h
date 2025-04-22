@@ -9,10 +9,10 @@
 namespace frc {
     class WPILIB_DLLEXPORT Gearbox {
     public:
-        DCMotor dcMotor;
-        int numMotors;
-        double reduction;
-        units::kilogram_square_meter_t J;
+        const DCMotor* dcMotor;
+        const int numMotors;
+        const double reduction;
+        const units::kilogram_square_meter_t J;
 
         /**
          * Create a gearbox with the given DCMotor, number of motors, gearing
@@ -24,7 +24,7 @@ namespace frc {
          * @param J The moment of inertia J of the gearbox.
          * @throws std::domain_error if J <= 0 or gearing <= 0.
          */
-        constexpr explicit Gearbox(const DCMotor &dcMotor, const int numMotors = 1,
+        constexpr explicit Gearbox(const DCMotor *dcMotor, const int numMotors = 1,
                                    const double reduction = 1.0,
                                    const units::kilogram_square_meter_t J = 1_kg_sq_m)
             : dcMotor(dcMotor), numMotors(numMotors), reduction(reduction), J(J) {
@@ -57,7 +57,7 @@ namespace frc {
             units::radians_per_second_t speed, units::volt_t inputVoltage) const {
             return units::newton_meter_t{
                 numMotors * reduction *
-                dcMotor.Torque(speed * reduction, inputVoltage).value() / J.value()
+                dcMotor->Torque(speed * reduction, inputVoltage).value() / J.value()
             };
         }
 
@@ -69,7 +69,7 @@ namespace frc {
         [[nodiscard]]
         constexpr units::newton_meter_t Acceleration(units::ampere_t current) const {
             return units::newton_meter_t
-                    {numMotors * reduction * dcMotor.Torque(current / numMotors).value() / J.value()};
+                    {numMotors * reduction * dcMotor->Torque(current / numMotors).value() / J.value()};
         }
 
         /**
@@ -81,7 +81,7 @@ namespace frc {
         [[nodiscard]]
         constexpr units::ampere_t Current(units::radians_per_second_t speed,
                                           units::volt_t inputVoltage) const {
-            return numMotors * dcMotor.Current(speed * reduction, inputVoltage);
+            return numMotors * dcMotor->Current(speed * reduction, inputVoltage);
         }
 
         /**
@@ -91,7 +91,7 @@ namespace frc {
          */
         [[nodiscard]]
         constexpr units::ampere_t Current(units::newton_meter_t torque) const {
-            return numMotors * dcMotor.Current(torque / numMotors / reduction);
+            return numMotors * dcMotor->Current(torque / numMotors / reduction);
         }
 
         /**
@@ -104,7 +104,7 @@ namespace frc {
         constexpr units::newton_meter_t Torque(units::radians_per_second_t speed,
                                                units::volt_t inputVoltage) const {
             return numMotors * reduction *
-                   dcMotor.Torque(speed * reduction, inputVoltage);
+                   dcMotor->Torque(speed * reduction, inputVoltage);
         }
 
         /**
@@ -114,7 +114,7 @@ namespace frc {
          */
         [[nodiscard]]
         constexpr units::newton_meter_t Torque(units::ampere_t current) const {
-            return numMotors * reduction * dcMotor.Torque(current / numMotors);
+            return numMotors * reduction * dcMotor->Torque(current / numMotors);
         }
 
         /**
@@ -127,7 +127,7 @@ namespace frc {
         [[nodiscard]]
         constexpr units::volt_t Voltage(units::newton_meter_t torque,
                                         units::radians_per_second_t speed) const {
-            return dcMotor.Voltage(torque / numMotors / reduction, speed * reduction);
+            return dcMotor->Voltage(torque / numMotors / reduction, speed * reduction);
         }
 
         /**
@@ -140,7 +140,7 @@ namespace frc {
         [[nodiscard]]
         constexpr units::volt_t Voltage(units::ampere_t current,
                                         units::radians_per_second_t speed) const {
-            return dcMotor.Voltage(current / numMotors, speed * reduction);
+            return dcMotor->Voltage(current / numMotors, speed * reduction);
         }
 
         /**
@@ -153,7 +153,7 @@ namespace frc {
         [[nodiscard]]
         constexpr units::radians_per_second_t Speed(
             units::newton_meter_t torque, units::volt_t inputVoltage) const {
-            return dcMotor.Speed(torque / numMotors / reduction, inputVoltage) /
+            return dcMotor->Speed(torque / numMotors / reduction, inputVoltage) /
                    reduction;
         }
 
@@ -167,7 +167,7 @@ namespace frc {
         [[nodiscard]]
         constexpr units::radians_per_second_t Speed(
             units::ampere_t current, units::volt_t inputVoltage) const {
-            return dcMotor.Speed(current / numMotors, inputVoltage) / reduction;
+            return dcMotor->Speed(current / numMotors, inputVoltage) / reduction;
         }
     };
 } // namespace frc

@@ -44,7 +44,7 @@ class Robot : public frc::TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in meters.
   frc::LinearSystem<2, 1, 1> m_elevatorPlant =
-      frc::LinearSystemId::ElevatorSystem(frc::Gearbox(frc::DCMotor::NEO(), 2),
+      frc::LinearSystemId::ElevatorSystem(frc::Gearbox(&frc::NEO, 2),
                                           kCarriageMass, kDrumRadius,
                                           kGearRatio)
           .Slice(0);

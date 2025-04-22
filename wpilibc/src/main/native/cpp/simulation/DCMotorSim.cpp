@@ -33,10 +33,10 @@ DCMotorSim::DCMotorSim(const LinearSystem<2, 1, 2>& plant,
       //
       //   B = GKₜ/(RJ)
       //   J = GKₜ/(RB)
-      m_gearing(-gearbox.dcMotor.Kv.value() * m_plant.A(1, 1) /
+      m_gearing(-gearbox.dcMotor->Kv.value() * m_plant.A(1, 1) /
                 m_plant.B(1, 0)),
-      m_j(m_gearing * gearbox.dcMotor.Kt.value() /
-          (gearbox.dcMotor.R.value() * m_plant.B(1, 0))) {}
+      m_j(m_gearing * gearbox.dcMotor->Kt.value() /
+          (gearbox.dcMotor->R.value() * m_plant.B(1, 0))) {}
 
 void DCMotorSim::SetState(units::radian_t angularPosition,
                           units::radians_per_second_t angularVelocity) {
@@ -74,7 +74,7 @@ units::ampere_t DCMotorSim::GetCurrentDraw() const {
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output.
   return m_gearbox.numMotors *
-         m_gearbox.dcMotor.Current(
+         m_gearbox.dcMotor->Current(
              units::radians_per_second_t{m_x(1)} * m_gearing,
              units::volt_t{m_u(0)}) *
          wpi::sgn(m_u(0));
