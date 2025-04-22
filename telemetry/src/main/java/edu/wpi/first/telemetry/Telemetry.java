@@ -77,7 +77,7 @@ public final class Telemetry {
    * @param value the value
    * @param struct struct serializer
    */
-  public <T> void log(String name, T value, Struct<T> struct) {
+  public static <T> void log(String name, T value, Struct<T> struct) {
     m_root.log(name, value, struct);
   }
 
@@ -89,7 +89,7 @@ public final class Telemetry {
    * @param value the value
    * @param proto protobuf serializer
    */
-  public <T> void log(String name, T value, Protobuf<T, ?> proto) {
+  public static <T> void log(String name, T value, Protobuf<T, ?> proto) {
     m_root.log(name, value, proto);
   }
 

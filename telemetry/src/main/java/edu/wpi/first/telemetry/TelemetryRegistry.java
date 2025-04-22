@@ -14,9 +14,7 @@ import java.util.function.BiConsumer;
 
 /** Global registry for telemetry handlers (type handlers and telemetry backends). */
 public final class TelemetryRegistry {
-  /**
-   * Handler for logging objects of specific type. Typically only one handler is specified, the
-   */
+  /** Handler for logging objects of specific type. Typically only one handler is specified, the */
   @FunctionalInterface
   public interface TypeHandler<T> {
     /**
@@ -56,13 +54,7 @@ public final class TelemetryRegistry {
       traceString.append("\tat ").append(loc).append('\n');
     }
 
-    System.err.println(
-        "Telemetry '"
-            + path
-            + "': warning: "
-            + msg
-            + "\n"
-            + traceString.toString());
+    System.err.println("Telemetry '" + path + "': warning: " + msg + "\n" + traceString.toString());
   }
 
   /**
@@ -104,8 +96,8 @@ public final class TelemetryRegistry {
   }
 
   /**
-   * Registers a handler for logging objects of a particular type. The handler should
-   * populate the provided TelemetryTable name as appropriate for the object's data.
+   * Registers a handler for logging objects of a particular type. The handler should populate the
+   * provided TelemetryTable name as appropriate for the object's data.
    *
    * @param <T> class
    * @param cls class object
@@ -184,8 +176,9 @@ public final class TelemetryRegistry {
    * @return telemetry backend, or null if no match
    */
   public static TelemetryBackend getBackend(String path) {
+    String normalized = normalizeName(path);
     synchronized (s_backends) {
-      return s_backends.getLongestMatch(path);
+      return s_backends.getLongestMatch(normalized);
     }
   }
 
@@ -197,7 +190,11 @@ public final class TelemetryRegistry {
    */
   static TelemetryEntry getEntry(String path) {
     String normalized = normalizeName(path);
-    return getBackend(normalized).getEntry(normalized);
+    TelemetryBackend backend;
+    synchronized (s_backends) {
+      backend = s_backends.getLongestMatch(normalized);
+    }
+    return backend.getEntry(normalized);
   }
 
   /**

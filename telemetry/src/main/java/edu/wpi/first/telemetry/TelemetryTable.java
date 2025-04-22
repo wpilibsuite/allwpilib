@@ -71,7 +71,7 @@ public final class TelemetryTable {
 
   private void typeMismatch(String typeString) {
     TelemetryRegistry.reportWarning(
-        m_path, "table type mismatch, expected '" + m_type + "', got '" + typeString + "'");
+        m_path, "table type mismatch, expected '" + getType() + "', got '" + typeString + "'");
   }
 
   /**
@@ -138,7 +138,7 @@ public final class TelemetryTable {
       String typeString = v.getTelemetryType();
       boolean setType = false;
       if (typeString != null) {
-        synchronized (this) {
+        synchronized (table) {
           if (table.m_type == null) {
             setType = true;
           } else if (!table.m_type.equals(typeString)) {

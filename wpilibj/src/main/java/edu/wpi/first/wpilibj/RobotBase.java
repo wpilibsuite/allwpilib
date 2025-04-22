@@ -114,10 +114,12 @@ public abstract class RobotBase implements AutoCloseable {
 
     // set up telemetry
     TelemetryRegistry.registerBackend("", new NetworkTablesTelemetryBackend(inst, "/Telemetry"));
-    TelemetryRegistry.registerTypeHandler(Measure.class, (table, name, value) -> {
-      table.setProperty(name, "unit", value.unit().name());
-      table.log(name, value.magnitude());
-    });
+    TelemetryRegistry.registerTypeHandler(
+        Measure.class,
+        (table, name, value) -> {
+          table.setProperty(name, "unit", value.unit().name());
+          table.log(name, value.magnitude());
+        });
 
     // wait for the NT server to actually start
     try {
