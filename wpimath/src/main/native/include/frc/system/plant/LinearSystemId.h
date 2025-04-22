@@ -321,30 +321,15 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * velocity].
    *
    * @param gearbox The gearbox attached to the carriage.
-   * @param J The moment of inertia J of the flywheel.
-   * @param gearing Gear ratio from motor to flywheel.
-   * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
   static constexpr LinearSystem<1, 1, 1> FlywheelSystem(
-      Gearbox gearbox, units::kilogram_square_meter_t J, double gearing) {
-    if (J <= 0_kg_sq_m) {
-      throw std::domain_error("J must be greater than zero.");
-    }
-    if (gearing <= 0.0) {
-      throw std::domain_error("gearing must be greater than zero.");
-    }
-
-    Matrixd<1, 1> A{
-        {(-gcem::pow(gearing, 2) * gearbox.numMotors * gearbox.dcMotor.Kt /
-          (gearbox.dcMotor.Kv * gearbox.dcMotor.R * J))
-             .value()}};
-    Matrixd<1, 1> B{{(gearing * gearbox.numMotors * gearbox.dcMotor.Kt /
-                      (gearbox.dcMotor.R * J))
-                         .value()}};
+      const Gearbox& gearbox) {
+    Matrixd<1, 1> A{{gearbox.Acceleration(1_rad_per_s, 0_V).value()}};
+    Matrixd<1, 1> B{{gearbox.Acceleration(0_rad_per_s, 1_V).value()}};
     Matrixd<1, 1> C{{1.0}};
     Matrixd<1, 1> D{{0.0}};
 
-    return LinearSystem<1, 1, 1>(A, B, C, D);
+    return {A, B, C, D};
   }
 
   /**

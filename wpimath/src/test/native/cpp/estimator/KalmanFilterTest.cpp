@@ -17,6 +17,6 @@
 
 TEST(KalmanFilterTest, Flywheel) {
   auto gearbox = frc::Gearbox(frc::DCMotor::NEO());
-  auto flywheel = frc::LinearSystemId::FlywheelSystem(gearbox, 1_kg_sq_m, 1.0);
+  auto flywheel = frc::LinearSystemId::FlywheelSystem(gearbox);
   frc::KalmanFilter<1, 1, 1> kf{flywheel, {1}, {1}, 5_ms};
 }
