@@ -96,6 +96,18 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
+ * Returns current drawn by motor with given speed and input voltage.
+ *
+ * @param speed        The current angular velocity of the motor.
+ * @param inputVoltage The voltage being applied to the motor.
+ */
+  [[nodiscard]]
+  constexpr units::newton_meter_t Torque(units::radians_per_second_t speed,
+                                    units::volt_t inputVoltage) const {
+    return -Kt / Kv / R * speed + Kt / R * inputVoltage;
+  }
+
+  /**
    * Returns torque produced by the motor with a given current.
    *
    * @param current     The current drawn by the motor.
@@ -119,6 +131,19 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
+ * Returns the voltage provided to the motor for a given current and
+ * angular velocity.
+ *
+ * @param current     The current drawn by the motor.
+ * @param speed       The current angular velocity of the motor.
+ */
+  [[nodiscard]]
+  constexpr units::volt_t Voltage(units::ampere_t current,
+                                  units::radians_per_second_t speed) const {
+    return 1.0 / Kv * speed + current * R;
+  }
+
+  /**
    * Returns the angular speed produced by the motor at a given torque and input
    * voltage.
    *
@@ -129,6 +154,19 @@ class WPILIB_DLLEXPORT DCMotor {
   constexpr units::radians_per_second_t Speed(
       units::newton_meter_t torque, units::volt_t inputVoltage) const {
     return inputVoltage * Kv - 1.0 / Kt * torque * R * Kv;
+  }
+
+  /**
+ * Returns the angular speed produced by the motor at a given torque and input
+ * voltage.
+ *
+ * @param current     The current drawn by the motor.
+ * @param inputVoltage  The input voltage provided to the motor.
+ */
+  [[nodiscard]]
+  constexpr units::radians_per_second_t Speed(
+      units::ampere_t current, units::volt_t inputVoltage) const {
+    return inputVoltage * Kv - current * R * Kv;
   }
 
   /**
