@@ -59,7 +59,7 @@ TEST(LinearSystemIDTest, FlywheelSystem) {
 
 TEST(LinearSystemIDTest, DCMotorSystem) {
 #if __GNUC__ <= 11
-  auto model = frc::LinearSystemId::DCMotorSystem(
+  auto model = frc::LinearSystemId::GearboxSystem(
       frc::Gearbox(&frc::NEO, 2, 1.0, 0.00032_kg_sq_m));
 #else
   constexpr auto model = frc::LinearSystemId::GearboxSystem(
@@ -81,7 +81,7 @@ TEST(LinearSystemIDTest, IdentifyPositionSystem) {
   constexpr double ka = 0.5;
 
 #if __GNUC__ <= 11
-  auto model = frc::LinearSystemId::IdentifyPositionSystem<units::meter>(
+  auto model = frc::LinearSystemId::IdentifyPositionSystem<units::meter, units::volt>(
       kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
 #else
   constexpr auto model =
