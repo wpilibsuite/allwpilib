@@ -26,15 +26,15 @@ namespace frc {
  * Linear system ID utility functions.
  */
 class WPILIB_DLLEXPORT LinearSystemId {
-public:
+ public:
   template <typename Distance>
   using Velocity_t = units::unit_t<
-    units::compound_unit<Distance, units::inverse<units::seconds>>>;
+      units::compound_unit<Distance, units::inverse<units::seconds>>>;
 
   template <typename Distance>
   using Acceleration_t = units::unit_t<units::compound_unit<
-    units::compound_unit<Distance, units::inverse<units::seconds>>,
-    units::inverse<units::seconds>>>;
+      units::compound_unit<Distance, units::inverse<units::seconds>>,
+      units::inverse<units::seconds>>>;
 
   template <typename Input>
   using Input_t = units::unit_t<Input>;
@@ -51,9 +51,9 @@ public:
    * @throws std::domain_error if mass <= 0, radius <= 0, or gearing <= 0.
    */
   static constexpr LinearSystem<2, 1, 2> ElevatorSystem(const Gearbox& gearbox,
-    units::kilogram_t mass,
-    units::meter_t radius,
-    double gearing) {
+                                                        units::kilogram_t mass,
+                                                        units::meter_t radius,
+                                                        double gearing) {
     if (mass <= 0_kg) {
       throw std::domain_error("mass must be greater than zero.");
     }
@@ -69,11 +69,11 @@ public:
                            gearbox.dcMotor->Kt /
                            (gearbox.dcMotor->R * units::math::pow<2>(radius) *
                             mass * gearbox.dcMotor->Kv))
-                     .value()}};
+                              .value()}};
     Matrixd<2, 1> B{{0.0},
                     {(gearing * gearbox.numMotors * gearbox.dcMotor->Kt /
                       (gearbox.dcMotor->R * radius * mass))
-                        .value()}};
+                         .value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
@@ -104,11 +104,11 @@ public:
                     {0.0, (-gcem::pow(gearing, 2) * gearbox.numMotors *
                            gearbox.dcMotor->Kt /
                            (gearbox.dcMotor->Kv * gearbox.dcMotor->R * J))
-                     .value()}};
+                              .value()}};
     Matrixd<2, 1> B{{0.0},
                     {(gearing * gearbox.numMotors * gearbox.dcMotor->Kt /
                       (gearbox.dcMotor->R * J))
-                        .value()}};
+                         .value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
@@ -180,10 +180,10 @@ public:
    * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   template <typename Distance, typename Input>
-    requires (std::same_as<units::meter, Distance> ||
-              std::same_as<units::radian, Distance>) && (
-               std::same_as<units::ampere, Input> || std::same_as<
-                 units::volt, Input>)
+    requires(std::same_as<units::meter, Distance> ||
+             std::same_as<units::radian, Distance>) &&
+            (std::same_as<units::ampere, Input> ||
+             std::same_as<units::volt, Input>)
   static constexpr LinearSystem<2, 1, 2> IdentifyPositionSystem(
       decltype(Input_t<Input>(1) / Velocity_t<Distance>(1)) kV,
       decltype(Input_t<Input>(1) / Acceleration_t<Distance>(1)) kA) {
@@ -411,4 +411,4 @@ public:
     return LinearSystem<2, 2, 2>(A, B, C, D);
   }
 };
-} // namespace frc
+}  // namespace frc

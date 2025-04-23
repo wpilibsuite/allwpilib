@@ -81,8 +81,9 @@ TEST(LinearSystemIDTest, IdentifyPositionSystem) {
   constexpr double ka = 0.5;
 
 #if __GNUC__ <= 11
-  auto model = frc::LinearSystemId::IdentifyPositionSystem<units::meter, units::volt>(
-      kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
+  auto model =
+      frc::LinearSystemId::IdentifyPositionSystem<units::meter, units::volt>(
+          kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
 #else
   constexpr auto model =
       frc::LinearSystemId::IdentifyPositionSystem<units::meter, units::volt>(
