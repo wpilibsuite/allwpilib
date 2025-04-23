@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -642,6 +643,56 @@ class SchedulerTest {
                 System.identityHashCode(c3Command) // parent
                 ),
         messageJson);
+  }
+
+  @Test
+  void siblingsInCompositionCannotShareRequirements() {
+    var resource = new RequireableResource("The Resource", scheduler);
+    var group = Command.noRequirements(co -> {
+      co.fork(resource.run(Coroutine::park).named("First"));
+      co.fork(resource.run(Coroutine::park).named("Second"));
+    }).named("Group");
+
+    scheduler.schedule(group);
+
+    try {
+      scheduler.run();
+      fail("An error should have been thrown");
+    } catch (CommandExecutionException e) {
+      assertEquals(group, e.getCommand());
+      if (e.getCause() instanceof IllegalArgumentException argumentException) {
+        assertEquals(
+            "Command Second requires resources that are already used by First. "
+                + "Both require The Resource",
+            argumentException.getMessage());
+      } else {
+        fail("Unexpected cause: " + e.getCause());
+      }
+    }
+  }
+
+  @Test
+  void nestedOneShotCompositionsAllRunInOneCycle() {
+    var runs = new AtomicInteger(0);
+    Supplier<Command> makeOneShot = () -> Command.noRequirements(_c -> runs.incrementAndGet()).named("One Shot");
+    var command = Command.noRequirements(co -> {
+      co.fork(makeOneShot.get());
+      co.fork(makeOneShot.get());
+      co.fork(Command.noRequirements(inner -> inner.fork(makeOneShot.get())).named("Inner"));
+      co.fork(
+          Command.noRequirements(co2 -> {
+            co2.fork(makeOneShot.get());
+            co2.fork(
+                Command.noRequirements(co3 -> {
+                  co3.fork(makeOneShot.get());
+                }).named("3"));
+          }).named("2"));
+    }).named("Command");
+
+    scheduler.schedule(command);
+    scheduler.run();
+    assertEquals(5, runs.get(), "All oneshot commands should have run");
+    assertFalse(scheduler.isRunning(command), "Command should have exited after one cycle");
   }
 
   record PriorityCommand(int priority, RequireableResource... subsystems) implements Command {
