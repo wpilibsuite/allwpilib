@@ -289,8 +289,8 @@ public class Scheduler implements ProtobufSerializable {
   }
 
   /**
-   * Cancels all running commands with which an incoming state conflicts. Ancestor commands will not
-   * be canceled.
+   * Cancels all running commands with which an incoming state conflicts. Ancestor commands of the
+   * incoming state will not be canceled.
    */
   private void evictConflictingRunningCommands(CommandState incomingState) {
     // The set of root states with which the incoming state conflicts but does not inherit from
