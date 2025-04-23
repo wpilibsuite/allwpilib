@@ -29,12 +29,14 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    * @param gearbox            The flywheel gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  explicit FlywheelSim(const Gearbox& gearbox,
+  explicit FlywheelSim(const Gearbox& gearbox, const Input_t maxInput,
                        const std::array<double, 1>& measurementStdDevs = {0.0})
       : LinearSystemSim(LinearSystemId::FlywheelSystem(gearbox),
                         measurementStdDevs),
-        m_gearbox(gearbox) {}
+        m_gearbox(gearbox),
+        m_maxInput(maxInput.value()) {}
 
+  using LinearSystemSim::SetInput;
   using LinearSystemSim::SetState;
 
   /**
@@ -98,18 +100,18 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    * @return The flywheel input voltage.
    */
   [[nodiscard]]
-  units::volt_t GetInputVoltage() const {
+  units::volt_t GetVoltage() const {
     return units::volt_t{GetInput(0)};
   }
 
   /**
-   * Sets the input voltage for the flywheel.
+   * Sets the input for the flywheel.
    *
-   * @param voltage The input voltage.
+   * @param input The input.
    */
-  void SetInputVoltage(const units::volt_t voltage) {
-    SetInput(Vectord<1>{voltage.value()});
-    ClampInput(frc::RobotController::GetBatteryVoltage().value());
+  void SetInput(const Input_t input) {
+    SetInput(Vectord<1>{input.value()});
+    ClampInput(m_maxInput);
   }
 
   /**
@@ -122,6 +124,7 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
 
  private:
   const Gearbox m_gearbox;
+  const double m_maxInput;
 };
 
 }  // namespace frc::sim

@@ -9,6 +9,7 @@
 #include <units/angular_velocity.h>
 #include <units/torque.h>
 
+#include "frc/EigenCore.h"
 #include "frc/simulation/LinearSystemSim.h"
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/DCMotor.h"
@@ -28,15 +29,18 @@ class GearboxSim : public LinearSystemSim<2, 1, 2> {
    * Creates a simulated DC motor mechanism.
    *
    * @param gearbox            The system's gearbox.
+   * @param maxInput           The maximum input for the system.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  explicit GearboxSim(const Gearbox& gearbox,
+  explicit GearboxSim(const Gearbox& gearbox, const Input_t maxInput,
                       const std::array<double, 2>& measurementStdDevs = {0.0,
                                                                          0.0})
       : LinearSystemSim(LinearSystemId::GearboxSystem(gearbox),
                         measurementStdDevs),
-        m_gearbox(gearbox) {}
+        m_gearbox(gearbox),
+        m_maxInput(maxInput.value()) {}
 
+  using LinearSystemSim::SetInput;
   using LinearSystemSim::SetState;
 
   /**
@@ -136,13 +140,13 @@ class GearboxSim : public LinearSystemSim<2, 1, 2> {
   }
 
   /**
-   * Sets the input voltage for the DC motor.
+   * Sets the input for the DC motor.
    *
-   * @param voltage The input voltage.
+   * @param input The input.
    */
-  void SetInputVoltage(const units::volt_t voltage) {
-    SetInput(Vectord<1>{voltage.value()});
-    ClampInput(frc::RobotController::GetBatteryVoltage().value());
+  void SetInput(const Input_t input) {
+    SetInput(Vectord<1>{input.value()});
+    ClampInput(m_maxInput);
   }
 
   /**
@@ -155,5 +159,6 @@ class GearboxSim : public LinearSystemSim<2, 1, 2> {
 
  private:
   const Gearbox m_gearbox;
+  const double m_maxInput;
 };
 }  // namespace frc::sim

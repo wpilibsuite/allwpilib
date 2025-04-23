@@ -4,6 +4,7 @@
 
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
+#include <frc/RobotController.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/BangBangController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
@@ -51,7 +52,7 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override {
     // To update our simulation, we set motor voltage inputs, update the
     // simulation, and write the simulated velocities to our simulated encoder
-    m_flywheelSim.SetInputVoltage(
+    m_flywheelSim.SetInput(
         m_flywheelMotor.Get() *
         units::volt_t{frc::RobotController::GetInputVoltage()});
     m_flywheelSim.Update(20_ms);
@@ -95,7 +96,8 @@ class Robot : public frc::TimedRobot {
 
   frc::Gearbox m_gearbox = frc::Gearbox(&frc::NEO, 1);
 
-  frc::sim::FlywheelSim<units::volt> m_flywheelSim{m_gearbox};
+  frc::sim::FlywheelSim<units::volt> m_flywheelSim{
+      m_gearbox, frc::RobotController::GetBatteryVoltage()};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 };
 

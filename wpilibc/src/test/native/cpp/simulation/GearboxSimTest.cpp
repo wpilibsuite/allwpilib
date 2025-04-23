@@ -16,7 +16,8 @@
 
 TEST(DCMotorSimTest, VoltageSteadyState) {
   frc::Gearbox gearbox = frc::Gearbox(&frc::NEO, 1, 1.0, 0.0005_kg_sq_m);
-  frc::sim::GearboxSim<units::volt> sim{gearbox};
+  frc::sim::GearboxSim<units::volt> sim{
+      gearbox, frc::RobotController::GetBatteryVoltage()};
 
   frc::Encoder encoder{0, 1};
   frc::sim::EncoderSim encoderSim{encoder};
@@ -33,8 +34,7 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
     // Then, SimulationPeriodic runs
     frc::sim::RoboRioSim::SetVInVoltage(
         frc::sim::BatterySim::Calculate({sim.GetCurrent()}));
-    sim.SetInputVoltage(motor.Get() *
-                        frc::RobotController::GetBatteryVoltage());
+    sim.SetInput(motor.Get() * frc::RobotController::GetBatteryVoltage());
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }
@@ -49,8 +49,7 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
     // Then, SimulationPeriodic runs
     frc::sim::RoboRioSim::SetVInVoltage(
         frc::sim::BatterySim::Calculate({sim.GetCurrent()}));
-    sim.SetInputVoltage(motor.Get() *
-                        frc::RobotController::GetBatteryVoltage());
+    sim.SetInput(motor.Get() * frc::RobotController::GetBatteryVoltage());
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }
@@ -60,7 +59,8 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
 
 TEST(DCMotorSimTest, PositionFeedbackControl) {
   frc::Gearbox gearbox = frc::Gearbox(&frc::NEO, 1, 1.0, 0.0005_kg_sq_m);
-  frc::sim::GearboxSim<units::volt> sim{gearbox};
+  frc::sim::GearboxSim<units::volt> sim{
+      gearbox, frc::RobotController::GetBatteryVoltage()};
 
   frc::PIDController controller{0.04, 0.0, 0.001};
 
@@ -78,8 +78,7 @@ TEST(DCMotorSimTest, PositionFeedbackControl) {
     // Then, SimulationPeriodic runs
     frc::sim::RoboRioSim::SetVInVoltage(
         frc::sim::BatterySim::Calculate({sim.GetCurrent()}));
-    sim.SetInputVoltage(motor.Get() *
-                        frc::RobotController::GetBatteryVoltage());
+    sim.SetInput(motor.Get() * frc::RobotController::GetBatteryVoltage());
     sim.Update(20_ms);
     encoderSim.SetDistance(sim.GetAngularPosition().value());
     encoderSim.SetRate(sim.GetAngularVelocity().value());
