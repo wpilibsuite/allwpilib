@@ -49,6 +49,30 @@ public final class Coroutine {
   }
 
   /**
+   * Forks off a command. It will run until its natural completion, the parent command exits,
+   * or the parent command cancels it. The parent command will continue executing while the
+   * forked command runs, and can resync with the forked command using {@link #await(Command)}.
+   * <p>
+   * {@snippet lang = java:
+   * Command example() {
+   *   return Command.noRequirements((coroutine) -> {
+   *     Command inner = ...;
+   *     coroutine.fork(inner);
+   *     // ... do more things
+   *     // then sync back up with the inner command
+   *     coroutine.await(inner);
+   *   }).named("Example");
+   * }
+   * }
+   *
+   * @param command The command to fork.
+   */
+  public void fork(Command command) {
+    // Shorthand; this is handy for user-defined compositions
+    scheduler.schedule(command);
+  }
+
+  /**
    * Awaits completion of a command. If the command is not currently scheduled or running, it will
    * be scheduled automatically.
    *
