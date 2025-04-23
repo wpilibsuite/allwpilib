@@ -169,22 +169,8 @@ jobs:
       with:
         python-version: 3.13
 
-    #
-    # Setup build caching
-    #
-
-    - name: Set ccache size
-      shell: bash
-      id: ccache
-      run: echo "MAX_SIZE=500M" >> $GITHUB_OUTPUT
-
-    - name: Setup ccache
-      # uses: hendrikmuhs/ccache-action@v1.2.10
-      uses: robotpy/ccache-action@fork
-      with:
-          key: ubuntu-22.04-3.13
-          variant: ccache
-          max-size: ${{ steps.ccache.outputs.max_size }}
+    - name: Install sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
 
     - name: Install deps
       shell: bash
@@ -203,4 +189,8 @@ jobs:
         ./rdev.sh ci run
       env:
         RPYBUILD_STRIP_LIBPYTHON: "1"
-        RPYBUILD_CC_LAUNCHER: ccache
+        RPYBUILD_CC_LAUNCHER: sccache
+        SCCACHE_WEBDAV_ENDPOINT: "https://frcmaven.wpi.edu/artifactory/wpilib-generic-cache-cmake-local"
+        SCCACHE_WEBDAV_KEY_PREFIX: "sccache-robotpy"
+        SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+        SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
