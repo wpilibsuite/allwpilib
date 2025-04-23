@@ -65,11 +65,13 @@ public final class Coroutine {
    * }
    * }
    *
-   * @param command The command to fork.
+   * @param commands The commands to fork.
    */
-  public void fork(Command command) {
+  public void fork(Command... commands) {
     // Shorthand; this is handy for user-defined compositions
-    scheduler.schedule(command);
+    for (var command : commands) {
+      scheduler.schedule(command);
+    }
   }
 
   /**
