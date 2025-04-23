@@ -75,10 +75,10 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    * @param dtSeconds The time between updates.
    */
   public void update(double dtSeconds) {
-    // Update X. By default, this is the linear system dynamics X = Ax + Bu
+    // Update x. By default, this is the linear system dynamics xₖ₊₁ = Axₖ + Buₖ.
     m_x = updateX(m_x, m_u, dtSeconds);
 
-    // y = cx + du
+    // yₖ = Cxₖ + Duₖ
     m_y = m_plant.calculateY(m_x, m_u);
 
     // Add measurement noise.
@@ -164,6 +164,11 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    */
   public void setState(Matrix<States, N1> state) {
     m_x = state;
+
+    // Update the output to reflect the new state.
+    //
+    //   yₖ = Cxₖ + Duₖ
+    m_y = m_plant.calculateY(m_x, m_u);
   }
 
   /**
