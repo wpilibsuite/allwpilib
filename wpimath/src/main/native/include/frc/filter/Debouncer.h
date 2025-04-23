@@ -48,6 +48,38 @@ class WPILIB_DLLEXPORT Debouncer {
    */
   bool Calculate(bool input);
 
+  /**
+   * Sets the time to debounce.
+   *
+   * @param time The number of seconds the value must change from baseline
+   *             for the filtered value to change.
+   */
+  constexpr void SetDebounceTime(units::second_t time) {
+    m_debounceTime = time;
+  }
+
+  /**
+   * Gets the time to debounce.
+   *
+   * @return The number of seconds the value must change from baseline
+   *             for the filtered value to change.
+   */
+  constexpr units::second_t GetDebounceTime() const { return m_debounceTime; }
+
+  /**
+   * Set the debounce type.
+   *
+   * @param type Which type of state change the debouncing will be performed on.
+   */
+  constexpr void SetDebounceType(DebounceType type) { m_debounceType = type; }
+
+  /**
+   * Get the debounce type.
+   *
+   * @return Which type of state change the debouncing will be performed on.
+   */
+  constexpr DebounceType GetDebounceType() const { return m_debounceType; }
+
  private:
   units::second_t m_debounceTime;
   bool m_baseline;
