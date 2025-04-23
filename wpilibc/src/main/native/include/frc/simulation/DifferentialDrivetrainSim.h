@@ -237,11 +237,9 @@ class DifferentialDrivetrainSim {
   class KitbotMotor {
    public:
     /// One CIM motor per drive side.
-    static constexpr frc::Gearbox SingleCIMPerSide =
-        frc::Gearbox(&frc::CIM, 1);
+    static constexpr frc::Gearbox SingleCIMPerSide = frc::Gearbox(&frc::CIM, 1);
     /// Two CIM motors per drive side.
-    static constexpr frc::Gearbox DualCIMPerSide =
-        frc::Gearbox(&frc::CIM, 2);
+    static constexpr frc::Gearbox DualCIMPerSide = frc::Gearbox(&frc::CIM, 2);
     /// One Mini CIM motor per drive side.
     static constexpr frc::Gearbox SingleMiniCIMPerSide =
         frc::Gearbox(&frc::MiniCIM);
@@ -255,11 +253,9 @@ class DifferentialDrivetrainSim {
     static constexpr frc::Gearbox DualFalcon500PerSide =
         frc::Gearbox(&frc::Falcon500, 2);
     /// One NEO motor per drive side.
-    static constexpr frc::Gearbox SingleNEOPerSide =
-        frc::Gearbox(&frc::NEO);
+    static constexpr frc::Gearbox SingleNEOPerSide = frc::Gearbox(&frc::NEO);
     /// Two NEO motors per drive side.
-    static constexpr frc::Gearbox DualNEOPerSide =
-        frc::Gearbox(&frc::NEO, 2);
+    static constexpr frc::Gearbox DualNEOPerSide = frc::Gearbox(&frc::NEO, 2);
   };
 
   /**

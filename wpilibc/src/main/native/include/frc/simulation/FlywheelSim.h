@@ -6,32 +6,34 @@
 
 #include <units/angular_acceleration.h>
 #include <units/angular_velocity.h>
-#include <units/moment_of_inertia.h>
 #include <units/torque.h>
 
+#include "frc/RobotController.h"
 #include "frc/simulation/LinearSystemSim.h"
-#include "frc/system/LinearSystem.h"
 #include "frc/system/plant/DCMotor.h"
 #include "frc/system/plant/Gearbox.h"
+#include "frc/system/plant/LinearSystemId.h"
 
 namespace frc::sim {
 /**
  * Represents a simulated flywheel mechanism.
  */
+template <typename Input>
+  requires units::current_unit<Input> || units::voltage_unit<Input>
 class FlywheelSim : public LinearSystemSim<1, 1, 1> {
  public:
+  using Input_t = units::unit_t<Input>;
   /**
    * Creates a simulated flywheel mechanism.
    *
-   * @param plant              The linear system representing the flywheel. This
-   *                           system can be created with
-   *                           LinearSystemId::FlywheelSystem() or
-   * LinearSystemId::IdentifyVelocitySystem().
    * @param gearbox            The flywheel gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  FlywheelSim(const LinearSystem<1, 1, 1>& plant, const Gearbox& gearbox,
-              const std::array<double, 1>& measurementStdDevs = {0.0});
+  explicit FlywheelSim(const Gearbox& gearbox,
+              const std::array<double, 1>& measurementStdDevs = {0.0})
+      : LinearSystemSim(LinearSystemId::FlywheelSystem(gearbox),
+                        measurementStdDevs),
+        m_gearbox(gearbox) {}
 
   using LinearSystemSim::SetState;
 
@@ -40,68 +42,76 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    *
    * @param velocity The new velocity
    */
-  void SetVelocity(units::radians_per_second_t velocity);
+  void SetVelocity(units::radians_per_second_t velocity) {
+    LinearSystemSim::SetState(Vectord<1>{velocity.value()});
+  }
 
   /**
    * Returns the flywheel's velocity.
    *
    * @return The flywheel's velocity.
    */
-  units::radians_per_second_t GetAngularVelocity() const;
+  [[nodiscard]] units::radians_per_second_t GetAngularVelocity() const {
+    return units::radians_per_second_t{GetOutput(0)};
+  }
 
   /**
    * Returns the flywheel's acceleration.
    *
    * @return The flywheel's acceleration
    */
-  units::radians_per_second_squared_t GetAngularAcceleration() const;
+  [[nodiscard]] units::radians_per_second_squared_t GetAngularAcceleration() const {
+    return units::radians_per_second_squared_t{
+        (m_plant.A() * m_x + m_plant.B() * m_u)(0, 0)};
+  }
 
   /**
    * Returns the flywheel's torque.
    *
    * @return The flywheel's torque
    */
-  units::newton_meter_t GetTorque() const;
+  [[nodiscard]] units::newton_meter_t GetTorque() const {
+    return units::newton_meter_t{GetAngularAcceleration().value() *
+                                 m_gearbox.J.value()};
+  }
 
   /**
    * Returns the flywheel's current draw.
    *
    * @return The flywheel's current draw.
    */
-  units::ampere_t GetCurrentDraw() const;
+  [[nodiscard]] units::ampere_t GetCurrent() const {
+    // I = V / R - omega / (Kv * R)
+    // Reductions are greater than 1, so a reduction of 10:1 would mean the
+    // motor is spinning 10x faster than the output.
+    return m_gearbox.Current(units::radians_per_second_t{m_x(0)},
+                             units::volt_t{m_u(0)});
+  }
 
   /**
    * Gets the input voltage for the flywheel.
    *
    * @return The flywheel input voltage.
    */
-  units::volt_t GetInputVoltage() const;
+  [[nodiscard]] units::volt_t GetInputVoltage() const { return units::volt_t{GetInput(0)}; }
 
   /**
    * Sets the input voltage for the flywheel.
    *
    * @param voltage The input voltage.
    */
-  void SetInputVoltage(units::volt_t voltage);
+  void SetInputVoltage(const units::volt_t voltage) {
+    SetInput(Vectord<1>{voltage.value()});
+    ClampInput(frc::RobotController::GetBatteryVoltage().value());
+  }
 
   /**
    * Returns the gearbox.
    */
-  Gearbox GetGearbox() const { return m_gearbox; }
-
-  /**
-   * Returns the gearing;
-   */
-  double GetGearing() const { return m_gearing; }
-
-  /**
-   * Returns the moment of inertia
-   */
-  units::kilogram_square_meter_t J() const { return m_j; }
+  [[nodiscard]] const Gearbox& GetGearbox() const { return m_gearbox; }
 
  private:
-  Gearbox m_gearbox;
-  double m_gearing;
-  units::kilogram_square_meter_t m_j;
+  const Gearbox m_gearbox;
 };
+
 }  // namespace frc::sim

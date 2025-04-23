@@ -22,10 +22,8 @@
 #include "frc/system/plant/LinearSystemId.h"
 
 TEST(StateSpaceSimTest, FlywheelSim) {
-  const frc::LinearSystem<1, 1, 1> plant =
-      frc::LinearSystemId::IdentifyVelocitySystem<units::radian>(
-          0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq);
-  frc::sim::FlywheelSim sim{plant, frc::Gearbox(&frc::NEO, 2)};
+  frc::sim::FlywheelSim<units::volt> sim{frc::Gearbox(&frc::NEO, 2, 0.02_V / 1_rad_per_s,
+                                         0.01_V / 1_rad_per_s_sq)};
   frc::PIDController controller{0.2, 0.0, 0.0};
   frc::SimpleMotorFeedforward<units::radian, units::volts> feedforward{
       0_V, 0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq};
@@ -44,7 +42,7 @@ TEST(StateSpaceSimTest, FlywheelSim) {
 
     // Then, SimulationPeriodic runs
     frc::sim::RoboRioSim::SetVInVoltage(
-        frc::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
+        frc::sim::BatterySim::Calculate({sim.GetCurrent()}));
     sim.SetInput(
         frc::Vectord<1>{motor.Get() * frc::RobotController::GetInputVoltage()});
     sim.Update(20_ms);

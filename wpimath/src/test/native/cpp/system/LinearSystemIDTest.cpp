@@ -15,12 +15,10 @@
 TEST(LinearSystemIDTest, IdentifyDrivetrainVelocitySystem) {
 #if __GNUC__ <= 11
   auto model = frc::LinearSystemId::DrivetrainVelocitySystem(
-      frc::Gearbox(&frc::NEO, 4), 70_kg, 0.05_m, 0.4_m, 6.0_kg_sq_m,
-      6.0);
+      frc::Gearbox(&frc::NEO, 4), 70_kg, 0.05_m, 0.4_m, 6.0_kg_sq_m, 6.0);
 #else
   constexpr auto model = frc::LinearSystemId::DrivetrainVelocitySystem(
-      frc::Gearbox(&frc::NEO, 4), 70_kg, 0.05_m, 0.4_m, 6.0_kg_sq_m,
-      6.0);
+      frc::Gearbox(&frc::NEO, 4), 70_kg, 0.05_m, 0.4_m, 6.0_kg_sq_m, 6.0);
 #endif
 
   ASSERT_TRUE(model.A().isApprox(
@@ -34,8 +32,8 @@ TEST(LinearSystemIDTest, IdentifyDrivetrainVelocitySystem) {
 }
 
 TEST(LinearSystemIDTest, ElevatorSystem) {
-  auto model = frc::LinearSystemId::ElevatorSystem(
-                   frc::Gearbox(&frc::NEO, 2), 5_kg, 0.05_m, 12)
+  auto model = frc::LinearSystemId::ElevatorSystem(frc::Gearbox(&frc::NEO, 2),
+                                                   5_kg, 0.05_m, 12)
                    .Slice(0);
   ASSERT_TRUE(model.A().isApprox(
       frc::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -99.05473}}, 0.001));
@@ -64,7 +62,7 @@ TEST(LinearSystemIDTest, DCMotorSystem) {
   auto model = frc::LinearSystemId::DCMotorSystem(
       frc::Gearbox(&frc::NEO, 2, 1.0, 0.00032_kg_sq_m));
 #else
-  constexpr auto model = frc::LinearSystemId::DCMotorSystem(
+  constexpr auto model = frc::LinearSystemId::GearboxSystem(
       frc::Gearbox(&frc::NEO, 2, 1.0, 0.00032_kg_sq_m));
 #endif
 
@@ -87,7 +85,7 @@ TEST(LinearSystemIDTest, IdentifyPositionSystem) {
       kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
 #else
   constexpr auto model =
-      frc::LinearSystemId::IdentifyPositionSystem<units::meter>(
+      frc::LinearSystemId::IdentifyPositionSystem<units::meter, units::volt>(
           kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
 #endif
 

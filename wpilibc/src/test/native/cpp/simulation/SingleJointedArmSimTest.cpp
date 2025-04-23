@@ -9,9 +9,9 @@
 #include "frc/simulation/SingleJointedArmSim.h"
 
 TEST(SingleJointedArmTest, Disabled) {
-  frc::sim::SingleJointedArmSim sim(frc::Gearbox(&frc::Vex775Pro, 2),
-                                    300, 3_kg_sq_m, 30_in, -180_deg, 0_deg,
-                                    true, 90_deg);
+  frc::sim::SingleJointedArmSim sim(frc::Gearbox(&frc::Vex775Pro, 2), 300,
+                                    3_kg_sq_m, 30_in, -180_deg, 0_deg, true,
+                                    90_deg);
   sim.SetState(frc::Vectord<2>{0.0, 0.0});
 
   for (size_t i = 0; i < 12 / 0.02; ++i) {
@@ -25,8 +25,8 @@ TEST(SingleJointedArmTest, Disabled) {
 
 TEST(SingleJointedArmTest, InitialState) {
   constexpr auto startingAngle = 45_deg;
-  frc::sim::SingleJointedArmSim sim(frc::Gearbox(&frc::KrakenX60, 2),
-                                    125, 3_kg_sq_m, 30_in, 0_deg, 90_deg, true,
+  frc::sim::SingleJointedArmSim sim(frc::Gearbox(&frc::KrakenX60, 2), 125,
+                                    3_kg_sq_m, 30_in, 0_deg, 90_deg, true,
                                     startingAngle);
 
   EXPECT_EQ(startingAngle, sim.GetAngle());

@@ -42,9 +42,8 @@ class Robot : public frc::TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [velocity], in radians per second.
   frc::LinearSystem<1, 1, 1> m_flywheelPlant =
-      frc::LinearSystemId::FlywheelSystem(frc::Gearbox(&frc::NEO, 2,
-                                          kFlywheelGearing,
-                                          kFlywheelMomentOfInertia));
+      frc::LinearSystemId::FlywheelSystem(frc::Gearbox(
+          &frc::NEO, 2, kFlywheelGearing, kFlywheelMomentOfInertia));
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   frc::KalmanFilter<1, 1, 1> m_observer{
