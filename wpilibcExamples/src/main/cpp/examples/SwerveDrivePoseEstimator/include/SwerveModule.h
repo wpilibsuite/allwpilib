@@ -49,8 +49,8 @@ class SwerveModule {
       0.0,
       {kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration}};
 
-  frc::SimpleMotorFeedforward<units::meters> m_driveFeedforward{1_V,
-                                                                3_V / 1_mps};
-  frc::SimpleMotorFeedforward<units::radians> m_turnFeedforward{
+  frc::SimpleMotorFeedforward<units::meters, units::volts> m_driveFeedforward{
+      1_V, 3_V / 1_mps};
+  frc::SimpleMotorFeedforward<units::radians, units::volts> m_turnFeedforward{
       1_V, 0.5_V / 1_rad_per_s};
 };

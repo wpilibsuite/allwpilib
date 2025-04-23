@@ -4,6 +4,7 @@
 
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
+#include <frc/RobotController.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/BangBangController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
@@ -51,7 +52,7 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override {
     // To update our simulation, we set motor voltage inputs, update the
     // simulation, and write the simulated velocities to our simulated encoder
-    m_flywheelSim.SetInputVoltage(
+    m_flywheelSim.SetInput(
         m_flywheelMotor.Get() *
         units::volt_t{frc::RobotController::GetInputVoltage()});
     m_flywheelSim.Update(20_ms);
@@ -80,7 +81,7 @@ class Robot : public frc::TimedRobot {
   static constexpr decltype(1_V / 1_rad_per_s) kFlywheelKv = 0.000195_V / 1_rpm;
   static constexpr decltype(1_V / 1_rad_per_s_sq) kFlywheelKa =
       0.0003_V / 1_rev_per_m_per_s;
-  frc::SimpleMotorFeedforward<units::radians> m_feedforward{
+  frc::SimpleMotorFeedforward<units::radians, units::volts> m_feedforward{
       kFlywheelKs, kFlywheelKv, kFlywheelKa};
 
   // Simulation classes help us simulate our robot
@@ -93,11 +94,10 @@ class Robot : public frc::TimedRobot {
   static constexpr units::kilogram_square_meter_t kFlywheelMomentOfInertia =
       0.5 * 1.5_lb * 4_in * 4_in;
 
-  frc::DCMotor m_gearbox = frc::DCMotor::NEO(1);
-  frc::LinearSystem<1, 1, 1> m_plant{frc::LinearSystemId::FlywheelSystem(
-      m_gearbox, kFlywheelMomentOfInertia, kFlywheelGearing)};
+  frc::Gearbox m_gearbox = frc::Gearbox(&frc::NEO, 1);
 
-  frc::sim::FlywheelSim m_flywheelSim{m_plant, m_gearbox};
+  frc::sim::FlywheelSim<units::volt> m_flywheelSim{
+      m_gearbox, frc::RobotController::GetBatteryVoltage()};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 };
 

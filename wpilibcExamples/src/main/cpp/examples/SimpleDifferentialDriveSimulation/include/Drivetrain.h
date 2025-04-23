@@ -96,7 +96,8 @@ class Drivetrain {
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  frc::SimpleMotorFeedforward<units::meters> m_feedforward{1_V, 3_V / 1_mps};
+  frc::SimpleMotorFeedforward<units::meters, units::volts> m_feedforward{
+      1_V, 3_V / 1_mps};
 
   // Simulation classes help us simulate our robot
   frc::sim::EncoderSim m_leftEncoderSim{m_leftEncoder};
@@ -106,5 +107,5 @@ class Drivetrain {
       frc::LinearSystemId::IdentifyDrivetrainSystem(
           1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
   frc::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
-      m_drivetrainSystem, kTrackwidth, frc::DCMotor::CIM(2), 8, 2_in};
+      m_drivetrainSystem, kTrackwidth, frc::Gearbox(&frc::CIM, 2), 8, 2_in};
 };

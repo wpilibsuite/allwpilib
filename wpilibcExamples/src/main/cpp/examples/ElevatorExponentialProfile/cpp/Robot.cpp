@@ -48,7 +48,7 @@ class Robot : public frc::TimedRobot {
  private:
   frc::Joystick m_joystick{1};
   ExampleSmartMotorController m_motor{1};
-  frc::SimpleMotorFeedforward<units::meters> m_feedforward{
+  frc::SimpleMotorFeedforward<units::meters, units::volts> m_feedforward{
       // Note: These gains are fake, and will have to be tuned for your robot.
       1_V, 1_V / 1_mps, 1_V / 1_mps_sq};
 

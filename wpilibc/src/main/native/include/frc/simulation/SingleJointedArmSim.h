@@ -13,6 +13,7 @@
 
 #include "frc/simulation/LinearSystemSim.h"
 #include "frc/system/plant/DCMotor.h"
+#include "frc/system/plant/Gearbox.h"
 
 namespace frc::sim {
 /**
@@ -26,7 +27,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param system             The system representing this arm. This system can
    *                           be created with
    *                           LinearSystemId::SingleJointedArmSystem().
-   * @param gearbox            The type and number of motors on the arm gearbox.
+   * @param gearbox            The arm gearbox.
    * @param gearing            The gear ratio of the arm (numbers greater than 1
    *                           represent reductions).
    * @param armLength          The length of the arm.
@@ -37,7 +38,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param measurementStdDevs The standard deviations of the measurements.
    */
   SingleJointedArmSim(const LinearSystem<2, 1, 2>& system,
-                      const DCMotor& gearbox, double gearing,
+                      const Gearbox& gearbox, double gearing,
                       units::meter_t armLength, units::radian_t minAngle,
                       units::radian_t maxAngle, bool simulateGravity,
                       units::radian_t startingAngle,
@@ -46,7 +47,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Creates a simulated arm mechanism.
    *
-   * @param gearbox            The type and number of motors on the arm gearbox.
+   * @param gearbox            The arm gearbox.
    * @param gearing            The gear ratio of the arm (numbers greater than 1
    *                           represent reductions).
    * @param moi                The moment of inertia of the arm. This can be
@@ -58,7 +59,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param startingAngle      The initial position of the arm.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  SingleJointedArmSim(const DCMotor& gearbox, double gearing,
+  SingleJointedArmSim(const Gearbox& gearbox, double gearing,
                       units::kilogram_square_meter_t moi,
                       units::meter_t armLength, units::radian_t minAngle,
                       units::radian_t maxAngle, bool simulateGravity,
@@ -164,7 +165,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
   units::meter_t m_armLen;
   units::radian_t m_minAngle;
   units::radian_t m_maxAngle;
-  const DCMotor m_gearbox;
+  const Gearbox m_gearbox;
   double m_gearing;
   bool m_simulateGravity;
 };

@@ -14,7 +14,7 @@ using namespace frc;
 using namespace frc::sim;
 
 ElevatorSim::ElevatorSim(const LinearSystem<2, 1, 2>& plant,
-                         const DCMotor& gearbox, units::meter_t minHeight,
+                         const Gearbox& gearbox, units::meter_t minHeight,
                          units::meter_t maxHeight, bool simulateGravity,
                          units::meter_t startingHeight,
                          const std::array<double, 2>& measurementStdDevs)
@@ -26,7 +26,7 @@ ElevatorSim::ElevatorSim(const LinearSystem<2, 1, 2>& plant,
   SetState(startingHeight, 0_mps);
 }
 
-ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
+ElevatorSim::ElevatorSim(const Gearbox& gearbox, double gearing,
                          units::kilogram_t carriageMass,
                          units::meter_t drumRadius, units::meter_t minHeight,
                          units::meter_t maxHeight, bool simulateGravity,
@@ -42,13 +42,13 @@ template <typename Distance>
            std::same_as<units::radian, Distance>
 ElevatorSim::ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
                          decltype(1_V / Acceleration_t<Distance>(1)) kA,
-                         const DCMotor& gearbox, units::meter_t minHeight,
+                         const Gearbox& gearbox, units::meter_t minHeight,
                          units::meter_t maxHeight, bool simulateGravity,
                          units::meter_t startingHeight,
                          const std::array<double, 2>& measurementStdDevs)
-    : ElevatorSim(LinearSystemId::IdentifyPositionSystem(kV, kA), gearbox,
-                  minHeight, maxHeight, simulateGravity, startingHeight,
-                  measurementStdDevs) {}
+    : ElevatorSim(LinearSystemId::IdentifyPositionSystem<units::meter>(kV, kA),
+                  gearbox, minHeight, maxHeight, simulateGravity,
+                  startingHeight, measurementStdDevs) {}
 
 void ElevatorSim::SetState(units::meter_t position,
                            units::meters_per_second_t velocity) {
@@ -90,10 +90,12 @@ units::ampere_t ElevatorSim::GetCurrentDraw() const {
       units::volt, units::inverse<units::meters_per_second>>>;
   Kv_t Kv = Kv_t{kA * m_plant.A(1, 1)};
   units::meters_per_second_t velocity{m_x(1)};
-  units::radians_per_second_t motorVelocity = velocity * Kv * m_gearbox.Kv;
+  units::radians_per_second_t motorVelocity =
+      velocity * Kv * m_gearbox.dcMotor->Kv;
 
   // Perform calculation and return.
-  return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) *
+  return m_gearbox.numMotors *
+         m_gearbox.dcMotor->Current(motorVelocity, units::volt_t{m_u(0)}) *
          wpi::sgn(m_u(0));
 }
 

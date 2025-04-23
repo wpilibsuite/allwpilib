@@ -9,6 +9,7 @@
 #include "frc/EigenCore.h"
 #include "frc/controller/LinearPlantInversionFeedforward.h"
 #include "frc/system/plant/LinearSystemId.h"
+#include "units/current.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "units/voltage.h"
@@ -19,6 +20,8 @@ namespace frc {
  * A helper class that computes feedforward outputs for a simple elevator
  * (modeled as a motor acting against the force of gravity).
  */
+template <class Input>
+  requires(units::current_unit<Input> || units::voltage_unit<Input>)
 class ElevatorFeedforward {
  public:
   using Distance = units::meters;
@@ -26,24 +29,24 @@ class ElevatorFeedforward {
       units::compound_unit<Distance, units::inverse<units::seconds>>;
   using Acceleration =
       units::compound_unit<Velocity, units::inverse<units::seconds>>;
-  using kv_unit = units::compound_unit<units::volts, units::inverse<Velocity>>;
-  using ka_unit =
-      units::compound_unit<units::volts, units::inverse<Acceleration>>;
+  using kv_unit = units::compound_unit<Input, units::inverse<Velocity>>;
+  using ka_unit = units::compound_unit<Input, units::inverse<Acceleration>>;
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains.
    *
-   * @param kS The static gain, in volts.
-   * @param kG The gravity gain, in volts.
-   * @param kV The velocity gain, in volt seconds per distance.
-   * @param kA The acceleration gain, in volt seconds² per distance.
+   * @param kS The static gain, in input units (e.g., volts or amperes).
+   * @param kG The gravity gain, in input units (e.g., volts or amperes).
+   * @param kV The velocity gain, in input units per (meters/second).
+   * @param kA The acceleration gain, in input units per (meters/second²).
    * @param dt The period in seconds.
    * @throws IllegalArgumentException for kv &lt; zero.
    * @throws IllegalArgumentException for ka &lt; zero.
    * @throws IllegalArgumentException for period &le; zero.
    */
   constexpr ElevatorFeedforward(
-      units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
+      units::unit_t<Input> kS, units::unit_t<Input> kG,
+      units::unit_t<kv_unit> kV,
       units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0),
       units::second_t dt = 20_ms)
       : kS(kS), kG(kG), kV(kV), kA(kA), m_dt(dt) {
@@ -73,11 +76,11 @@ class ElevatorFeedforward {
    *
    * @param velocity     The velocity setpoint.
    * @param acceleration The acceleration setpoint.
-   * @return The computed feedforward, in volts.
+   * @return The computed feedforward, in input units (e.g., volts or amperes).
    * @deprecated Use the current/next velocity overload instead.
    */
   [[deprecated("Use the current/next velocity overload instead.")]]
-  constexpr units::volt_t Calculate(
+  constexpr units::unit_t<Input> Calculate(
       units::unit_t<Velocity> velocity,
       units::unit_t<Acceleration> acceleration) const {
     return kS * wpi::sgn(velocity) + kG + kV * velocity + kA * acceleration;
@@ -90,12 +93,12 @@ class ElevatorFeedforward {
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity    The next velocity setpoint.
    * @param dt              Time between velocity setpoints in seconds.
-   * @return The computed feedforward, in volts.
+   * @return The computed feedforward, in input units (e.g., volts or amperes).
    */
   [[deprecated("Use the current/next velocity overload instead.")]]
-  units::volt_t Calculate(units::unit_t<Velocity> currentVelocity,
-                          units::unit_t<Velocity> nextVelocity,
-                          units::second_t dt) const {
+  units::unit_t<Input> Calculate(units::unit_t<Velocity> currentVelocity,
+                                 units::unit_t<Velocity> nextVelocity,
+                                 units::second_t dt) const {
     // See wpimath/algorithms.md#Elevator_feedforward for derivation
     auto plant = LinearSystemId::IdentifyVelocitySystem<Distance>(kV, kA);
     LinearPlantInversionFeedforward<1, 1> feedforward{plant, dt};
@@ -112,9 +115,9 @@ class ElevatorFeedforward {
    * control. Use this method when the setpoint does not change.
    *
    * @param currentVelocity The velocity setpoint.
-   * @return The computed feedforward, in volts.
+   * @return The computed feedforward, in input units (e.g., volts or amperes).
    */
-  constexpr units::volt_t Calculate(
+  constexpr units::unit_t<Input> Calculate(
       units::unit_t<Velocity> currentVelocity) const {
     return Calculate(currentVelocity, currentVelocity);
   }
@@ -127,9 +130,9 @@ class ElevatorFeedforward {
    *
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity    The next velocity setpoint.
-   * @return The computed feedforward, in volts.
+   * @return The computed feedforward, in input units (e.g., volts or amperes).
    */
-  constexpr units::volt_t Calculate(
+  constexpr units::unit_t<Input> Calculate(
       units::unit_t<Velocity> currentVelocity,
       units::unit_t<Velocity> nextVelocity) const {
     // See wpimath/algorithms.md#Elevator_feedforward for derivation
@@ -141,7 +144,7 @@ class ElevatorFeedforward {
       double A_d = gcem::exp(A * m_dt.value());
       double B_d = 1.0 / A * (A_d - 1.0) * B;
       return kG + kS * wpi::sgn(currentVelocity) +
-             units::volt_t{
+             units::unit_t<Input>{
                  1.0 / B_d *
                  (nextVelocity.value() - A_d * currentVelocity.value())};
     }
@@ -151,69 +154,73 @@ class ElevatorFeedforward {
   // formulas for the methods below:
 
   /**
-   * Calculates the maximum achievable velocity given a maximum voltage supply
-   * and an acceleration.  Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
+   * Calculates the maximum achievable velocity given a maximum input (e.g.,
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
+   * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the elevator.
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * supplied to the elevator.
    * @param acceleration The acceleration of the elevator.
    * @return The maximum possible velocity at the given acceleration.
    */
   constexpr units::unit_t<Velocity> MaxAchievableVelocity(
-      units::volt_t maxVoltage, units::unit_t<Acceleration> acceleration) {
+      units::unit_t<Input> maxInput, units::unit_t<Acceleration> acceleration) {
     // Assume max velocity is positive
-    return (maxVoltage - kS - kG - kA * acceleration) / kV;
+    return (maxInput - kS - kG - kA * acceleration) / kV;
   }
 
   /**
-   * Calculates the minimum achievable velocity given a maximum voltage supply
-   * and an acceleration.  Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
+   * Calculates the minimum achievable velocity given a maximum input (e.g.,
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
+   * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the elevator.
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * supplied to the elevator.
    * @param acceleration The acceleration of the elevator.
    * @return The minimum possible velocity at the given acceleration.
    */
   constexpr units::unit_t<Velocity> MinAchievableVelocity(
-      units::volt_t maxVoltage, units::unit_t<Acceleration> acceleration) {
+      units::unit_t<Input> maxInput, units::unit_t<Acceleration> acceleration) {
     // Assume min velocity is negative, ks flips sign
-    return (-maxVoltage + kS - kG - kA * acceleration) / kV;
+    return (-maxInput + kS - kG - kA * acceleration) / kV;
   }
 
   /**
-   * Calculates the maximum achievable acceleration given a maximum voltage
-   * supply and a velocity. Useful for ensuring that velocity and
+   * Calculates the maximum achievable acceleration given a maximum input (e.g.,
+   * volts or amperes) and a velocity.  Useful for ensuring that velocity and
    * acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the velocity constraint, and this will give you
    * a simultaneously-achievable acceleration constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the elevator.
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * supplied to the elevator.
    * @param velocity The velocity of the elevator.
    * @return The maximum possible acceleration at the given velocity.
    */
   constexpr units::unit_t<Acceleration> MaxAchievableAcceleration(
-      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) {
-    return (maxVoltage - kS * wpi::sgn(velocity) - kG - kV * velocity) / kA;
+      units::unit_t<Input> maxInput, units::unit_t<Velocity> velocity) {
+    return (maxInput - kS * wpi::sgn(velocity) - kG - kV * velocity) / kA;
   }
 
   /**
-   * Calculates the minimum achievable acceleration given a maximum voltage
-   * supply and a velocity. Useful for ensuring that velocity and
+   * Calculates the minimum achievable acceleration given a maximum input (e.g.,
+   * volts or amperes) and a velocity.  Useful for ensuring that velocity and
    * acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the velocity constraint, and this will give you
    * a simultaneously-achievable acceleration constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the elevator.
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * supplied to the elevator.
    * @param velocity The velocity of the elevator.
    * @return The minimum possible acceleration at the given velocity.
    */
   constexpr units::unit_t<Acceleration> MinAchievableAcceleration(
-      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) {
-    return MaxAchievableAcceleration(-maxVoltage, velocity);
+      units::unit_t<Input> maxInput, units::unit_t<Velocity> velocity) {
+    return MaxAchievableAcceleration(-maxInput, velocity);
   }
 
   /**
@@ -221,14 +228,14 @@ class ElevatorFeedforward {
    *
    * @param kS The static gain.
    */
-  constexpr void SetKs(units::volt_t kS) { this->kS = kS; }
+  constexpr void SetKs(units::unit_t<Input> kS) { this->kS = kS; }
 
   /**
    * Sets the gravity gain.
    *
    * @param kG The gravity gain.
    */
-  constexpr void SetKg(units::volt_t kG) { this->kG = kG; }
+  constexpr void SetKg(units::unit_t<Input> kG) { this->kG = kG; }
 
   /**
    * Sets the velocity gain.
@@ -249,14 +256,14 @@ class ElevatorFeedforward {
    *
    * @return The static gain.
    */
-  constexpr units::volt_t GetKs() const { return kS; }
+  constexpr units::unit_t<Input> GetKs() const { return kS; }
 
   /**
    * Returns the gravity gain.
    *
    * @return The gravity gain.
    */
-  constexpr units::volt_t GetKg() const { return kG; }
+  constexpr units::unit_t<Input> GetKg() const { return kG; }
 
   /**
    * Returns the velocity gain.
@@ -272,12 +279,19 @@ class ElevatorFeedforward {
    */
   constexpr units::unit_t<ka_unit> GetKa() const { return kA; }
 
+  /**
+   * Returns the period.
+   *
+   * @return The period.
+   */
+  constexpr units::second_t GetDt() const { return m_dt; }
+
  private:
   /// The static gain.
-  units::volt_t kS;
+  units::unit_t<Input> kS;
 
   /// The gravity gain.
-  units::volt_t kG;
+  units::unit_t<Input> kG;
 
   /// The velocity gain.
   units::unit_t<kv_unit> kV;

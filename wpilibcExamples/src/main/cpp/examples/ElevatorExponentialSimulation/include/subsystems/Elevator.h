@@ -32,7 +32,7 @@ class Elevator {
 
  private:
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
-  frc::DCMotor m_elevatorGearbox = frc::DCMotor::NEO(2);
+  frc::Gearbox m_elevatorGearbox = frc::Gearbox(&frc::NEO, 2);
 
   // Standard classes for controlling our elevator
   frc::ExponentialProfile<units::meters, units::volts>::Constraints
@@ -44,7 +44,7 @@ class Elevator {
   frc::PIDController m_controller{
       Constants::kElevatorKp, Constants::kElevatorKi, Constants::kElevatorKd};
 
-  frc::ElevatorFeedforward m_feedforward{
+  frc::ElevatorFeedforward<units::volt> m_feedforward{
       Constants::kElevatorkS, Constants::kElevatorkG, Constants::kElevatorkV,
       Constants::kElevatorkA};
   frc::Encoder m_encoder{Constants::kEncoderAChannel,

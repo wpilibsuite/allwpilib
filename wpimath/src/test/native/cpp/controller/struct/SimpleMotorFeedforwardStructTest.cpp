@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../StructTestBase.h"
+#include "StructTestBase.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
 #include "frc/controller/struct/SimpleMotorFeedforwardStruct.h"
 #include "units/acceleration.h"
@@ -12,13 +12,14 @@
 
 using namespace frc;
 
-template <typename T>
+template <typename T, typename I>
 struct SimpleMotorFeedforwardStructTestData {
-  using Type = SimpleMotorFeedforward<T>;
+  using Type = SimpleMotorFeedforward<T, I>;
 
   inline static const Type kTestData = {
-      units::volt_t{0.4}, units::volt_t{4.0} / (units::unit_t<T>{1} / 1_s),
-      units::volt_t{0.7} / (units::unit_t<T>{1} / 1_s / 1_s), 25_ms};
+      units::unit_t<I>{0.4},
+      units::unit_t<I>{4.0} / (units::unit_t<T>{1} / 1_s),
+      units::unit_t<I>{0.7} / (units::unit_t<T>{1} / 1_s / 1_s), 25_ms};
 
   static void CheckEq(const Type& testData, const Type& data) {
     EXPECT_EQ(testData.GetKs().value(), data.GetKs().value());
@@ -28,12 +29,28 @@ struct SimpleMotorFeedforwardStructTestData {
   }
 };
 
-INSTANTIATE_TYPED_TEST_SUITE_P(
-    SimpleMotorFeedforwardMeters, StructTest,
-    SimpleMotorFeedforwardStructTestData<units::meters>);
-INSTANTIATE_TYPED_TEST_SUITE_P(
-    SimpleMotorFeedforwardFeet, StructTest,
-    SimpleMotorFeedforwardStructTestData<units::feet>);
-INSTANTIATE_TYPED_TEST_SUITE_P(
-    SimpleMotorFeedforwardRadians, StructTest,
-    SimpleMotorFeedforwardStructTestData<units::radians>);
+using SimpleMotorFeedforwardStructTestTypes = ::testing::Types<
+    SimpleMotorFeedforwardStructTestData<units::meters, units::volts>,
+    SimpleMotorFeedforwardStructTestData<units::feet, units::volts>,
+    SimpleMotorFeedforwardStructTestData<units::radians, units::volts>>;
+
+INSTANTIATE_TYPED_TEST_SUITE_P(SimpleMotorFeedforward, StructTest,
+                               SimpleMotorFeedforwardStructTestTypes);
+
+TEST(SimpleMotorFeedforwardStructTest, CheckSize) {
+  constexpr size_t expectedSize = 32;
+  EXPECT_EQ((wpi::Struct<
+                SimpleMotorFeedforward<units::meter, units::volt>>::GetSize()),
+            expectedSize);
+  EXPECT_EQ(
+      (wpi::Struct<
+          SimpleMotorFeedforward<units::meter, units::ampere>>::GetSize()),
+      expectedSize);
+  EXPECT_EQ((wpi::Struct<
+                SimpleMotorFeedforward<units::radian, units::volt>>::GetSize()),
+            expectedSize);
+  EXPECT_EQ(
+      (wpi::Struct<
+          SimpleMotorFeedforward<units::radian, units::ampere>>::GetSize()),
+      expectedSize);
+}

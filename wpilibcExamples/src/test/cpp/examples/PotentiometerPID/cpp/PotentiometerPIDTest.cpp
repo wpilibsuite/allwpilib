@@ -22,7 +22,7 @@
 #include "Robot.h"
 
 class PotentiometerPIDTest : public testing::Test {
-  frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
+  frc::Gearbox m_elevatorGearbox = frc::Gearbox(&frc::Vex775Pro, 4);
   static constexpr double kElevatorGearing = 10.0;
   static constexpr units::meter_t kElevatorDrumRadius = 2.0_in;
   static constexpr units::kilogram_t kCarriageMass = 4.0_kg;

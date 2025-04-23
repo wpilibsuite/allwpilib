@@ -8,6 +8,7 @@
 #include <wpi/MathExtras.h>
 
 #include "units/angle.h"
+#include "units/current.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "units/voltage.h"
@@ -19,31 +20,31 @@ namespace frc {
  * A helper class that computes feedforward voltages for a simple
  * permanent-magnet DC motor.
  */
-template <class Distance>
-  requires units::length_unit<Distance> || units::angle_unit<Distance>
+template <class Distance, class Input>
+  requires(units::length_unit<Distance> || units::angle_unit<Distance>) &&
+          (units::current_unit<Input> || units::voltage_unit<Input>)
 class SimpleMotorFeedforward {
  public:
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
   using Acceleration =
       units::compound_unit<Velocity, units::inverse<units::seconds>>;
-  using kv_unit = units::compound_unit<units::volts, units::inverse<Velocity>>;
-  using ka_unit =
-      units::compound_unit<units::volts, units::inverse<Acceleration>>;
+  using kv_unit = units::compound_unit<Input, units::inverse<Velocity>>;
+  using ka_unit = units::compound_unit<Input, units::inverse<Acceleration>>;
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains.
    *
-   * @param kS The static gain, in volts.
-   * @param kV The velocity gain, in volt seconds per distance.
-   * @param kA The acceleration gain, in volt seconds² per distance.
+   * @param kS The static gain, in input units (e.g., volts or amperes).
+   * @param kV The velocity gain, in input units per (distance/second).
+   * @param kA The acceleration gain, in input units per (distance/second²).
    * @param dt The period in seconds.
    * @throws IllegalArgumentException for kv &lt; zero.
    * @throws IllegalArgumentException for ka &lt; zero.
    * @throws IllegalArgumentException for period &le; zero.
    */
   constexpr SimpleMotorFeedforward(
-      units::volt_t kS, units::unit_t<kv_unit> kV,
+      units::unit_t<Input> kS, units::unit_t<kv_unit> kV,
       units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0),
       units::second_t dt = 20_ms)
       : kS(kS), kV(kV), kA(kA), m_dt(dt) {
@@ -73,9 +74,10 @@ class SimpleMotorFeedforward {
    * change.
    *
    * @param velocity The velocity setpoint.
-   * @return The computed feedforward, in volts.
+   * @return The computed feedforward, in input units (e.g., volts or amperes).
    */
-  constexpr units::volt_t Calculate(units::unit_t<Velocity> velocity) const {
+  constexpr units::unit_t<Input> Calculate(
+      units::unit_t<Velocity> velocity) const {
     return Calculate(velocity, velocity);
   }
 
@@ -87,9 +89,9 @@ class SimpleMotorFeedforward {
    *
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity    The next velocity setpoint.
-   * @return The computed feedforward, in volts.
+   * @return The computed feedforward, in input units (e.g., volts or amperes).
    */
-  constexpr units::volt_t Calculate(
+  constexpr units::unit_t<Input> Calculate(
       units::unit_t<Velocity> currentVelocity,
       units::unit_t<Velocity> nextVelocity) const {
     // See wpimath/algorithms.md#Simple_motor_feedforward for derivation
@@ -101,7 +103,7 @@ class SimpleMotorFeedforward {
       double A_d = gcem::exp(A * m_dt.value());
       double B_d = 1.0 / A * (A_d - 1.0) * B;
       return kS * wpi::sgn(currentVelocity) +
-             units::volt_t{
+             units::unit_t<Input>{
                  1.0 / B_d *
                  (nextVelocity.value() - A_d * currentVelocity.value())};
     }
@@ -111,71 +113,75 @@ class SimpleMotorFeedforward {
   // formulas for the methods below:
 
   /**
-   * Calculates the maximum achievable velocity given a maximum voltage supply
-   * and an acceleration.  Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
+   * Calculates the maximum achievable velocity given a maximum input (e.g.,
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
+   * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * supplied to the motor.
    * @param acceleration The acceleration of the motor.
    * @return The maximum possible velocity at the given acceleration.
    */
   constexpr units::unit_t<Velocity> MaxAchievableVelocity(
-      units::volt_t maxVoltage,
+      units::unit_t<Input> maxInput,
       units::unit_t<Acceleration> acceleration) const {
     // Assume max velocity is positive
-    return (maxVoltage - kS - kA * acceleration) / kV;
+    return (maxInput - kS - kA * acceleration) / kV;
   }
 
   /**
-   * Calculates the minimum achievable velocity given a maximum voltage supply
-   * and an acceleration.  Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
+   * Calculates the minimum achievable velocity given a maximum input (e.g.,
+   * volts or amperes) and an acceleration.  Useful for ensuring that velocity
+   * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the acceleration constraint, and this will give you
    * a simultaneously-achievable velocity constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * supplied to the motor.
    * @param acceleration The acceleration of the motor.
    * @return The minimum possible velocity at the given acceleration.
    */
   constexpr units::unit_t<Velocity> MinAchievableVelocity(
-      units::volt_t maxVoltage,
+      units::unit_t<Input> maxInput,
       units::unit_t<Acceleration> acceleration) const {
     // Assume min velocity is positive, ks flips sign
-    return (-maxVoltage + kS - kA * acceleration) / kV;
+    return (-maxInput + kS - kA * acceleration) / kV;
   }
 
   /**
-   * Calculates the maximum achievable acceleration given a maximum voltage
-   * supply and a velocity. Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
+   * Calculates the maximum achievable acceleration given a maximum input (e.g.,
+   * volts or amperes) and a velocity.  Useful for ensuring that velocity
+   * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the velocity constraint, and this will give you
    * a simultaneously-achievable acceleration constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * supplied to the motor.
    * @param velocity The velocity of the motor.
    * @return The maximum possible acceleration at the given velocity.
    */
   constexpr units::unit_t<Acceleration> MaxAchievableAcceleration(
-      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) const {
-    return (maxVoltage - kS * wpi::sgn(velocity) - kV * velocity) / kA;
+      units::unit_t<Input> maxInput, units::unit_t<Velocity> velocity) const {
+    return (maxInput - kS * wpi::sgn(velocity) - kV * velocity) / kA;
   }
 
   /**
-   * Calculates the minimum achievable acceleration given a maximum voltage
-   * supply and a velocity. Useful for ensuring that velocity and
-   * acceleration constraints for a trapezoidal profile are simultaneously
+   * Calculates the minimum achievable acceleration given a maximum input (e.g.,
+   * volts or amperes) and a velocity.  Useful for ensuring that velocity
+   * and acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the velocity constraint, and this will give you
    * a simultaneously-achievable acceleration constraint.
    *
-   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param maxInput The maximum input (e.g., volts or amperes) that can be
+   * supplied to the motor.
    * @param velocity The velocity of the motor.
    * @return The minimum possible acceleration at the given velocity.
    */
   constexpr units::unit_t<Acceleration> MinAchievableAcceleration(
-      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) const {
-    return MaxAchievableAcceleration(-maxVoltage, velocity);
+      units::unit_t<Input> maxInput, units::unit_t<Velocity> velocity) const {
+    return MaxAchievableAcceleration(-maxInput, velocity);
   }
 
   /**
@@ -183,7 +189,7 @@ class SimpleMotorFeedforward {
    *
    * @param kS The static gain.
    */
-  constexpr void SetKs(units::volt_t kS) { this->kS = kS; }
+  constexpr void SetKs(units::unit_t<Input> kS) { this->kS = kS; }
 
   /**
    * Sets the velocity gain.
@@ -204,7 +210,7 @@ class SimpleMotorFeedforward {
    *
    * @return The static gain.
    */
-  constexpr units::volt_t GetKs() const { return kS; }
+  constexpr units::unit_t<Input> GetKs() const { return kS; }
 
   /**
    * Returns the velocity gain.
@@ -229,7 +235,7 @@ class SimpleMotorFeedforward {
 
  private:
   /** The static gain. */
-  units::volt_t kS;
+  units::unit_t<Input> kS;
 
   /** The velocity gain. */
   units::unit_t<kv_unit> kV;

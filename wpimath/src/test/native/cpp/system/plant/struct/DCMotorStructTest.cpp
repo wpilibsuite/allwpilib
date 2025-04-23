@@ -11,7 +11,7 @@ using namespace frc;
 using StructType = wpi::Struct<frc::DCMotor>;
 
 inline constexpr DCMotor kExpectedData =
-    DCMotor{1.91_V, 19.1_Nm, 1.74_A, 2.29_A, 2.2_rad_per_s, 2};
+    DCMotor{1.91_V, 19.1_Nm, 1.74_A, 2.29_A, 2.2_rad_per_s};
 
 TEST(DCMotorStructTest, Roundtrip) {
   uint8_t buffer[StructType::GetSize()];

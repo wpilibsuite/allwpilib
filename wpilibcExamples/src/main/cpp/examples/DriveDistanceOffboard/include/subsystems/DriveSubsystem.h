@@ -111,7 +111,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   ExampleSmartMotorController m_rightFollower;
 
   // A feedforward component for the drive
-  frc::SimpleMotorFeedforward<units::meters> m_feedforward;
+  frc::SimpleMotorFeedforward<units::meters, units::volts> m_feedforward;
 
   // The robot's drive
   frc::DifferentialDrive m_drive{

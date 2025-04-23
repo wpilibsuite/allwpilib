@@ -18,13 +18,13 @@
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 
 TEST(DifferentialDrivetrainSimTest, Convergence) {
-  auto motor = frc::DCMotor::NEO(2);
+  auto gearbox = frc::Gearbox(&frc::NEO, 2);
   auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
-      motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
+      gearbox, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
 
   frc::DifferentialDriveKinematics kinematics{24_in};
   frc::sim::DifferentialDrivetrainSim sim{
-      plant, 24_in, motor,
+      plant, 24_in, gearbox,
       1.0,   2_in,  {0.001, 0.001, 0.0001, 0.1, 0.1, 0.005, 0.005}};
 
   frc::LinearPlantInversionFeedforward feedforward{plant, 20_ms};
@@ -70,12 +70,12 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
 }
 
 TEST(DifferentialDrivetrainSimTest, Current) {
-  auto motor = frc::DCMotor::NEO(2);
+  auto gearbox = frc::Gearbox(&frc::NEO, 2);
   auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
-      motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
+      gearbox, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
 
   frc::DifferentialDriveKinematics kinematics{24_in};
-  frc::sim::DifferentialDrivetrainSim sim{plant, 24_in, motor, 1.0, 2_in};
+  frc::sim::DifferentialDrivetrainSim sim{plant, 24_in, gearbox, 1.0, 2_in};
 
   sim.SetInputs(-12_V, 12_V);
   for (int i = 0; i < 10; ++i) {
@@ -97,12 +97,12 @@ TEST(DifferentialDrivetrainSimTest, Current) {
 }
 
 TEST(DifferentialDrivetrainSimTest, ModelStability) {
-  auto motor = frc::DCMotor::NEO(2);
+  auto gearbox = frc::Gearbox(&frc::NEO, 2);
   auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
-      motor, 50_kg, 2_in, 12_in, 2_kg_sq_m, 5.0);
+      gearbox, 50_kg, 2_in, 12_in, 2_kg_sq_m, 5.0);
 
   frc::DifferentialDriveKinematics kinematics{24_in};
-  frc::sim::DifferentialDrivetrainSim sim{plant, 24_in, motor, 1.0, 2_in};
+  frc::sim::DifferentialDrivetrainSim sim{plant, 24_in, gearbox, 1.0, 2_in};
 
   sim.SetInputs(2_V, 4_V);
 

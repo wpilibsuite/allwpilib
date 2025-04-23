@@ -18,13 +18,13 @@ using namespace frc;
 using namespace frc::sim;
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
-    LinearSystem<2, 2, 2> plant, units::meter_t trackwidth, DCMotor driveMotor,
+    LinearSystem<2, 2, 2> plant, units::meter_t trackwidth, Gearbox gearbox,
     double gearRatio, units::meter_t wheelRadius,
     const std::array<double, 7>& measurementStdDevs)
     : m_plant(std::move(plant)),
       m_rb(trackwidth / 2.0),
       m_wheelRadius(wheelRadius),
-      m_motor(driveMotor),
+      m_gearbox(gearbox),
       m_originalGearing(gearRatio),
       m_currentGearing(gearRatio),
       m_measurementStdDevs(measurementStdDevs) {
@@ -34,13 +34,13 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
 }
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
-    frc::DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
+    frc::Gearbox gearbox, double gearing, units::kilogram_square_meter_t J,
     units::kilogram_t mass, units::meter_t wheelRadius,
     units::meter_t trackwidth, const std::array<double, 7>& measurementStdDevs)
     : DifferentialDrivetrainSim(
           frc::LinearSystemId::DrivetrainVelocitySystem(
-              driveMotor, mass, wheelRadius, trackwidth / 2.0, J, gearing),
-          trackwidth, driveMotor, gearing, wheelRadius, measurementStdDevs) {}
+              gearbox, mass, wheelRadius, trackwidth / 2.0, J, gearing),
+          trackwidth, gearbox, gearing, wheelRadius, measurementStdDevs) {}
 
 Eigen::Vector2d DifferentialDrivetrainSim::ClampInput(
     const Eigen::Vector2d& u) {
@@ -93,15 +93,18 @@ Pose2d DifferentialDrivetrainSim::GetPose() const {
 }
 
 units::ampere_t DifferentialDrivetrainSim::GetLeftCurrentDraw() const {
-  return m_motor.Current(units::radians_per_second_t{m_x(State::kLeftVelocity) *
-                                                     m_currentGearing /
-                                                     m_wheelRadius.value()},
-                         units::volt_t{m_u(0)}) *
+  return m_gearbox.numMotors *
+         m_gearbox.dcMotor->Current(
+             units::radians_per_second_t{m_x(State::kLeftVelocity) *
+                                         m_currentGearing /
+                                         m_wheelRadius.value()},
+             units::volt_t{m_u(0)}) *
          wpi::sgn(m_u(0));
 }
 
 units::ampere_t DifferentialDrivetrainSim::GetRightCurrentDraw() const {
-  return m_motor.Current(
+  return m_gearbox.numMotors *
+         m_gearbox.dcMotor->Current(
              units::radians_per_second_t{m_x(State::kRightVelocity) *
                                          m_currentGearing /
                                          m_wheelRadius.value()},

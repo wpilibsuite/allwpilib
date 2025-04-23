@@ -12,6 +12,7 @@
 
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/DCMotor.h"
+#include "frc/system/plant/Gearbox.h"
 #include "units/acceleration.h"
 #include "units/angular_acceleration.h"
 #include "units/angular_velocity.h"
@@ -35,18 +36,21 @@ class WPILIB_DLLEXPORT LinearSystemId {
       units::compound_unit<Distance, units::inverse<units::seconds>>,
       units::inverse<units::seconds>>>;
 
+  template <typename Input>
+  using Input_t = units::unit_t<Input>;
+
   /**
    * Create a state-space model of the elevator system. The states of the system
    * are [position, velocity]ᵀ, inputs are [voltage], and outputs are [position,
    * velocity]ᵀ.
    *
-   * @param motor The motor (or gearbox) attached to the carriage.
+   * @param gearbox The gearbox attached to the carriage.
    * @param mass The mass of the elevator carriage, in kilograms.
    * @param radius The radius of the elevator's driving drum, in meters.
    * @param gearing Gear ratio from motor to carriage.
    * @throws std::domain_error if mass <= 0, radius <= 0, or gearing <= 0.
    */
-  static constexpr LinearSystem<2, 1, 2> ElevatorSystem(DCMotor motor,
+  static constexpr LinearSystem<2, 1, 2> ElevatorSystem(const Gearbox& gearbox,
                                                         units::kilogram_t mass,
                                                         units::meter_t radius,
                                                         double gearing) {
@@ -60,31 +64,35 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("gearing must be greater than zero.");
     }
 
-    Matrixd<2, 2> A{
-        {0.0, 1.0},
-        {0.0, (-gcem::pow(gearing, 2) * motor.Kt /
-               (motor.R * units::math::pow<2>(radius) * mass * motor.Kv))
-                  .value()}};
+    Matrixd<2, 2> A{{0.0, 1.0},
+                    {0.0, (-gcem::pow(gearing, 2) * gearbox.numMotors *
+                           gearbox.dcMotor->Kt /
+                           (gearbox.dcMotor->R * units::math::pow<2>(radius) *
+                            mass * gearbox.dcMotor->Kv))
+                              .value()}};
     Matrixd<2, 1> B{{0.0},
-                    {(gearing * motor.Kt / (motor.R * radius * mass)).value()}};
+                    {(gearing * gearbox.numMotors * gearbox.dcMotor->Kt /
+                      (gearbox.dcMotor->R * radius * mass))
+                         .value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
-    return LinearSystem<2, 1, 2>(A, B, C, D);
+    return {A, B, C, D};
   }
 
   /**
-   * Create a state-space model of a single-jointed arm system.The states of the
-   * system are [angle, angular velocity]ᵀ, inputs are [voltage], and outputs
-   * are [angle, angular velocity]ᵀ.
+   * Create a state-space model of a single-jointed arm system. The states of
+   * the system are [angle, angular velocity]ᵀ, inputs are [voltage], and
+   * outputs are [angle, angular velocity]ᵀ.
    *
-   * @param motor The motor (or gearbox) attached to the arm.
+   * @param gearbox The gearbox attached to the arm.
    * @param J The moment of inertia J of the arm.
    * @param gearing Gear ratio from motor to arm.
    * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
   static constexpr LinearSystem<2, 1, 2> SingleJointedArmSystem(
-      DCMotor motor, units::kilogram_square_meter_t J, double gearing) {
+      const Gearbox& gearbox, const units::kilogram_square_meter_t J,
+      const double gearing) {
     if (J <= 0_kg_sq_m) {
       throw std::domain_error("J must be greater than zero.");
     }
@@ -92,15 +100,19 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("gearing must be greater than zero.");
     }
 
-    Matrixd<2, 2> A{
-        {0.0, 1.0},
-        {0.0, (-gcem::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J))
-                  .value()}};
-    Matrixd<2, 1> B{{0.0}, {(gearing * motor.Kt / (motor.R * J)).value()}};
+    Matrixd<2, 2> A{{0.0, 1.0},
+                    {0.0, (-gcem::pow(gearing, 2) * gearbox.numMotors *
+                           gearbox.dcMotor->Kt /
+                           (gearbox.dcMotor->Kv * gearbox.dcMotor->R * J))
+                              .value()}};
+    Matrixd<2, 1> B{{0.0},
+                    {(gearing * gearbox.numMotors * gearbox.dcMotor->Kt /
+                      (gearbox.dcMotor->R * J))
+                         .value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
-    return LinearSystem<2, 1, 2>(A, B, C, D);
+    return {A, B, C, D};
   }
 
   /**
@@ -142,13 +154,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
     Matrixd<1, 1> C{{1.0}};
     Matrixd<1, 1> D{{0.0}};
 
-    return LinearSystem<1, 1, 1>(A, B, C, D);
+    return {A, B, C, D};
   }
 
   /**
    * Create a state-space model for a 1 DOF position system from its kV
    * (volts/(unit/sec)) and kA (volts/(unit/sec²)). These constants can be
-   * found using SysId. the states of the system are [position, velocity]ᵀ,
+   * found using SysId. The states of the system are [position, velocity]ᵀ,
    * inputs are [voltage], and outputs are [position, velocity]ᵀ.
    *
    * You MUST use an SI unit (i.e. meters or radians) for the Distance template
@@ -167,12 +179,14 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @see <a
    * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  template <typename Distance>
-    requires std::same_as<units::meter, Distance> ||
-             std::same_as<units::radian, Distance>
+  template <typename Distance, typename Input>
+    requires(std::same_as<units::meter, Distance> ||
+             std::same_as<units::radian, Distance>) &&
+            (std::same_as<units::ampere, Input> ||
+             std::same_as<units::volt, Input>)
   static constexpr LinearSystem<2, 1, 2> IdentifyPositionSystem(
-      decltype(1_V / Velocity_t<Distance>(1)) kV,
-      decltype(1_V / Acceleration_t<Distance>(1)) kA) {
+      decltype(Input_t<Input>(1) / Velocity_t<Distance>(1)) kV,
+      decltype(Input_t<Input>(1) / Acceleration_t<Distance>(1)) kA) {
     if (kV < decltype(kV){0}) {
       throw std::domain_error("Kv must be greater than or equal to zero.");
     }
@@ -185,7 +199,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
-    return LinearSystem<2, 1, 2>(A, B, C, D);
+    return {A, B, C, D};
   }
 
   /**
@@ -312,102 +326,35 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * are [angular velocity], inputs are [voltage], and outputs are [angular
    * velocity].
    *
-   * @param motor The motor (or gearbox) attached to the flywheel.
-   * @param J The moment of inertia J of the flywheel.
-   * @param gearing Gear ratio from motor to flywheel.
-   * @throws std::domain_error if J <= 0 or gearing <= 0.
+   * @param gearbox The gearbox attached to the carriage.
    */
   static constexpr LinearSystem<1, 1, 1> FlywheelSystem(
-      DCMotor motor, units::kilogram_square_meter_t J, double gearing) {
-    if (J <= 0_kg_sq_m) {
-      throw std::domain_error("J must be greater than zero.");
-    }
-    if (gearing <= 0.0) {
-      throw std::domain_error("gearing must be greater than zero.");
-    }
-
-    Matrixd<1, 1> A{
-        {(-gcem::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J))
-             .value()}};
-    Matrixd<1, 1> B{{(gearing * motor.Kt / (motor.R * J)).value()}};
+      const Gearbox& gearbox) {
+    Matrixd<1, 1> A{{gearbox.Acceleration(1_rad_per_s, 0_V).value()}};
+    Matrixd<1, 1> B{{gearbox.Acceleration(0_rad_per_s, 1_V).value()}};
     Matrixd<1, 1> C{{1.0}};
     Matrixd<1, 1> D{{0.0}};
 
-    return LinearSystem<1, 1, 1>(A, B, C, D);
+    return {A, B, C, D};
   }
 
   /**
-   * Create a state-space model of a DC motor system. The states of the system
-   * are [angular position, angular velocity]ᵀ, inputs are [voltage], and
-   * outputs are [angular position, angular velocity]ᵀ.
+   * Create a state-space model of a Gearbox system containing DC motors. The
+   * states of the system are [angular position, angular velocity]ᵀ, inputs are
+   * [voltage], and outputs are [angular position, angular velocity]ᵀ.
    *
-   * @param motor The motor (or gearbox) attached to the system.
-   * @param J the moment of inertia J of the DC motor.
-   * @param gearing Gear ratio from motor to output.
-   * @throws std::domain_error if J <= 0 or gearing <= 0.
+   * @param gearbox The gearbox attached to the carriage.
    * @see <a
    * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  static constexpr LinearSystem<2, 1, 2> DCMotorSystem(
-      DCMotor motor, units::kilogram_square_meter_t J, double gearing) {
-    if (J <= 0_kg_sq_m) {
-      throw std::domain_error("J must be greater than zero.");
-    }
-    if (gearing <= 0.0) {
-      throw std::domain_error("gearing must be greater than zero.");
-    }
-
-    Matrixd<2, 2> A{
-        {0.0, 1.0},
-        {0.0, (-gcem::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J))
-                  .value()}};
-    Matrixd<2, 1> B{{0.0}, {(gearing * motor.Kt / (motor.R * J)).value()}};
+  static constexpr LinearSystem<2, 1, 2> GearboxSystem(const Gearbox& gearbox) {
+    Matrixd<2, 2> A{{0.0, 1.0},
+                    {0.0, gearbox.Acceleration(1_rad_per_s, 0_V).value()}};
+    Matrixd<2, 1> B{{0.0}, {gearbox.Acceleration(0_rad_per_s, 1_V).value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
-    return LinearSystem<2, 1, 2>(A, B, C, D);
-  }
-
-  /**
-   * Create a state-space model of a DC motor system from its kV
-   * (volts/(unit/sec)) and kA (volts/(unit/sec²)). These constants can be
-   * found using SysId. the states of the system are [angular position, angular
-   * velocity]ᵀ, inputs are [voltage], and outputs are [angular position,
-   * angular velocity]ᵀ.
-   *
-   * You MUST use an SI unit (i.e. meters or radians) for the Distance template
-   * argument. You may still use non-SI units (such as feet or inches) for the
-   * actual method arguments; they will automatically be converted to SI
-   * internally.
-   *
-   * The parameters provided by the user are from this feedforward model:
-   *
-   * u = K_v v + K_a a
-   *
-   * @param kV The velocity gain, in volts/(unit/sec).
-   * @param kA The acceleration gain, in volts/(unit/sec²).
-   *
-   * @throws std::domain_error if kV < 0 or kA <= 0.
-   */
-  template <typename Distance>
-    requires std::same_as<units::meter, Distance> ||
-             std::same_as<units::radian, Distance>
-  static constexpr LinearSystem<2, 1, 2> DCMotorSystem(
-      decltype(1_V / Velocity_t<Distance>(1)) kV,
-      decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    if (kV < decltype(kV){0}) {
-      throw std::domain_error("Kv must be greater than or equal to zero.");
-    }
-    if (kA <= decltype(kA){0}) {
-      throw std::domain_error("Ka must be greater than zero.");
-    }
-
-    Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
-    Matrixd<2, 1> B{0.0, 1.0 / kA.value()};
-    Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
-    Matrixd<2, 1> D{{0.0}, {0.0}};
-
-    return LinearSystem<2, 1, 2>(A, B, C, D);
+    return {A, B, C, D};
   }
 
   /**
@@ -416,7 +363,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * voltage, right voltage], and the outputs are [left velocity, right
    * velocity]ᵀ.
    *
-   * @param motor The motor (or gearbox) driving the drivetrain.
+   * @param gearbox The gearbox attached to the carriage.
    * @param mass The mass of the robot in kilograms.
    * @param r The radius of the wheels in meters.
    * @param rb The radius of the base (half of the trackwidth), in meters.
@@ -426,7 +373,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *         gearing <= 0.
    */
   static constexpr LinearSystem<2, 2, 2> DrivetrainVelocitySystem(
-      const DCMotor& motor, units::kilogram_t mass, units::meter_t r,
+      const Gearbox& gearbox, units::kilogram_t mass, units::meter_t r,
       units::meter_t rb, units::kilogram_square_meter_t J, double gearing) {
     if (mass <= 0_kg) {
       throw std::domain_error("mass must be greater than zero.");
@@ -444,9 +391,11 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("gearing must be greater than zero.");
     }
 
-    auto C1 = -gcem::pow(gearing, 2) * motor.Kt /
-              (motor.Kv * motor.R * units::math::pow<2>(r));
-    auto C2 = gearing * motor.Kt / (motor.R * r);
+    auto C1 =
+        -gcem::pow(gearing, 2) * gearbox.numMotors * gearbox.dcMotor->Kt /
+        (gearbox.dcMotor->Kv * gearbox.dcMotor->R * units::math::pow<2>(r));
+    auto C2 = gearing * gearbox.numMotors * gearbox.dcMotor->Kt /
+              (gearbox.dcMotor->R * r);
 
     Matrixd<2, 2> A{{((1 / mass + units::math::pow<2>(rb) / J) * C1).value(),
                      ((1 / mass - units::math::pow<2>(rb) / J) * C1).value()},
@@ -462,5 +411,4 @@ class WPILIB_DLLEXPORT LinearSystemId {
     return LinearSystem<2, 2, 2>(A, B, C, D);
   }
 };
-
 }  // namespace frc

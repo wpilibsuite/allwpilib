@@ -22,8 +22,8 @@ using namespace frc;
 
 TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
   // Pick an unreasonably large kA to ensure the constraint has to do some work
-  SimpleMotorFeedforward<units::meter> feedforward{1_V, 1_V / 1_mps,
-                                                   3_V / 1_mps_sq};
+  SimpleMotorFeedforward<units::meter, units::volts> feedforward{
+      1_V, 1_V / 1_mps, 3_V / 1_mps_sq};
   const DifferentialDriveKinematics kinematics{0.5_m};
   const auto maxVoltage = 10_V;
 
@@ -63,8 +63,8 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
 }
 
 TEST(DifferentialDriveVoltageConstraintTest, HighCurvature) {
-  SimpleMotorFeedforward<units::meter> feedforward{1_V, 1_V / 1_mps,
-                                                   3_V / 1_mps_sq};
+  SimpleMotorFeedforward<units::meter, units::volts> feedforward{
+      1_V, 1_V / 1_mps, 3_V / 1_mps_sq};
   // Large trackwidth - need to test with radius of curvature less than half of
   // trackwidth
   const DifferentialDriveKinematics kinematics{3_m};

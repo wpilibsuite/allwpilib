@@ -9,16 +9,15 @@
 #include "frc/controller/PIDController.h"
 #include "frc/motorcontrol/PWMVictorSPX.h"
 #include "frc/simulation/BatterySim.h"
-#include "frc/simulation/DCMotorSim.h"
 #include "frc/simulation/EncoderSim.h"
+#include "frc/simulation/GearboxSim.h"
 #include "frc/simulation/RoboRioSim.h"
 #include "frc/system/plant/LinearSystemId.h"
 
 TEST(DCMotorSimTest, VoltageSteadyState) {
-  frc::DCMotor gearbox = frc::DCMotor::NEO(1);
-  auto plant = frc::LinearSystemId::DCMotorSystem(
-      frc::DCMotor::NEO(1), units::kilogram_square_meter_t{0.0005}, 1.0);
-  frc::sim::DCMotorSim sim{plant, gearbox};
+  frc::Gearbox gearbox = frc::Gearbox(&frc::NEO, 1, 1.0, 0.0005_kg_sq_m);
+  frc::sim::GearboxSim<units::volt> sim{
+      gearbox, frc::RobotController::GetBatteryVoltage()};
 
   frc::Encoder encoder{0, 1};
   frc::sim::EncoderSim encoderSim{encoder};
@@ -34,14 +33,13 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
 
     // Then, SimulationPeriodic runs
     frc::sim::RoboRioSim::SetVInVoltage(
-        frc::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
-    sim.SetInputVoltage(motor.Get() *
-                        frc::RobotController::GetBatteryVoltage());
+        frc::sim::BatterySim::Calculate({sim.GetCurrent()}));
+    sim.SetInput(motor.Get() * frc::RobotController::GetBatteryVoltage());
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }
 
-  EXPECT_NEAR((gearbox.Kv * 12_V).value(), encoder.GetRate(), 0.1);
+  EXPECT_NEAR((gearbox.dcMotor->Kv * 12_V).value(), encoder.GetRate(), 0.1);
 
   // Decay
   for (int i = 0; i < 100; i++) {
@@ -50,9 +48,8 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
 
     // Then, SimulationPeriodic runs
     frc::sim::RoboRioSim::SetVInVoltage(
-        frc::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
-    sim.SetInputVoltage(motor.Get() *
-                        frc::RobotController::GetBatteryVoltage());
+        frc::sim::BatterySim::Calculate({sim.GetCurrent()}));
+    sim.SetInput(motor.Get() * frc::RobotController::GetBatteryVoltage());
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }
@@ -61,10 +58,9 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
 }
 
 TEST(DCMotorSimTest, PositionFeedbackControl) {
-  frc::DCMotor gearbox = frc::DCMotor::NEO(1);
-  auto plant = frc::LinearSystemId::DCMotorSystem(
-      frc::DCMotor::NEO(1), units::kilogram_square_meter_t{0.0005}, 1.0);
-  frc::sim::DCMotorSim sim{plant, gearbox};
+  frc::Gearbox gearbox = frc::Gearbox(&frc::NEO, 1, 1.0, 0.0005_kg_sq_m);
+  frc::sim::GearboxSim<units::volt> sim{
+      gearbox, frc::RobotController::GetBatteryVoltage()};
 
   frc::PIDController controller{0.04, 0.0, 0.001};
 
@@ -81,9 +77,8 @@ TEST(DCMotorSimTest, PositionFeedbackControl) {
 
     // Then, SimulationPeriodic runs
     frc::sim::RoboRioSim::SetVInVoltage(
-        frc::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
-    sim.SetInputVoltage(motor.Get() *
-                        frc::RobotController::GetBatteryVoltage());
+        frc::sim::BatterySim::Calculate({sim.GetCurrent()}));
+    sim.SetInput(motor.Get() * frc::RobotController::GetBatteryVoltage());
     sim.Update(20_ms);
     encoderSim.SetDistance(sim.GetAngularPosition().value());
     encoderSim.SetRate(sim.GetAngularVelocity().value());

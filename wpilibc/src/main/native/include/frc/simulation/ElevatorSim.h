@@ -12,6 +12,7 @@
 
 #include "frc/simulation/LinearSystemSim.h"
 #include "frc/system/plant/DCMotor.h"
+#include "frc/system/plant/Gearbox.h"
 
 namespace frc::sim {
 /**
@@ -34,15 +35,14 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param plant              The linear system that represents the elevator.
    *                           This system can be created with
    *                           LinearSystemId::ElevatorSystem().
-   * @param gearbox            The type of and number of motors in your
-   *                           elevator gearbox.
+   * @param gearbox            The elevator gearbox.
    * @param minHeight          The minimum allowed height of the elevator.
    * @param maxHeight          The maximum allowed height of the elevator.
    * @param simulateGravity    Whether gravity should be simulated or not.
    * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
-  ElevatorSim(const LinearSystem<2, 1, 2>& plant, const DCMotor& gearbox,
+  ElevatorSim(const LinearSystem<2, 1, 2>& plant, const Gearbox& gearbox,
               units::meter_t minHeight, units::meter_t maxHeight,
               bool simulateGravity, units::meter_t startingHeight,
               const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
@@ -50,8 +50,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Constructs a simulated elevator mechanism.
    *
-   * @param gearbox            The type of and number of motors in your
-   *                           elevator gearbox.
+   * @param gearbox            The elevator gearbox.
    * @param gearing            The gearing of the elevator (numbers greater
    *                           than 1 represent reductions).
    * @param carriageMass       The mass of the elevator carriage.
@@ -63,7 +62,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param startingHeight     The starting height of the elevator.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
-  ElevatorSim(const DCMotor& gearbox, double gearing,
+  ElevatorSim(const Gearbox& gearbox, double gearing,
               units::kilogram_t carriageMass, units::meter_t drumRadius,
               units::meter_t minHeight, units::meter_t maxHeight,
               bool simulateGravity, units::meter_t startingHeight,
@@ -74,8 +73,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    *
    * @param kV                 The velocity gain.
    * @param kA                 The acceleration gain.
-   * @param gearbox            The type of and number of motors in your
-   *                           elevator gearbox.
+   * @param gearbox            The elevator gearbox.
    * @param minHeight          The minimum allowed height of the elevator.
    * @param maxHeight          The maximum allowed height of the elevator.
    * @param simulateGravity    Whether gravity should be simulated or not.
@@ -87,7 +85,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
              std::same_as<units::radian, Distance>
   ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
               decltype(1_V / Acceleration_t<Distance>(1)) kA,
-              const DCMotor& gearbox, units::meter_t minHeight,
+              const Gearbox& gearbox, units::meter_t minHeight,
               units::meter_t maxHeight, bool simulateGravity,
               units::meter_t startingHeight,
               const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
@@ -171,7 +169,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
                      units::second_t dt) override;
 
  private:
-  DCMotor m_gearbox;
+  Gearbox m_gearbox;
   units::meter_t m_minHeight;
   units::meter_t m_maxHeight;
   bool m_simulateGravity;

@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../ProtoTestBase.h"
+#include "ProtoTestBase.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
 #include "frc/controller/proto/SimpleMotorFeedforwardProto.h"
 #include "units/acceleration.h"
@@ -12,13 +12,14 @@
 
 using namespace frc;
 
-template <typename T>
+template <typename T, typename I>
 struct SimpleMotorFeedforwardProtoTestData {
-  using Type = SimpleMotorFeedforward<T>;
+  using Type = SimpleMotorFeedforward<T, I>;
 
   inline static const Type kTestData = {
-      units::volt_t{0.4}, units::volt_t{4.0} / (units::unit_t<T>{1} / 1_s),
-      units::volt_t{0.7} / (units::unit_t<T>{1} / 1_s / 1_s), 25_ms};
+      units::unit_t<I>{0.4},
+      units::unit_t<I>{4.0} / (units::unit_t<T>{1} / 1_s),
+      units::unit_t<I>{0.7} / (units::unit_t<T>{1} / 1_s / 1_s), 25_ms};
 
   static void CheckEq(const Type& testData, const Type& data) {
     EXPECT_EQ(testData.GetKs().value(), data.GetKs().value());
@@ -28,12 +29,10 @@ struct SimpleMotorFeedforwardProtoTestData {
   }
 };
 
-INSTANTIATE_TYPED_TEST_SUITE_P(
-    SimpleMotorFeedforwardMeters, ProtoTest,
-    SimpleMotorFeedforwardProtoTestData<units::meters>);
-INSTANTIATE_TYPED_TEST_SUITE_P(
-    SimpleMotorFeedforwardFeet, ProtoTest,
-    SimpleMotorFeedforwardProtoTestData<units::feet>);
-INSTANTIATE_TYPED_TEST_SUITE_P(
-    SimpleMotorFeedforwardRadians, ProtoTest,
-    SimpleMotorFeedforwardProtoTestData<units::radians>);
+using SimpleMotorFeedforwardProtoTestTypes = ::testing::Types<
+    SimpleMotorFeedforwardProtoTestData<units::meters, units::volts>,
+    SimpleMotorFeedforwardProtoTestData<units::feet, units::volts>,
+    SimpleMotorFeedforwardProtoTestData<units::radians, units::volts>>;
+
+INSTANTIATE_TYPED_TEST_SUITE_P(SimpleMotorFeedforward, ProtoTest,
+                               SimpleMotorFeedforwardProtoTestTypes);
