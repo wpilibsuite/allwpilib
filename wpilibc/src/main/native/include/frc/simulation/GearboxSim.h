@@ -22,7 +22,7 @@ namespace frc::sim {
 template <typename Input>
   requires units::current_unit<Input> || units::voltage_unit<Input>
 class GearboxSim : public LinearSystemSim<2, 1, 2> {
-public:
+ public:
   using Input_t = units::unit_t<Input>;
   /**
    * Creates a simulated DC motor mechanism.
@@ -31,11 +31,11 @@ public:
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
   explicit GearboxSim(const Gearbox& gearbox,
-             const std::array<double, 2>& measurementStdDevs = {0.0, 0.0})
-    : LinearSystemSim(LinearSystemId::GearboxSystem(gearbox),
-                      measurementStdDevs),
-      m_gearbox(gearbox) {
-  }
+                      const std::array<double, 2>& measurementStdDevs = {0.0,
+                                                                         0.0})
+      : LinearSystemSim(LinearSystemId::GearboxSystem(gearbox),
+                        measurementStdDevs),
+        m_gearbox(gearbox) {}
 
   using LinearSystemSim::SetState;
 
@@ -73,7 +73,8 @@ public:
    *
    * @return The DC motor position.
    */
-  [[nodiscard]] units::radian_t GetAngularPosition() const {
+  [[nodiscard]]
+  units::radian_t GetAngularPosition() const {
     return units::radian_t{GetOutput(0)};
   }
 
@@ -82,7 +83,8 @@ public:
    *
    * @return The DC motor velocity.
    */
-  [[nodiscard]] units::radians_per_second_t GetAngularVelocity() const {
+  [[nodiscard]]
+  units::radians_per_second_t GetAngularVelocity() const {
     return units::radians_per_second_t{GetOutput(1)};
   }
 
@@ -91,7 +93,8 @@ public:
    *
    * @return The DC motor acceleration
    */
-  [[nodiscard]] units::radians_per_second_squared_t GetAngularAcceleration() const {
+  [[nodiscard]]
+  units::radians_per_second_squared_t GetAngularAcceleration() const {
     return units::radians_per_second_squared_t{
         (m_plant.A() * m_x + m_plant.B() * m_u)(1, 0)};
   }
@@ -101,7 +104,8 @@ public:
    *
    * @return The DC motor torque
    */
-  [[nodiscard]] units::newton_meter_t GetTorque() const {
+  [[nodiscard]]
+  units::newton_meter_t GetTorque() const {
     return units::newton_meter_t{GetAngularAcceleration().value() *
                                  m_gearbox.J.value()};
   }
@@ -111,7 +115,8 @@ public:
    *
    * @return The DC motor current draw.
    */
-  [[nodiscard]] units::ampere_t GetCurrent() const {
+  [[nodiscard]]
+  units::ampere_t GetCurrent() const {
     // I = V / R - omega / (Kv * R)
     // Reductions are greater than 1, so a reduction of 10:1 would mean the
     // motor is spinning 10x faster than the output.
@@ -124,7 +129,8 @@ public:
    *
    * @return The DC motor input voltage.
    */
-  [[nodiscard]] units::volt_t GetVoltage() const {
+  [[nodiscard]]
+  units::volt_t GetVoltage() const {
     return m_gearbox.Voltage(GetAngularAcceleration(),
                              units::radians_per_second_t{m_x(1)});
   }
@@ -142,9 +148,12 @@ public:
   /**
    * Returns the gearbox.
    */
-  [[nodiscard]] const Gearbox& GetGearbox() const { return m_gearbox; }
+  [[nodiscard]]
+  const Gearbox& GetGearbox() const {
+    return m_gearbox;
+  }
 
-private:
+ private:
   const Gearbox m_gearbox;
 };
-} // namespace frc::sim
+}  // namespace frc::sim

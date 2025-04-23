@@ -30,7 +30,7 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
   explicit FlywheelSim(const Gearbox& gearbox,
-              const std::array<double, 1>& measurementStdDevs = {0.0})
+                       const std::array<double, 1>& measurementStdDevs = {0.0})
       : LinearSystemSim(LinearSystemId::FlywheelSystem(gearbox),
                         measurementStdDevs),
         m_gearbox(gearbox) {}
@@ -51,7 +51,8 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    *
    * @return The flywheel's velocity.
    */
-  [[nodiscard]] units::radians_per_second_t GetAngularVelocity() const {
+  [[nodiscard]]
+  units::radians_per_second_t GetAngularVelocity() const {
     return units::radians_per_second_t{GetOutput(0)};
   }
 
@@ -60,7 +61,8 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    *
    * @return The flywheel's acceleration
    */
-  [[nodiscard]] units::radians_per_second_squared_t GetAngularAcceleration() const {
+  [[nodiscard]]
+  units::radians_per_second_squared_t GetAngularAcceleration() const {
     return units::radians_per_second_squared_t{
         (m_plant.A() * m_x + m_plant.B() * m_u)(0, 0)};
   }
@@ -70,7 +72,8 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    *
    * @return The flywheel's torque
    */
-  [[nodiscard]] units::newton_meter_t GetTorque() const {
+  [[nodiscard]]
+  units::newton_meter_t GetTorque() const {
     return units::newton_meter_t{GetAngularAcceleration().value() *
                                  m_gearbox.J.value()};
   }
@@ -80,7 +83,8 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    *
    * @return The flywheel's current draw.
    */
-  [[nodiscard]] units::ampere_t GetCurrent() const {
+  [[nodiscard]]
+  units::ampere_t GetCurrent() const {
     // I = V / R - omega / (Kv * R)
     // Reductions are greater than 1, so a reduction of 10:1 would mean the
     // motor is spinning 10x faster than the output.
@@ -93,7 +97,10 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    *
    * @return The flywheel input voltage.
    */
-  [[nodiscard]] units::volt_t GetInputVoltage() const { return units::volt_t{GetInput(0)}; }
+  [[nodiscard]]
+  units::volt_t GetInputVoltage() const {
+    return units::volt_t{GetInput(0)};
+  }
 
   /**
    * Sets the input voltage for the flywheel.
@@ -108,7 +115,10 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   /**
    * Returns the gearbox.
    */
-  [[nodiscard]] const Gearbox& GetGearbox() const { return m_gearbox; }
+  [[nodiscard]]
+  const Gearbox& GetGearbox() const {
+    return m_gearbox;
+  }
 
  private:
   const Gearbox m_gearbox;

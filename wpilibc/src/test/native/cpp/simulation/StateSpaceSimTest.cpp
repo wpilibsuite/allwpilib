@@ -22,8 +22,8 @@
 #include "frc/system/plant/LinearSystemId.h"
 
 TEST(StateSpaceSimTest, FlywheelSim) {
-  frc::sim::FlywheelSim<units::volt> sim{frc::Gearbox(&frc::NEO, 2, 0.02_V / 1_rad_per_s,
-                                         0.01_V / 1_rad_per_s_sq)};
+  frc::sim::FlywheelSim<units::volt> sim{frc::Gearbox(
+      &frc::NEO, 2, 0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq)};
   frc::PIDController controller{0.2, 0.0, 0.0};
   frc::SimpleMotorFeedforward<units::radian, units::volts> feedforward{
       0_V, 0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq};
