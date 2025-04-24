@@ -6,7 +6,7 @@ package edu.wpi.first.math.system;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
-import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.Vector;
 import java.util.function.BiFunction;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleUnaryOperator;
@@ -67,17 +67,17 @@ public final class NumericalIntegration {
    * @param dtSeconds The time over which to integrate.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
-  public static <States extends Num, Inputs extends Num> Matrix<States, N1> rk4(
-      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
-      Matrix<States, N1> x,
-      Matrix<Inputs, N1> u,
+  public static <States extends Num, Inputs extends Num> Vector<States> rk4(
+      BiFunction<Vector<States>, Vector<Inputs>, Vector<States>> f,
+      Vector<States> x,
+      Vector<Inputs> u,
       double dtSeconds) {
     final var h = dtSeconds;
 
-    Matrix<States, N1> k1 = f.apply(x, u);
-    Matrix<States, N1> k2 = f.apply(x.plus(k1.times(h * 0.5)), u);
-    Matrix<States, N1> k3 = f.apply(x.plus(k2.times(h * 0.5)), u);
-    Matrix<States, N1> k4 = f.apply(x.plus(k3.times(h)), u);
+    Vector<States> k1 = f.apply(x, u);
+    Vector<States> k2 = f.apply(x.plus(k1.times(h * 0.5)), u);
+    Vector<States> k3 = f.apply(x.plus(k2.times(h * 0.5)), u);
+    Vector<States> k4 = f.apply(x.plus(k3.times(h)), u);
 
     return x.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(h / 6.0));
   }
@@ -91,14 +91,14 @@ public final class NumericalIntegration {
    * @param dtSeconds The time over which to integrate.
    * @return 4th order Runge-Kutta integration of dx/dt = f(x) for dt.
    */
-  public static <States extends Num> Matrix<States, N1> rk4(
-      UnaryOperator<Matrix<States, N1>> f, Matrix<States, N1> x, double dtSeconds) {
+  public static <States extends Num> Vector<States> rk4(
+      UnaryOperator<Vector<States>> f, Vector<States> x, double dtSeconds) {
     final var h = dtSeconds;
 
-    Matrix<States, N1> k1 = f.apply(x);
-    Matrix<States, N1> k2 = f.apply(x.plus(k1.times(h * 0.5)));
-    Matrix<States, N1> k3 = f.apply(x.plus(k2.times(h * 0.5)));
-    Matrix<States, N1> k4 = f.apply(x.plus(k3.times(h)));
+    Vector<States> k1 = f.apply(x);
+    Vector<States> k2 = f.apply(x.plus(k1.times(h * 0.5)));
+    Vector<States> k3 = f.apply(x.plus(k2.times(h * 0.5)));
+    Vector<States> k4 = f.apply(x.plus(k3.times(h)));
 
     return x.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(h / 6.0));
   }
@@ -141,10 +141,10 @@ public final class NumericalIntegration {
    * @param dtSeconds The time over which to integrate.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
-  public static <States extends Num, Inputs extends Num> Matrix<States, N1> rkdp(
-      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
-      Matrix<States, N1> x,
-      Matrix<Inputs, N1> u,
+  public static <States extends Num, Inputs extends Num> Vector<States> rkdp(
+      BiFunction<Vector<States>, Vector<Inputs>, Vector<States>> f,
+      Vector<States> x,
+      Vector<Inputs> u,
       double dtSeconds) {
     return rkdp(f, x, u, dtSeconds, 1e-6);
   }
@@ -161,10 +161,10 @@ public final class NumericalIntegration {
    * @param maxError The maximum acceptable truncation error. Usually a small number like 1e-6.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
-  public static <States extends Num, Inputs extends Num> Matrix<States, N1> rkdp(
-      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
-      Matrix<States, N1> x,
-      Matrix<Inputs, N1> u,
+  public static <States extends Num, Inputs extends Num> Vector<States> rkdp(
+      BiFunction<Vector<States>, Vector<Inputs>, Vector<States>> f,
+      Vector<States> x,
+      Vector<Inputs> u,
       double dtSeconds,
       double maxError) {
     // See https://en.wikipedia.org/wiki/Dormand%E2%80%93Prince_method for the
@@ -196,7 +196,7 @@ public final class NumericalIntegration {
       1.0 / 40.0
     };
 
-    Matrix<States, N1> newX;
+    Vector<States> newX;
     double truncationError;
 
     double dtElapsed = 0.0;

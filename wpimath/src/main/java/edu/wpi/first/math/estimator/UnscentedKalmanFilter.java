@@ -385,7 +385,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     //
     // equation (18)
     for (int i = 0; i < m_pts.getNumSigmas(); ++i) {
-      Matrix<States, N1> x = sigmas.extractColumnVector(i);
+      Vector<States, N1> x = sigmas.extractColumnVector(i);
 
       m_sigmasF.setColumn(i, NumericalIntegration.rk4(m_f, x, u, dtSeconds));
     }
