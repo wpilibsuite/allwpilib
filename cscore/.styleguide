@@ -38,8 +38,10 @@ includeOtherLibs {
   ^fmt/
   ^gtest/
   ^opencv2/
+  ^imgui
   ^support/
   ^tcpsockets/
   ^wpi/
+  ^wpigui/
   ^wpinet/
 }

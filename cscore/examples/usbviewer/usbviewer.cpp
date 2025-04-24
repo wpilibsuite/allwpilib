@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <imgui.h>
-#include <imgui_internal.h>
 #include <wpigui.h>
 
 #include <atomic>
 #include <thread>
 #include <vector>
 
+#include <imgui.h>
+#include <imgui_internal.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <wpi/print.h>

@@ -28,6 +28,7 @@ includeOtherLibs {
   ^imgui
   ^networktables/
   ^ntcore
+  ^units
   ^wpi/
   ^wpigui
   ^wpimath/
