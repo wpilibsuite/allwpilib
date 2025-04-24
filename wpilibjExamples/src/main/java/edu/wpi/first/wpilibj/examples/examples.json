@@ -461,7 +461,7 @@
   },
   {
     "name": "DriveDistanceOffboard",
-    "description": "Drive a differential drivetrain a set distance using TrapezoidProfileCommand and smart motor controller PID.",
+    "description": "Drive a differential drivetrain a set distance using TrapezoidProfile and smart motor controller PID.",
     "tags": [
       "Command-based",
       "Differential Drive",
