@@ -40,7 +40,6 @@ EXAMPLE_FOLDERS = [
     "RapidReactCommandBot",
     "RomiReference",
     "SelectCommand",
-    "ShuffleBoard",
     "SimpleDifferentialDriveSimulation",
     "Solenoid",
     "StateSpaceArm",
@@ -53,8 +52,6 @@ EXAMPLE_FOLDERS = [
     "SysIdRoutine",
     "TankDrive",
     "TankDriveXboxController",
-    "Ultrasonic",
-    "UltrasonicPID",
     "UnitTest",
     "XRPReference",
 ]

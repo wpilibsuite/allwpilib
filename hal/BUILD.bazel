@@ -17,29 +17,10 @@ filegroup(
 )
 
 py_binary(
-    name = "generate_usage_reporting",
-    srcs = ["generate_usage_reporting.py"],
-    data = [":templates"],
-    tags = ["manual"],
-    visibility = ["//visibility:public"],
-)
-
-py_binary(
     name = "generate_nanopb",
     srcs = ["generate_nanopb.py"],
     tags = ["manual"],
     visibility = ["//visibility:public"],
-)
-
-py_binary(
-    name = "generate_hal",
-    srcs = ["generate_hal.py"],
-    tags = ["manual"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":generate_nanopb",
-        ":generate_usage_reporting",
-    ],
 )
 
 generate_hal(

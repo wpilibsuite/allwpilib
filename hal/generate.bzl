@@ -2,8 +2,8 @@ def __generate_hal_impl(ctx):
     output_dir = ctx.actions.declare_directory("_gendir")
 
     args = ctx.actions.args()
-    args.add("--output_directory", output_dir.path)
-    args.add("--nanopb_generator", ctx.executable._nanopb_generator)
+    args.add("--output_directory", output_dir.path + "/main/native/cpp/mrc/protobuf")
+    args.add("--nanopb", ctx.executable._nanopb_generator)
 
     ctx.actions.run(
         inputs = ctx.attr._templates.files.to_list() + ctx.attr.proto_files.files.to_list(),
@@ -36,7 +36,7 @@ generate_hal = rule(
             default = Label("//hal:templates"),
         ),
         "_tool": attr.label(
-            default = Label("//hal:generate_hal"),
+            default = Label("//hal:generate_nanopb"),
             cfg = "exec",
             executable = True,
         ),

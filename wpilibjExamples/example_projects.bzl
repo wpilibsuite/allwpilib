@@ -39,7 +39,6 @@ EXAMPLES_FOLDERS = [
     "rapidreactcommandbot",
     "romireference",
     "selectcommand",
-    "shuffleboard",
     "simpledifferentialdrivesimulation",
     "solenoid",
     "statespacearm",
@@ -52,8 +51,6 @@ EXAMPLES_FOLDERS = [
     "sysidroutine",
     "tankdrive",
     "tankdrivexboxcontroller",
-    "ultrasonic",
-    "ultrasonicpid",
     "unittest",
     "xrpreference",
 ]
