@@ -24,6 +24,7 @@ write_source_files(
         "src/generated": ":gen_units",
     },
     suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
     visibility = ["//visibility:public"],
 )
 

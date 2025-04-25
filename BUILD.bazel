@@ -26,6 +26,7 @@ alias(
         "@bazel_tools//src/conditions:windows": "@quickbuffer_protoc_windows//file",
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": "@quickbuffer_protoc_linux//file",
     }),
+    tags = ["pregeneration"],
     visibility = ["//visibility:public"],
 )
 
@@ -43,4 +44,5 @@ write_source_files(
         "//wpiunits:write_wpiunits",
         "//wpiutil:write_wpiutil",
     ],
+    tags = ["pregeneration"],
 )

@@ -55,6 +55,7 @@ py_binary(
 
 generate_wpimath(
     name = "generate_wpimath",
+    tags = ["pregeneration"],
 )
 
 write_source_files(
@@ -63,6 +64,7 @@ write_source_files(
         "src/generated": ":generate_wpimath",
     },
     suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
     visibility = ["//visibility:public"],
 )
 

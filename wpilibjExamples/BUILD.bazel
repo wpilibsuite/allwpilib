@@ -27,6 +27,7 @@ write_source_file(
     in_file = ":generate_bazel_files_rule",
     out_file = "example_projects.bzl",
     suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
     visibility = ["//visibility:public"],
 )
 

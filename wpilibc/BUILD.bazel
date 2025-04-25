@@ -59,6 +59,7 @@ write_source_files(
         "src/generated": ":generate_wpilibc",
     },
     suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
     visibility = ["//visibility:public"],
 )
 

@@ -34,6 +34,7 @@ write_source_files(
         "src/generated": ":generate_hal_files",
     },
     suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
     visibility = ["//visibility:public"],
 )
 

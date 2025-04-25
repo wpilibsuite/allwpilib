@@ -44,6 +44,7 @@ write_source_files(
         "src/generated/test/native/cpp": ":generate_wpiutil",
     },
     suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
     visibility = ["//visibility:public"],
 )
 
