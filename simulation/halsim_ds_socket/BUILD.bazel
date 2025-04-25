@@ -1,0 +1,47 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+
+cc_library(
+    name = "headers",
+    hdrs = glob(["src/main/native/include/**"]),
+    includes = ["src/main/native/include"],
+)
+
+cc_library(
+    name = "halsim_ds_socket",
+    srcs = glob(["src/main/native/cpp/**"]),
+    features = ["windows_export_all_symbols"],
+    tags = [
+        "no-roborio",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":headers",
+        "//hal:wpiHal.static",
+        "//wpinet:wpinet.static",
+    ],
+)
+
+cc_test(
+    name = "halsim_ds_socket-test",
+    size = "small",
+    srcs = glob([
+        "src/test/native/**/*.cpp",
+        "src/test/native/**/*.h",
+    ]),
+    tags = ["no-roborio"],
+    deps = [
+        "//simulation/halsim_ds_socket:halsim_ds_socket",
+        "//thirdparty/googletest:googletest.static",
+    ],
+)
+
+cc_binary(
+    name = "DevMain-Cpp",
+    srcs = ["src/dev/native/cpp/main.cpp"],
+    tags = [
+        "no-roborio",
+    ],
+    deps = [
+        ":halsim_ds_socket",
+    ],
+)

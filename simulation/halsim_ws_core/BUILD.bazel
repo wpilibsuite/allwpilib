@@ -1,0 +1,20 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "halsim_ws_core",
+    srcs = glob(["src/main/native/cpp/*.cpp"]),
+    hdrs = glob([
+        "src/main/native/include/*.h",
+        "src/main/native/include/*.inc",
+    ]),
+    strip_include_prefix = "src/main/native/include",
+    tags = [
+        "no-roborio",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//hal:wpiHal.static",
+        "//wpinet:wpinet.static",
+        "//wpiutil:wpiutil.static",
+    ],
+)

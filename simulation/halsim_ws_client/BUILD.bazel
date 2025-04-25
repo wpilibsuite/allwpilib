@@ -1,0 +1,29 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+cc_library(
+    name = "halsim_ws_client",
+    srcs = glob([
+        "src/main/native/cpp/*.cpp",
+        "src/main/native/include/*.h",
+    ]),
+    features = ["windows_export_all_symbols"],
+    includes = ["src/main/native/include"],
+    tags = [
+        "no-roborio",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//simulation/halsim_ws_core",
+    ],
+)
+
+cc_binary(
+    name = "DevMain-Cpp",
+    srcs = ["src/dev/native/cpp/main.cpp"],
+    tags = [
+        "no-roborio",
+    ],
+    deps = [
+        ":halsim_ws_client",
+    ],
+)
