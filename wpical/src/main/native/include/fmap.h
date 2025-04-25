@@ -4,12 +4,38 @@
 
 #pragma once
 
-#include <fieldmap.h>
+#include <string>
+#include <vector>
 
-#include <tagpose.h>
+#include <Eigen/Core>
+#include <frc/apriltag/AprilTagFieldLayout.h>
 #include <wpi/json.h>
 
 namespace fmap {
-wpi::json singleTag(int tag, const tag::Pose& tagpose);
-wpi::json convertfmap(const wpi::json& json);
+struct Fiducial {
+  std::string family;
+  int id;
+  double size;
+  Eigen::Matrix4d transform;
+  int unique = 1;
+};
+
+class Fieldmap {
+ public:
+  Fieldmap() = default;
+  Fieldmap(std::string type, std::vector<Fiducial> fiducials);
+
+  explicit Fieldmap(const frc::AprilTagFieldLayout& layout);
+
+  std::string type;
+  std::vector<Fiducial> fiducials;
+};
+
+void to_json(wpi::json& json, const Fiducial& layout);
+
+void from_json(const wpi::json& json, Fiducial& layout);
+
+void to_json(wpi::json& json, const Fieldmap& layout);
+
+void from_json(const wpi::json& json, Fieldmap& layout);
 }  // namespace fmap

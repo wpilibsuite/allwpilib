@@ -49,6 +49,7 @@ def eigen_inclusions(dp, f):
     modules = [
         "Cholesky",
         "Core",
+        "Dense",
         "Eigenvalues",
         "Geometry",
         "Householder",
@@ -62,6 +63,7 @@ def eigen_inclusions(dp, f):
         "SparseCore",
         "SparseLU",
         "SparseQR",
+        "StdVector",
         "misc",
         "plugins",
     ]
@@ -86,7 +88,7 @@ def unsupported_inclusions(dp, f):
         return False
 
     # Include the MatrixFunctions module
-    return "MatrixFunctions" in abspath
+    return "MatrixFunctions" in abspath or "SpecialFunctions" in abspath or "Tensor" in abspath or abspath.endswith("SpecialFunctionsFunctors.h")
 
 
 def copy_upstream_src(wpilib_root):

@@ -1,6 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64')) {
+if (project.hasProperty('onlylinuxathena')) {
     return;
 }
 
@@ -31,6 +31,7 @@ def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
 def wpilibVersionFileOutput = file("$buildDir/generated/main/cpp/WPILibVersion.cpp")
 
 apply from: "${rootDir}/shared/ceres.gradle"
+apply from: "${rootDir}/shared/gtsam.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
 
 task generateCppVersion() {
@@ -120,7 +121,7 @@ nativeUtils.platformConfigs.each {
         it.cppCompiler.args.add("-fpermissive")
     }
 }
-def testResources = "\"$rootDir/wpical/src/main/native/resources\"".replace("\\", "/")
+def testResources = "\"$rootDir/wpical/src/main/native/assets\"".replace("\\", "/")
 model {
     components {
         "${nativeName}"(NativeExecutableSpec) {
@@ -152,16 +153,19 @@ model {
                 }
             }
             binaries.all {
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name.startsWith("linuxarm")) {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     it.buildable = false
                     return
                 }
+                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
-                nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
+                nativeUtils.useRequiredLibrary(it, 'gtsam')
+                nativeUtils.useRequiredLibrary(it, 'ceres')
+                it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
                 it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.cppCompiler.define('GLOG_DEPRECATED', '__declspec(deprecated)')
@@ -175,6 +179,9 @@ model {
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
                     it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore' << '-framework' << 'Accelerate'
                 } else {
+                    it.cppCompiler.args.add("-Wno-deprecated-copy")
+                    it.cppCompiler.args.add("-Wno-redundant-move")
+
                     it.linker.args << '-lX11' << "-lgfortran"
                     if (it.targetPlatform.name.startsWith('linuxarm')) {
                         it.linker.args << '-lGL'
@@ -203,18 +210,24 @@ model {
                 }
             }
             binaries.all {
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name.startsWith("linuxarm")) {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     it.buildable = false
                     return
                 }
+                lib project: ':apriltag', library: 'apriltag', linkage: 'static'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
+                nativeUtils.useRequiredLibrary(it, 'gtsam')
+                it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
                 it.cppCompiler.define('PROJECT_ROOT_PATH', testResources)
                 it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
+
                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.windowsarm64) {
                     // https://developercommunity.visualstudio.com/t/-imp-std-init-once-complete-unresolved-external-sy/1684365#T-N10041864
                     it.linker.args << '/alternatename:__imp___std_init_once_complete=__imp_InitOnceComplete'
@@ -236,10 +249,13 @@ model {
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
                     it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore' << '-framework' << 'Accelerate'
                 } else {
-                    it.linker.args << '-lX11' << '-lgfortran'
+                    it.linker.args << '-lX11'
                     if (it.targetPlatform.name.startsWith('linuxarm')) {
                         it.linker.args << '-lGL'
                     }
+
+                    it.cppCompiler.args.add("-Wno-deprecated-copy")
+                    it.cppCompiler.args.add("-Wno-redundant-move")
                 }
             }
         }

@@ -4,6 +4,9 @@ include(CompileWarnings)
 include(GenResources)
 include(LinkMacOSGUI)
 include(AddTest)
+include(FetchContent)
+
+find_package (SuiteSparse 5.12 NO_MODULE)
 
 configure_file(src/main/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
 generate_resources(src/main/native/resources generated/main/cpp WPIcal wpical wpical_resources_src)
@@ -25,6 +28,26 @@ elseif(APPLE)
     set_source_files_properties(${APP_ICON_MACOSX} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
 
+set(GTSAM_COMPILE_OPTIONS_PRIVATE_DEBUG CACHE INTERNAL FORCE)
+set(GTSAM_COMPILE_OPTIONS_PRIVATE_RELWITHDEBINFO CACHE INTERNAL FORCE)
+set(GTSAM_ENABLE_BOOST_SERIALIZATION OFF)
+set(GTSAM_WITH_TBB OFF)
+set(GTSAM_USE_BOOST_FEATURES OFF)
+set(GTSAM_BUILD_PYTHON OFF)
+set(GTSAM_BUILD_EXAMPLES_ALWAYS OFF)
+set(GTSAM_BUILD_TESTS OFF)
+set(BUILD_SHARED_LIBS OFF)
+set(GTSAM_FORCE_SHARED_LIB OFF)
+set(GTSAM_FORCE_STATIC_LIB ON)
+
+include(FetchContent)
+fetchcontent_declare(
+    gtsam
+    GIT_REPOSITORY    https://github.com/mcm001/gtsam
+    GIT_TAG           c24ca7951f1db4cfe4e23f368b2eda503de72176
+)
+fetchcontent_makeavailable(gtsam)
+
 add_executable(
     wpical
     ${wpical_src}
@@ -38,7 +61,9 @@ wpilib_target_warnings(wpical)
 target_include_directories(
     wpical
     PRIVATE
+        /usr/local/include/
         src/main/native/include
+        src/main/native/thirdparty/mrcal/generated
         src/main/native/thirdparty/libdogleg/include
         src/main/native/thirdparty/mrcal/include
         src/main/native/thirdparty/mrcal_java/include
@@ -79,17 +104,19 @@ else()
         -Wno-missing-field-initializers
     )
 endif()
-target_compile_options(wpical PRIVATE ${compile_flags})
+set_target_properties(${wpical_thirdparty_src} PROPERTIES COMPILE_FLAGS ${compile_flags})
 
 find_package(OpenCV REQUIRED)
-find_package(Ceres CONFIG REQUIRED)
 target_link_libraries(
     wpical
+    gtsam
     apriltag
     ${OpenCV_LIBS}
     wpigui
     wpiutil
-    Ceres::ceres
+    wpimath
+    SuiteSparse::CHOLMOD
+    # Ceres::ceres
 )
 
 if(WIN32)
@@ -119,11 +146,13 @@ if(WITH_TESTS)
     )
     target_link_libraries(
         wpical_test
+        gtsam
         googletest
         apriltag
         ${OpenCV_LIBS}
         wpigui
         wpiutil
-        Ceres::ceres
+        SuiteSparse::CHOLMOD
+        # Ceres::ceres
     )
 endif()
