@@ -116,7 +116,8 @@ using namespace cs;
     return false;
   }
 
-  // Quirk: exposure auto is 3 for on, 1 for off
+  // There is room for quirk handling improvement here, but I will leave it
+  // for now.
   if (property == sharedThis->GetPropertyIndex(kPropertyAutoExposure)) {
     return value == kPropertyAutoExposureOn;
   }
@@ -594,6 +595,11 @@ using namespace cs;
         return;
     }
     
+    if (self.uvcControl == nil) {
+        OBJCWARNING("Cannot cache property {}: UVC control not initialized", [name UTF8String]);
+        return;
+    }
+    
     // Get property limits
     int32_t minimum = 0, maximum = 0, defaultValue = 0;
     int32_t value = defaultValue;
@@ -601,25 +607,22 @@ using namespace cs;
     
     std::string nameStr = std::string([name UTF8String]);
     
-    if (self.uvcControl != nil) {
-        // Get the property limits
-        if ([self.uvcControl getPropertyLimits:propID 
-                                          min:&minimum 
-                                          max:&maximum 
-                                     defValue:&defaultValue 
-                                       status:&status]) {
-        } else {
-            OBJCWARNING("Failed to get property limits for {}", nameStr);
-            return;
-        }
-        
-        // Get current value
-        if (![self.uvcControl getProperty:propID withValue:&value status:&status]) {
-            value = defaultValue;
-            OBJCWARNING("Failed to get current value for {}: {}", 
-                      nameStr, value);
-            return;
-        }
+    // Get the property limits
+    if (![self.uvcControl getPropertyLimits:propID 
+                                      min:&minimum 
+                                      max:&maximum 
+                                 defValue:&defaultValue 
+                                   status:&status]) {
+        OBJCWARNING("Failed to get property limits for {}", nameStr);
+        return;
+    }
+    
+    // Get current value
+    if (![self.uvcControl getProperty:propID withValue:&value status:&status]) {
+        value = defaultValue;
+        OBJCWARNING("Failed to get current value for {}: {}", 
+                  nameStr, value);
+        return;
     }
     
     // Create property
@@ -651,6 +654,11 @@ using namespace cs;
         return;
     }
     
+    if (self.uvcControl == nil) {
+        OBJCWARNING("Cannot cache auto property {}: UVC control not initialized", [baseName UTF8String]);
+        return;
+    }
+    
     // Build auto mode property name
     std::string nameStr = std::string([baseName UTF8String]);
     
@@ -658,11 +666,9 @@ using namespace cs;
     bool enabled = false;
     CS_Status status = 0;
     
-    if (self.uvcControl != nil) {
-       if(![self.uvcControl getAutoProperty:propID enabled:&enabled status:&status]) {
+    if(![self.uvcControl getAutoProperty:propID enabled:&enabled status:&status]) {
         OBJCWARNING("Failed to get auto property {}", nameStr);
         return;
-       }
     }
     
     // Create property
