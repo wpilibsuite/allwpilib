@@ -7,8 +7,8 @@ package edu.wpi.first.wpilibj.examples.coroutines.subsystems;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.commandsv3.Command;
-import edu.wpi.first.wpilibj.commandsv3.RequireableResource;
+import org.wpilib.commands3.Command;
+import org.wpilib.commands3.RequireableResource;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 /** Subsystem for managing the compressor, pressure sensor, etc. */

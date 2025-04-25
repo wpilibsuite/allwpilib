@@ -2,7 +2,7 @@ ext {
     useJava = true
     useCpp = false
     baseId = 'commandsv3'
-    groupId = 'edu.wpi.first.wpilibj'
+    groupId = 'org.wpilib'
 
     nativeName = 'commandsv3'
     devMain = ''

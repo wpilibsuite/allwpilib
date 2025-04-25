@@ -5,9 +5,9 @@
 package edu.wpi.first.wpilibj.examples.coroutines.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.commandsv3.Command;
-import edu.wpi.first.wpilibj.commandsv3.RequireableResource;
-import edu.wpi.first.wpilibj.commandsv3.button.Trigger;
+import org.wpilib.commands3.Command;
+import org.wpilib.commands3.RequireableResource;
+import org.wpilib.commands3.button.Trigger;
 import edu.wpi.first.wpilibj.examples.coroutines.Constants.StorageConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 

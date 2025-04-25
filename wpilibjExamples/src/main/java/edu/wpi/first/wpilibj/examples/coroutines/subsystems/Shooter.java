@@ -11,7 +11,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.commandsv3.RequireableResource;
+import org.wpilib.commands3.RequireableResource;
 import edu.wpi.first.wpilibj.examples.coroutines.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 

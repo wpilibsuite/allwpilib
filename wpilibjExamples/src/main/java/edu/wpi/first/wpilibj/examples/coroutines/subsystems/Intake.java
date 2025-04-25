@@ -8,8 +8,8 @@ import static edu.wpi.first.wpilibj.examples.coroutines.Constants.IntakeConstant
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.commandsv3.Command;
-import edu.wpi.first.wpilibj.commandsv3.RequireableResource;
+import org.wpilib.commands3.Command;
+import org.wpilib.commands3.RequireableResource;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 public class Intake extends RequireableResource {

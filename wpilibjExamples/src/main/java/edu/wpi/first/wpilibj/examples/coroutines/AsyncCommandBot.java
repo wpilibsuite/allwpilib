@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.coroutines;
 
-import edu.wpi.first.wpilibj.commandsv3.Command;
-import edu.wpi.first.wpilibj.commandsv3.button.CommandXboxController;
-import edu.wpi.first.wpilibj.commandsv3.button.Trigger;
+import org.wpilib.commands3.Command;
+import org.wpilib.commands3.button.CommandXboxController;
+import org.wpilib.commands3.button.Trigger;
 import edu.wpi.first.wpilibj.examples.coroutines.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.coroutines.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.coroutines.Constants.ShooterConstants;

@@ -5,8 +5,8 @@
 package edu.wpi.first.wpilibj.examples.coroutines;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.commandsv3.Command;
-import edu.wpi.first.wpilibj.commandsv3.Scheduler;
+import org.wpilib.commands3.Command;
+import org.wpilib.commands3.Scheduler;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
