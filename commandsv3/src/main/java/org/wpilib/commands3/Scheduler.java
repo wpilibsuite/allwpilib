@@ -184,26 +184,6 @@ public class Scheduler implements ProtobufSerializable {
       return ScheduleResult.LOWER_PRIORITY_THAN_RUNNING_COMMAND;
     }
 
-    // If scheduled within a composition, prevent the composition from scheduling multiple
-    // conflicting commands
-    // TODO: Should we return quietly instead of throwing an exception?
-    //       Should we cancel the sibling?
-    var siblings = potentialSiblings();
-    var conflictingSibling = siblings.stream().filter(command::conflictsWith).findFirst();
-    if (conflictingSibling.isPresent()) {
-      var conflicts = new ArrayList<>(command.requirements());
-      conflicts.retainAll(conflictingSibling.get().requirements());
-      throw new IllegalArgumentException(
-          "Command "
-              + command.name()
-              + " requires resources that are already used by "
-              + conflictingSibling.get().name()
-              + ". Both require "
-              + conflicts.stream()
-                  .map(RequireableResource::getName)
-                  .collect(Collectors.joining(", ")));
-    }
-
     for (var scheduledState : onDeck) {
       if (!command.conflictsWith(scheduledState.command())) {
         // No shared requirements, skip
@@ -259,22 +239,6 @@ public class Scheduler implements ProtobufSerializable {
     return true;
   }
 
-  private Collection<Command> potentialSiblings() {
-    var siblings = new ArrayList<Command>();
-    for (var state : commandStates.values()) {
-      if (state.parent() != null && state.parent() == currentCommand()) {
-        siblings.add(state.command());
-      }
-    }
-    for (var state : onDeck) {
-      if (state.parent() != null && state.parent() == currentCommand()) {
-        siblings.add(state.command());
-      }
-    }
-
-    return siblings;
-  }
-
   private void evictConflictingOnDeckCommands(Command command) {
     for (var iterator = onDeck.iterator(); iterator.hasNext(); ) {
       var scheduledState = iterator.next();
@@ -300,8 +264,12 @@ public class Scheduler implements ProtobufSerializable {
             .filter(state -> !inheritsFrom(incomingState, state.command()))
             .map(
                 state -> {
+                  // Find the highest level ancestor of the conflicting command from which the
+                  // incoming state does _not_ inherit. If they're totally unrelated, this will
+                  // get the very root ancestor; otherwise, it'll return a direct sibling of the
+                  // incoming command
                   CommandState root = state;
-                  while (root.parent() != null) {
+                  while (root.parent() != null && root.parent() != incomingState.parent()) {
                     root = commandStates.get(root.parent());
                   }
                   return root;

@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.Time;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * A coroutine object is injected into command's {@link Command#run(Coroutine)} method to allow
@@ -102,6 +103,8 @@ public final class Coroutine {
    * @throws IllegalArgumentException if any of the commands conflict with each other
    */
   public void awaitAll(Collection<Command> commands) {
+    validateNoConflicts(commands);
+
     // Schedule anything that's not already queued or running
     for (var command : commands) {
       if (!scheduler.isScheduledOrRunning(command)) {
@@ -135,6 +138,8 @@ public final class Coroutine {
    * @throws IllegalArgumentException if any of the commands conflict with each other
    */
   public void awaitAny(Collection<Command> commands) {
+    validateNoConflicts(commands);
+
     // Schedule anything that's not already queued or running
     for (var command : commands) {
       if (!scheduler.isScheduledOrRunning(command)) {
@@ -156,6 +161,39 @@ public final class Coroutine {
    */
   public void awaitAny(Command... commands) {
     awaitAny(Arrays.asList(commands));
+  }
+
+  /**
+   * Validates that a set of commands have no internal requirement conflicts. An error is thrown if
+   * a conflict is detected.
+   *
+   * @param commands The commands to validate
+   * @throws IllegalArgumentException If at least one pair of commands is found in the input
+   *  where both commands have at least one required resource in common
+   */
+  private static void validateNoConflicts(Collection<Command> commands) {
+    for (var c1 : commands) {
+      for (var c2 : commands) {
+        if (c1 == c2) {
+          // Commands can't conflict with themselves
+          continue;
+        }
+
+        // TODO: Report all pairs of conflicting commands? Instead of just the first one we find
+        if (c1.conflictsWith(c2)) {
+          var conflictNames =
+              c1.requirements().stream()
+                  .filter(c2::requires)
+                  .map(RequireableResource::getName)
+                  .collect(Collectors.joining(", "));
+
+          throw new IllegalArgumentException(
+              "Command %s requires resources that are already used by %s. Both require %s"
+                  .formatted(c2.name(), c1.name(), conflictNames)
+          );
+        }
+      }
+    }
   }
 
   /**

@@ -646,29 +646,35 @@ class SchedulerTest {
   }
 
   @Test
-  void siblingsInCompositionCannotShareRequirements() {
+  void siblingsInCompositionCanShareRequirements() {
     var resource = new RequireableResource("The Resource", scheduler);
+    var firstRan = new AtomicBoolean(false);
+    var secondRan = new AtomicBoolean(false);
+
+    var first = resource.run(c -> {
+      firstRan.set(true);
+      c.park();
+    }).named("First");
+
+    var second = resource.run(c -> {
+      secondRan.set(true);
+      c.park();
+    }).named("Second");
+
     var group = Command.noRequirements(co -> {
-      co.fork(resource.run(Coroutine::park).named("First"));
-      co.fork(resource.run(Coroutine::park).named("Second"));
+      co.fork(first);
+      co.fork(second);
+      co.park();
     }).named("Group");
 
     scheduler.schedule(group);
+    scheduler.run();
 
-    try {
-      scheduler.run();
-      fail("An error should have been thrown");
-    } catch (CommandExecutionException e) {
-      assertEquals(group, e.getCommand());
-      if (e.getCause() instanceof IllegalArgumentException argumentException) {
-        assertEquals(
-            "Command Second requires resources that are already used by First. "
-                + "Both require The Resource",
-            argumentException.getMessage());
-      } else {
-        fail("Unexpected cause: " + e.getCause());
-      }
-    }
+    assertTrue(firstRan.get(), "First child should have run to a yield point");
+    assertTrue(secondRan.get(), "Second child should have run to a yield point");
+    assertFalse(scheduler.isScheduledOrRunning(first), "First child should have been interrupted");
+    assertTrue(scheduler.isRunning(second), "Second child should still be running");
+    assertTrue(scheduler.isRunning(group), "Group should still be running");
   }
 
   @Test
