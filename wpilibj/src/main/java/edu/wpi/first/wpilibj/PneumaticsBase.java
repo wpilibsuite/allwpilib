@@ -9,14 +9,15 @@ public interface PneumaticsBase extends AutoCloseable {
   /**
    * For internal use to get a module for a specific type.
    *
+   * @param busId The bus ID
    * @param module module number
    * @param type module type
    * @return module
    */
-  static PneumaticsBase getForType(int module, PneumaticsModuleType type) {
+  static PneumaticsBase getForType(int busId, int module, PneumaticsModuleType type) {
     return switch (type) {
-      case CTREPCM -> new PneumaticsControlModule(module);
-      case REVPH -> new PneumaticHub(module);
+      case CTREPCM -> new PneumaticsControlModule(busId, module);
+      case REVPH -> new PneumaticHub(busId, module);
     };
   }
 
@@ -245,4 +246,12 @@ public interface PneumaticsBase extends AutoCloseable {
    * @return Compressor object
    */
   Compressor makeCompressor();
+
+  /**
+   * Report usage.
+   *
+   * @param device device and channel as appropriate
+   * @param data arbitrary usage data
+   */
+  void reportUsage(String device, String data);
 }

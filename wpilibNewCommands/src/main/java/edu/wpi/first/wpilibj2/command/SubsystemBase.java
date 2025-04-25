@@ -20,7 +20,7 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
   public SubsystemBase() {
     String name = this.getClass().getSimpleName();
     name = name.substring(name.lastIndexOf('.') + 1);
-    SendableRegistry.addLW(this, name, name);
+    SendableRegistry.add(this, name, name);
     CommandScheduler.getInstance().registerSubsystem(this);
   }
 
@@ -31,7 +31,7 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
    */
   @SuppressWarnings("this-escape")
   public SubsystemBase(String name) {
-    SendableRegistry.addLW(this, name, name);
+    SendableRegistry.add(this, name, name);
     CommandScheduler.getInstance().registerSubsystem(this);
   }
 
@@ -79,7 +79,7 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
    * @param child sendable
    */
   public void addChild(String name, Sendable child) {
-    SendableRegistry.addLW(child, getSubsystem(), name);
+    SendableRegistry.add(child, getSubsystem(), name);
   }
 
   @Override

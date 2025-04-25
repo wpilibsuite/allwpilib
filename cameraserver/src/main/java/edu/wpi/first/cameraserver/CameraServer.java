@@ -4,7 +4,6 @@
 
 package edu.wpi.first.cameraserver;
 
-import edu.wpi.first.cscore.AxisCamera;
 import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
@@ -541,9 +540,7 @@ public final class CameraServer {
    * @return The USB camera capturing images.
    */
   public static UsbCamera startAutomaticCapture() {
-    UsbCamera camera = startAutomaticCapture(m_defaultUsbDevice.getAndIncrement());
-    CameraServerSharedStore.getCameraServerShared().reportUsbCamera(camera.getHandle());
-    return camera;
+    return startAutomaticCapture(m_defaultUsbDevice.getAndIncrement());
   }
 
   /**
@@ -558,7 +555,7 @@ public final class CameraServer {
   public static UsbCamera startAutomaticCapture(int dev) {
     UsbCamera camera = new UsbCamera("USB Camera " + dev, dev);
     startAutomaticCapture(camera);
-    CameraServerSharedStore.getCameraServerShared().reportUsbCamera(camera.getHandle());
+    CameraServerSharedStore.reportUsage("UsbCamera[" + dev + "]", "auto");
     return camera;
   }
 
@@ -572,7 +569,7 @@ public final class CameraServer {
   public static UsbCamera startAutomaticCapture(String name, int dev) {
     UsbCamera camera = new UsbCamera(name, dev);
     startAutomaticCapture(camera);
-    CameraServerSharedStore.getCameraServerShared().reportUsbCamera(camera.getHandle());
+    CameraServerSharedStore.reportUsage("UsbCamera[" + dev + "]", "name");
     return camera;
   }
 
@@ -586,7 +583,7 @@ public final class CameraServer {
   public static UsbCamera startAutomaticCapture(String name, String path) {
     UsbCamera camera = new UsbCamera(name, path);
     startAutomaticCapture(camera);
-    CameraServerSharedStore.getCameraServerShared().reportUsbCamera(camera.getHandle());
+    CameraServerSharedStore.reportUsage("UsbCamera[" + path + "]", "path");
     return camera;
   }
 
@@ -601,72 +598,6 @@ public final class CameraServer {
     MjpegServer server = addServer("serve_" + camera.getName());
     server.setSource(camera);
     return server;
-  }
-
-  /**
-   * Adds an Axis IP camera.
-   *
-   * <p>This overload calls {@link #addAxisCamera(String, String)} with name "Axis Camera".
-   *
-   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-   * @return The Axis camera capturing images.
-   * @deprecated Call startAutomaticCapture with a HttpCamera instead.
-   */
-  @Deprecated(forRemoval = true, since = "2025")
-  @SuppressWarnings("removal")
-  public static AxisCamera addAxisCamera(String host) {
-    return addAxisCamera("Axis Camera", host);
-  }
-
-  /**
-   * Adds an Axis IP camera.
-   *
-   * <p>This overload calls {@link #addAxisCamera(String, String[])} with name "Axis Camera".
-   *
-   * @param hosts Array of Camera host IPs/DNS names
-   * @return The Axis camera capturing images.
-   * @deprecated Call startAutomaticCapture with a HttpCamera instead.
-   */
-  @Deprecated(forRemoval = true, since = "2025")
-  @SuppressWarnings("removal")
-  public static AxisCamera addAxisCamera(String[] hosts) {
-    return addAxisCamera("Axis Camera", hosts);
-  }
-
-  /**
-   * Adds an Axis IP camera.
-   *
-   * @param name The name to give the camera
-   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-   * @return The Axis camera capturing images.
-   * @deprecated Call startAutomaticCapture with a HttpCamera instead.
-   */
-  @Deprecated(forRemoval = true, since = "2025")
-  @SuppressWarnings("removal")
-  public static AxisCamera addAxisCamera(String name, String host) {
-    AxisCamera camera = new AxisCamera(name, host);
-    // Create a passthrough MJPEG server for USB access
-    startAutomaticCapture(camera);
-    CameraServerSharedStore.getCameraServerShared().reportAxisCamera(camera.getHandle());
-    return camera;
-  }
-
-  /**
-   * Adds an Axis IP camera.
-   *
-   * @param name The name to give the camera
-   * @param hosts Array of Camera host IPs/DNS names
-   * @return The Axis camera capturing images.
-   * @deprecated Call startAutomaticCapture with a HttpCamera instead.
-   */
-  @Deprecated(forRemoval = true, since = "2025")
-  @SuppressWarnings("removal")
-  public static AxisCamera addAxisCamera(String name, String[] hosts) {
-    AxisCamera camera = new AxisCamera(name, hosts);
-    // Create a passthrough MJPEG server for USB access
-    startAutomaticCapture(camera);
-    CameraServerSharedStore.getCameraServerShared().reportAxisCamera(camera.getHandle());
-    return camera;
   }
 
   /**

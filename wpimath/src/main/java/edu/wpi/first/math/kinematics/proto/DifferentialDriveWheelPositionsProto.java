@@ -34,7 +34,7 @@ public class DifferentialDriveWheelPositionsProto
   @Override
   public void pack(
       ProtobufDifferentialDriveWheelPositions msg, DifferentialDriveWheelPositions value) {
-    msg.setLeft(value.leftMeters);
-    msg.setRight(value.rightMeters);
+    msg.setLeft(value.left);
+    msg.setRight(value.right);
   }
 }

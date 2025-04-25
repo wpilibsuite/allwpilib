@@ -114,18 +114,6 @@ int32_t HAL_GetTeamNumber(void);
 HAL_RuntimeType HAL_GetRuntimeType(void);
 
 /**
- * Gets the state of the "USER" button on the roboRIO.
- *
- * @warning the User Button is used to stop user programs from automatically
- * loading if it is held for more then 5 seconds. Because of this, it's not
- * recommended to be used by teams for any other purpose.
- *
- * @param[out] status the error code, or 0 for success
- * @return true if the button is currently pressed down
- */
-HAL_Bool HAL_GetFPGAButton(int32_t* status);
-
-/**
  * Gets if the system outputs are currently active.
  *
  * @param[out] status the error code, or 0 for success
@@ -147,30 +135,6 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status);
  * @return number of disables due to communication errors.
  */
 int32_t HAL_GetCommsDisableCount(int32_t* status);
-
-/**
- * Gets a port handle for a specific channel.
- *
- * The created handle does not need to be freed.
- *
- * @param channel the channel number
- * @return the created port
- */
-HAL_PortHandle HAL_GetPort(int32_t channel);
-
-/**
- * Gets a port handle for a specific channel and module.
- *
- * This is expected to be used for PCMs, as the roboRIO does not work with
- * modules anymore.
- *
- * The created handle does not need to be freed.
- *
- * @param module  the module number
- * @param channel the channel number
- * @return the created port
- */
-HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel);
 
 /**
  * Reads the microsecond-resolution timer on the FPGA.

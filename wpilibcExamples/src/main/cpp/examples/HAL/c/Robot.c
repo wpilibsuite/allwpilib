@@ -62,8 +62,7 @@ int main(void) {
 
   // Create a Motor Controller
   status = 0;
-  HAL_DigitalHandle pwmPort =
-      HAL_InitializePWMPort(HAL_GetPort(2), NULL, &status);
+  HAL_DigitalHandle pwmPort = HAL_InitializePWMPort(1, NULL, &status);
 
   if (status != 0) {
     const char* message = HAL_GetLastError(&status);
@@ -71,13 +70,9 @@ int main(void) {
     return 1;
   }
 
-  // Set PWM config to standard servo speeds
-  HAL_SetPWMConfigMicroseconds(pwmPort, 2000, 1501, 1500, 1499, 1000, &status);
-
   // Create an Input
   status = 0;
-  HAL_DigitalHandle dio =
-      HAL_InitializeDIOPort(HAL_GetPort(2), 1, NULL, &status);
+  HAL_DigitalHandle dio = HAL_InitializeDIOPort(2, 1, NULL, &status);
 
   if (status != 0) {
     const char* message = HAL_GetLastError(&status);
@@ -107,9 +102,9 @@ int main(void) {
       case TeleopMode:
         status = 0;
         if (HAL_GetDIO(dio, &status)) {
-          HAL_SetPWMSpeed(pwmPort, 1.0, &status);
+          HAL_SetPWMPulseTimeMicroseconds(pwmPort, 2000, &status);
         } else {
-          HAL_SetPWMSpeed(pwmPort, 0, &status);
+          HAL_SetPWMPulseTimeMicroseconds(pwmPort, 1500, &status);
         }
         break;
       case AutoMode:

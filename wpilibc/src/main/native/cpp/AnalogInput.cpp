@@ -7,9 +7,9 @@
 #include <string>
 
 #include <hal/AnalogInput.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
+#include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -26,16 +26,14 @@ AnalogInput::AnalogInput(int channel) {
   }
 
   m_channel = channel;
-
-  HAL_PortHandle port = HAL_GetPort(channel);
   int32_t status = 0;
   std::string stackTrace = wpi::GetStackTrace(1);
-  m_port = HAL_InitializeAnalogInputPort(port, stackTrace.c_str(), &status);
+  m_port = HAL_InitializeAnalogInputPort(channel, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
-  HAL_Report(HALUsageReporting::kResourceType_AnalogChannel, channel + 1);
+  HAL_ReportUsage("IO", channel, "AnalogInput");
 
-  wpi::SendableRegistry::AddLW(this, "AnalogInput", channel);
+  wpi::SendableRegistry::Add(this, "AnalogInput", channel);
 }
 
 int AnalogInput::GetValue() const {

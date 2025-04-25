@@ -28,7 +28,4 @@ struct AnalogPort {
 extern IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
                              kNumAnalogInputs, HAL_HandleEnum::AnalogInput>*
     analogInputHandles;
-
-int32_t GetAnalogTriggerInputIndex(HAL_AnalogTriggerHandle handle,
-                                   int32_t* status);
 }  // namespace hal

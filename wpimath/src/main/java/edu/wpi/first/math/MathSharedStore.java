@@ -25,7 +25,7 @@ public final class MathSharedStore {
             public void reportError(String error, StackTraceElement[] stackTrace) {}
 
             @Override
-            public void reportUsage(MathUsageId id, int count) {}
+            public void reportUsage(String resource, String data) {}
 
             @Override
             public double getTimestamp() {
@@ -58,11 +58,11 @@ public final class MathSharedStore {
   /**
    * Report usage.
    *
-   * @param id the usage id
-   * @param count the usage count
+   * @param resource the resource name
+   * @param data arbitrary string data
    */
-  public static void reportUsage(MathUsageId id, int count) {
-    getMathShared().reportUsage(id, count);
+  public static void reportUsage(String resource, String data) {
+    getMathShared().reportUsage(resource, data);
   }
 
   /**

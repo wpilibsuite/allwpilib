@@ -8,8 +8,7 @@
 {%- endmacro %}
 package edu.wpi.first.wpilibj;
 
-{{ "// " if SkipReporting }}import edu.wpi.first.hal.FRCNetComm.tResourceType;
-{{ "// " if SkipReporting }}import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
@@ -99,11 +98,11 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    */
   public {{ ConsoleName }}Controller(final int port) {
     super(port);
-    {{ "// " if SkipReporting }}HAL.report(tResourceType.kResourceType_{{ ConsoleName }}Controller, port + 1);
+    HAL.reportUsage("HID", port, "{{ ConsoleName }}Controller");
   }
 {% for stick in sticks %}
   /**
-   * Get the {{ stick.NameParts[1] }} axis value of {{ stick.NameParts[0] }} side of the controller.
+   * Get the {{ stick.NameParts[1] }} axis value of {{ stick.NameParts[0] }} side of the controller. {{ stick.PositiveDirection }} is positive.
    *
    * @return The axis value.
    */

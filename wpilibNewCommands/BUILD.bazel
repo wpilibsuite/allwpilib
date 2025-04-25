@@ -3,6 +3,7 @@ load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//wpilibNewCommands:generate.bzl", "generate_wpilib_new_commands")
 
 py_binary(
@@ -97,6 +98,23 @@ cc_test(
     deps = [
         ":wpilibNewCommands.static",
         "//thirdparty/googletest:googletest.static",
+    ],
+)
+
+wpilib_java_junit5_test(
+    name = "wpilibNewCommands-java-test",
+    srcs = glob(["**/*.java"]),
+    resource_strip_prefix = "wpilibNewCommands/src/test/resources",
+    resources = glob(["src/test/resources/**"]),
+    deps = [
+        ":wpilibNewCommands-java",
+        "//hal:hal-java",
+        "//ntcore:networktables-java",
+        "//wpilibj",
+        "//wpimath:wpimath-java",
+        "//wpiunits",
+        "//wpiutil:wpiutil-java",
+        "@maven//:org_mockito_mockito_core",
     ],
 )
 

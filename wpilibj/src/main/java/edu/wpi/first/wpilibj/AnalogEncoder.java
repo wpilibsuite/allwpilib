@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
@@ -83,7 +84,9 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     m_fullRange = fullRange;
     m_expectedZero = expectedZero;
 
-    SendableRegistry.addLW(this, "Analog Encoder", m_analogInput.getChannel());
+    HAL.reportUsage("IO", m_analogInput.getChannel(), "AnalogEncoder");
+
+    SendableRegistry.add(this, "Analog Encoder", m_analogInput.getChannel());
   }
 
   private double mapSensorRange(double pos) {
@@ -109,7 +112,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     }
 
     double analog = m_analogInput.getVoltage();
-    double pos = analog / RobotController.getVoltage5V();
+    double pos = analog / RobotController.getVoltage3V3();
 
     // Map sensor range if range isn't full
     pos = mapSensorRange(pos);

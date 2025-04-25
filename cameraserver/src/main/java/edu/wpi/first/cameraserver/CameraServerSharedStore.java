@@ -20,16 +20,10 @@ public final class CameraServerSharedStore {
       cameraServerShared =
           new CameraServerShared() {
             @Override
-            public void reportVideoServer(int id) {}
-
-            @Override
-            public void reportUsbCamera(int id) {}
+            public void reportUsage(String resource, String data) {}
 
             @Override
             public void reportDriverStationError(String error) {}
-
-            @Override
-            public void reportAxisCamera(int id) {}
 
             @Override
             public Long getRobotMainThreadId() {
@@ -38,6 +32,16 @@ public final class CameraServerSharedStore {
           };
     }
     return cameraServerShared;
+  }
+
+  /**
+   * Report usage.
+   *
+   * @param resource the resource name
+   * @param data arbitrary string data
+   */
+  public static void reportUsage(String resource, String data) {
+    getCameraServerShared().reportUsage(resource, data);
   }
 
   /**

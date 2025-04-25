@@ -91,10 +91,6 @@
     <Source name="CameraServer.java" />
   </Match>
   <Match>
-    <Bug pattern="SSD_DO_NOT_USE_INSTANCE_LOCK_ON_SHARED_STATIC_DATA" />
-    <Source name="Ultrasonic.java" />
-  </Match>
-  <Match>
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
   </Match>
   <Match>
@@ -133,10 +129,6 @@
   <Match>
     <Bug pattern="URF_UNREAD_FIELD" />
     <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
-  </Match>
-  <Match>
-    <Bug pattern="URF_UNREAD_FIELD" />
-    <Class name="edu.wpi.first.wpilibj.AnalogTrigger" />
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />

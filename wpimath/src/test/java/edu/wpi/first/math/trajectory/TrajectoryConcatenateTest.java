@@ -36,15 +36,15 @@ class TrajectoryConcatenateTest {
       var state = t.getStates().get(i);
 
       // Make sure that the timestamps are strictly increasing.
-      assertTrue(state.timeSeconds > time);
-      time = state.timeSeconds;
+      assertTrue(state.time > time);
+      time = state.time;
 
       // Ensure that the states in t are the same as those in t1 and t2.
       if (i < t1.getStates().size()) {
         assertEquals(state, t1.getStates().get(i));
       } else {
         var st = t2.getStates().get(i - t1.getStates().size() + 1);
-        st.timeSeconds += t1.getTotalTimeSeconds();
+        st.time += t1.getTotalTime();
         assertEquals(state, st);
       }
     }

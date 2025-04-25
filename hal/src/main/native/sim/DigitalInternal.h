@@ -9,7 +9,6 @@
 #include <string>
 
 #include "PortsInternal.h"
-#include "hal/AnalogTrigger.h"
 #include "hal/handles/DigitalHandleResource.h"
 
 namespace hal {
@@ -43,13 +42,6 @@ constexpr int32_t kPwmDisabled = 0;
 
 struct DigitalPort {
   uint8_t channel;
-  bool configSet = false;
-  bool eliminateDeadband = false;
-  int32_t maxPwm = 0;
-  int32_t deadbandMaxPwm = 0;
-  int32_t centerPwm = 0;
-  int32_t deadbandMinPwm = 0;
-  int32_t minPwm = 0;
   int32_t filterIndex = 0;
   std::string previousAllocation;
 };
@@ -57,17 +49,6 @@ struct DigitalPort {
 extern DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
                              kNumDigitalChannels + kNumPWMHeaders>*
     digitalChannelHandles;
-
-/**
- * Remap the digital source channel and set the module.
- *
- * If it's an analog trigger, determine the module from the high order routing
- * channel else do normal digital input remapping based on channel number
- * (MXP).
- */
-bool remapDigitalSource(HAL_Handle digitalSourceHandle,
-                        HAL_AnalogTriggerType analogTriggerType,
-                        uint8_t& channel, uint8_t& module, bool& analogTrigger);
 
 /**
  * Map DIO channel numbers from their physical number (10 to 26) to their

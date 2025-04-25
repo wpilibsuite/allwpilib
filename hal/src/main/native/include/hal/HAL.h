@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #include "hal/AnalogInput.h"
-#include "hal/AnalogTrigger.h"
 #include "hal/CAN.h"
 #include "hal/CANAPI.h"
 #include "hal/CTREPCM.h"
@@ -17,11 +16,8 @@
 #include "hal/DriverStation.h"
 #include "hal/Encoder.h"
 #include "hal/Errors.h"
-#include "hal/FRCUsageReporting.h"
 #include "hal/HALBase.h"
 #include "hal/I2C.h"
-#include "hal/Interrupts.h"
-#include "hal/LEDs.h"
 #include "hal/Main.h"
 #include "hal/Notifier.h"
 #include "hal/PWM.h"
@@ -31,4 +27,5 @@
 #include "hal/SimDevice.h"
 #include "hal/Threads.h"
 #include "hal/Types.h"
+#include "hal/UsageReporting.h"
 #include "hal/Value.h"

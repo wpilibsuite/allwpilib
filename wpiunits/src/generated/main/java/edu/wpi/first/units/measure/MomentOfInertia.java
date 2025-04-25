@@ -87,11 +87,6 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
     return (MomentOfInertia) div(divisor);
   }
 
-  @Override
-  default Velocity<MomentOfInertiaUnit> per(TimeUnit period) {
-    return div(period.of(1));
-  }
-
 
   @Override
   default Mult<MomentOfInertiaUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
@@ -113,6 +108,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   default Per<MomentOfInertiaUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -138,6 +138,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<MomentOfInertiaUnit, AngleUnit> per(AngleUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<MomentOfInertiaUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
@@ -159,6 +164,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   default Per<MomentOfInertiaUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -184,6 +194,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<MomentOfInertiaUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default AngularMomentum times(AngularVelocity multiplier) {
@@ -207,6 +222,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<MomentOfInertiaUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<MomentOfInertiaUnit, CurrentUnit> times(Current multiplier) {
@@ -228,6 +248,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   default Per<MomentOfInertiaUnit, CurrentUnit> divide(Current divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
   @Override
@@ -275,6 +300,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<MomentOfInertiaUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<MomentOfInertiaUnit, EnergyUnit> times(Energy multiplier) {
@@ -296,6 +326,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   default Per<MomentOfInertiaUnit, EnergyUnit> divide(Energy divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -321,6 +356,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<MomentOfInertiaUnit, ForceUnit> per(ForceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<MomentOfInertiaUnit, FrequencyUnit> times(Frequency multiplier) {
@@ -342,6 +382,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   default Per<MomentOfInertiaUnit, FrequencyUnit> divide(Frequency divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -367,6 +412,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<MomentOfInertiaUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<MomentOfInertiaUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
@@ -388,6 +438,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   default Per<MomentOfInertiaUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -413,6 +468,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<MomentOfInertiaUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<MomentOfInertiaUnit, MassUnit> times(Mass multiplier) {
@@ -434,6 +494,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   default Per<MomentOfInertiaUnit, MassUnit> divide(Mass divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, MassUnit> per(MassUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -459,6 +524,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Dimensionless per(MomentOfInertiaUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<MomentOfInertiaUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
@@ -480,6 +550,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   default Per<MomentOfInertiaUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
   }
 
 
@@ -505,6 +580,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<MomentOfInertiaUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
+  }
+
 
   @Override
   default Mult<MomentOfInertiaUnit, PowerUnit> times(Power multiplier) {
@@ -526,6 +606,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   default Per<MomentOfInertiaUnit, PowerUnit> divide(Power divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, PowerUnit> per(PowerUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -551,6 +636,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<MomentOfInertiaUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<MomentOfInertiaUnit, TemperatureUnit> times(Temperature multiplier) {
@@ -572,6 +662,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   default Per<MomentOfInertiaUnit, TemperatureUnit> divide(Temperature divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -597,6 +692,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Velocity<MomentOfInertiaUnit> per(TimeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<MomentOfInertiaUnit, TorqueUnit> times(Torque multiplier) {
@@ -618,6 +718,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   default Per<MomentOfInertiaUnit, TorqueUnit> divide(Torque divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -643,6 +748,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<MomentOfInertiaUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<MomentOfInertiaUnit, VoltageUnit> times(Voltage multiplier) {
@@ -664,6 +774,11 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   default Per<MomentOfInertiaUnit, VoltageUnit> divide(Voltage divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<MomentOfInertiaUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 }

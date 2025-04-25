@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class HatchSubsystem extends SubsystemBase {
   private final DoubleSolenoid m_hatchSolenoid =
       new DoubleSolenoid(
+          0,
           PneumaticsModuleType.CTREPCM,
           HatchConstants.kHatchSolenoidPorts[0],
           HatchConstants.kHatchSolenoidPorts[1]);

@@ -8,11 +8,7 @@
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
-#include "frc/DigitalSource.h"
-
 namespace frc {
-
-class DigitalGlitchFilter;
 
 /**
  * Class to read a digital input.
@@ -23,8 +19,7 @@ class DigitalGlitchFilter;
  * as required. This class is only for devices like switches etc. that aren't
  * implemented anywhere else.
  */
-class DigitalInput : public DigitalSource,
-                     public wpi::Sendable,
+class DigitalInput : public wpi::Sendable,
                      public wpi::SendableHelper<DigitalInput> {
  public:
   /**
@@ -48,26 +43,10 @@ class DigitalInput : public DigitalSource,
    */
   bool Get() const;
 
-  // Digital Source Interface
-  /**
-   * @return The HAL Handle to the specified source.
-   */
-  HAL_Handle GetPortHandleForRouting() const override;
-
-  /**
-   * @return The type of analog trigger output to be used. 0 for Digitals
-   */
-  AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
-
-  /**
-   * Is source an AnalogTrigger
-   */
-  bool IsAnalogTrigger() const override;
-
   /**
    * @return The GPIO channel number that this object represents.
    */
-  int GetChannel() const override;
+  int GetChannel() const;
 
   /**
    * Indicates this input is used by a simulated device.
@@ -81,8 +60,6 @@ class DigitalInput : public DigitalSource,
  private:
   int m_channel;
   hal::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> m_handle;
-
-  friend class DigitalGlitchFilter;
 };
 
 }  // namespace frc

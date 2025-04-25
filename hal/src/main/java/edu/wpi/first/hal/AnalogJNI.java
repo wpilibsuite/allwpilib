@@ -8,43 +8,24 @@ package edu.wpi.first.hal;
  * Analog Input / Output / Trigger JNI Functions.
  *
  * @see "hal/AnalogInput.h"
- * @see "hal/AnalogTrigger.h"
  */
 public class AnalogJNI extends JNIWrapper {
   /**
-   * <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:58</i><br>
-   * enum values
-   */
-  public interface AnalogTriggerType {
-    /** <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:54</i> */
-    int kInWindow = 0;
-
-    /** <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:55</i> */
-    int kState = 1;
-
-    /** <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:56</i> */
-    int kRisingPulse = 2;
-
-    /** <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:57</i> */
-    int kFallingPulse = 3;
-  }
-
-  /**
    * Initializes the analog input port using the given port object.
    *
-   * @param halPortHandle Handle to the port to initialize.
+   * @param channel The smartio channel.
    * @return the created analog input handle
    * @see "HAL_InitializeAnalogInputPort"
    */
-  public static native int initializeAnalogInputPort(int halPortHandle);
+  public static native int initializeAnalogInputPort(int channel);
 
   /**
    * Frees an analog input port.
    *
-   * @param portHandle Handle to the analog port.
+   * @param analogPortHandle Handle to the analog port.
    * @see "HAL_FreeAnalogInputPort"
    */
-  public static native void freeAnalogInputPort(int portHandle);
+  public static native void freeAnalogInputPort(int analogPortHandle);
 
   /**
    * Checks that the analog module number is valid.
@@ -247,145 +228,6 @@ public class AnalogJNI extends JNIWrapper {
    * @see "HAL_GetAnalogOffset"
    */
   public static native int getAnalogOffset(int analogPortHandle);
-
-  /**
-   * Initializes an analog trigger.
-   *
-   * @param analogInputHandle the analog input to use for triggering
-   * @return the created analog trigger handle
-   * @see "HAL_InitializeAnalogTrigger"
-   */
-  public static native int initializeAnalogTrigger(int analogInputHandle);
-
-  /**
-   * Initializes an analog trigger with a Duty Cycle input.
-   *
-   * @param dutyCycleHandle the analog input to use for duty cycle
-   * @return tbe created analog trigger handle
-   * @see "HAL_InitializeAnalogTriggerDutyCycle"
-   */
-  public static native int initializeAnalogTriggerDutyCycle(int dutyCycleHandle);
-
-  /**
-   * Frees an analog trigger.
-   *
-   * @param analogTriggerHandle the trigger handle
-   * @see "HAL_CleanAnalogTrigger"
-   */
-  public static native void cleanAnalogTrigger(int analogTriggerHandle);
-
-  /**
-   * Sets the raw ADC upper and lower limits of the analog trigger.
-   *
-   * <p>HAL_SetAnalogTriggerLimitsVoltage or HAL_SetAnalogTriggerLimitsDutyCycle is likely better in
-   * most cases.
-   *
-   * @param analogTriggerHandle the trigger handle
-   * @param lower the lower ADC value
-   * @param upper the upper ADC value
-   * @see "HAL_SetAnalogTriggerLimitsRaw"
-   */
-  public static native void setAnalogTriggerLimitsRaw(
-      int analogTriggerHandle, int lower, int upper);
-
-  /**
-   * Sets the upper and lower limits of the analog trigger.
-   *
-   * <p>The limits are given as floating point duty cycle values.
-   *
-   * @param analogTriggerHandle the trigger handle
-   * @param lower the lower duty cycle value
-   * @param higher the upper duty cycle value
-   * @see "HAL_SetAnalogTriggerLimitsDutyCycle"
-   */
-  public static native void setAnalogTriggerLimitsDutyCycle(
-      int analogTriggerHandle, double lower, double higher);
-
-  /**
-   * Sets the upper and lower limits of the analog trigger.
-   *
-   * <p>The limits are given as floating point voltage values.
-   *
-   * @param analogTriggerHandle the trigger handle
-   * @param lower the lower voltage value
-   * @param upper the upper voltage value
-   * @see "HAL_SetAnalogTriggerLimitsVoltage"
-   */
-  public static native void setAnalogTriggerLimitsVoltage(
-      int analogTriggerHandle, double lower, double upper);
-
-  /**
-   * Configures the analog trigger to use the averaged vs. raw values.
-   *
-   * <p>If the value is true, then the averaged value is selected for the analog trigger, otherwise
-   * the immediate value is used.
-   *
-   * <p>This is not allowed to be used if filtered mode is set. This is not allowed to be used with
-   * Duty Cycle based inputs.
-   *
-   * @param analogTriggerHandle the trigger handle
-   * @param useAveragedValue true to use averaged values, false for raw
-   * @see "HAL_SetAnalogTriggerAveraged"
-   */
-  public static native void setAnalogTriggerAveraged(
-      int analogTriggerHandle, boolean useAveragedValue);
-
-  /**
-   * Configures the analog trigger to use a filtered value.
-   *
-   * <p>The analog trigger will operate with a 3 point average rejection filter. This is designed to
-   * help with 360 degree pot applications for the period where the pot crosses through zero.
-   *
-   * <p>This is not allowed to be used if averaged mode is set.
-   *
-   * @param analogTriggerHandle the trigger handle
-   * @param useFilteredValue true to use filtered values, false for average or raw
-   * @see "HAL_SetAnalogTriggerFiltered"
-   */
-  public static native void setAnalogTriggerFiltered(
-      int analogTriggerHandle, boolean useFilteredValue);
-
-  /**
-   * Returns the InWindow output of the analog trigger.
-   *
-   * <p>True if the analog input is between the upper and lower limits.
-   *
-   * @param analogTriggerHandle the trigger handle
-   * @return the InWindow output of the analog trigger
-   * @see "HAL_GetAnalogTriggerInWindow"
-   */
-  public static native boolean getAnalogTriggerInWindow(int analogTriggerHandle);
-
-  /**
-   * Returns the TriggerState output of the analog trigger.
-   *
-   * <p>True if above upper limit. False if below lower limit. If in Hysteresis, maintain previous
-   * state.
-   *
-   * @param analogTriggerHandle the trigger handle
-   * @return the TriggerState output of the analog trigger
-   * @see "HAL_GetAnalogTriggerTriggerState"
-   */
-  public static native boolean getAnalogTriggerTriggerState(int analogTriggerHandle);
-
-  /**
-   * Gets the state of the analog trigger output.
-   *
-   * @param analogTriggerHandle the trigger handle
-   * @param type the type of trigger to trigger on
-   * @return the state of the analog trigger output
-   * @see "HAL_GetAnalogTriggerOutput"
-   */
-  public static native boolean getAnalogTriggerOutput(int analogTriggerHandle, int type);
-
-  /**
-   * Get the FPGA index for the AnalogTrigger.
-   *
-   * @param analogTriggerHandle the trigger handle
-   * @return the FPGA index
-   * @see "HAL_GetAnalogTriggerFPGAIndex"
-   */
-  public static native int getAnalogTriggerFPGAIndex(int analogTriggerHandle);
 
   /** Utility class. */
   private AnalogJNI() {}

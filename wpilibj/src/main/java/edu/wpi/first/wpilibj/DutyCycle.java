@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DutyCycleJNI;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -15,7 +14,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * Class to read a duty cycle PWM input.
  *
  * <p>PWM input signals are specified with a frequency and a ratio of high to low in that frequency.
- * There are 8 of these in the roboRIO, and they can be attached to any {@link DigitalSource}.
+ * There are 8 of these in the roboRIO, and they can be attached to any SmartIO Channel.
  *
  * <p>These can be combined as the input of an AnalogTrigger to a Counter in order to implement
  * rollover checking.
@@ -32,11 +31,11 @@ public class DutyCycle implements Sendable, AutoCloseable {
    */
   @SuppressWarnings("this-escape")
   public DutyCycle(int channel) {
-    m_handle = DutyCycleJNI.initialize(HAL.getPort((byte) channel));
+    m_handle = DutyCycleJNI.initialize(channel);
 
     m_channel = channel;
-    HAL.report(tResourceType.kResourceType_DutyCycle, channel + 1);
-    SendableRegistry.addLW(this, "Duty Cycle", channel);
+    HAL.reportUsage("IO", channel, "DutyCycle");
+    SendableRegistry.add(this, "Duty Cycle", channel);
   }
 
   /** Close the DutyCycle and free all resources. */

@@ -8,7 +8,6 @@
 
 #include <frc/controller/PIDController.h>
 #include <frc/geometry/Translation2d.h>
-#include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc2/command/Commands.h>

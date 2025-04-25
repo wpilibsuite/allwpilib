@@ -2,6 +2,7 @@ load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//wpiunits:generate_wpiunits.bzl", "generate_wpiunits")
 
 py_binary(
@@ -31,6 +32,14 @@ java_library(
     srcs = glob(["src/main/java/**/*.java"]) + glob(["src/generated/main/java/**/*.java"]),
     visibility = ["//visibility:public"],
     deps = [],
+)
+
+wpilib_java_junit5_test(
+    name = "wpiunits-test",
+    srcs = glob(["src/test/java/**/*.java"]),
+    deps = [
+        ":wpiunits",
+    ],
 )
 
 java_binary(

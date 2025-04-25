@@ -4,6 +4,10 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
+import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDevice.Direction;
+import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -22,6 +26,16 @@ public abstract class PWMMotorController extends MotorSafety
   /** PWM instances for motor controller. */
   protected PWM m_pwm;
 
+  private SimDevice m_simDevice;
+  private SimDouble m_simSpeed;
+
+  private boolean m_eliminateDeadband;
+  private int m_minPwm;
+  private int m_deadbandMinPwm;
+  private int m_centerPwm;
+  private int m_deadbandMaxPwm;
+  private int m_maxPwm;
+
   /**
    * Constructor.
    *
@@ -32,7 +46,13 @@ public abstract class PWMMotorController extends MotorSafety
   @SuppressWarnings("this-escape")
   protected PWMMotorController(final String name, final int channel) {
     m_pwm = new PWM(channel, false);
-    SendableRegistry.addLW(this, name, channel);
+    SendableRegistry.add(this, name, channel);
+
+    m_simDevice = SimDevice.create("PWMMotorController", channel);
+    if (m_simDevice != null) {
+      m_simSpeed = m_simDevice.createDouble("Speed", Direction.kOutput, 0.0);
+      m_pwm.setSimDevice(m_simDevice);
+    }
   }
 
   /** Free the resource associated with the PWM channel and set the value to 0. */
@@ -40,6 +60,105 @@ public abstract class PWMMotorController extends MotorSafety
   public void close() {
     SendableRegistry.remove(this);
     m_pwm.close();
+
+    if (m_simDevice != null) {
+      m_simDevice.close();
+      m_simDevice = null;
+      m_simSpeed = null;
+    }
+  }
+
+  private int getMinPositivePwm() {
+    if (m_eliminateDeadband) {
+      return m_deadbandMaxPwm;
+    } else {
+      return m_centerPwm + 1;
+    }
+  }
+
+  private int getMaxNegativePwm() {
+    if (m_eliminateDeadband) {
+      return m_deadbandMinPwm;
+    } else {
+      return m_centerPwm - 1;
+    }
+  }
+
+  private int getPositiveScaleFactor() {
+    return m_maxPwm - getMinPositivePwm();
+  }
+
+  private int getNegativeScaleFactor() {
+    return getMaxNegativePwm() - m_minPwm;
+  }
+
+  /**
+   * Takes a speed from -1 to 1, and outputs it in the microsecond format.
+   *
+   * @param speed the speed to output
+   */
+  protected final void setSpeed(double speed) {
+    if (Double.isFinite(speed)) {
+      speed = MathUtil.clamp(speed, -1.0, 1.0);
+    } else {
+      speed = 0.0;
+    }
+
+    if (m_simSpeed != null) {
+      m_simSpeed.set(speed);
+    }
+
+    int rawValue;
+    if (speed == 0.0) {
+      rawValue = m_centerPwm;
+    } else if (speed > 0.0) {
+      rawValue = (int) Math.round(speed * getPositiveScaleFactor()) + getMinPositivePwm();
+    } else {
+      rawValue = (int) Math.round(speed * getNegativeScaleFactor()) + getMaxNegativePwm();
+    }
+
+    m_pwm.setPulseTimeMicroseconds(rawValue);
+  }
+
+  /**
+   * Gets the speed from -1 to 1, from the currently set pulse time.
+   *
+   * @return motor controller speed
+   */
+  protected final double getSpeed() {
+    int rawValue = m_pwm.getPulseTimeMicroseconds();
+
+    if (rawValue == 0) {
+      return 0.0;
+    } else if (rawValue > m_maxPwm) {
+      return 1.0;
+    } else if (rawValue < m_minPwm) {
+      return -1.0;
+    } else if (rawValue > getMinPositivePwm()) {
+      return (rawValue - getMinPositivePwm()) / (double) getPositiveScaleFactor();
+    } else if (rawValue < getMaxNegativePwm()) {
+      return (rawValue - getMaxNegativePwm()) / (double) getNegativeScaleFactor();
+    } else {
+      return 0.0;
+    }
+  }
+
+  /**
+   * Sets the bounds in microseconds for the controller.
+   *
+   * @param maxPwm maximum
+   * @param deadbandMaxPwm deadband max
+   * @param centerPwm center
+   * @param deadbandMinPwm deadmand min
+   * @param minPwm minimum
+   */
+  protected final void setBoundsMicroseconds(
+      int maxPwm, int deadbandMaxPwm, int centerPwm, int deadbandMinPwm, int minPwm) {
+    m_maxPwm = maxPwm;
+    m_deadbandMaxPwm = deadbandMaxPwm;
+    m_centerPwm = centerPwm;
+    m_deadbandMinPwm = deadbandMinPwm;
+    m_minPwm = minPwm;
   }
 
   /**
@@ -55,7 +174,7 @@ public abstract class PWMMotorController extends MotorSafety
     if (m_isInverted) {
       speed = -speed;
     }
-    m_pwm.setSpeed(speed);
+    setSpeed(speed);
 
     for (var follower : m_followers) {
       follower.set(speed);
@@ -65,15 +184,13 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   /**
-   * Get the recently set value of the PWM. This value is affected by the inversion property. If you
-   * want the value that is sent directly to the MotorController, use {@link
-   * edu.wpi.first.wpilibj.PWM#getSpeed()} instead.
+   * Get the recently set value of the PWM. This value is affected by the inversion property.
    *
    * @return The most recently set value for the PWM between -1.0 and 1.0.
    */
   @Override
   public double get() {
-    return m_pwm.getSpeed() * (m_isInverted ? -1.0 : 1.0);
+    return getSpeed() * (m_isInverted ? -1.0 : 1.0);
   }
 
   /**
@@ -99,6 +216,10 @@ public abstract class PWMMotorController extends MotorSafety
   public void disable() {
     m_pwm.setDisabled();
 
+    if (m_simSpeed != null) {
+      m_simSpeed.set(0.0);
+    }
+
     for (var follower : m_followers) {
       follower.disable();
     }
@@ -107,7 +228,7 @@ public abstract class PWMMotorController extends MotorSafety
   @Override
   public void stopMotor() {
     // Don't use set(0) as that will feed the watch kitty
-    m_pwm.setSpeed(0);
+    m_pwm.setPulseTimeMicroseconds(0);
 
     for (var follower : m_followers) {
       follower.stopMotor();
@@ -145,7 +266,7 @@ public abstract class PWMMotorController extends MotorSafety
    *     values.
    */
   public void enableDeadbandElimination(boolean eliminateDeadband) {
-    m_pwm.enableDeadbandElimination(eliminateDeadband);
+    m_eliminateDeadband = eliminateDeadband;
   }
 
   /**
@@ -161,7 +282,6 @@ public abstract class PWMMotorController extends MotorSafety
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Motor Controller");
     builder.setActuator(true);
-    builder.setSafeState(this::disable);
     builder.addDoubleProperty("Value", this::get, this::set);
   }
 }

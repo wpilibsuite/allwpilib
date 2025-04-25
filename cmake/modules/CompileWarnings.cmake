@@ -46,7 +46,7 @@ macro(wpilib_target_warnings target)
 
     # Suppress warning "enumeration types with a fixed underlying type are a
     # Clang extension"
-    if(APPLE)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wno-fixed-enum-extension>)
     endif()
 

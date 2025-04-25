@@ -31,14 +31,12 @@ void InitializeDIO() {
 
 extern "C" {
 
-HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
-                                        HAL_Bool input,
+HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
                                         const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
 
-  int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex) {
+  if (channel < 0 || channel >= kNumDigitalChannels) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
                                      kNumDigitalChannels, channel);
@@ -268,33 +266,5 @@ HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status) {
 
 HAL_Bool HAL_IsAnyPulsing(int32_t* status) {
   return false;  // TODO(Thad) Figure this out
-}
-
-void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
-                         int32_t* status) {
-  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-  // mimics athena HAL
-  port->filterIndex = filterIndex % 4;
-}
-
-int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-  return port->filterIndex;
-}
-
-void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {
-  // TODO(Thad) figure this out
-}
-
-int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status) {
-  return 0;  // TODO(Thad) figure this out
 }
 }  // extern "C"

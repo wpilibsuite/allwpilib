@@ -1,9 +1,11 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//ntcore:generate_ntcore.bzl", "generate_ntcore")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 
 generate_ntcore(
     name = "generate_ntcore",
@@ -53,6 +55,12 @@ filegroup(
 )
 
 filegroup(
+    name = "generated_jni",
+    srcs = glob(["src/generated/main/native/cpp/jni/**"]),
+    visibility = ["//ntcore:__subpackages__"],
+)
+
+filegroup(
     name = "generated_java",
     srcs = glob(["src/generated/main/java/**/*.java"]),
     visibility = ["//ntcore:__subpackages__"],
@@ -73,16 +81,29 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":generated_cc_headers",
+        "//datalog:datalog.static",
         "//wpinet:wpinet.static",
         "//wpiutil:wpiutil.static",
     ],
 )
 
-java_library(
-    name = "networktables-java",
-    srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
+wpilib_jni_cc_library(
+    name = "ntcorejni",
+    srcs = glob(["src/main/native/cpp/jni/**"]) + [":generated_jni"],
+    java_dep = ":networktables-java",
     visibility = ["//visibility:public"],
     deps = [
+        ":ntcore.static",
+    ],
+)
+
+wpilib_jni_java_library(
+    name = "networktables-java",
+    srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
+    native_libs = [":ntcorejni"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//datalog:datalog-java",
         "//wpiutil:wpiutil-java",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
@@ -104,6 +125,16 @@ cc_test(
         ":ntcore.static",
         "//thirdparty/googletest:googletest.static",
         "//wpiutil:wpiutil-testlib",
+    ],
+)
+
+wpilib_java_junit5_test(
+    name = "ntcore-java-test",
+    srcs = glob(["src/test/java/**/*.java"]),
+    tags = ["exclusive"],
+    deps = [
+        ":networktables-java",
+        "//wpiutil:wpiutil-java",
     ],
 )
 

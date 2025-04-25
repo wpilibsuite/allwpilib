@@ -205,12 +205,12 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
    *
    * @param x The current state.
    * @param clampedU The control input.
-   * @param dtSeconds Timestep for model update.
+   * @param dt Timestep for model update in seconds.
    * @return the updated x.
    */
   public Matrix<States, N1> calculateX(
-      Matrix<States, N1> x, Matrix<Inputs, N1> clampedU, double dtSeconds) {
-    var discABpair = Discretization.discretizeAB(m_A, m_B, dtSeconds);
+      Matrix<States, N1> x, Matrix<Inputs, N1> clampedU, double dt) {
+    var discABpair = Discretization.discretizeAB(m_A, m_B, dt);
 
     return discABpair.getFirst().times(x).plus(discABpair.getSecond().times(clampedU));
   }

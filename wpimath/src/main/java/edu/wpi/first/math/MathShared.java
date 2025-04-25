@@ -17,10 +17,10 @@ public interface MathShared {
   /**
    * Report usage.
    *
-   * @param id the usage id
-   * @param count the usage count
+   * @param resource the resource name
+   * @param data arbitrary string data
    */
-  void reportUsage(MathUsageId id, int count);
+  void reportUsage(String resource, String data);
 
   /**
    * Get the current time.

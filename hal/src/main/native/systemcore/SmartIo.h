@@ -6,10 +6,11 @@
 
 #include <string>
 
+#include <networktables/IntegerTopic.h>
+
 #include "PortsInternal.h"
 #include "hal/handles/DigitalHandleResource.h"
 #include "hal/handles/HandlesInternal.h"
-#include "networktables/IntegerTopic.h"
 
 namespace hal {
 
@@ -35,13 +36,6 @@ enum class PwmOutputPeriod {
 
 struct SmartIo {
   uint8_t channel;
-  bool configSet = false;
-  bool eliminateDeadband = false;
-  int32_t maxPwm = 0;
-  int32_t deadbandMaxPwm = 0;
-  int32_t centerPwm = 0;
-  int32_t deadbandMinPwm = 0;
-  int32_t minPwm = 0;
   std::string previousAllocation;
   SmartIoMode currentMode{SmartIoMode::DigitalInput};
   nt::IntegerPublisher modePublisher;
@@ -66,6 +60,8 @@ struct SmartIo {
   int32_t GetPwmMicroseconds(uint16_t* microseconds);
 
   int32_t GetAnalogInput(uint16_t* value);
+
+  int32_t GetCounter(int32_t* count);
 };
 
 extern DigitalHandleResource<HAL_DigitalHandle, SmartIo, kNumSmartIo>*

@@ -6,15 +6,14 @@
 
 #include "frc/motorcontrol/SparkMini.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 using namespace frc;
 
 SparkMini::SparkMini(int channel) : PWMMotorController("SparkMini", channel) {
-  m_pwm.SetBounds(2.5_ms, 1.51_ms, 1.5_ms, 1.49_ms, 0.5_ms);
-  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
-  m_pwm.SetSpeed(0.0);
-  m_pwm.SetZeroLatch();
+  SetBounds(2.5_ms, 1.51_ms, 1.5_ms, 1.49_ms, 0.5_ms);
+  m_pwm.SetOutputPeriod(PWM::kOutputPeriod_5Ms);
+  SetSpeed(0.0);
 
-  HAL_Report(HALUsageReporting::kResourceType_RevSPARK, GetChannel() + 1);
+  HAL_ReportUsage("IO", GetChannel(), "RevSPARK");
 }

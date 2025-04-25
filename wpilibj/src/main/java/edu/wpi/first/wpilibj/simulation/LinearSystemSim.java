@@ -72,13 +72,13 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
   /**
    * Updates the simulation.
    *
-   * @param dtSeconds The time between updates.
+   * @param dt The time between updates in seconds.
    */
-  public void update(double dtSeconds) {
-    // Update X. By default, this is the linear system dynamics X = Ax + Bu
-    m_x = updateX(m_x, m_u, dtSeconds);
+  public void update(double dt) {
+    // Update x. By default, this is the linear system dynamics xₖ₊₁ = Axₖ + Buₖ.
+    m_x = updateX(m_x, m_u, dt);
 
-    // y = cx + du
+    // yₖ = Cxₖ + Duₖ
     m_y = m_plant.calculateY(m_x, m_u);
 
     // Add measurement noise.
@@ -164,6 +164,11 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    */
   public void setState(Matrix<States, N1> state) {
     m_x = state;
+
+    // Update the output to reflect the new state.
+    //
+    //   yₖ = Cxₖ + Duₖ
+    m_y = m_plant.calculateY(m_x, m_u);
   }
 
   /**
@@ -171,12 +176,12 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    *
    * @param currentXhat The current state estimate.
    * @param u The system inputs (usually voltage).
-   * @param dtSeconds The time difference between controller updates.
+   * @param dt The time difference between controller updates in seconds.
    * @return The new state.
    */
   protected Matrix<States, N1> updateX(
-      Matrix<States, N1> currentXhat, Matrix<Inputs, N1> u, double dtSeconds) {
-    return m_plant.calculateX(currentXhat, u, dtSeconds);
+      Matrix<States, N1> currentXhat, Matrix<Inputs, N1> u, double dt) {
+    return m_plant.calculateX(currentXhat, u, dt);
   }
 
   /**

@@ -33,10 +33,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   // The feedforward controller.
   private final SimpleMotorFeedforward m_feedforward =
-      new SimpleMotorFeedforward(
-          DriveConstants.ksVolts,
-          DriveConstants.kvVoltSecondsPerMeter,
-          DriveConstants.kaVoltSecondsSquaredPerMeter);
+      new SimpleMotorFeedforward(DriveConstants.ks, DriveConstants.kv, DriveConstants.ka);
 
   // The robot's drive
   private final DifferentialDrive m_drive =
@@ -46,8 +43,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final TrapezoidProfile m_profile =
       new TrapezoidProfile(
           new TrapezoidProfile.Constraints(
-              DriveConstants.kMaxSpeedMetersPerSecond,
-              DriveConstants.kMaxAccelerationMetersPerSecondSquared));
+              DriveConstants.kMaxSpeed, DriveConstants.kMaxAcceleration));
 
   // The timer
   private final Timer m_timer = new Timer();

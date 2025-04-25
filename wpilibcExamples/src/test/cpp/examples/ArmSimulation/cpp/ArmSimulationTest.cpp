@@ -8,7 +8,7 @@
 #include <frc/Preferences.h>
 #include <frc/simulation/DriverStationSim.h>
 #include <frc/simulation/JoystickSim.h>
-#include <frc/simulation/PWMSim.h>
+#include <frc/simulation/PWMMotorControllerSim.h>
 #include <frc/simulation/SimHooks.h>
 #include <gtest/gtest.h>
 #include <hal/simulation/MockHooks.h>
@@ -23,7 +23,7 @@ class ArmSimulationTest : public testing::TestWithParam<units::degree_t> {
   std::optional<std::thread> m_thread;
 
  protected:
-  frc::sim::PWMSim m_motorSim{kMotorPort};
+  frc::sim::PWMMotorControllerSim m_motorSim{kMotorPort};
   frc::sim::EncoderSim m_encoderSim =
       frc::sim::EncoderSim::CreateForChannel(kEncoderAChannel);
   frc::sim::JoystickSim m_joystickSim{kJoystickPort};
@@ -41,7 +41,6 @@ class ArmSimulationTest : public testing::TestWithParam<units::degree_t> {
     m_thread->join();
 
     m_encoderSim.ResetData();
-    m_motorSim.ResetData();
     frc::sim::DriverStationSim::ResetData();
     frc::Preferences::RemoveAll();
   }
@@ -61,7 +60,6 @@ TEST_P(ArmSimulationTest, Teleop) {
     frc::sim::DriverStationSim::SetEnabled(true);
     frc::sim::DriverStationSim::NotifyNewData();
 
-    EXPECT_TRUE(m_motorSim.GetInitialized());
     EXPECT_TRUE(m_encoderSim.GetInitialized());
   }
 

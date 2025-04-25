@@ -17,11 +17,11 @@ extern "C" {
 #endif
 
 /**
- * Gets the number of analog triggers in the current system.
+ * Gets the number of can buses in the current system.
  *
- * @return the number of analog triggers
+ * @return the number of can buses
  */
-int32_t HAL_GetNumAnalogTriggers(void);
+int32_t HAL_GetNumCanBuses(void);
 
 /**
  * Gets the number of analog inputs in the current system.

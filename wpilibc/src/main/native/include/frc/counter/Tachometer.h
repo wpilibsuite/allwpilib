@@ -14,9 +14,9 @@
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
-namespace frc {
-class DigitalSource;
+#include "EdgeConfiguration.h"
 
+namespace frc {
 /**
  * Tachometer for getting rotational speed from a device.
  *
@@ -32,21 +32,22 @@ class Tachometer : public wpi::Sendable,
   /**
    * Constructs a new tachometer.
    *
-   * @param source The source.
+   * @param channel The DIO Channel.
+   * @param configuration Edge configuration
    */
-  explicit Tachometer(DigitalSource& source);
-
-  /**
-   * Constructs a new tachometer.
-   *
-   * @param source The source.
-   */
-  explicit Tachometer(std::shared_ptr<DigitalSource> source);
+  Tachometer(int channel, EdgeConfiguration configuration);
 
   Tachometer(Tachometer&&) = default;
   Tachometer& operator=(Tachometer&&) = default;
 
   ~Tachometer() override = default;
+
+  /**
+   * Sets the configuration for the channel.
+   *
+   * @param configuration The channel configuration.
+   */
+  void SetEdgeConfiguration(EdgeConfiguration configuration);
 
   /**
    * Gets the tachometer frequency.
@@ -102,40 +103,18 @@ class Tachometer : public wpi::Sendable,
   bool GetStopped() const;
 
   /**
-   * Gets the number of sample to average.
-   *
-   * @return Samples to average.
-   */
-  int GetSamplesToAverage() const;
-
-  /**
-   * Sets the number of samples to average.
-   *
-   * @param samples Samples to average.
-   */
-  void SetSamplesToAverage(int samples);
-
-  /**
    * Sets the maximum period before the tachometer is considered stopped.
    *
    * @param maxPeriod The max period.
    */
   void SetMaxPeriod(units::second_t maxPeriod);
 
-  /**
-   * Sets if to update when empty.
-   *
-   * @param updateWhenEmpty True to update when empty.
-   */
-  void SetUpdateWhenEmpty(bool updateWhenEmpty);
-
  protected:
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  std::shared_ptr<DigitalSource> m_source;
   hal::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;
   int m_edgesPerRevolution;
-  int32_t m_index;
+  int32_t m_channel;
 };
 }  // namespace frc

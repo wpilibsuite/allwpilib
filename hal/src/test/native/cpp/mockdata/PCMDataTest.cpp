@@ -38,7 +38,7 @@ TEST(PCMDataTest, PCMInitialization) {
   // Use out of range index
   module = 8000;
   gTestSolenoidCallbackName = "Unset";
-  pcmHandle = HAL_InitializeCTREPCM(module, nullptr, &status);
+  pcmHandle = HAL_InitializeCTREPCM(0, module, nullptr, &status);
   EXPECT_EQ(HAL_kInvalidHandle, pcmHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
@@ -49,7 +49,7 @@ TEST(PCMDataTest, PCMInitialization) {
   status = 0;
   module = MODULE_TO_TEST;
   gTestSolenoidCallbackName = "Unset";
-  pcmHandle = HAL_InitializeCTREPCM(module, nullptr, &status);
+  pcmHandle = HAL_InitializeCTREPCM(0, module, nullptr, &status);
   EXPECT_TRUE(HAL_kInvalidHandle != pcmHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestSolenoidCallbackName.c_str());
@@ -58,7 +58,7 @@ TEST(PCMDataTest, PCMInitialization) {
   status = 0;
   module = MODULE_TO_TEST;
   gTestSolenoidCallbackName = "Unset";
-  pcmHandle = HAL_InitializeCTREPCM(module, nullptr, &status);
+  pcmHandle = HAL_InitializeCTREPCM(0, module, nullptr, &status);
   EXPECT_EQ(HAL_kInvalidHandle, pcmHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
@@ -76,7 +76,7 @@ TEST(PCMDataTest, PCMInitialization) {
   status = 0;
   module = MODULE_TO_TEST;
   gTestSolenoidCallbackName = "Unset";
-  pcmHandle = HAL_InitializeCTREPCM(module, nullptr, &status);
+  pcmHandle = HAL_InitializeCTREPCM(0, module, nullptr, &status);
   EXPECT_TRUE(HAL_kInvalidHandle != pcmHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestSolenoidCallbackName.c_str());

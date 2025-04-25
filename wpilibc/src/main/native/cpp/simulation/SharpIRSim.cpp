@@ -16,9 +16,9 @@ SharpIRSim::SharpIRSim(const SharpIR& sharpIR)
 
 SharpIRSim::SharpIRSim(int channel) {
   frc::sim::SimDeviceSim deviceSim{"SharpIR", channel};
-  m_simRange = deviceSim.GetDouble("Range (cm)");
+  m_simRange = deviceSim.GetDouble("Range (m)");
 }
 
-void SharpIRSim::SetRange(units::centimeter_t rng) {
-  m_simRange.Set(rng.value());
+void SharpIRSim::SetRange(units::meter_t range) {
+  m_simRange.Set(range.value());
 }

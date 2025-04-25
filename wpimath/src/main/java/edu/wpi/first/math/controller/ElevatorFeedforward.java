@@ -15,16 +15,16 @@ import edu.wpi.first.util.struct.StructSerializable;
  */
 public class ElevatorFeedforward implements ProtobufSerializable, StructSerializable {
   /** The static gain, in volts. */
-  private final double ks;
+  private double ks;
 
   /** The gravity gain, in volts. */
-  private final double kg;
+  private double kg;
 
   /** The velocity gain, in V/(m/s). */
-  private final double kv;
+  private double kv;
 
   /** The acceleration gain, in V/(m/s²). */
-  private final double ka;
+  private double ka;
 
   /** The period, in seconds. */
   private final double m_dt;
@@ -36,12 +36,12 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    * @param kg The gravity gain in volts.
    * @param kv The velocity gain in V/(m/s).
    * @param ka The acceleration gain in V/(m/s²).
-   * @param dtSeconds The period in seconds.
+   * @param dt The period in seconds.
    * @throws IllegalArgumentException for kv &lt; zero.
    * @throws IllegalArgumentException for ka &lt; zero.
    * @throws IllegalArgumentException for period &le; zero.
    */
-  public ElevatorFeedforward(double ks, double kg, double kv, double ka, double dtSeconds) {
+  public ElevatorFeedforward(double ks, double kg, double kv, double ka, double dt) {
     this.ks = ks;
     this.kg = kg;
     this.kv = kv;
@@ -52,11 +52,10 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
     if (ka < 0.0) {
       throw new IllegalArgumentException("ka must be a non-negative number, got " + ka + "!");
     }
-    if (dtSeconds <= 0.0) {
-      throw new IllegalArgumentException(
-          "period must be a positive number, got " + dtSeconds + "!");
+    if (dt <= 0.0) {
+      throw new IllegalArgumentException("period must be a positive number, got " + dt + "!");
     }
-    m_dt = dtSeconds;
+    m_dt = dt;
   }
 
   /**
@@ -84,6 +83,42 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    */
   public ElevatorFeedforward(double ks, double kg, double kv) {
     this(ks, kg, kv, 0);
+  }
+
+  /**
+   * Sets the static gain.
+   *
+   * @param ks The static gain in volts.
+   */
+  public void setKs(double ks) {
+    this.ks = ks;
+  }
+
+  /**
+   * Sets the gravity gain.
+   *
+   * @param kg The gravity gain in volts.
+   */
+  public void setKg(double kg) {
+    this.kg = kg;
+  }
+
+  /**
+   * Sets the velocity gain.
+   *
+   * @param kv The velocity gain in V/(m/s).
+   */
+  public void setKv(double kv) {
+    this.kv = kv;
+  }
+
+  /**
+   * Sets the acceleration gain.
+   *
+   * @param ka The acceleration gain in V/(m/s²).
+   */
+  public void setKa(double ka) {
+    this.ka = ka;
   }
 
   /**

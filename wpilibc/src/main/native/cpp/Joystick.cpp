@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 #include "frc/event/BooleanEvent.h"
 
@@ -19,7 +19,7 @@ Joystick::Joystick(int port) : GenericHID(port) {
   m_axes[Axis::kTwist] = kDefaultTwistChannel;
   m_axes[Axis::kThrottle] = kDefaultThrottleChannel;
 
-  HAL_Report(HALUsageReporting::kResourceType_Joystick, port + 1);
+  HAL_ReportUsage("HID", port, "Joystick");
 }
 
 void Joystick::SetXChannel(int channel) {
@@ -119,5 +119,13 @@ double Joystick::GetMagnitude() const {
 }
 
 units::radian_t Joystick::GetDirection() const {
+  // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#joystick-and-controller-coordinate-system
+  // A positive rotation around the X axis moves the joystick right, and a
+  // positive rotation around the Y axis moves the joystick backward. When
+  // treating them as translations, 0 radians is measured from the right
+  // direction, and angle increases clockwise.
+  //
+  // It's rotated 90 degrees CCW (y is negated and the arguments are reversed)
+  // so that 0 radians is forward.
   return units::radian_t{std::atan2(GetX(), -GetY())};
 }

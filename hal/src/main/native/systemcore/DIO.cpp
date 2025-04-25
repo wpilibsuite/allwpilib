@@ -25,14 +25,12 @@ void InitializeDIO() {}
 
 extern "C" {
 
-HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
-                                        HAL_Bool input,
+HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
                                         const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
 
-  int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex || channel >= kNumSmartIo) {
+  if (channel < 0 || channel >= kNumSmartIo) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
                                      kNumSmartIo, channel);
@@ -179,13 +177,13 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
   }
 }
 
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
+void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
                int32_t* status) {
   *status = HAL_HANDLE_ERROR;
   return;
 }
 
-void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
+void HAL_PulseMultiple(uint32_t channelMask, double pulseLength,
                        int32_t* status) {
   *status = HAL_HANDLE_ERROR;
   return;
@@ -199,27 +197,6 @@ HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status) {
 HAL_Bool HAL_IsAnyPulsing(int32_t* status) {
   *status = HAL_HANDLE_ERROR;
   return false;
-}
-
-void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
-                         int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
 }
 
 }  // extern "C"

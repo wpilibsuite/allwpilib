@@ -6,15 +6,14 @@
 
 #include "frc/motorcontrol/Koors40.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 using namespace frc;
 
 Koors40::Koors40(int channel) : PWMMotorController("Koors40", channel) {
-  m_pwm.SetBounds(2.004_ms, 1.52_ms, 1.5_ms, 1.48_ms, 0.997_ms);
-  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_4X);
-  m_pwm.SetSpeed(0.0);
-  m_pwm.SetZeroLatch();
+  SetBounds(2.004_ms, 1.52_ms, 1.5_ms, 1.48_ms, 0.997_ms);
+  m_pwm.SetOutputPeriod(PWM::kOutputPeriod_20Ms);
+  SetSpeed(0.0);
 
-  HAL_Report(HALUsageReporting::kResourceType_Koors40, GetChannel() + 1);
+  HAL_ReportUsage("IO", GetChannel(), "Koors40");
 }

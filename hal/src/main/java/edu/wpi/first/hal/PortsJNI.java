@@ -11,12 +11,12 @@ package edu.wpi.first.hal;
  */
 public class PortsJNI extends JNIWrapper {
   /**
-   * Gets the number of analog triggers in the current system.
+   * Gets the number of can buses in the current system.
    *
-   * @return the number of analog triggers
-   * @see "HAL_GetNumAnalogTriggers"
+   * @return the number of can buses
+   * @see "HAL_GetNumCanBuses"
    */
-  public static native int getNumAnalogTriggers();
+  public static native int getNumCanBuses();
 
   /**
    * Gets the number of analog inputs in the current system.

@@ -14,11 +14,11 @@ import edu.wpi.first.util.struct.StructSerializable;
 
 /** Represents the wheel speeds for a differential drive drivetrain. */
 public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, StructSerializable {
-  /** Speed of the left side of the robot. */
-  public double leftMetersPerSecond;
+  /** Speed of the left side of the robot in meters per second. */
+  public double left;
 
-  /** Speed of the right side of the robot. */
-  public double rightMetersPerSecond;
+  /** Speed of the right side of the robot in meters per second. */
+  public double right;
 
   /** DifferentialDriveWheelSpeeds protobuf for serialization. */
   public static final DifferentialDriveWheelSpeedsProto proto =
@@ -34,19 +34,19 @@ public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, Struc
   /**
    * Constructs a DifferentialDriveWheelSpeeds.
    *
-   * @param leftMetersPerSecond The left speed.
-   * @param rightMetersPerSecond The right speed.
+   * @param left The left speed in meters per second.
+   * @param right The right speed in meters per second.
    */
-  public DifferentialDriveWheelSpeeds(double leftMetersPerSecond, double rightMetersPerSecond) {
-    this.leftMetersPerSecond = leftMetersPerSecond;
-    this.rightMetersPerSecond = rightMetersPerSecond;
+  public DifferentialDriveWheelSpeeds(double left, double right) {
+    this.left = left;
+    this.right = right;
   }
 
   /**
    * Constructs a DifferentialDriveWheelSpeeds.
    *
-   * @param left The left speed.
-   * @param right The right speed.
+   * @param left The left speed in meters per second.
+   * @param right The right speed in meters per second.
    */
   public DifferentialDriveWheelSpeeds(LinearVelocity left, LinearVelocity right) {
     this(left.in(MetersPerSecond), right.in(MetersPerSecond));
@@ -60,15 +60,14 @@ public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, Struc
    * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
    * absolute threshold, while maintaining the ratio of speeds between wheels.
    *
-   * @param attainableMaxSpeedMetersPerSecond The absolute max speed that a wheel can reach.
+   * @param attainableMaxSpeed The absolute max speed in meters per second that a wheel can reach.
    */
-  public void desaturate(double attainableMaxSpeedMetersPerSecond) {
-    double realMaxSpeed = Math.max(Math.abs(leftMetersPerSecond), Math.abs(rightMetersPerSecond));
+  public void desaturate(double attainableMaxSpeed) {
+    double realMaxSpeed = Math.max(Math.abs(left), Math.abs(right));
 
-    if (realMaxSpeed > attainableMaxSpeedMetersPerSecond) {
-      leftMetersPerSecond = leftMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond;
-      rightMetersPerSecond =
-          rightMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond;
+    if (realMaxSpeed > attainableMaxSpeed) {
+      left = left / realMaxSpeed * attainableMaxSpeed;
+      right = right / realMaxSpeed * attainableMaxSpeed;
     }
   }
 
@@ -80,7 +79,7 @@ public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, Struc
    * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
    * absolute threshold, while maintaining the ratio of speeds between wheels.
    *
-   * @param attainableMaxSpeed The absolute max speed that a wheel can reach.
+   * @param attainableMaxSpeed The absolute max speed in meters per second that a wheel can reach.
    */
   public void desaturate(LinearVelocity attainableMaxSpeed) {
     desaturate(attainableMaxSpeed.in(MetersPerSecond));
@@ -96,9 +95,7 @@ public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, Struc
    * @return The sum of the DifferentialDriveWheelSpeeds.
    */
   public DifferentialDriveWheelSpeeds plus(DifferentialDriveWheelSpeeds other) {
-    return new DifferentialDriveWheelSpeeds(
-        leftMetersPerSecond + other.leftMetersPerSecond,
-        rightMetersPerSecond + other.rightMetersPerSecond);
+    return new DifferentialDriveWheelSpeeds(left + other.left, right + other.right);
   }
 
   /**
@@ -112,9 +109,7 @@ public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, Struc
    * @return The difference between the two DifferentialDriveWheelSpeeds.
    */
   public DifferentialDriveWheelSpeeds minus(DifferentialDriveWheelSpeeds other) {
-    return new DifferentialDriveWheelSpeeds(
-        leftMetersPerSecond - other.leftMetersPerSecond,
-        rightMetersPerSecond - other.rightMetersPerSecond);
+    return new DifferentialDriveWheelSpeeds(left - other.left, right - other.right);
   }
 
   /**
@@ -124,7 +119,7 @@ public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, Struc
    * @return The inverse of the current DifferentialDriveWheelSpeeds.
    */
   public DifferentialDriveWheelSpeeds unaryMinus() {
-    return new DifferentialDriveWheelSpeeds(-leftMetersPerSecond, -rightMetersPerSecond);
+    return new DifferentialDriveWheelSpeeds(-left, -right);
   }
 
   /**
@@ -138,8 +133,7 @@ public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, Struc
    * @return The scaled DifferentialDriveWheelSpeeds.
    */
   public DifferentialDriveWheelSpeeds times(double scalar) {
-    return new DifferentialDriveWheelSpeeds(
-        leftMetersPerSecond * scalar, rightMetersPerSecond * scalar);
+    return new DifferentialDriveWheelSpeeds(left * scalar, right * scalar);
   }
 
   /**
@@ -153,14 +147,12 @@ public class DifferentialDriveWheelSpeeds implements ProtobufSerializable, Struc
    * @return The scaled DifferentialDriveWheelSpeeds.
    */
   public DifferentialDriveWheelSpeeds div(double scalar) {
-    return new DifferentialDriveWheelSpeeds(
-        leftMetersPerSecond / scalar, rightMetersPerSecond / scalar);
+    return new DifferentialDriveWheelSpeeds(left / scalar, right / scalar);
   }
 
   @Override
   public String toString() {
     return String.format(
-        "DifferentialDriveWheelSpeeds(Left: %.2f m/s, Right: %.2f m/s)",
-        leftMetersPerSecond, rightMetersPerSecond);
+        "DifferentialDriveWheelSpeeds(Left: %.2f m/s, Right: %.2f m/s)", left, right);
   }
 }

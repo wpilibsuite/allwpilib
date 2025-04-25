@@ -59,8 +59,19 @@ class ElevatorSimTest {
         encoderSim.setDistance(y.get(0, 0));
       }
 
-      assertEquals(controller.getSetpoint(), sim.getPositionMeters(), 0.2);
+      assertEquals(controller.getSetpoint(), sim.getPosition(), 0.2);
     }
+  }
+
+  @Test
+  void testInitialState() {
+    double startingHeightMeters = 0.5;
+    var sim =
+        new ElevatorSim(
+            DCMotor.getKrakenX60(2), 20, 8.0, 0.1, 0.0, 1.0, true, startingHeightMeters, 0.01, 0.0);
+
+    assertEquals(startingHeightMeters, sim.getPosition());
+    assertEquals(0, sim.getVelocity());
   }
 
   @Test
@@ -81,14 +92,14 @@ class ElevatorSimTest {
     for (int i = 0; i < 100; i++) {
       sim.setInput(VecBuilder.fill(0));
       sim.update(0.020);
-      var height = sim.getPositionMeters();
+      var height = sim.getPosition();
       assertTrue(height >= -0.05);
     }
 
     for (int i = 0; i < 100; i++) {
       sim.setInput(VecBuilder.fill(12.0));
       sim.update(0.020);
-      var height = sim.getPositionMeters();
+      var height = sim.getPosition();
       assertTrue(height <= 1.05);
     }
   }
@@ -110,7 +121,7 @@ class ElevatorSimTest {
             DCMotor.getVex775Pro(4), 4, Units.inchesToMeters(0.5), 100);
     assertEquals(
         system.calculateX(VecBuilder.fill(0, 0), VecBuilder.fill(12), 0.02 * 50.0).get(0, 0),
-        sim.getPositionMeters(),
+        sim.getPosition(),
         0.01);
   }
 }

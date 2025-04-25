@@ -5,7 +5,6 @@
 package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
@@ -23,15 +22,15 @@ public class MecanumDriveOdometry extends Odometry<MecanumDriveWheelPositions> {
    * @param kinematics The mecanum drive kinematics for your drivetrain.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The distances driven by each wheel.
-   * @param initialPoseMeters The starting position of the robot on the field.
+   * @param initialPose The starting position of the robot on the field.
    */
   public MecanumDriveOdometry(
       MecanumDriveKinematics kinematics,
       Rotation2d gyroAngle,
       MecanumDriveWheelPositions wheelPositions,
-      Pose2d initialPoseMeters) {
-    super(kinematics, gyroAngle, wheelPositions, initialPoseMeters);
-    MathSharedStore.reportUsage(MathUsageId.kOdometry_MecanumDrive, 1);
+      Pose2d initialPose) {
+    super(kinematics, gyroAngle, wheelPositions, initialPose);
+    MathSharedStore.reportUsage("MecanumDriveOdometry", "");
   }
 
   /**

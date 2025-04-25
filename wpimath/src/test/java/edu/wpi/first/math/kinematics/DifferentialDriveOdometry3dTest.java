@@ -25,7 +25,7 @@ class DifferentialDriveOdometry3dTest {
             0,
             0,
             new Pose3d(1, 2, 0, new Rotation3d(0, 0, Units.degreesToRadians(45))));
-    var pose = odometry.getPoseMeters();
+    var pose = odometry.getPose();
     assertAll(
         () -> assertEquals(pose.getX(), 1.0, kEpsilon),
         () -> assertEquals(pose.getY(), 2.0, kEpsilon),

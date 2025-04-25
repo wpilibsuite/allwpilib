@@ -38,18 +38,18 @@ public class SwerveDrivePoseEstimator extends PoseEstimator<SwerveModulePosition
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The current gyro angle.
    * @param modulePositions The current distance measurements and rotations of the swerve modules.
-   * @param initialPoseMeters The starting pose estimate.
+   * @param initialPose The starting pose estimate.
    */
   public SwerveDrivePoseEstimator(
       SwerveDriveKinematics kinematics,
       Rotation2d gyroAngle,
       SwerveModulePosition[] modulePositions,
-      Pose2d initialPoseMeters) {
+      Pose2d initialPose) {
     this(
         kinematics,
         gyroAngle,
         modulePositions,
-        initialPoseMeters,
+        initialPose,
         VecBuilder.fill(0.1, 0.1, 0.1),
         VecBuilder.fill(0.9, 0.9, 0.9));
   }
@@ -60,7 +60,7 @@ public class SwerveDrivePoseEstimator extends PoseEstimator<SwerveModulePosition
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param gyroAngle The current gyro angle.
    * @param modulePositions The current distance and rotation measurements of the swerve modules.
-   * @param initialPoseMeters The starting pose estimate.
+   * @param initialPose The starting pose estimate.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
    *     in meters, and heading in radians). Increase these numbers to trust your state estimate
    *     less.
@@ -72,12 +72,12 @@ public class SwerveDrivePoseEstimator extends PoseEstimator<SwerveModulePosition
       SwerveDriveKinematics kinematics,
       Rotation2d gyroAngle,
       SwerveModulePosition[] modulePositions,
-      Pose2d initialPoseMeters,
+      Pose2d initialPose,
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     super(
         kinematics,
-        new SwerveDriveOdometry(kinematics, gyroAngle, modulePositions, initialPoseMeters),
+        new SwerveDriveOdometry(kinematics, gyroAngle, modulePositions, initialPose),
         stateStdDevs,
         visionMeasurementStdDevs);
 
@@ -86,13 +86,13 @@ public class SwerveDrivePoseEstimator extends PoseEstimator<SwerveModulePosition
 
   @Override
   public Pose2d updateWithTime(
-      double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] wheelPositions) {
+      double currentTime, Rotation2d gyroAngle, SwerveModulePosition[] wheelPositions) {
     if (wheelPositions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
               + "constructor");
     }
 
-    return super.updateWithTime(currentTimeSeconds, gyroAngle, wheelPositions);
+    return super.updateWithTime(currentTime, gyroAngle, wheelPositions);
   }
 }

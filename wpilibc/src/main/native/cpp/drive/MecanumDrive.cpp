@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -46,14 +46,13 @@ MecanumDrive::MecanumDrive(std::function<void(double)> frontLeftMotor,
       m_rearRightMotor{std::move(rearRightMotor)} {
   static int instances = 0;
   ++instances;
-  wpi::SendableRegistry::AddLW(this, "MecanumDrive", instances);
+  wpi::SendableRegistry::Add(this, "MecanumDrive", instances);
 }
 
 void MecanumDrive::DriveCartesian(double xSpeed, double ySpeed,
                                   double zRotation, Rotation2d gyroAngle) {
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
-               HALUsageReporting::kRobotDrive2_MecanumCartesian, 4);
+    HAL_ReportUsage("RobotDrive", "MecanumCartesian");
     reported = true;
   }
 
@@ -79,8 +78,7 @@ void MecanumDrive::DriveCartesian(double xSpeed, double ySpeed,
 void MecanumDrive::DrivePolar(double magnitude, Rotation2d angle,
                               double zRotation) {
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
-               HALUsageReporting::kRobotDrive2_MecanumPolar, 4);
+    HAL_ReportUsage("RobotDrive", "MecanumPolar");
     reported = true;
   }
 
@@ -133,7 +131,6 @@ std::string MecanumDrive::GetDescription() const {
 void MecanumDrive::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("MecanumDrive");
   builder.SetActuator(true);
-  builder.SetSafeState([=, this] { StopMotor(); });
   builder.AddDoubleProperty(
       "Front Left Motor Speed", [&] { return m_frontLeftOutput; },
       m_frontLeftMotor);

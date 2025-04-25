@@ -16,8 +16,6 @@ class DigitalOutputTest {
   @Test
   void testDefaultFunctions() {
     try (DigitalOutput output = new DigitalOutput(0)) {
-      assertFalse(output.isAnalogTrigger());
-      assertEquals(0, output.getAnalogTriggerTypeForRouting());
       assertFalse(output.isPulsing());
     }
   }

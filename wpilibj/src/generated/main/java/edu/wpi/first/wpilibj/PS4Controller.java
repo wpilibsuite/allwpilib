@@ -6,7 +6,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -125,11 +124,11 @@ public class PS4Controller extends GenericHID implements Sendable {
    */
   public PS4Controller(final int port) {
     super(port);
-    HAL.report(tResourceType.kResourceType_PS4Controller, port + 1);
+    HAL.reportUsage("HID", port, "PS4Controller");
   }
 
   /**
-   * Get the X axis value of left side of the controller.
+   * Get the X axis value of left side of the controller. Right is positive.
    *
    * @return The axis value.
    */
@@ -138,7 +137,7 @@ public class PS4Controller extends GenericHID implements Sendable {
   }
 
   /**
-   * Get the Y axis value of left side of the controller.
+   * Get the Y axis value of left side of the controller. Back is positive.
    *
    * @return The axis value.
    */
@@ -147,7 +146,7 @@ public class PS4Controller extends GenericHID implements Sendable {
   }
 
   /**
-   * Get the X axis value of right side of the controller.
+   * Get the X axis value of right side of the controller. Right is positive.
    *
    * @return The axis value.
    */
@@ -156,7 +155,7 @@ public class PS4Controller extends GenericHID implements Sendable {
   }
 
   /**
-   * Get the Y axis value of right side of the controller.
+   * Get the Y axis value of right side of the controller. Back is positive.
    *
    * @return The axis value.
    */

@@ -55,7 +55,6 @@ public class EpilogueGenerator {
         out.println("import static edu.wpi.first.units.Units.Seconds;");
         out.println();
 
-        out.println("import edu.wpi.first.hal.FRCNetComm;");
         out.println("import edu.wpi.first.hal.HAL;");
         out.println();
 
@@ -89,10 +88,7 @@ public class EpilogueGenerator {
         out.println(
             """
               static {
-                HAL.report(
-                  FRCNetComm.tResourceType.kResourceType_LoggingFramework,
-                  FRCNetComm.tInstances.kLoggingFramework_Epilogue
-                );
+                HAL.reportUsage("Epilogue", "");
               }
             """);
 

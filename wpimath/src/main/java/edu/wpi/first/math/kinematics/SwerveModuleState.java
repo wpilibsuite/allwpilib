@@ -17,8 +17,8 @@ import java.util.Objects;
 /** Represents the state of one swerve module. */
 public class SwerveModuleState
     implements Comparable<SwerveModuleState>, ProtobufSerializable, StructSerializable {
-  /** Speed of the wheel of the module. */
-  public double speedMetersPerSecond;
+  /** Speed of the wheel of the module in meters per second. */
+  public double speed;
 
   /** Angle of the module. */
   public Rotation2d angle = Rotation2d.kZero;
@@ -35,11 +35,11 @@ public class SwerveModuleState
   /**
    * Constructs a SwerveModuleState.
    *
-   * @param speedMetersPerSecond The speed of the wheel of the module.
+   * @param speed The speed of the wheel of the module in meters per second.
    * @param angle The angle of the module.
    */
-  public SwerveModuleState(double speedMetersPerSecond, Rotation2d angle) {
-    this.speedMetersPerSecond = speedMetersPerSecond;
+  public SwerveModuleState(double speed, Rotation2d angle) {
+    this.speed = speed;
     this.angle = angle;
   }
 
@@ -56,13 +56,13 @@ public class SwerveModuleState
   @Override
   public boolean equals(Object obj) {
     return obj instanceof SwerveModuleState other
-        && Math.abs(other.speedMetersPerSecond - speedMetersPerSecond) < 1E-9
+        && Math.abs(other.speed - speed) < 1E-9
         && angle.equals(other.angle);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(speedMetersPerSecond, angle);
+    return Objects.hash(speed, angle);
   }
 
   /**
@@ -74,13 +74,12 @@ public class SwerveModuleState
    */
   @Override
   public int compareTo(SwerveModuleState other) {
-    return Double.compare(this.speedMetersPerSecond, other.speedMetersPerSecond);
+    return Double.compare(this.speed, other.speed);
   }
 
   @Override
   public String toString() {
-    return String.format(
-        "SwerveModuleState(Speed: %.2f m/s, Angle: %s)", speedMetersPerSecond, angle);
+    return String.format("SwerveModuleState(Speed: %.2f m/s, Angle: %s)", speed, angle);
   }
 
   /**
@@ -93,7 +92,7 @@ public class SwerveModuleState
   public void optimize(Rotation2d currentAngle) {
     var delta = angle.minus(currentAngle);
     if (Math.abs(delta.getDegrees()) > 90.0) {
-      speedMetersPerSecond *= -1;
+      speed *= -1;
       angle = angle.rotateBy(Rotation2d.kPi);
     }
   }
@@ -114,9 +113,9 @@ public class SwerveModuleState
     var delta = desiredState.angle.minus(currentAngle);
     if (Math.abs(delta.getDegrees()) > 90.0) {
       return new SwerveModuleState(
-          -desiredState.speedMetersPerSecond, desiredState.angle.rotateBy(Rotation2d.kPi));
+          -desiredState.speed, desiredState.angle.rotateBy(Rotation2d.kPi));
     } else {
-      return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
+      return new SwerveModuleState(desiredState.speed, desiredState.angle);
     }
   }
 
@@ -128,6 +127,6 @@ public class SwerveModuleState
    * @param currentAngle The current module angle.
    */
   public void cosineScale(Rotation2d currentAngle) {
-    speedMetersPerSecond *= angle.minus(currentAngle).getCos();
+    speed *= angle.minus(currentAngle).getCos();
   }
 }

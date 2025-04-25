@@ -31,7 +31,7 @@ typedef struct _wpi_proto_ProtobufDifferentialDriveKinematics {
     static std::string_view msg_name(void) noexcept;
     static pb_filedesc_t file_descriptor(void) noexcept;
 
-    double track_width;
+    double trackwidth;
 } wpi_proto_ProtobufDifferentialDriveKinematics;
 
 typedef struct _wpi_proto_ProtobufDifferentialDriveWheelSpeeds {
@@ -138,7 +138,7 @@ typedef struct _wpi_proto_ProtobufSwerveModuleState {
 #define wpi_proto_ProtobufChassisSpeeds_vx_tag   1
 #define wpi_proto_ProtobufChassisSpeeds_vy_tag   2
 #define wpi_proto_ProtobufChassisSpeeds_omega_tag 3
-#define wpi_proto_ProtobufDifferentialDriveKinematics_track_width_tag 1
+#define wpi_proto_ProtobufDifferentialDriveKinematics_trackwidth_tag 1
 #define wpi_proto_ProtobufDifferentialDriveWheelSpeeds_left_tag 1
 #define wpi_proto_ProtobufDifferentialDriveWheelSpeeds_right_tag 2
 #define wpi_proto_ProtobufDifferentialDriveWheelPositions_left_tag 1
@@ -170,7 +170,7 @@ X(a, STATIC,   SINGULAR, DOUBLE,   omega,             3)
 #define wpi_proto_ProtobufChassisSpeeds_DEFAULT NULL
 
 #define wpi_proto_ProtobufDifferentialDriveKinematics_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, DOUBLE,   track_width,       1)
+X(a, STATIC,   SINGULAR, DOUBLE,   trackwidth,        1)
 #define wpi_proto_ProtobufDifferentialDriveKinematics_CALLBACK NULL
 #define wpi_proto_ProtobufDifferentialDriveKinematics_DEFAULT NULL
 

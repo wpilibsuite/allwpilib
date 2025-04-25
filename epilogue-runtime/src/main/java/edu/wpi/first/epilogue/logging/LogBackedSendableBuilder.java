@@ -44,11 +44,6 @@ public class LogBackedSendableBuilder implements SendableBuilder {
   }
 
   @Override
-  public void setSafeState(Runnable func) {
-    // ignore
-  }
-
-  @Override
   public void addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter) {
     m_updates.add(() -> m_backend.log(key, getter.getAsBoolean()));
   }

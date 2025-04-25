@@ -6,7 +6,6 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PWM;
 
@@ -38,11 +37,10 @@ public class Victor extends PWMMotorController {
   public Victor(final int channel) {
     super("Victor", channel);
 
-    m_pwm.setBoundsMicroseconds(2027, 1525, 1507, 1490, 1026);
-    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k2X);
-    m_pwm.setSpeed(0.0);
-    m_pwm.setZeroLatch();
+    setBoundsMicroseconds(2027, 1525, 1507, 1490, 1026);
+    m_pwm.setOutputPeriod(PWM.OutputPeriod.k10Ms);
+    setSpeed(0.0);
 
-    HAL.report(tResourceType.kResourceType_Victor, getChannel() + 1);
+    HAL.reportUsage("IO", getChannel(), "Victor");
   }
 }

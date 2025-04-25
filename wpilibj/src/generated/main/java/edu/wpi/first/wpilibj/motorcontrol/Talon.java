@@ -6,7 +6,6 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PWM;
 
@@ -38,11 +37,10 @@ public class Talon extends PWMMotorController {
   public Talon(final int channel) {
     super("Talon", channel);
 
-    m_pwm.setBoundsMicroseconds(2037, 1539, 1513, 1487, 989);
-    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
-    m_pwm.setSpeed(0.0);
-    m_pwm.setZeroLatch();
+    setBoundsMicroseconds(2037, 1539, 1513, 1487, 989);
+    m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
+    setSpeed(0.0);
 
-    HAL.report(tResourceType.kResourceType_Talon, getChannel() + 1);
+    HAL.reportUsage("IO", getChannel(), "Talon");
   }
 }

@@ -56,7 +56,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
    */
   @SuppressWarnings("this-escape")
   public AnalogPotentiometer(final AnalogInput input, double fullRange, double offset) {
-    SendableRegistry.addLW(this, "AnalogPotentiometer", input.getChannel());
+    SendableRegistry.add(this, "AnalogPotentiometer", input.getChannel());
     m_analogInput = input;
     m_initAnalogInput = false;
 
@@ -125,7 +125,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
     if (m_analogInput == null) {
       return m_offset;
     }
-    return (m_analogInput.getAverageVoltage() / RobotController.getVoltage5V()) * m_fullRange
+    return (m_analogInput.getAverageVoltage() / RobotController.getVoltage3V3()) * m_fullRange
         + m_offset;
   }
 

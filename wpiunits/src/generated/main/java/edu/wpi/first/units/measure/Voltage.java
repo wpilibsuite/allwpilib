@@ -87,11 +87,6 @@ public interface Voltage extends Measure<VoltageUnit> {
     return (Voltage) div(divisor);
   }
 
-  @Override
-  default Velocity<VoltageUnit> per(TimeUnit period) {
-    return div(period.of(1));
-  }
-
 
   @Override
   default Mult<VoltageUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
@@ -113,6 +108,11 @@ public interface Voltage extends Measure<VoltageUnit> {
   @Override
   default Per<VoltageUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<VoltageUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -138,6 +138,11 @@ public interface Voltage extends Measure<VoltageUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<VoltageUnit, AngleUnit> per(AngleUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<VoltageUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
@@ -159,6 +164,11 @@ public interface Voltage extends Measure<VoltageUnit> {
   @Override
   default Per<VoltageUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<VoltageUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -184,6 +194,11 @@ public interface Voltage extends Measure<VoltageUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<VoltageUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<VoltageUnit, AngularVelocityUnit> times(AngularVelocity multiplier) {
@@ -207,6 +222,11 @@ public interface Voltage extends Measure<VoltageUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<VoltageUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Power times(Current multiplier) {
@@ -228,6 +248,11 @@ public interface Voltage extends Measure<VoltageUnit> {
   @SuppressWarnings({"deprecation", "removal"})
   default Resistance divide(Current divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Resistance per(CurrentUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
   @Override
@@ -275,6 +300,11 @@ public interface Voltage extends Measure<VoltageUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<VoltageUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<VoltageUnit, EnergyUnit> times(Energy multiplier) {
@@ -296,6 +326,11 @@ public interface Voltage extends Measure<VoltageUnit> {
   @Override
   default Per<VoltageUnit, EnergyUnit> divide(Energy divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<VoltageUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -321,6 +356,11 @@ public interface Voltage extends Measure<VoltageUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<VoltageUnit, ForceUnit> per(ForceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<VoltageUnit, FrequencyUnit> times(Frequency multiplier) {
@@ -342,6 +382,11 @@ public interface Voltage extends Measure<VoltageUnit> {
   @Override
   default Per<VoltageUnit, FrequencyUnit> divide(Frequency divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<VoltageUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -367,6 +412,11 @@ public interface Voltage extends Measure<VoltageUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<VoltageUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<VoltageUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
@@ -388,6 +438,11 @@ public interface Voltage extends Measure<VoltageUnit> {
   @Override
   default Per<VoltageUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<VoltageUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -413,6 +468,11 @@ public interface Voltage extends Measure<VoltageUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<VoltageUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<VoltageUnit, MassUnit> times(Mass multiplier) {
@@ -434,6 +494,11 @@ public interface Voltage extends Measure<VoltageUnit> {
   @Override
   default Per<VoltageUnit, MassUnit> divide(Mass divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<VoltageUnit, MassUnit> per(MassUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -459,6 +524,11 @@ public interface Voltage extends Measure<VoltageUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<VoltageUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<VoltageUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
@@ -480,6 +550,11 @@ public interface Voltage extends Measure<VoltageUnit> {
   @Override
   default Per<VoltageUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<VoltageUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
   }
 
 
@@ -505,6 +580,11 @@ public interface Voltage extends Measure<VoltageUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<VoltageUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
+    return div(divisorUnit.ofNative(1));
+  }
+
 
   @Override
   default Mult<VoltageUnit, PowerUnit> times(Power multiplier) {
@@ -526,6 +606,11 @@ public interface Voltage extends Measure<VoltageUnit> {
   @Override
   default Per<VoltageUnit, PowerUnit> divide(Power divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<VoltageUnit, PowerUnit> per(PowerUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -551,6 +636,11 @@ public interface Voltage extends Measure<VoltageUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Current per(ResistanceUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<VoltageUnit, TemperatureUnit> times(Temperature multiplier) {
@@ -572,6 +662,11 @@ public interface Voltage extends Measure<VoltageUnit> {
   @Override
   default Per<VoltageUnit, TemperatureUnit> divide(Temperature divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<VoltageUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -597,6 +692,11 @@ public interface Voltage extends Measure<VoltageUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Velocity<VoltageUnit> per(TimeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<VoltageUnit, TorqueUnit> times(Torque multiplier) {
@@ -618,6 +718,11 @@ public interface Voltage extends Measure<VoltageUnit> {
   @Override
   default Per<VoltageUnit, TorqueUnit> divide(Torque divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Per<VoltageUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 
@@ -643,6 +748,11 @@ public interface Voltage extends Measure<VoltageUnit> {
     return div(divisor);
   }
 
+  @Override
+  default Per<VoltageUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
 
   @Override
   default Mult<VoltageUnit, VoltageUnit> times(Voltage multiplier) {
@@ -664,6 +774,11 @@ public interface Voltage extends Measure<VoltageUnit> {
   @Override
   default Dimensionless divide(Voltage divisor) {
     return div(divisor);
+  }
+
+  @Override
+  default Dimensionless per(VoltageUnit divisorUnit) {
+    return div(divisorUnit.one());
   }
 
 }

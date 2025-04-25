@@ -11,7 +11,6 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/livewindow/LiveWindow.h"
 #include "frc/simulation/DriverStationSim.h"
 #include "frc/simulation/SimHooks.h"
 
@@ -20,7 +19,7 @@ using namespace frc;
 inline constexpr auto kPeriod = 20_ms;
 
 namespace {
-class TimedRobotTest : public ::testing::TestWithParam<bool> {
+class TimedRobotTest : public ::testing::Test {
  protected:
   void SetUp() override { frc::sim::PauseTiming(); }
 
@@ -308,12 +307,8 @@ TEST_F(TimedRobotTest, TeleopMode) {
   robotThread.join();
 }
 
-TEST_P(TimedRobotTest, TestMode) {
-  bool isTestLW = GetParam();
-
+TEST_F(TimedRobotTest, TestMode) {
   MockRobot robot;
-  robot.EnableLiveWindowInTest(isTestLW);
-
   std::thread robotThread{[&] { robot.StartCompetition(); }};
 
   frc::sim::DriverStationSim::SetEnabled(true);
@@ -328,7 +323,6 @@ TEST_P(TimedRobotTest, TestMode) {
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
   EXPECT_EQ(0u, robot.m_testInitCount);
-  EXPECT_FALSE(frc::LiveWindow::IsEnabled());
 
   EXPECT_EQ(0u, robot.m_robotPeriodicCount);
   EXPECT_EQ(0u, robot.m_simulationPeriodicCount);
@@ -350,9 +344,6 @@ TEST_P(TimedRobotTest, TestMode) {
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
   EXPECT_EQ(1u, robot.m_testInitCount);
-  EXPECT_EQ(isTestLW, frc::LiveWindow::IsEnabled());
-
-  EXPECT_THROW(robot.EnableLiveWindowInTest(isTestLW), std::runtime_error);
 
   EXPECT_EQ(1u, robot.m_robotPeriodicCount);
   EXPECT_EQ(1u, robot.m_simulationPeriodicCount);
@@ -399,7 +390,6 @@ TEST_P(TimedRobotTest, TestMode) {
   EXPECT_EQ(0u, robot.m_autonomousInitCount);
   EXPECT_EQ(0u, robot.m_teleopInitCount);
   EXPECT_EQ(1u, robot.m_testInitCount);
-  EXPECT_FALSE(frc::LiveWindow::IsEnabled());
 
   EXPECT_EQ(3u, robot.m_robotPeriodicCount);
   EXPECT_EQ(3u, robot.m_simulationPeriodicCount);
@@ -609,5 +599,3 @@ TEST_F(TimedRobotTest, AddPeriodicWithOffset) {
   robot.EndCompetition();
   robotThread.join();
 }
-
-INSTANTIATE_TEST_SUITE_P(TimedRobotTests, TimedRobotTest, testing::Bool());

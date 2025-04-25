@@ -26,7 +26,6 @@ struct Component {
   std::string name;
   std::string subsystem = "Ungrouped";
   Sendable* parent = nullptr;
-  bool liveWindow = false;
   wpi::SmallVector<std::shared_ptr<void>, 2> data;
 
   void SetName(std::string_view moduleType, int channel) {
@@ -41,7 +40,6 @@ struct Component {
 struct SendableRegistryInst {
   wpi::recursive_mutex mutex;
 
-  std::function<std::unique_ptr<SendableBuilder>()> liveWindowFactory;
   wpi::UidVector<std::unique_ptr<Component>, 32> components;
   wpi::DenseMap<void*, SendableRegistry::UID> componentMap;
   int nextDataHandle = 0;
@@ -85,11 +83,6 @@ void SendableRegistry::EnsureInitialized() {
   GetInstance();
 }
 
-void SendableRegistry::SetLiveWindowBuilderFactory(
-    std::function<std::unique_ptr<SendableBuilder>()> factory) {
-  GetInstance().liveWindowFactory = std::move(factory);
-}
-
 void SendableRegistry::Add(Sendable* sendable, std::string_view name) {
   auto& inst = GetInstance();
   std::scoped_lock lock(inst.mutex);
@@ -122,58 +115,6 @@ void SendableRegistry::Add(Sendable* sendable, std::string_view subsystem,
   std::scoped_lock lock(inst.mutex);
   auto& comp = inst.GetOrAdd(sendable);
   comp.sendable = sendable;
-  comp.name = name;
-  comp.subsystem = subsystem;
-}
-
-void SendableRegistry::AddLW(Sendable* sendable, std::string_view name) {
-  auto& inst = GetInstance();
-  std::scoped_lock lock(inst.mutex);
-  auto& comp = inst.GetOrAdd(sendable);
-  comp.sendable = sendable;
-  if (inst.liveWindowFactory) {
-    comp.builder = inst.liveWindowFactory();
-  }
-  comp.liveWindow = true;
-  comp.name = name;
-}
-
-void SendableRegistry::AddLW(Sendable* sendable, std::string_view moduleType,
-                             int channel) {
-  auto& inst = GetInstance();
-  std::scoped_lock lock(inst.mutex);
-  auto& comp = inst.GetOrAdd(sendable);
-  comp.sendable = sendable;
-  if (inst.liveWindowFactory) {
-    comp.builder = inst.liveWindowFactory();
-  }
-  comp.liveWindow = true;
-  comp.SetName(moduleType, channel);
-}
-
-void SendableRegistry::AddLW(Sendable* sendable, std::string_view moduleType,
-                             int moduleNumber, int channel) {
-  auto& inst = GetInstance();
-  std::scoped_lock lock(inst.mutex);
-  auto& comp = inst.GetOrAdd(sendable);
-  comp.sendable = sendable;
-  if (inst.liveWindowFactory) {
-    comp.builder = inst.liveWindowFactory();
-  }
-  comp.liveWindow = true;
-  comp.SetName(moduleType, moduleNumber, channel);
-}
-
-void SendableRegistry::AddLW(Sendable* sendable, std::string_view subsystem,
-                             std::string_view name) {
-  auto& inst = GetInstance();
-  std::scoped_lock lock(inst.mutex);
-  auto& comp = inst.GetOrAdd(sendable);
-  comp.sendable = sendable;
-  if (inst.liveWindowFactory) {
-    comp.builder = inst.liveWindowFactory();
-  }
-  comp.liveWindow = true;
   comp.name = name;
   comp.subsystem = subsystem;
 }
@@ -361,26 +302,6 @@ std::shared_ptr<void> SendableRegistry::GetData(Sendable* sendable,
   return comp.data[handle];
 }
 
-void SendableRegistry::EnableLiveWindow(Sendable* sendable) {
-  auto& inst = GetInstance();
-  std::scoped_lock lock(inst.mutex);
-  auto it = inst.componentMap.find(sendable);
-  if (it == inst.componentMap.end() || !inst.components[it->getSecond() - 1]) {
-    return;
-  }
-  inst.components[it->getSecond() - 1]->liveWindow = true;
-}
-
-void SendableRegistry::DisableLiveWindow(Sendable* sendable) {
-  auto& inst = GetInstance();
-  std::scoped_lock lock(inst.mutex);
-  auto it = inst.componentMap.find(sendable);
-  if (it == inst.componentMap.end() || !inst.components[it->getSecond() - 1]) {
-    return;
-  }
-  inst.components[it->getSecond() - 1]->liveWindow = false;
-}
-
 SendableRegistry::UID SendableRegistry::GetUniqueId(Sendable* sendable) {
   auto& inst = GetInstance();
   std::scoped_lock lock(inst.mutex);
@@ -428,27 +349,5 @@ void SendableRegistry::Update(UID sendableUid) {
   }
   if (inst.components[sendableUid - 1]->builder) {
     inst.components[sendableUid - 1]->builder->Update();
-  }
-}
-
-void SendableRegistry::ForeachLiveWindow(
-    int dataHandle, wpi::function_ref<void(CallbackData& data)> callback) {
-  auto& inst = GetInstance();
-  assert(dataHandle >= 0);
-  std::scoped_lock lock(inst.mutex);
-  wpi::SmallVector<Component*, 128> components;
-  for (auto&& comp : inst.components) {
-    components.emplace_back(comp.get());
-  }
-  for (auto comp : components) {
-    if (comp && comp->builder && comp->sendable && comp->liveWindow) {
-      if (static_cast<size_t>(dataHandle) >= comp->data.size()) {
-        comp->data.resize(dataHandle + 1);
-      }
-      CallbackData cbdata{comp->sendable,         comp->name,
-                          comp->subsystem,        comp->parent,
-                          comp->data[dataHandle], *comp->builder};
-      callback(cbdata);
-    }
   }
 }

@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 
@@ -67,8 +68,10 @@ void AnalogEncoder::Init(double fullRange, double expectedZero) {
   m_fullRange = fullRange;
   m_expectedZero = expectedZero;
 
-  wpi::SendableRegistry::AddLW(this, "Analog Encoder",
-                               m_analogInput->GetChannel());
+  HAL_ReportUsage("IO", m_analogInput->GetChannel(), "AnalogEncoder");
+
+  wpi::SendableRegistry::Add(this, "Analog Encoder",
+                             m_analogInput->GetChannel());
 }
 
 double AnalogEncoder::Get() const {
@@ -77,7 +80,7 @@ double AnalogEncoder::Get() const {
   }
 
   double analog = m_analogInput->GetVoltage();
-  double pos = analog / RobotController::GetVoltage5V();
+  double pos = analog / RobotController::GetVoltage3V3();
 
   // Map sensor range if range isn't full
   pos = MapSensorRange(pos);

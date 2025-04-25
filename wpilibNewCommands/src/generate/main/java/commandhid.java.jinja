@@ -107,7 +107,7 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
 {% endfor -%}
 {% for stick in sticks %}
   /**
-   * Get the {{ stick.NameParts[1] }} axis value of {{ stick.NameParts[0] }} side of the controller.
+   * Get the {{ stick.NameParts[1] }} axis value of {{ stick.NameParts[0] }} side of the controller. {{ stick.PositiveDirection }} is positive.
    *
    * @return The axis value.
    */

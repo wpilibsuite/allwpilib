@@ -43,6 +43,7 @@ load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
 rules_jvm_external_deps()
 
 load("@rules_jvm_external//:defs.bzl", "maven_install")
+load("@rules_jvm_external//:specs.bzl", "maven")
 
 maven_artifacts = [
     "org.ejml:ejml-simple:0.43.1",
@@ -51,6 +52,72 @@ maven_artifacts = [
     "com.fasterxml.jackson.core:jackson-databind:2.15.2",
     "us.hebi.quickbuf:quickbuf-runtime:1.3.3",
     "com.google.code.gson:gson:2.10.1",
+    maven.artifact(
+        "org.junit.jupiter",
+        "junit-jupiter",
+        "5.10.1",
+        testonly = True,
+    ),
+    maven.artifact(
+        "org.junit.platform",
+        "junit-platform-console",
+        "1.10.1",
+        testonly = True,
+    ),
+    maven.artifact(
+        "org.junit.platform",
+        "junit-platform-launcher",
+        "1.10.1",
+        testonly = True,
+    ),
+    maven.artifact(
+        "org.junit.platform",
+        "junit-platform-reporting",
+        "1.10.1",
+        testonly = True,
+    ),
+    maven.artifact(
+        "com.google.code.gson",
+        "gson",
+        "2.10.1",
+        testonly = False,
+    ),
+    maven.artifact(
+        "org.hamcrest",
+        "hamcrest-all",
+        "1.3",
+        testonly = True,
+    ),
+    maven.artifact(
+        "com.googlecode.junit-toolbox",
+        "junit-toolbox",
+        "2.4",
+        testonly = True,
+    ),
+    maven.artifact(
+        "org.apache.ant",
+        "ant",
+        "1.10.12",
+        testonly = True,
+    ),
+    maven.artifact(
+        "org.apache.ant",
+        "ant-junit",
+        "1.10.12",
+        testonly = True,
+    ),
+    maven.artifact(
+        "org.mockito",
+        "mockito-core",
+        "4.1.0",
+        testonly = True,
+    ),
+    maven.artifact(
+        "com.google.testing.compile",
+        "compile-testing",
+        "0.21.0",
+        testonly = True,
+    ),
 ]
 
 maven_install(

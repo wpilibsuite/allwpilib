@@ -50,7 +50,6 @@ void InitializeHAL() {
   InitializeREVPH();
   InitializeAddressableLED();
   InitializeAnalogInput();
-  InitializeAnalogTrigger();
   InitializeCAN();
   InitializeCANAPI();
   InitializeConstants();
@@ -60,8 +59,6 @@ void InitializeHAL() {
   InitializeEncoder();
   InitializeFRCDriverStation();
   InitializeI2C();
-  InitializeInterrupts();
-  InitializeLEDs();
   InitializeMain();
   InitializeNotifier();
   InitializeCTREPDP();
@@ -72,6 +69,7 @@ void InitializeHAL() {
   InitializeSerialPort();
   InitializeSmartIo();
   InitializeThreads();
+  InitializeUsageReporting();
 }
 }  // namespace init
 
@@ -82,25 +80,6 @@ uint64_t GetDSInitializeTime() {
 }  // namespace hal
 
 extern "C" {
-
-HAL_PortHandle HAL_GetPort(int32_t channel) {
-  // Dont allow a number that wouldn't fit in a uint8_t
-  if (channel < 0 || channel >= 255) {
-    return HAL_kInvalidHandle;
-  }
-  return createPortHandle(channel, 1);
-}
-
-HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel) {
-  // Dont allow a number that wouldn't fit in a uint8_t
-  if (channel < 0 || channel >= 255) {
-    return HAL_kInvalidHandle;
-  }
-  if (module < 0 || module >= 255) {
-    return HAL_kInvalidHandle;
-  }
-  return createPortHandle(channel, module);
-}
 
 const char* HAL_GetErrorMessage(int32_t code) {
   switch (code) {
@@ -272,12 +251,6 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
   return (upper << 32) + static_cast<uint64_t>(unexpandedLower);
 }
 
-HAL_Bool HAL_GetFPGAButton(int32_t* status) {
-  hal::init::CheckInit();
-  *status = HAL_HANDLE_ERROR;
-  return false;
-}
-
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
   hal::init::CheckInit();
   *status = HAL_HANDLE_ERROR;
@@ -363,17 +336,5 @@ void HAL_Shutdown(void) {}
 void HAL_SimPeriodicBefore(void) {}
 
 void HAL_SimPeriodicAfter(void) {}
-
-int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
-                   const char* feature) {
-  if (feature == nullptr) {
-    feature = "";
-  }
-
-  return 0;
-
-  // return FRC_NetworkCommunication_nUsageReporting_report(
-  //     resource, instanceNumber, context, feature);
-}
 
 }  // extern "C"

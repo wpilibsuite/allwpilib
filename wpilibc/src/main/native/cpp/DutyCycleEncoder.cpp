@@ -11,7 +11,6 @@
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/DigitalInput.h"
-#include "frc/DigitalSource.h"
 #include "frc/DutyCycle.h"
 #include "frc/MathUtil.h"
 
@@ -74,8 +73,8 @@ void DutyCycleEncoder::Init(double fullRange, double expectedZero) {
   m_fullRange = fullRange;
   m_expectedZero = expectedZero;
 
-  wpi::SendableRegistry::AddLW(this, "DutyCycle Encoder",
-                               m_dutyCycle->GetSourceChannel());
+  wpi::SendableRegistry::Add(this, "DutyCycle Encoder",
+                             m_dutyCycle->GetSourceChannel());
 }
 
 double DutyCycleEncoder::Get() const {

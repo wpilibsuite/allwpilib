@@ -4,7 +4,7 @@
 
 #include "frc/AnalogAccelerometer.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -53,9 +53,8 @@ void AnalogAccelerometer::InitSendable(wpi::SendableBuilder& builder) {
 }
 
 void AnalogAccelerometer::InitAccelerometer() {
-  HAL_Report(HALUsageReporting::kResourceType_Accelerometer,
-             m_analogInput->GetChannel() + 1);
+  HAL_ReportUsage("IO", m_analogInput->GetChannel(), "Accelerometer");
 
-  wpi::SendableRegistry::AddLW(this, "Accelerometer",
-                               m_analogInput->GetChannel());
+  wpi::SendableRegistry::Add(this, "Accelerometer",
+                             m_analogInput->GetChannel());
 }

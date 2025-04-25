@@ -21,7 +21,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  */
 public class Odometry<T> {
   private final Kinematics<?, T> m_kinematics;
-  private Pose2d m_poseMeters;
+  private Pose2d m_pose;
 
   private Rotation2d m_gyroOffset;
   private Rotation2d m_previousAngle;
@@ -33,17 +33,14 @@ public class Odometry<T> {
    * @param kinematics The kinematics of the drivebase.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The current encoder readings.
-   * @param initialPoseMeters The starting position of the robot on the field.
+   * @param initialPose The starting position of the robot on the field.
    */
   public Odometry(
-      Kinematics<?, T> kinematics,
-      Rotation2d gyroAngle,
-      T wheelPositions,
-      Pose2d initialPoseMeters) {
+      Kinematics<?, T> kinematics, Rotation2d gyroAngle, T wheelPositions, Pose2d initialPose) {
     m_kinematics = kinematics;
-    m_poseMeters = initialPoseMeters;
-    m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
-    m_previousAngle = m_poseMeters.getRotation();
+    m_pose = initialPose;
+    m_gyroOffset = m_pose.getRotation().minus(gyroAngle);
+    m_previousAngle = m_pose.getRotation();
     m_previousWheelPositions = m_kinematics.copy(wheelPositions);
   }
 
@@ -55,24 +52,24 @@ public class Odometry<T> {
    *
    * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelPositions The current encoder readings.
-   * @param poseMeters The position on the field that your robot is at.
+   * @param pose The position on the field that your robot is at.
    */
-  public void resetPosition(Rotation2d gyroAngle, T wheelPositions, Pose2d poseMeters) {
-    m_poseMeters = poseMeters;
-    m_previousAngle = m_poseMeters.getRotation();
-    m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
+  public void resetPosition(Rotation2d gyroAngle, T wheelPositions, Pose2d pose) {
+    m_pose = pose;
+    m_previousAngle = m_pose.getRotation();
+    m_gyroOffset = m_pose.getRotation().minus(gyroAngle);
     m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
   }
 
   /**
    * Resets the pose.
    *
-   * @param poseMeters The pose to reset to.
+   * @param pose The pose to reset to.
    */
-  public void resetPose(Pose2d poseMeters) {
-    m_gyroOffset = m_gyroOffset.plus(poseMeters.getRotation().minus(m_poseMeters.getRotation()));
-    m_poseMeters = poseMeters;
-    m_previousAngle = m_poseMeters.getRotation();
+  public void resetPose(Pose2d pose) {
+    m_gyroOffset = m_gyroOffset.plus(pose.getRotation().minus(m_pose.getRotation()));
+    m_pose = pose;
+    m_previousAngle = m_pose.getRotation();
   }
 
   /**
@@ -81,7 +78,7 @@ public class Odometry<T> {
    * @param translation The translation to reset to.
    */
   public void resetTranslation(Translation2d translation) {
-    m_poseMeters = new Pose2d(translation, m_poseMeters.getRotation());
+    m_pose = new Pose2d(translation, m_pose.getRotation());
   }
 
   /**
@@ -90,9 +87,9 @@ public class Odometry<T> {
    * @param rotation The rotation to reset to.
    */
   public void resetRotation(Rotation2d rotation) {
-    m_gyroOffset = m_gyroOffset.plus(rotation.minus(m_poseMeters.getRotation()));
-    m_poseMeters = new Pose2d(m_poseMeters.getTranslation(), rotation);
-    m_previousAngle = m_poseMeters.getRotation();
+    m_gyroOffset = m_gyroOffset.plus(rotation.minus(m_pose.getRotation()));
+    m_pose = new Pose2d(m_pose.getTranslation(), rotation);
+    m_previousAngle = m_pose.getRotation();
   }
 
   /**
@@ -100,8 +97,8 @@ public class Odometry<T> {
    *
    * @return The pose of the robot (x and y are in meters).
    */
-  public Pose2d getPoseMeters() {
-    return m_poseMeters;
+  public Pose2d getPose() {
+    return m_pose;
   }
 
   /**
@@ -120,12 +117,12 @@ public class Odometry<T> {
     var twist = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);
     twist.dtheta = angle.minus(m_previousAngle).getRadians();
 
-    var newPose = m_poseMeters.exp(twist);
+    var newPose = m_pose.exp(twist);
 
     m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
     m_previousAngle = angle;
-    m_poseMeters = new Pose2d(newPose.getTranslation(), angle);
+    m_pose = new Pose2d(newPose.getTranslation(), angle);
 
-    return m_poseMeters;
+    return m_pose;
   }
 }
