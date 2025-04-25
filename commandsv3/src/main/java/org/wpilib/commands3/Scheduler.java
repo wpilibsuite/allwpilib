@@ -493,16 +493,7 @@ public class Scheduler implements ProtobufSerializable {
    * @return the binding coroutine
    */
   private Coroutine buildCoroutine(Command command) {
-    return new Coroutine(
-        this,
-        scope,
-        coroutine -> {
-          try {
-            command.run(coroutine);
-          } catch (Exception e) {
-            throw new CommandExecutionException(command, e);
-          }
-        });
+    return new Coroutine(this, scope, command::run);
   }
 
   /**

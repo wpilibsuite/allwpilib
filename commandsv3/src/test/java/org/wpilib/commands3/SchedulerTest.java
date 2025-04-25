@@ -164,23 +164,13 @@ class SchedulerTest {
     scheduler.schedule(command);
 
     try {
+
       scheduler.run();
       fail("An exception should have been thrown");
-    } catch (CommandExecutionException e) {
-      if (e.getCommand() != command) {
-        fail("Expected command " + command + ", but was " + e.getCommand());
-      }
-
-      var cause = e.getCause();
-      if (cause instanceof RuntimeException re) {
-        assertEquals("The exception", re.getMessage());
-      } else {
-        fail(
-            "Expected cause to be a RuntimeException with message 'The exception', but was "
-                + cause);
-      }
+    } catch (RuntimeException e) {
+      assertEquals("The exception", e.getMessage());
     } catch (Throwable t) {
-      fail("Expected a CommandExecutionException to be thrown, but got " + t);
+      fail("Expected a RuntimeException to be thrown, but got " + t);
     }
   }
 
@@ -428,14 +418,12 @@ class SchedulerTest {
     try {
       scheduler.run();
       fail("An exception should have been thrown");
-    } catch (CommandExecutionException e) {
-      if (e.getCause() instanceof IllegalArgumentException iae) {
+    } catch (IllegalArgumentException iae) {
         assertEquals(
             "Command Second requires resources that are already used by First. Both require The Resource",
             iae.getMessage());
-      } else {
-        fail("Unexpected exception: " + e);
-      }
+    } catch (Exception e) {
+      fail("Unexpected exception: " + e);
     }
   }
 
