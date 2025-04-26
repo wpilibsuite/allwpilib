@@ -8,9 +8,11 @@ cc_library(
         "src/main/native/include/*.inc",
     ]),
     strip_include_prefix = "src/main/native/include",
-    tags = [
-        "no-roborio",
-    ],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [
         "//hal:wpiHal.static",

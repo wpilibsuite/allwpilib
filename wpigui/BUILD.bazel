@@ -32,7 +32,6 @@ cc_library(
            }),
     strip_include_prefix = "include",
     tags = [
-        "no-roborio",
         "wpi-cpp-gui",
     ],
     visibility = ["//visibility:public"],

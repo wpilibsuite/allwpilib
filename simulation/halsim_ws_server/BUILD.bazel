@@ -10,9 +10,11 @@ cc_library(
     name = "halsim_ws_server",
     srcs = glob(["src/main/native/cpp/**"]),
     features = ["windows_export_all_symbols"],
-    tags = [
-        "no-roborio",
-    ],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [
         ":headers",
@@ -33,7 +35,6 @@ cc_test(
     srcs = glob(["src/test/native/**/*.cpp"]),
     tags = [
         "no-asan",
-        "no-roborio",
     ],
     deps = [
         ":halsim_ws_server",
@@ -45,9 +46,6 @@ cc_test(
 cc_binary(
     name = "DevMain-Cpp",
     srcs = ["src/dev/native/cpp/main.cpp"],
-    tags = [
-        "no-roborio",
-    ],
     deps = [
         ":halsim_ws_server",
     ],
