@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Encoder",
+    "description": "Snippets of Encoder class usage for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Encoder"
+    ],
+    "foldername": "Encoder",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "DutyCycleEncoder",
+    "description": "Snippets of DutyCycleEncoder class usage for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Encoder",
+      "Duty Cycle"
+    ],
+    "foldername": "DutyCycleEncoder",
+    "gradlebase": "cpp"
+  }
+]

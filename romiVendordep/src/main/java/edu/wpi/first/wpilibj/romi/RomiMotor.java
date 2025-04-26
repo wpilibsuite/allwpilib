@@ -25,6 +25,7 @@ public class RomiMotor extends PWMMotorController {
    * @param channel The PWM channel that the RomiMotor is attached to. 0 is the left motor, 1 is the
    *     right.
    */
+  @SuppressWarnings("this-escape")
   public RomiMotor(final int channel) {
     super("Romi Motor", channel);
     initRomiMotor();
