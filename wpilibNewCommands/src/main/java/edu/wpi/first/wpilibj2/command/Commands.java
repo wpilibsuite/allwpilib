@@ -106,6 +106,20 @@ public final class Commands {
   }
 
   /**
+   * Constructs a command that runs an action once, and then runs an action every
+   * iteration until interrupted.
+   *
+   * @param start the action to run on start
+   * @param run the action to run every iteration
+   * @param requirements subsystems the action requires
+   */
+  public static Command startRunEnd(Runnable start, Runnable run, Runnable end, Subsystem... requirements) {
+    requireNonNullParam(end, "end", "Command.runEnd");
+    return new FunctionalCommand(
+      start, run, interrupted -> end.run(), () -> false, requirements);
+  }
+
+  /**
    * Constructs a command that prints a message and finishes.
    *
    * @param message the message to print
