@@ -4,7 +4,7 @@
 
 #include <frc/DoubleSolenoid.h>
 #include <frc/simulation/DoubleSolenoidSim.h>
-#include <frc/simulation/PWMSim.h>
+#include <frc/simulation/PWMMotorControllerSim.h>
 #include <gtest/gtest.h>
 
 #include "Constants.h"
@@ -13,7 +13,7 @@
 class IntakeTest : public testing::Test {
  protected:
   Intake intake;  // create our intake
-  frc::sim::PWMSim simMotor{
+  frc::sim::PWMMotorControllerSim simMotor{
       IntakeConstants::kMotorPort};  // create our simulation PWM
   frc::sim::DoubleSolenoidSim simPiston{
       frc::PneumaticsModuleType::CTREPCM, IntakeConstants::kPistonFwdChannel,

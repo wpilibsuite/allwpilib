@@ -21,8 +21,8 @@ public class Debouncer {
     kBoth
   }
 
-  private final double m_debounceTime;
-  private final DebounceType m_debounceType;
+  private double m_debounceTime;
+  private DebounceType m_debounceType;
   private boolean m_baseline;
 
   private double m_prevTime;
@@ -40,11 +40,7 @@ public class Debouncer {
 
     resetTimer();
 
-    m_baseline =
-        switch (m_debounceType) {
-          case kBoth, kRising -> false;
-          case kFalling -> true;
-        };
+    m_baseline = m_debounceType == DebounceType.kFalling;
   }
 
   /**
@@ -85,5 +81,45 @@ public class Debouncer {
     } else {
       return m_baseline;
     }
+  }
+
+  /**
+   * Sets the time to debounce.
+   *
+   * @param time The number of seconds the value must change from baseline for the filtered value to
+   *     change.
+   */
+  public void setDebounceTime(double time) {
+    m_debounceTime = time;
+  }
+
+  /**
+   * Gets the time to debounce.
+   *
+   * @return The number of seconds the value must change from baseline for the filtered value to
+   *     change.
+   */
+  public double getDebounceTime() {
+    return m_debounceTime;
+  }
+
+  /**
+   * Sets the debounce type.
+   *
+   * @param type Which type of state change the debouncing will be performed on.
+   */
+  public void setDebounceType(DebounceType type) {
+    m_debounceType = type;
+
+    m_baseline = m_debounceType == DebounceType.kFalling;
+  }
+
+  /**
+   * Gets the debounce type.
+   *
+   * @return Which type of state change the debouncing will be performed on.
+   */
+  public DebounceType getDebounceType() {
+    return m_debounceType;
   }
 }

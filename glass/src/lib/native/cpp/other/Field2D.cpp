@@ -224,8 +224,8 @@ class ObjectInfo {
 
 class FieldInfo {
  public:
-  static constexpr auto kDefaultWidth = 16.541052_m;
-  static constexpr auto kDefaultHeight = 8.211_m;
+  static constexpr auto kDefaultWidth = 17.5483_m;
+  static constexpr auto kDefaultHeight = 8.0519_m;
 
   explicit FieldInfo(Storage& storage);
 
@@ -345,7 +345,7 @@ static bool InputPose(frc::Pose2d* pose) {
 }
 
 FieldInfo::FieldInfo(Storage& storage)
-    : m_builtin{storage.GetString("builtin", "2024 Crescendo")},
+    : m_builtin{storage.GetString("builtin", "2025 Reefscape")},
       m_filename{storage.GetString("image")},
       m_width{storage.GetFloat("width", kDefaultWidth.to<float>())},
       m_height{storage.GetFloat("height", kDefaultHeight.to<float>())},

@@ -21,7 +21,7 @@ public class XRPServo {
 
   private static void checkDeviceAllocation(int deviceNum) {
     if (!s_simDeviceNameMap.containsKey(deviceNum)) {
-      throw new IllegalArgumentException("Invalid XRPServo device number. Should be 4-5");
+      throw new IllegalArgumentException("Invalid XRPServo device number. Should be 4-7");
     }
 
     if (s_registeredDevices.contains(deviceNum)) {
@@ -34,6 +34,8 @@ public class XRPServo {
   static {
     s_simDeviceNameMap.put(4, "servo1");
     s_simDeviceNameMap.put(5, "servo2");
+    s_simDeviceNameMap.put(6, "servo3");
+    s_simDeviceNameMap.put(7, "servo4");
   }
 
   private final SimDouble m_simPosition;

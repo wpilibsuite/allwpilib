@@ -42,6 +42,13 @@ objc_library(
         "src/main/native/include",
         "src/main/native/objcpp",
     ],
+    sdk_frameworks = [
+        "CoreFoundation",
+        "AVFoundation",
+        "Foundation",
+        "CoreMedia",
+        "CoreVideo",
+    ],
     tags = ["manual"],
     deps = [
         "//wpinet:wpinet.static",
