@@ -97,10 +97,22 @@ CommandPtr RunEnd(std::function<void()> run, std::function<void()> end,
 [[nodiscard]]
 CommandPtr StartRun(std::function<void()> start, std::function<void()> run,
                     Requirements requirements = {});
+/**
+ * Constructs a command that runs an action once, and then runs an action every
+ * iteration until interrupted, and then runs a third action.
+ *
+ * @param run the action to run every iteration
+ * @param end the action to run on interrupt
+ * @param requirements subsystems the action requires
+ */
+[[nodiscard]]
+CommandPtr StartRunEnd(std::function<void> start, std::function<void()> run, std::function<void()> end,
+                  Requirements requirements = {});
+
 
 /**
  * Constructs a command that prints a message and finishes.
- *
+ * 
  * @param msg the message to print
  */
 [[nodiscard]]
