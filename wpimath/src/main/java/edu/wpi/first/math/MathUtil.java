@@ -4,6 +4,9 @@
 
 package edu.wpi.first.math;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+
 /** Math utility functions. */
 public final class MathUtil {
   private MathUtil() {
@@ -44,50 +47,51 @@ public final class MathUtil {
    * @return The value after the deadband is applied.
    */
   public static double applyDeadband(double value, double deadband, double maxMagnitude) {
-    if (Math.abs(value) > deadband) {
-      if (maxMagnitude / deadband > 1.0e12) {
-        // If max magnitude is sufficiently large, the implementation encounters
-        // roundoff error.  Implementing the limiting behavior directly avoids
-        // the problem.
-        return value > 0.0 ? value - deadband : value + deadband;
-      }
-      if (value > 0.0) {
-        // Map deadband to 0 and map max to max.
-        //
-        // y - y₁ = m(x - x₁)
-        // y - y₁ = (y₂ - y₁)/(x₂ - x₁) (x - x₁)
-        // y = (y₂ - y₁)/(x₂ - x₁) (x - x₁) + y₁
-        //
-        // (x₁, y₁) = (deadband, 0) and (x₂, y₂) = (max, max).
-        // x₁ = deadband
-        // y₁ = 0
-        // x₂ = max
-        // y₂ = max
-        //
-        // y = (max - 0)/(max - deadband) (x - deadband) + 0
-        // y = max/(max - deadband) (x - deadband)
-        // y = max (x - deadband)/(max - deadband)
-        return maxMagnitude * (value - deadband) / (maxMagnitude - deadband);
-      } else {
-        // Map -deadband to 0 and map -max to -max.
-        //
-        // y - y₁ = m(x - x₁)
-        // y - y₁ = (y₂ - y₁)/(x₂ - x₁) (x - x₁)
-        // y = (y₂ - y₁)/(x₂ - x₁) (x - x₁) + y₁
-        //
-        // (x₁, y₁) = (-deadband, 0) and (x₂, y₂) = (-max, -max).
-        // x₁ = -deadband
-        // y₁ = 0
-        // x₂ = -max
-        // y₂ = -max
-        //
-        // y = (-max - 0)/(-max + deadband) (x + deadband) + 0
-        // y = max/(max - deadband) (x + deadband)
-        // y = max (x + deadband)/(max - deadband)
-        return maxMagnitude * (value + deadband) / (maxMagnitude - deadband);
-      }
+    if (Math.abs(value) < deadband) {
+      return 0;
+    }
+    if (value > 0.0) {
+      // Map deadband to 0 and map max to max with a linear relationship.
+      //
+      //   y - y₁ = m(x - x₁)
+      //   y - y₁ = (y₂ - y₁)/(x₂ - x₁) (x - x₁)
+      //   y = (y₂ - y₁)/(x₂ - x₁) (x - x₁) + y₁
+      //
+      // (x₁, y₁) = (deadband, 0) and (x₂, y₂) = (max, max).
+      //
+      //   x₁ = deadband
+      //   y₁ = 0
+      //   x₂ = max
+      //   y₂ = max
+      //   y = (max - 0)/(max - deadband) (x - deadband) + 0
+      //   y = max/(max - deadband) (x - deadband)
+      //
+      // To handle high values of max, rewrite so that max only appears on the denominator.
+      //
+      //   y = ((max - deadband) + deadband)/(max - deadband) (x - deadband)
+      //   y = (1 + deadband/(max - deadband)) (x - deadband)
+      return (1 + deadband / (maxMagnitude - deadband)) * (value - deadband);
     } else {
-      return 0.0;
+      // Map -deadband to 0 and map -max to -max with a linear relationship.
+      //
+      //   y - y₁ = m(x - x₁)
+      //   y - y₁ = (y₂ - y₁)/(x₂ - x₁) (x - x₁)
+      //   y = (y₂ - y₁)/(x₂ - x₁) (x - x₁) + y₁
+      //
+      // (x₁, y₁) = (-deadband, 0) and (x₂, y₂) = (-max, -max).
+      //
+      //   x₁ = -deadband
+      //   y₁ = 0
+      //   x₂ = -max
+      //   y₂ = -max
+      //   y = (-max - 0)/(-max + deadband) (x + deadband) + 0
+      //   y = max/(max - deadband) (x + deadband)
+      //
+      // To handle high values of max, rewrite so that max only appears on the denominator.
+      //
+      //   y = ((max - deadband) + deadband)/(max - deadband) (x + deadband)
+      //   y = (1 + deadband/(max - deadband)) (x + deadband)
+      return (1 + deadband / (maxMagnitude - deadband)) * (value + deadband);
     }
   }
 
@@ -208,5 +212,63 @@ public final class MathUtil {
     double errorBound = (max - min) / 2.0;
     double error = MathUtil.inputModulus(expected - actual, -errorBound, errorBound);
     return Math.abs(error) < tolerance;
+  }
+
+  /**
+   * Limits translation velocity.
+   *
+   * @param current Translation at current timestep.
+   * @param next Translation at next timestep.
+   * @param dt Timestep duration.
+   * @param maxVelocity Maximum translation velocity.
+   * @return Returns the next Translation2d limited to maxVelocity
+   */
+  public static Translation2d slewRateLimit(
+      Translation2d current, Translation2d next, double dt, double maxVelocity) {
+    if (maxVelocity < 0) {
+      Exception e = new IllegalArgumentException();
+      MathSharedStore.reportError(
+          "maxVelocity must be a non-negative number, got " + maxVelocity, e.getStackTrace());
+      return next;
+    }
+    Translation2d diff = next.minus(current);
+    double dist = diff.getNorm();
+    if (dist < 1e-9) {
+      return next;
+    }
+    if (dist > maxVelocity * dt) {
+      // Move maximum allowed amount in direction of the difference
+      return current.plus(diff.times(maxVelocity * dt / dist));
+    }
+    return next;
+  }
+
+  /**
+   * Limits translation velocity.
+   *
+   * @param current Translation at current timestep.
+   * @param next Translation at next timestep.
+   * @param dt Timestep duration.
+   * @param maxVelocity Maximum translation velocity.
+   * @return Returns the next Translation3d limited to maxVelocity
+   */
+  public static Translation3d slewRateLimit(
+      Translation3d current, Translation3d next, double dt, double maxVelocity) {
+    if (maxVelocity < 0) {
+      Exception e = new IllegalArgumentException();
+      MathSharedStore.reportError(
+          "maxVelocity must be a non-negative number, got " + maxVelocity, e.getStackTrace());
+      return next;
+    }
+    Translation3d diff = next.minus(current);
+    double dist = diff.getNorm();
+    if (dist < 1e-9) {
+      return next;
+    }
+    if (dist > maxVelocity * dt) {
+      // Move maximum allowed amount in direction of the difference
+      return current.plus(diff.times(maxVelocity * dt / dist));
+    }
+    return next;
   }
 }

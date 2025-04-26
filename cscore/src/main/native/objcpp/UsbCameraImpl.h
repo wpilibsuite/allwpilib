@@ -91,6 +91,5 @@ class UsbCameraImpl : public SourceImpl {
  private:
   UsbCameraImplObjc* m_objc;
   std::vector<CameraModeStore> m_platformModes;
-  VideoMode m_mode;
 };
 }  // namespace cs

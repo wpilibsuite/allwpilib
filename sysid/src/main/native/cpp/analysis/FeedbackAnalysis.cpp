@@ -8,6 +8,7 @@
 
 #include <frc/controller/LinearQuadraticRegulator.h>
 #include <frc/system/LinearSystem.h>
+#include <frc/system/plant/LinearSystemId.h>
 #include <units/acceleration.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
@@ -18,6 +19,7 @@ using namespace sysid;
 
 using Kv_t = decltype(1_V / 1_mps);
 using Ka_t = decltype(1_V / 1_mps_sq);
+using Matrix1d = Eigen::Matrix<double, 1, 1>;
 
 FeedbackGains sysid::CalculatePositionFeedbackGains(
     const FeedbackControllerPreset& preset, const LQRParameters& params,
@@ -26,39 +28,32 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
     return {0.0, 0.0};
   }
 
-  // If acceleration requires no effort, velocity becomes an input for position
-  // control. We choose an appropriate model in this case to avoid numerical
+  // If acceleration for position control requires no effort, velocity becomes
+  // an input. We choose an appropriate model in this case to avoid numerical
   // instabilities in the LQR.
-  if (Ka > 1E-7) {
-    // Create a position system from our feedforward gains.
-    frc::LinearSystem<2, 1, 1> system{
-        frc::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -Kv / Ka}},
-        frc::Matrixd<2, 1>{0.0, 1.0 / Ka}, frc::Matrixd<1, 2>{1.0, 0.0},
-        frc::Matrixd<1, 1>{0.0}};
-    // Create an LQR with 2 states to control -- position and velocity.
-    frc::LinearQuadraticRegulator<2, 1> controller{
-        system, {params.qp, params.qv}, {params.r}, preset.period};
-    // Compensate for any latency from sensor measurements, filtering, etc.
+  if (std::abs(Ka) < 1e-7) {
+    // System has position state and velocity input
+    frc::LinearSystem<1, 1, 1> system{Matrix1d{0.0}, Matrix1d{1.0},
+                                      Matrix1d{1.0}, Matrix1d{0.0}};
+
+    frc::LinearQuadraticRegulator<1, 1> controller{
+        system, {params.qp}, {params.r}, preset.period};
     controller.LatencyCompensate(system, preset.period,
                                  preset.measurementDelay);
 
-    return {
-        controller.K(0, 0) * preset.outputConversionFactor,
-        controller.K(0, 1) * preset.outputConversionFactor /
-            (preset.normalized ? 1 : units::second_t{preset.period}.value())};
+    return {Kv * controller.K(0, 0) * preset.outputConversionFactor, 0.0};
   }
 
-  // This is our special model to avoid instabilities in the LQR.
-  auto system = frc::LinearSystem<1, 1, 1>(
-      Eigen::Matrix<double, 1, 1>{0.0}, Eigen::Matrix<double, 1, 1>{1.0},
-      Eigen::Matrix<double, 1, 1>{1.0}, Eigen::Matrix<double, 1, 1>{0.0});
-  // Create an LQR with one state -- position.
-  frc::LinearQuadraticRegulator<1, 1> controller{
-      system, {params.qp}, {params.r}, preset.period};
-  // Compensate for any latency from sensor measurements, filtering, etc.
+  auto system = frc::LinearSystemId::IdentifyPositionSystem<units::meters>(
+      Kv_t{Kv}, Ka_t{Ka});
+
+  frc::LinearQuadraticRegulator<2, 1> controller{
+      system, {params.qp, params.qv}, {params.r}, preset.period};
   controller.LatencyCompensate(system, preset.period, preset.measurementDelay);
 
-  return {Kv * controller.K(0, 0) * preset.outputConversionFactor, 0.0};
+  return {controller.K(0, 0) * preset.outputConversionFactor,
+          controller.K(0, 1) * preset.outputConversionFactor /
+              (preset.normalized ? 1 : units::second_t{preset.period}.value())};
 }
 
 FeedbackGains sysid::CalculateVelocityFeedbackGains(
@@ -69,20 +64,16 @@ FeedbackGains sysid::CalculateVelocityFeedbackGains(
   }
 
   // If acceleration for velocity control requires no effort, the feedback
-  // control gains approach zero. We special-case it here because numerical
-  // instabilities arise in LQR otherwise.
-  if (Ka < 1E-7) {
+  // control gains approach zero. We special-case it here to avoid numerical
+  // instabilities in LQR.
+  if (std::abs(Ka) < 1E-7) {
     return {0.0, 0.0};
   }
 
-  // Create a velocity system from our feedforward gains.
-  frc::LinearSystem<1, 1, 1> system{
-      frc::Matrixd<1, 1>{-Kv / Ka}, frc::Matrixd<1, 1>{1.0 / Ka},
-      frc::Matrixd<1, 1>{1.0}, frc::Matrixd<1, 1>{0.0}};
-  // Create an LQR controller with 1 state -- velocity.
+  auto system = frc::LinearSystemId::IdentifyVelocitySystem<units::meters>(
+      Kv_t{Kv}, Ka_t{Ka});
   frc::LinearQuadraticRegulator<1, 1> controller{
       system, {params.qv}, {params.r}, preset.period};
-  // Compensate for any latency from sensor measurements, filtering, etc.
   controller.LatencyCompensate(system, preset.period, preset.measurementDelay);
 
   return {controller.K(0, 0) * preset.outputConversionFactor /
