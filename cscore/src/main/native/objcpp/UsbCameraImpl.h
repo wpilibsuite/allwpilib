@@ -12,6 +12,7 @@
 #include <string>
 #include <optional>
 #include <map>
+#include <wpi/StringMap.h>
 
 #include "SourceImpl.h"
 
@@ -108,15 +109,15 @@ class UsbCameraImpl : public SourceImpl {
   wpi::mutex& GetMutex() { return m_mutex; }
 
   // Property cache accessors
-  std::map<std::string, uint32_t>& GetPropertyCache() { return m_propertyCache; }
-  std::map<std::string, uint32_t>& GetPropertyAutoCache() { return m_propertyAutoCache; }
+  wpi::StringMap<uint32_t>& GetPropertyCache() { return m_propertyCache; }
+  wpi::StringMap<uint32_t>& GetPropertyAutoCache() { return m_propertyAutoCache; }
 
  private:
   UsbCameraImplObjc* m_objc;
   std::vector<CameraModeStore> m_platformModes;
   
   // Property caches
-  std::map<std::string, uint32_t> m_propertyCache;
-  std::map<std::string, uint32_t> m_propertyAutoCache;
+  wpi::StringMap<uint32_t> m_propertyCache;
+  wpi::StringMap<uint32_t> m_propertyAutoCache;
 };
 }  // namespace cs
