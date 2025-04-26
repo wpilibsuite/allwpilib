@@ -43,7 +43,7 @@ public class TrapezoidProfile {
   private int m_direction;
 
   private final Constraints m_constraints;
-  private State m_current;
+  private State m_current = new State();
 
   private double m_endAccel;
   private double m_endFullSpeed;
@@ -187,7 +187,8 @@ public class TrapezoidProfile {
    * Returns the time left until a target distance in the profile is reached.
    *
    * @param target The target distance.
-   * @return The time left until a target distance in the profile is reached.
+   * @return The time left until a target distance in the profile is reached, or zero if no goal was
+   *     set.
    */
   public double timeLeftUntil(double target) {
     double position = m_current.position * m_direction;
@@ -253,7 +254,7 @@ public class TrapezoidProfile {
   /**
    * Returns the total time the profile takes to reach the goal.
    *
-   * @return The total time the profile takes to reach the goal.
+   * @return The total time the profile takes to reach the goal, or zero if no goal was set.
    */
   public double totalTime() {
     return m_endDecel;
