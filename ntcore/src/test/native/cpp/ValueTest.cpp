@@ -271,6 +271,8 @@ TEST_F(ValueTest, StringArray) {
   NT_DisposeValue(&cv);
 }
 
+// Google Test doesn't have ASSERT_DEATH when compiled with emscripten
+#ifndef __EMSCRIPTEN__
 #ifdef NDEBUG
 TEST_F(ValueDeathTest, DISABLED_GetAssertions) {
 #else
@@ -285,6 +287,7 @@ TEST_F(ValueDeathTest, GetAssertions) {
   ASSERT_DEATH((void)v.GetDoubleArray(), "type == NT_DOUBLE_ARRAY");
   ASSERT_DEATH((void)v.GetStringArray(), "type == NT_STRING_ARRAY");
 }
+#endif
 
 TEST_F(ValueTest, UnassignedComparison) {
   Value v1, v2;

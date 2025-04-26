@@ -70,6 +70,6 @@ void SpanMatcher<T>::DescribeNegationTo(::std::ostream* os) const {
 
 }  // namespace wpi
 
-inline std::span<const uint8_t> operator"" _us(const char* str, size_t len) {
+inline std::span<const uint8_t> operator""_us(const char* str, size_t len) {
   return {reinterpret_cast<const uint8_t*>(str), len};
 }
