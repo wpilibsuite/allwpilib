@@ -11,7 +11,7 @@
 #include <memory>
 #include <string>
 #include <optional>
-#include <map>
+
 #include <wpi/StringMap.h>
 
 #include "SourceImpl.h"
