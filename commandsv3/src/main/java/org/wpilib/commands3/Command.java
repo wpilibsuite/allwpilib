@@ -240,7 +240,7 @@ public interface Command {
    * @param commands The commands to run in parallel
    * @return A command builder
    */
-  static ParallelGroup.Builder parallel(Command... commands) {
+  static ParallelGroupBuilder parallel(Command... commands) {
     return ParallelGroup.all(commands);
   }
 
@@ -252,7 +252,7 @@ public interface Command {
    * @param commands The commands to run in parallel
    * @return A command builder
    */
-  static ParallelGroup.Builder race(Command... commands) {
+  static ParallelGroupBuilder race(Command... commands) {
     return ParallelGroup.race(commands);
   }
 
@@ -264,7 +264,7 @@ public interface Command {
    * @param commands The commands to run in sequence.
    * @return A command builder
    */
-  static Sequence.Builder sequence(Command... commands) {
+  static SequenceBuilder sequence(Command... commands) {
     return Sequence.sequence(commands);
   }
 
@@ -285,7 +285,7 @@ public interface Command {
         });
   }
 
-  default ParallelGroup.Builder until(BooleanSupplier endCondition) {
+  default ParallelGroupBuilder until(BooleanSupplier endCondition) {
     return ParallelGroup.builder()
         .optional(this, Command.waitingFor(endCondition).named("Until Condition"));
   }
@@ -307,7 +307,7 @@ public interface Command {
    * @param next The command to run after this one in the sequence
    * @return A sequence builder
    */
-  default Sequence.Builder andThen(Command next) {
+  default SequenceBuilder andThen(Command next) {
     return Sequence.builder().andThen(this).andThen(next);
   }
 
@@ -327,7 +327,7 @@ public interface Command {
    * @param parallel The commands to run in parallel with this one
    * @return A parallel group builder
    */
-  default ParallelGroup.Builder alongWith(Command... parallel) {
+  default ParallelGroupBuilder alongWith(Command... parallel) {
     return ParallelGroup.builder().requiring(this).requiring(parallel);
   }
 
@@ -338,7 +338,7 @@ public interface Command {
    * @param parallel The commands to run in parallel with this one
    * @return A parallel group builder
    */
-  default ParallelGroup.Builder raceWith(Command... parallel) {
+  default ParallelGroupBuilder raceWith(Command... parallel) {
     return ParallelGroup.builder().optional(this).optional(parallel);
   }
 }
