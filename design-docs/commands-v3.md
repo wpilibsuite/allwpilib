@@ -92,6 +92,11 @@ does not require that inner resource. Using the above example, directly scheduli
 requires `innerResource` will cancel a running `outerCommand` - but only if `outerCommand` is
 *currently using* the inner resource at the time.
 
+**Effectively, all child commands in v3 are "proxied"**, using the v2 framework's definition, unless
+using the built-in ParallelGroup and Sequence compositions or explicitly adding child command 
+requirements to the parent. However, child commands _cannot_ interrupt their parent, even if they
+share requirements, unlike proxy commands in v2.
+
 ### Priority Levels
 
 Priority levels allow for finer-grained control over when commands should be interruptible than a
@@ -303,3 +308,31 @@ parent_id: uint32, name: string, priority: int32, required_resources: string arr
 use the `id` and `parent_id` attributes to reconstruct the tree structure, if desired. `id` and
 `parent_id` marginally increase the size of serialized data, but make the schema and deserialization
 quite simple.
+
+Command IDs are the Java system identity hashcode (_not_ object hashcode, which can be overridden
+and be identical for different command objects). If a command has no parent, its parent ID will be
+set to zero.
+
+Records in the serialized output will be ordered by scheduling order. As a result, child commands
+will always appear _after_ their parent.
+
+For example, if a scheduler is running a command like this:
+
+```java
+RequireableResource r1, r2;
+
+Command theCommand() {
+  return ParallelGroup.all(
+      r1.run(/* ... */).withPriority(1).named("Command 1"),
+      r2.run(/* ... */).withPriority(2).named("Command 2")
+  ).withAutomaticName();
+}
+```
+
+Telemetry for the scheduler would look like:
+
+| `id`   | `parent_id` | `name`                    | `priority` | `required_resources` |
+|--------|-------------|---------------------------|------------|----------------------|
+| 347123 | 0           | "(Command 1 & Command 2)" | 2          | ["R1", "R2"]         |
+| 998712 | 347123      | "Command 1"               | 1          | ["R1"]               |
+| 591564 | 347123      | "Command 2"               | 2          | ["R2"]               |
