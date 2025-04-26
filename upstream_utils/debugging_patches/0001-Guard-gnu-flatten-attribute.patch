@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Thu, 21 Nov 2024 17:51:15 -0800
-Subject: [PATCH 1/4] Guard [[gnu::flatten]] attribute
+Subject: [PATCH 1/5] Guard [[gnu::flatten]] attribute
 
 ---
  include/debugging.hpp | 10 ++++++++--
