@@ -1,6 +1,6 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//wpilibjExamples:build_java_examples.bzl", "build_commands", "build_examples", "build_templates")
+load("//wpilibjExamples:build_java_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates")
 
 py_binary(
     name = "generate_bazel_files",
@@ -15,6 +15,7 @@ genrule(
     srcs = [
         "src/main/java/edu/wpi/first/wpilibj/commands/commands.json",
         "src/main/java/edu/wpi/first/wpilibj/examples/examples.json",
+        "src/main/java/edu/wpi/first/wpilibj/snippets/snippets.json",
         "src/main/java/edu/wpi/first/wpilibj/templates/templates.json",
     ],
     outs = ["gen/example_projects.bzl"],
@@ -37,5 +38,7 @@ halsim_deps = [
 build_commands()
 
 build_examples(halsim_deps = halsim_deps)
+
+build_snippets()
 
 build_templates()

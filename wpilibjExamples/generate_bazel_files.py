@@ -37,6 +37,7 @@ def main():
     templates = load_foldernames(
         "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/templates/templates.json"
     )
+    snippets = load_foldernames("wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/snippets/snippets.json")
     tests = load_tests(
         "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/examples.json"
     )
@@ -51,6 +52,9 @@ def main():
         )
         f.write(
             'COMMANDS_V2_FOLDERS = [\n    "' + '",\n    "'.join(commands) + '",\n]\n\n'
+        )
+        f.write(
+            'SNIPPETS_FOLDERS = [\n    "' + '",\n    "'.join(snippets) + '",\n]\n\n'
         )
         f.write(
             'TEMPLATES_FOLDERS = [\n    "' + '",\n    "'.join(templates) + '",\n]\n\n'

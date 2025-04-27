@@ -1,5 +1,5 @@
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
-load("//wpilibjExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLES_FOLDERS", "TEMPLATES_FOLDERS")
+load("//wpilibjExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLES_FOLDERS", "SNIPPETS_FOLDERS", "TEMPLATES_FOLDERS")
 
 def build_examples(halsim_deps):
     for folder in EXAMPLES_FOLDERS:
@@ -39,6 +39,17 @@ def build_commands():
                 "//wpilibj:wpilibj",
                 "//wpilibNewCommands:wpilibNewCommands-java",
                 "//wpimath:wpimath-java",
+            ],
+            tags = ["wpi-example"],
+        )
+
+def build_snippets():
+    for folder in SNIPPETS_FOLDERS:
+        java_library(
+            name = folder + "-snippet",
+            srcs = native.glob(["src/main/java/edu/wpi/first/wpilibj/snippets/" + folder + "/**/*.java"]),
+            deps = [
+                "//wpilibj:wpilibj",
             ],
             tags = ["wpi-example"],
         )

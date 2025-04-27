@@ -67,6 +67,11 @@ COMMANDS_V2_FOLDERS = [
     "subsystem2",
 ]
 
+SNIPPETS_FOLDERS = [
+    "DutyCycleEncoder",
+    "Encoder",
+]
+
 TEMPLATES_FOLDERS = [
     "commandbased",
     "commandbasedskeleton",

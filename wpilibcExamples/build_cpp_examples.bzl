@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//wpilibcExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLE_FOLDERS", "TEMPLATES_FOLDERS", "TESTS_FOLDERS")
+load("//wpilibcExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLE_FOLDERS", "SNIPPETS_FOLDERS", "TEMPLATES_FOLDERS", "TESTS_FOLDERS")
 
 def build_examples(halsim_deps = []):
     for folder in EXAMPLE_FOLDERS:
@@ -32,6 +32,19 @@ def build_commands():
                 "//wpilibNewCommands:wpilibNewCommands.static",
             ],
             strip_include_prefix = "src/main/cpp/commands/" + folder,
+            tags = ["wpi-example"],
+        )
+
+def build_snippets():
+    for folder in SNIPPETS_FOLDERS:
+        cc_library(
+            name = folder + "-template",
+            srcs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.cpp"]),
+            hdrs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.h"]),
+            deps = [
+                "//wpilibNewCommands:wpilibNewCommands.static",
+            ],
+            strip_include_prefix = "src/main/cpp/snippets/" + folder + "/include",
             tags = ["wpi-example"],
         )
 

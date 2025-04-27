@@ -1,6 +1,6 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//wpilibcExamples:build_cpp_examples.bzl", "build_commands", "build_examples", "build_templates", "build_tests")
+load("//wpilibcExamples:build_cpp_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests")
 
 py_binary(
     name = "generate_bazel_files",
@@ -15,6 +15,7 @@ genrule(
     srcs = [
         "src/main/cpp/commands/commands.json",
         "src/main/cpp/examples/examples.json",
+        "src/main/cpp/snippets/snippets.json",
         "src/main/cpp/templates/templates.json",
     ],
     outs = ["gen/example_projects.bzl"],
@@ -37,6 +38,8 @@ halsim_deps = [
 build_commands()
 
 build_examples(halsim_deps = halsim_deps)
+
+build_snippets()
 
 build_templates()
 
