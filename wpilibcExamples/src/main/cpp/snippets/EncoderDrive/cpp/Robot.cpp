@@ -4,10 +4,10 @@
 
 #include <numbers>
 
-#include <frc/drive/DifferentialDrive.h>
 #include <frc/Encoder.h>
-#include <frc/motorcontrol/Spark.h>
 #include <frc/TimedRobot.h>
+#include <frc/drive/DifferentialDrive.h>
+#include <frc/motorcontrol/Spark.h>
 
 /**
  * Encoder drive to distance snippets for frc-docs.
