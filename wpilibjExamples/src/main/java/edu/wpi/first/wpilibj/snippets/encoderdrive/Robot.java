@@ -39,7 +39,6 @@ public class Robot extends TimedRobot {
   /** Drives forward at half speed until the robot has moved 5 feet, then stops. */
   @Override
   public void autonomousPeriodic() {
-
     if (m_encoder.getDistance() < 5.0) {
       m_drive.tankDrive(0.5, 0.5);
     } else {
