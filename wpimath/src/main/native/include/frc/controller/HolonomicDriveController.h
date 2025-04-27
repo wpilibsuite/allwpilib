@@ -27,8 +27,8 @@ namespace frc {
  * angular velocity.
  *
  * The holonomic drive controller takes in one PID controller for each
- * direction, field-relative x and y, and one profiled PID controller for the angular
- * direction. Because the heading dynamics are decoupled from
+ * direction, field-relative x and y, and one profiled PID controller for the
+ * angular direction. Because the heading dynamics are decoupled from
  * translations, users can specify a custom heading that the drivetrain should
  * point toward. This heading reference is profiled for smoothness.
  */
