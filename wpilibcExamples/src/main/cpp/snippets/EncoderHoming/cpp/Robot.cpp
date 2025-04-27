@@ -6,8 +6,8 @@
 
 #include <frc/DigitalInput.h>
 #include <frc/Encoder.h>
-#include <frc/motorcontrol/Spark.h>
 #include <frc/TimedRobot.h>
+#include <frc/motorcontrol/Spark.h>
 
 /**
  * Encoder mechanism homing snippets for frc-docs.
