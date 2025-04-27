@@ -33,5 +33,29 @@
     "foldername": "analogencoder",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "EncoderDrive",
+    "description": "Snippets of driving to a distance for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Encoder",
+      "Differential Drive"
+    ],
+    "foldername": "encoderdrive",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "EncoderHoming",
+    "description": "Snippets of homing a mechanism for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Encoder",
+      "Digital Input"
+    ],
+    "foldername": "encoderhoming",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
