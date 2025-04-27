@@ -14,7 +14,7 @@ public enum RuntimeType {
   kRoboRIO2(HALUtil.RUNTIME_ROBORIO2),
   /** Simulation runtime. */
   kSimulation(HALUtil.RUNTIME_SIMULATION),
-  /** SystemCore */
+  /** SystemCore. */
   kSystemCore(HALUtil.RUNTIME_SYSTEMCORE);
 
   /** RuntimeType value. */
