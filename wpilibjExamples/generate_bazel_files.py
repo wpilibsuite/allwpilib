@@ -37,7 +37,9 @@ def main():
     templates = load_foldernames(
         "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/templates/templates.json"
     )
-    snippets = load_foldernames("wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/snippets/snippets.json")
+    snippets = load_foldernames(
+        "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/snippets/snippets.json"
+    )
     tests = load_tests(
         "wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/examples.json"
     )
