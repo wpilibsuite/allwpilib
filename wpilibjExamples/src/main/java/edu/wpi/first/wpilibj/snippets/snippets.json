@@ -21,5 +21,17 @@
     "foldername": "dutycycleencoder",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "AnalogEncoder",
+    "description": "Snippets of AnalogEncoder class usage for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Encoder",
+      "Analog"
+    ],
+    "foldername": "analogencoder",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
