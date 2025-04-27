@@ -165,6 +165,7 @@ public interface Subsystem {
    * @param start the action to run on start
    * @param run the action to run every iteration
    * @param end the action to run on interrupt
+   * @return the command
    */
   default Command startRunEnd(Runnable start, Runnable run, Runnable end) {
     return Commands.startRunEnd(start, run, end, this);
