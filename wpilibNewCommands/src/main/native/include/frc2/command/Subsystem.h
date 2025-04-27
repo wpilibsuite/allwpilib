@@ -170,16 +170,16 @@ class Subsystem {
   CommandPtr StartRun(std::function<void()> start, std::function<void()> run);
 
   /**
-   * Constructs a command that runs an action once, and then runs an action every
-   * iteration until interrupted.
+   * Constructs a command that runs an action once, and then runs an action
+   * every iteration until interrupted, and then runs a third action.
    *
    * @param start the action to run on start
    * @param run the action to run every iteration
-   * @param requirements subsystems the action requires
+   * @param end the action to run on interrupt
    */
   [[nodiscard]]
-  CommandPtr StartRunEnd(std::function<void()>, std::function<void()> run, std::function<void()> end);
-
+  CommandPtr StartRunEnd(std::function<void()> start, std::function<void()> run,
+                         std::function<void()> end);
 
   /**
    * Constructs a DeferredCommand with the provided supplier. This subsystem is
