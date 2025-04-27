@@ -113,6 +113,7 @@ public final class Commands {
    * @param run the action to run every iteration
    * @param end the action to run on interrupt
    * @param requirements subsystems the action requires
+   * @return the command
    */
   public static Command startRunEnd(
       Runnable start, Runnable run, Runnable end, Subsystem... requirements) {
