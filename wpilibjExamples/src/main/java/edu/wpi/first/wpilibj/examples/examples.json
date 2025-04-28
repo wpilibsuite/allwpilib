@@ -424,6 +424,21 @@
     "commandversion": 2
   },
   {
+    "name": "SwerveBotNew",
+    "description": "Use WPILib SwerveDrive and SwerveModule with a swerve drive.",
+    "tags": [
+      "Swerve Drive",
+      "Odometry",
+      "XboxController",
+      "Gyro",
+      "Encoder"
+    ],
+    "foldername": "swervebotnew",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "MecanumBot",
     "description": "Use kinematics and odometry with a mecanum drive.",
     "tags": [
