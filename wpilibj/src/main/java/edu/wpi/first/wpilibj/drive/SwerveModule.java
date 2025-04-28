@@ -34,7 +34,6 @@ import static edu.wpi.first.units.Units.Volts;
  * in a swerve drive system.
  */
 public class SwerveModule {
-
     /** Function to apply voltage to the drive motor. */
     private final Consumer<Voltage> m_driveVoltageConsumer;
 

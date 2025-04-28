@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.wpilibj.drive;
 
 import static edu.wpi.first.units.Units.Degrees;
@@ -25,7 +29,6 @@ import edu.wpi.first.units.measure.Angle;
  * updating odometry, and creating estimators for robot pose.
  */
 public class SwerveDrive {
-
     private final SwerveDriveKinematics m_kinematics;
     private final Supplier<Angle> m_gyro;
     private final SwerveDriveOdometry m_odometry;

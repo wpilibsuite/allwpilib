@@ -49,7 +49,7 @@ public final class Constants {
     public static final Translation2d kRearLeftModuleLocation = new Translation2d(kWheelBase / 2, -kTrackWidth / 2);
     public static final Translation2d kFrontRightModuleLocation = new Translation2d(-kWheelBase / 2, kTrackWidth / 2);
     public static final Translation2d kRearRightModuleLocation = new Translation2d(-kWheelBase / 2, -kTrackWidth / 2);
- 
+
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
     // for *your* robot's drive.

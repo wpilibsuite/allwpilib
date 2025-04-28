@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj.drive.SwerveDrive;
 import edu.wpi.first.wpilibj.drive.SwerveModule;
 
 public class DriveSubsystem extends SubsystemBase {
-
     private final SwerveDrive m_swerveDrive;
     private final SwerveModule m_frontLeftModule = createSwerveModule(
         DriveConstants.kFrontLeftModuleLocation,
@@ -38,7 +37,7 @@ public class DriveSubsystem extends SubsystemBase {
         DriveConstants.kFrontLeftDriveEncoderPorts,
         DriveConstants.kFrontLeftTurningEncoderPorts
     );
-    
+
     private final SwerveModule m_rearLeftModule = createSwerveModule(
         DriveConstants.kRearLeftModuleLocation,
         DriveConstants.kRearLeftDriveMotorPort,
@@ -46,7 +45,7 @@ public class DriveSubsystem extends SubsystemBase {
         DriveConstants.kRearLeftDriveEncoderPorts,
         DriveConstants.kRearLeftTurningEncoderPorts
     );
-    
+
     private final SwerveModule m_frontRightModule = createSwerveModule(
         DriveConstants.kFrontRightModuleLocation,
         DriveConstants.kFrontRightDriveMotorPort,
@@ -54,7 +53,7 @@ public class DriveSubsystem extends SubsystemBase {
         DriveConstants.kFrontRightDriveEncoderPorts,
         DriveConstants.kFrontRightTurningEncoderPorts
     );
-    
+
     private final SwerveModule m_rearRightModule = createSwerveModule(
         DriveConstants.kRearRightModuleLocation,
         DriveConstants.kRearRightDriveMotorPort,
@@ -79,7 +78,6 @@ public class DriveSubsystem extends SubsystemBase {
     // Helper function to create a swerve module
     private SwerveModule createSwerveModule(Translation2d location, int driveMotorPort, int turningMotorPort,
                                             int[] driveEncoderPorts, int[] turningEncoderPorts) {
-
         PWMSparkMax driveMotor = new PWMSparkMax(driveMotorPort);
         PWMSparkMax turningMotor = new PWMSparkMax(turningMotorPort);
 
