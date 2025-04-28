@@ -13,6 +13,16 @@ template bool IsStabilizable<2, 1>(const Matrixd<2, 2>& A,
 template bool IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(
     const Eigen::MatrixXd& A, const Eigen::MatrixXd& B);
 
+template bool IsDetectable<Eigen::Dynamic, Eigen::Dynamic>(
+    const Eigen::MatrixXd& A, const Eigen::MatrixXd& C);
+
+template Eigen::VectorXd ClampInputMaxMagnitude<Eigen::Dynamic>(const Eigen::VectorXd& u,
+    const Eigen::VectorXd& umin,
+    const Eigen::VectorXd& umax);
+
+template Eigen::VectorXd DesaturateInputVector<Eigen::Dynamic>(const Eigen::VectorXd& u,
+    double maxMagnitude);
+
 Eigen::MatrixXd MakeCostMatrix(const std::span<const double> costs) {
   Eigen::MatrixXd result{costs.size(), costs.size()};
   result.setZero();

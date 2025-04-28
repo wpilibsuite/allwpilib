@@ -317,6 +317,10 @@ bool IsDetectable(const Matrixd<States, States>& A,
   return IsStabilizable<States, Outputs>(A.transpose(), C.transpose());
 }
 
+extern template WPILIB_DLLEXPORT bool
+IsDetectable<Eigen::Dynamic, Eigen::Dynamic>(const Eigen::MatrixXd& A,
+                                             const Eigen::MatrixXd& C);
+
 /**
  * Converts a Pose2d into a vector of [x, y, theta].
  *
@@ -347,11 +351,16 @@ constexpr Vectord<Inputs> ClampInputMaxMagnitude(const Vectord<Inputs>& u,
                                                  const Vectord<Inputs>& umin,
                                                  const Vectord<Inputs>& umax) {
   Vectord<Inputs> result;
-  for (int i = 0; i < Inputs; ++i) {
+  for (int i = 0; i < u.rows(); ++i) {
     result(i) = std::clamp(u(i), umin(i), umax(i));
   }
   return result;
 }
+
+extern template WPILIB_DLLEXPORT Eigen::VectorXd
+ClampInputMaxMagnitude<Eigen::Dynamic>(const Eigen::VectorXd& u,
+                                       const Eigen::VectorXd& umin,
+                                       const Eigen::VectorXd& umax);
 
 /**
  * Renormalize all inputs if any exceeds the maximum magnitude. Useful for
@@ -372,4 +381,9 @@ Vectord<Inputs> DesaturateInputVector(const Vectord<Inputs>& u,
   }
   return u;
 }
+
+extern template WPILIB_DLLEXPORT Eigen::VectorXd
+DesaturateInputVector<Eigen::Dynamic>(const Eigen::VectorXd& u,
+                                      double maxMagnitude);
+
 }  // namespace frc
