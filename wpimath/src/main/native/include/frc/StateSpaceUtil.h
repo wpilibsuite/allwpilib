@@ -123,6 +123,19 @@ constexpr Matrixd<N, N> MakeCostMatrix(const std::array<double, N>& costs) {
   return result;
 }
 
+/**
+ * Creates a cost matrix from the given vector for use with LQR.
+ *
+ * The cost matrix is constructed using Bryson's rule. The inverse square of
+ * each element in the input is placed on the cost matrix diagonal. If a
+ * tolerance is infinity, its cost matrix entry is set to zero.
+ *
+ * @param costs A possibly variable length container. For a Q matrix, its
+ *              elements are the maximum allowed excursions of the states from
+ *              the reference. For an R matrix, its elements are the maximum
+ *              allowed excursions of the control inputs from no actuation.
+ * @return State excursion or control effort cost matrix.
+ */
 Eigen::MatrixXd MakeCostMatrix(const std::span<const double> costs);
 
 /**
@@ -154,6 +167,18 @@ constexpr Matrixd<N, N> MakeCovMatrix(const std::array<double, N>& stdDevs) {
   return result;
 }
 
+/**
+ * Creates a covariance matrix from the given vector for use with Kalman
+ * filters.
+ *
+ * Each element is squared and placed on the covariance matrix diagonal.
+ *
+ * @param stdDevs A possibly variable length container. For a Q matrix, its
+ *                elements are the standard deviations of each state from how
+ *                the model behaves. For an R matrix, its elements are the
+ *                standard deviations for each output measurement.
+ * @return Process noise or measurement noise covariance matrix.
+ */
 Eigen::MatrixXd MakeCovMatrix(const std::span<const double> stdDevs);
 
 template <std::same_as<double>... Ts>
@@ -204,6 +229,14 @@ Vectord<N> MakeWhiteNoiseVector(const std::array<double, N>& stdDevs) {
   return result;
 }
 
+/**
+ * Creates a vector of normally distributed white noise with the given noise
+ * intensities for each element.
+ *
+ * @param stdDevs A possibly variable length container whose elements are the
+ *                standard deviations of each element of the noise vector.
+ * @return White noise vector.
+ */
 Eigen::VectorXd MakeWhiteNoiseVector(const std::span<const double> stdDevs);
 
 /**
