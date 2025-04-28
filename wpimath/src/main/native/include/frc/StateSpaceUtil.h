@@ -123,6 +123,8 @@ constexpr Matrixd<N, N> MakeCostMatrix(const std::array<double, N>& costs) {
   return result;
 }
 
+Eigen::MatrixXd MakeCostMatrix(const std::span<const double> costs);
+
 /**
  * Creates a covariance matrix from the given vector for use with Kalman
  * filters.
@@ -151,6 +153,8 @@ constexpr Matrixd<N, N> MakeCovMatrix(const std::array<double, N>& stdDevs) {
 
   return result;
 }
+
+Eigen::MatrixXd MakeCovMatrix(const std::span<const double> stdDevs);
 
 template <std::same_as<double>... Ts>
 Vectord<sizeof...(Ts)> MakeWhiteNoiseVector(Ts... stdDevs) {
@@ -199,6 +203,8 @@ Vectord<N> MakeWhiteNoiseVector(const std::array<double, N>& stdDevs) {
   }
   return result;
 }
+
+Eigen::VectorXd MakeWhiteNoiseVector(const std::span<const double> stdDevs);
 
 /**
  * Converts a Pose2d into a vector of [x, y, theta].
