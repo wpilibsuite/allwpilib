@@ -4,13 +4,9 @@
 
 package edu.wpi.first.wpilibj.drive;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
-
-import java.util.concurrent.locks.Lock;
-import java.util.function.Supplier;
-
 import edu.wpi.first.math.Matrix;
+import java.util.function.Supplier;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
