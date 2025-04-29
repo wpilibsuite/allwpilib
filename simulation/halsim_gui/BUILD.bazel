@@ -1,5 +1,4 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//shared/bazel/rules:cc_flags.bzl", "get_wpigui_linker_flags")
 
 cc_library(
     name = "halsim_gui",
@@ -9,7 +8,6 @@ cc_library(
     ]),
     features = ["windows_export_all_symbols"],
     includes = ["src/main/native/include"],
-    linkopts = get_wpigui_linker_flags(console = True),
     tags = [
         "wpi-cpp-gui",
     ],
@@ -32,7 +30,6 @@ cc_test(
         "src/test/native/**/*.cpp",
         "src/test/native/**/*.h",
     ]),
-    linkopts = get_wpigui_linker_flags(console = True),
     tags = [
         "no-asan",
         "wpi-cpp-gui",
