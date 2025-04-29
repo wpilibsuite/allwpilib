@@ -136,7 +136,8 @@ constexpr Matrixd<N, N> MakeCostMatrix(const std::array<double, N>& costs) {
  *              allowed excursions of the control inputs from no actuation.
  * @return State excursion or control effort cost matrix.
  */
-WPILIB_DLLEXPORT Eigen::MatrixXd MakeCostMatrix(const std::span<const double> costs);
+WPILIB_DLLEXPORT Eigen::MatrixXd MakeCostMatrix(
+    const std::span<const double> costs);
 
 /**
  * Creates a covariance matrix from the given vector for use with Kalman
@@ -179,7 +180,8 @@ constexpr Matrixd<N, N> MakeCovMatrix(const std::array<double, N>& stdDevs) {
  *                standard deviations for each output measurement.
  * @return Process noise or measurement noise covariance matrix.
  */
-WPILIB_DLLEXPORT Eigen::MatrixXd MakeCovMatrix(const std::span<const double> stdDevs);
+WPILIB_DLLEXPORT Eigen::MatrixXd MakeCovMatrix(
+    const std::span<const double> stdDevs);
 
 template <std::same_as<double>... Ts>
 Vectord<sizeof...(Ts)> MakeWhiteNoiseVector(Ts... stdDevs) {
@@ -237,7 +239,8 @@ Vectord<N> MakeWhiteNoiseVector(const std::array<double, N>& stdDevs) {
  *                standard deviations of each element of the noise vector.
  * @return White noise vector.
  */
-WPILIB_DLLEXPORT Eigen::VectorXd MakeWhiteNoiseVector(const std::span<const double> stdDevs);
+WPILIB_DLLEXPORT Eigen::VectorXd MakeWhiteNoiseVector(
+    const std::span<const double> stdDevs);
 
 /**
  * Converts a Pose2d into a vector of [x, y, theta].
