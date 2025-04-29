@@ -21,6 +21,10 @@ cc_binary(
         ":generate-resources",
         ":generate-version",
     ],
+    linkopts = select({
+        "@bazel_tools//src/conditions:windows": ["-SUBSYSTEM:WINDOWS"],
+        "//conditions:default": [],
+    }),
     tags = [
         "wpi-cpp-gui",
     ],

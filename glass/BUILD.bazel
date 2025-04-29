@@ -53,6 +53,10 @@ cc_binary(
         ":generate-resources",
         ":generate-version",
     ] + glob(["src/app/native/cpp/**"]),
+    linkopts = select({
+        "@bazel_tools//src/conditions:windows": ["-SUBSYSTEM:WINDOWS"],
+        "//conditions:default": [],
+    }),
     tags = [
         "wpi-cpp-gui",
     ],
