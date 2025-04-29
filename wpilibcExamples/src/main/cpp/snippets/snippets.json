@@ -52,5 +52,15 @@
     ],
     "foldername": "EncoderHoming",
     "gradlebase": "cpp"
+  },
+  {
+    "name": "LimitSwitch",
+    "description": "Snippets of Limit Switch for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Digital Input"
+    ],
+    "foldername": "LimitSwitch",
+    "gradlebase": "cpp"
   }
 ]
