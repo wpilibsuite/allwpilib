@@ -4,8 +4,6 @@
 
 #include "glass/other/Field2D.h"
 
-#include <portable-file-dialogs.h>
-
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -22,6 +20,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
+#include <portable-file-dialogs.h>
 #include <units/angle.h>
 #include <units/length.h>
 #include <wpi/MemoryBuffer.h>
