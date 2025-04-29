@@ -32,31 +32,31 @@ class StructDescriptorDatabase;
  */
 enum class StructFieldType {
   /// bool.
-  kBool,
+  BOOL,
   /// char.
-  kChar,
+  CHAR,
   /// int8.
-  kInt8,
+  INT8,
   /// int16.
-  kInt16,
+  INT16,
   /// int32.
-  kInt32,
+  INT32,
   /// int64.
-  kInt64,
+  INT64,
   /// uint8.
-  kUint8,
+  UINT8,
   /// uint16.
-  kUint16,
+  UINT16,
   /// uint32.
-  kUint32,
+  UINT32,
   /// uint64.
-  kUint64,
+  UINT64,
   /// float.
-  kFloat,
+  FLOAT,
   /// double.
-  kDouble,
+  DOUBLE,
   /// struct.
-  kStruct
+  STRUCT
 };
 
 /**
@@ -108,10 +108,10 @@ class StructFieldDescriptor {
    * @return true if signed integer, false otherwise
    */
   bool IsInt() const {
-    return m_type == StructFieldType::kInt8 ||
-           m_type == StructFieldType::kInt16 ||
-           m_type == StructFieldType::kInt32 ||
-           m_type == StructFieldType::kInt64;
+    return m_type == StructFieldType::INT8 ||
+           m_type == StructFieldType::INT16 ||
+           m_type == StructFieldType::INT32 ||
+           m_type == StructFieldType::INT64;
   }
 
   /**
@@ -120,10 +120,10 @@ class StructFieldDescriptor {
    * @return true if unsigned integer, false otherwise
    */
   bool IsUint() const {
-    return m_type == StructFieldType::kUint8 ||
-           m_type == StructFieldType::kUint16 ||
-           m_type == StructFieldType::kUint32 ||
-           m_type == StructFieldType::kUint64;
+    return m_type == StructFieldType::UINT8 ||
+           m_type == StructFieldType::UINT16 ||
+           m_type == StructFieldType::UINT32 ||
+           m_type == StructFieldType::UINT64;
   }
 
   /**
@@ -409,7 +409,7 @@ class DynamicStruct {
    */
   bool GetBoolField(const StructFieldDescriptor* field,
                     size_t arrIndex = 0) const {
-    assert(field->m_type == StructFieldType::kBool);
+    assert(field->m_type == StructFieldType::BOOL);
     return GetFieldImpl(field, arrIndex);
   }
 
@@ -458,7 +458,7 @@ class DynamicStruct {
    */
   float GetFloatField(const StructFieldDescriptor* field,
                       size_t arrIndex = 0) const {
-    assert(field->m_type == StructFieldType::kFloat);
+    assert(field->m_type == StructFieldType::FLOAT);
     return bit_cast<float>(
         static_cast<uint32_t>(GetFieldImpl(field, arrIndex)));
   }
@@ -472,7 +472,7 @@ class DynamicStruct {
    */
   double GetDoubleField(const StructFieldDescriptor* field,
                         size_t arrIndex = 0) const {
-    assert(field->m_type == StructFieldType::kDouble);
+    assert(field->m_type == StructFieldType::DOUBLE);
     return bit_cast<double>(GetFieldImpl(field, arrIndex));
   }
 
@@ -493,7 +493,7 @@ class DynamicStruct {
    */
   DynamicStruct GetStructField(const StructFieldDescriptor* field,
                                size_t arrIndex = 0) const {
-    assert(field->m_type == StructFieldType::kStruct);
+    assert(field->m_type == StructFieldType::STRUCT);
     assert(field->m_parent == m_desc);
     assert(m_desc->IsValid());
     assert(arrIndex < field->m_arraySize);
@@ -553,7 +553,7 @@ class MutableDynamicStruct : public DynamicStruct {
    */
   void SetBoolField(const StructFieldDescriptor* field, bool value,
                     size_t arrIndex = 0) {
-    assert(field->m_type == StructFieldType::kBool);
+    assert(field->m_type == StructFieldType::BOOL);
     SetFieldImpl(field, value ? 1 : 0, arrIndex);
   }
 
@@ -592,7 +592,7 @@ class MutableDynamicStruct : public DynamicStruct {
    */
   void SetFloatField(const StructFieldDescriptor* field, float value,
                      size_t arrIndex = 0) {
-    assert(field->m_type == StructFieldType::kFloat);
+    assert(field->m_type == StructFieldType::FLOAT);
     SetFieldImpl(field, bit_cast<uint32_t>(value), arrIndex);
   }
 
@@ -605,7 +605,7 @@ class MutableDynamicStruct : public DynamicStruct {
    */
   void SetDoubleField(const StructFieldDescriptor* field, double value,
                       size_t arrIndex = 0) {
-    assert(field->m_type == StructFieldType::kDouble);
+    assert(field->m_type == StructFieldType::DOUBLE);
     SetFieldImpl(field, bit_cast<uint64_t>(value), arrIndex);
   }
 
@@ -638,7 +638,7 @@ class MutableDynamicStruct : public DynamicStruct {
    */
   MutableDynamicStruct GetStructField(const StructFieldDescriptor* field,
                                       size_t arrIndex = 0) {
-    assert(field->m_type == StructFieldType::kStruct);
+    assert(field->m_type == StructFieldType::STRUCT);
     assert(field->m_parent == m_desc);
     assert(m_desc->IsValid());
     assert(arrIndex < field->m_arraySize);

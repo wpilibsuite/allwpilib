@@ -9,18 +9,18 @@ package edu.wpi.first.util;
  */
 public enum TimestampSource {
   /** unknown. */
-  kUnknown(0),
+  UNKNOWN(0),
   /**
    * wpi::Now when the new frame was dequeued by CSCore. Does not account for camera exposure time
    * or V4L latency.
    */
-  kFrameDequeue(1),
+  FRAME_DEQUEUE(1),
   /** End of Frame. Same as V4L2_BUF_FLAG_TSTAMP_SRC_EOF, translated into wpi::Now's timebase. */
-  kV4LEOF(2),
+  VALUE_OF(2),
   /**
    * Start of Exposure. Same as V4L2_BUF_FLAG_TSTAMP_SRC_SOE, translated into wpi::Now's timebase.
    */
-  kV4LSOE(3);
+  V4LSOE(3);
 
   private final int value;
 

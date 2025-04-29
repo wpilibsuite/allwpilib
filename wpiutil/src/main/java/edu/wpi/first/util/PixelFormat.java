@@ -7,23 +7,23 @@ package edu.wpi.first.util;
 /** Image pixel format. */
 public enum PixelFormat {
   /** Unknown format. */
-  kUnknown(0),
+  UNKNOWN(0),
   /** Motion-JPEG (compressed image data). */
-  kMJPEG(1),
+  MJPEG(1),
   /** YUY 4:2:2, 16 bpp. */
-  kYUYV(2),
+  YUYV(2),
   /** RGB 5-6-5, 16 bpp. */
-  kRGB565(3),
+  RGB565(3),
   /** BGR 8-8-8, 24 bpp. */
-  kBGR(4),
+  BGR(4),
   /** Grayscale, 8 bpp. */
-  kGray(5),
+  GRAY(5),
   /** Grayscale, 16 bpp. */
-  kY16(6),
+  Y16(6),
   /** YUV 4:2:2, 16 bpp. */
-  kUYVY(7),
+  UYVY(7),
   /** BGRA 8-8-8-8. 32 bpp. */
-  kBGRA(8);
+  BGRA(8);
 
   private final int value;
 

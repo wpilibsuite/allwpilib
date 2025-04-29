@@ -32,18 +32,18 @@ typedef WPI_Handle WPI_SemaphoreHandle;  // NOLINT
 namespace wpi {
 
 /** Constant representing an invalid handle. */
-constexpr unsigned int kInvalidHandle = 0;
+constexpr unsigned int INVALID_HANDLE = 0;
 
 /**
  * Standard types for handles.
  * @{
  */
-constexpr int kHandleTypeEvent = 1;
-constexpr int kHandleTypeSemaphore = 2;
-constexpr int kHandleTypeCSBase = 3;
-constexpr int kHandleTypeNTBase = 16;
-constexpr int kHandleTypeHALBase = 48;
-constexpr int kHandleTypeUserBase = 80;
+constexpr int HANDLE_TYPE_EVENT = 1;
+constexpr int HANDLE_TYPE_SEMAPHORE = 2;
+constexpr int HANDLE_TYPE_CS_BASE = 3;
+constexpr int HANDLE_TYPE_NT_BASE = 16;
+constexpr int HANDLE_TYPE_HAL_BASE = 48;
+constexpr int HANDLE_TYPE_USER_BASE = 80;
 /** @} */
 
 /**
