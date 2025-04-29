@@ -57,5 +57,16 @@
     "foldername": "encoderhoming",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "LimitSwitch",
+    "description": "Snippets of Limit Switch for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Digital Input"
+    ],
+    "foldername": "limitswitch",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
