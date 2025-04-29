@@ -45,7 +45,7 @@ class PWMSimModel : public glass::PWMModel {
 
 class PWMsSimModel : public glass::PWMsModel {
  public:
-  PWMsSimModel() : m_sources(HAL_GetNumPWMChannels()) {}
+  PWMsSimModel() : m_sources(HAL_GetNumSmartIo()) {}
 
   void Update() override;
 
@@ -96,7 +96,7 @@ void PWMsSimModel::ForEachPWM(
 }
 
 static bool PWMsAnyInitialized() {
-  static const int32_t num = HAL_GetNumPWMChannels();
+  static const int32_t num = HAL_GetNumSmartIo();
   for (int32_t i = 0; i < num; ++i) {
     if (HALSIM_GetPWMInitialized(i)) {
       return true;

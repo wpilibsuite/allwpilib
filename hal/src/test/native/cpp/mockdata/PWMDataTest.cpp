@@ -23,7 +23,7 @@ void TestPwmInitializationCallback(const char* name, void* param,
 }
 
 TEST(PWMSimTest, PwmInitialization) {
-  const int INDEX_TO_TEST = 7;
+  const int INDEX_TO_TEST = 3;
 
   int callbackParam = 0;
   int callbackId = HALSIM_RegisterPWMInitializedCallback(

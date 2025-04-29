@@ -4,24 +4,15 @@
 
 #include "hal/Counter.h"
 
-#include "CounterInternal.h"
+#include "SmartIo.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/cpp/fpga_clock.h"
 #include "hal/handles/LimitedHandleResource.h"
-
-namespace hal {
-
-LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
-                      HAL_HandleEnum::Counter>* counterHandles;
-}  // namespace hal
 
 namespace hal::init {
 void InitializeCounter() {
-  static LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
-                               HAL_HandleEnum::Counter>
-      cH;
-  counterHandles = &cH;
 }
 }  // namespace hal::init
 

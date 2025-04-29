@@ -19,7 +19,7 @@
 namespace wpilibws {
 
 void HALSimWSProviderAnalogIn::Initialize(WSRegisterFunc webRegisterFunc) {
-  CreateProviders<HALSimWSProviderAnalogIn>("AI", HAL_GetNumAnalogInputs(),
+  CreateProviders<HALSimWSProviderAnalogIn>("AI", HAL_GetNumSmartIo(),
                                             webRegisterFunc);
 }
 
