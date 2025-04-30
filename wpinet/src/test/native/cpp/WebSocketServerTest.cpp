@@ -57,7 +57,7 @@ class WebSocketServerTest : public WebSocketTest {
   std::function<void(std::string_view)> handleData;
   std::vector<uint8_t> wireData;
   std::shared_ptr<WebSocket> ws;
-  HttpParser resp{HttpParser::kResponse};
+  HttpParser resp{HttpParser::RESPONSE};
   bool headersDone = false;
 };
 

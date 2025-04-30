@@ -211,9 +211,9 @@ const std::array<uv::Buffer, 2> WebSocketTrySendTest::m_frame0bufs{m_bufs[0],
 const std::array<uv::Buffer, 1> WebSocketTrySendTest::m_frame1bufs{m_bufs[2]};
 const std::array<uv::Buffer, 1> WebSocketTrySendTest::m_frame2bufs{m_bufs[3]};
 const std::array<WebSocket::Frame, 3> WebSocketTrySendTest::m_frames{
-    WebSocket::Frame{WebSocket::Frame::kBinaryFragment, m_frame0bufs},
-    WebSocket::Frame{WebSocket::Frame::kBinary, m_frame1bufs},
-    WebSocket::Frame{WebSocket::Frame::kText, m_frame2bufs},
+    WebSocket::Frame{WebSocket::Frame::BINARY_FRAGMENT, m_frame0bufs},
+    WebSocket::Frame{WebSocket::Frame::BINARY, m_frame1bufs},
+    WebSocket::Frame{WebSocket::Frame::TEXT, m_frame2bufs},
 };
 const std::array<std::vector<uint8_t>, 3> WebSocketTrySendTest::m_serialized{
     WebSocketTest::BuildMessage(m_frames[0].opcode, false, false, m_frame0data),
@@ -389,7 +389,7 @@ TEST_F(WebSocketTrySendTest, Big) {
     bufs.emplace_back(
         uv::Buffer::Allocate(i < 100000 ? 1430 : (100000 - (i - 1430))));
   }
-  WebSocket::Frame frame{WebSocket::kOpBinary | WebSocket::kFlagFin, bufs};
+  WebSocket::Frame frame{WebSocket::OP_BINARY | WebSocket::FLAG_FIN, bufs};
   EXPECT_CALL(stream, TryWrite(_)).WillOnce(Return(7681));
 
   // Write called for remainder of buffers

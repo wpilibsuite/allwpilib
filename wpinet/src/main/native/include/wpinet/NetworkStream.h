@@ -16,10 +16,10 @@ class NetworkStream {
   virtual ~NetworkStream() = default;
 
   enum Error {
-    kConnectionClosed = 0,
-    kConnectionReset = -1,
-    kConnectionTimedOut = -2,
-    kWouldBlock = -3
+    CONNECTION_CLOSED = 0,
+    CONNECTION_RESET = -1,
+    CONNECTION_TIMED_OUT = -2,
+    WOULD_BLOCK = -3
   };
 
   virtual size_t send(const char* buffer, size_t len, Error* err) = 0;

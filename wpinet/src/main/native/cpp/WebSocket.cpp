@@ -108,9 +108,9 @@ class WebSocket::WriteReq : public uv::WriteReq,
   std::shared_ptr<WriteReq> m_controlCont;
 };
 
-static constexpr uint8_t kFlagMasking = 0x80;
-static constexpr uint8_t kLenMask = 0x7f;
-static constexpr size_t kWriteAllocSize = 4096;
+static constexpr uint8_t FLAG_MASKING = 0x80;
+static constexpr uint8_t LEN_MASK = 0x7f;
+static constexpr size_t WRITE_ALLOC_SIZE = 4096;
 
 class WebSocket::ClientHandshakeData {
  public:
@@ -135,7 +135,7 @@ class WebSocket::ClientHandshakeData {
 
   SmallString<64> key;                       // the key sent to the server
   SmallVector<std::string, 2> protocols;     // valid protocols
-  HttpParser parser{HttpParser::kResponse};  // server response parser
+  HttpParser parser{HttpParser::RESPONSE};  // server response parser
   bool hasUpgrade = false;
   bool hasConnection = false;
   bool hasAccept = false;
@@ -223,7 +223,7 @@ void WebSocket::StartClient(std::string_view uri, std::string_view host,
 
   // Build client request
   SmallVector<uv::Buffer, 4> bufs;
-  raw_uv_ostream os{bufs, kWriteAllocSize};
+  raw_uv_ostream os{bufs, WRITE_ALLOC_SIZE};
 
   os << "GET " << uri << " HTTP/1.1\r\n";
   os << "Host: " << host << "\r\n";
@@ -342,7 +342,7 @@ void WebSocket::StartServer(std::string_view key, std::string_view version,
 
   // Build server response
   SmallVector<uv::Buffer, 4> bufs;
-  raw_uv_ostream os{bufs, kWriteAllocSize};
+  raw_uv_ostream os{bufs, WRITE_ALLOC_SIZE};
 
   // Handle unsupported version
   if (version != "13") {
@@ -390,13 +390,13 @@ void WebSocket::StartServer(std::string_view key, std::string_view version,
 void WebSocket::SendClose(uint16_t code, std::string_view reason) {
   SmallVector<uv::Buffer, 4> bufs;
   if (code != 1005) {
-    raw_uv_ostream os{bufs, kWriteAllocSize};
+    raw_uv_ostream os{bufs, WRITE_ALLOC_SIZE};
     const uint8_t codeMsb[] = {static_cast<uint8_t>((code >> 8) & 0xff),
                                static_cast<uint8_t>(code & 0xff)};
     os << std::span{codeMsb};
     os << reason;
   }
-  SendControl(kFlagFin | kOpClose, bufs, [](auto bufs, uv::Error) {
+  SendControl(FLAG_FIN | OP_CLOSE, bufs, [](auto bufs, uv::Error) {
     for (auto&& buf : bufs) {
       buf.Deallocate();
     }
@@ -478,13 +478,13 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
       // Once we have first two bytes, we can calculate the header size
       if (m_headerSize == 0) {
         m_headerSize = 2;
-        uint8_t len = m_header[1] & kLenMask;
+        uint8_t len = m_header[1] & LEN_MASK;
         if (len == 126) {
           m_headerSize += 2;
         } else if (len == 127) {
           m_headerSize += 8;
         }
-        bool masking = (m_header[1] & kFlagMasking) != 0;
+        bool masking = (m_header[1] & FLAG_MASKING) != 0;
         if (masking) {
           m_headerSize += 4;  // masking key
         }
@@ -510,7 +510,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
 
       if (m_header.size() >= m_headerSize) {
         // get payload length
-        uint8_t len = m_header[1] & kLenMask;
+        uint8_t len = m_header[1] & LEN_MASK;
         if (len == 126) {
           m_frameSize = (static_cast<uint16_t>(m_header[2]) << 8) |
                         static_cast<uint16_t>(m_header[3]);
@@ -528,7 +528,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
         }
 
         // limit maximum size
-        bool control = (m_header[0] & kFlagControl) != 0;
+        bool control = (m_header[0] & FLAG_CONTROL) != 0;
         if (((control ? m_controlPayload.size() : m_payload.size()) +
              m_frameSize) > m_maxMessageSize) {
           return Fail(1009, "message too large");
@@ -537,7 +537,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
     }
 
     if (m_frameSize != UINT64_MAX) {
-      bool control = (m_header[0] & kFlagControl) != 0;
+      bool control = (m_header[0] & FLAG_CONTROL) != 0;
       size_t need;
       if (control) {
         need = m_frameSize - m_controlPayload.size();
@@ -555,21 +555,21 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
       if (need == 0) {
         // We have a complete frame
         // If the message had masking, unmask it
-        if ((m_header[1] & kFlagMasking) != 0) {
+        if ((m_header[1] & FLAG_MASKING) != 0) {
           Unmask(control ? std::span{m_controlPayload}
                          : std::span{m_payload}.subspan(m_frameStart),
                  std::span<const uint8_t, 4>{&m_header[m_headerSize - 4], 4});
         }
 
         // Handle message
-        bool fin = (m_header[0] & kFlagFin) != 0;
-        uint8_t opcode = m_header[0] & kOpMask;
+        bool fin = (m_header[0] & FLAG_FIN) != 0;
+        uint8_t opcode = m_header[0] & OP_MASK;
         switch (opcode) {
-          case kOpCont:
+          case OP_CONT:
             WS_DEBUG(m_stream, "WS Fragment {} [{}]", m_payload.size(),
                      DebugBinary(m_payload));
             switch (m_fragmentOpcode) {
-              case kOpText:
+              case OP_TEXT:
                 if (!m_combineFragments || fin) {
                   std::string_view content{
                       reinterpret_cast<char*>(m_payload.data()),
@@ -579,7 +579,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
                   text(content, fin);
                 }
                 break;
-              case kOpBinary:
+              case OP_BINARY:
                 if (!m_combineFragments || fin) {
                   WS_DEBUG(m_stream, "WS RecvBinary(Defrag) {} ({})",
                            m_payload.size(), DebugBinary(m_payload));
@@ -594,7 +594,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
               m_fragmentOpcode = 0;
             }
             break;
-          case kOpText: {
+          case OP_TEXT: {
             std::string_view content{reinterpret_cast<char*>(m_payload.data()),
                                      m_payload.size()};
             if (m_fragmentOpcode != 0) {
@@ -613,7 +613,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
             }
             break;
           }
-          case kOpBinary:
+          case OP_BINARY:
             if (m_fragmentOpcode != 0) {
               WS_DEBUG(m_stream, "WS RecvBinary {} ({}) -> INCOMPLETE FRAGMENT",
                        m_payload.size(), DebugBinary(m_payload));
@@ -630,7 +630,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
               m_fragmentOpcode = opcode;
             }
             break;
-          case kOpClose: {
+          case OP_CLOSE: {
             uint16_t code;
             std::string_view reason;
             if (!fin) {
@@ -657,7 +657,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
             }
             break;
           }
-          case kOpPing:
+          case OP_PING:
             if (!fin) {
               return Fail(1002, "cannot fragment control frames");
             }
@@ -665,7 +665,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
             if (m_state == OPEN) {
               SmallVector<uv::Buffer, 4> bufs;
               {
-                raw_uv_ostream os{bufs, kWriteAllocSize};
+                raw_uv_ostream os{bufs, WRITE_ALLOC_SIZE};
                 os << m_controlPayload;
               }
               SendPong(bufs, [](auto bufs, uv::Error) {
@@ -678,7 +678,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
                      DebugBinary(m_controlPayload));
             ping(m_controlPayload);
             break;
-          case kOpPong:
+          case OP_PONG:
             if (!fin) {
               return Fail(1002, "cannot fragment control frames");
             }
