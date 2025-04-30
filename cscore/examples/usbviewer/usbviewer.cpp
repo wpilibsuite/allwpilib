@@ -3,13 +3,17 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <atomic>
+#include <memory>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <opencv2/core/core.hpp>
+#include <opencv2/core/mat.hpp>
 #include <opencv2/imgproc.hpp>
+#include <wpi/mutex.h>
 #include <wpi/print.h>
 #include <wpi/spinlock.h>
 #include <wpigui.h>
@@ -20,10 +24,10 @@
 namespace gui = wpi::gui;
 
 int main() {
-  std::atomic<cv::Mat*> latestFrame{nullptr};
-  std::vector<cv::Mat*> sharedFreeList;
-  wpi::spinlock sharedFreeListMutex;
-  std::vector<cv::Mat*> sourceFreeList;
+  wpi::mutex latestFrameMutex;
+  std::unique_ptr<cv::Mat> latestFrame{nullptr};
+  wpi::spinlock freeListMutex;
+  std::vector<std::unique_ptr<cv::Mat>> freeList;
   std::atomic<bool> stopCamera{false};
 
   cs::UsbCamera camera{"usbcam", 0};
@@ -41,36 +45,31 @@ int main() {
         continue;
       }
 
-      // get or create a mat, prefer sourceFreeList over sharedFreeList
-      cv::Mat* out;
-      if (!sourceFreeList.empty()) {
-        out = sourceFreeList.back();
-        sourceFreeList.pop_back();
-      } else {
-        {
-          std::scoped_lock lock(sharedFreeListMutex);
-          for (auto mat : sharedFreeList) {
-            sourceFreeList.emplace_back(mat);
-          }
-          sharedFreeList.clear();
-        }
-        if (!sourceFreeList.empty()) {
-          out = sourceFreeList.back();
-          sourceFreeList.pop_back();
+      // get or create a mat
+      std::unique_ptr<cv::Mat> out;
+      {
+        std::scoped_lock lock(freeListMutex);
+        if (!freeList.empty()) {
+          out = std::move(freeList.back());
+          freeList.pop_back();
         } else {
-          out = new cv::Mat;
+          out = std::make_unique<cv::Mat>(cv::Mat());
         }
       }
 
       // convert to RGBA
       cv::cvtColor(frame, *out, cv::COLOR_BGR2RGBA);
 
-      // make available
-      auto prev = latestFrame.exchange(out);
+      {
+        // make available
+        std::scoped_lock lock(latestFrameMutex);
+        latestFrame.swap(out);
+      }
 
-      // put prev on free list
-      if (prev) {
-        sourceFreeList.emplace_back(prev);
+      // put the previous frame on free list
+      if (out) {
+        std::scoped_lock lock(freeListMutex);
+        freeList.emplace_back(std::move(out));
       }
     }
   });
@@ -79,19 +78,16 @@ int main() {
   gui::Initialize("Hello World", 1024, 768);
   gui::Texture tex;
   gui::AddEarlyExecute([&] {
-    auto frame = latestFrame.exchange(nullptr);
-    if (frame) {
+    std::scoped_lock lock(latestFrameMutex);
+    if (latestFrame) {
       // create or update texture
-      if (!tex || frame->cols != tex.GetWidth() ||
-          frame->rows != tex.GetHeight()) {
-        tex = gui::Texture(gui::kPixelRGBA, frame->cols, frame->rows,
-                           frame->data);
+      if (!tex || latestFrame->cols != tex.GetWidth() ||
+          latestFrame->rows != tex.GetHeight()) {
+        tex = gui::Texture(gui::kPixelRGBA, latestFrame->cols,
+                           latestFrame->rows, latestFrame->data);
       } else {
-        tex.Update(frame->data);
+        tex.Update(latestFrame->data);
       }
-      // put back on shared freelist
-      std::scoped_lock lock(sharedFreeListMutex);
-      sharedFreeList.emplace_back(frame);
     }
 
     ImGui::SetNextWindowSize(ImVec2(640, 480), ImGuiCond_FirstUseEver);
