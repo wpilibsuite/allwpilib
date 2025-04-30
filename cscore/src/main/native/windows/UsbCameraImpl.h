@@ -80,19 +80,19 @@ class UsbCameraImpl : public SourceImpl,
   // Messages passed to/from camera thread
   struct Message {
     enum Kind {
-      kNone = 0,
-      kCmdSetPath,
-      kCmdSetMode,
-      kCmdSetPixelFormat,
-      kCmdSetResolution,
-      kCmdSetFPS,
-      kCmdSetProperty,
-      kCmdSetPropertyStr,
-      kNumSinksChanged,         // no response
-      kNumSinksEnabledChanged,  // no response
+      NONE = 0,
+      CMD_SET_PATH,
+      CMD_SET_MODE,
+      CMD_SET_PIXEL_FORMAT,
+      CMD_SET_RESOLUTION,
+      CMD_SET_FPS,
+      CMD_SET_PROPERTY,
+      CMD_SET_PROPERTY_STR,
+      NUM_SINKS_CHANGED,         // no response
+      NUM_SINKS_ENABLED_CHANGED,  // no response
       // Responses
-      kOk,
-      kError
+      OK,
+      ERROR
     };
 
     explicit Message(Kind kind_)

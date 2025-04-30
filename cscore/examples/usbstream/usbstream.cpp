@@ -15,7 +15,7 @@ int main() {
     wpi::print("  {}\n", addr);
   }
   cs::UsbCamera camera{"usbcam", 0};
-  camera.SetVideoMode(cs::VideoMode::kMJPEG, 320, 240, 30);
+  camera.SetVideoMode(cs::VideoMode::MJPEG, 320, 240, 30);
   cs::MjpegServer mjpegServer{"httpserver", 8081};
   mjpegServer.SetSource(camera);
 
@@ -25,7 +25,7 @@ int main() {
         wpi::print("FPS={} MBPS={}\n", camera.GetActualFPS(),
                    (camera.GetActualDataRate() / 1000000.0));
       },
-      cs::RawEvent::kTelemetryUpdated, false, &status);
+      cs::RawEvent::TELEMETRY_UPDATED, false, &status);
   cs::SetTelemetryPeriod(1.0);
 
   std::getchar();

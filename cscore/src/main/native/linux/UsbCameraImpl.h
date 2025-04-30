@@ -68,19 +68,19 @@ class UsbCameraImpl : public SourceImpl {
   // Messages passed to/from camera thread
   struct Message {
     enum Kind {
-      kNone = 0,
-      kCmdSetPath,
-      kCmdSetMode,
-      kCmdSetPixelFormat,
-      kCmdSetResolution,
-      kCmdSetFPS,
-      kCmdSetProperty,
-      kCmdSetPropertyStr,
-      kNumSinksChanged,         // no response
-      kNumSinksEnabledChanged,  // no response
+      NONE = 0,
+      CMD_SET_PATH,
+      CMD_SET_MODE,
+      CMD_SET_PIXEL_FORMAT,
+      CMD_SET_RESOLUTION,
+      CMD_SET_FPS,
+      CMD_SET_PROPERTY,
+      CMD_SET_PROPERTY_STR,
+      NUM_SINKS_CHANGED,         // no response
+      NUM_SINKS_ENABLED_CHANGED,  // no response
       // Responses
-      kOk,
-      kError
+      OK,
+      ERROR
     };
 
     explicit Message(Kind kind_)
@@ -149,8 +149,8 @@ class UsbCameraImpl : public SourceImpl {
   int m_connectVerbose{1};
   unsigned m_capabilities = 0;
   // Number of buffers to ask OS for
-  static constexpr int kNumBuffers = 4;
-  std::array<UsbCameraBuffer, kNumBuffers> m_buffers;
+  static constexpr int NUM_BUFFERS = 4;
+  std::array<UsbCameraBuffer, NUM_BUFFERS> m_buffers;
 
   std::atomic_int m_fd;
   std::atomic_int m_command_fd;  // for command eventfd

@@ -43,7 +43,7 @@ class NotifierThread
   }
 
   void SetListener(RawEvent* data, unsigned int listener_uid) {
-    data->listener = Handle(listener_uid, Handle::kListener);
+    data->listener = Handle(listener_uid, Handle::LISTENER);
   }
 
   void DoCallback(std::function<void(const RawEvent& event)> callback,

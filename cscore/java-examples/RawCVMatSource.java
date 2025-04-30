@@ -48,7 +48,7 @@ public class RawCVMatSource extends ImageSource {
     if (channels != 1 && channels != 3) {
       throw new VideoException("Unsupported Image Type");
     }
-    int imgType = channels == 1 ? PixelFormat.kGray.getValue() : PixelFormat.kBGR.getValue();
+    int imgType = channels == 1 ? PixelFormat.GRAY.getValue() : PixelFormat.BGR.getValue();
     CameraServerJNI.putRawSourceFrame(
         m_handle,
         image.dataAddr(),
