@@ -21,7 +21,7 @@ public interface GenericSubscriber extends Subscriber, Supplier<NetworkTableValu
 
   /**
    * Get the last published value.
-   * If no value has been published, returns a value with type NetworkTableType.kUnassigned.
+   * If no value has been published, returns a value with type NetworkTableType.UNASSIGNED.
    *
    * @return value
    */

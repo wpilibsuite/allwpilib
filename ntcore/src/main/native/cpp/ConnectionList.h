@@ -56,7 +56,7 @@ class ConnectionList final : public IConnectionList {
   wpi::UidVector<std::optional<ConnectionInfo>, 8> m_connections;
 
   struct DataLoggerData {
-    static constexpr auto kType = Handle::kConnectionDataLogger;
+    static constexpr auto TYPE = Handle::CONNECTION_DATA_LOGGER;
 
     DataLoggerData(NT_ConnectionDataLogger handle, wpi::log::DataLog& log,
                    std::string_view name, int64_t time)

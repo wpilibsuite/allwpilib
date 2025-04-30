@@ -16,7 +16,7 @@ namespace nt {
 
 template <typename T>
 concept HandleType = requires {
-  { T::kType } -> std::convertible_to<NT_Handle>;
+  { T::TYPE } -> std::convertible_to<NT_Handle>;
 };
 
 // Utility wrapper class for our UidVectors
@@ -27,14 +27,14 @@ class HandleMap : public wpi::UidVector<std::unique_ptr<T>, Size> {
   T* Add(int inst, Args&&... args) {
     auto i = this->emplace_back();
     auto& it = (*this)[i];
-    it = std::make_unique<T>(Handle(inst, i, T::kType),
+    it = std::make_unique<T>(Handle(inst, i, T::TYPE),
                              std::forward<Args>(args)...);
     return it.get();
   }
 
   std::unique_ptr<T> Remove(NT_Handle handle) {
     Handle h{handle};
-    if (!h.IsType(T::kType)) {
+    if (!h.IsType(T::TYPE)) {
       return {};
     }
     unsigned int i = h.GetIndex();
@@ -46,7 +46,7 @@ class HandleMap : public wpi::UidVector<std::unique_ptr<T>, Size> {
 
   T* Get(NT_Handle handle) {
     Handle h{handle};
-    if (!h.IsType(T::kType)) {
+    if (!h.IsType(T::TYPE)) {
       return {};
     }
     unsigned int i = h.GetIndex();

@@ -87,9 +87,9 @@ public final class NetworkTableListenerPoller implements AutoCloseable {
    * @return Listener handle
    */
   public int addConnectionListener(boolean immediateNotify) {
-    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.kConnection);
+    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.CONNECTION);
     if (immediateNotify) {
-      eventKinds.add(NetworkTableEvent.Kind.kImmediate);
+      eventKinds.add(NetworkTableEvent.Kind.IMMEDIATE);
     }
     return NetworkTablesJNI.addListener(m_handle, m_inst.getHandle(), eventKinds);
   }
@@ -103,9 +103,9 @@ public final class NetworkTableListenerPoller implements AutoCloseable {
    * @return Listener handle
    */
   public int addTimeSyncListener(boolean immediateNotify) {
-    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.kTimeSync);
+    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.TIME_SYNC);
     if (immediateNotify) {
-      eventKinds.add(NetworkTableEvent.Kind.kImmediate);
+      eventKinds.add(NetworkTableEvent.Kind.IMMEDIATE);
     }
     return NetworkTablesJNI.addListener(m_handle, m_inst.getHandle(), eventKinds);
   }

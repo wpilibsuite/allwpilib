@@ -372,7 +372,7 @@ TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
   // publish before client connect
   server.SetLocal(&local, &queue);
   constexpr int pubuid = 1;
-  NT_Topic topicHandle = nt::Handle{0, 1, nt::Handle::kTopic};
+  NT_Topic topicHandle = nt::Handle{0, 1, nt::Handle::TOPIC};
   constexpr int subuid = 1;
   Value defaultValue = Value::MakeDouble(1.0, 10);
   defaultValue.SetTime(0);

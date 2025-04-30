@@ -40,7 +40,7 @@ class TopicListenerTest {
     // Use connection listener to ensure we've connected
     int poller = NetworkTablesJNI.createListenerPoller(m_clientInst.getHandle());
     NetworkTablesJNI.addListener(
-        poller, m_clientInst.getHandle(), EnumSet.of(NetworkTableEvent.Kind.kConnected));
+        poller, m_clientInst.getHandle(), EnumSet.of(NetworkTableEvent.Kind.CONNECTED));
     try {
       if (WPIUtilJNI.waitForObjectTimeout(poller, 1.0)) {
         fail("client didn't connect to server");
@@ -59,7 +59,7 @@ class TopicListenerTest {
     final int poller = NetworkTablesJNI.createListenerPoller(m_serverInst.getHandle());
     final int handle =
         NetworkTablesJNI.addListener(
-            poller, new String[] {"/foo"}, EnumSet.of(NetworkTableEvent.Kind.kPublish));
+            poller, new String[] {"/foo"}, EnumSet.of(NetworkTableEvent.Kind.PUBLISH));
 
     // Trigger an event
     m_clientInst.getEntry("/foo/bar").setDouble(1.0);
@@ -87,6 +87,6 @@ class TopicListenerTest {
     assertNotNull(events[0].topicInfo);
     assertEquals(m_serverInst.getTopic("/foo/bar"), events[0].topicInfo.getTopic());
     assertEquals("/foo/bar", events[0].topicInfo.name);
-    assertTrue(events[0].is(NetworkTableEvent.Kind.kPublish));
+    assertTrue(events[0].is(NetworkTableEvent.Kind.PUBLISH));
   }
 }

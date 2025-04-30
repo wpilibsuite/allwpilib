@@ -28,16 +28,16 @@ class ServerClient;
 struct TopicClientData {
   wpi::SmallPtrSet<ServerPublisher*, 2> publishers;
   wpi::SmallPtrSet<ServerSubscriber*, 2> subscribers;
-  net::ValueSendMode sendMode = net::ValueSendMode::kDisabled;
+  net::ValueSendMode sendMode = net::ValueSendMode::DISABLED;
 
   bool AddSubscriber(ServerSubscriber* sub) {
     bool added = subscribers.insert(sub).second;
     auto& options = sub->GetOptions();
     if (!options.topicsOnly) {
       if (options.sendAll) {
-        sendMode = net::ValueSendMode::kAll;
-      } else if (sendMode == net::ValueSendMode::kDisabled) {
-        sendMode = net::ValueSendMode::kNormal;
+        sendMode = net::ValueSendMode::ALL;
+      } else if (sendMode == net::ValueSendMode::DISABLED) {
+        sendMode = net::ValueSendMode::NORMAL;
       }
     }
     return added;

@@ -18,43 +18,43 @@ public final class NetworkTableEvent {
      * Initial listener addition. Set this to receive immediate notification of matches to other
      * criteria.
      */
-    kImmediate(0x0001),
+    IMMEDIATE(0x0001),
 
     /** Client connected (on server, any client connected). */
-    kConnected(0x0002),
+    CONNECTED(0x0002),
 
     /** Client disconnected (on server, any client disconnected). */
-    kDisconnected(0x0004),
+    DISCONNECTED(0x0004),
 
     /** Any connection event (connect or disconnect). */
-    kConnection(0x0004 | 0x0002),
+    CONNECTION(0x0004 | 0x0002),
 
     /** New topic published. */
-    kPublish(0x0008),
+    PUBLISH(0x0008),
 
     /** Topic unpublished. */
-    kUnpublish(0x0010),
+    UNPUBLISH(0x0010),
 
     /** Topic properties changed. */
-    kProperties(0x0020),
+    PROPERTIES(0x0020),
 
     /** Any topic event (publish, unpublish, or properties changed). */
-    kTopic(0x0020 | 0x0010 | 0x0008),
+    TOPIC(0x0020 | 0x0010 | 0x0008),
 
     /** Topic value updated (via network). */
-    kValueRemote(0x0040),
+    VALUE_REMOTE(0x0040),
 
     /** Topic value updated (local). */
-    kValueLocal(0x0080),
+    VALUE_LOCAL(0x0080),
 
     /** Topic value updated (network or local). */
-    kValueAll(0x0080 | 0x0040),
+    VALUE_ALL(0x0080 | 0x0040),
 
     /** Log message. */
-    kLogMessage(0x0100),
+    LOG_MESSAGE(0x0100),
 
     /** Time synchronized with server. */
-    kTimeSync(0x0200);
+    TIME_SYNC(0x0200);
 
     private final int value;
 
@@ -79,14 +79,14 @@ public final class NetworkTableEvent {
   public final int listener;
 
   /**
-   * Determine if event is of a particular kind. For example, kPublish if the topic was not
+   * Determine if event is of a particular kind. For example, PUBLISH if the topic was not
    * previously published. Also indicates the data included with the event:
    *
    * <ul>
-   *   <li>kConnected or kDisconnected: connInfo
-   *   <li>kPublish, kUnpublish, or kProperties: topicInfo
-   *   <li>kValueRemote, kValueLocal: valueData
-   *   <li>kLogMessage: logMessage
+   *   <li>CONNECTED or DISCONNECTED: connInfo
+   *   <li>PUBLISH, UNPUBLISH, or PROPERTIES: topicInfo
+   *   <li>VALUE_REMOTE, VALUE_LOCAL: valueData
+   *   <li>LOG_MESSAGE: logMessage
    * </ul>
    *
    * @param kind Kind

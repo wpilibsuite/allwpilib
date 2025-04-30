@@ -303,7 +303,7 @@ class {{ TypeName }}Topic final : public Topic {
   using TimestampedValueType = Timestamped{{ TypeName }};
 {%- if TypeString %}
   /** The default type string for this topic type. */
-  static constexpr std::string_view kTypeString = {{ TypeString }};
+  static constexpr std::string_view TYPE_STRING = {{ TypeString }};
 {%- endif %}
 
   {{ TypeName }}Topic() = default;
@@ -344,9 +344,9 @@ class {{ TypeName }}Topic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       {% if not TypeString %}std::string_view typeString, {% endif %}ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return {{ TypeName }}Subscriber{
-        ::nt::Subscribe(m_handle, NT_{{ cpp.TYPE_NAME }}, {{ TypeString|default('typeString') }}, options),
+        ::nt::Subscribe(m_handle, NT_{{ TYPE_NAME }}, {{ TypeString|default('typeString') }}, options),
         defaultValue};
   }
 {%- if TypeString %}
@@ -369,9 +369,9 @@ class {{ TypeName }}Topic final : public Topic {
   [[nodiscard]]
   SubscriberType SubscribeEx(
       std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return {{ TypeName }}Subscriber{
-        ::nt::Subscribe(m_handle, NT_{{ cpp.TYPE_NAME }}, typeString, options),
+        ::nt::Subscribe(m_handle, NT_{{ TYPE_NAME }}, typeString, options),
         defaultValue};
   }
 {% endif %}
@@ -394,9 +394,9 @@ class {{ TypeName }}Topic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish({% if not TypeString %}std::string_view typeString, {% endif %}const PubSubOptions& options = kDefaultPubSubOptions) {
+  PublisherType Publish({% if not TypeString %}std::string_view typeString, {% endif %}const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return {{ TypeName }}Publisher{
-        ::nt::Publish(m_handle, NT_{{ cpp.TYPE_NAME }}, {{ TypeString|default('typeString') }}, options)};
+        ::nt::Publish(m_handle, NT_{{ TYPE_NAME }}, {{ TypeString|default('typeString') }}, options)};
   }
 
   /**
@@ -419,9 +419,9 @@ class {{ TypeName }}Topic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::json& properties, const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return {{ TypeName }}Publisher{
-        ::nt::PublishEx(m_handle, NT_{{ cpp.TYPE_NAME }}, typeString, properties, options)};
+        ::nt::PublishEx(m_handle, NT_{{ TYPE_NAME }}, typeString, properties, options)};
   }
 
   /**
@@ -449,9 +449,9 @@ class {{ TypeName }}Topic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry({% if not TypeString %}std::string_view typeString, {% endif %}ParamType defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions) {
+                     const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return {{ TypeName }}Entry{
-        ::nt::GetEntry(m_handle, NT_{{ cpp.TYPE_NAME }}, {{ TypeString|default('typeString') }}, options),
+        ::nt::GetEntry(m_handle, NT_{{ TYPE_NAME }}, {{ TypeString|default('typeString') }}, options),
         defaultValue};
   }
 {%- if TypeString %}
@@ -478,9 +478,9 @@ class {{ TypeName }}Topic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
-                       const PubSubOptions& options = kDefaultPubSubOptions) {
+                       const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return {{ TypeName }}Entry{
-        ::nt::GetEntry(m_handle, NT_{{ cpp.TYPE_NAME }}, typeString, options),
+        ::nt::GetEntry(m_handle, NT_{{ TYPE_NAME }}, typeString, options),
         defaultValue};
   }
 {% endif %}

@@ -71,8 +71,8 @@ class InstanceImpl {
   static int AllocImpl();
 
   static std::atomic<int> s_default;
-  static constexpr int kNumInstances = 16;
-  static std::atomic<InstanceImpl*> s_instances[kNumInstances];
+  static constexpr int NUM_INSTANCES = 16;
+  static std::atomic<InstanceImpl*> s_instances[NUM_INSTANCES];
   static wpi::mutex s_mutex;
 
   wpi::mutex m_mutex;

@@ -58,7 +58,7 @@ public class PubSubOptions {
   }
 
   /** Default value of periodic. */
-  public static final double kDefaultPeriodic = 0.1;
+  public static final double DEFAULT_PERIODIC = 0.1;
 
   /**
    * Polling storage size for a subscription. Specifies the maximum number of updates NetworkTables
@@ -72,7 +72,7 @@ public class PubSubOptions {
    * frequently than this (e.g. use a combined minimum period for all values) or apply a restricted
    * range to this value. The default is 100 ms.
    */
-  public double periodic = kDefaultPeriodic;
+  public double periodic = DEFAULT_PERIODIC;
 
   /**
    * For subscriptions, if non-zero, value updates for readQueue() are not queued for this

@@ -9,7 +9,7 @@ package edu.wpi.first.networktables;
 /** NetworkTables String topic. */
 public final class StringTopic extends Topic {
   /** The default type string for this topic type. */
-  public static final String kTypeString = "string";
+  public static final String TYPE_STRING = "string";
 
   /**
    * Construct from a generic topic.
@@ -51,7 +51,7 @@ public final class StringTopic extends Topic {
     return new StringEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kString.getValue(),
+            m_handle, NetworkTableType.STRING.getValue(),
             "string", options),
         defaultValue);
   }
@@ -79,7 +79,7 @@ public final class StringTopic extends Topic {
     return new StringEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kString.getValue(),
+            m_handle, NetworkTableType.STRING.getValue(),
             typeString, options),
         defaultValue);
   }
@@ -104,7 +104,7 @@ public final class StringTopic extends Topic {
     return new StringEntryImpl(
         this,
         NetworkTablesJNI.publish(
-            m_handle, NetworkTableType.kString.getValue(),
+            m_handle, NetworkTableType.STRING.getValue(),
             "string", options),
         "");
   }
@@ -134,7 +134,7 @@ public final class StringTopic extends Topic {
     return new StringEntryImpl(
         this,
         NetworkTablesJNI.publishEx(
-            m_handle, NetworkTableType.kString.getValue(),
+            m_handle, NetworkTableType.STRING.getValue(),
             typeString, properties, options),
         "");
   }
@@ -165,7 +165,7 @@ public final class StringTopic extends Topic {
     return new StringEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kString.getValue(),
+            m_handle, NetworkTableType.STRING.getValue(),
             "string", options),
         defaultValue);
   }
@@ -198,7 +198,7 @@ public final class StringTopic extends Topic {
     return new StringEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kString.getValue(),
+            m_handle, NetworkTableType.STRING.getValue(),
             typeString, options),
         defaultValue);
   }

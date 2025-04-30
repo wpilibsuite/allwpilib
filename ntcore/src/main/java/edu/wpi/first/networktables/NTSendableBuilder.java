@@ -35,6 +35,6 @@ public interface NTSendableBuilder extends SendableBuilder {
 
   @Override
   default BackendKind getBackendKind() {
-    return BackendKind.kNetworkTables;
+    return BackendKind.NETWORK_TABLES;
   }
 }

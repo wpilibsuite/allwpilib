@@ -77,7 +77,7 @@ class NetworkClientBase : public INetworkClient {
   std::shared_ptr<wpi::uv::Async<>> m_flush;
 
   using Queue = net::LocalClientMessageQueue;
-  net::ClientMessage m_localMsgs[Queue::kBlockSize];
+  net::ClientMessage m_localMsgs[Queue::BLOCK_SIZE];
 
   std::vector<std::pair<std::string, unsigned int>> m_servers;
 

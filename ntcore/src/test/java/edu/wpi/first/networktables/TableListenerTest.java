@@ -37,7 +37,7 @@ class TableListenerTest {
     NetworkTable table = m_inst.getTable("/foo");
     AtomicInteger count = new AtomicInteger();
     table.addListener(
-        EnumSet.of(NetworkTableEvent.Kind.kTopic),
+        EnumSet.of(NetworkTableEvent.Kind.TOPIC),
         (atable, key, event) -> {
           count.incrementAndGet();
           assertEquals(atable, table);

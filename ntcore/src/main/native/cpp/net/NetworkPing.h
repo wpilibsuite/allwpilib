@@ -12,8 +12,8 @@ class WireConnection;
 
 class NetworkPing {
  public:
-  static constexpr uint32_t kPingIntervalMs = 200;
-  static constexpr uint32_t kPingTimeoutMs = 1000;
+  static constexpr uint32_t PING_INTERVAL_MS = 200;
+  static constexpr uint32_t PING_TIMEOUT_MS = 1000;
 
   explicit NetworkPing(WireConnection& wire) : m_wire{wire} {}
 

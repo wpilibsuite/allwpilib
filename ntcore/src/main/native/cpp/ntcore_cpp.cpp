@@ -41,21 +41,21 @@ wpi::json TopicInfo::GetProperties() const {
  */
 
 NT_Inst GetDefaultInstance() {
-  return Handle{InstanceImpl::GetDefaultIndex(), 0, Handle::kInstance};
+  return Handle{InstanceImpl::GetDefaultIndex(), 0, Handle::INSTANCE};
 }
 
 NT_Inst CreateInstance() {
-  return Handle{InstanceImpl::Alloc(), 0, Handle::kInstance};
+  return Handle{InstanceImpl::Alloc(), 0, Handle::INSTANCE};
 }
 
 void ResetInstance(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     ii->Reset();
   }
 }
 
 void DestroyInstance(NT_Inst inst) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  int i = Handle{inst}.GetTypedInst(Handle::INSTANCE);
   if (i < 0) {
     return;
   }
@@ -65,8 +65,8 @@ void DestroyInstance(NT_Inst inst) {
 NT_Inst GetInstanceFromHandle(NT_Handle handle) {
   Handle h{handle};
   auto type = h.GetType();
-  if (type >= Handle::kListener && type < Handle::kTypeMax) {
-    return Handle(h.GetInst(), 0, Handle::kInstance);
+  if (type >= Handle::LISTENER && type < Handle::TYPE_MAX) {
+    return Handle(h.GetInst(), 0, Handle::INSTANCE);
   }
 
   return 0;
@@ -77,7 +77,7 @@ NT_Inst GetInstanceFromHandle(NT_Handle handle) {
  */
 
 NT_Entry GetEntry(NT_Inst inst, std::string_view name) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->localStorage.GetEntry(name);
   } else {
     return {};
@@ -164,7 +164,7 @@ std::vector<Value> ReadQueueValue(NT_Handle subentry, unsigned int types) {
 
 std::vector<NT_Topic> GetTopics(NT_Inst inst, std::string_view prefix,
                                 unsigned int types) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->localStorage.GetTopics(prefix, types);
   } else {
     return {};
@@ -173,7 +173,7 @@ std::vector<NT_Topic> GetTopics(NT_Inst inst, std::string_view prefix,
 
 std::vector<NT_Topic> GetTopics(NT_Inst inst, std::string_view prefix,
                                 std::span<const std::string_view> types) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->localStorage.GetTopics(prefix, types);
   } else {
     return {};
@@ -182,7 +182,7 @@ std::vector<NT_Topic> GetTopics(NT_Inst inst, std::string_view prefix,
 
 std::vector<TopicInfo> GetTopicInfo(NT_Inst inst, std::string_view prefix,
                                     unsigned int types) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->localStorage.GetTopicInfo(prefix, types);
   } else {
     return {};
@@ -191,7 +191,7 @@ std::vector<TopicInfo> GetTopicInfo(NT_Inst inst, std::string_view prefix,
 
 std::vector<TopicInfo> GetTopicInfo(NT_Inst inst, std::string_view prefix,
                                     std::span<const std::string_view> types) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->localStorage.GetTopicInfo(prefix, types);
   } else {
     return {};
@@ -199,7 +199,7 @@ std::vector<TopicInfo> GetTopicInfo(NT_Inst inst, std::string_view prefix,
 }
 
 TopicInfo GetTopicInfo(NT_Topic topic) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     return ii->localStorage.GetTopicInfo(topic);
   } else {
     return {};
@@ -207,7 +207,7 @@ TopicInfo GetTopicInfo(NT_Topic topic) {
 }
 
 NT_Topic GetTopic(NT_Inst inst, std::string_view name) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->localStorage.GetTopic(name);
   } else {
     return {};
@@ -215,7 +215,7 @@ NT_Topic GetTopic(NT_Inst inst, std::string_view name) {
 }
 
 std::string GetTopicName(NT_Topic topic) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     return ii->localStorage.GetTopicName(topic);
   } else {
     return {};
@@ -223,7 +223,7 @@ std::string GetTopicName(NT_Topic topic) {
 }
 
 NT_Type GetTopicType(NT_Topic topic) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     return ii->localStorage.GetTopicType(topic);
   } else {
     return {};
@@ -231,7 +231,7 @@ NT_Type GetTopicType(NT_Topic topic) {
 }
 
 std::string GetTopicTypeString(NT_Topic topic) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     return ii->localStorage.GetTopicTypeString(topic);
   } else {
     return {};
@@ -239,7 +239,7 @@ std::string GetTopicTypeString(NT_Topic topic) {
 }
 
 void SetTopicPersistent(NT_Topic topic, bool value) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     ii->localStorage.SetTopicPersistent(topic, value);
   } else {
     return;
@@ -247,7 +247,7 @@ void SetTopicPersistent(NT_Topic topic, bool value) {
 }
 
 bool GetTopicPersistent(NT_Topic topic) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     return ii->localStorage.GetTopicPersistent(topic);
   } else {
     return {};
@@ -255,7 +255,7 @@ bool GetTopicPersistent(NT_Topic topic) {
 }
 
 void SetTopicRetained(NT_Topic topic, bool value) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     ii->localStorage.SetTopicRetained(topic, value);
   } else {
     return;
@@ -263,7 +263,7 @@ void SetTopicRetained(NT_Topic topic, bool value) {
 }
 
 bool GetTopicRetained(NT_Topic topic) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     return ii->localStorage.GetTopicRetained(topic);
   } else {
     return {};
@@ -271,7 +271,7 @@ bool GetTopicRetained(NT_Topic topic) {
 }
 
 void SetTopicCached(NT_Topic topic, bool value) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     ii->localStorage.SetTopicCached(topic, value);
   } else {
     return;
@@ -279,7 +279,7 @@ void SetTopicCached(NT_Topic topic, bool value) {
 }
 
 bool GetTopicCached(NT_Topic topic) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     return ii->localStorage.GetTopicCached(topic);
   } else {
     return {};
@@ -294,7 +294,7 @@ bool GetTopicExists(NT_Handle handle) {
 }
 
 wpi::json GetTopicProperty(NT_Topic topic, std::string_view name) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     return ii->localStorage.GetTopicProperty(topic, name);
   } else {
     return {};
@@ -303,7 +303,7 @@ wpi::json GetTopicProperty(NT_Topic topic, std::string_view name) {
 
 void SetTopicProperty(NT_Topic topic, std::string_view name,
                       const wpi::json& value) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     ii->localStorage.SetTopicProperty(topic, name, value);
   } else {
     return;
@@ -311,13 +311,13 @@ void SetTopicProperty(NT_Topic topic, std::string_view name,
 }
 
 void DeleteTopicProperty(NT_Topic topic, std::string_view name) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     ii->localStorage.DeleteTopicProperty(topic, name);
   }
 }
 
 wpi::json GetTopicProperties(NT_Topic topic) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     return ii->localStorage.GetTopicProperties(topic);
   } else {
     return {};
@@ -325,7 +325,7 @@ wpi::json GetTopicProperties(NT_Topic topic) {
 }
 
 bool SetTopicProperties(NT_Topic topic, const wpi::json& properties) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     return ii->localStorage.SetTopicProperties(topic, properties);
   } else {
     return {};
@@ -334,7 +334,7 @@ bool SetTopicProperties(NT_Topic topic, const wpi::json& properties) {
 
 NT_Subscriber Subscribe(NT_Topic topic, NT_Type type, std::string_view typeStr,
                         const PubSubOptions& options) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     return ii->localStorage.Subscribe(topic, type, typeStr, options);
   } else {
     return {};
@@ -342,7 +342,7 @@ NT_Subscriber Subscribe(NT_Topic topic, NT_Type type, std::string_view typeStr,
 }
 
 void Unsubscribe(NT_Subscriber sub) {
-  if (auto ii = InstanceImpl::GetTyped(sub, Handle::kSubscriber)) {
+  if (auto ii = InstanceImpl::GetTyped(sub, Handle::SUBSCRIBER)) {
     ii->localStorage.Unsubscribe(sub);
   }
 }
@@ -355,7 +355,7 @@ NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
 NT_Publisher PublishEx(NT_Topic topic, NT_Type type, std::string_view typeStr,
                        const wpi::json& properties,
                        const PubSubOptions& options) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     return ii->localStorage.Publish(topic, type, typeStr, properties, options);
   } else {
     return {};
@@ -370,7 +370,7 @@ void Unpublish(NT_Handle pubentry) {
 
 NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
                   const PubSubOptions& options) {
-  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::TOPIC)) {
     return ii->localStorage.GetEntry(topic, type, typeStr, options);
   } else {
     return {};
@@ -378,7 +378,7 @@ NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
 }
 
 void ReleaseEntry(NT_Entry entry) {
-  if (auto ii = InstanceImpl::GetTyped(entry, Handle::kEntry)) {
+  if (auto ii = InstanceImpl::GetTyped(entry, Handle::ENTRY)) {
     ii->localStorage.ReleaseEntry(entry);
   }
 }
@@ -400,7 +400,7 @@ NT_Topic GetTopicFromHandle(NT_Handle pubsubentry) {
 NT_MultiSubscriber SubscribeMultiple(NT_Inst inst,
                                      std::span<const std::string_view> prefixes,
                                      const PubSubOptions& options) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->localStorage.SubscribeMultiple(prefixes, options);
   } else {
     return {};
@@ -408,7 +408,7 @@ NT_MultiSubscriber SubscribeMultiple(NT_Inst inst,
 }
 
 void UnsubscribeMultiple(NT_MultiSubscriber sub) {
-  if (auto ii = InstanceImpl::GetTyped(sub, Handle::kMultiSubscriber)) {
+  if (auto ii = InstanceImpl::GetTyped(sub, Handle::MULTI_SUBSCRIBER)) {
     ii->localStorage.UnsubscribeMultiple(sub);
   }
 }
@@ -438,7 +438,7 @@ static void CleanupListeners(
 
 static void DoAddListener(InstanceImpl& ii, NT_Listener listener,
                           NT_Handle handle, unsigned int mask) {
-  if (Handle{handle}.IsType(Handle::kInstance)) {
+  if (Handle{handle}.IsType(Handle::INSTANCE)) {
     if ((mask & NT_EVENT_CONNECTION) != 0) {
       ii.connectionList.AddListener(listener, mask);
     }
@@ -454,7 +454,7 @@ static void DoAddListener(InstanceImpl& ii, NT_Listener listener,
 }
 
 NT_ListenerPoller CreateListenerPoller(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->listenerStorage.CreateListenerPoller();
   } else {
     return {};
@@ -462,13 +462,13 @@ NT_ListenerPoller CreateListenerPoller(NT_Inst inst) {
 }
 
 void DestroyListenerPoller(NT_ListenerPoller poller) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kListenerPoller)) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::LISTENER_POLLER)) {
     CleanupListeners(*ii, ii->listenerStorage.DestroyListenerPoller(poller));
   }
 }
 
 std::vector<Event> ReadListenerQueue(NT_ListenerPoller poller) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kListenerPoller)) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::LISTENER_POLLER)) {
     return ii->listenerStorage.ReadListenerQueue(poller);
   } else {
     return {};
@@ -476,7 +476,7 @@ std::vector<Event> ReadListenerQueue(NT_ListenerPoller poller) {
 }
 
 void RemoveListener(NT_Listener listener) {
-  if (auto ii = InstanceImpl::GetTyped(listener, Handle::kListener)) {
+  if (auto ii = InstanceImpl::GetTyped(listener, Handle::LISTENER)) {
     CleanupListeners(*ii, ii->listenerStorage.RemoveListener(listener));
   }
 }
@@ -492,7 +492,7 @@ bool WaitForListenerQueue(NT_Handle handle, double timeout) {
 NT_Listener AddListener(NT_Inst inst,
                         std::span<const std::string_view> prefixes,
                         unsigned int mask, ListenerCallback callback) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     if ((mask & (NT_EVENT_TOPIC | NT_EVENT_VALUE_ALL)) != 0) {
       auto listener = ii->listenerStorage.AddListener(std::move(callback));
       ii->localStorage.AddListener(listener, prefixes, mask);
@@ -516,7 +516,7 @@ NT_Listener AddListener(NT_Handle handle, unsigned int mask,
 NT_Listener AddPolledListener(NT_ListenerPoller poller,
                               std::span<const std::string_view> prefixes,
                               unsigned int mask) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kListenerPoller)) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::LISTENER_POLLER)) {
     if ((mask & (NT_EVENT_TOPIC | NT_EVENT_VALUE_ALL)) != 0) {
       auto listener = ii->listenerStorage.AddListener(poller);
       ii->localStorage.AddListener(listener, prefixes, mask);
@@ -528,7 +528,7 @@ NT_Listener AddPolledListener(NT_ListenerPoller poller,
 
 NT_Listener AddPolledListener(NT_ListenerPoller poller, NT_Handle handle,
                               unsigned int mask) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kListenerPoller)) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::LISTENER_POLLER)) {
     if (Handle{handle}.GetInst() != Handle{poller}.GetInst()) {
       WPI_ERROR(
           ii->logger,
@@ -579,7 +579,7 @@ std::string_view GetStringFromType(NT_Type type) {
 NT_DataLogger StartEntryDataLog(NT_Inst inst, wpi::log::DataLog& log,
                                 std::string_view prefix,
                                 std::string_view logPrefix) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->localStorage.StartDataLog(log, prefix, logPrefix);
   } else {
     return 0;
@@ -587,7 +587,7 @@ NT_DataLogger StartEntryDataLog(NT_Inst inst, wpi::log::DataLog& log,
 }
 
 void StopEntryDataLog(NT_DataLogger logger) {
-  if (auto ii = InstanceImpl::GetTyped(logger, Handle::kDataLogger)) {
+  if (auto ii = InstanceImpl::GetTyped(logger, Handle::DATA_LOGGER)) {
     ii->localStorage.StopDataLog(logger);
   }
 }
@@ -595,7 +595,7 @@ void StopEntryDataLog(NT_DataLogger logger) {
 NT_ConnectionDataLogger StartConnectionDataLog(NT_Inst inst,
                                                wpi::log::DataLog& log,
                                                std::string_view name) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->connectionList.StartDataLog(log, name);
   } else {
     return 0;
@@ -603,7 +603,7 @@ NT_ConnectionDataLogger StartConnectionDataLog(NT_Inst inst,
 }
 
 void StopConnectionDataLog(NT_ConnectionDataLogger logger) {
-  if (auto ii = InstanceImpl::GetTyped(logger, Handle::kConnectionDataLogger)) {
+  if (auto ii = InstanceImpl::GetTyped(logger, Handle::CONNECTION_DATA_LOGGER)) {
     ii->connectionList.StopDataLog(logger);
   }
 }
@@ -613,7 +613,7 @@ void StopConnectionDataLog(NT_ConnectionDataLogger logger) {
  */
 
 unsigned int GetNetworkMode(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->networkMode;
   } else {
     return {};
@@ -621,38 +621,38 @@ unsigned int GetNetworkMode(NT_Inst inst) {
 }
 
 void StartLocal(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     ii->StartLocal();
   }
 }
 
 void StopLocal(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     ii->StopLocal();
   }
 }
 
 void StartServer(NT_Inst inst, std::string_view persist_filename,
                  std::string_view listen_address, unsigned int port) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     ii->StartServer(persist_filename, listen_address, port);
   }
 }
 
 void StopServer(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     ii->StopServer();
   }
 }
 
 void StartClient(NT_Inst inst, std::string_view identity) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     ii->StartClient(identity);
   }
 }
 
 void StopClient(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     ii->StopClient();
   }
 }
@@ -664,7 +664,7 @@ void SetServer(NT_Inst inst, std::string_view server_name, unsigned int port) {
 void SetServer(
     NT_Inst inst,
     std::span<const std::pair<std::string_view, unsigned int>> servers) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     std::vector<std::pair<std::string, unsigned int>> serversCopy;
     serversCopy.reserve(servers.size());
     for (auto&& server : servers) {
@@ -675,7 +675,7 @@ void SetServer(
 }
 
 void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     std::vector<std::pair<std::string, unsigned int>> servers;
     servers.reserve(5);
 
@@ -702,7 +702,7 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
 }
 
 void Disconnect(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     if (auto client = ii->GetClient()) {
       client->Disconnect();
     }
@@ -710,7 +710,7 @@ void Disconnect(NT_Inst inst) {
 }
 
 void StartDSClient(NT_Inst inst, unsigned int port) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     if (auto client = ii->GetClient()) {
       client->StartDSClient(port);
     }
@@ -718,7 +718,7 @@ void StartDSClient(NT_Inst inst, unsigned int port) {
 }
 
 void StopDSClient(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     if (auto client = ii->GetClient()) {
       client->StopDSClient();
     }
@@ -726,7 +726,7 @@ void StopDSClient(NT_Inst inst) {
 }
 
 void FlushLocal(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     if (auto client = ii->GetClient()) {
       client->FlushLocal();
     } else if (auto server = ii->GetServer()) {
@@ -736,7 +736,7 @@ void FlushLocal(NT_Inst inst) {
 }
 
 void Flush(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     if (auto client = ii->GetClient()) {
       client->Flush();
     } else if (auto server = ii->GetServer()) {
@@ -746,7 +746,7 @@ void Flush(NT_Inst inst) {
 }
 
 std::vector<ConnectionInfo> GetConnections(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->connectionList.GetConnections();
   } else {
     return {};
@@ -754,7 +754,7 @@ std::vector<ConnectionInfo> GetConnections(NT_Inst inst) {
 }
 
 bool IsConnected(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->networkMode == NT_NET_MODE_LOCAL ||
            ii->connectionList.IsConnected();
   } else {
@@ -763,7 +763,7 @@ bool IsConnected(NT_Inst inst) {
 }
 
 std::optional<int64_t> GetServerTimeOffset(NT_Inst inst) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->GetServerTimeOffset();
   } else {
     return {};
@@ -772,7 +772,7 @@ std::optional<int64_t> GetServerTimeOffset(NT_Inst inst) {
 
 NT_Listener AddLogger(NT_Inst inst, unsigned int minLevel,
                       unsigned int maxLevel, ListenerCallback func) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     if (minLevel < ii->logger.min_level()) {
       ii->logger.set_min_level(minLevel);
     }
@@ -786,7 +786,7 @@ NT_Listener AddLogger(NT_Inst inst, unsigned int minLevel,
 
 NT_Listener AddPolledLogger(NT_ListenerPoller poller, unsigned int minLevel,
                             unsigned int maxLevel) {
-  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kListenerPoller)) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::LISTENER_POLLER)) {
     if (minLevel < ii->logger.min_level()) {
       ii->logger.set_min_level(minLevel);
     }
@@ -799,7 +799,7 @@ NT_Listener AddPolledLogger(NT_ListenerPoller poller, unsigned int minLevel,
 }
 
 bool HasSchema(NT_Inst inst, std::string_view name) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     return ii->localStorage.HasSchema(name);
   } else {
     return false;
@@ -808,7 +808,7 @@ bool HasSchema(NT_Inst inst, std::string_view name) {
 
 void AddSchema(NT_Inst inst, std::string_view name, std::string_view type,
                std::span<const uint8_t> schema) {
-  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     ii->localStorage.AddSchema(name, type, schema);
   }
 }

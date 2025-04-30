@@ -9,7 +9,7 @@ package edu.wpi.first.networktables;
 /** NetworkTables BooleanArray topic. */
 public final class BooleanArrayTopic extends Topic {
   /** The default type string for this topic type. */
-  public static final String kTypeString = "boolean[]";
+  public static final String TYPE_STRING = "boolean[]";
 
   /**
    * Construct from a generic topic.
@@ -51,7 +51,7 @@ public final class BooleanArrayTopic extends Topic {
     return new BooleanArrayEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kBooleanArray.getValue(),
+            m_handle, NetworkTableType.BOOLEAN_ARRAY.getValue(),
             "boolean[]", options),
         defaultValue);
   }
@@ -79,7 +79,7 @@ public final class BooleanArrayTopic extends Topic {
     return new BooleanArrayEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kBooleanArray.getValue(),
+            m_handle, NetworkTableType.BOOLEAN_ARRAY.getValue(),
             typeString, options),
         defaultValue);
   }
@@ -104,7 +104,7 @@ public final class BooleanArrayTopic extends Topic {
     return new BooleanArrayEntryImpl(
         this,
         NetworkTablesJNI.publish(
-            m_handle, NetworkTableType.kBooleanArray.getValue(),
+            m_handle, NetworkTableType.BOOLEAN_ARRAY.getValue(),
             "boolean[]", options),
         new boolean[] {});
   }
@@ -134,7 +134,7 @@ public final class BooleanArrayTopic extends Topic {
     return new BooleanArrayEntryImpl(
         this,
         NetworkTablesJNI.publishEx(
-            m_handle, NetworkTableType.kBooleanArray.getValue(),
+            m_handle, NetworkTableType.BOOLEAN_ARRAY.getValue(),
             typeString, properties, options),
         new boolean[] {});
   }
@@ -165,7 +165,7 @@ public final class BooleanArrayTopic extends Topic {
     return new BooleanArrayEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kBooleanArray.getValue(),
+            m_handle, NetworkTableType.BOOLEAN_ARRAY.getValue(),
             "boolean[]", options),
         defaultValue);
   }
@@ -198,7 +198,7 @@ public final class BooleanArrayTopic extends Topic {
     return new BooleanArrayEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kBooleanArray.getValue(),
+            m_handle, NetworkTableType.BOOLEAN_ARRAY.getValue(),
             typeString, options),
         defaultValue);
   }

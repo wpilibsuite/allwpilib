@@ -10,7 +10,7 @@ package edu.wpi.first.networktables;
 public final class {{ TypeName }}Topic extends Topic {
 {%- if TypeString %}
   /** The default type string for this topic type. */
-  public static final String kTypeString = {{ TypeString }};
+  public static final String TYPE_STRING = {{ TypeString }};
 {% endif %}
   /**
    * Construct from a generic topic.
@@ -58,7 +58,7 @@ public final class {{ TypeName }}Topic extends Topic {
     return new {{ TypeName }}EntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.k{{ TypeName }}.getValue(),
+            m_handle, NetworkTableType.{{ TYPE_NAME }}.getValue(),
             {{ TypeString|default('typeString') }}, options),
         defaultValue);
   }
@@ -86,7 +86,7 @@ public final class {{ TypeName }}Topic extends Topic {
     return new {{ TypeName }}EntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.k{{ TypeName }}.getValue(),
+            m_handle, NetworkTableType.{{ TYPE_NAME }}.getValue(),
             typeString, options),
         defaultValue);
   }
@@ -117,7 +117,7 @@ public final class {{ TypeName }}Topic extends Topic {
     return new {{ TypeName }}EntryImpl(
         this,
         NetworkTablesJNI.publish(
-            m_handle, NetworkTableType.k{{ TypeName }}.getValue(),
+            m_handle, NetworkTableType.{{ TYPE_NAME }}.getValue(),
             {{ TypeString|default('typeString') }}, options),
         {{ java.EmptyValue }});
   }
@@ -147,7 +147,7 @@ public final class {{ TypeName }}Topic extends Topic {
     return new {{ TypeName }}EntryImpl(
         this,
         NetworkTablesJNI.publishEx(
-            m_handle, NetworkTableType.k{{ TypeName }}.getValue(),
+            m_handle, NetworkTableType.{{ TYPE_NAME }}.getValue(),
             typeString, properties, options),
         {{ java.EmptyValue }});
   }
@@ -184,7 +184,7 @@ public final class {{ TypeName }}Topic extends Topic {
     return new {{ TypeName }}EntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.k{{ TypeName }}.getValue(),
+            m_handle, NetworkTableType.{{ TYPE_NAME }}.getValue(),
             {{ TypeString|default('typeString') }}, options),
         defaultValue);
   }
@@ -217,7 +217,7 @@ public final class {{ TypeName }}Topic extends Topic {
     return new {{ TypeName }}EntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.k{{ TypeName }}.getValue(),
+            m_handle, NetworkTableType.{{ TYPE_NAME }}.getValue(),
             typeString, options),
         defaultValue);
   }

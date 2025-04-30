@@ -48,16 +48,16 @@ std::vector<TopicInfo> LocalStorage::GetTopicInfo(
 
 void LocalStorage::Release(NT_Handle pubsubentryHandle) {
   switch (Handle{pubsubentryHandle}.GetType()) {
-    case Handle::kEntry:
+    case Handle::ENTRY:
       ReleaseEntry(pubsubentryHandle);
       break;
-    case Handle::kPublisher:
+    case Handle::PUBLISHER:
       Unpublish(pubsubentryHandle);
       break;
-    case Handle::kSubscriber:
+    case Handle::SUBSCRIBER:
       Unsubscribe(pubsubentryHandle);
       break;
-    case Handle::kMultiSubscriber:
+    case Handle::MULTI_SUBSCRIBER:
       UnsubscribeMultiple(pubsubentryHandle);
       break;
     default:
