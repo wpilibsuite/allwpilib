@@ -9,7 +9,7 @@ import java.util.Arrays;
 /** Log array of integer values. */
 public class IntegerArrayLogEntry extends DataLogEntry {
   /** The data type for integer array values. */
-  public static final String kDataType = "int64[]";
+  public static final String DATA_TYPE = "int64[]";
 
   /**
    * Constructs a integer array log entry.
@@ -20,7 +20,7 @@ public class IntegerArrayLogEntry extends DataLogEntry {
    * @param timestamp entry creation timestamp (0=now)
    */
   public IntegerArrayLogEntry(DataLog log, String name, String metadata, long timestamp) {
-    super(log, name, kDataType, metadata, timestamp);
+    super(log, name, DATA_TYPE, metadata, timestamp);
   }
 
   /**

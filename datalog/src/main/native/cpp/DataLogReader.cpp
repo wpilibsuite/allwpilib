@@ -30,17 +30,17 @@ static bool ReadString(std::span<const uint8_t>* buf, std::string_view* str) {
 
 bool DataLogRecord::IsStart() const {
   return m_entry == 0 && m_data.size() >= 17 &&
-         m_data[0] == impl::kControlStart;
+         m_data[0] == impl::CONTROL_START;
 }
 
 bool DataLogRecord::IsFinish() const {
   return m_entry == 0 && m_data.size() == 5 &&
-         m_data[0] == impl::kControlFinish;
+         m_data[0] == impl::CONTROL_FINISH;
 }
 
 bool DataLogRecord::IsSetMetadata() const {
   return m_entry == 0 && m_data.size() >= 9 &&
-         m_data[0] == impl::kControlSetMetadata;
+         m_data[0] == impl::CONTROL_SET_METADATA;
 }
 
 bool DataLogRecord::GetStartData(StartRecordData* out) const {

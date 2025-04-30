@@ -29,18 +29,18 @@
 
 using namespace wpi::log;
 
-static constexpr uintmax_t kMinFreeSpace = 5 * 1024 * 1024;
+static constexpr uintmax_t MIN_FREE_SPACE = 5 * 1024 * 1024;
 
 static std::string FormatBytesSize(uintmax_t value) {
-  static constexpr uintmax_t kKiB = 1024;
-  static constexpr uintmax_t kMiB = kKiB * 1024;
-  static constexpr uintmax_t kGiB = kMiB * 1024;
-  if (value >= kGiB) {
-    return fmt::format("{:.1f} GiB", static_cast<double>(value) / kGiB);
-  } else if (value >= kMiB) {
-    return fmt::format("{:.1f} MiB", static_cast<double>(value) / kMiB);
-  } else if (value >= kKiB) {
-    return fmt::format("{:.1f} KiB", static_cast<double>(value) / kKiB);
+  static constexpr uintmax_t KIB = 1024;
+  static constexpr uintmax_t MIB = KIB * 1024;
+  static constexpr uintmax_t GIB = MIB * 1024;
+  if (value >= GIB) {
+    return fmt::format("{:.1f} GiB", static_cast<double>(value) / GIB);
+  } else if (value >= MIB) {
+    return fmt::format("{:.1f} MiB", static_cast<double>(value) / MIB);
+  } else if (value >= KIB) {
+    return fmt::format("{:.1f} KiB", static_cast<double>(value) / KIB);
   } else {
     return fmt::format("{} B", value);
   }
@@ -108,16 +108,16 @@ void DataLogBackgroundWriter::Flush() {
 void DataLogBackgroundWriter::Pause() {
   DataLog::Pause();
   std::scoped_lock lock{m_mutex};
-  m_state = kPaused;
+  m_state = PAUSED;
 }
 
 void DataLogBackgroundWriter::Resume() {
   DataLog::Resume();
   std::scoped_lock lock{m_mutex};
-  if (m_state == kPaused) {
-    m_state = kActive;
-  } else if (m_state == kStopped) {
-    m_state = kStart;
+  if (m_state == PAUSED) {
+    m_state = ACTIVE;
+  } else if (m_state == STOPPED) {
+    m_state = START;
   }
 }
 
@@ -125,7 +125,7 @@ void DataLogBackgroundWriter::Stop() {
   DataLog::Stop();
   {
     std::scoped_lock lock{m_mutex};
-    m_state = kStopped;
+    m_state = STOPPED;
     m_newFilename.clear();
   }
   m_cond.notify_all();
@@ -237,11 +237,11 @@ void DataLogBackgroundWriter::StartLogFile(WriterThreadState& state) {
   } else {
     state.freeSpace = UINTMAX_MAX;
   }
-  if (state.freeSpace < kMinFreeSpace) {
+  if (state.freeSpace < MIN_FREE_SPACE) {
     WPI_ERROR(m_msglog,
               "Insufficient free space ({} available), no log being saved",
               FormatBytesSize(state.freeSpace));
-    m_state = kStopped;
+    m_state = STOPPED;
   } else {
     // try preferred filename, or randomize it a few times, before giving up
     for (int i = 0; i < 5; ++i) {
@@ -304,7 +304,7 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
       doFlush = true;
     }
 
-    if (m_state == kStopped) {
+    if (m_state == STOPPED) {
       state.Close();
       continue;
     }
@@ -335,15 +335,15 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
       doStart = true;
     }
 
-    if (m_state == kStart || doStart) {
+    if (m_state == START || doStart) {
       lock.unlock();
       DataLog::Stop();
       StartLogFile(state);
       lock.lock();
-      if (m_state == kStopped) {
+      if (m_state == STOPPED) {
         continue;
       }
-      m_state = kActive;
+      m_state = ACTIVE;
       written = 0;
     }
 
@@ -393,7 +393,7 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
           // stop writing when we go below the minimum free space
           state.freeSpace -= buf.GetData().size();
           written += buf.GetData().size();
-          if (state.freeSpace < kMinFreeSpace) {
+          if (state.freeSpace < MIN_FREE_SPACE) {
             [[unlikely]] WPI_ERROR(
                 m_msglog,
                 "Stopped logging due to low free space ({} available)",
@@ -412,7 +412,7 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
 #endif
         lock.lock();
         if (blocked) {
-          [[unlikely]] m_state = kPaused;
+          [[unlikely]] m_state = PAUSED;
         }
       }
 

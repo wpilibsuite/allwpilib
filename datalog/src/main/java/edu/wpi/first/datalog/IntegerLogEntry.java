@@ -7,7 +7,7 @@ package edu.wpi.first.datalog;
 /** Log integer values. */
 public class IntegerLogEntry extends DataLogEntry {
   /** The data type for integer values. */
-  public static final String kDataType = "int64";
+  public static final String DATA_TYPE = "int64";
 
   /**
    * Constructs a integer log entry.
@@ -18,7 +18,7 @@ public class IntegerLogEntry extends DataLogEntry {
    * @param timestamp entry creation timestamp (0=now)
    */
   public IntegerLogEntry(DataLog log, String name, String metadata, long timestamp) {
-    super(log, name, kDataType, metadata, timestamp);
+    super(log, name, DATA_TYPE, metadata, timestamp);
   }
 
   /**

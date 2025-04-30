@@ -14,9 +14,9 @@ __all__ = ["StartRecordData", "MetadataRecordData", "DataLogRecord", "DataLogRea
 floatStruct = struct.Struct("<f")
 doubleStruct = struct.Struct("<d")
 
-kControlStart = 0
-kControlFinish = 1
-kControlSetMetadata = 2
+CONTROL_START = 0
+CONTROL_FINISH = 1
+CONTROL_SET_METADATA = 2
 
 
 class StartRecordData:
@@ -69,21 +69,21 @@ class DataLogRecord:
         return (
             self.entry == 0
             and len(self.data) >= 17
-            and self._getControlType() == kControlStart
+            and self._getControlType() == CONTROL_START
         )
 
     def isFinish(self) -> bool:
         return (
             self.entry == 0
             and len(self.data) == 5
-            and self._getControlType() == kControlFinish
+            and self._getControlType() == CONTROL_FINISH
         )
 
     def isSetMetadata(self) -> bool:
         return (
             self.entry == 0
             and len(self.data) >= 9
-            and self._getControlType() == kControlSetMetadata
+            and self._getControlType() == CONTROL_SET_METADATA
         )
 
     def getStartData(self) -> StartRecordData:
