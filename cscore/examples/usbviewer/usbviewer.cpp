@@ -25,7 +25,7 @@ namespace gui = wpi::gui;
 
 int main() {
   wpi::mutex latestFrameMutex;
-  std::unique_ptr<cv::Mat> latestFrame{nullptr};
+  std::unique_ptr<cv::Mat> latestFrame;
   wpi::spinlock freeListMutex;
   std::vector<std::unique_ptr<cv::Mat>> freeList;
   std::atomic<bool> stopCamera{false};
@@ -48,12 +48,12 @@ int main() {
       // get or create a mat
       std::unique_ptr<cv::Mat> out;
       {
-        std::scoped_lock lock(freeListMutex);
+        std::scoped_lock lock{freeListMutex};
         if (!freeList.empty()) {
           out = std::move(freeList.back());
           freeList.pop_back();
         } else {
-          out = std::make_unique<cv::Mat>(cv::Mat());
+          out = std::make_unique<cv::Mat>();
         }
       }
 
@@ -62,13 +62,13 @@ int main() {
 
       {
         // make available
-        std::scoped_lock lock(latestFrameMutex);
+        std::scoped_lock lock{latestFrameMutex};
         latestFrame.swap(out);
       }
 
       // put the previous frame on free list
       if (out) {
-        std::scoped_lock lock(freeListMutex);
+        std::scoped_lock lock{freeListMutex};
         freeList.emplace_back(std::move(out));
       }
     }
@@ -80,7 +80,7 @@ int main() {
   gui::AddEarlyExecute([&] {
     std::unique_ptr<cv::Mat> frame;
     {
-      std::scoped_lock lock(latestFrameMutex);
+      std::scoped_lock lock{latestFrameMutex};
       latestFrame.swap(frame);
     }
     if (frame) {
@@ -93,7 +93,7 @@ int main() {
         tex.Update(frame->data);
       }
       {
-        std::scoped_lock lock(freeListMutex);
+        std::scoped_lock lock{freeListMutex};
         freeList.emplace_back(std::move(frame));
       }
     }
