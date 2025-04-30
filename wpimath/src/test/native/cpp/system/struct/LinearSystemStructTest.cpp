@@ -13,7 +13,7 @@ using namespace frc;
 struct LinearSystemStructTestData {
   using Type = LinearSystem<2, 3, 4>;
 
-  inline static const Type kTestData{
+  inline static const Type TEST_DATA{
       Matrixd<2, 2>{{1.1, 1.2}, {1.3, 1.4}},
       Matrixd<2, 3>{{2.1, 2.2, 2.3}, {2.4, 2.5, 2.6}},
       Matrixd<4, 2>{{3.1, 3.2}, {3.3, 3.4}, {3.5, 3.6}, {3.7, 3.8}},

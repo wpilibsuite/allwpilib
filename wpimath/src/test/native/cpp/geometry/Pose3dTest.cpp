@@ -33,7 +33,7 @@ TEST(Pose3dTest, RotateBy) {
 }
 
 TEST(Pose3dTest, TestTransformByRotations) {
-  constexpr double kEpsilon = 1E-9;
+  constexpr double EPSILON = 1E-9;
 
   const Pose3d initialPose{0_m, 0_m, 0_m, Rotation3d{0_deg, 0_deg, 0_deg}};
   const Transform3d transform1{Translation3d{0_m, 0_m, 0_m},
@@ -48,11 +48,11 @@ TEST(Pose3dTest, TestTransformByRotations) {
                          .TransformBy(transform3);
 
   EXPECT_NEAR(finalPose.Rotation().X().value(),
-              initialPose.Rotation().X().value(), kEpsilon);
+              initialPose.Rotation().X().value(), EPSILON);
   EXPECT_NEAR(finalPose.Rotation().Y().value(),
-              initialPose.Rotation().Y().value(), kEpsilon);
+              initialPose.Rotation().Y().value(), EPSILON);
   EXPECT_NEAR(finalPose.Rotation().Z().value(),
-              initialPose.Rotation().Z().value(), kEpsilon);
+              initialPose.Rotation().Z().value(), EPSILON);
 }
 
 TEST(Pose3dTest, TransformBy) {

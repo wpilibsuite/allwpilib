@@ -71,7 +71,7 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    */
   public DifferentialDriveOdometry3d(
       Rotation3d gyroAngle, double leftDistance, double rightDistance) {
-    this(gyroAngle, leftDistance, rightDistance, Pose3d.kZero);
+    this(gyroAngle, leftDistance, rightDistance, Pose3d.ZERO);
   }
 
   /**
@@ -83,7 +83,7 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    */
   public DifferentialDriveOdometry3d(
       Rotation3d gyroAngle, Distance leftDistance, Distance rightDistance) {
-    this(gyroAngle, leftDistance, rightDistance, Pose3d.kZero);
+    this(gyroAngle, leftDistance, rightDistance, Pose3d.ZERO);
   }
 
   /**

@@ -37,7 +37,7 @@ public final class VectorStruct<R extends Num> implements Struct<Vector<R>> {
 
   @Override
   public int getSize() {
-    return kSizeDouble * m_rows;
+    return SIZE_DOUBLE * m_rows;
   }
 
   @Override

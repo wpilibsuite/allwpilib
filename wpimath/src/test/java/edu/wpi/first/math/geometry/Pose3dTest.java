@@ -15,7 +15,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class Pose3dTest {
-  private static final double kEpsilon = 1E-9;
+  private static final double EPSILON = 1E-9;
 
   @Test
   void testRotateBy() {
@@ -37,25 +37,25 @@ class Pose3dTest {
     double c = Math.cos(yaw);
     double s = Math.sin(yaw);
     assertAll(
-        () -> assertEquals(c * x - s * y, rotated.getX(), kEpsilon),
-        () -> assertEquals(s * x + c * y, rotated.getY(), kEpsilon),
-        () -> assertEquals(0.0, rotated.getZ(), kEpsilon),
-        () -> assertEquals(0.0, rotated.getRotation().getX(), kEpsilon),
-        () -> assertEquals(0.0, rotated.getRotation().getY(), kEpsilon),
+        () -> assertEquals(c * x - s * y, rotated.getX(), EPSILON),
+        () -> assertEquals(s * x + c * y, rotated.getY(), EPSILON),
+        () -> assertEquals(0.0, rotated.getZ(), EPSILON),
+        () -> assertEquals(0.0, rotated.getRotation().getX(), EPSILON),
+        () -> assertEquals(0.0, rotated.getRotation().getY(), EPSILON),
         () ->
             assertEquals(
                 initial.getRotation().getZ() + rotation.getZ(),
                 rotated.getRotation().getZ(),
-                kEpsilon));
+                EPSILON));
   }
 
   @Test
   void testTransformByRotations() {
-    var initialPose = Pose3d.kZero;
+    var initialPose = Pose3d.ZERO;
 
     var transform1 =
         new Transform3d(
-            Translation3d.kZero,
+            Translation3d.ZERO,
             new Rotation3d(
                 Units.degreesToRadians(90.0),
                 Units.degreesToRadians(45.0),
@@ -63,7 +63,7 @@ class Pose3dTest {
 
     var transform2 =
         new Transform3d(
-            Translation3d.kZero,
+            Translation3d.ZERO,
             new Rotation3d(
                 Units.degreesToRadians(-90.0),
                 Units.degreesToRadians(0.0),
@@ -71,7 +71,7 @@ class Pose3dTest {
 
     var transform3 =
         new Transform3d(
-            Translation3d.kZero,
+            Translation3d.ZERO,
             new Rotation3d(
                 Units.degreesToRadians(0.0),
                 Units.degreesToRadians(-45.0),
@@ -91,14 +91,12 @@ class Pose3dTest {
 
     assertAll(
         () ->
-            assertEquals(
-                finalPose.getRotation().getX(), initialPose.getRotation().getX(), kEpsilon),
+            assertEquals(finalPose.getRotation().getX(), initialPose.getRotation().getX(), EPSILON),
+        () ->
+            assertEquals(finalPose.getRotation().getY(), initialPose.getRotation().getY(), EPSILON),
         () ->
             assertEquals(
-                finalPose.getRotation().getY(), initialPose.getRotation().getY(), kEpsilon),
-        () ->
-            assertEquals(
-                finalPose.getRotation().getZ(), initialPose.getRotation().getZ(), kEpsilon));
+                finalPose.getRotation().getZ(), initialPose.getRotation().getZ(), EPSILON));
   }
 
   @Test
@@ -115,10 +113,10 @@ class Pose3dTest {
     var transformed = initial.plus(transformation);
 
     assertAll(
-        () -> assertEquals(1.0 + 5.0 / Math.sqrt(2.0), transformed.getX(), kEpsilon),
-        () -> assertEquals(2.0 + 5.0 / Math.sqrt(2.0), transformed.getY(), kEpsilon),
+        () -> assertEquals(1.0 + 5.0 / Math.sqrt(2.0), transformed.getX(), EPSILON),
+        () -> assertEquals(2.0 + 5.0 / Math.sqrt(2.0), transformed.getY(), EPSILON),
         () ->
-            assertEquals(Units.degreesToRadians(50.0), transformed.getRotation().getZ(), kEpsilon));
+            assertEquals(Units.degreesToRadians(50.0), transformed.getRotation().getZ(), EPSILON));
   }
 
   @Test
@@ -131,22 +129,22 @@ class Pose3dTest {
     var finalRelativeToInitial = last.relativeTo(initial);
 
     assertAll(
-        () -> assertEquals(5.0 * Math.sqrt(2.0), finalRelativeToInitial.getX(), kEpsilon),
-        () -> assertEquals(0.0, finalRelativeToInitial.getY(), kEpsilon),
-        () -> assertEquals(0.0, finalRelativeToInitial.getRotation().getZ(), kEpsilon));
+        () -> assertEquals(5.0 * Math.sqrt(2.0), finalRelativeToInitial.getX(), EPSILON),
+        () -> assertEquals(0.0, finalRelativeToInitial.getY(), EPSILON),
+        () -> assertEquals(0.0, finalRelativeToInitial.getRotation().getZ(), EPSILON));
   }
 
   @Test
   void testRotateAround() {
-    var initial = new Pose3d(new Translation3d(5, 0, 0), Rotation3d.kZero);
-    var point = Translation3d.kZero;
+    var initial = new Pose3d(new Translation3d(5, 0, 0), Rotation3d.ZERO);
+    var point = Translation3d.ZERO;
 
     var rotated = initial.rotateAround(point, new Rotation3d(0, 0, Math.PI));
 
     assertAll(
-        () -> assertEquals(-5.0, rotated.getX(), kEpsilon),
-        () -> assertEquals(0.0, rotated.getY(), kEpsilon),
-        () -> assertEquals(Math.PI, rotated.getRotation().getZ(), kEpsilon));
+        () -> assertEquals(-5.0, rotated.getX(), EPSILON),
+        () -> assertEquals(0.0, rotated.getY(), EPSILON),
+        () -> assertEquals(Math.PI, rotated.getRotation().getZ(), EPSILON));
   }
 
   @Test
@@ -177,9 +175,9 @@ class Pose3dTest {
     final var transform = last.minus(initial);
 
     assertAll(
-        () -> assertEquals(5.0 * Math.sqrt(2.0), transform.getX(), kEpsilon),
-        () -> assertEquals(0.0, transform.getY(), kEpsilon),
-        () -> assertEquals(0.0, transform.getRotation().getZ(), kEpsilon));
+        () -> assertEquals(5.0 * Math.sqrt(2.0), transform.getX(), EPSILON),
+        () -> assertEquals(0.0, transform.getY(), EPSILON),
+        () -> assertEquals(0.0, transform.getRotation().getZ(), EPSILON));
   }
 
   @Test

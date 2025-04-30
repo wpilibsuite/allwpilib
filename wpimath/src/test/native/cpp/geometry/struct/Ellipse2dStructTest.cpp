@@ -11,18 +11,18 @@ using namespace frc;
 namespace {
 
 using StructType = wpi::Struct<frc::Ellipse2d>;
-const Ellipse2d kExpectedData{
+const Ellipse2d EXPECTED_DATA{
     Pose2d{Translation2d{0.191_m, 2.2_m}, Rotation2d{22.9_rad}}, 1.2_m, 2.3_m};
 }  // namespace
 
 TEST(Ellipse2dStructTest, Roundtrip) {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   Ellipse2d unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.Center(), unpacked_data.Center());
-  EXPECT_EQ(kExpectedData.XSemiAxis(), unpacked_data.XSemiAxis());
-  EXPECT_EQ(kExpectedData.YSemiAxis(), unpacked_data.YSemiAxis());
+  EXPECT_EQ(EXPECTED_DATA.Center(), unpacked_data.Center());
+  EXPECT_EQ(EXPECTED_DATA.XSemiAxis(), unpacked_data.XSemiAxis());
+  EXPECT_EQ(EXPECTED_DATA.YSemiAxis(), unpacked_data.YSemiAxis());
 }

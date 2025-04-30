@@ -87,10 +87,10 @@ T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
   // See https://en.wikipedia.org/wiki/Dormand%E2%80%93Prince_method for the
   // Butcher tableau the following arrays came from.
 
-  constexpr int kDim = 7;
+  constexpr int DIM = 7;
 
   // clang-format off
-  constexpr double A[kDim - 1][kDim - 1]{
+  constexpr double A[DIM - 1][DIM - 1]{
       {      1.0 / 5.0},
       {      3.0 / 40.0,        9.0 / 40.0},
       {     44.0 / 45.0,      -56.0 / 15.0,       32.0 / 9.0},
@@ -99,10 +99,10 @@ T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
       {    35.0 / 384.0,               0.0,   500.0 / 1113.0,  125.0 / 192.0,  -2187.0 / 6784.0, 11.0 / 84.0}};
   // clang-format on
 
-  constexpr std::array<double, kDim> b1{
+  constexpr std::array<double, DIM> b1{
       35.0 / 384.0, 0.0, 500.0 / 1113.0, 125.0 / 192.0, -2187.0 / 6784.0,
       11.0 / 84.0,  0.0};
-  constexpr std::array<double, kDim> b2{5179.0 / 57600.0,    0.0,
+  constexpr std::array<double, DIM> b2{5179.0 / 57600.0,    0.0,
                                         7571.0 / 16695.0,    393.0 / 640.0,
                                         -92097.0 / 339200.0, 187.0 / 2100.0,
                                         1.0 / 40.0};
@@ -171,10 +171,10 @@ T RKDP(F&& f, units::second_t t, T y, units::second_t dt,
   // See https://en.wikipedia.org/wiki/Dormand%E2%80%93Prince_method for the
   // Butcher tableau the following arrays came from.
 
-  constexpr int kDim = 7;
+  constexpr int DIM = 7;
 
   // clang-format off
-  constexpr double A[kDim - 1][kDim - 1]{
+  constexpr double A[DIM - 1][DIM - 1]{
       {      1.0 / 5.0},
       {      3.0 / 40.0,        9.0 / 40.0},
       {     44.0 / 45.0,      -56.0 / 15.0,       32.0 / 9.0},
@@ -183,15 +183,15 @@ T RKDP(F&& f, units::second_t t, T y, units::second_t dt,
       {    35.0 / 384.0,               0.0,   500.0 / 1113.0,  125.0 / 192.0,  -2187.0 / 6784.0, 11.0 / 84.0}};
   // clang-format on
 
-  constexpr std::array<double, kDim> b1{
+  constexpr std::array<double, DIM> b1{
       35.0 / 384.0, 0.0, 500.0 / 1113.0, 125.0 / 192.0, -2187.0 / 6784.0,
       11.0 / 84.0,  0.0};
-  constexpr std::array<double, kDim> b2{5179.0 / 57600.0,    0.0,
+  constexpr std::array<double, DIM> b2{5179.0 / 57600.0,    0.0,
                                         7571.0 / 16695.0,    393.0 / 640.0,
                                         -92097.0 / 339200.0, 187.0 / 2100.0,
                                         1.0 / 40.0};
 
-  constexpr std::array<double, kDim - 1> c{1.0 / 5.0, 3.0 / 10.0, 4.0 / 5.0,
+  constexpr std::array<double, DIM - 1> c{1.0 / 5.0, 3.0 / 10.0, 4.0 / 5.0,
                                            8.0 / 9.0, 1.0,        1.0};
 
   T newY;

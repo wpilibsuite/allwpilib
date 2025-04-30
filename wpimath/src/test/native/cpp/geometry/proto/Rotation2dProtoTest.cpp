@@ -11,15 +11,15 @@ using namespace frc;
 
 namespace {
 
-const Rotation2d kExpectedData = Rotation2d{1.91_rad};
+const Rotation2d EXPECTED_DATA = Rotation2d{1.91_rad};
 }  // namespace
 
 TEST(Rotation2dProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  ASSERT_TRUE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
-  EXPECT_EQ(kExpectedData.Radians().value(), unpacked_data->Radians().value());
+  EXPECT_EQ(EXPECTED_DATA.Radians().value(), unpacked_data->Radians().value());
 }

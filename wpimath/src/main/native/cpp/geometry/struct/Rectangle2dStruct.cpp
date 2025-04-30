@@ -5,23 +5,23 @@
 #include "frc/geometry/struct/Rectangle2dStruct.h"
 
 namespace {
-constexpr size_t kCenterOff = 0;
-constexpr size_t kXWidthOff = kCenterOff + wpi::GetStructSize<frc::Pose2d>();
-constexpr size_t kYWidthOff = kXWidthOff + 8;
+constexpr size_t CENTER_OFF = 0;
+constexpr size_t X_WIDTH_OFF = CENTER_OFF + wpi::GetStructSize<frc::Pose2d>();
+constexpr size_t Y_WIDTH_OFF = X_WIDTH_OFF + 8;
 }  // namespace
 
 using StructType = wpi::Struct<frc::Rectangle2d>;
 
 frc::Rectangle2d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Rectangle2d{
-      wpi::UnpackStruct<frc::Pose2d, kCenterOff>(data),
-      units::meter_t{wpi::UnpackStruct<double, kXWidthOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kYWidthOff>(data)},
+      wpi::UnpackStruct<frc::Pose2d, CENTER_OFF>(data),
+      units::meter_t{wpi::UnpackStruct<double, X_WIDTH_OFF>(data)},
+      units::meter_t{wpi::UnpackStruct<double, Y_WIDTH_OFF>(data)},
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data, const frc::Rectangle2d& value) {
-  wpi::PackStruct<kCenterOff>(data, value.Center());
-  wpi::PackStruct<kXWidthOff>(data, value.XWidth().value());
-  wpi::PackStruct<kYWidthOff>(data, value.YWidth().value());
+  wpi::PackStruct<CENTER_OFF>(data, value.Center());
+  wpi::PackStruct<X_WIDTH_OFF>(data, value.XWidth().value());
+  wpi::PackStruct<Y_WIDTH_OFF>(data, value.YWidth().value());
 }

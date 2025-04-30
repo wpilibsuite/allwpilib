@@ -57,7 +57,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @param radius The radius of the circle.
    */
   public Ellipse2d(Translation2d center, double radius) {
-    this(new Pose2d(center, Rotation2d.kZero), radius, radius);
+    this(new Pose2d(center, Rotation2d.ZERO), radius, radius);
   }
 
   /**
@@ -68,7 +68,7 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
    * @param radius The radius of the circle.
    */
   public Ellipse2d(Translation2d center, Distance radius) {
-    this(new Pose2d(center, Rotation2d.kZero), radius, radius);
+    this(new Pose2d(center, Rotation2d.ZERO), radius, radius);
   }
 
   /**
@@ -142,12 +142,12 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
 
     if (m_xSemiAxis > m_ySemiAxis) {
       return new Pair<>(
-          m_center.plus(new Transform2d(-c, 0.0, Rotation2d.kZero)).getTranslation(),
-          m_center.plus(new Transform2d(c, 0.0, Rotation2d.kZero)).getTranslation());
+          m_center.plus(new Transform2d(-c, 0.0, Rotation2d.ZERO)).getTranslation(),
+          m_center.plus(new Transform2d(c, 0.0, Rotation2d.ZERO)).getTranslation());
     } else {
       return new Pair<>(
-          m_center.plus(new Transform2d(0.0, -c, Rotation2d.kZero)).getTranslation(),
-          m_center.plus(new Transform2d(0.0, c, Rotation2d.kZero)).getTranslation());
+          m_center.plus(new Transform2d(0.0, -c, Rotation2d.ZERO)).getTranslation(),
+          m_center.plus(new Transform2d(0.0, c, Rotation2d.ZERO)).getTranslation());
     }
   }
 

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 class Rectangle2dTest {
-  private static final double kEpsilon = 1E-9;
+  private static final double EPSILON = 1E-9;
 
   @Test
   void testNewWithCorners() {
@@ -58,16 +58,16 @@ class Rectangle2dTest {
     var rect = new Rectangle2d(center, 1.0, 2.0);
 
     var point1 = new Translation2d(2.5, 2.0);
-    assertEquals(0.5, rect.getDistance(point1), kEpsilon);
+    assertEquals(0.5, rect.getDistance(point1), EPSILON);
 
     var point2 = new Translation2d(1.0, 2.0);
-    assertEquals(0.0, rect.getDistance(point2), kEpsilon);
+    assertEquals(0.0, rect.getDistance(point2), EPSILON);
 
     var point3 = new Translation2d(1.0, 1.0);
-    assertEquals(0.5, rect.getDistance(point3), kEpsilon);
+    assertEquals(0.5, rect.getDistance(point3), EPSILON);
 
     var point4 = new Translation2d(-1.0, 2.5);
-    assertEquals(1.0, rect.getDistance(point4), kEpsilon);
+    assertEquals(1.0, rect.getDistance(point4), EPSILON);
   }
 
   @Test
@@ -78,14 +78,14 @@ class Rectangle2dTest {
     var point1 = new Translation2d(1.0, 3.0);
     var nearestPoint1 = rect.nearest(point1);
     assertAll(
-        () -> assertEquals(1.0, nearestPoint1.getX(), kEpsilon),
-        () -> assertEquals(2.5, nearestPoint1.getY(), kEpsilon));
+        () -> assertEquals(1.0, nearestPoint1.getX(), EPSILON),
+        () -> assertEquals(2.5, nearestPoint1.getY(), EPSILON));
 
     var point2 = new Translation2d(0.0, 0.0);
     var nearestPoint2 = rect.nearest(point2);
     assertAll(
-        () -> assertEquals(0.0, nearestPoint2.getX(), kEpsilon),
-        () -> assertEquals(0.0, nearestPoint2.getY(), kEpsilon));
+        () -> assertEquals(0.0, nearestPoint2.getX(), EPSILON),
+        () -> assertEquals(0.0, nearestPoint2.getY(), EPSILON));
   }
 
   @Test

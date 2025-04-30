@@ -29,7 +29,7 @@ class DebouncerTest {
 
   @Test
   void debounceRisingTest() {
-    var debouncer = new Debouncer(0.02, Debouncer.DebounceType.kRising);
+    var debouncer = new Debouncer(0.02, Debouncer.DebounceType.RISING);
 
     debouncer.calculate(false);
     assertFalse(debouncer.calculate(true));
@@ -41,7 +41,7 @@ class DebouncerTest {
 
   @Test
   void debounceFallingTest() {
-    var debouncer = new Debouncer(0.02, Debouncer.DebounceType.kFalling);
+    var debouncer = new Debouncer(0.02, Debouncer.DebounceType.FALLING);
 
     debouncer.calculate(true);
     assertTrue(debouncer.calculate(false));
@@ -55,7 +55,7 @@ class DebouncerTest {
 
   @Test
   void debounceBothTest() {
-    var debouncer = new Debouncer(0.02, Debouncer.DebounceType.kBoth);
+    var debouncer = new Debouncer(0.02, Debouncer.DebounceType.BOTH);
 
     debouncer.calculate(false);
     assertFalse(debouncer.calculate(true));
@@ -72,18 +72,18 @@ class DebouncerTest {
 
   @Test
   void debounceParamsTest() {
-    var debouncer = new Debouncer(0.02, Debouncer.DebounceType.kBoth);
+    var debouncer = new Debouncer(0.02, Debouncer.DebounceType.BOTH);
 
     assertEquals(debouncer.getDebounceTime(), 0.02);
-    assertSame(debouncer.getDebounceType(), Debouncer.DebounceType.kBoth);
+    assertSame(debouncer.getDebounceType(), Debouncer.DebounceType.BOTH);
 
     debouncer.setDebounceTime(0.1);
 
     assertEquals(debouncer.getDebounceTime(), 0.1);
 
-    debouncer.setDebounceType(Debouncer.DebounceType.kFalling);
+    debouncer.setDebounceType(Debouncer.DebounceType.FALLING);
 
-    assertSame(debouncer.getDebounceType(), Debouncer.DebounceType.kFalling);
+    assertSame(debouncer.getDebounceType(), Debouncer.DebounceType.FALLING);
     assertTrue(debouncer.calculate(false));
   }
 }

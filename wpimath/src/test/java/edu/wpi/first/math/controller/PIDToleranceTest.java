@@ -10,14 +10,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 class PIDToleranceTest {
-  private static final double kSetpoint = 50.0;
-  private static final double kTolerance = 10.0;
-  private static final double kRange = 200;
+  private static final double SETPOINT = 50.0;
+  private static final double TOLERANCE = 10.0;
+  private static final double RANGE = 200;
 
   @Test
   void initialToleranceTest() {
     try (var controller = new PIDController(0.05, 0.0, 0.0)) {
-      controller.enableContinuousInput(-kRange / 2, kRange / 2);
+      controller.enableContinuousInput(-RANGE / 2, RANGE / 2);
 
       assertFalse(controller.atSetpoint());
     }
@@ -26,12 +26,12 @@ class PIDToleranceTest {
   @Test
   void absoluteToleranceTest() {
     try (var controller = new PIDController(0.05, 0.0, 0.0)) {
-      controller.enableContinuousInput(-kRange / 2, kRange / 2);
+      controller.enableContinuousInput(-RANGE / 2, RANGE / 2);
 
       assertFalse(controller.atSetpoint());
 
-      controller.setTolerance(kTolerance);
-      controller.setSetpoint(kSetpoint);
+      controller.setTolerance(TOLERANCE);
+      controller.setSetpoint(SETPOINT);
 
       assertFalse(
           controller.atSetpoint(),
@@ -45,14 +45,14 @@ class PIDToleranceTest {
           "Error was in tolerance when it should not have been. Error was "
               + controller.getError());
 
-      controller.calculate(kSetpoint + kTolerance / 2);
+      controller.calculate(SETPOINT + TOLERANCE / 2);
 
       assertTrue(
           controller.atSetpoint(),
           "Error was not in tolerance when it should have been. Error was "
               + controller.getError());
 
-      controller.calculate(kSetpoint + 10 * kTolerance);
+      controller.calculate(SETPOINT + 10 * TOLERANCE);
 
       assertFalse(
           controller.atSetpoint(),

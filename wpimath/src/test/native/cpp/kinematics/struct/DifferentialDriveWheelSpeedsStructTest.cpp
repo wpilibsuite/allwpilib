@@ -11,17 +11,17 @@ using namespace frc;
 namespace {
 
 using StructType = wpi::Struct<frc::DifferentialDriveWheelSpeeds>;
-const DifferentialDriveWheelSpeeds kExpectedData{
+const DifferentialDriveWheelSpeeds EXPECTED_DATA{
     DifferentialDriveWheelSpeeds{1.74_mps, 35.04_mps}};
 }  // namespace
 
 TEST(DifferentialDriveWheelSpeedsStructTest, Roundtrip) {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   DifferentialDriveWheelSpeeds unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.left.value(), unpacked_data.left.value());
-  EXPECT_EQ(kExpectedData.right.value(), unpacked_data.right.value());
+  EXPECT_EQ(EXPECTED_DATA.left.value(), unpacked_data.left.value());
+  EXPECT_EQ(EXPECTED_DATA.right.value(), unpacked_data.right.value());
 }

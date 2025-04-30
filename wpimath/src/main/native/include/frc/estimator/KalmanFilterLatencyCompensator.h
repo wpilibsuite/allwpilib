@@ -68,7 +68,7 @@ class KalmanFilterLatencyCompensator {
                                          ObserverSnapshot{observer, u, localY});
 
     // Remove the oldest snapshot if the vector exceeds our maximum size.
-    if (m_pastObserverSnapshots.size() > kMaxPastObserverStates) {
+    if (m_pastObserverSnapshots.size() > MAX_PAST_OBSERVER_STATES) {
       m_pastObserverSnapshots.erase(m_pastObserverSnapshots.begin());
     }
   }
@@ -173,7 +173,7 @@ class KalmanFilterLatencyCompensator {
   }
 
  private:
-  static constexpr size_t kMaxPastObserverStates = 300;
+  static constexpr size_t MAX_PAST_OBSERVER_STATES = 300;
   std::vector<std::pair<units::second_t, ObserverSnapshot>>
       m_pastObserverSnapshots;
 };

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 class Ellipse2dTest {
-  private static final double kEpsilon = 1E-9;
+  private static final double EPSILON = 1E-9;
 
   @Test
   void testGetFocalPoints() {
@@ -60,16 +60,16 @@ class Ellipse2dTest {
     var ellipse = new Ellipse2d(center, 1.0, 2.0);
 
     var point1 = new Translation2d(2.5, 2.0);
-    assertEquals(0.0, ellipse.getDistance(point1), kEpsilon);
+    assertEquals(0.0, ellipse.getDistance(point1), EPSILON);
 
     var point2 = new Translation2d(1.0, 2.0);
-    assertEquals(0.0, ellipse.getDistance(point2), kEpsilon);
+    assertEquals(0.0, ellipse.getDistance(point2), EPSILON);
 
     var point3 = new Translation2d(1.0, 1.0);
-    assertEquals(0.0, ellipse.getDistance(point3), kEpsilon);
+    assertEquals(0.0, ellipse.getDistance(point3), EPSILON);
 
     var point4 = new Translation2d(-1.0, 2.5);
-    assertEquals(0.19210128384806818, ellipse.getDistance(point4), kEpsilon);
+    assertEquals(0.19210128384806818, ellipse.getDistance(point4), EPSILON);
   }
 
   @Test
@@ -80,26 +80,26 @@ class Ellipse2dTest {
     var point1 = new Translation2d(2.5, 2.0);
     var nearestPoint1 = ellipse.nearest(point1);
     assertAll(
-        () -> assertEquals(2.5, nearestPoint1.getX(), kEpsilon),
-        () -> assertEquals(2.0, nearestPoint1.getY(), kEpsilon));
+        () -> assertEquals(2.5, nearestPoint1.getX(), EPSILON),
+        () -> assertEquals(2.0, nearestPoint1.getY(), EPSILON));
 
     var point2 = new Translation2d(1.0, 2.0);
     var nearestPoint2 = ellipse.nearest(point2);
     assertAll(
-        () -> assertEquals(1.0, nearestPoint2.getX(), kEpsilon),
-        () -> assertEquals(2.0, nearestPoint2.getY(), kEpsilon));
+        () -> assertEquals(1.0, nearestPoint2.getX(), EPSILON),
+        () -> assertEquals(2.0, nearestPoint2.getY(), EPSILON));
 
     var point3 = new Translation2d(1.0, 1.0);
     var nearestPoint3 = ellipse.nearest(point3);
     assertAll(
-        () -> assertEquals(1.0, nearestPoint3.getX(), kEpsilon),
-        () -> assertEquals(1.0, nearestPoint3.getY(), kEpsilon));
+        () -> assertEquals(1.0, nearestPoint3.getX(), EPSILON),
+        () -> assertEquals(1.0, nearestPoint3.getY(), EPSILON));
 
     var point4 = new Translation2d(-1.0, 2.5);
     var nearestPoint4 = ellipse.nearest(point4);
     assertAll(
-        () -> assertEquals(-0.8512799937611617, nearestPoint4.getX(), kEpsilon),
-        () -> assertEquals(2.378405333174535, nearestPoint4.getY(), kEpsilon));
+        () -> assertEquals(-0.8512799937611617, nearestPoint4.getX(), EPSILON),
+        () -> assertEquals(2.378405333174535, nearestPoint4.getY(), EPSILON));
   }
 
   @Test

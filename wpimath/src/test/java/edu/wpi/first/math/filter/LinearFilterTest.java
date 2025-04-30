@@ -18,15 +18,15 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class LinearFilterTest {
-  private static final double kFilterStep = 0.005;
-  private static final double kFilterTime = 2.0;
-  private static final double kSinglePoleIIRTimeConstant = 0.015915;
-  private static final double kHighPassTimeConstant = 0.006631;
-  private static final int kMovAvgTaps = 6;
+  private static final double FILTER_STEP = 0.005;
+  private static final double FILTER_TIME = 2.0;
+  private static final double SINGLE_POLE_IIR_TIME_CONSTANT = 0.015915;
+  private static final double HIGH_PASS_TIME_CONSTANT = 0.006631;
+  private static final int MOV_AVG_TAPS = 6;
 
-  private static final double kSinglePoleIIRExpectedOutput = -3.2172003;
-  private static final double kHighPassExpectedOutput = 10.074717;
-  private static final double kMovAvgExpectedOutput = -10.191644;
+  private static final double SINGLE_POLE_IIR_EXPECTED_OUTPUT = -3.2172003;
+  private static final double HIGH_PASS_EXPECTED_OUTPUT = 10.074717;
+  private static final double MOV_AVG_EXPECTED_OUTPUT = -10.191644;
 
   private static double getData(double t) {
     return 100.0 * Math.sin(2.0 * Math.PI * t) + 20.0 * Math.cos(50.0 * Math.PI * t);
@@ -53,11 +53,11 @@ class LinearFilterTest {
     double filterError = 0.0;
 
     final Random gen = new Random();
-    final double kStdDev = 10.0;
+    final double STDDEV = 10.0;
 
-    for (double t = 0; t < kFilterTime; t += kFilterStep) {
+    for (double t = 0; t < FILTER_TIME; t += FILTER_STEP) {
       final double theory = getData(t);
-      final double noise = gen.nextGaussian() * kStdDev;
+      final double noise = gen.nextGaussian() * STDDEV;
       filterError += Math.abs(filter.calculate(theory + noise) - theory);
       noiseGenError += Math.abs(noise - theory);
     }
@@ -72,8 +72,8 @@ class LinearFilterTest {
 
   static Stream<LinearFilter> noiseFilterProvider() {
     return Stream.of(
-        LinearFilter.singlePoleIIR(kSinglePoleIIRTimeConstant, kFilterStep),
-        LinearFilter.movingAverage(kMovAvgTaps));
+        LinearFilter.singlePoleIIR(SINGLE_POLE_IIR_TIME_CONSTANT, FILTER_STEP),
+        LinearFilter.movingAverage(MOV_AVG_TAPS));
   }
 
   /** Test if the linear filters produce consistent output for a given data set. */
@@ -82,7 +82,7 @@ class LinearFilterTest {
   void outputTest(
       final LinearFilter filter, final DoubleFunction<Double> data, final double expectedOutput) {
     double filterOutput = 0.0;
-    for (double t = 0.0; t < kFilterTime; t += kFilterStep) {
+    for (double t = 0.0; t < FILTER_TIME; t += FILTER_STEP) {
       filterOutput = filter.calculate(data.apply(t));
     }
 
@@ -92,19 +92,19 @@ class LinearFilterTest {
   static Stream<Arguments> outputFilterProvider() {
     return Stream.of(
         arguments(
-            LinearFilter.singlePoleIIR(kSinglePoleIIRTimeConstant, kFilterStep),
+            LinearFilter.singlePoleIIR(SINGLE_POLE_IIR_TIME_CONSTANT, FILTER_STEP),
             (DoubleFunction<Double>) LinearFilterTest::getData,
-            kSinglePoleIIRExpectedOutput),
+            SINGLE_POLE_IIR_EXPECTED_OUTPUT),
         arguments(
-            LinearFilter.highPass(kHighPassTimeConstant, kFilterStep),
+            LinearFilter.highPass(HIGH_PASS_TIME_CONSTANT, FILTER_STEP),
             (DoubleFunction<Double>) LinearFilterTest::getData,
-            kHighPassExpectedOutput),
+            HIGH_PASS_EXPECTED_OUTPUT),
         arguments(
-            LinearFilter.movingAverage(kMovAvgTaps),
+            LinearFilter.movingAverage(MOV_AVG_TAPS),
             (DoubleFunction<Double>) LinearFilterTest::getData,
-            kMovAvgExpectedOutput),
+            MOV_AVG_EXPECTED_OUTPUT),
         arguments(
-            LinearFilter.movingAverage(kMovAvgTaps),
+            LinearFilter.movingAverage(MOV_AVG_TAPS),
             (DoubleFunction<Double>) LinearFilterTest::getPulseData,
             0.0));
   }

@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 class KalmanFilterTest {
   private static LinearSystem<N2, N1, N2> elevatorPlant;
 
-  private static final double kDt = 0.00505;
+  private static final double DT = 0.00505;
 
   static {
     createElevator();
@@ -69,7 +69,7 @@ class KalmanFilterTest {
     assertDoesNotThrow(
         () ->
             new KalmanFilter<>(
-                Nat.N2(), Nat.N1(), (LinearSystem<N2, N1, N1>) elevatorPlant.slice(0), Q, R, kDt));
+                Nat.N2(), Nat.N1(), (LinearSystem<N2, N1, N1>) elevatorPlant.slice(0), Q, R, DT));
   }
 
   @Test
@@ -154,7 +154,7 @@ class KalmanFilterTest {
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
-            List.of(new Pose2d(0, 0, Rotation2d.kZero), new Pose2d(5, 5, Rotation2d.kZero)),
+            List.of(new Pose2d(0, 0, Rotation2d.ZERO), new Pose2d(5, 5, Rotation2d.ZERO)),
             new TrajectoryConfig(2, 2));
     var time = 0.0;
     var lastVelocity = VecBuilder.fill(0.0, 0.0, 0.0);

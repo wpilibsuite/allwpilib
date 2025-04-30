@@ -15,7 +15,7 @@
 
 using namespace frc;
 
-static constexpr double kEpsilon = 0.01;
+static constexpr double EPSILON = 0.01;
 
 class SwerveDriveOdometry3dTest : public ::testing::Test {
  protected:
@@ -39,10 +39,10 @@ TEST_F(SwerveDriveOdometry3dTest, Initialize) {
 
   const frc::Pose3d& pose = odometry.GetPose();
 
-  EXPECT_NEAR(pose.X().value(), 1, kEpsilon);
-  EXPECT_NEAR(pose.Y().value(), 2, kEpsilon);
-  EXPECT_NEAR(pose.Z().value(), 0, kEpsilon);
-  EXPECT_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 45, kEpsilon);
+  EXPECT_NEAR(pose.X().value(), 1, EPSILON);
+  EXPECT_NEAR(pose.Y().value(), 2, EPSILON);
+  EXPECT_NEAR(pose.Z().value(), 0, EPSILON);
+  EXPECT_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 45, EPSILON);
 }
 
 TEST_F(SwerveDriveOdometry3dTest, TwoIterations) {
@@ -56,10 +56,10 @@ TEST_F(SwerveDriveOdometry3dTest, TwoIterations) {
   auto pose = m_odometry.Update(frc::Rotation3d{},
                                 {position, position, position, position});
 
-  EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Z().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Rotation().ToRotation2d().Degrees().value(), kEpsilon);
+  EXPECT_NEAR(0.5, pose.X().value(), EPSILON);
+  EXPECT_NEAR(0.0, pose.Y().value(), EPSILON);
+  EXPECT_NEAR(0.0, pose.Z().value(), EPSILON);
+  EXPECT_NEAR(0.0, pose.Rotation().ToRotation2d().Degrees().value(), EPSILON);
 }
 
 TEST_F(SwerveDriveOdometry3dTest, 90DegreeTurn) {
@@ -73,10 +73,10 @@ TEST_F(SwerveDriveOdometry3dTest, 90DegreeTurn) {
   auto pose = m_odometry.Update(frc::Rotation3d{0_deg, 0_deg, 90_deg},
                                 {fl, fr, bl, br});
 
-  EXPECT_NEAR(12.0, pose.X().value(), kEpsilon);
-  EXPECT_NEAR(12.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Z().value(), kEpsilon);
-  EXPECT_NEAR(90.0, pose.Rotation().ToRotation2d().Degrees().value(), kEpsilon);
+  EXPECT_NEAR(12.0, pose.X().value(), EPSILON);
+  EXPECT_NEAR(12.0, pose.Y().value(), EPSILON);
+  EXPECT_NEAR(0.0, pose.Z().value(), EPSILON);
+  EXPECT_NEAR(90.0, pose.Rotation().ToRotation2d().Degrees().value(), EPSILON);
 }
 
 TEST_F(SwerveDriveOdometry3dTest, GyroAngleReset) {
@@ -88,10 +88,10 @@ TEST_F(SwerveDriveOdometry3dTest, GyroAngleReset) {
   auto pose = m_odometry.Update(frc::Rotation3d{0_deg, 0_deg, 90_deg},
                                 {position, position, position, position});
 
-  EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Z().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Rotation().ToRotation2d().Degrees().value(), kEpsilon);
+  EXPECT_NEAR(0.5, pose.X().value(), EPSILON);
+  EXPECT_NEAR(0.0, pose.Y().value(), EPSILON);
+  EXPECT_NEAR(0.0, pose.Z().value(), EPSILON);
+  EXPECT_NEAR(0.0, pose.Rotation().ToRotation2d().Degrees().value(), EPSILON);
 }
 
 TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingTrajectory) {

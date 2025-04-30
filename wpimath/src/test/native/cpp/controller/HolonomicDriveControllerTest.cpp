@@ -16,8 +16,8 @@
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
 
-static constexpr units::meter_t kTolerance{1 / 12.0};
-static constexpr units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
+static constexpr units::meter_t TOLERANCE{1 / 12.0};
+static constexpr units::radian_t ANGULAR_TOLERANCE{2.0 * std::numbers::pi /
                                                    180.0};
 
 TEST(HolonomicDriveControllerTest, ReachesReference) {
@@ -36,20 +36,20 @@ TEST(HolonomicDriveControllerTest, ReachesReference) {
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       waypoints, {8.0_mps, 4.0_mps_sq});
 
-  constexpr units::second_t kDt = 20_ms;
+  constexpr units::second_t DT = 20_ms;
   auto totalTime = trajectory.TotalTime();
-  for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
-    auto state = trajectory.Sample(kDt * i);
+  for (size_t i = 0; i < (totalTime / DT).value(); ++i) {
+    auto state = trajectory.Sample(DT * i);
     auto [vx, vy, omega] = controller.Calculate(robotPose, state, 0_rad);
 
-    robotPose = robotPose.Exp(frc::Twist2d{vx * kDt, vy * kDt, omega * kDt});
+    robotPose = robotPose.Exp(frc::Twist2d{vx * DT, vy * DT, omega * DT});
   }
 
   auto& endPose = trajectory.States().back().pose;
-  EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
-  EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
+  EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), TOLERANCE);
+  EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), TOLERANCE);
   EXPECT_NEAR_UNITS(frc::AngleModulus(robotPose.Rotation().Radians()), 0_rad,
-                    kAngularTolerance);
+                    ANGULAR_TOLERANCE);
 }
 
 TEST(HolonomicDriveControllerTest, DoesNotRotateUnnecessarily) {

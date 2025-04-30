@@ -281,9 +281,9 @@ class LinearSystemLoop {
   StateVector m_nextR;
 
   // These are accessible from non-templated subclasses.
-  static constexpr int kStates = States;
-  static constexpr int kInputs = Inputs;
-  static constexpr int kOutputs = Outputs;
+  static constexpr int STATES = States;
+  static constexpr int INPUTS = Inputs;
+  static constexpr int OUTPUTS = Outputs;
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)

@@ -25,28 +25,28 @@ using Kg_unit = decltype(1_V);
 /**
  * Simulates a single-jointed arm and returns the final state.
  *
- * @param Ks The static gain, in volts.
- * @param Kv The velocity gain, in volt seconds per radian.
- * @param Ka The acceleration gain, in volt seconds² per radian.
- * @param Kg The gravity gain, in volts.
+ * @param s The static gain, in volts.
+ * @param v The velocity gain, in volt seconds per radian.
+ * @param a The acceleration gain, in volt seconds² per radian.
+ * @param g The gravity gain, in volts.
  * @param currentAngle The starting angle.
  * @param currentVelocity The starting angular velocity.
  * @param input The input voltage.
  * @param dt The simulation time.
  * @return The final state as a 2-vector of angle and angular velocity.
  */
-frc::Matrixd<2, 1> Simulate(Ks_unit Ks, Kv_unit Kv, Ka_unit Ka, Kg_unit Kg,
+frc::Matrixd<2, 1> Simulate(Ks_unit s, Kv_unit v, Ka_unit a, Kg_unit g,
                             units::radian_t currentAngle,
                             units::radians_per_second_t currentVelocity,
                             units::volt_t input, units::second_t dt) {
-  frc::Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -Kv.value() / Ka.value()}};
-  frc::Matrixd<2, 1> B{{0.0}, {1.0 / Ka.value()}};
+  frc::Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -v.value() / a.value()}};
+  frc::Matrixd<2, 1> B{{0.0}, {1.0 / a.value()}};
 
   return frc::RK4(
       [&](const frc::Matrixd<2, 1>& x,
           const frc::Matrixd<1, 1>& u) -> frc::Matrixd<2, 1> {
-        frc::Matrixd<2, 1> c{0.0, -Ks.value() / Ka.value() * wpi::sgn(x(1)) -
-                                      Kg.value() / Ka.value() * std::cos(x(0))};
+        frc::Matrixd<2, 1> c{0.0, -s.value() / a.value() * wpi::sgn(x(1)) -
+                                      g.value() / a.value() * std::cos(x(0))};
         return A * x + B * u + c;
       },
       frc::Matrixd<2, 1>{currentAngle.value(), currentVelocity.value()},
@@ -57,17 +57,17 @@ frc::Matrixd<2, 1> Simulate(Ks_unit Ks, Kv_unit Kv, Ka_unit Ka, Kg_unit Kg,
  * Simulates a single-jointed arm and returns the final state.
  *
  * @param armFF The feedforward object.
- * @param Ks The static gain, in volts.
- * @param Kv The velocity gain, in volt seconds per radian.
- * @param Ka The acceleration gain, in volt seconds² per radian.
- * @param Kg The gravity gain, in volts.
+ * @param s The static gain, in volts.
+ * @param v The velocity gain, in volt seconds per radian.
+ * @param a The acceleration gain, in volt seconds² per radian.
+ * @param g The gravity gain, in volts.
  * @param currentAngle The starting angle.
  * @param currentVelocity The starting angular velocity.
  * @param input The input voltage.
  * @param dt The simulation time.
  */
-void CalculateAndSimulate(const frc::ArmFeedforward& armFF, Ks_unit Ks,
-                          Kv_unit Kv, Ka_unit Ka, Kg_unit Kg,
+void CalculateAndSimulate(const frc::ArmFeedforward& armFF, Ks_unit s,
+                          Kv_unit v, Ka_unit a, Kg_unit g,
                           units::radian_t currentAngle,
                           units::radians_per_second_t currentVelocity,
                           units::radians_per_second_t nextVelocity,
@@ -75,18 +75,18 @@ void CalculateAndSimulate(const frc::ArmFeedforward& armFF, Ks_unit Ks,
   auto input = armFF.Calculate(currentAngle, currentVelocity, nextVelocity);
   EXPECT_NEAR(
       nextVelocity.value(),
-      Simulate(Ks, Kv, Ka, Kg, currentAngle, currentVelocity, input, dt)(1),
+      Simulate(s, v, a, g, currentAngle, currentVelocity, input, dt)(1),
       1e-4);
 }
 
 }  // namespace
 
 TEST(ArmFeedforwardTest, Calculate) {
-  constexpr auto Ks = 0.5_V;
-  constexpr auto Kv = 1.5_V / 1_rad_per_s;
-  constexpr auto Ka = 2_V / 1_rad_per_s_sq;
-  constexpr auto Kg = 1_V;
-  frc::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
+  constexpr auto S = 0.5_V;
+  constexpr auto V = 1.5_V / 1_rad_per_s;
+  constexpr auto A = 2_V / 1_rad_per_s_sq;
+  constexpr auto G = 1_V;
+  frc::ArmFeedforward armFF{S, G, V, A};
 
   // Calculate(angle, angular velocity)
   EXPECT_NEAR(
@@ -97,22 +97,22 @@ TEST(ArmFeedforwardTest, Calculate) {
       0.002);
 
   // Calculate(currentAngle, currentVelocity, nextAngle, dt)
-  CalculateAndSimulate(armFF, Ks, Kv, Ka, Kg, std::numbers::pi / 3 * 1_rad,
+  CalculateAndSimulate(armFF, S, V, A, G, std::numbers::pi / 3 * 1_rad,
                        1_rad_per_s, 1.05_rad_per_s, 20_ms);
-  CalculateAndSimulate(armFF, Ks, Kv, Ka, Kg, std::numbers::pi / 3 * 1_rad,
+  CalculateAndSimulate(armFF, S, V, A, G, std::numbers::pi / 3 * 1_rad,
                        1_rad_per_s, 0.95_rad_per_s, 20_ms);
-  CalculateAndSimulate(armFF, Ks, Kv, Ka, Kg, -std::numbers::pi / 3 * 1_rad,
+  CalculateAndSimulate(armFF, S, V, A, G, -std::numbers::pi / 3 * 1_rad,
                        1_rad_per_s, 1.05_rad_per_s, 20_ms);
-  CalculateAndSimulate(armFF, Ks, Kv, Ka, Kg, -std::numbers::pi / 3 * 1_rad,
+  CalculateAndSimulate(armFF, S, V, A, G, -std::numbers::pi / 3 * 1_rad,
                        1_rad_per_s, 0.95_rad_per_s, 20_ms);
 }
 
 TEST(ArmFeedforwardTest, CalculateIllConditionedModel) {
-  constexpr auto Ks = 0.39671_V;
-  constexpr auto Kv = 2.7167_V / 1_rad_per_s;
-  constexpr auto Ka = 1e-2_V / 1_rad_per_s_sq;
-  constexpr auto Kg = 0.2708_V;
-  frc::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
+  constexpr auto S = 0.39671_V;
+  constexpr auto V = 2.7167_V / 1_rad_per_s;
+  constexpr auto A = 1e-2_V / 1_rad_per_s_sq;
+  constexpr auto G = 0.2708_V;
+  frc::ArmFeedforward armFF{S, G, V, A};
 
   constexpr auto currentAngle = 1_rad;
   constexpr auto currentVelocity = 0.02_rad_per_s;
@@ -122,28 +122,28 @@ TEST(ArmFeedforwardTest, CalculateIllConditionedModel) {
 
   EXPECT_DOUBLE_EQ(
       armFF.Calculate(currentAngle, currentVelocity, nextVelocity).value(),
-      (Ks + Kv * currentVelocity + Ka * averageAccel +
-       Kg * units::math::cos(currentAngle))
+      (S + V * currentVelocity + A * averageAccel +
+       G * units::math::cos(currentAngle))
           .value());
 }
 
 TEST(ArmFeedforwardTest, CalculateIllConditionedGradient) {
-  constexpr auto Ks = 0.39671_V;
-  constexpr auto Kv = 2.7167_V / 1_rad_per_s;
-  constexpr auto Ka = 0.50799_V / 1_rad_per_s_sq;
-  constexpr auto Kg = 0.2708_V;
-  frc::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
+  constexpr auto S = 0.39671_V;
+  constexpr auto V = 2.7167_V / 1_rad_per_s;
+  constexpr auto A = 0.50799_V / 1_rad_per_s_sq;
+  constexpr auto G = 0.2708_V;
+  frc::ArmFeedforward armFF{S, G, V, A};
 
-  CalculateAndSimulate(armFF, Ks, Kv, Ka, Kg, 1_rad, 0.02_rad_per_s,
+  CalculateAndSimulate(armFF, S, V, A, G, 1_rad, 0.02_rad_per_s,
                        0_rad_per_s, 20_ms);
 }
 
 TEST(ArmFeedforwardTest, AchievableVelocity) {
-  constexpr auto Ks = 0.5_V;
-  constexpr auto Kv = 1.5_V / 1_rad_per_s;
-  constexpr auto Ka = 2_V / 1_rad_per_s_sq;
-  constexpr auto Kg = 1_V;
-  frc::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
+  constexpr auto S = 0.5_V;
+  constexpr auto V = 1.5_V / 1_rad_per_s;
+  constexpr auto A = 2_V / 1_rad_per_s_sq;
+  constexpr auto G = 1_V;
+  frc::ArmFeedforward armFF{S, G, V, A};
 
   EXPECT_NEAR(armFF
                   .MaxAchievableVelocity(12_V, std::numbers::pi / 3 * 1_rad,
@@ -158,11 +158,11 @@ TEST(ArmFeedforwardTest, AchievableVelocity) {
 }
 
 TEST(ArmFeedforwardTest, AchievableAcceleration) {
-  constexpr auto Ks = 0.5_V;
-  constexpr auto Kv = 1.5_V / 1_rad_per_s;
-  constexpr auto Ka = 2_V / 1_rad_per_s_sq;
-  constexpr auto Kg = 1_V;
-  frc::ArmFeedforward armFF{Ks, Kg, Kv, Ka};
+  constexpr auto S = 0.5_V;
+  constexpr auto V = 1.5_V / 1_rad_per_s;
+  constexpr auto A = 2_V / 1_rad_per_s_sq;
+  constexpr auto G = 1_V;
+  frc::ArmFeedforward armFF{S, G, V, A};
 
   EXPECT_NEAR(armFF
                   .MaxAchievableAcceleration(12_V, std::numbers::pi / 3 * 1_rad,
@@ -187,11 +187,11 @@ TEST(ArmFeedforwardTest, AchievableAcceleration) {
 }
 
 TEST(ArmFeedforwardTest, NegativeGains) {
-  constexpr auto Ks = 0.5_V;
-  constexpr auto Kv = 1.5_V / 1_rad_per_s;
-  constexpr auto Ka = 2_V / 1_rad_per_s_sq;
-  constexpr auto Kg = 1_V;
-  frc::ArmFeedforward armFF{Ks, Kg, -Kv, -Ka};
+  constexpr auto S = 0.5_V;
+  constexpr auto V = 1.5_V / 1_rad_per_s;
+  constexpr auto A = 2_V / 1_rad_per_s_sq;
+  constexpr auto G = 1_V;
+  frc::ArmFeedforward armFF{S, G, -V, -A};
 
   EXPECT_EQ(armFF.GetKv().value(), 0);
   EXPECT_EQ(armFF.GetKa().value(), 0);

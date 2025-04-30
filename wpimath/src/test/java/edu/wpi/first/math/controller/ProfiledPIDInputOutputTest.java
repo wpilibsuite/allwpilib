@@ -19,15 +19,15 @@ class ProfiledPIDInputOutputTest {
     controller.setP(1);
     controller.enableContinuousInput(-180, 180);
 
-    final double kSetpoint = -179.0;
-    final double kMeasurement = -179.0;
-    final double kGoal = 179.0;
+    final double SETPOINT = -179.0;
+    final double MEASUREMENT = -179.0;
+    final double GOAL = 179.0;
 
-    controller.reset(kSetpoint);
-    assertTrue(controller.calculate(kMeasurement, kGoal) < 0.0);
+    controller.reset(SETPOINT);
+    assertTrue(controller.calculate(MEASUREMENT, GOAL) < 0.0);
 
     // Error must be less than half the input range at all times
-    assertTrue(Math.abs(controller.getSetpoint().position - kMeasurement) < 180.0);
+    assertTrue(Math.abs(controller.getSetpoint().position - MEASUREMENT) < 180.0);
   }
 
   @Test
@@ -38,15 +38,15 @@ class ProfiledPIDInputOutputTest {
     controller.setP(1);
     controller.enableContinuousInput(-Math.PI, Math.PI);
 
-    final double kSetpoint = -3.4826633343199735;
-    final double kMeasurement = -3.1352207333939606;
-    final double kGoal = -3.534162788601621;
+    final double SETPOINT = -3.4826633343199735;
+    final double MEASUREMENT = -3.1352207333939606;
+    final double GOAL = -3.534162788601621;
 
-    controller.reset(kSetpoint);
-    assertTrue(controller.calculate(kMeasurement, kGoal) < 0.0);
+    controller.reset(SETPOINT);
+    assertTrue(controller.calculate(MEASUREMENT, GOAL) < 0.0);
 
     // Error must be less than half the input range at all times
-    assertTrue(Math.abs(controller.getSetpoint().position - kMeasurement) < Math.PI);
+    assertTrue(Math.abs(controller.getSetpoint().position - MEASUREMENT) < Math.PI);
   }
 
   @Test
@@ -57,15 +57,15 @@ class ProfiledPIDInputOutputTest {
     controller.setP(1);
     controller.enableContinuousInput(-Math.PI, Math.PI);
 
-    final double kSetpoint = -3.5176604690006377;
-    final double kMeasurement = 3.1191729343822456;
-    final double kGoal = 2.709680418117445;
+    final double SETPOINT = -3.5176604690006377;
+    final double MEASUREMENT = 3.1191729343822456;
+    final double GOAL = 2.709680418117445;
 
-    controller.reset(kSetpoint);
-    assertTrue(controller.calculate(kMeasurement, kGoal) < 0.0);
+    controller.reset(SETPOINT);
+    assertTrue(controller.calculate(MEASUREMENT, GOAL) < 0.0);
 
     // Error must be less than half the input range at all times
-    assertTrue(Math.abs(controller.getSetpoint().position - kMeasurement) < Math.PI);
+    assertTrue(Math.abs(controller.getSetpoint().position - MEASUREMENT) < Math.PI);
   }
 
   @Test
@@ -76,15 +76,15 @@ class ProfiledPIDInputOutputTest {
     controller.setP(1);
     controller.enableContinuousInput(0, 2.0 * Math.PI);
 
-    final double kSetpoint = 2.78;
-    final double kMeasurement = 3.12;
-    final double kGoal = 2.71;
+    final double SETPOINT = 2.78;
+    final double MEASUREMENT = 3.12;
+    final double GOAL = 2.71;
 
-    controller.reset(kSetpoint);
-    assertTrue(controller.calculate(kMeasurement, kGoal) < 0.0);
+    controller.reset(SETPOINT);
+    assertTrue(controller.calculate(MEASUREMENT, GOAL) < 0.0);
 
     // Error must be less than half the input range at all times
-    assertTrue(Math.abs(controller.getSetpoint().position - kMeasurement) < Math.PI / 2.0);
+    assertTrue(Math.abs(controller.getSetpoint().position - MEASUREMENT) < Math.PI / 2.0);
   }
 
   @Test

@@ -21,7 +21,7 @@ public class Rotation2dStruct implements Struct<Rotation2d> {
 
   @Override
   public int getSize() {
-    return kSizeDouble;
+    return SIZE_DOUBLE;
   }
 
   @Override
