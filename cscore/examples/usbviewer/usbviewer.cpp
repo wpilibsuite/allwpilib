@@ -78,15 +78,23 @@ int main() {
   gui::Initialize("Hello World", 1024, 768);
   gui::Texture tex;
   gui::AddEarlyExecute([&] {
-    std::scoped_lock lock(latestFrameMutex);
-    if (latestFrame) {
+    std::unique_ptr<cv::Mat> frame;
+    {
+      std::scoped_lock lock(latestFrameMutex);
+      latestFrame.swap(frame);
+    }
+    if (frame) {
       // create or update texture
-      if (!tex || latestFrame->cols != tex.GetWidth() ||
-          latestFrame->rows != tex.GetHeight()) {
-        tex = gui::Texture(gui::kPixelRGBA, latestFrame->cols,
-                           latestFrame->rows, latestFrame->data);
+      if (!tex || frame->cols != tex.GetWidth() ||
+          frame->rows != tex.GetHeight()) {
+        tex = gui::Texture(gui::kPixelRGBA, frame->cols, frame->rows,
+                           frame->data);
       } else {
-        tex.Update(latestFrame->data);
+        tex.Update(frame->data);
+      }
+      {
+        std::scoped_lock lock(freeListMutex);
+        freeList.emplace_back(std::move(frame));
       }
     }
 
