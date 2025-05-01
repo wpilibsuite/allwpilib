@@ -42,8 +42,8 @@ namespace units {
 UNIT_ADD_WITH_METRIC_PREFIXES(length, meter, meters, m,
                               unit<std::ratio<1>, units::category::length_unit>)
 UNIT_ADD(length, foot, feet, ft, unit<std::ratio<381, 1250>, meters>)
-UNIT_ADD(length, mil, mils, mil, unit<std::ratio<1000>, feet>)
 UNIT_ADD(length, inch, inches, in, unit<std::ratio<1, 12>, feet>)
+UNIT_ADD(length, mil, mils, mil, unit<std::ratio<1, 1000>, inches>)
 UNIT_ADD(length, mile, miles, mi, unit<std::ratio<5280>, feet>)
 UNIT_ADD(length, nauticalMile, nauticalMiles, nmi,
          unit<std::ratio<1852>, meters>)
