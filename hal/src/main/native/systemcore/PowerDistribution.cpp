@@ -22,12 +22,12 @@ extern "C" {
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     int32_t busId, int32_t moduleNumber, HAL_PowerDistributionType type,
     const char* allocationLocation, int32_t* status) {
-  if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic) {
+  if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_Automatic) {
     if (moduleNumber != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
       *status = PARAMETER_OUT_OF_RANGE;
       hal::SetLastError(
           status, "Automatic PowerDistributionType must have default module");
-      return HAL_kInvalidHandle;
+      return HAL_InvalidHandle;
     }
 
     uint64_t waitTime = hal::GetDSInitializeTime() + 400000;
@@ -36,7 +36,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     do {
       uint64_t currentTime = HAL_GetFPGATime(status);
       if (*status != 0) {
-        return HAL_kInvalidHandle;
+        return HAL_InvalidHandle;
       }
       if (currentTime >= waitTime) {
         break;
@@ -47,7 +47,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
 
     // Try PDP first
     auto pdpHandle = HAL_InitializePDP(busId, 0, allocationLocation, status);
-    if (pdpHandle != HAL_kInvalidHandle) {
+    if (pdpHandle != HAL_InvalidHandle) {
       *status = 0;
       HAL_GetPDPVoltage(pdpHandle, status);
       if (*status == 0 || *status == HAL_CAN_TIMEOUT) {
@@ -60,7 +60,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     return static_cast<HAL_PowerDistributionHandle>(pdhHandle);
   }
 
-  if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
+  if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_CTRE) {
     if (moduleNumber == HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
       moduleNumber = 0;
     }
@@ -105,7 +105,7 @@ HAL_Bool HAL_CheckPowerDistributionChannel(HAL_PowerDistributionHandle handle,
 
 HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
                                           HAL_PowerDistributionType type) {
-  if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
+  if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_CTRE) {
     return HAL_CheckPDPModule(module);
   } else {
     return HAL_CheckREVPDHModuleNumber(module);
@@ -115,16 +115,16 @@ HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
 HAL_PowerDistributionType HAL_GetPowerDistributionType(
     HAL_PowerDistributionHandle handle, int32_t* status) {
   return IsCtre(handle)
-             ? HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE
-             : HAL_PowerDistributionType::HAL_PowerDistributionType_kRev;
+             ? HAL_PowerDistributionType::HAL_PowerDistributionType_CTRE
+             : HAL_PowerDistributionType::HAL_PowerDistributionType_REV;
 }
 
 int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,
                                             int32_t* status) {
   if (IsCtre(handle)) {
-    return kNumCTREPDPChannels;
+    return NUM_CTRE_PDP_CHANNELS;
   } else {
-    return kNumREVPDHChannels;
+    return NUM_REV_PDH_CHANNELS;
   }
 }
 
@@ -160,14 +160,14 @@ void HAL_GetPowerDistributionAllChannelCurrents(
     HAL_PowerDistributionHandle handle, double* currents,
     int32_t currentsLength, int32_t* status) {
   if (IsCtre(handle)) {
-    if (currentsLength < kNumCTREPDPChannels) {
+    if (currentsLength < NUM_CTRE_PDP_CHANNELS) {
       *status = PARAMETER_OUT_OF_RANGE;
       SetLastError(status, "Output array not large enough");
       return;
     }
     return HAL_GetPDPAllChannelCurrents(handle, currents, status);
   } else {
-    if (currentsLength < kNumREVPDHChannels) {
+    if (currentsLength < NUM_REV_PDH_CHANNELS) {
       *status = PARAMETER_OUT_OF_RANGE;
       SetLastError(status, "Output array not large enough");
       return;

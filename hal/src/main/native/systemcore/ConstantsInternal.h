@@ -7,5 +7,5 @@
 #include <stdint.h>
 
 namespace hal {
-constexpr int32_t kSystemClockTicksPerMicrosecond = 40;
+constexpr int32_t SYSTEM_CLOCK_TICKS_PER_MICROSECOND = 40;
 }  // namespace hal

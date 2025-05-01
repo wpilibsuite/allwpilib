@@ -439,7 +439,7 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxes
     auto arrayRef = jArrayRef.array();
     auto arraySize = arrayRef.size();
     int maxCount =
-        arraySize < HAL_kMaxJoystickAxes ? arraySize : HAL_kMaxJoystickAxes;
+        arraySize < HAL_MaxJoystickAxes ? arraySize : HAL_MaxJoystickAxes;
     axes.count = maxCount;
     for (int i = 0; i < maxCount; i++) {
       axes.axes[i] = arrayRef[i];
@@ -464,7 +464,7 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVs
     auto arrayRef = jArrayRef.array();
     auto arraySize = arrayRef.size();
     int maxCount =
-        arraySize < HAL_kMaxJoystickPOVs ? arraySize : HAL_kMaxJoystickPOVs;
+        arraySize < HAL_MaxJoystickPOVs ? arraySize : HAL_MaxJoystickPOVs;
     povs.count = maxCount;
     for (int i = 0; i < maxCount; i++) {
       povs.povs[i] = arrayRef[i];

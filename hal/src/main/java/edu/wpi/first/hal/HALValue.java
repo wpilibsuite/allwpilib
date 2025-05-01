@@ -7,22 +7,22 @@ package edu.wpi.first.hal;
 /** Represents a HAL entry value. */
 public final class HALValue {
   /** Unassigned type. */
-  public static final int kUnassigned = 0;
+  public static final int UNASSIGNED = 0;
 
   /** Boolean. */
-  public static final int kBoolean = 0x01;
+  public static final int BOOLEAN = 0x01;
 
   /** Double. */
-  public static final int kDouble = 0x02;
+  public static final int DOUBLE = 0x02;
 
   /** Enum. */
-  public static final int kEnum = 0x04;
+  public static final int ENUM = 0x04;
 
   /** Int. */
-  public static final int kInt = 0x08;
+  public static final int INT = 0x08;
 
   /** Long. */
-  public static final int kLong = 0x10;
+  public static final int LONG = 0x10;
 
   private int m_type;
   private long m_long;
@@ -43,7 +43,7 @@ public final class HALValue {
   /**
    * Get the type of the value.
    *
-   * @return Type (e.g. kBoolean).
+   * @return Type (e.g. BOOLEAN).
    */
   public int getType() {
     return m_type;
@@ -101,7 +101,7 @@ public final class HALValue {
    * @return HAL value
    */
   public static HALValue makeBoolean(boolean value) {
-    return new HALValue(value ? 1 : 0, kBoolean);
+    return new HALValue(value ? 1 : 0, BOOLEAN);
   }
 
   /**
@@ -111,7 +111,7 @@ public final class HALValue {
    * @return HAL value
    */
   public static HALValue makeEnum(int value) {
-    return new HALValue(value, kEnum);
+    return new HALValue(value, ENUM);
   }
 
   /**
@@ -121,7 +121,7 @@ public final class HALValue {
    * @return HAL value
    */
   public static HALValue makeInt(int value) {
-    return new HALValue(value, kInt);
+    return new HALValue(value, INT);
   }
 
   /**
@@ -131,7 +131,7 @@ public final class HALValue {
    * @return HAL value
    */
   public static HALValue makeLong(long value) {
-    return new HALValue(value, kLong);
+    return new HALValue(value, LONG);
   }
 
   /**
@@ -141,7 +141,7 @@ public final class HALValue {
    * @return HAL value
    */
   public static HALValue makeDouble(double value) {
-    return new HALValue(value, kDouble);
+    return new HALValue(value, DOUBLE);
   }
 
   /**
@@ -163,11 +163,11 @@ public final class HALValue {
    */
   public static HALValue fromNative(int type, long value1, double value2) {
     return switch (type) {
-      case kBoolean -> makeBoolean(value1 != 0);
-      case kDouble -> makeDouble(value2);
-      case kEnum -> makeEnum((int) value1);
-      case kInt -> makeInt((int) value1);
-      case kLong -> makeLong(value1);
+      case BOOLEAN -> makeBoolean(value1 != 0);
+      case DOUBLE -> makeDouble(value2);
+      case ENUM -> makeEnum((int) value1);
+      case INT -> makeInt((int) value1);
+      case LONG -> makeLong(value1);
       default -> makeUnassigned();
     };
   }

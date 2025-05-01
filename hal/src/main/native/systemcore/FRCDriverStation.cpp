@@ -39,18 +39,18 @@
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");
 
-static_assert(MRC_MAX_NUM_AXES == HAL_kMaxJoystickAxes);
-static_assert(MRC_MAX_NUM_POVS == HAL_kMaxJoystickPOVs);
-static_assert(MRC_MAX_NUM_JOYSTICKS == HAL_kMaxJoysticks);
+static_assert(MRC_MAX_NUM_AXES == HAL_MaxJoystickAxes);
+static_assert(MRC_MAX_NUM_POVS == HAL_MaxJoystickPOVs);
+static_assert(MRC_MAX_NUM_JOYSTICKS == HAL_MaxJoysticks);
 
 namespace {
 struct JoystickDataCache {
   JoystickDataCache() { std::memset(this, 0, sizeof(*this)); }
   void Update(const mrc::ControlData& data);
 
-  HAL_JoystickAxes axes[HAL_kMaxJoysticks];
-  HAL_JoystickPOVs povs[HAL_kMaxJoysticks];
-  HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
+  HAL_JoystickAxes axes[HAL_MaxJoysticks];
+  HAL_JoystickPOVs povs[HAL_MaxJoysticks];
+  HAL_JoystickButtons buttons[HAL_MaxJoysticks];
   HAL_AllianceStationID allianceStation;
   float matchTime;
   HAL_ControlWord controlWord;
@@ -242,7 +242,7 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
-  if ((stickNum) < 0 || (stickNum) >= HAL_kMaxJoysticks) \
+  if ((stickNum) < 0 || (stickNum) >= HAL_MaxJoysticks) \
   return PARAMETER_OUT_OF_RANGE
 
 static HAL_ControlWord newestControlWord;
@@ -259,7 +259,7 @@ struct TcpCache {
   void CloneTo(TcpCache* other) { std::memcpy(other, this, sizeof(*this)); }
 
   HAL_MatchInfo matchInfo;
-  HAL_JoystickDescriptor descriptors[HAL_kMaxJoysticks];
+  HAL_JoystickDescriptor descriptors[HAL_MaxJoysticks];
 };
 static_assert(std::is_standard_layout_v<TcpCache>);
 }  // namespace

@@ -14,11 +14,11 @@
 using namespace hal;
 
 static_assert(edu_wpi_first_hal_PowerDistributionJNI_AUTOMATIC_TYPE ==
-              HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic);
+              HAL_PowerDistributionType::HAL_PowerDistributionType_Automatic);
 static_assert(edu_wpi_first_hal_PowerDistributionJNI_CTRE_TYPE ==
-              HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE);
+              HAL_PowerDistributionType::HAL_PowerDistributionType_CTRE);
 static_assert(edu_wpi_first_hal_PowerDistributionJNI_REV_TYPE ==
-              HAL_PowerDistributionType::HAL_PowerDistributionType_kRev);
+              HAL_PowerDistributionType::HAL_PowerDistributionType_REV);
 static_assert(edu_wpi_first_hal_PowerDistributionJNI_DEFAULT_MODULE ==
               HAL_DEFAULT_POWER_DISTRIBUTION_MODULE);
 
@@ -51,7 +51,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_PowerDistributionJNI_free
   (JNIEnv*, jclass, jint handle)
 {
-  if (handle != HAL_kInvalidHandle) {
+  if (handle != HAL_InvalidHandle) {
     HAL_CleanPowerDistribution(handle);
   }
 }

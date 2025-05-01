@@ -23,12 +23,12 @@ struct PCM {
 };
 }  // namespace
 
-static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
+static IndexedHandleResource<HAL_CTREPCMHandle, PCM, NUM_CTRE_PCM_MODULES,
                              HAL_HandleEnum::CTREPCM>* pcmHandles;
 
 namespace hal::init {
 void InitializeCTREPCM() {
-  static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
+  static IndexedHandleResource<HAL_CTREPCMHandle, PCM, NUM_CTRE_PCM_MODULES,
                                HAL_HandleEnum::CTREPCM>
       pH;
   pcmHandles = &pH;
@@ -49,9 +49,9 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
                                            pcm->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PCM", 0,
-                                       kNumCTREPCMModules - 1, module);
+                                       NUM_CTRE_PCM_MODULES - 1, module);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_InvalidHandle;  // failed to allocate. Pass error back.
   }
 
   pcm->previousAllocation = allocationLocation ? allocationLocation : "";
@@ -75,7 +75,7 @@ void HAL_FreeCTREPCM(HAL_CTREPCMHandle handle) {
 }
 
 HAL_Bool HAL_CheckCTREPCMSolenoidChannel(int32_t channel) {
-  return channel < kNumCTRESolenoidChannels && channel >= 0;
+  return channel < NUM_CTRE_SOLENOID_CHANNELS && channel >= 0;
 }
 
 HAL_Bool HAL_GetCTREPCMCompressor(HAL_CTREPCMHandle handle, int32_t* status) {
@@ -172,7 +172,7 @@ int32_t HAL_GetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t* status) {
   std::scoped_lock lock{pcm->lock};
   auto& data = SimCTREPCMData[pcm->module].solenoidOutput;
   uint8_t ret = 0;
-  for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
+  for (int i = 0; i < NUM_CTRE_SOLENOID_CHANNELS; i++) {
     ret |= (data[i] << i);
   }
   return ret;
@@ -187,7 +187,7 @@ void HAL_SetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t mask,
 
   auto& data = SimCTREPCMData[pcm->module].solenoidOutput;
   std::scoped_lock lock{pcm->lock};
-  for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
+  for (int i = 0; i < NUM_CTRE_SOLENOID_CHANNELS; i++) {
     auto indexMask = (1 << i);
     if ((mask & indexMask) != 0) {
       data[i] = (values & indexMask) != 0;

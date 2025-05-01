@@ -12,7 +12,7 @@
  * @{
  */
 
-#define HAL_kInvalidHandle 0
+#define HAL_InvalidHandle 0
 
 typedef int32_t HAL_Handle;
 
@@ -92,7 +92,7 @@ namespace hal {
  * Will free the handle if FreeFunction is provided
  */
 template <typename CType, void (*FreeFunction)(CType) = nullptr,
-          int32_t CInvalid = HAL_kInvalidHandle>
+          int32_t CInvalid = HAL_InvalidHandle>
 class Handle {
  public:
   Handle() = default;

@@ -14,63 +14,63 @@ void InitializePorts() {}
 
 extern "C" {
 int32_t HAL_GetNumCanBuses(void) {
-  return kNumCanBuses;
+  return NUM_CAN_BUSES;
 }
 int32_t HAL_GetNumAnalogInputs(void) {
-  return kNumAnalogInputs;
+  return NUM_ANALOG_INPUTS;
 }
 int32_t HAL_GetNumCounters(void) {
-  return kNumCounters;
+  return NUM_COUNTERS;
 }
 int32_t HAL_GetNumDigitalHeaders(void) {
-  return kNumDigitalHeaders;
+  return NUM_DIGITAL_HEADERS;
 }
 int32_t HAL_GetNumPWMHeaders(void) {
-  return kNumPWMHeaders;
+  return NUM_PWM_HEADERS;
 }
 int32_t HAL_GetNumDigitalChannels(void) {
-  return kNumDigitalChannels;
+  return NUM_DIGITAL_CHANNELS;
 }
 int32_t HAL_GetNumPWMChannels(void) {
-  return kNumPWMChannels;
+  return NUM_PWM_CHANNELS;
 }
 int32_t HAL_GetNumDigitalPWMOutputs(void) {
-  return kNumDigitalPWMOutputs;
+  return NUM_DIGITAL_PWM_OUTPUTS;
 }
 int32_t HAL_GetNumEncoders(void) {
-  return kNumEncoders;
+  return NUM_ENCODERS;
 }
 int32_t HAL_GetNumInterrupts(void) {
-  return kNumInterrupts;
+  return NUM_INTERRUPTS;
 }
 int32_t HAL_GetNumCTREPCMModules(void) {
-  return kNumCTREPCMModules;
+  return NUM_CTRE_PCM_MODULES;
 }
 int32_t HAL_GetNumCTRESolenoidChannels(void) {
-  return kNumCTRESolenoidChannels;
+  return NUM_CTRE_SOLENOID_CHANNELS;
 }
 int32_t HAL_GetNumCTREPDPModules(void) {
-  return kNumCTREPDPModules;
+  return NUM_CTRE_PDP_MODULES;
 }
 int32_t HAL_GetNumCTREPDPChannels(void) {
-  return kNumCTREPDPChannels;
+  return NUM_CTRE_PDP_CHANNELS;
 }
 int32_t HAL_GetNumREVPDHModules(void) {
-  return kNumREVPDHModules;
+  return NUM_REV_PDH_MODULES;
 }
 int32_t HAL_GetNumREVPDHChannels(void) {
-  return kNumREVPDHChannels;
+  return NUM_REV_PDH_CHANNELS;
 }
 int32_t HAL_GetNumREVPHModules(void) {
-  return kNumREVPHModules;
+  return NUM_REV_PH_MODULES;
 }
 int32_t HAL_GetNumREVPHChannels(void) {
-  return kNumREVPHChannels;
+  return NUM_REV_PH_CHANNELS;
 }
 int32_t HAL_GetNumDutyCycles(void) {
-  return kNumDutyCycles;
+  return NUM_DUTY_CYCLES;
 }
 int32_t HAL_GetNumAddressableLEDs(void) {
-  return kNumAddressableLEDs;
+  return NUM_ADDRESSABLE_LEDS;
 }
 }  // extern "C"

@@ -11,7 +11,7 @@ using namespace hal;
 
 namespace hal::init {
 void InitializeEncoderData() {
-  static EncoderData sed[kNumEncoders];
+  static EncoderData sed[NUM_ENCODERS];
   ::hal::SimEncoderData = sed;
 }
 }  // namespace hal::init
@@ -34,7 +34,7 @@ void EncoderData::ResetData() {
 
 extern "C" {
 int32_t HALSIM_FindEncoderForChannel(int32_t channel) {
-  for (int i = 0; i < kNumEncoders; ++i) {
+  for (int i = 0; i < NUM_ENCODERS; ++i) {
     if (!SimEncoderData[i].initialized) {
       continue;
     }

@@ -14,8 +14,8 @@
 
 namespace hal {
 
-constexpr int32_t kPwmDisabled = 0;
-constexpr int32_t kPwmAlwaysHigh = 0xFFFF;
+constexpr int32_t PWM_DISABLED = 0;
+constexpr int32_t PWM_ALWAYS_HIGH = 0xFFFF;
 
 enum class SmartIoMode {
   DigitalInput = 0,
@@ -64,7 +64,7 @@ struct SmartIo {
   int32_t GetCounter(int32_t* count);
 };
 
-extern DigitalHandleResource<HAL_DigitalHandle, SmartIo, kNumSmartIo>*
+extern DigitalHandleResource<HAL_DigitalHandle, SmartIo, NUM_SMART_IO>*
     smartIoHandles;
 
 extern wpi::mutex smartIoMutex;

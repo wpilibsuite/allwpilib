@@ -14,6 +14,6 @@ void InitializeConstants() {}
 
 extern "C" {
 int32_t HAL_GetSystemClockTicksPerMicrosecond(void) {
-  return kSystemClockTicksPerMicrosecond;
+  return SYSTEM_CLOCK_TICKS_PER_MICROSECOND;
 }
 }  // extern "C"

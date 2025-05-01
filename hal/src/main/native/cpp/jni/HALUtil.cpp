@@ -23,12 +23,12 @@
 
 using namespace wpi::java;
 
-#define kRioStatusOffset -63000
-#define kRioStatusSuccess 0
-#define kRIOStatusBufferInvalidSize (kRioStatusOffset - 80)
-#define kRIOStatusOperationTimedOut -52007
-#define kRIOStatusFeatureNotSupported (kRioStatusOffset - 193)
-#define kRIOStatusResourceNotInitialized -52010
+#define RIO_STATUS_OFFSET -63000
+#define RIO_STATUS_SUCCESS 0
+#define RIO_STATUS_BUFFER_INVALID_SIZE (RIO_STATUS_OFFSET - 80)
+#define RIO_STATUS_OPERATION_TIMED_OUT -52007
+#define RIO_STATUS_FEATURE_NOT_SUPPORTED (RIO_STATUS_OFFSET - 193)
+#define RIO_STATUS_RESOURCE_NOT_INITIALIZED -52010
 
 static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_ROBORIO == HAL_Runtime_RoboRIO);
 static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_ROBORIO2 ==

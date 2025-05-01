@@ -18,10 +18,10 @@
 using namespace hal;
 
 static constexpr HAL_CANManufacturer manufacturer =
-    HAL_CANManufacturer::HAL_CAN_Man_kCTRE;
+    HAL_CANManufacturer::HAL_CAN_Man_CTRE;
 
 static constexpr HAL_CANDeviceType deviceType =
-    HAL_CANDeviceType::HAL_CAN_Dev_kPneumatics;
+    HAL_CANDeviceType::HAL_CAN_Dev_Pneumatics;
 
 static constexpr int32_t Status1 = 0x50;
 static constexpr int32_t StatusSolFaults = 0x51;
@@ -133,12 +133,12 @@ struct PCM {
 };
 }  // namespace
 
-static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
+static IndexedHandleResource<HAL_CTREPCMHandle, PCM, NUM_CTRE_PCM_MODULES,
                              HAL_HandleEnum::CTREPCM>* pcmHandles;
 
 namespace hal::init {
 void InitializeCTREPCM() {
-  static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
+  static IndexedHandleResource<HAL_CTREPCMHandle, PCM, NUM_CTRE_PCM_MODULES,
                                HAL_HandleEnum::CTREPCM>
       pH;
   pcmHandles = &pH;
@@ -189,16 +189,16 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
                                            pcm->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PCM", 0,
-                                       kNumCTREPCMModules - 1, module);
+                                       NUM_CTRE_PCM_MODULES - 1, module);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_InvalidHandle;  // failed to allocate. Pass error back.
   }
 
   pcm->canHandle =
       HAL_InitializeCAN(busId, manufacturer, module, deviceType, status);
   if (*status != 0) {
     pcmHandles->Free(handle);
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   std::memset(&pcm->oneShot, 0, sizeof(pcm->oneShot));
@@ -210,7 +210,7 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
   HAL_SetCTREPCMClosedLoopControl(handle, true, status);
   if (*status != 0) {
     HAL_FreeCTREPCM(handle);
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
   return handle;
 }
@@ -224,7 +224,7 @@ void HAL_FreeCTREPCM(HAL_CTREPCMHandle handle) {
 }
 
 HAL_Bool HAL_CheckCTREPCMSolenoidChannel(int32_t channel) {
-  return channel < kNumCTRESolenoidChannels && channel >= 0;
+  return channel < NUM_CTRE_SOLENOID_CHANNELS && channel >= 0;
 }
 
 HAL_Bool HAL_GetCTREPCMCompressor(HAL_CTREPCMHandle handle, int32_t* status) {

@@ -72,7 +72,7 @@ THandle UnlimitedHandleResource<THandle, TStruct, enumValue>::Allocate(
     }
   }
   if (i >= INT16_MAX) {
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   m_structures.push_back(structure);

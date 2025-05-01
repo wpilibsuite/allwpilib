@@ -256,7 +256,7 @@ Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_getData
   (JNIEnv* env, jclass, jint index)
 {
   auto data =
-      std::make_unique<HAL_AddressableLEDData[]>(HAL_kAddressableLEDMaxLength);
+      std::make_unique<HAL_AddressableLEDData[]>(HAL_AddressableLEDMaxLength);
   int32_t length = HALSIM_GetAddressableLEDData(index, data.get());
   return MakeJByteArray(
       env, std::span(reinterpret_cast<jbyte*>(data.get()), length * 4));

@@ -23,12 +23,12 @@ struct PCM {
 };
 }  // namespace
 
-static IndexedHandleResource<HAL_REVPHHandle, PCM, kNumREVPHModules,
+static IndexedHandleResource<HAL_REVPHHandle, PCM, NUM_REV_PH_MODULES,
                              HAL_HandleEnum::REVPH>* pcmHandles;
 
 namespace hal::init {
 void InitializeREVPH() {
-  static IndexedHandleResource<HAL_REVPHHandle, PCM, kNumREVPHModules,
+  static IndexedHandleResource<HAL_REVPHHandle, PCM, NUM_REV_PH_MODULES,
                                HAL_HandleEnum::REVPH>
       pH;
   pcmHandles = &pH;
@@ -43,8 +43,8 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
   if (!HAL_CheckREVPHModuleNumber(module)) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
-                                     kNumREVPHModules, module);
-    return HAL_kInvalidHandle;
+                                     NUM_REV_PH_MODULES, module);
+    return HAL_InvalidHandle;
   }
 
   HAL_REVPHHandle handle;
@@ -57,9 +57,9 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
                                            pcm->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
-                                       kNumREVPHModules, module);
+                                       NUM_REV_PH_MODULES, module);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_InvalidHandle;  // failed to allocate. Pass error back.
   }
 
   pcm->previousAllocation = allocationLocation ? allocationLocation : "";
@@ -68,7 +68,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
   SimREVPHData[module].initialized = true;
   // Enable closed loop
   SimREVPHData[module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kDigital;
+      HAL_REVPHCompressorConfigType_Digital;
 
   return handle;
 }
@@ -84,11 +84,11 @@ void HAL_FreeREVPH(HAL_REVPHHandle handle) {
 }
 
 HAL_Bool HAL_CheckREVPHModuleNumber(int32_t module) {
-  return module >= 1 && module <= kNumREVPHModules;
+  return module >= 1 && module <= NUM_REV_PH_MODULES;
 }
 
 HAL_Bool HAL_CheckREVPHSolenoidChannel(int32_t channel) {
-  return channel < kNumREVPHChannels && channel >= 0;
+  return channel < NUM_REV_PH_CHANNELS && channel >= 0;
 }
 
 HAL_Bool HAL_GetREVPHCompressor(HAL_REVPHHandle handle, int32_t* status) {
@@ -120,7 +120,7 @@ void HAL_SetREVPHClosedLoopControlDisabled(HAL_REVPHHandle handle,
     return;
   }
   SimREVPHData[pcm->module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kDisabled;
+      HAL_REVPHCompressorConfigType_Disabled;
 }
 
 void HAL_SetREVPHClosedLoopControlDigital(HAL_REVPHHandle handle,
@@ -131,7 +131,7 @@ void HAL_SetREVPHClosedLoopControlDigital(HAL_REVPHHandle handle,
     return;
   }
   SimREVPHData[pcm->module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kDigital;
+      HAL_REVPHCompressorConfigType_Digital;
 }
 
 void HAL_SetREVPHClosedLoopControlAnalog(HAL_REVPHHandle handle,
@@ -144,7 +144,7 @@ void HAL_SetREVPHClosedLoopControlAnalog(HAL_REVPHHandle handle,
     return;
   }
   SimREVPHData[pcm->module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kAnalog;
+      HAL_REVPHCompressorConfigType_Analog;
 }
 
 void HAL_SetREVPHClosedLoopControlHybrid(HAL_REVPHHandle handle,
@@ -157,7 +157,7 @@ void HAL_SetREVPHClosedLoopControlHybrid(HAL_REVPHHandle handle,
     return;
   }
   SimREVPHData[pcm->module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kHybrid;
+      HAL_REVPHCompressorConfigType_Hybrid;
 }
 
 HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
@@ -165,7 +165,7 @@ HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
   auto pcm = pcmHandles->Get(handle);
   if (pcm == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return HAL_REVPHCompressorConfigType_kDisabled;
+    return HAL_REVPHCompressorConfigType_Disabled;
   }
   return SimREVPHData[pcm->module].compressorConfigType;
 }
@@ -205,7 +205,7 @@ int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status) {
   std::scoped_lock lock{pcm->lock};
   auto& data = SimREVPHData[pcm->module].solenoidOutput;
   int32_t ret = 0;
-  for (int i = 0; i < kNumREVPHChannels; i++) {
+  for (int i = 0; i < NUM_REV_PH_CHANNELS; i++) {
     ret |= (data[i] << i);
   }
   return ret;
@@ -220,7 +220,7 @@ void HAL_SetREVPHSolenoids(HAL_REVPHHandle handle, int32_t mask, int32_t values,
 
   auto& data = SimREVPHData[pcm->module].solenoidOutput;
   std::scoped_lock lock{pcm->lock};
-  for (int i = 0; i < kNumREVPHChannels; i++) {
+  for (int i = 0; i < NUM_REV_PH_CHANNELS; i++) {
     auto indexMask = (1 << i);
     if ((mask & indexMask) != 0) {
       data[i] = (values & indexMask) != 0;

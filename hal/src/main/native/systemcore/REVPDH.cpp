@@ -25,12 +25,12 @@
 using namespace hal;
 
 static constexpr HAL_CANManufacturer manufacturer =
-    HAL_CANManufacturer::HAL_CAN_Man_kREV;
+    HAL_CANManufacturer::HAL_CAN_Man_REV;
 
 static constexpr HAL_CANDeviceType deviceType =
-    HAL_CANDeviceType::HAL_CAN_Dev_kPowerDistribution;
+    HAL_CANDeviceType::HAL_CAN_Dev_PowerDistribution;
 
-static constexpr int32_t kDefaultControlPeriod = 50;
+static constexpr int32_t DEFAULT_CONTROL_PERIOD = 50;
 
 namespace {
 
@@ -69,18 +69,18 @@ static constexpr uint32_t PDH_CLEAR_FAULTS_FRAME_API =
 static constexpr uint32_t PDH_VERSION_FRAME_API =
     APIFromExtId(PDH_VERSION_FRAME_ID);
 
-static constexpr int32_t kPDHFrameStatus0Timeout = 20;
-static constexpr int32_t kPDHFrameStatus1Timeout = 20;
-static constexpr int32_t kPDHFrameStatus2Timeout = 20;
-static constexpr int32_t kPDHFrameStatus3Timeout = 20;
-static constexpr int32_t kPDHFrameStatus4Timeout = 20;
+static constexpr int32_t PDH_FRAME_STATUS_0_TIMEOUT = 20;
+static constexpr int32_t PDH_FRAME_STATUS_1_TIMEOUT = 20;
+static constexpr int32_t PDH_FRAME_STATUS_2_TIMEOUT = 20;
+static constexpr int32_t PDH_FRAME_STATUS_3_TIMEOUT = 20;
+static constexpr int32_t PDH_FRAME_STATUS_4_TIMEOUT = 20;
 
-static IndexedHandleResource<HAL_REVPDHHandle, REV_PDHObj, kNumREVPDHModules,
+static IndexedHandleResource<HAL_REVPDHHandle, REV_PDHObj, NUM_REV_PDH_MODULES,
                              HAL_HandleEnum::REVPDH>* REVPDHHandles;
 
 namespace hal::init {
 void InitializeREVPDH() {
-  static IndexedHandleResource<HAL_REVPDHHandle, REV_PDHObj, kNumREVPDHModules,
+  static IndexedHandleResource<HAL_REVPDHHandle, REV_PDHObj, NUM_REV_PDH_MODULES,
                                HAL_HandleEnum::REVPDH>
       rH;
   REVPDHHandles = &rH;
@@ -95,7 +95,7 @@ static PDH_status_0_t HAL_ReadREVPDHStatus0(HAL_CANHandle hcan,
   PDH_status_0_t result = {};
 
   HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_0_FRAME_API, &message,
-                           kPDHFrameStatus0Timeout * 2, status);
+                           PDH_FRAME_STATUS_0_TIMEOUT * 2, status);
 
   if (*status != 0) {
     return result;
@@ -112,7 +112,7 @@ static PDH_status_1_t HAL_ReadREVPDHStatus1(HAL_CANHandle hcan,
   PDH_status_1_t result = {};
 
   HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_1_FRAME_API, &message,
-                           kPDHFrameStatus1Timeout * 2, status);
+                           PDH_FRAME_STATUS_1_TIMEOUT * 2, status);
 
   if (*status != 0) {
     return result;
@@ -129,7 +129,7 @@ static PDH_status_2_t HAL_ReadREVPDHStatus2(HAL_CANHandle hcan,
   PDH_status_2_t result = {};
 
   HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_2_FRAME_API, &message,
-                           kPDHFrameStatus2Timeout * 2, status);
+                           PDH_FRAME_STATUS_2_TIMEOUT * 2, status);
 
   if (*status != 0) {
     return result;
@@ -146,7 +146,7 @@ static PDH_status_3_t HAL_ReadREVPDHStatus3(HAL_CANHandle hcan,
   PDH_status_3_t result = {};
 
   HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_3_FRAME_API, &message,
-                           kPDHFrameStatus3Timeout * 2, status);
+                           PDH_FRAME_STATUS_3_TIMEOUT * 2, status);
 
   if (*status != 0) {
     return result;
@@ -163,7 +163,7 @@ static PDH_status_4_t HAL_ReadREVPDHStatus4(HAL_CANHandle hcan,
   PDH_status_4_t result = {};
 
   HAL_ReadCANPacketTimeout(hcan, PDH_STATUS_4_FRAME_API, &message,
-                           kPDHFrameStatus4Timeout * 2, status);
+                           PDH_FRAME_STATUS_4_TIMEOUT * 2, status);
 
   if (*status != 0) {
     return result;
@@ -196,8 +196,8 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t busId, int32_t module,
   if (!HAL_CheckREVPDHModuleNumber(module)) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH", 1,
-                                     kNumREVPDHModules, module);
-    return HAL_kInvalidHandle;
+                                     NUM_REV_PDH_MODULES, module);
+    return HAL_InvalidHandle;
   }
 
   HAL_REVPDHHandle handle;
@@ -209,9 +209,9 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t busId, int32_t module,
                                            hpdh->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH", 1,
-                                       kNumREVPDHModules, module);
+                                       NUM_REV_PDH_MODULES, module);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_InvalidHandle;  // failed to allocate. Pass error back.
   }
 
   HAL_CANHandle hcan =
@@ -219,12 +219,12 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t busId, int32_t module,
 
   if (*status != 0) {
     REVPDHHandles->Free(handle);
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   hpdh->previousAllocation = allocationLocation ? allocationLocation : "";
   hpdh->hcan = hcan;
-  hpdh->controlPeriod = kDefaultControlPeriod;
+  hpdh->controlPeriod = DEFAULT_CONTROL_PERIOD;
   std::memset(&hpdh->versionInfo, 0, sizeof(hpdh->versionInfo));
 
   return handle;
@@ -246,11 +246,11 @@ int32_t HAL_GetREVPDHModuleNumber(HAL_REVPDHHandle handle, int32_t* status) {
 }
 
 HAL_Bool HAL_CheckREVPDHModuleNumber(int32_t module) {
-  return ((module >= 1) && (module <= kNumREVPDHModules)) ? 1 : 0;
+  return ((module >= 1) && (module <= NUM_REV_PDH_MODULES)) ? 1 : 0;
 }
 
 HAL_Bool HAL_CheckREVPDHChannelNumber(int32_t channel) {
-  return ((channel >= 0) && (channel < kNumREVPDHChannels)) ? 1 : 0;
+  return ((channel >= 0) && (channel < NUM_REV_PDH_CHANNELS)) ? 1 : 0;
 }
 
 double HAL_GetREVPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,

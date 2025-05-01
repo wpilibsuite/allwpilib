@@ -32,16 +32,16 @@ static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
 
 using namespace hal;
 
-static constexpr int kJoystickPorts = 6;
+static constexpr int JOYSTICK_PORTS = 6;
 
 namespace {
 struct JoystickDataCache {
   JoystickDataCache() { std::memset(this, 0, sizeof(*this)); }
   void Update();
 
-  HAL_JoystickAxes axes[kJoystickPorts];
-  HAL_JoystickPOVs povs[kJoystickPorts];
-  HAL_JoystickButtons buttons[kJoystickPorts];
+  HAL_JoystickAxes axes[JOYSTICK_PORTS];
+  HAL_JoystickPOVs povs[JOYSTICK_PORTS];
+  HAL_JoystickButtons buttons[JOYSTICK_PORTS];
   HAL_AllianceStationID allianceStation;
   double matchTime;
   HAL_ControlWord controlWord;
@@ -60,7 +60,7 @@ struct FRCDriverStation {
 }  // namespace
 
 void JoystickDataCache::Update() {
-  for (int i = 0; i < kJoystickPorts; i++) {
+  for (int i = 0; i < JOYSTICK_PORTS; i++) {
     SimDriverStationData->GetJoystickAxes(i, &axes[i]);
     SimDriverStationData->GetJoystickPOVs(i, &povs[i]);
     SimDriverStationData->GetJoystickButtons(i, &buttons[i]);
@@ -80,7 +80,7 @@ void JoystickDataCache::Update() {
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
-  if ((stickNum) < 0 || (stickNum) >= HAL_kMaxJoysticks) \
+  if ((stickNum) < 0 || (stickNum) >= HAL_MaxJoysticks) \
   return PARAMETER_OUT_OF_RANGE
 
 static HAL_ControlWord newestControlWord;
@@ -98,7 +98,7 @@ struct TcpCache {
   void CloneTo(TcpCache* other) { std::memcpy(other, this, sizeof(*this)); }
 
   HAL_MatchInfo matchInfo;
-  HAL_JoystickDescriptor descriptors[HAL_kMaxJoysticks];
+  HAL_JoystickDescriptor descriptors[HAL_MaxJoysticks];
 };
 static_assert(std::is_standard_layout_v<TcpCache>);
 }  // namespace
@@ -109,7 +109,7 @@ static TcpCache tcpCurrent;
 void TcpCache::Update() {
   SimDriverStationData->GetMatchInfo(&matchInfo);
 
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+  for (int i = 0; i < HAL_MaxJoysticks; i++) {
     SimDriverStationData->GetJoystickDescriptor(i, &descriptors[i]);
   }
 }
@@ -229,7 +229,7 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
   if (gShutdown) {
-    return HAL_AllianceStationID_kUnknown;
+    return HAL_AllianceStationID_Unknown;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
   return currentRead->allianceStation;

@@ -17,10 +17,10 @@
 using namespace hal;
 
 static constexpr HAL_CANManufacturer manufacturer =
-    HAL_CANManufacturer::HAL_CAN_Man_kCTRE;
+    HAL_CANManufacturer::HAL_CAN_Man_CTRE;
 
 static constexpr HAL_CANDeviceType deviceType =
-    HAL_CANDeviceType::HAL_CAN_Dev_kPowerDistribution;
+    HAL_CANDeviceType::HAL_CAN_Dev_PowerDistribution;
 
 namespace hal::init {
 void InitializePowerDistribution() {}
@@ -30,29 +30,29 @@ extern "C" {
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     int32_t busId, int32_t module, HAL_PowerDistributionType type,
     const char* allocationLocation, int32_t* status) {
-  if (type == HAL_PowerDistributionType_kAutomatic) {
+  if (type == HAL_PowerDistributionType_Automatic) {
     if (module != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
       *status = PARAMETER_OUT_OF_RANGE;
       hal::SetLastError(
           status, "Automatic PowerDistributionType must have default module");
-      return HAL_kInvalidHandle;
+      return HAL_InvalidHandle;
     }
 
     // TODO Make this not matter
-    type = HAL_PowerDistributionType_kCTRE;
+    type = HAL_PowerDistributionType_CTRE;
     module = 0;
   }
 
   if (!HAL_CheckPowerDistributionModule(module, type)) {
     *status = RESOURCE_OUT_OF_RANGE;
-    if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
+    if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_CTRE) {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PDP", 0,
-                                       kNumCTREPDPModules - 1, module);
+                                       NUM_CTRE_PDP_MODULES - 1, module);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PDH", 1,
-                                       kNumREVPDHModules, module);
+                                       NUM_REV_PDH_MODULES, module);
     }
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
   hal::init::CheckInit();
   SimPowerDistributionData[module].initialized = true;
@@ -61,7 +61,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
 
   if (*status != 0) {
     HAL_CleanCAN(handle);
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   return handle;
@@ -78,10 +78,10 @@ int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle,
 
 HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
                                           HAL_PowerDistributionType type) {
-  if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
-    return module < kNumCTREPDPModules && module >= 0;
+  if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_CTRE) {
+    return module < NUM_CTRE_PDP_MODULES && module >= 0;
   } else {
-    return module <= kNumREVPDHModules && module >= 1;
+    return module <= NUM_REV_PDH_MODULES && module >= 1;
   }
 }
 
@@ -89,24 +89,24 @@ HAL_Bool HAL_CheckPowerDistributionChannel(HAL_PowerDistributionHandle handle,
                                            int32_t channel) {
   // TODO make this grab from the handle directly
   if (false) {
-    return channel < kNumCTREPDPChannels && channel >= 0;
+    return channel < NUM_CTRE_PDP_CHANNELS && channel >= 0;
   } else {
-    return channel < kNumREVPDHChannels && channel >= 0;
+    return channel < NUM_REV_PDH_CHANNELS && channel >= 0;
   }
 }
 
 HAL_PowerDistributionType HAL_GetPowerDistributionType(
     HAL_PowerDistributionHandle handle, int32_t* status) {
-  return HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE;
+  return HAL_PowerDistributionType::HAL_PowerDistributionType_CTRE;
 }
 
 int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,
                                             int32_t* status) {
   // TODO make this grab from the handle directly
   if (false) {
-    return kNumCTREPDPChannels;
+    return NUM_CTRE_PDP_CHANNELS;
   } else {
-    return kNumREVPDHChannels;
+    return NUM_REV_PDH_CHANNELS;
   }
 }
 
@@ -147,7 +147,7 @@ void HAL_GetPowerDistributionAllChannelCurrents(
   }
 
   auto& data = SimPowerDistributionData[module];
-  int toCopy = (std::min)(currentsLength, kNumPDSimChannels);
+  int toCopy = (std::min)(currentsLength, NUM_PD_SIM_CHANNELS);
   for (int i = 0; i < toCopy; i++) {
     currents[i] = data.current[i];
   }
@@ -161,7 +161,7 @@ double HAL_GetPowerDistributionTotalCurrent(HAL_PowerDistributionHandle handle,
 
   double total = 0.0;
   auto& data = SimPowerDistributionData[module];
-  for (int i = 0; i < kNumPDSimChannels; i++) {
+  for (int i = 0; i < NUM_PD_SIM_CHANNELS; i++) {
     total += data.current[i];
   }
   return total;
