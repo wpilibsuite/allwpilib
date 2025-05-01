@@ -71,9 +71,9 @@ static bool IsFiltered(std::string_view key) {
  */
 static void PrepareMechData(std::vector<PreparedData>* data,
                             std::string_view unit = "") {
-  constexpr size_t kWindow = 3;
+  constexpr size_t WINDOW = 3;
 
-  CheckSize(*data, kWindow, "Acceleration Calculation");
+  CheckSize(*data, WINDOW, "Acceleration Calculation");
 
   // Calculates the cosine of the position data for single jointed arm analysis
   for (size_t i = 0; i < data->size(); ++i) {
@@ -96,21 +96,21 @@ static void PrepareMechData(std::vector<PreparedData>* data,
   }
 
   auto derivative =
-      CentralFiniteDifference<1, kWindow>(GetMeanTimeDelta(*data));
+      CentralFiniteDifference<1, WINDOW>(GetMeanTimeDelta(*data));
 
   // Load the derivative filter with the first value for accurate initial
   // behavior
-  for (size_t i = 0; i < kWindow; ++i) {
+  for (size_t i = 0; i < WINDOW; ++i) {
     derivative.Calculate(data->at(0).velocity);
   }
 
-  for (size_t i = (kWindow - 1) / 2; i < data->size(); ++i) {
-    data->at(i - (kWindow - 1) / 2).acceleration =
+  for (size_t i = (WINDOW - 1) / 2; i < data->size(); ++i) {
+    data->at(i - (WINDOW - 1) / 2).acceleration =
         derivative.Calculate(data->at(i).velocity);
   }
 
   // Fill in accelerations past end of derivative filter
-  for (size_t i = data->size() - (kWindow - 1) / 2; i < data->size(); ++i) {
+  for (size_t i = data->size() - (WINDOW - 1) / 2; i < data->size(); ++i) {
     data->at(i).acceleration = 0.0;
   }
 }
@@ -356,7 +356,7 @@ void sysid::InitialTrimAndFilter(
       if (wpi::contains(key, "quasistatic")) {
         settings->velocityThreshold =
             std::min(settings->velocityThreshold,
-                     GetNoiseFloor(dataset, kNoiseMeanWindow,
+                     GetNoiseFloor(dataset, NOISE_MEAN_WINDOW,
                                    [](auto&& pt) { return pt.velocity; }));
       }
     }

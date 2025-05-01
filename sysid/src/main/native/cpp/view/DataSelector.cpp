@@ -23,7 +23,7 @@
 
 using namespace sysid;
 
-static constexpr const char* kAnalysisTypes[] = {"Elevator", "Arm", "Simple"};
+static constexpr const char* ANALYSIS_TYPES[] = {"Elevator", "Arm", "Simple"};
 
 static bool EmitEntryTarget(const char* name, bool isString,
                             const wpi::log::DataLogReaderEntry** entry) {
@@ -136,7 +136,7 @@ void DataSelector::Display() {
   }
 
   if (m_executedTests.size() < 4 && !m_testCountValidated) {
-    for (auto test : kValidTests) {
+    for (auto test : VALID_TESTS) {
       if (!m_executedTests.contains(test)) {
         m_missingTests.push_back(test);
         m_testCountValidated = true;
@@ -156,8 +156,8 @@ void DataSelector::Display() {
   }
 #endif
 
-  ImGui::Combo("Analysis Type", &m_selectedAnalysis, kAnalysisTypes,
-               IM_ARRAYSIZE(kAnalysisTypes));
+  ImGui::Combo("Analysis Type", &m_selectedAnalysis, ANALYSIS_TYPES,
+               IM_ARRAYSIZE(ANALYSIS_TYPES));
 
   // DND targets
   EmitEntryTarget("Velocity", false, &m_velocityEntry);
@@ -165,7 +165,7 @@ void DataSelector::Display() {
   EmitEntryTarget("Voltage", false, &m_voltageEntry);
 
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 7);
-  ImGui::Combo("Units", &m_selectedUnit, kUnits, IM_ARRAYSIZE(kUnits));
+  ImGui::Combo("Units", &m_selectedUnit, UNITS, IM_ARRAYSIZE(UNITS));
 
   ImGui::InputDouble("Velocity scaling", &m_velocityScale);
   ImGui::InputDouble("Position scaling", &m_positionScale);
@@ -287,8 +287,8 @@ static std::vector<std::pair<int64_t, double>> GetData(
 
 TestData DataSelector::BuildTestData() {
   TestData data;
-  data.distanceUnit = kUnits[m_selectedUnit];
-  data.mechanismType = analysis::FromName(kAnalysisTypes[m_selectedAnalysis]);
+  data.distanceUnit = UNITS[m_selectedUnit];
+  data.mechanismType = analysis::FromName(ANALYSIS_TYPES[m_selectedAnalysis]);
 
   // read and sort the entire dataset first; this is memory hungry but
   // dramatically speeds up splitting it into runs.

@@ -45,8 +45,8 @@ class AnalyzerPlot {
    * @param rawData      Raw data storage.
    * @param filteredData Filtered data storage.
    * @param unit         Unit of the dataset
-   * @param ff           Feedforward gains (Ks, Kv, Ka, optionally
-   *                     Kg and offset).
+   * @param ff           Feedforward gains (S, V, A, optionally
+   *                     G and offset).
    * @param startTimes   Array of dataset start times.
    * @param type         Type of analysis.
    * @param abort        Aborts analysis early if set to true from another
@@ -120,7 +120,7 @@ class AnalyzerPlot {
 
  private:
   // The maximum size of each vector (dataset to plot)
-  static constexpr size_t kMaxSize = 2048;
+  static constexpr size_t MAX_SIZE = 2048;
 
   struct FilteredDataVsTimePlot {
     std::vector<ImPlotPoint> rawData;

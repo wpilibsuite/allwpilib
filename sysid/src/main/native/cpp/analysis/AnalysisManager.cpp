@@ -198,64 +198,64 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
   const auto& ff =
       sysid::CalculateFeedforwardGains(GetFilteredData(), analysisType, false);
 
-  const auto& Ks = ff.coeffs[0];
+  const auto& S = ff.coeffs[0];
   FeedforwardGain KsGain = {
-      .gain = Ks, .descriptor = "Voltage needed to overcome static friction."};
-  if (Ks < 0) {
+      .gain = S, .descriptor = "Voltage needed to overcome static friction."};
+  if (S < 0) {
     KsGain.isValidGain = false;
     KsGain.errorMessage = fmt::format(
-        "Calculated Ks gain of: {0:.3f} is erroneous! Ks should be >= 0.", Ks);
+        "Calculated S gain of: {0:.3f} is erroneous! S should be >= 0.", S);
   }
 
-  const auto& Kv = ff.coeffs[1];
+  const auto& V = ff.coeffs[1];
   FeedforwardGain KvGain = {
-      .gain = Kv,
+      .gain = V,
       .descriptor =
           "Voltage needed to hold/cruise at a constant velocity while "
           "overcoming the counter-electromotive force and any additional "
           "friction."};
-  if (Kv < 0) {
+  if (V < 0) {
     KvGain.isValidGain = false;
     KvGain.errorMessage = fmt::format(
-        "Calculated Kv gain of: {0:.3f} is erroneous! Kv should be >= 0.", Kv);
+        "Calculated V gain of: {0:.3f} is erroneous! V should be >= 0.", V);
   }
 
-  const auto& Ka = ff.coeffs[2];
+  const auto& A = ff.coeffs[2];
   FeedforwardGain KaGain = {
-      .gain = Ka,
+      .gain = A,
       .descriptor =
           "Voltage needed to induce a given acceleration in the motor shaft."};
-  if (Ka <= 0) {
+  if (A <= 0) {
     KaGain.isValidGain = false;
     KaGain.errorMessage = fmt::format(
-        "Calculated Ka gain of: {0:.3f} is erroneous! Ka should be > 0.", Ka);
+        "Calculated A gain of: {0:.3f} is erroneous! A should be > 0.", A);
   }
 
-  if (analysisType == analysis::kSimple) {
+  if (analysisType == analysis::SIMPLE) {
     return FeedforwardGains{
-        .olsResult = ff, .Ks = KsGain, .Kv = KvGain, .Ka = KaGain};
+        .olsResult = ff, .S = KsGain, .V = KvGain, .A = KaGain};
   }
 
-  if (analysisType == analysis::kElevator || analysisType == analysis::kArm) {
-    const auto& Kg = ff.coeffs[3];
+  if (analysisType == analysis::ELEVATOR || analysisType == analysis::ARM) {
+    const auto& G = ff.coeffs[3];
     FeedforwardGain KgGain = {
-        Kg, "Voltage needed to counteract the force of gravity."};
-    if (Kg < 0) {
+        G, "Voltage needed to counteract the force of gravity."};
+    if (G < 0) {
       KgGain.isValidGain = false;
       KgGain.errorMessage = fmt::format(
-          "Calculated Kg gain of: {0:.3f} is erroneous! Kg should be >= 0.",
-          Ka);
+          "Calculated G gain of: {0:.3f} is erroneous! G should be >= 0.",
+          A);
     }
 
-    // Elevator analysis only requires Kg
-    if (analysisType == analysis::kElevator) {
+    // Elevator analysis only requires G
+    if (analysisType == analysis::ELEVATOR) {
       return FeedforwardGains{.olsResult = ff,
-                              .Ks = KsGain,
-                              .Kv = KvGain,
-                              .Ka = KaGain,
-                              .Kg = KgGain};
+                              .S = KsGain,
+                              .V = KvGain,
+                              .A = KaGain,
+                              .G = KgGain};
     } else {
-      // Arm analysis requires Kg and an angle offset
+      // Arm analysis requires G and an angle offset
       FeedforwardGain offset = {
           .gain = ff.coeffs[4],
           .descriptor =
@@ -270,14 +270,14 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
 }
 
 sysid::FeedbackGains AnalysisManager::CalculateFeedback(
-    const FeedforwardGain& Kv, const FeedforwardGain& Ka) {
+    const FeedforwardGain& V, const FeedforwardGain& A) {
   FeedbackGains fb;
-  if (m_settings.type == FeedbackControllerLoopType::kPosition) {
+  if (m_settings.type == FeedbackControllerLoopType::POSITION) {
     fb = sysid::CalculatePositionFeedbackGains(
-        m_settings.preset, m_settings.lqr, Kv.gain, Ka.gain);
+        m_settings.preset, m_settings.lqr, V.gain, A.gain);
   } else {
     fb = sysid::CalculateVelocityFeedbackGains(
-        m_settings.preset, m_settings.lqr, Kv.gain, Ka.gain);
+        m_settings.preset, m_settings.lqr, V.gain, A.gain);
   }
 
   return fb;

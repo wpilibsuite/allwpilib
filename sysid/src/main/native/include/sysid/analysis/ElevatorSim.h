@@ -16,14 +16,14 @@ namespace sysid {
 class ElevatorSim {
  public:
   /**
-   * @param Ks              Static friction gain.
-   * @param Kv              Velocity gain.
-   * @param Ka              Acceleration gain.
-   * @param Kg              Gravity gain.
+   * @param S              Static friction gain.
+   * @param V              Velocity gain.
+   * @param A              Acceleration gain.
+   * @param G              Gravity gain.
    * @param initialPosition Initial elevator position.
    * @param initialVelocity Initial elevator velocity.
    */
-  ElevatorSim(double Ks, double Kv, double Ka, double Kg,
+  ElevatorSim(double S, double V, double A, double G,
               double initialPosition = 0.0, double initialVelocity = 0.0);
 
   /**

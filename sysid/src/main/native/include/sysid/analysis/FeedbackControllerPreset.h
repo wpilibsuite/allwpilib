@@ -68,12 +68,12 @@ struct FeedbackControllerPreset {
 /**
  * The loop type for the feedback controller.
  */
-enum class FeedbackControllerLoopType { kPosition, kVelocity };
+enum class FeedbackControllerLoopType { POSITION, VELOCITY };
 
 namespace presets {
-inline constexpr FeedbackControllerPreset kDefault{1.0, 1.0, 20_ms, true, 0_s};
+inline constexpr FeedbackControllerPreset DEFAULT{1.0, 1.0, 20_ms, true, 0_s};
 
-inline constexpr FeedbackControllerPreset kWPILib{kDefault};
+inline constexpr FeedbackControllerPreset WPILIB{DEFAULT};
 
 // Measurement delay from a moving average filter:
 //
@@ -115,7 +115,7 @@ inline constexpr FeedbackControllerPreset kWPILib{kDefault};
  *
  * Total delay = 50 ms + 31.5 ms = 81.5 ms.
  */
-inline constexpr FeedbackControllerPreset kCTREv5{1023.0 / 12.0, 0.1, 1_ms,
+inline constexpr FeedbackControllerPreset CTRE_V5{1023.0 / 12.0, 0.1, 1_ms,
                                                   false, 81.5_ms};
 /**
  * https://api.ctr-electronics.com/phoenixpro/release/cpp/classctre_1_1phoenixpro_1_1hardware_1_1core_1_1_core_c_a_ncoder.html#a718a1a214b58d3c4543e88e3cb51ade5
@@ -125,7 +125,7 @@ inline constexpr FeedbackControllerPreset kCTREv5{1023.0 / 12.0, 0.1, 1_ms,
  * Phoenix 6 devices make use of Kalman filters default-tuned to lowest latency,
  * which in testing is roughly 1 millisecond
  */
-inline constexpr FeedbackControllerPreset kCTREv6{1.0, 1.0, 1_ms, true, 1_ms};
+inline constexpr FeedbackControllerPreset CTRE_V6{1.0, 1.0, 1_ms, true, 1_ms};
 
 /**
  * https://github.com/wpilibsuite/sysid/issues/258#issuecomment-1010658237
@@ -134,7 +134,7 @@ inline constexpr FeedbackControllerPreset kCTREv6{1.0, 1.0, 1_ms, true, 1_ms};
  *
  * Total delay = 8-tap moving average delay = (8 - 1) / 2 * 32 ms = 112 ms.
  */
-inline constexpr FeedbackControllerPreset kREVNEOBuiltIn{1.0 / 12.0, 60.0, 1_ms,
+inline constexpr FeedbackControllerPreset REV_NEO_BUILTIN{1.0 / 12.0, 60.0, 1_ms,
                                                          false, 112_ms};
 
 /**
@@ -146,7 +146,7 @@ inline constexpr FeedbackControllerPreset kREVNEOBuiltIn{1.0 / 12.0, 60.0, 1_ms,
  *
  * Total delay = 50 ms + 31.5 ms = 81.5 ms.
  */
-inline constexpr FeedbackControllerPreset kREVNonNEO{1.0 / 12.0, 60.0, 1_ms,
+inline constexpr FeedbackControllerPreset REV_NON_NEO{1.0 / 12.0, 60.0, 1_ms,
                                                      false, 81.5_ms};
 
 /**
@@ -154,7 +154,7 @@ inline constexpr FeedbackControllerPreset kREVNonNEO{1.0 / 12.0, 60.0, 1_ms,
  *
  * Backward finite difference delay = 10 ms / 2 = 5 ms.
  */
-inline constexpr FeedbackControllerPreset kVenom{4096.0 / 12.0, 60.0, 1_ms,
+inline constexpr FeedbackControllerPreset VENOM{4096.0 / 12.0, 60.0, 1_ms,
                                                  false, 5_ms};
 }  // namespace presets
 }  // namespace sysid

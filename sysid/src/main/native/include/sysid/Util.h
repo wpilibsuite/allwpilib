@@ -34,7 +34,7 @@
 #define STRINGIZE(s) #s
 
 namespace sysid {
-inline constexpr const char* kUnits[] = {"Meters",  "Feet",      "Inches",
+inline constexpr const char* UNITS[] = {"Meters",  "Feet",      "Inches",
                                          "Radians", "Rotations", "Degrees"};
 
 /**

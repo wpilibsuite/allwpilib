@@ -48,51 +48,51 @@ struct Vector2d {
 };
 
 // App window size
-inline constexpr Vector2d kAppWindowSize{1280, 720};
+inline constexpr Vector2d APP_WINDOW_SIZE{1280, 720};
 
 // Menubar height
-inline constexpr int kMenubarHeight = 20;
+inline constexpr int MENUBAR_HEIGHT = 20;
 
 // Gap between window edges
-inline constexpr int kWindowGap = 5;
+inline constexpr int WINDOW_GAP = 5;
 
 // Left column position and size
-inline constexpr Vector2d kLeftColPos{kWindowGap, kMenubarHeight + kWindowGap};
-inline constexpr Vector2d kLeftColSize{
-    310, kAppWindowSize.y - kLeftColPos.y - kWindowGap};
+inline constexpr Vector2d LEFT_COL_POS{WINDOW_GAP, MENUBAR_HEIGHT + WINDOW_GAP};
+inline constexpr Vector2d LEFT_COL_SIZE{
+    310, APP_WINDOW_SIZE.y - LEFT_COL_POS.y - WINDOW_GAP};
 
 // Left column contents
-inline constexpr Vector2d kLogLoaderWindowPos = kLeftColPos;
-inline constexpr Vector2d kLogLoaderWindowSize{kLeftColSize.x, 450};
-inline constexpr Vector2d kDataSelectorWindowPos =
-    kLogLoaderWindowPos + Vector2d{0, kLogLoaderWindowSize.y + kWindowGap};
-inline constexpr Vector2d kDataSelectorWindowSize{
-    kLeftColSize.x, kAppWindowSize.y - kWindowGap - kDataSelectorWindowPos.y};
+inline constexpr Vector2d LOG_LOADER_WINDOW_POS = LEFT_COL_POS;
+inline constexpr Vector2d LOG_LOADER_WINDOW_SIZE{LEFT_COL_SIZE.x, 450};
+inline constexpr Vector2d DATA_SELECTOR_WINDOW_POS =
+    LOG_LOADER_WINDOW_POS + Vector2d{0, LOG_LOADER_WINDOW_SIZE.y + WINDOW_GAP};
+inline constexpr Vector2d DATA_SELECTOR_WINDOW_SIZE{
+    LEFT_COL_SIZE.x, APP_WINDOW_SIZE.y - WINDOW_GAP - DATA_SELECTOR_WINDOW_POS.y};
 
 // Center column position and size
-inline constexpr Vector2d kCenterColPos =
-    kLeftColPos + Vector2d{kLeftColSize.x + kWindowGap, 0};
-inline constexpr Vector2d kCenterColSize{
-    360, kAppWindowSize.y - kLeftColPos.y - kWindowGap};
+inline constexpr Vector2d CENTER_COL_POS =
+    LEFT_COL_POS + Vector2d{LEFT_COL_SIZE.x + WINDOW_GAP, 0};
+inline constexpr Vector2d CENTER_COL_SIZE{
+    360, APP_WINDOW_SIZE.y - LEFT_COL_POS.y - WINDOW_GAP};
 
 // Center column contents
-inline constexpr Vector2d kAnalyzerWindowPos = kCenterColPos;
-inline constexpr Vector2d kAnalyzerWindowSize{kCenterColSize.x, 550};
-inline constexpr Vector2d kProgramLogWindowPos =
-    kAnalyzerWindowPos + Vector2d{0, kAnalyzerWindowSize.y + kWindowGap};
-inline constexpr Vector2d kProgramLogWindowSize{
-    kCenterColSize.x, kAppWindowSize.y - kWindowGap - kProgramLogWindowPos.y};
+inline constexpr Vector2d ANALYZER_WINDOW_POS = CENTER_COL_POS;
+inline constexpr Vector2d ANALYZER_WINDOW_SIZE{CENTER_COL_SIZE.x, 550};
+inline constexpr Vector2d PROGRAM_LOG_WINDOW_POS =
+    ANALYZER_WINDOW_POS + Vector2d{0, ANALYZER_WINDOW_SIZE.y + WINDOW_GAP};
+inline constexpr Vector2d PROGRAM_LOG_WINDOW_SIZE{
+    CENTER_COL_SIZE.x, APP_WINDOW_SIZE.y - WINDOW_GAP - PROGRAM_LOG_WINDOW_POS.y};
 
 // Right column position and size
-inline constexpr Vector2d kRightColPos =
-    kCenterColPos + Vector2d{kCenterColSize.x + kWindowGap, 0};
-inline constexpr Vector2d kRightColSize =
-    kAppWindowSize - kRightColPos - Vector2d{kWindowGap, kWindowGap};
+inline constexpr Vector2d RIGHT_COL_POS =
+    CENTER_COL_POS + Vector2d{CENTER_COL_SIZE.x + WINDOW_GAP, 0};
+inline constexpr Vector2d RIGHT_COL_SIZE =
+    APP_WINDOW_SIZE - RIGHT_COL_POS - Vector2d{WINDOW_GAP, WINDOW_GAP};
 
 // Right column contents
-inline constexpr Vector2d kDiagnosticPlotWindowPos = kRightColPos;
-inline constexpr Vector2d kDiagnosticPlotWindowSize = kRightColSize;
+inline constexpr Vector2d DIAGNOSTIC_PLOT_WINDOW_POS = RIGHT_COL_POS;
+inline constexpr Vector2d DIAGNOSTIC_PLOT_WINDOW_SIZE = RIGHT_COL_SIZE;
 
 // Text box width as a multiple of the font size
-inline constexpr int kTextBoxWidthMultiple = 10;
+inline constexpr int TEXT_BOX_WIDTH_MULTIPLE = 10;
 }  // namespace sysid

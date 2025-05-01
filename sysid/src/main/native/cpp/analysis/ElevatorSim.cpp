@@ -10,13 +10,13 @@
 
 using namespace sysid;
 
-ElevatorSim::ElevatorSim(double Ks, double Kv, double Ka, double Kg,
+ElevatorSim::ElevatorSim(double S, double V, double A, double G,
                          double initialPosition, double initialVelocity)
     // dx/dt = Ax + Bu + c sgn(x) + d
-    : m_A{{0.0, 1.0}, {0.0, -Kv / Ka}},
-      m_B{0.0, 1.0 / Ka},
-      m_c{0.0, -Ks / Ka},
-      m_d{0.0, -Kg / Ka} {
+    : m_A{{0.0, 1.0}, {0.0, -V / A}},
+      m_B{0.0, 1.0 / A},
+      m_c{0.0, -S / A},
+      m_d{0.0, -G / A} {
   Reset(initialPosition, initialVelocity);
 }
 

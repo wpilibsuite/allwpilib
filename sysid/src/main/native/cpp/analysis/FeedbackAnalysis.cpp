@@ -23,15 +23,15 @@ using Matrix1d = Eigen::Matrix<double, 1, 1>;
 
 FeedbackGains sysid::CalculatePositionFeedbackGains(
     const FeedbackControllerPreset& preset, const LQRParameters& params,
-    double Kv, double Ka) {
-  if (!std::isfinite(Kv) || !std::isfinite(Ka)) {
+    double V, double A) {
+  if (!std::isfinite(V) || !std::isfinite(A)) {
     return {0.0, 0.0};
   }
 
   // If acceleration for position control requires no effort, velocity becomes
   // an input. We choose an appropriate model in this case to avoid numerical
   // instabilities in the LQR.
-  if (std::abs(Ka) < 1e-7) {
+  if (std::abs(A) < 1e-7) {
     // System has position state and velocity input
     frc::LinearSystem<1, 1, 1> system{Matrix1d{0.0}, Matrix1d{1.0},
                                       Matrix1d{1.0}, Matrix1d{0.0}};
@@ -41,11 +41,11 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
     controller.LatencyCompensate(system, preset.period,
                                  preset.measurementDelay);
 
-    return {Kv * controller.K(0, 0) * preset.outputConversionFactor, 0.0};
+    return {V * controller.K(0, 0) * preset.outputConversionFactor, 0.0};
   }
 
   auto system = frc::LinearSystemId::IdentifyPositionSystem<units::meters>(
-      Kv_t{Kv}, Ka_t{Ka});
+      Kv_t{V}, Ka_t{A});
 
   frc::LinearQuadraticRegulator<2, 1> controller{
       system, {params.qp, params.qv}, {params.r}, preset.period};
@@ -58,20 +58,20 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
 
 FeedbackGains sysid::CalculateVelocityFeedbackGains(
     const FeedbackControllerPreset& preset, const LQRParameters& params,
-    double Kv, double Ka, double encFactor) {
-  if (!std::isfinite(Kv) || !std::isfinite(Ka)) {
+    double V, double A, double encFactor) {
+  if (!std::isfinite(V) || !std::isfinite(A)) {
     return {0.0, 0.0};
   }
 
   // If acceleration for velocity control requires no effort, the feedback
   // control gains approach zero. We special-case it here to avoid numerical
   // instabilities in LQR.
-  if (std::abs(Ka) < 1E-7) {
+  if (std::abs(A) < 1E-7) {
     return {0.0, 0.0};
   }
 
   auto system = frc::LinearSystemId::IdentifyVelocitySystem<units::meters>(
-      Kv_t{Kv}, Ka_t{Ka});
+      Kv_t{V}, Ka_t{A});
   frc::LinearQuadraticRegulator<1, 1> controller{
       system, {params.qv}, {params.r}, preset.period};
   controller.LatencyCompensate(system, preset.period, preset.measurementDelay);
