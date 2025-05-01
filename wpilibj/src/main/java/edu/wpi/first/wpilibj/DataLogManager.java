@@ -60,8 +60,8 @@ public final class DataLogManager {
 
   // if less than this much free space, delete log files until there is this much free space
   // OR there are this many files remaining.
-  private static final long kFreeSpaceThreshold = 50000000L;
-  private static final int kFileCountThreshold = 10;
+  private static final long FREE_SPACE_THRESHOLD = 50000000L;
+  private static final int FILE_COUNT_THRESHOLD = 10;
 
   private DataLogManager() {}
 
@@ -251,7 +251,7 @@ public final class DataLogManager {
       } catch (IOException ex) {
         // ignored
       }
-      if (RobotBase.getRuntimeType() == RuntimeType.kRoboRIO) {
+      if (RobotBase.getRuntimeType() == RuntimeType.ROBORIO) {
         DriverStation.reportWarning(
             "DataLogManager: Logging to RoboRIO 1 internal storage is not recommended!"
                 + " Plug in a FAT32 formatted flash drive!",
@@ -312,7 +312,7 @@ public final class DataLogManager {
     {
       File logDir = new File(m_logDir);
       long freeSpace = logDir.getUsableSpace();
-      if (freeSpace < kFreeSpaceThreshold) {
+      if (freeSpace < FREE_SPACE_THRESHOLD) {
         // Delete oldest FRC_*.wpilog files (ignore FRC_TBD_*.wpilog as we just created one)
         File[] files =
             logDir.listFiles(
@@ -325,14 +325,14 @@ public final class DataLogManager {
           int count = files.length;
           for (File file : files) {
             --count;
-            if (count < kFileCountThreshold) {
+            if (count < FILE_COUNT_THRESHOLD) {
               break;
             }
             long length = file.length();
             if (file.delete()) {
               DriverStation.reportWarning("DataLogManager: Deleted " + file.getName(), false);
               freeSpace += length;
-              if (freeSpace >= kFreeSpaceThreshold) {
+              if (freeSpace >= FREE_SPACE_THRESHOLD) {
                 break;
               }
             } else {
@@ -340,12 +340,12 @@ public final class DataLogManager {
             }
           }
         }
-      } else if (freeSpace < 2 * kFreeSpaceThreshold) {
+      } else if (freeSpace < 2 * FREE_SPACE_THRESHOLD) {
         DriverStation.reportWarning(
             "DataLogManager: Log storage device has "
                 + freeSpace / 1000000
                 + " MB of free space remaining! Logs will get deleted below "
-                + kFreeSpaceThreshold / 1000000
+                + FREE_SPACE_THRESHOLD / 1000000
                 + " MB of free space. "
                 + "Consider deleting logs off the storage device.",
             false);

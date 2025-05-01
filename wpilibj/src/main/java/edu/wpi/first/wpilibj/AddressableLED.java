@@ -24,17 +24,17 @@ public class AddressableLED implements AutoCloseable {
   /** Order that color data is sent over the wire. */
   public enum ColorOrder {
     /** RGB order. */
-    kRGB(AddressableLEDJNI.COLOR_ORDER_RGB),
+    RGB(AddressableLEDJNI.COLOR_ORDER_RGB),
     /** RBG order. */
-    kRBG(AddressableLEDJNI.COLOR_ORDER_RBG),
+    RBG(AddressableLEDJNI.COLOR_ORDER_RBG),
     /** BGR order. */
-    kBGR(AddressableLEDJNI.COLOR_ORDER_BGR),
+    BGR(AddressableLEDJNI.COLOR_ORDER_BGR),
     /** BRG order. */
-    kBRG(AddressableLEDJNI.COLOR_ORDER_BRG),
+    BRG(AddressableLEDJNI.COLOR_ORDER_BRG),
     /** GBR order. */
-    kGBR(AddressableLEDJNI.COLOR_ORDER_GBR),
+    GBR(AddressableLEDJNI.COLOR_ORDER_GBR),
     /** GRB order. This is the default order. */
-    kGRB(AddressableLEDJNI.COLOR_ORDER_GRB);
+    GRB(AddressableLEDJNI.COLOR_ORDER_GRB);
 
     /** The native value for this ColorOrder. */
     public final int value;
@@ -51,13 +51,13 @@ public class AddressableLED implements AutoCloseable {
      */
     public ColorOrder fromValue(int value) {
       return switch (value) {
-        case AddressableLEDJNI.COLOR_ORDER_RBG -> kRBG;
-        case AddressableLEDJNI.COLOR_ORDER_BGR -> kBGR;
-        case AddressableLEDJNI.COLOR_ORDER_BRG -> kBRG;
-        case AddressableLEDJNI.COLOR_ORDER_GRB -> kGRB;
-        case AddressableLEDJNI.COLOR_ORDER_GBR -> kGBR;
-        case AddressableLEDJNI.COLOR_ORDER_RGB -> kRGB;
-        default -> kGRB;
+        case AddressableLEDJNI.COLOR_ORDER_RBG -> RBG;
+        case AddressableLEDJNI.COLOR_ORDER_BGR -> BGR;
+        case AddressableLEDJNI.COLOR_ORDER_BRG -> BRG;
+        case AddressableLEDJNI.COLOR_ORDER_GRB -> GRB;
+        case AddressableLEDJNI.COLOR_ORDER_GBR -> GBR;
+        case AddressableLEDJNI.COLOR_ORDER_RGB -> RGB;
+        default -> GRB;
       };
     }
   }

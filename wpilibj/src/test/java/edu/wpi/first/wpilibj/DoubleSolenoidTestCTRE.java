@@ -14,14 +14,14 @@ class DoubleSolenoidTestCTRE {
   @Test
   void testValidInitialization() {
     try (DoubleSolenoid solenoid = new DoubleSolenoid(0, 3, PneumaticsModuleType.CTREPCM, 2, 3)) {
-      solenoid.set(DoubleSolenoid.Value.kReverse);
-      assertEquals(DoubleSolenoid.Value.kReverse, solenoid.get());
+      solenoid.set(DoubleSolenoid.Value.REVERSE);
+      assertEquals(DoubleSolenoid.Value.REVERSE, solenoid.get());
 
-      solenoid.set(DoubleSolenoid.Value.kForward);
-      assertEquals(DoubleSolenoid.Value.kForward, solenoid.get());
+      solenoid.set(DoubleSolenoid.Value.FORWARD);
+      assertEquals(DoubleSolenoid.Value.FORWARD, solenoid.get());
 
-      solenoid.set(DoubleSolenoid.Value.kOff);
-      assertEquals(DoubleSolenoid.Value.kOff, solenoid.get());
+      solenoid.set(DoubleSolenoid.Value.OFF);
+      assertEquals(DoubleSolenoid.Value.OFF, solenoid.get());
     }
   }
 
@@ -63,18 +63,18 @@ class DoubleSolenoidTestCTRE {
   void testToggle() {
     try (DoubleSolenoid solenoid = new DoubleSolenoid(0, 4, PneumaticsModuleType.CTREPCM, 2, 3)) {
       // Bootstrap it into reverse
-      solenoid.set(DoubleSolenoid.Value.kReverse);
+      solenoid.set(DoubleSolenoid.Value.REVERSE);
 
       solenoid.toggle();
-      assertEquals(DoubleSolenoid.Value.kForward, solenoid.get());
+      assertEquals(DoubleSolenoid.Value.FORWARD, solenoid.get());
 
       solenoid.toggle();
-      assertEquals(DoubleSolenoid.Value.kReverse, solenoid.get());
+      assertEquals(DoubleSolenoid.Value.REVERSE, solenoid.get());
 
       // Of shouldn't do anything on toggle
-      solenoid.set(DoubleSolenoid.Value.kOff);
+      solenoid.set(DoubleSolenoid.Value.OFF);
       solenoid.toggle();
-      assertEquals(DoubleSolenoid.Value.kOff, solenoid.get());
+      assertEquals(DoubleSolenoid.Value.OFF, solenoid.get());
     }
   }
 

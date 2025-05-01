@@ -24,7 +24,7 @@ class PS5ControllerTest {
     PS5Controller joy = new PS5Controller(2);
     PS5ControllerSim joysim = new PS5ControllerSim(joy);
 
-    var buttonName = button.toString();
+    String buttonName = button.toString();
 
     String simSetMethodName = "set" + buttonName;
     String joyGetMethodName = "get" + buttonName;
@@ -64,7 +64,7 @@ class PS5ControllerTest {
     PS5Controller joy = new PS5Controller(2);
     PS5ControllerSim joysim = new PS5ControllerSim(joy);
 
-    var axisName = axis.toString();
+    String axisName = axis.toString();
 
     String simSetMethodName = "set" + axisName;
     String joyGetMethodName = "get" + axisName;

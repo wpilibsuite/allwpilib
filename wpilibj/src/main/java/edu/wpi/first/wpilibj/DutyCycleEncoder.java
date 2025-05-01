@@ -86,8 +86,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     m_simDevice = SimDevice.create("DutyCycle:DutyCycleEncoder", m_dutyCycle.getSourceChannel());
 
     if (m_simDevice != null) {
-      m_simPosition = m_simDevice.createDouble("Position", SimDevice.Direction.kInput, 0.0);
-      m_simIsConnected = m_simDevice.createBoolean("Connected", SimDevice.Direction.kInput, true);
+      m_simPosition = m_simDevice.createDouble("Position", SimDevice.Direction.INPUT, 0.0);
+      m_simIsConnected = m_simDevice.createBoolean("Connected", SimDevice.Direction.INPUT, true);
     }
 
     m_fullRange = fullRange;

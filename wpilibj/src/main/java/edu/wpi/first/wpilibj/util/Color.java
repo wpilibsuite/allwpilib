@@ -107,9 +107,9 @@ public class Color {
   public static Color fromHSV(int h, int s, int v) {
     int rgb = hsvToRgb(h, s, v);
     return new Color(
-        unpackRGB(rgb, RGBChannel.kRed),
-        unpackRGB(rgb, RGBChannel.kGreen),
-        unpackRGB(rgb, RGBChannel.kBlue));
+        unpackRGB(rgb, RGBChannel.RED),
+        unpackRGB(rgb, RGBChannel.GREEN),
+        unpackRGB(rgb, RGBChannel.BLUE));
   }
 
   @Override
@@ -229,11 +229,11 @@ public class Color {
   /** Represents a color channel in an RGB color. */
   public enum RGBChannel {
     /** The red channel of an RGB color. */
-    kRed,
+    RED,
     /** The green channel of an RGB color. */
-    kGreen,
+    GREEN,
     /** The blue channel of an RGB color. */
-    kBlue
+    BLUE
   }
 
   /**
@@ -261,9 +261,9 @@ public class Color {
    */
   public static int unpackRGB(int packedColor, RGBChannel channel) {
     return switch (channel) {
-      case kRed -> (packedColor >> 16) & 0xFF;
-      case kGreen -> (packedColor >> 8) & 0xFF;
-      case kBlue -> packedColor & 0xFF;
+      case RED -> (packedColor >> 16) & 0xFF;
+      case GREEN -> (packedColor >> 8) & 0xFF;
+      case BLUE -> packedColor & 0xFF;
     };
   }
 
@@ -279,9 +279,9 @@ public class Color {
     int packedRGB = lerpRGB(a.red, a.green, a.blue, b.red, b.green, b.blue, t);
 
     return new Color(
-        unpackRGB(packedRGB, RGBChannel.kRed),
-        unpackRGB(packedRGB, RGBChannel.kGreen),
-        unpackRGB(packedRGB, RGBChannel.kBlue));
+        unpackRGB(packedRGB, RGBChannel.RED),
+        unpackRGB(packedRGB, RGBChannel.GREEN),
+        unpackRGB(packedRGB, RGBChannel.BLUE));
   }
 
   /**
@@ -338,494 +338,491 @@ public class Color {
    */
 
   /** 0x1560BD. */
-  public static final Color kDenim = new Color(0.0823529412, 0.376470589, 0.7411764706, "kDenim");
+  public static final Color DENIM = new Color(0.0823529412, 0.376470589, 0.7411764706, "DENIM");
 
   /** 0x0066B3. */
-  public static final Color kFirstBlue = new Color(0.0, 0.4, 0.7019607844, "kFirstBlue");
+  public static final Color FIRST_BLUE = new Color(0.0, 0.4, 0.7019607844, "FIRST_BLUE");
 
   /** 0xED1C24. */
-  public static final Color kFirstRed =
-      new Color(0.9294117648, 0.1098039216, 0.1411764706, "kFirstRed");
+  public static final Color FIRST_RED =
+      new Color(0.9294117648, 0.1098039216, 0.1411764706, "FIRST_RED");
 
   /*
    * Standard Colors
    */
 
   /** 0xF0F8FF. */
-  public static final Color kAliceBlue = new Color(0.9411765f, 0.972549f, 1.0f, "kAliceBlue");
+  public static final Color ALICE_BLUE = new Color(0.9411765f, 0.972549f, 1.0f, "ALICE_BLUE");
 
   /** 0xFAEBD7. */
-  public static final Color kAntiqueWhite =
-      new Color(0.98039216f, 0.92156863f, 0.84313726f, "kAntiqueWhite");
+  public static final Color ANTIQUE_WHITE =
+      new Color(0.98039216f, 0.92156863f, 0.84313726f, "ANTIQUE_WHITE");
 
   /** 0x00FFFF. */
-  public static final Color kAqua = new Color(0.0f, 1.0f, 1.0f, "kAqua");
+  public static final Color AGUA = new Color(0.0f, 1.0f, 1.0f, "AGUA");
 
   /** 0x7FFFD4. */
-  public static final Color kAquamarine = new Color(0.49803922f, 1.0f, 0.83137256f, "kAquamarine");
+  public static final Color AQUAMARINE = new Color(0.49803922f, 1.0f, 0.83137256f, "AQUAMARINE");
 
   /** 0xF0FFFF. */
-  public static final Color kAzure = new Color(0.9411765f, 1.0f, 1.0f, "kAzure");
+  public static final Color AZURE = new Color(0.9411765f, 1.0f, 1.0f, "AZURE");
 
   /** 0xF5F5DC. */
-  public static final Color kBeige = new Color(0.9607843f, 0.9607843f, 0.8627451f, "kBeige");
+  public static final Color BEIGE = new Color(0.9607843f, 0.9607843f, 0.8627451f, "BEIGE");
 
   /** 0xFFE4C4. */
-  public static final Color kBisque = new Color(1.0f, 0.89411765f, 0.76862746f, "kBisque");
+  public static final Color BISQUE = new Color(1.0f, 0.89411765f, 0.76862746f, "BISQUE");
 
   /** 0x000000. */
-  public static final Color kBlack = new Color(0.0f, 0.0f, 0.0f, "kBlack");
+  public static final Color BLACK = new Color(0.0f, 0.0f, 0.0f, "BLACK");
 
   /** 0xFFEBCD. */
-  public static final Color kBlanchedAlmond =
-      new Color(1.0f, 0.92156863f, 0.8039216f, "kBlanchedAlmond");
+  public static final Color BLANCHED_ALMOND =
+      new Color(1.0f, 0.92156863f, 0.8039216f, "BLANCHED_ALMOND");
 
   /** 0x0000FF. */
-  public static final Color kBlue = new Color(0.0f, 0.0f, 1.0f, "kBlue");
+  public static final Color BLUE = new Color(0.0f, 0.0f, 1.0f, "BLUE");
 
   /** 0x8A2BE2. */
-  public static final Color kBlueViolet =
-      new Color(0.5411765f, 0.16862746f, 0.8862745f, "kBlueViolet");
+  public static final Color BLUE_VIOLET =
+      new Color(0.5411765f, 0.16862746f, 0.8862745f, "BLUE_VIOLET");
 
   /** 0xA52A2A. */
-  public static final Color kBrown = new Color(0.64705884f, 0.16470589f, 0.16470589f, "kBrown");
+  public static final Color BROWN = new Color(0.64705884f, 0.16470589f, 0.16470589f, "BROWN");
 
   /** 0xDEB887. */
-  public static final Color kBurlywood =
-      new Color(0.87058824f, 0.72156864f, 0.5294118f, "kBurlywood");
+  public static final Color BURLYWOOD =
+      new Color(0.87058824f, 0.72156864f, 0.5294118f, "BURLYWOOD");
 
   /** 0x5F9EA0. */
-  public static final Color kCadetBlue =
-      new Color(0.37254903f, 0.61960787f, 0.627451f, "kCadetBlue");
+  public static final Color CADET_BLUE =
+      new Color(0.37254903f, 0.61960787f, 0.627451f, "CADET_BLUE");
 
   /** 0x7FFF00. */
-  public static final Color kChartreuse = new Color(0.49803922f, 1.0f, 0.0f, "kChartreuse");
+  public static final Color CHARTREUSE = new Color(0.49803922f, 1.0f, 0.0f, "CHARTREUSE");
 
   /** 0xD2691E. */
-  public static final Color kChocolate =
-      new Color(0.8235294f, 0.4117647f, 0.11764706f, "kChocolate");
+  public static final Color CHOCOLATE = new Color(0.8235294f, 0.4117647f, 0.11764706f, "CHOCOLATE");
 
   /** 0xFF7F50. */
-  public static final Color kCoral = new Color(1.0f, 0.49803922f, 0.3137255f, "kCoral");
+  public static final Color CORAL = new Color(1.0f, 0.49803922f, 0.3137255f, "CORAL");
 
   /** 0x6495ED. */
-  public static final Color kCornflowerBlue =
-      new Color(0.39215687f, 0.58431375f, 0.92941177f, "kCornflowerBlue");
+  public static final Color CORNFLOWER_BLUE =
+      new Color(0.39215687f, 0.58431375f, 0.92941177f, "CORNFLOWER_BLUE");
 
   /** 0xFFF8DC. */
-  public static final Color kCornsilk = new Color(1.0f, 0.972549f, 0.8627451f, "kCornsilk");
+  public static final Color CORNSILK = new Color(1.0f, 0.972549f, 0.8627451f, "CORNSILK");
 
   /** 0xDC143C. */
-  public static final Color kCrimson = new Color(0.8627451f, 0.078431375f, 0.23529412f, "kCrimson");
+  public static final Color CRIMSON = new Color(0.8627451f, 0.078431375f, 0.23529412f, "CRIMSON");
 
   /** 0x00FFFF. */
-  public static final Color kCyan = new Color(0.0f, 1.0f, 1.0f, "kCyan");
+  public static final Color CYAN = new Color(0.0f, 1.0f, 1.0f, "CYAN");
 
   /** 0x00008B. */
-  public static final Color kDarkBlue = new Color(0.0f, 0.0f, 0.54509807f, "kDarkBlue");
+  public static final Color DARK_BLUE = new Color(0.0f, 0.0f, 0.54509807f, "DARK_BLUE");
 
   /** 0x008B8B. */
-  public static final Color kDarkCyan = new Color(0.0f, 0.54509807f, 0.54509807f, "kDarkCyan");
+  public static final Color DARK_CYAN = new Color(0.0f, 0.54509807f, 0.54509807f, "DARK_CYAN");
 
   /** 0xB8860B. */
-  public static final Color kDarkGoldenrod =
-      new Color(0.72156864f, 0.5254902f, 0.043137256f, "kDarkGoldenrod");
+  public static final Color DARK_GOLDENROD =
+      new Color(0.72156864f, 0.5254902f, 0.043137256f, "DARK_GOLDENROD");
 
   /** 0xA9A9A9. */
-  public static final Color kDarkGray = new Color(0.6627451f, 0.6627451f, 0.6627451f, "kDarkGray");
+  public static final Color DARK_GRAY = new Color(0.6627451f, 0.6627451f, 0.6627451f, "DARK_GRAY");
 
   /** 0x006400. */
-  public static final Color kDarkGreen = new Color(0.0f, 0.39215687f, 0.0f, "kDarkGreen");
+  public static final Color DARK_GREEN = new Color(0.0f, 0.39215687f, 0.0f, "DARK_GREEN");
 
   /** 0xBDB76B. */
-  public static final Color kDarkKhaki =
-      new Color(0.7411765f, 0.7176471f, 0.41960785f, "kDarkKhaki");
+  public static final Color DARK_KHAKI =
+      new Color(0.7411765f, 0.7176471f, 0.41960785f, "DARK_KHAKI");
 
   /** 0x8B008B. */
-  public static final Color kDarkMagenta =
-      new Color(0.54509807f, 0.0f, 0.54509807f, "kDarkMagenta");
+  public static final Color DARK_MAGENTA =
+      new Color(0.54509807f, 0.0f, 0.54509807f, "DARK_MAGENTA");
 
   /** 0x556B2F. */
-  public static final Color kDarkOliveGreen =
-      new Color(0.33333334f, 0.41960785f, 0.18431373f, "kDarkOliveGreen");
+  public static final Color DARK_OLIVE_GREEN =
+      new Color(0.33333334f, 0.41960785f, 0.18431373f, "DARK_OLIVE_GREEN");
 
   /** 0xFF8C00. */
-  public static final Color kDarkOrange = new Color(1.0f, 0.54901963f, 0.0f, "kDarkOrange");
+  public static final Color DARK_ORANGE = new Color(1.0f, 0.54901963f, 0.0f, "DARK_ORANGE");
 
   /** 0x9932CC. */
-  public static final Color kDarkOrchid = new Color(0.6f, 0.19607843f, 0.8f, "kDarkOrchid");
+  public static final Color DARK_ORCHID = new Color(0.6f, 0.19607843f, 0.8f, "DARK_ORCHID");
 
   /** 0x8B0000. */
-  public static final Color kDarkRed = new Color(0.54509807f, 0.0f, 0.0f, "kDarkRed");
+  public static final Color DARK_RED = new Color(0.54509807f, 0.0f, 0.0f, "DARK_RED");
 
   /** 0xE9967A. */
-  public static final Color kDarkSalmon =
-      new Color(0.9137255f, 0.5882353f, 0.47843137f, "kDarkSalmon");
+  public static final Color DARK_SALMON =
+      new Color(0.9137255f, 0.5882353f, 0.47843137f, "DARK_SALMON");
 
   /** 0x8FBC8F. */
-  public static final Color kDarkSeaGreen =
-      new Color(0.56078434f, 0.7372549f, 0.56078434f, "kDarkSeaGreen");
+  public static final Color DARK_SEA_GREEN =
+      new Color(0.56078434f, 0.7372549f, 0.56078434f, "DARK_SEA_GREEN");
 
   /** 0x483D8B. */
-  public static final Color kDarkSlateBlue =
-      new Color(0.28235295f, 0.23921569f, 0.54509807f, "kDarkSlateBlue");
+  public static final Color DARK_SLATE_BLUE =
+      new Color(0.28235295f, 0.23921569f, 0.54509807f, "DARK_SLATE_BLUE");
 
   /** 0x2F4F4F. */
-  public static final Color kDarkSlateGray =
-      new Color(0.18431373f, 0.30980393f, 0.30980393f, "kDarkSlateGray");
+  public static final Color DARK_SLATE_GRAY =
+      new Color(0.18431373f, 0.30980393f, 0.30980393f, "DARK_SLATE_GRAY");
 
   /** 0x00CED1. */
-  public static final Color kDarkTurquoise =
-      new Color(0.0f, 0.80784315f, 0.81960785f, "kDarkTurquoise");
+  public static final Color DARK_TURQUOISE =
+      new Color(0.0f, 0.80784315f, 0.81960785f, "DARK_TURQUOISE");
 
   /** 0x9400D3. */
-  public static final Color kDarkViolet = new Color(0.5803922f, 0.0f, 0.827451f, "kDarkViolet");
+  public static final Color DARK_VIOLET = new Color(0.5803922f, 0.0f, 0.827451f, "DARK_VIOLET");
 
   /** 0xFF1493. */
-  public static final Color kDeepPink = new Color(1.0f, 0.078431375f, 0.5764706f, "kDeepPink");
+  public static final Color DEEP_PINK = new Color(1.0f, 0.078431375f, 0.5764706f, "DEEP_PINK");
 
   /** 0x00BFFF. */
-  public static final Color kDeepSkyBlue = new Color(0.0f, 0.7490196f, 1.0f, "kDeepSkyBlue");
+  public static final Color DEEP_SKY_BLUE = new Color(0.0f, 0.7490196f, 1.0f, "DEEP_SKY_BLUE");
 
   /** 0x696969. */
-  public static final Color kDimGray = new Color(0.4117647f, 0.4117647f, 0.4117647f, "kDimGray");
+  public static final Color DIM_GRAY = new Color(0.4117647f, 0.4117647f, 0.4117647f, "DIM_GRAY");
 
   /** 0x1E90FF. */
-  public static final Color kDodgerBlue = new Color(0.11764706f, 0.5647059f, 1.0f, "kDodgerBlue");
+  public static final Color DODGER_BLUE = new Color(0.11764706f, 0.5647059f, 1.0f, "DODGER_BLUE");
 
   /** 0xB22222. */
-  public static final Color kFirebrick =
-      new Color(0.69803923f, 0.13333334f, 0.13333334f, "kFirebrick");
+  public static final Color FIREBRICK =
+      new Color(0.69803923f, 0.13333334f, 0.13333334f, "FIREBRICK");
 
   /** 0xFFFAF0. */
-  public static final Color kFloralWhite = new Color(1.0f, 0.98039216f, 0.9411765f, "kFloralWhite");
+  public static final Color FLORAL_WHITE = new Color(1.0f, 0.98039216f, 0.9411765f, "FLORAL_WHITE");
 
   /** 0x228B22. */
-  public static final Color kForestGreen =
-      new Color(0.13333334f, 0.54509807f, 0.13333334f, "kForestGreen");
+  public static final Color FOREST_GREEN =
+      new Color(0.13333334f, 0.54509807f, 0.13333334f, "FOREST_GREEN");
 
   /** 0xFF00FF. */
-  public static final Color kFuchsia = new Color(1.0f, 0.0f, 1.0f, "kFuchsia");
+  public static final Color FUCHSIA = new Color(1.0f, 0.0f, 1.0f, "FUCHSIA");
 
   /** 0xDCDCDC. */
-  public static final Color kGainsboro =
-      new Color(0.8627451f, 0.8627451f, 0.8627451f, "kGainsboro");
+  public static final Color GAINSBORO = new Color(0.8627451f, 0.8627451f, 0.8627451f, "GAINSBORO");
 
   /** 0xF8F8FF. */
-  public static final Color kGhostWhite = new Color(0.972549f, 0.972549f, 1.0f, "kGhostWhite");
+  public static final Color GHOST_WHITE = new Color(0.972549f, 0.972549f, 1.0f, "GHOST_WHITE");
 
   /** 0xFFD700. */
-  public static final Color kGold = new Color(1.0f, 0.84313726f, 0.0f, "kGold");
+  public static final Color GOLD = new Color(1.0f, 0.84313726f, 0.0f, "GOLD");
 
   /** 0xDAA520. */
-  public static final Color kGoldenrod =
-      new Color(0.85490197f, 0.64705884f, 0.1254902f, "kGoldenrod");
+  public static final Color GOLDENROD =
+      new Color(0.85490197f, 0.64705884f, 0.1254902f, "GOLDENROD");
 
   /** 0x808080. */
-  public static final Color kGray = new Color(0.5019608f, 0.5019608f, 0.5019608f, "kGray");
+  public static final Color GRAY = new Color(0.5019608f, 0.5019608f, 0.5019608f, "GRAY");
 
   /** 0x008000. */
-  public static final Color kGreen = new Color(0.0f, 0.5019608f, 0.0f, "kGreen");
+  public static final Color GREEN = new Color(0.0f, 0.5019608f, 0.0f, "GREEN");
 
   /** 0xADFF2F. */
-  public static final Color kGreenYellow = new Color(0.6784314f, 1.0f, 0.18431373f, "kGreenYellow");
+  public static final Color GREEN_YELLOW = new Color(0.6784314f, 1.0f, 0.18431373f, "GREEN_YELLOW");
 
   /** 0xF0FFF0. */
-  public static final Color kHoneydew = new Color(0.9411765f, 1.0f, 0.9411765f, "kHoneydew");
+  public static final Color HONEYDEW = new Color(0.9411765f, 1.0f, 0.9411765f, "HONEYDEW");
 
   /** 0xFF69B4. */
-  public static final Color kHotPink = new Color(1.0f, 0.4117647f, 0.7058824f, "kHotPink");
+  public static final Color HOT_PINK = new Color(1.0f, 0.4117647f, 0.7058824f, "HOT_PINK");
 
   /** 0xCD5C5C. */
-  public static final Color kIndianRed =
-      new Color(0.8039216f, 0.36078432f, 0.36078432f, "kIndianRed");
+  public static final Color INDIAN_RED =
+      new Color(0.8039216f, 0.36078432f, 0.36078432f, "INDIAN_RED");
 
   /** 0x4B0082. */
-  public static final Color kIndigo = new Color(0.29411766f, 0.0f, 0.50980395f, "kIndigo");
+  public static final Color INDIGO = new Color(0.29411766f, 0.0f, 0.50980395f, "INDIGO");
 
   /** 0xFFFFF0. */
-  public static final Color kIvory = new Color(1.0f, 1.0f, 0.9411765f, "kIvory");
+  public static final Color IVORY = new Color(1.0f, 1.0f, 0.9411765f, "IVORY");
 
   /** 0xF0E68C. */
-  public static final Color kKhaki = new Color(0.9411765f, 0.9019608f, 0.54901963f, "kKhaki");
+  public static final Color KHAKI = new Color(0.9411765f, 0.9019608f, 0.54901963f, "KHAKI");
 
   /** 0xE6E6FA. */
-  public static final Color kLavender = new Color(0.9019608f, 0.9019608f, 0.98039216f, "kLavender");
+  public static final Color LAVENDER = new Color(0.9019608f, 0.9019608f, 0.98039216f, "LAVENDER");
 
   /** 0xFFF0F5. */
-  public static final Color kLavenderBlush =
-      new Color(1.0f, 0.9411765f, 0.9607843f, "kLavenderBlush");
+  public static final Color LAVENDER_BLUSH =
+      new Color(1.0f, 0.9411765f, 0.9607843f, "LAVENDER_BLUSH");
 
   /** 0x7CFC00. */
-  public static final Color kLawnGreen = new Color(0.4862745f, 0.9882353f, 0.0f, "kLawnGreen");
+  public static final Color LAWN_GREEN = new Color(0.4862745f, 0.9882353f, 0.0f, "LAWN_GREEN");
 
   /** 0xFFFACD. */
-  public static final Color kLemonChiffon =
-      new Color(1.0f, 0.98039216f, 0.8039216f, "kLemonChiffon");
+  public static final Color LEMON_CHIFFON =
+      new Color(1.0f, 0.98039216f, 0.8039216f, "LEMON_CHIFFON");
 
   /** 0xADD8E6. */
-  public static final Color kLightBlue =
-      new Color(0.6784314f, 0.84705883f, 0.9019608f, "kLightBlue");
+  public static final Color LIGHT_BLUE =
+      new Color(0.6784314f, 0.84705883f, 0.9019608f, "LIGHT_BLUE");
 
   /** 0xF08080. */
-  public static final Color kLightCoral =
-      new Color(0.9411765f, 0.5019608f, 0.5019608f, "kLightCoral");
+  public static final Color LIGHT_CORAL =
+      new Color(0.9411765f, 0.5019608f, 0.5019608f, "LIGHT_CORAL");
 
   /** 0xE0FFFF. */
-  public static final Color kLightCyan = new Color(0.8784314f, 1.0f, 1.0f, "kLightCyan");
+  public static final Color LIGHT_CYAN = new Color(0.8784314f, 1.0f, 1.0f, "LIGHT_CYAN");
 
   /** 0xFAFAD2. */
-  public static final Color kLightGoldenrodYellow =
-      new Color(0.98039216f, 0.98039216f, 0.8235294f, "kLightGoldenrodYellow");
+  public static final Color LIGHT_GOLDENROD_YELLOW =
+      new Color(0.98039216f, 0.98039216f, 0.8235294f, "LIGHT_GOLDENROD_YELLOW");
 
   /** 0xD3D3D3. */
-  public static final Color kLightGray = new Color(0.827451f, 0.827451f, 0.827451f, "kLightGray");
+  public static final Color LIGHT_GRAY = new Color(0.827451f, 0.827451f, 0.827451f, "LIGHT_GRAY");
 
   /** 0x90EE90. */
-  public static final Color kLightGreen =
-      new Color(0.5647059f, 0.93333334f, 0.5647059f, "kLightGreen");
+  public static final Color LIGHT_GREEN =
+      new Color(0.5647059f, 0.93333334f, 0.5647059f, "LIGHT_GREEN");
 
   /** 0xFFB6C1. */
-  public static final Color kLightPink = new Color(1.0f, 0.7137255f, 0.75686276f, "kLightPink");
+  public static final Color LIGHT_PINK = new Color(1.0f, 0.7137255f, 0.75686276f, "LIGHT_PINK");
 
   /** 0xFFA07A. */
-  public static final Color kLightSalmon = new Color(1.0f, 0.627451f, 0.47843137f, "kLightSalmon");
+  public static final Color LIGHT_SALMON = new Color(1.0f, 0.627451f, 0.47843137f, "LIGHT_SALMON");
 
   /** 0x20B2AA. */
-  public static final Color kLightSeaGreen =
-      new Color(0.1254902f, 0.69803923f, 0.6666667f, "kLightSeaGreen");
+  public static final Color LIGHT_SEA_GREEN =
+      new Color(0.1254902f, 0.69803923f, 0.6666667f, "LIGHT_SEA_GREEN");
 
   /** 0x87CEFA. */
-  public static final Color kLightSkyBlue =
-      new Color(0.5294118f, 0.80784315f, 0.98039216f, "kLightSkyBlue");
+  public static final Color LIGHT_SKY_BLUE =
+      new Color(0.5294118f, 0.80784315f, 0.98039216f, "LIGHT_SKY_BLUE");
 
   /** 0x778899. */
-  public static final Color kLightSlateGray =
-      new Color(0.46666667f, 0.53333336f, 0.6f, "kLightSlateGray");
+  public static final Color LIGHT_SLATE_GRAY =
+      new Color(0.46666667f, 0.53333336f, 0.6f, "LIGHT_SLATE_GRAY");
 
   /** 0xB0C4DE. */
-  public static final Color kLightSteelBlue =
-      new Color(0.6901961f, 0.76862746f, 0.87058824f, "kLightSteelBlue");
+  public static final Color LIGHT_STEEL_BLUE =
+      new Color(0.6901961f, 0.76862746f, 0.87058824f, "LIGHT_STEEL_BLUE");
 
   /** 0xFFFFE0. */
-  public static final Color kLightYellow = new Color(1.0f, 1.0f, 0.8784314f, "kLightYellow");
+  public static final Color LIGHT_YELLOW = new Color(1.0f, 1.0f, 0.8784314f, "LIGHT_YELLOW");
 
   /** 0x00FF00. */
-  public static final Color kLime = new Color(0.0f, 1.0f, 0.0f, "kLime");
+  public static final Color LIME = new Color(0.0f, 1.0f, 0.0f, "LIME");
 
   /** 0x32CD32. */
-  public static final Color kLimeGreen =
-      new Color(0.19607843f, 0.8039216f, 0.19607843f, "kLimeGreen");
+  public static final Color LIME_GREEN =
+      new Color(0.19607843f, 0.8039216f, 0.19607843f, "LIME_GREEN");
 
   /** 0xFAF0E6. */
-  public static final Color kLinen = new Color(0.98039216f, 0.9411765f, 0.9019608f, "kLinen");
+  public static final Color LINEN = new Color(0.98039216f, 0.9411765f, 0.9019608f, "LINEN");
 
   /** 0xFF00FF. */
-  public static final Color kMagenta = new Color(1.0f, 0.0f, 1.0f, "kMagenta");
+  public static final Color MAGENTA = new Color(1.0f, 0.0f, 1.0f, "MAGENTA");
 
   /** 0x800000. */
-  public static final Color kMaroon = new Color(0.5019608f, 0.0f, 0.0f, "kMaroon");
+  public static final Color MAROON = new Color(0.5019608f, 0.0f, 0.0f, "MAROON");
 
   /** 0x66CDAA. */
-  public static final Color kMediumAquamarine =
-      new Color(0.4f, 0.8039216f, 0.6666667f, "kMediumAquamarine");
+  public static final Color MEDIUM_AQUAMARINE =
+      new Color(0.4f, 0.8039216f, 0.6666667f, "MEDIUM_AQUAMARINE");
 
   /** 0x0000CD. */
-  public static final Color kMediumBlue = new Color(0.0f, 0.0f, 0.8039216f, "kMediumBlue");
+  public static final Color MEDIUM_BLUE = new Color(0.0f, 0.0f, 0.8039216f, "MEDIUM_BLUE");
 
   /** 0xBA55D3. */
-  public static final Color kMediumOrchid =
-      new Color(0.7294118f, 0.33333334f, 0.827451f, "kMediumOrchid");
+  public static final Color MEDIUM_ORCHID =
+      new Color(0.7294118f, 0.33333334f, 0.827451f, "MEDIUM_ORCHID");
 
   /** 0x9370DB. */
-  public static final Color kMediumPurple =
-      new Color(0.5764706f, 0.4392157f, 0.85882354f, "kMediumPurple");
+  public static final Color MEDIUM_PURPLE =
+      new Color(0.5764706f, 0.4392157f, 0.85882354f, "MEDIUM_PURPLE");
 
   /** 0x3CB371. */
-  public static final Color kMediumSeaGreen =
-      new Color(0.23529412f, 0.7019608f, 0.44313726f, "kMediumSeaGreen");
+  public static final Color MEDIUM_SEA_GREEN =
+      new Color(0.23529412f, 0.7019608f, 0.44313726f, "MEDIUM_SEA_GREEN");
 
   /** 0x7B68EE. */
-  public static final Color kMediumSlateBlue =
-      new Color(0.48235294f, 0.40784314f, 0.93333334f, "kMediumSlateBlue");
+  public static final Color MEDIUM_SLATE_BLUE =
+      new Color(0.48235294f, 0.40784314f, 0.93333334f, "MEDIUM_SLATE_BLUE");
 
   /** 0x00FA9A. */
-  public static final Color kMediumSpringGreen =
-      new Color(0.0f, 0.98039216f, 0.6039216f, "kMediumSpringGreen");
+  public static final Color MEDIUM_SPRING_GREEN =
+      new Color(0.0f, 0.98039216f, 0.6039216f, "MEDIUM_SPRING_GREEN");
 
   /** 0x48D1CC. */
-  public static final Color kMediumTurquoise =
-      new Color(0.28235295f, 0.81960785f, 0.8f, "kMediumTurquoise");
+  public static final Color MEDIUM_TURQUOISE =
+      new Color(0.28235295f, 0.81960785f, 0.8f, "MEDIUM_TURQUOISE");
 
   /** 0xC71585. */
-  public static final Color kMediumVioletRed =
-      new Color(0.78039217f, 0.08235294f, 0.52156866f, "kMediumVioletRed");
+  public static final Color MEDIUM_VIOLET_RED =
+      new Color(0.78039217f, 0.08235294f, 0.52156866f, "MEDIUM_VIOLET_RED");
 
   /** 0x191970. */
-  public static final Color kMidnightBlue =
-      new Color(0.09803922f, 0.09803922f, 0.4392157f, "kMidnightBlue");
+  public static final Color MIDNIGHT_BLUE =
+      new Color(0.09803922f, 0.09803922f, 0.4392157f, "MIDNIGHT_BLUE");
 
   /** 0xF5FFFA. */
-  public static final Color kMintcream = new Color(0.9607843f, 1.0f, 0.98039216f, "kMintcream");
+  public static final Color MINTCREAM = new Color(0.9607843f, 1.0f, 0.98039216f, "MINTCREAM");
 
   /** 0xFFE4E1. */
-  public static final Color kMistyRose = new Color(1.0f, 0.89411765f, 0.88235295f, "kMistyRose");
+  public static final Color MISTY_ROSE = new Color(1.0f, 0.89411765f, 0.88235295f, "MISTY_ROSE");
 
   /** 0xFFE4B5. */
-  public static final Color kMoccasin = new Color(1.0f, 0.89411765f, 0.70980394f, "kMoccasin");
+  public static final Color MOCCASIN = new Color(1.0f, 0.89411765f, 0.70980394f, "MOCCASIN");
 
   /** 0xFFDEAD. */
-  public static final Color kNavajoWhite = new Color(1.0f, 0.87058824f, 0.6784314f, "kNavajoWhite");
+  public static final Color NAVAJO_WHITE = new Color(1.0f, 0.87058824f, 0.6784314f, "NAVAJO_WHITE");
 
   /** 0x000080. */
-  public static final Color kNavy = new Color(0.0f, 0.0f, 0.5019608f, "kNavy");
+  public static final Color NAVY = new Color(0.0f, 0.0f, 0.5019608f, "NAVY");
 
   /** 0xFDF5E6. */
-  public static final Color kOldLace = new Color(0.99215686f, 0.9607843f, 0.9019608f, "kOldLace");
+  public static final Color OLD_LACE = new Color(0.99215686f, 0.9607843f, 0.9019608f, "OLD_LACE");
 
   /** 0x808000. */
-  public static final Color kOlive = new Color(0.5019608f, 0.5019608f, 0.0f, "kOlive");
+  public static final Color OLIVE = new Color(0.5019608f, 0.5019608f, 0.0f, "OLIVE");
 
   /** 0x6B8E23. */
-  public static final Color kOliveDrab =
-      new Color(0.41960785f, 0.5568628f, 0.13725491f, "kOliveDrab");
+  public static final Color OLIVE_DRAB =
+      new Color(0.41960785f, 0.5568628f, 0.13725491f, "OLIVE_DRAB");
 
   /** 0xFFA500. */
-  public static final Color kOrange = new Color(1.0f, 0.64705884f, 0.0f, "kOrange");
+  public static final Color ORANGE = new Color(1.0f, 0.64705884f, 0.0f, "ORANGE");
 
   /** 0xFF4500. */
-  public static final Color kOrangeRed = new Color(1.0f, 0.27058825f, 0.0f, "kOrangeRed");
+  public static final Color ORANGE_RED = new Color(1.0f, 0.27058825f, 0.0f, "ORANGE_RED");
 
   /** 0xDA70D6. */
-  public static final Color kOrchid = new Color(0.85490197f, 0.4392157f, 0.8392157f, "kOrchid");
+  public static final Color ORCHID = new Color(0.85490197f, 0.4392157f, 0.8392157f, "ORCHID");
 
   /** 0xEEE8AA. */
-  public static final Color kPaleGoldenrod =
-      new Color(0.93333334f, 0.9098039f, 0.6666667f, "kPaleGoldenrod");
+  public static final Color PALE_GOLDENROD =
+      new Color(0.93333334f, 0.9098039f, 0.6666667f, "PALE_GOLDENROD");
 
   /** 0x98FB98. */
-  public static final Color kPaleGreen =
-      new Color(0.59607846f, 0.9843137f, 0.59607846f, "kPaleGreen");
+  public static final Color PALE_GREEN =
+      new Color(0.59607846f, 0.9843137f, 0.59607846f, "PALE_GREEN");
 
   /** 0xAFEEEE. */
-  public static final Color kPaleTurquoise =
-      new Color(0.6862745f, 0.93333334f, 0.93333334f, "kPaleTurquoise");
+  public static final Color PALE_TURQUOISE =
+      new Color(0.6862745f, 0.93333334f, 0.93333334f, "PALE_TURQUOISE");
 
   /** 0xDB7093. */
-  public static final Color kPaleVioletRed =
-      new Color(0.85882354f, 0.4392157f, 0.5764706f, "kPaleVioletRed");
+  public static final Color PALE_VIOLET_RED =
+      new Color(0.85882354f, 0.4392157f, 0.5764706f, "PALE_VIOLET_RED");
 
   /** 0xFFEFD5. */
-  public static final Color kPapayaWhip = new Color(1.0f, 0.9372549f, 0.8352941f, "kPapayaWhip");
+  public static final Color PAPAYA_WHIP = new Color(1.0f, 0.9372549f, 0.8352941f, "PAPAYA_WHIP");
 
   /** 0xFFDAB9. */
-  public static final Color kPeachPuff = new Color(1.0f, 0.85490197f, 0.7254902f, "kPeachPuff");
+  public static final Color PEACH_PUFF = new Color(1.0f, 0.85490197f, 0.7254902f, "PEACH_PUFF");
 
   /** 0xCD853F. */
-  public static final Color kPeru = new Color(0.8039216f, 0.52156866f, 0.24705882f, "kPeru");
+  public static final Color PERU = new Color(0.8039216f, 0.52156866f, 0.24705882f, "PERU");
 
   /** 0xFFC0CB. */
-  public static final Color kPink = new Color(1.0f, 0.7529412f, 0.79607844f, "kPink");
+  public static final Color PINK = new Color(1.0f, 0.7529412f, 0.79607844f, "PINK");
 
   /** 0xDDA0DD. */
-  public static final Color kPlum = new Color(0.8666667f, 0.627451f, 0.8666667f, "kPlum");
+  public static final Color PLUM = new Color(0.8666667f, 0.627451f, 0.8666667f, "PLUM");
 
   /** 0xB0E0E6. */
-  public static final Color kPowderBlue =
-      new Color(0.6901961f, 0.8784314f, 0.9019608f, "kPowderBlue");
+  public static final Color POWDER_BLUE =
+      new Color(0.6901961f, 0.8784314f, 0.9019608f, "POWDER_BLUE");
 
   /** 0x800080. */
-  public static final Color kPurple = new Color(0.5019608f, 0.0f, 0.5019608f, "kPurple");
+  public static final Color PURPLE = new Color(0.5019608f, 0.0f, 0.5019608f, "PURPLE");
 
   /** 0xFF0000. */
-  public static final Color kRed = new Color(1.0f, 0.0f, 0.0f, "kRed");
+  public static final Color RED = new Color(1.0f, 0.0f, 0.0f, "RED");
 
   /** 0xBC8F8F. */
-  public static final Color kRosyBrown =
-      new Color(0.7372549f, 0.56078434f, 0.56078434f, "kRosyBrown");
+  public static final Color ROSY_BROWN =
+      new Color(0.7372549f, 0.56078434f, 0.56078434f, "ROSY_BROWN");
 
   /** 0x4169E1. */
-  public static final Color kRoyalBlue =
-      new Color(0.25490198f, 0.4117647f, 0.88235295f, "kRoyalBlue");
+  public static final Color ROYAL_BLUE =
+      new Color(0.25490198f, 0.4117647f, 0.88235295f, "ROYAL_BLUE");
 
   /** 0x8B4513. */
-  public static final Color kSaddleBrown =
-      new Color(0.54509807f, 0.27058825f, 0.07450981f, "kSaddleBrown");
+  public static final Color SADDLE_BROWN =
+      new Color(0.54509807f, 0.27058825f, 0.07450981f, "SADDLE_BROWN");
 
   /** 0xFA8072. */
-  public static final Color kSalmon = new Color(0.98039216f, 0.5019608f, 0.44705883f, "kSalmon");
+  public static final Color SALMON = new Color(0.98039216f, 0.5019608f, 0.44705883f, "SALMON");
 
   /** 0xF4A460. */
-  public static final Color kSandyBrown =
-      new Color(0.95686275f, 0.6431373f, 0.3764706f, "kSandyBrown");
+  public static final Color SANDY_BROWN =
+      new Color(0.95686275f, 0.6431373f, 0.3764706f, "SANDY_BROWN");
 
   /** 0x2E8B57. */
-  public static final Color kSeaGreen =
-      new Color(0.18039216f, 0.54509807f, 0.34117648f, "kSeaGreen");
+  public static final Color SEA_GREEN =
+      new Color(0.18039216f, 0.54509807f, 0.34117648f, "SEA_GREEN");
 
   /** 0xFFF5EE. */
-  public static final Color kSeashell = new Color(1.0f, 0.9607843f, 0.93333334f, "kSeashell");
+  public static final Color SEASHELL = new Color(1.0f, 0.9607843f, 0.93333334f, "SEASHELL");
 
   /** 0xA0522D. */
-  public static final Color kSienna = new Color(0.627451f, 0.32156864f, 0.1764706f, "kSienna");
+  public static final Color SIENNA = new Color(0.627451f, 0.32156864f, 0.1764706f, "SIENNA");
 
   /** 0xC0C0C0. */
-  public static final Color kSilver = new Color(0.7529412f, 0.7529412f, 0.7529412f, "kSilver");
+  public static final Color SILVER = new Color(0.7529412f, 0.7529412f, 0.7529412f, "SILVER");
 
   /** 0x87CEEB. */
-  public static final Color kSkyBlue = new Color(0.5294118f, 0.80784315f, 0.92156863f, "kSkyBlue");
+  public static final Color SKY_BLUE = new Color(0.5294118f, 0.80784315f, 0.92156863f, "SKY_BLUE");
 
   /** 0x6A5ACD. */
-  public static final Color kSlateBlue =
-      new Color(0.41568628f, 0.3529412f, 0.8039216f, "kSlateBlue");
+  public static final Color SLATE_BLUE =
+      new Color(0.41568628f, 0.3529412f, 0.8039216f, "SLATE_BLUE");
 
   /** 0x708090. */
-  public static final Color kSlateGray =
-      new Color(0.4392157f, 0.5019608f, 0.5647059f, "kSlateGray");
+  public static final Color SLATE_GRAY =
+      new Color(0.4392157f, 0.5019608f, 0.5647059f, "SLATE_GRAY");
 
   /** 0xFFFAFA. */
-  public static final Color kSnow = new Color(1.0f, 0.98039216f, 0.98039216f, "kSnow");
+  public static final Color SNOW = new Color(1.0f, 0.98039216f, 0.98039216f, "SNOW");
 
   /** 0x00FF7F. */
-  public static final Color kSpringGreen = new Color(0.0f, 1.0f, 0.49803922f, "kSpringGreen");
+  public static final Color SPRING_GREEN = new Color(0.0f, 1.0f, 0.49803922f, "SPRING_GREEN");
 
   /** 0x4682B4. */
-  public static final Color kSteelBlue =
-      new Color(0.27450982f, 0.50980395f, 0.7058824f, "kSteelBlue");
+  public static final Color STEEL_BLUE =
+      new Color(0.27450982f, 0.50980395f, 0.7058824f, "STEEL_BLUE");
 
   /** 0xD2B48C. */
-  public static final Color kTan = new Color(0.8235294f, 0.7058824f, 0.54901963f, "kTan");
+  public static final Color TAN = new Color(0.8235294f, 0.7058824f, 0.54901963f, "TAN");
 
   /** 0x008080. */
-  public static final Color kTeal = new Color(0.0f, 0.5019608f, 0.5019608f, "kTeal");
+  public static final Color TEAL = new Color(0.0f, 0.5019608f, 0.5019608f, "TEAL");
 
   /** 0xD8BFD8. */
-  public static final Color kThistle = new Color(0.84705883f, 0.7490196f, 0.84705883f, "kThistle");
+  public static final Color THISTLE = new Color(0.84705883f, 0.7490196f, 0.84705883f, "THISTLE");
 
   /** 0xFF6347. */
-  public static final Color kTomato = new Color(1.0f, 0.3882353f, 0.2784314f, "kTomato");
+  public static final Color TOMATO = new Color(1.0f, 0.3882353f, 0.2784314f, "TOMATO");
 
   /** 0x40E0D0. */
-  public static final Color kTurquoise =
-      new Color(0.2509804f, 0.8784314f, 0.8156863f, "kTurquoise");
+  public static final Color TURQUOISE = new Color(0.2509804f, 0.8784314f, 0.8156863f, "TURQUOISE");
 
   /** 0xEE82EE. */
-  public static final Color kViolet = new Color(0.93333334f, 0.50980395f, 0.93333334f, "kViolet");
+  public static final Color VIOLET = new Color(0.93333334f, 0.50980395f, 0.93333334f, "VIOLET");
 
   /** 0xF5DEB3. */
-  public static final Color kWheat = new Color(0.9607843f, 0.87058824f, 0.7019608f, "kWheat");
+  public static final Color WHEAT = new Color(0.9607843f, 0.87058824f, 0.7019608f, "WHEAT");
 
   /** 0xFFFFFF. */
-  public static final Color kWhite = new Color(1.0f, 1.0f, 1.0f, "kWhite");
+  public static final Color WHITE = new Color(1.0f, 1.0f, 1.0f, "WHITE");
 
   /** 0xF5F5F5. */
-  public static final Color kWhiteSmoke =
-      new Color(0.9607843f, 0.9607843f, 0.9607843f, "kWhiteSmoke");
+  public static final Color WHITE_SMOKE =
+      new Color(0.9607843f, 0.9607843f, 0.9607843f, "WHITE_SMOKE");
 
   /** 0xFFFF00. */
-  public static final Color kYellow = new Color(1.0f, 1.0f, 0.0f, "kYellow");
+  public static final Color YELLOW = new Color(1.0f, 1.0f, 0.0f, "YELLOW");
 
   /** 0x9ACD32. */
-  public static final Color kYellowGreen =
-      new Color(0.6039216f, 0.8039216f, 0.19607843f, "kYellowGreen");
+  public static final Color YELLOW_GREEN =
+      new Color(0.6039216f, 0.8039216f, 0.19607843f, "YELLOW_GREEN");
 }

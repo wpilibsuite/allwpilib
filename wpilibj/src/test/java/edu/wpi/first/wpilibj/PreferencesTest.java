@@ -37,7 +37,7 @@ class PreferencesTest {
   private NetworkTableInstance m_inst;
   private NetworkTable m_table;
 
-  private static final String kFilename = "networktables.json";
+  private static final String FILENAME = "networktables.json";
 
   @BeforeEach
   void setup(@TempDir Path tempDir) {
@@ -45,7 +45,7 @@ class PreferencesTest {
     m_table = m_inst.getTable("Preferences");
     Preferences.setNetworkTableInstance(m_inst);
 
-    Path filepath = tempDir.resolve(kFilename);
+    Path filepath = tempDir.resolve(FILENAME);
     try (InputStream is = getClass().getResource("PreferencesTestDefault.json").openStream()) {
       Files.copy(is, filepath);
     } catch (IOException ex) {
@@ -55,7 +55,7 @@ class PreferencesTest {
     m_inst.startServer(filepath.toString(), "", 0);
     try {
       int count = 0;
-      while (m_inst.getNetworkMode().contains(NetworkTableInstance.NetworkMode.kStarting)) {
+      while (m_inst.getNetworkMode().contains(NetworkTableInstance.NetworkMode.STARTING)) {
         Thread.sleep(100);
         count++;
         if (count > 30) {

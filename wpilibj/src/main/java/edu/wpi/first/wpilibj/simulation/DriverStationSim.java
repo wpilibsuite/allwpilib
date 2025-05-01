@@ -222,13 +222,13 @@ public final class DriverStationSim {
    */
   public static AllianceStationID getAllianceStationId() {
     return switch (DriverStationDataJNI.getAllianceStationId()) {
-      case DriverStationJNI.kUnknownAllianceStation -> AllianceStationID.Unknown;
-      case DriverStationJNI.kRed1AllianceStation -> AllianceStationID.Red1;
-      case DriverStationJNI.kRed2AllianceStation -> AllianceStationID.Red2;
-      case DriverStationJNI.kRed3AllianceStation -> AllianceStationID.Red3;
-      case DriverStationJNI.kBlue1AllianceStation -> AllianceStationID.Blue1;
-      case DriverStationJNI.kBlue2AllianceStation -> AllianceStationID.Blue2;
-      case DriverStationJNI.kBlue3AllianceStation -> AllianceStationID.Blue3;
+      case DriverStationJNI.UNKNOWN_ALLIANCE_STATION -> AllianceStationID.Unknown;
+      case DriverStationJNI.RED1_ALLIANCE_STATION -> AllianceStationID.Red1;
+      case DriverStationJNI.RED2_ALLIANCE_STATION -> AllianceStationID.Red2;
+      case DriverStationJNI.RED3_ALLIANCE_STATION -> AllianceStationID.Red3;
+      case DriverStationJNI.BLUE1_ALLIANCE_STATION -> AllianceStationID.Blue1;
+      case DriverStationJNI.BLUE2_ALLIANCE_STATION -> AllianceStationID.Blue2;
+      case DriverStationJNI.BLUE3_ALLIANCE_STATION -> AllianceStationID.Blue3;
       default -> AllianceStationID.Unknown;
     };
   }
@@ -241,13 +241,13 @@ public final class DriverStationSim {
   public static void setAllianceStationId(AllianceStationID allianceStationId) {
     int allianceStation =
         switch (allianceStationId) {
-          case Unknown -> DriverStationJNI.kUnknownAllianceStation;
-          case Red1 -> DriverStationJNI.kRed1AllianceStation;
-          case Red2 -> DriverStationJNI.kRed2AllianceStation;
-          case Red3 -> DriverStationJNI.kRed3AllianceStation;
-          case Blue1 -> DriverStationJNI.kBlue1AllianceStation;
-          case Blue2 -> DriverStationJNI.kBlue2AllianceStation;
-          case Blue3 -> DriverStationJNI.kBlue3AllianceStation;
+          case Unknown -> DriverStationJNI.UNKNOWN_ALLIANCE_STATION;
+          case Red1 -> DriverStationJNI.RED1_ALLIANCE_STATION;
+          case Red2 -> DriverStationJNI.RED2_ALLIANCE_STATION;
+          case Red3 -> DriverStationJNI.RED3_ALLIANCE_STATION;
+          case Blue1 -> DriverStationJNI.BLUE1_ALLIANCE_STATION;
+          case Blue2 -> DriverStationJNI.BLUE2_ALLIANCE_STATION;
+          case Blue3 -> DriverStationJNI.BLUE3_ALLIANCE_STATION;
         };
     DriverStationDataJNI.setAllianceStationId(allianceStation);
   }
