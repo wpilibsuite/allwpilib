@@ -9,16 +9,16 @@
 
 using namespace frc;
 using RumbleType = GenericHID::RumbleType;
-static constexpr double kEpsilon = 0.0001;
+static constexpr double EPSILON = 0.0001;
 TEST(GenericHIDTest, RumbleRange) {
   GenericHID hid{0};
   sim::GenericHIDSim sim{0};
 
   for (int i = 0; i <= 100; i++) {
     double rumbleValue = i / 100.0;
-    hid.SetRumble(RumbleType::kBothRumble, rumbleValue);
-    EXPECT_NEAR(rumbleValue, sim.GetRumble(RumbleType::kLeftRumble), kEpsilon);
-    EXPECT_NEAR(rumbleValue, sim.GetRumble(RumbleType::kRightRumble), kEpsilon);
+    hid.SetRumble(RumbleType::BOTH_RUMBLE, rumbleValue);
+    EXPECT_NEAR(rumbleValue, sim.GetRumble(RumbleType::LEFT_RUMBLE), EPSILON);
+    EXPECT_NEAR(rumbleValue, sim.GetRumble(RumbleType::RIGHT_RUMBLE), EPSILON);
   }
 }
 
@@ -27,24 +27,24 @@ TEST(GenericHIDTest, RumbleTypes) {
   sim::GenericHIDSim sim{0};
 
   // Make sure both are off
-  hid.SetRumble(RumbleType::kBothRumble, 0);
-  EXPECT_NEAR(0, sim.GetRumble(RumbleType::kBothRumble), kEpsilon);
+  hid.SetRumble(RumbleType::BOTH_RUMBLE, 0);
+  EXPECT_NEAR(0, sim.GetRumble(RumbleType::BOTH_RUMBLE), EPSILON);
 
   // test both
-  hid.SetRumble(RumbleType::kBothRumble, 1);
-  EXPECT_NEAR(1, sim.GetRumble(RumbleType::kLeftRumble), kEpsilon);
-  EXPECT_NEAR(1, sim.GetRumble(RumbleType::kRightRumble), kEpsilon);
-  hid.SetRumble(RumbleType::kBothRumble, 0);
+  hid.SetRumble(RumbleType::BOTH_RUMBLE, 1);
+  EXPECT_NEAR(1, sim.GetRumble(RumbleType::LEFT_RUMBLE), EPSILON);
+  EXPECT_NEAR(1, sim.GetRumble(RumbleType::RIGHT_RUMBLE), EPSILON);
+  hid.SetRumble(RumbleType::BOTH_RUMBLE, 0);
 
   // test left only
-  hid.SetRumble(RumbleType::kLeftRumble, 1);
-  EXPECT_NEAR(1, sim.GetRumble(RumbleType::kLeftRumble), kEpsilon);
-  EXPECT_NEAR(0, sim.GetRumble(RumbleType::kRightRumble), kEpsilon);
-  hid.SetRumble(RumbleType::kLeftRumble, 0);
+  hid.SetRumble(RumbleType::LEFT_RUMBLE, 1);
+  EXPECT_NEAR(1, sim.GetRumble(RumbleType::LEFT_RUMBLE), EPSILON);
+  EXPECT_NEAR(0, sim.GetRumble(RumbleType::RIGHT_RUMBLE), EPSILON);
+  hid.SetRumble(RumbleType::LEFT_RUMBLE, 0);
 
   // test right only
-  hid.SetRumble(RumbleType::kRightRumble, 1);
-  EXPECT_NEAR(0, sim.GetRumble(RumbleType::kLeftRumble), kEpsilon);
-  EXPECT_NEAR(1, sim.GetRumble(RumbleType::kRightRumble), kEpsilon);
-  hid.SetRumble(RumbleType::kRightRumble, 0);
+  hid.SetRumble(RumbleType::RIGHT_RUMBLE, 1);
+  EXPECT_NEAR(0, sim.GetRumble(RumbleType::LEFT_RUMBLE), EPSILON);
+  EXPECT_NEAR(1, sim.GetRumble(RumbleType::RIGHT_RUMBLE), EPSILON);
+  hid.SetRumble(RumbleType::RIGHT_RUMBLE, 0);
 }

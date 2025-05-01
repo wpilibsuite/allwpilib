@@ -30,17 +30,17 @@ class Color {
   /**
    * 0x1560BD.
    */
-  static const Color kDenim;
+  static const Color DENIM;
 
   /**
    * 0x0066B3.
    */
-  static const Color kFirstBlue;
+  static const Color FIRST_BLUE;
 
   /**
    * 0xED1C24.
    */
-  static const Color kFirstRed;
+  static const Color FIRST_RED;
 
   /*
    * Standard Colors
@@ -49,702 +49,702 @@ class Color {
   /**
    * 0xF0F8FF.
    */
-  static const Color kAliceBlue;
+  static const Color ALICE_BLUE;
 
   /**
    * 0xFAEBD7.
    */
-  static const Color kAntiqueWhite;
+  static const Color ANTIQUE_WHITE;
 
   /**
    * 0x00FFFF.
    */
-  static const Color kAqua;
+  static const Color AQUA;
 
   /**
    * 0x7FFFD4.
    */
-  static const Color kAquamarine;
+  static const Color AQUAMARINE;
 
   /**
    * 0xF0FFFF.
    */
-  static const Color kAzure;
+  static const Color AZURE;
 
   /**
    * 0xF5F5DC.
    */
-  static const Color kBeige;
+  static const Color BEIGE;
 
   /**
    * 0xFFE4C4.
    */
-  static const Color kBisque;
+  static const Color BISQUE;
 
   /**
    * 0x000000.
    */
-  static const Color kBlack;
+  static const Color BLACK;
 
   /**
    * 0xFFEBCD.
    */
-  static const Color kBlanchedAlmond;
+  static const Color BLANCHED_ALMOND;
 
   /**
    * 0x0000FF.
    */
-  static const Color kBlue;
+  static const Color BLUE;
 
   /**
    * 0x8A2BE2.
    */
-  static const Color kBlueViolet;
+  static const Color BLUE_VIOLET;
 
   /**
    * 0xA52A2A.
    */
-  static const Color kBrown;
+  static const Color BROWN;
 
   /**
    * 0xDEB887.
    */
-  static const Color kBurlywood;
+  static const Color BURLYWOOD;
 
   /**
    * 0x5F9EA0.
    */
-  static const Color kCadetBlue;
+  static const Color CADET_BLUE;
 
   /**
    * 0x7FFF00.
    */
-  static const Color kChartreuse;
+  static const Color CHARTREUSE;
 
   /**
    * 0xD2691E.
    */
-  static const Color kChocolate;
+  static const Color CHOCOLATE;
 
   /**
    * 0xFF7F50.
    */
-  static const Color kCoral;
+  static const Color CORAL;
 
   /**
    * 0x6495ED.
    */
-  static const Color kCornflowerBlue;
+  static const Color CORNFLOWER_BLUE;
 
   /**
    * 0xFFF8DC.
    */
-  static const Color kCornsilk;
+  static const Color CORNSILK;
 
   /**
    * 0xDC143C.
    */
-  static const Color kCrimson;
+  static const Color CRIMSON;
 
   /**
    * 0x00FFFF.
    */
-  static const Color kCyan;
+  static const Color CYAN;
 
   /**
    * 0x00008B.
    */
-  static const Color kDarkBlue;
+  static const Color DARK_BLUE;
 
   /**
    * 0x008B8B.
    */
-  static const Color kDarkCyan;
+  static const Color DARK_CYAN;
 
   /**
    * 0xB8860B.
    */
-  static const Color kDarkGoldenrod;
+  static const Color DARK_GOLDENROD;
 
   /**
    * 0xA9A9A9.
    */
-  static const Color kDarkGray;
+  static const Color DARK_GRAY;
 
   /**
    * 0x006400.
    */
-  static const Color kDarkGreen;
+  static const Color DARK_GREEN;
 
   /**
    * 0xBDB76B.
    */
-  static const Color kDarkKhaki;
+  static const Color DARK_KHAKI;
 
   /**
    * 0x8B008B.
    */
-  static const Color kDarkMagenta;
+  static const Color DARK_MAGENTA;
 
   /**
    * 0x556B2F.
    */
-  static const Color kDarkOliveGreen;
+  static const Color DARK_OLIVE_GREEN;
 
   /**
    * 0xFF8C00.
    */
-  static const Color kDarkOrange;
+  static const Color DARK_ORANGE;
 
   /**
    * 0x9932CC.
    */
-  static const Color kDarkOrchid;
+  static const Color DARK_ORCHID;
 
   /**
    * 0x8B0000.
    */
-  static const Color kDarkRed;
+  static const Color DARK_RED;
 
   /**
    * 0xE9967A.
    */
-  static const Color kDarkSalmon;
+  static const Color DARK_SALMON;
 
   /**
    * 0x8FBC8F.
    */
-  static const Color kDarkSeaGreen;
+  static const Color DARK_SEA_GREEN;
 
   /**
    * 0x483D8B.
    */
-  static const Color kDarkSlateBlue;
+  static const Color DARK_SLATE_BLUE;
 
   /**
    * 0x2F4F4F.
    */
-  static const Color kDarkSlateGray;
+  static const Color DARK_SLATE_GRAY;
 
   /**
    * 0x00CED1.
    */
-  static const Color kDarkTurquoise;
+  static const Color DARK_TURQUOISE;
 
   /**
    * 0x9400D3.
    */
-  static const Color kDarkViolet;
+  static const Color DARK_VIOLET;
 
   /**
    * 0xFF1493.
    */
-  static const Color kDeepPink;
+  static const Color DEEP_PINK;
 
   /**
    * 0x00BFFF.
    */
-  static const Color kDeepSkyBlue;
+  static const Color DEEP_SKY_BLUE;
 
   /**
    * 0x696969.
    */
-  static const Color kDimGray;
+  static const Color DIM_GRAY;
 
   /**
    * 0x1E90FF.
    */
-  static const Color kDodgerBlue;
+  static const Color DODGER_BLUE;
 
   /**
    * 0xB22222.
    */
-  static const Color kFirebrick;
+  static const Color FIREBRICK;
 
   /**
    * 0xFFFAF0.
    */
-  static const Color kFloralWhite;
+  static const Color FLORAL_WHITE;
 
   /**
    * 0x228B22.
    */
-  static const Color kForestGreen;
+  static const Color FOREST_GREEN;
 
   /**
    * 0xFF00FF.
    */
-  static const Color kFuchsia;
+  static const Color FUCHSIA;
 
   /**
    * 0xDCDCDC.
    */
-  static const Color kGainsboro;
+  static const Color GAINSBORO;
 
   /**
    * 0xF8F8FF.
    */
-  static const Color kGhostWhite;
+  static const Color GHOST_WHITE;
 
   /**
    * 0xFFD700.
    */
-  static const Color kGold;
+  static const Color GOLD;
 
   /**
    * 0xDAA520.
    */
-  static const Color kGoldenrod;
+  static const Color GOLDENROD;
 
   /**
    * 0x808080.
    */
-  static const Color kGray;
+  static const Color GRAY;
 
   /**
    * 0x008000.
    */
-  static const Color kGreen;
+  static const Color GREEN;
 
   /**
    * 0xADFF2F.
    */
-  static const Color kGreenYellow;
+  static const Color GREEN_YELLOW;
 
   /**
    * 0xF0FFF0.
    */
-  static const Color kHoneydew;
+  static const Color HONEYDEW;
 
   /**
    * 0xFF69B4.
    */
-  static const Color kHotPink;
+  static const Color HOT_PINK;
 
   /**
    * 0xCD5C5C.
    */
-  static const Color kIndianRed;
+  static const Color INDIAN_RED;
 
   /**
    * 0x4B0082.
    */
-  static const Color kIndigo;
+  static const Color INDIGO;
 
   /**
    * 0xFFFFF0.
    */
-  static const Color kIvory;
+  static const Color IVORY;
 
   /**
    * 0xF0E68C.
    */
-  static const Color kKhaki;
+  static const Color KHAKI;
 
   /**
    * 0xE6E6FA.
    */
-  static const Color kLavender;
+  static const Color LAVENDER;
 
   /**
    * 0xFFF0F5.
    */
-  static const Color kLavenderBlush;
+  static const Color LAVENDER_BLUSH;
 
   /**
    * 0x7CFC00.
    */
-  static const Color kLawnGreen;
+  static const Color LAWN_GREEN;
 
   /**
    * 0xFFFACD.
    */
-  static const Color kLemonChiffon;
+  static const Color LEMON_CHIFFON;
 
   /**
    * 0xADD8E6.
    */
-  static const Color kLightBlue;
+  static const Color LIGHT_BLUE;
 
   /**
    * 0xF08080.
    */
-  static const Color kLightCoral;
+  static const Color LIGHT_CORAL;
 
   /**
    * 0xE0FFFF.
    */
-  static const Color kLightCyan;
+  static const Color LIGHT_CYAN;
 
   /**
    * 0xFAFAD2.
    */
-  static const Color kLightGoldenrodYellow;
+  static const Color LIGHT_GOLDENROD_YELLOW;
 
   /**
    * 0xD3D3D3.
    */
-  static const Color kLightGray;
+  static const Color LIGHT_GRAY;
 
   /**
    * 0x90EE90.
    */
-  static const Color kLightGreen;
+  static const Color LIGHT_GREEN;
 
   /**
    * 0xFFB6C1.
    */
-  static const Color kLightPink;
+  static const Color LIGHT_PINK;
 
   /**
    * 0xFFA07A.
    */
-  static const Color kLightSalmon;
+  static const Color LIGHT_SALMON;
 
   /**
    * 0x20B2AA.
    */
-  static const Color kLightSeaGreen;
+  static const Color LIGHT_SEA_GREEN;
 
   /**
    * 0x87CEFA.
    */
-  static const Color kLightSkyBlue;
+  static const Color LIGHT_SKY_BLUE;
 
   /**
    * 0x778899.
    */
-  static const Color kLightSlateGray;
+  static const Color LIGHT_SLATE_GRAY;
 
   /**
    * 0xB0C4DE.
    */
-  static const Color kLightSteelBlue;
+  static const Color LIGHT_STEEL_BLUE;
 
   /**
    * 0xFFFFE0.
    */
-  static const Color kLightYellow;
+  static const Color LIGHT_YELLOW;
 
   /**
    * 0x00FF00.
    */
-  static const Color kLime;
+  static const Color LIME;
 
   /**
    * 0x32CD32.
    */
-  static const Color kLimeGreen;
+  static const Color LIME_GREEN;
 
   /**
    * 0xFAF0E6.
    */
-  static const Color kLinen;
+  static const Color LINEN;
 
   /**
    * 0xFF00FF.
    */
-  static const Color kMagenta;
+  static const Color MAGENTA;
 
   /**
    * 0x800000.
    */
-  static const Color kMaroon;
+  static const Color MAROON;
 
   /**
    * 0x66CDAA.
    */
-  static const Color kMediumAquamarine;
+  static const Color MEDIUM_AQUAMARINE;
 
   /**
    * 0x0000CD.
    */
-  static const Color kMediumBlue;
+  static const Color MEDIUM_BLUE;
 
   /**
    * 0xBA55D3.
    */
-  static const Color kMediumOrchid;
+  static const Color MEDIUM_ORCHID;
 
   /**
    * 0x9370DB.
    */
-  static const Color kMediumPurple;
+  static const Color MEDIUM_PURPLE;
 
   /**
    * 0x3CB371.
    */
-  static const Color kMediumSeaGreen;
+  static const Color MEDIUM_SEA_GREEN;
 
   /**
    * 0x7B68EE.
    */
-  static const Color kMediumSlateBlue;
+  static const Color MEDIUM_SLATE_BLUE;
 
   /**
    * 0x00FA9A.
    */
-  static const Color kMediumSpringGreen;
+  static const Color MEDIUM_SPRING_GREEN;
 
   /**
    * 0x48D1CC.
    */
-  static const Color kMediumTurquoise;
+  static const Color MEDIUM_TURQUOISE;
 
   /**
    * 0xC71585.
    */
-  static const Color kMediumVioletRed;
+  static const Color MEDIUM_VIOLET_RED;
 
   /**
    * 0x191970.
    */
-  static const Color kMidnightBlue;
+  static const Color MIDNIGHT_BLUE;
 
   /**
    * 0xF5FFFA.
    */
-  static const Color kMintcream;
+  static const Color MINTCREAM;
 
   /**
    * 0xFFE4E1.
    */
-  static const Color kMistyRose;
+  static const Color MISTY_ROSE;
 
   /**
    * 0xFFE4B5.
    */
-  static const Color kMoccasin;
+  static const Color MOCCASIN;
 
   /**
    * 0xFFDEAD.
    */
-  static const Color kNavajoWhite;
+  static const Color NAVAJO_WHITE;
 
   /**
    * 0x000080.
    */
-  static const Color kNavy;
+  static const Color NAVY;
 
   /**
    * 0xFDF5E6.
    */
-  static const Color kOldLace;
+  static const Color OLD_LACE;
 
   /**
    * 0x808000.
    */
-  static const Color kOlive;
+  static const Color OLIVE;
 
   /**
    * 0x6B8E23.
    */
-  static const Color kOliveDrab;
+  static const Color OLIVE_DRAB;
 
   /**
    * 0xFFA500.
    */
-  static const Color kOrange;
+  static const Color ORANGE;
 
   /**
    * 0xFF4500.
    */
-  static const Color kOrangeRed;
+  static const Color ORANGE_RED;
 
   /**
    * 0xDA70D6.
    */
-  static const Color kOrchid;
+  static const Color ORCHID;
 
   /**
    * 0xEEE8AA.
    */
-  static const Color kPaleGoldenrod;
+  static const Color PALE_GOLDENROD;
 
   /**
    * 0x98FB98.
    */
-  static const Color kPaleGreen;
+  static const Color PALE_GREEN;
 
   /**
    * 0xAFEEEE.
    */
-  static const Color kPaleTurquoise;
+  static const Color PALE_TURQUOISE;
 
   /**
    * 0xDB7093.
    */
-  static const Color kPaleVioletRed;
+  static const Color PALE_VIOLET_RED;
 
   /**
    * 0xFFEFD5.
    */
-  static const Color kPapayaWhip;
+  static const Color PAPAYA_WHIP;
 
   /**
    * 0xFFDAB9.
    */
-  static const Color kPeachPuff;
+  static const Color PEACH_PUFF;
 
   /**
    * 0xCD853F.
    */
-  static const Color kPeru;
+  static const Color PERU;
 
   /**
    * 0xFFC0CB.
    */
-  static const Color kPink;
+  static const Color PINK;
 
   /**
    * 0xDDA0DD.
    */
-  static const Color kPlum;
+  static const Color PLUM;
 
   /**
    * 0xB0E0E6.
    */
-  static const Color kPowderBlue;
+  static const Color POWDER_BLUE;
 
   /**
    * 0x800080.
    */
-  static const Color kPurple;
+  static const Color PURPLE;
 
   /**
    * 0xFF0000.
    */
-  static const Color kRed;
+  static const Color RED;
 
   /**
    * 0xBC8F8F.
    */
-  static const Color kRosyBrown;
+  static const Color ROSY_BROWN;
 
   /**
    * 0x4169E1.
    */
-  static const Color kRoyalBlue;
+  static const Color ROYAL_BLUE;
 
   /**
    * 0x8B4513.
    */
-  static const Color kSaddleBrown;
+  static const Color SADDLE_BROWN;
 
   /**
    * 0xFA8072.
    */
-  static const Color kSalmon;
+  static const Color SALMON;
 
   /**
    * 0xF4A460.
    */
-  static const Color kSandyBrown;
+  static const Color SANDY_BROWN;
 
   /**
    * 0x2E8B57.
    */
-  static const Color kSeaGreen;
+  static const Color SEA_GREEN;
 
   /**
    * 0xFFF5EE.
    */
-  static const Color kSeashell;
+  static const Color SEASHELL;
 
   /**
    * 0xA0522D.
    */
-  static const Color kSienna;
+  static const Color SIENNA;
 
   /**
    * 0xC0C0C0.
    */
-  static const Color kSilver;
+  static const Color SILVER;
 
   /**
    * 0x87CEEB.
    */
-  static const Color kSkyBlue;
+  static const Color SKY_BLUE;
 
   /**
    * 0x6A5ACD.
    */
-  static const Color kSlateBlue;
+  static const Color SLATE_BLUE;
 
   /**
    * 0x708090.
    */
-  static const Color kSlateGray;
+  static const Color SLATE_GRAY;
 
   /**
    * 0xFFFAFA.
    */
-  static const Color kSnow;
+  static const Color SNOW;
 
   /**
    * 0x00FF7F.
    */
-  static const Color kSpringGreen;
+  static const Color SPRING_GREEN;
 
   /**
    * 0x4682B4.
    */
-  static const Color kSteelBlue;
+  static const Color STEEL_BLUE;
 
   /**
    * 0xD2B48C.
    */
-  static const Color kTan;
+  static const Color TAN;
 
   /**
    * 0x008080.
    */
-  static const Color kTeal;
+  static const Color TEAL;
 
   /**
    * 0xD8BFD8.
    */
-  static const Color kThistle;
+  static const Color THISTLE;
 
   /**
    * 0xFF6347.
    */
-  static const Color kTomato;
+  static const Color TOMATO;
 
   /**
    * 0x40E0D0.
    */
-  static const Color kTurquoise;
+  static const Color TURQUOISE;
 
   /**
    * 0xEE82EE.
    */
-  static const Color kViolet;
+  static const Color VIOLET;
 
   /**
    * 0xF5DEB3.
    */
-  static const Color kWheat;
+  static const Color WHEAT;
 
   /**
    * 0xFFFFFF.
    */
-  static const Color kWhite;
+  static const Color WHITE;
 
   /**
    * 0xF5F5F5.
    */
-  static const Color kWhiteSmoke;
+  static const Color WHITE_SMOKE;
 
   /**
    * 0xFFFF00.
    */
-  static const Color kYellow;
+  static const Color YELLOW;
 
   /**
    * 0x9ACD32.
    */
-  static const Color kYellowGreen;
+  static const Color YELLOW_GREEN;
 
   /**
    * Constructs a default color (black).
@@ -882,174 +882,174 @@ class Color {
 /*
  * FIRST Colors
  */
-inline constexpr Color Color::kDenim{0.0823529412, 0.376470589, 0.7411764706};
-inline constexpr Color Color::kFirstBlue{0.0, 0.4, 0.7019607844};
-inline constexpr Color Color::kFirstRed{0.9294117648, 0.1098039216,
+inline constexpr Color Color::DENIM{0.0823529412, 0.376470589, 0.7411764706};
+inline constexpr Color Color::FIRST_BLUE{0.0, 0.4, 0.7019607844};
+inline constexpr Color Color::FIRST_RED{0.9294117648, 0.1098039216,
                                         0.1411764706};
 
 /*
  * Standard Colors
  */
-inline constexpr Color Color::kAliceBlue{0.9411765f, 0.972549f, 1.0f};
-inline constexpr Color Color::kAntiqueWhite{0.98039216f, 0.92156863f,
+inline constexpr Color Color::ALICE_BLUE{0.9411765f, 0.972549f, 1.0f};
+inline constexpr Color Color::ANTIQUE_WHITE{0.98039216f, 0.92156863f,
                                             0.84313726f};
-inline constexpr Color Color::kAqua{0.0f, 1.0f, 1.0f};
-inline constexpr Color Color::kAquamarine{0.49803922f, 1.0f, 0.83137256f};
-inline constexpr Color Color::kAzure{0.9411765f, 1.0f, 1.0f};
-inline constexpr Color Color::kBeige{0.9607843f, 0.9607843f, 0.8627451f};
-inline constexpr Color Color::kBisque{1.0f, 0.89411765f, 0.76862746f};
-inline constexpr Color Color::kBlack{0.0f, 0.0f, 0.0f};
-inline constexpr Color Color::kBlanchedAlmond{1.0f, 0.92156863f, 0.8039216f};
-inline constexpr Color Color::kBlue{0.0f, 0.0f, 1.0f};
-inline constexpr Color Color::kBlueViolet{0.5411765f, 0.16862746f, 0.8862745f};
-inline constexpr Color Color::kBrown{0.64705884f, 0.16470589f, 0.16470589f};
-inline constexpr Color Color::kBurlywood{0.87058824f, 0.72156864f, 0.5294118f};
-inline constexpr Color Color::kCadetBlue{0.37254903f, 0.61960787f, 0.627451f};
-inline constexpr Color Color::kChartreuse{0.49803922f, 1.0f, 0.0f};
-inline constexpr Color Color::kChocolate{0.8235294f, 0.4117647f, 0.11764706f};
-inline constexpr Color Color::kCoral{1.0f, 0.49803922f, 0.3137255f};
-inline constexpr Color Color::kCornflowerBlue{0.39215687f, 0.58431375f,
+inline constexpr Color Color::AQUA{0.0f, 1.0f, 1.0f};
+inline constexpr Color Color::AQUAMARINE{0.49803922f, 1.0f, 0.83137256f};
+inline constexpr Color Color::AZURE{0.9411765f, 1.0f, 1.0f};
+inline constexpr Color Color::BEIGE{0.9607843f, 0.9607843f, 0.8627451f};
+inline constexpr Color Color::BISQUE{1.0f, 0.89411765f, 0.76862746f};
+inline constexpr Color Color::BLACK{0.0f, 0.0f, 0.0f};
+inline constexpr Color Color::BLANCHED_ALMOND{1.0f, 0.92156863f, 0.8039216f};
+inline constexpr Color Color::BLUE{0.0f, 0.0f, 1.0f};
+inline constexpr Color Color::BLUE_VIOLET{0.5411765f, 0.16862746f, 0.8862745f};
+inline constexpr Color Color::BROWN{0.64705884f, 0.16470589f, 0.16470589f};
+inline constexpr Color Color::BURLYWOOD{0.87058824f, 0.72156864f, 0.5294118f};
+inline constexpr Color Color::CADET_BLUE{0.37254903f, 0.61960787f, 0.627451f};
+inline constexpr Color Color::CHARTREUSE{0.49803922f, 1.0f, 0.0f};
+inline constexpr Color Color::CHOCOLATE{0.8235294f, 0.4117647f, 0.11764706f};
+inline constexpr Color Color::CORAL{1.0f, 0.49803922f, 0.3137255f};
+inline constexpr Color Color::CORNFLOWER_BLUE{0.39215687f, 0.58431375f,
                                               0.92941177f};
-inline constexpr Color Color::kCornsilk{1.0f, 0.972549f, 0.8627451f};
-inline constexpr Color Color::kCrimson{0.8627451f, 0.078431375f, 0.23529412f};
-inline constexpr Color Color::kCyan{0.0f, 1.0f, 1.0f};
-inline constexpr Color Color::kDarkBlue{0.0f, 0.0f, 0.54509807f};
-inline constexpr Color Color::kDarkCyan{0.0f, 0.54509807f, 0.54509807f};
-inline constexpr Color Color::kDarkGoldenrod{0.72156864f, 0.5254902f,
+inline constexpr Color Color::CORNSILK{1.0f, 0.972549f, 0.8627451f};
+inline constexpr Color Color::CRIMSON{0.8627451f, 0.078431375f, 0.23529412f};
+inline constexpr Color Color::CYAN{0.0f, 1.0f, 1.0f};
+inline constexpr Color Color::DARK_BLUE{0.0f, 0.0f, 0.54509807f};
+inline constexpr Color Color::DARK_CYAN{0.0f, 0.54509807f, 0.54509807f};
+inline constexpr Color Color::DARK_GOLDENROD{0.72156864f, 0.5254902f,
                                              0.043137256f};
-inline constexpr Color Color::kDarkGray{0.6627451f, 0.6627451f, 0.6627451f};
-inline constexpr Color Color::kDarkGreen{0.0f, 0.39215687f, 0.0f};
-inline constexpr Color Color::kDarkKhaki{0.7411765f, 0.7176471f, 0.41960785f};
-inline constexpr Color Color::kDarkMagenta{0.54509807f, 0.0f, 0.54509807f};
-inline constexpr Color Color::kDarkOliveGreen{0.33333334f, 0.41960785f,
+inline constexpr Color Color::DARK_GRAY{0.6627451f, 0.6627451f, 0.6627451f};
+inline constexpr Color Color::DARK_GREEN{0.0f, 0.39215687f, 0.0f};
+inline constexpr Color Color::DARK_KHAKI{0.7411765f, 0.7176471f, 0.41960785f};
+inline constexpr Color Color::DARK_MAGENTA{0.54509807f, 0.0f, 0.54509807f};
+inline constexpr Color Color::DARK_OLIVE_GREEN{0.33333334f, 0.41960785f,
                                               0.18431373f};
-inline constexpr Color Color::kDarkOrange{1.0f, 0.54901963f, 0.0f};
-inline constexpr Color Color::kDarkOrchid{0.6f, 0.19607843f, 0.8f};
-inline constexpr Color Color::kDarkRed{0.54509807f, 0.0f, 0.0f};
-inline constexpr Color Color::kDarkSalmon{0.9137255f, 0.5882353f, 0.47843137f};
-inline constexpr Color Color::kDarkSeaGreen{0.56078434f, 0.7372549f,
+inline constexpr Color Color::DARK_ORANGE{1.0f, 0.54901963f, 0.0f};
+inline constexpr Color Color::DARK_ORCHID{0.6f, 0.19607843f, 0.8f};
+inline constexpr Color Color::DARK_RED{0.54509807f, 0.0f, 0.0f};
+inline constexpr Color Color::DARK_SALMON{0.9137255f, 0.5882353f, 0.47843137f};
+inline constexpr Color Color::DARK_SEA_GREEN{0.56078434f, 0.7372549f,
                                             0.56078434f};
-inline constexpr Color Color::kDarkSlateBlue{0.28235295f, 0.23921569f,
+inline constexpr Color Color::DARK_SLATE_BLUE{0.28235295f, 0.23921569f,
                                              0.54509807f};
-inline constexpr Color Color::kDarkSlateGray{0.18431373f, 0.30980393f,
+inline constexpr Color Color::DARK_SLATE_GRAY{0.18431373f, 0.30980393f,
                                              0.30980393f};
-inline constexpr Color Color::kDarkTurquoise{0.0f, 0.80784315f, 0.81960785f};
-inline constexpr Color Color::kDarkViolet{0.5803922f, 0.0f, 0.827451f};
-inline constexpr Color Color::kDeepPink{1.0f, 0.078431375f, 0.5764706f};
-inline constexpr Color Color::kDeepSkyBlue{0.0f, 0.7490196f, 1.0f};
-inline constexpr Color Color::kDimGray{0.4117647f, 0.4117647f, 0.4117647f};
-inline constexpr Color Color::kDodgerBlue{0.11764706f, 0.5647059f, 1.0f};
-inline constexpr Color Color::kFirebrick{0.69803923f, 0.13333334f, 0.13333334f};
-inline constexpr Color Color::kFloralWhite{1.0f, 0.98039216f, 0.9411765f};
-inline constexpr Color Color::kForestGreen{0.13333334f, 0.54509807f,
+inline constexpr Color Color::DARK_TURQUOISE{0.0f, 0.80784315f, 0.81960785f};
+inline constexpr Color Color::DARK_VIOLET{0.5803922f, 0.0f, 0.827451f};
+inline constexpr Color Color::DEEP_PINK{1.0f, 0.078431375f, 0.5764706f};
+inline constexpr Color Color::DEEP_SKY_BLUE{0.0f, 0.7490196f, 1.0f};
+inline constexpr Color Color::DIM_GRAY{0.4117647f, 0.4117647f, 0.4117647f};
+inline constexpr Color Color::DODGER_BLUE{0.11764706f, 0.5647059f, 1.0f};
+inline constexpr Color Color::FIREBRICK{0.69803923f, 0.13333334f, 0.13333334f};
+inline constexpr Color Color::FLORAL_WHITE{1.0f, 0.98039216f, 0.9411765f};
+inline constexpr Color Color::FOREST_GREEN{0.13333334f, 0.54509807f,
                                            0.13333334f};
-inline constexpr Color Color::kFuchsia{1.0f, 0.0f, 1.0f};
-inline constexpr Color Color::kGainsboro{0.8627451f, 0.8627451f, 0.8627451f};
-inline constexpr Color Color::kGhostWhite{0.972549f, 0.972549f, 1.0f};
-inline constexpr Color Color::kGold{1.0f, 0.84313726f, 0.0f};
-inline constexpr Color Color::kGoldenrod{0.85490197f, 0.64705884f, 0.1254902f};
-inline constexpr Color Color::kGray{0.5019608f, 0.5019608f, 0.5019608f};
-inline constexpr Color Color::kGreen{0.0f, 0.5019608f, 0.0f};
-inline constexpr Color Color::kGreenYellow{0.6784314f, 1.0f, 0.18431373f};
-inline constexpr Color Color::kHoneydew{0.9411765f, 1.0f, 0.9411765f};
-inline constexpr Color Color::kHotPink{1.0f, 0.4117647f, 0.7058824f};
-inline constexpr Color Color::kIndianRed{0.8039216f, 0.36078432f, 0.36078432f};
-inline constexpr Color Color::kIndigo{0.29411766f, 0.0f, 0.50980395f};
-inline constexpr Color Color::kIvory{1.0f, 1.0f, 0.9411765f};
-inline constexpr Color Color::kKhaki{0.9411765f, 0.9019608f, 0.54901963f};
-inline constexpr Color Color::kLavender{0.9019608f, 0.9019608f, 0.98039216f};
-inline constexpr Color Color::kLavenderBlush{1.0f, 0.9411765f, 0.9607843f};
-inline constexpr Color Color::kLawnGreen{0.4862745f, 0.9882353f, 0.0f};
-inline constexpr Color Color::kLemonChiffon{1.0f, 0.98039216f, 0.8039216f};
-inline constexpr Color Color::kLightBlue{0.6784314f, 0.84705883f, 0.9019608f};
-inline constexpr Color Color::kLightCoral{0.9411765f, 0.5019608f, 0.5019608f};
-inline constexpr Color Color::kLightCyan{0.8784314f, 1.0f, 1.0f};
-inline constexpr Color Color::kLightGoldenrodYellow{0.98039216f, 0.98039216f,
+inline constexpr Color Color::FUCHSIA{1.0f, 0.0f, 1.0f};
+inline constexpr Color Color::GAINSBORO{0.8627451f, 0.8627451f, 0.8627451f};
+inline constexpr Color Color::GHOST_WHITE{0.972549f, 0.972549f, 1.0f};
+inline constexpr Color Color::GOLD{1.0f, 0.84313726f, 0.0f};
+inline constexpr Color Color::GOLDENROD{0.85490197f, 0.64705884f, 0.1254902f};
+inline constexpr Color Color::GRAY{0.5019608f, 0.5019608f, 0.5019608f};
+inline constexpr Color Color::GREEN{0.0f, 0.5019608f, 0.0f};
+inline constexpr Color Color::GREEN_YELLOW{0.6784314f, 1.0f, 0.18431373f};
+inline constexpr Color Color::HONEYDEW{0.9411765f, 1.0f, 0.9411765f};
+inline constexpr Color Color::HOT_PINK{1.0f, 0.4117647f, 0.7058824f};
+inline constexpr Color Color::INDIAN_RED{0.8039216f, 0.36078432f, 0.36078432f};
+inline constexpr Color Color::INDIGO{0.29411766f, 0.0f, 0.50980395f};
+inline constexpr Color Color::IVORY{1.0f, 1.0f, 0.9411765f};
+inline constexpr Color Color::KHAKI{0.9411765f, 0.9019608f, 0.54901963f};
+inline constexpr Color Color::LAVENDER{0.9019608f, 0.9019608f, 0.98039216f};
+inline constexpr Color Color::LAVENDER_BLUSH{1.0f, 0.9411765f, 0.9607843f};
+inline constexpr Color Color::LAWN_GREEN{0.4862745f, 0.9882353f, 0.0f};
+inline constexpr Color Color::LEMON_CHIFFON{1.0f, 0.98039216f, 0.8039216f};
+inline constexpr Color Color::LIGHT_BLUE{0.6784314f, 0.84705883f, 0.9019608f};
+inline constexpr Color Color::LIGHT_CORAL{0.9411765f, 0.5019608f, 0.5019608f};
+inline constexpr Color Color::LIGHT_CYAN{0.8784314f, 1.0f, 1.0f};
+inline constexpr Color Color::LIGHT_GOLDENROD_YELLOW{0.98039216f, 0.98039216f,
                                                     0.8235294f};
-inline constexpr Color Color::kLightGray{0.827451f, 0.827451f, 0.827451f};
-inline constexpr Color Color::kLightGreen{0.5647059f, 0.93333334f, 0.5647059f};
-inline constexpr Color Color::kLightPink{1.0f, 0.7137255f, 0.75686276f};
-inline constexpr Color Color::kLightSalmon{1.0f, 0.627451f, 0.47843137f};
-inline constexpr Color Color::kLightSeaGreen{0.1254902f, 0.69803923f,
+inline constexpr Color Color::LIGHT_GRAY{0.827451f, 0.827451f, 0.827451f};
+inline constexpr Color Color::LIGHT_GREEN{0.5647059f, 0.93333334f, 0.5647059f};
+inline constexpr Color Color::LIGHT_PINK{1.0f, 0.7137255f, 0.75686276f};
+inline constexpr Color Color::LIGHT_SALMON{1.0f, 0.627451f, 0.47843137f};
+inline constexpr Color Color::LIGHT_SEA_GREEN{0.1254902f, 0.69803923f,
                                              0.6666667f};
-inline constexpr Color Color::kLightSkyBlue{0.5294118f, 0.80784315f,
+inline constexpr Color Color::LIGHT_SKY_BLUE{0.5294118f, 0.80784315f,
                                             0.98039216f};
-inline constexpr Color Color::kLightSlateGray{0.46666667f, 0.53333336f, 0.6f};
-inline constexpr Color Color::kLightSteelBlue{0.6901961f, 0.76862746f,
+inline constexpr Color Color::LIGHT_SLATE_GRAY{0.46666667f, 0.53333336f, 0.6f};
+inline constexpr Color Color::LIGHT_STEEL_BLUE{0.6901961f, 0.76862746f,
                                               0.87058824f};
-inline constexpr Color Color::kLightYellow{1.0f, 1.0f, 0.8784314f};
-inline constexpr Color Color::kLime{0.0f, 1.0f, 0.0f};
-inline constexpr Color Color::kLimeGreen{0.19607843f, 0.8039216f, 0.19607843f};
-inline constexpr Color Color::kLinen{0.98039216f, 0.9411765f, 0.9019608f};
-inline constexpr Color Color::kMagenta{1.0f, 0.0f, 1.0f};
-inline constexpr Color Color::kMaroon{0.5019608f, 0.0f, 0.0f};
-inline constexpr Color Color::kMediumAquamarine{0.4f, 0.8039216f, 0.6666667f};
-inline constexpr Color Color::kMediumBlue{0.0f, 0.0f, 0.8039216f};
-inline constexpr Color Color::kMediumOrchid{0.7294118f, 0.33333334f, 0.827451f};
-inline constexpr Color Color::kMediumPurple{0.5764706f, 0.4392157f,
+inline constexpr Color Color::LIGHT_YELLOW{1.0f, 1.0f, 0.8784314f};
+inline constexpr Color Color::LIME{0.0f, 1.0f, 0.0f};
+inline constexpr Color Color::LIME_GREEN{0.19607843f, 0.8039216f, 0.19607843f};
+inline constexpr Color Color::LINEN{0.98039216f, 0.9411765f, 0.9019608f};
+inline constexpr Color Color::MAGENTA{1.0f, 0.0f, 1.0f};
+inline constexpr Color Color::MAROON{0.5019608f, 0.0f, 0.0f};
+inline constexpr Color Color::MEDIUM_AQUAMARINE{0.4f, 0.8039216f, 0.6666667f};
+inline constexpr Color Color::MEDIUM_BLUE{0.0f, 0.0f, 0.8039216f};
+inline constexpr Color Color::MEDIUM_ORCHID{0.7294118f, 0.33333334f, 0.827451f};
+inline constexpr Color Color::MEDIUM_PURPLE{0.5764706f, 0.4392157f,
                                             0.85882354f};
-inline constexpr Color Color::kMediumSeaGreen{0.23529412f, 0.7019608f,
+inline constexpr Color Color::MEDIUM_SEA_GREEN{0.23529412f, 0.7019608f,
                                               0.44313726f};
-inline constexpr Color Color::kMediumSlateBlue{0.48235294f, 0.40784314f,
+inline constexpr Color Color::MEDIUM_SLATE_BLUE{0.48235294f, 0.40784314f,
                                                0.93333334f};
-inline constexpr Color Color::kMediumSpringGreen{0.0f, 0.98039216f, 0.6039216f};
-inline constexpr Color Color::kMediumTurquoise{0.28235295f, 0.81960785f, 0.8f};
-inline constexpr Color Color::kMediumVioletRed{0.78039217f, 0.08235294f,
+inline constexpr Color Color::MEDIUM_SPRING_GREEN{0.0f, 0.98039216f, 0.6039216f};
+inline constexpr Color Color::MEDIUM_TURQUOISE{0.28235295f, 0.81960785f, 0.8f};
+inline constexpr Color Color::MEDIUM_VIOLET_RED{0.78039217f, 0.08235294f,
                                                0.52156866f};
-inline constexpr Color Color::kMidnightBlue{0.09803922f, 0.09803922f,
+inline constexpr Color Color::MIDNIGHT_BLUE{0.09803922f, 0.09803922f,
                                             0.4392157f};
-inline constexpr Color Color::kMintcream{0.9607843f, 1.0f, 0.98039216f};
-inline constexpr Color Color::kMistyRose{1.0f, 0.89411765f, 0.88235295f};
-inline constexpr Color Color::kMoccasin{1.0f, 0.89411765f, 0.70980394f};
-inline constexpr Color Color::kNavajoWhite{1.0f, 0.87058824f, 0.6784314f};
-inline constexpr Color Color::kNavy{0.0f, 0.0f, 0.5019608f};
-inline constexpr Color Color::kOldLace{0.99215686f, 0.9607843f, 0.9019608f};
-inline constexpr Color Color::kOlive{0.5019608f, 0.5019608f, 0.0f};
-inline constexpr Color Color::kOliveDrab{0.41960785f, 0.5568628f, 0.13725491f};
-inline constexpr Color Color::kOrange{1.0f, 0.64705884f, 0.0f};
-inline constexpr Color Color::kOrangeRed{1.0f, 0.27058825f, 0.0f};
-inline constexpr Color Color::kOrchid{0.85490197f, 0.4392157f, 0.8392157f};
-inline constexpr Color Color::kPaleGoldenrod{0.93333334f, 0.9098039f,
+inline constexpr Color Color::MINTCREAM{0.9607843f, 1.0f, 0.98039216f};
+inline constexpr Color Color::MISTY_ROSE{1.0f, 0.89411765f, 0.88235295f};
+inline constexpr Color Color::MOCCASIN{1.0f, 0.89411765f, 0.70980394f};
+inline constexpr Color Color::NAVAJO_WHITE{1.0f, 0.87058824f, 0.6784314f};
+inline constexpr Color Color::NAVY{0.0f, 0.0f, 0.5019608f};
+inline constexpr Color Color::OLD_LACE{0.99215686f, 0.9607843f, 0.9019608f};
+inline constexpr Color Color::OLIVE{0.5019608f, 0.5019608f, 0.0f};
+inline constexpr Color Color::OLIVE_DRAB{0.41960785f, 0.5568628f, 0.13725491f};
+inline constexpr Color Color::ORANGE{1.0f, 0.64705884f, 0.0f};
+inline constexpr Color Color::ORANGE_RED{1.0f, 0.27058825f, 0.0f};
+inline constexpr Color Color::ORCHID{0.85490197f, 0.4392157f, 0.8392157f};
+inline constexpr Color Color::PALE_GOLDENROD{0.93333334f, 0.9098039f,
                                              0.6666667f};
-inline constexpr Color Color::kPaleGreen{0.59607846f, 0.9843137f, 0.59607846f};
-inline constexpr Color Color::kPaleTurquoise{0.6862745f, 0.93333334f,
+inline constexpr Color Color::PALE_GREEN{0.59607846f, 0.9843137f, 0.59607846f};
+inline constexpr Color Color::PALE_TURQUOISE{0.6862745f, 0.93333334f,
                                              0.93333334f};
-inline constexpr Color Color::kPaleVioletRed{0.85882354f, 0.4392157f,
+inline constexpr Color Color::PALE_VIOLET_RED{0.85882354f, 0.4392157f,
                                              0.5764706f};
-inline constexpr Color Color::kPapayaWhip{1.0f, 0.9372549f, 0.8352941f};
-inline constexpr Color Color::kPeachPuff{1.0f, 0.85490197f, 0.7254902f};
-inline constexpr Color Color::kPeru{0.8039216f, 0.52156866f, 0.24705882f};
-inline constexpr Color Color::kPink{1.0f, 0.7529412f, 0.79607844f};
-inline constexpr Color Color::kPlum{0.8666667f, 0.627451f, 0.8666667f};
-inline constexpr Color Color::kPowderBlue{0.6901961f, 0.8784314f, 0.9019608f};
-inline constexpr Color Color::kPurple{0.5019608f, 0.0f, 0.5019608f};
-inline constexpr Color Color::kRed{1.0f, 0.0f, 0.0f};
-inline constexpr Color Color::kRosyBrown{0.7372549f, 0.56078434f, 0.56078434f};
-inline constexpr Color Color::kRoyalBlue{0.25490198f, 0.4117647f, 0.88235295f};
-inline constexpr Color Color::kSaddleBrown{0.54509807f, 0.27058825f,
+inline constexpr Color Color::PAPAYA_WHIP{1.0f, 0.9372549f, 0.8352941f};
+inline constexpr Color Color::PEACH_PUFF{1.0f, 0.85490197f, 0.7254902f};
+inline constexpr Color Color::PERU{0.8039216f, 0.52156866f, 0.24705882f};
+inline constexpr Color Color::PINK{1.0f, 0.7529412f, 0.79607844f};
+inline constexpr Color Color::PLUM{0.8666667f, 0.627451f, 0.8666667f};
+inline constexpr Color Color::POWDER_BLUE{0.6901961f, 0.8784314f, 0.9019608f};
+inline constexpr Color Color::PURPLE{0.5019608f, 0.0f, 0.5019608f};
+inline constexpr Color Color::RED{1.0f, 0.0f, 0.0f};
+inline constexpr Color Color::ROSY_BROWN{0.7372549f, 0.56078434f, 0.56078434f};
+inline constexpr Color Color::ROYAL_BLUE{0.25490198f, 0.4117647f, 0.88235295f};
+inline constexpr Color Color::SADDLE_BROWN{0.54509807f, 0.27058825f,
                                            0.07450981f};
-inline constexpr Color Color::kSalmon{0.98039216f, 0.5019608f, 0.44705883f};
-inline constexpr Color Color::kSandyBrown{0.95686275f, 0.6431373f, 0.3764706f};
-inline constexpr Color Color::kSeaGreen{0.18039216f, 0.54509807f, 0.34117648f};
-inline constexpr Color Color::kSeashell{1.0f, 0.9607843f, 0.93333334f};
-inline constexpr Color Color::kSienna{0.627451f, 0.32156864f, 0.1764706f};
-inline constexpr Color Color::kSilver{0.7529412f, 0.7529412f, 0.7529412f};
-inline constexpr Color Color::kSkyBlue{0.5294118f, 0.80784315f, 0.92156863f};
-inline constexpr Color Color::kSlateBlue{0.41568628f, 0.3529412f, 0.8039216f};
-inline constexpr Color Color::kSlateGray{0.4392157f, 0.5019608f, 0.5647059f};
-inline constexpr Color Color::kSnow{1.0f, 0.98039216f, 0.98039216f};
-inline constexpr Color Color::kSpringGreen{0.0f, 1.0f, 0.49803922f};
-inline constexpr Color Color::kSteelBlue{0.27450982f, 0.50980395f, 0.7058824f};
-inline constexpr Color Color::kTan{0.8235294f, 0.7058824f, 0.54901963f};
-inline constexpr Color Color::kTeal{0.0f, 0.5019608f, 0.5019608f};
-inline constexpr Color Color::kThistle{0.84705883f, 0.7490196f, 0.84705883f};
-inline constexpr Color Color::kTomato{1.0f, 0.3882353f, 0.2784314f};
-inline constexpr Color Color::kTurquoise{0.2509804f, 0.8784314f, 0.8156863f};
-inline constexpr Color Color::kViolet{0.93333334f, 0.50980395f, 0.93333334f};
-inline constexpr Color Color::kWheat{0.9607843f, 0.87058824f, 0.7019608f};
-inline constexpr Color Color::kWhite{1.0f, 1.0f, 1.0f};
-inline constexpr Color Color::kWhiteSmoke{0.9607843f, 0.9607843f, 0.9607843f};
-inline constexpr Color Color::kYellow{1.0f, 1.0f, 0.0f};
-inline constexpr Color Color::kYellowGreen{0.6039216f, 0.8039216f, 0.19607843f};
+inline constexpr Color Color::SALMON{0.98039216f, 0.5019608f, 0.44705883f};
+inline constexpr Color Color::SANDY_BROWN{0.95686275f, 0.6431373f, 0.3764706f};
+inline constexpr Color Color::SEA_GREEN{0.18039216f, 0.54509807f, 0.34117648f};
+inline constexpr Color Color::SEASHELL{1.0f, 0.9607843f, 0.93333334f};
+inline constexpr Color Color::SIENNA{0.627451f, 0.32156864f, 0.1764706f};
+inline constexpr Color Color::SILVER{0.7529412f, 0.7529412f, 0.7529412f};
+inline constexpr Color Color::SKY_BLUE{0.5294118f, 0.80784315f, 0.92156863f};
+inline constexpr Color Color::SLATE_BLUE{0.41568628f, 0.3529412f, 0.8039216f};
+inline constexpr Color Color::SLATE_GRAY{0.4392157f, 0.5019608f, 0.5647059f};
+inline constexpr Color Color::SNOW{1.0f, 0.98039216f, 0.98039216f};
+inline constexpr Color Color::SPRING_GREEN{0.0f, 1.0f, 0.49803922f};
+inline constexpr Color Color::STEEL_BLUE{0.27450982f, 0.50980395f, 0.7058824f};
+inline constexpr Color Color::TAN{0.8235294f, 0.7058824f, 0.54901963f};
+inline constexpr Color Color::TEAL{0.0f, 0.5019608f, 0.5019608f};
+inline constexpr Color Color::THISTLE{0.84705883f, 0.7490196f, 0.84705883f};
+inline constexpr Color Color::TOMATO{1.0f, 0.3882353f, 0.2784314f};
+inline constexpr Color Color::TURQUOISE{0.2509804f, 0.8784314f, 0.8156863f};
+inline constexpr Color Color::VIOLET{0.93333334f, 0.50980395f, 0.93333334f};
+inline constexpr Color Color::WHEAT{0.9607843f, 0.87058824f, 0.7019608f};
+inline constexpr Color Color::WHITE{1.0f, 1.0f, 1.0f};
+inline constexpr Color Color::WHITE_SMOKE{0.9607843f, 0.9607843f, 0.9607843f};
+inline constexpr Color Color::YELLOW{1.0f, 1.0f, 0.0f};
+inline constexpr Color Color::YELLOW_GREEN{0.6039216f, 0.8039216f, 0.19607843f};
 
 }  // namespace frc

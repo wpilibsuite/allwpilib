@@ -24,9 +24,9 @@ class I2C {
    */
   enum Port {
     /// I2C Port 0.
-    kPort0 = 0,
+    PORT0 = 0,
     /// I2C Port 1.
-    kPort1
+    PORT1
   };
 
   /**
@@ -153,7 +153,7 @@ class I2C {
   bool VerifySensor(int registerAddress, int count, const uint8_t* expected);
 
  private:
-  hal::Handle<HAL_I2CPort, HAL_CloseI2C, HAL_I2C_kInvalid> m_port;
+  hal::Handle<HAL_I2CPort, HAL_CloseI2C, HAL_I2C_Invalid> m_port;
   int m_deviceAddress;
 };
 

@@ -14,7 +14,7 @@
 namespace frc::sim {
 
 namespace {
-constexpr double kDefaultDistancePerPulse = .0005;
+constexpr double DEFAULT_DISTANCE_PER_PULSE = .0005;
 }  // namespace
 
 TEST(EncoderSimTest, Initialize) {
@@ -40,7 +40,7 @@ TEST(EncoderSimTest, Rate) {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   sim.SetRate(1.91);
   EXPECT_EQ(1.91, sim.GetRate());
@@ -53,7 +53,7 @@ TEST(EncoderSimTest, Count) {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   IntCallback callback;
   auto cb = sim.RegisterCountCallback(callback.GetCallback(), false);
@@ -72,7 +72,7 @@ TEST(EncoderSimTest, Distance) {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   sim.SetDistance(229.174);
   EXPECT_EQ(229.174, sim.GetDistance());
@@ -86,7 +86,7 @@ TEST(EncoderSimTest, Period) {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   DoubleCallback callback;
   auto cb = sim.RegisterPeriodCallback(callback.GetCallback(), false);
@@ -95,7 +95,7 @@ TEST(EncoderSimTest, Period) {
   WPI_IGNORE_DEPRECATED
   EXPECT_EQ(123.456, encoder.GetPeriod().value());
   WPI_UNIGNORE_DEPRECATED
-  EXPECT_EQ(kDefaultDistancePerPulse / 123.456, encoder.GetRate());
+  EXPECT_EQ(DEFAULT_DISTANCE_PER_PULSE / 123.456, encoder.GetRate());
 
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(123.456, callback.GetLastValue());
@@ -108,7 +108,7 @@ TEST(EncoderSimTest, SetMaxPeriod) {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   DoubleCallback callback;
   auto cb = sim.RegisterMaxPeriodCallback(callback.GetCallback(), false);
@@ -129,7 +129,7 @@ TEST(EncoderSimTest, SetDirection) {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   BooleanCallback callback;
   auto cb = sim.RegisterDirectionCallback(callback.GetCallback(), false);
@@ -154,7 +154,7 @@ TEST(EncoderSimTest, SetReverseDirection) {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   BooleanCallback callback;
   auto cb = sim.RegisterReverseDirectionCallback(callback.GetCallback(), false);
@@ -177,7 +177,7 @@ TEST(EncoderSimTest, SetSamplesToAverage) {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   IntCallback callback;
   auto cb = sim.RegisterSamplesToAverageCallback(callback.GetCallback(), false);
@@ -213,7 +213,7 @@ TEST(EncoderSimTest, Reset) {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   BooleanCallback callback;
   auto cb = sim.RegisterResetCallback(callback.GetCallback(), false);

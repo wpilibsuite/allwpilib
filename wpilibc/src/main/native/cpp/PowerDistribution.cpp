@@ -17,12 +17,12 @@
 #include "frc/Errors.h"
 
 static_assert(static_cast<HAL_PowerDistributionType>(
-                  frc::PowerDistribution::ModuleType::kCTRE) ==
-              HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE);
+                  frc::PowerDistribution::ModuleType::CTRE) ==
+              HAL_PowerDistributionType::HAL_PowerDistributionType_CTRE);
 static_assert(static_cast<HAL_PowerDistributionType>(
-                  frc::PowerDistribution::ModuleType::kRev) ==
-              HAL_PowerDistributionType::HAL_PowerDistributionType_kRev);
-static_assert(frc::PowerDistribution::kDefaultModule ==
+                  frc::PowerDistribution::ModuleType::REV) ==
+              HAL_PowerDistributionType::HAL_PowerDistributionType_REV);
+static_assert(frc::PowerDistribution::DEFAULT_MODULE ==
               HAL_DEFAULT_POWER_DISTRIBUTION_MODULE);
 
 using namespace frc;
@@ -32,15 +32,15 @@ PowerDistribution::PowerDistribution(int busId) {
 
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
-      busId, kDefaultModule,
-      HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic,
+      busId, DEFAULT_MODULE,
+      HAL_PowerDistributionType::HAL_PowerDistributionType_Automatic,
       stack.c_str(), &status);
-  FRC_CheckErrorStatus(status, "Module {}", kDefaultModule);
+  FRC_CheckErrorStatus(status, "Module {}", DEFAULT_MODULE);
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
 
   if (HAL_GetPowerDistributionType(m_handle, &status) ==
-      HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
+      HAL_PowerDistributionType::HAL_PowerDistributionType_CTRE) {
     HAL_ReportUsage("PDP", m_module, "");
   } else {
     HAL_ReportUsage("PDH", m_module, "");
@@ -60,7 +60,7 @@ PowerDistribution::PowerDistribution(int busId, int module,
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   FRC_ReportError(status, "Module {}", module);
 
-  if (moduleType == ModuleType::kCTRE) {
+  if (moduleType == ModuleType::CTRE) {
     HAL_ReportUsage("PDP_CTRE", m_module, "");
   } else {
     HAL_ReportUsage("PDH_REV", m_module, "");

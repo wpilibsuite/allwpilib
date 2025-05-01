@@ -84,16 +84,16 @@ double DifferentialDrivetrainSim::GetState(int state) const {
 }
 
 Rotation2d DifferentialDrivetrainSim::GetHeading() const {
-  return units::radian_t{GetOutput(State::kHeading)};
+  return units::radian_t{GetOutput(State::HEADING)};
 }
 
 Pose2d DifferentialDrivetrainSim::GetPose() const {
-  return Pose2d{units::meter_t{GetOutput(State::kX)},
-                units::meter_t{GetOutput(State::kY)}, GetHeading()};
+  return Pose2d{units::meter_t{GetOutput(State::X)},
+                units::meter_t{GetOutput(State::Y)}, GetHeading()};
 }
 
 units::ampere_t DifferentialDrivetrainSim::GetLeftCurrentDraw() const {
-  return m_motor.Current(units::radians_per_second_t{m_x(State::kLeftVelocity) *
+  return m_motor.Current(units::radians_per_second_t{m_x(State::LEFT_VELOCITY) *
                                                      m_currentGearing /
                                                      m_wheelRadius.value()},
                          units::volt_t{m_u(0)}) *
@@ -102,7 +102,7 @@ units::ampere_t DifferentialDrivetrainSim::GetLeftCurrentDraw() const {
 
 units::ampere_t DifferentialDrivetrainSim::GetRightCurrentDraw() const {
   return m_motor.Current(
-             units::radians_per_second_t{m_x(State::kRightVelocity) *
+             units::radians_per_second_t{m_x(State::RIGHT_VELOCITY) *
                                          m_currentGearing /
                                          m_wheelRadius.value()},
              units::volt_t{m_u(1)}) *
@@ -118,11 +118,11 @@ void DifferentialDrivetrainSim::SetState(const Vectord<7>& state) {
 }
 
 void DifferentialDrivetrainSim::SetPose(const frc::Pose2d& pose) {
-  m_x(State::kX) = pose.X().value();
-  m_x(State::kY) = pose.Y().value();
-  m_x(State::kHeading) = pose.Rotation().Radians().value();
-  m_x(State::kLeftPosition) = 0;
-  m_x(State::kRightPosition) = 0;
+  m_x(State::X) = pose.X().value();
+  m_x(State::Y) = pose.Y().value();
+  m_x(State::HEADING) = pose.Rotation().Radians().value();
+  m_x(State::LEFT_POSITION) = 0;
+  m_x(State::RIGHT_POSITION) = 0;
 }
 
 Vectord<7> DifferentialDrivetrainSim::Dynamics(const Vectord<7>& x,
@@ -143,13 +143,13 @@ Vectord<7> DifferentialDrivetrainSim::Dynamics(const Vectord<7>& x,
   A.block<2, 2>(2, 0).setIdentity();
   A.block<4, 2>(0, 2).setZero();
 
-  double v = (x(State::kLeftVelocity) + x(State::kRightVelocity)) / 2.0;
+  double v = (x(State::LEFT_VELOCITY) + x(State::RIGHT_VELOCITY)) / 2.0;
 
   Vectord<7> xdot;
-  xdot(0) = v * std::cos(x(State::kHeading));
-  xdot(1) = v * std::sin(x(State::kHeading));
+  xdot(0) = v * std::cos(x(State::HEADING));
+  xdot(1) = v * std::sin(x(State::HEADING));
   xdot(2) =
-      ((x(State::kRightVelocity) - x(State::kLeftVelocity)) / (2.0 * m_rb))
+      ((x(State::RIGHT_VELOCITY) - x(State::LEFT_VELOCITY)) / (2.0 * m_rb))
           .value();
   xdot.block<4, 1>(3, 0) = A * x.block<4, 1>(3, 0) + B * u;
   return xdot;

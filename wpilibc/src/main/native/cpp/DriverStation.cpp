@@ -45,7 +45,7 @@ class MatchDataSenderEntry {
                        std::string_view key,
                        typename Topic::ParamType initialVal,
                        wpi::json topicProperties = wpi::json::object())
-      : publisher{Topic{table->GetTopic(key)}.PublishEx(Topic::kTypeString,
+      : publisher{Topic{table->GetTopic(key)}.PublishEx(Topic::TYPE_STRING,
                                                         topicProperties)},
         prevVal{initialVal} {
     publisher.Set(initialVal);
@@ -63,7 +63,7 @@ class MatchDataSenderEntry {
   typename Topic::ValueType prevVal;
 };
 
-static constexpr std::string_view kSmartDashboardType = "FMSInfo";
+static constexpr std::string_view SMART_DASHBOARD_TYPE = "FMSInfo";
 
 struct MatchDataSender {
   std::shared_ptr<nt::NetworkTable> table =
@@ -71,8 +71,8 @@ struct MatchDataSender {
   MatchDataSenderEntry<nt::StringTopic> typeMetaData{
       table,
       ".type",
-      kSmartDashboardType,
-      {{"SmartDashboard", kSmartDashboardType}}};
+      SMART_DASHBOARD_TYPE,
+      {{"SmartDashboard", SMART_DASHBOARD_TYPE}}};
   MatchDataSenderEntry<nt::StringTopic> gameSpecificMessage{
       table, "GameSpecificMessage", ""};
   MatchDataSenderEntry<nt::StringTopic> eventName{table, "EventName", ""};
@@ -118,7 +118,7 @@ class DataLogSender {
   wpi::log::BooleanLogEntry m_logEstop;
 
   bool m_logJoysticks;
-  std::array<JoystickLogSender, DriverStation::kJoystickPorts> m_joysticks;
+  std::array<JoystickLogSender, DriverStation::JOYSTICK_PORTS> m_joysticks;
 };
 
 struct Instance {
@@ -131,10 +131,10 @@ struct Instance {
 
   // Joystick button rising/falling edge flags
   wpi::mutex buttonEdgeMutex;
-  std::array<HAL_JoystickButtons, DriverStation::kJoystickPorts>
+  std::array<HAL_JoystickButtons, DriverStation::JOYSTICK_PORTS>
       previousButtonStates;
-  std::array<uint32_t, DriverStation::kJoystickPorts> joystickButtonsPressed;
-  std::array<uint32_t, DriverStation::kJoystickPorts> joystickButtonsReleased;
+  std::array<uint32_t, DriverStation::JOYSTICK_PORTS> joystickButtonsPressed;
+  std::array<uint32_t, DriverStation::JOYSTICK_PORTS> joystickButtonsReleased;
 
   bool silenceJoystickWarning = false;
 
@@ -148,7 +148,7 @@ struct Instance {
 };
 }  // namespace
 
-static constexpr auto kJoystickUnpluggedMessageInterval = 1_s;
+static constexpr auto JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1_s;
 
 static Instance& GetInstance() {
   static Instance instance;
@@ -190,7 +190,7 @@ Instance::Instance() {
 
   // All joysticks should default to having zero axes, povs and buttons, so
   // uninitialized memory doesn't get sent to motor controllers.
-  for (unsigned int i = 0; i < DriverStation::kJoystickPorts; i++) {
+  for (unsigned int i = 0; i < DriverStation::JOYSTICK_PORTS; i++) {
     joystickButtonsPressed[i] = 0;
     joystickButtonsReleased[i] = 0;
     previousButtonStates[i].count = 0;
@@ -205,7 +205,7 @@ Instance::~Instance() {
 }
 
 bool DriverStation::GetStickButton(int stick, int button) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
@@ -230,7 +230,7 @@ bool DriverStation::GetStickButton(int stick, int button) {
 }
 
 bool DriverStation::GetStickButtonPressed(int stick, int button) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
@@ -261,7 +261,7 @@ bool DriverStation::GetStickButtonPressed(int stick, int button) {
 }
 
 bool DriverStation::GetStickButtonReleased(int stick, int button) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
@@ -292,11 +292,11 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
 }
 
 double DriverStation::GetStickAxis(int stick, int axis) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0.0;
   }
-  if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
+  if (axis < 0 || axis >= HAL_MaxJoystickAxes) {
     FRC_ReportError(warn::BadJoystickAxis, "axis {} out of range", axis);
     return 0.0;
   }
@@ -316,11 +316,11 @@ double DriverStation::GetStickAxis(int stick, int axis) {
 }
 
 int DriverStation::GetStickPOV(int stick, int pov) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return -1;
   }
-  if (pov < 0 || pov >= HAL_kMaxJoystickPOVs) {
+  if (pov < 0 || pov >= HAL_MaxJoystickPOVs) {
     FRC_ReportError(warn::BadJoystickAxis, "POV {} out of range", pov);
     return -1;
   }
@@ -340,7 +340,7 @@ int DriverStation::GetStickPOV(int stick, int pov) {
 }
 
 int DriverStation::GetStickButtons(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
@@ -352,7 +352,7 @@ int DriverStation::GetStickButtons(int stick) {
 }
 
 int DriverStation::GetStickAxisCount(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
@@ -364,7 +364,7 @@ int DriverStation::GetStickAxisCount(int stick) {
 }
 
 int DriverStation::GetStickPOVCount(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
@@ -376,7 +376,7 @@ int DriverStation::GetStickPOVCount(int stick) {
 }
 
 int DriverStation::GetStickButtonCount(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
@@ -388,7 +388,7 @@ int DriverStation::GetStickButtonCount(int stick) {
 }
 
 bool DriverStation::GetJoystickIsXbox(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
@@ -400,7 +400,7 @@ bool DriverStation::GetJoystickIsXbox(int stick) {
 }
 
 int DriverStation::GetJoystickType(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return -1;
   }
@@ -412,7 +412,7 @@ int DriverStation::GetJoystickType(int stick) {
 }
 
 std::string DriverStation::GetJoystickName(int stick) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
   }
 
@@ -423,11 +423,11 @@ std::string DriverStation::GetJoystickName(int stick) {
 }
 
 int DriverStation::GetJoystickAxisType(int stick, int axis) {
-  if (stick < 0 || stick >= kJoystickPorts) {
+  if (stick < 0 || stick >= JOYSTICK_PORTS) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return -1;
   }
-  if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
+  if (axis < 0 || axis >= HAL_MaxJoystickAxes) {
     FRC_ReportError(warn::BadJoystickAxis, "axis {} out of range", axis);
     return -1;
   }
@@ -544,14 +544,14 @@ std::optional<DriverStation::Alliance> DriverStation::GetAlliance() {
   int32_t status = 0;
   auto allianceStationID = HAL_GetAllianceStation(&status);
   switch (allianceStationID) {
-    case HAL_AllianceStationID_kRed1:
-    case HAL_AllianceStationID_kRed2:
-    case HAL_AllianceStationID_kRed3:
-      return kRed;
-    case HAL_AllianceStationID_kBlue1:
-    case HAL_AllianceStationID_kBlue2:
-    case HAL_AllianceStationID_kBlue3:
-      return kBlue;
+    case HAL_AllianceStationID_Red1:
+    case HAL_AllianceStationID_Red2:
+    case HAL_AllianceStationID_Red3:
+      return RED;
+    case HAL_AllianceStationID_Blue1:
+    case HAL_AllianceStationID_Blue2:
+    case HAL_AllianceStationID_Blue3:
+      return BLUE;
     default:
       return {};
   }
@@ -561,14 +561,14 @@ std::optional<int> DriverStation::GetLocation() {
   int32_t status = 0;
   auto allianceStationID = HAL_GetAllianceStation(&status);
   switch (allianceStationID) {
-    case HAL_AllianceStationID_kRed1:
-    case HAL_AllianceStationID_kBlue1:
+    case HAL_AllianceStationID_Red1:
+    case HAL_AllianceStationID_Blue1:
       return 1;
-    case HAL_AllianceStationID_kRed2:
-    case HAL_AllianceStationID_kBlue2:
+    case HAL_AllianceStationID_Red2:
+    case HAL_AllianceStationID_Blue2:
       return 2;
-    case HAL_AllianceStationID_kRed3:
-    case HAL_AllianceStationID_kBlue3:
+    case HAL_AllianceStationID_Red3:
+    case HAL_AllianceStationID_Blue3:
       return 3;
     default:
       return {};
@@ -616,7 +616,7 @@ void DriverStation::RefreshData() {
     HAL_JoystickButtons currentButtons;
     std::unique_lock lock(inst.buttonEdgeMutex);
 
-    for (int32_t i = 0; i < DriverStation::kJoystickPorts; i++) {
+    for (int32_t i = 0; i < DriverStation::JOYSTICK_PORTS; i++) {
       HAL_GetJoystickButtons(i, &currentButtons);
 
       // If buttons weren't pressed and are now, set flags in m_buttonsPressed
@@ -681,7 +681,7 @@ void ReportJoystickUnpluggedErrorV(fmt::string_view format,
   auto currentTime = Timer::GetTimestamp();
   if (currentTime > inst.nextMessageTime) {
     ReportErrorV(err::Error, "", 0, "", format, args);
-    inst.nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
+    inst.nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
   }
 }
 
@@ -692,7 +692,7 @@ void ReportJoystickUnpluggedWarningV(fmt::string_view format,
     auto currentTime = Timer::GetTimestamp();
     if (currentTime > inst.nextMessageTime) {
       ReportErrorV(warn::Warning, "", 0, "", format, args);
-      inst.nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
+      inst.nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
     }
   }
 }
@@ -703,23 +703,23 @@ void SendMatchData() {
   bool isRedAlliance = false;
   int stationNumber = 1;
   switch (alliance) {
-    case HAL_AllianceStationID::HAL_AllianceStationID_kBlue1:
+    case HAL_AllianceStationID::HAL_AllianceStationID_Blue1:
       isRedAlliance = false;
       stationNumber = 1;
       break;
-    case HAL_AllianceStationID::HAL_AllianceStationID_kBlue2:
+    case HAL_AllianceStationID::HAL_AllianceStationID_Blue2:
       isRedAlliance = false;
       stationNumber = 2;
       break;
-    case HAL_AllianceStationID::HAL_AllianceStationID_kBlue3:
+    case HAL_AllianceStationID::HAL_AllianceStationID_Blue3:
       isRedAlliance = false;
       stationNumber = 3;
       break;
-    case HAL_AllianceStationID::HAL_AllianceStationID_kRed1:
+    case HAL_AllianceStationID::HAL_AllianceStationID_Red1:
       isRedAlliance = true;
       stationNumber = 1;
       break;
-    case HAL_AllianceStationID::HAL_AllianceStationID_kRed2:
+    case HAL_AllianceStationID::HAL_AllianceStationID_Red2:
       isRedAlliance = true;
       stationNumber = 2;
       break;
@@ -814,7 +814,7 @@ void JoystickLogSender::AppendButtons(HAL_JoystickButtons buttons,
 
 void JoystickLogSender::AppendPOVs(const HAL_JoystickPOVs& povs,
                                    uint64_t timestamp) {
-  int64_t povsArr[HAL_kMaxJoystickPOVs];
+  int64_t povsArr[HAL_MaxJoystickPOVs];
   for (int i = 0; i < povs.count; ++i) {
     povsArr[i] = povs.povs[i];
   }

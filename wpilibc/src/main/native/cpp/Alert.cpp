@@ -45,12 +45,12 @@ class Alert::SendableAlerts : public nt::NTSendable,
   void InitSendable(nt::NTSendableBuilder& builder) override {
     builder.SetSmartDashboardType("Alerts");
     builder.AddStringArrayProperty(
-        "errors", [this]() { return GetStrings(AlertType::kError); }, nullptr);
+        "errors", [this]() { return GetStrings(AlertType::ERROR); }, nullptr);
     builder.AddStringArrayProperty(
-        "warnings", [this]() { return GetStrings(AlertType::kWarning); },
+        "warnings", [this]() { return GetStrings(AlertType::WARNING); },
         nullptr);
     builder.AddStringArrayProperty(
-        "infos", [this]() { return GetStrings(AlertType::kInfo); }, nullptr);
+        "infos", [this]() { return GetStrings(AlertType::INFO); }, nullptr);
   }
 
   /**
@@ -65,9 +65,9 @@ class Alert::SendableAlerts : public nt::NTSendable,
 
   const std::set<PublishedAlert>& GetActiveAlertsStorage(AlertType type) const {
     switch (type) {
-      case AlertType::kInfo:
-      case AlertType::kWarning:
-      case AlertType::kError:
+      case AlertType::INFO:
+      case AlertType::WARNING:
+      case AlertType::ERROR:
         return m_alerts[static_cast<int32_t>(type)];
       default:
         throw FRC_MakeError(frc::err::InvalidParameter,
@@ -175,12 +175,12 @@ void Alert::SetText(std::string_view text) {
 
 std::string frc::format_as(Alert::AlertType type) {
   switch (type) {
-    case Alert::AlertType::kInfo:
-      return "kInfo";
-    case Alert::AlertType::kWarning:
-      return "kWarning";
-    case Alert::AlertType::kError:
-      return "kError";
+    case Alert::AlertType::INFO:
+      return "INFO";
+    case Alert::AlertType::WARNING:
+      return "WARNING";
+    case Alert::AlertType::ERROR:
+      return "ERROR";
     default:
       return std::to_string(static_cast<int>(type));
   }

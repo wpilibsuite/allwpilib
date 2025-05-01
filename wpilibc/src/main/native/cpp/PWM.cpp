@@ -40,7 +40,7 @@ PWM::PWM(int channel, bool registerSendable) {
 }
 
 PWM::~PWM() {
-  if (m_handle != HAL_kInvalidHandle) {
+  if (m_handle != HAL_InvalidHandle) {
     SetDisabled();
   }
 }
@@ -69,15 +69,15 @@ void PWM::SetOutputPeriod(OutputPeriod mult) {
   int32_t status = 0;
 
   switch (mult) {
-    case kOutputPeriod_20Ms:
+    case OUTPUT_PERIOD_20MS:
       HAL_SetPWMOutputPeriod(m_handle, 3,
                              &status);  // Squelch 3 out of 4 outputs
       break;
-    case kOutputPeriod_10Ms:
+    case OUTPUT_PERIOD_10MS:
       HAL_SetPWMOutputPeriod(m_handle, 1,
                              &status);  // Squelch 1 out of 2 outputs
       break;
-    case kOutputPeriod_5Ms:
+    case OUTPUT_PERIOD_5MS:
       HAL_SetPWMOutputPeriod(m_handle, 0,
                              &status);  // Don't squelch any outputs
       break;

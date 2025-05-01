@@ -14,7 +14,7 @@ Servo::Servo(int channel) : m_pwm(channel, false) {
   wpi::SendableRegistry::Add(this, "Servo", channel);
 
   // Assign defaults for period multiplier for the servo PWM control signal
-  m_pwm.SetOutputPeriod(PWM::kOutputPeriod_20Ms);
+  m_pwm.SetOutputPeriod(PWM::OUTPUT_PERIOD_20MS);
 
   HAL_ReportUsage("IO", channel, "Servo");
   wpi::SendableRegistry::SetName(this, "Servo", channel);
@@ -51,17 +51,17 @@ double Servo::Get() const {
 }
 
 void Servo::SetAngle(double degrees) {
-  if (degrees < kMinServoAngle) {
-    degrees = kMinServoAngle;
-  } else if (degrees > kMaxServoAngle) {
-    degrees = kMaxServoAngle;
+  if (degrees < MIN_SERVO_ANGLE) {
+    degrees = MIN_SERVO_ANGLE;
+  } else if (degrees > MAX_SERVO_ANGLE) {
+    degrees = MAX_SERVO_ANGLE;
   }
 
-  Set((degrees - kMinServoAngle) / GetServoAngleRange());
+  Set((degrees - MIN_SERVO_ANGLE) / GetServoAngleRange());
 }
 
 double Servo::GetAngle() const {
-  return Get() * GetServoAngleRange() + kMinServoAngle;
+  return Get() * GetServoAngleRange() + MIN_SERVO_ANGLE;
 }
 
 void Servo::InitSendable(wpi::SendableBuilder& builder) {
@@ -72,7 +72,7 @@ void Servo::InitSendable(wpi::SendableBuilder& builder) {
 }
 
 double Servo::GetServoAngleRange() {
-  return kMaxServoAngle - kMinServoAngle;
+  return MAX_SERVO_ANGLE - MIN_SERVO_ANGLE;
 }
 
 units::microsecond_t Servo::GetFullRangeScaleFactor() const {

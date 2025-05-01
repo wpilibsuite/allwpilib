@@ -20,16 +20,16 @@
 using namespace frc;
 
 // The Preferences table name
-static constexpr std::string_view kTableName{"Preferences"};
-static constexpr std::string_view kSmartDashboardType = "RobotPreferences";
+static constexpr std::string_view TABLE_NAME{"Preferences"};
+static constexpr std::string_view SMART_DASHBOARD_TYPE = "RobotPreferences";
 namespace {
 struct Instance {
   Instance();
 
   std::shared_ptr<nt::NetworkTable> table{
-      nt::NetworkTableInstance::GetDefault().GetTable(kTableName)};
+      nt::NetworkTableInstance::GetDefault().GetTable(TABLE_NAME)};
   nt::StringPublisher typePublisher{table->GetStringTopic(".type").PublishEx(
-      nt::StringTopic::kTypeString, {{"SmartDashboard", kSmartDashboardType}})};
+      nt::StringTopic::TYPE_STRING, {{"SmartDashboard", SMART_DASHBOARD_TYPE}})};
   nt::MultiSubscriber tableSubscriber{nt::NetworkTableInstance::GetDefault(),
                                       {{fmt::format("{}/", table->GetPath())}}};
   nt::NetworkTableListener listener;
@@ -169,7 +169,7 @@ void Preferences::RemoveAll() {
 }
 
 Instance::Instance() {
-  typePublisher.Set(kSmartDashboardType);
+  typePublisher.Set(SMART_DASHBOARD_TYPE);
   listener = nt::NetworkTableListener::CreateListener(
       tableSubscriber, NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
       [typeTopic = typePublisher.GetTopic().GetHandle()](auto& event) {

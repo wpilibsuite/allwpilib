@@ -199,7 +199,7 @@ class LEDPattern {
 
   /**
    * Creates a pattern that plays this pattern overlaid on another. Anywhere
-   * this pattern sets an LED to off (or {@link frc::Color::kBlack}), the base
+   * this pattern sets an LED to off (or {@link frc::Color::BLACK}), the base
    * pattern will be displayed instead.
    *
    * @param base the base pattern to overlay on top of
@@ -231,7 +231,7 @@ class LEDPattern {
    * pattern by applying a mask that sets the desired area to white, and all
    * other areas to black. However, it can also be used to display only certain
    * color channels or hues; for example, masking with {@code
-   * LEDPattern.color(Color.kRed)} will turn off the green and blue channels on
+   * LEDPattern.color(Color.RED)} will turn off the green and blue channels on
    * the output pattern, leaving only the red LEDs to be illuminated.
    *
    * @param mask the mask to apply
@@ -256,10 +256,10 @@ class LEDPattern {
    *
    * <pre>
    *   // Solid red, but at 50% brightness
-   *   frc::LEDPattern::Solid(frc::Color::kRed).AtBrightness(0.5);
+   *   frc::LEDPattern::Solid(frc::Color::RED).AtBrightness(0.5);
    *
    *   // Solid white, but at only 10% (i.e. ~0.5V)
-   *   frc::LEDPattern::Solid(frc:Color::kWhite).AtBrightness(0.1);
+   *   frc::LEDPattern::Solid(frc:Color::WHITE).AtBrightness(0.1);
    * </pre>
    *
    * @param relativeBrightness the multiplier to apply to all channels to modify
@@ -296,7 +296,7 @@ class LEDPattern {
    *
    * <pre>
    * frc::LEDPattern basePattern =
-   *   frc::LEDPattern::Gradient(frc::Color::kRed, frc::Color::kBlue);
+   *   frc::LEDPattern::Gradient(frc::Color::RED, frc::Color::BLUE);
    * frc::LEDPattern progressPattern =
    *   basePattern.Mask(frc::LEDPattern::ProgressMaskLayer([&]() {
    *     return elevator.GetHeight() / elevator.MaxHeight();
@@ -345,14 +345,14 @@ class LEDPattern {
      * A continuous gradient, where the gradient wraps around to allow for
      * seamless scrolling effects.
      */
-    kContinuous,
+    CONTINUOUS,
     /**
      * A discontinuous gradient, where the first pixel is set to the first color
      * of the gradient and the final pixel is set to the last color of the
      * gradient. There is no wrapping effect, so scrolling effects will display
      * an obvious seam.
      */
-    kDiscontinuous
+    DISCONTINUOUS
   };
 
   /**

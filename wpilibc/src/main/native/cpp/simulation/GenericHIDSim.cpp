@@ -70,6 +70,6 @@ int64_t GenericHIDSim::GetOutputs() {
 
 double GenericHIDSim::GetRumble(GenericHID::RumbleType type) {
   int value = DriverStationSim::GetJoystickRumble(
-      m_port, type == GenericHID::kLeftRumble ? 0 : 1);
+      m_port, type == GenericHID::LEFT_RUMBLE ? 0 : 1);
   return value / 65535.0;
 }

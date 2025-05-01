@@ -11,8 +11,8 @@
 
 using namespace frc;
 
-static constexpr std::string_view kBackgroundColor = "backgroundColor";
-static constexpr std::string_view kDims = "dims";
+static constexpr std::string_view BACKGROUND_COLOR = "backgroundColor";
+static constexpr std::string_view DIMS = "dims";
 
 Mechanism2d::Mechanism2d(double width, double height,
                          const Color8Bit& backgroundColor)
@@ -42,9 +42,9 @@ void Mechanism2d::InitSendable(nt::NTSendableBuilder& builder) {
 
   std::scoped_lock lock(m_mutex);
   m_table = builder.GetTable();
-  m_dimsPub = m_table->GetDoubleArrayTopic(kDims).Publish();
+  m_dimsPub = m_table->GetDoubleArrayTopic(DIMS).Publish();
   m_dimsPub.Set({{m_width, m_height}});
-  m_colorPub = m_table->GetStringTopic(kBackgroundColor).Publish();
+  m_colorPub = m_table->GetStringTopic(BACKGROUND_COLOR).Publish();
   m_colorPub.Set(m_color);
   for (auto& entry : m_roots) {
     entry.second.Update(m_table->GetSubTable(entry.first));

@@ -21,16 +21,16 @@ class PowerDistribution : public wpi::Sendable,
                           public wpi::SendableHelper<PowerDistribution> {
  public:
   /// Default module number.
-  static constexpr int kDefaultModule = -1;
+  static constexpr int DEFAULT_MODULE = -1;
 
   /**
    * Power distribution module type.
    */
   enum class ModuleType {
     /// CTRE (Cross The Road Electronics) CTRE Power Distribution Panel (PDP).
-    kCTRE = 1,
+    CTRE = 1,
     /// REV Power Distribution Hub (PDH).
-    kRev = 2
+    REV = 2
   };
 
   /**

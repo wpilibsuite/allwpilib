@@ -131,7 +131,7 @@ class DifferentialDrivetrainSim {
    * @return The encoder position.
    */
   units::meter_t GetRightPosition() const {
-    return units::meter_t{GetOutput(State::kRightPosition)};
+    return units::meter_t{GetOutput(State::RIGHT_POSITION)};
   }
 
   /**
@@ -139,7 +139,7 @@ class DifferentialDrivetrainSim {
    * @return The encoder velocity.
    */
   units::meters_per_second_t GetRightVelocity() const {
-    return units::meters_per_second_t{GetOutput(State::kRightVelocity)};
+    return units::meters_per_second_t{GetOutput(State::RIGHT_VELOCITY)};
   }
 
   /**
@@ -147,7 +147,7 @@ class DifferentialDrivetrainSim {
    * @return The encoder position.
    */
   units::meter_t GetLeftPosition() const {
-    return units::meter_t{GetOutput(State::kLeftPosition)};
+    return units::meter_t{GetOutput(State::LEFT_POSITION)};
   }
 
   /**
@@ -155,7 +155,7 @@ class DifferentialDrivetrainSim {
    * @return The encoder velocity.
    */
   units::meters_per_second_t GetLeftVelocity() const {
-    return units::meters_per_second_t{GetOutput(State::kLeftVelocity)};
+    return units::meters_per_second_t{GetOutput(State::LEFT_VELOCITY)};
   }
 
   /**
@@ -198,13 +198,13 @@ class DifferentialDrivetrainSim {
 
   class State {
    public:
-    static constexpr int kX = 0;
-    static constexpr int kY = 1;
-    static constexpr int kHeading = 2;
-    static constexpr int kLeftVelocity = 3;
-    static constexpr int kRightVelocity = 4;
-    static constexpr int kLeftPosition = 5;
-    static constexpr int kRightPosition = 6;
+    static constexpr int X = 0;
+    static constexpr int Y = 1;
+    static constexpr int HEADING = 2;
+    static constexpr int LEFT_VELOCITY = 3;
+    static constexpr int RIGHT_VELOCITY = 4;
+    static constexpr int LEFT_POSITION = 5;
+    static constexpr int RIGHT_POSITION = 6;
   };
 
   /**
@@ -218,15 +218,15 @@ class DifferentialDrivetrainSim {
   class KitbotGearing {
    public:
     /// Gear ratio of 12.75:1.
-    static constexpr double k12p75 = 12.75;
+    static constexpr double RATIO_12_75 = 12.75;
     /// Gear ratio of 10.71:1.
-    static constexpr double k10p71 = 10.71;
+    static constexpr double RATIO_10_71 = 10.71;
     /// Gear ratio of 8.45:1.
-    static constexpr double k8p45 = 8.45;
+    static constexpr double RATIO_8_45 = 8.45;
     /// Gear ratio of 7.31:1.
-    static constexpr double k7p31 = 7.31;
+    static constexpr double RATIO_7_31 = 7.31;
     /// Gear ratio of 5.95:1.
-    static constexpr double k5p95 = 5.95;
+    static constexpr double RATIO_5_95 = 5.95;
   };
 
   /**
@@ -261,11 +261,11 @@ class DifferentialDrivetrainSim {
   class KitbotWheelSize {
    public:
     /// Six inch diameter wheels.
-    static constexpr units::meter_t kSixInch = 6_in;
+    static constexpr units::meter_t SIX_INCH = 6_in;
     /// Eight inch diameter wheels.
-    static constexpr units::meter_t kEightInch = 8_in;
+    static constexpr units::meter_t EIGHT_INCH = 8_in;
     /// Ten inch diameter wheels.
-    static constexpr units::meter_t kTenInch = 10_in;
+    static constexpr units::meter_t TEN_INCH = 10_in;
   };
 
   /**

@@ -147,11 +147,11 @@ class CAN {
   bool ReadPacketTimeout(int apiId, int timeoutMs, HAL_CANReceiveMessage* data);
 
   /// Team manufacturer.
-  static constexpr HAL_CANManufacturer kTeamManufacturer = HAL_CAN_Man_kTeamUse;
+  static constexpr HAL_CANManufacturer TEAM_MANUFACTURER = HAL_CAN_Man_TeamUse;
 
   /// Team device type.
-  static constexpr HAL_CANDeviceType kTeamDeviceType =
-      HAL_CAN_Dev_kMiscellaneous;
+  static constexpr HAL_CANDeviceType TEAM_DEVICE_TYPE =
+      HAL_CAN_Dev_Miscellaneous;
 
  private:
   hal::Handle<HAL_CANHandle, HAL_CleanCAN> m_handle;

@@ -27,13 +27,13 @@ class ADXL345_I2C : public nt::NTSendable,
    */
   enum Range {
     /// 2 Gs max.
-    kRange_2G = 0,
+    RANGE_2G = 0,
     /// 4 Gs max.
-    kRange_4G = 1,
+    RANGE_4G = 1,
     /// 8 Gs max.
-    kRange_8G = 2,
+    RANGE_8G = 2,
     /// 16 Gs max.
-    kRange_16G = 3
+    RANGE_16G = 3
   };
 
   /**
@@ -41,11 +41,11 @@ class ADXL345_I2C : public nt::NTSendable,
    */
   enum Axes {
     /// X axis.
-    kAxis_X = 0x00,
+    AXIS_X = 0x00,
     /// Y axis.
-    kAxis_Y = 0x02,
+    AXIS_Y = 0x02,
     /// Z axis.
-    kAxis_Z = 0x04
+    AXIS_Z = 0x04
   };
 
   /**
@@ -61,7 +61,7 @@ class ADXL345_I2C : public nt::NTSendable,
   };
 
   /// Default I2C device address.
-  static constexpr int kAddress = 0x1D;
+  static constexpr int ADDRESS = 0x1D;
 
   /**
    * Constructs the ADXL345 Accelerometer over I2C.
@@ -70,8 +70,8 @@ class ADXL345_I2C : public nt::NTSendable,
    * @param range         The range (+ or -) that the accelerometer will measure
    * @param deviceAddress The I2C address of the accelerometer (0x1D or 0x53)
    */
-  explicit ADXL345_I2C(I2C::Port port, Range range = kRange_2G,
-                       int deviceAddress = kAddress);
+  explicit ADXL345_I2C(I2C::Port port, Range range = RANGE_2G,
+                       int deviceAddress = ADDRESS);
   ~ADXL345_I2C() override = default;
 
   ADXL345_I2C(ADXL345_I2C&&) = default;
@@ -136,24 +136,24 @@ class ADXL345_I2C : public nt::NTSendable,
   hal::SimDouble m_simY;
   hal::SimDouble m_simZ;
 
-  static constexpr int kPowerCtlRegister = 0x2D;
-  static constexpr int kDataFormatRegister = 0x31;
-  static constexpr int kDataRegister = 0x32;
-  static constexpr double kGsPerLSB = 0.00390625;
+  static constexpr int POWER_CTL_REGISTER = 0x2D;
+  static constexpr int DATA_FORMAT_REGISTER = 0x31;
+  static constexpr int DATA_REGISTER = 0x32;
+  static constexpr double GS_PER_LSB = 0.00390625;
 
   enum PowerCtlFields {
-    kPowerCtl_Link = 0x20,
-    kPowerCtl_AutoSleep = 0x10,
-    kPowerCtl_Measure = 0x08,
-    kPowerCtl_Sleep = 0x04
+    POWER_CTL_LINK = 0x20,
+    POWER_CTL_AUTO_SLEEP = 0x10,
+    POWER_CTL_MEASURE = 0x08,
+    POWER_CTL_SLEEP = 0x04
   };
 
   enum DataFormatFields {
-    kDataFormat_SelfTest = 0x80,
-    kDataFormat_SPI = 0x40,
-    kDataFormat_IntInvert = 0x20,
-    kDataFormat_FullRes = 0x08,
-    kDataFormat_Justify = 0x04
+    DATA_FORMAT_SELF_TEST = 0x80,
+    DATA_FORMAT_SPI = 0x40,
+    DATA_FORMAT_INT_INVERT = 0x20,
+    DATA_FORMAT_FULL_RES = 0x08,
+    DATA_FORMAT_JUSTIFY = 0x04
   };
 };
 

@@ -21,13 +21,13 @@ TEST(RoboRioSimTest, SetVin) {
   DoubleCallback voltageCallback;
   auto voltageCb = RoboRioSim::RegisterVInVoltageCallback(
       voltageCallback.GetCallback(), false);
-  constexpr double kTestVoltage = 1.91;
+  constexpr double TEST_VOLTAGE = 1.91;
 
-  RoboRioSim::SetVInVoltage(units::volt_t{kTestVoltage});
+  RoboRioSim::SetVInVoltage(units::volt_t{TEST_VOLTAGE});
   EXPECT_TRUE(voltageCallback.WasTriggered());
-  EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
-  EXPECT_EQ(kTestVoltage, RoboRioSim::GetVInVoltage().value());
-  EXPECT_EQ(kTestVoltage, RobotController::GetInputVoltage());
+  EXPECT_EQ(TEST_VOLTAGE, voltageCallback.GetLastValue());
+  EXPECT_EQ(TEST_VOLTAGE, RoboRioSim::GetVInVoltage().value());
+  EXPECT_EQ(TEST_VOLTAGE, RobotController::GetInputVoltage());
 }
 
 TEST(RoboRioSimTest, SetBrownout) {
@@ -36,13 +36,13 @@ TEST(RoboRioSimTest, SetBrownout) {
   DoubleCallback voltageCallback;
   auto voltageCb = RoboRioSim::RegisterBrownoutVoltageCallback(
       voltageCallback.GetCallback(), false);
-  constexpr double kTestVoltage = 1.91;
+  constexpr double TEST_VOLTAGE = 1.91;
 
-  RoboRioSim::SetBrownoutVoltage(units::volt_t{kTestVoltage});
+  RoboRioSim::SetBrownoutVoltage(units::volt_t{TEST_VOLTAGE});
   EXPECT_TRUE(voltageCallback.WasTriggered());
-  EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
-  EXPECT_EQ(kTestVoltage, RoboRioSim::GetBrownoutVoltage().value());
-  EXPECT_EQ(kTestVoltage, RobotController::GetBrownoutVoltage().value());
+  EXPECT_EQ(TEST_VOLTAGE, voltageCallback.GetLastValue());
+  EXPECT_EQ(TEST_VOLTAGE, RoboRioSim::GetBrownoutVoltage().value());
+  EXPECT_EQ(TEST_VOLTAGE, RobotController::GetBrownoutVoltage().value());
 }
 
 TEST(RoboRioSimTest, Set3V3) {
@@ -60,21 +60,21 @@ TEST(RoboRioSimTest, Set3V3) {
       activeCallback.GetCallback(), false);
   auto faultsCb = RoboRioSim::RegisterUserFaults3V3Callback(
       faultCallback.GetCallback(), false);
-  constexpr double kTestVoltage = 22.9;
-  constexpr double kTestCurrent = 174;
-  constexpr int kTestFaults = 229;
+  constexpr double TEST_VOLTAGE = 22.9;
+  constexpr double TEST_CURRENT = 174;
+  constexpr int TEST_FAULTS = 229;
 
-  RoboRioSim::SetUserVoltage3V3(units::volt_t{kTestVoltage});
+  RoboRioSim::SetUserVoltage3V3(units::volt_t{TEST_VOLTAGE});
   EXPECT_TRUE(voltageCallback.WasTriggered());
-  EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
-  EXPECT_EQ(kTestVoltage, RoboRioSim::GetUserVoltage3V3().value());
-  EXPECT_EQ(kTestVoltage, RobotController::GetVoltage3V3());
+  EXPECT_EQ(TEST_VOLTAGE, voltageCallback.GetLastValue());
+  EXPECT_EQ(TEST_VOLTAGE, RoboRioSim::GetUserVoltage3V3().value());
+  EXPECT_EQ(TEST_VOLTAGE, RobotController::GetVoltage3V3());
 
-  RoboRioSim::SetUserCurrent3V3(units::ampere_t{kTestCurrent});
+  RoboRioSim::SetUserCurrent3V3(units::ampere_t{TEST_CURRENT});
   EXPECT_TRUE(currentCallback.WasTriggered());
-  EXPECT_EQ(kTestCurrent, currentCallback.GetLastValue());
-  EXPECT_EQ(kTestCurrent, RoboRioSim::GetUserCurrent3V3().value());
-  EXPECT_EQ(kTestCurrent, RobotController::GetCurrent3V3());
+  EXPECT_EQ(TEST_CURRENT, currentCallback.GetLastValue());
+  EXPECT_EQ(TEST_CURRENT, RoboRioSim::GetUserCurrent3V3().value());
+  EXPECT_EQ(TEST_CURRENT, RobotController::GetCurrent3V3());
 
   RoboRioSim::SetUserActive3V3(false);
   EXPECT_TRUE(activeCallback.WasTriggered());
@@ -82,11 +82,11 @@ TEST(RoboRioSimTest, Set3V3) {
   EXPECT_FALSE(RoboRioSim::GetUserActive3V3());
   EXPECT_FALSE(RobotController::GetEnabled3V3());
 
-  RoboRioSim::SetUserFaults3V3(kTestFaults);
+  RoboRioSim::SetUserFaults3V3(TEST_FAULTS);
   EXPECT_TRUE(faultCallback.WasTriggered());
-  EXPECT_EQ(kTestFaults, faultCallback.GetLastValue());
-  EXPECT_EQ(kTestFaults, RoboRioSim::GetUserFaults3V3());
-  EXPECT_EQ(kTestFaults, RobotController::GetFaultCount3V3());
+  EXPECT_EQ(TEST_FAULTS, faultCallback.GetLastValue());
+  EXPECT_EQ(TEST_FAULTS, RoboRioSim::GetUserFaults3V3());
+  EXPECT_EQ(TEST_FAULTS, RobotController::GetFaultCount3V3());
 }
 
 TEST(RoboRioSimTest, SetCPUTemp) {
@@ -95,13 +95,13 @@ TEST(RoboRioSimTest, SetCPUTemp) {
   DoubleCallback callback;
   auto cbHandle =
       RoboRioSim::RegisterCPUTempCallback(callback.GetCallback(), false);
-  constexpr double kCPUTemp = 100.0;
+  constexpr double CPU_TEMP = 100.0;
 
-  RoboRioSim::SetCPUTemp(units::celsius_t{kCPUTemp});
+  RoboRioSim::SetCPUTemp(units::celsius_t{CPU_TEMP});
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(kCPUTemp, callback.GetLastValue());
-  EXPECT_EQ(kCPUTemp, RoboRioSim::GetCPUTemp().value());
-  EXPECT_EQ(kCPUTemp, RobotController::GetCPUTemp().value());
+  EXPECT_EQ(CPU_TEMP, callback.GetLastValue());
+  EXPECT_EQ(CPU_TEMP, RoboRioSim::GetCPUTemp().value());
+  EXPECT_EQ(CPU_TEMP, RobotController::GetCPUTemp().value());
 }
 
 TEST(RoboRioSimTest, SetTeamNumber) {
@@ -110,50 +110,50 @@ TEST(RoboRioSimTest, SetTeamNumber) {
   IntCallback callback;
   auto cbHandle =
       RoboRioSim::RegisterTeamNumberCallback(callback.GetCallback(), false);
-  constexpr int kTeamNumber = 9999;
+  constexpr int TEAM_NUMBER = 9999;
 
-  RoboRioSim::SetTeamNumber(kTeamNumber);
+  RoboRioSim::SetTeamNumber(TEAM_NUMBER);
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(kTeamNumber, callback.GetLastValue());
-  EXPECT_EQ(kTeamNumber, RoboRioSim::GetTeamNumber());
-  EXPECT_EQ(kTeamNumber, RobotController::GetTeamNumber());
+  EXPECT_EQ(TEAM_NUMBER, callback.GetLastValue());
+  EXPECT_EQ(TEAM_NUMBER, RoboRioSim::GetTeamNumber());
+  EXPECT_EQ(TEAM_NUMBER, RobotController::GetTeamNumber());
 }
 
 TEST(RoboRioSimTest, SetSerialNumber) {
-  const std::string kSerialNum = "Hello";
+  const std::string SERIAL_NUM = "Hello";
 
   RoboRioSim::ResetData();
 
-  RoboRioSim::SetSerialNumber(kSerialNum);
-  EXPECT_EQ(kSerialNum, RoboRioSim::GetSerialNumber());
-  EXPECT_EQ(kSerialNum, RobotController::GetSerialNumber());
+  RoboRioSim::SetSerialNumber(SERIAL_NUM);
+  EXPECT_EQ(SERIAL_NUM, RoboRioSim::GetSerialNumber());
+  EXPECT_EQ(SERIAL_NUM, RobotController::GetSerialNumber());
 
-  const std::string kSerialNumberOverflow = "SerialNumber";
-  const std::string kSerialNumberTruncated = kSerialNumberOverflow.substr(0, 8);
+  const std::string SERIAL_NUMBER_OVERFLOW = "SerialNumber";
+  const std::string SERIAL_NUMBER_TRUNCATED = SERIAL_NUMBER_OVERFLOW.substr(0, 8);
 
-  RoboRioSim::SetSerialNumber(kSerialNumberOverflow);
-  EXPECT_EQ(kSerialNumberTruncated, RoboRioSim::GetSerialNumber());
-  EXPECT_EQ(kSerialNumberTruncated, RobotController::GetSerialNumber());
+  RoboRioSim::SetSerialNumber(SERIAL_NUMBER_OVERFLOW);
+  EXPECT_EQ(SERIAL_NUMBER_TRUNCATED, RoboRioSim::GetSerialNumber());
+  EXPECT_EQ(SERIAL_NUMBER_TRUNCATED, RobotController::GetSerialNumber());
 }
 
 TEST(RoboRioSimTest, SetComments) {
-  const std::string kComments =
+  const std::string COMMENTS =
       "Hello! These are comments in the roboRIO web interface!";
 
   RoboRioSim::ResetData();
 
-  RoboRioSim::SetComments(kComments);
-  EXPECT_EQ(kComments, RoboRioSim::GetComments());
-  EXPECT_EQ(kComments, RobotController::GetComments());
+  RoboRioSim::SetComments(COMMENTS);
+  EXPECT_EQ(COMMENTS, RoboRioSim::GetComments());
+  EXPECT_EQ(COMMENTS, RobotController::GetComments());
 
-  const std::string kCommentsOverflow =
+  const std::string COMMENTS_OVERFLOW =
       "Hello! These are comments in the roboRIO web interface! This comment "
       "exceeds 64 characters!";
-  const std::string kCommentsTruncated = kCommentsOverflow.substr(0, 64);
+  const std::string COMMENTS_TRUNCATED = COMMENTS_OVERFLOW.substr(0, 64);
 
-  RoboRioSim::SetComments(kCommentsOverflow);
-  EXPECT_EQ(kCommentsTruncated, RoboRioSim::GetComments());
-  EXPECT_EQ(kCommentsTruncated, RobotController::GetComments());
+  RoboRioSim::SetComments(COMMENTS_OVERFLOW);
+  EXPECT_EQ(COMMENTS_TRUNCATED, RoboRioSim::GetComments());
+  EXPECT_EQ(COMMENTS_TRUNCATED, RobotController::GetComments());
 }
 
 }  // namespace frc::sim

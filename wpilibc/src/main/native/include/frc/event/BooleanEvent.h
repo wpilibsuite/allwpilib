@@ -126,7 +126,7 @@ class BooleanEvent {
    */
   BooleanEvent Debounce(units::second_t debounceTime,
                         frc::Debouncer::DebounceType type =
-                            frc::Debouncer::DebounceType::kRising);
+                            frc::Debouncer::DebounceType::RISING);
 
  private:
   EventLoop* m_loop;
