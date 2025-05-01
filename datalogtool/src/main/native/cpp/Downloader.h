@@ -38,17 +38,17 @@ class Downloader {
 
   wpi::mutex m_mutex;
   enum State {
-    kDisconnected,
-    kConnecting,
-    kConnected,
-    kDisconnecting,
-    kGetFiles,
-    kDownload,
-    kDownloadDone,
-    kDelete,
-    kDeleteDone,
-    kExit
-  } m_state = kDisconnected;
+    DISCONNECTED,
+    CONNECTING,
+    CONNECTED,
+    DISCONNECTING,
+    GET_FILES,
+    DOWNLOAD,
+    DOWNLOAD_DONE,
+    DELETE,
+    DELETE_DONE,
+    EXIT
+  } m_state = DISCONNECTED;
   std::condition_variable m_cv;
 
   std::string& m_serverTeam;
