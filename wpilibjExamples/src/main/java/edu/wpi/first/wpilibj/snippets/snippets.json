@@ -68,5 +68,28 @@
     "foldername": "limitswitch",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "DigitalInput",
+    "description": "Snippets of Digital Input for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Digital Input"
+    ],
+    "foldername": "digitalinput",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "AnalogTrigger",
+    "description": "Snippets of Analog Trigger for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Analog",
+      "Digital Input"
+    ],
+    "foldername": "analogtrigger",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
