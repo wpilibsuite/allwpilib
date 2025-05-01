@@ -9,21 +9,21 @@ import java.io.UncheckedIOException;
 /** Loadable AprilTag field layouts. */
 public enum AprilTagFields {
   /** 2022 Rapid React. */
-  k2022RapidReact("2022-rapidreact.json"),
+  RAPID_REACT_2022("2022-rapidreact.json"),
   /** 2023 Charged Up. */
-  k2023ChargedUp("2023-chargedup.json"),
+  CHARGED_UP_2023("2023-chargedup.json"),
   /** 2024 Crescendo. */
-  k2024Crescendo("2024-crescendo.json"),
+  CRESCENDO_2024("2024-crescendo.json"),
   /** 2025 Reefscape Welded (see TU 12). */
-  k2025ReefscapeWelded("2025-reefscape-welded.json"),
+  REEFSCAPE_2025_WELDED("2025-reefscape-welded.json"),
   /** 2025 Reefscape AndyMark (see TU 12). */
-  k2025ReefscapeAndyMark("2025-reefscape-andymark.json");
+  REEFSCAPE_2025_ANDYMARK("2025-reefscape-andymark.json");
 
   /** Base resource directory. */
-  public static final String kBaseResourceDir = "/edu/wpi/first/apriltag/";
+  public static final String BASE_RESOURCE_DIR = "/edu/wpi/first/apriltag/";
 
   /** Alias to the current game. */
-  public static final AprilTagFields kDefaultField = k2025ReefscapeWelded;
+  public static final AprilTagFields DEFAULT_FIELD = REEFSCAPE_2025_WELDED;
 
   /** Resource filename. */
   public final String m_resourceFile;
@@ -31,7 +31,7 @@ public enum AprilTagFields {
   AprilTagFieldLayout m_fieldLayout;
 
   AprilTagFields(String resourceFile) {
-    m_resourceFile = kBaseResourceDir + resourceFile;
+    m_resourceFile = BASE_RESOURCE_DIR + resourceFile;
   }
 
   /**

@@ -16,13 +16,13 @@
 
 1. Update `src/main/java/edu/wpi/first/apriltag/AprilTagFields.java`
     1. Add enum value for new field to `AprilTagFields`
-    2. Update `AprilTagFields.kDefaultField` if necessary
+    2. Update `AprilTagFields.DEFAULT_FIELD` if necessary
 
 ### C++ updates
 
 1. Update `src/main/native/include/frc/apriltag/AprilTagFields.h`
     1. Add enum value for new field to `AprilTagFields`
-    2. Update `AprilTagFields::kDefaultField` if necessary
+    2. Update `AprilTagFields::DEFAULT_FIELD` if necessary
 2. Update `src/main/native/cpp/AprilTagFields.cpp`
     1. Add resource getter prototype like `std::string_view GetResource_2024_crescendo_json()`
     2. Add case for new field to switch in `LoadAprilTagLayoutField()`

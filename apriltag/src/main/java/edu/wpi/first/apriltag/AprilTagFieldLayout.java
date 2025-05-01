@@ -49,9 +49,9 @@ public class AprilTagFieldLayout {
   /** Common origin positions for the AprilTag coordinate system. */
   public enum OriginPosition {
     /** Blue alliance wall, right side. */
-    kBlueAllianceWallRightSide,
+    BLUE_ALLIANCE_WALL_RIGHT_SIDE,
     /** Red alliance wall, right side. */
-    kRedAllianceWallRightSide,
+    RED_ALLIANCE_WALL_RIGHT_SIDE,
   }
 
   private final Map<Integer, AprilTag> m_apriltags = new HashMap<>();
@@ -82,7 +82,7 @@ public class AprilTagFieldLayout {
         new ObjectMapper().readValue(path.toFile(), AprilTagFieldLayout.class);
     m_apriltags.putAll(layout.m_apriltags);
     m_fieldDimensions = layout.m_fieldDimensions;
-    setOrigin(OriginPosition.kBlueAllianceWallRightSide);
+    setOrigin(OriginPosition.BLUE_ALLIANCE_WALL_RIGHT_SIDE);
   }
 
   /**
@@ -105,7 +105,7 @@ public class AprilTagFieldLayout {
       m_apriltags.put(tag.ID, tag);
     }
     m_fieldDimensions = fieldDimensions;
-    setOrigin(OriginPosition.kBlueAllianceWallRightSide);
+    setOrigin(OriginPosition.BLUE_ALLIANCE_WALL_RIGHT_SIDE);
   }
 
   /**
@@ -151,8 +151,8 @@ public class AprilTagFieldLayout {
   public final void setOrigin(OriginPosition origin) {
     var pose =
         switch (origin) {
-          case kBlueAllianceWallRightSide -> Pose3d.kZero;
-          case kRedAllianceWallRightSide -> new Pose3d(
+          case BLUE_ALLIANCE_WALL_RIGHT_SIDE -> Pose3d.ZERO;
+          case RED_ALLIANCE_WALL_RIGHT_SIDE -> new Pose3d(
               new Translation3d(m_fieldDimensions.fieldLength, m_fieldDimensions.fieldWidth, 0),
               new Rotation3d(0, 0, Math.PI));
         };
