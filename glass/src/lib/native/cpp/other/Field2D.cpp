@@ -45,7 +45,7 @@ namespace gui = wpi::gui;
 
 namespace {
 
-enum DisplayUnits { kDisplayMeters = 0, kDisplayFeet, kDisplayInches };
+enum DisplayUnits { DISPLAY_METERS = 0, DISPLAY_FEET, DISPLAY_INCHES };
 
 // Per-frame field data (not persistent)
 struct FieldFrameData {
@@ -116,34 +116,34 @@ class PopupState {
 struct DisplayOptions {
   explicit DisplayOptions(const gui::Texture& texture) : texture{texture} {}
 
-  enum Style { kBoxImage = 0, kLine, kLineClosed, kTrack, kHidden };
+  enum Style { BOX_IMAGE = 0, LINE, LINE_CLOSED, TRACK, HIDDEN };
 
-  static constexpr Style kDefaultStyle = kBoxImage;
-  static constexpr float kDefaultWeight = 4.0f;
-  static constexpr float kDefaultColorFloat[] = {255, 0, 0, 255};
-  static constexpr ImU32 kDefaultColor = IM_COL32(255, 0, 0, 255);
-  static constexpr auto kDefaultWidth = 0.6858_m;
-  static constexpr auto kDefaultLength = 0.8204_m;
-  static constexpr bool kDefaultArrows = true;
-  static constexpr int kDefaultArrowSize = 50;
-  static constexpr float kDefaultArrowWeight = 4.0f;
-  static constexpr float kDefaultArrowColorFloat[] = {0, 255, 0, 255};
-  static constexpr ImU32 kDefaultArrowColor = IM_COL32(0, 255, 0, 255);
-  static constexpr bool kDefaultSelectable = true;
+  static constexpr Style DEFAULT_STYLE = BOX_IMAGE;
+  static constexpr float DEFAULT_WEIGHT = 4.0f;
+  static constexpr float DEFAULT_COLOR_FLOAT[] = {255, 0, 0, 255};
+  static constexpr ImU32 DEFAULT_COLOR = IM_COL32(255, 0, 0, 255);
+  static constexpr auto DEFAULT_WIDTH = 0.6858_m;
+  static constexpr auto DEFAULT_LENGTH = 0.8204_m;
+  static constexpr bool DEFAULT_ARROWS = true;
+  static constexpr int DEFAULT_ARROW_SIZE = 50;
+  static constexpr float DEFAULT_ARROW_WEIGHT = 4.0f;
+  static constexpr float DEFAULT_ARROW_COLOR_FLOAT[] = {0, 255, 0, 255};
+  static constexpr ImU32 DEFAULT_ARROW_COLOR = IM_COL32(0, 255, 0, 255);
+  static constexpr bool DEFAULT_SELECTABLE = true;
 
-  Style style = kDefaultStyle;
-  float weight = kDefaultWeight;
-  int color = kDefaultColor;
+  Style style = DEFAULT_STYLE;
+  float weight = DEFAULT_WEIGHT;
+  int color = DEFAULT_COLOR;
 
-  units::meter_t width = kDefaultWidth;
-  units::meter_t length = kDefaultLength;
+  units::meter_t width = DEFAULT_WIDTH;
+  units::meter_t length = DEFAULT_LENGTH;
 
-  bool arrows = kDefaultArrows;
-  int arrowSize = kDefaultArrowSize;
-  float arrowWeight = kDefaultArrowWeight;
-  int arrowColor = kDefaultArrowColor;
+  bool arrows = DEFAULT_ARROWS;
+  int arrowSize = DEFAULT_ARROW_SIZE;
+  float arrowWeight = DEFAULT_ARROW_WEIGHT;
+  int arrowColor = DEFAULT_ARROW_COLOR;
 
-  bool selectable = kDefaultSelectable;
+  bool selectable = DEFAULT_SELECTABLE;
 
   const gui::Texture& texture;
 };
@@ -224,8 +224,8 @@ class ObjectInfo {
 
 class FieldInfo {
  public:
-  static constexpr auto kDefaultWidth = 17.5483_m;
-  static constexpr auto kDefaultHeight = 8.0519_m;
+  static constexpr auto DEFAULT_WIDTH = 17.5483_m;
+  static constexpr auto DEFAULT_HEIGHT = 8.0519_m;
 
   explicit FieldInfo(Storage& storage);
 
@@ -266,15 +266,15 @@ class FieldInfo {
 
 static PoseDragState gDragState;
 static PopupState gPopupState;
-static DisplayUnits gDisplayUnits = kDisplayMeters;
+static DisplayUnits gDisplayUnits = DISPLAY_METERS;
 
 static double ConvertDisplayLength(units::meter_t v) {
   switch (gDisplayUnits) {
-    case kDisplayFeet:
+    case DISPLAY_FEET:
       return v.convert<units::feet>().value();
-    case kDisplayInches:
+    case DISPLAY_INCHES:
       return v.convert<units::inches>().value();
-    case kDisplayMeters:
+    case DISPLAY_METERS:
     default:
       return v.value();
   }
@@ -290,13 +290,13 @@ static bool InputLength(const char* label, units::meter_t* v, double step = 0.0,
   double dv = ConvertDisplayLength(*v);
   if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
     switch (gDisplayUnits) {
-      case kDisplayFeet:
+      case DISPLAY_FEET:
         *v = units::foot_t{dv};
         break;
-      case kDisplayInches:
+      case DISPLAY_INCHES:
         *v = units::inch_t{dv};
         break;
-      case kDisplayMeters:
+      case DISPLAY_METERS:
       default:
         *v = units::meter_t{dv};
         break;
@@ -347,8 +347,8 @@ static bool InputPose(frc::Pose2d* pose) {
 FieldInfo::FieldInfo(Storage& storage)
     : m_builtin{storage.GetString("builtin", "2025 Reefscape")},
       m_filename{storage.GetString("image")},
-      m_width{storage.GetFloat("width", kDefaultWidth.to<float>())},
-      m_height{storage.GetFloat("height", kDefaultHeight.to<float>())},
+      m_width{storage.GetFloat("width", DEFAULT_WIDTH.to<float>())},
+      m_height{storage.GetFloat("height", DEFAULT_HEIGHT.to<float>())},
       m_top{storage.GetInt("top", 0)},
       m_left{storage.GetInt("left", 0)},
       m_bottom{storage.GetInt("bottom", -1)},
@@ -628,24 +628,24 @@ void FieldInfo::Draw(ImDrawList* drawList, const FieldFrameData& ffd) const {
 
 ObjectInfo::ObjectInfo(Storage& storage)
     : m_width{storage.GetFloat("width",
-                               DisplayOptions::kDefaultWidth.to<float>())},
+                               DisplayOptions::DEFAULT_WIDTH.to<float>())},
       m_length{storage.GetFloat("length",
-                                DisplayOptions::kDefaultLength.to<float>())},
+                                DisplayOptions::DEFAULT_LENGTH.to<float>())},
       m_style{storage.GetString("style"),
-              DisplayOptions::kDefaultStyle,
+              DisplayOptions::DEFAULT_STYLE,
               {"Box/Image", "Line", "Line (Closed)", "Track", "Hidden"}},
-      m_weight{storage.GetFloat("weight", DisplayOptions::kDefaultWeight)},
+      m_weight{storage.GetFloat("weight", DisplayOptions::DEFAULT_WEIGHT)},
       m_color{
-          storage.GetFloatArray("color", DisplayOptions::kDefaultColorFloat)},
-      m_arrows{storage.GetBool("arrows", DisplayOptions::kDefaultArrows)},
+          storage.GetFloatArray("color", DisplayOptions::DEFAULT_COLOR_FLOAT)},
+      m_arrows{storage.GetBool("arrows", DisplayOptions::DEFAULT_ARROWS)},
       m_arrowSize{
-          storage.GetInt("arrowSize", DisplayOptions::kDefaultArrowSize)},
+          storage.GetInt("arrowSize", DisplayOptions::DEFAULT_ARROW_SIZE)},
       m_arrowWeight{
-          storage.GetFloat("arrowWeight", DisplayOptions::kDefaultArrowWeight)},
+          storage.GetFloat("arrowWeight", DisplayOptions::DEFAULT_ARROW_WEIGHT)},
       m_arrowColor{storage.GetFloatArray(
-          "arrowColor", DisplayOptions::kDefaultArrowColorFloat)},
+          "arrowColor", DisplayOptions::DEFAULT_ARROW_COLOR_FLOAT)},
       m_selectable{
-          storage.GetBool("selectable", DisplayOptions::kDefaultSelectable)},
+          storage.GetBool("selectable", DisplayOptions::DEFAULT_SELECTABLE)},
       m_filename{storage.GetString("image")} {}
 
 DisplayOptions ObjectInfo::GetDisplayOptions() const {
@@ -667,7 +667,7 @@ void ObjectInfo::DisplaySettings() {
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   m_style.Combo("Style");
   switch (m_style.GetValue()) {
-    case DisplayOptions::kBoxImage:
+    case DisplayOptions::BOX_IMAGE:
       if (ImGui::Button("Choose image...")) {
         m_fileOpener = std::make_unique<pfd::open_file>(
             "Choose object image", "",
@@ -682,7 +682,7 @@ void ObjectInfo::DisplaySettings() {
       InputFloatLength("Width", &m_width);
       InputFloatLength("Length", &m_length);
       break;
-    case DisplayOptions::kTrack:
+    case DisplayOptions::TRACK:
       InputFloatLength("Width", &m_width);
       break;
     default:
@@ -737,7 +737,7 @@ void ObjectInfo::DrawLine(ImDrawList* drawList,
     i += nlin - 1;
   }
 
-  if (points.size() > 2 && m_style.GetValue() == DisplayOptions::kLineClosed) {
+  if (points.size() > 2 && m_style.GetValue() == DisplayOptions::LINE_CLOSED) {
     drawList->AddLine(points.back(), points.front(), color, m_weight);
   }
 }
@@ -838,7 +838,7 @@ std::pair<int, float> PoseFrameData::IsHovered(const ImVec2& cursor) const {
     return {1, dist};
   }
 
-  if (m_displayOptions.style == DisplayOptions::kBoxImage) {
+  if (m_displayOptions.style == DisplayOptions::BOX_IMAGE) {
     dist = gui::GetDistSquared(cursor, m_corners[0]);
     if (dist < hitRadiusSquared) {
       return {2, dist};
@@ -858,7 +858,7 @@ std::pair<int, float> PoseFrameData::IsHovered(const ImVec2& cursor) const {
     if (dist < hitRadiusSquared) {
       return {5, dist};
     }
-  } else if (m_displayOptions.style == DisplayOptions::kTrack) {
+  } else if (m_displayOptions.style == DisplayOptions::TRACK) {
     dist = gui::GetDistSquared(cursor, m_corners[4]);
     if (dist < hitRadiusSquared) {
       return {6, dist};
@@ -908,7 +908,7 @@ void PoseFrameData::Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
                          std::vector<ImVec2>* left,
                          std::vector<ImVec2>* right) const {
   switch (m_displayOptions.style) {
-    case DisplayOptions::kBoxImage:
+    case DisplayOptions::BOX_IMAGE:
       if (m_displayOptions.texture) {
         drawList->AddImageQuad(m_displayOptions.texture, m_corners[0],
                                m_corners[1], m_corners[2], m_corners[3]);
@@ -917,16 +917,16 @@ void PoseFrameData::Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
       drawList->AddQuad(m_corners[0], m_corners[1], m_corners[2], m_corners[3],
                         m_displayOptions.color, m_displayOptions.weight);
       break;
-    case DisplayOptions::kLine:
-    case DisplayOptions::kLineClosed:
+    case DisplayOptions::LINE:
+    case DisplayOptions::LINE_CLOSED:
       center->emplace_back(m_center);
       break;
-    case DisplayOptions::kTrack:
+    case DisplayOptions::TRACK:
       center->emplace_back(m_center);
       left->emplace_back(m_corners[4]);
       right->emplace_back(m_corners[5]);
       break;
-    case DisplayOptions::kHidden:
+    case DisplayOptions::HIDDEN:
       break;
   }
 
@@ -946,7 +946,7 @@ void glass::DisplayField2DSettings(Field2DModel* model) {
   }
 
   EnumSetting displayUnits{GetStorage().GetString("units"),
-                           kDisplayMeters,
+                           DISPLAY_METERS,
                            {"meters", "feet", "inches"}};
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   displayUnits.Combo("Units");

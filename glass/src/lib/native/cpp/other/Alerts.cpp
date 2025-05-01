@@ -14,16 +14,16 @@ void glass::DisplayAlerts(AlertsModel* model) {
   auto& warnings = model->GetWarnings();
   auto& errors = model->GetErrors();
 
-  const ImVec4 kWarningColor{0.85f, 0.56f, 0.0f, 1.0f};
-  const ImVec4 kErrorColor{0.9f, 0.25f, 0.25f, 1.0f};
+  const ImVec4 WARNING_COLOR{0.85f, 0.56f, 0.0f, 1.0f};
+  const ImVec4 ERROR_COLOR{0.9f, 0.25f, 0.25f, 1.0f};
 
   // show higher severity alerts on top
   for (auto&& error : errors) {
-    ImGui::TextColored(kErrorColor, "%s %s", ICON_FA_CIRCLE_XMARK,
+    ImGui::TextColored(ERROR_COLOR, "%s %s", ICON_FA_CIRCLE_XMARK,
                        error.c_str());
   }
   for (auto&& warning : warnings) {
-    ImGui::TextColored(kWarningColor, "%s %s", ICON_FA_TRIANGLE_EXCLAMATION,
+    ImGui::TextColored(WARNING_COLOR, "%s %s", ICON_FA_TRIANGLE_EXCLAMATION,
                        warning.c_str());
   }
   for (auto&& info : infos) {

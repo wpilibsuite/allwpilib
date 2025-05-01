@@ -29,11 +29,11 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
       m_typeCache{storage.GetChild("types")} {
   storage.SetCustomApply([this] {
     m_listener = m_poller.AddListener(
-        {{""}}, nt::EventFlags::kImmediate | nt::EventFlags::kTopic);
+        {{""}}, nt::EventFlags::IMMEDIATE | nt::EventFlags::TOPIC);
     for (auto&& childIt : m_storage.GetChildren()) {
       auto id = childIt.key();
       auto typePtr = m_typeCache.FindValue(id);
-      if (!typePtr || typePtr->type != Storage::Value::kString) {
+      if (!typePtr || typePtr->type != Storage::Value::STRING) {
         continue;
       }
 
@@ -124,7 +124,7 @@ void NetworkTablesProvider::Update() {
         continue;
       }
 
-      if (event.flags & nt::EventFlags::kUnpublish) {
+      if (event.flags & nt::EventFlags::UNPUBLISH) {
         auto it = m_topicMap.find(info->topic);
         if (it != m_topicMap.end()) {
           m_poller.RemoveListener(it->second.listener);
@@ -139,13 +139,13 @@ void NetworkTablesProvider::Update() {
         if (it2 != m_viewEntries.end()) {
           m_viewEntries.erase(it2);
         }
-      } else if (event.flags & nt::EventFlags::kPublish) {
+      } else if (event.flags & nt::EventFlags::PUBLISH) {
         // subscribe to it; use a subscriber so we only get string values
         SubListener sublistener;
         sublistener.subscriber = nt::StringTopic{info->topic}.Subscribe("");
         sublistener.listener = m_poller.AddListener(
             sublistener.subscriber,
-            nt::EventFlags::kValueAll | nt::EventFlags::kImmediate);
+            nt::EventFlags::VALUE_ALL | nt::EventFlags::IMMEDIATE);
         m_topicMap.try_emplace(info->topic, std::move(sublistener));
       }
     } else if (auto valueData = event.GetValueEventData()) {
@@ -196,7 +196,7 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
 
   // the window might exist and we're just not associated to it yet
   if (!window) {
-    window = GetOrAddWindow(entry->name, true, Window::kHide);
+    window = GetOrAddWindow(entry->name, true, Window::HIDE);
   }
   if (!window) {
     return;

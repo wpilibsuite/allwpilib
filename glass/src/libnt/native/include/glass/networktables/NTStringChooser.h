@@ -17,7 +17,7 @@ namespace glass {
 
 class NTStringChooserModel : public StringChooserModel {
  public:
-  static constexpr const char* kType = "String Chooser";
+  static constexpr const char* TYPE = "String Chooser";
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTStringChooserModel(std::string_view path);

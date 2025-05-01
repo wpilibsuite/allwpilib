@@ -21,7 +21,7 @@ namespace glass {
 
 class NTMechanism2DModel : public Mechanism2DModel {
  public:
-  static constexpr const char* kType = "Mechanism2d";
+  static constexpr const char* TYPE = "Mechanism2d";
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTMechanism2DModel(std::string_view path);

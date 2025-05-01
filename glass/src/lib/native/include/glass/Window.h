@@ -24,10 +24,10 @@ class Storage;
  */
 class Window {
  public:
-  enum Visibility { kHide = 0, kShow, kDisabled };
+  enum Visibility { HIDE = 0, SHOW, DISABLED };
 
   Window(Storage& storage, std::string_view id,
-         Visibility defaultVisibility = kShow);
+         Visibility defaultVisibility = SHOW);
 
   std::string_view GetId() const { return m_id; }
 

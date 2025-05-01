@@ -136,7 +136,7 @@ static void NtInitialize() {
 
   gNetworkTablesLogWindow = std::make_unique<glass::Window>(
       glass::GetStorageRoot().GetChild("NetworkTables Log"),
-      "NetworkTables Log", glass::Window::kHide);
+      "NetworkTables Log", glass::Window::HIDE);
   gNetworkTablesLogWindow->SetView(
       std::make_unique<glass::LogView>(&gNetworkTablesLog));
   gNetworkTablesLogWindow->SetDefaultPos(250, 615);
@@ -165,7 +165,7 @@ static void NtInitialize() {
       [&] { glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get()); }));
   gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
   gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
-  gNetworkTablesInfoWindow->SetDefaultVisibility(glass::Window::kHide);
+  gNetworkTablesInfoWindow->SetDefaultVisibility(glass::Window::HIDE);
   gNetworkTablesInfoWindow->DisableRenamePopup();
   gui::AddLateExecute([] { gNetworkTablesInfoWindow->Display(); });
 

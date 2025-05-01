@@ -18,7 +18,7 @@ namespace glass {
 
 class NTFMSModel : public FMSModel {
  public:
-  static constexpr const char* kType = "FMSInfo";
+  static constexpr const char* TYPE = "FMSInfo";
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTFMSModel(std::string_view path);

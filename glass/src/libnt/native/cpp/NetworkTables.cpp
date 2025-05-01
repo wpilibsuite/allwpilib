@@ -93,9 +93,9 @@ NetworkTablesModel::NetworkTablesModel()
 
 NetworkTablesModel::NetworkTablesModel(nt::NetworkTableInstance inst)
     : m_inst{inst}, m_poller{inst} {
-  m_poller.AddListener({{"", "$"}}, nt::EventFlags::kTopic |
-                                        nt::EventFlags::kValueAll |
-                                        nt::EventFlags::kImmediate);
+  m_poller.AddListener({{"", "$"}}, nt::EventFlags::TOPIC |
+                                        nt::EventFlags::VALUE_ALL |
+                                        nt::EventFlags::IMMEDIATE);
 }
 
 NetworkTablesModel::Entry::~Entry() {
@@ -254,7 +254,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
   for (auto&& field : fields) {
     auto& child = *outIt++;
     switch (field.GetType()) {
-      case wpi::StructFieldType::kBool:
+      case wpi::StructFieldType::BOOL:
         if (field.IsArray()) {
           std::vector<int> v;
           v.reserve(field.GetArraySize());
@@ -267,18 +267,18 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
         }
         child.UpdateFromValue(model, child.path, "");
         break;
-      case wpi::StructFieldType::kChar:
+      case wpi::StructFieldType::CHAR:
         child.value = nt::Value::MakeString(s.GetStringField(&field), time);
         child.UpdateFromValue(model, child.path, "");
         break;
-      case wpi::StructFieldType::kInt8:
-      case wpi::StructFieldType::kInt16:
-      case wpi::StructFieldType::kInt32:
-      case wpi::StructFieldType::kInt64:
-      case wpi::StructFieldType::kUint8:
-      case wpi::StructFieldType::kUint16:
-      case wpi::StructFieldType::kUint32:
-      case wpi::StructFieldType::kUint64: {
+      case wpi::StructFieldType::INT8:
+      case wpi::StructFieldType::INT16:
+      case wpi::StructFieldType::INT32:
+      case wpi::StructFieldType::INT64:
+      case wpi::StructFieldType::UINT8:
+      case wpi::StructFieldType::UINT16:
+      case wpi::StructFieldType::UINT32:
+      case wpi::StructFieldType::UINT64: {
         bool isUint = field.IsUint();
         if (field.IsArray()) {
           std::vector<int64_t> v;
@@ -301,7 +301,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
         child.UpdateFromValue(model, child.path, "");
         break;
       }
-      case wpi::StructFieldType::kFloat:
+      case wpi::StructFieldType::FLOAT:
         if (field.IsArray()) {
           std::vector<float> v;
           v.reserve(field.GetArraySize());
@@ -314,7 +314,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
         }
         child.UpdateFromValue(model, child.path, "");
         break;
-      case wpi::StructFieldType::kDouble:
+      case wpi::StructFieldType::DOUBLE:
         if (field.IsArray()) {
           std::vector<double> v;
           v.reserve(field.GetArraySize());
@@ -327,7 +327,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
         }
         child.UpdateFromValue(model, child.path, "");
         break;
-      case wpi::StructFieldType::kStruct:
+      case wpi::StructFieldType::STRUCT:
         if (field.IsArray()) {
           if (child.valueChildrenMap) {
             child.valueChildren.clear();
@@ -849,14 +849,14 @@ void NetworkTablesModel::Update() {
   for (auto&& event : m_poller.ReadQueue()) {
     if (auto info = event.GetTopicInfo()) {
       auto& entry = m_entries[info->topic];
-      if (event.flags & nt::EventFlags::kPublish) {
+      if (event.flags & nt::EventFlags::PUBLISH) {
         if (!entry) {
           entry = std::make_unique<Entry>();
           m_sortedEntries.emplace_back(entry.get());
           updateTree = true;
         }
       }
-      if (event.flags & nt::EventFlags::kUnpublish) {
+      if (event.flags & nt::EventFlags::UNPUBLISH) {
         // meta topic handling
         if (wpi::starts_with(info->name, '$')) {
           // meta topic handling
@@ -890,7 +890,7 @@ void NetworkTablesModel::Update() {
         updateTree = true;
         continue;
       }
-      if (event.flags & nt::EventFlags::kProperties) {
+      if (event.flags & nt::EventFlags::PROPERTIES) {
         updateTree = true;
       }
       if (entry) {
@@ -1227,8 +1227,8 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
       ImGui::LabelText(typeStr, "%.6f", val.GetFloat());
       break;
     case NT_DOUBLE: {
-      unsigned char precision = (flags & NetworkTablesFlags_Precision) >>
-                                kNetworkTablesFlags_PrecisionBitShift;
+      unsigned char precision = (flags & NETWORK_TABLES_FLAGS__PRECISION) >>
+                                NETWORK_TABLES_FLAGS__PRECISION_BIT_SHIFT;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -1269,11 +1269,11 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
   }
 }
 
-static constexpr size_t kTextBufferSize = 4096;
+static constexpr size_t TEXT_BUFFER_SIZE = 4096;
 
 static char* GetTextBuffer(std::string_view in) {
-  static char textBuffer[kTextBufferSize];
-  size_t len = (std::min)(in.size(), kTextBufferSize - 1);
+  static char textBuffer[TEXT_BUFFER_SIZE];
+  size_t len = (std::min)(in.size(), TEXT_BUFFER_SIZE - 1);
   std::memcpy(textBuffer, in.data(), len);
   textBuffer[len] = '\0';
   return textBuffer;
@@ -1330,8 +1330,8 @@ bool ArrayEditorImpl<NTType, T>::Emit() {
         } else if constexpr (NTType == NT_FLOAT_ARRAY) {
           ImGui::InputFloat(label, &m_arr[row], 0, 0, "%.6f");
         } else if constexpr (NTType == NT_DOUBLE_ARRAY) {
-          unsigned char precision = (m_flags & NetworkTablesFlags_Precision) >>
-                                    kNetworkTablesFlags_PrecisionBitShift;
+          unsigned char precision = (m_flags & NETWORK_TABLES_FLAGS__PRECISION) >>
+                                    NETWORK_TABLES_FLAGS__PRECISION_BIT_SHIFT;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -1470,8 +1470,8 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_DOUBLE: {
       double v = val.GetDouble();
-      unsigned char precision = (flags & NetworkTablesFlags_Precision) >>
-                                kNetworkTablesFlags_PrecisionBitShift;
+      unsigned char precision = (flags & NETWORK_TABLES_FLAGS__PRECISION) >>
+                                NETWORK_TABLES_FLAGS__PRECISION_BIT_SHIFT;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -1491,7 +1491,7 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_STRING: {
       char* v = GetTextBuffer(entry.valueStr);
-      ImGui::InputText(typeStr, v, kTextBufferSize,
+      ImGui::InputText(typeStr, v, TEXT_BUFFER_SIZE,
                        ImGuiInputTextFlags_EnterReturnsTrue);
       if (ImGui::IsItemDeactivatedAfterEdit()) {
         if (v[0] == '"') {
@@ -1641,7 +1641,7 @@ static void CreateTopicMenuItem(NetworkTablesModel* model,
 void glass::DisplayNetworkTablesAddMenu(NetworkTablesModel* model,
                                         std::string_view path,
                                         NetworkTablesFlags flags) {
-  static char nameBuffer[kTextBufferSize];
+  static char nameBuffer[TEXT_BUFFER_SIZE];
 
   if (ImGui::BeginMenu("Add new...")) {
     if (ImGui::IsWindowAppearing()) {
@@ -1649,7 +1649,7 @@ void glass::DisplayNetworkTablesAddMenu(NetworkTablesModel* model,
     }
 
     ImGui::InputTextWithHint("New item name", "example", nameBuffer,
-                             kTextBufferSize);
+                             TEXT_BUFFER_SIZE);
     std::string fullNewPath;
     if (path == "/") {
       path = "";
@@ -1660,7 +1660,7 @@ void glass::DisplayNetworkTablesAddMenu(NetworkTablesModel* model,
     ImGui::Separator();
     auto entry = model->GetEntry(fullNewPath);
     bool exists = entry && entry->info.type != NT_Type::NT_UNASSIGNED;
-    bool enabled = (flags & NetworkTablesFlags_CreateNoncanonicalKeys ||
+    bool enabled = (flags & NETWORK_TABLES_FLAGS__CREATE_NONCANONICAL_KEYS ||
                     nameBuffer[0] != '\0') &&
                    !exists;
 
@@ -1817,7 +1817,7 @@ static void EmitEntry(NetworkTablesModel* model,
       }
       ImGui::EndPopup();
     }
-  } else if (flags & NetworkTablesFlags_ReadOnly) {
+  } else if (flags & NETWORK_TABLES_FLAGS__READ_ONLY) {
     EmitEntryValueReadonly(
         entry,
         entry.info.type_str.empty() ? nullptr : entry.info.type_str.c_str(),
@@ -1826,7 +1826,7 @@ static void EmitEntry(NetworkTablesModel* model,
     EmitEntryValueEditable(model, entry, flags);
   }
 
-  if (flags & NetworkTablesFlags_ShowProperties) {
+  if (flags & NETWORK_TABLES_FLAGS__SHOW_PROPERTIES) {
     ImGui::TableNextColumn();
     ImGui::Text("%s", entry.info.properties.c_str());
     if (ImGui::BeginPopupContextItem(entry.info.name.c_str())) {
@@ -1844,7 +1844,7 @@ static void EmitEntry(NetworkTablesModel* model,
     }
   }
 
-  if (flags & NetworkTablesFlags_ShowTimestamp) {
+  if (flags & NETWORK_TABLES_FLAGS__SHOW_TIMESTAMP) {
     ImGui::TableNextColumn();
     if (entry.value) {
       ImGui::Text("%f", (entry.value.last_change() * 1.0e-6) -
@@ -1854,7 +1854,7 @@ static void EmitEntry(NetworkTablesModel* model,
     }
   }
 
-  if (flags & NetworkTablesFlags_ShowServerTimestamp) {
+  if (flags & NETWORK_TABLES_FLAGS__SHOW_SERVER_TIMESTAMP) {
     ImGui::TableNextColumn();
     if (entry.value && entry.value.server_time() != 0) {
       if (entry.value.server_time() == 1) {
@@ -1878,7 +1878,7 @@ static void EmitTree(NetworkTablesModel* model,
                      NetworkTablesFlags flags, ShowCategory category,
                      bool root) {
   for (auto&& node : tree) {
-    if (root && (flags & NetworkTablesFlags_ShowSpecial) == 0 &&
+    if (root && (flags & NETWORK_TABLES_FLAGS__SHOW_SPECIAL) == 0 &&
         wpi::starts_with(node.name, '$')) {
       continue;
     }
@@ -1907,10 +1907,10 @@ static void DisplayTable(NetworkTablesModel* model,
     return;
   }
 
-  const bool showProperties = (flags & NetworkTablesFlags_ShowProperties);
-  const bool showTimestamp = (flags & NetworkTablesFlags_ShowTimestamp);
+  const bool showProperties = (flags & NETWORK_TABLES_FLAGS__SHOW_PROPERTIES);
+  const bool showTimestamp = (flags & NETWORK_TABLES_FLAGS__SHOW_TIMESTAMP);
   const bool showServerTimestamp =
-      (flags & NetworkTablesFlags_ShowServerTimestamp);
+      (flags & NETWORK_TABLES_FLAGS__SHOW_SERVER_TIMESTAMP);
 
   ImGui::BeginTable("values",
                     2 + (showProperties ? 1 : 0) + (showTimestamp ? 1 : 0) +
@@ -1933,7 +1933,7 @@ static void DisplayTable(NetworkTablesModel* model,
   }
   ImGui::TableHeadersRow();
 
-  if (flags & NetworkTablesFlags_TreeView) {
+  if (flags & NETWORK_TABLES_FLAGS__TREE_VIEW) {
     switch (category) {
       case ShowPersistent:
         PushID("persistent");
@@ -1953,7 +1953,7 @@ static void DisplayTable(NetworkTablesModel* model,
     }
   } else {
     for (auto entry : model->GetEntries()) {
-      if ((flags & NetworkTablesFlags_ShowSpecial) != 0 ||
+      if ((flags & NETWORK_TABLES_FLAGS__SHOW_SPECIAL) != 0 ||
           !wpi::starts_with(entry->info.name, '$')) {
         EmitEntry(model, *entry, entry->info.name.c_str(), flags, category);
       }
@@ -2079,7 +2079,7 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
     ImGui::EndPopup();
   }
 
-  if (flags & NetworkTablesFlags_CombinedView) {
+  if (flags & NETWORK_TABLES_FLAGS__COMBINED_VIEW) {
     DisplayTable(model, model->GetTreeRoot(), flags, ShowAll);
   } else {
     if (CollapsingHeader("Persistent Values", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -2102,42 +2102,42 @@ void NetworkTablesFlagsSettings::Update() {
   if (!m_pTreeView) {
     auto& storage = GetStorage();
     m_pTreeView =
-        &storage.GetBool("tree", m_defaultFlags & NetworkTablesFlags_TreeView);
+        &storage.GetBool("tree", m_defaultFlags & NETWORK_TABLES_FLAGS__TREE_VIEW);
     m_pCombinedView = &storage.GetBool(
-        "combined", m_defaultFlags & NetworkTablesFlags_CombinedView);
+        "combined", m_defaultFlags & NETWORK_TABLES_FLAGS__COMBINED_VIEW);
     m_pShowSpecial = &storage.GetBool(
-        "special", m_defaultFlags & NetworkTablesFlags_ShowSpecial);
+        "special", m_defaultFlags & NETWORK_TABLES_FLAGS__SHOW_SPECIAL);
     m_pShowProperties = &storage.GetBool(
-        "properties", m_defaultFlags & NetworkTablesFlags_ShowProperties);
+        "properties", m_defaultFlags & NETWORK_TABLES_FLAGS__SHOW_PROPERTIES);
     m_pShowTimestamp = &storage.GetBool(
-        "timestamp", m_defaultFlags & NetworkTablesFlags_ShowTimestamp);
+        "timestamp", m_defaultFlags & NETWORK_TABLES_FLAGS__SHOW_TIMESTAMP);
     m_pShowServerTimestamp = &storage.GetBool(
         "serverTimestamp",
-        m_defaultFlags & NetworkTablesFlags_ShowServerTimestamp);
+        m_defaultFlags & NETWORK_TABLES_FLAGS__SHOW_SERVER_TIMESTAMP);
     m_pCreateNoncanonicalKeys = &storage.GetBool(
         "createNonCanonical",
-        m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
+        m_defaultFlags & NETWORK_TABLES_FLAGS__CREATE_NONCANONICAL_KEYS);
     m_pPrecision = &storage.GetInt(
-        "precision", (m_defaultFlags & NetworkTablesFlags_Precision) >>
-                         kNetworkTablesFlags_PrecisionBitShift);
+        "precision", (m_defaultFlags & NETWORK_TABLES_FLAGS__PRECISION) >>
+                         NETWORK_TABLES_FLAGS__PRECISION_BIT_SHIFT);
   }
 
   m_flags &= ~(
-      NetworkTablesFlags_TreeView | NetworkTablesFlags_CombinedView |
-      NetworkTablesFlags_ShowSpecial | NetworkTablesFlags_ShowProperties |
-      NetworkTablesFlags_ShowTimestamp |
-      NetworkTablesFlags_ShowServerTimestamp |
-      NetworkTablesFlags_CreateNoncanonicalKeys | NetworkTablesFlags_Precision);
+      NETWORK_TABLES_FLAGS__TREE_VIEW | NETWORK_TABLES_FLAGS__COMBINED_VIEW |
+      NETWORK_TABLES_FLAGS__SHOW_SPECIAL | NETWORK_TABLES_FLAGS__SHOW_PROPERTIES |
+      NETWORK_TABLES_FLAGS__SHOW_TIMESTAMP |
+      NETWORK_TABLES_FLAGS__SHOW_SERVER_TIMESTAMP |
+      NETWORK_TABLES_FLAGS__CREATE_NONCANONICAL_KEYS | NETWORK_TABLES_FLAGS__PRECISION);
   m_flags |=
-      (*m_pTreeView ? NetworkTablesFlags_TreeView : 0) |
-      (*m_pCombinedView ? NetworkTablesFlags_CombinedView : 0) |
-      (*m_pShowSpecial ? NetworkTablesFlags_ShowSpecial : 0) |
-      (*m_pShowProperties ? NetworkTablesFlags_ShowProperties : 0) |
-      (*m_pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0) |
-      (*m_pShowServerTimestamp ? NetworkTablesFlags_ShowServerTimestamp : 0) |
-      (*m_pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
+      (*m_pTreeView ? NETWORK_TABLES_FLAGS__TREE_VIEW : 0) |
+      (*m_pCombinedView ? NETWORK_TABLES_FLAGS__COMBINED_VIEW : 0) |
+      (*m_pShowSpecial ? NETWORK_TABLES_FLAGS__SHOW_SPECIAL : 0) |
+      (*m_pShowProperties ? NETWORK_TABLES_FLAGS__SHOW_PROPERTIES : 0) |
+      (*m_pShowTimestamp ? NETWORK_TABLES_FLAGS__SHOW_TIMESTAMP : 0) |
+      (*m_pShowServerTimestamp ? NETWORK_TABLES_FLAGS__SHOW_SERVER_TIMESTAMP : 0) |
+      (*m_pCreateNoncanonicalKeys ? NETWORK_TABLES_FLAGS__CREATE_NONCANONICAL_KEYS
                                   : 0) |
-      (*m_pPrecision << kNetworkTablesFlags_PrecisionBitShift);
+      (*m_pPrecision << NETWORK_TABLES_FLAGS__PRECISION_BIT_SHIFT);
 }
 
 void NetworkTablesFlagsSettings::DisplayMenu() {

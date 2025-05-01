@@ -224,15 +224,15 @@ bool HamburgerButton(const ImGuiID id, const ImVec2 position) {
   return pressed;
 }
 
-static const int kBufferSize = 256;
+static const int BUFFER_SIZE = 256;
 
 struct InputExprState {
-  char inputBuffer[kBufferSize];
+  char inputBuffer[BUFFER_SIZE];
 };
 
 static wpi::DenseMap<int, InputExprState> exprStates;
 // Shared string buffer for inactive inputs
-static char previewBuffer[kBufferSize];
+static char previewBuffer[BUFFER_SIZE];
 
 template <typename V>
 bool InputExpr(const char* label, V* v, const char* format,
@@ -251,13 +251,13 @@ bool InputExpr(const char* label, V* v, const char* format,
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
     // Preview stored value
-    std::snprintf(inputBuffer, kBufferSize, format, *v);
+    std::snprintf(inputBuffer, BUFFER_SIZE, format, *v);
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
   }
 
-  ImGui::InputText(label, inputBuffer, kBufferSize, flags);
+  ImGui::InputText(label, inputBuffer, BUFFER_SIZE, flags);
   bool active = ImGui::IsItemActive();
   bool changed = ImGui::IsItemDeactivatedAfterEdit();
 
@@ -265,7 +265,7 @@ bool InputExpr(const char* label, V* v, const char* format,
     InputExprState& state = exprStates[id];
     if (!hasState) {
       // State was just created, copy in contents of preview buffer
-      std::strncpy(state.inputBuffer, previewBuffer, kBufferSize);
+      std::strncpy(state.inputBuffer, previewBuffer, BUFFER_SIZE);
     }
 
     // Attempt to parse current value
