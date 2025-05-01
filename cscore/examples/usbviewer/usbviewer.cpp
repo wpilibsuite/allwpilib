@@ -24,9 +24,9 @@
 namespace gui = wpi::gui;
 
 int main() {
-  wpi::mutex latestFrameMutex;
+  wpi::spinlock latestFrameMutex;
   std::unique_ptr<cv::Mat> latestFrame;
-  wpi::spinlock freeListMutex;
+  wpi::mutex freeListMutex;
   std::vector<std::unique_ptr<cv::Mat>> freeList;
   std::atomic<bool> stopCamera{false};
 
