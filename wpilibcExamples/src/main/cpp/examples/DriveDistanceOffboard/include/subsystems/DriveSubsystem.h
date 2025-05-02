@@ -82,7 +82,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * @param distance The distance to drive forward.
    * @return A command.
    */
-    frc2::CommandPtr ProfiledDriveDistance(units::meter_t distance);
+  frc2::CommandPtr ProfiledDriveDistance(units::meter_t distance);
 
   /**
    * Creates a command to drive forward a specified distance using a motion
@@ -91,7 +91,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * @param distance The distance to drive forward.
    * @return A command.
    */
-    frc2::CommandPtr DynamicProfiledDriveDistance(units::meter_t distance);
+  frc2::CommandPtr DynamicProfiledDriveDistance(units::meter_t distance);
 
  private:
   frc::TrapezoidProfile<units::meters> m_profile{

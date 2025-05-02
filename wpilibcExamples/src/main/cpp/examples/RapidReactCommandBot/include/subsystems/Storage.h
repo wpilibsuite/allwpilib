@@ -16,7 +16,7 @@ class Storage : frc2::SubsystemBase {
  public:
   Storage();
   /** Returns a command that runs the storage motor indefinitely. */
-    frc2::CommandPtr RunCommand();
+  frc2::CommandPtr RunCommand();
 
   /** Whether the ball storage is full. */
   frc2::Trigger HasCargo{[this] { return m_ballSensor.Get(); }};

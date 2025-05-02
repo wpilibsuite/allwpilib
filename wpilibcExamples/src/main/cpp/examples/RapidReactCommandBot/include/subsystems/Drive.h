@@ -28,7 +28,7 @@ class Drive : public frc2::SubsystemBase {
    * @param fwd the commanded forward movement
    * @param rot the commanded rotation
    */
-    frc2::CommandPtr ArcadeDriveCommand(std::function<double()> fwd,
+  frc2::CommandPtr ArcadeDriveCommand(std::function<double()> fwd,
                                       std::function<double()> rot);
 
   /**
@@ -38,7 +38,7 @@ class Drive : public frc2::SubsystemBase {
    * @param distance The distance to drive forward in meters
    * @param speed The fraction of max speed at which to drive
    */
-    frc2::CommandPtr DriveDistanceCommand(units::meter_t distance, double speed);
+  frc2::CommandPtr DriveDistanceCommand(units::meter_t distance, double speed);
 
   /**
    * Returns a command that turns to robot to the specified angle using a motion
@@ -46,7 +46,7 @@ class Drive : public frc2::SubsystemBase {
    *
    * @param angle The angle to turn to
    */
-    frc2::CommandPtr TurnToAngleCommand(units::degree_t angle);
+  frc2::CommandPtr TurnToAngleCommand(units::degree_t angle);
 
  private:
   frc::PWMSparkMax m_leftLeader{DriveConstants::kLeftMotor1Port};
