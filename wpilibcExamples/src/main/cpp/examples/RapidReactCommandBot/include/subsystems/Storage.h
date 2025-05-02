@@ -23,6 +23,6 @@ class Storage : frc2::SubsystemBase {
   frc2::Trigger HasCargo{[this] { return m_ballSensor.Get(); }};
 
  private:
-  frc::PWMSparkMax m_motor{StorageConstants::kMotorPort};
-  frc::DigitalInput m_ballSensor{StorageConstants::kBallSensorPort};
+  frc::PWMSparkMax m_motor{StorageConstants::MOTOR_PORT};
+  frc::DigitalInput m_ballSensor{StorageConstants::BALL_SENSOR_PORT};
 };

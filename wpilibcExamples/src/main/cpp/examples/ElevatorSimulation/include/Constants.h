@@ -25,31 +25,31 @@
 
 namespace Constants {
 
-inline constexpr int kMotorPort = 0;
-inline constexpr int kEncoderAChannel = 0;
-inline constexpr int kEncoderBChannel = 1;
-inline constexpr int kJoystickPort = 0;
+inline constexpr int MOTOR_PORT = 0;
+inline constexpr int ENCODER_A_CHANNEL = 0;
+inline constexpr int ENCODER_B_CHANNEL = 1;
+inline constexpr int JOYSTICK_PORT = 0;
 
-inline constexpr double kElevatorKp = 5.0;
-inline constexpr double kElevatorKi = 0.0;
-inline constexpr double kElevatorKd = 0.0;
+inline constexpr double ELEVATOR_P = 5.0;
+inline constexpr double ELEVATOR_I = 0.0;
+inline constexpr double ELEVATOR_D = 0.0;
 
-inline constexpr units::volt_t kElevatorkS = 0.0_V;
-inline constexpr units::volt_t kElevatorkG = 0.762_V;
-inline constexpr auto kElevatorkV = 0.762_V / 1_mps;
-inline constexpr auto kElevatorkA = 0.0_V / 1_mps_sq;
+inline constexpr units::volt_t ELEVATOR_S = 0.0_V;
+inline constexpr units::volt_t ELEVATOR_G = 0.762_V;
+inline constexpr auto ELEVATOR_V = 0.762_V / 1_mps;
+inline constexpr auto ELEVATOR_A = 0.0_V / 1_mps_sq;
 
-inline constexpr double kElevatorGearing = 10.0;
-inline constexpr units::meter_t kElevatorDrumRadius = 2_in;
-inline constexpr units::kilogram_t kCarriageMass = 4.0_kg;
+inline constexpr double ELEVATOR_GEARING = 10.0;
+inline constexpr units::meter_t ELEVATOR_DRUM_RADIUS = 2_in;
+inline constexpr units::kilogram_t CARRIAGE_MASS = 4.0_kg;
 
-inline constexpr units::meter_t kSetpoint = 75_cm;
-inline constexpr units::meter_t kMinElevatorHeight = 0_cm;
-inline constexpr units::meter_t kMaxElevatorHeight = 1.25_m;
+inline constexpr units::meter_t SETPOINT = 75_cm;
+inline constexpr units::meter_t MIN_ELEVATOR_HEIGHT = 0_cm;
+inline constexpr units::meter_t MAX_ELEVATOR_HEIGHT = 1.25_m;
 
 // distance per pulse = (distance per revolution) / (pulses per revolution)
 //  = (Pi * D) / ppr
-inline constexpr double kArmEncoderDistPerPulse =
-    2.0 * std::numbers::pi * kElevatorDrumRadius.value() / 4096.0;
+inline constexpr double ARM_ENCODER_DIST_PER_PULSE =
+    2.0 * std::numbers::pi * ELEVATOR_DRUM_RADIUS.value() / 4096.0;
 
 }  // namespace Constants

@@ -36,29 +36,29 @@ class Elevator {
 
   // Standard classes for controlling our elevator
   frc::ExponentialProfile<units::meters, units::volts>::Constraints
-      m_constraints{Constants::kElevatorMaxV, Constants::kElevatorkV,
-                    Constants::kElevatorkA};
+      m_constraints{Constants::ELEVATOR_MAX_V, Constants::ELEVATOR_V,
+                    Constants::ELEVATOR_A};
   frc::ExponentialProfile<units::meters, units::volts> m_profile{m_constraints};
   frc::ExponentialProfile<units::meters, units::volts>::State m_setpoint;
 
   frc::PIDController m_controller{
-      Constants::kElevatorKp, Constants::kElevatorKi, Constants::kElevatorKd};
+      Constants::ELEVATOR_P, Constants::ELEVATOR_I, Constants::ELEVATOR_D};
 
   frc::ElevatorFeedforward m_feedforward{
-      Constants::kElevatorkS, Constants::kElevatorkG, Constants::kElevatorkV,
-      Constants::kElevatorkA};
-  frc::Encoder m_encoder{Constants::kEncoderAChannel,
-                         Constants::kEncoderBChannel};
-  frc::PWMSparkMax m_motor{Constants::kMotorPort};
+      Constants::ELEVATOR_S, Constants::ELEVATOR_G, Constants::ELEVATOR_V,
+      Constants::ELEVATOR_A};
+  frc::Encoder m_encoder{Constants::ENCODER_A_CHANNEL,
+                         Constants::ENCODER_B_CHANNEL};
+  frc::PWMSparkMax m_motor{Constants::MOTOR_PORT};
   frc::sim::PWMMotorControllerSim m_motorSim{m_motor};
 
   // Simulation classes help us simulate what's going on, including gravity.
   frc::sim::ElevatorSim m_elevatorSim{m_elevatorGearbox,
-                                      Constants::kElevatorGearing,
-                                      Constants::kCarriageMass,
-                                      Constants::kElevatorDrumRadius,
-                                      Constants::kMinElevatorHeight,
-                                      Constants::kMaxElevatorHeight,
+                                      Constants::ELEVATOR_GEARING,
+                                      Constants::CARRIAGE_MASS,
+                                      Constants::ELEVATOR_DRUM_RADIUS,
+                                      Constants::MIN_ELEVATOR_HEIGHT,
+                                      Constants::MAX_ELEVATOR_HEIGHT,
                                       true,
                                       0_m,
                                       {0.005}};

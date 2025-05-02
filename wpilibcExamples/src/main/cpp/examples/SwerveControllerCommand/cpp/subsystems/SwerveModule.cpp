@@ -23,7 +23,7 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel,
   // distance traveled for one rotation of the wheel divided by the encoder
   // resolution.
   m_driveEncoder.SetDistancePerPulse(
-      ModuleConstants::kDriveEncoderDistancePerPulse);
+      ModuleConstants::DRIVE_ENCODER_DISTANCE_PER_PULSE);
 
   // Set whether drive encoder should be reversed or not
   m_driveEncoder.SetReverseDirection(driveEncoderReversed);
@@ -32,7 +32,7 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel,
   // This is the the angle through an entire rotation (2 * std::numbers::pi)
   // divided by the encoder resolution.
   m_turningEncoder.SetDistancePerPulse(
-      ModuleConstants::kTurningEncoderDistancePerPulse);
+      ModuleConstants::TURNING_ENCODER_DISTANCE_PER_PULSE);
 
   // Set whether turning encoder should be reversed or not
   m_turningEncoder.SetReverseDirection(turningEncoderReversed);

@@ -9,10 +9,10 @@
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
-    : m_leftLeader{kLeftMotor1Port},
-      m_leftFollower{kLeftMotor2Port},
-      m_rightLeader{kRightMotor1Port},
-      m_rightFollower{kRightMotor2Port},
+    : m_leftLeader{LEFT_MOTOR_1_PORT},
+      m_leftFollower{LEFT_MOTOR_2_PORT},
+      m_rightLeader{RIGHT_MOTOR_1_PORT},
+      m_rightFollower{RIGHT_MOTOR_2_PORT},
       m_feedforward{ks, kv, ka} {
   wpi::SendableRegistry::AddChild(&m_drive, &m_leftLeader);
   wpi::SendableRegistry::AddChild(&m_drive, &m_rightLeader);
@@ -40,12 +40,12 @@ void DriveSubsystem::SetDriveStates(
     frc::TrapezoidProfile<units::meters>::State nextRight) {
   // Feedforward is divided by battery voltage to normalize it to [-1, 1]
   m_leftLeader.SetSetpoint(
-      ExampleSmartMotorController::PIDMode::kPosition,
+      ExampleSmartMotorController::PIDMode::POSITION,
       currentLeft.position.value(),
       m_feedforward.Calculate(currentLeft.velocity, nextLeft.velocity) /
           frc::RobotController::GetBatteryVoltage());
   m_rightLeader.SetSetpoint(
-      ExampleSmartMotorController::PIDMode::kPosition,
+      ExampleSmartMotorController::PIDMode::POSITION,
       currentRight.position.value(),
       m_feedforward.Calculate(currentRight.velocity, nextRight.velocity) /
           frc::RobotController::GetBatteryVoltage());
@@ -86,7 +86,7 @@ frc2::CommandPtr DriveSubsystem::ProfiledDriveDistance(
                auto currentTime = m_timer.Get();
                auto currentSetpoint =
                    m_profile.Calculate(currentTime, {}, {distance, 0_mps});
-               auto nextSetpoint = m_profile.Calculate(currentTime + kDt, {},
+               auto nextSetpoint = m_profile.Calculate(currentTime + DT, {},
                                                        {distance, 0_mps});
                SetDriveStates(currentSetpoint, currentSetpoint, nextSetpoint,
                               nextSetpoint);
@@ -118,10 +118,10 @@ frc2::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
                    {m_initialRightDistance + distance, 0_mps});
 
                auto nextLeftSetpoint = m_profile.Calculate(
-                   currentTime + kDt, {m_initialLeftDistance, 0_mps},
+                   currentTime + DT, {m_initialLeftDistance, 0_mps},
                    {m_initialLeftDistance + distance, 0_mps});
                auto nextRightSetpoint = m_profile.Calculate(
-                   currentTime + kDt, {m_initialRightDistance, 0_mps},
+                   currentTime + DT, {m_initialRightDistance, 0_mps},
                    {m_initialRightDistance + distance, 0_mps});
                SetDriveStates(currentLeftSetpoint, currentRightSetpoint,
                               nextLeftSetpoint, nextRightSetpoint);

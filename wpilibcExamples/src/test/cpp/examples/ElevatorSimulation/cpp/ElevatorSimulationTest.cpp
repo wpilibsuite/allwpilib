@@ -25,10 +25,10 @@ class ElevatorSimulationTest : public testing::Test {
   std::optional<std::thread> m_thread;
 
  protected:
-  frc::sim::PWMMotorControllerSim m_motorSim{Constants::kMotorPort};
+  frc::sim::PWMMotorControllerSim m_motorSim{Constants::MOTOR_PORT};
   frc::sim::EncoderSim m_encoderSim =
-      frc::sim::EncoderSim::CreateForChannel(Constants::kEncoderAChannel);
-  frc::sim::JoystickSim m_joystickSim{Constants::kJoystickPort};
+      frc::sim::EncoderSim::CreateForChannel(Constants::ENCODER_A_CHANNEL);
+  frc::sim::JoystickSim m_joystickSim{Constants::JOYSTICK_PORT};
 
  public:
   void SetUp() override {
@@ -73,12 +73,12 @@ TEST_F(ElevatorSimulationTest, Teleop) {
     // advance 75 timesteps
     frc::sim::StepTiming(1.5_s);
 
-    EXPECT_NEAR(kSetpoint.value(), m_encoderSim.GetDistance(), 0.05);
+    EXPECT_NEAR(SETPOINT.value(), m_encoderSim.GetDistance(), 0.05);
 
     // advance 25 timesteps to see setpoint is held.
     frc::sim::StepTiming(0.5_s);
 
-    EXPECT_NEAR(kSetpoint.value(), m_encoderSim.GetDistance(), 0.05);
+    EXPECT_NEAR(SETPOINT.value(), m_encoderSim.GetDistance(), 0.05);
   }
 
   {
@@ -100,12 +100,12 @@ TEST_F(ElevatorSimulationTest, Teleop) {
     // advance 75 timesteps
     frc::sim::StepTiming(1.5_s);
 
-    EXPECT_NEAR(kSetpoint.value(), m_encoderSim.GetDistance(), 0.05);
+    EXPECT_NEAR(SETPOINT.value(), m_encoderSim.GetDistance(), 0.05);
 
     // advance 25 timesteps to see setpoint is held.
     frc::sim::StepTiming(0.5_s);
 
-    EXPECT_NEAR(kSetpoint.value(), m_encoderSim.GetDistance(), 0.05);
+    EXPECT_NEAR(SETPOINT.value(), m_encoderSim.GetDistance(), 0.05);
   }
 
   {

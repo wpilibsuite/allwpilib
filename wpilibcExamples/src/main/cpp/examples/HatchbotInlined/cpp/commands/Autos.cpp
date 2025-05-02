@@ -16,14 +16,14 @@ frc2::CommandPtr autos::SimpleAuto(DriveSubsystem* drive) {
              // Reset encoders on command start
              [drive] { drive->ResetEncoders(); },
              // Drive forward while the command is executing
-             [drive] { drive->ArcadeDrive(AutoConstants::kAutoDriveSpeed, 0); },
+             [drive] { drive->ArcadeDrive(AutoConstants::AUTO_DRIVE_SPEED, 0); },
              // Stop driving at the end of the command
              [drive](bool interrupted) { drive->ArcadeDrive(0, 0); },
              // End the command when the robot's driven distance exceeds the
              // desired value
              [drive] {
                return drive->GetAverageEncoderDistance() >=
-                      AutoConstants::kAutoDriveDistanceInches;
+                      AutoConstants::AUTO_DRIVE_DISTANCE_INCHES;
              },
              // Requires the drive subsystem
              {drive})
@@ -38,14 +38,14 @@ frc2::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
           // Reset encoders on command start
           [drive] { drive->ResetEncoders(); },
           // Drive forward while the command is executing
-          [drive] { drive->ArcadeDrive(kAutoDriveSpeed, 0); },
+          [drive] { drive->ArcadeDrive(AUTO_DRIVE_SPEED, 0); },
           // Stop driving at the end of the command
           [drive](bool interrupted) { drive->ArcadeDrive(0, 0); },
           // End the command when the robot's driven distance exceeds the
           // desired value
           [drive] {
             return drive->GetAverageEncoderDistance() >=
-                   kAutoDriveDistanceInches;
+                   AUTO_DRIVE_DISTANCE_INCHES;
           },
           // Requires the drive subsystem
           {drive})
@@ -58,14 +58,14 @@ frc2::CommandPtr autos::ComplexAuto(DriveSubsystem* drive,
           // Reset encoders on command start
           [drive] { drive->ResetEncoders(); },
           // Drive backward while the command is executing
-          [drive] { drive->ArcadeDrive(-kAutoDriveSpeed, 0); },
+          [drive] { drive->ArcadeDrive(-AUTO_DRIVE_SPEED, 0); },
           // Stop driving at the end of the command
           [drive](bool interrupted) { drive->ArcadeDrive(0, 0); },
           // End the command when the robot's driven distance exceeds the
           // desired value
           [drive] {
             return drive->GetAverageEncoderDistance() <=
-                   kAutoBackupDistanceInches;
+                   AUTO_BACKUP_DISTANCE_INCHES;
           },
           // Requires the drive subsystem
           {drive})

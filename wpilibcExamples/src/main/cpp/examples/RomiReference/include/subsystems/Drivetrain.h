@@ -15,8 +15,8 @@
 
 class Drivetrain : public frc2::SubsystemBase {
  public:
-  static constexpr double kCountsPerRevolution = 1440.0;
-  static constexpr units::meter_t kWheelDiameter = 70_mm;
+  static constexpr double COUNTS_PER_REVOLUTION = 1440.0;
+  static constexpr units::meter_t WHEEL_DIAMETER = 70_mm;
 
   Drivetrain();
 

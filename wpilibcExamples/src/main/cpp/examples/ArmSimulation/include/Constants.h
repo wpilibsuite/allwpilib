@@ -22,25 +22,25 @@
  * they are needed.
  */
 
-inline constexpr int kMotorPort = 0;
-inline constexpr int kEncoderAChannel = 0;
-inline constexpr int kEncoderBChannel = 1;
-inline constexpr int kJoystickPort = 0;
+inline constexpr int MOTOR_PORT = 0;
+inline constexpr int ENCODER_A_CHANNEL = 0;
+inline constexpr int ENCODER_B_CHANNEL = 1;
+inline constexpr int JOYSTICK_PORT = 0;
 
-inline constexpr std::string_view kArmPositionKey = "ArmPosition";
-inline constexpr std::string_view kArmPKey = "ArmP";
+inline constexpr std::string_view ARM_POSITION_KEY = "ArmPosition";
+inline constexpr std::string_view ARM_P_KEY = "ArmP";
 
-inline constexpr double kDefaultArmKp = 50.0;
-inline constexpr units::degree_t kDefaultArmSetpoint = 75.0_deg;
+inline constexpr double DEFAULT_ARM_P = 50.0;
+inline constexpr units::degree_t DEFAULT_ARM_SETPOINT = 75.0_deg;
 
-inline constexpr units::radian_t kMinAngle = -75.0_deg;
-inline constexpr units::radian_t kMaxAngle = 255.0_deg;
+inline constexpr units::radian_t MIN_ANGLE = -75.0_deg;
+inline constexpr units::radian_t MAX_ANGLE = 255.0_deg;
 
-inline constexpr double kArmReduction = 200.0;
-inline constexpr units::kilogram_t kArmMass = 8.0_kg;
-inline constexpr units::meter_t kArmLength = 30.0_in;
+inline constexpr double ARM_REDUCTION = 200.0;
+inline constexpr units::kilogram_t ARM_MASS = 8.0_kg;
+inline constexpr units::meter_t ARM_LENGTH = 30.0_in;
 
 // distance per pulse = (angle per revolution) / (pulses per revolution)
 //  = (2 * PI rads) / (4096 pulses)
-inline constexpr double kArmEncoderDistPerPulse =
+inline constexpr double ARM_ENCODER_DIST_PER_PULSE =
     2.0 * std::numbers::pi / 4096.0;

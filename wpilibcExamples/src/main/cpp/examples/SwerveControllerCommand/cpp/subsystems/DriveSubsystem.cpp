@@ -14,29 +14,35 @@
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
-    : m_frontLeft{kFrontLeftDriveMotorPort,
-                  kFrontLeftTurningMotorPort,
-                  kFrontLeftDriveEncoderPorts,
-                  kFrontLeftTurningEncoderPorts,
-                  kFrontLeftDriveEncoderReversed,
-                  kFrontLeftTurningEncoderReversed},
+    : m_frontLeft{FRONT_LEFT_DRIVE_MOTOR_PORT,
+                  FRONT_LEFT_TURNING_MOTOR_PORT,
+                  FRONT_LEFT_DRIVE_ENCODER_PORTS,
+                  FRONT_LEFT_TURNING_ENCODER_PORTS,
+                  FRONT_LEFT_DRIVE_ENCODER_REVERSED,
+                  FRONT_LEFT_TURNING_ENCODER_REVERSED},
 
-      m_rearLeft{
-          kRearLeftDriveMotorPort,       kRearLeftTurningMotorPort,
-          kRearLeftDriveEncoderPorts,    kRearLeftTurningEncoderPorts,
-          kRearLeftDriveEncoderReversed, kRearLeftTurningEncoderReversed},
+      m_rearLeft{REAR_LEFT_DRIVE_MOTOR_PORT,
+                 REAR_LEFT_TURNING_MOTOR_PORT,
+                 REAR_LEFT_DRIVE_ENCODER_PORTS,
+                 REAR_LEFT_TURNING_ENCODER_PORTS,
+                 REAR_LEFT_DRIVE_ENCODER_REVERSED,
+                 REAR_LEFT_TURNING_ENCODER_REVERSED},
 
-      m_frontRight{
-          kFrontRightDriveMotorPort,       kFrontRightTurningMotorPort,
-          kFrontRightDriveEncoderPorts,    kFrontRightTurningEncoderPorts,
-          kFrontRightDriveEncoderReversed, kFrontRightTurningEncoderReversed},
+      m_frontRight{FRONT_RIGHT_DRIVE_MOTOR_PORT,
+                   FRONT_RIGHT_TURNING_MOTOR_PORT,
+                   FRONT_RIGHT_DRIVE_ENCODER_PORTS,
+                   FRONT_RIGHT_TURNING_ENCODER_PORTS,
+                   FRONT_RIGHT_DRIVE_ENCODER_REVERSED,
+                   FRONT_RIGHT_TURNING_ENCODER_REVERSED},
 
-      m_rearRight{
-          kRearRightDriveMotorPort,       kRearRightTurningMotorPort,
-          kRearRightDriveEncoderPorts,    kRearRightTurningEncoderPorts,
-          kRearRightDriveEncoderReversed, kRearRightTurningEncoderReversed},
+      m_rearRight{REAR_RIGHT_DRIVE_MOTOR_PORT,
+                  REAR_RIGHT_TURNING_MOTOR_PORT,
+                  REAR_RIGHT_DRIVE_ENCODER_PORTS,
+                  REAR_RIGHT_TURNING_ENCODER_PORTS,
+                  REAR_RIGHT_DRIVE_ENCODER_REVERSED,
+                  REAR_RIGHT_TURNING_ENCODER_REVERSED},
 
-      m_odometry{kDriveKinematics,
+      m_odometry{DRIVE_KINEMATICS,
                  m_gyro.GetRotation2d(),
                  {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
                   m_rearLeft.GetPosition(), m_rearRight.GetPosition()},
@@ -59,8 +65,8 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   }
   chassisSpeeds = chassisSpeeds.Discretize(period);
 
-  auto states = kDriveKinematics.ToSwerveModuleStates(chassisSpeeds);
-  kDriveKinematics.DesaturateWheelSpeeds(&states, AutoConstants::kMaxSpeed);
+  auto states = DRIVE_KINEMATICS.ToSwerveModuleStates(chassisSpeeds);
+  DRIVE_KINEMATICS.DesaturateWheelSpeeds(&states, AutoConstants::MAX_SPEED);
 
   auto [fl, fr, bl, br] = states;
   m_frontLeft.SetDesiredState(fl);
@@ -71,8 +77,8 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 
 void DriveSubsystem::SetModuleStates(
     wpi::array<frc::SwerveModuleState, 4> desiredStates) {
-  kDriveKinematics.DesaturateWheelSpeeds(&desiredStates,
-                                         AutoConstants::kMaxSpeed);
+  DRIVE_KINEMATICS.DesaturateWheelSpeeds(&desiredStates,
+                                         AutoConstants::MAX_SPEED);
   m_frontLeft.SetDesiredState(desiredStates[0]);
   m_frontRight.SetDesiredState(desiredStates[1]);
   m_rearLeft.SetDesiredState(desiredStates[2]);

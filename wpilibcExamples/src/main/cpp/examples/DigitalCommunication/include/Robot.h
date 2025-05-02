@@ -16,16 +16,16 @@
 class Robot : public frc::TimedRobot {
  public:
   // define ports for communication with light controller
-  static constexpr int kAlliancePort = 0;
-  static constexpr int kEnabledPort = 1;
-  static constexpr int kAutonomousPort = 2;
-  static constexpr int kAlertPort = 3;
+  static constexpr int ALLIANCE_PORT = 0;
+  static constexpr int ENABLED_PORT = 1;
+  static constexpr int AUTONOMOUS_PORT = 2;
+  static constexpr int ALERT_PORT = 3;
 
   void RobotPeriodic() override;
 
  private:
-  frc::DigitalOutput m_allianceOutput{kAlliancePort};
-  frc::DigitalOutput m_enabledOutput{kEnabledPort};
-  frc::DigitalOutput m_autonomousOutput{kAutonomousPort};
-  frc::DigitalOutput m_alertOutput{kAlertPort};
+  frc::DigitalOutput m_allianceOutput{ALLIANCE_PORT};
+  frc::DigitalOutput m_enabledOutput{ENABLED_PORT};
+  frc::DigitalOutput m_autonomousOutput{AUTONOMOUS_PORT};
+  frc::DigitalOutput m_alertOutput{ALERT_PORT};
 };

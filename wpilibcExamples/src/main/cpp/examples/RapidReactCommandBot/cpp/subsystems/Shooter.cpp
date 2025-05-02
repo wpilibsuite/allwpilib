@@ -7,9 +7,9 @@
 #include <frc2/command/Commands.h>
 
 Shooter::Shooter() {
-  m_shooterFeedback.SetTolerance(ShooterConstants::kShooterTolerance.value());
+  m_shooterFeedback.SetTolerance(ShooterConstants::SHOOTER_TOLERANCE.value());
   m_shooterEncoder.SetDistancePerPulse(
-      ShooterConstants::kEncoderDistancePerPulse);
+      ShooterConstants::ENCODER_DISTANCE_PER_PULSE);
 
   SetDefaultCommand(RunOnce([this] {
                       m_shooterMotor.Disable();

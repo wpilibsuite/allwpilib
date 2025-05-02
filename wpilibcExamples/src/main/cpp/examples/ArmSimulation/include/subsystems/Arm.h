@@ -29,17 +29,17 @@ class Arm {
   void Stop();
 
  private:
-  // The P gain for the PID controller that drives this arm.
-  double m_armKp = kDefaultArmKp;
-  units::degree_t m_armSetpoint = kDefaultArmSetpoint;
+  // The kP gain for the PID controller that drives this arm.
+  double m_armKp = DEFAULT_ARM_P;
+  units::degree_t m_armSetpoint = DEFAULT_ARM_SETPOINT;
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
   frc::DCMotor m_armGearbox = frc::DCMotor::Vex775Pro(2);
 
   // Standard classes for controlling our arm
   frc::PIDController m_controller{m_armKp, 0, 0};
-  frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
-  frc::PWMSparkMax m_motor{kMotorPort};
+  frc::Encoder m_encoder{ENCODER_A_CHANNEL, ENCODER_B_CHANNEL};
+  frc::PWMSparkMax m_motor{MOTOR_PORT};
 
   // Simulation classes help us simulate what's going on, including gravity.
   // This sim represents an arm with 2 775s, a 600:1 reduction, a mass of 5kg,
@@ -47,14 +47,14 @@ class Arm {
   // with a standard deviation of 1 encoder tick.
   frc::sim::SingleJointedArmSim m_armSim{
       m_armGearbox,
-      kArmReduction,
-      frc::sim::SingleJointedArmSim::EstimateMOI(kArmLength, kArmMass),
-      kArmLength,
-      kMinAngle,
-      kMaxAngle,
+      ARM_REDUCTION,
+      frc::sim::SingleJointedArmSim::EstimateMOI(ARM_LENGTH, ARM_MASS),
+      ARM_LENGTH,
+      MIN_ANGLE,
+      MAX_ANGLE,
       true,
       0_deg,
-      {kArmEncoderDistPerPulse}};
+      {ARM_ENCODER_DIST_PER_PULSE}};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 
   // Create a Mechanism2d display of an Arm
@@ -62,7 +62,7 @@ class Arm {
   frc::MechanismRoot2d* m_armBase = m_mech2d.GetRoot("ArmBase", 30, 30);
   frc::MechanismLigament2d* m_armTower =
       m_armBase->Append<frc::MechanismLigament2d>(
-          "Arm Tower", 30, -90_deg, 6, frc::Color8Bit{frc::Color::kBlue});
+          "Arm Tower", 30, -90_deg, 6, frc::Color8Bit{frc::Color::BLUE});
   frc::MechanismLigament2d* m_arm = m_armBase->Append<frc::MechanismLigament2d>(
-      "Arm", 30, m_armSim.GetAngle(), 6, frc::Color8Bit{frc::Color::kYellow});
+      "Arm", 30, m_armSim.GetAngle(), 6, frc::Color8Bit{frc::Color::YELLOW});
 };

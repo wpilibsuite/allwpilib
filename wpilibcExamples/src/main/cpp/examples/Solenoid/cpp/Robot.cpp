@@ -38,21 +38,21 @@ void Robot::TeleopPeriodic() {
    * the button is pressed; Set takes a boolean for whether
    * to retract the solenoid (false) or extend it (true).
    */
-  m_solenoid.Set(m_stick.GetRawButton(kSolenoidButton));
+  m_solenoid.Set(m_stick.GetRawButton(SOLENOID_BUTTON));
 
   /*
    * GetRawButtonPressed will only return true once per press.
    * If a button is pressed, set the solenoid to the respective channel.
    */
-  if (m_stick.GetRawButtonPressed(kDoubleSolenoidForward)) {
-    m_doubleSolenoid.Set(frc::DoubleSolenoid::kForward);
-  } else if (m_stick.GetRawButtonPressed(kDoubleSolenoidReverse)) {
-    m_doubleSolenoid.Set(frc::DoubleSolenoid::kReverse);
+  if (m_stick.GetRawButtonPressed(DOUBLE_SOLENOID_FORWARD)) {
+    m_doubleSolenoid.Set(frc::DoubleSolenoid::FORWARD);
+  } else if (m_stick.GetRawButtonPressed(DOUBLE_SOLENOID_REVERSE)) {
+    m_doubleSolenoid.Set(frc::DoubleSolenoid::REVERSE);
   }
 
   // On button press, toggle the compressor with the mode selected from the
   // dashboard.
-  if (m_stick.GetRawButtonPressed(kCompressorButton)) {
+  if (m_stick.GetRawButtonPressed(COMPRESSOR_BUTTON)) {
     // Check whether the compressor is currently enabled.
     bool isCompressorEnabled = m_compressor.IsEnabled();
     if (isCompressorEnabled) {

@@ -34,10 +34,10 @@ class Pneumatics : frc2::SubsystemBase {
   // the scale parameter in the AnalogPotentiometer constructor is scaled from
   // 1 instead of 5, so if r is the raw AnalogPotentiometer output, the
   // pressure is 250r-25
-  static constexpr double kScale = 250;
-  static constexpr double kOffset = -25;
+  static constexpr double SCALE = 250;
+  static constexpr double OFFSET = -25;
   frc::AnalogPotentiometer m_pressureTransducer{/* the AnalogIn port*/ 2,
-                                                kScale, kOffset};
+                                                SCALE, OFFSET};
 
   // Compressor connected to a PH with a default CAN ID
   frc::Compressor m_compressor{0, frc::PneumaticsModuleType::CTREPCM};

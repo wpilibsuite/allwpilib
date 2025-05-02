@@ -5,11 +5,11 @@
 #include "subsystems/Intake.h"
 
 void Intake::Deploy() {
-  m_piston.Set(frc::DoubleSolenoid::Value::kForward);
+  m_piston.Set(frc::DoubleSolenoid::Value::FORWARD);
 }
 
 void Intake::Retract() {
-  m_piston.Set(frc::DoubleSolenoid::Value::kReverse);
+  m_piston.Set(frc::DoubleSolenoid::Value::REVERSE);
   m_motor.Set(0);  // turn off the motor
 }
 
@@ -22,5 +22,5 @@ void Intake::Activate(double speed) {
 }
 
 bool Intake::IsDeployed() const {
-  return m_piston.Get() == frc::DoubleSolenoid::Value::kForward;
+  return m_piston.Get() == frc::DoubleSolenoid::Value::FORWARD;
 }

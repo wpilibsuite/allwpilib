@@ -7,16 +7,16 @@
 #include <frc2/command/Commands.h>
 
 Drive::Drive() {
-  m_leftMotor.AddFollower(frc::PWMSparkMax{constants::drive::kLeftMotor2Port});
+  m_leftMotor.AddFollower(frc::PWMSparkMax{constants::drive::LEFT_MOTOR_2_PORT});
   m_rightMotor.AddFollower(
-      frc::PWMSparkMax{constants::drive::kRightMotor2Port});
+      frc::PWMSparkMax{constants::drive::RIGHT_MOTOR_2_PORT});
 
   m_rightMotor.SetInverted(true);
 
   m_leftEncoder.SetDistancePerPulse(
-      constants::drive::kEncoderDistancePerPulse.value());
+      constants::drive::ENCODER_DISTANCE_PER_PULSE.value());
   m_rightEncoder.SetDistancePerPulse(
-      constants::drive::kEncoderDistancePerPulse.value());
+      constants::drive::ENCODER_DISTANCE_PER_PULSE.value());
 
   m_drive.SetSafetyEnabled(false);
 }

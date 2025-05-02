@@ -23,10 +23,10 @@ Drivetrain::Drivetrain() {
   // gearbox is constructed, you might have to invert the left side instead.
   m_rightMotor.SetInverted(true);
 
-  m_leftEncoder.SetDistancePerPulse(std::numbers::pi * kWheelDiameter.value() /
-                                    kCountsPerRevolution);
-  m_rightEncoder.SetDistancePerPulse(std::numbers::pi * kWheelDiameter.value() /
-                                     kCountsPerRevolution);
+  m_leftEncoder.SetDistancePerPulse(std::numbers::pi * WHEEL_DIAMETER.value() /
+                                    COUNTS_PER_REVOLUTION);
+  m_rightEncoder.SetDistancePerPulse(std::numbers::pi * WHEEL_DIAMETER.value() /
+                                     COUNTS_PER_REVOLUTION);
   ResetEncoders();
 }
 

@@ -36,15 +36,15 @@ class RobotContainer {
   HatchSubsystem m_hatch;
 
   // The autonomous routines
-  DriveDistance m_simpleAuto{AutoConstants::kAutoDriveDistanceInches,
-                             AutoConstants::kAutoDriveSpeed, &m_drive};
+  DriveDistance m_simpleAuto{AutoConstants::AUTO_DRIVE_DISTANCE_INCHES,
+                             AutoConstants::AUTO_DRIVE_SPEED, &m_drive};
   ComplexAuto m_complexAuto{&m_drive, &m_hatch};
 
   // The chooser for the autonomous routines
   frc::SendableChooser<frc2::Command*> m_chooser;
 
   // The driver's controller
-  frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
+  frc::XboxController m_driverController{OIConstants::DRIVER_CONTROLLER_PORT};
 
   void ConfigureButtonBindings();
 };

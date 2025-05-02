@@ -58,7 +58,7 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
     chassisSpeeds = chassisSpeeds.ToRobotRelative(m_gyro.GetRotation2d());
   }
   SetSpeeds(m_kinematics.ToWheelSpeeds(chassisSpeeds.Discretize(period))
-                .Desaturate(kMaxSpeed));
+                .Desaturate(MAX_SPEED));
 }
 
 void Drivetrain::UpdateOdometry() {

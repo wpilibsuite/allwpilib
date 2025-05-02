@@ -26,12 +26,12 @@
  * destructed!
  */
 class Robot : public frc::TimedRobot {
-  static constexpr double kMetersPerPulse = 0.01;
-  static constexpr double kElevatorMinimumLength = 0.5;
+  static constexpr double METERS_PER_PULSE = 0.01;
+  static constexpr double ELEVATOR_MINIMUM_LENGTH = 0.5;
 
  public:
   Robot() {
-    m_elevatorEncoder.SetDistancePerPulse(kMetersPerPulse);
+    m_elevatorEncoder.SetDistancePerPulse(METERS_PER_PULSE);
 
     // publish to dashboard
     frc::SmartDashboard::PutData("Mech2d", &m_mech);
@@ -39,7 +39,7 @@ class Robot : public frc::TimedRobot {
 
   void RobotPeriodic() override {
     // update the dashboard mechanism's state
-    m_elevator->SetLength(kElevatorMinimumLength +
+    m_elevator->SetLength(ELEVATOR_MINIMUM_LENGTH +
                           m_elevatorEncoder.GetDistance());
     m_wrist->SetAngle(units::degree_t{m_wristPotentiometer.Get()});
   }
@@ -66,7 +66,7 @@ class Robot : public frc::TimedRobot {
       m_root->Append<frc::MechanismLigament2d>("elevator", 1, 90_deg);
   frc::MechanismLigament2d* m_wrist =
       m_elevator->Append<frc::MechanismLigament2d>(
-          "wrist", 0.5, 90_deg, 6, frc::Color8Bit{frc::Color::kPurple});
+          "wrist", 0.5, 90_deg, 6, frc::Color8Bit{frc::Color::PURPLE});
 };
 
 #ifndef RUNNING_FRC_TESTS

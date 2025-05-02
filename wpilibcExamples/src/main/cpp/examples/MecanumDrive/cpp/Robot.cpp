@@ -34,24 +34,24 @@ class Robot : public frc::TimedRobot {
   }
 
  private:
-  static constexpr int kFrontLeftChannel = 0;
-  static constexpr int kRearLeftChannel = 1;
-  static constexpr int kFrontRightChannel = 2;
-  static constexpr int kRearRightChannel = 3;
+  static constexpr int FRONT_LEFT_CHANNEL = 0;
+  static constexpr int REAR_LEFT_CHANNEL = 1;
+  static constexpr int FRONT_RIGHT_CHANNEL = 2;
+  static constexpr int REAR_RIGHT_CHANNEL = 3;
 
-  static constexpr int kJoystickChannel = 0;
+  static constexpr int JOYSTICK_CHANNEL = 0;
 
-  frc::PWMSparkMax m_frontLeft{kFrontLeftChannel};
-  frc::PWMSparkMax m_rearLeft{kRearLeftChannel};
-  frc::PWMSparkMax m_frontRight{kFrontRightChannel};
-  frc::PWMSparkMax m_rearRight{kRearRightChannel};
+  frc::PWMSparkMax m_frontLeft{FRONT_LEFT_CHANNEL};
+  frc::PWMSparkMax m_rearLeft{REAR_LEFT_CHANNEL};
+  frc::PWMSparkMax m_frontRight{FRONT_RIGHT_CHANNEL};
+  frc::PWMSparkMax m_rearRight{REAR_RIGHT_CHANNEL};
   frc::MecanumDrive m_robotDrive{
       [&](double output) { m_frontLeft.Set(output); },
       [&](double output) { m_rearLeft.Set(output); },
       [&](double output) { m_frontRight.Set(output); },
       [&](double output) { m_rearRight.Set(output); }};
 
-  frc::Joystick m_stick{kJoystickChannel};
+  frc::Joystick m_stick{JOYSTICK_CHANNEL};
 };
 
 #ifndef RUNNING_FRC_TESTS

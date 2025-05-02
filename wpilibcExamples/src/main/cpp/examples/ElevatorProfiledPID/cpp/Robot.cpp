@@ -19,7 +19,7 @@
 
 class Robot : public frc::TimedRobot {
  public:
-  static constexpr units::second_t kDt = 20_ms;
+  static constexpr units::second_t DT = 20_ms;
 
   Robot() {
     m_encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * std::numbers::pi * 1.5);
@@ -40,13 +40,13 @@ class Robot : public frc::TimedRobot {
   }
 
  private:
-  static constexpr units::meters_per_second_t kMaxVelocity = 1.75_mps;
-  static constexpr units::meters_per_second_squared_t kMaxAcceleration =
+  static constexpr units::meters_per_second_t MAX_VELOCITY = 1.75_mps;
+  static constexpr units::meters_per_second_squared_t MAX_ACCELERATION =
       0.75_mps_sq;
   static constexpr double kP = 1.3;
   static constexpr double kI = 0.0;
   static constexpr double kD = 0.7;
-  static constexpr units::volt_t kS = 1.1_V;
+  static constexpr units::volt_t S = 1.1_V;
   static constexpr units::volt_t kG = 1.2_V;
   static constexpr auto kV = 1.3_V / 1_mps;
 
@@ -57,10 +57,10 @@ class Robot : public frc::TimedRobot {
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
   frc::TrapezoidProfile<units::meters>::Constraints m_constraints{
-      kMaxVelocity, kMaxAcceleration};
+    MAX_VELOCITY, MAX_ACCELERATION};
   frc::ProfiledPIDController<units::meters> m_controller{kP, kI, kD,
-                                                         m_constraints, kDt};
-  frc::ElevatorFeedforward m_feedforward{kS, kG, kV};
+                                                         m_constraints, DT};
+  frc::ElevatorFeedforward m_feedforward{S, kG, kV};
 };
 
 #ifndef RUNNING_FRC_TESTS

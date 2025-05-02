@@ -16,20 +16,20 @@
 
 namespace constants {
 namespace drive {
-inline constexpr int kLeftMotor1Port = 0;
-inline constexpr int kLeftMotor2Port = 1;
-inline constexpr int kRightMotor1Port = 2;
-inline constexpr int kRightMotor2Port = 3;
+inline constexpr int LEFT_MOTOR_1_PORT = 0;
+inline constexpr int LEFT_MOTOR_2_PORT = 1;
+inline constexpr int RIGHT_MOTOR_1_PORT = 2;
+inline constexpr int RIGHT_MOTOR_2_PORT = 3;
 
-inline constexpr std::array<int, 2> kLeftEncoderPorts = {0, 1};
-inline constexpr std::array<int, 2> kRightEncoderPorts = {2, 3};
-inline constexpr bool kLeftEncoderReversed = false;
-inline constexpr bool kRightEncoderReversed = true;
+inline constexpr std::array<int, 2> LEFT_ENCODER_PORTS = {0, 1};
+inline constexpr std::array<int, 2> RIGHT_ENCODER_PORTS = {2, 3};
+inline constexpr bool LEFT_ENCODER_REVERSED = false;
+inline constexpr bool RIGHT_ENCODER_REVERSED = true;
 
-inline constexpr int kEncoderCpr = 1024;
-inline constexpr units::meter_t kWheelDiameter = 6_in;
-inline constexpr units::meter_t kEncoderDistancePerPulse =
-    (kWheelDiameter * std::numbers::pi) / static_cast<double>(kEncoderCpr);
+inline constexpr int ENCODER_CPR = 1024;
+inline constexpr units::meter_t WHEEL_DIAMETER = 6_in;
+inline constexpr units::meter_t ENCODER_DISTANCE_PER_PULSE =
+    (WHEEL_DIAMETER * std::numbers::pi) / static_cast<double>(ENCODER_CPR);
 }  // namespace drive
 
 namespace shooter {
@@ -44,45 +44,45 @@ using ka_unit =
                          units::inverse<units::turns_per_second_squared>>;
 using ka_unit_t = units::unit_t<ka_unit>;
 
-inline constexpr std::array<int, 2> kEncoderPorts = {4, 5};
-inline constexpr bool kEncoderReversed = false;
-inline constexpr int kEncoderCpr = 1024;
-inline constexpr units::turn_t kEncoderDistancePerPulse =
-    1_tr / static_cast<double>(kEncoderCpr);
+inline constexpr std::array<int, 2> ENCODER_PORTS = {4, 5};
+inline constexpr bool ENCODER_REVERSED = false;
+inline constexpr int ENCODER_CPR = 1024;
+inline constexpr units::turn_t ENCODER_DISTANCE_PER_PULSE =
+    1_tr / static_cast<double>(ENCODER_CPR);
 
-inline constexpr int kShooterMotorPort = 4;
-inline constexpr int kFeederMotorPort = 5;
+inline constexpr int SHOOTER_MOTOR_PORT = 4;
+inline constexpr int FEEDER_MOTOR_PORT = 5;
 
-inline constexpr units::turns_per_second_t kShooterFreeSpeed = 5300_tps;
-inline constexpr units::turns_per_second_t kShooterTargetSpeed = 4000_tps;
-inline constexpr units::turns_per_second_t kShooterTolerance = 50_tps;
+inline constexpr units::turns_per_second_t SHOOTER_FREE_SPEED = 5300_tps;
+inline constexpr units::turns_per_second_t SHOOTER_TARGET_SPEED = 4000_tps;
+inline constexpr units::turns_per_second_t SHOOTER_TOLERANCE = 50_tps;
 
 inline constexpr double kP = 1.0;
 
-inline constexpr units::volt_t kS = 0.05_V;
-inline constexpr kv_unit_t kV = 12_V / kShooterFreeSpeed;
+inline constexpr units::volt_t S = 0.05_V;
+inline constexpr kv_unit_t kV = 12_V / SHOOTER_FREE_SPEED;
 inline constexpr ka_unit_t kA = 0_V * 1_s * 1_s / 1_tr;
 
-inline constexpr double kFeederSpeed = 0.5;
+inline constexpr double FEEDER_SPEED = 0.5;
 }  // namespace shooter
 
 namespace intake {
-inline constexpr int kMotorPort = 6;
-inline constexpr std::array<int, 2> kSolenoidPorts = {2, 3};
+inline constexpr int MOTOR_PORT = 6;
+inline constexpr std::array<int, 2> SOLENOID_PORTS = {2, 3};
 }  // namespace intake
 
 namespace storage {
-inline constexpr int kMotorPort = 7;
-inline constexpr int kBallSensorPort = 6;
+inline constexpr int MOTOR_PORT = 7;
+inline constexpr int BALL_SENSOR_PORT = 6;
 }  // namespace storage
 
 namespace autonomous {
-inline constexpr units::second_t kTimeout = 3_s;
-inline constexpr units::meter_t kDriveDistance = 2_m;
-inline constexpr double kDriveSpeed = 0.5;
+inline constexpr units::second_t TIMEOUT = 3_s;
+inline constexpr units::meter_t DRIVE_DISTANCE = 2_m;
+inline constexpr double DRIVE_SPEED = 0.5;
 }  // namespace autonomous
 
 namespace oi {
-inline constexpr int kDriverControllerPort = 0;
+inline constexpr int DRIVER_CONTROLLER_PORT = 0;
 }  // namespace oi
 }  // namespace constants

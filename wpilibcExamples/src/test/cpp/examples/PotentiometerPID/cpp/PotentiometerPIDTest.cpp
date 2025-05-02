@@ -23,25 +23,25 @@
 
 class PotentiometerPIDTest : public testing::Test {
   frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
-  static constexpr double kElevatorGearing = 10.0;
-  static constexpr units::meter_t kElevatorDrumRadius = 2.0_in;
-  static constexpr units::kilogram_t kCarriageMass = 4.0_kg;
+  static constexpr double ELEVATOR_GEARING = 10.0;
+  static constexpr units::meter_t ELEVATOR_DRUM_RADIUS = 2.0_in;
+  static constexpr units::kilogram_t CARRIAGE_MASS = 4.0_kg;
 
   Robot m_robot;
   std::optional<std::thread> m_thread;
 
  protected:
   frc::sim::ElevatorSim m_elevatorSim{m_elevatorGearbox,
-                                      kElevatorGearing,
-                                      kCarriageMass,
-                                      kElevatorDrumRadius,
+    ELEVATOR_GEARING,
+                                      CARRIAGE_MASS,
+                                      ELEVATOR_DRUM_RADIUS,
                                       0.0_m,
-                                      Robot::kFullHeight,
+                                      Robot::FULL_HEIGHT,
                                       true,
                                       0.0_m};
-  frc::sim::PWMMotorControllerSim m_motorSim{Robot::kMotorChannel};
-  frc::sim::AnalogInputSim m_analogSim{Robot::kPotChannel};
-  frc::sim::JoystickSim m_joystickSim{Robot::kJoystickChannel};
+  frc::sim::PWMMotorControllerSim m_motorSim{Robot::MOTOR_CHANNEL};
+  frc::sim::AnalogInputSim m_analogSim{Robot::POT_CHANNEL};
+  frc::sim::JoystickSim m_joystickSim{Robot::JOYSTICK_CHANNEL};
   int32_t m_callback;
   int32_t m_port;
 
@@ -58,7 +58,7 @@ class PotentiometerPIDTest : public testing::Test {
      */
     m_analogSim.SetVoltage(
         (frc::RobotController::GetVoltage3V3() *
-         (m_elevatorSim.GetPosition().value() / Robot::kFullHeight))
+         (m_elevatorSim.GetPosition().value() / Robot::FULL_HEIGHT))
             .value());
   }
 
@@ -103,7 +103,7 @@ TEST_F(PotentiometerPIDTest, Teleop) {
     // advance 50 timesteps
     frc::sim::StepTiming(1_s);
 
-    EXPECT_NEAR(Robot::kSetpoints[0].value(),
+    EXPECT_NEAR(Robot::SETPOINTS[0].value(),
                 m_elevatorSim.GetPosition().value(), 0.1);
   }
 
@@ -116,7 +116,7 @@ TEST_F(PotentiometerPIDTest, Teleop) {
     // advance 50 timesteps
     frc::sim::StepTiming(1_s);
 
-    EXPECT_NEAR(Robot::kSetpoints[1].value(),
+    EXPECT_NEAR(Robot::SETPOINTS[1].value(),
                 m_elevatorSim.GetPosition().value(), 0.1);
   }
 
@@ -138,7 +138,7 @@ TEST_F(PotentiometerPIDTest, Teleop) {
     // advance 50 timesteps
     frc::sim::StepTiming(1_s);
 
-    EXPECT_NEAR(Robot::kSetpoints[2].value(),
+    EXPECT_NEAR(Robot::SETPOINTS[2].value(),
                 m_elevatorSim.GetPosition().value(), 0.1);
   }
 
@@ -159,7 +159,7 @@ TEST_F(PotentiometerPIDTest, Teleop) {
 
     // advance 60 timesteps
     frc::sim::StepTiming(1.2_s);
-    EXPECT_NEAR(Robot::kSetpoints[0].value(),
+    EXPECT_NEAR(Robot::SETPOINTS[0].value(),
                 m_elevatorSim.GetPosition().value(), 0.1);
   }
 }
