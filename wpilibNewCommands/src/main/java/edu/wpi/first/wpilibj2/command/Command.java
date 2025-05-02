@@ -572,10 +572,10 @@ public abstract class Command implements Sendable {
    * How the command behaves when another command with a shared requirement is scheduled.
    *
    * @return a variant of {@link InterruptionBehavior}, defaulting to {@link
-   *     InterruptionBehavior#kCancelSelf kCancelSelf}.
+   *     InterruptionBehavior#CANCEL_SELF }.
    */
   public InterruptionBehavior getInterruptionBehavior() {
-    return InterruptionBehavior.kCancelSelf;
+    return InterruptionBehavior.CANCEL_SELF;
   }
 
   /**
@@ -636,8 +636,8 @@ public abstract class Command implements Sendable {
      *
      * <p>This is the default behavior.
      */
-    kCancelSelf,
+    CANCEL_SELF,
     /** This command continues, and the incoming command is not scheduled. */
-    kCancelIncoming
+    CANCEL_INCOMING
   }
 }

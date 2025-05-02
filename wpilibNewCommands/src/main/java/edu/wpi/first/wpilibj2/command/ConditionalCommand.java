@@ -76,11 +76,11 @@ public class ConditionalCommand extends Command {
 
   @Override
   public InterruptionBehavior getInterruptionBehavior() {
-    if (m_onTrue.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf
-        || m_onFalse.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
-      return InterruptionBehavior.kCancelSelf;
+    if (m_onTrue.getInterruptionBehavior() == InterruptionBehavior.CANCEL_SELF
+        || m_onFalse.getInterruptionBehavior() == InterruptionBehavior.CANCEL_SELF) {
+      return InterruptionBehavior.CANCEL_SELF;
     } else {
-      return InterruptionBehavior.kCancelIncoming;
+      return InterruptionBehavior.CANCEL_INCOMING;
     }
   }
 

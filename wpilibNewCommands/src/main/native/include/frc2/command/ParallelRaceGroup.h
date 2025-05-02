@@ -86,7 +86,7 @@ class ParallelRaceGroup : public CommandHelper<Command, ParallelRaceGroup> {
   std::vector<std::unique_ptr<Command>> m_commands;
   bool m_runWhenDisabled{true};
   Command::InterruptionBehavior m_interruptBehavior{
-      Command::InterruptionBehavior::kCancelIncoming};
+      Command::InterruptionBehavior::CANCEL_INCOMING};
   bool m_finished{false};
   bool isRunning = false;
 };

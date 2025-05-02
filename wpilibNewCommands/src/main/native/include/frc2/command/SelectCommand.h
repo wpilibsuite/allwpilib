@@ -65,8 +65,8 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
       this->AddRequirements(command.second->GetRequirements());
       m_runsWhenDisabled &= command.second->RunsWhenDisabled();
       if (command.second->GetInterruptionBehavior() ==
-          Command::InterruptionBehavior::kCancelSelf) {
-        m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
+          Command::InterruptionBehavior::CANCEL_SELF) {
+        m_interruptBehavior = Command::InterruptionBehavior::CANCEL_SELF;
       }
       m_commands.emplace(std::move(command.first), std::move(command.second));
     }
@@ -87,8 +87,8 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
       this->AddRequirements(command.second->GetRequirements());
       m_runsWhenDisabled &= command.second->RunsWhenDisabled();
       if (command.second->GetInterruptionBehavior() ==
-          Command::InterruptionBehavior::kCancelSelf) {
-        m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
+          Command::InterruptionBehavior::CANCEL_SELF) {
+        m_interruptBehavior = Command::InterruptionBehavior::CANCEL_SELF;
       }
       m_commands.emplace(std::move(command.first), std::move(command.second));
     }
@@ -139,7 +139,7 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
   Command* m_selectedCommand;
   bool m_runsWhenDisabled = true;
   Command::InterruptionBehavior m_interruptBehavior{
-      Command::InterruptionBehavior::kCancelIncoming};
+      Command::InterruptionBehavior::CANCEL_INCOMING};
 
   PrintCommand m_defaultCommand{
       "SelectCommand selector value does not correspond to any command!"};

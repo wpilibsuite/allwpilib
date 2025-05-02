@@ -66,7 +66,7 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
 }
 
 CommandScheduler::CommandScheduler()
-    : m_impl(new Impl), m_watchdog(frc::TimedRobot::kDefaultPeriod, [] {
+    : m_impl(new Impl), m_watchdog(frc::TimedRobot::DEFAULT_PERIOD, [] {
         std::puts("CommandScheduler loop time overrun.");
       }) {
   HAL_ReportUsage("CommandScheduler", "");
@@ -117,7 +117,7 @@ void CommandScheduler::Schedule(Command* command) {
     if (requirements.find(i1.first) != requirements.end()) {
       isDisjoint = false;
       allInterruptible &= (i1.second->GetInterruptionBehavior() ==
-                           Command::InterruptionBehavior::kCancelSelf);
+                           Command::InterruptionBehavior::CANCEL_SELF);
       intersection.emplace_back(i1.second);
     }
   }
@@ -516,7 +516,7 @@ void CommandScheduler::InitSendable(wpi::SendableBuilder& builder) {
 void CommandScheduler::SetDefaultCommandImpl(Subsystem* subsystem,
                                              std::unique_ptr<Command> command) {
   if (command->GetInterruptionBehavior() ==
-      Command::InterruptionBehavior::kCancelIncoming) {
+      Command::InterruptionBehavior::CANCEL_INCOMING) {
     std::puts(
         "Registering a non-interruptible default command!\n"
         "This will likely prevent any other commands from "

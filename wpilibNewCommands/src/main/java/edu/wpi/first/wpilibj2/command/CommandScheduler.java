@@ -59,7 +59,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     return instance;
   }
 
-  private static final Optional<Command> kNoInterruptor = Optional.empty();
+  private static final Optional<Command> NO_INTERRUPTOR = Optional.empty();
 
   private final Map<Command, Exception> m_composedCommands = new WeakHashMap<>();
 
@@ -94,7 +94,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   private final List<Optional<Command>> m_toCancelInterruptors = new ArrayList<>();
   private final Set<Command> m_endingCommands = new LinkedHashSet<>();
 
-  private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> {});
+  private final Watchdog m_watchdog = new Watchdog(TimedRobot.DEFAULT_PERIOD, () -> {});
 
   CommandScheduler() {
     HAL.reportUsage("CommandScheduler", "");
@@ -205,7 +205,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       for (Subsystem requirement : requirements) {
         Command requiring = requiring(requirement);
         if (requiring != null
-            && requiring.getInterruptionBehavior() == InterruptionBehavior.kCancelIncoming) {
+            && requiring.getInterruptionBehavior() == InterruptionBehavior.CANCEL_INCOMING) {
           return;
         }
       }
@@ -276,7 +276,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       Command command = iterator.next();
 
       if (isDisabled && !command.runsWhenDisabled()) {
-        cancel(command, kNoInterruptor);
+        cancel(command, NO_INTERRUPTOR);
         continue;
       }
 
@@ -394,7 +394,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       throw new IllegalArgumentException("Default commands must require their subsystem!");
     }
 
-    if (defaultCommand.getInterruptionBehavior() == InterruptionBehavior.kCancelIncoming) {
+    if (defaultCommand.getInterruptionBehavior() == InterruptionBehavior.CANCEL_INCOMING) {
       DriverStation.reportWarning(
           "Registering a non-interruptible default command!\n"
               + "This will likely prevent any other commands from requiring this subsystem.",
@@ -443,7 +443,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    */
   public void cancel(Command... commands) {
     for (Command command : commands) {
-      cancel(command, kNoInterruptor);
+      cancel(command, NO_INTERRUPTOR);
     }
   }
 

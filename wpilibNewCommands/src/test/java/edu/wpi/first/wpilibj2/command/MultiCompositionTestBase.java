@@ -26,28 +26,28 @@ abstract class MultiCompositionTestBase<T extends Command> extends SingleComposi
     return Stream.of(
         arguments(
             "AllCancelSelf",
-            InterruptionBehavior.kCancelSelf,
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf)),
+            InterruptionBehavior.CANCEL_SELF,
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_SELF),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_SELF),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_SELF)),
         arguments(
             "AllCancelIncoming",
-            InterruptionBehavior.kCancelIncoming,
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)),
+            InterruptionBehavior.CANCEL_INCOMING,
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_INCOMING),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_INCOMING),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_INCOMING)),
         arguments(
             "TwoCancelSelfOneIncoming",
-            InterruptionBehavior.kCancelSelf,
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming)),
+            InterruptionBehavior.CANCEL_SELF,
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_SELF),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_SELF),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_INCOMING)),
         arguments(
             "TwoCancelIncomingOneSelf",
-            InterruptionBehavior.kCancelSelf,
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf)));
+            InterruptionBehavior.CANCEL_SELF,
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_INCOMING),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_INCOMING),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_SELF)));
   }
 
   @MethodSource

@@ -41,22 +41,22 @@ class SwerveControllerCommandTest {
   }
 
   private final Timer m_timer = new Timer();
-  private Rotation2d m_angle = Rotation2d.kZero;
+  private Rotation2d m_angle = Rotation2d.ZERO;
 
   private SwerveModuleState[] m_moduleStates =
       new SwerveModuleState[] {
-        new SwerveModuleState(0, Rotation2d.kZero),
-        new SwerveModuleState(0, Rotation2d.kZero),
-        new SwerveModuleState(0, Rotation2d.kZero),
-        new SwerveModuleState(0, Rotation2d.kZero)
+        new SwerveModuleState(0, Rotation2d.ZERO),
+        new SwerveModuleState(0, Rotation2d.ZERO),
+        new SwerveModuleState(0, Rotation2d.ZERO),
+        new SwerveModuleState(0, Rotation2d.ZERO)
       };
 
   private final SwerveModulePosition[] m_modulePositions =
       new SwerveModulePosition[] {
-        new SwerveModulePosition(0, Rotation2d.kZero),
-        new SwerveModulePosition(0, Rotation2d.kZero),
-        new SwerveModulePosition(0, Rotation2d.kZero),
-        new SwerveModulePosition(0, Rotation2d.kZero)
+        new SwerveModulePosition(0, Rotation2d.ZERO),
+        new SwerveModulePosition(0, Rotation2d.ZERO),
+        new SwerveModulePosition(0, Rotation2d.ZERO),
+        new SwerveModulePosition(0, Rotation2d.ZERO)
       };
 
   private final ProfiledPIDController m_rotController =
@@ -64,20 +64,20 @@ class SwerveControllerCommandTest {
 
   private static final double kxTolerance = 1 / 12.0;
   private static final double kyTolerance = 1 / 12.0;
-  private static final double kAngularTolerance = 1 / 12.0;
+  private static final double ANGULAR_TOLERANCE = 1 / 12.0;
 
-  private static final double kWheelBase = 0.5;
-  private static final double kTrackwidth = 0.5;
+  private static final double WHEEL_BASE = 0.5;
+  private static final double TRACK_WIDTH = 0.5;
 
   private final SwerveDriveKinematics m_kinematics =
       new SwerveDriveKinematics(
-          new Translation2d(kWheelBase / 2, kTrackwidth / 2),
-          new Translation2d(kWheelBase / 2, -kTrackwidth / 2),
-          new Translation2d(-kWheelBase / 2, kTrackwidth / 2),
-          new Translation2d(-kWheelBase / 2, -kTrackwidth / 2));
+          new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
+          new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+          new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
+          new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
   private final SwerveDriveOdometry m_odometry =
-      new SwerveDriveOdometry(m_kinematics, Rotation2d.kZero, m_modulePositions, Pose2d.kZero);
+      new SwerveDriveOdometry(m_kinematics, Rotation2d.ZERO, m_modulePositions, Pose2d.ZERO);
 
   @SuppressWarnings("PMD.ArrayIsStoredDirectly")
   public void setModuleStates(SwerveModuleState[] moduleStates) {
@@ -95,7 +95,7 @@ class SwerveControllerCommandTest {
     final var subsystem = new Subsystem() {};
 
     final var waypoints = new ArrayList<Pose2d>();
-    waypoints.add(Pose2d.kZero);
+    waypoints.add(Pose2d.ZERO);
     waypoints.add(new Pose2d(1, 5, new Rotation2d(3)));
     var config = new TrajectoryConfig(8.8, 0.1);
     final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
@@ -137,6 +137,6 @@ class SwerveControllerCommandTest {
             assertEquals(
                 endState.pose.getRotation().getRadians(),
                 getRobotPose().getRotation().getRadians(),
-                kAngularTolerance));
+                ANGULAR_TOLERANCE));
   }
 }

@@ -142,9 +142,9 @@ class Mechanism {
  */
 enum Direction {
   /// Forward.
-  kForward,
+  FORWARD,
   /// Reverse.
-  kReverse
+  REVERSE
 };
 
 /**
