@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
+  private static final String DEFAULT_AUTO = "Default";
+  private static final String CUSTOM_AUTO = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
@@ -26,8 +26,8 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   public Robot() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
+    m_chooser.setDefaultOption("Default Auto", DEFAULT_AUTO);
+    m_chooser.addOption("My Auto", CUSTOM_AUTO);
     SmartDashboard.putData("Auto choices", m_chooser);
   }
 
@@ -54,7 +54,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+    // m_autoSelected = SmartDashboard.getString("Auto Selector", DEFAULT_AUTO);
     System.out.println("Auto selected: " + m_autoSelected);
 
     m_drivetrain.resetEncoders();
@@ -64,10 +64,10 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     switch (m_autoSelected) {
-      case kCustomAuto:
+      case CUSTOM_AUTO:
         // Put custom auto code here
         break;
-      case kDefaultAuto:
+      case DEFAULT_AUTO:
       default:
         // Put default auto code here
         break;

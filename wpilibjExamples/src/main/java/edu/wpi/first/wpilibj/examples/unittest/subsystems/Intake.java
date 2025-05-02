@@ -14,21 +14,21 @@ public class Intake implements AutoCloseable {
   private final DoubleSolenoid m_piston;
 
   public Intake() {
-    m_motor = new PWMSparkMax(IntakeConstants.kMotorPort);
+    m_motor = new PWMSparkMax(IntakeConstants.MOTOR_PORT);
     m_piston =
         new DoubleSolenoid(
             0,
             PneumaticsModuleType.CTREPCM,
-            IntakeConstants.kPistonFwdChannel,
-            IntakeConstants.kPistonRevChannel);
+            IntakeConstants.PISTON_FWD_CHANNEL,
+            IntakeConstants.PISTON_REV_CHANNEL);
   }
 
   public void deploy() {
-    m_piston.set(DoubleSolenoid.Value.kForward);
+    m_piston.set(DoubleSolenoid.Value.FORWARD);
   }
 
   public void retract() {
-    m_piston.set(DoubleSolenoid.Value.kReverse);
+    m_piston.set(DoubleSolenoid.Value.REVERSE);
     m_motor.set(0); // turn off the motor
   }
 
@@ -41,7 +41,7 @@ public class Intake implements AutoCloseable {
   }
 
   public boolean isDeployed() {
-    return m_piston.get() == DoubleSolenoid.Value.kForward;
+    return m_piston.get() == DoubleSolenoid.Value.FORWARD;
   }
 
   @Override

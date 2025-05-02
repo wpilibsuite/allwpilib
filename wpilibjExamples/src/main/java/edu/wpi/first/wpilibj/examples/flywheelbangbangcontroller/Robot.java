@@ -25,42 +25,42 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * control RPM.
  */
 public class Robot extends TimedRobot {
-  private static final int kMotorPort = 0;
-  private static final int kEncoderAChannel = 0;
-  private static final int kEncoderBChannel = 1;
+  private static final int MOTOR_PORT = 0;
+  private static final int ENCODER_A_CHANNEL = 0;
+  private static final int ENCODER_B_CHANNEL = 1;
 
   // Max setpoint for joystick control in RPM
-  private static final double kMaxSetpointValue = 6000.0;
+  private static final double MAX_SETPOINT_VALUE = 6000.0;
 
   // Joystick to control setpoint
   private final Joystick m_joystick = new Joystick(0);
 
-  private final PWMSparkMax m_flywheelMotor = new PWMSparkMax(kMotorPort);
-  private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
+  private final PWMSparkMax m_flywheelMotor = new PWMSparkMax(MOTOR_PORT);
+  private final Encoder m_encoder = new Encoder(ENCODER_A_CHANNEL, ENCODER_B_CHANNEL);
 
   private final BangBangController m_bangBangController = new BangBangController();
 
   // Gains are for example purposes only - must be determined for your own robot!
-  public static final double kFlywheelKs = 0.0001; // V
-  public static final double kFlywheelKv = 0.000195; // V/RPM
-  public static final double kFlywheelKa = 0.0003; // V/(RPM/s)
+  public static final double FLYWHEEL_S = 0.0001; // V
+  public static final double FLYWHEEL_V = 0.000195; // V/RPM
+  public static final double FLYWHEEL_A = 0.0003; // V/(RPM/s)
   private final SimpleMotorFeedforward m_feedforward =
-      new SimpleMotorFeedforward(kFlywheelKs, kFlywheelKv, kFlywheelKa);
+      new SimpleMotorFeedforward(FLYWHEEL_S, FLYWHEEL_V, FLYWHEEL_A);
 
   // Simulation classes help us simulate our robot
 
   // Reduction between motors and encoder, as output over input. If the flywheel
   // spins slower than the motors, this number should be greater than one.
-  private static final double kFlywheelGearing = 1.0;
+  private static final double FLYWHEEL_GEARING = 1.0;
 
   // 1/2 MR²
-  private static final double kFlywheelMomentOfInertia =
+  private static final double FLYWHEEL_MOMENT_OF_INERTIA =
       0.5 * Units.lbsToKilograms(1.5) * Math.pow(Units.inchesToMeters(4), 2);
 
   private final DCMotor m_gearbox = DCMotor.getNEO(1);
 
   private final LinearSystem<N1, N1, N1> m_plant =
-      LinearSystemId.createFlywheelSystem(m_gearbox, kFlywheelGearing, kFlywheelMomentOfInertia);
+      LinearSystemId.createFlywheelSystem(m_gearbox, FLYWHEEL_GEARING, FLYWHEEL_MOMENT_OF_INERTIA);
 
   private final FlywheelSim m_flywheelSim = new FlywheelSim(m_plant, m_gearbox);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
@@ -78,7 +78,7 @@ public class Robot extends TimedRobot {
         Math.max(
             0.0,
             m_joystick.getRawAxis(0)
-                * Units.rotationsPerMinuteToRadiansPerSecond(kMaxSetpointValue));
+                * Units.rotationsPerMinuteToRadiansPerSecond(MAX_SETPOINT_VALUE));
 
     // Set setpoint and measurement of the bang-bang controller
     double bangOutput = m_bangBangController.calculate(m_encoder.getRate(), setpoint) * 12.0;

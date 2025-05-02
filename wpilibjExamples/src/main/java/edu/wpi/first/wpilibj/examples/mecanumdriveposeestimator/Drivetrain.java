@@ -22,8 +22,8 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 /** Represents a mecanum drive style drivetrain. */
 public class Drivetrain {
-  public static final double kMaxSpeed = 3.0; // 3 meters per second
-  public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
+  public static final double MAX_SPEED = 3.0; // 3 meters per second
+  public static final double MAX_ANGULAR_SPEED = Math.PI; // 1/2 rotation per second
 
   private final PWMSparkMax m_frontLeftMotor = new PWMSparkMax(1);
   private final PWMSparkMax m_frontRightMotor = new PWMSparkMax(2);
@@ -58,7 +58,7 @@ public class Drivetrain {
           m_kinematics,
           m_gyro.getRotation2d(),
           getCurrentDistances(),
-          Pose2d.kZero,
+          Pose2d.ZERO,
           VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
           VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
@@ -142,7 +142,7 @@ public class Drivetrain {
       chassisSpeeds =
           chassisSpeeds.toRobotRelative(m_poseEstimator.getEstimatedPosition().getRotation());
     }
-    setSpeeds(m_kinematics.toWheelSpeeds(chassisSpeeds.discretize(period)).desaturate(kMaxSpeed));
+    setSpeeds(m_kinematics.toWheelSpeeds(chassisSpeeds.discretize(period)).desaturate(MAX_SPEED));
   }
 
   /** Updates the field relative position of the robot. */

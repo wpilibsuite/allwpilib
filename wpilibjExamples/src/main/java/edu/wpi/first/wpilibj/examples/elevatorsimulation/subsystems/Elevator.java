@@ -29,29 +29,26 @@ public class Elevator implements AutoCloseable {
   // Standard classes for controlling our elevator
   private final ProfiledPIDController m_controller =
       new ProfiledPIDController(
-          Constants.kElevatorKp,
-          Constants.kElevatorKi,
-          Constants.kElevatorKd,
+          Constants.ELEVATOR_P,
+          Constants.ELEVATOR_I,
+          Constants.ELEVATOR_D,
           new TrapezoidProfile.Constraints(2.45, 2.45));
   ElevatorFeedforward m_feedforward =
       new ElevatorFeedforward(
-          Constants.kElevatorkS,
-          Constants.kElevatorkG,
-          Constants.kElevatorkV,
-          Constants.kElevatorkA);
+          Constants.ELEVATOR_S, Constants.ELEVATOR_G, Constants.ELEVATOR_V, Constants.ELEVATOR_A);
   private final Encoder m_encoder =
-      new Encoder(Constants.kEncoderAChannel, Constants.kEncoderBChannel);
-  private final PWMSparkMax m_motor = new PWMSparkMax(Constants.kMotorPort);
+      new Encoder(Constants.ENCODER_A_CHANNEL, Constants.ENCODER_B_CHANNEL);
+  private final PWMSparkMax m_motor = new PWMSparkMax(Constants.MOTOR_PORT);
 
   // Simulation classes help us simulate what's going on, including gravity.
   private final ElevatorSim m_elevatorSim =
       new ElevatorSim(
           m_elevatorGearbox,
-          Constants.kElevatorGearing,
-          Constants.kCarriageMass,
-          Constants.kElevatorDrumRadius,
-          Constants.kMinElevatorHeight,
-          Constants.kMaxElevatorHeight,
+          Constants.ELEVATOR_GEARING,
+          Constants.CARRIAGE_MASS,
+          Constants.ELEVATOR_DRUM_RADIUS,
+          Constants.MIN_ELEVATOR_HEIGHT,
+          Constants.MAX_ELEVATOR_HEIGHT,
           true,
           0,
           0.01,
@@ -67,7 +64,7 @@ public class Elevator implements AutoCloseable {
 
   /** Subsystem constructor. */
   public Elevator() {
-    m_encoder.setDistancePerPulse(Constants.kElevatorEncoderDistPerPulse);
+    m_encoder.setDistancePerPulse(Constants.ELEVATOR_ENCODER_DIST_PER_PULSE);
 
     // Publish Mechanism2d to SmartDashboard
     // To view the Elevator visualization, select Network Tables -> SmartDashboard -> Elevator Sim

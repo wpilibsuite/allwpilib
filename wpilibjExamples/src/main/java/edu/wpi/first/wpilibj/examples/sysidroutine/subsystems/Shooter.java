@@ -26,17 +26,17 @@ import java.util.function.DoubleSupplier;
 
 public class Shooter extends SubsystemBase {
   // The motor on the shooter wheel .
-  private final PWMSparkMax m_shooterMotor = new PWMSparkMax(ShooterConstants.kShooterMotorPort);
+  private final PWMSparkMax m_shooterMotor = new PWMSparkMax(ShooterConstants.SHOOTER_MOTOR_PORT);
 
   // The motor on the feeder wheels.
-  private final PWMSparkMax m_feederMotor = new PWMSparkMax(ShooterConstants.kFeederMotorPort);
+  private final PWMSparkMax m_feederMotor = new PWMSparkMax(ShooterConstants.FEEDER_MOTOR_PORT);
 
   // The shooter wheel encoder
   private final Encoder m_shooterEncoder =
       new Encoder(
-          ShooterConstants.kEncoderPorts[0],
-          ShooterConstants.kEncoderPorts[1],
-          ShooterConstants.kEncoderReversed);
+          ShooterConstants.ENCODER_PORTS[0],
+          ShooterConstants.ENCODER_PORTS[1],
+          ShooterConstants.ENCODER_REVERSED);
 
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutVoltage m_appliedVoltage = Volts.mutable(0);
@@ -70,16 +70,16 @@ public class Shooter extends SubsystemBase {
               this));
   // PID controller to run the shooter wheel in closed-loop, set the constants equal to those
   // calculated by SysId
-  private final PIDController m_shooterFeedback = new PIDController(ShooterConstants.kP, 0, 0);
+  private final PIDController m_shooterFeedback = new PIDController(ShooterConstants.P, 0, 0);
   // Feedforward controller to run the shooter wheel in closed-loop, set the constants equal to
   // those calculated by SysId
   private final SimpleMotorFeedforward m_shooterFeedforward =
-      new SimpleMotorFeedforward(ShooterConstants.kS, ShooterConstants.kV, ShooterConstants.kA);
+      new SimpleMotorFeedforward(ShooterConstants.S, ShooterConstants.V, ShooterConstants.A);
 
   /** Creates a new Shooter subsystem. */
   public Shooter() {
     // Sets the distance per pulse for the encoders
-    m_shooterEncoder.setDistancePerPulse(ShooterConstants.kEncoderDistancePerPulse);
+    m_shooterEncoder.setDistancePerPulse(ShooterConstants.ENCODER_DISTANCE_PER_PULSE);
   }
 
   /**
@@ -93,7 +93,7 @@ public class Shooter extends SubsystemBase {
           m_shooterMotor.setVoltage(
               m_shooterFeedback.calculate(m_shooterEncoder.getRate(), shooterSpeed.getAsDouble())
                   + m_shooterFeedforward.calculate(shooterSpeed.getAsDouble()));
-          m_feederMotor.set(ShooterConstants.kFeederSpeed);
+          m_feederMotor.set(ShooterConstants.FEEDER_SPEED);
         })
         .finallyDo(
             () -> {

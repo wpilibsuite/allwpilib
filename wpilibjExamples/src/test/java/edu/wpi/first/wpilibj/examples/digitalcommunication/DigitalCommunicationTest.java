@@ -24,10 +24,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 class DigitalCommunicationTest {
   private Robot m_robot;
   private Thread m_thread;
-  private final DIOSim m_allianceOutput = new DIOSim(Robot.kAlliancePort);
-  private final DIOSim m_enabledOutput = new DIOSim(Robot.kEnabledPort);
-  private final DIOSim m_autonomousOutput = new DIOSim(Robot.kAutonomousPort);
-  private final DIOSim m_alertOutput = new DIOSim(Robot.kAlertPort);
+  private final DIOSim m_allianceOutput = new DIOSim(Robot.ALLIANCE_PORT);
+  private final DIOSim m_enabledOutput = new DIOSim(Robot.ENABLED_PORT);
+  private final DIOSim m_autonomousOutput = new DIOSim(Robot.AUTONOMOUS_PORT);
+  private final DIOSim m_alertOutput = new DIOSim(Robot.ALERT_PORT);
 
   @BeforeEach
   void startThread() {

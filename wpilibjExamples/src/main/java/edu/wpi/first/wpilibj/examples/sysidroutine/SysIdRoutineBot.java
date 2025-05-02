@@ -25,7 +25,7 @@ public class SysIdRoutineBot {
 
   // The driver's controller
   CommandXboxController m_driverController =
-      new CommandXboxController(OIConstants.kDriverControllerPort);
+      new CommandXboxController(OIConstants.DRIVER_CONTROLLER_PORT);
 
   /**
    * Use this method to define bindings between conditions and commands. These are useful for
@@ -48,19 +48,19 @@ public class SysIdRoutineBot {
     m_driverController
         .a()
         .and(m_driverController.rightBumper())
-        .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.FORWARD));
     m_driverController
         .b()
         .and(m_driverController.rightBumper())
-        .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        .whileTrue(m_drive.sysIdQuasistatic(SysIdRoutine.Direction.REVERSE));
     m_driverController
         .x()
         .and(m_driverController.rightBumper())
-        .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.FORWARD));
     m_driverController
         .y()
         .and(m_driverController.rightBumper())
-        .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        .whileTrue(m_drive.sysIdDynamic(SysIdRoutine.Direction.REVERSE));
 
     // Control the shooter wheel with the left trigger
     m_shooter.setDefaultCommand(m_shooter.runShooter(m_driverController::getLeftTriggerAxis));
@@ -68,19 +68,19 @@ public class SysIdRoutineBot {
     m_driverController
         .a()
         .and(m_driverController.leftBumper())
-        .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.FORWARD));
     m_driverController
         .b()
         .and(m_driverController.leftBumper())
-        .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        .whileTrue(m_shooter.sysIdQuasistatic(SysIdRoutine.Direction.REVERSE));
     m_driverController
         .x()
         .and(m_driverController.leftBumper())
-        .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.FORWARD));
     m_driverController
         .y()
         .and(m_driverController.leftBumper())
-        .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        .whileTrue(m_shooter.sysIdDynamic(SysIdRoutine.Direction.REVERSE));
   }
 
   /**

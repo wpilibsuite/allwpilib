@@ -15,14 +15,14 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // Turn on rumble at the start of auto
-    m_hid.setRumble(RumbleType.kLeftRumble, 1.0);
-    m_hid.setRumble(RumbleType.kRightRumble, 1.0);
+    m_hid.setRumble(RumbleType.LEFT_RUMBLE, 1.0);
+    m_hid.setRumble(RumbleType.RIGHT_RUMBLE, 1.0);
   }
 
   @Override
   public void disabledInit() {
     // Stop the rumble when entering disabled
-    m_hid.setRumble(RumbleType.kLeftRumble, 0.0);
-    m_hid.setRumble(RumbleType.kRightRumble, 0.0);
+    m_hid.setRumble(RumbleType.LEFT_RUMBLE, 0.0);
+    m_hid.setRumble(RumbleType.RIGHT_RUMBLE, 0.0);
   }
 }

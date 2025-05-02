@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 public class Robot extends TimedRobot {
-  private static double kDt = 0.02;
+  private static double DT = 0.02;
 
   private final Joystick m_joystick = new Joystick(1);
   private final ExampleSmartMotorController m_motor = new ExampleSmartMotorController(1);
@@ -39,11 +39,11 @@ public class Robot extends TimedRobot {
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    ExponentialProfile.State next = m_profile.calculate(kDt, m_setpoint, m_goal);
+    ExponentialProfile.State next = m_profile.calculate(DT, m_setpoint, m_goal);
 
     // Send setpoint to offboard controller PID
     m_motor.setSetpoint(
-        ExampleSmartMotorController.PIDMode.kPosition,
+        ExampleSmartMotorController.PIDMode.POSITION,
         m_setpoint.position,
         m_feedforward.calculate(next.velocity) / 12.0);
 

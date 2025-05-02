@@ -26,9 +26,9 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 @ResourceLock("timing")
 class PotentiometerPIDTest {
   private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
-  private static final double kElevatorGearing = 10.0;
-  private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
-  private static final double kCarriageMassKg = 4.0; // kg
+  private static final double ELEVATOR_GEARING = 10.0;
+  private static final double ELEVATOR_DRUM_RADIUS = Units.inchesToMeters(2.0);
+  private static final double CARRIAGE_MASS_KG = 4.0; // kg
 
   private Robot m_robot;
   private Thread m_thread;
@@ -49,16 +49,16 @@ class PotentiometerPIDTest {
     m_elevatorSim =
         new ElevatorSim(
             m_elevatorGearbox,
-            kElevatorGearing,
-            kCarriageMassKg,
-            kElevatorDrumRadius,
+            ELEVATOR_GEARING,
+            CARRIAGE_MASS_KG,
+            ELEVATOR_DRUM_RADIUS,
             0.0,
-            Robot.kFullHeight,
+            Robot.FULL_HEIGHT,
             true,
             0);
-    m_analogSim = new AnalogInputSim(Robot.kPotChannel);
-    m_motorSim = new PWMMotorControllerSim(Robot.kMotorChannel);
-    m_joystickSim = new JoystickSim(Robot.kJoystickChannel);
+    m_analogSim = new AnalogInputSim(Robot.POT_CHANNEL);
+    m_motorSim = new PWMMotorControllerSim(Robot.MOTOR_CHANNEL);
+    m_joystickSim = new JoystickSim(Robot.JOYSTICK_CHANNEL);
 
     m_callback =
         HAL.registerSimPeriodicBeforeCallback(
@@ -74,7 +74,7 @@ class PotentiometerPIDTest {
                */
               m_analogSim.setVoltage(
                   RobotController.getVoltage3V3()
-                      * (m_elevatorSim.getPosition() / Robot.kFullHeight));
+                      * (m_elevatorSim.getPosition() / Robot.FULL_HEIGHT));
             });
 
     m_thread.start();
@@ -111,7 +111,7 @@ class PotentiometerPIDTest {
       // advance 50 timesteps
       SimHooks.stepTiming(1);
 
-      assertEquals(Robot.kSetpoints[0], m_elevatorSim.getPosition(), 0.1);
+      assertEquals(Robot.SETPOINTS[0], m_elevatorSim.getPosition(), 0.1);
     }
 
     // second setpoint
@@ -123,7 +123,7 @@ class PotentiometerPIDTest {
       // advance 50 timesteps
       SimHooks.stepTiming(1);
 
-      assertEquals(Robot.kSetpoints[1], m_elevatorSim.getPosition(), 0.1);
+      assertEquals(Robot.SETPOINTS[1], m_elevatorSim.getPosition(), 0.1);
     }
 
     // we need to unpress the button
@@ -144,7 +144,7 @@ class PotentiometerPIDTest {
       // advance 50 timesteps
       SimHooks.stepTiming(1);
 
-      assertEquals(Robot.kSetpoints[2], m_elevatorSim.getPosition(), 0.1);
+      assertEquals(Robot.SETPOINTS[2], m_elevatorSim.getPosition(), 0.1);
     }
 
     // we need to unpress the button
@@ -165,7 +165,7 @@ class PotentiometerPIDTest {
       // advance 60 timesteps
       SimHooks.stepTiming(1.2);
 
-      assertEquals(Robot.kSetpoints[0], m_elevatorSim.getPosition(), 0.1);
+      assertEquals(Robot.SETPOINTS[0], m_elevatorSim.getPosition(), 0.1);
     }
   }
 }

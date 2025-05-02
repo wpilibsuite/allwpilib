@@ -16,14 +16,14 @@ import edu.wpi.first.wpilibj.examples.unittest.subsystems.Intake;
  */
 public class Robot extends TimedRobot {
   private final Intake m_intake = new Intake();
-  private final Joystick m_joystick = new Joystick(Constants.kJoystickIndex);
+  private final Joystick m_joystick = new Joystick(Constants.JOYSTICK_INDEX);
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
     // Activate the intake while the trigger is held
     if (m_joystick.getTrigger()) {
-      m_intake.activate(IntakeConstants.kIntakeSpeed);
+      m_intake.activate(IntakeConstants.INTAKE_SPEED);
     } else {
       m_intake.activate(0);
     }

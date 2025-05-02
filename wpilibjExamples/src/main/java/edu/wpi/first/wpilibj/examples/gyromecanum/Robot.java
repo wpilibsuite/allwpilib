@@ -18,25 +18,25 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 public class Robot extends TimedRobot {
   // gyro calibration constant, may need to be adjusted;
   // gyro value of 360 is set to correspond to one full revolution
-  private static final double kVoltsPerDegreePerSecond = 0.0128;
+  private static final double VOLTS_PER_DEGREE_PER_SECOND = 0.0128;
 
-  private static final int kFrontLeftChannel = 0;
-  private static final int kRearLeftChannel = 1;
-  private static final int kFrontRightChannel = 2;
-  private static final int kRearRightChannel = 3;
-  private static final int kGyroPort = 0;
-  private static final int kJoystickPort = 0;
+  private static final int FRONT_LEFT_CHANNEL = 0;
+  private static final int REAR_LEFT_CHANNEL = 1;
+  private static final int FRONT_RIGHT_CHANNEL = 2;
+  private static final int REAR_RIGHT_CHANNEL = 3;
+  private static final int GYRO_PORT = 0;
+  private static final int JOYSTICK_PORT = 0;
 
   private final MecanumDrive m_robotDrive;
-  private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
-  private final Joystick m_joystick = new Joystick(kJoystickPort);
+  private final AnalogGyro m_gyro = new AnalogGyro(GYRO_PORT);
+  private final Joystick m_joystick = new Joystick(JOYSTICK_PORT);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    PWMSparkMax frontLeft = new PWMSparkMax(kFrontLeftChannel);
-    PWMSparkMax rearLeft = new PWMSparkMax(kRearLeftChannel);
-    PWMSparkMax frontRight = new PWMSparkMax(kFrontRightChannel);
-    PWMSparkMax rearRight = new PWMSparkMax(kRearRightChannel);
+    PWMSparkMax frontLeft = new PWMSparkMax(FRONT_LEFT_CHANNEL);
+    PWMSparkMax rearLeft = new PWMSparkMax(REAR_LEFT_CHANNEL);
+    PWMSparkMax frontRight = new PWMSparkMax(FRONT_RIGHT_CHANNEL);
+    PWMSparkMax rearRight = new PWMSparkMax(REAR_RIGHT_CHANNEL);
 
     // Invert the right side motors.
     // You may need to change or remove this to match your robot.
@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
 
     m_robotDrive = new MecanumDrive(frontLeft::set, rearLeft::set, frontRight::set, rearRight::set);
 
-    m_gyro.setSensitivity(kVoltsPerDegreePerSecond);
+    m_gyro.setSensitivity(VOLTS_PER_DEGREE_PER_SECOND);
 
     SendableRegistry.addChild(m_robotDrive, frontLeft);
     SendableRegistry.addChild(m_robotDrive, rearLeft);
