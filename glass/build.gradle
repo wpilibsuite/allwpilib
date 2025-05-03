@@ -101,6 +101,38 @@ model {
             }
             appendDebugPathToBinaries(binaries)
         }
+        "${nativeName}cs"(NativeLibrarySpec) {
+            sources.cpp {
+                source {
+                    srcDirs = ['src/libcs/native/cpp']
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/libcs/native/include'
+                }
+            }
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    it.buildable = false
+                    return
+                }
+                if (it instanceof SharedLibraryBinarySpec) {
+                    it.buildable = false
+                    return
+                }
+                lib library: nativeName, linkage: 'static'
+                project(':ntcore').addNtcoreDependency(it, 'shared')
+                lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                nativeUtils.useRequiredLibrary(it, 'opencv_shared')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                lib project: ':fieldImages', library: 'fieldImages', linkage: 'shared'
+                nativeUtils.useRequiredLibrary(it, 'imgui')
+            }
+            appendDebugPathToBinaries(binaries)
+        }
         "${nativeName}nt"(NativeLibrarySpec) {
             sources.cpp {
                 source {
@@ -157,9 +189,10 @@ model {
                     it.buildable = false
                     return
                 }
-                lib project: ':cscore', library: 'cscore', linkage: 'static'
+                lib library: 'glasscs', linkage: 'static'
                 lib library: 'glassnt', linkage: 'static'
                 lib library: nativeName, linkage: 'static'
+                lib project: ':cscore', library: 'cscore', linkage: 'static'
                 project(':ntcore').addNtcoreDependency(it, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
