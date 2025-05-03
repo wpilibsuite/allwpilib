@@ -83,5 +83,15 @@
     ],
     "foldername": "AnalogTrigger",
     "gradlebase": "cpp"
+  },
+  {
+    "name": "AnalogInput",
+    "description": "Snippets of Analog Input for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Analog"
+    ],
+    "foldername": "AnalogInput",
+    "gradlebase": "cpp"
   }
 ]
