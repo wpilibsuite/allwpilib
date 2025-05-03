@@ -1667,38 +1667,78 @@ static void EmitValueName(DataSource* source, const char* name,
 
 static void EmitValueTree(
     const std::vector<NetworkTablesModel::EntryValueTreeNode>& children,
-    NetworkTablesFlags flags) {
-  for (auto&& child : children) {
-    ImGui::TableNextRow();
-    ImGui::TableNextColumn();
-    EmitValueName(child.source.get(), child.name.c_str(), child.path.c_str());
+    NetworkTablesFlags flags);
 
-    ImGui::TableNextColumn();
-    if (!child.valueChildren.empty()) {
-      auto pos = ImGui::GetCursorPos();
-      char label[128];
-      std::string_view ts = child.typeStr;
-      bool havePopup = GetHeadingTypeString(&ts);
-      wpi::format_to_n_c_str(label, sizeof(label), "{}##v_{}", ts.data(),
-                             child.name.c_str());
-      bool valueChildrenOpen =
-          TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth);
-      if (havePopup) {
-        if (ImGui::IsItemHovered()) {
-          ImGui::BeginTooltip();
-          ImGui::TextUnformatted(child.typeStr.c_str());
-          ImGui::EndTooltip();
-        }
+static void EmitValueTreeChild(
+    const NetworkTablesModel::EntryValueTreeNode& child,
+    NetworkTablesFlags flags) {
+  ImGui::TableNextRow();
+  ImGui::TableNextColumn();
+  EmitValueName(child.source.get(), child.name.c_str(), child.path.c_str());
+
+  ImGui::TableNextColumn();
+  if (!child.valueChildren.empty()) {
+    auto pos = ImGui::GetCursorPos();
+    char label[128];
+    std::string_view ts = child.typeStr;
+    bool havePopup = GetHeadingTypeString(&ts);
+    wpi::format_to_n_c_str(label, sizeof(label), "{}##v_{}", ts.data(),
+                           child.name.c_str());
+    bool valueChildrenOpen =
+        TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth);
+    if (havePopup) {
+      if (ImGui::IsItemHovered()) {
+        ImGui::BeginTooltip();
+        ImGui::TextUnformatted(child.typeStr.c_str());
+        ImGui::EndTooltip();
       }
-      // make it look like a normal label w/type
-      ImGui::SetCursorPos(pos);
-      ImGui::LabelText(child.valueChildrenMap ? "{...}" : "[...]", "%s", "");
-      if (valueChildrenOpen) {
-        EmitValueTree(child.valueChildren, flags);
-        TreePop();
+    }
+    // make it look like a normal label w/type
+    ImGui::SetCursorPos(pos);
+    ImGui::LabelText(child.valueChildrenMap ? "{...}" : "[...]", "%s", "");
+    if (valueChildrenOpen) {
+      EmitValueTree(child.valueChildren, flags);
+      TreePop();
+    }
+  } else {
+    EmitEntryValueReadonly(child, nullptr, flags);
+  }
+}
+
+static void EmitValueTree(
+    const std::vector<NetworkTablesModel::EntryValueTreeNode>& children,
+    NetworkTablesFlags flags) {
+  NetworkTablesOrdering order = (flags & NetworkTablesFlags_Ordering) >>
+                                kNetworkTablesFlags_OrderingBitShift;
+
+  if (order == NetworkTablesOrdering_Combined) {
+    // All in order
+    for (auto&& child : children) {
+      EmitValueTreeChild(child, flags);
+    }
+  } else if (order == NetworkTablesOrdering_EntriesFirst) {
+    // All entries, then all subtables
+    for (auto&& child : children) {
+      if (child.valueChildren.empty()) {
+        EmitValueTreeChild(child, flags);
       }
-    } else {
-      EmitEntryValueReadonly(child, nullptr, flags);
+    }
+    for (auto&& child : children) {
+      if (!child.valueChildren.empty()) {
+        EmitValueTreeChild(child, flags);
+      }
+    }
+  } else if (order == NetworkTablesOrdering_SubtablesFirst) {
+    // All subtables, then all entries
+    for (auto&& child : children) {
+      if (!child.valueChildren.empty()) {
+        EmitValueTreeChild(child, flags);
+      }
+    }
+    for (auto&& child : children) {
+      if (child.valueChildren.empty()) {
+        EmitValueTreeChild(child, flags);
+      }
     }
   }
 }
@@ -1832,25 +1872,66 @@ static void EmitEntry(NetworkTablesModel* model,
 static void EmitTree(NetworkTablesModel* model,
                      const std::vector<NetworkTablesModel::TreeNode>& tree,
                      NetworkTablesFlags flags, ShowCategory category,
-                     bool root) {
-  for (auto&& node : tree) {
-    if (root && (flags & NetworkTablesFlags_ShowSpecial) == 0 &&
-        wpi::starts_with(node.name, '$')) {
-      continue;
-    }
-    if (node.entry) {
-      EmitEntry(model, *node.entry, node.name.c_str(), flags, category);
-    }
+                     bool root);
 
-    if (!node.children.empty()) {
-      ImGui::TableNextRow();
-      ImGui::TableNextColumn();
-      bool open =
-          TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
-      EmitParentContextMenu(model, node.path, flags);
-      if (open) {
-        EmitTree(model, node.children, flags, category, false);
-        TreePop();
+static void EmitTreeNode(NetworkTablesModel* model,
+                         const NetworkTablesModel::TreeNode& node,
+                         NetworkTablesFlags flags, ShowCategory category,
+                         bool root) {
+  if (root && (flags & NetworkTablesFlags_ShowSpecial) == 0 &&
+      wpi::starts_with(node.name, '$')) {
+    return;
+  }
+  if (node.entry) {
+    EmitEntry(model, *node.entry, node.name.c_str(), flags, category);
+  }
+
+  if (!node.children.empty()) {
+    ImGui::TableNextRow();
+    ImGui::TableNextColumn();
+    bool open = TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
+    EmitParentContextMenu(model, node.path, flags);
+    if (open) {
+      EmitTree(model, node.children, flags, category, false);
+      TreePop();
+    }
+  }
+}
+
+static void EmitTree(NetworkTablesModel* model,
+                     const std::vector<NetworkTablesModel::TreeNode>& tree,
+                     NetworkTablesFlags flags, ShowCategory category,
+                     bool root) {
+  NetworkTablesOrdering order = (flags & NetworkTablesFlags_Ordering) >>
+                                kNetworkTablesFlags_OrderingBitShift;
+
+  if (order == NetworkTablesOrdering_Combined) {
+    // All in order
+    for (auto&& node : tree) {
+      EmitTreeNode(model, node, flags, category, root);
+    }
+  } else if (order == NetworkTablesOrdering_EntriesFirst) {
+    // All entries, then all subtables
+    for (auto&& node : tree) {
+      if (node.entry) {
+        EmitTreeNode(model, node, flags, category, root);
+      }
+    }
+    for (auto&& node : tree) {
+      if (!node.entry) {
+        EmitTreeNode(model, node, flags, category, root);
+      }
+    }
+  } else if (order == NetworkTablesOrdering_SubtablesFirst) {
+    // All subtables, then all entries
+    for (auto&& node : tree) {
+      if (!node.entry) {
+        EmitTreeNode(model, node, flags, category, root);
+      }
+    }
+    for (auto&& node : tree) {
+      if (node.entry) {
+        EmitTreeNode(model, node, flags, category, root);
       }
     }
   }
@@ -2073,17 +2154,24 @@ void NetworkTablesFlagsSettings::Update() {
     m_pCreateNoncanonicalKeys = &storage.GetBool(
         "createNonCanonical",
         m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
+    m_pOrdering = std::make_unique<EnumSetting>(
+        storage.GetString("ordering"),
+        (m_defaultFlags & NetworkTablesFlags_Ordering) >>
+            kNetworkTablesFlags_OrderingBitShift,
+        std::initializer_list<const char*>(
+            {"Combined", "Entries First", "Subtables First"}));
     m_pPrecision = &storage.GetInt(
         "precision", (m_defaultFlags & NetworkTablesFlags_Precision) >>
                          kNetworkTablesFlags_PrecisionBitShift);
   }
 
-  m_flags &= ~(
-      NetworkTablesFlags_TreeView | NetworkTablesFlags_CombinedView |
-      NetworkTablesFlags_ShowSpecial | NetworkTablesFlags_ShowProperties |
-      NetworkTablesFlags_ShowTimestamp |
-      NetworkTablesFlags_ShowServerTimestamp |
-      NetworkTablesFlags_CreateNoncanonicalKeys | NetworkTablesFlags_Precision);
+  m_flags &=
+      ~(NetworkTablesFlags_TreeView | NetworkTablesFlags_CombinedView |
+        NetworkTablesFlags_ShowSpecial | NetworkTablesFlags_ShowProperties |
+        NetworkTablesFlags_ShowTimestamp |
+        NetworkTablesFlags_ShowServerTimestamp |
+        NetworkTablesFlags_CreateNoncanonicalKeys |
+        NetworkTablesFlags_Ordering | NetworkTablesFlags_Precision);
   m_flags |=
       (*m_pTreeView ? NetworkTablesFlags_TreeView : 0) |
       (*m_pCombinedView ? NetworkTablesFlags_CombinedView : 0) |
@@ -2093,6 +2181,7 @@ void NetworkTablesFlagsSettings::Update() {
       (*m_pShowServerTimestamp ? NetworkTablesFlags_ShowServerTimestamp : 0) |
       (*m_pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
                                   : 0) |
+      (m_pOrdering->GetValue() << kNetworkTablesFlags_OrderingBitShift) |
       (*m_pPrecision << kNetworkTablesFlags_PrecisionBitShift);
 }
 
@@ -2106,6 +2195,7 @@ void NetworkTablesFlagsSettings::DisplayMenu() {
   ImGui::MenuItem("Show Properties", "", m_pShowProperties);
   ImGui::MenuItem("Show Timestamp", "", m_pShowTimestamp);
   ImGui::MenuItem("Show Server Timestamp", "", m_pShowServerTimestamp);
+  m_pOrdering->Menu("Entry Ordering");
   if (ImGui::BeginMenu("Decimal Precision")) {
     static const char* precisionOptions[] = {"1", "2", "3", "4", "5",
                                              "6", "7", "8", "9", "10"};
