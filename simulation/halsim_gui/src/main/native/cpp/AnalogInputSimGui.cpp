@@ -7,7 +7,6 @@
 #include <memory>
 #include <vector>
 
-#include <glass/View.h>
 #include <glass/hardware/AnalogInput.h>
 #include <hal/Ports.h>
 #include <hal/simulation/AnalogGyroData.h>
@@ -15,7 +14,6 @@
 #include <hal/simulation/SimDeviceData.h>
 
 #include "HALDataSource.h"
-#include "HALSimGui.h"
 
 using namespace halsimgui;
 
@@ -61,7 +59,7 @@ class AnalogInputsSimModel : public glass::AnalogInputsModel {
 
   void Update() override;
 
-  bool Exists() override { return true; }
+  bool Exists() override;
 
   void ForEachAnalogInput(
       wpi::function_ref<void(glass::AnalogInputModel& model, int index)> func)
@@ -87,6 +85,15 @@ void AnalogInputsSimModel::Update() {
   }
 }
 
+bool AnalogInputsSimModel::Exists() {
+  for (auto&& model : m_models) {
+    if (model) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void AnalogInputsSimModel::ForEachAnalogInput(
     wpi::function_ref<void(glass::AnalogInputModel& model, int index)> func) {
   for (int32_t i = 0, iend = static_cast<int32_t>(m_models.size()); i < iend;
@@ -97,25 +104,6 @@ void AnalogInputsSimModel::ForEachAnalogInput(
   }
 }
 
-static bool AnalogInputsAnyInitialized() {
-  static const int32_t num = HAL_GetNumAnalogInputs();
-  for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetAnalogInInitialized(i)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-void AnalogInputSimGui::Initialize() {
-  HALSimGui::halProvider->Register(
-      "Analog Inputs", AnalogInputsAnyInitialized,
-      [] { return std::make_unique<AnalogInputsSimModel>(); },
-      [](glass::Window* win, glass::Model* model) {
-        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-        win->SetDefaultPos(640, 20);
-        return glass::MakeFunctionView([=] {
-          glass::DisplayAnalogInputs(static_cast<AnalogInputsSimModel*>(model));
-        });
-      });
+glass::AnalogInputsModel* halsimgui::CreateAnalogInputsModel() {
+  return glass::CreateModel<AnalogInputsSimModel>();
 }

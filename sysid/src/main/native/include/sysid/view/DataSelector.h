@@ -12,7 +12,6 @@
 #include <utility>
 #include <vector>
 
-#include <glass/View.h>
 #include <glass/support/DataLogReaderThread.h>
 #include <wpi/StringMap.h>
 
@@ -31,7 +30,7 @@ namespace sysid {
 /**
  * Helps with loading datalog files.
  */
-class DataSelector : public glass::View {
+class DataSelector {
  public:
   /**
    * Creates a data selector widget
@@ -44,7 +43,7 @@ class DataSelector : public glass::View {
   /**
    * Displays the log loader window.
    */
-  void Display() override;
+  void Display();
 
   /**
    * Resets view. Must be called whenever the DataLogReader goes away, as this
