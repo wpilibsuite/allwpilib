@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GGreenix <76048260+GGreenix@users.noreply.github.com>
+Date: Tue, 7 Jan 2025 16:47:29 +0200
+Subject: [PATCH 14/17] added roi for gradient cluster method
+
+---
+ apriltag_quad_thresh.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/apriltag_quad_thresh.c b/apriltag_quad_thresh.c
+index f282618ab6fe8e5095f5033e62ef1fa64e3874a7..db6ba115e8629766a65ce79abe84aff2fb902543 100644
+--- a/apriltag_quad_thresh.c
++++ b/apriltag_quad_thresh.c
+@@ -1075,13 +1075,13 @@ static void do_quad_task(void *p)
+ 
+         struct quad quad;
+         memset(&quad, 0, sizeof(struct quad));
+-        if(&quad->p[3][0] > td->roiX && &quad->p[3][1] > td->roiY && &quad->p[1][0] < td->roiX + td->roiWidth && &quad->p[1][1] < td->roiY + td->roiHeight){    
++        // if(&quad->p[3][0] > td->roiX && &quad->p[3][1] > td->roiY && &quad->p[1][0] < td->roiX + td->roiWidth && &quad->p[1][1] < td->roiY + td->roiHeight){    
+             if (fit_quad(td, task->im, *cluster, &quad, task->tag_width, task->normal_border, task->reversed_border)) {
+                 pthread_mutex_lock(&td->mutex);
+                 zarray_add(quads, &quad);
+                 pthread_mutex_unlock(&td->mutex);
+             }
+-        }
++        // }
+     }
+ }
+ 
