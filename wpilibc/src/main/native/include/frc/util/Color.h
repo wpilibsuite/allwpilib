@@ -922,17 +922,17 @@ inline constexpr Color Color::DARK_GREEN{0.0f, 0.39215687f, 0.0f};
 inline constexpr Color Color::DARK_KHAKI{0.7411765f, 0.7176471f, 0.41960785f};
 inline constexpr Color Color::DARK_MAGENTA{0.54509807f, 0.0f, 0.54509807f};
 inline constexpr Color Color::DARK_OLIVE_GREEN{0.33333334f, 0.41960785f,
-                                              0.18431373f};
+                                               0.18431373f};
 inline constexpr Color Color::DARK_ORANGE{1.0f, 0.54901963f, 0.0f};
 inline constexpr Color Color::DARK_ORCHID{0.6f, 0.19607843f, 0.8f};
 inline constexpr Color Color::DARK_RED{0.54509807f, 0.0f, 0.0f};
 inline constexpr Color Color::DARK_SALMON{0.9137255f, 0.5882353f, 0.47843137f};
 inline constexpr Color Color::DARK_SEA_GREEN{0.56078434f, 0.7372549f,
-                                            0.56078434f};
+                                             0.56078434f};
 inline constexpr Color Color::DARK_SLATE_BLUE{0.28235295f, 0.23921569f,
-                                             0.54509807f};
+                                              0.54509807f};
 inline constexpr Color Color::DARK_SLATE_GRAY{0.18431373f, 0.30980393f,
-                                             0.30980393f};
+                                              0.30980393f};
 inline constexpr Color Color::DARK_TURQUOISE{0.0f, 0.80784315f, 0.81960785f};
 inline constexpr Color Color::DARK_VIOLET{0.5803922f, 0.0f, 0.827451f};
 inline constexpr Color Color::DEEP_PINK{1.0f, 0.078431375f, 0.5764706f};
@@ -965,18 +965,18 @@ inline constexpr Color Color::LIGHT_BLUE{0.6784314f, 0.84705883f, 0.9019608f};
 inline constexpr Color Color::LIGHT_CORAL{0.9411765f, 0.5019608f, 0.5019608f};
 inline constexpr Color Color::LIGHT_CYAN{0.8784314f, 1.0f, 1.0f};
 inline constexpr Color Color::LIGHT_GOLDENROD_YELLOW{0.98039216f, 0.98039216f,
-                                                    0.8235294f};
+                                                     0.8235294f};
 inline constexpr Color Color::LIGHT_GRAY{0.827451f, 0.827451f, 0.827451f};
 inline constexpr Color Color::LIGHT_GREEN{0.5647059f, 0.93333334f, 0.5647059f};
 inline constexpr Color Color::LIGHT_PINK{1.0f, 0.7137255f, 0.75686276f};
 inline constexpr Color Color::LIGHT_SALMON{1.0f, 0.627451f, 0.47843137f};
 inline constexpr Color Color::LIGHT_SEA_GREEN{0.1254902f, 0.69803923f,
-                                             0.6666667f};
+                                              0.6666667f};
 inline constexpr Color Color::LIGHT_SKY_BLUE{0.5294118f, 0.80784315f,
-                                            0.98039216f};
+                                             0.98039216f};
 inline constexpr Color Color::LIGHT_SLATE_GRAY{0.46666667f, 0.53333336f, 0.6f};
 inline constexpr Color Color::LIGHT_STEEL_BLUE{0.6901961f, 0.76862746f,
-                                              0.87058824f};
+                                               0.87058824f};
 inline constexpr Color Color::LIGHT_YELLOW{1.0f, 1.0f, 0.8784314f};
 inline constexpr Color Color::LIME{0.0f, 1.0f, 0.0f};
 inline constexpr Color Color::LIME_GREEN{0.19607843f, 0.8039216f, 0.19607843f};
@@ -989,13 +989,14 @@ inline constexpr Color Color::MEDIUM_ORCHID{0.7294118f, 0.33333334f, 0.827451f};
 inline constexpr Color Color::MEDIUM_PURPLE{0.5764706f, 0.4392157f,
                                             0.85882354f};
 inline constexpr Color Color::MEDIUM_SEA_GREEN{0.23529412f, 0.7019608f,
-                                              0.44313726f};
+                                               0.44313726f};
 inline constexpr Color Color::MEDIUM_SLATE_BLUE{0.48235294f, 0.40784314f,
-                                               0.93333334f};
-inline constexpr Color Color::MEDIUM_SPRING_GREEN{0.0f, 0.98039216f, 0.6039216f};
+                                                0.93333334f};
+inline constexpr Color Color::MEDIUM_SPRING_GREEN{0.0f, 0.98039216f,
+                                                  0.6039216f};
 inline constexpr Color Color::MEDIUM_TURQUOISE{0.28235295f, 0.81960785f, 0.8f};
 inline constexpr Color Color::MEDIUM_VIOLET_RED{0.78039217f, 0.08235294f,
-                                               0.52156866f};
+                                                0.52156866f};
 inline constexpr Color Color::MIDNIGHT_BLUE{0.09803922f, 0.09803922f,
                                             0.4392157f};
 inline constexpr Color Color::MINTCREAM{0.9607843f, 1.0f, 0.98039216f};
@@ -1015,7 +1016,7 @@ inline constexpr Color Color::PALE_GREEN{0.59607846f, 0.9843137f, 0.59607846f};
 inline constexpr Color Color::PALE_TURQUOISE{0.6862745f, 0.93333334f,
                                              0.93333334f};
 inline constexpr Color Color::PALE_VIOLET_RED{0.85882354f, 0.4392157f,
-                                             0.5764706f};
+                                              0.5764706f};
 inline constexpr Color Color::PAPAYA_WHIP{1.0f, 0.9372549f, 0.8352941f};
 inline constexpr Color Color::PEACH_PUFF{1.0f, 0.85490197f, 0.7254902f};
 inline constexpr Color Color::PERU{0.8039216f, 0.52156866f, 0.24705882f};

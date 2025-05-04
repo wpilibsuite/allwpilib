@@ -210,8 +210,7 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
     if (decl.bitWidth != 0) {
       // only integer or boolean types are allowed
       if (type == StructFieldType::CHAR || type == StructFieldType::FLOAT ||
-          type == StructFieldType::DOUBLE ||
-          type == StructFieldType::STRUCT) {
+          type == StructFieldType::DOUBLE || type == StructFieldType::STRUCT) {
         *err = fmt::format("field {}: type {} cannot be bitfield", decl.name,
                            decl.typeString);
         [[unlikely]] return nullptr;

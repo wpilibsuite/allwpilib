@@ -134,8 +134,8 @@ inline constexpr FeedbackControllerPreset CTRE_V6{1.0, 1.0, 1_ms, true, 1_ms};
  *
  * Total delay = 8-tap moving average delay = (8 - 1) / 2 * 32 ms = 112 ms.
  */
-inline constexpr FeedbackControllerPreset REV_NEO_BUILTIN{1.0 / 12.0, 60.0, 1_ms,
-                                                         false, 112_ms};
+inline constexpr FeedbackControllerPreset REV_NEO_BUILTIN{1.0 / 12.0, 60.0,
+                                                          1_ms, false, 112_ms};
 
 /**
  * https://www.revrobotics.com/content/sw/max/sw-docs/cpp/classrev_1_1_c_a_n_encoder.html#a7e6ce792bc0c0558fb944771df572e6a
@@ -147,7 +147,7 @@ inline constexpr FeedbackControllerPreset REV_NEO_BUILTIN{1.0 / 12.0, 60.0, 1_ms
  * Total delay = 50 ms + 31.5 ms = 81.5 ms.
  */
 inline constexpr FeedbackControllerPreset REV_NON_NEO{1.0 / 12.0, 60.0, 1_ms,
-                                                     false, 81.5_ms};
+                                                      false, 81.5_ms};
 
 /**
  * https://github.com/wpilibsuite/sysid/pull/138#issuecomment-841734229
@@ -155,6 +155,6 @@ inline constexpr FeedbackControllerPreset REV_NON_NEO{1.0 / 12.0, 60.0, 1_ms,
  * Backward finite difference delay = 10 ms / 2 = 5 ms.
  */
 inline constexpr FeedbackControllerPreset VENOM{4096.0 / 12.0, 60.0, 1_ms,
-                                                 false, 5_ms};
+                                                false, 5_ms};
 }  // namespace presets
 }  // namespace sysid

@@ -413,7 +413,8 @@ void NetworkServer::Init() {
   m_idle = uv::Idle::Create(m_loop);
   if (m_idle) {
     m_idle->idle.connect([this] {
-      if (m_serverImpl.ProcessIncomingMessages(CLIENT_PROCESS_MESSAGE_COUNT_MAX)) {
+      if (m_serverImpl.ProcessIncomingMessages(
+              CLIENT_PROCESS_MESSAGE_COUNT_MAX)) {
         DEBUG4("Starting idle processing");
         m_idle->Start();  // more to process
       } else {

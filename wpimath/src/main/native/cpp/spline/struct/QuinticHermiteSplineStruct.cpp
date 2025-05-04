@@ -23,9 +23,9 @@ frc::QuinticHermiteSpline wpi::Struct<frc::QuinticHermiteSpline>::Unpack(
 void wpi::Struct<frc::QuinticHermiteSpline>::Pack(
     std::span<uint8_t> data, const frc::QuinticHermiteSpline& value) {
   wpi::PackStructArray<X_INITIAL_OFF, 3>(data,
-                                        value.GetInitialControlVector().x);
+                                         value.GetInitialControlVector().x);
   wpi::PackStructArray<X_FINAL_OFF, 3>(data, value.GetFinalControlVector().x);
   wpi::PackStructArray<Y_INITIAL_OFF, 3>(data,
-                                        value.GetInitialControlVector().y);
+                                         value.GetInitialControlVector().y);
   wpi::PackStructArray<Y_FINAL_OFF, 3>(data, value.GetFinalControlVector().y);
 }

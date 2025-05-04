@@ -133,8 +133,8 @@ class WebSocket::ClientHandshakeData {
     }
   }
 
-  SmallString<64> key;                       // the key sent to the server
-  SmallVector<std::string, 2> protocols;     // valid protocols
+  SmallString<64> key;                      // the key sent to the server
+  SmallVector<std::string, 2> protocols;    // valid protocols
   HttpParser parser{HttpParser::RESPONSE};  // server response parser
   bool hasUpgrade = false;
   bool hasConnection = false;

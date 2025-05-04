@@ -77,7 +77,8 @@ struct SocketCanState {
                 std::array<std::optional<canfd_frame>, hal::NUM_CAN_BUSES>>
       timedFrames;
   // packet to time
-  wpi::DenseMap<uint32_t, std::array<uint16_t, hal::NUM_CAN_BUSES>> packetToTime;
+  wpi::DenseMap<uint32_t, std::array<uint16_t, hal::NUM_CAN_BUSES>>
+      packetToTime;
 
   wpi::mutex readMutex[hal::NUM_CAN_BUSES];
   // TODO(thadhouse) we need a MUCH better way of doing this masking

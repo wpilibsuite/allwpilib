@@ -110,8 +110,7 @@ class StructFieldDescriptor {
   bool IsInt() const {
     return m_type == StructFieldType::INT8 ||
            m_type == StructFieldType::INT16 ||
-           m_type == StructFieldType::INT32 ||
-           m_type == StructFieldType::INT64;
+           m_type == StructFieldType::INT32 || m_type == StructFieldType::INT64;
   }
 
   /**

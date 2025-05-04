@@ -275,8 +275,7 @@ TEST(FeedforwardAnalysisTest, Simple) {
 
     sysid::SimpleMotorSim model{S, V, A};
 
-    RunTests(model, sysid::analysis::SIMPLE, {{S, V, A}},
-             {{8e-3, 8e-3, 8e-3}});
+    RunTests(model, sysid::analysis::SIMPLE, {{S, V, A}}, {{8e-3, 8e-3, 8e-3}});
   }
 
   {
@@ -286,7 +285,6 @@ TEST(FeedforwardAnalysisTest, Simple) {
 
     sysid::SimpleMotorSim model{S, V, A};
 
-    RunTests(model, sysid::analysis::SIMPLE, {{S, V, A}},
-             {{8e-3, 8e-3, 8e-3}});
+    RunTests(model, sysid::analysis::SIMPLE, {{S, V, A}}, {{8e-3, 8e-3, 8e-3}});
   }
 }

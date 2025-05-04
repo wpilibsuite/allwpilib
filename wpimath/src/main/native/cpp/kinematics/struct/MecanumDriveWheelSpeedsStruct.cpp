@@ -19,7 +19,8 @@ frc::MecanumDriveWheelSpeeds StructType::Unpack(std::span<const uint8_t> data) {
           wpi::UnpackStruct<double, FRONT_LEFT_OFF>(data)},
       units::meters_per_second_t{
           wpi::UnpackStruct<double, FRONT_RIGHT_OFF>(data)},
-      units::meters_per_second_t{wpi::UnpackStruct<double, REAR_LEFT_OFF>(data)},
+      units::meters_per_second_t{
+          wpi::UnpackStruct<double, REAR_LEFT_OFF>(data)},
       units::meters_per_second_t{
           wpi::UnpackStruct<double, REAR_RIGHT_OFF>(data)},
   };

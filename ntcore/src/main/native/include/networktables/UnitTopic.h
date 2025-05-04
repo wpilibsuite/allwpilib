@@ -365,7 +365,8 @@ class UnitTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
+  PublisherType Publish(
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return UnitPublisher<T>{::nt::PublishEx(m_handle, NT_DOUBLE, "double",
                                             {{"unit", T{}.name()}}, options)};
   }

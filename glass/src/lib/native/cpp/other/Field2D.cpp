@@ -640,8 +640,8 @@ ObjectInfo::ObjectInfo(Storage& storage)
       m_arrows{storage.GetBool("arrows", DisplayOptions::DEFAULT_ARROWS)},
       m_arrowSize{
           storage.GetInt("arrowSize", DisplayOptions::DEFAULT_ARROW_SIZE)},
-      m_arrowWeight{
-          storage.GetFloat("arrowWeight", DisplayOptions::DEFAULT_ARROW_WEIGHT)},
+      m_arrowWeight{storage.GetFloat("arrowWeight",
+                                     DisplayOptions::DEFAULT_ARROW_WEIGHT)},
       m_arrowColor{storage.GetFloatArray(
           "arrowColor", DisplayOptions::DEFAULT_ARROW_COLOR_FLOAT)},
       m_selectable{

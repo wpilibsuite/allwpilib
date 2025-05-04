@@ -16,8 +16,8 @@
 using namespace hal;
 
 static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
-                             NUM_DIGITAL_PWM_OUTPUTS, HAL_HandleEnum::DigitalPWM>*
-    digitalPWMHandles;
+                             NUM_DIGITAL_PWM_OUTPUTS,
+                             HAL_HandleEnum::DigitalPWM>* digitalPWMHandles;
 
 namespace hal::init {
 void InitializeDIO() {

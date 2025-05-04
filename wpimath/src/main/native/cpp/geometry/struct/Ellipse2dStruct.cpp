@@ -6,7 +6,8 @@
 
 namespace {
 constexpr size_t CENTER_OFF = 0;
-constexpr size_t X_SEMI_AXIS_OFF = CENTER_OFF + wpi::GetStructSize<frc::Pose2d>();
+constexpr size_t X_SEMI_AXIS_OFF =
+    CENTER_OFF + wpi::GetStructSize<frc::Pose2d>();
 constexpr size_t Y_SEMI_AXIS_OFF = X_SEMI_AXIS_OFF + 8;
 }  // namespace
 

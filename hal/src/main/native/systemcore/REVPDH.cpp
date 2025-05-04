@@ -80,8 +80,8 @@ static IndexedHandleResource<HAL_REVPDHHandle, REV_PDHObj, NUM_REV_PDH_MODULES,
 
 namespace hal::init {
 void InitializeREVPDH() {
-  static IndexedHandleResource<HAL_REVPDHHandle, REV_PDHObj, NUM_REV_PDH_MODULES,
-                               HAL_HandleEnum::REVPDH>
+  static IndexedHandleResource<HAL_REVPDHHandle, REV_PDHObj,
+                               NUM_REV_PDH_MODULES, HAL_HandleEnum::REVPDH>
       rH;
   REVPDHHandles = &rH;
 }

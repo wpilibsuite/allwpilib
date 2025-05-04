@@ -34,12 +34,10 @@ inline constexpr int REAR_LEFT_DRIVE_MOTOR_PORT = 2;
 inline constexpr int FRONT_RIGHT_DRIVE_MOTOR_PORT = 4;
 inline constexpr int REAR_RIGHT_DRIVE_MOTOR_PORT = 6;
 
-
 inline constexpr int FRONT_LEFT_TURNING_MOTOR_PORT = 1;
 inline constexpr int REAR_LEFT_TURNING_MOTOR_PORT = 3;
 inline constexpr int FRONT_RIGHT_TURNING_MOTOR_PORT = 5;
 inline constexpr int REAR_RIGHT_TURNING_MOTOR_PORT = 7;
-
 
 inline constexpr int FRONT_LEFT_TURNING_ENCODER_PORTS[2]{0, 1};
 inline constexpr int REAR_LEFT_TURNING_ENCODER_PORTS[2]{2, 3};

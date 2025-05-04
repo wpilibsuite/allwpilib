@@ -73,10 +73,9 @@ void CalculateAndSimulate(const frc::ArmFeedforward& armFF, Ks_unit s,
                           units::radians_per_second_t nextVelocity,
                           units::second_t dt) {
   auto input = armFF.Calculate(currentAngle, currentVelocity, nextVelocity);
-  EXPECT_NEAR(
-      nextVelocity.value(),
-      Simulate(s, v, a, g, currentAngle, currentVelocity, input, dt)(1),
-      1e-4);
+  EXPECT_NEAR(nextVelocity.value(),
+              Simulate(s, v, a, g, currentAngle, currentVelocity, input, dt)(1),
+              1e-4);
 }
 
 }  // namespace
@@ -134,8 +133,8 @@ TEST(ArmFeedforwardTest, CalculateIllConditionedGradient) {
   constexpr auto G = 0.2708_V;
   frc::ArmFeedforward armFF{S, G, V, A};
 
-  CalculateAndSimulate(armFF, S, V, A, G, 1_rad, 0.02_rad_per_s,
-                       0_rad_per_s, 20_ms);
+  CalculateAndSimulate(armFF, S, V, A, G, 1_rad, 0.02_rad_per_s, 0_rad_per_s,
+                       20_ms);
 }
 
 TEST(ArmFeedforwardTest, AchievableVelocity) {

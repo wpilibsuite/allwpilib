@@ -138,7 +138,7 @@ static void ConvertArray(std::vector<To>** outPtr, std::vector<From>** inPtr) {
       default:                                                       \
         return false;                                                \
     }                                                                \
-    value->type = Storage::Value::AllCapsName##_ARRAY;             \
+    value->type = Storage::Value::AllCapsName##_ARRAY;               \
     return true;                                                     \
   }
 
@@ -266,11 +266,11 @@ Storage::Value& Storage::GetValue(std::string_view key) {
     auto& valuePtr = m_values[key];                                            \
     bool setValue = false;                                                     \
     if (!valuePtr) {                                                           \
-      valuePtr = std::make_unique<Value>(Value::AllCapsName##_ARRAY);        \
+      valuePtr = std::make_unique<Value>(Value::AllCapsName##_ARRAY);          \
       setValue = true;                                                         \
-    } else if (valuePtr->type != Value::AllCapsName##_ARRAY) {               \
+    } else if (valuePtr->type != Value::AllCapsName##_ARRAY) {                 \
       if (!Convert##CapsName##Array(valuePtr.get())) {                         \
-        valuePtr->Reset(Value::AllCapsName##_ARRAY);                         \
+        valuePtr->Reset(Value::AllCapsName##_ARRAY);                           \
         setValue = true;                                                       \
       }                                                                        \
     }                                                                          \
@@ -339,9 +339,8 @@ std::unique_ptr<Storage::Value> Storage::Erase(std::string_view key) {
 }
 
 void Storage::EraseChildren() {
-  std::erase_if(m_values, [](const auto& kv) {
-    return kv.second->type == Value::CHILD;
-  });
+  std::erase_if(m_values,
+                [](const auto& kv) { return kv.second->type == Value::CHILD; });
 }
 
 static bool JsonArrayToStorage(Storage::Value* valuePtr, const wpi::json& jarr,

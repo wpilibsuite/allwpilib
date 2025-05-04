@@ -43,8 +43,7 @@ XRPMotor::XRPMotor(int deviceNum) {
     m_simDevice.CreateBoolean("init", hal::SimDevice::OUTPUT, true);
     m_simInverted =
         m_simDevice.CreateBoolean("inverted", hal::SimDevice::INPUT, false);
-    m_simSpeed =
-        m_simDevice.CreateDouble("speed", hal::SimDevice::OUTPUT, 0.0);
+    m_simSpeed = m_simDevice.CreateDouble("speed", hal::SimDevice::OUTPUT, 0.0);
   }
 }
 

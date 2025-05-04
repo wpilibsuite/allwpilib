@@ -1330,8 +1330,9 @@ bool ArrayEditorImpl<NTType, T>::Emit() {
         } else if constexpr (NTType == NT_FLOAT_ARRAY) {
           ImGui::InputFloat(label, &m_arr[row], 0, 0, "%.6f");
         } else if constexpr (NTType == NT_DOUBLE_ARRAY) {
-          unsigned char precision = (m_flags & NETWORK_TABLES_FLAGS__PRECISION) >>
-                                    NETWORK_TABLES_FLAGS__PRECISION_BIT_SHIFT;
+          unsigned char precision =
+              (m_flags & NETWORK_TABLES_FLAGS__PRECISION) >>
+              NETWORK_TABLES_FLAGS__PRECISION_BIT_SHIFT;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -2101,8 +2102,8 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
 void NetworkTablesFlagsSettings::Update() {
   if (!m_pTreeView) {
     auto& storage = GetStorage();
-    m_pTreeView =
-        &storage.GetBool("tree", m_defaultFlags & NETWORK_TABLES_FLAGS__TREE_VIEW);
+    m_pTreeView = &storage.GetBool(
+        "tree", m_defaultFlags & NETWORK_TABLES_FLAGS__TREE_VIEW);
     m_pCombinedView = &storage.GetBool(
         "combined", m_defaultFlags & NETWORK_TABLES_FLAGS__COMBINED_VIEW);
     m_pShowSpecial = &storage.GetBool(
@@ -2122,21 +2123,25 @@ void NetworkTablesFlagsSettings::Update() {
                          NETWORK_TABLES_FLAGS__PRECISION_BIT_SHIFT);
   }
 
-  m_flags &= ~(
-      NETWORK_TABLES_FLAGS__TREE_VIEW | NETWORK_TABLES_FLAGS__COMBINED_VIEW |
-      NETWORK_TABLES_FLAGS__SHOW_SPECIAL | NETWORK_TABLES_FLAGS__SHOW_PROPERTIES |
-      NETWORK_TABLES_FLAGS__SHOW_TIMESTAMP |
-      NETWORK_TABLES_FLAGS__SHOW_SERVER_TIMESTAMP |
-      NETWORK_TABLES_FLAGS__CREATE_NONCANONICAL_KEYS | NETWORK_TABLES_FLAGS__PRECISION);
+  m_flags &=
+      ~(NETWORK_TABLES_FLAGS__TREE_VIEW | NETWORK_TABLES_FLAGS__COMBINED_VIEW |
+        NETWORK_TABLES_FLAGS__SHOW_SPECIAL |
+        NETWORK_TABLES_FLAGS__SHOW_PROPERTIES |
+        NETWORK_TABLES_FLAGS__SHOW_TIMESTAMP |
+        NETWORK_TABLES_FLAGS__SHOW_SERVER_TIMESTAMP |
+        NETWORK_TABLES_FLAGS__CREATE_NONCANONICAL_KEYS |
+        NETWORK_TABLES_FLAGS__PRECISION);
   m_flags |=
       (*m_pTreeView ? NETWORK_TABLES_FLAGS__TREE_VIEW : 0) |
       (*m_pCombinedView ? NETWORK_TABLES_FLAGS__COMBINED_VIEW : 0) |
       (*m_pShowSpecial ? NETWORK_TABLES_FLAGS__SHOW_SPECIAL : 0) |
       (*m_pShowProperties ? NETWORK_TABLES_FLAGS__SHOW_PROPERTIES : 0) |
       (*m_pShowTimestamp ? NETWORK_TABLES_FLAGS__SHOW_TIMESTAMP : 0) |
-      (*m_pShowServerTimestamp ? NETWORK_TABLES_FLAGS__SHOW_SERVER_TIMESTAMP : 0) |
-      (*m_pCreateNoncanonicalKeys ? NETWORK_TABLES_FLAGS__CREATE_NONCANONICAL_KEYS
-                                  : 0) |
+      (*m_pShowServerTimestamp ? NETWORK_TABLES_FLAGS__SHOW_SERVER_TIMESTAMP
+                               : 0) |
+      (*m_pCreateNoncanonicalKeys
+           ? NETWORK_TABLES_FLAGS__CREATE_NONCANONICAL_KEYS
+           : 0) |
       (*m_pPrecision << NETWORK_TABLES_FLAGS__PRECISION_BIT_SHIFT);
 }
 

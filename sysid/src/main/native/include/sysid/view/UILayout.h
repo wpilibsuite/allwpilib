@@ -67,7 +67,8 @@ inline constexpr Vector2d LOG_LOADER_WINDOW_SIZE{LEFT_COL_SIZE.x, 450};
 inline constexpr Vector2d DATA_SELECTOR_WINDOW_POS =
     LOG_LOADER_WINDOW_POS + Vector2d{0, LOG_LOADER_WINDOW_SIZE.y + WINDOW_GAP};
 inline constexpr Vector2d DATA_SELECTOR_WINDOW_SIZE{
-    LEFT_COL_SIZE.x, APP_WINDOW_SIZE.y - WINDOW_GAP - DATA_SELECTOR_WINDOW_POS.y};
+    LEFT_COL_SIZE.x,
+    APP_WINDOW_SIZE.y - WINDOW_GAP - DATA_SELECTOR_WINDOW_POS.y};
 
 // Center column position and size
 inline constexpr Vector2d CENTER_COL_POS =
@@ -81,7 +82,8 @@ inline constexpr Vector2d ANALYZER_WINDOW_SIZE{CENTER_COL_SIZE.x, 550};
 inline constexpr Vector2d PROGRAM_LOG_WINDOW_POS =
     ANALYZER_WINDOW_POS + Vector2d{0, ANALYZER_WINDOW_SIZE.y + WINDOW_GAP};
 inline constexpr Vector2d PROGRAM_LOG_WINDOW_SIZE{
-    CENTER_COL_SIZE.x, APP_WINDOW_SIZE.y - WINDOW_GAP - PROGRAM_LOG_WINDOW_POS.y};
+    CENTER_COL_SIZE.x,
+    APP_WINDOW_SIZE.y - WINDOW_GAP - PROGRAM_LOG_WINDOW_POS.y};
 
 // Right column position and size
 inline constexpr Vector2d RIGHT_COL_POS =

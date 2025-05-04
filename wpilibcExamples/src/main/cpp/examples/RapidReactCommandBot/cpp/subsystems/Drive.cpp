@@ -23,7 +23,8 @@ Drive::Drive() {
 
   // Sets the distance per pulse for the encoders
   m_leftEncoder.SetDistancePerPulse(DriveConstants::ENCODER_DISTANCE_PER_PULSE);
-  m_rightEncoder.SetDistancePerPulse(DriveConstants::ENCODER_DISTANCE_PER_PULSE);
+  m_rightEncoder.SetDistancePerPulse(
+      DriveConstants::ENCODER_DISTANCE_PER_PULSE);
 
   // Set the controller to be continuous (because it is an angle controller)
   m_controller.EnableContinuousInput(-180_deg, 180_deg);

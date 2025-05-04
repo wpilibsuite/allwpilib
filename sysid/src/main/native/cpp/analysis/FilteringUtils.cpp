@@ -95,8 +95,7 @@ static void PrepareMechData(std::vector<PreparedData>* data,
     pt.sin = sin;
   }
 
-  auto derivative =
-      CentralFiniteDifference<1, WINDOW>(GetMeanTimeDelta(*data));
+  auto derivative = CentralFiniteDifference<1, WINDOW>(GetMeanTimeDelta(*data));
 
   // Load the derivative filter with the first value for accurate initial
   // behavior

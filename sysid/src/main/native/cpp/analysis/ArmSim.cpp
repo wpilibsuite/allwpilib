@@ -19,11 +19,7 @@ ArmSim::ArmSim(double S, double V, double A, double G, double offset,
     // a = 1/A u - S/A sgn(x) - V/A x - G/A cos(theta)
     // a = -V/A x + 1/A u - S/A sgn(x) - G/A cos(theta)
     // a = Ax + Bu + c sgn(x) + d cos(theta)
-    : m_A{-V / A},
-      m_B{1.0 / A},
-      m_c{-S / A},
-      m_d{-G / A},
-      m_offset{offset} {
+    : m_A{-V / A}, m_B{1.0 / A}, m_c{-S / A}, m_d{-G / A}, m_offset{offset} {
   Reset(initialPosition, initialVelocity);
 }
 

@@ -45,7 +45,7 @@ class Drivetrain {
     m_leftEncoder.SetDistancePerPulse(2 * std::numbers::pi * WHEEL_RADIUS /
                                       ENCODER_RESOLUTION);
     m_rightEncoder.SetDistancePerPulse(2 * std::numbers::pi * WHEEL_RADIUS /
-                                      ENCODER_RESOLUTION);
+                                       ENCODER_RESOLUTION);
 
     m_leftEncoder.Reset();
     m_rightEncoder.Reset();

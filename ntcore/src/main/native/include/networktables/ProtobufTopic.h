@@ -401,7 +401,8 @@ class ProtobufTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
+  PublisherType Publish(
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     wpi::ProtobufMessage<T> msg;
     auto typeString = msg.GetTypeString();
     return ProtobufPublisher<T>{

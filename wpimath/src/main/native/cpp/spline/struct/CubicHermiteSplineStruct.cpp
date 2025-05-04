@@ -23,9 +23,9 @@ frc::CubicHermiteSpline wpi::Struct<frc::CubicHermiteSpline>::Unpack(
 void wpi::Struct<frc::CubicHermiteSpline>::Pack(
     std::span<uint8_t> data, const frc::CubicHermiteSpline& value) {
   wpi::PackStructArray<X_INITIAL_OFF, 2>(data,
-                                        value.GetInitialControlVector().x);
+                                         value.GetInitialControlVector().x);
   wpi::PackStructArray<X_FINAL_OFF, 2>(data, value.GetFinalControlVector().x);
   wpi::PackStructArray<Y_INITIAL_OFF, 2>(data,
-                                        value.GetInitialControlVector().y);
+                                         value.GetInitialControlVector().y);
   wpi::PackStructArray<Y_FINAL_OFF, 2>(data, value.GetFinalControlVector().y);
 }

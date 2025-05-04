@@ -41,8 +41,8 @@ class Elevator {
   frc::ExponentialProfile<units::meters, units::volts> m_profile{m_constraints};
   frc::ExponentialProfile<units::meters, units::volts>::State m_setpoint;
 
-  frc::PIDController m_controller{
-      Constants::ELEVATOR_P, Constants::ELEVATOR_I, Constants::ELEVATOR_D};
+  frc::PIDController m_controller{Constants::ELEVATOR_P, Constants::ELEVATOR_I,
+                                  Constants::ELEVATOR_D};
 
   frc::ElevatorFeedforward m_feedforward{
       Constants::ELEVATOR_S, Constants::ELEVATOR_G, Constants::ELEVATOR_V,

@@ -46,7 +46,9 @@ class Robot : public frc::TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in radians.
   frc::LinearSystem<2, 1, 1> m_armPlant =
-      frc::LinearSystemId::SingleJointedArmSystem(frc::DCMotor::NEO(2), ARM_MOI, ARM_GEARING).Slice(0);
+      frc::LinearSystemId::SingleJointedArmSystem(frc::DCMotor::NEO(2), ARM_MOI,
+                                                  ARM_GEARING)
+          .Slice(0);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   frc::KalmanFilter<2, 1, 1> m_observer{

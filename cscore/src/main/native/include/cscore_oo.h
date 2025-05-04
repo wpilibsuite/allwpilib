@@ -1088,11 +1088,11 @@ class ImageSource : public VideoSource {
   VideoProperty CreateStringProperty(std::string_view name,
                                      std::string_view value) {
     m_status = 0;
-    auto prop = VideoProperty{CreateSourceProperty(
-        m_handle, name,
-        static_cast<CS_PropertyKind>(
-            static_cast<int>(VideoProperty::Kind::STRING)),
-        0, 0, 0, 0, 0, &m_status)};
+    auto prop = VideoProperty{
+        CreateSourceProperty(m_handle, name,
+                             static_cast<CS_PropertyKind>(
+                                 static_cast<int>(VideoProperty::Kind::STRING)),
+                             0, 0, 0, 0, 0, &m_status)};
     prop.SetString(value);
     return prop;
   }

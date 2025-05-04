@@ -9,12 +9,9 @@ using namespace frc;
 RomiGyro::RomiGyro() : m_simDevice("Gyro:RomiGyro") {
   if (m_simDevice) {
     m_simDevice.CreateBoolean("init", hal::SimDevice::OUTPUT, true);
-    m_simRateX =
-        m_simDevice.CreateDouble("rate_x", hal::SimDevice::INPUT, 0.0);
-    m_simRateY =
-        m_simDevice.CreateDouble("rate_y", hal::SimDevice::INPUT, 0.0);
-    m_simRateZ =
-        m_simDevice.CreateDouble("rate_z", hal::SimDevice::INPUT, 0.0);
+    m_simRateX = m_simDevice.CreateDouble("rate_x", hal::SimDevice::INPUT, 0.0);
+    m_simRateY = m_simDevice.CreateDouble("rate_y", hal::SimDevice::INPUT, 0.0);
+    m_simRateZ = m_simDevice.CreateDouble("rate_z", hal::SimDevice::INPUT, 0.0);
     m_simAngleX =
         m_simDevice.CreateDouble("angle_x", hal::SimDevice::INPUT, 0.0);
     m_simAngleY =

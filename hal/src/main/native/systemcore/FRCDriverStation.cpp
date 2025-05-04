@@ -241,7 +241,7 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
   }
 }
 
-#define CHECK_JOYSTICK_NUMBER(stickNum)                  \
+#define CHECK_JOYSTICK_NUMBER(stickNum)                 \
   if ((stickNum) < 0 || (stickNum) >= HAL_MaxJoysticks) \
   return PARAMETER_OUT_OF_RANGE
 

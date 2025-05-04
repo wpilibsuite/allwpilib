@@ -32,7 +32,7 @@ class PotentiometerPIDTest : public testing::Test {
 
  protected:
   frc::sim::ElevatorSim m_elevatorSim{m_elevatorGearbox,
-    ELEVATOR_GEARING,
+                                      ELEVATOR_GEARING,
                                       CARRIAGE_MASS,
                                       ELEVATOR_DRUM_RADIUS,
                                       0.0_m,

@@ -36,8 +36,8 @@ class Pneumatics : frc2::SubsystemBase {
   // pressure is 250r-25
   static constexpr double SCALE = 250;
   static constexpr double OFFSET = -25;
-  frc::AnalogPotentiometer m_pressureTransducer{/* the AnalogIn port*/ 2,
-                                                SCALE, OFFSET};
+  frc::AnalogPotentiometer m_pressureTransducer{/* the AnalogIn port*/ 2, SCALE,
+                                                OFFSET};
 
   // Compressor connected to a PH with a default CAN ID
   frc::Compressor m_compressor{0, frc::PneumaticsModuleType::CTREPCM};

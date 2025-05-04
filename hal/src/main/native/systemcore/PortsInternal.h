@@ -19,8 +19,9 @@ constexpr int32_t NUM_DIGITAL_HEADERS = 10;
 constexpr int32_t NUM_DIGITAL_MXP_CHANNELS = 16;
 constexpr int32_t NUM_DIGITAL_SPI_PORT_CHANNELS = 5;
 constexpr int32_t NUM_PWM_HEADERS = 0;
-constexpr int32_t NUM_DIGITAL_CHANNELS =
-    NUM_DIGITAL_HEADERS + NUM_DIGITAL_MXP_CHANNELS + NUM_DIGITAL_SPI_PORT_CHANNELS;
+constexpr int32_t NUM_DIGITAL_CHANNELS = NUM_DIGITAL_HEADERS +
+                                         NUM_DIGITAL_MXP_CHANNELS +
+                                         NUM_DIGITAL_SPI_PORT_CHANNELS;
 constexpr int32_t NUM_PWM_CHANNELS = 0 + NUM_PWM_HEADERS;
 constexpr int32_t NUM_DIGITAL_PWM_OUTPUTS = 0;
 constexpr int32_t NUM_ENCODERS = 0;

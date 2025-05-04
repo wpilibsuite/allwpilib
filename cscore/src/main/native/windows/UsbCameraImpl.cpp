@@ -716,7 +716,8 @@ CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
     const Message* msg) {
   if (msgKind == Message::CMD_SET_MODE ||
       msgKind == Message::CMD_SET_PIXEL_FORMAT ||
-      msgKind == Message::CMD_SET_RESOLUTION || msgKind == Message::CMD_SET_FPS) {
+      msgKind == Message::CMD_SET_RESOLUTION ||
+      msgKind == Message::CMD_SET_FPS) {
     return DeviceCmdSetMode(lock, *msg);
   } else if (msgKind == Message::CMD_SET_PROPERTY ||
              msgKind == Message::CMD_SET_PROPERTY_STR) {

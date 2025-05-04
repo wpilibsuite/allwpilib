@@ -26,7 +26,7 @@ using namespace hal;
 
 namespace {
 constexpr const char* physicalPorts[NUM_I2C_BUSES] = {"/dev/i2c-1",
-                                                     "/dev/i2c-10"};
+                                                      "/dev/i2c-10"};
 
 struct I2C {
   wpi::mutex initMutex;

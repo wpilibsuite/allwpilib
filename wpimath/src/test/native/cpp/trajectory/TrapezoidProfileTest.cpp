@@ -47,8 +47,8 @@ TEST(TrapezoidProfileTest, PosContinuousUnderVelChange) {
   frc::TrapezoidProfile<units::meter>::State goal{12_m, 0_mps};
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
-  auto state = profile.Calculate(
-      DT, frc::TrapezoidProfile<units::meter>::State{}, goal);
+  auto state =
+      profile.Calculate(DT, frc::TrapezoidProfile<units::meter>::State{}, goal);
 
   auto lastPos = state.position;
   for (int i = 0; i < 1600; ++i) {
@@ -149,8 +149,8 @@ TEST(TrapezoidProfileTest, TimingToGoal) {
   frc::TrapezoidProfile<units::meter>::State goal{2_m, 0_mps};
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
-  auto state = profile.Calculate(DT, goal,
-                                 frc::TrapezoidProfile<units::meter>::State{});
+  auto state =
+      profile.Calculate(DT, goal, frc::TrapezoidProfile<units::meter>::State{});
 
   auto predictedTimeLeft = profile.TimeLeftUntil(goal.position);
   bool reachedGoal = false;
@@ -173,8 +173,8 @@ TEST(TrapezoidProfileTest, TimingBeforeGoal) {
   frc::TrapezoidProfile<units::meter>::State goal{2_m, 0_mps};
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
-  auto state = profile.Calculate(DT, goal,
-                                 frc::TrapezoidProfile<units::meter>::State{});
+  auto state =
+      profile.Calculate(DT, goal, frc::TrapezoidProfile<units::meter>::State{});
 
   auto predictedTimeLeft = profile.TimeLeftUntil(1_m);
   bool reachedGoal = false;
@@ -196,8 +196,8 @@ TEST(TrapezoidProfileTest, TimingToNegativeGoal) {
   frc::TrapezoidProfile<units::meter>::State goal{-2_m, 0_mps};
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
-  auto state = profile.Calculate(DT, goal,
-                                 frc::TrapezoidProfile<units::meter>::State{});
+  auto state =
+      profile.Calculate(DT, goal, frc::TrapezoidProfile<units::meter>::State{});
 
   auto predictedTimeLeft = profile.TimeLeftUntil(goal.position);
   bool reachedGoal = false;
@@ -220,8 +220,8 @@ TEST(TrapezoidProfileTest, TimingBeforeNegativeGoal) {
   frc::TrapezoidProfile<units::meter>::State goal{-2_m, 0_mps};
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
-  auto state = profile.Calculate(DT, goal,
-                                 frc::TrapezoidProfile<units::meter>::State{});
+  auto state =
+      profile.Calculate(DT, goal, frc::TrapezoidProfile<units::meter>::State{});
 
   auto predictedTimeLeft = profile.TimeLeftUntil(-1_m);
   bool reachedGoal = false;

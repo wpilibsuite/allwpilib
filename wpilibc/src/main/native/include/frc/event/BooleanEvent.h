@@ -124,9 +124,9 @@ class BooleanEvent {
    * @param type The debounce type.
    * @return The debounced event.
    */
-  BooleanEvent Debounce(units::second_t debounceTime,
-                        frc::Debouncer::DebounceType type =
-                            frc::Debouncer::DebounceType::RISING);
+  BooleanEvent Debounce(
+      units::second_t debounceTime,
+      frc::Debouncer::DebounceType type = frc::Debouncer::DebounceType::RISING);
 
  private:
   EventLoop* m_loop;

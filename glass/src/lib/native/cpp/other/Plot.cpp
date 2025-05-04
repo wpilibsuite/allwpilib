@@ -147,7 +147,7 @@ class Plot {
   std::string& m_name;
   bool& m_visible;
   static constexpr float DEFAULT_BACKGROUND_COLOR[4] = {0.0, 0.0, 0.0,
-                                                       IMPLOT_AUTO};
+                                                        IMPLOT_AUTO};
   ColorSetting m_backgroundColor;
   bool& m_showPause;
   bool& m_lockPrevX;

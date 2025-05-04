@@ -243,17 +243,13 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
     if (G < 0) {
       KgGain.isValidGain = false;
       KgGain.errorMessage = fmt::format(
-          "Calculated G gain of: {0:.3f} is erroneous! G should be >= 0.",
-          A);
+          "Calculated G gain of: {0:.3f} is erroneous! G should be >= 0.", A);
     }
 
     // Elevator analysis only requires G
     if (analysisType == analysis::ELEVATOR) {
-      return FeedforwardGains{.olsResult = ff,
-                              .S = KsGain,
-                              .V = KvGain,
-                              .A = KaGain,
-                              .G = KgGain};
+      return FeedforwardGains{
+          .olsResult = ff, .S = KsGain, .V = KvGain, .A = KaGain, .G = KgGain};
     } else {
       // Arm analysis requires G and an angle offset
       FeedforwardGain offset = {
@@ -273,11 +269,11 @@ sysid::FeedbackGains AnalysisManager::CalculateFeedback(
     const FeedforwardGain& V, const FeedforwardGain& A) {
   FeedbackGains fb;
   if (m_settings.type == FeedbackControllerLoopType::POSITION) {
-    fb = sysid::CalculatePositionFeedbackGains(
-        m_settings.preset, m_settings.lqr, V.gain, A.gain);
+    fb = sysid::CalculatePositionFeedbackGains(m_settings.preset,
+                                               m_settings.lqr, V.gain, A.gain);
   } else {
-    fb = sysid::CalculateVelocityFeedbackGains(
-        m_settings.preset, m_settings.lqr, V.gain, A.gain);
+    fb = sysid::CalculateVelocityFeedbackGains(m_settings.preset,
+                                               m_settings.lqr, V.gain, A.gain);
   }
 
   return fb;

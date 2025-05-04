@@ -515,8 +515,8 @@ class StructArrayTopic final : public Topic {
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
   [[nodiscard]]
-  SubscriberType Subscribe(
-      U&& defaultValue, const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
+  SubscriberType Subscribe(U&& defaultValue, const PubSubOptions& options =
+                                                 DEFAULT_PUB_SUB_OPTIONS) {
     return std::apply(
         [&](const I&... info) {
           return StructArraySubscriber<T, I...>{
@@ -578,7 +578,8 @@ class StructArrayTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
+  PublisherType Publish(
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return std::apply(
         [&](const I&... info) {
           return StructArrayPublisher<T, I...>{

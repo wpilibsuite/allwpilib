@@ -129,7 +129,8 @@ TEST(RoboRioSimTest, SetSerialNumber) {
   EXPECT_EQ(SERIAL_NUM, RobotController::GetSerialNumber());
 
   const std::string SERIAL_NUMBER_OVERFLOW = "SerialNumber";
-  const std::string SERIAL_NUMBER_TRUNCATED = SERIAL_NUMBER_OVERFLOW.substr(0, 8);
+  const std::string SERIAL_NUMBER_TRUNCATED =
+      SERIAL_NUMBER_OVERFLOW.substr(0, 8);
 
   RoboRioSim::SetSerialNumber(SERIAL_NUMBER_OVERFLOW);
   EXPECT_EQ(SERIAL_NUMBER_TRUNCATED, RoboRioSim::GetSerialNumber());

@@ -603,7 +603,8 @@ NT_ConnectionDataLogger StartConnectionDataLog(NT_Inst inst,
 }
 
 void StopConnectionDataLog(NT_ConnectionDataLogger logger) {
-  if (auto ii = InstanceImpl::GetTyped(logger, Handle::CONNECTION_DATA_LOGGER)) {
+  if (auto ii =
+          InstanceImpl::GetTyped(logger, Handle::CONNECTION_DATA_LOGGER)) {
     ii->connectionList.StopDataLog(logger);
   }
 }

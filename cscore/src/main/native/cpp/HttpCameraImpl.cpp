@@ -300,8 +300,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
     // We know how big it is!  Just get a frame of the right size and read
     // the data directly into it.
     unsigned int contentLength = v.value();
-    auto image =
-        AllocImage(VideoMode::PixelFormat::MJPEG, 0, 0, contentLength);
+    auto image = AllocImage(VideoMode::PixelFormat::MJPEG, 0, 0, contentLength);
     is.read(image->data(), contentLength);
     if (!m_active || is.has_error()) {
       return false;

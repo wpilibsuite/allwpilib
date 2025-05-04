@@ -17,7 +17,8 @@ frc::DifferentialDriveFeedforward wpi::Struct<
       decltype(1_V / 1_mps){wpi::UnpackStruct<double, KV_LINEAR_OFF>(data)},
       decltype(1_V / 1_mps_sq){wpi::UnpackStruct<double, KA_LINEAR_OFF>(data)},
       decltype(1_V / 1_mps){wpi::UnpackStruct<double, KV_ANGULAR_OFF>(data)},
-      decltype(1_V / 1_mps_sq){wpi::UnpackStruct<double, KA_ANGULAR_OFF>(data)}};
+      decltype(1_V /
+               1_mps_sq){wpi::UnpackStruct<double, KA_ANGULAR_OFF>(data)}};
 }
 
 void wpi::Struct<frc::DifferentialDriveFeedforward>::Pack(

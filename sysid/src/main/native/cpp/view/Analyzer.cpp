@@ -158,8 +158,7 @@ bool Analyzer::DisplayResetAndUnitOverride() {
   ImGui::SetNextWindowSize(ImVec2(size.x / 4, size.y * 0.2));
   if (ImGui::BeginPopupModal("Override Units")) {
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 7);
-    ImGui::Combo("Units", &m_selectedOverrideUnit, UNITS,
-                 IM_ARRAYSIZE(UNITS));
+    ImGui::Combo("Units", &m_selectedOverrideUnit, UNITS, IM_ARRAYSIZE(UNITS));
     unit = UNITS[m_selectedOverrideUnit];
 
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 7);
@@ -604,8 +603,7 @@ void Analyzer::DisplayFeedbackGains() {
                    IM_ARRAYSIZE(PRESET_NAMES))) {
     m_settings.preset = m_presets[PRESET_NAMES[m_selectedPreset]];
     m_settings.type = FeedbackControllerLoopType::VELOCITY;
-    m_selectedLoopType =
-        static_cast<int>(FeedbackControllerLoopType::VELOCITY);
+    m_selectedLoopType = static_cast<int>(FeedbackControllerLoopType::VELOCITY);
     UpdateFeedbackGains();
   }
   ImGui::SameLine();

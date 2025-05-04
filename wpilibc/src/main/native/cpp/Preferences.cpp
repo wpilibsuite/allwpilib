@@ -29,7 +29,8 @@ struct Instance {
   std::shared_ptr<nt::NetworkTable> table{
       nt::NetworkTableInstance::GetDefault().GetTable(TABLE_NAME)};
   nt::StringPublisher typePublisher{table->GetStringTopic(".type").PublishEx(
-      nt::StringTopic::TYPE_STRING, {{"SmartDashboard", SMART_DASHBOARD_TYPE}})};
+      nt::StringTopic::TYPE_STRING,
+      {{"SmartDashboard", SMART_DASHBOARD_TYPE}})};
   nt::MultiSubscriber tableSubscriber{nt::NetworkTableInstance::GetDefault(),
                                       {{fmt::format("{}/", table->GetPath())}}};
   nt::NetworkTableListener listener;

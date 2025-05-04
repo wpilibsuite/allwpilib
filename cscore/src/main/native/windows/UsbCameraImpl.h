@@ -88,7 +88,7 @@ class UsbCameraImpl : public SourceImpl,
       CMD_SET_FPS,
       CMD_SET_PROPERTY,
       CMD_SET_PROPERTY_STR,
-      NUM_SINKS_CHANGED,         // no response
+      NUM_SINKS_CHANGED,          // no response
       NUM_SINKS_ENABLED_CHANGED,  // no response
       // Responses
       OK,

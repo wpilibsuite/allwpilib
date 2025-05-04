@@ -134,8 +134,7 @@ TEST_F(TopicListenerTest, TopicUnpublishPropsImm) {
 
   auto poller = nt::CreateListenerPoller(m_serverInst);
   nt::AddPolledListener(poller, nt::GetTopic(m_serverInst, "/foo"),
-                        nt::EventFlags::UNPUBLISH |
-                            nt::EventFlags::PROPERTIES |
+                        nt::EventFlags::UNPUBLISH | nt::EventFlags::PROPERTIES |
                             nt::EventFlags::IMMEDIATE);
 
   bool timedOut = false;
@@ -148,8 +147,7 @@ TEST_F(TopicListenerTest, TopicUnpublishLocal) {
   auto topic = nt::GetTopic(m_serverInst, "/foo");
 
   auto poller = nt::CreateListenerPoller(m_serverInst);
-  auto handle =
-      nt::AddPolledListener(poller, topic, nt::EventFlags::UNPUBLISH);
+  auto handle = nt::AddPolledListener(poller, topic, nt::EventFlags::UNPUBLISH);
 
   auto pub = nt::Publish(topic, NT_DOUBLE, "double");
   nt::Unpublish(pub);
@@ -261,8 +259,7 @@ TEST_F(TopicListenerTest, PrefixPublishImm) {
 
   auto poller = nt::CreateListenerPoller(m_serverInst);
   auto handle = nt::AddPolledListener(
-      poller, {{"/foo/"}},
-      nt::EventFlags::PUBLISH | nt::EventFlags::IMMEDIATE);
+      poller, {{"/foo/"}}, nt::EventFlags::PUBLISH | nt::EventFlags::IMMEDIATE);
 
   bool timedOut = false;
   ASSERT_TRUE(wpi::WaitForObject(poller, 1.0, &timedOut));
@@ -276,8 +273,7 @@ TEST_F(TopicListenerTest, PrefixUnpublishPropsImm) {
 
   auto poller = nt::CreateListenerPoller(m_serverInst);
   nt::AddPolledListener(poller, {{"/foo/"}},
-                        nt::EventFlags::UNPUBLISH |
-                            nt::EventFlags::PROPERTIES |
+                        nt::EventFlags::UNPUBLISH | nt::EventFlags::PROPERTIES |
                             nt::EventFlags::IMMEDIATE);
 
   bool timedOut = false;

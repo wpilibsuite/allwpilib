@@ -18,14 +18,16 @@ DriveSubsystem::DriveSubsystem()
       m_frontRight{FRONT_RIGHT_MOTOR_PORT},
       m_rearRight{REAR_RIGHT_MOTOR_PORT},
 
-      m_frontLeftEncoder{FRONT_LEFT_ENCODER_PORTS[0], FRONT_LEFT_ENCODER_PORTS[1],
+      m_frontLeftEncoder{FRONT_LEFT_ENCODER_PORTS[0],
+                         FRONT_LEFT_ENCODER_PORTS[1],
                          FRONT_LEFT_ENCODER_REVERSED},
       m_rearLeftEncoder{REAR_LEFT_ENCODER_PORTS[0], REAR_LEFT_ENCODER_PORTS[1],
                         REAR_LEFT_ENCODER_REVERSED},
       m_frontRightEncoder{FRONT_RIGHT_ENCODER_PORTS[0],
                           FRONT_RIGHT_ENCODER_PORTS[1],
                           FRONT_RIGHT_ENCODER_REVERSED},
-      m_rearRightEncoder{REAR_RIGHT_ENCODER_PORTS[0], REAR_RIGHT_ENCODER_PORTS[1],
+      m_rearRightEncoder{REAR_RIGHT_ENCODER_PORTS[0],
+                         REAR_RIGHT_ENCODER_PORTS[1],
                          REAR_RIGHT_ENCODER_REVERSED},
 
       m_odometry{DRIVE_KINEMATICS, m_gyro.GetRotation2d(),

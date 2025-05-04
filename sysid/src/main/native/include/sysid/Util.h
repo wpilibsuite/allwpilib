@@ -35,7 +35,7 @@
 
 namespace sysid {
 inline constexpr const char* UNITS[] = {"Meters",  "Feet",      "Inches",
-                                         "Radians", "Rotations", "Degrees"};
+                                        "Radians", "Rotations", "Degrees"};
 
 /**
  * Displays a tooltip beside the widget that this method is called after with

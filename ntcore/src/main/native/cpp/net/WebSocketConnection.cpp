@@ -166,7 +166,7 @@ int WebSocketConnection::Write(
       m_frames.back().opcode |= wpi::WebSocket::FLAG_FIN;
     }
     StartFrame(m_state == TEXT ? wpi::WebSocket::Frame::TEXT
-                                : wpi::WebSocket::Frame::BINARY);
+                               : wpi::WebSocket::Frame::BINARY);
     m_framePos = 0;
     first = true;
   }

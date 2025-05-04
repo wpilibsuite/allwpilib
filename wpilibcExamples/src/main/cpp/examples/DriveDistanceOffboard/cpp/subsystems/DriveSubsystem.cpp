@@ -86,8 +86,8 @@ frc2::CommandPtr DriveSubsystem::ProfiledDriveDistance(
                auto currentTime = m_timer.Get();
                auto currentSetpoint =
                    m_profile.Calculate(currentTime, {}, {distance, 0_mps});
-               auto nextSetpoint = m_profile.Calculate(currentTime + DT, {},
-                                                       {distance, 0_mps});
+               auto nextSetpoint =
+                   m_profile.Calculate(currentTime + DT, {}, {distance, 0_mps});
                SetDriveStates(currentSetpoint, currentSetpoint, nextSetpoint,
                               nextSetpoint);
              })
