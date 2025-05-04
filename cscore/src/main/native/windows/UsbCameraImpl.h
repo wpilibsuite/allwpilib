@@ -91,8 +91,8 @@ class UsbCameraImpl : public SourceImpl,
       NUM_SINKS_CHANGED,          // no response
       NUM_SINKS_ENABLED_CHANGED,  // no response
       // Responses
-      OK,
-      ERROR
+      MSG_OK,
+      MSG_ERROR
     };
 
     explicit Message(Kind kind_)
