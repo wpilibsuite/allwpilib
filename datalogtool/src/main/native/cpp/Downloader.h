@@ -38,16 +38,16 @@ class Downloader {
 
   wpi::mutex m_mutex;
   enum State {
-    DISCONNECTED,
     CONNECTING,
     CONNECTED,
     DISCONNECTING,
+    DISCONNECTED,
     GET_FILES,
-    DOWNLOAD,
-    DOWNLOAD_DONE,
-    DELETE,
-    DELETE_DONE,
-    EXIT
+    DOWNLOADING,
+    DOWNLOADED,
+    DELETING,
+    DELETED,
+    EXITING
   } m_state = DISCONNECTED;
   std::condition_variable m_cv;
 
