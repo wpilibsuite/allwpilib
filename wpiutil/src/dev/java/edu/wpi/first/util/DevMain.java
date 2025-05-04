@@ -8,7 +8,7 @@ public final class DevMain {
   /** Main entry point. */
   public static void main(String[] args) {
     System.out.println("Hello World!");
-    System.out.println(CombinedRuntimeLoader.getPlatformPath());
+    System.out.println(RuntimeLoader.getPlatform());
     WPIUtilJNI.checkMsvcRuntime();
   }
 
