@@ -91,5 +91,16 @@
     "foldername": "analogtrigger",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "AnalogInput",
+    "description": "Snippets of Analog Input for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Analog"
+    ],
+    "foldername": "analoginput",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
