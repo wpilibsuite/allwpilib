@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 public class Robot extends TimedRobot {
   // Initializes an AnalogTrigger on port 0
   AnalogTrigger m_trigger0 = new AnalogTrigger(0);
-  // Initializes an AnalogInput on port 1 and enables 2-bit oversampling
+  // Initializes an AnalogInput on port 1
   AnalogInput m_input = new AnalogInput(1);
 
   // Initializes an AnalogTrigger using the above input
