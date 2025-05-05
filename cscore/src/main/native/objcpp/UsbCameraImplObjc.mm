@@ -905,24 +905,32 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   if (!self.deviceValid) {
     return false;
   }
-  self.streaming = true;
 
+  if (![self.videoDevice lockForConfiguration:nil]) {
+    OBJCERROR("Failed to lock for configuration");
+    return false;
+  }
+
+  [self.session beginConfiguration];
+
+  if (self.currentFormat != nil) {
+    self.videoDevice.activeFormat = self.currentFormat;
+  }
+
+  if (self.currentFPS != 0) {
+    CMTime frameDuration = [self findNearestFrameDuration:self.currentFPS];
+    self.videoDevice.activeVideoMinFrameDuration = frameDuration;
+    self.videoDevice.activeVideoMaxFrameDuration = frameDuration;
+  }
+
+  [self.session commitConfiguration];
+
+  self.streaming = true;
+  // Start the capture session before device unlock to ensure
+  // the session preset settings are preserved
   [self.session startRunning];
 
-  if ([self.videoDevice lockForConfiguration:nil]) {
-    if (self.currentFormat != nil) {
-      self.videoDevice.activeFormat = self.currentFormat;
-    }
-    if (self.currentFPS != 0) {
-      self.videoDevice.activeVideoMinFrameDuration =
-          [self findNearestFrameDuration:self.currentFPS];
-      self.videoDevice.activeVideoMaxFrameDuration =
-          [self findNearestFrameDuration:self.currentFPS];
-    }
-    [self.videoDevice unlockForConfiguration];
-  } else {
-    OBJCERROR("Failed to lock for configuration");
-  }
+  [self.videoDevice unlockForConfiguration];
 
   return true;
 }
