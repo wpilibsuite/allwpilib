@@ -14,11 +14,11 @@ model {
         "${nativeName}"(NativeLibrarySpec) {
             sources.cpp {
                 source {
-                    srcDirs "src/main/native//src", "src/googletest/src"
+                    srcDirs "src/main/native/simd/cpp/src/Simd"
                     include '*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'include', 'src/googletest', 'src/googlemock'
+                    srcDirs 'src/main/native/simd/include/src'
                 }
             }
         }
