@@ -39,5 +39,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // Get the value of the potentiometer
     m_pot.get();
+
+    m_pot1.get();
   }
 }
