@@ -17,8 +17,10 @@ def write_controller_file(output_dir: Path, controller_name: str, contents: str)
     output_file = output_dir / controller_name
     output_file.write_text(contents, encoding="utf-8", newline="\n")
 
+
 def camel_to_snake(name):
-    return re.sub('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))', r'_\1', name).upper()
+    return re.sub("((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))", r"_\1", name).upper()
+
 
 def generate_hids(output_directory: Path, template_directory: Path, schema_file: Path):
     with schema_file.open(encoding="utf-8") as f:
@@ -31,7 +33,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         autoescape=False,
         keep_trailing_newline=True,
     )
-    env.filters['camel_to_snake'] = camel_to_snake
+    env.filters["camel_to_snake"] = camel_to_snake
 
     root_path = output_directory / hdr_subdirectory
     template = env.get_template("hid.h.jinja")
@@ -46,7 +48,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         loader=FileSystemLoader(template_directory / cpp_subdirectory),
         autoescape=False,
     )
-    env.filters['camel_to_snake'] = camel_to_snake
+    env.filters["camel_to_snake"] = camel_to_snake
 
     root_path = output_directory / cpp_subdirectory
     template = env.get_template("hid.cpp.jinja")
@@ -62,7 +64,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         autoescape=False,
         keep_trailing_newline=True,
     )
-    env.filters['camel_to_snake'] = camel_to_snake
+    env.filters["camel_to_snake"] = camel_to_snake
 
     root_path = output_directory / sim_hdr_subdirectory
     template = env.get_template("hidsim.h.jinja")
@@ -77,7 +79,7 @@ def generate_hids(output_directory: Path, template_directory: Path, schema_file:
         loader=FileSystemLoader(template_directory / sim_cpp_subdirectory),
         autoescape=False,
     )
-    env.filters['camel_to_snake'] = camel_to_snake
+    env.filters["camel_to_snake"] = camel_to_snake
 
     root_path = output_directory / sim_cpp_subdirectory
     template = env.get_template("hidsim.cpp.jinja")

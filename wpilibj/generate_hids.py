@@ -17,8 +17,10 @@ def write_controller_file(output_dir: Path, controller_name: str, contents: str)
     output_file = output_dir / controller_name
     output_file.write_text(contents, encoding="utf-8", newline="\n")
 
+
 def camel_to_snake(name):
-    return re.sub('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))', r'_\1', name).upper()
+    return re.sub("((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))", r"_\1", name).upper()
+
 
 def generate_hids(output_directory: Path, template_directory: Path):
     with (template_directory / "hids.json").open(encoding="utf-8") as f:
@@ -30,7 +32,7 @@ def generate_hids(output_directory: Path, template_directory: Path):
         autoescape=False,
         keep_trailing_newline=True,
     )
-    env.filters['camel_to_snake'] = camel_to_snake
+    env.filters["camel_to_snake"] = camel_to_snake
 
     rootPath = output_directory / "main/java/edu/wpi/first/wpilibj"
     template = env.get_template("hid.java.jinja")
