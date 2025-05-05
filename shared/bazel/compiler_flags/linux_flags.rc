@@ -12,3 +12,10 @@ build:linux --copt=-Werror
 
 # Not in nativetools
 build:linux --cxxopt=-Wno-deprecated-enum-enum-conversion
+
+# Cleanup build output for tools
+build:linux --host_cxxopt=-Wno-missing-field-initializers
+build:linux --host_cxxopt=-Wno-deprecated-enum-enum-conversion
+build:linux --host_cxxopt=-Wno-sign-compare
+build:linux --host_cxxopt=-Wno-unknown-pragmas
+build:linux --host_cxxopt=-Wno-attributes
