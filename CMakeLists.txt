@@ -290,6 +290,7 @@ set(SELF_DIR "$\{SELF_DIR\}")
 set(WPIUNITS_DEP_REPLACE_IMPL "find_dependency(wpiunits)")
 set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
 add_subdirectory(wpiutil)
+add_subdirectory(thirdparty/simd)
 
 if(WITH_NTCORE)
     set(NTCORE_DEP_REPLACE "find_dependency(ntcore)")
