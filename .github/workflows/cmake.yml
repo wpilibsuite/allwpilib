@@ -40,7 +40,7 @@ jobs:
     steps:
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
-        run: apt-get update && apt-get install -y libopencv-dev libopencv4.5-java libprotobuf-dev protobuf-compiler ninja-build
+        run: apt-get update && apt-get install -y libopencv-dev libprotobuf-dev protobuf-compiler ninja-build
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
