@@ -32,10 +32,10 @@ class LTVDifferentialDriveControllerTest {
   /** States of the drivetrain system. */
   static class State {
     /// X position in global coordinate frame.
-    public static final int kX = 0;
+    public static final int X = 0;
 
     /// Y position in global coordinate frame.
-    public static final int kY = 1;
+    public static final int Y = 1;
 
     /// Heading in global coordinate frame.
     public static final int HEADING = 2;
@@ -100,8 +100,7 @@ class LTVDifferentialDriveControllerTest {
     for (int i = 0; i < (totalTime / DT); ++i) {
       var state = trajectory.sample(DT * i);
       robotPose =
-          new Pose2d(
-              x.get(State.kX, 0), x.get(State.kY, 0), new Rotation2d(x.get(State.HEADING, 0)));
+          new Pose2d(x.get(State.X, 0), x.get(State.Y, 0), new Rotation2d(x.get(State.HEADING, 0)));
       final var output =
           controller.calculate(
               robotPose, x.get(State.LEFT_VELOCITY, 0), x.get(State.RIGHT_VELOCITY, 0), state);
