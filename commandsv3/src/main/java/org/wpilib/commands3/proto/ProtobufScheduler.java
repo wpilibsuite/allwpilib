@@ -15,12 +15,24 @@ import us.hebi.quickbuf.MessageFactory;
 import us.hebi.quickbuf.ProtoMessage;
 import us.hebi.quickbuf.ProtoSink;
 import us.hebi.quickbuf.ProtoSource;
+import us.hebi.quickbuf.ProtoUtil;
 import us.hebi.quickbuf.RepeatedMessage;
 
 /** Protobuf type {@code ProtobufScheduler} */
 @SuppressWarnings("hiding")
 public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> implements Cloneable {
   private static final long serialVersionUID = 0L;
+
+  /**
+   *
+   *
+   * <pre>
+   *  How much time the scheduler took in its last `run()` invocation.
+   * </pre>
+   *
+   * <code>optional double last_time_ms = 3;</code>
+   */
+  private double lastTimeMs;
 
   /**
    *
@@ -53,6 +65,71 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
    *
    *
    * <pre>
+   *  How much time the scheduler took in its last `run()` invocation.
+   * </pre>
+   *
+   * <code>optional double last_time_ms = 3;</code>
+   *
+   * @return whether the lastTimeMs field is set
+   */
+  public boolean hasLastTimeMs() {
+    return (bitField0_ & 0x00000001) != 0;
+  }
+
+  /**
+   *
+   *
+   * <pre>
+   *  How much time the scheduler took in its last `run()` invocation.
+   * </pre>
+   *
+   * <code>optional double last_time_ms = 3;</code>
+   *
+   * @return this
+   */
+  public ProtobufScheduler clearLastTimeMs() {
+    bitField0_ &= ~0x00000001;
+    lastTimeMs = 0D;
+    return this;
+  }
+
+  /**
+   *
+   *
+   * <pre>
+   *  How much time the scheduler took in its last `run()` invocation.
+   * </pre>
+   *
+   * <code>optional double last_time_ms = 3;</code>
+   *
+   * @return the lastTimeMs
+   */
+  public double getLastTimeMs() {
+    return lastTimeMs;
+  }
+
+  /**
+   *
+   *
+   * <pre>
+   *  How much time the scheduler took in its last `run()` invocation.
+   * </pre>
+   *
+   * <code>optional double last_time_ms = 3;</code>
+   *
+   * @param value the lastTimeMs to set
+   * @return this
+   */
+  public ProtobufScheduler setLastTimeMs(final double value) {
+    bitField0_ |= 0x00000001;
+    lastTimeMs = value;
+    return this;
+  }
+
+  /**
+   *
+   *
+   * <pre>
    *  Note: commands are generally queued by triggers, which occurs immediately before they are
    *  promoted and start running. Entries will only appear here when serializing a scheduler
    *  _after_ manually scheduling a command but _before_ calling scheduler.run()
@@ -63,7 +140,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
    * @return whether the queuedCommands field is set
    */
   public boolean hasQueuedCommands() {
-    return (bitField0_ & 0x00000001) != 0;
+    return (bitField0_ & 0x00000002) != 0;
   }
 
   /**
@@ -80,7 +157,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
    * @return this
    */
   public ProtobufScheduler clearQueuedCommands() {
-    bitField0_ &= ~0x00000001;
+    bitField0_ &= ~0x00000002;
     queuedCommands.clear();
     return this;
   }
@@ -122,7 +199,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
    * @return internal storage object for modifications
    */
   public RepeatedMessage<ProtobufCommand> getMutableQueuedCommands() {
-    bitField0_ |= 0x00000001;
+    bitField0_ |= 0x00000002;
     return queuedCommands;
   }
 
@@ -141,7 +218,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
    * @return this
    */
   public ProtobufScheduler addQueuedCommands(final ProtobufCommand value) {
-    bitField0_ |= 0x00000001;
+    bitField0_ |= 0x00000002;
     queuedCommands.add(value);
     return this;
   }
@@ -161,7 +238,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
    * @return this
    */
   public ProtobufScheduler addAllQueuedCommands(final ProtobufCommand... values) {
-    bitField0_ |= 0x00000001;
+    bitField0_ |= 0x00000002;
     queuedCommands.addAll(values);
     return this;
   }
@@ -172,7 +249,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
    * @return whether the runningCommands field is set
    */
   public boolean hasRunningCommands() {
-    return (bitField0_ & 0x00000002) != 0;
+    return (bitField0_ & 0x00000004) != 0;
   }
 
   /**
@@ -181,7 +258,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
    * @return this
    */
   public ProtobufScheduler clearRunningCommands() {
-    bitField0_ &= ~0x00000002;
+    bitField0_ &= ~0x00000004;
     runningCommands.clear();
     return this;
   }
@@ -207,7 +284,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
    * @return internal storage object for modifications
    */
   public RepeatedMessage<ProtobufCommand> getMutableRunningCommands() {
-    bitField0_ |= 0x00000002;
+    bitField0_ |= 0x00000004;
     return runningCommands;
   }
 
@@ -218,7 +295,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
    * @return this
    */
   public ProtobufScheduler addRunningCommands(final ProtobufCommand value) {
-    bitField0_ |= 0x00000002;
+    bitField0_ |= 0x00000004;
     runningCommands.add(value);
     return this;
   }
@@ -230,7 +307,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
    * @return this
    */
   public ProtobufScheduler addAllRunningCommands(final ProtobufCommand... values) {
-    bitField0_ |= 0x00000002;
+    bitField0_ |= 0x00000004;
     runningCommands.addAll(values);
     return this;
   }
@@ -240,6 +317,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
     cachedSize = other.cachedSize;
     if ((bitField0_ | other.bitField0_) != 0) {
       bitField0_ = other.bitField0_;
+      lastTimeMs = other.lastTimeMs;
       queuedCommands.copyFrom(other.queuedCommands);
       runningCommands.copyFrom(other.runningCommands);
     }
@@ -252,6 +330,9 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
       return this;
     }
     cachedSize = -1;
+    if (other.hasLastTimeMs()) {
+      setLastTimeMs(other.lastTimeMs);
+    }
     if (other.hasQueuedCommands()) {
       getMutableQueuedCommands().addAll(other.queuedCommands);
     }
@@ -268,6 +349,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
     }
     cachedSize = -1;
     bitField0_ = 0;
+    lastTimeMs = 0D;
     queuedCommands.clear();
     runningCommands.clear();
     return this;
@@ -295,6 +377,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
     }
     ProtobufScheduler other = (ProtobufScheduler) o;
     return bitField0_ == other.bitField0_
+        && (!hasLastTimeMs() || ProtoUtil.isEqual(lastTimeMs, other.lastTimeMs))
         && (!hasQueuedCommands() || queuedCommands.equals(other.queuedCommands))
         && (!hasRunningCommands() || runningCommands.equals(other.runningCommands));
   }
@@ -302,12 +385,16 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
   @Override
   public void writeTo(final ProtoSink output) throws IOException {
     if ((bitField0_ & 0x00000001) != 0) {
+      output.writeRawByte((byte) 25);
+      output.writeDoubleNoTag(lastTimeMs);
+    }
+    if ((bitField0_ & 0x00000002) != 0) {
       for (int i = 0; i < queuedCommands.length(); i++) {
         output.writeRawByte((byte) 10);
         output.writeMessageNoTag(queuedCommands.get(i));
       }
     }
-    if ((bitField0_ & 0x00000002) != 0) {
+    if ((bitField0_ & 0x00000004) != 0) {
       for (int i = 0; i < runningCommands.length(); i++) {
         output.writeRawByte((byte) 18);
         output.writeMessageNoTag(runningCommands.get(i));
@@ -319,10 +406,13 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
   protected int computeSerializedSize() {
     int size = 0;
     if ((bitField0_ & 0x00000001) != 0) {
+      size += 9;
+    }
+    if ((bitField0_ & 0x00000002) != 0) {
       size +=
           (1 * queuedCommands.length()) + ProtoSink.computeRepeatedMessageSizeNoTag(queuedCommands);
     }
-    if ((bitField0_ & 0x00000002) != 0) {
+    if ((bitField0_ & 0x00000004) != 0) {
       size +=
           (1 * runningCommands.length())
               + ProtoSink.computeRepeatedMessageSizeNoTag(runningCommands);
@@ -337,11 +427,21 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
     int tag = input.readTag();
     while (true) {
       switch (tag) {
+        case 25:
+          {
+            // lastTimeMs
+            lastTimeMs = input.readDouble();
+            bitField0_ |= 0x00000001;
+            tag = input.readTag();
+            if (tag != 10) {
+              break;
+            }
+          }
         case 10:
           {
             // queuedCommands
             tag = input.readRepeatedMessage(queuedCommands, tag);
-            bitField0_ |= 0x00000001;
+            bitField0_ |= 0x00000002;
             if (tag != 18) {
               break;
             }
@@ -350,7 +450,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
           {
             // runningCommands
             tag = input.readRepeatedMessage(runningCommands, tag);
-            bitField0_ |= 0x00000002;
+            bitField0_ |= 0x00000004;
             if (tag != 0) {
               break;
             }
@@ -375,9 +475,12 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
   public void writeTo(final JsonSink output) throws IOException {
     output.beginObject();
     if ((bitField0_ & 0x00000001) != 0) {
-      output.writeRepeatedMessage(FieldNames.queuedCommands, queuedCommands);
+      output.writeDouble(FieldNames.lastTimeMs, lastTimeMs);
     }
     if ((bitField0_ & 0x00000002) != 0) {
+      output.writeRepeatedMessage(FieldNames.queuedCommands, queuedCommands);
+    }
+    if ((bitField0_ & 0x00000004) != 0) {
       output.writeRepeatedMessage(FieldNames.runningCommands, runningCommands);
     }
     output.endObject();
@@ -390,13 +493,26 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
     }
     while (!input.isAtEnd()) {
       switch (input.readFieldHash()) {
+        case 1958056841:
+        case -740797521:
+          {
+            if (input.isAtField(FieldNames.lastTimeMs)) {
+              if (!input.trySkipNullValue()) {
+                lastTimeMs = input.readDouble();
+                bitField0_ |= 0x00000001;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
         case -167160549:
         case -1904270380:
           {
             if (input.isAtField(FieldNames.queuedCommands)) {
               if (!input.trySkipNullValue()) {
                 input.readRepeatedMessage(queuedCommands);
-                bitField0_ |= 0x00000001;
+                bitField0_ |= 0x00000002;
               }
             } else {
               input.skipUnknownField();
@@ -409,7 +525,7 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
             if (input.isAtField(FieldNames.runningCommands)) {
               if (!input.trySkipNullValue()) {
                 input.readRepeatedMessage(runningCommands);
-                bitField0_ |= 0x00000002;
+                bitField0_ |= 0x00000004;
               }
             } else {
               input.skipUnknownField();
@@ -475,6 +591,8 @@ public final class ProtobufScheduler extends ProtoMessage<ProtobufScheduler> imp
 
   /** Contains name constants used for serializing JSON */
   static class FieldNames {
+    static final FieldName lastTimeMs = FieldName.forField("lastTimeMs", "last_time_ms");
+
     static final FieldName queuedCommands = FieldName.forField("queuedCommands", "queued_commands");
 
     static final FieldName runningCommands =

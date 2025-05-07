@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +29,7 @@ class SchedulerTest {
 
   @BeforeEach
   void setup() {
+    RobotController.setTimeSource(() -> System.nanoTime() / 1000L);
     scheduler = new Scheduler();
   }
 
@@ -577,6 +579,7 @@ class SchedulerTest {
     assertEquals(
         """
         {
+          "lastTimeMs": %s,
           "queuedCommands": [{
             "priority": 0,
             "id": %s,
@@ -587,6 +590,8 @@ class SchedulerTest {
             "name": "Command 2"
           }],
           "runningCommands": [{
+            "lastTimeMs": %s,
+            "totalTimeMs": %s,
             "priority": 0,
             "id": %s,
             "name": "Group",
@@ -594,6 +599,8 @@ class SchedulerTest {
               "name": "The Resource"
             }]
           }, {
+            "lastTimeMs": %s,
+            "totalTimeMs": %s,
             "priority": 0,
             "id": %s,
             "parentId": %s,
@@ -602,6 +609,8 @@ class SchedulerTest {
               "name": "The Resource"
             }]
           }, {
+            "lastTimeMs": %s,
+            "totalTimeMs": %s,
             "priority": 0,
             "id": %s,
             "parentId": %s,
@@ -610,6 +619,8 @@ class SchedulerTest {
               "name": "The Resource"
             }]
           }, {
+            "lastTimeMs": %s,
+            "totalTimeMs": %s,
             "priority": 0,
             "id": %s,
             "parentId": %s,
@@ -620,15 +631,33 @@ class SchedulerTest {
           }]
         }"""
             .formatted(
-                System.identityHashCode(scheduledCommand1), // id
-                System.identityHashCode(scheduledCommand2), // id
-                System.identityHashCode(group), // id
-                System.identityHashCode(c2Command), // id
-                System.identityHashCode(group), // parent
-                System.identityHashCode(c3Command), // id
-                System.identityHashCode(c2Command), // parent
-                System.identityHashCode(parkCommand), // id
-                System.identityHashCode(c3Command) // parent
+                // Scheduler data
+                scheduler.lastRuntimeMs(),
+
+                // On deck commands
+                scheduler.runId(scheduledCommand1),
+                scheduler.runId(scheduledCommand2),
+
+                // Running commands
+                scheduler.lastRuntimeMs(group),
+                scheduler.totalRuntimeMs(group),
+                scheduler.runId(group), // id
+                // top-level command, no parent ID
+
+                scheduler.lastRuntimeMs(c2Command),
+                scheduler.totalRuntimeMs(c2Command),
+                scheduler.runId(c2Command), // id
+                scheduler.runId(group), // parent
+
+                scheduler.lastRuntimeMs(c3Command),
+                scheduler.totalRuntimeMs(c3Command),
+                scheduler.runId(c3Command), // id
+                scheduler.runId(c2Command), // parent
+
+                scheduler.lastRuntimeMs(parkCommand),
+                scheduler.totalRuntimeMs(parkCommand),
+                scheduler.runId(parkCommand), // id
+                scheduler.runId(c3Command) // parent
                 ),
         messageJson);
   }

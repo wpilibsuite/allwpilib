@@ -4,9 +4,12 @@
 
 package org.wpilib.commands3;
 
+import static edu.wpi.first.units.Units.Microseconds;
+import static edu.wpi.first.units.Units.Milliseconds;
+
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
-import org.wpilib.commands3.proto.SchedulerProto;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,6 +22,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.wpilib.commands3.proto.SchedulerProto;
 
 /** Manages the lifecycles of {@link Coroutine}-based {@link Command Commands}. */
 public class Scheduler implements ProtobufSerializable {
@@ -46,7 +50,9 @@ public class Scheduler implements ProtobufSerializable {
   /** The scope for continuations to yield to. */
   private final ContinuationScope scope = new ContinuationScope("coroutine commands");
 
+  // Telemetry
   public static final SchedulerProto proto = new SchedulerProto();
+  private double lastRunTimeMs = -1;
 
   /** The default scheduler instance. */
   private static final Scheduler defaultScheduler = new Scheduler();
@@ -347,6 +353,8 @@ public class Scheduler implements ProtobufSerializable {
    * TimedRobot#robotPeriodic()}
    */
   public void run() {
+    long startMicros = RobotController.getTime();
+
     // Process triggers first; these tend to queue and cancel commands
     eventLoop.poll();
 
@@ -354,6 +362,9 @@ public class Scheduler implements ProtobufSerializable {
     promoteScheduledCommands();
     runCommands();
     scheduleDefaultCommands();
+
+    long endMicros = RobotController.getTime();
+    lastRunTimeMs = Milliseconds.convertFrom(endMicros - startMicros, Microseconds);
   }
 
   private void promoteScheduledCommands() {
@@ -405,11 +416,16 @@ public class Scheduler implements ProtobufSerializable {
 
     var previousState = currentState();
 
+    executingCommands.push(state);
+    long startMicros = RobotController.getTime();
     coroutine.mount();
     try {
-      executingCommands.push(state);
       coroutine.runToYieldPoint();
     } finally {
+      long endMicros = RobotController.getTime();
+      double elapsedMs = Milliseconds.convertFrom(endMicros - startMicros, Microseconds);
+      state.setLastRuntimeMs(elapsedMs);
+
       if (currentState() == state) {
         // Remove the command we just ran from the top of the stack
         executingCommands.pop();
@@ -583,5 +599,61 @@ public class Scheduler implements ProtobufSerializable {
       return null;
     }
     return state.parent();
+  }
+
+  /**
+   * Gets how long a command took to run in the previous cycle. If the command is not currently
+   * running, returns -1.
+   *
+   * @param command The command to check
+   * @return How long, in milliseconds, the command last took to execute.
+   */
+  public double lastRuntimeMs(Command command) {
+    if (commandStates.containsKey(command)) {
+      return commandStates.get(command).lastRuntimeMs();
+    } else {
+      return -1;
+    }
+  }
+
+  /**
+   * Gets how long a command has taken to run, in aggregate, since it was most recently scheduled.
+   * If the command is not currently running, returns -1.
+   *
+   * @param command The command to check
+   * @return How long, in milliseconds, the command has taken to execute in total
+   */
+  public double totalRuntimeMs(Command command) {
+    if (commandStates.containsKey(command)) {
+      return commandStates.get(command).totalRuntimeMs();
+    } else {
+      // Not running; no data
+      return -1;
+    }
+  }
+
+  public int runId(Command command) {
+    if (commandStates.containsKey(command)) {
+      return commandStates.get(command).id();
+    }
+
+    // Check scheduled commands
+    for (var scheduled : onDeck) {
+      if (scheduled.command() == command) {
+        return scheduled.id();
+      }
+    }
+
+    return 0;
+  }
+
+  /**
+   * Gets how long the scheduler took to process its most recent {@link #run()} invocation, in
+   * milliseconds. Defaults to -1 if the scheduler has not yet run.
+   *
+   * @return How long, in milliseconds, the scheduler last took to execute.
+   */
+  public double lastRuntimeMs() {
+    return lastRunTimeMs;
   }
 }

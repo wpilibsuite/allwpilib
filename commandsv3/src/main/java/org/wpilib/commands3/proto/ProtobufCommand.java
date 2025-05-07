@@ -15,6 +15,7 @@ import us.hebi.quickbuf.MessageFactory;
 import us.hebi.quickbuf.ProtoMessage;
 import us.hebi.quickbuf.ProtoSink;
 import us.hebi.quickbuf.ProtoSource;
+import us.hebi.quickbuf.ProtoUtil;
 import us.hebi.quickbuf.RepeatedMessage;
 import us.hebi.quickbuf.Utf8String;
 
@@ -23,19 +24,85 @@ import us.hebi.quickbuf.Utf8String;
 public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> implements Cloneable {
   private static final long serialVersionUID = 0L;
 
-  /** <code>optional int32 priority = 4;</code> */
+  /**
+   *
+   *
+   * <pre>
+   *  How much time the command took to execute in its most recent run.
+   *  Only included in a message for an actively running command.
+   * </pre>
+   *
+   * <code>optional double last_time_ms = 6;</code>
+   */
+  private double lastTimeMs;
+
+  /**
+   *
+   *
+   * <pre>
+   *  How long the command has taken to run, in aggregate.
+   *  Only included in a message for an actively running command.
+   * </pre>
+   *
+   * <code>optional double total_time_ms = 7;</code>
+   */
+  private double totalTimeMs;
+
+  /**
+   *
+   *
+   * <pre>
+   *  The priority level of the command.
+   * </pre>
+   *
+   * <code>optional int32 priority = 4;</code>
+   */
   private int priority;
 
-  /** <code>optional uint32 id = 1;</code> */
+  /**
+   *
+   *
+   * <pre>
+   *  A unique ID for the command.
+   *  Different invocations of the same command object have different IDs.
+   * </pre>
+   *
+   * <code>optional uint32 id = 1;</code>
+   */
   private int id;
 
-  /** <code>optional uint32 parent_id = 2;</code> */
+  /**
+   *
+   *
+   * <pre>
+   *  The ID of the parent command.
+   *  Not included in the message for top-level commands.
+   * </pre>
+   *
+   * <code>optional uint32 parent_id = 2;</code>
+   */
   private int parentId;
 
-  /** <code>optional string name = 3;</code> */
+  /**
+   *
+   *
+   * <pre>
+   *  The name of the command.
+   * </pre>
+   *
+   * <code>optional string name = 3;</code>
+   */
   private final Utf8String name = Utf8String.newEmptyInstance();
 
-  /** <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code> */
+  /**
+   *
+   *
+   * <pre>
+   *  The resources required by the command.
+   * </pre>
+   *
+   * <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code>
+   */
   private final RepeatedMessage<ProtobufRequireableResource> requirements =
       RepeatedMessage.newEmptyInstance(ProtobufRequireableResource.getFactory());
 
@@ -49,26 +116,182 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  How much time the command took to execute in its most recent run.
+   *  Only included in a message for an actively running command.
+   * </pre>
+   *
+   * <code>optional double last_time_ms = 6;</code>
+   *
+   * @return whether the lastTimeMs field is set
+   */
+  public boolean hasLastTimeMs() {
+    return (bitField0_ & 0x00000002) != 0;
+  }
+
+  /**
+   *
+   *
+   * <pre>
+   *  How much time the command took to execute in its most recent run.
+   *  Only included in a message for an actively running command.
+   * </pre>
+   *
+   * <code>optional double last_time_ms = 6;</code>
+   *
+   * @return this
+   */
+  public ProtobufCommand clearLastTimeMs() {
+    bitField0_ &= ~0x00000002;
+    lastTimeMs = 0D;
+    return this;
+  }
+
+  /**
+   *
+   *
+   * <pre>
+   *  How much time the command took to execute in its most recent run.
+   *  Only included in a message for an actively running command.
+   * </pre>
+   *
+   * <code>optional double last_time_ms = 6;</code>
+   *
+   * @return the lastTimeMs
+   */
+  public double getLastTimeMs() {
+    return lastTimeMs;
+  }
+
+  /**
+   *
+   *
+   * <pre>
+   *  How much time the command took to execute in its most recent run.
+   *  Only included in a message for an actively running command.
+   * </pre>
+   *
+   * <code>optional double last_time_ms = 6;</code>
+   *
+   * @param value the lastTimeMs to set
+   * @return this
+   */
+  public ProtobufCommand setLastTimeMs(final double value) {
+    bitField0_ |= 0x00000002;
+    lastTimeMs = value;
+    return this;
+  }
+
+  /**
+   *
+   *
+   * <pre>
+   *  How long the command has taken to run, in aggregate.
+   *  Only included in a message for an actively running command.
+   * </pre>
+   *
+   * <code>optional double total_time_ms = 7;</code>
+   *
+   * @return whether the totalTimeMs field is set
+   */
+  public boolean hasTotalTimeMs() {
+    return (bitField0_ & 0x00000001) != 0;
+  }
+
+  /**
+   *
+   *
+   * <pre>
+   *  How long the command has taken to run, in aggregate.
+   *  Only included in a message for an actively running command.
+   * </pre>
+   *
+   * <code>optional double total_time_ms = 7;</code>
+   *
+   * @return this
+   */
+  public ProtobufCommand clearTotalTimeMs() {
+    bitField0_ &= ~0x00000001;
+    totalTimeMs = 0D;
+    return this;
+  }
+
+  /**
+   *
+   *
+   * <pre>
+   *  How long the command has taken to run, in aggregate.
+   *  Only included in a message for an actively running command.
+   * </pre>
+   *
+   * <code>optional double total_time_ms = 7;</code>
+   *
+   * @return the totalTimeMs
+   */
+  public double getTotalTimeMs() {
+    return totalTimeMs;
+  }
+
+  /**
+   *
+   *
+   * <pre>
+   *  How long the command has taken to run, in aggregate.
+   *  Only included in a message for an actively running command.
+   * </pre>
+   *
+   * <code>optional double total_time_ms = 7;</code>
+   *
+   * @param value the totalTimeMs to set
+   * @return this
+   */
+  public ProtobufCommand setTotalTimeMs(final double value) {
+    bitField0_ |= 0x00000001;
+    totalTimeMs = value;
+    return this;
+  }
+
+  /**
+   *
+   *
+   * <pre>
+   *  The priority level of the command.
+   * </pre>
+   *
    * <code>optional int32 priority = 4;</code>
    *
    * @return whether the priority field is set
    */
   public boolean hasPriority() {
-    return (bitField0_ & 0x00000001) != 0;
+    return (bitField0_ & 0x00000008) != 0;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The priority level of the command.
+   * </pre>
+   *
    * <code>optional int32 priority = 4;</code>
    *
    * @return this
    */
   public ProtobufCommand clearPriority() {
-    bitField0_ &= ~0x00000001;
+    bitField0_ &= ~0x00000008;
     priority = 0;
     return this;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The priority level of the command.
+   * </pre>
+   *
    * <code>optional int32 priority = 4;</code>
    *
    * @return the priority
@@ -78,38 +301,65 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The priority level of the command.
+   * </pre>
+   *
    * <code>optional int32 priority = 4;</code>
    *
    * @param value the priority to set
    * @return this
    */
   public ProtobufCommand setPriority(final int value) {
-    bitField0_ |= 0x00000001;
+    bitField0_ |= 0x00000008;
     priority = value;
     return this;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  A unique ID for the command.
+   *  Different invocations of the same command object have different IDs.
+   * </pre>
+   *
    * <code>optional uint32 id = 1;</code>
    *
    * @return whether the id field is set
    */
   public boolean hasId() {
-    return (bitField0_ & 0x00000002) != 0;
+    return (bitField0_ & 0x00000010) != 0;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  A unique ID for the command.
+   *  Different invocations of the same command object have different IDs.
+   * </pre>
+   *
    * <code>optional uint32 id = 1;</code>
    *
    * @return this
    */
   public ProtobufCommand clearId() {
-    bitField0_ &= ~0x00000002;
+    bitField0_ &= ~0x00000010;
     id = 0;
     return this;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  A unique ID for the command.
+   *  Different invocations of the same command object have different IDs.
+   * </pre>
+   *
    * <code>optional uint32 id = 1;</code>
    *
    * @return the id
@@ -119,18 +369,32 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  A unique ID for the command.
+   *  Different invocations of the same command object have different IDs.
+   * </pre>
+   *
    * <code>optional uint32 id = 1;</code>
    *
    * @param value the id to set
    * @return this
    */
   public ProtobufCommand setId(final int value) {
-    bitField0_ |= 0x00000002;
+    bitField0_ |= 0x00000010;
     id = value;
     return this;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The ID of the parent command.
+   *  Not included in the message for top-level commands.
+   * </pre>
+   *
    * <code>optional uint32 parent_id = 2;</code>
    *
    * @return whether the parentId field is set
@@ -140,6 +404,13 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The ID of the parent command.
+   *  Not included in the message for top-level commands.
+   * </pre>
+   *
    * <code>optional uint32 parent_id = 2;</code>
    *
    * @return this
@@ -151,6 +422,13 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The ID of the parent command.
+   *  Not included in the message for top-level commands.
+   * </pre>
+   *
    * <code>optional uint32 parent_id = 2;</code>
    *
    * @return the parentId
@@ -160,6 +438,13 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The ID of the parent command.
+   *  Not included in the message for top-level commands.
+   * </pre>
+   *
    * <code>optional uint32 parent_id = 2;</code>
    *
    * @param value the parentId to set
@@ -172,26 +457,44 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The name of the command.
+   * </pre>
+   *
    * <code>optional string name = 3;</code>
    *
    * @return whether the name field is set
    */
   public boolean hasName() {
-    return (bitField0_ & 0x00000008) != 0;
+    return (bitField0_ & 0x00000020) != 0;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The name of the command.
+   * </pre>
+   *
    * <code>optional string name = 3;</code>
    *
    * @return this
    */
   public ProtobufCommand clearName() {
-    bitField0_ &= ~0x00000008;
+    bitField0_ &= ~0x00000020;
     name.clear();
     return this;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The name of the command.
+   * </pre>
+   *
    * <code>optional string name = 3;</code>
    *
    * @return the name
@@ -201,6 +504,12 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The name of the command.
+   * </pre>
+   *
    * <code>optional string name = 3;</code>
    *
    * @return internal {@code Utf8String} representation of name for reading
@@ -210,60 +519,96 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The name of the command.
+   * </pre>
+   *
    * <code>optional string name = 3;</code>
    *
    * @return internal {@code Utf8String} representation of name for modifications
    */
   public Utf8String getMutableNameBytes() {
-    bitField0_ |= 0x00000008;
+    bitField0_ |= 0x00000020;
     return this.name;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The name of the command.
+   * </pre>
+   *
    * <code>optional string name = 3;</code>
    *
    * @param value the name to set
    * @return this
    */
   public ProtobufCommand setName(final CharSequence value) {
-    bitField0_ |= 0x00000008;
+    bitField0_ |= 0x00000020;
     name.copyFrom(value);
     return this;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The name of the command.
+   * </pre>
+   *
    * <code>optional string name = 3;</code>
    *
    * @param value the name to set
    * @return this
    */
   public ProtobufCommand setName(final Utf8String value) {
-    bitField0_ |= 0x00000008;
+    bitField0_ |= 0x00000020;
     name.copyFrom(value);
     return this;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The resources required by the command.
+   * </pre>
+   *
    * <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code>
    *
    * @return whether the requirements field is set
    */
   public boolean hasRequirements() {
-    return (bitField0_ & 0x00000010) != 0;
+    return (bitField0_ & 0x00000040) != 0;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The resources required by the command.
+   * </pre>
+   *
    * <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code>
    *
    * @return this
    */
   public ProtobufCommand clearRequirements() {
-    bitField0_ &= ~0x00000010;
+    bitField0_ &= ~0x00000040;
     requirements.clear();
     return this;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The resources required by the command.
+   * </pre>
+   *
    * <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code> This method
    * returns the internal storage object without modifying any has state. The returned object should
    * not be modified and be treated as read-only.
@@ -277,6 +622,12 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The resources required by the command.
+   * </pre>
+   *
    * <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code> This method
    * returns the internal storage object and sets the corresponding has state. The returned object
    * will become part of this message and its contents may be modified as long as the has state is
@@ -285,30 +636,42 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
    * @return internal storage object for modifications
    */
   public RepeatedMessage<ProtobufRequireableResource> getMutableRequirements() {
-    bitField0_ |= 0x00000010;
+    bitField0_ |= 0x00000040;
     return requirements;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The resources required by the command.
+   * </pre>
+   *
    * <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code>
    *
    * @param value the requirements to add
    * @return this
    */
   public ProtobufCommand addRequirements(final ProtobufRequireableResource value) {
-    bitField0_ |= 0x00000010;
+    bitField0_ |= 0x00000040;
     requirements.add(value);
     return this;
   }
 
   /**
+   *
+   *
+   * <pre>
+   *  The resources required by the command.
+   * </pre>
+   *
    * <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code>
    *
    * @param values the requirements to add
    * @return this
    */
   public ProtobufCommand addAllRequirements(final ProtobufRequireableResource... values) {
-    bitField0_ |= 0x00000010;
+    bitField0_ |= 0x00000040;
     requirements.addAll(values);
     return this;
   }
@@ -318,6 +681,8 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
     cachedSize = other.cachedSize;
     if ((bitField0_ | other.bitField0_) != 0) {
       bitField0_ = other.bitField0_;
+      lastTimeMs = other.lastTimeMs;
+      totalTimeMs = other.totalTimeMs;
       priority = other.priority;
       id = other.id;
       parentId = other.parentId;
@@ -333,6 +698,12 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
       return this;
     }
     cachedSize = -1;
+    if (other.hasLastTimeMs()) {
+      setLastTimeMs(other.lastTimeMs);
+    }
+    if (other.hasTotalTimeMs()) {
+      setTotalTimeMs(other.totalTimeMs);
+    }
     if (other.hasPriority()) {
       setPriority(other.priority);
     }
@@ -358,6 +729,8 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
     }
     cachedSize = -1;
     bitField0_ = 0;
+    lastTimeMs = 0D;
+    totalTimeMs = 0D;
     priority = 0;
     id = 0;
     parentId = 0;
@@ -388,6 +761,8 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
     }
     ProtobufCommand other = (ProtobufCommand) o;
     return bitField0_ == other.bitField0_
+        && (!hasLastTimeMs() || ProtoUtil.isEqual(lastTimeMs, other.lastTimeMs))
+        && (!hasTotalTimeMs() || ProtoUtil.isEqual(totalTimeMs, other.totalTimeMs))
         && (!hasPriority() || priority == other.priority)
         && (!hasId() || id == other.id)
         && (!hasParentId() || parentId == other.parentId)
@@ -397,11 +772,19 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
 
   @Override
   public void writeTo(final ProtoSink output) throws IOException {
+    if ((bitField0_ & 0x00000002) != 0) {
+      output.writeRawByte((byte) 49);
+      output.writeDoubleNoTag(lastTimeMs);
+    }
     if ((bitField0_ & 0x00000001) != 0) {
+      output.writeRawByte((byte) 57);
+      output.writeDoubleNoTag(totalTimeMs);
+    }
+    if ((bitField0_ & 0x00000008) != 0) {
       output.writeRawByte((byte) 32);
       output.writeInt32NoTag(priority);
     }
-    if ((bitField0_ & 0x00000002) != 0) {
+    if ((bitField0_ & 0x00000010) != 0) {
       output.writeRawByte((byte) 8);
       output.writeUInt32NoTag(id);
     }
@@ -409,11 +792,11 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
       output.writeRawByte((byte) 16);
       output.writeUInt32NoTag(parentId);
     }
-    if ((bitField0_ & 0x00000008) != 0) {
+    if ((bitField0_ & 0x00000020) != 0) {
       output.writeRawByte((byte) 26);
       output.writeStringNoTag(name);
     }
-    if ((bitField0_ & 0x00000010) != 0) {
+    if ((bitField0_ & 0x00000040) != 0) {
       for (int i = 0; i < requirements.length(); i++) {
         output.writeRawByte((byte) 42);
         output.writeMessageNoTag(requirements.get(i));
@@ -424,19 +807,25 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
   @Override
   protected int computeSerializedSize() {
     int size = 0;
+    if ((bitField0_ & 0x00000002) != 0) {
+      size += 9;
+    }
     if ((bitField0_ & 0x00000001) != 0) {
+      size += 9;
+    }
+    if ((bitField0_ & 0x00000008) != 0) {
       size += 1 + ProtoSink.computeInt32SizeNoTag(priority);
     }
-    if ((bitField0_ & 0x00000002) != 0) {
+    if ((bitField0_ & 0x00000010) != 0) {
       size += 1 + ProtoSink.computeUInt32SizeNoTag(id);
     }
     if ((bitField0_ & 0x00000004) != 0) {
       size += 1 + ProtoSink.computeUInt32SizeNoTag(parentId);
     }
-    if ((bitField0_ & 0x00000008) != 0) {
+    if ((bitField0_ & 0x00000020) != 0) {
       size += 1 + ProtoSink.computeStringSizeNoTag(name);
     }
-    if ((bitField0_ & 0x00000010) != 0) {
+    if ((bitField0_ & 0x00000040) != 0) {
       size += (1 * requirements.length()) + ProtoSink.computeRepeatedMessageSizeNoTag(requirements);
     }
     return size;
@@ -449,11 +838,31 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
     int tag = input.readTag();
     while (true) {
       switch (tag) {
+        case 49:
+          {
+            // lastTimeMs
+            lastTimeMs = input.readDouble();
+            bitField0_ |= 0x00000002;
+            tag = input.readTag();
+            if (tag != 57) {
+              break;
+            }
+          }
+        case 57:
+          {
+            // totalTimeMs
+            totalTimeMs = input.readDouble();
+            bitField0_ |= 0x00000001;
+            tag = input.readTag();
+            if (tag != 32) {
+              break;
+            }
+          }
         case 32:
           {
             // priority
             priority = input.readInt32();
-            bitField0_ |= 0x00000001;
+            bitField0_ |= 0x00000008;
             tag = input.readTag();
             if (tag != 8) {
               break;
@@ -463,7 +872,7 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
           {
             // id
             id = input.readUInt32();
-            bitField0_ |= 0x00000002;
+            bitField0_ |= 0x00000010;
             tag = input.readTag();
             if (tag != 16) {
               break;
@@ -483,7 +892,7 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
           {
             // name
             input.readString(name);
-            bitField0_ |= 0x00000008;
+            bitField0_ |= 0x00000020;
             tag = input.readTag();
             if (tag != 42) {
               break;
@@ -493,7 +902,7 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
           {
             // requirements
             tag = input.readRepeatedMessage(requirements, tag);
-            bitField0_ |= 0x00000010;
+            bitField0_ |= 0x00000040;
             if (tag != 0) {
               break;
             }
@@ -517,19 +926,25 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
   @Override
   public void writeTo(final JsonSink output) throws IOException {
     output.beginObject();
+    if ((bitField0_ & 0x00000002) != 0) {
+      output.writeDouble(FieldNames.lastTimeMs, lastTimeMs);
+    }
     if ((bitField0_ & 0x00000001) != 0) {
+      output.writeDouble(FieldNames.totalTimeMs, totalTimeMs);
+    }
+    if ((bitField0_ & 0x00000008) != 0) {
       output.writeInt32(FieldNames.priority, priority);
     }
-    if ((bitField0_ & 0x00000002) != 0) {
+    if ((bitField0_ & 0x00000010) != 0) {
       output.writeUInt32(FieldNames.id, id);
     }
     if ((bitField0_ & 0x00000004) != 0) {
       output.writeUInt32(FieldNames.parentId, parentId);
     }
-    if ((bitField0_ & 0x00000008) != 0) {
+    if ((bitField0_ & 0x00000020) != 0) {
       output.writeString(FieldNames.name, name);
     }
-    if ((bitField0_ & 0x00000010) != 0) {
+    if ((bitField0_ & 0x00000040) != 0) {
       output.writeRepeatedMessage(FieldNames.requirements, requirements);
     }
     output.endObject();
@@ -542,12 +957,38 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
     }
     while (!input.isAtEnd()) {
       switch (input.readFieldHash()) {
+        case 1958056841:
+        case -740797521:
+          {
+            if (input.isAtField(FieldNames.lastTimeMs)) {
+              if (!input.trySkipNullValue()) {
+                lastTimeMs = input.readDouble();
+                bitField0_ |= 0x00000002;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+        case -717217353:
+        case 1006112349:
+          {
+            if (input.isAtField(FieldNames.totalTimeMs)) {
+              if (!input.trySkipNullValue()) {
+                totalTimeMs = input.readDouble();
+                bitField0_ |= 0x00000001;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
         case -1165461084:
           {
             if (input.isAtField(FieldNames.priority)) {
               if (!input.trySkipNullValue()) {
                 priority = input.readInt32();
-                bitField0_ |= 0x00000001;
+                bitField0_ |= 0x00000008;
               }
             } else {
               input.skipUnknownField();
@@ -559,7 +1000,7 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
             if (input.isAtField(FieldNames.id)) {
               if (!input.trySkipNullValue()) {
                 id = input.readUInt32();
-                bitField0_ |= 0x00000002;
+                bitField0_ |= 0x00000010;
               }
             } else {
               input.skipUnknownField();
@@ -584,7 +1025,7 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
             if (input.isAtField(FieldNames.name)) {
               if (!input.trySkipNullValue()) {
                 input.readString(name);
-                bitField0_ |= 0x00000008;
+                bitField0_ |= 0x00000020;
               }
             } else {
               input.skipUnknownField();
@@ -596,7 +1037,7 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
             if (input.isAtField(FieldNames.requirements)) {
               if (!input.trySkipNullValue()) {
                 input.readRepeatedMessage(requirements);
-                bitField0_ |= 0x00000010;
+                bitField0_ |= 0x00000040;
               }
             } else {
               input.skipUnknownField();
@@ -661,6 +1102,10 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
 
   /** Contains name constants used for serializing JSON */
   static class FieldNames {
+    static final FieldName lastTimeMs = FieldName.forField("lastTimeMs", "last_time_ms");
+
+    static final FieldName totalTimeMs = FieldName.forField("totalTimeMs", "total_time_ms");
+
     static final FieldName priority = FieldName.forField("priority");
 
     static final FieldName id = FieldName.forField("id");

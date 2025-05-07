@@ -133,6 +133,12 @@ subsystems; a command at a particular index may require different subsystems tha
 command at that same index that’s running at a later point in time, making data analysis in
 AdvantageScope difficult since we can’t rely on consistent ordering.
 
+Telemetry will send lists of the on-deck and running commands. Commands in those lists will appear
+as an ID number, parent command ID (if any; top level commands have no parent), name, names of
+the required resources, priority level, last time to process, and total processing time. Separate
+runs of the same command object have different ID numbers and processing time data. The total time
+spent in the scheduler loop will also be included, but not the aggregate total of _all_ loops.
+
 ## Non-Goals
 
 ### Preemptive Multitasking
@@ -304,14 +310,14 @@ caused by loop timings for deeply nested commands.
 
 Scheduler state is serialized using protobuf. The scheduler will send a list of the currently queued
 commands and a list of the current running commands. Commands are serialized as (id: uint32,
-parent_id: uint32, name: string, priority: int32, required_resources: string array). Consumers can
-use the `id` and `parent_id` attributes to reconstruct the tree structure, if desired. `id` and
-`parent_id` marginally increase the size of serialized data, but make the schema and deserialization
-quite simple.
+parent_id: uint32, name: string, priority: int32, required_resources: string array,
+last_time_ms: double, total_time_ms: double). Consumers can use the `id` and `parent_id` attributes 
+to reconstruct the tree structure, if desired. `id` and `parent_id` marginally increase the size of
+serialized data, but make the schema and deserialization quite simple.
 
 Command IDs are the Java system identity hashcode (_not_ object hashcode, which can be overridden
-and be identical for different command objects). If a command has no parent, its parent ID will be
-set to zero.
+and be identical for different command objects). If a command has no parent, no parent ID will
+appear in its message.
 
 Records in the serialized output will be ordered by scheduling order. As a result, child commands
 will always appear _after_ their parent.
@@ -329,10 +335,10 @@ Command theCommand() {
 }
 ```
 
-Telemetry for the scheduler would look like:
+Telemetry for commands in the scheduler would look like:
 
-| `id`   | `parent_id` | `name`                    | `priority` | `required_resources` |
-|--------|-------------|---------------------------|------------|----------------------|
-| 347123 | 0           | "(Command 1 & Command 2)" | 2          | ["R1", "R2"]         |
-| 998712 | 347123      | "Command 1"               | 1          | ["R1"]               |
-| 591564 | 347123      | "Command 2"               | 2          | ["R2"]               |
+| `id`   | `parent_id` | `name`                    | `priority` | `required_resources` | `last_time_ms` | `total_time_ms` |
+|--------|-------------|---------------------------|------------|----------------------|----------------|-----------------|
+| 347123 | --          | "(Command 1 & Command 2)" | 2          | ["R1", "R2"]         | 0.210          | 5.122           |
+| 998712 | 347123      | "Command 1"               | 1          | ["R1"]               | 0.051          | 1.241           |
+| 591564 | 347123      | "Command 2"               | 2          | ["R2"]               | 0.108          | 3.249           |

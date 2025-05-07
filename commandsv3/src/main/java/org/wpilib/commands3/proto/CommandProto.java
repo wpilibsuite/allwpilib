@@ -9,6 +9,7 @@ import org.wpilib.commands3.Command;
 import org.wpilib.commands3.Scheduler;
 import us.hebi.quickbuf.Descriptors;
 
+/** Protobuf serde for running commands. */
 public class CommandProto implements Protobuf<Command, ProtobufCommand> {
   private final Scheduler scheduler;
 
@@ -38,20 +39,24 @@ public class CommandProto implements Protobuf<Command, ProtobufCommand> {
   }
 
   @Override
-  public void pack(ProtobufCommand msg, Command value) {
-    // Use identityHashCode for ID fields. Object hashCode can be overridden and collide
-    msg.setId(System.identityHashCode(value));
-    if (scheduler.getParentOf(value) instanceof Command parent) {
-      msg.setParentId(System.identityHashCode(parent));
+  public void pack(ProtobufCommand msg, Command command) {
+    msg.setId(scheduler.runId(command));
+    if (scheduler.getParentOf(command) instanceof Command parent) {
+      msg.setParentId(scheduler.runId(parent));
     }
-    msg.setName(value.name());
-    msg.setPriority(value.priority());
+    msg.setName(command.name());
+    msg.setPriority(command.priority());
 
-    for (var requirement : value.requirements()) {
+    for (var requirement : command.requirements()) {
       var rrp = new RequireableResourceProto();
       ProtobufRequireableResource requirementMessage = rrp.createMessage();
       rrp.pack(requirementMessage, requirement);
       msg.addRequirements(requirementMessage);
+    }
+
+    if (scheduler.isRunning(command)) {
+      msg.setLastTimeMs(scheduler.lastRuntimeMs(command));
+      msg.setTotalTimeMs(scheduler.totalRuntimeMs(command));
     }
   }
 }

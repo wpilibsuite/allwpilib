@@ -44,5 +44,7 @@ public class SchedulerProto implements Protobuf<Scheduler, ProtobufScheduler> {
       cp.pack(commandMessage, command);
       msg.addRunningCommands(commandMessage);
     }
+
+    msg.setLastTimeMs(scheduler.lastRuntimeMs());
   }
 }
