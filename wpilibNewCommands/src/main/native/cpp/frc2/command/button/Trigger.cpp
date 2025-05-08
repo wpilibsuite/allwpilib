@@ -15,8 +15,10 @@ using namespace frc2;
 
 Trigger::Trigger(const Trigger& other) = default;
 
-void Trigger::AddBinding(wpi::unique_function<void(bool, bool)>&& body) {
-  m_loop->Bind([condition = m_condition, previous = m_condition(),
+void Trigger::AddBinding(wpi::unique_function<void(bool, bool)>&& body,
+                         InitialState initialState) {
+  m_loop->Bind([condition = m_condition,
+                previous = GetInitialState(initialState),
                 body = std::move(body)]() mutable {
     bool current = condition();
 
@@ -26,153 +28,182 @@ void Trigger::AddBinding(wpi::unique_function<void(bool, bool)>&& body) {
   });
 }
 
-Trigger Trigger::OnChange(Command* command) {
-  AddBinding([command](bool previous, bool current) {
-    if (previous != current) {
-      command->Schedule();
-    }
-  });
+Trigger Trigger::OnChange(Command* command, InitialState initialState) {
+  AddBinding(
+      [command](bool previous, bool current) {
+        if (previous != current) {
+          command->Schedule();
+        }
+      },
+      initialState);
   return *this;
 }
 
-Trigger Trigger::OnChange(CommandPtr&& command) {
-  AddBinding([command = std::move(command)](bool previous, bool current) {
-    if (previous != current) {
-      command.Schedule();
-    }
-  });
+Trigger Trigger::OnChange(CommandPtr&& command, InitialState initialState) {
+  AddBinding(
+      [command = std::move(command)](bool previous, bool current) {
+        if (previous != current) {
+          command.Schedule();
+        }
+      },
+      initialState);
   return *this;
 }
 
-Trigger Trigger::OnTrue(Command* command) {
-  AddBinding([command](bool previous, bool current) {
-    if (!previous && current) {
-      command->Schedule();
-    }
-  });
+Trigger Trigger::OnTrue(Command* command, InitialState initialState) {
+  AddBinding(
+      [command](bool previous, bool current) {
+        if (!previous && current) {
+          command->Schedule();
+        }
+      },
+      initialState);
   return *this;
 }
 
-Trigger Trigger::OnTrue(CommandPtr&& command) {
-  AddBinding([command = std::move(command)](bool previous, bool current) {
-    if (!previous && current) {
-      command.Schedule();
-    }
-  });
+Trigger Trigger::OnTrue(CommandPtr&& command, InitialState initialState) {
+  AddBinding(
+      [command = std::move(command)](bool previous, bool current) {
+        if (!previous && current) {
+          command.Schedule();
+        }
+      },
+      initialState);
   return *this;
 }
 
-Trigger Trigger::OnFalse(Command* command) {
-  AddBinding([command](bool previous, bool current) {
-    if (previous && !current) {
-      command->Schedule();
-    }
-  });
+Trigger Trigger::OnFalse(Command* command, InitialState initialState) {
+  AddBinding(
+      [command](bool previous, bool current) {
+        if (previous && !current) {
+          command->Schedule();
+        }
+      },
+      initialState);
   return *this;
 }
 
-Trigger Trigger::OnFalse(CommandPtr&& command) {
-  AddBinding([command = std::move(command)](bool previous, bool current) {
-    if (previous && !current) {
-      command.Schedule();
-    }
-  });
+Trigger Trigger::OnFalse(CommandPtr&& command, InitialState initialState) {
+  AddBinding(
+      [command = std::move(command)](bool previous, bool current) {
+        if (previous && !current) {
+          command.Schedule();
+        }
+      },
+      initialState);
   return *this;
 }
 
-Trigger Trigger::WhileTrue(Command* command) {
-  AddBinding([command](bool previous, bool current) {
-    if (!previous && current) {
-      command->Schedule();
-    } else if (previous && !current) {
-      command->Cancel();
-    }
-  });
+Trigger Trigger::WhileTrue(Command* command, InitialState initialState) {
+  AddBinding(
+      [command](bool previous, bool current) {
+        if (!previous && current) {
+          command->Schedule();
+        } else if (previous && !current) {
+          command->Cancel();
+        }
+      },
+      initialState);
   return *this;
 }
 
-Trigger Trigger::WhileTrue(CommandPtr&& command) {
-  AddBinding([command = std::move(command)](bool previous, bool current) {
-    if (!previous && current) {
-      command.Schedule();
-    } else if (previous && !current) {
-      command.Cancel();
-    }
-  });
+Trigger Trigger::WhileTrue(CommandPtr&& command, InitialState initialState) {
+  AddBinding(
+      [command = std::move(command)](bool previous, bool current) {
+        if (!previous && current) {
+          command.Schedule();
+        } else if (previous && !current) {
+          command.Cancel();
+        }
+      },
+      initialState);
   return *this;
 }
 
-Trigger Trigger::WhileFalse(Command* command) {
-  AddBinding([command](bool previous, bool current) {
-    if (previous && !current) {
-      command->Schedule();
-    } else if (!previous && current) {
-      command->Cancel();
-    }
-  });
+Trigger Trigger::WhileFalse(Command* command, InitialState initialState) {
+  AddBinding(
+      [command](bool previous, bool current) {
+        if (previous && !current) {
+          command->Schedule();
+        } else if (!previous && current) {
+          command->Cancel();
+        }
+      },
+      initialState);
   return *this;
 }
 
-Trigger Trigger::WhileFalse(CommandPtr&& command) {
-  AddBinding([command = std::move(command)](bool previous, bool current) {
-    if (!previous && current) {
-      command.Schedule();
-    } else if (previous && !current) {
-      command.Cancel();
-    }
-  });
+Trigger Trigger::WhileFalse(CommandPtr&& command, InitialState initialState) {
+  AddBinding(
+      [command = std::move(command)](bool previous, bool current) {
+        if (!previous && current) {
+          command.Schedule();
+        } else if (previous && !current) {
+          command.Cancel();
+        }
+      },
+      initialState);
   return *this;
 }
 
-Trigger Trigger::ToggleOnTrue(Command* command) {
-  AddBinding([command](bool previous, bool current) {
-    if (!previous && current) {
-      if (command->IsScheduled()) {
-        command->Cancel();
-      } else {
-        command->Schedule();
-      }
-    }
-  });
+Trigger Trigger::ToggleOnTrue(Command* command, InitialState initialState) {
+  AddBinding(
+      [command](bool previous, bool current) {
+        if (!previous && current) {
+          if (command->IsScheduled()) {
+            command->Cancel();
+          } else {
+            command->Schedule();
+          }
+        }
+      },
+      initialState);
   return *this;
 }
 
-Trigger Trigger::ToggleOnTrue(CommandPtr&& command) {
-  AddBinding([command = std::move(command)](bool previous, bool current) {
-    if (!previous && current) {
-      if (command.IsScheduled()) {
-        command.Cancel();
-      } else {
-        command.Schedule();
-      }
-    }
-  });
+Trigger Trigger::ToggleOnTrue(CommandPtr&& command, InitialState initialState) {
+  AddBinding(
+      [command = std::move(command)](bool previous, bool current) {
+        if (!previous && current) {
+          if (command.IsScheduled()) {
+            command.Cancel();
+          } else {
+            command.Schedule();
+          }
+        }
+      },
+      initialState);
   return *this;
 }
 
-Trigger Trigger::ToggleOnFalse(Command* command) {
-  AddBinding([command](bool previous, bool current) {
-    if (previous && !current) {
-      if (command->IsScheduled()) {
-        command->Cancel();
-      } else {
-        command->Schedule();
-      }
-    }
-  });
+Trigger Trigger::ToggleOnFalse(Command* command, InitialState initialState) {
+  AddBinding(
+      [command](bool previous, bool current) {
+        if (previous && !current) {
+          if (command->IsScheduled()) {
+            command->Cancel();
+          } else {
+            command->Schedule();
+          }
+        }
+      },
+      initialState);
   return *this;
 }
 
-Trigger Trigger::ToggleOnFalse(CommandPtr&& command) {
-  AddBinding([command = std::move(command)](bool previous, bool current) {
-    if (previous && !current) {
-      if (command.IsScheduled()) {
-        command.Cancel();
-      } else {
-        command.Schedule();
-      }
-    }
-  });
+Trigger Trigger::ToggleOnFalse(CommandPtr&& command,
+                               InitialState initialState) {
+  AddBinding(
+      [command = std::move(command)](bool previous, bool current) {
+        if (previous && !current) {
+          if (command.IsScheduled()) {
+            command.Cancel();
+          } else {
+            command.Schedule();
+          }
+        }
+      },
+      initialState);
   return *this;
 }
 
