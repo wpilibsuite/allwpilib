@@ -720,14 +720,14 @@ class BooleanLogEntry : public DataLogValueEntryImpl<bool> {
  */
 class IntegerLogEntry : public DataLogValueEntryImpl<int64_t> {
  public:
-  static constexpr std::string_view dATA_TYPE = "int64";
+  static constexpr std::string_view DATA_TYPE = "int64";
 
   IntegerLogEntry() = default;
   IntegerLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
       : IntegerLogEntry{log, name, {}, timestamp} {}
   IntegerLogEntry(DataLog& log, std::string_view name,
                   std::string_view metadata, int64_t timestamp = 0)
-      : DataLogValueEntryImpl{log, name, dATA_TYPE, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, DATA_TYPE, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
