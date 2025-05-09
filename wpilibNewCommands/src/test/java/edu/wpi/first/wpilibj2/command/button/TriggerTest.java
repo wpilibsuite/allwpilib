@@ -12,7 +12,6 @@ import static org.mockito.Mockito.verify;
 
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.CommandTestBase;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -26,7 +25,6 @@ import org.junit.jupiter.api.Test;
 class TriggerTest extends CommandTestBase {
   @Test
   void onTrueTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicBoolean finished = new AtomicBoolean(false);
     Command command1 = new WaitUntilCommand(finished::get);
 
@@ -45,7 +43,6 @@ class TriggerTest extends CommandTestBase {
 
   @Test
   void onFalseTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicBoolean finished = new AtomicBoolean(false);
     Command command1 = new WaitUntilCommand(finished::get);
 
@@ -64,7 +61,6 @@ class TriggerTest extends CommandTestBase {
 
   @Test
   void onChangeTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicBoolean finished = new AtomicBoolean(false);
     Command command1 = new WaitUntilCommand(finished::get);
 
@@ -90,7 +86,6 @@ class TriggerTest extends CommandTestBase {
 
   @Test
   void whileTrueRepeatedlyTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicInteger inits = new AtomicInteger(0);
     AtomicInteger counter = new AtomicInteger(0);
     // the repeatedly() here is the point!
@@ -121,7 +116,6 @@ class TriggerTest extends CommandTestBase {
 
   @Test
   void whileTrueLambdaRunTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicInteger counter = new AtomicInteger(0);
     // the repeatedly() here is the point!
     Command command1 = new RunCommand(counter::incrementAndGet);
@@ -143,7 +137,6 @@ class TriggerTest extends CommandTestBase {
 
   @Test
   void whileTrueOnceTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicInteger startCounter = new AtomicInteger(0);
     AtomicInteger endCounter = new AtomicInteger(0);
     Command command1 =
@@ -168,7 +161,6 @@ class TriggerTest extends CommandTestBase {
 
   @Test
   void toggleOnTrueTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicInteger startCounter = new AtomicInteger(0);
     AtomicInteger endCounter = new AtomicInteger(0);
     Command command1 =
@@ -197,7 +189,6 @@ class TriggerTest extends CommandTestBase {
 
   @Test
   void cancelWhenActiveTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     AtomicInteger startCounter = new AtomicInteger(0);
     AtomicInteger endCounter = new AtomicInteger(0);
 
@@ -247,7 +238,6 @@ class TriggerTest extends CommandTestBase {
 
   @Test
   void debounceTest() {
-    CommandScheduler scheduler = CommandScheduler.getInstance();
     MockCommandHolder commandHolder = new MockCommandHolder(true);
     Command command = commandHolder.getMock();
 
