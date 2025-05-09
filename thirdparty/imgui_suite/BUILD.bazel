@@ -1,0 +1,356 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
+
+cc_library(
+    name = "gl3w",
+    srcs = ["generated/gl3w/src/gl3w.c"],
+    hdrs = [
+        "generated/gl3w/include/GL/gl3w.h",
+        "generated/gl3w/include/GL/glcorearb.h",
+        "generated/gl3w/include/KHR/khrplatform.h",
+    ],
+    includes = [
+        "generated/gl3w/include",
+    ],
+    strip_include_prefix = "generated/gl3w/include",
+)
+
+cc_library(
+    name = "fonts",
+    srcs = glob(["generated/fonts/src/**"]),
+    hdrs = glob(["generated/fonts/include/**"]),
+    includes = ["generated/fonts/include"],
+    deps = [
+        ":imgui",
+    ],
+)
+
+py_binary(
+    name = "gl3w_gen",
+    srcs = ["gl3w/gl3w_gen.py"],
+    tags = ["manual"],
+)
+
+#----------------------------------------
+# GLFW
+#----------------------------------------
+
+COMMON_SOURCES = [
+    "glfw/src/internal.h",
+    "glfw/src/platform.h",
+    "glfw/src/mappings.h",
+    "glfw/src/context.c",
+    "glfw/src/init.c",
+    "glfw/src/input.c",
+    "glfw/src/monitor.c",
+    "glfw/src/platform.c",
+    "glfw/src/vulkan.c",
+    "glfw/src/window.c",
+    "glfw/src/egl_context.c",
+    "glfw/src/osmesa_context.c",
+    "glfw/src/null_platform.h",
+    "glfw/src/null_joystick.h",
+    "glfw/src/null_init.c",
+    "glfw/src/null_monitor.c",
+    "glfw/src/null_window.c",
+    "glfw/src/null_joystick.c",
+] + [
+]
+
+############################
+# Linux
+############################
+
+LINUX_DEFINES = ["_GLFW_X11"]
+
+LINUX_LINKOPTS = []
+
+LINUX_SOURCES = COMMON_SOURCES + [
+    "glfw/src/posix_time.h",
+    "glfw/src/posix_thread.h",
+    "glfw/src/posix_module.c",
+    "glfw/src/posix_time.c",
+    "glfw/src/posix_thread.c",
+    "glfw/src/x11_platform.h",
+    "glfw/src/xkb_unicode.h",
+    "glfw/src/x11_init.c",
+    "glfw/src/x11_monitor.c",
+    "glfw/src/x11_window.c",
+    "glfw/src/xkb_unicode.c",
+    "glfw/src/glx_context.c",
+    "glfw/src/linux_joystick.h",
+    "glfw/src/linux_joystick.c",
+    "glfw/src/posix_poll.h",
+    "glfw/src/posix_poll.c",
+]
+
+############################
+# Windows
+############################
+
+WINDOWS_DEFINES = [
+    "_GLFW_WIN32",
+    "GLFW_INVALID_CODEPOINT",
+]
+
+WINDOWS_LINKOPTS = [
+    "-DEFAULTLIB:user32.lib",
+    "-DEFAULTLIB:gdi32.lib",
+    "-DEFAULTLIB:shell32.lib",
+]
+
+WINDOWS_SOURCES = COMMON_SOURCES + [
+    "glfw/src/win32_time.h",
+    "glfw/src/win32_thread.h",
+    "glfw/src/win32_module.c",
+    "glfw/src/win32_time.c",
+    "glfw/src/win32_thread.c",
+    "glfw/src/win32_platform.h",
+    "glfw/src/win32_joystick.h",
+    "glfw/src/win32_init.c",
+    "glfw/src/win32_joystick.c",
+    "glfw/src/win32_monitor.c",
+    "glfw/src/win32_window.c",
+    "glfw/src/wgl_context.c",
+]
+
+############################
+# Mac
+############################
+DARWIN_DEFINES = [
+    "_GLFW_COCOA",
+    "_GLFW_NSGL",
+    "_GLFW_NO_DLOAD_WINMM",
+    "_GLFW_USE_OPENGL",
+]
+
+DARWIN_LINKOPTS = []
+
+DARWIN_SOURCES = COMMON_SOURCES + [
+    "glfw/src/cocoa_time.h",
+    "glfw/src/cocoa_time.c",
+    "glfw/src/posix_thread.h",
+    "glfw/src/posix_module.c",
+    "glfw/src/posix_thread.c",
+    "glfw/src/cocoa_platform.h",
+    "glfw/src/cocoa_joystick.h",
+    "glfw/src/cocoa_init.m",
+    "glfw/src/cocoa_joystick.m",
+    "glfw/src/cocoa_monitor.m",
+    "glfw/src/cocoa_window.m",
+    "glfw/src/nsgl_context.m",
+]
+
+cc_library(
+    name = "glfw_hdrs",
+    hdrs = [
+        "glfw/include/GLFW/glfw3.h",
+        "glfw/include/GLFW/glfw3native.h",
+    ],
+    includes = [
+        "glfw/include",
+    ],
+    strip_include_prefix = "glfw/include",
+)
+
+cc_library(
+    name = "glfw_src",
+    srcs = select({
+        "@bazel_tools//src/conditions:windows": WINDOWS_SOURCES,
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_SOURCES,
+    }),
+    defines = select({
+        "@bazel_tools//src/conditions:windows": WINDOWS_DEFINES,
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_DEFINES,
+    }),
+    tags = ["manual"],
+    deps = [
+        ":glfw_hdrs",
+    ],
+)
+
+wpilib_objc_library(
+    name = "glfw_src_darwin",
+    srcs = DARWIN_SOURCES,
+    copts = [
+        "-fno-objc-arc",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-Wno-unused-command-line-argument",
+    ],
+    defines = DARWIN_DEFINES + ["GLFW_INVALID_CODEPOINT"],
+    include_arc = False,
+    is_cpp = False,
+    deps = [
+        ":glfw_hdrs",
+    ],
+)
+
+cc_library(
+    name = "glfw",
+    linkopts = select({
+        "@bazel_tools//src/conditions:darwin": DARWIN_LINKOPTS,
+        "@bazel_tools//src/conditions:windows": WINDOWS_LINKOPTS,
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_LINKOPTS,
+    }),
+    linkstatic = True,
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    visibility = ["//thirdparty/imgui_suite:__subpackages__"],
+    deps = [":glfw_hdrs"] + select({
+        "@bazel_tools//src/conditions:darwin": [":glfw_src_darwin"],
+        "@bazel_tools//src/conditions:windows": [":glfw_src"],
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": [":glfw_src"],
+    }),
+)
+
+#----------------------------------------
+# IMGUI
+#----------------------------------------
+IMGUI_COMMON_SOURCES = glob(["imgui/cpp/*.cpp"]) + [
+    "imgui/cpp/misc/cpp/imgui_stdlib.cpp",
+]
+
+IMGUI_COMMON_HEADERS = glob(["imgui/include/*.h"]) + [
+    "imgui/include/misc/cpp/imgui_stdlib.h",
+]
+
+###########################
+# Linux
+###########################
+IMGUI_LINUX_SRCS = [
+    "imgui/cpp/backends/imgui_impl_glfw.cpp",
+    "imgui/cpp/backends/imgui_impl_opengl2.cpp",
+    "imgui/cpp/backends/imgui_impl_opengl3.cpp",
+]
+
+IMGUI_LINUX_HDRS = [
+    "imgui/include/backends/imgui_impl_glfw.h",
+    "imgui/include/backends/imgui_impl_opengl2.h",
+    "imgui/include/backends/imgui_impl_opengl3.h",
+    "imgui/include/backends/imgui_impl_opengl3_loader.h",
+]
+
+###########################
+# OSX
+###########################
+IMGUI_DARWIN_SRCS = [
+    "imgui/cpp/backends/imgui_impl_glfw.cpp",
+    "imgui/cpp/backends/imgui_impl_metal.mm",
+]
+
+IMGUI_DARWIN_HDRS = [
+    "imgui/include/backends/imgui_impl_glfw.h",
+    "imgui/include/backends/imgui_impl_metal.h",
+]
+
+###########################
+# Windows
+###########################
+IMGUI_WIN_SRCS = [
+    "imgui/cpp/backends/imgui_impl_glfw.cpp",
+    "imgui/cpp/backends/imgui_impl_dx11.cpp",
+]
+
+IMGUI_WIN_HDRS = [
+    "imgui/include/backends/imgui_impl_glfw.h",
+    "imgui/include/backends/imgui_impl_dx11.h",
+]
+
+cc_library(
+    name = "imgui_src",
+    srcs = IMGUI_COMMON_SOURCES + select({
+        "@bazel_tools//src/conditions:windows": IMGUI_WIN_SRCS,
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": IMGUI_LINUX_SRCS,
+    }),
+    hdrs = IMGUI_COMMON_HEADERS + select({
+        "@bazel_tools//src/conditions:windows": IMGUI_WIN_HDRS,
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": IMGUI_LINUX_HDRS,
+    }),
+    includes = [
+        "imgui/include",
+        "imgui/include/backends",
+        "imgui/include/misc/cpp",
+    ],
+    linkstatic = True,
+    strip_include_prefix = "imgui/include",
+    tags = ["manual"],
+    visibility = ["//thirdparty/imgui_suite:__subpackages__"],
+    deps = [
+        ":glfw",
+    ],
+)
+
+wpilib_objc_library(
+    name = "imgui_src_darwin",
+    srcs = IMGUI_COMMON_SOURCES + IMGUI_DARWIN_SRCS,
+    hdrs = IMGUI_COMMON_HEADERS + IMGUI_DARWIN_HDRS,
+    include_arc = False,
+    includes = [
+        "imgui/include",
+        "imgui/include/backends",
+        "imgui/include/misc/cpp",
+    ],
+    deps = [
+        ":glfw",
+    ],
+)
+
+cc_library(
+    name = "imgui",
+    visibility = ["//thirdparty/imgui_suite:__subpackages__"],
+    deps = select({
+        "@bazel_tools//src/conditions:darwin": [":imgui_src_darwin"],
+        "@bazel_tools//src/conditions:windows": [":imgui_src"],
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": [":imgui_src"],
+    }),
+)
+
+#----------------------------------------
+# IMPLOT
+#----------------------------------------
+
+cc_library(
+    name = "implot",
+    srcs = glob(["implot/cpp/**"]),
+    hdrs = glob(["implot/include/**"]),
+    includes = ["implot/include"],
+    linkstatic = True,
+    strip_include_prefix = "implot/include",
+    visibility = ["//thirdparty/imgui_suite:__subpackages__"],
+    deps = [
+        "//thirdparty/imgui_suite:imgui",
+    ],
+)
+
+#----------------------------------
+# STB
+#----------------------------------
+
+cc_library(
+    name = "stb",
+    srcs = glob(["stb/cpp/**"]),
+    hdrs = glob(["stb/include/**"]),
+    linkstatic = True,
+    strip_include_prefix = "stb/include",
+    visibility = ["//visibility:public"],
+)
+
+#########################################
+# IMGUI suite
+#########################################
+cc_library(
+    name = "imgui_suite",
+    linkstatic = True,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":fonts",
+        ":gl3w",
+        ":imgui",
+        ":implot",
+        ":stb",
+    ],
+)
