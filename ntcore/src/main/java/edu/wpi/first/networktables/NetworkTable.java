@@ -572,7 +572,7 @@ public final class NetworkTable {
 
     return m_inst.addListener(
         new String[] {m_pathWithSep},
-        EnumSet.of(NetworkTableEvent.Kind.kPublish, NetworkTableEvent.Kind.kImmediate),
+        EnumSet.of(NetworkTableEvent.Kind.PUBLISH, NetworkTableEvent.Kind.IMMEDIATE),
         new Consumer<>() {
           final Set<String> m_notifiedTables = new HashSet<>();
 

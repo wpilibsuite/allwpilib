@@ -40,7 +40,7 @@ public final class MatrixStruct<R extends Num, C extends Num> implements Struct<
 
   @Override
   public int getSize() {
-    return kSizeDouble * m_rows.getNum() * m_cols.getNum();
+    return SIZE_DOUBLE * m_rows.getNum() * m_cols.getNum();
   }
 
   @Override

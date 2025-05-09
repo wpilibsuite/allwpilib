@@ -51,7 +51,7 @@ WPI_EventHandle wpi::CreateEvent(bool manualReset, bool initialState) {
   std::scoped_lock lock{manager.mutex};
 
   auto index = manager.eventIds.emplace_back(0);
-  WPI_EventHandle handle = (kHandleTypeEvent << 24) | (index & 0xffffff);
+  WPI_EventHandle handle = (HANDLE_TYPE_EVENT << 24) | (index & 0xffffff);
 
   // configure state data
   auto& state = manager.states[handle];
@@ -62,7 +62,7 @@ WPI_EventHandle wpi::CreateEvent(bool manualReset, bool initialState) {
 }
 
 void wpi::DestroyEvent(WPI_EventHandle handle) {
-  if ((handle >> 24) != kHandleTypeEvent) {
+  if ((handle >> 24) != HANDLE_TYPE_EVENT) {
     return;
   }
 
@@ -77,7 +77,7 @@ void wpi::DestroyEvent(WPI_EventHandle handle) {
 }
 
 void wpi::SetEvent(WPI_EventHandle handle) {
-  if ((handle >> 24) != kHandleTypeEvent) {
+  if ((handle >> 24) != HANDLE_TYPE_EVENT) {
     return;
   }
 
@@ -85,7 +85,7 @@ void wpi::SetEvent(WPI_EventHandle handle) {
 }
 
 void wpi::ResetEvent(WPI_EventHandle handle) {
-  if ((handle >> 24) != kHandleTypeEvent) {
+  if ((handle >> 24) != HANDLE_TYPE_EVENT) {
     return;
   }
 
@@ -100,7 +100,7 @@ WPI_SemaphoreHandle wpi::CreateSemaphore(int initialCount, int maximumCount) {
   std::scoped_lock lock{manager.mutex};
 
   auto index = manager.semaphoreIds.emplace_back(maximumCount);
-  WPI_EventHandle handle = (kHandleTypeSemaphore << 24) | (index & 0xffffff);
+  WPI_EventHandle handle = (HANDLE_TYPE_SEMAPHORE << 24) | (index & 0xffffff);
 
   // configure state data
   auto& state = manager.states[handle];
@@ -111,7 +111,7 @@ WPI_SemaphoreHandle wpi::CreateSemaphore(int initialCount, int maximumCount) {
 }
 
 void wpi::DestroySemaphore(WPI_SemaphoreHandle handle) {
-  if ((handle >> 24) != kHandleTypeSemaphore) {
+  if ((handle >> 24) != HANDLE_TYPE_SEMAPHORE) {
     return;
   }
 
@@ -127,7 +127,7 @@ void wpi::DestroySemaphore(WPI_SemaphoreHandle handle) {
 
 bool wpi::ReleaseSemaphore(WPI_SemaphoreHandle handle, int releaseCount,
                            int* prevCount) {
-  if ((handle >> 24) != kHandleTypeSemaphore) {
+  if ((handle >> 24) != HANDLE_TYPE_SEMAPHORE) {
     return false;
   }
   if (releaseCount <= 0) {

@@ -157,9 +157,9 @@ class DriverStationData {
     HAL_JoystickDescriptor descriptor;
   };
 
-  static constexpr int kNumJoysticks = 6;
+  static constexpr int NUM_JOYSTICKS = 6;
   wpi::spinlock m_joystickDataMutex;
-  JoystickData m_joystickData[kNumJoysticks];
+  JoystickData m_joystickData[NUM_JOYSTICKS];
 
   wpi::spinlock m_matchInfoMutex;
   HAL_MatchInfo m_matchInfo;

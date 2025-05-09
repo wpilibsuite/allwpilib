@@ -42,17 +42,17 @@ void RobotContainer::ConfigureButtonBindings() {
 
   // While holding the shoulder button, drive at half speed
   frc2::JoystickButton(&m_driverController,
-                       frc::XboxController::Button::kRightBumper)
+                       frc::XboxController::Button::RIGHT_BUMPER)
       .OnTrue(&m_driveHalfSpeed)
       .OnFalse(&m_driveFullSpeed);
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
-  frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
-                               AutoConstants::kMaxAcceleration);
+  frc::TrajectoryConfig config(AutoConstants::MAX_SPEED,
+                               AutoConstants::MAX_ACCELERATION);
   // Add kinematics to ensure max speed is actually obeyed
-  config.SetKinematics(DriveConstants::kDriveKinematics);
+  config.SetKinematics(DriveConstants::DRIVE_KINEMATICS);
 
   // An example trajectory to follow.  All units in meters.
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
@@ -70,15 +70,15 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
           exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
           frc::SimpleMotorFeedforward<units::meters>(ks, kv, ka),
-          DriveConstants::kDriveKinematics,
+          DriveConstants::DRIVE_KINEMATICS,
 
-          frc::PIDController{AutoConstants::kPXController, 0, 0},
-          frc::PIDController{AutoConstants::kPYController, 0, 0},
+          frc::PIDController{AutoConstants::X_CONTROLLER_P, 0, 0},
+          frc::PIDController{AutoConstants::Y_CONTROLLER_P, 0, 0},
           frc::ProfiledPIDController<units::radians>(
-              AutoConstants::kPThetaController, 0, 0,
-              AutoConstants::kThetaControllerConstraints),
+              AutoConstants::THETA_CONTROLLER_P, 0, 0,
+              AutoConstants::THETA_CONTROLLER_CONSTRAINTS),
 
-          AutoConstants::kMaxSpeed,
+          AutoConstants::MAX_SPEED,
 
           [this]() {
             return frc::MecanumDriveWheelSpeeds{
@@ -92,10 +92,10 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
                     m_drive.GetRearRightEncoder().GetRate()}};
           },
 
-          frc::PIDController{DriveConstants::kPFrontLeftVel, 0, 0},
-          frc::PIDController{DriveConstants::kPRearLeftVel, 0, 0},
-          frc::PIDController{DriveConstants::kPFrontRightVel, 0, 0},
-          frc::PIDController{DriveConstants::kPRearRightVel, 0, 0},
+          frc::PIDController{DriveConstants::FRONT_LEFT_VEL_P, 0, 0},
+          frc::PIDController{DriveConstants::REAR_LEFT_VEL_P, 0, 0},
+          frc::PIDController{DriveConstants::FRONT_RIGHT_VEL_P, 0, 0},
+          frc::PIDController{DriveConstants::REAR_RIGHT_VEL_P, 0, 0},
 
           [this](units::volt_t frontLeft, units::volt_t rearLeft,
                  units::volt_t frontRight, units::volt_t rearRight) {

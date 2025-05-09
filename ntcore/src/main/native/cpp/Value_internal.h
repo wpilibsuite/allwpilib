@@ -26,7 +26,7 @@ struct TypeInfo {};
 
 template <>
 struct TypeInfo<bool> {
-  static constexpr NT_Type kType = NT_BOOLEAN;
+  static constexpr NT_Type TYPE = NT_BOOLEAN;
 
   using Value = bool;
   using View = bool;
@@ -34,7 +34,7 @@ struct TypeInfo<bool> {
 
 template <>
 struct TypeInfo<int64_t> {
-  static constexpr NT_Type kType = NT_INTEGER;
+  static constexpr NT_Type TYPE = NT_INTEGER;
 
   using Value = int64_t;
   using View = int64_t;
@@ -42,7 +42,7 @@ struct TypeInfo<int64_t> {
 
 template <>
 struct TypeInfo<float> {
-  static constexpr NT_Type kType = NT_FLOAT;
+  static constexpr NT_Type TYPE = NT_FLOAT;
 
   using Value = float;
   using View = float;
@@ -50,7 +50,7 @@ struct TypeInfo<float> {
 
 template <>
 struct TypeInfo<double> {
-  static constexpr NT_Type kType = NT_DOUBLE;
+  static constexpr NT_Type TYPE = NT_DOUBLE;
 
   using Value = double;
   using View = double;
@@ -58,7 +58,7 @@ struct TypeInfo<double> {
 
 template <>
 struct TypeInfo<std::string> {
-  static constexpr NT_Type kType = NT_STRING;
+  static constexpr NT_Type TYPE = NT_STRING;
 
   using Value = std::string;
   using View = std::string_view;
@@ -72,7 +72,7 @@ struct TypeInfo<std::string_view> : public TypeInfo<std::string> {};
 
 template <>
 struct TypeInfo<uint8_t[]> {
-  static constexpr NT_Type kType = NT_RAW;
+  static constexpr NT_Type TYPE = NT_RAW;
 
   using Value = std::vector<uint8_t>;
   using View = std::span<const uint8_t>;
@@ -88,7 +88,7 @@ struct TypeInfo<std::span<const uint8_t>> : public TypeInfo<uint8_t[]> {};
 
 template <>
 struct TypeInfo<bool[]> {
-  static constexpr NT_Type kType = NT_BOOLEAN_ARRAY;
+  static constexpr NT_Type TYPE = NT_BOOLEAN_ARRAY;
   using ElementType = bool;
 
   using Value = std::vector<int>;
@@ -100,7 +100,7 @@ struct TypeInfo<bool[]> {
 
 template <>
 struct TypeInfo<int64_t[]> {
-  static constexpr NT_Type kType = NT_INTEGER_ARRAY;
+  static constexpr NT_Type TYPE = NT_INTEGER_ARRAY;
   using ElementType = int64_t;
 
   using Value = std::vector<int64_t>;
@@ -117,7 +117,7 @@ struct TypeInfo<std::span<const int64_t>> : public TypeInfo<int64_t[]> {};
 
 template <>
 struct TypeInfo<float[]> {
-  static constexpr NT_Type kType = NT_FLOAT_ARRAY;
+  static constexpr NT_Type TYPE = NT_FLOAT_ARRAY;
   using ElementType = float;
 
   using Value = std::vector<float>;
@@ -134,7 +134,7 @@ struct TypeInfo<std::span<const float>> : public TypeInfo<float[]> {};
 
 template <>
 struct TypeInfo<double[]> {
-  static constexpr NT_Type kType = NT_DOUBLE_ARRAY;
+  static constexpr NT_Type TYPE = NT_DOUBLE_ARRAY;
   using ElementType = double;
 
   using Value = std::vector<double>;
@@ -151,7 +151,7 @@ struct TypeInfo<std::span<const double>> : public TypeInfo<double[]> {};
 
 template <>
 struct TypeInfo<std::string[]> {
-  static constexpr NT_Type kType = NT_STRING_ARRAY;
+  static constexpr NT_Type TYPE = NT_STRING_ARRAY;
   using ElementType = std::string;
 
   using Value = std::vector<std::string>;
@@ -166,7 +166,7 @@ struct TypeInfo<std::span<const std::string>> : public TypeInfo<std::string[]> {
 
 template <typename T>
 concept ValidType = requires {
-  { TypeInfo<std::remove_cvref_t<T>>::kType } -> std::convertible_to<NT_Type>;
+  { TypeInfo<std::remove_cvref_t<T>>::TYPE } -> std::convertible_to<NT_Type>;
   typename TypeInfo<std::remove_cvref_t<T>>::Value;
   typename TypeInfo<std::remove_cvref_t<T>>::View;
 };
@@ -177,7 +177,7 @@ static_assert(ValidType<uint8_t[]>);
 static_assert(ValidType<std::vector<uint8_t>>);
 
 template <ValidType T, NT_Type type>
-constexpr bool IsNTType = TypeInfo<std::remove_cvref_t<T>>::kType == type;
+constexpr bool IsNTType = TypeInfo<std::remove_cvref_t<T>>::TYPE == type;
 
 static_assert(IsNTType<bool, NT_BOOLEAN>);
 static_assert(!IsNTType<bool, NT_DOUBLE>);
@@ -253,7 +253,7 @@ typename TypeInfo<T>::Value GetNumericArrayAs(const Value& value) {
 
 template <ValidType T>
 inline bool IsType(const Value& value) {
-  return value.type() == TypeInfo<T>::kType;
+  return value.type() == TypeInfo<T>::TYPE;
 }
 
 template <ValidType T>

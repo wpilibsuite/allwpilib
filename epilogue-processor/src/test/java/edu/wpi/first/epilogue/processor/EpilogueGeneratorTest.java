@@ -6,7 +6,7 @@ package edu.wpi.first.epilogue.processor;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
-import static edu.wpi.first.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
+import static edu.wpi.first.epilogue.processor.CompileTestOptions.JAVA_VERSION_OPTIONS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.testing.compile.Compilation;
@@ -394,7 +394,7 @@ class EpilogueGeneratorTest {
       String loggedClassContent, String loggerClassContent) {
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
             .compile(JavaFileObjects.forSourceString("", loggedClassContent));
 

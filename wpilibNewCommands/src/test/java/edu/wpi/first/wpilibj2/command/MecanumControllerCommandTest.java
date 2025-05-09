@@ -41,7 +41,7 @@ class MecanumControllerCommandTest {
   }
 
   private final Timer m_timer = new Timer();
-  private Rotation2d m_angle = Rotation2d.kZero;
+  private Rotation2d m_angle = Rotation2d.ZERO;
 
   private double m_frontLeftSpeed;
   private double m_frontLeftDistance;
@@ -57,21 +57,21 @@ class MecanumControllerCommandTest {
 
   private static final double kxTolerance = 1 / 12.0;
   private static final double kyTolerance = 1 / 12.0;
-  private static final double kAngularTolerance = 1 / 12.0;
+  private static final double ANGULAR_TOLERANCE = 1 / 12.0;
 
-  private static final double kWheelBase = 0.5;
-  private static final double kTrackwidth = 0.5;
+  private static final double WHEEL_BASE = 0.5;
+  private static final double TRACK_WIDTH = 0.5;
 
   private final MecanumDriveKinematics m_kinematics =
       new MecanumDriveKinematics(
-          new Translation2d(kWheelBase / 2, kTrackwidth / 2),
-          new Translation2d(kWheelBase / 2, -kTrackwidth / 2),
-          new Translation2d(-kWheelBase / 2, kTrackwidth / 2),
-          new Translation2d(-kWheelBase / 2, -kTrackwidth / 2));
+          new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
+          new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+          new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
+          new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
   private final MecanumDriveOdometry m_odometry =
       new MecanumDriveOdometry(
-          m_kinematics, Rotation2d.kZero, new MecanumDriveWheelPositions(), Pose2d.kZero);
+          m_kinematics, Rotation2d.ZERO, new MecanumDriveWheelPositions(), Pose2d.ZERO);
 
   public void setWheelSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
     this.m_frontLeftSpeed = wheelSpeeds.frontLeft;
@@ -96,7 +96,7 @@ class MecanumControllerCommandTest {
     final var subsystem = new Subsystem() {};
 
     final var waypoints = new ArrayList<Pose2d>();
-    waypoints.add(Pose2d.kZero);
+    waypoints.add(Pose2d.ZERO);
     waypoints.add(new Pose2d(1, 5, new Rotation2d(3)));
     var config = new TrajectoryConfig(8.8, 0.1);
     final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
@@ -137,6 +137,6 @@ class MecanumControllerCommandTest {
             assertEquals(
                 endState.pose.getRotation().getRadians(),
                 getRobotPose().getRotation().getRadians(),
-                kAngularTolerance));
+                ANGULAR_TOLERANCE));
   }
 }

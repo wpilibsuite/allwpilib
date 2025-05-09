@@ -18,7 +18,7 @@ class ADXL345SimTest {
   void testInitI2C(ADXL345_I2C.Range range) {
     HAL.initialize(500, 0);
 
-    try (ADXL345_I2C accel = new ADXL345_I2C(I2C.Port.kPort0, range)) {
+    try (ADXL345_I2C accel = new ADXL345_I2C(I2C.Port.PORT0, range)) {
       ADXL345Sim sim = new ADXL345Sim(accel);
 
       sim.setX(1.91);

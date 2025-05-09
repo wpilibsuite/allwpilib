@@ -60,12 +60,12 @@ bool ConditionalCommand::RunsWhenDisabled() const {
 Command::InterruptionBehavior ConditionalCommand::GetInterruptionBehavior()
     const {
   if (m_onTrue->GetInterruptionBehavior() ==
-          InterruptionBehavior::kCancelSelf ||
+          InterruptionBehavior::CANCEL_SELF ||
       m_onFalse->GetInterruptionBehavior() ==
-          InterruptionBehavior::kCancelSelf) {
-    return InterruptionBehavior::kCancelSelf;
+          InterruptionBehavior::CANCEL_SELF) {
+    return InterruptionBehavior::CANCEL_SELF;
   } else {
-    return InterruptionBehavior::kCancelIncoming;
+    return InterruptionBehavior::CANCEL_INCOMING;
   }
 }
 

@@ -212,7 +212,7 @@ static SIM_JniHandle AllocateDeviceCallback(
 
   auto handle = deviceCallbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_InvalidHandle) {
     return -1;
   }
 
@@ -269,7 +269,7 @@ static SIM_JniHandle AllocateValueCallback(
 
   auto handle = valueCallbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_InvalidHandle) {
     return -1;
   }
 

@@ -35,37 +35,37 @@ static void DefaultLogger(unsigned int level, const char* file,
   wpi::print(stderr, "NT: {}: {} ({}:{})\n", levelmsg, msg, file, line);
 }
 
-static constexpr unsigned int kFlagCritical = 1u << 16;
-static constexpr unsigned int kFlagError = 1u << 17;
-static constexpr unsigned int kFlagWarning = 1u << 18;
-static constexpr unsigned int kFlagInfo = 1u << 19;
-static constexpr unsigned int kFlagDebug = 1u << 20;
-static constexpr unsigned int kFlagDebug1 = 1u << 21;
-static constexpr unsigned int kFlagDebug2 = 1u << 22;
-static constexpr unsigned int kFlagDebug3 = 1u << 23;
-static constexpr unsigned int kFlagDebug4 = 1u << 24;
+static constexpr unsigned int FLAG_CRITICAL = 1u << 16;
+static constexpr unsigned int FLAG_ERROR = 1u << 17;
+static constexpr unsigned int FLAG_WARNING = 1u << 18;
+static constexpr unsigned int FLAG_INFO = 1u << 19;
+static constexpr unsigned int FLAG_DEBUG = 1u << 20;
+static constexpr unsigned int FLAG_DEBUG1 = 1u << 21;
+static constexpr unsigned int FLAG_DEBUG2 = 1u << 22;
+static constexpr unsigned int FLAG_DEBUG3 = 1u << 23;
+static constexpr unsigned int FLAG_DEBUG4 = 1u << 24;
 
 static unsigned int LevelToFlag(unsigned int level) {
   if (level >= wpi::WPI_LOG_CRITICAL) {
-    return EventFlags::kLogMessage | kFlagCritical;
+    return EventFlags::LOG_MESSAGE | FLAG_CRITICAL;
   } else if (level >= wpi::WPI_LOG_ERROR) {
-    return EventFlags::kLogMessage | kFlagError;
+    return EventFlags::LOG_MESSAGE | FLAG_ERROR;
   } else if (level >= wpi::WPI_LOG_WARNING) {
-    return EventFlags::kLogMessage | kFlagWarning;
+    return EventFlags::LOG_MESSAGE | FLAG_WARNING;
   } else if (level >= wpi::WPI_LOG_INFO) {
-    return EventFlags::kLogMessage | kFlagInfo;
+    return EventFlags::LOG_MESSAGE | FLAG_INFO;
   } else if (level >= wpi::WPI_LOG_DEBUG) {
-    return EventFlags::kLogMessage | kFlagDebug;
+    return EventFlags::LOG_MESSAGE | FLAG_DEBUG;
   } else if (level >= wpi::WPI_LOG_DEBUG1) {
-    return EventFlags::kLogMessage | kFlagDebug1;
+    return EventFlags::LOG_MESSAGE | FLAG_DEBUG1;
   } else if (level >= wpi::WPI_LOG_DEBUG2) {
-    return EventFlags::kLogMessage | kFlagDebug2;
+    return EventFlags::LOG_MESSAGE | FLAG_DEBUG2;
   } else if (level >= wpi::WPI_LOG_DEBUG3) {
-    return EventFlags::kLogMessage | kFlagDebug3;
+    return EventFlags::LOG_MESSAGE | FLAG_DEBUG3;
   } else if (level >= wpi::WPI_LOG_DEBUG4) {
-    return EventFlags::kLogMessage | kFlagDebug4;
+    return EventFlags::LOG_MESSAGE | FLAG_DEBUG4;
   } else {
-    return EventFlags::kLogMessage;
+    return EventFlags::LOG_MESSAGE;
   }
 }
 
@@ -73,34 +73,34 @@ static unsigned int LevelsToEventMask(unsigned int minLevel,
                                       unsigned int maxLevel) {
   unsigned int mask = 0;
   if (minLevel <= wpi::WPI_LOG_CRITICAL && maxLevel >= wpi::WPI_LOG_CRITICAL) {
-    mask |= kFlagCritical;
+    mask |= FLAG_CRITICAL;
   }
   if (minLevel <= wpi::WPI_LOG_ERROR && maxLevel >= wpi::WPI_LOG_ERROR) {
-    mask |= kFlagError;
+    mask |= FLAG_ERROR;
   }
   if (minLevel <= wpi::WPI_LOG_WARNING && maxLevel >= wpi::WPI_LOG_WARNING) {
-    mask |= kFlagWarning;
+    mask |= FLAG_WARNING;
   }
   if (minLevel <= wpi::WPI_LOG_INFO && maxLevel >= wpi::WPI_LOG_INFO) {
-    mask |= kFlagInfo;
+    mask |= FLAG_INFO;
   }
   if (minLevel <= wpi::WPI_LOG_DEBUG && maxLevel >= wpi::WPI_LOG_DEBUG) {
-    mask |= kFlagDebug;
+    mask |= FLAG_DEBUG;
   }
   if (minLevel <= wpi::WPI_LOG_DEBUG1 && maxLevel >= wpi::WPI_LOG_DEBUG1) {
-    mask |= kFlagDebug1;
+    mask |= FLAG_DEBUG1;
   }
   if (minLevel <= wpi::WPI_LOG_DEBUG2 && maxLevel >= wpi::WPI_LOG_DEBUG2) {
-    mask |= kFlagDebug2;
+    mask |= FLAG_DEBUG2;
   }
   if (minLevel <= wpi::WPI_LOG_DEBUG3 && maxLevel >= wpi::WPI_LOG_DEBUG3) {
-    mask |= kFlagDebug3;
+    mask |= FLAG_DEBUG3;
   }
   if (minLevel <= wpi::WPI_LOG_DEBUG4 && maxLevel >= wpi::WPI_LOG_DEBUG4) {
-    mask |= kFlagDebug4;
+    mask |= FLAG_DEBUG4;
   }
   if (mask == 0) {
-    mask = EventFlags::kLogMessage;
+    mask = EventFlags::LOG_MESSAGE;
   }
   return mask;
 }

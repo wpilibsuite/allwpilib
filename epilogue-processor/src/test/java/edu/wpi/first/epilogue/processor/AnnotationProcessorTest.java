@@ -6,7 +6,7 @@ package edu.wpi.first.epilogue.processor;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
-import static edu.wpi.first.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
+import static edu.wpi.first.epilogue.processor.CompileTestOptions.JAVA_VERSION_OPTIONS;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -150,7 +150,7 @@ class AnnotationProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
             .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
 
@@ -1066,7 +1066,7 @@ class AnnotationProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
             .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
 
@@ -1752,7 +1752,7 @@ class AnnotationProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
             .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
 
@@ -1780,7 +1780,7 @@ class AnnotationProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
             .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
 
@@ -1928,8 +1928,8 @@ class AnnotationProcessorTest {
         @Logged(defaultNaming = Logged.Naming.USE_HUMAN_NAME)
         class Example {
           double m_memberPrefix;
-          double kConstantPrefix;
-          double k_otherConstantPrefix;
+          double CONSTANT_PREFIX;
+          double OTHER_CONSTANT_PREFIX;
           double s_otherPrefix;
 
           public double getTheGetterMethod() {
@@ -1961,8 +1961,8 @@ class AnnotationProcessorTest {
           public void update(EpilogueBackend backend, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
               backend.log("Member Prefix", object.m_memberPrefix);
-              backend.log("Constant Prefix", object.kConstantPrefix);
-              backend.log("Other Constant Prefix", object.k_otherConstantPrefix);
+              backend.log("Constant Prefix", object.CONSTANT_PREFIX);
+              backend.log("Other Constant Prefix", object.OTHER_CONSTANT_PREFIX);
               backend.log("Other Prefix", object.s_otherPrefix);
               backend.log("The Getter Method", object.getTheGetterMethod());
               backend.log("optedOut", object.optedOut());
@@ -1992,7 +1992,7 @@ class AnnotationProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
             .compile(
                 JavaFileObjects.forSourceString("example.Example", source),
@@ -2019,7 +2019,7 @@ class AnnotationProcessorTest {
   private void assertLoggerGenerates(String loggedClassContent, String loggerClassContent) {
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
             .compile(
                 JavaFileObjects.forSourceString(

@@ -44,9 +44,9 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    */
   enum class OriginPosition {
     /// Blue alliance wall, right side.
-    kBlueAllianceWallRightSide,
+    BLUE_ALLIANCE_WALL_RIGHT_SIDE,
     /// Red alliance wall, right side.
-    kRedAllianceWallRightSide,
+    RED_ALLIANCE_WALL_RIGHT_SIDE,
   };
 
   /**

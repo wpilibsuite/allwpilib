@@ -8,6 +8,6 @@
 
 namespace nt::server {
 
-inline constexpr uint32_t kMinPeriodMs = 5;
+inline constexpr uint32_t MIN_PERIOD_MS = 5;
 
 }  // namespace nt::server

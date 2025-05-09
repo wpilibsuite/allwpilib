@@ -44,7 +44,7 @@ MappedFileRegion::MappedFileRegion(fs::file_t f, uint64_t length,
   }
 
   HANDLE fileMappingHandle = ::CreateFileMappingW(
-      f, 0, mapMode == kReadOnly ? PAGE_READONLY : PAGE_READWRITE, length >> 32,
+      f, 0, mapMode == READ_ONLY ? PAGE_READONLY : PAGE_READWRITE, length >> 32,
       length & 0xffffffff, 0);
   if (fileMappingHandle == nullptr) {
     ec = wpi::mapWindowsError(GetLastError());
@@ -53,13 +53,13 @@ MappedFileRegion::MappedFileRegion(fs::file_t f, uint64_t length,
 
   DWORD dwDesiredAccess = 0;
   switch (mapMode) {
-    case kReadOnly:
+    case READ_ONLY:
       dwDesiredAccess = FILE_MAP_READ;
       break;
-    case kReadWrite:
+    case READ_WRITE:
       dwDesiredAccess = FILE_MAP_WRITE;
       break;
-    case kPriv:
+    case PRIV:
       dwDesiredAccess = FILE_MAP_WRITE | FILE_MAP_COPY;
       break;
   }
@@ -87,8 +87,8 @@ MappedFileRegion::MappedFileRegion(fs::file_t f, uint64_t length,
 #else
   m_mapping =
       ::mmap(nullptr, length,
-             mapMode == kReadOnly ? PROT_READ : (PROT_READ | PROT_WRITE),
-             mapMode == kPriv ? MAP_PRIVATE : MAP_SHARED, f, offset);
+             mapMode == READ_ONLY ? PROT_READ : (PROT_READ | PROT_WRITE),
+             mapMode == PRIV ? MAP_PRIVATE : MAP_SHARED, f, offset);
   if (m_mapping == MAP_FAILED) {
     ec = std::error_code(errno, std::generic_category());
     m_mapping = nullptr;

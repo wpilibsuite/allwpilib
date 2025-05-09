@@ -15,27 +15,27 @@ using namespace wpi::structparser;
 
 std::string_view wpi::structparser::ToString(Token::Kind kind) {
   switch (kind) {
-    case Token::kInteger:
+    case Token::INTEGER:
       return "integer";
-    case Token::kIdentifier:
+    case Token::IDENTIFIER:
       return "identifier";
-    case Token::kLeftBracket:
+    case Token::LEFT_BRACKET:
       return "'['";
-    case Token::kRightBracket:
+    case Token::RIGHT_BRACKET:
       return "']'";
-    case Token::kLeftBrace:
+    case Token::LEFT_BRACE:
       return "'{'";
-    case Token::kRightBrace:
+    case Token::RIGHT_BRACE:
       return "'}'";
-    case Token::kColon:
+    case Token::COLON:
       return "':'";
-    case Token::kSemicolon:
+    case Token::SEMICOLON:
       return "';'";
-    case Token::kComma:
+    case Token::COMMA:
       return "','";
-    case Token::kEquals:
+    case Token::EQUALS:
       return "'='";
-    case Token::kEndOfInput:
+    case Token::END_OF_INPUT:
       return "<EOF>";
     default:
       return "unknown";
@@ -52,21 +52,21 @@ Token Lexer::Scan() {
 
   switch (m_current) {
     case '[':
-      return MakeToken(Token::kLeftBracket);
+      return MakeToken(Token::LEFT_BRACKET);
     case ']':
-      return MakeToken(Token::kRightBracket);
+      return MakeToken(Token::RIGHT_BRACKET);
     case '{':
-      return MakeToken(Token::kLeftBrace);
+      return MakeToken(Token::LEFT_BRACE);
     case '}':
-      return MakeToken(Token::kRightBrace);
+      return MakeToken(Token::RIGHT_BRACE);
     case ':':
-      return MakeToken(Token::kColon);
+      return MakeToken(Token::COLON);
     case ';':
-      return MakeToken(Token::kSemicolon);
+      return MakeToken(Token::SEMICOLON);
     case ',':
-      return MakeToken(Token::kComma);
+      return MakeToken(Token::COMMA);
     case '=':
-      return MakeToken(Token::kEquals);
+      return MakeToken(Token::EQUALS);
     case '-':
     case '0':
     case '1':
@@ -80,12 +80,12 @@ Token Lexer::Scan() {
     case '9':
       return ScanInteger();
     case -1:
-      return {Token::kEndOfInput, {}};
+      return {Token::END_OF_INPUT, {}};
     default:
       if (isAlpha(m_current) || m_current == '_') {
         [[likely]] return ScanIdentifier();
       }
-      return MakeToken(Token::kUnknown);
+      return MakeToken(Token::UNKNOWN);
   }
 }
 
@@ -94,7 +94,7 @@ Token Lexer::ScanInteger() {
     Get();
   } while (isDigit(m_current));
   Unget();
-  return MakeToken(Token::kInteger);
+  return MakeToken(Token::INTEGER);
 }
 
 Token Lexer::ScanIdentifier() {
@@ -102,7 +102,7 @@ Token Lexer::ScanIdentifier() {
     Get();
   } while (isAlnum(m_current) || m_current == '_');
   Unget();
-  return MakeToken(Token::kIdentifier);
+  return MakeToken(Token::IDENTIFIER);
 }
 
 void Parser::FailExpect(Token::Kind desired) {
@@ -116,31 +116,31 @@ void Parser::Fail(std::string_view msg) {
 bool Parser::Parse(ParsedSchema* out) {
   do {
     GetNextToken();
-    if (m_token.Is(Token::kSemicolon)) {
+    if (m_token.Is(Token::SEMICOLON)) {
       continue;
     }
-    if (m_token.Is(Token::kEndOfInput)) {
+    if (m_token.Is(Token::END_OF_INPUT)) {
       break;
     }
     if (!ParseDeclaration(&out->declarations.emplace_back())) {
       [[unlikely]] return false;
     }
-  } while (m_token.kind != Token::kEndOfInput);
+  } while (m_token.kind != Token::END_OF_INPUT);
   return true;
 }
 
 bool Parser::ParseDeclaration(ParsedDeclaration* out) {
   // optional enum specification
-  if (m_token.Is(Token::kIdentifier) && m_token.text == "enum") {
+  if (m_token.Is(Token::IDENTIFIER) && m_token.text == "enum") {
     GetNextToken();
-    if (!Expect(Token::kLeftBrace)) {
+    if (!Expect(Token::LEFT_BRACE)) {
       [[unlikely]] return false;
     }
     if (!ParseEnum(&out->enumValues)) {
       [[unlikely]] return false;
     }
     GetNextToken();
-  } else if (m_token.Is(Token::kLeftBrace)) {
+  } else if (m_token.Is(Token::LEFT_BRACE)) {
     if (!ParseEnum(&out->enumValues)) {
       [[unlikely]] return false;
     }
@@ -148,23 +148,23 @@ bool Parser::ParseDeclaration(ParsedDeclaration* out) {
   }
 
   // type name
-  if (!Expect(Token::kIdentifier)) {
+  if (!Expect(Token::IDENTIFIER)) {
     [[unlikely]] return false;
   }
   out->typeString = m_token.text;
   GetNextToken();
 
   // identifier name
-  if (!Expect(Token::kIdentifier)) {
+  if (!Expect(Token::IDENTIFIER)) {
     [[unlikely]] return false;
   }
   out->name = m_token.text;
   GetNextToken();
 
   // array or bit field
-  if (m_token.Is(Token::kLeftBracket)) {
+  if (m_token.Is(Token::LEFT_BRACKET)) {
     GetNextToken();
-    if (!Expect(Token::kInteger)) {
+    if (!Expect(Token::INTEGER)) {
       [[unlikely]] return false;
     }
     auto val = parse_integer<uint64_t>(m_token.text, 10);
@@ -176,13 +176,13 @@ bool Parser::ParseDeclaration(ParsedDeclaration* out) {
       [[unlikely]] return false;
     }
     GetNextToken();
-    if (!Expect(Token::kRightBracket)) {
+    if (!Expect(Token::RIGHT_BRACKET)) {
       [[unlikely]] return false;
     }
     GetNextToken();
-  } else if (m_token.Is(Token::kColon)) {
+  } else if (m_token.Is(Token::COLON)) {
     GetNextToken();
-    if (!Expect(Token::kInteger)) {
+    if (!Expect(Token::INTEGER)) {
       [[unlikely]] return false;
     }
     auto val = parse_integer<unsigned int>(m_token.text, 10);
@@ -197,27 +197,27 @@ bool Parser::ParseDeclaration(ParsedDeclaration* out) {
   }
 
   // declaration must end with EOF or semicolon
-  if (m_token.Is(Token::kEndOfInput)) {
+  if (m_token.Is(Token::END_OF_INPUT)) {
     return true;
   }
-  return Expect(Token::kSemicolon);
+  return Expect(Token::SEMICOLON);
 }
 
 bool Parser::ParseEnum(EnumValues* out) {
   // we start with current = '{'
   GetNextToken();
-  while (!m_token.Is(Token::kRightBrace)) {
-    if (!Expect(Token::kIdentifier)) {
+  while (!m_token.Is(Token::RIGHT_BRACE)) {
+    if (!Expect(Token::IDENTIFIER)) {
       [[unlikely]] return false;
     }
     std::string name;
     name = m_token.text;
     GetNextToken();
-    if (!Expect(Token::kEquals)) {
+    if (!Expect(Token::EQUALS)) {
       [[unlikely]] return false;
     }
     GetNextToken();
-    if (!Expect(Token::kInteger)) {
+    if (!Expect(Token::INTEGER)) {
       [[unlikely]] return false;
     }
     int64_t value;
@@ -229,10 +229,10 @@ bool Parser::ParseEnum(EnumValues* out) {
     }
     out->emplace_back(std::move(name), value);
     GetNextToken();
-    if (m_token.Is(Token::kRightBrace)) {
+    if (m_token.Is(Token::RIGHT_BRACE)) {
       break;
     }
-    if (!Expect(Token::kComma)) {
+    if (!Expect(Token::COMMA)) {
       [[unlikely]] return false;
     }
     GetNextToken();

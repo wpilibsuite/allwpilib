@@ -19,7 +19,7 @@
 #include "units/velocity.h"
 #include "units/voltage.h"
 
-static constexpr auto kDt = 10_ms;
+static constexpr auto DT = 10_ms;
 static constexpr auto kV = 2.5629_V / 1_mps;
 static constexpr auto kA = 0.43277_V / 1_mps_sq;
 
@@ -40,7 +40,7 @@ frc::ExponentialProfile<units::meter, units::volts>::State CheckDynamics(
     frc::SimpleMotorFeedforward<units::meter> feedforward,
     frc::ExponentialProfile<units::meter, units::volts>::State current,
     frc::ExponentialProfile<units::meter, units::volts>::State goal) {
-  auto next = profile.Calculate(kDt, current, goal);
+  auto next = profile.Calculate(DT, current, goal);
   auto signal = feedforward.Calculate(current.velocity, next.velocity);
 
   EXPECT_LE(units::math::abs(signal), (constraints.maxInput + 1e-9_V));
@@ -53,7 +53,7 @@ TEST(ExponentialProfileTest, ReachesGoal) {
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
   frc::SimpleMotorFeedforward<units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, kDt};
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{10_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
 
@@ -70,7 +70,7 @@ TEST(ExponentialProfileTest, PosContinuousUnderVelChange) {
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
   frc::SimpleMotorFeedforward<units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, kDt};
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{10_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
 
@@ -93,7 +93,7 @@ TEST(ExponentialProfileTest, PosContinuousUnderVelChangeBackward) {
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
   frc::SimpleMotorFeedforward<units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, kDt};
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{-10_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
 
@@ -115,7 +115,7 @@ TEST(ExponentialProfileTest, Backwards) {
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
   frc::SimpleMotorFeedforward<units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, kDt};
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{-10_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state;
 
@@ -130,7 +130,7 @@ TEST(ExponentialProfileTest, SwitchGoalInMiddle) {
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
   frc::SimpleMotorFeedforward<units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, kDt};
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{-10_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
 
@@ -152,7 +152,7 @@ TEST(ExponentialProfileTest, TopSpeed) {
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
   frc::SimpleMotorFeedforward<units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, kDt};
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{40_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state;
 
@@ -173,7 +173,7 @@ TEST(ExponentialProfileTest, TopSpeedBackward) {
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
   frc::SimpleMotorFeedforward<units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, kDt};
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{-40_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state;
 
@@ -194,7 +194,7 @@ TEST(ExponentialProfileTest, HighInitialSpeed) {
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
   frc::SimpleMotorFeedforward<units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, kDt};
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{40_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 8_mps};
 
@@ -211,7 +211,7 @@ TEST(ExponentialProfileTest, HighInitialSpeedBackward) {
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
   frc::SimpleMotorFeedforward<units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, kDt};
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{-40_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, -8_mps};
 
@@ -279,7 +279,7 @@ TEST(ExponentialProfileTest, TimingToCurrent) {
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
   frc::SimpleMotorFeedforward<units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, kDt};
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{2_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
 
@@ -296,7 +296,7 @@ TEST(ExponentialProfileTest, TimingToGoal) {
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
   frc::SimpleMotorFeedforward<units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, kDt};
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{2_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
 
@@ -319,7 +319,7 @@ TEST(ExponentialProfileTest, TimingToNegativeGoal) {
       12_V, -kV / kA, 1 / kA};
   frc::ExponentialProfile<units::meter, units::volts> profile{constraints};
   frc::SimpleMotorFeedforward<units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, kDt};
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
   frc::ExponentialProfile<units::meter, units::volts>::State goal{-2_m, 0_mps};
   frc::ExponentialProfile<units::meter, units::volts>::State state{0_m, 0_mps};
 

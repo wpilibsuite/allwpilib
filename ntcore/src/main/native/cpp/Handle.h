@@ -18,20 +18,20 @@ namespace nt {
 class Handle {
  public:
   enum Type {
-    kListener = wpi::kHandleTypeNTBase,
-    kListenerPoller,
-    kEntry,
-    kInstance,
-    kDataLogger,
-    kConnectionDataLogger,
-    kMultiSubscriber,
-    kTopic,
-    kSubscriber,
-    kPublisher,
-    kTypeMax
+    LISTENER = wpi::HANDLE_TYPE_NT_BASE,
+    LISTENER_POLLER,
+    ENTRY,
+    INSTANCE,
+    DATA_LOGGER,
+    CONNECTION_DATA_LOGGER,
+    MULTI_SUBSCRIBER,
+    TOPIC,
+    SUBSCRIBER,
+    PUBLISHER,
+    TYPE_MAX
   };
-  static_assert(kTypeMax <= wpi::kHandleTypeHALBase);
-  enum { kIndexMax = 0xfffff };
+  static_assert(TYPE_MAX <= wpi::HANDLE_TYPE_HAL_BASE);
+  enum { INDEX_MAX = 0xfffff };
 
   constexpr explicit Handle(NT_Handle handle) : m_handle(handle) {}
   constexpr operator NT_Handle() const { return m_handle; }

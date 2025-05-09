@@ -150,7 +150,7 @@ void Encoder::InitSendable(wpi::SendableBuilder& builder) {
   int32_t status = 0;
   HAL_EncoderEncodingType type = HAL_GetEncoderEncodingType(m_encoder, &status);
   FRC_CheckErrorStatus(status, "GetEncodingType");
-  if (type == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
+  if (type == HAL_EncoderEncodingType::HAL_Encoder_4X) {
     builder.SetSmartDashboardType("Quadrature Encoder");
   } else {
     builder.SetSmartDashboardType("Encoder");

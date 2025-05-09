@@ -46,7 +46,7 @@ class CommandRequirementsTest extends CommandTestBase {
 
       Command notInterrupted =
           Commands.idle(requirement)
-              .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
+              .withInterruptBehavior(Command.InterruptionBehavior.CANCEL_INCOMING);
       MockCommandHolder interrupterHolder = new MockCommandHolder(true, requirement);
       Command interrupter = interrupterHolder.getMock();
 

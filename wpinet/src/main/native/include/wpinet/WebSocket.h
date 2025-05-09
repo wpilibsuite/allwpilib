@@ -35,15 +35,15 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   struct private_init {};
 
  public:
-  static constexpr uint8_t kOpCont = 0x00;
-  static constexpr uint8_t kOpText = 0x01;
-  static constexpr uint8_t kOpBinary = 0x02;
-  static constexpr uint8_t kOpClose = 0x08;
-  static constexpr uint8_t kOpPing = 0x09;
-  static constexpr uint8_t kOpPong = 0x0A;
-  static constexpr uint8_t kOpMask = 0x0F;
-  static constexpr uint8_t kFlagFin = 0x80;
-  static constexpr uint8_t kFlagControl = 0x08;
+  static constexpr uint8_t OP_CONT = 0x00;
+  static constexpr uint8_t OP_TEXT = 0x01;
+  static constexpr uint8_t OP_BINARY = 0x02;
+  static constexpr uint8_t OP_CLOSE = 0x08;
+  static constexpr uint8_t OP_PING = 0x09;
+  static constexpr uint8_t OP_PONG = 0x0A;
+  static constexpr uint8_t OP_MASK = 0x0F;
+  static constexpr uint8_t FLAG_FIN = 0x80;
+  static constexpr uint8_t FLAG_CONTROL = 0x08;
 
   WebSocket(uv::Stream& stream, bool server, const private_init&);
   WebSocket(const WebSocket&) = delete;
@@ -85,14 +85,14 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * Frame.  Used by SendFrames().
    */
   struct Frame {
-    static constexpr uint8_t kText = kFlagFin | kOpText;
-    static constexpr uint8_t kBinary = kFlagFin | kOpBinary;
-    static constexpr uint8_t kTextFragment = kOpText;
-    static constexpr uint8_t kBinaryFragment = kOpBinary;
-    static constexpr uint8_t kFragment = kOpCont;
-    static constexpr uint8_t kFinalFragment = kFlagFin | kOpCont;
-    static constexpr uint8_t kPing = kFlagFin | kOpPing;
-    static constexpr uint8_t kPong = kFlagFin | kOpPong;
+    static constexpr uint8_t TEXT = FLAG_FIN | OP_TEXT;
+    static constexpr uint8_t BINARY = FLAG_FIN | OP_BINARY;
+    static constexpr uint8_t TEXT_FRAGMENT = OP_TEXT;
+    static constexpr uint8_t BINARY_FRAGMENT = OP_BINARY;
+    static constexpr uint8_t FRAGMENT = OP_CONT;
+    static constexpr uint8_t FINAL_FRAGMENT = FLAG_FIN | OP_CONT;
+    static constexpr uint8_t PING = FLAG_FIN | OP_PING;
+    static constexpr uint8_t PONG = FLAG_FIN | OP_PONG;
 
     constexpr Frame(uint8_t opcode, std::span<const uv::Buffer> data)
         : opcode{opcode}, data{data} {}
@@ -204,7 +204,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendText(
       std::span<const uv::Buffer> data,
       std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
-    Send(kFlagFin | kOpText, data, std::move(callback));
+    Send(FLAG_FIN | OP_TEXT, data, std::move(callback));
   }
 
   /**
@@ -226,7 +226,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendBinary(
       std::span<const uv::Buffer> data,
       std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
-    Send(kFlagFin | kOpBinary, data, std::move(callback));
+    Send(FLAG_FIN | OP_BINARY, data, std::move(callback));
   }
 
   /**
@@ -250,7 +250,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendTextFragment(
       std::span<const uv::Buffer> data,
       std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
-    Send(kOpText, data, std::move(callback));
+    Send(OP_TEXT, data, std::move(callback));
   }
 
   /**
@@ -276,7 +276,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendBinaryFragment(
       std::span<const uv::Buffer> data,
       std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
-    Send(kOpBinary, data, std::move(callback));
+    Send(OP_BINARY, data, std::move(callback));
   }
 
   /**
@@ -302,7 +302,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendFragment(
       std::span<const uv::Buffer> data, bool fin,
       std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
-    Send(kOpCont | (fin ? kFlagFin : 0), data, std::move(callback));
+    Send(OP_CONT | (fin ? FLAG_FIN : 0), data, std::move(callback));
   }
 
   /**
@@ -340,7 +340,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendPing(
       std::span<const uv::Buffer> data,
       std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
-    SendControl(kFlagFin | kOpPing, data, std::move(callback));
+    SendControl(FLAG_FIN | OP_PING, data, std::move(callback));
   }
 
   /**
@@ -377,7 +377,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendPong(
       std::span<const uv::Buffer> data,
       std::function<void(std::span<uv::Buffer>, uv::Error)> callback) {
-    SendControl(kFlagFin | kOpPong, data, std::move(callback));
+    SendControl(FLAG_FIN | OP_PONG, data, std::move(callback));
   }
 
   /**

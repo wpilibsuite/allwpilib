@@ -137,13 +137,13 @@ Notifier::Notifier(Notifier&& rhs)
       m_expirationTime(std::move(rhs.m_expirationTime)),
       m_period(std::move(rhs.m_period)),
       m_periodic(std::move(rhs.m_periodic)) {
-  rhs.m_notifier = HAL_kInvalidHandle;
+  rhs.m_notifier = HAL_InvalidHandle;
 }
 
 Notifier& Notifier::operator=(Notifier&& rhs) {
   m_thread = std::move(rhs.m_thread);
   m_notifier = rhs.m_notifier.load();
-  rhs.m_notifier = HAL_kInvalidHandle;
+  rhs.m_notifier = HAL_InvalidHandle;
   m_callback = std::move(rhs.m_callback);
   m_expirationTime = std::move(rhs.m_expirationTime);
   m_period = std::move(rhs.m_period);

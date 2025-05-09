@@ -37,19 +37,19 @@ class SysIdRoutineTest : public ::testing::Test {
           std::nullopt, std::nullopt, std::nullopt,
           [this](frc::sysid::State state) {
             switch (state) {
-              case frc::sysid::State::kQuasistaticForward:
+              case frc::sysid::State::QUASISTATIC_FORWARD:
                 currentStateList.emplace_back(StateTest::InRecordStateQf);
                 break;
-              case frc::sysid::State::kQuasistaticReverse:
+              case frc::sysid::State::QUASISTATIC_REVERSE:
                 currentStateList.emplace_back(StateTest::InRecordStateQr);
                 break;
-              case frc::sysid::State::kDynamicForward:
+              case frc::sysid::State::DYNAMIC_FORWARD:
                 currentStateList.emplace_back(StateTest::InRecordStateDf);
                 break;
-              case frc::sysid::State::kDynamicReverse:
+              case frc::sysid::State::DYNAMIC_REVERSE:
                 currentStateList.emplace_back(StateTest::InRecordStateDr);
                 break;
-              case frc::sysid::State::kNone:
+              case frc::sysid::State::NONE:
                 currentStateList.emplace_back(StateTest::DoneWithRecordState);
                 break;
             }
@@ -66,13 +66,13 @@ class SysIdRoutineTest : public ::testing::Test {
           &m_subsystem}};
 
   frc2::CommandPtr m_quasistaticForward{
-      m_sysidRoutine.Quasistatic(frc2::sysid::Direction::kForward)};
+      m_sysidRoutine.Quasistatic(frc2::sysid::Direction::FORWARD)};
   frc2::CommandPtr m_quasistaticReverse{
-      m_sysidRoutine.Quasistatic(frc2::sysid::Direction::kReverse)};
+      m_sysidRoutine.Quasistatic(frc2::sysid::Direction::REVERSE)};
   frc2::CommandPtr m_dynamicForward{
-      m_sysidRoutine.Dynamic(frc2::sysid::Direction::kForward)};
+      m_sysidRoutine.Dynamic(frc2::sysid::Direction::FORWARD)};
   frc2::CommandPtr m_dynamicReverse{
-      m_sysidRoutine.Dynamic(frc2::sysid::Direction::kReverse)};
+      m_sysidRoutine.Dynamic(frc2::sysid::Direction::REVERSE)};
 
   frc2::sysid::SysIdRoutine m_emptySysidRoutine{
       frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
@@ -80,7 +80,7 @@ class SysIdRoutineTest : public ::testing::Test {
                              &m_subsystem}};
 
   frc2::CommandPtr m_emptyRoutineForward{
-      m_emptySysidRoutine.Quasistatic(frc2::sysid::Direction::kForward)};
+      m_emptySysidRoutine.Quasistatic(frc2::sysid::Direction::FORWARD)};
 
   void RunCommand(frc2::CommandPtr command) {
     command.get()->Initialize();
@@ -93,13 +93,13 @@ class SysIdRoutineTest : public ::testing::Test {
   void SetUp() override {
     frc::sim::PauseTiming();
     frc2::CommandPtr m_quasistaticForward{
-        m_sysidRoutine.Quasistatic(frc2::sysid::Direction::kForward)};
+        m_sysidRoutine.Quasistatic(frc2::sysid::Direction::FORWARD)};
     frc2::CommandPtr m_quasistaticReverse{
-        m_sysidRoutine.Quasistatic(frc2::sysid::Direction::kReverse)};
+        m_sysidRoutine.Quasistatic(frc2::sysid::Direction::REVERSE)};
     frc2::CommandPtr m_dynamicForward{
-        m_sysidRoutine.Dynamic(frc2::sysid::Direction::kForward)};
+        m_sysidRoutine.Dynamic(frc2::sysid::Direction::FORWARD)};
     frc2::CommandPtr m_dynamicReverse{
-        m_sysidRoutine.Dynamic(frc2::sysid::Direction::kReverse)};
+        m_sysidRoutine.Dynamic(frc2::sysid::Direction::REVERSE)};
   }
 
   void TearDown() override { frc::sim::ResumeTiming(); }

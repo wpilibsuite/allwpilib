@@ -21,8 +21,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class HolonomicDriveControllerTest {
-  private static final double kTolerance = 1 / 12.0;
-  private static final double kAngularTolerance = Math.toRadians(2);
+  private static final double TOLERANCE = 1 / 12.0;
+  private static final double ANGULAR_TOLERANCE = Math.toRadians(2);
 
   @Test
   void testReachesReference() {
@@ -32,23 +32,23 @@ class HolonomicDriveControllerTest {
             new PIDController(1.0, 0.0, 0.0),
             new ProfiledPIDController(
                 1.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2.0 * Math.PI, Math.PI)));
-    Pose2d robotPose = new Pose2d(2.7, 23.0, Rotation2d.kZero);
+    Pose2d robotPose = new Pose2d(2.7, 23.0, Rotation2d.ZERO);
 
     List<Pose2d> waypoints = new ArrayList<>();
-    waypoints.add(new Pose2d(2.75, 22.521, Rotation2d.kZero));
+    waypoints.add(new Pose2d(2.75, 22.521, Rotation2d.ZERO));
     waypoints.add(new Pose2d(24.73, 19.68, new Rotation2d(5.8)));
 
     TrajectoryConfig config = new TrajectoryConfig(8.0, 4.0);
     Trajectory trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
 
-    final double kDt = 0.02;
-    final double kTotalTime = trajectory.getTotalTime();
+    final double DT = 0.02;
+    final double TOTAL_TIME = trajectory.getTotalTime();
 
-    for (int i = 0; i < (kTotalTime / kDt); i++) {
-      Trajectory.State state = trajectory.sample(kDt * i);
-      ChassisSpeeds output = controller.calculate(robotPose, state, Rotation2d.kZero);
+    for (int i = 0; i < (TOTAL_TIME / DT); i++) {
+      Trajectory.State state = trajectory.sample(DT * i);
+      ChassisSpeeds output = controller.calculate(robotPose, state, Rotation2d.ZERO);
 
-      robotPose = robotPose.exp(new Twist2d(output.vx * kDt, output.vy * kDt, output.omega * kDt));
+      robotPose = robotPose.exp(new Twist2d(output.vx * DT, output.vy * DT, output.omega * DT));
     }
 
     final List<Trajectory.State> states = trajectory.getStates();
@@ -59,13 +59,13 @@ class HolonomicDriveControllerTest {
     final Pose2d finalRobotPose = robotPose;
 
     assertAll(
-        () -> assertEquals(endPose.getX(), finalRobotPose.getX(), kTolerance),
-        () -> assertEquals(endPose.getY(), finalRobotPose.getY(), kTolerance),
+        () -> assertEquals(endPose.getX(), finalRobotPose.getX(), TOLERANCE),
+        () -> assertEquals(endPose.getY(), finalRobotPose.getY(), TOLERANCE),
         () ->
             assertEquals(
                 0.0,
                 MathUtil.angleModulus(finalRobotPose.getRotation().getRadians()),
-                kAngularTolerance));
+                ANGULAR_TOLERANCE));
   }
 
   @Test
@@ -78,7 +78,7 @@ class HolonomicDriveControllerTest {
 
     ChassisSpeeds speeds =
         controller.calculate(
-            new Pose2d(0, 0, new Rotation2d(1.57)), Pose2d.kZero, 0, new Rotation2d(1.57));
+            new Pose2d(0, 0, new Rotation2d(1.57)), Pose2d.ZERO, 0, new Rotation2d(1.57));
 
     assertEquals(0.0, speeds.omega);
   }

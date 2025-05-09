@@ -19,9 +19,9 @@ import java.util.Set;
  * <p>The subclass should call feed() whenever the motor value is updated.
  */
 public abstract class MotorSafety {
-  private static final double kDefaultSafetyExpiration = 0.1;
+  private static final double DEFAULT_SAFETY_EXPIRATION = 0.1;
 
-  private double m_expiration = kDefaultSafetyExpiration;
+  private double m_expiration = DEFAULT_SAFETY_EXPIRATION;
   private boolean m_enabled;
   private double m_stopTime = Timer.getFPGATimestamp();
   private final Object m_thisMutex = new Object();

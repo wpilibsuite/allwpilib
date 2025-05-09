@@ -14,15 +14,15 @@ public class VideoSource implements AutoCloseable {
   /** Video source kind. */
   public enum Kind {
     /** Unknown video source. */
-    kUnknown(0),
+    UNKNOWN(0),
     /** USB video source. */
-    kUsb(1),
+    USB(1),
     /** HTTP video source. */
-    kHttp(2),
+    HTTP(2),
     /** CV video source. */
-    kCv(4),
+    CV(4),
     /** Raw video source. */
-    kRaw(8);
+    RAW(8);
 
     private final int value;
 
@@ -46,15 +46,15 @@ public class VideoSource implements AutoCloseable {
      * Automatically connect or disconnect based on whether any sinks are connected to this source.
      * This is the default behavior.
      */
-    kAutoManage(0),
+    AUTO_MANAGE(0),
 
     /** Try to keep the connection open regardless of whether any sinks are connected. */
-    kKeepOpen(1),
+    KEEP_OPEN(1),
 
     /**
      * Never open the connection. If this is set when the connection is open, close the connection.
      */
-    kForceClose(2);
+    FORCE_CLOSE(2);
 
     private final int value;
 
@@ -80,11 +80,11 @@ public class VideoSource implements AutoCloseable {
    */
   public static Kind getKindFromInt(int kind) {
     return switch (kind) {
-      case 1 -> Kind.kUsb;
-      case 2 -> Kind.kHttp;
-      case 4 -> Kind.kCv;
-      case 8 -> Kind.kRaw;
-      default -> Kind.kUnknown;
+      case 1 -> Kind.USB;
+      case 2 -> Kind.HTTP;
+      case 4 -> Kind.CV;
+      case 8 -> Kind.RAW;
+      default -> Kind.UNKNOWN;
     };
   }
 
@@ -212,7 +212,7 @@ public class VideoSource implements AutoCloseable {
    * Get a property.
    *
    * @param name Property name
-   * @return Property contents (of kind Property::kNone if no property with the given name exists)
+   * @return Property contents (of kind Property::NONE if no property with the given name exists)
    */
   public VideoProperty getProperty(String name) {
     return new VideoProperty(CameraServerJNI.getSourceProperty(m_handle, name));
@@ -345,7 +345,7 @@ public class VideoSource implements AutoCloseable {
    */
   public double getActualFPS() {
     return CameraServerJNI.getTelemetryAverageValue(
-        m_handle, CameraServerJNI.TelemetryKind.kSourceFramesReceived);
+        m_handle, CameraServerJNI.TelemetryKind.SOURCE_FRAMES_RECEIVED);
   }
 
   /**
@@ -358,7 +358,7 @@ public class VideoSource implements AutoCloseable {
    */
   public double getActualDataRate() {
     return CameraServerJNI.getTelemetryAverageValue(
-        m_handle, CameraServerJNI.TelemetryKind.kSourceBytesReceived);
+        m_handle, CameraServerJNI.TelemetryKind.SOURCE_BYTES_RECEIVED);
   }
 
   /**

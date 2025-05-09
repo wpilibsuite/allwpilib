@@ -106,10 +106,10 @@ class MotorSafety {
   virtual std::string GetDescription() const = 0;
 
  private:
-  static constexpr auto kDefaultSafetyExpiration = 100_ms;
+  static constexpr auto DEFAULT_SAFETY_EXPIRATION = 100_ms;
 
   // The expiration time for this object
-  units::second_t m_expiration = kDefaultSafetyExpiration;
+  units::second_t m_expiration = DEFAULT_SAFETY_EXPIRATION;
 
   // True if motor safety is enabled for this motor
   bool m_enabled = false;

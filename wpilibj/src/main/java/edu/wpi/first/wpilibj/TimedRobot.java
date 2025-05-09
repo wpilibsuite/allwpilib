@@ -63,7 +63,7 @@ public class TimedRobot extends IterativeRobotBase {
   }
 
   /** Default loop period. */
-  public static final double kDefaultPeriod = 0.02;
+  public static final double DEFAULT_PERIOD = 0.02;
 
   // The C pointer to the notifier object. We don't use it directly, it is
   // just passed to the JNI bindings.
@@ -76,7 +76,7 @@ public class TimedRobot extends IterativeRobotBase {
 
   /** Constructor for TimedRobot. */
   protected TimedRobot() {
-    this(kDefaultPeriod);
+    this(DEFAULT_PERIOD);
   }
 
   /**

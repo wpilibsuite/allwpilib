@@ -87,7 +87,7 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
       // Now enforce all acceleration limits.
       EnforceAccelerationLimits(reversed, constraints, &constrainedState);
 
-      if (ds.value() < kEpsilon) {
+      if (ds.value() < EPSILON) {
         break;
       }
 
@@ -143,7 +143,7 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
       // Check all acceleration constraints with the new max velocity.
       EnforceAccelerationLimits(reversed, constraints, &constrainedState);
 
-      if (ds.value() > -kEpsilon) {
+      if (ds.value() > -EPSILON) {
         break;
       }
 

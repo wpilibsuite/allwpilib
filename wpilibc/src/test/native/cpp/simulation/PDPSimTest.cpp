@@ -22,7 +22,7 @@ TEST(PowerDistributionSimTest, Initialize) {
   BooleanCallback callback;
 
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
-  PowerDistribution pdp(0, 2, frc::PowerDistribution::ModuleType::kCTRE);
+  PowerDistribution pdp(0, 2, frc::PowerDistribution::ModuleType::CTRE);
   EXPECT_TRUE(sim.GetInitialized());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
@@ -35,7 +35,7 @@ TEST(PowerDistributionSimTest, Initialize) {
 
 TEST(PowerDistributionSimTest, SetTemperature) {
   HAL_Initialize(500, 0);
-  PowerDistribution pdp{0, 2, frc::PowerDistribution::ModuleType::kCTRE};
+  PowerDistribution pdp{0, 2, frc::PowerDistribution::ModuleType::CTRE};
   PowerDistributionSim sim(pdp);
 
   DoubleCallback callback;
@@ -50,7 +50,7 @@ TEST(PowerDistributionSimTest, SetTemperature) {
 
 TEST(PowerDistributionSimTest, SetVoltage) {
   HAL_Initialize(500, 0);
-  PowerDistribution pdp{0, 2, frc::PowerDistribution::ModuleType::kCTRE};
+  PowerDistribution pdp{0, 2, frc::PowerDistribution::ModuleType::CTRE};
   PowerDistributionSim sim(pdp);
 
   DoubleCallback callback;
@@ -65,7 +65,7 @@ TEST(PowerDistributionSimTest, SetVoltage) {
 
 TEST(PowerDistributionSimTest, SetCurrent) {
   HAL_Initialize(500, 0);
-  PowerDistribution pdp{0, 2, frc::PowerDistribution::ModuleType::kCTRE};
+  PowerDistribution pdp{0, 2, frc::PowerDistribution::ModuleType::CTRE};
   PowerDistributionSim sim(pdp);
 
   for (int channel = 0; channel < HAL_GetNumCTREPDPChannels(); ++channel) {
@@ -73,10 +73,10 @@ TEST(PowerDistributionSimTest, SetCurrent) {
     auto cb =
         sim.RegisterCurrentCallback(channel, callback.GetCallback(), false);
 
-    const double kTestCurrent = 35.04 + channel;
-    sim.SetCurrent(channel, kTestCurrent);
-    EXPECT_EQ(kTestCurrent, sim.GetCurrent(channel));
-    EXPECT_EQ(kTestCurrent, pdp.GetCurrent(channel));
+    const double TEST_CURRENT = 35.04 + channel;
+    sim.SetCurrent(channel, TEST_CURRENT);
+    EXPECT_EQ(TEST_CURRENT, sim.GetCurrent(channel));
+    EXPECT_EQ(TEST_CURRENT, pdp.GetCurrent(channel));
     EXPECT_TRUE(callback.WasTriggered());
     EXPECT_TRUE(callback.GetLastValue());
   }
@@ -84,13 +84,13 @@ TEST(PowerDistributionSimTest, SetCurrent) {
 
 TEST(PowerDistributionSimTest, GetAllCurrents) {
   HAL_Initialize(500, 0);
-  PowerDistribution pdp{0, 2, frc::PowerDistribution::ModuleType::kRev};
+  PowerDistribution pdp{0, 2, frc::PowerDistribution::ModuleType::REV};
   PowerDistributionSim sim(pdp);
 
   // setup
   for (int channel = 0; channel < pdp.GetNumChannels(); ++channel) {
-    const double kTestCurrent = 24 - channel;
-    sim.SetCurrent(channel, kTestCurrent);
+    const double TEST_CURRENT = 24 - channel;
+    sim.SetCurrent(channel, TEST_CURRENT);
   }
 
   // run it
@@ -98,8 +98,8 @@ TEST(PowerDistributionSimTest, GetAllCurrents) {
 
   // verify
   for (int channel = 0; channel < pdp.GetNumChannels(); ++channel) {
-    const double kTestCurrent = 24 - channel;
-    EXPECT_EQ(kTestCurrent, currents[channel]);
+    const double TEST_CURRENT = 24 - channel;
+    EXPECT_EQ(TEST_CURRENT, currents[channel]);
   }
 }
 

@@ -73,7 +73,7 @@ class WPILIB_DLLEXPORT TrajectoryParameterizer {
       units::meters_per_second_squared_t maxAcceleration, bool reversed);
 
  private:
-  constexpr static double kEpsilon = 1E-6;
+  constexpr static double EPSILON = 1E-6;
 
   /**
    * Represents a constrained state that is used when time parameterizing a

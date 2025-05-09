@@ -45,7 +45,7 @@ void Tracer::PrintEpochs(wpi::raw_ostream& os) {
   using std::chrono::microseconds;
 
   auto now = hal::fpga_clock::now();
-  if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
+  if (now - m_lastEpochsPrintTime > MIN_PRINT_PERIOD) {
     m_lastEpochsPrintTime = now;
     for (const auto& epoch : m_epochs) {
       os << fmt::format(

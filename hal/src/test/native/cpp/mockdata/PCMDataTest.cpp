@@ -39,7 +39,7 @@ TEST(PCMDataTest, PCMInitialization) {
   module = 8000;
   gTestSolenoidCallbackName = "Unset";
   pcmHandle = HAL_InitializeCTREPCM(0, module, nullptr, &status);
-  EXPECT_EQ(HAL_kInvalidHandle, pcmHandle);
+  EXPECT_EQ(HAL_InvalidHandle, pcmHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
   EXPECT_EQ(RESOURCE_OUT_OF_RANGE, status);
@@ -50,7 +50,7 @@ TEST(PCMDataTest, PCMInitialization) {
   module = MODULE_TO_TEST;
   gTestSolenoidCallbackName = "Unset";
   pcmHandle = HAL_InitializeCTREPCM(0, module, nullptr, &status);
-  EXPECT_TRUE(HAL_kInvalidHandle != pcmHandle);
+  EXPECT_TRUE(HAL_InvalidHandle != pcmHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestSolenoidCallbackName.c_str());
 
@@ -59,7 +59,7 @@ TEST(PCMDataTest, PCMInitialization) {
   module = MODULE_TO_TEST;
   gTestSolenoidCallbackName = "Unset";
   pcmHandle = HAL_InitializeCTREPCM(0, module, nullptr, &status);
-  EXPECT_EQ(HAL_kInvalidHandle, pcmHandle);
+  EXPECT_EQ(HAL_InvalidHandle, pcmHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
   EXPECT_EQ(RESOURCE_IS_ALLOCATED, status);
@@ -77,7 +77,7 @@ TEST(PCMDataTest, PCMInitialization) {
   module = MODULE_TO_TEST;
   gTestSolenoidCallbackName = "Unset";
   pcmHandle = HAL_InitializeCTREPCM(0, module, nullptr, &status);
-  EXPECT_TRUE(HAL_kInvalidHandle != pcmHandle);
+  EXPECT_TRUE(HAL_InvalidHandle != pcmHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestSolenoidCallbackName.c_str());
 }

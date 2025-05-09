@@ -30,7 +30,7 @@ class XRPOnBoardIO {
  public:
   XRPOnBoardIO() {}  // No need to do anything. No configurable IO
 
-  static constexpr auto kMessageInterval = 1_s;
+  static constexpr auto MESSAGE_INTERVAL = 1_s;
   units::second_t m_nextMessageTime = 0_s;
 
   /**

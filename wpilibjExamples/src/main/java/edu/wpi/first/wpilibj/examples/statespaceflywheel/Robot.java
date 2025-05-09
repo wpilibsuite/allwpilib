@@ -24,17 +24,18 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
  * flywheel.
  */
 public class Robot extends TimedRobot {
-  private static final int kMotorPort = 0;
-  private static final int kEncoderAChannel = 0;
-  private static final int kEncoderBChannel = 1;
-  private static final int kJoystickPort = 0;
-  private static final double kSpinupRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(500.0);
+  private static final int MOTOR_PORT = 0;
+  private static final int ENCODER_A_CHANNEL = 0;
+  private static final int ENCODER_B_CHANNEL = 1;
+  private static final int JOYSTICK_PORT = 0;
+  private static final double SPINUP_RAD_PER_SEC =
+      Units.rotationsPerMinuteToRadiansPerSecond(500.0);
 
-  private static final double kFlywheelMomentOfInertia = 0.00032; // kg * m^2
+  private static final double FLYWHEEL_MOMENT_OF_INERTIA = 0.00032; // kg * m^2
 
   // Reduction between motors and encoder, as output over input. If the flywheel spins slower than
   // the motors, this number should be greater than one.
-  private static final double kFlywheelGearing = 1.0;
+  private static final double FLYWHEEL_GEARING = 1.0;
 
   // The plant holds a state-space model of our flywheel. This system has the following properties:
   //
@@ -43,7 +44,7 @@ public class Robot extends TimedRobot {
   // Outputs (what we can measure): [velocity], in radians per second.
   private final LinearSystem<N1, N1, N1> m_flywheelPlant =
       LinearSystemId.createFlywheelSystem(
-          DCMotor.getNEO(2), kFlywheelMomentOfInertia, kFlywheelGearing);
+          DCMotor.getNEO(2), FLYWHEEL_MOMENT_OF_INERTIA, FLYWHEEL_GEARING);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   private final KalmanFilter<N1, N1, N1> m_observer =
@@ -74,12 +75,12 @@ public class Robot extends TimedRobot {
       new LinearSystemLoop<>(m_flywheelPlant, m_controller, m_observer, 12.0, 0.020);
 
   // An encoder set up to measure flywheel velocity in radians per second.
-  private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
+  private final Encoder m_encoder = new Encoder(ENCODER_A_CHANNEL, ENCODER_B_CHANNEL);
 
-  private final PWMSparkMax m_motor = new PWMSparkMax(kMotorPort);
+  private final PWMSparkMax m_motor = new PWMSparkMax(MOTOR_PORT);
 
   // A joystick to read the trigger from.
-  private final Joystick m_joystick = new Joystick(kJoystickPort);
+  private final Joystick m_joystick = new Joystick(JOYSTICK_PORT);
 
   public Robot() {
     // We go 2 pi radians per 4096 clicks.
@@ -97,7 +98,7 @@ public class Robot extends TimedRobot {
     // PID controller.
     if (m_joystick.getTriggerPressed()) {
       // We just pressed the trigger, so let's set our next reference
-      m_loop.setNextR(VecBuilder.fill(kSpinupRadPerSec));
+      m_loop.setNextR(VecBuilder.fill(SPINUP_RAD_PER_SEC));
     } else if (m_joystick.getTriggerReleased()) {
       // We just released the trigger, so let's spin down
       m_loop.setNextR(VecBuilder.fill(0.0));

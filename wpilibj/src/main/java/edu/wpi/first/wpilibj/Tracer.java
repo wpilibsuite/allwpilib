@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  * which parts of an operation consumed the most time.
  */
 public class Tracer {
-  private static final long kMinPrintPeriod = 1000000; // microseconds
+  private static final long MIN_PRINT_PERIOD = 1000000; // microseconds
 
   private long m_lastEpochsPrintTime; // microseconds
   private long m_startTime; // microseconds
@@ -71,7 +71,7 @@ public class Tracer {
    */
   public void printEpochs(Consumer<String> output) {
     long now = RobotController.getFPGATime();
-    if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
+    if (now - m_lastEpochsPrintTime > MIN_PRINT_PERIOD) {
       StringBuilder sb = new StringBuilder();
       m_lastEpochsPrintTime = now;
       m_epochs.forEach(

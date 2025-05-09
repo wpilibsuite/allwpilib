@@ -10,7 +10,7 @@
 
 Shooter::Shooter() {
   m_shooterEncoder.SetDistancePerPulse(
-      constants::shooter::kEncoderDistancePerPulse.value());
+      constants::shooter::ENCODER_DISTANCE_PER_PULSE.value());
 }
 
 frc2::CommandPtr Shooter::RunShooterCommand(
@@ -22,7 +22,7 @@ frc2::CommandPtr Shooter::RunShooterCommand(
                        m_shooterEncoder.GetRate(), shooterSpeed())} +
                    m_shooterFeedforward.Calculate(
                        units::turns_per_second_t{shooterSpeed()}));
-               m_feederMotor.Set(constants::shooter::kFeederSpeed);
+               m_feederMotor.Set(constants::shooter::FEEDER_SPEED);
              },
              {this})
       .WithName("Set Shooter Speed");

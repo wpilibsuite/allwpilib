@@ -41,9 +41,9 @@ class Drivetrain {
  public:
   Drivetrain();
 
-  static constexpr units::meters_per_second_t kMaxSpeed =
+  static constexpr units::meters_per_second_t MAX_SPEED =
       3.0_mps;  // 3 meters per second
-  static constexpr units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr units::radians_per_second_t MAX_ANGULAR_SPEED{
       std::numbers::pi};  // 1/2 rotation per second
 
   /**
@@ -111,11 +111,11 @@ class Drivetrain {
                                 nt::DoubleArrayEntry& cameraToObjectEntry);
 
  private:
-  static constexpr units::meter_t kTrackwidth = 0.381_m * 2;
-  static constexpr units::meter_t kWheelRadius = 0.0508_m;
-  static constexpr int kEncoderResolution = 4096;
+  static constexpr units::meter_t TRACK_WIDTH = 0.381_m * 2;
+  static constexpr units::meter_t WHEEL_RADIUS = 0.0508_m;
+  static constexpr int ENCODER_RESOLUTION = 4096;
 
-  static constexpr std::array<double, 7> kDefaultVal{0.0, 0.0, 0.0, 0.0,
+  static constexpr std::array<double, 7> DEFAULT_VAL{0.0, 0.0, 0.0, 0.0,
                                                      0.0, 0.0, 0.0};
 
   frc::Transform3d m_robotToCamera{
@@ -126,11 +126,11 @@ class Drivetrain {
   nt::DoubleArrayTopic m_cameraToObjectTopic{
       m_inst.GetDoubleArrayTopic("m_cameraToObjectTopic")};
   nt::DoubleArrayEntry m_cameraToObjectEntry =
-      m_cameraToObjectTopic.GetEntry(kDefaultVal);
+      m_cameraToObjectTopic.GetEntry(DEFAULT_VAL);
   nt::DoubleArrayEntry& m_cameraToObjectEntryRef = m_cameraToObjectEntry;
 
   frc::AprilTagFieldLayout m_aprilTagFieldLayout{
-      frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2024Crescendo)};
+      frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::CRESCENDO_2024)};
   frc::Pose3d m_objectInField{m_aprilTagFieldLayout.GetTagPose(0).value()};
 
   frc::PWMSparkMax m_leftLeader{1};
@@ -146,7 +146,7 @@ class Drivetrain {
 
   frc::AnalogGyro m_gyro{0};
 
-  frc::DifferentialDriveKinematics m_kinematics{kTrackwidth};
+  frc::DifferentialDriveKinematics m_kinematics{TRACK_WIDTH};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
@@ -172,5 +172,5 @@ class Drivetrain {
       frc::LinearSystemId::IdentifyDrivetrainSystem(
           1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
   frc::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
-      m_drivetrainSystem, kTrackwidth, frc::DCMotor::CIM(2), 8, 2_in};
+      m_drivetrainSystem, TRACK_WIDTH, frc::DCMotor::CIM(2), 8, 2_in};
 };

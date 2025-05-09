@@ -339,7 +339,7 @@ class RawTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return RawSubscriber{
         ::nt::Subscribe(m_handle, NT_RAW, typeString, options),
         defaultValue};
@@ -362,7 +362,7 @@ class RawTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(std::string_view typeString, const PubSubOptions& options = kDefaultPubSubOptions) {
+  PublisherType Publish(std::string_view typeString, const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return RawPublisher{
         ::nt::Publish(m_handle, NT_RAW, typeString, options)};
   }
@@ -387,7 +387,7 @@ class RawTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::json& properties, const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return RawPublisher{
         ::nt::PublishEx(m_handle, NT_RAW, typeString, properties, options)};
   }
@@ -416,7 +416,7 @@ class RawTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(std::string_view typeString, ParamType defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions) {
+                     const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return RawEntry{
         ::nt::GetEntry(m_handle, NT_RAW, typeString, options),
         defaultValue};

@@ -136,7 +136,7 @@ class KeyboardJoystick : public SystemJoystick {
   std::vector<std::unique_ptr<glass::Storage>>& m_axisStorage;
   std::vector<AxisConfig> m_axisConfig;
 
-  static constexpr int kMaxButtonCount = 32;
+  static constexpr int MAX_BUTTON_COUNT = 32;
   std::vector<int>& m_buttonKey;
 
   struct PovConfig {
@@ -197,11 +197,11 @@ class JoystickModel {
   int axisCount;
   int buttonCount;
   int povCount;
-  std::unique_ptr<glass::DoubleSource> axes[HAL_kMaxJoystickAxes];
+  std::unique_ptr<glass::DoubleSource> axes[HAL_MaxJoystickAxes];
   // use pointer instead of unique_ptr to allow it to be passed directly
   // to DrawLEDSources()
   glass::BooleanSource* buttons[32];
-  std::unique_ptr<glass::IntegerSource> povs[HAL_kMaxJoystickPOVs];
+  std::unique_ptr<glass::IntegerSource> povs[HAL_MaxJoystickPOVs];
 
  private:
   static void CallbackFunc(const char*, void* param, const HAL_Value*);
@@ -272,7 +272,7 @@ static std::vector<std::unique_ptr<GlfwKeyboardJoystick>> gKeyboardJoysticks;
 
 // robot joysticks
 static std::vector<RobotJoystick> gRobotJoysticks;
-static std::unique_ptr<JoystickModel> gJoystickSources[HAL_kMaxJoysticks];
+static std::unique_ptr<JoystickModel> gJoystickSources[HAL_MaxJoysticks];
 
 // FMS
 static std::unique_ptr<FMSSimModel> gFMSModel;
@@ -442,10 +442,10 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
   data->desc.type = m_isGamepad ? 21 : 20;
   std::strncpy(data->desc.name, m_name, sizeof(data->desc.name) - 1);
   data->desc.name[sizeof(data->desc.name) - 1] = '\0';
-  data->desc.axisCount = (std::min)(m_axisCount, HAL_kMaxJoystickAxes);
+  data->desc.axisCount = (std::min)(m_axisCount, HAL_MaxJoystickAxes);
   // desc.axisTypes ???
   data->desc.buttonCount = (std::min)(m_buttonCount, 32);
-  data->desc.povCount = (std::min)(m_hatCount, HAL_kMaxJoystickPOVs);
+  data->desc.povCount = (std::min)(m_hatCount, HAL_MaxJoystickPOVs);
 
   data->buttons.count = data->desc.buttonCount;
   for (int j = 0; j < data->buttons.count; ++j) {
@@ -617,8 +617,8 @@ void KeyboardJoystick::SettingsDisplay() {
     if (ImGui::InputInt("Count", &m_axisCount)) {
       if (m_axisCount < 0) {
         m_axisCount = 0;
-      } else if (m_axisCount > HAL_kMaxJoystickAxes) {
-        m_axisCount = HAL_kMaxJoystickAxes;
+      } else if (m_axisCount > HAL_MaxJoystickAxes) {
+        m_axisCount = HAL_MaxJoystickAxes;
       }
     }
     while (m_axisCount > static_cast<int>(m_axisConfig.size())) {
@@ -652,8 +652,8 @@ void KeyboardJoystick::SettingsDisplay() {
       if (m_buttonCount < 0) {
         m_buttonCount = 0;
       }
-      if (m_buttonCount > kMaxButtonCount) {
-        m_buttonCount = kMaxButtonCount;
+      if (m_buttonCount > MAX_BUTTON_COUNT) {
+        m_buttonCount = MAX_BUTTON_COUNT;
       }
     }
     while (m_buttonCount > static_cast<int>(m_buttonKey.size())) {
@@ -674,8 +674,8 @@ void KeyboardJoystick::SettingsDisplay() {
       if (m_povCount < 0) {
         m_povCount = 0;
       }
-      if (m_povCount > HAL_kMaxJoystickPOVs) {
-        m_povCount = HAL_kMaxJoystickPOVs;
+      if (m_povCount > HAL_MaxJoystickPOVs) {
+        m_povCount = HAL_MaxJoystickPOVs;
       }
     }
     while (m_povCount > static_cast<int>(m_povConfig.size())) {
@@ -1022,7 +1022,7 @@ static void DriverStationConnect(bool enabled, bool autonomous, bool test) {
 
 static void DriverStationExecute() {
   // update sources
-  for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
+  for (int i = 0; i < HAL_MaxJoysticks; ++i) {
     auto& source = gJoystickSources[i];
     int32_t axisCount, buttonCount, povCount;
     HALSIM_GetJoystickCounts(i, &axisCount, &buttonCount, &povCount);
@@ -1042,11 +1042,11 @@ static void DriverStationExecute() {
   bool disableDS = IsDSDisabled();
   if (disableDS && !prevDisableDS) {
     if (auto win = DriverStationGui::dsManager->GetWindow("System Joysticks")) {
-      win->SetVisibility(glass::Window::kDisabled);
+      win->SetVisibility(glass::Window::DISABLED);
     }
   } else if (!disableDS && prevDisableDS) {
     if (auto win = DriverStationGui::dsManager->GetWindow("System Joysticks")) {
-      win->SetVisibility(glass::Window::kShow);
+      win->SetVisibility(glass::Window::SHOW);
     }
   }
   prevDisableDS = disableDS;
@@ -1139,7 +1139,7 @@ static void DriverStationExecute() {
   // Update HAL
   if (isAttached && !isAuto) {
     for (int i = 0, end = gRobotJoysticks.size();
-         i < end && i < HAL_kMaxJoysticks; ++i) {
+         i < end && i < HAL_MaxJoysticks; ++i) {
       gRobotJoysticks[i].SetHAL(i);
     }
   }
@@ -1156,7 +1156,7 @@ static void DriverStationExecute() {
 
 FMSSimModel::FMSSimModel() {
   m_matchTime.SetValue(-1.0);
-  m_allianceStationId.SetValue(HAL_AllianceStationID_kRed1);
+  m_allianceStationId.SetValue(HAL_AllianceStationID_Red1);
 }
 
 void FMSSimModel::UpdateHAL() {
@@ -1268,10 +1268,10 @@ static void DisplaySystemJoysticks() {
 static void DisplayJoysticks() {
   bool disableDS = IsDSDisabled();
   // imgui doesn't size columns properly with autoresize, so force it
-  ImGui::Dummy(ImVec2(ImGui::GetFontSize() * 10 * HAL_kMaxJoysticks, 0));
+  ImGui::Dummy(ImVec2(ImGui::GetFontSize() * 10 * HAL_MaxJoysticks, 0));
 
-  ImGui::Columns(HAL_kMaxJoysticks, "Joysticks", false);
-  for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
+  ImGui::Columns(HAL_MaxJoysticks, "Joysticks", false);
+  for (int i = 0; i < HAL_MaxJoysticks; ++i) {
     auto& joy = gRobotJoysticks[i];
     char label[128];
     joy.name.GetLabel(label, sizeof(label), "Joystick", i);
@@ -1312,7 +1312,7 @@ static void DisplayJoysticks() {
   }
   ImGui::Separator();
 
-  for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
+  for (int i = 0; i < HAL_MaxJoysticks; ++i) {
     auto& joy = gRobotJoysticks[i];
     auto source = gJoystickSources[i].get();
 
@@ -1441,8 +1441,8 @@ void DriverStationGui::GlobalInit() {
     }
 
     auto& robotJoystickStorage = storageRoot.GetChildArray("robotJoysticks");
-    robotJoystickStorage.resize(HAL_kMaxJoysticks);
-    for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
+    robotJoystickStorage.resize(HAL_MaxJoysticks);
+    for (int i = 0; i < HAL_MaxJoysticks; ++i) {
       if (!robotJoystickStorage[i]) {
         robotJoystickStorage[i] = std::make_unique<glass::Storage>();
       }
@@ -1457,7 +1457,7 @@ void DriverStationGui::GlobalInit() {
 
       if (auto win = dsManager->AddWindow(
               label, [j = joy.get()] { j->SettingsDisplay(); },
-              glass::Window::kHide)) {
+              glass::Window::HIDE)) {
         win->DisableRenamePopup();
         win->SetDefaultPos(10 + 310 * i++, 50);
         if (i > 3) {

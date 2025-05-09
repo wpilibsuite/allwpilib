@@ -29,7 +29,7 @@ class LoadConfigTest {
 
   @Test
   void test2022RapidReact() {
-    AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.k2022RapidReact);
+    AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.RAPID_REACT_2022);
 
     // Blue Hangar Truss - Hub
     Pose3d expectedPose =
@@ -37,7 +37,7 @@ class LoadConfigTest {
             Units.inchesToMeters(127.272),
             Units.inchesToMeters(216.01),
             Units.inchesToMeters(67.932),
-            Rotation3d.kZero);
+            Rotation3d.ZERO);
     Optional<Pose3d> maybePose = layout.getTagPose(1);
     assertTrue(maybePose.isPresent());
     assertEquals(expectedPose, maybePose.get());

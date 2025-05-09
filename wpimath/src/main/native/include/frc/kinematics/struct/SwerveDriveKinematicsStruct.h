@@ -12,29 +12,29 @@
 
 template <size_t NumModules>
 struct wpi::Struct<frc::SwerveDriveKinematics<NumModules>> {
-  static constexpr ct_string kTypeName = wpi::Concat(
+  static constexpr ct_string TYPE_NAME = wpi::Concat(
       "SwerveDriveKinematics__"_ct_string, wpi::NumToCtString<NumModules>());
-  static constexpr std::string_view GetTypeName() { return kTypeName; }
+  static constexpr std::string_view GetTypeName() { return TYPE_NAME; }
   static constexpr size_t GetSize() {
     return NumModules * wpi::Struct<frc::Translation2d>::GetSize();
   }
-  static constexpr ct_string kSchema =
+  static constexpr ct_string SCHEMA =
       wpi::Concat("Translation2d modules["_ct_string,
                   wpi::NumToCtString<NumModules>(), "]"_ct_string);
-  static constexpr std::string_view GetSchema() { return kSchema; }
+  static constexpr std::string_view GetSchema() { return SCHEMA; }
 
   static frc::SwerveDriveKinematics<NumModules> Unpack(
       std::span<const uint8_t> data) {
-    constexpr size_t kModulesOff = 0;
+    constexpr size_t MODULES_OFF = 0;
     return frc::SwerveDriveKinematics<NumModules>{
-        wpi::UnpackStructArray<frc::Translation2d, kModulesOff, NumModules>(
+        wpi::UnpackStructArray<frc::Translation2d, MODULES_OFF, NumModules>(
             data)};
   }
 
   static void Pack(std::span<uint8_t> data,
                    const frc::SwerveDriveKinematics<NumModules>& value) {
-    constexpr size_t kModulesOff = 0;
-    wpi::PackStructArray<kModulesOff, NumModules>(data, value.GetModules());
+    constexpr size_t MODULES_OFF = 0;
+    wpi::PackStructArray<MODULES_OFF, NumModules>(data, value.GetModules());
   }
 
   static void ForEachNested(

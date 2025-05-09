@@ -23,7 +23,7 @@ public class ParallelRaceGroup extends Command {
   private final Set<Command> m_commands = new LinkedHashSet<>();
   private boolean m_runWhenDisabled = true;
   private boolean m_finished = true;
-  private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
+  private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.CANCEL_INCOMING;
 
   /**
    * Creates a new ParallelCommandRace. The given commands will be executed simultaneously, and will
@@ -59,8 +59,8 @@ public class ParallelRaceGroup extends Command {
       m_commands.add(command);
       addRequirements(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
-      if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
-        m_interruptBehavior = InterruptionBehavior.kCancelSelf;
+      if (command.getInterruptionBehavior() == InterruptionBehavior.CANCEL_SELF) {
+        m_interruptBehavior = InterruptionBehavior.CANCEL_SELF;
       }
     }
   }

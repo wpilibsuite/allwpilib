@@ -125,7 +125,7 @@ public final class DynamicStruct {
    * @throws ArrayIndexOutOfBoundsException if array index is out of bounds
    */
   public boolean getBoolField(StructFieldDescriptor field, int arrIndex) {
-    if (field.getType() != StructFieldType.kBool) {
+    if (field.getType() != StructFieldType.BOOL) {
       throw new UnsupportedOperationException("field is not bool type");
     }
     return getFieldImpl(field, arrIndex) != 0;
@@ -157,7 +157,7 @@ public final class DynamicStruct {
    * @throws ReadOnlyBufferException if the underlying buffer is read-only
    */
   public void setBoolField(StructFieldDescriptor field, boolean value, int arrIndex) {
-    if (field.getType() != StructFieldType.kBool) {
+    if (field.getType() != StructFieldType.BOOL) {
       throw new UnsupportedOperationException("field is not bool type");
     }
     setFieldImpl(field, value ? 1 : 0, arrIndex);
@@ -253,7 +253,7 @@ public final class DynamicStruct {
    * @throws ArrayIndexOutOfBoundsException if array index is out of bounds
    */
   public float getFloatField(StructFieldDescriptor field, int arrIndex) {
-    if (field.getType() != StructFieldType.kFloat) {
+    if (field.getType() != StructFieldType.FLOAT) {
       throw new UnsupportedOperationException("field is not float type");
     }
     return Float.intBitsToFloat((int) getFieldImpl(field, arrIndex));
@@ -285,7 +285,7 @@ public final class DynamicStruct {
    * @throws ReadOnlyBufferException if the underlying buffer is read-only
    */
   public void setFloatField(StructFieldDescriptor field, float value, int arrIndex) {
-    if (field.getType() != StructFieldType.kFloat) {
+    if (field.getType() != StructFieldType.FLOAT) {
       throw new UnsupportedOperationException("field is not float type");
     }
     setFieldImpl(field, Float.floatToIntBits(value), arrIndex);
@@ -317,7 +317,7 @@ public final class DynamicStruct {
    * @throws ArrayIndexOutOfBoundsException if array index is out of bounds
    */
   public double getDoubleField(StructFieldDescriptor field, int arrIndex) {
-    if (field.getType() != StructFieldType.kDouble) {
+    if (field.getType() != StructFieldType.DOUBLE) {
       throw new UnsupportedOperationException("field is not double type");
     }
     return Double.longBitsToDouble(getFieldImpl(field, arrIndex));
@@ -349,7 +349,7 @@ public final class DynamicStruct {
    * @throws ReadOnlyBufferException if the underlying buffer is read-only
    */
   public void setDoubleField(StructFieldDescriptor field, double value, int arrIndex) {
-    if (field.getType() != StructFieldType.kDouble) {
+    if (field.getType() != StructFieldType.DOUBLE) {
       throw new UnsupportedOperationException("field is not double type");
     }
     setFieldImpl(field, Double.doubleToLongBits(value), arrIndex);
@@ -380,7 +380,7 @@ public final class DynamicStruct {
    */
   @SuppressWarnings({"PMD.CollapsibleIfStatements", "PMD.AvoidDeeplyNestedIfStmts"})
   public String getStringField(StructFieldDescriptor field) {
-    if (field.getType() != StructFieldType.kChar) {
+    if (field.getType() != StructFieldType.CHAR) {
       throw new UnsupportedOperationException("field is not char type");
     }
     if (!field.getParent().equals(m_desc)) {
@@ -454,7 +454,7 @@ public final class DynamicStruct {
    * @throws IllegalStateException if struct descriptor is invalid
    */
   public boolean setStringField(StructFieldDescriptor field, String value) {
-    if (field.getType() != StructFieldType.kChar) {
+    if (field.getType() != StructFieldType.CHAR) {
       throw new UnsupportedOperationException("field is not char type");
     }
     if (!field.getParent().equals(m_desc)) {
@@ -485,7 +485,7 @@ public final class DynamicStruct {
    * @throws ArrayIndexOutOfBoundsException if array index is out of bounds
    */
   public DynamicStruct getStructField(StructFieldDescriptor field, int arrIndex) {
-    if (field.getType() != StructFieldType.kStruct) {
+    if (field.getType() != StructFieldType.STRUCT) {
       throw new UnsupportedOperationException("field is not struct type");
     }
     if (!field.getParent().equals(m_desc)) {
@@ -528,7 +528,7 @@ public final class DynamicStruct {
    * @throws ReadOnlyBufferException if the underlying buffer is read-only
    */
   public void setStructField(StructFieldDescriptor field, DynamicStruct value, int arrIndex) {
-    if (field.getType() != StructFieldType.kStruct) {
+    if (field.getType() != StructFieldType.STRUCT) {
       throw new UnsupportedOperationException("field is not struct type");
     }
     if (!field.getParent().equals(m_desc)) {
@@ -588,7 +588,7 @@ public final class DynamicStruct {
           default -> throw new IllegalStateException("invalid field size");
         };
 
-    if (field.isUint() || field.getType() == StructFieldType.kBool) {
+    if (field.isUint() || field.getType() == StructFieldType.BOOL) {
       // for unsigned fields, we can simply logical shift and mask
       return (val >>> field.m_bitShift) & field.getBitMask();
     } else {

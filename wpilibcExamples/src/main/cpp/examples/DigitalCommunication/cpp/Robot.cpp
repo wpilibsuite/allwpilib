@@ -9,7 +9,7 @@
 void Robot::RobotPeriodic() {
   // pull alliance port high if on red alliance, pull low if on blue alliance
   m_allianceOutput.Set(frc::DriverStation::GetAlliance() ==
-                       frc::DriverStation::kRed);
+                       frc::DriverStation::RED);
 
   // pull enabled port high if enabled, low if disabled
   m_enabledOutput.Set(frc::DriverStation::IsEnabled());

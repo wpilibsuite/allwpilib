@@ -27,7 +27,7 @@ class CTREPCMData {
       false};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetSolenoidOutputName,
                GetSolenoidOutputDefault>
-      solenoidOutput[kNumCTRESolenoidChannels];
+      solenoidOutput[NUM_CTRE_SOLENOID_CHANNELS];
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetCompressorOnName> compressorOn{
       false};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetClosedLoopEnabledName>

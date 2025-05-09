@@ -47,16 +47,16 @@ public final class NetworkTableInstance implements AutoCloseable {
   /** Client/server mode flag values (as returned by {@link #getNetworkMode()}). */
   public enum NetworkMode {
     /** Running in server mode. */
-    kServer(0x01),
+    SERVER(0x01),
 
     /** Running in client mode. */
-    kClient(0x04),
+    CLIENT(0x04),
 
     /** Currently starting up (either client or server). */
-    kStarting(0x08),
+    STARTING(0x08),
 
     /** Running in local-only mode. */
-    kLocal(0x10);
+    LOCAL(0x10);
 
     private final int value;
 
@@ -75,7 +75,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /** The default port that network tables operates on. */
-  public static final int kDefaultPort = 5810;
+  public static final int DEFAULT_PORT = 5810;
 
   /**
    * Construct from native handle.
@@ -989,9 +989,9 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public int addConnectionListener(
       boolean immediateNotify, Consumer<NetworkTableEvent> listener) {
-    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.kConnection);
+    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.CONNECTION);
     if (immediateNotify) {
-      eventKinds.add(NetworkTableEvent.Kind.kImmediate);
+      eventKinds.add(NetworkTableEvent.Kind.IMMEDIATE);
     }
     return m_listeners.add(m_handle, eventKinds, listener);
   }
@@ -1007,9 +1007,9 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public int addTimeSyncListener(
       boolean immediateNotify, Consumer<NetworkTableEvent> listener) {
-    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.kTimeSync);
+    EnumSet<NetworkTableEvent.Kind> eventKinds = EnumSet.of(NetworkTableEvent.Kind.TIME_SYNC);
     if (immediateNotify) {
-      eventKinds.add(NetworkTableEvent.Kind.kImmediate);
+      eventKinds.add(NetworkTableEvent.Kind.IMMEDIATE);
     }
     return m_listeners.add(m_handle, eventKinds, listener);
   }
@@ -1181,7 +1181,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * @param listenAddress the address to listen on, or empty to listen on any address
    */
   public void startServer(String persistFilename, String listenAddress) {
-    startServer(persistFilename, listenAddress, kDefaultPort);
+    startServer(persistFilename, listenAddress, DEFAULT_PORT);
   }
 
   /**

@@ -24,7 +24,7 @@ public record CustomStruct(int x) implements StructSerializable {
 
     @Override
     public int getSize() {
-      return kSizeInt32;
+      return SIZE_INT32;
     }
 
     @Override

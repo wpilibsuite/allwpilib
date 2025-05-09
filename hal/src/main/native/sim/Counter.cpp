@@ -12,13 +12,13 @@
 
 namespace hal {
 
-LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
+LimitedHandleResource<HAL_CounterHandle, Counter, NUM_COUNTERS,
                       HAL_HandleEnum::Counter>* counterHandles;
 }  // namespace hal
 
 namespace hal::init {
 void InitializeCounter() {
-  static LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
+  static LimitedHandleResource<HAL_CounterHandle, Counter, NUM_COUNTERS,
                                HAL_HandleEnum::Counter>
       cH;
   counterHandles = &cH;

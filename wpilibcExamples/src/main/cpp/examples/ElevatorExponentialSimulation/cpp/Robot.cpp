@@ -25,10 +25,10 @@ void Robot::TeleopInit() {
 void Robot::TeleopPeriodic() {
   if (m_joystick.GetTrigger()) {
     // Here, we set the constant setpoint of 0.75 meters.
-    m_elevator.ReachGoal(Constants::kSetpoint);
+    m_elevator.ReachGoal(Constants::SETPOINT);
   } else {
     // Otherwise, we update the setpoint to 0.
-    m_elevator.ReachGoal(Constants::kLowerSetpoint);
+    m_elevator.ReachGoal(Constants::LOWER_SETPOINT);
   }
 }
 

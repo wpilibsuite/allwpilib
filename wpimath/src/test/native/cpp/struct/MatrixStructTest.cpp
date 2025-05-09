@@ -13,7 +13,7 @@ using namespace frc;
 struct MatrixStructTestData {
   using Type = Matrixd<2, 3>;
 
-  inline static const Type kTestData{{1.1, 1.2, 1.3}, {1.4, 1.5, 1.6}};
+  inline static const Type TEST_DATA{{1.1, 1.2, 1.3}, {1.4, 1.5, 1.6}};
 
   static void CheckEq(const Type& testData, const Type& data) {
     EXPECT_EQ(testData, data);

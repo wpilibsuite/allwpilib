@@ -177,9 +177,9 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
      *
      * <p>This is the default behavior.
      */
-    kCancelSelf,
+    CANCEL_SELF,
     /** This command continues, and the incoming command is not scheduled. */
-    kCancelIncoming
+    CANCEL_INCOMING
   };
 
   friend class CommandPtr;
@@ -479,10 +479,10 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * How the command behaves when another command with a shared requirement is
    * scheduled.
    *
-   * @return a variant of InterruptionBehavior, defaulting to kCancelSelf.
+   * @return a variant of InterruptionBehavior, defaulting to CANCEL_SELF.
    */
   virtual InterruptionBehavior GetInterruptionBehavior() const {
-    return InterruptionBehavior::kCancelSelf;
+    return InterruptionBehavior::CANCEL_SELF;
   }
 
   /**

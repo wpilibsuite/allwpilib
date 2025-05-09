@@ -20,10 +20,10 @@ public interface SendableBuilder extends AutoCloseable {
   /** The backend kinds used for the sendable builder. */
   enum BackendKind {
     /** Unknown. */
-    kUnknown,
+    UNKNOWN,
 
     /** NetworkTables. */
-    kNetworkTables
+    NETWORK_TABLES
   }
 
   /**

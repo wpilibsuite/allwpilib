@@ -38,7 +38,7 @@ public class Translation3d
    *
    * <p>This exists to avoid allocations for common translations.
    */
-  public static final Translation3d kZero = new Translation3d();
+  public static final Translation3d ZERO = new Translation3d();
 
   private final double m_x;
   private final double m_y;

@@ -17,7 +17,7 @@ import java.util.Objects;
  *
  * <pre><code>
  * ExponentialProfile.Constraints constraints =
- *   ExponentialProfile.Constraints.fromCharacteristics(kMaxV, kV, kA);
+ *   ExponentialProfile.Constraints.fromCharacteristics(MAX_V, V, A);
  * ExponentialProfile.State previousProfiledReference =
  *   new ExponentialProfile.State(initialReference, 0.0);
  * ExponentialProfile profile = new ExponentialProfile(constraints);
@@ -106,12 +106,12 @@ public class ExponentialProfile {
      * Constructs constraints for an ExponentialProfile from characteristics.
      *
      * @param maxInput maximum unsigned input voltage
-     * @param kV The velocity gain.
-     * @param kA The acceleration gain.
+     * @param v The velocity gain.
+     * @param a The acceleration gain.
      * @return The Constraints object.
      */
-    public static Constraints fromCharacteristics(double maxInput, double kV, double kA) {
-      return new Constraints(maxInput, -kV / kA, 1.0 / kA);
+    public static Constraints fromCharacteristics(double maxInput, double v, double a) {
+      return new Constraints(maxInput, -v / a, 1.0 / a);
     }
 
     /**

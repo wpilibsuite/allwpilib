@@ -75,19 +75,19 @@ int main(int argc, char** argv) {
   for (const auto& prop : camera.EnumerateProperties()) {
     wpi::print("  {}", prop.GetName());
     switch (prop.GetKind()) {
-      case cs::VideoProperty::kBoolean:
+      case cs::VideoProperty::BOOLEAN:
         wpi::print(" (bool): value={} default={}", prop.Get(),
                    prop.GetDefault());
         break;
-      case cs::VideoProperty::kInteger:
+      case cs::VideoProperty::INTEGER:
         wpi::print(" (int): value={} min={} max={} step={} default={}",
                    prop.Get(), prop.GetMin(), prop.GetMax(), prop.GetStep(),
                    prop.GetDefault());
         break;
-      case cs::VideoProperty::kString:
+      case cs::VideoProperty::STRING:
         wpi::print(" (string): {}", prop.GetString());
         break;
-      case cs::VideoProperty::kEnum: {
+      case cs::VideoProperty::ENUM: {
         wpi::print(" (enum): value={}", prop.Get());
         auto choices = prop.GetChoices();
         for (size_t i = 0; i < choices.size(); ++i) {

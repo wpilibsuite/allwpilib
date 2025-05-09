@@ -428,19 +428,19 @@ void HttpMultipartScanner::SetBoundary(std::string_view boundary) {
   m_boundaryWith += boundary;
   m_boundaryWithout = "\n";
   m_boundaryWithout += boundary;
-  m_dashes = kUnknown;
+  m_dashes = UNKNOWN;
 }
 
 void HttpMultipartScanner::Reset(bool saveSkipped) {
   m_saveSkipped = saveSkipped;
-  m_state = kBoundary;
+  m_state = BOUNDARY;
   m_posWith = 0;
   m_posWithout = 0;
   m_buf.resize(0);
 }
 
 std::string_view HttpMultipartScanner::Execute(std::string_view in) {
-  if (m_state == kDone) {
+  if (m_state == DONE) {
     Reset(m_saveSkipped);
   }
   if (m_saveSkipped) {
@@ -448,16 +448,16 @@ std::string_view HttpMultipartScanner::Execute(std::string_view in) {
   }
 
   size_t pos = 0;
-  if (m_state == kBoundary) {
+  if (m_state == BOUNDARY) {
     for (char ch : in) {
       ++pos;
-      if (m_dashes != kWithout) {
+      if (m_dashes != WITHOUT) {
         if (ch == m_boundaryWith[m_posWith]) {
           ++m_posWith;
           if (m_posWith == m_boundaryWith.size()) {
             // Found the boundary; transition to padding
-            m_state = kPadding;
-            m_dashes = kWith;  // no longer accept plain 'boundary'
+            m_state = PADDING;
+            m_dashes = WITH;  // no longer accept plain 'boundary'
             break;
           }
         } else if (ch == m_boundaryWith[0]) {
@@ -467,13 +467,13 @@ std::string_view HttpMultipartScanner::Execute(std::string_view in) {
         }
       }
 
-      if (m_dashes != kWith) {
+      if (m_dashes != WITH) {
         if (ch == m_boundaryWithout[m_posWithout]) {
           ++m_posWithout;
           if (m_posWithout == m_boundaryWithout.size()) {
             // Found the boundary; transition to padding
-            m_state = kPadding;
-            m_dashes = kWithout;  // no longer accept '--boundary'
+            m_state = PADDING;
+            m_dashes = WITHOUT;  // no longer accept '--boundary'
             break;
           }
         } else if (ch == m_boundaryWithout[0]) {
@@ -485,12 +485,12 @@ std::string_view HttpMultipartScanner::Execute(std::string_view in) {
     }
   }
 
-  if (m_state == kPadding) {
+  if (m_state == PADDING) {
     for (char ch : drop_front(in, pos)) {
       ++pos;
       if (ch == '\n') {
         // Found the LF; return remaining input buffer (following it)
-        m_state = kDone;
+        m_state = DONE;
         if (m_saveSkipped) {
           m_buf.resize(m_buf.size() - in.size() + pos);
         }

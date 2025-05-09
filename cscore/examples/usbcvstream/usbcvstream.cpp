@@ -10,12 +10,12 @@
 
 int main() {
   cs::UsbCamera camera{"usbcam", 0};
-  camera.SetVideoMode(cs::VideoMode::kMJPEG, 320, 240, 30);
+  camera.SetVideoMode(cs::VideoMode::MJPEG, 320, 240, 30);
   cs::MjpegServer mjpegServer{"httpserver", 8081};
   mjpegServer.SetSource(camera);
   cs::CvSink cvsink{"cvsink"};
   cvsink.SetSource(camera);
-  cs::CvSource cvsource{"cvsource", cs::VideoMode::kMJPEG, 320, 240, 30};
+  cs::CvSource cvsource{"cvsource", cs::VideoMode::MJPEG, 320, 240, 30};
   cs::MjpegServer cvMjpegServer{"cvhttpserver", 8082};
   cvMjpegServer.SetSource(cvsource);
 

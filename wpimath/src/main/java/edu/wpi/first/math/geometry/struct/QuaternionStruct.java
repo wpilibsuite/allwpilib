@@ -21,7 +21,7 @@ public class QuaternionStruct implements Struct<Quaternion> {
 
   @Override
   public int getSize() {
-    return kSizeDouble * 4;
+    return SIZE_DOUBLE * 4;
   }
 
   @Override

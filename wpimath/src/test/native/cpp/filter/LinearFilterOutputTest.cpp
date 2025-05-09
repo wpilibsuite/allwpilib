@@ -16,20 +16,20 @@
 #include "units/time.h"
 
 // Filter constants
-static constexpr auto kFilterStep = 5_ms;
-static constexpr auto kFilterTime = 2_s;
-static constexpr double kSinglePoleIIRTimeConstant = 0.015915;
-static constexpr double kSinglePoleIIRExpectedOutput = -3.2172003;
-static constexpr double kHighPassTimeConstant = 0.006631;
-static constexpr double kHighPassExpectedOutput = 10.074717;
-static constexpr int32_t kMovAvgTaps = 6;
-static constexpr double kMovAvgExpectedOutput = -10.191644;
+static constexpr auto FILTER_STEP = 5_ms;
+static constexpr auto FILTER_TIME = 2_s;
+static constexpr double SINGLE_POLE_IIR_TIME_CONSTANT = 0.015915;
+static constexpr double SINGLE_POLE_IIR_EXPECTED_OUTPUT = -3.2172003;
+static constexpr double HIGH_PASS_TIME_CONSTANT = 0.006631;
+static constexpr double HIGH_PASS_EXPECTED_OUTPUT = 10.074717;
+static constexpr int32_t MOV_AVG_TAPS = 6;
+static constexpr double MOV_AVG_EXPECTED_OUTPUT = -10.191644;
 
 enum LinearFilterOutputTestType {
-  kTestSinglePoleIIR,
-  kTestHighPass,
-  kTestMovAvg,
-  kTestPulse
+  TEST_SINGLE_POLE_IIR,
+  TEST_HIGH_PASS,
+  TEST_MOV_AVG,
+  TEST_PULSE
 };
 
 static double GetData(double t) {
@@ -53,19 +53,19 @@ class LinearFilterOutputTest
  protected:
   frc::LinearFilter<double> m_filter = [=] {
     switch (GetParam()) {
-      case kTestSinglePoleIIR:
+      case TEST_SINGLE_POLE_IIR:
         return frc::LinearFilter<double>::SinglePoleIIR(
-            kSinglePoleIIRTimeConstant, kFilterStep);
+            SINGLE_POLE_IIR_TIME_CONSTANT, FILTER_STEP);
         break;
-      case kTestHighPass:
-        return frc::LinearFilter<double>::HighPass(kHighPassTimeConstant,
-                                                   kFilterStep);
+      case TEST_HIGH_PASS:
+        return frc::LinearFilter<double>::HighPass(HIGH_PASS_TIME_CONSTANT,
+                                                   FILTER_STEP);
         break;
-      case kTestMovAvg:
-        return frc::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+      case TEST_MOV_AVG:
+        return frc::LinearFilter<double>::MovingAverage(MOV_AVG_TAPS);
         break;
       default:
-        return frc::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+        return frc::LinearFilter<double>::MovingAverage(MOV_AVG_TAPS);
         break;
     }
   }();
@@ -74,25 +74,25 @@ class LinearFilterOutputTest
 
   LinearFilterOutputTest() {
     switch (GetParam()) {
-      case kTestSinglePoleIIR: {
+      case TEST_SINGLE_POLE_IIR: {
         m_data = GetData;
-        m_expectedOutput = kSinglePoleIIRExpectedOutput;
+        m_expectedOutput = SINGLE_POLE_IIR_EXPECTED_OUTPUT;
         break;
       }
 
-      case kTestHighPass: {
+      case TEST_HIGH_PASS: {
         m_data = GetData;
-        m_expectedOutput = kHighPassExpectedOutput;
+        m_expectedOutput = HIGH_PASS_EXPECTED_OUTPUT;
         break;
       }
 
-      case kTestMovAvg: {
+      case TEST_MOV_AVG: {
         m_data = GetData;
-        m_expectedOutput = kMovAvgExpectedOutput;
+        m_expectedOutput = MOV_AVG_EXPECTED_OUTPUT;
         break;
       }
 
-      case kTestPulse: {
+      case TEST_PULSE: {
         m_data = GetPulseData;
         m_expectedOutput = 0.0;
         break;
@@ -106,7 +106,7 @@ class LinearFilterOutputTest
  */
 TEST_P(LinearFilterOutputTest, Output) {
   double filterOutput = 0.0;
-  for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
+  for (auto t = 0_s; t < FILTER_TIME; t += FILTER_STEP) {
     filterOutput = m_filter.Calculate(m_data(t.value()));
   }
 
@@ -117,8 +117,8 @@ TEST_P(LinearFilterOutputTest, Output) {
 }
 
 INSTANTIATE_TEST_SUITE_P(Tests, LinearFilterOutputTest,
-                         testing::Values(kTestSinglePoleIIR, kTestHighPass,
-                                         kTestMovAvg, kTestPulse));
+                         testing::Values(TEST_SINGLE_POLE_IIR, TEST_HIGH_PASS,
+                                         TEST_MOV_AVG, TEST_PULSE));
 
 template <int Derivative, int Samples, typename F, typename DfDx>
 void AssertCentralResults(F&& f, DfDx&& dfdx, units::second_t h, double min,

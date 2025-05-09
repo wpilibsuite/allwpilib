@@ -57,9 +57,9 @@ public class XRPMotor implements MotorController {
     SimDevice xrpMotorSimDevice = SimDevice.create(simDeviceName);
 
     if (xrpMotorSimDevice != null) {
-      xrpMotorSimDevice.createBoolean("init", Direction.kOutput, true);
-      m_simInverted = xrpMotorSimDevice.createBoolean("inverted", Direction.kInput, false);
-      m_simSpeed = xrpMotorSimDevice.createDouble("speed", Direction.kOutput, 0.0);
+      xrpMotorSimDevice.createBoolean("init", Direction.OUTPUT, true);
+      m_simInverted = xrpMotorSimDevice.createBoolean("inverted", Direction.INPUT, false);
+      m_simSpeed = xrpMotorSimDevice.createDouble("speed", Direction.OUTPUT, 0.0);
     } else {
       m_simInverted = null;
       m_simSpeed = null;

@@ -101,7 +101,7 @@ class SequentialCommandGroup
   size_t m_currentCommandIndex{invalid_index};
   bool m_runWhenDisabled{true};
   Command::InterruptionBehavior m_interruptBehavior{
-      Command::InterruptionBehavior::kCancelIncoming};
+      Command::InterruptionBehavior::CANCEL_INCOMING};
 };
 }  // namespace frc2
 

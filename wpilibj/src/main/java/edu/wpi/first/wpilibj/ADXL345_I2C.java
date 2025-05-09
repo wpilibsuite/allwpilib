@@ -20,44 +20,44 @@ import java.nio.ByteOrder;
 @SuppressWarnings("TypeName")
 public class ADXL345_I2C implements NTSendable, AutoCloseable {
   /** Default I2C device address. */
-  public static final byte kAddress = 0x1D;
+  public static final byte ADDRESS = 0x1D;
 
-  private static final byte kPowerCtlRegister = 0x2D;
-  private static final byte kDataFormatRegister = 0x31;
-  private static final byte kDataRegister = 0x32;
-  private static final double kGsPerLSB = 0.00390625;
-  // private static final byte kPowerCtl_Link = 0x20;
-  // private static final byte kPowerCtl_AutoSleep = 0x10;
-  private static final byte kPowerCtl_Measure = 0x08;
-  // private static final byte kPowerCtl_Sleep = 0x04;
+  private static final byte POWER_CTL_REGISTER = 0x2D;
+  private static final byte DATA_FORMAT_REGISTER = 0x31;
+  private static final byte DATA_REGISTER = 0x32;
+  private static final double GS_PER_LSB = 0.00390625;
+  // private static final byte POWER_CTL_LINK = 0x20;
+  // private static final byte POWER_CTL_AUTO_SLEEP = 0x10;
+  private static final byte POWER_CTL_MEASURE = 0x08;
+  // private static final byte POWER_CTL_SLEEP = 0x04;
 
-  // private static final byte kDataFormat_SelfTest = (byte) 0x80;
-  // private static final byte kDataFormat_SPI = 0x40;
-  // private static final byte kDataFormat_IntInvert = 0x20;
-  private static final byte kDataFormat_FullRes = 0x08;
+  // private static final byte DATA_FORMAT_SELF_TEST = (byte) 0x80;
+  // private static final byte DATA_FORMAT_SPI = 0x40;
+  // private static final byte DATA_FORMAT_INT_INVERT = 0x20;
+  private static final byte DATA_FORMAT_FULL_RES = 0x08;
 
-  // private static final byte kDataFormat_Justify = 0x04;
+  // private static final byte DATA_FORMAT_JUSTIFY = 0x04;
 
   /** Accelerometer range. */
   public enum Range {
     /** 2 Gs max. */
-    k2G,
+    TWO_G,
     /** 4 Gs max. */
-    k4G,
+    FOUR_G,
     /** 8 Gs max. */
-    k8G,
+    EIGHT_G,
     /** 16 Gs max. */
-    k16G
+    SIXTEEN_G
   }
 
   /** Accelerometer axes. */
   public enum Axes {
     /** X axis. */
-    kX((byte) 0x00),
+    X((byte) 0x00),
     /** Y axis. */
-    kY((byte) 0x02),
+    Y((byte) 0x02),
     /** Z axis. */
-    kZ((byte) 0x04);
+    Z((byte) 0x04);
 
     /** The integer value representing this enumeration. */
     public final byte value;
@@ -98,7 +98,7 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
    * @param range The range (+ or -) that the accelerometer will measure.
    */
   public ADXL345_I2C(I2C.Port port, Range range) {
-    this(port, range, kAddress);
+    this(port, range, ADDRESS);
   }
 
   /**
@@ -118,17 +118,17 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
       m_simRange =
           m_simDevice.createEnumDouble(
               "range",
-              SimDevice.Direction.kOutput,
+              SimDevice.Direction.OUTPUT,
               new String[] {"2G", "4G", "8G", "16G"},
               new double[] {2.0, 4.0, 8.0, 16.0},
               0);
-      m_simX = m_simDevice.createDouble("x", SimDevice.Direction.kInput, 0.0);
-      m_simY = m_simDevice.createDouble("y", SimDevice.Direction.kInput, 0.0);
-      m_simZ = m_simDevice.createDouble("z", SimDevice.Direction.kInput, 0.0);
+      m_simX = m_simDevice.createDouble("x", SimDevice.Direction.INPUT, 0.0);
+      m_simY = m_simDevice.createDouble("y", SimDevice.Direction.INPUT, 0.0);
+      m_simZ = m_simDevice.createDouble("z", SimDevice.Direction.INPUT, 0.0);
     }
 
     // Turn on the measurements
-    m_i2c.write(kPowerCtlRegister, kPowerCtl_Measure);
+    m_i2c.write(POWER_CTL_REGISTER, POWER_CTL_MEASURE);
 
     setRange(range);
 
@@ -176,14 +176,14 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
   public final void setRange(Range range) {
     final byte value =
         switch (range) {
-          case k2G -> 0;
-          case k4G -> 1;
-          case k8G -> 2;
-          case k16G -> 3;
+          case TWO_G -> 0;
+          case FOUR_G -> 1;
+          case EIGHT_G -> 2;
+          case SIXTEEN_G -> 3;
         };
 
     // Specify the data format to read
-    m_i2c.write(kDataFormatRegister, kDataFormat_FullRes | value);
+    m_i2c.write(DATA_FORMAT_REGISTER, DATA_FORMAT_FULL_RES | value);
 
     if (m_simRange != null) {
       m_simRange.set(value);
@@ -196,7 +196,7 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
    * @return The acceleration along the X axis in g-forces.
    */
   public double getX() {
-    return getAcceleration(Axes.kX);
+    return getAcceleration(Axes.X);
   }
 
   /**
@@ -205,7 +205,7 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
    * @return The acceleration along the Y axis in g-forces.
    */
   public double getY() {
-    return getAcceleration(Axes.kY);
+    return getAcceleration(Axes.Y);
   }
 
   /**
@@ -214,7 +214,7 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
    * @return The acceleration along the Z axis in g-forces.
    */
   public double getZ() {
-    return getAcceleration(Axes.kZ);
+    return getAcceleration(Axes.Z);
   }
 
   /**
@@ -224,21 +224,21 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
    * @return Acceleration of the ADXL345 in Gs.
    */
   public double getAcceleration(Axes axis) {
-    if (axis == Axes.kX && m_simX != null) {
+    if (axis == Axes.X && m_simX != null) {
       return m_simX.get();
     }
-    if (axis == Axes.kY && m_simY != null) {
+    if (axis == Axes.Y && m_simY != null) {
       return m_simY.get();
     }
-    if (axis == Axes.kZ && m_simZ != null) {
+    if (axis == Axes.Z && m_simZ != null) {
       return m_simZ.get();
     }
     ByteBuffer rawAccel = ByteBuffer.allocate(2);
-    m_i2c.read(kDataRegister + axis.value, 2, rawAccel);
+    m_i2c.read(DATA_REGISTER + axis.value, 2, rawAccel);
 
     // Sensor is little endian... swap bytes
     rawAccel.order(ByteOrder.LITTLE_ENDIAN);
-    return rawAccel.getShort(0) * kGsPerLSB;
+    return rawAccel.getShort(0) * GS_PER_LSB;
   }
 
   /**
@@ -255,13 +255,13 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
       return data;
     }
     ByteBuffer rawData = ByteBuffer.allocate(6);
-    m_i2c.read(kDataRegister, 6, rawData);
+    m_i2c.read(DATA_REGISTER, 6, rawData);
 
     // Sensor is little endian... swap bytes
     rawData.order(ByteOrder.LITTLE_ENDIAN);
-    data.XAxis = rawData.getShort(0) * kGsPerLSB;
-    data.YAxis = rawData.getShort(2) * kGsPerLSB;
-    data.ZAxis = rawData.getShort(4) * kGsPerLSB;
+    data.XAxis = rawData.getShort(0) * GS_PER_LSB;
+    data.YAxis = rawData.getShort(2) * GS_PER_LSB;
+    data.ZAxis = rawData.getShort(4) * GS_PER_LSB;
     return data;
   }
 

@@ -14,27 +14,27 @@
 #include "hal/DriverStation.h"
 #include "hal/HALBase.h"
 
-static_assert(edu_wpi_first_hal_DriverStationJNI_kUnknownAllianceStation ==
-              HAL_AllianceStationID_kUnknown);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kRed1AllianceStation ==
-              HAL_AllianceStationID_kRed1);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kRed2AllianceStation ==
-              HAL_AllianceStationID_kRed2);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kRed3AllianceStation ==
-              HAL_AllianceStationID_kRed3);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kBlue1AllianceStation ==
-              HAL_AllianceStationID_kBlue1);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kBlue2AllianceStation ==
-              HAL_AllianceStationID_kBlue2);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kBlue3AllianceStation ==
-              HAL_AllianceStationID_kBlue3);
+static_assert(edu_wpi_first_hal_DriverStationJNI_UNKNOWN_ALLIANCE_STATION ==
+              HAL_AllianceStationID_Unknown);
+static_assert(edu_wpi_first_hal_DriverStationJNI_RED1_ALLIANCE_STATION ==
+              HAL_AllianceStationID_Red1);
+static_assert(edu_wpi_first_hal_DriverStationJNI_RED2_ALLIANCE_STATION ==
+              HAL_AllianceStationID_Red2);
+static_assert(edu_wpi_first_hal_DriverStationJNI_RED3_ALLIANCE_STATION ==
+              HAL_AllianceStationID_Red3);
+static_assert(edu_wpi_first_hal_DriverStationJNI_BLUE1_ALLIANCE_STATION ==
+              HAL_AllianceStationID_Blue1);
+static_assert(edu_wpi_first_hal_DriverStationJNI_BLUE2_ALLIANCE_STATION ==
+              HAL_AllianceStationID_Blue2);
+static_assert(edu_wpi_first_hal_DriverStationJNI_BLUE3_ALLIANCE_STATION ==
+              HAL_AllianceStationID_Blue3);
 
-static_assert(edu_wpi_first_hal_DriverStationJNI_kMaxJoystickAxes ==
-              HAL_kMaxJoystickAxes);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kMaxJoystickPOVs ==
-              HAL_kMaxJoystickPOVs);
-static_assert(edu_wpi_first_hal_DriverStationJNI_kMaxJoysticks ==
-              HAL_kMaxJoysticks);
+static_assert(edu_wpi_first_hal_DriverStationJNI_MAX_JOYSTICK_AXES ==
+              HAL_MaxJoystickAxes);
+static_assert(edu_wpi_first_hal_DriverStationJNI_MAX_JOYSTICK_POVS ==
+              HAL_MaxJoystickPOVs);
+static_assert(edu_wpi_first_hal_DriverStationJNI_MAX_JOYSTICKS ==
+              HAL_MaxJoysticks);
 
 using namespace hal;
 using namespace wpi::java;
@@ -155,7 +155,7 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxesRaw
     return 0;
   }
 
-  jint raw[HAL_kMaxJoystickAxes];
+  jint raw[HAL_MaxJoystickAxes];
   for (int16_t i = 0; i < axes.count; i++) {
     raw[i] = axes.raw[i];
   }
@@ -228,9 +228,9 @@ Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
   (JNIEnv* env, jclass cls, jfloatArray axesArray, jbyteArray rawAxesArray,
    jshortArray povsArray, jlongArray buttonsAndMetadataArray)
 {
-  HAL_JoystickAxes axes[HAL_kMaxJoysticks];
-  HAL_JoystickPOVs povs[HAL_kMaxJoysticks];
-  HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
+  HAL_JoystickAxes axes[HAL_MaxJoysticks];
+  HAL_JoystickPOVs povs[HAL_MaxJoysticks];
+  HAL_JoystickButtons buttons[HAL_MaxJoysticks];
 
   HAL_GetAllJoystickData(axes, povs, buttons);
 
@@ -243,12 +243,12 @@ Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
   static_assert(sizeof(jRawAxes[0]) == sizeof(axes[0].raw[0]));
   static_assert(sizeof(jPovs[0]) == sizeof(povs[0].povs[0]));
 
-  for (size_t i = 0; i < HAL_kMaxJoysticks; i++) {
-    std::memcpy(&jAxes[i * HAL_kMaxJoystickAxes], axes[i].axes,
+  for (size_t i = 0; i < HAL_MaxJoysticks; i++) {
+    std::memcpy(&jAxes[i * HAL_MaxJoystickAxes], axes[i].axes,
                 sizeof(axes[i].axes));
-    std::memcpy(&jRawAxes[i * HAL_kMaxJoystickAxes], axes[i].raw,
+    std::memcpy(&jRawAxes[i * HAL_MaxJoystickAxes], axes[i].raw,
                 sizeof(axes[i].raw));
-    std::memcpy(&jPovs[i * HAL_kMaxJoystickPOVs], povs[i].povs,
+    std::memcpy(&jPovs[i * HAL_MaxJoystickPOVs], povs[i].povs,
                 sizeof(povs[i].povs));
     jButtons[i * 4] = axes[i].count;
     jButtons[(i * 4) + 1] = povs[i].count;

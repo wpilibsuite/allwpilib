@@ -87,7 +87,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_NotifierJNI_cleanNotifier
   (JNIEnv* env, jclass, jint notifierHandle)
 {
-  if (notifierHandle != HAL_kInvalidHandle) {
+  if (notifierHandle != HAL_InvalidHandle) {
     HAL_CleanNotifier((HAL_NotifierHandle)notifierHandle);
   }
 }

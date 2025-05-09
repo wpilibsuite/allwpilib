@@ -36,13 +36,13 @@ HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
   // hal::init::CheckInit();
 
   *status = HAL_HANDLE_ERROR;
-  return HAL_kInvalidHandle;
+  return HAL_InvalidHandle;
 }
 HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
                                                     const char* portName,
                                                     int32_t* status) {
   *status = HAL_HANDLE_ERROR;
-  return HAL_kInvalidHandle;
+  return HAL_InvalidHandle;
 }
 
 void HAL_CloseSerial(HAL_SerialPortHandle handle) {}

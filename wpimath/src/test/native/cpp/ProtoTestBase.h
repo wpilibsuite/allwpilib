@@ -14,14 +14,14 @@ class ProtoTest : public testing::Test {};
 TYPED_TEST_SUITE_P(ProtoTest);
 
 TYPED_TEST_P(ProtoTest, RoundTrip) {
-  wpi::ProtobufMessage<decltype(TypeParam::kTestData)> message;
+  wpi::ProtobufMessage<decltype(TypeParam::TEST_DATA)> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, TypeParam::kTestData));
+  ASSERT_TRUE(message.Pack(buf, TypeParam::TEST_DATA));
   auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  TypeParam::CheckEq(TypeParam::kTestData, *unpacked_data);
+  TypeParam::CheckEq(TypeParam::TEST_DATA, *unpacked_data);
 }
 
 REGISTER_TYPED_TEST_SUITE_P(ProtoTest, RoundTrip);

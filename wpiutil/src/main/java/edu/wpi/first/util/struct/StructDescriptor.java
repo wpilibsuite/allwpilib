@@ -113,7 +113,7 @@ public class StructDescriptor {
         offset += field.m_size * field.m_arraySize;
       } else {
         int bitWidth = field.getBitWidth();
-        if (field.getType() == StructFieldType.kBool
+        if (field.getType() == StructFieldType.BOOL
             && prevBitfieldSize != 0
             && (shift + 1) <= (prevBitfieldSize * 8)) {
           // bool takes on size of preceding bitfield type (if it fits)

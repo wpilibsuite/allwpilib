@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import org.junit.jupiter.api.Test;
 
 class MecanumDriveKinematicsTest {
-  private static final double kEpsilon = 1E-9;
+  private static final double EPSILON = 1E-9;
 
   private final Translation2d m_fl = new Translation2d(12, 12);
   private final Translation2d m_fr = new Translation2d(12, -12);
@@ -232,22 +232,22 @@ class MecanumDriveKinematicsTest {
     double factor = 5.5 / 7.0;
 
     assertAll(
-        () -> assertEquals(5.0 * factor, wheelSpeeds.frontLeft, kEpsilon),
-        () -> assertEquals(6.0 * factor, wheelSpeeds.frontRight, kEpsilon),
-        () -> assertEquals(4.0 * factor, wheelSpeeds.rearLeft, kEpsilon),
-        () -> assertEquals(7.0 * factor, wheelSpeeds.rearRight, kEpsilon));
+        () -> assertEquals(5.0 * factor, wheelSpeeds.frontLeft, EPSILON),
+        () -> assertEquals(6.0 * factor, wheelSpeeds.frontRight, EPSILON),
+        () -> assertEquals(4.0 * factor, wheelSpeeds.rearLeft, EPSILON),
+        () -> assertEquals(7.0 * factor, wheelSpeeds.rearRight, EPSILON));
   }
 
   @Test
   void testDesaturateNegativeSpeeds() {
     var wheelSpeeds = new MecanumDriveWheelSpeeds(-5, 6, 4, -7).desaturate(5.5);
 
-    final double kFactor = 5.5 / 7.0;
+    final double FACTOR = 5.5 / 7.0;
 
     assertAll(
-        () -> assertEquals(-5.0 * kFactor, wheelSpeeds.frontLeft, kEpsilon),
-        () -> assertEquals(6.0 * kFactor, wheelSpeeds.frontRight, kEpsilon),
-        () -> assertEquals(4.0 * kFactor, wheelSpeeds.rearLeft, kEpsilon),
-        () -> assertEquals(-7.0 * kFactor, wheelSpeeds.rearRight, kEpsilon));
+        () -> assertEquals(-5.0 * FACTOR, wheelSpeeds.frontLeft, EPSILON),
+        () -> assertEquals(6.0 * FACTOR, wheelSpeeds.frontRight, EPSILON),
+        () -> assertEquals(4.0 * FACTOR, wheelSpeeds.rearLeft, EPSILON),
+        () -> assertEquals(-7.0 * FACTOR, wheelSpeeds.rearRight, EPSILON));
   }
 }

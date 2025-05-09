@@ -38,9 +38,9 @@ RobotContainer::RobotContainer() {
             // Multiply by max speed to map the joystick unitless inputs to
             // actual units. This will map the [-1, 1] to [max speed backwards,
             // max speed forwards], converting them to actual units.
-            m_driverController.GetLeftY() * AutoConstants::kMaxSpeed,
-            m_driverController.GetLeftX() * AutoConstants::kMaxSpeed,
-            m_driverController.GetRightX() * AutoConstants::kMaxAngularSpeed,
+            m_driverController.GetLeftY() * AutoConstants::MAX_SPEED,
+            m_driverController.GetLeftX() * AutoConstants::MAX_SPEED,
+            m_driverController.GetRightX() * AutoConstants::MAX_ANGULAR_SPEED,
             false);
       },
       {&m_drive}));
@@ -50,10 +50,10 @@ void RobotContainer::ConfigureButtonBindings() {}
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
-  frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
-                               AutoConstants::kMaxAcceleration);
+  frc::TrajectoryConfig config(AutoConstants::MAX_SPEED,
+                               AutoConstants::MAX_ACCELERATION);
   // Add kinematics to ensure max speed is actually obeyed
-  config.SetKinematics(m_drive.kDriveKinematics);
+  config.SetKinematics(m_drive.DRIVE_KINEMATICS);
 
   // An example trajectory to follow.  All units in meters.
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
@@ -67,8 +67,8 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       config);
 
   frc::ProfiledPIDController<units::radians> thetaController{
-      AutoConstants::kPThetaController, 0, 0,
-      AutoConstants::kThetaControllerConstraints};
+      AutoConstants::THETA_CONTROLLER_P, 0, 0,
+      AutoConstants::THETA_CONTROLLER_CONSTRAINTS};
 
   thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
                                         units::radian_t{std::numbers::pi});
@@ -77,10 +77,10 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       frc2::SwerveControllerCommand<4>(
           exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
-          m_drive.kDriveKinematics,
+          m_drive.DRIVE_KINEMATICS,
 
-          frc::PIDController{AutoConstants::kPXController, 0, 0},
-          frc::PIDController{AutoConstants::kPYController, 0, 0},
+          frc::PIDController{AutoConstants::X_CONTROLLER_P, 0, 0},
+          frc::PIDController{AutoConstants::Y_CONTROLLER_P, 0, 0},
           thetaController,
 
           [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },

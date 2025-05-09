@@ -9,7 +9,7 @@ using namespace hal;
 
 namespace hal::init {
 void InitializePowerDistributionData() {
-  static PowerDistributionData spd[kNumPDSimModules];
+  static PowerDistributionData spd[NUM_PD_SIM_MODULES];
   ::hal::SimPowerDistributionData = spd;
 }
 }  // namespace hal::init
@@ -19,7 +19,7 @@ void PowerDistributionData::ResetData() {
   initialized.Reset(false);
   temperature.Reset(0.0);
   voltage.Reset(12.0);
-  for (int i = 0; i < kNumPDSimChannels; i++) {
+  for (int i = 0; i < NUM_PD_SIM_CHANNELS; i++) {
     current[i].Reset(0.0);
   }
 }
@@ -42,7 +42,7 @@ HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(double, HALSIM, PowerDistributionCurrent,
 void HALSIM_GetPowerDistributionAllCurrents(int32_t index, double* currents,
                                             int length) {
   auto& data = SimPowerDistributionData[index].current;
-  int toCopy = (std::min)(length, kNumPDSimChannels);
+  int toCopy = (std::min)(length, NUM_PD_SIM_CHANNELS);
   for (int i = 0; i < toCopy; i++) {
     currents[i] = data[i];
   }
@@ -52,7 +52,7 @@ void HALSIM_SetPowerDistributionAllCurrents(int32_t index,
                                             const double* currents,
                                             int length) {
   auto& data = SimPowerDistributionData[index].current;
-  int toCopy = (std::min)(length, kNumPDSimChannels);
+  int toCopy = (std::min)(length, NUM_PD_SIM_CHANNELS);
   for (int i = 0; i < toCopy; i++) {
     data[i] = currents[i];
   }

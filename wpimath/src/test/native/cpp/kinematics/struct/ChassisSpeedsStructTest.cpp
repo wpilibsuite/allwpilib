@@ -11,18 +11,18 @@ using namespace frc;
 namespace {
 
 using StructType = wpi::Struct<frc::ChassisSpeeds>;
-const ChassisSpeeds kExpectedData{
+const ChassisSpeeds EXPECTED_DATA{
     ChassisSpeeds{2.29_mps, 2.2_mps, 0.3504_rad_per_s}};
 }  // namespace
 
 TEST(ChassisSpeedsStructTest, Roundtrip) {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   ChassisSpeeds unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.vx.value(), unpacked_data.vx.value());
-  EXPECT_EQ(kExpectedData.vy.value(), unpacked_data.vy.value());
-  EXPECT_EQ(kExpectedData.omega.value(), unpacked_data.omega.value());
+  EXPECT_EQ(EXPECTED_DATA.vx.value(), unpacked_data.vx.value());
+  EXPECT_EQ(EXPECTED_DATA.vy.value(), unpacked_data.vy.value());
+  EXPECT_EQ(EXPECTED_DATA.omega.value(), unpacked_data.omega.value());
 }

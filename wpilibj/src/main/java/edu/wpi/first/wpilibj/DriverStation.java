@@ -30,7 +30,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /** Provide access to the network communication data to / from the Driver Station. */
 public final class DriverStation {
   /** Number of Joystick ports. */
-  public static final int kJoystickPorts = 6;
+  public static final int JOYSTICK_PORTS = 6;
 
   private static final class HALJoystickButtons {
     public int m_buttons;
@@ -94,7 +94,7 @@ public final class DriverStation {
 
   @SuppressWarnings("MemberName")
   private static class MatchDataSender {
-    private static final String kSmartDashboardType = "FMSInfo";
+    private static final String SMART_DASHBOARD_TYPE = "FMSInfo";
 
     final StringPublisher gameSpecificMessage;
     final StringPublisher eventName;
@@ -118,8 +118,8 @@ public final class DriverStation {
       table
           .getStringTopic(".type")
           .publishEx(
-              StringTopic.kTypeString, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}")
-          .set(kSmartDashboardType);
+              StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + SMART_DASHBOARD_TYPE + "\"}")
+          .set(SMART_DASHBOARD_TYPE);
       gameSpecificMessage = table.getStringTopic("GameSpecificMessage").publish();
       gameSpecificMessage.set("");
       eventName = table.getStringTopic("EventName").publish();
@@ -304,8 +304,8 @@ public final class DriverStation {
     float[] m_sizedAxes;
     long[] m_sizedPOVs;
     final HALJoystickButtons m_prevButtons = new HALJoystickButtons();
-    final HALJoystickAxes m_prevAxes = new HALJoystickAxes(DriverStationJNI.kMaxJoystickAxes);
-    final HALJoystickPOVs m_prevPOVs = new HALJoystickPOVs(DriverStationJNI.kMaxJoystickPOVs);
+    final HALJoystickAxes m_prevAxes = new HALJoystickAxes(DriverStationJNI.MAX_JOYSTICK_AXES);
+    final HALJoystickPOVs m_prevPOVs = new HALJoystickPOVs(DriverStationJNI.MAX_JOYSTICK_POVS);
     final BooleanArrayLogEntry m_logButtons;
     final FloatArrayLogEntry m_logAxes;
     final IntegerArrayLogEntry m_logPOVs;
@@ -330,8 +330,8 @@ public final class DriverStation {
       m_logEstop.append(m_wasEstop, timestamp);
 
       if (logJoysticks) {
-        m_joysticks = new JoystickLogSender[kJoystickPorts];
-        for (int i = 0; i < kJoystickPorts; i++) {
+        m_joysticks = new JoystickLogSender[JOYSTICK_PORTS];
+        for (int i = 0; i < JOYSTICK_PORTS; i++) {
           m_joysticks[i] = new JoystickLogSender(log, i, timestamp);
         }
       } else {
@@ -384,27 +384,27 @@ public final class DriverStation {
   }
 
   // Joystick User Data
-  private static HALJoystickAxes[] m_joystickAxes = new HALJoystickAxes[kJoystickPorts];
-  private static HALJoystickAxesRaw[] m_joystickAxesRaw = new HALJoystickAxesRaw[kJoystickPorts];
-  private static HALJoystickPOVs[] m_joystickPOVs = new HALJoystickPOVs[kJoystickPorts];
-  private static HALJoystickButtons[] m_joystickButtons = new HALJoystickButtons[kJoystickPorts];
+  private static HALJoystickAxes[] m_joystickAxes = new HALJoystickAxes[JOYSTICK_PORTS];
+  private static HALJoystickAxesRaw[] m_joystickAxesRaw = new HALJoystickAxesRaw[JOYSTICK_PORTS];
+  private static HALJoystickPOVs[] m_joystickPOVs = new HALJoystickPOVs[JOYSTICK_PORTS];
+  private static HALJoystickButtons[] m_joystickButtons = new HALJoystickButtons[JOYSTICK_PORTS];
   private static MatchInfoData m_matchInfo = new MatchInfoData();
   private static ControlWord m_controlWord = new ControlWord();
   private static EventVector m_refreshEvents = new EventVector();
 
   // Joystick Cached Data
-  private static HALJoystickAxes[] m_joystickAxesCache = new HALJoystickAxes[kJoystickPorts];
+  private static HALJoystickAxes[] m_joystickAxesCache = new HALJoystickAxes[JOYSTICK_PORTS];
   private static HALJoystickAxesRaw[] m_joystickAxesRawCache =
-      new HALJoystickAxesRaw[kJoystickPorts];
-  private static HALJoystickPOVs[] m_joystickPOVsCache = new HALJoystickPOVs[kJoystickPorts];
+      new HALJoystickAxesRaw[JOYSTICK_PORTS];
+  private static HALJoystickPOVs[] m_joystickPOVsCache = new HALJoystickPOVs[JOYSTICK_PORTS];
   private static HALJoystickButtons[] m_joystickButtonsCache =
-      new HALJoystickButtons[kJoystickPorts];
+      new HALJoystickButtons[JOYSTICK_PORTS];
   private static MatchInfoData m_matchInfoCache = new MatchInfoData();
   private static ControlWord m_controlWordCache = new ControlWord();
 
   // Joystick button rising/falling edge flags
-  private static int[] m_joystickButtonsPressed = new int[kJoystickPorts];
-  private static int[] m_joystickButtonsReleased = new int[kJoystickPorts];
+  private static int[] m_joystickButtonsPressed = new int[JOYSTICK_PORTS];
+  private static int[] m_joystickButtonsReleased = new int[JOYSTICK_PORTS];
 
   // preallocated byte buffer for button count
   private static final ByteBuffer m_buttonCountBuffer = ByteBuffer.allocateDirect(1);
@@ -427,16 +427,16 @@ public final class DriverStation {
   static {
     HAL.initialize(500, 0);
 
-    for (int i = 0; i < kJoystickPorts; i++) {
+    for (int i = 0; i < JOYSTICK_PORTS; i++) {
       m_joystickButtons[i] = new HALJoystickButtons();
-      m_joystickAxes[i] = new HALJoystickAxes(DriverStationJNI.kMaxJoystickAxes);
-      m_joystickAxesRaw[i] = new HALJoystickAxesRaw(DriverStationJNI.kMaxJoystickAxes);
-      m_joystickPOVs[i] = new HALJoystickPOVs(DriverStationJNI.kMaxJoystickPOVs);
+      m_joystickAxes[i] = new HALJoystickAxes(DriverStationJNI.MAX_JOYSTICK_AXES);
+      m_joystickAxesRaw[i] = new HALJoystickAxesRaw(DriverStationJNI.MAX_JOYSTICK_AXES);
+      m_joystickPOVs[i] = new HALJoystickPOVs(DriverStationJNI.MAX_JOYSTICK_POVS);
 
       m_joystickButtonsCache[i] = new HALJoystickButtons();
-      m_joystickAxesCache[i] = new HALJoystickAxes(DriverStationJNI.kMaxJoystickAxes);
-      m_joystickAxesRawCache[i] = new HALJoystickAxesRaw(DriverStationJNI.kMaxJoystickAxes);
-      m_joystickPOVsCache[i] = new HALJoystickPOVs(DriverStationJNI.kMaxJoystickPOVs);
+      m_joystickAxesCache[i] = new HALJoystickAxes(DriverStationJNI.MAX_JOYSTICK_AXES);
+      m_joystickAxesRawCache[i] = new HALJoystickAxesRaw(DriverStationJNI.MAX_JOYSTICK_AXES);
+      m_joystickPOVsCache[i] = new HALJoystickPOVs(DriverStationJNI.MAX_JOYSTICK_POVS);
     }
 
     m_matchDataSender = new MatchDataSender();
@@ -529,7 +529,7 @@ public final class DriverStation {
    * @return The state of the joystick button.
    */
   public static boolean getStickButton(final int stick, final int button) {
-    if (stick < 0 || stick >= kJoystickPorts) {
+    if (stick < 0 || stick >= JOYSTICK_PORTS) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
     if (button <= 0) {
@@ -567,7 +567,7 @@ public final class DriverStation {
       reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
       return false;
     }
-    if (stick < 0 || stick >= kJoystickPorts) {
+    if (stick < 0 || stick >= JOYSTICK_PORTS) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
@@ -607,7 +607,7 @@ public final class DriverStation {
       reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
       return false;
     }
-    if (stick < 0 || stick >= kJoystickPorts) {
+    if (stick < 0 || stick >= JOYSTICK_PORTS) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
@@ -644,10 +644,10 @@ public final class DriverStation {
    * @return The value of the axis on the joystick.
    */
   public static double getStickAxis(int stick, int axis) {
-    if (stick < 0 || stick >= kJoystickPorts) {
+    if (stick < 0 || stick >= JOYSTICK_PORTS) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (axis < 0 || axis >= DriverStationJNI.kMaxJoystickAxes) {
+    if (axis < 0 || axis >= DriverStationJNI.MAX_JOYSTICK_AXES) {
       throw new IllegalArgumentException("Joystick axis is out of range");
     }
 
@@ -677,10 +677,10 @@ public final class DriverStation {
    * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
    */
   public static int getStickPOV(int stick, int pov) {
-    if (stick < 0 || stick >= kJoystickPorts) {
+    if (stick < 0 || stick >= JOYSTICK_PORTS) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (pov < 0 || pov >= DriverStationJNI.kMaxJoystickPOVs) {
+    if (pov < 0 || pov >= DriverStationJNI.MAX_JOYSTICK_POVS) {
       throw new IllegalArgumentException("Joystick POV is out of range");
     }
 
@@ -709,7 +709,7 @@ public final class DriverStation {
    * @return The state of the buttons on the joystick.
    */
   public static int getStickButtons(final int stick) {
-    if (stick < 0 || stick >= kJoystickPorts) {
+    if (stick < 0 || stick >= JOYSTICK_PORTS) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
@@ -728,7 +728,7 @@ public final class DriverStation {
    * @return The number of axes on the indicated joystick
    */
   public static int getStickAxisCount(int stick) {
-    if (stick < 0 || stick >= kJoystickPorts) {
+    if (stick < 0 || stick >= JOYSTICK_PORTS) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
@@ -747,7 +747,7 @@ public final class DriverStation {
    * @return The number of povs on the indicated joystick
    */
   public static int getStickPOVCount(int stick) {
-    if (stick < 0 || stick >= kJoystickPorts) {
+    if (stick < 0 || stick >= JOYSTICK_PORTS) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
@@ -766,7 +766,7 @@ public final class DriverStation {
    * @return The number of buttons on the indicated joystick
    */
   public static int getStickButtonCount(int stick) {
-    if (stick < 0 || stick >= kJoystickPorts) {
+    if (stick < 0 || stick >= JOYSTICK_PORTS) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
@@ -785,7 +785,7 @@ public final class DriverStation {
    * @return A boolean that returns the value of isXbox
    */
   public static boolean getJoystickIsXbox(int stick) {
-    if (stick < 0 || stick >= kJoystickPorts) {
+    if (stick < 0 || stick >= JOYSTICK_PORTS) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
@@ -799,7 +799,7 @@ public final class DriverStation {
    * @return The value of type
    */
   public static int getJoystickType(int stick) {
-    if (stick < 0 || stick >= kJoystickPorts) {
+    if (stick < 0 || stick >= JOYSTICK_PORTS) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
@@ -813,7 +813,7 @@ public final class DriverStation {
    * @return The value of name
    */
   public static String getJoystickName(int stick) {
-    if (stick < 0 || stick >= kJoystickPorts) {
+    if (stick < 0 || stick >= JOYSTICK_PORTS) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
@@ -828,7 +828,7 @@ public final class DriverStation {
    * @return What type of axis the axis is reporting to be
    */
   public static int getJoystickAxisType(int stick, int axis) {
-    if (stick < 0 || stick >= kJoystickPorts) {
+    if (stick < 0 || stick >= JOYSTICK_PORTS) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
@@ -1237,7 +1237,7 @@ public final class DriverStation {
     DriverStationJNI.refreshDSData();
 
     // Get the status of all the joysticks
-    for (byte stick = 0; stick < kJoystickPorts; stick++) {
+    for (byte stick = 0; stick < JOYSTICK_PORTS; stick++) {
       m_joystickAxesCache[stick].m_count =
           DriverStationJNI.getJoystickAxes(stick, m_joystickAxesCache[stick].m_axes);
       m_joystickAxesRawCache[stick].m_count =
@@ -1257,7 +1257,7 @@ public final class DriverStation {
     // lock joystick mutex to swap cache data
     m_cacheDataMutex.lock();
     try {
-      for (int i = 0; i < kJoystickPorts; i++) {
+      for (int i = 0; i < JOYSTICK_PORTS; i++) {
         // If buttons weren't pressed and are now, set flags in m_buttonsPressed
         m_joystickButtonsPressed[i] |=
             ~m_joystickButtons[i].m_buttons & m_joystickButtonsCache[i].m_buttons;

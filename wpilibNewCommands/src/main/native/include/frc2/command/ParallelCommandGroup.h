@@ -97,7 +97,7 @@ class ParallelCommandGroup
   std::vector<std::pair<std::unique_ptr<Command>, bool>> m_commands;
   bool m_runWhenDisabled{true};
   Command::InterruptionBehavior m_interruptBehavior{
-      Command::InterruptionBehavior::kCancelIncoming};
+      Command::InterruptionBehavior::CANCEL_INCOMING};
   bool isRunning = false;
 };
 }  // namespace frc2

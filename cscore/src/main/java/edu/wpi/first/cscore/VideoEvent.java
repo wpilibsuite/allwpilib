@@ -10,47 +10,47 @@ public class VideoEvent {
   /** VideoEvent kind. */
   public enum Kind {
     /** Unknown video event. */
-    kUnknown(0x0000),
+    UNKNOWN(0x0000),
     /** Source Created event. */
-    kSourceCreated(0x0001),
+    SOURCE_CREATED(0x0001),
     /** Source Destroyed event. */
-    kSourceDestroyed(0x0002),
+    SOURCE_DESTROYED(0x0002),
     /** Source Connected event. */
-    kSourceConnected(0x0004),
+    SOURCE_CONNECTED(0x0004),
     /** Source Disconnected event. */
-    kSourceDisconnected(0x0008),
+    SOURCE_DISCONNECTED(0x0008),
     /** Source Video Modes Updated event. */
-    kSourceVideoModesUpdated(0x0010),
+    SOURCE_VIDEO_MODES_UPDATED(0x0010),
     /** Source VideoMode Changed event. */
-    kSourceVideoModeChanged(0x0020),
+    SOURCE_VIDEO_MODE_CHANGED(0x0020),
     /** Source Property Created event. */
-    kSourcePropertyCreated(0x0040),
+    SOURCE_PROPERTY_CREATED(0x0040),
     /** Source Property Value Updated event. */
-    kSourcePropertyValueUpdated(0x0080),
+    SOURCE_PROPERTY_VALUE_UPDATED(0x0080),
     /** Source Property Choices Updated event. */
-    kSourcePropertyChoicesUpdated(0x0100),
+    SOURCE_PROPERTY_CHOICES_UPDATED(0x0100),
     /** Sink Source Changed event. */
-    kSinkSourceChanged(0x0200),
+    SINK_SOURCE_CHANGED(0x0200),
     /** Sink Created event. */
-    kSinkCreated(0x0400),
+    SINK_CREATED(0x0400),
     /** Sink Destroyed event. */
-    kSinkDestroyed(0x0800),
+    SINK_DESTROYED(0x0800),
     /** Sink Enabled event. */
-    kSinkEnabled(0x1000),
+    SINK_ENABLED(0x1000),
     /** Sink Disabled event. */
-    kSinkDisabled(0x2000),
+    SINK_DISABLED(0x2000),
     /** Network Interfaces Changed event. */
-    kNetworkInterfacesChanged(0x4000),
+    NETWORK_INTERFACES_CHANGED(0x4000),
     /** Telemetry Updated event. */
-    kTelemetryUpdated(0x8000),
+    TELEMETRY_UPDATED(0x8000),
     /** Sink Property Created event. */
-    kSinkPropertyCreated(0x10000),
+    SINK_PROPERTY_CREATED(0x10000),
     /** Sink Property Value Updated event. */
-    kSinkPropertyValueUpdated(0x20000),
+    SINK_PROPERTY_VALUE_UPDATED(0x20000),
     /** Sink Property Choices Updated event. */
-    kSinkPropertyChoicesUpdated(0x40000),
+    SINK_PROPERTY_CHOICES_UPDATED(0x40000),
     /** Usb Cameras Changed event. */
-    kUsbCamerasChanged(0x80000);
+    USB_CAMERAS_CHANGED(0x80000);
 
     private final int value;
 
@@ -76,26 +76,26 @@ public class VideoEvent {
    */
   public static Kind getKindFromInt(int kind) {
     return switch (kind) {
-      case 0x0001 -> Kind.kSourceCreated;
-      case 0x0002 -> Kind.kSourceDestroyed;
-      case 0x0004 -> Kind.kSourceConnected;
-      case 0x0008 -> Kind.kSourceDisconnected;
-      case 0x0010 -> Kind.kSourceVideoModesUpdated;
-      case 0x0020 -> Kind.kSourceVideoModeChanged;
-      case 0x0040 -> Kind.kSourcePropertyCreated;
-      case 0x0080 -> Kind.kSourcePropertyValueUpdated;
-      case 0x0100 -> Kind.kSourcePropertyChoicesUpdated;
-      case 0x0200 -> Kind.kSinkSourceChanged;
-      case 0x0400 -> Kind.kSinkCreated;
-      case 0x0800 -> Kind.kSinkDestroyed;
-      case 0x1000 -> Kind.kSinkEnabled;
-      case 0x2000 -> Kind.kSinkDisabled;
-      case 0x4000 -> Kind.kNetworkInterfacesChanged;
-      case 0x10000 -> Kind.kSinkPropertyCreated;
-      case 0x20000 -> Kind.kSinkPropertyValueUpdated;
-      case 0x40000 -> Kind.kSinkPropertyChoicesUpdated;
-      case 0x80000 -> Kind.kUsbCamerasChanged;
-      default -> Kind.kUnknown;
+      case 0x0001 -> Kind.SOURCE_CREATED;
+      case 0x0002 -> Kind.SOURCE_DESTROYED;
+      case 0x0004 -> Kind.SOURCE_CONNECTED;
+      case 0x0008 -> Kind.SOURCE_DISCONNECTED;
+      case 0x0010 -> Kind.SOURCE_VIDEO_MODES_UPDATED;
+      case 0x0020 -> Kind.SOURCE_VIDEO_MODE_CHANGED;
+      case 0x0040 -> Kind.SOURCE_PROPERTY_CREATED;
+      case 0x0080 -> Kind.SOURCE_PROPERTY_VALUE_UPDATED;
+      case 0x0100 -> Kind.SOURCE_PROPERTY_CHOICES_UPDATED;
+      case 0x0200 -> Kind.SINK_SOURCE_CHANGED;
+      case 0x0400 -> Kind.SINK_CREATED;
+      case 0x0800 -> Kind.SINK_DESTROYED;
+      case 0x1000 -> Kind.SINK_ENABLED;
+      case 0x2000 -> Kind.SINK_DISABLED;
+      case 0x4000 -> Kind.NETWORK_INTERFACES_CHANGED;
+      case 0x10000 -> Kind.SINK_PROPERTY_CREATED;
+      case 0x20000 -> Kind.SINK_PROPERTY_VALUE_UPDATED;
+      case 0x40000 -> Kind.SINK_PROPERTY_CHOICES_UPDATED;
+      case 0x80000 -> Kind.USB_CAMERAS_CHANGED;
+      default -> Kind.UNKNOWN;
     };
   }
 
@@ -131,7 +131,7 @@ public class VideoEvent {
   /**
    * The source handle.
    *
-   * <p>Valid for kSource* and kSink* respectively.
+   * <p>Valid for SOURCE* and SINK* respectively.
    */
   public int sourceHandle;
 
@@ -141,12 +141,12 @@ public class VideoEvent {
   /** Source/sink/property name. */
   public String name;
 
-  // Fields for kSourceVideoModeChanged event.
+  // Fields for SOURCE_VIDEO_MODE_CHANGED event.
 
   /** New source video mode. */
   public VideoMode mode;
 
-  // Fields for kSourceProperty* events.
+  // Fields for SOURCE_PROPERTY* events.
 
   /** Source property handle. */
   public int propertyHandle;

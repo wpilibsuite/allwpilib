@@ -19,10 +19,10 @@ public class Pneumatics extends SubsystemBase {
   // in this case, 250(V/5)-25
   // the scale parameter in the AnalogPotentiometer constructor is scaled from 1 instead of 5,
   // so if r is the raw AnalogPotentiometer output, the pressure is 250r-25
-  static final double kScale = 250;
-  static final double kOffset = -25;
+  static final double SCALE = 250;
+  static final double OFFSET = -25;
   private final AnalogPotentiometer m_pressureTransducer =
-      new AnalogPotentiometer(/* the AnalogIn port*/ 2, kScale, kOffset);
+      new AnalogPotentiometer(/* the AnalogIn port*/ 2, SCALE, OFFSET);
 
   // Compressor connected to a PCM with a default CAN ID (0)
   private final Compressor m_compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);

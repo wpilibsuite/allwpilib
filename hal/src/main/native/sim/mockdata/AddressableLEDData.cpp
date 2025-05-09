@@ -12,7 +12,7 @@ using namespace hal;
 
 namespace hal::init {
 void InitializeAddressableLEDData() {
-  static AddressableLEDData sad[kNumAddressableLEDs];
+  static AddressableLEDData sad[NUM_ADDRESSABLE_LEDS];
   ::hal::SimAddressableLEDData = sad;
 }
 }  // namespace hal::init
@@ -28,7 +28,7 @@ void AddressableLEDData::ResetData() {
 }
 
 void AddressableLEDData::SetData(const HAL_AddressableLEDData* d, int32_t len) {
-  len = (std::min)(HAL_kAddressableLEDMaxLength, len);
+  len = (std::min)(HAL_AddressableLEDMaxLength, len);
   {
     std::scoped_lock lock(m_dataMutex);
     std::memcpy(m_data, d, len * sizeof(d[0]));
@@ -48,7 +48,7 @@ int32_t AddressableLEDData::GetData(HAL_AddressableLEDData* d) {
 extern "C" {
 
 int32_t HALSIM_FindAddressableLEDForChannel(int32_t channel) {
-  for (int i = 0; i < kNumAddressableLEDs; ++i) {
+  for (int i = 0; i < NUM_ADDRESSABLE_LEDS; ++i) {
     if (SimAddressableLEDData[i].initialized &&
         SimAddressableLEDData[i].outputPort == channel) {
       return i;

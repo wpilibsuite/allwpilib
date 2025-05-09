@@ -16,16 +16,16 @@ class Robot : public frc::TimedRobot {
   void RobotPeriodic() override;
 
  private:
-  static constexpr int kLength = 60;
+  static constexpr int LENGTH = 60;
 
   // PWM port 9
   // Must be a PWM header, not MXP or DIO
   frc::AddressableLED m_led{9};
-  std::array<frc::AddressableLED::LEDData, kLength>
+  std::array<frc::AddressableLED::LEDData, LENGTH>
       m_ledBuffer;  // Reuse the buffer
 
   // Our LED strip has a density of 120 LEDs per meter
-  units::meter_t kLedSpacing{1 / 120.0};
+  units::meter_t LED_SPACING{1 / 120.0};
 
   // Create an LED pattern that will display a rainbow across
   // all hues at maximum saturation and half brightness
@@ -34,5 +34,5 @@ class Robot : public frc::TimedRobot {
   // Create a new pattern that scrolls the rainbow pattern across the LED
   // strip, moving at a speed of 1 meter per second.
   frc::LEDPattern m_scrollingRainbow =
-      m_rainbow.ScrollAtAbsoluteSpeed(1_mps, kLedSpacing);
+      m_rainbow.ScrollAtAbsoluteSpeed(1_mps, LED_SPACING);
 };

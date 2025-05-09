@@ -30,7 +30,7 @@ void LoggerTest::Generate() {
   nt::StartClient(m_inst, "");
 
   // generate error message
-  nt::Publish(nt::Handle(nt::Handle{m_inst}.GetInst(), 5, nt::Handle::kTopic),
+  nt::Publish(nt::Handle(nt::Handle{m_inst}.GetInst(), 5, nt::Handle::TOPIC),
               NT_DOUBLE, "");
 }
 
@@ -40,8 +40,8 @@ void LoggerTest::Check(const std::vector<nt::Event>& events, NT_Listener handle,
   ASSERT_EQ(events.size(), count);
   for (size_t i = 0; i < count; ++i) {
     ASSERT_EQ(events[i].listener, handle);
-    ASSERT_EQ(events[i].flags & nt::EventFlags::kLogMessage,
-              nt::EventFlags::kLogMessage);
+    ASSERT_EQ(events[i].flags & nt::EventFlags::LOG_MESSAGE,
+              nt::EventFlags::LOG_MESSAGE);
     auto log = events[i].GetLogMessage();
     ASSERT_TRUE(log);
     if (infoMsg) {
@@ -60,7 +60,7 @@ void LoggerTest::Check(const std::vector<nt::Event>& events, NT_Listener handle,
 TEST_F(LoggerTest, DefaultLogRange) {
   auto poller = nt::CreateListenerPoller(m_inst);
   auto handle =
-      nt::AddPolledListener(poller, m_inst, nt::EventFlags::kLogMessage);
+      nt::AddPolledListener(poller, m_inst, nt::EventFlags::LOG_MESSAGE);
 
   Generate();
 

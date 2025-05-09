@@ -206,36 +206,38 @@ class NetworkTablesModel : public Model {
 
 using NetworkTablesFlags = int;
 
-static constexpr const int kNetworkTablesFlags_PrecisionBitShift = 9;
+static constexpr const int NETWORK_TABLES_FLAGS__PRECISION_BIT_SHIFT = 9;
 
 enum NetworkTablesFlags_ {
-  NetworkTablesFlags_TreeView = 1 << 0,
-  NetworkTablesFlags_CombinedView = 1 << 1,
-  NetworkTablesFlags_ReadOnly = 1 << 2,
-  NetworkTablesFlags_ShowSpecial = 1 << 3,
-  NetworkTablesFlags_ShowProperties = 1 << 4,
-  NetworkTablesFlags_ShowTimestamp = 1 << 5,
-  NetworkTablesFlags_ShowServerTimestamp = 1 << 6,
-  NetworkTablesFlags_CreateNoncanonicalKeys = 1 << 7,
-  NetworkTablesFlags_Precision = 0xff << kNetworkTablesFlags_PrecisionBitShift,
-  NetworkTablesFlags_Default = NetworkTablesFlags_TreeView |
-                               (6 << kNetworkTablesFlags_PrecisionBitShift),
+  NETWORK_TABLES_FLAGS__TREE_VIEW = 1 << 0,
+  NETWORK_TABLES_FLAGS__COMBINED_VIEW = 1 << 1,
+  NETWORK_TABLES_FLAGS__READ_ONLY = 1 << 2,
+  NETWORK_TABLES_FLAGS__SHOW_SPECIAL = 1 << 3,
+  NETWORK_TABLES_FLAGS__SHOW_PROPERTIES = 1 << 4,
+  NETWORK_TABLES_FLAGS__SHOW_TIMESTAMP = 1 << 5,
+  NETWORK_TABLES_FLAGS__SHOW_SERVER_TIMESTAMP = 1 << 6,
+  NETWORK_TABLES_FLAGS__CREATE_NONCANONICAL_KEYS = 1 << 7,
+  NETWORK_TABLES_FLAGS__PRECISION =
+      0xff << NETWORK_TABLES_FLAGS__PRECISION_BIT_SHIFT,
+  NETWORK_TABLES_FLAGS__DEFAULT =
+      NETWORK_TABLES_FLAGS__TREE_VIEW |
+      (6 << NETWORK_TABLES_FLAGS__PRECISION_BIT_SHIFT),
 };
 
 void DisplayNetworkTablesInfo(NetworkTablesModel* model);
 
 void DisplayNetworkTables(
     NetworkTablesModel* model,
-    NetworkTablesFlags flags = NetworkTablesFlags_Default);
+    NetworkTablesFlags flags = NETWORK_TABLES_FLAGS__DEFAULT);
 
 void DisplayNetworkTablesAddMenu(
     NetworkTablesModel* model, std::string_view path = {},
-    NetworkTablesFlags flags = NetworkTablesFlags_Default);
+    NetworkTablesFlags flags = NETWORK_TABLES_FLAGS__DEFAULT);
 
 class NetworkTablesFlagsSettings {
  public:
   explicit NetworkTablesFlagsSettings(
-      NetworkTablesFlags defaultFlags = NetworkTablesFlags_Default)
+      NetworkTablesFlags defaultFlags = NETWORK_TABLES_FLAGS__DEFAULT)
       : m_defaultFlags{defaultFlags}, m_flags{defaultFlags} {}
 
   void Update();
@@ -260,7 +262,7 @@ class NetworkTablesView : public View {
  public:
   explicit NetworkTablesView(
       NetworkTablesModel* model,
-      NetworkTablesFlags defaultFlags = NetworkTablesFlags_Default)
+      NetworkTablesFlags defaultFlags = NETWORK_TABLES_FLAGS__DEFAULT)
       : m_model{model}, m_flags{defaultFlags} {}
 
   void Display() override;

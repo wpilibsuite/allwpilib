@@ -45,7 +45,7 @@ class WPILIB_DLLEXPORT DCMotor {
   units::ohm_t R;
 
   /// Motor velocity constant.
-  radians_per_second_per_volt_t Kv;
+  radians_per_second_per_volt_t V;
 
   /// Motor torque constant.
   newton_meters_per_ampere_t Kt;
@@ -70,7 +70,7 @@ class WPILIB_DLLEXPORT DCMotor {
         freeCurrent(freeCurrent * numMotors),
         freeSpeed(freeSpeed),
         R(nominalVoltage / this->stallCurrent),
-        Kv(freeSpeed / (nominalVoltage - R * this->freeCurrent)),
+        V(freeSpeed / (nominalVoltage - R * this->freeCurrent)),
         Kt(this->stallTorque / this->stallCurrent) {}
 
   /**
@@ -81,7 +81,7 @@ class WPILIB_DLLEXPORT DCMotor {
    */
   constexpr units::ampere_t Current(units::radians_per_second_t speed,
                                     units::volt_t inputVoltage) const {
-    return -1.0 / Kv / R * speed + 1.0 / R * inputVoltage;
+    return -1.0 / V / R * speed + 1.0 / R * inputVoltage;
   }
 
   /**
@@ -111,7 +111,7 @@ class WPILIB_DLLEXPORT DCMotor {
    */
   constexpr units::volt_t Voltage(units::newton_meter_t torque,
                                   units::radians_per_second_t speed) const {
-    return 1.0 / Kv * speed + 1.0 / Kt * R * torque;
+    return 1.0 / V * speed + 1.0 / Kt * R * torque;
   }
 
   /**
@@ -123,7 +123,7 @@ class WPILIB_DLLEXPORT DCMotor {
    */
   constexpr units::radians_per_second_t Speed(
       units::newton_meter_t torque, units::volt_t inputVoltage) const {
-    return inputVoltage * Kv - 1.0 / Kt * torque * R * Kv;
+    return inputVoltage * V - 1.0 / Kt * torque * R * V;
   }
 
   /**

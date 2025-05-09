@@ -64,8 +64,8 @@ struct Instance {
 
 // if less than this much free space, delete log files until there is this much
 // free space OR there are this many files remaining.
-static constexpr uintmax_t kFreeSpaceThreshold = 50000000;
-static constexpr int kFileCountThreshold = 10;
+static constexpr uintmax_t FREE_SPACE_THRESHOLD = 50000000;
+static constexpr int FILE_COUNT_THRESHOLD = 10;
 
 static std::string MakeLogDir(std::string_view dir) {
   if (!dir.empty()) {
@@ -81,7 +81,7 @@ static std::string MakeLogDir(std::string_view dir) {
     return "/u/logs";
     HAL_ReportUsage("DataLogManager", "USB");
   }
-  if (RobotBase::GetRuntimeType() == kRoboRIO) {
+  if (RobotBase::GetRuntimeType() == ROBORIO) {
     FRC_ReportWarning(
         "DataLogManager: Logging to RoboRIO 1 internal storage is "
         "not recommended! Plug in a FAT32 formatted flash drive!");
@@ -138,7 +138,7 @@ void Thread::Main() {
     } else {
       freeSpace = UINTMAX_MAX;
     }
-    if (freeSpace < kFreeSpaceThreshold) {
+    if (freeSpace < FREE_SPACE_THRESHOLD) {
       // Delete oldest FRC_*.wpilog files (ignore FRC_TBD_*.wpilog as we just
       // created one)
       std::vector<fs::directory_entry> entries;
@@ -158,7 +158,7 @@ void Thread::Main() {
       int count = entries.size();
       for (auto&& entry : entries) {
         --count;
-        if (count < kFileCountThreshold) {
+        if (count < FILE_COUNT_THRESHOLD) {
           break;
         }
         auto size = entry.file_size();
@@ -166,7 +166,7 @@ void Thread::Main() {
           FRC_ReportWarning("DataLogManager: Deleted {}",
                             entry.path().string());
           freeSpace += size;
-          if (freeSpace >= kFreeSpaceThreshold) {
+          if (freeSpace >= FREE_SPACE_THRESHOLD) {
             break;
           }
         } else {
@@ -174,13 +174,13 @@ void Thread::Main() {
                      entry.path().string());
         }
       }
-    } else if (freeSpace < 2 * kFreeSpaceThreshold) {
+    } else if (freeSpace < 2 * FREE_SPACE_THRESHOLD) {
       FRC_ReportError(
           warn::Warning,
           "DataLogManager: Log storage device has {} MB of free space "
           "remaining! Logs will get deleted below {} MB of free space. "
           "Consider deleting logs off the storage device.",
-          freeSpace / 1000000, kFreeSpaceThreshold / 1000000);
+          freeSpace / 1000000, FREE_SPACE_THRESHOLD / 1000000);
     }
   }
 
@@ -252,17 +252,17 @@ void Thread::Main() {
         // match info comes through TCP, so we need to double-check we've
         // actually received it
         auto matchType = DriverStation::GetMatchType();
-        if (matchType != DriverStation::kNone) {
+        if (matchType != DriverStation::NONE) {
           // rename per match info
           char matchTypeChar;
           switch (matchType) {
-            case DriverStation::kPractice:
+            case DriverStation::PRACTICE:
               matchTypeChar = 'P';
               break;
-            case DriverStation::kQualification:
+            case DriverStation::QUALIFICATION:
               matchTypeChar = 'Q';
               break;
-            case DriverStation::kElimination:
+            case DriverStation::ELIMINATION:
               matchTypeChar = 'E';
               break;
             default:

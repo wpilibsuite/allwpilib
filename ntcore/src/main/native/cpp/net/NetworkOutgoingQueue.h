@@ -23,7 +23,7 @@
 
 namespace nt::net {
 
-static constexpr uint32_t kMinPeriodMs = 5;
+static constexpr uint32_t MIN_PERIOD_MS = 5;
 
 inline uint32_t UpdatePeriodCalc(uint32_t period, uint32_t aPeriod) {
   uint32_t newPeriod;
@@ -32,8 +32,8 @@ inline uint32_t UpdatePeriodCalc(uint32_t period, uint32_t aPeriod) {
   } else {
     newPeriod = std::gcd(period, aPeriod);
   }
-  if (newPeriod < kMinPeriodMs) {
-    return kMinPeriodMs;
+  if (newPeriod < MIN_PERIOD_MS) {
+    return MIN_PERIOD_MS;
   }
   return newPeriod;
 }
@@ -48,8 +48,8 @@ uint32_t CalculatePeriod(const T& container, F&& getPeriod) {
       period = std::gcd(period, getPeriod(item));
     }
   }
-  if (period < kMinPeriodMs) {
-    return kMinPeriodMs;
+  if (period < MIN_PERIOD_MS) {
+    return MIN_PERIOD_MS;
   }
   return period;
 }
@@ -59,7 +59,7 @@ concept NetworkMessage =
     std::same_as<typename MessageType::ValueMsg, ServerValueMsg> ||
     std::same_as<typename MessageType::ValueMsg, ClientValueMsg>;
 
-enum class ValueSendMode { kDisabled = 0, kAll, kNormal, kImm };
+enum class ValueSendMode { DISABLED = 0, ALL, NORMAL, IMM };
 
 template <NetworkMessage MessageType>
 class NetworkOutgoingQueue {
@@ -117,19 +117,19 @@ class NetworkOutgoingQueue {
 
   void SendValue(int id, const Value& value, ValueSendMode mode) {
     if (m_local) {
-      mode = ValueSendMode::kImm;  // always send local immediately
+      mode = ValueSendMode::IMM;  // always send local immediately
     }
     // backpressure by stopping sending all if the buffer is too full
-    if (mode == ValueSendMode::kAll && m_totalSize >= kOutgoingLimit) {
-      mode = ValueSendMode::kNormal;
+    if (mode == ValueSendMode::ALL && m_totalSize >= OUTGOING_LIMIT) {
+      mode = ValueSendMode::NORMAL;
     }
     switch (mode) {
-      case ValueSendMode::kDisabled:  // do nothing
+      case ValueSendMode::DISABLED:  // do nothing
         break;
-      case ValueSendMode::kImm:  // send immediately
+      case ValueSendMode::IMM:  // send immediately
         m_wire.SendBinary([&](auto& os) { EncodeValue(os, id, value); });
         break;
-      case ValueSendMode::kAll: {  // append to outgoing
+      case ValueSendMode::ALL: {  // append to outgoing
         auto& info = m_idMap[id];
         auto& queue = m_queues[info.queueIndex];
         info.valuePos = queue.msgs.size();
@@ -137,7 +137,7 @@ class NetworkOutgoingQueue {
         m_totalSize += sizeof(Message) + value.size();
         break;
       }
-      case ValueSendMode::kNormal: {
+      case ValueSendMode::NORMAL: {
         // replace, or append if not present
         auto& info = m_idMap[id];
         auto& queue = m_queues[info.queueIndex];
@@ -169,7 +169,7 @@ class NetworkOutgoingQueue {
     }
 
     // rate limit frequency of transmissions
-    if (curTimeMs < (m_lastSendMs + kMinPeriodMs)) {
+    if (curTimeMs < (m_lastSendMs + MIN_PERIOD_MS)) {
       return;
     }
 
@@ -314,7 +314,7 @@ class NetworkOutgoingQueue {
   bool m_local;
 
   // maximum total size of outgoing queues in bytes (approximate)
-  static constexpr size_t kOutgoingLimit = 1024 * 1024;
+  static constexpr size_t OUTGOING_LIMIT = 1024 * 1024;
 };
 
 }  // namespace nt::net

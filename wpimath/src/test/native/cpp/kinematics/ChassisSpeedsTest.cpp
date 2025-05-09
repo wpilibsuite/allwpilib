@@ -8,7 +8,7 @@
 
 #include "frc/kinematics/ChassisSpeeds.h"
 
-static constexpr double kEpsilon = 1E-9;
+static constexpr double EPSILON = 1E-9;
 
 TEST(ChassisSpeedsTest, Discretize) {
   constexpr frc::ChassisSpeeds target{1_mps, 0_mps, 0.5_rad_per_s};
@@ -23,10 +23,10 @@ TEST(ChassisSpeedsTest, Discretize) {
     pose = pose.Exp(twist);
   }
 
-  EXPECT_NEAR((target.vx * duration).value(), pose.X().value(), kEpsilon);
-  EXPECT_NEAR((target.vy * duration).value(), pose.Y().value(), kEpsilon);
+  EXPECT_NEAR((target.vx * duration).value(), pose.X().value(), EPSILON);
+  EXPECT_NEAR((target.vy * duration).value(), pose.Y().value(), EPSILON);
   EXPECT_NEAR((target.omega * duration).value(),
-              pose.Rotation().Radians().value(), kEpsilon);
+              pose.Rotation().Radians().value(), EPSILON);
 }
 
 TEST(ChassisSpeedsTest, ToRobotRelative) {
@@ -34,18 +34,18 @@ TEST(ChassisSpeedsTest, ToRobotRelative) {
       frc::ChassisSpeeds{1_mps, 0_mps, 0.5_rad_per_s}.ToRobotRelative(
           -90.0_deg);
 
-  EXPECT_NEAR(0.0, chassisSpeeds.vx.value(), kEpsilon);
-  EXPECT_NEAR(1.0, chassisSpeeds.vy.value(), kEpsilon);
-  EXPECT_NEAR(0.5, chassisSpeeds.omega.value(), kEpsilon);
+  EXPECT_NEAR(0.0, chassisSpeeds.vx.value(), EPSILON);
+  EXPECT_NEAR(1.0, chassisSpeeds.vy.value(), EPSILON);
+  EXPECT_NEAR(0.5, chassisSpeeds.omega.value(), EPSILON);
 }
 
 TEST(ChassisSpeedsTest, ToFieldRelative) {
   const auto chassisSpeeds =
       frc::ChassisSpeeds{1_mps, 0_mps, 0.5_rad_per_s}.ToFieldRelative(45.0_deg);
 
-  EXPECT_NEAR(1.0 / std::sqrt(2.0), chassisSpeeds.vx.value(), kEpsilon);
-  EXPECT_NEAR(1.0 / std::sqrt(2.0), chassisSpeeds.vy.value(), kEpsilon);
-  EXPECT_NEAR(0.5, chassisSpeeds.omega.value(), kEpsilon);
+  EXPECT_NEAR(1.0 / std::sqrt(2.0), chassisSpeeds.vx.value(), EPSILON);
+  EXPECT_NEAR(1.0 / std::sqrt(2.0), chassisSpeeds.vy.value(), EPSILON);
+  EXPECT_NEAR(0.5, chassisSpeeds.omega.value(), EPSILON);
 }
 
 TEST(ChassisSpeedsTest, Plus) {
@@ -54,9 +54,9 @@ TEST(ChassisSpeedsTest, Plus) {
 
   const frc::ChassisSpeeds result = left + right;
 
-  EXPECT_NEAR(3.0, result.vx.value(), kEpsilon);
-  EXPECT_NEAR(2.0, result.vy.value(), kEpsilon);
-  EXPECT_NEAR(1.0, result.omega.value(), kEpsilon);
+  EXPECT_NEAR(3.0, result.vx.value(), EPSILON);
+  EXPECT_NEAR(2.0, result.vy.value(), EPSILON);
+  EXPECT_NEAR(1.0, result.omega.value(), EPSILON);
 }
 
 TEST(ChassisSpeedsTest, Minus) {
@@ -65,9 +65,9 @@ TEST(ChassisSpeedsTest, Minus) {
 
   const frc::ChassisSpeeds result = left - right;
 
-  EXPECT_NEAR(-1.0, result.vx.value(), kEpsilon);
-  EXPECT_NEAR(0, result.vy.value(), kEpsilon);
-  EXPECT_NEAR(0.5, result.omega.value(), kEpsilon);
+  EXPECT_NEAR(-1.0, result.vx.value(), EPSILON);
+  EXPECT_NEAR(0, result.vy.value(), EPSILON);
+  EXPECT_NEAR(0.5, result.omega.value(), EPSILON);
 }
 
 TEST(ChassisSpeedsTest, UnaryMinus) {
@@ -75,9 +75,9 @@ TEST(ChassisSpeedsTest, UnaryMinus) {
 
   const frc::ChassisSpeeds result = -speeds;
 
-  EXPECT_NEAR(-1.0, result.vx.value(), kEpsilon);
-  EXPECT_NEAR(-0.5, result.vy.value(), kEpsilon);
-  EXPECT_NEAR(-0.75, result.omega.value(), kEpsilon);
+  EXPECT_NEAR(-1.0, result.vx.value(), EPSILON);
+  EXPECT_NEAR(-0.5, result.vy.value(), EPSILON);
+  EXPECT_NEAR(-0.75, result.omega.value(), EPSILON);
 }
 
 TEST(ChassisSpeedsTest, Multiplication) {
@@ -85,9 +85,9 @@ TEST(ChassisSpeedsTest, Multiplication) {
 
   const frc::ChassisSpeeds result = speeds * 2;
 
-  EXPECT_NEAR(2.0, result.vx.value(), kEpsilon);
-  EXPECT_NEAR(1.0, result.vy.value(), kEpsilon);
-  EXPECT_NEAR(1.5, result.omega.value(), kEpsilon);
+  EXPECT_NEAR(2.0, result.vx.value(), EPSILON);
+  EXPECT_NEAR(1.0, result.vy.value(), EPSILON);
+  EXPECT_NEAR(1.5, result.omega.value(), EPSILON);
 }
 
 TEST(ChassisSpeedsTest, Division) {
@@ -95,7 +95,7 @@ TEST(ChassisSpeedsTest, Division) {
 
   const frc::ChassisSpeeds result = speeds / 2;
 
-  EXPECT_NEAR(0.5, result.vx.value(), kEpsilon);
-  EXPECT_NEAR(0.25, result.vy.value(), kEpsilon);
-  EXPECT_NEAR(0.375, result.omega.value(), kEpsilon);
+  EXPECT_NEAR(0.5, result.vx.value(), EPSILON);
+  EXPECT_NEAR(0.25, result.vy.value(), EPSILON);
+  EXPECT_NEAR(0.375, result.omega.value(), EPSILON);
 }

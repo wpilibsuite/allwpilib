@@ -78,7 +78,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     m_simDevice = SimDevice.create("AnalogEncoder", m_analogInput.getChannel());
 
     if (m_simDevice != null) {
-      m_simPosition = m_simDevice.createDouble("Position", Direction.kInput, 0.0);
+      m_simPosition = m_simDevice.createDouble("Position", Direction.INPUT, 0.0);
     }
 
     m_fullRange = fullRange;

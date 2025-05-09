@@ -21,7 +21,7 @@ public class Translation3dStruct implements Struct<Translation3d> {
 
   @Override
   public int getSize() {
-    return kSizeDouble * 3;
+    return SIZE_DOUBLE * 3;
   }
 
   @Override

@@ -25,17 +25,17 @@
  * to control an elevator.
  */
 class Robot : public frc::TimedRobot {
-  static constexpr int kMotorPort = 0;
-  static constexpr int kEncoderAChannel = 0;
-  static constexpr int kEncoderBChannel = 1;
-  static constexpr int kJoystickPort = 0;
+  static constexpr int MOTOR_PORT = 0;
+  static constexpr int ENCODER_A_CHANNEL = 0;
+  static constexpr int ENCODER_B_CHANNEL = 1;
+  static constexpr int JOYSTICK_PORT = 0;
 
-  static constexpr units::meter_t kRaisedPosition = 2_ft;
-  static constexpr units::meter_t kLoweredPosition = 0_ft;
+  static constexpr units::meter_t RAISED_POSITION = 2_ft;
+  static constexpr units::meter_t LOWERED_POSITION = 0_ft;
 
-  static constexpr units::meter_t kDrumRadius = 0.75_in;
-  static constexpr units::kilogram_t kCarriageMass = 4.5_kg;
-  static constexpr double kGearRatio = 6.0;
+  static constexpr units::meter_t DRUM_RADIUS = 0.75_in;
+  static constexpr units::kilogram_t CARRIAGE_MASS = 4.5_kg;
+  static constexpr double GEAR_RATIO = 6.0;
 
   // The plant holds a state-space model of our elevator. This system has the
   // following properties:
@@ -44,8 +44,8 @@ class Robot : public frc::TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in meters.
   frc::LinearSystem<2, 1, 1> m_elevatorPlant =
-      frc::LinearSystemId::ElevatorSystem(frc::DCMotor::NEO(2), kCarriageMass,
-                                          kDrumRadius, kGearRatio)
+      frc::LinearSystemId::ElevatorSystem(frc::DCMotor::NEO(2), CARRIAGE_MASS,
+                                          DRUM_RADIUS, GEAR_RATIO)
           .Slice(0);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
@@ -82,10 +82,10 @@ class Robot : public frc::TimedRobot {
                                         m_observer, 12_V, 20_ms};
 
   // An encoder set up to measure elevator height in meters.
-  frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
+  frc::Encoder m_encoder{ENCODER_A_CHANNEL, ENCODER_B_CHANNEL};
 
-  frc::PWMSparkMax m_motor{kMotorPort};
-  frc::XboxController m_joystick{kJoystickPort};
+  frc::PWMSparkMax m_motor{MOTOR_PORT};
+  frc::XboxController m_joystick{JOYSTICK_PORT};
 
   frc::TrapezoidProfile<units::meters> m_profile{{3_fps, 6_fps_sq}};
 
@@ -94,7 +94,7 @@ class Robot : public frc::TimedRobot {
  public:
   Robot() {
     // Circumference = pi * d, so distance per click = pi * d / counts
-    m_encoder.SetDistancePerPulse(2.0 * std::numbers::pi * kDrumRadius.value() /
+    m_encoder.SetDistancePerPulse(2.0 * std::numbers::pi * DRUM_RADIUS.value() /
                                   4096.0);
   }
 
@@ -112,10 +112,10 @@ class Robot : public frc::TimedRobot {
     frc::TrapezoidProfile<units::meters>::State goal;
     if (m_joystick.GetRightBumperButton()) {
       // We pressed the bumper, so let's set our next reference
-      goal = {kRaisedPosition, 0_fps};
+      goal = {RAISED_POSITION, 0_fps};
     } else {
       // We released the bumper, so let's spin down
-      goal = {kLoweredPosition, 0_fps};
+      goal = {LOWERED_POSITION, 0_fps};
     }
     m_lastProfiledReference =
         m_profile.Calculate(20_ms, m_lastProfiledReference, goal);

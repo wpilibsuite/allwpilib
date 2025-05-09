@@ -192,14 +192,14 @@ class Frame {
                          int jpegQuality = -1) const;
 
   Image* Convert(Image* image, VideoMode::PixelFormat pixelFormat) {
-    if (pixelFormat == VideoMode::kMJPEG) {
+    if (pixelFormat == VideoMode::MJPEG) {
       return nullptr;
     }
     return ConvertImpl(image, pixelFormat, -1, 80);
   }
   Image* ConvertToMJPEG(Image* image, int requiredQuality,
                         int defaultQuality = 80) {
-    return ConvertImpl(image, VideoMode::kMJPEG, requiredQuality,
+    return ConvertImpl(image, VideoMode::MJPEG, requiredQuality,
                        defaultQuality);
   }
   Image* ConvertMJPEGToBGR(Image* image);
@@ -219,14 +219,14 @@ class Frame {
   Image* ConvertBGRToBGRA(Image* image);
 
   Image* GetImage(int width, int height, VideoMode::PixelFormat pixelFormat) {
-    if (pixelFormat == VideoMode::kMJPEG) {
+    if (pixelFormat == VideoMode::MJPEG) {
       return nullptr;
     }
     return GetImageImpl(width, height, pixelFormat, -1, 80);
   }
   Image* GetImageMJPEG(int width, int height, int requiredQuality,
                        int defaultQuality = 80) {
-    return GetImageImpl(width, height, VideoMode::kMJPEG, requiredQuality,
+    return GetImageImpl(width, height, VideoMode::MJPEG, requiredQuality,
                         defaultQuality);
   }
 

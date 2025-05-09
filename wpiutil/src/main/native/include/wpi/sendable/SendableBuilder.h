@@ -25,9 +25,9 @@ class SendableBuilder {
    */
   enum BackendKind {
     /// Unknown.
-    kUnknown,
+    UNKNOWN,
     /// NetworkTables.
-    kNetworkTables
+    NETWORK_TABLES
   };
 
   virtual ~SendableBuilder() = default;

@@ -17,79 +17,79 @@
 /**
  * The CAN device type.
  *
- * Teams should use HAL_CAN_Dev_kMiscellaneous
+ * Teams should use HAL_CAN_Dev_Miscellaneous
  */
 HAL_ENUM(HAL_CANDeviceType) {
   /// Broadcast.
-  HAL_CAN_Dev_kBroadcast = 0,
+  HAL_CAN_Dev_Broadcast = 0,
   /// Robot controller.
-  HAL_CAN_Dev_kRobotController = 1,
+  HAL_CAN_Dev_RobotController = 1,
   /// Motor controller.
-  HAL_CAN_Dev_kMotorController = 2,
+  HAL_CAN_Dev_MotorController = 2,
   /// Relay controller.
-  HAL_CAN_Dev_kRelayController = 3,
+  HAL_CAN_Dev_RelayController = 3,
   /// Gyro sensor.
-  HAL_CAN_Dev_kGyroSensor = 4,
+  HAL_CAN_Dev_GyroSensor = 4,
   /// Accelerometer.
-  HAL_CAN_Dev_kAccelerometer = 5,
+  HAL_CAN_Dev_Accelerometer = 5,
   /// Ultrasonic sensor.
-  HAL_CAN_Dev_kUltrasonicSensor = 6,
+  HAL_CAN_Dev_UltrasonicSensor = 6,
   /// Gear tooth sensor.
-  HAL_CAN_Dev_kGearToothSensor = 7,
+  HAL_CAN_Dev_GearToothSensor = 7,
   /// Power distribution.
-  HAL_CAN_Dev_kPowerDistribution = 8,
+  HAL_CAN_Dev_PowerDistribution = 8,
   /// Pneumatics.
-  HAL_CAN_Dev_kPneumatics = 9,
+  HAL_CAN_Dev_Pneumatics = 9,
   /// Miscellaneous.
-  HAL_CAN_Dev_kMiscellaneous = 10,
+  HAL_CAN_Dev_Miscellaneous = 10,
   /// IO breakout.
-  HAL_CAN_Dev_kIOBreakout = 11,
+  HAL_CAN_Dev_IOBreakout = 11,
   // Servo controller.
-  HAL_CAN_Dev_kServoController = 12,
+  HAL_CAN_Dev_ServoController = 12,
   /// Firmware update.
-  HAL_CAN_Dev_kFirmwareUpdate = 31
+  HAL_CAN_Dev_FirmwareUpdate = 31
 };
 
 /**
  * The CAN manufacturer ID.
  *
- * Teams should use HAL_CAN_Man_kTeamUse.
+ * Teams should use HAL_CAN_Man_TeamUse.
  */
 HAL_ENUM(HAL_CANManufacturer) {
   /// Broadcast.
-  HAL_CAN_Man_kBroadcast = 0,
+  HAL_CAN_Man_Broadcast = 0,
   /// National Instruments.
-  HAL_CAN_Man_kNI = 1,
+  HAL_CAN_Man_NI = 1,
   /// Luminary Micro.
-  HAL_CAN_Man_kLM = 2,
+  HAL_CAN_Man_LM = 2,
   /// DEKA Research and Development Corp.
-  HAL_CAN_Man_kDEKA = 3,
+  HAL_CAN_Man_DEKA = 3,
   /// Cross the Road Electronics.
-  HAL_CAN_Man_kCTRE = 4,
+  HAL_CAN_Man_CTRE = 4,
   /// REV robotics.
-  HAL_CAN_Man_kREV = 5,
+  HAL_CAN_Man_REV = 5,
   /// Grapple.
-  HAL_CAN_Man_kGrapple = 6,
+  HAL_CAN_Man_Grapple = 6,
   /// MindSensors.
-  HAL_CAN_Man_kMS = 7,
+  HAL_CAN_Man_MS = 7,
   /// Team use.
-  HAL_CAN_Man_kTeamUse = 8,
+  HAL_CAN_Man_TeamUse = 8,
   /// Kauai Labs.
-  HAL_CAN_Man_kKauaiLabs = 9,
+  HAL_CAN_Man_KauaiLabs = 9,
   /// Copperforge.
-  HAL_CAN_Man_kCopperforge = 10,
+  HAL_CAN_Man_Copperforge = 10,
   /// Playing With Fusion.
-  HAL_CAN_Man_kPWF = 11,
+  HAL_CAN_Man_PWF = 11,
   /// Studica.
-  HAL_CAN_Man_kStudica = 12,
+  HAL_CAN_Man_Studica = 12,
   /// TheThriftyBot.
-  HAL_CAN_Man_kTheThriftyBot = 13,
+  HAL_CAN_Man_TheThriftyBot = 13,
   /// Redux Robotics.
-  HAL_CAN_Man_kReduxRobotics = 14,
+  HAL_CAN_Man_ReduxRobotics = 14,
   /// AndyMark.
-  HAL_CAN_Man_kAndyMark = 15,
+  HAL_CAN_Man_AndyMark = 15,
   /// Vivid-Hosting.
-  HAL_CAN_Man_kVividHosting = 16
+  HAL_CAN_Man_VividHosting = 16
 };
 
 /**

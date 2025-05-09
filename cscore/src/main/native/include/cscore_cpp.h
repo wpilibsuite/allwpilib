@@ -61,15 +61,15 @@ struct UsbCameraInfo {
  */
 struct VideoMode : public CS_VideoMode {
   enum PixelFormat {
-    kUnknown = WPI_PIXFMT_UNKNOWN,
-    kMJPEG = WPI_PIXFMT_MJPEG,
-    kYUYV = WPI_PIXFMT_YUYV,
-    kRGB565 = WPI_PIXFMT_RGB565,
-    kBGR = WPI_PIXFMT_BGR,
-    kGray = WPI_PIXFMT_GRAY,
-    kY16 = WPI_PIXFMT_Y16,
-    kUYVY = WPI_PIXFMT_UYVY,
-    kBGRA = WPI_PIXFMT_BGRA,
+    UNKNOWN = WPI_PIXFMT_UNKNOWN,
+    MJPEG = WPI_PIXFMT_MJPEG,
+    YUYV = WPI_PIXFMT_YUYV,
+    RGB565 = WPI_PIXFMT_RGB565,
+    BGR = WPI_PIXFMT_BGR,
+    GRAY = WPI_PIXFMT_GRAY,
+    Y16 = WPI_PIXFMT_Y16,
+    UYVY = WPI_PIXFMT_UYVY,
+    BGRA = WPI_PIXFMT_BGRA,
   };
   VideoMode() {
     pixelFormat = 0;
@@ -83,7 +83,7 @@ struct VideoMode : public CS_VideoMode {
     height = height_;
     fps = fps_;
   }
-  explicit operator bool() const { return pixelFormat == kUnknown; }
+  explicit operator bool() const { return pixelFormat == UNKNOWN; }
 
   bool operator==(const VideoMode& other) const {
     return pixelFormat == other.pixelFormat && width == other.width &&
@@ -101,41 +101,41 @@ struct VideoMode : public CS_VideoMode {
  */
 struct RawEvent {
   enum Kind {
-    kSourceCreated = CS_SOURCE_CREATED,
-    kSourceDestroyed = CS_SOURCE_DESTROYED,
-    kSourceConnected = CS_SOURCE_CONNECTED,
-    kSourceDisconnected = CS_SOURCE_DISCONNECTED,
-    kSourceVideoModesUpdated = CS_SOURCE_VIDEOMODES_UPDATED,
-    kSourceVideoModeChanged = CS_SOURCE_VIDEOMODE_CHANGED,
-    kSourcePropertyCreated = CS_SOURCE_PROPERTY_CREATED,
-    kSourcePropertyValueUpdated = CS_SOURCE_PROPERTY_VALUE_UPDATED,
-    kSourcePropertyChoicesUpdated = CS_SOURCE_PROPERTY_CHOICES_UPDATED,
-    kSinkSourceChanged = CS_SINK_SOURCE_CHANGED,
-    kSinkCreated = CS_SINK_CREATED,
-    kSinkDestroyed = CS_SINK_DESTROYED,
-    kSinkEnabled = CS_SINK_ENABLED,
-    kSinkDisabled = CS_SINK_DISABLED,
-    kNetworkInterfacesChanged = CS_NETWORK_INTERFACES_CHANGED,
-    kTelemetryUpdated = CS_TELEMETRY_UPDATED,
-    kSinkPropertyCreated = CS_SINK_PROPERTY_CREATED,
-    kSinkPropertyValueUpdated = CS_SINK_PROPERTY_VALUE_UPDATED,
-    kSinkPropertyChoicesUpdated = CS_SINK_PROPERTY_CHOICES_UPDATED,
-    kUsbCamerasChanged = CS_USB_CAMERAS_CHANGED
+    SOURCE_CREATED = CS_SOURCE_CREATED,
+    SOURCE_DESTROYED = CS_SOURCE_DESTROYED,
+    SOURCE_CONNECTED = CS_SOURCE_CONNECTED,
+    SOURCE_DISCONNECTED = CS_SOURCE_DISCONNECTED,
+    SOURCE_VIDEO_MODES_UPDATED = CS_SOURCE_VIDEOMODES_UPDATED,
+    SOURCE_VIDEO_MODE_CHANGED = CS_SOURCE_VIDEOMODE_CHANGED,
+    SOURCE_PROPERTY_CREATED = CS_SOURCE_PROPERTY_CREATED,
+    SOURCE_PROPERTY_VALUE_UPDATED = CS_SOURCE_PROPERTY_VALUE_UPDATED,
+    SOURCE_PROPERTY_CHOICES_UPDATED = CS_SOURCE_PROPERTY_CHOICES_UPDATED,
+    SINK_SOURCE_CHANGED = CS_SINK_SOURCE_CHANGED,
+    SINK_CREATED = CS_SINK_CREATED,
+    SINK_DESTROYED = CS_SINK_DESTROYED,
+    SINK_ENABLED = CS_SINK_ENABLED,
+    SINK_DISABLED = CS_SINK_DISABLED,
+    NETWORK_INTERFACES_CHANGED = CS_NETWORK_INTERFACES_CHANGED,
+    TELEMETRY_UPDATED = CS_TELEMETRY_UPDATED,
+    SINK_PROPERTY_CREATED = CS_SINK_PROPERTY_CREATED,
+    SINK_PROPERTY_VALUE_UPDATED = CS_SINK_PROPERTY_VALUE_UPDATED,
+    SINK_PROPERTY_CHOICES_UPDATED = CS_SINK_PROPERTY_CHOICES_UPDATED,
+    USB_CAMERAS_CHANGED = CS_USB_CAMERAS_CHANGED
   };
 
   RawEvent() = default;
   explicit RawEvent(RawEvent::Kind kind_) : kind{kind_} {}
   RawEvent(std::string_view name_, CS_Handle handle_, RawEvent::Kind kind_)
       : kind{kind_}, name{name_} {
-    if (kind_ == kSinkCreated || kind_ == kSinkDestroyed ||
-        kind_ == kSinkEnabled || kind_ == kSinkDisabled) {
+    if (kind_ == SINK_CREATED || kind_ == SINK_DESTROYED ||
+        kind_ == SINK_ENABLED || kind_ == SINK_DISABLED) {
       sinkHandle = handle_;
     } else {
       sourceHandle = handle_;
     }
   }
   RawEvent(std::string_view name_, CS_Source source_, const VideoMode& mode_)
-      : kind{kSourceVideoModeChanged},
+      : kind{SOURCE_VIDEO_MODE_CHANGED},
         sourceHandle{source_},
         name{name_},
         mode{mode_} {}
@@ -152,17 +152,17 @@ struct RawEvent {
 
   Kind kind;
 
-  // Valid for kSource* and kSink* respectively
+  // Valid for SOURCE* and SINK* respectively
   CS_Source sourceHandle = CS_INVALID_HANDLE;
   CS_Sink sinkHandle = CS_INVALID_HANDLE;
 
   // Source/sink/property name
   std::string name;
 
-  // Fields for kSourceVideoModeChanged event
+  // Fields for SOURCE_VIDEO_MODE_CHANGED event
   VideoMode mode;
 
-  // Fields for kSourceProperty* events
+  // Fields for SOURCE_PROPERTY* events
   CS_Property propertyHandle;
   CS_PropertyKind propertyKind;
   int value;

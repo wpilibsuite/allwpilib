@@ -35,7 +35,7 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
   SetTimeout(5_s);
 
   // Don't wait until the buffer is full to transmit.
-  SetWriteBufferMode(kFlushOnAccess);
+  SetWriteBufferMode(FLUSH_ON_ACCESS);
 
   DisableTermination();
 
@@ -65,7 +65,7 @@ SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
   SetTimeout(5_s);
 
   // Don't wait until the buffer is full to transmit.
-  SetWriteBufferMode(kFlushOnAccess);
+  SetWriteBufferMode(FLUSH_ON_ACCESS);
 
   DisableTermination();
 

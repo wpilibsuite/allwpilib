@@ -27,17 +27,17 @@ static std::shared_ptr<PropertyContainer> GetPropertyContainer(
     CS_Property propertyHandle, int* propertyIndex, CS_Status* status) {
   std::shared_ptr<PropertyContainer> container;
   Handle handle{propertyHandle};
-  if (handle.IsType(Handle::kProperty)) {
+  if (handle.IsType(Handle::PROPERTY)) {
     int i = handle.GetParentIndex();
-    auto data = Instance::GetInstance().GetSource(Handle{i, Handle::kSource});
+    auto data = Instance::GetInstance().GetSource(Handle{i, Handle::SOURCE});
     if (!data) {
       *status = CS_INVALID_HANDLE;
       return nullptr;
     }
     container = data->source;
-  } else if (handle.IsType(Handle::kSinkProperty)) {
+  } else if (handle.IsType(Handle::SINK_PROPERTY)) {
     int i = handle.GetParentIndex();
-    auto data = Instance::GetInstance().GetSink(Handle{i, Handle::kSink});
+    auto data = Instance::GetInstance().GetSink(Handle{i, Handle::SINK});
     if (!data) {
       *status = CS_INVALID_HANDLE;
       return nullptr;
@@ -286,7 +286,7 @@ CS_Property GetSourceProperty(CS_Source source, std::string_view name,
     *status = CS_INVALID_HANDLE;
     return 0;
   }
-  return Handle{source, property, Handle::kProperty};
+  return Handle{source, property, Handle::PROPERTY};
 }
 
 std::span<CS_Property> EnumerateSourceProperties(
@@ -300,7 +300,7 @@ std::span<CS_Property> EnumerateSourceProperties(
   wpi::SmallVector<int, 32> properties_buf;
   for (auto property :
        data->source->EnumerateProperties(properties_buf, status)) {
-    vec.push_back(Handle{source, property, Handle::kProperty});
+    vec.push_back(Handle{source, property, Handle::PROPERTY});
   }
   return vec;
 }
@@ -583,7 +583,7 @@ CS_Property GetSinkProperty(CS_Sink sink, std::string_view name,
     *status = CS_INVALID_HANDLE;
     return 0;
   }
-  return Handle{sink, property, Handle::kSinkProperty};
+  return Handle{sink, property, Handle::SINK_PROPERTY};
 }
 
 std::span<CS_Property> EnumerateSinkProperties(
@@ -596,7 +596,7 @@ std::span<CS_Property> EnumerateSinkProperties(
   wpi::SmallVector<int, 32> properties_buf;
   for (auto property :
        data->sink->EnumerateProperties(properties_buf, status)) {
-    vec.push_back(Handle{sink, property, Handle::kSinkProperty});
+    vec.push_back(Handle{sink, property, Handle::SINK_PROPERTY});
   }
   return vec;
 }
@@ -746,11 +746,11 @@ CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
   if (immediateNotify) {
     // TODO
   }
-  return Handle{uid, Handle::kListener};
+  return Handle{uid, Handle::LISTENER};
 }
 
 void RemoveListener(CS_Listener handle, CS_Status* status) {
-  int uid = Handle{handle}.GetTypedIndex(Handle::kListener);
+  int uid = Handle{handle}.GetTypedIndex(Handle::LISTENER);
   if (uid < 0) {
     *status = CS_INVALID_HANDLE;
     return;
@@ -760,11 +760,11 @@ void RemoveListener(CS_Listener handle, CS_Status* status) {
 
 CS_ListenerPoller CreateListenerPoller() {
   auto& inst = Instance::GetInstance();
-  return Handle(inst.notifier.CreatePoller(), Handle::kListenerPoller);
+  return Handle(inst.notifier.CreatePoller(), Handle::LISTENER_POLLER);
 }
 
 void DestroyListenerPoller(CS_ListenerPoller poller) {
-  int uid = Handle{poller}.GetTypedIndex(Handle::kListenerPoller);
+  int uid = Handle{poller}.GetTypedIndex(Handle::LISTENER_POLLER);
   if (uid < 0) {
     return;
   }
@@ -774,7 +774,7 @@ void DestroyListenerPoller(CS_ListenerPoller poller) {
 CS_Listener AddPolledListener(CS_ListenerPoller poller, int eventMask,
                               bool immediateNotify, CS_Status* status) {
   Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kListenerPoller);
+  int id = handle.GetTypedIndex(Handle::LISTENER_POLLER);
   if (id < 0) {
     *status = CS_INVALID_HANDLE;
     return 0;
@@ -783,12 +783,12 @@ CS_Listener AddPolledListener(CS_ListenerPoller poller, int eventMask,
   auto& inst = Instance::GetInstance();
   int uid = inst.notifier.AddPolled(id, eventMask);
   StartBackground(eventMask, immediateNotify);
-  return Handle{uid, Handle::kListener};
+  return Handle{uid, Handle::LISTENER};
 }
 
 std::vector<RawEvent> PollListener(CS_ListenerPoller poller) {
   Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kListenerPoller);
+  int id = handle.GetTypedIndex(Handle::LISTENER_POLLER);
   if (id < 0) {
     return {};
   }
@@ -798,7 +798,7 @@ std::vector<RawEvent> PollListener(CS_ListenerPoller poller) {
 std::vector<RawEvent> PollListener(CS_ListenerPoller poller, double timeout,
                                    bool* timedOut) {
   Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kListenerPoller);
+  int id = handle.GetTypedIndex(Handle::LISTENER_POLLER);
   if (id < 0) {
     return {};
   }
@@ -807,7 +807,7 @@ std::vector<RawEvent> PollListener(CS_ListenerPoller poller, double timeout,
 
 void CancelPollListener(CS_ListenerPoller poller) {
   Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kListenerPoller);
+  int id = handle.GetTypedIndex(Handle::LISTENER_POLLER);
   if (id < 0) {
     return;
   }

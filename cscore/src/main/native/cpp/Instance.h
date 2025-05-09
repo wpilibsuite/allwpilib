@@ -58,8 +58,8 @@ class Instance {
   UsbCameraListener usbCameraListener;
 
  private:
-  UnlimitedHandleResource<Handle, SourceData, Handle::kSource> m_sources;
-  UnlimitedHandleResource<Handle, SinkData, Handle::kSink> m_sinks;
+  UnlimitedHandleResource<Handle, SourceData, Handle::SOURCE> m_sources;
+  UnlimitedHandleResource<Handle, SinkData, Handle::SINK> m_sinks;
 
  public:
   wpi::EventLoopRunner eventLoop;

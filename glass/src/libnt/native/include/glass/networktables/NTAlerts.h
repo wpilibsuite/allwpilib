@@ -17,7 +17,7 @@ namespace glass {
 
 class NTAlertsModel : public AlertsModel {
  public:
-  static constexpr const char* kType = "Alerts";
+  static constexpr const char* TYPE = "Alerts";
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTAlertsModel(std::string_view path);

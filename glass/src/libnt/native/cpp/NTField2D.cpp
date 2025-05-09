@@ -118,9 +118,9 @@ NTField2DModel::NTField2DModel(nt::NetworkTableInstance inst,
       m_tableSub{inst, {{m_path}}, {.periodic = 0.05, .sendAll = true}},
       m_nameTopic{inst.GetTopic(fmt::format("{}/.name", path))},
       m_poller{inst} {
-  m_poller.AddListener(m_tableSub, nt::EventFlags::kTopic |
-                                       nt::EventFlags::kValueAll |
-                                       nt::EventFlags::kImmediate);
+  m_poller.AddListener(m_tableSub, nt::EventFlags::TOPIC |
+                                       nt::EventFlags::VALUE_ALL |
+                                       nt::EventFlags::IMMEDIATE);
 }
 
 NTField2DModel::~NTField2DModel() = default;
@@ -134,12 +134,12 @@ void NTField2DModel::Update() {
         continue;
       }
       auto [it, match] = Find(info->name);
-      if (event.flags & nt::EventFlags::kUnpublish) {
+      if (event.flags & nt::EventFlags::UNPUBLISH) {
         if (match) {
           m_objects.erase(it);
         }
         continue;
-      } else if (event.flags & nt::EventFlags::kPublish) {
+      } else if (event.flags & nt::EventFlags::PUBLISH) {
         if (!match) {
           it = m_objects.emplace(
               it, std::make_unique<ObjectModel>(

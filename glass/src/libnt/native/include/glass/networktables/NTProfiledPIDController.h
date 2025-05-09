@@ -18,7 +18,7 @@
 namespace glass {
 class NTProfiledPIDControllerModel : public ProfiledPIDControllerModel {
  public:
-  static constexpr const char* kType = "ProfiledPIDController";
+  static constexpr const char* TYPE = "ProfiledPIDController";
 
   explicit NTProfiledPIDControllerModel(std::string_view path);
   NTProfiledPIDControllerModel(nt::NetworkTableInstance inst,

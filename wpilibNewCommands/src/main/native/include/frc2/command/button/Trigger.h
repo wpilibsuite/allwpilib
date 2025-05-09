@@ -280,9 +280,9 @@ class Trigger {
    * @param type The debounce type.
    * @return The debounced trigger.
    */
-  Trigger Debounce(units::second_t debounceTime,
-                   frc::Debouncer::DebounceType type =
-                       frc::Debouncer::DebounceType::kRising);
+  Trigger Debounce(
+      units::second_t debounceTime,
+      frc::Debouncer::DebounceType type = frc::Debouncer::DebounceType::RISING);
 
   /**
    * Returns the current state of this trigger.

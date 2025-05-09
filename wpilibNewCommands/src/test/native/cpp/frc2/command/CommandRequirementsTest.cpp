@@ -55,7 +55,7 @@ TEST_F(CommandRequirementsTest, RequirementUninterruptible) {
                         [&endCounter](bool interruptible) { endCounter++; },
                         [] { return false; }, {&requirement})
           .WithInterruptBehavior(
-              Command::InterruptionBehavior::kCancelIncoming);
+              Command::InterruptionBehavior::CANCEL_INCOMING);
   MockCommand command2({&requirement});
 
   EXPECT_CALL(command2, Initialize()).Times(0);

@@ -9,7 +9,7 @@ package edu.wpi.first.networktables;
 /** NetworkTables Integer topic. */
 public final class IntegerTopic extends Topic {
   /** The default type string for this topic type. */
-  public static final String kTypeString = "int";
+  public static final String TYPE_STRING = "int";
 
   /**
    * Construct from a generic topic.
@@ -51,7 +51,7 @@ public final class IntegerTopic extends Topic {
     return new IntegerEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kInteger.getValue(),
+            m_handle, NetworkTableType.INTEGER.getValue(),
             "int", options),
         defaultValue);
   }
@@ -79,7 +79,7 @@ public final class IntegerTopic extends Topic {
     return new IntegerEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kInteger.getValue(),
+            m_handle, NetworkTableType.INTEGER.getValue(),
             typeString, options),
         defaultValue);
   }
@@ -104,7 +104,7 @@ public final class IntegerTopic extends Topic {
     return new IntegerEntryImpl(
         this,
         NetworkTablesJNI.publish(
-            m_handle, NetworkTableType.kInteger.getValue(),
+            m_handle, NetworkTableType.INTEGER.getValue(),
             "int", options),
         0);
   }
@@ -134,7 +134,7 @@ public final class IntegerTopic extends Topic {
     return new IntegerEntryImpl(
         this,
         NetworkTablesJNI.publishEx(
-            m_handle, NetworkTableType.kInteger.getValue(),
+            m_handle, NetworkTableType.INTEGER.getValue(),
             typeString, properties, options),
         0);
   }
@@ -165,7 +165,7 @@ public final class IntegerTopic extends Topic {
     return new IntegerEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kInteger.getValue(),
+            m_handle, NetworkTableType.INTEGER.getValue(),
             "int", options),
         defaultValue);
   }
@@ -198,7 +198,7 @@ public final class IntegerTopic extends Topic {
     return new IntegerEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kInteger.getValue(),
+            m_handle, NetworkTableType.INTEGER.getValue(),
             typeString, options),
         defaultValue);
   }

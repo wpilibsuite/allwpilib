@@ -20,21 +20,21 @@ using namespace wpi;
 
 static size_t TypeToSize(StructFieldType type) {
   switch (type) {
-    case StructFieldType::kBool:
-    case StructFieldType::kChar:
-    case StructFieldType::kInt8:
-    case StructFieldType::kUint8:
+    case StructFieldType::BOOL:
+    case StructFieldType::CHAR:
+    case StructFieldType::INT8:
+    case StructFieldType::UINT8:
       return 1;
-    case StructFieldType::kInt16:
-    case StructFieldType::kUint16:
+    case StructFieldType::INT16:
+    case StructFieldType::UINT16:
       return 2;
-    case StructFieldType::kInt32:
-    case StructFieldType::kUint32:
-    case StructFieldType::kFloat:
+    case StructFieldType::INT32:
+    case StructFieldType::UINT32:
+    case StructFieldType::FLOAT:
       return 4;
-    case StructFieldType::kInt64:
-    case StructFieldType::kUint64:
-    case StructFieldType::kDouble:
+    case StructFieldType::INT64:
+    case StructFieldType::UINT64:
+    case StructFieldType::DOUBLE:
       return 8;
     default:
       return 0;
@@ -43,31 +43,31 @@ static size_t TypeToSize(StructFieldType type) {
 
 static StructFieldType TypeStringToType(std::string_view str) {
   if (str == "bool") {
-    return StructFieldType::kBool;
+    return StructFieldType::BOOL;
   } else if (str == "char") {
-    return StructFieldType::kChar;
+    return StructFieldType::CHAR;
   } else if (str == "int8") {
-    return StructFieldType::kInt8;
+    return StructFieldType::INT8;
   } else if (str == "int16") {
-    return StructFieldType::kInt16;
+    return StructFieldType::INT16;
   } else if (str == "int32") {
-    return StructFieldType::kInt32;
+    return StructFieldType::INT32;
   } else if (str == "int64") {
-    return StructFieldType::kInt64;
+    return StructFieldType::INT64;
   } else if (str == "uint8") {
-    return StructFieldType::kUint8;
+    return StructFieldType::UINT8;
   } else if (str == "uint16") {
-    return StructFieldType::kUint16;
+    return StructFieldType::UINT16;
   } else if (str == "uint32") {
-    return StructFieldType::kUint32;
+    return StructFieldType::UINT32;
   } else if (str == "uint64") {
-    return StructFieldType::kUint64;
+    return StructFieldType::UINT64;
   } else if (str == "float" || str == "float32") {
-    return StructFieldType::kFloat;
+    return StructFieldType::FLOAT;
   } else if (str == "double" || str == "float64") {
-    return StructFieldType::kDouble;
+    return StructFieldType::DOUBLE;
   } else {
-    return StructFieldType::kStruct;
+    return StructFieldType::STRUCT;
   }
 }
 
@@ -145,7 +145,7 @@ std::string StructDescriptor::CalculateOffsets(
       }
       offset += field.m_size * field.m_arraySize;
     } else {
-      if (field.m_type == StructFieldType::kBool && prevBitfieldSize != 0 &&
+      if (field.m_type == StructFieldType::BOOL && prevBitfieldSize != 0 &&
           (shift + 1) <= (prevBitfieldSize * 8)) {
         // bool takes on size of preceding bitfield type (if it fits)
         field.m_size = prevBitfieldSize;
@@ -209,9 +209,8 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
     // bitfield checks
     if (decl.bitWidth != 0) {
       // only integer or boolean types are allowed
-      if (type == StructFieldType::kChar || type == StructFieldType::kFloat ||
-          type == StructFieldType::kDouble ||
-          type == StructFieldType::kStruct) {
+      if (type == StructFieldType::CHAR || type == StructFieldType::FLOAT ||
+          type == StructFieldType::DOUBLE || type == StructFieldType::STRUCT) {
         *err = fmt::format("field {}: type {} cannot be bitfield", decl.name,
                            decl.typeString);
         [[unlikely]] return nullptr;
@@ -225,7 +224,7 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
       }
 
       // bit width must be 1 for booleans
-      if (type == StructFieldType::kBool && decl.bitWidth != 1) {
+      if (type == StructFieldType::BOOL && decl.bitWidth != 1) {
         *err = fmt::format("field {}: bit width must be 1 for bool type",
                            decl.name);
         [[unlikely]] return nullptr;
@@ -241,7 +240,7 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
 
     // struct handling
     const StructDescriptor* structDesc = nullptr;
-    if (type == StructFieldType::kStruct) {
+    if (type == StructFieldType::STRUCT) {
       // recursive definitions are not allowed
       if (decl.typeString == name) {
         *err = fmt::format("field {}: recursive struct reference", decl.name);
@@ -350,7 +349,7 @@ void MutableDynamicStruct::SetData(std::span<const uint8_t> data) {
 
 std::string_view DynamicStruct::GetStringField(
     const StructFieldDescriptor* field) const {
-  assert(field->m_type == StructFieldType::kChar);
+  assert(field->m_type == StructFieldType::CHAR);
   assert(field->m_parent == m_desc);
   assert(m_desc->IsValid());
   // Find last non zero character
@@ -407,7 +406,7 @@ std::string_view DynamicStruct::GetStringField(
 
 bool MutableDynamicStruct::SetStringField(const StructFieldDescriptor* field,
                                           std::string_view value) {
-  assert(field->m_type == StructFieldType::kChar);
+  assert(field->m_type == StructFieldType::CHAR);
   assert(field->m_parent == m_desc);
   assert(m_desc->IsValid());
   size_t len = (std::min)(field->m_arraySize, value.size());
@@ -422,7 +421,7 @@ bool MutableDynamicStruct::SetStringField(const StructFieldDescriptor* field,
 void MutableDynamicStruct::SetStructField(const StructFieldDescriptor* field,
                                           const DynamicStruct& value,
                                           size_t arrIndex) {
-  assert(field->m_type == StructFieldType::kStruct);
+  assert(field->m_type == StructFieldType::STRUCT);
   assert(field->m_parent == m_desc);
   assert(m_desc->IsValid());
   assert(value.GetDescriptor() == field->m_struct);

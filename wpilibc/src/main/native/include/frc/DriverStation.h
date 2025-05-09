@@ -27,9 +27,9 @@ class DriverStation final {
    */
   enum Alliance {
     /// Red alliance.
-    kRed,
+    RED,
     /// Blue alliance.
-    kBlue
+    BLUE
   };
 
   /**
@@ -37,17 +37,17 @@ class DriverStation final {
    */
   enum MatchType {
     /// None.
-    kNone,
+    NONE,
     /// Practice.
-    kPractice,
+    PRACTICE,
     /// Qualification.
-    kQualification,
+    QUALIFICATION,
     /// Elimination.
-    kElimination
+    ELIMINATION
   };
 
   /// Number of Joystick ports.
-  static constexpr int kJoystickPorts = 6;
+  static constexpr int JOYSTICK_PORTS = 6;
 
   /**
    * The state of one joystick button. %Button indexes begin at 1.
@@ -275,8 +275,8 @@ class DriverStation final {
   /**
    * Returns the type of match being played provided by the FMS.
    *
-   * @return The match type enum (kNone, kPractice, kQualification,
-   *         kElimination)
+   * @return The match type enum (NONE, PRACTICE, QUALIFICATION,
+   *         ELIMINATION)
    */
   static MatchType GetMatchType();
 

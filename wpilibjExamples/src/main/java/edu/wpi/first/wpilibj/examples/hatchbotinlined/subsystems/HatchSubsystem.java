@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.hatchbotinlined.subsystems;
 
-import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kForward;
-import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kReverse;
+import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.FORWARD;
+import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.REVERSE;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -20,25 +20,25 @@ public class HatchSubsystem extends SubsystemBase {
       new DoubleSolenoid(
           0,
           PneumaticsModuleType.CTREPCM,
-          HatchConstants.kHatchSolenoidPorts[0],
-          HatchConstants.kHatchSolenoidPorts[1]);
+          HatchConstants.HATCH_SOLENOID_PORTS[0],
+          HatchConstants.HATCH_SOLENOID_PORTS[1]);
 
   /** Grabs the hatch. */
   public Command grabHatchCommand() {
     // implicitly require `this`
-    return this.runOnce(() -> m_hatchSolenoid.set(kForward));
+    return this.runOnce(() -> m_hatchSolenoid.set(FORWARD));
   }
 
   /** Releases the hatch. */
   public Command releaseHatchCommand() {
     // implicitly require `this`
-    return this.runOnce(() -> m_hatchSolenoid.set(kReverse));
+    return this.runOnce(() -> m_hatchSolenoid.set(REVERSE));
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     // Publish the solenoid state to telemetry.
-    builder.addBooleanProperty("extended", () -> m_hatchSolenoid.get() == kForward, null);
+    builder.addBooleanProperty("extended", () -> m_hatchSolenoid.get() == FORWARD, null);
   }
 }

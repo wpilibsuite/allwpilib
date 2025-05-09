@@ -328,14 +328,14 @@ class DynamicStructTest {
 
   private static Stream<Arguments> provideSimpleTestParams() {
     return Stream.of(
-        Arguments.of("bool a", 1, StructFieldType.kBool, false, false, 8, 0xff, 0, 0),
-        Arguments.of("char a", 1, StructFieldType.kChar, false, false, 8, 0xff, 0, 0),
-        Arguments.of("int8 a", 1, StructFieldType.kInt8, true, false, 8, 0xff, -128, 127),
-        Arguments.of("int16 a", 2, StructFieldType.kInt16, true, false, 16, 0xffff, -32768, 32767),
+        Arguments.of("bool a", 1, StructFieldType.BOOL, false, false, 8, 0xff, 0, 0),
+        Arguments.of("char a", 1, StructFieldType.CHAR, false, false, 8, 0xff, 0, 0),
+        Arguments.of("int8 a", 1, StructFieldType.INT8, true, false, 8, 0xff, -128, 127),
+        Arguments.of("int16 a", 2, StructFieldType.INT16, true, false, 16, 0xffff, -32768, 32767),
         Arguments.of(
             "int32 a",
             4,
-            StructFieldType.kInt32,
+            StructFieldType.INT32,
             true,
             false,
             32,
@@ -345,23 +345,23 @@ class DynamicStructTest {
         Arguments.of(
             "int64 a",
             8,
-            StructFieldType.kInt64,
+            StructFieldType.INT64,
             true,
             false,
             64,
             -1,
             -9223372036854775808L,
             9223372036854775807L),
-        Arguments.of("uint8 a", 1, StructFieldType.kUint8, false, true, 8, 0xff, 0, 255),
-        Arguments.of("uint16 a", 2, StructFieldType.kUint16, false, true, 16, 0xffff, 0, 65535),
+        Arguments.of("uint8 a", 1, StructFieldType.UINT8, false, true, 8, 0xff, 0, 255),
+        Arguments.of("uint16 a", 2, StructFieldType.UINT16, false, true, 16, 0xffff, 0, 65535),
         Arguments.of(
-            "uint32 a", 4, StructFieldType.kUint32, false, true, 32, 0xffffffffL, 0, 4294967295L),
-        Arguments.of("uint64 a", 8, StructFieldType.kUint64, false, true, 64, -1, 0, 0),
-        Arguments.of("float a", 4, StructFieldType.kFloat, false, false, 32, 0xffffffffL, 0, 0),
-        Arguments.of("float32 a", 4, StructFieldType.kFloat, false, false, 32, 0xffffffffL, 0, 0),
-        Arguments.of("double a", 8, StructFieldType.kDouble, false, false, 64, -1, 0, 0),
-        Arguments.of("float64 a", 8, StructFieldType.kDouble, false, false, 64, -1, 0, 0),
-        Arguments.of("foo a", 0, StructFieldType.kStruct, false, false, 0, 0, 0, 0));
+            "uint32 a", 4, StructFieldType.UINT32, false, true, 32, 0xffffffffL, 0, 4294967295L),
+        Arguments.of("uint64 a", 8, StructFieldType.UINT64, false, true, 64, -1, 0, 0),
+        Arguments.of("float a", 4, StructFieldType.FLOAT, false, false, 32, 0xffffffffL, 0, 0),
+        Arguments.of("float32 a", 4, StructFieldType.FLOAT, false, false, 32, 0xffffffffL, 0, 0),
+        Arguments.of("double a", 8, StructFieldType.DOUBLE, false, false, 64, -1, 0, 0),
+        Arguments.of("float64 a", 8, StructFieldType.DOUBLE, false, false, 64, -1, 0, 0),
+        Arguments.of("foo a", 0, StructFieldType.STRUCT, false, false, 0, 0, 0, 0));
   }
 
   @ParameterizedTest
@@ -385,7 +385,7 @@ class DynamicStructTest {
     assertEquals(field.isInt(), isInt);
     assertEquals(field.isUint(), isUint);
     assertFalse(field.isArray());
-    if (type != StructFieldType.kStruct) {
+    if (type != StructFieldType.STRUCT) {
       assertTrue(desc.isValid());
       assertEquals(desc.getSize(), size);
       assertEquals(field.getSize(), size);
@@ -419,7 +419,7 @@ class DynamicStructTest {
     assertEquals(field.isUint(), isUint);
     assertTrue(field.isArray());
     assertEquals(field.getArraySize(), 2);
-    if (type != StructFieldType.kStruct) {
+    if (type != StructFieldType.STRUCT) {
       assertTrue(desc.isValid());
       assertEquals(desc.getSize(), size * 2);
     } else {
@@ -440,7 +440,7 @@ class DynamicStructTest {
       long bitMask,
       long minVal,
       long maxVal) {
-    if (type == StructFieldType.kStruct) {
+    if (type == StructFieldType.STRUCT) {
       return;
     }
     var desc = assertDoesNotThrow(() -> db.add("test", schema));
@@ -448,13 +448,13 @@ class DynamicStructTest {
     var dynamic = DynamicStruct.allocate(desc);
     var field = desc.findFieldByName("a");
     assertNotNull(field);
-    if ((isInt || isUint) && type != StructFieldType.kUint64) {
+    if ((isInt || isUint) && type != StructFieldType.UINT64) {
       // Java can't represent uint64 max
       dynamic.setIntField(field, minVal);
       assertEquals(minVal, dynamic.getIntField(field));
       dynamic.setIntField(field, maxVal);
       assertEquals(maxVal, dynamic.getIntField(field));
-    } else if (type == StructFieldType.kBool) {
+    } else if (type == StructFieldType.BOOL) {
       dynamic.setBoolField(field, false);
       assertFalse(dynamic.getBoolField(field));
       dynamic.setBoolField(field, true);

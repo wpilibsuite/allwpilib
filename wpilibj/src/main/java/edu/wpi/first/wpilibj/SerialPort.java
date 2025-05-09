@@ -15,15 +15,15 @@ public class SerialPort implements AutoCloseable {
   /** Serial port. */
   public enum Port {
     /** Onboard serial port on the roboRIO. */
-    kOnboard(0),
+    ONBOARD(0),
     /** MXP (roboRIO MXP) serial port. */
-    kMXP(1),
-    /** USB serial port (same as kUSB1). */
-    kUSB(2),
+    MXP(1),
+    /** USB serial port (same as USB1). */
+    USB(2),
     /** USB serial port 1. */
-    kUSB1(2),
+    USB1(2),
     /** USB serial port 2. */
-    kUSB2(3);
+    USB2(3);
 
     /** Port value. */
     public final int value;
@@ -36,15 +36,15 @@ public class SerialPort implements AutoCloseable {
   /** Represents the parity to use for serial communications. */
   public enum Parity {
     /** No parity. */
-    kNone(0),
+    NONE(0),
     /** Odd parity. */
-    kOdd(1),
+    ODD(1),
     /** Even parity. */
-    kEven(2),
+    EVEN(2),
     /** Parity bit always on. */
-    kMark(3),
+    MARK(3),
     /** Parity bit always off. */
-    kSpace(4);
+    SPACE(4);
 
     /** Parity value. */
     public final int value;
@@ -57,11 +57,11 @@ public class SerialPort implements AutoCloseable {
   /** Represents the number of stop bits to use for Serial Communication. */
   public enum StopBits {
     /** One stop bit. */
-    kOne(10),
+    ONE(10),
     /** One and a half stop bits. */
-    kOnePointFive(15),
+    ONE_POINT_FIVE(15),
     /** Two stop bits. */
-    kTwo(20);
+    TWO(20);
 
     /** StopBits value. */
     public final int value;
@@ -74,13 +74,13 @@ public class SerialPort implements AutoCloseable {
   /** Represents what type of flow control to use for serial communication. */
   public enum FlowControl {
     /** No flow control. */
-    kNone(0),
+    NONE(0),
     /** XON/XOFF flow control. */
-    kXonXoff(1),
+    XON_XOFF(1),
     /** RTS/CTS flow control. */
-    kRtsCts(2),
+    RTS_CTS(2),
     /** DTS/DSR flow control. */
-    kDtsDsr(4);
+    DTS_DSR(4);
 
     /** FlowControl value. */
     public final int value;
@@ -93,9 +93,9 @@ public class SerialPort implements AutoCloseable {
   /** Represents which type of buffer mode to use when writing to a serial port. */
   public enum WriteBufferMode {
     /** Flush the buffer on each access. */
-    kFlushOnAccess(1),
+    FLUSH_ON_ACCESS(1),
     /** Flush the buffer when it is full. */
-    kFlushWhenFull(2);
+    FLUSH_WHEN_FULL(2);
 
     /** WriteBufferMode value. */
     public final int value;
@@ -129,7 +129,7 @@ public class SerialPort implements AutoCloseable {
     setTimeout(5.0);
 
     // Don't wait until the buffer is full to transmit.
-    setWriteBufferMode(WriteBufferMode.kFlushOnAccess);
+    setWriteBufferMode(WriteBufferMode.FLUSH_ON_ACCESS);
 
     disableTermination();
 
@@ -145,7 +145,7 @@ public class SerialPort implements AutoCloseable {
    * @param parity Select the type of parity checking to use.
    */
   public SerialPort(final int baudRate, Port port, final int dataBits, Parity parity) {
-    this(baudRate, port, dataBits, parity, StopBits.kOne);
+    this(baudRate, port, dataBits, parity, StopBits.ONE);
   }
 
   /**
@@ -156,7 +156,7 @@ public class SerialPort implements AutoCloseable {
    * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
    */
   public SerialPort(final int baudRate, Port port, final int dataBits) {
-    this(baudRate, port, dataBits, Parity.kNone, StopBits.kOne);
+    this(baudRate, port, dataBits, Parity.NONE, StopBits.ONE);
   }
 
   /**
@@ -166,7 +166,7 @@ public class SerialPort implements AutoCloseable {
    * @param port The serial port to use.
    */
   public SerialPort(final int baudRate, Port port) {
-    this(baudRate, port, 8, Parity.kNone, StopBits.kOne);
+    this(baudRate, port, 8, Parity.NONE, StopBits.ONE);
   }
 
   @Override
@@ -325,10 +325,10 @@ public class SerialPort implements AutoCloseable {
   /**
    * Specify the flushing behavior of the output buffer.
    *
-   * <p>When set to kFlushOnAccess, data is synchronously written to the serial port after each call
-   * to either print() or write().
+   * <p>When set to FLUSH_ON_ACCESS, data is synchronously written to the serial port after each
+   * call to either print() or write().
    *
-   * <p>When set to kFlushWhenFull, data will only be written to the serial port when the buffer is
+   * <p>When set to FLUSH_WHEN_FULL, data will only be written to the serial port when the buffer is
    * full or when flush() is called.
    *
    * @param mode The write buffer mode.
@@ -340,7 +340,7 @@ public class SerialPort implements AutoCloseable {
   /**
    * Force the output buffer to be written to the port.
    *
-   * <p>This is used when setWriteBufferMode() is set to kFlushWhenFull to force a flush before the
+   * <p>This is used when setWriteBufferMode() is set to FLUSH_WHEN_FULL to force a flush before the
    * buffer is full.
    */
   public void flush() {

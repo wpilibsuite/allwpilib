@@ -7,6 +7,6 @@
 namespace AutoConstants {
 
 const frc::TrapezoidProfile<units::radians>::Constraints
-    kThetaControllerConstraints{kMaxAngularSpeed, kMaxAngularAcceleration};
+    THETA_CONTROLLER_CONSTRAINTS{MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCELERATION};
 
 }  // namespace AutoConstants

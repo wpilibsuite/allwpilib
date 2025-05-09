@@ -12,7 +12,7 @@ using namespace frc;
 
 PWMSparkFlex::PWMSparkFlex(int channel) : PWMMotorController("PWMSparkFlex", channel) {
   SetBounds(2.003_ms, 1.55_ms, 1.5_ms, 1.46_ms, 0.999_ms);
-  m_pwm.SetOutputPeriod(PWM::kOutputPeriod_5Ms);
+  m_pwm.SetOutputPeriod(PWM::OUTPUT_PERIOD_5MS);
   SetSpeed(0.0);
 
   HAL_ReportUsage("IO", GetChannel(), "RevSparkFlexPWM");

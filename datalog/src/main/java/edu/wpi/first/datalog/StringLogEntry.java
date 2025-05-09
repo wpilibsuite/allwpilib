@@ -7,7 +7,7 @@ package edu.wpi.first.datalog;
 /** Log string values. */
 public class StringLogEntry extends DataLogEntry {
   /** The data type for string values. */
-  public static final String kDataType = "string";
+  public static final String DATA_TYPE = "string";
 
   /**
    * Constructs a String log entry.
@@ -43,7 +43,7 @@ public class StringLogEntry extends DataLogEntry {
    * @param timestamp entry creation timestamp (0=now)
    */
   public StringLogEntry(DataLog log, String name, String metadata, long timestamp) {
-    this(log, name, metadata, kDataType, timestamp);
+    this(log, name, metadata, DATA_TYPE, timestamp);
   }
 
   /**

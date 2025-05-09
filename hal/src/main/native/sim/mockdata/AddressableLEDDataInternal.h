@@ -21,7 +21,7 @@ class AddressableLEDData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Data)
 
   wpi::recursive_spinlock m_dataMutex;
-  HAL_AddressableLEDData m_data[HAL_kAddressableLEDMaxLength];
+  HAL_AddressableLEDData m_data[HAL_AddressableLEDMaxLength];
 
  public:
   void SetData(const HAL_AddressableLEDData* d, int32_t len);

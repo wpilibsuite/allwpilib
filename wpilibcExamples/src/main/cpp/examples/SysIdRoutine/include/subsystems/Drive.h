@@ -25,18 +25,18 @@ class Drive : public frc2::SubsystemBase {
   frc2::CommandPtr SysIdDynamic(frc2::sysid::Direction direction);
 
  private:
-  frc::PWMSparkMax m_leftMotor{constants::drive::kLeftMotor1Port};
-  frc::PWMSparkMax m_rightMotor{constants::drive::kRightMotor1Port};
+  frc::PWMSparkMax m_leftMotor{constants::drive::LEFT_MOTOR_1_PORT};
+  frc::PWMSparkMax m_rightMotor{constants::drive::RIGHT_MOTOR_1_PORT};
   frc::DifferentialDrive m_drive{[this](auto val) { m_leftMotor.Set(val); },
                                  [this](auto val) { m_rightMotor.Set(val); }};
 
-  frc::Encoder m_leftEncoder{constants::drive::kLeftEncoderPorts[0],
-                             constants::drive::kLeftEncoderPorts[1],
-                             constants::drive::kLeftEncoderReversed};
+  frc::Encoder m_leftEncoder{constants::drive::LEFT_ENCODER_PORTS[0],
+                             constants::drive::LEFT_ENCODER_PORTS[1],
+                             constants::drive::LEFT_ENCODER_REVERSED};
 
-  frc::Encoder m_rightEncoder{constants::drive::kRightEncoderPorts[0],
-                              constants::drive::kRightEncoderPorts[1],
-                              constants::drive::kRightEncoderReversed};
+  frc::Encoder m_rightEncoder{constants::drive::RIGHT_ENCODER_PORTS[0],
+                              constants::drive::RIGHT_ENCODER_PORTS[1],
+                              constants::drive::RIGHT_ENCODER_REVERSED};
 
   frc2::sysid::SysIdRoutine m_sysIdRoutine{
       frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},

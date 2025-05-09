@@ -54,7 +54,7 @@ HAL_Bool HAL_CheckREVPDHModuleNumber(int32_t module);
 /**
  * Checks if a PDH channel number is valid.
  *
- * @param module        channel number (0 .. kNumREVPDHChannels)
+ * @param module        channel number (0 .. NUM_REV_PDH_CHANNELS)
  * @return 1 if the channel number is valid; 0 otherwise
  */
 HAL_Bool HAL_CheckREVPDHChannelNumber(int32_t channel);
@@ -64,7 +64,7 @@ HAL_Bool HAL_CheckREVPDHChannelNumber(int32_t channel);
  *
  * @param handle        PDH handle
  * @param channel       the channel to retrieve the current of (0 ..
- * kNumREVPDHChannels)
+ * NUM_REV_PDH_CHANNELS)
  *
  * @return the current of the PDH channel in Amps
  */

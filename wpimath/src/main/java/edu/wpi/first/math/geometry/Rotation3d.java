@@ -36,7 +36,7 @@ public class Rotation3d
    *
    * <p>This exists to avoid allocations for common rotations.
    */
-  public static final Rotation3d kZero = new Rotation3d();
+  public static final Rotation3d ZERO = new Rotation3d();
 
   private final Quaternion m_q;
 

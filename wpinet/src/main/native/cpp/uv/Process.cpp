@@ -46,30 +46,30 @@ std::shared_ptr<Process> Process::SpawnArray(Loop& loop, std::string_view file,
 
   for (auto&& o : options) {
     switch (o.m_type) {
-      case Option::kArg:
+      case Option::ARG:
         argsBuf.push_back(const_cast<char*>(o.m_data.str));
         break;
-      case Option::kEnv:
+      case Option::ENV:
         envBuf.push_back(const_cast<char*>(o.m_data.str));
         break;
-      case Option::kCwd:
+      case Option::CWD:
         coptions.cwd = o.m_data.str[0] == '\0' ? nullptr : o.m_data.str;
         break;
-      case Option::kUid:
+      case Option::UID:
         coptions.uid = o.m_data.uid;
         coptions.flags |= UV_PROCESS_SETUID;
         break;
-      case Option::kGid:
+      case Option::GID:
         coptions.gid = o.m_data.gid;
         coptions.flags |= UV_PROCESS_SETGID;
         break;
-      case Option::kSetFlags:
+      case Option::SET_FLAGS:
         coptions.flags |= o.m_data.flags;
         break;
-      case Option::kClearFlags:
+      case Option::CLEAR_FLAGS:
         coptions.flags &= ~o.m_data.flags;
         break;
-      case Option::kStdioIgnore: {
+      case Option::STDIO_IGNORE: {
         size_t index = o.m_data.stdio.index;
         if (index >= stdioBuf.size()) {
           stdioBuf.resize(index + 1);
@@ -78,7 +78,7 @@ std::shared_ptr<Process> Process::SpawnArray(Loop& loop, std::string_view file,
         stdioBuf[index].data.fd = 0;
         break;
       }
-      case Option::kStdioInheritFd: {
+      case Option::STDIO_INHERIT_FD: {
         size_t index = o.m_data.stdio.index;
         if (index >= stdioBuf.size()) {
           stdioBuf.resize(index + 1);
@@ -87,7 +87,7 @@ std::shared_ptr<Process> Process::SpawnArray(Loop& loop, std::string_view file,
         stdioBuf[index].data.fd = o.m_data.stdio.fd;
         break;
       }
-      case Option::kStdioInheritPipe: {
+      case Option::STDIO_INHERIT_PIPE: {
         size_t index = o.m_data.stdio.index;
         if (index >= stdioBuf.size()) {
           stdioBuf.resize(index + 1);
@@ -96,7 +96,7 @@ std::shared_ptr<Process> Process::SpawnArray(Loop& loop, std::string_view file,
         stdioBuf[index].data.stream = o.m_data.stdio.pipe->GetRawStream();
         break;
       }
-      case Option::kStdioCreatePipe: {
+      case Option::STDIO_CREATE_PIPE: {
         size_t index = o.m_data.stdio.index;
         if (index >= stdioBuf.size()) {
           stdioBuf.resize(index + 1);

@@ -22,7 +22,7 @@ namespace glass {
 
 class NTField2DModel : public Field2DModel {
  public:
-  static constexpr const char* kType = "Field2d";
+  static constexpr const char* TYPE = "Field2d";
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTField2DModel(std::string_view path);

@@ -72,7 +72,7 @@ class WPILIB_DLLEXPORT SplineParameterizer {
   static std::vector<PoseWithCurvature> Parameterize(const Spline<Dim>& spline,
                                                      double t0 = 0.0,
                                                      double t1 = 1.0) {
-    constexpr const char* kMalformedSplineExceptionMsg =
+    constexpr const char* MALFORMED_SPLINE_EXCEPTION_MSG =
         "Could not parameterize a malformed spline. This means that you "
         "probably had two or more adjacent waypoints that were very close "
         "together with headings in opposing directions.";
@@ -82,7 +82,7 @@ class WPILIB_DLLEXPORT SplineParameterizer {
     if (auto point = spline.GetPoint(t0)) {
       splinePoints.push_back(point.value());
     } else {
-      throw MalformedSplineException(kMalformedSplineExceptionMsg);
+      throw MalformedSplineException(MALFORMED_SPLINE_EXCEPTION_MSG);
     }
 
     // We use an "explicit stack" to simulate recursion, instead of a recursive
@@ -98,27 +98,27 @@ class WPILIB_DLLEXPORT SplineParameterizer {
 
       auto start = spline.GetPoint(current.t0);
       if (!start) {
-        throw MalformedSplineException(kMalformedSplineExceptionMsg);
+        throw MalformedSplineException(MALFORMED_SPLINE_EXCEPTION_MSG);
       }
 
       auto end = spline.GetPoint(current.t1);
       if (!end) {
-        throw MalformedSplineException(kMalformedSplineExceptionMsg);
+        throw MalformedSplineException(MALFORMED_SPLINE_EXCEPTION_MSG);
       }
 
       const auto twist = start.value().first.Log(end.value().first);
 
-      if (units::math::abs(twist.dy) > kMaxDy ||
-          units::math::abs(twist.dx) > kMaxDx ||
-          units::math::abs(twist.dtheta) > kMaxDtheta) {
+      if (units::math::abs(twist.dy) > MAX_DY ||
+          units::math::abs(twist.dx) > MAX_DX ||
+          units::math::abs(twist.dtheta) > MAX_DTHETA) {
         stack.emplace(StackContents{(current.t0 + current.t1) / 2, current.t1});
         stack.emplace(StackContents{current.t0, (current.t0 + current.t1) / 2});
       } else {
         splinePoints.push_back(end.value());
       }
 
-      if (iterations++ >= kMaxIterations) {
-        throw MalformedSplineException(kMalformedSplineExceptionMsg);
+      if (iterations++ >= MAX_ITERATIONS) {
+        throw MalformedSplineException(MALFORMED_SPLINE_EXCEPTION_MSG);
       }
     }
 
@@ -127,9 +127,9 @@ class WPILIB_DLLEXPORT SplineParameterizer {
 
  private:
   // Constraints for spline parameterization.
-  static inline constexpr units::meter_t kMaxDx = 5_in;
-  static inline constexpr units::meter_t kMaxDy = 0.05_in;
-  static inline constexpr units::radian_t kMaxDtheta = 0.0872_rad;
+  static inline constexpr units::meter_t MAX_DX = 5_in;
+  static inline constexpr units::meter_t MAX_DY = 0.05_in;
+  static inline constexpr units::radian_t MAX_DTHETA = 0.0872_rad;
 
   struct StackContents {
     double t0;
@@ -143,7 +143,7 @@ class WPILIB_DLLEXPORT SplineParameterizer {
    * paths don't usually go over 300 iterations, so hitting this maximum should
    * definitely indicate something has gone wrong.
    */
-  static constexpr int kMaxIterations = 5000;
+  static constexpr int MAX_ITERATIONS = 5000;
 
   friend class CubicHermiteSplineTest;
   friend class QuinticHermiteSplineTest;

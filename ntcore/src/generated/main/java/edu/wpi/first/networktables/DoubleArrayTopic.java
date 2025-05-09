@@ -9,7 +9,7 @@ package edu.wpi.first.networktables;
 /** NetworkTables DoubleArray topic. */
 public final class DoubleArrayTopic extends Topic {
   /** The default type string for this topic type. */
-  public static final String kTypeString = "double[]";
+  public static final String TYPE_STRING = "double[]";
 
   /**
    * Construct from a generic topic.
@@ -51,7 +51,7 @@ public final class DoubleArrayTopic extends Topic {
     return new DoubleArrayEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kDoubleArray.getValue(),
+            m_handle, NetworkTableType.DOUBLE_ARRAY.getValue(),
             "double[]", options),
         defaultValue);
   }
@@ -79,7 +79,7 @@ public final class DoubleArrayTopic extends Topic {
     return new DoubleArrayEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kDoubleArray.getValue(),
+            m_handle, NetworkTableType.DOUBLE_ARRAY.getValue(),
             typeString, options),
         defaultValue);
   }
@@ -104,7 +104,7 @@ public final class DoubleArrayTopic extends Topic {
     return new DoubleArrayEntryImpl(
         this,
         NetworkTablesJNI.publish(
-            m_handle, NetworkTableType.kDoubleArray.getValue(),
+            m_handle, NetworkTableType.DOUBLE_ARRAY.getValue(),
             "double[]", options),
         new double[] {});
   }
@@ -134,7 +134,7 @@ public final class DoubleArrayTopic extends Topic {
     return new DoubleArrayEntryImpl(
         this,
         NetworkTablesJNI.publishEx(
-            m_handle, NetworkTableType.kDoubleArray.getValue(),
+            m_handle, NetworkTableType.DOUBLE_ARRAY.getValue(),
             typeString, properties, options),
         new double[] {});
   }
@@ -165,7 +165,7 @@ public final class DoubleArrayTopic extends Topic {
     return new DoubleArrayEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kDoubleArray.getValue(),
+            m_handle, NetworkTableType.DOUBLE_ARRAY.getValue(),
             "double[]", options),
         defaultValue);
   }
@@ -198,7 +198,7 @@ public final class DoubleArrayTopic extends Topic {
     return new DoubleArrayEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kDoubleArray.getValue(),
+            m_handle, NetworkTableType.DOUBLE_ARRAY.getValue(),
             typeString, options),
         defaultValue);
   }

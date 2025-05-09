@@ -23,15 +23,15 @@ class Robot : public frc::TimedRobot {
   void TeleopInit() override;
   void TeleopPeriodic() override;
 
-  static constexpr int kPotChannel = 1;
-  static constexpr int kMotorChannel = 7;
-  static constexpr int kJoystickChannel = 3;
+  static constexpr int POT_CHANNEL = 1;
+  static constexpr int MOTOR_CHANNEL = 7;
+  static constexpr int JOYSTICK_CHANNEL = 3;
 
   // The elevator can move 1.5 meters from top to bottom
-  static constexpr units::meter_t kFullHeight = 1.5_m;
+  static constexpr units::meter_t FULL_HEIGHT = 1.5_m;
 
   // Bottom, middle, and top elevator setpoints
-  static constexpr std::array<units::meter_t, 3> kSetpoints = {
+  static constexpr std::array<units::meter_t, 3> SETPOINTS = {
       {0.2_m, 0.8_m, 1.4_m}};
 
  private:
@@ -45,11 +45,11 @@ class Robot : public frc::TimedRobot {
   static constexpr double kD = 0.25;
 
   // Scaling is handled internally
-  frc::AnalogPotentiometer m_potentiometer{kPotChannel, kFullHeight.value()};
+  frc::AnalogPotentiometer m_potentiometer{POT_CHANNEL, FULL_HEIGHT.value()};
 
-  frc::PWMSparkMax m_elevatorMotor{kMotorChannel};
+  frc::PWMSparkMax m_elevatorMotor{MOTOR_CHANNEL};
   frc::PIDController m_pidController{kP, kI, kD};
-  frc::Joystick m_joystick{kJoystickChannel};
+  frc::Joystick m_joystick{JOYSTICK_CHANNEL};
 
   size_t m_index;
 };

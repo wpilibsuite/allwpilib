@@ -12,7 +12,7 @@ using namespace frc;
 struct CubicHermiteSplineProtoTestData {
   using Type = CubicHermiteSpline;
 
-  inline static const Type kTestData{
+  inline static const Type TEST_DATA{
       wpi::array<double, 2>{{0.1, 0.2}}, wpi::array<double, 2>{{0.3, 0.4}},
       wpi::array<double, 2>{{0.5, 0.6}}, wpi::array<double, 2>{{0.7, 0.8}}};
 

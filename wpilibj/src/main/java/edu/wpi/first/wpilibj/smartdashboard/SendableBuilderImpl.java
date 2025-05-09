@@ -231,7 +231,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
       m_typePub =
           m_table
               .getStringTopic(".type")
-              .publishEx(StringTopic.kTypeString, "{\"SmartDashboard\":\"" + type + "\"}");
+              .publishEx(StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + type + "\"}");
     }
     m_typePub.set(type);
   }

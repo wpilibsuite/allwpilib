@@ -22,8 +22,8 @@ import java.util.Random;
 import org.junit.jupiter.api.Test;
 
 class LinearSystemLoopTest {
-  private static final double kDt = 0.00505;
-  private static final double kPositionStddev = 0.0001;
+  private static final double DT = 0.00505;
+  private static final double POSITION_STDDEV = 0.0001;
   private static final Random random = new Random();
 
   LinearSystem<N2, N1, N2> m_plant =
@@ -37,7 +37,7 @@ class LinearSystemLoopTest {
           (LinearSystem<N2, N1, N1>) m_plant.slice(0),
           VecBuilder.fill(0.05, 1.0),
           VecBuilder.fill(0.0001),
-          kDt);
+          DT);
 
   @SuppressWarnings("unchecked")
   LinearQuadraticRegulator<N2, N1, N1> m_controller =
@@ -57,7 +57,7 @@ class LinearSystemLoopTest {
     Matrix<N1, N1> y = plant.calculateY(loop.getXHat(), loop.getU()).plus(VecBuilder.fill(noise));
 
     loop.correct(y);
-    loop.predict(kDt);
+    loop.predict(DT);
   }
 
   @Test
@@ -74,7 +74,7 @@ class LinearSystemLoopTest {
       profile = new TrapezoidProfile(constraints);
       state =
           profile.calculate(
-              kDt,
+              DT,
               new TrapezoidProfile.State(m_loop.getXHat(0), m_loop.getXHat(1)),
               new TrapezoidProfile.State(references.get(0, 0), references.get(1, 0)));
       m_loop.setNextR(VecBuilder.fill(state.position, state.velocity));
@@ -82,7 +82,7 @@ class LinearSystemLoopTest {
       updateTwoState(
           (LinearSystem<N2, N1, N1>) m_plant.slice(0),
           m_loop,
-          (random.nextGaussian()) * kPositionStddev);
+          (random.nextGaussian()) * POSITION_STDDEV);
       var u = m_loop.getU(0);
 
       assertTrue(u >= -12.1 && u <= 12.1, "U out of bounds! Got " + u);
@@ -98,14 +98,14 @@ class LinearSystemLoopTest {
         LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2), 0.00289, 1.0);
     KalmanFilter<N1, N1, N1> observer =
         new KalmanFilter<>(
-            Nat.N1(), Nat.N1(), plant, VecBuilder.fill(1.0), VecBuilder.fill(kPositionStddev), kDt);
+            Nat.N1(), Nat.N1(), plant, VecBuilder.fill(1.0), VecBuilder.fill(POSITION_STDDEV), DT);
 
     var qElms = VecBuilder.fill(9.0);
     var rElms = VecBuilder.fill(12.0);
 
-    var controller = new LinearQuadraticRegulator<>(plant, qElms, rElms, kDt);
+    var controller = new LinearQuadraticRegulator<>(plant, qElms, rElms, DT);
 
-    var feedforward = new LinearPlantInversionFeedforward<>(plant, kDt);
+    var feedforward = new LinearPlantInversionFeedforward<>(plant, DT);
 
     var loop = new LinearSystemLoop<>(controller, feedforward, observer, 12);
 
@@ -125,15 +125,15 @@ class LinearSystemLoopTest {
       Matrix<N1, N1> y =
           plant
               .calculateY(loop.getXHat(), loop.getU())
-              .plus(VecBuilder.fill(random.nextGaussian() * kPositionStddev));
+              .plus(VecBuilder.fill(random.nextGaussian() * POSITION_STDDEV));
 
       loop.correct(y);
-      loop.predict(kDt);
+      loop.predict(DT);
       var u = loop.getU(0);
 
       assertTrue(u >= -12.1 && u <= 12.1, "U out of bounds! Got " + u);
 
-      time += kDt;
+      time += DT;
     }
 
     assertEquals(0.0, loop.getError(0), 0.1);

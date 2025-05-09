@@ -18,7 +18,7 @@
 
 class Robot : public frc::TimedRobot {
  public:
-  static constexpr units::second_t kDt = 20_ms;
+  static constexpr units::second_t DT = 20_ms;
 
   Robot() {
     // Note: These gains are fake, and will have to be tuned for your robot.
@@ -34,11 +34,11 @@ class Robot : public frc::TimedRobot {
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    auto next = m_profile.Calculate(kDt, m_goal, m_setpoint);
+    auto next = m_profile.Calculate(DT, m_goal, m_setpoint);
 
     // Send setpoint to offboard controller PID
     m_motor.SetSetpoint(
-        ExampleSmartMotorController::PIDMode::kPosition,
+        ExampleSmartMotorController::PIDMode::POSITION,
         m_setpoint.position.value(),
         m_feedforward.Calculate(m_setpoint.velocity, next.velocity) / 12_V);
 

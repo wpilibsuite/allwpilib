@@ -50,5 +50,5 @@ class RapidReactCommandBot {
 
   // The driver's controller
   frc2::CommandXboxController m_driverController{
-      OIConstants::kDriverControllerPort};
+      OIConstants::DRIVER_CONTROLLER_PORT};
 };

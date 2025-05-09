@@ -11,17 +11,17 @@ using namespace frc;
 namespace {
 
 using StructType = wpi::Struct<frc::DifferentialDriveWheelVoltages>;
-const DifferentialDriveWheelVoltages kExpectedData{
+const DifferentialDriveWheelVoltages EXPECTED_DATA{
     DifferentialDriveWheelVoltages{0.174_V, 0.191_V}};
 }  // namespace
 
 TEST(DifferentialDriveWheelVoltagesStructTest, Roundtrip) {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   DifferentialDriveWheelVoltages unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.left.value(), unpacked_data.left.value());
-  EXPECT_EQ(kExpectedData.right.value(), unpacked_data.right.value());
+  EXPECT_EQ(EXPECTED_DATA.left.value(), unpacked_data.left.value());
+  EXPECT_EQ(EXPECTED_DATA.right.value(), unpacked_data.right.value());
 }

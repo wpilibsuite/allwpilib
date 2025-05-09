@@ -18,7 +18,7 @@
 class Robot : public frc::TimedRobot {
  public:
   Robot() {
-    m_gyro.SetSensitivity(kVoltsPerDegreePerSecond);
+    m_gyro.SetSensitivity(VOLTS_PER_DEGREE_PER_SECOND);
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
@@ -34,30 +34,30 @@ class Robot : public frc::TimedRobot {
    * angle.
    */
   void TeleopPeriodic() override {
-    double turningValue = (kAngleSetpoint - m_gyro.GetAngle()) * kP;
+    double turningValue = (ANGLE_SETPOINT - m_gyro.GetAngle()) * kP;
     m_drive.ArcadeDrive(-m_joystick.GetY(), -turningValue);
   }
 
  private:
-  static constexpr double kAngleSetpoint = 0.0;
+  static constexpr double ANGLE_SETPOINT = 0.0;
   static constexpr double kP = 0.005;  // Proportional turning constant
 
   // Gyro calibration constant, may need to be adjusted. Gyro value of 360 is
   // set to correspond to one full revolution.
-  static constexpr double kVoltsPerDegreePerSecond = 0.0128;
+  static constexpr double VOLTS_PER_DEGREE_PER_SECOND = 0.0128;
 
-  static constexpr int kLeftMotorPort = 0;
-  static constexpr int kRightMotorPort = 1;
-  static constexpr int kGyroPort = 0;
-  static constexpr int kJoystickPort = 0;
+  static constexpr int LEFT_MOTOR_PORT = 0;
+  static constexpr int RIGHT_MOTOR_PORT = 1;
+  static constexpr int GYRO_PORT = 0;
+  static constexpr int JOYSTICK_PORT = 0;
 
-  frc::PWMSparkMax m_left{kLeftMotorPort};
-  frc::PWMSparkMax m_right{kRightMotorPort};
+  frc::PWMSparkMax m_left{LEFT_MOTOR_PORT};
+  frc::PWMSparkMax m_right{RIGHT_MOTOR_PORT};
   frc::DifferentialDrive m_drive{[&](double output) { m_left.Set(output); },
                                  [&](double output) { m_right.Set(output); }};
 
-  frc::AnalogGyro m_gyro{kGyroPort};
-  frc::Joystick m_joystick{kJoystickPort};
+  frc::AnalogGyro m_gyro{GYRO_PORT};
+  frc::Joystick m_joystick{JOYSTICK_PORT};
 };
 
 #ifndef RUNNING_FRC_TESTS

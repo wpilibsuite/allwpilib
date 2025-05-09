@@ -26,8 +26,8 @@ class Drivetrain {
              bool fieldRelative, units::second_t period);
   void UpdateOdometry();
 
-  static constexpr auto kMaxSpeed = 3.0_mps;  // 3 meters per second
-  static constexpr units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr auto MAX_SPEED = 3.0_mps;  // 3 meters per second
+  static constexpr units::radians_per_second_t MAX_ANGULAR_SPEED{
       std::numbers::pi};  // 1/2 rotation per second
 
  private:

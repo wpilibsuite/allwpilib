@@ -23,40 +23,40 @@ namespace frc {
 class Joystick : public GenericHID {
  public:
   /// Default X axis channel.
-  static constexpr int kDefaultXChannel = 0;
+  static constexpr int DEFAULT_X_CHANNEL = 0;
   /// Default Y axis channel.
-  static constexpr int kDefaultYChannel = 1;
+  static constexpr int DEFAULT_Y_CHANNEL = 1;
   /// Default Z axis channel.
-  static constexpr int kDefaultZChannel = 2;
+  static constexpr int DEFAULT_Z_CHANNEL = 2;
   /// Default twist axis channel.
-  static constexpr int kDefaultTwistChannel = 2;
+  static constexpr int DEFAULT_TWIST_CHANNEL = 2;
   /// Default throttle axis channel.
-  static constexpr int kDefaultThrottleChannel = 3;
+  static constexpr int DEFAULT_THROTTLE_CHANNEL = 3;
 
   /**
    * Represents an analog axis on a joystick.
    */
   enum AxisType {
     /// X axis.
-    kXAxis,
+    X_AXIS,
     /// Y axis.
-    kYAxis,
+    Y_AXIS,
     /// Z axis.
-    kZAxis,
+    Z_AXIS,
     /// Twist axis.
-    kTwistAxis,
+    TWIST_AXIS,
     /// Throttle axis.
-    kThrottleAxis
+    THROTTLE_AXIS
   };
 
   /**
    * Represents a digital button on a joystick.
    */
   enum ButtonType {
-    /// kTrigger.
-    kTriggerButton,
-    /// kTop.
-    kTopButton
+    /// TRIGGER.
+    TRIGGER_BUTTON,
+    /// TOP.
+    TOP_BUTTON
   };
 
   /**
@@ -263,10 +263,10 @@ class Joystick : public GenericHID {
   units::radian_t GetDirection() const;
 
  private:
-  enum Axis { kX, kY, kZ, kTwist, kThrottle, kNumAxes };
-  enum Button { kTrigger = 1, kTop = 2 };
+  enum Axis { X, Y, Z, TWIST, THROTTLE, NUM_AXES };
+  enum Button { TRIGGER = 1, TOP = 2 };
 
-  std::array<int, Axis::kNumAxes> m_axes;
+  std::array<int, Axis::NUM_AXES> m_axes;
 };
 
 }  // namespace frc

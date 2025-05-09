@@ -14,15 +14,15 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 @SuppressWarnings("PMD.RedundantFieldInitializer")
 public class Robot extends TimedRobot {
-  private static double kDt = 0.02;
-  private static double kMaxVelocity = 1.75;
-  private static double kMaxAcceleration = 0.75;
-  private static double kP = 1.3;
-  private static double kI = 0.0;
-  private static double kD = 0.7;
-  private static double kS = 1.1;
-  private static double kG = 1.2;
-  private static double kV = 1.3;
+  private static double DT = 0.02;
+  private static double MAX_VELOCITY = 1.75;
+  private static double MAX_ACCELERATION = 0.75;
+  private static double P = 1.3;
+  private static double I = 0.0;
+  private static double D = 0.7;
+  private static double S = 1.1;
+  private static double G = 1.2;
+  private static double V = 1.3;
 
   private final Joystick m_joystick = new Joystick(1);
   private final Encoder m_encoder = new Encoder(1, 2);
@@ -31,10 +31,10 @@ public class Robot extends TimedRobot {
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
   private final TrapezoidProfile.Constraints m_constraints =
-      new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
+      new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCELERATION);
   private final ProfiledPIDController m_controller =
-      new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
-  private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(kS, kG, kV);
+      new ProfiledPIDController(P, I, D, m_constraints, DT);
+  private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(S, G, V);
 
   public Robot() {
     m_encoder.setDistancePerPulse(1.0 / 360.0 * 2.0 * Math.PI * 1.5);

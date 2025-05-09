@@ -16,9 +16,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class QuinticHermiteSplineTest {
-  private static final double kMaxDx = 0.127;
-  private static final double kMaxDy = 0.00127;
-  private static final double kMaxDtheta = 0.0872;
+  private static final double MAX_DX = 0.127;
+  private static final double MAX_DY = 0.00127;
+  private static final double MAX_DTHETA = 0.0872;
 
   private void run(Pose2d a, Pose2d b) {
     // Start the timer.
@@ -41,9 +41,9 @@ class QuinticHermiteSplineTest {
       // Make sure the twist is under the tolerance defined by the Spline class.
       var twist = p0.pose.log(p1.pose);
       assertAll(
-          () -> assertTrue(Math.abs(twist.dx) < kMaxDx),
-          () -> assertTrue(Math.abs(twist.dy) < kMaxDy),
-          () -> assertTrue(Math.abs(twist.dtheta) < kMaxDtheta));
+          () -> assertTrue(Math.abs(twist.dx) < MAX_DX),
+          () -> assertTrue(Math.abs(twist.dy) < MAX_DY),
+          () -> assertTrue(Math.abs(twist.dtheta) < MAX_DTHETA));
     }
 
     // Check first point
@@ -67,27 +67,26 @@ class QuinticHermiteSplineTest {
 
   @Test
   void testStraightLine() {
-    run(Pose2d.kZero, new Pose2d(3, 0, Rotation2d.kZero));
+    run(Pose2d.ZERO, new Pose2d(3, 0, Rotation2d.ZERO));
   }
 
   @Test
   void testSimpleSCurve() {
-    run(Pose2d.kZero, new Pose2d(1, 1, Rotation2d.kZero));
+    run(Pose2d.ZERO, new Pose2d(1, 1, Rotation2d.ZERO));
   }
 
   @Test
   void testSquiggly() {
-    run(new Pose2d(0, 0, Rotation2d.kCCW_Pi_2), new Pose2d(-1, 0, Rotation2d.kCCW_Pi_2));
+    run(new Pose2d(0, 0, Rotation2d.CCW_PI_2), new Pose2d(-1, 0, Rotation2d.CCW_PI_2));
   }
 
   @Test
   void testMalformed() {
     assertThrows(
         MalformedSplineException.class,
-        () -> run(new Pose2d(0, 0, Rotation2d.kZero), new Pose2d(1, 0, Rotation2d.kPi)));
+        () -> run(new Pose2d(0, 0, Rotation2d.ZERO), new Pose2d(1, 0, Rotation2d.PI)));
     assertThrows(
         MalformedSplineException.class,
-        () ->
-            run(new Pose2d(10, 10, Rotation2d.kCCW_Pi_2), new Pose2d(10, 11, Rotation2d.kCW_Pi_2)));
+        () -> run(new Pose2d(10, 10, Rotation2d.CCW_PI_2), new Pose2d(10, 11, Rotation2d.CW_PI_2)));
   }
 }

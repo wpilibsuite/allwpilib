@@ -7,29 +7,29 @@ package edu.wpi.first.networktables;
 /** Network table data types. */
 public enum NetworkTableType {
   /** Unassigned data type. */
-  kUnassigned(0, ""),
+  UNASSIGNED(0, ""),
   /** Boolean data type. */
-  kBoolean(0x01, "boolean"),
+  BOOLEAN(0x01, "boolean"),
   /** Double precision floating-point data type. */
-  kDouble(0x02, "double"),
+  DOUBLE(0x02, "double"),
   /** String data type. */
-  kString(0x04, "string"),
+  STRING(0x04, "string"),
   /** Raw data type. */
-  kRaw(0x08, "raw"),
+  RAW(0x08, "raw"),
   /** Boolean array data type. */
-  kBooleanArray(0x10, "boolean[]"),
+  BOOLEAN_ARRAY(0x10, "boolean[]"),
   /** Double precision floating-point array data type. */
-  kDoubleArray(0x20, "double[]"),
+  DOUBLE_ARRAY(0x20, "double[]"),
   /** String array data type. */
-  kStringArray(0x40, "string[]"),
+  STRING_ARRAY(0x40, "string[]"),
   /** Integer data type. */
-  kInteger(0x100, "int"),
+  INTEGER(0x100, "int"),
   /** Single precision floating-point data type. */
-  kFloat(0x200, "float"),
+  FLOAT(0x200, "float"),
   /** Integer array data type. */
-  kIntegerArray(0x400, "int[]"),
+  INTEGER_ARRAY(0x400, "int[]"),
   /** Single precision floating-point array data type. */
-  kFloatArray(0x800, "float[]");
+  FLOAT_ARRAY(0x800, "float[]");
 
   private final int m_value;
   private final String m_valueStr;
@@ -65,18 +65,18 @@ public enum NetworkTableType {
    */
   public static NetworkTableType getFromInt(int value) {
     return switch (value) {
-      case 0x01 -> kBoolean;
-      case 0x02 -> kDouble;
-      case 0x04 -> kString;
-      case 0x08 -> kRaw;
-      case 0x10 -> kBooleanArray;
-      case 0x20 -> kDoubleArray;
-      case 0x40 -> kStringArray;
-      case 0x100 -> kInteger;
-      case 0x200 -> kFloat;
-      case 0x400 -> kIntegerArray;
-      case 0x800 -> kFloatArray;
-      default -> kUnassigned;
+      case 0x01 -> BOOLEAN;
+      case 0x02 -> DOUBLE;
+      case 0x04 -> STRING;
+      case 0x08 -> RAW;
+      case 0x10 -> BOOLEAN_ARRAY;
+      case 0x20 -> DOUBLE_ARRAY;
+      case 0x40 -> STRING_ARRAY;
+      case 0x100 -> INTEGER;
+      case 0x200 -> FLOAT;
+      case 0x400 -> INTEGER_ARRAY;
+      case 0x800 -> FLOAT_ARRAY;
+      default -> UNASSIGNED;
     };
   }
 
@@ -88,18 +88,18 @@ public enum NetworkTableType {
    */
   public static NetworkTableType getFromString(String typeString) {
     return switch (typeString) {
-      case "boolean" -> kBoolean;
-      case "double" -> kDouble;
-      case "float" -> kFloat;
-      case "int" -> kInteger;
-      case "string", "json" -> kString;
-      case "boolean[]" -> kBooleanArray;
-      case "double[]" -> kDoubleArray;
-      case "float[]" -> kFloatArray;
-      case "int[]" -> kIntegerArray;
-      case "string[]" -> kStringArray;
-      case "" -> kUnassigned;
-      default -> kRaw;
+      case "boolean" -> BOOLEAN;
+      case "double" -> DOUBLE;
+      case "float" -> FLOAT;
+      case "int" -> INTEGER;
+      case "string", "json" -> STRING;
+      case "boolean[]" -> BOOLEAN_ARRAY;
+      case "double[]" -> DOUBLE_ARRAY;
+      case "float[]" -> FLOAT_ARRAY;
+      case "int[]" -> INTEGER_ARRAY;
+      case "string[]" -> STRING_ARRAY;
+      case "" -> UNASSIGNED;
+      default -> RAW;
     };
   }
 

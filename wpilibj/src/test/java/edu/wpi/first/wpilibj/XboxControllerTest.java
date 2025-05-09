@@ -24,7 +24,7 @@ class XboxControllerTest {
     XboxController joy = new XboxController(2);
     XboxControllerSim joysim = new XboxControllerSim(joy);
 
-    var buttonName = button.toString();
+    String buttonName = button.toString();
 
     String simSetMethodName = "set" + buttonName;
     String joyGetMethodName = "get" + buttonName;
@@ -64,7 +64,7 @@ class XboxControllerTest {
     XboxController joy = new XboxController(2);
     XboxControllerSim joysim = new XboxControllerSim(joy);
 
-    var axisName = axis.toString();
+    String axisName = axis.toString();
 
     String simSetMethodName = "set" + axisName;
     String joyGetMethodName = "get" + axisName;

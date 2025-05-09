@@ -19,21 +19,21 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
   private final ExampleSmartMotorController m_leftLeader =
-      new ExampleSmartMotorController(DriveConstants.kLeftMotor1Port);
+      new ExampleSmartMotorController(DriveConstants.LEFT_MOTOR_1_PORT);
 
   private final ExampleSmartMotorController m_leftFollower =
-      new ExampleSmartMotorController(DriveConstants.kLeftMotor2Port);
+      new ExampleSmartMotorController(DriveConstants.LEFT_MOTOR_2_PORT);
 
   // The motors on the right side of the drive.
   private final ExampleSmartMotorController m_rightLeader =
-      new ExampleSmartMotorController(DriveConstants.kRightMotor1Port);
+      new ExampleSmartMotorController(DriveConstants.RIGHT_MOTOR_1_PORT);
 
   private final ExampleSmartMotorController m_rightFollower =
-      new ExampleSmartMotorController(DriveConstants.kRightMotor2Port);
+      new ExampleSmartMotorController(DriveConstants.RIGHT_MOTOR_2_PORT);
 
   // The feedforward controller.
   private final SimpleMotorFeedforward m_feedforward =
-      new SimpleMotorFeedforward(DriveConstants.ks, DriveConstants.kv, DriveConstants.ka);
+      new SimpleMotorFeedforward(DriveConstants.S, DriveConstants.V, DriveConstants.A);
 
   // The robot's drive
   private final DifferentialDrive m_drive =
@@ -43,7 +43,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final TrapezoidProfile m_profile =
       new TrapezoidProfile(
           new TrapezoidProfile.Constraints(
-              DriveConstants.kMaxSpeed, DriveConstants.kMaxAcceleration));
+              DriveConstants.MAX_SPEED, DriveConstants.MAX_ACCELERATION));
 
   // The timer
   private final Timer m_timer = new Timer();
@@ -61,8 +61,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_leftFollower.follow(m_leftLeader);
     m_rightFollower.follow(m_rightLeader);
 
-    m_leftLeader.setPID(DriveConstants.kp, 0, 0);
-    m_rightLeader.setPID(DriveConstants.kp, 0, 0);
+    m_leftLeader.setPID(DriveConstants.P, 0, 0);
+    m_rightLeader.setPID(DriveConstants.P, 0, 0);
   }
 
   /**
@@ -90,12 +90,12 @@ public class DriveSubsystem extends SubsystemBase {
       TrapezoidProfile.State nextRight) {
     // Feedforward is divided by battery voltage to normalize it to [-1, 1]
     m_leftLeader.setSetpoint(
-        ExampleSmartMotorController.PIDMode.kPosition,
+        ExampleSmartMotorController.PIDMode.POSITION,
         currentLeft.position,
         m_feedforward.calculate(currentLeft.velocity, nextLeft.velocity)
             / RobotController.getBatteryVoltage());
     m_rightLeader.setSetpoint(
-        ExampleSmartMotorController.PIDMode.kPosition,
+        ExampleSmartMotorController.PIDMode.POSITION,
         currentRight.position,
         m_feedforward.calculate(currentLeft.velocity, nextLeft.velocity)
             / RobotController.getBatteryVoltage());
@@ -155,7 +155,7 @@ public class DriveSubsystem extends SubsystemBase {
                   m_profile.calculate(currentTime, new State(), new State(distance, 0));
               var nextSetpoint =
                   m_profile.calculate(
-                      currentTime + DriveConstants.kDt, new State(), new State(distance, 0));
+                      currentTime + DriveConstants.DT, new State(), new State(distance, 0));
               setDriveStates(currentSetpoint, currentSetpoint, nextSetpoint, nextSetpoint);
             })
         .until(() -> m_profile.isFinished(0));
@@ -196,12 +196,12 @@ public class DriveSubsystem extends SubsystemBase {
                       new State(m_initialRightDistance + distance, 0));
               var nextLeftSetpoint =
                   m_profile.calculate(
-                      currentTime + DriveConstants.kDt,
+                      currentTime + DriveConstants.DT,
                       new State(m_initialLeftDistance, 0),
                       new State(m_initialLeftDistance + distance, 0));
               var nextRightSetpoint =
                   m_profile.calculate(
-                      currentTime + DriveConstants.kDt,
+                      currentTime + DriveConstants.DT,
                       new State(m_initialRightDistance, 0),
                       new State(m_initialRightDistance + distance, 0));
               setDriveStates(

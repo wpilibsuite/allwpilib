@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.examples.elevatorexponentialsimulation.subsystems.E
 
 /** This is a sample program to demonstrate the use of elevator simulation. */
 public class Robot extends TimedRobot {
-  private final Joystick m_joystick = new Joystick(Constants.kJoystickPort);
+  private final Joystick m_joystick = new Joystick(Constants.JOYSTICK_PORT);
   private final Elevator m_elevator = new Elevator();
 
   public Robot() {
@@ -38,10 +38,10 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     if (m_joystick.getTrigger()) {
       // Here, we set the constant setpoint of 10 meters.
-      m_elevator.reachGoal(Constants.kSetpoint);
+      m_elevator.reachGoal(Constants.SETPOINT);
     } else {
       // Otherwise, we update the setpoint to 1 meter.
-      m_elevator.reachGoal(Constants.kLowerkSetpoint);
+      m_elevator.reachGoal(Constants.LOWER_SETPOINT);
     }
   }
 

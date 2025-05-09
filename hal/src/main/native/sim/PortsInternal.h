@@ -7,35 +7,35 @@
 #include <stdint.h>
 
 namespace hal {
-constexpr int32_t kNumCanBuses = 5;
-constexpr int32_t kAccelerometers = 1;
-constexpr int32_t kNumAccumulators = 2;
-constexpr int32_t kNumAnalogInputs = 8;
-constexpr int32_t kNumAnalogOutputs = 2;
-constexpr int32_t kNumCounters = 8;
-constexpr int32_t kNumDigitalHeaders = 10;
-constexpr int32_t kNumPWMHeaders = 10;
-constexpr int32_t kNumDigitalChannels = 31;
-constexpr int32_t kNumPWMChannels = 20;
-constexpr int32_t kNumDigitalPWMOutputs = 6;
-constexpr int32_t kNumEncoders = 8;
-constexpr int32_t kI2CPorts = 2;
-constexpr int32_t kNumInterrupts = 8;
-constexpr int32_t kNumRelayChannels = 8;
-constexpr int32_t kNumRelayHeaders = kNumRelayChannels / 2;
-constexpr int32_t kNumCTREPCMModules = 63;
-constexpr int32_t kNumCTRESolenoidChannels = 8;
-constexpr int32_t kNumCTREPDPModules = 63;
-constexpr int32_t kNumCTREPDPChannels = 16;
-constexpr int32_t kNumREVPDHModules = 63;
-constexpr int32_t kNumREVPDHChannels = 24;
-constexpr int32_t kNumPDSimModules = kNumREVPDHModules;
-constexpr int32_t kNumPDSimChannels = kNumREVPDHChannels;
-constexpr int32_t kNumDutyCycles = 8;
-constexpr int32_t kNumAddressableLEDs = 1;
-constexpr int32_t kNumREVPHModules = 63;
-constexpr int32_t kNumREVPHChannels = 16;
-constexpr int32_t kSPIAccelerometers = 5;
-constexpr int32_t kSPIPorts = 5;
+constexpr int32_t NUM_CAN_BUSES = 5;
+constexpr int32_t ACCELEROMETERS = 1;
+constexpr int32_t NUM_ACCUMULATORS = 2;
+constexpr int32_t NUM_ANALOG_INPUTS = 8;
+constexpr int32_t NUM_ANALOG_OUTPUTS = 2;
+constexpr int32_t NUM_COUNTERS = 8;
+constexpr int32_t NUM_DIGITAL_HEADERS = 10;
+constexpr int32_t NUM_PWM_HEADERS = 10;
+constexpr int32_t NUM_DIGITAL_CHANNELS = 31;
+constexpr int32_t NUM_PWM_CHANNELS = 20;
+constexpr int32_t NUM_DIGITAL_PWM_OUTPUTS = 6;
+constexpr int32_t NUM_ENCODERS = 8;
+constexpr int32_t I2C_PORTS = 2;
+constexpr int32_t NUM_INTERRUPTS = 8;
+constexpr int32_t NUM_RELAY_CHANNELS = 8;
+constexpr int32_t NUM_RELAY_HEADERS = NUM_RELAY_CHANNELS / 2;
+constexpr int32_t NUM_CTRE_PCM_MODULES = 63;
+constexpr int32_t NUM_CTRE_SOLENOID_CHANNELS = 8;
+constexpr int32_t NUM_CTRE_PDP_MODULES = 63;
+constexpr int32_t NUM_CTRE_PDP_CHANNELS = 16;
+constexpr int32_t NUM_REV_PDH_MODULES = 63;
+constexpr int32_t NUM_REV_PDH_CHANNELS = 24;
+constexpr int32_t NUM_PD_SIM_MODULES = NUM_REV_PDH_MODULES;
+constexpr int32_t NUM_PD_SIM_CHANNELS = NUM_REV_PDH_CHANNELS;
+constexpr int32_t NUM_DUTY_CYCLES = 8;
+constexpr int32_t NUM_ADDRESSABLE_LEDS = 1;
+constexpr int32_t NUM_REV_PH_MODULES = 63;
+constexpr int32_t NUM_REV_PH_CHANNELS = 16;
+constexpr int32_t SPI_ACCELEROMETERS = 5;
+constexpr int32_t SPI_PORTS = 5;
 
 }  // namespace hal

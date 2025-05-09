@@ -112,7 +112,7 @@ class Watchdog {
 
  private:
   // Used for timeout print rate-limiting
-  static constexpr auto kMinPrintPeriod = 1_s;
+  static constexpr auto MIN_PRINT_PERIOD = 1_s;
 
   units::second_t m_startTime = 0_s;
   units::second_t m_timeout;

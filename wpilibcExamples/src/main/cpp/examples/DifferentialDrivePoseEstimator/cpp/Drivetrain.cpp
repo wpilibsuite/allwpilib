@@ -21,9 +21,9 @@ Drivetrain::Drivetrain() {
   // distance traveled for one rotation of the wheel divided by the encoder
   // resolution.
   m_leftEncoder.SetDistancePerPulse(
-      (2 * std::numbers::pi * kWheelRadius / kEncoderResolution).value());
+      (2 * std::numbers::pi * WHEEL_RADIUS / ENCODER_RESOLUTION).value());
   m_rightEncoder.SetDistancePerPulse(
-      (2 * std::numbers::pi * kWheelRadius / kEncoderResolution).value());
+      (2 * std::numbers::pi * WHEEL_RADIUS / ENCODER_RESOLUTION).value());
 
   m_leftEncoder.Reset();
   m_rightEncoder.Reset();

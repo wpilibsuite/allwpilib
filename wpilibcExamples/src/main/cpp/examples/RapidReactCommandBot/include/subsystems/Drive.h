@@ -52,29 +52,29 @@ class Drive : public frc2::SubsystemBase {
   frc2::CommandPtr TurnToAngleCommand(units::degree_t angle);
 
  private:
-  frc::PWMSparkMax m_leftLeader{DriveConstants::kLeftMotor1Port};
-  frc::PWMSparkMax m_leftFollower{DriveConstants::kLeftMotor2Port};
-  frc::PWMSparkMax m_rightLeader{DriveConstants::kRightMotor1Port};
-  frc::PWMSparkMax m_rightFollower{DriveConstants::kRightMotor2Port};
+  frc::PWMSparkMax m_leftLeader{DriveConstants::LEFT_MOTOR_1_PORT};
+  frc::PWMSparkMax m_leftFollower{DriveConstants::LEFT_MOTOR_2_PORT};
+  frc::PWMSparkMax m_rightLeader{DriveConstants::RIGHT_MOTOR_1_PORT};
+  frc::PWMSparkMax m_rightFollower{DriveConstants::RIGHT_MOTOR_2_PORT};
 
   frc::DifferentialDrive m_drive{
       [&](double output) { m_leftLeader.Set(output); },
       [&](double output) { m_rightLeader.Set(output); }};
 
-  frc::Encoder m_leftEncoder{DriveConstants::kLeftEncoderPorts[0],
-                             DriveConstants::kLeftEncoderPorts[1],
-                             DriveConstants::kLeftEncoderReversed};
-  frc::Encoder m_rightEncoder{DriveConstants::kRightEncoderPorts[0],
-                              DriveConstants::kRightEncoderPorts[1],
-                              DriveConstants::kRightEncoderReversed};
+  frc::Encoder m_leftEncoder{DriveConstants::LEFT_ENCODER_PORTS[0],
+                             DriveConstants::LEFT_ENCODER_PORTS[1],
+                             DriveConstants::LEFT_ENCODER_REVERSED};
+  frc::Encoder m_rightEncoder{DriveConstants::RIGHT_ENCODER_PORTS[0],
+                              DriveConstants::RIGHT_ENCODER_PORTS[1],
+                              DriveConstants::RIGHT_ENCODER_REVERSED};
 
   frc::AnalogGyro m_gyro{0};
 
   frc::ProfiledPIDController<units::radians> m_controller{
-      DriveConstants::kTurnP,
-      DriveConstants::kTurnI,
-      DriveConstants::kTurnD,
-      {DriveConstants::kMaxTurnRate, DriveConstants::kMaxTurnAcceleration}};
+      DriveConstants::TURN_P,
+      DriveConstants::TURN_I,
+      DriveConstants::TURN_D,
+      {DriveConstants::MAX_TURN_RATE, DriveConstants::MAX_TURN_ACCELERATION}};
   frc::SimpleMotorFeedforward<units::radians> m_feedforward{
       DriveConstants::ks, DriveConstants::kv, DriveConstants::ka};
 };

@@ -26,21 +26,21 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
  * elevator.
  */
 public class Robot extends TimedRobot {
-  private static final int kMotorPort = 0;
-  private static final int kEncoderAChannel = 0;
-  private static final int kEncoderBChannel = 1;
-  private static final int kJoystickPort = 0;
-  private static final double kHighGoalPosition = Units.feetToMeters(3);
-  private static final double kLowGoalPosition = Units.feetToMeters(0);
+  private static final int MOTOR_PORT = 0;
+  private static final int ENCODER_A_CHANNEL = 0;
+  private static final int ENCODER_B_CHANNEL = 1;
+  private static final int JOYSTICK_PORT = 0;
+  private static final double HIGH_GOAL_POSITION = Units.feetToMeters(3);
+  private static final double LOW_GOAL_POSITION = Units.feetToMeters(0);
 
-  private static final double kCarriageMass = 4.5; // kilograms
+  private static final double CARRIAGE_MASS = 4.5; // kilograms
 
   // A 1.5in diameter drum has a radius of 0.75in, or 0.019in.
-  private static final double kDrumRadius = 1.5 / 2.0 * 25.4 / 1000.0;
+  private static final double DRUM_RADIUS = 1.5 / 2.0 * 25.4 / 1000.0;
 
   // Reduction between motors and encoder, as output over input. If the elevator spins slower than
   // the motors, this number should be greater than one.
-  private static final double kElevatorGearing = 6.0;
+  private static final double ELEVATOR_GEARING = 6.0;
 
   private final TrapezoidProfile m_profile =
       new TrapezoidProfile(
@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
    */
   private final LinearSystem<N2, N1, N2> m_elevatorPlant =
       LinearSystemId.createElevatorSystem(
-          DCMotor.getNEO(2), kCarriageMass, kDrumRadius, kElevatorGearing);
+          DCMotor.getNEO(2), CARRIAGE_MASS, DRUM_RADIUS, ELEVATOR_GEARING);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   @SuppressWarnings("unchecked")
@@ -102,16 +102,16 @@ public class Robot extends TimedRobot {
           0.020);
 
   // An encoder set up to measure elevator height in meters.
-  private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
+  private final Encoder m_encoder = new Encoder(ENCODER_A_CHANNEL, ENCODER_B_CHANNEL);
 
-  private final PWMSparkMax m_motor = new PWMSparkMax(kMotorPort);
+  private final PWMSparkMax m_motor = new PWMSparkMax(MOTOR_PORT);
 
   // A joystick to read the trigger from.
-  private final Joystick m_joystick = new Joystick(kJoystickPort);
+  private final Joystick m_joystick = new Joystick(JOYSTICK_PORT);
 
   public Robot() {
     // Circumference = pi * d, so distance per click = pi * d / counts
-    m_encoder.setDistancePerPulse(Math.PI * 2 * kDrumRadius / 4096.0);
+    m_encoder.setDistancePerPulse(Math.PI * 2 * DRUM_RADIUS / 4096.0);
   }
 
   @Override
@@ -131,10 +131,10 @@ public class Robot extends TimedRobot {
     TrapezoidProfile.State goal;
     if (m_joystick.getTrigger()) {
       // the trigger is pressed, so we go to the high goal.
-      goal = new TrapezoidProfile.State(kHighGoalPosition, 0.0);
+      goal = new TrapezoidProfile.State(HIGH_GOAL_POSITION, 0.0);
     } else {
       // Otherwise, we go to the low goal
-      goal = new TrapezoidProfile.State(kLowGoalPosition, 0.0);
+      goal = new TrapezoidProfile.State(LOW_GOAL_POSITION, 0.0);
     }
     // Step our TrapezoidalProfile forward 20ms and set it as our next reference
     m_lastProfiledReference = m_profile.calculate(0.020, m_lastProfiledReference, goal);

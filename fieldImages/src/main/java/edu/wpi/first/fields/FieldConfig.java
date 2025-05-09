@@ -42,11 +42,11 @@ public class FieldConfig {
   public FieldConfig() {}
 
   public URL getImageUrl() {
-    return getClass().getResource(Fields.kBaseResourceDir + m_fieldImage);
+    return getClass().getResource(Fields.BASE_RESOURCE_DIR + m_fieldImage);
   }
 
   public InputStream getImageAsStream() {
-    return getClass().getResourceAsStream(Fields.kBaseResourceDir + m_fieldImage);
+    return getClass().getResourceAsStream(Fields.BASE_RESOURCE_DIR + m_fieldImage);
   }
 
   /**

@@ -26,19 +26,19 @@ int main() {
     for (const auto& prop : camera.EnumerateProperties()) {
       wpi::print("  {}", prop.GetName());
       switch (prop.GetKind()) {
-        case cs::VideoProperty::kBoolean:
+        case cs::VideoProperty::BOOLEAN:
           wpi::print(" (bool): value={} default={}", prop.Get(),
                      prop.GetDefault());
           break;
-        case cs::VideoProperty::kInteger:
+        case cs::VideoProperty::INTEGER:
           wpi::print(" (int): value={} min={} max={} step={} default={}",
                      prop.Get(), prop.GetMin(), prop.GetMax(), prop.GetStep(),
                      prop.GetDefault());
           break;
-        case cs::VideoProperty::kString:
+        case cs::VideoProperty::STRING:
           wpi::print(" (string): {}", prop.GetString());
           break;
-        case cs::VideoProperty::kEnum: {
+        case cs::VideoProperty::ENUM: {
           wpi::print(" (enum): value={}", prop.Get());
           auto choices = prop.GetChoices();
           for (size_t i = 0; i < choices.size(); ++i) {
@@ -58,13 +58,13 @@ int main() {
     for (const auto& mode : camera.EnumerateVideoModes()) {
       const char* pixelFormat;
       switch (mode.pixelFormat) {
-        case cs::VideoMode::kMJPEG:
+        case cs::VideoMode::MJPEG:
           pixelFormat = "MJPEG";
           break;
-        case cs::VideoMode::kYUYV:
+        case cs::VideoMode::YUYV:
           pixelFormat = "YUYV";
           break;
-        case cs::VideoMode::kRGB565:
+        case cs::VideoMode::RGB565:
           pixelFormat = "RGB565";
           break;
         default:

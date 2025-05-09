@@ -13,14 +13,14 @@ namespace frc {
 
 TEST(DoubleSolenoidREVTest, ValidInitialization) {
   DoubleSolenoid solenoid{0, 3, frc::PneumaticsModuleType::CTREPCM, 2, 3};
-  solenoid.Set(DoubleSolenoid::kReverse);
-  EXPECT_EQ(DoubleSolenoid::kReverse, solenoid.Get());
+  solenoid.Set(DoubleSolenoid::REVERSE);
+  EXPECT_EQ(DoubleSolenoid::REVERSE, solenoid.Get());
 
-  solenoid.Set(DoubleSolenoid::kForward);
-  EXPECT_EQ(DoubleSolenoid::kForward, solenoid.Get());
+  solenoid.Set(DoubleSolenoid::FORWARD);
+  EXPECT_EQ(DoubleSolenoid::FORWARD, solenoid.Get());
 
-  solenoid.Set(DoubleSolenoid::kOff);
-  EXPECT_EQ(DoubleSolenoid::kOff, solenoid.Get());
+  solenoid.Set(DoubleSolenoid::OFF);
+  EXPECT_EQ(DoubleSolenoid::OFF, solenoid.Get());
 }
 
 TEST(DoubleSolenoidREVTest, ThrowForwardPortAlreadyInitialized) {
@@ -49,18 +49,18 @@ TEST(DoubleSolenoidREVTest, ThrowBothPortsAlreadyInitialized) {
 TEST(DoubleSolenoidREVTest, Toggle) {
   DoubleSolenoid solenoid{0, 4, frc::PneumaticsModuleType::CTREPCM, 2, 3};
   // Bootstrap it into reverse
-  solenoid.Set(DoubleSolenoid::kReverse);
+  solenoid.Set(DoubleSolenoid::REVERSE);
 
   solenoid.Toggle();
-  EXPECT_EQ(DoubleSolenoid::kForward, solenoid.Get());
+  EXPECT_EQ(DoubleSolenoid::FORWARD, solenoid.Get());
 
   solenoid.Toggle();
-  EXPECT_EQ(DoubleSolenoid::kReverse, solenoid.Get());
+  EXPECT_EQ(DoubleSolenoid::REVERSE, solenoid.Get());
 
   // Of shouldn't do anything on toggle
-  solenoid.Set(DoubleSolenoid::kOff);
+  solenoid.Set(DoubleSolenoid::OFF);
   solenoid.Toggle();
-  EXPECT_EQ(DoubleSolenoid::kOff, solenoid.Get());
+  EXPECT_EQ(DoubleSolenoid::OFF, solenoid.Get());
 }
 
 TEST(DoubleSolenoidREVTest, InvalidForwardPort) {

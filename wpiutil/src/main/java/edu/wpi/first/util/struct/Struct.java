@@ -21,25 +21,25 @@ import java.nio.ByteBuffer;
  */
 public interface Struct<T> {
   /** Serialized size of a "bool" value. */
-  int kSizeBool = 1;
+  int SIZE_BOOL = 1;
 
   /** Serialized size of an "int8" or "uint8" value. */
-  int kSizeInt8 = 1;
+  int SIZE_INT8 = 1;
 
   /** Serialized size of an "int16" or "uint16" value. */
-  int kSizeInt16 = 2;
+  int SIZE_INT16 = 2;
 
   /** Serialized size of an "int32" or "uint32" value. */
-  int kSizeInt32 = 4;
+  int SIZE_INT32 = 4;
 
   /** Serialized size of an "int64" or "uint64" value. */
-  int kSizeInt64 = 8;
+  int SIZE_INT64 = 8;
 
   /** Serialized size of an "float" or "float32" value. */
-  int kSizeFloat = 4;
+  int SIZE_FLOAT = 4;
 
   /** Serialized size of an "double" or "float64" value. */
-  int kSizeDouble = 8;
+  int SIZE_DOUBLE = 8;
 
   /**
    * Gets the Class object for the stored value.
@@ -147,7 +147,7 @@ public interface Struct<T> {
 
   /**
    * Deserializes a double array from a raw struct serialized ByteBuffer starting at the current
-   * position. Will increment the ByteBuffer position by size * kSizeDouble bytes. Will not
+   * position. Will increment the ByteBuffer position by size * SIZE_DOUBLE bytes. Will not
    * otherwise modify the ByteBuffer (e.g. byte order will not be changed).
    *
    * @param bb ByteBuffer
@@ -180,7 +180,7 @@ public interface Struct<T> {
 
   /**
    * Puts array contents to a ByteBuffer starting at the current position. Will increment the
-   * ByteBuffer position by size * kSizeDouble bytes. Will not otherwise modify the ByteBuffer (e.g.
+   * ByteBuffer position by size * SIZE_DOUBLE bytes. Will not otherwise modify the ByteBuffer (e.g.
    * byte order will not be changed).
    *
    * @param bb ByteBuffer

@@ -54,7 +54,7 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
         m_poseEstimator.GetEstimatedPosition().Rotation());
   }
   SetSpeeds(m_kinematics.ToWheelSpeeds(chassisSpeeds.Discretize(period))
-                .Desaturate(kMaxSpeed));
+                .Desaturate(MAX_SPEED));
 }
 
 void Drivetrain::UpdateOdometry() {

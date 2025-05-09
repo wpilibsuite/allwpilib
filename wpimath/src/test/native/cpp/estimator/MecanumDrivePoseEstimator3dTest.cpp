@@ -24,8 +24,8 @@ void testFollowTrajectory(
     std::function<frc::Pose2d(frc::Trajectory::State&)>
         visionMeasurementGenerator,
     const frc::Pose2d& startingPose, const frc::Pose2d& endingPose,
-    const units::second_t dt, const units::second_t kVisionUpdateRate,
-    const units::second_t kVisionUpdateDelay, const bool checkError,
+    const units::second_t dt, const units::second_t visionUpdateRate,
+    const units::second_t visionUpdateDelay, const bool checkError,
     const bool debug) {
   frc::MecanumDriveWheelPositions wheelPositions{};
 
@@ -54,7 +54,7 @@ void testFollowTrajectory(
     // We are due for a new vision measurement if it's been `visionUpdateRate`
     // seconds since the last vision measurement
     if (visionPoses.empty() ||
-        visionPoses.back().first + kVisionUpdateRate < t) {
+        visionPoses.back().first + visionUpdateRate < t) {
       auto visionPose =
           visionMeasurementGenerator(groundTruthState) +
           frc::Transform2d{frc::Translation2d{distribution(generator) * 0.1_m,
@@ -66,7 +66,7 @@ void testFollowTrajectory(
     // We should apply the oldest vision measurement if it has been
     // `visionUpdateDelay` seconds since it was measured
     if (!visionPoses.empty() &&
-        visionPoses.front().first + kVisionUpdateDelay < t) {
+        visionPoses.front().first + visionUpdateDelay < t) {
       auto visionEntry = visionPoses.front();
       estimator.AddVisionMeasurement(frc::Pose3d{visionEntry.second},
                                      visionEntry.first);

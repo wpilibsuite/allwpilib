@@ -100,25 +100,25 @@ public class DriverStationJNI extends JNIWrapper {
   private static native int nativeGetAllianceStation();
 
   /** Unknown Alliance Station ID. */
-  public static final int kUnknownAllianceStation = 0;
+  public static final int UNKNOWN_ALLIANCE_STATION = 0;
 
   /** Red Alliance Station 1 ID. */
-  public static final int kRed1AllianceStation = 1;
+  public static final int RED1_ALLIANCE_STATION = 1;
 
   /** Red Alliance Station 2 ID. */
-  public static final int kRed2AllianceStation = 2;
+  public static final int RED2_ALLIANCE_STATION = 2;
 
   /** Red Alliance Station 3 ID. */
-  public static final int kRed3AllianceStation = 3;
+  public static final int RED3_ALLIANCE_STATION = 3;
 
   /** Blue Alliance Station 1 ID. */
-  public static final int kBlue1AllianceStation = 4;
+  public static final int BLUE1_ALLIANCE_STATION = 4;
 
   /** Blue Alliance Station 2 ID. */
-  public static final int kBlue2AllianceStation = 5;
+  public static final int BLUE2_ALLIANCE_STATION = 5;
 
   /** Blue Alliance Station 3 ID. */
-  public static final int kBlue3AllianceStation = 6;
+  public static final int BLUE3_ALLIANCE_STATION = 6;
 
   /**
    * Gets the current alliance station ID.
@@ -128,25 +128,25 @@ public class DriverStationJNI extends JNIWrapper {
    */
   public static AllianceStationID getAllianceStation() {
     return switch (nativeGetAllianceStation()) {
-      case kUnknownAllianceStation -> AllianceStationID.Unknown;
-      case kRed1AllianceStation -> AllianceStationID.Red1;
-      case kRed2AllianceStation -> AllianceStationID.Red2;
-      case kRed3AllianceStation -> AllianceStationID.Red3;
-      case kBlue1AllianceStation -> AllianceStationID.Blue1;
-      case kBlue2AllianceStation -> AllianceStationID.Blue2;
-      case kBlue3AllianceStation -> AllianceStationID.Blue3;
+      case UNKNOWN_ALLIANCE_STATION -> AllianceStationID.Unknown;
+      case RED1_ALLIANCE_STATION -> AllianceStationID.Red1;
+      case RED2_ALLIANCE_STATION -> AllianceStationID.Red2;
+      case RED3_ALLIANCE_STATION -> AllianceStationID.Red3;
+      case BLUE1_ALLIANCE_STATION -> AllianceStationID.Blue1;
+      case BLUE2_ALLIANCE_STATION -> AllianceStationID.Blue2;
+      case BLUE3_ALLIANCE_STATION -> AllianceStationID.Blue3;
       default -> null;
     };
   }
 
   /** The maximum number of axes. */
-  public static final int kMaxJoystickAxes = 12;
+  public static final int MAX_JOYSTICK_AXES = 12;
 
   /** The maximum number of POVs. */
-  public static final int kMaxJoystickPOVs = 12;
+  public static final int MAX_JOYSTICK_POVS = 12;
 
   /** The maximum number of joysticks. */
-  public static final int kMaxJoysticks = 6;
+  public static final int MAX_JOYSTICKS = 6;
 
   /**
    * Gets the axes of a specific joystick.

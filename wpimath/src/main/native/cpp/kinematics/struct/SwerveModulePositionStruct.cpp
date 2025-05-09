@@ -5,21 +5,21 @@
 #include "frc/kinematics/struct/SwerveModulePositionStruct.h"
 
 namespace {
-constexpr size_t kDistanceOff = 0;
-constexpr size_t kAngleOff = kDistanceOff + 8;
+constexpr size_t DISTANCE_OFF = 0;
+constexpr size_t ANGLE_OFF = DISTANCE_OFF + 8;
 }  // namespace
 
 using StructType = wpi::Struct<frc::SwerveModulePosition>;
 
 frc::SwerveModulePosition StructType::Unpack(std::span<const uint8_t> data) {
   return frc::SwerveModulePosition{
-      units::meter_t{wpi::UnpackStruct<double, kDistanceOff>(data)},
-      wpi::UnpackStruct<frc::Rotation2d, kAngleOff>(data),
+      units::meter_t{wpi::UnpackStruct<double, DISTANCE_OFF>(data)},
+      wpi::UnpackStruct<frc::Rotation2d, ANGLE_OFF>(data),
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
                       const frc::SwerveModulePosition& value) {
-  wpi::PackStruct<kDistanceOff>(data, value.distance.value());
-  wpi::PackStruct<kAngleOff>(data, value.angle);
+  wpi::PackStruct<DISTANCE_OFF>(data, value.distance.value());
+  wpi::PackStruct<ANGLE_OFF>(data, value.angle);
 }

@@ -33,18 +33,18 @@ class AlertTest {
   @AfterEach
   void checkClean() {
     update();
-    assertEquals(0, getActiveAlerts(AlertType.kError).length);
-    assertEquals(0, getActiveAlerts(AlertType.kWarning).length);
-    assertEquals(0, getActiveAlerts(AlertType.kInfo).length);
+    assertEquals(0, getActiveAlerts(AlertType.ERROR).length);
+    assertEquals(0, getActiveAlerts(AlertType.WARNING).length);
+    assertEquals(0, getActiveAlerts(AlertType.INFO).length);
   }
 
   private String getSubtableName(Alert.AlertType type) {
     switch (type) {
-      case kError:
+      case ERROR:
         return "errors";
-      case kWarning:
+      case WARNING:
         return "warnings";
-      case kInfo:
+      case INFO:
         return "infos";
       default:
         return "unknown";
@@ -82,88 +82,88 @@ class AlertTest {
 
   @Test
   void setUnsetSingle() {
-    try (var one = makeAlert("one", AlertType.kInfo)) {
-      assertFalse(isAlertActive("one", AlertType.kInfo));
+    try (var one = makeAlert("one", AlertType.INFO)) {
+      assertFalse(isAlertActive("one", AlertType.INFO));
       one.set(true);
-      assertTrue(isAlertActive("one", AlertType.kInfo));
+      assertTrue(isAlertActive("one", AlertType.INFO));
       one.set(false);
-      assertFalse(isAlertActive("one", AlertType.kInfo));
+      assertFalse(isAlertActive("one", AlertType.INFO));
     }
   }
 
   @Test
   void setUnsetMultiple() {
-    try (var one = makeAlert("one", AlertType.kError);
-        var two = makeAlert("two", AlertType.kInfo)) {
-      assertFalse(isAlertActive("one", AlertType.kError));
-      assertFalse(isAlertActive("two", AlertType.kInfo));
+    try (var one = makeAlert("one", AlertType.ERROR);
+        var two = makeAlert("two", AlertType.INFO)) {
+      assertFalse(isAlertActive("one", AlertType.ERROR));
+      assertFalse(isAlertActive("two", AlertType.INFO));
       one.set(true);
-      assertTrue(isAlertActive("one", AlertType.kError));
-      assertFalse(isAlertActive("two", AlertType.kInfo));
+      assertTrue(isAlertActive("one", AlertType.ERROR));
+      assertFalse(isAlertActive("two", AlertType.INFO));
       one.set(true);
       two.set(true);
-      assertTrue(isAlertActive("one", AlertType.kError));
-      assertTrue(isAlertActive("two", AlertType.kInfo));
+      assertTrue(isAlertActive("one", AlertType.ERROR));
+      assertTrue(isAlertActive("two", AlertType.INFO));
       one.set(false);
-      assertFalse(isAlertActive("one", AlertType.kError));
-      assertTrue(isAlertActive("two", AlertType.kInfo));
+      assertFalse(isAlertActive("one", AlertType.ERROR));
+      assertTrue(isAlertActive("two", AlertType.INFO));
     }
   }
 
   @Test
   void setIsIdempotent() {
-    try (var a = makeAlert("A", AlertType.kInfo);
-        var b = makeAlert("B", AlertType.kInfo);
-        var c = makeAlert("C", AlertType.kInfo)) {
+    try (var a = makeAlert("A", AlertType.INFO);
+        var b = makeAlert("B", AlertType.INFO);
+        var c = makeAlert("C", AlertType.INFO)) {
       a.set(true);
       b.set(true);
       c.set(true);
 
-      var startState = List.of(getActiveAlerts(AlertType.kInfo));
+      var startState = List.of(getActiveAlerts(AlertType.INFO));
 
       b.set(true);
-      assertState(AlertType.kInfo, startState);
+      assertState(AlertType.INFO, startState);
 
       a.set(true);
-      assertState(AlertType.kInfo, startState);
+      assertState(AlertType.INFO, startState);
     }
   }
 
   @Test
   void closeUnsetsAlert() {
-    try (var alert = makeAlert("alert", AlertType.kWarning)) {
+    try (var alert = makeAlert("alert", AlertType.WARNING)) {
       alert.set(true);
-      assertTrue(isAlertActive("alert", AlertType.kWarning));
+      assertTrue(isAlertActive("alert", AlertType.WARNING));
     }
-    assertFalse(isAlertActive("alert", AlertType.kWarning));
+    assertFalse(isAlertActive("alert", AlertType.WARNING));
   }
 
   @Test
   void setTextWhileUnset() {
-    try (var alert = makeAlert("BEFORE", AlertType.kInfo)) {
+    try (var alert = makeAlert("BEFORE", AlertType.INFO)) {
       assertEquals("BEFORE", alert.getText());
       alert.set(true);
-      assertTrue(isAlertActive("BEFORE", AlertType.kInfo));
+      assertTrue(isAlertActive("BEFORE", AlertType.INFO));
       alert.set(false);
-      assertFalse(isAlertActive("BEFORE", AlertType.kInfo));
+      assertFalse(isAlertActive("BEFORE", AlertType.INFO));
       alert.setText("AFTER");
       assertEquals("AFTER", alert.getText());
       alert.set(true);
-      assertFalse(isAlertActive("BEFORE", AlertType.kInfo));
-      assertTrue(isAlertActive("AFTER", AlertType.kInfo));
+      assertFalse(isAlertActive("BEFORE", AlertType.INFO));
+      assertTrue(isAlertActive("AFTER", AlertType.INFO));
     }
   }
 
   @Test
   void setTextWhileSet() {
-    try (var alert = makeAlert("BEFORE", AlertType.kInfo)) {
+    try (var alert = makeAlert("BEFORE", AlertType.INFO)) {
       assertEquals("BEFORE", alert.getText());
       alert.set(true);
-      assertTrue(isAlertActive("BEFORE", AlertType.kInfo));
+      assertTrue(isAlertActive("BEFORE", AlertType.INFO));
       alert.setText("AFTER");
       assertEquals("AFTER", alert.getText());
-      assertFalse(isAlertActive("BEFORE", AlertType.kInfo));
-      assertTrue(isAlertActive("AFTER", AlertType.kInfo));
+      assertFalse(isAlertActive("BEFORE", AlertType.INFO));
+      assertTrue(isAlertActive("AFTER", AlertType.INFO));
     }
   }
 
@@ -171,20 +171,20 @@ class AlertTest {
   @Test
   void setTextDoesNotAffectFirstOrderSort() {
     SimHooks.pauseTiming();
-    try (var a = makeAlert("A", AlertType.kInfo);
-        var b = makeAlert("B", AlertType.kInfo);
-        var c = makeAlert("C", AlertType.kInfo)) {
+    try (var a = makeAlert("A", AlertType.INFO);
+        var b = makeAlert("B", AlertType.INFO);
+        var c = makeAlert("C", AlertType.INFO)) {
       a.set(true);
       SimHooks.stepTiming(1);
       b.set(true);
       SimHooks.stepTiming(1);
       c.set(true);
 
-      var expectedEndState = new ArrayList<>(List.of(getActiveAlerts(AlertType.kInfo)));
+      var expectedEndState = new ArrayList<>(List.of(getActiveAlerts(AlertType.INFO)));
       expectedEndState.replaceAll(s -> "B".equals(s) ? "AFTER" : s);
       b.setText("AFTER");
 
-      assertState(AlertType.kInfo, expectedEndState);
+      assertState(AlertType.INFO, expectedEndState);
     } finally {
       SimHooks.resumeTiming();
     }
@@ -194,41 +194,41 @@ class AlertTest {
   @Test
   void sortOrder() {
     SimHooks.pauseTiming();
-    try (var a = makeAlert("A", AlertType.kInfo);
-        var b = makeAlert("B", AlertType.kInfo);
-        var c = makeAlert("C", AlertType.kInfo)) {
+    try (var a = makeAlert("A", AlertType.INFO);
+        var b = makeAlert("B", AlertType.INFO);
+        var c = makeAlert("C", AlertType.INFO)) {
       a.set(true);
-      assertState(AlertType.kInfo, List.of("A"));
+      assertState(AlertType.INFO, List.of("A"));
       SimHooks.stepTiming(1);
       b.set(true);
-      assertState(AlertType.kInfo, List.of("B", "A"));
+      assertState(AlertType.INFO, List.of("B", "A"));
       SimHooks.stepTiming(1);
       c.set(true);
-      assertState(AlertType.kInfo, List.of("C", "B", "A"));
+      assertState(AlertType.INFO, List.of("C", "B", "A"));
 
       SimHooks.stepTiming(1);
       c.set(false);
-      assertState(AlertType.kInfo, List.of("B", "A"));
+      assertState(AlertType.INFO, List.of("B", "A"));
 
       SimHooks.stepTiming(1);
       c.set(true);
-      assertState(AlertType.kInfo, List.of("C", "B", "A"));
+      assertState(AlertType.INFO, List.of("C", "B", "A"));
 
       SimHooks.stepTiming(1);
       a.set(false);
-      assertState(AlertType.kInfo, List.of("C", "B"));
+      assertState(AlertType.INFO, List.of("C", "B"));
 
       SimHooks.stepTiming(1);
       b.set(false);
-      assertState(AlertType.kInfo, List.of("C"));
+      assertState(AlertType.INFO, List.of("C"));
 
       SimHooks.stepTiming(1);
       b.set(true);
-      assertState(AlertType.kInfo, List.of("B", "C"));
+      assertState(AlertType.INFO, List.of("B", "C"));
 
       SimHooks.stepTiming(1);
       a.set(true);
-      assertState(AlertType.kInfo, List.of("A", "B", "C"));
+      assertState(AlertType.INFO, List.of("A", "B", "C"));
     } finally {
       SimHooks.resumeTiming();
     }

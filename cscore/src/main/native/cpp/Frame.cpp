@@ -93,22 +93,22 @@ Image* Frame::GetNearestImage(int width, int height,
 
   // 2) Same width, height, different (but non-JPEG) pixelFormat (color conv)
   // 2a) If we want JPEG output, prefer BGR over other pixel formats
-  if (pixelFormat == VideoMode::kMJPEG) {
+  if (pixelFormat == VideoMode::MJPEG) {
     for (auto i : m_impl->images) {
-      if (i->Is(width, height, VideoMode::kBGR)) {
+      if (i->Is(width, height, VideoMode::BGR)) {
         return i;
       }
     }
   }
 
   for (auto i : m_impl->images) {
-    if (i->Is(width, height) && i->pixelFormat != VideoMode::kMJPEG) {
+    if (i->Is(width, height) && i->pixelFormat != VideoMode::MJPEG) {
       return i;
     }
   }
 
   // 3) Different width, height, same pixelFormat (only if non-JPEG) (resample)
-  if (pixelFormat != VideoMode::kMJPEG) {
+  if (pixelFormat != VideoMode::MJPEG) {
     // 3a) Smallest image at least width/height in size
     for (auto i : m_impl->images) {
       if (i->IsLarger(width, height) && i->pixelFormat == pixelFormat &&
@@ -135,7 +135,7 @@ Image* Frame::GetNearestImage(int width, int height,
   //    (color conversion + resample)
   // 4a) Smallest image at least width/height in size
   for (auto i : m_impl->images) {
-    if (i->IsLarger(width, height) && i->pixelFormat != VideoMode::kMJPEG &&
+    if (i->IsLarger(width, height) && i->pixelFormat != VideoMode::MJPEG &&
         (!found || (i->IsSmaller(*found)))) {
       found = i;
     }
@@ -146,7 +146,7 @@ Image* Frame::GetNearestImage(int width, int height,
 
   // 4b) Largest image (less than width/height)
   for (auto i : m_impl->images) {
-    if (i->pixelFormat != VideoMode::kMJPEG &&
+    if (i->pixelFormat != VideoMode::MJPEG &&
         (!found || (i->IsLarger(*found)))) {
       found = i;
     }
@@ -158,7 +158,7 @@ Image* Frame::GetNearestImage(int width, int height,
   // 5) Same width, height, JPEG pixelFormat (decompression).  As there may be
   //    multiple JPEG images, find the highest quality one.
   for (auto i : m_impl->images) {
-    if (i->Is(width, height, VideoMode::kMJPEG) &&
+    if (i->Is(width, height, VideoMode::MJPEG) &&
         (!found || i->jpegQuality > found->jpegQuality)) {
       found = i;
       // consider one without a quality setting to be the highest quality
@@ -175,7 +175,7 @@ Image* Frame::GetNearestImage(int width, int height,
   // 6) Different width, height, JPEG pixelFormat (decompression)
   // 6a) Smallest image at least width/height in size
   for (auto i : m_impl->images) {
-    if (i->IsLarger(width, height) && i->pixelFormat == VideoMode::kMJPEG &&
+    if (i->IsLarger(width, height) && i->pixelFormat == VideoMode::MJPEG &&
         (!found || (i->IsSmaller(*found)))) {
       found = i;
     }
@@ -186,7 +186,7 @@ Image* Frame::GetNearestImage(int width, int height,
 
   // 6b) Largest image (less than width/height)
   for (auto i : m_impl->images) {
-    if (i->pixelFormat != VideoMode::kMJPEG &&
+    if (i->pixelFormat != VideoMode::MJPEG &&
         (!found || (i->IsLarger(*found)))) {
       found = i;
     }
@@ -211,169 +211,169 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
   // anything else with it.  Note that if the destination format is JPEG, we
   // still need to do this (unless it was already a JPEG, in which case we
   // would have returned above).
-  if (cur->pixelFormat == VideoMode::kMJPEG) {
+  if (cur->pixelFormat == VideoMode::MJPEG) {
     cur = ConvertMJPEGToBGR(cur);
-    if (pixelFormat == VideoMode::kBGR) {
+    if (pixelFormat == VideoMode::BGR) {
       return cur;
     }
   }
 
   // Color convert
   switch (pixelFormat) {
-    case VideoMode::kRGB565:
+    case VideoMode::RGB565:
       // If source is YUYV, UYVY, Gray, or Y16, need to convert to BGR first
-      if (cur->pixelFormat == VideoMode::kYUYV) {
+      if (cur->pixelFormat == VideoMode::YUYV) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
+                GetExistingImage(cur->width, cur->height, VideoMode::BGR)) {
           cur = newImage;
         } else {
           cur = ConvertYUYVToBGR(cur);
         }
-      } else if (cur->pixelFormat == VideoMode::kUYVY) {
+      } else if (cur->pixelFormat == VideoMode::UYVY) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
+                GetExistingImage(cur->width, cur->height, VideoMode::BGR)) {
           cur = newImage;
         } else {
           cur = ConvertUYVYToBGR(cur);
         }
-      } else if (cur->pixelFormat == VideoMode::kGray) {
+      } else if (cur->pixelFormat == VideoMode::GRAY) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
+                GetExistingImage(cur->width, cur->height, VideoMode::BGR)) {
           cur = newImage;
         } else {
           cur = ConvertGrayToBGR(cur);
         }
-      } else if (cur->pixelFormat == VideoMode::kY16) {
+      } else if (cur->pixelFormat == VideoMode::Y16) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
+                GetExistingImage(cur->width, cur->height, VideoMode::BGR)) {
           cur = newImage;
         } else if (Image* newImage = GetExistingImage(cur->width, cur->height,
-                                                      VideoMode::kGray)) {
+                                                      VideoMode::GRAY)) {
           cur = ConvertGrayToBGR(newImage);
         } else {
           cur = ConvertGrayToBGR(ConvertY16ToGray(cur));
         }
       }
       return ConvertBGRToRGB565(cur);
-    case VideoMode::kGray:
-    case VideoMode::kY16:
+    case VideoMode::GRAY:
+    case VideoMode::Y16:
       // If source is also grayscale, convert directly
-      if (pixelFormat == VideoMode::kGray &&
-          cur->pixelFormat == VideoMode::kY16) {
+      if (pixelFormat == VideoMode::GRAY &&
+          cur->pixelFormat == VideoMode::Y16) {
         return ConvertY16ToGray(cur);
-      } else if (pixelFormat == VideoMode::kY16 &&
-                 cur->pixelFormat == VideoMode::kGray) {
+      } else if (pixelFormat == VideoMode::Y16 &&
+                 cur->pixelFormat == VideoMode::GRAY) {
         return ConvertGrayToY16(cur);
       }
       // If source is YUYV, UYVY, convert directly to Gray
       // If RGB565, need to convert to BGR first
-      if (cur->pixelFormat == VideoMode::kYUYV) {
+      if (cur->pixelFormat == VideoMode::YUYV) {
         cur = ConvertYUYVToGray(cur);
-      } else if (cur->pixelFormat == VideoMode::kUYVY) {
+      } else if (cur->pixelFormat == VideoMode::UYVY) {
         cur = ConvertUYVYToGray(cur);
-      } else if (cur->pixelFormat == VideoMode::kRGB565) {
+      } else if (cur->pixelFormat == VideoMode::RGB565) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
+                GetExistingImage(cur->width, cur->height, VideoMode::BGR)) {
           cur = newImage;
         } else {
           cur = ConvertRGB565ToBGR(cur);
         }
         cur = ConvertBGRToGray(cur);
       }
-      if (pixelFormat == VideoMode::kY16) {
+      if (pixelFormat == VideoMode::Y16) {
         cur = ConvertGrayToY16(cur);
       }
       return cur;
-    case VideoMode::kBGR:
-    case VideoMode::kMJPEG:
-      if (cur->pixelFormat == VideoMode::kYUYV) {
+    case VideoMode::BGR:
+    case VideoMode::MJPEG:
+      if (cur->pixelFormat == VideoMode::YUYV) {
         cur = ConvertYUYVToBGR(cur);
-      } else if (cur->pixelFormat == VideoMode::kUYVY) {
+      } else if (cur->pixelFormat == VideoMode::UYVY) {
         cur = ConvertUYVYToBGR(cur);
-      } else if (cur->pixelFormat == VideoMode::kRGB565) {
+      } else if (cur->pixelFormat == VideoMode::RGB565) {
         cur = ConvertRGB565ToBGR(cur);
-      } else if (cur->pixelFormat == VideoMode::kGray) {
-        if (pixelFormat == VideoMode::kBGR) {
+      } else if (cur->pixelFormat == VideoMode::GRAY) {
+        if (pixelFormat == VideoMode::BGR) {
           return ConvertGrayToBGR(cur);
         } else {
           return ConvertGrayToMJPEG(cur, defaultJpegQuality);
         }
-      } else if (cur->pixelFormat == VideoMode::kY16) {
+      } else if (cur->pixelFormat == VideoMode::Y16) {
         // Check to see if Gray version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kGray)) {
+                GetExistingImage(cur->width, cur->height, VideoMode::GRAY)) {
           cur = newImage;
         } else {
           cur = ConvertY16ToGray(cur);
         }
-        if (pixelFormat == VideoMode::kBGR) {
+        if (pixelFormat == VideoMode::BGR) {
           return ConvertGrayToBGR(cur);
         } else {
           return ConvertGrayToMJPEG(cur, defaultJpegQuality);
         }
       }
       break;
-    case VideoMode::kBGRA:
+    case VideoMode::BGRA:
       // If source is RGB565, YUYV, UYVY, Gray or Y16, need to convert to BGR
       // first
-      if (cur->pixelFormat == VideoMode::kRGB565) {
+      if (cur->pixelFormat == VideoMode::RGB565) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
+                GetExistingImage(cur->width, cur->height, VideoMode::BGR)) {
           cur = newImage;
         } else {
           cur = ConvertRGB565ToBGR(cur);
         }
-      } else if (cur->pixelFormat == VideoMode::kYUYV) {
+      } else if (cur->pixelFormat == VideoMode::YUYV) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
+                GetExistingImage(cur->width, cur->height, VideoMode::BGR)) {
           cur = newImage;
         } else {
           cur = ConvertYUYVToBGR(cur);
         }
-      } else if (cur->pixelFormat == VideoMode::kUYVY) {
+      } else if (cur->pixelFormat == VideoMode::UYVY) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
+                GetExistingImage(cur->width, cur->height, VideoMode::BGR)) {
           cur = newImage;
         } else {
           cur = ConvertUYVYToBGR(cur);
         }
-      } else if (cur->pixelFormat == VideoMode::kGray) {
+      } else if (cur->pixelFormat == VideoMode::GRAY) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
+                GetExistingImage(cur->width, cur->height, VideoMode::BGR)) {
           cur = newImage;
         } else {
           cur = ConvertGrayToBGR(cur);
         }
-      } else if (cur->pixelFormat == VideoMode::kY16) {
+      } else if (cur->pixelFormat == VideoMode::Y16) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
+                GetExistingImage(cur->width, cur->height, VideoMode::BGR)) {
           cur = newImage;
         } else if (Image* newImage = GetExistingImage(cur->width, cur->height,
-                                                      VideoMode::kGray)) {
+                                                      VideoMode::GRAY)) {
           cur = ConvertGrayToBGR(newImage);
         } else {
           cur = ConvertGrayToBGR(ConvertY16ToGray(cur));
         }
       }
       return ConvertBGRToBGRA(cur);
-    case VideoMode::kYUYV:
-    case VideoMode::kUYVY:
+    case VideoMode::YUYV:
+    case VideoMode::UYVY:
     default:
       return nullptr;  // Unsupported
   }
 
   // Compress if destination is JPEG
-  if (pixelFormat == VideoMode::kMJPEG) {
+  if (pixelFormat == VideoMode::MJPEG) {
     cur = ConvertBGRToMJPEG(cur, defaultJpegQuality);
   }
 
@@ -381,13 +381,13 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
 }
 
 Image* Frame::ConvertMJPEGToBGR(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kMJPEG) {
+  if (!image || image->pixelFormat != VideoMode::MJPEG) {
     return nullptr;
   }
 
   // Allocate an BGR image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kBGR, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::BGR, image->width, image->height,
                                 image->width * image->height * 3);
 
   // Decode
@@ -404,13 +404,13 @@ Image* Frame::ConvertMJPEGToBGR(Image* image) {
 }
 
 Image* Frame::ConvertMJPEGToGray(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kMJPEG) {
+  if (!image || image->pixelFormat != VideoMode::MJPEG) {
     return nullptr;
   }
 
   // Allocate an grayscale image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::GRAY, image->width, image->height,
                                 image->width * image->height);
 
   // Decode
@@ -427,13 +427,13 @@ Image* Frame::ConvertMJPEGToGray(Image* image) {
 }
 
 Image* Frame::ConvertYUYVToBGR(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kYUYV) {
+  if (!image || image->pixelFormat != VideoMode::YUYV) {
     return nullptr;
   }
 
   // Allocate a BGR image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kBGR, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::BGR, image->width, image->height,
                                 image->width * image->height * 3);
 
   // Convert
@@ -449,13 +449,13 @@ Image* Frame::ConvertYUYVToBGR(Image* image) {
 }
 
 Image* Frame::ConvertYUYVToGray(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kYUYV) {
+  if (!image || image->pixelFormat != VideoMode::YUYV) {
     return nullptr;
   }
 
   // Allocate a grayscale image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::GRAY, image->width, image->height,
                                 image->width * image->height);
 
   // Convert
@@ -471,13 +471,13 @@ Image* Frame::ConvertYUYVToGray(Image* image) {
 }
 
 Image* Frame::ConvertUYVYToBGR(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kUYVY) {
+  if (!image || image->pixelFormat != VideoMode::UYVY) {
     return nullptr;
   }
 
   // Allocate a BGR image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kBGR, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::BGR, image->width, image->height,
                                 image->width * image->height * 3);
 
   // Convert
@@ -493,13 +493,13 @@ Image* Frame::ConvertUYVYToBGR(Image* image) {
 }
 
 Image* Frame::ConvertUYVYToGray(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kUYVY) {
+  if (!image || image->pixelFormat != VideoMode::UYVY) {
     return nullptr;
   }
 
   // Allocate a grayscale image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::GRAY, image->width, image->height,
                                 image->width * image->height);
 
   // Convert
@@ -515,13 +515,13 @@ Image* Frame::ConvertUYVYToGray(Image* image) {
 }
 
 Image* Frame::ConvertBGRToRGB565(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kBGR) {
+  if (!image || image->pixelFormat != VideoMode::BGR) {
     return nullptr;
   }
 
   // Allocate a RGB565 image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kRGB565, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::RGB565, image->width, image->height,
                                 image->width * image->height * 2);
 
   // Convert
@@ -537,13 +537,13 @@ Image* Frame::ConvertBGRToRGB565(Image* image) {
 }
 
 Image* Frame::ConvertRGB565ToBGR(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kRGB565) {
+  if (!image || image->pixelFormat != VideoMode::RGB565) {
     return nullptr;
   }
 
   // Allocate a BGR image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kBGR, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::BGR, image->width, image->height,
                                 image->width * image->height * 3);
 
   // Convert
@@ -559,13 +559,13 @@ Image* Frame::ConvertRGB565ToBGR(Image* image) {
 }
 
 Image* Frame::ConvertBGRToGray(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kBGR) {
+  if (!image || image->pixelFormat != VideoMode::BGR) {
     return nullptr;
   }
 
   // Allocate a Grayscale image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::GRAY, image->width, image->height,
                                 image->width * image->height);
 
   // Convert
@@ -581,13 +581,13 @@ Image* Frame::ConvertBGRToGray(Image* image) {
 }
 
 Image* Frame::ConvertGrayToBGR(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kGray) {
+  if (!image || image->pixelFormat != VideoMode::GRAY) {
     return nullptr;
   }
 
   // Allocate a BGR image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kBGR, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::BGR, image->width, image->height,
                                 image->width * image->height * 3);
 
   // Convert
@@ -603,7 +603,7 @@ Image* Frame::ConvertGrayToBGR(Image* image) {
 }
 
 Image* Frame::ConvertBGRToMJPEG(Image* image, int quality) {
-  if (!image || image->pixelFormat != VideoMode::kBGR) {
+  if (!image || image->pixelFormat != VideoMode::BGR) {
     return nullptr;
   }
   if (!m_impl) {
@@ -618,7 +618,7 @@ Image* Frame::ConvertBGRToMJPEG(Image* image, int quality) {
   // this is a little bit more conservative in assuming 50% space savings over
   // the equivalent BGR image.
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kMJPEG, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::MJPEG, image->width, image->height,
                                 image->width * image->height * 1.5);
 
   // Compress
@@ -638,7 +638,7 @@ Image* Frame::ConvertBGRToMJPEG(Image* image, int quality) {
 }
 
 Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
-  if (!image || image->pixelFormat != VideoMode::kGray) {
+  if (!image || image->pixelFormat != VideoMode::GRAY) {
     return nullptr;
   }
   if (!m_impl) {
@@ -653,7 +653,7 @@ Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
   // this is a little bit more conservative in assuming 25% space savings over
   // the equivalent grayscale image.
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kMJPEG, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::MJPEG, image->width, image->height,
                                 image->width * image->height * 0.75);
 
   // Compress
@@ -673,13 +673,13 @@ Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
 }
 
 Image* Frame::ConvertGrayToY16(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kGray) {
+  if (!image || image->pixelFormat != VideoMode::GRAY) {
     return nullptr;
   }
 
   // Allocate a Y16 image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kY16, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::Y16, image->width, image->height,
                                 image->width * image->height * 2);
 
   // Convert with linear scaling
@@ -695,13 +695,13 @@ Image* Frame::ConvertGrayToY16(Image* image) {
 }
 
 Image* Frame::ConvertY16ToGray(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kY16) {
+  if (!image || image->pixelFormat != VideoMode::Y16) {
     return nullptr;
   }
 
   // Allocate a Grayscale image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::GRAY, image->width, image->height,
                                 image->width * image->height);
 
   // Scale min to 0 and max to 255
@@ -717,13 +717,13 @@ Image* Frame::ConvertY16ToGray(Image* image) {
 }
 
 Image* Frame::ConvertBGRToBGRA(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kBGR) {
+  if (!image || image->pixelFormat != VideoMode::BGR) {
     return nullptr;
   }
 
   // Allocate a RGB565 image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kBGRA, image->width, image->height,
+      m_impl->source.AllocImage(VideoMode::BGRA, image->width, image->height,
                                 image->width * image->height * 4);
 
   // Convert
@@ -759,7 +759,7 @@ Image* Frame::GetImageImpl(int width, int height,
   // anything else with it.  Note that if the destination format is JPEG, we
   // still need to do this (unless the width/height/compression were the same,
   // in which case we already returned the existing JPEG above).
-  if (cur->pixelFormat == VideoMode::kMJPEG) {
+  if (cur->pixelFormat == VideoMode::MJPEG) {
     cur = ConvertMJPEGToBGR(cur);
   }
 
@@ -809,7 +809,7 @@ std::unique_ptr<Image> CreateImageFromBGRA(cs::SourceImpl* source, size_t width,
   cv::Mat finalImage{static_cast<int>(height), static_cast<int>(width), CV_8UC4,
                      const_cast<uint8_t*>(data), stride};
   std::unique_ptr<Image> dest = source->AllocImage(
-      VideoMode::PixelFormat::kBGR, width, height, width * height * 3);
+      VideoMode::PixelFormat::BGR, width, height, width * height * 3);
   cv::cvtColor(finalImage, dest->AsMat(), cv::COLOR_BGRA2BGR);
   return dest;
 }

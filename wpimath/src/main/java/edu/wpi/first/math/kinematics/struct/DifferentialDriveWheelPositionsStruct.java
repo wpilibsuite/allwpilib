@@ -22,7 +22,7 @@ public class DifferentialDriveWheelPositionsStruct
 
   @Override
   public int getSize() {
-    return kSizeDouble * 2;
+    return SIZE_DOUBLE * 2;
   }
 
   @Override

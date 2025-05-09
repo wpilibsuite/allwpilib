@@ -10,15 +10,15 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 Arm::Arm() {
-  m_encoder.SetDistancePerPulse(kArmEncoderDistPerPulse);
+  m_encoder.SetDistancePerPulse(ARM_ENCODER_DIST_PER_PULSE);
 
   // Put Mechanism 2d to SmartDashboard
   frc::SmartDashboard::PutData("Arm Sim", &m_mech2d);
 
-  // Set the Arm position setpoint and P constant to Preferences if the keys
+  // Set the Arm position setpoint and kP constant to Preferences if the keys
   // don't already exist
-  frc::Preferences::InitDouble(kArmPositionKey, m_armSetpoint.value());
-  frc::Preferences::InitDouble(kArmPKey, m_armKp);
+  frc::Preferences::InitDouble(ARM_POSITION_KEY, m_armSetpoint.value());
+  frc::Preferences::InitDouble(ARM_P_KEY, m_armKp);
 }
 
 void Arm::SimulationPeriodic() {
@@ -44,9 +44,9 @@ void Arm::SimulationPeriodic() {
 void Arm::LoadPreferences() {
   // Read Preferences for Arm setpoint and kP on entering Teleop
   m_armSetpoint = units::degree_t{
-      frc::Preferences::GetDouble(kArmPositionKey, m_armSetpoint.value())};
-  if (m_armKp != frc::Preferences::GetDouble(kArmPKey, m_armKp)) {
-    m_armKp = frc::Preferences::GetDouble(kArmPKey, m_armKp);
+      frc::Preferences::GetDouble(ARM_POSITION_KEY, m_armSetpoint.value())};
+  if (m_armKp != frc::Preferences::GetDouble(ARM_P_KEY, m_armKp)) {
+    m_armKp = frc::Preferences::GetDouble(ARM_P_KEY, m_armKp);
     m_controller.SetP(m_armKp);
   }
 }

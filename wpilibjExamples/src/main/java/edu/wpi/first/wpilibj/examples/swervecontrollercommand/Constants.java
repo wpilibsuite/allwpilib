@@ -19,98 +19,98 @@ import edu.wpi.first.wpilibj.TimedRobot;
  */
 public final class Constants {
   public static final class DriveConstants {
-    public static final int kFrontLeftDriveMotorPort = 0;
-    public static final int kRearLeftDriveMotorPort = 2;
-    public static final int kFrontRightDriveMotorPort = 4;
-    public static final int kRearRightDriveMotorPort = 6;
+    public static final int FRONT_LEFT_DRIVE_MOTOR_PORT = 0;
+    public static final int REAR_LEFT_DRIVE_MOTOR_PORT = 2;
+    public static final int FRONT_RIGHT_DRIVE_MOTOR_PORT = 4;
+    public static final int REAR_RIGHT_DRIVE_MOTOR_PORT = 6;
 
-    public static final int kFrontLeftTurningMotorPort = 1;
-    public static final int kRearLeftTurningMotorPort = 3;
-    public static final int kFrontRightTurningMotorPort = 5;
-    public static final int kRearRightTurningMotorPort = 7;
+    public static final int FRONT_LEFT_TURNING_MOTOR_PORT = 1;
+    public static final int REAR_LEFT_TURNING_MOTOR_PORT = 3;
+    public static final int FRONT_RIGHT_TURNING_MOTOR_PORT = 5;
+    public static final int REAR_RIGHT_TURNING_MOTOR_PORT = 7;
 
-    public static final int[] kFrontLeftTurningEncoderPorts = new int[] {0, 1};
-    public static final int[] kRearLeftTurningEncoderPorts = new int[] {2, 3};
-    public static final int[] kFrontRightTurningEncoderPorts = new int[] {4, 5};
-    public static final int[] kRearRightTurningEncoderPorts = new int[] {6, 7};
+    public static final int[] FRONT_LEFT_TURNING_ENCODER_PORTS = new int[] {0, 1};
+    public static final int[] REAR_LEFT_TURNING_ENCODER_PORTS = new int[] {2, 3};
+    public static final int[] FRONT_RIGHT_TURNING_ENCODER_PORTS = new int[] {4, 5};
+    public static final int[] REAR_RIGHT_TURNING_ENCODER_PORTS = new int[] {6, 7};
 
-    public static final boolean kFrontLeftTurningEncoderReversed = false;
-    public static final boolean kRearLeftTurningEncoderReversed = true;
-    public static final boolean kFrontRightTurningEncoderReversed = false;
-    public static final boolean kRearRightTurningEncoderReversed = true;
+    public static final boolean FRONT_LEFT_TURNING_ENCODER_REVERSED = false;
+    public static final boolean REAR_LEFT_TURNING_ENCODER_REVERSED = true;
+    public static final boolean FRONT_RIGHT_TURNING_ENCODER_REVERSED = false;
+    public static final boolean REAR_RIGHT_TURNING_ENCODER_REVERSED = true;
 
-    public static final int[] kFrontLeftDriveEncoderPorts = new int[] {8, 9};
-    public static final int[] kRearLeftDriveEncoderPorts = new int[] {10, 11};
-    public static final int[] kFrontRightDriveEncoderPorts = new int[] {12, 13};
-    public static final int[] kRearRightDriveEncoderPorts = new int[] {14, 15};
+    public static final int[] FRONT_LEFT_DRIVE_ENCODER_PORTS = new int[] {8, 9};
+    public static final int[] REAR_LEFT_DRIVE_ENCODER_PORTS = new int[] {10, 11};
+    public static final int[] FRONT_RIGHT_DRIVE_ENCODER_PORTS = new int[] {12, 13};
+    public static final int[] REAR_RIGHT_DRIVE_ENCODER_PORTS = new int[] {14, 15};
 
-    public static final boolean kFrontLeftDriveEncoderReversed = false;
-    public static final boolean kRearLeftDriveEncoderReversed = true;
-    public static final boolean kFrontRightDriveEncoderReversed = false;
-    public static final boolean kRearRightDriveEncoderReversed = true;
+    public static final boolean FRONT_LEFT_DRIVE_ENCODER_REVERSED = false;
+    public static final boolean REAR_LEFT_DRIVE_ENCODER_REVERSED = true;
+    public static final boolean FRONT_RIGHT_DRIVE_ENCODER_REVERSED = false;
+    public static final boolean REAR_RIGHT_DRIVE_ENCODER_REVERSED = true;
 
     // If you call DriveSubsystem.drive() with a different period make sure to update this.
-    public static final double kDrivePeriod = TimedRobot.kDefaultPeriod;
+    public static final double DRIVE_PERIOD = TimedRobot.DEFAULT_PERIOD;
 
-    public static final double kTrackwidth = 0.5;
+    public static final double TRACK_WIDTH = 0.5;
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = 0.7;
+    public static final double WHEEL_BASE = 0.7;
     // Distance between front and back wheels on robot
-    public static final SwerveDriveKinematics kDriveKinematics =
+    public static final SwerveDriveKinematics DRIVE_KINEMATICS =
         new SwerveDriveKinematics(
-            new Translation2d(kWheelBase / 2, kTrackwidth / 2),
-            new Translation2d(kWheelBase / 2, -kTrackwidth / 2),
-            new Translation2d(-kWheelBase / 2, kTrackwidth / 2),
-            new Translation2d(-kWheelBase / 2, -kTrackwidth / 2));
+            new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
+            new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+            new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
+            new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
-    public static final boolean kGyroReversed = false;
+    public static final boolean GYRO_REVERSED = false;
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
     // for *your* robot's drive.
     // The SysId tool provides a convenient method for obtaining these values for your robot.
-    public static final double ks = 1; // V
-    public static final double kv = 0.8; // V/(m/s)
-    public static final double ka = 0.15; // V/(m/s²)
+    public static final double S = 1; // V
+    public static final double V = 0.8; // V/(m/s)
+    public static final double A = 0.15; // V/(m/s²)
 
-    public static final double kMaxSpeed = 3; // m/s
+    public static final double MAX_SPEED = 3; // m/s
   }
 
   public static final class ModuleConstants {
-    public static final double kMaxModuleAngularSpeed = 2 * Math.PI; // rad/s
-    public static final double kMaxModuleAngularAcceleration = 2 * Math.PI; // rad/s²
+    public static final double MAX_MODULE_ANGULAR_SPEED = 2 * Math.PI; // rad/s
+    public static final double MAX_MODULE_ANGULAR_ACCELERATION = 2 * Math.PI; // rad/s²
 
-    public static final int kEncoderCPR = 1024;
-    public static final double kWheelDiameter = 0.15; // m
-    public static final double kDriveEncoderDistancePerPulse =
+    public static final int ENCODER_CPR = 1024;
+    public static final double WHEEL_DIAMETER = 0.15; // m
+    public static final double DRIVE_ENCODER_DISTANCE_PER_PULSE =
         // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelDiameter * Math.PI) / kEncoderCPR;
+        (WHEEL_DIAMETER * Math.PI) / ENCODER_CPR;
 
-    public static final double kTurningEncoderDistancePerPulse =
+    public static final double TURNING_ENCODER_DISTANCE_PER_PULSE =
         // Assumes the encoders are on a 1:1 reduction with the module shaft.
-        (2 * Math.PI) / kEncoderCPR;
+        (2 * Math.PI) / ENCODER_CPR;
 
-    public static final double kPModuleTurningController = 1;
+    public static final double MODULE_TURNING_CONTROLLER_P = 1;
 
-    public static final double kPModuleDriveController = 1;
+    public static final double MODULE_DRIVE_CONTROLLER_P = 1;
   }
 
   public static final class OIConstants {
-    public static final int kDriverControllerPort = 0;
+    public static final int DRIVER_CONTROLLER_PORT = 0;
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeed = 3; // m/s
-    public static final double kMaxAcceleration = 3; // m/s²
-    public static final double kMaxAngularSpeed = Math.PI; // rad/s
-    public static final double kMaxAngularAcceleration = Math.PI; // rad/s²
+    public static final double MAX_SPEED = 3; // m/s
+    public static final double MAX_ACCELERATION = 3; // m/s²
+    public static final double MAX_ANGULAR_SPEED = Math.PI; // rad/s
+    public static final double MAX_ANGULAR_ACCELERATION = Math.PI; // rad/s²
 
-    public static final double kPXController = 1;
-    public static final double kPYController = 1;
-    public static final double kPThetaController = 1;
+    public static final double X_CONTROLLER_P = 1;
+    public static final double Y_CONTROLLER_P = 1;
+    public static final double THETA_CONTROLLER_P = 1;
 
     // Constraint for the motion profiled robot angle controller
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-        new TrapezoidProfile.Constraints(kMaxAngularSpeed, kMaxAngularAcceleration);
+    public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
+        new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCELERATION);
   }
 }

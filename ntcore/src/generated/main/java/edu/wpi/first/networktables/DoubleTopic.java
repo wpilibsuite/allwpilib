@@ -9,7 +9,7 @@ package edu.wpi.first.networktables;
 /** NetworkTables Double topic. */
 public final class DoubleTopic extends Topic {
   /** The default type string for this topic type. */
-  public static final String kTypeString = "double";
+  public static final String TYPE_STRING = "double";
 
   /**
    * Construct from a generic topic.
@@ -51,7 +51,7 @@ public final class DoubleTopic extends Topic {
     return new DoubleEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kDouble.getValue(),
+            m_handle, NetworkTableType.DOUBLE.getValue(),
             "double", options),
         defaultValue);
   }
@@ -79,7 +79,7 @@ public final class DoubleTopic extends Topic {
     return new DoubleEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kDouble.getValue(),
+            m_handle, NetworkTableType.DOUBLE.getValue(),
             typeString, options),
         defaultValue);
   }
@@ -104,7 +104,7 @@ public final class DoubleTopic extends Topic {
     return new DoubleEntryImpl(
         this,
         NetworkTablesJNI.publish(
-            m_handle, NetworkTableType.kDouble.getValue(),
+            m_handle, NetworkTableType.DOUBLE.getValue(),
             "double", options),
         0);
   }
@@ -134,7 +134,7 @@ public final class DoubleTopic extends Topic {
     return new DoubleEntryImpl(
         this,
         NetworkTablesJNI.publishEx(
-            m_handle, NetworkTableType.kDouble.getValue(),
+            m_handle, NetworkTableType.DOUBLE.getValue(),
             typeString, properties, options),
         0);
   }
@@ -165,7 +165,7 @@ public final class DoubleTopic extends Topic {
     return new DoubleEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kDouble.getValue(),
+            m_handle, NetworkTableType.DOUBLE.getValue(),
             "double", options),
         defaultValue);
   }
@@ -198,7 +198,7 @@ public final class DoubleTopic extends Topic {
     return new DoubleEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kDouble.getValue(),
+            m_handle, NetworkTableType.DOUBLE.getValue(),
             typeString, options),
         defaultValue);
   }

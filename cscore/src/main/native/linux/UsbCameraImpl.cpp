@@ -51,13 +51,13 @@ constexpr inline size_t array_lengthof(T (&)[N]) {
 }
 }  // namespace
 
-static constexpr char const* kPropWbAuto = "white_balance_temperature_auto";
-static constexpr char const* kPropWbValue = "white_balance_temperature";
-static constexpr char const* kPropExAuto = "exposure_auto";
-static constexpr char const* kPropExValue = "exposure_absolute";
-static constexpr char const* kPropBrValue = "brightness";
-static constexpr char const* kPropConnectVerbose = "connect_verbose";
-static constexpr unsigned kPropConnectVerboseId = 0;
+static constexpr char const* PROP_WB_AUTO = "white_balance_temperature_auto";
+static constexpr char const* PROP_WB_VALUE = "white_balance_temperature";
+static constexpr char const* PROP_EX_AUTO = "exposure_auto";
+static constexpr char const* PROP_EX_VALUE = "exposure_absolute";
+static constexpr char const* PROP_BR_VALUE = "brightness";
+static constexpr char const* PROP_CONNECT_VERBOSE = "connect_verbose";
+static constexpr unsigned PROP_CONNECT_VERBOSE_ID = 0;
 
 // Conversions v4l2_fract time per frame from/to frames per second (fps)
 static inline int FractToFPS(const struct v4l2_fract& timeperframe) {
@@ -75,44 +75,44 @@ static inline struct v4l2_fract FPSToFract(int fps) {
 static VideoMode::PixelFormat ToPixelFormat(__u32 pixelFormat) {
   switch (pixelFormat) {
     case V4L2_PIX_FMT_MJPEG:
-      return VideoMode::kMJPEG;
+      return VideoMode::MJPEG;
     case V4L2_PIX_FMT_YUYV:
-      return VideoMode::kYUYV;
+      return VideoMode::YUYV;
     case V4L2_PIX_FMT_RGB565:
-      return VideoMode::kRGB565;
+      return VideoMode::RGB565;
     case V4L2_PIX_FMT_BGR24:
-      return VideoMode::kBGR;
+      return VideoMode::BGR;
     case V4L2_PIX_FMT_ABGR32:
-      return VideoMode::kBGRA;
+      return VideoMode::BGRA;
     case V4L2_PIX_FMT_GREY:
-      return VideoMode::kGray;
+      return VideoMode::GRAY;
     case V4L2_PIX_FMT_Y16:
-      return VideoMode::kY16;
+      return VideoMode::Y16;
     case V4L2_PIX_FMT_UYVY:
-      return VideoMode::kUYVY;
+      return VideoMode::UYVY;
     default:
-      return VideoMode::kUnknown;
+      return VideoMode::UNKNOWN;
   }
 }
 
 // Conversion from VideoMode::PixelFormat to v4l2_format pixelformat
 static __u32 FromPixelFormat(VideoMode::PixelFormat pixelFormat) {
   switch (pixelFormat) {
-    case VideoMode::kMJPEG:
+    case VideoMode::MJPEG:
       return V4L2_PIX_FMT_MJPEG;
-    case VideoMode::kYUYV:
+    case VideoMode::YUYV:
       return V4L2_PIX_FMT_YUYV;
-    case VideoMode::kRGB565:
+    case VideoMode::RGB565:
       return V4L2_PIX_FMT_RGB565;
-    case VideoMode::kBGR:
+    case VideoMode::BGR:
       return V4L2_PIX_FMT_BGR24;
-    case VideoMode::kBGRA:
+    case VideoMode::BGRA:
       return V4L2_PIX_FMT_ABGR32;
-    case VideoMode::kGray:
+    case VideoMode::GRAY:
       return V4L2_PIX_FMT_GREY;
-    case VideoMode::kY16:
+    case VideoMode::Y16:
       return V4L2_PIX_FMT_Y16;
-    case VideoMode::kUYVY:
+    case VideoMode::UYVY:
       return V4L2_PIX_FMT_UYVY;
     default:
       return 0;
@@ -345,9 +345,9 @@ UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::Logger& logger,
   SetDescription(GetDescriptionImpl(m_path.c_str()));
   SetQuirks();
 
-  CreateProperty(kPropConnectVerbose, [] {
-    return std::make_unique<UsbCameraProperty>(kPropConnectVerbose,
-                                               kPropConnectVerboseId,
+  CreateProperty(PROP_CONNECT_VERBOSE, [] {
+    return std::make_unique<UsbCameraProperty>(PROP_CONNECT_VERBOSE,
+                                               PROP_CONNECT_VERBOSE_ID,
                                                CS_PROP_INTEGER, 0, 1, 1, 1, 1);
   });
 }
@@ -360,7 +360,7 @@ UsbCameraImpl::~UsbCameraImpl() {
 
   // Send message to wake up thread; select timeout will wake us up anyway,
   // but this speeds shutdown.
-  Send(Message{Message::kNone});
+  Send(Message{Message::NONE});
 
   // join camera thread
   if (m_cameraThread.joinable()) {
@@ -538,7 +538,7 @@ void UsbCameraImpl::CameraThreadMain() {
       if ((buf.flags & V4L2_BUF_FLAG_ERROR) == 0) {
         SDEBUG4("got image size={} index={}", buf.bytesused, buf.index);
 
-        if (buf.index >= kNumBuffers || !m_buffers[buf.index].m_data) {
+        if (buf.index >= NUM_BUFFERS || !m_buffers[buf.index].m_data) {
           SWARNING("invalid buffer {}", buf.index);
           continue;
         }
@@ -549,7 +549,7 @@ void UsbCameraImpl::CameraThreadMain() {
         int width = m_mode.width;
         int height = m_mode.height;
         bool good = true;
-        if (m_mode.pixelFormat == VideoMode::kMJPEG &&
+        if (m_mode.pixelFormat == VideoMode::MJPEG &&
             !GetJpegSize(image, &width, &height)) {
           SWARNING("invalid JPEG image received from camera");
           good = false;
@@ -627,7 +627,7 @@ void UsbCameraImpl::DeviceDisconnect() {
   }
 
   // Unmap buffers
-  for (int i = 0; i < kNumBuffers; ++i) {
+  for (int i = 0; i < NUM_BUFFERS; ++i) {
     m_buffers[i] = UsbCameraBuffer{};
   }
 
@@ -701,7 +701,7 @@ void UsbCameraImpl::DeviceConnect() {
   SDEBUG3("allocating buffers");
   struct v4l2_requestbuffers rb;
   std::memset(&rb, 0, sizeof(rb));
-  rb.count = kNumBuffers;
+  rb.count = NUM_BUFFERS;
   rb.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   rb.memory = V4L2_MEMORY_MMAP;
   if (DoIoctl(fd, VIDIOC_REQBUFS, &rb) != 0) {
@@ -713,7 +713,7 @@ void UsbCameraImpl::DeviceConnect() {
 
   // Map buffers
   SDEBUG3("mapping buffers");
-  for (int i = 0; i < kNumBuffers; ++i) {
+  for (int i = 0; i < NUM_BUFFERS; ++i) {
     struct v4l2_buffer buf;
     std::memset(&buf, 0, sizeof(buf));
     buf.index = i;
@@ -763,7 +763,7 @@ bool UsbCameraImpl::DeviceStreamOn() {
 
   // Queue buffers
   SDEBUG3("queuing buffers");
-  for (int i = 0; i < kNumBuffers; ++i) {
+  for (int i = 0; i < NUM_BUFFERS; ++i) {
     struct v4l2_buffer buf;
     std::memset(&buf, 0, sizeof(buf));
     buf.index = i;
@@ -815,7 +815,7 @@ bool UsbCameraImpl::DeviceStreamOff() {
 CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
     std::unique_lock<wpi::mutex>& lock, const Message& msg) {
   VideoMode newMode;
-  if (msg.kind == Message::kCmdSetMode) {
+  if (msg.kind == Message::CMD_SET_MODE) {
     newMode.pixelFormat = msg.data[0];
     newMode.width = msg.data[1];
     newMode.height = msg.data[2];
@@ -823,16 +823,16 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
     m_modeSetPixelFormat = true;
     m_modeSetResolution = true;
     m_modeSetFPS = true;
-  } else if (msg.kind == Message::kCmdSetPixelFormat) {
+  } else if (msg.kind == Message::CMD_SET_PIXEL_FORMAT) {
     newMode = m_mode;
     newMode.pixelFormat = msg.data[0];
     m_modeSetPixelFormat = true;
-  } else if (msg.kind == Message::kCmdSetResolution) {
+  } else if (msg.kind == Message::CMD_SET_RESOLUTION) {
     newMode = m_mode;
     newMode.width = msg.data[0];
     newMode.height = msg.data[1];
     m_modeSetResolution = true;
-  } else if (msg.kind == Message::kCmdSetFPS) {
+  } else if (msg.kind == Message::CMD_SET_FPS) {
     newMode = m_mode;
     newMode.fps = msg.data[0];
     m_modeSetFPS = true;
@@ -878,7 +878,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
 
 CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
     std::unique_lock<wpi::mutex>& lock, const Message& msg) {
-  bool setString = (msg.kind == Message::kCmdSetPropertyStr);
+  bool setString = (msg.kind == Message::CMD_SET_PROPERTY_STR);
   int property = msg.data[0];
   int value = msg.data[1];
   std::string_view valueStr = msg.dataStr;
@@ -920,7 +920,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
 
   // Actually set the new value on the device (if possible)
   if (!prop->device) {
-    if (prop->id == kPropConnectVerboseId) {
+    if (prop->id == PROP_CONNECT_VERBOSE_ID) {
       m_connectVerbose = value;
     }
   } else {
@@ -961,18 +961,18 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetPath(
 
 CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
     std::unique_lock<wpi::mutex>& lock, const Message& msg) {
-  if (msg.kind == Message::kCmdSetMode ||
-      msg.kind == Message::kCmdSetPixelFormat ||
-      msg.kind == Message::kCmdSetResolution ||
-      msg.kind == Message::kCmdSetFPS) {
+  if (msg.kind == Message::CMD_SET_MODE ||
+      msg.kind == Message::CMD_SET_PIXEL_FORMAT ||
+      msg.kind == Message::CMD_SET_RESOLUTION ||
+      msg.kind == Message::CMD_SET_FPS) {
     return DeviceCmdSetMode(lock, msg);
-  } else if (msg.kind == Message::kCmdSetProperty ||
-             msg.kind == Message::kCmdSetPropertyStr) {
+  } else if (msg.kind == Message::CMD_SET_PROPERTY ||
+             msg.kind == Message::CMD_SET_PROPERTY_STR) {
     return DeviceCmdSetProperty(lock, msg);
-  } else if (msg.kind == Message::kNumSinksChanged ||
-             msg.kind == Message::kNumSinksEnabledChanged) {
+  } else if (msg.kind == Message::NUM_SINKS_CHANGED ||
+             msg.kind == Message::NUM_SINKS_ENABLED_CHANGED) {
     return CS_OK;
-  } else if (msg.kind == Message::kCmdSetPath) {
+  } else if (msg.kind == Message::CMD_SET_PATH) {
     return DeviceCmdSetPath(lock, msg);
   } else {
     return CS_OK;
@@ -989,8 +989,8 @@ void UsbCameraImpl::DeviceProcessCommands() {
     m_commands.pop_back();
 
     CS_StatusValue status = DeviceProcessCommand(lock, msg);
-    if (msg.kind != Message::kNumSinksChanged &&
-        msg.kind != Message::kNumSinksEnabledChanged) {
+    if (msg.kind != Message::NUM_SINKS_CHANGED &&
+        msg.kind != Message::NUM_SINKS_ENABLED_CHANGED) {
       m_responses.emplace_back(msg.from, status);
     }
   }
@@ -1074,7 +1074,7 @@ void UsbCameraImpl::DeviceCacheMode() {
   if (DoIoctl(fd, VIDIOC_G_FMT, &vfmt) != 0) {
     SERROR("could not read current video mode");
     std::scoped_lock lock(m_mutex);
-    m_mode = VideoMode{VideoMode::kMJPEG, 320, 240, 30};
+    m_mode = VideoMode{VideoMode::MJPEG, 320, 240, 30};
     return;
   }
   VideoMode::PixelFormat pixelFormat = ToPixelFormat(vfmt.fmt.pix.pixelformat);
@@ -1103,9 +1103,9 @@ void UsbCameraImpl::DeviceCacheMode() {
     }
   } else {
     // Default to MJPEG
-    if (pixelFormat != VideoMode::kMJPEG) {
+    if (pixelFormat != VideoMode::MJPEG) {
       formatChanged = true;
-      pixelFormat = VideoMode::kMJPEG;
+      pixelFormat = VideoMode::MJPEG;
     }
   }
 
@@ -1315,7 +1315,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   for (fmt.index = 0; TryIoctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0; ++fmt.index) {
     VideoMode::PixelFormat pixelFormat = ToPixelFormat(fmt.pixelformat);
-    if (pixelFormat == VideoMode::kUnknown) {
+    if (pixelFormat == VideoMode::UNKNOWN) {
       continue;
     }
 
@@ -1355,7 +1355,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   // https://picamera.readthedocs.io/en/release-1.10/fov.html
   if (modes.empty() && m_picamera) {
     for (VideoMode::PixelFormat pixelFormat :
-         {VideoMode::kYUYV, VideoMode::kMJPEG, VideoMode::kBGR}) {
+         {VideoMode::YUYV, VideoMode::MJPEG, VideoMode::BGR}) {
       modes.emplace_back(pixelFormat, 1920, 1080, 30);
       modes.emplace_back(pixelFormat, 2592, 1944, 15);
       modes.emplace_back(pixelFormat, 1296, 972, 42);
@@ -1441,7 +1441,7 @@ std::unique_ptr<PropertyImpl> UsbCameraImpl::CreateEmptyProperty(
 
 bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
   // Wake up camera thread; this will try to reconnect
-  *status = SendAndWait(Message{Message::kNone});
+  *status = SendAndWait(Message{Message::NONE});
   if (*status != CS_OK) {
     return false;
   }
@@ -1470,7 +1470,7 @@ void UsbCameraImpl::SetQuirks() {
 }
 
 void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
-  Message msg{Message::kCmdSetProperty};
+  Message msg{Message::CMD_SET_PROPERTY};
   msg.data[0] = property;
   msg.data[1] = value;
   *status = SendAndWait(std::move(msg));
@@ -1478,7 +1478,7 @@ void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
 
 void UsbCameraImpl::SetStringProperty(int property, std::string_view value,
                                       CS_Status* status) {
-  Message msg{Message::kCmdSetPropertyStr};
+  Message msg{Message::CMD_SET_PROPERTY_STR};
   msg.data[0] = property;
   msg.dataStr = value;
   *status = SendAndWait(std::move(msg));
@@ -1490,24 +1490,24 @@ void UsbCameraImpl::SetBrightness(int brightness, CS_Status* status) {
   } else if (brightness < 0) {
     brightness = 0;
   }
-  SetProperty(GetPropertyIndex(kPropBrValue), brightness, status);
+  SetProperty(GetPropertyIndex(PROP_BR_VALUE), brightness, status);
 }
 
 int UsbCameraImpl::GetBrightness(CS_Status* status) const {
-  return GetProperty(GetPropertyIndex(kPropBrValue), status);
+  return GetProperty(GetPropertyIndex(PROP_BR_VALUE), status);
 }
 
 void UsbCameraImpl::SetWhiteBalanceAuto(CS_Status* status) {
-  SetProperty(GetPropertyIndex(kPropWbAuto), 1, status);  // auto
+  SetProperty(GetPropertyIndex(PROP_WB_AUTO), 1, status);  // auto
 }
 
 void UsbCameraImpl::SetWhiteBalanceHoldCurrent(CS_Status* status) {
-  SetProperty(GetPropertyIndex(kPropWbAuto), 0, status);  // manual
+  SetProperty(GetPropertyIndex(PROP_WB_AUTO), 0, status);  // manual
 }
 
 void UsbCameraImpl::SetWhiteBalanceManual(int value, CS_Status* status) {
-  SetProperty(GetPropertyIndex(kPropWbAuto), 0, status);  // manual
-  SetProperty(GetPropertyIndex(kPropWbValue), value, status);
+  SetProperty(GetPropertyIndex(PROP_WB_AUTO), 0, status);  // manual
+  SetProperty(GetPropertyIndex(PROP_WB_VALUE), value, status);
 }
 
 void UsbCameraImpl::SetExposureAuto(CS_Status* status) {
@@ -1519,7 +1519,7 @@ void UsbCameraImpl::SetExposureAuto(CS_Status* status) {
     SetProperty(GetPropertyIndex(quirkPiCameraPropExAuto),
                 quirkPiCameraPropExAutoOn, status);
   } else {
-    SetProperty(GetPropertyIndex(kPropExAuto), 3, status);
+    SetProperty(GetPropertyIndex(PROP_EX_AUTO), 3, status);
   }
 }
 
@@ -1531,7 +1531,7 @@ void UsbCameraImpl::SetExposureHoldCurrent(CS_Status* status) {
     SetProperty(GetPropertyIndex(quirkPiCameraPropExAuto),
                 quirkPiCameraPropExAutoOff, status);  // manual
   } else {
-    SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
+    SetProperty(GetPropertyIndex(PROP_EX_AUTO), 1, status);  // manual
   }
 }
 
@@ -1543,7 +1543,7 @@ void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
     SetProperty(GetPropertyIndex(quirkPiCameraPropExAuto),
                 quirkPiCameraPropExAutoOff, status);  // manual
   } else {
-    SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
+    SetProperty(GetPropertyIndex(PROP_EX_AUTO), 1, status);  // manual
   }
   if (value > 100) {
     value = 100;
@@ -1555,12 +1555,12 @@ void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
   } else if (m_picamera) {
     SetProperty(GetPropertyIndex(quirkPiCameraPropExValue), value, status);
   } else {
-    SetProperty(GetPropertyIndex(kPropExValue), value, status);
+    SetProperty(GetPropertyIndex(PROP_EX_VALUE), value, status);
   }
 }
 
 bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
-  Message msg{Message::kCmdSetMode};
+  Message msg{Message::CMD_SET_MODE};
   msg.data[0] = mode.pixelFormat;
   msg.data[1] = mode.width;
   msg.data[2] = mode.height;
@@ -1571,14 +1571,14 @@ bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
 
 bool UsbCameraImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
                                    CS_Status* status) {
-  Message msg{Message::kCmdSetPixelFormat};
+  Message msg{Message::CMD_SET_PIXEL_FORMAT};
   msg.data[0] = pixelFormat;
   *status = SendAndWait(std::move(msg));
   return *status == CS_OK;
 }
 
 bool UsbCameraImpl::SetResolution(int width, int height, CS_Status* status) {
-  Message msg{Message::kCmdSetResolution};
+  Message msg{Message::CMD_SET_RESOLUTION};
   msg.data[0] = width;
   msg.data[1] = height;
   *status = SendAndWait(std::move(msg));
@@ -1586,22 +1586,22 @@ bool UsbCameraImpl::SetResolution(int width, int height, CS_Status* status) {
 }
 
 bool UsbCameraImpl::SetFPS(int fps, CS_Status* status) {
-  Message msg{Message::kCmdSetFPS};
+  Message msg{Message::CMD_SET_FPS};
   msg.data[0] = fps;
   *status = SendAndWait(std::move(msg));
   return *status == CS_OK;
 }
 
 void UsbCameraImpl::NumSinksChanged() {
-  Send(Message{Message::kNumSinksChanged});
+  Send(Message{Message::NUM_SINKS_CHANGED});
 }
 
 void UsbCameraImpl::NumSinksEnabledChanged() {
-  Send(Message{Message::kNumSinksEnabledChanged});
+  Send(Message{Message::NUM_SINKS_ENABLED_CHANGED});
 }
 
 void UsbCameraImpl::SetPath(std::string_view path, CS_Status* status) {
-  Message msg{Message::kCmdSetPath};
+  Message msg{Message::CMD_SET_PATH};
   msg.dataStr = path;
   *status = SendAndWait(std::move(msg));
 }

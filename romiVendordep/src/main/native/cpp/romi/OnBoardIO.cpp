@@ -37,7 +37,7 @@ bool OnBoardIO::GetButtonBPressed() {
   auto currentTime = frc::Timer::GetTimestamp();
   if (currentTime > m_nextMessageTime) {
     FRC_ReportError(frc::err::Error, "{}", "Button B was not configured");
-    m_nextMessageTime = currentTime + kMessageInterval;
+    m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
   }
   return false;
 }
@@ -50,7 +50,7 @@ bool OnBoardIO::GetButtonCPressed() {
   auto currentTime = frc::Timer::GetTimestamp();
   if (currentTime > m_nextMessageTime) {
     FRC_ReportError(frc::err::Error, "{}", "Button C was not configured");
-    m_nextMessageTime = currentTime + kMessageInterval;
+    m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
   }
   return false;
 }
@@ -62,7 +62,7 @@ void OnBoardIO::SetGreenLed(bool value) {
     auto currentTime = frc::Timer::GetTimestamp();
     if (currentTime > m_nextMessageTime) {
       FRC_ReportError(frc::err::Error, "{}", "Green LED was not configured");
-      m_nextMessageTime = currentTime + kMessageInterval;
+      m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
     }
   }
 }
@@ -74,7 +74,7 @@ void OnBoardIO::SetRedLed(bool value) {
     auto currentTime = frc::Timer::GetTimestamp();
     if (currentTime > m_nextMessageTime) {
       FRC_ReportError(frc::err::Error, "{}", "Red LED was not configured");
-      m_nextMessageTime = currentTime + kMessageInterval;
+      m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
     }
   }
 }

@@ -49,7 +49,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_CANAPIJNI_cleanCAN
   (JNIEnv* env, jclass, jint handle)
 {
-  if (handle != HAL_kInvalidHandle) {
+  if (handle != HAL_InvalidHandle) {
     HAL_CleanCAN(static_cast<HAL_CANHandle>(handle));
   }
 }

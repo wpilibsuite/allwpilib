@@ -33,7 +33,7 @@ class I2CCommunicationTest : public testing::TestWithParam<T> {
     gString = std::string();
     frc::sim::PauseTiming();
     frc::sim::DriverStationSim::ResetData();
-    m_port = static_cast<int32_t>(Robot::kPort);
+    m_port = static_cast<int32_t>(Robot::PORT);
 
     m_callback = HALSIM_RegisterI2CWriteCallback(m_port, &callback, nullptr);
 
@@ -63,17 +63,17 @@ TEST_P(AllianceTest, Alliance) {
 
   char expected = 'U';
   switch (alliance) {
-    case HAL_AllianceStationID_kBlue1:
-    case HAL_AllianceStationID_kBlue2:
-    case HAL_AllianceStationID_kBlue3:
+    case HAL_AllianceStationID_Blue1:
+    case HAL_AllianceStationID_Blue2:
+    case HAL_AllianceStationID_Blue3:
       expected = 'B';
       break;
-    case HAL_AllianceStationID_kRed1:
-    case HAL_AllianceStationID_kRed2:
-    case HAL_AllianceStationID_kRed3:
+    case HAL_AllianceStationID_Red1:
+    case HAL_AllianceStationID_Red2:
+    case HAL_AllianceStationID_Red3:
       expected = 'R';
       break;
-    case HAL_AllianceStationID_kUnknown:
+    case HAL_AllianceStationID_Unknown:
       expected = 'U';
       break;
   }
@@ -83,25 +83,25 @@ TEST_P(AllianceTest, Alliance) {
 INSTANTIATE_TEST_SUITE_P(
     I2CCommunicationTests, AllianceTest,
     testing::Values<HAL_AllianceStationID>(
-        HAL_AllianceStationID_kRed1, HAL_AllianceStationID_kRed2,
-        HAL_AllianceStationID_kRed3, HAL_AllianceStationID_kBlue1,
-        HAL_AllianceStationID_kBlue2, HAL_AllianceStationID_kBlue3,
-        HAL_AllianceStationID_kUnknown),
+        HAL_AllianceStationID_Red1, HAL_AllianceStationID_Red2,
+        HAL_AllianceStationID_Red3, HAL_AllianceStationID_Blue1,
+        HAL_AllianceStationID_Blue2, HAL_AllianceStationID_Blue3,
+        HAL_AllianceStationID_Unknown),
     [](const testing::TestParamInfo<AllianceTest::ParamType>& info) {
       switch (info.param) {
-        case HAL_AllianceStationID_kBlue1:
+        case HAL_AllianceStationID_Blue1:
           return std::string{"Blue1"};
-        case HAL_AllianceStationID_kBlue2:
+        case HAL_AllianceStationID_Blue2:
           return std::string{"Blue2"};
-        case HAL_AllianceStationID_kBlue3:
+        case HAL_AllianceStationID_Blue3:
           return std::string{"Blue3"};
-        case HAL_AllianceStationID_kRed1:
+        case HAL_AllianceStationID_Red1:
           return std::string{"Red1"};
-        case HAL_AllianceStationID_kRed2:
+        case HAL_AllianceStationID_Red2:
           return std::string{"Red2"};
-        case HAL_AllianceStationID_kRed3:
+        case HAL_AllianceStationID_Red3:
           return std::string{"Red3"};
-        case HAL_AllianceStationID_kUnknown:
+        case HAL_AllianceStationID_Unknown:
           return std::string{"Unknown"};
       }
       return std::string{"Error"};

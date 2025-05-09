@@ -194,7 +194,7 @@ class StorageImpl {
     return it->second;
   }
   LocalTopic* GetTopicById(int topicId) {
-    return m_topics.Get(Handle{m_inst, topicId, Handle::kTopic});
+    return m_topics.Get(Handle{m_inst, topicId, Handle::TOPIC});
   }
 
   LocalSubscriber* GetSubEntry(NT_Handle subentryHandle);

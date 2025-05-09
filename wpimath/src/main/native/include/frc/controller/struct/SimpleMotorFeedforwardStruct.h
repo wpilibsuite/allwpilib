@@ -29,16 +29,16 @@ struct wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
     using BaseUnit =
         units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
     using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit>;
-    constexpr size_t kKsOff = 0;
-    constexpr size_t kKvOff = kKsOff + 8;
-    constexpr size_t kKaOff = kKvOff + 8;
-    constexpr size_t kDtOff = kKaOff + 8;
-    return {units::volt_t{wpi::UnpackStruct<double, kKsOff>(data)},
+    constexpr size_t KS_OFF = 0;
+    constexpr size_t KV_OFF = KS_OFF + 8;
+    constexpr size_t KA_OFF = KV_OFF + 8;
+    constexpr size_t DT_OFF = KA_OFF + 8;
+    return {units::volt_t{wpi::UnpackStruct<double, KS_OFF>(data)},
             units::unit_t<typename BaseFeedforward::kv_unit>{
-                wpi::UnpackStruct<double, kKvOff>(data)},
+                wpi::UnpackStruct<double, KV_OFF>(data)},
             units::unit_t<typename BaseFeedforward::ka_unit>{
-                wpi::UnpackStruct<double, kKaOff>(data)},
-            units::second_t{wpi::UnpackStruct<double, kDtOff>(data)}};
+                wpi::UnpackStruct<double, KA_OFF>(data)},
+            units::second_t{wpi::UnpackStruct<double, DT_OFF>(data)}};
   }
 
   static void Pack(std::span<uint8_t> data,
@@ -46,18 +46,18 @@ struct wpi::Struct<frc::SimpleMotorFeedforward<Distance>> {
     using BaseUnit =
         units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
     using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit>;
-    constexpr size_t kKsOff = 0;
-    constexpr size_t kKvOff = kKsOff + 8;
-    constexpr size_t kKaOff = kKvOff + 8;
-    constexpr size_t kDtOff = kKaOff + 8;
-    wpi::PackStruct<kKsOff>(data, value.GetKs().value());
-    wpi::PackStruct<kKvOff>(
+    constexpr size_t KS_OFF = 0;
+    constexpr size_t KV_OFF = KS_OFF + 8;
+    constexpr size_t KA_OFF = KV_OFF + 8;
+    constexpr size_t DT_OFF = KA_OFF + 8;
+    wpi::PackStruct<KS_OFF>(data, value.GetKs().value());
+    wpi::PackStruct<KV_OFF>(
         data, units::unit_t<typename BaseFeedforward::kv_unit>{value.GetKv()}
                   .value());
-    wpi::PackStruct<kKaOff>(
+    wpi::PackStruct<KA_OFF>(
         data, units::unit_t<typename BaseFeedforward::ka_unit>{value.GetKa()}
                   .value());
-    wpi::PackStruct<kDtOff>(data, units::second_t{value.GetDt()}.value());
+    wpi::PackStruct<DT_OFF>(data, units::second_t{value.GetDt()}.value());
   }
 };
 

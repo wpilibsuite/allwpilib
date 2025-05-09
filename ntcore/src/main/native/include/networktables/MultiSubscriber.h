@@ -30,7 +30,7 @@ class MultiSubscriber final {
    */
   MultiSubscriber(NetworkTableInstance inst,
                   std::span<const std::string_view> prefixes,
-                  const PubSubOptions& options = kDefaultPubSubOptions)
+                  const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS)
       : m_handle{::nt::SubscribeMultiple(inst.GetHandle(), prefixes, options)} {
   }
 

@@ -105,7 +105,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable {
 
     // Find the chassis translation/rotation deltas in the robot frame that move the robot from its
     // current pose to the desired pose
-    var twist = Pose2d.kZero.log(desiredDeltaPose);
+    var twist = Pose2d.ZERO.log(desiredDeltaPose);
 
     // Turn the chassis translation/rotation deltas into average velocities
     return new ChassisSpeeds(twist.dx / dt, twist.dy / dt, twist.dtheta / dt);

@@ -205,7 +205,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
         ++frameStart;
       }
 
-      bool isFin = (frameStart->opcode & WebSocket::kFlagFin) != 0;
+      bool isFin = (frameStart->opcode & WebSocket::FLAG_FIN) != 0;
       if (offIt != offEnd && *offIt == sentBytes && isFin) {
         // we finished at a normal FIN frame boundary; no need for a Write()
         ++frameStart;
@@ -272,7 +272,7 @@ std::span<const WebSocket::Frame> TrySendFrames(
           continuePos += req->m_frames.AddFrame(*frameStart, server);
         }
         req->m_continueFrameOffs.emplace_back(continuePos);
-        isFin = (frameStart->opcode & WebSocket::kFlagFin) != 0;
+        isFin = (frameStart->opcode & WebSocket::FLAG_FIN) != 0;
         ++frameStart;
       }
 

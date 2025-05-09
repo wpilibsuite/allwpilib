@@ -123,7 +123,7 @@ void ServerClient4Base::ClientSubscribe(int subuid,
     bool wasSubscribed =
         tcdIt != topic->clients.end() && !tcdIt->second.subscribers.empty();
     bool wasSubscribedValue =
-        wasSubscribed ? tcdIt->second.sendMode != net::ValueSendMode::kDisabled
+        wasSubscribed ? tcdIt->second.sendMode != net::ValueSendMode::DISABLED
                       : false;
 
     bool added = false;
@@ -155,7 +155,7 @@ void ServerClient4Base::ClientSubscribe(int subuid,
 
   for (auto topic : dataToSend) {
     DEBUG4("send last value for {} to client {}", topic->name, m_id);
-    SendValue(topic, topic->lastValue, net::ValueSendMode::kAll);
+    SendValue(topic, topic->lastValue, net::ValueSendMode::ALL);
   }
 }
 

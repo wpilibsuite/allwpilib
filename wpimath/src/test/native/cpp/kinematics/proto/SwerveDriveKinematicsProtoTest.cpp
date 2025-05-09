@@ -14,7 +14,7 @@ using namespace frc;
 struct SwerveDriveKinematicsProtoTestData {
   using Type = SwerveDriveKinematics<4>;
 
-  inline static const Type kTestData{
+  inline static const Type TEST_DATA{
       frc::Translation2d{1.0_m, 0.9_m}, frc::Translation2d{1.1_m, -0.8_m},
       frc::Translation2d{-1.2_m, 0.7_m}, frc::Translation2d{-1.3_m, -0.6_m}};
 

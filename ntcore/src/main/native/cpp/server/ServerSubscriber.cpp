@@ -19,7 +19,7 @@ using namespace mpack;
 static void WriteOptions(mpack_writer_t& w, const PubSubOptionsImpl& options) {
   int size =
       (options.sendAll ? 1 : 0) + (options.topicsOnly ? 1 : 0) +
-      (options.periodicMs != PubSubOptionsImpl::kDefaultPeriodicMs ? 1 : 0) +
+      (options.periodicMs != PubSubOptionsImpl::DEFAULT_PERIODIC_MS ? 1 : 0) +
       (options.prefixMatch ? 1 : 0);
   mpack_start_map(&w, size);
   if (options.sendAll) {
@@ -30,7 +30,7 @@ static void WriteOptions(mpack_writer_t& w, const PubSubOptionsImpl& options) {
     mpack_write_str(&w, "topicsonly");
     mpack_write_bool(&w, true);
   }
-  if (options.periodicMs != PubSubOptionsImpl::kDefaultPeriodicMs) {
+  if (options.periodicMs != PubSubOptionsImpl::DEFAULT_PERIODIC_MS) {
     mpack_write_str(&w, "periodic");
     mpack_write_float(&w, options.periodicMs / 1000.0);
   }

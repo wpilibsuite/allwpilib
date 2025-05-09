@@ -63,7 +63,7 @@ class Tracer {
   void PrintEpochs(wpi::raw_ostream& os);
 
  private:
-  static constexpr std::chrono::milliseconds kMinPrintPeriod{1000};
+  static constexpr std::chrono::milliseconds MIN_PRINT_PERIOD{1000};
 
   hal::fpga_clock::time_point m_startTime;
   hal::fpga_clock::time_point m_lastEpochsPrintTime = hal::fpga_clock::epoch();

@@ -16,35 +16,35 @@
  */
 
 namespace DriveConstants {
-inline constexpr int kLeftMotor1Port = 0;
-inline constexpr int kLeftMotor2Port = 1;
-inline constexpr int kRightMotor1Port = 2;
-inline constexpr int kRightMotor2Port = 3;
+inline constexpr int LEFT_MOTOR_1_PORT = 0;
+inline constexpr int LEFT_MOTOR_2_PORT = 1;
+inline constexpr int RIGHT_MOTOR_1_PORT = 2;
+inline constexpr int RIGHT_MOTOR_2_PORT = 3;
 
-inline constexpr int kLeftEncoderPorts[]{0, 1};
-inline constexpr int kRightEncoderPorts[]{2, 3};
-inline constexpr bool kLeftEncoderReversed = false;
-inline constexpr bool kRightEncoderReversed = true;
+inline constexpr int LEFT_ENCODER_PORTS[]{0, 1};
+inline constexpr int RIGHT_ENCODER_PORTS[]{2, 3};
+inline constexpr bool LEFT_ENCODER_REVERSED = false;
+inline constexpr bool RIGHT_ENCODER_REVERSED = true;
 
-inline constexpr int kEncoderCPR = 1024;
-inline constexpr double kWheelDiameterInches = 6;
-inline constexpr double kEncoderDistancePerPulse =
+inline constexpr int ENCODER_CPR = 1024;
+inline constexpr double WHEEL_DIAMETER_INCHES = 6;
+inline constexpr double ENCODER_DISTANCE_PER_PULSE =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterInches * std::numbers::pi) /
-    static_cast<double>(kEncoderCPR);
+    (WHEEL_DIAMETER_INCHES * std::numbers::pi) /
+    static_cast<double>(ENCODER_CPR);
 }  // namespace DriveConstants
 
 namespace HatchConstants {
-inline constexpr int kHatchSolenoidModule = 0;
-inline constexpr int kHatchSolenoidPorts[]{0, 1};
+inline constexpr int HATCH_SOLENOID_MODULE = 0;
+inline constexpr int HATCH_SOLENOID_PORTS[]{0, 1};
 }  // namespace HatchConstants
 
 namespace AutoConstants {
-constexpr double kAutoDriveDistanceInches = 60;
-constexpr double kAutoBackupDistanceInches = 20;
-constexpr double kAutoDriveSpeed = 0.5;
+constexpr double AUTO_DRIVE_DISTANCE_INCHES = 60;
+constexpr double AUTO_BACKUP_DISTANCE_INCHES = 20;
+constexpr double AUTO_DRIVE_SPEED = 0.5;
 }  // namespace AutoConstants
 
 namespace OIConstants {
-constexpr int kDriverControllerPort = 0;
+constexpr int DRIVER_CONTROLLER_PORT = 0;
 }  // namespace OIConstants

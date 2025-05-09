@@ -33,15 +33,15 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
     /**
      * PWM pulses occur every 5 ms
      */
-    kOutputPeriod_5Ms = 1,
+    OUTPUT_PERIOD_5MS = 1,
     /**
      * PWM pulses occur every 10 ms
      */
-    kOutputPeriod_10Ms = 2,
+    OUTPUT_PERIOD_10MS = 2,
     /**
      * PWM pulses occur every 20 ms
      */
-    kOutputPeriod_20Ms = 4
+    OUTPUT_PERIOD_20MS = 4
   };
 
   /**

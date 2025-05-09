@@ -76,8 +76,8 @@ AnalyzerPlot::AnalyzerPlot(wpi::Logger& logger) : m_logger(logger) {}
 void AnalyzerPlot::SetRawTimeData(const std::vector<PreparedData>& rawSlow,
                                   const std::vector<PreparedData>& rawFast,
                                   std::atomic<bool>& abort) {
-  auto rawSlowStep = std::ceil(rawSlow.size() * 1.0 / kMaxSize * 4);
-  auto rawFastStep = std::ceil(rawFast.size() * 1.0 / kMaxSize * 4);
+  auto rawSlowStep = std::ceil(rawSlow.size() * 1.0 / MAX_SIZE * 4);
+  auto rawFastStep = std::ceil(rawFast.size() * 1.0 / MAX_SIZE * 4);
   // Populate Raw Slow Time Series Data
   for (size_t i = 0; i < rawSlow.size(); i += rawSlowStep) {
     if (abort) {
@@ -137,9 +137,9 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
   double squaredVariationSum = 0;
   int timeSeriesPoints = 0;
 
-  const auto& Ks = ffGains.Ks.gain;
-  const auto& Kv = ffGains.Kv.gain;
-  const auto& Ka = ffGains.Ka.gain;
+  const auto& S = ffGains.S.gain;
+  const auto& V = ffGains.V.gain;
+  const auto& A = ffGains.A.gain;
 
   auto& [slowForward, slowBackward, fastForward, fastBackward] = filteredData;
   auto& [rawSlowForward, rawSlowBackward, rawFastForward, rawFastBackward] =
@@ -160,8 +160,8 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
 
   // Calculate step sizes to ensure that we only use the memory that we
   // allocated.
-  auto slowStep = std::ceil(slow.size() * 1.0 / kMaxSize * 4);
-  auto fastStep = std::ceil(fast.size() * 1.0 / kMaxSize * 4);
+  auto slowStep = std::ceil(slow.size() * 1.0 / MAX_SIZE * 4);
+  auto fastStep = std::ceil(fast.size() * 1.0 / MAX_SIZE * 4);
 
   units::second_t dtMean = GetMeanTimeDelta(filteredData);
 
@@ -225,29 +225,29 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
     SetRawTimeData(rawSlow, rawFast, abort);
 
     // Populate simulated time domain data
-    if (type == analysis::kElevator) {
-      const auto& Kg = ffGains.Kg.gain;
+    if (type == analysis::ELEVATOR) {
+      const auto& G = ffGains.G.gain;
       m_quasistaticData.simData = PopulateTimeDomainSim(
-          rawSlow, startTimes, fastStep, sysid::ElevatorSim{Ks, Kv, Ka, Kg},
+          rawSlow, startTimes, fastStep, sysid::ElevatorSim{S, V, A, G},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
       m_dynamicData.simData = PopulateTimeDomainSim(
-          rawFast, startTimes, fastStep, sysid::ElevatorSim{Ks, Kv, Ka, Kg},
+          rawFast, startTimes, fastStep, sysid::ElevatorSim{S, V, A, G},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
-    } else if (type == analysis::kArm) {
-      const auto& Kg = ffGains.Kg.gain;
+    } else if (type == analysis::ARM) {
+      const auto& G = ffGains.G.gain;
       const auto& offset = ffGains.offset.gain;
       m_quasistaticData.simData = PopulateTimeDomainSim(
-          rawSlow, startTimes, fastStep, sysid::ArmSim{Ks, Kv, Ka, Kg, offset},
+          rawSlow, startTimes, fastStep, sysid::ArmSim{S, V, A, G, offset},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
       m_dynamicData.simData = PopulateTimeDomainSim(
-          rawFast, startTimes, fastStep, sysid::ArmSim{Ks, Kv, Ka, Kg, offset},
+          rawFast, startTimes, fastStep, sysid::ArmSim{S, V, A, G, offset},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
     } else {
       m_quasistaticData.simData = PopulateTimeDomainSim(
-          rawSlow, startTimes, fastStep, sysid::SimpleMotorSim{Ks, Kv, Ka},
+          rawSlow, startTimes, fastStep, sysid::SimpleMotorSim{S, V, A},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
       m_dynamicData.simData = PopulateTimeDomainSim(
-          rawFast, startTimes, fastStep, sysid::SimpleMotorSim{Ks, Kv, Ka},
+          rawFast, startTimes, fastStep, sysid::SimpleMotorSim{S, V, A},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
     }
   }
@@ -265,7 +265,7 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
         return a.velocity < b.velocity;
       })->velocity;
   auto minVel = std::min(slowMinVel, fastMinVel);
-  m_regressionData.fitLine[0] = ImPlotPoint{minVel, -Kv / Ka * minVel};
+  m_regressionData.fitLine[0] = ImPlotPoint{minVel, -V / A * minVel};
 
   // Find maximum velocity of slow and fast datasets, then find point for line
   // of best fit
@@ -278,7 +278,7 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
         return a.velocity < b.velocity;
       })->velocity;
   auto maxVel = std::max(slowMaxVel, fastMaxVel);
-  m_regressionData.fitLine[1] = ImPlotPoint{maxVel, -Kv / Ka * maxVel};
+  m_regressionData.fitLine[1] = ImPlotPoint{maxVel, -V / A * maxVel};
 
   // Populate acceleration vs velocity graph
   for (size_t i = 0; i < slow.size(); i += slowStep) {
@@ -287,15 +287,15 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
     }
 
     // Calculate portion of acceleration caused by back-EMF
-    double accelPortion = slow[i].acceleration - 1.0 / Ka * slow[i].voltage +
-                          std::copysign(Ks / Ka, slow[i].velocity);
+    double accelPortion = slow[i].acceleration - 1.0 / A * slow[i].voltage +
+                          std::copysign(S / A, slow[i].velocity);
 
-    if (type == analysis::kElevator) {
-      const auto& Kg = ffGains.Kg.gain;
-      accelPortion -= Kg / Ka;
-    } else if (type == analysis::kArm) {
-      const auto& Kg = ffGains.Kg.gain;
-      accelPortion -= Kg / Ka * slow[i].cos;
+    if (type == analysis::ELEVATOR) {
+      const auto& G = ffGains.G.gain;
+      accelPortion -= G / A;
+    } else if (type == analysis::ARM) {
+      const auto& G = ffGains.G.gain;
+      accelPortion -= G / A * slow[i].cos;
     }
 
     m_regressionData.data.emplace_back(slow[i].velocity, accelPortion);
@@ -306,15 +306,15 @@ void AnalyzerPlot::SetData(const Storage& rawData, const Storage& filteredData,
     }
 
     // Calculate portion of voltage that corresponds to change in acceleration.
-    double accelPortion = fast[i].acceleration - 1.0 / Ka * fast[i].voltage +
-                          std::copysign(Ks / Ka, fast[i].velocity);
+    double accelPortion = fast[i].acceleration - 1.0 / A * fast[i].voltage +
+                          std::copysign(S / A, fast[i].velocity);
 
-    if (type == analysis::kElevator) {
-      const auto& Kg = ffGains.Kg.gain;
-      accelPortion -= Kg / Ka;
-    } else if (type == analysis::kArm) {
-      const auto& Kg = ffGains.Kg.gain;
-      accelPortion -= Kg / Ka * fast[i].cos;
+    if (type == analysis::ELEVATOR) {
+      const auto& G = ffGains.G.gain;
+      accelPortion -= G / A;
+    } else if (type == analysis::ARM) {
+      const auto& G = ffGains.G.gain;
+      accelPortion -= G / A * fast[i].cos;
     }
 
     m_regressionData.data.emplace_back(fast[i].velocity, accelPortion);
@@ -435,9 +435,9 @@ bool AnalyzerPlot::DisplayPlots() {
 }
 
 AnalyzerPlot::FilteredDataVsTimePlot::FilteredDataVsTimePlot() {
-  rawData.reserve(kMaxSize);
-  filteredData.reserve(kMaxSize);
-  simData.reserve(kMaxSize);
+  rawData.reserve(MAX_SIZE);
+  filteredData.reserve(MAX_SIZE);
+  simData.reserve(MAX_SIZE);
 }
 
 void AnalyzerPlot::FilteredDataVsTimePlot::Plot(const char* title,
@@ -484,7 +484,7 @@ void AnalyzerPlot::FilteredDataVsTimePlot::Clear() {
 }
 
 AnalyzerPlot::DataWithFitLinePlot::DataWithFitLinePlot() {
-  data.reserve(kMaxSize);
+  data.reserve(MAX_SIZE);
 }
 
 void AnalyzerPlot::DataWithFitLinePlot::Plot(const char* title,

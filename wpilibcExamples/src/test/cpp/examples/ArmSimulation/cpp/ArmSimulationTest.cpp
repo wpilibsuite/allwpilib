@@ -23,10 +23,10 @@ class ArmSimulationTest : public testing::TestWithParam<units::degree_t> {
   std::optional<std::thread> m_thread;
 
  protected:
-  frc::sim::PWMMotorControllerSim m_motorSim{kMotorPort};
+  frc::sim::PWMMotorControllerSim m_motorSim{MOTOR_PORT};
   frc::sim::EncoderSim m_encoderSim =
-      frc::sim::EncoderSim::CreateForChannel(kEncoderAChannel);
-  frc::sim::JoystickSim m_joystickSim{kJoystickPort};
+      frc::sim::EncoderSim::CreateForChannel(ENCODER_A_CHANNEL);
+  frc::sim::JoystickSim m_joystickSim{JOYSTICK_PORT};
 
  public:
   void SetUp() override {
@@ -47,12 +47,12 @@ class ArmSimulationTest : public testing::TestWithParam<units::degree_t> {
 };
 
 TEST_P(ArmSimulationTest, Teleop) {
-  EXPECT_TRUE(frc::Preferences::ContainsKey(kArmPositionKey));
-  EXPECT_TRUE(frc::Preferences::ContainsKey(kArmPKey));
-  frc::Preferences::SetDouble(kArmPositionKey, GetParam().value());
+  EXPECT_TRUE(frc::Preferences::ContainsKey(ARM_POSITION_KEY));
+  EXPECT_TRUE(frc::Preferences::ContainsKey(ARM_P_KEY));
+  frc::Preferences::SetDouble(ARM_POSITION_KEY, GetParam().value());
   units::degree_t setpoint = GetParam();
   EXPECT_DOUBLE_EQ(setpoint.value(),
-                   frc::Preferences::GetDouble(kArmPositionKey, NAN));
+                   frc::Preferences::GetDouble(ARM_POSITION_KEY, NAN));
 
   // teleop init
   {
@@ -67,7 +67,7 @@ TEST_P(ArmSimulationTest, Teleop) {
     frc::sim::StepTiming(3_s);
 
     // Ensure arm is still at minimum angle.
-    EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 2.0);
+    EXPECT_NEAR(MIN_ANGLE.value(), m_encoderSim.GetDistance(), 2.0);
   }
 
   {
@@ -100,7 +100,7 @@ TEST_P(ArmSimulationTest, Teleop) {
 
     frc::sim::StepTiming(3_s);
 
-    EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 2.0);
+    EXPECT_NEAR(MIN_ANGLE.value(), m_encoderSim.GetDistance(), 2.0);
   }
 
   {
@@ -136,13 +136,13 @@ TEST_P(ArmSimulationTest, Teleop) {
     frc::sim::StepTiming(3_s);
 
     ASSERT_NEAR(0.0, m_motorSim.GetSpeed(), 0.05);
-    EXPECT_NEAR(kMinAngle.value(), m_encoderSim.GetDistance(), 2.0);
+    EXPECT_NEAR(MIN_ANGLE.value(), m_encoderSim.GetDistance(), 2.0);
   }
 }
 
 INSTANTIATE_TEST_SUITE_P(
     ArmSimulationTests, ArmSimulationTest,
-    testing::Values(kDefaultArmSetpoint, 25.0_deg, 50.0_deg),
+    testing::Values(DEFAULT_ARM_SETPOINT, 25.0_deg, 50.0_deg),
     [](const testing::TestParamInfo<units::degree_t>& info) {
       return testing::PrintToString(info.param.value())
           .append(std::string(info.param.abbreviation()));

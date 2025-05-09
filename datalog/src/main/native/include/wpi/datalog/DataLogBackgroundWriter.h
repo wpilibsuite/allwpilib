@@ -158,11 +158,11 @@ class DataLogBackgroundWriter final : public DataLog {
   bool m_doFlush{false};
   bool m_shutdown{false};
   enum State {
-    kStart,
-    kActive,
-    kPaused,
-    kStopped,
-  } m_state = kActive;
+    START,
+    ACTIVE,
+    PAUSED,
+    STOPPED,
+  } m_state = ACTIVE;
   double m_period;
   std::string m_newFilename;
   std::thread m_thread;

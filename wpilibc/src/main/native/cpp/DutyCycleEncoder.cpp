@@ -67,7 +67,7 @@ void DutyCycleEncoder::Init(double fullRange, double expectedZero) {
   if (m_simDevice) {
     m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
     m_simIsConnected =
-        m_simDevice.CreateBoolean("Connected", hal::SimDevice::kInput, true);
+        m_simDevice.CreateBoolean("Connected", hal::SimDevice::INPUT, true);
   }
 
   m_fullRange = fullRange;

@@ -12,18 +12,18 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import org.junit.jupiter.api.Test;
 
 class DifferentialDriveOdometryTest {
-  private static final double kEpsilon = 1E-9;
+  private static final double EPSILON = 1E-9;
   private final DifferentialDriveOdometry m_odometry =
-      new DifferentialDriveOdometry(Rotation2d.kZero, 0, 0);
+      new DifferentialDriveOdometry(Rotation2d.ZERO, 0, 0);
 
   @Test
   void testOdometryWithEncoderDistances() {
-    m_odometry.resetPosition(Rotation2d.fromDegrees(45), 0, 0, Pose2d.kZero);
+    m_odometry.resetPosition(Rotation2d.fromDegrees(45), 0, 0, Pose2d.ZERO);
     var pose = m_odometry.update(Rotation2d.fromDegrees(135.0), 0.0, 5 * Math.PI);
 
     assertAll(
-        () -> assertEquals(pose.getX(), 5.0, kEpsilon),
-        () -> assertEquals(pose.getY(), 5.0, kEpsilon),
-        () -> assertEquals(pose.getRotation().getDegrees(), 90.0, kEpsilon));
+        () -> assertEquals(pose.getX(), 5.0, EPSILON),
+        () -> assertEquals(pose.getY(), 5.0, EPSILON),
+        () -> assertEquals(pose.getRotation().getDegrees(), 90.0, EPSILON));
   }
 }

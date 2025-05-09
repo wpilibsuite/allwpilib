@@ -24,19 +24,19 @@ class RobotDriveBase : public MotorSafety {
    */
   enum MotorType {
     /// Front-left motor.
-    kFrontLeft = 0,
+    FRONT_LEFT = 0,
     /// Front-right motor.
-    kFrontRight = 1,
+    FRONT_RIGHT = 1,
     /// Rear-left motor.
-    kRearLeft = 2,
+    REAR_LEFT = 2,
     /// Rear-right motor.
-    kRearRight = 3,
+    REAR_RIGHT = 3,
     /// Left motor.
-    kLeft = 0,
+    LEFT = 0,
     /// Right motor.
-    kRight = 1,
+    RIGHT = 1,
     /// Back motor.
-    kBack = 2
+    BACK = 2
   };
 
   RobotDriveBase();
@@ -78,10 +78,10 @@ class RobotDriveBase : public MotorSafety {
 
  protected:
   /// Default input deadband.
-  static constexpr double kDefaultDeadband = 0.02;
+  static constexpr double DEFAULT_DEADBAND = 0.02;
 
   /// Default maximum output.
-  static constexpr double kDefaultMaxOutput = 1.0;
+  static constexpr double DEFAULT_MAX_OUTPUT = 1.0;
 
   /**
    * Renormalize all wheel speeds if the magnitude of any wheel is greater than
@@ -90,10 +90,10 @@ class RobotDriveBase : public MotorSafety {
   static void Desaturate(std::span<double> wheelSpeeds);
 
   /// Input deadband.
-  double m_deadband = kDefaultDeadband;
+  double m_deadband = DEFAULT_DEADBAND;
 
   /// Maximum output.
-  double m_maxOutput = kDefaultMaxOutput;
+  double m_maxOutput = DEFAULT_MAX_OUTPUT;
 };
 
 }  // namespace frc

@@ -45,7 +45,7 @@ constexpr int16_t InvalidHandleIndex = -1;
  */
 enum class HAL_HandleEnum {
   Undefined = 0,
-  DIO = wpi::kHandleTypeHALBase,
+  DIO = wpi::HANDLE_TYPE_HAL_BASE,
   Port = 2,
   Notifier = 3,
   Interrupt = 4,

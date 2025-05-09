@@ -21,11 +21,11 @@ extern "C" {
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
     int32_t channel, const char* allocationLocation, int32_t* status) {
   hal::init::CheckInit();
-  if (channel < 0 || channel >= kNumAnalogInputs) {
+  if (channel < 0 || channel >= NUM_ANALOG_INPUTS) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Input",
-                                     0, kNumAnalogInputs, channel);
-    return HAL_kInvalidHandle;
+                                     0, NUM_ANALOG_INPUTS, channel);
+    return HAL_InvalidHandle;
   }
 
   HAL_AnalogInputHandle handle;
@@ -37,9 +37,9 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
                                            analog_port->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Input",
-                                       0, kNumAnalogInputs, channel);
+                                       0, NUM_ANALOG_INPUTS, channel);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_InvalidHandle;  // failed to allocate. Pass error back.
   }
 
   analog_port->channel = static_cast<uint8_t>(channel);
@@ -68,7 +68,7 @@ HAL_Bool HAL_CheckAnalogModule(int32_t module) {
 }
 
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
-  return channel < kNumAnalogInputs && channel >= 0;
+  return channel < NUM_ANALOG_INPUTS && channel >= 0;
 }
 
 void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,
@@ -84,7 +84,7 @@ void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // No op
 }
 double HAL_GetAnalogSampleRate(int32_t* status) {
-  return kDefaultSampleRate;
+  return DEFAULT_SAMPLE_RATE;
 }
 void HAL_SetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
                               int32_t bits, int32_t* status) {

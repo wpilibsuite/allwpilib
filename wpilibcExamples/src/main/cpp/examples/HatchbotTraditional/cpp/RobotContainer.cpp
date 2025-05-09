@@ -41,14 +41,14 @@ void RobotContainer::ConfigureButtonBindings() {
   // the scheduler thus, no memory leaks!
 
   // Grab the hatch when the 'A' button is pressed.
-  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
+  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::A)
       .OnTrue(GrabHatch(&m_hatch).ToPtr());
   // Release the hatch when the 'B' button is pressed.
-  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
+  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::B)
       .OnTrue(ReleaseHatch(&m_hatch).ToPtr());
   // While holding the shoulder button, drive at half speed
   frc2::JoystickButton(&m_driverController,
-                       frc::XboxController::Button::kRightBumper)
+                       frc::XboxController::Button::RIGHT_BUMPER)
       .WhileTrue(HalveDriveSpeed(&m_drive).ToPtr());
 }
 

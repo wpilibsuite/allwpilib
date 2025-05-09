@@ -152,7 +152,7 @@ CS_Property CreateSourceProperty(CS_Source source, std::string_view name,
   int property = static_cast<ConfigurableSourceImpl&>(*data->source)
                      .CreateProperty(name, kind, minimum, maximum, step,
                                      defaultValue, value);
-  return Handle{source, property, Handle::kProperty};
+  return Handle{source, property, Handle::PROPERTY};
 }
 
 CS_Property CreateSourcePropertyCallback(
@@ -167,7 +167,7 @@ CS_Property CreateSourcePropertyCallback(
   int property = static_cast<ConfigurableSourceImpl&>(*data->source)
                      .CreateProperty(name, kind, minimum, maximum, step,
                                      defaultValue, value, onChange);
-  return Handle{source, property, Handle::kProperty};
+  return Handle{source, property, Handle::PROPERTY};
 }
 
 void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
@@ -186,7 +186,7 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
     *status = CS_INVALID_HANDLE;
     return;
   }
-  auto data2 = Instance::GetInstance().GetSource(Handle{i, Handle::kSource});
+  auto data2 = Instance::GetInstance().GetSource(Handle{i, Handle::SOURCE});
   if (!data2 || data->source.get() != data2->source.get()) {
     *status = CS_INVALID_HANDLE;
     return;

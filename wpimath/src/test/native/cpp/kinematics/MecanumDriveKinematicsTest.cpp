@@ -208,22 +208,22 @@ TEST_F(MecanumDriveKinematicsTest, Desaturate) {
   auto wheelSpeeds =
       MecanumDriveWheelSpeeds{5_mps, 6_mps, 4_mps, 7_mps}.Desaturate(5.5_mps);
 
-  double kFactor = 5.5 / 7.0;
+  double factor = 5.5 / 7.0;
 
-  EXPECT_NEAR(wheelSpeeds.frontLeft.value(), 5.0 * kFactor, 1E-9);
-  EXPECT_NEAR(wheelSpeeds.frontRight.value(), 6.0 * kFactor, 1E-9);
-  EXPECT_NEAR(wheelSpeeds.rearLeft.value(), 4.0 * kFactor, 1E-9);
-  EXPECT_NEAR(wheelSpeeds.rearRight.value(), 7.0 * kFactor, 1E-9);
+  EXPECT_NEAR(wheelSpeeds.frontLeft.value(), 5.0 * factor, 1E-9);
+  EXPECT_NEAR(wheelSpeeds.frontRight.value(), 6.0 * factor, 1E-9);
+  EXPECT_NEAR(wheelSpeeds.rearLeft.value(), 4.0 * factor, 1E-9);
+  EXPECT_NEAR(wheelSpeeds.rearRight.value(), 7.0 * factor, 1E-9);
 }
 
 TEST_F(MecanumDriveKinematicsTest, DesaturateNegativeSpeeds) {
   auto wheelSpeeds =
       MecanumDriveWheelSpeeds{-5_mps, 6_mps, 4_mps, -7_mps}.Desaturate(5.5_mps);
 
-  constexpr double kFactor = 5.5 / 7.0;
+  constexpr double factor = 5.5 / 7.0;
 
-  EXPECT_NEAR(wheelSpeeds.frontLeft.value(), -5.0 * kFactor, 1E-9);
-  EXPECT_NEAR(wheelSpeeds.frontRight.value(), 6.0 * kFactor, 1E-9);
-  EXPECT_NEAR(wheelSpeeds.rearLeft.value(), 4.0 * kFactor, 1E-9);
-  EXPECT_NEAR(wheelSpeeds.rearRight.value(), -7.0 * kFactor, 1E-9);
+  EXPECT_NEAR(wheelSpeeds.frontLeft.value(), -5.0 * factor, 1E-9);
+  EXPECT_NEAR(wheelSpeeds.frontRight.value(), 6.0 * factor, 1E-9);
+  EXPECT_NEAR(wheelSpeeds.rearLeft.value(), 4.0 * factor, 1E-9);
+  EXPECT_NEAR(wheelSpeeds.rearRight.value(), -7.0 * factor, 1E-9);
 }

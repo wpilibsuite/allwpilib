@@ -21,7 +21,7 @@
 namespace glass {
 class NTCommandSchedulerModel : public CommandSchedulerModel {
  public:
-  static constexpr const char* kType = "Scheduler";
+  static constexpr const char* TYPE = "Scheduler";
 
   explicit NTCommandSchedulerModel(std::string_view path);
   NTCommandSchedulerModel(nt::NetworkTableInstance inst, std::string_view path);

@@ -41,9 +41,9 @@ XRPServo::XRPServo(int deviceNum) {
   m_simDevice = hal::SimDevice(m_deviceName.c_str());
 
   if (m_simDevice) {
-    m_simDevice.CreateBoolean("init", hal::SimDevice::kOutput, true);
+    m_simDevice.CreateBoolean("init", hal::SimDevice::OUTPUT, true);
     m_simPosition =
-        m_simDevice.CreateDouble("position", hal::SimDevice::kOutput, 0.5);
+        m_simDevice.CreateDouble("position", hal::SimDevice::OUTPUT, 0.5);
   }
 }
 

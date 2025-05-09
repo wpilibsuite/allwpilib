@@ -39,7 +39,7 @@ class DSCommPacketTest : public ::testing::Test {
 };
 
 TEST_F(DSCommPacketTest, EmptyJoystickTag) {
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+  for (int i = 0; i < HAL_MaxJoysticks; i++) {
     uint8_t arr[2];
     auto& data = ReadJoystickTag(arr, 0);
     ASSERT_EQ(data.axes.count, 0);
@@ -49,7 +49,7 @@ TEST_F(DSCommPacketTest, EmptyJoystickTag) {
 }
 
 TEST_F(DSCommPacketTest, BlankJoystickTag) {
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+  for (int i = 0; i < HAL_MaxJoysticks; i++) {
     uint8_t arr[5];
     arr[0] = 4;
     arr[1] = 2;
@@ -64,7 +64,7 @@ TEST_F(DSCommPacketTest, BlankJoystickTag) {
 }
 
 TEST_F(DSCommPacketTest, MainJoystickTag) {
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+  for (int i = 0; i < HAL_MaxJoysticks; i++) {
     // Just random data
     std::array<uint8_t, 12> _buttons{{0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1}};
 
@@ -97,7 +97,7 @@ TEST_F(DSCommPacketTest, MainJoystickTag) {
 }
 
 TEST_F(DSCommPacketTest, DescriptorTag) {
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
+  for (int i = 0; i < HAL_MaxJoysticks; i++) {
     uint8_t arr[] = {// Size (2), tag
                      0, 0, 7,
                      // Joystick index, Is Xbox, Type
@@ -132,7 +132,7 @@ TEST_F(DSCommPacketTest, MatchInfoTag) {
   arr[1] = sizeof(arr) - 2;
   auto& matchInfo = ReadNewMatchInfoTag(arr);
   ASSERT_STREQ(matchInfo.eventName, "WCBC");
-  ASSERT_EQ(matchInfo.matchType, HAL_MatchType::HAL_kMatchType_qualification);
+  ASSERT_EQ(matchInfo.matchType, HAL_MatchType::HAL_MatchType_qualification);
   ASSERT_EQ(matchInfo.matchNumber, 18);
   ASSERT_EQ(matchInfo.replayNumber, 1);
 }

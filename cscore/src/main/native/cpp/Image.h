@@ -54,20 +54,20 @@ class Image {
   cv::Mat AsMat() {
     int type;
     switch (pixelFormat) {
-      case VideoMode::kYUYV:
-      case VideoMode::kRGB565:
-      case VideoMode::kY16:
-      case VideoMode::kUYVY:
+      case VideoMode::YUYV:
+      case VideoMode::RGB565:
+      case VideoMode::Y16:
+      case VideoMode::UYVY:
         type = CV_8UC2;
         break;
-      case VideoMode::kBGR:
+      case VideoMode::BGR:
         type = CV_8UC3;
         break;
-      case VideoMode::kBGRA:
+      case VideoMode::BGRA:
         type = CV_8UC4;
         break;
-      case VideoMode::kGray:
-      case VideoMode::kMJPEG:
+      case VideoMode::GRAY:
+      case VideoMode::MJPEG:
       default:
         type = CV_8UC1;
         break;
@@ -77,18 +77,18 @@ class Image {
 
   int GetStride() const {
     switch (pixelFormat) {
-      case VideoMode::kYUYV:
-      case VideoMode::kRGB565:
-      case VideoMode::kY16:
-      case VideoMode::kUYVY:
+      case VideoMode::YUYV:
+      case VideoMode::RGB565:
+      case VideoMode::Y16:
+      case VideoMode::UYVY:
         return 2 * width;
-      case VideoMode::kBGR:
+      case VideoMode::BGR:
         return 3 * width;
-      case VideoMode::kBGRA:
+      case VideoMode::BGRA:
         return 4 * width;
-      case VideoMode::kGray:
+      case VideoMode::GRAY:
         return width;
-      case VideoMode::kMJPEG:
+      case VideoMode::MJPEG:
       default:
         return 0;
     }
@@ -107,7 +107,7 @@ class Image {
     // Consider +/-5 on JPEG quality to be "close enough"
     return width == width_ && height == height_ &&
            pixelFormat == pixelFormat_ &&
-           (pixelFormat != VideoMode::kMJPEG || jpegQuality_ == -1 ||
+           (pixelFormat != VideoMode::MJPEG || jpegQuality_ == -1 ||
             (jpegQuality != -1 && std::abs(jpegQuality - jpegQuality_) <= 5));
   }
   bool IsLarger(int width_, int height_) {
@@ -123,7 +123,7 @@ class Image {
   std::vector<uchar> m_data;
 
  public:
-  VideoMode::PixelFormat pixelFormat{VideoMode::kUnknown};
+  VideoMode::PixelFormat pixelFormat{VideoMode::UNKNOWN};
   int width{0};
   int height{0};
   int jpegQuality{-1};

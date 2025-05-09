@@ -26,26 +26,26 @@ class DSCommPacket {
   void SetupSendBuffer(wpi::raw_uv_ostream& buf);
 
   /* TCP Tags */
-  static const uint8_t kGameDataTag = 0x0e;
-  static const uint8_t kJoystickNameTag = 0x02;
-  static const uint8_t kMatchInfoTag = 0x07;
+  static const uint8_t GAME_DATA_TAG = 0x0e;
+  static const uint8_t JOYSTICK_NAME_TAG = 0x02;
+  static const uint8_t MATCH_INFO_TAG = 0x07;
 
   /* UDP Tags*/
-  static const uint8_t kJoystickDataTag = 0x0c;
-  static const uint8_t kMatchTimeTag = 0x07;
+  static const uint8_t JOYSTICK_DATA_TAG = 0x0c;
+  static const uint8_t MATCH_TIME_TAG = 0x07;
 
   /* Control word bits */
-  static const uint8_t kTest = 0x01;
-  static const uint8_t kEnabled = 0x04;
-  static const uint8_t kAutonomous = 0x02;
-  static const uint8_t kFMS_Attached = 0x08;
-  static const uint8_t kEmergencyStop = 0x80;
+  static const uint8_t TEST = 0x01;
+  static const uint8_t ENABLED = 0x04;
+  static const uint8_t AUTONOMOUS = 0x02;
+  static const uint8_t FMS_ATTACHED = 0x08;
+  static const uint8_t EMERGENCY_STOP = 0x80;
 
   /* Control request bitmask */
-  static const uint8_t kRequestNormalMask = 0xF0;
+  static const uint8_t REQUEST_NORMAL_MASK = 0xF0;
 
   /* Status bits */
-  static const uint8_t kRobotHasCode = 0x20;
+  static const uint8_t ROBOT_HAS_CODE = 0x20;
 
  private:
   void SendJoysticks(void);
@@ -65,7 +65,7 @@ class DSCommPacket {
   HAL_ControlWord m_control_word;
   HAL_AllianceStationID m_alliance_station;
   HAL_MatchInfo matchInfo;
-  std::array<DSCommJoystickPacket, HAL_kMaxJoysticks> m_joystick_packets;
+  std::array<DSCommJoystickPacket, HAL_MaxJoysticks> m_joystick_packets;
   double m_match_time = -1;
 };
 

@@ -19,7 +19,7 @@ class AprilTagPoseSetOriginTest {
     var layout =
         new AprilTagFieldLayout(
             List.of(
-                new AprilTag(1, Pose3d.kZero),
+                new AprilTag(1, Pose3d.ZERO),
                 new AprilTag(
                     2,
                     new Pose3d(
@@ -28,7 +28,7 @@ class AprilTagPoseSetOriginTest {
                         new Rotation3d(0, 0, Units.degreesToRadians(180))))),
             Units.feetToMeters(54.0),
             Units.feetToMeters(27.0));
-    layout.setOrigin(AprilTagFieldLayout.OriginPosition.kRedAllianceWallRightSide);
+    layout.setOrigin(AprilTagFieldLayout.OriginPosition.RED_ALLIANCE_WALL_RIGHT_SIDE);
 
     assertEquals(
         new Pose3d(
@@ -40,7 +40,7 @@ class AprilTagPoseSetOriginTest {
         new Pose3d(
             new Translation3d(
                 Units.feetToMeters(50.0), Units.feetToMeters(23.0), Units.feetToMeters(4)),
-            Rotation3d.kZero),
+            Rotation3d.ZERO),
         layout.getTagPose(2).orElse(null));
   }
 }

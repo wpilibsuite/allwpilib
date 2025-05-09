@@ -21,7 +21,7 @@ public class DCMotorStruct implements Struct<DCMotor> {
 
   @Override
   public int getSize() {
-    return kSizeDouble * 5;
+    return SIZE_DOUBLE * 5;
   }
 
   @Override

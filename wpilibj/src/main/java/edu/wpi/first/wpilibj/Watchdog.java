@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Watchdog implements Closeable, Comparable<Watchdog> {
   // Used for timeout print rate-limiting
-  private static final long kMinPrintPeriod = (long) 1e6; // μs
+  private static final long MIN_PRINT_PERIOD = (long) 1e6; // μs
 
   private double m_startTime;
   private double m_timeout;
@@ -241,7 +241,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
         Watchdog watchdog = m_watchdogs.poll();
 
         double now = curTime * 1e-6;
-        if (now - watchdog.m_lastTimeoutPrint > kMinPrintPeriod) {
+        if (now - watchdog.m_lastTimeoutPrint > MIN_PRINT_PERIOD) {
           watchdog.m_lastTimeoutPrint = now;
           if (!watchdog.m_suppressTimeoutMessage) {
             DriverStation.reportWarning(

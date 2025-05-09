@@ -302,7 +302,7 @@ class DoubleArrayTopic final : public Topic {
   using ParamType = std::span<const double>;
   using TimestampedValueType = TimestampedDoubleArray;
   /** The default type string for this topic type. */
-  static constexpr std::string_view kTypeString = "double[]";
+  static constexpr std::string_view TYPE_STRING = "double[]";
 
   DoubleArrayTopic() = default;
 
@@ -339,7 +339,7 @@ class DoubleArrayTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return DoubleArraySubscriber{
         ::nt::Subscribe(m_handle, NT_DOUBLE_ARRAY, "double[]", options),
         defaultValue};
@@ -363,7 +363,7 @@ class DoubleArrayTopic final : public Topic {
   [[nodiscard]]
   SubscriberType SubscribeEx(
       std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return DoubleArraySubscriber{
         ::nt::Subscribe(m_handle, NT_DOUBLE_ARRAY, typeString, options),
         defaultValue};
@@ -385,7 +385,7 @@ class DoubleArrayTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
+  PublisherType Publish(const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return DoubleArrayPublisher{
         ::nt::Publish(m_handle, NT_DOUBLE_ARRAY, "double[]", options)};
   }
@@ -410,7 +410,7 @@ class DoubleArrayTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::json& properties, const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return DoubleArrayPublisher{
         ::nt::PublishEx(m_handle, NT_DOUBLE_ARRAY, typeString, properties, options)};
   }
@@ -437,7 +437,7 @@ class DoubleArrayTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(ParamType defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions) {
+                     const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return DoubleArrayEntry{
         ::nt::GetEntry(m_handle, NT_DOUBLE_ARRAY, "double[]", options),
         defaultValue};
@@ -465,7 +465,7 @@ class DoubleArrayTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
-                       const PubSubOptions& options = kDefaultPubSubOptions) {
+                       const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return DoubleArrayEntry{
         ::nt::GetEntry(m_handle, NT_DOUBLE_ARRAY, typeString, options),
         defaultValue};

@@ -7,7 +7,7 @@ package edu.wpi.first.datalog;
 /** Log boolean values. */
 public class BooleanLogEntry extends DataLogEntry {
   /** The data type for boolean values. */
-  public static final String kDataType = "boolean";
+  public static final String DATA_TYPE = "boolean";
 
   /**
    * Constructs a boolean log entry.
@@ -18,7 +18,7 @@ public class BooleanLogEntry extends DataLogEntry {
    * @param timestamp entry creation timestamp (0=now)
    */
   public BooleanLogEntry(DataLog log, String name, String metadata, long timestamp) {
-    super(log, name, kDataType, metadata, timestamp);
+    super(log, name, DATA_TYPE, metadata, timestamp);
   }
 
   /**

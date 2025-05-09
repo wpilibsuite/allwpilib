@@ -6,25 +6,25 @@
 
 #include "frc/controller/PIDController.h"
 
-static constexpr double kSetpoint = 50.0;
-static constexpr double kRange = 200;
-static constexpr double kTolerance = 10.0;
+static constexpr double SETPOINT = 50.0;
+static constexpr double RANGE = 200;
+static constexpr double TOLERANCE = 10.0;
 
 TEST(PIDToleranceTest, InitialTolerance) {
   frc::PIDController controller{0.5, 0.0, 0.0};
-  controller.EnableContinuousInput(-kRange / 2, kRange / 2);
+  controller.EnableContinuousInput(-RANGE / 2, RANGE / 2);
 
   EXPECT_FALSE(controller.AtSetpoint());
 }
 
 TEST(PIDToleranceTest, AbsoluteTolerance) {
   frc::PIDController controller{0.5, 0.0, 0.0};
-  controller.EnableContinuousInput(-kRange / 2, kRange / 2);
+  controller.EnableContinuousInput(-RANGE / 2, RANGE / 2);
 
   EXPECT_FALSE(controller.AtSetpoint());
 
-  controller.SetTolerance(kTolerance);
-  controller.SetSetpoint(kSetpoint);
+  controller.SetTolerance(TOLERANCE);
+  controller.SetSetpoint(SETPOINT);
 
   EXPECT_FALSE(controller.AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "
@@ -36,13 +36,13 @@ TEST(PIDToleranceTest, AbsoluteTolerance) {
       << "Error was in tolerance when it should not have been. Error was "
       << controller.GetError();
 
-  controller.Calculate(kSetpoint + kTolerance / 2);
+  controller.Calculate(SETPOINT + TOLERANCE / 2);
 
   EXPECT_TRUE(controller.AtSetpoint())
       << "Error was not in tolerance when it should have been. Error was "
       << controller.GetError();
 
-  controller.Calculate(kSetpoint + 10 * kTolerance);
+  controller.Calculate(SETPOINT + 10 * TOLERANCE);
 
   EXPECT_FALSE(controller.AtSetpoint())
       << "Error was in tolerance when it should not have been. Error was "

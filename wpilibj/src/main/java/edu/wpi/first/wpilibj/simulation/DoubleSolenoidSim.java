@@ -59,11 +59,11 @@ public class DoubleSolenoidSim {
     boolean fwdState = m_module.getSolenoidOutput(m_fwd);
     boolean revState = m_module.getSolenoidOutput(m_rev);
     if (fwdState && !revState) {
-      return DoubleSolenoid.Value.kForward;
+      return DoubleSolenoid.Value.FORWARD;
     } else if (!fwdState && revState) {
-      return DoubleSolenoid.Value.kReverse;
+      return DoubleSolenoid.Value.REVERSE;
     } else {
-      return DoubleSolenoid.Value.kOff;
+      return DoubleSolenoid.Value.OFF;
     }
   }
 
@@ -73,8 +73,8 @@ public class DoubleSolenoidSim {
    * @param value The value to set (Off, Forward, Reverse)
    */
   public void set(final DoubleSolenoid.Value value) {
-    m_module.setSolenoidOutput(m_fwd, value == DoubleSolenoid.Value.kForward);
-    m_module.setSolenoidOutput(m_rev, value == DoubleSolenoid.Value.kReverse);
+    m_module.setSolenoidOutput(m_fwd, value == DoubleSolenoid.Value.FORWARD);
+    m_module.setSolenoidOutput(m_rev, value == DoubleSolenoid.Value.REVERSE);
   }
 
   /**

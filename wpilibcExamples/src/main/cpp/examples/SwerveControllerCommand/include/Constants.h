@@ -29,39 +29,39 @@
  */
 
 namespace DriveConstants {
-inline constexpr int kFrontLeftDriveMotorPort = 0;
-inline constexpr int kRearLeftDriveMotorPort = 2;
-inline constexpr int kFrontRightDriveMotorPort = 4;
-inline constexpr int kRearRightDriveMotorPort = 6;
+inline constexpr int FRONT_LEFT_DRIVE_MOTOR_PORT = 0;
+inline constexpr int REAR_LEFT_DRIVE_MOTOR_PORT = 2;
+inline constexpr int FRONT_RIGHT_DRIVE_MOTOR_PORT = 4;
+inline constexpr int REAR_RIGHT_DRIVE_MOTOR_PORT = 6;
 
-inline constexpr int kFrontLeftTurningMotorPort = 1;
-inline constexpr int kRearLeftTurningMotorPort = 3;
-inline constexpr int kFrontRightTurningMotorPort = 5;
-inline constexpr int kRearRightTurningMotorPort = 7;
+inline constexpr int FRONT_LEFT_TURNING_MOTOR_PORT = 1;
+inline constexpr int REAR_LEFT_TURNING_MOTOR_PORT = 3;
+inline constexpr int FRONT_RIGHT_TURNING_MOTOR_PORT = 5;
+inline constexpr int REAR_RIGHT_TURNING_MOTOR_PORT = 7;
 
-inline constexpr int kFrontLeftTurningEncoderPorts[2]{0, 1};
-inline constexpr int kRearLeftTurningEncoderPorts[2]{2, 3};
-inline constexpr int kFrontRightTurningEncoderPorts[2]{4, 5};
-inline constexpr int kRearRightTurningEncoderPorts[2]{6, 7};
+inline constexpr int FRONT_LEFT_TURNING_ENCODER_PORTS[2]{0, 1};
+inline constexpr int REAR_LEFT_TURNING_ENCODER_PORTS[2]{2, 3};
+inline constexpr int FRONT_RIGHT_TURNING_ENCODER_PORTS[2]{4, 5};
+inline constexpr int REAR_RIGHT_TURNING_ENCODER_PORTS[2]{6, 7};
 
-inline constexpr bool kFrontLeftTurningEncoderReversed = false;
-inline constexpr bool kRearLeftTurningEncoderReversed = true;
-inline constexpr bool kFrontRightTurningEncoderReversed = false;
-inline constexpr bool kRearRightTurningEncoderReversed = true;
+inline constexpr bool FRONT_LEFT_TURNING_ENCODER_REVERSED = false;
+inline constexpr bool REAR_LEFT_TURNING_ENCODER_REVERSED = true;
+inline constexpr bool FRONT_RIGHT_TURNING_ENCODER_REVERSED = false;
+inline constexpr bool REAR_RIGHT_TURNING_ENCODER_REVERSED = true;
 
-inline constexpr int kFrontLeftDriveEncoderPorts[2]{8, 9};
-inline constexpr int kRearLeftDriveEncoderPorts[2]{10, 11};
-inline constexpr int kFrontRightDriveEncoderPorts[2]{12, 13};
-inline constexpr int kRearRightDriveEncoderPorts[2]{14, 15};
+inline constexpr int FRONT_LEFT_DRIVE_ENCODER_PORTS[2]{8, 9};
+inline constexpr int REAR_LEFT_DRIVE_ENCODER_PORTS[2]{10, 11};
+inline constexpr int FRONT_RIGHT_DRIVE_ENCODER_PORTS[2]{12, 13};
+inline constexpr int REAR_RIGHT_DRIVE_ENCODER_PORTS[2]{14, 15};
 
-inline constexpr bool kFrontLeftDriveEncoderReversed = false;
-inline constexpr bool kRearLeftDriveEncoderReversed = true;
-inline constexpr bool kFrontRightDriveEncoderReversed = false;
-inline constexpr bool kRearRightDriveEncoderReversed = true;
+inline constexpr bool FRONT_LEFT_DRIVE_ENCODER_REVERSED = false;
+inline constexpr bool REAR_LEFT_DRIVE_ENCODER_REVERSED = true;
+inline constexpr bool FRONT_RIGHT_DRIVE_ENCODER_REVERSED = false;
+inline constexpr bool REAR_RIGHT_DRIVE_ENCODER_REVERSED = true;
 
 // If you call DriveSubsystem::Drive with a different period make sure to update
 // this.
-inline constexpr units::second_t kDrivePeriod = frc::TimedRobot::kDefaultPeriod;
+inline constexpr units::second_t DRIVE_PERIOD = frc::TimedRobot::DEFAULT_PERIOD;
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or
@@ -72,45 +72,45 @@ inline constexpr auto kv = 0.8 * 1_V * 1_s / 1_m;
 inline constexpr auto ka = 0.15 * 1_V * 1_s * 1_s / 1_m;
 
 // Example value only - as above, this must be tuned for your drive!
-inline constexpr double kPFrontLeftVel = 0.5;
-inline constexpr double kPRearLeftVel = 0.5;
-inline constexpr double kPFrontRightVel = 0.5;
-inline constexpr double kPRearRightVel = 0.5;
+inline constexpr double FRONT_LEFT_VEL_P = 0.5;
+inline constexpr double REAR_LEFT_VEL_P = 0.5;
+inline constexpr double FRONT_RIGHT_VEL_P = 0.5;
+inline constexpr double REAR_RIGHT_VEL_P = 0.5;
 }  // namespace DriveConstants
 
 namespace ModuleConstants {
-inline constexpr int kEncoderCPR = 1024;
-inline constexpr auto kWheelDiameter = 0.15_m;
-inline constexpr double kDriveEncoderDistancePerPulse =
+inline constexpr int ENCODER_CPR = 1024;
+inline constexpr auto WHEEL_DIAMETER = 0.15_m;
+inline constexpr double DRIVE_ENCODER_DISTANCE_PER_PULSE =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameter.value() * std::numbers::pi) /
-    static_cast<double>(kEncoderCPR);
+    (WHEEL_DIAMETER.value() * std::numbers::pi) /
+    static_cast<double>(ENCODER_CPR);
 
-inline constexpr double kTurningEncoderDistancePerPulse =
+inline constexpr double TURNING_ENCODER_DISTANCE_PER_PULSE =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (std::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
+    (std::numbers::pi * 2) / static_cast<double>(ENCODER_CPR);
 
-inline constexpr double kPModuleTurningController = 1;
-inline constexpr double kPModuleDriveController = 1;
+inline constexpr double MODULE_TURNING_CONTROLLER_P = 1;
+inline constexpr double MODULE_DRIVE_CONTROLLER_P = 1;
 }  // namespace ModuleConstants
 
 namespace AutoConstants {
-inline constexpr auto kMaxSpeed = 3_mps;
-inline constexpr auto kMaxAcceleration = 3_mps_sq;
-inline constexpr auto kMaxAngularSpeed = 3.142_rad_per_s;
-inline constexpr auto kMaxAngularAcceleration = 3.142_rad_per_s_sq;
+inline constexpr auto MAX_SPEED = 3_mps;
+inline constexpr auto MAX_ACCELERATION = 3_mps_sq;
+inline constexpr auto MAX_ANGULAR_SPEED = 3.142_rad_per_s;
+inline constexpr auto MAX_ANGULAR_ACCELERATION = 3.142_rad_per_s_sq;
 
-inline constexpr double kPXController = 0.5;
-inline constexpr double kPYController = 0.5;
-inline constexpr double kPThetaController = 0.5;
+inline constexpr double X_CONTROLLER_P = 0.5;
+inline constexpr double Y_CONTROLLER_P = 0.5;
+inline constexpr double THETA_CONTROLLER_P = 0.5;
 
 //
 
 extern const frc::TrapezoidProfile<units::radians>::Constraints
-    kThetaControllerConstraints;
+    THETA_CONTROLLER_CONSTRAINTS;
 
 }  // namespace AutoConstants
 
 namespace OIConstants {
-inline constexpr int kDriverControllerPort = 0;
+inline constexpr int DRIVER_CONTROLLER_PORT = 0;
 }  // namespace OIConstants

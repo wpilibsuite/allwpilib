@@ -18,17 +18,17 @@ namespace frc {
  */
 template <int Rows, int Cols, typename F>
 auto NumericalJacobian(F&& f, const Vectord<Cols>& x) {
-  constexpr double kEpsilon = 1e-5;
+  constexpr double EPSILON = 1e-5;
   Matrixd<Rows, Cols> result;
   result.setZero();
 
   // It's more expensive, but +- epsilon will be more accurate
   for (int i = 0; i < Cols; ++i) {
     Vectord<Cols> dX_plus = x;
-    dX_plus(i) += kEpsilon;
+    dX_plus(i) += EPSILON;
     Vectord<Cols> dX_minus = x;
-    dX_minus(i) -= kEpsilon;
-    result.col(i) = (f(dX_plus) - f(dX_minus)) / (kEpsilon * 2.0);
+    dX_minus(i) -= EPSILON;
+    result.col(i) = (f(dX_plus) - f(dX_minus)) / (EPSILON * 2.0);
   }
 
   return result;

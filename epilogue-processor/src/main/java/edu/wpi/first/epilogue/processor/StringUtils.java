@@ -149,6 +149,16 @@ public final class StringUtils {
       sanitizedName = sanitizedName.substring(1);
     }
 
+    // Convert CONSTANT_VARIABLES to ConstantVariables
+    // (though normally these should be static, and thus not logged)
+    if (sanitizedName.matches("^([A-Z]_?)+$")) {
+      sanitizedName =
+          Arrays.stream(sanitizedName.split("_"))
+              .map(String::toLowerCase)
+              .map(StringUtils::capitalize)
+              .collect(Collectors.joining());
+    }
+
     // Drop leading "get" from accessor methods
     if (sanitizedName.matches("^get[A-Z].*$")) {
       sanitizedName = sanitizedName.substring(3);

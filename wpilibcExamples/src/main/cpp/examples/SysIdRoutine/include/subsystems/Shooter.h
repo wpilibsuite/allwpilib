@@ -25,12 +25,12 @@ class Shooter : public frc2::SubsystemBase {
   frc2::CommandPtr SysIdDynamic(frc2::sysid::Direction direction);
 
  private:
-  frc::PWMSparkMax m_shooterMotor{constants::shooter::kShooterMotorPort};
-  frc::PWMSparkMax m_feederMotor{constants::shooter::kFeederMotorPort};
+  frc::PWMSparkMax m_shooterMotor{constants::shooter::SHOOTER_MOTOR_PORT};
+  frc::PWMSparkMax m_feederMotor{constants::shooter::FEEDER_MOTOR_PORT};
 
-  frc::Encoder m_shooterEncoder{constants::shooter::kEncoderPorts[0],
-                                constants::shooter::kEncoderPorts[1],
-                                constants::shooter::kEncoderReversed};
+  frc::Encoder m_shooterEncoder{constants::shooter::ENCODER_PORTS[0],
+                                constants::shooter::ENCODER_PORTS[1],
+                                constants::shooter::ENCODER_REVERSED};
 
   frc2::sysid::SysIdRoutine m_sysIdRoutine{
       frc2::sysid::Config{std::nullopt, std::nullopt, std::nullopt, nullptr},
@@ -49,5 +49,5 @@ class Shooter : public frc2::SubsystemBase {
           this}};
   frc::PIDController m_shooterFeedback{constants::shooter::kP, 0, 0};
   frc::SimpleMotorFeedforward<units::radians> m_shooterFeedforward{
-      constants::shooter::kS, constants::shooter::kV, constants::shooter::kA};
+      constants::shooter::S, constants::shooter::kV, constants::shooter::kA};
 };

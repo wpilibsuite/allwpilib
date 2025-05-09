@@ -45,12 +45,12 @@ class AnalysisManager {
     /**
      * The feedback controller preset used to calculate gains.
      */
-    FeedbackControllerPreset preset = presets::kDefault;
+    FeedbackControllerPreset preset = presets::DEFAULT;
 
     /**
      * The feedback controller loop type (position or velocity).
      */
-    FeedbackControllerLoopType type = FeedbackControllerLoopType::kVelocity;
+    FeedbackControllerLoopType type = FeedbackControllerLoopType::VELOCITY;
 
     /**
      * LQR parameters used for feedback gain calculation.
@@ -106,24 +106,24 @@ class AnalysisManager {
     OLSResult olsResult;
 
     /**
-     * The static gain Ks.
+     * The static gain S.
      */
-    FeedforwardGain Ks = {};
+    FeedforwardGain S = {};
 
     /**
      * The velocity gain kV.
      */
-    FeedforwardGain Kv = {};
+    FeedforwardGain V = {};
 
     /**
      * The acceleration gain kA.
      */
-    FeedforwardGain Ka = {};
+    FeedforwardGain A = {};
 
     /**
-     * The gravity gain Kg.
+     * The gravity gain G.
      */
-    FeedforwardGain Kg = {};
+    FeedforwardGain G = {};
 
     /**
      * The offset (arm).
@@ -157,7 +157,7 @@ class AnalysisManager {
   /**
    * The keys (which contain sysid data) that are in the JSON to analyze.
    */
-  static constexpr const char* kJsonDataKeys[] = {
+  static constexpr const char* JSON_DATA_KEYS[] = {
       "quasistatic-forward", "quasistatic-reverse", "dynamic-forward",
       "dynamic-reverse"};
 
@@ -222,8 +222,8 @@ class AnalysisManager {
    * @param ff The feedforward gains.
    * @return The calculated feedback gains.
    */
-  FeedbackGains CalculateFeedback(const FeedforwardGain& Kv,
-                                  const FeedforwardGain& Ka);
+  FeedbackGains CalculateFeedback(const FeedforwardGain& V,
+                                  const FeedforwardGain& A);
 
   /**
    * Overrides the units in the JSON with the user-provided ones.

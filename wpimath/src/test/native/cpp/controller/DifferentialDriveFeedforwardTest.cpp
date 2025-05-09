@@ -15,18 +15,18 @@
 #include "units/time.h"
 
 TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
-  constexpr auto kVLinear = 1_V / 1_mps;
-  constexpr auto kALinear = 1_V / 1_mps_sq;
-  constexpr auto kVAngular = 1_V / 1_rad_per_s;
-  constexpr auto kAAngular = 1_V / 1_rad_per_s_sq;
-  constexpr auto trackwidth = 1_m;
-  constexpr auto dt = 20_ms;
+  constexpr auto V_LINEAR = 1_V / 1_mps;
+  constexpr auto A_LINEAR = 1_V / 1_mps_sq;
+  constexpr auto V_ANGULAR = 1_V / 1_rad_per_s;
+  constexpr auto A_ANGULAR = 1_V / 1_rad_per_s_sq;
+  constexpr auto TRACK_WIDTH = 1_m;
+  constexpr auto DT = 20_ms;
 
   frc::DifferentialDriveFeedforward differentialDriveFeedforward{
-      kVLinear, kALinear, kVAngular, kAAngular, trackwidth};
+      V_LINEAR, A_LINEAR, V_ANGULAR, A_ANGULAR, TRACK_WIDTH};
   frc::LinearSystem<2, 2, 2> plant =
       frc::LinearSystemId::IdentifyDrivetrainSystem(
-          kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
+          V_LINEAR, A_LINEAR, V_ANGULAR, A_ANGULAR, TRACK_WIDTH);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
     for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;
@@ -37,10 +37,10 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
              nextRightVelocity += 2_mps) {
           auto [left, right] = differentialDriveFeedforward.Calculate(
               currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
-              nextRightVelocity, dt);
+              nextRightVelocity, DT);
           Eigen::Vector2d nextX = plant.CalculateX(
               Eigen::Vector2d{currentLeftVelocity, currentRightVelocity},
-              Eigen::Vector2d{left, right}, dt);
+              Eigen::Vector2d{left, right}, DT);
           EXPECT_NEAR(nextX(0), nextLeftVelocity.value(), 1e-6);
           EXPECT_NEAR(nextX(1), nextRightVelocity.value(), 1e-6);
         }
@@ -50,17 +50,17 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
 }
 
 TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
-  constexpr auto kVLinear = 1_V / 1_mps;
-  constexpr auto kALinear = 1_V / 1_mps_sq;
-  constexpr auto kVAngular = 1_V / 1_mps;
-  constexpr auto kAAngular = 1_V / 1_mps_sq;
-  constexpr auto dt = 20_ms;
+  constexpr auto V_LINEAR = 1_V / 1_mps;
+  constexpr auto A_LINEAR = 1_V / 1_mps_sq;
+  constexpr auto V_ANGULAR = 1_V / 1_mps;
+  constexpr auto A_ANGULAR = 1_V / 1_mps_sq;
+  constexpr auto DT = 20_ms;
 
   frc::DifferentialDriveFeedforward differentialDriveFeedforward{
-      kVLinear, kALinear, kVAngular, kAAngular};
+      V_LINEAR, A_LINEAR, V_ANGULAR, A_ANGULAR};
   frc::LinearSystem<2, 2, 2> plant =
-      frc::LinearSystemId::IdentifyDrivetrainSystem(kVLinear, kALinear,
-                                                    kVAngular, kAAngular);
+      frc::LinearSystemId::IdentifyDrivetrainSystem(V_LINEAR, A_LINEAR,
+                                                    V_ANGULAR, A_ANGULAR);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
     for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;
@@ -71,10 +71,10 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
              nextRightVelocity += 2_mps) {
           auto [left, right] = differentialDriveFeedforward.Calculate(
               currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
-              nextRightVelocity, dt);
+              nextRightVelocity, DT);
           Eigen::Vector2d nextX = plant.CalculateX(
               Eigen::Vector2d{currentLeftVelocity, currentRightVelocity},
-              Eigen::Vector2d{left, right}, dt);
+              Eigen::Vector2d{left, right}, DT);
           EXPECT_NEAR(nextX(0), nextLeftVelocity.value(), 1e-6);
           EXPECT_NEAR(nextX(1), nextRightVelocity.value(), 1e-6);
         }

@@ -42,7 +42,7 @@ import java.util.function.DoubleConsumer;
  * positive Z axis points up. Rotations follow the right-hand rule, so counterclockwise rotation
  * around the Z axis is positive.
  *
- * <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#kDefaultDeadband} will
+ * <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#DEFAULT_DEADBAND} will
  * be set to 0, and larger values will be scaled so that the full range is still used. This deadband
  * value can be changed with {@link #setDeadband}.
  *
@@ -176,7 +176,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    *     positive.
    */
   public void driveCartesian(double xSpeed, double ySpeed, double zRotation) {
-    driveCartesian(xSpeed, ySpeed, zRotation, Rotation2d.kZero);
+    driveCartesian(xSpeed, ySpeed, zRotation, Rotation2d.ZERO);
   }
 
   /**
@@ -234,7 +234,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     }
 
     driveCartesian(
-        magnitude * angle.getCos(), magnitude * angle.getSin(), zRotation, Rotation2d.kZero);
+        magnitude * angle.getCos(), magnitude * angle.getSin(), zRotation, Rotation2d.ZERO);
   }
 
   /**
@@ -250,7 +250,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * @return Wheel speeds [-1.0..1.0].
    */
   public static WheelSpeeds driveCartesianIK(double xSpeed, double ySpeed, double zRotation) {
-    return driveCartesianIK(xSpeed, ySpeed, zRotation, Rotation2d.kZero);
+    return driveCartesianIK(xSpeed, ySpeed, zRotation, Rotation2d.ZERO);
   }
 
   /**
@@ -276,18 +276,18 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     var input = new Translation2d(xSpeed, ySpeed).rotateBy(gyroAngle.unaryMinus());
 
     double[] wheelSpeeds = new double[4];
-    wheelSpeeds[MotorType.kFrontLeft.value] = input.getX() + input.getY() + zRotation;
-    wheelSpeeds[MotorType.kFrontRight.value] = input.getX() - input.getY() - zRotation;
-    wheelSpeeds[MotorType.kRearLeft.value] = input.getX() - input.getY() + zRotation;
-    wheelSpeeds[MotorType.kRearRight.value] = input.getX() + input.getY() - zRotation;
+    wheelSpeeds[MotorType.FRONT_LEFT.value] = input.getX() + input.getY() + zRotation;
+    wheelSpeeds[MotorType.FRONT_RIGHT.value] = input.getX() - input.getY() - zRotation;
+    wheelSpeeds[MotorType.REAR_LEFT.value] = input.getX() - input.getY() + zRotation;
+    wheelSpeeds[MotorType.REAR_RIGHT.value] = input.getX() + input.getY() - zRotation;
 
     normalize(wheelSpeeds);
 
     return new WheelSpeeds(
-        wheelSpeeds[MotorType.kFrontLeft.value],
-        wheelSpeeds[MotorType.kFrontRight.value],
-        wheelSpeeds[MotorType.kRearLeft.value],
-        wheelSpeeds[MotorType.kRearRight.value]);
+        wheelSpeeds[MotorType.FRONT_LEFT.value],
+        wheelSpeeds[MotorType.FRONT_RIGHT.value],
+        wheelSpeeds[MotorType.REAR_LEFT.value],
+        wheelSpeeds[MotorType.REAR_RIGHT.value]);
   }
 
   @Override

@@ -24,5 +24,5 @@ double ServoSim::GetPosition() const {
 }
 
 double ServoSim::GetAngle() const {
-  return GetPosition() * Servo::GetServoAngleRange() + Servo::kMinServoAngle;
+  return GetPosition() * Servo::GetServoAngleRange() + Servo::MIN_SERVO_ANGLE;
 }

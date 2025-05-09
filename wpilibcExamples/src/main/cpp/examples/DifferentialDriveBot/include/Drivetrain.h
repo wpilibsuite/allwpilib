@@ -36,18 +36,18 @@ class Drivetrain {
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    m_leftEncoder.SetDistancePerPulse(2 * std::numbers::pi * kWheelRadius /
-                                      kEncoderResolution);
-    m_rightEncoder.SetDistancePerPulse(2 * std::numbers::pi * kWheelRadius /
-                                       kEncoderResolution);
+    m_leftEncoder.SetDistancePerPulse(2 * std::numbers::pi * WHEEL_RADIUS /
+                                      ENCODER_RESOLUTION);
+    m_rightEncoder.SetDistancePerPulse(2 * std::numbers::pi * WHEEL_RADIUS /
+                                       ENCODER_RESOLUTION);
 
     m_leftEncoder.Reset();
     m_rightEncoder.Reset();
   }
 
-  static constexpr units::meters_per_second_t kMaxSpeed =
+  static constexpr units::meters_per_second_t MAX_SPEED =
       3.0_mps;  // 3 meters per second
-  static constexpr units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr units::radians_per_second_t MAX_ANGULAR_SPEED{
       std::numbers::pi};  // 1/2 rotation per second
 
   void SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds);
@@ -56,9 +56,9 @@ class Drivetrain {
   void UpdateOdometry();
 
  private:
-  static constexpr units::meter_t kTrackwidth = 0.381_m * 2;
-  static constexpr double kWheelRadius = 0.0508;  // meters
-  static constexpr int kEncoderResolution = 4096;
+  static constexpr units::meter_t TRACK_WIDTH = 0.381_m * 2;
+  static constexpr double WHEEL_RADIUS = 0.0508;  // meters
+  static constexpr int ENCODER_RESOLUTION = 4096;
 
   frc::PWMSparkMax m_leftLeader{1};
   frc::PWMSparkMax m_leftFollower{2};
@@ -73,7 +73,7 @@ class Drivetrain {
 
   frc::AnalogGyro m_gyro{0};
 
-  frc::DifferentialDriveKinematics m_kinematics{kTrackwidth};
+  frc::DifferentialDriveKinematics m_kinematics{TRACK_WIDTH};
   frc::DifferentialDriveOdometry m_odometry{
       m_gyro.GetRotation2d(), units::meter_t{m_leftEncoder.GetDistance()},
       units::meter_t{m_rightEncoder.GetDistance()}};

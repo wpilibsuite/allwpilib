@@ -23,7 +23,7 @@ namespace frc {
 class CameraServer {
  public:
   /// CameraServer base port.
-  static constexpr uint16_t kBasePort = 1181;
+  static constexpr uint16_t BASE_PORT = 1181;
 
   /**
    * Start automatically capturing images to send to the dashboard.

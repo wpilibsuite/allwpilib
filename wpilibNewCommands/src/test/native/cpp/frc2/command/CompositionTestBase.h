@@ -41,14 +41,14 @@ class SingleCompositionInterruptibilityTest : public CommandTestBase {};
 TYPED_TEST_SUITE_P(SingleCompositionInterruptibilityTest);
 
 TYPED_TEST_P(SingleCompositionInterruptibilityTest, CancelSelf) {
-  auto param = Command::InterruptionBehavior::kCancelSelf;
+  auto param = Command::InterruptionBehavior::CANCEL_SELF;
   TypeParam command =
       TypeParam(cmd::Idle().WithInterruptBehavior(param).Unwrap());
   EXPECT_EQ(param, command.GetInterruptionBehavior());
 }
 
 TYPED_TEST_P(SingleCompositionInterruptibilityTest, CancelIncoming) {
-  auto param = Command::InterruptionBehavior::kCancelIncoming;
+  auto param = Command::InterruptionBehavior::CANCEL_INCOMING;
   TypeParam command =
       TypeParam(cmd::Idle().WithInterruptBehavior(param).Unwrap());
   EXPECT_EQ(param, command.GetInterruptionBehavior());
@@ -126,48 +126,48 @@ TYPED_TEST_SUITE_P(MultiCompositionInterruptibilityTest);
 TYPED_TEST_P(MultiCompositionInterruptibilityTest, AllCancelSelf) {
   TypeParam command = TypeParam(CommandPtr::UnwrapVector(
       cmd::impl::MakeVector(cmd::Idle().WithInterruptBehavior(
-                                Command::InterruptionBehavior::kCancelSelf),
+                                Command::InterruptionBehavior::CANCEL_SELF),
                             cmd::Idle().WithInterruptBehavior(
-                                Command::InterruptionBehavior::kCancelSelf),
+                                Command::InterruptionBehavior::CANCEL_SELF),
                             cmd::Idle().WithInterruptBehavior(
-                                Command::InterruptionBehavior::kCancelSelf))));
-  EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
+                                Command::InterruptionBehavior::CANCEL_SELF))));
+  EXPECT_EQ(Command::InterruptionBehavior::CANCEL_SELF,
             command.GetInterruptionBehavior());
 }
 
 TYPED_TEST_P(MultiCompositionInterruptibilityTest, AllCancelIncoming) {
   TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
       cmd::Idle().WithInterruptBehavior(
-          Command::InterruptionBehavior::kCancelIncoming),
+          Command::InterruptionBehavior::CANCEL_INCOMING),
       cmd::Idle().WithInterruptBehavior(
-          Command::InterruptionBehavior::kCancelIncoming),
+          Command::InterruptionBehavior::CANCEL_INCOMING),
       cmd::Idle().WithInterruptBehavior(
-          Command::InterruptionBehavior::kCancelIncoming))));
-  EXPECT_EQ(Command::InterruptionBehavior::kCancelIncoming,
+          Command::InterruptionBehavior::CANCEL_INCOMING))));
+  EXPECT_EQ(Command::InterruptionBehavior::CANCEL_INCOMING,
             command.GetInterruptionBehavior());
 }
 
 TYPED_TEST_P(MultiCompositionInterruptibilityTest, TwoCancelSelfOneIncoming) {
   TypeParam command = TypeParam(CommandPtr::UnwrapVector(cmd::impl::MakeVector(
       cmd::Idle().WithInterruptBehavior(
-          Command::InterruptionBehavior::kCancelSelf),
+          Command::InterruptionBehavior::CANCEL_SELF),
       cmd::Idle().WithInterruptBehavior(
-          Command::InterruptionBehavior::kCancelSelf),
+          Command::InterruptionBehavior::CANCEL_SELF),
       cmd::Idle().WithInterruptBehavior(
-          Command::InterruptionBehavior::kCancelIncoming))));
-  EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
+          Command::InterruptionBehavior::CANCEL_INCOMING))));
+  EXPECT_EQ(Command::InterruptionBehavior::CANCEL_SELF,
             command.GetInterruptionBehavior());
 }
 
 TYPED_TEST_P(MultiCompositionInterruptibilityTest, TwoCancelIncomingOneSelf) {
   TypeParam command = TypeParam(CommandPtr::UnwrapVector(
       cmd::impl::MakeVector(cmd::Idle().WithInterruptBehavior(
-                                Command::InterruptionBehavior::kCancelIncoming),
+                                Command::InterruptionBehavior::CANCEL_INCOMING),
                             cmd::Idle().WithInterruptBehavior(
-                                Command::InterruptionBehavior::kCancelIncoming),
+                                Command::InterruptionBehavior::CANCEL_INCOMING),
                             cmd::Idle().WithInterruptBehavior(
-                                Command::InterruptionBehavior::kCancelSelf))));
-  EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
+                                Command::InterruptionBehavior::CANCEL_SELF))));
+  EXPECT_EQ(Command::InterruptionBehavior::CANCEL_SELF,
             command.GetInterruptionBehavior());
 }
 

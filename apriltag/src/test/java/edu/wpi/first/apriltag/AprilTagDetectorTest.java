@@ -181,7 +181,7 @@ class AprilTagDetectorTest {
       var estimator =
           new AprilTagPoseEstimator(new AprilTagPoseEstimator.Config(0.2, 500, 500, 320, 240));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
-      assertEquals(Transform3d.kZero, est.pose2);
+      assertEquals(Transform3d.ZERO, est.pose2);
       Transform3d pose = estimator.estimate(results[0]);
       assertEquals(est.pose1, pose);
     } finally {

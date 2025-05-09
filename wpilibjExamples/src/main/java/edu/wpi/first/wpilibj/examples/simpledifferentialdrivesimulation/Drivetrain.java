@@ -26,13 +26,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivetrain {
   // 3 meters per second.
-  public static final double kMaxSpeed = 3.0;
+  public static final double MAX_SPEED = 3.0;
   // 1/2 rotation per second.
-  public static final double kMaxAngularSpeed = Math.PI;
+  public static final double MAX_ANGULAR_SPEED = Math.PI;
 
-  private static final double kTrackwidth = 0.381 * 2;
-  private static final double kWheelRadius = 0.0508;
-  private static final int kEncoderResolution = -4096;
+  private static final double TRACK_WIDTH = 0.381 * 2;
+  private static final double WHEEL_RADIUS = 0.0508;
+  private static final int ENCODER_RESOLUTION = -4096;
 
   private final PWMSparkMax m_leftLeader = new PWMSparkMax(1);
   private final PWMSparkMax m_leftFollower = new PWMSparkMax(2);
@@ -48,7 +48,7 @@ public class Drivetrain {
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
   private final DifferentialDriveKinematics m_kinematics =
-      new DifferentialDriveKinematics(kTrackwidth);
+      new DifferentialDriveKinematics(TRACK_WIDTH);
   private final DifferentialDriveOdometry m_odometry =
       new DifferentialDriveOdometry(
           m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
@@ -65,7 +65,7 @@ public class Drivetrain {
       LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
   private final DifferentialDrivetrainSim m_drivetrainSimulator =
       new DifferentialDrivetrainSim(
-          m_drivetrainSystem, DCMotor.getCIM(2), 8, kTrackwidth, kWheelRadius, null);
+          m_drivetrainSystem, DCMotor.getCIM(2), 8, TRACK_WIDTH, WHEEL_RADIUS, null);
 
   /** Subsystem constructor. */
   public Drivetrain() {
@@ -80,8 +80,8 @@ public class Drivetrain {
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    m_leftEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
-    m_rightEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+    m_leftEncoder.setDistancePerPulse(2 * Math.PI * WHEEL_RADIUS / ENCODER_RESOLUTION);
+    m_rightEncoder.setDistancePerPulse(2 * Math.PI * WHEEL_RADIUS / ENCODER_RESOLUTION);
 
     m_leftEncoder.reset();
     m_rightEncoder.reset();

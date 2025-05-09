@@ -31,7 +31,7 @@ TEST(I2CSimTest, I2CInitialization) {
       INDEX_TO_TEST, &TestI2CInitializationCallback, &callbackParam, false);
   ASSERT_TRUE(0 != callbackId);
 
-  port = HAL_I2C_kPort1;
+  port = HAL_I2C_Port1;
   gTestI2CCallbackName = "Unset";
   HAL_InitializeI2C(port, &status);
   EXPECT_STREQ("Initialized", gTestI2CCallbackName.c_str());

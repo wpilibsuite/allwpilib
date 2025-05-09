@@ -16,7 +16,7 @@
 namespace glass {
 class NTSubsystemModel : public SubsystemModel {
  public:
-  static constexpr const char* kType = "Subsystem";
+  static constexpr const char* TYPE = "Subsystem";
 
   explicit NTSubsystemModel(std::string_view path);
   NTSubsystemModel(nt::NetworkTableInstance inst, std::string_view path);

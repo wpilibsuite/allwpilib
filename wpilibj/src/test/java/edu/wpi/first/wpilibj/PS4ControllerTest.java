@@ -24,7 +24,7 @@ class PS4ControllerTest {
     PS4Controller joy = new PS4Controller(2);
     PS4ControllerSim joysim = new PS4ControllerSim(joy);
 
-    var buttonName = button.toString();
+    String buttonName = button.toString();
 
     String simSetMethodName = "set" + buttonName;
     String joyGetMethodName = "get" + buttonName;
@@ -64,7 +64,7 @@ class PS4ControllerTest {
     PS4Controller joy = new PS4Controller(2);
     PS4ControllerSim joysim = new PS4ControllerSim(joy);
 
-    var axisName = axis.toString();
+    String axisName = axis.toString();
 
     String simSetMethodName = "set" + axisName;
     String joyGetMethodName = "get" + axisName;

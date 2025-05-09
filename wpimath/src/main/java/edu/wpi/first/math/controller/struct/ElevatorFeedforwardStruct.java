@@ -21,7 +21,7 @@ public class ElevatorFeedforwardStruct implements Struct<ElevatorFeedforward> {
 
   @Override
   public int getSize() {
-    return kSizeDouble * 5;
+    return SIZE_DOUBLE * 5;
   }
 
   @Override

@@ -30,8 +30,8 @@ void testFollowTrajectory(
     std::function<frc::Pose2d(frc::Trajectory::State&)>
         visionMeasurementGenerator,
     const frc::Pose2d& startingPose, const frc::Pose2d& endingPose,
-    const units::second_t dt, const units::second_t kVisionUpdateRate,
-    const units::second_t kVisionUpdateDelay, const bool checkError,
+    const units::second_t dt, const units::second_t VISION_UPDATE_RATE,
+    const units::second_t VISION_UPDATE_DELAY, const bool checkError,
     const bool debug) {
   units::meter_t leftDistance = 0_m;
   units::meter_t rightDistance = 0_m;
@@ -63,7 +63,7 @@ void testFollowTrajectory(
     // We are due for a new vision measurement if it's been `visionUpdateRate`
     // seconds since the last vision measurement
     if (visionPoses.empty() ||
-        visionPoses.back().first + kVisionUpdateRate < t) {
+        visionPoses.back().first + VISION_UPDATE_RATE < t) {
       auto visionPose =
           visionMeasurementGenerator(groundTruthState) +
           frc::Transform2d{frc::Translation2d{distribution(generator) * 0.1_m,
@@ -75,7 +75,7 @@ void testFollowTrajectory(
     // We should apply the oldest vision measurement if it has been
     // `visionUpdateDelay` seconds since it was measured
     if (!visionPoses.empty() &&
-        visionPoses.front().first + kVisionUpdateDelay < t) {
+        visionPoses.front().first + VISION_UPDATE_DELAY < t) {
       auto visionEntry = visionPoses.front();
       estimator.AddVisionMeasurement(frc::Pose3d{visionEntry.second},
                                      visionEntry.first);

@@ -30,11 +30,11 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
                                         int32_t* status) {
   hal::init::CheckInit();
 
-  if (channel < 0 || channel >= kNumSmartIo) {
+  if (channel < 0 || channel >= NUM_SMART_IO) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
-                                     kNumSmartIo, channel);
-    return HAL_kInvalidHandle;
+                                     NUM_SMART_IO, channel);
+    return HAL_InvalidHandle;
   }
 
   HAL_DigitalHandle handle;
@@ -48,9 +48,9 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
                                            port->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
-                                       kNumSmartIo, channel);
+                                       NUM_SMART_IO, channel);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_InvalidHandle;  // failed to allocate. Pass error back.
   }
 
   port->channel = channel;
@@ -59,7 +59,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
                                        : SmartIoMode::DigitalOutput);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::DIO);
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   port->previousAllocation = allocationLocation ? allocationLocation : "";
@@ -68,7 +68,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
 }
 
 HAL_Bool HAL_CheckDIOChannel(int32_t channel) {
-  return channel < kNumSmartIo && channel >= 0;
+  return channel < NUM_SMART_IO && channel >= 0;
 }
 
 void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
@@ -97,7 +97,7 @@ void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
 
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
   *status = HAL_HANDLE_ERROR;
-  return HAL_kInvalidHandle;
+  return HAL_InvalidHandle;
 }
 
 void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator) {}

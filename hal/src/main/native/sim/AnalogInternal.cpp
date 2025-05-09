@@ -8,14 +8,14 @@
 #include "hal/handles/IndexedHandleResource.h"
 
 namespace hal {
-IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,
+IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, NUM_ANALOG_INPUTS,
                       HAL_HandleEnum::AnalogInput>* analogInputHandles;
 }  // namespace hal
 
 namespace hal::init {
 void InitializeAnalogInternal() {
   static IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
-                               kNumAnalogInputs, HAL_HandleEnum::AnalogInput>
+                               NUM_ANALOG_INPUTS, HAL_HandleEnum::AnalogInput>
       aiH;
   analogInputHandles = &aiH;
 }

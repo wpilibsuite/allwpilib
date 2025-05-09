@@ -42,10 +42,10 @@ public class PoseEstimator<T> {
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
   private final Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
 
-  private static final double kBufferDuration = 1.5;
+  private static final double BUFFER_DURATION = 1.5;
   // Maps timestamps to odometry-only pose estimates
   private final TimeInterpolatableBuffer<Pose2d> m_odometryPoseBuffer =
-      TimeInterpolatableBuffer.createBuffer(kBufferDuration);
+      TimeInterpolatableBuffer.createBuffer(BUFFER_DURATION);
   // Maps timestamps to vision updates
   // Always contains one entry before the oldest entry in m_odometryPoseBuffer, unless there have
   // been no vision measurements after the last reset
@@ -249,7 +249,7 @@ public class PoseEstimator<T> {
   public void addVisionMeasurement(Pose2d visionRobotPose, double timestamp) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
     if (m_odometryPoseBuffer.getInternalBuffer().isEmpty()
-        || m_odometryPoseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestamp) {
+        || m_odometryPoseBuffer.getInternalBuffer().lastKey() - BUFFER_DURATION > timestamp) {
       return;
     }
 

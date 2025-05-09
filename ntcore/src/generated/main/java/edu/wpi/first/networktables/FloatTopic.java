@@ -9,7 +9,7 @@ package edu.wpi.first.networktables;
 /** NetworkTables Float topic. */
 public final class FloatTopic extends Topic {
   /** The default type string for this topic type. */
-  public static final String kTypeString = "float";
+  public static final String TYPE_STRING = "float";
 
   /**
    * Construct from a generic topic.
@@ -51,7 +51,7 @@ public final class FloatTopic extends Topic {
     return new FloatEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kFloat.getValue(),
+            m_handle, NetworkTableType.FLOAT.getValue(),
             "float", options),
         defaultValue);
   }
@@ -79,7 +79,7 @@ public final class FloatTopic extends Topic {
     return new FloatEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kFloat.getValue(),
+            m_handle, NetworkTableType.FLOAT.getValue(),
             typeString, options),
         defaultValue);
   }
@@ -104,7 +104,7 @@ public final class FloatTopic extends Topic {
     return new FloatEntryImpl(
         this,
         NetworkTablesJNI.publish(
-            m_handle, NetworkTableType.kFloat.getValue(),
+            m_handle, NetworkTableType.FLOAT.getValue(),
             "float", options),
         0);
   }
@@ -134,7 +134,7 @@ public final class FloatTopic extends Topic {
     return new FloatEntryImpl(
         this,
         NetworkTablesJNI.publishEx(
-            m_handle, NetworkTableType.kFloat.getValue(),
+            m_handle, NetworkTableType.FLOAT.getValue(),
             typeString, properties, options),
         0);
   }
@@ -165,7 +165,7 @@ public final class FloatTopic extends Topic {
     return new FloatEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kFloat.getValue(),
+            m_handle, NetworkTableType.FLOAT.getValue(),
             "float", options),
         defaultValue);
   }
@@ -198,7 +198,7 @@ public final class FloatTopic extends Topic {
     return new FloatEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kFloat.getValue(),
+            m_handle, NetworkTableType.FLOAT.getValue(),
             typeString, options),
         defaultValue);
   }

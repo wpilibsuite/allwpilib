@@ -10,7 +10,7 @@ using namespace frc;
 
 Debouncer::Debouncer(units::second_t debounceTime, DebounceType type)
     : m_debounceTime(debounceTime), m_debounceType(type) {
-  m_baseline = m_debounceType == DebounceType::kFalling;
+  m_baseline = m_debounceType == DebounceType::FALLING;
   ResetTimer();
 }
 
@@ -29,7 +29,7 @@ bool Debouncer::Calculate(bool input) {
   }
 
   if (HasElapsed()) {
-    if (m_debounceType == DebounceType::kBoth) {
+    if (m_debounceType == DebounceType::BOTH) {
       m_baseline = input;
       ResetTimer();
     }

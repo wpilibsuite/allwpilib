@@ -9,13 +9,13 @@ public class HttpCamera extends VideoCamera {
   /** HTTP camera kind. */
   public enum HttpCameraKind {
     /** Unknown camera kind. */
-    kUnknown(0),
+    UNKNOWN(0),
     /** MJPG Streamer camera. */
-    kMJPGStreamer(1),
+    MJPEG_STREAMER(1),
     /** CS Core camera. */
-    kCSCore(2),
+    CS_CORE(2),
     /** Axis camera. */
-    kAxis(3);
+    AXIS(3);
 
     private final int value;
 
@@ -41,10 +41,10 @@ public class HttpCamera extends VideoCamera {
    */
   public static HttpCameraKind getHttpCameraKindFromInt(int kind) {
     return switch (kind) {
-      case 1 -> HttpCameraKind.kMJPGStreamer;
-      case 2 -> HttpCameraKind.kCSCore;
-      case 3 -> HttpCameraKind.kAxis;
-      default -> HttpCameraKind.kUnknown;
+      case 1 -> HttpCameraKind.MJPEG_STREAMER;
+      case 2 -> HttpCameraKind.CS_CORE;
+      case 3 -> HttpCameraKind.AXIS;
+      default -> HttpCameraKind.UNKNOWN;
     };
   }
 
@@ -55,7 +55,7 @@ public class HttpCamera extends VideoCamera {
    * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
    */
   public HttpCamera(String name, String url) {
-    super(CameraServerJNI.createHttpCamera(name, url, HttpCameraKind.kUnknown.getValue()));
+    super(CameraServerJNI.createHttpCamera(name, url, HttpCameraKind.UNKNOWN.getValue()));
   }
 
   /**
@@ -63,7 +63,7 @@ public class HttpCamera extends VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. AXIS)
    */
   public HttpCamera(String name, String url, HttpCameraKind kind) {
     super(CameraServerJNI.createHttpCamera(name, url, kind.getValue()));
@@ -76,7 +76,7 @@ public class HttpCamera extends VideoCamera {
    * @param urls Array of Camera URLs
    */
   public HttpCamera(String name, String[] urls) {
-    super(CameraServerJNI.createHttpCameraMulti(name, urls, HttpCameraKind.kUnknown.getValue()));
+    super(CameraServerJNI.createHttpCameraMulti(name, urls, HttpCameraKind.UNKNOWN.getValue()));
   }
 
   /**
@@ -84,7 +84,7 @@ public class HttpCamera extends VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param urls Array of Camera URLs
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. AXIS)
    */
   public HttpCamera(String name, String[] urls, HttpCameraKind kind) {
     super(CameraServerJNI.createHttpCameraMulti(name, urls, kind.getValue()));

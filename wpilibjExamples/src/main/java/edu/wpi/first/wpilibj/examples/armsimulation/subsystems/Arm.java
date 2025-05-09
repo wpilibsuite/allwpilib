@@ -25,8 +25,8 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 
 public class Arm implements AutoCloseable {
   // The P gain for the PID controller that drives this arm.
-  private double m_armKp = Constants.kDefaultArmKp;
-  private double m_armSetpointDegrees = Constants.kDefaultArmSetpointDegrees;
+  private double m_armKp = Constants.DEFAULT_ARM_P;
+  private double m_armSetpointDegrees = Constants.DEFAULT_ARM_SETPOINT_DEGREES;
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
   private final DCMotor m_armGearbox = DCMotor.getVex775Pro(2);
@@ -34,8 +34,8 @@ public class Arm implements AutoCloseable {
   // Standard classes for controlling our arm
   private final PIDController m_controller = new PIDController(m_armKp, 0, 0);
   private final Encoder m_encoder =
-      new Encoder(Constants.kEncoderAChannel, Constants.kEncoderBChannel);
-  private final PWMSparkMax m_motor = new PWMSparkMax(Constants.kMotorPort);
+      new Encoder(Constants.ENCODER_A_CHANNEL, Constants.ENCODER_B_CHANNEL);
+  private final PWMSparkMax m_motor = new PWMSparkMax(Constants.MOTOR_PORT);
 
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
@@ -43,14 +43,14 @@ public class Arm implements AutoCloseable {
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
           m_armGearbox,
-          Constants.kArmReduction,
-          SingleJointedArmSim.estimateMOI(Constants.kArmLength, Constants.kArmMass),
-          Constants.kArmLength,
-          Constants.kMinAngleRads,
-          Constants.kMaxAngleRads,
+          Constants.ARM_REDUCTION,
+          SingleJointedArmSim.estimateMOI(Constants.ARM_LENGTH, Constants.ARM_MASS),
+          Constants.ARM_LENGTH,
+          Constants.MIN_ANGLE_RADS,
+          Constants.MAX_ANGLE_RADS,
           true,
           0,
-          Constants.kArmEncoderDistPerPulse,
+          Constants.ARM_ENCODER_DIST_PER_PULSE,
           0.0 // Add noise with a std-dev of 1 tick
           );
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
@@ -67,19 +67,19 @@ public class Arm implements AutoCloseable {
               30,
               Units.radiansToDegrees(m_armSim.getAngle()),
               6,
-              new Color8Bit(Color.kYellow)));
+              new Color8Bit(Color.YELLOW)));
 
   /** Subsystem constructor. */
   public Arm() {
-    m_encoder.setDistancePerPulse(Constants.kArmEncoderDistPerPulse);
+    m_encoder.setDistancePerPulse(Constants.ARM_ENCODER_DIST_PER_PULSE);
 
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Arm Sim", m_mech2d);
-    m_armTower.setColor(new Color8Bit(Color.kBlue));
+    m_armTower.setColor(new Color8Bit(Color.BLUE));
 
     // Set the Arm position setpoint and P constant to Preferences if the keys don't already exist
-    Preferences.initDouble(Constants.kArmPositionKey, m_armSetpointDegrees);
-    Preferences.initDouble(Constants.kArmPKey, m_armKp);
+    Preferences.initDouble(Constants.ARMPOSITION_KEY, m_armSetpointDegrees);
+    Preferences.initDouble(Constants.ARMP_KEY, m_armKp);
   }
 
   /** Update the simulation model. */
@@ -104,9 +104,9 @@ public class Arm implements AutoCloseable {
   /** Load setpoint and kP from preferences. */
   public void loadPreferences() {
     // Read Preferences for Arm setpoint and kP on entering Teleop
-    m_armSetpointDegrees = Preferences.getDouble(Constants.kArmPositionKey, m_armSetpointDegrees);
-    if (m_armKp != Preferences.getDouble(Constants.kArmPKey, m_armKp)) {
-      m_armKp = Preferences.getDouble(Constants.kArmPKey, m_armKp);
+    m_armSetpointDegrees = Preferences.getDouble(Constants.ARMPOSITION_KEY, m_armSetpointDegrees);
+    if (m_armKp != Preferences.getDouble(Constants.ARMP_KEY, m_armKp)) {
+      m_armKp = Preferences.getDouble(Constants.ARMP_KEY, m_armKp);
       m_controller.setP(m_armKp);
     }
   }

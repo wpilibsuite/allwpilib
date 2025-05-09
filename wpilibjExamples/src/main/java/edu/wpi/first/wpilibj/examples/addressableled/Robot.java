@@ -22,12 +22,12 @@ public class Robot extends TimedRobot {
   private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
 
   // Our LED strip has a density of 120 LEDs per meter
-  private static final Distance kLedSpacing = Meters.of(1 / 120.0);
+  private static final Distance LED_SPACING = Meters.of(1 / 120.0);
 
   // Create a new pattern that scrolls the rainbow pattern across the LED strip, moving at a speed
   // of 1 meter per second.
   private final LEDPattern m_scrollingRainbow =
-      m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
+      m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), LED_SPACING);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {

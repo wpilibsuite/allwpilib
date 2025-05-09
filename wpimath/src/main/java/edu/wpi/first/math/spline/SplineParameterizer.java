@@ -34,11 +34,11 @@ import java.util.List;
 
 /** Class used to parameterize a spline by its arc length. */
 public final class SplineParameterizer {
-  private static final double kMaxDx = 0.127;
-  private static final double kMaxDy = 0.00127;
-  private static final double kMaxDtheta = 0.0872;
+  private static final double MAX_D_X = 0.127;
+  private static final double MAX_D_Y = 0.00127;
+  private static final double MAX_D_THETA = 0.0872;
 
-  private static final String kMalformedSplineExceptionMsg =
+  private static final String MALFORMED_SPLINE_EXCEPTION_MSG =
       "Could not parameterize a malformed spline. This means that you probably had two or more "
           + "adjacent waypoints that were very close together with headings in opposing "
           + "directions.";
@@ -49,7 +49,7 @@ public final class SplineParameterizer {
    * iterations. Even long, complex paths don't usually go over 300 iterations, so hitting this
    * maximum should definitely indicate something has gone wrong.
    */
-  private static final int kMaxIterations = 5000;
+  private static final int MAX_ITERATIONS = 5000;
 
   private static class StackContents {
     final double t1;
@@ -118,18 +118,18 @@ public final class SplineParameterizer {
 
       var start = spline.getPoint(current.t0);
       if (!start.isPresent()) {
-        throw new MalformedSplineException(kMalformedSplineExceptionMsg);
+        throw new MalformedSplineException(MALFORMED_SPLINE_EXCEPTION_MSG);
       }
 
       var end = spline.getPoint(current.t1);
       if (!end.isPresent()) {
-        throw new MalformedSplineException(kMalformedSplineExceptionMsg);
+        throw new MalformedSplineException(MALFORMED_SPLINE_EXCEPTION_MSG);
       }
 
       final var twist = start.get().pose.log(end.get().pose);
-      if (Math.abs(twist.dy) > kMaxDy
-          || Math.abs(twist.dx) > kMaxDx
-          || Math.abs(twist.dtheta) > kMaxDtheta) {
+      if (Math.abs(twist.dy) > MAX_D_Y
+          || Math.abs(twist.dx) > MAX_D_X
+          || Math.abs(twist.dtheta) > MAX_D_THETA) {
         stack.addFirst(new StackContents((current.t0 + current.t1) / 2, current.t1));
         stack.addFirst(new StackContents(current.t0, (current.t0 + current.t1) / 2));
       } else {
@@ -137,8 +137,8 @@ public final class SplineParameterizer {
       }
 
       iterations++;
-      if (iterations >= kMaxIterations) {
-        throw new MalformedSplineException(kMalformedSplineExceptionMsg);
+      if (iterations >= MAX_ITERATIONS) {
+        throw new MalformedSplineException(MALFORMED_SPLINE_EXCEPTION_MSG);
       }
     }
 

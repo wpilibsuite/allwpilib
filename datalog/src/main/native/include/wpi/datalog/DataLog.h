@@ -39,9 +39,9 @@ namespace wpi::log {
 namespace impl {
 
 enum ControlRecordType {
-  kControlStart = 0,
-  kControlFinish,
-  kControlSetMetadata
+  CONTROL_START = 0,
+  CONTROL_FINISH,
+  CONTROL_SET_METADATA
 };
 
 }  // namespace impl
@@ -381,12 +381,12 @@ class DataLog {
                          int64_t timestamp);
 
  protected:
-  static constexpr size_t kBlockSize = 16 * 1024;
+  static constexpr size_t BLOCK_SIZE = 16 * 1024;
   static wpi::Logger s_defaultMessageLog;
 
   class Buffer {
    public:
-    explicit Buffer(size_t alloc = kBlockSize)
+    explicit Buffer(size_t alloc = BLOCK_SIZE)
         : m_buf{new uint8_t[alloc]}, m_maxLen{alloc} {}
     ~Buffer() { delete[] m_buf; }
 
@@ -488,8 +488,8 @@ class DataLog {
   virtual bool BufferFull() = 0;
 
  private:
-  static constexpr size_t kMaxBufferCount = 1024 * 1024 / kBlockSize;
-  static constexpr size_t kMaxFreeCount = 256 * 1024 / kBlockSize;
+  static constexpr size_t MAX_BUFFER_COUNT = 1024 * 1024 / BLOCK_SIZE;
+  static constexpr size_t MAX_FREE_COUNT = 256 * 1024 / BLOCK_SIZE;
 
   // must be called with m_mutex held
   int StartImpl(std::string_view name, std::string_view type,
@@ -637,14 +637,14 @@ class DataLogValueEntryImpl : public DataLogEntry {
  */
 class RawLogEntry : public DataLogValueEntryImpl<std::vector<uint8_t>> {
  public:
-  static constexpr std::string_view kDataType = "raw";
+  static constexpr std::string_view DATA_TYPE = "raw";
 
   RawLogEntry() = default;
   RawLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
-      : RawLogEntry{log, name, {}, kDataType, timestamp} {}
+      : RawLogEntry{log, name, {}, DATA_TYPE, timestamp} {}
   RawLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
               int64_t timestamp = 0)
-      : RawLogEntry{log, name, metadata, kDataType, timestamp} {}
+      : RawLogEntry{log, name, metadata, DATA_TYPE, timestamp} {}
   RawLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
               std::string_view type, int64_t timestamp = 0)
       : DataLogValueEntryImpl{log, name, type, metadata, timestamp} {}
@@ -677,14 +677,14 @@ class RawLogEntry : public DataLogValueEntryImpl<std::vector<uint8_t>> {
  */
 class BooleanLogEntry : public DataLogValueEntryImpl<bool> {
  public:
-  static constexpr std::string_view kDataType = "boolean";
+  static constexpr std::string_view DATA_TYPE = "boolean";
 
   BooleanLogEntry() = default;
   BooleanLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
       : BooleanLogEntry{log, name, {}, timestamp} {}
   BooleanLogEntry(DataLog& log, std::string_view name,
                   std::string_view metadata, int64_t timestamp = 0)
-      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, DATA_TYPE, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -720,14 +720,14 @@ class BooleanLogEntry : public DataLogValueEntryImpl<bool> {
  */
 class IntegerLogEntry : public DataLogValueEntryImpl<int64_t> {
  public:
-  static constexpr std::string_view kDataType = "int64";
+  static constexpr std::string_view DATA_TYPE = "int64";
 
   IntegerLogEntry() = default;
   IntegerLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
       : IntegerLogEntry{log, name, {}, timestamp} {}
   IntegerLogEntry(DataLog& log, std::string_view name,
                   std::string_view metadata, int64_t timestamp = 0)
-      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, DATA_TYPE, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -763,14 +763,14 @@ class IntegerLogEntry : public DataLogValueEntryImpl<int64_t> {
  */
 class FloatLogEntry : public DataLogValueEntryImpl<float> {
  public:
-  static constexpr std::string_view kDataType = "float";
+  static constexpr std::string_view DATA_TYPE = "float";
 
   FloatLogEntry() = default;
   FloatLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
       : FloatLogEntry{log, name, {}, timestamp} {}
   FloatLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
                 int64_t timestamp = 0)
-      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, DATA_TYPE, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -806,14 +806,14 @@ class FloatLogEntry : public DataLogValueEntryImpl<float> {
  */
 class DoubleLogEntry : public DataLogValueEntryImpl<double> {
  public:
-  static constexpr std::string_view kDataType = "double";
+  static constexpr std::string_view DATA_TYPE = "double";
 
   DoubleLogEntry() = default;
   DoubleLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
       : DoubleLogEntry{log, name, {}, timestamp} {}
   DoubleLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
                  int64_t timestamp = 0)
-      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, DATA_TYPE, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -849,14 +849,14 @@ class DoubleLogEntry : public DataLogValueEntryImpl<double> {
  */
 class StringLogEntry : public DataLogValueEntryImpl<std::string> {
  public:
-  static constexpr const char* kDataType = "string";
+  static constexpr const char* DATA_TYPE = "string";
 
   StringLogEntry() = default;
   StringLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
-      : StringLogEntry{log, name, {}, kDataType, timestamp} {}
+      : StringLogEntry{log, name, {}, DATA_TYPE, timestamp} {}
   StringLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
                  int64_t timestamp = 0)
-      : StringLogEntry{log, name, metadata, kDataType, timestamp} {}
+      : StringLogEntry{log, name, metadata, DATA_TYPE, timestamp} {}
   StringLogEntry(DataLog& log, std::string_view name, std::string_view metadata,
                  std::string_view type, int64_t timestamp = 0)
       : DataLogValueEntryImpl{log, name, type, metadata, timestamp} {}
@@ -895,7 +895,7 @@ class StringLogEntry : public DataLogValueEntryImpl<std::string> {
  */
 class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
  public:
-  static constexpr const char* kDataType = "boolean[]";
+  static constexpr const char* DATA_TYPE = "boolean[]";
 
   BooleanArrayLogEntry() = default;
   BooleanArrayLogEntry(DataLog& log, std::string_view name,
@@ -903,7 +903,7 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
       : BooleanArrayLogEntry{log, name, {}, timestamp} {}
   BooleanArrayLogEntry(DataLog& log, std::string_view name,
                        std::string_view metadata, int64_t timestamp = 0)
-      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, DATA_TYPE, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.  For find functions to work, timestamp
@@ -1027,7 +1027,7 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
 class IntegerArrayLogEntry
     : public DataLogValueEntryImpl<std::vector<int64_t>> {
  public:
-  static constexpr const char* kDataType = "int64[]";
+  static constexpr const char* DATA_TYPE = "int64[]";
 
   IntegerArrayLogEntry() = default;
   IntegerArrayLogEntry(DataLog& log, std::string_view name,
@@ -1035,7 +1035,7 @@ class IntegerArrayLogEntry
       : IntegerArrayLogEntry{log, name, {}, timestamp} {}
   IntegerArrayLogEntry(DataLog& log, std::string_view name,
                        std::string_view metadata, int64_t timestamp = 0)
-      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, DATA_TYPE, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -1089,14 +1089,14 @@ class IntegerArrayLogEntry
  */
 class FloatArrayLogEntry : public DataLogValueEntryImpl<std::vector<float>> {
  public:
-  static constexpr const char* kDataType = "float[]";
+  static constexpr const char* DATA_TYPE = "float[]";
 
   FloatArrayLogEntry() = default;
   FloatArrayLogEntry(DataLog& log, std::string_view name, int64_t timestamp = 0)
       : FloatArrayLogEntry{log, name, {}, timestamp} {}
   FloatArrayLogEntry(DataLog& log, std::string_view name,
                      std::string_view metadata, int64_t timestamp = 0)
-      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, DATA_TYPE, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -1150,7 +1150,7 @@ class FloatArrayLogEntry : public DataLogValueEntryImpl<std::vector<float>> {
  */
 class DoubleArrayLogEntry : public DataLogValueEntryImpl<std::vector<double>> {
  public:
-  static constexpr const char* kDataType = "double[]";
+  static constexpr const char* DATA_TYPE = "double[]";
 
   DoubleArrayLogEntry() = default;
   DoubleArrayLogEntry(DataLog& log, std::string_view name,
@@ -1158,7 +1158,7 @@ class DoubleArrayLogEntry : public DataLogValueEntryImpl<std::vector<double>> {
       : DoubleArrayLogEntry{log, name, {}, timestamp} {}
   DoubleArrayLogEntry(DataLog& log, std::string_view name,
                       std::string_view metadata, int64_t timestamp = 0)
-      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, DATA_TYPE, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.
@@ -1213,7 +1213,7 @@ class DoubleArrayLogEntry : public DataLogValueEntryImpl<std::vector<double>> {
 class StringArrayLogEntry
     : public DataLogValueEntryImpl<std::vector<std::string>> {
  public:
-  static constexpr const char* kDataType = "string[]";
+  static constexpr const char* DATA_TYPE = "string[]";
 
   StringArrayLogEntry() = default;
   StringArrayLogEntry(DataLog& log, std::string_view name,
@@ -1221,7 +1221,7 @@ class StringArrayLogEntry
       : StringArrayLogEntry{log, name, {}, timestamp} {}
   StringArrayLogEntry(DataLog& log, std::string_view name,
                       std::string_view metadata, int64_t timestamp = 0)
-      : DataLogValueEntryImpl{log, name, kDataType, metadata, timestamp} {}
+      : DataLogValueEntryImpl{log, name, DATA_TYPE, metadata, timestamp} {}
 
   /**
    * Appends a record to the log.

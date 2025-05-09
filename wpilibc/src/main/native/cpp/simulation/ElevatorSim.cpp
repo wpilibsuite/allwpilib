@@ -81,16 +81,16 @@ units::meters_per_second_t ElevatorSim::GetVelocity() const {
 }
 
 units::ampere_t ElevatorSim::GetCurrentDraw() const {
-  // I = V / R - omega / (Kv * R)
+  // I = V / R - omega / (V * R)
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output.
 
   double kA = 1.0 / m_plant.B(1, 0);
   using Kv_t = units::unit_t<units::compound_unit<
       units::volt, units::inverse<units::meters_per_second>>>;
-  Kv_t Kv = Kv_t{kA * m_plant.A(1, 1)};
+  Kv_t V = Kv_t{kA * m_plant.A(1, 1)};
   units::meters_per_second_t velocity{m_x(1)};
-  units::radians_per_second_t motorVelocity = velocity * Kv * m_gearbox.Kv;
+  units::radians_per_second_t motorVelocity = velocity * V * m_gearbox.V;
 
   // Perform calculation and return.
   return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) *

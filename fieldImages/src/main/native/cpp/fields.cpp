@@ -20,7 +20,7 @@
 
 using namespace fields;
 
-static const Field kFields[] = {
+static const Field FIELDS[] = {
     {"2025 Reefscape", GetResource_2025_reefscape_json,
      GetResource_2025_field_png},
     {"2024 Crescendo", GetResource_2024_crescendo_json,
@@ -50,5 +50,5 @@ static const Field kFields[] = {
 };
 
 std::span<const Field> fields::GetFields() {
-  return kFields;
+  return FIELDS;
 }

@@ -29,11 +29,11 @@ class SendableChooserBase : public wpi::Sendable,
   SendableChooserBase& operator=(SendableChooserBase&& oth);
 
  protected:
-  static constexpr const char* kDefault = "default";
-  static constexpr const char* kOptions = "options";
-  static constexpr const char* kSelected = "selected";
-  static constexpr const char* kActive = "active";
-  static constexpr const char* kInstance = ".instance";
+  static constexpr const char* DEFAULT = "default";
+  static constexpr const char* OPTIONS = "options";
+  static constexpr const char* SELECTED = "selected";
+  static constexpr const char* ACTIVE = "active";
+  static constexpr const char* INSTANCE = ".instance";
 
   std::string m_defaultChoice;
   std::string m_selected;

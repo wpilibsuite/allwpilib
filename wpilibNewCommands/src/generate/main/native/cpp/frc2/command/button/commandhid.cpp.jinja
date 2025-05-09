@@ -6,6 +6,9 @@
 {% macro capitalize_first(string) -%}
 {{ string[0]|capitalize + string[1:] }}
 {%- endmacro %}
+{% macro snakecase(string) -%}
+{{ string|camel_to_snake }}
+{%- endmacro %}
 #include "frc2/command/button/Command{{ ConsoleName }}Controller.h"
 
 using namespace frc2;
@@ -18,7 +21,7 @@ frc::{{ ConsoleName }}Controller& Command{{ ConsoleName }}Controller::GetHID() {
 }
 {% for button in buttons %}
 Trigger Command{{ ConsoleName }}Controller::{{ capitalize_first(button.name) }}(frc::EventLoop* loop) const {
-  return Button(frc::{{ ConsoleName }}Controller::Button::k{{ capitalize_first(button.name) }}, loop);
+  return Button(frc::{{ ConsoleName }}Controller::Button::{{ snakecase(button.name) }}, loop);
 }
 {% endfor -%}
 {% for trigger in triggers -%}

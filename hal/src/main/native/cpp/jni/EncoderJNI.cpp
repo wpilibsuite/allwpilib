@@ -42,7 +42,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_EncoderJNI_freeEncoder
   (JNIEnv* env, jclass, jint id)
 {
-  if (id != HAL_kInvalidHandle) {
+  if (id != HAL_InvalidHandle) {
     HAL_FreeEncoder((HAL_EncoderHandle)id);
   }
 }

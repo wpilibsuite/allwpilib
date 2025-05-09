@@ -51,7 +51,7 @@ TEST_F(ConnectionListenerTest, Polled) {
   NT_ListenerPoller poller = nt::CreateListenerPoller(server_inst);
   ASSERT_NE(poller, 0u);
   NT_Listener handle =
-      nt::AddPolledListener(poller, server_inst, nt::EventFlags::kConnection);
+      nt::AddPolledListener(poller, server_inst, nt::EventFlags::CONNECTION);
   ASSERT_NE(handle, 0u);
 
   // trigger a connect event
@@ -65,7 +65,7 @@ TEST_F(ConnectionListenerTest, Polled) {
   ASSERT_EQ(result.size(), 1u);
   EXPECT_EQ(handle, result[0].listener);
   EXPECT_TRUE(result[0].GetConnectionInfo());
-  EXPECT_EQ(result[0].flags, nt::EventFlags::kConnected);
+  EXPECT_EQ(result[0].flags, nt::EventFlags::CONNECTED);
 
   // trigger a disconnect event
   nt::StopClient(client_inst);
@@ -79,7 +79,7 @@ TEST_F(ConnectionListenerTest, Polled) {
   ASSERT_EQ(result.size(), 1u);
   EXPECT_EQ(handle, result[0].listener);
   EXPECT_TRUE(result[0].GetConnectionInfo());
-  EXPECT_EQ(result[0].flags, nt::EventFlags::kDisconnected);
+  EXPECT_EQ(result[0].flags, nt::EventFlags::DISCONNECTED);
 }
 
 class ConnectionListenerVariantTest
@@ -89,7 +89,7 @@ class ConnectionListenerVariantTest
 TEST_P(ConnectionListenerVariantTest, Threaded) {
   wpi::mutex m;
   std::vector<nt::Event> result;
-  auto handle = nt::AddListener(server_inst, nt::EventFlags::kConnection,
+  auto handle = nt::AddListener(server_inst, nt::EventFlags::CONNECTION,
                                 [&](auto& event) {
                                   std::scoped_lock lock{m};
                                   result.push_back(event);
@@ -108,7 +108,7 @@ TEST_P(ConnectionListenerVariantTest, Threaded) {
     ASSERT_EQ(result.size(), 1u);
     EXPECT_EQ(handle, result[0].listener);
     EXPECT_TRUE(result[0].GetConnectionInfo());
-    EXPECT_EQ(result[0].flags, nt::EventFlags::kConnected);
+    EXPECT_EQ(result[0].flags, nt::EventFlags::CONNECTED);
     result.clear();
   }
 
@@ -125,7 +125,7 @@ TEST_P(ConnectionListenerVariantTest, Threaded) {
     ASSERT_EQ(result.size(), 1u);
     EXPECT_EQ(handle, result[0].listener);
     EXPECT_TRUE(result[0].GetConnectionInfo());
-    EXPECT_EQ(result[0].flags, nt::EventFlags::kDisconnected);
+    EXPECT_EQ(result[0].flags, nt::EventFlags::DISCONNECTED);
   }
 }
 

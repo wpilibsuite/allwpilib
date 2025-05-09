@@ -20,12 +20,12 @@ struct DutyCycle {
 struct Empty {};
 }  // namespace
 
-static LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
+static LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, NUM_DUTY_CYCLES,
                              HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
 
 namespace hal::init {
 void InitializeDutyCycle() {
-  static LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
+  static LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, NUM_DUTY_CYCLES,
                                HAL_HandleEnum::DutyCycle>
       dcH;
   dutyCycleHandles = &dcH;
@@ -39,15 +39,15 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
   hal::init::CheckInit();
 
   HAL_DutyCycleHandle handle = dutyCycleHandles->Allocate();
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_InvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   auto dutyCycle = dutyCycleHandles->Get(handle);
   if (dutyCycle == nullptr) {  // would only occur on thread issue
     *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   int16_t index = getHandleIndex(handle);

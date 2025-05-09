@@ -24,15 +24,15 @@ namespace frc::sysid {
  */
 enum class State {
   /// Quasistatic forward test.
-  kQuasistaticForward,
+  QUASISTATIC_FORWARD,
   /// Quasistatic reverse test.
-  kQuasistaticReverse,
+  QUASISTATIC_REVERSE,
   /// Dynamic forward test.
-  kDynamicForward,
+  DYNAMIC_FORWARD,
   /// Dynamic reverse test.
-  kDynamicReverse,
+  DYNAMIC_REVERSE,
   /// No test.
-  kNone
+  NONE
 };
 
 /**

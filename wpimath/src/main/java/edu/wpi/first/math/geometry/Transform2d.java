@@ -24,7 +24,7 @@ public class Transform2d implements ProtobufSerializable, StructSerializable {
    *
    * <p>This exists to avoid allocations for common transformations.
    */
-  public static final Transform2d kZero = new Transform2d();
+  public static final Transform2d ZERO = new Transform2d();
 
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
@@ -98,8 +98,8 @@ public class Transform2d implements ProtobufSerializable, StructSerializable {
 
   /** Constructs the identity transform -- maps an initial pose to itself. */
   public Transform2d() {
-    m_translation = Translation2d.kZero;
-    m_rotation = Rotation2d.kZero;
+    m_translation = Translation2d.ZERO;
+    m_rotation = Rotation2d.ZERO;
   }
 
   /**
@@ -130,7 +130,7 @@ public class Transform2d implements ProtobufSerializable, StructSerializable {
    * @return The composition of the two transformations.
    */
   public Transform2d plus(Transform2d other) {
-    return new Transform2d(Pose2d.kZero, Pose2d.kZero.transformBy(this).transformBy(other));
+    return new Transform2d(Pose2d.ZERO, Pose2d.ZERO.transformBy(this).transformBy(other));
   }
 
   /**

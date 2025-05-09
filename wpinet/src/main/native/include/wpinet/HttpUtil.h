@@ -429,7 +429,7 @@ class HttpMultipartScanner {
   std::string_view Execute(std::string_view in);
 
   // Returns true when the boundary has been found.
-  bool IsDone() const { return m_state == kDone; }
+  bool IsDone() const { return m_state == DONE; }
 
   // Get the skipped data.  Will be empty if saveSkipped was false.
   std::string_view GetSkipped() const {
@@ -440,10 +440,10 @@ class HttpMultipartScanner {
   SmallString<64> m_boundaryWith, m_boundaryWithout;
 
   // Internal state
-  enum State { kBoundary, kPadding, kDone };
+  enum State { BOUNDARY, PADDING, DONE };
   State m_state;
   size_t m_posWith, m_posWithout;
-  enum Dashes { kUnknown, kWith, kWithout };
+  enum Dashes { UNKNOWN, WITH, WITHOUT };
   Dashes m_dashes;
 
   // Buffer

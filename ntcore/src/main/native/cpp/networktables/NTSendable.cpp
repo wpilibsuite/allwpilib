@@ -11,7 +11,7 @@
 using namespace nt;
 
 void NTSendable::InitSendable(wpi::SendableBuilder& builder) {
-  if (builder.GetBackendKind() == wpi::SendableBuilder::kNetworkTables) {
+  if (builder.GetBackendKind() == wpi::SendableBuilder::NETWORK_TABLES) {
     InitSendable(static_cast<NTSendableBuilder&>(builder));
   }
 }

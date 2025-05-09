@@ -6,6 +6,9 @@
 {% macro capitalize_first(string) -%}
 {{ string[0]|capitalize + string[1:] }}
 {%- endmacro %}
+{% macro snakecase(string) -%}
+{{ string|camel_to_snake }}
+{%- endmacro %}
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.HAL;
@@ -13,6 +16,9 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * Handle input from {{ ConsoleName }} controllers connected to the Driver Station.
@@ -30,7 +36,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
   public enum Button {
 {%- for button in buttons %}
     /** {{ capitalize_first(button.DocName|default(button.name))  }} button. */
-    k{{ capitalize_first(button.name) }}({{ button.value }}){{ ";" if loop.last else ","}}
+    {{ snakecase(button.name) }}({{ button.value }}){{ ";" if loop.last else ","}}
 {%- endfor %}
 
     /** Button value. */
@@ -42,7 +48,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
 
     /**
      * Get the human-friendly name of the button, matching the relevant methods. This is done by
-     * stripping the leading `k`, and appending `Button`.
+     * appending `Button`.
      *
      * <p>Primarily used for automated unit tests.
      *
@@ -50,8 +56,15 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
      */
     @Override
     public String toString() {
-      // Remove leading `k`
-      return this.name().substring(1) + "Button";
+      var name = this.name();
+      if (name.length() > 2) {
+        name = name.transform(str -> Arrays.stream(str.split("_"))
+            .map(s -> s.substring(0, 1).toUpperCase(Locale.getDefault())
+                      + s.substring(1).toLowerCase(Locale.getDefault()))
+            .collect(Collectors.joining())
+        );
+      }
+      return name + "Button";
     }
   }
 
@@ -59,11 +72,11 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
   public enum Axis {
 {%- for stick in sticks %}
     /** {{ stick.NameParts|map("capitalize")|join(" ") }} axis. */
-    k{{ stick.NameParts|map("capitalize")|join }}({{ stick.value }}){{ "," if triggers|length > 0 or not loop.last else ";"}}
+    {{ snakecase(stick.NameParts|join) }}({{ stick.value }}){{ "," if triggers|length > 0 or not loop.last else ";"}}
 {%- endfor %}
 {%- for trigger in triggers %}
     /** {{ trigger.DocName|capitalize }}. */
-    k{{ capitalize_first(trigger.name) }}({{ trigger.value }}){{ ";" if loop.last else ","}}
+    {{ snakecase(trigger.name) }}({{ trigger.value }}){{ ";" if loop.last else ","}}
 {%- endfor %}
 
     /** Axis value. */
@@ -75,7 +88,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
 
     /**
      * Get the human-friendly name of the axis, matching the relevant methods. This is done by
-     * stripping the leading `k`, and appending `Axis` if the name ends with `{{ AxisNameSuffix }}`.
+     * appending `Axis` if the name ends with `{{ AxisNameSuffix }}`.
      *
      * <p>Primarily used for automated unit tests.
      *
@@ -83,7 +96,12 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
      */
     @Override
     public String toString() {
-      var name = this.name().substring(1); // Remove leading `k`
+      var name = this.name()
+          .transform(str -> Arrays.stream(str.split("_"))
+              .map(s -> s.substring(0, 1).toUpperCase(Locale.getDefault())
+                        + s.substring(1).toLowerCase(Locale.getDefault()))
+              .collect(Collectors.joining())
+          );
       if (name.endsWith("{{ AxisNameSuffix }}")) {
         return name + "Axis";
       }
@@ -107,7 +125,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return The axis value.
    */
   public double get{{ stick.NameParts|map("capitalize")|join }}() {
-    return getRawAxis(Axis.k{{ stick.NameParts|map("capitalize")|join }}.value);
+    return getRawAxis(Axis.{{ snakecase(stick.NameParts|join) }}.value);
   }
 {% endfor -%}
 {% for trigger in triggers %}
@@ -118,7 +136,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return The axis value.
    */
   public double get{{ capitalize_first(trigger.name) }}Axis() {
-    return getRawAxis(Axis.k{{ capitalize_first(trigger.name) }}.value);
+    return getRawAxis(Axis.{{ snakecase(trigger.name) }}.value);
   }
 {% if trigger.UseThresholdMethods %}
   /**
@@ -132,7 +150,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    *     threshold, attached to the given event loop
    */
   public BooleanEvent {{ trigger.name }}(double threshold, EventLoop loop) {
-    return axisGreaterThan(Axis.k{{ capitalize_first(trigger.name) }}.value, threshold, loop);
+    return axisGreaterThan(Axis.{{ snakecase(trigger.name) }}.value, threshold, loop);
   }
 
   /**
@@ -155,7 +173,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return The state of the button.
    */
   public boolean get{{ capitalize_first(button.name) }}Button() {
-    return getRawButton(Button.k{{ capitalize_first(button.name) }}.value);
+    return getRawButton(Button.{{ snakecase(button.name) }}.value);
   }
 
   /**
@@ -164,7 +182,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return Whether the button was pressed since the last check.
    */
   public boolean get{{ capitalize_first(button.name) }}ButtonPressed() {
-    return getRawButtonPressed(Button.k{{ capitalize_first(button.name) }}.value);
+    return getRawButtonPressed(Button.{{ snakecase(button.name) }}.value);
   }
 
   /**
@@ -173,7 +191,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return Whether the button was released since the last check.
    */
   public boolean get{{ capitalize_first(button.name) }}ButtonReleased() {
-    return getRawButtonReleased(Button.k{{ capitalize_first(button.name) }}.value);
+    return getRawButtonReleased(Button.{{ snakecase(button.name) }}.value);
   }
 
   /**
@@ -184,7 +202,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    *     attached to the given loop.
    */
   public BooleanEvent {{ button.name }}(EventLoop loop) {
-    return button(Button.k{{ capitalize_first(button.name) }}.value, loop);
+    return button(Button.{{ snakecase(button.name) }}.value, loop);
   }
 {% endfor -%}
 {% if ConsoleName == "Xbox" or ConsoleName == "Stadia" %}
@@ -197,7 +215,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumper() {
-    return getRawButton(Button.kLeftBumper.value);
+    return getRawButton(Button.LEFT_BUMPER.value);
   }
 
   /**
@@ -209,7 +227,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumper() {
-    return getRawButton(Button.kRightBumper.value);
+    return getRawButton(Button.RIGHT_BUMPER.value);
   }
 
   /**
@@ -222,7 +240,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumperPressed() {
-    return getRawButtonPressed(Button.kLeftBumper.value);
+    return getRawButtonPressed(Button.LEFT_BUMPER.value);
   }
 
   /**
@@ -235,7 +253,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumperPressed() {
-    return getRawButtonPressed(Button.kRightBumper.value);
+    return getRawButtonPressed(Button.RIGHT_BUMPER.value);
   }
 
   /**
@@ -248,7 +266,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getLeftBumperReleased() {
-    return getRawButtonReleased(Button.kLeftBumper.value);
+    return getRawButtonReleased(Button.LEFT_BUMPER.value);
   }
 
   /**
@@ -261,7 +279,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getRightBumperReleased() {
-    return getRawButtonReleased(Button.kRightBumper.value);
+    return getRawButtonReleased(Button.RIGHT_BUMPER.value);
   }
 {%- elif ConsoleName == "PS4" or ConsoleName == "PS5" %}
   /**
@@ -273,7 +291,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getTouchpad() {
-    return getRawButton(Button.kTouchpad.value);
+    return getRawButton(Button.TOUCHPAD.value);
   }
 
   /**
@@ -286,7 +304,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getTouchpadPressed() {
-    return getRawButtonPressed(Button.kTouchpad.value);
+    return getRawButtonPressed(Button.TOUCHPAD.value);
   }
 
   /**
@@ -299,7 +317,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    */
   @Deprecated(since = "2025", forRemoval = true)
   public boolean getTouchpadReleased() {
-    return getRawButtonReleased(Button.kTouchpad.value);
+    return getRawButtonReleased(Button.TOUCHPAD.value);
   }
 {%- endif %}
 

@@ -7,7 +7,7 @@
 void Robot::TeleopInit() {
   // Move to the bottom setpoint when teleop starts
   m_index = 0;
-  m_pidController.SetSetpoint(kSetpoints[m_index].value());
+  m_pidController.SetSetpoint(SETPOINTS[m_index].value());
 }
 
 void Robot::TeleopPeriodic() {
@@ -24,8 +24,8 @@ void Robot::TeleopPeriodic() {
   // incremented
   if (m_joystick.GetTriggerPressed()) {
     // index of the elevator setpoint wraps around.
-    m_index = (m_index + 1) % kSetpoints.size();
-    m_pidController.SetSetpoint(kSetpoints[m_index].value());
+    m_index = (m_index + 1) % SETPOINTS.size();
+    m_pidController.SetSetpoint(SETPOINTS[m_index].value());
   }
 }
 

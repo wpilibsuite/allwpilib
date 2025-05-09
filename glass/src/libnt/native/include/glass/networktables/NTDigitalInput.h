@@ -18,7 +18,7 @@ namespace glass {
 
 class NTDigitalInputModel : public DIOModel {
  public:
-  static constexpr const char* kType = "Digital Input";
+  static constexpr const char* TYPE = "Digital Input";
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTDigitalInputModel(std::string_view path);

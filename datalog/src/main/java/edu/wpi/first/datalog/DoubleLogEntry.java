@@ -7,7 +7,7 @@ package edu.wpi.first.datalog;
 /** Log double values. */
 public class DoubleLogEntry extends DataLogEntry {
   /** The data type for double values. */
-  public static final String kDataType = "double";
+  public static final String DATA_TYPE = "double";
 
   /**
    * Constructs a double log entry.
@@ -18,7 +18,7 @@ public class DoubleLogEntry extends DataLogEntry {
    * @param timestamp entry creation timestamp (0=now)
    */
   public DoubleLogEntry(DataLog log, String name, String metadata, long timestamp) {
-    super(log, name, kDataType, metadata, timestamp);
+    super(log, name, DATA_TYPE, metadata, timestamp);
   }
 
   /**

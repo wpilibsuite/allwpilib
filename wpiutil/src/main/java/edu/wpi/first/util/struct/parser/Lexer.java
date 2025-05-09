@@ -28,21 +28,21 @@ public class Lexer {
     m_tokenStart = m_pos - 1;
 
     return switch (m_current) {
-      case '[' -> TokenKind.kLeftBracket;
-      case ']' -> TokenKind.kRightBracket;
-      case '{' -> TokenKind.kLeftBrace;
-      case '}' -> TokenKind.kRightBrace;
-      case ':' -> TokenKind.kColon;
-      case ';' -> TokenKind.kSemicolon;
-      case ',' -> TokenKind.kComma;
-      case '=' -> TokenKind.kEquals;
+      case '[' -> TokenKind.LEFT_BRACKET;
+      case ']' -> TokenKind.RIGHT_BRACKET;
+      case '{' -> TokenKind.LEFT_BRACE;
+      case '}' -> TokenKind.RIGHT_BRACE;
+      case ':' -> TokenKind.COLON;
+      case ';' -> TokenKind.SEMICOLON;
+      case ',' -> TokenKind.COMMA;
+      case '=' -> TokenKind.EQUALS;
       case '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> scanInteger();
-      case '\0' -> TokenKind.kEndOfInput;
+      case '\0' -> TokenKind.END_OF_INPUT;
       default -> {
         if (Character.isLetter(m_current) || m_current == '_') {
           yield scanIdentifier();
         }
-        yield TokenKind.kUnknown;
+        yield TokenKind.UNKNOWN;
       }
     };
   }
@@ -73,7 +73,7 @@ public class Lexer {
       get();
     } while (Character.isDigit(m_current));
     unget();
-    return TokenKind.kInteger;
+    return TokenKind.INTEGER;
   }
 
   private TokenKind scanIdentifier() {
@@ -81,7 +81,7 @@ public class Lexer {
       get();
     } while (Character.isLetterOrDigit(m_current) || m_current == '_');
     unget();
-    return TokenKind.kIdentifier;
+    return TokenKind.IDENTIFIER;
   }
 
   private void get() {

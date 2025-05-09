@@ -21,7 +21,7 @@ public final class CubicHermiteSplineStruct implements Struct<CubicHermiteSpline
 
   @Override
   public int getSize() {
-    return kSizeDouble * 4 * 2;
+    return SIZE_DOUBLE * 4 * 2;
   }
 
   @Override

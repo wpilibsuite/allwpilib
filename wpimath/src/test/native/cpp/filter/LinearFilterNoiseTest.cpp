@@ -13,12 +13,12 @@
 #include "units/time.h"
 
 // Filter constants
-static constexpr auto kFilterStep = 5_ms;
-static constexpr auto kFilterTime = 2_s;
-static constexpr double kSinglePoleIIRTimeConstant = 0.015915;
-static constexpr int32_t kMovAvgTaps = 6;
+static constexpr auto FILTER_STEP = 5_ms;
+static constexpr auto FILTER_TIME = 2_s;
+static constexpr double SINGLE_POLE_IIR_TIME_CONSTANT = 0.015915;
+static constexpr int32_t MOV_AVG_TAPS = 6;
 
-enum LinearFilterNoiseTestType { kTestSinglePoleIIR, kTestMovAvg };
+enum LinearFilterNoiseTestType { TEST_SINGLE_POLE_IIR, TEST_MOV_AVG };
 
 static double GetData(double t) {
   return 100.0 * std::sin(2.0 * std::numbers::pi * t);
@@ -29,12 +29,12 @@ class LinearFilterNoiseTest
  protected:
   frc::LinearFilter<double> m_filter = [=] {
     switch (GetParam()) {
-      case kTestSinglePoleIIR:
+      case TEST_SINGLE_POLE_IIR:
         return frc::LinearFilter<double>::SinglePoleIIR(
-            kSinglePoleIIRTimeConstant, kFilterStep);
+            SINGLE_POLE_IIR_TIME_CONSTANT, FILTER_STEP);
         break;
       default:
-        return frc::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+        return frc::LinearFilter<double>::MovingAverage(MOV_AVG_TAPS);
         break;
     }
   }();
@@ -51,7 +51,7 @@ TEST_P(LinearFilterNoiseTest, NoiseReduce) {
   std::mt19937 gen{rd()};
   std::normal_distribution<double> distr{0.0, 10.0};
 
-  for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
+  for (auto t = 0_s; t < FILTER_TIME; t += FILTER_STEP) {
     double theory = GetData(t.value());
     double noise = distr(gen);
     filterError += std::abs(m_filter.Calculate(theory + noise) - theory);
@@ -66,4 +66,4 @@ TEST_P(LinearFilterNoiseTest, NoiseReduce) {
 }
 
 INSTANTIATE_TEST_SUITE_P(Tests, LinearFilterNoiseTest,
-                         testing::Values(kTestSinglePoleIIR, kTestMovAvg));
+                         testing::Values(TEST_SINGLE_POLE_IIR, TEST_MOV_AVG));

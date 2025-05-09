@@ -55,15 +55,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public abstract class IterativeRobotBase extends RobotBase {
   private enum Mode {
-    kNone,
-    kDisabled,
-    kAutonomous,
-    kTeleop,
-    kTest
+    NONE,
+    DISABLED,
+    AUTONOMOUS,
+    TELEOP,
+    TEST
   }
 
   private final DSControlWord m_word = new DSControlWord();
-  private Mode m_lastMode = Mode.kNone;
+  private Mode m_lastMode = Mode.NONE;
   private final double m_period;
   private final Watchdog m_watchdog;
   private boolean m_ntFlushEnabled = true;
@@ -271,15 +271,15 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_word.refresh();
 
     // Get current mode
-    Mode mode = Mode.kNone;
+    Mode mode = Mode.NONE;
     if (m_word.isDisabled()) {
-      mode = Mode.kDisabled;
+      mode = Mode.DISABLED;
     } else if (m_word.isAutonomous()) {
-      mode = Mode.kAutonomous;
+      mode = Mode.AUTONOMOUS;
     } else if (m_word.isTeleop()) {
-      mode = Mode.kTeleop;
+      mode = Mode.TELEOP;
     } else if (m_word.isTest()) {
-      mode = Mode.kTest;
+      mode = Mode.TEST;
     }
 
     if (!m_calledDsConnected && m_word.isDSAttached()) {
@@ -291,10 +291,10 @@ public abstract class IterativeRobotBase extends RobotBase {
     if (m_lastMode != mode) {
       // Call last mode's exit function
       switch (m_lastMode) {
-        case kDisabled -> disabledExit();
-        case kAutonomous -> autonomousExit();
-        case kTeleop -> teleopExit();
-        case kTest -> testExit();
+        case DISABLED -> disabledExit();
+        case AUTONOMOUS -> autonomousExit();
+        case TELEOP -> teleopExit();
+        case TEST -> testExit();
         default -> {
           // NOP
         }
@@ -302,19 +302,19 @@ public abstract class IterativeRobotBase extends RobotBase {
 
       // Call current mode's entry function
       switch (mode) {
-        case kDisabled -> {
+        case DISABLED -> {
           disabledInit();
           m_watchdog.addEpoch("disabledInit()");
         }
-        case kAutonomous -> {
+        case AUTONOMOUS -> {
           autonomousInit();
           m_watchdog.addEpoch("autonomousInit()");
         }
-        case kTeleop -> {
+        case TELEOP -> {
           teleopInit();
           m_watchdog.addEpoch("teleopInit()");
         }
-        case kTest -> {
+        case TEST -> {
           testInit();
           m_watchdog.addEpoch("testInit()");
         }
@@ -328,22 +328,22 @@ public abstract class IterativeRobotBase extends RobotBase {
 
     // Call the appropriate function depending upon the current robot mode
     switch (mode) {
-      case kDisabled -> {
+      case DISABLED -> {
         DriverStationJNI.observeUserProgramDisabled();
         disabledPeriodic();
         m_watchdog.addEpoch("disabledPeriodic()");
       }
-      case kAutonomous -> {
+      case AUTONOMOUS -> {
         DriverStationJNI.observeUserProgramAutonomous();
         autonomousPeriodic();
         m_watchdog.addEpoch("autonomousPeriodic()");
       }
-      case kTeleop -> {
+      case TELEOP -> {
         DriverStationJNI.observeUserProgramTeleop();
         teleopPeriodic();
         m_watchdog.addEpoch("teleopPeriodic()");
       }
-      case kTest -> {
+      case TEST -> {
         DriverStationJNI.observeUserProgramTest();
         testPeriodic();
         m_watchdog.addEpoch("testPeriodic()");

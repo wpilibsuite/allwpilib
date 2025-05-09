@@ -113,15 +113,15 @@ MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(double xSpeed,
           -gyroAngle);
 
   double wheelSpeeds[4];
-  wheelSpeeds[kFrontLeft] = input.X().value() + input.Y().value() + zRotation;
-  wheelSpeeds[kFrontRight] = input.X().value() - input.Y().value() - zRotation;
-  wheelSpeeds[kRearLeft] = input.X().value() - input.Y().value() + zRotation;
-  wheelSpeeds[kRearRight] = input.X().value() + input.Y().value() - zRotation;
+  wheelSpeeds[FRONT_LEFT] = input.X().value() + input.Y().value() + zRotation;
+  wheelSpeeds[FRONT_RIGHT] = input.X().value() - input.Y().value() - zRotation;
+  wheelSpeeds[REAR_LEFT] = input.X().value() - input.Y().value() + zRotation;
+  wheelSpeeds[REAR_RIGHT] = input.X().value() + input.Y().value() - zRotation;
 
   Desaturate(wheelSpeeds);
 
-  return {wheelSpeeds[kFrontLeft], wheelSpeeds[kFrontRight],
-          wheelSpeeds[kRearLeft], wheelSpeeds[kRearRight]};
+  return {wheelSpeeds[FRONT_LEFT], wheelSpeeds[FRONT_RIGHT],
+          wheelSpeeds[REAR_LEFT], wheelSpeeds[REAR_RIGHT]};
 }
 
 std::string MecanumDrive::GetDescription() const {

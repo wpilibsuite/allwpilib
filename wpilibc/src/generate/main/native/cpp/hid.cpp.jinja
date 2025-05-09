@@ -6,6 +6,9 @@
 {% macro capitalize_first(string) -%}
 {{ string[0]|capitalize + string[1:] }}
 {%- endmacro %}
+{% macro snakecase(string) -%}
+{{ string|camel_to_snake }}
+{%- endmacro %}
 #include "frc/{{ ConsoleName }}Controller.h"
 
 #include <hal/UsageReporting.h>
@@ -20,12 +23,12 @@ using namespace frc;
 }
 {% for stick in sticks %}
 double {{ ConsoleName }}Controller::Get{{ stick.NameParts|map("capitalize")|join }}() const {
-  return GetRawAxis(Axis::k{{ stick.NameParts|map("capitalize")|join }});
+  return GetRawAxis(Axis::{{ snakecase(stick.NameParts|join) }});
 }
 {% endfor -%}
 {% for trigger in triggers %}
 double {{ ConsoleName }}Controller::Get{{ capitalize_first(trigger.name) }}Axis() const {
-  return GetRawAxis(Axis::k{{ capitalize_first(trigger.name) }});
+  return GetRawAxis(Axis::{{ snakecase(trigger.name) }});
 }
 {% if trigger.UseThresholdMethods %}
 BooleanEvent {{ ConsoleName }}Controller::{{ capitalize_first(trigger.name) }}(double threshold, EventLoop* loop) const {
@@ -39,15 +42,15 @@ BooleanEvent {{ ConsoleName }}Controller::{{ capitalize_first(trigger.name) }}(E
 {% endfor -%}
 {% for button in buttons %}
 bool {{ ConsoleName }}Controller::Get{{ capitalize_first(button.name) }}Button() const {
-  return GetRawButton(Button::k{{ capitalize_first(button.name) }});
+  return GetRawButton(Button::{{ snakecase(button.name) }});
 }
 
 bool {{ ConsoleName }}Controller::Get{{ capitalize_first(button.name) }}ButtonPressed() {
-  return GetRawButtonPressed(Button::k{{ capitalize_first(button.name) }});
+  return GetRawButtonPressed(Button::{{ snakecase(button.name) }});
 }
 
 bool {{ ConsoleName }}Controller::Get{{ capitalize_first(button.name) }}ButtonReleased() {
-  return GetRawButtonReleased(Button::k{{ capitalize_first(button.name) }});
+  return GetRawButtonReleased(Button::{{ snakecase(button.name) }});
 }
 
 BooleanEvent {{ ConsoleName }}Controller::{{ capitalize_first(button.name) }}(EventLoop* loop) const {
@@ -56,39 +59,39 @@ BooleanEvent {{ ConsoleName }}Controller::{{ capitalize_first(button.name) }}(Ev
 {% endfor -%}
 {% if ConsoleName == "Xbox" or ConsoleName == "Stadia"%}
 bool {{ ConsoleName }}Controller::GetLeftBumper() const {
-  return GetRawButton(Button::kLeftBumper);
+  return GetRawButton(Button::LEFT_BUMPER);
 }
 
 bool {{ ConsoleName }}Controller::GetRightBumper() const {
-  return GetRawButton(Button::kRightBumper);
+  return GetRawButton(Button::RIGHT_BUMPER);
 }
 
 bool {{ ConsoleName }}Controller::GetLeftBumperPressed() {
-  return GetRawButtonPressed(Button::kLeftBumper);
+  return GetRawButtonPressed(Button::LEFT_BUMPER);
 }
 
 bool {{ ConsoleName }}Controller::GetRightBumperPressed() {
-  return GetRawButtonPressed(Button::kRightBumper);
+  return GetRawButtonPressed(Button::RIGHT_BUMPER);
 }
 
 bool {{ ConsoleName }}Controller::GetLeftBumperReleased() {
-  return GetRawButtonReleased(Button::kLeftBumper);
+  return GetRawButtonReleased(Button::LEFT_BUMPER);
 }
 
 bool {{ ConsoleName }}Controller::GetRightBumperReleased() {
-  return GetRawButtonReleased(Button::kRightBumper);
+  return GetRawButtonReleased(Button::RIGHT_BUMPER);
 }
 {%- elif ConsoleName == "PS4" or ConsoleName == "PS5" %}
 bool {{ ConsoleName }}Controller::GetTouchpad() const {
-  return GetRawButton(Button::kTouchpad);
+  return GetRawButton(Button::TOUCHPAD);
 }
 
 bool {{ ConsoleName }}Controller::GetTouchpadPressed() {
-  return GetRawButtonPressed(Button::kTouchpad);
+  return GetRawButtonPressed(Button::TOUCHPAD);
 }
 
 bool {{ ConsoleName }}Controller::GetTouchpadReleased() {
-  return GetRawButtonReleased(Button::kTouchpad);
+  return GetRawButtonReleased(Button::TOUCHPAD);
 }
 {%- endif %}
 

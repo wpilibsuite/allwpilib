@@ -9,7 +9,7 @@ package edu.wpi.first.networktables;
 /** NetworkTables FloatArray topic. */
 public final class FloatArrayTopic extends Topic {
   /** The default type string for this topic type. */
-  public static final String kTypeString = "float[]";
+  public static final String TYPE_STRING = "float[]";
 
   /**
    * Construct from a generic topic.
@@ -51,7 +51,7 @@ public final class FloatArrayTopic extends Topic {
     return new FloatArrayEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kFloatArray.getValue(),
+            m_handle, NetworkTableType.FLOAT_ARRAY.getValue(),
             "float[]", options),
         defaultValue);
   }
@@ -79,7 +79,7 @@ public final class FloatArrayTopic extends Topic {
     return new FloatArrayEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kFloatArray.getValue(),
+            m_handle, NetworkTableType.FLOAT_ARRAY.getValue(),
             typeString, options),
         defaultValue);
   }
@@ -104,7 +104,7 @@ public final class FloatArrayTopic extends Topic {
     return new FloatArrayEntryImpl(
         this,
         NetworkTablesJNI.publish(
-            m_handle, NetworkTableType.kFloatArray.getValue(),
+            m_handle, NetworkTableType.FLOAT_ARRAY.getValue(),
             "float[]", options),
         new float[] {});
   }
@@ -134,7 +134,7 @@ public final class FloatArrayTopic extends Topic {
     return new FloatArrayEntryImpl(
         this,
         NetworkTablesJNI.publishEx(
-            m_handle, NetworkTableType.kFloatArray.getValue(),
+            m_handle, NetworkTableType.FLOAT_ARRAY.getValue(),
             typeString, properties, options),
         new float[] {});
   }
@@ -165,7 +165,7 @@ public final class FloatArrayTopic extends Topic {
     return new FloatArrayEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kFloatArray.getValue(),
+            m_handle, NetworkTableType.FLOAT_ARRAY.getValue(),
             "float[]", options),
         defaultValue);
   }
@@ -198,7 +198,7 @@ public final class FloatArrayTopic extends Topic {
     return new FloatArrayEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kFloatArray.getValue(),
+            m_handle, NetworkTableType.FLOAT_ARRAY.getValue(),
             typeString, options),
         defaultValue);
   }

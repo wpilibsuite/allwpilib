@@ -13,22 +13,24 @@
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
-    : m_frontLeft{kFrontLeftMotorPort},
-      m_rearLeft{kRearLeftMotorPort},
-      m_frontRight{kFrontRightMotorPort},
-      m_rearRight{kRearRightMotorPort},
+    : m_frontLeft{FRONT_LEFT_MOTOR_PORT},
+      m_rearLeft{REAR_LEFT_MOTOR_PORT},
+      m_frontRight{FRONT_RIGHT_MOTOR_PORT},
+      m_rearRight{REAR_RIGHT_MOTOR_PORT},
 
-      m_frontLeftEncoder{kFrontLeftEncoderPorts[0], kFrontLeftEncoderPorts[1],
-                         kFrontLeftEncoderReversed},
-      m_rearLeftEncoder{kRearLeftEncoderPorts[0], kRearLeftEncoderPorts[1],
-                        kRearLeftEncoderReversed},
-      m_frontRightEncoder{kFrontRightEncoderPorts[0],
-                          kFrontRightEncoderPorts[1],
-                          kFrontRightEncoderReversed},
-      m_rearRightEncoder{kRearRightEncoderPorts[0], kRearRightEncoderPorts[1],
-                         kRearRightEncoderReversed},
+      m_frontLeftEncoder{FRONT_LEFT_ENCODER_PORTS[0],
+                         FRONT_LEFT_ENCODER_PORTS[1],
+                         FRONT_LEFT_ENCODER_REVERSED},
+      m_rearLeftEncoder{REAR_LEFT_ENCODER_PORTS[0], REAR_LEFT_ENCODER_PORTS[1],
+                        REAR_LEFT_ENCODER_REVERSED},
+      m_frontRightEncoder{FRONT_RIGHT_ENCODER_PORTS[0],
+                          FRONT_RIGHT_ENCODER_PORTS[1],
+                          FRONT_RIGHT_ENCODER_REVERSED},
+      m_rearRightEncoder{REAR_RIGHT_ENCODER_PORTS[0],
+                         REAR_RIGHT_ENCODER_PORTS[1],
+                         REAR_RIGHT_ENCODER_REVERSED},
 
-      m_odometry{kDriveKinematics, m_gyro.GetRotation2d(),
+      m_odometry{DRIVE_KINEMATICS, m_gyro.GetRotation2d(),
                  getCurrentWheelDistances(), frc::Pose2d{}} {
   wpi::SendableRegistry::AddChild(&m_drive, &m_frontLeft);
   wpi::SendableRegistry::AddChild(&m_drive, &m_rearLeft);
@@ -36,10 +38,10 @@ DriveSubsystem::DriveSubsystem()
   wpi::SendableRegistry::AddChild(&m_drive, &m_rearRight);
 
   // Set the distance per pulse for the encoders
-  m_frontLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
-  m_rearLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
-  m_frontRightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
-  m_rearRightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
+  m_frontLeftEncoder.SetDistancePerPulse(ENCODER_DISTANCE_PER_PULSE);
+  m_rearLeftEncoder.SetDistancePerPulse(ENCODER_DISTANCE_PER_PULSE);
+  m_frontRightEncoder.SetDistancePerPulse(ENCODER_DISTANCE_PER_PULSE);
+  m_rearRightEncoder.SetDistancePerPulse(ENCODER_DISTANCE_PER_PULSE);
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
   // gearbox is constructed, you might have to invert the left side instead.

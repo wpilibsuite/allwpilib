@@ -38,7 +38,7 @@ public class RobotContainer {
   // A simple auto routine that drives forward a specified distance, and then stops.
   private final Command m_simpleAuto =
       new DriveDistance(
-          AutoConstants.kAutoDriveDistanceInches, AutoConstants.kAutoDriveSpeed, m_robotDrive);
+          AutoConstants.AUTO_DRIVE_DISTACE_INCHES, AutoConstants.AUTO_DRIVE_SPEED, m_robotDrive);
 
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
   private final Command m_complexAuto = new ComplexAuto(m_robotDrive, m_hatchSubsystem);
@@ -47,7 +47,7 @@ public class RobotContainer {
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  XboxController m_driverController = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -83,12 +83,12 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Grab the hatch when the 'A' button is pressed.
-    new JoystickButton(m_driverController, Button.kA.value).onTrue(new GrabHatch(m_hatchSubsystem));
+    new JoystickButton(m_driverController, Button.A.value).onTrue(new GrabHatch(m_hatchSubsystem));
     // Release the hatch when the 'B' button is pressed.
-    new JoystickButton(m_driverController, Button.kB.value)
+    new JoystickButton(m_driverController, Button.B.value)
         .onTrue(new ReleaseHatch(m_hatchSubsystem));
     // While holding the shoulder button, drive at half speed
-    new JoystickButton(m_driverController, Button.kRightBumper.value)
+    new JoystickButton(m_driverController, Button.RIGHT_BUMPER.value)
         .whileTrue(new HalveDriveSpeed(m_robotDrive));
   }
 

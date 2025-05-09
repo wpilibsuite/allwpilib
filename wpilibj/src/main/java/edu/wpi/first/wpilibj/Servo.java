@@ -21,25 +21,25 @@ import edu.wpi.first.wpilibj.PWM.OutputPeriod;
  * in the FIRST Kit of Parts in 2008.
  */
 public class Servo implements Sendable, AutoCloseable {
-  private static final double kMaxServoAngle = 180.0;
-  private static final double kMinServoAngle = 0.0;
+  private static final double MAX_SERVO_ANGLE = 180.0;
+  private static final double MIN_SERVO_ANGLE = 0.0;
 
-  private static final int kDefaultMaxServoPWM = 2400;
-  private static final int kDefaultMinServoPWM = 600;
+  private static final int DEFAULT_MAX_SERVO_PWM = 2400;
+  private static final int DEFAULT_MIN_SERVO_PWM = 600;
 
   private final PWM m_pwm;
 
   private SimDevice m_simDevice;
   private SimDouble m_simPosition;
 
-  private static final int m_minPwm = kDefaultMinServoPWM;
-  private static final int m_maxPwm = kDefaultMaxServoPWM;
+  private static final int m_minPwm = DEFAULT_MIN_SERVO_PWM;
+  private static final int m_maxPwm = DEFAULT_MAX_SERVO_PWM;
 
   /**
    * Constructor.
    *
-   * <p>By default, {@value #kDefaultMaxServoPWM} ms is used as the max PWM value and {@value
-   * #kDefaultMinServoPWM} ms is used as the minPWM value.
+   * <p>By default, {@value #DEFAULT_MAX_SERVO_PWM} ms is used as the max PWM value and {@value
+   * #DEFAULT_MIN_SERVO_PWM} ms is used as the minPWM value.
    *
    * @param channel The PWM channel to which the servo is attached. 0-9 are on-board, 10-19 are on
    *     the MXP port
@@ -55,7 +55,7 @@ public class Servo implements Sendable, AutoCloseable {
 
     m_simDevice = SimDevice.create("Servo", channel);
     if (m_simDevice != null) {
-      m_simPosition = m_simDevice.createDouble("Position", Direction.kOutput, 0.0);
+      m_simPosition = m_simDevice.createDouble("Position", Direction.OUTPUT, 0.0);
       m_pwm.setSimDevice(m_simDevice);
     }
   }
@@ -125,13 +125,13 @@ public class Servo implements Sendable, AutoCloseable {
    * @param degrees The angle in degrees to set the servo.
    */
   public void setAngle(double degrees) {
-    if (degrees < kMinServoAngle) {
-      degrees = kMinServoAngle;
-    } else if (degrees > kMaxServoAngle) {
-      degrees = kMaxServoAngle;
+    if (degrees < MIN_SERVO_ANGLE) {
+      degrees = MIN_SERVO_ANGLE;
+    } else if (degrees > MAX_SERVO_ANGLE) {
+      degrees = MAX_SERVO_ANGLE;
     }
 
-    set((degrees - kMinServoAngle) / getServoAngleRange());
+    set((degrees - MIN_SERVO_ANGLE) / getServoAngleRange());
   }
 
   /**
@@ -143,7 +143,7 @@ public class Servo implements Sendable, AutoCloseable {
    * @return The angle in degrees to which the servo is set.
    */
   public double getAngle() {
-    return get() * getServoAngleRange() + kMinServoAngle;
+    return get() * getServoAngleRange() + MIN_SERVO_ANGLE;
   }
 
   /**
@@ -169,7 +169,7 @@ public class Servo implements Sendable, AutoCloseable {
   }
 
   private double getServoAngleRange() {
-    return kMaxServoAngle - kMinServoAngle;
+    return MAX_SERVO_ANGLE - MIN_SERVO_ANGLE;
   }
 
   @Override

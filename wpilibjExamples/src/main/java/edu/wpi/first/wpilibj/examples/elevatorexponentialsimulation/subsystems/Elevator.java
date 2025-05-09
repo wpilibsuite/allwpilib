@@ -30,33 +30,30 @@ public class Elevator implements AutoCloseable {
   private final ExponentialProfile m_profile =
       new ExponentialProfile(
           ExponentialProfile.Constraints.fromCharacteristics(
-              Constants.kElevatorMaxV, Constants.kElevatorkV, Constants.kElevatorkA));
+              Constants.ELEVATOR_MAX_V, Constants.ELEVATOR_V, Constants.ELEVATOR_A));
 
   private ExponentialProfile.State m_setpoint = new ExponentialProfile.State(0, 0);
 
   // Standard classes for controlling our elevator
   private final PIDController m_pidController =
-      new PIDController(Constants.kElevatorKp, Constants.kElevatorKi, Constants.kElevatorKd);
+      new PIDController(Constants.ELEVATOR_P, Constants.ELEVATOR_I, Constants.ELEVATOR_D);
 
   ElevatorFeedforward m_feedforward =
       new ElevatorFeedforward(
-          Constants.kElevatorkS,
-          Constants.kElevatorkG,
-          Constants.kElevatorkV,
-          Constants.kElevatorkA);
+          Constants.ELEVATOR_S, Constants.ELEVATOR_G, Constants.ELEVATOR_V, Constants.ELEVATOR_A);
   private final Encoder m_encoder =
-      new Encoder(Constants.kEncoderAChannel, Constants.kEncoderBChannel);
-  private final PWMSparkMax m_motor = new PWMSparkMax(Constants.kMotorPort);
+      new Encoder(Constants.ENCODER_A_CHANNEL, Constants.ENCODER_B_CHANNEL);
+  private final PWMSparkMax m_motor = new PWMSparkMax(Constants.MOTOR_PORT);
 
   // Simulation classes help us simulate what's going on, including gravity.
   private final ElevatorSim m_elevatorSim =
       new ElevatorSim(
           m_elevatorGearbox,
-          Constants.kElevatorGearing,
-          Constants.kCarriageMass,
-          Constants.kElevatorDrumRadius,
-          Constants.kMinElevatorHeight,
-          Constants.kMaxElevatorHeight,
+          Constants.ELEVATOR_GEARING,
+          Constants.CARRIAGE_MASS,
+          Constants.ELEVATOR_DRUM_RADIUS,
+          Constants.MIN_ELEVATOR_HEIGHT,
+          Constants.MAX_ELEVATOR_HEIGHT,
           true,
           0,
           0.005,
@@ -74,7 +71,7 @@ public class Elevator implements AutoCloseable {
 
   /** Subsystem constructor. */
   public Elevator() {
-    m_encoder.setDistancePerPulse(Constants.kElevatorEncoderDistPerPulse);
+    m_encoder.setDistancePerPulse(Constants.ELEVATOR_ENCODER_DIST_PER_PULSE);
 
     // Publish Mechanism2d to SmartDashboard
     // To view the Elevator visualization, select Network Tables -> SmartDashboard -> Elevator Sim

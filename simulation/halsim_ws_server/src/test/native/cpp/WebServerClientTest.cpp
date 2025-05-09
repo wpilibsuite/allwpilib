@@ -14,7 +14,7 @@
 #include <wpinet/raw_uv_ostream.h>
 #include <wpinet/uv/util.h>
 
-static constexpr int kTcpConnectAttemptTimeout = 1000;
+static constexpr int TCP_CONNECT_ATTEMPT_TIMEOUT = 1000;
 
 namespace uv = wpi::uv;
 
@@ -87,7 +87,7 @@ bool WebServerClientTest::Initialize() {
         }
 
         // If we weren't previously connected, attempt a reconnection
-        m_connect_timer->Start(uv::Timer::Time(kTcpConnectAttemptTimeout));
+        m_connect_timer->Start(uv::Timer::Time(TCP_CONNECT_ATTEMPT_TIMEOUT));
       });
 
   m_tcp_client->closed.connect(

@@ -91,7 +91,7 @@ TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
 }
 
 TimedRobot::~TimedRobot() {
-  if (m_notifier != HAL_kInvalidHandle) {
+  if (m_notifier != HAL_InvalidHandle) {
     int32_t status = 0;
     HAL_StopNotifier(m_notifier, &status);
     FRC_ReportError(status, "StopNotifier");

@@ -6,17 +6,17 @@
 
 namespace DriveConstants {
 
-const frc::MecanumDriveKinematics kDriveKinematics{
-    frc::Translation2d{kWheelBase / 2, kTrackwidth / 2},
-    frc::Translation2d{kWheelBase / 2, -kTrackwidth / 2},
-    frc::Translation2d{-kWheelBase / 2, kTrackwidth / 2},
-    frc::Translation2d{-kWheelBase / 2, -kTrackwidth / 2}};
+const frc::MecanumDriveKinematics DRIVE_KINEMATICS{
+    frc::Translation2d{WHEEL_BASE / 2, TRACK_WIDTH / 2},
+    frc::Translation2d{WHEEL_BASE / 2, -TRACK_WIDTH / 2},
+    frc::Translation2d{-WHEEL_BASE / 2, TRACK_WIDTH / 2},
+    frc::Translation2d{-WHEEL_BASE / 2, -TRACK_WIDTH / 2}};
 
 }  // namespace DriveConstants
 
 namespace AutoConstants {
 
 const frc::TrapezoidProfile<units::radians>::Constraints
-    kThetaControllerConstraints{kMaxAngularSpeed, kMaxAngularAcceleration};
+    THETA_CONTROLLER_CONSTRAINTS{MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCELERATION};
 
 }  // namespace AutoConstants

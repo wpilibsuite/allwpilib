@@ -33,7 +33,7 @@ void RapidReactCommandBot::ConfigureBindings() {
   // Fire the shooter with the A button
   m_driverController.A().OnTrue(
       frc2::cmd::Parallel(
-          m_shooter.ShootCommand(ShooterConstants::kShooterTarget),
+          m_shooter.ShootCommand(ShooterConstants::SHOOTER_TARGET),
           m_storage.RunCommand())
           // Since we composed this inline we should give it a name
           .WithName("Shoot"));
@@ -45,7 +45,7 @@ void RapidReactCommandBot::ConfigureBindings() {
 
 frc2::CommandPtr RapidReactCommandBot::GetAutonomousCommand() {
   return m_drive
-      .DriveDistanceCommand(AutoConstants::kDriveDistance,
-                            AutoConstants::kDriveSpeed)
-      .WithTimeout(AutoConstants::kTimeout);
+      .DriveDistanceCommand(AutoConstants::DRIVE_DISTANCE,
+                            AutoConstants::DRIVE_SPEED)
+      .WithTimeout(AutoConstants::TIMEOUT);
 }

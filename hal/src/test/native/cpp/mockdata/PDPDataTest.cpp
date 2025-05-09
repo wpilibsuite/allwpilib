@@ -33,7 +33,7 @@ TEST(PdpSimTest, PdpInitialization) {
   // Use out of range index
   gTestPdpCallbackName = "Unset";
   HAL_InitializePowerDistribution(
-      0, INDEX_TO_TEST, HAL_PowerDistributionType_kCTRE, nullptr, &status);
+      0, INDEX_TO_TEST, HAL_PowerDistributionType_CTRE, nullptr, &status);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPdpCallbackName.c_str());
 }

@@ -26,42 +26,42 @@ import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
 class LTVDifferentialDriveControllerTest {
-  private static final double kTolerance = 1 / 12.0;
-  private static final double kAngularTolerance = Math.toRadians(2);
+  private static final double TOLERANCE = 1 / 12.0;
+  private static final double ANGULAR_TOLERANCE = Math.toRadians(2);
 
   /** States of the drivetrain system. */
   static class State {
     /// X position in global coordinate frame.
-    public static final int kX = 0;
+    public static final int X = 0;
 
     /// Y position in global coordinate frame.
-    public static final int kY = 1;
+    public static final int Y = 1;
 
     /// Heading in global coordinate frame.
-    public static final int kHeading = 2;
+    public static final int HEADING = 2;
 
     /// Left encoder velocity.
-    public static final int kLeftVelocity = 3;
+    public static final int LEFT_VELOCITY = 3;
 
     /// Right encoder velocity.
-    public static final int kRightVelocity = 4;
+    public static final int RIGHT_VELOCITY = 4;
   }
 
-  private static final double kLinearV = 3.02; // V/(m/s)
-  private static final double kLinearA = 0.642; // V/(m/s²)
-  private static final double kAngularV = 1.382; // V/(m/s)
-  private static final double kAngularA = 0.08495; // V/(m/s²)
+  private static final double LINEAR_V = 3.02; // V/(m/s)
+  private static final double LINEAR_A = 0.642; // V/(m/s²)
+  private static final double ANGULAR_V = 1.382; // V/(m/s)
+  private static final double ANGULAR_A = 0.08495; // V/(m/s²)
   private static final LinearSystem<N2, N2, N2> plant =
-      LinearSystemId.identifyDrivetrainSystem(kLinearV, kLinearA, kAngularV, kAngularA);
-  private static final double kTrackwidth = 0.9;
+      LinearSystemId.identifyDrivetrainSystem(LINEAR_V, LINEAR_A, ANGULAR_V, ANGULAR_A);
+  private static final double TRACK_WIDTH = 0.9;
 
   private static Matrix<N5, N1> dynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {
-    double v = (x.get(State.kLeftVelocity, 0) + x.get(State.kRightVelocity, 0)) / 2.0;
+    double v = (x.get(State.LEFT_VELOCITY, 0) + x.get(State.RIGHT_VELOCITY, 0)) / 2.0;
 
     var xdot = new Matrix<>(Nat.N5(), Nat.N1());
-    xdot.set(0, 0, v * Math.cos(x.get(State.kHeading, 0)));
-    xdot.set(1, 0, v * Math.sin(x.get(State.kHeading, 0)));
-    xdot.set(2, 0, (x.get(State.kRightVelocity, 0) - x.get(State.kLeftVelocity, 0)) / kTrackwidth);
+    xdot.set(0, 0, v * Math.cos(x.get(State.HEADING, 0)));
+    xdot.set(1, 0, v * Math.sin(x.get(State.HEADING, 0)));
+    xdot.set(2, 0, (x.get(State.RIGHT_VELOCITY, 0) - x.get(State.LEFT_VELOCITY, 0)) / TRACK_WIDTH);
     xdot.assignBlock(
         3, 0, plant.getA().times(x.block(Nat.N2(), Nat.N1(), 3, 0)).plus(plant.getB().times(u)));
     return xdot;
@@ -69,19 +69,19 @@ class LTVDifferentialDriveControllerTest {
 
   @Test
   void testReachesReference() {
-    final double kDt = 0.02;
+    final double DT = 0.02;
 
     final var controller =
         new LTVDifferentialDriveController(
             plant,
-            kTrackwidth,
+            TRACK_WIDTH,
             VecBuilder.fill(0.0625, 0.125, 2.5, 0.95, 0.95),
             VecBuilder.fill(12.0, 12.0),
-            kDt);
-    var robotPose = new Pose2d(2.7, 23.0, Rotation2d.kZero);
+            DT);
+    var robotPose = new Pose2d(2.7, 23.0, Rotation2d.ZERO);
 
     final var waypoints = new ArrayList<Pose2d>();
-    waypoints.add(new Pose2d(2.75, 22.521, Rotation2d.kZero));
+    waypoints.add(new Pose2d(2.75, 22.521, Rotation2d.ZERO));
     waypoints.add(new Pose2d(24.73, 19.68, new Rotation2d(5.846)));
     var config = new TrajectoryConfig(8.8, 0.1);
     final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
@@ -97,21 +97,20 @@ class LTVDifferentialDriveControllerTest {
             0.0);
 
     final var totalTime = trajectory.getTotalTime();
-    for (int i = 0; i < (totalTime / kDt); ++i) {
-      var state = trajectory.sample(kDt * i);
+    for (int i = 0; i < (totalTime / DT); ++i) {
+      var state = trajectory.sample(DT * i);
       robotPose =
-          new Pose2d(
-              x.get(State.kX, 0), x.get(State.kY, 0), new Rotation2d(x.get(State.kHeading, 0)));
+          new Pose2d(x.get(State.X, 0), x.get(State.Y, 0), new Rotation2d(x.get(State.HEADING, 0)));
       final var output =
           controller.calculate(
-              robotPose, x.get(State.kLeftVelocity, 0), x.get(State.kRightVelocity, 0), state);
+              robotPose, x.get(State.LEFT_VELOCITY, 0), x.get(State.RIGHT_VELOCITY, 0), state);
 
       x =
           NumericalIntegration.rkdp(
               LTVDifferentialDriveControllerTest::dynamics,
               x,
               VecBuilder.fill(output.left, output.right),
-              kDt);
+              DT);
     }
 
     final var states = trajectory.getStates();
@@ -121,13 +120,13 @@ class LTVDifferentialDriveControllerTest {
     // must be final or effectively final.
     final var finalRobotPose = robotPose;
     assertAll(
-        () -> assertEquals(endPose.getX(), finalRobotPose.getX(), kTolerance),
-        () -> assertEquals(endPose.getY(), finalRobotPose.getY(), kTolerance),
+        () -> assertEquals(endPose.getX(), finalRobotPose.getX(), TOLERANCE),
+        () -> assertEquals(endPose.getY(), finalRobotPose.getY(), TOLERANCE),
         () ->
             assertEquals(
                 0.0,
                 MathUtil.angleModulus(
                     endPose.getRotation().getRadians() - finalRobotPose.getRotation().getRadians()),
-                kAngularTolerance));
+                ANGULAR_TOLERANCE));
   }
 }

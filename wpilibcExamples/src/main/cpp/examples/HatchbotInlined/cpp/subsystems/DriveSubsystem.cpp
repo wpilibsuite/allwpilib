@@ -9,12 +9,12 @@
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
-    : m_left1{kLeftMotor1Port},
-      m_left2{kLeftMotor2Port},
-      m_right1{kRightMotor1Port},
-      m_right2{kRightMotor2Port},
-      m_leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
-      m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]} {
+    : m_left1{LEFT_MOTOR_1_PORT},
+      m_left2{LEFT_MOTOR_2_PORT},
+      m_right1{RIGHT_MOTOR_1_PORT},
+      m_right2{RIGHT_MOTOR_2_PORT},
+      m_leftEncoder{LEFT_ENCODER_PORTS[0], LEFT_ENCODER_PORTS[1]},
+      m_rightEncoder{RIGHT_ENCODER_PORTS[0], RIGHT_ENCODER_PORTS[1]} {
   wpi::SendableRegistry::AddChild(&m_drive, &m_left1);
   wpi::SendableRegistry::AddChild(&m_drive, &m_right1);
 
@@ -27,8 +27,8 @@ DriveSubsystem::DriveSubsystem()
   m_right1.SetInverted(true);
 
   // Set the distance per pulse for the encoders
-  m_leftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
-  m_rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
+  m_leftEncoder.SetDistancePerPulse(ENCODER_DISTANCE_PER_PULSE);
+  m_rightEncoder.SetDistancePerPulse(ENCODER_DISTANCE_PER_PULSE);
 }
 
 void DriveSubsystem::Periodic() {

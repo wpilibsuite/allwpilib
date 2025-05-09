@@ -91,7 +91,7 @@ SIM_JniHandle sim::AllocateBufferCallback(
 
   auto handle = callbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_InvalidHandle) {
     return -1;
   }
 

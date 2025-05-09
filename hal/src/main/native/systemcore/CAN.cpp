@@ -67,21 +67,22 @@ struct FrameStore {
 struct SocketCanState {
   wpi::EventLoopRunner readLoopRunner;
   wpi::EventLoopRunner writeLoopRunner;
-  wpi::mutex writeMutex[hal::kNumCanBuses];
-  int socketHandle[hal::kNumCanBuses];
+  wpi::mutex writeMutex[hal::NUM_CAN_BUSES];
+  int socketHandle[hal::NUM_CAN_BUSES];
   // ms to count/timer map
   wpi::DenseMap<uint16_t, std::pair<size_t, std::weak_ptr<wpi::uv::Timer>>>
       timers;
   // ms to bus mask/packet
   wpi::DenseMap<uint16_t,
-                std::array<std::optional<canfd_frame>, hal::kNumCanBuses>>
+                std::array<std::optional<canfd_frame>, hal::NUM_CAN_BUSES>>
       timedFrames;
   // packet to time
-  wpi::DenseMap<uint32_t, std::array<uint16_t, hal::kNumCanBuses>> packetToTime;
+  wpi::DenseMap<uint32_t, std::array<uint16_t, hal::NUM_CAN_BUSES>>
+      packetToTime;
 
-  wpi::mutex readMutex[hal::kNumCanBuses];
+  wpi::mutex readMutex[hal::NUM_CAN_BUSES];
   // TODO(thadhouse) we need a MUCH better way of doing this masking
-  wpi::DenseMap<uint32_t, FrameStore> readFrames[hal::kNumCanBuses];
+  wpi::DenseMap<uint32_t, FrameStore> readFrames[hal::NUM_CAN_BUSES];
 
   bool InitializeBuses();
 
@@ -111,7 +112,7 @@ bool SocketCanState::InitializeBuses() {
       std::printf("Failed to set CAN thread priority\n");
     }
 
-    for (int i = 0; i < hal::kNumCanBuses; i++) {
+    for (int i = 0; i < hal::NUM_CAN_BUSES; i++) {
       std::scoped_lock lock{writeMutex[i]};
       socketHandle[i] = socket(PF_CAN, SOCK_RAW, CAN_RAW);
       if (socketHandle[i] == -1) {
@@ -243,7 +244,7 @@ extern "C" {
 void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
                          const struct HAL_CANMessage* message, int32_t periodMs,
                          int32_t* status) {
-  if (busId < 0 || busId >= hal::kNumCanBuses) {
+  if (busId < 0 || busId >= hal::NUM_CAN_BUSES) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
@@ -297,7 +298,7 @@ void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
 void HAL_CAN_ReceiveMessage(int32_t busId, uint32_t messageId,
                             struct HAL_CANReceiveMessage* message,
                             int32_t* status) {
-  if (busId < 0 || busId >= hal::kNumCanBuses) {
+  if (busId < 0 || busId >= hal::NUM_CAN_BUSES) {
     message->message.dataSize = 0;
     message->timeStamp = 0;
     *status = PARAMETER_OUT_OF_RANGE;

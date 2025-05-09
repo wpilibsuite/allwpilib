@@ -15,10 +15,11 @@ import java.util.Optional;
  * code using the roboRIO's I2C port.
  */
 public class Robot extends TimedRobot {
-  static final Port kPort = Port.kPort0;
-  private static final int kDeviceAddress = 4;
+  static final Port PORT = Port.PORT0;
 
-  private final I2C m_arduino = new I2C(kPort, kDeviceAddress);
+  private static final int DEVICE_ADDRESS = 4;
+
+  private final I2C m_arduino = new I2C(PORT, DEVICE_ADDRESS);
 
   private void writeString(String input) {
     // Creates a char array from the input string

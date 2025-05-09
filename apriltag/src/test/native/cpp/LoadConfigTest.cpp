@@ -14,7 +14,7 @@ namespace frc {
 std::vector<AprilTagField> GetAllFields() {
   std::vector<AprilTagField> output;
 
-  for (int i = 0; i < static_cast<int>(AprilTagField::kNumFields); ++i) {
+  for (int i = 0; i < static_cast<int>(AprilTagField::NUM_FIELDS); ++i) {
     output.push_back(static_cast<AprilTagField>(i));
   }
 
@@ -23,7 +23,7 @@ std::vector<AprilTagField> GetAllFields() {
 
 TEST(AprilTagFieldsTest, TestLoad2022RapidReact) {
   AprilTagFieldLayout layout =
-      AprilTagFieldLayout::LoadField(AprilTagField::k2022RapidReact);
+      AprilTagFieldLayout::LoadField(AprilTagField::RAPID_REACT_2022);
 
   // Blue Hangar Truss - Hub
   auto expectedPose =

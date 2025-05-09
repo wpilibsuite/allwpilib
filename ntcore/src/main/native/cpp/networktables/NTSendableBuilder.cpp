@@ -7,5 +7,5 @@
 using namespace nt;
 
 NTSendableBuilder::BackendKind NTSendableBuilder::GetBackendKind() const {
-  return kNetworkTables;
+  return NETWORK_TABLES;
 }

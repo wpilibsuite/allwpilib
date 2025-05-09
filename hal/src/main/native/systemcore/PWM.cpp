@@ -33,11 +33,11 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
                                         int32_t* status) {
   hal::init::CheckInit();
 
-  if (channel < 0 || channel >= kNumSmartIo) {
+  if (channel < 0 || channel >= NUM_SMART_IO) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
-                                     kNumSmartIo, channel);
-    return HAL_kInvalidHandle;
+                                     NUM_SMART_IO, channel);
+    return HAL_InvalidHandle;
   }
 
   HAL_DigitalHandle handle;
@@ -51,9 +51,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
                                            port->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
-                                       kNumSmartIo, channel);
+                                       NUM_SMART_IO, channel);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_InvalidHandle;  // failed to allocate. Pass error back.
   }
 
   port->channel = channel;
@@ -61,14 +61,14 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
   *status = port->InitializeMode(SmartIoMode::PwmOutput);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::PWM);
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   // Disable the PWM output.
   HAL_SetPWMPulseTimeMicroseconds(handle, 0, status);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::PWM);
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   port->previousAllocation = allocationLocation ? allocationLocation : "";
@@ -101,7 +101,7 @@ void HAL_SetPWMSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
 }
 
 HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
-  return channel < kNumSmartIo && channel >= 0;
+  return channel < NUM_SMART_IO && channel >= 0;
 }
 
 void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,

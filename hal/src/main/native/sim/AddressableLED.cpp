@@ -24,13 +24,13 @@ struct AddressableLED {
 }  // namespace
 
 static LimitedHandleResource<HAL_AddressableLEDHandle, AddressableLED,
-                             kNumAddressableLEDs,
+                             NUM_ADDRESSABLE_LEDS,
                              HAL_HandleEnum::AddressableLED>* ledHandles;
 
 namespace hal::init {
 void InitializeAddressableLED() {
   static LimitedHandleResource<HAL_AddressableLEDHandle, AddressableLED,
-                               kNumAddressableLEDs,
+                               NUM_ADDRESSABLE_LEDS,
                                HAL_HandleEnum::AddressableLED>
       dcH;
   ledHandles = &dcH;
@@ -52,24 +52,24 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
     } else {
       *status = HAL_HANDLE_ERROR;
     }
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
-  if (digitalPort->channel >= kNumPWMHeaders) {
+  if (digitalPort->channel >= NUM_PWM_HEADERS) {
     *status = HAL_LED_CHANNEL_ERROR;
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   HAL_AddressableLEDHandle handle = ledHandles->Allocate();
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_InvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   auto led = ledHandles->Get(handle);
   if (!led) {  // would only occur on thread issue
     *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   int16_t index = getHandleIndex(handle);
@@ -117,13 +117,13 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  if (length > HAL_kAddressableLEDMaxLength || length < 0) {
+  if (length > HAL_AddressableLEDMaxLength || length < 0) {
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(
         status,
         fmt::format(
             "LED length must be less than or equal to {}. {} was requested",
-            HAL_kAddressableLEDMaxLength, length));
+            HAL_AddressableLEDMaxLength, length));
     return;
   }
   SimAddressableLEDData[led->index].length = length;

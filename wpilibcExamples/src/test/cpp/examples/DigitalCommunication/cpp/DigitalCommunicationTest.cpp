@@ -16,10 +16,10 @@
 template <typename T>
 class DigitalCommunicationTest : public testing::TestWithParam<T> {
  public:
-  frc::sim::DIOSim m_allianceOutput{Robot::kAlliancePort};
-  frc::sim::DIOSim m_enabledOutput{Robot::kEnabledPort};
-  frc::sim::DIOSim m_autonomousOutput{Robot::kAutonomousPort};
-  frc::sim::DIOSim m_alertOutput{Robot::kAlertPort};
+  frc::sim::DIOSim m_allianceOutput{Robot::ALLIANCE_PORT};
+  frc::sim::DIOSim m_enabledOutput{Robot::ENABLED_PORT};
+  frc::sim::DIOSim m_autonomousOutput{Robot::AUTONOMOUS_PORT};
+  frc::sim::DIOSim m_alertOutput{Robot::ALERT_PORT};
   Robot m_robot;
   std::optional<std::thread> m_thread;
 
@@ -56,15 +56,15 @@ TEST_P(AllianceTest, Alliance) {
 
   bool isRed = false;
   switch (alliance) {
-    case HAL_AllianceStationID_kBlue1:
-    case HAL_AllianceStationID_kBlue2:
-    case HAL_AllianceStationID_kBlue3:
-    case HAL_AllianceStationID_kUnknown:
+    case HAL_AllianceStationID_Blue1:
+    case HAL_AllianceStationID_Blue2:
+    case HAL_AllianceStationID_Blue3:
+    case HAL_AllianceStationID_Unknown:
       isRed = false;
       break;
-    case HAL_AllianceStationID_kRed1:
-    case HAL_AllianceStationID_kRed2:
-    case HAL_AllianceStationID_kRed3:
+    case HAL_AllianceStationID_Red1:
+    case HAL_AllianceStationID_Red2:
+    case HAL_AllianceStationID_Red3:
       isRed = true;
       break;
   }
@@ -74,25 +74,25 @@ TEST_P(AllianceTest, Alliance) {
 INSTANTIATE_TEST_SUITE_P(
     DigitalCommunicationTests, AllianceTest,
     testing::Values<HAL_AllianceStationID>(
-        HAL_AllianceStationID_kRed1, HAL_AllianceStationID_kRed2,
-        HAL_AllianceStationID_kRed3, HAL_AllianceStationID_kBlue1,
-        HAL_AllianceStationID_kBlue2, HAL_AllianceStationID_kBlue3,
-        HAL_AllianceStationID_kUnknown),
+        HAL_AllianceStationID_Red1, HAL_AllianceStationID_Red2,
+        HAL_AllianceStationID_Red3, HAL_AllianceStationID_Blue1,
+        HAL_AllianceStationID_Blue2, HAL_AllianceStationID_Blue3,
+        HAL_AllianceStationID_Unknown),
     [](const testing::TestParamInfo<AllianceTest::ParamType>& info) {
       switch (info.param) {
-        case HAL_AllianceStationID_kBlue1:
+        case HAL_AllianceStationID_Blue1:
           return std::string{"Blue1"};
-        case HAL_AllianceStationID_kBlue2:
+        case HAL_AllianceStationID_Blue2:
           return std::string{"Blue2"};
-        case HAL_AllianceStationID_kBlue3:
+        case HAL_AllianceStationID_Blue3:
           return std::string{"Blue3"};
-        case HAL_AllianceStationID_kRed1:
+        case HAL_AllianceStationID_Red1:
           return std::string{"Red1"};
-        case HAL_AllianceStationID_kRed2:
+        case HAL_AllianceStationID_Red2:
           return std::string{"Red2"};
-        case HAL_AllianceStationID_kRed3:
+        case HAL_AllianceStationID_Red3:
           return std::string{"Red3"};
-        case HAL_AllianceStationID_kUnknown:
+        case HAL_AllianceStationID_Unknown:
           return std::string{"Unknown"};
       }
       return std::string{"Error"};

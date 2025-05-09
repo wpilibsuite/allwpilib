@@ -171,7 +171,7 @@ public class BooleanEvent implements BooleanSupplier {
    * @return The debounced event (rising edges debounced only).
    */
   public BooleanEvent debounce(double seconds) {
-    return debounce(seconds, Debouncer.DebounceType.kRising);
+    return debounce(seconds, Debouncer.DebounceType.RISING);
   }
 
   /**

@@ -40,9 +40,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class CameraServer {
   /** CameraServer base port. */
-  public static final int kBasePort = 1181;
+  public static final int BASE_PORT = 1181;
 
-  private static final String kPublishName = "/CameraPublisher";
+  private static final String PUBLISH_NAME = "/CameraPublisher";
 
   private static final class PropertyPublisher implements AutoCloseable {
     @SuppressWarnings({"PMD.MissingBreakInSwitch", "PMD.ImplicitSwitchFallThrough", "fallthrough"})
@@ -59,14 +59,14 @@ public final class CameraServer {
 
       try {
         switch (event.propertyKind) {
-          case kBoolean:
+          case BOOLEAN:
             m_booleanValueEntry = table.getBooleanTopic(name).getEntry(false);
             m_booleanValueEntry.setDefault(event.value != 0);
             break;
-          case kEnum:
+          case ENUM:
             m_choicesTopic = table.getStringArrayTopic(infoName + "/choices");
             // fall through
-          case kInteger:
+          case INTEGER:
             m_integerValueEntry = table.getIntegerTopic(name).getEntry(0);
             m_minPublisher = table.getIntegerTopic(infoName + "/min").publish();
             m_maxPublisher = table.getIntegerTopic(infoName + "/max").publish();
@@ -79,7 +79,7 @@ public final class CameraServer {
             m_stepPublisher.set(CameraServerJNI.getPropertyStep(event.propertyHandle));
             m_defaultPublisher.set(CameraServerJNI.getPropertyDefault(event.propertyHandle));
             break;
-          case kString:
+          case STRING:
             m_stringValueEntry = table.getStringTopic(name).getEntry("");
             m_stringValueEntry.setDefault(event.valueStr);
             break;
@@ -93,17 +93,17 @@ public final class CameraServer {
 
     void update(VideoEvent event) {
       switch (event.propertyKind) {
-        case kBoolean -> {
+        case BOOLEAN -> {
           if (m_booleanValueEntry != null) {
             m_booleanValueEntry.set(event.value != 0);
           }
         }
-        case kInteger, kEnum -> {
+        case INTEGER, ENUM -> {
           if (m_integerValueEntry != null) {
             m_integerValueEntry.set(event.value);
           }
         }
-        case kString -> {
+        case STRING -> {
           if (m_stringValueEntry != null) {
             m_stringValueEntry.set(event.valueStr);
           }
@@ -213,7 +213,7 @@ public final class CameraServer {
   // source handle indexed by sink handle
   private static final Map<Integer, Integer> m_fixedSources = new HashMap<>();
   private static final NetworkTable m_publishTable =
-      NetworkTableInstance.getDefault().getTable(kPublishName);
+      NetworkTableInstance.getDefault().getTable(PUBLISH_NAME);
 
   // We publish sources to NetworkTables using the following structure:
   // "/CameraPublisher/{Source.Name}/" - root
@@ -233,13 +233,13 @@ public final class CameraServer {
           event -> {
             synchronized (CameraServer.class) {
               switch (event.kind) {
-                case kSourceCreated -> {
+                case SOURCE_CREATED -> {
                   // Create subtable for the camera
                   NetworkTable table = m_publishTable.getSubTable(event.name);
                   m_publishers.put(
                       event.sourceHandle, new SourcePublisher(table, event.sourceHandle));
                 }
-                case kSourceDestroyed -> {
+                case SOURCE_DESTROYED -> {
                   SourcePublisher publisher = m_publishers.remove(event.sourceHandle);
                   if (publisher != null) {
                     try {
@@ -249,7 +249,7 @@ public final class CameraServer {
                     }
                   }
                 }
-                case kSourceConnected -> {
+                case SOURCE_CONNECTED -> {
                   SourcePublisher publisher = m_publishers.get(event.sourceHandle);
                   if (publisher != null) {
                     // update the description too (as it may have changed)
@@ -258,32 +258,32 @@ public final class CameraServer {
                     publisher.m_connectedPublisher.set(true);
                   }
                 }
-                case kSourceDisconnected -> {
+                case SOURCE_DISCONNECTED -> {
                   SourcePublisher publisher = m_publishers.get(event.sourceHandle);
                   if (publisher != null) {
                     publisher.m_connectedPublisher.set(false);
                   }
                 }
-                case kSourceVideoModesUpdated -> {
+                case SOURCE_VIDEO_MODES_UPDATED -> {
                   SourcePublisher publisher = m_publishers.get(event.sourceHandle);
                   if (publisher != null) {
                     publisher.m_modesPublisher.set(getSourceModeValues(event.sourceHandle));
                   }
                 }
-                case kSourceVideoModeChanged -> {
+                case SOURCE_VIDEO_MODE_CHANGED -> {
                   SourcePublisher publisher = m_publishers.get(event.sourceHandle);
                   if (publisher != null) {
                     publisher.m_modeEntry.set(videoModeToString(event.mode));
                   }
                 }
-                case kSourcePropertyCreated -> {
+                case SOURCE_PROPERTY_CREATED -> {
                   SourcePublisher publisher = m_publishers.get(event.sourceHandle);
                   if (publisher != null) {
                     publisher.m_properties.put(
                         event.propertyHandle, new PropertyPublisher(publisher.m_table, event));
                   }
                 }
-                case kSourcePropertyValueUpdated -> {
+                case SOURCE_PROPERTY_VALUE_UPDATED -> {
                   SourcePublisher publisher = m_publishers.get(event.sourceHandle);
                   if (publisher != null) {
                     PropertyPublisher pp = publisher.m_properties.get(event.propertyHandle);
@@ -292,7 +292,7 @@ public final class CameraServer {
                     }
                   }
                 }
-                case kSourcePropertyChoicesUpdated -> {
+                case SOURCE_PROPERTY_CHOICES_UPDATED -> {
                   SourcePublisher publisher = m_publishers.get(event.sourceHandle);
                   if (publisher != null) {
                     PropertyPublisher pp = publisher.m_properties.get(event.propertyHandle);
@@ -310,10 +310,10 @@ public final class CameraServer {
                     }
                   }
                 }
-                case kSinkSourceChanged,
-                    kSinkCreated,
-                    kSinkDestroyed,
-                    kNetworkInterfacesChanged -> {
+                case SINK_SOURCE_CHANGED,
+                    SINK_CREATED,
+                    SINK_DESTROYED,
+                    NETWORK_INTERFACES_CHANGED -> {
                   m_addresses = CameraServerJNI.getNetworkInterfaces();
                   updateStreamValues();
                 }
@@ -326,7 +326,7 @@ public final class CameraServer {
           0x4fff,
           true);
 
-  private static int m_nextPort = kBasePort;
+  private static int m_nextPort = BASE_PORT;
   private static String[] m_addresses = new String[0];
 
   /**
@@ -336,8 +336,8 @@ public final class CameraServer {
    */
   private static String makeSourceValue(int source) {
     return switch (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))) {
-      case kUsb -> "usb:" + CameraServerJNI.getUsbCameraPath(source);
-      case kHttp -> {
+      case USB -> "usb:" + CameraServerJNI.getUsbCameraPath(source);
+      case HTTP -> {
         String[] urls = CameraServerJNI.getHttpCameraUrls(source);
         if (urls.length > 0) {
           yield "ip:" + urls[0];
@@ -345,9 +345,9 @@ public final class CameraServer {
           yield "ip:";
         }
       }
-      case kCv -> "cv:";
-      case kRaw -> "raw:";
-      case kUnknown -> "unknown:";
+      case CV -> "cv:";
+      case RAW -> "raw:";
+      case UNKNOWN -> "unknown:";
     };
   }
 
@@ -368,7 +368,7 @@ public final class CameraServer {
    */
   private static synchronized String[] getSinkStreamValues(int sink) {
     // Ignore all but MjpegServer
-    if (VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) != VideoSink.Kind.kMjpeg) {
+    if (VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) != VideoSink.Kind.MJPEG) {
       return new String[0];
     }
 
@@ -403,7 +403,7 @@ public final class CameraServer {
   private static synchronized String[] getSourceStreamValues(int source) {
     // Ignore all but HttpCamera
     if (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))
-        != VideoSource.Kind.kHttp) {
+        != VideoSource.Kind.HTTP) {
       return new String[0];
     }
 
@@ -421,7 +421,7 @@ public final class CameraServer {
         int sinkSource = CameraServerJNI.getSinkSource(sink);
         if (source == sinkSource
             && VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink))
-                == VideoSink.Kind.kMjpeg) {
+                == VideoSink.Kind.MJPEG) {
           // Add USB-only passthrough
           String[] finalValues = Arrays.copyOf(values, values.length + 1);
           int port = CameraServerJNI.getMjpegServerPort(sink);
@@ -452,7 +452,7 @@ public final class CameraServer {
       if (publisher != null) {
         // Don't set stream values if this is a HttpCamera passthrough
         if (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))
-            == VideoSource.Kind.kHttp) {
+            == VideoSource.Kind.HTTP) {
           continue;
         }
 
@@ -483,15 +483,15 @@ public final class CameraServer {
   /** Provide string description of pixel format. */
   private static String pixelFormatToString(PixelFormat pixelFormat) {
     return switch (pixelFormat) {
-      case kMJPEG -> "MJPEG";
-      case kYUYV -> "YUYV";
-      case kRGB565 -> "RGB565";
-      case kBGR -> "BGR";
-      case kBGRA -> "BGRA";
-      case kGray -> "Gray";
-      case kY16 -> "Y16";
-      case kUYVY -> "UYVY";
-      case kUnknown -> "Unknown";
+      case MJPEG -> "MJPEG";
+      case YUYV -> "YUYV";
+      case RGB565 -> "RGB565";
+      case BGR -> "BGR";
+      case BGRA -> "BGRA";
+      case GRAY -> "Gray";
+      case Y16 -> "Y16";
+      case UYVY -> "UYVY";
+      case UNKNOWN -> "Unknown";
     };
   }
 
@@ -610,7 +610,7 @@ public final class CameraServer {
    */
   public static MjpegServer addSwitchedCamera(String name) {
     // create a dummy CvSource
-    CvSource source = new CvSource(name, PixelFormat.kMJPEG, 160, 120, 30);
+    CvSource source = new CvSource(name, PixelFormat.MJPEG, 160, 120, 30);
     MjpegServer server = startAutomaticCapture(source);
     synchronized (CameraServer.class) {
       m_fixedSources.put(server.getHandle(), source.getHandle());
@@ -656,7 +656,7 @@ public final class CameraServer {
       VideoSink sink = m_sinks.get(name);
       if (sink != null) {
         VideoSink.Kind kind = sink.getKind();
-        if (kind != VideoSink.Kind.kCv) {
+        if (kind != VideoSink.Kind.CV) {
           throw new VideoException("expected OpenCV sink, but got " + kind);
         }
         return (CvSink) sink;
@@ -684,7 +684,7 @@ public final class CameraServer {
       VideoSink sink = m_sinks.get(name);
       if (sink != null) {
         VideoSink.Kind kind = sink.getKind();
-        if (kind != VideoSink.Kind.kCv) {
+        if (kind != VideoSink.Kind.CV) {
           throw new VideoException("expected OpenCV sink, but got " + kind);
         }
         return (CvSink) sink;
@@ -725,7 +725,7 @@ public final class CameraServer {
    * @return OpenCV source for the MJPEG stream
    */
   public static CvSource putVideo(String name, int width, int height) {
-    CvSource source = new CvSource(name, PixelFormat.kMJPEG, width, height, 30);
+    CvSource source = new CvSource(name, PixelFormat.MJPEG, width, height, 30);
     startAutomaticCapture(source);
     return source;
   }

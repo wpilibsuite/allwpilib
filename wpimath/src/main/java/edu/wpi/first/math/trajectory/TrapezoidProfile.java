@@ -18,7 +18,7 @@ import java.util.Objects;
  *
  * <pre><code>
  * TrapezoidProfile.Constraints constraints =
- *   new TrapezoidProfile.Constraints(kMaxV, kMaxA);
+ *   new TrapezoidProfile.Constraints(MAX_V, MAX_A);
  * TrapezoidProfile.State previousProfiledReference =
  *   new TrapezoidProfile.State(initialReference, 0.0);
  * TrapezoidProfile profile = new TrapezoidProfile(constraints);

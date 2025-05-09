@@ -175,7 +175,7 @@ public class LogBackedSendableBuilder implements SendableBuilder {
 
   @Override
   public BackendKind getBackendKind() {
-    return BackendKind.kUnknown;
+    return BackendKind.UNKNOWN;
   }
 
   @Override

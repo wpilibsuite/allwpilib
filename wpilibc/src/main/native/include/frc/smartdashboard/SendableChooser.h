@@ -126,9 +126,9 @@ class SendableChooser : public SendableChooserBase {
 
   void InitSendable(wpi::SendableBuilder& builder) override {
     builder.SetSmartDashboardType("String Chooser");
-    builder.PublishConstInteger(kInstance, m_instance);
+    builder.PublishConstInteger(INSTANCE, m_instance);
     builder.AddStringArrayProperty(
-        kOptions,
+        OPTIONS,
         [=, this] {
           std::vector<std::string> keys;
           for (const auto& choice : m_choices) {
@@ -138,13 +138,13 @@ class SendableChooser : public SendableChooserBase {
         },
         nullptr);
     builder.AddSmallStringProperty(
-        kDefault,
+        DEFAULT,
         [=, this](wpi::SmallVectorImpl<char>&) -> std::string_view {
           return m_defaultChoice;
         },
         nullptr);
     builder.AddSmallStringProperty(
-        kActive,
+        ACTIVE,
         [=, this](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
           std::scoped_lock lock(m_mutex);
           if (m_haveSelected) {
@@ -155,7 +155,7 @@ class SendableChooser : public SendableChooserBase {
           }
         },
         nullptr);
-    builder.AddStringProperty(kSelected, nullptr,
+    builder.AddStringProperty(SELECTED, nullptr,
                               [=, this](std::string_view val) {
                                 T choice{};
                                 std::function<void(T)> listener;

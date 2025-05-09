@@ -126,7 +126,7 @@ class HttpServerConnection {
   virtual void SendError(int code, std::string_view message = {});
 
   /** The HTTP request. */
-  HttpParser m_request{HttpParser::kRequest};
+  HttpParser m_request{HttpParser::REQUEST};
 
   /** Whether the connection should be kept alive. */
   bool m_keepAlive = false;

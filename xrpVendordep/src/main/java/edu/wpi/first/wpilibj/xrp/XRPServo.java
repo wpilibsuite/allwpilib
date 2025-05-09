@@ -53,9 +53,9 @@ public class XRPServo {
     SimDevice xrpServoSimDevice = SimDevice.create(simDeviceName);
 
     if (xrpServoSimDevice != null) {
-      xrpServoSimDevice.createBoolean("init", Direction.kOutput, true);
+      xrpServoSimDevice.createBoolean("init", Direction.OUTPUT, true);
       // This should mimic PWM position [0.0, 1.0]
-      m_simPosition = xrpServoSimDevice.createDouble("position", Direction.kOutput, 0.5);
+      m_simPosition = xrpServoSimDevice.createDouble("position", Direction.OUTPUT, 0.5);
     } else {
       m_simPosition = null;
     }

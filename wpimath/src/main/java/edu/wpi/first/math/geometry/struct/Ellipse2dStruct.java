@@ -22,7 +22,7 @@ public class Ellipse2dStruct implements Struct<Ellipse2d> {
 
   @Override
   public int getSize() {
-    return Pose2d.struct.getSize() + kSizeDouble + kSizeDouble;
+    return Pose2d.struct.getSize() + SIZE_DOUBLE + SIZE_DOUBLE;
   }
 
   @Override

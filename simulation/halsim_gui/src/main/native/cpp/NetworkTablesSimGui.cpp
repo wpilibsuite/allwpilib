@@ -40,7 +40,7 @@ void NetworkTablesSimGui::Initialize() {
       [&] { glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get()); }));
   gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
   gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
-  gNetworkTablesInfoWindow->SetDefaultVisibility(glass::Window::kHide);
+  gNetworkTablesInfoWindow->SetDefaultVisibility(glass::Window::HIDE);
   gNetworkTablesInfoWindow->DisableRenamePopup();
   wpi::gui::AddLateExecute([] { gNetworkTablesInfoWindow->Display(); });
 

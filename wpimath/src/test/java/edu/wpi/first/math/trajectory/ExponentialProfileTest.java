@@ -14,9 +14,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class ExponentialProfileTest {
-  private static final double kDt = 0.01;
+  private static final double DT = 0.01;
   private static final SimpleMotorFeedforward feedforward =
-      new SimpleMotorFeedforward(0, 2.5629, 0.43277, kDt);
+      new SimpleMotorFeedforward(0, 2.5629, 0.43277, DT);
   private static final ExponentialProfile.Constraints constraints =
       ExponentialProfile.Constraints.fromCharacteristics(12, 2.5629, 0.43277);
 
@@ -42,7 +42,7 @@ class ExponentialProfileTest {
 
   private static ExponentialProfile.State checkDynamics(
       ExponentialProfile profile, ExponentialProfile.State current, ExponentialProfile.State goal) {
-    var next = profile.calculate(kDt, current, goal);
+    var next = profile.calculate(DT, current, goal);
     var signal = feedforward.calculate(current.velocity, next.velocity);
 
     assertTrue(Math.abs(signal) < constraints.maxInput + 1e-9);

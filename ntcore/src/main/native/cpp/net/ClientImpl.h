@@ -93,16 +93,16 @@ class ClientImpl final : private ServerMessageHandler {
   NetworkPing m_ping;
 
   // timestamp handling
-  static constexpr uint32_t kRttIntervalMs = 3000;
+  static constexpr uint32_t RTT_INTERVAL_MS = 3000;
   uint64_t m_nextPingTimeMs{0};
   uint64_t m_pongTimeMs{0};
   uint32_t m_rtt2Us{UINT32_MAX};
   bool m_haveTimeOffset{false};
 
   // periodic sweep handling
-  static constexpr uint32_t kMinPeriodMs = 5;
-  static constexpr uint32_t kMaxPeriodMs = NetworkPing::kPingIntervalMs;
-  uint32_t m_periodMs{kMaxPeriodMs};
+  static constexpr uint32_t MIN_PERIOD_MS = 5;
+  static constexpr uint32_t MAX_PERIOD_MS = NetworkPing::PING_INTERVAL_MS;
+  uint32_t m_periodMs{MAX_PERIOD_MS};
 
   // outgoing queue
   NetworkOutgoingQueue<ClientMessage> m_outgoing;

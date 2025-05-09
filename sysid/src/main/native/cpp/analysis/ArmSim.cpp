@@ -12,18 +12,14 @@
 
 using namespace sysid;
 
-ArmSim::ArmSim(double Ks, double Kv, double Ka, double Kg, double offset,
+ArmSim::ArmSim(double S, double V, double A, double G, double offset,
                double initialPosition, double initialVelocity)
-    // u = Ks sgn(x) + Kv x + Ka a + Kg cos(theta)
-    // Ka a = u - Ks sgn(x) - Kv x - Kg cos(theta)
-    // a = 1/Ka u - Ks/Ka sgn(x) - Kv/Ka x - Kg/Ka cos(theta)
-    // a = -Kv/Ka x + 1/Ka u - Ks/Ka sgn(x) - Kg/Ka cos(theta)
+    // u = S sgn(x) + V x + A a + G cos(theta)
+    // A a = u - S sgn(x) - V x - G cos(theta)
+    // a = 1/A u - S/A sgn(x) - V/A x - G/A cos(theta)
+    // a = -V/A x + 1/A u - S/A sgn(x) - G/A cos(theta)
     // a = Ax + Bu + c sgn(x) + d cos(theta)
-    : m_A{-Kv / Ka},
-      m_B{1.0 / Ka},
-      m_c{-Ks / Ka},
-      m_d{-Kg / Ka},
-      m_offset{offset} {
+    : m_A{-V / A}, m_B{1.0 / A}, m_c{-S / A}, m_d{-G / A}, m_offset{offset} {
   Reset(initialPosition, initialVelocity);
 }
 

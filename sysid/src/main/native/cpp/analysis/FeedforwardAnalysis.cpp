@@ -61,10 +61,10 @@ static void PopulateOLSData(const std::vector<PreparedData>& d,
     X(sample, 2) = std::copysign(1, pt.velocity);
 
     // Set test-specific variables
-    if (type == analysis::kElevator) {
+    if (type == analysis::ELEVATOR) {
       // Set the gravity term (for δ)
       X(sample, 3) = 1.0;
-    } else if (type == analysis::kArm) {
+    } else if (type == analysis::ARM) {
       // Set the cosine and sine terms (for δ and ε)
       X(sample, 3) = pt.cos;
       X(sample, 4) = pt.sin;
@@ -87,7 +87,7 @@ static void CheckOLSDataQuality(const Eigen::MatrixXd& X,
   const Eigen::VectorXd& eigvals = eigSolver.eigenvalues();
   const Eigen::MatrixXd& eigvecs = eigSolver.eigenvectors();
 
-  // Bits are Ks, Kv, Ka, Kg, offset
+  // Bits are S, V, A, G, offset
   std::bitset<5> badGains;
 
   constexpr double threshold = 10.0;
@@ -105,7 +105,7 @@ static void CheckOLSDataQuality(const Eigen::MatrixXd& X,
     if (std::abs(eigvals(row) * maxCoeff) <= threshold) {
       // Fit for α is bad
       if (maxIndex == 0) {
-        // Affects Kv
+        // Affects V
         badGains.set(1);
       }
 
@@ -118,17 +118,17 @@ static void CheckOLSDataQuality(const Eigen::MatrixXd& X,
 
       // Fit for γ is bad
       if (maxIndex == 2) {
-        // Affects Ks
+        // Affects S
         badGains.set(0);
       }
 
       // Fit for δ is bad
       if (maxIndex == 3) {
-        if (type == analysis::kElevator) {
-          // Affects Kg
+        if (type == analysis::ELEVATOR) {
+          // Affects G
           badGains.set(3);
-        } else if (type == analysis::kArm) {
-          // Affects Kg and offset
+        } else if (type == analysis::ARM) {
+          // Affects G and offset
           badGains.set(3);
           badGains.set(4);
         }
@@ -136,7 +136,7 @@ static void CheckOLSDataQuality(const Eigen::MatrixXd& X,
 
       // Fit for ε is bad
       if (maxIndex == 4) {
-        // Affects Kg and offset
+        // Affects G and offset
         badGains.set(3);
         badGains.set(4);
       }
@@ -146,7 +146,7 @@ static void CheckOLSDataQuality(const Eigen::MatrixXd& X,
   // If any gains are bad, throw an error
   if (badGains.any()) {
     // Create list of bad gain names
-    constexpr std::array gainNames{"Ks", "Kv", "Ka", "Kg", "offset"};
+    constexpr std::array gainNames{"S", "V", "A", "G", "offset"};
     std::vector<std::string_view> badGainsList;
     for (size_t i = 0; i < badGains.size(); ++i) {
       if (badGains.test(i)) {
@@ -165,8 +165,8 @@ static void CheckOLSDataQuality(const Eigen::MatrixXd& X,
     // Append guidance for fixing the data
     error +=
         "Ensure the data has:\n\n"
-        "  * at least 2 steady-state velocity events to separate Ks from Kv\n"
-        "  * at least 1 acceleration event to find Ka\n"
+        "  * at least 2 steady-state velocity events to separate S from V\n"
+        "  * at least 1 acceleration event to find A\n"
         "  * for elevators, enough vertical motion to measure gravity\n"
         "  * for arms, enough range of motion to measure gravity and encoder "
         "offset\n";
@@ -221,53 +221,53 @@ OLSResult CalculateFeedforwardGains(const Storage& data,
   //
   // See docs/ols-derivations.md for more details.
   {
-    // dx/dt = -Kv/Ka x + 1/Ka u - Ks/Ka sgn(x)
+    // dx/dt = -V/A x + 1/A u - S/A sgn(x)
     // dx/dt = αx + βu + γ sgn(x)
 
-    // α = -Kv/Ka
-    // β = 1/Ka
-    // γ = -Ks/Ka
+    // α = -V/A
+    // β = 1/A
+    // γ = -S/A
     double α = ols.coeffs[0];
     double β = ols.coeffs[1];
     double γ = ols.coeffs[2];
 
-    // Ks = -γ/β
-    // Kv = -α/β
-    // Ka = 1/β
+    // S = -γ/β
+    // V = -α/β
+    // A = 1/β
     gains.emplace_back(-γ / β);
     gains.emplace_back(-α / β);
     gains.emplace_back(1 / β);
 
-    if (type == analysis::kElevator) {
-      // dx/dt = -Kv/Ka x + 1/Ka u - Ks/Ka sgn(x) - Kg/Ka
+    if (type == analysis::ELEVATOR) {
+      // dx/dt = -V/A x + 1/A u - S/A sgn(x) - G/A
       // dx/dt = αx + βu + γ sgn(x) + δ
 
-      // δ = -Kg/Ka
+      // δ = -G/A
       double δ = ols.coeffs[3];
 
-      // Kg = -δ/β
+      // G = -δ/β
       gains.emplace_back(-δ / β);
     }
 
-    if (type == analysis::kArm) {
-      // dx/dt = -Kv/Ka x + 1/Ka u - Ks/Ka sgn(x)
-      //           - Kg/Ka cos(offset) cos(angle)                   NOLINT
-      //           + Kg/Ka sin(offset) sin(angle)                   NOLINT
+    if (type == analysis::ARM) {
+      // dx/dt = -V/A x + 1/A u - S/A sgn(x)
+      //           - G/A cos(offset) cos(angle)                   NOLINT
+      //           + G/A sin(offset) sin(angle)                   NOLINT
       // dx/dt = αx + βu + γ sgn(x) + δ cos(angle) + ε sin(angle)   NOLINT
 
-      // δ = -Kg/Ka cos(offset)
-      // ε = Kg/Ka sin(offset)
+      // δ = -G/A cos(offset)
+      // ε = G/A sin(offset)
       double δ = ols.coeffs[3];
       double ε = ols.coeffs[4];
 
-      // Kg = hypot(δ, ε)/β      NOLINT
+      // G = hypot(δ, ε)/β      NOLINT
       // offset = atan2(ε, -δ)   NOLINT
       gains.emplace_back(std::hypot(δ, ε) / β);
       gains.emplace_back(std::atan2(ε, -δ));
     }
   }
 
-  // Gains are Ks, Kv, Ka, Kg (elevator/arm only), offset (arm only)
+  // Gains are S, V, A, G (elevator/arm only), offset (arm only)
   return OLSResult{gains, ols.rSquared, ols.rmse};
 }
 

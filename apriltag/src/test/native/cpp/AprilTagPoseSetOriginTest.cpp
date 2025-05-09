@@ -23,7 +23,7 @@ TEST(AprilTagPoseSetOriginTest, TransformationMatches) {
       54_ft, 27_ft};
 
   layout.SetOrigin(
-      AprilTagFieldLayout::OriginPosition::kRedAllianceWallRightSide);
+      AprilTagFieldLayout::OriginPosition::RED_ALLIANCE_WALL_RIGHT_SIDE);
 
   auto mirrorPose =
       Pose3d{54_ft, 27_ft, 0_ft, Rotation3d{0_deg, 0_deg, 180_deg}};

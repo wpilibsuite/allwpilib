@@ -192,9 +192,9 @@ public class SysIdRoutine extends SysIdRoutineLog {
   /** Motor direction for a SysId test. */
   public enum Direction {
     /** Forward. */
-    kForward,
+    FORWARD,
     /** Reverse. */
-    kReverse
+    REVERSE
   }
 
   /**
@@ -209,13 +209,13 @@ public class SysIdRoutine extends SysIdRoutineLog {
    */
   public Command quasistatic(Direction direction) {
     State state;
-    if (direction == Direction.kForward) {
-      state = State.kQuasistaticForward;
-    } else { // if (direction == Direction.kReverse) {
-      state = State.kQuasistaticReverse;
+    if (direction == Direction.FORWARD) {
+      state = State.QUASISTATIC_FORWARD;
+    } else { // if (direction == Direction.REVERSE) {
+      state = State.QUASISTATIC_REVERSE;
     }
 
-    double outputSign = direction == Direction.kForward ? 1.0 : -1.0;
+    double outputSign = direction == Direction.FORWARD ? 1.0 : -1.0;
 
     Timer timer = new Timer();
     return m_mechanism
@@ -234,7 +234,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
         .finallyDo(
             () -> {
               m_mechanism.m_drive.accept(Volts.of(0));
-              m_recordState.accept(State.kNone);
+              m_recordState.accept(State.NONE);
               timer.stop();
             })
         .withName("sysid-" + state.toString() + "-" + m_mechanism.m_name)
@@ -252,11 +252,11 @@ public class SysIdRoutine extends SysIdRoutineLog {
    * @return A command to run the test.
    */
   public Command dynamic(Direction direction) {
-    double outputSign = direction == Direction.kForward ? 1.0 : -1.0;
+    double outputSign = direction == Direction.FORWARD ? 1.0 : -1.0;
     State state =
         Map.ofEntries(
-                entry(Direction.kForward, State.kDynamicForward),
-                entry(Direction.kReverse, State.kDynamicReverse))
+                entry(Direction.FORWARD, State.DYNAMIC_FORWARD),
+                entry(Direction.REVERSE, State.DYNAMIC_REVERSE))
             .get(direction);
 
     return m_mechanism
@@ -273,7 +273,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
         .finallyDo(
             () -> {
               m_mechanism.m_drive.accept(Volts.of(0));
-              m_recordState.accept(State.kNone);
+              m_recordState.accept(State.NONE);
             })
         .withName("sysid-" + state.toString() + "-" + m_mechanism.m_name)
         .withTimeout(m_config.m_timeout.in(Seconds));

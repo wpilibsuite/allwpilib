@@ -9,19 +9,19 @@ public class VideoCamera extends VideoSource {
   /** White balance. */
   public static class WhiteBalance {
     /** Fixed indoor white balance. */
-    public static final int kFixedIndoor = 3000;
+    public static final int FIXED_INDOOR = 3000;
 
     /** Fixed outdoor white balance 1. */
-    public static final int kFixedOutdoor1 = 4000;
+    public static final int FIXED_OUTDOOR1 = 4000;
 
     /** Fixed outdoor white balance 2. */
-    public static final int kFixedOutdoor2 = 5000;
+    public static final int FIXED_OUTDOOR2 = 5000;
 
     /** Fixed fluorescent white balance 1. */
-    public static final int kFixedFluorescent1 = 5100;
+    public static final int FIXED_FLUORESCENT1 = 5100;
 
     /** Fixed fluorescent white balance 2. */
-    public static final int kFixedFlourescent2 = 5200;
+    public static final int FIXED_FLUORESCENT2 = 5200;
 
     /** Default constructor. */
     public WhiteBalance() {}

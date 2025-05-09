@@ -42,26 +42,26 @@ typedef struct HAL_ControlWord HAL_ControlWord;
 
 HAL_ENUM(HAL_AllianceStationID) {
   /** Unknown Alliance Station */
-  HAL_AllianceStationID_kUnknown = 0,
+  HAL_AllianceStationID_Unknown = 0,
   /** Red Alliance Station 1 */
-  HAL_AllianceStationID_kRed1,
+  HAL_AllianceStationID_Red1,
   /** Red Alliance Station 2 */
-  HAL_AllianceStationID_kRed2,
+  HAL_AllianceStationID_Red2,
   /** Red Alliance Station 3 */
-  HAL_AllianceStationID_kRed3,
+  HAL_AllianceStationID_Red3,
   /** Blue Alliance Station 1 */
-  HAL_AllianceStationID_kBlue1,
+  HAL_AllianceStationID_Blue1,
   /** Blue Alliance Station 2 */
-  HAL_AllianceStationID_kBlue2,
+  HAL_AllianceStationID_Blue2,
   /** Blue Alliance Station 3 */
-  HAL_AllianceStationID_kBlue3,
+  HAL_AllianceStationID_Blue3,
 };
 
 HAL_ENUM(HAL_MatchType) {
-  HAL_kMatchType_none = 0,
-  HAL_kMatchType_practice,
-  HAL_kMatchType_qualification,
-  HAL_kMatchType_elimination,
+  HAL_MatchType_none = 0,
+  HAL_MatchType_practice,
+  HAL_MatchType_qualification,
+  HAL_MatchType_elimination,
 };
 
 /**
@@ -69,28 +69,28 @@ HAL_ENUM(HAL_MatchType) {
  * struct. This is used for allocating buffers, not bounds checking, since there
  * are usually less axes in practice.
  */
-#define HAL_kMaxJoystickAxes 12
+#define HAL_MaxJoystickAxes 12
 /**
  * The maximum number of POVs that will be stored in a single HAL_JoystickPOVs
  * struct. This is used for allocating buffers, not bounds checking, since there
  * are usually less POVs in practice.
  */
-#define HAL_kMaxJoystickPOVs 12
+#define HAL_MaxJoystickPOVs 12
 /**
  * The maximum number of joysticks.
  */
-#define HAL_kMaxJoysticks 6
+#define HAL_MaxJoysticks 6
 
 struct HAL_JoystickAxes {
   int16_t count;
-  float axes[HAL_kMaxJoystickAxes];
-  uint8_t raw[HAL_kMaxJoystickAxes];
+  float axes[HAL_MaxJoystickAxes];
+  uint8_t raw[HAL_MaxJoystickAxes];
 };
 typedef struct HAL_JoystickAxes HAL_JoystickAxes;
 
 struct HAL_JoystickPOVs {
   int16_t count;
-  int16_t povs[HAL_kMaxJoystickPOVs];
+  int16_t povs[HAL_MaxJoystickPOVs];
 };
 typedef struct HAL_JoystickPOVs HAL_JoystickPOVs;
 
@@ -105,7 +105,7 @@ struct HAL_JoystickDescriptor {
   uint8_t type;
   char name[256];
   uint8_t axisCount;
-  uint8_t axisTypes[HAL_kMaxJoystickAxes];
+  uint8_t axisTypes[HAL_MaxJoystickAxes];
   uint8_t buttonCount;
   uint8_t povCount;
 };

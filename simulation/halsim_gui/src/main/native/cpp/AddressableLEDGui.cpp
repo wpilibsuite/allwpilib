@@ -36,7 +36,7 @@ class AddressableLEDModel : public glass::LEDDisplayModel {
  private:
   int32_t m_index;
 
-  HAL_AddressableLEDData m_data[HAL_kAddressableLEDMaxLength];
+  HAL_AddressableLEDData m_data[HAL_AddressableLEDMaxLength];
 };
 
 class AddressableLEDsModel : public glass::LEDDisplaysModel {

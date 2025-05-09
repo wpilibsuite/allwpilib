@@ -50,12 +50,12 @@ struct FeedbackGains {
  *
  * @param preset The feedback controller preset.
  * @param params The parameters for calculating optimal feedback gains.
- * @param Kv     Velocity feedforward gain.
- * @param Ka     Acceleration feedforward gain.
+ * @param V     Velocity feedforward gain.
+ * @param A     Acceleration feedforward gain.
  */
 FeedbackGains CalculatePositionFeedbackGains(
     const FeedbackControllerPreset& preset, const LQRParameters& params,
-    double Kv, double Ka);
+    double V, double A);
 
 /**
  * Calculates velocity feedback gains for the given controller preset, LQR
@@ -64,13 +64,13 @@ FeedbackGains CalculatePositionFeedbackGains(
  * @param preset           The feedback controller preset.
  * @param params           The parameters for calculating optimal feedback
  *                         gains.
- * @param Kv               Velocity feedforward gain.
- * @param Ka               Acceleration feedforward gain.
+ * @param V               Velocity feedforward gain.
+ * @param A               Acceleration feedforward gain.
  * @param encFactor        The factor to convert the gains from output units to
  *                         encoder units. This is usually encoder EPR * gearing
  *                         * units per rotation.
  */
 FeedbackGains CalculateVelocityFeedbackGains(
     const FeedbackControllerPreset& preset, const LQRParameters& params,
-    double Kv, double Ka, double encFactor = 1.0);
+    double V, double A, double encFactor = 1.0);
 }  // namespace sysid

@@ -9,7 +9,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 Elevator::Elevator() {
-  m_encoder.SetDistancePerPulse(Constants::kArmEncoderDistPerPulse);
+  m_encoder.SetDistancePerPulse(Constants::ARM_ENCODER_DIST_PER_PULSE);
 
   // Put Mechanism 2d to SmartDashboard
   // To view the Elevator visualization, select Network Tables -> SmartDashboard

@@ -104,15 +104,15 @@ void IterativeRobotBase::LoopFunc() {
 
   // Get current mode
   DSControlWord word;
-  Mode mode = Mode::kNone;
+  Mode mode = Mode::NONE;
   if (word.IsDisabled()) {
-    mode = Mode::kDisabled;
+    mode = Mode::DISABLED;
   } else if (word.IsAutonomous()) {
-    mode = Mode::kAutonomous;
+    mode = Mode::AUTONOMOUS;
   } else if (word.IsTeleop()) {
-    mode = Mode::kTeleop;
+    mode = Mode::TELEOP;
   } else if (word.IsTest()) {
-    mode = Mode::kTest;
+    mode = Mode::TEST;
   }
 
   if (!m_calledDsConnected && word.IsDSAttached()) {
@@ -123,27 +123,27 @@ void IterativeRobotBase::LoopFunc() {
   // If mode changed, call mode exit and entry functions
   if (m_lastMode != mode) {
     // Call last mode's exit function
-    if (m_lastMode == Mode::kDisabled) {
+    if (m_lastMode == Mode::DISABLED) {
       DisabledExit();
-    } else if (m_lastMode == Mode::kAutonomous) {
+    } else if (m_lastMode == Mode::AUTONOMOUS) {
       AutonomousExit();
-    } else if (m_lastMode == Mode::kTeleop) {
+    } else if (m_lastMode == Mode::TELEOP) {
       TeleopExit();
-    } else if (m_lastMode == Mode::kTest) {
+    } else if (m_lastMode == Mode::TEST) {
       TestExit();
     }
 
     // Call current mode's entry function
-    if (mode == Mode::kDisabled) {
+    if (mode == Mode::DISABLED) {
       DisabledInit();
       m_watchdog.AddEpoch("DisabledInit()");
-    } else if (mode == Mode::kAutonomous) {
+    } else if (mode == Mode::AUTONOMOUS) {
       AutonomousInit();
       m_watchdog.AddEpoch("AutonomousInit()");
-    } else if (mode == Mode::kTeleop) {
+    } else if (mode == Mode::TELEOP) {
       TeleopInit();
       m_watchdog.AddEpoch("TeleopInit()");
-    } else if (mode == Mode::kTest) {
+    } else if (mode == Mode::TEST) {
       TestInit();
       m_watchdog.AddEpoch("TestInit()");
     }
@@ -152,19 +152,19 @@ void IterativeRobotBase::LoopFunc() {
   }
 
   // Call the appropriate function depending upon the current robot mode
-  if (mode == Mode::kDisabled) {
+  if (mode == Mode::DISABLED) {
     HAL_ObserveUserProgramDisabled();
     DisabledPeriodic();
     m_watchdog.AddEpoch("DisabledPeriodic()");
-  } else if (mode == Mode::kAutonomous) {
+  } else if (mode == Mode::AUTONOMOUS) {
     HAL_ObserveUserProgramAutonomous();
     AutonomousPeriodic();
     m_watchdog.AddEpoch("AutonomousPeriodic()");
-  } else if (mode == Mode::kTeleop) {
+  } else if (mode == Mode::TELEOP) {
     HAL_ObserveUserProgramTeleop();
     TeleopPeriodic();
     m_watchdog.AddEpoch("TeleopPeriodic()");
-  } else if (mode == Mode::kTest) {
+  } else if (mode == Mode::TEST) {
     HAL_ObserveUserProgramTest();
     TestPeriodic();
     m_watchdog.AddEpoch("TestPeriodic()");

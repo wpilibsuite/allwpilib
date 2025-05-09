@@ -18,7 +18,7 @@
 namespace glass {
 class NTMotorControllerModel : public MotorControllerModel {
  public:
-  static constexpr const char* kType = "Motor Controller";
+  static constexpr const char* TYPE = "Motor Controller";
 
   explicit NTMotorControllerModel(std::string_view path);
   NTMotorControllerModel(nt::NetworkTableInstance inst, std::string_view path);

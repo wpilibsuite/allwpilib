@@ -23,10 +23,10 @@ import java.util.function.DoubleSupplier;
 
 public class Drive extends SubsystemBase {
   // The motors on the left side of the drive.
-  private final PWMSparkMax m_leftMotor = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
+  private final PWMSparkMax m_leftMotor = new PWMSparkMax(DriveConstants.LEFT_MOTOR_1_PORT);
 
   // The motors on the right side of the drive.
-  private final PWMSparkMax m_rightMotor = new PWMSparkMax(DriveConstants.kRightMotor1Port);
+  private final PWMSparkMax m_rightMotor = new PWMSparkMax(DriveConstants.RIGHT_MOTOR_1_PORT);
 
   // The robot's drive
   private final DifferentialDrive m_drive =
@@ -35,16 +35,16 @@ public class Drive extends SubsystemBase {
   // The left-side drive encoder
   private final Encoder m_leftEncoder =
       new Encoder(
-          DriveConstants.kLeftEncoderPorts[0],
-          DriveConstants.kLeftEncoderPorts[1],
-          DriveConstants.kLeftEncoderReversed);
+          DriveConstants.LEFT_ENCODER_PORTS[0],
+          DriveConstants.LEFT_ENCODER_PORTS[1],
+          DriveConstants.LEFT_ENCODER_REVERSED);
 
   // The right-side drive encoder
   private final Encoder m_rightEncoder =
       new Encoder(
-          DriveConstants.kRightEncoderPorts[0],
-          DriveConstants.kRightEncoderPorts[1],
-          DriveConstants.kRightEncoderReversed);
+          DriveConstants.RIGHT_ENCODER_PORTS[0],
+          DriveConstants.RIGHT_ENCODER_PORTS[1],
+          DriveConstants.RIGHT_ENCODER_REVERSED);
 
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutVoltage m_appliedVoltage = Volts.mutable(0);
@@ -93,8 +93,8 @@ public class Drive extends SubsystemBase {
   /** Creates a new Drive subsystem. */
   public Drive() {
     // Add the second motors on each side of the drivetrain
-    m_leftMotor.addFollower(new PWMSparkMax(DriveConstants.kLeftMotor2Port));
-    m_rightMotor.addFollower(new PWMSparkMax(DriveConstants.kRightMotor2Port));
+    m_leftMotor.addFollower(new PWMSparkMax(DriveConstants.LEFT_MOTOR_2_PORT));
+    m_rightMotor.addFollower(new PWMSparkMax(DriveConstants.RIGHT_MOTOR_2_PORT));
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
@@ -102,8 +102,8 @@ public class Drive extends SubsystemBase {
     m_rightMotor.setInverted(true);
 
     // Sets the distance per pulse for the encoders
-    m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
-    m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+    m_leftEncoder.setDistancePerPulse(DriveConstants.ENCODER_DISTANCE_PER_PULSE);
+    m_rightEncoder.setDistancePerPulse(DriveConstants.ENCODER_DISTANCE_PER_PULSE);
   }
 
   /**

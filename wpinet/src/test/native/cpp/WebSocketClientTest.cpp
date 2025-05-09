@@ -92,7 +92,7 @@ class WebSocketClientTest : public WebSocketTest {
   bool mockBadAccept = false;
   std::vector<uint8_t> wireData;
   std::shared_ptr<uv::Pipe> conn;
-  HttpParser req{HttpParser::kRequest};
+  HttpParser req{HttpParser::REQUEST};
   SmallString<64> clientKey;
   std::string mockProtocol;
   bool serverHeadersDone = false;

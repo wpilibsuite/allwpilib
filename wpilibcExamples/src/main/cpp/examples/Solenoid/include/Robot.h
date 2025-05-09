@@ -55,8 +55,8 @@ class Robot : public frc::TimedRobot {
   // Compressor connected to a PH with a default CAN ID
   frc::Compressor m_compressor{0, frc::PneumaticsModuleType::REVPH};
 
-  static constexpr int kSolenoidButton = 1;
-  static constexpr int kDoubleSolenoidForward = 2;
-  static constexpr int kDoubleSolenoidReverse = 3;
-  static constexpr int kCompressorButton = 4;
+  static constexpr int SOLENOID_BUTTON = 1;
+  static constexpr int DOUBLE_SOLENOID_FORWARD = 2;
+  static constexpr int DOUBLE_SOLENOID_REVERSE = 3;
+  static constexpr int COMPRESSOR_BUTTON = 4;
 };

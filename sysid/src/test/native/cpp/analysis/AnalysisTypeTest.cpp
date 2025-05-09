@@ -7,8 +7,8 @@
 #include "sysid/analysis/AnalysisType.h"
 
 TEST(AnalysisTypeTest, FromName) {
-  EXPECT_EQ(sysid::analysis::kElevator, sysid::analysis::FromName("Elevator"));
-  EXPECT_EQ(sysid::analysis::kArm, sysid::analysis::FromName("Arm"));
-  EXPECT_EQ(sysid::analysis::kSimple, sysid::analysis::FromName("Simple"));
-  EXPECT_EQ(sysid::analysis::kSimple, sysid::analysis::FromName("Random"));
+  EXPECT_EQ(sysid::analysis::ELEVATOR, sysid::analysis::FromName("Elevator"));
+  EXPECT_EQ(sysid::analysis::ARM, sysid::analysis::FromName("Arm"));
+  EXPECT_EQ(sysid::analysis::SIMPLE, sysid::analysis::FromName("Simple"));
+  EXPECT_EQ(sysid::analysis::SIMPLE, sysid::analysis::FromName("Random"));
 }

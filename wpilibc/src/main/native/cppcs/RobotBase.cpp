@@ -28,11 +28,11 @@
 #include "frc/Notifier.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
-static_assert(frc::RuntimeType::kRoboRIO ==
+static_assert(frc::RuntimeType::ROBORIO ==
               static_cast<frc::RuntimeType>(HAL_Runtime_RoboRIO));
-static_assert(frc::RuntimeType::kRoboRIO2 ==
+static_assert(frc::RuntimeType::ROBORIO2 ==
               static_cast<frc::RuntimeType>(HAL_Runtime_RoboRIO2));
-static_assert(frc::RuntimeType::kSimulation ==
+static_assert(frc::RuntimeType::SIMULATION ==
               static_cast<frc::RuntimeType>(HAL_Runtime_Simulation));
 
 using SetCameraServerSharedFP = void (*)(frc::CameraServerShared*);
@@ -208,7 +208,7 @@ RobotBase::RobotBase() {
 
   connListenerHandle =
       inst.AddConnectionListener(false, [&](const nt::Event& event) {
-        if (event.Is(nt::EventFlags::kConnected)) {
+        if (event.Is(nt::EventFlags::CONNECTED)) {
           auto connInfo = event.GetConnectionInfo();
           HAL_ReportUsage(fmt::format("NT/{}", connInfo->remote_id), "");
         }

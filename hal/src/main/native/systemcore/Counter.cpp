@@ -31,11 +31,11 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
                                         const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
-  if (channel == InvalidHandleIndex || channel >= kNumSmartIo) {
+  if (channel == InvalidHandleIndex || channel >= NUM_SMART_IO) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Counter", 0,
-                                     kNumSmartIo, channel);
-    return HAL_kInvalidHandle;
+                                     NUM_SMART_IO, channel);
+    return HAL_InvalidHandle;
   }
 
   HAL_CounterHandle handle;
@@ -49,9 +49,9 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
                                            port->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Counter", 0,
-                                       kNumSmartIo, channel);
+                                       NUM_SMART_IO, channel);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_InvalidHandle;  // failed to allocate. Pass error back.
   }
 
   port->channel = channel;
@@ -61,7 +61,7 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
                                       : SmartIoMode::SingleCounterFalling);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::Counter);
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   port->previousAllocation = allocationLocation ? allocationLocation : "";

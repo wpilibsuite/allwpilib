@@ -97,7 +97,7 @@ void HALProvider::Show(ViewEntry* entry, glass::Window* window) {
   if (!window) {
     window = GetOrAddWindow(
         entry->name, true,
-        entry->showDefault ? glass::Window::kShow : glass::Window::kHide);
+        entry->showDefault ? glass::Window::SHOW : glass::Window::HIDE);
   }
   if (!window) {
     return;

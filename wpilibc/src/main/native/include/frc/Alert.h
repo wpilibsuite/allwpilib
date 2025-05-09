@@ -13,7 +13,7 @@ namespace frc {
 
 /**
  * Persistent alert to be sent via NetworkTables. Alerts are tagged with a type
- * of kError, kWarning, or kInfo to denote urgency. See Alert::AlertType for
+ * of ERROR, WARNING, or INFO to denote urgency. See Alert::AlertType for
  * suggested usage of each type. Alerts can be displayed on supported
  * dashboards, and are shown in a priority order based on type and recency of
  * activation, with newly activated alerts first.
@@ -27,7 +27,7 @@ namespace frc {
  *
  * <pre>
  * class Robot {
- *   frc::Alert alert{"Something went wrong", frc::Alert::AlertType::kWarning};
+ *   frc::Alert alert{"Something went wrong", frc::Alert::AlertType::WARNING};
  * }
  *
  * Robot::periodic() {
@@ -46,14 +46,14 @@ class Alert {
      * symbol. Use this type for problems which will seriously affect the
      * robot's functionality and thus require immediate attention.
      */
-    kError,
+    ERROR,
 
     /**
      * Medium priority alert - displayed second on the dashboard with a yellow
      * "!" symbol. Use this type for problems which could affect the robot's
      * functionality but do not necessarily require immediate attention.
      */
-    kWarning,
+    WARNING,
 
     /**
      * Low priority alert - displayed last on the dashboard with a green "i"
@@ -61,7 +61,7 @@ class Alert {
      * robot's functionality, or any other alerts which do not fall under the
      * other categories.
      */
-    kInfo
+    INFO
   };
 
   /**

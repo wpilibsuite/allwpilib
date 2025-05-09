@@ -16,7 +16,7 @@ namespace wpilibws {
 extern std::atomic<bool>* gDSSocketConnected;
 
 void HALSimWSProviderJoystick::Initialize(WSRegisterFunc webregisterFunc) {
-  CreateProviders<HALSimWSProviderJoystick>("Joystick", HAL_kMaxJoysticks,
+  CreateProviders<HALSimWSProviderJoystick>("Joystick", HAL_MaxJoysticks,
                                             webregisterFunc);
 }
 
@@ -98,7 +98,7 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
     HAL_JoystickAxes axes{};
     axes.count =
         std::min(it.value().size(),
-                 static_cast<wpi::json::size_type>(HAL_kMaxJoystickAxes));
+                 static_cast<wpi::json::size_type>(HAL_MaxJoystickAxes));
     for (int i = 0; i < axes.count; i++) {
       axes.axes[i] = it.value()[i];
     }
@@ -123,7 +123,7 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
     HAL_JoystickPOVs povs{};
     povs.count =
         std::min(it.value().size(),
-                 static_cast<wpi::json::size_type>(HAL_kMaxJoystickPOVs));
+                 static_cast<wpi::json::size_type>(HAL_MaxJoystickPOVs));
     for (int i = 0; i < povs.count; i++) {
       povs.povs[i] = it.value()[i];
     }

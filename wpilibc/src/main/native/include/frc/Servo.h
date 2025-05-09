@@ -94,14 +94,14 @@ class Servo : public wpi::Sendable, public wpi::SendableHelper<Servo> {
   static double GetServoAngleRange();
   units::microsecond_t GetFullRangeScaleFactor() const;
 
-  static constexpr double kMaxServoAngle = 180.0;
-  static constexpr double kMinServoAngle = 0.0;
+  static constexpr double MAX_SERVO_ANGLE = 180.0;
+  static constexpr double MIN_SERVO_ANGLE = 0.0;
 
-  static constexpr units::millisecond_t kDefaultMaxServoPWM = 2.4_ms;
-  static constexpr units::millisecond_t kDefaultMinServoPWM = 0.6_ms;
+  static constexpr units::millisecond_t DEFAULT_MAX_SERVO_PWM = 2.4_ms;
+  static constexpr units::millisecond_t DEFAULT_MIN_SERVO_PWM = 0.6_ms;
 
-  units::millisecond_t m_maxPwm = kDefaultMaxServoPWM;
-  units::millisecond_t m_minPwm = kDefaultMinServoPWM;
+  units::millisecond_t m_maxPwm = DEFAULT_MAX_SERVO_PWM;
+  units::millisecond_t m_minPwm = DEFAULT_MIN_SERVO_PWM;
 
   hal::SimDevice m_simDevice;
   hal::SimDouble m_simPosition;

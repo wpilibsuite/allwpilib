@@ -28,11 +28,11 @@ class GenericHID {
    */
   enum RumbleType {
     /// Left rumble motor.
-    kLeftRumble,
+    LEFT_RUMBLE,
     /// Right rumble motor.
-    kRightRumble,
+    RIGHT_RUMBLE,
     /// Both left and right rumble motors.
-    kBothRumble
+    BOTH_RUMBLE
   };
 
   /**
@@ -40,39 +40,39 @@ class GenericHID {
    */
   enum HIDType {
     /// Unknown.
-    kUnknown = -1,
+    UNKNOWN = -1,
     /// XInputUnknown.
-    kXInputUnknown = 0,
+    XINPUT_UNKNOWN = 0,
     /// XInputGamepad.
-    kXInputGamepad = 1,
+    XINPUT_GAMEPAD = 1,
     /// XInputWheel.
-    kXInputWheel = 2,
+    XINPUT_WHEEL = 2,
     /// XInputArcadeStick.
-    kXInputArcadeStick = 3,
+    XINPUT_ARCADE_STICK = 3,
     /// XInputFlightStick.
-    kXInputFlightStick = 4,
+    XINPUT_FLIGHT_STICK = 4,
     /// XInputDancePad.
-    kXInputDancePad = 5,
+    XINPUT_DANCE_PAD = 5,
     /// XInputGuitar.
-    kXInputGuitar = 6,
+    XINPUT_GUITAR = 6,
     /// XInputGuitar2.
-    kXInputGuitar2 = 7,
+    XINPUT_GUITAR2 = 7,
     /// XInputDrumKit.
-    kXInputDrumKit = 8,
+    XINPUT_DRUM_KIT = 8,
     /// XInputGuitar3.
-    kXInputGuitar3 = 11,
+    XINPUT_GUITAR3 = 11,
     /// XInputArcadePad.
-    kXInputArcadePad = 19,
+    XINPUT_ARCADE_PAD = 19,
     /// HIDJoystick.
-    kHIDJoystick = 20,
+    HID_JOYSTICK = 20,
     /// HIDGamepad.
-    kHIDGamepad = 21,
+    HID_GAMEPAD = 21,
     /// HIDDriving.
-    kHIDDriving = 22,
+    HID_DRIVING = 22,
     /// HIDFlight.
-    kHIDFlight = 23,
+    HID_FLIGHT = 23,
     /// HID1stPerson.
-    kHID1stPerson = 24
+    HID_1ST_PERSON = 24
   };
 
   explicit GenericHID(int port);

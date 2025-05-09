@@ -21,10 +21,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * to the Dashboard.
  */
 public class Robot extends TimedRobot {
-  private static final int kMotorPort = 0;
-  private static final int kJoystickPort = 0;
-  private static final int kEncoderPortA = 0;
-  private static final int kEncoderPortB = 1;
+  private static final int MOTOR_PORT = 0;
+  private static final int JOYSTICK_PORT = 0;
+  private static final int ENCODER_PORT_A = 0;
+  private static final int ENCODER_PORT_B = 1;
 
   private final PWMSparkMax m_motor;
   private final Joystick m_joystick;
@@ -32,9 +32,9 @@ public class Robot extends TimedRobot {
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    m_motor = new PWMSparkMax(kMotorPort);
-    m_joystick = new Joystick(kJoystickPort);
-    m_encoder = new Encoder(kEncoderPortA, kEncoderPortB);
+    m_motor = new PWMSparkMax(MOTOR_PORT);
+    m_joystick = new Joystick(JOYSTICK_PORT);
+    m_encoder = new Encoder(ENCODER_PORT_A, ENCODER_PORT_B);
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
     m_encoder.setDistancePerPulse((Math.PI * 6) / 360.0);

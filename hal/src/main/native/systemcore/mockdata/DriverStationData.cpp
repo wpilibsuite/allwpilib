@@ -20,7 +20,7 @@ DEFINE_CAPI(HAL_Bool, EStop, false)
 DEFINE_CAPI(HAL_Bool, FmsAttached, false)
 DEFINE_CAPI(HAL_Bool, DsAttached, false)
 DEFINE_CAPI(HAL_AllianceStationID, AllianceStationId,
-            HAL_AllianceStationID_kRed1)
+            HAL_AllianceStationID_Red1)
 DEFINE_CAPI(double, MatchTime, 0)
 
 #undef DEFINE_CAPI

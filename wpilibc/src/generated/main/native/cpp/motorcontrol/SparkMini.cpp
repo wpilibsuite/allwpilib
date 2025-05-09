@@ -12,7 +12,7 @@ using namespace frc;
 
 SparkMini::SparkMini(int channel) : PWMMotorController("SparkMini", channel) {
   SetBounds(2.5_ms, 1.51_ms, 1.5_ms, 1.49_ms, 0.5_ms);
-  m_pwm.SetOutputPeriod(PWM::kOutputPeriod_5Ms);
+  m_pwm.SetOutputPeriod(PWM::OUTPUT_PERIOD_5MS);
   SetSpeed(0.0);
 
   HAL_ReportUsage("IO", GetChannel(), "RevSPARK");

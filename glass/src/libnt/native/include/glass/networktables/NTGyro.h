@@ -17,7 +17,7 @@
 namespace glass {
 class NTGyroModel : public GyroModel {
  public:
-  static constexpr const char* kType = "Gyro";
+  static constexpr const char* TYPE = "Gyro";
 
   explicit NTGyroModel(std::string_view path);
   NTGyroModel(nt::NetworkTableInstance inst, std::string_view path);

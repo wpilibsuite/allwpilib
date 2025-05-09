@@ -12,7 +12,7 @@
 
 using namespace frc;
 
-static constexpr std::string_view kSmartDashboardType = "line";
+static constexpr std::string_view SMART_DASHBOARD_TYPE = "line";
 
 MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
                                          units::degree_t angle,
@@ -28,8 +28,8 @@ MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
 void MechanismLigament2d::UpdateEntries(
     std::shared_ptr<nt::NetworkTable> table) {
   m_typePub = table->GetStringTopic(".type").PublishEx(
-      nt::StringTopic::kTypeString, {{"SmartDashboard", kSmartDashboardType}});
-  m_typePub.Set(kSmartDashboardType);
+      nt::StringTopic::TYPE_STRING, {{"SmartDashboard", SMART_DASHBOARD_TYPE}});
+  m_typePub.Set(SMART_DASHBOARD_TYPE);
 
   m_colorEntry = table->GetStringTopic("color").GetEntry("");
   m_colorEntry.Set(m_color);
