@@ -30,6 +30,11 @@ Vectord<States> AngleResidual(const Vectord<States>& a,
   return ret;
 }
 
+template <>
+Eigen::VectorXd AngleResidual<Eigen::Dynamic>(const Eigen::VectorXd& a,
+                                              const Eigen::VectorXd& b,
+                                              int angleStateIdx);
+
 /**
  * Returns a function that subtracts two vectors while normalizing the resulting
  * value in the selected row as if it were an angle.
@@ -44,6 +49,10 @@ AngleResidual(int angleStateIdx) {
     return AngleResidual<States>(a, b, angleStateIdx);
   };
 }
+
+template <>
+std::function<Eigen::VectorXd(const Eigen::VectorXd&, const Eigen::VectorXd&)>
+AngleResidual<Eigen::Dynamic>(int angleStateIdx);
 
 /**
  * Adds a and b while normalizing the resulting value in the selected row as an
@@ -63,6 +72,11 @@ Vectord<States> AngleAdd(const Vectord<States>& a, const Vectord<States>& b,
   return ret;
 }
 
+template <>
+Eigen::VectorXd AngleAdd<Eigen::Dynamic>(const Eigen::VectorXd& a,
+                                         const Eigen::VectorXd& b,
+                                         int angleStateIdx);
+
 /**
  * Returns a function that adds two vectors while normalizing the resulting
  * value in the selected row as an angle.
@@ -75,6 +89,10 @@ std::function<Vectord<States>(const Vectord<States>&, const Vectord<States>&)>
 AngleAdd(int angleStateIdx) {
   return [=](auto a, auto b) { return AngleAdd<States>(a, b, angleStateIdx); };
 }
+
+template <>
+std::function<Eigen::VectorXd(const Eigen::VectorXd&, const Eigen::VectorXd&)>
+AngleAdd<Eigen::Dynamic>(int angleStateIdx);
 
 /**
  * Computes the mean of sigmas with the weights Wm while computing a special
@@ -107,6 +125,11 @@ Vectord<CovDim> AngleMean(const Matrixd<CovDim, 2 * States + 1>& sigmas,
   return ret;
 }
 
+template <>
+Eigen::VectorXd AngleMean<Eigen::Dynamic, Eigen::Dynamic>(
+    const Eigen::MatrixXd& sigmas, const Eigen::VectorXd& Wm,
+    int angleStatesIdx);
+
 /**
  * Returns a function that computes the mean of sigmas with the weights Wm while
  * computing a special angle mean for a select row.
@@ -124,5 +147,9 @@ AngleMean(int angleStateIdx) {
     return AngleMean<CovDim, States>(sigmas, Wm, angleStateIdx);
   };
 }
+
+template <>
+std::function<Eigen::VectorXd(const Eigen::MatrixXd&, const Eigen::VectorXd&)>
+AngleMean<Eigen::Dynamic, Eigen::Dynamic>(int angleStateIdx);
 
 }  // namespace frc
