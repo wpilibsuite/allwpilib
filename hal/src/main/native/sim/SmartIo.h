@@ -4,17 +4,19 @@
 
 #pragma once
 
+#include <stdint.h>
+#include <string>
+
 #include "PortsInternal.h"
+#include "hal/handles/DigitalHandleResource.h"
 #include "hal/handles/HandlesInternal.h"
-#include "hal/handles/LimitedHandleResource.h"
 
 namespace hal {
-
-struct Counter {
-  uint8_t index;
+struct SmartIo {
+  uint8_t channel;
+  std::string previousAllocation;
 };
 
-extern LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
-                             HAL_HandleEnum::Counter>* counterHandles;
-
+extern DigitalHandleResource<HAL_DigitalHandle, SmartIo, kNumSmartIo>*
+    smartIoHandles;
 }  // namespace hal

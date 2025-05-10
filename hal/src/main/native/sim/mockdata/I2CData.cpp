@@ -9,7 +9,7 @@ using namespace hal;
 
 namespace hal::init {
 void InitializeI2CData() {
-  static I2CData sid[kI2CPorts];
+  static I2CData sid[kNumI2cBuses];
   ::hal::SimI2CData = sid;
 }
 }  // namespace hal::init
