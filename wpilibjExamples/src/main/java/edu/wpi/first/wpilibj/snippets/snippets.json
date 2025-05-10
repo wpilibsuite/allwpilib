@@ -113,5 +113,17 @@
     "foldername": "analogpotentiometer",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "AnalogAccelerometer",
+    "description": "Snippets of Analog Accelerometer for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Analog",
+      "Accelerometer"
+    ],
+    "foldername": "analogaccelerometer",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
