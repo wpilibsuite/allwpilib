@@ -9,6 +9,7 @@ import edu.wpi.first.math.system.plant.struct.DCMotorStruct;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.util.Objects;
 
 /** Holds the constants for a DC motor. */
 public class DCMotor implements ProtobufSerializable, StructSerializable {
@@ -320,5 +321,31 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
     // From https://www.revrobotics.com/next-generation-spark-neo/
     return new DCMotor(
         12, 3.60, 211, 3.6, Units.rotationsPerMinuteToRadiansPerSecond(6784), numMotors);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof DCMotor other
+        && Math.abs(other.nominalVoltageVolts - nominalVoltageVolts) < 1E-9
+        && Math.abs(other.stallTorqueNewtonMeters - stallTorqueNewtonMeters) < 1E-9
+        && Math.abs(other.stallCurrentAmps - stallCurrentAmps) < 1E-9
+        && Math.abs(other.freeCurrentAmps - freeCurrentAmps) < 1E-9
+        && Math.abs(other.freeSpeedRadPerSec - freeSpeedRadPerSec) < 1E-9
+        && Math.abs(other.rOhms - rOhms) < 1E-9
+        && Math.abs(other.KvRadPerSecPerVolt - KvRadPerSecPerVolt) < 1E-9
+        && Math.abs(other.KtNMPerAmp - KtNMPerAmp) < 1E-9;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        nominalVoltageVolts,
+        stallTorqueNewtonMeters,
+        stallCurrentAmps,
+        freeCurrentAmps,
+        freeSpeedRadPerSec,
+        rOhms,
+        KvRadPerSecPerVolt,
+        KtNMPerAmp);
   }
 }
