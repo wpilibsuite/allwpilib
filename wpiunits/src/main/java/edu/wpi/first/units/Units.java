@@ -79,7 +79,7 @@ public final class Units {
 
   /** 457.2/1000 of a {@link #Meter}, or 18 {@link #Inches}. */
   public static final DistanceUnit Cubit = Cubits;
-  
+
   /** 1.8288 {@link #Meter}s, or 6 {@link #Feet}. */
   public static final DistanceUnit Fathoms =
       derive(Feet).aggregate(6).named("Fathom").symbol("ftm").make();
@@ -104,10 +104,10 @@ public final class Units {
   /** 1609.344 {@link #Meter}s, or 5280 {@link #Feet}. */
   public static final DistanceUnit Miles =
       derive(Feet).aggregate(5280).named("Mile").symbol("mi").make();
-  
+
   /** 1609.344 {@link #Meter}s, or 5280 {@link #Feet}. */
-  public static final DistanceUnit Mile = Miles; // allias 
-  
+  public static final DistanceUnit Mile = Miles; // allias
+
   /** 4828.032 {@link #Meter}s, or 3 {@link #Miles}. */
   public static final DistanceUnit Leagues =
       derive(Mile).aggregate(3).named("League").symbol("lea").make();
