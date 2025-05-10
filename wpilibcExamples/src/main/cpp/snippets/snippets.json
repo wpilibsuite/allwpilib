@@ -103,5 +103,16 @@
     ],
     "foldername": "AnalogPotentiometer",
     "gradlebase": "cpp"
+  },
+  {
+    "name": "AnalogAccelerometer",
+    "description": "Snippets of Analog Accelerometer for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Analog",
+      "Accelerometer"
+    ],
+    "foldername": "AnalogAccelerometer",
+    "gradlebase": "cpp"
   }
 ]

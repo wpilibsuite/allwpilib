@@ -74,7 +74,7 @@ def tagList = [
         /* --- Hardware --- */
         "Analog", "Ultrasonic", "Gyro", "Pneumatics", "I2C", "Duty Cycle", "PDP", "DMA", "Relay",
         "AddressableLEDs", "HAL", "Encoder", "Smart Motor Controller", "Digital Input",
-        "Digital Output",
+        "Digital Output", "Accelerometer",
 
         /* --- HID --- */
         "XboxController", "PS4Controller", "PS5Controller", "Joystick",
