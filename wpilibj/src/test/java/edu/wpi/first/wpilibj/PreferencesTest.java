@@ -91,6 +91,13 @@ class PreferencesTest {
         "Preferences was not empty!  Preferences in table: " + Arrays.toString(keys.toArray()));
   }
 
+  @Test
+  void getNetworkTableTest() {
+    NetworkTable networkTable = Preferences.getNetworkTable();
+
+    assertEquals(m_table, networkTable);
+  }
+
   @ParameterizedTest
   @MethodSource("defaultKeyProvider")
   void defaultKeysTest(String key) {
