@@ -112,7 +112,7 @@ public final class Units {
   public static final DistanceUnit Leagues =
       derive(Mile).aggregate(3).named("League").symbol("lea").make();
 
-   /** 4828.032 {@link #Meter}s, or 3 {@link #Miles}. */
+  /** 4828.032 {@link #Meter}s, or 3 {@link #Miles}. */
   public static final DistanceUnit League = Leagues; // alias
 
   // TimeUnit
