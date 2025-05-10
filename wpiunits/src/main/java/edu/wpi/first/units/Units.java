@@ -71,7 +71,7 @@ public final class Units {
       derive(Feet).aggregate(3).named("Yard").symbol("yd").make();
 
   /** 914.4/1000 of a {@link #Meter}, or 3 {@link #Feet}. */
-  public static final DistanceUnit Yard = Yard;
+  public static final DistanceUnit Yard = Yards;
 
   /** 457.2/1000 of a {@link #Meter}, or 18 {@link #Inches}. */
   public static final DistanceUnit Cubits =
