@@ -6,7 +6,7 @@
 #include <frc/TimedRobot.h>
 
 /**
- * AnalogEncoder snippets for frc-docs.
+ * AnalogInput snippets for frc-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/analog-input-software.html
  */
 class Robot : public frc::TimedRobot {

@@ -102,5 +102,16 @@
     "foldername": "analoginput",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "AnalogPotentiometer",
+    "description": "Snippets of Analog Potentiometer for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Analog"
+    ],
+    "foldername": "analogpotentiometer",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
