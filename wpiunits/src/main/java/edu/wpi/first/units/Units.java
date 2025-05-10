@@ -101,11 +101,11 @@ public final class Units {
   /** 201.168 {@link #Meter}s, or 10 {@link #Chains}. */
   public static final DistanceUnit Furlong = Furlongs; // alias
 
-  /** 16093.44 {@link #Meter}s, or 52800 {@link #Feet}. */
+  /** 1609.344 {@link #Meter}s, or 5280 {@link #Feet}. */
   public static final DistanceUnit Miles =
-      derive(Feet).aggregate(52800).named("Mile").symbol("mi").make();
+      derive(Feet).aggregate(5280).named("Mile").symbol("mi").make();
   
-  /** 16093.44 {@link #Meter}s, or 52800 {@link #Feet}. */
+  /** 1609.344 {@link #Meter}s, or 5280 {@link #Feet}. */
   public static final DistanceUnit Mile = Miles; // allias 
   
   /** 4828.032 {@link #Meter}s, or 3 {@link #Miles}. */
