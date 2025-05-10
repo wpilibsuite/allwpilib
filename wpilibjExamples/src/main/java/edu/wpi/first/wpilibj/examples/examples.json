@@ -777,6 +777,15 @@
     "commandversion": 2
   },
   {
+    "name": "Resistance",
+    "description": "Demonstrates the use of a ResistanceCalculator to calculate a channel's resistance.",
+    "tags": [],
+    "foldername": "resistance",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "RomiReference",
     "description": "An example command-based robot program that can be used with the Romi reference robot design.",
     "tags": [
