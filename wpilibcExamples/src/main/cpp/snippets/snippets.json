@@ -144,5 +144,15 @@
     ],
     "foldername": "AccelerometerCollision",
     "gradlebase": "cpp"
+  },
+  {
+    "name": "AccelerometerFilter",
+    "description": "Snippets of filterning Accelerometer for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Accelerometer"
+    ],
+    "foldername": "AccelerometerFilter",
+    "gradlebase": "cpp"
   }
 ]
