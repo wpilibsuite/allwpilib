@@ -136,5 +136,16 @@
     "foldername": "adxlaccelerometers",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "BuiltInAccelerometer",
+    "description": "Snippets of BuiltIn accelerometer for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Accelerometer"
+    ],
+    "foldername": "builtinaccelerometer",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]

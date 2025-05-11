@@ -124,5 +124,15 @@
     ],
     "foldername": "ADXLAccelerometers",
     "gradlebase": "cpp"
+  },
+  {
+    "name": "BuiltInAccelerometer",
+    "description": "Snippets of BuiltIn Accelerometer for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Accelerometer"
+    ],
+    "foldername": "BuiltInAccelerometer",
+    "gradlebase": "cpp"
   }
 ]
