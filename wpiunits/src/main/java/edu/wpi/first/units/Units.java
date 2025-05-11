@@ -56,64 +56,8 @@ public final class Units {
   public static final DistanceUnit Feet =
       derive(Inches).aggregate(12).named("Foot").symbol("ft").make();
 
-  /** 101.6/1000 of a {@link #Meter}, or 4 {@link #Inches}. */
-  public static final DistanceUnit Hands =
-      derive(Inches).aggregate(4).named("Hand").symbol("hand").make();
-
-  /** 101.6/1000 of a {@link #Meter}, or 4 {@link #Inches}. */
-  public static final DistanceUnit Hand = Hands;
-
   /** 304.8/1000 of a {@link #Meter}, or 12 {@link #Inches}. */
   public static final DistanceUnit Foot = Feet; // alias
-
-  /** 914.4/1000 of a {@link #Meter}, or 3 {@link #Feet}. */
-  public static final DistanceUnit Yards =
-      derive(Feet).aggregate(3).named("Yard").symbol("yd").make();
-
-  /** 914.4/1000 of a {@link #Meter}, or 3 {@link #Feet}. */
-  public static final DistanceUnit Yard = Yards;
-
-  /** 457.2/1000 of a {@link #Meter}, or 18 {@link #Inches}. */
-  public static final DistanceUnit Cubits =
-      derive(Inches).aggregate(18).named("Cubit").symbol("cbt").make();
-
-  /** 457.2/1000 of a {@link #Meter}, or 18 {@link #Inches}. */
-  public static final DistanceUnit Cubit = Cubits;
-
-  /** 1.8288 {@link #Meter}s, or 6 {@link #Feet}. */
-  public static final DistanceUnit Fathoms =
-      derive(Feet).aggregate(6).named("Fathom").symbol("ftm").make();
-
-  /** 1.8288 {@link #Meter}s, or 6 {@link #Feet}. */
-  public static final DistanceUnit Fathom = Fathoms; // alias
-
-  /** 20.1168 (Except in India, where it is 20 meters) {@link #Meter}s, or 66 {@link #Feet}. */
-  public static final DistanceUnit Chains =
-      derive(Feet).aggregate(66).named("Chain").symbol("ch").make();
-
-  /** 20.1168 (Except in India, where it is 20 meters) {@link #Meter}s, or 66 {@link #Feet}. */
-  public static final DistanceUnit Chain = Chains; // alias
-
-  /** 201.168 {@link #Meter}s, or 10 {@link #Chains}. */
-  public static final DistanceUnit Furlongs =
-      derive(Chain).aggregate(10).named("Furlong").symbol("fur").make();
-
-  /** 201.168 {@link #Meter}s, or 10 {@link #Chains}. */
-  public static final DistanceUnit Furlong = Furlongs; // alias
-
-  /** 1609.344 {@link #Meter}s, or 5280 {@link #Feet}. */
-  public static final DistanceUnit Miles =
-      derive(Feet).aggregate(5280).named("Mile").symbol("mi").make();
-
-  /** 1609.344 {@link #Meter}s, or 5280 {@link #Feet}. */
-  public static final DistanceUnit Mile = Miles; // allias
-
-  /** 4828.032 {@link #Meter}s, or 3 {@link #Miles}. */
-  public static final DistanceUnit Leagues =
-      derive(Mile).aggregate(3).named("League").symbol("lea").make();
-
-  /** 4828.032 {@link #Meter}s, or 3 {@link #Miles}. */
-  public static final DistanceUnit League = Leagues; // alias
 
   // TimeUnit
   /** The base unit of time. */
@@ -140,13 +84,6 @@ public final class Units {
 
   /** Alias for {@link #Minutes} to make combined unit definitions read more smoothly. */
   public static final TimeUnit Minute = Minutes; // singularized alias
-
-  /** 60 {@link #Minutes}. */
-  public static final TimeUnit Hours =
-      derive(Minutes).aggregate(60).named("Hour").symbol("hr").make();
-
-  /** Alias for {@link #Hours} to make combined unit definitions read more smoothly. */
-  public static final TimeUnit Hour = Hours; // singularized alias
 
   // AngleUnit
   /**
