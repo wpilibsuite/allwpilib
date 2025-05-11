@@ -134,5 +134,15 @@
     ],
     "foldername": "BuiltInAccelerometer",
     "gradlebase": "cpp"
+  },
+  {
+    "name": "AccelerometerCollisionDetection",
+    "description": "Snippets of Accelerometer collision detection for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Accelerometer"
+    ],
+    "foldername": "AccelerometerCollision",
+    "gradlebase": "cpp"
   }
 ]
