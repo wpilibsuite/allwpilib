@@ -148,6 +148,13 @@ public final class Units {
   /** Alias for {@link #Hours} to make combined unit definitions read more smoothly. */
   public static final TimeUnit Hour = Hours; // singularized alias
 
+  /** 220752000 {@link #Seconds}. */
+    public static final TimeUnit DogYears = 
+        derive(Seconds).aggregate(220752000 ).named("Dog Year").symbol("dogyr").make();
+
+  /** Alias for {@link #DogYears} to make combined unit definitions read more smoothly. */
+    public static final TimeUnit DogYear = DogYears; // singularized alias
+
   // AngleUnit
   /**
    * The standard SI unit of angle, represented by the distance that the radius of a unit circle can
