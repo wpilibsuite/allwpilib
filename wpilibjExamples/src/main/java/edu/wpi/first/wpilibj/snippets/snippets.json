@@ -147,5 +147,16 @@
     "foldername": "builtinaccelerometer",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "AccelerometerCollisionDetection",
+    "description": "Snippets of Accelerometer for collision detection for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Accelerometer"
+    ],
+    "foldername": "accelerometercollision",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
