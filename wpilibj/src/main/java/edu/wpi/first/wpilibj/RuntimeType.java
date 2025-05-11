@@ -13,7 +13,9 @@ public enum RuntimeType {
   /** roboRIO 2.0. */
   kRoboRIO2(HALUtil.RUNTIME_ROBORIO2),
   /** Simulation runtime. */
-  kSimulation(HALUtil.RUNTIME_SIMULATION);
+  kSimulation(HALUtil.RUNTIME_SIMULATION),
+  /** SystemCore. */
+  kSystemCore(HALUtil.RUNTIME_SYSTEMCORE);
 
   /** RuntimeType value. */
   public final int value;
@@ -32,6 +34,7 @@ public enum RuntimeType {
     return switch (type) {
       case HALUtil.RUNTIME_ROBORIO -> RuntimeType.kRoboRIO;
       case HALUtil.RUNTIME_ROBORIO2 -> RuntimeType.kRoboRIO2;
+      case HALUtil.RUNTIME_SYSTEMCORE -> RuntimeType.kSystemCore;
       default -> RuntimeType.kSimulation;
     };
   }
