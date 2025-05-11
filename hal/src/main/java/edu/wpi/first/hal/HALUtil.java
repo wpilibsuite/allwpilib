@@ -43,6 +43,9 @@ public final class HALUtil extends JNIWrapper {
   /** Simulation runtime. */
   public static final int RUNTIME_SIMULATION = 2;
 
+  /** SystemCore. */
+  public static final int RUNTIME_SYSTEMCORE = 3;
+
   /**
    * Returns the FPGA Version number.
    *

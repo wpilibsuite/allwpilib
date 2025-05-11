@@ -41,7 +41,7 @@ ext {
                     include '*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/llvm/include'
+                    srcDirs 'src/main/native/thirdparty/json/include'
                 }
             }
             llvmCpp(CppSourceSet) {
@@ -128,7 +128,7 @@ ext {
             it.sources {
                 wpiutilWindowsCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/windows', 'src/main/native/llvm/cpp/llvm', 'src/main/native/json/cpp'
+                        srcDirs 'src/main/native/windows'
                         include '**/*.cpp'
                     }
                     exportedHeaders {
@@ -141,7 +141,7 @@ ext {
             it.sources {
                 wpiutilmacOSCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/macOS', 'src/main/native/llvm/cpp/llvm', 'src/main/native/json/cpp'
+                        srcDirs 'src/main/native/macOS'
                         include '**/*.cpp'
                     }
                     exportedHeaders {
@@ -154,7 +154,7 @@ ext {
             it.sources {
                 wpiutilLinuxCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/linux', 'src/main/native/llvm/cpp/llvm', 'src/main/native/json/cpp'
+                        srcDirs 'src/main/native/linux'
                         include '**/*.cpp'
                     }
                     exportedHeaders {
@@ -166,16 +166,6 @@ ext {
         }
     }
 }
-
-def examplesMap = [:];
-file("$projectDir/examples").list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                return new File(current, name).isDirectory();
-            }
-        }).each {
-            examplesMap.put(it, [])
-        }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
@@ -272,42 +262,9 @@ model {
     }
 }
 
-model {
-    components {
-        examplesMap.each { key, value ->
-            "${key}"(NativeExecutableSpec) {
-                targetBuildTypes 'debug'
-                binaries.all {
-                    lib library: 'wpiutil', linkage: 'shared'
-                }
-                sources {
-                    cpp {
-                        source {
-                            srcDirs 'examples/' + "${key}"
-                            include '**/*.cpp'
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-sourceSets {
-    printlog
-}
-
-task runPrintLog(type: JavaExec) {
-    classpath = sourceSets.printlog.runtimeClasspath
-
-    mainClass = 'printlog.PrintLog'
-}
-
 dependencies {
     api "com.fasterxml.jackson.core:jackson-annotations:2.15.2"
     api "com.fasterxml.jackson.core:jackson-core:2.15.2"
     api "com.fasterxml.jackson.core:jackson-databind:2.15.2"
     api 'us.hebi.quickbuf:quickbuf-runtime:1.3.3'
-
-    printlogImplementation sourceSets.main.output
 }
