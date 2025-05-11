@@ -15,13 +15,18 @@ import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Intake;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Pneumatics;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Shooter;
 import edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.Storage;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.SendableChooserCommand;
 
 /**
- * This class automatically runs the {@link CommandScheduler} for you. If you change the name of this class or the package after creating this project, you must also update the Main.java file in the project.
+ * This class automatically runs the {@link CommandScheduler} for you. If you change the name of
+ * this class or the package after creating this project, you must also update the Main.java file in
+ * the project.
  */
 @Logged(name = "Rapid React Command Robot")
 public class Robot extends CommandRobot {
@@ -35,6 +40,8 @@ public class Robot extends CommandRobot {
   // The driver's controller
   CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);
+
+  private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -82,5 +89,7 @@ public class Robot extends CommandRobot {
         m_drive
             .driveDistanceCommand(AutoConstants.kDriveDistanceMeters, AutoConstants.kDriveSpeed)
             .withTimeout(AutoConstants.kTimeoutSeconds));
+
+    autonomous().whileTrue(new SendableChooserCommand(m_autoChooser));
   }
 }

@@ -5,8 +5,8 @@
 package edu.wpi.first.wpilibj2.command;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 
 /**
  * CommandRobot is a wrapper over TimedRobot designed to work well with Command based programming.
@@ -17,10 +17,41 @@ public class CommandRobot extends TimedRobot {
   /** The CommandScheduler instance. */
   protected CommandScheduler m_scheduler = CommandScheduler.getInstance();
 
-  /** The autonomous chooser. */
-  protected SendableChooser<Command> m_autoChooser = new SendableChooser<>();
+  /**
+   * Returns a trigger that is true when the robot is enabled in autonomous mode.
+   *
+   * @return A trigger that is true when the robot is enabled in autonomous mode.
+   */
+  protected Trigger autonomous() {
+    return RobotModeTriggers.autonomous();
+  }
 
-  private Command m_autonomousCommand;
+  /**
+   * Returns a trigger that is true when the robot is enabled in teleop mode.
+   *
+   * @return A trigger that is true when the robot is enabled in teleop mode.
+   */
+  protected Trigger teleop() {
+    return RobotModeTriggers.teleop();
+  }
+
+  /**
+   * Returns a trigger that is true when the robot is disabled.
+   *
+   * @return A trigger that is true when the robot is disabled.
+   */
+  protected Trigger disabled() {
+    return RobotModeTriggers.disabled();
+  }
+
+  /**
+   * Returns a trigger that is true when the robot is enabled in test mode.
+   *
+   * @return A trigger that is true when the robot is enabled in test mode.
+   */
+  protected Trigger test() {
+    return RobotModeTriggers.test();
+  }
 
   /** Constructor for CommandRobot. */
   protected CommandRobot() {
@@ -35,10 +66,6 @@ public class CommandRobot extends TimedRobot {
   protected CommandRobot(double period) {
     super(period);
     addPeriodic(() -> m_scheduler.run(), 0.02);
-    m_autoChooser.setDefaultOption(
-        "No autos configured.",
-        Commands.print("No autos configured. Add Commands to m_autoChooser to fix this."));
-    SmartDashboard.putData(m_autoChooser);
   }
 
   @Override
@@ -48,12 +75,7 @@ public class CommandRobot extends TimedRobot {
   public final void robotPeriodic() {}
 
   @Override
-  public void autonomousInit() {
-    m_autonomousCommand = m_autoChooser.getSelected();
-    if (m_autonomousCommand != null) {
-      m_scheduler.schedule(m_autonomousCommand);
-    }
-  }
+  public void autonomousInit() {}
 
   @Override
   public final void autonomousPeriodic() {}
@@ -62,11 +84,7 @@ public class CommandRobot extends TimedRobot {
   public void autonomousExit() {}
 
   @Override
-  public final void teleopInit() {
-    if (m_autonomousCommand != null) {
-      m_scheduler.cancel(m_autonomousCommand);
-    }
-  }
+  public final void teleopInit() {}
 
   @Override
   public final void teleopPeriodic() {}

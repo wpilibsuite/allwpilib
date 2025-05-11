@@ -4,15 +4,24 @@
 
 package edu.wpi.first.wpilibj.templates.xrpcommandbased;
 
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
+
+import java.util.Set;
 import edu.wpi.first.wpilibj.templates.xrpcommandbased.commands.ExampleCommand;
 import edu.wpi.first.wpilibj.templates.xrpcommandbased.subsystems.XRPDrivetrain;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.CommandRobot;
 
 /**
- * This class automatically runs the {@link CommandScheduler} for you. If you change the name of this class or the package after creating this project, you must also update the Main.java file in the project.
-*/
+ * This class automatically runs the {@link CommandScheduler} for you. If you change the name of
+ * this class or the package after creating this project, you must also update the Main.java file in
+ * the project.
+ */
 public class Robot extends CommandRobot {
   private final XRPDrivetrain m_xrpDrivetrain = new XRPDrivetrain();
+  private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -20,5 +29,7 @@ public class Robot extends CommandRobot {
    */
   public Robot() {
     m_autoChooser.setDefaultOption("Example Auto", new ExampleCommand(m_xrpDrivetrain));
+
+    autonomous().whileTrue(Commands.defer(() -> m_autoChooser.getSelected().asProxy(), Set.of()));
   }
 }
