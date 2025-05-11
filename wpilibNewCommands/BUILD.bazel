@@ -1,18 +1,13 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules/publishing:publishing.bzl", "bundle_library_artifacts")
 
-cc_library(
-    name = "generated_cc_headers",
-    hdrs = glob(["src/generated/main/native/include/**"]),
-    includes = ["src/generated/main/native/include"],
-    strip_include_prefix = "src/generated/main/native/include",
-    visibility = ["//wpilibNewCommands:__subpackages__"],
-)
-
-filegroup(
-    name = "generated_cc_source",
-    srcs = glob(["src/generated/main/native/cpp/**"]),
+third_party_cc_lib_helper(
+    name = "generated_cc",
+    include_root = "src/generated/main/native/include",
+    src_root = "src/generated/main/native/cpp",
     visibility = ["//wpilibNewCommands:__subpackages__"],
 )
 
@@ -22,15 +17,17 @@ filegroup(
     visibility = ["//wpilibNewCommands:__subpackages__"],
 )
 
-cc_library(
+wpilib_cc_library(
     name = "wpilibNewCommands.static",
-    srcs = glob(["src/main/native/cpp/**"]) + [":generated_cc_source"],
+    srcs = glob(["src/main/native/cpp/**"]),
     hdrs = glob(["src/main/native/include/**"]),
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
+    third_party_libraries = [
+        ":generated_cc",
+    ],
     visibility = ["//visibility:public"],
     deps = [
-        ":generated_cc_headers",
         "//wpilibc:wpilibc.static",
     ],
 )
@@ -102,4 +99,13 @@ java_binary(
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
     ],
+)
+
+bundle_library_artifacts(
+    name = "publishing_bundle",
+    cc_hdr_pkg = ":wpilibNewCommands.static-hdrs-zip",
+    cc_src_pkg = ":wpilibNewCommands.static-srcs-zip",
+    cc_static_library_pkg = ":wpilibNewCommands.static-zip",
+    library_base_name = "wpilibNewCommands",
+    maven_base = "edu.wpi.first.wpilibNewCommands",
 )

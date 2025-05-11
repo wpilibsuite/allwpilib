@@ -1,7 +1,10 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
+load("//shared/bazel/rules/publishing:publishing.bzl", "bundle_library_artifacts")
 
 cc_library(
     name = "mrc_cc_headers",
@@ -31,7 +34,19 @@ filegroup(
     }),
 )
 
-cc_library(
+pkg_files(
+    name = "hal-sim-pkg",
+    srcs = glob(["src/main/native/sim/**"]),
+    strip_prefix = "src/main/native",
+)
+
+pkg_files(
+    name = "hal-systemcore-pkg",
+    srcs = glob(["src/main/native/systemcore/**"]),
+    strip_prefix = "src/main/native",
+)
+
+wpilib_cc_library(
     name = "wpiHal.static",
     srcs = [":platform-srcs"] + glob(
         [
@@ -41,6 +56,10 @@ cc_library(
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**/*"]),
+    extra_src_pkg_files = [
+        "hal-sim-pkg",
+        "hal-systemcore-pkg",
+    ],
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
@@ -110,4 +129,14 @@ java_binary(
     main_class = "edu.wpi.first.hal.DevMain",
     deps = [
     ],
+)
+
+bundle_library_artifacts(
+    name = "publishing_bundle",
+    cc_hdr_pkg = ":wpiHal.static-hdrs-zip",
+    cc_src_pkg = ":wpiHal.static-srcs-zip",
+    cc_static_library_pkg = ":wpiHal.static-zip",
+    jni_pkg = ":wpiHaljni-zip",
+    library_base_name = "hal",
+    maven_base = "edu.wpi.first.hal",
 )

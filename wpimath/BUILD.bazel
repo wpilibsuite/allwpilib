@@ -1,8 +1,10 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
+load("//shared/bazel/rules/publishing:publishing.bzl", "bundle_default_jni_library")
 
 filegroup(
     name = "generated_java",
@@ -10,40 +12,23 @@ filegroup(
     visibility = ["//wpimath:__subpackages__"],
 )
 
-cc_library(
-    name = "eigen-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/eigen/include/**",
-    ]),
-    includes = ["src/main/native/thirdparty/eigen/include"],
-    strip_include_prefix = "src/main/native/thirdparty/eigen/include",
+third_party_cc_lib_helper(
+    name = "eigen",
+    include_root = "src/main/native/thirdparty/eigen/include",
     visibility = ["//wpimath:__subpackages__"],
 )
 
-cc_library(
+third_party_cc_lib_helper(
     name = "gcem",
-    hdrs = glob([
-        "src/main/native/thirdparty/gcem/include/**",
-    ]),
-    includes = ["src/main/native/thirdparty/gcem/include"],
-    strip_include_prefix = "src/main/native/thirdparty/gcem/include",
+    include_root = "src/main/native/thirdparty/gcem/include",
     visibility = ["//wpimath:__subpackages__"],
 )
 
-cc_library(
-    name = "sleipnir-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/sleipnir/include/**/*.hpp",
-    ]),
-    includes = ["src/main/native/thirdparty/sleipnir/include"],
-    strip_include_prefix = "src/main/native/thirdparty/sleipnir/include",
-    visibility = ["//wpimath:__subpackages__"],
-)
-
-filegroup(
-    name = "sleipnir-srcs",
-    srcs = glob(["src/main/native/thirdparty/sleipnir/src/**"]),
-    visibility = ["//wpimath:__subpackages__"],
+third_party_cc_lib_helper(
+    name = "sleipnir",
+    include_root = "src/main/native/thirdparty/sleipnir/include",
+    src_root = "src/main/native/thirdparty/sleipnir/src",
+    visibility = ["//wpiwpimathutil:__subpackages__"],
 )
 
 cc_library(
@@ -54,7 +39,7 @@ cc_library(
     visibility = ["//wpiutil:__subpackages__"],
 )
 
-cc_library(
+wpilib_cc_library(
     name = "wpimath.static",
     srcs = glob(
         [
@@ -62,7 +47,7 @@ cc_library(
             "src/generated/main/native/cpp/**/*.cpp",
         ],
         exclude = ["src/main/native/cpp/jni/**"],
-    ) + [":sleipnir-srcs"],
+    ),
     hdrs = glob(["src/main/native/include/**"]),
     defines = ["WPILIB_EXPORTS"],
     includes = [
@@ -70,12 +55,16 @@ cc_library(
         "src/main/native/thirdparty/sleipnir/src",
     ],
     strip_include_prefix = "src/main/native/include",
+    third_party_libraries = [
+        ":sleipnir",
+    ],
+    thrid_party_header_only_libraries = [
+        ":eigen",
+        ":gcem",
+    ],
     visibility = ["//visibility:public"],
     deps = [
-        ":eigen-headers",
-        ":gcem",
         ":nanopb-generated-headers",
-        ":sleipnir-headers",
         "//wpiutil:wpiutil.static",
     ],
 )
@@ -168,4 +157,10 @@ py_binary(
     name = "ExponentialProfileModel",
     srcs = ["algorithms/ExponentialProfileModel.py"],
     tags = ["manual"],
+)
+
+bundle_default_jni_library(
+    name = "publishing_bundle",
+    library_base_name = "wpimath",
+    maven_base = "edu.wpi.first.wpimath",
 )

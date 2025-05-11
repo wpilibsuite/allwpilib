@@ -1,0 +1,31 @@
+load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("//shared/bazel/rules/publishing:publishing.bzl", "wpilib_publish")
+
+pkg_files(
+    name = "liscense_pkg_files",
+    srcs = [
+        "LICENSE.md",
+        "ThirdPartyNotices.txt",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+wpilib_publish(
+    name = "publish",
+    bundles = [
+        "//wpiutil:publishing_bundle",
+        "//wpinet:publishing_bundle",
+        "//ntcore:publishing_bundle",
+        "//hal:publishing_bundle",
+        "//cscore:publishing_bundle",
+        "//fieldImages:publishing_bundle",
+        "//wpimath:publishing_bundle",
+        "//cameraserver:publishing_bundle",
+        "//wpilibc:publishing_bundle",
+        "//wpilibNewCommands:publishing_bundle",
+        "//apriltag:publishing_bundle",
+        "//datalog:publishing_bundle",
+        "//xrpVendordep:publishing_bundle",
+        "//romiVendordep:publishing_bundle",
+    ],
+)

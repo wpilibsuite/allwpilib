@@ -1,7 +1,8 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_java//java:defs.bzl", "java_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
+load("//shared/bazel/rules/publishing:publishing.bzl", "bundle_library_artifacts")
 
 generate_resources(
     name = "generate-resources",
@@ -11,10 +12,11 @@ generate_resources(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
+wpilib_cc_library(
     name = "fieldImages",
     srcs = [":generate-resources"] + glob(["src/main/native/cpp/**"]),
     hdrs = glob(["src/main/native/include/**/*"]),
+    include_license_files = True,
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
 )
@@ -37,4 +39,13 @@ wpilib_java_junit5_test(
     deps = [
         ":fieldImages-java",
     ],
+)
+
+bundle_library_artifacts(
+    name = "publishing_bundle",
+    cc_hdr_pkg = ":fieldImages-hdrs-zip",
+    cc_src_pkg = ":fieldImages-srcs-zip",
+    cc_static_library_pkg = ":fieldImages-zip",
+    library_base_name = "fieldImages",
+    maven_base = "edu.wpi.first.fieldImages",
 )

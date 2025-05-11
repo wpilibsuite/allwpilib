@@ -1,6 +1,8 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_java//java:defs.bzl", "java_library")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
 def _jni_headers_impl(ctx):
     include_dir = ctx.actions.declare_directory(ctx.attr.name + ".h")
@@ -98,4 +100,17 @@ def wpilib_jni_cc_library(
         name = name + ".static",
         deps = [jni, java_dep + ".hdrs"] + deps,
         **kwargs
+    )
+
+    pkg_files(
+        name = name + ".pkg",
+        srcs = [":" + name + ".static"],
+        tags = ["manual"],
+        prefix = "linux/x86-64",  # TODO(pjreiniger) Make cross platform
+    )
+
+    pkg_zip(
+        name = name + "-zip",
+        srcs = ["//:liscense_pkg_files"] + [name + ".pkg"],
+        tags = ["manual", "no-remote"],
     )

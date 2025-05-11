@@ -1,8 +1,11 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
+load("//shared/bazel/rules/publishing:publishing.bzl", "bundle_default_jni_library")
 
 WIN_UV_SRCS = glob([
     "src/main/native/thirdparty/libuv/src/win/*.cpp",
@@ -72,19 +75,22 @@ filegroup(
     visibility = ["//wpinet:__subpackages__"],
 )
 
-cc_library(
-    name = "tcpsockets-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/tcpsockets/include/**/*.h",
-    ]),
-    includes = ["src/main/native/thirdparty/tcpsockets/include"],
-    strip_include_prefix = "src/main/native/thirdparty/tcpsockets/include",
-    visibility = ["//wpinet:__subpackages__"],
+pkg_files(
+    name = "thirdparty-libuv-hdr-pkg",
+    srcs = glob(["src/main/native/thirdparty/libuv/include/**"]),
+    strip_prefix = "src/main/native/thirdparty/libuv/include",
 )
 
-filegroup(
-    name = "tcpsockets-srcs",
-    srcs = glob(["src/main/native/thirdparty/tcpsockets/cpp/**"]),
+pkg_files(
+    name = "thirdparty-libuv-src-pkg",
+    srcs = glob(["src/main/native/thirdparty/libuv/src/**"]),
+    strip_prefix = "src/main/native/thirdparty/libuv/src",
+)
+
+third_party_cc_lib_helper(
+    name = "tcpsockets",
+    include_root = "src/main/native/thirdparty/tcpsockets/include",
+    src_root = "src/main/native/thirdparty/tcpsockets/cpp",
     visibility = ["//wpinet:__subpackages__"],
 )
 
@@ -112,27 +118,29 @@ cc_library(
     strip_include_prefix = "src/main/native/cpp",
 )
 
-cc_library(
+wpilib_cc_library(
     name = "wpinet.static",
     srcs = glob(
         ["src/main/native/cpp/**"],
         exclude = ["src/main/native/cpp/jni/**"],
     ) + [
         ":libuv-srcs",
-        ":tcpsockets-srcs",
     ] + ["native-srcs"],
     hdrs = glob(["src/main/native/include/**/*"]),
+    extra_hdr_pkg_files = [":thirdparty-libuv-hdr-pkg"],
     includes = ["src/main/native/include"],
     linkopts = select({
         "@bazel_tools//src/conditions:linux": ["-ldl"],
         "//conditions:default": [],
     }),
     strip_include_prefix = "src/main/native/include",
+    third_party_libraries = [
+        ":tcpsockets",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":libuv-headers",
         ":private_includes",
-        ":tcpsockets-headers",
         "//wpiutil:wpiutil.static",
     ],
 )
@@ -243,4 +251,10 @@ cc_binary(
     deps = [
         ":wpinet.static",
     ],
+)
+
+bundle_default_jni_library(
+    name = "publishing_bundle",
+    library_base_name = "wpinet",
+    maven_base = "edu.wpi.first.wpinet",
 )
