@@ -125,5 +125,16 @@
     "foldername": "analogaccelerometer",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "ADXLAccelerometers",
+    "description": "Snippets of ADXL 345 and 362 accelerometers for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Accelerometer"
+    ],
+    "foldername": "adxlaccelerometers",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
