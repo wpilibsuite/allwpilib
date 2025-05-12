@@ -142,6 +142,6 @@ java_binary(
 
 bundle_default_jni_library(
     name = "publishing_bundle",
-    library_base_name = "cscore",
     group_id = "edu.wpi.first.cscore",
+    library_base_name = "cscore",
 )

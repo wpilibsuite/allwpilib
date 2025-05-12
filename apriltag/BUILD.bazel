@@ -150,6 +150,6 @@ py_binary(
 
 bundle_default_jni_library(
     name = "publishing_bundle",
-    library_base_name = "apriltag",
     group_id = "edu.wpi.first.apriltag",
+    library_base_name = "apriltag",
 )

@@ -161,6 +161,6 @@ py_binary(
 
 bundle_default_jni_library(
     name = "publishing_bundle",
-    library_base_name = "wpimath",
     group_id = "edu.wpi.first.wpimath",
+    library_base_name = "wpimath",
 )

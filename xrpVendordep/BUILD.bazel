@@ -60,6 +60,6 @@ bundle_library_artifacts(
     cc_hdr_pkg = ":xrp-cpp-hdrs-zip",
     cc_src_pkg = ":xrp-cpp-srcs-zip",
     cc_static_library_pkg = ":xrp-cpp-zip",
-    library_base_name = "xrpVendordep",
     group_id = "edu.wpi.first.xrpVendordep",
+    library_base_name = "xrpVendordep",
 )

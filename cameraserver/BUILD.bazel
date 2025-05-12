@@ -65,6 +65,6 @@ bundle_library_artifacts(
     cc_hdr_pkg = ":cameraserver.static-hdrs-zip",
     cc_src_pkg = ":cameraserver.static-srcs-zip",
     cc_static_library_pkg = ":cameraserver.static-zip",
-    library_base_name = "cameraserver",
     group_id = "edu.wpi.first.cameraserver",
+    library_base_name = "cameraserver",
 )

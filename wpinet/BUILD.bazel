@@ -255,6 +255,6 @@ cc_binary(
 
 bundle_default_jni_library(
     name = "publishing_bundle",
-    library_base_name = "wpinet",
     group_id = "edu.wpi.first.wpinet",
+    library_base_name = "wpinet",
 )

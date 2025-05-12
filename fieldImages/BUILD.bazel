@@ -46,6 +46,6 @@ bundle_library_artifacts(
     cc_hdr_pkg = ":fieldImages-hdrs-zip",
     cc_src_pkg = ":fieldImages-srcs-zip",
     cc_static_library_pkg = ":fieldImages-zip",
-    library_base_name = "fieldImages",
     group_id = "edu.wpi.first.fieldImages",
+    library_base_name = "fieldImages",
 )

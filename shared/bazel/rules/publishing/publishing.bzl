@@ -86,7 +86,7 @@ def wpilib_publish(
     """
     Helper function that takes a list of bundled maven information and publishes it to an external location.
 
-    This will take a list of json files containing maven publishing infomration, created by the 
+    This will take a list of json files containing maven publishing infomration, created by the
     //shared/bazel/rules/publishing:generate_maven_bundle target, and publish to a directory.
 
     See the "publish.py" library for a description of the available options

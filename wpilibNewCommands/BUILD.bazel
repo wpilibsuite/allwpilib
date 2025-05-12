@@ -106,6 +106,6 @@ bundle_library_artifacts(
     cc_hdr_pkg = ":wpilibNewCommands.static-hdrs-zip",
     cc_src_pkg = ":wpilibNewCommands.static-srcs-zip",
     cc_static_library_pkg = ":wpilibNewCommands.static-zip",
-    library_base_name = "wpilibNewCommands",
     group_id = "edu.wpi.first.wpilibNewCommands",
+    library_base_name = "wpilibNewCommands",
 )

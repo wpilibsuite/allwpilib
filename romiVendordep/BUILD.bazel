@@ -59,6 +59,6 @@ bundle_library_artifacts(
     cc_hdr_pkg = ":romi-cpp.static-hdrs-zip",
     cc_src_pkg = ":romi-cpp.static-srcs-zip",
     cc_static_library_pkg = ":romi-cpp.static-zip",
-    library_base_name = "romiVendordep",
     group_id = "edu.wpi.first.romiVendordep",
+    library_base_name = "romiVendordep",
 )

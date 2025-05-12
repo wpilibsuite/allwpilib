@@ -214,6 +214,6 @@ java_binary(
 
 bundle_default_jni_library(
     name = "publishing_bundle",
-    library_base_name = "wpiutil",
     group_id = "edu.wpi.first.wpiutil",
+    library_base_name = "wpiutil",
 )

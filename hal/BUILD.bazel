@@ -136,7 +136,7 @@ bundle_library_artifacts(
     cc_hdr_pkg = ":wpiHal.static-hdrs-zip",
     cc_src_pkg = ":wpiHal.static-srcs-zip",
     cc_static_library_pkg = ":wpiHal.static-zip",
+    group_id = "edu.wpi.first.hal",
     jni_pkg = ":wpiHaljni-zip",
     library_base_name = "hal",
-    group_id = "edu.wpi.first.hal",
 )

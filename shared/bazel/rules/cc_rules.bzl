@@ -12,7 +12,7 @@ def third_party_cc_lib_helper(
     Helper for src / headers pairs that aren't directly compiled, but rather pulled into a bigger library.
 
     Due to allwpilibs directory structure of includes and sources living next to eachother, it often is required
-    to make a header shim to deal with the include path, and a filegroup of the sources. This pattern is extermely 
+    to make a header shim to deal with the include path, and a filegroup of the sources. This pattern is extermely
     common for the thirdparty libraries that live beneath certain libraries.
 
     This will produce a library shim with the include path stripped, a filegroup of sources, and packages that can be
@@ -81,9 +81,9 @@ def wpilib_cc_library(
         hdrs: The headers used to compile the library. Note: This may be platform dependent and not include all the sources of the library for packaging
         third_party_libraries: These are helper dependencies, created by third_party_cc_lib_helper. Header shims will be added as deps and src filegroups will be added to srcs
         third_party_header_only_libraries: Similar to third_party_libraries, but for shims that contain no sources
-        extra_src_pkg_files: Extra pkg_files to add to the source bundle. This is useful in the event that a library is complicated and requires 
+        extra_src_pkg_files: Extra pkg_files to add to the source bundle. This is useful in the event that a library is complicated and requires
                 extra, customized sources to be added to the published zip file
-        extra_hdr_pkg_files: Extra pkg_files to add to the headers bundle. This is useful in the event that a library is complicated and requires 
+        extra_hdr_pkg_files: Extra pkg_files to add to the headers bundle. This is useful in the event that a library is complicated and requires
                 extra, customized headers to be added to the published zip file
         include_license_files: If the header / source / library zip files should automatically includes the license files. This is used to maintain
                 consistency with the gradle publishing, as not all of them export the license files.

@@ -80,6 +80,6 @@ bundle_library_artifacts(
     cc_hdr_pkg = ":wpilibc.static-hdrs-zip",
     cc_src_pkg = ":wpilibc.static-srcs-zip",
     cc_static_library_pkg = ":wpilibc.static-zip",
-    library_base_name = "wpilibc",
     group_id = "edu.wpi.first.wpilibc",
+    library_base_name = "wpilibc",
 )
