@@ -1,0 +1,22 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "halsim_ws_core",
+    srcs = glob(["src/main/native/cpp/*.cpp"]),
+    hdrs = glob([
+        "src/main/native/include/*.h",
+        "src/main/native/include/*.inc",
+    ]),
+    strip_include_prefix = "src/main/native/include",
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//hal:wpiHal.static",
+        "//wpinet:wpinet.static",
+        "//wpiutil:wpiutil.static",
+    ],
+)
