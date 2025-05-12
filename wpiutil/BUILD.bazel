@@ -110,6 +110,12 @@ wpilib_cc_library(
     hdrs = glob(["src/main/native/include/**/*"]),
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
+    third_party_header_only_libraries = [
+        ":argparse",
+        ":expected",
+        ":json",
+        ":sigslot",
+    ],
     third_party_libraries = [
         ":debugging",
         ":fmtlib",
@@ -118,12 +124,6 @@ wpilib_cc_library(
         ":mpack",
         ":nanopb",
         ":protobuf",
-    ],
-    thrid_party_header_only_libraries = [
-        ":argparse",
-        ":expected",
-        ":json",
-        ":sigslot",
     ],
     visibility = ["//visibility:public"],
     deps = select({
@@ -215,5 +215,5 @@ java_binary(
 bundle_default_jni_library(
     name = "publishing_bundle",
     library_base_name = "wpiutil",
-    maven_base = "edu.wpi.first.wpiutil",
+    group_id = "edu.wpi.first.wpiutil",
 )

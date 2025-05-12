@@ -61,5 +61,5 @@ bundle_library_artifacts(
     cc_src_pkg = ":xrp-cpp-srcs-zip",
     cc_static_library_pkg = ":xrp-cpp-zip",
     library_base_name = "xrpVendordep",
-    maven_base = "edu.wpi.first.xrpVendordep",
+    group_id = "edu.wpi.first.xrpVendordep",
 )

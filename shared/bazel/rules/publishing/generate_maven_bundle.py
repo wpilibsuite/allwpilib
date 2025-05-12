@@ -21,7 +21,6 @@ def main():
             )
         )
 
-    # print(json.dumps(json_data, indent=4))
     with open(args.output_file, "w") as f:
         f.write(json.dumps(json_data))
 

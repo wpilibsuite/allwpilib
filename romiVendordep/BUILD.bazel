@@ -60,5 +60,5 @@ bundle_library_artifacts(
     cc_src_pkg = ":romi-cpp.static-srcs-zip",
     cc_static_library_pkg = ":romi-cpp.static-zip",
     library_base_name = "romiVendordep",
-    maven_base = "edu.wpi.first.romiVendordep",
+    group_id = "edu.wpi.first.romiVendordep",
 )

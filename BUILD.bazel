@@ -2,7 +2,7 @@ load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("//shared/bazel/rules/publishing:publishing.bzl", "wpilib_publish")
 
 pkg_files(
-    name = "liscense_pkg_files",
+    name = "license_pkg_files",
     srcs = [
         "LICENSE.md",
         "ThirdPartyNotices.txt",

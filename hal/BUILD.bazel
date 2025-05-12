@@ -138,5 +138,5 @@ bundle_library_artifacts(
     cc_static_library_pkg = ":wpiHal.static-zip",
     jni_pkg = ":wpiHaljni-zip",
     library_base_name = "hal",
-    maven_base = "edu.wpi.first.hal",
+    group_id = "edu.wpi.first.hal",
 )

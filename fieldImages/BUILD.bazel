@@ -47,5 +47,5 @@ bundle_library_artifacts(
     cc_src_pkg = ":fieldImages-srcs-zip",
     cc_static_library_pkg = ":fieldImages-zip",
     library_base_name = "fieldImages",
-    maven_base = "edu.wpi.first.fieldImages",
+    group_id = "edu.wpi.first.fieldImages",
 )

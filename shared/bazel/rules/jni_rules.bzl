@@ -111,6 +111,6 @@ def wpilib_jni_cc_library(
 
     pkg_zip(
         name = name + "-zip",
-        srcs = ["//:liscense_pkg_files"] + [name + ".pkg"],
+        srcs = ["//:license_pkg_files"] + [name + ".pkg"],
         tags = ["manual", "no-remote"],
     )

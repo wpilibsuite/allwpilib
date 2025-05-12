@@ -28,7 +28,7 @@ third_party_cc_lib_helper(
     name = "sleipnir",
     include_root = "src/main/native/thirdparty/sleipnir/include",
     src_root = "src/main/native/thirdparty/sleipnir/src",
-    visibility = ["//wpiwpimathutil:__subpackages__"],
+    visibility = ["//wpimath:__subpackages__"],
 )
 
 cc_library(
@@ -36,7 +36,7 @@ cc_library(
     hdrs = glob(["src/generated/main/native/cpp/**/*.h"]),
     includes = ["src/generated/main/native/cpp"],
     strip_include_prefix = "src/generated/main/native/cpp",
-    visibility = ["//wpiutil:__subpackages__"],
+    visibility = ["//wpimath:__subpackages__"],
 )
 
 wpilib_cc_library(
@@ -55,12 +55,12 @@ wpilib_cc_library(
         "src/main/native/thirdparty/sleipnir/src",
     ],
     strip_include_prefix = "src/main/native/include",
-    third_party_libraries = [
-        ":sleipnir",
-    ],
-    thrid_party_header_only_libraries = [
+    third_party_header_only_libraries = [
         ":eigen",
         ":gcem",
+    ],
+    third_party_libraries = [
+        ":sleipnir",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -162,5 +162,5 @@ py_binary(
 bundle_default_jni_library(
     name = "publishing_bundle",
     library_base_name = "wpimath",
-    maven_base = "edu.wpi.first.wpimath",
+    group_id = "edu.wpi.first.wpimath",
 )

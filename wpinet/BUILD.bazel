@@ -256,5 +256,5 @@ cc_binary(
 bundle_default_jni_library(
     name = "publishing_bundle",
     library_base_name = "wpinet",
-    maven_base = "edu.wpi.first.wpinet",
+    group_id = "edu.wpi.first.wpinet",
 )

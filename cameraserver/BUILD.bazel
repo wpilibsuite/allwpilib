@@ -66,5 +66,5 @@ bundle_library_artifacts(
     cc_src_pkg = ":cameraserver.static-srcs-zip",
     cc_static_library_pkg = ":cameraserver.static-zip",
     library_base_name = "cameraserver",
-    maven_base = "edu.wpi.first.cameraserver",
+    group_id = "edu.wpi.first.cameraserver",
 )

@@ -110,5 +110,5 @@ wpilib_java_junit5_test(
 bundle_default_jni_library(
     name = "publishing_bundle",
     library_base_name = "datalog",
-    maven_base = "edu.wpi.first.datalog",
+    group_id = "edu.wpi.first.datalog",
 )

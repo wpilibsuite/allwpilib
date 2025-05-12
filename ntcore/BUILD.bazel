@@ -120,5 +120,5 @@ java_binary(
 bundle_default_jni_library(
     name = "publishing_bundle",
     library_base_name = "ntcore",
-    maven_base = "edu.wpi.first.ntcore",
+    group_id = "edu.wpi.first.ntcore",
 )

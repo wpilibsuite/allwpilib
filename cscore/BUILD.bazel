@@ -143,5 +143,5 @@ java_binary(
 bundle_default_jni_library(
     name = "publishing_bundle",
     library_base_name = "cscore",
-    maven_base = "edu.wpi.first.cscore",
+    group_id = "edu.wpi.first.cscore",
 )

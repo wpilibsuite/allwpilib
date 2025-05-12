@@ -151,5 +151,5 @@ py_binary(
 bundle_default_jni_library(
     name = "publishing_bundle",
     library_base_name = "apriltag",
-    maven_base = "edu.wpi.first.apriltag",
+    group_id = "edu.wpi.first.apriltag",
 )

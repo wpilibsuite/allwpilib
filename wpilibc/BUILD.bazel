@@ -81,5 +81,5 @@ bundle_library_artifacts(
     cc_src_pkg = ":wpilibc.static-srcs-zip",
     cc_static_library_pkg = ":wpilibc.static-zip",
     library_base_name = "wpilibc",
-    maven_base = "edu.wpi.first.wpilibc",
+    group_id = "edu.wpi.first.wpilibc",
 )

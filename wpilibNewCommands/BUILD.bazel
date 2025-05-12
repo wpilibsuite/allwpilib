@@ -107,5 +107,5 @@ bundle_library_artifacts(
     cc_src_pkg = ":wpilibNewCommands.static-srcs-zip",
     cc_static_library_pkg = ":wpilibNewCommands.static-zip",
     library_base_name = "wpilibNewCommands",
-    maven_base = "edu.wpi.first.wpilibNewCommands",
+    group_id = "edu.wpi.first.wpilibNewCommands",
 )
