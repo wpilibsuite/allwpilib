@@ -6,7 +6,6 @@ cc_library(
         "src/main/native/cpp/*",
         "src/main/native/include/*.h",
     ]),
-    features = ["windows_export_all_symbols"],
     includes = ["src/main/native/include"],
     tags = [
         "wpi-cpp-gui",

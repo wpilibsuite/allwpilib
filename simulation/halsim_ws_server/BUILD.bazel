@@ -9,7 +9,6 @@ cc_library(
 cc_library(
     name = "halsim_ws_server",
     srcs = glob(["src/main/native/cpp/**"]),
-    features = ["windows_export_all_symbols"],
     target_compatible_with = select({
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
