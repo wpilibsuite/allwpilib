@@ -98,7 +98,7 @@ public class SequentialCommandGroup extends Command {
 
   @Override
   public final boolean isFinished() {
-    return m_currentCommandIndex == m_commands.size();
+    return m_currentCommandIndex == m_commands.size() || m_currentCommandIndex == -1;
   }
 
   @Override
