@@ -19,7 +19,11 @@ filegroup(
 py_binary(
     name = "generate_nanopb",
     srcs = ["generate_nanopb.py"],
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
 )
 

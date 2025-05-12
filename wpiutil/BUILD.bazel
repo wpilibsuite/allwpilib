@@ -13,7 +13,11 @@ py_binary(
     srcs = glob(["src/main/native/thirdparty/nanopb/generator/**/*.py"]),
     data = ["src/main/native/thirdparty/nanopb/generator/proto/nanopb.proto"],
     imports = ["."],
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [
         requirement("protobuf"),
@@ -24,7 +28,11 @@ py_binary(
 py_binary(
     name = "generate_nanopb",
     srcs = ["generate_nanopb.py"],
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
 )
 

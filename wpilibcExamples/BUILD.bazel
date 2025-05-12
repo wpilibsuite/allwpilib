@@ -5,7 +5,11 @@ load("//wpilibcExamples:build_cpp_examples.bzl", "build_commands", "build_exampl
 py_binary(
     name = "generate_bazel_files",
     srcs = ["generate_bazel_files.py"],
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 cmd = "$(locations :generate_bazel_files) $(OUTS)"

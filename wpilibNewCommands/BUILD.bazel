@@ -9,7 +9,11 @@ load("//wpilibNewCommands:generate.bzl", "generate_wpilib_new_commands")
 py_binary(
     name = "generate_hids",
     srcs = ["generate_hids.py"],
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [requirement("jinja2")],
 )

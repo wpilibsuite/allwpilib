@@ -10,7 +10,11 @@ load("//wpilibj:generate.bzl", "generate_wpilibj")
 py_binary(
     name = "generate_hids",
     srcs = ["generate_hids.py"],
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [requirement("jinja2")],
 )
@@ -18,7 +22,11 @@ py_binary(
 py_binary(
     name = "generate_pwm_motor_controllers",
     srcs = ["generate_pwm_motor_controllers.py"],
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [requirement("jinja2")],
 )
@@ -27,7 +35,11 @@ py_binary(
     name = "generate_wpilibj_py",
     srcs = ["generate_wpilibj.py"],
     main = "generate_wpilibj.py",
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [
         ":generate_hids",
