@@ -23,3 +23,9 @@ Examples:
   build --local_ram_resources=HOST_RAM*.5 # Don't use more than half my RAM when building
   build --local_cpu_resources=HOST_CPUS-1 # Leave one core alone
   ```
+
+## Pregenerating Files
+allwpilib uses extensive use of pre-generating files that are later used to build C++ / Java libraries that are tracked by version control. Quite often,
+these pre-generation scripts use some configuration file to create multipile files inside of an output directory. While this process could be accomplished
+with a `genrule` that would require an explicit listing of every output file, which would be tedious to maintain as well as potentially confusing to people
+adding new features those libraries. Therefor, we use `@aspect_bazel_lib` and their `write_source_files` feature to generate these directories. In the event that the generation process creates more than a small handful of predictable files, a custom rule is written to generate the directory.

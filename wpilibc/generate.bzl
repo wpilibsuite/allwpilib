@@ -1,4 +1,7 @@
 def __generate_wpilibc_impl(ctx):
+    """
+    Custom rule used to create the wpilibc pre-generated files. See `./README-Bazel.md` for the reasoning.
+    """
     output_dir = ctx.actions.declare_directory("_gendir")
 
     args = ctx.actions.args()
