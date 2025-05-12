@@ -1,0 +1,51 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+
+cc_library(
+    name = "headers",
+    hdrs = glob(["src/main/native/include/**"]),
+    includes = ["src/main/native/include"],
+)
+
+cc_library(
+    name = "halsim_ws_server",
+    srcs = glob(["src/main/native/cpp/**"]),
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":headers",
+        "//simulation/halsim_ws_core",
+    ],
+)
+
+cc_library(
+    name = "test_headers",
+    srcs = glob(["src/test/native/include/*.h"]),
+    includes = ["src/test/native/include"],
+    strip_include_prefix = "src/test/native/include",
+)
+
+cc_test(
+    name = "halsim_ws_server-test",
+    size = "small",
+    srcs = glob(["src/test/native/**/*.cpp"]),
+    tags = [
+        "no-asan",
+    ],
+    deps = [
+        ":halsim_ws_server",
+        ":test_headers",
+        "//thirdparty/googletest:googletest.static",
+    ],
+)
+
+cc_binary(
+    name = "DevMain-Cpp",
+    srcs = ["src/dev/native/cpp/main.cpp"],
+    deps = [
+        ":halsim_ws_server",
+    ],
+)
