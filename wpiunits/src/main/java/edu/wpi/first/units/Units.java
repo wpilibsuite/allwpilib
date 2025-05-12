@@ -106,7 +106,7 @@ public final class Units {
       derive(Feet).aggregate(5280).named("Mile").symbol("mi").make();
 
   /** 1609.344 {@link #Meter}s, or 5280 {@link #Feet}. */
-  public static final DistanceUnit Mile = Miles; // allias
+  public static final DistanceUnit Mile = Miles; // alias
 
   /** 4828.032 {@link #Meter}s, or 3 {@link #Miles}. */
   public static final DistanceUnit Leagues =
