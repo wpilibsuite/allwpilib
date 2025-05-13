@@ -430,9 +430,12 @@ public class Scheduler implements ProtobufSerializable {
         // Remove the command we just ran from the top of the stack
         executingCommands.pop();
       }
+
       if (previousState != null) {
         // Remount the parent command, if there is one
         previousState.coroutine().mount();
+      } else {
+        Continuation.mountContinuation(null);
       }
     }
 

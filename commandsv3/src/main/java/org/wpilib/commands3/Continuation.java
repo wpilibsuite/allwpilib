@@ -21,6 +21,7 @@ public final class Continuation {
   private static final MethodHandle IS_DONE;
 
   private static final MethodHandle java_lang_thread_setContinuation;
+  private static final MethodHandle java_lang_thread_getContinuation;
 
   static {
     try {
@@ -63,6 +64,11 @@ public final class Continuation {
               Thread.class,
               "setContinuation",
               MethodType.methodType(void.class, Continuation.jdk_internal_vm_Continuation));
+
+      java_lang_thread_getContinuation =
+          lookup.findVirtual(
+              Thread.class,
+              "getContinuation", MethodType.methodType(Continuation.jdk_internal_vm_Continuation));
     } catch (Throwable t) {
       throw new ExceptionInInitializerError(t);
     }
@@ -95,6 +101,8 @@ public final class Continuation {
   public static boolean yield(ContinuationScope scope) {
     try {
       return (boolean) YIELD.invoke(scope.continuationScope);
+    } catch (RuntimeException e) {
+      throw e;
     } catch (Throwable t) {
       throw new RuntimeException(t);
     }
@@ -162,5 +170,16 @@ public final class Continuation {
    */
   public boolean yield() {
     return Continuation.yield(scope);
+  }
+
+  boolean isMounted() {
+    try {
+      Object mountedContinuation = java_lang_thread_getContinuation.invoke(Thread.currentThread());
+      return mountedContinuation == continuation;
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new RuntimeException(t);
+    }
   }
 }
