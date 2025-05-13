@@ -35,7 +35,25 @@ public final class Coroutine {
    * @return true
    */
   public boolean yield() {
-    return backingContinuation.yield();
+    requireMounted();
+
+    try {
+      return backingContinuation.yield();
+    } catch (IllegalStateException e) {
+      if (e.getMessage().equals("Pinned: MONITOR")) {
+        // Yielding inside a synchronized block or method
+        // Throw with an error message that's more helpful for our users
+        throw new IllegalStateException(
+            "Coroutine.yield() cannot be called inside a synchronized block or method. " +
+            "Consider using a Lock instead of synchronized, " +
+            "or rewrite your code to avoid locks and mutexes altogether.",
+            e
+        );
+      } else {
+        // rethrow
+        throw e;
+      }
+    }
   }
 
   /**
@@ -44,6 +62,8 @@ public final class Coroutine {
    */
   @SuppressWarnings("InfiniteLoopStatement")
   public void park() {
+    requireMounted();
+
     while (true) {
       Coroutine.this.yield();
     }
@@ -69,6 +89,8 @@ public final class Coroutine {
    * @param commands The commands to fork.
    */
   public void fork(Command... commands) {
+    requireMounted();
+
     // Shorthand; this is handy for user-defined compositions
     for (var command : commands) {
       scheduler.schedule(command);
@@ -84,6 +106,8 @@ public final class Coroutine {
    *     command
    */
   public void await(Command command) {
+    requireMounted();
+
     if (!scheduler.isScheduledOrRunning(command)) {
       scheduler.schedule(command);
     }
@@ -103,6 +127,8 @@ public final class Coroutine {
    * @throws IllegalArgumentException if any of the commands conflict with each other
    */
   public void awaitAll(Collection<Command> commands) {
+    requireMounted();
+
     validateNoConflicts(commands);
 
     // Schedule anything that's not already queued or running
@@ -138,6 +164,8 @@ public final class Coroutine {
    * @throws IllegalArgumentException if any of the commands conflict with each other
    */
   public void awaitAny(Collection<Command> commands) {
+    requireMounted();
+
     validateNoConflicts(commands);
 
     // Schedule anything that's not already queued or running
@@ -215,6 +243,8 @@ public final class Coroutine {
    * @param duration the duration of time to wait
    */
   public void wait(Time duration) {
+    requireMounted();
+
     await(new WaitCommand(duration));
   }
 
@@ -228,6 +258,23 @@ public final class Coroutine {
    */
   public Scheduler scheduler() {
     return scheduler;
+  }
+
+  private boolean isMounted() {
+    return backingContinuation.isMounted();
+  }
+
+  private void requireMounted() {
+    // Note: attempting to yield() outside a command will already throw an error due to the
+    // continuation being unmounted, but other actions like forking and awaiting should also
+    // throw errors. For consistent messaging, we use this helper in all places, not just the
+    // ones that interact with the backing continuation.
+
+    if (isMounted()) {
+      return;
+    }
+
+    throw new IllegalStateException("Coroutines can only be used while running in a command");
   }
 
   // Package-private for interaction with the scheduler.

@@ -155,6 +155,25 @@ single-threaded environment. All commands will be run by a single thread, which 
 the same thread on which commands are scheduled and canceled via triggers. No guarantees are made
 for stability or proper functioning if used in a multithreaded environment.
 
+### Unbounded use of coroutines
+
+Coroutines are intended to be used within the context of a running command or sideloaded periodic
+function, and rely on their backing continuations to be mounted in order to run. Using a coroutine
+outside its command makes no sense, and an error will be thrown if attempting to do so:
+
+```java
+Coroutine coroutine;
+var badCommand = Command.noRequirements(co -> {
+  coroutine = co;
+}).named("Do not do this");
+
+Scheduler.getInstance().schedule(badCommand);
+Scheduler.getInstance().run();
+
+// Doing anything with a captured coroutine will throw an error
+co.fork(...); // IllegalStateException
+co.yield(); // IllegalStateException
+```
 
 ## Implementation Details
 
