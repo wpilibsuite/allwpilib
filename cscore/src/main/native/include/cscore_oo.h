@@ -779,9 +779,9 @@ class HttpCamera : public VideoCamera {
     /// Unknown camera kind.
     UNKNOWN = CS_HTTP_UNKNOWN,
     /// MJPG Streamer camera.
-    MJPGSTREAMER = CS_HTTP_MJPGSTREAMER,
+    MJPG_STREAMER = CS_HTTP_MJPGSTREAMER,
     /// CS Core camera.
-    CSCORE = CS_HTTP_CSCORE,
+    CS_CORE = CS_HTTP_CSCORE,
     /// Axis camera.
     AXIS = CS_HTTP_AXIS
   };
