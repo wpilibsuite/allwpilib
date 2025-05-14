@@ -23,7 +23,7 @@ void nt::net::WireEncodePublish(wpi::raw_ostream& os, int pubuid,
                                 std::string_view name, std::string_view typeStr,
                                 const wpi::json& properties) {
   wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << PublishMsg::kMethodStr << "\",\"params\":{";
+  os << "{\"method\":\"" << PublishMsg::METHOD_STR << "\",\"params\":{";
   os << "\"name\":\"";
   s.dump_escaped(name, false);
   os << "\",\"properties\":";
@@ -37,7 +37,7 @@ void nt::net::WireEncodePublish(wpi::raw_ostream& os, int pubuid,
 
 void nt::net::WireEncodeUnpublish(wpi::raw_ostream& os, int pubuid) {
   wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << UnpublishMsg::kMethodStr << "\",\"params\":{";
+  os << "{\"method\":\"" << UnpublishMsg::METHOD_STR << "\",\"params\":{";
   os << "\"pubuid\":";
   s.dump_integer(pubuid);
   os << "}}";
@@ -47,7 +47,7 @@ void nt::net::WireEncodeSetProperties(wpi::raw_ostream& os,
                                       std::string_view name,
                                       const wpi::json& update) {
   wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << SetPropertiesMsg::kMethodStr << "\",\"params\":{";
+  os << "{\"method\":\"" << SetPropertiesMsg::METHOD_STR << "\",\"params\":{";
   os << "\"name\":\"";
   s.dump_escaped(name, false);
   os << "\",\"update\":";
@@ -78,7 +78,7 @@ static void WireEncodeSubscribeImpl(wpi::raw_ostream& os, int subuid,
                                     std::span<const T> topicNames,
                                     const PubSubOptionsImpl& options) {
   wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << SubscribeMsg::kMethodStr << "\",\"params\":{";
+  os << "{\"method\":\"" << SubscribeMsg::METHOD_STR << "\",\"params\":{";
   os << "\"options\":{";
   bool first = true;
   if (options.sendAll) {
@@ -99,7 +99,7 @@ static void WireEncodeSubscribeImpl(wpi::raw_ostream& os, int subuid,
     os << "\"prefix\":true";
     first = false;
   }
-  if (options.periodicMs != PubSubOptionsImpl::kDefaultPeriodicMs) {
+  if (options.periodicMs != PubSubOptionsImpl::DEFAULT_PERIODIC_MS) {
     if (!first) {
       os << ',';
     }
@@ -127,7 +127,7 @@ void nt::net::WireEncodeSubscribe(wpi::raw_ostream& os, int subuid,
 
 void nt::net::WireEncodeUnsubscribe(wpi::raw_ostream& os, int subuid) {
   wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << UnsubscribeMsg::kMethodStr << "\",\"params\":{";
+  os << "{\"method\":\"" << UnsubscribeMsg::METHOD_STR << "\",\"params\":{";
   os << "\"subuid\":";
   s.dump_integer(subuid);
   os << "}}";
@@ -155,7 +155,7 @@ void nt::net::WireEncodeAnnounce(wpi::raw_ostream& os, std::string_view name,
                                  const wpi::json& properties,
                                  std::optional<int> pubuid) {
   wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << AnnounceMsg::kMethodStr << "\",\"params\":{";
+  os << "{\"method\":\"" << AnnounceMsg::METHOD_STR << "\",\"params\":{";
   os << "\"id\":";
   s.dump_integer(id);
   os << ",\"name\":\"";
@@ -174,7 +174,7 @@ void nt::net::WireEncodeAnnounce(wpi::raw_ostream& os, std::string_view name,
 void nt::net::WireEncodeUnannounce(wpi::raw_ostream& os, std::string_view name,
                                    int64_t id) {
   wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << UnannounceMsg::kMethodStr << "\",\"params\":{";
+  os << "{\"method\":\"" << UnannounceMsg::METHOD_STR << "\",\"params\":{";
   os << "\"id\":";
   s.dump_integer(id);
   os << ",\"name\":\"";
@@ -186,7 +186,7 @@ void nt::net::WireEncodePropertiesUpdate(wpi::raw_ostream& os,
                                          std::string_view name,
                                          const wpi::json& update, bool ack) {
   wpi::json::serializer s{os, ' ', 0};
-  os << "{\"method\":\"" << PropertiesUpdateMsg::kMethodStr
+  os << "{\"method\":\"" << PropertiesUpdateMsg::METHOD_STR
      << "\",\"params\":{";
   os << "\"name\":\"";
   s.dump_escaped(name, false);

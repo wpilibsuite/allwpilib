@@ -14,13 +14,13 @@
  */
 
 namespace IntakeConstants {
-inline constexpr int kMotorPort = 1;
+inline constexpr int MOTOR_PORT = 1;
 
-inline constexpr int kPistonFwdChannel = 0;
-inline constexpr int kPistonRevChannel = 1;
-inline constexpr double kIntakeSpeed = 0.5;
+inline constexpr int PISTON_FWD_CHANNEL = 0;
+inline constexpr int PISTON_REV_CHANNEL = 1;
+inline constexpr double INTAKE_SPEED = 0.5;
 }  // namespace IntakeConstants
 
 namespace OperatorConstants {
-inline constexpr int kJoystickIndex = 0;
+inline constexpr int JOYSTICK_INDEX = 0;
 }  // namespace OperatorConstants

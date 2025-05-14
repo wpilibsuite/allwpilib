@@ -29,7 +29,7 @@ public class MechanismLigament2d extends MechanismObject2d {
   private double m_weight;
   private DoubleEntry m_weightEntry;
 
-  private static String kSmartDashboardType = "line";
+  private static String SMART_DASHBOARD_TYPE = "line";
 
   /**
    * Create a new ligament.
@@ -208,8 +208,8 @@ public class MechanismLigament2d extends MechanismObject2d {
         table
             .getStringTopic(".type")
             .publishEx(
-                StringTopic.kTypeString, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
-    m_typePub.set(kSmartDashboardType);
+                StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + SMART_DASHBOARD_TYPE + "\"}");
+    m_typePub.set(SMART_DASHBOARD_TYPE);
 
     if (m_angleEntry != null) {
       m_angleEntry.close();

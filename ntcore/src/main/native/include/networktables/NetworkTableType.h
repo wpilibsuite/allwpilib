@@ -14,29 +14,29 @@ namespace nt {
  */
 enum class NetworkTableType {
   /// Unassigned data type.
-  kUnassigned = NT_UNASSIGNED,
+  UNASSIGNED = NT_UNASSIGNED,
   /// Boolean data type.
-  kBoolean = NT_BOOLEAN,
+  BOOLEAN = NT_BOOLEAN,
   /// Double precision floating-point data type.
-  kDouble = NT_DOUBLE,
+  DOUBLE = NT_DOUBLE,
   /// String data type.
-  kString = NT_STRING,
+  STRING = NT_STRING,
   /// Raw data type.
-  kRaw = NT_RAW,
+  RAW = NT_RAW,
   /// Boolean array data type.
-  kBooleanArray = NT_BOOLEAN_ARRAY,
+  BOOLEAN_ARRAY = NT_BOOLEAN_ARRAY,
   /// Double precision floating-point array data type.
-  kDoubleArray = NT_DOUBLE_ARRAY,
+  DOUBLE_ARRAY = NT_DOUBLE_ARRAY,
   /// String array data type.
-  kStringArray = NT_STRING_ARRAY,
+  STRING_ARRAY = NT_STRING_ARRAY,
   /// Integer data type.
-  kInteger = NT_INTEGER,
+  INTEGER = NT_INTEGER,
   /// Single precision floating-point data type.
-  kFloat = NT_FLOAT,
+  FLOAT = NT_FLOAT,
   /// Integer array data type.
-  kIntegerArray = NT_INTEGER_ARRAY,
+  INTEGER_ARRAY = NT_INTEGER_ARRAY,
   /// Single precision floating-point array data type.
-  kFloatArray = NT_FLOAT_ARRAY
+  FLOAT_ARRAY = NT_FLOAT_ARRAY
 };
 
 }  // namespace nt

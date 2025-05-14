@@ -59,7 +59,7 @@ public class SwerveDriveOdometry3d extends Odometry3d<SwerveModulePosition[]> {
       SwerveDriveKinematics kinematics,
       Rotation3d gyroAngle,
       SwerveModulePosition[] modulePositions) {
-    this(kinematics, gyroAngle, modulePositions, Pose3d.kZero);
+    this(kinematics, gyroAngle, modulePositions, Pose3d.ZERO);
   }
 
   @Override

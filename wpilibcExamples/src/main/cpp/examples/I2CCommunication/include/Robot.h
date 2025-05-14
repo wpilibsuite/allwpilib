@@ -17,9 +17,9 @@ class Robot : public frc::TimedRobot {
  public:
   void RobotPeriodic() override;
 
-  static constexpr frc::I2C::Port kPort = frc::I2C::Port::kPort0;
+  static constexpr frc::I2C::Port PORT = frc::I2C::Port::PORT0;
 
  private:
   static constexpr int deviceAddress = 4;
-  frc::I2C arduino{kPort, deviceAddress};
+  frc::I2C arduino{PORT, deviceAddress};
 };

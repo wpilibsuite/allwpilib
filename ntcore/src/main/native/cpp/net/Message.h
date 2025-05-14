@@ -22,7 +22,7 @@ namespace nt::net {
 #endif
 
 struct PublishMsg {
-  static constexpr std::string_view kMethodStr = "publish";
+  static constexpr std::string_view METHOD_STR = "publish";
   int pubuid{0};
   std::string name;
   std::string typeStr;
@@ -31,25 +31,25 @@ struct PublishMsg {
 };
 
 struct UnpublishMsg {
-  static constexpr std::string_view kMethodStr = "unpublish";
+  static constexpr std::string_view METHOD_STR = "unpublish";
   int pubuid{0};
 };
 
 struct SetPropertiesMsg {
-  static constexpr std::string_view kMethodStr = "setproperties";
+  static constexpr std::string_view METHOD_STR = "setproperties";
   std::string name;
   wpi::json update;
 };
 
 struct SubscribeMsg {
-  static constexpr std::string_view kMethodStr = "subscribe";
+  static constexpr std::string_view METHOD_STR = "subscribe";
   int subuid{0};
   std::vector<std::string> topicNames;
   PubSubOptionsImpl options;
 };
 
 struct UnsubscribeMsg {
-  static constexpr std::string_view kMethodStr = "unsubscribe";
+  static constexpr std::string_view METHOD_STR = "unsubscribe";
   int subuid{0};
 };
 
@@ -71,7 +71,7 @@ struct ClientMessage {
 };
 
 struct AnnounceMsg {
-  static constexpr std::string_view kMethodStr = "announce";
+  static constexpr std::string_view METHOD_STR = "announce";
   std::string name;
   int id{0};
   std::string typeStr;
@@ -80,13 +80,13 @@ struct AnnounceMsg {
 };
 
 struct UnannounceMsg {
-  static constexpr std::string_view kMethodStr = "unannounce";
+  static constexpr std::string_view METHOD_STR = "unannounce";
   std::string name;
   int id{0};
 };
 
 struct PropertiesUpdateMsg {
-  static constexpr std::string_view kMethodStr = "properties";
+  static constexpr std::string_view METHOD_STR = "properties";
   std::string name;
   wpi::json update;
   bool ack;

@@ -208,10 +208,10 @@ void Command::InitSendable(wpi::SendableBuilder& builder) {
       "interruptBehavior",
       [this] {
         switch (GetInterruptionBehavior()) {
-          case Command::InterruptionBehavior::kCancelIncoming:
-            return "kCancelIncoming";
-          case Command::InterruptionBehavior::kCancelSelf:
-            return "kCancelSelf";
+          case Command::InterruptionBehavior::CANCEL_INCOMING:
+            return "CANCEL_INCOMING";
+          case Command::InterruptionBehavior::CANCEL_SELF:
+            return "CANCEL_SELF";
           default:
             return "Invalid";
         }

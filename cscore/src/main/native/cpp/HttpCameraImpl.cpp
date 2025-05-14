@@ -300,8 +300,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
     // We know how big it is!  Just get a frame of the right size and read
     // the data directly into it.
     unsigned int contentLength = v.value();
-    auto image =
-        AllocImage(VideoMode::PixelFormat::kMJPEG, 0, 0, contentLength);
+    auto image = AllocImage(VideoMode::PixelFormat::MJPEG, 0, 0, contentLength);
     is.read(image->data(), contentLength);
     if (!m_active || is.has_error()) {
       return false;
@@ -321,7 +320,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
       PutError("did not receive a JPEG image", wpi::Now());
       return false;
     }
-    PutFrame(VideoMode::PixelFormat::kMJPEG, width, height, imageBuf,
+    PutFrame(VideoMode::PixelFormat::MJPEG, width, height, imageBuf,
              wpi::Now());
   }
 
@@ -329,9 +328,9 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
 
   // update video mode if not set
   std::scoped_lock lock(m_mutex);
-  if (m_mode.pixelFormat != VideoMode::PixelFormat::kMJPEG ||
+  if (m_mode.pixelFormat != VideoMode::PixelFormat::MJPEG ||
       m_mode.width == 0 || m_mode.height == 0) {
-    m_mode.pixelFormat = VideoMode::PixelFormat::kMJPEG;
+    m_mode.pixelFormat = VideoMode::PixelFormat::MJPEG;
     m_mode.width = width;
     m_mode.height = height;
   }
@@ -469,9 +468,9 @@ bool HttpCameraImpl::CacheProperties(CS_Status* status) const {
 
   // Pretty typical set of video modes
   m_videoModes.clear();
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 640, 480, 30);
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 320, 240, 30);
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 160, 120, 30);
+  m_videoModes.emplace_back(VideoMode::MJPEG, 640, 480, 30);
+  m_videoModes.emplace_back(VideoMode::MJPEG, 320, 240, 30);
+  m_videoModes.emplace_back(VideoMode::MJPEG, 160, 120, 30);
 
   m_properties_cached = true;
   return true;
@@ -520,7 +519,7 @@ void HttpCameraImpl::SetExposureManual(int value, CS_Status* status) {
 }
 
 bool HttpCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
-  if (mode.pixelFormat != VideoMode::kMJPEG) {
+  if (mode.pixelFormat != VideoMode::MJPEG) {
     return false;
   }
   std::scoped_lock lock(m_mutex);
@@ -562,12 +561,12 @@ bool AxisCameraImpl::CacheProperties(CS_Status* status) const {
   // TODO: get video modes from device
   std::scoped_lock lock(m_mutex);
   m_videoModes.clear();
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 640, 480, 30);
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 480, 360, 30);
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 320, 240, 30);
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 240, 180, 30);
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 176, 144, 30);
-  m_videoModes.emplace_back(VideoMode::kMJPEG, 160, 120, 30);
+  m_videoModes.emplace_back(VideoMode::MJPEG, 640, 480, 30);
+  m_videoModes.emplace_back(VideoMode::MJPEG, 480, 360, 30);
+  m_videoModes.emplace_back(VideoMode::MJPEG, 320, 240, 30);
+  m_videoModes.emplace_back(VideoMode::MJPEG, 240, 180, 30);
+  m_videoModes.emplace_back(VideoMode::MJPEG, 176, 144, 30);
+  m_videoModes.emplace_back(VideoMode::MJPEG, 160, 120, 30);
 
   m_properties_cached = true;
   return true;

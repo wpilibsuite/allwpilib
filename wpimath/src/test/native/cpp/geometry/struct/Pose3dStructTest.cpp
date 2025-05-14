@@ -11,7 +11,7 @@ using namespace frc;
 namespace {
 
 using StructType = wpi::Struct<frc::Pose3d>;
-const Pose3d kExpectedData{
+const Pose3d EXPECTED_DATA{
     Pose3d{Translation3d{1.1_m, 2.2_m, 1.1_m},
            Rotation3d{Quaternion{1.91, 0.3504, 3.3, 1.74}}}};
 }  // namespace
@@ -19,10 +19,10 @@ const Pose3d kExpectedData{
 TEST(Pose3dStructTest, Roundtrip) {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   Pose3d unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.Translation(), unpacked_data.Translation());
-  EXPECT_EQ(kExpectedData.Rotation(), unpacked_data.Rotation());
+  EXPECT_EQ(EXPECTED_DATA.Translation(), unpacked_data.Translation());
+  EXPECT_EQ(EXPECTED_DATA.Rotation(), unpacked_data.Rotation());
 }

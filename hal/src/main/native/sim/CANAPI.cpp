@@ -71,18 +71,18 @@ HAL_CANHandle HAL_InitializeCAN(int32_t busId, HAL_CANManufacturer manufacturer,
                                 int32_t* status) {
   hal::init::CheckInit();
 
-  if (busId < 0 || busId > hal::kNumCanBuses) {
+  if (busId < 0 || busId > hal::NUM_CAN_BUSES) {
     *status = PARAMETER_OUT_OF_RANGE;
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   auto can = std::make_shared<CANStorage>();
 
   auto handle = canHandles->Allocate(can);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_InvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   can->busId = busId;

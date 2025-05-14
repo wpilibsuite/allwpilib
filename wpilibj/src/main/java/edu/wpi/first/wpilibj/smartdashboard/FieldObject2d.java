@@ -59,7 +59,7 @@ public class FieldObject2d implements AutoCloseable {
   public synchronized Pose2d getPose() {
     updateFromEntry();
     if (m_poses.isEmpty()) {
-      return Pose2d.kZero;
+      return Pose2d.ZERO;
     }
     return m_poses.get(0);
   }

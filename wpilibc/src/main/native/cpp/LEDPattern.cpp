@@ -203,7 +203,7 @@ LEDPattern LEDPattern::AtBrightness(double relativeBrightness) {
 // Static constants and functions
 
 LEDPattern LEDPattern::Off() {
-  return LEDPattern::Solid(Color::kBlack);
+  return LEDPattern::Solid(Color::BLACK);
 }
 
 LEDPattern LEDPattern::Solid(const Color color) {
@@ -223,10 +223,10 @@ LEDPattern LEDPattern::ProgressMaskLayer(
     size_t max = bufLen * progress;
 
     for (size_t led = 0; led < max; led++) {
-      writer(led, Color::kWhite);
+      writer(led, Color::WHITE);
     }
     for (size_t led = max; led < bufLen; led++) {
-      writer(led, Color::kBlack);
+      writer(led, Color::BLACK);
     }
   }};
 }
@@ -252,7 +252,7 @@ LEDPattern LEDPattern::Steps(std::span<const std::pair<double, Color>> steps) {
     for (auto step : steps) {
       stopPositions[std::floor(step.first * bufLen)] = step.second;
     }
-    auto currentColor = Color::kBlack;
+    auto currentColor = Color::BLACK;
     for (size_t led = 0; led < bufLen; led++) {
       if (stopPositions.contains(led)) {
         currentColor = stopPositions[led];
@@ -284,10 +284,10 @@ LEDPattern LEDPattern::Gradient(GradientType type,
     auto bufLen = data.size();
     int ledsPerSegment = 0;
     switch (type) {
-      case kContinuous:
+      case CONTINUOUS:
         ledsPerSegment = bufLen / numSegments;
         break;
-      case kDiscontinuous:
+      case DISCONTINUOUS:
         ledsPerSegment = (bufLen - 1) / (numSegments - 1);
         break;
     }

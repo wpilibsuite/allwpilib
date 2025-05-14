@@ -12,23 +12,23 @@ namespace {
 
 using StructType = wpi::Struct<frc::ElevatorFeedforward>;
 
-static constexpr auto Ks = 1.91_V;
-static constexpr auto Kg = 2.29_V;
-static constexpr auto Kv = 35.04_V * 1_s / 1_m;
-static constexpr auto Ka = 1.74_V * 1_s * 1_s / 1_m;
+static constexpr auto S = 1.91_V;
+static constexpr auto G = 2.29_V;
+static constexpr auto V = 35.04_V * 1_s / 1_m;
+static constexpr auto A = 1.74_V * 1_s * 1_s / 1_m;
 
-constexpr ElevatorFeedforward kExpectedData{Ks, Kg, Kv, Ka};
+constexpr ElevatorFeedforward EXPECTED_DATA{S, G, V, A};
 }  // namespace
 
 TEST(ElevatorFeedforwardStructTest, Roundtrip) {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   ElevatorFeedforward unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.GetKs().value(), unpacked_data.GetKs().value());
-  EXPECT_EQ(kExpectedData.GetKg().value(), unpacked_data.GetKg().value());
-  EXPECT_EQ(kExpectedData.GetKv().value(), unpacked_data.GetKv().value());
-  EXPECT_EQ(kExpectedData.GetKa().value(), unpacked_data.GetKa().value());
+  EXPECT_EQ(EXPECTED_DATA.GetKs().value(), unpacked_data.GetKs().value());
+  EXPECT_EQ(EXPECTED_DATA.GetKg().value(), unpacked_data.GetKg().value());
+  EXPECT_EQ(EXPECTED_DATA.GetKv().value(), unpacked_data.GetKv().value());
+  EXPECT_EQ(EXPECTED_DATA.GetKa().value(), unpacked_data.GetKa().value());
 }

@@ -22,11 +22,11 @@ class WPILIB_DLLEXPORT Debouncer {
    */
   enum DebounceType {
     /// Rising edge.
-    kRising,
+    RISING,
     /// Falling edge.
-    kFalling,
+    FALLING,
     /// Both rising and falling edges.
-    kBoth
+    BOTH
   };
 
   /**
@@ -38,7 +38,7 @@ class WPILIB_DLLEXPORT Debouncer {
    *                     performed on.
    */
   explicit Debouncer(units::second_t debounceTime,
-                     DebounceType type = DebounceType::kRising);
+                     DebounceType type = DebounceType::RISING);
 
   /**
    * Applies the debouncer to the input stream.
@@ -74,7 +74,7 @@ class WPILIB_DLLEXPORT Debouncer {
   constexpr void SetDebounceType(DebounceType type) {
     m_debounceType = type;
 
-    m_baseline = m_debounceType == DebounceType::kFalling;
+    m_baseline = m_debounceType == DebounceType::FALLING;
   }
 
   /**

@@ -15,7 +15,7 @@
 
 using namespace frc;
 
-static constexpr double kEpsilon = 0.01;
+static constexpr double EPSILON = 0.01;
 
 class SwerveDriveOdometryTest : public ::testing::Test {
  protected:
@@ -40,9 +40,9 @@ TEST_F(SwerveDriveOdometryTest, TwoIterations) {
   auto pose =
       m_odometry.Update(0_deg, {position, position, position, position});
 
-  EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Rotation().Degrees().value(), kEpsilon);
+  EXPECT_NEAR(0.5, pose.X().value(), EPSILON);
+  EXPECT_NEAR(0.0, pose.Y().value(), EPSILON);
+  EXPECT_NEAR(0.0, pose.Rotation().Degrees().value(), EPSILON);
 }
 
 TEST_F(SwerveDriveOdometryTest, 90DegreeTurn) {
@@ -54,9 +54,9 @@ TEST_F(SwerveDriveOdometryTest, 90DegreeTurn) {
   m_odometry.ResetPosition(0_rad, {zero, zero, zero, zero}, Pose2d{});
   auto pose = m_odometry.Update(90_deg, {fl, fr, bl, br});
 
-  EXPECT_NEAR(12.0, pose.X().value(), kEpsilon);
-  EXPECT_NEAR(12.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(90.0, pose.Rotation().Degrees().value(), kEpsilon);
+  EXPECT_NEAR(12.0, pose.X().value(), EPSILON);
+  EXPECT_NEAR(12.0, pose.Y().value(), EPSILON);
+  EXPECT_NEAR(90.0, pose.Rotation().Degrees().value(), EPSILON);
 }
 
 TEST_F(SwerveDriveOdometryTest, GyroAngleReset) {
@@ -67,9 +67,9 @@ TEST_F(SwerveDriveOdometryTest, GyroAngleReset) {
   auto pose =
       m_odometry.Update(90_deg, {position, position, position, position});
 
-  EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Rotation().Degrees().value(), kEpsilon);
+  EXPECT_NEAR(0.5, pose.X().value(), EPSILON);
+  EXPECT_NEAR(0.0, pose.Y().value(), EPSILON);
+  EXPECT_NEAR(0.0, pose.Rotation().Degrees().value(), EPSILON);
 }
 
 TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {

@@ -6,6 +6,9 @@
 {% macro capitalize_first(string) -%}
 {{ string[0]|capitalize + string[1:] }}
 {%- endmacro %}
+{% macro snakecase(string) -%}
+{{ string|camel_to_snake }}
+{%- endmacro %}
 #pragma once
 
 #include <wpi/sendable/Sendable.h>
@@ -220,7 +223,7 @@ class {{ ConsoleName }}Controller : public GenericHID,
   struct Button {
 {%- for button in buttons %}
     /// {{ capitalize_first(button.DocName|default(button.name)) }} button.
-    static constexpr int k{{ capitalize_first(button.name) }} = {{ button.value }};
+    static constexpr int {{ snakecase(button.name) }} = {{ button.value }};
 {%- endfor %}
   };
 
@@ -228,11 +231,11 @@ class {{ ConsoleName }}Controller : public GenericHID,
   struct Axis {
 {%- for stick in sticks %}
     /// {{ stick.NameParts|map("capitalize")|join(" ") }} axis.
-    static constexpr int k{{ stick.NameParts|map("capitalize")|join }} = {{ stick.value }};
+    static constexpr int {{ snakecase(stick.NameParts|join) }} = {{ stick.value }};
 {%- endfor %}
 {%- for trigger in triggers %}
     /// {{ trigger.DocName|capitalize }}.
-    static constexpr int k{{ capitalize_first(trigger.name) }} = {{ trigger.value }};
+    static constexpr int {{ snakecase(trigger.name) }} = {{ trigger.value }};
 {%- endfor %}
   };
 

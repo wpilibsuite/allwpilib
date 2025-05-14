@@ -93,9 +93,9 @@ class ColorTest {
   @MethodSource("hsvToRgbProvider")
   void hsvToRgb(int h, int s, int v, int r, int g, int b) {
     int rgb = Color.hsvToRgb(h, s, v);
-    int R = Color.unpackRGB(rgb, Color.RGBChannel.kRed);
-    int G = Color.unpackRGB(rgb, Color.RGBChannel.kGreen);
-    int B = Color.unpackRGB(rgb, Color.RGBChannel.kBlue);
+    int R = Color.unpackRGB(rgb, Color.RGBChannel.RED);
+    int G = Color.unpackRGB(rgb, Color.RGBChannel.GREEN);
+    int B = Color.unpackRGB(rgb, Color.RGBChannel.BLUE);
 
     assertAll(
         () -> assertEquals(r, R, "R value didn't match"),

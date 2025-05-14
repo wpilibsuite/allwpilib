@@ -29,11 +29,11 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
     int32_t channel, const char* allocationLocation, int32_t* status) {
   hal::init::CheckInit();
 
-  if (channel < 0 || channel >= kNumSmartIo) {
+  if (channel < 0 || channel >= NUM_SMART_IO) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog", 0,
-                                     kNumSmartIo, channel);
-    return HAL_kInvalidHandle;
+                                     NUM_SMART_IO, channel);
+    return HAL_InvalidHandle;
   }
 
   HAL_DigitalHandle handle;
@@ -47,9 +47,9 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
                                            port->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog", 0,
-                                       kNumSmartIo, channel);
+                                       NUM_SMART_IO, channel);
     }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+    return HAL_InvalidHandle;  // failed to allocate. Pass error back.
   }
 
   port->channel = channel;
@@ -57,7 +57,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   *status = port->InitializeMode(SmartIoMode::AnalogInput);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::AnalogInput);
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
 
   port->previousAllocation = allocationLocation ? allocationLocation : "";
@@ -92,7 +92,7 @@ HAL_Bool HAL_CheckAnalogModule(int32_t module) {
 }
 
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
-  return channel < kNumSmartIo && channel >= 0;
+  return channel < NUM_SMART_IO && channel >= 0;
 }
 
 void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,

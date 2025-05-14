@@ -29,27 +29,27 @@ class SwerveDriveOdometryTest {
 
   private final SwerveDriveOdometry m_odometry =
       new SwerveDriveOdometry(
-          m_kinematics, Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
+          m_kinematics, Rotation2d.ZERO, new SwerveModulePosition[] {zero, zero, zero, zero});
 
   @Test
   void testTwoIterations() {
     // 5 units/sec  in the x-axis (forward)
     final SwerveModulePosition[] wheelDeltas = {
-      new SwerveModulePosition(0.5, Rotation2d.kZero),
-      new SwerveModulePosition(0.5, Rotation2d.kZero),
-      new SwerveModulePosition(0.5, Rotation2d.kZero),
-      new SwerveModulePosition(0.5, Rotation2d.kZero)
+      new SwerveModulePosition(0.5, Rotation2d.ZERO),
+      new SwerveModulePosition(0.5, Rotation2d.ZERO),
+      new SwerveModulePosition(0.5, Rotation2d.ZERO),
+      new SwerveModulePosition(0.5, Rotation2d.ZERO)
     };
 
     m_odometry.update(
-        Rotation2d.kZero,
+        Rotation2d.ZERO,
         new SwerveModulePosition[] {
           new SwerveModulePosition(),
           new SwerveModulePosition(),
           new SwerveModulePosition(),
           new SwerveModulePosition()
         });
-    var pose = m_odometry.update(Rotation2d.kZero, wheelDeltas);
+    var pose = m_odometry.update(Rotation2d.ZERO, wheelDeltas);
 
     assertAll(
         () -> assertEquals(5.0 / 10.0, pose.getX(), 0.01),
@@ -66,15 +66,15 @@ class SwerveDriveOdometryTest {
     //        Module 3: speed 42.14888838624436 angle -26.565051177077986
 
     final SwerveModulePosition[] wheelDeltas = {
-      new SwerveModulePosition(18.85, Rotation2d.kCCW_Pi_2),
+      new SwerveModulePosition(18.85, Rotation2d.CCW_PI_2),
       new SwerveModulePosition(42.15, Rotation2d.fromDegrees(26.565)),
-      new SwerveModulePosition(18.85, Rotation2d.kCW_Pi_2),
+      new SwerveModulePosition(18.85, Rotation2d.CW_PI_2),
       new SwerveModulePosition(42.15, Rotation2d.fromDegrees(-26.565))
     };
     final var zero = new SwerveModulePosition();
 
-    m_odometry.update(Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
-    final var pose = m_odometry.update(Rotation2d.kCCW_Pi_2, wheelDeltas);
+    m_odometry.update(Rotation2d.ZERO, new SwerveModulePosition[] {zero, zero, zero, zero});
+    final var pose = m_odometry.update(Rotation2d.CCW_PI_2, wheelDeltas);
 
     assertAll(
         () -> assertEquals(12.0, pose.getX(), 0.01),
@@ -84,15 +84,15 @@ class SwerveDriveOdometryTest {
 
   @Test
   void testGyroAngleReset() {
-    var gyro = Rotation2d.kCCW_Pi_2;
-    var fieldAngle = Rotation2d.kZero;
+    var gyro = Rotation2d.CCW_PI_2;
+    var fieldAngle = Rotation2d.ZERO;
     m_odometry.resetPosition(
         gyro,
         new SwerveModulePosition[] {zero, zero, zero, zero},
-        new Pose2d(Translation2d.kZero, fieldAngle));
+        new Pose2d(Translation2d.ZERO, fieldAngle));
     var delta = new SwerveModulePosition();
     m_odometry.update(gyro, new SwerveModulePosition[] {delta, delta, delta, delta});
-    delta = new SwerveModulePosition(1.0, Rotation2d.kZero);
+    delta = new SwerveModulePosition(1.0, Rotation2d.ZERO);
     var pose = m_odometry.update(gyro, new SwerveModulePosition[] {delta, delta, delta, delta});
 
     assertAll(
@@ -111,7 +111,7 @@ class SwerveDriveOdometryTest {
             new Translation2d(-1, 1));
     var odometry =
         new SwerveDriveOdometry(
-            kinematics, Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
+            kinematics, Rotation2d.ZERO, new SwerveModulePosition[] {zero, zero, zero, zero});
 
     SwerveModulePosition fl = new SwerveModulePosition();
     SwerveModulePosition fr = new SwerveModulePosition();
@@ -122,9 +122,9 @@ class SwerveDriveOdometryTest {
         TrajectoryGenerator.generateTrajectory(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+                new Pose2d(3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
-                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+                new Pose2d(-3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
             new TrajectoryConfig(0.5, 2));
 
@@ -195,7 +195,7 @@ class SwerveDriveOdometryTest {
             new Translation2d(-1, 1));
     var odometry =
         new SwerveDriveOdometry(
-            kinematics, Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
+            kinematics, Rotation2d.ZERO, new SwerveModulePosition[] {zero, zero, zero, zero});
 
     SwerveModulePosition fl = new SwerveModulePosition();
     SwerveModulePosition fr = new SwerveModulePosition();
@@ -206,9 +206,9 @@ class SwerveDriveOdometryTest {
         TrajectoryGenerator.generateTrajectory(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+                new Pose2d(3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
-                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+                new Pose2d(-3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
             new TrajectoryConfig(0.5, 2));
 

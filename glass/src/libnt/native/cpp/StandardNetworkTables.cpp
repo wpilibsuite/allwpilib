@@ -26,7 +26,7 @@ using namespace glass;
 
 void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
   provider.Register(
-      NTAlertsModel::kType,
+      NTAlertsModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTAlertsModel>(inst, path);
       },
@@ -36,7 +36,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
             [=] { DisplayAlerts(static_cast<NTAlertsModel*>(model)); });
       });
   provider.Register(
-      NTCommandSchedulerModel::kType,
+      NTCommandSchedulerModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTCommandSchedulerModel>(inst, path);
       },
@@ -47,7 +47,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         });
       });
   provider.Register(
-      NTCommandSelectorModel::kType,
+      NTCommandSelectorModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTCommandSelectorModel>(inst, path);
       },
@@ -58,7 +58,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         });
       });
   provider.Register(
-      NTDifferentialDriveModel::kType,
+      NTDifferentialDriveModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTDifferentialDriveModel>(inst, path);
       },
@@ -69,7 +69,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         });
       });
   provider.Register(
-      NTFMSModel::kType,
+      NTFMSModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTFMSModel>(inst, path);
       },
@@ -79,7 +79,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
             [=] { DisplayFMS(static_cast<FMSModel*>(model), true); });
       });
   provider.Register(
-      NTDigitalInputModel::kType,
+      NTDigitalInputModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTDigitalInputModel>(inst, path);
       },
@@ -90,7 +90,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         });
       });
   provider.Register(
-      NTDigitalOutputModel::kType,
+      NTDigitalOutputModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTDigitalOutputModel>(inst, path);
       },
@@ -101,7 +101,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         });
       });
   provider.Register(
-      NTField2DModel::kType,
+      NTField2DModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTField2DModel>(inst, path);
       },
@@ -113,7 +113,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
             static_cast<NTField2DModel*>(model));
       });
   provider.Register(
-      NTGyroModel::kType,
+      NTGyroModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTGyroModel>(inst, path);
       },
@@ -123,7 +123,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
             [=] { DisplayGyro(static_cast<NTGyroModel*>(model)); });
       });
   provider.Register(
-      NTMecanumDriveModel::kType,
+      NTMecanumDriveModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTMecanumDriveModel>(inst, path);
       },
@@ -133,7 +133,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
             [=] { DisplayDrive(static_cast<NTMecanumDriveModel*>(model)); });
       });
   provider.Register(
-      NTMechanism2DModel::kType,
+      NTMechanism2DModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTMechanism2DModel>(inst, path);
       },
@@ -145,7 +145,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
             static_cast<NTMechanism2DModel*>(model));
       });
   provider.Register(
-      NTPIDControllerModel::kType,
+      NTPIDControllerModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTPIDControllerModel>(inst, path);
       },
@@ -156,7 +156,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         });
       });
   provider.Register(
-      NTProfiledPIDControllerModel::kType,
+      NTProfiledPIDControllerModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTProfiledPIDControllerModel>(inst, path);
       },
@@ -168,7 +168,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         });
       });
   provider.Register(
-      NTMotorControllerModel::kType,
+      NTMotorControllerModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTMotorControllerModel>(inst, path);
       },
@@ -179,7 +179,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         });
       });
   provider.Register(
-      NTStringChooserModel::kType,
+      NTStringChooserModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTStringChooserModel>(inst, path);
       },
@@ -190,7 +190,7 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         });
       });
   provider.Register(
-      NTSubsystemModel::kType,
+      NTSubsystemModel::TYPE,
       [](nt::NetworkTableInstance inst, const char* path) {
         return std::make_unique<NTSubsystemModel>(inst, path);
       },

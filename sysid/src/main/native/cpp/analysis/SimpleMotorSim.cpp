@@ -10,10 +10,10 @@
 
 using namespace sysid;
 
-SimpleMotorSim::SimpleMotorSim(double Ks, double Kv, double Ka,
+SimpleMotorSim::SimpleMotorSim(double S, double V, double A,
                                double initialPosition, double initialVelocity)
     // dx/dt = Ax + Bu + c sgn(x)
-    : m_A{{0.0, 1.0}, {0.0, -Kv / Ka}}, m_B{0.0, 1.0 / Ka}, m_c{0.0, -Ks / Ka} {
+    : m_A{{0.0, 1.0}, {0.0, -V / A}}, m_B{0.0, 1.0 / A}, m_c{0.0, -S / A} {
   Reset(initialPosition, initialVelocity);
 }
 

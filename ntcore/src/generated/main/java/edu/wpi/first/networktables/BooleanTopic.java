@@ -9,7 +9,7 @@ package edu.wpi.first.networktables;
 /** NetworkTables Boolean topic. */
 public final class BooleanTopic extends Topic {
   /** The default type string for this topic type. */
-  public static final String kTypeString = "boolean";
+  public static final String TYPE_STRING = "boolean";
 
   /**
    * Construct from a generic topic.
@@ -51,7 +51,7 @@ public final class BooleanTopic extends Topic {
     return new BooleanEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kBoolean.getValue(),
+            m_handle, NetworkTableType.BOOLEAN.getValue(),
             "boolean", options),
         defaultValue);
   }
@@ -79,7 +79,7 @@ public final class BooleanTopic extends Topic {
     return new BooleanEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kBoolean.getValue(),
+            m_handle, NetworkTableType.BOOLEAN.getValue(),
             typeString, options),
         defaultValue);
   }
@@ -104,7 +104,7 @@ public final class BooleanTopic extends Topic {
     return new BooleanEntryImpl(
         this,
         NetworkTablesJNI.publish(
-            m_handle, NetworkTableType.kBoolean.getValue(),
+            m_handle, NetworkTableType.BOOLEAN.getValue(),
             "boolean", options),
         false);
   }
@@ -134,7 +134,7 @@ public final class BooleanTopic extends Topic {
     return new BooleanEntryImpl(
         this,
         NetworkTablesJNI.publishEx(
-            m_handle, NetworkTableType.kBoolean.getValue(),
+            m_handle, NetworkTableType.BOOLEAN.getValue(),
             typeString, properties, options),
         false);
   }
@@ -165,7 +165,7 @@ public final class BooleanTopic extends Topic {
     return new BooleanEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kBoolean.getValue(),
+            m_handle, NetworkTableType.BOOLEAN.getValue(),
             "boolean", options),
         defaultValue);
   }
@@ -198,7 +198,7 @@ public final class BooleanTopic extends Topic {
     return new BooleanEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kBoolean.getValue(),
+            m_handle, NetworkTableType.BOOLEAN.getValue(),
             typeString, options),
         defaultValue);
   }

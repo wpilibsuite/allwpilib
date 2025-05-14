@@ -63,7 +63,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
     Matrixd<2, 2> A{
         {0.0, 1.0},
         {0.0, (-gcem::pow(gearing, 2) * motor.Kt /
-               (motor.R * units::math::pow<2>(radius) * mass * motor.Kv))
+               (motor.R * units::math::pow<2>(radius) * mass * motor.V))
                   .value()}};
     Matrixd<2, 1> B{{0.0},
                     {(gearing * motor.Kt / (motor.R * radius * mass)).value()}};
@@ -94,7 +94,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
 
     Matrixd<2, 2> A{
         {0.0, 1.0},
-        {0.0, (-gcem::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J))
+        {0.0, (-gcem::pow(gearing, 2) * motor.Kt / (motor.V * motor.R * J))
                   .value()}};
     Matrixd<2, 1> B{{0.0}, {(gearing * motor.Kt / (motor.R * J)).value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
@@ -131,10 +131,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
     if (kV < decltype(kV){0}) {
-      throw std::domain_error("Kv must be greater than or equal to zero.");
+      throw std::domain_error("V must be greater than or equal to zero.");
     }
     if (kA <= decltype(kA){0}) {
-      throw std::domain_error("Ka must be greater than zero.");
+      throw std::domain_error("A must be greater than zero.");
     }
 
     Matrixd<1, 1> A{{-kV.value() / kA.value()}};
@@ -174,10 +174,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
     if (kV < decltype(kV){0}) {
-      throw std::domain_error("Kv must be greater than or equal to zero.");
+      throw std::domain_error("V must be greater than or equal to zero.");
     }
     if (kA <= decltype(kA){0}) {
-      throw std::domain_error("Ka must be greater than zero.");
+      throw std::domain_error("A must be greater than zero.");
     }
 
     Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
@@ -214,16 +214,16 @@ class WPILIB_DLLEXPORT LinearSystemId {
       decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
       decltype(1_V / 1_mps) kVAngular, decltype(1_V / 1_mps_sq) kAAngular) {
     if (kVLinear <= decltype(kVLinear){0}) {
-      throw std::domain_error("Kv,linear must be greater than zero.");
+      throw std::domain_error("V,linear must be greater than zero.");
     }
     if (kALinear <= decltype(kALinear){0}) {
-      throw std::domain_error("Ka,linear must be greater than zero.");
+      throw std::domain_error("A,linear must be greater than zero.");
     }
     if (kVAngular <= decltype(kVAngular){0}) {
-      throw std::domain_error("Kv,angular must be greater than zero.");
+      throw std::domain_error("V,angular must be greater than zero.");
     }
     if (kAAngular <= decltype(kAAngular){0}) {
-      throw std::domain_error("Ka,angular must be greater than zero.");
+      throw std::domain_error("A,angular must be greater than zero.");
     }
 
     double A1 = -(kVLinear.value() / kALinear.value() +
@@ -276,23 +276,23 @@ class WPILIB_DLLEXPORT LinearSystemId {
       decltype(1_V / 1_rad_per_s) kVAngular,
       decltype(1_V / 1_rad_per_s_sq) kAAngular, units::meter_t trackwidth) {
     if (kVLinear <= decltype(kVLinear){0}) {
-      throw std::domain_error("Kv,linear must be greater than zero.");
+      throw std::domain_error("V,linear must be greater than zero.");
     }
     if (kALinear <= decltype(kALinear){0}) {
-      throw std::domain_error("Ka,linear must be greater than zero.");
+      throw std::domain_error("A,linear must be greater than zero.");
     }
     if (kVAngular <= decltype(kVAngular){0}) {
-      throw std::domain_error("Kv,angular must be greater than zero.");
+      throw std::domain_error("V,angular must be greater than zero.");
     }
     if (kAAngular <= decltype(kAAngular){0}) {
-      throw std::domain_error("Ka,angular must be greater than zero.");
+      throw std::domain_error("A,angular must be greater than zero.");
     }
     if (trackwidth <= 0_m) {
       throw std::domain_error("r must be greater than zero.");
     }
 
-    // We want to find a factor to include in Kv,angular that will convert
-    // `u = Kv,angular omega` to `u = Kv,angular v`.
+    // We want to find a factor to include in V,angular that will convert
+    // `u = V,angular omega` to `u = V,angular v`.
     //
     // v = omega r
     // omega = v/r
@@ -327,7 +327,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
     }
 
     Matrixd<1, 1> A{
-        {(-gcem::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J))
+        {(-gcem::pow(gearing, 2) * motor.Kt / (motor.V * motor.R * J))
              .value()}};
     Matrixd<1, 1> B{{(gearing * motor.Kt / (motor.R * J)).value()}};
     Matrixd<1, 1> C{{1.0}};
@@ -359,7 +359,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
 
     Matrixd<2, 2> A{
         {0.0, 1.0},
-        {0.0, (-gcem::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J))
+        {0.0, (-gcem::pow(gearing, 2) * motor.Kt / (motor.V * motor.R * J))
                   .value()}};
     Matrixd<2, 1> B{{0.0}, {(gearing * motor.Kt / (motor.R * J)).value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
@@ -396,10 +396,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
     if (kV < decltype(kV){0}) {
-      throw std::domain_error("Kv must be greater than or equal to zero.");
+      throw std::domain_error("V must be greater than or equal to zero.");
     }
     if (kA <= decltype(kA){0}) {
-      throw std::domain_error("Ka must be greater than zero.");
+      throw std::domain_error("A must be greater than zero.");
     }
 
     Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
@@ -445,7 +445,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
     }
 
     auto C1 = -gcem::pow(gearing, 2) * motor.Kt /
-              (motor.Kv * motor.R * units::math::pow<2>(r));
+              (motor.V * motor.R * units::math::pow<2>(r));
     auto C2 = gearing * motor.Kt / (motor.R * r);
 
     Matrixd<2, 2> A{{((1 / mass + units::math::pow<2>(rb) / J) * C1).value(),

@@ -5,17 +5,17 @@
 #include "frc/geometry/struct/Rotation2dStruct.h"
 
 namespace {
-constexpr size_t kValueOff = 0;
+constexpr size_t VALUE_OFF = 0;
 }  // namespace
 
 using StructType = wpi::Struct<frc::Rotation2d>;
 
 frc::Rotation2d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Rotation2d{
-      units::radian_t{wpi::UnpackStruct<double, kValueOff>(data)},
+      units::radian_t{wpi::UnpackStruct<double, VALUE_OFF>(data)},
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data, const frc::Rotation2d& value) {
-  wpi::PackStruct<kValueOff>(data, value.Radians().value());
+  wpi::PackStruct<VALUE_OFF>(data, value.Radians().value());
 }

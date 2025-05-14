@@ -42,21 +42,21 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    */
   struct Option {
     enum Type {
-      kNone,
-      kArg,
-      kEnv,
-      kCwd,
-      kUid,
-      kGid,
-      kSetFlags,
-      kClearFlags,
-      kStdioIgnore,
-      kStdioInheritFd,
-      kStdioInheritPipe,
-      kStdioCreatePipe
+      NONE,
+      ARG,
+      ENV,
+      CWD,
+      UID,
+      GID,
+      SET_FLAGS,
+      CLEAR_FLAGS,
+      STDIO_IGNORE,
+      STDIO_INHERIT_FD,
+      STDIO_INHERIT_PIPE,
+      STDIO_CREATE_PIPE
     };
 
-    Option() : m_type(kNone) {}
+    Option() : m_type(NONE) {}
 
     /*implicit*/ Option(const char* arg) {  // NOLINT
       m_data.str = arg;
@@ -78,7 +78,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
 
     explicit Option(Type type) : m_type(type) {}
 
-    Type m_type = kArg;
+    Type m_type = ARG;
     std::string m_strData;
     union {
       const char* str;
@@ -102,7 +102,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * @param env environment variable
    */
   static Option Env(std::string_view env) {
-    Option o(Option::kEnv);
+    Option o(Option::ENV);
     o.m_strData = env;
     o.m_data.str = o.m_strData.c_str();
     return o;
@@ -113,7 +113,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * @param cwd current working directory
    */
   static Option Cwd(std::string_view cwd) {
-    Option o(Option::kCwd);
+    Option o(Option::CWD);
     o.m_strData = cwd;
     o.m_data.str = o.m_strData.c_str();
     return o;
@@ -124,7 +124,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * @param uid user id
    */
   static Option Uid(uv_uid_t uid) {
-    Option o(Option::kUid);
+    Option o(Option::UID);
     o.m_data.uid = uid;
     return o;
   }
@@ -134,7 +134,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * @param gid group id
    */
   static Option Gid(uv_gid_t gid) {
-    Option o(Option::kGid);
+    Option o(Option::GID);
     o.m_data.gid = gid;
     return o;
   }
@@ -144,7 +144,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * @param flags Bitmask values from uv_process_flags.
    */
   static Option SetFlags(unsigned int flags) {
-    Option o(Option::kSetFlags);
+    Option o(Option::SET_FLAGS);
     o.m_data.flags = flags;
     return o;
   }
@@ -154,7 +154,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * @param flags Bitmask values from uv_process_flags.
    */
   static Option ClearFlags(unsigned int flags) {
-    Option o(Option::kClearFlags);
+    Option o(Option::CLEAR_FLAGS);
     o.m_data.flags = flags;
     return o;
   }
@@ -164,7 +164,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * @param index stdio index
    */
   static Option StdioIgnore(size_t index) {
-    Option o(Option::kStdioIgnore);
+    Option o(Option::STDIO_IGNORE);
     o.m_data.stdio.index = index;
     return o;
   }
@@ -175,7 +175,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * @param fd parent file descriptor
    */
   static Option StdioInherit(size_t index, int fd) {
-    Option o(Option::kStdioInheritFd);
+    Option o(Option::STDIO_INHERIT_FD);
     o.m_data.stdio.index = index;
     o.m_data.stdio.fd = fd;
     return o;
@@ -187,7 +187,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * @param pipe pipe
    */
   static Option StdioInherit(size_t index, Pipe& pipe) {
-    Option o(Option::kStdioInheritPipe);
+    Option o(Option::STDIO_INHERIT_PIPE);
     o.m_data.stdio.index = index;
     o.m_data.stdio.pipe = &pipe;
     return o;
@@ -201,7 +201,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    *              UV_OVERLAPPED_PIPE (Windows only, ignored on Unix).
    */
   static Option StdioCreatePipe(size_t index, Pipe& pipe, unsigned int flags) {
-    Option o(Option::kStdioCreatePipe);
+    Option o(Option::STDIO_CREATE_PIPE);
     o.m_data.stdio.index = index;
     o.m_data.stdio.pipe = &pipe;
     o.m_data.stdio.flags = flags;

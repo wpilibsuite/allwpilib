@@ -9,7 +9,7 @@ using namespace hal;
 
 namespace hal::init {
 void InitializeAnalogInData() {
-  static AnalogInData sind[kNumAnalogInputs];
+  static AnalogInData sind[NUM_ANALOG_INPUTS];
   ::hal::SimAnalogInData = sind;
 }
 }  // namespace hal::init

@@ -24,7 +24,7 @@
 
 namespace sysid {
 
-constexpr int kNoiseMeanWindow = 9;
+constexpr int NOISE_MEAN_WINDOW = 9;
 
 /**
  * Exception for Invalid Data Errors in which we can't pin the cause of error to

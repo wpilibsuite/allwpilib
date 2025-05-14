@@ -43,7 +43,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
              bool fieldRelative,
-             units::second_t period = DriveConstants::kDrivePeriod);
+             units::second_t period = DriveConstants::DRIVE_PERIOD);
 
   /**
    * Resets the drive encoders to currently read a position of 0.
@@ -88,16 +88,16 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void ResetOdometry(frc::Pose2d pose);
 
-  units::meter_t kTrackwidth =
+  units::meter_t TRACK_WIDTH =
       0.5_m;  // Distance between centers of right and left wheels on robot
-  units::meter_t kWheelBase =
+  units::meter_t WHEEL_BASE =
       0.7_m;  // Distance between centers of front and back wheels on robot
 
-  frc::SwerveDriveKinematics<4> kDriveKinematics{
-      frc::Translation2d{kWheelBase / 2, kTrackwidth / 2},
-      frc::Translation2d{kWheelBase / 2, -kTrackwidth / 2},
-      frc::Translation2d{-kWheelBase / 2, kTrackwidth / 2},
-      frc::Translation2d{-kWheelBase / 2, -kTrackwidth / 2}};
+  frc::SwerveDriveKinematics<4> DRIVE_KINEMATICS{
+      frc::Translation2d{WHEEL_BASE / 2, TRACK_WIDTH / 2},
+      frc::Translation2d{WHEEL_BASE / 2, -TRACK_WIDTH / 2},
+      frc::Translation2d{-WHEEL_BASE / 2, TRACK_WIDTH / 2},
+      frc::Translation2d{-WHEEL_BASE / 2, -TRACK_WIDTH / 2}};
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

@@ -26,7 +26,7 @@ class Robot : public frc::TimedRobot {
     m_frontRight.SetInverted(true);
     m_rearRight.SetInverted(true);
 
-    m_gyro.SetSensitivity(kVoltsPerDegreePerSecond);
+    m_gyro.SetSensitivity(VOLTS_PER_DEGREE_PER_SECOND);
   }
 
   /**
@@ -40,27 +40,27 @@ class Robot : public frc::TimedRobot {
  private:
   // Gyro calibration constant, may need to be adjusted. Gyro value of 360 is
   // set to correspond to one full revolution.
-  static constexpr double kVoltsPerDegreePerSecond = 0.0128;
+  static constexpr double VOLTS_PER_DEGREE_PER_SECOND = 0.0128;
 
-  static constexpr int kFrontLeftMotorPort = 0;
-  static constexpr int kRearLeftMotorPort = 1;
-  static constexpr int kFrontRightMotorPort = 2;
-  static constexpr int kRearRightMotorPort = 3;
-  static constexpr int kGyroPort = 0;
-  static constexpr int kJoystickPort = 0;
+  static constexpr int FRONT_LEFT_MOTOR_PORT = 0;
+  static constexpr int READ_LEFT_MOTOR_PORT = 1;
+  static constexpr int FRONT_RIGHT_MOTOR_PORT = 2;
+  static constexpr int REAR_RIGHT_MOTOR_PORT = 3;
+  static constexpr int GYRO_PORT = 0;
+  static constexpr int JOYSTICK_PORT = 0;
 
-  frc::PWMSparkMax m_frontLeft{kFrontLeftMotorPort};
-  frc::PWMSparkMax m_rearLeft{kRearLeftMotorPort};
-  frc::PWMSparkMax m_frontRight{kFrontRightMotorPort};
-  frc::PWMSparkMax m_rearRight{kRearRightMotorPort};
+  frc::PWMSparkMax m_frontLeft{FRONT_LEFT_MOTOR_PORT};
+  frc::PWMSparkMax m_rearLeft{READ_LEFT_MOTOR_PORT};
+  frc::PWMSparkMax m_frontRight{FRONT_RIGHT_MOTOR_PORT};
+  frc::PWMSparkMax m_rearRight{REAR_RIGHT_MOTOR_PORT};
   frc::MecanumDrive m_robotDrive{
       [&](double output) { m_frontLeft.Set(output); },
       [&](double output) { m_rearLeft.Set(output); },
       [&](double output) { m_frontRight.Set(output); },
       [&](double output) { m_rearRight.Set(output); }};
 
-  frc::AnalogGyro m_gyro{kGyroPort};
-  frc::Joystick m_joystick{kJoystickPort};
+  frc::AnalogGyro m_gyro{GYRO_PORT};
+  frc::Joystick m_joystick{JOYSTICK_PORT};
 };
 
 #ifndef RUNNING_FRC_TESTS

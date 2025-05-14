@@ -10,10 +10,10 @@ namespace frc {
  */
 enum RuntimeType {
   /// roboRIO 1.0.
-  kRoboRIO,
+  ROBORIO,
   /// roboRIO 2.0.
-  kRoboRIO2,
+  ROBORIO2,
   /// Simulation runtime.
-  kSimulation
+  SIMULATION
 };
 }  // namespace frc

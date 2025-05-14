@@ -60,7 +60,7 @@ public class Rectangle2d implements ProtobufSerializable, StructSerializable {
    */
   public Rectangle2d(Translation2d cornerA, Translation2d cornerB) {
     this(
-        new Pose2d(cornerA.plus(cornerB).div(2.0), Rotation2d.kZero),
+        new Pose2d(cornerA.plus(cornerB).div(2.0), Rotation2d.ZERO),
         Math.abs(cornerA.getX() - cornerB.getX()),
         Math.abs(cornerA.getY() - cornerB.getY()));
   }

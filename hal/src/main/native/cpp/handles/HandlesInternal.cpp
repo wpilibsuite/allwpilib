@@ -52,11 +52,11 @@ void HandleBase::ResetGlobalHandles() {
 HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType,
                         int16_t version) {
   if (index < 0) {
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
   uint8_t hType = static_cast<uint8_t>(handleType);
   if (hType == 0 || hType > 127) {
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
   // set last 8 bits, then shift to first 8 bits
   HAL_Handle handle = hType;

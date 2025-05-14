@@ -15,15 +15,15 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
     : m_i2c(port, deviceAddress),
       m_simDevice("Accel:ADXL345_I2C", port, deviceAddress) {
   if (m_simDevice) {
-    m_simRange = m_simDevice.CreateEnumDouble("range", hal::SimDevice::kOutput,
+    m_simRange = m_simDevice.CreateEnumDouble("range", hal::SimDevice::OUTPUT,
                                               {"2G", "4G", "8G", "16G"},
                                               {2.0, 4.0, 8.0, 16.0}, 0);
-    m_simX = m_simDevice.CreateDouble("x", hal::SimDevice::kInput, 0.0);
-    m_simY = m_simDevice.CreateDouble("y", hal::SimDevice::kInput, 0.0);
-    m_simZ = m_simDevice.CreateDouble("z", hal::SimDevice::kInput, 0.0);
+    m_simX = m_simDevice.CreateDouble("x", hal::SimDevice::INPUT, 0.0);
+    m_simY = m_simDevice.CreateDouble("y", hal::SimDevice::INPUT, 0.0);
+    m_simZ = m_simDevice.CreateDouble("z", hal::SimDevice::INPUT, 0.0);
   }
   // Turn on the measurements
-  m_i2c.Write(kPowerCtlRegister, kPowerCtl_Measure);
+  m_i2c.Write(POWER_CTL_REGISTER, POWER_CTL_MEASURE);
   // Specify the data format to read
   SetRange(range);
 
@@ -43,36 +43,36 @@ int ADXL345_I2C::GetI2CDeviceAddress() const {
 }
 
 void ADXL345_I2C::SetRange(Range range) {
-  m_i2c.Write(kDataFormatRegister,
-              kDataFormat_FullRes | static_cast<uint8_t>(range));
+  m_i2c.Write(DATA_FORMAT_REGISTER,
+              DATA_FORMAT_FULL_RES | static_cast<uint8_t>(range));
 }
 
 double ADXL345_I2C::GetX() {
-  return GetAcceleration(kAxis_X);
+  return GetAcceleration(AXIS_X);
 }
 
 double ADXL345_I2C::GetY() {
-  return GetAcceleration(kAxis_Y);
+  return GetAcceleration(AXIS_Y);
 }
 
 double ADXL345_I2C::GetZ() {
-  return GetAcceleration(kAxis_Z);
+  return GetAcceleration(AXIS_Z);
 }
 
 double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
-  if (axis == kAxis_X && m_simX) {
+  if (axis == AXIS_X && m_simX) {
     return m_simX.Get();
   }
-  if (axis == kAxis_Y && m_simY) {
+  if (axis == AXIS_Y && m_simY) {
     return m_simY.Get();
   }
-  if (axis == kAxis_Z && m_simZ) {
+  if (axis == AXIS_Z && m_simZ) {
     return m_simZ.Get();
   }
   int16_t rawAccel = 0;
-  m_i2c.Read(kDataRegister + static_cast<int>(axis), sizeof(rawAccel),
+  m_i2c.Read(DATA_REGISTER + static_cast<int>(axis), sizeof(rawAccel),
              reinterpret_cast<uint8_t*>(&rawAccel));
-  return rawAccel * kGsPerLSB;
+  return rawAccel * GS_PER_LSB;
 }
 
 ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() {
@@ -84,12 +84,12 @@ ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() {
     return data;
   }
   int16_t rawData[3];
-  m_i2c.Read(kDataRegister, sizeof(rawData),
+  m_i2c.Read(DATA_REGISTER, sizeof(rawData),
              reinterpret_cast<uint8_t*>(rawData));
 
-  data.XAxis = rawData[0] * kGsPerLSB;
-  data.YAxis = rawData[1] * kGsPerLSB;
-  data.ZAxis = rawData[2] * kGsPerLSB;
+  data.XAxis = rawData[0] * GS_PER_LSB;
+  data.YAxis = rawData[1] * GS_PER_LSB;
+  data.ZAxis = rawData[2] * GS_PER_LSB;
   return data;
 }
 

@@ -12,7 +12,7 @@ using namespace frc;
 
 Koors40::Koors40(int channel) : PWMMotorController("Koors40", channel) {
   SetBounds(2.004_ms, 1.52_ms, 1.5_ms, 1.48_ms, 0.997_ms);
-  m_pwm.SetOutputPeriod(PWM::kOutputPeriod_20Ms);
+  m_pwm.SetOutputPeriod(PWM::OUTPUT_PERIOD_20MS);
   SetSpeed(0.0);
 
   HAL_ReportUsage("IO", GetChannel(), "Koors40");

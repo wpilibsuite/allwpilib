@@ -14,15 +14,15 @@ import edu.wpi.first.math.util.Units;
 import org.junit.jupiter.api.Test;
 
 class Translation3dTest {
-  private static final double kEpsilon = 1E-9;
+  private static final double EPSILON = 1E-9;
 
   @Test
   void testNewWithMeasures() {
     var translation = new Translation3d(Inches.of(6), Inches.of(8), Inches.of(16));
 
-    assertEquals(0.1524, translation.getX(), kEpsilon);
-    assertEquals(0.2032, translation.getY(), kEpsilon);
-    assertEquals(0.4064, translation.getZ(), kEpsilon);
+    assertEquals(0.1524, translation.getX(), EPSILON);
+    assertEquals(0.2032, translation.getY(), EPSILON);
+    assertEquals(0.4064, translation.getZ(), EPSILON);
   }
 
   @Test
@@ -33,9 +33,9 @@ class Translation3dTest {
     var sum = one.plus(two);
 
     assertAll(
-        () -> assertEquals(3.0, sum.getX(), kEpsilon),
-        () -> assertEquals(8.0, sum.getY(), kEpsilon),
-        () -> assertEquals(13.0, sum.getZ(), kEpsilon));
+        () -> assertEquals(3.0, sum.getX(), EPSILON),
+        () -> assertEquals(8.0, sum.getY(), EPSILON),
+        () -> assertEquals(13.0, sum.getZ(), EPSILON));
   }
 
   @Test
@@ -46,9 +46,9 @@ class Translation3dTest {
     var difference = one.minus(two);
 
     assertAll(
-        () -> assertEquals(-1.0, difference.getX(), kEpsilon),
-        () -> assertEquals(-2.0, difference.getY(), kEpsilon),
-        () -> assertEquals(-3.0, difference.getZ(), kEpsilon));
+        () -> assertEquals(-1.0, difference.getX(), EPSILON),
+        () -> assertEquals(-2.0, difference.getY(), EPSILON),
+        () -> assertEquals(-3.0, difference.getZ(), EPSILON));
   }
 
   @Test
@@ -61,21 +61,21 @@ class Translation3dTest {
 
     var rotated1 = translation.rotateBy(new Rotation3d(xAxis, Units.degreesToRadians(90.0)));
     assertAll(
-        () -> assertEquals(1.0, rotated1.getX(), kEpsilon),
-        () -> assertEquals(-3.0, rotated1.getY(), kEpsilon),
-        () -> assertEquals(2.0, rotated1.getZ(), kEpsilon));
+        () -> assertEquals(1.0, rotated1.getX(), EPSILON),
+        () -> assertEquals(-3.0, rotated1.getY(), EPSILON),
+        () -> assertEquals(2.0, rotated1.getZ(), EPSILON));
 
     var rotated2 = translation.rotateBy(new Rotation3d(yAxis, Units.degreesToRadians(90.0)));
     assertAll(
-        () -> assertEquals(3.0, rotated2.getX(), kEpsilon),
-        () -> assertEquals(2.0, rotated2.getY(), kEpsilon),
-        () -> assertEquals(-1.0, rotated2.getZ(), kEpsilon));
+        () -> assertEquals(3.0, rotated2.getX(), EPSILON),
+        () -> assertEquals(2.0, rotated2.getY(), EPSILON),
+        () -> assertEquals(-1.0, rotated2.getZ(), EPSILON));
 
     var rotated3 = translation.rotateBy(new Rotation3d(zAxis, Units.degreesToRadians(90.0)));
     assertAll(
-        () -> assertEquals(-2.0, rotated3.getX(), kEpsilon),
-        () -> assertEquals(1.0, rotated3.getY(), kEpsilon),
-        () -> assertEquals(3.0, rotated3.getZ(), kEpsilon));
+        () -> assertEquals(-2.0, rotated3.getX(), EPSILON),
+        () -> assertEquals(1.0, rotated3.getY(), EPSILON),
+        () -> assertEquals(3.0, rotated3.getZ(), EPSILON));
   }
 
   @Test
@@ -91,25 +91,25 @@ class Translation3dTest {
         translation.rotateAround(around, new Rotation3d(xAxis, Units.degreesToRadians(90.0)));
 
     assertAll(
-        () -> assertEquals(1.0, rotated1.getX(), kEpsilon),
-        () -> assertEquals(0.0, rotated1.getY(), kEpsilon),
-        () -> assertEquals(1.0, rotated1.getZ(), kEpsilon));
+        () -> assertEquals(1.0, rotated1.getX(), EPSILON),
+        () -> assertEquals(0.0, rotated1.getY(), EPSILON),
+        () -> assertEquals(1.0, rotated1.getZ(), EPSILON));
 
     var rotated2 =
         translation.rotateAround(around, new Rotation3d(yAxis, Units.degreesToRadians(90.0)));
 
     assertAll(
-        () -> assertEquals(5.0, rotated2.getX(), kEpsilon),
-        () -> assertEquals(2.0, rotated2.getY(), kEpsilon),
-        () -> assertEquals(3.0, rotated2.getZ(), kEpsilon));
+        () -> assertEquals(5.0, rotated2.getX(), EPSILON),
+        () -> assertEquals(2.0, rotated2.getY(), EPSILON),
+        () -> assertEquals(3.0, rotated2.getZ(), EPSILON));
 
     var rotated3 =
         translation.rotateAround(around, new Rotation3d(zAxis, Units.degreesToRadians(90.0)));
 
     assertAll(
-        () -> assertEquals(3.0, rotated3.getX(), kEpsilon),
-        () -> assertEquals(0.0, rotated3.getY(), kEpsilon),
-        () -> assertEquals(3.0, rotated3.getZ(), kEpsilon));
+        () -> assertEquals(3.0, rotated3.getX(), EPSILON),
+        () -> assertEquals(0.0, rotated3.getY(), EPSILON),
+        () -> assertEquals(3.0, rotated3.getZ(), EPSILON));
   }
 
   @Test
@@ -126,9 +126,9 @@ class Translation3dTest {
     var mult = original.times(3);
 
     assertAll(
-        () -> assertEquals(9.0, mult.getX(), kEpsilon),
-        () -> assertEquals(15.0, mult.getY(), kEpsilon),
-        () -> assertEquals(21.0, mult.getZ(), kEpsilon));
+        () -> assertEquals(9.0, mult.getX(), EPSILON),
+        () -> assertEquals(15.0, mult.getY(), EPSILON),
+        () -> assertEquals(21.0, mult.getZ(), EPSILON));
   }
 
   @Test
@@ -137,22 +137,22 @@ class Translation3dTest {
     var div = original.div(2);
 
     assertAll(
-        () -> assertEquals(1.5, div.getX(), kEpsilon),
-        () -> assertEquals(2.5, div.getY(), kEpsilon),
-        () -> assertEquals(3.5, div.getZ(), kEpsilon));
+        () -> assertEquals(1.5, div.getX(), EPSILON),
+        () -> assertEquals(2.5, div.getY(), EPSILON),
+        () -> assertEquals(3.5, div.getZ(), EPSILON));
   }
 
   @Test
   void testNorm() {
     var one = new Translation3d(3.0, 5.0, 7.0);
-    assertEquals(Math.sqrt(83.0), one.getNorm(), kEpsilon);
+    assertEquals(Math.sqrt(83.0), one.getNorm(), EPSILON);
   }
 
   @Test
   void testDistance() {
     var one = new Translation3d(1.0, 1.0, 1.0);
     var two = new Translation3d(6.0, 6.0, 6.0);
-    assertEquals(5.0 * Math.sqrt(3.0), one.getDistance(two), kEpsilon);
+    assertEquals(5.0 * Math.sqrt(3.0), one.getDistance(two), EPSILON);
   }
 
   @Test
@@ -161,9 +161,9 @@ class Translation3dTest {
     var inverted = original.unaryMinus();
 
     assertAll(
-        () -> assertEquals(4.5, inverted.getX(), kEpsilon),
-        () -> assertEquals(-7.0, inverted.getY(), kEpsilon),
-        () -> assertEquals(-9.0, inverted.getZ(), kEpsilon));
+        () -> assertEquals(4.5, inverted.getX(), EPSILON),
+        () -> assertEquals(-7.0, inverted.getY(), EPSILON),
+        () -> assertEquals(-9.0, inverted.getZ(), EPSILON));
   }
 
   @Test
@@ -187,12 +187,12 @@ class Translation3dTest {
     var one = new Translation3d(Math.sqrt(2), new Rotation3d(zAxis, Units.degreesToRadians(45.0)));
     var two = new Translation3d(2, new Rotation3d(zAxis, Units.degreesToRadians(60.0)));
     assertAll(
-        () -> assertEquals(1.0, one.getX(), kEpsilon),
-        () -> assertEquals(1.0, one.getY(), kEpsilon),
-        () -> assertEquals(0.0, one.getZ(), kEpsilon),
-        () -> assertEquals(1.0, two.getX(), kEpsilon),
-        () -> assertEquals(Math.sqrt(3.0), two.getY(), kEpsilon),
-        () -> assertEquals(0.0, two.getZ(), kEpsilon));
+        () -> assertEquals(1.0, one.getX(), EPSILON),
+        () -> assertEquals(1.0, one.getY(), EPSILON),
+        () -> assertEquals(0.0, one.getZ(), EPSILON),
+        () -> assertEquals(1.0, two.getX(), EPSILON),
+        () -> assertEquals(Math.sqrt(3.0), two.getY(), EPSILON),
+        () -> assertEquals(0.0, two.getZ(), EPSILON));
   }
 
   @Test

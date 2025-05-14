@@ -42,10 +42,10 @@ import javax.tools.Diagnostic;
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class AnnotationProcessor extends AbstractProcessor {
-  private static final String kCustomLoggerFqn = "edu.wpi.first.epilogue.CustomLoggerFor";
-  private static final String kClassSpecificLoggerFqn =
+  private static final String CUSTOM_LOGGER_FQN = "edu.wpi.first.epilogue.CustomLoggerFor";
+  private static final String CLASS_SPECIFIC_LOGGER_FQN =
       "edu.wpi.first.epilogue.logging.ClassSpecificLogger";
-  private static final String kLoggedFqn = "edu.wpi.first.epilogue.Logged";
+  private static final String LOGGED_FQN = "edu.wpi.first.epilogue.Logged";
 
   private EpilogueGenerator m_epiloguerGenerator;
   private LoggerGenerator m_loggerGenerator;
@@ -61,7 +61,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     Map<TypeMirror, DeclaredType> customLoggers = new HashMap<>();
 
     annotations.stream()
-        .filter(ann -> kCustomLoggerFqn.contentEquals(ann.getQualifiedName()))
+        .filter(ann -> CUSTOM_LOGGER_FQN.contentEquals(ann.getQualifiedName()))
         .findAny()
         .ifPresent(
             customLogger -> {
@@ -82,7 +82,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                             .erasure(
                                 processingEnv
                                     .getElementUtils()
-                                    .getTypeElement(kClassSpecificLoggerFqn)
+                                    .getTypeElement(CLASS_SPECIFIC_LOGGER_FQN)
                                     .asType())))
         .filter(e -> e.getAnnotation(CustomLoggerFor.class) == null)
         .forEach(
@@ -119,7 +119,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     m_loggerGenerator = new LoggerGenerator(processingEnv, m_handlers);
 
     annotations.stream()
-        .filter(ann -> kLoggedFqn.contentEquals(ann.getQualifiedName()))
+        .filter(ann -> LOGGED_FQN.contentEquals(ann.getQualifiedName()))
         .findAny()
         .ifPresent(
             epilogue -> {

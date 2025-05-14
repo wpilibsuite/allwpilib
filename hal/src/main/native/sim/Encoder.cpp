@@ -30,20 +30,20 @@ struct Empty {};
 }  // namespace
 
 static LimitedHandleResource<HAL_EncoderHandle, Encoder,
-                             kNumEncoders + kNumCounters,
+                             NUM_ENCODERS + NUM_COUNTERS,
                              HAL_HandleEnum::Encoder>* encoderHandles;
 
-static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
+static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, NUM_ENCODERS,
                              HAL_HandleEnum::FPGAEncoder>* fpgaEncoderHandles;
 
 namespace hal::init {
 void InitializeEncoder() {
-  static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
+  static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, NUM_ENCODERS,
                                HAL_HandleEnum::FPGAEncoder>
       feH;
   fpgaEncoderHandles = &feH;
   static LimitedHandleResource<HAL_EncoderHandle, Encoder,
-                               kNumEncoders + kNumCounters,
+                               NUM_ENCODERS + NUM_COUNTERS,
                                HAL_HandleEnum::Encoder>
       eH;
   encoderHandles = &eH;
@@ -71,27 +71,27 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
                                         HAL_EncoderEncodingType encodingType,
                                         int32_t* status) {
   hal::init::CheckInit();
-  HAL_Handle nativeHandle = HAL_kInvalidHandle;
-  if (encodingType == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
+  HAL_Handle nativeHandle = HAL_InvalidHandle;
+  if (encodingType == HAL_EncoderEncodingType::HAL_Encoder_4X) {
     // k4x, allocate encoder
     nativeHandle = fpgaEncoderHandles->Allocate();
   } else {
     // k2x or k1x, allocate counter
     nativeHandle = counterHandles->Allocate();
   }
-  if (nativeHandle == HAL_kInvalidHandle) {
+  if (nativeHandle == HAL_InvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
   auto handle = encoderHandles->Allocate();
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_InvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
   auto encoder = encoderHandles->Get(handle);
   if (encoder == nullptr) {  // would only occur on thread issue
     *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
+    return HAL_InvalidHandle;
   }
   int16_t index = getHandleIndex(handle);
   SimEncoderData[index].digitalChannelA = aChannel;
@@ -104,11 +104,11 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
   encoder->nativeHandle = nativeHandle;
   encoder->encodingType = encodingType;
   encoder->distancePerPulse = 1.0;
-  if (encodingType == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
+  if (encodingType == HAL_EncoderEncodingType::HAL_Encoder_4X) {
     encoder->fpgaHandle = nativeHandle;
-    encoder->counterHandle = HAL_kInvalidHandle;
+    encoder->counterHandle = HAL_InvalidHandle;
   } else {
-    encoder->fpgaHandle = HAL_kInvalidHandle;
+    encoder->fpgaHandle = HAL_InvalidHandle;
     encoder->counterHandle = nativeHandle;
   }
   return handle;
@@ -139,11 +139,11 @@ void HAL_SetEncoderSimDevice(HAL_EncoderHandle handle,
 
 static inline int EncodingScaleFactor(Encoder* encoder) {
   switch (encoder->encodingType) {
-    case HAL_Encoder_k1X:
+    case HAL_Encoder_1X:
       return 1;
-    case HAL_Encoder_k2X:
+    case HAL_Encoder_2X:
       return 2;
-    case HAL_Encoder_k4X:
+    case HAL_Encoder_4X:
       return 4;
     default:
       return 0;
@@ -152,11 +152,11 @@ static inline int EncodingScaleFactor(Encoder* encoder) {
 
 static inline double DecodingScaleFactor(Encoder* encoder) {
   switch (encoder->encodingType) {
-    case HAL_Encoder_k1X:
+    case HAL_Encoder_1X:
       return 1.0;
-    case HAL_Encoder_k2X:
+    case HAL_Encoder_2X:
       return 0.5;
-    case HAL_Encoder_k4X:
+    case HAL_Encoder_4X:
       return 0.25;
     default:
       return 0.0;
@@ -365,7 +365,7 @@ HAL_EncoderEncodingType HAL_GetEncoderEncodingType(
   auto encoder = encoderHandles->Get(encoderHandle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return HAL_Encoder_k4X;  // default to k4x
+    return HAL_Encoder_4X;  // default to k4x
   }
 
   return encoder->encodingType;

@@ -24,9 +24,9 @@ namespace wpi {
 class HttpParser {
  public:
   enum Type {
-    kRequest = HTTP_REQUEST,
-    kResponse = HTTP_RESPONSE,
-    kBoth = HTTP_BOTH
+    REQUEST = HTTP_REQUEST,
+    RESPONSE = HTTP_RESPONSE,
+    BOTH = HTTP_BOTH
   };
 
   /**
@@ -215,7 +215,7 @@ class HttpParser {
   http_parser_settings m_settings;
 
   size_t m_maxLength = 1024;
-  enum { kStart, kUrl, kStatus, kField, kValue } m_state = kStart;
+  enum { START, URL, STATUS, FIELD, VALUE } m_state = START;
   SmallString<128> m_urlBuf;
   SmallString<32> m_fieldBuf;
   SmallString<128> m_valueBuf;

@@ -16,15 +16,15 @@ namespace sysid {
 class ArmSim {
  public:
   /**
-   * @param Ks              Static friction gain.
-   * @param Kv              Velocity gain.
-   * @param Ka              Acceleration gain.
-   * @param Kg              Gravity cosine gain.
+   * @param S              Static friction gain.
+   * @param V              Velocity gain.
+   * @param A              Acceleration gain.
+   * @param G              Gravity cosine gain.
    * @param offset          Arm position offset.
    * @param initialPosition Initial arm position.
    * @param initialVelocity Initial arm velocity.
    */
-  ArmSim(double Ks, double Kv, double Ka, double Kg, double offset = 0.0,
+  ArmSim(double S, double V, double A, double G, double offset = 0.0,
          double initialPosition = 0.0, double initialVelocity = 0.0);
 
   /**

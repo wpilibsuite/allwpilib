@@ -28,7 +28,7 @@ struct SavedSettings {
   std::string defaultFontName = "Proggy Dotted";
 };
 
-constexpr int kFontScaledLevels = 9;
+constexpr int FONT_SCALED_LEVELS = 9;
 
 struct Context : public SavedSettings {
   std::atomic_bool exit{false};

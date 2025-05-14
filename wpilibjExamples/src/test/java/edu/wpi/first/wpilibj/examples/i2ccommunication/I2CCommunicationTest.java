@@ -28,7 +28,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 class I2CCommunicationTest {
   private Robot m_robot;
   private Thread m_thread;
-  private final I2CSim m_i2c = new I2CSim(Robot.kPort.value);
+  private final I2CSim m_i2c = new I2CSim(Robot.PORT.value);
   private CompletableFuture<String> m_future;
   private CallbackStore m_callback;
 

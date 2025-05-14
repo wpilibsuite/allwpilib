@@ -305,9 +305,9 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   switch (fourcc) {
     case kCVPixelFormatType_422YpCbCr8_yuvs:
     case kCVPixelFormatType_422YpCbCr8FullRange:
-      return cs::VideoMode::PixelFormat::kYUYV;
+      return cs::VideoMode::PixelFormat::YUYV;
     default:
-      return cs::VideoMode::PixelFormat::kBGR;
+      return cs::VideoMode::PixelFormat::BGR;
   }
 }
 

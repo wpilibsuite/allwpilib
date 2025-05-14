@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
 class VideoModeTest {
   @Test
   void equalityTest() {
-    VideoMode a = new VideoMode(PixelFormat.kMJPEG, 1920, 1080, 30);
-    VideoMode b = new VideoMode(PixelFormat.kMJPEG, 1920, 1080, 30);
+    VideoMode a = new VideoMode(PixelFormat.MJPEG, 1920, 1080, 30);
+    VideoMode b = new VideoMode(PixelFormat.MJPEG, 1920, 1080, 30);
 
     assertEquals(a, b);
     assertNotEquals(a, null);

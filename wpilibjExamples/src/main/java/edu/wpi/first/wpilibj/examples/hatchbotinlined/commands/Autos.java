@@ -19,11 +19,11 @@ public final class Autos {
         // Reset encoders on command start
         drive::resetEncoders,
         // Drive forward while the command is executing
-        () -> drive.arcadeDrive(AutoConstants.kAutoDriveSpeed, 0),
+        () -> drive.arcadeDrive(AutoConstants.AUTO_DRIVE_SPEED, 0),
         // Stop driving at the end of the command
         interrupt -> drive.arcadeDrive(0, 0),
         // End the command when the robot's driven distance exceeds the desired value
-        () -> drive.getAverageEncoderDistance() >= AutoConstants.kAutoDriveDistanceInches,
+        () -> drive.getAverageEncoderDistance() >= AutoConstants.AUTO_DRIVE_DISTANCE_INCHES,
         // Require the drive subsystem
         drive);
   }
@@ -36,13 +36,13 @@ public final class Autos {
             // Reset encoders on command start
             driveSubsystem::resetEncoders,
             // Drive forward while the command is executing
-            () -> driveSubsystem.arcadeDrive(AutoConstants.kAutoDriveSpeed, 0),
+            () -> driveSubsystem.arcadeDrive(AutoConstants.AUTO_DRIVE_SPEED, 0),
             // Stop driving at the end of the command
             interrupt -> driveSubsystem.arcadeDrive(0, 0),
             // End the command when the robot's driven distance exceeds the desired value
             () ->
                 driveSubsystem.getAverageEncoderDistance()
-                    >= AutoConstants.kAutoDriveDistanceInches,
+                    >= AutoConstants.AUTO_DRIVE_DISTANCE_INCHES,
             // Require the drive subsystem
             driveSubsystem),
 
@@ -54,13 +54,13 @@ public final class Autos {
             // Reset encoders on command start
             driveSubsystem::resetEncoders,
             // Drive backward while the command is executing
-            () -> driveSubsystem.arcadeDrive(-AutoConstants.kAutoDriveSpeed, 0),
+            () -> driveSubsystem.arcadeDrive(-AutoConstants.AUTO_DRIVE_SPEED, 0),
             // Stop driving at the end of the command
             interrupt -> driveSubsystem.arcadeDrive(0, 0),
             // End the command when the robot's driven distance exceeds the desired value
             () ->
                 driveSubsystem.getAverageEncoderDistance()
-                    <= AutoConstants.kAutoBackupDistanceInches,
+                    <= AutoConstants.AUTO_BACKUP_DISTANCE_INCHES,
             // Require the drive subsystem
             driveSubsystem));
   }

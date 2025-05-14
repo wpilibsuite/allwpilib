@@ -14,7 +14,7 @@
 #include "units/math.h"
 #include "units/velocity.h"
 
-static constexpr auto kDt = 10_ms;
+static constexpr auto DT = 10_ms;
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
@@ -34,7 +34,7 @@ TEST(TrapezoidProfileTest, ReachesGoal) {
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
   for (int i = 0; i < 450; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    state = profile.Calculate(DT, state, goal);
   }
   EXPECT_EQ(state, goal);
 }
@@ -47,8 +47,8 @@ TEST(TrapezoidProfileTest, PosContinuousUnderVelChange) {
   frc::TrapezoidProfile<units::meter>::State goal{12_m, 0_mps};
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
-  auto state = profile.Calculate(
-      kDt, frc::TrapezoidProfile<units::meter>::State{}, goal);
+  auto state =
+      profile.Calculate(DT, frc::TrapezoidProfile<units::meter>::State{}, goal);
 
   auto lastPos = state.position;
   for (int i = 0; i < 1600; ++i) {
@@ -57,8 +57,8 @@ TEST(TrapezoidProfileTest, PosContinuousUnderVelChange) {
       profile = frc::TrapezoidProfile<units::meter>{constraints};
     }
 
-    state = profile.Calculate(kDt, state, goal);
-    auto estimatedVel = (state.position - lastPos) / kDt;
+    state = profile.Calculate(DT, state, goal);
+    auto estimatedVel = (state.position - lastPos) / DT;
 
     if (i >= 400) {
       // Since estimatedVel can have floating point rounding errors, we check
@@ -83,7 +83,7 @@ TEST(TrapezoidProfileTest, Backwards) {
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
   for (int i = 0; i < 400; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    state = profile.Calculate(DT, state, goal);
   }
   EXPECT_EQ(state, goal);
 }
@@ -96,14 +96,14 @@ TEST(TrapezoidProfileTest, SwitchGoalInMiddle) {
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
   for (int i = 0; i < 200; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    state = profile.Calculate(DT, state, goal);
   }
   EXPECT_NE(state, goal);
 
   goal = {0.0_m, 0.0_mps};
   profile = frc::TrapezoidProfile<units::meter>{constraints};
   for (int i = 0; i < 550; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    state = profile.Calculate(DT, state, goal);
   }
   EXPECT_EQ(state, goal);
 }
@@ -117,13 +117,13 @@ TEST(TrapezoidProfileTest, TopSpeed) {
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
   for (int i = 0; i < 200; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    state = profile.Calculate(DT, state, goal);
   }
   EXPECT_NEAR_UNITS(constraints.maxVelocity, state.velocity, 10e-5_mps);
 
   profile = frc::TrapezoidProfile<units::meter>{constraints};
   for (int i = 0; i < 2000; ++i) {
-    state = profile.Calculate(kDt, state, goal);
+    state = profile.Calculate(DT, state, goal);
   }
   EXPECT_EQ(state, goal);
 }
@@ -136,7 +136,7 @@ TEST(TrapezoidProfileTest, TimingToCurrent) {
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
   for (int i = 0; i < 400; i++) {
-    state = profile.Calculate(kDt, state, goal);
+    state = profile.Calculate(DT, state, goal);
     EXPECT_NEAR_UNITS(profile.TimeLeftUntil(state.position), 0_s, 2e-2_s);
   }
 }
@@ -149,13 +149,13 @@ TEST(TrapezoidProfileTest, TimingToGoal) {
   frc::TrapezoidProfile<units::meter>::State goal{2_m, 0_mps};
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
-  auto state = profile.Calculate(kDt, goal,
-                                 frc::TrapezoidProfile<units::meter>::State{});
+  auto state =
+      profile.Calculate(DT, goal, frc::TrapezoidProfile<units::meter>::State{});
 
   auto predictedTimeLeft = profile.TimeLeftUntil(goal.position);
   bool reachedGoal = false;
   for (int i = 0; i < 400; i++) {
-    state = profile.Calculate(kDt, state, goal);
+    state = profile.Calculate(DT, state, goal);
     if (!reachedGoal && state == goal) {
       // Expected value using for loop index is just an approximation since the
       // time left in the profile doesn't increase linearly at the endpoints
@@ -173,13 +173,13 @@ TEST(TrapezoidProfileTest, TimingBeforeGoal) {
   frc::TrapezoidProfile<units::meter>::State goal{2_m, 0_mps};
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
-  auto state = profile.Calculate(kDt, goal,
-                                 frc::TrapezoidProfile<units::meter>::State{});
+  auto state =
+      profile.Calculate(DT, goal, frc::TrapezoidProfile<units::meter>::State{});
 
   auto predictedTimeLeft = profile.TimeLeftUntil(1_m);
   bool reachedGoal = false;
   for (int i = 0; i < 400; i++) {
-    state = profile.Calculate(kDt, state, goal);
+    state = profile.Calculate(DT, state, goal);
     if (!reachedGoal &&
         (units::math::abs(state.velocity - 1_mps) < 10e-5_mps)) {
       EXPECT_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 2e-2);
@@ -196,13 +196,13 @@ TEST(TrapezoidProfileTest, TimingToNegativeGoal) {
   frc::TrapezoidProfile<units::meter>::State goal{-2_m, 0_mps};
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
-  auto state = profile.Calculate(kDt, goal,
-                                 frc::TrapezoidProfile<units::meter>::State{});
+  auto state =
+      profile.Calculate(DT, goal, frc::TrapezoidProfile<units::meter>::State{});
 
   auto predictedTimeLeft = profile.TimeLeftUntil(goal.position);
   bool reachedGoal = false;
   for (int i = 0; i < 400; i++) {
-    state = profile.Calculate(kDt, state, goal);
+    state = profile.Calculate(DT, state, goal);
     if (!reachedGoal && state == goal) {
       // Expected value using for loop index is just an approximation since the
       // time left in the profile doesn't increase linearly at the endpoints
@@ -220,13 +220,13 @@ TEST(TrapezoidProfileTest, TimingBeforeNegativeGoal) {
   frc::TrapezoidProfile<units::meter>::State goal{-2_m, 0_mps};
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
-  auto state = profile.Calculate(kDt, goal,
-                                 frc::TrapezoidProfile<units::meter>::State{});
+  auto state =
+      profile.Calculate(DT, goal, frc::TrapezoidProfile<units::meter>::State{});
 
   auto predictedTimeLeft = profile.TimeLeftUntil(-1_m);
   bool reachedGoal = false;
   for (int i = 0; i < 400; i++) {
-    state = profile.Calculate(kDt, state, goal);
+    state = profile.Calculate(DT, state, goal);
     if (!reachedGoal &&
         (units::math::abs(state.velocity + 1_mps) < 10e-5_mps)) {
       EXPECT_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 2e-2);

@@ -13,7 +13,7 @@ class AprilTagGenerationTest {
   @Test
   void test36h11() {
     var frame = AprilTag.generate36h11AprilTagImage(1);
-    assertEquals(PixelFormat.kGray, frame.getPixelFormat());
+    assertEquals(PixelFormat.GRAY, frame.getPixelFormat());
     assertEquals(10, frame.getWidth());
     assertEquals(10, frame.getHeight());
     int stride = frame.getStride();

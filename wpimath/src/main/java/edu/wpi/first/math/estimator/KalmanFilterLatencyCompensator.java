@@ -21,7 +21,7 @@ import java.util.function.BiConsumer;
  * @param <O> The number of outputs.
  */
 public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num> {
-  private static final int kMaxPastObserverStates = 300;
+  private static final int MAX_PAST_OBSERVER_STATES = 300;
 
   private final List<Map.Entry<Double, ObserverSnapshot>> m_pastObserverSnapshots;
 
@@ -47,7 +47,7 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
       KalmanTypeFilter<S, I, O> observer, Matrix<I, N1> u, Matrix<O, N1> localY, double timestamp) {
     m_pastObserverSnapshots.add(Map.entry(timestamp, new ObserverSnapshot(observer, u, localY)));
 
-    if (m_pastObserverSnapshots.size() > kMaxPastObserverStates) {
+    if (m_pastObserverSnapshots.size() > MAX_PAST_OBSERVER_STATES) {
       m_pastObserverSnapshots.remove(0);
     }
   }

@@ -66,7 +66,7 @@ class ConnectionListenerTest {
     assertNotSame(poller, 0, "bad poller handle");
     int handle =
         NetworkTablesJNI.addListener(
-            poller, m_serverInst.getHandle(), EnumSet.of(NetworkTableEvent.Kind.kConnection));
+            poller, m_serverInst.getHandle(), EnumSet.of(NetworkTableEvent.Kind.CONNECTION));
     assertNotSame(handle, 0, "bad listener handle");
 
     // trigger a connect event
@@ -84,7 +84,7 @@ class ConnectionListenerTest {
     assertEquals(1, events.length);
     assertEquals(handle, events[0].listener);
     assertNotNull(events[0].connInfo);
-    assertTrue(events[0].is(NetworkTableEvent.Kind.kConnected));
+    assertTrue(events[0].is(NetworkTableEvent.Kind.CONNECTED));
 
     // trigger a disconnect event
     m_clientInst.stopClient();
@@ -105,7 +105,7 @@ class ConnectionListenerTest {
     assertNotNull(events);
     assertEquals(1, events.length);
     assertEquals(handle, events[0].listener);
-    assertTrue(events[0].is(NetworkTableEvent.Kind.kDisconnected));
+    assertTrue(events[0].is(NetworkTableEvent.Kind.DISCONNECTED));
   }
 
   private static int threadedPort = 10001;
@@ -157,7 +157,7 @@ class ConnectionListenerTest {
       assertEquals(1, events.size());
       assertEquals(handle, events.get(0).listener);
       assertNotNull(events.get(0).connInfo);
-      assertTrue(events.get(0).is(NetworkTableEvent.Kind.kConnected));
+      assertTrue(events.get(0).is(NetworkTableEvent.Kind.CONNECTED));
       events.clear();
     }
 
@@ -182,7 +182,7 @@ class ConnectionListenerTest {
       assertEquals(1, events.size());
       assertEquals(handle, events.get(0).listener);
       assertNotNull(events.get(0).connInfo);
-      assertTrue(events.get(0).is(NetworkTableEvent.Kind.kDisconnected));
+      assertTrue(events.get(0).is(NetworkTableEvent.Kind.DISCONNECTED));
     }
   }
 }

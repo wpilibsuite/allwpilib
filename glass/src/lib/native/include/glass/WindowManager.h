@@ -66,7 +66,7 @@ class WindowManager {
    * @param defaultVisibility default window visibility
    */
   Window* AddWindow(std::string_view id, wpi::unique_function<void()> display,
-                    Window::Visibility defaultVisibility = Window::kShow);
+                    Window::Visibility defaultVisibility = Window::SHOW);
 
   /**
    * Adds window to GUI.  The view's display function is called from within a
@@ -86,7 +86,7 @@ class WindowManager {
    * @return Window, or nullptr on duplicate window
    */
   Window* AddWindow(std::string_view id, std::unique_ptr<View> view,
-                    Window::Visibility defaultVisibility = Window::kShow);
+                    Window::Visibility defaultVisibility = Window::SHOW);
 
   /**
    * Adds window to GUI.  A View must be assigned to the returned Window
@@ -106,7 +106,7 @@ class WindowManager {
    * @return Window, or nullptr on duplicate window
    */
   Window* GetOrAddWindow(std::string_view id, bool duplicateOk = false,
-                         Window::Visibility defaultVisibility = Window::kShow);
+                         Window::Visibility defaultVisibility = Window::SHOW);
 
   /**
    * Gets existing window.  If none exists, returns nullptr.

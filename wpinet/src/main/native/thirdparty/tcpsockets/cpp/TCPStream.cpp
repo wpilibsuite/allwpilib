@@ -65,7 +65,7 @@ TCPStream::~TCPStream() {
 
 size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
   if (m_sd < 0) {
-    *err = kConnectionClosed;
+    *err = CONNECTION_CLOSED;
     return 0;
   }
 #ifdef _WIN32
@@ -80,7 +80,7 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
       break;
     }
     if (!m_blocking) {
-      *err = kWouldBlock;
+      *err = WOULD_BLOCK;
       return 0;
     }
     Sleep(1);
@@ -91,7 +91,7 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
                            "Send() failed: WSA error={}\n", WSAGetLastError());
 
     OutputDebugStringA(Buffer);
-    *err = kConnectionReset;
+    *err = CONNECTION_RESET;
     return 0;
   }
 #else
@@ -103,9 +103,9 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
 #endif
   if (rv < 0) {
     if (!m_blocking && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-      *err = kWouldBlock;
+      *err = WOULD_BLOCK;
     } else {
-      *err = kConnectionReset;
+      *err = CONNECTION_RESET;
     }
     return 0;
   }
@@ -115,7 +115,7 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
 
 size_t TCPStream::receive(char* buffer, size_t len, Error* err, int timeout) {
   if (m_sd < 0) {
-    *err = kConnectionClosed;
+    *err = CONNECTION_CLOSED;
     return 0;
   }
 #ifdef _WIN32
@@ -136,7 +136,7 @@ size_t TCPStream::receive(char* buffer, size_t len, Error* err, int timeout) {
     rv = read(m_sd, buffer, len);
 #endif
   } else {
-    *err = kConnectionTimedOut;
+    *err = CONNECTION_TIMED_OUT;
     return 0;
   }
   if (rv < 0) {
@@ -145,9 +145,9 @@ size_t TCPStream::receive(char* buffer, size_t len, Error* err, int timeout) {
 #else
     if (!m_blocking && (errno == EAGAIN || errno == EWOULDBLOCK)) {
 #endif
-      *err = kWouldBlock;
+      *err = WOULD_BLOCK;
     } else {
-      *err = kConnectionReset;
+      *err = CONNECTION_RESET;
     }
     return 0;
   }

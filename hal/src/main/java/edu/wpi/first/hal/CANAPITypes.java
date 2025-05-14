@@ -16,7 +16,7 @@ public final class CANAPITypes {
    * FRC CAN device type.
    *
    * <p>This enum represents different types of CAN devices. Teams are encouraged to use the
-   * kMiscellaneous for custom or miscellaneous devices.
+   * MISCELLANEOUS for custom or miscellaneous devices.
    *
    * @see <a href=
    *     "https://docs.wpilib.org/en/stable/docs/software/can-devices/can-addressing.html">CAN
@@ -24,33 +24,33 @@ public final class CANAPITypes {
    */
   public enum CANDeviceType {
     /** Broadcast. */
-    kBroadcast(0),
+    BROADCAST(0),
     /** Robot controller. */
-    kRobotController(1),
+    ROBOT_CONTROLLER(1),
     /** Motor controller. */
-    kMotorController(2),
+    MOTOR_CONTROLLER(2),
     /** Relay controller. */
-    kRelayController(3),
+    RELAY_CONTROLLER(3),
     /** Gyro sensor. */
-    kGyroSensor(4),
+    GYRO_SENSOR(4),
     /** Accelerometer. */
-    kAccelerometer(5),
+    ACCELEROMETER(5),
     /** Ultrasonic sensor. */
-    kUltrasonicSensor(6),
+    ULTRASONIC_SENSOR(6),
     /** Gear tooth sensor. */
-    kGearToothSensor(7),
+    GEAR_TOOTH_SENSOR(7),
     /** Power distribution. */
-    kPowerDistribution(8),
+    POWER_DISTRIBUTION(8),
     /** Pneumatics. */
-    kPneumatics(9),
+    PNEUMATICS(9),
     /** Miscellaneous. */
-    kMiscellaneous(10),
+    MISCELLANEOUS(10),
     /** IO breakout. */
-    kIOBreakout(11),
+    IO_BREAKOUT(11),
     /** Servo Controller. */
-    kServoController(12),
+    SERVO_CONTROLLER(12),
     /** Firmware update. */
-    kFirmwareUpdate(31);
+    FIRMWARE_UPDATE(31);
 
     /** The device type ID. */
     @SuppressWarnings("PMD.MemberName")
@@ -65,7 +65,7 @@ public final class CANAPITypes {
    * FRC CAN manufacturer ID.
    *
    * <p>This enum represents different manufacturer IDs for CAN devices. Teams are encouraged to use
-   * the kTeamUse manufacturer ID for custom or team-specific devices.
+   * the TEAM_USE manufacturer ID for custom or team-specific devices.
    *
    * @see <a href=
    *     "https://docs.wpilib.org/en/stable/docs/software/can-devices/can-addressing.html">CAN
@@ -73,39 +73,39 @@ public final class CANAPITypes {
    */
   public enum CANManufacturer {
     /** Broadcast. */
-    kBroadcast(0),
+    BROADCAST(0),
     /** National Instruments. */
-    kNI(1),
+    NI(1),
     /** Luminary Micro. */
-    kLM(2),
+    LM(2),
     /** DEKA Research and Development Corp. */
-    kDEKA(3),
+    DEKA(3),
     /** Cross the Road Electronics. */
-    kCTRE(4),
+    CTRE(4),
     /** REV Robotics. */
-    kREV(5),
+    REV(5),
     /** Grapple. */
-    kGrapple(6),
+    GRAPPLE(6),
     /** MindSensors. */
-    kMS(7),
+    MS(7),
     /** Team use. */
-    kTeamUse(8),
+    TEAM_USE(8),
     /** Kauai Labs. */
-    kKauaiLabs(9),
+    KAUAI_LABS(9),
     /** Copperforge. */
-    kCopperforge(10),
+    COPPER_FORGE(10),
     /** Playing With Fusion. */
-    kPWF(11),
+    PWF(11),
     /** Studica. */
-    kStudica(12),
+    STUDICA(12),
     /** TheThriftyBot. */
-    kTheThriftyBot(13),
+    THE_THRIFTY_BOT(13),
     /** Redux Robotics. */
-    kReduxRobotics(14),
+    REDUX_ROBOTICS(14),
     /** AndyMark. */
-    kAndyMark(15),
+    ANDYMARK(15),
     /** Vivid-Hosting. */
-    kVividHosting(16);
+    VIVID_HOSTING(16);
 
     /** The manufacturer ID. */
     @SuppressWarnings("PMD.MemberName")

@@ -6,6 +6,9 @@
 {% macro capitalize_first(string) -%}
 {{ string[0]|capitalize + string[1:] }}
 {%- endmacro %}
+{% macro snakecase(string) -%}
+{{ string|camel_to_snake }}
+{%- endmacro %}
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.wpilibj.{{ ConsoleName }}Controller;
@@ -44,7 +47,7 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void set{{ stick.NameParts|map("capitalize")|join }}(double value) {
-    setRawAxis({{ ConsoleName }}Controller.Axis.k{{ stick.NameParts|map("capitalize")|join }}.value, value);
+    setRawAxis({{ ConsoleName }}Controller.Axis.{{ snakecase(stick.NameParts|join) }}.value, value);
   }
 {% endfor -%}
 {% for trigger in triggers %}
@@ -54,7 +57,7 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void set{{ capitalize_first(trigger.name) }}Axis(double value) {
-    setRawAxis({{ ConsoleName }}Controller.Axis.k{{ capitalize_first(trigger.name) }}.value, value);
+    setRawAxis({{ ConsoleName }}Controller.Axis.{{ snakecase(trigger.name) }}.value, value);
   }
 {% endfor -%}
 {% for button in buttons %}
@@ -64,7 +67,7 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void set{{ capitalize_first(button.name) }}Button(boolean value) {
-    setRawButton({{ ConsoleName }}Controller.Button.k{{ capitalize_first(button.name) }}.value, value);
+    setRawButton({{ ConsoleName }}Controller.Button.{{ snakecase(button.name) }}.value, value);
   }
 {% endfor -%}
 {% if ConsoleName == "Xbox" %}
@@ -77,7 +80,7 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
    */
   @Deprecated(since = "2025", forRemoval = true)
   public void setLeftBumper(boolean state) {
-    setRawButton(XboxController.Button.kLeftBumper.value, state);
+    setRawButton(XboxController.Button.LEFT_BUMPER.value, state);
   }
 
   /**
@@ -89,7 +92,7 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
    */
   @Deprecated(since = "2025", forRemoval = true)
   public void setRightBumper(boolean state) {
-    setRawButton(XboxController.Button.kRightBumper.value, state);
+    setRawButton(XboxController.Button.RIGHT_BUMPER.value, state);
   }
 {% elif ConsoleName == "PS4" %}
   /**
@@ -101,7 +104,7 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
    */
   @Deprecated(since = "2025", forRemoval = true)
   public void setTouchpad(boolean value) {
-    setRawButton(PS4Controller.Button.kTouchpad.value, value);
+    setRawButton(PS4Controller.Button.TOUCHPAD.value, value);
   }
 {% elif ConsoleName == "PS5" %}
   /**
@@ -113,7 +116,7 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
    */
   @Deprecated(since = "2025", forRemoval = true)
   public void setTouchpad(boolean value) {
-    setRawButton(PS5Controller.Button.kTouchpad.value, value);
+    setRawButton(PS5Controller.Button.TOUCHPAD.value, value);
   }
 {% endif -%}
 }

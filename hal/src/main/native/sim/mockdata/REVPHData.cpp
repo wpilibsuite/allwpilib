@@ -9,19 +9,19 @@ using namespace hal;
 
 namespace hal::init {
 void InitializeREVPHData() {
-  static REVPHData spd[kNumREVPHModules];
+  static REVPHData spd[NUM_REV_PH_MODULES];
   ::hal::SimREVPHData = spd;
 }
 }  // namespace hal::init
 
 REVPHData* hal::SimREVPHData;
 void REVPHData::ResetData() {
-  for (int i = 0; i < kNumREVPHChannels; i++) {
+  for (int i = 0; i < NUM_REV_PH_CHANNELS; i++) {
     solenoidOutput[i].Reset(false);
   }
   initialized.Reset(false);
   compressorOn.Reset(false);
-  compressorConfigType.Reset(HAL_REVPHCompressorConfigType_kDisabled);
+  compressorConfigType.Reset(HAL_REVPHCompressorConfigType_Disabled);
   pressureSwitch.Reset(false);
   compressorCurrent.Reset(0.0);
 }
@@ -47,7 +47,7 @@ DEFINE_CAPI(double, CompressorCurrent, compressorCurrent)
 void HALSIM_GetREVPHAllSolenoids(int32_t index, uint8_t* values) {
   auto& data = SimREVPHData[index].solenoidOutput;
   uint8_t ret = 0;
-  for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
+  for (int i = 0; i < NUM_CTRE_SOLENOID_CHANNELS; i++) {
     ret |= (data[i] << i);
   }
   *values = ret;
@@ -55,7 +55,7 @@ void HALSIM_GetREVPHAllSolenoids(int32_t index, uint8_t* values) {
 
 void HALSIM_SetREVPHAllSolenoids(int32_t index, uint8_t values) {
   auto& data = SimREVPHData[index].solenoidOutput;
-  for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
+  for (int i = 0; i < NUM_CTRE_SOLENOID_CHANNELS; i++) {
     data[i] = (values & 0x1) != 0;
     values >>= 1;
   }

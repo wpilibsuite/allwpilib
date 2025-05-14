@@ -25,12 +25,12 @@ TEST(DriverStationTest, Joystick) {
     HAL_GetJoystickButtons(joystickNum, &buttons);
 
     EXPECT_EQ(0, axes.count);
-    for (int i = 0; i < HAL_kMaxJoystickAxes; ++i) {
+    for (int i = 0; i < HAL_MaxJoystickAxes; ++i) {
       EXPECT_EQ(0, axes.axes[i]);
     }
 
     EXPECT_EQ(0, povs.count);
-    for (int i = 0; i < HAL_kMaxJoystickPOVs; ++i) {
+    for (int i = 0; i < HAL_MaxJoystickPOVs; ++i) {
       EXPECT_EQ(0, povs.povs[i]);
     }
 
@@ -104,12 +104,12 @@ TEST(DriverStationTest, Joystick) {
     HAL_GetJoystickButtons(joystickNum, &buttons);
 
     EXPECT_EQ(0, axes.count);
-    for (int i = 0; i < HAL_kMaxJoystickAxes; ++i) {
+    for (int i = 0; i < HAL_MaxJoystickAxes; ++i) {
       EXPECT_EQ(0, axes.axes[i]);
     }
 
     EXPECT_EQ(0, povs.count);
-    for (int i = 0; i < HAL_kMaxJoystickPOVs; ++i) {
+    for (int i = 0; i < HAL_MaxJoystickPOVs; ++i) {
       EXPECT_EQ(0, povs.povs[i]);
     }
 
@@ -127,7 +127,7 @@ TEST(DriverStationTest, EventInfo) {
                          sizeof(info.gameSpecificMessage), gameData);
   info.gameSpecificMessageSize = gameData.size();
   info.matchNumber = 5;
-  info.matchType = HAL_MatchType::HAL_kMatchType_qualification;
+  info.matchType = HAL_MatchType::HAL_MatchType_qualification;
   info.replayNumber = 42;
   HALSIM_SetMatchInfo(&info);
 
@@ -142,7 +142,7 @@ TEST(DriverStationTest, EventInfo) {
   EXPECT_EQ(eventName, dataBack.eventName);
   EXPECT_EQ(gameData, gsm);
   EXPECT_EQ(5, dataBack.matchNumber);
-  EXPECT_EQ(HAL_MatchType::HAL_kMatchType_qualification, dataBack.matchType);
+  EXPECT_EQ(HAL_MatchType::HAL_MatchType_qualification, dataBack.matchType);
   EXPECT_EQ(42, dataBack.replayNumber);
 }
 

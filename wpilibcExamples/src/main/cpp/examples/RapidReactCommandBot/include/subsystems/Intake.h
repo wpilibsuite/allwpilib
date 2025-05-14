@@ -27,10 +27,10 @@ class Intake : public frc2::SubsystemBase {
   frc2::CommandPtr RetractCommand();
 
  private:
-  frc::PWMSparkMax m_motor{IntakeConstants::kMotorPort};
+  frc::PWMSparkMax m_motor{IntakeConstants::MOTOR_PORT};
 
   // Double solenoid connected to two channels of a PCM with the default CAN ID
   frc::DoubleSolenoid m_piston{0, frc::PneumaticsModuleType::CTREPCM,
-                               IntakeConstants::kSolenoidPorts[0],
-                               IntakeConstants::kSolenoidPorts[1]};
+                               IntakeConstants::SOLENOID_PORTS[0],
+                               IntakeConstants::SOLENOID_PORTS[1]};
 };

@@ -168,7 +168,7 @@ void AddDefaultFont(
  */
 ImFont* GetFont(int font);
 
-enum Style { kStyleClassic = 0, kStyleDark, kStyleLight, kStyleDeepDark };
+enum Style { STYLE_CLASSIC = 0, STYLE_DARK, STYLE_LIGHT, STYLE_DEEP_DARK };
 
 /**
  * Sets the ImGui style.  Using this function makes this setting persistent.
@@ -217,7 +217,7 @@ void EmitViewMenu();
 /**
  * Pixel formats for texture pixel data.
  */
-enum PixelFormat { kPixelRGBA, kPixelBGRA };
+enum PixelFormat { PIXEL_RGBA, PIXEL_BGRA };
 
 /**
  * Creates a texture from pixel data.
@@ -437,7 +437,7 @@ class Texture {
 
  private:
   ImTextureID m_texture = nullptr;
-  PixelFormat m_format = kPixelRGBA;
+  PixelFormat m_format = PIXEL_RGBA;
   int m_width = 0;
   int m_height = 0;
 };

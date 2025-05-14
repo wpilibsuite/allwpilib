@@ -12,7 +12,7 @@
 
 using namespace frc;
 
-static constexpr double kEpsilon = 0.1;
+static constexpr double EPSILON = 0.1;
 
 class SwerveDriveKinematicsTest : public ::testing::Test {
  protected:
@@ -29,15 +29,15 @@ TEST_F(SwerveDriveKinematicsTest, StraightLineInverseKinematics) {
 
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds);
 
-  EXPECT_NEAR(fl.speed.value(), 5.0, kEpsilon);
-  EXPECT_NEAR(fr.speed.value(), 5.0, kEpsilon);
-  EXPECT_NEAR(bl.speed.value(), 5.0, kEpsilon);
-  EXPECT_NEAR(br.speed.value(), 5.0, kEpsilon);
+  EXPECT_NEAR(fl.speed.value(), 5.0, EPSILON);
+  EXPECT_NEAR(fr.speed.value(), 5.0, EPSILON);
+  EXPECT_NEAR(bl.speed.value(), 5.0, EPSILON);
+  EXPECT_NEAR(br.speed.value(), 5.0, EPSILON);
 
-  EXPECT_NEAR(fl.angle.Radians().value(), 0.0, kEpsilon);
-  EXPECT_NEAR(fr.angle.Radians().value(), 0.0, kEpsilon);
-  EXPECT_NEAR(bl.angle.Radians().value(), 0.0, kEpsilon);
-  EXPECT_NEAR(br.angle.Radians().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(fl.angle.Radians().value(), 0.0, EPSILON);
+  EXPECT_NEAR(fr.angle.Radians().value(), 0.0, EPSILON);
+  EXPECT_NEAR(bl.angle.Radians().value(), 0.0, EPSILON);
+  EXPECT_NEAR(br.angle.Radians().value(), 0.0, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest, StraightLineForwardKinematics) {
@@ -45,9 +45,9 @@ TEST_F(SwerveDriveKinematicsTest, StraightLineForwardKinematics) {
 
   auto chassisSpeeds = m_kinematics.ToChassisSpeeds(state, state, state, state);
 
-  EXPECT_NEAR(chassisSpeeds.vx.value(), 5.0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.vy.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.omega.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.vx.value(), 5.0, EPSILON);
+  EXPECT_NEAR(chassisSpeeds.vy.value(), 0.0, EPSILON);
+  EXPECT_NEAR(chassisSpeeds.omega.value(), 0.0, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest, StraightLineForwardKinematicsWithDeltas) {
@@ -55,33 +55,33 @@ TEST_F(SwerveDriveKinematicsTest, StraightLineForwardKinematicsWithDeltas) {
 
   auto twist = m_kinematics.ToTwist2d(delta, delta, delta, delta);
 
-  EXPECT_NEAR(twist.dx.value(), 5.0, kEpsilon);
-  EXPECT_NEAR(twist.dy.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(twist.dtheta.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(twist.dx.value(), 5.0, EPSILON);
+  EXPECT_NEAR(twist.dy.value(), 0.0, EPSILON);
+  EXPECT_NEAR(twist.dtheta.value(), 0.0, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest, StraightStrafeInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 5_mps, 0_rad_per_s};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds);
 
-  EXPECT_NEAR(fl.speed.value(), 5.0, kEpsilon);
-  EXPECT_NEAR(fr.speed.value(), 5.0, kEpsilon);
-  EXPECT_NEAR(bl.speed.value(), 5.0, kEpsilon);
-  EXPECT_NEAR(br.speed.value(), 5.0, kEpsilon);
+  EXPECT_NEAR(fl.speed.value(), 5.0, EPSILON);
+  EXPECT_NEAR(fr.speed.value(), 5.0, EPSILON);
+  EXPECT_NEAR(bl.speed.value(), 5.0, EPSILON);
+  EXPECT_NEAR(br.speed.value(), 5.0, EPSILON);
 
-  EXPECT_NEAR(fl.angle.Degrees().value(), 90.0, kEpsilon);
-  EXPECT_NEAR(fr.angle.Degrees().value(), 90.0, kEpsilon);
-  EXPECT_NEAR(bl.angle.Degrees().value(), 90.0, kEpsilon);
-  EXPECT_NEAR(br.angle.Degrees().value(), 90.0, kEpsilon);
+  EXPECT_NEAR(fl.angle.Degrees().value(), 90.0, EPSILON);
+  EXPECT_NEAR(fr.angle.Degrees().value(), 90.0, EPSILON);
+  EXPECT_NEAR(bl.angle.Degrees().value(), 90.0, EPSILON);
+  EXPECT_NEAR(br.angle.Degrees().value(), 90.0, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest, StraightStrafeForwardKinematics) {
   SwerveModuleState state{5_mps, 90_deg};
   auto chassisSpeeds = m_kinematics.ToChassisSpeeds(state, state, state, state);
 
-  EXPECT_NEAR(chassisSpeeds.vx.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.vy.value(), 5.0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.omega.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.vx.value(), 0.0, EPSILON);
+  EXPECT_NEAR(chassisSpeeds.vy.value(), 5.0, EPSILON);
+  EXPECT_NEAR(chassisSpeeds.omega.value(), 0.0, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest, StraightStrafeForwardKinematicsWithDeltas) {
@@ -89,9 +89,9 @@ TEST_F(SwerveDriveKinematicsTest, StraightStrafeForwardKinematicsWithDeltas) {
 
   auto twist = m_kinematics.ToTwist2d(delta, delta, delta, delta);
 
-  EXPECT_NEAR(twist.dx.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(twist.dy.value(), 5.0, kEpsilon);
-  EXPECT_NEAR(twist.dtheta.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(twist.dx.value(), 0.0, EPSILON);
+  EXPECT_NEAR(twist.dy.value(), 5.0, EPSILON);
+  EXPECT_NEAR(twist.dtheta.value(), 0.0, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseKinematics) {
@@ -99,15 +99,15 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseKinematics) {
                        units::radians_per_second_t{2 * std::numbers::pi}};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds);
 
-  EXPECT_NEAR(fl.speed.value(), 106.63, kEpsilon);
-  EXPECT_NEAR(fr.speed.value(), 106.63, kEpsilon);
-  EXPECT_NEAR(bl.speed.value(), 106.63, kEpsilon);
-  EXPECT_NEAR(br.speed.value(), 106.63, kEpsilon);
+  EXPECT_NEAR(fl.speed.value(), 106.63, EPSILON);
+  EXPECT_NEAR(fr.speed.value(), 106.63, EPSILON);
+  EXPECT_NEAR(bl.speed.value(), 106.63, EPSILON);
+  EXPECT_NEAR(br.speed.value(), 106.63, EPSILON);
 
-  EXPECT_NEAR(fl.angle.Degrees().value(), 135.0, kEpsilon);
-  EXPECT_NEAR(fr.angle.Degrees().value(), 45.0, kEpsilon);
-  EXPECT_NEAR(bl.angle.Degrees().value(), -135.0, kEpsilon);
-  EXPECT_NEAR(br.angle.Degrees().value(), -45.0, kEpsilon);
+  EXPECT_NEAR(fl.angle.Degrees().value(), 135.0, EPSILON);
+  EXPECT_NEAR(fr.angle.Degrees().value(), 45.0, EPSILON);
+  EXPECT_NEAR(bl.angle.Degrees().value(), -135.0, EPSILON);
+  EXPECT_NEAR(br.angle.Degrees().value(), -45.0, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest, ConserveWheelAngle) {
@@ -116,15 +116,15 @@ TEST_F(SwerveDriveKinematicsTest, ConserveWheelAngle) {
   m_kinematics.ToSwerveModuleStates(speeds);
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(ChassisSpeeds{});
 
-  EXPECT_NEAR(fl.speed.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(fr.speed.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(bl.speed.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(br.speed.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(fl.speed.value(), 0.0, EPSILON);
+  EXPECT_NEAR(fr.speed.value(), 0.0, EPSILON);
+  EXPECT_NEAR(bl.speed.value(), 0.0, EPSILON);
+  EXPECT_NEAR(br.speed.value(), 0.0, EPSILON);
 
-  EXPECT_NEAR(fl.angle.Degrees().value(), 135.0, kEpsilon);
-  EXPECT_NEAR(fr.angle.Degrees().value(), 45.0, kEpsilon);
-  EXPECT_NEAR(bl.angle.Degrees().value(), -135.0, kEpsilon);
-  EXPECT_NEAR(br.angle.Degrees().value(), -45.0, kEpsilon);
+  EXPECT_NEAR(fl.angle.Degrees().value(), 135.0, EPSILON);
+  EXPECT_NEAR(fr.angle.Degrees().value(), 45.0, EPSILON);
+  EXPECT_NEAR(bl.angle.Degrees().value(), -135.0, EPSILON);
+  EXPECT_NEAR(br.angle.Degrees().value(), -45.0, EPSILON);
 }
 TEST_F(SwerveDriveKinematicsTest, ResetWheelAngle) {
   Rotation2d fl = {0_deg};
@@ -135,15 +135,15 @@ TEST_F(SwerveDriveKinematicsTest, ResetWheelAngle) {
   auto [flMod, frMod, blMod, brMod] =
       m_kinematics.ToSwerveModuleStates(ChassisSpeeds{});
 
-  EXPECT_NEAR(flMod.speed.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(frMod.speed.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(blMod.speed.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(brMod.speed.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(flMod.speed.value(), 0.0, EPSILON);
+  EXPECT_NEAR(frMod.speed.value(), 0.0, EPSILON);
+  EXPECT_NEAR(blMod.speed.value(), 0.0, EPSILON);
+  EXPECT_NEAR(brMod.speed.value(), 0.0, EPSILON);
 
-  EXPECT_NEAR(flMod.angle.Degrees().value(), 0.0, kEpsilon);
-  EXPECT_NEAR(frMod.angle.Degrees().value(), 90.0, kEpsilon);
-  EXPECT_NEAR(blMod.angle.Degrees().value(), 180.0, kEpsilon);
-  EXPECT_NEAR(brMod.angle.Degrees().value(), -90.0, kEpsilon);
+  EXPECT_NEAR(flMod.angle.Degrees().value(), 0.0, EPSILON);
+  EXPECT_NEAR(frMod.angle.Degrees().value(), 90.0, EPSILON);
+  EXPECT_NEAR(blMod.angle.Degrees().value(), 180.0, EPSILON);
+  EXPECT_NEAR(brMod.angle.Degrees().value(), -90.0, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardKinematics) {
@@ -154,9 +154,9 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardKinematics) {
 
   auto chassisSpeeds = m_kinematics.ToChassisSpeeds(fl, fr, bl, br);
 
-  EXPECT_NEAR(chassisSpeeds.vx.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.vy.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.omega.value(), 2 * std::numbers::pi, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.vx.value(), 0.0, EPSILON);
+  EXPECT_NEAR(chassisSpeeds.vy.value(), 0.0, EPSILON);
+  EXPECT_NEAR(chassisSpeeds.omega.value(), 2 * std::numbers::pi, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardKinematicsWithDeltas) {
@@ -167,9 +167,9 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardKinematicsWithDeltas) {
 
   auto twist = m_kinematics.ToTwist2d(fl, fr, bl, br);
 
-  EXPECT_NEAR(twist.dx.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(twist.dy.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(twist.dtheta.value(), 2 * std::numbers::pi, kEpsilon);
+  EXPECT_NEAR(twist.dx.value(), 0.0, EPSILON);
+  EXPECT_NEAR(twist.dy.value(), 0.0, EPSILON);
+  EXPECT_NEAR(twist.dtheta.value(), 2 * std::numbers::pi, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest, OffCenterCORRotationInverseKinematics) {
@@ -177,15 +177,15 @@ TEST_F(SwerveDriveKinematicsTest, OffCenterCORRotationInverseKinematics) {
                        units::radians_per_second_t{2 * std::numbers::pi}};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds, m_fl);
 
-  EXPECT_NEAR(fl.speed.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(fr.speed.value(), 150.796, kEpsilon);
-  EXPECT_NEAR(bl.speed.value(), 150.796, kEpsilon);
-  EXPECT_NEAR(br.speed.value(), 213.258, kEpsilon);
+  EXPECT_NEAR(fl.speed.value(), 0.0, EPSILON);
+  EXPECT_NEAR(fr.speed.value(), 150.796, EPSILON);
+  EXPECT_NEAR(bl.speed.value(), 150.796, EPSILON);
+  EXPECT_NEAR(br.speed.value(), 213.258, EPSILON);
 
-  EXPECT_NEAR(fl.angle.Degrees().value(), 0.0, kEpsilon);
-  EXPECT_NEAR(fr.angle.Degrees().value(), 0.0, kEpsilon);
-  EXPECT_NEAR(bl.angle.Degrees().value(), -90.0, kEpsilon);
-  EXPECT_NEAR(br.angle.Degrees().value(), -45.0, kEpsilon);
+  EXPECT_NEAR(fl.angle.Degrees().value(), 0.0, EPSILON);
+  EXPECT_NEAR(fr.angle.Degrees().value(), 0.0, EPSILON);
+  EXPECT_NEAR(bl.angle.Degrees().value(), -90.0, EPSILON);
+  EXPECT_NEAR(br.angle.Degrees().value(), -45.0, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest, OffCenterCORRotationForwardKinematics) {
@@ -196,9 +196,9 @@ TEST_F(SwerveDriveKinematicsTest, OffCenterCORRotationForwardKinematics) {
 
   auto chassisSpeeds = m_kinematics.ToChassisSpeeds(fl, fr, bl, br);
 
-  EXPECT_NEAR(chassisSpeeds.vx.value(), 75.398, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.vy.value(), -75.398, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.omega.value(), 2 * std::numbers::pi, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.vx.value(), 75.398, EPSILON);
+  EXPECT_NEAR(chassisSpeeds.vy.value(), -75.398, EPSILON);
+  EXPECT_NEAR(chassisSpeeds.omega.value(), 2 * std::numbers::pi, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest,
@@ -210,9 +210,9 @@ TEST_F(SwerveDriveKinematicsTest,
 
   auto twist = m_kinematics.ToTwist2d(fl, fr, bl, br);
 
-  EXPECT_NEAR(twist.dx.value(), 75.398, kEpsilon);
-  EXPECT_NEAR(twist.dy.value(), -75.398, kEpsilon);
-  EXPECT_NEAR(twist.dtheta.value(), 2 * std::numbers::pi, kEpsilon);
+  EXPECT_NEAR(twist.dx.value(), 75.398, EPSILON);
+  EXPECT_NEAR(twist.dy.value(), -75.398, EPSILON);
+  EXPECT_NEAR(twist.dtheta.value(), 2 * std::numbers::pi, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest,
@@ -221,15 +221,15 @@ TEST_F(SwerveDriveKinematicsTest,
   auto [fl, fr, bl, br] =
       m_kinematics.ToSwerveModuleStates(speeds, Translation2d{24_m, 0_m});
 
-  EXPECT_NEAR(fl.speed.value(), 23.43, kEpsilon);
-  EXPECT_NEAR(fr.speed.value(), 23.43, kEpsilon);
-  EXPECT_NEAR(bl.speed.value(), 54.08, kEpsilon);
-  EXPECT_NEAR(br.speed.value(), 54.08, kEpsilon);
+  EXPECT_NEAR(fl.speed.value(), 23.43, EPSILON);
+  EXPECT_NEAR(fr.speed.value(), 23.43, EPSILON);
+  EXPECT_NEAR(bl.speed.value(), 54.08, EPSILON);
+  EXPECT_NEAR(br.speed.value(), 54.08, EPSILON);
 
-  EXPECT_NEAR(fl.angle.Degrees().value(), -140.19, kEpsilon);
-  EXPECT_NEAR(fr.angle.Degrees().value(), -39.81, kEpsilon);
-  EXPECT_NEAR(bl.angle.Degrees().value(), -109.44, kEpsilon);
-  EXPECT_NEAR(br.angle.Degrees().value(), -70.56, kEpsilon);
+  EXPECT_NEAR(fl.angle.Degrees().value(), -140.19, EPSILON);
+  EXPECT_NEAR(fr.angle.Degrees().value(), -39.81, EPSILON);
+  EXPECT_NEAR(bl.angle.Degrees().value(), -109.44, EPSILON);
+  EXPECT_NEAR(br.angle.Degrees().value(), -70.56, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest,
@@ -241,9 +241,9 @@ TEST_F(SwerveDriveKinematicsTest,
 
   auto chassisSpeeds = m_kinematics.ToChassisSpeeds(fl, fr, bl, br);
 
-  EXPECT_NEAR(chassisSpeeds.vx.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.vy.value(), -33.0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.omega.value(), 1.5, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.vx.value(), 0.0, EPSILON);
+  EXPECT_NEAR(chassisSpeeds.vy.value(), -33.0, EPSILON);
+  EXPECT_NEAR(chassisSpeeds.omega.value(), 1.5, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest,
@@ -255,9 +255,9 @@ TEST_F(SwerveDriveKinematicsTest,
 
   auto twist = m_kinematics.ToTwist2d(fl, fr, bl, br);
 
-  EXPECT_NEAR(twist.dx.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(twist.dy.value(), -33.0, kEpsilon);
-  EXPECT_NEAR(twist.dtheta.value(), 1.5, kEpsilon);
+  EXPECT_NEAR(twist.dx.value(), 0.0, EPSILON);
+  EXPECT_NEAR(twist.dy.value(), -33.0, EPSILON);
+  EXPECT_NEAR(twist.dtheta.value(), 1.5, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest, Desaturate) {
@@ -269,12 +269,12 @@ TEST_F(SwerveDriveKinematicsTest, Desaturate) {
   wpi::array<SwerveModuleState, 4> arr{state1, state2, state3, state4};
   SwerveDriveKinematics<4>::DesaturateWheelSpeeds(&arr, 5.5_mps);
 
-  double kFactor = 5.5 / 7.0;
+  double factor = 5.5 / 7.0;
 
-  EXPECT_NEAR(arr[0].speed.value(), 5.0 * kFactor, kEpsilon);
-  EXPECT_NEAR(arr[1].speed.value(), 6.0 * kFactor, kEpsilon);
-  EXPECT_NEAR(arr[2].speed.value(), 4.0 * kFactor, kEpsilon);
-  EXPECT_NEAR(arr[3].speed.value(), 7.0 * kFactor, kEpsilon);
+  EXPECT_NEAR(arr[0].speed.value(), 5.0 * factor, EPSILON);
+  EXPECT_NEAR(arr[1].speed.value(), 6.0 * factor, EPSILON);
+  EXPECT_NEAR(arr[2].speed.value(), 4.0 * factor, EPSILON);
+  EXPECT_NEAR(arr[3].speed.value(), 7.0 * factor, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest, DesaturateSmooth) {
@@ -287,12 +287,12 @@ TEST_F(SwerveDriveKinematicsTest, DesaturateSmooth) {
   SwerveDriveKinematics<4>::DesaturateWheelSpeeds(
       &arr, m_kinematics.ToChassisSpeeds(arr), 5.5_mps, 5.5_mps, 3.5_rad_per_s);
 
-  double kFactor = 5.5 / 7.0;
+  double factor = 5.5 / 7.0;
 
-  EXPECT_NEAR(arr[0].speed.value(), 5.0 * kFactor, kEpsilon);
-  EXPECT_NEAR(arr[1].speed.value(), 6.0 * kFactor, kEpsilon);
-  EXPECT_NEAR(arr[2].speed.value(), 4.0 * kFactor, kEpsilon);
-  EXPECT_NEAR(arr[3].speed.value(), 7.0 * kFactor, kEpsilon);
+  EXPECT_NEAR(arr[0].speed.value(), 5.0 * factor, EPSILON);
+  EXPECT_NEAR(arr[1].speed.value(), 6.0 * factor, EPSILON);
+  EXPECT_NEAR(arr[2].speed.value(), 4.0 * factor, EPSILON);
+  EXPECT_NEAR(arr[3].speed.value(), 7.0 * factor, EPSILON);
 }
 
 TEST_F(SwerveDriveKinematicsTest, DesaturateNegativeSpeed) {
@@ -304,8 +304,8 @@ TEST_F(SwerveDriveKinematicsTest, DesaturateNegativeSpeed) {
   wpi::array<SwerveModuleState, 4> arr{state1, state2, state3, state4};
   SwerveDriveKinematics<4>::DesaturateWheelSpeeds(&arr, 1.0_mps);
 
-  EXPECT_NEAR(arr[0].speed.value(), 0.5, kEpsilon);
-  EXPECT_NEAR(arr[1].speed.value(), 0.5, kEpsilon);
-  EXPECT_NEAR(arr[2].speed.value(), -1.0, kEpsilon);
-  EXPECT_NEAR(arr[3].speed.value(), -1.0, kEpsilon);
+  EXPECT_NEAR(arr[0].speed.value(), 0.5, EPSILON);
+  EXPECT_NEAR(arr[1].speed.value(), 0.5, EPSILON);
+  EXPECT_NEAR(arr[2].speed.value(), -1.0, EPSILON);
+  EXPECT_NEAR(arr[3].speed.value(), -1.0, EPSILON);
 }

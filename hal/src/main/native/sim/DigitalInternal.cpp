@@ -12,13 +12,13 @@
 namespace hal {
 
 DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
-                      kNumDigitalChannels + kNumPWMHeaders>*
+                      NUM_DIGITAL_CHANNELS + NUM_PWM_HEADERS>*
     digitalChannelHandles;
 
 namespace init {
 void InitializeDigitalInternal() {
   static DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
-                               kNumDigitalChannels + kNumPWMHeaders>
+                               NUM_DIGITAL_CHANNELS + NUM_PWM_HEADERS>
       dcH;
   digitalChannelHandles = &dcH;
 }

@@ -16,68 +16,68 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
   public static final class DriveConstants {
-    public static final int kLeftMotor1Port = 0;
-    public static final int kLeftMotor2Port = 1;
-    public static final int kRightMotor1Port = 2;
-    public static final int kRightMotor2Port = 3;
+    public static final int LEFT_MOTOR_1_PORT = 0;
+    public static final int LEFT_MOTOR_2_PORT = 1;
+    public static final int RIGHT_MOTOR_1_PORT = 2;
+    public static final int RIGHT_MOTOR_2_PORT = 3;
 
-    public static final int[] kLeftEncoderPorts = {0, 1};
-    public static final int[] kRightEncoderPorts = {2, 3};
-    public static final boolean kLeftEncoderReversed = false;
-    public static final boolean kRightEncoderReversed = true;
+    public static final int[] LEFT_ENCODER_PORTS = {0, 1};
+    public static final int[] RIGHT_ENCODER_PORTS = {2, 3};
+    public static final boolean LEFT_ENCODER_REVERSED = false;
+    public static final boolean RIGHT_ENCODER_REVERSED = true;
 
-    public static final int kEncoderCPR = 1024;
-    public static final double kWheelDiameter = Units.inchesToMeters(6);
-    public static final double kEncoderDistancePerPulse =
+    public static final int ENCODER_CPR = 1024;
+    public static final double WHEEL_DIAMETER = Units.inchesToMeters(6);
+    public static final double ENCODER_DISTANCE_PER_PULSE =
         // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelDiameter * Math.PI) / kEncoderCPR;
+        (WHEEL_DIAMETER * Math.PI) / ENCODER_CPR;
   }
 
   public static final class ShooterConstants {
-    public static final int[] kEncoderPorts = {4, 5};
-    public static final boolean kEncoderReversed = false;
-    public static final int kEncoderCPR = 1024;
-    public static final double kEncoderDistancePerPulse =
+    public static final int[] ENCODER_PORTS = {4, 5};
+    public static final boolean ENCODER_REVERSED = false;
+    public static final int ENCODER_CPR = 1024;
+    public static final double ENCODER_DISTANCE_PER_PULSE =
         // Distance units will be rotations
-        1.0 / kEncoderCPR;
+        1.0 / ENCODER_CPR;
 
-    public static final int kShooterMotorPort = 4;
-    public static final int kFeederMotorPort = 5;
+    public static final int SHOOTER_MOTOR_PORT = 4;
+    public static final int FEEDER_MOTOR_PORT = 5;
 
-    public static final double kShooterFreeRPS = 5300;
-    public static final double kShooterTargetRPS = 4000;
-    public static final double kShooterToleranceRPS = 50;
+    public static final double SHOOTER_FREE_RPS = 5300;
+    public static final double SHOOTER_TARGET_RPS = 4000;
+    public static final double SHOOTER_TOLERANCE_RPS = 50;
 
     // These are not real PID gains, and will have to be tuned for your specific robot.
-    public static final double kP = 1;
+    public static final double P = 1;
 
     // On a real robot the feedforward constants should be empirically determined; these are
     // reasonable guesses.
-    public static final double kS = 0.05; // V
+    public static final double S = 0.05; // V
     // Should have value 12V at free speed
-    public static final double kV = 12.0 / kShooterFreeRPS; // V/(rot/s)
-    public static final double kA = 0; // V/(rot/s²)
+    public static final double V = 12.0 / SHOOTER_FREE_RPS; // V/(rot/s)
+    public static final double A = 0; // V/(rot/s²)
 
-    public static final double kFeederSpeed = 0.5;
+    public static final double FEEDER_SPEED = 0.5;
   }
 
   public static final class IntakeConstants {
-    public static final int kMotorPort = 6;
-    public static final int[] kSolenoidPorts = {2, 3};
+    public static final int MOTOR_PORT = 6;
+    public static final int[] SOLENOID_PORTS = {2, 3};
   }
 
   public static final class StorageConstants {
-    public static final int kMotorPort = 7;
-    public static final int kBallSensorPort = 6;
+    public static final int MOTOR_PORT = 7;
+    public static final int BALL_SENSOR_PORT = 6;
   }
 
   public static final class AutoConstants {
-    public static final double kTimeout = 3;
-    public static final double kDriveDistance = 2; // m
-    public static final double kDriveSpeed = 0.5;
+    public static final double TIMEOUT = 3;
+    public static final double DRIVE_DISTANCE = 2; // m
+    public static final double DRIVE_SPEED = 0.5;
   }
 
   public static final class OIConstants {
-    public static final int kDriverControllerPort = 0;
+    public static final int DRIVER_CONTROLLER_PORT = 0;
   }
 }

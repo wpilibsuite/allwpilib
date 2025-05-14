@@ -41,7 +41,7 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }
 
-  EXPECT_NEAR((gearbox.Kv * 12_V).value(), encoder.GetRate(), 0.1);
+  EXPECT_NEAR((gearbox.V * 12_V).value(), encoder.GetRate(), 0.1);
 
   // Decay
   for (int i = 0; i < 100; i++) {

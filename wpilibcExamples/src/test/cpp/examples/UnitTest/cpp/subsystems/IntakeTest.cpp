@@ -14,10 +14,10 @@ class IntakeTest : public testing::Test {
  protected:
   Intake intake;  // create our intake
   frc::sim::PWMMotorControllerSim simMotor{
-      IntakeConstants::kMotorPort};  // create our simulation PWM
+      IntakeConstants::MOTOR_PORT};  // create our simulation PWM
   frc::sim::DoubleSolenoidSim simPiston{
-      frc::PneumaticsModuleType::CTREPCM, IntakeConstants::kPistonFwdChannel,
-      IntakeConstants::kPistonRevChannel};  // create our simulation solenoid
+      frc::PneumaticsModuleType::CTREPCM, IntakeConstants::PISTON_FWD_CHANNEL,
+      IntakeConstants::PISTON_REV_CHANNEL};  // create our simulation solenoid
 };
 
 TEST_F(IntakeTest, DoesntWorkWhenClosed) {
@@ -36,10 +36,10 @@ TEST_F(IntakeTest, WorksWhenOpen) {
 
 TEST_F(IntakeTest, Retract) {
   intake.Retract();
-  EXPECT_EQ(frc::DoubleSolenoid::Value::kReverse, simPiston.Get());
+  EXPECT_EQ(frc::DoubleSolenoid::Value::REVERSE, simPiston.Get());
 }
 
 TEST_F(IntakeTest, Deploy) {
   intake.Deploy();
-  EXPECT_EQ(frc::DoubleSolenoid::Value::kForward, simPiston.Get());
+  EXPECT_EQ(frc::DoubleSolenoid::Value::FORWARD, simPiston.Get());
 }

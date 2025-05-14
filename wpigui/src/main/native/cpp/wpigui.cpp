@@ -625,16 +625,16 @@ static void StyleColorsDeepDark() {
 void gui::SetStyle(Style style) {
   gContext->style = static_cast<int>(style);
   switch (style) {
-    case kStyleClassic:
+    case STYLE_CLASSIC:
       ImGui::StyleColorsClassic();
       break;
-    case kStyleDark:
+    case STYLE_DARK:
       ImGui::StyleColorsDark();
       break;
-    case kStyleLight:
+    case STYLE_LIGHT:
       ImGui::StyleColorsLight();
       break;
-    case kStyleDeepDark:
+    case STYLE_DEEP_DARK:
       StyleColorsDeepDark();
       break;
   }
@@ -679,21 +679,21 @@ void gui::EmitViewMenu() {
   if (ImGui::BeginMenu("View")) {
     if (ImGui::BeginMenu("Style")) {
       bool selected;
-      selected = gContext->style == kStyleClassic;
+      selected = gContext->style == STYLE_CLASSIC;
       if (ImGui::MenuItem("Classic", nullptr, &selected, true)) {
-        SetStyle(kStyleClassic);
+        SetStyle(STYLE_CLASSIC);
       }
-      selected = gContext->style == kStyleDark;
+      selected = gContext->style == STYLE_DARK;
       if (ImGui::MenuItem("Dark", nullptr, &selected, true)) {
-        SetStyle(kStyleDark);
+        SetStyle(STYLE_DARK);
       }
-      selected = gContext->style == kStyleLight;
+      selected = gContext->style == STYLE_LIGHT;
       if (ImGui::MenuItem("Light", nullptr, &selected, true)) {
-        SetStyle(kStyleLight);
+        SetStyle(STYLE_LIGHT);
       }
-      selected = gContext->style == kStyleDeepDark;
+      selected = gContext->style == STYLE_DEEP_DARK;
       if (ImGui::MenuItem("Deep Dark", nullptr, &selected, true)) {
-        SetStyle(kStyleDeepDark);
+        SetStyle(STYLE_DEEP_DARK);
       }
       ImGui::EndMenu();
     }
@@ -710,7 +710,7 @@ void gui::EmitViewMenu() {
     }
 
     if (ImGui::BeginMenu("Zoom")) {
-      for (int i = 0; i < kFontScaledLevels && (25 * (i + 2)) <= 200; ++i) {
+      for (int i = 0; i < FONT_SCALED_LEVELS && (25 * (i + 2)) <= 200; ++i) {
         char label[20];
         std::snprintf(label, sizeof(label), "%d%%", 25 * (i + 2));
         bool selected = gContext->userScale == i;
@@ -761,9 +761,9 @@ bool gui::UpdateTextureFromImage(ImTextureID* texture, int width, int height,
   }
 
   if (width2 == width && height2 == height) {
-    UpdateTexture(texture, kPixelRGBA, width2, height2, imgData);
+    UpdateTexture(texture, PIXEL_RGBA, width2, height2, imgData);
   } else {
-    *texture = CreateTexture(kPixelRGBA, width2, height2, imgData);
+    *texture = CreateTexture(PIXEL_RGBA, width2, height2, imgData);
   }
 
   stbi_image_free(imgData);
@@ -781,7 +781,7 @@ bool gui::CreateTextureFromFile(const char* filename, ImTextureID* out_texture,
     return false;
   }
 
-  *out_texture = CreateTexture(kPixelRGBA, width, height, data);
+  *out_texture = CreateTexture(PIXEL_RGBA, width, height, data);
   if (out_width) {
     *out_width = width;
   }
@@ -806,7 +806,7 @@ bool gui::CreateTextureFromImage(const unsigned char* data, int len,
     return false;
   }
 
-  *out_texture = CreateTexture(kPixelRGBA, width, height, imgData);
+  *out_texture = CreateTexture(PIXEL_RGBA, width, height, imgData);
   if (out_width) {
     *out_width = width;
   }

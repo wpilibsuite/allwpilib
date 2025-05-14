@@ -54,7 +54,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_AddressableLEDJNI_free
   (JNIEnv* env, jclass, jint handle)
 {
-  if (handle != HAL_kInvalidHandle) {
+  if (handle != HAL_InvalidHandle) {
     HAL_FreeAddressableLED(static_cast<HAL_AddressableLEDHandle>(handle));
   }
 }

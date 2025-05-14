@@ -16,7 +16,7 @@ template <typename T>
 struct SimpleMotorFeedforwardProtoTestData {
   using Type = SimpleMotorFeedforward<T>;
 
-  inline static const Type kTestData = {
+  inline static const Type TEST_DATA = {
       units::volt_t{0.4}, units::volt_t{4.0} / (units::unit_t<T>{1} / 1_s),
       units::volt_t{0.7} / (units::unit_t<T>{1} / 1_s / 1_s), 25_ms};
 

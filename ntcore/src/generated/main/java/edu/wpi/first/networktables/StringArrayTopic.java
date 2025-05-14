@@ -9,7 +9,7 @@ package edu.wpi.first.networktables;
 /** NetworkTables StringArray topic. */
 public final class StringArrayTopic extends Topic {
   /** The default type string for this topic type. */
-  public static final String kTypeString = "string[]";
+  public static final String TYPE_STRING = "string[]";
 
   /**
    * Construct from a generic topic.
@@ -51,7 +51,7 @@ public final class StringArrayTopic extends Topic {
     return new StringArrayEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kStringArray.getValue(),
+            m_handle, NetworkTableType.STRING_ARRAY.getValue(),
             "string[]", options),
         defaultValue);
   }
@@ -79,7 +79,7 @@ public final class StringArrayTopic extends Topic {
     return new StringArrayEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kStringArray.getValue(),
+            m_handle, NetworkTableType.STRING_ARRAY.getValue(),
             typeString, options),
         defaultValue);
   }
@@ -104,7 +104,7 @@ public final class StringArrayTopic extends Topic {
     return new StringArrayEntryImpl(
         this,
         NetworkTablesJNI.publish(
-            m_handle, NetworkTableType.kStringArray.getValue(),
+            m_handle, NetworkTableType.STRING_ARRAY.getValue(),
             "string[]", options),
         new String[] {});
   }
@@ -134,7 +134,7 @@ public final class StringArrayTopic extends Topic {
     return new StringArrayEntryImpl(
         this,
         NetworkTablesJNI.publishEx(
-            m_handle, NetworkTableType.kStringArray.getValue(),
+            m_handle, NetworkTableType.STRING_ARRAY.getValue(),
             typeString, properties, options),
         new String[] {});
   }
@@ -165,7 +165,7 @@ public final class StringArrayTopic extends Topic {
     return new StringArrayEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kStringArray.getValue(),
+            m_handle, NetworkTableType.STRING_ARRAY.getValue(),
             "string[]", options),
         defaultValue);
   }
@@ -198,7 +198,7 @@ public final class StringArrayTopic extends Topic {
     return new StringArrayEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kStringArray.getValue(),
+            m_handle, NetworkTableType.STRING_ARRAY.getValue(),
             typeString, options),
         defaultValue);
   }

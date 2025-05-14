@@ -46,18 +46,18 @@ class SwerveControllerCommandTest : public ::testing::Test {
       frc::TrapezoidProfile<units::radians>::Constraints{
           9_rad_per_s, units::unit_t<radians_per_second_squared_t>(3)}};
 
-  static constexpr units::meter_t kxTolerance{1 / 12.0};
-  static constexpr units::meter_t kyTolerance{1 / 12.0};
-  static constexpr units::radian_t kAngularTolerance{1 / 12.0};
+  static constexpr units::meter_t X_TOLERANCE{1 / 12.0};
+  static constexpr units::meter_t Y_TOLERANCE{1 / 12.0};
+  static constexpr units::radian_t ANGULAR_TOLERANCE{1 / 12.0};
 
-  static constexpr units::meter_t kWheelBase{0.5};
-  static constexpr units::meter_t kTrackwidth{0.5};
+  static constexpr units::meter_t WHEEL_BASE{0.5};
+  static constexpr units::meter_t TRACK_WIDTH{0.5};
 
   frc::SwerveDriveKinematics<4> m_kinematics{
-      frc::Translation2d{kWheelBase / 2, kTrackwidth / 2},
-      frc::Translation2d{kWheelBase / 2, -kTrackwidth / 2},
-      frc::Translation2d{-kWheelBase / 2, kTrackwidth / 2},
-      frc::Translation2d{-kWheelBase / 2, -kTrackwidth / 2}};
+      frc::Translation2d{WHEEL_BASE / 2, TRACK_WIDTH / 2},
+      frc::Translation2d{WHEEL_BASE / 2, -TRACK_WIDTH / 2},
+      frc::Translation2d{-WHEEL_BASE / 2, TRACK_WIDTH / 2},
+      frc::Translation2d{-WHEEL_BASE / 2, -TRACK_WIDTH / 2}};
 
   frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, 0_rad, m_modulePositions,
                                          frc::Pose2d{0_m, 0_m, 0_rad}};
@@ -106,8 +106,8 @@ TEST_F(SwerveControllerCommandTest, ReachesReference) {
   m_timer.Stop();
   command.End(false);
 
-  EXPECT_NEAR_UNITS(endState.pose.X(), getRobotPose().X(), kxTolerance);
-  EXPECT_NEAR_UNITS(endState.pose.Y(), getRobotPose().Y(), kyTolerance);
+  EXPECT_NEAR_UNITS(endState.pose.X(), getRobotPose().X(), X_TOLERANCE);
+  EXPECT_NEAR_UNITS(endState.pose.Y(), getRobotPose().Y(), Y_TOLERANCE);
   EXPECT_NEAR_UNITS(endState.pose.Rotation().Radians(),
-                    getRobotPose().Rotation().Radians(), kAngularTolerance);
+                    getRobotPose().Rotation().Radians(), ANGULAR_TOLERANCE);
 }

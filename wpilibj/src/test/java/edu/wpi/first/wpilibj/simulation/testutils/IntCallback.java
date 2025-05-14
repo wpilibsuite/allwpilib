@@ -9,7 +9,7 @@ import edu.wpi.first.hal.HALValue;
 public class IntCallback extends CallbackHelperBase<Integer> {
   @Override
   public void callback(String name, HALValue value) {
-    if (value.getType() != HALValue.kInt) {
+    if (value.getType() != HALValue.INT) {
       throw new IllegalArgumentException("Wrong callback for type " + value.getType());
     }
 

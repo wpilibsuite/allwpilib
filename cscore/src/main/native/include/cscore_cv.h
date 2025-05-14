@@ -49,7 +49,7 @@ class CvSource : public ImageSource {
    *
    * <p>
    * The image format is guessed from the number of channels. The channel
-   * mapping is as follows. 1: kGray 2: kYUYV 3: BGR 4: BGRA Any other channel
+   * mapping is as follows. 1: GRAY 2: YUYV 3: BGR 4: BGRA Any other channel
    * numbers will throw an error. If your image is an in alternate format, use
    * the overload that takes a PixelFormat.
    *
@@ -98,7 +98,7 @@ class CvSink : public ImageSink {
    * @param pixelFormat The pixel format to read
    */
   explicit CvSink(std::string_view name, VideoMode::PixelFormat pixelFormat =
-                                             VideoMode::PixelFormat::kBGR);
+                                             VideoMode::PixelFormat::BGR);
 
   /**
    * Wait for the next frame and get the image.
@@ -211,42 +211,42 @@ inline bool CvSource::VerifyFormat(cv::Mat& image,
                                    VideoMode::PixelFormat pixelFormat) {
   int channels = image.channels();
   switch (pixelFormat) {
-    case VideoMode::PixelFormat::kBGR:
+    case VideoMode::PixelFormat::BGR:
       if (channels == 3) {
         return true;
       }
       break;
-    case VideoMode::PixelFormat::kBGRA:
+    case VideoMode::PixelFormat::BGRA:
       if (channels == 4) {
         return true;
       }
       break;
-    case VideoMode::PixelFormat::kGray:
+    case VideoMode::PixelFormat::GRAY:
       if (channels == 1) {
         return true;
       }
       break;
-    case VideoMode::PixelFormat::kRGB565:
+    case VideoMode::PixelFormat::RGB565:
       if (channels == 2) {
         return true;
       }
       break;
-    case VideoMode::PixelFormat::kUYVY:
+    case VideoMode::PixelFormat::UYVY:
       if (channels == 2) {
         return true;
       }
       break;
-    case VideoMode::PixelFormat::kY16:
+    case VideoMode::PixelFormat::Y16:
       if (channels == 2) {
         return true;
       }
       break;
-    case VideoMode::PixelFormat::kYUYV:
+    case VideoMode::PixelFormat::YUYV:
       if (channels == 2) {
         return true;
       }
       break;
-    case VideoMode::PixelFormat::kMJPEG:
+    case VideoMode::PixelFormat::MJPEG:
       if (channels == 1) {
         return true;
       }
@@ -270,16 +270,16 @@ inline void CvSource::PutFrame(cv::Mat& image) {
   VideoMode::PixelFormat format;
   if (channels == 1) {
     // 1 channel is assumed Grayscale
-    format = VideoMode::PixelFormat::kGray;
+    format = VideoMode::PixelFormat::GRAY;
   } else if (channels == 2) {
     // 2 channels is assumed YUYV
-    format = VideoMode::PixelFormat::kYUYV;
+    format = VideoMode::PixelFormat::YUYV;
   } else if (channels == 3) {
     // 3 channels is assumed BGR
-    format = VideoMode::PixelFormat::kBGR;
+    format = VideoMode::PixelFormat::BGR;
   } else if (channels == 4) {
     // 4 channels is assumed BGRA
-    format = VideoMode::PixelFormat::kBGRA;
+    format = VideoMode::PixelFormat::BGRA;
   } else {
     // TODO Error
     return;

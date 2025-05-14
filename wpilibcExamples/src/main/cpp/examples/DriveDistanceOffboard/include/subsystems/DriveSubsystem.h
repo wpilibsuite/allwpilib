@@ -97,7 +97,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
  private:
   frc::TrapezoidProfile<units::meters> m_profile{
-      {DriveConstants::kMaxSpeed, DriveConstants::kMaxAcceleration}};
+      {DriveConstants::MAX_SPEED, DriveConstants::MAX_ACCELERATION}};
   frc::Timer m_timer;
   units::meter_t m_initialLeftDistance;
   units::meter_t m_initialRightDistance;

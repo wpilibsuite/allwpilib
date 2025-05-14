@@ -22,9 +22,9 @@ import edu.wpi.first.math.util.Units;
  * point toward. This heading reference is profiled for smoothness.
  */
 public class HolonomicDriveController {
-  private Pose2d m_poseError = Pose2d.kZero;
-  private Rotation2d m_rotationError = Rotation2d.kZero;
-  private Pose2d m_poseTolerance = Pose2d.kZero;
+  private Pose2d m_poseError = Pose2d.ZERO;
+  private Rotation2d m_rotationError = Rotation2d.ZERO;
+  private Pose2d m_poseTolerance = Pose2d.ZERO;
   private boolean m_enabled = true;
 
   private final PIDController m_xController;

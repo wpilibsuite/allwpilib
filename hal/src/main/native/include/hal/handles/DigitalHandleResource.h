@@ -58,14 +58,14 @@ DigitalHandleResource<THandle, TStruct, size>::Allocate(
     int16_t index, HAL_HandleEnum enumValue, THandle* handle, int32_t* status) {
   // don't acquire the lock if we can fail early.
   if (index < 0 || index >= size) {
-    *handle = HAL_kInvalidHandle;
+    *handle = HAL_InvalidHandle;
     *status = RESOURCE_OUT_OF_RANGE;
     return nullptr;
   }
   std::scoped_lock lock(m_handleMutexes[index]);
   // check for allocation, otherwise allocate and return a valid handle
   if (m_structures[index] != nullptr) {
-    *handle = HAL_kInvalidHandle;
+    *handle = HAL_InvalidHandle;
     *status = RESOURCE_IS_ALLOCATED;
     return m_structures[index];
   }

@@ -32,15 +32,15 @@ class SerialPort {
    */
   enum Port {
     /// Onboard serial port on the roboRIO.
-    kOnboard = 0,
+    ONBOARD = 0,
     /// MXP (roboRIO MXP) serial port.
-    kMXP = 1,
-    /// USB serial port (same as kUSB1).
-    kUSB = 2,
+    MXP = 1,
+    /// USB serial port (same as USB1).
+    USB = 2,
     /// USB serial port 1.
-    kUSB1 = 2,
+    USB1 = 2,
     /// USB serial port 2.
-    kUSB2 = 3
+    USB2 = 3
   };
 
   /**
@@ -48,15 +48,15 @@ class SerialPort {
    */
   enum Parity {
     /// No parity.
-    kParity_None = 0,
+    PARITY_NONE = 0,
     /// Odd parity.
-    kParity_Odd = 1,
+    PARITY_ODD = 1,
     /// Even parity.
-    kParity_Even = 2,
+    PARITY_EVEN = 2,
     /// Parity bit always on.
-    kParity_Mark = 3,
+    PARITY_MARK = 3,
     /// Parity bit always off.
-    kParity_Space = 4
+    PARITY_SPACE = 4
   };
 
   /**
@@ -64,11 +64,11 @@ class SerialPort {
    */
   enum StopBits {
     /// One stop bit.
-    kStopBits_One = 10,
+    STOP_BITS_ONE = 10,
     /// One and a half stop bits.
-    kStopBits_OnePointFive = 15,
+    STOP_BITS_ONE_POINT_FIVE = 15,
     /// Two stop bits.
-    kStopBits_Two = 20
+    STOP_BITS_TWO = 20
   };
 
   /**
@@ -76,13 +76,13 @@ class SerialPort {
    */
   enum FlowControl {
     /// No flow control.
-    kFlowControl_None = 0,
+    FLOW_CONTROL_NONE = 0,
     /// XON/XOFF flow control.
-    kFlowControl_XonXoff = 1,
+    FLOW_CONTROL_XONXOFF = 1,
     /// RTS/CTS flow control.
-    kFlowControl_RtsCts = 2,
+    FLOW_CONTROL_RTSCTS = 2,
     /// DTS/DSR flow control.
-    kFlowControl_DtrDsr = 4
+    FLOW_CONTROL_DTRDSR = 4
   };
 
   /**
@@ -90,9 +90,9 @@ class SerialPort {
    */
   enum WriteBufferMode {
     /// Flush the buffer on each access.
-    kFlushOnAccess = 1,
+    FLUSH_ON_ACCESS = 1,
     /// Flush the buffer when it is full.
-    kFlushWhenFull = 2
+    FLUSH_WHEN_FULL = 2
   };
 
   /**
@@ -106,9 +106,9 @@ class SerialPort {
    * @param stopBits The number of stop bits to use as defined by the enum
    *                 StopBits.
    */
-  explicit SerialPort(int baudRate, Port port = kOnboard, int dataBits = 8,
-                      Parity parity = kParity_None,
-                      StopBits stopBits = kStopBits_One);
+  explicit SerialPort(int baudRate, Port port = ONBOARD, int dataBits = 8,
+                      Parity parity = PARITY_NONE,
+                      StopBits stopBits = STOP_BITS_ONE);
 
   /**
    * Create an instance of a Serial Port class.
@@ -125,9 +125,9 @@ class SerialPort {
    * @param stopBits The number of stop bits to use as defined by the enum
    *                 StopBits.
    */
-  SerialPort(int baudRate, std::string_view portName, Port port = kOnboard,
-             int dataBits = 8, Parity parity = kParity_None,
-             StopBits stopBits = kStopBits_One);
+  SerialPort(int baudRate, std::string_view portName, Port port = ONBOARD,
+             int dataBits = 8, Parity parity = PARITY_NONE,
+             StopBits stopBits = STOP_BITS_ONE);
 
   SerialPort(SerialPort&& rhs) = default;
   SerialPort& operator=(SerialPort&& rhs) = default;
@@ -228,10 +228,10 @@ class SerialPort {
   /**
    * Specify the flushing behavior of the output buffer.
    *
-   * When set to kFlushOnAccess, data is synchronously written to the serial
+   * When set to FLUSH_ON_ACCESS, data is synchronously written to the serial
    * port after each call to either Printf() or Write().
    *
-   * When set to kFlushWhenFull, data will only be written to the serial port
+   * When set to FLUSH_WHEN_FULL, data will only be written to the serial port
    * when the buffer is full or when Flush() is called.
    *
    * @param mode The write buffer mode.
@@ -241,7 +241,7 @@ class SerialPort {
   /**
    * Force the output buffer to be written to the port.
    *
-   * This is used when SetWriteBufferMode() is set to kFlushWhenFull to force a
+   * This is used when SetWriteBufferMode() is set to FLUSH_WHEN_FULL to force a
    * flush before the buffer is full.
    */
   void Flush();

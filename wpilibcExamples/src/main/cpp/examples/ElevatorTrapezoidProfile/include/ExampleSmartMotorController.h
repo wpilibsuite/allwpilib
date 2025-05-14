@@ -12,7 +12,7 @@
  */
 class ExampleSmartMotorController {
  public:
-  enum PIDMode { kPosition, kVelocity, kMovementWitchcraft };
+  enum PIDMode { POSITION, VELOCITY, MOVEMENT_WITCHCRAFT };
 
   /**
    * Creates a new ExampleSmartMotorController.

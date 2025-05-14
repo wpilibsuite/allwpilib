@@ -28,12 +28,12 @@ class SwerveModule {
   void SetDesiredState(frc::SwerveModuleState& state);
 
  private:
-  static constexpr auto kWheelRadius = 0.0508_m;
-  static constexpr int kEncoderResolution = 4096;
+  static constexpr auto WHEEL_RADIUS = 0.0508_m;
+  static constexpr int ENCODER_RESOLUTION = 4096;
 
-  static constexpr auto kModuleMaxAngularVelocity =
+  static constexpr auto MODULE_MAX_ANGULAR_VELOCITY =
       std::numbers::pi * 1_rad_per_s;  // radians per second
-  static constexpr auto kModuleMaxAngularAcceleration =
+  static constexpr auto MODULE_MAX_ANGULAR_ACCELERATION =
       std::numbers::pi * 2_rad_per_s / 1_s;  // radians per second^2
 
   frc::PWMSparkMax m_driveMotor;
@@ -47,7 +47,7 @@ class SwerveModule {
       1.0,
       0.0,
       0.0,
-      {kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration}};
+      {MODULE_MAX_ANGULAR_VELOCITY, MODULE_MAX_ANGULAR_ACCELERATION}};
 
   frc::SimpleMotorFeedforward<units::meters> m_driveFeedforward{1_V,
                                                                 3_V / 1_mps};

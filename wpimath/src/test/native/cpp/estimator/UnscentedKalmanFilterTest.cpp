@@ -37,7 +37,7 @@ frc::Vectord<5> DriveDynamics(const frc::Vectord<5>& x,
   constexpr auto J = 5.6_kg_sq_m;      // Robot moment of inertia
 
   auto C1 = -std::pow(Ghigh, 2) * motors.Kt /
-            (motors.Kv * motors.R * units::math::pow<2>(r));
+            (motors.V * motors.R * units::math::pow<2>(r));
   auto C2 = Ghigh * motors.Kt / (motors.R * r);
   auto k1 = (1 / m + units::math::pow<2>(rb) / J);
   auto k2 = (1 / m - units::math::pow<2>(rb) / J);

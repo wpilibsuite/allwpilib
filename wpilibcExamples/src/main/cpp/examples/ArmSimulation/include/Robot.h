@@ -21,6 +21,6 @@ class Robot : public frc::TimedRobot {
   void DisabledInit() override;
 
  private:
-  frc::Joystick m_joystick{kJoystickPort};
+  frc::Joystick m_joystick{JOYSTICK_PORT};
   Arm m_arm;
 };

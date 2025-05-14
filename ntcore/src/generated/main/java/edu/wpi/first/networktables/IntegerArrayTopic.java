@@ -9,7 +9,7 @@ package edu.wpi.first.networktables;
 /** NetworkTables IntegerArray topic. */
 public final class IntegerArrayTopic extends Topic {
   /** The default type string for this topic type. */
-  public static final String kTypeString = "int[]";
+  public static final String TYPE_STRING = "int[]";
 
   /**
    * Construct from a generic topic.
@@ -51,7 +51,7 @@ public final class IntegerArrayTopic extends Topic {
     return new IntegerArrayEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kIntegerArray.getValue(),
+            m_handle, NetworkTableType.INTEGER_ARRAY.getValue(),
             "int[]", options),
         defaultValue);
   }
@@ -79,7 +79,7 @@ public final class IntegerArrayTopic extends Topic {
     return new IntegerArrayEntryImpl(
         this,
         NetworkTablesJNI.subscribe(
-            m_handle, NetworkTableType.kIntegerArray.getValue(),
+            m_handle, NetworkTableType.INTEGER_ARRAY.getValue(),
             typeString, options),
         defaultValue);
   }
@@ -104,7 +104,7 @@ public final class IntegerArrayTopic extends Topic {
     return new IntegerArrayEntryImpl(
         this,
         NetworkTablesJNI.publish(
-            m_handle, NetworkTableType.kIntegerArray.getValue(),
+            m_handle, NetworkTableType.INTEGER_ARRAY.getValue(),
             "int[]", options),
         new long[] {});
   }
@@ -134,7 +134,7 @@ public final class IntegerArrayTopic extends Topic {
     return new IntegerArrayEntryImpl(
         this,
         NetworkTablesJNI.publishEx(
-            m_handle, NetworkTableType.kIntegerArray.getValue(),
+            m_handle, NetworkTableType.INTEGER_ARRAY.getValue(),
             typeString, properties, options),
         new long[] {});
   }
@@ -165,7 +165,7 @@ public final class IntegerArrayTopic extends Topic {
     return new IntegerArrayEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kIntegerArray.getValue(),
+            m_handle, NetworkTableType.INTEGER_ARRAY.getValue(),
             "int[]", options),
         defaultValue);
   }
@@ -198,7 +198,7 @@ public final class IntegerArrayTopic extends Topic {
     return new IntegerArrayEntryImpl(
         this,
         NetworkTablesJNI.getEntry(
-            m_handle, NetworkTableType.kIntegerArray.getValue(),
+            m_handle, NetworkTableType.INTEGER_ARRAY.getValue(),
             typeString, options),
         defaultValue);
   }

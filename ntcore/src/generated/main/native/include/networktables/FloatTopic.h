@@ -241,7 +241,7 @@ class FloatTopic final : public Topic {
   using ParamType = float;
   using TimestampedValueType = TimestampedFloat;
   /** The default type string for this topic type. */
-  static constexpr std::string_view kTypeString = "float";
+  static constexpr std::string_view TYPE_STRING = "float";
 
   FloatTopic() = default;
 
@@ -278,7 +278,7 @@ class FloatTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return FloatSubscriber{
         ::nt::Subscribe(m_handle, NT_FLOAT, "float", options),
         defaultValue};
@@ -302,7 +302,7 @@ class FloatTopic final : public Topic {
   [[nodiscard]]
   SubscriberType SubscribeEx(
       std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return FloatSubscriber{
         ::nt::Subscribe(m_handle, NT_FLOAT, typeString, options),
         defaultValue};
@@ -324,7 +324,7 @@ class FloatTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
+  PublisherType Publish(const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return FloatPublisher{
         ::nt::Publish(m_handle, NT_FLOAT, "float", options)};
   }
@@ -349,7 +349,7 @@ class FloatTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::json& properties, const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return FloatPublisher{
         ::nt::PublishEx(m_handle, NT_FLOAT, typeString, properties, options)};
   }
@@ -376,7 +376,7 @@ class FloatTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(ParamType defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions) {
+                     const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return FloatEntry{
         ::nt::GetEntry(m_handle, NT_FLOAT, "float", options),
         defaultValue};
@@ -404,7 +404,7 @@ class FloatTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
-                       const PubSubOptions& options = kDefaultPubSubOptions) {
+                       const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return FloatEntry{
         ::nt::GetEntry(m_handle, NT_FLOAT, typeString, options),
         defaultValue};

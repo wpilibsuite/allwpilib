@@ -28,7 +28,7 @@ int main() {
   std::atomic<bool> stopCamera{false};
 
   cs::UsbCamera camera{"usbcam", 0};
-  camera.SetVideoMode(cs::VideoMode::kMJPEG, 640, 480, 30);
+  camera.SetVideoMode(cs::VideoMode::MJPEG, 640, 480, 30);
   cs::CvSink cvsink{"cvsink"};
   cvsink.SetSource(camera);
 
@@ -85,7 +85,7 @@ int main() {
       // create or update texture
       if (!tex || frame->cols != tex.GetWidth() ||
           frame->rows != tex.GetHeight()) {
-        tex = gui::Texture(gui::kPixelRGBA, frame->cols, frame->rows,
+        tex = gui::Texture(gui::PIXEL_RGBA, frame->cols, frame->rows,
                            frame->data);
       } else {
         tex.Update(frame->data);

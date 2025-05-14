@@ -36,12 +36,12 @@ ServerClient4::ServerClient4(std::string_view name, std::string_view connInfo,
 }
 
 bool ServerClient4::ProcessIncomingText(std::string_view data) {
-  constexpr int kMaxImmProcessing = 10;
+  constexpr int MAX_IMM_PROCESSING = 10;
   bool queueWasEmpty = m_incoming.empty();
   // can't directly process, because we don't know how big it is
   WireDecodeText(data, m_incoming, m_logger);
   if (queueWasEmpty &&
-      DoProcessIncomingMessages(m_incoming, kMaxImmProcessing)) {
+      DoProcessIncomingMessages(m_incoming, MAX_IMM_PROCESSING)) {
     m_wire.StopRead();
     return true;
   }
@@ -49,9 +49,9 @@ bool ServerClient4::ProcessIncomingText(std::string_view data) {
 }
 
 bool ServerClient4::ProcessIncomingBinary(std::span<const uint8_t> data) {
-  constexpr int kMaxImmProcessing = 10;
+  constexpr int MAX_IMM_PROCESSING = 10;
   // if we've already queued, keep queuing
-  int count = m_incoming.empty() ? 0 : kMaxImmProcessing;
+  int count = m_incoming.empty() ? 0 : MAX_IMM_PROCESSING;
   for (;;) {
     if (data.empty()) {
       break;
@@ -76,13 +76,13 @@ bool ServerClient4::ProcessIncomingBinary(std::span<const uint8_t> data) {
     }
 
     // handle value set
-    if (++count < kMaxImmProcessing) {
+    if (++count < MAX_IMM_PROCESSING) {
       ClientSetValue(pubuid, value);
     } else {
       m_incoming.ClientSetValue(pubuid, value);
     }
   }
-  if (count >= kMaxImmProcessing) {
+  if (count >= MAX_IMM_PROCESSING) {
     m_wire.StopRead();
     return true;
   }

@@ -32,14 +32,14 @@ using namespace sysid;
 Analyzer::Analyzer(glass::Storage& storage, wpi::Logger& logger)
     : m_logger(logger) {
   // Fill the StringMap with preset values.
-  m_presets["Default"] = presets::kDefault;
-  m_presets["WPILib"] = presets::kWPILib;
-  m_presets["CTRE Phoenix 5"] = presets::kCTREv5;
-  m_presets["CTRE Phoenix 6"] = presets::kCTREv6;
-  m_presets["REV Brushless Encoder Port"] = presets::kREVNEOBuiltIn;
-  m_presets["REV Brushed Encoder Port"] = presets::kREVNonNEO;
-  m_presets["REV Data Port"] = presets::kREVNonNEO;
-  m_presets["Venom"] = presets::kVenom;
+  m_presets["Default"] = presets::DEFAULT;
+  m_presets["WPILib"] = presets::WPILIB;
+  m_presets["CTRE Phoenix 5"] = presets::CTRE_V5;
+  m_presets["CTRE Phoenix 6"] = presets::CTRE_V6;
+  m_presets["REV Brushless Encoder Port"] = presets::REV_NEO_BUILTIN;
+  m_presets["REV Brushed Encoder Port"] = presets::REV_NON_NEO;
+  m_presets["REV Data Port"] = presets::REV_NON_NEO;
+  m_presets["Venom"] = presets::VENOM;
 
   ResetData();
   UpdateFeedbackGains();
@@ -53,28 +53,28 @@ void Analyzer::UpdateFeedforwardGains() {
     m_accelRSquared = feedforwardGains.olsResult.rSquared;
     m_accelRMSE = feedforwardGains.olsResult.rmse;
     m_settings.preset.measurementDelay =
-        m_settings.type == FeedbackControllerLoopType::kPosition
+        m_settings.type == FeedbackControllerLoopType::POSITION
             // Clamp feedback measurement delay to ≥ 0
             ? units::math::max(0_s, m_manager->GetPositionDelay())
             : units::math::max(0_s, m_manager->GetVelocityDelay());
     PrepareGraphs();
   } catch (const sysid::InvalidDataError& e) {
-    m_state = AnalyzerState::kGeneralDataError;
+    m_state = AnalyzerState::GENERAL_DATA_ERROR;
     HandleError(e.what());
   } catch (const sysid::NoQuasistaticDataError& e) {
-    m_state = AnalyzerState::kVelocityThresholdError;
+    m_state = AnalyzerState::VELOCITY_THRESHOLD_ERROR;
     HandleError(e.what());
   } catch (const sysid::NoDynamicDataError& e) {
-    m_state = AnalyzerState::kTestDurationError;
+    m_state = AnalyzerState::TEST_DURATION_ERROR;
     HandleError(e.what());
   } catch (const AnalysisManager::FileReadingError& e) {
-    m_state = AnalyzerState::kFileError;
+    m_state = AnalyzerState::FILE_ERROR;
     HandleError(e.what());
   } catch (const wpi::json::exception& e) {
-    m_state = AnalyzerState::kFileError;
+    m_state = AnalyzerState::FILE_ERROR;
     HandleError(e.what());
   } catch (const std::exception& e) {
-    m_state = AnalyzerState::kFileError;
+    m_state = AnalyzerState::FILE_ERROR;
     HandleError(e.what());
   }
 }
@@ -82,11 +82,11 @@ void Analyzer::UpdateFeedforwardGains() {
 void Analyzer::UpdateFeedbackGains() {
   WPI_INFO(m_logger, "{}", "Updating feedback gains");
 
-  const auto& Kv = m_feedforwardGains.Kv;
-  const auto& Ka = m_feedforwardGains.Ka;
-  if (Kv.isValidGain && Ka.isValidGain) {
-    const auto& fb = m_manager->CalculateFeedback(Kv, Ka);
-    m_timescale = units::second_t{Ka.gain / Kv.gain};
+  const auto& V = m_feedforwardGains.V;
+  const auto& A = m_feedforwardGains.A;
+  if (V.isValidGain && A.isValidGain) {
+    const auto& fb = m_manager->CalculateFeedback(V, A);
+    m_timescale = units::second_t{A.gain / V.gain};
     m_timescaleValid = true;
     m_Kp = fb.Kp;
     m_Kd = fb.Kd;
@@ -113,16 +113,16 @@ static void SetPosition(double beginX, double beginY, double xShift,
 }
 
 bool Analyzer::IsErrorState() {
-  return m_state == AnalyzerState::kVelocityThresholdError ||
-         m_state == AnalyzerState::kTestDurationError ||
-         m_state == AnalyzerState::kGeneralDataError ||
-         m_state == AnalyzerState::kFileError;
+  return m_state == AnalyzerState::VELOCITY_THRESHOLD_ERROR ||
+         m_state == AnalyzerState::TEST_DURATION_ERROR ||
+         m_state == AnalyzerState::GENERAL_DATA_ERROR ||
+         m_state == AnalyzerState::FILE_ERROR;
 }
 
 bool Analyzer::IsDataErrorState() {
-  return m_state == AnalyzerState::kVelocityThresholdError ||
-         m_state == AnalyzerState::kTestDurationError ||
-         m_state == AnalyzerState::kGeneralDataError;
+  return m_state == AnalyzerState::VELOCITY_THRESHOLD_ERROR ||
+         m_state == AnalyzerState::TEST_DURATION_ERROR ||
+         m_state == AnalyzerState::GENERAL_DATA_ERROR;
 }
 
 void Analyzer::ResetData() {
@@ -140,7 +140,7 @@ bool Analyzer::DisplayResetAndUnitOverride() {
   ImGui::SameLine(width - ImGui::CalcTextSize("Reset").x);
   if (ImGui::Button("Reset")) {
     ResetData();
-    m_state = AnalyzerState::kWaitingForData;
+    m_state = AnalyzerState::WAITING_FOR_DATA;
     return true;
   }
 
@@ -158,9 +158,8 @@ bool Analyzer::DisplayResetAndUnitOverride() {
   ImGui::SetNextWindowSize(ImVec2(size.x / 4, size.y * 0.2));
   if (ImGui::BeginPopupModal("Override Units")) {
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 7);
-    ImGui::Combo("Units", &m_selectedOverrideUnit, kUnits,
-                 IM_ARRAYSIZE(kUnits));
-    unit = kUnits[m_selectedOverrideUnit];
+    ImGui::Combo("Units", &m_selectedOverrideUnit, UNITS, IM_ARRAYSIZE(UNITS));
+    unit = UNITS[m_selectedOverrideUnit];
 
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 7);
 
@@ -190,14 +189,14 @@ void Analyzer::ConfigParamsOnFileSelect() {
   m_settings.lqr.qp = 0.1;
   // Estimate qv as 1/4 * max velocity = 1/4 * (12V - kS) / kV
   m_settings.lqr.qv =
-      0.25 * (12.0 - m_feedforwardGains.Ks.gain) / m_feedforwardGains.Kv.gain;
+      0.25 * (12.0 - m_feedforwardGains.S.gain) / m_feedforwardGains.V.gain;
 }
 
 void Analyzer::Display() {
   DisplayGraphs();
 
   switch (m_state) {
-    case AnalyzerState::kWaitingForData: {
+    case AnalyzerState::WAITING_FOR_DATA: {
       ImGui::Text(
           "SysId is currently in theoretical analysis mode.\n"
           "To analyze recorded test data, select a "
@@ -222,7 +221,7 @@ void Analyzer::Display() {
       }
       break;
     }
-    case AnalyzerState::kNominalDisplay: {  // Allow the user to select which
+    case AnalyzerState::NOMINAL_DISPLAY: {  // Allow the user to select which
                                             // data set they want analyzed and
                                             // add a
       // reset button. Also show the units and the units per rotation.
@@ -244,24 +243,24 @@ void Analyzer::Display() {
       }
       break;
     }
-    case AnalyzerState::kFileError: {
+    case AnalyzerState::FILE_ERROR: {
       CreateErrorPopup(m_errorPopup, m_exception);
       if (!m_errorPopup) {
-        m_state = AnalyzerState::kWaitingForData;
+        m_state = AnalyzerState::WAITING_FOR_DATA;
         return;
       }
       break;
     }
-    case AnalyzerState::kMissingTestsError: {
+    case AnalyzerState::MISSING_TESTS_ERROR: {
       CreateErrorPopup(m_errorPopup, m_exception);
       if (!m_errorPopup) {
-        m_state = AnalyzerState::kWaitingForData;
+        m_state = AnalyzerState::WAITING_FOR_DATA;
       }
       break;
     }
-    case AnalyzerState::kGeneralDataError:
-    case AnalyzerState::kTestDurationError:
-    case AnalyzerState::kVelocityThresholdError: {
+    case AnalyzerState::GENERAL_DATA_ERROR:
+    case AnalyzerState::TEST_DURATION_ERROR:
+    case AnalyzerState::VELOCITY_THRESHOLD_ERROR: {
       CreateErrorPopup(m_errorPopup, m_exception);
       if (DisplayResetAndUnitOverride()) {
         return;
@@ -284,25 +283,25 @@ void Analyzer::PrepareData() {
     UpdateFeedforwardGains();
     UpdateFeedbackGains();
   } catch (const sysid::InvalidDataError& e) {
-    m_state = AnalyzerState::kGeneralDataError;
+    m_state = AnalyzerState::GENERAL_DATA_ERROR;
     HandleError(e.what());
   } catch (const sysid::NoQuasistaticDataError& e) {
-    m_state = AnalyzerState::kVelocityThresholdError;
+    m_state = AnalyzerState::VELOCITY_THRESHOLD_ERROR;
     HandleError(e.what());
   } catch (const sysid::NoDynamicDataError& e) {
-    m_state = AnalyzerState::kTestDurationError;
+    m_state = AnalyzerState::TEST_DURATION_ERROR;
     HandleError(e.what());
   } catch (const sysid::MissingTestsError& e) {
-    m_state = AnalyzerState::kMissingTestsError;
+    m_state = AnalyzerState::MISSING_TESTS_ERROR;
     HandleError(e.what());
   } catch (const AnalysisManager::FileReadingError& e) {
-    m_state = AnalyzerState::kFileError;
+    m_state = AnalyzerState::FILE_ERROR;
     HandleError(e.what());
   } catch (const wpi::json::exception& e) {
-    m_state = AnalyzerState::kFileError;
+    m_state = AnalyzerState::FILE_ERROR;
     HandleError(e.what());
   } catch (const std::exception& e) {
-    m_state = AnalyzerState::kFileError;
+    m_state = AnalyzerState::FILE_ERROR;
     HandleError(e.what());
   }
 }
@@ -328,7 +327,7 @@ void Analyzer::PrepareGraphs() {
                      m_abortDataPrep);
     });
     UpdateFeedbackGains();
-    m_state = AnalyzerState::kNominalDisplay;
+    m_state = AnalyzerState::NOMINAL_DISPLAY;
   }
 }
 
@@ -343,9 +342,9 @@ void Analyzer::SetMissingTests(const std::vector<std::string>& missingTests) {
 }
 
 void Analyzer::DisplayGraphs() {
-  ImGui::SetNextWindowPos(ImVec2{kDiagnosticPlotWindowPos},
+  ImGui::SetNextWindowPos(ImVec2{DIAGNOSTIC_PLOT_WINDOW_POS},
                           ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2{kDiagnosticPlotWindowSize},
+  ImGui::SetNextWindowSize(ImVec2{DIAGNOSTIC_PLOT_WINDOW_SIZE},
                            ImGuiCond_FirstUseEver);
   ImGui::Begin("Diagnostic Plots");
 
@@ -380,7 +379,7 @@ void Analyzer::DisplayGraphs() {
     }
 
     // If a JSON is selected
-    if (m_state == AnalyzerState::kNominalDisplay) {
+    if (m_state == AnalyzerState::NOMINAL_DISPLAY) {
       DisplayDouble("Acceleration R²", &m_accelRSquared);
       CreateTooltip(
           "The coefficient of determination of the OLS fit of acceleration "
@@ -433,11 +432,11 @@ void Analyzer::AbortDataPrep() {
 
 void Analyzer::DisplayFeedforwardParameters(float beginX, float beginY) {
   // Increase spacing to not run into trackwidth in the normal analyzer view
-  constexpr double kHorizontalOffset = 1.1;
-  SetPosition(beginX, beginY, kHorizontalOffset, 0);
+  constexpr double HORIZONTAL_OFFSET = 1.1;
+  SetPosition(beginX, beginY, HORIZONTAL_OFFSET, 0);
 
   bool displayAll =
-      !IsErrorState() || m_state == AnalyzerState::kGeneralDataError;
+      !IsErrorState() || m_state == AnalyzerState::GENERAL_DATA_ERROR;
 
   if (displayAll) {
     // Wait for enter before refresh so double digit entries like "15" don't
@@ -455,10 +454,10 @@ void Analyzer::DisplayFeedforwardParameters(float beginX, float beginY) {
         "filter's sliding window.");
   }
 
-  if (displayAll || m_state == AnalyzerState::kVelocityThresholdError) {
+  if (displayAll || m_state == AnalyzerState::VELOCITY_THRESHOLD_ERROR) {
     // Wait for enter before refresh so decimal inputs like "0.2" don't
     // prematurely refresh with a velocity threshold of "0".
-    SetPosition(beginX, beginY, kHorizontalOffset, 1);
+    SetPosition(beginX, beginY, HORIZONTAL_OFFSET, 1);
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
     double threshold = m_settings.velocityThreshold;
     if (ImGui::InputDouble("Velocity Threshold", &threshold, 0.0, 0.0, "%.3f",
@@ -469,8 +468,8 @@ void Analyzer::DisplayFeedforwardParameters(float beginX, float beginY) {
     CreateTooltip("Velocity data below this threshold will be ignored.");
   }
 
-  if (displayAll || m_state == AnalyzerState::kTestDurationError) {
-    SetPosition(beginX, beginY, kHorizontalOffset, 2);
+  if (displayAll || m_state == AnalyzerState::TEST_DURATION_ERROR) {
+    SetPosition(beginX, beginY, HORIZONTAL_OFFSET, 2);
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
     if (ImGui::SliderFloat("Test Duration", &m_stepTestDuration,
                            m_manager->GetMinStepTime().value(),
@@ -483,12 +482,12 @@ void Analyzer::DisplayFeedforwardParameters(float beginX, float beginY) {
 
 void Analyzer::CollectFeedforwardGains(float beginX, float beginY) {
   SetPosition(beginX, beginY, 0, 0);
-  if (DisplayDouble("Kv", &m_feedforwardGains.Kv.gain, false)) {
+  if (DisplayDouble("V", &m_feedforwardGains.V.gain, false)) {
     UpdateFeedbackGains();
   }
 
   SetPosition(beginX, beginY, 0, 1);
-  if (DisplayDouble("Ka", &m_feedforwardGains.Ka.gain, false)) {
+  if (DisplayDouble("A", &m_feedforwardGains.A.gain, false)) {
     UpdateFeedbackGains();
   }
 
@@ -519,13 +518,13 @@ void Analyzer::DisplayFeedforwardGain(const char* text,
 
 void Analyzer::DisplayFeedforwardGains(float beginX, float beginY) {
   SetPosition(beginX, beginY, 0, 0);
-  DisplayFeedforwardGain("Ks", m_feedforwardGains.Ks);
+  DisplayFeedforwardGain("S", m_feedforwardGains.S);
 
   SetPosition(beginX, beginY, 0, 1);
-  DisplayFeedforwardGain("Kv", m_feedforwardGains.Kv);
+  DisplayFeedforwardGain("V", m_feedforwardGains.V);
 
   SetPosition(beginX, beginY, 0, 2);
-  DisplayFeedforwardGain("Ka", m_feedforwardGains.Ka);
+  DisplayFeedforwardGain("A", m_feedforwardGains.A);
 
   SetPosition(beginX, beginY, 0, 3);
   // Show Timescale
@@ -567,10 +566,10 @@ void Analyzer::DisplayFeedforwardGains(float beginX, float beginY) {
 
   SetPosition(beginX, beginY, 0, 6);
 
-  if (m_manager->GetAnalysisType() == analysis::kElevator) {
-    DisplayFeedforwardGain("Kg", m_feedforwardGains.Kg);
-  } else if (m_manager->GetAnalysisType() == analysis::kArm) {
-    DisplayFeedforwardGain("Kg", m_feedforwardGains.Kg);
+  if (m_manager->GetAnalysisType() == analysis::ELEVATOR) {
+    DisplayFeedforwardGain("G", m_feedforwardGains.G);
+  } else if (m_manager->GetAnalysisType() == analysis::ARM) {
+    DisplayFeedforwardGain("G", m_feedforwardGains.G);
 
     double offset;
     auto unit = m_manager->GetUnit();
@@ -599,13 +598,12 @@ void Analyzer::DisplayFeedforwardGains(float beginX, float beginY) {
 void Analyzer::DisplayFeedbackGains() {
   // Allow the user to select a feedback controller preset.
   ImGui::Spacing();
-  ImGui::SetNextItemWidth(ImGui::GetFontSize() * kTextBoxWidthMultiple);
-  if (ImGui::Combo("Gain Preset", &m_selectedPreset, kPresetNames,
-                   IM_ARRAYSIZE(kPresetNames))) {
-    m_settings.preset = m_presets[kPresetNames[m_selectedPreset]];
-    m_settings.type = FeedbackControllerLoopType::kVelocity;
-    m_selectedLoopType =
-        static_cast<int>(FeedbackControllerLoopType::kVelocity);
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * TEXT_BOX_WIDTH_MULTIPLE);
+  if (ImGui::Combo("Gain Preset", &m_selectedPreset, PRESET_NAMES,
+                   IM_ARRAYSIZE(PRESET_NAMES))) {
+    m_settings.preset = m_presets[PRESET_NAMES[m_selectedPreset]];
+    m_settings.type = FeedbackControllerLoopType::VELOCITY;
+    m_selectedLoopType = static_cast<int>(FeedbackControllerLoopType::VELOCITY);
     UpdateFeedbackGains();
   }
   ImGui::SameLine();
@@ -620,7 +618,7 @@ void Analyzer::DisplayFeedbackGains() {
       "REV (Brushless): For use with NEO and NEO 550 motors on a SPARK MAX.\n"
       "REV (Brushed): For use with brushed motors connected to a SPARK MAX.");
 
-  if (m_settings.preset != m_presets[kPresetNames[m_selectedPreset]]) {
+  if (m_settings.preset != m_presets[PRESET_NAMES[m_selectedPreset]]) {
     ImGui::SameLine();
     ImGui::TextDisabled("(modified)");
   }
@@ -693,15 +691,15 @@ void Analyzer::DisplayFeedbackGains() {
   ImGui::Spacing();
 
   // Allow the user to select a loop type.
-  ImGui::SetNextItemWidth(ImGui::GetFontSize() * kTextBoxWidthMultiple);
-  if (ImGui::Combo("Loop Type", &m_selectedLoopType, kLoopTypes,
-                   IM_ARRAYSIZE(kLoopTypes))) {
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * TEXT_BOX_WIDTH_MULTIPLE);
+  if (ImGui::Combo("Loop Type", &m_selectedLoopType, LOOP_TYPES,
+                   IM_ARRAYSIZE(LOOP_TYPES))) {
     m_settings.type =
         static_cast<FeedbackControllerLoopType>(m_selectedLoopType);
-    if (m_state == AnalyzerState::kWaitingForData) {
+    if (m_state == AnalyzerState::WAITING_FOR_DATA) {
       m_settings.preset.measurementDelay = 0_ms;
     } else {
-      if (m_settings.type == FeedbackControllerLoopType::kPosition) {
+      if (m_settings.type == FeedbackControllerLoopType::POSITION) {
         m_settings.preset.measurementDelay = m_manager->GetPositionDelay();
       } else {
         m_settings.preset.measurementDelay = m_manager->GetVelocityDelay();
@@ -725,7 +723,7 @@ void Analyzer::DisplayFeedbackGains() {
 
   if (m_selectedLoopType == 0) {
     std::string unit;
-    if (m_state != AnalyzerState::kWaitingForData) {
+    if (m_state != AnalyzerState::WAITING_FOR_DATA) {
       unit = fmt::format(" ({})", GetAbbreviation(m_manager->GetUnit()));
     }
 
@@ -739,7 +737,7 @@ void Analyzer::DisplayFeedbackGains() {
   }
 
   std::string unit;
-  if (m_state != AnalyzerState::kWaitingForData) {
+  if (m_state != AnalyzerState::WAITING_FOR_DATA) {
     unit = fmt::format(" ({}/s)", GetAbbreviation(m_manager->GetUnit()));
   }
 

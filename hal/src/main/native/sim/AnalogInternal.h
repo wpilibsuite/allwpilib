@@ -13,11 +13,11 @@
 #include "hal/handles/IndexedHandleResource.h"
 
 namespace hal {
-constexpr int32_t kTimebase = 40000000;  ///< 40 MHz clock
-constexpr int32_t kDefaultOversampleBits = 0;
-constexpr int32_t kDefaultAverageBits = 7;
-constexpr double kDefaultSampleRate = 50000.0;
-static constexpr uint32_t kAccumulatorChannels[] = {0, 1};
+constexpr int32_t TIME_BASE = 40000000;  ///< 40 MHz clock
+constexpr int32_t DEFAULT_OVERSAMPLE_BITS = 0;
+constexpr int32_t DEFAULT_AVERAGE_BITS = 7;
+constexpr double DEFAULT_SAMPLE_RATE = 50000.0;
+static constexpr uint32_t ACCUMULATOR_CHANNELS[] = {0, 1};
 
 struct AnalogPort {
   uint8_t channel;
@@ -26,6 +26,6 @@ struct AnalogPort {
 };
 
 extern IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
-                             kNumAnalogInputs, HAL_HandleEnum::AnalogInput>*
+                             NUM_ANALOG_INPUTS, HAL_HandleEnum::AnalogInput>*
     analogInputHandles;
 }  // namespace hal

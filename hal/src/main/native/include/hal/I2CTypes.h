@@ -15,8 +15,8 @@
  */
 
 HAL_ENUM(HAL_I2CPort) {
-  HAL_I2C_kInvalid = -1,
-  HAL_I2C_kPort0,
-  HAL_I2C_kPort1
+  HAL_I2C_Invalid = -1,
+  HAL_I2C_Port0,
+  HAL_I2C_Port1
 };
 /** @} */

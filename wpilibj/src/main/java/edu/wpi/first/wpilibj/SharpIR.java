@@ -96,7 +96,7 @@ public class SharpIR implements Sendable, AutoCloseable {
 
     m_simDevice = SimDevice.create("SharpIR", m_sensor.getChannel());
     if (m_simDevice != null) {
-      m_simRange = m_simDevice.createDouble("Range (m)", Direction.kInput, 0.0);
+      m_simRange = m_simDevice.createDouble("Range (m)", Direction.INPUT, 0.0);
       m_sensor.setSimDevice(m_simDevice);
     }
   }

@@ -11,18 +11,18 @@ using namespace frc;
 
 namespace {
 
-const Pose2d kExpectedData =
+const Pose2d EXPECTED_DATA =
     Pose2d{Translation2d{0.191_m, 2.2_m}, Rotation2d{22.9_rad}};
 }  // namespace
 
 TEST(Pose2dProtoTest, Roundtrip) {
-  wpi::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  ASSERT_TRUE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.Translation(), unpacked_data->Translation());
-  EXPECT_EQ(kExpectedData.Rotation(), unpacked_data->Rotation());
+  EXPECT_EQ(EXPECTED_DATA.Translation(), unpacked_data->Translation());
+  EXPECT_EQ(EXPECTED_DATA.Rotation(), unpacked_data->Rotation());
 }

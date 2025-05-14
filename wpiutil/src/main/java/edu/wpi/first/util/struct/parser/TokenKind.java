@@ -7,40 +7,40 @@ package edu.wpi.first.util.struct.parser;
 /** A lexed raw struct schema token. */
 public enum TokenKind {
   /** Unknown. */
-  kUnknown("unknown"),
+  UNKNOWN("unknown"),
 
   /** Integer. */
-  kInteger("integer"),
+  INTEGER("integer"),
 
   /** Identifier. */
-  kIdentifier("identifier"),
+  IDENTIFIER("identifier"),
 
   /** Left square bracket. */
-  kLeftBracket("'['"),
+  LEFT_BRACKET("'['"),
 
   /** Right square bracket. */
-  kRightBracket("']'"),
+  RIGHT_BRACKET("']'"),
 
   /** Left curly brace. */
-  kLeftBrace("'{'"),
+  LEFT_BRACE("'{'"),
 
   /** Right curly brace. */
-  kRightBrace("'}'"),
+  RIGHT_BRACE("'}'"),
 
   /** Colon. */
-  kColon("':'"),
+  COLON("':'"),
 
   /** Semicolon. */
-  kSemicolon("';'"),
+  SEMICOLON("';'"),
 
   /** Comma. */
-  kComma("','"),
+  COMMA("','"),
 
   /** Equals. */
-  kEquals("'='"),
+  EQUALS("'='"),
 
   /** End of input. */
-  kEndOfInput("<EOF>");
+  END_OF_INPUT("<EOF>");
 
   private final String m_name;
 

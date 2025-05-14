@@ -72,13 +72,13 @@ void DoubleSolenoid::Set(Value value) {
   int setValue = 0;
 
   switch (value) {
-    case kOff:
+    case OFF:
       setValue = 0;
       break;
-    case kForward:
+    case FORWARD:
       setValue = m_forwardMask;
       break;
-    case kReverse:
+    case REVERSE:
       setValue = m_reverseMask;
       break;
   }
@@ -90,21 +90,21 @@ DoubleSolenoid::Value DoubleSolenoid::Get() const {
   auto values = m_module->GetSolenoids();
 
   if ((values & m_forwardMask) != 0) {
-    return Value::kForward;
+    return Value::FORWARD;
   } else if ((values & m_reverseMask) != 0) {
-    return Value::kReverse;
+    return Value::REVERSE;
   } else {
-    return Value::kOff;
+    return Value::OFF;
   }
 }
 
 void DoubleSolenoid::Toggle() {
   Value value = Get();
 
-  if (value == kForward) {
-    Set(kReverse);
-  } else if (value == kReverse) {
-    Set(kForward);
+  if (value == FORWARD) {
+    Set(REVERSE);
+  } else if (value == REVERSE) {
+    Set(FORWARD);
   }
 }
 
@@ -131,20 +131,20 @@ void DoubleSolenoid::InitSendable(wpi::SendableBuilder& builder) {
       "Value",
       [=, this](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
         switch (Get()) {
-          case kForward:
+          case FORWARD:
             return "Forward";
-          case kReverse:
+          case REVERSE:
             return "Reverse";
           default:
             return "Off";
         }
       },
       [=, this](std::string_view value) {
-        Value lvalue = kOff;
+        Value lvalue = OFF;
         if (value == "Forward") {
-          lvalue = kForward;
+          lvalue = FORWARD;
         } else if (value == "Reverse") {
-          lvalue = kReverse;
+          lvalue = REVERSE;
         }
         Set(lvalue);
       });

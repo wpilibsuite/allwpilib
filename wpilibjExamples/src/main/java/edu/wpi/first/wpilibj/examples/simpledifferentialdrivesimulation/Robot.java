@@ -34,9 +34,9 @@ public class Robot extends TimedRobot {
   public Robot() {
     m_trajectory =
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(2, 2, Rotation2d.kZero),
+            new Pose2d(2, 2, Rotation2d.ZERO),
             List.of(),
-            new Pose2d(6, 4, Rotation2d.kZero),
+            new Pose2d(6, 4, Rotation2d.ZERO),
             new TrajectoryConfig(2, 2));
   }
 
@@ -63,13 +63,13 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
-    double xSpeed = -m_speedLimiter.calculate(m_controller.getLeftY()) * Drivetrain.kMaxSpeed;
+    double xSpeed = -m_speedLimiter.calculate(m_controller.getLeftY()) * Drivetrain.MAX_SPEED;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    double rot = -m_rotLimiter.calculate(m_controller.getRightX()) * Drivetrain.kMaxAngularSpeed;
+    double rot = -m_rotLimiter.calculate(m_controller.getRightX()) * Drivetrain.MAX_ANGULAR_SPEED;
     m_drive.drive(xSpeed, rot);
   }
 

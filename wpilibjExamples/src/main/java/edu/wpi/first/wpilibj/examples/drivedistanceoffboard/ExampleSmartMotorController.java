@@ -11,9 +11,9 @@ package edu.wpi.first.wpilibj.examples.drivedistanceoffboard;
  */
 public class ExampleSmartMotorController {
   public enum PIDMode {
-    kPosition,
-    kVelocity,
-    kMovementWitchcraft
+    POSITION,
+    VELOCITY,
+    MOVEMENT_WITCHCRAFT
   }
 
   double m_value;

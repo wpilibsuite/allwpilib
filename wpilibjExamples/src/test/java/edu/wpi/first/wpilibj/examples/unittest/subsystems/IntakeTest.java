@@ -28,12 +28,12 @@ class IntakeTest {
     m_intake = new Intake(); // create our intake
     m_simMotor =
         new PWMMotorControllerSim(
-            IntakeConstants.kMotorPort); // create our simulation PWM motor controller
+            IntakeConstants.MOTOR_PORT); // create our simulation PWM motor controller
     m_simPiston =
         new DoubleSolenoidSim(
             PneumaticsModuleType.CTREPCM,
-            IntakeConstants.kPistonFwdChannel,
-            IntakeConstants.kPistonRevChannel); // create our simulation solenoid
+            IntakeConstants.PISTON_FWD_CHANNEL,
+            IntakeConstants.PISTON_REV_CHANNEL); // create our simulation solenoid
   }
 
   @SuppressWarnings("PMD.SignatureDeclareThrowsException")
@@ -60,12 +60,12 @@ class IntakeTest {
   @Test
   void retractTest() {
     m_intake.retract();
-    assertEquals(DoubleSolenoid.Value.kReverse, m_simPiston.get());
+    assertEquals(DoubleSolenoid.Value.REVERSE, m_simPiston.get());
   }
 
   @Test
   void deployTest() {
     m_intake.deploy();
-    assertEquals(DoubleSolenoid.Value.kForward, m_simPiston.get());
+    assertEquals(DoubleSolenoid.Value.FORWARD, m_simPiston.get());
   }
 }

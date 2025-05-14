@@ -21,7 +21,7 @@ public class DifferentialDriveKinematicsStruct implements Struct<DifferentialDri
 
   @Override
   public int getSize() {
-    return kSizeDouble;
+    return SIZE_DOUBLE;
   }
 
   @Override

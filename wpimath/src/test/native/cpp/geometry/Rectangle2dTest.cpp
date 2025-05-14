@@ -38,39 +38,39 @@ TEST(Rectangle2dTest, Contains) {
 }
 
 TEST(Rectangle2dTest, Distance) {
-  constexpr double kEpsilon = 1E-9;
+  constexpr double EPSILON = 1E-9;
 
   constexpr frc::Pose2d center{1_m, 2_m, 270_deg};
   constexpr frc::Rectangle2d rect{center, 1_m, 2_m};
 
   constexpr frc::Translation2d point1{2.5_m, 2_m};
-  EXPECT_NEAR(0.5, rect.Distance(point1).value(), kEpsilon);
+  EXPECT_NEAR(0.5, rect.Distance(point1).value(), EPSILON);
 
   constexpr frc::Translation2d point2{1_m, 2_m};
-  EXPECT_NEAR(0, rect.Distance(point2).value(), kEpsilon);
+  EXPECT_NEAR(0, rect.Distance(point2).value(), EPSILON);
 
   constexpr frc::Translation2d point3{1_m, 1_m};
-  EXPECT_NEAR(0.5, rect.Distance(point3).value(), kEpsilon);
+  EXPECT_NEAR(0.5, rect.Distance(point3).value(), EPSILON);
 
   constexpr frc::Translation2d point4{-1_m, 2.5_m};
-  EXPECT_NEAR(1, rect.Distance(point4).value(), kEpsilon);
+  EXPECT_NEAR(1, rect.Distance(point4).value(), EPSILON);
 }
 
 TEST(Rectangle2dTest, Nearest) {
-  constexpr double kEpsilon = 1E-9;
+  constexpr double EPSILON = 1E-9;
 
   constexpr frc::Pose2d center{1_m, 1_m, 90_deg};
   constexpr frc::Rectangle2d rect{center, 3_m, 4_m};
 
   constexpr frc::Translation2d point1{1_m, 3_m};
   auto nearestPoint1 = rect.Nearest(point1);
-  EXPECT_NEAR(1.0, nearestPoint1.X().value(), kEpsilon);
-  EXPECT_NEAR(2.5, nearestPoint1.Y().value(), kEpsilon);
+  EXPECT_NEAR(1.0, nearestPoint1.X().value(), EPSILON);
+  EXPECT_NEAR(2.5, nearestPoint1.Y().value(), EPSILON);
 
   constexpr frc::Translation2d point2{0_m, 0_m};
   auto nearestPoint2 = rect.Nearest(point2);
-  EXPECT_NEAR(0.0, nearestPoint2.X().value(), kEpsilon);
-  EXPECT_NEAR(0.0, nearestPoint2.Y().value(), kEpsilon);
+  EXPECT_NEAR(0.0, nearestPoint2.X().value(), EPSILON);
+  EXPECT_NEAR(0.0, nearestPoint2.Y().value(), EPSILON);
 }
 
 TEST(Rectangle2dTest, Equals) {

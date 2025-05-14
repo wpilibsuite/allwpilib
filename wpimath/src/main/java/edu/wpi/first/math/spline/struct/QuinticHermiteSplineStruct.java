@@ -21,7 +21,7 @@ public final class QuinticHermiteSplineStruct implements Struct<QuinticHermiteSp
 
   @Override
   public int getSize() {
-    return kSizeDouble * 4 * 3;
+    return SIZE_DOUBLE * 4 * 3;
   }
 
   @Override

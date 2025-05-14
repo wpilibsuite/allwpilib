@@ -11,19 +11,19 @@ using namespace frc;
 namespace {
 
 using StructType = wpi::Struct<frc::MecanumDriveWheelSpeeds>;
-const MecanumDriveWheelSpeeds kExpectedData{
+const MecanumDriveWheelSpeeds EXPECTED_DATA{
     MecanumDriveWheelSpeeds{2.29_mps, 17.4_mps, 4.4_mps, 0.229_mps}};
 }  // namespace
 
 TEST(MecanumDriveWheelSpeedsStructTest, Roundtrip) {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   MecanumDriveWheelSpeeds unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.frontLeft.value(), unpacked_data.frontLeft.value());
-  EXPECT_EQ(kExpectedData.frontRight.value(), unpacked_data.frontRight.value());
-  EXPECT_EQ(kExpectedData.rearLeft.value(), unpacked_data.rearLeft.value());
-  EXPECT_EQ(kExpectedData.rearRight.value(), unpacked_data.rearRight.value());
+  EXPECT_EQ(EXPECTED_DATA.frontLeft.value(), unpacked_data.frontLeft.value());
+  EXPECT_EQ(EXPECTED_DATA.frontRight.value(), unpacked_data.frontRight.value());
+  EXPECT_EQ(EXPECTED_DATA.rearLeft.value(), unpacked_data.rearLeft.value());
+  EXPECT_EQ(EXPECTED_DATA.rearRight.value(), unpacked_data.rearRight.value());
 }

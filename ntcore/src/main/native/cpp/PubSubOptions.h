@@ -11,13 +11,13 @@ namespace nt {
 // internal helper class for PubSubOptions
 class PubSubOptionsImpl : public PubSubOptions {
  public:
-  constexpr PubSubOptionsImpl() : PubSubOptionsImpl{kDefaultPubSubOptions} {}
+  constexpr PubSubOptionsImpl() : PubSubOptionsImpl{DEFAULT_PUB_SUB_OPTIONS} {}
 
   /*implicit*/ constexpr PubSubOptionsImpl(  // NOLINT
       const PubSubOptions& options)
       : PubSubOptions{options} {
     if (periodic == 0) {
-      periodic = kDefaultPeriodic;
+      periodic = DEFAULT_PERIODIC;
     }
     periodicMs = static_cast<unsigned int>(periodic * 1000);
     if (pollStorage == 0) {
@@ -29,8 +29,8 @@ class PubSubOptionsImpl : public PubSubOptions {
     }
   }
 
-  static constexpr unsigned int kDefaultPeriodicMs = 100;
-  unsigned int periodicMs = kDefaultPeriodicMs;
+  static constexpr unsigned int DEFAULT_PERIODIC_MS = 100;
+  unsigned int periodicMs = DEFAULT_PERIODIC_MS;
 };
 
 }  // namespace nt

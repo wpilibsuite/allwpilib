@@ -17,13 +17,13 @@ namespace sysid {
 class SimpleMotorSim {
  public:
   /**
-   * @param Ks              Static friction gain.
-   * @param Kv              Velocity gain.
-   * @param Ka              Acceleration gain.
+   * @param S              Static friction gain.
+   * @param V              Velocity gain.
+   * @param A              Acceleration gain.
    * @param initialPosition Initial flywheel position.
    * @param initialVelocity Initial flywheel velocity.
    */
-  SimpleMotorSim(double Ks, double Kv, double Ka, double initialPosition = 0.0,
+  SimpleMotorSim(double S, double V, double A, double initialPosition = 0.0,
                  double initialVelocity = 0.0);
 
   /**

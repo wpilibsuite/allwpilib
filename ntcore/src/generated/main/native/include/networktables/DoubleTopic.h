@@ -241,7 +241,7 @@ class DoubleTopic final : public Topic {
   using ParamType = double;
   using TimestampedValueType = TimestampedDouble;
   /** The default type string for this topic type. */
-  static constexpr std::string_view kTypeString = "double";
+  static constexpr std::string_view TYPE_STRING = "double";
 
   DoubleTopic() = default;
 
@@ -278,7 +278,7 @@ class DoubleTopic final : public Topic {
   [[nodiscard]]
   SubscriberType Subscribe(
       ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return DoubleSubscriber{
         ::nt::Subscribe(m_handle, NT_DOUBLE, "double", options),
         defaultValue};
@@ -302,7 +302,7 @@ class DoubleTopic final : public Topic {
   [[nodiscard]]
   SubscriberType SubscribeEx(
       std::string_view typeString, ParamType defaultValue,
-      const PubSubOptions& options = kDefaultPubSubOptions) {
+      const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return DoubleSubscriber{
         ::nt::Subscribe(m_handle, NT_DOUBLE, typeString, options),
         defaultValue};
@@ -324,7 +324,7 @@ class DoubleTopic final : public Topic {
    * @return publisher
    */
   [[nodiscard]]
-  PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
+  PublisherType Publish(const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return DoublePublisher{
         ::nt::Publish(m_handle, NT_DOUBLE, "double", options)};
   }
@@ -349,7 +349,7 @@ class DoubleTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-    const wpi::json& properties, const PubSubOptions& options = kDefaultPubSubOptions) {
+    const wpi::json& properties, const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return DoublePublisher{
         ::nt::PublishEx(m_handle, NT_DOUBLE, typeString, properties, options)};
   }
@@ -376,7 +376,7 @@ class DoubleTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntry(ParamType defaultValue,
-                     const PubSubOptions& options = kDefaultPubSubOptions) {
+                     const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return DoubleEntry{
         ::nt::GetEntry(m_handle, NT_DOUBLE, "double", options),
         defaultValue};
@@ -404,7 +404,7 @@ class DoubleTopic final : public Topic {
    */
   [[nodiscard]]
   EntryType GetEntryEx(std::string_view typeString, ParamType defaultValue,
-                       const PubSubOptions& options = kDefaultPubSubOptions) {
+                       const PubSubOptions& options = DEFAULT_PUB_SUB_OPTIONS) {
     return DoubleEntry{
         ::nt::GetEntry(m_handle, NT_DOUBLE, typeString, options),
         defaultValue};

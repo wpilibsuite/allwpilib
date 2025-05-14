@@ -32,7 +32,7 @@ constexpr bool IsSpecial(std::string_view name) {
 }
 
 struct LocalTopic {
-  static constexpr auto kType = Handle::kTopic;
+  static constexpr auto TYPE = Handle::TOPIC;
 
   LocalTopic(NT_Topic handle, std::string_view name)
       : handle{handle}, name{name}, special{IsSpecial(name)} {}

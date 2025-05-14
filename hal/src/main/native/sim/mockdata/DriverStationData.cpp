@@ -38,7 +38,7 @@ void DriverStationData::ResetData() {
     m_joystickButtonsCallbacks.Reset();
     m_joystickOutputsCallbacks.Reset();
     m_joystickDescriptorCallbacks.Reset();
-    for (int i = 0; i < kNumJoysticks; i++) {
+    for (int i = 0; i < NUM_JOYSTICKS; i++) {
       m_joystickData[i].axes = HAL_JoystickAxes{};
       m_joystickData[i].povs = HAL_JoystickPOVs{};
       m_joystickData[i].buttons = HAL_JoystickButtons{};
@@ -59,7 +59,7 @@ void DriverStationData::ResetData() {
   int32_t DriverStationData::RegisterJoystick##name##Callback(                 \
       int32_t joystickNum, HAL_Joystick##name##Callback callback, void* param, \
       HAL_Bool initialNotify) {                                                \
-    if (joystickNum < 0 || joystickNum >= kNumJoysticks)                       \
+    if (joystickNum < 0 || joystickNum >= NUM_JOYSTICKS)                       \
       return 0;                                                                \
     std::scoped_lock lock(m_joystickDataMutex);                                \
     int32_t uid = m_joystick##name##Callbacks.Register(callback, param);       \
@@ -79,7 +79,7 @@ void DriverStationData::ResetData() {
                                                                            \
   void DriverStationData::GetJoystick##name(int32_t joystickNum,           \
                                             HAL_Joystick##name* d) {       \
-    if (joystickNum < 0 || joystickNum >= kNumJoysticks)                   \
+    if (joystickNum < 0 || joystickNum >= NUM_JOYSTICKS)                   \
       return;                                                              \
     std::scoped_lock lock(m_joystickDataMutex);                            \
     *d = m_joystickData[joystickNum].data##data2;                          \
@@ -87,7 +87,7 @@ void DriverStationData::ResetData() {
                                                                            \
   void DriverStationData::SetJoystick##name(int32_t joystickNum,           \
                                             const HAL_Joystick##name* d) { \
-    if (joystickNum < 0 || joystickNum >= kNumJoysticks)                   \
+    if (joystickNum < 0 || joystickNum >= NUM_JOYSTICKS)                   \
       return;                                                              \
     std::scoped_lock lock(m_joystickDataMutex);                            \
     m_joystickData[joystickNum].data##data2 = *d;                          \
@@ -102,7 +102,7 @@ DEFINE_CPPAPI_CALLBACKS(Descriptor, descriptor, )
 
 void DriverStationData::GetJoystickDescriptor(
     int32_t joystickNum, HAL_JoystickDescriptor* descriptor) {
-  if (joystickNum < 0 || joystickNum >= kNumJoysticks) {
+  if (joystickNum < 0 || joystickNum >= NUM_JOYSTICKS) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -111,7 +111,7 @@ void DriverStationData::GetJoystickDescriptor(
 
 void DriverStationData::SetJoystickDescriptor(
     int32_t joystickNum, const HAL_JoystickDescriptor* descriptor) {
-  if (joystickNum < 0 || joystickNum >= kNumJoysticks) {
+  if (joystickNum < 0 || joystickNum >= NUM_JOYSTICKS) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -124,7 +124,7 @@ void DriverStationData::SetJoystickDescriptor(
 int32_t DriverStationData::RegisterJoystickOutputsCallback(
     int32_t joystickNum, HAL_JoystickOutputsCallback callback, void* param,
     HAL_Bool initialNotify) {
-  if (joystickNum < 0 || joystickNum >= DriverStationData::kNumJoysticks) {
+  if (joystickNum < 0 || joystickNum >= DriverStationData::NUM_JOYSTICKS) {
     return 0;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -145,7 +145,7 @@ void DriverStationData::GetJoystickOutputs(int32_t joystickNum,
                                            int64_t* outputs,
                                            int32_t* leftRumble,
                                            int32_t* rightRumble) {
-  if (joystickNum < 0 || joystickNum >= kNumJoysticks) {
+  if (joystickNum < 0 || joystickNum >= NUM_JOYSTICKS) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -157,7 +157,7 @@ void DriverStationData::GetJoystickOutputs(int32_t joystickNum,
 void DriverStationData::SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                            int32_t leftRumble,
                                            int32_t rightRumble) {
-  if (joystickNum < 0 || joystickNum >= kNumJoysticks) {
+  if (joystickNum < 0 || joystickNum >= NUM_JOYSTICKS) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -225,7 +225,7 @@ void DriverStationData::NotifyNewData() {
 
 void DriverStationData::SetJoystickButton(int32_t stick, int32_t button,
                                           HAL_Bool state) {
-  if (stick < 0 || stick >= kNumJoysticks) {
+  if (stick < 0 || stick >= NUM_JOYSTICKS) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -239,10 +239,10 @@ void DriverStationData::SetJoystickButton(int32_t stick, int32_t button,
 
 void DriverStationData::SetJoystickAxis(int32_t stick, int32_t axis,
                                         double value) {
-  if (stick < 0 || stick >= kNumJoysticks) {
+  if (stick < 0 || stick >= NUM_JOYSTICKS) {
     return;
   }
-  if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
+  if (axis < 0 || axis >= HAL_MaxJoystickAxes) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -252,10 +252,10 @@ void DriverStationData::SetJoystickAxis(int32_t stick, int32_t axis,
 
 void DriverStationData::SetJoystickPOV(int32_t stick, int32_t pov,
                                        int32_t value) {
-  if (stick < 0 || stick >= kNumJoysticks) {
+  if (stick < 0 || stick >= NUM_JOYSTICKS) {
     return;
   }
-  if (pov < 0 || pov >= HAL_kMaxJoystickPOVs) {
+  if (pov < 0 || pov >= HAL_MaxJoystickPOVs) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -264,7 +264,7 @@ void DriverStationData::SetJoystickPOV(int32_t stick, int32_t pov,
 }
 
 void DriverStationData::SetJoystickButtons(int32_t stick, uint32_t buttons) {
-  if (stick < 0 || stick >= kNumJoysticks) {
+  if (stick < 0 || stick >= NUM_JOYSTICKS) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -273,7 +273,7 @@ void DriverStationData::SetJoystickButtons(int32_t stick, uint32_t buttons) {
 }
 
 void DriverStationData::SetJoystickAxisCount(int32_t stick, int32_t count) {
-  if (stick < 0 || stick >= kNumJoysticks) {
+  if (stick < 0 || stick >= NUM_JOYSTICKS) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -284,7 +284,7 @@ void DriverStationData::SetJoystickAxisCount(int32_t stick, int32_t count) {
 }
 
 void DriverStationData::SetJoystickPOVCount(int32_t stick, int32_t count) {
-  if (stick < 0 || stick >= kNumJoysticks) {
+  if (stick < 0 || stick >= NUM_JOYSTICKS) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -295,7 +295,7 @@ void DriverStationData::SetJoystickPOVCount(int32_t stick, int32_t count) {
 }
 
 void DriverStationData::SetJoystickButtonCount(int32_t stick, int32_t count) {
-  if (stick < 0 || stick >= kNumJoysticks) {
+  if (stick < 0 || stick >= NUM_JOYSTICKS) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -308,7 +308,7 @@ void DriverStationData::SetJoystickButtonCount(int32_t stick, int32_t count) {
 void DriverStationData::GetJoystickCounts(int32_t stick, int32_t* axisCount,
                                           int32_t* buttonCount,
                                           int32_t* povCount) {
-  if (stick < 0 || stick >= kNumJoysticks) {
+  if (stick < 0 || stick >= NUM_JOYSTICKS) {
     *axisCount = 0;
     *buttonCount = 0;
     *povCount = 0;
@@ -321,7 +321,7 @@ void DriverStationData::GetJoystickCounts(int32_t stick, int32_t* axisCount,
 }
 
 void DriverStationData::SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox) {
-  if (stick < 0 || stick >= kNumJoysticks) {
+  if (stick < 0 || stick >= NUM_JOYSTICKS) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -330,7 +330,7 @@ void DriverStationData::SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox) {
 }
 
 void DriverStationData::SetJoystickType(int32_t stick, int32_t type) {
-  if (stick < 0 || stick >= kNumJoysticks) {
+  if (stick < 0 || stick >= NUM_JOYSTICKS) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -339,7 +339,7 @@ void DriverStationData::SetJoystickType(int32_t stick, int32_t type) {
 }
 
 void DriverStationData::SetJoystickName(int32_t stick, std::string_view name) {
-  if (stick < 0 || stick >= kNumJoysticks) {
+  if (stick < 0 || stick >= NUM_JOYSTICKS) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
@@ -351,10 +351,10 @@ void DriverStationData::SetJoystickName(int32_t stick, std::string_view name) {
 
 void DriverStationData::SetJoystickAxisType(int32_t stick, int32_t axis,
                                             int32_t type) {
-  if (stick < 0 || stick >= kNumJoysticks) {
+  if (stick < 0 || stick >= NUM_JOYSTICKS) {
     return;
   }
-  if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
+  if (axis < 0 || axis >= HAL_MaxJoystickAxes) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);

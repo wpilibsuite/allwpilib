@@ -119,7 +119,7 @@ void NTMechanismGroupImpl::NTUpdate(const nt::Event& event,
   bool match = it != m_objects.end() && (*it)->GetName() == name;
 
   if (event.GetTopicInfo()) {
-    if (event.flags & nt::EventFlags::kPublish) {
+    if (event.flags & nt::EventFlags::PUBLISH) {
       if (!match) {
         it = m_objects.emplace(
             it, std::make_unique<NTMechanismObjectModel>(
@@ -144,7 +144,7 @@ bool NTMechanismObjectModel::NTUpdate(const nt::Event& event,
                                       std::string_view childName) {
   if (auto info = event.GetTopicInfo()) {
     if (info->topic == m_typeTopic.GetHandle()) {
-      if (event.flags & nt::EventFlags::kUnpublish) {
+      if (event.flags & nt::EventFlags::UNPUBLISH) {
         return true;
       }
     } else if (info->topic != m_colorTopic.GetHandle() &&
@@ -211,7 +211,7 @@ bool NTMechanism2DModel::RootModel::NTUpdate(const nt::Event& event,
   if (auto info = event.GetTopicInfo()) {
     if (info->topic == m_xTopic.GetHandle() ||
         info->topic == m_yTopic.GetHandle()) {
-      if (event.flags & nt::EventFlags::kUnpublish) {
+      if (event.flags & nt::EventFlags::UNPUBLISH) {
         return true;
       }
     } else {
@@ -248,9 +248,9 @@ NTMechanism2DModel::NTMechanism2DModel(nt::NetworkTableInstance inst,
       m_bgColorTopic{m_inst.GetTopic(fmt::format("{}/backgroundColor", path))},
       m_poller{m_inst},
       m_dimensionsValue{1_m, 1_m} {
-  m_poller.AddListener(m_tableSub, nt::EventFlags::kTopic |
-                                       nt::EventFlags::kValueAll |
-                                       nt::EventFlags::kImmediate);
+  m_poller.AddListener(m_tableSub, nt::EventFlags::TOPIC |
+                                       nt::EventFlags::VALUE_ALL |
+                                       nt::EventFlags::IMMEDIATE);
 }
 
 NTMechanism2DModel::~NTMechanism2DModel() = default;
@@ -274,7 +274,7 @@ void NTMechanism2DModel::Update() {
                                  });
       bool match = it != m_roots.end() && (*it)->GetName() == name;
 
-      if (event.flags & nt::EventFlags::kPublish) {
+      if (event.flags & nt::EventFlags::PUBLISH) {
         if (!match) {
           it = m_roots.emplace(
               it, std::make_unique<RootModel>(

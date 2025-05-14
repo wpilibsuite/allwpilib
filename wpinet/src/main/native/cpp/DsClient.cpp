@@ -16,7 +16,7 @@
 
 using namespace wpi;
 
-static constexpr uv::Timer::Time kReconnectTime{500};
+static constexpr uv::Timer::Time RECONNECT_TIME{500};
 
 DsClient::DsClient(wpi::uv::Loop& loop, wpi::Logger& logger,
                    const private_init&)
@@ -30,7 +30,7 @@ DsClient::DsClient(wpi::uv::Loop& loop, wpi::Logger& logger,
     WPI_DEBUG4(m_logger, "DS connection closed");
     clearIp();
     // try to connect again
-    m_tcp->Reuse([this] { m_timer->Start(kReconnectTime); });
+    m_tcp->Reuse([this] { m_timer->Start(RECONNECT_TIME); });
   });
   m_tcp->data.connect([this](wpi::uv::Buffer buf, size_t len) {
     HandleIncoming({buf.base, len});
@@ -58,7 +58,7 @@ void DsClient::Connect() {
   connreq->error = [this](uv::Error err) {
     WPI_DEBUG4(m_logger, "DS connect failure: {}", err.str());
     // try to connect again
-    m_tcp->Reuse([this] { m_timer->Start(kReconnectTime); });
+    m_tcp->Reuse([this] { m_timer->Start(RECONNECT_TIME); });
   };
 
   WPI_DEBUG4(m_logger, "Starting DS connection attempt");

@@ -25,7 +25,7 @@ class SelfCancellingCommand
   SelfCancellingCommand(CommandScheduler* scheduler, int& counter,
                         Subsystem* requirement,
                         Command::InterruptionBehavior interruptionBehavior =
-                            Command::InterruptionBehavior::kCancelSelf)
+                            Command::InterruptionBehavior::CANCEL_SELF)
       : m_scheduler(scheduler),
         m_counter(counter),
         m_interrupt(interruptionBehavior) {
@@ -382,5 +382,5 @@ TEST_F(SchedulingRecursionTest, CancelNextCommandFromCommand) {
 
 INSTANTIATE_TEST_SUITE_P(
     SchedulingRecursionTests, SchedulingRecursionTest,
-    testing::Values(Command::InterruptionBehavior::kCancelSelf,
-                    Command::InterruptionBehavior::kCancelIncoming));
+    testing::Values(Command::InterruptionBehavior::CANCEL_SELF,
+                    Command::InterruptionBehavior::CANCEL_INCOMING));

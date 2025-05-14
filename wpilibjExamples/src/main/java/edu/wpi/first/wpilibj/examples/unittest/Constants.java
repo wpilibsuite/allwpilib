@@ -13,13 +13,13 @@ package edu.wpi.first.wpilibj.examples.unittest;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final int kJoystickIndex = 0;
+  public static final int JOYSTICK_INDEX = 0;
 
   public static final class IntakeConstants {
-    public static final int kMotorPort = 1;
+    public static final int MOTOR_PORT = 1;
 
-    public static final int kPistonFwdChannel = 0;
-    public static final int kPistonRevChannel = 1;
-    public static final double kIntakeSpeed = 0.5;
+    public static final int PISTON_FWD_CHANNEL = 0;
+    public static final int PISTON_REV_CHANNEL = 1;
+    public static final double INTAKE_SPEED = 0.5;
   }
 }

@@ -174,7 +174,7 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
 
  private:
   uv::Stream& m_stream;
-  HttpParser m_req{HttpParser::kRequest};
+  HttpParser m_req{HttpParser::REQUEST};
   WebSocketServerHelper m_helper;
   SmallVector<std::string, 2> m_protocols;
   ServerOptions m_options;

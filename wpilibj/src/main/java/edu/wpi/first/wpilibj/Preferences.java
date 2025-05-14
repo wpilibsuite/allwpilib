@@ -34,9 +34,9 @@ import java.util.EnumSet;
  */
 public final class Preferences {
   /** The Preferences table name. */
-  private static final String kTableName = "Preferences";
+  private static final String TABLE_NAME = "Preferences";
 
-  private static final String kSmartDashboardType = "RobotPreferences";
+  private static final String SMART_DASHBOARD_TYPE = "RobotPreferences";
 
   /** The network table. */
   private static NetworkTable m_table;
@@ -59,7 +59,7 @@ public final class Preferences {
    * @param inst NetworkTable instance
    */
   public static synchronized void setNetworkTableInstance(NetworkTableInstance inst) {
-    m_table = inst.getTable(kTableName);
+    m_table = inst.getTable(TABLE_NAME);
     if (m_typePublisher != null) {
       m_typePublisher.close();
     }
@@ -67,8 +67,8 @@ public final class Preferences {
         m_table
             .getStringTopic(".type")
             .publishEx(
-                StringTopic.kTypeString, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
-    m_typePublisher.set(kSmartDashboardType);
+                StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + SMART_DASHBOARD_TYPE + "\"}");
+    m_typePublisher.set(SMART_DASHBOARD_TYPE);
 
     // Subscribe to all Preferences; this ensures we get the latest values
     // ahead of a getter call.
@@ -85,7 +85,7 @@ public final class Preferences {
     m_listener =
         NetworkTableListener.createListener(
             m_tableSubscriber,
-            EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kPublish),
+            EnumSet.of(NetworkTableEvent.Kind.IMMEDIATE, NetworkTableEvent.Kind.PUBLISH),
             event -> {
               if (event.topicInfo != null) {
                 Topic topic = event.topicInfo.getTopic();

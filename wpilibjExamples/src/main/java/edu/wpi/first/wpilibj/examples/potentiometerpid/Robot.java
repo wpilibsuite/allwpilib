@@ -15,15 +15,15 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
  * reach and maintain position setpoints on an elevator mechanism.
  */
 public class Robot extends TimedRobot {
-  static final int kPotChannel = 1;
-  static final int kMotorChannel = 7;
-  static final int kJoystickChannel = 3;
+  static final int POT_CHANNEL = 1;
+  static final int MOTOR_CHANNEL = 7;
+  static final int JOYSTICK_CHANNEL = 3;
 
   // The elevator can move 1.5 meters from top to bottom
-  static final double kFullHeight = 1.5;
+  static final double FULL_HEIGHT = 1.5;
 
   // Bottom, middle, and top elevator setpoints in meters
-  static final double[] kSetpoints = {0.2, 0.8, 1.4};
+  static final double[] SETPOINTS = {0.2, 0.8, 1.4};
 
   // proportional, integral, and derivative speed constants
   // DANGER: when tuning PID constants, high/inappropriate values for kP, kI,
@@ -35,9 +35,9 @@ public class Robot extends TimedRobot {
   private final PIDController m_pidController = new PIDController(kP, kI, kD);
   // Scaling is handled internally
   private final AnalogPotentiometer m_potentiometer =
-      new AnalogPotentiometer(kPotChannel, kFullHeight);
-  private final PWMSparkMax m_elevatorMotor = new PWMSparkMax(kMotorChannel);
-  private final Joystick m_joystick = new Joystick(kJoystickChannel);
+      new AnalogPotentiometer(POT_CHANNEL, FULL_HEIGHT);
+  private final PWMSparkMax m_elevatorMotor = new PWMSparkMax(MOTOR_CHANNEL);
+  private final Joystick m_joystick = new Joystick(JOYSTICK_CHANNEL);
 
   private int m_index;
 
@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     // Move to the bottom setpoint when teleop starts
     m_index = 0;
-    m_pidController.setSetpoint(kSetpoints[m_index]);
+    m_pidController.setSetpoint(SETPOINTS[m_index]);
   }
 
   @Override
@@ -62,9 +62,9 @@ public class Robot extends TimedRobot {
     // when the button is pressed once, the selected elevator setpoint is incremented
     if (m_joystick.getTriggerPressed()) {
       // index of the elevator setpoint wraps around.
-      m_index = (m_index + 1) % kSetpoints.length;
+      m_index = (m_index + 1) % SETPOINTS.length;
       System.out.println("m_index = " + m_index);
-      m_pidController.setSetpoint(kSetpoints[m_index]);
+      m_pidController.setSetpoint(SETPOINTS[m_index]);
     }
   }
 

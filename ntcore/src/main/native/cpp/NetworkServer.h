@@ -73,7 +73,7 @@ class NetworkServer {
   bool m_shutdown = false;
 
   using Queue = net::LocalClientMessageQueue;
-  net::ClientMessage m_localMsgs[Queue::kBlockSize];
+  net::ClientMessage m_localMsgs[Queue::BLOCK_SIZE];
 
   server::ServerImpl m_serverImpl;
 

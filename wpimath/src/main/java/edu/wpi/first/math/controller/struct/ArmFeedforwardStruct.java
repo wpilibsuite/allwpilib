@@ -21,7 +21,7 @@ public class ArmFeedforwardStruct implements Struct<ArmFeedforward> {
 
   @Override
   public int getSize() {
-    return kSizeDouble * 5;
+    return SIZE_DOUBLE * 5;
   }
 
   @Override

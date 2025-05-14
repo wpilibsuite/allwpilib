@@ -72,31 +72,31 @@ class NetworkTableInstance final {
    * This is a bitmask.
    */
   enum NetworkMode {
-    kNetModeNone = NT_NET_MODE_NONE,
-    kNetModeServer = NT_NET_MODE_SERVER,
-    kNetModeClient = NT_NET_MODE_CLIENT,
-    kNetModeLocal = NT_NET_MODE_LOCAL
+    NET_MODE_NONE = NT_NET_MODE_NONE,
+    NET_MODE_SERVER = NT_NET_MODE_SERVER,
+    NET_MODE_CLIENT = NT_NET_MODE_CLIENT,
+    NET_MODE_LOCAL = NT_NET_MODE_LOCAL
   };
 
   /**
    * Logging levels (as used by SetLogger()).
    */
   enum LogLevel {
-    kLogCritical = NT_LOG_CRITICAL,
-    kLogError = NT_LOG_ERROR,
-    kLogWarning = NT_LOG_WARNING,
-    kLogInfo = NT_LOG_INFO,
-    kLogDebug = NT_LOG_DEBUG,
-    kLogDebug1 = NT_LOG_DEBUG1,
-    kLogDebug2 = NT_LOG_DEBUG2,
-    kLogDebug3 = NT_LOG_DEBUG3,
-    kLogDebug4 = NT_LOG_DEBUG4
+    LOG_CRITICAL = NT_LOG_CRITICAL,
+    LOG_ERROR = NT_LOG_ERROR,
+    LOG_WARNING = NT_LOG_WARNING,
+    LOG_INFO = NT_LOG_INFO,
+    LOG_DEBUG = NT_LOG_DEBUG,
+    LOG_DEBUG1 = NT_LOG_DEBUG1,
+    LOG_DEBUG2 = NT_LOG_DEBUG2,
+    LOG_DEBUG3 = NT_LOG_DEBUG3,
+    LOG_DEBUG4 = NT_LOG_DEBUG4
   };
 
   /**
    * The default port that network tables operates on.
    */
-  static constexpr unsigned int kDefaultPort = NT_DEFAULT_PORT;
+  static constexpr unsigned int DEFAULT_PORT = NT_DEFAULT_PORT;
 
   /**
    * Construct invalid instance.
@@ -609,7 +609,7 @@ class NetworkTableInstance final {
    */
   void StartServer(std::string_view persist_filename = "networktables.json",
                    const char* listen_address = "",
-                   unsigned int port = kDefaultPort) {
+                   unsigned int port = DEFAULT_PORT) {
     ::nt::StartServer(m_handle, persist_filename, listen_address, port);
   }
 

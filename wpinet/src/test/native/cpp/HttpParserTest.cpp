@@ -9,7 +9,7 @@
 namespace wpi {
 
 TEST(HttpParserTest, UrlMethodHeadersComplete) {
-  HttpParser p{HttpParser::kRequest};
+  HttpParser p{HttpParser::REQUEST};
   int callbacks = 0;
   p.url.connect([&](std::string_view path) {
     ASSERT_EQ(path, "/foo/bar");
@@ -27,7 +27,7 @@ TEST(HttpParserTest, UrlMethodHeadersComplete) {
 }
 
 TEST(HttpParserTest, UrlMethodHeader) {
-  HttpParser p{HttpParser::kRequest};
+  HttpParser p{HttpParser::REQUEST};
   int callbacks = 0;
   p.url.connect([&](std::string_view path) {
     ASSERT_EQ(path, "/foo/bar");
@@ -47,7 +47,7 @@ TEST(HttpParserTest, UrlMethodHeader) {
 }
 
 TEST(HttpParserTest, StatusHeadersComplete) {
-  HttpParser p{HttpParser::kResponse};
+  HttpParser p{HttpParser::RESPONSE};
   int callbacks = 0;
   p.status.connect([&](std::string_view status) {
     ASSERT_EQ(status, "OK");
@@ -64,7 +64,7 @@ TEST(HttpParserTest, StatusHeadersComplete) {
 }
 
 TEST(HttpParserTest, StatusHeader) {
-  HttpParser p{HttpParser::kResponse};
+  HttpParser p{HttpParser::RESPONSE};
   int callbacks = 0;
   p.status.connect([&](std::string_view status) {
     ASSERT_EQ(status, "OK");
@@ -81,7 +81,7 @@ TEST(HttpParserTest, StatusHeader) {
 }
 
 TEST(HttpParserTest, HeaderFieldComplete) {
-  HttpParser p{HttpParser::kRequest};
+  HttpParser p{HttpParser::REQUEST};
   int callbacks = 0;
   p.header.connect([&](std::string_view name, std::string_view value) {
     ASSERT_EQ(name, "Foo");
@@ -104,7 +104,7 @@ TEST(HttpParserTest, HeaderFieldComplete) {
 }
 
 TEST(HttpParserTest, HeaderFieldNext) {
-  HttpParser p{HttpParser::kRequest};
+  HttpParser p{HttpParser::REQUEST};
   int callbacks = 0;
   p.header.connect([&](std::string_view name, std::string_view value) {
     ASSERT_EQ(name, "Foo");
@@ -127,7 +127,7 @@ TEST(HttpParserTest, HeaderFieldNext) {
 }
 
 TEST(HttpParserTest, HeadersComplete) {
-  HttpParser p{HttpParser::kRequest};
+  HttpParser p{HttpParser::REQUEST};
   int callbacks = 0;
   p.headersComplete.connect([&](bool keepAlive) {
     ASSERT_EQ(keepAlive, false);
@@ -141,7 +141,7 @@ TEST(HttpParserTest, HeadersComplete) {
 }
 
 TEST(HttpParserTest, HeadersCompleteHTTP11) {
-  HttpParser p{HttpParser::kRequest};
+  HttpParser p{HttpParser::REQUEST};
   int callbacks = 0;
   p.headersComplete.connect([&](bool keepAlive) {
     ASSERT_EQ(keepAlive, true);
@@ -155,7 +155,7 @@ TEST(HttpParserTest, HeadersCompleteHTTP11) {
 }
 
 TEST(HttpParserTest, HeadersCompleteKeepAlive) {
-  HttpParser p{HttpParser::kRequest};
+  HttpParser p{HttpParser::REQUEST};
   int callbacks = 0;
   p.headersComplete.connect([&](bool keepAlive) {
     ASSERT_EQ(keepAlive, true);
@@ -171,7 +171,7 @@ TEST(HttpParserTest, HeadersCompleteKeepAlive) {
 }
 
 TEST(HttpParserTest, HeadersCompleteUpgrade) {
-  HttpParser p{HttpParser::kRequest};
+  HttpParser p{HttpParser::REQUEST};
   int callbacks = 0;
   p.headersComplete.connect([&](bool) {
     ASSERT_TRUE(p.IsUpgrade());
@@ -188,14 +188,14 @@ TEST(HttpParserTest, HeadersCompleteUpgrade) {
 }
 
 TEST(HttpParserTest, Reset) {
-  HttpParser p{HttpParser::kRequest};
+  HttpParser p{HttpParser::REQUEST};
   int callbacks = 0;
   p.headersComplete.connect([&](bool) { ++callbacks; });
   p.Execute("GET / HTTP/1.1\r\n");
   ASSERT_EQ(callbacks, 0);
   p.Execute("\r\n");
   ASSERT_EQ(callbacks, 1);
-  p.Reset(HttpParser::kRequest);
+  p.Reset(HttpParser::REQUEST);
   p.Execute("GET / HTTP/1.1\r\n");
   ASSERT_EQ(callbacks, 1);
   p.Execute("\r\n");

@@ -14,16 +14,16 @@
 
 static_assert(
     edu_wpi_first_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_DISABLED ==
-    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDisabled);
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_Disabled);
 static_assert(
     edu_wpi_first_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_DIGITAL ==
-    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDigital);
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_Digital);
 static_assert(
     edu_wpi_first_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_ANALOG ==
-    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kAnalog);
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_Analog);
 static_assert(
     edu_wpi_first_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_HYBRID ==
-    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kHybrid);
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_Hybrid);
 
 using namespace hal;
 

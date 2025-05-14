@@ -9,7 +9,7 @@ import edu.wpi.first.hal.HALValue;
 public class DoubleCallback extends CallbackHelperBase<Double> {
   @Override
   public void callback(String name, HALValue value) {
-    if (value.getType() != HALValue.kDouble) {
+    if (value.getType() != HALValue.DOUBLE) {
       throw new IllegalArgumentException("Wrong callback for type " + value.getType());
     }
 

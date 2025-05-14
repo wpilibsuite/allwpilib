@@ -11,16 +11,16 @@ using namespace frc;
 namespace {
 
 using StructType = wpi::Struct<frc::Rotation3d>;
-const Rotation3d kExpectedData{
+const Rotation3d EXPECTED_DATA{
     Rotation3d{Quaternion{2.29, 0.191, 0.191, 17.4}}};
 }  // namespace
 
 TEST(Rotation3dStructTest, Roundtrip) {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   Rotation3d unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.GetQuaternion(), unpacked_data.GetQuaternion());
+  EXPECT_EQ(EXPECTED_DATA.GetQuaternion(), unpacked_data.GetQuaternion());
 }

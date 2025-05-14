@@ -11,7 +11,7 @@
 using namespace nt;
 
 std::atomic<int> InstanceImpl::s_default{-1};
-std::atomic<InstanceImpl*> InstanceImpl::s_instances[kNumInstances];
+std::atomic<InstanceImpl*> InstanceImpl::s_instances[NUM_INSTANCES];
 wpi::mutex InstanceImpl::s_mutex;
 
 using namespace std::placeholders;
@@ -32,7 +32,7 @@ InstanceImpl* InstanceImpl::GetDefault() {
 }
 
 InstanceImpl* InstanceImpl::Get(int inst) {
-  if (inst < 0 || inst >= kNumInstances) {
+  if (inst < 0 || inst >= NUM_INSTANCES) {
     return nullptr;
   }
   return s_instances[inst];
@@ -66,7 +66,7 @@ int InstanceImpl::Alloc() {
 
 int InstanceImpl::AllocImpl() {
   int inst = 0;
-  for (; inst < kNumInstances; ++inst) {
+  for (; inst < NUM_INSTANCES; ++inst) {
     if (!s_instances[inst]) {
       s_instances[inst] = new InstanceImpl(inst);
       return inst;
@@ -77,7 +77,7 @@ int InstanceImpl::AllocImpl() {
 
 void InstanceImpl::Destroy(int inst) {
   std::scoped_lock lock(s_mutex);
-  if (inst < 0 || inst >= kNumInstances) {
+  if (inst < 0 || inst >= NUM_INSTANCES) {
     return;
   }
 

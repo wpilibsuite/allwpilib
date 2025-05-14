@@ -25,7 +25,7 @@ HttpParser::HttpParser(Type type) {
   m_settings.on_message_begin = [](http_parser* p) -> int {
     auto& self = *static_cast<HttpParser*>(p->data);
     self.m_urlBuf.clear();
-    self.m_state = kStart;
+    self.m_state = START;
     self.messageBegin();
     return self.m_aborted;
   };
@@ -38,7 +38,7 @@ HttpParser::HttpParser(Type type) {
       return 1;
     }
     self.m_urlBuf += std::string_view{at, length};
-    self.m_state = kUrl;
+    self.m_state = URL;
     return 0;
   };
 
@@ -51,7 +51,7 @@ HttpParser::HttpParser(Type type) {
       return 1;
     }
     self.m_valueBuf += std::string_view{at, length};
-    self.m_state = kStatus;
+    self.m_state = STATUS;
     return 0;
   };
 
@@ -61,7 +61,7 @@ HttpParser::HttpParser(Type type) {
     auto& self = *static_cast<HttpParser*>(p->data);
 
     // once we're in header, we know the URL is complete
-    if (self.m_state == kUrl) {
+    if (self.m_state == URL) {
       self.url(self.m_urlBuf);
       if (self.m_aborted) {
         return 1;
@@ -69,7 +69,7 @@ HttpParser::HttpParser(Type type) {
     }
 
     // once we're in header, we know the status is complete
-    if (self.m_state == kStatus) {
+    if (self.m_state == STATUS) {
       self.status(self.m_valueBuf);
       if (self.m_aborted) {
         return 1;
@@ -77,7 +77,7 @@ HttpParser::HttpParser(Type type) {
     }
 
     // if we previously were in value state, that means we finished a header
-    if (self.m_state == kValue) {
+    if (self.m_state == VALUE) {
       self.header(self.m_fieldBuf, self.m_valueBuf);
       if (self.m_aborted) {
         return 1;
@@ -85,8 +85,8 @@ HttpParser::HttpParser(Type type) {
     }
 
     // clear field and value when we enter this state
-    if (self.m_state != kField) {
-      self.m_state = kField;
+    if (self.m_state != FIELD) {
+      self.m_state = FIELD;
       self.m_fieldBuf.clear();
       self.m_valueBuf.clear();
     }
@@ -105,8 +105,8 @@ HttpParser::HttpParser(Type type) {
     auto& self = *static_cast<HttpParser*>(p->data);
 
     // if we weren't previously in value state, clear the buffer
-    if (self.m_state != kValue) {
-      self.m_state = kValue;
+    if (self.m_state != VALUE) {
+      self.m_state = VALUE;
       self.m_valueBuf.clear();
     }
 
@@ -123,7 +123,7 @@ HttpParser::HttpParser(Type type) {
     auto& self = *static_cast<HttpParser*>(p->data);
 
     // if we previously were in url state, that means we finished the url
-    if (self.m_state == kUrl) {
+    if (self.m_state == URL) {
       self.url(self.m_urlBuf);
       if (self.m_aborted) {
         return 1;
@@ -131,7 +131,7 @@ HttpParser::HttpParser(Type type) {
     }
 
     // if we previously were in status state, that means we finished the status
-    if (self.m_state == kStatus) {
+    if (self.m_state == STATUS) {
       self.status(self.m_valueBuf);
       if (self.m_aborted) {
         return 1;
@@ -139,7 +139,7 @@ HttpParser::HttpParser(Type type) {
     }
 
     // if we previously were in value state, that means we finished a header
-    if (self.m_state == kValue) {
+    if (self.m_state == VALUE) {
       self.header(self.m_fieldBuf, self.m_valueBuf);
       if (self.m_aborted) {
         return 1;
@@ -185,7 +185,7 @@ void HttpParser::Reset(Type type) {
                    static_cast<http_parser_type>(static_cast<int>(type)));
   m_parser.data = this;
   m_maxLength = 1024;
-  m_state = kStart;
+  m_state = START;
   m_urlBuf.clear();
   m_fieldBuf.clear();
   m_valueBuf.clear();

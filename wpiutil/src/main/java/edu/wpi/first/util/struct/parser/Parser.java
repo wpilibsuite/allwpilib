@@ -28,14 +28,14 @@ public class Parser {
     ParsedSchema schema = new ParsedSchema();
     do {
       getNextToken();
-      if (m_token == TokenKind.kSemicolon) {
+      if (m_token == TokenKind.SEMICOLON) {
         continue;
       }
-      if (m_token == TokenKind.kEndOfInput) {
+      if (m_token == TokenKind.END_OF_INPUT) {
         break;
       }
       schema.declarations.add(parseDeclaration());
-    } while (m_token != TokenKind.kEndOfInput);
+    } while (m_token != TokenKind.END_OF_INPUT);
     return schema;
   }
 
@@ -43,30 +43,30 @@ public class Parser {
     ParsedDeclaration decl = new ParsedDeclaration();
 
     // optional enum specification
-    if (m_token == TokenKind.kIdentifier && "enum".equals(m_lexer.getTokenText())) {
+    if (m_token == TokenKind.IDENTIFIER && "enum".equals(m_lexer.getTokenText())) {
       getNextToken();
-      expect(TokenKind.kLeftBrace);
+      expect(TokenKind.LEFT_BRACE);
       decl.enumValues = parseEnum();
       getNextToken();
-    } else if (m_token == TokenKind.kLeftBrace) {
+    } else if (m_token == TokenKind.LEFT_BRACE) {
       decl.enumValues = parseEnum();
       getNextToken();
     }
 
     // type name
-    expect(TokenKind.kIdentifier);
+    expect(TokenKind.IDENTIFIER);
     decl.typeString = m_lexer.getTokenText();
     getNextToken();
 
     // identifier name
-    expect(TokenKind.kIdentifier);
+    expect(TokenKind.IDENTIFIER);
     decl.name = m_lexer.getTokenText();
     getNextToken();
 
     // array or bit field
-    if (m_token == TokenKind.kLeftBracket) {
+    if (m_token == TokenKind.LEFT_BRACKET) {
       getNextToken();
-      expect(TokenKind.kInteger);
+      expect(TokenKind.INTEGER);
       String valueStr = m_lexer.getTokenText();
       int value;
       try {
@@ -81,11 +81,11 @@ public class Parser {
             m_lexer.m_pos, "array size '" + valueStr + "' is not a positive integer");
       }
       getNextToken();
-      expect(TokenKind.kRightBracket);
+      expect(TokenKind.RIGHT_BRACKET);
       getNextToken();
-    } else if (m_token == TokenKind.kColon) {
+    } else if (m_token == TokenKind.COLON) {
       getNextToken();
-      expect(TokenKind.kInteger);
+      expect(TokenKind.INTEGER);
       String valueStr = m_lexer.getTokenText();
       int value;
       try {
@@ -103,8 +103,8 @@ public class Parser {
     }
 
     // declaration must end with EOF or semicolon
-    if (m_token != TokenKind.kEndOfInput) {
-      expect(TokenKind.kSemicolon);
+    if (m_token != TokenKind.END_OF_INPUT) {
+      expect(TokenKind.SEMICOLON);
     }
 
     return decl;
@@ -115,13 +115,13 @@ public class Parser {
 
     // we start with current = '{'
     getNextToken();
-    while (m_token != TokenKind.kRightBrace) {
-      expect(TokenKind.kIdentifier);
+    while (m_token != TokenKind.RIGHT_BRACE) {
+      expect(TokenKind.IDENTIFIER);
       final String name = m_lexer.getTokenText();
       getNextToken();
-      expect(TokenKind.kEquals);
+      expect(TokenKind.EQUALS);
       getNextToken();
-      expect(TokenKind.kInteger);
+      expect(TokenKind.INTEGER);
       String valueStr = m_lexer.getTokenText();
       long value;
       try {
@@ -131,10 +131,10 @@ public class Parser {
       }
       map.put(name, value);
       getNextToken();
-      if (m_token == TokenKind.kRightBrace) {
+      if (m_token == TokenKind.RIGHT_BRACE) {
         break;
       }
-      expect(TokenKind.kComma);
+      expect(TokenKind.COMMA);
       getNextToken();
     }
     return map;

@@ -13,7 +13,7 @@ class StructTest : public testing::Test {};
 TYPED_TEST_SUITE_P(StructTest);
 
 // For these tests:
-// TypeParam defines Type, kTestData, and CheckEq
+// TypeParam defines Type, TEST_DATA, and CheckEq
 // Type is the data type
 // StructType is the instantiation of wpi::Struct<>
 
@@ -22,10 +22,10 @@ TYPED_TEST_P(StructTest, RoundTrip) {
   using StructType = wpi::Struct<Type>;
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  wpi::PackStruct(buffer, TypeParam::kTestData);
+  wpi::PackStruct(buffer, TypeParam::TEST_DATA);
 
   Type unpacked_data = wpi::UnpackStruct<Type>(buffer);
-  TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
+  TypeParam::CheckEq(TypeParam::TEST_DATA, unpacked_data);
 }
 
 TYPED_TEST_P(StructTest, DoublePack) {
@@ -33,11 +33,11 @@ TYPED_TEST_P(StructTest, DoublePack) {
   using StructType = wpi::Struct<Type>;
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  wpi::PackStruct(buffer, TypeParam::kTestData);
-  wpi::PackStruct(buffer, TypeParam::kTestData);
+  wpi::PackStruct(buffer, TypeParam::TEST_DATA);
+  wpi::PackStruct(buffer, TypeParam::TEST_DATA);
 
   Type unpacked_data = wpi::UnpackStruct<Type>(buffer);
-  TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
+  TypeParam::CheckEq(TypeParam::TEST_DATA, unpacked_data);
 }
 
 TYPED_TEST_P(StructTest, DoubleUnpack) {
@@ -45,16 +45,16 @@ TYPED_TEST_P(StructTest, DoubleUnpack) {
   using StructType = wpi::Struct<Type>;
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  wpi::PackStruct(buffer, TypeParam::kTestData);
+  wpi::PackStruct(buffer, TypeParam::TEST_DATA);
 
   {
     Type unpacked_data = wpi::UnpackStruct<Type>(buffer);
-    TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
+    TypeParam::CheckEq(TypeParam::TEST_DATA, unpacked_data);
   }
 
   {
     Type unpacked_data = wpi::UnpackStruct<Type>(buffer);
-    TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
+    TypeParam::CheckEq(TypeParam::TEST_DATA, unpacked_data);
   }
 }
 

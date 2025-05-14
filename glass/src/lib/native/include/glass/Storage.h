@@ -41,30 +41,30 @@ class Storage {
  public:
   struct Value {
     enum Type {
-      kNone,
-      kInt,
-      kInt64,
-      kBool,
-      kFloat,
-      kDouble,
-      kString,
-      kChild,
-      kIntArray,
-      kInt64Array,
-      kBoolArray,
-      kFloatArray,
-      kDoubleArray,
-      kStringArray,
-      kChildArray
+      NONE,
+      INT,
+      INT64,
+      BOOL,
+      FLOAT,
+      DOUBLE,
+      STRING,
+      CHILD,
+      INT_ARRAY,
+      INT64_ARRAY,
+      BOOL_ARRAY,
+      FLOAT_ARRAY,
+      DOUBLE_ARRAY,
+      STRING_ARRAY,
+      CHILD_ARRAY
     };
 
     Value() = default;
     explicit Value(Type type) : type{type} {}
     Value(const Value&) = delete;
     Value& operator=(const Value&) = delete;
-    ~Value() { Reset(kNone); }
+    ~Value() { Reset(NONE); }
 
-    Type type = kNone;
+    Type type = NONE;
     union {
       int intVal;
       int64_t int64Val;
@@ -249,7 +249,7 @@ class ChildIterator {
  public:
   ChildIterator(IteratorType it, IteratorType end) noexcept
       : anchor(it), end(end) {
-    while (anchor != end && anchor->second->type != Storage::Value::kChild) {
+    while (anchor != end && anchor->second->type != Storage::Value::CHILD) {
       ++anchor;
     }
   }
@@ -260,7 +260,7 @@ class ChildIterator {
   /// increment operator (needed for range-based for)
   ChildIterator& operator++() {
     ++anchor;
-    while (anchor != end && anchor->second->type != Storage::Value::kChild) {
+    while (anchor != end && anchor->second->type != Storage::Value::CHILD) {
       ++anchor;
     }
     return *this;

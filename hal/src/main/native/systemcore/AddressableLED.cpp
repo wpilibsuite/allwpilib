@@ -25,7 +25,7 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
   hal::init::CheckInit();
 
   *status = HAL_HANDLE_ERROR;
-  return HAL_kInvalidHandle;
+  return HAL_InvalidHandle;
 }
 
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {}

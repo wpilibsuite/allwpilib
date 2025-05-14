@@ -47,15 +47,15 @@ class VideoProperty {
  public:
   enum Kind {
     /// No specific property.
-    kNone = CS_PROP_NONE,
+    NONE = CS_PROP_NONE,
     /// Boolean property.
-    kBoolean = CS_PROP_BOOLEAN,
+    BOOLEAN = CS_PROP_BOOLEAN,
     /// Integer property.
-    kInteger = CS_PROP_INTEGER,
+    INTEGER = CS_PROP_INTEGER,
     /// String property.
-    kString = CS_PROP_STRING,
+    STRING = CS_PROP_STRING,
     /// Enum property.
-    kEnum = CS_PROP_ENUM
+    ENUM = CS_PROP_ENUM
   };
 
   VideoProperty() = default;
@@ -82,35 +82,35 @@ class VideoProperty {
    *
    * @return True if property is valid.
    */
-  explicit operator bool() const { return m_kind != kNone; }
+  explicit operator bool() const { return m_kind != NONE; }
 
   /**
    * Returns true if property is a boolean.
    *
    * @return True if property is a boolean.
    */
-  bool IsBoolean() const { return m_kind == kBoolean; }
+  bool IsBoolean() const { return m_kind == BOOLEAN; }
 
   /**
    * Returns true if property is an integer.
    *
    * @return True if property is an integer.
    */
-  bool IsInteger() const { return m_kind == kInteger; }
+  bool IsInteger() const { return m_kind == INTEGER; }
 
   /**
    * Returns true if property is a string.
    *
    * @return True if property is a string.
    */
-  bool IsString() const { return m_kind == kString; }
+  bool IsString() const { return m_kind == STRING; }
 
   /**
    * Returns true if property is an enum.
    *
    * @return True if property is an enum.
    */
-  bool IsEnum() const { return m_kind == kEnum; }
+  bool IsEnum() const { return m_kind == ENUM; }
 
   /**
    * Returns property value.
@@ -232,7 +232,7 @@ class VideoProperty {
   explicit VideoProperty(CS_Property handle) : m_handle(handle) {
     m_status = 0;
     if (handle == 0) {
-      m_kind = kNone;
+      m_kind = NONE;
     } else {
       m_kind = static_cast<Kind>(
           static_cast<int>(GetPropertyKind(handle, &m_status)));
@@ -244,7 +244,7 @@ class VideoProperty {
 
   mutable CS_Status m_status{0};
   CS_Property m_handle{0};
-  Kind m_kind{kNone};
+  Kind m_kind{NONE};
 };
 
 /**
@@ -260,15 +260,15 @@ class VideoSource {
    */
   enum Kind {
     /// Unknown video source.
-    kUnknown = CS_SOURCE_UNKNOWN,
+    UNKNOWN = CS_SOURCE_UNKNOWN,
     /// USB video source.
-    kUsb = CS_SOURCE_USB,
+    USB = CS_SOURCE_USB,
     /// HTTP video source.
-    kHttp = CS_SOURCE_HTTP,
+    HTTP = CS_SOURCE_HTTP,
     /// CV video source.
-    kCv = CS_SOURCE_CV,
+    CV = CS_SOURCE_CV,
     /// Raw video source.
-    kRaw = CS_SOURCE_RAW,
+    RAW = CS_SOURCE_RAW,
   };
 
   /** Connection strategy.  Used for SetConnectionStrategy(). */
@@ -277,19 +277,19 @@ class VideoSource {
      * Automatically connect or disconnect based on whether any sinks are
      * connected to this source.  This is the default behavior.
      */
-    kConnectionAutoManage = CS_CONNECTION_AUTO_MANAGE,
+    CONNECTION_AUTO_MANAGE = CS_CONNECTION_AUTO_MANAGE,
 
     /**
      * Try to keep the connection open regardless of whether any sinks are
      * connected.
      */
-    kConnectionKeepOpen = CS_CONNECTION_KEEP_OPEN,
+    CONNECTION_KEEP_OPEN = CS_CONNECTION_KEEP_OPEN,
 
     /**
      * Never open the connection.  If this is set when the connection is open,
      * close the connection.
      */
-    kConnectionForceClose = CS_CONNECTION_FORCE_CLOSE
+    CONNECTION_FORCE_CLOSE = CS_CONNECTION_FORCE_CLOSE
   };
 
   VideoSource() noexcept = default;
@@ -398,7 +398,7 @@ class VideoSource {
   /** Get a property.
    *
    * @param name Property name
-   * @return Property contents (of kind Property::kNone if no property with
+   * @return Property contents (of kind Property::NONE if no property with
    *         the given name exists)
    */
   VideoProperty GetProperty(std::string_view name) {
@@ -613,15 +613,15 @@ class VideoCamera : public VideoSource {
    */
   enum WhiteBalance {
     /// Fixed indoor white balance.
-    kFixedIndoor = 3000,
+    FIXED_INDOOR = 3000,
     /// Fixed outdoor white balance 1.
-    kFixedOutdoor1 = 4000,
+    FIXED_OUTDOOR1 = 4000,
     /// Fixed outdoor white balance 2.
-    kFixedOutdoor2 = 5000,
+    FIXED_OUTDOOR2 = 5000,
     /// Fixed fluorescent white balance 1.
-    kFixedFluorescent1 = 5100,
+    FIXED_FLUORESCENT1 = 5100,
     /// Fixed fluorescent white balance 2.
-    kFixedFlourescent2 = 5200
+    FIXED_FLUORESCENT2 = 5200
   };
 
   VideoCamera() = default;
@@ -777,13 +777,13 @@ class HttpCamera : public VideoCamera {
    */
   enum HttpCameraKind {
     /// Unknown camera kind.
-    kUnknown = CS_HTTP_UNKNOWN,
+    UNKNOWN = CS_HTTP_UNKNOWN,
     /// MJPG Streamer camera.
-    kMJPGStreamer = CS_HTTP_MJPGSTREAMER,
+    MJPG_STREAMER = CS_HTTP_MJPGSTREAMER,
     /// CS Core camera.
-    kCSCore = CS_HTTP_CSCORE,
+    CS_CORE = CS_HTTP_CSCORE,
     /// Axis camera.
-    kAxis = CS_HTTP_AXIS
+    AXIS = CS_HTTP_AXIS
   };
 
   /**
@@ -791,10 +791,10 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. AXIS)
    */
   HttpCamera(std::string_view name, std::string_view url,
-             HttpCameraKind kind = kUnknown) {
+             HttpCameraKind kind = UNKNOWN) {
     m_handle = CreateHttpCamera(
         name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
         &m_status);
@@ -805,10 +805,10 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. AXIS)
    */
   HttpCamera(std::string_view name, const char* url,
-             HttpCameraKind kind = kUnknown) {
+             HttpCameraKind kind = UNKNOWN) {
     m_handle = CreateHttpCamera(
         name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
         &m_status);
@@ -819,10 +819,10 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. AXIS)
    */
   HttpCamera(std::string_view name, const std::string& url,
-             HttpCameraKind kind = kUnknown)
+             HttpCameraKind kind = UNKNOWN)
       : HttpCamera(name, std::string_view{url}, kind) {}
 
   /**
@@ -830,10 +830,10 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param urls Array of Camera URLs
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. AXIS)
    */
   HttpCamera(std::string_view name, std::span<const std::string> urls,
-             HttpCameraKind kind = kUnknown) {
+             HttpCameraKind kind = UNKNOWN) {
     m_handle = CreateHttpCamera(
         name, urls, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
         &m_status);
@@ -844,11 +844,11 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param urls Array of Camera URLs
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. AXIS)
    */
   template <typename T>
   HttpCamera(std::string_view name, std::initializer_list<T> urls,
-             HttpCameraKind kind = kUnknown) {
+             HttpCameraKind kind = UNKNOWN) {
     std::vector<std::string> vec;
     vec.reserve(urls.size());
     for (const auto& url : urls) {
@@ -938,7 +938,7 @@ class [[deprecated("Use HttpCamera instead.")]] AxisCamera : public HttpCamera {
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
   AxisCamera(std::string_view name, std::string_view host)
-      : HttpCamera(name, HostToUrl(host), kAxis) {}
+      : HttpCamera(name, HostToUrl(host), AXIS) {}
 
   /**
    * Create a source for an Axis IP camera.
@@ -947,7 +947,7 @@ class [[deprecated("Use HttpCamera instead.")]] AxisCamera : public HttpCamera {
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
   AxisCamera(std::string_view name, const char* host)
-      : HttpCamera(name, HostToUrl(host), kAxis) {}
+      : HttpCamera(name, HostToUrl(host), AXIS) {}
 
   /**
    * Create a source for an Axis IP camera.
@@ -956,7 +956,7 @@ class [[deprecated("Use HttpCamera instead.")]] AxisCamera : public HttpCamera {
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
   AxisCamera(std::string_view name, const std::string& host)
-      : HttpCamera(name, HostToUrl(std::string_view{host}), kAxis) {}
+      : HttpCamera(name, HostToUrl(std::string_view{host}), AXIS) {}
 
   /**
    * Create a source for an Axis IP camera.
@@ -965,7 +965,7 @@ class [[deprecated("Use HttpCamera instead.")]] AxisCamera : public HttpCamera {
    * @param hosts Array of Camera host IPs/DNS names
    */
   AxisCamera(std::string_view name, std::span<const std::string> hosts)
-      : HttpCamera(name, HostToUrl(hosts), kAxis) {}
+      : HttpCamera(name, HostToUrl(hosts), AXIS) {}
 
   /**
    * Create a source for an Axis IP camera.
@@ -975,7 +975,7 @@ class [[deprecated("Use HttpCamera instead.")]] AxisCamera : public HttpCamera {
    */
   template <typename T>
   AxisCamera(std::string_view name, std::initializer_list<T> hosts)
-      : HttpCamera(name, HostToUrl(hosts), kAxis) {}
+      : HttpCamera(name, HostToUrl(hosts), AXIS) {}
 };
 
 /**
@@ -1056,7 +1056,7 @@ class ImageSource : public VideoSource {
     return VideoProperty{CreateSourceProperty(
         m_handle, name,
         static_cast<CS_PropertyKind>(
-            static_cast<int>(VideoProperty::Kind::kInteger)),
+            static_cast<int>(VideoProperty::Kind::INTEGER)),
         minimum, maximum, step, defaultValue, value, &m_status)};
   }
 
@@ -1074,7 +1074,7 @@ class ImageSource : public VideoSource {
     return VideoProperty{CreateSourceProperty(
         m_handle, name,
         static_cast<CS_PropertyKind>(
-            static_cast<int>(VideoProperty::Kind::kBoolean)),
+            static_cast<int>(VideoProperty::Kind::BOOLEAN)),
         0, 1, 1, defaultValue ? 1 : 0, value ? 1 : 0, &m_status)};
   }
 
@@ -1088,11 +1088,11 @@ class ImageSource : public VideoSource {
   VideoProperty CreateStringProperty(std::string_view name,
                                      std::string_view value) {
     m_status = 0;
-    auto prop = VideoProperty{CreateSourceProperty(
-        m_handle, name,
-        static_cast<CS_PropertyKind>(
-            static_cast<int>(VideoProperty::Kind::kString)),
-        0, 0, 0, 0, 0, &m_status)};
+    auto prop = VideoProperty{
+        CreateSourceProperty(m_handle, name,
+                             static_cast<CS_PropertyKind>(
+                                 static_cast<int>(VideoProperty::Kind::STRING)),
+                             0, 0, 0, 0, 0, &m_status)};
     prop.SetString(value);
     return prop;
   }
@@ -1139,13 +1139,13 @@ class VideoSink {
  public:
   enum Kind {
     /// Unknown sink type.
-    kUnknown = CS_SINK_UNKNOWN,
+    UNKNOWN = CS_SINK_UNKNOWN,
     /// MJPEG video sink.
-    kMjpeg = CS_SINK_MJPEG,
+    MJPEG = CS_SINK_MJPEG,
     /// CV video sink.
-    kCv = CS_SINK_CV,
+    CV = CS_SINK_CV,
     /// Raw video sink.
-    kRaw = CS_SINK_RAW,
+    RAW = CS_SINK_RAW,
   };
 
   VideoSink() noexcept = default;
@@ -1214,7 +1214,7 @@ class VideoSink {
    * Get a property of the sink.
    *
    * @param name Property name
-   * @return Property (kind Property::kNone if no property with
+   * @return Property (kind Property::NONE if no property with
    *         the given name exists)
    */
   VideoProperty GetProperty(std::string_view name) {
@@ -1310,7 +1310,7 @@ class VideoSink {
    * Get a property of the associated source.
    *
    * @param name Property name
-   * @return Property (kind Property::kNone if no property with
+   * @return Property (kind Property::NONE if no property with
    *         the given name exists or no source connected)
    */
   VideoProperty GetSourceProperty(std::string_view name) {

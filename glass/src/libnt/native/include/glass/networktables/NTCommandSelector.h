@@ -17,7 +17,7 @@
 namespace glass {
 class NTCommandSelectorModel : public CommandSelectorModel {
  public:
-  static constexpr const char* kType = "Command";
+  static constexpr const char* TYPE = "Command";
 
   explicit NTCommandSelectorModel(std::string_view path);
   NTCommandSelectorModel(nt::NetworkTableInstance inst, std::string_view path);

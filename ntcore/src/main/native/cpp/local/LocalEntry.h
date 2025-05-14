@@ -14,7 +14,7 @@ namespace nt::local {
 struct LocalPublisher;
 
 struct LocalEntry {
-  static constexpr auto kType = Handle::kEntry;
+  static constexpr auto TYPE = Handle::ENTRY;
 
   LocalEntry(NT_Entry handle, LocalSubscriber* subscriber)
       : handle{handle}, topic{subscriber->topic}, subscriber{subscriber} {}

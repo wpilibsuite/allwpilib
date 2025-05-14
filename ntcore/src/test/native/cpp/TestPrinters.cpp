@@ -25,26 +25,26 @@ void PrintTo(const Event& event, std::ostream* os) {
 void PrintTo(const Handle& handle, std::ostream* os) {
   *os << "Handle{";
   switch (handle.GetType()) {
-    case Handle::kListener:
-      *os << "kListener";
+    case Handle::LISTENER:
+      *os << "LISTENER";
       break;
-    case Handle::kListenerPoller:
-      *os << "kListenerPoller";
+    case Handle::LISTENER_POLLER:
+      *os << "LISTENER_POLLER";
       break;
-    case Handle::kEntry:
-      *os << "kEntry";
+    case Handle::ENTRY:
+      *os << "ENTRY";
       break;
-    case Handle::kInstance:
-      *os << "kInstance";
+    case Handle::INSTANCE:
+      *os << "INSTANCE";
       break;
-    case Handle::kTopic:
-      *os << "kTopic";
+    case Handle::TOPIC:
+      *os << "TOPIC";
       break;
-    case Handle::kSubscriber:
-      *os << "kSubscriber";
+    case Handle::SUBSCRIBER:
+      *os << "SUBSCRIBER";
       break;
-    case Handle::kPublisher:
-      *os << "kPublisher";
+    case Handle::PUBLISHER:
+      *os << "PUBLISHER";
       break;
     default:
       *os << "UNKNOWN";

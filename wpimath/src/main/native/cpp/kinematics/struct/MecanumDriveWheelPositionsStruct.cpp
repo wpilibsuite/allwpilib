@@ -5,10 +5,10 @@
 #include "frc/kinematics/struct/MecanumDriveWheelPositionsStruct.h"
 
 namespace {
-constexpr size_t kFrontLeftOff = 0;
-constexpr size_t kFrontRightOff = kFrontLeftOff + 8;
-constexpr size_t kRearLeftOff = kFrontRightOff + 8;
-constexpr size_t kRearRightOff = kRearLeftOff + 8;
+constexpr size_t FRONT_LEFT_OFF = 0;
+constexpr size_t FRONT_RIGHT_OFF = FRONT_LEFT_OFF + 8;
+constexpr size_t REAR_LEFT_OFF = FRONT_RIGHT_OFF + 8;
+constexpr size_t REAR_RIGHT_OFF = REAR_LEFT_OFF + 8;
 }  // namespace
 
 using StructType = wpi::Struct<frc::MecanumDriveWheelPositions>;
@@ -16,17 +16,17 @@ using StructType = wpi::Struct<frc::MecanumDriveWheelPositions>;
 frc::MecanumDriveWheelPositions StructType::Unpack(
     std::span<const uint8_t> data) {
   return frc::MecanumDriveWheelPositions{
-      units::meter_t{wpi::UnpackStruct<double, kFrontLeftOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kFrontRightOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kRearLeftOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kRearRightOff>(data)},
+      units::meter_t{wpi::UnpackStruct<double, FRONT_LEFT_OFF>(data)},
+      units::meter_t{wpi::UnpackStruct<double, FRONT_RIGHT_OFF>(data)},
+      units::meter_t{wpi::UnpackStruct<double, REAR_LEFT_OFF>(data)},
+      units::meter_t{wpi::UnpackStruct<double, REAR_RIGHT_OFF>(data)},
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
                       const frc::MecanumDriveWheelPositions& value) {
-  wpi::PackStruct<kFrontLeftOff>(data, value.frontLeft.value());
-  wpi::PackStruct<kFrontRightOff>(data, value.frontRight.value());
-  wpi::PackStruct<kRearLeftOff>(data, value.rearLeft.value());
-  wpi::PackStruct<kRearRightOff>(data, value.rearRight.value());
+  wpi::PackStruct<FRONT_LEFT_OFF>(data, value.frontLeft.value());
+  wpi::PackStruct<FRONT_RIGHT_OFF>(data, value.frontRight.value());
+  wpi::PackStruct<REAR_LEFT_OFF>(data, value.rearLeft.value());
+  wpi::PackStruct<REAR_RIGHT_OFF>(data, value.rearRight.value());
 }

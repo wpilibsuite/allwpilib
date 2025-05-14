@@ -16,7 +16,7 @@ HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(HAL_Bool, HALSIM, REVPHSolenoidOutput, false)
 DEFINE_CAPI(HAL_Bool, Initialized, false)
 DEFINE_CAPI(HAL_Bool, CompressorOn, false)
 DEFINE_CAPI(HAL_REVPHCompressorConfigType, CompressorConfigType,
-            HAL_REVPHCompressorConfigType_kDisabled)
+            HAL_REVPHCompressorConfigType_Disabled)
 DEFINE_CAPI(HAL_Bool, PressureSwitch, false)
 DEFINE_CAPI(double, CompressorCurrent, 0)
 

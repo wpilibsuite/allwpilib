@@ -16,19 +16,19 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 @Logged
 public class Intake extends SubsystemBase {
-  private final PWMSparkMax m_motor = new PWMSparkMax(IntakeConstants.kMotorPort);
+  private final PWMSparkMax m_motor = new PWMSparkMax(IntakeConstants.MOTOR_PORT);
 
   // Double solenoid connected to two channels of a PCM with the default CAN ID
   private final DoubleSolenoid m_pistons =
       new DoubleSolenoid(
           0,
           PneumaticsModuleType.CTREPCM,
-          IntakeConstants.kSolenoidPorts[0],
-          IntakeConstants.kSolenoidPorts[1]);
+          IntakeConstants.SOLENOID_PORTS[0],
+          IntakeConstants.SOLENOID_PORTS[1]);
 
   /** Returns a command that deploys the intake, and then runs the intake motor indefinitely. */
   public Command intakeCommand() {
-    return runOnce(() -> m_pistons.set(DoubleSolenoid.Value.kForward))
+    return runOnce(() -> m_pistons.set(DoubleSolenoid.Value.FORWARD))
         .andThen(run(() -> m_motor.set(1.0)))
         .withName("Intake");
   }
@@ -38,7 +38,7 @@ public class Intake extends SubsystemBase {
     return runOnce(
             () -> {
               m_motor.disable();
-              m_pistons.set(DoubleSolenoid.Value.kReverse);
+              m_pistons.set(DoubleSolenoid.Value.REVERSE);
             })
         .withName("Retract");
   }

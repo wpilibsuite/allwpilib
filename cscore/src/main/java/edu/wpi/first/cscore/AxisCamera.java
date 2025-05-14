@@ -30,7 +30,7 @@ public class AxisCamera extends HttpCamera {
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
   public AxisCamera(String name, String host) {
-    super(name, hostToUrl(host), HttpCameraKind.kAxis);
+    super(name, hostToUrl(host), HttpCameraKind.AXIS);
   }
 
   /**
@@ -40,6 +40,6 @@ public class AxisCamera extends HttpCamera {
    * @param hosts Array of Camera host IPs/DNS names
    */
   public AxisCamera(String name, String[] hosts) {
-    super(name, hostToUrl(hosts), HttpCameraKind.kAxis);
+    super(name, hostToUrl(hosts), HttpCameraKind.AXIS);
   }
 }

@@ -26,7 +26,7 @@ class Robot : public frc::TimedRobot {
   void TeleopPeriodic() override {
     // Scale setpoint value between 0 and maxSetpointValue
     units::radians_per_second_t setpoint =
-        units::math::max(0_rpm, m_joystick.GetRawAxis(0) * kMaxSetpointValue);
+        units::math::max(0_rpm, m_joystick.GetRawAxis(0) * MAX_SETPOINT_VALUE);
 
     // Set setpoint and measurement of the bang-bang controller
     units::volt_t bangOutput =
@@ -59,43 +59,43 @@ class Robot : public frc::TimedRobot {
   }
 
  private:
-  static constexpr int kMotorPort = 0;
-  static constexpr int kEncoderAChannel = 0;
-  static constexpr int kEncoderBChannel = 1;
+  static constexpr int MOTOR_PORT = 0;
+  static constexpr int ENCODER_A_CHANNEL = 0;
+  static constexpr int ENCODER_B_CHANNEL = 1;
 
   // Max setpoint for joystick control
-  static constexpr units::radians_per_second_t kMaxSetpointValue = 6000_rpm;
+  static constexpr units::radians_per_second_t MAX_SETPOINT_VALUE = 6000_rpm;
 
   // Joystick to control setpoint
   frc::Joystick m_joystick{0};
 
-  frc::PWMSparkMax m_flywheelMotor{kMotorPort};
-  frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
+  frc::PWMSparkMax m_flywheelMotor{MOTOR_PORT};
+  frc::Encoder m_encoder{ENCODER_A_CHANNEL, ENCODER_B_CHANNEL};
 
   frc::BangBangController m_bangBangController;
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  static constexpr units::volt_t kFlywheelKs = 0.0001_V;
-  static constexpr decltype(1_V / 1_rad_per_s) kFlywheelKv = 0.000195_V / 1_rpm;
-  static constexpr decltype(1_V / 1_rad_per_s_sq) kFlywheelKa =
+  static constexpr units::volt_t FLYWHEEL_S = 0.0001_V;
+  static constexpr decltype(1_V / 1_rad_per_s) FLYWHEEL_V = 0.000195_V / 1_rpm;
+  static constexpr decltype(1_V / 1_rad_per_s_sq) FLYWHEEL_A =
       0.0003_V / 1_rev_per_m_per_s;
   frc::SimpleMotorFeedforward<units::radians> m_feedforward{
-      kFlywheelKs, kFlywheelKv, kFlywheelKa};
+      FLYWHEEL_S, FLYWHEEL_V, FLYWHEEL_A};
 
   // Simulation classes help us simulate our robot
 
   // Reduction between motors and encoder, as output over input. If the flywheel
   // spins slower than the motors, this number should be greater than one.
-  static constexpr double kFlywheelGearing = 1.0;
+  static constexpr double FLYWHEEL_GEARING = 1.0;
 
   // 1/2 MR²
-  static constexpr units::kilogram_square_meter_t kFlywheelMomentOfInertia =
+  static constexpr units::kilogram_square_meter_t FLYWHEEL_MOMENT_OF_INERTIA =
       0.5 * 1.5_lb * 4_in * 4_in;
 
   frc::DCMotor m_gearbox = frc::DCMotor::NEO(1);
   frc::LinearSystem<1, 1, 1> m_plant{frc::LinearSystemId::FlywheelSystem(
-      m_gearbox, kFlywheelMomentOfInertia, kFlywheelGearing)};
+      m_gearbox, FLYWHEEL_MOMENT_OF_INERTIA, FLYWHEEL_GEARING)};
 
   frc::sim::FlywheelSim m_flywheelSim{m_plant, m_gearbox};
   frc::sim::EncoderSim m_encoderSim{m_encoder};

@@ -15,7 +15,7 @@
 using namespace frc;
 
 GenericHID::GenericHID(int port) {
-  if (port < 0 || port >= DriverStation::kJoystickPorts) {
+  if (port < 0 || port >= DriverStation::JOYSTICK_PORTS) {
     throw FRC_MakeError(warn::BadJoystickIndex, "port {} out of range", port);
   }
   m_port = port;
@@ -153,9 +153,9 @@ void GenericHID::SetRumble(RumbleType type, double value) {
   value = std::clamp(value, 0.0, 1.0);
   double rumbleValue = value * 65535;
 
-  if (type == kLeftRumble) {
+  if (type == LEFT_RUMBLE) {
     m_leftRumble = rumbleValue;
-  } else if (type == kRightRumble) {
+  } else if (type == RIGHT_RUMBLE) {
     m_rightRumble = rumbleValue;
   } else {
     m_leftRumble = rumbleValue;

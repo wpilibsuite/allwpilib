@@ -9,7 +9,7 @@ import java.util.Arrays;
 /** Log array of double values. */
 public class DoubleArrayLogEntry extends DataLogEntry {
   /** The data type for double array values. */
-  public static final String kDataType = "double[]";
+  public static final String DATA_TYPE = "double[]";
 
   /**
    * Constructs a double array log entry.
@@ -20,7 +20,7 @@ public class DoubleArrayLogEntry extends DataLogEntry {
    * @param timestamp entry creation timestamp (0=now)
    */
   public DoubleArrayLogEntry(DataLog log, String name, String metadata, long timestamp) {
-    super(log, name, kDataType, metadata, timestamp);
+    super(log, name, DATA_TYPE, metadata, timestamp);
   }
 
   /**

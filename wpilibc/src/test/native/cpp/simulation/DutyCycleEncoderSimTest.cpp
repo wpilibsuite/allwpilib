@@ -18,9 +18,9 @@ TEST(DutyCycleEncoderSimTest, Set) {
   DutyCycleEncoder enc{0, 10, 0};
   DutyCycleEncoderSim sim(enc);
 
-  constexpr double kTestValue{5.67};
-  sim.Set(kTestValue);
-  EXPECT_EQ(kTestValue, enc.Get());
+  constexpr double TEST_VALUE{5.67};
+  sim.Set(TEST_VALUE);
+  EXPECT_EQ(TEST_VALUE, enc.Get());
 }
 
 TEST(DutyCycleEncoderSimTest, SetIsConnected) {

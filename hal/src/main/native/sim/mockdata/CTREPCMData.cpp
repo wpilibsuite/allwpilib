@@ -9,14 +9,14 @@ using namespace hal;
 
 namespace hal::init {
 void InitializeCTREPCMData() {
-  static CTREPCMData spd[kNumCTREPCMModules];
+  static CTREPCMData spd[NUM_CTRE_PCM_MODULES];
   ::hal::SimCTREPCMData = spd;
 }
 }  // namespace hal::init
 
 CTREPCMData* hal::SimCTREPCMData;
 void CTREPCMData::ResetData() {
-  for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
+  for (int i = 0; i < NUM_CTRE_SOLENOID_CHANNELS; i++) {
     solenoidOutput[i].Reset(false);
   }
   initialized.Reset(false);
@@ -46,7 +46,7 @@ DEFINE_CAPI(double, CompressorCurrent, compressorCurrent)
 void HALSIM_GetCTREPCMAllSolenoids(int32_t index, uint8_t* values) {
   auto& data = SimCTREPCMData[index].solenoidOutput;
   uint8_t ret = 0;
-  for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
+  for (int i = 0; i < NUM_CTRE_SOLENOID_CHANNELS; i++) {
     ret |= (data[i] << i);
   }
   *values = ret;
@@ -54,7 +54,7 @@ void HALSIM_GetCTREPCMAllSolenoids(int32_t index, uint8_t* values) {
 
 void HALSIM_SetCTREPCMAllSolenoids(int32_t index, uint8_t values) {
   auto& data = SimCTREPCMData[index].solenoidOutput;
-  for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
+  for (int i = 0; i < NUM_CTRE_SOLENOID_CHANNELS; i++) {
     data[i] = (values & 0x1) != 0;
     values >>= 1;
   }

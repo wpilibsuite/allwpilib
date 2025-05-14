@@ -15,13 +15,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class ColorTest {
-  private static final double kEpsilon = 1e-3;
+  private static final double EPSILON = 1e-3;
 
   void assertColorMatches(double red, double green, double blue, Color color) {
     assertAll(
-        () -> assertEquals(red, color.red, kEpsilon),
-        () -> assertEquals(green, color.green, kEpsilon),
-        () -> assertEquals(blue, color.blue, kEpsilon));
+        () -> assertEquals(red, color.red, EPSILON),
+        () -> assertEquals(green, color.green, EPSILON),
+        () -> assertEquals(blue, color.blue, EPSILON));
   }
 
   @ParameterizedTest
@@ -38,8 +38,8 @@ class ColorTest {
 
   static Stream<Arguments> staticColorProvider() {
     return Stream.of(
-        arguments(0.0823529412, 0.376470589, 0.7411764706, Color.kDenim),
-        arguments(0.0, 0.4, 0.7019607844, Color.kFirstBlue),
-        arguments(0.9294117648, 0.1098039216, 0.1411764706, Color.kFirstRed));
+        arguments(0.0823529412, 0.376470589, 0.7411764706, Color.DENIM),
+        arguments(0.0, 0.4, 0.7019607844, Color.FIRST_BLUE),
+        arguments(0.9294117648, 0.1098039216, 0.1411764706, Color.FIRST_RED));
   }
 }

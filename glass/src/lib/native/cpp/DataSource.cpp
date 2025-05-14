@@ -132,21 +132,21 @@ void DataSource::DragDropTooltip() const {
 }
 
 const char* BooleanSource::GetType() const {
-  return kType;
+  return TYPE;
 }
 
 const char* DoubleSource::GetType() const {
-  return kType;
+  return TYPE;
 }
 
 const char* FloatSource::GetType() const {
-  return kType;
+  return TYPE;
 }
 
 const char* IntegerSource::GetType() const {
-  return kType;
+  return TYPE;
 }
 
 const char* StringSource::GetType() const {
-  return kType;
+  return TYPE;
 }

@@ -7,7 +7,7 @@ package edu.wpi.first.datalog;
 /** Log float values. */
 public class FloatLogEntry extends DataLogEntry {
   /** The data type for float values. */
-  public static final String kDataType = "float";
+  public static final String DATA_TYPE = "float";
 
   /**
    * Constructs a float log entry.
@@ -18,7 +18,7 @@ public class FloatLogEntry extends DataLogEntry {
    * @param timestamp entry creation timestamp (0=now)
    */
   public FloatLogEntry(DataLog log, String name, String metadata, long timestamp) {
-    super(log, name, kDataType, metadata, timestamp);
+    super(log, name, DATA_TYPE, metadata, timestamp);
   }
 
   /**

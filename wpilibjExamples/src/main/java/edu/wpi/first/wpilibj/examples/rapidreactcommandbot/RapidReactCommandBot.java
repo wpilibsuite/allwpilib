@@ -36,7 +36,7 @@ public class RapidReactCommandBot {
 
   // The driver's controller
   CommandXboxController m_driverController =
-      new CommandXboxController(OIConstants.kDriverControllerPort);
+      new CommandXboxController(OIConstants.DRIVER_CONTROLLER_PORT);
 
   /**
    * Use this method to define bindings between conditions and commands. These are useful for
@@ -70,7 +70,7 @@ public class RapidReactCommandBot {
         .a()
         .onTrue(
             parallel(
-                    m_shooter.shootCommand(ShooterConstants.kShooterTargetRPS),
+                    m_shooter.shootCommand(ShooterConstants.SHOOTER_TARGET_RPS),
                     m_storage.runCommand())
                 // Since we composed this inline we should give it a name
                 .withName("Shoot"));
@@ -87,7 +87,7 @@ public class RapidReactCommandBot {
   public Command getAutonomousCommand() {
     // Drive forward for 2 meters at half speed with a 3 second timeout
     return m_drive
-        .driveDistanceCommand(AutoConstants.kDriveDistance, AutoConstants.kDriveSpeed)
-        .withTimeout(AutoConstants.kTimeout);
+        .driveDistanceCommand(AutoConstants.DRIVE_DISTANCE, AutoConstants.DRIVE_SPEED)
+        .withTimeout(AutoConstants.TIMEOUT);
   }
 }

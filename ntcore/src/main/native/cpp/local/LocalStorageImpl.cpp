@@ -23,10 +23,10 @@ using namespace nt;
 using namespace nt::local;
 
 // maximum number of local publishers / subscribers to any given topic
-static constexpr size_t kMaxPublishers = 512;
-static constexpr size_t kMaxSubscribers = 512;
-static constexpr size_t kMaxMultiSubscribers = 512;
-static constexpr size_t kMaxListeners = 512;
+static constexpr size_t MAX_PUBLISHERS = 512;
+static constexpr size_t MAX_SUBSCRIBERS = 512;
+static constexpr size_t MAX_MULTI_SUBSCRIBERS = 512;
+static constexpr size_t MAX_LISTENERS = 512;
 
 StorageImpl::StorageImpl(int inst, IListenerStorage& listenerStorage,
                          wpi::Logger& logger)
@@ -304,7 +304,7 @@ bool StorageImpl::SetDefaultEntryValue(NT_Handle pubsubentryHandle,
 LocalSubscriber* StorageImpl::Subscribe(LocalTopic* topic, NT_Type type,
                                         std::string_view typeStr,
                                         const PubSubOptions& options) {
-  if (topic->localSubscribers.size() >= kMaxSubscribers) {
+  if (topic->localSubscribers.size() >= MAX_SUBSCRIBERS) {
     ERR("reached maximum number of subscribers to '{}', not subscribing",
         topic->name);
     return nullptr;
@@ -324,7 +324,7 @@ LocalPublisher* StorageImpl::Publish(LocalTopic* topic, NT_Type type,
     return nullptr;
   }
 
-  if (topic->localPublishers.size() >= kMaxPublishers) {
+  if (topic->localPublishers.size() >= MAX_PUBLISHERS) {
     ERR("reached maximum number of publishers to '{}', not publishing",
         topic->name);
     return nullptr;
@@ -337,7 +337,7 @@ LocalPublisher* StorageImpl::Publish(LocalTopic* topic, NT_Type type,
 LocalEntry* StorageImpl::GetEntry(LocalTopic* topic, NT_Type type,
                                   std::string_view typeStr,
                                   const PubSubOptions& options) {
-  if (topic->localSubscribers.size() >= kMaxSubscribers) {
+  if (topic->localSubscribers.size() >= MAX_SUBSCRIBERS) {
     ERR("reached maximum number of subscribers to '{}', not creating entry",
         topic->name);
     return nullptr;
@@ -360,7 +360,7 @@ LocalEntry* StorageImpl::GetEntry(std::string_view name) {
   auto* topic = GetOrCreateTopic(name);
 
   if (!topic->entry) {
-    if (topic->localSubscribers.size() >= kMaxSubscribers) {
+    if (topic->localSubscribers.size() >= MAX_SUBSCRIBERS) {
       ERR("reached maximum number of subscribers to '{}', not creating entry",
           topic->name);
       return nullptr;
@@ -378,11 +378,11 @@ LocalEntry* StorageImpl::GetEntry(std::string_view name) {
 
 void StorageImpl::RemoveSubEntry(NT_Handle subentryHandle) {
   Handle h{subentryHandle};
-  if (h.IsType(Handle::kSubscriber)) {
+  if (h.IsType(Handle::SUBSCRIBER)) {
     RemoveLocalSubscriber(subentryHandle);
-  } else if (h.IsType(Handle::kMultiSubscriber)) {
+  } else if (h.IsType(Handle::MULTI_SUBSCRIBER)) {
     RemoveMultiSubscriber(subentryHandle);
-  } else if (h.IsType(Handle::kEntry)) {
+  } else if (h.IsType(Handle::ENTRY)) {
     if (auto entry = RemoveEntry(subentryHandle)) {
       RemoveLocalSubscriber(entry->subscriber->handle);
       if (entry->publisher) {
@@ -393,7 +393,7 @@ void StorageImpl::RemoveSubEntry(NT_Handle subentryHandle) {
 }
 
 void StorageImpl::Unpublish(NT_Handle pubentryHandle) {
-  if (Handle{pubentryHandle}.IsType(Handle::kPublisher)) {
+  if (Handle{pubentryHandle}.IsType(Handle::PUBLISHER)) {
     RemoveLocalPublisher(pubentryHandle);
   } else if (auto entry = GetEntryByHandle(pubentryHandle)) {
     if (entry->publisher) {
@@ -413,7 +413,7 @@ void StorageImpl::Unpublish(NT_Handle pubentryHandle) {
 LocalMultiSubscriber* StorageImpl::AddMultiSubscriber(
     std::span<const std::string_view> prefixes, const PubSubOptions& options) {
   DEBUG4("AddMultiSubscriber({})", fmt::join(prefixes, ","));
-  if (m_multiSubscribers.size() >= kMaxMultiSubscribers) {
+  if (m_multiSubscribers.size() >= MAX_MULTI_SUBSCRIBERS) {
     ERR("reached maximum number of multi-subscribers, not subscribing");
     return nullptr;
   }
@@ -460,25 +460,25 @@ std::unique_ptr<LocalMultiSubscriber> StorageImpl::RemoveMultiSubscriber(
 
 LocalTopic* StorageImpl::GetTopic(NT_Handle handle) {
   switch (Handle{handle}.GetType()) {
-    case Handle::kEntry: {
+    case Handle::ENTRY: {
       if (auto entry = m_entries.Get(handle)) {
         return entry->topic;
       }
       break;
     }
-    case Handle::kSubscriber: {
+    case Handle::SUBSCRIBER: {
       if (auto subscriber = m_subscribers.Get(handle)) {
         return subscriber->topic;
       }
       break;
     }
-    case Handle::kPublisher: {
+    case Handle::PUBLISHER: {
       if (auto publisher = m_publishers.Get(handle)) {
         return publisher->topic;
       }
       break;
     }
-    case Handle::kTopic:
+    case Handle::TOPIC:
       return m_topics.Get(handle);
     default:
       break;
@@ -488,9 +488,9 @@ LocalTopic* StorageImpl::GetTopic(NT_Handle handle) {
 
 LocalSubscriber* StorageImpl::GetSubEntry(NT_Handle subentryHandle) {
   Handle h{subentryHandle};
-  if (h.IsType(Handle::kSubscriber)) {
+  if (h.IsType(Handle::SUBSCRIBER)) {
     return m_subscribers.Get(subentryHandle);
-  } else if (h.IsType(Handle::kEntry)) {
+  } else if (h.IsType(Handle::ENTRY)) {
     auto entry = m_entries.Get(subentryHandle);
     return entry ? entry->subscriber : nullptr;
   } else {
@@ -504,7 +504,7 @@ LocalSubscriber* StorageImpl::GetSubEntry(NT_Handle subentryHandle) {
 
 void StorageImpl::AddListenerImpl(NT_Listener listenerHandle, LocalTopic* topic,
                                   unsigned int eventMask) {
-  if (topic->localSubscribers.size() >= kMaxSubscribers) {
+  if (topic->localSubscribers.size() >= MAX_SUBSCRIBERS) {
     ERR("reached maximum number of subscribers to '{}', ignoring listener add",
         topic->name);
     return;
@@ -528,7 +528,7 @@ void StorageImpl::AddListenerImpl(NT_Listener listenerHandle,
   auto topic = subscriber->topic;
 
   if ((eventMask & NT_EVENT_TOPIC) != 0) {
-    if (topic->listeners.size() >= kMaxListeners) {
+    if (topic->listeners.size() >= MAX_LISTENERS) {
       ERR("reached maximum number of listeners to '{}', not adding listener",
           topic->name);
       return;
@@ -550,7 +550,7 @@ void StorageImpl::AddListenerImpl(NT_Listener listenerHandle,
   }
 
   if ((eventMask & NT_EVENT_VALUE_ALL) != 0) {
-    if (subscriber->valueListeners.size() >= kMaxListeners) {
+    if (subscriber->valueListeners.size() >= MAX_LISTENERS) {
       ERR("reached maximum number of listeners to '{}', not adding listener",
           topic->name);
       return;
@@ -600,7 +600,7 @@ void StorageImpl::AddListenerImpl(NT_Listener listenerHandle,
   }
 
   if ((eventMask & NT_EVENT_TOPIC) != 0) {
-    if (m_topicPrefixListeners.size() >= kMaxListeners) {
+    if (m_topicPrefixListeners.size() >= MAX_LISTENERS) {
       ERR("reached maximum number of listeners, not adding listener");
       return;
     }
@@ -626,7 +626,7 @@ void StorageImpl::AddListenerImpl(NT_Listener listenerHandle,
   }
 
   if ((eventMask & NT_EVENT_VALUE_ALL) != 0) {
-    if (subscriber->valueListeners.size() >= kMaxListeners) {
+    if (subscriber->valueListeners.size() >= MAX_LISTENERS) {
       ERR("reached maximum number of listeners, not adding listener");
       return;
     }
@@ -743,7 +743,7 @@ void StorageImpl::AddSchema(std::string_view name, std::string_view type,
 
   auto topic = GetOrCreateTopic(fullName);
 
-  if (topic->localPublishers.size() >= kMaxPublishers) {
+  if (topic->localPublishers.size() >= MAX_PUBLISHERS) {
     ERR("reached maximum number of publishers to '{}', not publishing",
         topic->name);
     return;

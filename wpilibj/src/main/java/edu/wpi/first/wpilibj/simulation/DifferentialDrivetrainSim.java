@@ -177,7 +177,7 @@ public class DifferentialDrivetrainSim {
    * @return The direction the robot is pointing.
    */
   public Rotation2d getHeading() {
-    return new Rotation2d(getOutput(State.kHeading));
+    return new Rotation2d(getOutput(State.HEADING));
   }
 
   /**
@@ -186,7 +186,7 @@ public class DifferentialDrivetrainSim {
    * @return The current pose.
    */
   public Pose2d getPose() {
-    return new Pose2d(getOutput(State.kX), getOutput(State.kY), getHeading());
+    return new Pose2d(getOutput(State.X), getOutput(State.Y), getHeading());
   }
 
   /**
@@ -195,7 +195,7 @@ public class DifferentialDrivetrainSim {
    * @return The encoder position in meters.
    */
   public double getRightPosition() {
-    return getOutput(State.kRightPosition);
+    return getOutput(State.RIGHT_POSITION);
   }
 
   /**
@@ -204,7 +204,7 @@ public class DifferentialDrivetrainSim {
    * @return The encoder velocity in meters per second.
    */
   public double getRightVelocity() {
-    return getOutput(State.kRightVelocity);
+    return getOutput(State.RIGHT_VELOCITY);
   }
 
   /**
@@ -213,7 +213,7 @@ public class DifferentialDrivetrainSim {
    * @return The encoder position in meters.
    */
   public double getLeftPosition() {
-    return getOutput(State.kLeftPosition);
+    return getOutput(State.LEFT_POSITION);
   }
 
   /**
@@ -222,7 +222,7 @@ public class DifferentialDrivetrainSim {
    * @return The encoder velocity in meters per second.
    */
   public double getLeftVelocity() {
-    return getOutput(State.kLeftVelocity);
+    return getOutput(State.LEFT_VELOCITY);
   }
 
   /**
@@ -232,7 +232,7 @@ public class DifferentialDrivetrainSim {
    */
   public double getLeftCurrentDraw() {
     return m_motor.getCurrent(
-            getState(State.kLeftVelocity) * m_currentGearing / m_wheelRadius, m_u.get(0, 0))
+            getState(State.LEFT_VELOCITY) * m_currentGearing / m_wheelRadius, m_u.get(0, 0))
         * Math.signum(m_u.get(0, 0));
   }
 
@@ -243,7 +243,7 @@ public class DifferentialDrivetrainSim {
    */
   public double getRightCurrentDraw() {
     return m_motor.getCurrent(
-            getState(State.kRightVelocity) * m_currentGearing / m_wheelRadius, m_u.get(1, 0))
+            getState(State.RIGHT_VELOCITY) * m_currentGearing / m_wheelRadius, m_u.get(1, 0))
         * Math.signum(m_u.get(1, 0));
   }
 
@@ -289,11 +289,11 @@ public class DifferentialDrivetrainSim {
    * @param pose The pose.
    */
   public void setPose(Pose2d pose) {
-    m_x.set(State.kX.value, 0, pose.getX());
-    m_x.set(State.kY.value, 0, pose.getY());
-    m_x.set(State.kHeading.value, 0, pose.getRotation().getRadians());
-    m_x.set(State.kLeftPosition.value, 0, 0);
-    m_x.set(State.kRightPosition.value, 0, 0);
+    m_x.set(State.X.value, 0, pose.getX());
+    m_x.set(State.Y.value, 0, pose.getY());
+    m_x.set(State.HEADING.value, 0, pose.getRotation().getRadians());
+    m_x.set(State.LEFT_POSITION.value, 0, 0);
+    m_x.set(State.RIGHT_POSITION.value, 0, 0);
   }
 
   /**
@@ -323,15 +323,15 @@ public class DifferentialDrivetrainSim {
 
     A.assignBlock(2, 0, Matrix.eye(Nat.N2()));
 
-    var v = (x.get(State.kLeftVelocity.value, 0) + x.get(State.kRightVelocity.value, 0)) / 2.0;
+    var v = (x.get(State.LEFT_VELOCITY.value, 0) + x.get(State.RIGHT_VELOCITY.value, 0)) / 2.0;
 
     var xdot = new Matrix<>(Nat.N7(), Nat.N1());
-    xdot.set(0, 0, v * Math.cos(x.get(State.kHeading.value, 0)));
-    xdot.set(1, 0, v * Math.sin(x.get(State.kHeading.value, 0)));
+    xdot.set(0, 0, v * Math.cos(x.get(State.HEADING.value, 0)));
+    xdot.set(1, 0, v * Math.sin(x.get(State.HEADING.value, 0)));
     xdot.set(
         2,
         0,
-        (x.get(State.kRightVelocity.value, 0) - x.get(State.kLeftVelocity.value, 0))
+        (x.get(State.RIGHT_VELOCITY.value, 0) - x.get(State.LEFT_VELOCITY.value, 0))
             / (2.0 * m_rb));
     xdot.assignBlock(3, 0, A.times(x.block(Nat.N4(), Nat.N1(), 3, 0)).plus(B.times(u)));
 
@@ -351,13 +351,13 @@ public class DifferentialDrivetrainSim {
 
   /** Represents the different states of the drivetrain. */
   enum State {
-    kX(0),
-    kY(1),
-    kHeading(2),
-    kLeftVelocity(3),
-    kRightVelocity(4),
-    kLeftPosition(5),
-    kRightPosition(6);
+    X(0),
+    Y(1),
+    HEADING(2),
+    LEFT_VELOCITY(3),
+    RIGHT_VELOCITY(4),
+    LEFT_POSITION(5),
+    RIGHT_POSITION(6);
 
     public final int value;
 
@@ -372,15 +372,15 @@ public class DifferentialDrivetrainSim {
    */
   public enum KitbotGearing {
     /** Gear ratio of 12.75:1. */
-    k12p75(12.75),
+    RATIO_12_75(12.75),
     /** Gear ratio of 10.71:1. */
-    k10p71(10.71),
+    RATIO_10_71(10.71),
     /** Gear ratio of 8.45:1. */
-    k8p45(8.45),
+    RATIO_8_45(8.45),
     /** Gear ratio of 7.31:1. */
-    k7p31(7.31),
+    RATIO_7_31(7.31),
     /** Gear ratio of 5.95:1. */
-    k5p95(5.95);
+    RATIO_5_95(5.95);
 
     /** KitbotGearing value. */
     public final double value;
@@ -393,21 +393,21 @@ public class DifferentialDrivetrainSim {
   /** Represents common motor layouts of the kit drivetrain. */
   public enum KitbotMotor {
     /** One CIM motor per drive side. */
-    kSingleCIMPerSide(DCMotor.getCIM(1)),
+    SINGLE_CIM_PER_SIDE(DCMotor.getCIM(1)),
     /** Two CIM motors per drive side. */
-    kDualCIMPerSide(DCMotor.getCIM(2)),
+    DUAL_CIM_PER_SIDE(DCMotor.getCIM(2)),
     /** One Mini CIM motor per drive side. */
-    kSingleMiniCIMPerSide(DCMotor.getMiniCIM(1)),
+    SINGLE_MINICIM_PER_SIDE(DCMotor.getMiniCIM(1)),
     /** Two Mini CIM motors per drive side. */
-    kDualMiniCIMPerSide(DCMotor.getMiniCIM(2)),
+    DUAL_MINICIM_PER_SIDE(DCMotor.getMiniCIM(2)),
     /** One Falcon 500 motor per drive side. */
-    kSingleFalcon500PerSide(DCMotor.getFalcon500(1)),
+    SINGLE_FALCON500_PER_SIDE(DCMotor.getFalcon500(1)),
     /** Two Falcon 500 motors per drive side. */
-    kDoubleFalcon500PerSide(DCMotor.getFalcon500(2)),
+    DUAL_FALCON500_PER_SIDE(DCMotor.getFalcon500(2)),
     /** One NEO motor per drive side. */
-    kSingleNEOPerSide(DCMotor.getNEO(1)),
+    SINGLE_NEO_PER_SIDE(DCMotor.getNEO(1)),
     /** Two NEO motors per drive side. */
-    kDoubleNEOPerSide(DCMotor.getNEO(2));
+    DUAL_NEO_PER_SIDE(DCMotor.getNEO(2));
 
     /** KitbotMotor value. */
     public final DCMotor value;
@@ -420,11 +420,11 @@ public class DifferentialDrivetrainSim {
   /** Represents common wheel sizes of the kit drivetrain. */
   public enum KitbotWheelSize {
     /** Six inch diameter wheels. */
-    kSixInch(Units.inchesToMeters(6)),
+    SIX_INCH(Units.inchesToMeters(6)),
     /** Eight inch diameter wheels. */
-    kEightInch(Units.inchesToMeters(8)),
+    EIGHT_INCH(Units.inchesToMeters(8)),
     /** Ten inch diameter wheels. */
-    kTenInch(Units.inchesToMeters(10));
+    TEN_INCH(Units.inchesToMeters(10));
 
     /** KitbotWheelSize value. */
     public final double value;

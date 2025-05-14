@@ -19,8 +19,8 @@ Robot::Robot() : frc::TimesliceRobot{5_ms, 10_ms} {
   // 5 ms (robot) + 2 ms (controller 1) + 2 ms (controller 2) = 9 ms
   // 9 ms / 10 ms -> 90% allocated
 
-  m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
-  m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
+  m_chooser.SetDefaultOption(AUTO_NAME_DEFAULT, AUTO_NAME_DEFAULT);
+  m_chooser.AddOption(AUTO_NAME_CUSTOM, AUTO_NAME_CUSTOM);
   frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 }
 
@@ -48,10 +48,10 @@ void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
   m_autoSelected = m_chooser.GetSelected();
   // m_autoSelected = SmartDashboard::GetString("Auto Selector",
-  //     kAutoNameDefault);
+  //     AUTO_NAME_DEFAULT);
   wpi::print("Auto selected: {}\n", m_autoSelected);
 
-  if (m_autoSelected == kAutoNameCustom) {
+  if (m_autoSelected == AUTO_NAME_CUSTOM) {
     // Custom Auto goes here
   } else {
     // Default Auto goes here
@@ -59,7 +59,7 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousPeriodic() {
-  if (m_autoSelected == kAutoNameCustom) {
+  if (m_autoSelected == AUTO_NAME_CUSTOM) {
     // Custom Auto goes here
   } else {
     // Default Auto goes here

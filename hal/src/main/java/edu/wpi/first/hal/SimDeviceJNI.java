@@ -11,13 +11,13 @@ package edu.wpi.first.hal;
  */
 public class SimDeviceJNI extends JNIWrapper {
   /** Input to user code from the simulator. */
-  public static final int kInput = 0;
+  public static final int INPUT = 0;
 
   /** Output from user code to the simulator. */
-  public static final int kOutput = 1;
+  public static final int OUTPUT = 1;
 
   /** Bidirectional between user code and simulator. */
-  public static final int kBidir = 2;
+  public static final int BIDIR = 2;
 
   /**
    * Creates a simulated device.
@@ -90,7 +90,7 @@ public class SimDeviceJNI extends JNIWrapper {
    * @return simulated value handle
    */
   public static int createSimValueInt(int device, String name, int direction, int initialValue) {
-    return createSimValueNative(device, name, direction, HALValue.kInt, initialValue, 0.0);
+    return createSimValueNative(device, name, direction, HALValue.INT, initialValue, 0.0);
   }
 
   /**
@@ -105,7 +105,7 @@ public class SimDeviceJNI extends JNIWrapper {
    * @return simulated value handle
    */
   public static int createSimValueLong(int device, String name, int direction, long initialValue) {
-    return createSimValueNative(device, name, direction, HALValue.kLong, initialValue, 0.0);
+    return createSimValueNative(device, name, direction, HALValue.LONG, initialValue, 0.0);
   }
 
   /**
@@ -121,7 +121,7 @@ public class SimDeviceJNI extends JNIWrapper {
    */
   public static int createSimValueDouble(
       int device, String name, int direction, double initialValue) {
-    return createSimValueNative(device, name, direction, HALValue.kDouble, 0, initialValue);
+    return createSimValueNative(device, name, direction, HALValue.DOUBLE, 0, initialValue);
   }
 
   /**
@@ -178,7 +178,7 @@ public class SimDeviceJNI extends JNIWrapper {
   public static int createSimValueBoolean(
       int device, String name, int direction, boolean initialValue) {
     return createSimValueNative(
-        device, name, direction, HALValue.kBoolean, initialValue ? 1 : 0, 0.0);
+        device, name, direction, HALValue.BOOLEAN, initialValue ? 1 : 0, 0.0);
   }
 
   /**
@@ -248,7 +248,7 @@ public class SimDeviceJNI extends JNIWrapper {
    * @param value the value to set
    */
   public static void setSimValueInt(int handle, int value) {
-    setSimValueNative(handle, HALValue.kInt, value, 0.0);
+    setSimValueNative(handle, HALValue.INT, value, 0.0);
   }
 
   /**
@@ -258,7 +258,7 @@ public class SimDeviceJNI extends JNIWrapper {
    * @param value the value to set
    */
   public static void setSimValueLong(int handle, long value) {
-    setSimValueNative(handle, HALValue.kLong, value, 0.0);
+    setSimValueNative(handle, HALValue.LONG, value, 0.0);
   }
 
   /**
@@ -268,7 +268,7 @@ public class SimDeviceJNI extends JNIWrapper {
    * @param value the value to set
    */
   public static void setSimValueDouble(int handle, double value) {
-    setSimValueNative(handle, HALValue.kDouble, 0, value);
+    setSimValueNative(handle, HALValue.DOUBLE, 0, value);
   }
 
   /**
@@ -278,7 +278,7 @@ public class SimDeviceJNI extends JNIWrapper {
    * @param value the value to set
    */
   public static void setSimValueEnum(int handle, int value) {
-    setSimValueNative(handle, HALValue.kEnum, value, 0.0);
+    setSimValueNative(handle, HALValue.ENUM, value, 0.0);
   }
 
   /**
@@ -288,7 +288,7 @@ public class SimDeviceJNI extends JNIWrapper {
    * @param value the value to set
    */
   public static void setSimValueBoolean(int handle, boolean value) {
-    setSimValueNative(handle, HALValue.kBoolean, value ? 1 : 0, 0.0);
+    setSimValueNative(handle, HALValue.BOOLEAN, value ? 1 : 0, 0.0);
   }
 
   /**

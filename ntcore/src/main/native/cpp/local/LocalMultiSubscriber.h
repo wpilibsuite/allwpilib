@@ -25,7 +25,7 @@ constexpr bool PrefixMatch(std::string_view name, std::string_view prefix,
 }
 
 struct LocalMultiSubscriber {
-  static constexpr auto kType = Handle::kMultiSubscriber;
+  static constexpr auto TYPE = Handle::MULTI_SUBSCRIBER;
 
   LocalMultiSubscriber(NT_MultiSubscriber handle,
                        std::span<const std::string_view> prefixes,

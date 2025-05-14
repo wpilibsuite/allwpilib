@@ -33,14 +33,14 @@ class Robot : public frc::TimedRobot {
     // negative values when we push forward.
     const auto xSpeed = -m_xspeedLimiter.Calculate(
                             frc::ApplyDeadband(m_controller.GetLeftY(), 0.02)) *
-                        Drivetrain::kMaxSpeed;
+                        Drivetrain::MAX_SPEED;
 
     // Get the y speed or sideways/strafe speed. We are inverting this because
     // we want a positive value when we pull to the left. Xbox controllers
     // return positive values when you pull to the right by default.
     const auto ySpeed = -m_yspeedLimiter.Calculate(
                             frc::ApplyDeadband(m_controller.GetLeftX(), 0.02)) *
-                        Drivetrain::kMaxSpeed;
+                        Drivetrain::MAX_SPEED;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
@@ -48,7 +48,7 @@ class Robot : public frc::TimedRobot {
     // the right by default.
     const auto rot = -m_rotLimiter.Calculate(
                          frc::ApplyDeadband(m_controller.GetRightX(), 0.02)) *
-                     Drivetrain::kMaxAngularSpeed;
+                     Drivetrain::MAX_ANGULAR_SPEED;
 
     m_swerve.Drive(xSpeed, ySpeed, rot, fieldRelative, GetPeriod());
   }

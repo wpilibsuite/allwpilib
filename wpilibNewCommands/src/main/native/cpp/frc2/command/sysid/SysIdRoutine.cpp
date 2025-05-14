@@ -10,13 +10,13 @@ using namespace frc2::sysid;
 
 frc2::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
   frc::sysid::State state;
-  if (direction == Direction::kForward) {
-    state = frc::sysid::State::kQuasistaticForward;
-  } else {  // if (direction == Direction::kReverse) {
-    state = frc::sysid::State::kQuasistaticReverse;
+  if (direction == Direction::FORWARD) {
+    state = frc::sysid::State::QUASISTATIC_FORWARD;
+  } else {  // if (direction == Direction::REVERSE) {
+    state = frc::sysid::State::QUASISTATIC_REVERSE;
   }
 
-  double outputSign = direction == Direction::kForward ? 1.0 : -1.0;
+  double outputSign = direction == Direction::FORWARD ? 1.0 : -1.0;
 
   return m_mechanism.m_subsystem->RunOnce([this] { timer.Restart(); })
       .AndThen(
@@ -29,7 +29,7 @@ frc2::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
               })
               .FinallyDo([this] {
                 m_mechanism.m_drive(0_V);
-                m_recordState(frc::sysid::State::kNone);
+                m_recordState(frc::sysid::State::NONE);
                 timer.Stop();
               })
               .WithName("sysid-" +
@@ -40,13 +40,13 @@ frc2::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
 
 frc2::CommandPtr SysIdRoutine::Dynamic(Direction direction) {
   frc::sysid::State state;
-  if (direction == Direction::kForward) {
-    state = frc::sysid::State::kDynamicForward;
-  } else {  // if (direction == Direction::kReverse) {
-    state = frc::sysid::State::kDynamicReverse;
+  if (direction == Direction::FORWARD) {
+    state = frc::sysid::State::DYNAMIC_FORWARD;
+  } else {  // if (direction == Direction::REVERSE) {
+    state = frc::sysid::State::DYNAMIC_REVERSE;
   }
 
-  double outputSign = direction == Direction::kForward ? 1.0 : -1.0;
+  double outputSign = direction == Direction::FORWARD ? 1.0 : -1.0;
 
   return m_mechanism.m_subsystem
       ->RunOnce([this] { m_outputVolts = m_config.m_stepVoltage; })
@@ -57,7 +57,7 @@ frc2::CommandPtr SysIdRoutine::Dynamic(Direction direction) {
       }))
       .FinallyDo([this] {
         m_mechanism.m_drive(0_V);
-        m_recordState(frc::sysid::State::kNone);
+        m_recordState(frc::sysid::State::NONE);
       })
       .WithName("sysid-" +
                 frc::sysid::SysIdRoutineLog::StateEnumToString(state) + "-" +

@@ -21,9 +21,9 @@ public class I2C implements AutoCloseable {
   /** I2C connection ports. */
   public enum Port {
     /** I2C Port 0. */
-    kPort0(0),
+    PORT0(0),
     /** I2C Port 1. */
-    kPort1(1);
+    PORT1(1);
 
     /** Port value. */
     public final int value;

@@ -7,6 +7,6 @@
 using namespace frc;
 
 RomiMotor::RomiMotor(int channel) : PWMMotorController("Romi Motor", channel) {
-  m_pwm.SetOutputPeriod(PWM::kOutputPeriod_5Ms);
+  m_pwm.SetOutputPeriod(PWM::OUTPUT_PERIOD_5MS);
   SetSpeed(0.0);
 }

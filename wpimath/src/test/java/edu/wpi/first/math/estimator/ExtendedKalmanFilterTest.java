@@ -113,7 +113,7 @@ class ExtendedKalmanFilterTest {
 
     List<Pose2d> waypoints =
         List.of(
-            new Pose2d(2.75, 22.521, Rotation2d.kZero),
+            new Pose2d(2.75, 22.521, Rotation2d.ZERO),
             new Pose2d(24.73, 19.68, Rotation2d.fromDegrees(5.846)));
     var trajectory =
         TrajectoryGenerator.generateTrajectory(waypoints, new TrajectoryConfig(8.8, 0.1));

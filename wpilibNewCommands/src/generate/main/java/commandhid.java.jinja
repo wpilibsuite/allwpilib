@@ -6,6 +6,9 @@
 {% macro capitalize_first(string) -%}
 {{ string[0]|capitalize + string[1:] }}
 {%- endmacro %}
+{% macro snakecase(string) -%}
+{{ string|camel_to_snake }}
+{%- endmacro %}
 package edu.wpi.first.wpilibj2.command.button;
 
 import edu.wpi.first.wpilibj.{{ ConsoleName }}Controller;
@@ -60,7 +63,7 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger {{ button.name }}(EventLoop loop) {
-    return button({{ ConsoleName }}Controller.Button.k{{ capitalize_first(button.name) }}.value, loop);
+    return button({{ ConsoleName }}Controller.Button.{{ snakecase(button.name) }}.value, loop);
   }
 {% endfor -%}
 {% for trigger in triggers -%}
@@ -76,7 +79,7 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger {{ trigger.name }}(double threshold, EventLoop loop) {
-    return axisGreaterThan({{ ConsoleName }}Controller.Axis.k{{ capitalize_first(trigger.name) }}.value, threshold, loop);
+    return axisGreaterThan({{ ConsoleName }}Controller.Axis.{{ snakecase(trigger.name) }}.value, threshold, loop);
   }
 
   /**

@@ -5,8 +5,8 @@
 #include "frc/kinematics/struct/DifferentialDriveWheelPositionsStruct.h"
 
 namespace {
-constexpr size_t kLeftOff = 0;
-constexpr size_t kRightOff = kLeftOff + 8;
+constexpr size_t LEFT_OFF = 0;
+constexpr size_t RIGHT_OFF = LEFT_OFF + 8;
 }  // namespace
 
 using StructType = wpi::Struct<frc::DifferentialDriveWheelPositions>;
@@ -14,13 +14,13 @@ using StructType = wpi::Struct<frc::DifferentialDriveWheelPositions>;
 frc::DifferentialDriveWheelPositions StructType::Unpack(
     std::span<const uint8_t> data) {
   return frc::DifferentialDriveWheelPositions{
-      units::meter_t{wpi::UnpackStruct<double, kLeftOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kRightOff>(data)},
+      units::meter_t{wpi::UnpackStruct<double, LEFT_OFF>(data)},
+      units::meter_t{wpi::UnpackStruct<double, RIGHT_OFF>(data)},
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
                       const frc::DifferentialDriveWheelPositions& value) {
-  wpi::PackStruct<kLeftOff>(data, value.left.value());
-  wpi::PackStruct<kRightOff>(data, value.right.value());
+  wpi::PackStruct<LEFT_OFF>(data, value.left.value());
+  wpi::PackStruct<RIGHT_OFF>(data, value.right.value());
 }

@@ -42,7 +42,7 @@ public class DataLogWriter extends DataLog {
   public DataLogWriter(OutputStream os, String extraHeader) {
     super(DataLogJNI.fgCreateMemory(extraHeader));
     m_os = os;
-    m_buf = new byte[kBufferSize];
+    m_buf = new byte[BUFFER_SIZE];
   }
 
   /**
@@ -77,7 +77,7 @@ public class DataLogWriter extends DataLog {
     }
   }
 
-  private static final int kBufferSize = 16 * 1024;
+  private static final int BUFFER_SIZE = 16 * 1024;
 
   private final OutputStream m_os;
   private final byte[] m_buf;

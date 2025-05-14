@@ -21,17 +21,17 @@
  * to control a flywheel.
  */
 class Robot : public frc::TimedRobot {
-  static constexpr int kMotorPort = 0;
-  static constexpr int kEncoderAChannel = 0;
-  static constexpr int kEncoderBChannel = 1;
-  static constexpr int kJoystickPort = 0;
-  static constexpr units::radians_per_second_t kSpinup = 500_rpm;
+  static constexpr int MOTOR_PORT = 0;
+  static constexpr int ENCODER_A_CHANNEL = 0;
+  static constexpr int ENCODER_B_CHANNEL = 1;
+  static constexpr int JOYSTICK_PORT = 0;
+  static constexpr units::radians_per_second_t SPINUP = 500_rpm;
 
   // Volts per (radian per second)
-  static constexpr auto kFlywheelKv = 0.023_V / 1_rad_per_s;
+  static constexpr auto FLYWHEEL_V = 0.023_V / 1_rad_per_s;
 
   // Volts per (radian per second squared)
-  static constexpr auto kFlywheelKa = 0.001_V / 1_rad_per_s_sq;
+  static constexpr auto FLYWHEEL_A = 0.001_V / 1_rad_per_s_sq;
 
   // The plant holds a state-space model of our flywheel. This system has the
   // following properties:
@@ -40,10 +40,10 @@ class Robot : public frc::TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [velocity], in radians per second.
   //
-  // The Kv and Ka constants are found using the FRC Characterization toolsuite.
+  // The V and A constants are found using the FRC Characterization toolsuite.
   frc::LinearSystem<1, 1, 1> m_flywheelPlant =
-      frc::LinearSystemId::IdentifyVelocitySystem<units::radian>(kFlywheelKv,
-                                                                 kFlywheelKa);
+      frc::LinearSystemId::IdentifyVelocitySystem<units::radian>(FLYWHEEL_V,
+                                                                 FLYWHEEL_A);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   frc::KalmanFilter<1, 1, 1> m_observer{
@@ -74,10 +74,10 @@ class Robot : public frc::TimedRobot {
                                         m_observer, 12_V, 20_ms};
 
   // An encoder set up to measure flywheel velocity in radians per second.
-  frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
+  frc::Encoder m_encoder{ENCODER_A_CHANNEL, ENCODER_B_CHANNEL};
 
-  frc::PWMSparkMax m_motor{kMotorPort};
-  frc::XboxController m_joystick{kJoystickPort};
+  frc::PWMSparkMax m_motor{MOTOR_PORT};
+  frc::XboxController m_joystick{JOYSTICK_PORT};
 
  public:
   Robot() {
@@ -94,7 +94,7 @@ class Robot : public frc::TimedRobot {
     // setpoint of a PID controller.
     if (m_joystick.GetRightBumperButton()) {
       // We pressed the bumper, so let's set our next reference
-      m_loop.SetNextR(frc::Vectord<1>{kSpinup.value()});
+      m_loop.SetNextR(frc::Vectord<1>{SPINUP.value()});
     } else {
       // We released the bumper, so let's spin down
       m_loop.SetNextR(frc::Vectord<1>{0.0});

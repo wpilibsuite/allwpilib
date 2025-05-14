@@ -12,7 +12,7 @@ using namespace frc;
 
 Victor::Victor(int channel) : PWMMotorController("Victor", channel) {
   SetBounds(2.027_ms, 1.525_ms, 1.507_ms, 1.49_ms, 1.026_ms);
-  m_pwm.SetOutputPeriod(PWM::kOutputPeriod_10Ms);
+  m_pwm.SetOutputPeriod(PWM::OUTPUT_PERIOD_10MS);
   SetSpeed(0.0);
 
   HAL_ReportUsage("IO", GetChannel(), "Victor");

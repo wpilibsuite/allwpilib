@@ -16,5 +16,5 @@ class Robot : public frc::TimedRobot {
 
  private:
   Intake m_intake;
-  frc::Joystick m_joystick{OperatorConstants::kJoystickIndex};
+  frc::Joystick m_joystick{OperatorConstants::JOYSTICK_INDEX};
 };

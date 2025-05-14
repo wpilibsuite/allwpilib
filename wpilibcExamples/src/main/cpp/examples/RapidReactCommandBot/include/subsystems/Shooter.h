@@ -32,13 +32,13 @@ class Shooter : public frc2::SubsystemBase {
   frc2::CommandPtr ShootCommand(units::turns_per_second_t setpoint);
 
  private:
-  frc::PWMSparkMax m_shooterMotor{ShooterConstants::kShooterMotorPort};
-  frc::PWMSparkMax m_feederMotor{ShooterConstants::kFeederMotorPort};
+  frc::PWMSparkMax m_shooterMotor{ShooterConstants::SHOOTER_MOTOR_PORT};
+  frc::PWMSparkMax m_feederMotor{ShooterConstants::FEEDER_MOTOR_PORT};
 
-  frc::Encoder m_shooterEncoder{ShooterConstants::kEncoderPorts[0],
-                                ShooterConstants::kEncoderPorts[1],
-                                ShooterConstants::kEncoderReversed};
+  frc::Encoder m_shooterEncoder{ShooterConstants::ENCODER_PORTS[0],
+                                ShooterConstants::ENCODER_PORTS[1],
+                                ShooterConstants::ENCODER_REVERSED};
   frc::SimpleMotorFeedforward<units::radians> m_shooterFeedforward{
-      ShooterConstants::kS, ShooterConstants::kV};
+      ShooterConstants::S, ShooterConstants::kV};
   frc::PIDController m_shooterFeedback{ShooterConstants::kP, 0.0, 0.0};
 };

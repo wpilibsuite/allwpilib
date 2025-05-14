@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj.Timer;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
-  public static final double kMaxSpeed = 3.0; // 3 meters per second
-  public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
+  public static final double MAX_SPEED = 3.0; // 3 meters per second
+  public static final double MAX_ANGULAR_SPEED = Math.PI; // 1/2 rotation per second
 
   private final Translation2d m_frontLeftLocation = new Translation2d(0.381, 0.381);
   private final Translation2d m_frontRightLocation = new Translation2d(0.381, -0.381);
@@ -48,7 +48,7 @@ public class Drivetrain {
             m_backLeft.getPosition(),
             m_backRight.getPosition()
           },
-          Pose2d.kZero,
+          Pose2d.ZERO,
           VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
           VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
@@ -75,7 +75,7 @@ public class Drivetrain {
     chassisSpeeds = chassisSpeeds.discretize(period);
 
     var states = m_kinematics.toWheelSpeeds(chassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, kMaxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_SPEED);
 
     m_frontLeft.setDesiredState(states[0]);
     m_frontRight.setDesiredState(states[1]);
