@@ -1,0 +1,46 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//wpilibjExamples:build_java_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates")
+
+py_binary(
+    name = "generate_bazel_files",
+    srcs = ["generate_bazel_files.py"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+genrule(
+    name = "generate_bazel_files_rule",
+    srcs = [
+        "src/main/java/edu/wpi/first/wpilibj/commands/commands.json",
+        "src/main/java/edu/wpi/first/wpilibj/examples/examples.json",
+        "src/main/java/edu/wpi/first/wpilibj/snippets/snippets.json",
+        "src/main/java/edu/wpi/first/wpilibj/templates/templates.json",
+    ],
+    outs = ["gen/example_projects.bzl"],
+    cmd = "$(locations :generate_bazel_files) $(OUTS)",
+    tools = [":generate_bazel_files"],
+)
+
+write_source_file(
+    name = "write_example_project_list",
+    in_file = ":generate_bazel_files_rule",
+    out_file = "example_projects.bzl",
+    suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
+    visibility = ["//visibility:public"],
+)
+
+halsim_deps = [
+]
+
+build_commands()
+
+build_examples(halsim_deps = halsim_deps)
+
+build_snippets()
+
+build_templates()
