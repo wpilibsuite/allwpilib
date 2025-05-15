@@ -1,5 +1,15 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 
+def generate_maven_info_cmd(
+        artifact,
+        group_id,
+        artifact_name,
+        suffix = ""):
+    """
+    Helper function used to format the maven info into a CSV that can be parsed by the python tool.
+    """
+    return "$(locations {}),{},{},{} ".format(artifact, group_id, artifact_name, suffix)
+
 def bundle_library_artifacts(
         name,
         group_id,
@@ -7,7 +17,9 @@ def bundle_library_artifacts(
         cc_hdr_pkg = None,
         cc_src_pkg = None,
         cc_static_library_pkg = None,
-        jni_pkg = None):
+        java_pkg = None,
+        jni_pkg = None,
+        add_cc_suffix = True):
     """
     Helper function for creating a file containing the info used to later publish maven libraries
 
@@ -25,28 +37,26 @@ def bundle_library_artifacts(
     srcs = []
 
     cmd = "$(locations //shared/bazel/rules/publishing:generate_maven_bundle) --output_file=$(OUTS) --maven_infos "
+    maybe_cc_suffix = "-cpp" if add_cc_suffix else ""
 
     # TODO(pjreiniger) Make this cross platform
     platform = "linuxx86-64"
 
-    def add_cc_arg(package_name, suffix):
-        return "$(locations " + package_name + ")," + group_id + "," + library_base_name + "-cpp," + suffix + " "
-
     if cc_hdr_pkg:
         srcs.append(cc_hdr_pkg)
-        cmd += add_cc_arg(cc_hdr_pkg, "-headers")
+        cmd += generate_maven_info_cmd(cc_hdr_pkg, group_id, library_base_name + maybe_cc_suffix, "-headers")
 
     if cc_src_pkg:
         srcs.append(cc_src_pkg)
-        cmd += add_cc_arg(cc_src_pkg, "-sources")
+        cmd += generate_maven_info_cmd(cc_src_pkg, group_id, library_base_name + maybe_cc_suffix, "-sources")
 
     if cc_static_library_pkg:
         srcs.append(cc_static_library_pkg)
-        cmd += add_cc_arg(cc_static_library_pkg, "-" + platform + "static")
+        cmd += generate_maven_info_cmd(cc_static_library_pkg, group_id, library_base_name + maybe_cc_suffix, "-" + platform + "static")
 
     if jni_pkg:
         srcs.append(jni_pkg)
-        cmd += "$(locations " + jni_pkg + ")," + group_id + "," + library_base_name + "-jni,-" + platform + " "
+        cmd += generate_maven_info_cmd(jni_pkg, group_id, library_base_name + "-jni", "-" + platform)
 
     output_file = name + "-maven-info.json"
 

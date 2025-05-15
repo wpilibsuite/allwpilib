@@ -63,6 +63,8 @@ def wpilib_cc_library(
         extra_src_pkg_files = [],
         extra_hdr_pkg_files = [],
         include_license_files = False,
+        srcs_pkg_root = "src/main/native/cpp",
+        hdrs_pkg_root = "src/main/native/include",
         **kwargs):
     """
     This function is used to ease the creation of a cc_library with publishing given the standard allwpilib directory structure.
@@ -100,8 +102,8 @@ def wpilib_cc_library(
 
     pkg_files(
         name = name + "-srcs-pkg",
-        srcs = native.glob(["src/main/native/cpp/**"]),
-        strip_prefix = "src/main/native/cpp",
+        srcs = native.glob([srcs_pkg_root + "/**"]),
+        strip_prefix = srcs_pkg_root,
         tags = ["manual"],
     )
 
@@ -113,8 +115,8 @@ def wpilib_cc_library(
 
     pkg_files(
         name = name + "-headers-pkg",
-        srcs = native.glob(["src/main/native/include/**"]),
-        strip_prefix = "src/main/native/include",
+        srcs = native.glob([hdrs_pkg_root + "/**"]),
+        strip_prefix = hdrs_pkg_root,
         tags = ["manual"],
     )
 

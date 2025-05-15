@@ -1,5 +1,8 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
 load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
+load("//shared/bazel/rules/publishing:publishing.bzl", "bundle_library_artifacts")
 
 WIN_SRCS = glob(["src/main/native/directx11/**/*.cpp"])
 
@@ -31,7 +34,16 @@ wpilib_objc_library(
     ],
 )
 
-cc_library(
+pkg_files(
+    name = "native-pkg",
+    srcs = glob([
+        "src/main/native/directx11/**",
+        "src/main/native/opengl3/**",
+        "src/main/native/metal/**",
+    ]),
+)
+
+wpilib_cc_library(
     name = "wpigui",
     srcs = glob(["src/main/native/cpp/**/*.cpp"]) +
            select({
@@ -39,6 +51,8 @@ cc_library(
                "@bazel_tools//src/conditions:windows": WIN_SRCS,
                "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_SRCS,
            }),
+    extra_src_pkg_files = [":native-pkg"],
+    include_license_files = True,
     strip_include_prefix = "include",
     tags = [
         "wpi-cpp-gui",
@@ -51,4 +65,13 @@ cc_library(
         "@bazel_tools//src/conditions:darwin": [":wpigui-mac"],
         "//conditions:default": [],
     }),
+)
+
+bundle_library_artifacts(
+    name = "publishing_bundle",
+    cc_hdr_pkg = ":wpigui-hdrs-zip",
+    cc_src_pkg = ":wpigui-srcs-zip",
+    cc_static_library_pkg = ":wpigui-zip",
+    library_base_name = "wpigui",
+    group_id = "edu.wpi.first.wpigui",
 )

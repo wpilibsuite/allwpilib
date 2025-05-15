@@ -1,11 +1,14 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+load("//shared/bazel/rules/publishing:publishing.bzl", "bundle_library_artifacts")
 
-cc_library(
+wpilib_cc_library(
     name = "halsim_gui",
     srcs = glob([
         "src/main/native/cpp/*",
         "src/main/native/include/*.h",
     ]),
+    include_license_files = True,
     includes = ["src/main/native/include"],
     tags = [
         "wpi-cpp-gui",
@@ -48,4 +51,14 @@ cc_binary(
     deps = [
         ":halsim_gui",
     ],
+)
+
+bundle_library_artifacts(
+    name = "publishing_bundle",
+    add_cc_suffix = False,
+    cc_hdr_pkg = ":halsim_gui-hdrs-zip",
+    cc_src_pkg = ":halsim_gui-srcs-zip",
+    cc_static_library_pkg = ":halsim_gui-zip",
+    library_base_name = "halsim_gui",
+    group_id = "edu.wpi.first.halsim",
 )

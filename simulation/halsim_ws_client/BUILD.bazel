@@ -1,11 +1,14 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+load("//shared/bazel/rules/publishing:publishing.bzl", "bundle_library_artifacts")
 
-cc_library(
+wpilib_cc_library(
     name = "halsim_ws_client",
     srcs = glob([
         "src/main/native/cpp/*.cpp",
         "src/main/native/include/*.h",
     ]),
+    include_license_files = True,
     includes = ["src/main/native/include"],
     target_compatible_with = select({
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
@@ -24,4 +27,14 @@ cc_binary(
     deps = [
         ":halsim_ws_client",
     ],
+)
+
+bundle_library_artifacts(
+    name = "publishing_bundle",
+    add_cc_suffix = False,
+    cc_hdr_pkg = ":halsim_ws_client-hdrs-zip",
+    cc_src_pkg = ":halsim_ws_client-srcs-zip",
+    cc_static_library_pkg = ":halsim_ws_client-zip",
+    library_base_name = "halsim_ws_client",
+    group_id = "edu.wpi.first.halsim",
 )

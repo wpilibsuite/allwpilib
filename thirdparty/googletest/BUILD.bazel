@@ -1,10 +1,23 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+load("//shared/bazel/rules/publishing:publishing.bzl", "bundle_library_artifacts")
 
-cc_library(
+wpilib_cc_library(
     name = "googletest.static",
     srcs = glob(["src/**"]),
     hdrs = glob(["include/**"]),
+    hdrs_pkg_root = "include",
+    include_license_files = True,
     includes = ["src/googletest"],
+    srcs_pkg_root = "src",
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
+)
+
+bundle_library_artifacts(
+    name = "publishing_bundle",
+    cc_hdr_pkg = ":googletest.static-hdrs-zip",
+    cc_src_pkg = ":googletest.static-srcs-zip",
+    cc_static_library_pkg = ":googletest.static-zip",
+    library_base_name = "googletest",
+    group_id = "edu.wpi.first.thirdparty.googletest",
 )
