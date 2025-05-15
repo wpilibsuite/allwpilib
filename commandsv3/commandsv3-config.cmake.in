@@ -8,7 +8,7 @@ include(CMakeFindDependencyMacro)
 @WPIMATH_DEP_REPLACE@
 
 @FILENAME_DEP_REPLACE@
-include(${SELF_DIR}/wpilibnewcommands.cmake)
+include(${SELF_DIR}/commandsv3.cmake)
 if(@WITH_JAVA@)
-    include(${SELF_DIR}/wpilibNewCommands_jar.cmake)
+    include(${SELF_DIR}/commandsv3_jar.cmake)
 endif()
