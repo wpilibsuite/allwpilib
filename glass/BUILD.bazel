@@ -61,8 +61,8 @@ bundle_library_artifacts(
     cc_hdr_pkg = ":libglass-hdrs-zip",
     cc_src_pkg = ":libglass-srcs-zip",
     cc_static_library_pkg = ":libglass-zip",
-    library_base_name = "libglass",
     group_id = "edu.wpi.first.glass",
+    library_base_name = "libglass",
 )
 
 bundle_library_artifacts(
@@ -71,8 +71,8 @@ bundle_library_artifacts(
     cc_hdr_pkg = ":libglassnt-hdrs-zip",
     cc_src_pkg = ":libglassnt-srcs-zip",
     cc_static_library_pkg = ":libglassnt-zip",
-    library_base_name = "libglassnt",
     group_id = "edu.wpi.first.glass",
+    library_base_name = "libglassnt",
 )
 
 cc_binary(

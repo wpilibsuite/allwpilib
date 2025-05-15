@@ -1,9 +1,48 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//ntcore:generate_ntcore.bzl", "generate_ntcore")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules/publishing:publishing.bzl", "bundle_default_jni_library")
+
+generate_ntcore(
+    name = "generate_ntcore",
+)
+
+filegroup(
+    name = "templates",
+    srcs = glob([
+        "src/generate/**/*.jinja",
+        "src/generate/*.json",
+    ]),
+)
+
+py_binary(
+    name = "generate_topics",
+    srcs = ["generate_topics.py"],
+    data = [":templates"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [requirement("jinja2")],
+)
+
+write_source_files(
+    name = "write_ntcore",
+    files = {
+        "src/generated": ":generate_ntcore",
+    },
+    suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
+    visibility = ["//visibility:public"],
+)
 
 third_party_cc_lib_helper(
     name = "generated_cc",

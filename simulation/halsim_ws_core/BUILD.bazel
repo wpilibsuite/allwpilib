@@ -29,6 +29,6 @@ bundle_library_artifacts(
     cc_hdr_pkg = ":halsim_ws_core-hdrs-zip",
     cc_src_pkg = ":halsim_ws_core-srcs-zip",
     cc_static_library_pkg = ":halsim_ws_core-zip",
-    library_base_name = "halsim_ws_core",
     group_id = "edu.wpi.first.halsim",
+    library_base_name = "halsim_ws_core",
 )

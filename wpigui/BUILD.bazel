@@ -72,6 +72,6 @@ bundle_library_artifacts(
     cc_hdr_pkg = ":wpigui-hdrs-zip",
     cc_src_pkg = ":wpigui-srcs-zip",
     cc_static_library_pkg = ":wpigui-zip",
-    library_base_name = "wpigui",
     group_id = "edu.wpi.first.wpigui",
+    library_base_name = "wpigui",
 )

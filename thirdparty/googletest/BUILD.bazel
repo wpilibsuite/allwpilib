@@ -18,6 +18,6 @@ bundle_library_artifacts(
     cc_hdr_pkg = ":googletest.static-hdrs-zip",
     cc_src_pkg = ":googletest.static-srcs-zip",
     cc_static_library_pkg = ":googletest.static-zip",
-    library_base_name = "googletest",
     group_id = "edu.wpi.first.thirdparty.googletest",
+    library_base_name = "googletest",
 )

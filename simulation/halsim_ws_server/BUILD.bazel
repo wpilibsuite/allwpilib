@@ -59,6 +59,6 @@ bundle_library_artifacts(
     cc_hdr_pkg = ":halsim_ws_server-hdrs-zip",
     cc_src_pkg = ":halsim_ws_server-srcs-zip",
     cc_static_library_pkg = ":halsim_ws_server-zip",
-    library_base_name = "halsim_ws_server",
     group_id = "edu.wpi.first.halsim",
+    library_base_name = "halsim_ws_server",
 )

@@ -1,10 +1,62 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
 load("//shared/bazel/rules/publishing:publishing.bzl", "bundle_default_jni_library")
+load("//wpiutil:generate.bzl", "generate_wpiutil")
+
+py_binary(
+    name = "nanopb_generator",
+    srcs = glob(["src/main/native/thirdparty/nanopb/generator/**/*.py"]),
+    data = ["src/main/native/thirdparty/nanopb/generator/proto/nanopb.proto"],
+    imports = ["."],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        requirement("protobuf"),
+        requirement("grpcio-tools"),
+    ],
+)
+
+py_binary(
+    name = "generate_nanopb",
+    srcs = ["generate_nanopb.py"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "proto_files",
+    srcs = glob(["src/test/proto/*.proto"]),
+)
+
+generate_wpiutil(
+    name = "generate_wpiutil",
+    proto_files = ":proto_files",
+)
+
+write_source_files(
+    name = "write_wpiutil",
+    files = {
+        "src/generated/test/native/cpp": ":generate_wpiutil",
+    },
+    suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
+    visibility = ["//visibility:public"],
+)
 
 third_party_cc_lib_helper(
     name = "argparse",
