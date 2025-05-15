@@ -23,6 +23,8 @@ public final class Continuation {
   private static final MethodHandle java_lang_thread_setContinuation;
   private static final MethodHandle java_lang_thread_getContinuation;
 
+  private static final ThreadLocal<Continuation> mountedContinuation = new ThreadLocal<>();
+
   static {
     try {
       jdk_internal_vm_Continuation = Class.forName("jdk.internal.vm.Continuation");
@@ -149,8 +151,10 @@ public final class Continuation {
     try {
       if (continuation == null) {
         java_lang_thread_setContinuation.invoke(Thread.currentThread(), null);
+        mountedContinuation.remove();
       } else {
         java_lang_thread_setContinuation.invoke(Thread.currentThread(), continuation.continuation);
+        mountedContinuation.set(continuation);
       }
     } catch (Throwable t) {
       // Anything thrown internally by Thread.setContinuation.
@@ -158,6 +162,16 @@ public final class Continuation {
       // However, if the invocation fails for some reason, we'll end up with an
       // IllegalStateException when attempting to run an unmounted continuation
     }
+  }
+
+  /**
+   * Gets the currently mounted continuation. This is thread-local value; calling this method on two
+   * different threads will give two different results.
+   *
+   * @return The continuation mounted on the current thread.
+   */
+  public static Continuation getMountedContinuation() {
+    return mountedContinuation.get();
   }
 
   @Override
@@ -173,13 +187,6 @@ public final class Continuation {
   }
 
   boolean isMounted() {
-    try {
-      Object mountedContinuation = java_lang_thread_getContinuation.invoke(Thread.currentThread());
-      return mountedContinuation == continuation;
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
+    return this == getMountedContinuation();
   }
 }
