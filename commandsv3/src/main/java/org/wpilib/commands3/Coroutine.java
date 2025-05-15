@@ -178,6 +178,8 @@ public final class Coroutine {
     while (commands.stream().allMatch(scheduler::isScheduledOrRunning)) {
       this.yield();
     }
+
+    commands.forEach(scheduler::cancel);
   }
 
   /**
