@@ -8,6 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import edu.wpi.first.wpilibj.RobotController;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
@@ -23,8 +26,8 @@ class CoroutineTest {
   void setup() {
     scheduler = new Scheduler();
     scope = new ContinuationScope("Test Scope");
+    RobotController.setTimeSource(() -> System.nanoTime() / 1000L);
   }
-
 
   @Test
   void forkMany() {
@@ -111,5 +114,36 @@ class CoroutineTest {
     } catch (IllegalStateException expected) {
       assertEquals("Coroutines can only be used while running in a command", expected.getMessage());
     }
+  }
+
+  @Test
+  void awaitAnyCleansUp() {
+    AtomicBoolean firstRan = new AtomicBoolean(false);
+    AtomicBoolean secondRan = new AtomicBoolean(false);
+    AtomicBoolean ranAfterAwait = new AtomicBoolean(false);
+
+    var firstInner = Command.noRequirements(c2 -> firstRan.set(true)).named("First");
+    var secondInner = Command.noRequirements(c2 -> {
+      secondRan.set(true);
+      c2.park();
+    }).named("Second");
+
+    var outer = Command.noRequirements(co -> {
+      co.awaitAny(firstInner, secondInner);
+
+      ranAfterAwait.set(true);
+      co.park(); // prevent exiting
+    }).named("Command");
+
+    scheduler.schedule(outer);
+    scheduler.run();
+
+    // Everything should have run...
+    assertTrue(firstRan.get());
+    assertTrue(secondRan.get());
+    assertTrue(ranAfterAwait.get());
+
+    // But only the outer command should still be running; secondInner should have been cancelled
+    assertEquals(Set.of(outer), scheduler.getRunningCommands());
   }
 }
