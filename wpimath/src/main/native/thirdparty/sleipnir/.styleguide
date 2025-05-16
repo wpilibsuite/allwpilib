@@ -10,13 +10,14 @@ modifiableFileExclude {
   \.patch$
   \.png$
   \.svg$
-  jormungandr/cpp/Docstrings\.hpp$
+  jormungandr/cpp/docstrings\.hpp$
   jormungandr/py\.typed$
 }
 
 includeOtherLibs {
   ^Eigen/
   ^catch2/
+  ^gch/
   ^nanobind/
   ^sleipnir/
 }
