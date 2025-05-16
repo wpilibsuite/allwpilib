@@ -209,7 +209,8 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs
     return 0;
   }
 
-  env->SetByteArrayRegion(povsArray, 0, povs.count, reinterpret_cast<const jbyte*>(povs.povs));
+  env->SetByteArrayRegion(povsArray, 0, povs.count,
+                          reinterpret_cast<const jbyte*>(povs.povs));
 
   return povs.count;
 }

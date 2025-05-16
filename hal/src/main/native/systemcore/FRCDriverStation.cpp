@@ -11,6 +11,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <networktables/BooleanTopic.h>
@@ -33,8 +34,8 @@
 #include "hal/proto/ErrorInfo.h"
 #include "hal/proto/JoystickDescriptor.h"
 #include "hal/proto/JoystickRumbleData.h"
-#include "hal/proto/OpMode.h"
 #include "hal/proto/MatchInfo.h"
+#include "hal/proto/OpMode.h"
 #include "mrc/NtNetComm.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
@@ -140,9 +141,18 @@ struct SystemServerDriverStation {
           ntInst.GetProtobufTopic<mrc::JoystickDescriptor>(name).Subscribe({});
     }
 
-    teleopOpModes = ntInst.GetProtobufTopic<std::vector<mrc::OpMode>>(ROBOT_TELEOP_OP_MODES_PATH).Publish();
-    autoOpModes = ntInst.GetProtobufTopic<std::vector<mrc::OpMode>>(ROBOT_AUTO_OP_MODES_PATH).Publish();
-    testOpModes = ntInst.GetProtobufTopic<std::vector<mrc::OpMode>>(ROBOT_TEST_OP_MODES_PATH).Publish();
+    teleopOpModes = ntInst
+                        .GetProtobufTopic<std::vector<mrc::OpMode>>(
+                            ROBOT_TELEOP_OP_MODES_PATH)
+                        .Publish();
+    autoOpModes = ntInst
+                      .GetProtobufTopic<std::vector<mrc::OpMode>>(
+                          ROBOT_AUTO_OP_MODES_PATH)
+                      .Publish();
+    testOpModes = ntInst
+                      .GetProtobufTopic<std::vector<mrc::OpMode>>(
+                          ROBOT_TEST_OP_MODES_PATH)
+                      .Publish();
 
     std::vector<mrc::OpMode> staticTeleopOpModes;
     staticTeleopOpModes.emplace_back(mrc::OpMode{"TeleOp", 2});
@@ -557,17 +567,13 @@ void HAL_ObserveUserProgramStarting(void) {
   systemServerDs->hasUserCodeReadyPublisher.Set(true);
 }
 
-void HAL_ObserveUserProgramDisabled(void) {
-}
+void HAL_ObserveUserProgramDisabled(void) {}
 
-void HAL_ObserveUserProgramAutonomous(void) {
-}
+void HAL_ObserveUserProgramAutonomous(void) {}
 
-void HAL_ObserveUserProgramTeleop(void) {
-}
+void HAL_ObserveUserProgramTeleop(void) {}
 
-void HAL_ObserveUserProgramTest(void) {
-}
+void HAL_ObserveUserProgramTest(void) {}
 
 HAL_Bool HAL_RefreshDSData(void) {
   mrc::ControlData newestData;

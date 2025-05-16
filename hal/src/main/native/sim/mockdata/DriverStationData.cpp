@@ -320,7 +320,8 @@ void DriverStationData::GetJoystickCounts(int32_t stick, int32_t* axisCount,
   *povCount = m_joystickData[stick].povs.count;
 }
 
-void DriverStationData::SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad) {
+void DriverStationData::SetJoystickIsGamepad(int32_t stick,
+                                             HAL_Bool isGamepad) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
