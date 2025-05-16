@@ -452,15 +452,15 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxes
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickPOVs
- * Signature: (B[S)V
+ * Signature: (B[B)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVs
-  (JNIEnv* env, jclass, jbyte joystickNum, jshortArray povsArray)
+  (JNIEnv* env, jclass, jbyte joystickNum, jbyteArray povsArray)
 {
   HAL_JoystickPOVs povs;
   {
-    JSpan<const jshort> jArrayRef(env, povsArray);
+    JSpan<const jbyte> jArrayRef(env, povsArray);
     auto arrayRef = jArrayRef.array();
     auto arraySize = arrayRef.size();
     int maxCount =
@@ -701,14 +701,14 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButtonCount
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    setJoystickIsXbox
+ * Method:    setJoystickIsGamepad
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickIsXbox
-  (JNIEnv*, jclass, jint stick, jboolean isXbox)
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickIsGamepad
+  (JNIEnv*, jclass, jint stick, jboolean isGamepad)
 {
-  HALSIM_SetJoystickIsXbox(stick, isXbox);
+  HALSIM_SetJoystickIsGamepad(stick, isGamepad);
 }
 
 /*

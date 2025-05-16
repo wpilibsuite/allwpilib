@@ -323,12 +323,12 @@ class DriverStationSim {
   static void SetJoystickButtonCount(int stick, int count);
 
   /**
-   * Sets the value of isXbox for a joystick.
+   * Sets the value of isGamepad for a joystick.
    *
    * @param stick The joystick number
-   * @param isXbox The value of isXbox
+   * @param isGamepad The value of isGamepad
    */
-  static void SetJoystickIsXbox(int stick, bool isXbox);
+  static void SetJoystickIsGamepad(int stick, bool isGamepad);
 
   /**
    * Sets the value of type for a joystick.

@@ -99,7 +99,7 @@ void HALSIM_GetJoystickCounts(int32_t stick, int32_t* axisCount,
   *povCount = 0;
 }
 
-void HALSIM_SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox) {}
+void HALSIM_SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad) {}
 
 void HALSIM_SetJoystickType(int32_t stick, int32_t type) {}
 

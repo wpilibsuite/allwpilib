@@ -105,7 +105,7 @@ class DriverStationData {
   void GetJoystickCounts(int32_t stick, int32_t* axisCount,
                          int32_t* buttonCount, int32_t* povCount);
 
-  void SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox);
+  void SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad);
   void SetJoystickType(int32_t stick, int32_t type);
   void SetJoystickName(int32_t stick, std::string_view message);
   void SetJoystickAxisType(int32_t stick, int32_t axis, int32_t type);

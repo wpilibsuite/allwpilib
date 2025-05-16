@@ -225,8 +225,8 @@ void DriverStationSim::SetJoystickButtonCount(int stick, int count) {
   HALSIM_SetJoystickButtonCount(stick, count);
 }
 
-void DriverStationSim::SetJoystickIsXbox(int stick, bool isXbox) {
-  HALSIM_SetJoystickIsXbox(stick, isXbox);
+void DriverStationSim::SetJoystickIsGamepad(int stick, bool isGamepad) {
+  HALSIM_SetJoystickIsGamepad(stick, isGamepad);
 }
 
 void DriverStationSim::SetJoystickType(int stick, int type) {

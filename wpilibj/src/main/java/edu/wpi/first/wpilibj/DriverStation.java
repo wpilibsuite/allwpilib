@@ -47,24 +47,24 @@ public final class DriverStation {
   }
 
   private static class HALJoystickAxesRaw {
-    public final int[] m_axes;
+    public final short[] m_axes;
 
     @SuppressWarnings("unused")
     public int m_count;
 
     HALJoystickAxesRaw(int count) {
-      m_axes = new int[count];
+      m_axes = new short[count];
     }
   }
 
   private static class HALJoystickPOVs {
-    public final short[] m_povs;
+    public final byte[] m_povs;
     public int m_count;
 
     HALJoystickPOVs(int count) {
-      m_povs = new short[count];
+      m_povs = new byte[count];
       for (int i = 0; i < count; i++) {
-        m_povs[i] = -1;
+        m_povs[i] = 0;
       }
     }
   }
@@ -779,17 +779,17 @@ public final class DriverStation {
   }
 
   /**
-   * Gets the value of isXbox on a joystick.
+   * Gets the value of isGamepad on a joystick.
    *
    * @param stick The joystick port number
-   * @return A boolean that returns the value of isXbox
+   * @return A boolean that returns the value of isGamepad
    */
-  public static boolean getJoystickIsXbox(int stick) {
+  public static boolean getJoystickIsGamepad(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
-    return DriverStationJNI.getJoystickIsXbox((byte) stick) == 1;
+    return DriverStationJNI.getJoystickIsGamepad((byte) stick) == 1;
   }
 
   /**
