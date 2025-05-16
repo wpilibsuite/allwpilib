@@ -4,52 +4,46 @@
 
 #include "Robot.h"
 
+#include <frc2/command/Command.h>
+#include <frc2/command/Commands.h>
+#include <frc2/command/button/Trigger.h>
+
+#include "Constants.h"
+
 Robot::Robot() {
-  // Configure default commands and condition bindings on robot startup
-  m_robot.ConfigureBindings();
+  // Automatically run the storage motor whenever the ball storage is not full,
+  // and turn it off whenever it fills. Uses subsystem-hosted trigger to
+  // improve readability and make inter-subsystem communication easier.
+  m_storage.HasCargo.WhileFalse(m_storage.RunCommand());
+
+  // Automatically disable and retract the intake whenever the ball storage is
+  // full.
+  m_storage.HasCargo.OnTrue(m_intake.RetractCommand());
+
+  // Control the drive with split-stick arcade controls
+  m_drive.SetDefaultCommand(m_drive.ArcadeDriveCommand(
+      [this] { return -m_driverController.GetLeftY(); },
+      [this] { return -m_driverController.GetRightX(); }));
+
+  // Deploy the intake with the X button
+  m_driverController.X().OnTrue(m_intake.IntakeCommand());
+  // Retract the intake with the Y button
+  m_driverController.Y().OnTrue(m_intake.RetractCommand());
+
+  // Fire the shooter with the A button
+  m_driverController.A().OnTrue(
+      frc2::cmd::Parallel(
+          m_shooter.ShootCommand(ShooterConstants::kShooterTarget),
+          m_storage.RunCommand())
+          // Since we composed this inline we should give it a name
+          .WithName("Shoot"));
+
+  // Toggle compressor with the Start button
+  m_driverController.Start().ToggleOnTrue(
+      m_pneumatics.DisableCompressorCommand());
+
+  m_autoChooser.SetDefaultOption("Example Auto", m_exampleAuto.get());
 }
-
-void Robot::RobotPeriodic() {
-  // Runs the Scheduler.  This is responsible for polling buttons, adding
-  // newly-scheduled commands, running already-scheduled commands, removing
-  // finished or interrupted commands, and running subsystem Periodic() methods.
-  // This must be called from the robot's periodic block in order for anything
-  // in the Command-based framework to work.
-  frc2::CommandScheduler::GetInstance().Run();
-}
-
-void Robot::DisabledInit() {}
-
-void Robot::DisabledPeriodic() {}
-
-void Robot::AutonomousInit() {
-  m_autonomousCommand = m_robot.GetAutonomousCommand();
-
-  if (m_autonomousCommand) {
-    m_autonomousCommand->Schedule();
-  }
-}
-
-void Robot::AutonomousPeriodic() {}
-
-void Robot::TeleopInit() {
-  // This makes sure that the autonomous stops running when
-  // teleop starts running. If you want the autonomous to
-  // continue until interrupted by another command, remove
-  // this line or comment it out.
-  if (m_autonomousCommand) {
-    m_autonomousCommand->Cancel();
-  }
-}
-
-void Robot::TeleopPeriodic() {}
-
-void Robot::TestInit() {
-  // Cancels all running commands at the start of test mode.
-  frc2::CommandScheduler::GetInstance().CancelAll();
-}
-
-void Robot::TestPeriodic() {}
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
