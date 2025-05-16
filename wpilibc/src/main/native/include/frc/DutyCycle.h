@@ -71,6 +71,9 @@ class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
   /**
    * Get the frequency of the duty cycle signal.
    *
+   * @warning This will return inaccurate values for up to 2 seconds after this
+   * duty cycle input is initialized.
+   *
    * @return frequency in Hertz
    */
   int GetFrequency() const;
