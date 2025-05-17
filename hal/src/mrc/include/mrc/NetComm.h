@@ -16,9 +16,31 @@
 
 namespace mrc {
 
+struct OpModeTrace {
+  uint64_t Hash{0};
+  bool Enabled{false};
+  bool NoCurrentOpMpode{false};
+
+  static OpModeTrace FromValue(uint64_t Value) {
+    return OpModeTrace{
+        .Hash = Value & 0x3FFFFFFFFFFFFFFF,
+        .Enabled = (Value & 0x8000000000000000) == 0,
+        .NoCurrentOpMpode = (Value & 0x4000000000000000) != 0,
+    };
+  }
+
+  uint64_t ToValue() const {
+    uint64_t RetVal = Hash & 0x3FFFFFFFFFFFFFFF;
+    RetVal |= Enabled ? 0 : 0x8000000000000000;
+    RetVal |= NoCurrentOpMpode ? 0x4000000000000000 : 0;
+    return RetVal;
+  }
+};
+
 struct ControlFlags {
   uint32_t Enabled : 1;
-  uint32_t ModeReserved : 2;
+  uint32_t Auto : 1;
+  uint32_t Test : 1;
   uint32_t EStop : 1;
   uint32_t FmsConnected : 1;
   uint32_t DsConnected : 1;
@@ -29,9 +51,9 @@ struct ControlFlags {
 
 struct JoystickAxes {
  public:
-  std::span<float> Axes() { return std::span{AxesStore.data(), GetCount()}; }
+  std::span<int16_t> Axes() { return std::span{AxesStore.data(), GetCount()}; }
 
-  std::span<const float> Axes() const {
+  std::span<const int16_t> Axes() const {
     return std::span{AxesStore.data(), GetCount()};
   }
 
@@ -42,15 +64,15 @@ struct JoystickAxes {
   size_t GetCount() const { return Count; }
 
  private:
-  std::array<float, MRC_MAX_NUM_AXES> AxesStore;
+  std::array<int16_t, MRC_MAX_NUM_AXES> AxesStore;
   uint8_t Count{0};
 };
 
 struct JoystickPovs {
  public:
-  std::span<int16_t> Povs() { return std::span{PovsStore.data(), GetCount()}; }
+  std::span<uint8_t> Povs() { return std::span{PovsStore.data(), GetCount()}; }
 
-  std::span<const int16_t> Povs() const {
+  std::span<const uint8_t> Povs() const {
     return std::span{PovsStore.data(), GetCount()};
   }
 
@@ -61,7 +83,7 @@ struct JoystickPovs {
   size_t GetCount() const { return Count; }
 
  private:
-  std::array<int16_t, MRC_MAX_NUM_POVS> PovsStore;
+  std::array<uint8_t, MRC_MAX_NUM_POVS> PovsStore;
   uint8_t Count{0};
 };
 
@@ -86,7 +108,8 @@ struct Joystick {
 
 struct ControlData {
   ControlFlags ControlWord;
-  float MatchTime;
+  uint16_t MatchTime;
+  uint64_t CurrentOpMode;
 
   std::span<Joystick> Joysticks() {
     return std::span{JoysticksStore.data(), GetJoystickCount()};
@@ -103,41 +126,30 @@ struct ControlData {
         (std::min)(NewCount, static_cast<uint8_t>(MRC_MAX_NUM_JOYSTICKS));
   }
 
-  void SetOpMode(std::string_view Mode) {
-    if (Mode.size() > MRC_MAX_OPMODE_LEN) {
-      Mode = Mode.substr(0, MRC_MAX_OPMODE_LEN);
-    }
-    OpMode = Mode;
-  }
-
-  void MoveOpMode(std::string&& Mode) {
-    OpMode = std::move(Mode);
-    if (OpMode.size() > MRC_MAX_OPMODE_LEN) {
-      OpMode.resize(MRC_MAX_OPMODE_LEN);
-    }
-  }
-
-  std::string_view GetOpMode() const { return OpMode; }
-
-  std::span<uint8_t> WritableOpModeBuffer(size_t Len) {
-    if (Len > MRC_MAX_OPMODE_LEN) {
-      Len = MRC_MAX_OPMODE_LEN;
-    }
-    OpMode.resize(Len);
-    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(OpMode.data()),
-                              OpMode.size()};
-  }
-
  private:
   std::array<Joystick, MRC_MAX_NUM_JOYSTICKS> JoysticksStore;
   uint8_t JoystickCount{0};
-  std::string OpMode;
 };
 
-struct JoystickOutputData {
-  uint32_t HidOutputs{0};
-  float LeftRumble{0};
-  float RightRumble{0};
+struct JoystickRumbleData {
+ public:
+  std::span<uint16_t> Rumbles() {
+    return std::span{RumbleStore.data(), GetCount()};
+  }
+
+  std::span<const uint16_t> Rumbles() const {
+    return std::span{RumbleStore.data(), GetCount()};
+  }
+
+  void SetCount(uint8_t NewCount) {
+    Count = (std::min)(NewCount, static_cast<uint8_t>(MRC_MAX_NUM_RUMBLE));
+  }
+
+  size_t GetCount() const { return Count; }
+
+ private:
+  std::array<uint16_t, MRC_MAX_NUM_RUMBLE> RumbleStore;
+  uint8_t Count{0};
 };
 
 enum class MatchType : uint8_t {
@@ -190,8 +202,9 @@ struct MatchInfo {
 
 struct JoystickDescriptor {
  public:
-  bool IsXbox{0};
+  bool IsGamepad{0};
   uint8_t Type{0};
+  uint8_t RumbleCount{0};
 
   std::span<uint8_t> AxesTypes() {
     return std::span{AxesTypesStore.data(), GetAxesCount()};
@@ -251,64 +264,6 @@ struct JoystickDescriptor {
   uint8_t AxesCount{0};
   uint8_t ButtonCount{0};
   uint8_t PovCount{0};
-};
-
-struct VersionInfo {
-  uint32_t DeviceId{0};
-
-  void SetName(std::string_view NewName) {
-    if (NewName.size() > MRC_MAX_VERSION_SIZE) {
-      NewName = NewName.substr(0, MRC_MAX_VERSION_SIZE);
-    }
-    Name = NewName;
-  }
-
-  void MoveName(std::string&& NewName) {
-    Name = std::move(NewName);
-    if (Name.size() > MRC_MAX_VERSION_SIZE) {
-      Name.resize(MRC_MAX_VERSION_SIZE);
-    }
-  }
-
-  std::string_view GetName() const { return Name; }
-
-  std::span<uint8_t> WritableNameBuffer(size_t Len) {
-    if (Len > MRC_MAX_VERSION_SIZE) {
-      Len = MRC_MAX_VERSION_SIZE;
-    }
-    Name.resize(Len);
-    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Name.data()),
-                              Name.size()};
-  }
-
-  void SetVersion(std::string_view NewVersion) {
-    if (NewVersion.size() > MRC_MAX_VERSION_SIZE) {
-      NewVersion = NewVersion.substr(0, MRC_MAX_VERSION_SIZE);
-    }
-    Version = NewVersion;
-  }
-
-  void MoveVersion(std::string&& NewVersion) {
-    Version = std::move(NewVersion);
-    if (Version.size() > MRC_MAX_VERSION_SIZE) {
-      Version.resize(MRC_MAX_VERSION_SIZE);
-    }
-  }
-
-  std::string_view GetVersion() const { return Version; }
-
-  std::span<uint8_t> WritableVersionBuffer(size_t Len) {
-    if (Len > MRC_MAX_VERSION_SIZE) {
-      Len = MRC_MAX_VERSION_SIZE;
-    }
-    Version.resize(Len);
-    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Version.data()),
-                              Version.size()};
-  }
-
- private:
-  std::string Name;
-  std::string Version;
 };
 
 struct ErrorInfo {
@@ -394,6 +349,44 @@ struct ErrorInfo {
   std::string Details;
   std::string Location;
   std::string CallStack;
+};
+
+struct OpMode {
+  OpMode(std::string_view _Name, uint64_t _Hash) : Hash{_Hash} {
+    SetName(_Name);
+  }
+
+  OpMode() = default;
+
+  uint64_t Hash{0};
+
+  void SetName(std::string_view NewName) {
+    if (NewName.size() > MRC_MAX_OPMODE_LEN) {
+      NewName = NewName.substr(0, MRC_MAX_OPMODE_LEN);
+    }
+    Name = NewName;
+  }
+
+  void MoveName(std::string&& NewName) {
+    Name = std::move(NewName);
+    if (Name.size() > MRC_MAX_OPMODE_LEN) {
+      Name.resize(MRC_MAX_OPMODE_LEN);
+    }
+  }
+
+  std::string_view GetName() const { return Name; }
+
+  std::span<uint8_t> WritableNameBuffer(size_t Len) {
+    if (Len > MRC_MAX_OPMODE_LEN) {
+      Len = MRC_MAX_OPMODE_LEN;
+    }
+    Name.resize(Len);
+    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Name.data()),
+                              Name.size()};
+  }
+
+ private:
+  std::string Name;
 };
 
 }  // namespace mrc

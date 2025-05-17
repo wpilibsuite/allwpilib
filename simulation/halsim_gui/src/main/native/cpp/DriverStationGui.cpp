@@ -393,29 +393,6 @@ void GlfwSystemJoystick::Update() {
   }
 }
 
-static int HatToAngle(unsigned char hat) {
-  switch (hat) {
-    case GLFW_HAT_UP:
-      return 0;
-    case GLFW_HAT_RIGHT:
-      return 90;
-    case GLFW_HAT_DOWN:
-      return 180;
-    case GLFW_HAT_LEFT:
-      return 270;
-    case GLFW_HAT_RIGHT_UP:
-      return 45;
-    case GLFW_HAT_RIGHT_DOWN:
-      return 135;
-    case GLFW_HAT_LEFT_UP:
-      return 315;
-    case GLFW_HAT_LEFT_DOWN:
-      return 225;
-    default:
-      return -1;
-  }
-}
-
 void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
   if (!m_present) {
     return;
@@ -438,7 +415,7 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
   }
 
   // copy into HAL structures
-  data->desc.isXbox = m_isGamepad ? 1 : 0;
+  data->desc.isGamepad = m_isGamepad ? 1 : 0;
   data->desc.type = m_isGamepad ? 21 : 20;
   std::strncpy(data->desc.name, m_name, sizeof(data->desc.name) - 1);
   data->desc.name[sizeof(data->desc.name) - 1] = '\0';
@@ -478,7 +455,14 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
 
   data->povs.count = data->desc.povCount;
   for (int j = 0; j < data->povs.count; ++j) {
-    data->povs.povs[j] = HatToAngle(m_hats[j]);
+#if __GNUC__ >= 12
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
+#endif  // __GNUC__ >= 12
+    data->povs.povs[j] = m_hats[j];
+#if __GNUC__ >= 12
+#pragma GCC diagnostic pop
+#endif  // __GNUC__ >= 12
   }
 }
 
@@ -562,7 +546,7 @@ KeyboardJoystick::KeyboardJoystick(glass::Storage& storage, int index)
   }
 
   // init desc structure
-  m_data.desc.isXbox = 0;
+  m_data.desc.isGamepad = 0;
   m_data.desc.type = 20;
   std::strncpy(m_data.desc.name, m_name, 256);
 }
@@ -774,27 +758,37 @@ void KeyboardJoystick::Update() {
     }
   }
 
+#define SDL_HAT_CENTERED 0x00u
+#define SDL_HAT_UP 0x01u
+#define SDL_HAT_RIGHT 0x02u
+#define SDL_HAT_DOWN 0x04u
+#define SDL_HAT_LEFT 0x08u
+#define SDL_HAT_RIGHTUP (SDL_HAT_RIGHT | SDL_HAT_UP)
+#define SDL_HAT_RIGHTDOWN (SDL_HAT_RIGHT | SDL_HAT_DOWN)
+#define SDL_HAT_LEFTUP (SDL_HAT_LEFT | SDL_HAT_UP)
+#define SDL_HAT_LEFTDOWN (SDL_HAT_LEFT | SDL_HAT_DOWN)
+
   // povs
   for (int i = 0; i < m_data.povs.count; ++i) {
     auto& config = m_povConfig[i];
     auto& povValue = m_data.povs.povs[i];
-    povValue = -1;
+    povValue = 0;
     if (IsKeyDown(io, config.key0)) {
-      povValue = 0;
+      povValue = SDL_HAT_UP;
     } else if (IsKeyDown(io, config.key45)) {
-      povValue = 45;
+      povValue = SDL_HAT_RIGHTUP;
     } else if (IsKeyDown(io, config.key90)) {
-      povValue = 90;
+      povValue = SDL_HAT_RIGHT;
     } else if (IsKeyDown(io, config.key135)) {
-      povValue = 135;
+      povValue = SDL_HAT_RIGHTDOWN;
     } else if (IsKeyDown(io, config.key180)) {
-      povValue = 180;
+      povValue = SDL_HAT_DOWN;
     } else if (IsKeyDown(io, config.key225)) {
-      povValue = 225;
+      povValue = SDL_HAT_LEFTDOWN;
     } else if (IsKeyDown(io, config.key270)) {
-      povValue = 270;
+      povValue = SDL_HAT_LEFT;
     } else if (IsKeyDown(io, config.key315)) {
-      povValue = 315;
+      povValue = SDL_HAT_LEFTUP;
     }
   }
 
@@ -1326,7 +1320,7 @@ static void DisplayJoysticks() {
       ImGui::PushID(i);
       if (disableDS) {
         ImGui::Text("%s", joy.data.desc.name);
-        ImGui::Text("Gamepad: %s", joy.data.desc.isXbox ? "Yes" : "No");
+        ImGui::Text("Gamepad: %s", joy.data.desc.isGamepad ? "Yes" : "No");
       } else {
         ImGui::Text("%d: %s", joy.sys->GetIndex(), joy.sys->GetName());
 

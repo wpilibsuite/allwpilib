@@ -135,7 +135,7 @@ class DriverStation final {
    * @param stick The joystick port number
    * @return A boolean that is true if the controller is an xbox controller.
    */
-  static bool GetJoystickIsXbox(int stick);
+  static bool GetJoystickIsGamepad(int stick);
 
   /**
    * Returns the type of joystick at a given port.

@@ -230,7 +230,7 @@ void DSCommPacket::ReadJoystickDescriptionTag(std::span<const uint8_t> data) {
   int joystickNum = data[0];
   DSCommJoystickPacket& packet = m_joystick_packets[joystickNum];
   packet.ResetTcp();
-  packet.descriptor.isXbox = data[1] != 0 ? 1 : 0;
+  packet.descriptor.isGamepad = data[1] != 0 ? 1 : 0;
   packet.descriptor.type = data[2];
   int nameLength =
       std::min<size_t>(data[3], (sizeof(packet.descriptor.name) - 1));

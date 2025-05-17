@@ -387,7 +387,7 @@ int DriverStation::GetStickButtonCount(int stick) {
   return buttons.count;
 }
 
-bool DriverStation::GetJoystickIsXbox(int stick) {
+bool DriverStation::GetJoystickIsGamepad(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
@@ -396,7 +396,7 @@ bool DriverStation::GetJoystickIsXbox(int stick) {
   HAL_JoystickDescriptor descriptor;
   HAL_GetJoystickDescriptor(stick, &descriptor);
 
-  return static_cast<bool>(descriptor.isXbox);
+  return static_cast<bool>(descriptor.isGamepad);
 }
 
 int DriverStation::GetJoystickType(int stick) {
