@@ -455,7 +455,14 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
 
   data->povs.count = data->desc.povCount;
   for (int j = 0; j < data->povs.count; ++j) {
+#if __GNUC__ >= 12
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
+#endif  // __GNUC__ >= 12
     data->povs.povs[j] = m_hats[j];
+#if __GNUC__ >= 12
+#pragma GCC diagnostic pop
+#endif  // __GNUC__ >= 12
   }
 }
 
