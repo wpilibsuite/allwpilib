@@ -18,7 +18,7 @@
 namespace wpilibws {
 
 void HALSimWSProviderPWM::Initialize(WSRegisterFunc webRegisterFunc) {
-  CreateProviders<HALSimWSProviderPWM>("PWM", HAL_GetNumPWMChannels(),
+  CreateProviders<HALSimWSProviderPWM>("PWM", HAL_GetNumSmartIo(),
                                        webRegisterFunc);
 }
 
