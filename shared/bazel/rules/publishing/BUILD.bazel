@@ -1,0 +1,9 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+
+exports_files(["publish.py"])
+
+py_binary(
+    name = "generate_maven_bundle",
+    srcs = ["generate_maven_bundle.py"],
+    visibility = ["//visibility:public"],
+)

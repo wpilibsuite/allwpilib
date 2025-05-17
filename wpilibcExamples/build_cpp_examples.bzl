@@ -1,7 +1,44 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("@rules_pkg//:pkg.bzl", "pkg_zip")
 load("//wpilibcExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLE_FOLDERS", "SNIPPETS_FOLDERS", "TEMPLATES_FOLDERS", "TESTS_FOLDERS")
 
+def _package_type(package_type):
+    pkg_files(
+        name = package_type + "-pkg",
+        srcs = native.glob(["src/main/cpp/" + package_type + "/**"]),
+        strip_prefix = "src/main/cpp",
+    )
+
+    pkgs = ["//:license_pkg_files", ":" + package_type + "-pkg"]
+    if package_type == "examples":
+        pkg_files(
+            name = package_type + "-tests-pkg",
+            srcs = native.glob(["src/test/cpp/" + package_type + "/**"]),
+            strip_prefix = "src/test/cpp/" + package_type,
+            prefix = "examples_test",
+        )
+        pkgs.append(package_type + "-tests-pkg")
+
+    pkg_zip(
+        name = package_type + "-zip",
+        srcs = pkgs,
+        tags = ["manual", "no-remote"],
+    )
+
+    native.genrule(
+        name = package_type + "-publshing-bundle",
+        srcs = [":" + package_type + "-zip"],
+        outs = [package_type + "-maven-info.json"],
+        cmd = "$(locations //shared/bazel/rules/publishing:generate_maven_bundle) --output_file=$(OUTS) --maven_infos $(locations :" + package_type + "-zip),edu.wpi.first.wpilibc," + package_type + ", ",
+        tools = ["//shared/bazel/rules/publishing:generate_maven_bundle"],
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
 def build_examples(halsim_deps = []):
+    _package_type("examples")
+
     for folder in EXAMPLE_FOLDERS:
         cc_library(
             name = folder + "-examples-headers",
@@ -23,6 +60,8 @@ def build_examples(halsim_deps = []):
         )
 
 def build_commands():
+    _package_type("commands")
+
     for folder in COMMANDS_V2_FOLDERS:
         cc_library(
             name = folder + "-command",
@@ -36,6 +75,8 @@ def build_commands():
         )
 
 def build_snippets():
+    _package_type("snippets")
+
     for folder in SNIPPETS_FOLDERS:
         cc_library(
             name = folder + "-template",
@@ -49,6 +90,8 @@ def build_snippets():
         )
 
 def build_templates():
+    _package_type("templates")
+
     for folder in TEMPLATES_FOLDERS:
         cc_library(
             name = folder + "-template",
