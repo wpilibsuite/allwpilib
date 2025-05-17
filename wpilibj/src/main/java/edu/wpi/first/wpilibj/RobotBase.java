@@ -98,7 +98,7 @@ public abstract class RobotBase implements AutoCloseable {
    */
   protected RobotBase() {
     final NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    m_threadId = Thread.currentThread().getId();
+    m_threadId = Thread.currentThread().threadId();
     setupCameraServerShared();
     setupMathShared();
     // subscribe to "" to force persistent values to propagate to local
