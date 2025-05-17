@@ -393,29 +393,6 @@ void GlfwSystemJoystick::Update() {
   }
 }
 
-static int HatToAngle(unsigned char hat) {
-  switch (hat) {
-    case GLFW_HAT_UP:
-      return 0;
-    case GLFW_HAT_RIGHT:
-      return 90;
-    case GLFW_HAT_DOWN:
-      return 180;
-    case GLFW_HAT_LEFT:
-      return 270;
-    case GLFW_HAT_RIGHT_UP:
-      return 45;
-    case GLFW_HAT_RIGHT_DOWN:
-      return 135;
-    case GLFW_HAT_LEFT_UP:
-      return 315;
-    case GLFW_HAT_LEFT_DOWN:
-      return 225;
-    default:
-      return -1;
-  }
-}
-
 void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
   if (!m_present) {
     return;
@@ -478,7 +455,7 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
 
   data->povs.count = data->desc.povCount;
   for (int j = 0; j < data->povs.count; ++j) {
-    data->povs.povs[j] = HatToAngle(m_hats[j]);
+    data->povs.povs[j] = m_hats[j];
   }
 }
 
