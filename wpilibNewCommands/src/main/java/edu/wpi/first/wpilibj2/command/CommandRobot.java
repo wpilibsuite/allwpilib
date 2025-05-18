@@ -18,40 +18,24 @@ public class CommandRobot extends TimedRobot {
   protected CommandScheduler m_scheduler = CommandScheduler.getInstance();
 
   /**
-   * Returns a trigger that is true when the robot is enabled in autonomous mode.
-   *
-   * @return A trigger that is true when the robot is enabled in autonomous mode.
+   * A trigger that is true when the robot is enabled in autonomous mode.
    */
-  protected Trigger autonomous() {
-    return RobotModeTriggers.autonomous();
-  }
+  protected Trigger autonomous = RobotModeTriggers.autonomous();
 
   /**
-   * Returns a trigger that is true when the robot is enabled in teleop mode.
-   *
-   * @return A trigger that is true when the robot is enabled in teleop mode.
+   * A trigger that is true when the robot is enabled in teleop mode.
    */
-  protected Trigger teleop() {
-    return RobotModeTriggers.teleop();
-  }
+  protected Trigger teleop = RobotModeTriggers.teleop();
 
   /**
-   * Returns a trigger that is true when the robot is disabled.
-   *
-   * @return A trigger that is true when the robot is disabled.
+   * A trigger that is true when the robot is disabled.
    */
-  protected Trigger disabled() {
-    return RobotModeTriggers.disabled();
-  }
+  protected Trigger disabled = RobotModeTriggers.disabled();
 
   /**
-   * Returns a trigger that is true when the robot is enabled in test mode.
-   *
-   * @return A trigger that is true when the robot is enabled in test mode.
+   * A trigger that is true when the robot is enabled in test mode.
    */
-  protected Trigger test() {
-    return RobotModeTriggers.test();
-  }
+  protected Trigger test = RobotModeTriggers.test();
 
   /** Constructor for CommandRobot. */
   protected CommandRobot() {
