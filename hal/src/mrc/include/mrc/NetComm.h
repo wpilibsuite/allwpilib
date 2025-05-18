@@ -88,7 +88,7 @@ struct JoystickPovs {
 };
 
 struct JoystickButtons {
-  uint32_t Buttons;
+  uint64_t Buttons;
 
   void SetCount(uint8_t NewCount) {
     Count = (std::min)(NewCount, static_cast<uint8_t>(MRC_MAX_NUM_BUTTONS));

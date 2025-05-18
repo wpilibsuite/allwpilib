@@ -256,8 +256,8 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
       povs[count].povs[i] = newPovs[i];
     }
 
-    buttons->count = newStick.Buttons.GetCount();
-    buttons->buttons = newStick.Buttons.Buttons;
+    buttons[count].count = newStick.Buttons.GetCount();
+    buttons[count].buttons = newStick.Buttons.Buttons;
   }
 }
 

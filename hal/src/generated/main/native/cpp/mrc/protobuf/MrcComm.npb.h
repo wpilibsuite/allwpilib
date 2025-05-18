@@ -21,7 +21,7 @@ typedef struct _mrc_proto_ProtobufJoystickData {
     static pb_filedesc_t file_descriptor(void) noexcept;
 
     uint32_t ButtonCount;
-    uint32_t Buttons;
+    uint64_t Buttons;
     pb_callback_t Axes;
     /* Each POV takes up 4 bits
  We can fit 8 in here. */
@@ -155,7 +155,7 @@ typedef struct _mrc_proto_ProtobufAvailableOpModes {
 /* Struct field encoding specification for nanopb */
 #define mrc_proto_ProtobufJoystickData_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, UINT32,   ButtonCount,       1) \
-X(a, STATIC,   SINGULAR, FIXED32,  Buttons,           2) \
+X(a, STATIC,   SINGULAR, UINT64,   Buttons,           2) \
 X(a, CALLBACK, REPEATED, SINT32,   Axes,              3) \
 X(a, STATIC,   SINGULAR, UINT32,   POVCount,          4) \
 X(a, STATIC,   SINGULAR, UINT32,   POVs,              5)
