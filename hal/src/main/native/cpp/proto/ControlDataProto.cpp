@@ -151,7 +151,7 @@ bool wpi::Protobuf<mrc::Joystick>::Pack(OutputStream& Stream,
   wpi::PackCallback AxesCb{Value.Axes.Axes()};
 
   uint32_t PovsStore = 0;
-  for (size_t i = 0; i < Value.Povs.GetCount(); i++) {
+  for (int i = static_cast<int>(Value.Povs.GetCount()) - 1; i >= 0; i--) {
     PovsStore <<= 4;
     PovsStore |= Value.Povs.Povs()[i] & 0xF;
   }
