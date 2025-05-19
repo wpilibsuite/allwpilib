@@ -71,7 +71,7 @@ BooleanEvent GenericHID::POVDownRight(EventLoop* loop) const {
   return POV(0b0110, loop);
 }
 
-BooleanEvent GeneribcHID::POVDown(EventLoop* loop) const {
+BooleanEvent GenericHID::POVDown(EventLoop* loop) const {
   return POV(0b0100u, loop);
 }
 
