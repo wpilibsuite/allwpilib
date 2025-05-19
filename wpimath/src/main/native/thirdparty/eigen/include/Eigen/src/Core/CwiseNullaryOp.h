@@ -71,9 +71,13 @@ class CwiseNullaryOp : public internal::dense_xpr_base<CwiseNullaryOp<NullaryOp,
     eigen_assert(rows >= 0 && (RowsAtCompileTime == Dynamic || RowsAtCompileTime == rows) && cols >= 0 &&
                  (ColsAtCompileTime == Dynamic || ColsAtCompileTime == cols));
   }
+  EIGEN_DEVICE_FUNC CwiseNullaryOp(Index size, const NullaryOp& func = NullaryOp())
+      : CwiseNullaryOp(RowsAtCompileTime == 1 ? 1 : size, RowsAtCompileTime == 1 ? size : 1, func) {
+    EIGEN_STATIC_ASSERT(CwiseNullaryOp::IsVectorAtCompileTime, YOU_TRIED_CALLING_A_VECTOR_METHOD_ON_A_MATRIX);
+  }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index rows() const { return m_rows.value(); }
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index cols() const { return m_cols.value(); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index rows() const { return m_rows.value(); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index cols() const { return m_cols.value(); }
 
   /** \returns the functor representing the nullary operation */
   EIGEN_DEVICE_FUNC const NullaryOp& functor() const { return m_functor; }
@@ -283,7 +287,7 @@ DenseBase<Derived>::LinSpaced(Index size, const Scalar& low, const Scalar& high)
 }
 
 /**
- * \copydoc DenseBase::LinSpaced(Index, const Scalar&, const Scalar&)
+ * \copydoc DenseBase::LinSpaced(Index, const DenseBase::Scalar&, const DenseBase::Scalar&)
  * Special version for fixed size types which does not require the size parameter.
  */
 template <typename Derived>
@@ -343,7 +347,8 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void DenseBase<Derived>::fill(const Scalar
  */
 template <typename Derived>
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& DenseBase<Derived>::setConstant(const Scalar& val) {
-  return derived() = Constant(rows(), cols(), val);
+  internal::eigen_fill_impl<Derived>::run(derived(), val);
+  return derived();
 }
 
 /** Resizes to the given \a size, and sets all coefficients in this expression to the given value \a val.
@@ -479,9 +484,9 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& DenseBase<Derived>::setEqualSpace
  * \sa Zero(), Zero(Index)
  */
 template <typename Derived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const typename DenseBase<Derived>::ConstantReturnType DenseBase<Derived>::Zero(
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const typename DenseBase<Derived>::ZeroReturnType DenseBase<Derived>::Zero(
     Index rows, Index cols) {
-  return Constant(rows, cols, Scalar(0));
+  return ZeroReturnType(rows, cols);
 }
 
 /** \returns an expression of a zero vector.
@@ -501,9 +506,9 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const typename DenseBase<Derived>::Constan
  * \sa Zero(), Zero(Index,Index)
  */
 template <typename Derived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const typename DenseBase<Derived>::ConstantReturnType DenseBase<Derived>::Zero(
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const typename DenseBase<Derived>::ZeroReturnType DenseBase<Derived>::Zero(
     Index size) {
-  return Constant(size, Scalar(0));
+  return ZeroReturnType(size);
 }
 
 /** \returns an expression of a fixed-size zero matrix or vector.
@@ -517,8 +522,8 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const typename DenseBase<Derived>::Constan
  * \sa Zero(Index), Zero(Index,Index)
  */
 template <typename Derived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const typename DenseBase<Derived>::ConstantReturnType DenseBase<Derived>::Zero() {
-  return Constant(Scalar(0));
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const typename DenseBase<Derived>::ZeroReturnType DenseBase<Derived>::Zero() {
+  return ZeroReturnType(RowsAtCompileTime, ColsAtCompileTime);
 }
 
 /** \returns true if *this is approximately equal to the zero matrix,
@@ -547,7 +552,8 @@ EIGEN_DEVICE_FUNC bool DenseBase<Derived>::isZero(const RealScalar& prec) const 
  */
 template <typename Derived>
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& DenseBase<Derived>::setZero() {
-  return setConstant(Scalar(0));
+  internal::eigen_zero_impl<Derived>::run(derived());
+  return derived();
 }
 
 /** Resizes to the given \a size, and sets all coefficients in this expression to zero.
@@ -562,7 +568,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& DenseBase<Derived>::setZero() {
 template <typename Derived>
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& PlainObjectBase<Derived>::setZero(Index newSize) {
   resize(newSize);
-  return setConstant(Scalar(0));
+  return setZero();
 }
 
 /** Resizes to the given size, and sets all coefficients in this expression to zero.
@@ -578,7 +584,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& PlainObjectBase<Derived>::setZero
 template <typename Derived>
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& PlainObjectBase<Derived>::setZero(Index rows, Index cols) {
   resize(rows, cols);
-  return setConstant(Scalar(0));
+  return setZero();
 }
 
 /** Resizes to the given size, changing only the number of columns, and sets all
