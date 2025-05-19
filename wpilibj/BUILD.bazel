@@ -15,7 +15,6 @@ py_binary(
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    visibility = ["//visibility:public"],
     deps = [requirement("jinja2")],
 )
 
@@ -27,7 +26,6 @@ py_binary(
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    visibility = ["//visibility:public"],
     deps = [requirement("jinja2")],
 )
 
@@ -40,7 +38,6 @@ py_binary(
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    visibility = ["//visibility:public"],
     deps = [
         ":generate_hids",
         ":generate_pwm_motor_controllers",
@@ -65,13 +62,11 @@ generate_version_file(
     name = "generate-version",
     output_file = "WPILibVersion.java",
     template = "src/generate/WPILibVersion.java.in",
-    visibility = ["//visibility:public"],
 )
 
 filegroup(
     name = "generated_java",
     srcs = glob(["src/generated/main/java/**/*.java"]),
-    visibility = ["//wpilibj:__subpackages__"],
 )
 
 java_library(

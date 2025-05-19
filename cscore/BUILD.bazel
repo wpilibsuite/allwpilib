@@ -1,5 +1,6 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test", "objc_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test", "objc_library")
 load("@rules_java//java:defs.bzl", "java_binary")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 
@@ -57,7 +58,7 @@ objc_library(
     ],
 )
 
-cc_library(
+wpilib_cc_library(
     name = "cscore.static",
     srcs = [":native-srcs"] + glob(
         ["src/main/native/cpp/**"],

@@ -1,6 +1,6 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
 
-cc_library(
+wpilib_cc_library(
     name = "halsim_ws_core",
     srcs = glob(["src/main/native/cpp/*.cpp"]),
     hdrs = glob(["src/main/native/include/*.h"]),

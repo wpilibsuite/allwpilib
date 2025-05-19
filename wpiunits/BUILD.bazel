@@ -10,7 +10,6 @@ py_binary(
     srcs = ["generate_units.py"],
     data = glob(["src/generate/main/java/**"]),
     tags = ["manual"],
-    visibility = ["//visibility:public"],
     deps = [requirement("jinja2")],
 )
 
