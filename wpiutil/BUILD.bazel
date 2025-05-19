@@ -93,16 +93,6 @@ cc_library(
 )
 
 cc_library(
-    name = "concurrentqueue-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/concurrentqueue/include/**/*",
-    ]),
-    includes = ["src/main/native/thirdparty/concurrentqueue/include"],
-    strip_include_prefix = "src/main/native/thirdparty/concurrentqueue/include",
-    visibility = ["//wpiutil:__subpackages__"],
-)
-
-cc_library(
     name = "fmtlib-headers",
     hdrs = glob([
         "src/main/native/thirdparty/fmtlib/include/**/*.h",
@@ -195,10 +185,7 @@ filegroup(
 
 cc_library(
     name = "nanopb-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/nanopb/include/**/*.h",
-        "src/main/native/thirdparty/nanopb/include/**/*.inc",
-    ]),
+    hdrs = glob(["src/main/native/thirdparty/nanopb/include/**/*.h"]),
     includes = ["src/main/native/thirdparty/nanopb/include"],
     strip_include_prefix = "src/main/native/thirdparty/nanopb/include",
     visibility = ["//wpiutil:__subpackages__"],
@@ -230,10 +217,7 @@ generate_resources(
 filegroup(
     name = "native-srcs",
     srcs = select({
-        "@bazel_tools//src/conditions:windows": glob([
-            "src/main/native/windows/*.cpp",
-            "src/main/native/windows/*.h",
-        ]),
+        "@bazel_tools//src/conditions:windows": glob(["src/main/native/windows/*.cpp"]),
         "@rules_bzlmodrio_toolchains//constraints/combined:is_unix": glob(["src/main/native/unix/*.cpp"]),
     }),
 )
@@ -260,7 +244,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":argparse-headers",
-        ":concurrentqueue-headers",
         ":debugging-headers",
         ":expected-headers",
         ":fmtlib-headers",

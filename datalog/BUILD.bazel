@@ -79,10 +79,7 @@ java_binary(
 cc_test(
     name = "datalog-cpp-test",
     size = "small",
-    srcs = glob([
-        "src/test/native/**/*.cpp",
-        "src/test/native/**/*.h",
-    ]),
+    srcs = glob(["src/test/native/**/*.cpp"]),
     tags = [
         "exclusive",
         "no-asan",

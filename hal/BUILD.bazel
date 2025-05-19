@@ -7,11 +7,6 @@ load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 
 filegroup(
-    name = "templates",
-    srcs = glob(["src/generate/*"]),
-)
-
-filegroup(
     name = "proto_files",
     srcs = glob(["src/mrc/proto/**/*.proto"]),
 )
@@ -43,14 +38,6 @@ write_source_files(
 )
 
 cc_library(
-    name = "generated_cc_headers",
-    hdrs = glob(["src/generated/main/native/include/**"]),
-    includes = ["src/generated/main/native/include"],
-    strip_include_prefix = "src/generated/main/native/include",
-    visibility = ["//hal:__subpackages__"],
-)
-
-cc_library(
     name = "mrc_cc_headers",
     hdrs = glob(["src/mrc/include/**"]),
     includes = ["src/mrc/include"],
@@ -63,12 +50,6 @@ cc_library(
     hdrs = glob(["src/generated/main/native/cpp/mrc/protobuf/**"]),
     includes = ["src/generated/main/native/cpp/mrc/protobuf"],
     strip_include_prefix = "src/generated/main/native/cpp/mrc/protobuf",
-    visibility = ["//hal:__subpackages__"],
-)
-
-filegroup(
-    name = "generated_java",
-    srcs = glob(["src/generated/main/java/**/*.java"]),
     visibility = ["//hal:__subpackages__"],
 )
 
@@ -98,7 +79,6 @@ cc_library(
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
-        ":generated_cc_headers",
         ":generated_mrc_cc_headers",
         ":mrc_cc_headers",
         "//ntcore:ntcore.static",
@@ -132,10 +112,7 @@ wpilib_jni_java_library(
 cc_test(
     name = "hal-cpp-test",
     size = "small",
-    srcs = glob([
-        "src/test/native/**/*.cpp",
-        "src/test/native/**/*.h",
-    ]),
+    srcs = glob(["src/test/native/**/*.cpp"]),
     deps = [
         ":wpiHal.static",
         "//thirdparty/googletest:googletest.static",
