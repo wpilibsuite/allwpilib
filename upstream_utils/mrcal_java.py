@@ -2,46 +2,30 @@
 
 import os
 import shutil
+from pathlib import Path
 
 from upstream_utils import Lib, walk_cwd_and_copy_if
 
 
-def delete_lines_by_range(file_path, start_line, end_line):
-    # Read all lines from the file
-    with open(file_path, "r") as file:
-        lines = file.readlines()
-
-    # Filter out lines that are within the specified range
-    filtered_lines = [
-        line
-        for i, line in enumerate(lines, start=1)
-        if not (start_line <= i <= end_line)
-    ]
-
-    # Write the remaining lines back to the file
-    with open(file_path, "w") as file:
-        file.writelines(filtered_lines)
-
-
-def copy_upstream_src(wpilib_root):
-    wpical = os.path.join(wpilib_root, "wpical")
+def copy_upstream_src(wpilib_root: Path):
+    wpical = wpilib_root / "wpical"
 
     # Delete old install
     for d in [
         "src/main/native/thirdparty/mrcal_java/src",
         "src/main/native/thirdparty/mrcal_java/include",
     ]:
-        shutil.rmtree(os.path.join(wpical, d), ignore_errors=True)
+        shutil.rmtree(wpical / d, ignore_errors=True)
 
     os.chdir("src")
     files = walk_cwd_and_copy_if(
-        lambda dp, f: f.endswith("mrcal_wrapper.h"),
-        os.path.join(wpical, "src/main/native/thirdparty/mrcal_java/include"),
+        lambda dp, f: f == "mrcal_wrapper.h",
+        wpical / "src/main/native/thirdparty/mrcal_java/include",
     )
 
     files = walk_cwd_and_copy_if(
-        lambda dp, f: f.endswith("mrcal_wrapper.cpp"),
-        os.path.join(wpical, "src/main/native/thirdparty/mrcal_java/src"),
+        lambda dp, f: f == "mrcal_wrapper.cpp",
+        wpical / "src/main/native/thirdparty/mrcal_java/src",
     )
 
     for f in files:

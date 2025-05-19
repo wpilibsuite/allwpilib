@@ -1,48 +1,31 @@
 #!/usr/bin/env python3
 
-import os
 import shutil
+from pathlib import Path
 
-from upstream_utils import Lib, copy_to
+from upstream_utils import Lib, has_prefix, walk_cwd_and_copy_if
 
 
-def copy_upstream_src(wpilib_root):
-    wpimath = os.path.join(wpilib_root, "wpimath")
+def copy_upstream_src(wpilib_root: Path):
+    wpimath = wpilib_root / "wpimath"
 
     # Delete old install
     for d in [
         "src/main/native/thirdparty/sleipnir/src",
         "src/main/native/thirdparty/sleipnir/include",
     ]:
-        shutil.rmtree(os.path.join(wpimath, d), ignore_errors=True)
+        shutil.rmtree(wpimath / d, ignore_errors=True)
 
-    # Copy Sleipnir source files into allwpilib
-    src_files = [os.path.join(dp, f) for dp, dn, fn in os.walk("src") for f in fn]
-    src_files = copy_to(
-        src_files, os.path.join(wpimath, "src/main/native/thirdparty/sleipnir")
+    # Copy Sleipnir files into allwpilib
+    walk_cwd_and_copy_if(
+        lambda dp, f: (has_prefix(dp, Path("include")) or has_prefix(dp, Path("src")))
+        and not f == "small_vector.hpp"
+        or f == ".clang-format"
+        or f == ".clang-tidy"
+        or f == ".styleguide"
+        or f == ".styleguide-license",
+        wpimath / "src/main/native/thirdparty/sleipnir",
     )
-
-    # Copy Sleipnir header files into allwpilib
-    include_files = [
-        os.path.join(dp, f)
-        for dp, dn, fn in os.walk("include")
-        for f in fn
-        if not f.endswith("small_vector.hpp")
-    ]
-    include_files = copy_to(
-        include_files, os.path.join(wpimath, "src/main/native/thirdparty/sleipnir")
-    )
-
-    for filename in [
-        ".clang-format",
-        ".clang-tidy",
-        ".styleguide",
-        ".styleguide-license",
-    ]:
-        shutil.copyfile(
-            filename,
-            os.path.join(wpimath, "src/main/native/thirdparty/sleipnir", filename),
-        )
 
 
 def main():
