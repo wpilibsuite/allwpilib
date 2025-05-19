@@ -47,7 +47,10 @@ wpilib_jni_java_library(
 py_binary(
     name = "datalog",
     srcs = ["examples/printlog/datalog.py"],
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 cc_binary(

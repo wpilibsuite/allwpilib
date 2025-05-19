@@ -9,14 +9,20 @@ load("//wpilibc:generate.bzl", "generate_wpilibc")
 py_binary(
     name = "generate_hids",
     srcs = ["generate_hids.py"],
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [requirement("jinja2")],
 )
 
 py_binary(
     name = "generate_pwm_motor_controllers",
     srcs = ["generate_pwm_motor_controllers.py"],
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [requirement("jinja2")],
 )
 

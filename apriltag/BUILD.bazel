@@ -134,5 +134,8 @@ java_binary(
 py_binary(
     name = "convert_apriltag_layouts",
     srcs = ["convert_apriltag_layouts.py"],
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )

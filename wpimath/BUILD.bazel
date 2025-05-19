@@ -182,10 +182,6 @@ cc_test(
         "src/test/native/cpp/**/*.cpp",
         "src/test/native/cpp/**/*.h",
     ]),
-    tags = [
-        "no-bullseye",
-        "no-raspi",
-    ],
     deps = [
         ":test_headers",
         ":wpimath.static",
@@ -226,5 +222,8 @@ java_binary(
 py_binary(
     name = "ExponentialProfileModel",
     srcs = ["algorithms/ExponentialProfileModel.py"],
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
