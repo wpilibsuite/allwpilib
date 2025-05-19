@@ -195,6 +195,7 @@ struct packet_traits<float> : default_packet_traits {
     HasBessel = 1,
     HasSqrt = 1,
     HasRsqrt = 1,
+    HasCbrt = 1,
     HasTanh = EIGEN_FAST_MATH,
     HasErf = EIGEN_FAST_MATH,
     HasErfc = EIGEN_FAST_MATH,
@@ -217,10 +218,12 @@ struct packet_traits<double> : default_packet_traits {
     HasCos = EIGEN_FAST_MATH,
     HasTanh = EIGEN_FAST_MATH,
     HasLog = 1,
+    HasErf = EIGEN_FAST_MATH,
     HasErfc = EIGEN_FAST_MATH,
     HasExp = 1,
     HasSqrt = 1,
     HasRsqrt = 1,
+    HasCbrt = 1,
     HasATan = 1,
     HasATanh = 1,
     HasBlend = 1
@@ -1693,10 +1696,24 @@ EIGEN_STRONG_INLINE void pscatter<uint32_t, Packet4ui>(uint32_t* to, const Packe
 }
 template <>
 EIGEN_STRONG_INLINE void pscatter<bool, Packet16b>(bool* to, const Packet16b& from, Index stride) {
-  to[4 * stride * 0] = _mm_cvtsi128_si32(from);
-  to[4 * stride * 1] = _mm_cvtsi128_si32(_mm_shuffle_epi32(from, 1));
-  to[4 * stride * 2] = _mm_cvtsi128_si32(_mm_shuffle_epi32(from, 2));
-  to[4 * stride * 3] = _mm_cvtsi128_si32(_mm_shuffle_epi32(from, 3));
+  EIGEN_ALIGN16 bool tmp[16];
+  pstore(tmp, from);
+  to[stride * 0] = tmp[0];
+  to[stride * 1] = tmp[1];
+  to[stride * 2] = tmp[2];
+  to[stride * 3] = tmp[3];
+  to[stride * 4] = tmp[4];
+  to[stride * 5] = tmp[5];
+  to[stride * 6] = tmp[6];
+  to[stride * 7] = tmp[7];
+  to[stride * 8] = tmp[8];
+  to[stride * 9] = tmp[9];
+  to[stride * 10] = tmp[10];
+  to[stride * 11] = tmp[11];
+  to[stride * 12] = tmp[12];
+  to[stride * 13] = tmp[13];
+  to[stride * 14] = tmp[14];
+  to[stride * 15] = tmp[15];
 }
 
 // some compilers might be tempted to perform multiple moves instead of using a vector path.
@@ -1766,7 +1783,6 @@ EIGEN_STRONG_INLINE Packet4f pldexp<Packet4f>(const Packet4f& a, const Packet4f&
 
 // We specialize pldexp here, since the generic implementation uses Packet2l, which is not well
 // supported by SSE, and has more range than is needed for exponents.
-// TODO(rmlarsen): Remove this specialization once Packet2l has support or casting.
 template <>
 EIGEN_STRONG_INLINE Packet2d pldexp<Packet2d>(const Packet2d& a, const Packet2d& exponent) {
   // Clamp exponent to [-2099, 2099]
@@ -1785,6 +1801,24 @@ EIGEN_STRONG_INLINE Packet2d pldexp<Packet2d>(const Packet2d& a, const Packet2d&
   c = _mm_castsi128_pd(_mm_slli_epi64(padd(b, bias), 52));           // 2^(e - 3b)
   out = pmul(out, c);                                                // a * 2^e
   return out;
+}
+
+// We specialize pldexp here, since the generic implementation uses Packet2l, which is not well
+// supported by SSE, and has more range than is needed for exponents.
+template <>
+EIGEN_STRONG_INLINE Packet2d pldexp_fast<Packet2d>(const Packet2d& a, const Packet2d& exponent) {
+  // Clamp exponent to [-1023, 1024]
+  const Packet2d min_exponent = pset1<Packet2d>(-1023.0);
+  const Packet2d max_exponent = pset1<Packet2d>(1024.0);
+  const Packet2d e = pmin(pmax(exponent, min_exponent), max_exponent);
+
+  // Convert e to integer and swizzle to low-order bits.
+  const Packet4i ei = vec4i_swizzle1(_mm_cvtpd_epi32(e), 0, 3, 1, 3);
+
+  // Compute 2^e multiply:
+  const Packet4i bias = _mm_set_epi32(0, 1023, 0, 1023);
+  const Packet2d c = _mm_castsi128_pd(_mm_slli_epi64(padd(ei, bias), 52));  // 2^e
+  return pmul(a, c);
 }
 
 // with AVX, the default implementations based on pload1 are faster
