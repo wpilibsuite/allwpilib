@@ -146,9 +146,9 @@ def has_prefix(path: Path, prefix: Path):
     Returns:
     True if the path begins with the prefix, False otherwise.
     """
-    return len(path.parts) >= len(prefix.parts) and all([
+    return len(path.parts) >= len(prefix.parts) and all(
         p1 == p2 for p1, p2 in zip(path.parts, prefix.parts)
-    ])
+    )
 
 
 def git_am(patch: Path, use_threeway=False, ignore_whitespace=False):
