@@ -38,8 +38,8 @@ def eigen_inclusions(dp: Path, f: str):
     if "MKL" in f:
         return False
 
-    # Include architectures we care about
-    if "arch" in dp.parts:
+    # Include architectures we care about by filtering for Core/arch
+    if "Core" in dp.parts and "arch" in dp.parts:
         return (
             "AVX" in dp.parts
             or "Default" in dp.parts
@@ -68,7 +68,7 @@ def eigen_inclusions(dp: Path, f: str):
         "plugins",
     ]
     for m in modules:
-        if m in dp.parts:
+        if m in dp.parts or f == m:
             return True
     return False
 
