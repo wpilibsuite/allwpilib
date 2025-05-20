@@ -16,7 +16,8 @@ compile_pip_requirements(
     extra_args = ["--allow-unsafe"],
     requirements_in = "requirements.txt",
     requirements_txt = "requirements_lock.txt",
-    tags = ["no-roborio"],
+    # compile_pip_requirements does not respect target_compatible_with for some of the targets it generates under the hood
+    tags = ["no-systemcore"],
 )
 
 alias(

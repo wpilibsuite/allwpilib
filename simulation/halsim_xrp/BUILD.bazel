@@ -1,18 +1,12 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("//shared/bazel/rules:halsim_library.bzl", "wpilib_halsim_extension")
 
-cc_library(
+wpilib_halsim_extension(
     name = "halsim_xrp",
     srcs = glob([
         "src/main/native/cpp/*",
         "src/main/native/include/*.h",
     ]),
-    includes = ["src/main/native/include"],
-    target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-    visibility = ["//visibility:public"],
     deps = [
         "//simulation/halsim_ws_core",
         "//xrpVendordep:xrp-cpp",

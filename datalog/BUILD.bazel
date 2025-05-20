@@ -1,10 +1,11 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 
-cc_library(
+wpilib_cc_library(
     name = "datalog.static",
     srcs = glob(
         ["src/main/native/cpp/**"],
@@ -46,7 +47,10 @@ wpilib_jni_java_library(
 py_binary(
     name = "datalog",
     srcs = ["examples/printlog/datalog.py"],
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 cc_binary(
@@ -79,10 +83,7 @@ java_binary(
 cc_test(
     name = "datalog-cpp-test",
     size = "small",
-    srcs = glob([
-        "src/test/native/**/*.cpp",
-        "src/test/native/**/*.h",
-    ]),
+    srcs = glob(["src/test/native/**/*.cpp"]),
     tags = [
         "exclusive",
         "no-asan",

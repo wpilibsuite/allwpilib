@@ -81,7 +81,6 @@ def wpilib_jni_java_library(
     jni = "@rules_bzlmodrio_toolchains//jni"
     _jni_headers(
         name = headers_name,
-        tags = ["manual"],
         jni = jni,
         lib = ":" + name,
         testonly = testonly,

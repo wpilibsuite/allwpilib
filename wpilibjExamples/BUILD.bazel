@@ -1,6 +1,6 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//wpilibjExamples:build_java_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates")
+load("//wpilibjExamples:build_java_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests")
 
 py_binary(
     name = "generate_bazel_files",
@@ -44,3 +44,5 @@ build_examples(halsim_deps = halsim_deps)
 build_snippets()
 
 build_templates()
+
+build_tests()
