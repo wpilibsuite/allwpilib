@@ -132,6 +132,12 @@ jobs:
           ./protobuf.py clone
           ./protobuf.py copy-src
           ./protobuf.py format-patch
+      - name: Run simd.py
+        run: |
+          cd upstream_utils
+          ./simd.py clone
+          ./simd.py copy-src
+          ./simd.py format-patch
       - name: Run sleipnir.py
         run: |
           cd upstream_utils
