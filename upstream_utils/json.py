@@ -4,7 +4,7 @@ import os
 import shutil
 from pathlib import Path
 
-from upstream_utils import Lib, copy_to, walk_cwd_and_copy_if, walk_if
+from upstream_utils import Lib, walk_if
 
 
 def copy_upstream_src(wpilib_root: Path):
