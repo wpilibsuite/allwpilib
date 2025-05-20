@@ -19,7 +19,7 @@
 namespace wpilibws {
 
 void HALSimWSProviderDIO::Initialize(WSRegisterFunc webRegisterFunc) {
-  CreateProviders<HALSimWSProviderDIO>("DIO", HAL_GetNumDigitalChannels(),
+  CreateProviders<HALSimWSProviderDIO>("DIO", HAL_GetNumSmartIo(),
                                        webRegisterFunc);
 }
 
