@@ -4,7 +4,7 @@ import os
 import shutil
 from pathlib import Path
 
-from upstream_utils import Lib, walk_cwd_and_copy_if
+from upstream_utils import Lib, copy_to, walk_cwd_and_copy_if, walk_if
 
 
 def copy_upstream_src(wpilib_root: Path):
@@ -18,12 +18,19 @@ def copy_upstream_src(wpilib_root: Path):
 
     # Create lists of source and destination files
     os.chdir("include/nlohmann")
-    include_files = walk_cwd_and_copy_if(
-        lambda dp, f: True,
-        wpiutil / "src/main/native/thirdparty/json/include/wpi",
-    )
+    files = walk_if(Path("."), lambda dp, f: True)
+    src_include_files = [f.absolute() for f in files]
+    wpiutil_json_root = wpiutil / "src/main/native/thirdparty/json/include/wpi"
+    dest_include_files = [wpiutil_json_root / f.with_suffix(".h") for f in files]
 
-    for include_file in include_files:
+    # Copy json header files into allwpilib
+    for i in range(len(src_include_files)):
+        dest_dir = dest_include_files[i].parent
+        if not dest_dir.exists():
+            dest_dir.mkdir(parents=True)
+        shutil.copyfile(src_include_files[i], dest_include_files[i])
+
+    for include_file in dest_include_files:
         with open(include_file) as f:
             content = f.read()
 
