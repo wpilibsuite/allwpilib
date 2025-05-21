@@ -23,6 +23,8 @@
 #include <wpi/json.h>
 #include <wpigui.h>
 
+#include <opencv2/aruco/charuco.hpp>
+
 namespace gui = wpi::gui;
 
 const char* GetWPILibVersion();
@@ -226,6 +228,53 @@ static void DisplayGui() {
   static double imagerWidth = 1920;
   static double imagerHeight = 1080;
 
+  static const char* charucoDictNames[] = {
+    "DICT_4X4_50",
+    "DICT_4X4_100",
+    "DICT_4X4_250",
+    "DICT_4X4_1000",
+    "DICT_5X5_50",
+    "DICT_5X5_100",
+    "DICT_5X5_250",
+    "DICT_5X5_1000",
+    "DICT_6X6_50",
+    "DICT_6X6_100",
+    "DICT_6X6_250",
+    "DICT_6X6_1000",
+    "DICT_7X7_50",
+    "DICT_7X7_100",
+    "DICT_7X7_250",
+    "DICT_7X7_1000"
+  };
+
+  static const int charucoDictEnums[] = {
+    cv::aruco::DICT_4X4_50,
+    cv::aruco::DICT_4X4_100,
+    cv::aruco::DICT_4X4_250,
+    cv::aruco::DICT_4X4_1000,
+    cv::aruco::DICT_5X5_50,
+    cv::aruco::DICT_5X5_100,
+    cv::aruco::DICT_5X5_250,
+    cv::aruco::DICT_5X5_1000,
+    cv::aruco::DICT_6X6_50,
+    cv::aruco::DICT_6X6_100,
+    cv::aruco::DICT_6X6_250,
+    cv::aruco::DICT_6X6_1000,
+    cv::aruco::DICT_7X7_50,
+    cv::aruco::DICT_7X7_100,
+    cv::aruco::DICT_7X7_250,
+    cv::aruco::DICT_7X7_1000,
+    cv::aruco::DICT_ARUCO_ORIGINAL,
+    cv::aruco::DICT_APRILTAG_16h5,
+    cv::aruco::DICT_APRILTAG_25h9,
+    cv::aruco::DICT_APRILTAG_36h10,
+    cv::aruco::DICT_APRILTAG_36h11
+  };
+
+  static int currentDictIdx = 0;
+
+  static const int numCharucoDicts = IM_ARRAYSIZE(charucoDictNames);
+
   static int pinnedTag = 1;
 
   static int focusedTag = 1;
@@ -419,6 +468,18 @@ static void DisplayGui() {
       ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
       ImGui::InputDouble("Image Height (pixels)", &imagerHeight);
 
+      if (ImGui::BeginCombo("ChArUco Dictionary", charucoDictNames[currentDictIdx])) {
+        for (int i = 0; i < numCharucoDicts; ++i) {
+          bool isSelected = (currentDictIdx == i);
+          if (ImGui::Selectable(charucoDictNames[i], isSelected)) {
+            currentDictIdx = i;
+          }
+          if (isSelected)
+            ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+      }
+
       ImGui::Separator();
       if (ImGui::Button("Calibrate") && !selected_camera_intrinsics.empty()) {
         std::cout << "calibration button pressed" << std::endl;
@@ -469,7 +530,7 @@ static void DisplayGui() {
         std::cout << "calibration button pressed" << std::endl;
         int ret = cameracalibration::calibrate(
             selected_camera_intrinsics.c_str(), cameraModel, squareWidth,
-            markerWidth, boardWidth, boardHeight, showDebug);
+            markerWidth, boardWidth, boardHeight, showDebug, charucoDictEnums[currentDictIdx]);
         if (ret == 0) {
           size_t lastSeparatorPos =
               selected_camera_intrinsics.find_last_of("/\\");
