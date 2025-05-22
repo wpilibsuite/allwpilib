@@ -4,11 +4,12 @@
 
 #include "wpinet/MulticastServiceResolver.h"
 
+#include <arpa/inet.h>
+
 #include <memory>
 #include <string>
 #include <utility>
 
-#include <arpa/inet.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/mutex.h>
