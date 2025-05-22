@@ -325,7 +325,7 @@ class Lib:
         """
         return self.wpilib_root / f"upstream_utils/{self.name}_patches"
 
-    def get_patch_list(self) -> list[str]:
+    def get_patch_list(self) -> list[Path]:
         """Returns a list of the filenames of the patches to apply.
 
         Returns:
@@ -333,9 +333,7 @@ class Lib:
         order by the Unicode code points."""
         if not self.get_patch_directory().exists():
             return []
-        return sorted(
-            self.get_patch_directory().glob("*.patch")
-        )
+        return sorted(self.get_patch_directory().glob("*.patch"))
 
     def apply_patches(self):
         """Applies the patches listed in the patch list to the current
@@ -346,7 +344,7 @@ class Lib:
 
         for f in self.get_patch_list():
             git_am(
-                Path(self.get_patch_directory(), f),
+                self.get_patch_directory() / f,
                 **self.patch_options,
             )
 
