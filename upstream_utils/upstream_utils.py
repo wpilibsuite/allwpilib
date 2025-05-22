@@ -334,7 +334,7 @@ class Lib:
         if not self.get_patch_directory().exists():
             return []
         return sorted(
-            f for f in os.listdir(self.get_patch_directory()) if f.endswith(".patch")
+            self.get_patch_directory().glob("*.patch")
         )
 
     def apply_patches(self):
