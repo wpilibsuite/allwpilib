@@ -65,9 +65,31 @@ bool MulticastServiceResolver::HasImplementation() const {
   return pImpl->dynamicDns.CanDnsResolve;
 }
 
+bool MulticastServiceResolver::SetCopyCallback(
+    std::function<bool(const ServiceData&)> callback) {
+  if (pImpl->serviceCancel.reserved != nullptr) {
+    return false;
+  }
+  this->copyCallback = std::move(callback);
+  return true;
+}
+
+bool MulticastServiceResolver::SetMoveCallback(
+    std::function<void(ServiceData&&)> callback) {
+  if (pImpl->serviceCancel.reserved != nullptr) {
+    return false;
+  }
+  this->moveCallback = std::move(callback);
+  return true;
+}
+
 static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
     DnsCompletion(_In_ PVOID pQueryContext,
                   _Inout_ PDNS_QUERY_RESULT pQueryResults) {
+  if (pQueryResults->QueryStatus != ERROR_SUCCESS) {
+    return;
+  }
+
   MulticastServiceResolver::Impl* impl =
       reinterpret_cast<MulticastServiceResolver::Impl*>(pQueryContext);
 

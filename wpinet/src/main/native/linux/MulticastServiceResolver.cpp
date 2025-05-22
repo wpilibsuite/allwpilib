@@ -44,6 +44,26 @@ bool MulticastServiceResolver::HasImplementation() const {
   return pImpl->table.IsValid();
 }
 
+bool MulticastServiceResolver::SetCopyCallback(
+    std::function<bool(const ServiceData&)> callback) {
+  std::scoped_lock lock{*pImpl->thread};
+  if (pImpl->client) {
+    return false;
+  }
+  this->copyCallback = std::move(callback);
+  return true;
+}
+
+bool MulticastServiceResolver::SetMoveCallback(
+    std::function<void(ServiceData&&)> callback) {
+  std::scoped_lock lock{*pImpl->thread};
+  if (pImpl->client) {
+    return false;
+  }
+  this->moveCallback = std::move(callback);
+  return true;
+}
+
 static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
                             AvahiProtocol protocol, AvahiResolverEvent event,
                             const char* name, const char* type,

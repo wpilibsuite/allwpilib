@@ -179,6 +179,24 @@ bool MulticastServiceResolver::HasImplementation() const {
   return true;
 }
 
+bool MulticastServiceResolver::SetCopyCallback(
+    std::function<bool(const ServiceData&)> callback) {
+  if (pImpl->serviceRef) {
+    return false;
+  }
+  this->copyCallback = std::move(callback);
+  return true;
+}
+
+bool MulticastServiceResolver::SetMoveCallback(
+    std::function<void(ServiceData&&)> callback) {
+  if (pImpl->serviceRef) {
+    return false;
+  }
+  this->moveCallback = std::move(callback);
+  return true;
+}
+
 void MulticastServiceResolver::Start() {
   if (pImpl->serviceRef) {
     return;

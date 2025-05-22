@@ -32,6 +32,10 @@ class MulticastServiceResolver {
     /// Service data payload.
     std::vector<std::pair<std::string, std::string>> txt;
   };
+
+  bool SetCopyCallback(std::function<bool(const ServiceData&)> callback);
+  bool SetMoveCallback(std::function<void(ServiceData&&)> callback);
+
   /**
    * Starts multicast service resolver.
    */
@@ -72,12 +76,23 @@ class MulticastServiceResolver {
  private:
   void PushData(ServiceData&& data) {
     std::scoped_lock lock{mutex};
-    queue.emplace_back(std::forward<ServiceData>(data));
-    event.Set();
+    if (copyCallback) {
+      if (!copyCallback(data)) {
+        queue.emplace_back(std::forward<ServiceData>(data));
+        event.Set();
+      }
+    } else if (moveCallback) {
+      moveCallback(std::move(data));
+    } else {
+      queue.emplace_back(std::forward<ServiceData>(data));
+      event.Set();
+    }
   }
   wpi::Event event{true};
   std::vector<ServiceData> queue;
   wpi::mutex mutex;
+  std::function<bool(const ServiceData&)> copyCallback;
+  std::function<void(ServiceData&&)> moveCallback;
   std::unique_ptr<Impl> pImpl;
 };
 }  // namespace wpi
