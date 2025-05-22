@@ -21,9 +21,9 @@ class MulticastServiceResolver {
   explicit MulticastServiceResolver(std::string_view serviceType);
   ~MulticastServiceResolver() noexcept;
   struct ServiceData {
-    /// IPv4 address.
+    /// IPv4 address in host order.
     unsigned int ipv4Address;
-    /// Port number.
+    /// Port number in host order.
     int port;
     /// Service name.
     std::string serviceName;
@@ -32,20 +32,17 @@ class MulticastServiceResolver {
     /// Service data payload.
     std::vector<std::pair<std::string, std::string>> txt;
   };
-
   /**
    * Set a copy callback to be called when a service is resolved.
    * Takes presidence over the move callback. Return true to
    * not send the data to the event queue.
    */
   bool SetCopyCallback(std::function<bool(const ServiceData&)> callback);
-
   /**
    * Set a move callback to be called when a service is resolved.
    * Data is moved into the function and cannot be added to the event queue.
    */
   bool SetMoveCallback(std::function<void(ServiceData&&)> callback);
-
   /**
    * Starts multicast service resolver.
    */

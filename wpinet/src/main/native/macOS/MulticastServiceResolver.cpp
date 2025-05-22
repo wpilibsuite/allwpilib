@@ -72,8 +72,8 @@ void ServiceGetAddrInfoReply(DNSServiceRef sdRef, DNSServiceFlags flags,
   DnsResolveState* resolveState = static_cast<DnsResolveState*>(context);
 
   resolveState->data.hostName = hostname;
-  resolveState->data.ipv4Address =
-      reinterpret_cast<const struct sockaddr_in*>(address)->sin_addr.s_addr;
+  resolveState->data.ipv4Address = ntohl(
+      reinterpret_cast<const struct sockaddr_in*>(address)->sin_addr.s_addr);
 
   resolveState->pImpl->onFound(std::move(resolveState->data));
 

@@ -103,8 +103,8 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
         outputHostName.append(".");
       } while (true);
 
-      data.ipv4Address = address->data.ipv4.address;
-      data.port = port;
+      data.ipv4Address = ntohl(address->data.ipv4.address);
+      data.port = ntohs(port);
       data.serviceName = name;
       data.hostName = std::string{outputHostName};
 
