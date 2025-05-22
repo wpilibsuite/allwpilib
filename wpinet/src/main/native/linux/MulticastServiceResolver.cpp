@@ -8,6 +8,7 @@
 #include <string>
 #include <utility>
 
+#include <arpa/inet.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/mutex.h>
