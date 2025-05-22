@@ -1,12 +1,9 @@
 {
-  "name": "main",
-  "version-string": "latest",
-  "dependencies": [
-    "opencv",
-    "fmt",
-    "libuv",
-    "protobuf",
-    "libssh"
-  ],
-  "builtin-baseline": "37c3e63a1306562f7f59c4c3c8892ddd50fdf992"
+  "name" : "main",
+  "version-string" : "latest",
+  "dependencies" : [ "opencv", "fmt", "libuv", "libssh", {
+    "name" : "protobuf",
+    "version>=" : "5.29.3"
+  } ],
+  "builtin-baseline" : "37c3e63a1306562f7f59c4c3c8892ddd50fdf992"
 }

@@ -271,7 +271,7 @@ static void DisplayGui() {
     cv::aruco::DICT_APRILTAG_36h11
   };
 
-  static int currentDictIdx = 0;
+  static int currentDictIdx = 7; // Default to DICT_5X5_1000
 
   static const int numCharucoDicts = IM_ARRAYSIZE(charucoDictNames);
 
@@ -468,18 +468,6 @@ static void DisplayGui() {
       ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
       ImGui::InputDouble("Image Height (pixels)", &imagerHeight);
 
-      if (ImGui::BeginCombo("ChArUco Dictionary", charucoDictNames[currentDictIdx])) {
-        for (int i = 0; i < numCharucoDicts; ++i) {
-          bool isSelected = (currentDictIdx == i);
-          if (ImGui::Selectable(charucoDictNames[i], isSelected)) {
-            currentDictIdx = i;
-          }
-          if (isSelected)
-            ImGui::SetItemDefaultFocus();
-        }
-        ImGui::EndCombo();
-      }
-
       ImGui::Separator();
       if (ImGui::Button("Calibrate") && !selected_camera_intrinsics.empty()) {
         std::cout << "calibration button pressed" << std::endl;
@@ -524,6 +512,18 @@ static void DisplayGui() {
       ImGui::InputInt("Board Width (squares)", &boardWidth);
       ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
       ImGui::InputInt("Board Height (squares)", &boardHeight);
+
+      if (ImGui::BeginCombo("ChArUco Dictionary", charucoDictNames[currentDictIdx])) {
+        for (int i = 0; i < numCharucoDicts; ++i) {
+          bool isSelected = (currentDictIdx == i);
+          if (ImGui::Selectable(charucoDictNames[i], isSelected)) {
+            currentDictIdx = i;
+          }
+          if (isSelected)
+            ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+      }
 
       ImGui::Separator();
       if (ImGui::Button("Calibrate") && !selected_camera_intrinsics.empty()) {
