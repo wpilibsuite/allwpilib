@@ -33,7 +33,17 @@ class MulticastServiceResolver {
     std::vector<std::pair<std::string, std::string>> txt;
   };
 
+  /**
+   * Set a copy callback to be called when a service is resolved.
+   * Takes presidence over the move callback. Return true to
+   * not send the data to the event queue.
+   */
   bool SetCopyCallback(std::function<bool(const ServiceData&)> callback);
+
+  /**
+   * Set a move callback to be called when a service is resolved.
+   * Data is moved into the function and cannot be added to the event queue.
+   */
   bool SetMoveCallback(std::function<void(ServiceData&&)> callback);
 
   /**
