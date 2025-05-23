@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-import os
 import shutil
+from pathlib import Path
 
 from upstream_utils import Lib
 
 
-def run_global_replacements(wpiutil_llvm_files):
+def run_global_replacements(wpiutil_llvm_files: list[Path]):
     for wpi_file in wpiutil_llvm_files:
         with open(wpi_file) as f:
             content = f.read()
@@ -23,7 +23,7 @@ def run_global_replacements(wpiutil_llvm_files):
         # Fix uses of span
         content = content.replace("span", "std::span")
         content = content.replace("include <std::span>", "include <span>")
-        if wpi_file.endswith("ConvertUTFWrapper.cpp"):
+        if wpi_file.name == "ConvertUTFWrapper.cpp":
             content = content.replace(
                 "const UTF16 *Src = reinterpret_cast<const UTF16 *>(SrcBytes.begin());",
                 "const UTF16 *Src = reinterpret_cast<const UTF16 *>(&*SrcBytes.begin());",
@@ -88,19 +88,19 @@ def run_global_replacements(wpiutil_llvm_files):
             f.write(content)
 
 
-def flattened_llvm_files(llvm, dirs_to_keep):
-    file_lookup = {}
+def flattened_llvm_files(llvm: Path, dirs_to_keep: list[Path]):
+    file_lookup: dict[str, Path] = {}
 
     for dir_to_keep in dirs_to_keep:
-        dir_to_crawl = os.path.join(llvm, dir_to_keep)
-        for root, _, files in os.walk(dir_to_crawl):
+        dir_to_crawl = llvm / dir_to_keep
+        for root, _, files in dir_to_crawl.walk():
             for f in files:
-                file_lookup[f] = os.path.join(root, f)
+                file_lookup[f] = root / f
 
     return file_lookup
 
 
-def find_wpiutil_llvm_files(wpiutil_root, subfolder):
+def find_wpiutil_llvm_files(wpiutil_root: Path, subfolder: str):
     # These files have substantial changes, not worth managing with the patching process
     ignore_list = [
         "StringExtras.h",
@@ -110,22 +110,22 @@ def find_wpiutil_llvm_files(wpiutil_root, subfolder):
         "SmallVectorMemoryBuffer.h",
     ]
 
-    wpiutil_files = []
-    for root, _, files in os.walk(os.path.join(wpiutil_root, subfolder)):
+    wpiutil_files: list[Path] = []
+    for root, _, files in (wpiutil_root / subfolder).walk():
         for f in files:
             if f not in ignore_list:
-                full_file = os.path.join(root, f)
+                full_file = root / f
                 wpiutil_files.append(full_file)
 
     return wpiutil_files
 
 
-def overwrite_files(wpiutil_files, llvm_files):
+def overwrite_files(wpiutil_files: list[Path], llvm_files: dict[str, Path]):
     # Very sparse rips from LLVM sources. Not worth tyring to make match upstream
     unmatched_files_whitelist = ["fs.h", "fs.cpp", "function_ref.h"]
 
     for wpi_file in wpiutil_files:
-        wpi_base_name = os.path.basename(wpi_file)
+        wpi_base_name = wpi_file.name
         if wpi_base_name in llvm_files:
             shutil.copyfile(llvm_files[wpi_base_name], wpi_file)
 
@@ -133,14 +133,14 @@ def overwrite_files(wpiutil_files, llvm_files):
             print(f"No file match for {wpi_file}, check if LLVM deleted it")
 
 
-def overwrite_source(wpiutil_root, llvm_root):
+def overwrite_source(wpiutil_root: Path, llvm_root: Path):
     llvm_files = flattened_llvm_files(
         llvm_root,
         [
-            "llvm/include/llvm/ADT/",
-            "llvm/include/llvm/Config",
-            "llvm/include/llvm/Support/",
-            "llvm/lib/Support/",
+            Path("llvm/include/llvm/ADT/"),
+            Path("llvm/include/llvm/Config/"),
+            Path("llvm/include/llvm/Support/"),
+            Path("llvm/lib/Support/"),
         ],
     )
     wpi_files = find_wpiutil_llvm_files(
@@ -153,10 +153,14 @@ def overwrite_source(wpiutil_root, llvm_root):
     run_global_replacements(wpi_files)
 
 
-def overwrite_tests(wpiutil_root, llvm_root):
+def overwrite_tests(wpiutil_root: Path, llvm_root: Path):
     llvm_files = flattened_llvm_files(
         llvm_root,
-        ["llvm/unittests/ADT/", "llvm/unittests/Config", "llvm/unittests/Support/"],
+        [
+            Path("llvm/unittests/ADT/"),
+            Path("llvm/unittests/Config/"),
+            Path("llvm/unittests/Support/"),
+        ],
     )
     wpi_files = find_wpiutil_llvm_files(wpiutil_root, "src/test/native/cpp/llvm")
 
@@ -164,9 +168,9 @@ def overwrite_tests(wpiutil_root, llvm_root):
     run_global_replacements(wpi_files)
 
 
-def copy_upstream_src(wpilib_root):
-    upstream_root = os.path.abspath(".")
-    wpiutil = os.path.join(wpilib_root, "wpiutil")
+def copy_upstream_src(wpilib_root: Path):
+    upstream_root = Path(".").absolute()
+    wpiutil = wpilib_root / "wpiutil"
 
     overwrite_source(wpiutil, upstream_root)
     overwrite_tests(wpiutil, upstream_root)
