@@ -200,7 +200,8 @@ class TrapezoidProfile {
    * Returns the time left until a target distance in the profile is reached.
    *
    * @param target The target distance.
-   * @return The time left until a target distance in the profile is reached.
+   * @return The time left until a target distance in the profile is reached, or
+   * zero if no goal was set.
    */
   constexpr units::second_t TimeLeftUntil(Distance_t target) const {
     Distance_t position = m_current.position * m_direction;
@@ -271,7 +272,8 @@ class TrapezoidProfile {
   /**
    * Returns the total time the profile takes to reach the goal.
    *
-   * @return The total time the profile takes to reach the goal.
+   * @return The total time the profile takes to reach the goal, or zero if no
+   * goal was set.
    */
   constexpr units::second_t TotalTime() const { return m_endDecel; }
 
@@ -311,14 +313,14 @@ class TrapezoidProfile {
   }
 
   // The direction of the profile, either 1 for forwards or -1 for inverted
-  int m_direction;
+  int m_direction = 1;
 
   Constraints m_constraints;
   State m_current;
 
-  units::second_t m_endAccel;
-  units::second_t m_endFullSpeed;
-  units::second_t m_endDecel;
+  units::second_t m_endAccel = 0_s;
+  units::second_t m_endFullSpeed = 0_s;
+  units::second_t m_endDecel = 0_s;
 };
 
 }  // namespace frc

@@ -28,6 +28,25 @@ TEST(NumericalJacobianTest, Bu) {
   EXPECT_TRUE(newB.isApprox(B));
 }
 
+Eigen::VectorXd AxBuFn_DynamicSize(const Eigen::VectorXd& x,
+                                   const Eigen::VectorXd& u) {
+  return A * x + B * u;
+}
+
+// Test that we can recover A from AxBuFn() pretty accurately
+TEST(NumericalJacobianTest, Ax_DynamicSize) {
+  Eigen::MatrixXd newA = frc::NumericalJacobianX(
+      AxBuFn_DynamicSize, frc::Vectord<4>::Zero(), frc::Vectord<2>::Zero());
+  EXPECT_TRUE(newA.isApprox(A));
+}
+
+// Test that we can recover B from AxBuFn() pretty accurately
+TEST(NumericalJacobianTest, Bu_DynamicSize) {
+  Eigen::MatrixXd newB = frc::NumericalJacobianU(
+      AxBuFn_DynamicSize, frc::Vectord<4>::Zero(), frc::Vectord<2>::Zero());
+  EXPECT_TRUE(newB.isApprox(B));
+}
+
 frc::Matrixd<3, 4> C{{1, 2, 4, 1}, {5, 2, 3, 4}, {5, 1, 3, 2}};
 frc::Matrixd<3, 2> D{{1, 1}, {2, 1}, {3, 2}};
 
@@ -47,5 +66,22 @@ TEST(NumericalJacobianTest, Cx) {
 TEST(NumericalJacobianTest, Du) {
   frc::Matrixd<3, 2> newD = frc::NumericalJacobianU<3, 4, 2>(
       CxDuFn, frc::Vectord<4>::Zero(), frc::Vectord<2>::Zero());
+  EXPECT_TRUE(newD.isApprox(D));
+}
+
+Eigen::VectorXd CxDuFn_DynamicSize(const Eigen::VectorXd& x,
+                                   const Eigen::VectorXd& u) {
+  return C * x + D * u;
+}
+
+TEST(NumericalJacobianTest, Cx_DynamicSize) {
+  Eigen::MatrixXd newC = frc::NumericalJacobianX(
+      CxDuFn_DynamicSize, Eigen::VectorXd::Zero(4), Eigen::VectorXd::Zero(2));
+  EXPECT_TRUE(newC.isApprox(C));
+}
+
+TEST(NumericalJacobianTest, Du_DynamicSize) {
+  Eigen::MatrixXd newD = frc::NumericalJacobianU(
+      CxDuFn_DynamicSize, Eigen::VectorXd::Zero(4), Eigen::VectorXd::Zero(2));
   EXPECT_TRUE(newD.isApprox(D));
 }

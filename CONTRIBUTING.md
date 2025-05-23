@@ -80,7 +80,7 @@ xₖ₊₁ = Axₖ + Buₖ
 
 Changes should be submitted as a Pull Request against the main branch of WPILib. For most changes, commits will be squashed upon merge. For particularly large changes, multiple commits are ok, but assume one commit unless asked otherwise. We may ask you to break a PR into multiple standalone PRs or commits for rebase within one PR to separate unrelated changes. No change will be merged unless it is up to date with the current main branch. We do this to make sure that the git history isn't too cluttered.
 
-During the build season, breaking changes or other changes intended for the next season can be created as a pull request against the development branch of WPILib. After the season is over, the changes in the development branch will be merged into main.
+Particularly large and/or breaking changes should be targeted to the 2027 branch, which targets the [SystemCore Robot Controller](https://community.firstinspires.org/introducing-the-future-mobile-robot-controller). The intent is minimize changes for 2026, to allow development to focus on preparing for 2027.
 
 ### Merge Process
 

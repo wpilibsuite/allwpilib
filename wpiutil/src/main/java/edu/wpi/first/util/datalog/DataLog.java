@@ -451,10 +451,10 @@ public class DataLog implements AutoCloseable {
     if (!seen.add(typeString)) {
       throw new UnsupportedOperationException(typeString + ": circular reference with " + seen);
     }
-    addSchema(typeString, "structschema", struct.getSchema(), timestamp);
     for (Struct<?> inner : struct.getNested()) {
       addSchemaImpl(inner, timestamp, seen);
     }
+    addSchema(typeString, "structschema", struct.getSchema(), timestamp);
     seen.remove(typeString);
   }
 

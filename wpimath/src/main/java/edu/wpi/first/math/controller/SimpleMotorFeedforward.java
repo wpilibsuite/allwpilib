@@ -12,13 +12,13 @@ import edu.wpi.first.util.struct.StructSerializable;
 /** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
 public class SimpleMotorFeedforward implements ProtobufSerializable, StructSerializable {
   /** The static gain, in volts. */
-  private final double ks;
+  private double ks;
 
   /** The velocity gain, in V/(units/s). */
-  private final double kv;
+  private double kv;
 
   /** The acceleration gain, in V/(units/s²). */
-  private final double ka;
+  private double ka;
 
   /** The period, in seconds. */
   private final double m_dt;
@@ -81,6 +81,33 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    */
   public SimpleMotorFeedforward(double ks, double kv) {
     this(ks, kv, 0);
+  }
+
+  /**
+   * Sets the static gain.
+   *
+   * @param ks The static gain in volts.
+   */
+  public void setKs(double ks) {
+    this.ks = ks;
+  }
+
+  /**
+   * Sets the velocity gain.
+   *
+   * @param kv The velocity gain in V/(units/s).
+   */
+  public void setKv(double kv) {
+    this.kv = kv;
+  }
+
+  /**
+   * Sets the acceleration gain.
+   *
+   * @param ka The acceleration gain in V/(units/s²).
+   */
+  public void setKa(double ka) {
+    this.ka = ka;
   }
 
   /**
@@ -159,13 +186,13 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    */
   public double calculateWithVelocities(double currentVelocity, double nextVelocity) {
     // See wpimath/algorithms.md#Simple_motor_feedforward for derivation
-    if (ka == 0.0) {
+    if (ka < 1e-9) {
       return ks * Math.signum(nextVelocity) + kv * nextVelocity;
     } else {
       double A = -kv / ka;
       double B = 1.0 / ka;
       double A_d = Math.exp(A * m_dt);
-      double B_d = 1.0 / A * (A_d - 1.0) * B;
+      double B_d = A > -1e-9 ? B * m_dt : 1.0 / A * (A_d - 1.0) * B;
       return ks * Math.signum(currentVelocity) + 1.0 / B_d * (nextVelocity - A_d * currentVelocity);
     }
   }

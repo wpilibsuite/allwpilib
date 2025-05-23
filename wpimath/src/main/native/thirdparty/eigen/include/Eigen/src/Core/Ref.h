@@ -73,11 +73,11 @@ class RefBase : public MapBase<Derived> {
   typedef MapBase<Derived> Base;
   EIGEN_DENSE_PUBLIC_INTERFACE(RefBase)
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index innerStride() const {
+  EIGEN_DEVICE_FUNC constexpr Index innerStride() const {
     return StrideType::InnerStrideAtCompileTime != 0 ? m_stride.inner() : 1;
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index outerStride() const {
+  EIGEN_DEVICE_FUNC constexpr Index outerStride() const {
     return StrideType::OuterStrideAtCompileTime != 0 ? m_stride.outer()
            : IsVectorAtCompileTime                   ? this->size()
            : int(Flags) & RowMajorBit                ? this->cols()
@@ -97,11 +97,11 @@ class RefBase : public MapBase<Derived> {
   typedef Stride<StrideType::OuterStrideAtCompileTime, StrideType::InnerStrideAtCompileTime> StrideBase;
 
   // Resolves inner stride if default 0.
-  static EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index resolveInnerStride(Index inner) { return inner == 0 ? 1 : inner; }
+  static EIGEN_DEVICE_FUNC constexpr Index resolveInnerStride(Index inner) { return inner == 0 ? 1 : inner; }
 
   // Resolves outer stride if default 0.
-  static EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index resolveOuterStride(Index inner, Index outer, Index rows, Index cols,
-                                                                    bool isVectorAtCompileTime, bool isRowMajor) {
+  static EIGEN_DEVICE_FUNC constexpr Index resolveOuterStride(Index inner, Index outer, Index rows, Index cols,
+                                                              bool isVectorAtCompileTime, bool isRowMajor) {
     return outer == 0 ? isVectorAtCompileTime ? inner * rows * cols : isRowMajor ? inner * cols : inner * rows : outer;
   }
 

@@ -150,6 +150,10 @@ struct CoreThreadPoolDevice {
 
 namespace internal {
 
+#ifdef EIGEN_PARSED_BY_DOXYGEN
+struct Kernel;
+#endif
+
 template <typename Kernel>
 struct cost_helper {
   using SrcEvaluatorType = typename Kernel::SrcEvaluatorType;
@@ -304,19 +308,24 @@ struct dense_assignment_loop_with_device<Kernel, CoreThreadPoolDevice, LinearVec
       this->template assignPacket<DstAlignment, SrcAlignment, PacketType>(index);
     }
   };
+  static constexpr bool UsePacketSegment = Kernel::AssignmentTraits::UsePacketSegment;
+  using head_loop =
+      unaligned_dense_assignment_loop<PacketType, DstAlignment, SrcAlignment, UsePacketSegment, DstIsAligned>;
+  using tail_loop = unaligned_dense_assignment_loop<PacketType, DstAlignment, SrcAlignment, UsePacketSegment, false>;
+
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void run(Kernel& kernel, CoreThreadPoolDevice& device) {
     const Index size = kernel.size();
     const Index alignedStart =
         DstIsAligned ? 0 : internal::first_aligned<RequestedAlignment>(kernel.dstDataPtr(), size);
     const Index alignedEnd = alignedStart + numext::round_down(size - alignedStart, PacketSize);
 
-    unaligned_dense_assignment_loop<DstIsAligned != 0>::run(kernel, 0, alignedStart);
+    head_loop::run(kernel, 0, alignedStart);
 
     constexpr float cost = static_cast<float>(XprEvaluationCost);
     AssignmentFunctor functor(kernel);
     device.template parallelFor<AssignmentFunctor, PacketSize>(alignedStart, alignedEnd, functor, cost);
 
-    unaligned_dense_assignment_loop<>::run(kernel, alignedEnd, size);
+    tail_loop::run(kernel, alignedEnd, size);
   }
 };
 

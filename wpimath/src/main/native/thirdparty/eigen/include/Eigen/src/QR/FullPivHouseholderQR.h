@@ -82,6 +82,17 @@ class FullPivHouseholderQR : public SolverBase<FullPivHouseholderQR<MatrixType_,
   typedef typename internal::plain_col_type<MatrixType>::type ColVectorType;
   typedef typename MatrixType::PlainObject PlainObject;
 
+  /** \brief Reports whether the QR factorization was successful.
+   *
+   * \note This function always returns \c Success. It is provided for compatibility
+   * with other factorization routines.
+   * \returns \c Success
+   */
+  ComputationInfo info() const {
+    eigen_assert(m_isInitialized && "FullPivHouseholderQR is not initialized.");
+    return Success;
+  }
+
   /** \brief Default Constructor.
    *
    * The default constructor is useful in cases in which the user intends to

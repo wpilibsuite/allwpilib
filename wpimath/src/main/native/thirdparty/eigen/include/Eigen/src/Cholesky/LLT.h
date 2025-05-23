@@ -182,10 +182,10 @@ class LLT : public SolverBase<LLT<MatrixType_, UpLo_> > {
    * This method is provided for compatibility with other matrix decompositions, thus enabling generic code such as:
    * \code x = decomposition.adjoint().solve(b) \endcode
    */
-  const LLT& adjoint() const EIGEN_NOEXCEPT { return *this; }
+  const LLT& adjoint() const noexcept { return *this; }
 
-  inline EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT { return m_matrix.rows(); }
-  inline EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return m_matrix.cols(); }
+  constexpr Index rows() const noexcept { return m_matrix.rows(); }
+  constexpr Index cols() const noexcept { return m_matrix.cols(); }
 
   template <typename VectorType>
   LLT& rankUpdate(const VectorType& vec, const RealScalar& sigma = 1);

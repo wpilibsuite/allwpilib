@@ -26,5 +26,13 @@ double CommandJoystick::GetMagnitude() const {
 }
 
 units::radian_t CommandJoystick::GetDirection() const {
+  // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#joystick-and-controller-coordinate-system
+  // A positive rotation around the X axis moves the joystick right, and a
+  // positive rotation around the Y axis moves the joystick backward. When
+  // treating them as translations, 0 radians is measured from the right
+  // direction, and angle increases clockwise.
+  //
+  // It's rotated 90 degrees CCW (y is negated and the arguments are reversed)
+  // so that 0 radians is forward.
   return m_hid.GetDirection();
 }

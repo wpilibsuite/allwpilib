@@ -35,6 +35,13 @@ AddressableLED::AddressableLED(int port) : m_port{port} {
   HAL_Report(HALUsageReporting::kResourceType_AddressableLEDs, port + 1);
 }
 
+void AddressableLED::SetColorOrder(AddressableLED::ColorOrder order) {
+  int32_t status = 0;
+  HAL_SetAddressableLEDColorOrder(
+      m_handle, static_cast<HAL_AddressableLEDColorOrder>(order), &status);
+  FRC_CheckErrorStatus(status, "Port {} Color order {}", m_port, order);
+}
+
 void AddressableLED::SetLength(int length) {
   int32_t status = 0;
   HAL_SetAddressableLEDLength(m_handle, length, &status);

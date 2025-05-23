@@ -133,7 +133,8 @@ namespace frc {
 std::string_view GetResource_2022_rapidreact_json();
 std::string_view GetResource_2023_chargedup_json();
 std::string_view GetResource_2024_crescendo_json();
-std::string_view GetResource_2025_reefscape_json();
+std::string_view GetResource_2025_reefscape_welded_json();
+std::string_view GetResource_2025_reefscape_andymark_json();
 
 }  // namespace frc
 
@@ -149,8 +150,11 @@ AprilTagFieldLayout AprilTagFieldLayout::LoadField(AprilTagField field) {
     case AprilTagField::k2024Crescendo:
       fieldString = GetResource_2024_crescendo_json();
       break;
-    case AprilTagField::k2025Reefscape:
-      fieldString = GetResource_2025_reefscape_json();
+    case AprilTagField::k2025ReefscapeWelded:
+      fieldString = GetResource_2025_reefscape_welded_json();
+      break;
+    case AprilTagField::k2025ReefscapeAndyMark:
+      fieldString = GetResource_2025_reefscape_andymark_json();
       break;
     case AprilTagField::kNumFields:
       throw std::invalid_argument("Invalid Field");

@@ -28,7 +28,7 @@ public class BooleanEvent implements BooleanSupplier {
 
   private final BooleanSupplier m_signal;
 
-  /** The state of the condition in the current loop poll. Nightmare to manage. */
+  /** The state of the condition in the current loop poll. */
   private final AtomicBoolean m_state = new AtomicBoolean(false);
 
   /**
