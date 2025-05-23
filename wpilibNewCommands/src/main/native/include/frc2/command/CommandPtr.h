@@ -277,7 +277,10 @@ CommandPtr final {
 
   /**
    * Schedules this command.
+   *
+   * @deprecated Use CommandScheduler::GetInstance().Schedule() instead
    */
+  [[deprecated("Use CommandScheduler::GetInstance().Schedule() instead.")]]
   void Schedule() const&;
 
   // Prevent calls on a temporary, as the returned pointer would be invalid

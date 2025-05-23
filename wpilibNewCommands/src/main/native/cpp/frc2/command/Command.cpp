@@ -197,7 +197,7 @@ void Command::InitSendable(wpi::SendableBuilder& builder) {
       [this](bool value) {
         bool isScheduled = IsScheduled();
         if (value && !isScheduled) {
-          Schedule();
+          CommandScheduler::GetInstance().Schedule(this);
         } else if (!value && isScheduled) {
           Cancel();
         }
