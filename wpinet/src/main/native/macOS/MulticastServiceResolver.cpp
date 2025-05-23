@@ -184,7 +184,7 @@ bool MulticastServiceResolver::SetCopyCallback(
   if (pImpl->serviceRef) {
     return false;
   }
-  this->copyCallback = std::move(callback);
+  copyCallback = std::move(callback);
   return true;
 }
 
@@ -193,7 +193,7 @@ bool MulticastServiceResolver::SetMoveCallback(
   if (pImpl->serviceRef) {
     return false;
   }
-  this->moveCallback = std::move(callback);
+  moveCallback = std::move(callback);
   return true;
 }
 

@@ -70,7 +70,7 @@ bool MulticastServiceResolver::SetCopyCallback(
   if (pImpl->serviceCancel.reserved != nullptr) {
     return false;
   }
-  this->copyCallback = std::move(callback);
+  copyCallback = std::move(callback);
   return true;
 }
 
@@ -79,7 +79,7 @@ bool MulticastServiceResolver::SetMoveCallback(
   if (pImpl->serviceCancel.reserved != nullptr) {
     return false;
   }
-  this->moveCallback = std::move(callback);
+  moveCallback = std::move(callback);
   return true;
 }
 
