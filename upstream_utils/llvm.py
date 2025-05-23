@@ -88,7 +88,7 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
             f.write(content)
 
 
-def flattened_llvm_files(llvm: Path, dirs_to_keep: list[str]):
+def flattened_llvm_files(llvm: Path, dirs_to_keep: list[Path]):
     file_lookup: dict[str, Path] = {}
 
     for dir_to_keep in dirs_to_keep:
@@ -137,10 +137,10 @@ def overwrite_source(wpiutil_root: Path, llvm_root: Path):
     llvm_files = flattened_llvm_files(
         llvm_root,
         [
-            "llvm/include/llvm/ADT/",
-            "llvm/include/llvm/Config",
-            "llvm/include/llvm/Support/",
-            "llvm/lib/Support/",
+            Path("llvm/include/llvm/ADT/"),
+            Path("llvm/include/llvm/Config/"),
+            Path("llvm/include/llvm/Support/"),
+            Path("llvm/lib/Support/"),
         ],
     )
     wpi_files = find_wpiutil_llvm_files(
@@ -156,7 +156,11 @@ def overwrite_source(wpiutil_root: Path, llvm_root: Path):
 def overwrite_tests(wpiutil_root: Path, llvm_root: Path):
     llvm_files = flattened_llvm_files(
         llvm_root,
-        ["llvm/unittests/ADT/", "llvm/unittests/Config", "llvm/unittests/Support/"],
+        [
+            Path("llvm/unittests/ADT/"),
+            Path("llvm/unittests/Config/"),
+            Path("llvm/unittests/Support/"),
+        ],
     )
     wpi_files = find_wpiutil_llvm_files(wpiutil_root, "src/test/native/cpp/llvm")
 
