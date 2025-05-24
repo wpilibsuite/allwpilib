@@ -29,10 +29,13 @@ const std::string videoLocation = "/altfieldvideo";
 const std::string fileSuffix = ".mp4";
 const std::string videoLocation = "/fieldvideo";
 #endif
+
+const int charucoDict = 7;  // DICT_5X5_1000
+
 TEST(Camera_CalibrationTest, OpenCV_Typical) {
   int ret = cameracalibration::calibrate(
       projectRootPath + "/testcalibration" + fileSuffix, cameraModel, 0.709f,
-      0.551f, 12, 8, false);
+      0.551f, 12, 8, false, charucoDict);
   cameracalibration::dumpJson(cameraModel,
                               calSavePath + "/cameracalibration.json");
   EXPECT_EQ(ret, 0);
@@ -41,21 +44,21 @@ TEST(Camera_CalibrationTest, OpenCV_Typical) {
 TEST(Camera_CalibrationTest, OpenCV_Atypical) {
   int ret = cameracalibration::calibrate(
       projectRootPath + videoLocation + "/long" + fileSuffix, cameraModel,
-      0.709f, 0.551f, 12, 8, false);
+      0.709f, 0.551f, 12, 8, false, charucoDict);
   EXPECT_EQ(ret, 1);
 }
 
 TEST(Camera_CalibrationTest, MRcal_Typical) {
   int ret = cameracalibration::calibrate(
       projectRootPath + "/testcalibration" + fileSuffix, cameraModel, .709f, 12,
-      8, 1080, 1920, false);
+      8, 1080.0, 1920.0, false);
   EXPECT_EQ(ret, 0);
 }
 
 TEST(Camera_CalibrationTest, MRcal_Atypical) {
   int ret = cameracalibration::calibrate(
       projectRootPath + videoLocation + "/short" + fileSuffix, cameraModel,
-      0.709f, 12, 8, 1080, 1920, false);
+      0.709f, 12, 8, 1080.0, 1920.0, false);
   EXPECT_EQ(ret, 1);
 }
 
