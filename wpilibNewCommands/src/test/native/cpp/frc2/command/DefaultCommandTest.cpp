@@ -12,8 +12,6 @@ using namespace frc2;
 class DefaultCommandTest : public CommandTestBase {};
 
 TEST_F(DefaultCommandTest, DefaultCommandSchedule) {
-  CommandScheduler scheduler = GetScheduler();
-
   TestSubsystem subsystem;
 
   auto command = cmd::Idle({&subsystem});
@@ -26,8 +24,6 @@ TEST_F(DefaultCommandTest, DefaultCommandSchedule) {
 }
 
 TEST_F(DefaultCommandTest, DefaultCommandInterruptResume) {
-  CommandScheduler scheduler = GetScheduler();
-
   TestSubsystem subsystem;
 
   auto command1 = cmd::Idle({&subsystem});
