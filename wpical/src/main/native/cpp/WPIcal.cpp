@@ -492,8 +492,9 @@ static void DisplayGui() {
           if (ImGui::Selectable(charucoDictNames[i], isSelected)) {
             currentDictIdx = i;
           }
-          if (isSelected)
+          if (isSelected) {
             ImGui::SetItemDefaultFocus();
+          }
         }
         ImGui::EndCombo();
       }
