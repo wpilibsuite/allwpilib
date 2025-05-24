@@ -501,6 +501,10 @@ static void DisplayGui() {
         ImGui::EndCombo();
       }
 
+      if (ImGui::IsItemHovered(ImGuiHoveredFlags_None)) {
+        ImGui::SetTooltip("Only change if you know what you're doing");
+      }
+
       ImGui::Separator();
       if (ImGui::Button("Calibrate") && !selected_camera_intrinsics.empty()) {
         std::cout << "calibration button pressed" << std::endl;
