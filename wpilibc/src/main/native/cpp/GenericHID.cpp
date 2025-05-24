@@ -56,39 +56,39 @@ BooleanEvent GenericHID::POV(int pov, int angle, EventLoop* loop) const {
 }
 
 BooleanEvent GenericHID::POVUp(EventLoop* loop) const {
-  return POV(0, loop);
+  return POV(0b0001, loop);
 }
 
 BooleanEvent GenericHID::POVUpRight(EventLoop* loop) const {
-  return POV(45, loop);
+  return POV(0b0011u, loop);
 }
 
 BooleanEvent GenericHID::POVRight(EventLoop* loop) const {
-  return POV(90, loop);
+  return POV(0b0010u, loop);
 }
 
 BooleanEvent GenericHID::POVDownRight(EventLoop* loop) const {
-  return POV(135, loop);
+  return POV(0b0110, loop);
 }
 
 BooleanEvent GenericHID::POVDown(EventLoop* loop) const {
-  return POV(180, loop);
+  return POV(0b0100u, loop);
 }
 
 BooleanEvent GenericHID::POVDownLeft(EventLoop* loop) const {
-  return POV(225, loop);
+  return POV(0b1100u, loop);
 }
 
 BooleanEvent GenericHID::POVLeft(EventLoop* loop) const {
-  return POV(270, loop);
+  return POV(0b1000u, loop);
 }
 
 BooleanEvent GenericHID::POVUpLeft(EventLoop* loop) const {
-  return POV(315, loop);
+  return POV(0b1001u, loop);
 }
 
 BooleanEvent GenericHID::POVCenter(EventLoop* loop) const {
-  return POV(360, loop);
+  return POV(0b0000u, loop);
 }
 
 BooleanEvent GenericHID::AxisLessThan(int axis, double threshold,

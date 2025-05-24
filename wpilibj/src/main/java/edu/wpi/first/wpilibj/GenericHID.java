@@ -249,7 +249,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the 0 degree angle of a POV on the HID.
    */
   public BooleanEvent povUp(EventLoop loop) {
-    return pov(0, loop);
+    return pov(0b0001, loop);
   }
 
   /**
@@ -260,7 +260,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the 45 degree angle of a POV on the HID.
    */
   public BooleanEvent povUpRight(EventLoop loop) {
-    return pov(45, loop);
+    return pov(0b0011, loop);
   }
 
   /**
@@ -271,7 +271,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the 90 degree angle of a POV on the HID.
    */
   public BooleanEvent povRight(EventLoop loop) {
-    return pov(90, loop);
+    return pov(0b0010, loop);
   }
 
   /**
@@ -282,7 +282,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the 135 degree angle of a POV on the HID.
    */
   public BooleanEvent povDownRight(EventLoop loop) {
-    return pov(135, loop);
+    return pov(0b0110, loop);
   }
 
   /**
@@ -293,7 +293,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the 180 degree angle of a POV on the HID.
    */
   public BooleanEvent povDown(EventLoop loop) {
-    return pov(180, loop);
+    return pov(0b0100, loop);
   }
 
   /**
@@ -304,7 +304,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the 225 degree angle of a POV on the HID.
    */
   public BooleanEvent povDownLeft(EventLoop loop) {
-    return pov(225, loop);
+    return pov(0b1100, loop);
   }
 
   /**
@@ -315,7 +315,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the 270 degree angle of a POV on the HID.
    */
   public BooleanEvent povLeft(EventLoop loop) {
-    return pov(270, loop);
+    return pov(0b1000, loop);
   }
 
   /**
@@ -326,7 +326,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the 315 degree angle of a POV on the HID.
    */
   public BooleanEvent povUpLeft(EventLoop loop) {
-    return pov(315, loop);
+    return pov(0b1001, loop);
   }
 
   /**
@@ -337,7 +337,7 @@ public class GenericHID {
    * @return a BooleanEvent instance based around the center of a POV on the HID.
    */
   public BooleanEvent povCenter(EventLoop loop) {
-    return pov(-1, loop);
+    return pov(0b0000, loop);
   }
 
   /**
