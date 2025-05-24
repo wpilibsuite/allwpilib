@@ -241,10 +241,7 @@ static void DisplayGui() {
       cv::aruco::DICT_6X6_50,         cv::aruco::DICT_6X6_100,
       cv::aruco::DICT_6X6_250,        cv::aruco::DICT_6X6_1000,
       cv::aruco::DICT_7X7_50,         cv::aruco::DICT_7X7_100,
-      cv::aruco::DICT_7X7_250,        cv::aruco::DICT_7X7_1000,
-      cv::aruco::DICT_ARUCO_ORIGINAL, cv::aruco::DICT_APRILTAG_16h5,
-      cv::aruco::DICT_APRILTAG_25h9,  cv::aruco::DICT_APRILTAG_36h10,
-      cv::aruco::DICT_APRILTAG_36h11};
+      cv::aruco::DICT_7X7_250,        cv::aruco::DICT_7X7_1000};
 
   static int currentDictIdx = 7;  // Default to DICT_5X5_1000
 
