@@ -30,7 +30,7 @@ const std::string fileSuffix = ".mp4";
 const std::string videoLocation = "/fieldvideo";
 #endif
 
-const int charucoDict = 7;  // DICT_5X5_1000
+constexpr int charucoDict = 7;  // DICT_5X5_1000
 
 TEST(Camera_CalibrationTest, OpenCV_Typical) {
   int ret = cameracalibration::calibrate(

@@ -227,13 +227,13 @@ static void DisplayGui() {
   static double imagerWidth = 1920;
   static double imagerHeight = 1080;
 
-  static const char* charucoDictNames[] = {
+  static constexpr char* charucoDictNames[] = {
       "DICT_4X4_50", "DICT_4X4_100", "DICT_4X4_250", "DICT_4X4_1000",
       "DICT_5X5_50", "DICT_5X5_100", "DICT_5X5_250", "DICT_5X5_1000",
       "DICT_6X6_50", "DICT_6X6_100", "DICT_6X6_250", "DICT_6X6_1000",
       "DICT_7X7_50", "DICT_7X7_100", "DICT_7X7_250", "DICT_7X7_1000"};
 
-  static const int charucoDictEnums[] = {
+  static constexpr int charucoDictEnums[] = {
       cv::aruco::DICT_4X4_50,  cv::aruco::DICT_4X4_100,
       cv::aruco::DICT_4X4_250, cv::aruco::DICT_4X4_1000,
       cv::aruco::DICT_5X5_50,  cv::aruco::DICT_5X5_100,
@@ -245,7 +245,7 @@ static void DisplayGui() {
 
   static int currentDictIdx = 7;  // Default to DICT_5X5_1000
 
-  static const int numCharucoDicts = IM_ARRAYSIZE(charucoDictNames);
+  static constexpr int numCharucoDicts = IM_ARRAYSIZE(charucoDictNames);
 
   static int pinnedTag = 1;
 
