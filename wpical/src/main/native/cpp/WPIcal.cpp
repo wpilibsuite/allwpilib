@@ -243,7 +243,8 @@ static void DisplayGui() {
       cv::aruco::DICT_7X7_50,  cv::aruco::DICT_7X7_100,
       cv::aruco::DICT_7X7_250, cv::aruco::DICT_7X7_1000};
 
-  static int currentDictIdx = 7;  // Default to DICT_5X5_1000, used by default by wpical
+  static int currentDictIdx =
+      7;  // Default to DICT_5X5_1000, used by default by wpical
 
   static constexpr int numCharucoDicts = IM_ARRAYSIZE(charucoDictNames);
 
@@ -500,7 +501,9 @@ static void DisplayGui() {
       }
 
       if (ImGui::IsItemHovered(ImGuiHoveredFlags_None)) {
-        ImGui::SetTooltip("Only change if you know what you're doing");
+        ImGui::SetTooltip(
+            "Sets the ChArUco dictionary used for camera calibration.\nOnly "
+            "change if you know what you're doing.");
       }
 
       ImGui::Separator();
