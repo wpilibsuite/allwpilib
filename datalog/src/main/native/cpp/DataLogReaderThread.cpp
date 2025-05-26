@@ -110,13 +110,18 @@ void DataLogReaderThread::ReadMain() {
                    schema, err);
       }
     } else if (auto filename = wpi::remove_prefix(name, "/.schema/proto:")) {
-#ifndef NO_PROTOBUF
       // protobuf descriptor handling
-      if (!m_protoDb.Add(*filename, data)) {
+      upb_Status status;
+      status.ok = true;
+      upb_DefPool_AddFile(
+          m_protoPool,
+          google_protobuf_FileDescriptorProto_parse(
+              reinterpret_cast<const char*>(data.data()), data.size(), m_arena),
+          &status);
+      if (!status.ok) {
         wpi::print("could not decode protobuf '{}' filename '{}'\n", name,
                    *filename);
       }
-#endif
     }
   }
 
