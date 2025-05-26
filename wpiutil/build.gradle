@@ -1,5 +1,6 @@
 apply from: "${rootDir}/shared/resources.gradle"
 
+apply plugin: 'c'
 ext {
     noWpiutil = true
     skipJniSymbols = [
@@ -90,15 +91,6 @@ ext {
                     include '**/*.hpp'
                 }
             }
-            protobufCpp(CppSourceSet) {
-                source {
-                    srcDirs 'src/main/native/thirdparty/protobuf/src'
-                    include '**/*.cpp'
-                }
-                exportedHeaders {
-                    srcDirs 'src/main/native/thirdparty/protobuf/include'
-                }
-            }
             resourcesCpp(CppSourceSet) {
                 source {
                     srcDirs "$buildDir/generated/main/cpp", "$rootDir/shared/singlelib"
@@ -106,6 +98,15 @@ ext {
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/include'
+                }
+            }
+            upbCpp(CSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/upb/src'
+                    include '**/*.c'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/upb/include'
                 }
             }
         }
@@ -176,6 +177,7 @@ nativeUtils.exportsConfigs {
 
 nativeUtils.platformConfigs.each {
     if (it.name.contains('windows')) {
+        it.cCompiler.args.add("/wd4141")
         it.cppCompiler.args.add("/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR")
     }
 }
@@ -192,7 +194,6 @@ cppHeadersZip {
         'src/main/native/thirdparty/nanopb/include',
         'src/main/native/thirdparty/sigslot/include',
         'src/main/native/thirdparty/memory/include',
-        'src/main/native/thirdparty/protobuf/include'
     ]
 
     thirdpartyIncDirs.each {
@@ -222,10 +223,10 @@ cppSourcesZip {
     from('src/main/native/thirdparty/nanopb/src') {
         into '/'
     }
-    from('src/main/native/thirdparty/protobuf/src') {
+    from('src/main/native/thirdparty/sigslot/src') {
         into '/'
     }
-    from('src/main/native/thirdparty/sigslot/src') {
+    from('src/main/native/thirdparty/upb/src') {
         into '/'
     }
 }
@@ -235,7 +236,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include', 'src/main/native/thirdparty/nanopb/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include', 'src/main/native/thirdparty/upb/include'
                 }
             }
         }
