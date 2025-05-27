@@ -1,5 +1,6 @@
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
-load("//wpilibjExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLES_FOLDERS", "SNIPPETS_FOLDERS", "TEMPLATES_FOLDERS")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//wpilibjExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLES_FOLDERS", "SNIPPETS_FOLDERS", "TEMPLATES_FOLDERS", "TEST_FOLDERS")
 
 def build_examples(halsim_deps):
     for folder in EXAMPLES_FOLDERS:
@@ -66,6 +67,23 @@ def build_templates():
                 "//wpimath:wpimath-java",
                 "//wpiutil:wpiutil-java",
                 "//xrpVendordep:xrp-java",
+            ],
+            tags = ["wpi-example"],
+        )
+
+def build_tests():
+    for folder in TEST_FOLDERS:
+        wpilib_java_junit5_test(
+            name = folder + "-test",
+            srcs = native.glob(["src/test/java/edu/wpi/first/wpilibj/examples/" + folder + "/**/*.java"]),
+            deps = [
+                ":" + folder + "-example",
+                "//hal:hal-java",
+                "//ntcore:networktables-java",
+                "//wpilibj:wpilibj",
+                "//wpilibNewCommands:wpilibNewCommands-java",
+                "//wpimath:wpimath-java",
+                "//wpiutil:wpiutil-java",
             ],
             tags = ["wpi-example"],
         )

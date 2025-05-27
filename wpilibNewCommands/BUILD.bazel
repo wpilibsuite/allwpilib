@@ -1,8 +1,9 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//wpilibNewCommands:generate.bzl", "generate_wpilib_new_commands")
 
@@ -10,11 +11,9 @@ py_binary(
     name = "generate_hids",
     srcs = ["generate_hids.py"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    visibility = ["//visibility:public"],
     deps = [requirement("jinja2")],
 )
 
@@ -23,7 +22,6 @@ filegroup(
     srcs = glob(["src/generate/main/**"]) + [
         "//wpilibj:hid_schema",
     ],
-    visibility = ["//wpilibNewCommands:__subpackages__"],
 )
 
 generate_wpilib_new_commands(
@@ -40,35 +38,28 @@ write_source_files(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
-    name = "generated_cc_headers",
-    hdrs = glob(["src/generated/main/native/include/**"]),
-    includes = ["src/generated/main/native/include"],
-    strip_include_prefix = "src/generated/main/native/include",
-    visibility = ["//wpilibNewCommands:__subpackages__"],
-)
-
-filegroup(
-    name = "generated_cc_source",
-    srcs = glob(["src/generated/main/native/cpp/**"]),
-    visibility = ["//wpilibNewCommands:__subpackages__"],
+third_party_cc_lib_helper(
+    name = "generated_cc",
+    include_root = "src/generated/main/native/include",
+    src_root = "src/generated/main/native/cpp",
 )
 
 filegroup(
     name = "generated_java",
     srcs = glob(["src/generated/main/java/**/*.java"]),
-    visibility = ["//wpilibNewCommands:__subpackages__"],
 )
 
-cc_library(
+wpilib_cc_library(
     name = "wpilibNewCommands.static",
-    srcs = glob(["src/main/native/cpp/**"]) + [":generated_cc_source"],
+    srcs = glob(["src/main/native/cpp/**"]),
     hdrs = glob(["src/main/native/include/**"]),
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
+    third_party_libraries = [
+        ":generated_cc",
+    ],
     visibility = ["//visibility:public"],
     deps = [
-        ":generated_cc_headers",
         "//wpilibc:wpilibc.static",
     ],
 )

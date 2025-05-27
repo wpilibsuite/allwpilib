@@ -1,9 +1,10 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//ntcore:generate_ntcore.bzl", "generate_ntcore")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 
@@ -28,7 +29,6 @@ py_binary(
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    visibility = ["//visibility:public"],
     deps = [requirement("jinja2")],
 )
 
@@ -42,50 +42,40 @@ write_source_files(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
-    name = "generated_cc_headers",
-    hdrs = glob(["src/generated/main/native/include/**"]),
-    includes = ["src/generated/main/native/include"],
-    strip_include_prefix = "src/generated/main/native/include",
-    visibility = ["//ntcore:__subpackages__"],
-)
-
-filegroup(
-    name = "generated_cc_source",
-    srcs = glob(
-        ["src/generated/main/native/cpp/**"],
-        exclude = ["src/generated/main/native/cpp/jni/**"],
-    ),
-    visibility = ["//ntcore:__subpackages__"],
+third_party_cc_lib_helper(
+    name = "generated_cc",
+    include_root = "src/generated/main/native/include",
+    src_excludes = ["src/generated/main/native/cpp/jni/**"],
+    src_root = "src/generated/main/native/cpp",
 )
 
 filegroup(
     name = "generated_jni",
     srcs = glob(["src/generated/main/native/cpp/jni/**"]),
-    visibility = ["//ntcore:__subpackages__"],
 )
 
 filegroup(
     name = "generated_java",
     srcs = glob(["src/generated/main/java/**/*.java"]),
-    visibility = ["//ntcore:__subpackages__"],
 )
 
-cc_library(
+wpilib_cc_library(
     name = "ntcore.static",
     srcs = glob(
         ["src/main/native/cpp/**"],
         exclude = ["src/main/native/cpp/jni/**"],
-    ) + [":generated_cc_source"],
+    ),
     hdrs = glob(["src/main/native/include/**/*"]),
     includes = [
         "src/main/native/cpp",
         "src/main/native/include",
     ],
     strip_include_prefix = "src/main/native/include",
+    third_party_libraries = [
+        ":generated_cc",
+    ],
     visibility = ["//visibility:public"],
     deps = [
-        ":generated_cc_headers",
         "//datalog:datalog.static",
         "//wpinet:wpinet.static",
         "//wpiutil:wpiutil.static",

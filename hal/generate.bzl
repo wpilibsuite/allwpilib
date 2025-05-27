@@ -9,7 +9,7 @@ def __generate_hal_impl(ctx):
     args.add("--nanopb", ctx.executable._nanopb_generator)
 
     ctx.actions.run(
-        inputs = ctx.attr._templates.files.to_list() + ctx.attr.proto_files.files.to_list(),
+        inputs = ctx.attr.proto_files.files.to_list(),
         outputs = [output_dir],
         executable = ctx.executable._tool,
         arguments = [args],
@@ -34,9 +34,6 @@ generate_hal = rule(
             default = Label("@com_google_protobuf//:protoc"),
             cfg = "exec",
             executable = True,
-        ),
-        "_templates": attr.label(
-            default = Label("//hal:templates"),
         ),
         "_tool": attr.label(
             default = Label("//hal:generate_nanopb"),

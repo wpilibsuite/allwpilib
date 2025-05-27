@@ -5,13 +5,13 @@ def build_examples(halsim_deps = []):
     for folder in EXAMPLE_FOLDERS:
         cc_library(
             name = folder + "-examples-headers",
-            hdrs = native.glob(["src/main/cpp/examples/" + folder + "/include/**/*.h"]),
+            hdrs = native.glob(["src/main/cpp/examples/" + folder + "/include/**/*.h"], allow_empty = True),
             strip_include_prefix = "src/main/cpp/examples/" + folder + "/include",
             tags = ["wpi-example"],
         )
         cc_binary(
             name = folder + "-example",
-            srcs = native.glob(["src/main/cpp/examples/" + folder + "/cpp/**/*.cpp", "src/main/cpp/examples/" + folder + "/c/**/*.c"]),
+            srcs = native.glob(["src/main/cpp/examples/" + folder + "/cpp/**/*.cpp", "src/main/cpp/examples/" + folder + "/c/**/*.c"], allow_empty = True),
             deps = [
                 "//wpilibNewCommands:wpilibNewCommands.static",
                 "//apriltag:apriltag.static",
@@ -40,7 +40,6 @@ def build_snippets():
         cc_library(
             name = folder + "-template",
             srcs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.cpp"]),
-            hdrs = native.glob(["src/main/cpp/snippets/" + folder + "/**/*.h"]),
             deps = [
                 "//wpilibNewCommands:wpilibNewCommands.static",
             ],
@@ -68,7 +67,7 @@ def build_tests():
         cc_test(
             name = folder + "-test",
             size = "small",
-            srcs = native.glob([example_test_folder + "/**/*.cpp", example_src_folder + "/cpp/**/*.cpp", example_src_folder + "/c/**/*.c"]),
+            srcs = native.glob([example_test_folder + "/**/*.cpp", example_src_folder + "/cpp/**/*.cpp", example_src_folder + "/c/**/*.c"], allow_empty = True),
             deps = [
                 "//wpilibNewCommands:wpilibNewCommands.static",
                 ":{}-examples-headers".format(folder),
