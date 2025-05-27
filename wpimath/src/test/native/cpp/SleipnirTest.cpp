@@ -3,24 +3,25 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <sleipnir/optimization/OptimizationProblem.hpp>
+#include <sleipnir/optimization/problem.hpp>
 
 TEST(SleipnirTest, Quartic) {
-  sleipnir::OptimizationProblem problem;
+  slp::Problem problem;
 
-  auto x = problem.DecisionVariable();
-  x.SetValue(20.0);
+  auto x = problem.decision_variable();
+  x.set_value(20.0);
 
-  problem.Minimize(sleipnir::pow(x, 4));
+  problem.minimize(slp::pow(x, 4));
 
-  problem.SubjectTo(x >= 1);
+  problem.subject_to(x >= 1);
 
-  auto status = problem.Solve({.diagnostics = true});
+  EXPECT_EQ(problem.cost_function_type(), slp::ExpressionType::NONLINEAR);
+  EXPECT_EQ(problem.equality_constraint_type(), slp::ExpressionType::NONE);
+  EXPECT_EQ(problem.inequality_constraint_type(), slp::ExpressionType::LINEAR);
 
-  EXPECT_EQ(status.costFunctionType, sleipnir::ExpressionType::kNonlinear);
-  EXPECT_EQ(status.equalityConstraintType, sleipnir::ExpressionType::kNone);
-  EXPECT_EQ(status.inequalityConstraintType, sleipnir::ExpressionType::kLinear);
-  EXPECT_EQ(status.exitCondition, sleipnir::SolverExitCondition::kSuccess);
+  auto status = problem.solve({.diagnostics = true});
 
-  EXPECT_NEAR(x.Value(), 1.0, 1e-6);
+  EXPECT_EQ(status, slp::ExitStatus::SUCCESS);
+
+  EXPECT_NEAR(x.value(), 1.0, 1e-6);
 }
