@@ -26,7 +26,7 @@ public class FeedbackAnalysis {
    * @see edu.wpi.first.math.system.plant.LinearSystemId
    */
   public static FeedbackGains getPositionGains(
-      LinearSystem<N2, N1, N1> system,
+      LinearSystem<N2, N1, N2> system,
       double maxControlEffort,
       double positionTolerance,
       double velocityTolerance,
