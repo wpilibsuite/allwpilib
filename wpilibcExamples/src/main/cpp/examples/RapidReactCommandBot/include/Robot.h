@@ -4,27 +4,36 @@
 
 #pragma once
 
-#include <optional>
-
-#include <frc/TimedRobot.h>
 #include <frc2/command/CommandPtr.h>
+#include <frc2/command/CommandRobot.h>
+#include <frc2/command/button/CommandXboxController.h>
 
-#include "RapidReactCommandBot.h"
+#include "Constants.h"
+#include "subsystems/Drive.h"
+#include "subsystems/Intake.h"
+#include "subsystems/Pneumatics.h"
+#include "subsystems/Shooter.h"
+#include "subsystems/Storage.h"
 
-class Robot : public frc::TimedRobot {
+class Robot : public frc2::CommandRobot {
  public:
   Robot();
-  void RobotPeriodic() override;
-  void DisabledInit() override;
-  void DisabledPeriodic() override;
-  void AutonomousInit() override;
-  void AutonomousPeriodic() override;
-  void TeleopInit() override;
-  void TeleopPeriodic() override;
-  void TestInit() override;
-  void TestPeriodic() override;
 
  private:
-  RapidReactCommandBot m_robot;
-  std::optional<frc2::CommandPtr> m_autonomousCommand;
+  // The robot's subsystems
+  Drive m_drive;
+  Intake m_intake;
+  Shooter m_shooter;
+  Storage m_storage;
+  Pneumatics m_pneumatics;
+
+  // The driver's controller
+  frc2::CommandXboxController m_driverController{
+      OIConstants::kDriverControllerPort};
+
+  frc2::CommandPtr m_exampleAuto{
+      m_drive
+          .DriveDistanceCommand(AutoConstants::kDriveDistance,
+                                AutoConstants::kDriveSpeed)
+          .WithTimeout(AutoConstants::kTimeout)};
 };
