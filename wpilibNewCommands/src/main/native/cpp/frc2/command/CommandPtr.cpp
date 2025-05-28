@@ -259,7 +259,20 @@ CommandPtr CommandPtr::WithName(std::string_view name) && {
   return std::move(wrapper).ToPtr();
 }
 
-// TODO: Write impls
+CommandPtr CommandPtr::WithRequirements(Requirements requirements) && {
+  AssertValid();
+  return std::move(*m_ptr).WithRequirements(std::move(requirements));
+}
+
+CommandPtr CommandPtr::WithRequirements(wpi::SmallSet<Subsystem*, 4> requirements) && {
+  AssertValid();
+  return std::move(*m_ptr).WithRequirements(std::move(requirements));
+}
+
+CommandPtr CommandPtr::WithRequirements(Subsystem* requirement) && {
+  AssertValid();
+  return std::move(*m_ptr).WithRequirements(requirement);
+}
 
 Command* CommandPtr::get() const& {
   AssertValid();

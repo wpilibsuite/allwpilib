@@ -417,6 +417,57 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   CommandPtr WithName(std::string_view name) &&;
 
   /**
+   * Decorates this Command with the specified Subsystem requirements.
+   *
+   * The scheduler will prevent two commands that require the same subsystem
+   * from being scheduled simultaneously.
+   *
+   * Note that the scheduler determines the requirements of a command when it
+   * is scheduled, so this method should normally be called from the command's
+   * constructor.
+   *
+   * While this overload can be used with {@code AddRequirements({&subsystem1,
+   * &subsystem2})}, {@code AddRequirements({&subsystem})} selects the {@code
+   * AddRequirements(Subsystem*)} overload, which will function identically but
+   * may cause warnings about redundant braces.
+   *
+   * @param requirements the Subsystem requirements to add, which can be
+   * implicitly constructed from an initializer list or a span
+   */
+  [[nodiscard]]
+  CommandPtr WithRequirements(Requirements requirements) &&;
+
+  /**
+   * Decorates this Command with the specified Subsystem requirements.
+   *
+   * The scheduler will prevent two commands that require the same subsystem
+   * from being scheduled simultaneously.
+   *
+   * Note that the scheduler determines the requirements of a command when it
+   * is scheduled, so this method should normally be called from the command's
+   * constructor.
+   *
+   * @param requirements the Subsystem requirements to add
+   */
+  [[nodiscard]]
+  CommandPtr WithRequirements(wpi::SmallSet<Subsystem*, 4> requirements) &&;
+
+  /**
+   * Decorates this Command with the specified Subsystem requirements.
+   *
+   * The scheduler will prevent two commands that require the same subsystem
+   * from being scheduled simultaneously.
+   *
+   * Note that the scheduler determines the requirements of a command when it
+   * is scheduled, so this method should normally be called from the command's
+   * constructor.
+   *
+   * @param requirement the Subsystem requirement to add
+   */
+  [[nodiscard]]
+  CommandPtr WithRequirements(Subsystem* requirement) &&;
+
+  /**
    * Schedules this command.
    */
   void Schedule();
