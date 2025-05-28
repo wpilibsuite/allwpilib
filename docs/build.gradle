@@ -77,66 +77,19 @@ doxygen.sourceSets.main {
         // apriltag
         exclude 'apriltag_pose.h'
 
-        // Eigen
-        exclude 'Eigen/**'
-        exclude 'unsupported/**'
-
         // LLVM
-        exclude 'wpi/AlignOf.h'
-        exclude 'wpi/Casting.h'
-        exclude 'wpi/Chrono.h'
         exclude 'wpi/Compiler.h'
-        exclude 'wpi/ConvertUTF.h'
-        exclude 'wpi/DenseMap.h'
-        exclude 'wpi/DenseMapInfo.h'
-        exclude 'wpi/Endian.h'
-        exclude 'wpi/EpochTracker.h'
-        exclude 'wpi/Errc.h'
-        exclude 'wpi/Errno.h'
         exclude 'wpi/ErrorHandling.h'
         exclude 'wpi/bit.h'
-        exclude 'wpi/fs.h'
-        exclude 'wpi/FunctionExtras.h'
-        exclude 'wpi/function_ref.h'
-        exclude 'wpi/Hashing.h'
-        exclude 'wpi/iterator.h'
-        exclude 'wpi/iterator_range.h'
-        exclude 'wpi/ManagedStatic.h'
-        exclude 'wpi/MapVector.h'
-        exclude 'wpi/MathExtras.h'
-        exclude 'wpi/MemAlloc.h'
-        exclude 'wpi/PointerIntPair.h'
-        exclude 'wpi/PointerLikeTypeTraits.h'
-        exclude 'wpi/PointerUnion.h'
-        exclude 'wpi/raw_os_ostream.h'
         exclude 'wpi/raw_ostream.h'
-        exclude 'wpi/SmallPtrSet.h'
-        exclude 'wpi/SmallSet.h'
-        exclude 'wpi/SmallString.h'
         exclude 'wpi/SmallVector.h'
         exclude 'wpi/StringExtras.h'
-        exclude 'wpi/StringMap.h'
-        exclude 'wpi/SwapByteOrder.h'
-        exclude 'wpi/type_traits.h'
-        exclude 'wpi/VersionTuple.h'
-        exclude 'wpi/WindowsError.h'
-
-        // fmtlib
-        exclude 'fmt/**'
 
         // libuv
-        exclude 'uv.h'
         exclude 'uv/**'
-        exclude 'wpinet/uv/**'
 
         // json
-        exclude 'wpi/adl_serializer.h'
-        exclude 'wpi/byte_container_with_subtype.h'
         exclude 'wpi/detail/**'
-        exclude 'wpi/json.h'
-        exclude 'wpi/json_fwd.h'
-        exclude 'wpi/ordered_map.h'
-        exclude 'wpi/thirdparty/**'
 
         // mpack
         exclude 'wpi/mpack.h'
