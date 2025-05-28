@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj2.command.button;
 
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.wpilibj.DriverStation.POVDirection;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -80,7 +81,7 @@ public class CommandGenericHID {
    * @param angle POV angle in degrees, or -1 for the center / not pressed.
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
-  public Trigger pov(int angle) {
+  public Trigger pov(POVDirection angle) {
     return pov(0, angle, CommandScheduler.getInstance().getDefaultButtonLoop());
   }
 
@@ -96,11 +97,11 @@ public class CommandGenericHID {
    *     CommandScheduler#getDefaultButtonLoop() the default command scheduler button loop}.
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
-  public Trigger pov(int pov, int angle, EventLoop loop) {
+  public Trigger pov(int pov, POVDirection angle, EventLoop loop) {
     var cache = m_povCache.computeIfAbsent(loop, k -> new HashMap<>());
-    // angle can be -1, so use 3600 instead of 360
+    // angle.value is a 4 bit bitfield
     return cache.computeIfAbsent(
-        pov * 3600 + angle, k -> new Trigger(loop, () -> m_hid.getPOV(pov) == angle));
+        pov * 16 + angle.value, k -> new Trigger(loop, () -> m_hid.getPOV(pov) == angle));
   }
 
   /**
@@ -111,7 +112,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the 0 degree angle of a POV on the HID.
    */
   public Trigger povUp() {
-    return pov(0);
+    return pov(POVDirection.Up);
   }
 
   /**
@@ -122,7 +123,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the 45 degree angle of a POV on the HID.
    */
   public Trigger povUpRight() {
-    return pov(45);
+    return pov(POVDirection.UpRight);
   }
 
   /**
@@ -133,7 +134,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the 90 degree angle of a POV on the HID.
    */
   public Trigger povRight() {
-    return pov(90);
+    return pov(POVDirection.Right);
   }
 
   /**
@@ -144,7 +145,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the 135 degree angle of a POV on the HID.
    */
   public Trigger povDownRight() {
-    return pov(135);
+    return pov(POVDirection.DownRight);
   }
 
   /**
@@ -155,7 +156,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the 180 degree angle of a POV on the HID.
    */
   public Trigger povDown() {
-    return pov(180);
+    return pov(POVDirection.Down);
   }
 
   /**
@@ -166,7 +167,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the 225 degree angle of a POV on the HID.
    */
   public Trigger povDownLeft() {
-    return pov(225);
+    return pov(POVDirection.DownLeft);
   }
 
   /**
@@ -177,7 +178,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the 270 degree angle of a POV on the HID.
    */
   public Trigger povLeft() {
-    return pov(270);
+    return pov(POVDirection.Left);
   }
 
   /**
@@ -188,7 +189,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the 315 degree angle of a POV on the HID.
    */
   public Trigger povUpLeft() {
-    return pov(315);
+    return pov(POVDirection.UpLeft);
   }
 
   /**
@@ -199,7 +200,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the center position of a POV on the HID.
    */
   public Trigger povCenter() {
-    return pov(-1);
+    return pov(POVDirection.Center);
   }
 
   /**

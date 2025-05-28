@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj2.command.button;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.wpilibj.DriverStation.POVDirection;
 import edu.wpi.first.wpilibj.GenericHID;
 
 /**
@@ -21,7 +22,7 @@ public class POVButton extends Trigger {
    * @param angle The desired angle in degrees (e.g. 90, 270)
    * @param povNumber The POV number (see {@link GenericHID#getPOV(int)})
    */
-  public POVButton(GenericHID joystick, int angle, int povNumber) {
+  public POVButton(GenericHID joystick, POVDirection angle, int povNumber) {
     super(() -> joystick.getPOV(povNumber) == angle);
     requireNonNullParam(joystick, "joystick", "POVButton");
   }
@@ -32,7 +33,7 @@ public class POVButton extends Trigger {
    * @param joystick The GenericHID object that has the POV
    * @param angle The desired angle (e.g. 90, 270)
    */
-  public POVButton(GenericHID joystick, int angle) {
+  public POVButton(GenericHID joystick, POVDirection angle) {
     this(joystick, angle, 0);
   }
 }

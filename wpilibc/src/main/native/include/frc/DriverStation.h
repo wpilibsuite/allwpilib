@@ -7,6 +7,7 @@
 #include <optional>
 #include <string>
 
+#include <hal/DriverStationTypes.h>
 #include <units/time.h>
 #include <wpi/Synchronization.h>
 
@@ -44,6 +45,30 @@ class DriverStation final {
     kQualification,
     /// Elimination.
     kElimination
+  };
+
+  /**
+   * A controller POV direction.
+   */
+  enum POVDirection : uint8_t {
+    /// POV center.
+    kCenter = HAL_JoystickPOV_kCentered,
+    /// POV up.
+    kUp = HAL_JoystickPOV_kUp,
+    /// POV up right.
+    kUpRight = HAL_JoystickPOV_kRightUp,
+    /// POV right.
+    kRight = HAL_JoystickPOV_kRight,
+    /// POV down right.
+    kDownRight = HAL_JoystickPOV_kRightDown,
+    /// POV down.
+    kDown = HAL_JoystickPOV_kDown,
+    /// POV down left.
+    kDownLeft = HAL_JoystickPOV_kLeftDown,
+    /// POV left.
+    kLeft = HAL_JoystickPOV_kLeft,
+    /// POV up left.
+    kUpLeft = HAL_JoystickPOV_kLeftUp,
   };
 
   /// Number of Joystick ports.
@@ -95,7 +120,7 @@ class DriverStation final {
    *
    * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
    */
-  static int GetStickPOV(int stick, int pov);
+  static POVDirection GetStickPOV(int stick, int pov);
 
   /**
    * The state of the buttons on the joystick.

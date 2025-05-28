@@ -366,8 +366,8 @@ public final class DriverStationSim {
    * @param pov The POV number
    * @param value the angle of the POV in degrees, or -1 for not pressed
    */
-  public static void setJoystickPOV(int stick, int pov, int value) {
-    DriverStationDataJNI.setJoystickPOV(stick, pov, value);
+  public static void setJoystickPOV(int stick, int pov, DriverStation.POVDirection value) {
+    DriverStationDataJNI.setJoystickPOV(stick, pov, value.value);
   }
 
   /**

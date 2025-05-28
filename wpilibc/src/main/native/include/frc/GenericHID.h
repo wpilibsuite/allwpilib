@@ -8,6 +8,8 @@
 
 #include <string>
 
+#include "frc/DriverStation.h"
+
 namespace frc {
 
 class BooleanEvent;
@@ -149,7 +151,7 @@ class GenericHID {
    * @param pov The index of the POV to read (starting at 0)
    * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
    */
-  int GetPOV(int pov = 0) const;
+  DriverStation::POVDirection GetPOV(int pov = 0) const;
 
   /**
    * Constructs a BooleanEvent instance based around this angle of a POV on the
@@ -163,7 +165,7 @@ class GenericHID {
    * @return a BooleanEvent instance based around this angle of a POV on the
    * HID.
    */
-  BooleanEvent POV(int angle, EventLoop* loop) const;
+  BooleanEvent POV(DriverStation::POVDirection angle, EventLoop* loop) const;
 
   /**
    * Constructs a BooleanEvent instance based around this angle of a POV on the
@@ -178,7 +180,8 @@ class GenericHID {
    * @return a BooleanEvent instance based around this angle of a POV on the
    * HID.
    */
-  BooleanEvent POV(int pov, int angle, EventLoop* loop) const;
+  BooleanEvent POV(int pov, DriverStation::POVDirection angle,
+                   EventLoop* loop) const;
 
   /**
    * Constructs a BooleanEvent instance based around the 0 degree angle (up) of

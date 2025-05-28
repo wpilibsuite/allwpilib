@@ -42,53 +42,55 @@ double GenericHID::GetRawAxis(int axis) const {
   return DriverStation::GetStickAxis(m_port, axis);
 }
 
-int GenericHID::GetPOV(int pov) const {
+DriverStation::POVDirection GenericHID::GetPOV(int pov) const {
   return DriverStation::GetStickPOV(m_port, pov);
 }
 
-BooleanEvent GenericHID::POV(int angle, EventLoop* loop) const {
+BooleanEvent GenericHID::POV(DriverStation::POVDirection angle,
+                             EventLoop* loop) const {
   return POV(0, angle, loop);
 }
 
-BooleanEvent GenericHID::POV(int pov, int angle, EventLoop* loop) const {
+BooleanEvent GenericHID::POV(int pov, DriverStation::POVDirection angle,
+                             EventLoop* loop) const {
   return BooleanEvent(
       loop, [this, pov, angle] { return this->GetPOV(pov) == angle; });
 }
 
 BooleanEvent GenericHID::POVUp(EventLoop* loop) const {
-  return POV(0b0001, loop);
+  return POV(DriverStation::kUp, loop);
 }
 
 BooleanEvent GenericHID::POVUpRight(EventLoop* loop) const {
-  return POV(0b0011u, loop);
+  return POV(DriverStation::kUpRight, loop);
 }
 
 BooleanEvent GenericHID::POVRight(EventLoop* loop) const {
-  return POV(0b0010u, loop);
+  return POV(DriverStation::kRight, loop);
 }
 
 BooleanEvent GenericHID::POVDownRight(EventLoop* loop) const {
-  return POV(0b0110, loop);
+  return POV(DriverStation::kDownRight, loop);
 }
 
 BooleanEvent GenericHID::POVDown(EventLoop* loop) const {
-  return POV(0b0100u, loop);
+  return POV(DriverStation::kDown, loop);
 }
 
 BooleanEvent GenericHID::POVDownLeft(EventLoop* loop) const {
-  return POV(0b1100u, loop);
+  return POV(DriverStation::kDownLeft, loop);
 }
 
 BooleanEvent GenericHID::POVLeft(EventLoop* loop) const {
-  return POV(0b1000u, loop);
+  return POV(DriverStation::kLeft, loop);
 }
 
 BooleanEvent GenericHID::POVUpLeft(EventLoop* loop) const {
-  return POV(0b1001u, loop);
+  return POV(DriverStation::kUpLeft, loop);
 }
 
 BooleanEvent GenericHID::POVCenter(EventLoop* loop) const {
-  return POV(0b0000u, loop);
+  return POV(DriverStation::kCenter, loop);
 }
 
 BooleanEvent GenericHID::AxisLessThan(int axis, double threshold,

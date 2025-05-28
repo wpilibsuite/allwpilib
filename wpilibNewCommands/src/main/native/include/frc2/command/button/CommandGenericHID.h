@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
+
+#include <frc/DriverStation.h>
 #include <frc/GenericHID.h>
 
 #include "Trigger.h"
@@ -58,7 +60,7 @@ class CommandGenericHID {
    * @param angle POV angle in degrees, or -1 for the center / not pressed.
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
-  Trigger POV(int angle,
+  Trigger POV(frc::DriverStation::POVDirection angle,
               frc::EventLoop* loop =
                   CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 
@@ -75,7 +77,7 @@ class CommandGenericHID {
    * @param angle POV angle in degrees, or -1 for the center / not pressed.
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
-  Trigger POV(int pov, int angle,
+  Trigger POV(int pov, frc::DriverStation::POVDirection angle,
               frc::EventLoop* loop =
                   CommandScheduler::GetInstance().GetDefaultButtonLoop()) const;
 

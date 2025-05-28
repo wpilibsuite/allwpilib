@@ -288,7 +288,8 @@ class DriverStationSim {
    * @param pov The POV number
    * @param value the angle of the POV in degrees, or -1 for not pressed
    */
-  static void SetJoystickPOV(int stick, int pov, int value);
+  static void SetJoystickPOV(int stick, int pov,
+                             DriverStation::POVDirection value);
 
   /**
    * Sets the state of all the buttons on a joystick.

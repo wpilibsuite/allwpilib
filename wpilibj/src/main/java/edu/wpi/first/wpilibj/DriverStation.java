@@ -89,6 +89,51 @@ public final class DriverStation {
     Elimination
   }
 
+  /** A controller POV direction. */
+  public enum POVDirection {
+    /** POV center. */
+    Center(0x00),
+    /** POV up. */
+    Up(0x01),
+    /** POV up right. */
+    UpRight(0x01 | 0x02),
+    /** POV right. */
+    Right(0x02),
+    /** POV down right. */
+    DownRight(0x02 | 0x04),
+    /** POV down. */
+    Down(0x04),
+    /** POV down left. */
+    DownLeft(0x04 | 0x08),
+    /** POV left. */
+    Left(0x08),
+    /** POV up left. */
+    UpLeft(0x01 | 0x08);
+
+    /**
+     * Converts a byte value into a POVDirection enum value.
+     *
+     * @param value The byte value to convert.
+     * @return The corresponding POVDirection enum value.
+     * @throws IllegalArgumentException If value does not correspond to a POVDirection.
+     */
+    private static POVDirection of(byte value) {
+      for (var direction : values()) {
+        if (direction.value == value) {
+          return direction;
+        }
+      }
+      throw new IllegalArgumentException("Invalid value " + value + "!");
+    }
+
+    /** The corresponding HAL value. */
+    public final byte value;
+
+    POVDirection(int value) {
+      this.value = (byte) value;
+    }
+  }
+
   private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
   private static double m_nextMessageTime;
 
@@ -676,7 +721,7 @@ public final class DriverStation {
    * @param pov The POV to read.
    * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
    */
-  public static int getStickPOV(int stick, int pov) {
+  public static POVDirection getStickPOV(int stick, int pov) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
@@ -687,7 +732,7 @@ public final class DriverStation {
     m_cacheDataMutex.lock();
     try {
       if (pov < m_joystickPOVs[stick].m_count) {
-        return m_joystickPOVs[stick].m_povs[pov];
+        return POVDirection.of(m_joystickPOVs[stick].m_povs[pov]);
       }
     } finally {
       m_cacheDataMutex.unlock();
@@ -699,7 +744,7 @@ public final class DriverStation {
             + " on port "
             + stick
             + " not available, check if controller is plugged in");
-    return -1;
+    return POVDirection.Center;
   }
 
   /**
