@@ -118,7 +118,7 @@ class DriverStation final {
   /**
    * Get the state of a POV on the joystick.
    *
-   * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+   * @return the angle of the POV.
    */
   static POVDirection GetStickPOV(int stick, int pov);
 

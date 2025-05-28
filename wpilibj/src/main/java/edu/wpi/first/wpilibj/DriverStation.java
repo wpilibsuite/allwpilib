@@ -719,7 +719,7 @@ public final class DriverStation {
    *
    * @param stick The joystick to read.
    * @param pov The POV to read.
-   * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+   * @return the angle of the POV.
    */
   public static POVDirection getStickPOV(int stick, int pov) {
     if (stick < 0 || stick >= kJoystickPorts) {

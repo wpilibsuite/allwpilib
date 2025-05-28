@@ -184,25 +184,19 @@ public class GenericHID {
   }
 
   /**
-   * Get the angle in degrees of a POV on the HID.
-   *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
-   * upper-left is 315).
+   * Get the angle of a POV on the HID.
    *
    * @param pov The index of the POV to read (starting at 0). Defaults to 0.
-   * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+   * @return the angle of the POV.
    */
   public POVDirection getPOV(int pov) {
     return DriverStation.getStickPOV(m_port, pov);
   }
 
   /**
-   * Get the angle in degrees of the default POV (index 0) on the HID.
+   * Get the angle of the default POV (index 0) on the HID.
    *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
-   * upper-left is 315).
-   *
-   * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+   * @return the angle of the POV.
    */
   public POVDirection getPOV() {
     return getPOV(0);
@@ -211,10 +205,7 @@ public class GenericHID {
   /**
    * Constructs a BooleanEvent instance based around this angle of a POV on the HID.
    *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (eg right is 90,
-   * upper-left is 315).
-   *
-   * @param angle POV angle in degrees, or -1 for the center / not pressed.
+   * @param angle POV angle.
    * @param loop the event loop instance to attach the event to.
    * @return a BooleanEvent instance based around this angle of a POV on the HID.
    */
@@ -225,11 +216,8 @@ public class GenericHID {
   /**
    * Constructs a BooleanEvent instance based around this angle of a POV on the HID.
    *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
-   * upper-left is 315).
-   *
    * @param pov index of the POV to read (starting at 0). Defaults to 0.
-   * @param angle POV angle in degrees, or -1 for the center / not pressed.
+   * @param angle POV angle.
    * @param loop the event loop instance to attach the event to.
    * @return a BooleanEvent instance based around this angle of a POV on the HID.
    */
@@ -243,88 +231,88 @@ public class GenericHID {
   }
 
   /**
-   * Constructs a BooleanEvent instance based around the 0 degree angle (up) of the default (index
-   * 0) POV on the HID.
+   * Constructs a BooleanEvent instance based around the up direction of the default (index 0) POV
+   * on the HID.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a BooleanEvent instance based around the 0 degree angle of a POV on the HID.
+   * @return a BooleanEvent instance based around the up direction a POV on the HID.
    */
   public BooleanEvent povUp(EventLoop loop) {
     return pov(POVDirection.Up, loop);
   }
 
   /**
-   * Constructs a BooleanEvent instance based around the 45 degree angle (right up) of the default
-   * (index 0) POV on the HID.
+   * Constructs a BooleanEvent instance based around the up right direction of the default (index 0)
+   * POV on the HID.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a BooleanEvent instance based around the 45 degree angle of a POV on the HID.
+   * @return a BooleanEvent instance based around the up right direction of a POV on the HID.
    */
   public BooleanEvent povUpRight(EventLoop loop) {
     return pov(POVDirection.UpRight, loop);
   }
 
   /**
-   * Constructs a BooleanEvent instance based around the 90 degree angle (right) of the default
-   * (index 0) POV on the HID.
+   * Constructs a BooleanEvent instance based around the right direction of the default (index 0)
+   * POV on the HID.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a BooleanEvent instance based around the 90 degree angle of a POV on the HID.
+   * @return a BooleanEvent instance based around the right direction of a POV on the HID.
    */
   public BooleanEvent povRight(EventLoop loop) {
     return pov(POVDirection.Right, loop);
   }
 
   /**
-   * Constructs a BooleanEvent instance based around the 135 degree angle (right down) of the
-   * default (index 0) POV on the HID.
+   * Constructs a BooleanEvent instance based around the down right direction of the default (index
+   * 0) POV on the HID.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a BooleanEvent instance based around the 135 degree angle of a POV on the HID.
+   * @return a BooleanEvent instance based around the down right direction of a POV on the HID.
    */
   public BooleanEvent povDownRight(EventLoop loop) {
     return pov(POVDirection.DownRight, loop);
   }
 
   /**
-   * Constructs a BooleanEvent instance based around the 180 degree angle (down) of the default
-   * (index 0) POV on the HID.
+   * Constructs a BooleanEvent instance based around the down direction of the default (index 0) POV
+   * on the HID.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a BooleanEvent instance based around the 180 degree angle of a POV on the HID.
+   * @return a BooleanEvent instance based around the down direction of a POV on the HID.
    */
   public BooleanEvent povDown(EventLoop loop) {
     return pov(POVDirection.Down, loop);
   }
 
   /**
-   * Constructs a BooleanEvent instance based around the 225 degree angle (down left) of the default
-   * (index 0) POV on the HID.
+   * Constructs a BooleanEvent instance based around the down left direction of the default (index
+   * 0) POV on the HID.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a BooleanEvent instance based around the 225 degree angle of a POV on the HID.
+   * @return a BooleanEvent instance based around the down left direction of a POV on the HID.
    */
   public BooleanEvent povDownLeft(EventLoop loop) {
     return pov(POVDirection.DownLeft, loop);
   }
 
   /**
-   * Constructs a BooleanEvent instance based around the 270 degree angle (left) of the default
-   * (index 0) POV on the HID.
+   * Constructs a BooleanEvent instance based around the left direction of the default (index 0) POV
+   * on the HID.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a BooleanEvent instance based around the 270 degree angle of a POV on the HID.
+   * @return a BooleanEvent instance based around the left direction of a POV on the HID.
    */
   public BooleanEvent povLeft(EventLoop loop) {
     return pov(POVDirection.Left, loop);
   }
 
   /**
-   * Constructs a BooleanEvent instance based around the 315 degree angle (left up) of the default
-   * (index 0) POV on the HID.
+   * Constructs a BooleanEvent instance based around the up left direction of the default (index 0)
+   * POV on the HID.
    *
    * @param loop the event loop instance to attach the event to.
-   * @return a BooleanEvent instance based around the 315 degree angle of a POV on the HID.
+   * @return a BooleanEvent instance based around the up left direction of a POV on the HID.
    */
   public BooleanEvent povUpLeft(EventLoop loop) {
     return pov(POVDirection.UpLeft, loop);
