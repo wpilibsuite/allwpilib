@@ -18,7 +18,7 @@ task cppSourcesZip(type: Zip) {
     from('src/main/native/cpp') {
         into '/'
     }
-    from("$buildDir/generated/cpp") {
+    from("src/generated/main/native/cpp") {
         into '/'
     }
 }
