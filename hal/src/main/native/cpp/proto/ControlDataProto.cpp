@@ -127,15 +127,15 @@ std::optional<mrc::Joystick> wpi::Protobuf<mrc::Joystick>::Unpack(
   auto Axes = AxesCb.Items();
 
   mrc::Joystick Joystick;
-  Joystick.Axes.AvailableAxes = Msg.AvailableAxes;
-  auto JoystickAxesCount = (std::min)(Joystick.Axes.GetMaxAvailableCount(),
-                                      static_cast<int>(Axes.size()));
+  Joystick.Axes.SetAvailable(Msg.AvailableAxes);
+  auto JoystickAxesCount =
+      (std::min)(Joystick.Axes.GetMaxAvailableCount(), Axes.size());
 
-  for (int i = 0; i < JoystickAxesCount; i++) {
+  for (size_t i = 0; i < JoystickAxesCount; i++) {
     Joystick.Axes.Axes()[i] = Axes[i];
   }
 
-  Joystick.Buttons.AvailableButtons = Msg.AvailableButtons;
+  Joystick.Buttons.SetAvailable(Msg.AvailableButtons);
   Joystick.Buttons.Buttons = Msg.Buttons;
 
   Joystick.Povs.SetCount(Msg.POVCount);
@@ -160,9 +160,9 @@ bool wpi::Protobuf<mrc::Joystick>::Pack(OutputStream& Stream,
   }
 
   mrc_proto_ProtobufJoystickData Msg{
-      .AvailableButtons = Value.Buttons.AvailableButtons,
+      .AvailableButtons = Value.Buttons.GetAvailable(),
       .Buttons = Value.Buttons.Buttons,
-      .AvailableAxes = Value.Axes.AvailableAxes,
+      .AvailableAxes = Value.Axes.GetAvailable(),
       .Axes = AxesCb.Callback(),
       .POVCount = static_cast<uint32_t>(Value.Povs.GetCount()),
       .POVs = PovsStore,

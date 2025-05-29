@@ -584,13 +584,11 @@ void HAL_ObserveUserProgramDisabled(void) {
 
 void HAL_ObserveUserProgramAutonomous(void) {
   auto tVal = mrc::OpModeHash::MakeAuto(2, true).ToValue();
-  printf("Auto trace %lx\n", tVal);
   systemServerDs->traceOpModePublisher.Set(tVal);
 }
 
 void HAL_ObserveUserProgramTeleop(void) {
   auto tVal = mrc::OpModeHash::MakeTele(1, true).ToValue();
-  printf("Tele trace %lx\n", tVal);
   systemServerDs->traceOpModePublisher.Set(tVal);
 }
 
