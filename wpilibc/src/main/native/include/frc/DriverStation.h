@@ -76,7 +76,7 @@ class DriverStation final {
   /**
    * Gets the angle of a POVDirection.
    *
-   * @param The POVDirection to convert.
+   * @param angle The POVDirection to convert.
    * @return The angle clockwise from straight up, or std::nullopt if the
    * POVDirection is kCenter.
    */
