@@ -82,7 +82,7 @@ std::optional<mrc::ControlData> wpi::Protobuf<mrc::ControlData>::Unpack(
 
   ControlData.ControlWord = ToControlWord(Msg.ControlWord);
   ControlData.MatchTime = Msg.MatchTime;
-  ControlData.CurrentOpMode = Msg.CurrentOpMode;
+  ControlData.CurrentOpMode = mrc::OpModeHash::FromValue(Msg.CurrentOpMode);
   ControlData.SetJoystickCount(Joysticks.size());
 
   for (size_t i = 0; i < ControlData.GetJoystickCount(); i++) {
@@ -101,7 +101,7 @@ bool wpi::Protobuf<mrc::ControlData>::Pack(OutputStream& Stream,
       .ControlWord = FromControlWord(Value.ControlWord),
       .MatchTime = Value.MatchTime,
       .Joysticks = Joysticks.Callback(),
-      .CurrentOpMode = Value.CurrentOpMode,
+      .CurrentOpMode = Value.CurrentOpMode.ToValue(),
   };
 
   return Stream.Encode(Msg);
@@ -112,8 +112,9 @@ std::optional<mrc::Joystick> wpi::Protobuf<mrc::Joystick>::Unpack(
   wpi::UnpackCallback<int16_t, MRC_MAX_NUM_AXES> AxesCb;
 
   mrc_proto_ProtobufJoystickData Msg{
-      .ButtonCount = 0,
+      .AvailableButtons = 0,
       .Buttons = 0,
+      .AvailableAxes = 0,
       .Axes = AxesCb.Callback(),
       .POVCount = 0,
       .POVs = 0,
@@ -126,13 +127,15 @@ std::optional<mrc::Joystick> wpi::Protobuf<mrc::Joystick>::Unpack(
   auto Axes = AxesCb.Items();
 
   mrc::Joystick Joystick;
-  Joystick.Axes.SetCount(Axes.size());
+  Joystick.Axes.AvailableAxes = Msg.AvailableAxes;
+  auto JoystickAxesCount = (std::min)(Joystick.Axes.GetMaxAvailableCount(),
+                                      static_cast<int>(Axes.size()));
 
-  for (size_t i = 0; i < Joystick.Axes.GetCount(); i++) {
+  for (int i = 0; i < JoystickAxesCount; i++) {
     Joystick.Axes.Axes()[i] = Axes[i];
   }
 
-  Joystick.Buttons.SetCount(Msg.ButtonCount);
+  Joystick.Buttons.AvailableButtons = Msg.AvailableButtons;
   Joystick.Buttons.Buttons = Msg.Buttons;
 
   Joystick.Povs.SetCount(Msg.POVCount);
@@ -157,8 +160,9 @@ bool wpi::Protobuf<mrc::Joystick>::Pack(OutputStream& Stream,
   }
 
   mrc_proto_ProtobufJoystickData Msg{
-      .ButtonCount = static_cast<uint32_t>(Value.Buttons.GetCount()),
+      .AvailableButtons = Value.Buttons.AvailableButtons,
       .Buttons = Value.Buttons.Buttons,
+      .AvailableAxes = Value.Axes.AvailableAxes,
       .Axes = AxesCb.Callback(),
       .POVCount = static_cast<uint32_t>(Value.Povs.GetCount()),
       .POVs = PovsStore,

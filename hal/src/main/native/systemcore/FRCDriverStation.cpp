@@ -15,6 +15,7 @@
 
 #include <fmt/format.h>
 #include <networktables/BooleanTopic.h>
+#include <networktables/IntegerTopic.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/ProtobufTopic.h>
 #include <networktables/StringArrayTopic.h>
@@ -84,6 +85,7 @@ struct SystemServerDriverStation {
   nt::ProtobufPublisher<std::vector<mrc::OpMode>> teleopOpModes;
   nt::ProtobufPublisher<std::vector<mrc::OpMode>> autoOpModes;
   nt::ProtobufPublisher<std::vector<mrc::OpMode>> testOpModes;
+  nt::IntegerPublisher traceOpModePublisher;
 
   NT_Listener controlDataListener;
 
@@ -155,20 +157,28 @@ struct SystemServerDriverStation {
                       .Publish();
 
     std::vector<mrc::OpMode> staticTeleopOpModes;
-    staticTeleopOpModes.emplace_back(mrc::OpMode{"TeleOp", 2});
+    staticTeleopOpModes.emplace_back(
+        mrc::OpMode{"TeleOp", mrc::OpModeHash::MakeTele(2)});
     teleopOpModes.Set(staticTeleopOpModes);
 
     std::vector<mrc::OpMode> staticAutoOpModes;
-    staticAutoOpModes.emplace_back(mrc::OpMode{"Auto", 1});
+    staticAutoOpModes.emplace_back(
+        mrc::OpMode{"Auto", mrc::OpModeHash::MakeAuto(1)});
     autoOpModes.Set(staticAutoOpModes);
 
     std::vector<mrc::OpMode> staticTestOpModes;
-    staticTestOpModes.emplace_back(mrc::OpMode{"Test", 3});
+    staticTestOpModes.emplace_back(
+        mrc::OpMode{"Test", mrc::OpModeHash::MakeTest(3)});
     testOpModes.Set(staticTestOpModes);
 
     ntInst.AddListener(
         controlDataSubscriber, NT_EVENT_VALUE_REMOTE | NT_EVENT_UNPUBLISH,
         [this](const nt::Event& event) { HandleListener(event); });
+
+    traceOpModePublisher =
+        ntInst.GetIntegerTopic(ROBOT_CURRENT_OPMODE_TRACE_PATH)
+            .Publish(options);
+    traceOpModePublisher.GetTopic().SetCached(false);
   }
 
   void HandleListener(const nt::Event& event);
@@ -256,7 +266,7 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
       povs[count].povs[i] = newPovs[i];
     }
 
-    buttons[count].count = newStick.Buttons.GetCount();
+    buttons[count].count = newStick.Buttons.GetMaxAvailableCount();
     buttons[count].buttons = newStick.Buttons.Buttons;
   }
 }
@@ -567,13 +577,25 @@ void HAL_ObserveUserProgramStarting(void) {
   systemServerDs->hasUserCodeReadyPublisher.Set(true);
 }
 
-void HAL_ObserveUserProgramDisabled(void) {}
+void HAL_ObserveUserProgramDisabled(void) {
+  systemServerDs->traceOpModePublisher.Set(mrc::OpModeHash::MakeTele(1, false).ToValue());
+}
 
-void HAL_ObserveUserProgramAutonomous(void) {}
+void HAL_ObserveUserProgramAutonomous(void) {
+  auto tVal = mrc::OpModeHash::MakeAuto(2, true).ToValue();
+  printf("Auto trace %lx\n", tVal);
+  systemServerDs->traceOpModePublisher.Set(tVal);
+}
 
-void HAL_ObserveUserProgramTeleop(void) {}
+void HAL_ObserveUserProgramTeleop(void) {
+  auto tVal = mrc::OpModeHash::MakeTele(1, true).ToValue();
+  printf("Tele trace %lx\n", tVal);
+  systemServerDs->traceOpModePublisher.Set(tVal);
+}
 
-void HAL_ObserveUserProgramTest(void) {}
+void HAL_ObserveUserProgramTest(void) {
+  systemServerDs->traceOpModePublisher.Set(mrc::OpModeHash::MakeTest(3, true).ToValue());
+}
 
 HAL_Bool HAL_RefreshDSData(void) {
   mrc::ControlData newestData;

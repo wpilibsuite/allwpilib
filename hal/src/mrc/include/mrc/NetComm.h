@@ -7,6 +7,8 @@
 #include <stdint.h>
 
 #include <array>
+#include <bit>
+#include <limits>
 #include <span>
 #include <string>
 #include <string_view>
@@ -16,56 +18,94 @@
 
 namespace mrc {
 
-struct OpModeTrace {
-  uint64_t Hash{0};
-  bool Enabled{false};
-  bool NoCurrentOpMpode{false};
+struct OpModeHash {
+  uint64_t Hash : 56 {};
+  uint64_t IsAuto : 1 {};
+  uint64_t IsTest : 1 {};
+  uint64_t IsEnabled : 1 {};
+  uint64_t Reserved : 6 {};
 
-  static OpModeTrace FromValue(uint64_t Value) {
-    return OpModeTrace{
-        .Hash = Value & 0x3FFFFFFFFFFFFFFF,
-        .Enabled = (Value & 0x8000000000000000) == 0,
-        .NoCurrentOpMpode = (Value & 0x4000000000000000) != 0,
-    };
+  static OpModeHash MakeTest(uint64_t Hash, bool Enabled = false) {
+    OpModeHash FullHash;
+    FullHash.Hash = Hash & 0x00FFFFFFFFFFFFFF;
+    FullHash.IsTest = 1;
+    FullHash.IsEnabled = Enabled ? 1 : 0;
+    return FullHash;
+  }
+
+  static OpModeHash MakeTele(uint64_t Hash, bool Enabled = false) {
+    OpModeHash FullHash;
+    FullHash.Hash = Hash & 0x00FFFFFFFFFFFFFF;
+    FullHash.IsEnabled = Enabled ? 1 : 0;
+    return FullHash;
+  }
+
+  static OpModeHash MakeAuto(uint64_t Hash, bool Enabled = false) {
+    OpModeHash FullHash;
+    FullHash.Hash = Hash & 0x00FFFFFFFFFFFFFF;
+    FullHash.IsAuto = 1;
+    FullHash.IsEnabled = Enabled ? 1 : 0;
+    return FullHash;
+  }
+
+  static OpModeHash FromValue(uint64_t Value) {
+    OpModeHash RetVal;
+    RetVal.Hash = Value & 0x00FFFFFFFFFFFFFF;
+    RetVal.IsAuto = (Value & 0x2000000000000000) != 0;
+    RetVal.IsTest = (Value & 0x4000000000000000) != 0;
+    RetVal.IsEnabled = (Value & 0x8000000000000000) != 0;
+    return RetVal;
   }
 
   uint64_t ToValue() const {
-    uint64_t RetVal = Hash & 0x3FFFFFFFFFFFFFFF;
-    RetVal |= Enabled ? 0 : 0x8000000000000000;
-    RetVal |= NoCurrentOpMpode ? 0x4000000000000000 : 0;
+    uint64_t RetVal = Hash & 0x00FFFFFFFFFFFFFF;
+    RetVal |= IsAuto ? 0x2000000000000000 : 0;
+    RetVal |= IsTest ? 0x4000000000000000 : 0;
+    RetVal |= IsEnabled ? 0x8000000000000000 : 0;
     return RetVal;
   }
 };
 
 struct ControlFlags {
-  uint32_t Enabled : 1;
-  uint32_t Auto : 1;
-  uint32_t Test : 1;
-  uint32_t EStop : 1;
-  uint32_t FmsConnected : 1;
-  uint32_t DsConnected : 1;
-  uint32_t WatchdogActive : 1;
-  uint32_t Alliance : 6;
-  uint32_t Reserved : 19;
+  uint32_t Enabled : 1 {};
+  uint32_t Auto : 1 {};
+  uint32_t Test : 1 {};
+  uint32_t EStop : 1 {};
+  uint32_t FmsConnected : 1 {};
+  uint32_t DsConnected : 1 {};
+  uint32_t WatchdogActive : 1 {};
+  uint32_t Alliance : 6 {};
+  uint32_t Reserved : 19 {};
 };
 
 struct JoystickAxes {
  public:
-  std::span<int16_t> Axes() { return std::span{AxesStore.data(), GetCount()}; }
+  uint16_t AvailableAxes{0};
+
+  std::span<int16_t> Axes() {
+    return std::span{AxesStore.data(),
+                     static_cast<size_t>(GetMaxAvailableCount())};
+  }
 
   std::span<const int16_t> Axes() const {
-    return std::span{AxesStore.data(), GetCount()};
+    return std::span{AxesStore.data(),
+                     static_cast<size_t>(GetMaxAvailableCount())};
   }
 
-  void SetCount(uint8_t NewCount) {
-    Count = (std::min)(NewCount, static_cast<uint8_t>(MRC_MAX_NUM_AXES));
+  void SetMaxAvailableToCount(size_t Count) {
+    if (Count > MRC_MAX_NUM_AXES) {
+      Count = MRC_MAX_NUM_AXES;
+    }
+    AvailableAxes = (1 << Count) - 1;
   }
 
-  size_t GetCount() const { return Count; }
+  int GetMaxAvailableCount() const {
+    int Count = 16 - std::countl_zero(AvailableAxes);
+    return (std::min)(Count, MRC_MAX_NUM_AXES);
+  }
 
  private:
-  std::array<int16_t, MRC_MAX_NUM_AXES> AxesStore;
-  uint8_t Count{0};
+  std::array<int16_t, MRC_MAX_NUM_AXES> AxesStore{};
 };
 
 struct JoystickPovs {
@@ -83,21 +123,25 @@ struct JoystickPovs {
   size_t GetCount() const { return Count; }
 
  private:
-  std::array<uint8_t, MRC_MAX_NUM_POVS> PovsStore;
+  std::array<uint8_t, MRC_MAX_NUM_POVS> PovsStore{};
   uint8_t Count{0};
 };
 
 struct JoystickButtons {
-  uint64_t Buttons;
+  uint64_t Buttons{0};
+  uint64_t AvailableButtons{0};
 
-  void SetCount(uint8_t NewCount) {
-    Count = (std::min)(NewCount, static_cast<uint8_t>(MRC_MAX_NUM_BUTTONS));
+  void SetMaxAvailableToCount(size_t Count) {
+    if (Count > 63) {
+      AvailableButtons = (std::numeric_limits<uint64_t>::max)();
+      return;
+    }
+    AvailableButtons = (1ULL << Count) - 1;
   }
 
-  size_t GetCount() const { return Count; }
-
- private:
-  uint8_t Count{0};
+  int GetMaxAvailableCount() const {
+    return 64 - std::countl_zero(AvailableButtons);
+  }
 };
 
 struct Joystick {
@@ -108,8 +152,8 @@ struct Joystick {
 
 struct ControlData {
   ControlFlags ControlWord;
-  uint16_t MatchTime;
-  uint64_t CurrentOpMode;
+  uint16_t MatchTime{0};
+  OpModeHash CurrentOpMode;
 
   std::span<Joystick> Joysticks() {
     return std::span{JoysticksStore.data(), GetJoystickCount()};
@@ -352,13 +396,14 @@ struct ErrorInfo {
 };
 
 struct OpMode {
-  OpMode(std::string_view _Name, uint64_t _Hash) : Hash{_Hash} {
+  OpMode(std::string_view _Name, OpModeHash _Hash)
+      : Hash(_Hash) {
     SetName(_Name);
   }
 
   OpMode() = default;
 
-  uint64_t Hash{0};
+  OpModeHash Hash;
 
   void SetName(std::string_view NewName) {
     if (NewName.size() > MRC_MAX_OPMODE_LEN) {
