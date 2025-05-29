@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <frc/geometry/Rotation2d.h>
+
 #include <optional>
 #include <string>
 
@@ -70,6 +72,36 @@ class DriverStation final {
     /// POV up left.
     kUpLeft = HAL_JoystickPOV_kLeftUp,
   };
+
+  /**
+   * Gets the angle of a POVDirection.
+   *
+   * @param The POVDirection to convert.
+   * @return The angle clockwise from straight up, or std::nullopt if the
+   * POVDirection is kCenter.
+   */
+  static constexpr std::optional<Rotation2d> GetAngle(POVDirection angle) {
+    switch (angle) {
+      case kCenter:
+        return std::nullopt;
+      case kUp:
+        return Rotation2d{0_deg};
+      case kUpRight:
+        return Rotation2d{45_deg};
+      case kRight:
+        return Rotation2d{90_deg};
+      case kDownRight:
+        return Rotation2d{135_deg};
+      case kDown:
+        return Rotation2d{180_deg};
+      case kDownLeft:
+        return Rotation2d{225_deg};
+      case kLeft:
+        return Rotation2d{270_deg};
+      case kUpLeft:
+        return Rotation2d{315_deg};
+    }
+  }
 
   /// Number of Joystick ports.
   static constexpr int kJoystickPorts = 6;
