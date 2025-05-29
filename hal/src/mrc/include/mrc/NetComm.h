@@ -396,8 +396,7 @@ struct ErrorInfo {
 };
 
 struct OpMode {
-  OpMode(std::string_view _Name, OpModeHash _Hash)
-      : Hash(_Hash) {
+  OpMode(std::string_view _Name, OpModeHash _Hash) : Hash(_Hash) {
     SetName(_Name);
   }
 

@@ -578,7 +578,8 @@ void HAL_ObserveUserProgramStarting(void) {
 }
 
 void HAL_ObserveUserProgramDisabled(void) {
-  systemServerDs->traceOpModePublisher.Set(mrc::OpModeHash::MakeTele(1, false).ToValue());
+  systemServerDs->traceOpModePublisher.Set(
+      mrc::OpModeHash::MakeTele(1, false).ToValue());
 }
 
 void HAL_ObserveUserProgramAutonomous(void) {
@@ -594,7 +595,8 @@ void HAL_ObserveUserProgramTeleop(void) {
 }
 
 void HAL_ObserveUserProgramTest(void) {
-  systemServerDs->traceOpModePublisher.Set(mrc::OpModeHash::MakeTest(3, true).ToValue());
+  systemServerDs->traceOpModePublisher.Set(
+      mrc::OpModeHash::MakeTest(3, true).ToValue());
 }
 
 HAL_Bool HAL_RefreshDSData(void) {
