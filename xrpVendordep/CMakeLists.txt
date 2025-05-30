@@ -52,7 +52,11 @@ add_library(xrpVendordep ${xrpVendordep_native_src})
 set_target_properties(xrpVendordep PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET xrpVendordep PROPERTY FOLDER "libraries")
 
-target_compile_features(xrpVendordep PUBLIC cxx_std_20)
+if(MSVC)
+    target_compile_features(xrpVendordep PUBLIC cxx_std_23)
+else()
+    target_compile_features(xrpVendordep PUBLIC cxx_std_20)
+endif()
 wpilib_target_warnings(xrpVendordep)
 target_link_libraries(xrpVendordep wpilibc)
 
