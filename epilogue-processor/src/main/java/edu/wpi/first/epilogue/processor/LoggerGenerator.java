@@ -117,7 +117,7 @@ public class LoggerGenerator {
 
     List<VariableElement> fieldsToLog = new ArrayList<>();
     List<ExecutableElement> methodsToLog = new ArrayList<>();
-    collectLoggables(clazz, fieldsToLog, methodsToLog);
+    collectLoggables(clazz, fieldsToLog, methodsToLog, true);
 
     // Validate no name collisions
     Map<String, List<Element>> usedNames =
@@ -162,7 +162,7 @@ public class LoggerGenerator {
     writeLoggerFile(clazz, config, fieldsToLog, methodsToLog);
   }
 
-  private void collectLoggables(TypeElement clazz, List<VariableElement> fields, List<ExecutableElement> methods) {
+  private void collectLoggables(TypeElement clazz, List<VariableElement> fields, List<ExecutableElement> methods, boolean isRoot) {
     var config = clazz.getAnnotation(Logged.class);
     if (config == null) {
       config = m_defaultConfig;
@@ -185,6 +185,7 @@ public class LoggerGenerator {
               .filter(notSkipped)
               .filter(optedIn)
               .filter(e -> !e.getModifiers().contains(Modifier.STATIC))
+              .filter(e -> isRoot || e.getModifiers().contains(Modifier.PUBLIC))
               .filter(this::isLoggable)
               .toList();
     }
@@ -208,7 +209,7 @@ public class LoggerGenerator {
 
     TypeElement superclass = (TypeElement) m_processingEnv.getTypeUtils().asElement(clazz.getSuperclass());
     if (superclass != null) {
-      collectLoggables(superclass, fields, methods);
+      collectLoggables(superclass, fields, methods, false);
     }
   }
 

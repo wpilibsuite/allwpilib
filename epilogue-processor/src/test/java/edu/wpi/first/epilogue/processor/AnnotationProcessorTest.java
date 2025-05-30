@@ -450,8 +450,9 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
+      // nothing should be logged from BaseExample
       class BaseExample {
-        double x;
+        public double x;
         public double getValue() { return 2.0; }
       }
 
@@ -493,10 +494,18 @@ class AnnotationProcessorTest {
         """
       package edu.wpi.first.epilogue;
 
+      class Grandparent {
+        @Logged
+        public double a;
+        @Logged public double getB() { return 0; }
+      }
+
       @Logged
-      class BaseExample {
-        double x;
+      class BaseExample extends Grandparent {
+        public double x;
+        double z;
         public double getValue() { return 2.0; }
+        private double getOtherValue() { return 3.0; }
       }
 
       @Logged
@@ -524,7 +533,9 @@ class AnnotationProcessorTest {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             backend.log("y", object.y);
             backend.log("x", object.x);
+            backend.log("a", object.a);
             backend.log("getValue", object.getValue());
+            backend.log("getB", object.getB());
           }
         }
       }
