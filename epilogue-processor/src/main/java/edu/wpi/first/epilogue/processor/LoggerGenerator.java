@@ -162,57 +162,6 @@ public class LoggerGenerator {
     writeLoggerFile(clazz, config, fieldsToLog, methodsToLog);
   }
 
-  private void collectLoggables(TypeElement clazz, List<VariableElement> fields, List<ExecutableElement> methods, boolean isRoot) {
-    var config = clazz.getAnnotation(Logged.class);
-    if (config == null) {
-      config = m_defaultConfig;
-    }
-    boolean requireExplicitOptIn = config.strategy() == Logged.Strategy.OPT_IN;
-
-    Predicate<Element> notSkipped = LoggerGenerator::isNotSkipped;
-    Predicate<Element> optedIn =
-        e -> !requireExplicitOptIn || e.getAnnotation(Logged.class) != null;
-
-    List<VariableElement> classFields;
-    if (Objects.equals(clazz.getSuperclass().toString(), "java.lang.Record")) {
-      // Do not log record members - just use the accessor methods
-      classFields = List.of();
-    } else {
-      classFields =
-        clazz.getEnclosedElements().stream()
-              .filter(e -> e instanceof VariableElement)
-              .map(e -> (VariableElement) e)
-              .filter(notSkipped)
-              .filter(optedIn)
-              .filter(e -> !e.getModifiers().contains(Modifier.STATIC))
-              .filter(e -> isRoot || e.getModifiers().contains(Modifier.PUBLIC))
-              .filter(this::isLoggable)
-              .toList();
-    }
-    fields.addAll(classFields);
-
-    methods.addAll(
-      clazz.getEnclosedElements().stream()
-              .filter(e -> e instanceof ExecutableElement)
-              .map(e -> (ExecutableElement) e)
-              .filter(notSkipped)
-              .filter(optedIn)
-              .filter(e -> !e.getModifiers().contains(Modifier.STATIC))
-              .filter(e -> e.getModifiers().contains(Modifier.PUBLIC))
-              .filter(e -> e.getParameters().isEmpty())
-              .filter(e -> e.getReceiverType() != null)
-              .filter(kIsBuiltInJavaMethod.negate())
-              .filter(this::isLoggable)
-              .filter(e -> !isSimpleGetterMethodForLoggedField(e, classFields))
-              .toList()
-    );
-
-    TypeElement superclass = (TypeElement) m_processingEnv.getTypeUtils().asElement(clazz.getSuperclass());
-    if (superclass != null) {
-      collectLoggables(superclass, fields, methods, false);
-    }
-  }
-
   private void writeLoggerFile(
       TypeElement clazz,
       Logged classConfig,
@@ -363,6 +312,61 @@ public class LoggerGenerator {
 
       out.println("  }");
       out.println("}");
+    }
+  }
+
+  private void collectLoggables(
+      TypeElement clazz,
+      List<VariableElement> fields,
+      List<ExecutableElement> methods,
+      boolean isRoot) {
+    var config = clazz.getAnnotation(Logged.class);
+    if (config == null) {
+      config = m_defaultConfig;
+    }
+    boolean requireExplicitOptIn = config.strategy() == Logged.Strategy.OPT_IN;
+
+    Predicate<Element> notSkipped = LoggerGenerator::isNotSkipped;
+    Predicate<Element> optedIn =
+        e -> !requireExplicitOptIn || e.getAnnotation(Logged.class) != null;
+
+    List<VariableElement> classFields;
+    if (Objects.equals(clazz.getSuperclass().toString(), "java.lang.Record")) {
+      // Do not log record members - just use the accessor methods
+      classFields = List.of();
+    } else {
+      classFields =
+          clazz.getEnclosedElements().stream()
+              .filter(e -> e instanceof VariableElement)
+              .map(e -> (VariableElement) e)
+              .filter(notSkipped)
+              .filter(optedIn)
+              .filter(e -> !e.getModifiers().contains(Modifier.STATIC))
+              .filter(e -> isRoot || e.getModifiers().contains(Modifier.PUBLIC))
+              .filter(this::isLoggable)
+              .toList();
+    }
+    fields.addAll(classFields);
+
+    methods.addAll(
+        clazz.getEnclosedElements().stream()
+            .filter(e -> e instanceof ExecutableElement)
+            .map(e -> (ExecutableElement) e)
+            .filter(notSkipped)
+            .filter(optedIn)
+            .filter(e -> !e.getModifiers().contains(Modifier.STATIC))
+            .filter(e -> e.getModifiers().contains(Modifier.PUBLIC))
+            .filter(e -> e.getParameters().isEmpty())
+            .filter(e -> e.getReceiverType() != null)
+            .filter(kIsBuiltInJavaMethod.negate())
+            .filter(this::isLoggable)
+            .filter(e -> !isSimpleGetterMethodForLoggedField(e, classFields))
+            .toList());
+
+    TypeElement superclass =
+        (TypeElement) m_processingEnv.getTypeUtils().asElement(clazz.getSuperclass());
+    if (superclass != null) {
+      collectLoggables(superclass, fields, methods, false);
     }
   }
 
