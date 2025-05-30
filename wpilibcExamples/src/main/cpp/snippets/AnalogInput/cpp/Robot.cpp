@@ -40,8 +40,7 @@ class Robot : public frc::TimedRobot {
     m_analog.GetAverageVoltage();
   }
 
-  void TeleopPeriodic() override {
-  }
+  void TeleopPeriodic() override {}
 
  private:
   // Initializes an AnalogInput on port 0
