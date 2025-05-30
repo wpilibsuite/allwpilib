@@ -101,8 +101,8 @@ struct JoystickAxes {
   uint16_t GetAvailable() const { return AvailableAxes; }
 
   void SetMaxAvailableCount(size_t _Count) {
-    if (Count > MRC_MAX_NUM_AXES) {
-      Count = MRC_MAX_NUM_AXES;
+    if (_Count > MRC_MAX_NUM_AXES) {
+      _Count = MRC_MAX_NUM_AXES;
     }
     AvailableAxes = (1 << _Count) - 1;
     Count = static_cast<uint8_t>(_Count);
@@ -148,6 +148,7 @@ struct JoystickButtons {
   void SetMaxAvailableCount(size_t _Count) {
     if (_Count > 63) {
       AvailableButtons = (std::numeric_limits<uint64_t>::max)();
+      Count = MRC_MAX_NUM_BUTTONS;
       return;
     }
     AvailableButtons = (1ULL << _Count) - 1;
