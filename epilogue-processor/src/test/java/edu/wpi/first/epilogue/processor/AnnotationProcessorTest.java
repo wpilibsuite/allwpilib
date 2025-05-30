@@ -498,14 +498,15 @@ class AnnotationProcessorTest {
         @Logged
         public double a;
         @Logged public double getB() { return 0; }
+        public double getC() { return 1; }             // not annotated, not logged
       }
 
       @Logged
       class BaseExample extends Grandparent {
         public double x;
-        double z;
+        double z;                                      // not public, not logged
         public double getValue() { return 2.0; }
-        private double getOtherValue() { return 3.0; }
+        private double getOtherValue() { return 3.0; } // not public, not logged
       }
 
       @Logged
