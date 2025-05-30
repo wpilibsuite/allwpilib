@@ -445,6 +445,95 @@ class AnnotationProcessorTest {
   }
 
   @Test
+  void superclassStillOptIn() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      class BaseExample {
+        double x;
+        public double getValue() { return 2.0; }
+      }
+
+      @Logged
+      class Example extends BaseExample {
+        double y;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("y", object.y);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void superclass() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      @Logged
+      class BaseExample {
+        double x;
+        public double getValue() { return 2.0; }
+      }
+
+      @Logged
+      class Example extends BaseExample {
+        double y;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("y", object.y);
+            backend.log("x", object.x);
+            backend.log("getValue", object.getValue());
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
   void bytes() {
     String source =
         """
