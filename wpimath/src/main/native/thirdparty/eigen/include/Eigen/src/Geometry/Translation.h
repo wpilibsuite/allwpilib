@@ -69,18 +69,18 @@ class Translation {
   EIGEN_DEVICE_FUNC explicit inline Translation(const VectorType& vector) : m_coeffs(vector) {}
 
   /** \brief Returns the x-translation by value. **/
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Scalar x() const { return m_coeffs.x(); }
+  EIGEN_DEVICE_FUNC constexpr Scalar x() const { return m_coeffs.x(); }
   /** \brief Returns the y-translation by value. **/
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Scalar y() const { return m_coeffs.y(); }
+  EIGEN_DEVICE_FUNC constexpr Scalar y() const { return m_coeffs.y(); }
   /** \brief Returns the z-translation by value. **/
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Scalar z() const { return m_coeffs.z(); }
+  EIGEN_DEVICE_FUNC constexpr Scalar z() const { return m_coeffs.z(); }
 
   /** \brief Returns the x-translation as a reference. **/
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Scalar& x() { return m_coeffs.x(); }
+  EIGEN_DEVICE_FUNC constexpr Scalar& x() { return m_coeffs.x(); }
   /** \brief Returns the y-translation as a reference. **/
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Scalar& y() { return m_coeffs.y(); }
+  EIGEN_DEVICE_FUNC constexpr Scalar& y() { return m_coeffs.y(); }
   /** \brief Returns the z-translation as a reference. **/
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Scalar& z() { return m_coeffs.z(); }
+  EIGEN_DEVICE_FUNC constexpr Scalar& z() { return m_coeffs.z(); }
 
   EIGEN_DEVICE_FUNC const VectorType& vector() const { return m_coeffs; }
   EIGEN_DEVICE_FUNC VectorType& vector() { return m_coeffs; }

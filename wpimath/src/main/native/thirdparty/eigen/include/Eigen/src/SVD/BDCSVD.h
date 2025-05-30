@@ -147,6 +147,8 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
    * One \b cannot request unitaries using both the \a Options template parameter
    * and the constructor. If possible, prefer using the \a Options template parameter.
    *
+   * \param rows number of rows for the input matrix
+   * \param cols number of columns for the input matrix
    * \param computationOptions specification for computing Thin/Full unitaries U/V
    * \sa BDCSVD()
    *
@@ -163,7 +165,8 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
    *
    * \param matrix the matrix to decompose
    */
-  BDCSVD(const MatrixType& matrix) : m_algoswap(16), m_numIters(0) {
+  template <typename Derived>
+  BDCSVD(const MatrixBase<Derived>& matrix) : m_algoswap(16), m_numIters(0) {
     compute_impl(matrix, internal::get_computation_options(Options));
   }
 
@@ -179,7 +182,9 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
    * \deprecated Will be removed in the next major Eigen version. Options should
    * be specified in the \a Options template parameter.
    */
-  EIGEN_DEPRECATED BDCSVD(const MatrixType& matrix, unsigned int computationOptions) : m_algoswap(16), m_numIters(0) {
+  template <typename Derived>
+  EIGEN_DEPRECATED BDCSVD(const MatrixBase<Derived>& matrix, unsigned int computationOptions)
+      : m_algoswap(16), m_numIters(0) {
     internal::check_svd_options_assertions<MatrixType, Options>(computationOptions, matrix.rows(), matrix.cols());
     compute_impl(matrix, computationOptions);
   }
@@ -191,7 +196,10 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
    *
    * \param matrix the matrix to decompose
    */
-  BDCSVD& compute(const MatrixType& matrix) { return compute_impl(matrix, m_computationOptions); }
+  template <typename Derived>
+  BDCSVD& compute(const MatrixBase<Derived>& matrix) {
+    return compute_impl(matrix, m_computationOptions);
+  }
 
   /** \brief Method performing the decomposition of given matrix, as specified by
    *         the `computationOptions` parameter.
@@ -202,7 +210,8 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
    * \deprecated Will be removed in the next major Eigen version. Options should
    * be specified in the \a Options template parameter.
    */
-  EIGEN_DEPRECATED BDCSVD& compute(const MatrixType& matrix, unsigned int computationOptions) {
+  template <typename Derived>
+  EIGEN_DEPRECATED BDCSVD& compute(const MatrixBase<Derived>& matrix, unsigned int computationOptions) {
     internal::check_svd_options_assertions<MatrixType, Options>(computationOptions, matrix.rows(), matrix.cols());
     return compute_impl(matrix, computationOptions);
   }
@@ -213,7 +222,8 @@ class BDCSVD : public SVDBase<BDCSVD<MatrixType_, Options_> > {
   }
 
  private:
-  BDCSVD& compute_impl(const MatrixType& matrix, unsigned int computationOptions);
+  template <typename Derived>
+  BDCSVD& compute_impl(const MatrixBase<Derived>& matrix, unsigned int computationOptions);
   void divide(Index firstCol, Index lastCol, Index firstRowW, Index firstColW, Index shift);
   void computeSVDofM(Index firstCol, Index n, MatrixXr& U, VectorType& singVals, MatrixXr& V);
   void computeSingVals(const ArrayRef& col0, const ArrayRef& diag, const IndicesRef& perm, VectorType& singVals,
@@ -305,8 +315,13 @@ void BDCSVD<MatrixType, Options>::allocate(Index rows, Index cols, unsigned int 
 }  // end allocate
 
 template <typename MatrixType, int Options>
-BDCSVD<MatrixType, Options>& BDCSVD<MatrixType, Options>::compute_impl(const MatrixType& matrix,
+template <typename Derived>
+BDCSVD<MatrixType, Options>& BDCSVD<MatrixType, Options>::compute_impl(const MatrixBase<Derived>& matrix,
                                                                        unsigned int computationOptions) {
+  EIGEN_STATIC_ASSERT_SAME_MATRIX_SIZE(Derived, MatrixType);
+  EIGEN_STATIC_ASSERT((std::is_same<typename Derived::Scalar, typename MatrixType::Scalar>::value),
+                      Input matrix must have the same Scalar type as the BDCSVD object.);
+
 #ifdef EIGEN_BDCSVD_DEBUG_VERBOSE
   std::cout << "\n\n\n================================================================================================="
                "=====================\n\n\n";

@@ -2,8 +2,9 @@
 
 import os
 import shutil
+from pathlib import Path
 
-from upstream_utils import Lib, walk_cwd_and_copy_if, walk_if
+from upstream_utils import Lib, has_prefix, walk_cwd_and_copy_if
 
 EXCLUDED_FILES = [
     "gtest_main.cc",
@@ -14,49 +15,39 @@ EXCLUDED_FILES = [
 ]
 
 
-def walk_and_remap_copy(third_party_root, include_prefix):
-    gmock_files = walk_if(
-        ".", lambda dp, f: include_prefix in dp and f not in EXCLUDED_FILES
-    )
-
-    for f in gmock_files:
-        dst_file = os.path.join(
-            third_party_root, "include", f[len(include_prefix) + 1 :]
-        )
-        dest_dir = os.path.dirname(dst_file)
-        if not os.path.exists(dest_dir):
-            os.makedirs(dest_dir)
-        shutil.copyfile(f, dst_file)
-
-
-def copy_upstream_src(wpilib_root):
-    third_party_root = os.path.join(wpilib_root, "thirdparty/googletest")
+def copy_upstream_src(wpilib_root: Path):
+    upstream_root = Path(".").absolute()
+    third_party_root = wpilib_root / "thirdparty/googletest"
 
     # Delete old install
     for d in [
         "include",
         "src",
     ]:
-        shutil.rmtree(os.path.join(third_party_root, d), ignore_errors=True)
+        shutil.rmtree(third_party_root / d, ignore_errors=True)
 
     walk_cwd_and_copy_if(
-        lambda dp, f: "googlemock/src" in dp and f not in EXCLUDED_FILES,
-        os.path.join(third_party_root, "src"),
+        lambda dp, f: has_prefix(dp, Path("googlemock/src"))
+        and f not in EXCLUDED_FILES,
+        third_party_root / "src",
     )
 
     walk_cwd_and_copy_if(
-        lambda dp, f: "googletest/src" in dp and f not in EXCLUDED_FILES,
-        os.path.join(third_party_root, "src"),
+        lambda dp, f: has_prefix(dp, Path("googletest/src"))
+        and f not in EXCLUDED_FILES,
+        third_party_root / "src",
     )
 
-    walk_and_remap_copy(
-        third_party_root,
-        "./googlemock/include",
+    os.chdir(upstream_root / "googlemock/include")
+    walk_cwd_and_copy_if(
+        lambda dp, f: f not in EXCLUDED_FILES,
+        third_party_root / "include",
     )
 
-    walk_and_remap_copy(
-        third_party_root,
-        "./googletest/include",
+    os.chdir(upstream_root / "googletest/include")
+    walk_cwd_and_copy_if(
+        lambda dp, f: f not in EXCLUDED_FILES,
+        third_party_root / "include",
     )
 
 

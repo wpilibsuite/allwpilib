@@ -48,6 +48,7 @@ objc_library(
         "Foundation",
         "CoreMedia",
         "CoreVideo",
+        "IOKit",
     ],
     tags = ["manual"],
     deps = [

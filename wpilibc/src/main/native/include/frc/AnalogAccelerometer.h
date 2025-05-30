@@ -75,8 +75,7 @@ class AnalogAccelerometer : public wpi::Sendable,
    * Set the accelerometer sensitivity.
    *
    * This sets the sensitivity of the accelerometer used for calculating the
-   * acceleration. The sensitivity varies by accelerometer model. There are
-   * constants defined for various models.
+   * acceleration. The sensitivity varies by accelerometer model.
    *
    * @param sensitivity The sensitivity of accelerometer in Volts per G.
    */
@@ -85,8 +84,7 @@ class AnalogAccelerometer : public wpi::Sendable,
   /**
    * Set the voltage that corresponds to 0 G.
    *
-   * The zero G voltage varies by accelerometer model. There are constants
-   * defined for various models.
+   * The zero G voltage varies by accelerometer model.
    *
    * @param zero The zero G voltage.
    */

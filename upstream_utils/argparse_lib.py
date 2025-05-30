@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 
-import os
 import shutil
+from pathlib import Path
 
 from upstream_utils import Lib
 
 
-def copy_upstream_src(wpilib_root):
-    wpiutil = os.path.join(wpilib_root, "wpiutil")
+def copy_upstream_src(wpilib_root: Path):
+    wpiutil = wpilib_root / "wpiutil"
 
     # Copy header into allwpilib
-    dest_filename = os.path.join(
-        wpiutil,
-        f"src/main/native/thirdparty/argparse/include/wpi/argparse.h",
+    dest_filename = (
+        wpiutil / f"src/main/native/thirdparty/argparse/include/wpi/argparse.h"
     )
     shutil.copyfile("include/argparse/argparse.hpp", dest_filename)
     # Rename namespace from argparse to wpi
