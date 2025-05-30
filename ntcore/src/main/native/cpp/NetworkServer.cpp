@@ -221,10 +221,10 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
       return;
     }
 
-    // TODO: set local flag appropriately
+    bool local = m_info.remote_ip == "127.0.0.1";
     std::string dedupName;
     std::tie(dedupName, m_clientId) = m_server.m_serverImpl.AddClient(
-        name, m_connInfo, false, *m_wire,
+        name, m_connInfo, local, *m_wire,
         [this](uint32_t repeatMs) { UpdateOutgoingTimer(repeatMs); });
     INFO("CONNECTED NT4 client '{}' (from {})", dedupName, m_connInfo);
     m_info.remote_id = dedupName;
