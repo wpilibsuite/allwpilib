@@ -503,15 +503,16 @@ class AnnotationProcessorTest {
 
       @Logged
       class BaseExample extends Grandparent {
-        public double x;
-        double z;                                      // not public, not logged
+        protected double d;
+        public double e;
+        double f;
         public double getValue() { return 2.0; }
-        private double getOtherValue() { return 3.0; } // not public, not logged
+        private double getOtherValue() { return 3.0; }  // private, not logged
       }
 
       @Logged
       class Example extends BaseExample {
-        double y;
+        double g;
       }
     """;
 
@@ -532,8 +533,10 @@ class AnnotationProcessorTest {
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("y", object.y);
-            backend.log("x", object.x);
+            backend.log("g", object.g);
+            backend.log("d", object.d);
+            backend.log("e", object.e);
+            backend.log("f", object.f);
             backend.log("a", object.a);
             backend.log("getValue", object.getValue());
             backend.log("getB", object.getB());

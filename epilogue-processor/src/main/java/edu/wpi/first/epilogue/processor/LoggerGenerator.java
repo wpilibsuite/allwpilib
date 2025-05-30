@@ -117,7 +117,7 @@ public class LoggerGenerator {
 
     List<VariableElement> fieldsToLog = new ArrayList<>();
     List<ExecutableElement> methodsToLog = new ArrayList<>();
-    collectLoggables(clazz, fieldsToLog, methodsToLog, true);
+    collectLoggables(clazz, fieldsToLog, methodsToLog, clazz);
 
     // Validate no name collisions
     Map<String, List<Element>> usedNames =
@@ -319,7 +319,7 @@ public class LoggerGenerator {
       TypeElement clazz,
       List<VariableElement> fields,
       List<ExecutableElement> methods,
-      boolean isRoot) {
+      TypeElement root) {
     var config = clazz.getAnnotation(Logged.class);
     if (config == null) {
       config = m_defaultConfig;
@@ -329,6 +329,23 @@ public class LoggerGenerator {
     Predicate<Element> notSkipped = LoggerGenerator::isNotSkipped;
     Predicate<Element> optedIn =
         e -> !requireExplicitOptIn || e.getAnnotation(Logged.class) != null;
+    Predicate<Element> sufficientAccess =
+        e -> {
+          if (clazz.equals(root)) {
+            return true;
+          }
+
+          var mods = e.getModifiers();
+          if (!mods.contains(Modifier.PRIVATE)
+              && (mods.contains(Modifier.PUBLIC) || mods.contains(Modifier.PROTECTED))) {
+            return true;
+          }
+
+          // Package-private, so check the package
+          var elementPackage = m_processingEnv.getElementUtils().getPackageOf(e);
+          var rootPackage = m_processingEnv.getElementUtils().getPackageOf(root);
+          return Objects.equals(elementPackage.getQualifiedName(), rootPackage.getQualifiedName());
+        };
 
     List<VariableElement> classFields;
     if (Objects.equals(clazz.getSuperclass().toString(), "java.lang.Record")) {
@@ -342,7 +359,7 @@ public class LoggerGenerator {
               .filter(notSkipped)
               .filter(optedIn)
               .filter(e -> !e.getModifiers().contains(Modifier.STATIC))
-              .filter(e -> isRoot || e.getModifiers().contains(Modifier.PUBLIC))
+              .filter(sufficientAccess)
               .filter(this::isLoggable)
               .toList();
     }
@@ -366,7 +383,7 @@ public class LoggerGenerator {
     TypeElement superclass =
         (TypeElement) m_processingEnv.getTypeUtils().asElement(clazz.getSuperclass());
     if (superclass != null) {
-      collectLoggables(superclass, fields, methods, false);
+      collectLoggables(superclass, fields, methods, root);
     }
   }
 
