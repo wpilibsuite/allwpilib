@@ -6,6 +6,7 @@ package edu.wpi.first.epilogue.processor;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
 public class SupplierHandler extends ElementHandler {
@@ -42,15 +43,15 @@ public class SupplierHandler extends ElementHandler {
   }
 
   @Override
-  public String logInvocation(Element element) {
-    return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
+  public String logInvocation(Element element, TypeElement loggedClass) {
+    return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element, loggedClass) + ")";
   }
 
   @Override
-  public String elementAccess(Element element) {
+  public String elementAccess(Element element, TypeElement loggedClass) {
     var typeUtils = m_processingEnv.getTypeUtils();
     var dataType = dataType(element);
-    String base = super.elementAccess(element);
+    String base = super.elementAccess(element, loggedClass);
 
     if (typeUtils.isAssignable(dataType, m_booleanSupplier)) {
       return base + ".getAsBoolean()";

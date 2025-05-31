@@ -6,6 +6,7 @@ package edu.wpi.first.epilogue.processor;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
@@ -38,7 +39,7 @@ public class CollectionHandler extends ElementHandler {
   }
 
   @Override
-  public String logInvocation(Element element) {
+  public String logInvocation(Element element, TypeElement loggedClass) {
     var dataType = dataType(element);
     var componentType = ((DeclaredType) dataType).getTypeArguments().get(0);
 
@@ -46,12 +47,12 @@ public class CollectionHandler extends ElementHandler {
       return "backend.log(\""
           + loggedName(element)
           + "\", "
-          + elementAccess(element)
+          + elementAccess(element, loggedClass)
           + ", "
           + m_structHandler.structAccess(componentType)
           + ")";
     } else {
-      return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
+      return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element, loggedClass) + ")";
     }
   }
 }

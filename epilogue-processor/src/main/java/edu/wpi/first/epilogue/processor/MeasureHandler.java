@@ -6,6 +6,7 @@ package edu.wpi.first.epilogue.processor;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
 public class MeasureHandler extends ElementHandler {
@@ -30,8 +31,8 @@ public class MeasureHandler extends ElementHandler {
   }
 
   @Override
-  public String logInvocation(Element element) {
+  public String logInvocation(Element element, TypeElement loggedClass) {
     // EpilogueBackend has builtin support for logging measures
-    return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
+    return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element, loggedClass) + ")";
   }
 }

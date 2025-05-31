@@ -6,6 +6,7 @@ package edu.wpi.first.epilogue.processor;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
@@ -52,7 +53,7 @@ public class ArrayHandler extends ElementHandler {
   }
 
   @Override
-  public String logInvocation(Element element) {
+  public String logInvocation(Element element, TypeElement loggedClass) {
     var dataType = dataType(element);
 
     // known to be an array type (assuming isLoggable is checked first); this is a safe cast
@@ -63,13 +64,13 @@ public class ArrayHandler extends ElementHandler {
       return "backend.log(\""
           + loggedName(element)
           + "\", "
-          + elementAccess(element)
+          + elementAccess(element, loggedClass)
           + ", "
           + m_structHandler.structAccess(componentType)
           + ")";
     } else {
       // Primitive or string array
-      return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
+      return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element, loggedClass) + ")";
     }
   }
 }

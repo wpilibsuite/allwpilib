@@ -16,6 +16,7 @@ import static javax.lang.model.type.TypeKind.SHORT;
 import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
 public class PrimitiveHandler extends ElementHandler {
@@ -35,7 +36,7 @@ public class PrimitiveHandler extends ElementHandler {
   }
 
   @Override
-  public String logInvocation(Element element) {
-    return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
+  public String logInvocation(Element element, TypeElement loggedClass) {
+    return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element, loggedClass) + ")";
   }
 }

@@ -117,9 +117,9 @@ public abstract class ElementHandler {
    * @param element the element to generate the access for
    * @return the generated access snippet
    */
-  public String elementAccess(Element element) {
+  public String elementAccess(Element element, TypeElement loggedClass) {
     if (element instanceof VariableElement field) {
-      return fieldAccess(field);
+      return fieldAccess(field, loggedClass);
     } else if (element instanceof ExecutableElement method) {
       return methodAccess(method);
     } else {
@@ -127,8 +127,14 @@ public abstract class ElementHandler {
     }
   }
 
-  private static String fieldAccess(VariableElement field) {
-    if (!field.getModifiers().contains(Modifier.PUBLIC)) {
+  private static String fieldAccess(VariableElement field, TypeElement loggedClass) {
+    boolean superclassField = field.getEnclosingElement().equals(loggedClass); // not working
+    var mods = field.getModifiers();
+
+    boolean isVarHandle = !superclassField && mods.contains(Modifier.PRIVATE);
+    boolean isReflection = superclassField && !mods.contains(Modifier.PUBLIC) && !mods.contains(Modifier.PROTECTED);
+
+    if (isVarHandle || isReflection) {
       // ((com.example.Foo) $fooField.get(object))
       // Extra parentheses so cast evaluates before appended methods
       // (e.g. when appending .getAsDouble())
@@ -171,5 +177,5 @@ public abstract class ElementHandler {
    * @param element the field or method element to generate the logger call for
    * @return the generated log invocation
    */
-  public abstract String logInvocation(Element element);
+  public abstract String logInvocation(Element element, TypeElement loggedClass);
 }
