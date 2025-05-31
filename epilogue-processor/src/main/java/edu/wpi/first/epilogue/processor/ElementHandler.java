@@ -13,7 +13,9 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
 
 /**
  * Handles logging of fields or methods. An element that passes the {@link #isLoggable(Element)}
@@ -130,7 +132,13 @@ public abstract class ElementHandler {
       // ((com.example.Foo) $fooField.get(object))
       // Extra parentheses so cast evaluates before appended methods
       // (e.g. when appending .getAsDouble())
-      return "((" + field.asType() + ") $" + field.getSimpleName() + ".get(object))";
+      TypeMirror type = field.asType();
+      String typeString = field.asType().toString();
+      if (type.getKind() == TypeKind.TYPEVAR) {
+        TypeMirror upperBoundType = ((TypeVariable) type).getUpperBound();
+        typeString = upperBoundType.toString();
+      }
+      return "((" + typeString + ") $" + field.getSimpleName() + ".get(object))";
     } else {
       // object.fooField
       return "object." + field.getSimpleName();

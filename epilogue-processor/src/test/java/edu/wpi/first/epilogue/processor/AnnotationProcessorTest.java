@@ -1507,7 +1507,7 @@ class AnnotationProcessorTest {
 
       @Logged
       class Example<T extends String> {
-        public T value;
+        T value;
 
         public <S extends T> S upcast() { return (S) value; }
       }
@@ -1521,8 +1521,21 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import java.lang.invoke.MethodHandles;
+      import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
+        private static final VarHandle $value;
+
+        static {
+          try {
+            var lookup = MethodHandles.privateLookupIn(Example.class, MethodHandles.lookup());
+            $value = lookup.findVarHandle(Example.class, "value", java.lang.String.class);
+          } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+          }
+        }
+
         public ExampleLogger() {
           super(Example.class);
         }
@@ -1530,7 +1543,7 @@ class AnnotationProcessorTest {
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("value", object.value);
+            backend.log("value", ((java.lang.String) $value.get(object)));
             backend.log("upcast", object.upcast());
           }
         }
