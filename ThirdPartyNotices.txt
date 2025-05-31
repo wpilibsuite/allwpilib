@@ -50,7 +50,7 @@ Dear ImGui            thirdparty/imgui_suite/imgui
 implot                thirdparty/imgui_suite/implot
 memory                wpiutil/src/main/native/thirdparty/memory
 nanopb                wpiutil/src/main/native/thirdparty/nanopb
-protobuf              wpiutil/src/main/native/thirdparty/protobuf
+upb                   wpiutil/src/main/native/thirdparty/upb
 mrcal                 wpical/src/main/native/thirdparty/mrcal
 libdogleg             wpical/src/main/native/thirdparty/libdogleg
 Simd                  hal/src/main/native/athena/simd
@@ -1381,7 +1381,7 @@ redistribute it freely, subject to the following restrictions:
    distribution.
 
 ================
-protobuf License
+upb License
 ================
 Copyright 2008 Google Inc.  All rights reserved.
 
