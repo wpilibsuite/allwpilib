@@ -232,37 +232,6 @@ public class LoggerGenerator {
           out.println("  private static final VarHandle $" + varHandleField.getSimpleName() + ";");
         }
         out.println();
-
-        var classReference = simpleClassName + ".class";
-
-        out.println("  static {");
-        out.println("    try {");
-        out.println(
-            "      var lookup = MethodHandles.privateLookupIn("
-                + classReference
-                + ", MethodHandles.lookup());");
-
-        for (var varHandleField : varHandleFields) {
-          var fieldName = varHandleField.getSimpleName();
-          out.println(
-              "      $"
-                  + fieldName
-                  + " = lookup.findVarHandle("
-                  + classReference
-                  + ", \""
-                  + fieldName
-                  + "\", "
-                  + m_processingEnv.getTypeUtils().erasure(varHandleField.asType())
-                  + ".class);");
-        }
-
-        out.println("    } catch (ReflectiveOperationException e) {");
-        out.println(
-            "      throw new RuntimeException("
-                + "\"[EPILOGUE] Could not load private fields for logging!\", e);");
-        out.println("    }");
-        out.println("  }");
-        out.println();
       }
 
       if (requiresReflection) {
@@ -272,33 +241,68 @@ public class LoggerGenerator {
           out.println("  private static final Field $" + reflectionField.getSimpleName() + ";");
         }
         out.println();
-
-
+      }
+      
+      if (requiresVarHandles || requiresReflection) {
         out.println("  static {");
-        out.println("    try {");
 
-        for (var reflectionField : reflectionFields) {
-          var fieldName = reflectionField.getSimpleName();
-          var fieldClass = reflectionField.getEnclosingElement().toString();
+        if (requiresVarHandles) {
+          out.println("    try {");
+
+          var classReference = simpleClassName + ".class";
           out.println(
-              "      $"
-                  + fieldName
-                  + " = "
-                  + fieldClass
-                  + ".class.getDeclaredField(\""
-                  + fieldName
-                  + "\");");
-          out.println("      $" + fieldName + ".setAccessible(true);");
+            "      var lookup = MethodHandles.privateLookupIn("
+                + classReference
+                + ", MethodHandles.lookup());");
+
+          for (var varHandleField : varHandleFields) {
+            var fieldName = varHandleField.getSimpleName();
+            out.println(
+                "      $"
+                    + fieldName
+                    + " = lookup.findVarHandle("
+                    + classReference
+                    + ", \""
+                    + fieldName
+                    + "\", "
+                    + m_processingEnv.getTypeUtils().erasure(varHandleField.asType())
+                    + ".class);");
+          }
+
+          out.println("    } catch (ReflectiveOperationException e) {");
+          out.println(
+              "      throw new RuntimeException("
+                  + "\"[EPILOGUE] Could not load private fields for logging!\", e);");
+          out.println("    }");
         }
 
-        out.println("    } catch (NoSuchFieldException e) {");
-        out.println(
-            "      throw new RuntimeException("
-                + "\"[EPILOGUE] Could not load superclass fields for logging!\", e);");
-        out.println("    }");
+        if (requiresReflection) {
+          out.println("    try {");
+
+          for (var reflectionField : reflectionFields) {
+            var fieldName = reflectionField.getSimpleName();
+            var fieldClass = reflectionField.getEnclosingElement().toString();
+            out.println(
+                "      $"
+                    + fieldName
+                    + " = "
+                    + fieldClass
+                    + ".class.getDeclaredField(\""
+                    + fieldName
+                    + "\");");
+            out.println("      $" + fieldName + ".setAccessible(true);");
+          }
+  
+          out.println("    } catch (NoSuchFieldException e) {");
+          out.println(
+              "      throw new RuntimeException("
+                  + "\"[EPILOGUE] Could not load superclass fields for logging!\", e);");
+          out.println("    }");
+        }
         out.println("  }");
-        out.println();
+        out.println("");
       }
+      
       out.println("  public " + loggerSimpleClassName + "() {");
       out.println("    super(" + simpleClassName + ".class);");
       out.println("  }");
@@ -356,9 +360,9 @@ public class LoggerGenerator {
                       if (reflection) {
                         out.println("      } catch (IllegalAccessException e) {");
                         out.println(
-                            "        throw new RuntimeException(\"[EPILOGUE] Could not access field "
+                            "        throw new RuntimeException(\"[EPILOGUE] Could not access field '"
                                 + loggableElement.getSimpleName()
-                                + " for logging!\", e);");
+                                + "' for logging!\", e);");
                         out.println("      }");
                       }
                     }

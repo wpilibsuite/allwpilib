@@ -534,6 +534,9 @@ class AnnotationProcessorTest {
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         private static final VarHandle $i;
 
+        private static final Field $f;
+        private static final Field $g;
+
         static {
           try {
             var lookup = MethodHandles.privateLookupIn(Example.class, MethodHandles.lookup());
@@ -541,12 +544,6 @@ class AnnotationProcessorTest {
           } catch (ReflectiveOperationException e) {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
-        }
-
-        private static final Field $f;
-        private static final Field $g;
-
-        static {
           try {
             $f = edu.wpi.first.epilogue.BaseExample.class.getDeclaredField("f");
             $f.setAccessible(true);
@@ -571,12 +568,12 @@ class AnnotationProcessorTest {
             try {
               backend.log("f", ((double) $f.get(object)));
             } catch (IllegalAccessException e) {
-              throw new RuntimeException("[EPILOGUE] Could not access field f for logging!", e);
+              throw new RuntimeException("[EPILOGUE] Could not access field 'f' for logging!", e);
             }
             try {
               backend.log("g", ((double) $g.get(object)));
             } catch (IllegalAccessException e) {
-              throw new RuntimeException("[EPILOGUE] Could not access field g for logging!", e);
+              throw new RuntimeException("[EPILOGUE] Could not access field 'g' for logging!", e);
             }
             backend.log("a", object.a);
             backend.log("getValue", object.getValue());
