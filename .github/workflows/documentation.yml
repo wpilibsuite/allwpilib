@@ -13,7 +13,7 @@ jobs:
   publish:
     name: "Documentation - Publish"
     runs-on: ubuntu-24.04
-    if: github.repository == 'wpilibsuite/allwpilib' && (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
+    if: github.repository == 'wpilibsuite/allwpilib' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     concurrency: ci-docs-publish
     steps:
       - uses: actions/checkout@v4
