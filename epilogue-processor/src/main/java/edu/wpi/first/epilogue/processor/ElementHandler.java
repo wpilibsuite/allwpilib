@@ -126,7 +126,7 @@ public abstract class ElementHandler {
   }
 
   private static String fieldAccess(VariableElement field) {
-    if (field.getModifiers().contains(Modifier.PRIVATE)) {
+    if (!field.getModifiers().contains(Modifier.PUBLIC)) {
       // ((com.example.Foo) $fooField.get(object))
       // Extra parentheses so cast evaluates before appended methods
       // (e.g. when appending .getAsDouble())
