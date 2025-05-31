@@ -25,7 +25,7 @@ extern "C" void HALSIM_ResetAllSimData(void) {
     HALSIM_ResetAddressableLEDData(i);
   }
 
-  for (int32_t i = 0; i < hal::kNumAnalogInputs; i++) {
+  for (int32_t i = 0; i < hal::kNumSmartIo; i++) {
     HALSIM_ResetAnalogInData(i);
   }
 
@@ -35,17 +35,17 @@ extern "C" void HALSIM_ResetAllSimData(void) {
     HALSIM_ResetCTREPCMData(i);
   }
 
-  for (int32_t i = 0; i < hal::kNumDigitalPWMOutputs; i++) {
+  for (int32_t i = 0; i < hal::kNumSmartIo; i++) {
     HALSIM_ResetDigitalPWMData(i);
   }
 
-  for (int32_t i = 0; i < hal::kNumDigitalChannels; i++) {
+  for (int32_t i = 0; i < hal::kNumSmartIo; i++) {
     HALSIM_ResetDIOData(i);
   }
 
   HALSIM_ResetDriverStationData();
 
-  for (int32_t i = 0; i < hal::kNumDutyCycles; i++) {
+  for (int32_t i = 0; i < hal::kNumSmartIo; i++) {
     HALSIM_ResetDutyCycleData(i);
   }
 
@@ -53,7 +53,7 @@ extern "C" void HALSIM_ResetAllSimData(void) {
     HALSIM_ResetEncoderData(i);
   }
 
-  for (int32_t i = 0; i < hal::kI2CPorts; i++) {
+  for (int32_t i = 0; i < hal::kNumI2cBuses; i++) {
     HALSIM_ResetI2CData(i);
   }
 
@@ -61,7 +61,7 @@ extern "C" void HALSIM_ResetAllSimData(void) {
     HALSIM_ResetPowerDistributionData(i);
   }
 
-  for (int32_t i = 0; i < hal::kNumPWMChannels; i++) {
+  for (int32_t i = 0; i < hal::kNumSmartIo; i++) {
     HALSIM_ResetPWMData(i);
   }
 

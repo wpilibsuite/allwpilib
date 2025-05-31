@@ -5,13 +5,15 @@
 #include "hal/PWM.h"
 
 #include <algorithm>
+#include <fmt/format.h>
 #include <cmath>
 
 #include "ConstantsInternal.h"
-#include "DigitalInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
+#include "SmartIo.h"
 #include "PortsInternal.h"
+#include "hal/cpp/fpga_clock.h"
 #include "hal/handles/HandlesInternal.h"
 #include "mockdata/PWMDataInternal.h"
 
@@ -28,65 +30,73 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
                                         int32_t* status) {
   hal::init::CheckInit();
 
-  if (channel < 0 || channel >= kNumPWMChannels) {
+  if (channel < 0 || channel >= kNumSmartIo) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
-                                     kNumPWMChannels, channel);
+                                     kNumSmartIo, channel);
     return HAL_kInvalidHandle;
-  }
-
-  uint8_t origChannel = static_cast<uint8_t>(channel);
-
-  if (origChannel < kNumPWMHeaders) {
-    channel += kNumDigitalChannels;  // remap Headers to end of allocations
-  } else {
-    channel = remapMXPPWMChannel(channel) + 10;  // remap MXP to proper channel
   }
 
   HAL_DigitalHandle handle;
 
-  auto port = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM,
-                                              &handle, status);
+  auto port =
+      smartIoHandles->Allocate(channel, HAL_HandleEnum::PWM, &handle, status);
 
   if (*status != 0) {
     if (port) {
-      hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+      hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
                                            port->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
-                                       kNumPWMChannels, channel);
+                                       kNumSmartIo, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
 
-  port->channel = origChannel;
+  port->channel = channel;
 
-  SimPWMData[origChannel].initialized = true;
+  SimPWMData[channel].initialized = true;
 
   // Disable output.
   HAL_SetPWMPulseTimeMicroseconds(handle, 0, status);
+  if (*status != 0) {
+    smartIoHandles->Free(handle, HAL_HandleEnum::PWM);
+    return HAL_kInvalidHandle;
+  }
 
   port->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }
 void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle) {
-  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     return;
   }
 
-  SimPWMData[port->channel].initialized = false;
+  smartIoHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
 
-  digitalChannelHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
+  // Wait for no other object to hold this handle.
+  auto start = hal::fpga_clock::now();
+  while (port.use_count() != 1) {
+    auto current = hal::fpga_clock::now();
+    if (start + std::chrono::seconds(1) < current) {
+      std::puts("PWM handle free timeout");
+      std::fflush(stdout);
+      break;
+    }
+    std::this_thread::yield();
+  }
+
+  SimPWMData[port->channel].initialized = false;
 }
 
 HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
-  return channel < kNumPWMChannels && channel >= 0;
+  return channel < kNumSmartIo && channel >= 0;
 }
 
 void HAL_SetPWMSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
-  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::PWM);
+  auto port = smartIoHandles->Get(handle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     return;
   }
@@ -94,19 +104,30 @@ void HAL_SetPWMSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
 }
 
 void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
-                                     int32_t value, int32_t* status) {
-  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+                                     int32_t microsecondPulseTime,
+                                     int32_t* status) {
+  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
 
-  SimPWMData[port->channel].pulseMicrosecond = value;
+  if (microsecondPulseTime < 0 ||
+      (microsecondPulseTime != 0xFFFF && microsecondPulseTime >= 4096)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(
+        status,
+        fmt::format("Pulse time {} out of range. Expect [0-4096) or 0xFFFF",
+                    microsecondPulseTime));
+    return;
+  }
+
+  SimPWMData[port->channel].pulseMicrosecond = microsecondPulseTime;
 }
 
 int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
                                         int32_t* status) {
-  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -117,7 +138,7 @@ int32_t HAL_GetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
 
 void HAL_SetPWMOutputPeriod(HAL_DigitalHandle pwmPortHandle, int32_t period,
                             int32_t* status) {
-  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = smartIoHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;

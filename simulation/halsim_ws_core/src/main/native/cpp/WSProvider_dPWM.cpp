@@ -20,7 +20,7 @@ namespace wpilibws {
 
 void HALSimWSProviderDigitalPWM::Initialize(WSRegisterFunc webRegisterFunc) {
   CreateProviders<HALSimWSProviderDigitalPWM>(
-      "dPWM", HAL_GetNumDigitalPWMOutputs(), webRegisterFunc);
+      "dPWM", HAL_GetNumSmartIo(), webRegisterFunc);
 }
 
 HALSimWSProviderDigitalPWM::~HALSimWSProviderDigitalPWM() {
