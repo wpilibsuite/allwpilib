@@ -192,7 +192,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param duration the timeout duration
    * @return the command with the timeout added
    */
-  [[nodiscard]]
   CommandPtr WithTimeout(units::second_t duration) &&;
 
   /**
@@ -203,7 +202,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  [[nodiscard]]
   CommandPtr Until(std::function<bool()> condition) &&;
 
   /**
@@ -214,7 +212,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param condition the run condition
    * @return the command with the run condition added
    */
-  [[nodiscard]]
   CommandPtr OnlyWhile(std::function<bool()> condition) &&;
 
   /**
@@ -224,7 +221,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr BeforeStarting(std::function<void()> toRun,
                             Requirements requirements = {}) &&;
 
@@ -235,7 +231,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param before the command to run before this one
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr BeforeStarting(CommandPtr&& before) &&;
 
   /**
@@ -245,7 +240,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr AndThen(std::function<void()> toRun,
                      Requirements requirements = {}) &&;
 
@@ -257,7 +251,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param next the commands to run next
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr AndThen(CommandPtr&& next) &&;
 
   /**
@@ -266,7 +259,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    *
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr Repeatedly() &&;
 
   /**
@@ -282,7 +274,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @return the decorated command
    * @see ProxyCommand
    */
-  [[nodiscard]]
   CommandPtr AsProxy() &&;
 
   /**
@@ -294,7 +285,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param condition the condition that will prevent the command from running
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr Unless(std::function<bool()> condition) &&;
 
   /**
@@ -306,7 +296,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param condition the condition that will allow the command to run
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr OnlyIf(std::function<bool()> condition) &&;
 
   /**
@@ -330,7 +319,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @return the decorated command
    * @see WithDeadline
    */
-  [[nodiscard]]
   CommandPtr DeadlineFor(CommandPtr&& parallel) &&;
 
   /**
@@ -341,7 +329,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr AlongWith(CommandPtr&& parallel) &&;
 
   /**
@@ -352,7 +339,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param parallel the commands to run in parallel
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr RaceWith(CommandPtr&& parallel) &&;
 
   /**
@@ -361,7 +347,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param doesRunWhenDisabled true to run when disabled.
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr IgnoringDisable(bool doesRunWhenDisabled) &&;
 
   /**
@@ -370,7 +355,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param interruptBehavior the desired interrupt behavior
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr WithInterruptBehavior(
       Command::InterruptionBehavior interruptBehavior) &&;
 
@@ -382,7 +366,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * command was interrupted.
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr FinallyDo(std::function<void(bool)> end) &&;
 
   /**
@@ -394,7 +377,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * interrupted.
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr FinallyDo(std::function<void()> end) &&;
 
   /**
@@ -404,7 +386,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param handler a lambda to run when the command is interrupted
    * @return the decorated command
    */
-  [[nodiscard]]
   CommandPtr HandleInterrupt(std::function<void()> handler) &&;
 
   /**
@@ -413,7 +394,6 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param name name
    * @return the decorated Command
    */
-  [[nodiscard]]
   CommandPtr WithName(std::string_view name) &&;
 
   /**

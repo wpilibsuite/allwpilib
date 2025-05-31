@@ -90,7 +90,7 @@ public class AnalogAccelerometer implements Sendable, AutoCloseable {
    * Set the accelerometer sensitivity.
    *
    * <p>This sets the sensitivity of the accelerometer used for calculating the acceleration. The
-   * sensitivity varies by accelerometer model. There are constants defined for various models.
+   * sensitivity varies by accelerometer model.
    *
    * @param sensitivity The sensitivity of accelerometer in Volts per G.
    */
@@ -101,8 +101,7 @@ public class AnalogAccelerometer implements Sendable, AutoCloseable {
   /**
    * Set the voltage that corresponds to 0 G.
    *
-   * <p>The zero G voltage varies by accelerometer model. There are constants defined for various
-   * models.
+   * <p>The zero G voltage varies by accelerometer model.
    *
    * @param zero The zero G voltage.
    */

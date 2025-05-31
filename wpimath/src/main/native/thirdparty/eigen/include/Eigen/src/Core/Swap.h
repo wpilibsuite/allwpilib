@@ -65,6 +65,31 @@ class generic_dense_assignment_kernel<DstEvaluatorTypeT, SrcEvaluatorTypeT,
     Index col = Base::colIndexByOuterInner(outer, inner);
     assignPacket<StoreMode, LoadMode, PacketType>(row, col);
   }
+
+  template <int StoreMode, int LoadMode, typename PacketType>
+  EIGEN_STRONG_INLINE void assignPacketSegment(Index row, Index col, Index begin, Index count) {
+    PacketType tmp = m_src.template packetSegment<LoadMode, PacketType>(row, col, begin, count);
+    const_cast<SrcEvaluatorTypeT &>(m_src).template writePacketSegment<LoadMode>(
+        row, col, m_dst.template packetSegment<StoreMode, PacketType>(row, col, begin, count), begin, count);
+    m_dst.template writePacketSegment<StoreMode>(row, col, tmp, begin, count);
+  }
+
+  template <int StoreMode, int LoadMode, typename PacketType>
+  EIGEN_STRONG_INLINE void assignPacketSegment(Index index, Index begin, Index count) {
+    PacketType tmp = m_src.template packetSegment<LoadMode, PacketType>(index, begin, count);
+    const_cast<SrcEvaluatorTypeT &>(m_src).template writePacketSegment<LoadMode>(
+        index, m_dst.template packetSegment<StoreMode, PacketType>(index, begin, count), begin, count);
+    m_dst.template writePacketSegment<StoreMode>(index, tmp, begin, count);
+  }
+
+  // TODO find a simple way not to have to copy/paste this function from generic_dense_assignment_kernel, by simple I
+  // mean no CRTP (Gael)
+  template <int StoreMode, int LoadMode, typename PacketType>
+  EIGEN_STRONG_INLINE void assignPacketSegmentByOuterInner(Index outer, Index inner, Index begin, Index count) {
+    Index row = Base::rowIndexByOuterInner(outer, inner);
+    Index col = Base::colIndexByOuterInner(outer, inner);
+    assignPacketSegment<StoreMode, LoadMode, PacketType>(row, col, begin, count);
+  }
 };
 
 }  // namespace internal
