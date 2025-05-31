@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
       - name: Set environment variables (Development)
         run: |
           echo "BRANCH=development" >> $GITHUB_ENV
