@@ -128,7 +128,7 @@ public abstract class ElementHandler {
   }
 
   private static String fieldAccess(VariableElement field, TypeElement loggedClass) {
-    boolean superclassField = field.getEnclosingElement().equals(loggedClass); // not working
+    boolean superclassField = !field.getEnclosingElement().equals(loggedClass);
     var mods = field.getModifiers();
 
     boolean isVarHandle = !superclassField && mods.contains(Modifier.PRIVATE);
