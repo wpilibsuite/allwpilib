@@ -169,7 +169,7 @@ class NetworkOutgoingQueue {
     }
 
     // rate limit frequency of transmissions
-    if (curTimeMs < (m_lastSendMs + kMinPeriodMs)) {
+    if (!m_local && curTimeMs < (m_lastSendMs + kMinPeriodMs)) {
       return;
     }
 
