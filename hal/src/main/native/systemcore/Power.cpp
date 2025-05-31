@@ -6,8 +6,12 @@
 
 #include <memory>
 
+#include <networktables/DoubleTopic.h>
+
 #include "HALInitializer.h"
+#include "SystemServerInternal.h"
 #include "hal/Errors.h"
+#include "mrc/NtNetComm.h"
 
 using namespace hal;
 
@@ -19,16 +23,34 @@ static void initializePower(int32_t* status) {
 
 }  // namespace hal
 
+namespace {
+struct SystemServerPower {
+  nt::NetworkTableInstance ntInst;
+
+  nt::DoubleSubscriber batterySubscriber;
+
+  explicit SystemServerPower(nt::NetworkTableInstance inst) {
+    ntInst = inst;
+
+    batterySubscriber =
+        ntInst.GetDoubleTopic(ROBOT_BATTERY_VOLTAGE_PATH).Subscribe(0.0);
+  }
+};
+}  // namespace
+
+static ::SystemServerPower* systemServerPower;
+
 namespace hal::init {
-void InitializePower() {}
+void InitializePower() {
+  systemServerPower = new ::SystemServerPower{hal::GetSystemServer()};
+}
 }  // namespace hal::init
 
 extern "C" {
 
 double HAL_GetVinVoltage(int32_t* status) {
   initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  return systemServerPower->batterySubscriber.Get();
 }
 
 double HAL_GetUserVoltage3V3(int32_t* status) {
