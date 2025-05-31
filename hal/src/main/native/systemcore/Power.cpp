@@ -32,7 +32,8 @@ struct SystemServerPower {
   explicit SystemServerPower(nt::NetworkTableInstance inst) {
     ntInst = inst;
 
-    batterySubscriber = ntInst.GetDoubleTopic(ROBOT_BATTERY_VOLTAGE_PATH).Subscribe(0.0);
+    batterySubscriber =
+        ntInst.GetDoubleTopic(ROBOT_BATTERY_VOLTAGE_PATH).Subscribe(0.0);
   }
 };
 }  // namespace
