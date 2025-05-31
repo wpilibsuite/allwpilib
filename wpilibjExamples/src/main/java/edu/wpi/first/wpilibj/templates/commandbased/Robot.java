@@ -5,8 +5,14 @@
 package edu.wpi.first.wpilibj.templates.commandbased;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.templates.commandbased.Constants.OperatorConstants;
+import edu.wpi.first.wpilibj.templates.commandbased.commands.Autos;
+import edu.wpi.first.wpilibj.templates.commandbased.commands.ExampleCommand;
+import edu.wpi.first.wpilibj.templates.commandbased.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -16,16 +22,25 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  private final RobotContainer m_robotContainer;
+  // The robot's subsystems and commands are defined here...
+  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+
+  // Replace with CommandPS4Controller or CommandJoystick if needed
+  private final CommandXboxController m_driverController =
+      new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   public Robot() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
+    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+    new Trigger(m_exampleSubsystem::exampleCondition)
+        .onTrue(new ExampleCommand(m_exampleSubsystem));
+
+    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
+    // cancelling on release.
+    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
   }
 
   /**
@@ -54,7 +69,7 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = Autos.exampleAuto(m_exampleSubsystem);
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
