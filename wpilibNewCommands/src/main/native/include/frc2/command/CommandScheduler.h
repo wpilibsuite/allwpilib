@@ -44,6 +44,11 @@ class CommandScheduler final : public wpi::Sendable,
    */
   static CommandScheduler& GetInstance();
 
+  /** Resets the Scheduler instance, which is useful for testing purposes. This
+   * should not be called from user code and will only work when simulating
+   * code. */
+  static void ResetInstance();
+
   ~CommandScheduler() override;
   CommandScheduler(const CommandScheduler&) = delete;
   CommandScheduler& operator=(const CommandScheduler&) = delete;
@@ -482,10 +487,5 @@ class CommandScheduler final : public wpi::Sendable,
   std::unique_ptr<Impl> m_impl;
 
   frc::Watchdog m_watchdog;
-
-  friend class CommandTestBase;
-
-  template <typename T>
-  friend class CommandTestBaseWithParam;
 };
 }  // namespace frc2

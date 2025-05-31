@@ -93,7 +93,8 @@ class CommandTestBase : public ::testing::Test {
   ~CommandTestBase() override;
 
  protected:
-  CommandScheduler GetScheduler();
+  // Reference is still valid after resetting the instance
+  CommandScheduler& scheduler = CommandScheduler::GetInstance();
 
   void SetDSEnabled(bool enabled);
 };
@@ -102,11 +103,7 @@ template <typename T>
 class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
  public:
   CommandTestBaseWithParam() {
-    auto& scheduler = CommandScheduler::GetInstance();
-    scheduler.CancelAll();
-    scheduler.Enable();
-    scheduler.GetActiveButtonLoop()->Clear();
-    scheduler.UnregisterAllSubsystems();
+    CommandScheduler::ResetInstance();
 
     SetDSEnabled(true);
   }
@@ -117,7 +114,8 @@ class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
   }
 
  protected:
-  CommandScheduler GetScheduler() { return CommandScheduler(); }
+  // Reference is still valid after resetting the instance
+  CommandScheduler& scheduler = CommandScheduler::GetInstance();
 
   void SetDSEnabled(bool enabled) {
     frc::sim::DriverStationSim::SetDsAttached(true);
