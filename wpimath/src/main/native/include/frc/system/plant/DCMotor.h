@@ -254,6 +254,11 @@ class WPILIB_DLLEXPORT DCMotor {
     // From https://www.revrobotics.com/next-generation-spark-neo/
     return DCMotor(12_V, 3.60_Nm, 211_A, 3.615_A, 6784_rpm, numMotors);
   }
+
+  /**
+   * Checks equality between this DCMotor and another object.
+   */
+  constexpr bool operator==(const DCMotor&) const = default;
 };
 
 }  // namespace frc
