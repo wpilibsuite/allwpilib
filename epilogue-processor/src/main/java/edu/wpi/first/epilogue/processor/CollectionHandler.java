@@ -52,7 +52,11 @@ public class CollectionHandler extends ElementHandler {
           + m_structHandler.structAccess(componentType)
           + ")";
     } else {
-      return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element, loggedClass) + ")";
+      return "backend.log(\""
+          + loggedName(element)
+          + "\", "
+          + elementAccess(element, loggedClass)
+          + ")";
     }
   }
 }

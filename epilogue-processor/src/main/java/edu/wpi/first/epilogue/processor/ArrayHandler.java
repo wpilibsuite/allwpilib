@@ -70,7 +70,11 @@ public class ArrayHandler extends ElementHandler {
           + ")";
     } else {
       // Primitive or string array
-      return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element, loggedClass) + ")";
+      return "backend.log(\""
+          + loggedName(element)
+          + "\", "
+          + elementAccess(element, loggedClass)
+          + ")";
     }
   }
 }

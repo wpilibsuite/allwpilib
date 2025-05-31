@@ -444,7 +444,6 @@ class AnnotationProcessorTest {
     assertLoggerGenerates(source, expectedGeneratedSource);
   }
 
-  
   @Test
   void superclassStillOptIn() {
     String source =
@@ -568,12 +567,12 @@ class AnnotationProcessorTest {
             try {
               backend.log("f", ((double) $f.get(object)));
             } catch (IllegalAccessException e) {
-              throw new RuntimeException("[EPILOGUE] Could not access field 'f' for logging!", e);
+              throw new RuntimeException("[EPILOGUE] Could not access 'f' for logging!", e);
             }
             try {
               backend.log("g", ((double) $g.get(object)));
             } catch (IllegalAccessException e) {
-              throw new RuntimeException("[EPILOGUE] Could not access field 'g' for logging!", e);
+              throw new RuntimeException("[EPILOGUE] Could not access 'g' for logging!", e);
             }
             backend.log("a", object.a);
             backend.log("getValue", object.getValue());
@@ -1269,9 +1268,10 @@ class AnnotationProcessorTest {
 
       @Logged
       class Example<T extends String> {
-        T value;
+        T valueA;
+        private T valueB;
 
-        public <S extends T> S upcast() { return (S) value; }
+        public <S extends T> S upcast() { return (S) valueA; }
       }
       """;
 
@@ -1283,8 +1283,21 @@ class AnnotationProcessorTest {
       import edu.wpi.first.epilogue.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import java.lang.invoke.MethodHandles;
+      import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
+        private static final VarHandle $valueB;
+
+        static {
+          try {
+            var lookup = MethodHandles.privateLookupIn(Example.class, MethodHandles.lookup());
+            $valueB = lookup.findVarHandle(Example.class, "valueB", java.lang.String.class);
+          } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
+          }
+        }
+
         public ExampleLogger() {
           super(Example.class);
         }
@@ -1292,7 +1305,8 @@ class AnnotationProcessorTest {
         @Override
         public void update(EpilogueBackend backend, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("value", object.value);
+            backend.log("valueA", object.valueA);
+            backend.log("valueB", ((java.lang.String) $valueB.get(object)));
             backend.log("upcast", object.upcast());
           }
         }

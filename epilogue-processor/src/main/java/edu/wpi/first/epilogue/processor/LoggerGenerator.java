@@ -185,18 +185,27 @@ public class LoggerGenerator {
     var loggerFile = m_processingEnv.getFiler().createSourceFile(loggerClassName);
 
     var varHandleFields =
-        loggableFields.stream().filter(e -> {
-          return e.getEnclosingElement().equals(clazz) && e.getModifiers().contains(Modifier.PRIVATE);
-        }).toList();
+        loggableFields.stream()
+            .filter(
+                e -> {
+                  return e.getEnclosingElement().equals(clazz)
+                      && e.getModifiers().contains(Modifier.PRIVATE);
+                })
+            .toList();
     boolean requiresVarHandles = !varHandleFields.isEmpty();
 
     var reflectionFields =
-        loggableFields.stream().filter(e -> {
-          var mods = e.getModifiers();
-          return !e.getEnclosingElement().equals(clazz) && !mods.contains(Modifier.PUBLIC) && !mods.contains(Modifier.PROTECTED);
-        }).toList();
+        loggableFields.stream()
+            .filter(
+                e -> {
+                  var mods = e.getModifiers();
+                  return !e.getEnclosingElement().equals(clazz)
+                      && !mods.contains(Modifier.PUBLIC)
+                      && !mods.contains(Modifier.PROTECTED);
+                })
+            .toList();
     boolean requiresReflection = !reflectionFields.isEmpty();
-  
+
     try (var out = new PrintWriter(loggerFile.openWriter())) {
       if (packageName != null) {
         // package com.example;
@@ -242,7 +251,8 @@ public class LoggerGenerator {
         }
         out.println();
       }
-      
+
+      // Static initializer block to load VarHandles and reflection fields
       if (requiresVarHandles || requiresReflection) {
         out.println("  static {");
 
@@ -251,9 +261,9 @@ public class LoggerGenerator {
 
           var classReference = simpleClassName + ".class";
           out.println(
-            "      var lookup = MethodHandles.privateLookupIn("
-                + classReference
-                + ", MethodHandles.lookup());");
+              "      var lookup = MethodHandles.privateLookupIn("
+                  + classReference
+                  + ", MethodHandles.lookup());");
 
           for (var varHandleField : varHandleFields) {
             var fieldName = varHandleField.getSimpleName();
@@ -292,17 +302,18 @@ public class LoggerGenerator {
                     + "\");");
             out.println("      $" + fieldName + ".setAccessible(true);");
           }
-  
+
           out.println("    } catch (NoSuchFieldException e) {");
           out.println(
               "      throw new RuntimeException("
                   + "\"[EPILOGUE] Could not load superclass fields for logging!\", e);");
           out.println("    }");
         }
+
         out.println("  }");
-        out.println("");
+        out.println();
       }
-      
+
       out.println("  public " + loggerSimpleClassName + "() {");
       out.println("    super(" + simpleClassName + ".class);");
       out.println("  }");
@@ -360,7 +371,7 @@ public class LoggerGenerator {
                       if (reflection) {
                         out.println("      } catch (IllegalAccessException e) {");
                         out.println(
-                            "        throw new RuntimeException(\"[EPILOGUE] Could not access field '"
+                            "        throw new RuntimeException(\"[EPILOGUE] Could not access '"
                                 + loggableElement.getSimpleName()
                                 + "' for logging!\", e);");
                         out.println("      }");
