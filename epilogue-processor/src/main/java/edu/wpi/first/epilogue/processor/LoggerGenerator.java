@@ -198,10 +198,8 @@ public class LoggerGenerator {
         loggableFields.stream()
             .filter(
                 e -> {
-                  var mods = e.getModifiers();
                   return !e.getEnclosingElement().equals(clazz)
-                      && !mods.contains(Modifier.PUBLIC)
-                      && !mods.contains(Modifier.PROTECTED);
+                      && !e.getModifiers().contains(Modifier.PUBLIC);
                 })
             .toList();
     boolean requiresReflection = !reflectionFields.isEmpty();

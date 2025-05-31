@@ -132,8 +132,7 @@ public abstract class ElementHandler {
     var mods = field.getModifiers();
 
     boolean isVarHandle = !superclassField && mods.contains(Modifier.PRIVATE);
-    boolean isReflection =
-        superclassField && !mods.contains(Modifier.PUBLIC) && !mods.contains(Modifier.PROTECTED);
+    boolean isReflection = superclassField && !mods.contains(Modifier.PUBLIC);
 
     if (isVarHandle || isReflection) {
       // ((com.example.Foo) $fooField.get(object))

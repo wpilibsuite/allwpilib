@@ -519,11 +519,14 @@ class AnnotationProcessorTest {
       import java.lang.reflect.Field;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
+        private static final Field $b;
         private static final Field $c;
         private static final Field $d;
 
         static {
           try {
+            $b = edu.wpi.first.epilogue.BaseExample.class.getDeclaredField("b");
+            $b.setAccessible(true);
             $c = edu.wpi.first.epilogue.BaseExample.class.getDeclaredField("c");
             $c.setAccessible(true);
             $d = edu.wpi.first.epilogue.BaseExample.class.getDeclaredField("d");
@@ -542,7 +545,11 @@ class AnnotationProcessorTest {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             backend.log("e", object.e);
             backend.log("a", object.a);
-            backend.log("b", object.b);
+            try {
+              backend.log("b", ((double) $b.get(object)));
+            } catch (IllegalAccessException e) {
+              throw new RuntimeException("[EPILOGUE] Could not access 'b' for logging!", e);
+            }
             try {
               backend.log("c", ((double) $c.get(object)));
             } catch (IllegalAccessException e) {
@@ -606,6 +613,7 @@ class AnnotationProcessorTest {
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         private static final VarHandle $i;
 
+        private static final Field $d;
         private static final Field $f;
         private static final Field $g;
 
@@ -617,6 +625,8 @@ class AnnotationProcessorTest {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
           try {
+            $d = edu.wpi.first.epilogue.BaseExample.class.getDeclaredField("d");
+            $d.setAccessible(true);
             $f = edu.wpi.first.epilogue.BaseExample.class.getDeclaredField("f");
             $f.setAccessible(true);
             $g = edu.wpi.first.epilogue.BaseExample.class.getDeclaredField("g");
@@ -635,7 +645,11 @@ class AnnotationProcessorTest {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             backend.log("h", object.h);
             backend.log("i", ((double) $i.get(object)));
-            backend.log("d", object.d);
+            try {
+              backend.log("d", ((double) $d.get(object)));
+            } catch (IllegalAccessException e) {
+              throw new RuntimeException("[EPILOGUE] Could not access 'd' for logging!", e);
+            }
             backend.log("e", object.e);
             try {
               backend.log("f", ((double) $f.get(object)));
