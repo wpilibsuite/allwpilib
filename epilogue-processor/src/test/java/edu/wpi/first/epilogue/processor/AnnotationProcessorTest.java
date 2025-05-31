@@ -489,7 +489,80 @@ class AnnotationProcessorTest {
   }
 
   @Test
-  void superclass() {
+  void simpleSuperclass() {
+    String source =
+        """
+      package edu.wpi.first.epilogue;
+
+      @Logged
+      class BaseExample {
+        public double a;
+        protected double b;
+        private double c;
+        double d;
+      }
+
+      @Logged
+      class Example extends BaseExample {
+        double e;
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package edu.wpi.first.epilogue;
+
+      import edu.wpi.first.epilogue.Logged;
+      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+      import edu.wpi.first.epilogue.logging.EpilogueBackend;
+      import java.lang.reflect.Field;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        private static final Field $c;
+        private static final Field $d;
+
+        static {
+          try {
+            $c = edu.wpi.first.epilogue.BaseExample.class.getDeclaredField("c");
+            $c.setAccessible(true);
+            $d = edu.wpi.first.epilogue.BaseExample.class.getDeclaredField("d");
+            $d.setAccessible(true);
+          } catch (NoSuchFieldException e) {
+            throw new RuntimeException("[EPILOGUE] Could not load superclass fields for logging!", e);
+          }
+        }
+
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(EpilogueBackend backend, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            backend.log("e", object.e);
+            backend.log("a", object.a);
+            backend.log("b", object.b);
+            try {
+              backend.log("c", ((double) $c.get(object)));
+            } catch (IllegalAccessException e) {
+              throw new RuntimeException("[EPILOGUE] Could not access 'c' for logging!", e);
+            }
+            try {
+              backend.log("d", ((double) $d.get(object)));
+            } catch (IllegalAccessException e) {
+              throw new RuntimeException("[EPILOGUE] Could not access 'd' for logging!", e);
+            }
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void complexSuperclass() {
     String source =
         """
       package edu.wpi.first.epilogue;
