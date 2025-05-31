@@ -348,10 +348,13 @@ void latency() {
   std::this_thread::sleep_for(1s);
 
   // create publishers and subscribers
-  auto pub = nt::Publish(nt::GetTopic(client1, "highrate"), NT_DOUBLE, "double");
+  auto pub =
+      nt::Publish(nt::GetTopic(client1, "highrate"), NT_DOUBLE, "double");
   nt::SubscribeMultiple(server, {{std::string_view{}}});
-  auto sub = nt::Subscribe(nt::GetTopic(server, "highrate"), NT_DOUBLE, "double");
-  auto sub2 = nt::Subscribe(nt::GetTopic(client2, "highrate"), NT_DOUBLE, "double");
+  auto sub =
+      nt::Subscribe(nt::GetTopic(server, "highrate"), NT_DOUBLE, "double");
+  auto sub2 =
+      nt::Subscribe(nt::GetTopic(client2, "highrate"), NT_DOUBLE, "double");
 
   std::this_thread::sleep_for(1s);
 
