@@ -133,12 +133,10 @@ public abstract class ElementHandler {
       // Extra parentheses so cast evaluates before appended methods
       // (e.g. when appending .getAsDouble())
       TypeMirror type = field.asType();
-      String typeString = field.asType().toString();
       if (type.getKind() == TypeKind.TYPEVAR) {
-        TypeMirror upperBoundType = ((TypeVariable) type).getUpperBound();
-        typeString = upperBoundType.toString();
+        type = ((TypeVariable) type).getUpperBound();
       }
-      return "((" + typeString + ") $" + field.getSimpleName() + ".get(object))";
+      return "((" + type.toString() + ") $" + field.getSimpleName() + ".get(object))";
     } else {
       // object.fooField
       return "object." + field.getSimpleName();
