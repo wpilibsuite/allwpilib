@@ -258,7 +258,7 @@ void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp,
   INFO("CONNECTED NT4 to {} port {}", connInfo.remote_ip, connInfo.remote_port);
   m_connHandle = m_connList.AddConnection(connInfo);
 
-  bool local = connInfo.remote_ip == "127.0.0.1";
+  bool local = wpi::starts_with(connInfo.remote_ip, "127.");
 
   m_wire = std::make_shared<net::WebSocketConnection>(
       ws, connInfo.protocol_version, m_logger);

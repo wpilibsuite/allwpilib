@@ -222,7 +222,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
       return;
     }
 
-    bool local = m_info.remote_ip == "127.0.0.1";
+    bool local = wpi::starts_with(m_info.remote_ip, "127.");
     std::string dedupName;
     std::tie(dedupName, m_clientId) = m_server.m_serverImpl.AddClient(
         name, m_connInfo, local, *m_wire,
