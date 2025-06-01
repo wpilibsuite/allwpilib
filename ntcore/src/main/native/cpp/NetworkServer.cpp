@@ -60,6 +60,7 @@ class NetworkServer::ServerConnection {
   void SetupOutgoingTimer();
   void UpdateOutgoingTimer(uint32_t repeatMs);
   void ConnectionClosed();
+  uv::Loop& GetLoopRef() const { return m_outgoingTimer->GetLoopRef(); }
 
   NetworkServer& m_server;
   ConnectionInfo m_info;
@@ -239,11 +240,13 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
       if (m_server.m_serverImpl.ProcessIncomingText(m_clientId, data)) {
         m_server.m_idle->Start();
       }
+      m_server.m_serverImpl.SendAllLocalOutgoing(GetLoopRef().Now().count());
     });
     m_websocket->binary.connect([this](std::span<const uint8_t> data, bool) {
       if (m_server.m_serverImpl.ProcessIncomingBinary(m_clientId, data)) {
         m_server.m_idle->Start();
       }
+      m_server.m_serverImpl.SendAllLocalOutgoing(GetLoopRef().Now().count());
     });
 
     SetupOutgoingTimer();
@@ -420,6 +423,7 @@ void NetworkServer::Init() {
         DEBUG4("Stopping idle processing");
         m_idle->Stop();  // go back to sleep
       }
+      m_serverImpl.SendAllLocalOutgoing(m_loop.Now().count());
     });
   }
 

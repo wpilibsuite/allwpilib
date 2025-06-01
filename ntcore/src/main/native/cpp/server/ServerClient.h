@@ -73,6 +73,7 @@ class ServerClient {
 
   std::string_view GetName() const { return m_name; }
   int GetId() const { return m_id; }
+  bool IsLocal() const { return m_local; }
 
   virtual void UpdatePeriod(TopicClientData& tcd, ServerTopic* topic) {}
 

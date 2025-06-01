@@ -356,8 +356,6 @@ void latency() {
   auto sub2 =
       nt::Subscribe(nt::GetTopic(client2, "highrate"), NT_DOUBLE, "double");
 
-  std::this_thread::sleep_for(1s);
-
   nt::SetDouble(pub, 0);
 #if 0
   // warm up
