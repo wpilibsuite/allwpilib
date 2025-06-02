@@ -33,18 +33,18 @@ namespace frc {
 void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
                   const char* funcName, fmt::string_view format,
                   fmt::format_args args) {
-// TODO when we get a low level interface
-// #ifdef __FRC_SYSTEMCORE__
-//   if (status == 0) {
-//     return;
-//   }
-//   fmt::memory_buffer out;
-//   fmt::format_to(fmt::appender{out}, "Warning: ");
-//   fmt::vformat_to(fmt::appender{out}, format, args);
-//   out.push_back('\0');
-//   FRC_NetworkCommunication_sendError(status < 0, status, 0, out.data(),
-//                                      "DataLogManager", "");
-// #endif
+  // TODO when we get a low level interface
+  // #ifdef __FRC_SYSTEMCORE__
+  //   if (status == 0) {
+  //     return;
+  //   }
+  //   fmt::memory_buffer out;
+  //   fmt::format_to(fmt::appender{out}, "Warning: ");
+  //   fmt::vformat_to(fmt::appender{out}, format, args);
+  //   out.push_back('\0');
+  //   FRC_NetworkCommunication_sendError(status < 0, status, 0, out.data(),
+  //                                      "DataLogManager", "");
+  // #endif
 }
 
 template <typename... Args>
@@ -106,56 +106,58 @@ enum MatchType { kNone, kPractice, kQualification, kElimination };
 // #endif
 
 inline void UpdateMatchInfo() {
-// #ifdef __FRC_SYSTEMCORE__
-//   gGameSpecificMessageSize = sizeof(gGameSpecificMessage);
-//   FRC_NetworkCommunication_getMatchInfo(gEventName, &gMatchType, &gMatchNumber,
-//                                         &gReplayNumber, gGameSpecificMessage,
-//                                         &gGameSpecificMessageSize);
-// #endif
+  // #ifdef __FRC_SYSTEMCORE__
+  //   gGameSpecificMessageSize = sizeof(gGameSpecificMessage);
+  //   FRC_NetworkCommunication_getMatchInfo(gEventName, &gMatchType,
+  //   &gMatchNumber,
+  //                                         &gReplayNumber,
+  //                                         gGameSpecificMessage,
+  //                                         &gGameSpecificMessageSize);
+  // #endif
 }
 
 inline MatchType GetMatchType() {
-// #ifdef __FRC_SYSTEMCORE__
-//   return gMatchType;
-// #else
+  // #ifdef __FRC_SYSTEMCORE__
+  //   return gMatchType;
+  // #else
   return kNone;
-// #endif
+  // #endif
 }
 
 inline std::string_view GetEventName() {
-// #ifdef __FRC_SYSTEMCORE__
-//   return gEventName;
-// #else
+  // #ifdef __FRC_SYSTEMCORE__
+  //   return gEventName;
+  // #else
   return "";
-// #endif
+  // #endif
 }
 
 inline uint16_t GetMatchNumber() {
-// #ifdef __FRC_SYSTEMCORE__
-//   return gMatchNumber;
-// #else
+  // #ifdef __FRC_SYSTEMCORE__
+  //   return gMatchNumber;
+  // #else
   return 0;
-// #endif
+  // #endif
 }
 
 inline bool IsDSAttached() {
-// #ifdef __FRC_SYSTEMCORE__
-//   struct ControlWord_t cw;
-//   FRC_NetworkCommunication_getControlWord(&cw);
-//   return cw.dsAttached;
-// #else
+  // #ifdef __FRC_SYSTEMCORE__
+  //   struct ControlWord_t cw;
+  //   FRC_NetworkCommunication_getControlWord(&cw);
+  //   return cw.dsAttached;
+  // #else
   return true;
-// #endif
+  // #endif
 }
 
 inline bool IsFMSAttached() {
-// #ifdef __FRC_SYSTEMCORE__
-//   struct ControlWord_t cw;
-//   FRC_NetworkCommunication_getControlWord(&cw);
-//   return cw.fmsAttached;
-// #else
+  // #ifdef __FRC_SYSTEMCORE__
+  //   struct ControlWord_t cw;
+  //   FRC_NetworkCommunication_getControlWord(&cw);
+  //   return cw.fmsAttached;
+  // #else
   return false;
-// #endif
+  // #endif
 }
 
 WPI_EventHandle gNewDataEvent;
@@ -229,11 +231,6 @@ static std::string MakeLogDir(std::string_view dir) {
     fs::create_directory("/u/logs", ec);
     return "/u/logs";
   }
-  // if (RobotBase::GetRuntimeType() == kRoboRIO) {
-  //   FRC_ReportError(warn::Warning,
-  //                   "DataLogManager: Logging to RoboRIO 1 internal storage is "
-  //                   "not recommended! Plug in a FAT32 formatted flash drive!");
-  // }
   fs::create_directory("/home/systemcore/logs", ec);
   return "/home/systemcore/logs";
 #else
