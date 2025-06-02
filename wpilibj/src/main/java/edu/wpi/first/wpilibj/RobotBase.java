@@ -297,26 +297,6 @@ public abstract class RobotBase implements AutoCloseable {
     m_robotCopy = robot;
     m_runMutex.unlock();
 
-    if (!isSimulation()) {
-      final File file = new File("/tmp/frc_versions/FRC_Lib_Version.ini");
-      try {
-        if (file.exists() && !file.delete()) {
-          throw new IOException("Failed to delete FRC_Lib_Version.ini");
-        }
-
-        if (!file.createNewFile()) {
-          throw new IOException("Failed to create new FRC_Lib_Version.ini");
-        }
-
-        try (OutputStream output = Files.newOutputStream(file.toPath())) {
-          output.write("Java ".getBytes(StandardCharsets.UTF_8));
-          output.write(WPILibVersion.Version.getBytes(StandardCharsets.UTF_8));
-        }
-      } catch (IOException ex) {
-        DriverStation.reportError("Could not write FRC_Lib_Version.ini: " + ex, ex.getStackTrace());
-      }
-    }
-
     boolean errorOnExit = false;
     try {
       robot.startCompetition();

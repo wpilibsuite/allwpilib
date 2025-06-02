@@ -216,17 +216,6 @@ RobotBase::RobotBase() {
 
   SmartDashboard::init();
 
-  if constexpr (!IsSimulation()) {
-    std::FILE* file = nullptr;
-    file = std::fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
-
-    if (file != nullptr) {
-      std::fputs("C++ ", file);
-      std::fputs(GetWPILibVersion(), file);
-      std::fclose(file);
-    }
-  }
-
   // Call DriverStation::RefreshData() to kick things off
   DriverStation::RefreshData();
 }

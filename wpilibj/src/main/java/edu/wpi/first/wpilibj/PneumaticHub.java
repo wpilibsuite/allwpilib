@@ -10,11 +10,6 @@ import edu.wpi.first.hal.REVPHFaults;
 import edu.wpi.first.hal.REVPHJNI;
 import edu.wpi.first.hal.REVPHStickyFaults;
 import edu.wpi.first.hal.REVPHVersion;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,32 +34,6 @@ public class PneumaticHub implements PneumaticsBase {
       final REVPHVersion version = REVPHJNI.getVersion(m_handle);
       final String fwVersion =
           version.firmwareMajor + "." + version.firmwareMinor + "." + version.firmwareFix;
-
-      if (version.firmwareMajor > 0 && RobotBase.isReal()) {
-        // Write PH firmware version to roboRIO
-        final String fileName = "REV_PH_" + String.format("%02d", module) + "_WPILib_Version.ini";
-        final File file = new File("/tmp/frc_versions/" + fileName);
-        try {
-          if (file.exists() && !file.delete()) {
-            throw new IOException("Failed to delete " + fileName);
-          }
-
-          if (!file.createNewFile()) {
-            throw new IOException("Failed to create new " + fileName);
-          }
-
-          try (OutputStream output = Files.newOutputStream(file.toPath())) {
-            output.write("[Version]\n".getBytes(StandardCharsets.UTF_8));
-            output.write("model=REV PH\n".getBytes(StandardCharsets.UTF_8));
-            output.write(
-                ("deviceID=" + Integer.toHexString(0x9052600 | module) + "\n")
-                    .getBytes(StandardCharsets.UTF_8));
-            output.write(("currentVersion=" + fwVersion).getBytes(StandardCharsets.UTF_8));
-          }
-        } catch (IOException ex) {
-          DriverStation.reportError("Could not write " + fileName + ": " + ex, ex.getStackTrace());
-        }
-      }
 
       // Check PH firmware version
       if (version.firmwareMajor > 0 && version.firmwareMajor < 22) {
