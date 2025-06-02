@@ -19,7 +19,7 @@ std::string GetLaunchDirectory();
 
 /**
  * Obtains the operating directory of the program. On the roboRIO, this
- * is /home/lvuser. In simulation, it is where the simulation was launched
+ * is /home/systemcore. In simulation, it is where the simulation was launched
  * from (`pwd`).
  *
  * @return The result of the operating directory lookup.
@@ -29,7 +29,7 @@ std::string GetOperatingDirectory();
 /**
  * Obtains the deploy directory of the program, which is the remote location
  * src/main/deploy is deployed to by default. On the roboRIO, this is
- * /home/lvuser/deploy. In simulation, it is where the simulation was launched
+ * /home/systemcore/deploy. In simulation, it is where the simulation was launched
  * from, in the subdirectory "src/main/deploy" (`pwd`/src/main/deploy).
  *
  * @return The result of the operating directory lookup

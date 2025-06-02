@@ -10,8 +10,8 @@ import java.io.File;
  * Class for interacting with the Filesystem, particularly, interacting with FRC-related paths on
  * the system, such as the launch and deploy directories.
  *
- * <p>This class is primarily used for obtaining resources in src/main/deploy, and the RoboRIO path
- * /home/lvuser in a simulation-compatible way.
+ * <p>This class is primarily used for obtaining resources in src/main/deploy, and the systemcore path
+ * /home/systemcore in a simulation-compatible way.
  */
 public final class Filesystem {
   private Filesystem() {}
@@ -33,14 +33,14 @@ public final class Filesystem {
   }
 
   /**
-   * Obtains the operating directory of the program. On the roboRIO, this is /home/lvuser. In
+   * Obtains the operating directory of the program. On the systemcore, this is /home/systemcore. In
    * simulation, it is where the simulation was launched from (`pwd`).
    *
    * @return The operating directory
    */
   public static File getOperatingDirectory() {
     if (!RobotBase.isSimulation()) {
-      return new File("/home/lvuser");
+      return new File("/home/systemcore");
     } else {
       return getLaunchDirectory();
     }
@@ -48,7 +48,7 @@ public final class Filesystem {
 
   /**
    * Obtains the 'deploy' directory of the program, located at src/main/deploy, which is deployed by
-   * default. On the roboRIO, this is /home/lvuser/deploy. In simulation, it is where the simulation
+   * default. On the systemcore, this is /home/systemcore/deploy. In simulation, it is where the simulation
    * was launched from, in the subdirectory "src/main/deploy" (`pwd`/src/main/deploy).
    *
    * @return The 'deploy' directory
