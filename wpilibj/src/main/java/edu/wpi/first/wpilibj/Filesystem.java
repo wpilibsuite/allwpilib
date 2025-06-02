@@ -48,7 +48,7 @@ public final class Filesystem {
 
   /**
    * Obtains the 'deploy' directory of the program, located at src/main/deploy, which is deployed by
-   * default. On the systemcore, this is /home/systemcore/deploy. In simulation, it is where the 
+   * default. On the systemcore, this is /home/systemcore/deploy. In simulation, it is where the
    * simulation was launched from, in the subdirectory "src/main/deploy" (`pwd`/src/main/deploy).
    *
    * @return The 'deploy' directory
