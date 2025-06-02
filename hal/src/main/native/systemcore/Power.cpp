@@ -55,8 +55,9 @@ double HAL_GetVinVoltage(int32_t* status) {
 
 double HAL_GetUserVoltage3V3(int32_t* status) {
   initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  // Until we have a value, make this work, as lots of other
+  // code depends on it.
+  return 3.3;
 }
 
 double HAL_GetUserCurrent3V3(int32_t* status) {
