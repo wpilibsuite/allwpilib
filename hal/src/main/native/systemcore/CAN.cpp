@@ -138,8 +138,6 @@ bool SocketCanState::InitializeBuses() {
         return;
       }
 
-      std::printf("Successfully bound to can interface %d\n", i);
-
       auto poll = wpi::uv::Poll::Create(loop, socketHandle[i]);
       if (!poll) {
         success = false;
