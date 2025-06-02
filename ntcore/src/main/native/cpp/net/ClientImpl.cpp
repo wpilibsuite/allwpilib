@@ -28,7 +28,7 @@ using namespace nt;
 using namespace nt::net;
 
 ClientImpl::ClientImpl(
-    uint64_t curTimeMs, WireConnection& wire, wpi::Logger& logger,
+    uint64_t curTimeMs, WireConnection& wire, bool local, wpi::Logger& logger,
     std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
         timeSyncUpdated,
     std::function<void(uint32_t repeatMs)> setPeriodic)
@@ -40,7 +40,7 @@ ClientImpl::ClientImpl(
       m_nextPingTimeMs{curTimeMs + (wire.GetVersion() >= 0x0401
                                         ? NetworkPing::kPingIntervalMs
                                         : kRttIntervalMs)},
-      m_outgoing{wire, false} {
+      m_outgoing{wire, local} {
   // immediately send RTT ping
   auto now = wpi::Now();
   DEBUG4("Sending initial RTT ping {}", now);
