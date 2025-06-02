@@ -34,6 +34,8 @@ static_assert(frc::RuntimeType::kRoboRIO2 ==
               static_cast<frc::RuntimeType>(HAL_Runtime_RoboRIO2));
 static_assert(frc::RuntimeType::kSimulation ==
               static_cast<frc::RuntimeType>(HAL_Runtime_Simulation));
+static_assert(frc::RuntimeType::kSystemCore ==
+              static_cast<frc::RuntimeType>(HAL_Runtime_SystemCore));
 
 using SetCameraServerSharedFP = void (*)(frc::CameraServerShared*);
 

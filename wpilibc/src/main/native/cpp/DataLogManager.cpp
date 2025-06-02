@@ -81,11 +81,6 @@ static std::string MakeLogDir(std::string_view dir) {
     return "/u/logs";
     HAL_ReportUsage("DataLogManager", "USB");
   }
-  if (RobotBase::GetRuntimeType() == kRoboRIO) {
-    FRC_ReportWarning(
-        "DataLogManager: Logging to RoboRIO 1 internal storage is "
-        "not recommended! Plug in a FAT32 formatted flash drive!");
-  }
   fs::create_directory("/home/systemcore/logs", ec);
   HAL_ReportUsage("DataLogManager", "Onboard");
   return "/home/systemcore/logs";

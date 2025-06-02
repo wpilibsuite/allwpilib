@@ -14,6 +14,7 @@ enum RuntimeType {
   /// roboRIO 2.0.
   kRoboRIO2,
   /// Simulation runtime.
-  kSimulation
+  kSimulation,
+  kSystemCore
 };
 }  // namespace frc
