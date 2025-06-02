@@ -99,7 +99,7 @@ public abstract class RobotBase implements AutoCloseable {
     // subscribe to "" to force persistent values to propagate to local
     m_suball = new MultiSubscriber(inst, new String[] {""});
     if (!isSimulation()) {
-      inst.startServer("/home/lvuser/networktables.json");
+      inst.startServer("/home/systemcore/networktables.json");
     } else {
       inst.startServer();
     }
@@ -168,7 +168,7 @@ public abstract class RobotBase implements AutoCloseable {
    */
   public static boolean isReal() {
     RuntimeType runtimeType = getRuntimeType();
-    return runtimeType == RuntimeType.kRoboRIO || runtimeType == RuntimeType.kRoboRIO2;
+    return runtimeType == RuntimeType.kSystemCore;
   }
 
   /**

@@ -71,7 +71,7 @@ static std::string MakeLogDir(std::string_view dir) {
   if (!dir.empty()) {
     return std::string{dir};
   }
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
   // prefer a mounted USB drive if one is accessible
   std::error_code ec;
   auto s = fs::status("/u", ec);
@@ -81,14 +81,9 @@ static std::string MakeLogDir(std::string_view dir) {
     return "/u/logs";
     HAL_ReportUsage("DataLogManager", "USB");
   }
-  if (RobotBase::GetRuntimeType() == kRoboRIO) {
-    FRC_ReportWarning(
-        "DataLogManager: Logging to RoboRIO 1 internal storage is "
-        "not recommended! Plug in a FAT32 formatted flash drive!");
-  }
-  fs::create_directory("/home/lvuser/logs", ec);
+  fs::create_directory("/home/systemcore/logs", ec);
   HAL_ReportUsage("DataLogManager", "Onboard");
-  return "/home/lvuser/logs";
+  return "/home/systemcore/logs";
 #else
   std::string logDir = filesystem::GetOperatingDirectory() + "/logs";
   std::error_code ec;
@@ -312,7 +307,8 @@ void Thread::StopNTLog() {
 void Thread::StartConsoleLog() {
   if (!m_consoleLoggerEnabled && RobotBase::IsReal()) {
     m_consoleLoggerEnabled = true;
-    m_consoleLogger = {"/home/lvuser/FRC_UserProgram.log", m_log, "console"};
+    m_consoleLogger = {"/home/systemcore/FRC_UserProgram.log", m_log,
+                       "console"};
   }
 }
 

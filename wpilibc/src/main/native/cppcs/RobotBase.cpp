@@ -4,7 +4,7 @@
 
 #include "frc/RobotBase.h"
 
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
 #include <dlfcn.h>
 #endif
 
@@ -34,6 +34,8 @@ static_assert(frc::RuntimeType::kRoboRIO2 ==
               static_cast<frc::RuntimeType>(HAL_Runtime_RoboRIO2));
 static_assert(frc::RuntimeType::kSimulation ==
               static_cast<frc::RuntimeType>(HAL_Runtime_Simulation));
+static_assert(frc::RuntimeType::kSystemCore ==
+              static_cast<frc::RuntimeType>(HAL_Runtime_SystemCore));
 
 using SetCameraServerSharedFP = void (*)(frc::CameraServerShared*);
 
@@ -104,7 +106,7 @@ class WPILibMathShared : public wpi::math::MathShared {
 }  // namespace
 
 static void SetupCameraServerShared() {
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
 #ifdef DYNAMIC_CAMERA_SERVER
 #ifdef DYNAMIC_CAMERA_SERVER_DEBUG
   auto cameraServerLib = dlopen("libcameraserverd.so", RTLD_NOW);
@@ -189,7 +191,7 @@ RobotBase::RobotBase() {
   // subscribe to "" to force persistent values to propagate to local
   nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}});
   if constexpr (!IsSimulation()) {
-    inst.StartServer("/home/lvuser/networktables.json");
+    inst.StartServer("/home/systemcore/networktables.json");
   } else {
     inst.StartServer();
   }
