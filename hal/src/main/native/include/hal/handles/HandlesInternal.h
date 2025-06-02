@@ -140,7 +140,6 @@ inline int16_t getHandleTypedIndex(HAL_Handle handle, HAL_HandleEnum enumType,
   if (!isHandleCorrectVersion(handle, version)) {
     return InvalidHandleIndex;
   }
-  #else
 #endif
   return getHandleIndex(handle);
 }
