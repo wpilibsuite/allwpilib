@@ -74,6 +74,7 @@ void InitializeHAL() {
   InitializeAnalogTriggerData();
   InitializeCanData();
   InitializeCANAPI();
+  InitializeCAN2027API();
   InitializeDigitalPWMData();
   InitializeDutyCycleData();
   InitializeDIOData();
