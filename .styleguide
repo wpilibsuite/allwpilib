@@ -35,7 +35,6 @@ includeOtherLibs {
   ^cscore
   ^fmt/
   ^glass/
-  ^google/
   ^gtest/
   ^hal/
   ^imgui
@@ -47,6 +46,7 @@ includeOtherLibs {
   ^support/
   ^units/
   ^unsupported/
+  ^upb/
   ^vision/
   ^wpi/
   ^wpigui
