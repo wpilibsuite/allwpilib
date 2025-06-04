@@ -63,7 +63,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
-      - uses: bazelbuild/setup-bazelisk@v3
 
       - id: Setup_build_buddy
         uses: ./.github/actions/setup-build-buddy
