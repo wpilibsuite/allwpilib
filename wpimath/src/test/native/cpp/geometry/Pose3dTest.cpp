@@ -226,7 +226,8 @@ TEST(Pose3dTest, Nearest) {
   const Pose3d origin{0_m, 0_m, 0_m, Rotation3d{}};
 
   // Distance sort
-  // each poseX is X units away from the origin at various positions in 3D space.
+  // each poseX is X units away from the origin at various positions in 3D
+  // space.
   const Pose3d pose1{1_m, 0_m, 0_m, Rotation3d{}};
   const Pose3d pose2{0_m, 2_m, 0_m, Rotation3d{}};
   const Pose3d pose3{0_m, 0_m, 3_m, Rotation3d{}};
@@ -264,38 +265,67 @@ TEST(Pose3dTest, Nearest) {
   const Pose3d poseD{translation, Rotation3d{0_deg, 0_deg, 90_deg}};
   const Pose3d poseE{translation, Rotation3d{180_deg, 0_deg, 0_deg}};
 
-  auto result1 = Pose3d{0_m, 0_m, 0_m, Rotation3d{}}.Nearest({poseA, poseB, poseD});
-  EXPECT_DOUBLE_EQ(poseA.Rotation().X().value(), result1.Rotation().X().value());
-  EXPECT_DOUBLE_EQ(poseA.Rotation().Y().value(), result1.Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(poseA.Rotation().Z().value(), result1.Rotation().Z().value());
+  auto result1 =
+      Pose3d{0_m, 0_m, 0_m, Rotation3d{}}.Nearest({poseA, poseB, poseD});
+  EXPECT_DOUBLE_EQ(poseA.Rotation().X().value(),
+                   result1.Rotation().X().value());
+  EXPECT_DOUBLE_EQ(poseA.Rotation().Y().value(),
+                   result1.Rotation().Y().value());
+  EXPECT_DOUBLE_EQ(poseA.Rotation().Z().value(),
+                   result1.Rotation().Z().value());
 
-  auto result2 = Pose3d{0_m, 0_m, 0_m, Rotation3d{25_deg, 0_deg, 0_deg}}.Nearest({poseB, poseC, poseD});
-  EXPECT_DOUBLE_EQ(poseB.Rotation().X().value(), result2.Rotation().X().value());
-  EXPECT_DOUBLE_EQ(poseB.Rotation().Y().value(), result2.Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(poseB.Rotation().Z().value(), result2.Rotation().Z().value());
+  auto result2 =
+      Pose3d{0_m, 0_m, 0_m, Rotation3d{25_deg, 0_deg, 0_deg}}.Nearest(
+          {poseB, poseC, poseD});
+  EXPECT_DOUBLE_EQ(poseB.Rotation().X().value(),
+                   result2.Rotation().X().value());
+  EXPECT_DOUBLE_EQ(poseB.Rotation().Y().value(),
+                   result2.Rotation().Y().value());
+  EXPECT_DOUBLE_EQ(poseB.Rotation().Z().value(),
+                   result2.Rotation().Z().value());
 
-  auto result3 = Pose3d{0_m, 0_m, 0_m, Rotation3d{0_deg, 50_deg, 0_deg}}.Nearest({poseB, poseC, poseD});
-  EXPECT_DOUBLE_EQ(poseC.Rotation().X().value(), result3.Rotation().X().value());
-  EXPECT_DOUBLE_EQ(poseC.Rotation().Y().value(), result3.Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(poseC.Rotation().Z().value(), result3.Rotation().Z().value());
+  auto result3 =
+      Pose3d{0_m, 0_m, 0_m, Rotation3d{0_deg, 50_deg, 0_deg}}.Nearest(
+          {poseB, poseC, poseD});
+  EXPECT_DOUBLE_EQ(poseC.Rotation().X().value(),
+                   result3.Rotation().X().value());
+  EXPECT_DOUBLE_EQ(poseC.Rotation().Y().value(),
+                   result3.Rotation().Y().value());
+  EXPECT_DOUBLE_EQ(poseC.Rotation().Z().value(),
+                   result3.Rotation().Z().value());
 
-  auto result4 = Pose3d{0_m, 0_m, 0_m, Rotation3d{0_deg, 0_deg, 85_deg}}.Nearest({poseA, poseC, poseD});
-  EXPECT_DOUBLE_EQ(poseD.Rotation().X().value(), result4.Rotation().X().value());
-  EXPECT_DOUBLE_EQ(poseD.Rotation().Y().value(), result4.Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(poseD.Rotation().Z().value(), result4.Rotation().Z().value());
+  auto result4 =
+      Pose3d{0_m, 0_m, 0_m, Rotation3d{0_deg, 0_deg, 85_deg}}.Nearest(
+          {poseA, poseC, poseD});
+  EXPECT_DOUBLE_EQ(poseD.Rotation().X().value(),
+                   result4.Rotation().X().value());
+  EXPECT_DOUBLE_EQ(poseD.Rotation().Y().value(),
+                   result4.Rotation().Y().value());
+  EXPECT_DOUBLE_EQ(poseD.Rotation().Z().value(),
+                   result4.Rotation().Z().value());
 
-  auto result5 = Pose3d{0_m, 0_m, 0_m, Rotation3d{170_deg, 0_deg, 0_deg}}.Nearest({poseA, poseD, poseE});
-  EXPECT_DOUBLE_EQ(poseE.Rotation().X().value(), result5.Rotation().X().value());
-  EXPECT_DOUBLE_EQ(poseE.Rotation().Y().value(), result5.Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(poseE.Rotation().Z().value(), result5.Rotation().Z().value());
+  auto result5 =
+      Pose3d{0_m, 0_m, 0_m, Rotation3d{170_deg, 0_deg, 0_deg}}.Nearest(
+          {poseA, poseD, poseE});
+  EXPECT_DOUBLE_EQ(poseE.Rotation().X().value(),
+                   result5.Rotation().X().value());
+  EXPECT_DOUBLE_EQ(poseE.Rotation().Y().value(),
+                   result5.Rotation().Y().value());
+  EXPECT_DOUBLE_EQ(poseE.Rotation().Z().value(),
+                   result5.Rotation().Z().value());
 
   // Test with complex 3D rotations (combining roll, pitch, yaw)
   const Pose3d complexPose1{translation, Rotation3d{45_deg, 30_deg, 60_deg}};
   const Pose3d complexPose2{translation, Rotation3d{90_deg, 45_deg, 90_deg}};
   const Pose3d complexPose3{translation, Rotation3d{10_deg, 15_deg, 20_deg}};
 
-  auto complexResult = Pose3d{0_m, 0_m, 0_m, Rotation3d{5_deg, 10_deg, 15_deg}}.Nearest({complexPose1, complexPose2, complexPose3});
-  EXPECT_DOUBLE_EQ(complexPose3.Rotation().X().value(), complexResult.Rotation().X().value());
-  EXPECT_DOUBLE_EQ(complexPose3.Rotation().Y().value(), complexResult.Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(complexPose3.Rotation().Z().value(), complexResult.Rotation().Z().value());
+  auto complexResult =
+      Pose3d{0_m, 0_m, 0_m, Rotation3d{5_deg, 10_deg, 15_deg}}.Nearest(
+          {complexPose1, complexPose2, complexPose3});
+  EXPECT_DOUBLE_EQ(complexPose3.Rotation().X().value(),
+                   complexResult.Rotation().X().value());
+  EXPECT_DOUBLE_EQ(complexPose3.Rotation().Y().value(),
+                   complexResult.Rotation().Y().value());
+  EXPECT_DOUBLE_EQ(complexPose3.Rotation().Z().value(),
+                   complexResult.Rotation().Z().value());
 }

@@ -275,7 +275,7 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * If two or more poses in the collection have the same distance from this
    * pose, return the one with the closest rotation component.
-   * 
+   *
    * @param poses The collection of poses.
    * @return The nearest Pose3d from the collection.
    */
@@ -288,9 +288,8 @@ class WPILIB_DLLEXPORT Pose3d {
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
             return gcem::abs(
-                       (this->Rotation() - a.Rotation()).Angle().value()) < 
-                   gcem::abs(
-                       (this->Rotation() - b.Rotation()).Angle().value());
+                       (this->Rotation() - a.Rotation()).Angle().value()) <
+                   gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
           }
           return aDistance < bDistance;
         });
@@ -301,7 +300,7 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * If two or more poses in the collection have the same distance from this
    * pose, return the one with the closest rotation component.
-   * 
+   *
    * @param poses The collection of poses.
    * @return The nearest Pose3d from the collection.
    */
@@ -314,9 +313,8 @@ class WPILIB_DLLEXPORT Pose3d {
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
             return gcem::abs(
-                       (this->Rotation() - a.Rotation()).Angle().value()) < 
-                   gcem::abs(
-                       (this->Rotation() - b.Rotation()).Angle().value());
+                       (this->Rotation() - a.Rotation()).Angle().value()) <
+                   gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
           }
           return aDistance < bDistance;
         });
