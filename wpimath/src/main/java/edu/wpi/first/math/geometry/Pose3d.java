@@ -405,7 +405,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    * distance from this pose, return the one with the closest rotation component.
    *
    * @param poses The list of poses to find the nearest.
-   * @return The nearest Pose2d from the list.
+   * @return The nearest Pose3d from the list.
    */
   public Pose3d nearest(List<Pose3d> poses) {
     return Collections.min(
