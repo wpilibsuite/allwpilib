@@ -271,7 +271,11 @@ class WPILIB_DLLEXPORT Pose3d {
   }
 
   /**
-   * Returns the nearest Pose3d from a collection of poses
+   * Returns the nearest Pose3d from a collection of poses.
+   *
+   * If two or more poses in the collection have the same distance from this
+   * pose, return the one with the closest rotation component.
+   * 
    * @param poses The collection of poses.
    * @return The nearest Pose3d from the collection.
    */
@@ -293,7 +297,11 @@ class WPILIB_DLLEXPORT Pose3d {
   }
 
   /**
-   * Returns the nearest Pose3d from a collection of poses
+   * Returns the nearest Pose3d from a collection of poses.
+   *
+   * If two or more poses in the collection have the same distance from this
+   * pose, return the one with the closest rotation component.
+   * 
    * @param poses The collection of poses.
    * @return The nearest Pose3d from the collection.
    */
