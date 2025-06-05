@@ -21,6 +21,9 @@ import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 /** Represents a 3D pose containing translational and rotational elements. */
