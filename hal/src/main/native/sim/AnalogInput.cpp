@@ -4,11 +4,12 @@
 
 #include "hal/AnalogInput.h"
 
-#include "AnalogInternal.h"
+#include "SmartIo.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/cpp/fpga_clock.h"
 #include "mockdata/AnalogInDataInternal.h"
 
 using namespace hal;
@@ -21,44 +22,57 @@ extern "C" {
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
     int32_t channel, const char* allocationLocation, int32_t* status) {
   hal::init::CheckInit();
-  if (channel < 0 || channel >= kNumAnalogInputs) {
+  if (channel < 0 || channel >= kNumSmartIo) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Input",
-                                     0, kNumAnalogInputs, channel);
+                                     0, kNumSmartIo, channel);
     return HAL_kInvalidHandle;
   }
 
-  HAL_AnalogInputHandle handle;
-  auto analog_port = analogInputHandles->Allocate(channel, &handle, status);
+  HAL_DigitalHandle handle;
+
+  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::AnalogInput,
+                                       &handle, status);
 
   if (*status != 0) {
-    if (analog_port) {
+    if (port) {
       hal::SetLastErrorPreviouslyAllocated(status, "Analog Input", channel,
-                                           analog_port->previousAllocation);
+                                           port->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Input",
-                                       0, kNumAnalogInputs, channel);
+                                       0, kNumSmartIo, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
 
-  analog_port->channel = static_cast<uint8_t>(channel);
-  analog_port->isAccumulator = false;
+  port->channel = static_cast<uint8_t>(channel);
 
   SimAnalogInData[channel].initialized = true;
   SimAnalogInData[channel].simDevice = 0;
 
-  analog_port->previousAllocation =
-      allocationLocation ? allocationLocation : "";
+  port->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }
 void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  // no status, so no need to check for a proper free.
-  analogInputHandles->Free(analogPortHandle);
+  auto port =
+      smartIoHandles->Get(analogPortHandle, HAL_HandleEnum::AnalogInput);
   if (port == nullptr) {
     return;
+  }
+
+  smartIoHandles->Free(analogPortHandle, HAL_HandleEnum::AnalogInput);
+
+  // Wait for no other object to hold this handle.
+  auto start = hal::fpga_clock::now();
+  while (port.use_count() != 1) {
+    auto current = hal::fpga_clock::now();
+    if (start + std::chrono::seconds(1) < current) {
+      std::puts("DIO handle free timeout");
+      std::fflush(stdout);
+      break;
+    }
+    std::this_thread::yield();
   }
   SimAnalogInData[port->channel].initialized = false;
 }
@@ -68,12 +82,12 @@ HAL_Bool HAL_CheckAnalogModule(int32_t module) {
 }
 
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
-  return channel < kNumAnalogInputs && channel >= 0;
+  return channel < kNumSmartIo && channel >= 0;
 }
 
 void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,
                                  HAL_SimDeviceHandle device) {
-  auto port = analogInputHandles->Get(handle);
+  auto port = smartIoHandles->Get(handle, HAL_HandleEnum::AnalogInput);
   if (port == nullptr) {
     return;
   }
@@ -84,58 +98,39 @@ void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // No op
 }
 double HAL_GetAnalogSampleRate(int32_t* status) {
-  return kDefaultSampleRate;
+  return 0;
 }
 void HAL_SetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
                               int32_t bits, int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-
-  SimAnalogInData[port->channel].averageBits = bits;
+  *status = HAL_HANDLE_ERROR;
+  return;
 }
 int32_t HAL_GetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
                                  int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-
-  return SimAnalogInData[port->channel].averageBits;
+  *status = HAL_HANDLE_ERROR;
+  return 0;
 }
 void HAL_SetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
                                  int32_t bits, int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-
-  SimAnalogInData[port->channel].oversampleBits = bits;
+  *status = HAL_HANDLE_ERROR;
+  return;
 }
 int32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
                                     int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-
-  return SimAnalogInData[port->channel].oversampleBits;
+  *status = HAL_HANDLE_ERROR;
+  return 0;
 }
 int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
                            int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
+  auto port =
+      smartIoHandles->Get(analogPortHandle, HAL_HandleEnum::AnalogInput);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
 
   double voltage = SimAnalogInData[port->channel].voltage;
-  return HAL_GetAnalogVoltsToValue(analogPortHandle, voltage, status);
+  return (voltage / 3.3) * 4095.0;
 }
 int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analogPortHandle,
                                   int32_t* status) {
@@ -144,23 +139,13 @@ int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analogPortHandle,
 }
 int32_t HAL_GetAnalogVoltsToValue(HAL_AnalogInputHandle analogPortHandle,
                                   double voltage, int32_t* status) {
-  if (voltage > 5.0) {
-    voltage = 5.0;
-    *status = VOLTAGE_OUT_OF_RANGE;
-  }
-  if (voltage < 0.0) {
-    voltage = 0.0;
-    *status = VOLTAGE_OUT_OF_RANGE;
-  }
-  int32_t LSBWeight = HAL_GetAnalogLSBWeight(analogPortHandle, status);
-  int32_t offset = HAL_GetAnalogOffset(analogPortHandle, status);
-  int32_t value =
-      static_cast<int32_t>((voltage + offset * 1.0e-9) / (LSBWeight * 1.0e-9));
-  return value;
+                                    *status = HAL_HANDLE_ERROR;
+                                    return 0;
 }
 double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
                             int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
+  auto port =
+      smartIoHandles->Get(analogPortHandle, HAL_HandleEnum::AnalogInput);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0.0;
@@ -179,7 +164,8 @@ double HAL_GetAnalogValueToVolts(HAL_AnalogInputHandle analogPortHandle,
 
 double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
                                    int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
+  auto port =
+      smartIoHandles->Get(analogPortHandle, HAL_HandleEnum::AnalogInput);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0.0;
@@ -190,7 +176,7 @@ double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
 }
 int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
                                int32_t* status) {
-  return 1220703;
+  return 0;
 }
 int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
                             int32_t* status) {

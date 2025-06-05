@@ -84,11 +84,9 @@ void InitializeHAL() {
   InitializeSimDeviceData();
   InitializeAddressableLED();
   InitializeAnalogInput();
-  InitializeAnalogInternal();
   InitializeCAN();
   InitializeConstants();
   InitializeCounter();
-  InitializeDigitalInternal();
   InitializeDIO();
   InitializeDutyCycle();
   InitializeDriverStation();
@@ -104,6 +102,7 @@ void InitializeHAL() {
   InitializeCTREPCM();
   InitializeREVPH();
   InitializePWM();
+  InitializeSmartIo();
   InitializeSerialPort();
   InitializeSimDevice();
   InitializeThreads();
