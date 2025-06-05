@@ -396,6 +396,23 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
     return new Pose2d(m_translation.toTranslation2d(), m_rotation.toRotation2d());
   }
 
+
+  /**
+   * Returns the nearest Pose3d from a list of poses. If two or more poses in the list have the same
+   * distance from this pose, return the one with the closest rotation component.
+   *
+   * @param poses The list of poses to find the nearest.
+   * @return The nearest Pose2d from the list.
+   */
+  public Pose3d nearest(List<Pose3d> poses) {
+    return Collections.min(
+        poses,
+        Comparator.comparing(
+                (Pose3d other) -> this.getTranslation().getDistance(other.getTranslation()))
+            .thenComparing(
+                (Pose3d other) -> this.getRotation().minus(other.getRotation()).getAngle()));
+  }
+  
   @Override
   public String toString() {
     return String.format("Pose3d(%s, %s)", m_translation, m_rotation);
