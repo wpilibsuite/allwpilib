@@ -226,9 +226,8 @@ TEST(Pose3dTest, Nearest) {
   const Pose3d origin{0_m, 0_m, 0_m, Rotation3d{}};
 
   // Distance sort
-  // poses are in order of closest to farthest away from the origin at 
+  // poses are in order of closest to farthest away from the origin at
   // various positions in 3D space.
-
   const Pose3d pose1{1_m, 0_m, 0_m, Rotation3d{}};
   const Pose3d pose2{0_m, 2_m, 0_m, Rotation3d{}};
   const Pose3d pose3{0_m, 0_m, 3_m, Rotation3d{}};
