@@ -330,7 +330,7 @@ class Pose3dTest {
     var origin = Pose3d.kZero;
   
     // Distance sort
-    // each poseX is X units away from the origin at various positions in 3D space.
+    // poses are in order of closest to farthest away from the origin at various positions in 3D space.
     final var pose1 = new Pose3d(1, 0, 0, Rotation3d.kZero);
     final var pose2 = new Pose3d(0, 2, 0, Rotation3d.kZero);
     final var pose3 = new Pose3d(0, 0, 3, Rotation3d.kZero);
