@@ -24,6 +24,7 @@ extern void InitializeAnalogOutData();
 extern void InitializeAnalogTriggerData();
 extern void InitializeCanData();
 extern void InitializeCANAPI();
+extern void InitializeCAN2027API();
 extern void InitializeDigitalPWMData();
 extern void InitializeDutyCycleData();
 extern void InitializeDIOData();

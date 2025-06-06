@@ -74,6 +74,7 @@ void InitializeHAL() {
   InitializeAnalogTrigger();
   InitializeCAN();
   InitializeCANAPI();
+  InitializeCAN2027API();
   InitializeConstants();
   InitializeCounter();
   InitializeDigitalInternal();

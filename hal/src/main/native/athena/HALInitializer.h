@@ -28,6 +28,7 @@ extern void InitializeAnalogOutput();
 extern void InitializeAnalogTrigger();
 extern void InitializeCAN();
 extern void InitializeCANAPI();
+extern void InitializeCAN2027API();
 extern void InitializeConstants();
 extern void InitializeCounter();
 extern void InitializeDigitalInternal();
