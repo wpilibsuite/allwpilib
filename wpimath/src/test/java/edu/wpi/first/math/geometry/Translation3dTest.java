@@ -9,10 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import java.util.List;
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class Translation3dTest {
@@ -209,7 +208,6 @@ class Translation3dTest {
     assertEquals(vec, translation.toVector());
   }
 
-  
   @Test
   void testNearest() {
     var origin = Translation3d.kZero;

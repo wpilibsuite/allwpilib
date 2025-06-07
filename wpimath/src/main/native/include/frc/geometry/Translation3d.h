@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <algorithm>
+#include <initializer_list>
+#include <span>
+
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
@@ -242,7 +246,7 @@ class WPILIB_DLLEXPORT Translation3d {
     return units::math::abs(m_x - other.m_x) < 1E-9_m &&
            units::math::abs(m_y - other.m_y) < 1E-9_m &&
            units::math::abs(m_z - other.m_z) < 1E-9_m;
-
+  }
 
   /**
    * Returns the nearest Translation3d from a collection of translations
