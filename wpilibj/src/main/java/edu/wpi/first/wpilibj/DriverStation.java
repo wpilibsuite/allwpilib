@@ -133,27 +133,26 @@ public final class DriverStation {
     POVDirection(int value) {
       this.value = (byte) value;
     }
-  }
 
-  /**
-   * Gets the angle of a POVDirection.
-   *
-   * @param angle The POVDirection to convert.
-   * @return The angle clockwise from straight up, or Optional.empty() if the POVDirection is
-   *     Center.
-   */
-  public static Optional<Rotation2d> getAngle(POVDirection angle) {
-    return switch (angle) {
-      case Center -> Optional.empty();
-      case Up -> Optional.of(Rotation2d.fromDegrees(0));
-      case UpRight -> Optional.of(Rotation2d.fromDegrees(45));
-      case Right -> Optional.of(Rotation2d.fromDegrees(90));
-      case DownRight -> Optional.of(Rotation2d.fromDegrees(135));
-      case Down -> Optional.of(Rotation2d.fromDegrees(180));
-      case DownLeft -> Optional.of(Rotation2d.fromDegrees(225));
-      case Left -> Optional.of(Rotation2d.fromDegrees(270));
-      case UpLeft -> Optional.of(Rotation2d.fromDegrees(315));
-    };
+    /**
+     * Gets the angle of a POVDirection.
+     *
+     * @return The angle clockwise from straight up, or Optional.empty() if this POVDirection is
+     *     Center.
+     */
+    public Optional<Rotation2d> getAngle() {
+      return switch (this) {
+        case Center -> Optional.empty();
+        case Up -> Optional.of(Rotation2d.fromDegrees(0));
+        case UpRight -> Optional.of(Rotation2d.fromDegrees(45));
+        case Right -> Optional.of(Rotation2d.fromDegrees(90));
+        case DownRight -> Optional.of(Rotation2d.fromDegrees(135));
+        case Down -> Optional.of(Rotation2d.fromDegrees(180));
+        case DownLeft -> Optional.of(Rotation2d.fromDegrees(225));
+        case Left -> Optional.of(Rotation2d.fromDegrees(270));
+        case UpLeft -> Optional.of(Rotation2d.fromDegrees(315));
+      };
+    }
   }
 
   private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
