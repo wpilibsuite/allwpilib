@@ -270,6 +270,56 @@ class WPILIB_DLLEXPORT Pose3d {
     return Pose2d{m_translation.X(), m_translation.Y(), m_rotation.Z()};
   }
 
+  /**
+   * Returns the nearest Pose3d from a collection of poses.
+   *
+   * If two or more poses in the collection have the same distance from this
+   * pose, return the one with the closest rotation component.
+   *
+   * @param poses The collection of poses.
+   * @return The nearest Pose3d from the collection.
+   */
+  constexpr Pose3d Nearest(std::span<const Pose3d> poses) const {
+    return *std::min_element(
+        poses.begin(), poses.end(), [this](const Pose3d& a, const Pose3d& b) {
+          auto aDistance = this->Translation().Distance(a.Translation());
+          auto bDistance = this->Translation().Distance(b.Translation());
+
+          // If the distances are equal sort by difference in rotation
+          if (aDistance == bDistance) {
+            return gcem::abs(
+                       (this->Rotation() - a.Rotation()).Angle().value()) <
+                   gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
+          }
+          return aDistance < bDistance;
+        });
+  }
+
+  /**
+   * Returns the nearest Pose3d from a collection of poses.
+   *
+   * If two or more poses in the collection have the same distance from this
+   * pose, return the one with the closest rotation component.
+   *
+   * @param poses The collection of poses.
+   * @return The nearest Pose3d from the collection.
+   */
+  constexpr Pose3d Nearest(std::initializer_list<Pose3d> poses) const {
+    return *std::min_element(
+        poses.begin(), poses.end(), [this](const Pose3d& a, const Pose3d& b) {
+          auto aDistance = this->Translation().Distance(a.Translation());
+          auto bDistance = this->Translation().Distance(b.Translation());
+
+          // If the distances are equal sort by difference in rotation
+          if (aDistance == bDistance) {
+            return gcem::abs(
+                       (this->Rotation() - a.Rotation()).Angle().value()) <
+                   gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
+          }
+          return aDistance < bDistance;
+        });
+  }
+
  private:
   Translation3d m_translation;
   Rotation3d m_rotation;
