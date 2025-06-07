@@ -108,6 +108,35 @@ public final class MathUtil {
   }
 
   /**
+   * Applies a power curve to the input value while preserving its sign. The input is first
+   * normalized to the range [-1, 1] from [-maxMagnitude, maxMagnitude], then raised to the given
+   * exponent, and finally rescaled to the original magnitude range. The value stays within
+   * [-maxMagnitude, maxMagnitude].
+   *
+   * <p>This is useful for applying smoother or more aggressive control response curves (e.g.
+   * joystick input shaping).
+   *
+   * @param value The input value to transform.
+   * @param exponent The exponent to apply (1.0 = linear, 2.0 = squared curve). Must be positive.
+   * @param maxMagnitude The maximum expected absolute value of input. Must be positive.
+   * @return The transformed value with the same sign and scaled to the input range.
+   */
+  public static double applyPowerCurve(double value, double exponent, double maxMagnitude) {
+    return Math.copySign(Math.pow(Math.abs(value) / maxMagnitude, exponent), value) * maxMagnitude;
+  }
+
+  /**
+   * Applies a power curve to the input value while preserving its sign.
+   *
+   * @param value The input value to transform.
+   * @param exponent The exponent to apply.
+   * @return The transformed value with the same sign.
+   */
+  public static double applyPowerCurve(double value, double exponent) {
+    return applyPowerCurve(value, exponent, 1);
+  }
+
+  /**
    * Returns modulus of input.
    *
    * @param input Input value to wrap.
