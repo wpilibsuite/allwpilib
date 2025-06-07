@@ -100,6 +100,8 @@ class DriverStation final {
         return Rotation2d{270_deg};
       case kUpLeft:
         return Rotation2d{315_deg};
+      default:
+        return std::nullopt;
     }
   }
 
