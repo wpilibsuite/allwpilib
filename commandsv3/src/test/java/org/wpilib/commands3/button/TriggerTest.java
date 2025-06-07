@@ -127,4 +127,34 @@ class TriggerTest {
     scheduler.run();
     assertFalse(scheduler.isRunning(command));
   }
+
+  @Test
+  void commandScoping() {
+    var innerRan = new AtomicBoolean(false);
+    var innerSignal = new AtomicBoolean(false);
+
+    var inner = Command.noRequirements(co -> {
+      while (true) {
+        innerRan.set(true);
+        co.park();
+      }
+    }).named("Inner");
+
+    var outer = Command.noRequirements(co -> {
+      new Trigger(scheduler, innerSignal::get).onTrue(inner);
+      co.yield();
+    }).named("Outer");
+
+    scheduler.schedule(outer);
+    scheduler.run();
+    assertFalse(innerRan.get(), "The bound command should not run before the signal is set");
+
+    innerSignal.set(true);
+    scheduler.run();
+    assertTrue(innerRan.get(), "The nested trigger should have run the bound command");
+
+    innerRan.set(false);
+    scheduler.run();
+    assertFalse(innerRan.get(), "Trigger should not have fired again");
+  }
 }
