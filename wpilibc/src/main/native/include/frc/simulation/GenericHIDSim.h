@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include "frc/DriverStation.h"
 #include "frc/GenericHID.h"
 
 namespace frc {
@@ -60,14 +61,14 @@ class GenericHIDSim {
    * @param pov the POV to set
    * @param value the new value
    */
-  void SetPOV(int pov, int value);
+  void SetPOV(int pov, DriverStation::POVDirection value);
 
   /**
    * Set the value of the default POV (port 0).
    *
    * @param value the new value
    */
-  void SetPOV(int value);
+  void SetPOV(DriverStation::POVDirection value);
 
   /**
    * Set the axis count of this device.

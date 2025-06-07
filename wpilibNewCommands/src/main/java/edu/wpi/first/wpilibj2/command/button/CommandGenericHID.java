@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj2.command.button;
 
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.wpilibj.DriverStation.POVDirection;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -74,121 +75,115 @@ public class CommandGenericHID {
    * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
    * loop}.
    *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
-   * upper-left is 315).
-   *
-   * @param angle POV angle in degrees, or -1 for the center / not pressed.
+   * @param angle POV angle.
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
-  public Trigger pov(int angle) {
+  public Trigger pov(POVDirection angle) {
     return pov(0, angle, CommandScheduler.getInstance().getDefaultButtonLoop());
   }
 
   /**
    * Constructs a Trigger instance based around this angle of a POV on the HID.
    *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
-   * upper-left is 315).
-   *
    * @param pov index of the POV to read (starting at 0). Defaults to 0.
-   * @param angle POV angle in degrees, or -1 for the center / not pressed.
+   * @param angle POV angle.
    * @param loop the event loop instance to attach the event to. Defaults to {@link
    *     CommandScheduler#getDefaultButtonLoop() the default command scheduler button loop}.
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
-  public Trigger pov(int pov, int angle, EventLoop loop) {
+  public Trigger pov(int pov, POVDirection angle, EventLoop loop) {
     var cache = m_povCache.computeIfAbsent(loop, k -> new HashMap<>());
-    // angle can be -1, so use 3600 instead of 360
+    // angle.value is a 4 bit bitfield
     return cache.computeIfAbsent(
-        pov * 3600 + angle, k -> new Trigger(loop, () -> m_hid.getPOV(pov) == angle));
+        pov * 16 + angle.value, k -> new Trigger(loop, () -> m_hid.getPOV(pov) == angle));
   }
 
   /**
-   * Constructs a Trigger instance based around the 0 degree angle (up) of the default (index 0) POV
+   * Constructs a Trigger instance based around the up direction of the default (index 0) POV on the
+   * HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler
+   * button loop}.
+   *
+   * @return a Trigger instance based around the up direction of a POV on the HID.
+   */
+  public Trigger povUp() {
+    return pov(POVDirection.Up);
+  }
+
+  /**
+   * Constructs a Trigger instance based around the up right direction of the default (index 0) POV
    * on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
    * scheduler button loop}.
    *
-   * @return a Trigger instance based around the 0 degree angle of a POV on the HID.
-   */
-  public Trigger povUp() {
-    return pov(0);
-  }
-
-  /**
-   * Constructs a Trigger instance based around the 45 degree angle (right up) of the default (index
-   * 0) POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default
-   * command scheduler button loop}.
-   *
-   * @return a Trigger instance based around the 45 degree angle of a POV on the HID.
+   * @return a Trigger instance based around the up right direction of a POV on the HID.
    */
   public Trigger povUpRight() {
-    return pov(45);
+    return pov(POVDirection.UpRight);
   }
 
   /**
-   * Constructs a Trigger instance based around the 90 degree angle (right) of the default (index 0)
-   * POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * Constructs a Trigger instance based around the right direction of the default (index 0) POV on
+   * the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
    * scheduler button loop}.
    *
-   * @return a Trigger instance based around the 90 degree angle of a POV on the HID.
+   * @return a Trigger instance based around the right direction of a POV on the HID.
    */
   public Trigger povRight() {
-    return pov(90);
+    return pov(POVDirection.Right);
   }
 
   /**
-   * Constructs a Trigger instance based around the 135 degree angle (right down) of the default
-   * (index 0) POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the
-   * default command scheduler button loop}.
+   * Constructs a Trigger instance based around the down right direction of the default (index 0)
+   * POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
    *
-   * @return a Trigger instance based around the 135 degree angle of a POV on the HID.
+   * @return a Trigger instance based around the down right direction of a POV on the HID.
    */
   public Trigger povDownRight() {
-    return pov(135);
+    return pov(POVDirection.DownRight);
   }
 
   /**
-   * Constructs a Trigger instance based around the 180 degree angle (down) of the default (index 0)
-   * POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * Constructs a Trigger instance based around the down direction of the default (index 0) POV on
+   * the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
    * scheduler button loop}.
    *
-   * @return a Trigger instance based around the 180 degree angle of a POV on the HID.
+   * @return a Trigger instance based around the down direction of a POV on the HID.
    */
   public Trigger povDown() {
-    return pov(180);
+    return pov(POVDirection.Down);
   }
 
   /**
-   * Constructs a Trigger instance based around the 225 degree angle (down left) of the default
-   * (index 0) POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the
-   * default command scheduler button loop}.
-   *
-   * @return a Trigger instance based around the 225 degree angle of a POV on the HID.
-   */
-  public Trigger povDownLeft() {
-    return pov(225);
-  }
-
-  /**
-   * Constructs a Trigger instance based around the 270 degree angle (left) of the default (index 0)
+   * Constructs a Trigger instance based around the down left POV direction of the default (index 0)
    * POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
    * scheduler button loop}.
    *
-   * @return a Trigger instance based around the 270 degree angle of a POV on the HID.
+   * @return a Trigger instance based around the down left POV direction of a POV on the HID.
    */
-  public Trigger povLeft() {
-    return pov(270);
+  public Trigger povDownLeft() {
+    return pov(POVDirection.DownLeft);
   }
 
   /**
-   * Constructs a Trigger instance based around the 315 degree angle (left up) of the default (index
-   * 0) POV on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default
-   * command scheduler button loop}.
+   * Constructs a Trigger instance based around the left direction of the default (index 0) POV on
+   * the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
    *
-   * @return a Trigger instance based around the 315 degree angle of a POV on the HID.
+   * @return a Trigger instance based around the left direction of a POV on the HID.
+   */
+  public Trigger povLeft() {
+    return pov(POVDirection.Left);
+  }
+
+  /**
+   * Constructs a Trigger instance based around the up left direction of the default (index 0) POV
+   * on the HID, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   *
+   * @return a Trigger instance based around the up left direction of a POV on the HID.
    */
   public Trigger povUpLeft() {
-    return pov(315);
+    return pov(POVDirection.UpLeft);
   }
 
   /**
@@ -199,7 +194,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around the center position of a POV on the HID.
    */
   public Trigger povCenter() {
-    return pov(-1);
+    return pov(POVDirection.Center);
   }
 
   /**
