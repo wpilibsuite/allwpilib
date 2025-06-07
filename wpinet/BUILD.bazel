@@ -122,6 +122,9 @@ cc_library(
         ":tcpsockets-srcs",
     ] + ["native-srcs"],
     hdrs = glob(["src/main/native/include/**/*"]),
+    implementation_deps = [
+        ":private_includes",
+    ],
     includes = ["src/main/native/include"],
     linkopts = select({
         "@bazel_tools//src/conditions:linux": ["-ldl"],
@@ -131,7 +134,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":libuv-headers",
-        ":private_includes",
         ":tcpsockets-headers",
         "//wpiutil:wpiutil.static",
     ],
@@ -169,6 +171,7 @@ cc_test(
     ]),
     tags = ["no-asan"],
     deps = [
+        ":private_includes",
         ":wpinet.static",
         "//thirdparty/googletest:googletest.static",
         "//wpiutil:wpiutil-testlib",

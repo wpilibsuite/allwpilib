@@ -108,9 +108,9 @@ int32_t HAL_GetDutyCycleHighTime(HAL_DutyCycleHandle dutyCycleHandle,
     return false;
   }
 
-  uint16_t ret = false;
+  uint16_t ret = 0;
   *status = port->GetPwmInputMicroseconds(&ret);
-  return ret;
+  return static_cast<int32_t>(ret) * 1000;
 }
 
 int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,

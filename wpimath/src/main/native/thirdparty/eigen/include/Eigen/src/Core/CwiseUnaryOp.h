@@ -60,8 +60,8 @@ class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit CwiseUnaryOp(const XprType& xpr, const UnaryOp& func = UnaryOp())
       : m_xpr(xpr), m_functor(func) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT { return m_xpr.rows(); }
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return m_xpr.cols(); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index rows() const noexcept { return m_xpr.rows(); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index cols() const noexcept { return m_xpr.cols(); }
 
   /** \returns the functor representing the unary operation */
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const UnaryOp& functor() const { return m_functor; }

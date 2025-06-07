@@ -4,6 +4,8 @@
 
 #include "wpinet/MulticastServiceResolver.h"
 
+#include <arpa/inet.h>
+
 #include <memory>
 #include <string>
 #include <utility>
@@ -42,6 +44,26 @@ MulticastServiceResolver::~MulticastServiceResolver() noexcept {
 
 bool MulticastServiceResolver::HasImplementation() const {
   return pImpl->table.IsValid();
+}
+
+bool MulticastServiceResolver::SetCopyCallback(
+    std::function<bool(const ServiceData&)> callback) {
+  std::scoped_lock lock{*pImpl->thread};
+  if (pImpl->client) {
+    return false;
+  }
+  copyCallback = std::move(callback);
+  return true;
+}
+
+bool MulticastServiceResolver::SetMoveCallback(
+    std::function<void(ServiceData&&)> callback) {
+  std::scoped_lock lock{*pImpl->thread};
+  if (pImpl->client) {
+    return false;
+  }
+  moveCallback = std::move(callback);
+  return true;
 }
 
 static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
@@ -83,8 +105,8 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
         outputHostName.append(".");
       } while (true);
 
-      data.ipv4Address = address->data.ipv4.address;
-      data.port = port;
+      data.ipv4Address = ntohl(address->data.ipv4.address);
+      data.port = ntohs(port);
       data.serviceName = name;
       data.hostName = std::string{outputHostName};
 

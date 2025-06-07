@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <portable-file-dialogs.h>
-
 #include <functional>
 #include <memory>
 #include <vector>
+
+#include <portable-file-dialogs.h>
 
 namespace glass {
 

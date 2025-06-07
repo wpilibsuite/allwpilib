@@ -1,39 +1,33 @@
 #!/usr/bin/env python3
 
-import os
 import shutil
+from pathlib import Path
 
-from upstream_utils import Lib, copy_to, walk_if
+from upstream_utils import Lib, copy_to, has_prefix, walk_cwd_and_copy_if
 
-nanopb_sources = set(
-    [
-        "pb_encode.c",
-        "pb_decode.c",
-        "pb_common.c",
-    ]
-)
+nanopb_sources = [
+    Path("pb_encode.c"),
+    Path("pb_decode.c"),
+    Path("pb_common.c"),
+]
 
-nanopb_headers = set(
-    [
-        "pb.h",
-        "pb_encode.h",
-        "pb_decode.h",
-        "pb_common.h",
-    ]
-)
+nanopb_headers = [
+    Path("pb.h"),
+    Path("pb_encode.h"),
+    Path("pb_decode.h"),
+    Path("pb_common.h"),
+]
 
-nanopb_generator = set(
-    [
-        "pb.h",
-        "pb_encode.h",
-        "pb_decode.h",
-        "pb_common.h",
-    ]
-)
+nanopb_generator = [
+    Path("pb.h"),
+    Path("pb_encode.h"),
+    Path("pb_decode.h"),
+    Path("pb_common.h"),
+]
 
 
-def copy_upstream_src(wpilib_root):
-    wpiutil = os.path.join(wpilib_root, "wpiutil")
+def copy_upstream_src(wpilib_root: Path):
+    wpiutil = wpilib_root / "wpiutil"
 
     # Delete old install
     for d in [
@@ -41,25 +35,24 @@ def copy_upstream_src(wpilib_root):
         "src/main/native/thirdparty/nanopb/include",
         "src/main/native/thirdparty/nanopb/generator",
     ]:
-        shutil.rmtree(os.path.join(wpiutil, d), ignore_errors=True)
+        shutil.rmtree(wpiutil / d, ignore_errors=True)
 
     # Copy nanopb source files into allwpilib
     copy_to(
         nanopb_sources,
-        os.path.join(wpiutil, "src/main/native/thirdparty/nanopb/src"),
+        wpiutil / "src/main/native/thirdparty/nanopb/src",
         rename_c_to_cpp=True,
     )
 
     # Copy nanopb header files into allwpilib
     copy_to(
         nanopb_headers,
-        os.path.join(wpiutil, "src/main/native/thirdparty/nanopb/include"),
+        wpiutil / "src/main/native/thirdparty/nanopb/include",
     )
 
-    generator_files = walk_if("generator", lambda dp, f: True)
-    copy_to(
-        generator_files,
-        os.path.join(wpiutil, "src/main/native/thirdparty/nanopb"),
+    generator_files = walk_cwd_and_copy_if(
+        lambda dp, f: has_prefix(dp, Path("generator")),
+        wpiutil / "src/main/native/thirdparty/nanopb",
     )
 
 

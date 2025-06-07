@@ -16,7 +16,7 @@ std::string frc::filesystem::GetLaunchDirectory() {
 
 std::string frc::filesystem::GetOperatingDirectory() {
   if constexpr (!RobotBase::IsSimulation()) {
-    return "/home/lvuser";
+    return "/home/systemcore";
   } else {
     return frc::filesystem::GetLaunchDirectory();
   }
@@ -24,7 +24,7 @@ std::string frc::filesystem::GetOperatingDirectory() {
 
 std::string frc::filesystem::GetDeployDirectory() {
   if constexpr (!RobotBase::IsSimulation()) {
-    return "/home/lvuser/deploy";
+    return "/home/systemcore/deploy";
   } else {
     return (fs::current_path() / "src" / "main" / "deploy").string();
   }

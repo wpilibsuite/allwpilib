@@ -68,8 +68,16 @@ COMMANDS_V2_FOLDERS = [
 ]
 
 SNIPPETS_FOLDERS = [
+    "AnalogAccelerometer",
+    "AnalogEncoder",
+    "AnalogInput",
+    "AnalogPotentiometer",
+    "DigitalInput",
     "DutyCycleEncoder",
     "Encoder",
+    "EncoderDrive",
+    "EncoderHoming",
+    "LimitSwitch",
 ]
 
 TEMPLATES_FOLDERS = [

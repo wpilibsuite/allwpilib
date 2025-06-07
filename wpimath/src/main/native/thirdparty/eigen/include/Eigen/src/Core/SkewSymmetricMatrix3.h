@@ -66,7 +66,7 @@ class SkewSymmetricBase : public EigenBase<Derived> {
   EIGEN_DEVICE_FUNC DenseMatrixType toDenseMatrix() const { return derived(); }
 
   /** Determinant vanishes */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Scalar determinant() const { return 0; }
+  EIGEN_DEVICE_FUNC constexpr Scalar determinant() const { return 0; }
 
   /** A.transpose() = -A */
   EIGEN_DEVICE_FUNC PlainObject transpose() const { return (-vector()).asSkewSymmetric(); }
@@ -91,9 +91,9 @@ class SkewSymmetricBase : public EigenBase<Derived> {
   EIGEN_DEVICE_FUNC inline SkewSymmetricVectorType& vector() { return derived().vector(); }
 
   /** \returns the number of rows. */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const { return 3; }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const { return 3; }
   /** \returns the number of columns. */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const { return 3; }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const { return 3; }
 
   /** \returns the matrix product of \c *this by the dense matrix, \a matrix */
   template <typename MatrixDerived>
@@ -321,7 +321,7 @@ bool MatrixBase<Derived>::isSkewSymmetric(const RealScalar& prec) const {
   return (this->transpose() + *this).isZero(prec);
 }
 
-/** \returns the matrix product of \c *this by the skew symmetric matrix \skew.
+/** \returns the matrix product of \c *this by the skew symmetric matrix \a skew.
  */
 template <typename Derived>
 template <typename SkewDerived>

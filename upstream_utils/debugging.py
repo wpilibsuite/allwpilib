@@ -1,26 +1,25 @@
 #!/usr/bin/env python3
 
-import os
 import shutil
+from pathlib import Path
 
-from upstream_utils import Lib, walk_cwd_and_copy_if
+from upstream_utils import Lib, has_prefix, walk_cwd_and_copy_if
 
 
-def copy_upstream_src(wpilib_root):
-    wpiutil = os.path.join(wpilib_root, "wpiutil")
+def copy_upstream_src(wpilib_root: Path):
+    wpiutil = wpilib_root / "wpiutil"
 
     # Delete old install
     for d in [
         "src/main/native/thirdparty/debugging/src",
         "src/main/native/thirdparty/debugging/include",
     ]:
-        shutil.rmtree(os.path.join(wpiutil, d), ignore_errors=True)
+        shutil.rmtree(wpiutil / d, ignore_errors=True)
 
     # Copy debugging files into allwpilib
     filenames = walk_cwd_and_copy_if(
-        lambda dp, f: dp.startswith(os.path.join(".", "src"))
-        or dp.startswith(os.path.join(".", "include")),
-        os.path.join(wpiutil, "src/main/native/thirdparty/debugging"),
+        lambda dp, f: has_prefix(dp, Path("src")) or has_prefix(dp, Path("include")),
+        wpiutil / "src/main/native/thirdparty/debugging",
     )
 
     for filename in filenames:

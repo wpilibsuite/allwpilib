@@ -153,6 +153,14 @@ void ServerImpl::SendOutgoing(int clientId, uint64_t curTimeMs) {
   }
 }
 
+void ServerImpl::SendAllLocalOutgoing(uint64_t curTimeMs) {
+  for (auto&& client : m_clients) {
+    if (client && client->IsLocal()) {
+      client->SendOutgoing(curTimeMs, true);
+    }
+  }
+}
+
 void ServerImpl::SetLocal(net::ServerMessageHandler* local,
                           net::ClientMessageQueue* queue) {
   DEBUG4("SetLocal()");

@@ -134,7 +134,7 @@ class SimplicialCholeskyBase : public SparseSolverBase<Derived> {
       << "\n";
     s << "  tree:     " << ((total += m_parent.size() * sizeof(int)) >> 20) << "Mb"
       << "\n";
-    s << "  nonzeros: " << ((total += m_nonZerosPerCol.size() * sizeof(int)) >> 20) << "Mb"
+    s << "  nonzeros: " << ((total += m_workSpace.size() * sizeof(int)) >> 20) << "Mb"
       << "\n";
     s << "  perm:     " << ((total += m_P.size() * sizeof(int)) >> 20) << "Mb"
       << "\n";
@@ -240,7 +240,7 @@ class SimplicialCholeskyBase : public SparseSolverBase<Derived> {
   CholMatrixType m_matrix;
   VectorType m_diag;  // the diagonal coefficients (LDLT mode)
   VectorI m_parent;   // elimination tree
-  VectorI m_nonZerosPerCol;
+  VectorI m_workSpace;
   PermutationMatrix<Dynamic, Dynamic, StorageIndex> m_P;     // the permutation
   PermutationMatrix<Dynamic, Dynamic, StorageIndex> m_Pinv;  // the inverse permutation
 
@@ -830,7 +830,7 @@ void SimplicialCholeskyBase<Derived>::ordering(const MatrixType& a, ConstCholMat
   const Index size = a.rows();
   pmat = &ap;
   // Note that ordering methods compute the inverse permutation
-  if (!internal::is_same<OrderingType, NaturalOrdering<Index> >::value) {
+  if (!internal::is_same<OrderingType, NaturalOrdering<StorageIndex> >::value) {
     {
       CholMatrixType C;
       internal::permute_symm_to_fullsymm<UpLo, NonHermitian>(a, C, NULL);

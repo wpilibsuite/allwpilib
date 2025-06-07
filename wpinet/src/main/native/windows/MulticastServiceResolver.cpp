@@ -65,9 +65,31 @@ bool MulticastServiceResolver::HasImplementation() const {
   return pImpl->dynamicDns.CanDnsResolve;
 }
 
+bool MulticastServiceResolver::SetCopyCallback(
+    std::function<bool(const ServiceData&)> callback) {
+  if (pImpl->serviceCancel.reserved != nullptr) {
+    return false;
+  }
+  copyCallback = std::move(callback);
+  return true;
+}
+
+bool MulticastServiceResolver::SetMoveCallback(
+    std::function<void(ServiceData&&)> callback) {
+  if (pImpl->serviceCancel.reserved != nullptr) {
+    return false;
+  }
+  moveCallback = std::move(callback);
+  return true;
+}
+
 static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
     DnsCompletion(_In_ PVOID pQueryContext,
                   _Inout_ PDNS_QUERY_RESULT pQueryResults) {
+  if (pQueryResults->QueryStatus != ERROR_SUCCESS) {
+    return;
+  }
+
   MulticastServiceResolver::Impl* impl =
       reinterpret_cast<MulticastServiceResolver::Impl*>(pQueryContext);
 
@@ -167,8 +189,8 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
         wpi::convertUTF16ToUTF8String(wideServiceName, storage);
 
         data.serviceName = std::string{storage};
-        data.port = foundSrv->Data.Srv.wPort;
-        data.ipv4Address = A->Data.A.IpAddress;
+        data.port = ntohs(foundSrv->Data.Srv.wPort);
+        data.ipv4Address = ntohl(A->Data.A.IpAddress);
 
         impl->onFound(std::move(data));
       }

@@ -118,7 +118,6 @@ class SparseMatrixBase : public EigenBase<Derived> {
   // FIXME storage order do not match evaluator storage order
   typedef SparseMatrix<Scalar, Flags & RowMajorBit ? RowMajor : ColMajor, StorageIndex> PlainObject;
 
-#ifndef EIGEN_PARSED_BY_DOXYGEN
   /** This is the "real scalar" type; if the \a Scalar type is already real numbers
    * (e.g. int, float or double) then \a RealScalar is just the same as \a Scalar. If
    * \a Scalar is \a std::complex<T> then RealScalar is \a T.
@@ -127,6 +126,7 @@ class SparseMatrixBase : public EigenBase<Derived> {
    */
   typedef typename NumTraits<Scalar>::Real RealScalar;
 
+#ifndef EIGEN_PARSED_BY_DOXYGEN
   /** \internal the return type of coeff()
    */
   typedef std::conditional_t<HasDirectAccess_, const Scalar&, Scalar> CoeffReturnType;

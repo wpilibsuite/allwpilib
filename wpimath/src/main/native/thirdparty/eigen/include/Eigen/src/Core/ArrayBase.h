@@ -81,9 +81,6 @@ class ArrayBase : public DenseBase<Derived> {
 
   typedef typename Base::CoeffReturnType CoeffReturnType;
 
-#endif  // not EIGEN_PARSED_BY_DOXYGEN
-
-#ifndef EIGEN_PARSED_BY_DOXYGEN
   typedef typename Base::PlainObject PlainObject;
 
   /** \internal Represents a matrix with all coefficients equal to one another*/
@@ -118,19 +115,57 @@ class ArrayBase : public DenseBase<Derived> {
     return derived();
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator+=(const Scalar& scalar);
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator-=(const Scalar& scalar);
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator+=(const Scalar& other) {
+    internal::call_assignment(this->derived(), PlainObject::Constant(rows(), cols(), other),
+                              internal::add_assign_op<Scalar, Scalar>());
+    return derived();
+  }
 
-  template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator+=(const ArrayBase<OtherDerived>& other);
-  template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator-=(const ArrayBase<OtherDerived>& other);
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator-=(const Scalar& other) {
+    internal::call_assignment(this->derived(), PlainObject::Constant(rows(), cols(), other),
+                              internal::sub_assign_op<Scalar, Scalar>());
+    return derived();
+  }
 
+  /** replaces \c *this by \c *this + \a other.
+   *
+   * \returns a reference to \c *this
+   */
   template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator*=(const ArrayBase<OtherDerived>& other);
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator+=(const ArrayBase<OtherDerived>& other) {
+    call_assignment(derived(), other.derived(), internal::add_assign_op<Scalar, typename OtherDerived::Scalar>());
+    return derived();
+  }
 
+  /** replaces \c *this by \c *this - \a other.
+   *
+   * \returns a reference to \c *this
+   */
   template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator/=(const ArrayBase<OtherDerived>& other);
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator-=(const ArrayBase<OtherDerived>& other) {
+    call_assignment(derived(), other.derived(), internal::sub_assign_op<Scalar, typename OtherDerived::Scalar>());
+    return derived();
+  }
+
+  /** replaces \c *this by \c *this * \a other coefficient wise.
+   *
+   * \returns a reference to \c *this
+   */
+  template <typename OtherDerived>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator*=(const ArrayBase<OtherDerived>& other) {
+    call_assignment(derived(), other.derived(), internal::mul_assign_op<Scalar, typename OtherDerived::Scalar>());
+    return derived();
+  }
+
+  /** replaces \c *this by \c *this / \a other coefficient wise.
+   *
+   * \returns a reference to \c *this
+   */
+  template <typename OtherDerived>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator/=(const ArrayBase<OtherDerived>& other) {
+    call_assignment(derived(), other.derived(), internal::div_assign_op<Scalar, typename OtherDerived::Scalar>());
+    return derived();
+  }
 
  public:
   EIGEN_DEVICE_FUNC ArrayBase<Derived>& array() { return *this; }
@@ -172,50 +207,6 @@ class ArrayBase : public DenseBase<Derived> {
     return *this;
   }
 };
-
-/** replaces \c *this by \c *this - \a other.
- *
- * \returns a reference to \c *this
- */
-template <typename Derived>
-template <typename OtherDerived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& ArrayBase<Derived>::operator-=(const ArrayBase<OtherDerived>& other) {
-  call_assignment(derived(), other.derived(), internal::sub_assign_op<Scalar, typename OtherDerived::Scalar>());
-  return derived();
-}
-
-/** replaces \c *this by \c *this + \a other.
- *
- * \returns a reference to \c *this
- */
-template <typename Derived>
-template <typename OtherDerived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& ArrayBase<Derived>::operator+=(const ArrayBase<OtherDerived>& other) {
-  call_assignment(derived(), other.derived(), internal::add_assign_op<Scalar, typename OtherDerived::Scalar>());
-  return derived();
-}
-
-/** replaces \c *this by \c *this * \a other coefficient wise.
- *
- * \returns a reference to \c *this
- */
-template <typename Derived>
-template <typename OtherDerived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& ArrayBase<Derived>::operator*=(const ArrayBase<OtherDerived>& other) {
-  call_assignment(derived(), other.derived(), internal::mul_assign_op<Scalar, typename OtherDerived::Scalar>());
-  return derived();
-}
-
-/** replaces \c *this by \c *this / \a other coefficient wise.
- *
- * \returns a reference to \c *this
- */
-template <typename Derived>
-template <typename OtherDerived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& ArrayBase<Derived>::operator/=(const ArrayBase<OtherDerived>& other) {
-  call_assignment(derived(), other.derived(), internal::div_assign_op<Scalar, typename OtherDerived::Scalar>());
-  return derived();
-}
 
 }  // end namespace Eigen
 

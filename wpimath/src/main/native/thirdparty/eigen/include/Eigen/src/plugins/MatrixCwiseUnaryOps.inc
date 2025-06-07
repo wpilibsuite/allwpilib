@@ -60,9 +60,6 @@ EIGEN_DEVICE_FUNC inline const CwiseSqrtReturnType cwiseSqrt() const { return Cw
 
 /// \returns an expression of the coefficient-wise cube root of *this.
 ///
-/// Example: \include MatrixBase_cwiseCbrt.cpp
-/// Output: \verbinclude MatrixBase_cwiseCbrt.out
-///
 EIGEN_DOC_UNARY_ADDONS(cwiseCbrt, cube - root)
 ///
 /// \sa cwiseSqrt(), cwiseSquare(), cwisePow()

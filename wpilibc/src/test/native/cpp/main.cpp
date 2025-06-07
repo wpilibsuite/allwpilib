@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <hal/HALBase.h>
 
-#ifndef __FRC_ROBORIO__
+#ifndef __FRC_SYSTEMCORE__
 namespace frc::impl {
 void ResetMotorSafety();
 }
@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
   HAL_Initialize(500, 0);
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
-#ifndef __FRC_ROBORIO__
+#ifndef __FRC_SYSTEMCORE__
   frc::impl::ResetMotorSafety();
 #endif
   return ret;

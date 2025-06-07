@@ -38,7 +38,7 @@ class WireConnection;
 class ClientImpl final : private ServerMessageHandler {
  public:
   ClientImpl(
-      uint64_t curTimeMs, WireConnection& wire, wpi::Logger& logger,
+      uint64_t curTimeMs, WireConnection& wire, bool local, wpi::Logger& logger,
       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
           timeSyncUpdated,
       std::function<void(uint32_t repeatMs)> setPeriodic);

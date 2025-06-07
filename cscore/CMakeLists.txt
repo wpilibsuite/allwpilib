@@ -21,7 +21,7 @@ if(APPLE)
         cscore
         PROPERTIES
             LINK_FLAGS
-                "-framework CoreFoundation -framework AVFoundation -framework Foundation -framework CoreMedia -framework CoreVideo"
+                "-framework CoreFoundation -framework AVFoundation -framework Foundation -framework CoreMedia -framework CoreVideo -framework IOKit"
     )
 elseif(MSVC)
     target_sources(cscore PRIVATE ${cscore_windows_src})

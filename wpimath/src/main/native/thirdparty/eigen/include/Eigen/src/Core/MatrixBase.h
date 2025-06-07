@@ -112,7 +112,7 @@ class MatrixBase : public DenseBase<Derived> {
                              ConstTransposeReturnType>
       AdjointReturnType;
   /** \internal Return type of eigenvalues() */
-  typedef Matrix<std::complex<RealScalar>, internal::traits<Derived>::ColsAtCompileTime, 1, ColMajor>
+  typedef Matrix<internal::make_complex_t<Scalar>, internal::traits<Derived>::ColsAtCompileTime, 1, ColMajor>
       EigenvaluesReturnType;
   /** \internal the return type of identity */
   typedef CwiseNullaryOp<internal::scalar_identity_op<Scalar>, PlainObject> IdentityReturnType;
@@ -280,7 +280,7 @@ class MatrixBase : public DenseBase<Derived> {
    * \sa isApprox(), operator!= */
   template <typename OtherDerived>
   EIGEN_DEVICE_FUNC inline bool operator==(const MatrixBase<OtherDerived>& other) const {
-    return cwiseEqual(other).all();
+    return (this->rows() == other.rows()) && (this->cols() == other.cols()) && cwiseEqual(other).all();
   }
 
   /** \returns true if at least one pair of coefficients of \c *this and \a other are not exactly equal to each other.
@@ -289,7 +289,7 @@ class MatrixBase : public DenseBase<Derived> {
    * \sa isApprox(), operator== */
   template <typename OtherDerived>
   EIGEN_DEVICE_FUNC inline bool operator!=(const MatrixBase<OtherDerived>& other) const {
-    return cwiseNotEqual(other).any();
+    return !(*this == other);
   }
 
   NoAlias<Derived, Eigen::MatrixBase> EIGEN_DEVICE_FUNC noalias();
@@ -468,7 +468,7 @@ class MatrixBase : public DenseBase<Derived> {
   EIGEN_MATRIX_FUNCTION(MatrixSquareRootReturnValue, sqrt, square root)
   EIGEN_MATRIX_FUNCTION(MatrixLogarithmReturnValue, log, logarithm)
   EIGEN_MATRIX_FUNCTION_1(MatrixPowerReturnValue, pow, power to \c p, const RealScalar& p)
-  EIGEN_MATRIX_FUNCTION_1(MatrixComplexPowerReturnValue, pow, power to \c p, const std::complex<RealScalar>& p)
+  EIGEN_MATRIX_FUNCTION_1(MatrixComplexPowerReturnValue, pow, power to \c p, const internal::make_complex_t<Scalar>& p)
 
  protected:
   EIGEN_DEFAULT_COPY_CONSTRUCTOR(MatrixBase)

@@ -13,6 +13,8 @@
 
 namespace wpi {
 
+// TODO replace this with systemcore once our compiler has the defines
+// for RT
 #if defined(__FRC_ROBORIO__) && !defined(WPI_USE_PRIORITY_MUTEX)
 #define WPI_USE_PRIORITY_MUTEX
 #endif

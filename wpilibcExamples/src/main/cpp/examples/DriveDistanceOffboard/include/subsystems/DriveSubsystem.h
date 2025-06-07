@@ -82,7 +82,6 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * @param distance The distance to drive forward.
    * @return A command.
    */
-  [[nodiscard]]
   frc2::CommandPtr ProfiledDriveDistance(units::meter_t distance);
 
   /**
@@ -92,7 +91,6 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * @param distance The distance to drive forward.
    * @return A command.
    */
-  [[nodiscard]]
   frc2::CommandPtr DynamicProfiledDriveDistance(units::meter_t distance);
 
  private:

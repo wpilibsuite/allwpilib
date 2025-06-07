@@ -216,8 +216,8 @@ struct triangular_solve_retval : public ReturnByValue<triangular_solve_retval<Si
 
   triangular_solve_retval(const TriangularType& tri, const Rhs& rhs) : m_triangularMatrix(tri), m_rhs(rhs) {}
 
-  inline EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT { return m_rhs.rows(); }
-  inline EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return m_rhs.cols(); }
+  constexpr Index rows() const noexcept { return m_rhs.rows(); }
+  constexpr Index cols() const noexcept { return m_rhs.cols(); }
 
   template <typename Dest>
   inline void evalTo(Dest& dst) const {

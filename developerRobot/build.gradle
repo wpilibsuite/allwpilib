@@ -72,7 +72,7 @@ deploy {
             maxChannels = 4
             locations {
                 mdns(SshDeployLocation) {
-                    address = "limelight.local"
+                    address = "robot.local"
                     user = 'systemcore'
                     password = 'systemcore'
                     ipv6 = false

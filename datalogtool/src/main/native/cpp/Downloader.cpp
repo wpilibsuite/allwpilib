@@ -30,8 +30,9 @@
 
 Downloader::Downloader(glass::Storage& storage)
     : m_serverTeam{storage.GetString("serverTeam")},
-      m_remoteDir{storage.GetString("remoteDir", "/home/lvuser/logs")},
-      m_username{storage.GetString("username", "lvuser")},
+      m_remoteDir{storage.GetString("remoteDir", "/home/systemcore/logs")},
+      m_username{storage.GetString("username", "systemcore")},
+      m_password{"systemcore"},
       m_localDir{storage.GetString("localDir")},
       m_deleteAfter{storage.GetBool("deleteAfter", true)},
       m_thread{[this] { ThreadMain(); }} {}

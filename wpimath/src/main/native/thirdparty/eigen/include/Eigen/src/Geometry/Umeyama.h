@@ -21,8 +21,6 @@
 
 namespace Eigen {
 
-#ifndef EIGEN_PARSED_BY_DOXYGEN
-
 // These helpers are required since it allows to use mixed types as parameters
 // for the Umeyama. The problem with mixed parameters is that the return type
 // cannot trivially be deduced when float and double types are mixed.
@@ -49,8 +47,6 @@ struct umeyama_transform_matrix_type {
 };
 
 }  // namespace internal
-
-#endif
 
 /**
  * \geometry_module \ingroup Geometry_Module

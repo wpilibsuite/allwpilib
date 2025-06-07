@@ -33,15 +33,9 @@ model {
             if (!it.buildable || !(it instanceof NativeBinarySpec)) {
                 return
             }
-            if (it.component.name == "${nativeName}JNI") {
-                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                lib project: ':datalog', library: 'datalog', linkage: 'static'
-            } else {
-                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                lib project: ':datalog', library: 'datalog', linkage: 'shared'
-            }
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':datalog', library: 'datalog', linkage: 'shared'
         }
     }
 }

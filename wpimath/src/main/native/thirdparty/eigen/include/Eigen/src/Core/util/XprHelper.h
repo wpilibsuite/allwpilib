@@ -158,8 +158,8 @@ class variable_if_dynamic {
     EIGEN_ONLY_USED_FOR_DEBUG(v);
     eigen_assert(v == T(Value));
   }
-  EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE EIGEN_CONSTEXPR T value() { return T(Value); }
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR operator T() const { return T(Value); }
+  EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE constexpr T value() { return T(Value); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr operator T() const { return T(Value); }
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void setValue(T v) const {
     EIGEN_ONLY_USED_FOR_DEBUG(v);
     eigen_assert(v == T(Value));
@@ -171,7 +171,7 @@ class variable_if_dynamic<T, Dynamic> {
   T m_value;
 
  public:
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit variable_if_dynamic(T value = 0) EIGEN_NO_THROW : m_value(value) {}
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit variable_if_dynamic(T value = 0) noexcept : m_value(value) {}
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE T value() const { return m_value; }
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE operator T() const { return m_value; }
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void setValue(T value) { m_value = value; }
@@ -186,7 +186,7 @@ class variable_if_dynamicindex {
     EIGEN_ONLY_USED_FOR_DEBUG(v);
     eigen_assert(v == T(Value));
   }
-  EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE EIGEN_CONSTEXPR T value() { return T(Value); }
+  EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE constexpr T value() { return T(Value); }
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void setValue(T) {}
 };
 
@@ -315,7 +315,7 @@ struct find_packet_by_size<T, 1> {
 };
 
 #if EIGEN_MAX_STATIC_ALIGN_BYTES > 0
-constexpr inline int compute_default_alignment_helper(int ArrayBytes, int AlignmentBytes) {
+constexpr int compute_default_alignment_helper(int ArrayBytes, int AlignmentBytes) {
   if ((ArrayBytes % AlignmentBytes) == 0) {
     return AlignmentBytes;
   } else if (EIGEN_MIN_ALIGN_BYTES < AlignmentBytes) {
@@ -327,7 +327,7 @@ constexpr inline int compute_default_alignment_helper(int ArrayBytes, int Alignm
 #else
 // If static alignment is disabled, no need to bother.
 // This also avoids a division by zero
-constexpr inline int compute_default_alignment_helper(int ArrayBytes, int AlignmentBytes) {
+constexpr int compute_default_alignment_helper(int ArrayBytes, int AlignmentBytes) {
   EIGEN_UNUSED_VARIABLE(ArrayBytes);
   EIGEN_UNUSED_VARIABLE(AlignmentBytes);
   return 0;
@@ -362,7 +362,7 @@ class make_proper_matrix_type {
   typedef Matrix<Scalar_, Rows_, Cols_, Options, MaxRows_, MaxCols_> type;
 };
 
-constexpr inline unsigned compute_matrix_flags(int Options) {
+constexpr unsigned compute_matrix_flags(int Options) {
   unsigned row_major_bit = Options & RowMajor ? RowMajorBit : 0;
   // FIXME currently we still have to handle DirectAccessBit at the expression level to handle DenseCoeffsBase<>
   // and then propagate this information to the evaluator's flags.
@@ -370,7 +370,7 @@ constexpr inline unsigned compute_matrix_flags(int Options) {
   return DirectAccessBit | LvalueBit | NestByRefBit | row_major_bit;
 }
 
-constexpr inline int size_at_compile_time(int rows, int cols) {
+constexpr int size_at_compile_time(int rows, int cols) {
   if (rows == 0 || cols == 0) return 0;
   if (rows == Dynamic || cols == Dynamic) return Dynamic;
   return rows * cols;
@@ -885,8 +885,12 @@ struct scalar_div_cost {
 };
 
 template <typename T, bool Vectorized>
-struct scalar_div_cost<std::complex<T>, Vectorized> {
-  enum { value = 2 * scalar_div_cost<T>::value + 6 * NumTraits<T>::MulCost + 3 * NumTraits<T>::AddCost };
+struct scalar_div_cost<T, Vectorized, std::enable_if_t<NumTraits<T>::IsComplex>> {
+  using RealScalar = typename NumTraits<T>::Real;
+  enum {
+    value =
+        2 * scalar_div_cost<RealScalar>::value + 6 * NumTraits<RealScalar>::MulCost + 3 * NumTraits<RealScalar>::AddCost
+  };
 };
 
 template <bool Vectorized>

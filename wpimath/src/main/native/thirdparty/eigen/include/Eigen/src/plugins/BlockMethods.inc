@@ -1365,6 +1365,6 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE std::conditional_t<Direction == Vertical, 
  * \sa subVector(Index)
  */
 template <DirectionType Direction>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index subVectors() const {
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index subVectors() const {
   return (Direction == Vertical) ? cols() : rows();
 }
