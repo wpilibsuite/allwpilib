@@ -111,6 +111,9 @@ public final class DriverStation {
     /** POV up left. */
     UpLeft(0x01 | 0x08);
 
+    private static final double INVALID_POV_VALUE_INTERVAL = 1.0;
+    private static double s_nextMessageTime;
+
     /**
      * Converts a byte value into a POVDirection enum value.
      *
@@ -124,7 +127,12 @@ public final class DriverStation {
           return direction;
         }
       }
-      throw new IllegalArgumentException("Invalid value " + value + "!");
+      double currentTime = Timer.getTimestamp();
+      if (currentTime > s_nextMessageTime) {
+        reportError("Invalid POV value " + value + "!", false);
+        s_nextMessageTime = currentTime + INVALID_POV_VALUE_INTERVAL;
+      }
+      return Center;
     }
 
     /** The corresponding HAL value. */
