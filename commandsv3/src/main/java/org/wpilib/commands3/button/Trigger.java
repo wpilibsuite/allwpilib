@@ -32,7 +32,7 @@ public class Trigger implements BooleanSupplier {
   private final EventLoop m_loop;
   private final Scheduler scheduler;
   private Signal m_previousSignal = null;
-  private final Map<BindingType, List<Command>> m_bindings = new EnumMap<>(BindingType.class);
+  private final Map<BindingType, List<Binding>> m_bindings = new EnumMap<>(BindingType.class);
   private final Runnable m_eventLoopCallback = this::poll;
 
   /**
@@ -40,45 +40,14 @@ public class Trigger implements BooleanSupplier {
    * first run, when the previous signal value is undefined and unknown.
    */
   private enum Signal {
-    /** The signal is high. */
+    /**
+     * The signal is high.
+     */
     HIGH,
-    /** The signal is low. */
+    /**
+     * The signal is low.
+     */
     LOW
-  }
-
-  private enum BindingType {
-    /**
-     * Schedules (forks) a command on a rising edge signal. The command will run until it completes
-     * or is interrupted by another command requiring the same resources.
-     */
-    SCHEDULE_ON_RISING_EDGE,
-    /**
-     * Schedules (forks) a command on a falling edge signal. The command will run until it completes
-     * or is interrupted by another command requiring the same resources.
-     */
-    SCHEDULE_ON_FALLING_EDGE,
-    /**
-     * Schedules (forks) a command on a rising edge signal. If the command is still running on the
-     * next rising edge, it will be cancelled then; otherwise, it will be scheduled again.
-     */
-    TOGGLE_ON_RISING_EDGE,
-    /**
-     * Schedules (forks) a command on a falling edge signal. If the command is still running on the
-     * next falling edge, it will be cancelled then; otherwise, it will be scheduled again.
-     */
-    TOGGLE_ON_FALLING_EDGE,
-    /**
-     * Schedules a command on a rising edge signal. If the command is still running on the next
-     * falling edge, it will be cancelled then - unlike {@link #SCHEDULE_ON_RISING_EDGE}, which
-     * would allow it to continue to run.
-     */
-    RUN_WHILE_HIGH,
-    /**
-     * Schedules a command on a falling edge signal. If the command is still running on the next
-     * rising edge, it will be cancelled then - unlike {@link #SCHEDULE_ON_FALLING_EDGE}, which
-     * would allow it to continue to run.
-     */
-    RUN_WHILE_LOW
   }
 
   public Trigger(Scheduler scheduler, BooleanSupplier condition) {
@@ -254,6 +223,11 @@ public class Trigger implements BooleanSupplier {
   }
 
   private void poll() {
+    // Clear bindings that no longer need to run
+    // This should always be checked, regardless of signal change, since bindings may be scoped
+    // and those scopes may become inactive.
+    clearStaleBindings();
+
     var signal = signal();
 
     if (signal == m_previousSignal) {
@@ -289,12 +263,22 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
+   * Removes bindings in inactive scopes.
+   */
+  private void clearStaleBindings() {
+    m_bindings.forEach(((_bindingType, bindings) -> {
+      bindings.removeIf(binding -> !binding.scope().active());
+    }));
+  }
+
+  /**
    * Schedules all commands bound to the given binding type.
    *
    * @param bindingType the binding type to schedule
    */
   private void scheduleBindings(BindingType bindingType) {
-    m_bindings.getOrDefault(bindingType, List.of()).forEach(scheduler::schedule);
+    m_bindings.getOrDefault(bindingType, List.of())
+        .forEach(binding -> scheduler.schedule(binding.command()));
   }
 
   /**
@@ -303,7 +287,8 @@ public class Trigger implements BooleanSupplier {
    * @param bindingType the binding type to cancel
    */
   private void cancelBindings(BindingType bindingType) {
-    m_bindings.getOrDefault(bindingType, List.of()).forEach(scheduler::cancel);
+    m_bindings.getOrDefault(bindingType, List.of())
+        .forEach(binding -> scheduler.cancel(binding.command()));
   }
 
   /**
@@ -316,7 +301,8 @@ public class Trigger implements BooleanSupplier {
     m_bindings
         .getOrDefault(bindingType, List.of())
         .forEach(
-            command -> {
+            binding -> {
+              var command = binding.command();
               if (scheduler.isScheduledOrRunning(command)) {
                 scheduler.cancel(command);
               } else {
@@ -326,7 +312,16 @@ public class Trigger implements BooleanSupplier {
   }
 
   private void addBinding(BindingType bindingType, Command command) {
-    m_bindings.computeIfAbsent(bindingType, _k -> new ArrayList<>()).add(command);
+    BindingScope scope = switch (scheduler.currentCommand()) {
+      // A command is creating a binding - make it scoped to that specific command
+      case Command c -> new BindingScope.ForCommand(scheduler, c);
+
+      // Creating a binding outside a command - it's global in scope
+      case null -> BindingScope.Global.INSTANCE;
+    };
+
+    m_bindings.computeIfAbsent(bindingType, _k -> new ArrayList<>())
+        .add(new Binding(scope, bindingType, command));
 
     // Ensure this trigger is bound to the event loop. NOP if already bound
     m_loop.bind(m_eventLoopCallback);

@@ -466,7 +466,7 @@ public class Scheduler implements ProtobufSerializable {
    *
    * @return the currently executing command
    */
-  private Command currentCommand() {
+  public Command currentCommand() {
     var state = currentState();
     if (state == null) {
       return null;
