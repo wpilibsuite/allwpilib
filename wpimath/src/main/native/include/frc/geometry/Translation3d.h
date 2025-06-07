@@ -242,6 +242,32 @@ class WPILIB_DLLEXPORT Translation3d {
     return units::math::abs(m_x - other.m_x) < 1E-9_m &&
            units::math::abs(m_y - other.m_y) < 1E-9_m &&
            units::math::abs(m_z - other.m_z) < 1E-9_m;
+
+
+  /**
+   * Returns the nearest Translation3d from a collection of translations
+   * @param translations The collection of translations.
+   * @return The nearest Translation3d from the collection.
+   */
+  constexpr Translation3d Nearest(
+      std::span<const Translation3d> translations) const {
+    return *std::min_element(translations.begin(), translations.end(),
+                             [this](Translation3d a, Translation3d b) {
+                               return this->Distance(a) < this->Distance(b);
+                             });
+  }
+
+  /**
+   * Returns the nearest Translation3d from a collection of translations
+   * @param translations The collection of translations.
+   * @return The nearest Translation3d from the collection.
+   */
+  constexpr Translation3d Nearest(
+      std::initializer_list<Translation3d> translations) const {
+    return *std::min_element(translations.begin(), translations.end(),
+                             [this](Translation3d a, Translation3d b) {
+                               return this->Distance(a) < this->Distance(b);
+                             });
   }
 
  private:

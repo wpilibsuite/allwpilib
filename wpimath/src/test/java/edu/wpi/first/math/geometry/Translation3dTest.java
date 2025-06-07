@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.util.List;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
 import org.junit.jupiter.api.Test;
@@ -205,5 +207,24 @@ class Translation3dTest {
     assertEquals(vec.get(2), translation.getZ());
 
     assertEquals(vec, translation.toVector());
+  }
+
+  
+  @Test
+  void testNearest() {
+    var origin = Translation3d.kZero;
+
+    // Distance sort
+    // poses are in order of closest to farthest away from the origin at various positions in 3D
+    // space.
+    final var pose1 = new Translation3d(1, 0, 0);
+    final var pose2 = new Translation3d(0, 2, 0);
+    final var pose3 = new Translation3d(0, 0, 3);
+    final var pose4 = new Translation3d(2, 2, 2);
+    final var pose5 = new Translation3d(3, 3, 3);
+
+    assertEquals(pose3, origin.nearest(List.of(pose5, pose3, pose4)));
+    assertEquals(pose1, origin.nearest(List.of(pose1, pose2, pose3)));
+    assertEquals(pose2, origin.nearest(List.of(pose4, pose2, pose3)));
   }
 }

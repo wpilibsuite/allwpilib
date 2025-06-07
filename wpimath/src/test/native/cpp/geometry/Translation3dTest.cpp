@@ -186,3 +186,31 @@ TEST(Translation3dTest, Constexpr) {
   static_assert(projected.X() == 1_m);
   static_assert(projected.Y() == 2_m);
 }
+
+TEST(Translation3dTest, Nearest) {
+  const Translation3d origin{0_m, 0_m, 0_m};
+
+  // Distance sort
+  // poses are in order of closest to farthest away from the origin at various positions in 3D
+  // space.
+  const Translation3d pose1{1_m, 0_m, 0_m};
+  const Translation3d pose2{0_m, 2_m, 0_m};
+  const Translation3d pose3{0_m, 0_m, 3_m};
+  const Translation3d pose4{2_m, 2_m, 2_m};
+  const Translation3d pose5{3_m, 3_m, 3_m};
+
+  auto nearest1 = origin.Nearest({pose5, pose3, pose4});
+  EXPECT_DOUBLE_EQ(nearest1.X().value(), pose3.X().value());
+  EXPECT_DOUBLE_EQ(nearest1.Y().value(), pose3.Y().value());
+  EXPECT_DOUBLE_EQ(nearest1.Z().value(), pose3.Z().value());
+
+  auto nearest2 = origin.Nearest({pose1, pose2, pose3});
+  EXPECT_DOUBLE_EQ(nearest2.X().value(), pose1.X().value());
+  EXPECT_DOUBLE_EQ(nearest2.Y().value(), pose1.Y().value());
+  EXPECT_DOUBLE_EQ(nearest2.Z().value(), pose1.Z().value());
+
+  auto nearest3 = origin.Nearest({pose4, pose2, pose3});
+  EXPECT_DOUBLE_EQ(nearest3.X().value(), pose2.X().value());
+  EXPECT_DOUBLE_EQ(nearest3.Y().value(), pose2.Y().value());
+  EXPECT_DOUBLE_EQ(nearest3.Z().value(), pose2.Z().value());
+}
