@@ -97,20 +97,21 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
 /**
  * Applies a power curve transformation to the input value, preserving its sign.
  *
- * The function normalizes the input value to the range [0, 1] based on the 
- * maximum magnitude, applies the power transformation, then scales the result 
- * back to the original range. This keeps the value in the original range and 
+ * The function normalizes the input value to the range [0, 1] based on the
+ * maximum magnitude, applies the power transformation, then scales the result
+ * back to the original range. This keeps the value in the original range and
  * gives consistent curve behavior regardless of the input value's scale.
  *
- * This is useful for applying smoother or more aggressive control response 
+ * This is useful for applying smoother or more aggressive control response
  * curves (e.g. joystick input shaping).
  *
  * @param value The input value to transform.
- * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared 
+ * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared
  * curve). Must be positive.
- * @param maxMagnitude The maximum expected absolute value of input. Must be 
+ * @param maxMagnitude The maximum expected absolute value of input. Must be
  * positive.
- * @return The transformed value with the same sign and scaled to the input range.
+ * @return The transformed value with the same sign and scaled to the input
+ * range.
  */
 template <typename T>
   requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
@@ -121,17 +122,17 @@ constexpr T ApplyPowerCurve(T value, double exponent, T maxMagnitude) {
   } else {
     magnitude = units::math::abs(value);
   }
-  
+
   T normalizedValue = magnitude / maxMagnitude;
   T transformedMagnitude;
-  
+
   if constexpr (std::is_arithmetic_v<T>) {
     transformedMagnitude = gcem::pow(normalizedValue, exponent) * maxMagnitude;
   } else {
     auto numericValue = normalizedValue.template to<double>();
     transformedMagnitude = T{gcem::pow(numericValue, exponent)} * maxMagnitude;
   }
-  
+
   if (value < T{0.0}) {
     return -transformedMagnitude;
   } else {
