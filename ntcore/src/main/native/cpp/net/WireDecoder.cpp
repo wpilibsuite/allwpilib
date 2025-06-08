@@ -174,6 +174,12 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
+          // limit to 32-bit range and exclude endpoints used by DenseMap
+          if (pubuid >= 0x7fffffffLL || pubuid <= (-0x7fffffffLL - 1)) {
+            error = "pubuid out of range";
+            goto err;
+          }
+
           // properties; allow missing (treated as empty)
           wpi::json* properties = nullptr;
           auto propertiesIt = params->find("properties");
@@ -197,6 +203,12 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           // pubuid
           int64_t pubuid;
           if (!ObjGetNumber(*params, "pubuid", &error, &pubuid)) {
+            goto err;
+          }
+
+          // limit to 32-bit range and exclude endpoints used by DenseMap
+          if (pubuid >= 0x7fffffffLL || pubuid <= (-0x7fffffffLL - 1)) {
+            error = "pubuid out of range";
             goto err;
           }
 
@@ -228,6 +240,12 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           // subuid
           int64_t subuid;
           if (!ObjGetNumber(*params, "subuid", &error, &subuid)) {
+            goto err;
+          }
+
+          // limit to 32-bit range and exclude endpoints used by DenseMap
+          if (subuid >= 0x7fffffffLL || subuid <= (-0x7fffffffLL - 1)) {
+            error = "subuid out of range";
             goto err;
           }
 
@@ -303,6 +321,12 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
+          // limit to 32-bit range and exclude endpoints used by DenseMap
+          if (subuid >= 0x7fffffffLL || subuid <= (-0x7fffffffLL - 1)) {
+            error = "pubuid out of range";
+            goto err;
+          }
+
           // complete
           out.ClientUnsubscribe(subuid);
           rv = true;
@@ -324,6 +348,12 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
             goto err;
           }
 
+          // limit to 32-bit range and exclude endpoints used by DenseMap
+          if (id >= 0x7fffffffLL || id <= (-0x7fffffffLL - 1)) {
+            error = "id out of range";
+            goto err;
+          }
+
           // type
           auto typeStr = ObjGetString(*params, "type", &error);
           if (!typeStr) {
@@ -339,6 +369,13 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
               error = "pubuid value must be a number";
               goto err;
             }
+
+            // limit to 32-bit range and exclude endpoints used by DenseMap
+            if (val >= 0x7fffffffLL || val <= (-0x7fffffffLL - 1)) {
+              error = "pubuid out of range";
+              goto err;
+            }
+
             pubuid = val;
           }
 
@@ -366,6 +403,12 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           // id
           int64_t id;
           if (!ObjGetNumber(*params, "id", &error, &id)) {
+            goto err;
+          }
+
+          // limit to 32-bit range and exclude endpoints used by DenseMap
+          if (id >= 0x7fffffffLL || id <= (-0x7fffffffLL - 1)) {
+            error = "id out of range";
             goto err;
           }
 
