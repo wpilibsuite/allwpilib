@@ -76,17 +76,17 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
   void testApplyPowerCurve() {
     assertEquals(0.5, MathUtil.applyPowerCurve(0.5, 1.0));
     assertEquals(-0.5, MathUtil.applyPowerCurve(-0.5, 1.0));
-    
+
     assertEquals(0.5 * 0.5, MathUtil.applyPowerCurve(0.5, 2.0));
     assertEquals(-(0.5 * 0.5), MathUtil.applyPowerCurve(-0.5, 2.0));
-    
+
     assertEquals(Math.sqrt(0.5), MathUtil.applyPowerCurve(0.5, 0.5));
     assertEquals(-Math.sqrt(0.5), MathUtil.applyPowerCurve(-0.5, 0.5));
-    
+
     assertEquals(0.0, MathUtil.applyPowerCurve(0.0, 2.0));
     assertEquals(1.0, MathUtil.applyPowerCurve(1.0, 2.0));
     assertEquals(-1.0, MathUtil.applyPowerCurve(-1.0, 2.0));
-    
+
     assertEquals(Math.pow(0.8, 0.3), MathUtil.applyPowerCurve(0.8, 0.3));
     assertEquals(-Math.pow(0.8, 0.3), MathUtil.applyPowerCurve(-0.8, 0.3));
   }
@@ -95,10 +95,10 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
   void testApplyPowerCurveMaxMagnitude() {
     assertEquals(5, MathUtil.applyPowerCurve(5.0, 1.0, 10.0));
     assertEquals(-5, MathUtil.applyPowerCurve(-5.0, 1.0, 10.0));
-    
+
     assertEquals(0.5 * 0.5 * 10, MathUtil.applyPowerCurve(5.0, 2.0, 10.0));
     assertEquals(-0.5 * 0.5 * 10, MathUtil.applyPowerCurve(-5.0, 2.0, 10.0));
-    
+
     assertEquals(Math.sqrt(0.5) * 10, MathUtil.applyPowerCurve(5.0, 0.5, 10.0));
     assertEquals(-Math.sqrt(0.5) * 10, MathUtil.applyPowerCurve(-5.0, 0.5, 10.0));
 
