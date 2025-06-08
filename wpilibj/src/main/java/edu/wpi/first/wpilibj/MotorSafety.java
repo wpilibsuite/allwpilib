@@ -31,7 +31,7 @@ public abstract class MotorSafety {
 
   @SuppressWarnings("PMD.AssignmentInOperand")
   private static void threadMain() {
-    int event = WPIUtilJNI.createEvent(false, false);
+    int event = WPIUtilJNI.makeEvent(false, false);
     DriverStationJNI.provideNewDataEventHandle(event);
     ControlWord controlWord = new ControlWord();
 
