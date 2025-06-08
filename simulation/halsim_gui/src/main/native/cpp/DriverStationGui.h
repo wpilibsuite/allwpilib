@@ -4,26 +4,11 @@
 
 #pragma once
 
-#include <memory>
-#include <string_view>
-
-#include <glass/WindowManager.h>
-
 namespace halsimgui {
 
-class DSManager : public glass::WindowManager {
- public:
-  explicit DSManager(glass::Storage& storage) : WindowManager{storage} {}
-
-  void DisplayMenu() override;
-};
-
-class DriverStationGui {
- public:
-  static void GlobalInit();
-  static void SetDSSocketExtension(void* data);
-
-  static std::unique_ptr<DSManager> dsManager;
-};
+void InitializeDS();
+void DisplayDSMenu();
+void DisplayDS();
+void SetDSSocketExtension(void* data);
 
 }  // namespace halsimgui

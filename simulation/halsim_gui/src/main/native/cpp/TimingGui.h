@@ -6,9 +6,6 @@
 
 namespace halsimgui {
 
-class TimingGui {
- public:
-  static void Initialize();
-};
+void DisplayTiming();
 
 }  // namespace halsimgui

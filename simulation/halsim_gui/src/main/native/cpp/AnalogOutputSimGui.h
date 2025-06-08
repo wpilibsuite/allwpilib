@@ -4,11 +4,12 @@
 
 #pragma once
 
+namespace glass {
+class DeviceTreeModel;
+}  // namespace glass
+
 namespace halsimgui {
 
-class AnalogOutputSimGui {
- public:
-  static void Initialize();
-};
+void InitializeAnalogOutputs(glass::DeviceTreeModel& deviceTree);
 
 }  // namespace halsimgui

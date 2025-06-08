@@ -12,8 +12,6 @@
 #include <hal/simulation/AccelerometerData.h>
 
 #include "HALDataSource.h"
-#include "HALSimGui.h"
-#include "SimDeviceGui.h"
 
 using namespace glass;
 using namespace halsimgui;
@@ -54,10 +52,10 @@ class AccelerometerSimModel : public glass::AccelerometerModel {
 };
 }  // namespace
 
-void AccelerometerSimGui::Initialize() {
-  SimDeviceGui::GetDeviceTree().Add(
-      std::make_unique<AccelerometerSimModel>(0), [](glass::Model* model) {
-        glass::DisplayAccelerometerDevice(
-            static_cast<AccelerometerSimModel*>(model));
-      });
+void halsimgui::InitializeAccelerometers(glass::DeviceTreeModel& deviceTree) {
+  deviceTree.Add(std::make_unique<AccelerometerSimModel>(0),
+                 [](glass::Model* model) {
+                   glass::DisplayAccelerometerDevice(
+                       static_cast<AccelerometerSimModel*>(model));
+                 });
 }

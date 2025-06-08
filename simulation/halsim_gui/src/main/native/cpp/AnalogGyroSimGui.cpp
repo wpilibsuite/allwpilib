@@ -14,8 +14,6 @@
 #include <hal/simulation/AnalogGyroData.h>
 
 #include "HALDataSource.h"
-#include "HALSimGui.h"
-#include "SimDeviceGui.h"
 
 using namespace halsimgui;
 
@@ -88,10 +86,10 @@ void AnalogGyrosSimModel::ForEachAnalogGyro(
   }
 }
 
-void AnalogGyroSimGui::Initialize() {
-  SimDeviceGui::GetDeviceTree().Add(
-      std::make_unique<AnalogGyrosSimModel>(), [](glass::Model* model) {
-        glass::DisplayAnalogGyrosDevice(
-            static_cast<AnalogGyrosSimModel*>(model));
-      });
+void halsimgui::InitializeAnalogGyros(glass::DeviceTreeModel& deviceTree) {
+  deviceTree.Add(std::make_unique<AnalogGyrosSimModel>(),
+                 [](glass::Model* model) {
+                   glass::DisplayAnalogGyrosDevice(
+                       static_cast<AnalogGyrosSimModel*>(model));
+                 });
 }

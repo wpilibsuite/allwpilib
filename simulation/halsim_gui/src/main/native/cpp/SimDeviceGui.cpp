@@ -7,66 +7,40 @@
 #include <stdint.h>
 
 #include <memory>
-#include <utility>
 
 #include <fmt/format.h>
 #include <glass/other/DeviceTree.h>
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
-#include <wpi/DenseMap.h>
 #include <wpi/StringExtras.h>
 
-#include "HALDataSource.h"
 #include "HALSimGui.h"
 
 using namespace halsimgui;
 
-namespace {
-class SimValueSource : public glass::DataSource {
- public:
-  explicit SimValueSource(HAL_SimValueHandle handle, const char* device,
-                          const char* name)
-      : DataSource(fmt::format("{}-{}", device, name)),
-        m_callback{HALSIM_RegisterSimValueChangedCallback(
-            handle, this, CallbackFunc, true)} {}
-  ~SimValueSource() override {
-    if (m_callback != 0) {
-      HALSIM_CancelSimValueChangedCallback(m_callback);
-    }
+SimValueSource::SimValueSource(HAL_SimValueHandle handle, const char* device,
+                               const char* name)
+    : DataSource(fmt::format("{}-{}", device, name)),
+      m_callback{HALSIM_RegisterSimValueChangedCallback(handle, this,
+                                                        CallbackFunc, true)} {}
+
+SimValueSource::~SimValueSource() {
+  if (m_callback != 0) {
+    HALSIM_CancelSimValueChangedCallback(m_callback);
   }
+}
 
- private:
-  static void CallbackFunc(const char*, void* param, HAL_SimValueHandle,
-                           int32_t, const HAL_Value* value) {
-    auto source = static_cast<SimValueSource*>(param);
-    if (value->type == HAL_BOOLEAN) {
-      source->SetValue(value->data.v_boolean);
-      source->SetDigital(true);
-    } else if (value->type == HAL_DOUBLE) {
-      source->SetValue(value->data.v_double);
-      source->SetDigital(false);
-    }
+void SimValueSource::CallbackFunc(const char*, void* param, HAL_SimValueHandle,
+                                  int32_t, const HAL_Value* value) {
+  auto source = static_cast<SimValueSource*>(param);
+  if (value->type == HAL_BOOLEAN) {
+    source->SetValue(value->data.v_boolean);
+    source->SetDigital(true);
+  } else if (value->type == HAL_DOUBLE) {
+    source->SetValue(value->data.v_double);
+    source->SetDigital(false);
   }
-
-  int32_t m_callback;
-};
-
-class SimDevicesModel : public glass::Model {
- public:
-  void Update() override;
-  bool Exists() override { return true; }
-
-  glass::DataSource* GetSource(HAL_SimValueHandle handle) {
-    return m_sources[handle].get();
-  }
-
- private:
-  wpi::DenseMap<HAL_SimValueHandle, std::unique_ptr<SimValueSource>> m_sources;
-};
-}  // namespace
-
-static SimDevicesModel* gSimDevicesModel;
-static bool gSimDevicesShowPrefix = false;
+}
 
 void SimDevicesModel::Update() {
   HALSIM_EnumerateSimDevices(
@@ -140,6 +114,8 @@ static void DisplaySimValue(const char* name, void* data,
   }
 }
 
+static bool gSimDevicesShowPrefix = false;
+
 static void DisplaySimDevice(const char* name, void* data,
                              HAL_SimDeviceHandle handle) {
   std::string_view id{name};
@@ -157,38 +133,18 @@ static void DisplaySimDevice(const char* name, void* data,
   }
 }
 
-void SimDeviceGui::Initialize() {
-  HALSimGui::halProvider->Register(
-      "Other Devices", [] { return true; },
-      [] { return std::make_unique<glass::DeviceTreeModel>(); },
-      [](glass::Window* win, glass::Model* model) {
-        win->SetDefaultPos(1025, 20);
-        win->SetDefaultSize(250, 695);
-        win->DisableRenamePopup();
-        return glass::MakeFunctionView([=] {
-          if (ImGui::BeginPopupContextItem()) {
-            ImGui::Checkbox("Show prefix", &gSimDevicesShowPrefix);
-            ImGui::EndPopup();
-          }
-          static_cast<glass::DeviceTreeModel*>(model)->Display();
-        });
-      });
-  HALSimGui::halProvider->ShowDefault("Other Devices");
-
-  auto model = std::make_unique<SimDevicesModel>();
-  gSimDevicesModel = model.get();
-  GetDeviceTree().Add(std::move(model), [](glass::Model* model) {
+void halsimgui::InitializeDeviceTree(glass::DeviceTreeModel& deviceTree,
+                                     SimDevicesModel* model) {
+  deviceTree.Add(model, [](glass::Model* model) {
     HALSIM_EnumerateSimDevices("", static_cast<SimDevicesModel*>(model),
                                DisplaySimDevice);
   });
 }
 
-glass::DataSource* SimDeviceGui::GetValueSource(HAL_SimValueHandle handle) {
-  return gSimDevicesModel->GetSource(handle);
-}
-
-glass::DeviceTreeModel& SimDeviceGui::GetDeviceTree() {
-  static auto model = HALSimGui::halProvider->GetModel("Other Devices");
-  assert(model);
-  return *static_cast<glass::DeviceTreeModel*>(model);
+void halsimgui::DisplayDeviceTree(glass::DeviceTreeModel* model) {
+  if (ImGui::BeginPopupContextItem()) {
+    ImGui::Checkbox("Show prefix", &gSimDevicesShowPrefix);
+    ImGui::EndPopup();
+  }
+  model->Display();
 }

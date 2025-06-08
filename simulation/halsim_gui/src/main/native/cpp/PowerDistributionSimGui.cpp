@@ -14,7 +14,6 @@
 #include <hal/simulation/PowerDistributionData.h>
 
 #include "HALDataSource.h"
-#include "HALSimGui.h"
 
 using namespace halsimgui;
 
@@ -76,7 +75,7 @@ class PowerDistributionsSimModel : public glass::PowerDistributionsModel {
 
   void Update() override;
 
-  bool Exists() override { return true; }
+  bool Exists() override;
 
   void ForEachPowerDistribution(
       wpi::function_ref<void(glass::PowerDistributionModel& model, int index)>
@@ -101,6 +100,15 @@ void PowerDistributionsSimModel::Update() {
   }
 }
 
+bool PowerDistributionsSimModel::Exists() {
+  for (auto&& model : m_models) {
+    if (model) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void PowerDistributionsSimModel::ForEachPowerDistribution(
     wpi::function_ref<void(glass::PowerDistributionModel& model, int index)>
         func) {
@@ -112,25 +120,6 @@ void PowerDistributionsSimModel::ForEachPowerDistribution(
   }
 }
 
-static bool PowerDistributionsAnyInitialized() {
-  static const int32_t num = HAL_GetNumREVPDHModules();
-  for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetPowerDistributionInitialized(i)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-void PowerDistributionSimGui::Initialize() {
-  HALSimGui::halProvider->Register(
-      "PowerDistributions", PowerDistributionsAnyInitialized,
-      [] { return std::make_unique<PowerDistributionsSimModel>(); },
-      [](glass::Window* win, glass::Model* model) {
-        win->SetDefaultPos(245, 155);
-        return glass::MakeFunctionView([=] {
-          DisplayPowerDistributions(
-              static_cast<PowerDistributionsSimModel*>(model));
-        });
-      });
+glass::PowerDistributionsModel* halsimgui::CreatePowerDistributionsModel() {
+  return glass::CreateModel<PowerDistributionsSimModel>();
 }

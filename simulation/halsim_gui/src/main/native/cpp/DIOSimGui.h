@@ -4,11 +4,13 @@
 
 #pragma once
 
+namespace glass {
+class DIOsModel;
+class EncodersModel;
+}  // namespace glass
+
 namespace halsimgui {
 
-class DIOSimGui {
- public:
-  static void Initialize();
-};
+glass::DIOsModel* CreateDIOsModel(glass::EncodersModel& encodersModel);
 
 }  // namespace halsimgui

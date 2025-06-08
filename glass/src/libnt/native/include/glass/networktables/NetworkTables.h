@@ -25,11 +25,11 @@
 #endif
 
 #include "glass/Model.h"
-#include "glass/View.h"
 
 namespace glass {
 
 class DataSource;
+class Storage;
 
 class NetworkTablesModel : public Model {
  public:
@@ -232,41 +232,25 @@ void DisplayNetworkTablesAddMenu(
 class NetworkTablesFlagsSettings {
  public:
   explicit NetworkTablesFlagsSettings(
-      NetworkTablesFlags defaultFlags = NetworkTablesFlags_Default)
-      : m_defaultFlags{defaultFlags}, m_flags{defaultFlags} {}
+      Storage& storage,
+      NetworkTablesFlags defaultFlags = NetworkTablesFlags_Default);
+  explicit NetworkTablesFlagsSettings(
+      NetworkTablesFlags defaultFlags = NetworkTablesFlags_Default);
 
-  void Update();
   void DisplayMenu();
 
   NetworkTablesFlags GetFlags() const { return m_flags; }
 
  private:
-  bool* m_pTreeView = nullptr;
-  bool* m_pCombinedView = nullptr;
-  bool* m_pShowSpecial = nullptr;
-  bool* m_pShowProperties = nullptr;
-  bool* m_pShowTimestamp = nullptr;
-  bool* m_pShowServerTimestamp = nullptr;
-  bool* m_pCreateNoncanonicalKeys = nullptr;
-  int* m_pPrecision = nullptr;
-  NetworkTablesFlags m_defaultFlags;  // NOLINT
-  NetworkTablesFlags m_flags;         // NOLINT
-};
-
-class NetworkTablesView : public View {
- public:
-  explicit NetworkTablesView(
-      NetworkTablesModel* model,
-      NetworkTablesFlags defaultFlags = NetworkTablesFlags_Default)
-      : m_model{model}, m_flags{defaultFlags} {}
-
-  void Display() override;
-  void Settings() override;
-  bool HasSettings() override;
-
- private:
-  NetworkTablesModel* m_model;
-  NetworkTablesFlagsSettings m_flags;
+  bool& m_treeView;
+  bool& m_combinedView;
+  bool& m_showSpecial;
+  bool& m_showProperties;
+  bool& m_showTimestamp;
+  bool& m_showServerTimestamp;
+  bool& m_createNoncanonicalKeys;
+  int& m_precision;
+  NetworkTablesFlags m_flags;  // NOLINT
 };
 
 }  // namespace glass

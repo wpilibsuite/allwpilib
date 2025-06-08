@@ -4,11 +4,12 @@
 
 #pragma once
 
+namespace glass {
+class DeviceTreeModel;
+}  // namespace glass
+
 namespace halsimgui {
 
-class AccelerometerSimGui {
- public:
-  static void Initialize();
-};
+void InitializeAccelerometers(glass::DeviceTreeModel& deviceTree);
 
 }  // namespace halsimgui

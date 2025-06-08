@@ -4,13 +4,10 @@
 
 #include "RoboRioSimGui.h"
 
-#include <memory>
-
 #include <glass/hardware/RoboRio.h>
 #include <hal/simulation/RoboRioData.h>
 
 #include "HALDataSource.h"
-#include "HALSimGui.h"
 
 using namespace halsimgui;
 
@@ -130,14 +127,6 @@ class RoboRioSimModel : public glass::RoboRioModel {
 };
 }  // namespace
 
-void RoboRioSimGui::Initialize() {
-  HALSimGui::halProvider->Register(
-      "RoboRIO", [] { return true; },
-      [] { return std::make_unique<RoboRioSimModel>(); },
-      [](glass::Window* win, glass::Model* model) {
-        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-        win->SetDefaultPos(5, 125);
-        return glass::MakeFunctionView(
-            [=] { DisplayRoboRio(static_cast<RoboRioSimModel*>(model)); });
-      });
+glass::RoboRioModel* halsimgui::CreateRoboRioModel() {
+  return glass::CreateModel<RoboRioSimModel>();
 }
