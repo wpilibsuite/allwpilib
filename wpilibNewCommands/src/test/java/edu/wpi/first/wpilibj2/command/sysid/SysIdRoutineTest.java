@@ -127,7 +127,7 @@ class SysIdRoutineTest {
     runCommand(m_dynamicForward);
     orderCheck = inOrder(m_mechanism);
 
-    orderCheck.verify(m_mechanism, atLeastOnce()).drive(Volts.of(7));
+    orderCheck.verify(m_mechanism, atLeastOnce()).drive(Volts.of(4));
     orderCheck.verify(m_mechanism).drive(Volts.of(0));
     orderCheck.verify(m_mechanism, never()).drive(any());
 
@@ -136,7 +136,7 @@ class SysIdRoutineTest {
     orderCheck = inOrder(m_mechanism);
 
     runCommand(m_dynamicReverse);
-    orderCheck.verify(m_mechanism, atLeastOnce()).drive(Volts.of(-7));
+    orderCheck.verify(m_mechanism, atLeastOnce()).drive(Volts.of(-4));
     orderCheck.verify(m_mechanism).drive(Volts.of(0));
     orderCheck.verify(m_mechanism, never()).drive(any());
   }
