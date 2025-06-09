@@ -123,16 +123,17 @@ constexpr T ApplyPowerCurve(T value, double exponent, T maxMagnitude = T{1.0}) {
     magnitude = units::math::abs(value);
   }
 
-  T normalized = magnitude / maxMagnitude;
+  T result;
 
-  T transformed;
   if constexpr (std::is_arithmetic_v<T>) {
-    transformed = gcem::pow(normalized, exponent);
+    T normalized = magnitude / maxMagnitude;
+    T transformed = gcem::pow(normalized, exponent);
+    result = transformed * maxMagnitude;
   } else {
-    transformed = gcem::pow(normalized.value(), exponent);
+    auto normalizedValue = magnitude / maxMagnitude;
+    auto transformedValue = gcem::pow(normalizedValue.value(), exponent);
+    result = transformedValue * maxMagnitude;
   }
-  
-  T result = transformed * maxMagnitude;
 
   if (value < T{0.0}) {
     return -result;
