@@ -103,7 +103,7 @@ TEST(MathUtilTest, ApplyPowerCurveMaxMagnitude) {
                    frc::ApplyPowerCurve(-80.0, 0.3, 100.0));
 }
 
-TEST(MathUtilTest, ApplyDeadbandUnits) {
+TEST(MathUtilTest, ApplyPowerCurveWithUnits) {
   EXPECT_DOUBLE_EQ(
       0, frc::ApplyPowerCurve<units::meters_per_second_t>(0_mps, 2.0).value());
   EXPECT_DOUBLE_EQ(
