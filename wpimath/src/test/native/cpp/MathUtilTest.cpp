@@ -109,7 +109,8 @@ TEST(MathUtilTest, ApplyPowerCurveWithUnits) {
   EXPECT_DOUBLE_EQ(
       1, frc::ApplyPowerCurve<units::meters_per_second_t>(1_mps, 2.0).value());
   EXPECT_DOUBLE_EQ(
-      -1, frc::ApplyPowerCurve<units::meters_per_second_t>(-1_mps, 2.0).value());
+      -1,
+      frc::ApplyPowerCurve<units::meters_per_second_t>(-1_mps, 2.0).value());
 
   EXPECT_DOUBLE_EQ(
       0.5 * 0.5 * 10,
