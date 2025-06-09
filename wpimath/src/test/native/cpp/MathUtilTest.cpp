@@ -115,6 +115,10 @@ TEST(MathUtilTest, ApplyDeadbandUnits) {
       0.5 * 0.5 * 10,
       frc::ApplyPowerCurve<units::meters_per_second_t>(5_mps, 2.0, 10_mps)
           .value());
+  EXPECT_DOUBLE_EQ(
+      -0.5 * 0.5 * 10,
+      frc::ApplyPowerCurve<units::meters_per_second_t>(-5_mps, 2.0, 10_mps)
+          .value());
 }
 
 TEST(MathUtilTest, InputModulus) {
