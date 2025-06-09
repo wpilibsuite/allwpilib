@@ -108,14 +108,14 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
  * @param value The input value to transform.
  * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared
  * curve). Must be positive.
- * @param maxMagnitude The maximum expected absolute value of input. Must be
+ * @param maxMagnitude The maximum expected absolute value of input (Defaults to 1). Must be
  * positive.
  * @return The transformed value with the same sign and scaled to the input
  * range.
  */
 template <typename T>
   requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
-constexpr T ApplyPowerCurve(T value, double exponent, T maxMagnitude) {
+constexpr T ApplyPowerCurve(T value, double exponent, T maxMagnitude = T{1.0}) {
   T magnitude;
   if constexpr (std::is_arithmetic_v<T>) {
     magnitude = gcem::abs(value);
