@@ -83,7 +83,7 @@ TEST(MathUtilTest, ApplyPowerCurve) {
   EXPECT_DOUBLE_EQ(-std::pow(0.8, 0.3), frc::ApplyPowerCurve(-0.8, 0.3));
 }
 
-TEST(MathUtilTest, ApplyPowerCurveMaxMagnitude) {
+TEST(MathUtilTest, ApplyPowerCurveWithMaxMagnitude) {
   EXPECT_DOUBLE_EQ(5.0, frc::ApplyPowerCurve(5.0, 1.0, 10.0));
   EXPECT_DOUBLE_EQ(-5.0, frc::ApplyPowerCurve(-5.0, 1.0, 10.0));
 
@@ -107,9 +107,9 @@ TEST(MathUtilTest, ApplyPowerCurveWithUnits) {
   EXPECT_DOUBLE_EQ(
       0, frc::ApplyPowerCurve<units::meters_per_second_t>(0_mps, 2.0).value());
   EXPECT_DOUBLE_EQ(
-      -1, frc::ApplyPowerCurve<units::meters_per_second_t>(1_mps, 2.0).value());
+      1, frc::ApplyPowerCurve<units::meters_per_second_t>(1_mps, 2.0).value());
   EXPECT_DOUBLE_EQ(
-      1, frc::ApplyPowerCurve<units::meters_per_second_t>(-1_mps, 2.0).value());
+      -1, frc::ApplyPowerCurve<units::meters_per_second_t>(-1_mps, 2.0).value());
 
   EXPECT_DOUBLE_EQ(
       0.5 * 0.5 * 10,
