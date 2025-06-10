@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import org.wpilib.commands3.Trigger;
 
 /** A {@link Trigger} that uses a {@link NetworkTable} boolean field. */
 public class NetworkButton extends Trigger {

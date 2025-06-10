@@ -1,7 +1,4 @@
-package org.wpilib.commands3.button;
-
-import org.wpilib.commands3.Command;
-import org.wpilib.commands3.Scheduler;
+package org.wpilib.commands3;
 
 /**
  * A scope for when a binding is live. Bindings tied to a scope must be deleted when the scope
@@ -14,6 +11,14 @@ sealed interface BindingScope {
    * @return True if the scope is still active, false if not.
    */
   boolean active();
+
+  static BindingScope global() {
+    return Global.INSTANCE;
+  }
+
+  static BindingScope forCommand(Scheduler scheduler, Command command) {
+    return new ForCommand(scheduler, command);
+  }
 
   /**
    * A global binding scope. Bindings in this scope are always active.

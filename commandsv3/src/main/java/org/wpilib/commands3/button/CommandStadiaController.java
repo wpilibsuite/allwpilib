@@ -6,6 +6,7 @@ package org.wpilib.commands3.button;
 
 import edu.wpi.first.wpilibj.StadiaController;
 import org.wpilib.commands3.Scheduler;
+import org.wpilib.commands3.Trigger;
 
 /**
  * A version of {@link StadiaController} with {@link Trigger} factories for command-based.

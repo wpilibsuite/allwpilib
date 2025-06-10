@@ -163,16 +163,72 @@ class SchedulerTest {
                 })
             .named("Bad Behavior");
 
-    scheduler.schedule(command);
+    new Trigger(scheduler, () -> true)
+        .onTrue(command);
 
     try {
-
       scheduler.run();
       fail("An exception should have been thrown");
     } catch (RuntimeException e) {
       assertEquals("The exception", e.getMessage());
+
+      assertEquals("org.wpilib.commands3.SchedulerTest", e.getStackTrace()[0].getClassName());
+      assertEquals("lambda$errorDetection$3", e.getStackTrace()[0].getMethodName());
+
+      assertEquals("=== Command Binding Trace ===", e.getStackTrace()[2].getClassName());
+
+      assertEquals(getClass().getName(), e.getStackTrace()[3].getClassName());
+      assertEquals("errorDetection", e.getStackTrace()[3].getMethodName());
     } catch (Throwable t) {
       fail("Expected a RuntimeException to be thrown, but got " + t);
+    }
+  }
+
+  @Test
+  void nestedErrorDetection() {
+    var command = Command.noRequirements(co -> {
+      co.await(Command.noRequirements(c2 -> {
+        new Trigger(scheduler, () -> true)
+            .onTrue(Command.noRequirements(c3 -> {
+                  // Throws IndexOutOfBoundsException
+                  new ArrayList<>(0).get(-1);
+                }).named("Throws IndexOutOfBounds")
+            );
+        c2.park();
+      }).named("Schedules With Trigger"));
+    }).named("Schedules Directly");
+
+    scheduler.schedule(command);
+
+    // The first run sets up the trigger, but does not fire
+    // The second run will fire the trigger and cause the inner command to run and throw
+    scheduler.run();
+
+    try {
+      scheduler.run();
+      fail("Index OOB exception expected");
+    } catch (IndexOutOfBoundsException e) {
+      StackTraceElement[] stackTrace = e.getStackTrace();
+
+      assertEquals("Index -1 out of bounds for length 0", e.getMessage());
+      int nestedIndex = 0;
+      for (; nestedIndex < stackTrace.length; nestedIndex++) {
+        if (stackTrace[nestedIndex].getClassName().equals(getClass().getName())) {
+          break;
+        }
+      }
+
+      // user code trace for the scheduler run invocation (to `scheduler.run()` in the try block)
+      assertEquals("lambda$nestedErrorDetection$6", stackTrace[nestedIndex].getMethodName());
+      assertEquals("nestedErrorDetection", stackTrace[nestedIndex + 1].getMethodName());
+
+      // user code trace for where the command was scheduled (the `.onTrue()` line)
+      assertEquals("=== Command Binding Trace ===", stackTrace[nestedIndex + 2].getClassName());
+      assertEquals("lambda$nestedErrorDetection$7", stackTrace[nestedIndex + 3].getMethodName());
+      assertEquals("lambda$nestedErrorDetection$8", stackTrace[nestedIndex + 4].getMethodName());
+      assertEquals("nestedErrorDetection", stackTrace[nestedIndex + 5].getMethodName());
+    } catch (Throwable unexpected) {
+      fail("Expected an IndexOutOfBoundsException to have been thrown, but got" + unexpected);
     }
   }
 

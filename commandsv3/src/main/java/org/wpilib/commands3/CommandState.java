@@ -9,6 +9,7 @@ final class CommandState {
   private final Command command;
   private final Command parent;
   private final Coroutine coroutine;
+  private final Binding binding; // may be null
   private double lastRuntimeMs = -1;
   private double totalRuntimeMs = 0;
   private final int id = System.identityHashCode(this);
@@ -21,11 +22,15 @@ final class CommandState {
    *     that invoked the schedule() call; in this manner, an ancestry tree can be built, where each
    *     {@code CommandState} object references a parent node in the tree.
    * @param coroutine The coroutine to which the command is bound.
+   * @param scheduleFrames The stack frames for the schedule site; that is, the backtrace of the
+   *     code that caused the command to be scheduled. These let us report better traces when
+   *     commands encounter exceptions.
    */
-  CommandState(Command command, Command parent, Coroutine coroutine) {
+  CommandState(Command command, Command parent, Coroutine coroutine, Binding binding) {
     this.command = command;
     this.parent = parent;
     this.coroutine = coroutine;
+    this.binding = binding; // may be null
   }
 
   public Command command() {
@@ -38,6 +43,11 @@ final class CommandState {
 
   public Coroutine coroutine() {
     return coroutine;
+  }
+
+  // may return null
+  public Binding binding() {
+    return binding;
   }
 
   /**

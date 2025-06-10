@@ -5,6 +5,7 @@
 package org.wpilib.commands3.button;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.wpilib.commands3.Trigger;
 
 /**
  * This class is intended to be used within a program. The programmer can manually set its value.
