@@ -438,6 +438,24 @@ class SchedulerTest {
   }
 
   @Test
+  void compositionsDoNotCancelParent() {
+    var res = new RequireableResource("The Resource", scheduler);
+    var group = res.run(co -> {
+      co.fork(res.run(Coroutine::park).named("First Child"));
+      co.fork(res.run(Coroutine::park).named("Second Child"));
+      co.park();
+    }).named("Group");
+
+    scheduler.schedule(group);
+    scheduler.run();
+
+    assertEquals(
+        List.of("Group", "Second Child"),
+        scheduler.getRunningCommands().stream().map(Command::name).toList()
+    );
+  }
+
+  @Test
   void compositionsDoNotNeedRequirements() {
     var r1 = new RequireableResource("R1", scheduler);
     var r2 = new RequireableResource("r2", scheduler);
