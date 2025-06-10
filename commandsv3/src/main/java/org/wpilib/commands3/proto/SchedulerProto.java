@@ -33,7 +33,7 @@ public class SchedulerProto implements Protobuf<Scheduler, ProtobufScheduler> {
   public void pack(ProtobufScheduler msg, Scheduler scheduler) {
     var cp = new CommandProto(scheduler);
 
-    for (var command : scheduler.getScheduledCommands()) {
+    for (var command : scheduler.getQueuedCommands()) {
       ProtobufCommand commandMessage = cp.createMessage();
       cp.pack(commandMessage, command);
       msg.addQueuedCommands(commandMessage);
