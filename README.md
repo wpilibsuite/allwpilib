@@ -19,7 +19,7 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
     - [Using Development Builds](#using-development-builds)
     - [Custom toolchain location](#custom-toolchain-location)
     - [Formatting/Linting](#formattinglinting)
-    - [Generated file](#generated-files)
+    - [Generated files](#generated-files)
     - [CMake](#cmake)
     - [Bazel](#bazel)
   - [Running examples in simulation](#running-examples-in-simulation)
