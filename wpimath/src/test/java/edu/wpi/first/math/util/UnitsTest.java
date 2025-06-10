@@ -30,6 +30,16 @@ class UnitsTest extends UtilityClassTest<Units> {
   }
 
   @Test
+  void milesToMetersTest() {
+    assertEquals(1609.344, Units.milesToMeters(1), 1e-3);
+  }
+
+  @Test
+  void metersToMilesTest() {
+    assertEquals(0.000621371, Units.metersToMiles(1), 1e-2);
+  }
+
+  @Test
   void inchesToMetersTest() {
     assertEquals(0.0254, Units.inchesToMeters(1), 1e-3);
   }

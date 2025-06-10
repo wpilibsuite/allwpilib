@@ -8,6 +8,7 @@ package edu.wpi.first.math.util;
 public final class Units {
   private static final double kInchesPerFoot = 12.0;
   private static final double kMetersPerInch = 0.0254;
+  private static final double kMetersPerMiles = 1609.344;
   private static final double kSecondsPerMinute = 60;
   private static final double kMillisecondsPerSecond = 1000;
   private static final double kKilogramsPerLb = 0.453592;
@@ -55,6 +56,26 @@ public final class Units {
    */
   public static double inchesToMeters(double inches) {
     return inches * kMetersPerInch;
+  }
+
+  /**
+   * Converts given meters to miles.
+   *
+   * @param meters The meters to convert to miles.
+   * @return Miles converted from meters.
+   */
+  public static double metersToMiles(double meters) {
+    return meters / kMetersPerMiles;
+  }
+
+  /**
+   * Converts given miles to meters.
+   *
+   * @param miles The miles to convert to meters.
+   * @return Meters converted from miles.
+   */
+  public static double milesToMeters(double miles) {
+    return miles * kMetersPerMiles;
   }
 
   /**
