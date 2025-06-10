@@ -2,15 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.commands3.button;
+package org.wpilib.commands3;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Time;
-import org.wpilib.commands3.Command;
-import org.wpilib.commands3.Scheduler;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -278,7 +276,7 @@ public class Trigger implements BooleanSupplier {
    */
   private void scheduleBindings(BindingType bindingType) {
     m_bindings.getOrDefault(bindingType, List.of())
-        .forEach(binding -> scheduler.schedule(binding.command()));
+        .forEach(scheduler::schedule);
   }
 
   /**
@@ -306,7 +304,7 @@ public class Trigger implements BooleanSupplier {
               if (scheduler.isScheduledOrRunning(command)) {
                 scheduler.cancel(command);
               } else {
-                scheduler.schedule(command);
+                scheduler.schedule(binding);
               }
             });
   }
@@ -314,14 +312,17 @@ public class Trigger implements BooleanSupplier {
   private void addBinding(BindingType bindingType, Command command) {
     BindingScope scope = switch (scheduler.currentCommand()) {
       // A command is creating a binding - make it scoped to that specific command
-      case Command c -> new BindingScope.ForCommand(scheduler, c);
+      case Command c -> BindingScope.forCommand(scheduler, c);
 
       // Creating a binding outside a command - it's global in scope
-      case null -> BindingScope.Global.INSTANCE;
+      case null -> BindingScope.global();
     };
 
+    Throwable t = new Throwable("Dummy error to get the binding trace");
+    StackTraceElement[] frames = t.getStackTrace();
+
     m_bindings.computeIfAbsent(bindingType, _k -> new ArrayList<>())
-        .add(new Binding(scope, bindingType, command));
+        .add(new Binding(scope, bindingType, command, frames));
 
     // Ensure this trigger is bound to the event loop. NOP if already bound
     m_loop.bind(m_eventLoopCallback);

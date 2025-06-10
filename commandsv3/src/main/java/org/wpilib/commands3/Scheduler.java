@@ -182,6 +182,20 @@ public class Scheduler implements ProtobufSerializable {
    *     scheduled another command that shares at least one required resource
    */
   public ScheduleResult schedule(Command command) {
+    var binding = new Binding(
+        BindingScope.global(),
+        BindingType.IMMEDIATE,
+        command,
+        new Throwable().getStackTrace()
+    );
+
+    return schedule(binding);
+  }
+
+  // Package-private for use by Trigger
+  ScheduleResult schedule(Binding binding) {
+    var command = binding.command();
+
     if (isScheduledOrRunning(command)) {
       return ScheduleResult.ALREADY_RUNNING;
     }
@@ -207,7 +221,11 @@ public class Scheduler implements ProtobufSerializable {
     // so at this point we're guaranteed to be >= priority than anything already on deck
     evictConflictingOnDeckCommands(command);
 
-    var state = new CommandState(command, currentCommand(), buildCoroutine(command));
+    var state = new CommandState(
+        command,
+        currentCommand(),
+        buildCoroutine(command),
+        binding);
 
     if (currentState() != null) {
       // Scheduling a child command while running. Start it immediately instead of waiting a full
@@ -421,6 +439,11 @@ public class Scheduler implements ProtobufSerializable {
     coroutine.mount();
     try {
       coroutine.runToYieldPoint();
+    } catch (RuntimeException e) {
+      // Intercept the exception, inject stack frames from the schedule site, and rethrow it
+      var binding = state.binding();
+      e.setStackTrace(CommandTraceHelper.modifyTrace(e.getStackTrace(), binding.frames()));
+      throw e;
     } finally {
       long endMicros = RobotController.getTime();
       double elapsedMs = Milliseconds.convertFrom(endMicros - startMicros, Microseconds);

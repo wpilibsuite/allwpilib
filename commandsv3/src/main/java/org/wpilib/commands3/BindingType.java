@@ -1,9 +1,14 @@
-package org.wpilib.commands3.button;
+package org.wpilib.commands3;
 
 /**
  * Describes when a command bound to a trigger should run.
  */
 enum BindingType {
+  /**
+   * An immediate or manual binding created when calling {@link Scheduler#schedule(Command)}
+   * directly, without using a trigger to bind it to a signal.
+   */
+  IMMEDIATE,
   /**
    * Schedules (forks) a command on a rising edge signal. The command will run until it completes
    * or is interrupted by another command requiring the same resources.
