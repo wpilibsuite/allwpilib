@@ -157,7 +157,7 @@ public final class Continuation {
         mountedContinuation.set(continuation);
       }
     } catch (Throwable t) {
-      // Anything thrown internally by Thread.setContinuation.
+      // `t` is anything thrown internally by Thread.setContinuation.
       // It only assigns to a field, no way to throw
       // However, if the invocation fails for some reason, we'll end up with an
       // IllegalStateException when attempting to run an unmounted continuation

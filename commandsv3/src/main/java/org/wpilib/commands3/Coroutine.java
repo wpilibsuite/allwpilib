@@ -65,7 +65,8 @@ public final class Coroutine {
     requireMounted();
 
     while (true) {
-      Coroutine.this.yield();
+      // 'this' is required because 'yield' is a semi-keyword and needs to be qualified
+      this.yield();
     }
   }
 

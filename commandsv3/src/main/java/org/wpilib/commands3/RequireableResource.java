@@ -10,16 +10,31 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * A resource that may be claimed by a command. A single claimable resource cannot be claimed by
+ * more than one running command at a time.
+ */
 @SuppressWarnings("this-escape")
 public class RequireableResource implements Sendable {
   private final String name;
 
   private final Scheduler registeredScheduler;
 
+  /**
+   * Creates a new claimable resource, registered with the default scheduler instance.
+   *
+   * @param name The name of the resource. Cannot be null.
+   */
   public RequireableResource(String name) {
     this(name, Scheduler.getInstance());
   }
 
+  /**
+   * Creates a new claimable resource, registered with the given scheduler instance.
+   *
+   * @param name The name of the resource. Cannot be null.
+   * @param scheduler The registered scheduler. Cannot be null.
+   */
   public RequireableResource(String name, Scheduler scheduler) {
     this.name = name;
     this.registeredScheduler = scheduler;
@@ -54,10 +69,23 @@ public class RequireableResource implements Sendable {
     return new CommandBuilder().requiring(this).executing(command);
   }
 
+  /**
+   * Returns a command that idles this resource until another command claims it. The idle command
+   * has {@link Command#LOWEST_PRIORITY the lowest priority} and can be interrupted by any other
+   * command.
+   *
+   * <p>The default command for every claimable resource is an idle command.</p>
+   * @return A new idle command.
+   */
   public Command idle() {
     return new IdleCommand(this);
   }
 
+  /**
+   * Returns a command that idles this resource for the given duration of time.
+   * @param duration How long the resource should idle for.
+   * @return A new idle command.
+   */
   public Command idle(Time duration) {
     return idle().withTimeout(duration);
   }
