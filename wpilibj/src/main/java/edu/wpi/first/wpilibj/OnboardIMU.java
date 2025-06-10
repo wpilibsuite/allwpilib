@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 
 /** SystemCore onboard IMU */
 public class OnboardIMU {
-
   /** A mount orientation of SystemCore */
   public enum MountOrientation {
     /** Flat */
@@ -37,16 +36,15 @@ public class OnboardIMU {
    * @return yaw value in radians
    */
   public double getYawRadians() {
-    switch (m_mountOrientation) {
-      case kFlat:
-        return IMUJNI.getIMUYawFlat();
-      case kLandscape:
-        return IMUJNI.getIMUYawLandscape();
-      case kPortrait:
-        return IMUJNI.getIMUYawPortrait();
-      default:
-        return 0;
-    }
+    return getYawNoOffset() - m_yawOffset;
+  }
+
+  /**
+   * Reset the current yaw value to 0. Future reads of the yaw value will be relative to the current
+   * orientation.
+   */
+  public void resetYaw() {
+    m_yawOffset = getYawNoOffset();
   }
 
   /**
@@ -177,5 +175,19 @@ public class OnboardIMU {
     return accelsRaw;
   }
 
+  private double getYawNoOffset() {
+    switch (m_mountOrientation) {
+      case kFlat:
+        return IMUJNI.getIMUYawFlat();
+      case kLandscape:
+        return IMUJNI.getIMUYawLandscape();
+      case kPortrait:
+        return IMUJNI.getIMUYawPortrait();
+      default:
+        return 0;
+    }
+  }
+
   private final MountOrientation m_mountOrientation;
+  private double m_yawOffset = 0;
 }

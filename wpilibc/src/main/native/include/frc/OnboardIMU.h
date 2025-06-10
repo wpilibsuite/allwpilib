@@ -44,6 +44,12 @@ class OnboardIMU {
   units::radian_t GetYaw();
 
   /**
+   * Reset the current yaw value to 0. Future reads of the yaw value will be
+   * relative to the current orientation.
+   */
+  void ResetYaw();
+
+  /**
    * Get the yaw as a Rotation2d.
    * @return yaw
    */
@@ -116,6 +122,8 @@ class OnboardIMU {
   units::meters_per_second_squared_t GetAccelZ();
 
  private:
+  units::radian_t GetYawNoOffset();
   const MountOrientation m_mountOrientation;
+  units::radian_t m_yawOffset{0};
 };
 }  // namespace frc

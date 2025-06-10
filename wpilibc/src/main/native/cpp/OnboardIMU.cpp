@@ -15,7 +15,7 @@ OnboardIMU::OnboardIMU(MountOrientation mountOrientation)
   // TODO: usage reporting
 }
 
-units::radian_t OnboardIMU::GetYaw() {
+units::radian_t OnboardIMU::GetYawNoOffset() {
   int64_t timestamp;
   double val;
   switch (m_mountOrientation) {
@@ -32,6 +32,14 @@ units::radian_t OnboardIMU::GetYaw() {
       val = 0;
   }
   return units::radian_t{val};
+}
+
+units::radian_t OnboardIMU::GetYaw() {
+  return GetYawNoOffset() - m_yawOffset;
+}
+
+void OnboardIMU::ResetYaw() {
+  m_yawOffset = GetYawNoOffset();
 }
 
 Rotation2d OnboardIMU::GetRotation2d() {
