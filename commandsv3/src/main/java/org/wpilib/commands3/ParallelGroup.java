@@ -23,7 +23,6 @@ public class ParallelGroup implements Command {
   private final Set<RequireableResource> requirements = new HashSet<>();
   private final String name;
   private final int priority;
-  private RobotDisabledBehavior disabledBehavior;
 
   /**
    * Creates a new parallel group.
@@ -79,14 +78,6 @@ public class ParallelGroup implements Command {
 
     this.priority =
         allCommands.stream().mapToInt(Command::priority).max().orElse(Command.DEFAULT_PRIORITY);
-
-    this.disabledBehavior = RobotDisabledBehavior.RunWhileDisabled;
-    for (Command command : allCommands) {
-      if (command.robotDisabledBehavior() == RobotDisabledBehavior.CancelWhileDisabled) {
-        this.disabledBehavior = RobotDisabledBehavior.CancelWhileDisabled;
-        break;
-      }
-    }
   }
 
   /**
@@ -138,11 +129,6 @@ public class ParallelGroup implements Command {
   @Override
   public int priority() {
     return priority;
-  }
-
-  @Override
-  public RobotDisabledBehavior robotDisabledBehavior() {
-    return disabledBehavior;
   }
 
   @Override

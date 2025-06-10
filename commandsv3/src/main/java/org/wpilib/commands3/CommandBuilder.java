@@ -8,6 +8,7 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -23,8 +24,6 @@ public class CommandBuilder {
   private Runnable onCancel = () -> {};
   private String name;
   private int priority = Command.DEFAULT_PRIORITY;
-  private Command.RobotDisabledBehavior disabledBehavior =
-      Command.RobotDisabledBehavior.CancelWhileDisabled;
 
   /**
    * Adds a resource as a requirement for the command.
@@ -121,31 +120,6 @@ public class CommandBuilder {
   }
 
   /**
-   * Marks the command as being able to run while the robot is disabled.
-   *
-   * @return The builder object, for chaining
-   * @see Command#robotDisabledBehavior()
-   */
-  public CommandBuilder ignoringDisable() {
-    return withDisabledBehavior(Command.RobotDisabledBehavior.RunWhileDisabled);
-  }
-
-  /**
-   * Gives the command the given behavior when the robot is disabled.
-   *
-   * @param behavior The behavior when the robot is disabled
-   * @return The builder object, for chaining
-   * @see Command#robotDisabledBehavior()
-   * @see #ignoringDisable()
-   */
-  public CommandBuilder withDisabledBehavior(Command.RobotDisabledBehavior behavior) {
-    requireNonNullParam(behavior, "behavior", "CommandBuilder.withDisabledBehavior");
-
-    this.disabledBehavior = behavior;
-    return this;
-  }
-
-  /**
    * Sets the code that the command will execute when it's being run by the scheduler.
    *
    * @param impl The command implementation
@@ -211,13 +185,8 @@ public class CommandBuilder {
       }
 
       @Override
-      public RobotDisabledBehavior robotDisabledBehavior() {
-        return disabledBehavior;
-      }
-
-      @Override
       public String toString() {
-        return name();
+        return "Command name=" + name() + " priority=" + priority;
       }
     };
   }

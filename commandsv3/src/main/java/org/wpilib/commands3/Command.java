@@ -133,33 +133,6 @@ public interface Command {
     return DEFAULT_PRIORITY;
   }
 
-  enum RobotDisabledBehavior {
-    /**
-     * Behavior that will prevent a command from running while the robot is disabled. A command with
-     * this behavior will be cancelled while running if the robot is disabled, and will not be able
-     * to be scheduled while disabled.
-     */
-    CancelWhileDisabled,
-    /**
-     * Behavior that will allow a command to run while the robot is disabled. This allows safe
-     * commands - commands that do not try to move actuators - to still be able to run do perform
-     * tasks like updating data buffers or resetting sensors and odometry. Note that even if a
-     * command that <i>does</i> try to move actuators has this behavior, it will be unable to effect
-     * any movement due to the inbuilt safety mechanisms in the roboRIO and vendor hardware.
-     */
-    RunWhileDisabled,
-  }
-
-  /**
-   * The behavior of this command when the robot is disabled. Defaults to {@link
-   * RobotDisabledBehavior#CancelWhileDisabled}.
-   *
-   * @return the command's behavior during robot disable.
-   */
-  default RobotDisabledBehavior robotDisabledBehavior() {
-    return RobotDisabledBehavior.CancelWhileDisabled;
-  }
-
   /**
    * Checks if this command has a lower {@link #priority() priority} than another command.
    *
