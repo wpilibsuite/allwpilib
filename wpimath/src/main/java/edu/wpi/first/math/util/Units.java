@@ -8,8 +8,9 @@ package edu.wpi.first.math.util;
 public final class Units {
   private static final double kInchesPerFoot = 12.0;
   private static final double kMetersPerInch = 0.0254;
-  private static final double kMetersPerMiles = 1609.344;
+  private static final double kMetersPerMile = 1609.344;
   private static final double kSecondsPerMinute = 60;
+  private static final double kMinutesPerHour = 60;
   private static final double kMillisecondsPerSecond = 1000;
   private static final double kKilogramsPerLb = 0.453592;
 
@@ -65,7 +66,7 @@ public final class Units {
    * @return Miles converted from meters.
    */
   public static double metersToMiles(double meters) {
-    return meters / kMetersPerMiles;
+    return meters / kMetersPerMile;
   }
 
   /**
@@ -75,7 +76,7 @@ public final class Units {
    * @return Meters converted from miles.
    */
   public static double milesToMeters(double miles) {
-    return miles * kMetersPerMiles;
+    return miles * kMetersPerMile;
   }
 
   /**
@@ -157,6 +158,26 @@ public final class Units {
   public static double radiansPerSecondToRotationsPerMinute(double radiansPerSecond) {
     return radiansPerSecond * (kSecondsPerMinute / 2) / Math.PI;
   }
+
+  /**
+   * Converts miles per hour to meters per second.
+   *
+   * @param mph The miles per hour to convert to meters per second.
+   * @return Meters per second converted from miles per hour.
+   */
+  public static double milesPerHourToMetersPerSecond(double mph) {
+    return mph * (kMetersPerMile / (kSecondsPerMinute * kMinutesPerHour));
+  }
+
+  /**
+   * Converts meters per second to miles per hour.
+   *
+   * @param metersPerSecond The meters per second to convert to from miles per hour.
+   * @return Miles per hour converted from meters per second.
+   */
+  public static double metersPerSecondToMilesPerHour(double metersPerSecond) {
+    return metersPerSecond * ((kSecondsPerMinute * kMinutesPerHour) / kMetersPerMile);
+  }  
 
   /**
    * Converts given milliseconds to seconds.

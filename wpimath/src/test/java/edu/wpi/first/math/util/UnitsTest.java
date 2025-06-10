@@ -65,6 +65,16 @@ class UnitsTest extends UtilityClassTest<Units> {
   }
 
   @Test
+  void milesPerHourToMetersPerSecondTest() {
+    assertEquals(0.44704, Units.milesPerHourToMetersPerSecond(1), 1e-2);
+  }
+
+  @Test
+  void metersPerSecondToMilesPerHourTest() {
+    assertEquals(2.237, Units.metersPerSecondToMilesPerHour(1), 1e-2);
+  }
+
+  @Test
   void millisecondsToSeconds() {
     assertEquals(0.5, Units.millisecondsToSeconds(500), 1e-2);
   }
