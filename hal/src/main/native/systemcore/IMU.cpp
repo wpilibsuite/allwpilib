@@ -12,7 +12,7 @@
 #include "SystemServerInternal.h"
 #include "hal/Errors.h"
 
-#define IMU_PREFIX "imu/"
+#define IMU_PREFIX "/imu/"
 
 namespace {
 
