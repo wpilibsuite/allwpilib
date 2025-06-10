@@ -5,8 +5,6 @@
 package org.wpilib.commands3;
 
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -14,7 +12,7 @@ import java.util.function.Consumer;
  * A resource that may be claimed by a command. A single claimable resource cannot be claimed by
  * more than one running command at a time.
  */
-public class RequireableResource implements Sendable {
+public class RequireableResource {
   private final String name;
 
   private final Scheduler registeredScheduler;
@@ -95,14 +93,5 @@ public class RequireableResource implements Sendable {
   @Override
   public String toString() {
     return name;
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("RequireableResource");
-    builder.addStringArrayProperty(
-        "Current Commands",
-        () -> getRunningCommands().stream().map(Command::name).toArray(String[]::new),
-        null);
   }
 }
