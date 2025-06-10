@@ -5,8 +5,8 @@
 package edu.wpi.first.wpilibj.examples.gyromecanum;
 
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.OnboardIMU;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
@@ -16,19 +16,16 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
  * in relation to the starting orientation of the robot (field-oriented controls).
  */
 public class Robot extends TimedRobot {
-  // gyro calibration constant, may need to be adjusted;
-  // gyro value of 360 is set to correspond to one full revolution
-  private static final double kVoltsPerDegreePerSecond = 0.0128;
-
   private static final int kFrontLeftChannel = 0;
   private static final int kRearLeftChannel = 1;
   private static final int kFrontRightChannel = 2;
   private static final int kRearRightChannel = 3;
-  private static final int kGyroPort = 0;
+  private static final OnboardIMU.MountOrientation kIMUMountOrientation =
+      OnboardIMU.MountOrientation.kFlat;
   private static final int kJoystickPort = 0;
 
   private final MecanumDrive m_robotDrive;
-  private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
+  private final OnboardIMU m_imu = new OnboardIMU(kIMUMountOrientation);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
   /** Called once at the beginning of the robot program. */
@@ -45,8 +42,6 @@ public class Robot extends TimedRobot {
 
     m_robotDrive = new MecanumDrive(frontLeft::set, rearLeft::set, frontRight::set, rearRight::set);
 
-    m_gyro.setSensitivity(kVoltsPerDegreePerSecond);
-
     SendableRegistry.addChild(m_robotDrive, frontLeft);
     SendableRegistry.addChild(m_robotDrive, rearLeft);
     SendableRegistry.addChild(m_robotDrive, frontRight);
@@ -57,6 +52,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     m_robotDrive.driveCartesian(
-        -m_joystick.getY(), -m_joystick.getX(), -m_joystick.getZ(), m_gyro.getRotation2d());
+        -m_joystick.getY(), -m_joystick.getX(), -m_joystick.getZ(), m_imu.getRotation2d());
   }
 }
