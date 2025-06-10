@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package org.wpilib.commands3;
 
 import java.util.ArrayList;
@@ -20,7 +24,6 @@ final class CommandTraceHelper {
   public static StackTraceElement[] modifyTrace(
       StackTraceElement[] commandExceptionTrace,
       StackTraceElement[] commandScheduleTrace) {
-
     List<StackTraceElement> frames = new ArrayList<>();
 
     List<String> filteredClasses = List.of(
