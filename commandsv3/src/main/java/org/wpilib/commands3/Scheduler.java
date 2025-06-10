@@ -615,7 +615,7 @@ public class Scheduler implements ProtobufSerializable {
   }
 
   /** For internal use. */
-  public Collection<Command> getScheduledCommands() {
+  public Collection<Command> getQueuedCommands() {
     return onDeck.stream().map(CommandState::command).toList();
   }
 
