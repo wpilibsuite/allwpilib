@@ -4,6 +4,8 @@
 
 #include "hal/IMU.h"
 
+#include <numbers>
+
 #include <networktables/DoubleArrayTopic.h>
 #include <networktables/DoubleTopic.h>
 #include <networktables/NetworkTableInstance.h>
@@ -45,6 +47,7 @@ struct IMU {
 
 static IMU* imu;
 
+constexpr double kDegreesToRadians = std::numbers::pi / 180.0;
 }  // namespace
 
 namespace hal::init {
@@ -75,9 +78,9 @@ void HAL_GetIMUGyroRates(HAL_GyroRate3d* rate, int32_t* status) {
   }
 
   *rate = HAL_GyroRate3d{.timestamp = update.time,
-                         .x = update.value[0],
-                         .y = update.value[1],
-                         .z = update.value[2]};
+                         .x = update.value[0] * kDegreesToRadians,
+                         .y = update.value[1] * kDegreesToRadians,
+                         .z = update.value[2] * kDegreesToRadians};
 }
 
 void HAL_GetIMUEulerAngles(HAL_EulerAngles3d* angles, int32_t* status) {
@@ -87,9 +90,9 @@ void HAL_GetIMUEulerAngles(HAL_EulerAngles3d* angles, int32_t* status) {
     return;
   }
   *angles = HAL_EulerAngles3d{.timestamp = update.time,
-                              .x = update.value[0],
-                              .y = update.value[1],
-                              .z = update.value[2]};
+                              .x = update.value[0] * kDegreesToRadians,
+                              .y = update.value[1] * kDegreesToRadians,
+                              .z = update.value[2] * kDegreesToRadians};
 }
 
 void HAL_GetIMUQuaternion(HAL_Quaternion* quat, int32_t* status) {
@@ -108,18 +111,18 @@ void HAL_GetIMUQuaternion(HAL_Quaternion* quat, int32_t* status) {
 double HAL_GetIMUYawFlat(int64_t* timestamp) {
   auto update = imu->yawFlatSub.GetAtomic();
   *timestamp = update.time;
-  return update.value;
+  return update.value * kDegreesToRadians;
 }
 
 double HAL_GetIMUYawLandscape(int64_t* timestamp) {
   auto update = imu->yawLandscapeSub.GetAtomic();
   *timestamp = update.time;
-  return update.value;
+  return update.value * kDegreesToRadians;
 }
 
 double HAL_GetIMUYawPortrait(int64_t* timestamp) {
   auto update = imu->yawFlatSub.GetAtomic();
   *timestamp = update.time;
-  return update.value;
+  return update.value * kDegreesToRadians;
 }
 }  // extern "C"
