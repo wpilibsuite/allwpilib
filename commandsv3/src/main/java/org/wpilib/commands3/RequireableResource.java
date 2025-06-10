@@ -14,7 +14,6 @@ import java.util.function.Consumer;
  * A resource that may be claimed by a command. A single claimable resource cannot be claimed by
  * more than one running command at a time.
  */
-@SuppressWarnings("this-escape")
 public class RequireableResource implements Sendable {
   private final String name;
 
@@ -38,7 +37,6 @@ public class RequireableResource implements Sendable {
   public RequireableResource(String name, Scheduler scheduler) {
     this.name = name;
     this.registeredScheduler = scheduler;
-    setDefaultCommand(idle());
   }
 
   public String getName() {
