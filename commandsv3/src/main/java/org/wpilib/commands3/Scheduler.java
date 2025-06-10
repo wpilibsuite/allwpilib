@@ -143,6 +143,7 @@ public class Scheduler implements ProtobufSerializable {
    * @param callback the periodic function to run
    */
   public void addPeriodic(Runnable callback) {
+    // TODO: Add a unit test for this
     sideload(
         (coroutine) -> {
           while (coroutine.yield()) {
