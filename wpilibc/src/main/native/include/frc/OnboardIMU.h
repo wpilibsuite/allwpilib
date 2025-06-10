@@ -123,7 +123,7 @@ class OnboardIMU {
 
  private:
   units::radian_t GetYawNoOffset();
-  const MountOrientation m_mountOrientation;
+  MountOrientation m_mountOrientation;
   units::radian_t m_yawOffset{0};
 };
 }  // namespace frc
