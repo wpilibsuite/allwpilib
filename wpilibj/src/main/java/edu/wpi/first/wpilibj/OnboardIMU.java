@@ -9,20 +9,20 @@ import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 
-/** SystemCore onboard IMU */
+/** SystemCore onboard IMU. */
 public class OnboardIMU {
-  /** A mount orientation of SystemCore */
+  /** A mount orientation of SystemCore. */
   public enum MountOrientation {
-    /** Flat */
+    /** Flat. */
     kFlat,
-    /** Landscape */
+    /** Landscape. */
     kLandscape,
-    /** Portrait */
+    /** Portrait. */
     kPortrait
   }
 
   /**
-   * Constructs a handle to the SystemCore onboard IMU
+   * Constructs a handle to the SystemCore onboard IMU.
    *
    * @param mountOrientation the mount orientation of SystemCore to determine yaw.
    */
@@ -31,7 +31,7 @@ public class OnboardIMU {
   }
 
   /**
-   * Get the yaw value in radians
+   * Get the yaw value in radians.
    *
    * @return yaw value in radians
    */
@@ -189,5 +189,5 @@ public class OnboardIMU {
   }
 
   private final MountOrientation m_mountOrientation;
-  private double m_yawOffset = 0;
+  private double m_yawOffset;
 }

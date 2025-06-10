@@ -5,7 +5,7 @@
 package edu.wpi.first.hal;
 
 /**
- * IMU Functions
+ * IMU Functions.
  *
  * @see "hal/IMU.h"
  */
