@@ -24,7 +24,6 @@ public class Sequence implements Command {
   private final List<Command> commands = new ArrayList<>();
   private final Set<RequireableResource> requirements = new HashSet<>();
   private final int priority;
-  private RobotDisabledBehavior robotDisabledBehavior;
 
   /**
    * Creates a new command sequence.
@@ -42,14 +41,6 @@ public class Sequence implements Command {
 
     this.priority =
         commands.stream().mapToInt(Command::priority).max().orElse(Command.DEFAULT_PRIORITY);
-
-    this.robotDisabledBehavior = RobotDisabledBehavior.RunWhileDisabled;
-    for (var command : commands) {
-      if (command.robotDisabledBehavior() == RobotDisabledBehavior.CancelWhileDisabled) {
-        this.robotDisabledBehavior = RobotDisabledBehavior.CancelWhileDisabled;
-        break;
-      }
-    }
   }
 
   @Override
@@ -72,11 +63,6 @@ public class Sequence implements Command {
   @Override
   public int priority() {
     return priority;
-  }
-
-  @Override
-  public RobotDisabledBehavior robotDisabledBehavior() {
-    return robotDisabledBehavior;
   }
 
   public static SequenceBuilder builder() {

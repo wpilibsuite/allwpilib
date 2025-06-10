@@ -51,11 +51,6 @@ public final class IdleCommand implements Command {
   }
 
   @Override
-  public RobotDisabledBehavior robotDisabledBehavior() {
-    return RobotDisabledBehavior.RunWhileDisabled;
-  }
-
-  @Override
   public boolean equals(Object obj) {
     return obj instanceof IdleCommand other && Objects.equals(this.resource, other.resource);
   }
