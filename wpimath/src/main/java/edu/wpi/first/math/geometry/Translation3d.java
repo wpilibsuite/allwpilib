@@ -20,9 +20,9 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -305,7 +305,7 @@ public class Translation3d
    * @param translations The collection of translations to find the nearest.
    * @return The nearest Translation3d from the collection.
    */
-  public Translation3d nearest(Collection<Translation3d> translations) {
+  public Translation3d nearest(List<Translation3d> translations) {
     return Collections.min(translations, Comparator.comparing(this::getDistance));
   }
 
