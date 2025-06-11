@@ -255,10 +255,11 @@ class WPILIB_DLLEXPORT Translation3d {
    */
   constexpr Translation3d Nearest(
       std::span<const Translation3d> translations) const {
-    return *std::min_element(translations.begin(), translations.end(),
-                             [this](const Translation3d& a, const Translation3d& b) {
-                               return this->Distance(a) < this->Distance(b);
-                             });
+    return *std::min_element(
+        translations.begin(), translations.end(),
+        [this](const Translation3d& a, const Translation3d& b) {
+          return this->Distance(a) < this->Distance(b);
+        });
   }
 
   /**
@@ -268,10 +269,11 @@ class WPILIB_DLLEXPORT Translation3d {
    */
   constexpr Translation3d Nearest(
       std::initializer_list<Translation3d> translations) const {
-    return *std::min_element(translations.begin(), translations.end(),
-                             [this](const Translation3d& a, const Translation3d& b) {
-                               return this->Distance(a) < this->Distance(b);
-                             });
+    return *std::min_element(
+        translations.begin(), translations.end(),
+        [this](const Translation3d& a, const Translation3d& b) {
+          return this->Distance(a) < this->Distance(b);
+        });
   }
 
  private:
