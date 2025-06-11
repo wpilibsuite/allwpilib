@@ -213,8 +213,8 @@ class Translation3dTest {
     var origin = Translation3d.kZero;
 
     // Distance sort
-    // translations are in order of closest to farthest away from the origin at various positions in 3D
-    // space.
+    // translations are in order of closest to farthest away from the origin at various positions
+    // in 3D space.
     final var translation1 = new Translation3d(1, 0, 0);
     final var translation2 = new Translation3d(0, 2, 0);
     final var translation3 = new Translation3d(0, 0, 3);

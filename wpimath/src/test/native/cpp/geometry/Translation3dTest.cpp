@@ -191,8 +191,8 @@ TEST(Translation3dTest, Nearest) {
   const Translation3d origin{0_m, 0_m, 0_m};
 
   // Distance sort
-  // translations are in order of closest to farthest away from the origin at various
-  // positions in 3D space.
+  // translations are in order of closest to farthest away from the origin at
+  // various positions in 3D space.
   const Translation3d translation1{1_m, 0_m, 0_m};
   const Translation3d translation2{0_m, 2_m, 0_m};
   const Translation3d translation3{0_m, 0_m, 3_m};
