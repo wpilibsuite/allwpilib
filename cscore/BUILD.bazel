@@ -140,3 +140,24 @@ java_binary(
         "//wpiutil:wpiutil-java",
     ],
 )
+
+[wpilib_cc_library(
+    name = example + "-examples",
+    srcs = glob([
+        "examples/" + example + "/*.cpp",
+    ]),
+    tags = [
+        "wpi-example",
+    ],
+    deps = [
+        "//cscore:cscore.static",
+        "//wpigui",
+    ],
+) for example in [
+    "enum_usb",
+    "httpcvstream",
+    "settings",
+    "usbcvstream",
+    "usbstream",
+    "usbviewer",
+]]
