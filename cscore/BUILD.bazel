@@ -51,6 +51,7 @@ wpilib_objc_library(
         "Foundation",
         "CoreMedia",
         "CoreVideo",
+        "IOKit",
     ],
     deps = [
         "//wpinet:wpinet.static",

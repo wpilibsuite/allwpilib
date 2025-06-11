@@ -258,10 +258,12 @@ void NetworkClient::WsConnected(wpi::WebSocket& ws, uv::Tcp& tcp,
   INFO("CONNECTED NT4 to {} port {}", connInfo.remote_ip, connInfo.remote_port);
   m_connHandle = m_connList.AddConnection(connInfo);
 
+  bool local = wpi::starts_with(connInfo.remote_ip, "127.");
+
   m_wire = std::make_shared<net::WebSocketConnection>(
       ws, connInfo.protocol_version, m_logger);
   m_clientImpl = std::make_unique<net::ClientImpl>(
-      m_loop.Now().count(), *m_wire, m_logger, m_timeSyncUpdated,
+      m_loop.Now().count(), *m_wire, local, m_logger, m_timeSyncUpdated,
       [this](uint32_t repeatMs) {
         DEBUG4("Setting periodic timer to {}", repeatMs);
         if (m_sendOutgoingTimer &&

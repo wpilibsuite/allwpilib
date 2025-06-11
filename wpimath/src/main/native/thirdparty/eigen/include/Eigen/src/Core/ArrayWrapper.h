@@ -56,14 +56,10 @@ class ArrayWrapper : public ArrayBase<ArrayWrapper<ExpressionType> > {
 
   EIGEN_DEVICE_FUNC explicit EIGEN_STRONG_INLINE ArrayWrapper(ExpressionType& matrix) : m_expression(matrix) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const EIGEN_NOEXCEPT { return m_expression.rows(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const EIGEN_NOEXCEPT { return m_expression.cols(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index outerStride() const EIGEN_NOEXCEPT {
-    return m_expression.outerStride();
-  }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index innerStride() const EIGEN_NOEXCEPT {
-    return m_expression.innerStride();
-  }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept { return m_expression.rows(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return m_expression.cols(); }
+  EIGEN_DEVICE_FUNC constexpr Index outerStride() const noexcept { return m_expression.outerStride(); }
+  EIGEN_DEVICE_FUNC constexpr Index innerStride() const noexcept { return m_expression.innerStride(); }
 
   EIGEN_DEVICE_FUNC constexpr ScalarWithConstIfNotLvalue* data() { return m_expression.data(); }
   EIGEN_DEVICE_FUNC constexpr const Scalar* data() const { return m_expression.data(); }
@@ -135,14 +131,10 @@ class MatrixWrapper : public MatrixBase<MatrixWrapper<ExpressionType> > {
 
   EIGEN_DEVICE_FUNC explicit inline MatrixWrapper(ExpressionType& matrix) : m_expression(matrix) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const EIGEN_NOEXCEPT { return m_expression.rows(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const EIGEN_NOEXCEPT { return m_expression.cols(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index outerStride() const EIGEN_NOEXCEPT {
-    return m_expression.outerStride();
-  }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index innerStride() const EIGEN_NOEXCEPT {
-    return m_expression.innerStride();
-  }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept { return m_expression.rows(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return m_expression.cols(); }
+  EIGEN_DEVICE_FUNC constexpr Index outerStride() const noexcept { return m_expression.outerStride(); }
+  EIGEN_DEVICE_FUNC constexpr Index innerStride() const noexcept { return m_expression.innerStride(); }
 
   EIGEN_DEVICE_FUNC constexpr ScalarWithConstIfNotLvalue* data() { return m_expression.data(); }
   EIGEN_DEVICE_FUNC constexpr const Scalar* data() const { return m_expression.data(); }

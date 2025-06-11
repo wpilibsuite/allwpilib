@@ -71,7 +71,7 @@ static SendableRegistryInst& GetInstance() {
   return *GetInstanceHolder();
 }
 
-#ifndef __FRC_ROBORIO__
+#ifndef __FRC_SYSTEMCORE__
 namespace wpi::impl {
 void ResetSendableRegistry() {
   std::make_unique<SendableRegistryInst>().swap(GetInstanceHolder());

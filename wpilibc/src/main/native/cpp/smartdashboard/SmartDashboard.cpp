@@ -41,7 +41,7 @@ static Instance& GetInstance() {
   return *GetInstanceHolder();
 }
 
-#ifndef __FRC_ROBORIO__
+#ifndef __FRC_SYSTEMCORE__
 namespace frc::impl {
 void ResetSmartDashboardInstance() {
   std::make_unique<Instance>().swap(GetInstanceHolder());

@@ -6,12 +6,10 @@
 
 #include <array>
 #include <cmath>
-
-#define IMGUI_DEFINE_MATH_OPERATORS
+#include <numbers>
 
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <numbers>
 
 #include "glass/DataSource.h"
 

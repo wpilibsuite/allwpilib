@@ -376,6 +376,13 @@
 #define EIGEN_ARCH_MIPS 0
 #endif
 
+/// \internal EIGEN_ARCH_LOONGARCH64 set to 1 if the architecture is LOONGARCH64
+#if defined(__loongarch64)
+#define EIGEN_ARCH_LOONGARCH64 1
+#else
+#define EIGEN_ARCH_LOONGARCH64 0
+#endif
+
 /// \internal EIGEN_ARCH_SPARC set to 1 if the architecture is SPARC
 #if defined(__sparc__) || defined(__sparc)
 #define EIGEN_ARCH_SPARC 1
@@ -419,6 +426,16 @@
 // note: ANDROID is defined when using ndk_build, __ANDROID__ is defined when using a standalone toolchain.
 #if defined(__ANDROID__) || defined(ANDROID)
 #define EIGEN_OS_ANDROID 1
+
+// Since NDK r16, `__NDK_MAJOR__` and `__NDK_MINOR__` are defined in
+// <android/ndk-version.h>. For NDK < r16, users should define these macros,
+// e.g. `-D__NDK_MAJOR__=11 -D__NKD_MINOR__=0` for NDK r11.
+#if defined __has_include
+#if __has_include(<android/ndk-version.h>)
+#include <android/ndk-version.h>
+#endif
+#endif
+
 #else
 #define EIGEN_OS_ANDROID 0
 #endif
@@ -1259,11 +1276,6 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void ignore_unused_variable(cons
 #define EIGEN_TRY if (true)
 #define EIGEN_CATCH(X) else
 #endif
-
-#define EIGEN_NOEXCEPT noexcept
-#define EIGEN_NOEXCEPT_IF(x) noexcept(x)
-#define EIGEN_NO_THROW noexcept(true)
-#define EIGEN_EXCEPTION_SPEC(X) noexcept(false)
 
 // The all function is used to enable a variadic version of eigen_assert which can take a parameter pack as its input.
 namespace Eigen {

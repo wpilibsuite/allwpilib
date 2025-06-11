@@ -20,8 +20,9 @@ typedef struct _mrc_proto_ProtobufJoystickData {
     static std::string_view msg_name(void) noexcept;
     static pb_filedesc_t file_descriptor(void) noexcept;
 
-    uint32_t ButtonCount;
+    uint64_t AvailableButtons;
     uint64_t Buttons;
+    uint32_t AvailableAxes;
     pb_callback_t Axes;
     /* Each POV takes up 4 bits
  We can fit 8 in here. */
@@ -104,7 +105,7 @@ typedef struct _mrc_proto_ProtobufAvailableOpModes {
 
 
 /* Initializer values for message structs */
-#define mrc_proto_ProtobufJoystickData_init_default {0, 0, {{NULL}, NULL}, 0, 0}
+#define mrc_proto_ProtobufJoystickData_init_default {0, 0, 0, {{NULL}, NULL}, 0, 0}
 #define mrc_proto_ProtobufControlData_init_default {0, 0, {{NULL}, NULL}, 0}
 #define mrc_proto_ProtobufJoystickDescriptor_init_default {{{NULL}, NULL}, {{NULL}, NULL}, 0, 0, 0, 0, 0}
 #define mrc_proto_ProtobufJoystickRumbleData_init_default {{{NULL}, NULL}}
@@ -112,7 +113,7 @@ typedef struct _mrc_proto_ProtobufAvailableOpModes {
 #define mrc_proto_ProtobufErrorInfo_init_default {0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 #define mrc_proto_ProtobufOpMode_init_default    {0, {{NULL}, NULL}}
 #define mrc_proto_ProtobufAvailableOpModes_init_default {{{NULL}, NULL}}
-#define mrc_proto_ProtobufJoystickData_init_zero {0, 0, {{NULL}, NULL}, 0, 0}
+#define mrc_proto_ProtobufJoystickData_init_zero {0, 0, 0, {{NULL}, NULL}, 0, 0}
 #define mrc_proto_ProtobufControlData_init_zero  {0, 0, {{NULL}, NULL}, 0}
 #define mrc_proto_ProtobufJoystickDescriptor_init_zero {{{NULL}, NULL}, {{NULL}, NULL}, 0, 0, 0, 0, 0}
 #define mrc_proto_ProtobufJoystickRumbleData_init_zero {{{NULL}, NULL}}
@@ -122,11 +123,12 @@ typedef struct _mrc_proto_ProtobufAvailableOpModes {
 #define mrc_proto_ProtobufAvailableOpModes_init_zero {{{NULL}, NULL}}
 
 /* Field tags (for use in manual encoding/decoding) */
-#define mrc_proto_ProtobufJoystickData_ButtonCount_tag 1
+#define mrc_proto_ProtobufJoystickData_AvailableButtons_tag 1
 #define mrc_proto_ProtobufJoystickData_Buttons_tag 2
-#define mrc_proto_ProtobufJoystickData_Axes_tag  3
-#define mrc_proto_ProtobufJoystickData_POVCount_tag 4
-#define mrc_proto_ProtobufJoystickData_POVs_tag  5
+#define mrc_proto_ProtobufJoystickData_AvailableAxes_tag 3
+#define mrc_proto_ProtobufJoystickData_Axes_tag  4
+#define mrc_proto_ProtobufJoystickData_POVCount_tag 5
+#define mrc_proto_ProtobufJoystickData_POVs_tag  6
 #define mrc_proto_ProtobufControlData_ControlWord_tag 1
 #define mrc_proto_ProtobufControlData_MatchTime_tag 2
 #define mrc_proto_ProtobufControlData_Joysticks_tag 3
@@ -154,11 +156,12 @@ typedef struct _mrc_proto_ProtobufAvailableOpModes {
 
 /* Struct field encoding specification for nanopb */
 #define mrc_proto_ProtobufJoystickData_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, UINT32,   ButtonCount,       1) \
+X(a, STATIC,   SINGULAR, UINT64,   AvailableButtons,   1) \
 X(a, STATIC,   SINGULAR, UINT64,   Buttons,           2) \
-X(a, CALLBACK, REPEATED, SINT32,   Axes,              3) \
-X(a, STATIC,   SINGULAR, UINT32,   POVCount,          4) \
-X(a, STATIC,   SINGULAR, UINT32,   POVs,              5)
+X(a, STATIC,   SINGULAR, UINT32,   AvailableAxes,     3) \
+X(a, CALLBACK, REPEATED, SINT32,   Axes,              4) \
+X(a, STATIC,   SINGULAR, UINT32,   POVCount,          5) \
+X(a, STATIC,   SINGULAR, UINT32,   POVs,              6)
 #define mrc_proto_ProtobufJoystickData_CALLBACK pb_default_field_callback
 #define mrc_proto_ProtobufJoystickData_DEFAULT NULL
 

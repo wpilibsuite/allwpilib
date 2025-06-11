@@ -83,13 +83,11 @@ class Diagonal : public internal::dense_xpr_base<Diagonal<MatrixType, DiagIndex_
                                : numext::mini<Index>(m_matrix.rows(), m_matrix.cols() - m_index.value());
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const EIGEN_NOEXCEPT { return 1; }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return 1; }
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index innerStride() const EIGEN_NOEXCEPT {
-    return m_matrix.outerStride() + 1;
-  }
+  EIGEN_DEVICE_FUNC constexpr Index innerStride() const noexcept { return m_matrix.outerStride() + 1; }
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index outerStride() const EIGEN_NOEXCEPT { return 0; }
+  EIGEN_DEVICE_FUNC constexpr Index outerStride() const noexcept { return 0; }
 
   typedef std::conditional_t<internal::is_lvalue<MatrixType>::value, Scalar, const Scalar> ScalarWithConstIfNotLvalue;
 
@@ -134,13 +132,13 @@ class Diagonal : public internal::dense_xpr_base<Diagonal<MatrixType, DiagIndex_
 
  private:
   // some compilers may fail to optimize std::max etc in case of compile-time constants...
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index absDiagIndex() const EIGEN_NOEXCEPT {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index absDiagIndex() const noexcept {
     return m_index.value() > 0 ? m_index.value() : -m_index.value();
   }
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index rowOffset() const EIGEN_NOEXCEPT {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index rowOffset() const noexcept {
     return m_index.value() > 0 ? 0 : -m_index.value();
   }
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index colOffset() const EIGEN_NOEXCEPT {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index colOffset() const noexcept {
     return m_index.value() > 0 ? m_index.value() : 0;
   }
   // trigger a compile-time error if someone try to call packet
