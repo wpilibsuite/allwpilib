@@ -48,6 +48,7 @@ struct IMU {
 static IMU* imu;
 
 constexpr double kDegreesToRadians = std::numbers::pi / 180.0;
+constexpr double kGToMetersPerSecondSquared = 9.80665;
 }  // namespace
 
 namespace hal::init {
@@ -64,10 +65,11 @@ void HAL_GetIMUAcceleration(HAL_Acceleration3d* accel, int32_t* status) {
     *status = INCOMPATIBLE_STATE;
     return;
   }
-  *accel = HAL_Acceleration3d{.timestamp = update.time,
-                              .x = update.value[0],
-                              .y = update.value[1],
-                              .z = update.value[2]};
+  *accel =
+      HAL_Acceleration3d{.timestamp = update.time,
+                         .x = update.value[0] * kGToMetersPerSecondSquared,
+                         .y = update.value[1] * kGToMetersPerSecondSquared,
+                         .z = update.value[2] * kGToMetersPerSecondSquared};
 }
 
 void HAL_GetIMUGyroRates(HAL_GyroRate3d* rate, int32_t* status) {
