@@ -177,7 +177,7 @@ public final class Units {
    */
   public static double metersPerSecondToMilesPerHour(double metersPerSecond) {
     return metersPerSecond * ((kSecondsPerMinute * kMinutesPerHour) / kMetersPerMile);
-  }  
+  }
 
   /**
    * Converts given milliseconds to seconds.

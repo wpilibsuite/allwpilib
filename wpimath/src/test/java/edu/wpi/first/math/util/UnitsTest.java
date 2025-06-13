@@ -30,8 +30,8 @@ class UnitsTest extends UtilityClassTest<Units> {
   }
 
   @Test
-  void milesToMetersTest() {
-    assertEquals(1609.344, Units.milesToMeters(1), 1e-3);
+  void inchesToMetersTest() {
+    assertEquals(0.0254, Units.inchesToMeters(1), 1e-3);
   }
 
   @Test
@@ -40,8 +40,8 @@ class UnitsTest extends UtilityClassTest<Units> {
   }
 
   @Test
-  void inchesToMetersTest() {
-    assertEquals(0.0254, Units.inchesToMeters(1), 1e-3);
+  void milesToMetersTest() {
+    assertEquals(1609.344, Units.milesToMeters(1), 1e-3);
   }
 
   @Test
@@ -60,7 +60,7 @@ class UnitsTest extends UtilityClassTest<Units> {
   }
 
   @Test
-  void radiansPerSecondToRotationsPerMinute() {
+  void radiansPerSecondToRotationsPerMinuteTest() {
     assertEquals(76.39, Units.radiansPerSecondToRotationsPerMinute(8), 1e-2);
   }
 
@@ -71,16 +71,16 @@ class UnitsTest extends UtilityClassTest<Units> {
 
   @Test
   void metersPerSecondToMilesPerHourTest() {
-    assertEquals(2.237, Units.metersPerSecondToMilesPerHour(1), 1e-2);
+    assertEquals(2.2369, Units.metersPerSecondToMilesPerHour(1), 1e-2);
   }
 
   @Test
-  void millisecondsToSeconds() {
+  void millisecondsToSecondsTest() {
     assertEquals(0.5, Units.millisecondsToSeconds(500), 1e-2);
   }
 
   @Test
-  void secondsToMilliseconds() {
+  void secondsToMillisecondsTest() {
     assertEquals(1500, Units.secondsToMilliseconds(1.5), 1e-2);
   }
 
