@@ -108,19 +108,14 @@ public final class MathUtil {
   }
 
   /**
-   * Applies a power curve transformation to the input value, preserving its sign.
+   * Raises the input to the power of the given exponent while preserving its sign.
    *
-   * <p>The function normalizes the input value to the range [0, 1] based on the maximum magnitude,
-   * applies the power transformation, then scales the result back to the original range. This keeps
-   * the value in the original range and gives consistent curve behavior regardless of the input
-   * value's scale.
+   * <p>The function normalizes the input value to the range [0, 1] based on the maximum magnitude, raises it to the power of the exponent, then scales the result back to the original range and copying the sign. This keeps the value in the original range and gives consistent curve behavior regardless of the input value's scale.
    *
-   * <p>This is useful for applying smoother or more aggressive control response curves (e.g.
-   * joystick input shaping).
+   * <p>This is useful for applying smoother or more aggressive control response curves (e.g. joystick input shaping).
    *
    * @param value The input value to transform.
-   * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be
-   *     positive.
+   * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be positive.
    * @param maxMagnitude The maximum expected absolute value of input. Must be positive.
    * @return The transformed value with the same sign and scaled to the input range.
    */
@@ -129,13 +124,12 @@ public final class MathUtil {
   }
 
   /**
-   * Raises the input to the power of exponent while preserving its sign.
+   * Raises the input to the power of the given exponent while preserving its sign.
    *
-   * <p>This is useful for applying smoother or more aggressive control response curves (e.g.
-   * joystick input shaping).
+   * <p>This is useful for applying smoother or more aggressive control response curves (e.g. joystick input shaping).
    *
    * @param value The input value to transform.
-   * @param exponent The exponent to apply.
+   * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be positive.
    * @return The transformed value with the same sign.
    */
   public static double copysignPow(double value, double exponent) {
