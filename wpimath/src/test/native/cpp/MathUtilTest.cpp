@@ -109,13 +109,11 @@ TEST(MathUtilTest, CopySignPowWithUnits) {
   EXPECT_DOUBLE_EQ(
       1, frc::CopySignPow<units::meters_per_second_t>(1_mps, 2.0).value());
   EXPECT_DOUBLE_EQ(
-      -1,
-      frc::CopySignPow<units::meters_per_second_t>(-1_mps, 2.0).value());
+      -1, frc::CopySignPow<units::meters_per_second_t>(-1_mps, 2.0).value());
 
   EXPECT_DOUBLE_EQ(
       0.5 * 0.5 * 10,
-      frc::CopySignPow<units::meters_per_second_t>(5_mps, 2.0, 10_mps)
-          .value());
+      frc::CopySignPow<units::meters_per_second_t>(5_mps, 2.0, 10_mps).value());
   EXPECT_DOUBLE_EQ(
       -0.5 * 0.5 * 10,
       frc::CopySignPow<units::meters_per_second_t>(-5_mps, 2.0, 10_mps)
