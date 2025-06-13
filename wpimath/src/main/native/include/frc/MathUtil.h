@@ -116,30 +116,16 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
 template <typename T>
   requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
 constexpr T ApplyPowerCurve(T value, double exponent, T maxMagnitude = T{1.0}) {
-  T magnitude;
   if constexpr (std::is_arithmetic_v<T>) {
-    magnitude = gcem::abs(value);
+    return gcem::copysign(
+        gcem::pow(gcem::abs(value) / maxMagnitude, exponent) * maxMagnitude,
+        value);
   } else {
-    magnitude = units::math::abs(value);
+    return units::math::copysign(
+        gcem::pow((units::math::abs(value) / maxMagnitude).value(), exponent) *
+            maxMagnitude,
+        value);
   }
-
-  T result;
-
-  if constexpr (std::is_arithmetic_v<T>) {
-    T normalized = magnitude / maxMagnitude;
-    T transformed = gcem::pow(normalized, exponent);
-    result = transformed * maxMagnitude;
-  } else {
-    auto normalizedValue = magnitude / maxMagnitude;
-    auto transformedValue = gcem::pow(normalizedValue.value(), exponent);
-    result = transformedValue * maxMagnitude;
-  }
-
-  if (value < T{0.0}) {
-    return -result;
-  }
-
-  return result;
 }
 
 /**
