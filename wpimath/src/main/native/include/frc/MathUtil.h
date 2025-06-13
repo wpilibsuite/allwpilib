@@ -108,7 +108,7 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
  */
 template <typename T>
   requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
-constexpr T CopysignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
+constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
   if constexpr (std::is_arithmetic_v<T>) {
     return gcem::copysign(
         gcem::pow(gcem::abs(value) / maxMagnitude, exponent) * maxMagnitude,
