@@ -124,7 +124,7 @@ public final class MathUtil {
    * @param maxMagnitude The maximum expected absolute value of input. Must be positive.
    * @return The transformed value with the same sign and scaled to the input range.
    */
-  public static double applyPowerCurve(double value, double exponent, double maxMagnitude) {
+  public static double copysignPow(double value, double exponent, double maxMagnitude) {
     return Math.copySign(Math.pow(Math.abs(value) / maxMagnitude, exponent), value) * maxMagnitude;
   }
 
@@ -138,8 +138,8 @@ public final class MathUtil {
    * @param exponent The exponent to apply.
    * @return The transformed value with the same sign.
    */
-  public static double applyPowerCurve(double value, double exponent) {
-    return applyPowerCurve(value, exponent, 1);
+  public static double copysignPow(double value, double exponent) {
+    return copysignPow(value, exponent, 1);
   }
 
   /**
