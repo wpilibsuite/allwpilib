@@ -65,8 +65,7 @@ public class Trigger implements BooleanSupplier {
     this(Scheduler.getDefault(), condition);
   }
 
-  // For internal use
-  private Trigger(Scheduler scheduler, EventLoop loop, BooleanSupplier condition) {
+  public Trigger(Scheduler scheduler, EventLoop loop, BooleanSupplier condition) {
     this.scheduler = scheduler;
     m_loop = loop;
     m_condition = condition;
