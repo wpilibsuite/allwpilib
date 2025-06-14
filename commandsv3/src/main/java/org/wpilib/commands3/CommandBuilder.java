@@ -8,11 +8,11 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 /**
@@ -24,6 +24,7 @@ public class CommandBuilder {
   private Runnable onCancel = () -> {};
   private String name;
   private int priority = Command.DEFAULT_PRIORITY;
+  private BooleanSupplier endCondition = null;
 
   /**
    * Adds a resource as a requirement for the command.
@@ -148,6 +149,26 @@ public class CommandBuilder {
   }
 
   /**
+   * Makes the command run until some end condition is met, if it hasn't already finished by then
+   * on its own.
+   * @param endCondition The hard end condition for the command.
+   * @return The builder object, for chaining.
+   */
+  public CommandBuilder until(BooleanSupplier endCondition) {
+    this.endCondition = endCondition;
+    return this;
+  }
+
+  /**
+   * Makes the command run while some condition is true, ending when the condition becomes inactive.
+   * @param endCondition The command active condition.
+   * @return The builder object, for chaining.
+   */
+  public CommandBuilder asLongAs(BooleanSupplier active) {
+    return until(() -> !active.getAsBoolean());
+  }
+
+  /**
    * Creates the command.
    *
    * @return The built command
@@ -158,7 +179,7 @@ public class CommandBuilder {
     Objects.requireNonNull(name, "Name was not specified");
     Objects.requireNonNull(impl, "Command logic was not specified");
 
-    return new Command() {
+    var command = new Command() {
       @Override
       public void run(Coroutine coroutine) {
         impl.accept(coroutine);
@@ -189,5 +210,14 @@ public class CommandBuilder {
         return "Command name=" + name() + " priority=" + priority;
       }
     };
+
+    if (endCondition == null) {
+      // No custom end condition, just return the raw command
+      return command;
+    } else {
+      // A custom end condition is implemented as a race group, since we cannot modify the command
+      // body to inject the end condition.
+      return new ParallelGroupBuilder().requiring(command).until(endCondition).named(name);
+    }
   }
 }
