@@ -45,7 +45,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #leftBumper(EventLoop)
    */
   public Trigger leftBumper() {
-    return leftBumper(Scheduler.getInstance());
+    return leftBumper(Scheduler.getDefault());
   }
 
   /**
@@ -67,7 +67,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #rightBumper(EventLoop)
    */
   public Trigger rightBumper() {
-    return rightBumper(Scheduler.getInstance());
+    return rightBumper(Scheduler.getDefault());
   }
 
   /**
@@ -89,7 +89,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #leftStick(EventLoop)
    */
   public Trigger leftStick() {
-    return leftStick(Scheduler.getInstance());
+    return leftStick(Scheduler.getDefault());
   }
 
   /**
@@ -111,7 +111,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #rightStick(EventLoop)
    */
   public Trigger rightStick() {
-    return rightStick(Scheduler.getInstance());
+    return rightStick(Scheduler.getDefault());
   }
 
   /**
@@ -133,7 +133,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #rightTrigger(EventLoop)
    */
   public Trigger rightTrigger() {
-    return rightTrigger(Scheduler.getInstance());
+    return rightTrigger(Scheduler.getDefault());
   }
 
   /**
@@ -155,7 +155,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #leftTrigger(EventLoop)
    */
   public Trigger leftTrigger() {
-    return leftTrigger(Scheduler.getInstance());
+    return leftTrigger(Scheduler.getDefault());
   }
 
   /**
@@ -177,7 +177,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #a(EventLoop)
    */
   public Trigger a() {
-    return a(Scheduler.getInstance());
+    return a(Scheduler.getDefault());
   }
 
   /**
@@ -199,7 +199,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #b(EventLoop)
    */
   public Trigger b() {
-    return b(Scheduler.getInstance());
+    return b(Scheduler.getDefault());
   }
 
   /**
@@ -221,7 +221,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #x(EventLoop)
    */
   public Trigger x() {
-    return x(Scheduler.getInstance());
+    return x(Scheduler.getDefault());
   }
 
   /**
@@ -243,7 +243,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #y(EventLoop)
    */
   public Trigger y() {
-    return y(Scheduler.getInstance());
+    return y(Scheduler.getDefault());
   }
 
   /**
@@ -265,7 +265,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #ellipses(EventLoop)
    */
   public Trigger ellipses() {
-    return ellipses(Scheduler.getInstance());
+    return ellipses(Scheduler.getDefault());
   }
 
   /**
@@ -287,7 +287,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #stadia(EventLoop)
    */
   public Trigger stadia() {
-    return stadia(Scheduler.getInstance());
+    return stadia(Scheduler.getDefault());
   }
 
   /**
@@ -309,7 +309,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #google(EventLoop)
    */
   public Trigger google() {
-    return google(Scheduler.getInstance());
+    return google(Scheduler.getDefault());
   }
 
   /**
@@ -331,7 +331,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #frame(EventLoop)
    */
   public Trigger frame() {
-    return frame(Scheduler.getInstance());
+    return frame(Scheduler.getDefault());
   }
 
   /**
@@ -353,7 +353,7 @@ public class CommandStadiaController extends CommandGenericHID {
    * @see #hamburger(EventLoop)
    */
   public Trigger hamburger() {
-    return hamburger(Scheduler.getInstance());
+    return hamburger(Scheduler.getDefault());
   }
 
   /**

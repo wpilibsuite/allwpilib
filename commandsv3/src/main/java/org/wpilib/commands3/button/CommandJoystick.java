@@ -44,7 +44,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @see #trigger(Scheduler)
    */
   public Trigger trigger() {
-    return trigger(Scheduler.getInstance());
+    return trigger(Scheduler.getDefault());
   }
 
   /**
@@ -66,7 +66,7 @@ public class CommandJoystick extends CommandGenericHID {
    * @see #top(Scheduler)
    */
   public Trigger top() {
-    return top(Scheduler.getInstance());
+    return top(Scheduler.getDefault());
   }
 
   /**

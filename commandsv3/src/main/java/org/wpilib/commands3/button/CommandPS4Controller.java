@@ -44,7 +44,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     Scheduler#getDefaultEventLoop() default scheduler button loop}.
    */
   public Trigger L2() {
-    return L2(Scheduler.getInstance());
+    return L2(Scheduler.getDefault());
   }
 
   /**
@@ -65,7 +65,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     Scheduler#getDefaultEventLoop() default scheduler button loop}.
    */
   public Trigger R2() {
-    return R2(Scheduler.getInstance());
+    return R2(Scheduler.getDefault());
   }
 
   /**
@@ -86,7 +86,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     Scheduler#getDefaultEventLoop() default scheduler button loop}.
    */
   public Trigger L1() {
-    return L1(Scheduler.getInstance());
+    return L1(Scheduler.getDefault());
   }
 
   /**
@@ -107,7 +107,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     Scheduler#getDefaultEventLoop() default scheduler button loop}.
    */
   public Trigger R1() {
-    return R1(Scheduler.getInstance());
+    return R1(Scheduler.getDefault());
   }
 
   /**
@@ -128,7 +128,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     Scheduler#getDefaultEventLoop() default scheduler button loop}.
    */
   public Trigger L3() {
-    return L3(Scheduler.getInstance());
+    return L3(Scheduler.getDefault());
   }
 
   /**
@@ -149,7 +149,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     Scheduler#getDefaultEventLoop() default scheduler button loop}.
    */
   public Trigger R3() {
-    return R3(Scheduler.getInstance());
+    return R3(Scheduler.getDefault());
   }
 
   /**
@@ -170,7 +170,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
    */
   public Trigger square() {
-    return square(Scheduler.getInstance());
+    return square(Scheduler.getDefault());
   }
 
   /**
@@ -191,7 +191,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     Scheduler#getDefaultEventLoop() default scheduler button loop}.
    */
   public Trigger cross() {
-    return cross(Scheduler.getInstance());
+    return cross(Scheduler.getDefault());
   }
 
   /**
@@ -212,7 +212,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
    */
   public Trigger triangle() {
-    return triangle(Scheduler.getInstance());
+    return triangle(Scheduler.getDefault());
   }
 
   /**
@@ -233,7 +233,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
    */
   public Trigger circle() {
-    return circle(Scheduler.getInstance());
+    return circle(Scheduler.getDefault());
   }
 
   /**
@@ -254,7 +254,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     Scheduler#getDefaultEventLoop() default scheduler button loop}.
    */
   public Trigger share() {
-    return share(Scheduler.getInstance());
+    return share(Scheduler.getDefault());
   }
 
   /**
@@ -275,7 +275,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     Scheduler#getDefaultEventLoop() default scheduler button loop}.
    */
   public Trigger PS() {
-    return PS(Scheduler.getInstance());
+    return PS(Scheduler.getDefault());
   }
 
   /**
@@ -296,7 +296,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
    */
   public Trigger options() {
-    return options(Scheduler.getInstance());
+    return options(Scheduler.getDefault());
   }
 
   /**
@@ -317,7 +317,7 @@ public class CommandPS4Controller extends CommandGenericHID {
    *     Scheduler#getDefaultEventLoop() default scheduler button loop}.
    */
   public Trigger touchpad() {
-    return touchpad(Scheduler.getInstance());
+    return touchpad(Scheduler.getDefault());
   }
 
   /**

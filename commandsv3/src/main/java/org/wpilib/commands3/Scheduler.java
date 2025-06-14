@@ -63,7 +63,7 @@ public class Scheduler implements ProtobufSerializable {
    *
    * @return the default scheduler instance.
    */
-  public static Scheduler getInstance() {
+  public static Scheduler getDefault() {
     return defaultScheduler;
   }
 

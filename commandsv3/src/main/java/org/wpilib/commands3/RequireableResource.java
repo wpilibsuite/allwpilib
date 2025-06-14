@@ -23,7 +23,7 @@ public class RequireableResource {
    * @param name The name of the resource. Cannot be null.
    */
   public RequireableResource(String name) {
-    this(name, Scheduler.getInstance());
+    this(name, Scheduler.getDefault());
   }
 
   /**

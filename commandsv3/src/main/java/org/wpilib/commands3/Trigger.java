@@ -62,7 +62,7 @@ public class Trigger implements BooleanSupplier {
    * @param condition the condition represented by this trigger
    */
   public Trigger(BooleanSupplier condition) {
-    this(Scheduler.getInstance(), condition);
+    this(Scheduler.getDefault(), condition);
   }
 
   // For internal use
