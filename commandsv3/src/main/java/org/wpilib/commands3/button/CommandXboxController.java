@@ -45,7 +45,7 @@ public class CommandXboxController extends CommandGenericHID {
    * @see #leftBumper(Scheduler)
    */
   public Trigger leftBumper() {
-    return leftBumper(Scheduler.getInstance());
+    return leftBumper(Scheduler.getDefault());
   }
 
   /**
@@ -67,7 +67,7 @@ public class CommandXboxController extends CommandGenericHID {
    * @see #rightBumper(Scheduler)
    */
   public Trigger rightBumper() {
-    return rightBumper(Scheduler.getInstance());
+    return rightBumper(Scheduler.getDefault());
   }
 
   /**
@@ -89,7 +89,7 @@ public class CommandXboxController extends CommandGenericHID {
    * @see #leftStick(Scheduler)
    */
   public Trigger leftStick() {
-    return leftStick(Scheduler.getInstance());
+    return leftStick(Scheduler.getDefault());
   }
 
   /**
@@ -111,7 +111,7 @@ public class CommandXboxController extends CommandGenericHID {
    * @see #rightStick(Scheduler)
    */
   public Trigger rightStick() {
-    return rightStick(Scheduler.getInstance());
+    return rightStick(Scheduler.getDefault());
   }
 
   /**
@@ -133,7 +133,7 @@ public class CommandXboxController extends CommandGenericHID {
    * @see #a(Scheduler)
    */
   public Trigger a() {
-    return a(Scheduler.getInstance());
+    return a(Scheduler.getDefault());
   }
 
   /**
@@ -155,7 +155,7 @@ public class CommandXboxController extends CommandGenericHID {
    * @see #b(Scheduler)
    */
   public Trigger b() {
-    return b(Scheduler.getInstance());
+    return b(Scheduler.getDefault());
   }
 
   /**
@@ -177,7 +177,7 @@ public class CommandXboxController extends CommandGenericHID {
    * @see #x(Scheduler)
    */
   public Trigger x() {
-    return x(Scheduler.getInstance());
+    return x(Scheduler.getDefault());
   }
 
   /**
@@ -199,7 +199,7 @@ public class CommandXboxController extends CommandGenericHID {
    * @see #y(Scheduler)
    */
   public Trigger y() {
-    return y(Scheduler.getInstance());
+    return y(Scheduler.getDefault());
   }
 
   /**
@@ -221,7 +221,7 @@ public class CommandXboxController extends CommandGenericHID {
    * @see #start(Scheduler)
    */
   public Trigger start() {
-    return start(Scheduler.getInstance());
+    return start(Scheduler.getDefault());
   }
 
   /**
@@ -243,7 +243,7 @@ public class CommandXboxController extends CommandGenericHID {
    * @see #back(Scheduler)
    */
   public Trigger back() {
-    return back(Scheduler.getInstance());
+    return back(Scheduler.getDefault());
   }
 
   /**
@@ -282,7 +282,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     loop}.
    */
   public Trigger leftTrigger(double threshold) {
-    return leftTrigger(threshold, Scheduler.getInstance());
+    return leftTrigger(threshold, Scheduler.getDefault());
   }
 
   /**
@@ -321,7 +321,7 @@ public class CommandXboxController extends CommandGenericHID {
    *     loop}.
    */
   public Trigger rightTrigger(double threshold) {
-    return rightTrigger(threshold, Scheduler.getInstance());
+    return rightTrigger(threshold, Scheduler.getDefault());
   }
 
   /**

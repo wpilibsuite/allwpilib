@@ -39,11 +39,11 @@ public class CommandGenericHID {
    *
    * @param button the button index
    * @return an event instance representing the button's digital signal attached to the {@link
-   *     Scheduler#getInstance() default scheduler button scheduler}.
+   *     Scheduler#getDefault() default scheduler button scheduler}.
    * @see #button(int, Scheduler)
    */
   public Trigger button(int button) {
-    return this.button(button, Scheduler.getInstance());
+    return this.button(button, Scheduler.getDefault());
   }
 
   /**
@@ -60,7 +60,7 @@ public class CommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around this angle of the default (index 0) POV on the HID,
-   * attached to {@link Scheduler#getInstance() the default command scheduler button scheduler}.
+   * attached to {@link Scheduler#getDefault() the default command scheduler button scheduler}.
    *
    * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
    * upper-left is 315).
@@ -69,7 +69,7 @@ public class CommandGenericHID {
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
   public Trigger pov(int angle) {
-    return pov(0, angle, Scheduler.getInstance());
+    return pov(0, angle, Scheduler.getDefault());
   }
 
   /**
@@ -81,7 +81,7 @@ public class CommandGenericHID {
    * @param pov index of the POV to read (starting at 0). Defaults to 0.
    * @param angle POV angle in degrees, or -1 for the center / not pressed.
    * @param scheduler the scheduler instance to attach the event to. Defaults to {@link
-   *     Scheduler#getInstance() the default command scheduler button scheduler}.
+   *     Scheduler#getDefault() the default command scheduler button scheduler}.
    * @return a Trigger instance based around this angle of a POV on the HID.
    */
   public Trigger pov(int pov, int angle, Scheduler scheduler) {
@@ -90,7 +90,7 @@ public class CommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around the 0 degree angle (up) of the default (index 0) POV
-   * on the HID, attached to {@link Scheduler#getInstance() the default command scheduler button
+   * on the HID, attached to {@link Scheduler#getDefault() the default command scheduler button
    * scheduler}.
    *
    * @return a Trigger instance based around the 0 degree angle of a POV on the HID.
@@ -101,7 +101,7 @@ public class CommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around the 45 degree angle (right up) of the default (index
-   * 0) POV on the HID, attached to {@link Scheduler#getInstance() the default command scheduler
+   * 0) POV on the HID, attached to {@link Scheduler#getDefault() the default command scheduler
    * button scheduler}.
    *
    * @return a Trigger instance based around the 45 degree angle of a POV on the HID.
@@ -112,7 +112,7 @@ public class CommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around the 90 degree angle (right) of the default (index 0)
-   * POV on the HID, attached to {@link Scheduler#getInstance() the default command scheduler button
+   * POV on the HID, attached to {@link Scheduler#getDefault() the default command scheduler button
    * scheduler}.
    *
    * @return a Trigger instance based around the 90 degree angle of a POV on the HID.
@@ -123,7 +123,7 @@ public class CommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around the 135 degree angle (right down) of the default
-   * (index 0) POV on the HID, attached to {@link Scheduler#getInstance() the default command
+   * (index 0) POV on the HID, attached to {@link Scheduler#getDefault() the default command
    * scheduler button scheduler}.
    *
    * @return a Trigger instance based around the 135 degree angle of a POV on the HID.
@@ -134,7 +134,7 @@ public class CommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around the 180 degree angle (down) of the default (index 0)
-   * POV on the HID, attached to {@link Scheduler#getInstance() the default command scheduler button
+   * POV on the HID, attached to {@link Scheduler#getDefault() the default command scheduler button
    * scheduler}.
    *
    * @return a Trigger instance based around the 180 degree angle of a POV on the HID.
@@ -145,7 +145,7 @@ public class CommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around the 225 degree angle (down left) of the default
-   * (index 0) POV on the HID, attached to {@link Scheduler#getInstance() the default command
+   * (index 0) POV on the HID, attached to {@link Scheduler#getDefault() the default command
    * scheduler button scheduler}.
    *
    * @return a Trigger instance based around the 225 degree angle of a POV on the HID.
@@ -156,7 +156,7 @@ public class CommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around the 270 degree angle (left) of the default (index 0)
-   * POV on the HID, attached to {@link Scheduler#getInstance() the default command scheduler button
+   * POV on the HID, attached to {@link Scheduler#getDefault() the default command scheduler button
    * scheduler}.
    *
    * @return a Trigger instance based around the 270 degree angle of a POV on the HID.
@@ -167,7 +167,7 @@ public class CommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around the 315 degree angle (left up) of the default (index
-   * 0) POV on the HID, attached to {@link Scheduler#getInstance() the default command scheduler
+   * 0) POV on the HID, attached to {@link Scheduler#getDefault() the default command scheduler
    * button scheduler}.
    *
    * @return a Trigger instance based around the 315 degree angle of a POV on the HID.
@@ -178,7 +178,7 @@ public class CommandGenericHID {
 
   /**
    * Constructs a Trigger instance based around the center (not pressed) position of the default
-   * (index 0) POV on the HID, attached to {@link Scheduler#getInstance() the default command
+   * (index 0) POV on the HID, attached to {@link Scheduler#getDefault() the default command
    * scheduler button scheduler}.
    *
    * @return a Trigger instance based around the center position of a POV on the HID.
@@ -189,7 +189,7 @@ public class CommandGenericHID {
 
   /**
    * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
-   * attached to {@link Scheduler#getInstance() the default command scheduler button scheduler}.
+   * attached to {@link Scheduler#getDefault() the default command scheduler button scheduler}.
    *
    * @param axis The axis to read, starting at 0
    * @param threshold The value below which this trigger should return true.
@@ -197,7 +197,7 @@ public class CommandGenericHID {
    *     threshold.
    */
   public Trigger axisLessThan(int axis, double threshold) {
-    return axisLessThan(axis, threshold, Scheduler.getInstance());
+    return axisLessThan(axis, threshold, Scheduler.getDefault());
   }
 
   /**
@@ -217,7 +217,7 @@ public class CommandGenericHID {
 
   /**
    * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
-   * attached to {@link Scheduler#getInstance() the default command scheduler button scheduler}.
+   * attached to {@link Scheduler#getDefault() the default command scheduler button scheduler}.
    *
    * @param axis The axis to read, starting at 0
    * @param threshold The value above which this trigger should return true.
@@ -225,7 +225,7 @@ public class CommandGenericHID {
    *     threshold.
    */
   public Trigger axisGreaterThan(int axis, double threshold) {
-    return axisGreaterThan(axis, threshold, Scheduler.getInstance());
+    return axisGreaterThan(axis, threshold, Scheduler.getDefault());
   }
 
   /**
