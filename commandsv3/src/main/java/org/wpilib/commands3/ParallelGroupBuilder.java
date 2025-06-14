@@ -47,6 +47,18 @@ public class ParallelGroupBuilder {
   }
 
   /**
+   * Adds a command to the group. The command must complete for the group to exit.
+   *
+   * @param command The command to add to the group
+   * @return The builder object, for chaining
+   */
+  // Note: this primarily exists so users can cleanly chain .alongWith calls to build a
+  //       parallel group, eg `fooCommand().alongWith(barCommand()).alongWith(bazCommand())`
+  public ParallelGroupBuilder alongWith(Command command) {
+    return requiring(command);
+  }
+
+  /**
    * Forces the group to be a pure race, where the group will finish after the first command in
    * the group completes. All other commands in the group will be canceled.
    *
