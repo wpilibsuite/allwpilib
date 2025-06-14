@@ -19,6 +19,7 @@
 
 #include <wpi/DenseMap.h>
 #include <wpi/mutex.h>
+#include <wpi/print.h>
 #include <wpi/timestamp.h>
 
 #include "PortsInternal.h"
@@ -108,21 +109,25 @@ bool SocketCanState::InitializeBuses() {
     int32_t status = 0;
     HAL_SetCurrentThreadPriority(true, 50, &status);
     if (status != 0) {
-      std::printf("Failed to set CAN thread priority\n");
+      wpi::print("Failed to set CAN thread priority\n");
     }
 
     for (int i = 0; i < hal::kNumCanBuses; i++) {
       std::scoped_lock lock{writeMutex[i]};
       socketHandle[i] = socket(PF_CAN, SOCK_RAW, CAN_RAW);
       if (socketHandle[i] == -1) {
+        wpi::print("socket() for CAN {} failed with {}\n", i,
+                   std::strerror(errno));
         success = false;
         return;
       }
 
       ifreq ifr;
-      std::snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can%d", i);
+      std::snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "can_s%d", i);
 
       if (ioctl(socketHandle[i], SIOCGIFINDEX, &ifr) == -1) {
+        wpi::print("ioctl(SIOCGIFINDEX) for CAN {} failed with {}\n",
+                   ifr.ifr_name, std::strerror(errno));
         success = false;
         return;
       }
@@ -134,12 +139,15 @@ bool SocketCanState::InitializeBuses() {
 
       if (bind(socketHandle[i], reinterpret_cast<const sockaddr*>(&addr),
                sizeof(addr)) == -1) {
+        wpi::print("bind() for CAN {} failed with {}\n", ifr.ifr_name,
+                   std::strerror(errno));
         success = false;
         return;
       }
 
       auto poll = wpi::uv::Poll::Create(loop, socketHandle[i]);
       if (!poll) {
+        wpi::print("wpi::uv::Poll::Create for CAN {} failed\n", ifr.ifr_name);
         success = false;
         return;
       }
