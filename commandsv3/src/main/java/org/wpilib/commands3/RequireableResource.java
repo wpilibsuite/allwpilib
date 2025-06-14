@@ -17,6 +17,13 @@ public class RequireableResource {
 
   private final Scheduler registeredScheduler;
 
+  @SuppressWarnings("this-escape")
+  public RequireableResource() {
+    this.name = getClass().getSimpleName();
+    this.registeredScheduler = Scheduler.getDefault();
+    setDefaultCommand(idle());
+  }
+
   /**
    * Creates a new claimable resource, registered with the default scheduler instance.
    *
@@ -32,9 +39,11 @@ public class RequireableResource {
    * @param name The name of the resource. Cannot be null.
    * @param scheduler The registered scheduler. Cannot be null.
    */
+  @SuppressWarnings("this-escape")
   public RequireableResource(String name, Scheduler scheduler) {
     this.name = name;
     this.registeredScheduler = scheduler;
+    setDefaultCommand(idle());
   }
 
   public String getName() {
@@ -57,6 +66,12 @@ public class RequireableResource {
     registeredScheduler.scheduleAsDefaultCommand(this, defaultCommand);
   }
 
+  /**
+   * Gets the default command that was set by the latest call to
+   * {@link #setDefaultCommand(Command)}.
+   *
+   * @return The currently configured default command
+   */
   public Command getDefaultCommand() {
     return registeredScheduler.getDefaultCommandFor(this);
   }
