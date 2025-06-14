@@ -238,10 +238,11 @@ class WPILIB_DLLEXPORT Translation2d {
    */
   constexpr Translation2d Nearest(
       std::span<const Translation2d> translations) const {
-    return *std::min_element(translations.begin(), translations.end(),
-                             [this](Translation2d a, Translation2d b) {
-                               return this->Distance(a) < this->Distance(b);
-                             });
+    return *std::min_element(
+        translations.begin(), translations.end(),
+        [this](const Translation2d& a, const Translation2d& b) {
+          return this->Distance(a) < this->Distance(b);
+        });
   }
 
   /**
@@ -251,10 +252,11 @@ class WPILIB_DLLEXPORT Translation2d {
    */
   constexpr Translation2d Nearest(
       std::initializer_list<Translation2d> translations) const {
-    return *std::min_element(translations.begin(), translations.end(),
-                             [this](Translation2d a, Translation2d b) {
-                               return this->Distance(a) < this->Distance(b);
-                             });
+    return *std::min_element(
+        translations.begin(), translations.end(),
+        [this](const Translation2d& a, const Translation2d& b) {
+          return this->Distance(a) < this->Distance(b);
+        });
   }
 
  private:
