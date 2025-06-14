@@ -70,9 +70,8 @@ public class Scheduler implements ProtobufSerializable {
   public Scheduler() {}
 
   /**
-   * Sets the default command for a resource. The command must require the resource, and cannot
-   * require any others. Default commands must have a lower priority than {@link
-   * Command#DEFAULT_PRIORITY} to function properly.
+   * Sets the default command for a resource. The command must require that resource, and cannot
+   * require any other resources.
    *
    * @param resource the resource for which to set the default command
    * @param defaultCommand the default command to execute on the resource
@@ -87,10 +86,6 @@ public class Scheduler implements ProtobufSerializable {
     if (defaultCommand.requirements().size() > 1) {
       throw new IllegalArgumentException(
           "A resource's default command cannot require other resources");
-    }
-
-    if (defaultCommand.priority() >= Command.DEFAULT_PRIORITY) {
-      throw new IllegalArgumentException("Default commands must be low priority");
     }
 
     defaultCommands.put(resource, defaultCommand);
