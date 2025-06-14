@@ -249,7 +249,7 @@ public interface Command {
    * @param condition The condition to wait for
    * @return A command builder
    */
-  static CommandBuilder waitingFor(BooleanSupplier condition) {
+  static CommandBuilder waitUntil(BooleanSupplier condition) {
     return noRequirements(
         coroutine -> {
           while (!condition.getAsBoolean()) {
@@ -258,9 +258,16 @@ public interface Command {
         });
   }
 
+  /**
+   * Creates a command that runs this one and ends when the end condition is met (if this command
+   * has not already exited by then).
+   *
+   * @param endCondition The end condition to wait for.
+   * @return The waiting command
+   */
   default ParallelGroupBuilder until(BooleanSupplier endCondition) {
     return ParallelGroup.builder()
-        .optional(this, Command.waitingFor(endCondition).named("Until Condition"));
+        .optional(this, Command.waitUntil(endCondition).named("Until Condition"));
   }
 
   /**
