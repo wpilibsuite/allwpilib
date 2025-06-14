@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
 load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
 
 cc_library(
@@ -168,7 +169,11 @@ cc_library(
         "@bazel_tools//src/conditions:windows": WINDOWS_DEFINES,
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_DEFINES,
     }),
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@bazel_tools//src/conditions:windows": [],
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         ":glfw_hdrs",
     ],
@@ -203,7 +208,6 @@ cc_library(
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    visibility = ["//thirdparty/imgui_suite:__subpackages__"],
     deps = [":glfw_hdrs"] + select({
         "@bazel_tools//src/conditions:darwin": [":glfw_src_darwin"],
         "@bazel_tools//src/conditions:windows": [":glfw_src"],
@@ -281,8 +285,11 @@ cc_library(
     ],
     linkstatic = True,
     strip_include_prefix = "imgui/include",
-    tags = ["manual"],
-    visibility = ["//thirdparty/imgui_suite:__subpackages__"],
+    target_compatible_with = select({
+        "@bazel_tools//src/conditions:windows": [],
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         ":glfw",
     ],
@@ -305,7 +312,6 @@ wpilib_objc_library(
 
 cc_library(
     name = "imgui",
-    visibility = ["//thirdparty/imgui_suite:__subpackages__"],
     deps = select({
         "@bazel_tools//src/conditions:darwin": [":imgui_src_darwin"],
         "@bazel_tools//src/conditions:windows": [":imgui_src"],
@@ -324,7 +330,6 @@ cc_library(
     includes = ["implot/include"],
     linkstatic = True,
     strip_include_prefix = "implot/include",
-    visibility = ["//thirdparty/imgui_suite:__subpackages__"],
     deps = [
         "//thirdparty/imgui_suite:imgui",
     ],
@@ -340,13 +345,12 @@ cc_library(
     hdrs = glob(["stb/include/**"]),
     linkstatic = True,
     strip_include_prefix = "stb/include",
-    visibility = ["//visibility:public"],
 )
 
 #########################################
 # IMGUI suite
 #########################################
-cc_library(
+wpilib_cc_library(
     name = "imgui_suite",
     linkstatic = True,
     visibility = ["//visibility:public"],

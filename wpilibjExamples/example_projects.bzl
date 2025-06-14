@@ -97,5 +97,10 @@ TEMPLATES_FOLDERS = [
 ]
 
 TEST_FOLDERS = [
+    "armsimulation",
+    "digitalcommunication",
+    "elevatorsimulation",
+    "i2ccommunication",
+    "potentiometerpid",
     "unittest",
 ]

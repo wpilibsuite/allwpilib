@@ -123,11 +123,16 @@ maven_artifacts = [
 maven_install(
     name = "maven",
     artifacts = maven_artifacts,
+    maven_install_json = "//:maven_install.json",
     repositories = [
         "https://repo1.maven.org/maven2",
         "https://frcmaven.wpi.edu/artifactory/release/",
     ],
 )
+
+load("@maven//:defs.bzl", "pinned_maven_install")
+
+pinned_maven_install()
 
 # Setup aspect lib
 http_archive(
@@ -208,8 +213,8 @@ setup_legacy_bzlmodrio_ni_cpp_dependencies()
 
 http_archive(
     name = "bzlmodrio-opencv",
-    sha256 = "ba3f4910ce9cc0e08abff732aeb5835b1bcfd864ca5296edeadcf2935f7e81b9",
-    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr1/bzlmodRio-opencv-2025.4.10.0-3.bcr1.tar.gz",
+    sha256 = "6e8544fae07ed5b4fedc146f6ad083d0d8947e3efb5332a20abc46601a52a1b5",
+    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr2/bzlmodRio-opencv-2025.4.10.0-3.bcr2.tar.gz",
 )
 
 load("@bzlmodrio-opencv//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_opencv_cpp_dependencies")
@@ -219,6 +224,17 @@ setup_legacy_bzlmodrio_opencv_cpp_dependencies()
 load("@bzlmodrio-opencv//:maven_java_deps.bzl", "setup_legacy_bzlmodrio_opencv_java_dependencies")
 
 setup_legacy_bzlmodrio_opencv_java_dependencies()
+
+http_archive(
+    name = "bzlmodrio-libssh",
+    sha256 = "65caef82554617403a16c79e8bcac6553d40eca3e23197e63275bba22db7d5b5",
+    strip_prefix = "bzlmodRio-libssh-8405fbd5eb4e42b495f08f6ccf6fbbe5ced28bb7",
+    urls = ["https://github.com/wpilibsuite/bzlmodRio-libssh/archive/8405fbd5eb4e42b495f08f6ccf6fbbe5ced28bb7.tar.gz"],
+)
+
+load("@bzlmodrio-libssh//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_libssh_cpp_dependencies")
+
+setup_legacy_bzlmodrio_libssh_cpp_dependencies()
 
 http_archive(
     name = "build_bazel_apple_support",
