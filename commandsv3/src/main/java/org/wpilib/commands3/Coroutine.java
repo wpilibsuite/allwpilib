@@ -7,6 +7,7 @@ package org.wpilib.commands3;
 import edu.wpi.first.units.measure.Time;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -249,6 +250,18 @@ public final class Coroutine {
     requireMounted();
 
     await(new WaitCommand(duration));
+  }
+
+  /**
+   * Yields until a condition is met.
+   * @param condition The condition to wait for
+   */
+  public void waitUntil(BooleanSupplier condition) {
+    requireMounted();
+
+    while (!condition.getAsBoolean()) {
+      this.yield();
+    }
   }
 
   /**
