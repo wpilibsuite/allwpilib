@@ -61,8 +61,31 @@ public class RequireableResource {
     return registeredScheduler.getDefaultCommandFor(this);
   }
 
-  public CommandBuilder run(Consumer<Coroutine> command) {
-    return new CommandBuilder().requiring(this).executing(command);
+  /**
+   * Starts building a command that requires this resource.
+   *
+   * @param commandBody The main function body of the command.
+   * @return The command builder, for further configuration.
+   */
+  public CommandBuilder run(Consumer<Coroutine> commandBody) {
+    return new CommandBuilder().requiring(this).executing(commandBody);
+  }
+
+  /**
+   * Starts building a command that requires this resource. The given function will be called
+   * repeatedly in an infinite loop. Useful for building commands that don't need state or multiple
+   * stages of logic.
+   *
+   * @param loopBody The body of the infinite loop.
+   * @return The command builder, for further configuration.
+   */
+  public CommandBuilder runRepeatedly(Runnable loopBody) {
+    return run(coroutine -> {
+      while (true) {
+        loopBody.run();
+        coroutine.yield();
+      }
+    });
   }
 
   /**
