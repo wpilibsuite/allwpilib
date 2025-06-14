@@ -8,7 +8,7 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
 
 - [WPILib Project](#wpilib-project)
   - [WPILib Mission](#wpilib-mission)
-- [Tracking Changes](#tracking-changes)
+- [Watching Changes](#watching-changes)
 - [Quick Start](#quick-start)
 - [Building WPILib](#building-wpilib)
   - [Requirements](#requirements)
