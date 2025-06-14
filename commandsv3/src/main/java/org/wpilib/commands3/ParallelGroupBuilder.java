@@ -100,7 +100,7 @@ public class ParallelGroupBuilder {
 
     // We have a custom end condition, so we need to wrap the group in a race
     return ParallelGroup.builder()
-               .optional(group, Command.waitingFor(endCondition).named("Until Condition"))
+               .optional(group, Command.waitUntil(endCondition).named("Until Condition"))
                .named(name);
   }
 
