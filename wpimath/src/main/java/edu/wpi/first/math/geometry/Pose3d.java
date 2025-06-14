@@ -21,9 +21,9 @@ import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 
 /** Represents a 3D pose containing translational and rotational elements. */
@@ -400,13 +400,13 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   }
 
   /**
-   * Returns the nearest Pose3d from a list of poses. If two or more poses in the list have the same
-   * distance from this pose, return the one with the closest rotation component.
+   * Returns the nearest Pose3d from a collection of poses. If two or more poses in the collection
+   * have the same distance from this pose, return the one with the closest rotation component.
    *
-   * @param poses The list of poses to find the nearest.
-   * @return The nearest Pose3d from the list.
+   * @param poses The collection of poses to find the nearest.
+   * @return The nearest Pose3d from the collection.
    */
-  public Pose3d nearest(List<Pose3d> poses) {
+  public Pose3d nearest(Collection<Pose3d> poses) {
     return Collections.min(
         poses,
         Comparator.comparing(

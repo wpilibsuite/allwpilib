@@ -20,9 +20,9 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -273,12 +273,12 @@ public class Translation2d
   }
 
   /**
-   * Returns the nearest Translation2d from a list of translations.
+   * Returns the nearest Translation2d from a collection of translations.
    *
-   * @param translations The list of translations.
-   * @return The nearest Translation2d from the list.
+   * @param translations The collection of translations.
+   * @return The nearest Translation2d from the collection.
    */
-  public Translation2d nearest(List<Translation2d> translations) {
+  public Translation2d nearest(Collection<Translation2d> translations) {
     return Collections.min(translations, Comparator.comparing(this::getDistance));
   }
 
