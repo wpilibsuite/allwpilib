@@ -28,7 +28,7 @@ import java.util.function.BooleanSupplier;
 public class Trigger implements BooleanSupplier {
   private final BooleanSupplier m_condition;
   private final EventLoop m_loop;
-  private final Scheduler scheduler;
+  private final Scheduler m_scheduler;
   private Signal m_previousSignal = null;
   private final Map<BindingType, List<Binding>> m_bindings = new EnumMap<>(BindingType.class);
   private final Runnable m_eventLoopCallback = this::poll;
@@ -48,14 +48,22 @@ public class Trigger implements BooleanSupplier {
     LOW
   }
 
+  /**
+   * Creates a new trigger based on the given condition. Polled by the scheduler's
+   * {@link Scheduler#getDefaultEventLoop() default event loop}.
+   *
+   * @param scheduler The scheduler that should execute triggered commands.
+   * @param condition the condition represented by this trigger
+   */
   public Trigger(Scheduler scheduler, BooleanSupplier condition) {
-    this.scheduler = requireNonNullParam(scheduler, "scheduler", "Trigger");
-    this.m_loop = scheduler.getDefaultEventLoop();
-    this.m_condition = requireNonNullParam(condition, "condition", "Trigger");
+    m_scheduler = requireNonNullParam(scheduler, "scheduler", "Trigger");
+    m_loop = scheduler.getDefaultEventLoop();
+    m_condition = requireNonNullParam(condition, "condition", "Trigger");
   }
 
   /**
-   * Creates a new trigger based on the given condition.
+   * Creates a new trigger based on the given condition. Triggered commands are executed by the
+   * {@link Scheduler#getDefault() default scheduler}.
    *
    * <p>Polled by the default scheduler button loop.
    *
@@ -65,10 +73,17 @@ public class Trigger implements BooleanSupplier {
     this(Scheduler.getDefault(), condition);
   }
 
+  /**
+   * Creates a new trigger based on the given condition.
+   *
+   * @param scheduler The scheduler that should execute triggered commands.
+   * @param loop The event loop to poll the trigger.
+   * @param condition the condition represented by this trigger
+   */
   public Trigger(Scheduler scheduler, EventLoop loop, BooleanSupplier condition) {
-    this.scheduler = scheduler;
-    m_loop = loop;
-    m_condition = condition;
+    m_scheduler = requireNonNullParam(scheduler, "scheduler", "Trigger");
+    m_loop = requireNonNullParam(loop, "loop", "Trigger");
+    m_condition = requireNonNullParam(condition, "condition", "Trigger");
   }
 
   /**
@@ -162,7 +177,7 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger and(BooleanSupplier trigger) {
     return new Trigger(
-        scheduler, m_loop, () -> m_condition.getAsBoolean() && trigger.getAsBoolean());
+        m_scheduler, m_loop, () -> m_condition.getAsBoolean() && trigger.getAsBoolean());
   }
 
   /**
@@ -173,7 +188,7 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger or(BooleanSupplier trigger) {
     return new Trigger(
-        scheduler, m_loop, () -> m_condition.getAsBoolean() || trigger.getAsBoolean());
+        m_scheduler, m_loop, () -> m_condition.getAsBoolean() || trigger.getAsBoolean());
   }
 
   /**
@@ -183,7 +198,7 @@ public class Trigger implements BooleanSupplier {
    * @return the negated trigger
    */
   public Trigger negate() {
-    return new Trigger(scheduler, m_loop, () -> !m_condition.getAsBoolean());
+    return new Trigger(m_scheduler, m_loop, () -> !m_condition.getAsBoolean());
   }
 
   /**
@@ -201,13 +216,13 @@ public class Trigger implements BooleanSupplier {
    * Creates a new debounced trigger from this trigger - it will become active when this trigger has
    * been active for longer than the specified period.
    *
-   * @param seconds The debounce period.
+   * @param duration The debounce period.
    * @param type The debounce type.
    * @return The debounced trigger.
    */
   public Trigger debounce(Time duration, Debouncer.DebounceType type) {
     return new Trigger(
-        scheduler,
+        m_scheduler,
         m_loop,
         new BooleanSupplier() {
           final Debouncer m_debouncer = new Debouncer(duration.in(Seconds), type);
@@ -263,9 +278,9 @@ public class Trigger implements BooleanSupplier {
    * Removes bindings in inactive scopes.
    */
   private void clearStaleBindings() {
-    m_bindings.forEach(((_bindingType, bindings) -> {
+    m_bindings.forEach((_bindingType, bindings) -> {
       bindings.removeIf(binding -> !binding.scope().active());
-    }));
+    });
   }
 
   /**
@@ -275,7 +290,7 @@ public class Trigger implements BooleanSupplier {
    */
   private void scheduleBindings(BindingType bindingType) {
     m_bindings.getOrDefault(bindingType, List.of())
-        .forEach(scheduler::schedule);
+        .forEach(m_scheduler::schedule);
   }
 
   /**
@@ -285,7 +300,7 @@ public class Trigger implements BooleanSupplier {
    */
   private void cancelBindings(BindingType bindingType) {
     m_bindings.getOrDefault(bindingType, List.of())
-        .forEach(binding -> scheduler.cancel(binding.command()));
+        .forEach(binding -> m_scheduler.cancel(binding.command()));
   }
 
   /**
@@ -300,18 +315,18 @@ public class Trigger implements BooleanSupplier {
         .forEach(
             binding -> {
               var command = binding.command();
-              if (scheduler.isScheduledOrRunning(command)) {
-                scheduler.cancel(command);
+              if (m_scheduler.isScheduledOrRunning(command)) {
+                m_scheduler.cancel(command);
               } else {
-                scheduler.schedule(binding);
+                m_scheduler.schedule(binding);
               }
             });
   }
 
   private void addBinding(BindingType bindingType, Command command) {
-    BindingScope scope = switch (scheduler.currentCommand()) {
+    BindingScope scope = switch (m_scheduler.currentCommand()) {
       // A command is creating a binding - make it scoped to that specific command
-      case Command c -> BindingScope.forCommand(scheduler, c);
+      case Command c -> BindingScope.forCommand(m_scheduler, c);
 
       // Creating a binding outside a command - it's global in scope
       case null -> BindingScope.global();

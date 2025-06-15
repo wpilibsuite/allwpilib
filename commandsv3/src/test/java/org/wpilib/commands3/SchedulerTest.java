@@ -713,22 +713,22 @@ class SchedulerTest {
                 scheduler.runId(scheduledCommand2),
 
                 // Running commands
-                scheduler.lastRuntimeMs(group),
+                scheduler.lastCommandRuntimeMs(group),
                 scheduler.totalRuntimeMs(group),
                 scheduler.runId(group), // id
                 // top-level command, no parent ID
 
-                scheduler.lastRuntimeMs(c2Command),
+                scheduler.lastCommandRuntimeMs(c2Command),
                 scheduler.totalRuntimeMs(c2Command),
                 scheduler.runId(c2Command), // id
                 scheduler.runId(group), // parent
 
-                scheduler.lastRuntimeMs(c3Command),
+                scheduler.lastCommandRuntimeMs(c3Command),
                 scheduler.totalRuntimeMs(c3Command),
                 scheduler.runId(c3Command), // id
                 scheduler.runId(c2Command), // parent
 
-                scheduler.lastRuntimeMs(parkCommand),
+                scheduler.lastCommandRuntimeMs(parkCommand),
                 scheduler.totalRuntimeMs(parkCommand),
                 scheduler.runId(parkCommand), // id
                 scheduler.runId(c3Command) // parent

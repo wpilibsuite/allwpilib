@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
  * an automatically generated name using {@link #withAutomaticName()}.
  */
 public class SequenceBuilder {
-  private final List<Command> steps = new ArrayList<>();
-  private BooleanSupplier endCondition = null;
+  private final List<Command> m_steps = new ArrayList<>();
+  private BooleanSupplier m_endCondition = null;
 
   /**
    * Adds a command to the sequence.
@@ -29,7 +29,7 @@ public class SequenceBuilder {
   public SequenceBuilder andThen(Command next) {
     requireNonNullParam(next, "next", "Sequence.Builder.andThen");
 
-    steps.add(next);
+    m_steps.add(next);
     return this;
   }
 
@@ -39,11 +39,11 @@ public class SequenceBuilder {
    * (e.g. {@code .until(() -> conditionA()).until(() -> conditionB())}), then the last end
    * condition added will be used and any previously configured condition will be overridden.
    *
-   * @param condition The end condition for the group
+   * @param endCondition The end condition for the group
    * @return The builder object, for chaining
    */
   public SequenceBuilder until(BooleanSupplier endCondition) {
-    this.endCondition = endCondition;
+    m_endCondition = endCondition;
     return this;
   }
 
@@ -54,15 +54,15 @@ public class SequenceBuilder {
    * @return The built command
    */
   public Command named(String name) {
-    var seq = new Sequence(name, steps);
-    if (endCondition != null) {
+    var seq = new Sequence(name, m_steps);
+    if (m_endCondition != null) {
       // No custom end condition, return the group as is
       return seq;
     }
 
     // We have a custom end condition, so we need to wrap the group in a race
     return ParallelGroup.builder()
-               .optional(seq, Command.waitUntil(endCondition).named("Until Condition"))
+               .optional(seq, Command.waitUntil(m_endCondition).named("Until Condition"))
                .named(name);
   }
 
@@ -73,6 +73,6 @@ public class SequenceBuilder {
    * @return The built command
    */
   public Command withAutomaticName() {
-    return named(steps.stream().map(Command::name).collect(Collectors.joining(" -> ")));
+    return named(m_steps.stream().map(Command::name).collect(Collectors.joining(" -> ")));
   }
 }

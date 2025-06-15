@@ -37,8 +37,8 @@ public class InternalButton extends Trigger {
    */
   private InternalButton(AtomicBoolean state, AtomicBoolean inverted) {
     super(() -> state.get() != inverted.get());
-    this.m_pressed = state;
-    this.m_inverted = inverted;
+    m_pressed = state;
+    m_inverted = inverted;
   }
 
   /**

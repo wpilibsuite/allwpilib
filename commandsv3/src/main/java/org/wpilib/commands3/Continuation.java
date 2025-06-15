@@ -12,7 +12,7 @@ import java.lang.invoke.WrongMethodTypeException;
 /** A wrapper around the JDK internal Continuation class. */
 public final class Continuation {
   // The underlying jdk.internal.vm.Continuation object
-  final Object continuation;
+  final Object m_continuation;
 
   static final Class<?> jdk_internal_vm_Continuation;
   private static final MethodHandle CONSTRUCTOR;
@@ -76,7 +76,7 @@ public final class Continuation {
     }
   }
 
-  private final ContinuationScope scope;
+  private final ContinuationScope m_scope;
 
   /**
    * Constructs a continuation.
@@ -86,23 +86,22 @@ public final class Continuation {
    */
   public Continuation(ContinuationScope scope, Runnable target) {
     try {
-      this.continuation = CONSTRUCTOR.invoke(scope.continuationScope, target);
-      this.scope = scope;
+      m_continuation = CONSTRUCTOR.invoke(scope.m_continuationScope, target);
+      m_scope = scope;
     } catch (Throwable t) {
       throw new RuntimeException(t);
     }
   }
 
   /**
-   * Suspends the current continuations up to the given scope.
+   * Suspends the current continuations up to this continuation's scope.
    *
-   * @param scope The {@link ContinuationScope} to suspend
    * @return {@code true} for success; {@code false} for failure
-   * @throws IllegalStateException if not currently in the given {@code scope},
+   * @throws IllegalStateException if not currently in this continuation's scope
    */
-  public static boolean yield(ContinuationScope scope) {
+  public boolean yield() {
     try {
-      return (boolean) YIELD.invoke(scope.continuationScope);
+      return (boolean) YIELD.invoke(m_scope.m_continuationScope);
     } catch (RuntimeException e) {
       throw e;
     } catch (Throwable t) {
@@ -115,7 +114,7 @@ public final class Continuation {
    */
   public void run() {
     try {
-      RUN.invoke(continuation);
+      RUN.invoke(m_continuation);
     } catch (WrongMethodTypeException | ClassCastException e) {
       throw new IllegalStateException("Unable to run the underlying continuation!", e);
     } catch (RuntimeException e) {
@@ -129,13 +128,13 @@ public final class Continuation {
   }
 
   /**
-   * Tests whether this continuation is completed
+   * Tests whether this continuation is completed.
    *
    * @return whether this continuation is completed
    */
   public boolean isDone() {
     try {
-      return (boolean) IS_DONE.invoke(continuation);
+      return (boolean) IS_DONE.invoke(m_continuation);
     } catch (Throwable t) {
       throw new RuntimeException(t);
     }
@@ -153,7 +152,7 @@ public final class Continuation {
         java_lang_thread_setContinuation.invoke(Thread.currentThread(), null);
         mountedContinuation.remove();
       } else {
-        java_lang_thread_setContinuation.invoke(Thread.currentThread(), continuation.continuation);
+        java_lang_thread_setContinuation.invoke(Thread.currentThread(), continuation.m_continuation);
         mountedContinuation.set(continuation);
       }
     } catch (Throwable t) {
@@ -176,15 +175,9 @@ public final class Continuation {
 
   @Override
   public String toString() {
-    return continuation.toString();
+    return m_continuation.toString();
   }
 
-  /**
-   * @see Continuation#yield(ContinuationScope)
-   */
-  public boolean yield() {
-    return Continuation.yield(scope);
-  }
 
   boolean isMounted() {
     return this == getMountedContinuation();

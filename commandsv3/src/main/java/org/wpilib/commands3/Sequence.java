@@ -20,55 +20,67 @@ import java.util.Set;
  * but not by a later one, will be <i>uncommanded</i> while that later command executes.
  */
 public class Sequence implements Command {
-  private final String name;
-  private final List<Command> commands = new ArrayList<>();
-  private final Set<RequireableResource> requirements = new HashSet<>();
-  private final int priority;
+  private final String m_name;
+  private final List<Command> m_commands = new ArrayList<>();
+  private final Set<RequireableResource> m_requirements = new HashSet<>();
+  private final int m_priority;
 
   /**
    * Creates a new command sequence.
    *
-   * @param name the name of the sequence
+   * @param name     the name of the sequence
    * @param commands the commands to execute within the sequence
    */
   public Sequence(String name, List<Command> commands) {
-    this.name = name;
-    this.commands.addAll(commands);
+    m_name = name;
+    m_commands.addAll(commands);
 
     for (var command : commands) {
-      this.requirements.addAll(command.requirements());
+      m_requirements.addAll(command.requirements());
     }
 
-    this.priority =
+    m_priority =
         commands.stream().mapToInt(Command::priority).max().orElse(Command.DEFAULT_PRIORITY);
   }
 
   @Override
   public void run(Coroutine coroutine) {
-    for (var command : commands) {
+    for (var command : m_commands) {
       coroutine.await(command);
     }
   }
 
   @Override
   public String name() {
-    return name;
+    return m_name;
   }
 
   @Override
   public Set<RequireableResource> requirements() {
-    return requirements;
+    return m_requirements;
   }
 
   @Override
   public int priority() {
-    return priority;
+    return m_priority;
   }
 
+  /**
+   * Creates a new sequence builder to start building a new sequence of commands.
+   *
+   * @return A new builder
+   */
   public static SequenceBuilder builder() {
     return new SequenceBuilder();
   }
 
+  /**
+   * Starts creating a sequence of the given commands. The commands will execute in the order in
+   * which they are passed to this function.
+   *
+   * @param commands The commands to execute in sequence
+   * @return A builder for further configuration
+   */
   public static SequenceBuilder sequence(Command... commands) {
     var builder = new SequenceBuilder();
     for (var command : commands) {
@@ -77,6 +89,14 @@ public class Sequence implements Command {
     return builder;
   }
 
+  /**
+   * Creates a command that executes the given commands in sequence. The returned command will
+   * require all the resources required by every command in the sequence, and will have a priority
+   * equal to the highest priority of all the given commands.
+   *
+   * @param commands The commands to execute in sequence
+   * @return The sequence command
+   */
   public static Command of(Command... commands) {
     return sequence(commands).withAutomaticName();
   }

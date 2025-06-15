@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
  * {@link #withAutomaticName()}.
  */
 public class ParallelGroupBuilder {
-  private final Set<Command> commands = new LinkedHashSet<>();
-  private final Set<Command> requiredCommands = new LinkedHashSet<>();
-  private BooleanSupplier endCondition = null;
+  private final Set<Command> m_commands = new LinkedHashSet<>();
+  private final Set<Command> m_requiredCommands = new LinkedHashSet<>();
+  private BooleanSupplier m_endCondition = null;
 
   /**
    * Adds one or more optional commands to the group. They will not be required to complete for
@@ -29,7 +29,7 @@ public class ParallelGroupBuilder {
    * @return The builder object, for chaining
    */
   public ParallelGroupBuilder optional(Command... commands) {
-    this.commands.addAll(Arrays.asList(commands));
+    this.m_commands.addAll(Arrays.asList(commands));
     return this;
   }
 
@@ -41,8 +41,8 @@ public class ParallelGroupBuilder {
    * @return The builder object, for chaining
    */
   public ParallelGroupBuilder requiring(Command... commands) {
-    requiredCommands.addAll(Arrays.asList(commands));
-    this.commands.addAll(requiredCommands);
+    m_requiredCommands.addAll(Arrays.asList(commands));
+    this.m_commands.addAll(m_requiredCommands);
     return this;
   }
 
@@ -65,7 +65,7 @@ public class ParallelGroupBuilder {
    * @return The builder object, for chaining
    */
   public ParallelGroupBuilder racing() {
-    requiredCommands.clear();
+    m_requiredCommands.clear();
     return this;
   }
 
@@ -76,8 +76,8 @@ public class ParallelGroupBuilder {
    * @return The builder object, for chaining
    */
   public ParallelGroupBuilder requireAll() {
-    requiredCommands.clear();
-    requiredCommands.addAll(commands);
+    m_requiredCommands.clear();
+    m_requiredCommands.addAll(m_commands);
     return this;
   }
 
@@ -91,7 +91,7 @@ public class ParallelGroupBuilder {
    * @return The builder object, for chaining
    */
   public ParallelGroupBuilder until(BooleanSupplier condition) {
-    endCondition = condition;
+    m_endCondition = condition;
     return this;
   }
 
@@ -104,15 +104,15 @@ public class ParallelGroupBuilder {
    * @return The built group
    */
   public ParallelGroup named(String name) {
-    var group = new ParallelGroup(name, commands, requiredCommands);
-    if (endCondition == null) {
+    var group = new ParallelGroup(name, m_commands, m_requiredCommands);
+    if (m_endCondition == null) {
       // No custom end condition, return the group as is
       return group;
     }
 
     // We have a custom end condition, so we need to wrap the group in a race
     return ParallelGroup.builder()
-               .optional(group, Command.waitUntil(endCondition).named("Until Condition"))
+               .optional(group, Command.waitUntil(m_endCondition).named("Until Condition"))
                .named(name);
   }
 
@@ -124,15 +124,15 @@ public class ParallelGroupBuilder {
   public ParallelGroup withAutomaticName() {
     // eg "(CommandA & CommandB & CommandC)"
     String required =
-        requiredCommands.stream().map(Command::name).collect(Collectors.joining(" & ", "(", ")"));
+        m_requiredCommands.stream().map(Command::name).collect(Collectors.joining(" & ", "(", ")"));
 
-    var optionalCommands = new LinkedHashSet<>(commands);
-    optionalCommands.removeAll(requiredCommands);
+    var optionalCommands = new LinkedHashSet<>(m_commands);
+    optionalCommands.removeAll(m_requiredCommands);
     // eg "(CommandA | CommandB | CommandC)"
     String optional =
         optionalCommands.stream().map(Command::name).collect(Collectors.joining(" | ", "(", ")"));
 
-    if (requiredCommands.isEmpty()) {
+    if (m_requiredCommands.isEmpty()) {
       // No required commands, pure race
       return named(optional);
     } else if (optionalCommands.isEmpty()) {

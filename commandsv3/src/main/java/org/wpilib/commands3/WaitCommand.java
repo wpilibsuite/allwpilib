@@ -13,24 +13,24 @@ import java.util.Set;
 
 /** A command with no requirements that merely waits for a specified duration of time to elapse. */
 public class WaitCommand implements Command {
-  private final Time duration;
+  private final Time m_duration;
 
   public WaitCommand(Time duration) {
-    this.duration = requireNonNullParam(duration, "duration", "WaitCommand");
+    m_duration = requireNonNullParam(duration, "duration", "WaitCommand");
   }
 
   @Override
   public void run(Coroutine coroutine) {
     var timer = new Timer();
     timer.start();
-    while (!timer.hasElapsed(duration.in(Seconds))) {
+    while (!timer.hasElapsed(m_duration.in(Seconds))) {
       coroutine.yield();
     }
   }
 
   @Override
   public String name() {
-    return "Wait " + duration.in(Seconds) + " Seconds";
+    return "Wait " + m_duration.in(Seconds) + " Seconds";
   }
 
   @Override

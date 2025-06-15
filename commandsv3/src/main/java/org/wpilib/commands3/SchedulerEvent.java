@@ -10,10 +10,10 @@ import java.util.function.Consumer;
 /**
  * An event that occurs during scheduler processing. This can range from
  * {@link Scheduled a command being scheduled} by a trigger or manual call to
- * {@link Scheduler#schedule(Command)} to {@link Interrupted a command being interrupted by another}.
- * Event listeners can be registered with a scheduler via
- * {@link Scheduler#addEventListener(Consumer)}. All events have a timestamp that indicates when
- * the event occurred.
+ * {@link Scheduler#schedule(Command)} to
+ * {@link Interrupted a command being interrupted by another}. Event listeners can be registered
+ * with a scheduler via {@link Scheduler#addEventListener(Consumer)}. All events have a timestamp
+ * to indicate when the event occurred.
  */
 public sealed interface SchedulerEvent {
   /**

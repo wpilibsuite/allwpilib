@@ -13,14 +13,19 @@ import java.util.function.Consumer;
  * more than one running command at a time.
  */
 public class RequireableResource {
-  private final String name;
+  private final String m_name;
 
-  private final Scheduler registeredScheduler;
+  private final Scheduler m_registeredScheduler;
 
+  /**
+   * Creates a new requireable resource registered with the default scheduler instance and named
+   * using the name of the class. Intended to be used by subclasses to get sane defaults without
+   * needing to manually declare a constructor.
+   */
   @SuppressWarnings("this-escape")
-  public RequireableResource() {
-    this.name = getClass().getSimpleName();
-    this.registeredScheduler = Scheduler.getDefault();
+  protected RequireableResource() {
+    m_name = getClass().getSimpleName();
+    m_registeredScheduler = Scheduler.getDefault();
     setDefaultCommand(idle());
   }
 
@@ -41,13 +46,13 @@ public class RequireableResource {
    */
   @SuppressWarnings("this-escape")
   public RequireableResource(String name, Scheduler scheduler) {
-    this.name = name;
-    this.registeredScheduler = scheduler;
+    m_name = name;
+    m_registeredScheduler = scheduler;
     setDefaultCommand(idle());
   }
 
   public String getName() {
-    return name;
+    return m_name;
   }
 
   /**
@@ -63,7 +68,7 @@ public class RequireableResource {
    * @param defaultCommand the new default command
    */
   public void setDefaultCommand(Command defaultCommand) {
-    registeredScheduler.scheduleAsDefaultCommand(this, defaultCommand);
+    m_registeredScheduler.scheduleAsDefaultCommand(this, defaultCommand);
   }
 
   /**
@@ -73,7 +78,7 @@ public class RequireableResource {
    * @return The currently configured default command
    */
   public Command getDefaultCommand() {
-    return registeredScheduler.getDefaultCommandFor(this);
+    return m_registeredScheduler.getDefaultCommandFor(this);
   }
 
   /**
@@ -125,11 +130,11 @@ public class RequireableResource {
   }
 
   public List<Command> getRunningCommands() {
-    return registeredScheduler.getRunningCommandsFor(this);
+    return m_registeredScheduler.getRunningCommandsFor(this);
   }
 
   @Override
   public String toString() {
-    return name;
+    return m_name;
   }
 }

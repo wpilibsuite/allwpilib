@@ -28,38 +28,38 @@ import org.wpilib.commands3.proto.SchedulerProto;
 
 /** Manages the lifecycles of {@link Coroutine}-based {@link Command Commands}. */
 public class Scheduler implements ProtobufSerializable {
-  private final Map<RequireableResource, Command> defaultCommands = new LinkedHashMap<>();
+  private final Map<RequireableResource, Command> m_defaultCommands = new LinkedHashMap<>();
 
   /** The set of commands scheduled since the start of the previous run. */
-  private final Set<CommandState> onDeck = new LinkedHashSet<>();
+  private final Set<CommandState> m_onDeck = new LinkedHashSet<>();
 
   /** The states of all running commands (does not include on deck commands). */
-  private final Map<Command, CommandState> commandStates = new LinkedHashMap<>();
+  private final Map<Command, CommandState> m_commandStates = new LinkedHashMap<>();
 
   /**
    * The stack of currently executing commands. Child commands are pushed onto the stack and popped
    * when they complete. Use {@link #currentState()} and {@link #currentCommand()} to get the
    * currently executing command or its state.
    */
-  private final Stack<CommandState> executingCommands = new Stack<>();
+  private final Stack<CommandState> m_executingCommands = new Stack<>();
 
   /** The periodic callbacks to run, outside of the command structure. */
-  private final List<Coroutine> periodicCallbacks = new ArrayList<>();
+  private final List<Coroutine> m_periodicCallbacks = new ArrayList<>();
 
   /** Event loop for trigger bindings. */
-  private final EventLoop eventLoop = new EventLoop();
+  private final EventLoop m_eventLoop = new EventLoop();
 
   /** The scope for continuations to yield to. */
-  private final ContinuationScope scope = new ContinuationScope("coroutine commands");
+  private final ContinuationScope m_scope = new ContinuationScope("coroutine commands");
 
   // Telemetry
   public static final SchedulerProto proto = new SchedulerProto();
-  private double lastRunTimeMs = -1;
+  private double m_lastRunTimeMs = -1;
 
-  private final Set<Consumer<? super SchedulerEvent>> eventListeners = new LinkedHashSet<>();
+  private final Set<Consumer<? super SchedulerEvent>> m_eventListeners = new LinkedHashSet<>();
 
   /** The default scheduler instance. */
-  private static final Scheduler defaultScheduler = new Scheduler();
+  private static final Scheduler s_defaultScheduler = new Scheduler();
 
 
   /**
@@ -69,7 +69,7 @@ public class Scheduler implements ProtobufSerializable {
    * @return the default scheduler instance.
    */
   public static Scheduler getDefault() {
-    return defaultScheduler;
+    return s_defaultScheduler;
   }
 
   public Scheduler() {}
@@ -93,7 +93,7 @@ public class Scheduler implements ProtobufSerializable {
           "A resource's default command cannot require other resources");
     }
 
-    defaultCommands.put(resource, defaultCommand);
+    m_defaultCommands.put(resource, defaultCommand);
     schedule(defaultCommand);
   }
 
@@ -104,7 +104,7 @@ public class Scheduler implements ProtobufSerializable {
    * @return The default command, or null if no default command was ever set
    */
   public Command getDefaultCommandFor(RequireableResource resource) {
-    return defaultCommands.get(resource);
+    return m_defaultCommands.get(resource);
   }
 
   /**
@@ -121,8 +121,8 @@ public class Scheduler implements ProtobufSerializable {
    * @param callback the callback to sideload
    */
   public void sideload(Consumer<Coroutine> callback) {
-    var coroutine = new Coroutine(this, scope, callback);
-    periodicCallbacks.add(coroutine);
+    var coroutine = new Coroutine(this, m_scope, callback);
+    m_periodicCallbacks.add(coroutine);
   }
 
   /**
@@ -145,7 +145,7 @@ public class Scheduler implements ProtobufSerializable {
   public void addPeriodic(Runnable callback) {
     // TODO: Add a unit test for this
     sideload(
-        (coroutine) -> {
+        coroutine -> {
           while (coroutine.yield()) {
             callback.run();
           }
@@ -205,7 +205,7 @@ public class Scheduler implements ProtobufSerializable {
       return ScheduleResult.LOWER_PRIORITY_THAN_RUNNING_COMMAND;
     }
 
-    for (var scheduledState : onDeck) {
+    for (var scheduledState : m_onDeck) {
       if (!command.conflictsWith(scheduledState.command())) {
         // No shared requirements, skip
         continue;
@@ -235,13 +235,13 @@ public class Scheduler implements ProtobufSerializable {
       // cycle. This prevents issues with deeply nested command groups taking many scheduler cycles
       // to start running the commands that actually /do/ things
       evictConflictingRunningCommands(state);
-      commandStates.put(command, state);
+      m_commandStates.put(command, state);
       runCommand(state);
     } else {
       // Scheduling outside a command, add it to the pending set. If it's not overridden by another
       // conflicting command being scheduled in the same scheduler loop, it'll be promoted and
       // start to run when #runCommands() is called
-      onDeck.add(state);
+      m_onDeck.add(state);
     }
 
     return ScheduleResult.SUCCESS;
@@ -257,7 +257,7 @@ public class Scheduler implements ProtobufSerializable {
 
     // Scheduling from outside a command, eg a trigger binding or manual schedule call
     // Check for conflicts with the commands that are already running
-    for (Command c : commandStates.keySet()) {
+    for (Command c : m_commandStates.keySet()) {
       if (c.conflictsWith(command) && command.isLowerPriorityThan(c)) {
         return false;
       }
@@ -267,7 +267,7 @@ public class Scheduler implements ProtobufSerializable {
   }
 
   private void evictConflictingOnDeckCommands(Command command) {
-    for (var iterator = onDeck.iterator(); iterator.hasNext(); ) {
+    for (var iterator = m_onDeck.iterator(); iterator.hasNext(); ) {
       var scheduledState = iterator.next();
       var scheduledCommand = scheduledState.command();
       if (scheduledCommand.conflictsWith(command)) {
@@ -287,7 +287,7 @@ public class Scheduler implements ProtobufSerializable {
   private void evictConflictingRunningCommands(CommandState incomingState) {
     // The set of root states with which the incoming state conflicts but does not inherit from
     Set<CommandState> conflictingRootStates =
-        commandStates.values().stream()
+        m_commandStates.values().stream()
             .filter(state -> incomingState.command().conflictsWith(state.command()))
             .filter(state -> !inheritsFrom(incomingState, state.command()))
             .map(
@@ -298,7 +298,7 @@ public class Scheduler implements ProtobufSerializable {
                   // incoming command
                   CommandState root = state;
                   while (root.parent() != null && root.parent() != incomingState.parent()) {
-                    root = commandStates.get(root.parent());
+                    root = m_commandStates.get(root.parent());
                   }
                   return root;
                 })
@@ -323,7 +323,7 @@ public class Scheduler implements ProtobufSerializable {
       // No parent, cannot inherit
       return false;
     }
-    if (!commandStates.containsKey(ancestor)) {
+    if (!m_commandStates.containsKey(ancestor)) {
       // The given ancestor isn't running
       return false;
     }
@@ -332,7 +332,7 @@ public class Scheduler implements ProtobufSerializable {
       return true;
     }
     // Check if the command's parent inherits from the given ancestor
-    return commandStates.values().stream()
+    return m_commandStates.values().stream()
         .filter(s -> state.parent() == s.command())
         .anyMatch(s -> inheritsFrom(s, ancestor));
   }
@@ -352,8 +352,8 @@ public class Scheduler implements ProtobufSerializable {
     // Evict the command. The next call to run() will schedule the default command for all its
     // required resources, unless another command requiring those resources is scheduled between
     // calling cancel() and calling run()
-    commandStates.remove(command);
-    onDeck.removeIf(state -> state.command() == command);
+    m_commandStates.remove(command);
+    m_onDeck.removeIf(state -> state.command() == command);
 
     if (running) {
       // Only run the hook if the command was running. If it was on deck or not
@@ -377,39 +377,39 @@ public class Scheduler implements ProtobufSerializable {
    * TimedRobot#robotPeriodic()}
    */
   public void run() {
-    long startMicros = RobotController.getTime();
+    final long startMicros = RobotController.getTime();
 
     // Process triggers first; these tend to queue and cancel commands
-    eventLoop.poll();
+    m_eventLoop.poll();
 
     runPeriodicSideloads();
     promoteScheduledCommands();
     runCommands();
     scheduleDefaultCommands();
 
-    long endMicros = RobotController.getTime();
-    lastRunTimeMs = Milliseconds.convertFrom(endMicros - startMicros, Microseconds);
+    final long endMicros = RobotController.getTime();
+    m_lastRunTimeMs = Milliseconds.convertFrom(endMicros - startMicros, Microseconds);
   }
 
   private void promoteScheduledCommands() {
     // Clear any commands that conflict with the scheduled set
-    for (var queuedState : onDeck) {
+    for (var queuedState : m_onDeck) {
       evictConflictingRunningCommands(queuedState);
     }
 
     // Move any scheduled commands to the running set
-    for (var queuedState : onDeck) {
-      commandStates.put(queuedState.command(), queuedState);
+    for (var queuedState : m_onDeck) {
+      m_commandStates.put(queuedState.command(), queuedState);
     }
 
     // Clear the set of on-deck commands,
     // since we just put them all into the set of running commands
-    onDeck.clear();
+    m_onDeck.clear();
   }
 
   private void runPeriodicSideloads() {
     // Update periodic callbacks
-    for (Coroutine coroutine : periodicCallbacks) {
+    for (Coroutine coroutine : m_periodicCallbacks) {
       coroutine.mount();
       try {
         coroutine.runToYieldPoint();
@@ -419,28 +419,28 @@ public class Scheduler implements ProtobufSerializable {
     }
 
     // And remove any periodic callbacks that have completed
-    periodicCallbacks.removeIf(Coroutine::isDone);
+    m_periodicCallbacks.removeIf(Coroutine::isDone);
   }
 
   private void runCommands() {
     // Tick every command that hasn't been completed yet
-    for (var state : List.copyOf(commandStates.values())) {
+    for (var state : List.copyOf(m_commandStates.values())) {
       runCommand(state);
     }
   }
 
   private void runCommand(CommandState state) {
     final var command = state.command();
-    var coroutine = state.coroutine();
+    final var coroutine = state.coroutine();
 
-    if (!commandStates.containsKey(command)) {
+    if (!m_commandStates.containsKey(command)) {
       // Probably canceled by an owning composition, do not run
       return;
     }
 
     var previousState = currentState();
 
-    executingCommands.push(state);
+    m_executingCommands.push(state);
     long startMicros = RobotController.getTime();
     emitEvent(SchedulerEvent.mounted(command));
     coroutine.mount();
@@ -459,7 +459,7 @@ public class Scheduler implements ProtobufSerializable {
 
       if (currentState() == state) {
         // Remove the command we just ran from the top of the stack
-        executingCommands.pop();
+        m_executingCommands.pop();
       }
 
       if (previousState != null) {
@@ -474,7 +474,7 @@ public class Scheduler implements ProtobufSerializable {
       // Immediately check if the command has completed and remove any children commands.
       // This prevents child commands from being executed one extra time in the run() loop
       emitEvent(SchedulerEvent.completed(command));
-      commandStates.remove(command);
+      m_commandStates.remove(command);
       removeOrphanedChildren(command);
     } else {
       // Yielded
@@ -488,12 +488,12 @@ public class Scheduler implements ProtobufSerializable {
    * @return the currently executing command state
    */
   private CommandState currentState() {
-    if (executingCommands.isEmpty()) {
+    if (m_executingCommands.isEmpty()) {
       // Avoid EmptyStackException
       return null;
     }
 
-    return executingCommands.peek();
+    return m_executingCommands.peek();
   }
 
   /**
@@ -513,10 +513,10 @@ public class Scheduler implements ProtobufSerializable {
   private void scheduleDefaultCommands() {
     // Schedule the default commands for every resource that doesn't currently have a running or
     // scheduled command.
-    defaultCommands.forEach(
+    m_defaultCommands.forEach(
         (resource, defaultCommand) -> {
-          if (commandStates.keySet().stream().noneMatch(c -> c.requires(resource))
-              && onDeck.stream().noneMatch(c -> c.command().requires(resource))) {
+          if (m_commandStates.keySet().stream().noneMatch(c -> c.requires(resource))
+              && m_onDeck.stream().noneMatch(c -> c.command().requires(resource))) {
             // Nothing currently running or scheduled
             // Schedule the resource's default command, if it has one
             if (defaultCommand != null) {
@@ -533,7 +533,7 @@ public class Scheduler implements ProtobufSerializable {
    * @param parent the root command whose descendants to remove from the scheduler
    */
   private void removeOrphanedChildren(Command parent) {
-    commandStates.entrySet().stream()
+    m_commandStates.entrySet().stream()
         .filter(e -> e.getValue().parent() == parent)
         .toList() // copy to an intermediate list to avoid concurrent modification
         .forEach(e -> cancel(e.getKey()));
@@ -547,7 +547,7 @@ public class Scheduler implements ProtobufSerializable {
    * @return the binding coroutine
    */
   private Coroutine buildCoroutine(Command command) {
-    return new Coroutine(this, scope, command::run);
+    return new Coroutine(this, m_scope, command::run);
   }
 
   /**
@@ -557,7 +557,7 @@ public class Scheduler implements ProtobufSerializable {
    * @return true if the command is running, false if not
    */
   public boolean isRunning(Command command) {
-    return commandStates.containsKey(command);
+    return m_commandStates.containsKey(command);
   }
 
   /**
@@ -567,7 +567,7 @@ public class Scheduler implements ProtobufSerializable {
    * @return true if the command is scheduled to run, false if not
    */
   public boolean isScheduled(Command command) {
-    return onDeck.stream().anyMatch(state -> state.command() == command);
+    return m_onDeck.stream().anyMatch(state -> state.command() == command);
   }
 
   /**
@@ -587,7 +587,7 @@ public class Scheduler implements ProtobufSerializable {
    * @return the currently running commands
    */
   public Collection<Command> getRunningCommands() {
-    return Collections.unmodifiableSet(commandStates.keySet());
+    return Collections.unmodifiableSet(m_commandStates.keySet());
   }
 
   /**
@@ -598,7 +598,7 @@ public class Scheduler implements ProtobufSerializable {
    * @return the currently running commands that require the resource.
    */
   public List<Command> getRunningCommandsFor(RequireableResource resource) {
-    return commandStates.keySet().stream().filter(command -> command.requires(resource)).toList();
+    return m_commandStates.keySet().stream().filter(command -> command.requires(resource)).toList();
   }
 
   /**
@@ -607,17 +607,17 @@ public class Scheduler implements ProtobufSerializable {
    */
   public void cancelAll() {
     // Remove scheduled children of running commands
-    for (Iterator<CommandState> iterator = onDeck.iterator(); iterator.hasNext(); ) {
+    for (Iterator<CommandState> iterator = m_onDeck.iterator(); iterator.hasNext(); ) {
       CommandState state = iterator.next();
-      if (commandStates.containsKey(state.parent())) {
+      if (m_commandStates.containsKey(state.parent())) {
         iterator.remove();
         emitEvent(SchedulerEvent.evicted(state.command()));
       }
     }
 
     // Finally, remove running commands
-    commandStates.forEach((command, _state) -> emitEvent(SchedulerEvent.evicted(command)));
-    commandStates.clear();
+    m_commandStates.forEach((command, _state) -> emitEvent(SchedulerEvent.evicted(command)));
+    m_commandStates.clear();
   }
 
   /**
@@ -629,17 +629,17 @@ public class Scheduler implements ProtobufSerializable {
    * @return the default event loop.
    */
   public EventLoop getDefaultEventLoop() {
-    return eventLoop;
+    return m_eventLoop;
   }
 
   /** For internal use. */
   public Collection<Command> getQueuedCommands() {
-    return onDeck.stream().map(CommandState::command).toList();
+    return m_onDeck.stream().map(CommandState::command).toList();
   }
 
   /** For internal use. */
   public Command getParentOf(Command command) {
-    var state = commandStates.get(command);
+    var state = m_commandStates.get(command);
     if (state == null) {
       return null;
     }
@@ -653,9 +653,9 @@ public class Scheduler implements ProtobufSerializable {
    * @param command The command to check
    * @return How long, in milliseconds, the command last took to execute.
    */
-  public double lastRuntimeMs(Command command) {
-    if (commandStates.containsKey(command)) {
-      return commandStates.get(command).lastRuntimeMs();
+  public double lastCommandRuntimeMs(Command command) {
+    if (m_commandStates.containsKey(command)) {
+      return m_commandStates.get(command).lastRuntimeMs();
     } else {
       return -1;
     }
@@ -669,21 +669,28 @@ public class Scheduler implements ProtobufSerializable {
    * @return How long, in milliseconds, the command has taken to execute in total
    */
   public double totalRuntimeMs(Command command) {
-    if (commandStates.containsKey(command)) {
-      return commandStates.get(command).totalRuntimeMs();
+    if (m_commandStates.containsKey(command)) {
+      return m_commandStates.get(command).totalRuntimeMs();
     } else {
       // Not running; no data
       return -1;
     }
   }
 
+  /**
+   * Gets the unique run id for a scheduled or running command. If the command is not currently
+   * scheduled or running, this function returns {@code 0}.
+   *
+   * @param command The command to get the run ID for
+   * @return The run of the command
+   */
   public int runId(Command command) {
-    if (commandStates.containsKey(command)) {
-      return commandStates.get(command).id();
+    if (m_commandStates.containsKey(command)) {
+      return m_commandStates.get(command).id();
     }
 
     // Check scheduled commands
-    for (var scheduled : onDeck) {
+    for (var scheduled : m_onDeck) {
       if (scheduled.command() == command) {
         return scheduled.id();
       }
@@ -699,7 +706,7 @@ public class Scheduler implements ProtobufSerializable {
    * @return How long, in milliseconds, the scheduler last took to execute.
    */
   public double lastRuntimeMs() {
-    return lastRunTimeMs;
+    return m_lastRunTimeMs;
   }
 
   /**
@@ -721,14 +728,14 @@ public class Scheduler implements ProtobufSerializable {
   public void addEventListener(Consumer<? super SchedulerEvent> listener) {
     ErrorMessages.requireNonNullParam(listener, "listener", "addEventListener");
 
-    eventListeners.add(listener);
+    m_eventListeners.add(listener);
   }
 
   private void emitEvent(SchedulerEvent event) {
     // TODO: Prevent listeners from interacting with the scheduler.
     //       Scheduling or cancelling commands while the scheduler is processing will probably cause
     //       bugs in user code or even a program crash.
-    for (var listener : eventListeners) {
+    for (var listener : m_eventListeners) {
       listener.accept(event);
     }
   }
