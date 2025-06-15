@@ -3,7 +3,10 @@ try-import %workspace%/user.bazelrc
 
 common --noenable_bzlmod
 
-build --incompatible_disallow_empty_glob=1 # Bazel 8 prep
+# Make bazel 8 work for us.
+common --enable_workspace
+build --experimental_cc_static_library
+build --experimental_cc_shared_library
 
 build --java_language_version=17
 build --java_runtime_version=roboriojdk_17
