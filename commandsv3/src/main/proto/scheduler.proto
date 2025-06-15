@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package wpi.proto;
+
+option java_package = "org.wpilib.commands3.proto";
+option java_multiple_files = true;
+
+/*
+allwpilib $ protoc-quickbuf \
+              --quickbuf_out=gen_descriptors=true:commandsv3/src/main/java \
+              commandsv3/src/main/proto/scheduler.proto
+ */
+
+message ProtobufRequireableResource {
+  string name = 1;
+}
+
+message ProtobufCommand {
+  // A unique ID for the command.
+  // Different invocations of the same command object have different IDs.
+  uint32 id = 1;
+
+  // The ID of the parent command.
+  // Not included in the message for top-level commands.
+  optional uint32 parent_id = 2;
+
+  // The name of the command.
+  string name = 3;
+
+  // The priority level of the command.
+  int32 priority = 4;
+
+  // The resources required by the command.
+  repeated ProtobufRequireableResource requirements = 5;
+
+  // How much time the command took to execute in its most recent run.
+  // Only included in a message for an actively running command.
+  optional double last_time_ms = 6;
+
+  // How long the command has taken to run, in aggregate.
+  // Only included in a message for an actively running command.
+  optional double total_time_ms = 7;
+}
+
+message ProtobufScheduler {
+  // Note: commands are generally queued by triggers, which occurs immediately before they are
+  // promoted and start running. Entries will only appear here when serializing a scheduler
+  // _after_ manually scheduling a command but _before_ calling scheduler.run()
+  repeated ProtobufCommand queued_commands = 1;
+  repeated ProtobufCommand running_commands = 2;
+
+  // How much time the scheduler took in its last `run()` invocation.
+  double last_time_ms = 3;
+}
