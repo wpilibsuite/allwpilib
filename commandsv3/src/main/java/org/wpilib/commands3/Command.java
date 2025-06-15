@@ -250,12 +250,7 @@ public interface Command {
    * @return A command builder
    */
   static CommandBuilder waitUntil(BooleanSupplier condition) {
-    return noRequirements(
-        coroutine -> {
-          while (!condition.getAsBoolean()) {
-            coroutine.yield();
-          }
-        });
+    return noRequirements(coroutine -> coroutine.waitUntil(condition));
   }
 
   /**
