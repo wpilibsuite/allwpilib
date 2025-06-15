@@ -52,14 +52,15 @@ final class CommandTraceHelper {
         // The first frame here should be the line of user code that bound the command to a trigger.
         Stream.of(commandScheduleTrace)
             .dropWhile(frame -> {
-              return frame.getClassName().equals(Trigger.class.getName()) ||
-                         (frame.getClassName().equals(Scheduler.class.getName())
-                              && frame.getMethodName().equals("schedule"));
+              boolean inTriggerInternals = frame.getClassName().equals(Trigger.class.getName());
+              boolean isScheduleCall =
+                  frame.getClassName().equals(Scheduler.class.getName())
+                      && frame.getMethodName().equals("schedule");
+
+              return inTriggerInternals || isScheduleCall;
             })
-            .filter(frame -> {
-              return !filteredClasses.contains(frame.getClassName());
-            })
-                .forEach(frames::add);
+            .filter(frame -> !filteredClasses.contains(frame.getClassName()))
+            .forEach(frames::add);
         break;
       }
 

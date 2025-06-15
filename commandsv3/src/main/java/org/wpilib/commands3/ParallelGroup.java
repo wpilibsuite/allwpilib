@@ -18,11 +18,11 @@ import java.util.Set;
  * has reached its completion condition will be cancelled.
  */
 public class ParallelGroup implements Command {
-  private final Collection<Command> commands = new LinkedHashSet<>();
-  private final Collection<Command> requiredCommands = new HashSet<>();
-  private final Set<RequireableResource> requirements = new HashSet<>();
-  private final String name;
-  private final int priority;
+  private final Collection<Command> m_commands = new LinkedHashSet<>();
+  private final Collection<Command> m_requiredCommands = new HashSet<>();
+  private final Set<RequireableResource> m_requirements = new HashSet<>();
+  private final String m_name;
+  private final int m_priority;
 
   /**
    * Creates a new parallel group.
@@ -68,15 +68,15 @@ public class ParallelGroup implements Command {
       }
     }
 
-    this.name = name;
-    this.commands.addAll(allCommands);
-    this.requiredCommands.addAll(requiredCommands);
+    m_name = name;
+    this.m_commands.addAll(allCommands);
+    this.m_requiredCommands.addAll(requiredCommands);
 
     for (var command : allCommands) {
-      requirements.addAll(command.requirements());
+      m_requirements.addAll(command.requirements());
     }
 
-    this.priority =
+    m_priority =
         allCommands.stream().mapToInt(Command::priority).max().orElse(Command.DEFAULT_PRIORITY);
   }
 
@@ -103,37 +103,37 @@ public class ParallelGroup implements Command {
 
   @Override
   public void run(Coroutine coroutine) {
-    if (requiredCommands.isEmpty()) {
+    if (m_requiredCommands.isEmpty()) {
       // No command is explicitly required to complete
       // Schedule everything and wait for the first one to complete
-      coroutine.awaitAny(commands);
+      coroutine.awaitAny(m_commands);
     } else {
       // At least one command is required to complete
       // Schedule all the non-required commands (the scheduler will automatically cancel them
       // when this group completes), and await completion of all the required commands
-      commands.forEach(coroutine.scheduler()::schedule);
-      coroutine.awaitAll(requiredCommands);
+      m_commands.forEach(coroutine.scheduler()::schedule);
+      coroutine.awaitAll(m_requiredCommands);
     }
   }
 
   @Override
   public String name() {
-    return name;
+    return m_name;
   }
 
   @Override
   public Set<RequireableResource> requirements() {
-    return requirements;
+    return m_requirements;
   }
 
   @Override
   public int priority() {
-    return priority;
+    return m_priority;
   }
 
   @Override
   public String toString() {
-    return "ParallelGroup[name=" + name + "]";
+    return "ParallelGroup[name=" + m_name + "]";
   }
 
   public static ParallelGroupBuilder builder() {

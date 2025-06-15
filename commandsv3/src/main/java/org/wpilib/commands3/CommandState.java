@@ -6,15 +6,17 @@ package org.wpilib.commands3;
 
 /** Represents the state of a command as it is executed by the scheduler. */
 final class CommandState {
-  private final Command command;
-  private final Command parent;
-  private final Coroutine coroutine;
-  private final Binding binding; // may be null
+  private final Command m_command;
+  private final Command m_parent;
+  private final Coroutine m_coroutine;
+  private final Binding m_binding;
   private double lastRuntimeMs = -1;
   private double totalRuntimeMs = 0;
   private final int id = System.identityHashCode(this);
 
   /**
+   * Creates a new command state object.
+   *
    * @param command The command being tracked.
    * @param parent The parent command composition that scheduled the tracked command. Null if the
    *     command was scheduled by a top level construct like trigger bindings or manually scheduled
@@ -22,32 +24,30 @@ final class CommandState {
    *     that invoked the schedule() call; in this manner, an ancestry tree can be built, where each
    *     {@code CommandState} object references a parent node in the tree.
    * @param coroutine The coroutine to which the command is bound.
-   * @param scheduleFrames The stack frames for the schedule site; that is, the backtrace of the
-   *     code that caused the command to be scheduled. These let us report better traces when
-   *     commands encounter exceptions.
+   * @param binding The binding that caused the command to be scheduled.
    */
   CommandState(Command command, Command parent, Coroutine coroutine, Binding binding) {
-    this.command = command;
-    this.parent = parent;
-    this.coroutine = coroutine;
-    this.binding = binding; // may be null
+    m_command = command;
+    m_parent = parent;
+    m_coroutine = coroutine;
+    m_binding = binding;
   }
 
   public Command command() {
-    return command;
+    return m_command;
   }
 
   public Command parent() {
-    return parent;
+    return m_parent;
   }
 
   public Coroutine coroutine() {
-    return coroutine;
+    return m_coroutine;
   }
 
   // may return null
   public Binding binding() {
-    return binding;
+    return m_binding;
   }
 
   /**
@@ -87,13 +87,13 @@ final class CommandState {
   public String toString() {
     return "CommandState["
         + "command="
-        + command
+        + m_command
         + ", "
         + "parent="
-        + parent
+        + m_parent
         + ", "
         + "coroutine="
-        + coroutine
+        + m_coroutine
         + ']';
   }
 }

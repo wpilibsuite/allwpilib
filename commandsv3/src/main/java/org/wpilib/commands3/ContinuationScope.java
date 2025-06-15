@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public final class ContinuationScope {
   // The underlying jdk.internal.vm.ContinuationScope object
-  final Object continuationScope;
+  final Object m_continuationScope;
 
   static final Class<?> jdk_internal_vm_ContinuationScope;
   private static final MethodHandle CONSTRUCTOR;
@@ -31,10 +31,14 @@ public final class ContinuationScope {
     }
   }
 
+  /**
+   * Constructs a new scope.
+   * @param name The scope's name
+   */
   public ContinuationScope(String name) {
     Objects.requireNonNull(name);
     try {
-      this.continuationScope = CONSTRUCTOR.invoke(name);
+      m_continuationScope = CONSTRUCTOR.invoke(name);
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }
@@ -42,6 +46,6 @@ public final class ContinuationScope {
 
   @Override
   public String toString() {
-    return continuationScope.toString();
+    return m_continuationScope.toString();
   }
 }

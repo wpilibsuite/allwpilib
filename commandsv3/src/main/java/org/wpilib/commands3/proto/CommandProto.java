@@ -11,10 +11,10 @@ import us.hebi.quickbuf.Descriptors;
 
 /** Protobuf serde for running commands. */
 public class CommandProto implements Protobuf<Command, ProtobufCommand> {
-  private final Scheduler scheduler;
+  private final Scheduler m_scheduler;
 
   public CommandProto(Scheduler scheduler) {
-    this.scheduler = scheduler;
+    m_scheduler = scheduler;
   }
 
   @Override
@@ -40,9 +40,9 @@ public class CommandProto implements Protobuf<Command, ProtobufCommand> {
 
   @Override
   public void pack(ProtobufCommand msg, Command command) {
-    msg.setId(scheduler.runId(command));
-    if (scheduler.getParentOf(command) instanceof Command parent) {
-      msg.setParentId(scheduler.runId(parent));
+    msg.setId(m_scheduler.runId(command));
+    if (m_scheduler.getParentOf(command) instanceof Command parent) {
+      msg.setParentId(m_scheduler.runId(parent));
     }
     msg.setName(command.name());
     msg.setPriority(command.priority());
@@ -54,9 +54,9 @@ public class CommandProto implements Protobuf<Command, ProtobufCommand> {
       msg.addRequirements(requirementMessage);
     }
 
-    if (scheduler.isRunning(command)) {
-      msg.setLastTimeMs(scheduler.lastRuntimeMs(command));
-      msg.setTotalTimeMs(scheduler.totalRuntimeMs(command));
+    if (m_scheduler.isRunning(command)) {
+      msg.setLastTimeMs(m_scheduler.lastCommandRuntimeMs(command));
+      msg.setTotalTimeMs(m_scheduler.totalRuntimeMs(command));
     }
   }
 }

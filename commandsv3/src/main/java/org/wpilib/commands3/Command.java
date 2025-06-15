@@ -21,7 +21,7 @@ import java.util.function.Consumer;
  * command implementation <strong>must</strong> call {@link Coroutine#yield()} within any periodic
  * loop. Failure to do so may result in an unrecoverable infinite loop.
  *
- * {@snippet lang = java:
+ * <p>{@snippet lang = java:
  * // A 2013-style class-based command definition
  * class ClassBasedCommand extends Command {
  *   public ClassBasedCommand(Subsystem requiredSubsystem) {
@@ -140,7 +140,9 @@ public interface Command {
    * @return true if this command has a lower priority than the other one, false otherwise
    */
   default boolean isLowerPriorityThan(Command other) {
-    if (other == null) return false;
+    if (other == null) {
+      return false;
+    }
 
     return priority() < other.priority();
   }
@@ -269,9 +271,7 @@ public interface Command {
    * Starts creating a command sequence, starting from this command and then running the next one.
    * More commands can be added with the builder before naming and creating the sequence.
    *
-   * <p>
-   *
-   * {@snippet lang="java" :
+   * <p>{@snippet lang="java" :
    * Sequence aThenBThenC =
    *   commandA()
    *     .andThen(commandB())
@@ -290,9 +290,7 @@ public interface Command {
    * Starts creating a parallel command group, running this command alongside one or more other
    * commands. The group will exit once every command has finished.
    *
-   * <p>
-   *
-   * {@snippet lang="java" :
+   * <p>{@snippet lang="java" :
    * ParallelGroup abc =
    *   commandA()
    *     .alongWith(commandB(), commandC())

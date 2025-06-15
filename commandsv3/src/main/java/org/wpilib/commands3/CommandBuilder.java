@@ -19,12 +19,12 @@ import java.util.function.Consumer;
  * A builder that allows for all functionality of a command to be configured prior to creating it.
  */
 public class CommandBuilder {
-  private final Set<RequireableResource> requirements = new HashSet<>();
-  private Consumer<Coroutine> impl;
-  private Runnable onCancel = () -> {};
-  private String name;
-  private int priority = Command.DEFAULT_PRIORITY;
-  private BooleanSupplier endCondition = null;
+  private final Set<RequireableResource> m_requirements = new HashSet<>();
+  private Consumer<Coroutine> m_impl;
+  private Runnable m_onCancel = () -> {};
+  private String m_name;
+  private int m_priority = Command.DEFAULT_PRIORITY;
+  private BooleanSupplier m_endCondition = null;
 
   /**
    * Adds a resource as a requirement for the command.
@@ -36,7 +36,7 @@ public class CommandBuilder {
   public CommandBuilder requiring(RequireableResource resource) {
     requireNonNullParam(resource, "resource", "CommandBuilder.requiring");
 
-    requirements.add(resource);
+    m_requirements.add(resource);
     return this;
   }
 
@@ -53,7 +53,7 @@ public class CommandBuilder {
       requireNonNullParam(resources[i], "resources[" + i + "]", "CommandBuilder.requiring");
     }
 
-    requirements.addAll(Arrays.asList(resources));
+    m_requirements.addAll(Arrays.asList(resources));
     return this;
   }
 
@@ -77,7 +77,7 @@ public class CommandBuilder {
       }
     }
 
-    requirements.addAll(resources);
+    m_requirements.addAll(resources);
     return this;
   }
 
@@ -91,7 +91,7 @@ public class CommandBuilder {
   public CommandBuilder withName(String name) {
     requireNonNullParam(name, "name", "CommandBuilder.withName");
 
-    this.name = name;
+    m_name = name;
     return this;
   }
 
@@ -116,7 +116,7 @@ public class CommandBuilder {
    * @see Command#priority()
    */
   public CommandBuilder withPriority(int priority) {
-    this.priority = priority;
+    m_priority = priority;
     return this;
   }
 
@@ -130,7 +130,7 @@ public class CommandBuilder {
   public CommandBuilder executing(Consumer<Coroutine> impl) {
     requireNonNullParam(impl, "impl", "CommandBuilder.executing");
 
-    this.impl = impl;
+    m_impl = impl;
     return this;
   }
 
@@ -144,7 +144,7 @@ public class CommandBuilder {
   public CommandBuilder whenCanceled(Runnable onCancel) {
     requireNonNullParam(onCancel, "onCancel", "CommandBuilder.whenCanceled");
 
-    this.onCancel = onCancel;
+    m_onCancel = onCancel;
     return this;
   }
 
@@ -155,13 +155,13 @@ public class CommandBuilder {
    * @return The builder object, for chaining.
    */
   public CommandBuilder until(BooleanSupplier endCondition) {
-    this.endCondition = endCondition;
+    m_endCondition = endCondition;
     return this;
   }
 
   /**
    * Makes the command run while some condition is true, ending when the condition becomes inactive.
-   * @param endCondition The command active condition.
+   * @param active The command active condition.
    * @return The builder object, for chaining.
    */
   public CommandBuilder asLongAs(BooleanSupplier active) {
@@ -176,48 +176,48 @@ public class CommandBuilder {
    *     #executing(Consumer) implementation} were not configured before calling this method.
    */
   public Command make() {
-    Objects.requireNonNull(name, "Name was not specified");
-    Objects.requireNonNull(impl, "Command logic was not specified");
+    Objects.requireNonNull(m_name, "Name was not specified");
+    Objects.requireNonNull(m_impl, "Command logic was not specified");
 
     var command = new Command() {
       @Override
       public void run(Coroutine coroutine) {
-        impl.accept(coroutine);
+        m_impl.accept(coroutine);
       }
 
       @Override
       public void onCancel() {
-        onCancel.run();
+        m_onCancel.run();
       }
 
       @Override
       public String name() {
-        return name;
+        return m_name;
       }
 
       @Override
       public Set<RequireableResource> requirements() {
-        return requirements;
+        return m_requirements;
       }
 
       @Override
       public int priority() {
-        return priority;
+        return m_priority;
       }
 
       @Override
       public String toString() {
-        return "Command name=" + name() + " priority=" + priority;
+        return m_name;
       }
     };
 
-    if (endCondition == null) {
+    if (m_endCondition == null) {
       // No custom end condition, just return the raw command
       return command;
     } else {
       // A custom end condition is implemented as a race group, since we cannot modify the command
       // body to inject the end condition.
-      return new ParallelGroupBuilder().requiring(command).until(endCondition).named(name);
+      return new ParallelGroupBuilder().requiring(command).until(m_endCondition).named(m_name);
     }
   }
 }

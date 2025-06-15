@@ -15,13 +15,15 @@ import java.util.Set;
  * interruption function like a normal command.
  */
 public final class IdleCommand implements Command {
-  private final RequireableResource resource;
+  private final RequireableResource m_resource;
 
   /**
+   * Creates a new idle command.
+   *
    * @param resource the resource to idle.
    */
   public IdleCommand(RequireableResource resource) {
-    this.resource = requireNonNullParam(resource, "resource", "IdleCommand");
+    m_resource = requireNonNullParam(resource, "resource", "IdleCommand");
   }
 
   @Override
@@ -31,12 +33,12 @@ public final class IdleCommand implements Command {
 
   @Override
   public Set<RequireableResource> requirements() {
-    return Set.of(resource);
+    return Set.of(m_resource);
   }
 
   @Override
   public String name() {
-    return resource.getName() + "[IDLE]";
+    return m_resource.getName() + "[IDLE]";
   }
 
   @Override
@@ -52,11 +54,11 @@ public final class IdleCommand implements Command {
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof IdleCommand other && Objects.equals(this.resource, other.resource);
+    return obj instanceof IdleCommand other && Objects.equals(this.m_resource, other.m_resource);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(resource);
+    return Objects.hash(m_resource);
   }
 }

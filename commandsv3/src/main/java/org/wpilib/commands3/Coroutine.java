@@ -16,17 +16,20 @@ import java.util.stream.Collectors;
  * commands to yield and compositions to run other commands.
  */
 public final class Coroutine {
-  private final Scheduler scheduler;
-  private final Continuation backingContinuation;
+  private final Scheduler m_scheduler;
+  private final Continuation m_backingContinuation;
 
+  /**
+   * Creates a new coroutine. Package-private; only the scheduler should be creating these.
+   *
+   * @param scheduler The scheduler running the coroutine
+   * @param scope The continuation scope the coroutine's backing continuation runs in
+   * @param callback The callback for the continuation to execute when mounted. Often a command
+   *                 function's body.
+   */
   Coroutine(Scheduler scheduler, ContinuationScope scope, Consumer<Coroutine> callback) {
-    this.scheduler = scheduler;
-    this.backingContinuation =
-        new Continuation(
-            scope,
-            () -> {
-              callback.accept(this);
-            });
+    m_scheduler = scheduler;
+    m_backingContinuation = new Continuation(scope, () -> callback.accept(this));
   }
 
   /**
@@ -39,15 +42,15 @@ public final class Coroutine {
     requireMounted();
 
     try {
-      return backingContinuation.yield();
+      return m_backingContinuation.yield();
     } catch (IllegalStateException e) {
       if (e.getMessage().equals("Pinned: MONITOR")) {
         // Yielding inside a synchronized block or method
         // Throw with an error message that's more helpful for our users
         throw new IllegalStateException(
-            "Coroutine.yield() cannot be called inside a synchronized block or method. " +
-            "Consider using a Lock instead of synchronized, " +
-            "or rewrite your code to avoid locks and mutexes altogether.",
+            "Coroutine.yield() cannot be called inside a synchronized block or method. "
+                + "Consider using a Lock instead of synchronized, "
+                + "or rewrite your code to avoid locks and mutexes altogether.",
             e
         );
       } else {
@@ -75,8 +78,8 @@ public final class Coroutine {
    * Forks off a command. It will run until its natural completion, the parent command exits,
    * or the parent command cancels it. The parent command will continue executing while the
    * forked command runs, and can resync with the forked command using {@link #await(Command)}.
-   * <p>
-   * {@snippet lang = java:
+   *
+   * <p>{@snippet lang = java:
    * Command example() {
    *   return Command.noRequirements((coroutine) -> {
    *     Command inner = ...;
@@ -95,7 +98,7 @@ public final class Coroutine {
 
     // Shorthand; this is handy for user-defined compositions
     for (var command : commands) {
-      scheduler.schedule(command);
+      m_scheduler.schedule(command);
     }
   }
 
@@ -110,11 +113,11 @@ public final class Coroutine {
   public void await(Command command) {
     requireMounted();
 
-    if (!scheduler.isScheduledOrRunning(command)) {
-      scheduler.schedule(command);
+    if (!m_scheduler.isScheduledOrRunning(command)) {
+      m_scheduler.schedule(command);
     }
 
-    while (scheduler.isScheduledOrRunning(command)) {
+    while (m_scheduler.isScheduledOrRunning(command)) {
       // If the command is a one-shot, then the schedule call will completely execute the command.
       // There would be nothing to await
       this.yield();
@@ -135,12 +138,12 @@ public final class Coroutine {
 
     // Schedule anything that's not already queued or running
     for (var command : commands) {
-      if (!scheduler.isScheduledOrRunning(command)) {
-        scheduler.schedule(command);
+      if (!m_scheduler.isScheduledOrRunning(command)) {
+        m_scheduler.schedule(command);
       }
     }
 
-    while (commands.stream().anyMatch(scheduler::isScheduledOrRunning)) {
+    while (commands.stream().anyMatch(m_scheduler::isScheduledOrRunning)) {
       this.yield();
     }
 
@@ -172,16 +175,16 @@ public final class Coroutine {
 
     // Schedule anything that's not already queued or running
     for (var command : commands) {
-      if (!scheduler.isScheduledOrRunning(command)) {
-        scheduler.schedule(command);
+      if (!m_scheduler.isScheduledOrRunning(command)) {
+        m_scheduler.schedule(command);
       }
     }
 
-    while (commands.stream().allMatch(scheduler::isScheduledOrRunning)) {
+    while (commands.stream().allMatch(m_scheduler::isScheduledOrRunning)) {
       this.yield();
     }
 
-    commands.forEach(scheduler::cancel);
+    commands.forEach(m_scheduler::cancel);
   }
 
   /**
@@ -201,7 +204,7 @@ public final class Coroutine {
    *
    * @param commands The commands to validate
    * @throws IllegalArgumentException If at least one pair of commands is found in the input
-   *  where both commands have at least one required resource in common
+   *     where both commands have at least one required resource in common
    */
   private static void validateNoConflicts(Collection<Command> commands) {
     for (var c1 : commands) {
@@ -273,11 +276,11 @@ public final class Coroutine {
    * @return the command scheduler backing this coroutine
    */
   public Scheduler scheduler() {
-    return scheduler;
+    return m_scheduler;
   }
 
   private boolean isMounted() {
-    return backingContinuation.isMounted();
+    return m_backingContinuation.isMounted();
   }
 
   private void requireMounted() {
@@ -297,14 +300,14 @@ public final class Coroutine {
   // These functions are not intended for team use.
 
   void runToYieldPoint() {
-    backingContinuation.run();
+    m_backingContinuation.run();
   }
 
   void mount() {
-    Continuation.mountContinuation(backingContinuation);
+    Continuation.mountContinuation(m_backingContinuation);
   }
 
   boolean isDone() {
-    return backingContinuation.isDone();
+    return m_backingContinuation.isDone();
   }
 }
