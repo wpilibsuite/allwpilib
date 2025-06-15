@@ -28,7 +28,7 @@
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 
-#include "ComCreators.h"
+#include "COMCreators.h"
 #include "ComPtr.h"
 #include "SourceImpl.h"
 #include "UsbCameraProperty.h"
