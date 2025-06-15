@@ -7,6 +7,7 @@ package org.wpilib.commands3;
 import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Milliseconds;
 
+import edu.wpi.first.util.ErrorMessages;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -54,8 +56,11 @@ public class Scheduler implements ProtobufSerializable {
   public static final SchedulerProto proto = new SchedulerProto();
   private double lastRunTimeMs = -1;
 
+  private final Set<Consumer<? super SchedulerEvent>> eventListeners = new LinkedHashSet<>();
+
   /** The default scheduler instance. */
   private static final Scheduler defaultScheduler = new Scheduler();
+
 
   /**
    * Gets the default scheduler instance for use in a robot program. Some built in command types use
@@ -223,6 +228,8 @@ public class Scheduler implements ProtobufSerializable {
         buildCoroutine(command),
         binding);
 
+    emitEvent(SchedulerEvent.scheduled(command));
+
     if (currentState() != null) {
       // Scheduling a child command while running. Start it immediately instead of waiting a full
       // cycle. This prevents issues with deeply nested command groups taking many scheduler cycles
@@ -268,6 +275,7 @@ public class Scheduler implements ProtobufSerializable {
         // We don't need to call removeOrphanedChildren here because it hasn't started yet,
         // meaning it hasn't had a chance to schedule any children
         iterator.remove();
+        emitEvent(SchedulerEvent.interrupted(scheduledCommand, command));
       }
     }
   }
@@ -298,6 +306,7 @@ public class Scheduler implements ProtobufSerializable {
 
     // Cancel the root commands
     for (var conflictingState : conflictingRootStates) {
+      emitEvent(SchedulerEvent.interrupted(conflictingState.command(), incomingState.command()));
       cancel(conflictingState.command());
     }
   }
@@ -350,6 +359,7 @@ public class Scheduler implements ProtobufSerializable {
       // Only run the hook if the command was running. If it was on deck or not
       // even in the scheduler at the time, then there's nothing to do
       command.onCancel();
+      emitEvent(SchedulerEvent.evicted(command));
     }
 
     // Clean up any orphaned child commands; their lifespan must not exceed the parent's
@@ -432,6 +442,7 @@ public class Scheduler implements ProtobufSerializable {
 
     executingCommands.push(state);
     long startMicros = RobotController.getTime();
+    emitEvent(SchedulerEvent.mounted(command));
     coroutine.mount();
     try {
       coroutine.runToYieldPoint();
@@ -439,6 +450,7 @@ public class Scheduler implements ProtobufSerializable {
       // Intercept the exception, inject stack frames from the schedule site, and rethrow it
       var binding = state.binding();
       e.setStackTrace(CommandTraceHelper.modifyTrace(e.getStackTrace(), binding.frames()));
+      emitEvent(SchedulerEvent.completedWithError(command, e));
       throw e;
     } finally {
       long endMicros = RobotController.getTime();
@@ -461,8 +473,12 @@ public class Scheduler implements ProtobufSerializable {
     if (coroutine.isDone()) {
       // Immediately check if the command has completed and remove any children commands.
       // This prevents child commands from being executed one extra time in the run() loop
+      emitEvent(SchedulerEvent.completed(command));
       commandStates.remove(command);
       removeOrphanedChildren(command);
+    } else {
+      // Yielded
+      emitEvent(SchedulerEvent.yielded(command));
     }
   }
 
@@ -591,9 +607,16 @@ public class Scheduler implements ProtobufSerializable {
    */
   public void cancelAll() {
     // Remove scheduled children of running commands
-    onDeck.removeIf(s -> commandStates.containsKey(s.parent()));
+    for (Iterator<CommandState> iterator = onDeck.iterator(); iterator.hasNext(); ) {
+      CommandState state = iterator.next();
+      if (commandStates.containsKey(state.parent())) {
+        iterator.remove();
+        emitEvent(SchedulerEvent.evicted(state.command()));
+      }
+    }
 
     // Finally, remove running commands
+    commandStates.forEach((command, _state) -> emitEvent(SchedulerEvent.evicted(command)));
     commandStates.clear();
   }
 
@@ -677,5 +700,36 @@ public class Scheduler implements ProtobufSerializable {
    */
   public double lastRuntimeMs() {
     return lastRunTimeMs;
+  }
+
+  /**
+   * Adds a listener to handle events that are emitted by the scheduler. Events are emitted when
+   * certain actions are taken by user code or by internal processing logic in the scheduler.
+   * Listeners should take care to be quick, simple, and not schedule or cancel commands, as that
+   * may cause inconsistent scheduler behavior or even cause a program crash.
+   *
+   * <p>Listeners are primarily expected to be for data logging and telemetry. In particular, a
+   * one-shot command (one that never calls {@link Coroutine#yield()}) will never appear in the
+   * standard protobuf telemetry because it is scheduled, runs, and finishes all in a single
+   * scheduler cycle. However, {@link SchedulerEvent.Scheduled},{@link SchedulerEvent.Mounted}, and
+   * {@link SchedulerEvent.Completed} events will be emitted corresponding to those actions, and
+   * user code can listen for and log such events.
+   *
+   * @param listener The listener to add. Cannot be null.
+   * @throws NullPointerException if given a null listener
+   */
+  public void addEventListener(Consumer<? super SchedulerEvent> listener) {
+    ErrorMessages.requireNonNullParam(listener, "listener", "addEventListener");
+
+    eventListeners.add(listener);
+  }
+
+  private void emitEvent(SchedulerEvent event) {
+    // TODO: Prevent listeners from interacting with the scheduler.
+    //       Scheduling or cancelling commands while the scheduler is processing will probably cause
+    //       bugs in user code or even a program crash.
+    for (var listener : eventListeners) {
+      listener.accept(event);
+    }
   }
 }
