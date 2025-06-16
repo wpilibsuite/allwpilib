@@ -13,10 +13,9 @@ public class ErrorPrinter implements ErrorHandler {
 
   @Override
   public void handle(Throwable exception, ClassSpecificLogger<?> logger) {
-    System.err.println(
-        "[EPILOGUE] An error occurred while logging an instance of "
-            + logger.getLoggedType().getName()
-            + ": "
-            + exception.getMessage());
+    System.err.println("[EPILOGUE] An error occurred while logging an instance of "
+        + logger.getLoggedType().getName()
+        + ": "
+        + exception.getMessage());
   }
 }

@@ -56,10 +56,9 @@ public class MotorEncoderTest extends AbstractComsSetup {
   @Parameters(name = "{index}: {0}")
   public static Collection<MotorEncoderFixture<?>[]> generateData() {
     // logger.fine("Loading the MotorList");
-    return List.of(
-        new MotorEncoderFixture<?>[][] {
-          {TestBench.getTalonPair()}, {TestBench.getVictorPair()}, {TestBench.getJaguarPair()}
-        });
+    return List.of(new MotorEncoderFixture<?>[][] {
+      {TestBench.getTalonPair()}, {TestBench.getVictorPair()}, {TestBench.getJaguarPair()}
+    });
   }
 
   @Before
@@ -173,7 +172,8 @@ public class MotorEncoderTest extends AbstractComsSetup {
   public void testSetHighForwardSpeed() {
     me.getMotor().set(15);
     assertTrue(
-        me.getType() + " Motor speed was not close to 1.0, was: " + me.getMotor().get(),
+        me.getType() + " Motor speed was not close to 1.0, was: "
+            + me.getMotor().get(),
         me.isMotorSpeedWithinRange(1.0, 0.001));
   }
 
@@ -185,7 +185,8 @@ public class MotorEncoderTest extends AbstractComsSetup {
   public void testSetHighReverseSpeed() {
     me.getMotor().set(-15);
     assertTrue(
-        me.getType() + " Motor speed was not close to 1.0, was: " + me.getMotor().get(),
+        me.getType() + " Motor speed was not close to 1.0, was: "
+            + me.getMotor().get(),
         me.isMotorSpeedWithinRange(-1.0, 0.001));
   }
 
@@ -196,12 +197,10 @@ public class MotorEncoderTest extends AbstractComsSetup {
       pidController.setIntegratorRange(-0.2, 0.2);
       pidController.setSetpoint(1000);
 
-      try (Notifier pidRunner =
-          new Notifier(
-              () -> {
-                var speed = pidController.calculate(me.getEncoder().getDistance());
-                me.getMotor().set(MathUtil.clamp(speed, -0.2, 0.2));
-              })) {
+      try (Notifier pidRunner = new Notifier(() -> {
+        var speed = pidController.calculate(me.getEncoder().getDistance());
+        me.getMotor().set(MathUtil.clamp(speed, -0.2, 0.2));
+      })) {
         pidRunner.startPeriodic(pidController.getPeriod());
         Timer.delay(10.0);
         pidRunner.stop();
@@ -221,12 +220,10 @@ public class MotorEncoderTest extends AbstractComsSetup {
       pidController.setTolerance(200);
       pidController.setSetpoint(600);
 
-      try (Notifier pidRunner =
-          new Notifier(
-              () -> {
-                var speed = filter.calculate(me.getEncoder().getRate());
-                me.getMotor().set(MathUtil.clamp(speed, -0.3, 0.3));
-              })) {
+      try (Notifier pidRunner = new Notifier(() -> {
+        var speed = filter.calculate(me.getEncoder().getRate());
+        me.getMotor().set(MathUtil.clamp(speed, -0.3, 0.3));
+      })) {
         pidRunner.startPeriodic(pidController.getPeriod());
         Timer.delay(10.0);
         pidRunner.stop();
@@ -246,7 +243,9 @@ public class MotorEncoderTest extends AbstractComsSetup {
    */
   private void encodersResetCheck(MotorEncoderFixture<?> me) {
     assertEquals(
-        me.getType() + " Encoder value was incorrect after reset.", me.getEncoder().get(), 0);
+        me.getType() + " Encoder value was incorrect after reset.",
+        me.getEncoder().get(),
+        0);
     assertEquals(
         me.getType() + " Motor value was incorrect after reset.", me.getMotor().get(), 0, 0);
     assertEquals(

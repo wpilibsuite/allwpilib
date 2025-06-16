@@ -281,8 +281,10 @@ public final class Units {
    * The standard unit of force, equivalent to accelerating a mass of one {@link #Kilogram} at a
    * rate of one {@link #MetersPerSecondPerSecond meter per second per second}.
    */
-  public static final ForceUnit Newtons =
-      derive(Kilograms.mult(MetersPerSecondPerSecond)).named("Newton").symbol("N").make();
+  public static final ForceUnit Newtons = derive(Kilograms.mult(MetersPerSecondPerSecond))
+      .named("Newton")
+      .symbol("N")
+      .make();
 
   /**
    * The standard unit of force, equivalent to the standard force of gravity applied to a one {@link
@@ -420,7 +422,8 @@ public final class Units {
 
   // ResistanceUnit
   /** The base unit of resistance. Equivalent to one {@link #Volt} per {@link #Amp}. */
-  public static final ResistanceUnit Ohms = derive(Volts.per(Amp)).named("Ohm").symbol("Ω").make();
+  public static final ResistanceUnit Ohms =
+      derive(Volts.per(Amp)).named("Ohm").symbol("Ω").make();
 
   /** The base unit of resistance. Equivalent to one {@link #Volt} per {@link #Amp}. */
   public static final ResistanceUnit Ohm = Ohms; // alias
@@ -468,7 +471,8 @@ public final class Units {
 
   // PowerUnit
   /** The base unit of power. Equivalent to one {@link #Joule} per {@link #Second}. */
-  public static final PowerUnit Watts = derive(Joules.per(Second)).named("Watt").symbol("W").make();
+  public static final PowerUnit Watts =
+      derive(Joules.per(Second)).named("Watt").symbol("W").make();
 
   /** The base unit of power. Equivalent to one {@link #Joule} per {@link #Second}. */
   public static final PowerUnit Watt = Watts; // alias
@@ -510,13 +514,12 @@ public final class Units {
    * The base imperial (American) unit of temperature, where a value of 32 roughly corresponds to
    * the freezing point of water and a value of 212 corresponds to the boiling point.
    */
-  public static final TemperatureUnit Fahrenheit =
-      derive(Celsius)
-          .mappingInputRange(0, 100)
-          .toOutputRange(32, 212)
-          .named("Fahrenheit")
-          .symbol("°F")
-          .make();
+  public static final TemperatureUnit Fahrenheit = derive(Celsius)
+      .mappingInputRange(0, 100)
+      .toOutputRange(32, 212)
+      .named("Fahrenheit")
+      .symbol("°F")
+      .make();
 
   // Standard feedforward units for kV and kA.
   // kS and kG are just volts, which is already defined earlier

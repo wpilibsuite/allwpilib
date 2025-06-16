@@ -44,10 +44,9 @@ class UnscentedKalmanFilterTest {
     var m = 63.503; // Robot mass
     var J = 5.6; // Robot moment of inertia
 
-    var C1 =
-        -Math.pow(gHigh, 2)
-            * motors.KtNMPerAmp
-            / (motors.KvRadPerSecPerVolt * motors.rOhms * r * r);
+    var C1 = -Math.pow(gHigh, 2)
+        * motors.KtNMPerAmp
+        / (motors.KvRadPerSecPerVolt * motors.rOhms * r * r);
     var C2 = gHigh * motors.KtNMPerAmp / (motors.rOhms * r);
     var k1 = 1.0 / m + Math.pow(rb, 2) / J;
     var k2 = 1.0 / m - Math.pow(rb, 2) / J;
@@ -79,44 +78,41 @@ class UnscentedKalmanFilterTest {
   @Test
   void testDriveInit() {
     var dtSeconds = 0.005;
-    assertDoesNotThrow(
-        () -> {
-          UnscentedKalmanFilter<N5, N2, N3> observer =
-              new UnscentedKalmanFilter<>(
-                  Nat.N5(),
-                  Nat.N3(),
-                  UnscentedKalmanFilterTest::driveDynamics,
-                  UnscentedKalmanFilterTest::driveLocalMeasurementModel,
-                  VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
-                  VecBuilder.fill(0.0001, 0.01, 0.01),
-                  AngleStatistics.angleMean(2),
-                  AngleStatistics.angleMean(0),
-                  AngleStatistics.angleResidual(2),
-                  AngleStatistics.angleResidual(0),
-                  AngleStatistics.angleAdd(2),
-                  dtSeconds);
+    assertDoesNotThrow(() -> {
+      UnscentedKalmanFilter<N5, N2, N3> observer = new UnscentedKalmanFilter<>(
+          Nat.N5(),
+          Nat.N3(),
+          UnscentedKalmanFilterTest::driveDynamics,
+          UnscentedKalmanFilterTest::driveLocalMeasurementModel,
+          VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
+          VecBuilder.fill(0.0001, 0.01, 0.01),
+          AngleStatistics.angleMean(2),
+          AngleStatistics.angleMean(0),
+          AngleStatistics.angleResidual(2),
+          AngleStatistics.angleResidual(0),
+          AngleStatistics.angleAdd(2),
+          dtSeconds);
 
-          var u = VecBuilder.fill(12.0, 12.0);
-          observer.predict(u, dtSeconds);
+      var u = VecBuilder.fill(12.0, 12.0);
+      observer.predict(u, dtSeconds);
 
-          var localY = driveLocalMeasurementModel(observer.getXhat(), u);
-          observer.correct(u, localY);
+      var localY = driveLocalMeasurementModel(observer.getXhat(), u);
+      observer.correct(u, localY);
 
-          var globalY = driveGlobalMeasurementModel(observer.getXhat(), u);
-          var R =
-              StateSpaceUtil.makeCovarianceMatrix(
-                  Nat.N5(), VecBuilder.fill(0.01, 0.01, 0.0001, 0.01, 0.01));
-          observer.correct(
-              Nat.N5(),
-              u,
-              globalY,
-              UnscentedKalmanFilterTest::driveGlobalMeasurementModel,
-              R,
-              AngleStatistics.angleMean(2),
-              AngleStatistics.angleResidual(2),
-              AngleStatistics.angleResidual(2),
-              AngleStatistics.angleAdd(2));
-        });
+      var globalY = driveGlobalMeasurementModel(observer.getXhat(), u);
+      var R = StateSpaceUtil.makeCovarianceMatrix(
+          Nat.N5(), VecBuilder.fill(0.01, 0.01, 0.0001, 0.01, 0.01));
+      observer.correct(
+          Nat.N5(),
+          u,
+          globalY,
+          UnscentedKalmanFilterTest::driveGlobalMeasurementModel,
+          R,
+          AngleStatistics.angleMean(2),
+          AngleStatistics.angleResidual(2),
+          AngleStatistics.angleResidual(2),
+          AngleStatistics.angleAdd(2));
+    });
   }
 
   @Test
@@ -124,46 +120,42 @@ class UnscentedKalmanFilterTest {
     final double dtSeconds = 0.005;
     final double rbMeters = 0.8382 / 2.0; // Robot radius
 
-    UnscentedKalmanFilter<N5, N2, N3> observer =
-        new UnscentedKalmanFilter<>(
-            Nat.N5(),
-            Nat.N3(),
-            UnscentedKalmanFilterTest::driveDynamics,
-            UnscentedKalmanFilterTest::driveLocalMeasurementModel,
-            VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
-            VecBuilder.fill(0.0001, 0.5, 0.5),
-            AngleStatistics.angleMean(2),
-            AngleStatistics.angleMean(0),
-            AngleStatistics.angleResidual(2),
-            AngleStatistics.angleResidual(0),
-            AngleStatistics.angleAdd(2),
-            dtSeconds);
+    UnscentedKalmanFilter<N5, N2, N3> observer = new UnscentedKalmanFilter<>(
+        Nat.N5(),
+        Nat.N3(),
+        UnscentedKalmanFilterTest::driveDynamics,
+        UnscentedKalmanFilterTest::driveLocalMeasurementModel,
+        VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
+        VecBuilder.fill(0.0001, 0.5, 0.5),
+        AngleStatistics.angleMean(2),
+        AngleStatistics.angleMean(0),
+        AngleStatistics.angleResidual(2),
+        AngleStatistics.angleResidual(0),
+        AngleStatistics.angleAdd(2),
+        dtSeconds);
 
-    List<Pose2d> waypoints =
-        List.of(
-            new Pose2d(2.75, 22.521, Rotation2d.kZero),
-            new Pose2d(24.73, 19.68, Rotation2d.fromDegrees(5.846)));
+    List<Pose2d> waypoints = List.of(
+        new Pose2d(2.75, 22.521, Rotation2d.kZero),
+        new Pose2d(24.73, 19.68, Rotation2d.fromDegrees(5.846)));
     var trajectory =
         TrajectoryGenerator.generateTrajectory(waypoints, new TrajectoryConfig(8.8, 0.1));
 
     Matrix<N5, N1> r = new Matrix<>(Nat.N5(), Nat.N1());
     Matrix<N2, N1> u = new Matrix<>(Nat.N2(), Nat.N1());
 
-    var B =
-        NumericalJacobian.numericalJacobianU(
-            Nat.N5(),
-            Nat.N2(),
-            UnscentedKalmanFilterTest::driveDynamics,
-            new Matrix<>(Nat.N5(), Nat.N1()),
-            new Matrix<>(Nat.N2(), Nat.N1()));
+    var B = NumericalJacobian.numericalJacobianU(
+        Nat.N5(),
+        Nat.N2(),
+        UnscentedKalmanFilterTest::driveDynamics,
+        new Matrix<>(Nat.N5(), Nat.N1()),
+        new Matrix<>(Nat.N2(), Nat.N1()));
 
-    observer.setXhat(
-        VecBuilder.fill(
-            trajectory.getInitialPose().getTranslation().getX(),
-            trajectory.getInitialPose().getTranslation().getY(),
-            trajectory.getInitialPose().getRotation().getRadians(),
-            0.0,
-            0.0));
+    observer.setXhat(VecBuilder.fill(
+        trajectory.getInitialPose().getTranslation().getX(),
+        trajectory.getInitialPose().getTranslation().getY(),
+        trajectory.getInitialPose().getRotation().getRadians(),
+        0.0,
+        0.0));
 
     var trueXhat = observer.getXhat();
 
@@ -173,13 +165,12 @@ class UnscentedKalmanFilterTest {
       double vl = ref.velocityMetersPerSecond * (1 - (ref.curvatureRadPerMeter * rbMeters));
       double vr = ref.velocityMetersPerSecond * (1 + (ref.curvatureRadPerMeter * rbMeters));
 
-      var nextR =
-          VecBuilder.fill(
-              ref.poseMeters.getTranslation().getX(),
-              ref.poseMeters.getTranslation().getY(),
-              ref.poseMeters.getRotation().getRadians(),
-              vl,
-              vr);
+      var nextR = VecBuilder.fill(
+          ref.poseMeters.getTranslation().getX(),
+          ref.poseMeters.getTranslation().getY(),
+          ref.poseMeters.getRotation().getRadians(),
+          vl,
+          vr);
 
       Matrix<N3, N1> localY =
           driveLocalMeasurementModel(trueXhat, new Matrix<>(Nat.N2(), Nat.N1()));
@@ -193,18 +184,16 @@ class UnscentedKalmanFilterTest {
       observer.predict(u, dtSeconds);
 
       r = nextR;
-      trueXhat =
-          NumericalIntegration.rk4(
-              UnscentedKalmanFilterTest::driveDynamics, trueXhat, u, dtSeconds);
+      trueXhat = NumericalIntegration.rk4(
+          UnscentedKalmanFilterTest::driveDynamics, trueXhat, u, dtSeconds);
     }
 
     var localY = driveLocalMeasurementModel(trueXhat, u);
     observer.correct(u, localY);
 
     var globalY = driveGlobalMeasurementModel(trueXhat, u);
-    var R =
-        StateSpaceUtil.makeCovarianceMatrix(
-            Nat.N5(), VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
+    var R = StateSpaceUtil.makeCovarianceMatrix(
+        Nat.N5(), VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
     observer.correct(
         Nat.N5(),
         u,
@@ -230,15 +219,14 @@ class UnscentedKalmanFilterTest {
   void testLinearUKF() {
     var dt = 0.020;
     var plant = LinearSystemId.identifyVelocitySystem(0.02, 0.006);
-    var observer =
-        new UnscentedKalmanFilter<>(
-            Nat.N1(),
-            Nat.N1(),
-            (x, u) -> plant.getA().times(x).plus(plant.getB().times(u)),
-            plant::calculateY,
-            VecBuilder.fill(0.05),
-            VecBuilder.fill(1.0),
-            dt);
+    var observer = new UnscentedKalmanFilter<>(
+        Nat.N1(),
+        Nat.N1(),
+        (x, u) -> plant.getA().times(x).plus(plant.getB().times(u)),
+        plant::calculateY,
+        VecBuilder.fill(0.05),
+        VecBuilder.fill(1.0),
+        dt);
 
     var discABPair = Discretization.discretizeAB(plant.getA(), plant.getB(), dt);
     var discA = discABPair.getFirst();
@@ -260,15 +248,14 @@ class UnscentedKalmanFilterTest {
   void testRoundTripP() {
     var dtSeconds = 0.005;
 
-    var observer =
-        new UnscentedKalmanFilter<>(
-            Nat.N2(),
-            Nat.N2(),
-            (x, u) -> x,
-            (x, u) -> x,
-            VecBuilder.fill(0.0, 0.0),
-            VecBuilder.fill(0.0, 0.0),
-            dtSeconds);
+    var observer = new UnscentedKalmanFilter<>(
+        Nat.N2(),
+        Nat.N2(),
+        (x, u) -> x,
+        (x, u) -> x,
+        VecBuilder.fill(0.0, 0.0),
+        VecBuilder.fill(0.0, 0.0),
+        dtSeconds);
 
     var P = MatBuilder.fill(Nat.N2(), Nat.N2(), 2.0, 1.0, 1.0, 2.0);
     observer.setP(P);
@@ -322,37 +309,33 @@ class UnscentedKalmanFilterTest {
     final double vel_stddev = 0.1;
     final double accel_stddev = 0.1;
 
-    var states =
-        new ArrayList<>(
-            Collections.nCopies(
-                steps + 1, MatBuilder.fill(Nat.N4(), Nat.N1(), 0.0, 0.0, 0.0, 0.0)));
+    var states = new ArrayList<>(
+        Collections.nCopies(steps + 1, MatBuilder.fill(Nat.N4(), Nat.N1(), 0.0, 0.0, 0.0, 0.0)));
     var inputs =
         new ArrayList<>(Collections.nCopies(steps, MatBuilder.fill(Nat.N1(), Nat.N1(), 0.0)));
-    var measurements =
-        new ArrayList<>(
-            Collections.nCopies(steps + 1, MatBuilder.fill(Nat.N3(), Nat.N1(), 0.0, 0.0, 0.0)));
+    var measurements = new ArrayList<>(
+        Collections.nCopies(steps + 1, MatBuilder.fill(Nat.N3(), Nat.N1(), 0.0, 0.0, 0.0)));
     states.set(0, MatBuilder.fill(Nat.N4(), Nat.N1(), 0.0, 0.0, true_kV, true_kA));
 
-    var A =
-        MatBuilder.fill(
-            Nat.N4(),
-            Nat.N4(),
-            0.0,
-            1.0,
-            0.0,
-            0.0,
-            0.0,
-            -true_kV / true_kA,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0);
+    var A = MatBuilder.fill(
+        Nat.N4(),
+        Nat.N4(),
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        -true_kV / true_kA,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0);
     var B = MatBuilder.fill(Nat.N4(), Nat.N1(), 0.0, 1.0 / true_kA, 0.0, 0.0);
 
     var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
@@ -365,25 +348,22 @@ class UnscentedKalmanFilterTest {
       measurements.set(
           i,
           motorMeasurementModel(states.get(i + 1), inputs.get(i))
-              .plus(
-                  StateSpaceUtil.makeWhiteNoiseVector(
-                      VecBuilder.fill(pos_stddev, vel_stddev, accel_stddev))));
+              .plus(StateSpaceUtil.makeWhiteNoiseVector(
+                  VecBuilder.fill(pos_stddev, vel_stddev, accel_stddev))));
     }
 
-    var P0 =
-        MatBuilder.fill(
-            Nat.N4(), Nat.N4(), 0.001, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0, 0.0, 0.0, 0.0, 10, 0.0, 0.0,
-            0.0, 0.0, 10);
+    var P0 = MatBuilder.fill(
+        Nat.N4(), Nat.N4(), 0.001, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0, 0.0, 0.0, 0.0, 10, 0.0, 0.0, 0.0,
+        0.0, 10);
 
-    var observer =
-        new UnscentedKalmanFilter<N4, N1, N3>(
-            Nat.N4(),
-            Nat.N3(),
-            UnscentedKalmanFilterTest::motorDynamics,
-            UnscentedKalmanFilterTest::motorMeasurementModel,
-            VecBuilder.fill(0.1, 1.0, 1e-10, 1e-10),
-            VecBuilder.fill(pos_stddev, vel_stddev, accel_stddev),
-            dtSeconds);
+    var observer = new UnscentedKalmanFilter<N4, N1, N3>(
+        Nat.N4(),
+        Nat.N3(),
+        UnscentedKalmanFilterTest::motorDynamics,
+        UnscentedKalmanFilterTest::motorMeasurementModel,
+        VecBuilder.fill(0.1, 1.0, 1e-10, 1e-10),
+        VecBuilder.fill(pos_stddev, vel_stddev, accel_stddev),
+        dtSeconds);
 
     observer.setXhat(MatBuilder.fill(Nat.N4(), Nat.N1(), 0.0, 0.0, 2.0, 2.0));
     observer.setP(P0);

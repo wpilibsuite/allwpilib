@@ -29,18 +29,17 @@ public final class StructFetcher {
       Class<? extends T> clazz) {
     try {
       var possibleField = Optional.ofNullable(clazz.getDeclaredField("struct"));
-      return possibleField.flatMap(
-          field -> {
-            if (Struct.class.isAssignableFrom(field.getType())) {
-              try {
-                return Optional.ofNullable((Struct<T>) field.get(null));
-              } catch (IllegalAccessException e) {
-                return Optional.empty();
-              }
-            } else {
-              return Optional.empty();
-            }
-          });
+      return possibleField.flatMap(field -> {
+        if (Struct.class.isAssignableFrom(field.getType())) {
+          try {
+            return Optional.ofNullable((Struct<T>) field.get(null));
+          } catch (IllegalAccessException e) {
+            return Optional.empty();
+          }
+        } else {
+          return Optional.empty();
+        }
+      });
     } catch (NoSuchFieldException e) {
       return Optional.empty();
     }

@@ -27,14 +27,13 @@ public final class MatBuilder {
   public static <R extends Num, C extends Num> Matrix<R, C> fill(
       Nat<R> rows, Nat<C> cols, double... data) {
     if (Objects.requireNonNull(data).length != rows.getNum() * cols.getNum()) {
-      throw new IllegalArgumentException(
-          "Invalid matrix data provided. Wanted "
-              + rows.getNum()
-              + " x "
-              + cols.getNum()
-              + " matrix, but got "
-              + data.length
-              + " elements");
+      throw new IllegalArgumentException("Invalid matrix data provided. Wanted "
+          + rows.getNum()
+          + " x "
+          + cols.getNum()
+          + " matrix, but got "
+          + data.length
+          + " elements");
     }
     return new Matrix<>(new SimpleMatrix(rows.getNum(), cols.getNum(), true, data));
   }

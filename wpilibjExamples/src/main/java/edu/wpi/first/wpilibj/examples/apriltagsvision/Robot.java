@@ -46,9 +46,8 @@ public class Robot extends TimedRobot {
 
     // Set up Pose Estimator - parameters are for a Microsoft Lifecam HD-3000
     // (https://www.chiefdelphi.com/t/wpilib-apriltagdetector-sample-code/421411/21)
-    var poseEstConfig =
-        new AprilTagPoseEstimator.Config(
-            0.1651, 699.3778103158814, 677.7161226393544, 345.6059345433618, 207.12741326228522);
+    var poseEstConfig = new AprilTagPoseEstimator.Config(
+        0.1651, 699.3778103158814, 677.7161226393544, 345.6059345433618, 207.12741326228522);
     var estimator = new AprilTagPoseEstimator(poseEstConfig);
 
     // Get the UsbCamera from CameraServer
@@ -128,12 +127,9 @@ public class Robot extends TimedRobot {
 
         // put pose into dashboard
         Rotation3d rot = pose.getRotation();
-        tagsTable
-            .getEntry("pose_" + detection.getId())
-            .setDoubleArray(
-                new double[] {
-                  pose.getX(), pose.getY(), pose.getZ(), rot.getX(), rot.getY(), rot.getZ()
-                });
+        tagsTable.getEntry("pose_" + detection.getId()).setDoubleArray(new double[] {
+          pose.getX(), pose.getY(), pose.getZ(), rot.getX(), rot.getY(), rot.getZ()
+        });
       }
 
       // put list of tags onto dashboard

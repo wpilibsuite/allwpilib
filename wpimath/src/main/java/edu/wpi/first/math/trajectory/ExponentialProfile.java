@@ -314,11 +314,10 @@ public class ExponentialProfile {
         x_at_solvable_v = computeDistanceFromVelocity(solvableV, u, current);
       }
 
-      inflectionT_forward =
-          t_to_solvable_v
-              + Math.signum(input)
-                  * (inflectionPoint.position - x_at_solvable_v)
-                  / m_constraints.maxVelocity();
+      inflectionT_forward = t_to_solvable_v
+          + Math.signum(input)
+              * (inflectionPoint.position - x_at_solvable_v)
+              / m_constraints.maxVelocity();
     } else {
       inflectionT_forward = computeTimeFromVelocity(inflectionPoint.velocity, u, current.velocity);
     }

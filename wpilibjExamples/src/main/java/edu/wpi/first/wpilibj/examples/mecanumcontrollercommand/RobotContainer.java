@@ -50,12 +50,11 @@ public class RobotContainer {
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
         new RunCommand(
-            () ->
-                m_robotDrive.drive(
-                    -m_driverController.getLeftY(),
-                    -m_driverController.getRightX(),
-                    -m_driverController.getLeftX(),
-                    false),
+            () -> m_robotDrive.drive(
+                -m_driverController.getLeftY(),
+                -m_driverController.getRightX(),
+                -m_driverController.getLeftX(),
+                false),
             m_robotDrive));
   }
 
@@ -79,48 +78,45 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // Create config for trajectory
-    TrajectoryConfig config =
-        new TrajectoryConfig(
-                AutoConstants.kMaxSpeedMetersPerSecond,
-                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-            // Add kinematics to ensure max speed is actually obeyed
-            .setKinematics(DriveConstants.kDriveKinematics);
+    TrajectoryConfig config = new TrajectoryConfig(
+            AutoConstants.kMaxSpeedMetersPerSecond,
+            AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+        // Add kinematics to ensure max speed is actually obeyed
+        .setKinematics(DriveConstants.kDriveKinematics);
 
     // An example trajectory to follow. All units in meters.
-    Trajectory exampleTrajectory =
-        TrajectoryGenerator.generateTrajectory(
-            // Start at the origin facing the +X direction
-            Pose2d.kZero,
-            // Pass through these two interior waypoints, making an 's' curve path
-            List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-            // End 3 meters straight ahead of where we started, facing forward
-            new Pose2d(3, 0, Rotation2d.kZero),
-            config);
+    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+        // Start at the origin facing the +X direction
+        Pose2d.kZero,
+        // Pass through these two interior waypoints, making an 's' curve path
+        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+        // End 3 meters straight ahead of where we started, facing forward
+        new Pose2d(3, 0, Rotation2d.kZero),
+        config);
 
-    MecanumControllerCommand mecanumControllerCommand =
-        new MecanumControllerCommand(
-            exampleTrajectory,
-            m_robotDrive::getPose,
-            DriveConstants.kFeedforward,
-            DriveConstants.kDriveKinematics,
+    MecanumControllerCommand mecanumControllerCommand = new MecanumControllerCommand(
+        exampleTrajectory,
+        m_robotDrive::getPose,
+        DriveConstants.kFeedforward,
+        DriveConstants.kDriveKinematics,
 
-            // Position controllers
-            new PIDController(AutoConstants.kPXController, 0, 0),
-            new PIDController(AutoConstants.kPYController, 0, 0),
-            new ProfiledPIDController(
-                AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints),
+        // Position controllers
+        new PIDController(AutoConstants.kPXController, 0, 0),
+        new PIDController(AutoConstants.kPYController, 0, 0),
+        new ProfiledPIDController(
+            AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints),
 
-            // Needed for normalizing wheel speeds
-            AutoConstants.kMaxSpeedMetersPerSecond,
+        // Needed for normalizing wheel speeds
+        AutoConstants.kMaxSpeedMetersPerSecond,
 
-            // Velocity PID's
-            new PIDController(DriveConstants.kPFrontLeftVel, 0, 0),
-            new PIDController(DriveConstants.kPRearLeftVel, 0, 0),
-            new PIDController(DriveConstants.kPFrontRightVel, 0, 0),
-            new PIDController(DriveConstants.kPRearRightVel, 0, 0),
-            m_robotDrive::getCurrentWheelSpeeds,
-            m_robotDrive::setDriveMotorControllersVolts, // Consumer for the output motor voltages
-            m_robotDrive);
+        // Velocity PID's
+        new PIDController(DriveConstants.kPFrontLeftVel, 0, 0),
+        new PIDController(DriveConstants.kPRearLeftVel, 0, 0),
+        new PIDController(DriveConstants.kPFrontRightVel, 0, 0),
+        new PIDController(DriveConstants.kPRearRightVel, 0, 0),
+        m_robotDrive::getCurrentWheelSpeeds,
+        m_robotDrive::setDriveMotorControllersVolts, // Consumer for the output motor voltages
+        m_robotDrive);
 
     // Reset odometry to the initial pose of the trajectory, run path following
     // command, then stop at the end.

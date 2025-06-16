@@ -201,10 +201,9 @@ class Rotation3dTest {
     assertEquals(expected, rot);
 
     rot = rot.plus(new Rotation3d(0.0, Units.degreesToRadians(90.0), 0.0));
-    expected =
-        new Rotation3d(
-            VecBuilder.fill(1.0 / Math.sqrt(3), 1.0 / Math.sqrt(3), -1.0 / Math.sqrt(3)),
-            Units.degreesToRadians(120.0));
+    expected = new Rotation3d(
+        VecBuilder.fill(1.0 / Math.sqrt(3), 1.0 / Math.sqrt(3), -1.0 / Math.sqrt(3)),
+        Units.degreesToRadians(120.0));
     assertEquals(expected, rot);
 
     rot = rot.plus(new Rotation3d(0.0, 0.0, Units.degreesToRadians(90.0)));
@@ -325,11 +324,8 @@ class Rotation3dTest {
 
   @Test
   void testToRotation2d() {
-    var rotation =
-        new Rotation3d(
-            Units.degreesToRadians(20.0),
-            Units.degreesToRadians(30.0),
-            Units.degreesToRadians(40.0));
+    var rotation = new Rotation3d(
+        Units.degreesToRadians(20.0), Units.degreesToRadians(30.0), Units.degreesToRadians(40.0));
     var expected = new Rotation2d(Units.degreesToRadians(40.0));
 
     assertEquals(expected, rotation.toRotation2d());
@@ -346,11 +342,8 @@ class Rotation3dTest {
 
   @Test
   void testToMatrix() {
-    var before =
-        new Rotation3d(
-            Units.degreesToRadians(10.0),
-            Units.degreesToRadians(20.0),
-            Units.degreesToRadians(30.0));
+    var before = new Rotation3d(
+        Units.degreesToRadians(10.0), Units.degreesToRadians(20.0), Units.degreesToRadians(30.0));
     var after = new Rotation3d(before.toMatrix());
 
     assertEquals(before, after);

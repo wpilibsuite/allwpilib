@@ -27,44 +27,37 @@ public class Elevator implements AutoCloseable {
   private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
 
   // Standard classes for controlling our elevator
-  private final ProfiledPIDController m_controller =
-      new ProfiledPIDController(
-          Constants.kElevatorKp,
-          Constants.kElevatorKi,
-          Constants.kElevatorKd,
-          new TrapezoidProfile.Constraints(2.45, 2.45));
-  ElevatorFeedforward m_feedforward =
-      new ElevatorFeedforward(
-          Constants.kElevatorkS,
-          Constants.kElevatorkG,
-          Constants.kElevatorkV,
-          Constants.kElevatorkA);
+  private final ProfiledPIDController m_controller = new ProfiledPIDController(
+      Constants.kElevatorKp,
+      Constants.kElevatorKi,
+      Constants.kElevatorKd,
+      new TrapezoidProfile.Constraints(2.45, 2.45));
+  ElevatorFeedforward m_feedforward = new ElevatorFeedforward(
+      Constants.kElevatorkS, Constants.kElevatorkG, Constants.kElevatorkV, Constants.kElevatorkA);
   private final Encoder m_encoder =
       new Encoder(Constants.kEncoderAChannel, Constants.kEncoderBChannel);
   private final PWMSparkMax m_motor = new PWMSparkMax(Constants.kMotorPort);
 
   // Simulation classes help us simulate what's going on, including gravity.
-  private final ElevatorSim m_elevatorSim =
-      new ElevatorSim(
-          m_elevatorGearbox,
-          Constants.kElevatorGearing,
-          Constants.kCarriageMass,
-          Constants.kElevatorDrumRadius,
-          Constants.kMinElevatorHeightMeters,
-          Constants.kMaxElevatorHeightMeters,
-          true,
-          0,
-          0.01,
-          0.0);
+  private final ElevatorSim m_elevatorSim = new ElevatorSim(
+      m_elevatorGearbox,
+      Constants.kElevatorGearing,
+      Constants.kCarriageMass,
+      Constants.kElevatorDrumRadius,
+      Constants.kMinElevatorHeightMeters,
+      Constants.kMaxElevatorHeightMeters,
+      true,
+      0,
+      0.01,
+      0.0);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
   private final PWMSim m_motorSim = new PWMSim(m_motor);
 
   // Create a Mechanism2d visualization of the elevator
   private final Mechanism2d m_mech2d = new Mechanism2d(20, 50);
   private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("Elevator Root", 10, 0);
-  private final MechanismLigament2d m_elevatorMech2d =
-      m_mech2dRoot.append(
-          new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90));
+  private final MechanismLigament2d m_elevatorMech2d = m_mech2dRoot.append(
+      new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90));
 
   /** Subsystem constructor. */
   public Elevator() {

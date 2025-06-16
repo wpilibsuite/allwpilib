@@ -100,24 +100,23 @@ class AddressableLEDBufferTest {
     buffer.setRGB(1, 4, 5, 6);
     buffer.setRGB(2, 7, 8, 9);
 
-    buffer.forEach(
-        (index, r, g, b) -> {
-          switch (index) {
-            case 0 -> assertAll(
-                () -> assertEquals(1, r, "red at index 0"),
-                () -> assertEquals(2, g, "green at index 0"),
-                () -> assertEquals(3, b, "blue at index 0"));
-            case 1 -> assertAll(
-                () -> assertEquals(4, r, "red at index 1"),
-                () -> assertEquals(5, g, "green at index 1"),
-                () -> assertEquals(6, b, "blue at index 1"));
-            case 2 -> assertAll(
-                () -> assertEquals(7, r, "red at index 2"),
-                () -> assertEquals(8, g, "green at index 2"),
-                () -> assertEquals(9, b, "blue at index 2"));
-            default -> fail("Unexpected index " + index);
-          }
-        });
+    buffer.forEach((index, r, g, b) -> {
+      switch (index) {
+        case 0 -> assertAll(
+            () -> assertEquals(1, r, "red at index 0"),
+            () -> assertEquals(2, g, "green at index 0"),
+            () -> assertEquals(3, b, "blue at index 0"));
+        case 1 -> assertAll(
+            () -> assertEquals(4, r, "red at index 1"),
+            () -> assertEquals(5, g, "green at index 1"),
+            () -> assertEquals(6, b, "blue at index 1"));
+        case 2 -> assertAll(
+            () -> assertEquals(7, r, "red at index 2"),
+            () -> assertEquals(8, g, "green at index 2"),
+            () -> assertEquals(9, b, "blue at index 2"));
+        default -> fail("Unexpected index " + index);
+      }
+    });
   }
 
   @Test

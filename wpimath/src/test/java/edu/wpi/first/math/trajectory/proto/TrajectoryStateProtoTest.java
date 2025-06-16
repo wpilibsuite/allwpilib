@@ -14,9 +14,8 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import org.junit.jupiter.api.Test;
 
 class TrajectoryStateProtoTest {
-  private static final Trajectory.State DATA =
-      new Trajectory.State(
-          1.91, 4.4, 17.4, new Pose2d(new Translation2d(1.74, 19.1), new Rotation2d(22.9)), 0.174);
+  private static final Trajectory.State DATA = new Trajectory.State(
+      1.91, 4.4, 17.4, new Pose2d(new Translation2d(1.74, 19.1), new Rotation2d(22.9)), 0.174);
 
   @Test
   void testRoundtrip() {

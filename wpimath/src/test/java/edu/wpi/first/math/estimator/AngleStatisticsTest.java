@@ -22,18 +22,16 @@ class AngleStatisticsTest {
     var weights = new Matrix<>(Nat.N2(), Nat.N1());
     weights.fill(1.0 / sigmas.getNumCols());
 
-    assertTrue(
-        AngleStatistics.angleMean(sigmas, weights, 1)
-            .isEqual(VecBuilder.fill(1.1, Math.toRadians(1), 1.5), 1e-6));
+    assertTrue(AngleStatistics.angleMean(sigmas, weights, 1)
+        .isEqual(VecBuilder.fill(1.1, Math.toRadians(1), 1.5), 1e-6));
   }
 
   @Test
   void testResidual() {
     var first = VecBuilder.fill(1, Math.toRadians(1), 2);
     var second = VecBuilder.fill(1, Math.toRadians(359), 1);
-    assertTrue(
-        AngleStatistics.angleResidual(first, second, 1)
-            .isEqual(VecBuilder.fill(0, Math.toRadians(2), 1), 1e-6));
+    assertTrue(AngleStatistics.angleResidual(first, second, 1)
+        .isEqual(VecBuilder.fill(0, Math.toRadians(2), 1), 1e-6));
   }
 
   @Test

@@ -65,9 +65,8 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
     this.m_f = f;
     this.m_inputs = inputs;
 
-    this.m_B =
-        NumericalJacobian.numericalJacobianU(
-            states, inputs, m_f, new Matrix<>(states, Nat.N1()), new Matrix<>(inputs, Nat.N1()));
+    this.m_B = NumericalJacobian.numericalJacobianU(
+        states, inputs, m_f, new Matrix<>(states, Nat.N1()), new Matrix<>(inputs, Nat.N1()));
 
     m_r = new Matrix<>(states, Nat.N1());
     m_uff = new Matrix<>(inputs, Nat.N1());

@@ -29,9 +29,8 @@ class SendableChooserTest {
   @ParameterizedTest
   void returnsSelected(int toSelect) {
     try (var chooser = new SendableChooser<Integer>();
-        var chooserSim =
-            new SendableChooserSim(
-                m_inst, "/SmartDashboard/returnsSelectedChooser" + toSelect + "/")) {
+        var chooserSim = new SendableChooserSim(
+            m_inst, "/SmartDashboard/returnsSelectedChooser" + toSelect + "/")) {
       for (int i = 1; i <= 3; i++) {
         chooser.addOption(String.valueOf(i), i);
       }

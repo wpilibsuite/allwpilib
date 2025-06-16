@@ -40,19 +40,18 @@ public class Arm implements AutoCloseable {
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
-  private final SingleJointedArmSim m_armSim =
-      new SingleJointedArmSim(
-          m_armGearbox,
-          Constants.kArmReduction,
-          SingleJointedArmSim.estimateMOI(Constants.kArmLength, Constants.kArmMass),
-          Constants.kArmLength,
-          Constants.kMinAngleRads,
-          Constants.kMaxAngleRads,
-          true,
-          0,
-          Constants.kArmEncoderDistPerPulse,
-          0.0 // Add noise with a std-dev of 1 tick
-          );
+  private final SingleJointedArmSim m_armSim = new SingleJointedArmSim(
+      m_armGearbox,
+      Constants.kArmReduction,
+      SingleJointedArmSim.estimateMOI(Constants.kArmLength, Constants.kArmMass),
+      Constants.kArmLength,
+      Constants.kMinAngleRads,
+      Constants.kMaxAngleRads,
+      true,
+      0,
+      Constants.kArmEncoderDistPerPulse,
+      0.0 // Add noise with a std-dev of 1 tick
+      );
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
@@ -60,14 +59,8 @@ public class Arm implements AutoCloseable {
   private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
   private final MechanismLigament2d m_armTower =
       m_armPivot.append(new MechanismLigament2d("ArmTower", 30, -90));
-  private final MechanismLigament2d m_arm =
-      m_armPivot.append(
-          new MechanismLigament2d(
-              "Arm",
-              30,
-              Units.radiansToDegrees(m_armSim.getAngleRads()),
-              6,
-              new Color8Bit(Color.kYellow)));
+  private final MechanismLigament2d m_arm = m_armPivot.append(new MechanismLigament2d(
+      "Arm", 30, Units.radiansToDegrees(m_armSim.getAngleRads()), 6, new Color8Bit(Color.kYellow)));
 
   /** Subsystem constructor. */
   public Arm() {
@@ -113,9 +106,8 @@ public class Arm implements AutoCloseable {
 
   /** Run the control loop to reach and maintain the setpoint from the preferences. */
   public void reachSetpoint() {
-    var pidOutput =
-        m_controller.calculate(
-            m_encoder.getDistance(), Units.degreesToRadians(m_armSetpointDegrees));
+    var pidOutput = m_controller.calculate(
+        m_encoder.getDistance(), Units.degreesToRadians(m_armSetpointDegrees));
     m_motor.setVoltage(pidOutput);
   }
 

@@ -49,17 +49,15 @@ class DifferentialDriveAccelerationLimiterTest {
     var u = VecBuilder.fill(12.0, 12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
-      final var voltages =
-          accelLimiter.calculate(
-              xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
+      final var voltages = accelLimiter.calculate(
+          xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
       xAccelLimiter =
           plant.calculateX(xAccelLimiter, VecBuilder.fill(voltages.left, voltages.right), dt);
 
-      final var accels =
-          plant
-              .getA()
-              .times(xAccelLimiter)
-              .plus(plant.getB().times(VecBuilder.fill(voltages.left, voltages.right)));
+      final var accels = plant
+          .getA()
+          .times(xAccelLimiter)
+          .plus(plant.getB().times(VecBuilder.fill(voltages.left, voltages.right)));
       final double a = (accels.get(0, 0) + accels.get(1, 0)) / 2.0;
       final double alpha = (accels.get(1, 0) - accels.get(0, 0)) / trackwidth;
       assertTrue(Math.abs(a) <= maxA);
@@ -70,17 +68,15 @@ class DifferentialDriveAccelerationLimiterTest {
     u = VecBuilder.fill(-12.0, -12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
-      final var voltages =
-          accelLimiter.calculate(
-              xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
+      final var voltages = accelLimiter.calculate(
+          xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
       xAccelLimiter =
           plant.calculateX(xAccelLimiter, VecBuilder.fill(voltages.left, voltages.right), dt);
 
-      final var accels =
-          plant
-              .getA()
-              .times(xAccelLimiter)
-              .plus(plant.getB().times(VecBuilder.fill(voltages.left, voltages.right)));
+      final var accels = plant
+          .getA()
+          .times(xAccelLimiter)
+          .plus(plant.getB().times(VecBuilder.fill(voltages.left, voltages.right)));
       final double a = (accels.get(0, 0) + accels.get(1, 0)) / 2.0;
       final double alpha = (accels.get(1, 0) - accels.get(0, 0)) / trackwidth;
       assertTrue(Math.abs(a) <= maxA);
@@ -91,17 +87,15 @@ class DifferentialDriveAccelerationLimiterTest {
     u = VecBuilder.fill(-12.0, 12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
-      final var voltages =
-          accelLimiter.calculate(
-              xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
+      final var voltages = accelLimiter.calculate(
+          xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
       xAccelLimiter =
           plant.calculateX(xAccelLimiter, VecBuilder.fill(voltages.left, voltages.right), dt);
 
-      final var accels =
-          plant
-              .getA()
-              .times(xAccelLimiter)
-              .plus(plant.getB().times(VecBuilder.fill(voltages.left, voltages.right)));
+      final var accels = plant
+          .getA()
+          .times(xAccelLimiter)
+          .plus(plant.getB().times(VecBuilder.fill(voltages.left, voltages.right)));
       final double a = (accels.get(0, 0) + accels.get(1, 0)) / 2.0;
       final double alpha = (accels.get(1, 0) - accels.get(0, 0)) / trackwidth;
       assertTrue(Math.abs(a) <= maxA);
@@ -127,9 +121,8 @@ class DifferentialDriveAccelerationLimiterTest {
     var u = VecBuilder.fill(12.0, 12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
-      final var voltages =
-          accelLimiter.calculate(
-              xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
+      final var voltages = accelLimiter.calculate(
+          xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
       xAccelLimiter =
           plant.calculateX(xAccelLimiter, VecBuilder.fill(voltages.left, voltages.right), dt);
 
@@ -143,9 +136,8 @@ class DifferentialDriveAccelerationLimiterTest {
     u = VecBuilder.fill(-12.0, -12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
-      final var voltages =
-          accelLimiter.calculate(
-              xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
+      final var voltages = accelLimiter.calculate(
+          xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
       xAccelLimiter =
           plant.calculateX(xAccelLimiter, VecBuilder.fill(voltages.left, voltages.right), dt);
 
@@ -159,9 +151,8 @@ class DifferentialDriveAccelerationLimiterTest {
     u = VecBuilder.fill(-12.0, 12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
-      final var voltages =
-          accelLimiter.calculate(
-              xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
+      final var voltages = accelLimiter.calculate(
+          xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
       xAccelLimiter =
           plant.calculateX(xAccelLimiter, VecBuilder.fill(voltages.left, voltages.right), dt);
 
@@ -200,17 +191,15 @@ class DifferentialDriveAccelerationLimiterTest {
     var u = VecBuilder.fill(12.0, 12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
-      final var voltages =
-          accelLimiter.calculate(
-              xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
+      final var voltages = accelLimiter.calculate(
+          xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
       xAccelLimiter =
           plant.calculateX(xAccelLimiter, VecBuilder.fill(voltages.left, voltages.right), dt);
 
-      final var accels =
-          plant
-              .getA()
-              .times(xAccelLimiter)
-              .plus(plant.getB().times(VecBuilder.fill(voltages.left, voltages.right)));
+      final var accels = plant
+          .getA()
+          .times(xAccelLimiter)
+          .plus(plant.getB().times(VecBuilder.fill(voltages.left, voltages.right)));
       final double a = (accels.get(0, 0) + accels.get(1, 0)) / 2.0;
       assertTrue(minA <= a && a <= maxA);
     }
@@ -219,17 +208,15 @@ class DifferentialDriveAccelerationLimiterTest {
     u = VecBuilder.fill(-12.0, -12.0);
     for (double t = 0.0; t < 3.0; t += dt) {
       x = plant.calculateX(x, u, dt);
-      final var voltages =
-          accelLimiter.calculate(
-              xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
+      final var voltages = accelLimiter.calculate(
+          xAccelLimiter.get(0, 0), xAccelLimiter.get(1, 0), u.get(0, 0), u.get(1, 0));
       xAccelLimiter =
           plant.calculateX(xAccelLimiter, VecBuilder.fill(voltages.left, voltages.right), dt);
 
-      final var accels =
-          plant
-              .getA()
-              .times(xAccelLimiter)
-              .plus(plant.getB().times(VecBuilder.fill(voltages.left, voltages.right)));
+      final var accels = plant
+          .getA()
+          .times(xAccelLimiter)
+          .plus(plant.getB().times(VecBuilder.fill(voltages.left, voltages.right)));
       final double a = (accels.get(0, 0) + accels.get(1, 0)) / 2.0;
       assertTrue(minA <= a && a <= maxA);
     }

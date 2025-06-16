@@ -91,57 +91,54 @@ public class Notifier implements AutoCloseable {
     m_callback = callback;
     m_notifier.set(NotifierJNI.initializeNotifier());
 
-    m_thread =
-        new Thread(
-            () -> {
-              while (!Thread.interrupted()) {
-                int notifier = m_notifier.get();
-                if (notifier == 0) {
-                  break;
-                }
-                long curTime = NotifierJNI.waitForNotifierAlarm(notifier);
-                if (curTime == 0) {
-                  break;
-                }
+    m_thread = new Thread(() -> {
+      while (!Thread.interrupted()) {
+        int notifier = m_notifier.get();
+        if (notifier == 0) {
+          break;
+        }
+        long curTime = NotifierJNI.waitForNotifierAlarm(notifier);
+        if (curTime == 0) {
+          break;
+        }
 
-                Runnable threadHandler;
-                m_processLock.lock();
-                try {
-                  threadHandler = m_callback;
-                  if (m_periodic) {
-                    m_expirationTimeSeconds += m_periodSeconds;
-                    updateAlarm();
-                  } else {
-                    // Need to update the alarm to cause it to wait again
-                    updateAlarm(-1);
-                  }
-                } finally {
-                  m_processLock.unlock();
-                }
+        Runnable threadHandler;
+        m_processLock.lock();
+        try {
+          threadHandler = m_callback;
+          if (m_periodic) {
+            m_expirationTimeSeconds += m_periodSeconds;
+            updateAlarm();
+          } else {
+            // Need to update the alarm to cause it to wait again
+            updateAlarm(-1);
+          }
+        } finally {
+          m_processLock.unlock();
+        }
 
-                // Call callback
-                if (threadHandler != null) {
-                  threadHandler.run();
-                }
-              }
-            });
+        // Call callback
+        if (threadHandler != null) {
+          threadHandler.run();
+        }
+      }
+    });
     m_thread.setName("Notifier");
     m_thread.setDaemon(true);
-    m_thread.setUncaughtExceptionHandler(
-        (thread, error) -> {
-          Throwable cause = error.getCause();
-          if (cause != null) {
-            error = cause;
-          }
-          DriverStation.reportError(
-              "Unhandled exception in Notifier thread: " + error, error.getStackTrace());
-          DriverStation.reportError(
-              "The Runnable for this Notifier (or methods called by it) should have handled "
-                  + "the exception above.\n"
-                  + "  The above stacktrace can help determine where the error occurred.\n"
-                  + "  See https://wpilib.org/stacktrace for more information.",
-              false);
-        });
+    m_thread.setUncaughtExceptionHandler((thread, error) -> {
+      Throwable cause = error.getCause();
+      if (cause != null) {
+        error = cause;
+      }
+      DriverStation.reportError(
+          "Unhandled exception in Notifier thread: " + error, error.getStackTrace());
+      DriverStation.reportError(
+          "The Runnable for this Notifier (or methods called by it) should have handled "
+              + "the exception above.\n"
+              + "  The above stacktrace can help determine where the error occurred.\n"
+              + "  See https://wpilib.org/stacktrace for more information.",
+          false);
+    });
     m_thread.start();
   }
 

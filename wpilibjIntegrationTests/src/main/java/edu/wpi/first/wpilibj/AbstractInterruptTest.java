@@ -62,14 +62,11 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
     AtomicInteger counter = new AtomicInteger(0);
     AtomicLong interruptFireTime = new AtomicLong();
 
-    try (AsynchronousInterrupt interrupt =
-        new AsynchronousInterrupt(
-            getSource(),
-            (a, b) -> {
-              interruptFireTime.set(RobotController.getFPGATime());
-              hasFired.set(true);
-              counter.incrementAndGet();
-            })) {
+    try (AsynchronousInterrupt interrupt = new AsynchronousInterrupt(getSource(), (a, b) -> {
+      interruptFireTime.set(RobotController.getFPGATime());
+      hasFired.set(true);
+      counter.incrementAndGet();
+    })) {
       interrupt.enable();
       setInterruptLow();
       Timer.delay(0.01);
@@ -100,13 +97,10 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
     AtomicBoolean hasFired = new AtomicBoolean(false);
     AtomicInteger counter = new AtomicInteger(0);
 
-    try (AsynchronousInterrupt interrupt =
-        new AsynchronousInterrupt(
-            getSource(),
-            (a, b) -> {
-              hasFired.set(true);
-              counter.incrementAndGet();
-            })) {
+    try (AsynchronousInterrupt interrupt = new AsynchronousInterrupt(getSource(), (a, b) -> {
+      hasFired.set(true);
+      counter.incrementAndGet();
+    })) {
       interrupt.enable();
 
       final int fireCount = 50;
@@ -131,12 +125,11 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
   public void testSynchronousInterruptsTriggering() {
     try (SynchronousInterrupt interrupt = new SynchronousInterrupt(getSource())) {
       final double synchronousDelay = synchronousTimeout / 2.0;
-      final Runnable runnable =
-          () -> {
-            Timer.delay(synchronousDelay);
-            setInterruptLow();
-            setInterruptHigh();
-          };
+      final Runnable runnable = () -> {
+        Timer.delay(synchronousDelay);
+        setInterruptLow();
+        setInterruptHigh();
+      };
 
       // When
 
@@ -175,12 +168,11 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
   public void testSynchronousInterruptsWaitResultRisingEdge() {
     try (SynchronousInterrupt interrupt = new SynchronousInterrupt(getSource())) {
       final double synchronousDelay = synchronousTimeout / 2.0;
-      final Runnable runnable =
-          () -> {
-            Timer.delay(synchronousDelay);
-            setInterruptLow();
-            setInterruptHigh();
-          };
+      final Runnable runnable = () -> {
+        Timer.delay(synchronousDelay);
+        setInterruptLow();
+        setInterruptHigh();
+      };
 
       new Thread(runnable).start();
       // Delay for twice as long as the timeout so the test should fail first
@@ -200,12 +192,11 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
       interrupt.setInterruptEdges(false, true);
 
       final double synchronousDelay = synchronousTimeout / 2.0;
-      final Runnable runnable =
-          () -> {
-            Timer.delay(synchronousDelay);
-            setInterruptHigh();
-            setInterruptLow();
-          };
+      final Runnable runnable = () -> {
+        Timer.delay(synchronousDelay);
+        setInterruptHigh();
+        setInterruptLow();
+      };
 
       new Thread(runnable).start();
       // Delay for twice as long as the timeout so the test should fail first
@@ -222,13 +213,10 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
   public void testDisableStopsInterruptFiring() {
     AtomicBoolean interruptComplete = new AtomicBoolean(false);
     AtomicInteger counter = new AtomicInteger(0);
-    try (AsynchronousInterrupt interrupt =
-        new AsynchronousInterrupt(
-            getSource(),
-            (a, b) -> {
-              interruptComplete.set(true);
-              counter.incrementAndGet();
-            })) {
+    try (AsynchronousInterrupt interrupt = new AsynchronousInterrupt(getSource(), (a, b) -> {
+      interruptComplete.set(true);
+      counter.incrementAndGet();
+    })) {
       interrupt.enable();
       final int fireCount = 50;
       for (int i = 0; i < fireCount; i++) {

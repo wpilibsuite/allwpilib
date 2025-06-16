@@ -43,9 +43,8 @@ public class Drivetrain {
 
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
-  private final MecanumDriveKinematics m_kinematics =
-      new MecanumDriveKinematics(
-          m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
+  private final MecanumDriveKinematics m_kinematics = new MecanumDriveKinematics(
+      m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
   private final MecanumDriveOdometry m_odometry =
       new MecanumDriveOdometry(m_kinematics, m_gyro.getRotation2d(), getCurrentDistances());
@@ -100,18 +99,14 @@ public class Drivetrain {
     final double backLeftFeedforward = m_feedforward.calculate(speeds.rearLeftMetersPerSecond);
     final double backRightFeedforward = m_feedforward.calculate(speeds.rearRightMetersPerSecond);
 
-    final double frontLeftOutput =
-        m_frontLeftPIDController.calculate(
-            m_frontLeftEncoder.getRate(), speeds.frontLeftMetersPerSecond);
-    final double frontRightOutput =
-        m_frontRightPIDController.calculate(
-            m_frontRightEncoder.getRate(), speeds.frontRightMetersPerSecond);
-    final double backLeftOutput =
-        m_backLeftPIDController.calculate(
-            m_backLeftEncoder.getRate(), speeds.rearLeftMetersPerSecond);
-    final double backRightOutput =
-        m_backRightPIDController.calculate(
-            m_backRightEncoder.getRate(), speeds.rearRightMetersPerSecond);
+    final double frontLeftOutput = m_frontLeftPIDController.calculate(
+        m_frontLeftEncoder.getRate(), speeds.frontLeftMetersPerSecond);
+    final double frontRightOutput = m_frontRightPIDController.calculate(
+        m_frontRightEncoder.getRate(), speeds.frontRightMetersPerSecond);
+    final double backLeftOutput = m_backLeftPIDController.calculate(
+        m_backLeftEncoder.getRate(), speeds.rearLeftMetersPerSecond);
+    final double backRightOutput = m_backRightPIDController.calculate(
+        m_backRightEncoder.getRate(), speeds.rearRightMetersPerSecond);
 
     m_frontLeftMotor.setVoltage(frontLeftOutput + frontLeftFeedforward);
     m_frontRightMotor.setVoltage(frontRightOutput + frontRightFeedforward);
@@ -129,14 +124,11 @@ public class Drivetrain {
    */
   public void drive(
       double xSpeed, double ySpeed, double rot, boolean fieldRelative, double periodSeconds) {
-    var mecanumDriveWheelSpeeds =
-        m_kinematics.toWheelSpeeds(
-            ChassisSpeeds.discretize(
-                fieldRelative
-                    ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                        xSpeed, ySpeed, rot, m_gyro.getRotation2d())
-                    : new ChassisSpeeds(xSpeed, ySpeed, rot),
-                periodSeconds));
+    var mecanumDriveWheelSpeeds = m_kinematics.toWheelSpeeds(ChassisSpeeds.discretize(
+        fieldRelative
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
+            : new ChassisSpeeds(xSpeed, ySpeed, rot),
+        periodSeconds));
     mecanumDriveWheelSpeeds.desaturate(kMaxSpeed);
     setSpeeds(mecanumDriveWheelSpeeds);
   }

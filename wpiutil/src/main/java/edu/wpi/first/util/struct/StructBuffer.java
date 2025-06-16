@@ -152,9 +152,8 @@ public final class StructBuffer<T> {
   public ByteBuffer writeArray(Collection<T> values) {
     m_buf.position(0);
     if ((values.size() * m_structSize) > m_buf.capacity()) {
-      m_buf =
-          ByteBuffer.allocateDirect(values.size() * m_structSize * 2)
-              .order(ByteOrder.LITTLE_ENDIAN);
+      m_buf = ByteBuffer.allocateDirect(values.size() * m_structSize * 2)
+          .order(ByteOrder.LITTLE_ENDIAN);
     }
     for (T v : values) {
       m_struct.pack(m_buf, v);
@@ -172,9 +171,8 @@ public final class StructBuffer<T> {
   public ByteBuffer writeArray(T[] values) {
     m_buf.position(0);
     if ((values.length * m_structSize) > m_buf.capacity()) {
-      m_buf =
-          ByteBuffer.allocateDirect(values.length * m_structSize * 2)
-              .order(ByteOrder.LITTLE_ENDIAN);
+      m_buf = ByteBuffer.allocateDirect(values.length * m_structSize * 2)
+          .order(ByteOrder.LITTLE_ENDIAN);
     }
     for (T v : values) {
       m_struct.pack(m_buf, v);

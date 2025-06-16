@@ -286,10 +286,8 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
       s = sinTheta / dtheta;
       c = (1 - cosTheta) / dtheta;
     }
-    var transform =
-        new Transform2d(
-            new Translation2d(dx * s - dy * c, dx * c + dy * s),
-            new Rotation2d(cosTheta, sinTheta));
+    var transform = new Transform2d(
+        new Translation2d(dx * s - dy * c, dx * c + dy * s), new Rotation2d(cosTheta, sinTheta));
 
     return this.plus(transform);
   }
@@ -315,11 +313,10 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
       halfThetaByTanOfHalfDtheta = -(halfDtheta * transform.getRotation().getSin()) / cosMinusOne;
     }
 
-    Translation2d translationPart =
-        transform
-            .getTranslation()
-            .rotateBy(new Rotation2d(halfThetaByTanOfHalfDtheta, -halfDtheta))
-            .times(Math.hypot(halfThetaByTanOfHalfDtheta, halfDtheta));
+    Translation2d translationPart = transform
+        .getTranslation()
+        .rotateBy(new Rotation2d(halfThetaByTanOfHalfDtheta, -halfDtheta))
+        .times(Math.hypot(halfThetaByTanOfHalfDtheta, halfDtheta));
 
     return new Twist2d(translationPart.getX(), translationPart.getY(), dtheta);
   }
@@ -358,9 +355,8 @@ public class Pose2d implements Interpolatable<Pose2d>, ProtobufSerializable, Str
         poses,
         Comparator.comparing(
                 (Pose2d other) -> this.getTranslation().getDistance(other.getTranslation()))
-            .thenComparing(
-                (Pose2d other) ->
-                    Math.abs(this.getRotation().minus(other.getRotation()).getRadians())));
+            .thenComparing((Pose2d other) ->
+                Math.abs(this.getRotation().minus(other.getRotation()).getRadians())));
   }
 
   @Override

@@ -155,9 +155,8 @@ public class GenericHIDSim {
    * @return the rumble value
    */
   public double getRumble(GenericHID.RumbleType type) {
-    int value =
-        DriverStationSim.getJoystickRumble(
-            m_port, type == GenericHID.RumbleType.kLeftRumble ? 0 : 1);
+    int value = DriverStationSim.getJoystickRumble(
+        m_port, type == GenericHID.RumbleType.kLeftRumble ? 0 : 1);
     return value / 65535.0;
   }
 }

@@ -80,12 +80,11 @@ public class Rotation3d
     double cy = Math.cos(yaw * 0.5);
     double sy = Math.sin(yaw * 0.5);
 
-    m_q =
-        new Quaternion(
-            cr * cp * cy + sr * sp * sy,
-            sr * cp * cy - cr * sp * sy,
-            cr * sp * cy + sr * cp * sy,
-            cr * cp * sy - sr * sp * cy);
+    m_q = new Quaternion(
+        cr * cp * cy + sr * sp * sy,
+        sr * cp * cy - cr * sp * sy,
+        cr * sp * cy + sr * cp * sy,
+        cr * cp * sy - sr * sp * cy);
   }
 
   /**
@@ -164,10 +163,9 @@ public class Rotation3d
       throw new IllegalArgumentException(msg);
     }
     if (Math.abs(R.det() - 1.0) > 1e-9) {
-      var msg =
-          "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n"
-              + R.getStorage().toString()
-              + '\n';
+      var msg = "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n"
+          + R.getStorage().toString()
+          + '\n';
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(msg);
     }
@@ -261,16 +259,14 @@ public class Rotation3d
       var axis = Vector.cross(initial, other);
 
       double axisNorm = axis.norm();
-      m_q =
-          new Quaternion(
-              0.0, axis.get(0, 0) / axisNorm, axis.get(1, 0) / axisNorm, axis.get(2, 0) / axisNorm);
+      m_q = new Quaternion(
+          0.0, axis.get(0, 0) / axisNorm, axis.get(1, 0) / axisNorm, axis.get(2, 0) / axisNorm);
     } else {
       var axis = Vector.cross(initial, last);
 
       // https://stackoverflow.com/a/11741520
-      m_q =
-          new Quaternion(normProduct + dot, axis.get(0, 0), axis.get(1, 0), axis.get(2, 0))
-              .normalize();
+      m_q = new Quaternion(normProduct + dot, axis.get(0, 0), axis.get(1, 0), axis.get(2, 0))
+          .normalize();
     }
   }
 

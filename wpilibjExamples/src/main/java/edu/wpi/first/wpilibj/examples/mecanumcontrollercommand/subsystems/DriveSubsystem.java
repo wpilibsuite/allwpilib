@@ -26,42 +26,35 @@ public class DriveSubsystem extends SubsystemBase {
       new MecanumDrive(m_frontLeft::set, m_rearLeft::set, m_frontRight::set, m_rearRight::set);
 
   // The front-left-side drive encoder
-  private final Encoder m_frontLeftEncoder =
-      new Encoder(
-          DriveConstants.kFrontLeftEncoderPorts[0],
-          DriveConstants.kFrontLeftEncoderPorts[1],
-          DriveConstants.kFrontLeftEncoderReversed);
+  private final Encoder m_frontLeftEncoder = new Encoder(
+      DriveConstants.kFrontLeftEncoderPorts[0],
+      DriveConstants.kFrontLeftEncoderPorts[1],
+      DriveConstants.kFrontLeftEncoderReversed);
 
   // The rear-left-side drive encoder
-  private final Encoder m_rearLeftEncoder =
-      new Encoder(
-          DriveConstants.kRearLeftEncoderPorts[0],
-          DriveConstants.kRearLeftEncoderPorts[1],
-          DriveConstants.kRearLeftEncoderReversed);
+  private final Encoder m_rearLeftEncoder = new Encoder(
+      DriveConstants.kRearLeftEncoderPorts[0],
+      DriveConstants.kRearLeftEncoderPorts[1],
+      DriveConstants.kRearLeftEncoderReversed);
 
   // The front-right--side drive encoder
-  private final Encoder m_frontRightEncoder =
-      new Encoder(
-          DriveConstants.kFrontRightEncoderPorts[0],
-          DriveConstants.kFrontRightEncoderPorts[1],
-          DriveConstants.kFrontRightEncoderReversed);
+  private final Encoder m_frontRightEncoder = new Encoder(
+      DriveConstants.kFrontRightEncoderPorts[0],
+      DriveConstants.kFrontRightEncoderPorts[1],
+      DriveConstants.kFrontRightEncoderReversed);
 
   // The rear-right-side drive encoder
-  private final Encoder m_rearRightEncoder =
-      new Encoder(
-          DriveConstants.kRearRightEncoderPorts[0],
-          DriveConstants.kRearRightEncoderPorts[1],
-          DriveConstants.kRearRightEncoderReversed);
+  private final Encoder m_rearRightEncoder = new Encoder(
+      DriveConstants.kRearRightEncoderPorts[0],
+      DriveConstants.kRearRightEncoderPorts[1],
+      DriveConstants.kRearRightEncoderReversed);
 
   // The gyro sensor
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
 
   // Odometry class for tracking robot pose
-  MecanumDriveOdometry m_odometry =
-      new MecanumDriveOdometry(
-          DriveConstants.kDriveKinematics,
-          m_gyro.getRotation2d(),
-          new MecanumDriveWheelPositions());
+  MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(
+      DriveConstants.kDriveKinematics, m_gyro.getRotation2d(), new MecanumDriveWheelPositions());
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {

@@ -251,10 +251,9 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   @Override
   public void setSmartDashboardType(String type) {
     if (m_typePub == null) {
-      m_typePub =
-          m_table
-              .getStringTopic(".type")
-              .publishEx(StringTopic.kTypeString, "{\"SmartDashboard\":\"" + type + "\"}");
+      m_typePub = m_table
+          .getStringTopic(".type")
+          .publishEx(StringTopic.kTypeString, "{\"SmartDashboard\":\"" + type + "\"}");
     }
     m_typePub.set(type);
   }
@@ -326,12 +325,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     }
     if (setter != null) {
       property.m_sub = topic.subscribe(false, PubSubOption.excludePublisher(property.m_pub));
-      property.m_updateLocal =
-          sub -> {
-            for (boolean val : sub.readQueueValues()) {
-              setter.accept(val);
-            }
-          };
+      property.m_updateLocal = sub -> {
+        for (boolean val : sub.readQueueValues()) {
+          setter.accept(val);
+        }
+      };
     }
     m_properties.add(property);
   }
@@ -362,12 +360,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     }
     if (setter != null) {
       property.m_sub = topic.subscribe(0, PubSubOption.excludePublisher(property.m_pub));
-      property.m_updateLocal =
-          sub -> {
-            for (long val : sub.readQueueValues()) {
-              setter.accept(val);
-            }
-          };
+      property.m_updateLocal = sub -> {
+        for (long val : sub.readQueueValues()) {
+          setter.accept(val);
+        }
+      };
     }
     m_properties.add(property);
   }
@@ -398,12 +395,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     }
     if (setter != null) {
       property.m_sub = topic.subscribe(0.0f, PubSubOption.excludePublisher(property.m_pub));
-      property.m_updateLocal =
-          sub -> {
-            for (float val : sub.readQueueValues()) {
-              setter.accept(val);
-            }
-          };
+      property.m_updateLocal = sub -> {
+        for (float val : sub.readQueueValues()) {
+          setter.accept(val);
+        }
+      };
     }
     m_properties.add(property);
   }
@@ -434,12 +430,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     }
     if (setter != null) {
       property.m_sub = topic.subscribe(0.0, PubSubOption.excludePublisher(property.m_pub));
-      property.m_updateLocal =
-          sub -> {
-            for (double val : sub.readQueueValues()) {
-              setter.accept(val);
-            }
-          };
+      property.m_updateLocal = sub -> {
+        for (double val : sub.readQueueValues()) {
+          setter.accept(val);
+        }
+      };
     }
     m_properties.add(property);
   }
@@ -470,12 +465,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     }
     if (setter != null) {
       property.m_sub = topic.subscribe("", PubSubOption.excludePublisher(property.m_pub));
-      property.m_updateLocal =
-          sub -> {
-            for (String val : sub.readQueueValues()) {
-              setter.accept(val);
-            }
-          };
+      property.m_updateLocal = sub -> {
+        for (String val : sub.readQueueValues()) {
+          setter.accept(val);
+        }
+      };
     }
     m_properties.add(property);
   }
@@ -508,12 +502,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     if (setter != null) {
       property.m_sub =
           topic.subscribe(new boolean[] {}, PubSubOption.excludePublisher(property.m_pub));
-      property.m_updateLocal =
-          sub -> {
-            for (boolean[] val : sub.readQueueValues()) {
-              setter.accept(val);
-            }
-          };
+      property.m_updateLocal = sub -> {
+        for (boolean[] val : sub.readQueueValues()) {
+          setter.accept(val);
+        }
+      };
     }
     m_properties.add(property);
   }
@@ -546,12 +539,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     if (setter != null) {
       property.m_sub =
           topic.subscribe(new long[] {}, PubSubOption.excludePublisher(property.m_pub));
-      property.m_updateLocal =
-          sub -> {
-            for (long[] val : sub.readQueueValues()) {
-              setter.accept(val);
-            }
-          };
+      property.m_updateLocal = sub -> {
+        for (long[] val : sub.readQueueValues()) {
+          setter.accept(val);
+        }
+      };
     }
     m_properties.add(property);
   }
@@ -584,12 +576,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     if (setter != null) {
       property.m_sub =
           topic.subscribe(new float[] {}, PubSubOption.excludePublisher(property.m_pub));
-      property.m_updateLocal =
-          sub -> {
-            for (float[] val : sub.readQueueValues()) {
-              setter.accept(val);
-            }
-          };
+      property.m_updateLocal = sub -> {
+        for (float[] val : sub.readQueueValues()) {
+          setter.accept(val);
+        }
+      };
     }
     m_properties.add(property);
   }
@@ -622,12 +613,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     if (setter != null) {
       property.m_sub =
           topic.subscribe(new double[] {}, PubSubOption.excludePublisher(property.m_pub));
-      property.m_updateLocal =
-          sub -> {
-            for (double[] val : sub.readQueueValues()) {
-              setter.accept(val);
-            }
-          };
+      property.m_updateLocal = sub -> {
+        for (double[] val : sub.readQueueValues()) {
+          setter.accept(val);
+        }
+      };
     }
     m_properties.add(property);
   }
@@ -660,12 +650,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     if (setter != null) {
       property.m_sub =
           topic.subscribe(new String[] {}, PubSubOption.excludePublisher(property.m_pub));
-      property.m_updateLocal =
-          sub -> {
-            for (String[] val : sub.readQueueValues()) {
-              setter.accept(val);
-            }
-          };
+      property.m_updateLocal = sub -> {
+        for (String[] val : sub.readQueueValues()) {
+          setter.accept(val);
+        }
+      };
     }
     m_properties.add(property);
   }
@@ -699,12 +688,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     if (setter != null) {
       property.m_sub =
           topic.subscribe(typeString, new byte[] {}, PubSubOption.excludePublisher(property.m_pub));
-      property.m_updateLocal =
-          sub -> {
-            for (byte[] val : sub.readQueueValues()) {
-              setter.accept(val);
-            }
-          };
+      property.m_updateLocal = sub -> {
+        for (byte[] val : sub.readQueueValues()) {
+          setter.accept(val);
+        }
+      };
     }
     m_properties.add(property);
   }

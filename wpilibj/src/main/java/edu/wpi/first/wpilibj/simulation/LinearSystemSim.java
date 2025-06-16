@@ -51,12 +51,12 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    */
   public LinearSystemSim(
       LinearSystem<States, Inputs, Outputs> system, double... measurementStdDevs) {
-    if (measurementStdDevs.length != 0 && measurementStdDevs.length != system.getC().getNumRows()) {
-      throw new MatrixDimensionException(
-          "Malformed measurementStdDevs! Got "
-              + measurementStdDevs.length
-              + " elements instead of "
-              + system.getC().getNumRows());
+    if (measurementStdDevs.length != 0
+        && measurementStdDevs.length != system.getC().getNumRows()) {
+      throw new MatrixDimensionException("Malformed measurementStdDevs! Got "
+          + measurementStdDevs.length
+          + " elements instead of "
+          + system.getC().getNumRows());
     }
     this.m_plant = system;
     if (measurementStdDevs.length == 0) {

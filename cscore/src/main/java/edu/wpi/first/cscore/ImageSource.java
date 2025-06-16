@@ -63,9 +63,8 @@ public abstract class ImageSource extends VideoSource {
       int step,
       int defaultValue,
       int value) {
-    return new VideoProperty(
-        CameraServerJNI.createSourceProperty(
-            m_handle, name, kind.getValue(), minimum, maximum, step, defaultValue, value));
+    return new VideoProperty(CameraServerJNI.createSourceProperty(
+        m_handle, name, kind.getValue(), minimum, maximum, step, defaultValue, value));
   }
 
   /**
@@ -81,16 +80,15 @@ public abstract class ImageSource extends VideoSource {
    */
   public VideoProperty createIntegerProperty(
       String name, int minimum, int maximum, int step, int defaultValue, int value) {
-    return new VideoProperty(
-        CameraServerJNI.createSourceProperty(
-            m_handle,
-            name,
-            VideoProperty.Kind.kInteger.getValue(),
-            minimum,
-            maximum,
-            step,
-            defaultValue,
-            value));
+    return new VideoProperty(CameraServerJNI.createSourceProperty(
+        m_handle,
+        name,
+        VideoProperty.Kind.kInteger.getValue(),
+        minimum,
+        maximum,
+        step,
+        defaultValue,
+        value));
   }
 
   /**
@@ -102,16 +100,15 @@ public abstract class ImageSource extends VideoSource {
    * @return Property
    */
   public VideoProperty createBooleanProperty(String name, boolean defaultValue, boolean value) {
-    return new VideoProperty(
-        CameraServerJNI.createSourceProperty(
-            m_handle,
-            name,
-            VideoProperty.Kind.kBoolean.getValue(),
-            0,
-            1,
-            1,
-            defaultValue ? 1 : 0,
-            value ? 1 : 0));
+    return new VideoProperty(CameraServerJNI.createSourceProperty(
+        m_handle,
+        name,
+        VideoProperty.Kind.kBoolean.getValue(),
+        0,
+        1,
+        1,
+        defaultValue ? 1 : 0,
+        value ? 1 : 0));
   }
 
   /**
@@ -122,10 +119,8 @@ public abstract class ImageSource extends VideoSource {
    * @return Property
    */
   public VideoProperty createStringProperty(String name, String value) {
-    VideoProperty prop =
-        new VideoProperty(
-            CameraServerJNI.createSourceProperty(
-                m_handle, name, VideoProperty.Kind.kString.getValue(), 0, 0, 0, 0, 0));
+    VideoProperty prop = new VideoProperty(CameraServerJNI.createSourceProperty(
+        m_handle, name, VideoProperty.Kind.kString.getValue(), 0, 0, 0, 0, 0));
     prop.setString(value);
     return prop;
   }

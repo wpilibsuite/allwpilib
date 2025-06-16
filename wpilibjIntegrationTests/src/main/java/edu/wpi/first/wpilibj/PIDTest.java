@@ -77,13 +77,11 @@ public class PIDTest extends AbstractComsSetup {
     double ki = 0.0005;
     double kd = 0.0;
     for (int i = 0; i < 1; i++) {
-      data.addAll(
-          List.of(
-              new Object[][] {
-                {kp, ki, kd, TestBench.getTalonPair()},
-                {kp, ki, kd, TestBench.getVictorPair()},
-                {kp, ki, kd, TestBench.getJaguarPair()}
-              }));
+      data.addAll(List.of(new Object[][] {
+        {kp, ki, kd, TestBench.getTalonPair()},
+        {kp, ki, kd, TestBench.getVictorPair()},
+        {kp, ki, kd, TestBench.getJaguarPair()}
+      }));
     }
     return data;
   }
@@ -161,9 +159,8 @@ public class PIDTest extends AbstractComsSetup {
     m_controller.setSetpoint(reference);
     assertEquals(
         pidData() + "did not have an error of " + reference, reference, m_controller.getError(), 0);
-    Notifier pidRunner =
-        new Notifier(
-            () -> me.getMotor().set(m_controller.calculate(me.getEncoder().getDistance())));
+    Notifier pidRunner = new Notifier(
+        () -> me.getMotor().set(m_controller.calculate(me.getEncoder().getDistance())));
     pidRunner.startPeriodic(m_controller.getPeriod());
     Timer.delay(5);
     pidRunner.stop();

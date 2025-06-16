@@ -35,10 +35,8 @@ public class DutyCycle implements Sendable, AutoCloseable {
    */
   @SuppressWarnings("this-escape")
   public DutyCycle(DigitalSource digitalSource) {
-    m_handle =
-        DutyCycleJNI.initialize(
-            digitalSource.getPortHandleForRouting(),
-            digitalSource.getAnalogTriggerTypeForRouting());
+    m_handle = DutyCycleJNI.initialize(
+        digitalSource.getPortHandleForRouting(), digitalSource.getAnalogTriggerTypeForRouting());
 
     m_source = digitalSource;
     int index = getFPGAIndex();

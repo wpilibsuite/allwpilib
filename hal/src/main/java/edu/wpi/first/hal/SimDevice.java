@@ -239,9 +239,8 @@ public class SimDevice implements AutoCloseable {
    */
   public SimEnum createEnumDouble(
       String name, Direction direction, String[] options, double[] optionValues, int initialValue) {
-    int handle =
-        SimDeviceJNI.createSimValueEnumDouble(
-            m_handle, name, direction.m_value, options, optionValues, initialValue);
+    int handle = SimDeviceJNI.createSimValueEnumDouble(
+        m_handle, name, direction.m_value, options, optionValues, initialValue);
     if (handle <= 0) {
       return null;
     }

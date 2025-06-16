@@ -110,9 +110,8 @@ public final class DataLogManager {
       // Delete all previously existing FRC_TBD_*.wpilog files. These only exist when the robot
       // never connects to the DS, so they are very unlikely to have useful data and just clutter
       // the filesystem.
-      File[] files =
-          new File(m_logDir)
-              .listFiles((d, name) -> name.startsWith("FRC_TBD_") && name.endsWith(".wpilog"));
+      File[] files = new File(m_logDir)
+          .listFiles((d, name) -> name.startsWith("FRC_TBD_") && name.endsWith(".wpilog"));
       if (files != null) {
         for (File file : files) {
           if (!file.delete()) {
@@ -316,12 +315,8 @@ public final class DataLogManager {
       long freeSpace = logDir.getUsableSpace();
       if (freeSpace < kFreeSpaceThreshold) {
         // Delete oldest FRC_*.wpilog files (ignore FRC_TBD_*.wpilog as we just created one)
-        File[] files =
-            logDir.listFiles(
-                (dir, name) ->
-                    name.startsWith("FRC_")
-                        && name.endsWith(".wpilog")
-                        && !name.startsWith("FRC_TBD_"));
+        File[] files = logDir.listFiles((dir, name) ->
+            name.startsWith("FRC_") && name.endsWith(".wpilog") && !name.startsWith("FRC_TBD_"));
         if (files != null) {
           Arrays.sort(files, Comparator.comparingLong(File::lastModified));
           int count = files.length;
@@ -361,9 +356,8 @@ public final class DataLogManager {
     boolean dsRenamed = m_filenameOverride;
     boolean fmsRenamed = m_filenameOverride;
     int sysTimeCount = 0;
-    IntegerLogEntry sysTimeEntry =
-        new IntegerLogEntry(
-            m_log, "systemTime", "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}");
+    IntegerLogEntry sysTimeEntry = new IntegerLogEntry(
+        m_log, "systemTime", "{\"source\":\"DataLogManager\",\"format\":\"time_t_us\"}");
 
     Event newDataEvent = new Event();
     DriverStation.provideRefreshedDataEventHandle(newDataEvent.getHandle());
@@ -432,15 +426,14 @@ public final class DataLogManager {
                   case Elimination -> 'E';
                   default -> '_';
                 };
-            m_log.setFilename(
-                "FRC_"
-                    + m_timeFormatter.format(LocalDateTime.now(m_utc))
-                    + "_"
-                    + DriverStation.getEventName()
-                    + "_"
-                    + matchTypeChar
-                    + DriverStation.getMatchNumber()
-                    + ".wpilog");
+            m_log.setFilename("FRC_"
+                + m_timeFormatter.format(LocalDateTime.now(m_utc))
+                + "_"
+                + DriverStation.getEventName()
+                + "_"
+                + matchTypeChar
+                + DriverStation.getMatchNumber()
+                + ".wpilog");
             fmsRenamed = true;
             dsRenamed = true; // don't override FMS rename
           }

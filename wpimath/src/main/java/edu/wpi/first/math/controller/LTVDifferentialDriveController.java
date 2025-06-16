@@ -88,49 +88,47 @@ public class LTVDifferentialDriveController {
 
     // Control law derivation is in section 8.7 of
     // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
-    var A =
-        MatBuilder.fill(
-            Nat.N5(),
-            Nat.N5(),
-            0.0,
-            0.0,
-            0.0,
-            0.5,
-            0.5,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            -1.0 / m_trackwidth,
-            1.0 / m_trackwidth,
-            0.0,
-            0.0,
-            0.0,
-            plant.getA(0, 0),
-            plant.getA(0, 1),
-            0.0,
-            0.0,
-            0.0,
-            plant.getA(1, 0),
-            plant.getA(1, 1));
-    var B =
-        MatBuilder.fill(
-            Nat.N5(),
-            Nat.N2(),
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            plant.getB(0, 0),
-            plant.getB(0, 1),
-            plant.getB(1, 0),
-            plant.getB(1, 1));
+    var A = MatBuilder.fill(
+        Nat.N5(),
+        Nat.N5(),
+        0.0,
+        0.0,
+        0.0,
+        0.5,
+        0.5,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0 / m_trackwidth,
+        1.0 / m_trackwidth,
+        0.0,
+        0.0,
+        0.0,
+        plant.getA(0, 0),
+        plant.getA(0, 1),
+        0.0,
+        0.0,
+        0.0,
+        plant.getA(1, 0),
+        plant.getA(1, 1));
+    var B = MatBuilder.fill(
+        Nat.N5(),
+        Nat.N2(),
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        plant.getB(0, 0),
+        plant.getB(0, 1),
+        plant.getB(1, 0),
+        plant.getB(1, 1));
     var Q = StateSpaceUtil.makeCostMatrix(qelems);
     var R = StateSpaceUtil.makeCostMatrix(relems);
 
@@ -138,8 +136,11 @@ public class LTVDifferentialDriveController {
     // 0 = Ax + Bu
     // Ax = -Bu
     // x = -A⁻¹Bu
-    double maxV =
-        plant.getA().solve(plant.getB().times(VecBuilder.fill(12.0, 12.0))).times(-1.0).get(0, 0);
+    double maxV = plant
+        .getA()
+        .solve(plant.getB().times(VecBuilder.fill(12.0, 12.0)))
+        .times(-1.0)
+        .get(0, 0);
 
     if (maxV <= 0.0) {
       throw new IllegalArgumentException(
@@ -199,13 +200,12 @@ public class LTVDifferentialDriveController {
    */
   public void setTolerance(
       Pose2d poseTolerance, double leftVelocityTolerance, double rightVelocityTolerance) {
-    m_tolerance =
-        VecBuilder.fill(
-            poseTolerance.getX(),
-            poseTolerance.getY(),
-            poseTolerance.getRotation().getRadians(),
-            leftVelocityTolerance,
-            rightVelocityTolerance);
+    m_tolerance = VecBuilder.fill(
+        poseTolerance.getX(),
+        poseTolerance.getY(),
+        poseTolerance.getRotation().getRadians(),
+        leftVelocityTolerance,
+        rightVelocityTolerance);
   }
 
   /**
@@ -231,13 +231,12 @@ public class LTVDifferentialDriveController {
       double rightVelocityRef) {
     // This implements the linear time-varying differential drive controller in
     // theorem 9.6.3 of https://tavsys.net/controls-in-frc.
-    var x =
-        VecBuilder.fill(
-            currentPose.getX(),
-            currentPose.getY(),
-            currentPose.getRotation().getRadians(),
-            leftVelocity,
-            rightVelocity);
+    var x = VecBuilder.fill(
+        currentPose.getX(),
+        currentPose.getY(),
+        currentPose.getRotation().getRadians(),
+        leftVelocity,
+        rightVelocity);
 
     var inRobotFrame = Matrix.eye(Nat.N5());
     inRobotFrame.set(0, 0, Math.cos(x.get(State.kHeading.value, 0)));
@@ -245,13 +244,12 @@ public class LTVDifferentialDriveController {
     inRobotFrame.set(1, 0, -Math.sin(x.get(State.kHeading.value, 0)));
     inRobotFrame.set(1, 1, Math.cos(x.get(State.kHeading.value, 0)));
 
-    var r =
-        VecBuilder.fill(
-            poseRef.getX(),
-            poseRef.getY(),
-            poseRef.getRotation().getRadians(),
-            leftVelocityRef,
-            rightVelocityRef);
+    var r = VecBuilder.fill(
+        poseRef.getX(),
+        poseRef.getY(),
+        poseRef.getRotation().getRadians(),
+        leftVelocityRef,
+        rightVelocityRef);
     m_error = r.minus(x);
     m_error.set(
         State.kHeading.value, 0, MathUtil.angleModulus(m_error.get(State.kHeading.value, 0)));

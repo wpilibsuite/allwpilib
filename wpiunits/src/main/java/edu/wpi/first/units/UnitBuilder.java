@@ -244,31 +244,30 @@ public final class UnitBuilder<U extends Unit> {
    *     conversion functions, unit name, and unit symbol - in that order
    */
   public U make() {
-    return make(
-        (baseUnit, toBaseUnits, fromBaseUnits, name, symbol) -> {
-          var baseClass = baseUnit.getClass();
+    return make((baseUnit, toBaseUnits, fromBaseUnits, name, symbol) -> {
+      var baseClass = baseUnit.getClass();
 
-          try {
-            var ctor = getConstructor(baseUnit);
+      try {
+        var ctor = getConstructor(baseUnit);
 
-            return ctor.newInstance(baseUnit, toBaseUnits, fromBaseUnits, name, symbol);
-          } catch (InstantiationException e) {
-            throw new RuntimeException("Could not instantiate class " + baseClass.getName(), e);
-          } catch (IllegalAccessException e) {
-            throw new RuntimeException("Could not access constructor", e);
-          } catch (InvocationTargetException e) {
-            throw new RuntimeException(
-                "Constructing " + baseClass.getName() + " raised an exception", e);
-          } catch (NoSuchMethodException e) {
-            throw new RuntimeException(
-                "No compatible constructor "
-                    + baseClass.getSimpleName()
-                    + "("
-                    + baseClass.getSimpleName()
-                    + ", UnaryFunction, UnaryFunction, String, String)",
-                e);
-          }
-        });
+        return ctor.newInstance(baseUnit, toBaseUnits, fromBaseUnits, name, symbol);
+      } catch (InstantiationException e) {
+        throw new RuntimeException("Could not instantiate class " + baseClass.getName(), e);
+      } catch (IllegalAccessException e) {
+        throw new RuntimeException("Could not access constructor", e);
+      } catch (InvocationTargetException e) {
+        throw new RuntimeException(
+            "Constructing " + baseClass.getName() + " raised an exception", e);
+      } catch (NoSuchMethodException e) {
+        throw new RuntimeException(
+            "No compatible constructor "
+                + baseClass.getSimpleName()
+                + "("
+                + baseClass.getSimpleName()
+                + ", UnaryFunction, UnaryFunction, String, String)",
+            e);
+      }
+    });
   }
 
   @SuppressWarnings({"unchecked", "PMD.AvoidAccessibilityAlteration"})
@@ -276,13 +275,12 @@ public final class UnitBuilder<U extends Unit> {
       throws NoSuchMethodException {
     var baseClass = baseUnit.getClass();
 
-    var ctor =
-        baseClass.getDeclaredConstructor(
-            baseClass, // baseUnit
-            UnaryFunction.class, // toBaseUnits
-            UnaryFunction.class, // fromBaseUnits
-            String.class, // name
-            String.class); // symbol
+    var ctor = baseClass.getDeclaredConstructor(
+        baseClass, // baseUnit
+        UnaryFunction.class, // toBaseUnits
+        UnaryFunction.class, // fromBaseUnits
+        String.class, // name
+        String.class); // symbol
 
     // need to flag the constructor as accessible so we can use private, package-private,
     // and protected constructors

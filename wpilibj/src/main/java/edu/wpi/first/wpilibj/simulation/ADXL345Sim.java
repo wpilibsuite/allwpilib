@@ -31,9 +31,8 @@ public class ADXL345Sim {
    * @param device The device to simulate
    */
   public ADXL345Sim(ADXL345_I2C device) {
-    SimDeviceSim simDevice =
-        new SimDeviceSim(
-            "Accel:ADXL345_I2C" + "[" + device.getPort() + "," + device.getDeviceAddress() + "]");
+    SimDeviceSim simDevice = new SimDeviceSim(
+        "Accel:ADXL345_I2C" + "[" + device.getPort() + "," + device.getDeviceAddress() + "]");
     initSim(simDevice);
   }
 

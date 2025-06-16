@@ -94,16 +94,15 @@ public class StructDescriptorDatabase {
       }
 
       // create field
-      StructFieldDescriptor fieldDesc =
-          new StructFieldDescriptor(
-              theStruct,
-              decl.name,
-              type,
-              size,
-              decl.arraySize,
-              decl.bitWidth,
-              decl.enumValues,
-              structDesc);
+      StructFieldDescriptor fieldDesc = new StructFieldDescriptor(
+          theStruct,
+          decl.name,
+          type,
+          size,
+          decl.arraySize,
+          decl.bitWidth,
+          decl.enumValues,
+          structDesc);
       if (theStruct.m_fieldsByName.put(decl.name, fieldDesc) != null) {
         throw new BadSchemaException(decl.name, "duplicate field name");
       }

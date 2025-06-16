@@ -510,26 +510,23 @@ public final class NetworkTable {
    */
   public int addListener(EnumSet<NetworkTableEvent.Kind> eventKinds, TableEventListener listener) {
     final int prefixLen = m_path.length() + 1;
-    return m_inst.addListener(
-        new String[] {m_pathWithSep},
-        eventKinds,
-        event -> {
-          String topicName = null;
-          if (event.topicInfo != null) {
-            topicName = event.topicInfo.name;
-          } else if (event.valueData != null) {
-            topicName = event.valueData.getTopic().getName();
-          }
-          if (topicName == null) {
-            return;
-          }
-          String relativeKey = topicName.substring(prefixLen);
-          if (relativeKey.indexOf(PATH_SEPARATOR) != -1) {
-            // part of a sub table
-            return;
-          }
-          listener.accept(this, relativeKey, event);
-        });
+    return m_inst.addListener(new String[] {m_pathWithSep}, eventKinds, event -> {
+      String topicName = null;
+      if (event.topicInfo != null) {
+        topicName = event.topicInfo.name;
+      } else if (event.valueData != null) {
+        topicName = event.valueData.getTopic().getName();
+      }
+      if (topicName == null) {
+        return;
+      }
+      String relativeKey = topicName.substring(prefixLen);
+      if (relativeKey.indexOf(PATH_SEPARATOR) != -1) {
+        // part of a sub table
+        return;
+      }
+      listener.accept(this, relativeKey, event);
+    });
   }
 
   /**

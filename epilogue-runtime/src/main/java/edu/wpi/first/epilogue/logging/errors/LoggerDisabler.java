@@ -47,12 +47,11 @@ public class LoggerDisabler implements ErrorHandler {
 
     if (errorCount > m_threshold) {
       logger.disable();
-      System.err.println(
-          "[EPILOGUE] Too many errors detected in "
-              + logger.getClass().getName()
-              + " (maximum allowed: "
-              + m_threshold
-              + "). The most recent error follows:");
+      System.err.println("[EPILOGUE] Too many errors detected in "
+          + logger.getClass().getName()
+          + " (maximum allowed: "
+          + m_threshold
+          + "). The most recent error follows:");
       System.err.println(exception.getMessage());
       exception.printStackTrace(System.err);
     }

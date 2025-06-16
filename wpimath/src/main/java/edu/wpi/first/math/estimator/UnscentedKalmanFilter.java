@@ -176,11 +176,10 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
           BiFunction<Matrix<C, N1>, Matrix<C, N1>, Matrix<C, N1>> residualFunc,
           Matrix<C, C> squareRootR) {
     if (sigmas.getNumRows() != dim.getNum() || sigmas.getNumCols() != 2 * s.getNum() + 1) {
-      throw new IllegalArgumentException(
-          "Sigmas must be covDim by 2 * states + 1! Got "
-              + sigmas.getNumRows()
-              + " by "
-              + sigmas.getNumCols());
+      throw new IllegalArgumentException("Sigmas must be covDim by 2 * states + 1! Got "
+          + sigmas.getNumRows()
+          + " by "
+          + sigmas.getNumCols());
     }
 
     if (Wm.getNumRows() != 2 * s.getNum() + 1 || Wm.getNumCols() != 1) {
@@ -394,16 +393,15 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     // to compute the prior state mean and covariance
     //
     // equations (18) (19) and (20)
-    var ret =
-        squareRootUnscentedTransform(
-            m_states,
-            m_states,
-            m_sigmasF,
-            m_pts.getWm(),
-            m_pts.getWc(),
-            m_meanFuncX,
-            m_residualFuncX,
-            squareRootDiscQ);
+    var ret = squareRootUnscentedTransform(
+        m_states,
+        m_states,
+        m_sigmasF,
+        m_pts.getWm(),
+        m_pts.getWc(),
+        m_meanFuncX,
+        m_residualFuncX,
+        squareRootDiscQ);
 
     m_xHat = ret.getFirst();
     m_S = ret.getSecond();
@@ -519,16 +517,15 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     // covariance.
     //
     // equations (23) (24) and (25)
-    var transRet =
-        squareRootUnscentedTransform(
-            m_states,
-            rows,
-            sigmasH,
-            m_pts.getWm(),
-            m_pts.getWc(),
-            meanFuncY,
-            residualFuncY,
-            squareRootDiscR);
+    var transRet = squareRootUnscentedTransform(
+        m_states,
+        rows,
+        sigmasH,
+        m_pts.getWm(),
+        m_pts.getWc(),
+        meanFuncY,
+        residualFuncY,
+        squareRootDiscR);
     var yHat = transRet.getFirst();
     var Sy = transRet.getSecond();
 
@@ -557,10 +554,9 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     //   K = (S_{y}ᵀ \ (S_{y} \ P_{xy}ᵀ))ᵀ
     //
     // equation (27)
-    Matrix<States, R> K =
-        Sy.transpose()
-            .solveFullPivHouseholderQr(Sy.solveFullPivHouseholderQr(Pxy.transpose()))
-            .transpose();
+    Matrix<States, R> K = Sy.transpose()
+        .solveFullPivHouseholderQr(Sy.solveFullPivHouseholderQr(Pxy.transpose()))
+        .transpose();
 
     // Compute the posterior state mean
     //

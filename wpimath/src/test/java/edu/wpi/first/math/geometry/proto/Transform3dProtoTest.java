@@ -14,10 +14,9 @@ import edu.wpi.first.math.proto.Geometry3D.ProtobufTransform3d;
 import org.junit.jupiter.api.Test;
 
 class Transform3dProtoTest {
-  private static final Transform3d DATA =
-      new Transform3d(
-          new Translation3d(0.3504, 22.9, 3.504),
-          new Rotation3d(new Quaternion(0.3504, 35.04, 2.29, 0.3504)));
+  private static final Transform3d DATA = new Transform3d(
+      new Translation3d(0.3504, 22.9, 3.504),
+      new Rotation3d(new Quaternion(0.3504, 35.04, 2.29, 0.3504)));
 
   @Test
   void testRoundtrip() {

@@ -328,9 +328,8 @@ public class Color {
    */
   public static int lerpRGB(int r1, int g1, int b1, int r2, int g2, int b2, double t) {
     return packRGB(
-        (int) MathUtil.interpolate(r1, r2, t),
-        (int) MathUtil.interpolate(g1, g2, t),
-        (int) MathUtil.interpolate(b1, b2, t));
+        (int) MathUtil.interpolate(r1, r2, t), (int) MathUtil.interpolate(g1, g2, t), (int)
+            MathUtil.interpolate(b1, b2, t));
   }
 
   /*

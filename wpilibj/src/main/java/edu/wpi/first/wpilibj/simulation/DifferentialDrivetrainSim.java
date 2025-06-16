@@ -322,9 +322,8 @@ public class DifferentialDrivetrainSim {
         0,
         m_plant
             .getA()
-            .times(
-                (this.m_currentGearing * this.m_currentGearing)
-                    / (this.m_originalGearing * this.m_originalGearing)));
+            .times((this.m_currentGearing * this.m_currentGearing)
+                / (this.m_originalGearing * this.m_originalGearing)));
 
     A.assignBlock(2, 0, Matrix.eye(Nat.N2()));
 
@@ -459,9 +458,8 @@ public class DifferentialDrivetrainSim {
       Matrix<N7, N1> measurementStdDevs) {
     // MOI estimation -- note that I = mr² for point masses
     var batteryMoi = 12.5 / 2.2 * Math.pow(Units.inchesToMeters(10), 2);
-    var gearboxMoi =
-        (2.8 /* CIM motor */ * 2 / 2.2 + 2.0 /* Toughbox Mini- ish */)
-            * Math.pow(Units.inchesToMeters(26.0 / 2.0), 2);
+    var gearboxMoi = (2.8 /* CIM motor */ * 2 / 2.2 + 2.0 /* Toughbox Mini- ish */)
+        * Math.pow(Units.inchesToMeters(26.0 / 2.0), 2);
 
     return createKitbotSim(motor, gearing, wheelSize, batteryMoi + gearboxMoi, measurementStdDevs);
   }

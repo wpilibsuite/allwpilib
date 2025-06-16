@@ -146,29 +146,26 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
           }
         },
         null);
-    builder.addStringProperty(
-        SELECTED,
-        null,
-        val -> {
-          V choice;
-          Consumer<V> listener;
-          m_mutex.lock();
-          try {
-            m_selected = val;
-            if (!m_selected.equals(m_previousVal) && m_listener != null) {
-              choice = m_map.get(val);
-              listener = m_listener;
-            } else {
-              choice = null;
-              listener = null;
-            }
-            m_previousVal = val;
-          } finally {
-            m_mutex.unlock();
-          }
-          if (listener != null) {
-            listener.accept(choice);
-          }
-        });
+    builder.addStringProperty(SELECTED, null, val -> {
+      V choice;
+      Consumer<V> listener;
+      m_mutex.lock();
+      try {
+        m_selected = val;
+        if (!m_selected.equals(m_previousVal) && m_listener != null) {
+          choice = m_map.get(val);
+          listener = m_listener;
+        } else {
+          choice = null;
+          listener = null;
+        }
+        m_previousVal = val;
+      } finally {
+        m_mutex.unlock();
+      }
+      if (listener != null) {
+        listener.accept(choice);
+      }
+    });
   }
 }

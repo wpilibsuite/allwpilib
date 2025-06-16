@@ -44,10 +44,9 @@ public class MotorInvertingTest extends AbstractComsSetup {
   @Parameters(name = "{index}: {0}")
   public static Collection<MotorEncoderFixture<?>[]> generateData() {
     // logger.fine("Loading the MotorList");
-    return List.of(
-        new MotorEncoderFixture<?>[][] {
-          {TestBench.getTalonPair()}, {TestBench.getVictorPair()}, {TestBench.getJaguarPair()}
-        });
+    return List.of(new MotorEncoderFixture<?>[][] {
+      {TestBench.getTalonPair()}, {TestBench.getVictorPair()}, {TestBench.getJaguarPair()}
+    });
   }
 
   private static final Logger logger = Logger.getLogger(MotorInvertingTest.class.getName());

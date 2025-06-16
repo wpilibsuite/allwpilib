@@ -72,12 +72,11 @@ public class RawCVMatSink extends ImageSink {
       height = frame.getHeight();
       width = frame.getWidth();
       pixelFormat = frame.getPixelFormat();
-      tmpMat =
-          new Mat(
-              frame.getHeight(),
-              frame.getWidth(),
-              getCVFormat(VideoMode.getPixelFormatFromInt(pixelFormat)),
-              origByteBuffer);
+      tmpMat = new Mat(
+          frame.getHeight(),
+          frame.getWidth(),
+          getCVFormat(VideoMode.getPixelFormatFromInt(pixelFormat)),
+          origByteBuffer);
     }
     tmpMat.copyTo(image);
     return rv;

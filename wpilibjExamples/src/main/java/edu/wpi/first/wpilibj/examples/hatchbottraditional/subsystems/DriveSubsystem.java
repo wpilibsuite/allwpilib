@@ -26,18 +26,16 @@ public class DriveSubsystem extends SubsystemBase {
       new DifferentialDrive(m_leftLeader::set, m_rightLeader::set);
 
   // The left-side drive encoder
-  private final Encoder m_leftEncoder =
-      new Encoder(
-          DriveConstants.kLeftEncoderPorts[0],
-          DriveConstants.kLeftEncoderPorts[1],
-          DriveConstants.kLeftEncoderReversed);
+  private final Encoder m_leftEncoder = new Encoder(
+      DriveConstants.kLeftEncoderPorts[0],
+      DriveConstants.kLeftEncoderPorts[1],
+      DriveConstants.kLeftEncoderReversed);
 
   // The right-side drive encoder
-  private final Encoder m_rightEncoder =
-      new Encoder(
-          DriveConstants.kRightEncoderPorts[0],
-          DriveConstants.kRightEncoderPorts[1],
-          DriveConstants.kRightEncoderReversed);
+  private final Encoder m_rightEncoder = new Encoder(
+      DriveConstants.kRightEncoderPorts[0],
+      DriveConstants.kRightEncoderPorts[1],
+      DriveConstants.kRightEncoderReversed);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {

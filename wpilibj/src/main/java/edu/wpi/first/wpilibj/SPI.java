@@ -417,9 +417,8 @@ public class SPI implements AutoCloseable {
         boolean isSigned,
         boolean bigEndian) {
       m_notifier = new Notifier(this::update);
-      m_buf =
-          ByteBuffer.allocateDirect((xferSize + 1) * kAccumulateDepth * 4)
-              .order(ByteOrder.nativeOrder());
+      m_buf = ByteBuffer.allocateDirect((xferSize + 1) * kAccumulateDepth * 4)
+          .order(ByteOrder.nativeOrder());
       m_intBuf = m_buf.asIntBuffer();
       m_xferSize = xferSize + 1; // +1 for timestamp
       m_validMask = validMask;
@@ -587,9 +586,8 @@ public class SPI implements AutoCloseable {
     setAutoTransmitData(cmdBytes, xferSize - 4);
     startAutoRate(period);
 
-    m_accum =
-        new Accumulator(
-            m_port, xferSize, validMask, validValue, dataShift, dataSize, isSigned, bigEndian);
+    m_accum = new Accumulator(
+        m_port, xferSize, validMask, validValue, dataShift, dataSize, isSigned, bigEndian);
     m_accum.m_notifier.startPeriodic(period * 1024);
   }
 

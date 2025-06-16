@@ -18,11 +18,10 @@ public class Intake extends SubsystemBase {
   private final PWMSparkMax m_motor = new PWMSparkMax(IntakeConstants.kMotorPort);
 
   // Double solenoid connected to two channels of a PCM with the default CAN ID
-  private final DoubleSolenoid m_pistons =
-      new DoubleSolenoid(
-          PneumaticsModuleType.CTREPCM,
-          IntakeConstants.kSolenoidPorts[0],
-          IntakeConstants.kSolenoidPorts[1]);
+  private final DoubleSolenoid m_pistons = new DoubleSolenoid(
+      PneumaticsModuleType.CTREPCM,
+      IntakeConstants.kSolenoidPorts[0],
+      IntakeConstants.kSolenoidPorts[1]);
 
   /** Returns a command that deploys the intake, and then runs the intake motor indefinitely. */
   public Command intakeCommand() {
@@ -33,11 +32,10 @@ public class Intake extends SubsystemBase {
 
   /** Returns a command that turns off and retracts the intake. */
   public Command retractCommand() {
-    return runOnce(
-            () -> {
-              m_motor.disable();
-              m_pistons.set(DoubleSolenoid.Value.kReverse);
-            })
+    return runOnce(() -> {
+          m_motor.disable();
+          m_pistons.set(DoubleSolenoid.Value.kReverse);
+        })
         .withName("Retract");
   }
 }

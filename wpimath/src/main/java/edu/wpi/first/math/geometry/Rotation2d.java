@@ -154,10 +154,9 @@ public class Rotation2d
       throw new IllegalArgumentException(msg);
     }
     if (Math.abs(R.det() - 1.0) > 1e-9) {
-      var msg =
-          "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n"
-              + R.getStorage().toString()
-              + '\n';
+      var msg = "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n"
+          + R.getStorage().toString()
+          + '\n';
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(msg);
     }

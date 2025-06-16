@@ -77,15 +77,14 @@ public class Drivetrain {
 
   /* Here we use DifferentialDrivePoseEstimator so that we can fuse odometry readings. The
   numbers used  below are robot specific, and should be tuned. */
-  private final DifferentialDrivePoseEstimator m_poseEstimator =
-      new DifferentialDrivePoseEstimator(
-          m_kinematics,
-          m_gyro.getRotation2d(),
-          m_leftEncoder.getDistance(),
-          m_rightEncoder.getDistance(),
-          Pose2d.kZero,
-          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
-          VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+  private final DifferentialDrivePoseEstimator m_poseEstimator = new DifferentialDrivePoseEstimator(
+      m_kinematics,
+      m_gyro.getRotation2d(),
+      m_leftEncoder.getDistance(),
+      m_rightEncoder.getDistance(),
+      Pose2d.kZero,
+      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
+      VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
@@ -96,9 +95,8 @@ public class Drivetrain {
   private final EncoderSim m_rightEncoderSim = new EncoderSim(m_rightEncoder);
   private final LinearSystem<N2, N2, N2> m_drivetrainSystem =
       LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
-  private final DifferentialDrivetrainSim m_drivetrainSimulator =
-      new DifferentialDrivetrainSim(
-          m_drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
+  private final DifferentialDrivetrainSim m_drivetrainSimulator = new DifferentialDrivetrainSim(
+      m_drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
 
   /**
    * Constructs a differential drive object. Sets the encoder distance per pulse and resets the
@@ -126,8 +124,9 @@ public class Drivetrain {
 
     m_cameraToObjectEntry = cameraToObjectTopic.getEntry(m_defaultVal);
 
-    m_objectInField =
-        AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo).getTagPose(0).get();
+    m_objectInField = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo)
+        .getTagPose(0)
+        .get();
 
     SmartDashboard.putData("Field", m_fieldSim);
     SmartDashboard.putData("FieldEstimation", m_fieldApproximation);

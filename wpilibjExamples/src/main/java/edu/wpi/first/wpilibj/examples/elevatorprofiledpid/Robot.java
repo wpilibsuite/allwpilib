@@ -49,8 +49,7 @@ public class Robot extends TimedRobot {
     }
 
     // Run controller and update motor output
-    m_motor.setVoltage(
-        m_controller.calculate(m_encoder.getDistance())
-            + m_feedforward.calculate(m_controller.getSetpoint().velocity));
+    m_motor.setVoltage(m_controller.calculate(m_encoder.getDistance())
+        + m_feedforward.calculate(m_controller.getSetpoint().velocity));
   }
 }

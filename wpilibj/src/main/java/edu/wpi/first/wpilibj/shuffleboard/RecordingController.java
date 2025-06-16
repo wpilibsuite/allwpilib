@@ -57,9 +57,8 @@ final class RecordingController {
 
     String eventDescription = description == null ? "" : description;
 
-    m_eventsTable
-        .getSubTable(name)
-        .getEntry("Info")
-        .setStringArray(new String[] {eventDescription, importance.getSimpleName()});
+    m_eventsTable.getSubTable(name).getEntry("Info").setStringArray(new String[] {
+      eventDescription, importance.getSimpleName()
+    });
   }
 }

@@ -53,10 +53,9 @@ class SysIdRoutineTest {
     HAL.initialize(500, 0);
     SimHooks.pauseTiming();
     m_mechanism = mock(Mechanism.class);
-    m_sysidRoutine =
-        new SysIdRoutine(
-            new SysIdRoutine.Config(null, null, null, m_mechanism::recordState),
-            new SysIdRoutine.Mechanism(m_mechanism::drive, m_mechanism::log, new Subsystem() {}));
+    m_sysidRoutine = new SysIdRoutine(
+        new SysIdRoutine.Config(null, null, null, m_mechanism::recordState),
+        new SysIdRoutine.Mechanism(m_mechanism::drive, m_mechanism::log, new Subsystem() {}));
     m_quasistaticForward = m_sysidRoutine.quasistatic(SysIdRoutine.Direction.kForward);
     m_quasistaticReverse = m_sysidRoutine.quasistatic(SysIdRoutine.Direction.kReverse);
     m_dynamicForward = m_sysidRoutine.dynamic(SysIdRoutine.Direction.kForward);

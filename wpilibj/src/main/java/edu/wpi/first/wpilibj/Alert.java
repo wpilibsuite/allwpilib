@@ -172,10 +172,10 @@ public class Alert implements AutoCloseable {
   }
 
   private record PublishedAlert(long timestamp, String text) implements Comparable<PublishedAlert> {
-    private static final Comparator<PublishedAlert> comparator =
-        Comparator.comparingLong((PublishedAlert alert) -> alert.timestamp())
-            .reversed()
-            .thenComparing(Comparator.comparing((PublishedAlert alert) -> alert.text()));
+    private static final Comparator<PublishedAlert> comparator = Comparator.comparingLong(
+            (PublishedAlert alert) -> alert.timestamp())
+        .reversed()
+        .thenComparing(Comparator.comparing((PublishedAlert alert) -> alert.text()));
 
     @Override
     public int compareTo(PublishedAlert o) {
@@ -218,13 +218,11 @@ public class Alert implements AutoCloseable {
      * @return the SendableAlerts for the group
      */
     private static SendableAlerts forGroup(String group) {
-      return groups.computeIfAbsent(
-          group,
-          _group -> {
-            var sendable = new SendableAlerts();
-            SmartDashboard.putData(_group, sendable);
-            return sendable;
-          });
+      return groups.computeIfAbsent(group, _group -> {
+        var sendable = new SendableAlerts();
+        SmartDashboard.putData(_group, sendable);
+        return sendable;
+      });
     }
   }
 }

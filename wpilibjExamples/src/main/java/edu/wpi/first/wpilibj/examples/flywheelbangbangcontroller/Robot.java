@@ -74,11 +74,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // Scale setpoint value between 0 and maxSetpointValue
-    double setpoint =
-        Math.max(
-            0.0,
-            m_joystick.getRawAxis(0)
-                * Units.rotationsPerMinuteToRadiansPerSecond(kMaxSetpointValue));
+    double setpoint = Math.max(
+        0.0,
+        m_joystick.getRawAxis(0) * Units.rotationsPerMinuteToRadiansPerSecond(kMaxSetpointValue));
 
     // Set setpoint and measurement of the bang-bang controller
     double bangOutput = m_bangBangController.calculate(m_encoder.getRate(), setpoint) * 12.0;

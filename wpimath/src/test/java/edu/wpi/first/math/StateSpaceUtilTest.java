@@ -146,10 +146,8 @@ class StateSpaceUtilTest extends UtilityClassTest<StateSpaceUtil> {
     var matrix = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 2, 3, 4);
     wrappedResult = matrix.times(0.01).exp();
 
-    assertTrue(
-        wrappedResult.isEqual(
-            MatBuilder.fill(Nat.N2(), Nat.N2(), 1.01035625, 0.02050912, 0.03076368, 1.04111993),
-            1E-8));
+    assertTrue(wrappedResult.isEqual(
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 1.01035625, 0.02050912, 0.03076368, 1.04111993), 1E-8));
   }
 
   @Test

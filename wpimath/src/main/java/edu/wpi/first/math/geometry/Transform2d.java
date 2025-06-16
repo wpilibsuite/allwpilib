@@ -39,10 +39,9 @@ public class Transform2d implements ProtobufSerializable, StructSerializable {
     // We are rotating the difference between the translations
     // using a clockwise rotation matrix. This transforms the global
     // delta into a local delta (relative to the initial pose).
-    m_translation =
-        last.getTranslation()
-            .minus(initial.getTranslation())
-            .rotateBy(initial.getRotation().unaryMinus());
+    m_translation = last.getTranslation()
+        .minus(initial.getTranslation())
+        .rotateBy(initial.getRotation().unaryMinus());
 
     m_rotation = last.getRotation().minus(initial.getRotation());
   }

@@ -22,14 +22,11 @@ class ComputerVisionUtilTest extends UtilityClassTest<ComputerVisionUtil> {
   @Test
   void testObjectToRobotPose() {
     var robot = new Pose3d(1.0, 2.0, 0.0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(30.0)));
-    var cameraToObject =
-        new Transform3d(
-            new Translation3d(1.0, 1.0, 1.0),
-            new Rotation3d(0.0, Units.degreesToRadians(-20.0), Units.degreesToRadians(45.0)));
-    var robotToCamera =
-        new Transform3d(
-            new Translation3d(1.0, 0.0, 2.0),
-            new Rotation3d(0.0, 0.0, Units.degreesToRadians(25.0)));
+    var cameraToObject = new Transform3d(
+        new Translation3d(1.0, 1.0, 1.0),
+        new Rotation3d(0.0, Units.degreesToRadians(-20.0), Units.degreesToRadians(45.0)));
+    var robotToCamera = new Transform3d(
+        new Translation3d(1.0, 0.0, 2.0), new Rotation3d(0.0, 0.0, Units.degreesToRadians(25.0)));
     Pose3d object = robot.plus(robotToCamera).plus(cameraToObject);
 
     assertEquals(

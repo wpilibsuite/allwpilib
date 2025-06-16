@@ -270,16 +270,12 @@ class SwerveDriveKinematicsTest {
   private void assertModuleState(
       SwerveModuleState expected, SwerveModuleState actual, SwerveModuleState tolerance) {
     assertAll(
-        () ->
-            assertEquals(
-                expected.speedMetersPerSecond,
-                actual.speedMetersPerSecond,
-                tolerance.speedMetersPerSecond),
-        () ->
-            assertEquals(
-                expected.angle.getDegrees(),
-                actual.angle.getDegrees(),
-                tolerance.angle.getDegrees()));
+        () -> assertEquals(
+            expected.speedMetersPerSecond,
+            actual.speedMetersPerSecond,
+            tolerance.speedMetersPerSecond),
+        () -> assertEquals(
+            expected.angle.getDegrees(), actual.angle.getDegrees(), tolerance.angle.getDegrees()));
   }
 
   /**
@@ -293,13 +289,12 @@ class SwerveDriveKinematicsTest {
 
     // By equation (13.14) from state-space guide, our wheels/angles will be as follows,
     // (+-1 degree or speed):
-    SwerveModuleState[] expectedStates =
-        new SwerveModuleState[] {
-          new SwerveModuleState(23.43, Rotation2d.fromDegrees(-140.19)),
-          new SwerveModuleState(23.43, Rotation2d.fromDegrees(-39.81)),
-          new SwerveModuleState(54.08, Rotation2d.fromDegrees(-109.44)),
-          new SwerveModuleState(54.08, Rotation2d.fromDegrees(-70.56))
-        };
+    SwerveModuleState[] expectedStates = new SwerveModuleState[] {
+      new SwerveModuleState(23.43, Rotation2d.fromDegrees(-140.19)),
+      new SwerveModuleState(23.43, Rotation2d.fromDegrees(-39.81)),
+      new SwerveModuleState(54.08, Rotation2d.fromDegrees(-109.44)),
+      new SwerveModuleState(54.08, Rotation2d.fromDegrees(-70.56))
+    };
     var stateTolerance = new SwerveModuleState(0.1, Rotation2d.fromDegrees(0.1));
 
     for (int i = 0; i < expectedStates.length; i++) {

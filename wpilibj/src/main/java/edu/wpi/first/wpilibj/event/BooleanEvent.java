@@ -61,12 +61,11 @@ public class BooleanEvent implements BooleanSupplier {
    * @param action the action to run if this event is active.
    */
   public final void ifHigh(Runnable action) {
-    m_loop.bind(
-        () -> {
-          if (m_state.get()) {
-            action.run();
-          }
-        });
+    m_loop.bind(() -> {
+      if (m_state.get()) {
+        action.run();
+      }
+    });
   }
 
   /**
@@ -127,19 +126,17 @@ public class BooleanEvent implements BooleanSupplier {
    * @return the new event.
    */
   public BooleanEvent rising() {
-    return new BooleanEvent(
-        m_loop,
-        new BooleanSupplier() {
-          private boolean m_previous = m_state.get();
+    return new BooleanEvent(m_loop, new BooleanSupplier() {
+      private boolean m_previous = m_state.get();
 
-          @Override
-          public boolean getAsBoolean() {
-            boolean present = m_state.get();
-            boolean ret = !m_previous && present;
-            m_previous = present;
-            return ret;
-          }
-        });
+      @Override
+      public boolean getAsBoolean() {
+        boolean present = m_state.get();
+        boolean ret = !m_previous && present;
+        m_previous = present;
+        return ret;
+      }
+    });
   }
 
   /**
@@ -148,19 +145,17 @@ public class BooleanEvent implements BooleanSupplier {
    * @return the event.
    */
   public BooleanEvent falling() {
-    return new BooleanEvent(
-        m_loop,
-        new BooleanSupplier() {
-          private boolean m_previous = m_state.get();
+    return new BooleanEvent(m_loop, new BooleanSupplier() {
+      private boolean m_previous = m_state.get();
 
-          @Override
-          public boolean getAsBoolean() {
-            boolean present = m_state.get();
-            boolean ret = m_previous && !present;
-            m_previous = present;
-            return ret;
-          }
-        });
+      @Override
+      public boolean getAsBoolean() {
+        boolean present = m_state.get();
+        boolean ret = m_previous && !present;
+        m_previous = present;
+        return ret;
+      }
+    });
   }
 
   /**
@@ -183,15 +178,13 @@ public class BooleanEvent implements BooleanSupplier {
    * @return The debounced event.
    */
   public BooleanEvent debounce(double seconds, Debouncer.DebounceType type) {
-    return new BooleanEvent(
-        m_loop,
-        new BooleanSupplier() {
-          private final Debouncer m_debouncer = new Debouncer(seconds, type);
+    return new BooleanEvent(m_loop, new BooleanSupplier() {
+      private final Debouncer m_debouncer = new Debouncer(seconds, type);
 
-          @Override
-          public boolean getAsBoolean() {
-            return m_debouncer.calculate(m_state.get());
-          }
-        });
+      @Override
+      public boolean getAsBoolean() {
+        return m_debouncer.calculate(m_state.get());
+      }
+    });
   }
 }

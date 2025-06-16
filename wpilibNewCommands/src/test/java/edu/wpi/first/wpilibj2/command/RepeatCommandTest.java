@@ -20,16 +20,15 @@ class RepeatCommandTest extends SingleCompositionTestBase<RepeatCommand> {
       var endCounter = new AtomicInteger(0);
       var isFinishedHook = new AtomicBoolean(false);
 
-      final var command =
-          new FunctionalCommand(
-                  initCounter::incrementAndGet,
-                  exeCounter::incrementAndGet,
-                  interrupted -> endCounter.incrementAndGet(),
-                  () -> {
-                    isFinishedCounter.incrementAndGet();
-                    return isFinishedHook.get();
-                  })
-              .repeatedly();
+      final var command = new FunctionalCommand(
+              initCounter::incrementAndGet,
+              exeCounter::incrementAndGet,
+              interrupted -> endCounter.incrementAndGet(),
+              () -> {
+                isFinishedCounter.incrementAndGet();
+                return isFinishedHook.get();
+              })
+          .repeatedly();
 
       assertEquals(0, initCounter.get());
       assertEquals(0, exeCounter.get());

@@ -28,12 +28,10 @@ class StringUtilsTest {
         () -> assertEquals(List.of("ALLCAPS"), StringUtils.splitToWords("ALLCAPS")),
         () ->
             assertEquals(List.of("k", "First", "Second"), StringUtils.splitToWords("kFirstSecond")),
-        () ->
-            assertEquals(
-                List.of("there", "Is", "A", "Number", "123", "In", "Here", "VERSION", "456"),
-                StringUtils.splitToWords("thereIsANumber123InHereVERSION456")),
-        () ->
-            assertEquals(
-                List.of("get", "First", "Second"), StringUtils.splitToWords("getFirstSecond")));
+        () -> assertEquals(
+            List.of("there", "Is", "A", "Number", "123", "In", "Here", "VERSION", "456"),
+            StringUtils.splitToWords("thereIsANumber123InHereVERSION456")),
+        () -> assertEquals(
+            List.of("get", "First", "Second"), StringUtils.splitToWords("getFirstSecond")));
   }
 }

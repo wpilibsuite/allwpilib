@@ -81,10 +81,9 @@ public abstract class RelayCrossConnectFixture implements ITestFixture {
       m_inputTwo.close();
       m_freed = true;
     } else {
-      throw new RuntimeException(
-          "You attempted to free the "
-              + RelayCrossConnectFixture.class.getSimpleName()
-              + " multiple times");
+      throw new RuntimeException("You attempted to free the "
+          + RelayCrossConnectFixture.class.getSimpleName()
+          + " multiple times");
     }
   }
 }

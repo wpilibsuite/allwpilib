@@ -94,26 +94,24 @@ class MecanumDriveOdometryTest {
 
   @Test
   void testAccuracyFacingTrajectory() {
-    var kinematics =
-        new MecanumDriveKinematics(
-            new Translation2d(1, 1), new Translation2d(1, -1),
-            new Translation2d(-1, -1), new Translation2d(-1, 1));
+    var kinematics = new MecanumDriveKinematics(
+        new Translation2d(1, 1), new Translation2d(1, -1),
+        new Translation2d(-1, -1), new Translation2d(-1, 1));
 
     var wheelPositions = new MecanumDriveWheelPositions();
 
     var odometry =
         new MecanumDriveOdometry(kinematics, Rotation2d.kZero, wheelPositions, Pose2d.kZero);
 
-    var trajectory =
-        TrajectoryGenerator.generateTrajectory(
-            List.of(
-                Pose2d.kZero,
-                new Pose2d(20, 20, Rotation2d.kZero),
-                new Pose2d(10, 10, Rotation2d.kPi),
-                new Pose2d(30, 30, Rotation2d.kZero),
-                new Pose2d(20, 20, Rotation2d.kPi),
-                new Pose2d(10, 10, Rotation2d.kZero)),
-            new TrajectoryConfig(0.5, 2));
+    var trajectory = TrajectoryGenerator.generateTrajectory(
+        List.of(
+            Pose2d.kZero,
+            new Pose2d(20, 20, Rotation2d.kZero),
+            new Pose2d(10, 10, Rotation2d.kPi),
+            new Pose2d(30, 30, Rotation2d.kZero),
+            new Pose2d(20, 20, Rotation2d.kPi),
+            new Pose2d(10, 10, Rotation2d.kZero)),
+        new TrajectoryConfig(0.5, 2));
 
     var rand = new Random(5190);
 
@@ -127,17 +125,13 @@ class MecanumDriveOdometryTest {
     while (t <= trajectory.getTotalTimeSeconds()) {
       var groundTruthState = trajectory.sample(t);
 
-      trajectoryDistanceTravelled +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+      trajectoryDistanceTravelled += groundTruthState.velocityMetersPerSecond * dt
+          + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
 
-      var wheelSpeeds =
-          kinematics.toWheelSpeeds(
-              new ChassisSpeeds(
-                  groundTruthState.velocityMetersPerSecond,
-                  0,
-                  groundTruthState.velocityMetersPerSecond
-                      * groundTruthState.curvatureRadPerMeter));
+      var wheelSpeeds = kinematics.toWheelSpeeds(new ChassisSpeeds(
+          groundTruthState.velocityMetersPerSecond,
+          0,
+          groundTruthState.velocityMetersPerSecond * groundTruthState.curvatureRadPerMeter));
 
       wheelSpeeds.frontLeftMetersPerSecond += rand.nextGaussian() * 0.1;
       wheelSpeeds.frontRightMetersPerSecond += rand.nextGaussian() * 0.1;
@@ -151,13 +145,12 @@ class MecanumDriveOdometryTest {
 
       var lastPose = odometry.getPoseMeters();
 
-      var xHat =
-          odometry.update(
-              groundTruthState
-                  .poseMeters
-                  .getRotation()
-                  .plus(new Rotation2d(rand.nextGaussian() * 0.05)),
-              wheelPositions);
+      var xHat = odometry.update(
+          groundTruthState
+              .poseMeters
+              .getRotation()
+              .plus(new Rotation2d(rand.nextGaussian() * 0.05)),
+          wheelPositions);
 
       odometryDistanceTravelled += lastPose.getTranslation().getDistance(xHat.getTranslation());
 
@@ -183,26 +176,24 @@ class MecanumDriveOdometryTest {
 
   @Test
   void testAccuracyFacingXAxis() {
-    var kinematics =
-        new MecanumDriveKinematics(
-            new Translation2d(1, 1), new Translation2d(1, -1),
-            new Translation2d(-1, -1), new Translation2d(-1, 1));
+    var kinematics = new MecanumDriveKinematics(
+        new Translation2d(1, 1), new Translation2d(1, -1),
+        new Translation2d(-1, -1), new Translation2d(-1, 1));
 
     var wheelPositions = new MecanumDriveWheelPositions();
 
     var odometry =
         new MecanumDriveOdometry(kinematics, Rotation2d.kZero, wheelPositions, Pose2d.kZero);
 
-    var trajectory =
-        TrajectoryGenerator.generateTrajectory(
-            List.of(
-                Pose2d.kZero,
-                new Pose2d(20, 20, Rotation2d.kZero),
-                new Pose2d(10, 10, Rotation2d.kPi),
-                new Pose2d(30, 30, Rotation2d.kZero),
-                new Pose2d(20, 20, Rotation2d.kPi),
-                new Pose2d(10, 10, Rotation2d.kZero)),
-            new TrajectoryConfig(0.5, 2));
+    var trajectory = TrajectoryGenerator.generateTrajectory(
+        List.of(
+            Pose2d.kZero,
+            new Pose2d(20, 20, Rotation2d.kZero),
+            new Pose2d(10, 10, Rotation2d.kPi),
+            new Pose2d(30, 30, Rotation2d.kZero),
+            new Pose2d(20, 20, Rotation2d.kPi),
+            new Pose2d(10, 10, Rotation2d.kZero)),
+        new TrajectoryConfig(0.5, 2));
 
     var rand = new Random(5190);
 
@@ -216,18 +207,15 @@ class MecanumDriveOdometryTest {
     while (t <= trajectory.getTotalTimeSeconds()) {
       var groundTruthState = trajectory.sample(t);
 
-      trajectoryDistanceTravelled +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+      trajectoryDistanceTravelled += groundTruthState.velocityMetersPerSecond * dt
+          + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
 
-      var wheelSpeeds =
-          kinematics.toWheelSpeeds(
-              new ChassisSpeeds(
-                  groundTruthState.velocityMetersPerSecond
-                      * groundTruthState.poseMeters.getRotation().getCos(),
-                  groundTruthState.velocityMetersPerSecond
-                      * groundTruthState.poseMeters.getRotation().getSin(),
-                  0));
+      var wheelSpeeds = kinematics.toWheelSpeeds(new ChassisSpeeds(
+          groundTruthState.velocityMetersPerSecond
+              * groundTruthState.poseMeters.getRotation().getCos(),
+          groundTruthState.velocityMetersPerSecond
+              * groundTruthState.poseMeters.getRotation().getSin(),
+          0));
 
       wheelSpeeds.frontLeftMetersPerSecond += rand.nextGaussian() * 0.1;
       wheelSpeeds.frontRightMetersPerSecond += rand.nextGaussian() * 0.1;

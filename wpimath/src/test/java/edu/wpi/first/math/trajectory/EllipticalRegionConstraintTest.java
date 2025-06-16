@@ -19,16 +19,13 @@ class EllipticalRegionConstraintTest {
   @Test
   void testConstraint() {
     double maxVelocity = Units.feetToMeters(3.0);
-    var ellipse =
-        new Ellipse2d(
-            new Pose2d(Units.feetToMeters(5.0), Units.feetToMeters(2.5), Rotation2d.kPi),
-            Units.feetToMeters(5.0),
-            Units.feetToMeters(2.5));
+    var ellipse = new Ellipse2d(
+        new Pose2d(Units.feetToMeters(5.0), Units.feetToMeters(2.5), Rotation2d.kPi),
+        Units.feetToMeters(5.0),
+        Units.feetToMeters(2.5));
 
-    var trajectory =
-        TrajectoryGeneratorTest.getTrajectory(
-            List.of(
-                new EllipticalRegionConstraint(ellipse, new MaxVelocityConstraint(maxVelocity))));
+    var trajectory = TrajectoryGeneratorTest.getTrajectory(
+        List.of(new EllipticalRegionConstraint(ellipse, new MaxVelocityConstraint(maxVelocity))));
 
     boolean exceededConstraintOutsideRegion = false;
     for (var point : trajectory.getStates()) {

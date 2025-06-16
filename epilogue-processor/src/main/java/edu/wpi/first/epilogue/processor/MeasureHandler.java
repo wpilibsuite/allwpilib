@@ -14,14 +14,12 @@ public class MeasureHandler extends ElementHandler {
   protected MeasureHandler(ProcessingEnvironment processingEnv) {
     super(processingEnv);
 
-    m_measure =
-        processingEnv
-            .getTypeUtils()
-            .erasure(
-                processingEnv
-                    .getElementUtils()
-                    .getTypeElement("edu.wpi.first.units.Measure")
-                    .asType());
+    m_measure = processingEnv
+        .getTypeUtils()
+        .erasure(processingEnv
+            .getElementUtils()
+            .getTypeElement("edu.wpi.first.units.Measure")
+            .asType());
   }
 
   @Override

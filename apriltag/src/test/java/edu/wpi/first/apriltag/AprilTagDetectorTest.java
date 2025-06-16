@@ -208,10 +208,8 @@ class AprilTagDetectorTest {
       AprilTagDetection[] results = detector.detect(image);
       assertEquals(1, results.length);
 
-      var estimator =
-          new AprilTagPoseEstimator(
-              new AprilTagPoseEstimator.Config(
-                  0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
+      var estimator = new AprilTagPoseEstimator(
+          new AprilTagPoseEstimator.Config(0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
       assertEquals(Units.degreesToRadians(45), est.pose1.getRotation().getX(), 0.1);
@@ -241,10 +239,8 @@ class AprilTagDetectorTest {
       AprilTagDetection[] results = detector.detect(image);
       assertEquals(1, results.length);
 
-      var estimator =
-          new AprilTagPoseEstimator(
-              new AprilTagPoseEstimator.Config(
-                  0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
+      var estimator = new AprilTagPoseEstimator(
+          new AprilTagPoseEstimator.Config(0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
       assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);
@@ -271,10 +267,8 @@ class AprilTagDetectorTest {
       AprilTagDetection[] results = detector.detect(image);
       assertEquals(1, results.length);
 
-      var estimator =
-          new AprilTagPoseEstimator(
-              new AprilTagPoseEstimator.Config(
-                  0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
+      var estimator = new AprilTagPoseEstimator(
+          new AprilTagPoseEstimator.Config(0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
       assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);

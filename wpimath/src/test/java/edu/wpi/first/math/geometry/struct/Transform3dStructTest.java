@@ -15,10 +15,9 @@ import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
 class Transform3dStructTest {
-  private static final Transform3d DATA =
-      new Transform3d(
-          new Translation3d(0.3504, 22.9, 3.504),
-          new Rotation3d(new Quaternion(0.3504, 35.04, 2.29, 0.3504)));
+  private static final Transform3d DATA = new Transform3d(
+      new Translation3d(0.3504, 22.9, 3.504),
+      new Rotation3d(new Quaternion(0.3504, 35.04, 2.29, 0.3504)));
 
   @Test
   void testRoundtrip() {

@@ -35,20 +35,21 @@ public class Robot extends TimedRobot {
 
     // Add a 'max speed' widget to a tab named 'Configuration', using a number slider
     // The widget will be placed in the second column and row and will be TWO columns wide
-    m_maxSpeed =
-        Shuffleboard.getTab("Configuration")
-            .add("Max Speed", 1)
-            .withWidget("Number Slider")
-            .withPosition(1, 1)
-            .withSize(2, 1)
-            .getEntry();
+    m_maxSpeed = Shuffleboard.getTab("Configuration")
+        .add("Max Speed", 1)
+        .withWidget("Number Slider")
+        .withPosition(1, 1)
+        .withSize(2, 1)
+        .getEntry();
 
     // Add the tank drive and encoders to a 'Drivebase' tab
     ShuffleboardTab driveBaseTab = Shuffleboard.getTab("Drivebase");
     driveBaseTab.add("Tank Drive", m_tankDrive);
     // Put both encoders in a list layout
-    ShuffleboardLayout encoders =
-        driveBaseTab.getLayout("Encoders", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 2);
+    ShuffleboardLayout encoders = driveBaseTab
+        .getLayout("Encoders", BuiltInLayouts.kList)
+        .withPosition(0, 0)
+        .withSize(2, 2);
     encoders.add("Left Encoder", m_leftEncoder);
     encoders.add("Right Encoder", m_rightEncoder);
 

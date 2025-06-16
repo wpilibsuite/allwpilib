@@ -176,17 +176,15 @@ class AnnotationProcessorTest {
       }
     """;
 
-    Compilation compilation =
-        javac()
-            .withOptions(kJavaVersionOptions)
-            .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+    Compilation compilation = javac()
+        .withOptions(kJavaVersionOptions)
+        .withProcessors(new AnnotationProcessor())
+        .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
 
     assertThat(compilation).succeeded();
     // nothing is annotated with @Logged; so, no logger file should be generated
-    assertTrue(
-        compilation.generatedSourceFiles().stream()
-            .noneMatch(jfo -> jfo.getName().contains("Example")));
+    assertTrue(compilation.generatedSourceFiles().stream()
+        .noneMatch(jfo -> jfo.getName().contains("Example")));
   }
 
   @Test
@@ -1444,59 +1442,48 @@ class AnnotationProcessorTest {
       }
       """;
 
-    Compilation compilation =
-        javac()
-            .withOptions(kJavaVersionOptions)
-            .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+    Compilation compilation = javac()
+        .withOptions(kJavaVersionOptions)
+        .withProcessors(new AnnotationProcessor())
+        .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
 
     assertThat(compilation).failed();
     assertThat(compilation).hadErrorCount(10);
 
     List<Diagnostic<? extends JavaFileObject>> errors = compilation.errors();
     assertAll(
-        () ->
-            assertCompilationError(
-                "[EPILOGUE] You have opted in to logging on this field, but it is not a loggable data type!",
-                9,
-                31,
-                errors.get(0)),
-        () ->
-            assertCompilationError(
-                "[EPILOGUE] You have opted in to logging on this field, but it is not a loggable data type!",
-                10,
-                16,
-                errors.get(1)),
-        () ->
-            assertCompilationError(
-                "[EPILOGUE] Logged methods must be public", 14, 18, errors.get(2)),
-        () ->
-            assertCompilationError(
-                "[EPILOGUE] Logged methods must be public", 17, 10, errors.get(3)),
-        () ->
-            assertCompilationError(
-                "[EPILOGUE] Logged methods must be public", 20, 20, errors.get(4)),
-        () ->
-            assertCompilationError(
-                "[EPILOGUE] Logged methods cannot be static", 23, 24, errors.get(5)),
-        () ->
-            assertCompilationError(
-                "[EPILOGUE] Logged methods must be public", 26, 25, errors.get(6)),
-        () ->
-            assertCompilationError(
-                "[EPILOGUE] Logged methods cannot be static", 26, 25, errors.get(7)),
-        () ->
-            assertCompilationError(
-                "[EPILOGUE] You have opted in to logging on this method, but it does not return a loggable data type!",
-                29,
-                15,
-                errors.get(8)),
-        () ->
-            assertCompilationError(
-                "[EPILOGUE] You have opted in to logging on this method, but it does not return a loggable data type!",
-                32,
-                30,
-                errors.get(9)));
+        () -> assertCompilationError(
+            "[EPILOGUE] You have opted in to logging on this field, but it is not a loggable data type!",
+            9,
+            31,
+            errors.get(0)),
+        () -> assertCompilationError(
+            "[EPILOGUE] You have opted in to logging on this field, but it is not a loggable data type!",
+            10,
+            16,
+            errors.get(1)),
+        () -> assertCompilationError(
+            "[EPILOGUE] Logged methods must be public", 14, 18, errors.get(2)),
+        () -> assertCompilationError(
+            "[EPILOGUE] Logged methods must be public", 17, 10, errors.get(3)),
+        () -> assertCompilationError(
+            "[EPILOGUE] Logged methods must be public", 20, 20, errors.get(4)),
+        () -> assertCompilationError(
+            "[EPILOGUE] Logged methods cannot be static", 23, 24, errors.get(5)),
+        () -> assertCompilationError(
+            "[EPILOGUE] Logged methods must be public", 26, 25, errors.get(6)),
+        () -> assertCompilationError(
+            "[EPILOGUE] Logged methods cannot be static", 26, 25, errors.get(7)),
+        () -> assertCompilationError(
+            "[EPILOGUE] You have opted in to logging on this method, but it does not return a loggable data type!",
+            29,
+            15,
+            errors.get(8)),
+        () -> assertCompilationError(
+            "[EPILOGUE] You have opted in to logging on this method, but it does not return a loggable data type!",
+            32,
+            30,
+            errors.get(9)));
   }
 
   @Test
@@ -2268,11 +2255,10 @@ class AnnotationProcessorTest {
         }
         """;
 
-    Compilation compilation =
-        javac()
-            .withOptions(kJavaVersionOptions)
-            .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+    Compilation compilation = javac()
+        .withOptions(kJavaVersionOptions)
+        .withProcessors(new AnnotationProcessor())
+        .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
 
     assertThat(compilation).failed();
     assertThat(compilation).hadErrorCount(1);
@@ -2296,11 +2282,10 @@ class AnnotationProcessorTest {
         }
         """;
 
-    Compilation compilation =
-        javac()
-            .withOptions(kJavaVersionOptions)
-            .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+    Compilation compilation = javac()
+        .withOptions(kJavaVersionOptions)
+        .withProcessors(new AnnotationProcessor())
+        .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
 
     assertThat(compilation).succeeded();
     assertEquals(1, compilation.notes().size());
@@ -2362,34 +2347,30 @@ class AnnotationProcessorTest {
         }
         """;
 
-    Compilation compilation =
-        javac()
-            .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
+    Compilation compilation = javac()
+        .withProcessors(new AnnotationProcessor())
+        .compile(JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", source));
 
     assertThat(compilation).failed();
     assertThat(compilation).hadErrorCount(3);
 
     List<Diagnostic<? extends JavaFileObject>> errors = compilation.errors();
     assertAll(
-        () ->
-            assertCompilationError(
-                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.y, Example.z",
-                5,
-                40,
-                errors.get(0)),
-        () ->
-            assertCompilationError(
-                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.x, Example.z",
-                6,
-                40,
-                errors.get(1)),
-        () ->
-            assertCompilationError(
-                "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.x, Example.y",
-                7,
-                40,
-                errors.get(2)));
+        () -> assertCompilationError(
+            "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.y, Example.z",
+            5,
+            40,
+            errors.get(0)),
+        () -> assertCompilationError(
+            "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.x, Example.z",
+            6,
+            40,
+            errors.get(1)),
+        () -> assertCompilationError(
+            "[EPILOGUE] Conflicting name detected: \"Custom Name\" is also used by Example.x, Example.y",
+            7,
+            40,
+            errors.get(2)));
   }
 
   @Test
@@ -2540,13 +2521,12 @@ class AnnotationProcessorTest {
         package example;
         """;
 
-    Compilation compilation =
-        javac()
-            .withOptions(kJavaVersionOptions)
-            .withProcessors(new AnnotationProcessor())
-            .compile(
-                JavaFileObjects.forSourceString("example.Example", source),
-                JavaFileObjects.forSourceString("example.package-info", packageInfo));
+    Compilation compilation = javac()
+        .withOptions(kJavaVersionOptions)
+        .withProcessors(new AnnotationProcessor())
+        .compile(
+            JavaFileObjects.forSourceString("example.Example", source),
+            JavaFileObjects.forSourceString("example.package-info", packageInfo));
 
     assertThat(compilation).succeeded();
     compilation.generatedSourceFiles().stream()
@@ -2559,29 +2539,25 @@ class AnnotationProcessorTest {
       String message, long lineNumber, long col, Diagnostic<? extends JavaFileObject> diagnostic) {
     assertAll(
         () -> assertEquals(Diagnostic.Kind.ERROR, diagnostic.getKind(), "not an error"),
-        () ->
-            assertEquals(
-                message, diagnostic.getMessage(Locale.getDefault()), "error message mismatch"),
+        () -> assertEquals(
+            message, diagnostic.getMessage(Locale.getDefault()), "error message mismatch"),
         () -> assertEquals(lineNumber, diagnostic.getLineNumber(), "line number mismatch"),
         () -> assertEquals(col, diagnostic.getColumnNumber(), "column number mismatch"));
   }
 
   private void assertLoggerGenerates(String loggedClassContent, String loggerClassContent) {
-    Compilation compilation =
-        javac()
-            .withOptions(kJavaVersionOptions)
-            .withProcessors(new AnnotationProcessor())
-            .compile(
-                JavaFileObjects.forSourceString(
-                    "edu.wpi.first.epilogue.Example", loggedClassContent));
+    Compilation compilation = javac()
+        .withOptions(kJavaVersionOptions)
+        .withProcessors(new AnnotationProcessor())
+        .compile(
+            JavaFileObjects.forSourceString("edu.wpi.first.epilogue.Example", loggedClassContent));
 
     assertThat(compilation).succeeded();
     var generatedFiles = compilation.generatedSourceFiles();
-    var generatedFile =
-        generatedFiles.stream()
-            .filter(jfo -> jfo.getName().contains("Example"))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("Logger file was not generated!"));
+    var generatedFile = generatedFiles.stream()
+        .filter(jfo -> jfo.getName().contains("Example"))
+        .findFirst()
+        .orElseThrow(() -> new IllegalStateException("Logger file was not generated!"));
     try {
       var content = generatedFile.getCharContent(false);
       assertEquals(

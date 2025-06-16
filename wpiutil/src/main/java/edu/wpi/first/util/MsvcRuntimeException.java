@@ -15,10 +15,9 @@ public class MsvcRuntimeException extends RuntimeException {
     StringBuilder builder = new StringBuilder(100);
     builder
         .append("Invalid MSVC Runtime Detected.\n")
-        .append(
-            String.format(
-                "Expected at least %d.%d, but found %d.%d\n",
-                expectedMajor, expectedMinor, foundMajor, foundMinor))
+        .append(String.format(
+            "Expected at least %d.%d, but found %d.%d\n",
+            expectedMajor, expectedMinor, foundMajor, foundMinor))
         .append(String.format("JVM Location: %s\n", jvmLocation))
         .append(String.format("Runtime DLL Location: %s\n", runtimePath))
         .append("See https://wpilib.org/jvmruntime for more information\n");

@@ -16,11 +16,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** A hatch mechanism actuated by a single {@link edu.wpi.first.wpilibj.DoubleSolenoid}. */
 public class HatchSubsystem extends SubsystemBase {
-  private final DoubleSolenoid m_hatchSolenoid =
-      new DoubleSolenoid(
-          PneumaticsModuleType.CTREPCM,
-          HatchConstants.kHatchSolenoidPorts[0],
-          HatchConstants.kHatchSolenoidPorts[1]);
+  private final DoubleSolenoid m_hatchSolenoid = new DoubleSolenoid(
+      PneumaticsModuleType.CTREPCM,
+      HatchConstants.kHatchSolenoidPorts[0],
+      HatchConstants.kHatchSolenoidPorts[1]);
 
   /** Grabs the hatch. */
   public Command grabHatchCommand() {

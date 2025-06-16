@@ -27,12 +27,10 @@ class CubicHermiteSplineTest {
     // var start = System.nanoTime();
 
     // Generate and parameterize the spline.
-    var controlVectors =
-        SplineHelper.getCubicControlVectorsFromWaypoints(
-            a, waypoints.toArray(new Translation2d[0]), b);
-    var splines =
-        SplineHelper.getCubicSplinesFromControlVectors(
-            controlVectors[0], waypoints.toArray(new Translation2d[0]), controlVectors[1]);
+    var controlVectors = SplineHelper.getCubicControlVectorsFromWaypoints(
+        a, waypoints.toArray(new Translation2d[0]), b);
+    var splines = SplineHelper.getCubicSplinesFromControlVectors(
+        controlVectors[0], waypoints.toArray(new Translation2d[0]), controlVectors[1]);
 
     var poses = new ArrayList<PoseWithCurvature>();
 
@@ -64,11 +62,10 @@ class CubicHermiteSplineTest {
     assertAll(
         () -> assertEquals(a.getX(), poses.get(0).poseMeters.getX(), 1E-9),
         () -> assertEquals(a.getY(), poses.get(0).poseMeters.getY(), 1E-9),
-        () ->
-            assertEquals(
-                a.getRotation().getRadians(),
-                poses.get(0).poseMeters.getRotation().getRadians(),
-                1E-9));
+        () -> assertEquals(
+            a.getRotation().getRadians(),
+            poses.get(0).poseMeters.getRotation().getRadians(),
+            1E-9));
 
     // Check interior waypoints
     boolean interiorsGood = true;
@@ -88,11 +85,10 @@ class CubicHermiteSplineTest {
     assertAll(
         () -> assertEquals(b.getX(), poses.get(poses.size() - 1).poseMeters.getX(), 1E-9),
         () -> assertEquals(b.getY(), poses.get(poses.size() - 1).poseMeters.getY(), 1E-9),
-        () ->
-            assertEquals(
-                b.getRotation().getRadians(),
-                poses.get(poses.size() - 1).poseMeters.getRotation().getRadians(),
-                1E-9));
+        () -> assertEquals(
+            b.getRotation().getRadians(),
+            poses.get(poses.size() - 1).poseMeters.getRotation().getRadians(),
+            1E-9));
   }
 
   @Test
@@ -140,17 +136,15 @@ class CubicHermiteSplineTest {
   void testMalformed() {
     assertThrows(
         MalformedSplineException.class,
-        () ->
-            run(
-                new Pose2d(0, 0, Rotation2d.kZero),
-                new ArrayList<>(),
-                new Pose2d(1, 0, Rotation2d.kPi)));
+        () -> run(
+            new Pose2d(0, 0, Rotation2d.kZero),
+            new ArrayList<>(),
+            new Pose2d(1, 0, Rotation2d.kPi)));
     assertThrows(
         MalformedSplineException.class,
-        () ->
-            run(
-                new Pose2d(10, 10, Rotation2d.kCCW_Pi_2),
-                List.of(new Translation2d(10, 10.5)),
-                new Pose2d(10, 11, Rotation2d.kCW_Pi_2)));
+        () -> run(
+            new Pose2d(10, 10, Rotation2d.kCCW_Pi_2),
+            List.of(new Translation2d(10, 10.5)),
+            new Pose2d(10, 11, Rotation2d.kCW_Pi_2)));
   }
 }

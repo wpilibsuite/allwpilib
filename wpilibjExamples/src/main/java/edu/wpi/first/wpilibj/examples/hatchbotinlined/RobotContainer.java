@@ -54,9 +54,8 @@ public class RobotContainer {
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
         Commands.run(
-            () ->
-                m_robotDrive.arcadeDrive(
-                    -m_driverController.getLeftY(), -m_driverController.getRightX()),
+            () -> m_robotDrive.arcadeDrive(
+                -m_driverController.getLeftY(), -m_driverController.getRightX()),
             m_robotDrive));
 
     // Add commands to the autonomous command chooser
@@ -72,20 +71,14 @@ public class RobotContainer {
 
     // Set the scheduler to log Shuffleboard events for command initialize, interrupt, finish
     CommandScheduler.getInstance()
-        .onCommandInitialize(
-            command ->
-                Shuffleboard.addEventMarker(
-                    "Command initialized", command.getName(), EventImportance.kNormal));
+        .onCommandInitialize(command -> Shuffleboard.addEventMarker(
+            "Command initialized", command.getName(), EventImportance.kNormal));
     CommandScheduler.getInstance()
-        .onCommandInterrupt(
-            command ->
-                Shuffleboard.addEventMarker(
-                    "Command interrupted", command.getName(), EventImportance.kNormal));
+        .onCommandInterrupt(command -> Shuffleboard.addEventMarker(
+            "Command interrupted", command.getName(), EventImportance.kNormal));
     CommandScheduler.getInstance()
-        .onCommandFinish(
-            command ->
-                Shuffleboard.addEventMarker(
-                    "Command finished", command.getName(), EventImportance.kNormal));
+        .onCommandFinish(command -> Shuffleboard.addEventMarker(
+            "Command finished", command.getName(), EventImportance.kNormal));
   }
 
   /**

@@ -191,20 +191,16 @@ public final class TestBench {
   /** Gets two lists of possible DIO pairs for the two pairs. */
   private static List<List<Integer[]>> getDIOCrossConnect() {
     List<List<Integer[]>> pairs = new ArrayList<>();
-    List<Integer[]> setA =
-        List.of(
-            new Integer[][] {
-              {DIOCrossConnectA1, DIOCrossConnectA2},
-              {DIOCrossConnectA2, DIOCrossConnectA1}
-            });
+    List<Integer[]> setA = List.of(new Integer[][] {
+      {DIOCrossConnectA1, DIOCrossConnectA2},
+      {DIOCrossConnectA2, DIOCrossConnectA1}
+    });
     pairs.add(setA);
 
-    List<Integer[]> setB =
-        List.of(
-            new Integer[][] {
-              {DIOCrossConnectB1, DIOCrossConnectB2},
-              {DIOCrossConnectB2, DIOCrossConnectB1}
-            });
+    List<Integer[]> setB = List.of(new Integer[][] {
+      {DIOCrossConnectB1, DIOCrossConnectB2},
+      {DIOCrossConnectB2, DIOCrossConnectB1}
+    });
     pairs.add(setB);
     // NOTE: IF MORE DIOCROSSCONNECT PAIRS ARE ADDED ADD THEM HERE
     return pairs;

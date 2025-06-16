@@ -226,16 +226,15 @@ public interface LEDPattern {
   default LEDPattern scrollAtRelativeSpeed(Frequency velocity) {
     final double periodMicros = velocity.asPeriod().in(Microseconds);
 
-    return mapIndex(
-        (bufLen, index) -> {
-          long now = RobotController.getTime();
+    return mapIndex((bufLen, index) -> {
+      long now = RobotController.getTime();
 
-          // index should move by (buf.length) / (period)
-          double t = (now % (long) periodMicros) / periodMicros;
-          int offset = (int) (t * bufLen);
+      // index should move by (buf.length) / (period)
+      double t = (now % (long) periodMicros) / periodMicros;
+      int offset = (int) (t * bufLen);
 
-          return Math.floorMod(index + offset, bufLen);
-        });
+      return Math.floorMod(index + offset, bufLen);
+    });
   }
 
   /**
@@ -270,16 +269,15 @@ public interface LEDPattern {
     var metersPerMicro = velocity.in(Meters.per(Microsecond));
     var microsPerLED = (int) (ledSpacing.in(Meters) / metersPerMicro);
 
-    return mapIndex(
-        (bufLen, index) -> {
-          long now = RobotController.getTime();
+    return mapIndex((bufLen, index) -> {
+      long now = RobotController.getTime();
 
-          // every step in time that's a multiple of microsPerLED will increment the offset by 1
-          var offset = (int) (now / microsPerLED);
+      // every step in time that's a multiple of microsPerLED will increment the offset by 1
+      var offset = (int) (now / microsPerLED);
 
-          // floorMod so if the offset is negative, we still get positive outputs
-          return Math.floorMod(index + offset, bufLen);
-        });
+      // floorMod so if the offset is negative, we still get positive outputs
+      return Math.floorMod(index + offset, bufLen);
+    });
   }
 
   /**
@@ -343,25 +341,23 @@ public interface LEDPattern {
     final long periodMicros = (long) period.in(Microseconds);
 
     return (reader, writer) -> {
-      applyTo(
-          reader,
-          (i, r, g, b) -> {
-            // How far we are in the cycle, in the range [0, 1)
-            double t = (RobotController.getTime() % periodMicros) / (double) periodMicros;
-            double phase = t * 2 * Math.PI;
+      applyTo(reader, (i, r, g, b) -> {
+        // How far we are in the cycle, in the range [0, 1)
+        double t = (RobotController.getTime() % periodMicros) / (double) periodMicros;
+        double phase = t * 2 * Math.PI;
 
-            // Apply the cosine function and shift its output from [-1, 1] to [0, 1]
-            // Use cosine so the period starts at 100% brightness
-            double dim = (Math.cos(phase) + 1) / 2.0;
+        // Apply the cosine function and shift its output from [-1, 1] to [0, 1]
+        // Use cosine so the period starts at 100% brightness
+        double dim = (Math.cos(phase) + 1) / 2.0;
 
-            int output = Color.lerpRGB(0, 0, 0, r, g, b, dim);
+        int output = Color.lerpRGB(0, 0, 0, r, g, b, dim);
 
-            writer.setRGB(
-                i,
-                Color.unpackRGB(output, Color.RGBChannel.kRed),
-                Color.unpackRGB(output, Color.RGBChannel.kGreen),
-                Color.unpackRGB(output, Color.RGBChannel.kBlue));
-          });
+        writer.setRGB(
+            i,
+            Color.unpackRGB(output, Color.RGBChannel.kRed),
+            Color.unpackRGB(output, Color.RGBChannel.kGreen),
+            Color.unpackRGB(output, Color.RGBChannel.kBlue));
+      });
     };
   }
 
@@ -378,13 +374,11 @@ public interface LEDPattern {
       base.applyTo(reader, writer);
 
       // ... then, overwrite with the illuminated LEDs from the overlay
-      applyTo(
-          reader,
-          (i, r, g, b) -> {
-            if (r != 0 || g != 0 || b != 0) {
-              writer.setRGB(i, r, g, b);
-            }
-          });
+      applyTo(reader, (i, r, g, b) -> {
+        if (r != 0 || g != 0 || b != 0) {
+          writer.setRGB(i, r, g, b);
+        }
+      });
     };
   }
 
@@ -403,19 +397,16 @@ public interface LEDPattern {
     return (reader, writer) -> {
       applyTo(reader, writer);
 
-      other.applyTo(
-          reader,
-          (i, r, g, b) -> {
-            int blendedRGB =
-                Color.lerpRGB(
-                    reader.getRed(i), reader.getGreen(i), reader.getBlue(i), r, g, b, 0.5);
+      other.applyTo(reader, (i, r, g, b) -> {
+        int blendedRGB =
+            Color.lerpRGB(reader.getRed(i), reader.getGreen(i), reader.getBlue(i), r, g, b, 0.5);
 
-            writer.setRGB(
-                i,
-                Color.unpackRGB(blendedRGB, Color.RGBChannel.kRed),
-                Color.unpackRGB(blendedRGB, Color.RGBChannel.kGreen),
-                Color.unpackRGB(blendedRGB, Color.RGBChannel.kBlue));
-          });
+        writer.setRGB(
+            i,
+            Color.unpackRGB(blendedRGB, Color.RGBChannel.kRed),
+            Color.unpackRGB(blendedRGB, Color.RGBChannel.kGreen),
+            Color.unpackRGB(blendedRGB, Color.RGBChannel.kBlue));
+      });
     };
   }
 
@@ -435,12 +426,10 @@ public interface LEDPattern {
       // Apply the current pattern down as normal...
       applyTo(reader, writer);
 
-      mask.applyTo(
-          reader,
-          (i, r, g, b) -> {
-            // ... then perform a bitwise AND operation on each channel to apply the mask
-            writer.setRGB(i, r & reader.getRed(i), g & reader.getGreen(i), b & reader.getBlue(i));
-          });
+      mask.applyTo(reader, (i, r, g, b) -> {
+        // ... then perform a bitwise AND operation on each channel to apply the mask
+        writer.setRGB(i, r & reader.getRed(i), g & reader.getGreen(i), b & reader.getBlue(i));
+      });
     };
   }
 
@@ -471,18 +460,16 @@ public interface LEDPattern {
     double multiplier = relativeBrightness.in(Value);
 
     return (reader, writer) -> {
-      applyTo(
-          reader,
-          (i, r, g, b) -> {
-            // Clamp RGB values to keep them in the range [0, 255].
-            // Otherwise, the casts to byte would result in values like 256 wrapping to 0
+      applyTo(reader, (i, r, g, b) -> {
+        // Clamp RGB values to keep them in the range [0, 255].
+        // Otherwise, the casts to byte would result in values like 256 wrapping to 0
 
-            writer.setRGB(
-                i,
-                (int) MathUtil.clamp(r * multiplier, 0, 255),
-                (int) MathUtil.clamp(g * multiplier, 0, 255),
-                (int) MathUtil.clamp(b * multiplier, 0, 255));
-          });
+        writer.setRGB(
+            i,
+            (int) MathUtil.clamp(r * multiplier, 0, 255),
+            (int) MathUtil.clamp(g * multiplier, 0, 255),
+            (int) MathUtil.clamp(b * multiplier, 0, 255));
+      });
     };
   }
 
@@ -579,10 +566,9 @@ public interface LEDPattern {
       // precompute relevant positions for this buffer so we don't need to do a check
       // on every single LED index
       var stopPositions = new LongToObjectHashMap<Color>();
-      steps.forEach(
-          (progress, color) -> {
-            stopPositions.put((int) Math.floor(progress.doubleValue() * bufLen), color);
-          });
+      steps.forEach((progress, color) -> {
+        stopPositions.put((int) Math.floor(progress.doubleValue() * bufLen), color);
+      });
 
       Color currentColor = Color.kBlack;
       for (int led = 0; led < bufLen; led++) {
@@ -651,15 +637,8 @@ public interface LEDPattern {
 
         Color color = colors[colorIndex];
         Color nextColor = colors[nextColorIndex];
-        int gradientColor =
-            Color.lerpRGB(
-                color.red,
-                color.green,
-                color.blue,
-                nextColor.red,
-                nextColor.green,
-                nextColor.blue,
-                t);
+        int gradientColor = Color.lerpRGB(
+            color.red, color.green, color.blue, nextColor.red, nextColor.green, nextColor.blue, t);
 
         writer.setRGB(
             led,

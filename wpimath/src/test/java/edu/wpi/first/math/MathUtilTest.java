@@ -252,9 +252,8 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
 
     Translation3d result2 = MathUtil.slewRateLimit(translation3, translation4, 0.25, 2);
 
-    Translation3d expected2 =
-        new Translation3d(
-            1.0 + 1.0 / Math.sqrt(12.0), 1.0 + 1.0 / Math.sqrt(12.0), 1.0 + 1.0 / Math.sqrt(12.0));
+    Translation3d expected2 = new Translation3d(
+        1.0 + 1.0 / Math.sqrt(12.0), 1.0 + 1.0 / Math.sqrt(12.0), 1.0 + 1.0 / Math.sqrt(12.0));
 
     assertEquals(expected2, result2);
   }

@@ -65,21 +65,14 @@ class CommandDecoratorTest extends CommandTestBase {
       AtomicBoolean firstWasPolled = new AtomicBoolean(false);
 
       Command first =
-          new FunctionalCommand(
-              () -> {},
-              () -> firstHasRun.set(true),
-              interrupted -> {},
-              () -> {
-                firstWasPolled.set(true);
-                return true;
-              });
-      Command command =
-          first.until(
-              () -> {
-                assertAll(
-                    () -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get()));
-                return true;
-              });
+          new FunctionalCommand(() -> {}, () -> firstHasRun.set(true), interrupted -> {}, () -> {
+            firstWasPolled.set(true);
+            return true;
+          });
+      Command command = first.until(() -> {
+        assertAll(() -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get()));
+        return true;
+      });
 
       scheduler.schedule(command);
       scheduler.run();
@@ -114,21 +107,14 @@ class CommandDecoratorTest extends CommandTestBase {
       AtomicBoolean firstWasPolled = new AtomicBoolean(false);
 
       Command first =
-          new FunctionalCommand(
-              () -> {},
-              () -> firstHasRun.set(true),
-              interrupted -> {},
-              () -> {
-                firstWasPolled.set(true);
-                return true;
-              });
-      Command command =
-          first.onlyWhile(
-              () -> {
-                assertAll(
-                    () -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get()));
-                return false;
-              });
+          new FunctionalCommand(() -> {}, () -> firstHasRun.set(true), interrupted -> {}, () -> {
+            firstWasPolled.set(true);
+            return true;
+          });
+      Command command = first.onlyWhile(() -> {
+        assertAll(() -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get()));
+        return false;
+      });
 
       scheduler.schedule(command);
       scheduler.run();
@@ -247,20 +233,12 @@ class CommandDecoratorTest extends CommandTestBase {
       AtomicBoolean dictatorWasPolled = new AtomicBoolean(false);
 
       Command dictator =
-          new FunctionalCommand(
-              () -> {},
-              () -> dictatorHasRun.set(true),
-              interrupted -> {},
-              () -> {
-                dictatorWasPolled.set(true);
-                return true;
-              });
-      Command other =
-          Commands.run(
-              () ->
-                  assertAll(
-                      () -> assertTrue(dictatorHasRun.get()),
-                      () -> assertTrue(dictatorWasPolled.get())));
+          new FunctionalCommand(() -> {}, () -> dictatorHasRun.set(true), interrupted -> {}, () -> {
+            dictatorWasPolled.set(true);
+            return true;
+          });
+      Command other = Commands.run(() -> assertAll(
+          () -> assertTrue(dictatorHasRun.get()), () -> assertTrue(dictatorWasPolled.get())));
 
       Command group = dictator.deadlineFor(other);
 
@@ -301,20 +279,12 @@ class CommandDecoratorTest extends CommandTestBase {
       AtomicBoolean dictatorHasRun = new AtomicBoolean(false);
       AtomicBoolean dictatorWasPolled = new AtomicBoolean(false);
       Command dictator =
-          new FunctionalCommand(
-              () -> {},
-              () -> dictatorHasRun.set(true),
-              interrupted -> {},
-              () -> {
-                dictatorWasPolled.set(true);
-                return true;
-              });
-      Command other =
-          Commands.run(
-              () ->
-                  assertAll(
-                      () -> assertTrue(dictatorHasRun.get()),
-                      () -> assertTrue(dictatorWasPolled.get())));
+          new FunctionalCommand(() -> {}, () -> dictatorHasRun.set(true), interrupted -> {}, () -> {
+            dictatorWasPolled.set(true);
+            return true;
+          });
+      Command other = Commands.run(() -> assertAll(
+          () -> assertTrue(dictatorHasRun.get()), () -> assertTrue(dictatorWasPolled.get())));
       Command group = other.withDeadline(dictator);
       scheduler.schedule(group);
       scheduler.run();
@@ -351,19 +321,12 @@ class CommandDecoratorTest extends CommandTestBase {
       AtomicBoolean firstWasPolled = new AtomicBoolean(false);
 
       Command command1 =
-          new FunctionalCommand(
-              () -> {},
-              () -> firstHasRun.set(true),
-              interrupted -> {},
-              () -> {
-                firstWasPolled.set(true);
-                return true;
-              });
-      Command command2 =
-          Commands.run(
-              () ->
-                  assertAll(
-                      () -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get())));
+          new FunctionalCommand(() -> {}, () -> firstHasRun.set(true), interrupted -> {}, () -> {
+            firstWasPolled.set(true);
+            return true;
+          });
+      Command command2 = Commands.run(() ->
+          assertAll(() -> assertTrue(firstHasRun.get()), () -> assertTrue(firstWasPolled.get())));
 
       Command group = command1.alongWith(command2);
 
@@ -396,20 +359,14 @@ class CommandDecoratorTest extends CommandTestBase {
       AtomicBoolean firstWasPolled = new AtomicBoolean(false);
 
       Command command1 =
-          new FunctionalCommand(
-              () -> {},
-              () -> firstHasRun.set(true),
-              interrupted -> {},
-              () -> {
-                firstWasPolled.set(true);
-                return true;
-              });
-      Command command2 =
-          Commands.run(
-              () -> {
-                assertTrue(firstHasRun.get());
-                assertTrue(firstWasPolled.get());
-              });
+          new FunctionalCommand(() -> {}, () -> firstHasRun.set(true), interrupted -> {}, () -> {
+            firstWasPolled.set(true);
+            return true;
+          });
+      Command command2 = Commands.run(() -> {
+        assertTrue(firstHasRun.get());
+        assertTrue(firstWasPolled.get());
+      });
 
       Command group = command1.raceWith(command2);
 
@@ -464,23 +421,21 @@ class CommandDecoratorTest extends CommandTestBase {
       AtomicInteger first = new AtomicInteger(0);
       AtomicInteger second = new AtomicInteger(0);
 
-      Command command =
-          new FunctionalCommand(
-                  () -> {},
-                  () -> {},
-                  interrupted -> {
-                    if (!interrupted) {
-                      first.incrementAndGet();
-                    }
-                  },
-                  () -> true)
-              .finallyDo(
-                  interrupted -> {
-                    if (!interrupted) {
-                      // to differentiate between "didn't run" and "ran before command's `end()`
-                      second.addAndGet(1 + first.get());
-                    }
-                  });
+      Command command = new FunctionalCommand(
+              () -> {},
+              () -> {},
+              interrupted -> {
+                if (!interrupted) {
+                  first.incrementAndGet();
+                }
+              },
+              () -> true)
+          .finallyDo(interrupted -> {
+            if (!interrupted) {
+              // to differentiate between "didn't run" and "ran before command's `end()`
+              second.addAndGet(1 + first.get());
+            }
+          });
 
       scheduler.schedule(command);
       assertEquals(0, first.get());
@@ -500,21 +455,19 @@ class CommandDecoratorTest extends CommandTestBase {
       AtomicInteger first = new AtomicInteger(0);
       AtomicInteger second = new AtomicInteger(0);
 
-      Command command =
-          new FunctionalCommand(
-                  () -> {},
-                  () -> {},
-                  interrupted -> {
-                    if (interrupted) {
-                      first.incrementAndGet();
-                    }
-                  },
-                  () -> false)
-              .handleInterrupt(
-                  () -> {
-                    // to differentiate between "didn't run" and "ran before command's `end()`
-                    second.addAndGet(1 + first.get());
-                  });
+      Command command = new FunctionalCommand(
+              () -> {},
+              () -> {},
+              interrupted -> {
+                if (interrupted) {
+                  first.incrementAndGet();
+                }
+              },
+              () -> false)
+          .handleInterrupt(() -> {
+            // to differentiate between "didn't run" and "ran before command's `end()`
+            second.addAndGet(1 + first.get());
+          });
 
       scheduler.schedule(command);
       scheduler.run();

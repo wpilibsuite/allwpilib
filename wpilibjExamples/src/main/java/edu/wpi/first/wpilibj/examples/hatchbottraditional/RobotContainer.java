@@ -38,9 +38,8 @@ public class RobotContainer {
   // The autonomous routines
 
   // A simple auto routine that drives forward a specified distance, and then stops.
-  private final Command m_simpleAuto =
-      new DriveDistance(
-          AutoConstants.kAutoDriveDistanceInches, AutoConstants.kAutoDriveSpeed, m_robotDrive);
+  private final Command m_simpleAuto = new DriveDistance(
+      AutoConstants.kAutoDriveDistanceInches, AutoConstants.kAutoDriveSpeed, m_robotDrive);
 
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
   private final Command m_complexAuto = new ComplexAuto(m_robotDrive, m_hatchSubsystem);
@@ -78,25 +77,17 @@ public class RobotContainer {
 
     // Log Shuffleboard events for command initialize, execute, finish, interrupt
     CommandScheduler.getInstance()
-        .onCommandInitialize(
-            command ->
-                Shuffleboard.addEventMarker(
-                    "Command initialized", command.getName(), EventImportance.kNormal));
+        .onCommandInitialize(command -> Shuffleboard.addEventMarker(
+            "Command initialized", command.getName(), EventImportance.kNormal));
     CommandScheduler.getInstance()
-        .onCommandExecute(
-            command ->
-                Shuffleboard.addEventMarker(
-                    "Command executed", command.getName(), EventImportance.kNormal));
+        .onCommandExecute(command -> Shuffleboard.addEventMarker(
+            "Command executed", command.getName(), EventImportance.kNormal));
     CommandScheduler.getInstance()
-        .onCommandFinish(
-            command ->
-                Shuffleboard.addEventMarker(
-                    "Command finished", command.getName(), EventImportance.kNormal));
+        .onCommandFinish(command -> Shuffleboard.addEventMarker(
+            "Command finished", command.getName(), EventImportance.kNormal));
     CommandScheduler.getInstance()
-        .onCommandInterrupt(
-            command ->
-                Shuffleboard.addEventMarker(
-                    "Command interrupted", command.getName(), EventImportance.kNormal));
+        .onCommandInterrupt(command -> Shuffleboard.addEventMarker(
+            "Command interrupted", command.getName(), EventImportance.kNormal));
   }
 
   /**

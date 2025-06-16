@@ -24,43 +24,41 @@ public class MockDS {
 
   /** Start the mock DS thread. */
   public void start() {
-    m_thread =
-        new Thread(
-            () -> {
-              DatagramSocket socket;
-              try {
-                socket = new DatagramSocket();
-              } catch (SocketException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-                return;
-              }
-              InetSocketAddress addr = new InetSocketAddress("127.0.0.1", 1110);
-              byte[] sendData = new byte[6];
-              DatagramPacket packet = new DatagramPacket(sendData, 0, 6, addr);
-              short sendCount = 0;
-              int initCount = 0;
-              while (!Thread.currentThread().isInterrupted()) {
-                try {
-                  Thread.sleep(20);
-                  generateEnabledDsPacket(sendData, sendCount++);
-                  // ~50 disabled packets are required to make the robot actually enable
-                  // 1 is definitely not enough.
-                  if (initCount < 50) {
-                    initCount++;
-                    sendData[3] = 0;
-                  }
-                  packet.setData(sendData);
-                  socket.send(packet);
-                } catch (InterruptedException ex) {
-                  Thread.currentThread().interrupt();
-                } catch (IOException ex) {
-                  // TODO Auto-generated catch block
-                  ex.printStackTrace();
-                }
-              }
-              socket.close();
-            });
+    m_thread = new Thread(() -> {
+      DatagramSocket socket;
+      try {
+        socket = new DatagramSocket();
+      } catch (SocketException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+        return;
+      }
+      InetSocketAddress addr = new InetSocketAddress("127.0.0.1", 1110);
+      byte[] sendData = new byte[6];
+      DatagramPacket packet = new DatagramPacket(sendData, 0, 6, addr);
+      short sendCount = 0;
+      int initCount = 0;
+      while (!Thread.currentThread().isInterrupted()) {
+        try {
+          Thread.sleep(20);
+          generateEnabledDsPacket(sendData, sendCount++);
+          // ~50 disabled packets are required to make the robot actually enable
+          // 1 is definitely not enough.
+          if (initCount < 50) {
+            initCount++;
+            sendData[3] = 0;
+          }
+          packet.setData(sendData);
+          socket.send(packet);
+        } catch (InterruptedException ex) {
+          Thread.currentThread().interrupt();
+        } catch (IOException ex) {
+          // TODO Auto-generated catch block
+          ex.printStackTrace();
+        }
+      }
+      socket.close();
+    });
     // Because of the test setup in Java, this thread will not be stopped
     // So it must be a daemon thread
     m_thread.setDaemon(true);

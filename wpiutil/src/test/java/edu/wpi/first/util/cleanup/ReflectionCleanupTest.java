@@ -33,7 +33,9 @@ class ReflectionCleanupTest {
   }
 
   static class CleanupTest2 extends CleanupTest {
-    @SkipCleanup public CleanupClass m_class3 = new CleanupClass();
+    @SkipCleanup
+    public CleanupClass m_class3 = new CleanupClass();
+
     public CleanupClass m_class4 = new CleanupClass();
 
     @Override

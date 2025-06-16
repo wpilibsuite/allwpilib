@@ -24,7 +24,8 @@ public class PrimitiveHandler extends ElementHandler {
   protected PrimitiveHandler(ProcessingEnvironment processingEnv) {
     super(processingEnv);
 
-    m_javaLangString = processingEnv.getElementUtils().getTypeElement("java.lang.String").asType();
+    m_javaLangString =
+        processingEnv.getElementUtils().getTypeElement("java.lang.String").asType();
   }
 
   @Override

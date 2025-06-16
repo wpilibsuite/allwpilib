@@ -33,18 +33,16 @@ public class Drive extends SubsystemBase {
       new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
 
   // The left-side drive encoder
-  private final Encoder m_leftEncoder =
-      new Encoder(
-          DriveConstants.kLeftEncoderPorts[0],
-          DriveConstants.kLeftEncoderPorts[1],
-          DriveConstants.kLeftEncoderReversed);
+  private final Encoder m_leftEncoder = new Encoder(
+      DriveConstants.kLeftEncoderPorts[0],
+      DriveConstants.kLeftEncoderPorts[1],
+      DriveConstants.kLeftEncoderReversed);
 
   // The right-side drive encoder
-  private final Encoder m_rightEncoder =
-      new Encoder(
-          DriveConstants.kRightEncoderPorts[0],
-          DriveConstants.kRightEncoderPorts[1],
-          DriveConstants.kRightEncoderReversed);
+  private final Encoder m_rightEncoder = new Encoder(
+      DriveConstants.kRightEncoderPorts[0],
+      DriveConstants.kRightEncoderPorts[1],
+      DriveConstants.kRightEncoderReversed);
 
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutVoltage m_appliedVoltage = Volts.mutable(0);
@@ -54,41 +52,36 @@ public class Drive extends SubsystemBase {
   private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
 
   // Create a new SysId routine for characterizing the drive.
-  private final SysIdRoutine m_sysIdRoutine =
-      new SysIdRoutine(
-          // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-          new SysIdRoutine.Config(),
-          new SysIdRoutine.Mechanism(
-              // Tell SysId how to plumb the driving voltage to the motors.
-              voltage -> {
-                m_leftMotor.setVoltage(voltage);
-                m_rightMotor.setVoltage(voltage);
-              },
-              // Tell SysId how to record a frame of data for each motor on the mechanism being
-              // characterized.
-              log -> {
-                // Record a frame for the left motors.  Since these share an encoder, we consider
-                // the entire group to be one motor.
-                log.motor("drive-left")
-                    .voltage(
-                        m_appliedVoltage.mut_replace(
-                            m_leftMotor.get() * RobotController.getBatteryVoltage(), Volts))
-                    .linearPosition(m_distance.mut_replace(m_leftEncoder.getDistance(), Meters))
-                    .linearVelocity(
-                        m_velocity.mut_replace(m_leftEncoder.getRate(), MetersPerSecond));
-                // Record a frame for the right motors.  Since these share an encoder, we consider
-                // the entire group to be one motor.
-                log.motor("drive-right")
-                    .voltage(
-                        m_appliedVoltage.mut_replace(
-                            m_rightMotor.get() * RobotController.getBatteryVoltage(), Volts))
-                    .linearPosition(m_distance.mut_replace(m_rightEncoder.getDistance(), Meters))
-                    .linearVelocity(
-                        m_velocity.mut_replace(m_rightEncoder.getRate(), MetersPerSecond));
-              },
-              // Tell SysId to make generated commands require this subsystem, suffix test state in
-              // WPILog with this subsystem's name ("drive")
-              this));
+  private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+      // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+      new SysIdRoutine.Config(),
+      new SysIdRoutine.Mechanism(
+          // Tell SysId how to plumb the driving voltage to the motors.
+          voltage -> {
+            m_leftMotor.setVoltage(voltage);
+            m_rightMotor.setVoltage(voltage);
+          },
+          // Tell SysId how to record a frame of data for each motor on the mechanism being
+          // characterized.
+          log -> {
+            // Record a frame for the left motors.  Since these share an encoder, we consider
+            // the entire group to be one motor.
+            log.motor("drive-left")
+                .voltage(m_appliedVoltage.mut_replace(
+                    m_leftMotor.get() * RobotController.getBatteryVoltage(), Volts))
+                .linearPosition(m_distance.mut_replace(m_leftEncoder.getDistance(), Meters))
+                .linearVelocity(m_velocity.mut_replace(m_leftEncoder.getRate(), MetersPerSecond));
+            // Record a frame for the right motors.  Since these share an encoder, we consider
+            // the entire group to be one motor.
+            log.motor("drive-right")
+                .voltage(m_appliedVoltage.mut_replace(
+                    m_rightMotor.get() * RobotController.getBatteryVoltage(), Volts))
+                .linearPosition(m_distance.mut_replace(m_rightEncoder.getDistance(), Meters))
+                .linearVelocity(m_velocity.mut_replace(m_rightEncoder.getRate(), MetersPerSecond));
+          },
+          // Tell SysId to make generated commands require this subsystem, suffix test state in
+          // WPILog with this subsystem's name ("drive")
+          this));
 
   /** Creates a new Drive subsystem. */
   public Drive() {

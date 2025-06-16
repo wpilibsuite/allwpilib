@@ -128,14 +128,13 @@ public class Odometry3d<T> {
     var angle_difference = angle.minus(m_previousAngle).toVector();
 
     var twist2d = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);
-    var twist =
-        new Twist3d(
-            twist2d.dx,
-            twist2d.dy,
-            0,
-            angle_difference.get(0),
-            angle_difference.get(1),
-            angle_difference.get(2));
+    var twist = new Twist3d(
+        twist2d.dx,
+        twist2d.dy,
+        0,
+        angle_difference.get(0),
+        angle_difference.get(1),
+        angle_difference.get(2));
 
     var newPose = m_poseMeters.exp(twist);
 

@@ -26,12 +26,11 @@ class HolonomicDriveControllerTest {
 
   @Test
   void testReachesReference() {
-    HolonomicDriveController controller =
-        new HolonomicDriveController(
-            new PIDController(1.0, 0.0, 0.0),
-            new PIDController(1.0, 0.0, 0.0),
-            new ProfiledPIDController(
-                1.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2.0 * Math.PI, Math.PI)));
+    HolonomicDriveController controller = new HolonomicDriveController(
+        new PIDController(1.0, 0.0, 0.0),
+        new PIDController(1.0, 0.0, 0.0),
+        new ProfiledPIDController(
+            1.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2.0 * Math.PI, Math.PI)));
     Pose2d robotPose = new Pose2d(2.7, 23.0, Rotation2d.kZero);
 
     List<Pose2d> waypoints = new ArrayList<>();
@@ -48,12 +47,10 @@ class HolonomicDriveControllerTest {
       Trajectory.State state = trajectory.sample(kDt * i);
       ChassisSpeeds output = controller.calculate(robotPose, state, Rotation2d.kZero);
 
-      robotPose =
-          robotPose.exp(
-              new Twist2d(
-                  output.vxMetersPerSecond * kDt,
-                  output.vyMetersPerSecond * kDt,
-                  output.omegaRadiansPerSecond * kDt));
+      robotPose = robotPose.exp(new Twist2d(
+          output.vxMetersPerSecond * kDt,
+          output.vyMetersPerSecond * kDt,
+          output.omegaRadiansPerSecond * kDt));
     }
 
     final List<Trajectory.State> states = trajectory.getStates();
@@ -66,24 +63,21 @@ class HolonomicDriveControllerTest {
     assertAll(
         () -> assertEquals(endPose.getX(), finalRobotPose.getX(), kTolerance),
         () -> assertEquals(endPose.getY(), finalRobotPose.getY(), kTolerance),
-        () ->
-            assertEquals(
-                0.0,
-                MathUtil.angleModulus(finalRobotPose.getRotation().getRadians()),
-                kAngularTolerance));
+        () -> assertEquals(
+            0.0,
+            MathUtil.angleModulus(finalRobotPose.getRotation().getRadians()),
+            kAngularTolerance));
   }
 
   @Test
   void testDoesNotRotateUnnecessarily() {
-    var controller =
-        new HolonomicDriveController(
-            new PIDController(1, 0, 0),
-            new PIDController(1, 0, 0),
-            new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(4, 2)));
+    var controller = new HolonomicDriveController(
+        new PIDController(1, 0, 0),
+        new PIDController(1, 0, 0),
+        new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(4, 2)));
 
-    ChassisSpeeds speeds =
-        controller.calculate(
-            new Pose2d(0, 0, new Rotation2d(1.57)), Pose2d.kZero, 0, new Rotation2d(1.57));
+    ChassisSpeeds speeds = controller.calculate(
+        new Pose2d(0, 0, new Rotation2d(1.57)), Pose2d.kZero, 0, new Rotation2d(1.57));
 
     assertEquals(0.0, speeds.omegaRadiansPerSecond);
   }

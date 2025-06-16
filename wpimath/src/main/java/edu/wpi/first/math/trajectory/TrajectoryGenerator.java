@@ -79,10 +79,8 @@ public final class TrajectoryGenerator {
     // Get the spline points
     List<PoseWithCurvature> points;
     try {
-      points =
-          splinePointsFromSplines(
-              SplineHelper.getCubicSplinesFromControlVectors(
-                  newInitial, interiorWaypoints.toArray(new Translation2d[0]), newEnd));
+      points = splinePointsFromSplines(SplineHelper.getCubicSplinesFromControlVectors(
+          newInitial, interiorWaypoints.toArray(new Translation2d[0]), newEnd));
     } catch (MalformedSplineException ex) {
       reportError(ex.getMessage(), ex.getStackTrace());
       return kDoNothingTrajectory;
@@ -121,9 +119,8 @@ public final class TrajectoryGenerator {
    */
   public static Trajectory generateTrajectory(
       Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, TrajectoryConfig config) {
-    var controlVectors =
-        SplineHelper.getCubicControlVectorsFromWaypoints(
-            start, interiorWaypoints.toArray(new Translation2d[0]), end);
+    var controlVectors = SplineHelper.getCubicControlVectorsFromWaypoints(
+        start, interiorWaypoints.toArray(new Translation2d[0]), end);
 
     // Return the generated trajectory.
     return generateTrajectory(controlVectors[0], interiorWaypoints, controlVectors[1], config);
@@ -155,10 +152,8 @@ public final class TrajectoryGenerator {
     // Get the spline points
     List<PoseWithCurvature> points;
     try {
-      points =
-          splinePointsFromSplines(
-              SplineHelper.getQuinticSplinesFromControlVectors(
-                  newControlVectors.toArray(new Spline.ControlVector[] {})));
+      points = splinePointsFromSplines(SplineHelper.getQuinticSplinesFromControlVectors(
+          newControlVectors.toArray(new Spline.ControlVector[] {})));
     } catch (MalformedSplineException ex) {
       reportError(ex.getMessage(), ex.getStackTrace());
       return kDoNothingTrajectory;
@@ -205,10 +200,8 @@ public final class TrajectoryGenerator {
     // Get the spline points
     List<PoseWithCurvature> points;
     try {
-      points =
-          splinePointsFromSplines(
-              SplineHelper.optimizeCurvature(
-                  SplineHelper.getQuinticSplinesFromWaypoints(newWaypoints)));
+      points = splinePointsFromSplines(SplineHelper.optimizeCurvature(
+          SplineHelper.getQuinticSplinesFromWaypoints(newWaypoints)));
     } catch (MalformedSplineException ex) {
       reportError(ex.getMessage(), ex.getStackTrace());
       return kDoNothingTrajectory;

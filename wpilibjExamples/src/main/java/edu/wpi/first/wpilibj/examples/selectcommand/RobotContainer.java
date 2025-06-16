@@ -35,14 +35,13 @@ public class RobotContainer {
   // by the selector method at runtime.  Note that selectcommand works on Object(), so the
   // selector does not have to be an enum; it could be any desired type (string, integer,
   // boolean, double...)
-  private final Command m_exampleSelectCommand =
-      new SelectCommand<>(
-          // Maps selector values to commands
-          Map.ofEntries(
-              Map.entry(CommandSelector.ONE, new PrintCommand("Command one was selected!")),
-              Map.entry(CommandSelector.TWO, new PrintCommand("Command two was selected!")),
-              Map.entry(CommandSelector.THREE, new PrintCommand("Command three was selected!"))),
-          this::select);
+  private final Command m_exampleSelectCommand = new SelectCommand<>(
+      // Maps selector values to commands
+      Map.ofEntries(
+          Map.entry(CommandSelector.ONE, new PrintCommand("Command one was selected!")),
+          Map.entry(CommandSelector.TWO, new PrintCommand("Command two was selected!")),
+          Map.entry(CommandSelector.THREE, new PrintCommand("Command three was selected!"))),
+      this::select);
 
   public RobotContainer() {
     // Configure the button bindings

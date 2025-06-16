@@ -61,11 +61,10 @@ public final class SensorUtil {
    */
   public static void checkDigitalChannel(final int channel) {
     if (!DIOJNI.checkDIOChannel(channel)) {
-      String buf =
-          "Requested DIO channel is out of range. Minimum: 0, Maximum: "
-              + kDigitalChannels
-              + ", Requested: "
-              + channel;
+      String buf = "Requested DIO channel is out of range. Minimum: 0, Maximum: "
+          + kDigitalChannels
+          + ", Requested: "
+          + channel;
       throw new IllegalArgumentException(buf);
     }
   }
@@ -78,11 +77,10 @@ public final class SensorUtil {
    */
   public static void checkRelayChannel(final int channel) {
     if (!RelayJNI.checkRelayChannel(channel)) {
-      String buf =
-          "Requested relay channel is out of range. Minimum: 0, Maximum: "
-              + kRelayChannels
-              + ", Requested: "
-              + channel;
+      String buf = "Requested relay channel is out of range. Minimum: 0, Maximum: "
+          + kRelayChannels
+          + ", Requested: "
+          + channel;
       throw new IllegalArgumentException(buf);
     }
   }
@@ -95,11 +93,10 @@ public final class SensorUtil {
    */
   public static void checkPWMChannel(final int channel) {
     if (!PWMJNI.checkPWMChannel(channel)) {
-      String buf =
-          "Requested PWM channel is out of range. Minimum: 0, Maximum: "
-              + kPwmChannels
-              + ", Requested: "
-              + channel;
+      String buf = "Requested PWM channel is out of range. Minimum: 0, Maximum: "
+          + kPwmChannels
+          + ", Requested: "
+          + channel;
       throw new IllegalArgumentException(buf);
     }
   }
@@ -112,11 +109,10 @@ public final class SensorUtil {
    */
   public static void checkAnalogInputChannel(final int channel) {
     if (!AnalogJNI.checkAnalogInputChannel(channel)) {
-      String buf =
-          "Requested analog input channel is out of range. Minimum: 0, Maximum: "
-              + kAnalogInputChannels
-              + ", Requested: "
-              + channel;
+      String buf = "Requested analog input channel is out of range. Minimum: 0, Maximum: "
+          + kAnalogInputChannels
+          + ", Requested: "
+          + channel;
       throw new IllegalArgumentException(buf);
     }
   }
@@ -129,11 +125,10 @@ public final class SensorUtil {
    */
   public static void checkAnalogOutputChannel(final int channel) {
     if (!AnalogJNI.checkAnalogOutputChannel(channel)) {
-      String buf =
-          "Requested analog output channel is out of range. Minimum: 0, Maximum: "
-              + kAnalogOutputChannels
-              + ", Requested: "
-              + channel;
+      String buf = "Requested analog output channel is out of range. Minimum: 0, Maximum: "
+          + kAnalogOutputChannels
+          + ", Requested: "
+          + channel;
       throw new IllegalArgumentException(buf);
     }
   }

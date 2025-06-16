@@ -32,19 +32,17 @@ class DifferentialDrivetrainSimTest {
   @Test
   void testConvergence() {
     var motor = DCMotor.getNEO(2);
-    var plant =
-        LinearSystemId.createDrivetrainVelocitySystem(
-            motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5, 1.0);
+    var plant = LinearSystemId.createDrivetrainVelocitySystem(
+        motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5, 1.0);
 
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
-    var sim =
-        new DifferentialDrivetrainSim(
-            plant,
-            motor,
-            1,
-            kinematics.trackWidthMeters,
-            Units.inchesToMeters(2),
-            VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
+    var sim = new DifferentialDrivetrainSim(
+        plant,
+        motor,
+        1,
+        kinematics.trackWidthMeters,
+        Units.inchesToMeters(2),
+        VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
     var feedforward = new LinearPlantInversionFeedforward<>(plant, 0.020);
     var feedback = new LTVUnicycleController(0.020);
@@ -53,13 +51,12 @@ class DifferentialDrivetrainSimTest {
     // ground truth
     Matrix<N7, N1> groundTruthX = new Vector<>(Nat.N7());
 
-    var traj =
-        TrajectoryGenerator.generateTrajectory(
-            Pose2d.kZero,
-            List.of(),
-            new Pose2d(2, 2, Rotation2d.kZero),
-            new TrajectoryConfig(1, 1)
-                .addConstraint(new DifferentialDriveKinematicsConstraint(kinematics, 1)));
+    var traj = TrajectoryGenerator.generateTrajectory(
+        Pose2d.kZero,
+        List.of(),
+        new Pose2d(2, 2, Rotation2d.kZero),
+        new TrajectoryConfig(1, 1)
+            .addConstraint(new DifferentialDriveKinematicsConstraint(kinematics, 1)));
 
     for (double t = 0; t < traj.getTotalTimeSeconds(); t += 0.020) {
       var state = traj.sample(t);
@@ -67,9 +64,8 @@ class DifferentialDrivetrainSimTest {
 
       var wheelSpeeds = kinematics.toWheelSpeeds(feedbackOut);
 
-      var voltages =
-          feedforward.calculate(
-              VecBuilder.fill(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond));
+      var voltages = feedforward.calculate(
+          VecBuilder.fill(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond));
 
       // Sim periodic code
       sim.setInputs(voltages.get(0, 0), voltages.get(1, 0));
@@ -98,13 +94,11 @@ class DifferentialDrivetrainSimTest {
   @Test
   void testCurrent() {
     var motor = DCMotor.getNEO(2);
-    var plant =
-        LinearSystemId.createDrivetrainVelocitySystem(
-            motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5, 1.0);
+    var plant = LinearSystemId.createDrivetrainVelocitySystem(
+        motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5, 1.0);
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
-    var sim =
-        new DifferentialDrivetrainSim(
-            plant, motor, 1, kinematics.trackWidthMeters, Units.inchesToMeters(2), null);
+    var sim = new DifferentialDrivetrainSim(
+        plant, motor, 1, kinematics.trackWidthMeters, Units.inchesToMeters(2), null);
 
     sim.setInputs(-12, -12);
     for (int i = 0; i < 10; i++) {
@@ -128,19 +122,17 @@ class DifferentialDrivetrainSimTest {
   @Test
   void testModelStability() {
     var motor = DCMotor.getNEO(2);
-    var plant =
-        LinearSystemId.createDrivetrainVelocitySystem(
-            motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 2.0, 5.0);
+    var plant = LinearSystemId.createDrivetrainVelocitySystem(
+        motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 2.0, 5.0);
 
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
-    var sim =
-        new DifferentialDrivetrainSim(
-            plant,
-            motor,
-            5,
-            kinematics.trackWidthMeters,
-            Units.inchesToMeters(2),
-            VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
+    var sim = new DifferentialDrivetrainSim(
+        plant,
+        motor,
+        5,
+        kinematics.trackWidthMeters,
+        Units.inchesToMeters(2),
+        VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
     sim.setInputs(2, 4);
 

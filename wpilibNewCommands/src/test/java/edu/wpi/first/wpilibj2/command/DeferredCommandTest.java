@@ -74,12 +74,11 @@ class DeferredCommandTest extends CommandTestBase {
   @Test
   void deferredNullCommandTest() {
     DeferredCommand command = new DeferredCommand(() -> null, Set.of());
-    assertDoesNotThrow(
-        () -> {
-          command.initialize();
-          command.execute();
-          command.isFinished();
-          command.end(false);
-        });
+    assertDoesNotThrow(() -> {
+      command.initialize();
+      command.execute();
+      command.isFinished();
+      command.end(false);
+    });
   }
 }

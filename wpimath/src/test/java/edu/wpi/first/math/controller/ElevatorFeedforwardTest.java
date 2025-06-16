@@ -57,11 +57,9 @@ class ElevatorFeedforwardTest {
   @Test
   void testNegativeGains() {
     assertAll(
-        () ->
-            assertThrows(
-                IllegalArgumentException.class, () -> new ElevatorFeedforward(ks, kg, -kv, ka)),
-        () ->
-            assertThrows(
-                IllegalArgumentException.class, () -> new ElevatorFeedforward(ks, kg, kv, -ka)));
+        () -> assertThrows(
+            IllegalArgumentException.class, () -> new ElevatorFeedforward(ks, kg, -kv, ka)),
+        () -> assertThrows(
+            IllegalArgumentException.class, () -> new ElevatorFeedforward(ks, kg, kv, -ka)));
   }
 }

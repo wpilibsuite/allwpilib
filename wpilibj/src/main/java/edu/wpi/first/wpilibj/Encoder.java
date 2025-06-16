@@ -73,14 +73,13 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    * @param reverseDirection If true, counts down instead of up (this is all relative)
    */
   private void initEncoder(boolean reverseDirection, final EncodingType type) {
-    m_encoder =
-        EncoderJNI.initializeEncoder(
-            m_aSource.getPortHandleForRouting(),
-            m_aSource.getAnalogTriggerTypeForRouting(),
-            m_bSource.getPortHandleForRouting(),
-            m_bSource.getAnalogTriggerTypeForRouting(),
-            reverseDirection,
-            type.value);
+    m_encoder = EncoderJNI.initializeEncoder(
+        m_aSource.getPortHandleForRouting(),
+        m_aSource.getAnalogTriggerTypeForRouting(),
+        m_bSource.getPortHandleForRouting(),
+        m_bSource.getAnalogTriggerTypeForRouting(),
+        reverseDirection,
+        type.value);
 
     int fpgaIndex = getFPGAIndex();
     HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex + 1, type.value + 1);

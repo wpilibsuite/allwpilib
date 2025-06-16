@@ -455,11 +455,8 @@ public class PIDController implements Sendable, AutoCloseable {
     if (Math.abs(m_error) > m_iZone) {
       m_totalError = 0;
     } else if (m_ki != 0) {
-      m_totalError =
-          MathUtil.clamp(
-              m_totalError + m_error * m_period,
-              m_minimumIntegral / m_ki,
-              m_maximumIntegral / m_ki);
+      m_totalError = MathUtil.clamp(
+          m_totalError + m_error * m_period, m_minimumIntegral / m_ki, m_maximumIntegral / m_ki);
     }
 
     return m_kp * m_error + m_ki * m_totalError + m_kd * m_errorDerivative;
@@ -480,16 +477,13 @@ public class PIDController implements Sendable, AutoCloseable {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
-    builder.addDoubleProperty(
-        "izone",
-        this::getIZone,
-        (double toSet) -> {
-          try {
-            setIZone(toSet);
-          } catch (IllegalArgumentException e) {
-            MathSharedStore.reportError("IZone must be a non-negative number!", e.getStackTrace());
-          }
-        });
+    builder.addDoubleProperty("izone", this::getIZone, (double toSet) -> {
+      try {
+        setIZone(toSet);
+      } catch (IllegalArgumentException e) {
+        MathSharedStore.reportError("IZone must be a non-negative number!", e.getStackTrace());
+      }
+    });
     builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
     builder.addDoubleProperty("measurement", () -> m_measurement, null);
     builder.addDoubleProperty("error", this::getError, null);

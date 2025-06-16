@@ -39,11 +39,10 @@ class Pose2dTest {
     assertAll(
         () -> assertEquals(c * x - s * y, rotated.getX(), kEpsilon),
         () -> assertEquals(s * x + c * y, rotated.getY(), kEpsilon),
-        () ->
-            assertEquals(
-                initial.getRotation().getDegrees() + rotation.getDegrees(),
-                rotated.getRotation().getDegrees(),
-                kEpsilon));
+        () -> assertEquals(
+            initial.getRotation().getDegrees() + rotation.getDegrees(),
+            rotated.getRotation().getDegrees(),
+            kEpsilon));
   }
 
   @Test

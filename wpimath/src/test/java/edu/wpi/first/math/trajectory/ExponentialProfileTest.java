@@ -74,9 +74,8 @@ class ExponentialProfileTest {
 
     for (int i = 0; i < 300; ++i) {
       if (i == 150) {
-        profile =
-            new ExponentialProfile(
-                ExponentialProfile.Constraints.fromStateSpace(9, constraints.A, constraints.B));
+        profile = new ExponentialProfile(
+            ExponentialProfile.Constraints.fromStateSpace(9, constraints.A, constraints.B));
       }
 
       state = checkDynamics(profile, state, goal);
@@ -95,9 +94,8 @@ class ExponentialProfileTest {
 
     for (int i = 0; i < 300; ++i) {
       if (i == 150) {
-        profile =
-            new ExponentialProfile(
-                ExponentialProfile.Constraints.fromStateSpace(9, constraints.A, constraints.B));
+        profile = new ExponentialProfile(
+            ExponentialProfile.Constraints.fromStateSpace(9, constraints.A, constraints.B));
       }
 
       state = checkDynamics(profile, state, goal);
@@ -214,88 +212,87 @@ class ExponentialProfileTest {
 
   @Test
   void testHeuristic() {
-    List<TestCase> testCases =
-        List.of(
-            new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(0.75, -4),
-                new ExponentialProfile.State(1.3758, 4.4304)),
-            new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(1.4103, 4),
-                new ExponentialProfile.State(1.3758, 4.4304)),
-            new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(0.75, -4),
-                new ExponentialProfile.State(1.3758, 4.4304)),
-            new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(1.4103, 4),
-                new ExponentialProfile.State(1.3758, 4.4304)),
-            new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(0.5, -2),
-                new ExponentialProfile.State(0.4367, 3.7217)),
-            new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(0.546, 2),
-                new ExponentialProfile.State(0.4367, 3.7217)),
-            new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(0.5, -2),
-                new ExponentialProfile.State(0.5560, -2.9616)),
-            new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(0.546, 2),
-                new ExponentialProfile.State(0.5560, -2.9616)),
-            new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(-0.75, -4),
-                new ExponentialProfile.State(-0.7156, -4.4304)),
-            new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(-0.0897, 4),
-                new ExponentialProfile.State(-0.7156, -4.4304)),
-            new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(-0.75, -4),
-                new ExponentialProfile.State(-0.7156, -4.4304)),
-            new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(-0.0897, 4),
-                new ExponentialProfile.State(-0.7156, -4.4304)),
-            new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(-0.5, -4.5),
-                new ExponentialProfile.State(1.095, 4.314)),
-            new TestCase(
-                new ExponentialProfile.State(0.0, -4),
-                new ExponentialProfile.State(1.0795, 4.5),
-                new ExponentialProfile.State(-0.5122, -4.351)),
-            new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(-0.5, -4.5),
-                new ExponentialProfile.State(1.095, 4.314)),
-            new TestCase(
-                new ExponentialProfile.State(0.6603, 4),
-                new ExponentialProfile.State(1.0795, 4.5),
-                new ExponentialProfile.State(-0.5122, -4.351)),
-            new TestCase(
-                new ExponentialProfile.State(0.0, -8),
-                new ExponentialProfile.State(0, 0),
-                new ExponentialProfile.State(-0.1384, 3.342)),
-            new TestCase(
-                new ExponentialProfile.State(0.0, -8),
-                new ExponentialProfile.State(-1, 0),
-                new ExponentialProfile.State(-0.562, -6.792)),
-            new TestCase(
-                new ExponentialProfile.State(0.0, 8),
-                new ExponentialProfile.State(1, 0),
-                new ExponentialProfile.State(0.562, 6.792)),
-            new TestCase(
-                new ExponentialProfile.State(0.0, 8),
-                new ExponentialProfile.State(-1, 0),
-                new ExponentialProfile.State(-0.785, -4.346)));
+    List<TestCase> testCases = List.of(
+        new TestCase(
+            new ExponentialProfile.State(0.0, -4),
+            new ExponentialProfile.State(0.75, -4),
+            new ExponentialProfile.State(1.3758, 4.4304)),
+        new TestCase(
+            new ExponentialProfile.State(0.0, -4),
+            new ExponentialProfile.State(1.4103, 4),
+            new ExponentialProfile.State(1.3758, 4.4304)),
+        new TestCase(
+            new ExponentialProfile.State(0.6603, 4),
+            new ExponentialProfile.State(0.75, -4),
+            new ExponentialProfile.State(1.3758, 4.4304)),
+        new TestCase(
+            new ExponentialProfile.State(0.6603, 4),
+            new ExponentialProfile.State(1.4103, 4),
+            new ExponentialProfile.State(1.3758, 4.4304)),
+        new TestCase(
+            new ExponentialProfile.State(0.0, -4),
+            new ExponentialProfile.State(0.5, -2),
+            new ExponentialProfile.State(0.4367, 3.7217)),
+        new TestCase(
+            new ExponentialProfile.State(0.0, -4),
+            new ExponentialProfile.State(0.546, 2),
+            new ExponentialProfile.State(0.4367, 3.7217)),
+        new TestCase(
+            new ExponentialProfile.State(0.6603, 4),
+            new ExponentialProfile.State(0.5, -2),
+            new ExponentialProfile.State(0.5560, -2.9616)),
+        new TestCase(
+            new ExponentialProfile.State(0.6603, 4),
+            new ExponentialProfile.State(0.546, 2),
+            new ExponentialProfile.State(0.5560, -2.9616)),
+        new TestCase(
+            new ExponentialProfile.State(0.0, -4),
+            new ExponentialProfile.State(-0.75, -4),
+            new ExponentialProfile.State(-0.7156, -4.4304)),
+        new TestCase(
+            new ExponentialProfile.State(0.0, -4),
+            new ExponentialProfile.State(-0.0897, 4),
+            new ExponentialProfile.State(-0.7156, -4.4304)),
+        new TestCase(
+            new ExponentialProfile.State(0.6603, 4),
+            new ExponentialProfile.State(-0.75, -4),
+            new ExponentialProfile.State(-0.7156, -4.4304)),
+        new TestCase(
+            new ExponentialProfile.State(0.6603, 4),
+            new ExponentialProfile.State(-0.0897, 4),
+            new ExponentialProfile.State(-0.7156, -4.4304)),
+        new TestCase(
+            new ExponentialProfile.State(0.0, -4),
+            new ExponentialProfile.State(-0.5, -4.5),
+            new ExponentialProfile.State(1.095, 4.314)),
+        new TestCase(
+            new ExponentialProfile.State(0.0, -4),
+            new ExponentialProfile.State(1.0795, 4.5),
+            new ExponentialProfile.State(-0.5122, -4.351)),
+        new TestCase(
+            new ExponentialProfile.State(0.6603, 4),
+            new ExponentialProfile.State(-0.5, -4.5),
+            new ExponentialProfile.State(1.095, 4.314)),
+        new TestCase(
+            new ExponentialProfile.State(0.6603, 4),
+            new ExponentialProfile.State(1.0795, 4.5),
+            new ExponentialProfile.State(-0.5122, -4.351)),
+        new TestCase(
+            new ExponentialProfile.State(0.0, -8),
+            new ExponentialProfile.State(0, 0),
+            new ExponentialProfile.State(-0.1384, 3.342)),
+        new TestCase(
+            new ExponentialProfile.State(0.0, -8),
+            new ExponentialProfile.State(-1, 0),
+            new ExponentialProfile.State(-0.562, -6.792)),
+        new TestCase(
+            new ExponentialProfile.State(0.0, 8),
+            new ExponentialProfile.State(1, 0),
+            new ExponentialProfile.State(0.562, 6.792)),
+        new TestCase(
+            new ExponentialProfile.State(0.0, 8),
+            new ExponentialProfile.State(-1, 0),
+            new ExponentialProfile.State(-0.785, -4.346)));
 
     var profile = new ExponentialProfile(constraints);
 

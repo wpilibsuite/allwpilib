@@ -38,9 +38,8 @@ class RamseteControllerTest {
       var state = trajectory.sample(kDt * i);
 
       var output = controller.calculate(robotPose, state);
-      robotPose =
-          robotPose.exp(
-              new Twist2d(output.vxMetersPerSecond * kDt, 0, output.omegaRadiansPerSecond * kDt));
+      robotPose = robotPose.exp(
+          new Twist2d(output.vxMetersPerSecond * kDt, 0, output.omegaRadiansPerSecond * kDt));
     }
 
     final var states = trajectory.getStates();
@@ -52,11 +51,10 @@ class RamseteControllerTest {
     assertAll(
         () -> assertEquals(endPose.getX(), finalRobotPose.getX(), kTolerance),
         () -> assertEquals(endPose.getY(), finalRobotPose.getY(), kTolerance),
-        () ->
-            assertEquals(
-                0.0,
-                MathUtil.angleModulus(
-                    endPose.getRotation().getRadians() - finalRobotPose.getRotation().getRadians()),
-                kAngularTolerance));
+        () -> assertEquals(
+            0.0,
+            MathUtil.angleModulus(endPose.getRotation().getRadians()
+                - finalRobotPose.getRotation().getRadians()),
+            kAngularTolerance));
   }
 }

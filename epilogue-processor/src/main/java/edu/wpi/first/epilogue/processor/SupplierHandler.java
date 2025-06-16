@@ -17,20 +17,22 @@ public class SupplierHandler extends ElementHandler {
   protected SupplierHandler(ProcessingEnvironment processingEnv) {
     super(processingEnv);
 
-    m_booleanSupplier =
-        processingEnv
-            .getElementUtils()
-            .getTypeElement("java.util.function.BooleanSupplier")
-            .asType();
-    m_intSupplier =
-        processingEnv.getElementUtils().getTypeElement("java.util.function.IntSupplier").asType();
-    m_longSupplier =
-        processingEnv.getElementUtils().getTypeElement("java.util.function.LongSupplier").asType();
-    m_doubleSupplier =
-        processingEnv
-            .getElementUtils()
-            .getTypeElement("java.util.function.DoubleSupplier")
-            .asType();
+    m_booleanSupplier = processingEnv
+        .getElementUtils()
+        .getTypeElement("java.util.function.BooleanSupplier")
+        .asType();
+    m_intSupplier = processingEnv
+        .getElementUtils()
+        .getTypeElement("java.util.function.IntSupplier")
+        .asType();
+    m_longSupplier = processingEnv
+        .getElementUtils()
+        .getTypeElement("java.util.function.LongSupplier")
+        .asType();
+    m_doubleSupplier = processingEnv
+        .getElementUtils()
+        .getTypeElement("java.util.function.DoubleSupplier")
+        .asType();
   }
 
   @Override

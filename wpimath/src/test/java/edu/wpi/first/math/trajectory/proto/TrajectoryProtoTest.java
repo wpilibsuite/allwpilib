@@ -15,19 +15,13 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class TrajectoryProtoTest {
-  private static final Trajectory DATA =
-      new Trajectory(
-          List.of(
-              new Trajectory.State(
-                  1.1, 2.2, 3.3, new Pose2d(new Translation2d(1.1, 2.2), new Rotation2d(2.2)), 6.6),
-              new Trajectory.State(
-                  2.1, 2.2, 3.3, new Pose2d(new Translation2d(2.1, 2.2), new Rotation2d(2.2)), 6.6),
-              new Trajectory.State(
-                  3.1,
-                  2.2,
-                  3.3,
-                  new Pose2d(new Translation2d(3.1, 2.2), new Rotation2d(2.2)),
-                  6.6)));
+  private static final Trajectory DATA = new Trajectory(List.of(
+      new Trajectory.State(
+          1.1, 2.2, 3.3, new Pose2d(new Translation2d(1.1, 2.2), new Rotation2d(2.2)), 6.6),
+      new Trajectory.State(
+          2.1, 2.2, 3.3, new Pose2d(new Translation2d(2.1, 2.2), new Rotation2d(2.2)), 6.6),
+      new Trajectory.State(
+          3.1, 2.2, 3.3, new Pose2d(new Translation2d(3.1, 2.2), new Rotation2d(2.2)), 6.6)));
 
   @Test
   void testRoundtrip() {

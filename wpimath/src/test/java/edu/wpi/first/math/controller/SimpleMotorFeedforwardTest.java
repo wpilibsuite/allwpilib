@@ -58,14 +58,11 @@ class SimpleMotorFeedforwardTest {
     double dt = 0.02;
 
     assertAll(
-        () ->
-            assertThrows(
-                IllegalArgumentException.class, () -> new SimpleMotorFeedforward(Ks, -Kv, Ka, dt)),
-        () ->
-            assertThrows(
-                IllegalArgumentException.class, () -> new SimpleMotorFeedforward(Ks, Kv, -Ka, dt)),
-        () ->
-            assertThrows(
-                IllegalArgumentException.class, () -> new SimpleMotorFeedforward(Ks, Kv, Ka, 0)));
+        () -> assertThrows(
+            IllegalArgumentException.class, () -> new SimpleMotorFeedforward(Ks, -Kv, Ka, dt)),
+        () -> assertThrows(
+            IllegalArgumentException.class, () -> new SimpleMotorFeedforward(Ks, Kv, -Ka, dt)),
+        () -> assertThrows(
+            IllegalArgumentException.class, () -> new SimpleMotorFeedforward(Ks, Kv, Ka, 0)));
   }
 }

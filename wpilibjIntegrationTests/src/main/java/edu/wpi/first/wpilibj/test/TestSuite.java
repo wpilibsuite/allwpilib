@@ -79,36 +79,35 @@ public class TestSuite extends AbstractTestSuite {
 
   /** Displays a help message for the user when they use the --help flag at runtime. */
   protected static void displayHelp() {
-    String helpMessage =
-        "Test Parameters help: \n"
-            + "\t"
-            + QUICK_TEST_FLAG
-            + " will cause the quick test to be run. Ignores other flags except for "
-            + METHOD_REPEAT_FILTER
-            + "\n"
-            + "\t"
-            + CLASS_NAME_FILTER
-            + " will use the supplied regex text to search for suite/test class names "
-            + "matching the regex and run them.\n"
-            + "\t"
-            + METHOD_NAME_FILTER
-            + " will use the supplied regex text to search for test methods (excluding methods "
-            + "with the @Ignore annotation) and run only those methods. Can be paired with "
-            + METHOD_REPEAT_FILTER
-            + " to "
-            + "repeat the selected tests multiple times.\n"
-            + "\t"
-            + METHOD_REPEAT_FILTER
-            + " will repeat the tests selected with either "
-            + QUICK_TEST_FLAG
-            + " or "
-            + CLASS_NAME_FILTER
-            + " and run them the given number of times.\n"
-            + "[NOTE] All regex uses the syntax defined by java.util.regex.Pattern. This "
-            + "documentation can be found at "
-            + "http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html\n"
-            + "\n"
-            + "\n";
+    String helpMessage = "Test Parameters help: \n"
+        + "\t"
+        + QUICK_TEST_FLAG
+        + " will cause the quick test to be run. Ignores other flags except for "
+        + METHOD_REPEAT_FILTER
+        + "\n"
+        + "\t"
+        + CLASS_NAME_FILTER
+        + " will use the supplied regex text to search for suite/test class names "
+        + "matching the regex and run them.\n"
+        + "\t"
+        + METHOD_NAME_FILTER
+        + " will use the supplied regex text to search for test methods (excluding methods "
+        + "with the @Ignore annotation) and run only those methods. Can be paired with "
+        + METHOD_REPEAT_FILTER
+        + " to "
+        + "repeat the selected tests multiple times.\n"
+        + "\t"
+        + METHOD_REPEAT_FILTER
+        + " will repeat the tests selected with either "
+        + QUICK_TEST_FLAG
+        + " or "
+        + CLASS_NAME_FILTER
+        + " and run them the given number of times.\n"
+        + "[NOTE] All regex uses the syntax defined by java.util.regex.Pattern. This "
+        + "documentation can be found at "
+        + "http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html\n"
+        + "\n"
+        + "\n";
 
     TestBench.out().println(helpMessage);
   }
@@ -324,16 +323,15 @@ public class TestSuite extends AbstractTestSuite {
       TestBench.out().println("FAILURES!!!");
       // Print the test statistics
       TestBench.out()
-          .println(
-              "Tests run: "
-                  + result.getRunCount()
-                  + ", Failures: "
-                  + result.getFailureCount()
-                  + ", Ignored: "
-                  + result.getIgnoreCount()
-                  + ", In "
-                  + result.getRunTime()
-                  + "ms");
+          .println("Tests run: "
+              + result.getRunCount()
+              + ", Failures: "
+              + result.getFailureCount()
+              + ", Ignored: "
+              + result.getIgnoreCount()
+              + ", In "
+              + result.getRunTime()
+              + "ms");
 
       // Prints out a list of test that failed
       TestBench.out().println("Failure List (short):");
@@ -349,14 +347,13 @@ public class TestSuite extends AbstractTestSuite {
     } else {
       TestBench.out().println("SUCCESS!");
       TestBench.out()
-          .println(
-              "Tests run: "
-                  + result.getRunCount()
-                  + ", Ignored: "
-                  + result.getIgnoreCount()
-                  + ", In "
-                  + result.getRunTime()
-                  + "ms");
+          .println("Tests run: "
+              + result.getRunCount()
+              + ", Ignored: "
+              + result.getIgnoreCount()
+              + ", In "
+              + result.getRunTime()
+              + "ms");
     }
     TestBench.out().println();
   }

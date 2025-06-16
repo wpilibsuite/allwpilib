@@ -213,9 +213,8 @@ public abstract class Unit {
 
     double arbitrary = 16_777.214; // 2^24 / 1e3
 
-    return Math.abs(
-                this.m_fromBaseConverter.apply(arbitrary)
-                    - other.m_fromBaseConverter.apply(arbitrary))
+    return Math.abs(this.m_fromBaseConverter.apply(arbitrary)
+                - other.m_fromBaseConverter.apply(arbitrary))
             <= Measure.EQUIVALENCE_THRESHOLD
         && Math.abs(
                 this.m_toBaseConverter.apply(arbitrary) - other.m_toBaseConverter.apply(arbitrary))

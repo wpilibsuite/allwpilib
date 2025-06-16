@@ -44,9 +44,8 @@ class CommandRequirementsTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       Subsystem requirement = new SubsystemBase() {};
 
-      Command notInterrupted =
-          Commands.idle(requirement)
-              .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
+      Command notInterrupted = Commands.idle(requirement)
+          .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
       MockCommandHolder interrupterHolder = new MockCommandHolder(true, requirement);
       Command interrupter = interrupterHolder.getMock();
 

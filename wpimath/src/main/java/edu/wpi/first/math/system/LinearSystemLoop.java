@@ -207,11 +207,10 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
    */
   public void setNextR(double... nextR) {
     if (nextR.length != m_nextR.getNumRows()) {
-      throw new MatrixDimensionException(
-          String.format(
-              "The next reference does not have the "
-                  + "correct number of entries! Expected %s, but got %s.",
-              m_nextR.getNumRows(), nextR.length));
+      throw new MatrixDimensionException(String.format(
+          "The next reference does not have the "
+              + "correct number of entries! Expected %s, but got %s.",
+          m_nextR.getNumRows(), nextR.length));
     }
     m_nextR = new Matrix<>(new SimpleMatrix(m_nextR.getNumRows(), 1, true, nextR));
   }
@@ -330,11 +329,9 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
    * @param dtSeconds Timestep for model update.
    */
   public void predict(double dtSeconds) {
-    var u =
-        clampInput(
-            m_controller
-                .calculate(getObserver().getXhat(), m_nextR)
-                .plus(m_feedforward.calculate(m_nextR)));
+    var u = clampInput(m_controller
+        .calculate(getObserver().getXhat(), m_nextR)
+        .plus(m_feedforward.calculate(m_nextR)));
     getObserver().predict(u, dtSeconds);
   }
 

@@ -62,16 +62,14 @@ class MecanumControllerCommandTest {
   private static final double kWheelBase = 0.5;
   private static final double kTrackWidth = 0.5;
 
-  private final MecanumDriveKinematics m_kinematics =
-      new MecanumDriveKinematics(
-          new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-          new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-          new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-          new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+  private final MecanumDriveKinematics m_kinematics = new MecanumDriveKinematics(
+      new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+      new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+      new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+      new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-  private final MecanumDriveOdometry m_odometry =
-      new MecanumDriveOdometry(
-          m_kinematics, Rotation2d.kZero, new MecanumDriveWheelPositions(), Pose2d.kZero);
+  private final MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(
+      m_kinematics, Rotation2d.kZero, new MecanumDriveWheelPositions(), Pose2d.kZero);
 
   public void setWheelSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
     this.m_frontLeftSpeed = wheelSpeeds.frontLeftMetersPerSecond;
@@ -103,17 +101,16 @@ class MecanumControllerCommandTest {
 
     final var endState = trajectory.sample(trajectory.getTotalTimeSeconds());
 
-    final var command =
-        new MecanumControllerCommand(
-            trajectory,
-            this::getRobotPose,
-            m_kinematics,
-            new PIDController(0.6, 0, 0),
-            new PIDController(0.6, 0, 0),
-            m_rotController,
-            8.8,
-            this::setWheelSpeeds,
-            subsystem);
+    final var command = new MecanumControllerCommand(
+        trajectory,
+        this::getRobotPose,
+        m_kinematics,
+        new PIDController(0.6, 0, 0),
+        new PIDController(0.6, 0, 0),
+        m_rotController,
+        8.8,
+        this::setWheelSpeeds,
+        subsystem);
 
     m_timer.restart();
 
@@ -133,10 +130,9 @@ class MecanumControllerCommandTest {
     assertAll(
         () -> assertEquals(endState.poseMeters.getX(), getRobotPose().getX(), kxTolerance),
         () -> assertEquals(endState.poseMeters.getY(), getRobotPose().getY(), kyTolerance),
-        () ->
-            assertEquals(
-                endState.poseMeters.getRotation().getRadians(),
-                getRobotPose().getRotation().getRadians(),
-                kAngularTolerance));
+        () -> assertEquals(
+            endState.poseMeters.getRotation().getRadians(),
+            getRobotPose().getRotation().getRadians(),
+            kAngularTolerance));
   }
 }

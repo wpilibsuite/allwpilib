@@ -73,60 +73,58 @@ public class VideoListener implements AutoCloseable {
   private static final Condition s_waitQueueCond = s_lock.newCondition();
 
   private static void startThread() {
-    s_thread =
-        new Thread(
-            () -> {
-              boolean wasInterrupted = false;
-              while (!Thread.interrupted()) {
-                VideoEvent[] events;
-                try {
-                  events = CameraServerJNI.pollListener(s_poller);
-                } catch (InterruptedException ex) {
-                  s_lock.lock();
-                  try {
-                    if (s_waitQueue) {
-                      s_waitQueue = false;
-                      s_waitQueueCond.signalAll();
-                      continue;
-                    }
-                  } finally {
-                    s_lock.unlock();
-                  }
-                  Thread.currentThread().interrupt();
-                  // don't try to destroy poller, as its handle is likely no longer valid
-                  wasInterrupted = true;
-                  break;
-                }
-                for (VideoEvent event : events) {
-                  Consumer<VideoEvent> listener;
-                  s_lock.lock();
-                  try {
-                    listener = s_listeners.get(event.listener);
-                  } finally {
-                    s_lock.unlock();
-                  }
-                  if (listener != null) {
-                    try {
-                      listener.accept(event);
-                    } catch (Throwable throwable) {
-                      System.err.println(
-                          "Unhandled exception during listener callback: " + throwable);
-                      throwable.printStackTrace();
-                    }
-                  }
-                }
-              }
+    s_thread = new Thread(
+        () -> {
+          boolean wasInterrupted = false;
+          while (!Thread.interrupted()) {
+            VideoEvent[] events;
+            try {
+              events = CameraServerJNI.pollListener(s_poller);
+            } catch (InterruptedException ex) {
               s_lock.lock();
               try {
-                if (!wasInterrupted) {
-                  CameraServerJNI.destroyListenerPoller(s_poller);
+                if (s_waitQueue) {
+                  s_waitQueue = false;
+                  s_waitQueueCond.signalAll();
+                  continue;
                 }
-                s_poller = 0;
               } finally {
                 s_lock.unlock();
               }
-            },
-            "VideoListener");
+              Thread.currentThread().interrupt();
+              // don't try to destroy poller, as its handle is likely no longer valid
+              wasInterrupted = true;
+              break;
+            }
+            for (VideoEvent event : events) {
+              Consumer<VideoEvent> listener;
+              s_lock.lock();
+              try {
+                listener = s_listeners.get(event.listener);
+              } finally {
+                s_lock.unlock();
+              }
+              if (listener != null) {
+                try {
+                  listener.accept(event);
+                } catch (Throwable throwable) {
+                  System.err.println("Unhandled exception during listener callback: " + throwable);
+                  throwable.printStackTrace();
+                }
+              }
+            }
+          }
+          s_lock.lock();
+          try {
+            if (!wasInterrupted) {
+              CameraServerJNI.destroyListenerPoller(s_poller);
+            }
+            s_poller = 0;
+          } finally {
+            s_lock.unlock();
+          }
+        },
+        "VideoListener");
     s_thread.setDaemon(true);
     s_thread.start();
   }

@@ -46,36 +46,31 @@ class PotentiometerPIDTest {
     DriverStationSim.resetData();
     m_robot = new Robot();
     m_thread = new Thread(m_robot::startCompetition);
-    m_elevatorSim =
-        new ElevatorSim(
-            m_elevatorGearbox,
-            kElevatorGearing,
-            kCarriageMassKg,
-            kElevatorDrumRadius,
-            0.0,
-            Robot.kFullHeightMeters,
-            true,
-            0);
+    m_elevatorSim = new ElevatorSim(
+        m_elevatorGearbox,
+        kElevatorGearing,
+        kCarriageMassKg,
+        kElevatorDrumRadius,
+        0.0,
+        Robot.kFullHeightMeters,
+        true,
+        0);
     m_analogSim = new AnalogInputSim(Robot.kPotChannel);
     m_motorSim = new PWMSim(Robot.kMotorChannel);
     m_joystickSim = new JoystickSim(Robot.kJoystickChannel);
 
-    m_callback =
-        HAL.registerSimPeriodicBeforeCallback(
-            () -> {
-              m_elevatorSim.setInputVoltage(
-                  m_motorSim.getSpeed() * RobotController.getBatteryVoltage());
-              m_elevatorSim.update(0.02);
+    m_callback = HAL.registerSimPeriodicBeforeCallback(() -> {
+      m_elevatorSim.setInputVoltage(m_motorSim.getSpeed() * RobotController.getBatteryVoltage());
+      m_elevatorSim.update(0.02);
 
-              /*
-              meters = (v / 5v) * range
-              meters / range = v / 5v
-              5v * (meters / range) = v
-               */
-              m_analogSim.setVoltage(
-                  RobotController.getVoltage5V()
-                      * (m_elevatorSim.getPositionMeters() / Robot.kFullHeightMeters));
-            });
+      /*
+      meters = (v / 5v) * range
+      meters / range = v / 5v
+      5v * (meters / range) = v
+       */
+      m_analogSim.setVoltage(RobotController.getVoltage5V()
+          * (m_elevatorSim.getPositionMeters() / Robot.kFullHeightMeters));
+    });
 
     m_thread.start();
     SimHooks.stepTiming(0.0); // Wait for Notifiers

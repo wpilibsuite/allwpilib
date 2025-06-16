@@ -18,18 +18,15 @@ public class SendableHandler extends ElementHandler {
   protected SendableHandler(ProcessingEnvironment processingEnv) {
     super(processingEnv);
 
-    m_sendableType =
-        Optional.ofNullable(
-                lookupTypeElement(processingEnv, "edu.wpi.first.util.sendable.Sendable"))
-            .map(TypeElement::asType);
-    m_commandType =
-        Optional.ofNullable(
-                lookupTypeElement(processingEnv, "edu.wpi.first.wpilibj2.command.Command"))
-            .map(TypeElement::asType);
-    m_subsystemType =
-        Optional.ofNullable(
-                lookupTypeElement(processingEnv, "edu.wpi.first.wpilibj2.command.SubsystemBase"))
-            .map(TypeElement::asType);
+    m_sendableType = Optional.ofNullable(
+            lookupTypeElement(processingEnv, "edu.wpi.first.util.sendable.Sendable"))
+        .map(TypeElement::asType);
+    m_commandType = Optional.ofNullable(
+            lookupTypeElement(processingEnv, "edu.wpi.first.wpilibj2.command.Command"))
+        .map(TypeElement::asType);
+    m_subsystemType = Optional.ofNullable(
+            lookupTypeElement(processingEnv, "edu.wpi.first.wpilibj2.command.SubsystemBase"))
+        .map(TypeElement::asType);
   }
 
   @Override

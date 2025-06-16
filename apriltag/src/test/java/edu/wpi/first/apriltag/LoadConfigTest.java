@@ -32,34 +32,31 @@ class LoadConfigTest {
     AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.k2022RapidReact);
 
     // Blue Hangar Truss - Hub
-    Pose3d expectedPose =
-        new Pose3d(
-            Units.inchesToMeters(127.272),
-            Units.inchesToMeters(216.01),
-            Units.inchesToMeters(67.932),
-            Rotation3d.kZero);
+    Pose3d expectedPose = new Pose3d(
+        Units.inchesToMeters(127.272),
+        Units.inchesToMeters(216.01),
+        Units.inchesToMeters(67.932),
+        Rotation3d.kZero);
     Optional<Pose3d> maybePose = layout.getTagPose(1);
     assertTrue(maybePose.isPresent());
     assertEquals(expectedPose, maybePose.get());
 
     // Blue Terminal Near Station
-    expectedPose =
-        new Pose3d(
-            Units.inchesToMeters(4.768),
-            Units.inchesToMeters(67.631),
-            Units.inchesToMeters(35.063),
-            new Rotation3d(0, 0, Math.toRadians(46.25)));
+    expectedPose = new Pose3d(
+        Units.inchesToMeters(4.768),
+        Units.inchesToMeters(67.631),
+        Units.inchesToMeters(35.063),
+        new Rotation3d(0, 0, Math.toRadians(46.25)));
     maybePose = layout.getTagPose(5);
     assertTrue(maybePose.isPresent());
     assertEquals(expectedPose, maybePose.get());
 
     // Upper Hub Blue-Near
-    expectedPose =
-        new Pose3d(
-            Units.inchesToMeters(332.321),
-            Units.inchesToMeters(183.676),
-            Units.inchesToMeters(95.186),
-            new Rotation3d(0, Math.toRadians(26.75), Math.toRadians(69)));
+    expectedPose = new Pose3d(
+        Units.inchesToMeters(332.321),
+        Units.inchesToMeters(183.676),
+        Units.inchesToMeters(95.186),
+        new Rotation3d(0, Math.toRadians(26.75), Math.toRadians(69)));
     maybePose = layout.getTagPose(53);
     assertTrue(maybePose.isPresent());
     assertEquals(expectedPose, maybePose.get());

@@ -291,19 +291,17 @@ public class PoseEstimator3d<T> {
 
     // Step 5: We should not trust the twist entirely, so instead we scale this twist by a Kalman
     // gain matrix representing how much we trust vision measurements compared to our current pose.
-    var k_times_twist =
-        m_visionK.times(
-            VecBuilder.fill(twist.dx, twist.dy, twist.dz, twist.rx, twist.ry, twist.rz));
+    var k_times_twist = m_visionK.times(
+        VecBuilder.fill(twist.dx, twist.dy, twist.dz, twist.rx, twist.ry, twist.rz));
 
     // Step 6: Convert back to Twist3d.
-    var scaledTwist =
-        new Twist3d(
-            k_times_twist.get(0, 0),
-            k_times_twist.get(1, 0),
-            k_times_twist.get(2, 0),
-            k_times_twist.get(3, 0),
-            k_times_twist.get(4, 0),
-            k_times_twist.get(5, 0));
+    var scaledTwist = new Twist3d(
+        k_times_twist.get(0, 0),
+        k_times_twist.get(1, 0),
+        k_times_twist.get(2, 0),
+        k_times_twist.get(3, 0),
+        k_times_twist.get(4, 0),
+        k_times_twist.get(5, 0));
 
     // Step 7: Calculate and record the vision update.
     var visionUpdate = new VisionUpdate(visionSample.get().exp(scaledTwist), odometrySample.get());

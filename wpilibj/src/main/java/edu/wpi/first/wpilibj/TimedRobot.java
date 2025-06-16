@@ -39,11 +39,10 @@ public class TimedRobot extends IterativeRobotBase {
     Callback(Runnable func, long startTimeUs, long periodUs, long offsetUs) {
       this.func = func;
       this.period = periodUs;
-      this.expirationTime =
-          startTimeUs
-              + offsetUs
-              + this.period
-              + (RobotController.getFPGATime() - startTimeUs) / this.period * this.period;
+      this.expirationTime = startTimeUs
+          + offsetUs
+          + this.period
+          + (RobotController.getFPGATime() - startTimeUs) / this.period * this.period;
     }
 
     @Override
@@ -136,9 +135,8 @@ public class TimedRobot extends IterativeRobotBase {
       // plus one to avoid rapid repeat fires from a large loop overrun. We
       // assume currentTime ≥ expirationTime rather than checking for it since
       // the callback wouldn't be running otherwise.
-      callback.expirationTime +=
-          callback.period
-              + (currentTime - callback.expirationTime) / callback.period * callback.period;
+      callback.expirationTime += callback.period
+          + (currentTime - callback.expirationTime) / callback.period * callback.period;
       m_callbacks.add(callback);
 
       // Process all other callbacks that are ready to run
@@ -147,9 +145,8 @@ public class TimedRobot extends IterativeRobotBase {
 
         callback.func.run();
 
-        callback.expirationTime +=
-            callback.period
-                + (currentTime - callback.expirationTime) / callback.period * callback.period;
+        callback.expirationTime += callback.period
+            + (currentTime - callback.expirationTime) / callback.period * callback.period;
         m_callbacks.add(callback);
       }
     }
@@ -197,9 +194,8 @@ public class TimedRobot extends IterativeRobotBase {
    *     scheduling a callback in a different timeslot relative to TimedRobot.
    */
   public final void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
-    m_callbacks.add(
-        new Callback(
-            callback, m_startTimeUs, (long) (periodSeconds * 1e6), (long) (offsetSeconds * 1e6)));
+    m_callbacks.add(new Callback(
+        callback, m_startTimeUs, (long) (periodSeconds * 1e6), (long) (offsetSeconds * 1e6)));
   }
 
   /**

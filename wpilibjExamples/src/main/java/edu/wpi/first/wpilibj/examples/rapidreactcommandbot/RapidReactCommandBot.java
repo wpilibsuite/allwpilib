@@ -56,9 +56,8 @@ public class RapidReactCommandBot {
     m_storage.hasCargo.onTrue(m_intake.retractCommand());
 
     // Control the drive with split-stick arcade controls
-    m_drive.setDefaultCommand(
-        m_drive.arcadeDriveCommand(
-            () -> -m_driverController.getLeftY(), () -> -m_driverController.getRightX()));
+    m_drive.setDefaultCommand(m_drive.arcadeDriveCommand(
+        () -> -m_driverController.getLeftY(), () -> -m_driverController.getRightX()));
 
     // Deploy the intake with the X button
     m_driverController.x().onTrue(m_intake.intakeCommand());
@@ -68,12 +67,10 @@ public class RapidReactCommandBot {
     // Fire the shooter with the A button
     m_driverController
         .a()
-        .onTrue(
-            parallel(
-                    m_shooter.shootCommand(ShooterConstants.kShooterTargetRPS),
-                    m_storage.runCommand())
-                // Since we composed this inline we should give it a name
-                .withName("Shoot"));
+        .onTrue(parallel(
+                m_shooter.shootCommand(ShooterConstants.kShooterTargetRPS), m_storage.runCommand())
+            // Since we composed this inline we should give it a name
+            .withName("Shoot"));
 
     // Toggle compressor with the Start button
     m_driverController.start().toggleOnTrue(m_pneumatics.disableCompressorCommand());

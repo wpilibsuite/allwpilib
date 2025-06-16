@@ -19,19 +19,18 @@ public final class MathSharedStore {
    */
   public static synchronized MathShared getMathShared() {
     if (mathShared == null) {
-      mathShared =
-          new MathShared() {
-            @Override
-            public void reportError(String error, StackTraceElement[] stackTrace) {}
+      mathShared = new MathShared() {
+        @Override
+        public void reportError(String error, StackTraceElement[] stackTrace) {}
 
-            @Override
-            public void reportUsage(MathUsageId id, int count) {}
+        @Override
+        public void reportUsage(MathUsageId id, int count) {}
 
-            @Override
-            public double getTimestamp() {
-              return WPIUtilJNI.now() * 1.0e-6;
-            }
-          };
+        @Override
+        public double getTimestamp() {
+          return WPIUtilJNI.now() * 1.0e-6;
+        }
+      };
     }
     return mathShared;
   }

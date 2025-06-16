@@ -67,19 +67,18 @@ public class Trigger implements BooleanSupplier {
    * @param body The body of the binding to add.
    */
   private void addBinding(BindingBody body) {
-    m_loop.bind(
-        new Runnable() {
-          private boolean m_previous = m_condition.getAsBoolean();
+    m_loop.bind(new Runnable() {
+      private boolean m_previous = m_condition.getAsBoolean();
 
-          @Override
-          public void run() {
-            boolean current = m_condition.getAsBoolean();
+      @Override
+      public void run() {
+        boolean current = m_condition.getAsBoolean();
 
-            body.run(m_previous, current);
+        body.run(m_previous, current);
 
-            m_previous = current;
-          }
-        });
+        m_previous = current;
+      }
+    });
   }
 
   /**
@@ -90,12 +89,11 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger onChange(Command command) {
     requireNonNullParam(command, "command", "onChange");
-    addBinding(
-        (previous, current) -> {
-          if (previous != current) {
-            command.schedule();
-          }
-        });
+    addBinding((previous, current) -> {
+      if (previous != current) {
+        command.schedule();
+      }
+    });
     return this;
   }
 
@@ -107,12 +105,11 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger onTrue(Command command) {
     requireNonNullParam(command, "command", "onTrue");
-    addBinding(
-        (previous, current) -> {
-          if (!previous && current) {
-            command.schedule();
-          }
-        });
+    addBinding((previous, current) -> {
+      if (!previous && current) {
+        command.schedule();
+      }
+    });
     return this;
   }
 
@@ -124,12 +121,11 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger onFalse(Command command) {
     requireNonNullParam(command, "command", "onFalse");
-    addBinding(
-        (previous, current) -> {
-          if (previous && !current) {
-            command.schedule();
-          }
-        });
+    addBinding((previous, current) -> {
+      if (previous && !current) {
+        command.schedule();
+      }
+    });
     return this;
   }
 
@@ -145,14 +141,13 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger whileTrue(Command command) {
     requireNonNullParam(command, "command", "whileTrue");
-    addBinding(
-        (previous, current) -> {
-          if (!previous && current) {
-            command.schedule();
-          } else if (previous && !current) {
-            command.cancel();
-          }
-        });
+    addBinding((previous, current) -> {
+      if (!previous && current) {
+        command.schedule();
+      } else if (previous && !current) {
+        command.cancel();
+      }
+    });
     return this;
   }
 
@@ -168,14 +163,13 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger whileFalse(Command command) {
     requireNonNullParam(command, "command", "whileFalse");
-    addBinding(
-        (previous, current) -> {
-          if (previous && !current) {
-            command.schedule();
-          } else if (!previous && current) {
-            command.cancel();
-          }
-        });
+    addBinding((previous, current) -> {
+      if (previous && !current) {
+        command.schedule();
+      } else if (!previous && current) {
+        command.cancel();
+      }
+    });
     return this;
   }
 
@@ -187,16 +181,15 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger toggleOnTrue(Command command) {
     requireNonNullParam(command, "command", "toggleOnTrue");
-    addBinding(
-        (previous, current) -> {
-          if (!previous && current) {
-            if (command.isScheduled()) {
-              command.cancel();
-            } else {
-              command.schedule();
-            }
-          }
-        });
+    addBinding((previous, current) -> {
+      if (!previous && current) {
+        if (command.isScheduled()) {
+          command.cancel();
+        } else {
+          command.schedule();
+        }
+      }
+    });
     return this;
   }
 
@@ -208,16 +201,15 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger toggleOnFalse(Command command) {
     requireNonNullParam(command, "command", "toggleOnFalse");
-    addBinding(
-        (previous, current) -> {
-          if (previous && !current) {
-            if (command.isScheduled()) {
-              command.cancel();
-            } else {
-              command.schedule();
-            }
-          }
-        });
+    addBinding((previous, current) -> {
+      if (previous && !current) {
+        if (command.isScheduled()) {
+          command.cancel();
+        } else {
+          command.schedule();
+        }
+      }
+    });
     return this;
   }
 
@@ -276,15 +268,13 @@ public class Trigger implements BooleanSupplier {
    * @return The debounced trigger.
    */
   public Trigger debounce(double seconds, Debouncer.DebounceType type) {
-    return new Trigger(
-        m_loop,
-        new BooleanSupplier() {
-          final Debouncer m_debouncer = new Debouncer(seconds, type);
+    return new Trigger(m_loop, new BooleanSupplier() {
+      final Debouncer m_debouncer = new Debouncer(seconds, type);
 
-          @Override
-          public boolean getAsBoolean() {
-            return m_debouncer.calculate(m_condition.getAsBoolean());
-          }
-        });
+      @Override
+      public boolean getAsBoolean() {
+        return m_debouncer.calculate(m_condition.getAsBoolean());
+      }
+    });
   }
 }

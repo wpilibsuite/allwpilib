@@ -26,15 +26,13 @@ class MatrixTest {
     assertEquals(result, MatBuilder.fill(Nat.N2(), Nat.N2(), 6.0, 2.5, 0.0, 2.5));
 
     var mat3 = MatBuilder.fill(Nat.N2(), Nat.N3(), 1.0, 3.0, 0.5, 2.0, 4.3, 1.2);
-    var mat4 =
-        MatBuilder.fill(
-            Nat.N3(), Nat.N4(), 3.0, 1.5, 2.0, 4.5, 2.3, 1.0, 1.6, 3.1, 5.2, 2.1, 2.0, 1.0);
+    var mat4 = MatBuilder.fill(
+        Nat.N3(), Nat.N4(), 3.0, 1.5, 2.0, 4.5, 2.3, 1.0, 1.6, 3.1, 5.2, 2.1, 2.0, 1.0);
 
     Matrix<N2, N4> result2 = mat3.times(mat4);
 
-    assertTrue(
-        MatBuilder.fill(Nat.N2(), Nat.N4(), 12.5, 5.55, 7.8, 14.3, 22.13, 9.82, 13.28, 23.53)
-            .isEqual(result2, 1E-9));
+    assertTrue(MatBuilder.fill(Nat.N2(), Nat.N4(), 12.5, 5.55, 7.8, 14.3, 22.13, 9.82, 13.28, 23.53)
+        .isEqual(result2, 1E-9));
   }
 
   @Test
@@ -125,9 +123,7 @@ class MatrixTest {
     matrix = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 2, 3, 4);
     result = matrix.times(0.01).exp();
 
-    assertTrue(
-        result.isEqual(
-            MatBuilder.fill(Nat.N2(), Nat.N2(), 1.01035625, 0.02050912, 0.03076368, 1.04111993),
-            1E-8));
+    assertTrue(result.isEqual(
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 1.01035625, 0.02050912, 0.03076368, 1.04111993), 1E-8));
   }
 }

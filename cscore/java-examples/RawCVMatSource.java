@@ -15,9 +15,8 @@ public class RawCVMatSource extends ImageSource {
    * @param mode Video mode being generated
    */
   public RawCVMatSource(String name, VideoMode mode) {
-    super(
-        CameraServerJNI.createRawSource(
-            name, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
+    super(CameraServerJNI.createRawSource(
+        name, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
   }
 
   /**

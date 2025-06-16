@@ -135,9 +135,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * @param velocityMetersPerSecond New velocity in meters per second.
    */
   public final void setState(double positionMeters, double velocityMetersPerSecond) {
-    setState(
-        VecBuilder.fill(
-            MathUtil.clamp(positionMeters, m_minHeight, m_maxHeight), velocityMetersPerSecond));
+    setState(VecBuilder.fill(
+        MathUtil.clamp(positionMeters, m_minHeight, m_maxHeight), velocityMetersPerSecond));
   }
 
   /**
@@ -234,18 +233,17 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   @Override
   protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
     // Calculate updated x-hat from Runge-Kutta.
-    var updatedXhat =
-        NumericalIntegration.rkdp(
-            (x, _u) -> {
-              Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
-              if (m_simulateGravity) {
-                xdot = xdot.plus(VecBuilder.fill(0, -9.8));
-              }
-              return xdot;
-            },
-            currentXhat,
-            u,
-            dtSeconds);
+    var updatedXhat = NumericalIntegration.rkdp(
+        (x, _u) -> {
+          Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
+          if (m_simulateGravity) {
+            xdot = xdot.plus(VecBuilder.fill(0, -9.8));
+          }
+          return xdot;
+        },
+        currentXhat,
+        u,
+        dtSeconds);
 
     // We check for collisions after updating x-hat.
     if (wouldHitLowerLimit(updatedXhat.get(0, 0))) {

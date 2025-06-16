@@ -36,12 +36,11 @@ class UltrasonicTest {
   void automaticModeToggle() {
     try (@SuppressWarnings("unused")
         Ultrasonic ultrasonic = new Ultrasonic(0, 1)) {
-      assertDoesNotThrow(
-          () -> {
-            Ultrasonic.setAutomaticMode(true);
-            Ultrasonic.setAutomaticMode(false);
-            Ultrasonic.setAutomaticMode(true);
-          });
+      assertDoesNotThrow(() -> {
+        Ultrasonic.setAutomaticMode(true);
+        Ultrasonic.setAutomaticMode(false);
+        Ultrasonic.setAutomaticMode(true);
+      });
     }
   }
 

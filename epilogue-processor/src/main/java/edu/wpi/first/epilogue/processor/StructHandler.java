@@ -15,11 +15,10 @@ public class StructHandler extends ElementHandler {
 
   protected StructHandler(ProcessingEnvironment processingEnv) {
     super(processingEnv);
-    m_serializable =
-        processingEnv
-            .getElementUtils()
-            .getTypeElement("edu.wpi.first.util.struct.StructSerializable")
-            .asType();
+    m_serializable = processingEnv
+        .getElementUtils()
+        .getTypeElement("edu.wpi.first.util.struct.StructSerializable")
+        .asType();
     m_typeUtils = processingEnv.getTypeUtils();
   }
 

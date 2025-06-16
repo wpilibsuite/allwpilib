@@ -215,7 +215,8 @@ public class Translation3d
    */
   public Translation3d rotateBy(Rotation3d other) {
     final var p = new Quaternion(0.0, m_x, m_y, m_z);
-    final var qprime = other.getQuaternion().times(p).times(other.getQuaternion().inverse());
+    final var qprime =
+        other.getQuaternion().times(p).times(other.getQuaternion().inverse());
     return new Translation3d(qprime.getX(), qprime.getY(), qprime.getZ());
   }
 

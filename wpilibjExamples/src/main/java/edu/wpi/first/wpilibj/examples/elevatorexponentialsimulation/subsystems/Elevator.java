@@ -28,9 +28,8 @@ public class Elevator implements AutoCloseable {
   private final DCMotor m_elevatorGearbox = DCMotor.getNEO(2);
 
   private final ExponentialProfile m_profile =
-      new ExponentialProfile(
-          ExponentialProfile.Constraints.fromCharacteristics(
-              Constants.kElevatorMaxV, Constants.kElevatorkV, Constants.kElevatorkA));
+      new ExponentialProfile(ExponentialProfile.Constraints.fromCharacteristics(
+          Constants.kElevatorMaxV, Constants.kElevatorkV, Constants.kElevatorkA));
 
   private ExponentialProfile.State m_setpoint = new ExponentialProfile.State(0, 0);
 
@@ -38,29 +37,24 @@ public class Elevator implements AutoCloseable {
   private final PIDController m_pidController =
       new PIDController(Constants.kElevatorKp, Constants.kElevatorKi, Constants.kElevatorKd);
 
-  ElevatorFeedforward m_feedforward =
-      new ElevatorFeedforward(
-          Constants.kElevatorkS,
-          Constants.kElevatorkG,
-          Constants.kElevatorkV,
-          Constants.kElevatorkA);
+  ElevatorFeedforward m_feedforward = new ElevatorFeedforward(
+      Constants.kElevatorkS, Constants.kElevatorkG, Constants.kElevatorkV, Constants.kElevatorkA);
   private final Encoder m_encoder =
       new Encoder(Constants.kEncoderAChannel, Constants.kEncoderBChannel);
   private final PWMSparkMax m_motor = new PWMSparkMax(Constants.kMotorPort);
 
   // Simulation classes help us simulate what's going on, including gravity.
-  private final ElevatorSim m_elevatorSim =
-      new ElevatorSim(
-          m_elevatorGearbox,
-          Constants.kElevatorGearing,
-          Constants.kCarriageMass,
-          Constants.kElevatorDrumRadius,
-          Constants.kMinElevatorHeightMeters,
-          Constants.kMaxElevatorHeightMeters,
-          true,
-          0,
-          0.005,
-          0.0);
+  private final ElevatorSim m_elevatorSim = new ElevatorSim(
+      m_elevatorGearbox,
+      Constants.kElevatorGearing,
+      Constants.kCarriageMass,
+      Constants.kElevatorDrumRadius,
+      Constants.kMinElevatorHeightMeters,
+      Constants.kMaxElevatorHeightMeters,
+      true,
+      0,
+      0.005,
+      0.0);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
   private final PWMSim m_motorSim = new PWMSim(m_motor);
 
@@ -69,9 +63,8 @@ public class Elevator implements AutoCloseable {
       new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(51));
   private final MechanismRoot2d m_mech2dRoot =
       m_mech2d.getRoot("Elevator Root", Units.inchesToMeters(5), Units.inchesToMeters(0.5));
-  private final MechanismLigament2d m_elevatorMech2d =
-      m_mech2dRoot.append(
-          new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90));
+  private final MechanismLigament2d m_elevatorMech2d = m_mech2dRoot.append(
+      new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90));
 
   /** Subsystem constructor. */
   public Elevator() {

@@ -525,12 +525,11 @@ public abstract class Command implements Sendable {
    */
   public WrapperCommand handleInterrupt(Runnable handler) {
     requireNonNullParam(handler, "handler", "Command.handleInterrupt()");
-    return finallyDo(
-        interrupted -> {
-          if (interrupted) {
-            handler.run();
-          }
-        });
+    return finallyDo(interrupted -> {
+      if (interrupted) {
+        handler.run();
+      }
+    });
   }
 
   /** Schedules this command. */
@@ -604,20 +603,17 @@ public abstract class Command implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Command");
     builder.addStringProperty(".name", this::getName, null);
-    builder.addBooleanProperty(
-        "running",
-        this::isScheduled,
-        value -> {
-          if (value) {
-            if (!isScheduled()) {
-              schedule();
-            }
-          } else {
-            if (isScheduled()) {
-              cancel();
-            }
-          }
-        });
+    builder.addBooleanProperty("running", this::isScheduled, value -> {
+      if (value) {
+        if (!isScheduled()) {
+          schedule();
+        }
+      } else {
+        if (isScheduled()) {
+          cancel();
+        }
+      }
+    });
     builder.addBooleanProperty(
         ".isParented", () -> CommandScheduler.getInstance().isComposed(this), null);
     builder.addStringProperty(

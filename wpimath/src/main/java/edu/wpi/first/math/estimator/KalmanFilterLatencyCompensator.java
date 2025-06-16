@@ -129,8 +129,10 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
       int prevIdx = nextIdx - 1;
 
       // Find the snapshot closest in time to global measurement
-      double prevTimeDiff = Math.abs(timestamp - m_pastObserverSnapshots.get(prevIdx).getKey());
-      double nextTimeDiff = Math.abs(timestamp - m_pastObserverSnapshots.get(nextIdx).getKey());
+      double prevTimeDiff =
+          Math.abs(timestamp - m_pastObserverSnapshots.get(prevIdx).getKey());
+      double nextTimeDiff =
+          Math.abs(timestamp - m_pastObserverSnapshots.get(nextIdx).getKey());
       indexOfClosestEntry = prevTimeDiff <= nextTimeDiff ? prevIdx : nextIdx;
     }
 

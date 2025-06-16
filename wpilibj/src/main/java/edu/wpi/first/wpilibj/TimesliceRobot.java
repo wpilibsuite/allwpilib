@@ -97,14 +97,13 @@ public class TimesliceRobot extends TimedRobot {
    */
   public void schedule(Runnable func, double allocation) {
     if (m_nextOffset + allocation > m_controllerPeriod) {
-      throw new IllegalStateException(
-          "Function scheduled at offset "
-              + m_nextOffset
-              + " with allocation "
-              + allocation
-              + " exceeded controller period of "
-              + m_controllerPeriod
-              + "\n");
+      throw new IllegalStateException("Function scheduled at offset "
+          + m_nextOffset
+          + " with allocation "
+          + allocation
+          + " exceeded controller period of "
+          + m_controllerPeriod
+          + "\n");
     }
 
     addPeriodic(func, m_controllerPeriod, m_nextOffset);
