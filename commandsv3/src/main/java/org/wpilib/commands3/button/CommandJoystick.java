@@ -5,6 +5,7 @@
 package org.wpilib.commands3.button;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import org.wpilib.commands3.Scheduler;
 import org.wpilib.commands3.Trigger;
 
@@ -27,6 +28,17 @@ public class CommandJoystick extends CommandGenericHID {
   }
 
   /**
+   * Construct an instance of a controller.
+   *
+   * @param scheduler The scheduler that should execute the triggered commands.
+   * @param port The port index on the Driver Station that the controller is plugged into.
+   */
+  public CommandJoystick(Scheduler scheduler, int port) {
+    super(scheduler, port);
+    m_hid = new Joystick(port);
+  }
+
+  /**
    * Get the underlying GenericHID object.
    *
    * @return the wrapped GenericHID object
@@ -41,21 +53,21 @@ public class CommandJoystick extends CommandGenericHID {
    *
    * @return an event instance representing the trigger button's digital signal attached to the
    *     {@link Scheduler#getDefaultEventLoop() default scheduler button loop}.
-   * @see #trigger(Scheduler)
+   * @see #trigger(EventLoop)
    */
   public Trigger trigger() {
-    return trigger(Scheduler.getDefault());
+    return trigger(getScheduler().getDefaultEventLoop());
   }
 
   /**
    * Constructs an event instance around the trigger button's digital signal.
    *
-   * @param scheduler the scheduler instance to attach the event to.
+   * @param loop the event loop instance to attach the event to.
    * @return an event instance representing the trigger button's digital signal attached to the
-   *     given scheduler.
+   *     given loop.
    */
-  public Trigger trigger(Scheduler scheduler) {
-    return new Trigger(scheduler, m_hid.trigger(scheduler.getDefaultEventLoop()));
+  public Trigger trigger(EventLoop loop) {
+    return button(Joystick.ButtonType.kTrigger.value, loop);
   }
 
   /**
@@ -63,21 +75,21 @@ public class CommandJoystick extends CommandGenericHID {
    *
    * @return an event instance representing the top button's digital signal attached to the {@link
    *     Scheduler#getDefaultEventLoop() default scheduler button loop}.
-   * @see #top(Scheduler)
+   * @see #top(EventLoop)
    */
   public Trigger top() {
-    return top(Scheduler.getDefault());
+    return top(getScheduler().getDefaultEventLoop());
   }
 
   /**
    * Constructs an event instance around the top button's digital signal.
    *
-   * @param scheduler the scheduler instance to attach the event to.
+   * @param loop the event loop instance to attach the event to.
    * @return an event instance representing the top button's digital signal attached to the given
-   *     scheduler.
+   *     loop.
    */
-  public Trigger top(Scheduler scheduler) {
-    return new Trigger(scheduler, m_hid.top(scheduler.getDefaultEventLoop()));
+  public Trigger top(EventLoop loop) {
+    return button(Joystick.ButtonType.kTop.value, loop);
   }
 
   /**
@@ -173,6 +185,9 @@ public class CommandJoystick extends CommandGenericHID {
   /**
    * Get the x position of the HID.
    *
+   * <p>This depends on the mapping of the joystick connected to the current port. On most
+   * joysticks, positive is to the right.
+   *
    * @return the x position
    */
   public double getX() {
@@ -181,6 +196,9 @@ public class CommandJoystick extends CommandGenericHID {
 
   /**
    * Get the y position of the HID.
+   *
+   * <p>This depends on the mapping of the joystick connected to the current port. On most
+   * joysticks, positive is to the back.
    *
    * @return the y position
    */
@@ -218,8 +236,8 @@ public class CommandJoystick extends CommandGenericHID {
   }
 
   /**
-   * Get the magnitude of the direction vector formed by the joystick's current position relative to
-   * its origin.
+   * Get the magnitude of the vector formed by the joystick's current position relative to its
+   * origin.
    *
    * @return The magnitude of the direction vector
    */
@@ -228,16 +246,26 @@ public class CommandJoystick extends CommandGenericHID {
   }
 
   /**
-   * Get the direction of the vector formed by the joystick and its origin in radians.
+   * Get the direction of the vector formed by the joystick and its origin in radians. 0 is forward
+   * and clockwise is positive. (Straight right is π/2.)
    *
    * @return The direction of the vector in radians
    */
   public double getDirectionRadians() {
+    // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#joystick-and-controller-coordinate-system
+    // A positive rotation around the X axis moves the joystick right, and a
+    // positive rotation around the Y axis moves the joystick backward. When
+    // treating them as translations, 0 radians is measured from the right
+    // direction, and angle increases clockwise.
+    //
+    // It's rotated 90 degrees CCW (y is negated and the arguments are reversed)
+    // so that 0 radians is forward.
     return m_hid.getDirectionRadians();
   }
 
   /**
-   * Get the direction of the vector formed by the joystick and its origin in degrees.
+   * Get the direction of the vector formed by the joystick and its origin in degrees. 0 is forward
+   * and clockwise is positive. (Straight right is 90.)
    *
    * @return The direction of the vector in degrees
    */
