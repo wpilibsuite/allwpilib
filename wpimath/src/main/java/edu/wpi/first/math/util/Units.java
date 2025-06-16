@@ -146,7 +146,7 @@ public final class Units {
    * @return Meters per second converted from miles per hour.
    */
   public static double milesPerHourToMetersPerSecond(double mph) {
-    return mph * (kMetersPerMile / (kSecondsPerMinute * kMinutesPerHour));
+    return mph * kMetersPerMile / (kSecondsPerMinute * kMinutesPerHour);
   }
 
   /**
@@ -156,7 +156,7 @@ public final class Units {
    * @return Miles per hour converted from meters per second.
    */
   public static double metersPerSecondToMilesPerHour(double metersPerSecond) {
-    return metersPerSecond * ((kSecondsPerMinute * kMinutesPerHour) / kMetersPerMile);
+    return metersPerSecond * (kSecondsPerMinute * kMinutesPerHour) / kMetersPerMile;
   }
 
   /**
