@@ -1,16 +1,40 @@
-load("@rules_java//java:defs.bzl", "java_library", "java_plugin")
+load("//:version.bzl", "VERSION")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
+load("@rules_java//java:defs.bzl", "java_library", "java_plugin")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 
 java_library(
-    name = "processor",
+    name = "processor-java",
     srcs = glob(["src/main/java/**/*.java"]),
+    resource_strip_prefix = "epilogue-processor/src/main/resources/",
+    resources = glob(["src/main/resources/**"]),
+    tags = ["maven_coordinates=edu.wpi.first.epilogue:epilogue-processor-java:" + VERSION],
     visibility = ["//visibility:public"],
     runtime_deps = [
         "//wpilibNewCommands:wpilibNewCommands-java",
     ],
     deps = [
-        "//epilogue-runtime:epilogue",
+        "//epilogue-runtime:epilogue-java",
     ],
+)
+
+pkg_java_files(name = "epilogue-processor-java-srcs")
+
+pkg_files(
+    name = "resources",
+    srcs = glob(["src/main/resources/**"]),
+    strip_prefix = "src/main/resources/",
+)
+
+pkg_zip(
+    name = "libepilogue-processor-java-sources",
+    srcs = [
+        ":epilogue-processor-java-srcs",
+        ":resources",
+    ],
+    out = "libepilogue-processor-java-sources.jar",
 )
 
 java_plugin(
@@ -18,7 +42,7 @@ java_plugin(
     processor_class = "edu.wpi.first.epilogue.processor.AnnotationProcessor",
     visibility = ["//visibility:public"],
     deps = [
-        ":processor",
+        ":processor-java",
     ],
 )
 
@@ -29,7 +53,7 @@ wpilib_java_junit5_test(
         ":plugin",
     ],
     deps = [
-        ":processor",
+        ":processor-java",
         "@maven//:com_google_testing_compile_compile_testing",
     ],
 )

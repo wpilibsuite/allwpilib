@@ -1,6 +1,8 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_java//java:defs.bzl", "java_library")
+load("@rules_pkg//:mappings.bzl", "filter_directory", "pkg_files")
+load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
 def _jni_headers_impl(ctx):
     include_dir = ctx.actions.declare_directory(ctx.attr.name + ".h")
@@ -75,6 +77,7 @@ def wpilib_jni_java_library(
         name = name,
         visibility = visibility,
         testonly = testonly,
+        tags = tags,
         **java_library_args
     )
 
@@ -87,14 +90,26 @@ def wpilib_jni_java_library(
         visibility = visibility,
     )
 
+    # Expose a pkg_files with the JNI generated header in it.
+    filter_directory(
+        name = name + "-jni-hdrs-pkg",
+        src = headers_name,
+        excludes = ["MANIFEST.MF"],
+        outdir_name = "jni/",
+    )
+
 def wpilib_jni_cc_library(
         name,
         deps = [],
         java_dep = None,
         **kwargs):
     jni = "@rules_bzlmodrio_toolchains//jni"
+
+    if java_dep[0] != ":":
+        fail("java_dep", java_dep, "should start with a :")
+
     cc_library(
-        name = name + ".static",
+        name = name,
         deps = [jni, java_dep + ".hdrs"] + deps,
         **kwargs
     )

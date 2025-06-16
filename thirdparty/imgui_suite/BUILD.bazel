@@ -1,7 +1,10 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@rules_python//python:defs.bzl", "py_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+load("//:version.bzl", "VERSION")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("@rules_pkg//:pkg.bzl", "pkg_zip")
+load("@rules_python//python:defs.bzl", "py_binary")
 
 cc_library(
     name = "gl3w",
@@ -352,7 +355,9 @@ cc_library(
 #########################################
 wpilib_cc_library(
     name = "imgui_suite",
+    hdrs_pkg_root = None,
     linkstatic = True,
+    srcs_pkg_root = None,
     visibility = ["//visibility:public"],
     deps = [
         ":fonts",
@@ -360,5 +365,117 @@ wpilib_cc_library(
         ":imgui",
         ":implot",
         ":stb",
+    ],
+)
+
+wpilib_cc_static_library(
+    name = "static/imguiSuite",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":imgui_suite",
+    ],
+)
+
+pkg_files(
+    name = "glfw-hdrs-pkg",
+    srcs = glob(["glfw/include/**"]),
+    strip_prefix = "glfw/include",
+)
+
+pkg_files(
+    name = "imgui-hdrs-pkg",
+    srcs = glob(["imgui/include/**"]),
+    strip_prefix = "imgui/include",
+)
+
+pkg_files(
+    name = "implot-hdrs-pkg",
+    srcs = glob(["implot/include/**"]),
+    strip_prefix = "implot/include",
+)
+
+pkg_files(
+    name = "stb-hdrs-pkg",
+    srcs = glob(["stb/include/**"]),
+    strip_prefix = "stb/include",
+)
+
+pkg_files(
+    name = "generated-fonts-hdrs-pkg",
+    srcs = glob(["generated/fonts/include/**"]),
+    strip_prefix = "generated/fonts/include/",
+)
+
+pkg_files(
+    name = "generated-gl3w-hdrs-pkg",
+    srcs = glob(["generated/gl3w/include/**"]),
+    strip_prefix = "generated/gl3w/include/",
+)
+
+pkg_zip(
+    name = "imgui-suite-hdrs",
+    srcs = [
+        "generated-fonts-hdrs-pkg",
+        "generated-gl3w-hdrs-pkg",
+        "glfw-hdrs-pkg",
+        "imgui-hdrs-pkg",
+        "implot-hdrs-pkg",
+        "stb-hdrs-pkg",
+        "//:license_pkg_files",
+    ],
+    tags = [
+        "no-remote",
+    ],
+)
+
+pkg_files(
+    name = "glfw-srcs-pkg",
+    srcs = glob(["glfw/src/**"]),
+    strip_prefix = "glfw/src",
+)
+
+pkg_files(
+    name = "imgui-srcs-pkg",
+    srcs = glob(["imgui/cpp/**"]),
+    strip_prefix = "imgui/cpp",
+)
+
+pkg_files(
+    name = "implot-srcs-pkg",
+    srcs = glob(["implot/cpp/**"]),
+    strip_prefix = "implot/cpp",
+)
+
+pkg_files(
+    name = "stb-srcs-pkg",
+    srcs = glob(["stb/cpp/**"]),
+    strip_prefix = "stb/cpp",
+)
+
+pkg_files(
+    name = "generated-fonts-srcs-pkg",
+    srcs = glob(["generated/fonts/src/**"]),
+    strip_prefix = "generated/fonts/src/",
+)
+
+pkg_files(
+    name = "generated-gl3w-srcs-pkg",
+    srcs = glob(["generated/gl3w/src/**"]),
+    strip_prefix = "generated/gl3w/src/",
+)
+
+pkg_zip(
+    name = "imgui-suite-srcs",
+    srcs = [
+        "generated-fonts-srcs-pkg",
+        "generated-gl3w-srcs-pkg",
+        "glfw-srcs-pkg",
+        "imgui-srcs-pkg",
+        "implot-srcs-pkg",
+        "stb-srcs-pkg",
+        "//:license_pkg_files",
+    ],
+    tags = [
+        "no-remote",
     ],
 )

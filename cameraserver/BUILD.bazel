@@ -1,9 +1,10 @@
+load("//:version.bzl", "VERSION")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 
 wpilib_cc_library(
-    name = "cameraserver.static",
+    name = "cameraserver",
     srcs = glob(["src/main/native/cpp/**"]),
     hdrs = glob(["src/main/native/include/**/*"]),
     includes = [
@@ -13,19 +14,40 @@ wpilib_cc_library(
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
-        "//cscore:cscore.static",
-        "//ntcore:ntcore.static",
+        "//cscore",
+        "//ntcore",
     ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/cameraserver",
+    dynamic_deps = [
+        "//cscore:shared/cscore",
+        "//ntcore:shared/ntcore",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":cameraserver"],
+)
+
+wpilib_cc_static_library(
+    name = "static/cameraserver",
+    static_deps = [
+        "//cscore:static/cscore",
+        "//ntcore:static/ntcore",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":cameraserver"],
 )
 
 java_library(
     name = "cameraserver-java",
     srcs = glob(["src/main/java/**/*.java"]),
+    tags = ["maven_coordinates=edu.wpi.first.cameraserver:cameraserver-java:" + VERSION],
     visibility = ["//visibility:public"],
     deps = [
         "//cscore:cscore-java",
         "//hal:hal-java",
-        "//ntcore:networktables-java",
+        "//ntcore:ntcore-java",
         "//wpimath:wpimath-java",
         "//wpinet:wpinet-java",
         "//wpiutil:wpiutil-java",
@@ -38,8 +60,8 @@ cc_test(
     size = "small",
     srcs = glob(["src/test/native/**"]),
     deps = [
-        ":cameraserver.static",
-        "//thirdparty/googletest:googletest.static",
+        ":cameraserver",
+        "//thirdparty/googletest",
     ],
 )
 
@@ -47,7 +69,7 @@ cc_binary(
     name = "DevMain-Cpp",
     srcs = ["src/dev/native/cpp/main.cpp"],
     deps = [
-        ":cameraserver.static",
+        ":cameraserver",
     ],
 )
 

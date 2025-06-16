@@ -1,10 +1,23 @@
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+load("//:version.bzl", "VERSION")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
 
 wpilib_cc_library(
-    name = "googletest.static",
+    name = "googletest",
     srcs = glob(["src/**"]),
     hdrs = glob(["include/**"]),
+    hdrs_pkg_root = "include",
+    include_license_files = True,
     includes = ["src/googletest"],
+    srcs_pkg_root = "src",
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
+)
+
+wpilib_cc_static_library(
+    name = "static/googletest",
+    static_lib_name = "static/libgoogletest.a",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":googletest",
+    ],
 )

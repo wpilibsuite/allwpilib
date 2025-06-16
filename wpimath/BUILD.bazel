@@ -1,12 +1,15 @@
+load("//:version.bzl", "VERSION")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
+load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
+load("//wpimath:generate.bzl", "generate_wpimath")
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
-load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
-load("//wpimath:generate.bzl", "generate_wpimath")
 
 filegroup(
     name = "templates",
@@ -110,7 +113,7 @@ cc_library(
 )
 
 wpilib_cc_library(
-    name = "wpimath.static",
+    name = "wpimath",
     srcs = glob(
         [
             "src/main/native/cpp/**",
@@ -120,6 +123,9 @@ wpilib_cc_library(
     ),
     hdrs = glob(["src/main/native/include/**"]),
     defines = ["WPILIB_EXPORTS"],
+    extra_src_pkg_files = [
+        ":wpimath-java-jni-hdrs-pkg",
+    ],
     includes = [
         "src/main/native/include",
         "src/main/native/thirdparty/sleipnir/src",
@@ -135,7 +141,29 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":nanopb-generated-headers",
-        "//wpiutil:wpiutil.static",
+        "//wpiutil",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/wpimath",
+    dynamic_deps = [
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpimath",
+    ],
+)
+
+wpilib_cc_static_library(
+    name = "static/wpimath",
+    static_deps = [
+        "//wpiutil:static/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpimath",
     ],
 )
 
@@ -145,17 +173,30 @@ wpilib_jni_cc_library(
     java_dep = ":wpimath-java",
     visibility = ["//visibility:public"],
     deps = [
-        ":wpimath.static",
+        ":wpimath",
     ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/wpimathjni",
+    dynamic_deps = [
+        ":shared/wpimath",
+    ],
+    use_debug_name = False,
+    visibility = ["//visibility:public"],
+    deps = [":wpimathjni"],
 )
 
 wpilib_jni_java_library(
     name = "wpimath-java",
     srcs = [":generated_java"] + glob(["src/main/java/**/*.java"]),
     native_libs = [":wpimathjni"],
+    resource_strip_prefix = "wpimath/src/main/proto",
+    resources = glob(["src/main/proto/**"]),
+    tags = ["maven_coordinates=edu.wpi.first.wpimath:wpimath-java:" + VERSION],
     visibility = ["//visibility:public"],
     deps = [
-        "//wpiunits",
+        "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
         "@maven//:com_fasterxml_jackson_core_jackson_annotations",
         "@maven//:com_fasterxml_jackson_core_jackson_core",
@@ -165,6 +206,14 @@ wpilib_jni_java_library(
         "@maven//:org_ejml_ejml_simple",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
+)
+
+pkg_java_files(name = "wpimath-java-srcs")
+
+pkg_zip(
+    name = "libwpimath-java-sources",
+    srcs = [":wpimath-java-srcs"],
+    out = "libwpimath-java-sources.jar",
 )
 
 cc_library(
@@ -182,10 +231,19 @@ cc_test(
         "src/test/native/cpp/**/*.cpp",
         "src/test/native/cpp/**/*.h",
     ]),
+    dynamic_deps = [
+        ":shared/wpimath",
+        # TODO(austin): Why is this required?  Probably Brian's bug...
+        "//wpiutil:shared/wpiutil",
+    ],
+    tags = [
+        "no-bullseye",
+        "no-raspi",
+    ],
     deps = [
         ":test_headers",
-        ":wpimath.static",
-        "//thirdparty/googletest:googletest.static",
+        ":wpimath",
+        "//thirdparty/googletest",
     ],
 )
 
@@ -194,7 +252,7 @@ wpilib_java_junit5_test(
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":wpimath-java",
-        "//wpiunits",
+        "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
         "@maven//:org_ejml_ejml_core",
         "@maven//:org_ejml_ejml_simple",
@@ -206,7 +264,7 @@ cc_binary(
     name = "DevMain-Cpp",
     srcs = ["src/dev/native/cpp/main.cpp"],
     deps = [
-        ":wpimath.static",
+        ":wpimath",
     ],
 )
 

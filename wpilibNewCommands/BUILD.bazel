@@ -1,11 +1,14 @@
+load("//:version.bzl", "VERSION")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
+load("//wpilibNewCommands:generate.bzl", "generate_wpilib_new_commands")
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
-load("//wpilibNewCommands:generate.bzl", "generate_wpilib_new_commands")
 
 py_binary(
     name = "generate_hids",
@@ -50,7 +53,7 @@ filegroup(
 )
 
 wpilib_cc_library(
-    name = "wpilibNewCommands.static",
+    name = "wpilibNewCommands",
     srcs = glob(["src/main/native/cpp/**"]),
     hdrs = glob(["src/main/native/include/**"]),
     includes = ["src/main/native/include"],
@@ -60,24 +63,57 @@ wpilib_cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//wpilibc:wpilibc.static",
+        "//ntcore",
+        "//wpilibc",
+        "//wpinet",
     ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/wpilibNewCommands",
+    dynamic_deps = [
+        "//ntcore:shared/ntcore",
+        "//wpilibc:shared/wpilibc",
+        "//wpinet:shared/wpinet",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":wpilibNewCommands"],
+)
+
+wpilib_cc_static_library(
+    name = "static/wpilibNewCommands",
+    static_deps = [
+        "//ntcore:static/ntcore",
+        "//wpilibc:static/wpilibc",
+        "//wpinet:static/wpinet",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":wpilibNewCommands"],
 )
 
 java_library(
     name = "wpilibNewCommands-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
+    tags = ["maven_coordinates=edu.wpi.first.wpilibNewCommands:wpilibNewCommands-java:" + VERSION],
     visibility = ["//visibility:public"],
     deps = [
         "//cscore:cscore-java",
         "//hal:hal-java",
-        "//ntcore:networktables-java",
-        "//wpilibj",
+        "//ntcore:ntcore-java",
+        "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",
         "//wpinet:wpinet-java",
-        "//wpiunits",
+        "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
     ],
+)
+
+pkg_java_files(name = "wpilibNewCommands-java-srcs")
+
+pkg_zip(
+    name = "libwpilibNewCommands-java-sources",
+    srcs = [":wpilibNewCommands-java-srcs"],
+    out = "libwpilibNewCommands-java-sources.jar",
 )
 
 cc_test(
@@ -92,8 +128,8 @@ cc_test(
         "no-ubsan",
     ],
     deps = [
-        ":wpilibNewCommands.static",
-        "//thirdparty/googletest:googletest.static",
+        ":wpilibNewCommands",
+        "//thirdparty/googletest",
     ],
 )
 
@@ -105,10 +141,10 @@ wpilib_java_junit5_test(
     deps = [
         ":wpilibNewCommands-java",
         "//hal:hal-java",
-        "//ntcore:networktables-java",
-        "//wpilibj",
+        "//ntcore:ntcore-java",
+        "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",
-        "//wpiunits",
+        "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
         "@maven//:org_mockito_mockito_core",
     ],
@@ -127,7 +163,7 @@ java_binary(
     main_class = "edu.wpi.first.wpilibj2.commands.DevMain",
     deps = [
         "//hal:hal-java",
-        "//ntcore:networktables-java",
+        "//ntcore:ntcore-java",
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
     ],
