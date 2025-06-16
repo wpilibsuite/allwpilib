@@ -19,13 +19,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class CoroutineTest {
-  Scheduler scheduler;
-  ContinuationScope scope;
+  Scheduler m_scheduler;
+  ContinuationScope m_scope;
 
   @BeforeEach
   void setup() {
-    scheduler = new Scheduler();
-    scope = new ContinuationScope("Test Scope");
+    m_scheduler = new Scheduler();
+    m_scope = new ContinuationScope("Test Scope");
     RobotController.setTimeSource(() -> System.nanoTime() / 1000L);
   }
 
@@ -40,11 +40,11 @@ class CoroutineTest {
       co.park();
     }).named("Fork Many");
 
-    scheduler.schedule(all);
-    scheduler.run();
-    assertTrue(scheduler.isRunning(a));
-    assertTrue(scheduler.isRunning(b));
-    assertTrue(scheduler.isRunning(c));
+    m_scheduler.schedule(all);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(a));
+    assertTrue(m_scheduler.isRunning(b));
+    assertTrue(m_scheduler.isRunning(c));
   }
 
   @Test
@@ -61,16 +61,16 @@ class CoroutineTest {
       }
     }).named("Yield In Synchronized Block");
 
-    scheduler.schedule(yieldInSynchronized);
+    m_scheduler.schedule(yieldInSynchronized);
 
     try {
-      scheduler.run();
+      m_scheduler.run();
       fail("Monitor pinned exception should have been thrown");
     } catch (IllegalStateException expected) {
       assertEquals(
-          "Coroutine.yield() cannot be called inside a synchronized block or method. " +
-              "Consider using a Lock instead of synchronized, " +
-              "or rewrite your code to avoid locks and mutexes altogether.",
+          "Coroutine.yield() cannot be called inside a synchronized block or method. "
+              + "Consider using a Lock instead of synchronized, "
+              + "or rewrite your code to avoid locks and mutexes altogether.",
           expected.getMessage());
     }
   }
@@ -92,8 +92,8 @@ class CoroutineTest {
       }
     }).named("Increment In Lock Block");
 
-    scheduler.schedule(yieldInLock);
-    scheduler.run();
+    m_scheduler.schedule(yieldInLock);
+    m_scheduler.run();
     assertEquals(1, i.get());
   }
 
@@ -105,8 +105,8 @@ class CoroutineTest {
       escapeeCallback.set(co::yield);
     }).named("Bad Command");
 
-    scheduler.schedule(badCommand);
-    scheduler.run();
+    m_scheduler.schedule(badCommand);
+    m_scheduler.run();
 
     try {
       escapeeCallback.get().run();
@@ -135,8 +135,8 @@ class CoroutineTest {
       co.park(); // prevent exiting
     }).named("Command");
 
-    scheduler.schedule(outer);
-    scheduler.run();
+    m_scheduler.schedule(outer);
+    m_scheduler.run();
 
     // Everything should have run...
     assertTrue(firstRan.get());
@@ -144,6 +144,6 @@ class CoroutineTest {
     assertTrue(ranAfterAwait.get());
 
     // But only the outer command should still be running; secondInner should have been cancelled
-    assertEquals(Set.of(outer), scheduler.getRunningCommands());
+    assertEquals(Set.of(outer), m_scheduler.getRunningCommands());
   }
 }
