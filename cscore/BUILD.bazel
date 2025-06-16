@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
@@ -51,19 +51,22 @@ wpilib_objc_library(
         "IOKit",
     ],
     deps = [
-        "//wpinet:wpinet.static",
-        "//wpiutil:wpiutil.static",
+        "//wpinet",
+        "//wpiutil",
         "@bzlmodrio-opencv//libraries/cpp/opencv",
     ],
 )
 
 wpilib_cc_library(
-    name = "cscore.static",
+    name = "cscore",
     srcs = [":native-srcs"] + glob(
         ["src/main/native/cpp/**"],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**/*"]),
+    extra_src_pkg_files = [
+        ":cscore-java-jni-hdrs-pkg",
+    ],
     includes = [
         "src/main/native/cpp",
         "src/main/native/include",
@@ -71,13 +74,23 @@ wpilib_cc_library(
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
-        "//wpinet:wpinet.static",
-        "//wpiutil:wpiutil.static",
+        "//wpinet",
+        "//wpiutil",
         "@bzlmodrio-opencv//libraries/cpp/opencv",
     ] + select({
         "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
         "//conditions:default": [],
     }),
+)
+
+wpilib_cc_static_library(
+    name = "static/cscore",
+    static_deps = [
+        "//wpinet:static/wpinet",
+        "//wpiutil:static/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":cscore"],
 )
 
 wpilib_jni_cc_library(
@@ -86,7 +99,7 @@ wpilib_jni_cc_library(
     java_dep = ":cscore-java",
     visibility = ["//visibility:public"],
     deps = [
-        ":cscore.static",
+        ":cscore",
     ],
 )
 
@@ -106,8 +119,8 @@ cc_test(
     size = "small",
     srcs = glob(["src/test/native/**"]),
     deps = [
-        ":cscore.static",
-        "//thirdparty/googletest:googletest.static",
+        ":cscore",
+        "//thirdparty/googletest",
     ],
 )
 
@@ -124,7 +137,7 @@ cc_binary(
     name = "DevMain-Cpp",
     srcs = ["src/dev/native/cpp/main.cpp"],
     deps = [
-        ":cscore.static",
+        ":cscore",
     ],
 )
 
@@ -147,7 +160,7 @@ java_binary(
         "wpi-example",
     ],
     deps = [
-        "//cscore:cscore.static",
+        "//cscore",
         "//wpigui",
     ],
 ) for example in [
