@@ -60,26 +60,6 @@ public final class Units {
   }
 
   /**
-   * Converts given meters to miles.
-   *
-   * @param meters The meters to convert to miles.
-   * @return Miles converted from meters.
-   */
-  public static double metersToMiles(double meters) {
-    return meters / kMetersPerMile;
-  }
-
-  /**
-   * Converts given miles to meters.
-   *
-   * @param miles The miles to convert to meters.
-   * @return Meters converted from miles.
-   */
-  public static double milesToMeters(double miles) {
-    return miles * kMetersPerMile;
-  }
-
-  /**
    * Converts given degrees to radians.
    *
    * @param degrees The degrees to convert to radians.
