@@ -29,7 +29,7 @@ public class Trigger implements BooleanSupplier {
   private final BooleanSupplier m_condition;
   private final EventLoop m_loop;
   private final Scheduler m_scheduler;
-  private Signal m_previousSignal = null;
+  private Signal m_previousSignal;
   private final Map<BindingType, List<Binding>> m_bindings = new EnumMap<>(BindingType.class);
   private final Runnable m_eventLoopCallback = this::poll;
 

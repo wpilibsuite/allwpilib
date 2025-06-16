@@ -16,12 +16,13 @@ public final class Continuation {
 
   static final Class<?> jdk_internal_vm_Continuation;
   private static final MethodHandle CONSTRUCTOR;
+  @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
   private static final MethodHandle YIELD;
+  @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
   private static final MethodHandle RUN;
   private static final MethodHandle IS_DONE;
 
   private static final MethodHandle java_lang_thread_setContinuation;
-  private static final MethodHandle java_lang_thread_getContinuation;
 
   private static final ThreadLocal<Continuation> mountedContinuation = new ThreadLocal<>();
 
@@ -66,11 +67,6 @@ public final class Continuation {
               Thread.class,
               "setContinuation",
               MethodType.methodType(void.class, Continuation.jdk_internal_vm_Continuation));
-
-      java_lang_thread_getContinuation =
-          lookup.findVirtual(
-              Thread.class,
-              "getContinuation", MethodType.methodType(Continuation.jdk_internal_vm_Continuation));
     } catch (Throwable t) {
       throw new ExceptionInInitializerError(t);
     }
@@ -84,10 +80,13 @@ public final class Continuation {
    * @param scope the continuation's scope, used in yield
    * @param target the continuation's body
    */
+  @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.AvoidCatchingGenericException"})
   public Continuation(ContinuationScope scope, Runnable target) {
     try {
       m_continuation = CONSTRUCTOR.invoke(scope.m_continuationScope, target);
       m_scope = scope;
+    } catch (RuntimeException | Error e) {
+      throw e;
     } catch (Throwable t) {
       throw new RuntimeException(t);
     }
@@ -99,31 +98,31 @@ public final class Continuation {
    * @return {@code true} for success; {@code false} for failure
    * @throws IllegalStateException if not currently in this continuation's scope
    */
+  @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.AvoidCatchingGenericException"})
   public boolean yield() {
     try {
       return (boolean) YIELD.invoke(m_scope.m_continuationScope);
     } catch (RuntimeException e) {
       throw e;
     } catch (Throwable t) {
-      throw new RuntimeException(t);
+      throw new Error(t);
     }
   }
 
   /**
    * Mounts and runs the continuation body. If suspended, continues it from the last suspend point.
    */
+  @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.AvoidCatchingGenericException"})
   public void run() {
     try {
       RUN.invoke(m_continuation);
     } catch (WrongMethodTypeException | ClassCastException e) {
       throw new IllegalStateException("Unable to run the underlying continuation!", e);
-    } catch (RuntimeException e) {
+    } catch (RuntimeException | Error e) {
       // The bound task threw an exception; re-throw it
       throw e;
     } catch (Throwable t) {
-      // Other error type (eg StackOverflowError, OutOfMemoryError), wrap in an Error so it won't
-      // be caught by a naive `catch (Exception e)` statement
-      throw new Error(t);
+      throw new RuntimeException(t);
     }
   }
 
@@ -132,9 +131,12 @@ public final class Continuation {
    *
    * @return whether this continuation is completed
    */
+  @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.AvoidCatchingGenericException"})
   public boolean isDone() {
     try {
       return (boolean) IS_DONE.invoke(m_continuation);
+    } catch (RuntimeException | Error e) {
+      throw e;
     } catch (Throwable t) {
       throw new RuntimeException(t);
     }
@@ -146,20 +148,25 @@ public final class Continuation {
    *
    * @param continuation the continuation to mount
    */
+  @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.AvoidCatchingGenericException"})
   public static void mountContinuation(Continuation continuation) {
     try {
       if (continuation == null) {
         java_lang_thread_setContinuation.invoke(Thread.currentThread(), null);
         mountedContinuation.remove();
       } else {
-        java_lang_thread_setContinuation.invoke(Thread.currentThread(), continuation.m_continuation);
+        java_lang_thread_setContinuation.invoke(
+            Thread.currentThread(), continuation.m_continuation);
         mountedContinuation.set(continuation);
       }
+    } catch (RuntimeException | Error e) {
+      throw e;
     } catch (Throwable t) {
       // `t` is anything thrown internally by Thread.setContinuation.
       // It only assigns to a field, no way to throw
       // However, if the invocation fails for some reason, we'll end up with an
       // IllegalStateException when attempting to run an unmounted continuation
+      throw new RuntimeException(t);
     }
   }
 
@@ -179,6 +186,7 @@ public final class Continuation {
   }
 
 
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   boolean isMounted() {
     return this == getMountedContinuation();
   }

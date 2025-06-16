@@ -10,9 +10,9 @@ final class CommandState {
   private final Command m_parent;
   private final Coroutine m_coroutine;
   private final Binding m_binding;
-  private double lastRuntimeMs = -1;
-  private double totalRuntimeMs = 0;
-  private final int id = System.identityHashCode(this);
+  private double m_lastRuntimeMs = -1;
+  private double m_totalRuntimeMs;
+  private final int m_id = System.identityHashCode(this);
 
   /**
    * Creates a new command state object.
@@ -57,30 +57,30 @@ final class CommandState {
    * @return The runtime, in milliseconds.
    */
   public double lastRuntimeMs() {
-    return lastRuntimeMs;
+    return m_lastRuntimeMs;
   }
 
   public void setLastRuntimeMs(double lastRuntimeMs) {
-    this.lastRuntimeMs = lastRuntimeMs;
-    totalRuntimeMs += lastRuntimeMs;
+    this.m_lastRuntimeMs = lastRuntimeMs;
+    m_totalRuntimeMs += lastRuntimeMs;
   }
 
   public double totalRuntimeMs() {
-    return totalRuntimeMs;
+    return m_totalRuntimeMs;
   }
 
   public int id() {
-    return id;
+    return m_id;
   }
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof CommandState that && this.id == that.id;
+    return obj instanceof CommandState that && this.m_id == that.m_id;
   }
 
   @Override
   public int hashCode() {
-    return id;
+    return m_id;
   }
 
   @Override

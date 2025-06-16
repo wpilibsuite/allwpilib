@@ -284,6 +284,7 @@ public class Scheduler implements ProtobufSerializable {
    * Cancels all running commands with which an incoming state conflicts. Ancestor commands of the
    * incoming state will not be canceled.
    */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   private void evictConflictingRunningCommands(CommandState incomingState) {
     // The set of root states with which the incoming state conflicts but does not inherit from
     Set<CommandState> conflictingRootStates =
@@ -318,6 +319,7 @@ public class Scheduler implements ProtobufSerializable {
    * @param ancestor the potential ancestor for which to search
    * @return true if {@code ancestor} is the direct parent or indirect ancestor, false if not
    */
+  @SuppressWarnings({"PMD.CompareObjectsWithEquals", "PMD.SimplifyBooleanReturns"})
   private boolean inheritsFrom(CommandState state, Command ancestor) {
     if (state.parent() == null) {
       // No parent, cannot inherit
@@ -346,6 +348,7 @@ public class Scheduler implements ProtobufSerializable {
    *
    * @param command the command to cancel
    */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public void cancel(Command command) {
     boolean running = isRunning(command);
 
@@ -429,6 +432,7 @@ public class Scheduler implements ProtobufSerializable {
     }
   }
 
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private void runCommand(CommandState state) {
     final var command = state.command();
     final var coroutine = state.coroutine();
@@ -457,7 +461,7 @@ public class Scheduler implements ProtobufSerializable {
       double elapsedMs = Milliseconds.convertFrom(endMicros - startMicros, Microseconds);
       state.setLastRuntimeMs(elapsedMs);
 
-      if (currentState() == state) {
+      if (state.equals(currentState())) {
         // Remove the command we just ran from the top of the stack
         m_executingCommands.pop();
       }
@@ -516,12 +520,11 @@ public class Scheduler implements ProtobufSerializable {
     m_defaultCommands.forEach(
         (resource, defaultCommand) -> {
           if (m_commandStates.keySet().stream().noneMatch(c -> c.requires(resource))
-              && m_onDeck.stream().noneMatch(c -> c.command().requires(resource))) {
+              && m_onDeck.stream().noneMatch(c -> c.command().requires(resource))
+              && defaultCommand != null) {
             // Nothing currently running or scheduled
             // Schedule the resource's default command, if it has one
-            if (defaultCommand != null) {
-              schedule(defaultCommand);
-            }
+            schedule(defaultCommand);
           }
         });
   }
@@ -532,6 +535,7 @@ public class Scheduler implements ProtobufSerializable {
    *
    * @param parent the root command whose descendants to remove from the scheduler
    */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   private void removeOrphanedChildren(Command parent) {
     m_commandStates.entrySet().stream()
         .filter(e -> e.getValue().parent() == parent)
@@ -566,6 +570,7 @@ public class Scheduler implements ProtobufSerializable {
    * @param command the command to check
    * @return true if the command is scheduled to run, false if not
    */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public boolean isScheduled(Command command) {
     return m_onDeck.stream().anyMatch(state -> state.command() == command);
   }
@@ -684,6 +689,7 @@ public class Scheduler implements ProtobufSerializable {
    * @param command The command to get the run ID for
    * @return The run of the command
    */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public int runId(Command command) {
     if (m_commandStates.containsKey(command)) {
       return m_commandStates.get(command).id();
