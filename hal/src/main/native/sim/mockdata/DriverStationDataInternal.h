@@ -97,7 +97,7 @@ class DriverStationData {
 
   void SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state);
   void SetJoystickAxis(int32_t stick, int32_t axis, double value);
-  void SetJoystickPOV(int32_t stick, int32_t pov, int32_t value);
+  void SetJoystickPOV(int32_t stick, int32_t pov, HAL_JoystickPOV value);
   void SetJoystickButtons(int32_t stick, uint32_t buttons);
   void SetJoystickAxisCount(int32_t stick, int32_t count);
   void SetJoystickPOVCount(int32_t stick, int32_t count);
