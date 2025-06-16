@@ -7,7 +7,7 @@ option java_multiple_files = true;
 
 /*
 allwpilib $ protoc-quickbuf \
-              --quickbuf_out=gen_descriptors=true:commandsv3/src/main/java \
+              --quickbuf_out=gen_descriptors=true:commandsv3/src/generated/main/java \
               commandsv3/src/main/proto/scheduler.proto
  */
 

@@ -27,6 +27,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:4.1.0'
 }
 
+sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 sourceSets.main.resources.srcDir "${projectDir}/src/main/proto"
 
 tasks.withType(Javadoc) {
