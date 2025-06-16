@@ -135,14 +135,14 @@ cc_shared_library(
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
     ],
-    user_link_flags = [
-        "-Wl,-soname,libcscorejnicvstatic.so",
-    ] + select({
-        "@bazel_tools//src/conditions:darwin": [
+    user_link_flags = select({
+        "@platforms//os:osx": [
+            "-Wl,-install_name,libcscorejnicvstatic.so",
             "-exported_symbols_list",
             "$(location :src/main/native/MacSymbolScript.txt)",
         ],
         "//conditions:default": [
+            "-Wl,-soname,libcscorejnicvstatic.so",
             "-Wl,--version-script=$(location :src/main/native/LinuxSymbolScript.txt)",
         ],
     }),

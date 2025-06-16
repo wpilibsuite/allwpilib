@@ -253,8 +253,11 @@ def wpilib_cc_shared_library(
             name = name,
             dynamic_deps = dynamic_deps,
             user_link_flags = (user_link_flags or []) + select({
-                "//shared/bazel/rules:compilation_mode_dbg": ["-Wl,-soname,lib" + lib + "d.so"],
-                "//conditions:default": ["-Wl,-soname,lib" + lib + ".so"],
+                "//shared/bazel/rules:linux_compilation_mode_dbg": ["-Wl,-soname,lib" + lib + "d.so"],
+                "//shared/bazel/rules:osx_compilation_mode_dbg": ["-Wl,-install_name,lib" + lib + "d.so"],
+                "@platforms//os:linux": ["-Wl,-soname,lib" + lib + ".so"],
+                "@platforms//os:osx": ["-Wl,-install_name,lib" + lib + ".so"],
+                "//conditions:default": [],
             }),
             additional_linker_inputs = additional_linker_inputs,
             visibility = visibility,
@@ -308,7 +311,12 @@ def wpilib_cc_shared_library(
         native.cc_shared_library(
             name = name,
             dynamic_deps = dynamic_deps,
-            user_link_flags = (user_link_flags or []) + ["-Wl,-soname,lib" + lib + ".so"],
+            user_link_flags = (user_link_flags or []) + select({
+                "@platforms//os:osx": ["-Wl,-install_name,lib" + lib + ".so"],
+                "//conditions:default": [
+                    "-Wl,-soname,lib" + lib + ".so",
+                ],
+            }),
             visibility = visibility,
             additional_linker_inputs = additional_linker_inputs,
             deps = deps,
