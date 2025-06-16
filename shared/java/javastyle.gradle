@@ -29,7 +29,7 @@ spotless {
             exclude '**/build/**', '**/build-*/**', '**/bin/**', "src/generated/**"
         }
         toggleOffOn()
-        googleJavaFormat()
+        palantirJavaFormat().style("GOOGLE")
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
