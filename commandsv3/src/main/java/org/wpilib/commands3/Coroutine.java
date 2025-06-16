@@ -44,7 +44,7 @@ public final class Coroutine {
     try {
       return m_backingContinuation.yield();
     } catch (IllegalStateException e) {
-      if (e.getMessage().equals("Pinned: MONITOR")) {
+      if ("Pinned: MONITOR".equals(e.getMessage())) {
         // Yielding inside a synchronized block or method
         // Throw with an error message that's more helpful for our users
         throw new IllegalStateException(
@@ -206,6 +206,7 @@ public final class Coroutine {
    * @throws IllegalArgumentException If at least one pair of commands is found in the input
    *     where both commands have at least one required resource in common
    */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   private static void validateNoConflicts(Collection<Command> commands) {
     for (var c1 : commands) {
       for (var c2 : commands) {

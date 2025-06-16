@@ -24,7 +24,7 @@ public class CommandBuilder {
   private Runnable m_onCancel = () -> {};
   private String m_name;
   private int m_priority = Command.DEFAULT_PRIORITY;
-  private BooleanSupplier m_endCondition = null;
+  private BooleanSupplier m_endCondition;
 
   /**
    * Adds a resource as a requirement for the command.

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class ParallelGroupBuilder {
   private final Set<Command> m_commands = new LinkedHashSet<>();
   private final Set<Command> m_requiredCommands = new LinkedHashSet<>();
-  private BooleanSupplier m_endCondition = null;
+  private BooleanSupplier m_endCondition;
 
   /**
    * Adds one or more optional commands to the group. They will not be required to complete for

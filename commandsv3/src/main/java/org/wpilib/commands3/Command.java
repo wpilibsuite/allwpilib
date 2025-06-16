@@ -140,11 +140,7 @@ public interface Command {
    * @return true if this command has a lower priority than the other one, false otherwise
    */
   default boolean isLowerPriorityThan(Command other) {
-    if (other == null) {
-      return false;
-    }
-
-    return priority() < other.priority();
+    return other != null && priority() < other.priority();
   }
 
   /**

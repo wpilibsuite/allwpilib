@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public class SequenceBuilder {
   private final List<Command> m_steps = new ArrayList<>();
-  private BooleanSupplier m_endCondition = null;
+  private BooleanSupplier m_endCondition;
 
   /**
    * Adds a command to the sequence.

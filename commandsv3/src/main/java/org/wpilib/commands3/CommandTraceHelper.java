@@ -55,7 +55,7 @@ final class CommandTraceHelper {
               boolean inTriggerInternals = frame.getClassName().equals(Trigger.class.getName());
               boolean isScheduleCall =
                   frame.getClassName().equals(Scheduler.class.getName())
-                      && frame.getMethodName().equals("schedule");
+                      && "schedule".equals(frame.getMethodName());
 
               return inTriggerInternals || isScheduleCall;
             })
@@ -64,8 +64,8 @@ final class CommandTraceHelper {
         break;
       }
 
-      if (exceptionFrame.getClassName().equals("org.wpilib.commands3.Scheduler")
-              && exceptionFrame.getMethodName().equals("run")) {
+      if (exceptionFrame.getClassName().equals(Scheduler.class.getName())
+              && "run".equals(exceptionFrame.getMethodName())) {
         sawRun = true;
       }
     }

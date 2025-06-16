@@ -32,6 +32,7 @@ public class ParallelGroup implements Command {
    * @param requiredCommands The commands that are required to completed for the group to finish. If
    *     this is empty, then the group will finish when <i>any</i> command in it has completed.
    */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public ParallelGroup(
       String name, Collection<Command> allCommands, Collection<Command> requiredCommands) {
     requireNonNullParam(name, "name", "ParallelGroup");
