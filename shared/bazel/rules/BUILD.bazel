@@ -1,4 +1,15 @@
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
+
+# Generate this because otherwise the linter wants to change the format.
+write_file(
+    name = "manifest_write",
+    out = "MANIFEST.MF",
+    content = [
+        "Manifest-Version: 1.0",
+        "",
+    ],
+)
 
 config_setting(
     name = "is_linux_x86_64",
