@@ -25,12 +25,12 @@ import org.junit.jupiter.api.Timeout;
 
 @Timeout(5)
 class SchedulerTest {
-  private Scheduler scheduler;
+  private Scheduler m_scheduler;
 
   @BeforeEach
   void setup() {
     RobotController.setTimeSource(() -> System.nanoTime() / 1000L);
-    scheduler = new Scheduler();
+    m_scheduler = new Scheduler();
   }
 
   @Test
@@ -39,7 +39,7 @@ class SchedulerTest {
     var ran = new AtomicBoolean(false);
     var command =
         Command.noRequirements(
-                (coroutine) -> {
+                coroutine -> {
                   do {
                     coroutine.yield();
                   } while (!enabled.get());
@@ -47,13 +47,13 @@ class SchedulerTest {
                 })
             .named("Basic Command");
 
-    scheduler.schedule(command);
-    scheduler.run();
-    assertTrue(scheduler.isRunning(command), "Command should be running after being scheduled");
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command), "Command should be running after being scheduled");
 
     enabled.set(true);
-    scheduler.run();
-    if (scheduler.isRunning(command)) {
+    m_scheduler.run();
+    if (m_scheduler.isRunning(command)) {
       fail("Command should no longer be running after awaiting its completion");
     }
 
@@ -62,64 +62,65 @@ class SchedulerTest {
 
   @Test
   void higherPriorityCancels() {
-    var subsystem = new RequireableResource("Subsystem", scheduler);
+    final var subsystem = new RequireableResource("Subsystem", m_scheduler);
 
-    var lower = new PriorityCommand(-1000, subsystem);
-    var higher = new PriorityCommand(+1000, subsystem);
+    final var lower = new PriorityCommand(-1000, subsystem);
+    final var higher = new PriorityCommand(+1000, subsystem);
 
-    scheduler.schedule(lower);
-    scheduler.run();
-    assertTrue(scheduler.isRunning(lower));
+    m_scheduler.schedule(lower);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(lower));
 
-    scheduler.schedule(higher);
-    scheduler.run();
-    assertTrue(scheduler.isRunning(higher));
-    assertFalse(scheduler.isRunning(lower));
+    m_scheduler.schedule(higher);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(higher));
+    assertFalse(m_scheduler.isRunning(lower));
   }
 
   @Test
   void lowerPriorityDoesNotCancel() {
-    var subsystem = new RequireableResource("Subsystem", scheduler);
+    final var subsystem = new RequireableResource("Subsystem", m_scheduler);
 
-    var lower = new PriorityCommand(-1000, subsystem);
-    var higher = new PriorityCommand(+1000, subsystem);
+    final var lower = new PriorityCommand(-1000, subsystem);
+    final var higher = new PriorityCommand(+1000, subsystem);
 
-    scheduler.schedule(higher);
-    scheduler.run();
-    assertTrue(scheduler.isRunning(higher));
+    m_scheduler.schedule(higher);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(higher));
 
-    scheduler.schedule(lower);
-    scheduler.run();
-    if (!scheduler.isRunning(higher)) {
+    m_scheduler.schedule(lower);
+    m_scheduler.run();
+    if (!m_scheduler.isRunning(higher)) {
       fail("Higher priority command should still be running");
     }
-    if (scheduler.isRunning(lower)) {
+    if (m_scheduler.isRunning(lower)) {
       fail("Lower priority command should not be running");
     }
   }
 
   @Test
   void samePriorityCancels() {
-    var subsystem = new RequireableResource("Subsystem", scheduler);
+    final var subsystem = new RequireableResource("Subsystem", m_scheduler);
 
-    var first = new PriorityCommand(512, subsystem);
-    var second = new PriorityCommand(512, subsystem);
+    final var first = new PriorityCommand(512, subsystem);
+    final var second = new PriorityCommand(512, subsystem);
 
-    scheduler.schedule(first);
-    scheduler.run();
-    assertTrue(scheduler.isRunning(first));
+    m_scheduler.schedule(first);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(first));
 
-    scheduler.schedule(second);
-    scheduler.run();
-    assertTrue(scheduler.isRunning(second), "New command should be running");
-    assertFalse(scheduler.isRunning(first), "Old command should be canceled");
+    m_scheduler.schedule(second);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(second), "New command should be running");
+    assertFalse(m_scheduler.isRunning(first), "Old command should be canceled");
   }
 
   @Test
+  @SuppressWarnings({"PMD.RedundantFieldInitializer", "PMD.ImmutableField"}) // PMD bugs
   void atomicity() {
     var resource =
-        new RequireableResource("X", scheduler) {
-          int x = 0;
+        new RequireableResource("X", m_scheduler) {
+          int m_x = 0;
         };
 
     // Launch 100 commands that each call `x++` 500 times.
@@ -132,42 +133,43 @@ class SchedulerTest {
     for (int cmdCount = 0; cmdCount < numCommands; cmdCount++) {
       var command =
           Command.noRequirements(
-                  (coroutine) -> {
+                  coroutine -> {
                     for (int i = 0; i < iterations; i++) {
                       coroutine.yield();
-                      resource.x++;
+                      resource.m_x++;
                     }
                   })
               .named("CountCommand[" + cmdCount + "]");
 
-      scheduler.schedule(command);
+      m_scheduler.schedule(command);
     }
 
     for (int i = 0; i < iterations; i++) {
-      scheduler.run();
+      m_scheduler.run();
     }
-    scheduler.run();
+    m_scheduler.run();
 
-    assertEquals(numCommands * iterations, resource.x);
+    assertEquals(numCommands * iterations, resource.m_x);
   }
 
   @Test
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   void errorDetection() {
-    var resource = new RequireableResource("X", scheduler);
+    var resource = new RequireableResource("X", m_scheduler);
 
     var command =
         resource
             .run(
-                (coroutine) -> {
+                coroutine -> {
                   throw new RuntimeException("The exception");
                 })
             .named("Bad Behavior");
 
-    new Trigger(scheduler, () -> true)
+    new Trigger(m_scheduler, () -> true)
         .onTrue(command);
 
     try {
-      scheduler.run();
+      m_scheduler.run();
       fail("An exception should have been thrown");
     } catch (RuntimeException e) {
       assertEquals("The exception", e.getMessage());
@@ -188,7 +190,7 @@ class SchedulerTest {
   void nestedErrorDetection() {
     var command = Command.noRequirements(co -> {
       co.await(Command.noRequirements(c2 -> {
-        new Trigger(scheduler, () -> true)
+        new Trigger(m_scheduler, () -> true)
             .onTrue(Command.noRequirements(c3 -> {
                   // Throws IndexOutOfBoundsException
                   new ArrayList<>(0).get(-1);
@@ -198,14 +200,14 @@ class SchedulerTest {
       }).named("Schedules With Trigger"));
     }).named("Schedules Directly");
 
-    scheduler.schedule(command);
+    m_scheduler.schedule(command);
 
     // The first run sets up the trigger, but does not fire
     // The second run will fire the trigger and cause the inner command to run and throw
-    scheduler.run();
+    m_scheduler.run();
 
     try {
-      scheduler.run();
+      m_scheduler.run();
       fail("Index OOB exception expected");
     } catch (IndexOutOfBoundsException e) {
       StackTraceElement[] stackTrace = e.getStackTrace();
@@ -233,49 +235,50 @@ class SchedulerTest {
   }
 
   @Test
+  @SuppressWarnings({"PMD.RedundantFieldInitializer", "PMD.ImmutableField"}) // PMD bugs
   void runResource() {
     var example =
-        new RequireableResource("Counting", scheduler) {
-          int x = 0;
+        new RequireableResource("Counting", m_scheduler) {
+          int m_x = 0;
         };
 
     Command countToTen =
         example
             .run(
-                (coroutine) -> {
-                  example.x = 0;
+                coroutine -> {
+                  example.m_x = 0;
                   for (int i = 0; i < 10; i++) {
                     coroutine.yield();
-                    example.x++;
+                    example.m_x++;
                   }
                 })
             .named("Count To Ten");
 
-    scheduler.schedule(countToTen);
+    m_scheduler.schedule(countToTen);
     for (int i = 0; i < 10; i++) {
-      scheduler.run();
+      m_scheduler.run();
     }
-    scheduler.run();
+    m_scheduler.run();
 
-    assertEquals(10, example.x);
+    assertEquals(10, example.m_x);
   }
 
   @Test
   void cancelOnInterruptDoesNotResume() {
     var count = new AtomicInteger(0);
 
-    var resource = new RequireableResource("Resource", scheduler);
+    var resource = new RequireableResource("Resource", m_scheduler);
 
     var interrupter =
         Command.requiring(resource)
-            .executing((coroutine) -> {})
+            .executing(coroutine -> {})
             .withPriority(2)
             .named("Interrupter");
 
     var canceledCommand =
         Command.requiring(resource)
             .executing(
-                (coroutine) -> {
+                coroutine -> {
                   count.set(1);
                   coroutine.yield();
                   count.set(2);
@@ -283,11 +286,11 @@ class SchedulerTest {
             .withPriority(1)
             .named("Cancel By Default");
 
-    scheduler.schedule(canceledCommand);
-    scheduler.run();
+    m_scheduler.schedule(canceledCommand);
+    m_scheduler.run();
 
-    scheduler.schedule(interrupter);
-    scheduler.run();
+    m_scheduler.schedule(interrupter);
+    m_scheduler.run();
     assertEquals(1, count.get()); // the second "set" call should not have run
   }
 
@@ -295,11 +298,11 @@ class SchedulerTest {
   void scheduleOverDefaultDoesNotRescheduleDefault() {
     var count = new AtomicInteger(0);
 
-    var resource = new RequireableResource("Resource", scheduler);
+    var resource = new RequireableResource("Resource", m_scheduler);
     var defaultCmd =
         resource
             .run(
-                (coroutine) -> {
+                coroutine -> {
                   while (true) {
                     count.incrementAndGet();
                     coroutine.yield();
@@ -308,18 +311,18 @@ class SchedulerTest {
             .withPriority(-1)
             .named("Default Command");
 
-    var newerCmd = resource.run((coroutine) -> {}).named("Newer Command");
+    final var newerCmd = resource.run(coroutine -> {}).named("Newer Command");
     resource.setDefaultCommand(defaultCmd);
-    scheduler.run();
-    assertTrue(scheduler.isRunning(defaultCmd), "Default command should be running");
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(defaultCmd), "Default command should be running");
 
-    scheduler.schedule(newerCmd);
-    scheduler.run();
-    assertFalse(scheduler.isRunning(defaultCmd), "Default command should have been interrupted");
+    m_scheduler.schedule(newerCmd);
+    m_scheduler.run();
+    assertFalse(m_scheduler.isRunning(defaultCmd), "Default command should have been interrupted");
     assertEquals(1, count.get(), "Default command should have run once");
 
-    scheduler.run();
-    assertTrue(scheduler.isRunning(defaultCmd));
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(defaultCmd));
   }
 
   @Test
@@ -328,11 +331,11 @@ class SchedulerTest {
     for (int i = 1; i <= 10; i++) {
       commands.add(Command.noRequirements(Coroutine::yield).named("Command " + i));
     }
-    commands.forEach(scheduler::schedule);
-    scheduler.run();
-    scheduler.cancelAll();
+    commands.forEach(m_scheduler::schedule);
+    m_scheduler.run();
+    m_scheduler.cancelAll();
     for (Command command : commands) {
-      if (scheduler.isRunning(command)) {
+      if (m_scheduler.isRunning(command)) {
         fail(command.name() + " was not canceled by cancelAll()");
       }
     }
@@ -342,34 +345,34 @@ class SchedulerTest {
   void cancelAllStartsDefaults() {
     var resources = new ArrayList<RequireableResource>(10);
     for (int i = 1; i <= 10; i++) {
-      resources.add(new RequireableResource("System " + i, scheduler));
+      resources.add(new RequireableResource("System " + i, m_scheduler));
     }
 
     var command =
         new CommandBuilder().requiring(resources).executing(Coroutine::yield).named("Big Command");
 
     // Scheduling the command should evict the on-deck default commands
-    scheduler.schedule(command);
+    m_scheduler.schedule(command);
 
     // Then running should get it into the set of running commands
-    scheduler.run();
+    m_scheduler.run();
 
     // Cancelling should clear out the set of running commands
-    scheduler.cancelAll();
+    m_scheduler.cancelAll();
 
     // Then ticking the scheduler once to fully remove the command and schedule the defaults
-    scheduler.run();
+    m_scheduler.run();
 
     // Then one more tick to start running the scheduled defaults
-    scheduler.run();
+    m_scheduler.run();
 
-    if (scheduler.isRunning(command)) {
-      System.err.println(scheduler.getRunningCommands());
+    if (m_scheduler.isRunning(command)) {
+      System.err.println(m_scheduler.getRunningCommands());
       fail(command.name() + " was not canceled by cancelAll()");
     }
 
     for (var resource : resources) {
-      var runningCommands = scheduler.getRunningCommandsFor(resource);
+      var runningCommands = m_scheduler.getRunningCommandsFor(resource);
       assertEquals(
           1,
           runningCommands.size(),
@@ -385,13 +388,13 @@ class SchedulerTest {
   void cancelDeeplyNestedCompositions() {
     Command root =
         Command.noRequirements(
-                (co) -> {
+                co -> {
                   co.await(
                       Command.noRequirements(
-                              (co2) -> {
+                              co2 -> {
                                 co2.await(
                                     Command.noRequirements(
-                                            (co3) -> {
+                                            co3 -> {
                                               co3.await(
                                                   Command.noRequirements(Coroutine::park)
                                                       .named("Park"));
@@ -402,27 +405,27 @@ class SchedulerTest {
                 })
             .named("Root");
 
-    scheduler.schedule(root);
+    m_scheduler.schedule(root);
 
-    scheduler.run();
-    assertEquals(4, scheduler.getRunningCommands().size());
+    m_scheduler.run();
+    assertEquals(4, m_scheduler.getRunningCommands().size());
 
-    scheduler.cancel(root);
-    assertEquals(0, scheduler.getRunningCommands().size());
+    m_scheduler.cancel(root);
+    assertEquals(0, m_scheduler.getRunningCommands().size());
   }
 
   @Test
   void compositionsDoNotSelfCancel() {
-    var res = new RequireableResource("The Resource", scheduler);
+    var res = new RequireableResource("The Resource", m_scheduler);
     var group =
         res.run(
-                (co) -> {
+                co -> {
                   co.await(
                       res.run(
-                              (co2) -> {
+                              co2 -> {
                                 co2.await(
                                     res.run(
-                                            (co3) -> {
+                                            co3 -> {
                                               co3.await(res.run(Coroutine::park).named("Park"));
                                             })
                                         .named("C3"));
@@ -431,72 +434,74 @@ class SchedulerTest {
                 })
             .named("Group");
 
-    scheduler.schedule(group);
-    scheduler.run();
-    assertEquals(4, scheduler.getRunningCommands().size());
-    assertTrue(scheduler.isRunning(group));
+    m_scheduler.schedule(group);
+    m_scheduler.run();
+    assertEquals(4, m_scheduler.getRunningCommands().size());
+    assertTrue(m_scheduler.isRunning(group));
   }
 
   @Test
   void compositionsDoNotCancelParent() {
-    var res = new RequireableResource("The Resource", scheduler);
+    var res = new RequireableResource("The Resource", m_scheduler);
     var group = res.run(co -> {
       co.fork(res.run(Coroutine::park).named("First Child"));
       co.fork(res.run(Coroutine::park).named("Second Child"));
       co.park();
     }).named("Group");
 
-    scheduler.schedule(group);
-    scheduler.run();
+    m_scheduler.schedule(group);
+    m_scheduler.run();
 
     assertEquals(
         List.of("Group", "Second Child"),
-        scheduler.getRunningCommands().stream().map(Command::name).toList()
+        m_scheduler.getRunningCommands().stream().map(Command::name).toList()
     );
   }
 
   @Test
   void compositionsDoNotNeedRequirements() {
-    var r1 = new RequireableResource("R1", scheduler);
-    var r2 = new RequireableResource("r2", scheduler);
+    var r1 = new RequireableResource("R1", m_scheduler);
+    var r2 = new RequireableResource("r2", m_scheduler);
 
     // the group has no requirements, but can schedule child commands that do
     var group =
         Command.noRequirements(
-                (co) -> {
+                co -> {
                   co.awaitAll(
                       r1.run(Coroutine::park).named("R1 Command"),
                       r2.run(Coroutine::park).named("R2 Command"));
                 })
             .named("Composition");
 
-    scheduler.schedule(group);
-    scheduler.run(); // start r1 and r2 commands
-    assertEquals(3, scheduler.getRunningCommands().size());
+    m_scheduler.schedule(group);
+    m_scheduler.run(); // start r1 and r2 commands
+    assertEquals(3, m_scheduler.getRunningCommands().size());
   }
 
   @Test
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   void compositionsCannotAwaitConflictingCommands() {
-    var res = new RequireableResource("The Resource", scheduler);
+    var res = new RequireableResource("The Resource", m_scheduler);
 
     var group =
         Command.noRequirements(
-                (co) -> {
+                co -> {
                   co.awaitAll(
                       res.run(Coroutine::park).named("First"),
                       res.run(Coroutine::park).named("Second"));
                 })
             .named("Group");
 
-    scheduler.schedule(group);
+    m_scheduler.schedule(group);
 
     // Running should attempt to schedule multiple conflicting commands
     try {
-      scheduler.run();
+      m_scheduler.run();
       fail("An exception should have been thrown");
     } catch (IllegalArgumentException iae) {
         assertEquals(
-            "Command Second requires resources that are already used by First. Both require The Resource",
+            "Command Second requires resources that are already used by First. "
+                + "Both require The Resource",
             iae.getMessage());
     } catch (Exception e) {
       fail("Unexpected exception: " + e);
@@ -507,12 +512,12 @@ class SchedulerTest {
   void doesNotRunOnCancelWhenInterruptingOnDeck() {
     var ran = new AtomicBoolean(false);
 
-    var resource = new RequireableResource("The Resource", scheduler);
+    var resource = new RequireableResource("The Resource", m_scheduler);
     var cmd = resource.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
     var interrupter = resource.run(Coroutine::yield).named("Interrupter");
-    scheduler.schedule(cmd);
-    scheduler.schedule(interrupter);
-    scheduler.run();
+    m_scheduler.schedule(cmd);
+    m_scheduler.schedule(interrupter);
+    m_scheduler.run();
 
     assertFalse(ran.get(), "onCancel ran when it shouldn't have!");
   }
@@ -521,12 +526,12 @@ class SchedulerTest {
   void doesNotRunOnCancelWhenCancellingOnDeck() {
     var ran = new AtomicBoolean(false);
 
-    var resource = new RequireableResource("The Resource", scheduler);
+    var resource = new RequireableResource("The Resource", m_scheduler);
     var cmd = resource.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
-    scheduler.schedule(cmd);
+    m_scheduler.schedule(cmd);
     // cancelling before calling .run()
-    scheduler.cancel(cmd);
-    scheduler.run();
+    m_scheduler.cancel(cmd);
+    m_scheduler.run();
 
     assertFalse(ran.get(), "onCancel ran when it shouldn't have!");
   }
@@ -535,13 +540,13 @@ class SchedulerTest {
   void runsOnCancelWhenInterruptingCommand() {
     var ran = new AtomicBoolean(false);
 
-    var resource = new RequireableResource("The Resource", scheduler);
+    var resource = new RequireableResource("The Resource", m_scheduler);
     var cmd = resource.run(Coroutine::park).whenCanceled(() -> ran.set(true)).named("cmd");
     var interrupter = resource.run(Coroutine::park).named("Interrupter");
-    scheduler.schedule(cmd);
-    scheduler.run();
-    scheduler.schedule(interrupter);
-    scheduler.run();
+    m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    m_scheduler.schedule(interrupter);
+    m_scheduler.run();
 
     assertTrue(ran.get(), "onCancel should have run!");
   }
@@ -550,13 +555,13 @@ class SchedulerTest {
   void doesNotRunOnCancelWhenCompleting() {
     var ran = new AtomicBoolean(false);
 
-    var resource = new RequireableResource("The Resource", scheduler);
+    var resource = new RequireableResource("The Resource", m_scheduler);
     var cmd = resource.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
-    scheduler.schedule(cmd);
-    scheduler.run();
-    scheduler.run();
+    m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    m_scheduler.run();
 
-    assertFalse(scheduler.isScheduledOrRunning(cmd));
+    assertFalse(m_scheduler.isScheduledOrRunning(cmd));
     assertFalse(ran.get(), "onCancel ran when it shouldn't have!");
   }
 
@@ -564,11 +569,11 @@ class SchedulerTest {
   void runsOnCancelWhenCancelling() {
     var ran = new AtomicBoolean(false);
 
-    var resource = new RequireableResource("The Resource", scheduler);
+    var resource = new RequireableResource("The Resource", m_scheduler);
     var cmd = resource.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
-    scheduler.schedule(cmd);
-    scheduler.run();
-    scheduler.cancel(cmd);
+    m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    m_scheduler.cancel(cmd);
 
     assertTrue(ran.get(), "onCancel should have run!");
   }
@@ -577,78 +582,80 @@ class SchedulerTest {
   void runsOnCancelWhenCancellingParent() {
     var ran = new AtomicBoolean(false);
 
-    var resource = new RequireableResource("The Resource", scheduler);
+    var resource = new RequireableResource("The Resource", m_scheduler);
     var cmd = resource.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
 
     var group = new Sequence("Seq", Collections.singletonList(cmd));
-    scheduler.schedule(group);
-    scheduler.run();
-    scheduler.cancel(group);
+    m_scheduler.schedule(group);
+    m_scheduler.run();
+    m_scheduler.cancel(group);
 
     assertTrue(ran.get(), "onCancel should have run!");
   }
 
   @Test
   void sideloadThrowingException() {
-    scheduler.sideload(
+    m_scheduler.sideload(
         co -> {
           throw new RuntimeException("Bang!");
         });
 
     // An exception raised in a sideload function should bubble up
-    assertEquals("Bang!", assertThrowsExactly(RuntimeException.class, scheduler::run).getMessage());
+    assertEquals(
+        "Bang!",
+        assertThrowsExactly(RuntimeException.class, m_scheduler::run).getMessage());
   }
 
   @Test
   void nestedResources() {
     var superstructure =
-        new RequireableResource("Superstructure", scheduler) {
-          private final RequireableResource elevator =
-              new RequireableResource("Elevator", scheduler);
-          private final RequireableResource arm = new RequireableResource("Arm", scheduler);
+        new RequireableResource("Superstructure", m_scheduler) {
+          private final RequireableResource m_elevator =
+              new RequireableResource("Elevator", m_scheduler);
+          private final RequireableResource m_arm = new RequireableResource("Arm", m_scheduler);
 
           public Command superCommand() {
             return run(co -> {
-                  co.await(elevator.run(Coroutine::park).named("Elevator Subcommand"));
-                  co.await(arm.run(Coroutine::park).named("Arm Subcommand"));
+                  co.await(m_elevator.run(Coroutine::park).named("Elevator Subcommand"));
+                  co.await(m_arm.run(Coroutine::park).named("Arm Subcommand"));
                 })
                 .named("Super Command");
           }
         };
 
-    scheduler.schedule(superstructure.superCommand());
-    scheduler.run();
+    m_scheduler.schedule(superstructure.superCommand());
+    m_scheduler.run();
     assertEquals(
-        List.of(superstructure.arm.getDefaultCommand()),
-        superstructure.arm.getRunningCommands(),
+        List.of(superstructure.m_arm.getDefaultCommand()),
+        superstructure.m_arm.getRunningCommands(),
         "Arm should only be running its default command");
 
     // Scheduling something that requires an in-use inner resource cancels the outer command
-    scheduler.schedule(superstructure.elevator.run(Coroutine::park).named("Conflict"));
+    m_scheduler.schedule(superstructure.m_elevator.run(Coroutine::park).named("Conflict"));
 
-    scheduler.run(); // schedules the default superstructure command
-    scheduler.run(); // starts running the default superstructure command
+    m_scheduler.run(); // schedules the default superstructure command
+    m_scheduler.run(); // starts running the default superstructure command
     assertEquals(List.of(superstructure.getDefaultCommand()), superstructure.getRunningCommands());
   }
 
   @Test
   void protobuf() {
-    var res = new RequireableResource("The Resource", scheduler);
+    var res = new RequireableResource("The Resource", m_scheduler);
     var parkCommand = res.run(Coroutine::park).named("Park");
-    var c3Command = res.run((co) -> co.await(parkCommand)).named("C3");
-    var c2Command = res.run((co) -> co.await(c3Command)).named("C2");
-    var group = res.run((co) -> co.await(c2Command)).named("Group");
+    var c3Command = res.run(co -> co.await(parkCommand)).named("C3");
+    var c2Command = res.run(co -> co.await(c3Command)).named("C2");
+    var group = res.run(co -> co.await(c2Command)).named("Group");
 
-    scheduler.schedule(group);
-    scheduler.run();
+    m_scheduler.schedule(group);
+    m_scheduler.run();
 
     var scheduledCommand1 = Command.noRequirements(Coroutine::park).named("Command 1");
     var scheduledCommand2 = Command.noRequirements(Coroutine::park).named("Command 2");
-    scheduler.schedule(scheduledCommand1);
-    scheduler.schedule(scheduledCommand2);
+    m_scheduler.schedule(scheduledCommand1);
+    m_scheduler.schedule(scheduledCommand2);
 
     var message = Scheduler.proto.createMessage();
-    Scheduler.proto.pack(message, scheduler);
+    Scheduler.proto.pack(message, m_scheduler);
     var messageJson = message.toString();
     assertEquals(
         """
@@ -706,39 +713,39 @@ class SchedulerTest {
         }"""
             .formatted(
                 // Scheduler data
-                scheduler.lastRuntimeMs(),
+                m_scheduler.lastRuntimeMs(),
 
                 // On deck commands
-                scheduler.runId(scheduledCommand1),
-                scheduler.runId(scheduledCommand2),
+                m_scheduler.runId(scheduledCommand1),
+                m_scheduler.runId(scheduledCommand2),
 
                 // Running commands
-                scheduler.lastCommandRuntimeMs(group),
-                scheduler.totalRuntimeMs(group),
-                scheduler.runId(group), // id
+                m_scheduler.lastCommandRuntimeMs(group),
+                m_scheduler.totalRuntimeMs(group),
+                m_scheduler.runId(group), // id
                 // top-level command, no parent ID
 
-                scheduler.lastCommandRuntimeMs(c2Command),
-                scheduler.totalRuntimeMs(c2Command),
-                scheduler.runId(c2Command), // id
-                scheduler.runId(group), // parent
+                m_scheduler.lastCommandRuntimeMs(c2Command),
+                m_scheduler.totalRuntimeMs(c2Command),
+                m_scheduler.runId(c2Command), // id
+                m_scheduler.runId(group), // parent
 
-                scheduler.lastCommandRuntimeMs(c3Command),
-                scheduler.totalRuntimeMs(c3Command),
-                scheduler.runId(c3Command), // id
-                scheduler.runId(c2Command), // parent
+                m_scheduler.lastCommandRuntimeMs(c3Command),
+                m_scheduler.totalRuntimeMs(c3Command),
+                m_scheduler.runId(c3Command), // id
+                m_scheduler.runId(c2Command), // parent
 
-                scheduler.lastCommandRuntimeMs(parkCommand),
-                scheduler.totalRuntimeMs(parkCommand),
-                scheduler.runId(parkCommand), // id
-                scheduler.runId(c3Command) // parent
+                m_scheduler.lastCommandRuntimeMs(parkCommand),
+                m_scheduler.totalRuntimeMs(parkCommand),
+                m_scheduler.runId(parkCommand), // id
+                m_scheduler.runId(c3Command) // parent
                 ),
         messageJson);
   }
 
   @Test
   void siblingsInCompositionCanShareRequirements() {
-    var resource = new RequireableResource("The Resource", scheduler);
+    var resource = new RequireableResource("The Resource", m_scheduler);
     var firstRan = new AtomicBoolean(false);
     var secondRan = new AtomicBoolean(false);
 
@@ -758,20 +765,23 @@ class SchedulerTest {
       co.park();
     }).named("Group");
 
-    scheduler.schedule(group);
-    scheduler.run();
+    m_scheduler.schedule(group);
+    m_scheduler.run();
 
     assertTrue(firstRan.get(), "First child should have run to a yield point");
     assertTrue(secondRan.get(), "Second child should have run to a yield point");
-    assertFalse(scheduler.isScheduledOrRunning(first), "First child should have been interrupted");
-    assertTrue(scheduler.isRunning(second), "Second child should still be running");
-    assertTrue(scheduler.isRunning(group), "Group should still be running");
+    assertFalse(
+        m_scheduler.isScheduledOrRunning(first),
+        "First child should have been interrupted");
+    assertTrue(m_scheduler.isRunning(second), "Second child should still be running");
+    assertTrue(m_scheduler.isRunning(group), "Group should still be running");
   }
 
   @Test
   void nestedOneShotCompositionsAllRunInOneCycle() {
     var runs = new AtomicInteger(0);
-    Supplier<Command> makeOneShot = () -> Command.noRequirements(_c -> runs.incrementAndGet()).named("One Shot");
+    Supplier<Command> makeOneShot =
+        () -> Command.noRequirements(_c -> runs.incrementAndGet()).named("One Shot");
     var command = Command.noRequirements(co -> {
       co.fork(makeOneShot.get());
       co.fork(makeOneShot.get());
@@ -786,10 +796,10 @@ class SchedulerTest {
           }).named("2"));
     }).named("Command");
 
-    scheduler.schedule(command);
-    scheduler.run();
+    m_scheduler.schedule(command);
+    m_scheduler.run();
     assertEquals(5, runs.get(), "All oneshot commands should have run");
-    assertFalse(scheduler.isRunning(command), "Command should have exited after one cycle");
+    assertFalse(m_scheduler.isRunning(command), "Command should have exited after one cycle");
   }
 
   record PriorityCommand(int priority, RequireableResource... subsystems) implements Command {

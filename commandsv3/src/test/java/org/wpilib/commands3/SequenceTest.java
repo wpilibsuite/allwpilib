@@ -12,11 +12,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class SequenceTest {
-  private Scheduler scheduler;
+  private Scheduler m_scheduler;
 
   @BeforeEach
   void setup() {
-    scheduler = new Scheduler();
+    m_scheduler = new Scheduler();
   }
 
   @Test
@@ -24,22 +24,22 @@ class SequenceTest {
     var command = Command.noRequirements(Coroutine::yield).named("The Command");
 
     var sequence = new Sequence("The Sequence", List.of(command));
-    scheduler.schedule(sequence);
+    m_scheduler.schedule(sequence);
 
     // First run - the composed command is scheduled and starts
-    scheduler.run();
-    assertTrue(scheduler.isRunning(sequence));
-    assertTrue(scheduler.isRunning(command));
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(sequence));
+    assertTrue(m_scheduler.isRunning(command));
 
     // Second run - the composed command completes
-    scheduler.run();
-    assertTrue(scheduler.isRunning(sequence));
-    assertFalse(scheduler.isRunning(command));
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(sequence));
+    assertFalse(m_scheduler.isRunning(command));
 
     // Third run - sequence sees the composed command is done and completes
-    scheduler.run();
-    assertFalse(scheduler.isRunning(sequence));
-    assertFalse(scheduler.isRunning(command));
+    m_scheduler.run();
+    assertFalse(m_scheduler.isRunning(sequence));
+    assertFalse(m_scheduler.isRunning(command));
   }
 
   @Test
@@ -48,37 +48,37 @@ class SequenceTest {
     var c2 = Command.noRequirements(Coroutine::yield).named("C2");
 
     var sequence = new Sequence("C1 > C2", List.of(c1, c2));
-    scheduler.schedule(sequence);
+    m_scheduler.schedule(sequence);
 
     // First run - c1 is scheduled and starts
-    scheduler.run();
-    assertTrue(scheduler.isRunning(sequence), "Sequence should be running");
-    assertTrue(scheduler.isRunning(c1), "Starting the sequence should start the first command");
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(sequence), "Sequence should be running");
+    assertTrue(m_scheduler.isRunning(c1), "Starting the sequence should start the first command");
     assertFalse(
-        scheduler.isScheduledOrRunning(c2),
+        m_scheduler.isScheduledOrRunning(c2),
         "The second command should still be pending completion of the first command");
 
     // Second run - c1 completes
-    scheduler.run();
-    assertTrue(scheduler.isRunning(sequence));
-    assertFalse(scheduler.isRunning(c1), "First command should have completed");
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(sequence));
+    assertFalse(m_scheduler.isRunning(c1), "First command should have completed");
     assertFalse(
-        scheduler.isScheduledOrRunning(c2), "Second command should not start in the same cycle");
+        m_scheduler.isScheduledOrRunning(c2), "Second command should not start in the same cycle");
 
     // Third run - c2 is scheduled and starts
-    scheduler.run();
-    assertTrue(scheduler.isRunning(sequence));
-    assertTrue(scheduler.isRunning(c2), "Second command should have started");
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(sequence));
+    assertTrue(m_scheduler.isRunning(c2), "Second command should have started");
 
     // Fourth run - c2 completes
-    scheduler.run();
-    assertTrue(scheduler.isRunning(sequence));
-    assertFalse(scheduler.isRunning(c2), "Second command should have completed");
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(sequence));
+    assertFalse(m_scheduler.isRunning(c2), "Second command should have completed");
 
     // Fifth run - sequence completes
-    scheduler.run();
-    assertFalse(scheduler.isRunning(sequence), "Sequence should have completed");
-    assertFalse(scheduler.isRunning(c1), "First command should have stopped");
-    assertFalse(scheduler.isRunning(c2), "Second command should have stopped");
+    m_scheduler.run();
+    assertFalse(m_scheduler.isRunning(sequence), "Sequence should have completed");
+    assertFalse(m_scheduler.isRunning(c1), "First command should have stopped");
+    assertFalse(m_scheduler.isRunning(c2), "Second command should have stopped");
   }
 }
