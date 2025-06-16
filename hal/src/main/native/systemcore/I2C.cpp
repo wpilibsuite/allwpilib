@@ -25,8 +25,8 @@
 using namespace hal;
 
 namespace {
-constexpr const char* physicalPorts[kNumI2cBuses] = {"/dev/i2c-1",
-                                                     "/dev/i2c-10"};
+constexpr const char* physicalPorts[kNumI2cBuses] = {"/dev/i2c-10",
+                                                     "/dev/i2c-1"};
 
 struct I2C {
   wpi::mutex initMutex;
