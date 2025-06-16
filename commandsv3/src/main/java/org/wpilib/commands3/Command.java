@@ -22,50 +22,50 @@ import java.util.function.Consumer;
  * loop. Failure to do so may result in an unrecoverable infinite loop.
  *
  * <p>{@snippet lang = java:
- * // A 2013-style class-based command definition
- * class ClassBasedCommand extends Command {
- *   public ClassBasedCommand(Subsystem requiredSubsystem) {
- *     addRequirements(requiredSubsystem);
- *   }
+ *     // A 2013-style class-based command definition
+ *     class ClassBasedCommand extends Command {
+ *       public ClassBasedCommand(Subsystem requiredSubsystem) {
+ *         addRequirements(requiredSubsystem);
+ *       }
  *
- *   @Override
- *   public void initialize() {}
+ *       @Override
+ *       public void initialize() {}
  *
- *   @Override
- *   public void execute() {}
+ *       @Override
+ *       public void execute() {}
  *
- *   @Override
- *   public void end(boolean interrupted) {}
+ *       @Override
+ *       public void end(boolean interrupted) {}
  *
- *   @Override
- *   public void isFinished() { return true; }
+ *       @Override
+ *       public void isFinished() { return true; }
  *
- *   @Override
- *   public String getName() { return "The Command"; }
- * }
+ *       @Override
+ *       public String getName() { return "The Command"; }
+ *     }
  *
- * Command command = new ClassBasedCommand(requiredSubsystem);
+ *     Command command = new ClassBasedCommand(requiredSubsystem);
  *
- * // Or a 2020-style function-based command
- * Command command = requiredSubsystem
- *   .runOnce(() -> initialize())
- *   .andThen(
- *     requiredSubsystem
- *       .run(() -> execute())
- *       .until(() -> isFinished())
- *       .onFinish(() -> end())
- *   ).withName("The Command");
+ *     // Or a 2020-style function-based command
+ *     Command command = requiredSubsystem
+ *       .runOnce(() -> initialize())
+ *       .andThen(
+ *         requiredSubsystem
+ *           .run(() -> execute())
+ *           .until(() -> isFinished())
+ *           .onFinish(() -> end())
+ *       ).withName("The Command");
  *
- * // Can be represented with a 2025-style async-based definition
- * Command command = requiredSubsystem.run((coroutine) -> {
- *   initialize();
- *   while (!isFinished()) {
- *     coroutine.yield();
- *     execute();
- *   }
- *   end();
- * }).named("The Command");
- * }
+ *     // Can be represented with a 2025-style async-based definition
+ *     Command command = requiredSubsystem.run((coroutine) -> {
+ *       initialize();
+ *       while (!isFinished()) {
+ *         coroutine.yield();
+ *         execute();
+ *       }
+ *       end();
+ *     }).named("The Command");
+ *     }
  */
 public interface Command {
   /** The default command priority. */
