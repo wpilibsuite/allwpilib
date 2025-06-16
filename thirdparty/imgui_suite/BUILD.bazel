@@ -1,10 +1,9 @@
-load("//:version.bzl", "VERSION")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
 
 cc_library(
     name = "gl3w",

@@ -1,8 +1,7 @@
-load("//:version.bzl", "VERSION")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
 
 WIN_SRCS = glob(["src/main/native/directx11/**/*.cpp"])
 

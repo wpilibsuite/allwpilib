@@ -1,8 +1,7 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_java//java:defs.bzl", "java_library")
-load("@rules_pkg//:mappings.bzl", "filter_directory", "pkg_files")
-load("@rules_pkg//:pkg.bzl", "pkg_zip")
+load("@rules_pkg//:mappings.bzl", "filter_directory")
 
 def _jni_headers_impl(ctx):
     include_dir = ctx.actions.declare_directory(ctx.attr.name + ".h")

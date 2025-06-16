@@ -1,8 +1,7 @@
-load("//:version.bzl", "VERSION")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
-load("@rules_pkg//:mappings.bzl", "pkg_filegroup", "pkg_files")
+load("//:version.bzl", "VERSION")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 
 wpilib_cc_library(
     name = "xrpVendordep",

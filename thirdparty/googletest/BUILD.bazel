@@ -1,4 +1,3 @@
-load("//:version.bzl", "VERSION")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
 
 wpilib_cc_library(

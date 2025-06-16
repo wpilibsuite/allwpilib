@@ -1,5 +1,5 @@
-load("//:version.bzl", "VERSION")
 load("@rules_java//java:defs.bzl", "java_library")
+load("//:version.bzl", "VERSION")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 
 java_library(

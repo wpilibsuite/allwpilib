@@ -1,5 +1,4 @@
 load("@rules_pkg//:mappings.bzl", "pkg_filegroup", "pkg_files")
-load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 
 def pkg_java_files(name):
     pkg_files(

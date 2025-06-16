@@ -1,8 +1,8 @@
+load("@rules_cc//cc:action_names.bzl", "CPP_LINK_STATIC_LIBRARY_ACTION_NAME", "OBJ_COPY_ACTION_NAME", "STRIP_ACTION_NAME")
 load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_library")
+load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_ATTRS", "find_cpp_toolchain", "use_cc_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
-load("@rules_cc//cc:action_names.bzl", "CPP_LINK_STATIC_LIBRARY_ACTION_NAME", "OBJ_COPY_ACTION_NAME", "STRIP_ACTION_NAME")
-load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_ATTRS", "find_cpp_toolchain", "use_cc_toolchain")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
 def _split_debug_symbols_impl(ctx):
@@ -86,10 +86,10 @@ def _split_debug_symbols_impl(ctx):
 _split_debug_symbols = rule(
     implementation = _split_debug_symbols_impl,
     attrs = {
-        "shared_library": attr.label(mandatory = True, allow_single_file = True),
+        "copy": attr.bool(mandatory = True),
         "output": attr.output(mandatory = True),
         "output_debug": attr.output(mandatory = True),
-        "copy": attr.bool(mandatory = True),
+        "shared_library": attr.label(mandatory = True, allow_single_file = True),
     } | CC_TOOLCHAIN_ATTRS,
     fragments = ["cpp"],
     toolchains = use_cc_toolchain(),
@@ -275,14 +275,14 @@ def wpilib_cc_shared_library(
         pkg_files(
             name = folder + "/lib" + lib + "-shared-files",
             srcs = select({
-                "//shared/bazel/rules:is_linux_x86_64_dbg": [
-                    folder + "/split/lib" + lib + ".so",
-                ],
                 "//shared/bazel/rules:compilation_mode_dbg": [
                     folder + "/split/lib" + lib + ".so",
                     folder + "/split/lib" + lib + ".so.debug",
                 ],
                 "//shared/bazel/rules:is_linux_x86_64": [
+                    folder + "/split/lib" + lib + ".so",
+                ],
+                "//shared/bazel/rules:is_linux_x86_64_dbg": [
                     folder + "/split/lib" + lib + ".so",
                 ],
                 "//conditions:default": [
@@ -291,14 +291,14 @@ def wpilib_cc_shared_library(
                 ],
             }),
             renames = select({
-                "//shared/bazel/rules:is_linux_x86_64_dbg": {
-                    folder + "/split/lib" + lib + ".so": "lib" + lib + "d.so",
-                },
                 "//shared/bazel/rules:compilation_mode_dbg": {
                     folder + "/split/lib" + lib + ".so": "lib" + lib + "d.so",
                     folder + "/split/lib" + lib + ".so.debug": "lib" + lib + "d.so.debug",
                 },
                 "//shared/bazel/rules:is_linux_x86_64": {},
+                "//shared/bazel/rules:is_linux_x86_64_dbg": {
+                    folder + "/split/lib" + lib + ".so": "lib" + lib + "d.so",
+                },
                 "//conditions:default": {},
             }),
             visibility = visibility,
@@ -485,23 +485,23 @@ def _cc_static_library_impl(ctx):
 _wpilib_cc_static_library = rule(
     implementation = _cc_static_library_impl,
     attrs = {
-        "static_lib_name": attr.string(doc = """
-By default cc_static_library will use a name for the static library output file based on
-the target's name and the platform. This includes an extension and sometimes a prefix.
-Sometimes you may not want the default name, in which case you can use this
-attribute to choose a custom name."""),
-        "static_deps": attr.label_list(
-            providers = [CcStaticLibraryInfo],
-            doc = """
-List of all static libraries to not duplicate .o files from.
-""",
-        ),
         "deps": attr.label_list(
             providers = [CcInfo],
             doc = """
 List of all the dependencies to accumulate objects from to link into this static library.
 """,
         ),
+        "static_deps": attr.label_list(
+            providers = [CcStaticLibraryInfo],
+            doc = """
+List of all static libraries to not duplicate .o files from.
+""",
+        ),
+        "static_lib_name": attr.string(doc = """
+By default cc_static_library will use a name for the static library output file based on
+the target's name and the platform. This includes an extension and sometimes a prefix.
+Sometimes you may not want the default name, in which case you can use this
+attribute to choose a custom name."""),
     } | CC_TOOLCHAIN_ATTRS,
     toolchains = use_cc_toolchain(),
     fragments = ["cpp"],

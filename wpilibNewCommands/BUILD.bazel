@@ -1,14 +1,14 @@
-load("//:version.bzl", "VERSION")
-load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
-load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
-load("//wpilibNewCommands:generate.bzl", "generate_wpilib_new_commands")
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//:version.bzl", "VERSION")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
+load("//wpilibNewCommands:generate.bzl", "generate_wpilib_new_commands")
 
 py_binary(
     name = "generate_hids",

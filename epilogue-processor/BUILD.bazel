@@ -1,9 +1,9 @@
-load("//:version.bzl", "VERSION")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
-load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
 load("@rules_java//java:defs.bzl", "java_library", "java_plugin")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
+load("//:version.bzl", "VERSION")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
 
 java_library(
     name = "processor-java",

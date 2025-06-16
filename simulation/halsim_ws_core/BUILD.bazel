@@ -1,7 +1,4 @@
-load("//:version.bzl", "VERSION")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("@rules_pkg//:mappings.bzl", "pkg_filegroup", "pkg_files")
 
 wpilib_cc_library(
     name = "halsim_ws_core",
