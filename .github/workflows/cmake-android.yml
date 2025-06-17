@@ -45,7 +45,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ninja-build
 
       - name: configure
-        run: cmake --preset with-sccache -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_WPILIB=OFF -DWITH_GUI=OFF -DWITH_CSCORE=OFF -DWITH_TESTS=OFF -DWITH_SIMULATION_MODULES=OFF -DWITH_PROTOBUF=OFF -DWITH_JAVA=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_TOOLCHAIN_FILE=${{ steps.setup-ndk.outputs.ndk-path }}/build/cmake/android.toolchain.cmake -DANDROID_ABI="${{ matrix.abi }}" -DANDROID_PLATFORM=android-24
+        run: cmake --preset with-sccache -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_WPILIB=OFF -DWITH_GUI=OFF -DWITH_CSCORE=OFF -DWITH_TESTS=OFF -DWITH_SIMULATION_MODULES=OFF -DWITH_JAVA=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_TOOLCHAIN_FILE=${{ steps.setup-ndk.outputs.ndk-path }}/build/cmake/android.toolchain.cmake -DANDROID_ABI="${{ matrix.abi }}" -DANDROID_PLATFORM=android-24
 
       - name: build
         run: cmake --build build-cmake --parallel $(nproc)
