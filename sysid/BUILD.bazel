@@ -27,9 +27,9 @@ cc_library(
     hdrs = glob(["src/main/native/include/**"]),
     strip_include_prefix = "src/main/native/include",
     deps = [
-        "//datalog:datalog.static",
+        "//datalog",
         "//glass:libglass",
-        "//wpinet:wpinet.static",
+        "//wpinet",
     ],
 )
 
@@ -52,6 +52,6 @@ cc_test(
     ],
     deps = [
         ":sysid-lib",
-        "//thirdparty/googletest:googletest.static",
+        "//thirdparty/googletest",
     ],
 )
