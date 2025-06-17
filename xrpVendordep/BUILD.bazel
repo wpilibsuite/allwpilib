@@ -1,9 +1,9 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
 
 wpilib_cc_library(
-    name = "xrp-cpp",
+    name = "xrpVendordep",
     srcs = glob([
         "src/main/native/cpp/**",
     ]),
@@ -11,17 +11,30 @@ wpilib_cc_library(
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
-        "//wpilibc:wpilibc.static",
+        "//ntcore",
+        "//wpilibc",
+        "//wpinet",
     ],
 )
 
+wpilib_cc_static_library(
+    name = "static/xrpVendordep",
+    static_deps = [
+        "//ntcore:static/ntcore",
+        "//wpilibc:static/wpilibc",
+        "//wpinet:static/wpinet",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":xrpVendordep"],
+)
+
 java_library(
-    name = "xrp-java",
+    name = "xrpVendordep-java",
     srcs = glob(["src/main/java/**/*.java"]),
     visibility = ["//visibility:public"],
     deps = [
         "//hal:hal-java",
-        "//wpilibj",
+        "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",
     ],
 )
@@ -31,7 +44,8 @@ cc_test(
     size = "small",
     srcs = glob(["src/test/native/cpp/**"]),
     deps = [
-        "//thirdparty/googletest:googletest.static",
+        ":xrpVendordep",
+        "//thirdparty/googletest",
     ],
 )
 
@@ -39,7 +53,7 @@ cc_binary(
     name = "DevMain-Cpp",
     srcs = ["src/dev/native/cpp/main.cpp"],
     deps = [
-        "//wpiutil:wpiutil.static",
+        "//wpiutil",
     ],
 )
 
@@ -49,7 +63,7 @@ java_binary(
     main_class = "edu.wpi.first.wpilibj.xrp.DevMain",
     deps = [
         "//hal:hal-java",
-        "//ntcore:networktables-java",
+        "//ntcore:ntcore-java",
         "//wpiutil:wpiutil-java",
     ],
 )

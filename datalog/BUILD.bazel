@@ -1,17 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 
 wpilib_cc_library(
-    name = "datalog.static",
+    name = "datalog",
     srcs = glob(
         ["src/main/native/cpp/**"],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**"]),
+    extra_src_pkg_files = [":datalog-java-jni-hdrs-pkg"],
     includes = [
         "src/main/native/cpp",
         "src/main/native/include",
@@ -19,8 +20,17 @@ wpilib_cc_library(
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
-        "//wpiutil:wpiutil.static",
+        "//wpiutil",
     ],
+)
+
+wpilib_cc_static_library(
+    name = "static/datalog",
+    static_deps = [
+        "//wpiutil:static/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":datalog"],
 )
 
 wpilib_jni_cc_library(
@@ -29,7 +39,7 @@ wpilib_jni_cc_library(
     java_dep = ":datalog-java",
     visibility = ["//visibility:public"],
     deps = [
-        ":datalog.static",
+        ":datalog",
     ],
 )
 
@@ -45,8 +55,9 @@ wpilib_jni_java_library(
 )
 
 py_binary(
-    name = "datalog",
+    name = "datalog_example",
     srcs = ["examples/printlog/datalog.py"],
+    main = "examples/printlog/datalog.py",
     target_compatible_with = select({
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
@@ -57,8 +68,8 @@ cc_binary(
     name = "printlog",
     srcs = ["examples/printlog/printlog.cpp"],
     deps = [
-        ":datalog.static",
-        "//wpiutil:wpiutil.static",
+        ":datalog",
+        "//wpiutil",
     ],
 )
 
@@ -66,8 +77,8 @@ cc_binary(
     name = "writelog",
     srcs = ["examples/writelog/writelog.cpp"],
     deps = [
-        ":datalog.static",
-        "//wpiutil:wpiutil.static",
+        ":datalog",
+        "//wpiutil",
     ],
 )
 
@@ -90,8 +101,8 @@ cc_test(
         "no-tsan",
     ],
     deps = [
-        ":datalog.static",
-        "//thirdparty/googletest:googletest.static",
+        ":datalog",
+        "//thirdparty/googletest",
         "//wpiutil:wpiutil-testlib",
     ],
 )

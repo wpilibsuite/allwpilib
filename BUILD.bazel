@@ -1,8 +1,9 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 
-filegroup(
-    name = "license",
+pkg_files(
+    name = "license_pkg_files",
     srcs = [
         "LICENSE.md",
         "ThirdPartyNotices.txt",

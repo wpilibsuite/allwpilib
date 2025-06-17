@@ -1,10 +1,19 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
+load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
+
+pkg_files(
+    name = "thirdparty-apriltag-src-pkg",
+    srcs = glob(["src/main/native/thirdparty/apriltag/include/**"]),
+    strip_prefix = "src/main/native/thirdparty/apriltag/include",
+)
 
 cc_library(
     name = "thirdparty-apriltag",
@@ -44,19 +53,33 @@ generate_resources(
 )
 
 wpilib_cc_library(
-    name = "apriltag.static",
+    name = "apriltag",
     srcs = [":generate-resources"] + glob(
         ["src/main/native/cpp/**"],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**/*"]),
     defines = ["WPILIB_EXPORTS"],
+    extra_hdr_pkg_files = [":thirdparty-apriltag-src-pkg"],
+    extra_src_pkg_files = [":apriltag-java-jni-hdrs-pkg"],
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
         ":thirdparty-apriltag",
-        "//wpimath:wpimath.static",
-        "//wpiutil:wpiutil.static",
+        "//wpimath",
+        "//wpiutil",
+    ],
+)
+
+wpilib_cc_static_library(
+    name = "static/apriltag",
+    static_deps = [
+        "//wpimath:static/wpimath",
+        "//wpiutil:static/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":apriltag",
     ],
 )
 
@@ -66,7 +89,7 @@ wpilib_jni_cc_library(
     java_dep = ":apriltag-java",
     visibility = ["//visibility:public"],
     deps = [
-        ":apriltag.static",
+        ":apriltag",
     ],
 )
 
@@ -87,6 +110,23 @@ wpilib_jni_java_library(
     ],
 )
 
+pkg_java_files(name = "apriltag-java-srcs")
+
+pkg_files(
+    name = "resources",
+    srcs = glob(["src/main/native/resources/**"]),
+    strip_prefix = "src/main/native/resources/",
+)
+
+pkg_zip(
+    name = "libapriltag-java-sources",
+    srcs = [
+        ":apriltag-java-srcs",
+        ":resources",
+    ],
+    out = "libapriltag-java-sources.jar",
+)
+
 cc_test(
     name = "apriltag-cpp-test",
     size = "small",
@@ -95,8 +135,8 @@ cc_test(
         "no-asan",
     ],
     deps = [
-        ":apriltag.static",
-        "//thirdparty/googletest:googletest.static",
+        ":apriltag",
+        "//thirdparty/googletest",
     ],
 )
 
@@ -118,7 +158,7 @@ cc_binary(
     name = "DevMain-Cpp",
     srcs = ["src/dev/native/cpp/main.cpp"],
     deps = [
-        ":apriltag.static",
+        ":apriltag",
     ],
 )
 
