@@ -209,6 +209,9 @@ def _cc_static_library_impl(ctx):
         deps,
         used_objects,
     )
+    print("\n\n\n")
+    print(ctx.attr.name)
+    print(libs)
 
     used_objects_depset = depset(direct = libs, transitive = used_objects, order = "topological")
 
