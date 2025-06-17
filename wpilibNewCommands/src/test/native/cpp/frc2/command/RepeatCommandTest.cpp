@@ -11,8 +11,6 @@ using namespace frc2;
 class RepeatCommandTest : public CommandTestBase {};
 
 TEST_F(RepeatCommandTest, CallsMethodsCorrectly) {
-  CommandScheduler scheduler = GetScheduler();
-
   int initCounter = 0;
   int exeCounter = 0;
   int isFinishedCounter = 0;
