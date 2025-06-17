@@ -181,7 +181,7 @@ def _filter_inputs(
     linker_inputs = []
     for linker_input in dependency_linker_inputs:
         for lib in linker_input.libraries:
-            for o in lib.objects:
+            for o in lib.objects + lib.pic_objects:
                 if o not in used_objects_depset:
                     linker_inputs.append(o)
 
