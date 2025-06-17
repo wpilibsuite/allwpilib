@@ -826,13 +826,15 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @param angle A double in degrees (CCW positive)
    */
   public void setGyroAngle(IMUAxis axis, double angle) {
-    axis = switch (axis) {
-      case kYaw -> m_yaw_axis;
-      case kPitch -> m_pitch_axis;
-      case kRoll -> m_roll_axis;
-      default -> axis;};
+    IMUAxis mappedAxis =
+        switch (axis) {
+          case kYaw -> m_yaw_axis;
+          case kPitch -> m_pitch_axis;
+          case kRoll -> m_roll_axis;
+          default -> axis;
+        };
 
-    switch (axis) {
+    switch (mappedAxis) {
       case kX -> setGyroAngleX(angle);
       case kY -> setGyroAngleY(angle);
       case kZ -> setGyroAngleZ(angle);
@@ -885,13 +887,15 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return The axis angle in degrees (CCW positive).
    */
   public synchronized double getAngle(IMUAxis axis) {
-    axis = switch (axis) {
-      case kYaw -> m_yaw_axis;
-      case kPitch -> m_pitch_axis;
-      case kRoll -> m_roll_axis;
-      default -> axis;};
+    IMUAxis mappedAxis =
+        switch (axis) {
+          case kYaw -> m_yaw_axis;
+          case kPitch -> m_pitch_axis;
+          case kRoll -> m_roll_axis;
+          default -> axis;
+        };
 
-    return switch (axis) {
+    return switch (mappedAxis) {
       case kX -> {
         if (m_simGyroAngleX != null) {
           yield m_simGyroAngleX.get();
@@ -930,13 +934,15 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return Axis angular rate in degrees per second (CCW positive).
    */
   public synchronized double getRate(IMUAxis axis) {
-    axis = switch (axis) {
-      case kYaw -> m_yaw_axis;
-      case kPitch -> m_pitch_axis;
-      case kRoll -> m_roll_axis;
-      default -> axis;};
+    IMUAxis mappedAxis =
+        switch (axis) {
+          case kYaw -> m_yaw_axis;
+          case kPitch -> m_pitch_axis;
+          case kRoll -> m_roll_axis;
+          default -> axis;
+        };
 
-    return switch (axis) {
+    return switch (mappedAxis) {
       case kX -> {
         if (m_simGyroRateX != null) {
           yield m_simGyroRateX.get();
