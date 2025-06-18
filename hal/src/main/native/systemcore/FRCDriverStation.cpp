@@ -263,7 +263,7 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
 
     povs[count].count = newPovs.size();
     for (size_t i = 0; i < newPovs.size(); i++) {
-      povs[count].povs[i] = newPovs[i];
+      povs[count].povs[i] = static_cast<HAL_JoystickPOV>(newPovs[i]);
     }
 
     buttons[count].count = newStick.Buttons.GetMaxAvailableCount();

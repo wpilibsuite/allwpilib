@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 
 /** Class to control a simulated generic joystick. */
@@ -60,7 +61,7 @@ public class GenericHIDSim {
    * @param pov the POV to set
    * @param value the new value
    */
-  public void setPOV(int pov, int value) {
+  public void setPOV(int pov, DriverStation.POVDirection value) {
     DriverStationSim.setJoystickPOV(m_port, pov, value);
   }
 
@@ -69,7 +70,7 @@ public class GenericHIDSim {
    *
    * @param value the new value
    */
-  public void setPOV(int value) {
+  public void setPOV(DriverStation.POVDirection value) {
     setPOV(0, value);
   }
 

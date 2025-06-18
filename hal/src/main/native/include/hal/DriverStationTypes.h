@@ -88,9 +88,30 @@ struct HAL_JoystickAxes {
 };
 typedef struct HAL_JoystickAxes HAL_JoystickAxes;
 
+HAL_ENUM_WITH_UNDERLYING_TYPE(HAL_JoystickPOV, uint8_t){
+    /** Centered */
+    HAL_JoystickPOV_kCentered = 0x00u,
+    /** Up */
+    HAL_JoystickPOV_kUp = 0x01u,
+    /** Right */
+    HAL_JoystickPOV_kRight = 0x02u,
+    /** Down */
+    HAL_JoystickPOV_kDown = 0x04u,
+    /** Left */
+    HAL_JoystickPOV_kLeft = 0x08u,
+    /** Right-Up */
+    HAL_JoystickPOV_kRightUp = HAL_JoystickPOV_kRight | HAL_JoystickPOV_kUp,
+    /** Right-Down */
+    HAL_JoystickPOV_kRightDown = HAL_JoystickPOV_kRight | HAL_JoystickPOV_kDown,
+    /** Left-Up */
+    HAL_JoystickPOV_kLeftUp = HAL_JoystickPOV_kLeft | HAL_JoystickPOV_kUp,
+    /** Left-Down */
+    HAL_JoystickPOV_kLeftDown = HAL_JoystickPOV_kLeft | HAL_JoystickPOV_kDown,
+};
+
 struct HAL_JoystickPOVs {
   int16_t count;
-  uint8_t povs[HAL_kMaxJoystickPOVs];
+  HAL_JoystickPOV povs[HAL_kMaxJoystickPOVs];
 };
 typedef struct HAL_JoystickPOVs HAL_JoystickPOVs;
 

@@ -467,7 +467,7 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVs
         arraySize < HAL_kMaxJoystickPOVs ? arraySize : HAL_kMaxJoystickPOVs;
     povs.count = maxCount;
     for (int i = 0; i < maxCount; i++) {
-      povs.povs[i] = arrayRef[i];
+      povs.povs[i] = static_cast<HAL_JoystickPOV>(arrayRef[i]);
     }
   }
   HALSIM_SetJoystickPOVs(joystickNum, &povs);
@@ -642,13 +642,13 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxis
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickPOV
- * Signature: (III)V
+ * Signature: (IIB)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOV
-  (JNIEnv*, jclass, jint stick, jint pov, jint value)
+  (JNIEnv*, jclass, jint stick, jint pov, jbyte value)
 {
-  HALSIM_SetJoystickPOV(stick, pov, value);
+  HALSIM_SetJoystickPOV(stick, pov, static_cast<HAL_JoystickPOV>(value));
 }
 
 /*
