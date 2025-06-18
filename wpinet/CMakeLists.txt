@@ -152,6 +152,10 @@ if(NOT USE_SYSTEM_LIBUV)
         target_compile_definitions(wpinet PRIVATE -D_GNU_SOURCE)
     else()
         target_sources(wpinet PRIVATE ${uv_windows_src})
+        set_source_files_properties(
+            ${uv_windows_src}
+            PROPERTIES COMPILE_FLAGS $<${IS_CLANG}:-Wno-c++11-narrowing>
+        )
         if(BUILD_SHARED_LIBS)
             target_compile_definitions(wpinet PRIVATE -DBUILDING_UV_SHARED)
         endif()
