@@ -20,11 +20,11 @@ struct CameraModel {
 
 int calibrate(const std::string& input_video, CameraModel& camera_model,
               float square_width, float marker_width, int board_width,
-              int board_height, bool show_debug_window);
+              int board_height, bool show_debug_window, int dict);
 int calibrate(const std::string& input_video, CameraModel& camera_model,
               float square_width, float marker_width, int board_width,
               int board_height, double imagerWidthPixels,
-              double imagerHeightPixels, bool show_debug_window);
+              double imagerHeightPixels, bool show_debug_window, int dict);
 int calibrate(const std::string& input_video, CameraModel& camera_model,
               float square_width, int board_width, int board_height,
               double imagerWidthPixels, double imagerHeightPixels,
