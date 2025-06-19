@@ -95,6 +95,38 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
 }
 
 /**
+ * Returns a zero translation if the given translation is within the specified
+ * distance from the origin. The remaining distance between the deadband and
+ * the maximum distance is scaled from the origin to the maximum distance.
+ *
+ * @param value Value to clip.
+ * @param deadband Distance from origin.
+ * @param maxDistance The maximum distance from the origin of the input. Can
+ * be infinite.
+ * @return The value after the deadband is applied.
+ */
+constexpr Translation2d ApplyDeadband2d(const Translation2d& value,
+                                        units::meter_t deadband,
+                                        units::meter_t maxDistance) {
+  units::meter_t norm = ApplyDeadband(value.Norm(), deadband, maxDistance);
+  return Translation2d{norm, units::radian_t{0.0}}.RotateBy(value.Angle());
+}
+
+/**
+ * Returns a zero translation if the given translation is within the specified
+ * distance from the origin. The remaining distance between the deadband and a
+ * distance of 1.0 meter is scaled from the origin to a distance of 1.0 meter.
+ *
+ * @param value Value to clip.
+ * @param deadband Distance from origin.
+ * @return The value after the deadband is applied.
+ */
+constexpr Translation2d ApplyDeadband2d(const Translation2d& value,
+                                        units::meter_t deadband) {
+  return ApplyDeadband2d(value, deadband, units::meter_t{1.0});
+}
+
+/**
  * Raises the input to the power of the given exponent while preserving its
  * sign.
  *
@@ -128,6 +160,45 @@ constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
             maxMagnitude,
         value);
   }
+}
+
+/**
+ * Raises the norm of the input to the power of the given exponent while
+ * preserving its direction.
+ *
+ * The function normalizes the norm of the input to the range [0, 1] based on
+ * the maximum distance, raises it to the power of the exponent, then scales
+ * the result back to the original range. This keeps the value in the original
+ * max distance and gives consistent curve behavior regardless of the input
+ * norm's scale.
+ *
+ * @param value The input translation to transform.
+ * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared
+ * curve). Must be positive.
+ * @param maxDistance The maximum expected distance from origin of input. Must
+ * be positive.
+ * @return The transformed value with the same direction and norm scaled to the
+ * input range.
+ */
+constexpr Translation2d CopySignPow2d(const Translation2d& value,
+                                      double exponent,
+                                      units::meter_t maxDistance) {
+  units::meter_t norm = CopySignPow(value.Norm(), exponent, maxDistance);
+  return Translation2d{norm, units::radian_t{0.0}}.RotateBy(value.Angle());
+}
+
+/**
+ * Raises the norm of the input to the power of the given exponent while
+ * preserving its direction.
+ *
+ * @param value The input translation to transform.
+ * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared
+ * curve). Must be positive.
+ * @return The transformed value with the same direction.
+ */
+constexpr Translation2d CopySignPow2d(const Translation2d& value,
+                                      double exponent) {
+  return CopySignPow2d(value, exponent, units::meter_t{1.0});
 }
 
 /**
