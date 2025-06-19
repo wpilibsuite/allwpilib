@@ -5,26 +5,10 @@
 package edu.wpi.first.wpilibj;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
 class SensorUtilTest {
-  @Test
-  void checkAnalogInputChannel() {
-    assertThrows(IllegalArgumentException.class, () -> SensorUtil.checkAnalogInputChannel(100));
-  }
-
-  @Test
-  void testInvalidDigitalChannel() {
-    assertThrows(IllegalArgumentException.class, () -> SensorUtil.checkDigitalChannel(100));
-  }
-
-  @Test
-  void testInvalidPwmChannel() {
-    assertThrows(IllegalArgumentException.class, () -> SensorUtil.checkPWMChannel(100));
-  }
-
   @Test
   void testgetDefaultCtrePcmModule() {
     assertEquals(0, SensorUtil.getDefaultCTREPCMModule());

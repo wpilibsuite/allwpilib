@@ -9,7 +9,7 @@ using namespace hal;
 
 namespace hal::init {
 void InitializeDutyCycleData() {
-  static DutyCycleData sed[kNumDutyCycles];
+  static DutyCycleData sed[kNumSmartIo];
   ::hal::SimDutyCycleData = sed;
 }
 }  // namespace hal::init
@@ -26,13 +26,7 @@ void DutyCycleData::ResetData() {
 
 extern "C" {
 int32_t HALSIM_FindDutyCycleForChannel(int32_t channel) {
-  for (int i = 0; i < kNumDutyCycles; ++i) {
-    if (SimDutyCycleData[i].initialized &&
-        SimDutyCycleData[i].digitalChannel == channel) {
-      return i;
-    }
-  }
-  return -1;
+  return channel;
 }
 
 void HALSIM_ResetDutyCycleData(int32_t index) {
