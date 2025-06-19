@@ -64,11 +64,9 @@ public final class Preferences {
     if (m_typePublisher != null) {
       m_typePublisher.close();
     }
-    m_typePublisher =
-        m_table
-            .getStringTopic(".type")
-            .publishEx(
-                StringTopic.kTypeString, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
+    m_typePublisher = m_table
+        .getStringTopic(".type")
+        .publishEx(StringTopic.kTypeString, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
     m_typePublisher.set(kSmartDashboardType);
 
     // Subscribe to all Preferences; this ensures we get the latest values
@@ -83,18 +81,17 @@ public final class Preferences {
     if (m_listener != null) {
       m_listener.close();
     }
-    m_listener =
-        NetworkTableListener.createListener(
-            m_tableSubscriber,
-            EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kPublish),
-            event -> {
-              if (event.topicInfo != null) {
-                Topic topic = event.topicInfo.getTopic();
-                if (!topic.equals(m_typePublisher.getTopic())) {
-                  event.topicInfo.getTopic().setPersistent(true);
-                }
-              }
-            });
+    m_listener = NetworkTableListener.createListener(
+        m_tableSubscriber,
+        EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kPublish),
+        event -> {
+          if (event.topicInfo != null) {
+            Topic topic = event.topicInfo.getTopic();
+            if (!topic.equals(m_typePublisher.getTopic())) {
+              event.topicInfo.getTopic().setPersistent(true);
+            }
+          }
+        });
   }
 
   /**

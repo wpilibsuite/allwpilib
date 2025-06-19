@@ -164,12 +164,11 @@ public final class SplineHelper {
       newFy[newFy.length - 1] = yFinal[1];
 
       for (int i = 0; i < newFx.length - 1; i++) {
-        splines[i] =
-            new CubicHermiteSpline(
-                new double[] {newWaypts[i].getX(), newFx[i]},
-                new double[] {newWaypts[i + 1].getX(), newFx[i + 1]},
-                new double[] {newWaypts[i].getY(), newFy[i]},
-                new double[] {newWaypts[i + 1].getY(), newFy[i + 1]});
+        splines[i] = new CubicHermiteSpline(
+            new double[] {newWaypts[i].getX(), newFx[i]},
+            new double[] {newWaypts[i + 1].getX(), newFx[i + 1]},
+            new double[] {newWaypts[i].getY(), newFy[i]},
+            new double[] {newWaypts[i + 1].getY(), newFy[i + 1]});
       }
     } else if (waypoints.length == 1) {
       final var xDeriv = (3 * (xFinal[0] - xInitial[0]) - xFinal[1] - xInitial[1]) / 4.0;
@@ -178,19 +177,16 @@ public final class SplineHelper {
       double[] midXControlVector = {waypoints[0].getX(), xDeriv};
       double[] midYControlVector = {waypoints[0].getY(), yDeriv};
 
-      splines[0] =
-          new CubicHermiteSpline(
-              xInitial, midXControlVector,
-              yInitial, midYControlVector);
-      splines[1] =
-          new CubicHermiteSpline(
-              midXControlVector, xFinal,
-              midYControlVector, yFinal);
+      splines[0] = new CubicHermiteSpline(
+          xInitial, midXControlVector,
+          yInitial, midYControlVector);
+      splines[1] = new CubicHermiteSpline(
+          midXControlVector, xFinal,
+          midYControlVector, yFinal);
     } else {
-      splines[0] =
-          new CubicHermiteSpline(
-              xInitial, xFinal,
-              yInitial, yFinal);
+      splines[0] = new CubicHermiteSpline(
+          xInitial, xFinal,
+          yInitial, yFinal);
     }
     return splines;
   }
@@ -211,10 +207,9 @@ public final class SplineHelper {
       var xFinal = controlVectors[i + 1].x;
       var yInitial = controlVectors[i].y;
       var yFinal = controlVectors[i + 1].y;
-      splines[i] =
-          new QuinticHermiteSpline(
-              xInitial, xFinal,
-              yInitial, yFinal);
+      splines[i] = new QuinticHermiteSpline(
+          xInitial, xFinal,
+          yInitial, yFinal);
     }
     return splines;
   }
@@ -276,18 +271,15 @@ public final class SplineHelper {
       double ddy = alpha * ddyA + beta * ddyB;
 
       // Create new splines.
-      optimizedSplines[i] =
-          new QuinticHermiteSpline(
-              aInitial.x,
-              new double[] {aFinal.x[0], aFinal.x[1], ddx},
-              aInitial.y,
-              new double[] {aFinal.y[0], aFinal.y[1], ddy});
-      optimizedSplines[i + 1] =
-          new QuinticHermiteSpline(
-              new double[] {bInitial.x[0], bInitial.x[1], ddx},
-              bFinal.x,
-              new double[] {bInitial.y[0], bInitial.y[1], ddy},
-              bFinal.y);
+      optimizedSplines[i] = new QuinticHermiteSpline(
+          aInitial.x, new double[] {aFinal.x[0], aFinal.x[1], ddx}, aInitial.y, new double[] {
+            aFinal.y[0], aFinal.y[1], ddy
+          });
+      optimizedSplines[i + 1] = new QuinticHermiteSpline(
+          new double[] {bInitial.x[0], bInitial.x[1], ddx},
+          bFinal.x,
+          new double[] {bInitial.y[0], bInitial.y[1], ddy},
+          bFinal.y);
     }
     return optimizedSplines;
   }

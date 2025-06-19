@@ -35,8 +35,8 @@ public abstract class AbstractTestSuite {
   protected List<Class<?>> getAnnotatedTestClasses() {
     SuiteClasses annotation = getClass().getAnnotation(SuiteClasses.class);
     if (annotation == null) {
-      throw new RuntimeException(
-          String.format("class '%s' must have a SuiteClasses annotation", getClass().getName()));
+      throw new RuntimeException(String.format(
+          "class '%s' must have a SuiteClasses annotation", getClass().getName()));
     }
     return List.of(annotation.value());
   }
@@ -100,7 +100,8 @@ public abstract class AbstractTestSuite {
       if (areAnySuperClassesOfTypeAbstractTestSuite(c)) {
         // Create a new instance of this class so that we can retrieve its data
         try {
-          AbstractTestSuite suite = (AbstractTestSuite) c.getDeclaredConstructor().newInstance();
+          AbstractTestSuite suite =
+              (AbstractTestSuite) c.getDeclaredConstructor().newInstance();
           // Add the tests from this suite that match the regex to the list of
           // tests to run
           runningList = suite.getAllContainedBaseTests(runningList);

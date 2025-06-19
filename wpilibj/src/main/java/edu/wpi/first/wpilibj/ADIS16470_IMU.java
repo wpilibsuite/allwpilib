@@ -701,14 +701,12 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
           // Get delta angle value for all 3 axes and scale by the elapsed time
           // (based on timestamp)
           double elapsed_time = m_scaled_sample_rate / (buffer[i] - previous_timestamp);
-          double delta_angle_x =
-              toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5], buffer[i + 6])
-                  * kDeltaAngleSf
-                  / elapsed_time;
-          double delta_angle_y =
-              toInt(buffer[i + 7], buffer[i + 8], buffer[i + 9], buffer[i + 10])
-                  * kDeltaAngleSf
-                  / elapsed_time;
+          double delta_angle_x = toInt(buffer[i + 3], buffer[i + 4], buffer[i + 5], buffer[i + 6])
+              * kDeltaAngleSf
+              / elapsed_time;
+          double delta_angle_y = toInt(buffer[i + 7], buffer[i + 8], buffer[i + 9], buffer[i + 10])
+              * kDeltaAngleSf
+              / elapsed_time;
           double delta_angle_z =
               toInt(buffer[i + 11], buffer[i + 12], buffer[i + 13], buffer[i + 14])
                   * kDeltaAngleSf
@@ -828,7 +826,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @param angle A double in degrees (CCW positive)
    */
   public void setGyroAngle(IMUAxis axis, double angle) {
-    axis =
+    IMUAxis mappedAxis =
         switch (axis) {
           case kYaw -> m_yaw_axis;
           case kPitch -> m_pitch_axis;
@@ -836,7 +834,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
           default -> axis;
         };
 
-    switch (axis) {
+    switch (mappedAxis) {
       case kX -> setGyroAngleX(angle);
       case kY -> setGyroAngleY(angle);
       case kZ -> setGyroAngleZ(angle);
@@ -889,7 +887,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return The axis angle in degrees (CCW positive).
    */
   public synchronized double getAngle(IMUAxis axis) {
-    axis =
+    IMUAxis mappedAxis =
         switch (axis) {
           case kYaw -> m_yaw_axis;
           case kPitch -> m_pitch_axis;
@@ -897,7 +895,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
           default -> axis;
         };
 
-    return switch (axis) {
+    return switch (mappedAxis) {
       case kX -> {
         if (m_simGyroAngleX != null) {
           yield m_simGyroAngleX.get();
@@ -936,7 +934,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
    * @return Axis angular rate in degrees per second (CCW positive).
    */
   public synchronized double getRate(IMUAxis axis) {
-    axis =
+    IMUAxis mappedAxis =
         switch (axis) {
           case kYaw -> m_yaw_axis;
           case kPitch -> m_pitch_axis;
@@ -944,7 +942,7 @@ public class ADIS16470_IMU implements AutoCloseable, Sendable {
           default -> axis;
         };
 
-    return switch (axis) {
+    return switch (mappedAxis) {
       case kX -> {
         if (m_simGyroRateX != null) {
           yield m_simGyroRateX.get();

@@ -47,20 +47,18 @@ public class Drivetrain {
 
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
-  private final MecanumDriveKinematics m_kinematics =
-      new MecanumDriveKinematics(
-          m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
+  private final MecanumDriveKinematics m_kinematics = new MecanumDriveKinematics(
+      m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
   /* Here we use MecanumDrivePoseEstimator so that we can fuse odometry readings. The numbers used
   below are robot specific, and should be tuned. */
-  private final MecanumDrivePoseEstimator m_poseEstimator =
-      new MecanumDrivePoseEstimator(
-          m_kinematics,
-          m_gyro.getRotation2d(),
-          getCurrentDistances(),
-          Pose2d.kZero,
-          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
-          VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+  private final MecanumDrivePoseEstimator m_poseEstimator = new MecanumDrivePoseEstimator(
+      m_kinematics,
+      m_gyro.getRotation2d(),
+      getCurrentDistances(),
+      Pose2d.kZero,
+      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
+      VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
@@ -112,18 +110,14 @@ public class Drivetrain {
     final double backLeftFeedforward = m_feedforward.calculate(speeds.rearLeftMetersPerSecond);
     final double backRightFeedforward = m_feedforward.calculate(speeds.rearRightMetersPerSecond);
 
-    final double frontLeftOutput =
-        m_frontLeftPIDController.calculate(
-            m_frontLeftEncoder.getRate(), speeds.frontLeftMetersPerSecond);
-    final double frontRightOutput =
-        m_frontRightPIDController.calculate(
-            m_frontRightEncoder.getRate(), speeds.frontRightMetersPerSecond);
-    final double backLeftOutput =
-        m_backLeftPIDController.calculate(
-            m_backLeftEncoder.getRate(), speeds.rearLeftMetersPerSecond);
-    final double backRightOutput =
-        m_backRightPIDController.calculate(
-            m_backRightEncoder.getRate(), speeds.rearRightMetersPerSecond);
+    final double frontLeftOutput = m_frontLeftPIDController.calculate(
+        m_frontLeftEncoder.getRate(), speeds.frontLeftMetersPerSecond);
+    final double frontRightOutput = m_frontRightPIDController.calculate(
+        m_frontRightEncoder.getRate(), speeds.frontRightMetersPerSecond);
+    final double backLeftOutput = m_backLeftPIDController.calculate(
+        m_backLeftEncoder.getRate(), speeds.rearLeftMetersPerSecond);
+    final double backRightOutput = m_backRightPIDController.calculate(
+        m_backRightEncoder.getRate(), speeds.rearRightMetersPerSecond);
 
     m_frontLeftMotor.setVoltage(frontLeftOutput + frontLeftFeedforward);
     m_frontRightMotor.setVoltage(frontRightOutput + frontRightFeedforward);
@@ -141,14 +135,12 @@ public class Drivetrain {
    */
   public void drive(
       double xSpeed, double ySpeed, double rot, boolean fieldRelative, double periodSeconds) {
-    var mecanumDriveWheelSpeeds =
-        m_kinematics.toWheelSpeeds(
-            ChassisSpeeds.discretize(
-                fieldRelative
-                    ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                        xSpeed, ySpeed, rot, m_poseEstimator.getEstimatedPosition().getRotation())
-                    : new ChassisSpeeds(xSpeed, ySpeed, rot),
-                periodSeconds));
+    var mecanumDriveWheelSpeeds = m_kinematics.toWheelSpeeds(ChassisSpeeds.discretize(
+        fieldRelative
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                xSpeed, ySpeed, rot, m_poseEstimator.getEstimatedPosition().getRotation())
+            : new ChassisSpeeds(xSpeed, ySpeed, rot),
+        periodSeconds));
     mecanumDriveWheelSpeeds.desaturate(kMaxSpeed);
     setSpeeds(mecanumDriveWheelSpeeds);
   }

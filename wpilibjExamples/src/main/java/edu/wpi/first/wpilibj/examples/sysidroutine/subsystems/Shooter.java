@@ -32,11 +32,10 @@ public class Shooter extends SubsystemBase {
   private final PWMSparkMax m_feederMotor = new PWMSparkMax(ShooterConstants.kFeederMotorPort);
 
   // The shooter wheel encoder
-  private final Encoder m_shooterEncoder =
-      new Encoder(
-          ShooterConstants.kEncoderPorts[0],
-          ShooterConstants.kEncoderPorts[1],
-          ShooterConstants.kEncoderReversed);
+  private final Encoder m_shooterEncoder = new Encoder(
+      ShooterConstants.kEncoderPorts[0],
+      ShooterConstants.kEncoderPorts[1],
+      ShooterConstants.kEncoderReversed);
 
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutVoltage m_appliedVoltage = Volts.mutable(0);
@@ -46,38 +45,35 @@ public class Shooter extends SubsystemBase {
   private final MutAngularVelocity m_velocity = RadiansPerSecond.mutable(0);
 
   // Create a new SysId routine for characterizing the shooter.
-  private final SysIdRoutine m_sysIdRoutine =
-      new SysIdRoutine(
-          // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-          new SysIdRoutine.Config(),
-          new SysIdRoutine.Mechanism(
-              // Tell SysId how to plumb the driving voltage to the motor(s).
-              m_shooterMotor::setVoltage,
-              // Tell SysId how to record a frame of data for each motor on the mechanism being
-              // characterized.
-              log -> {
-                // Record a frame for the shooter motor.
-                log.motor("shooter-wheel")
-                    .voltage(
-                        m_appliedVoltage.mut_replace(
-                            m_shooterMotor.get() * RobotController.getBatteryVoltage(), Volts))
-                    .angularPosition(m_angle.mut_replace(m_shooterEncoder.getDistance(), Rotations))
-                    .angularVelocity(
-                        m_velocity.mut_replace(m_shooterEncoder.getRate(), RotationsPerSecond));
-              },
-              // Tell SysId to make generated commands require this subsystem, suffix test state in
-              // WPILog with this subsystem's name ("shooter")
-              this));
+  private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+      // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+      new SysIdRoutine.Config(),
+      new SysIdRoutine.Mechanism(
+          // Tell SysId how to plumb the driving voltage to the motor(s).
+          m_shooterMotor::setVoltage,
+          // Tell SysId how to record a frame of data for each motor on the mechanism being
+          // characterized.
+          log -> {
+            // Record a frame for the shooter motor.
+            log.motor("shooter-wheel")
+                .voltage(m_appliedVoltage.mut_replace(
+                    m_shooterMotor.get() * RobotController.getBatteryVoltage(), Volts))
+                .angularPosition(m_angle.mut_replace(m_shooterEncoder.getDistance(), Rotations))
+                .angularVelocity(
+                    m_velocity.mut_replace(m_shooterEncoder.getRate(), RotationsPerSecond));
+          },
+          // Tell SysId to make generated commands require this subsystem, suffix test state in
+          // WPILog with this subsystem's name ("shooter")
+          this));
   // PID controller to run the shooter wheel in closed-loop, set the constants equal to those
   // calculated by SysId
   private final PIDController m_shooterFeedback = new PIDController(ShooterConstants.kP, 0, 0);
   // Feedforward controller to run the shooter wheel in closed-loop, set the constants equal to
   // those calculated by SysId
-  private final SimpleMotorFeedforward m_shooterFeedforward =
-      new SimpleMotorFeedforward(
-          ShooterConstants.kSVolts,
-          ShooterConstants.kVVoltSecondsPerRotation,
-          ShooterConstants.kAVoltSecondsSquaredPerRotation);
+  private final SimpleMotorFeedforward m_shooterFeedforward = new SimpleMotorFeedforward(
+      ShooterConstants.kSVolts,
+      ShooterConstants.kVVoltSecondsPerRotation,
+      ShooterConstants.kAVoltSecondsSquaredPerRotation);
 
   /** Creates a new Shooter subsystem. */
   public Shooter() {
@@ -98,11 +94,10 @@ public class Shooter extends SubsystemBase {
                   + m_shooterFeedforward.calculate(shooterSpeed.getAsDouble()));
           m_feederMotor.set(ShooterConstants.kFeederSpeed);
         })
-        .finallyDo(
-            () -> {
-              m_shooterMotor.stopMotor();
-              m_feederMotor.stopMotor();
-            })
+        .finallyDo(() -> {
+          m_shooterMotor.stopMotor();
+          m_feederMotor.stopMotor();
+        })
         .withName("runShooter");
   }
 

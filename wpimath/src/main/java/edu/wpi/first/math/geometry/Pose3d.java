@@ -303,21 +303,20 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    */
   public Pose3d exp(Twist3d twist) {
     var quaternion = this.getRotation().getQuaternion();
-    double[] resultArray =
-        Pose3dJNI.exp(
-            this.getX(),
-            this.getY(),
-            this.getZ(),
-            quaternion.getW(),
-            quaternion.getX(),
-            quaternion.getY(),
-            quaternion.getZ(),
-            twist.dx,
-            twist.dy,
-            twist.dz,
-            twist.rx,
-            twist.ry,
-            twist.rz);
+    double[] resultArray = Pose3dJNI.exp(
+        this.getX(),
+        this.getY(),
+        this.getZ(),
+        quaternion.getW(),
+        quaternion.getX(),
+        quaternion.getY(),
+        quaternion.getZ(),
+        twist.dx,
+        twist.dy,
+        twist.dz,
+        twist.rx,
+        twist.ry,
+        twist.rz);
     return new Pose3d(
         resultArray[0],
         resultArray[1],
@@ -336,22 +335,21 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   public Twist3d log(Pose3d end) {
     var thisQuaternion = this.getRotation().getQuaternion();
     var endQuaternion = end.getRotation().getQuaternion();
-    double[] resultArray =
-        Pose3dJNI.log(
-            this.getX(),
-            this.getY(),
-            this.getZ(),
-            thisQuaternion.getW(),
-            thisQuaternion.getX(),
-            thisQuaternion.getY(),
-            thisQuaternion.getZ(),
-            end.getX(),
-            end.getY(),
-            end.getZ(),
-            endQuaternion.getW(),
-            endQuaternion.getX(),
-            endQuaternion.getY(),
-            endQuaternion.getZ());
+    double[] resultArray = Pose3dJNI.log(
+        this.getX(),
+        this.getY(),
+        this.getZ(),
+        thisQuaternion.getW(),
+        thisQuaternion.getX(),
+        thisQuaternion.getY(),
+        thisQuaternion.getZ(),
+        end.getX(),
+        end.getY(),
+        end.getZ(),
+        endQuaternion.getW(),
+        endQuaternion.getX(),
+        endQuaternion.getY(),
+        endQuaternion.getZ());
     return new Twist3d(
         resultArray[0],
         resultArray[1],
@@ -446,9 +444,8 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
       return endValue;
     } else {
       var twist = this.log(endValue);
-      var scaledTwist =
-          new Twist3d(
-              twist.dx * t, twist.dy * t, twist.dz * t, twist.rx * t, twist.ry * t, twist.rz * t);
+      var scaledTwist = new Twist3d(
+          twist.dx * t, twist.dy * t, twist.dz * t, twist.rx * t, twist.ry * t, twist.rz * t);
       return this.exp(scaledTwist);
     }
   }

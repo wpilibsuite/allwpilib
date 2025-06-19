@@ -57,9 +57,7 @@ public abstract class UtilityClassTest<T> {
   Stream<DynamicTest> publicMethodsStaticTestFactory() {
     return Arrays.stream(m_clazz.getDeclaredMethods())
         .filter(method -> Modifier.isPublic(method.getModifiers()))
-        .map(
-            method ->
-                dynamicTest(
-                    method.getName(), () -> assertTrue(Modifier.isStatic(method.getModifiers()))));
+        .map(method -> dynamicTest(
+            method.getName(), () -> assertTrue(Modifier.isStatic(method.getModifiers()))));
   }
 }

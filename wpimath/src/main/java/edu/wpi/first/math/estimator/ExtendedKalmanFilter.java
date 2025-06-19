@@ -143,12 +143,10 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     reset();
 
-    final var contA =
-        NumericalJacobian.numericalJacobianX(
-            states, states, f, m_xHat, new Matrix<>(inputs, Nat.N1()));
-    final var C =
-        NumericalJacobian.numericalJacobianX(
-            outputs, states, h, m_xHat, new Matrix<>(inputs, Nat.N1()));
+    final var contA = NumericalJacobian.numericalJacobianX(
+        states, states, f, m_xHat, new Matrix<>(inputs, Nat.N1()));
+    final var C = NumericalJacobian.numericalJacobianX(
+        outputs, states, h, m_xHat, new Matrix<>(inputs, Nat.N1()));
 
     final var discPair = Discretization.discretizeAQ(contA, m_contQ, dtSeconds);
     final var discA = discPair.getFirst();
@@ -379,11 +377,10 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     // Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
     // Use Joseph form for numerical stability
-    m_P =
-        Matrix.eye(m_states)
-            .minus(K.times(C))
-            .times(m_P)
-            .times(Matrix.eye(m_states).minus(K.times(C)).transpose())
-            .plus(K.times(discR).times(K.transpose()));
+    m_P = Matrix.eye(m_states)
+        .minus(K.times(C))
+        .times(m_P)
+        .times(Matrix.eye(m_states).minus(K.times(C)).transpose())
+        .plus(K.times(discR).times(K.transpose()));
   }
 }

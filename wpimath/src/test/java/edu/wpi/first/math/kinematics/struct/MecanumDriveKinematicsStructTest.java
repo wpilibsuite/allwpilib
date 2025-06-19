@@ -13,12 +13,11 @@ import java.nio.ByteOrder;
 import org.junit.jupiter.api.Test;
 
 class MecanumDriveKinematicsStructTest {
-  private static final MecanumDriveKinematics DATA =
-      new MecanumDriveKinematics(
-          new Translation2d(19.1, 2.2),
-          new Translation2d(35.04, 1.91),
-          new Translation2d(1.74, 3.504),
-          new Translation2d(3.504, 1.91));
+  private static final MecanumDriveKinematics DATA = new MecanumDriveKinematics(
+      new Translation2d(19.1, 2.2),
+      new Translation2d(35.04, 1.91),
+      new Translation2d(1.74, 3.504),
+      new Translation2d(3.504, 1.91));
 
   @Test
   void testRoundtrip() {

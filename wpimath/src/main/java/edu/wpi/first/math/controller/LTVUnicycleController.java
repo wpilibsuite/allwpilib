@@ -230,13 +230,12 @@ public class LTVUnicycleController {
     m_poseError = poseRef.relativeTo(currentPose);
 
     var K = m_table.get(linearVelocityRef);
-    var e =
-        MatBuilder.fill(
-            Nat.N3(),
-            Nat.N1(),
-            m_poseError.getX(),
-            m_poseError.getY(),
-            m_poseError.getRotation().getRadians());
+    var e = MatBuilder.fill(
+        Nat.N3(),
+        Nat.N1(),
+        m_poseError.getX(),
+        m_poseError.getY(),
+        m_poseError.getRotation().getRadians());
     var u = K.times(e);
 
     return new ChassisSpeeds(

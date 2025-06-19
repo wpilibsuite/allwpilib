@@ -200,35 +200,30 @@ class BooleanEventTest {
     var enableAssert = new AtomicBoolean(false);
     var counter = new AtomicInteger(0);
     // This event binds an action to the event loop first
-    new BooleanEvent(
-            loop,
-            () -> {
-              if (enableAssert.get()) {
-                counter.incrementAndGet();
-                assertEquals(1, counter.get() % 3);
-              }
-              return bool1.get();
-            })
+    new BooleanEvent(loop, () -> {
+          if (enableAssert.get()) {
+            counter.incrementAndGet();
+            assertEquals(1, counter.get() % 3);
+          }
+          return bool1.get();
+        })
         // The composed event binds an action to the event loop third
         .and(
             // This event binds an action to the event loop second
-            new BooleanEvent(
-                loop,
-                () -> {
-                  if (enableAssert.get()) {
-                    counter.incrementAndGet();
-                    assertEquals(2, counter.get() % 3);
-                  }
-                  return bool2.get();
-                }))
-        // This binds an action to the event loop fourth
-        .ifHigh(
-            () -> {
+            new BooleanEvent(loop, () -> {
               if (enableAssert.get()) {
                 counter.incrementAndGet();
-                assertEquals(0, counter.get() % 3);
+                assertEquals(2, counter.get() % 3);
               }
-            });
+              return bool2.get();
+            }))
+        // This binds an action to the event loop fourth
+        .ifHigh(() -> {
+          if (enableAssert.get()) {
+            counter.incrementAndGet();
+            assertEquals(0, counter.get() % 3);
+          }
+        });
     enableAssert.set(true);
     loop.poll();
     loop.poll();
@@ -353,11 +348,10 @@ class BooleanEventTest {
     var counter = new AtomicInteger(0);
 
     var event = new BooleanEvent(loop, bool::get).rising();
-    event.ifHigh(
-        () -> {
-          bool.set(false);
-          counter.incrementAndGet();
-        });
+    event.ifHigh(() -> {
+      bool.set(false);
+      counter.incrementAndGet();
+    });
     event.ifHigh(counter::incrementAndGet);
 
     assertEquals(0, counter.get());
@@ -403,26 +397,19 @@ class BooleanEventTest {
     var event2 = new BooleanEvent(loop, bool2::get);
     var event3 = new BooleanEvent(loop, bool3::get);
     var event4 = new BooleanEvent(loop, bool4::get);
-    event1.ifHigh(
-        () -> {
-          bool2.set(false);
-          bool3.set(false);
-          counter.incrementAndGet();
-        });
-    event3
-        .or(event4)
-        .ifHigh(
-            () -> {
-              bool1.set(false);
-              counter.incrementAndGet();
-            });
-    event1
-        .and(event2)
-        .ifHigh(
-            () -> {
-              bool4.set(false);
-              counter.incrementAndGet();
-            });
+    event1.ifHigh(() -> {
+      bool2.set(false);
+      bool3.set(false);
+      counter.incrementAndGet();
+    });
+    event3.or(event4).ifHigh(() -> {
+      bool1.set(false);
+      counter.incrementAndGet();
+    });
+    event1.and(event2).ifHigh(() -> {
+      bool4.set(false);
+      counter.incrementAndGet();
+    });
 
     assertEquals(0, counter.get());
 

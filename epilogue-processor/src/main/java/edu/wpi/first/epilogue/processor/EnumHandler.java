@@ -15,10 +15,10 @@ public class EnumHandler extends ElementHandler {
     super(processingEnv);
 
     // raw type java.lang.Enum
-    m_javaLangEnum =
-        processingEnv
-            .getTypeUtils()
-            .erasure(processingEnv.getElementUtils().getTypeElement("java.lang.Enum").asType());
+    m_javaLangEnum = processingEnv
+        .getTypeUtils()
+        .erasure(
+            processingEnv.getElementUtils().getTypeElement("java.lang.Enum").asType());
   }
 
   @Override

@@ -55,36 +55,33 @@ class UltrasonicPIDTest {
     DriverStationSim.resetData();
     m_robot = new Robot();
     m_thread = new Thread(m_robot::startCompetition);
-    m_driveSim =
-        new DifferentialDrivetrainSim(
-            LinearSystemId.identifyDrivetrainSystem(
-                kvVoltSecondsPerMeter,
-                kaVoltSecondsSquaredPerMeter,
-                kvVoltSecondsPerRadian,
-                kaVoltSecondsSquaredPerRadian),
-            m_gearbox,
-            kGearing,
-            kTrackwidthMeters,
-            kWheelDiameterMeters / 2.0,
-            null);
+    m_driveSim = new DifferentialDrivetrainSim(
+        LinearSystemId.identifyDrivetrainSystem(
+            kvVoltSecondsPerMeter,
+            kaVoltSecondsSquaredPerMeter,
+            kvVoltSecondsPerRadian,
+            kaVoltSecondsSquaredPerRadian),
+        m_gearbox,
+        kGearing,
+        kTrackwidthMeters,
+        kWheelDiameterMeters / 2.0,
+        null);
     m_ultrasonicSim = new UltrasonicSim(Robot.kUltrasonicPingPort, Robot.kUltrasonicEchoPort);
     m_leftMotorSim = new PWMSim(Robot.kLeftMotorPort);
     m_rightMotorSim = new PWMSim(Robot.kRightMotorPort);
 
-    m_callback =
-        HAL.registerSimPeriodicBeforeCallback(
-            () -> {
-              m_driveSim.setInputs(
-                  m_leftMotorSim.getSpeed() * RobotController.getBatteryVoltage(),
-                  m_rightMotorSim.getSpeed() * RobotController.getBatteryVoltage());
-              m_driveSim.update(0.02);
+    m_callback = HAL.registerSimPeriodicBeforeCallback(() -> {
+      m_driveSim.setInputs(
+          m_leftMotorSim.getSpeed() * RobotController.getBatteryVoltage(),
+          m_rightMotorSim.getSpeed() * RobotController.getBatteryVoltage());
+      m_driveSim.update(0.02);
 
-              double startingDistance = m_startToObject;
-              double range = m_driveSim.getLeftPositionMeters() - startingDistance;
+      double startingDistance = m_startToObject;
+      double range = m_driveSim.getLeftPositionMeters() - startingDistance;
 
-              m_ultrasonicSim.setRangeMeters(range);
-              m_distanceMM = range * 1.0e3;
-            });
+      m_ultrasonicSim.setRangeMeters(range);
+      m_distanceMM = range * 1.0e3;
+    });
 
     m_thread.start();
     SimHooks.stepTiming(0.0); // Wait for Notifiers

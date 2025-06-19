@@ -25,18 +25,8 @@ class ElevatorSimTest {
     @SuppressWarnings("resource")
     var controller = new PIDController(10, 0, 0);
 
-    var sim =
-        new ElevatorSim(
-            DCMotor.getVex775Pro(4),
-            14.67,
-            8,
-            0.75 * 25.4 / 1000.0,
-            0.0,
-            3.0,
-            true,
-            0.0,
-            0.01,
-            0.0);
+    var sim = new ElevatorSim(
+        DCMotor.getVex775Pro(4), 14.67, 8, 0.75 * 25.4 / 1000.0, 0.0, 3.0, true, 0.0, 0.01, 0.0);
 
     try (var motor = new PWMVictorSPX(0);
         var encoder = new Encoder(0, 1)) {
@@ -66,9 +56,8 @@ class ElevatorSimTest {
   @Test
   void testInitialState() {
     double startingHeightMeters = 0.5;
-    var sim =
-        new ElevatorSim(
-            DCMotor.getKrakenX60(2), 20, 8.0, 0.1, 0.0, 1.0, true, startingHeightMeters, 0.01, 0.0);
+    var sim = new ElevatorSim(
+        DCMotor.getKrakenX60(2), 20, 8.0, 0.1, 0.0, 1.0, true, startingHeightMeters, 0.01, 0.0);
 
     assertEquals(startingHeightMeters, sim.getPositionMeters());
     assertEquals(0, sim.getVelocityMetersPerSecond());
@@ -76,18 +65,8 @@ class ElevatorSimTest {
 
   @Test
   void testMinMax() {
-    var sim =
-        new ElevatorSim(
-            DCMotor.getVex775Pro(4),
-            14.67,
-            8.0,
-            0.75 * 25.4 / 1000.0,
-            0.0,
-            1.0,
-            true,
-            0.0,
-            0.01,
-            0.0);
+    var sim = new ElevatorSim(
+        DCMotor.getVex775Pro(4), 14.67, 8.0, 0.75 * 25.4 / 1000.0, 0.0, 1.0, true, 0.0, 0.01, 0.0);
 
     for (int i = 0; i < 100; i++) {
       sim.setInput(VecBuilder.fill(0));
@@ -106,9 +85,8 @@ class ElevatorSimTest {
 
   @Test
   void testStability() {
-    var sim =
-        new ElevatorSim(
-            DCMotor.getVex775Pro(4), 100, 4, Units.inchesToMeters(0.5), 0, 10, false, 0.0);
+    var sim = new ElevatorSim(
+        DCMotor.getVex775Pro(4), 100, 4, Units.inchesToMeters(0.5), 0, 10, false, 0.0);
 
     sim.setState(VecBuilder.fill(0, 0));
     sim.setInput(12);
@@ -116,11 +94,12 @@ class ElevatorSimTest {
       sim.update(0.02);
     }
 
-    var system =
-        LinearSystemId.createElevatorSystem(
-            DCMotor.getVex775Pro(4), 4, Units.inchesToMeters(0.5), 100);
+    var system = LinearSystemId.createElevatorSystem(
+        DCMotor.getVex775Pro(4), 4, Units.inchesToMeters(0.5), 100);
     assertEquals(
-        system.calculateX(VecBuilder.fill(0, 0), VecBuilder.fill(12), 0.02 * 50.0).get(0, 0),
+        system
+            .calculateX(VecBuilder.fill(0, 0), VecBuilder.fill(12), 0.02 * 50.0)
+            .get(0, 0),
         sim.getPositionMeters(),
         0.01);
   }

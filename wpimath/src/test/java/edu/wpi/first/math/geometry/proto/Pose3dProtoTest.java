@@ -14,10 +14,8 @@ import edu.wpi.first.math.proto.Geometry3D.ProtobufPose3d;
 import org.junit.jupiter.api.Test;
 
 class Pose3dProtoTest {
-  private static final Pose3d DATA =
-      new Pose3d(
-          new Translation3d(1.1, 2.2, 1.1),
-          new Rotation3d(new Quaternion(1.91, 0.3504, 3.3, 1.74)));
+  private static final Pose3d DATA = new Pose3d(
+      new Translation3d(1.1, 2.2, 1.1), new Rotation3d(new Quaternion(1.91, 0.3504, 3.3, 1.74)));
 
   @Test
   void testRoundtrip() {

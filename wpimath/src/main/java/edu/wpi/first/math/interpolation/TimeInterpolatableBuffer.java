@@ -125,11 +125,10 @@ public final class TimeInterpolatableBuffer<T> {
       // Otherwise, interpolate. Because T is between [0, 1], we want the ratio of (the difference
       // between the current time and bottom bound) and (the difference between top and bottom
       // bounds).
-      return Optional.of(
-          m_interpolatingFunc.interpolate(
-              bottomBound.getValue(),
-              topBound.getValue(),
-              (timeSeconds - bottomBound.getKey()) / (topBound.getKey() - bottomBound.getKey())));
+      return Optional.of(m_interpolatingFunc.interpolate(
+          bottomBound.getValue(),
+          topBound.getValue(),
+          (timeSeconds - bottomBound.getKey()) / (topBound.getKey() - bottomBound.getKey())));
     }
   }
 

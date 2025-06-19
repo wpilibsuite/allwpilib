@@ -43,21 +43,19 @@ class SwerveControllerCommandTest {
   private final Timer m_timer = new Timer();
   private Rotation2d m_angle = Rotation2d.kZero;
 
-  private SwerveModuleState[] m_moduleStates =
-      new SwerveModuleState[] {
-        new SwerveModuleState(0, Rotation2d.kZero),
-        new SwerveModuleState(0, Rotation2d.kZero),
-        new SwerveModuleState(0, Rotation2d.kZero),
-        new SwerveModuleState(0, Rotation2d.kZero)
-      };
+  private SwerveModuleState[] m_moduleStates = new SwerveModuleState[] {
+    new SwerveModuleState(0, Rotation2d.kZero),
+    new SwerveModuleState(0, Rotation2d.kZero),
+    new SwerveModuleState(0, Rotation2d.kZero),
+    new SwerveModuleState(0, Rotation2d.kZero)
+  };
 
-  private final SwerveModulePosition[] m_modulePositions =
-      new SwerveModulePosition[] {
-        new SwerveModulePosition(0, Rotation2d.kZero),
-        new SwerveModulePosition(0, Rotation2d.kZero),
-        new SwerveModulePosition(0, Rotation2d.kZero),
-        new SwerveModulePosition(0, Rotation2d.kZero)
-      };
+  private final SwerveModulePosition[] m_modulePositions = new SwerveModulePosition[] {
+    new SwerveModulePosition(0, Rotation2d.kZero),
+    new SwerveModulePosition(0, Rotation2d.kZero),
+    new SwerveModulePosition(0, Rotation2d.kZero),
+    new SwerveModulePosition(0, Rotation2d.kZero)
+  };
 
   private final ProfiledPIDController m_rotController =
       new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(3 * Math.PI, Math.PI));
@@ -69,12 +67,11 @@ class SwerveControllerCommandTest {
   private static final double kWheelBase = 0.5;
   private static final double kTrackWidth = 0.5;
 
-  private final SwerveDriveKinematics m_kinematics =
-      new SwerveDriveKinematics(
-          new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-          new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-          new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-          new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+  private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+      new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+      new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+      new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+      new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
   private final SwerveDriveOdometry m_odometry =
       new SwerveDriveOdometry(m_kinematics, Rotation2d.kZero, m_modulePositions, Pose2d.kZero);
@@ -102,16 +99,15 @@ class SwerveControllerCommandTest {
 
     final var endState = trajectory.sample(trajectory.getTotalTimeSeconds());
 
-    final var command =
-        new SwerveControllerCommand(
-            trajectory,
-            this::getRobotPose,
-            m_kinematics,
-            new PIDController(0.6, 0, 0),
-            new PIDController(0.6, 0, 0),
-            m_rotController,
-            this::setModuleStates,
-            subsystem);
+    final var command = new SwerveControllerCommand(
+        trajectory,
+        this::getRobotPose,
+        m_kinematics,
+        new PIDController(0.6, 0, 0),
+        new PIDController(0.6, 0, 0),
+        m_rotController,
+        this::setModuleStates,
+        subsystem);
 
     m_timer.restart();
 
@@ -133,10 +129,9 @@ class SwerveControllerCommandTest {
     assertAll(
         () -> assertEquals(endState.poseMeters.getX(), getRobotPose().getX(), kxTolerance),
         () -> assertEquals(endState.poseMeters.getY(), getRobotPose().getY(), kyTolerance),
-        () ->
-            assertEquals(
-                endState.poseMeters.getRotation().getRadians(),
-                getRobotPose().getRotation().getRadians(),
-                kAngularTolerance));
+        () -> assertEquals(
+            endState.poseMeters.getRotation().getRadians(),
+            getRobotPose().getRotation().getRadians(),
+            kAngularTolerance));
   }
 }

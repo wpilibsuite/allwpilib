@@ -154,27 +154,23 @@ public final class LiveWindow {
   /** Disable ALL telemetry. */
   public static synchronized void disableAllTelemetry() {
     telemetryEnabled = false;
-    SendableRegistry.foreachLiveWindow(
-        dataHandle,
-        cbdata -> {
-          if (cbdata.data == null) {
-            cbdata.data = new Component();
-          }
-          ((Component) cbdata.data).m_telemetryEnabled = false;
-        });
+    SendableRegistry.foreachLiveWindow(dataHandle, cbdata -> {
+      if (cbdata.data == null) {
+        cbdata.data = new Component();
+      }
+      ((Component) cbdata.data).m_telemetryEnabled = false;
+    });
   }
 
   /** Enable ALL telemetry. */
   public static synchronized void enableAllTelemetry() {
     telemetryEnabled = true;
-    SendableRegistry.foreachLiveWindow(
-        dataHandle,
-        cbdata -> {
-          if (cbdata.data == null) {
-            cbdata.data = new Component();
-          }
-          ((Component) cbdata.data).m_telemetryEnabled = true;
-        });
+    SendableRegistry.foreachLiveWindow(dataHandle, cbdata -> {
+      if (cbdata.data == null) {
+        cbdata.data = new Component();
+      }
+      ((Component) cbdata.data).m_telemetryEnabled = true;
+    });
   }
 
   /**
@@ -189,58 +185,54 @@ public final class LiveWindow {
       return;
     }
 
-    SendableRegistry.foreachLiveWindow(
-        dataHandle,
-        cbdata -> {
-          if (cbdata.sendable == null || cbdata.parent != null) {
-            return;
-          }
+    SendableRegistry.foreachLiveWindow(dataHandle, cbdata -> {
+      if (cbdata.sendable == null || cbdata.parent != null) {
+        return;
+      }
 
-          if (cbdata.data == null) {
-            cbdata.data = new Component();
-          }
+      if (cbdata.data == null) {
+        cbdata.data = new Component();
+      }
 
-          Component component = (Component) cbdata.data;
+      Component component = (Component) cbdata.data;
 
-          if (!liveWindowEnabled && !component.m_telemetryEnabled) {
-            return;
-          }
+      if (!liveWindowEnabled && !component.m_telemetryEnabled) {
+        return;
+      }
 
-          if (component.m_firstTime) {
-            // By holding off creating the NetworkTable entries, it allows the
-            // components to be redefined. This allows default sensor and actuator
-            // values to be created that are replaced with the custom names from
-            // users calling setName.
-            if (cbdata.name.isEmpty()) {
-              return;
-            }
-            NetworkTable ssTable = liveWindowTable.getSubTable(cbdata.subsystem);
-            NetworkTable table;
-            // Treat name==subsystem as top level of subsystem
-            if (cbdata.name.equals(cbdata.subsystem)) {
-              table = ssTable;
-            } else {
-              table = ssTable.getSubTable(cbdata.name);
-            }
-            component.m_namePub = new StringTopic(table.getTopic(".name")).publish();
-            component.m_namePub.set(cbdata.name);
-            ((SendableBuilderImpl) cbdata.builder).setTable(table);
-            cbdata.sendable.initSendable(cbdata.builder);
-            component.m_typePub =
-                new StringTopic(ssTable.getTopic(".type"))
-                    .publishEx(
-                        StringTopic.kTypeString,
-                        "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
-            component.m_typePub.set(kSmartDashboardType);
+      if (component.m_firstTime) {
+        // By holding off creating the NetworkTable entries, it allows the
+        // components to be redefined. This allows default sensor and actuator
+        // values to be created that are replaced with the custom names from
+        // users calling setName.
+        if (cbdata.name.isEmpty()) {
+          return;
+        }
+        NetworkTable ssTable = liveWindowTable.getSubTable(cbdata.subsystem);
+        NetworkTable table;
+        // Treat name==subsystem as top level of subsystem
+        if (cbdata.name.equals(cbdata.subsystem)) {
+          table = ssTable;
+        } else {
+          table = ssTable.getSubTable(cbdata.name);
+        }
+        component.m_namePub = new StringTopic(table.getTopic(".name")).publish();
+        component.m_namePub.set(cbdata.name);
+        ((SendableBuilderImpl) cbdata.builder).setTable(table);
+        cbdata.sendable.initSendable(cbdata.builder);
+        component.m_typePub = new StringTopic(ssTable.getTopic(".type"))
+            .publishEx(
+                StringTopic.kTypeString, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
+        component.m_typePub.set(kSmartDashboardType);
 
-            component.m_firstTime = false;
-          }
+        component.m_firstTime = false;
+      }
 
-          if (startLiveWindow) {
-            ((SendableBuilderImpl) cbdata.builder).startLiveWindowMode();
-          }
-          cbdata.builder.update();
-        });
+      if (startLiveWindow) {
+        ((SendableBuilderImpl) cbdata.builder).startLiveWindowMode();
+      }
+      cbdata.builder.update();
+    });
 
     startLiveWindow = false;
   }

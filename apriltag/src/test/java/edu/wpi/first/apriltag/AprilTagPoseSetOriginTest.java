@@ -16,18 +16,17 @@ import org.junit.jupiter.api.Test;
 class AprilTagPoseSetOriginTest {
   @Test
   void transformationMatches() {
-    var layout =
-        new AprilTagFieldLayout(
-            List.of(
-                new AprilTag(1, Pose3d.kZero),
-                new AprilTag(
-                    2,
-                    new Pose3d(
-                        new Translation3d(
-                            Units.feetToMeters(4.0), Units.feetToMeters(4), Units.feetToMeters(4)),
-                        new Rotation3d(0, 0, Units.degreesToRadians(180))))),
-            Units.feetToMeters(54.0),
-            Units.feetToMeters(27.0));
+    var layout = new AprilTagFieldLayout(
+        List.of(
+            new AprilTag(1, Pose3d.kZero),
+            new AprilTag(
+                2,
+                new Pose3d(
+                    new Translation3d(
+                        Units.feetToMeters(4.0), Units.feetToMeters(4), Units.feetToMeters(4)),
+                    new Rotation3d(0, 0, Units.degreesToRadians(180))))),
+        Units.feetToMeters(54.0),
+        Units.feetToMeters(27.0));
     layout.setOrigin(AprilTagFieldLayout.OriginPosition.kRedAllianceWallRightSide);
 
     assertEquals(

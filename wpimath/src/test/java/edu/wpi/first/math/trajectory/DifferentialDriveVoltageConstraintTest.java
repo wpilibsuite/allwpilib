@@ -36,11 +36,10 @@ class DifferentialDriveVoltageConstraintTest {
 
     while (t < duration) {
       var point = trajectory.sample(t);
-      var chassisSpeeds =
-          new ChassisSpeeds(
-              point.velocityMetersPerSecond,
-              0,
-              point.velocityMetersPerSecond * point.curvatureRadPerMeter);
+      var chassisSpeeds = new ChassisSpeeds(
+          point.velocityMetersPerSecond,
+          0,
+          point.velocityMetersPerSecond * point.curvatureRadPerMeter);
       var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
 
       t += dt;
@@ -49,30 +48,22 @@ class DifferentialDriveVoltageConstraintTest {
       // Not really a strictly-correct test as we're using the chassis accel instead of the
       // wheel accel, but much easier than doing it "properly" and a reasonable check anyway
       assertAll(
-          () ->
-              assertTrue(
-                  feedforward.calculateWithVelocities(
-                          wheelSpeeds.leftMetersPerSecond,
-                          wheelSpeeds.leftMetersPerSecond + dt * acceleration)
-                      <= maxVoltage + 0.05),
-          () ->
-              assertTrue(
-                  feedforward.calculateWithVelocities(
-                          wheelSpeeds.leftMetersPerSecond,
-                          wheelSpeeds.leftMetersPerSecond + dt * acceleration)
-                      >= -maxVoltage - 0.05),
-          () ->
-              assertTrue(
-                  feedforward.calculateWithVelocities(
-                          wheelSpeeds.rightMetersPerSecond,
-                          wheelSpeeds.rightMetersPerSecond + dt * acceleration)
-                      <= maxVoltage + 0.05),
-          () ->
-              assertTrue(
-                  feedforward.calculateWithVelocities(
-                          wheelSpeeds.rightMetersPerSecond,
-                          wheelSpeeds.rightMetersPerSecond + dt * acceleration)
-                      >= -maxVoltage - 0.05));
+          () -> assertTrue(feedforward.calculateWithVelocities(
+                  wheelSpeeds.leftMetersPerSecond,
+                  wheelSpeeds.leftMetersPerSecond + dt * acceleration)
+              <= maxVoltage + 0.05),
+          () -> assertTrue(feedforward.calculateWithVelocities(
+                  wheelSpeeds.leftMetersPerSecond,
+                  wheelSpeeds.leftMetersPerSecond + dt * acceleration)
+              >= -maxVoltage - 0.05),
+          () -> assertTrue(feedforward.calculateWithVelocities(
+                  wheelSpeeds.rightMetersPerSecond,
+                  wheelSpeeds.rightMetersPerSecond + dt * acceleration)
+              <= maxVoltage + 0.05),
+          () -> assertTrue(feedforward.calculateWithVelocities(
+                  wheelSpeeds.rightMetersPerSecond,
+                  wheelSpeeds.rightMetersPerSecond + dt * acceleration)
+              >= -maxVoltage - 0.05));
     }
   }
 
@@ -88,20 +79,16 @@ class DifferentialDriveVoltageConstraintTest {
     var config = new TrajectoryConfig(12, 12).addConstraint(constraint);
 
     // Radius of curvature should be ~1 meter.
-    assertDoesNotThrow(
-        () ->
-            TrajectoryGenerator.generateTrajectory(
-                new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
-                new ArrayList<>(),
-                new Pose2d(0, 1, Rotation2d.kPi),
-                config));
+    assertDoesNotThrow(() -> TrajectoryGenerator.generateTrajectory(
+        new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
+        new ArrayList<>(),
+        new Pose2d(0, 1, Rotation2d.kPi),
+        config));
 
-    assertDoesNotThrow(
-        () ->
-            TrajectoryGenerator.generateTrajectory(
-                new Pose2d(0, 1, Rotation2d.kPi),
-                new ArrayList<>(),
-                new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
-                config.setReversed(true)));
+    assertDoesNotThrow(() -> TrajectoryGenerator.generateTrajectory(
+        new Pose2d(0, 1, Rotation2d.kPi),
+        new ArrayList<>(),
+        new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
+        config.setReversed(true)));
   }
 }

@@ -48,7 +48,10 @@ public final class CurrentUnit extends Unit {
    * @return the power unit
    */
   public PowerUnit mult(VoltageUnit voltage, String name, String symbol) {
-    return Units.derive(PowerUnit.combine(voltage, this)).named(name).symbol(symbol).make();
+    return Units.derive(PowerUnit.combine(voltage, this))
+        .named(name)
+        .symbol(symbol)
+        .make();
   }
 
   @Override

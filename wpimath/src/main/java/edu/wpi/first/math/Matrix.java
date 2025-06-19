@@ -42,9 +42,8 @@ public class Matrix<R extends Num, C extends Num>
    * @param columns The number of columns of the matrix.
    */
   public Matrix(Nat<R> rows, Nat<C> columns) {
-    this.m_storage =
-        new SimpleMatrix(
-            Objects.requireNonNull(rows).getNum(), Objects.requireNonNull(columns).getNum());
+    this.m_storage = new SimpleMatrix(
+        Objects.requireNonNull(rows).getNum(), Objects.requireNonNull(columns).getNum());
   }
 
   /**
@@ -142,7 +141,8 @@ public class Matrix<R extends Num, C extends Num>
    * @param val The row vector to set the given row to.
    */
   public final void setRow(int row, Matrix<N1, C> val) {
-    this.m_storage.setRow(row, 0, Objects.requireNonNull(val).m_storage.getDDRM().getData());
+    this.m_storage.setRow(
+        row, 0, Objects.requireNonNull(val).m_storage.getDDRM().getData());
   }
 
   /**
@@ -152,7 +152,8 @@ public class Matrix<R extends Num, C extends Num>
    * @param val The column vector to set the given row to.
    */
   public final void setColumn(int column, Matrix<R, N1> val) {
-    this.m_storage.setColumn(column, 0, Objects.requireNonNull(val).m_storage.getDDRM().getData());
+    this.m_storage.setColumn(
+        column, 0, Objects.requireNonNull(val).m_storage.getDDRM().getData());
   }
 
   /**
@@ -387,12 +388,11 @@ public class Matrix<R extends Num, C extends Num>
    */
   public final Matrix<R, C> exp() {
     if (this.getNumRows() != this.getNumCols()) {
-      throw new MatrixDimensionException(
-          "Non-square matrices cannot be exponentiated! "
-              + "This matrix is "
-              + this.getNumRows()
-              + " x "
-              + this.getNumCols());
+      throw new MatrixDimensionException("Non-square matrices cannot be exponentiated! "
+          + "This matrix is "
+          + this.getNumRows()
+          + " x "
+          + this.getNumCols());
     }
     Matrix<R, C> toReturn = new Matrix<>(new SimpleMatrix(this.getNumRows(), this.getNumCols()));
     EigenJNI.exp(
@@ -411,12 +411,11 @@ public class Matrix<R extends Num, C extends Num>
    */
   public final Matrix<R, C> pow(double exponent) {
     if (this.getNumRows() != this.getNumCols()) {
-      throw new MatrixDimensionException(
-          "Non-square matrices cannot be raised to a power! "
-              + "This matrix is "
-              + this.getNumRows()
-              + " x "
-              + this.getNumCols());
+      throw new MatrixDimensionException("Non-square matrices cannot be raised to a power! "
+          + "This matrix is "
+          + this.getNumRows()
+          + " x "
+          + this.getNumCols());
     }
     Matrix<R, C> toReturn = new Matrix<>(new SimpleMatrix(this.getNumRows(), this.getNumCols()));
     EigenJNI.pow(
@@ -533,12 +532,11 @@ public class Matrix<R extends Num, C extends Num>
    */
   public final <R2 extends Num, C2 extends Num> Matrix<R2, C2> block(
       Nat<R2> height, Nat<C2> width, int startingRow, int startingCol) {
-    return new Matrix<>(
-        this.m_storage.extractMatrix(
-            startingRow,
-            startingRow + Objects.requireNonNull(height).getNum(),
-            startingCol,
-            startingCol + Objects.requireNonNull(width).getNum()));
+    return new Matrix<>(this.m_storage.extractMatrix(
+        startingRow,
+        startingRow + Objects.requireNonNull(height).getNum(),
+        startingCol,
+        startingCol + Objects.requireNonNull(width).getNum()));
   }
 
   /**
@@ -554,9 +552,8 @@ public class Matrix<R extends Num, C extends Num>
    */
   public final <R2 extends Num, C2 extends Num> Matrix<R2, C2> block(
       int height, int width, int startingRow, int startingCol) {
-    return new Matrix<>(
-        this.m_storage.extractMatrix(
-            startingRow, startingRow + height, startingCol, startingCol + width));
+    return new Matrix<>(this.m_storage.extractMatrix(
+        startingRow, startingRow + height, startingCol, startingCol + width));
   }
 
   /**

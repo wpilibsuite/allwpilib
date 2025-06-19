@@ -76,11 +76,10 @@ public final class LinearSystemId {
     }
 
     return new LinearSystem<>(
-        VecBuilder.fill(
-            -gearing
-                * gearing
-                * motor.KtNMPerAmp
-                / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgMetersSquared)),
+        VecBuilder.fill(-gearing
+            * gearing
+            * motor.KtNMPerAmp
+            / (motor.KvRadPerSecPerVolt * motor.rOhms * JKgMetersSquared)),
         VecBuilder.fill(gearing * motor.KtNMPerAmp / (motor.rOhms * JKgMetersSquared)),
         Matrix.eye(Nat.N1()),
         new Matrix<>(Nat.N1(), Nat.N1()));
@@ -193,10 +192,9 @@ public final class LinearSystemId {
       throw new IllegalArgumentException("gearing must be greater than zero.");
     }
 
-    var C1 =
-        -(gearing * gearing)
-            * motor.KtNMPerAmp
-            / (motor.KvRadPerSecPerVolt * motor.rOhms * rMeters * rMeters);
+    var C1 = -(gearing * gearing)
+        * motor.KtNMPerAmp
+        / (motor.KvRadPerSecPerVolt * motor.rOhms * rMeters * rMeters);
     var C2 = gearing * motor.KtNMPerAmp / (motor.rOhms * rMeters);
 
     final double C3 = 1 / massKg + rbMeters * rbMeters / JKgMetersSquared;

@@ -44,14 +44,13 @@ public final class VectorProto<R extends Num> implements Protobuf<Vector<R>, Pro
   @Override
   public Vector<R> unpack(ProtobufVector msg) {
     if (msg.getRows().length() != m_rows.getNum()) {
-      throw new IllegalArgumentException(
-          "Tried to unpack msg "
-              + msg
-              + " with "
-              + msg.getRows().length()
-              + " rows into Vector with "
-              + m_rows.getNum()
-              + " rows");
+      throw new IllegalArgumentException("Tried to unpack msg "
+          + msg
+          + " with "
+          + msg.getRows().length()
+          + " rows into Vector with "
+          + m_rows.getNum()
+          + " rows");
     }
     var storage = new SimpleMatrix(Protobuf.unpackArray(msg.getRows()));
     return new Vector<R>(storage);

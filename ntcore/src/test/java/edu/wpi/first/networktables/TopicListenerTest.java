@@ -57,9 +57,8 @@ class TopicListenerTest {
   void testPrefixNewRemote() {
     connect();
     final int poller = NetworkTablesJNI.createListenerPoller(m_serverInst.getHandle());
-    final int handle =
-        NetworkTablesJNI.addListener(
-            poller, new String[] {"/foo"}, EnumSet.of(NetworkTableEvent.Kind.kPublish));
+    final int handle = NetworkTablesJNI.addListener(
+        poller, new String[] {"/foo"}, EnumSet.of(NetworkTableEvent.Kind.kPublish));
 
     // Trigger an event
     m_clientInst.getEntry("/foo/bar").setDouble(1.0);

@@ -55,14 +55,13 @@ class TravelingSalesmanTest {
     // ...................
     // ....3.....1........
     // ...................
-    var poses =
-        new Pose2d[] {
-          new Pose2d(3, 3, Rotation2d.kZero),
-          new Pose2d(11, 5, Rotation2d.kZero),
-          new Pose2d(9, 2, Rotation2d.kZero),
-          new Pose2d(5, 5, Rotation2d.kZero),
-          new Pose2d(14, 3, Rotation2d.kZero)
-        };
+    var poses = new Pose2d[] {
+      new Pose2d(3, 3, Rotation2d.kZero),
+      new Pose2d(11, 5, Rotation2d.kZero),
+      new Pose2d(9, 2, Rotation2d.kZero),
+      new Pose2d(5, 5, Rotation2d.kZero),
+      new Pose2d(14, 3, Rotation2d.kZero)
+    };
 
     var traveler = new TravelingSalesman();
     var solution = traveler.solve(poses, 500);
@@ -80,29 +79,27 @@ class TravelingSalesmanTest {
     // .0.................
     // .....7..5...8......
     // ...................
-    var poses =
-        new Pose2d[] {
-          new Pose2d(2, 4, Rotation2d.kZero),
-          new Pose2d(10, 1, Rotation2d.kZero),
-          new Pose2d(12, 1, Rotation2d.kZero),
-          new Pose2d(7, 1, Rotation2d.kZero),
-          new Pose2d(3, 2, Rotation2d.kZero),
-          new Pose2d(9, 5, Rotation2d.kZero),
-          new Pose2d(5, 1, Rotation2d.kZero),
-          new Pose2d(6, 5, Rotation2d.kZero),
-          new Pose2d(13, 5, Rotation2d.kZero),
-          new Pose2d(14, 3, Rotation2d.kZero)
-        };
+    var poses = new Pose2d[] {
+      new Pose2d(2, 4, Rotation2d.kZero),
+      new Pose2d(10, 1, Rotation2d.kZero),
+      new Pose2d(12, 1, Rotation2d.kZero),
+      new Pose2d(7, 1, Rotation2d.kZero),
+      new Pose2d(3, 2, Rotation2d.kZero),
+      new Pose2d(9, 5, Rotation2d.kZero),
+      new Pose2d(5, 1, Rotation2d.kZero),
+      new Pose2d(6, 5, Rotation2d.kZero),
+      new Pose2d(13, 5, Rotation2d.kZero),
+      new Pose2d(14, 3, Rotation2d.kZero)
+    };
 
     var traveler = new TravelingSalesman();
     var solution = traveler.solve(poses, 500);
 
     assertEquals(10, solution.length);
-    var expected =
-        new Pose2d[] {
-          poses[0], poses[4], poses[6], poses[3], poses[1], poses[2], poses[9], poses[8], poses[5],
-          poses[7]
-        };
+    var expected = new Pose2d[] {
+      poses[0], poses[4], poses[6], poses[3], poses[1], poses[2], poses[9], poses[8], poses[5],
+      poses[7]
+    };
     assertTrue(isMatchingCycle(expected, solution));
   }
 }

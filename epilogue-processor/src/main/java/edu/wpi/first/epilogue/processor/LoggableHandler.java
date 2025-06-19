@@ -25,11 +25,10 @@ public class LoggableHandler extends ElementHandler {
   protected LoggableHandler(
       ProcessingEnvironment processingEnv, Collection<? extends Element> loggedTypes) {
     super(processingEnv);
-    m_loggedTypes =
-        loggedTypes.stream()
-            .filter(e -> e instanceof TypeElement)
-            .map(e -> (TypeElement) e)
-            .collect(Collectors.toSet());
+    m_loggedTypes = loggedTypes.stream()
+        .filter(e -> e instanceof TypeElement)
+        .map(e -> (TypeElement) e)
+        .collect(Collectors.toSet());
   }
 
   @Override
@@ -41,21 +40,18 @@ public class LoggableHandler extends ElementHandler {
   @Override
   public String logInvocation(Element element) {
     TypeMirror dataType = dataType(element);
-    var declaredType =
-        m_processingEnv
-            .getElementUtils()
-            .getTypeElement(m_processingEnv.getTypeUtils().erasure(dataType).toString());
+    var declaredType = m_processingEnv
+        .getElementUtils()
+        .getTypeElement(m_processingEnv.getTypeUtils().erasure(dataType).toString());
 
     // Get the list of known loggable subtypes of the input type. This will include the input type.
     // These are sorted by their distance from the declared type such that "more concrete" types are
     // checked first so the instanceof chain doesn't check a really generic type first, even if a
     // more specific loggable type could be used instead.
-    var loggableSubtypes =
-        m_loggedTypes.stream()
-            .filter(
-                l -> m_processingEnv.getTypeUtils().isAssignable(l.asType(), declaredType.asType()))
-            .sorted(inheritanceComparatorFor(declaredType))
-            .toList();
+    var loggableSubtypes = m_loggedTypes.stream()
+        .filter(l -> m_processingEnv.getTypeUtils().isAssignable(l.asType(), declaredType.asType()))
+        .sorted(inheritanceComparatorFor(declaredType))
+        .toList();
 
     int size = loggableSubtypes.size();
 
@@ -85,9 +81,8 @@ public class LoggableHandler extends ElementHandler {
       } else if (i == size - 1) {
         // Final invocation, generate an "else" statement
         String loggerCall = generateLoggerCall(element, type, varName);
-        part =
-            " else {\n  // Base type %s\n  %s;\n}"
-                .formatted(declaredType.getQualifiedName(), loggerCall);
+        part = " else {\n  // Base type %s\n  %s;\n}"
+            .formatted(declaredType.getQualifiedName(), loggerCall);
       } else {
         // Somewhere in the middle, generate an "else if" statement
         part = generateIf(type, element, " else if", varName);
@@ -127,11 +122,9 @@ public class LoggableHandler extends ElementHandler {
    * @return the comparator
    */
   private Comparator<TypeElement> inheritanceComparatorFor(TypeElement declaredType) {
-    Comparator<TypeElement> byDistance =
-        Comparator.comparingInt(
-            inheritor -> {
-              return inheritanceDistance(inheritor.asType(), declaredType.asType());
-            });
+    Comparator<TypeElement> byDistance = Comparator.comparingInt(inheritor -> {
+      return inheritanceDistance(inheritor.asType(), declaredType.asType());
+    });
 
     return byDistance
         .reversed()
@@ -192,12 +185,11 @@ public class LoggableHandler extends ElementHandler {
       parent = element.getSuperclass();
 
       // Handle cases of interface inheritance
-      distance =
-          1
-              + element.getInterfaces().stream()
-                  .mapToInt(iface -> inheritanceDistance(iface, base))
-                  .min()
-                  .orElse(distance);
+      distance = 1
+          + element.getInterfaces().stream()
+              .mapToInt(iface -> inheritanceDistance(iface, base))
+              .min()
+              .orElse(distance);
     }
 
     return distance;

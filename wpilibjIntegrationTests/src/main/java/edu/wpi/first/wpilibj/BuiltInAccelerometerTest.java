@@ -38,12 +38,11 @@ public class BuiltInAccelerometerTest extends AbstractComsSetup {
   /** Test with all valid ranges to make sure unpacking is always done correctly. */
   @Parameters
   public static Collection<BuiltInAccelerometer.Range[]> generateData() {
-    return List.of(
-        new BuiltInAccelerometer.Range[][] {
-          {BuiltInAccelerometer.Range.k2G},
-          {BuiltInAccelerometer.Range.k4G},
-          {BuiltInAccelerometer.Range.k8G}
-        });
+    return List.of(new BuiltInAccelerometer.Range[][] {
+      {BuiltInAccelerometer.Range.k2G},
+      {BuiltInAccelerometer.Range.k4G},
+      {BuiltInAccelerometer.Range.k8G}
+    });
   }
 
   @Override

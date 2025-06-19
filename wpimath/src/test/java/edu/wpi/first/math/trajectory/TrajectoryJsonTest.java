@@ -19,11 +19,8 @@ class TrajectoryJsonTest {
         List.of(new DifferentialDriveKinematicsConstraint(new DifferentialDriveKinematics(0.5), 3));
     var trajectory = TrajectoryGeneratorTest.getTrajectory(config);
 
-    var deserialized =
-        assertDoesNotThrow(
-            () ->
-                TrajectoryUtil.deserializeTrajectory(
-                    TrajectoryUtil.serializeTrajectory(trajectory)));
+    var deserialized = assertDoesNotThrow(
+        () -> TrajectoryUtil.deserializeTrajectory(TrajectoryUtil.serializeTrajectory(trajectory)));
 
     assertEquals(trajectory.getStates(), deserialized.getStates());
   }

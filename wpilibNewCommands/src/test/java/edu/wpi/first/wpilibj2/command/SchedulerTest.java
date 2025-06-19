@@ -51,11 +51,10 @@ class SchedulerTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
 
-      scheduler.onCommandInterrupt(
-          (interrupted, cause) -> {
-            assertFalse(cause.isPresent());
-            counter.incrementAndGet();
-          });
+      scheduler.onCommandInterrupt((interrupted, cause) -> {
+        assertFalse(cause.isPresent());
+        counter.incrementAndGet();
+      });
 
       Command command = Commands.run(() -> {});
 
@@ -75,12 +74,11 @@ class SchedulerTest extends CommandTestBase {
       Command command = subsystem.run(() -> {});
       Command interruptor = subsystem.runOnce(() -> {});
 
-      scheduler.onCommandInterrupt(
-          (interrupted, cause) -> {
-            assertTrue(cause.isPresent());
-            assertSame(interruptor, cause.get());
-            counter.incrementAndGet();
-          });
+      scheduler.onCommandInterrupt((interrupted, cause) -> {
+        assertTrue(cause.isPresent());
+        assertSame(interruptor, cause.get());
+        counter.incrementAndGet();
+      });
 
       scheduler.schedule(command);
       scheduler.schedule(interruptor);
@@ -100,12 +98,11 @@ class SchedulerTest extends CommandTestBase {
       // This command will schedule interruptor in execute() inside the run loop
       Command interruptorScheduler = Commands.runOnce(() -> scheduler.schedule(interruptor));
 
-      scheduler.onCommandInterrupt(
-          (interrupted, cause) -> {
-            assertTrue(cause.isPresent());
-            assertSame(interruptor, cause.get());
-            counter.incrementAndGet();
-          });
+      scheduler.onCommandInterrupt((interrupted, cause) -> {
+        assertTrue(cause.isPresent());
+        assertSame(interruptor, cause.get());
+        counter.incrementAndGet();
+      });
 
       scheduler.schedule(command);
       scheduler.schedule(interruptorScheduler);
@@ -120,13 +117,12 @@ class SchedulerTest extends CommandTestBase {
   void registerSubsystemTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger(0);
-      Subsystem system =
-          new SubsystemBase() {
-            @Override
-            public void periodic() {
-              counter.incrementAndGet();
-            }
-          };
+      Subsystem system = new SubsystemBase() {
+        @Override
+        public void periodic() {
+          counter.incrementAndGet();
+        }
+      };
 
       assertDoesNotThrow(() -> scheduler.registerSubsystem(system));
 
@@ -139,13 +135,12 @@ class SchedulerTest extends CommandTestBase {
   void unregisterSubsystemTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger(0);
-      Subsystem system =
-          new SubsystemBase() {
-            @Override
-            public void periodic() {
-              counter.incrementAndGet();
-            }
-          };
+      Subsystem system = new SubsystemBase() {
+        @Override
+        public void periodic() {
+          counter.incrementAndGet();
+        }
+      };
       scheduler.registerSubsystem(system);
       assertDoesNotThrow(() -> scheduler.unregisterSubsystem(system));
 

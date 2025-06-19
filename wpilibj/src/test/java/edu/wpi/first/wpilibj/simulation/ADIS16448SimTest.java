@@ -124,9 +124,7 @@ class ADIS16448SimTest {
 
   static Stream<Arguments> provideEnumCombinations() {
     return Stream.of(ADIS16448_IMU.IMUAxis.values())
-        .flatMap(
-            imuAxis ->
-                Stream.of(ADIS16448_IMU.CalibrationTime.values())
-                    .map(calibrationTime -> arguments(imuAxis, calibrationTime)));
+        .flatMap(imuAxis -> Stream.of(ADIS16448_IMU.CalibrationTime.values())
+            .map(calibrationTime -> arguments(imuAxis, calibrationTime)));
   }
 }

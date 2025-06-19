@@ -34,41 +34,37 @@ class MecanumDrivePoseEstimator3dTest {
 
   @Test
   void testAccuracyFacingTrajectory() {
-    var kinematics =
-        new MecanumDriveKinematics(
-            new Translation2d(1, 1), new Translation2d(1, -1),
-            new Translation2d(-1, -1), new Translation2d(-1, 1));
+    var kinematics = new MecanumDriveKinematics(
+        new Translation2d(1, 1), new Translation2d(1, -1),
+        new Translation2d(-1, -1), new Translation2d(-1, 1));
 
     var wheelPositions = new MecanumDriveWheelPositions();
 
-    var estimator =
-        new MecanumDrivePoseEstimator3d(
-            kinematics,
-            Rotation3d.kZero,
-            wheelPositions,
-            Pose3d.kZero,
-            VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
-            VecBuilder.fill(0.45, 0.45, 0.45, 0.1));
+    var estimator = new MecanumDrivePoseEstimator3d(
+        kinematics,
+        Rotation3d.kZero,
+        wheelPositions,
+        Pose3d.kZero,
+        VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
+        VecBuilder.fill(0.45, 0.45, 0.45, 0.1));
 
-    var trajectory =
-        TrajectoryGenerator.generateTrajectory(
-            List.of(
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
-                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(2, 2));
+    var trajectory = TrajectoryGenerator.generateTrajectory(
+        List.of(
+            new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+            new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+            new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+            new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+            new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
+        new TrajectoryConfig(2, 2));
 
     testFollowTrajectory(
         kinematics,
         estimator,
         trajectory,
-        state ->
-            new ChassisSpeeds(
-                state.velocityMetersPerSecond,
-                0,
-                state.velocityMetersPerSecond * state.curvatureRadPerMeter),
+        state -> new ChassisSpeeds(
+            state.velocityMetersPerSecond,
+            0,
+            state.velocityMetersPerSecond * state.curvatureRadPerMeter),
         state -> state.poseMeters,
         trajectory.getInitialPose(),
         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -80,54 +76,47 @@ class MecanumDrivePoseEstimator3dTest {
 
   @Test
   void testBadInitialPose() {
-    var kinematics =
-        new MecanumDriveKinematics(
-            new Translation2d(1, 1), new Translation2d(1, -1),
-            new Translation2d(-1, -1), new Translation2d(-1, 1));
+    var kinematics = new MecanumDriveKinematics(
+        new Translation2d(1, 1), new Translation2d(1, -1),
+        new Translation2d(-1, -1), new Translation2d(-1, 1));
 
     var wheelPositions = new MecanumDriveWheelPositions();
 
-    var estimator =
-        new MecanumDrivePoseEstimator3d(
-            kinematics,
-            Rotation3d.kZero,
-            wheelPositions,
-            Pose3d.kZero,
-            VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
-            VecBuilder.fill(0.45, 0.45, 0.45, 0.1));
+    var estimator = new MecanumDrivePoseEstimator3d(
+        kinematics,
+        Rotation3d.kZero,
+        wheelPositions,
+        Pose3d.kZero,
+        VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
+        VecBuilder.fill(0.45, 0.45, 0.45, 0.1));
 
-    var trajectory =
-        TrajectoryGenerator.generateTrajectory(
-            List.of(
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
-                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(2, 2));
+    var trajectory = TrajectoryGenerator.generateTrajectory(
+        List.of(
+            new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+            new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+            new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+            new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+            new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
+        new TrajectoryConfig(2, 2));
 
     for (int offset_direction_degs = 0; offset_direction_degs < 360; offset_direction_degs += 45) {
       for (int offset_heading_degs = 0; offset_heading_degs < 360; offset_heading_degs += 45) {
         var pose_offset = Rotation2d.fromDegrees(offset_direction_degs);
         var heading_offset = Rotation2d.fromDegrees(offset_heading_degs);
 
-        var initial_pose =
-            trajectory
-                .getInitialPose()
-                .plus(
-                    new Transform2d(
-                        new Translation2d(pose_offset.getCos(), pose_offset.getSin()),
-                        heading_offset));
+        var initial_pose = trajectory
+            .getInitialPose()
+            .plus(new Transform2d(
+                new Translation2d(pose_offset.getCos(), pose_offset.getSin()), heading_offset));
 
         testFollowTrajectory(
             kinematics,
             estimator,
             trajectory,
-            state ->
-                new ChassisSpeeds(
-                    state.velocityMetersPerSecond,
-                    0,
-                    state.velocityMetersPerSecond * state.curvatureRadPerMeter),
+            state -> new ChassisSpeeds(
+                state.velocityMetersPerSecond,
+                0,
+                state.velocityMetersPerSecond * state.curvatureRadPerMeter),
             state -> state.poseMeters,
             initial_pose,
             new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -169,13 +158,11 @@ class MecanumDrivePoseEstimator3dTest {
       // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
       // last vision measurement
       if (visionUpdateQueue.isEmpty() || visionUpdateQueue.lastKey() + visionUpdateRate < t) {
-        Pose2d newVisionPose =
-            visionMeasurementGenerator
-                .apply(groundTruthState)
-                .plus(
-                    new Transform2d(
-                        new Translation2d(rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.1),
-                        new Rotation2d(rand.nextGaussian() * 0.05)));
+        Pose2d newVisionPose = visionMeasurementGenerator
+            .apply(groundTruthState)
+            .plus(new Transform2d(
+                new Translation2d(rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.1),
+                new Rotation2d(rand.nextGaussian() * 0.05)));
 
         visionUpdateQueue.put(t, newVisionPose);
       }
@@ -196,22 +183,19 @@ class MecanumDrivePoseEstimator3dTest {
       wheelPositions.rearLeftMeters += wheelSpeeds.rearLeftMetersPerSecond * dt;
       wheelPositions.rearRightMeters += wheelSpeeds.rearRightMetersPerSecond * dt;
 
-      var xHat =
-          estimator.updateWithTime(
-              t,
-              new Rotation3d(
-                  groundTruthState
-                      .poseMeters
-                      .getRotation()
-                      .plus(new Rotation2d(rand.nextGaussian() * 0.05))
-                      .minus(trajectory.getInitialPose().getRotation())),
-              wheelPositions);
-
-      double error =
-          groundTruthState
+      var xHat = estimator.updateWithTime(
+          t,
+          new Rotation3d(groundTruthState
               .poseMeters
-              .getTranslation()
-              .getDistance(xHat.getTranslation().toTranslation2d());
+              .getRotation()
+              .plus(new Rotation2d(rand.nextGaussian() * 0.05))
+              .minus(trajectory.getInitialPose().getRotation())),
+          wheelPositions);
+
+      double error = groundTruthState
+          .poseMeters
+          .getTranslation()
+          .getDistance(xHat.getTranslation().toTranslation2d());
       if (error > maxError) {
         maxError = error;
       }
@@ -243,30 +227,27 @@ class MecanumDrivePoseEstimator3dTest {
     // is that all measurements affect the estimated pose. The alternative result is that only one
     // vision measurement affects the outcome. If that were the case, after 1000 measurements, the
     // estimated pose would converge to that measurement.
-    var kinematics =
-        new MecanumDriveKinematics(
-            new Translation2d(1, 1), new Translation2d(1, -1),
-            new Translation2d(-1, -1), new Translation2d(-1, 1));
+    var kinematics = new MecanumDriveKinematics(
+        new Translation2d(1, 1), new Translation2d(1, -1),
+        new Translation2d(-1, -1), new Translation2d(-1, 1));
 
     var wheelPositions = new MecanumDriveWheelPositions();
 
-    var estimator =
-        new MecanumDrivePoseEstimator3d(
-            kinematics,
-            Rotation3d.kZero,
-            wheelPositions,
-            new Pose3d(1, 2, 0, new Rotation3d(0, 0, -Math.PI / 2)),
-            VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
-            VecBuilder.fill(0.45, 0.45, 0.45, 0.1));
+    var estimator = new MecanumDrivePoseEstimator3d(
+        kinematics,
+        Rotation3d.kZero,
+        wheelPositions,
+        new Pose3d(1, 2, 0, new Rotation3d(0, 0, -Math.PI / 2)),
+        VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
+        VecBuilder.fill(0.45, 0.45, 0.45, 0.1));
 
     estimator.updateWithTime(0, Rotation3d.kZero, wheelPositions);
 
-    var visionMeasurements =
-        new Pose2d[] {
-          new Pose2d(0, 0, Rotation2d.kZero),
-          new Pose2d(3, 1, Rotation2d.kCCW_Pi_2),
-          new Pose2d(2, 4, Rotation2d.kPi),
-        };
+    var visionMeasurements = new Pose2d[] {
+      new Pose2d(0, 0, Rotation2d.kZero),
+      new Pose2d(3, 1, Rotation2d.kCCW_Pi_2),
+      new Pose2d(2, 4, Rotation2d.kPi),
+    };
 
     for (int i = 0; i < 1000; i++) {
       for (var measurement : visionMeasurements) {
@@ -275,18 +256,15 @@ class MecanumDrivePoseEstimator3dTest {
     }
 
     for (var measurement : visionMeasurements) {
-      var errorLog =
-          "Estimator converged to one vision measurement: "
-              + estimator.getEstimatedPosition().toString()
-              + " -> "
-              + measurement;
+      var errorLog = "Estimator converged to one vision measurement: "
+          + estimator.getEstimatedPosition().toString()
+          + " -> "
+          + measurement;
 
       var dx = Math.abs(measurement.getX() - estimator.getEstimatedPosition().getX());
       var dy = Math.abs(measurement.getY() - estimator.getEstimatedPosition().getY());
-      var dtheta =
-          Math.abs(
-              measurement.getRotation().getDegrees()
-                  - estimator.getEstimatedPosition().getRotation().toRotation2d().getDegrees());
+      var dtheta = Math.abs(measurement.getRotation().getDegrees()
+          - estimator.getEstimatedPosition().getRotation().toRotation2d().getDegrees());
 
       assertTrue(dx > 0.08 || dy > 0.08 || dtheta > 0.08, errorLog);
     }
@@ -294,20 +272,18 @@ class MecanumDrivePoseEstimator3dTest {
 
   @Test
   void testDiscardsOldVisionMeasurements() {
-    var kinematics =
-        new MecanumDriveKinematics(
-            new Translation2d(1, 1),
-            new Translation2d(-1, 1),
-            new Translation2d(1, -1),
-            new Translation2d(-1, -1));
-    var estimator =
-        new MecanumDrivePoseEstimator3d(
-            kinematics,
-            Rotation3d.kZero,
-            new MecanumDriveWheelPositions(),
-            Pose3d.kZero,
-            VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
-            VecBuilder.fill(0.9, 0.9, 0.9, 0.9));
+    var kinematics = new MecanumDriveKinematics(
+        new Translation2d(1, 1),
+        new Translation2d(-1, 1),
+        new Translation2d(1, -1),
+        new Translation2d(-1, -1));
+    var estimator = new MecanumDrivePoseEstimator3d(
+        kinematics,
+        Rotation3d.kZero,
+        new MecanumDriveWheelPositions(),
+        Pose3d.kZero,
+        VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
+        VecBuilder.fill(0.9, 0.9, 0.9, 0.9));
 
     double time = 0;
 
@@ -324,48 +300,40 @@ class MecanumDrivePoseEstimator3dTest {
         new Pose3d(10, 10, 0, new Rotation3d(0, 0, 0.1)), 1, VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
 
     assertAll(
-        () ->
-            assertEquals(
-                odometryPose.getX(), estimator.getEstimatedPosition().getX(), "Incorrect Final X"),
-        () ->
-            assertEquals(
-                odometryPose.getY(), estimator.getEstimatedPosition().getY(), "Incorrect Final Y"),
-        () ->
-            assertEquals(
-                odometryPose.getZ(), estimator.getEstimatedPosition().getZ(), "Incorrect Final Y"),
-        () ->
-            assertEquals(
-                odometryPose.getRotation().getX(),
-                estimator.getEstimatedPosition().getRotation().getX(),
-                "Incorrect Final Roll"),
-        () ->
-            assertEquals(
-                odometryPose.getRotation().getY(),
-                estimator.getEstimatedPosition().getRotation().getY(),
-                "Incorrect Final Pitch"),
-        () ->
-            assertEquals(
-                odometryPose.getRotation().getZ(),
-                estimator.getEstimatedPosition().getRotation().getZ(),
-                "Incorrect Final Yaw"));
+        () -> assertEquals(
+            odometryPose.getX(), estimator.getEstimatedPosition().getX(), "Incorrect Final X"),
+        () -> assertEquals(
+            odometryPose.getY(), estimator.getEstimatedPosition().getY(), "Incorrect Final Y"),
+        () -> assertEquals(
+            odometryPose.getZ(), estimator.getEstimatedPosition().getZ(), "Incorrect Final Y"),
+        () -> assertEquals(
+            odometryPose.getRotation().getX(),
+            estimator.getEstimatedPosition().getRotation().getX(),
+            "Incorrect Final Roll"),
+        () -> assertEquals(
+            odometryPose.getRotation().getY(),
+            estimator.getEstimatedPosition().getRotation().getY(),
+            "Incorrect Final Pitch"),
+        () -> assertEquals(
+            odometryPose.getRotation().getZ(),
+            estimator.getEstimatedPosition().getRotation().getZ(),
+            "Incorrect Final Yaw"));
   }
 
   @Test
   void testSampleAt() {
-    var kinematics =
-        new MecanumDriveKinematics(
-            new Translation2d(1, 1),
-            new Translation2d(-1, 1),
-            new Translation2d(1, -1),
-            new Translation2d(-1, -1));
-    var estimator =
-        new MecanumDrivePoseEstimator3d(
-            kinematics,
-            Rotation3d.kZero,
-            new MecanumDriveWheelPositions(),
-            Pose3d.kZero,
-            VecBuilder.fill(1, 1, 1, 1),
-            VecBuilder.fill(1, 1, 1, 1));
+    var kinematics = new MecanumDriveKinematics(
+        new Translation2d(1, 1),
+        new Translation2d(-1, 1),
+        new Translation2d(1, -1),
+        new Translation2d(-1, -1));
+    var estimator = new MecanumDrivePoseEstimator3d(
+        kinematics,
+        Rotation3d.kZero,
+        new MecanumDriveWheelPositions(),
+        Pose3d.kZero,
+        VecBuilder.fill(1, 1, 1, 1),
+        VecBuilder.fill(1, 1, 1, 1));
 
     // Returns empty when null
     assertEquals(Optional.empty(), estimator.sampleAt(1));
@@ -407,20 +375,18 @@ class MecanumDrivePoseEstimator3dTest {
 
   @Test
   void testReset() {
-    var kinematics =
-        new MecanumDriveKinematics(
-            new Translation2d(1, 1),
-            new Translation2d(-1, 1),
-            new Translation2d(1, -1),
-            new Translation2d(-1, -1));
-    var estimator =
-        new MecanumDrivePoseEstimator3d(
-            kinematics,
-            Rotation3d.kZero,
-            new MecanumDriveWheelPositions(),
-            Pose3d.kZero,
-            VecBuilder.fill(1, 1, 1, 1),
-            VecBuilder.fill(1, 1, 1, 1));
+    var kinematics = new MecanumDriveKinematics(
+        new Translation2d(1, 1),
+        new Translation2d(-1, 1),
+        new Translation2d(1, -1),
+        new Translation2d(-1, -1));
+    var estimator = new MecanumDrivePoseEstimator3d(
+        kinematics,
+        Rotation3d.kZero,
+        new MecanumDriveWheelPositions(),
+        Pose3d.kZero,
+        VecBuilder.fill(1, 1, 1, 1),
+        VecBuilder.fill(1, 1, 1, 1));
 
     // Test reset position
     estimator.resetPosition(
@@ -456,9 +422,8 @@ class MecanumDrivePoseEstimator3dTest {
         () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
-        () ->
-            assertEquals(
-                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+        () -> assertEquals(
+            Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test orientation
     estimator.update(Rotation3d.kZero, new MecanumDriveWheelPositions(3, 3, 3, 3));
@@ -469,9 +434,8 @@ class MecanumDrivePoseEstimator3dTest {
         () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
-        () ->
-            assertEquals(
-                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+        () -> assertEquals(
+            Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test reset translation
     estimator.resetTranslation(new Translation3d(-1, -1, -1));
@@ -482,9 +446,8 @@ class MecanumDrivePoseEstimator3dTest {
         () -> assertEquals(-1, estimator.getEstimatedPosition().getZ(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
-        () ->
-            assertEquals(
-                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+        () -> assertEquals(
+            Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test reset pose
     estimator.resetPose(Pose3d.kZero);

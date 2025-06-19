@@ -17,25 +17,24 @@ public final class CameraServerSharedStore {
    */
   public static synchronized CameraServerShared getCameraServerShared() {
     if (cameraServerShared == null) {
-      cameraServerShared =
-          new CameraServerShared() {
-            @Override
-            public void reportVideoServer(int id) {}
+      cameraServerShared = new CameraServerShared() {
+        @Override
+        public void reportVideoServer(int id) {}
 
-            @Override
-            public void reportUsbCamera(int id) {}
+        @Override
+        public void reportUsbCamera(int id) {}
 
-            @Override
-            public void reportDriverStationError(String error) {}
+        @Override
+        public void reportDriverStationError(String error) {}
 
-            @Override
-            public void reportAxisCamera(int id) {}
+        @Override
+        public void reportAxisCamera(int id) {}
 
-            @Override
-            public Long getRobotMainThreadId() {
-              return null;
-            }
-          };
+        @Override
+        public Long getRobotMainThreadId() {
+          return null;
+        }
+      };
     }
     return cameraServerShared;
   }

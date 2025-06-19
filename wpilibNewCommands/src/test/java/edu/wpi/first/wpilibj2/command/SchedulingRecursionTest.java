@@ -27,35 +27,33 @@ class SchedulingRecursionTest extends CommandTestBase {
       AtomicBoolean hasOtherRun = new AtomicBoolean();
       AtomicInteger counter = new AtomicInteger();
       Subsystem requirement = new SubsystemBase() {};
-      Command selfCancels =
-          new Command() {
-            {
-              addRequirements(requirement);
-            }
+      Command selfCancels = new Command() {
+        {
+          addRequirements(requirement);
+        }
 
-            @Override
-            public void initialize() {
-              scheduler.cancel(this);
-            }
+        @Override
+        public void initialize() {
+          scheduler.cancel(this);
+        }
 
-            @Override
-            public void end(boolean interrupted) {
-              counter.incrementAndGet();
-            }
+        @Override
+        public void end(boolean interrupted) {
+          counter.incrementAndGet();
+        }
 
-            @Override
-            public InterruptionBehavior getInterruptionBehavior() {
-              return interruptionBehavior;
-            }
-          };
+        @Override
+        public InterruptionBehavior getInterruptionBehavior() {
+          return interruptionBehavior;
+        }
+      };
       Command other = requirement.run(() -> hasOtherRun.set(true));
 
-      assertDoesNotThrow(
-          () -> {
-            scheduler.schedule(selfCancels);
-            scheduler.run();
-            scheduler.schedule(other);
-          });
+      assertDoesNotThrow(() -> {
+        scheduler.schedule(selfCancels);
+        scheduler.run();
+        scheduler.schedule(other);
+      });
       assertFalse(scheduler.isScheduled(selfCancels));
       assertTrue(scheduler.isScheduled(other));
       assertEquals(1, counter.get());
@@ -71,31 +69,29 @@ class SchedulingRecursionTest extends CommandTestBase {
       AtomicBoolean hasOtherRun = new AtomicBoolean();
       AtomicInteger counter = new AtomicInteger();
       Subsystem requirement = new Subsystem() {};
-      Command selfCancels =
-          new Command() {
-            {
-              addRequirements(requirement);
-            }
+      Command selfCancels = new Command() {
+        {
+          addRequirements(requirement);
+        }
 
-            @Override
-            public void end(boolean interrupted) {
-              counter.incrementAndGet();
-            }
+        @Override
+        public void end(boolean interrupted) {
+          counter.incrementAndGet();
+        }
 
-            @Override
-            public InterruptionBehavior getInterruptionBehavior() {
-              return interruptionBehavior;
-            }
-          };
+        @Override
+        public InterruptionBehavior getInterruptionBehavior() {
+          return interruptionBehavior;
+        }
+      };
       Command other = requirement.run(() -> hasOtherRun.set(true));
 
-      assertDoesNotThrow(
-          () -> {
-            scheduler.onCommandInitialize(cmd -> scheduler.cancel(selfCancels));
-            scheduler.schedule(selfCancels);
-            scheduler.run();
-            scheduler.schedule(other);
-          });
+      assertDoesNotThrow(() -> {
+        scheduler.onCommandInitialize(cmd -> scheduler.cancel(selfCancels));
+        scheduler.schedule(selfCancels);
+        scheduler.run();
+        scheduler.schedule(other);
+      });
       assertFalse(scheduler.isScheduled(selfCancels));
       assertTrue(scheduler.isScheduled(other));
       assertEquals(1, counter.get());
@@ -111,35 +107,33 @@ class SchedulingRecursionTest extends CommandTestBase {
       AtomicBoolean hasOtherRun = new AtomicBoolean();
       AtomicInteger counter = new AtomicInteger();
       Subsystem requirement = new SubsystemBase() {};
-      Command selfCancels =
-          new Command() {
-            {
-              addRequirements(requirement);
-            }
+      Command selfCancels = new Command() {
+        {
+          addRequirements(requirement);
+        }
 
-            @Override
-            public void initialize() {
-              scheduler.cancel(this);
-            }
+        @Override
+        public void initialize() {
+          scheduler.cancel(this);
+        }
 
-            @Override
-            public void end(boolean interrupted) {
-              counter.incrementAndGet();
-            }
+        @Override
+        public void end(boolean interrupted) {
+          counter.incrementAndGet();
+        }
 
-            @Override
-            public InterruptionBehavior getInterruptionBehavior() {
-              return interruptionBehavior;
-            }
-          };
+        @Override
+        public InterruptionBehavior getInterruptionBehavior() {
+          return interruptionBehavior;
+        }
+      };
       Command other = requirement.run(() -> hasOtherRun.set(true));
       scheduler.setDefaultCommand(requirement, other);
 
-      assertDoesNotThrow(
-          () -> {
-            scheduler.schedule(selfCancels);
-            scheduler.run();
-          });
+      assertDoesNotThrow(() -> {
+        scheduler.schedule(selfCancels);
+        scheduler.run();
+      });
       scheduler.run();
       assertFalse(scheduler.isScheduled(selfCancels));
       assertTrue(scheduler.isScheduled(other));
@@ -153,14 +147,13 @@ class SchedulingRecursionTest extends CommandTestBase {
   void cancelFromEnd() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
-      Command selfCancels =
-          new Command() {
-            @Override
-            public void end(boolean interrupted) {
-              counter.incrementAndGet();
-              scheduler.cancel(this);
-            }
-          };
+      Command selfCancels = new Command() {
+        @Override
+        public void end(boolean interrupted) {
+          counter.incrementAndGet();
+          scheduler.cancel(this);
+        }
+      };
       scheduler.schedule(selfCancels);
 
       assertDoesNotThrow(() -> scheduler.cancel(selfCancels));
@@ -174,11 +167,10 @@ class SchedulingRecursionTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
       Command selfCancels = Commands.idle();
-      scheduler.onCommandInterrupt(
-          cmd -> {
-            counter.incrementAndGet();
-            scheduler.cancel(selfCancels);
-          });
+      scheduler.onCommandInterrupt(cmd -> {
+        counter.incrementAndGet();
+        scheduler.cancel(selfCancels);
+      });
       scheduler.schedule(selfCancels);
 
       assertDoesNotThrow(() -> scheduler.cancel(selfCancels));
@@ -191,42 +183,38 @@ class SchedulingRecursionTest extends CommandTestBase {
   void cancelFromEndLoop() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
-      FunctionalCommand dCancelsAll =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancelAll();
-              },
-              () -> true);
-      FunctionalCommand cCancelsD =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancel(dCancelsAll);
-              },
-              () -> true);
-      FunctionalCommand bCancelsC =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancel(cCancelsD);
-              },
-              () -> true);
-      FunctionalCommand aCancelsB =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancel(bCancelsC);
-              },
-              () -> true);
+      FunctionalCommand dCancelsAll = new FunctionalCommand(
+          () -> {},
+          () -> {},
+          interrupted -> {
+            counter.incrementAndGet();
+            scheduler.cancelAll();
+          },
+          () -> true);
+      FunctionalCommand cCancelsD = new FunctionalCommand(
+          () -> {},
+          () -> {},
+          interrupted -> {
+            counter.incrementAndGet();
+            scheduler.cancel(dCancelsAll);
+          },
+          () -> true);
+      FunctionalCommand bCancelsC = new FunctionalCommand(
+          () -> {},
+          () -> {},
+          interrupted -> {
+            counter.incrementAndGet();
+            scheduler.cancel(cCancelsD);
+          },
+          () -> true);
+      FunctionalCommand aCancelsB = new FunctionalCommand(
+          () -> {},
+          () -> {},
+          interrupted -> {
+            counter.incrementAndGet();
+            scheduler.cancel(bCancelsC);
+          },
+          () -> true);
 
       scheduler.schedule(aCancelsB);
       scheduler.schedule(bCancelsC);
@@ -246,42 +234,38 @@ class SchedulingRecursionTest extends CommandTestBase {
   void cancelFromEndLoopWhileInRunLoop() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
-      FunctionalCommand dCancelsAll =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancelAll();
-              },
-              () -> true);
-      FunctionalCommand cCancelsD =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancel(dCancelsAll);
-              },
-              () -> true);
-      FunctionalCommand bCancelsC =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancel(cCancelsD);
-              },
-              () -> true);
-      FunctionalCommand aCancelsB =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancel(bCancelsC);
-              },
-              () -> true);
+      FunctionalCommand dCancelsAll = new FunctionalCommand(
+          () -> {},
+          () -> {},
+          interrupted -> {
+            counter.incrementAndGet();
+            scheduler.cancelAll();
+          },
+          () -> true);
+      FunctionalCommand cCancelsD = new FunctionalCommand(
+          () -> {},
+          () -> {},
+          interrupted -> {
+            counter.incrementAndGet();
+            scheduler.cancel(dCancelsAll);
+          },
+          () -> true);
+      FunctionalCommand bCancelsC = new FunctionalCommand(
+          () -> {},
+          () -> {},
+          interrupted -> {
+            counter.incrementAndGet();
+            scheduler.cancel(cCancelsD);
+          },
+          () -> true);
+      FunctionalCommand aCancelsB = new FunctionalCommand(
+          () -> {},
+          () -> {},
+          interrupted -> {
+            counter.incrementAndGet();
+            scheduler.cancel(bCancelsC);
+          },
+          () -> true);
 
       scheduler.schedule(aCancelsB);
       scheduler.schedule(bCancelsC);
@@ -301,18 +285,16 @@ class SchedulingRecursionTest extends CommandTestBase {
   void multiCancelFromEnd() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
-      FunctionalCommand bIncrementsCounter =
-          new FunctionalCommand(
-              () -> {}, () -> {}, interrupted -> counter.incrementAndGet(), () -> true);
-      Command aCancelsB =
-          new Command() {
-            @Override
-            public void end(boolean interrupted) {
-              counter.incrementAndGet();
-              scheduler.cancel(bIncrementsCounter);
-              scheduler.cancel(this);
-            }
-          };
+      FunctionalCommand bIncrementsCounter = new FunctionalCommand(
+          () -> {}, () -> {}, interrupted -> counter.incrementAndGet(), () -> true);
+      Command aCancelsB = new Command() {
+        @Override
+        public void end(boolean interrupted) {
+          counter.incrementAndGet();
+          scheduler.cancel(bIncrementsCounter);
+          scheduler.cancel(this);
+        }
+      };
 
       scheduler.schedule(aCancelsB);
       scheduler.schedule(bIncrementsCounter);
@@ -330,16 +312,15 @@ class SchedulingRecursionTest extends CommandTestBase {
       AtomicInteger counter = new AtomicInteger();
       Subsystem requirement = new SubsystemBase() {};
       Command other = requirement.runOnce(() -> {});
-      FunctionalCommand selfCancels =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.schedule(other);
-              },
-              () -> false,
-              requirement);
+      FunctionalCommand selfCancels = new FunctionalCommand(
+          () -> {},
+          () -> {},
+          interrupted -> {
+            counter.incrementAndGet();
+            scheduler.schedule(other);
+          },
+          () -> false,
+          requirement);
 
       scheduler.schedule(selfCancels);
 
@@ -355,16 +336,15 @@ class SchedulingRecursionTest extends CommandTestBase {
       AtomicInteger counter = new AtomicInteger();
       Subsystem requirement = new SubsystemBase() {};
       Command other = requirement.runOnce(() -> {});
-      FunctionalCommand selfCancels =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.schedule(other);
-              },
-              () -> false,
-              requirement);
+      FunctionalCommand selfCancels = new FunctionalCommand(
+          () -> {},
+          () -> {},
+          interrupted -> {
+            counter.incrementAndGet();
+            scheduler.schedule(other);
+          },
+          () -> false,
+          requirement);
 
       scheduler.schedule(selfCancels);
 
@@ -382,11 +362,10 @@ class SchedulingRecursionTest extends CommandTestBase {
       Subsystem requirement = new Subsystem() {};
       Command other = requirement.runOnce(() -> {});
       Command selfCancels = requirement.runOnce(() -> {});
-      scheduler.onCommandInterrupt(
-          cmd -> {
-            counter.incrementAndGet();
-            scheduler.schedule(other);
-          });
+      scheduler.onCommandInterrupt(cmd -> {
+        counter.incrementAndGet();
+        scheduler.schedule(other);
+      });
       scheduler.schedule(selfCancels);
 
       assertDoesNotThrow(() -> scheduler.schedule(other));
@@ -403,16 +382,15 @@ class SchedulingRecursionTest extends CommandTestBase {
       AtomicInteger counter = new AtomicInteger();
       Subsystem requirement = new SubsystemBase() {};
       Command other = requirement.runOnce(() -> {}).withInterruptBehavior(interruptionBehavior);
-      FunctionalCommand defaultCommand =
-          new FunctionalCommand(
-              () -> {
-                counter.incrementAndGet();
-                scheduler.schedule(other);
-              },
-              () -> {},
-              interrupted -> {},
-              () -> false,
-              requirement);
+      FunctionalCommand defaultCommand = new FunctionalCommand(
+          () -> {
+            counter.incrementAndGet();
+            scheduler.schedule(other);
+          },
+          () -> {},
+          interrupted -> {},
+          () -> false,
+          requirement);
 
       scheduler.setDefaultCommand(requirement, defaultCommand);
 
@@ -430,32 +408,25 @@ class SchedulingRecursionTest extends CommandTestBase {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger();
       Subsystem requirement = new Subsystem() {};
-      Command defaultCommand =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> counter.incrementAndGet(),
-              () -> false,
-              requirement);
+      Command defaultCommand = new FunctionalCommand(
+          () -> {}, () -> {}, interrupted -> counter.incrementAndGet(), () -> false, requirement);
       Command other = requirement.runOnce(() -> {});
-      Command cancelDefaultCommand =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.schedule(other);
-              },
-              () -> false);
+      Command cancelDefaultCommand = new FunctionalCommand(
+          () -> {},
+          () -> {},
+          interrupted -> {
+            counter.incrementAndGet();
+            scheduler.schedule(other);
+          },
+          () -> false);
 
-      assertDoesNotThrow(
-          () -> {
-            scheduler.schedule(cancelDefaultCommand);
-            scheduler.setDefaultCommand(requirement, defaultCommand);
+      assertDoesNotThrow(() -> {
+        scheduler.schedule(cancelDefaultCommand);
+        scheduler.setDefaultCommand(requirement, defaultCommand);
 
-            scheduler.run();
-            scheduler.cancel(cancelDefaultCommand);
-          });
+        scheduler.run();
+        scheduler.cancel(cancelDefaultCommand);
+      });
       assertEquals(2, counter.get());
       assertFalse(scheduler.isScheduled(defaultCommand));
       assertTrue(scheduler.isScheduled(other));

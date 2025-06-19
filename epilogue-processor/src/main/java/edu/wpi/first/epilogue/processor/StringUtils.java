@@ -37,7 +37,8 @@ public final class StringUtils {
    * @return the capitalized string
    */
   public static String capitalize(CharSequence str) {
-    return Character.toUpperCase(str.charAt(0)) + str.subSequence(1, str.length()).toString();
+    return Character.toUpperCase(str.charAt(0))
+        + str.subSequence(1, str.length()).toString();
   }
 
   /**

@@ -65,27 +65,21 @@ class EventLoopTest {
   void testConcurrentModification() {
     var loop = new EventLoop();
 
-    loop.bind(
-        () -> {
-          assertThrows(
-              ConcurrentModificationException.class,
-              () -> {
-                loop.bind(() -> {});
-              });
-        });
+    loop.bind(() -> {
+      assertThrows(ConcurrentModificationException.class, () -> {
+        loop.bind(() -> {});
+      });
+    });
 
     loop.poll();
 
     loop.clear();
 
-    loop.bind(
-        () -> {
-          assertThrows(
-              ConcurrentModificationException.class,
-              () -> {
-                loop.clear();
-              });
-        });
+    loop.bind(() -> {
+      assertThrows(ConcurrentModificationException.class, () -> {
+        loop.clear();
+      });
+    });
 
     loop.poll();
   }

@@ -102,11 +102,10 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
-    LiveWindow.setEnabledListener(
-        () -> {
-          disable();
-          cancelAll();
-        });
+    LiveWindow.setEnabledListener(() -> {
+      disable();
+      cancelAll();
+    });
     LiveWindow.setDisabledListener(this::enable);
   }
 
@@ -776,18 +775,15 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
           return ids;
         },
         null);
-    builder.addIntegerArrayProperty(
-        "Cancel",
-        () -> new long[] {},
-        toCancel -> {
-          Map<Long, Command> ids = new LinkedHashMap<>();
-          for (Command command : m_scheduledCommands) {
-            long id = command.hashCode();
-            ids.put(id, command);
-          }
-          for (long hash : toCancel) {
-            cancel(ids.get(hash));
-          }
-        });
+    builder.addIntegerArrayProperty("Cancel", () -> new long[] {}, toCancel -> {
+      Map<Long, Command> ids = new LinkedHashMap<>();
+      for (Command command : m_scheduledCommands) {
+        long id = command.hashCode();
+        ids.put(id, command);
+      }
+      for (long hash : toCancel) {
+        cancel(ids.get(hash));
+      }
+    });
   }
 }

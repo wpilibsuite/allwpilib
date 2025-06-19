@@ -28,11 +28,10 @@ class IntakeTest {
     m_intake = new Intake(); // create our intake
     m_simMotor =
         new PWMSim(IntakeConstants.kMotorPort); // create our simulation PWM motor controller
-    m_simPiston =
-        new DoubleSolenoidSim(
-            PneumaticsModuleType.CTREPCM,
-            IntakeConstants.kPistonFwdChannel,
-            IntakeConstants.kPistonRevChannel); // create our simulation solenoid
+    m_simPiston = new DoubleSolenoidSim(
+        PneumaticsModuleType.CTREPCM,
+        IntakeConstants.kPistonFwdChannel,
+        IntakeConstants.kPistonRevChannel); // create our simulation solenoid
   }
 
   @SuppressWarnings("PMD.SignatureDeclareThrowsException")

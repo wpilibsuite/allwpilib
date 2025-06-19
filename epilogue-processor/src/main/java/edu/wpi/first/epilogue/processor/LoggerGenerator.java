@@ -45,38 +45,37 @@ public class LoggerGenerator {
   private final List<ElementHandler> m_handlers;
 
   @SuppressWarnings("BadAnnotationImplementation")
-  private final Logged m_defaultConfig =
-      new Logged() {
-        @Override
-        public Class<? extends Annotation> annotationType() {
-          return Logged.class;
-        }
+  private final Logged m_defaultConfig = new Logged() {
+    @Override
+    public Class<? extends Annotation> annotationType() {
+      return Logged.class;
+    }
 
-        @Override
-        public String name() {
-          return "";
-        }
+    @Override
+    public String name() {
+      return "";
+    }
 
-        @Override
-        public Strategy strategy() {
-          return Strategy.OPT_IN;
-        }
+    @Override
+    public Strategy strategy() {
+      return Strategy.OPT_IN;
+    }
 
-        @Override
-        public Importance importance() {
-          return Importance.DEBUG;
-        }
+    @Override
+    public Importance importance() {
+      return Importance.DEBUG;
+    }
 
-        @Override
-        public Naming defaultNaming() {
-          return Naming.USE_CODE_NAME;
-        }
+    @Override
+    public Naming defaultNaming() {
+      return Naming.USE_CODE_NAME;
+    }
 
-        @Override
-        public boolean warnForNonLoggableTypes() {
-          return false;
-        }
-      };
+    @Override
+    public boolean warnForNonLoggableTypes() {
+      return false;
+    }
+  };
 
   public LoggerGenerator(ProcessingEnvironment processingEnv, List<ElementHandler> handlers) {
     this.m_processingEnv = processingEnv;
@@ -120,44 +119,42 @@ public class LoggerGenerator {
     collectLoggables(clazz, fieldsToLog, methodsToLog);
 
     // Validate no name collisions
-    Map<String, List<Element>> usedNames =
-        Stream.concat(fieldsToLog.stream(), methodsToLog.stream())
-            .reduce(
-                new HashMap<>(),
-                (map, element) -> {
-                  String name = ElementHandler.loggedName(element);
-                  map.computeIfAbsent(name, _k -> new ArrayList<>()).add(element);
+    Map<String, List<Element>> usedNames = Stream.concat(
+            fieldsToLog.stream(), methodsToLog.stream())
+        .reduce(
+            new HashMap<>(),
+            (map, element) -> {
+              String name = ElementHandler.loggedName(element);
+              map.computeIfAbsent(name, _k -> new ArrayList<>()).add(element);
 
-                  return map;
-                },
-                (left, right) -> {
-                  left.putAll(right);
-                  return left;
-                });
+              return map;
+            },
+            (left, right) -> {
+              left.putAll(right);
+              return left;
+            });
 
-    usedNames.forEach(
-        (name, elements) -> {
-          if (elements.size() > 1) {
-            // Collisions!
-            for (Element conflictingElement : elements) {
-              String conflicts =
-                  elements.stream()
-                      .filter(e -> !e.equals(conflictingElement))
-                      .map(e -> e.getEnclosingElement().getSimpleName() + "." + e)
-                      .collect(Collectors.joining(", "));
+    usedNames.forEach((name, elements) -> {
+      if (elements.size() > 1) {
+        // Collisions!
+        for (Element conflictingElement : elements) {
+          String conflicts = elements.stream()
+              .filter(e -> !e.equals(conflictingElement))
+              .map(e -> e.getEnclosingElement().getSimpleName() + "." + e)
+              .collect(Collectors.joining(", "));
 
-              m_processingEnv
-                  .getMessager()
-                  .printMessage(
-                      Diagnostic.Kind.ERROR,
-                      "[EPILOGUE] Conflicting name detected: \""
-                          + name
-                          + "\" is also used by "
-                          + conflicts,
-                      conflictingElement);
-            }
-          }
-        });
+          m_processingEnv
+              .getMessager()
+              .printMessage(
+                  Diagnostic.Kind.ERROR,
+                  "[EPILOGUE] Conflicting name detected: \""
+                      + name
+                      + "\" is also used by "
+                      + conflicts,
+                  conflictingElement);
+        }
+      }
+    });
 
     writeLoggerFile(clazz, config, fieldsToLog, methodsToLog);
   }
@@ -184,8 +181,9 @@ public class LoggerGenerator {
 
     var loggerFile = m_processingEnv.getFiler().createSourceFile(loggerClassName);
 
-    var varHandleFields =
-        loggableFields.stream().filter(e -> !e.getModifiers().contains(Modifier.PUBLIC)).toList();
+    var varHandleFields = loggableFields.stream()
+        .filter(e -> !e.getModifiers().contains(Modifier.PUBLIC))
+        .toList();
     boolean requiresVarHandles = !varHandleFields.isEmpty();
 
     try (var out = new PrintWriter(loggerFile.openWriter())) {
@@ -206,12 +204,11 @@ public class LoggerGenerator {
       out.println();
 
       // public class FooLogger implements ClassSpecificLogger<Foo> {
-      out.println(
-          "public class "
-              + loggerSimpleClassName
-              + " extends ClassSpecificLogger<"
-              + simpleClassName
-              + "> {");
+      out.println("public class "
+          + loggerSimpleClassName
+          + " extends ClassSpecificLogger<"
+          + simpleClassName
+          + "> {");
 
       if (requiresVarHandles) {
         for (var varHandleField : varHandleFields) {
@@ -225,29 +222,26 @@ public class LoggerGenerator {
 
         out.println("  static {");
         out.println("    try {");
-        out.println(
-            "      var lookup = MethodHandles.privateLookupIn("
-                + classReference
-                + ", MethodHandles.lookup());");
+        out.println("      var lookup = MethodHandles.privateLookupIn("
+            + classReference
+            + ", MethodHandles.lookup());");
 
         for (var varHandleField : varHandleFields) {
           var fieldName = varHandleField.getSimpleName();
-          out.println(
-              "      $"
-                  + fieldName
-                  + " = lookup.findVarHandle("
-                  + classReference
-                  + ", \""
-                  + fieldName
-                  + "\", "
-                  + m_processingEnv.getTypeUtils().erasure(varHandleField.asType())
-                  + ".class);");
+          out.println("      $"
+              + fieldName
+              + " = lookup.findVarHandle("
+              + classReference
+              + ", \""
+              + fieldName
+              + "\", "
+              + m_processingEnv.getTypeUtils().erasure(varHandleField.asType())
+              + ".class);");
         }
 
         out.println("    } catch (ReflectiveOperationException e) {");
-        out.println(
-            "      throw new RuntimeException("
-                + "\"[EPILOGUE] Could not load private fields for logging!\", e);");
+        out.println("      throw new RuntimeException("
+            + "\"[EPILOGUE] Could not load private fields for logging!\", e);");
         out.println("    }");
         out.println("  }");
         out.println();
@@ -266,49 +260,44 @@ public class LoggerGenerator {
 
       // Build a map of importance levels to the fields logged at those levels
       // e.g. { DEBUG: [fieldA, fieldB], INFO: [fieldC], CRITICAL: [fieldD, fieldE, fieldF] }
-      var loggedElementsByImportance =
-          Stream.concat(loggableFields.stream(), loggableMethods.stream())
-              .collect(
-                  groupingBy(
-                      element -> {
-                        var config = element.getAnnotation(Logged.class);
-                        if (config == null) {
-                          // No configuration on this element, fall back to the class-level
-                          // configuration
-                          return classConfig.importance();
-                        } else {
-                          return config.importance();
-                        }
-                      },
-                      () ->
-                          new EnumMap<>(Logged.Importance.class), // EnumMap for consistent ordering
-                      toList()));
+      var loggedElementsByImportance = Stream.concat(
+              loggableFields.stream(), loggableMethods.stream())
+          .collect(groupingBy(
+              element -> {
+                var config = element.getAnnotation(Logged.class);
+                if (config == null) {
+                  // No configuration on this element, fall back to the class-level
+                  // configuration
+                  return classConfig.importance();
+                } else {
+                  return config.importance();
+                }
+              },
+              () -> new EnumMap<>(Logged.Importance.class), // EnumMap for consistent ordering
+              toList()));
 
-      loggedElementsByImportance.forEach(
-          (importance, elements) -> {
-            out.println(
-                "    if (Epilogue.shouldLog(Logged.Importance." + importance.name() + ")) {");
+      loggedElementsByImportance.forEach((importance, elements) -> {
+        out.println("    if (Epilogue.shouldLog(Logged.Importance." + importance.name() + ")) {");
 
-            for (var loggableElement : elements) {
-              // findFirst for prioritization
-              var handler =
-                  m_handlers.stream().filter(h -> h.isLoggable(loggableElement)).findFirst();
+        for (var loggableElement : elements) {
+          // findFirst for prioritization
+          var handler =
+              m_handlers.stream().filter(h -> h.isLoggable(loggableElement)).findFirst();
 
-              handler.ifPresent(
-                  h -> {
-                    // May be null if the handler consumes the element but does not actually want it
-                    // to be logged. For example, the sendable handler consumes all sendable types
-                    // but does not log commands or subsystems, to prevent excessive warnings about
-                    // unloggable commands.
-                    var logInvocation = h.logInvocation(loggableElement);
-                    if (logInvocation != null) {
-                      out.println(logInvocation.indent(6).stripTrailing() + ";");
-                    }
-                  });
+          handler.ifPresent(h -> {
+            // May be null if the handler consumes the element but does not actually want it
+            // to be logged. For example, the sendable handler consumes all sendable types
+            // but does not log commands or subsystems, to prevent excessive warnings about
+            // unloggable commands.
+            var logInvocation = h.logInvocation(loggableElement);
+            if (logInvocation != null) {
+              out.println(logInvocation.indent(6).stripTrailing() + ";");
             }
-
-            out.println("    }");
           });
+        }
+
+        out.println("    }");
+      });
 
       out.println("  }");
       out.println("}");
@@ -332,32 +321,30 @@ public class LoggerGenerator {
       // Do not log record members - just use the accessor methods
       classFields = List.of();
     } else {
-      classFields =
-          clazz.getEnclosedElements().stream()
-              .filter(e -> e instanceof VariableElement)
-              .map(e -> (VariableElement) e)
-              .filter(notSkipped)
-              .filter(optedIn)
-              .filter(e -> !e.getModifiers().contains(Modifier.STATIC))
-              .filter(this::isLoggable)
-              .toList();
+      classFields = clazz.getEnclosedElements().stream()
+          .filter(e -> e instanceof VariableElement)
+          .map(e -> (VariableElement) e)
+          .filter(notSkipped)
+          .filter(optedIn)
+          .filter(e -> !e.getModifiers().contains(Modifier.STATIC))
+          .filter(this::isLoggable)
+          .toList();
     }
     fields.addAll(classFields);
 
-    methods.addAll(
-        clazz.getEnclosedElements().stream()
-            .filter(e -> e instanceof ExecutableElement)
-            .map(e -> (ExecutableElement) e)
-            .filter(notSkipped)
-            .filter(optedIn)
-            .filter(e -> !e.getModifiers().contains(Modifier.STATIC))
-            .filter(e -> e.getModifiers().contains(Modifier.PUBLIC))
-            .filter(e -> e.getParameters().isEmpty())
-            .filter(e -> e.getReceiverType() != null)
-            .filter(kIsBuiltInJavaMethod.negate())
-            .filter(this::isLoggable)
-            .filter(e -> !isSimpleGetterMethodForLoggedField(e, classFields))
-            .toList());
+    methods.addAll(clazz.getEnclosedElements().stream()
+        .filter(e -> e instanceof ExecutableElement)
+        .map(e -> (ExecutableElement) e)
+        .filter(notSkipped)
+        .filter(optedIn)
+        .filter(e -> !e.getModifiers().contains(Modifier.STATIC))
+        .filter(e -> e.getModifiers().contains(Modifier.PUBLIC))
+        .filter(e -> e.getParameters().isEmpty())
+        .filter(e -> e.getReceiverType() != null)
+        .filter(kIsBuiltInJavaMethod.negate())
+        .filter(this::isLoggable)
+        .filter(e -> !isSimpleGetterMethodForLoggedField(e, classFields))
+        .toList());
 
     TypeElement superclass =
         (TypeElement) m_processingEnv.getTypeUtils().asElement(clazz.getSuperclass());

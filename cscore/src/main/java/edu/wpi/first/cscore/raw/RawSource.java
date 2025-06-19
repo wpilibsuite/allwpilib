@@ -24,9 +24,8 @@ public class RawSource extends ImageSource {
    * @param mode Video mode being generated
    */
   public RawSource(String name, VideoMode mode) {
-    super(
-        CameraServerJNI.createRawSource(
-            name, false, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
+    super(CameraServerJNI.createRawSource(
+        name, false, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
   }
 
   /**

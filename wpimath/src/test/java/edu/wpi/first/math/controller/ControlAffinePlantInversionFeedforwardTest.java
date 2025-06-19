@@ -21,7 +21,9 @@ class ControlAffinePlantInversionFeedforwardTest {
         new ControlAffinePlantInversionFeedforward<>(Nat.N2(), Nat.N1(), this::getDynamics, 0.02);
 
     assertEquals(
-        48.0, feedforward.calculate(VecBuilder.fill(2, 2), VecBuilder.fill(3, 3)).get(0, 0), 1e-6);
+        48.0,
+        feedforward.calculate(VecBuilder.fill(2, 2), VecBuilder.fill(3, 3)).get(0, 0),
+        1e-6);
   }
 
   @Test
@@ -30,7 +32,9 @@ class ControlAffinePlantInversionFeedforwardTest {
         new ControlAffinePlantInversionFeedforward<>(Nat.N2(), Nat.N1(), this::getDynamics, 0.02);
 
     assertEquals(
-        48.0, feedforward.calculate(VecBuilder.fill(2, 2), VecBuilder.fill(3, 3)).get(0, 0), 1e-6);
+        48.0,
+        feedforward.calculate(VecBuilder.fill(2, 2), VecBuilder.fill(3, 3)).get(0, 0),
+        1e-6);
   }
 
   protected Matrix<N2, N1> getDynamics(Matrix<N2, N1> x, Matrix<N1, N1> u) {
