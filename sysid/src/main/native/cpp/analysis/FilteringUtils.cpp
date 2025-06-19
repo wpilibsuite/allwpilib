@@ -312,11 +312,11 @@ static std::string RemoveStr(std::string_view str, std::string_view removeStr) {
 }
 
 /**
- * Figures out the max duration of the Dynamic tests
+ * Figures out the max duration of the Step tests
  *
  * @param data The raw data String Map
  *
- * @return The maximum duration of the Dynamic Tests
+ * @return The maximum duration of the Step Tests
  */
 static units::second_t GetMaxStepTime(
     wpi::StringMap<std::vector<PreparedData>>& data) {
@@ -325,7 +325,7 @@ static units::second_t GetMaxStepTime(
     auto& key = it.first;
     auto& dataset = it.second;
 
-    if (IsRaw(key) && wpi::contains(key, "dynamic")) {
+    if (IsRaw(key) && wpi::contains(key, "step")) {
       if (!dataset.empty()) {
         auto duration = dataset.back().timestamp - dataset.front().timestamp;
         if (duration > maxStepTime) {
@@ -345,7 +345,7 @@ void sysid::InitialTrimAndFilter(
     units::second_t& maxStepTime, std::string_view unit) {
   auto& preparedData = *data;
 
-  // Find the maximum Step Test Duration of the dynamic tests
+  // Find the maximum Step Test Duration of the step tests
   maxStepTime = GetMaxStepTime(preparedData);
 
   // Calculate Velocity Threshold if it hasn't been set yet
@@ -353,7 +353,7 @@ void sysid::InitialTrimAndFilter(
     for (auto& it : preparedData) {
       auto& key = it.first;
       auto& dataset = it.second;
-      if (wpi::contains(key, "quasistatic")) {
+      if (wpi::contains(key, "sweep")) {
         settings->velocityThreshold =
             std::min(settings->velocityThreshold,
                      GetNoiseFloor(dataset, kNoiseMeanWindow,
@@ -366,9 +366,9 @@ void sysid::InitialTrimAndFilter(
     auto& key = it.first;
     auto& dataset = it.second;
 
-    // Trim quasistatic test data to remove all points where voltage is zero or
+    // Trim sweep test data to remove all points where voltage is zero or
     // velocity < velocity threshold.
-    if (wpi::contains(key, "quasistatic")) {
+    if (wpi::contains(key, "sweep")) {
       dataset.erase(std::remove_if(dataset.begin(), dataset.end(),
                                    [&](const auto& pt) {
                                      return std::abs(pt.voltage) <= 0 ||
@@ -379,7 +379,7 @@ void sysid::InitialTrimAndFilter(
 
       // Confirm there's still data
       if (dataset.empty()) {
-        throw sysid::NoQuasistaticDataError();
+        throw sysid::NoSweepDataError();
       }
     }
 
@@ -391,8 +391,8 @@ void sysid::InitialTrimAndFilter(
     // Recalculate Accel and Cosine
     PrepareMechData(&dataset, unit);
 
-    // Trims filtered Dynamic Test Data
-    if (IsFiltered(key) && wpi::contains(key, "dynamic")) {
+    // Trims filtered Step Test Data
+    if (IsFiltered(key) && wpi::contains(key, "step")) {
       // Get the filtered dataset name
       auto filteredKey = RemoveStr(key, "raw-");
 
@@ -413,7 +413,7 @@ void sysid::InitialTrimAndFilter(
 
       // Confirm there's still data
       if (preparedData[key].empty()) {
-        throw sysid::NoDynamicDataError();
+        throw sysid::NoStepDataError();
       }
     }
   }
