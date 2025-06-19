@@ -108,8 +108,7 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
 constexpr Translation2d ApplyDeadband2d(const Translation2d& value,
                                         units::meter_t deadband,
                                         units::meter_t maxDistance) {
-  units::meter_t norm = ApplyDeadband(value.Norm(), deadband, maxDistance);
-  return Translation2d{norm, units::radian_t{0.0}}.RotateBy(value.Angle());
+  return Translation2d{ApplyDeadband(value.Norm(), deadband, maxDistance), value.Angle();
 }
 
 /**
@@ -183,8 +182,7 @@ constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
 constexpr Translation2d CopySignPow2d(const Translation2d& value,
                                       double exponent,
                                       units::meter_t maxDistance) {
-  units::meter_t norm = CopySignPow(value.Norm(), exponent, maxDistance);
-  return Translation2d{norm, units::radian_t{0.0}}.RotateBy(value.Angle());
+  return Translation2d{CopySignPow(value.Norm(), exponent, maxDistance), value.Angle()};
 }
 
 /**
