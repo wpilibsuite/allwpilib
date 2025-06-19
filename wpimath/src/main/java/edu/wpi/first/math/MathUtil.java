@@ -108,6 +108,35 @@ public final class MathUtil {
   }
 
   /**
+   * Returns a zero translation if the given translation is within the specified distance from the
+   * origin. The remaining distance between the deadband and the maximum distance is scaled from the
+   * origin to the maximum distance.
+   *
+   * @param value Value to clip.
+   * @param deadband Distance from origin.
+   * @param maxDistance The maximum distance from the origin of the input. Can be infinite.
+   * @return The value after the deadband is applied.
+   */
+  public static Translation2d applyDeadband2d(
+      Translation2d value, double deadband, double maxDistance) {
+    double norm = applyDeadband(value.getNorm(), deadband, maxDistance);
+    return new Translation2d(norm, 0).rotateBy(value.getAngle());
+  }
+
+  /**
+   * Returns a zero translation if the given translation is within the specified distance from the
+   * origin. The remaining distance between the deadband and a distance of 1.0 is scaled from the
+   * origin to a distance of 1.0.
+   *
+   * @param value Value to clip.
+   * @param deadband Distance from origin.
+   * @return The value after the deadband is applied.
+   */
+  public static Translation2d applyDeadband2d(Translation2d value, double deadband) {
+    return applyDeadband2d(value, deadband, 1);
+  }
+
+  /**
    * Raises the input to the power of the given exponent while preserving its sign.
    *
    * <p>The function normalizes the input value to the range [0, 1] based on the maximum magnitude,
@@ -141,6 +170,38 @@ public final class MathUtil {
    */
   public static double copySignPow(double value, double exponent) {
     return copySignPow(value, exponent, 1);
+  }
+
+  /**
+   * Raises the norm of the input to the power of the given exponent while preserving its direction.
+   *
+   * <p>The function normalizes the norm of the input to the range [0, 1] based on the maximum
+   * distance, raises it to the power of the exponent, then scales the result back to the original
+   * range. This keeps the value in the original max distance and gives consistent curve behavior
+   * regardless of the input norms's scale.
+   *
+   * @param value The input translation to transform.
+   * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be
+   *     positive.
+   * @param maxDistance The maximum expected distance from origin of input. Must be positive.
+   * @return The transformed value with the same direction and norm scaled to the input range.
+   */
+  public static Translation2d copySignPow2d(
+      Translation2d value, double exponent, double maxDistance) {
+    double norm = copySignPow(value.getNorm(), exponent, maxDistance);
+    return new Translation2d(norm, 0).rotateBy(value.getAngle());
+  }
+
+  /**
+   * Raises the norm of the input to the power of the given exponent while preserving its direction.
+   *
+   * @param value The input translation to transform.
+   * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be
+   *     positive.
+   * @return The transformed value with the same direction.
+   */
+  public static Translation2d copySignPow2d(Translation2d value, double exponent) {
+    return copySignPow2d(value, exponent, 1);
   }
 
   /**
