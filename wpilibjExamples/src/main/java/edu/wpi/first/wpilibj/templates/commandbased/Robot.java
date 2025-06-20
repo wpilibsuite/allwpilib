@@ -4,17 +4,17 @@
 
 package edu.wpi.first.wpilibj.templates.commandbased;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.templates.commandbased.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj.templates.commandbased.commands.Autos;
 import edu.wpi.first.wpilibj.templates.commandbased.commands.ExampleCommand;
 import edu.wpi.first.wpilibj.templates.commandbased.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SendableChooserCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.SendableChooserCommand;
 
 /**
  * This class automatically runs the {@link CommandScheduler} for you. If you change the name of
@@ -44,9 +44,8 @@ public class Robot extends CommandRobot {
     // cancelling on release.
     m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
 
-    m_autoChooser.setDefaultOption(
-        "Example Auto", Autos.exampleAuto(m_exampleSubsystem));
+    m_autoChooser.setDefaultOption("Example Auto", Autos.exampleAuto(m_exampleSubsystem));
 
-    autonomous.whileTrue(new SendableChooserCommand(m_autoChooser));
+    m_autonomous.whileTrue(new SendableChooserCommand(m_autoChooser));
   }
 }

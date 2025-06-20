@@ -20,8 +20,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.SendableChooserCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
  * This class automatically runs the {@link CommandScheduler} for you. If you change the name of
@@ -90,6 +90,6 @@ public class Robot extends CommandRobot {
             .driveDistanceCommand(AutoConstants.kDriveDistanceMeters, AutoConstants.kDriveSpeed)
             .withTimeout(AutoConstants.kTimeoutSeconds));
 
-    autonomous.whileTrue(new SendableChooserCommand(m_autoChooser));
+    m_autonomous.whileTrue(new SendableChooserCommand(m_autoChooser));
   }
 }

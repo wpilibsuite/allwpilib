@@ -5,8 +5,8 @@
 package edu.wpi.first.wpilibj2.command;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * CommandRobot is a wrapper over TimedRobot designed to work well with Command based programming.
@@ -17,25 +17,17 @@ public class CommandRobot extends TimedRobot {
   /** The CommandScheduler instance. */
   protected CommandScheduler m_scheduler = CommandScheduler.getInstance();
 
-  /**
-   * A trigger that is true when the robot is enabled in autonomous mode.
-   */
-  protected Trigger autonomous = RobotModeTriggers.autonomous();
+  /** A trigger that is true when the robot is enabled in autonomous mode. */
+  protected Trigger m_autonomous = RobotModeTriggers.autonomous();
 
-  /**
-   * A trigger that is true when the robot is enabled in teleop mode.
-   */
-  protected Trigger teleop = RobotModeTriggers.teleop();
+  /** A trigger that is true when the robot is enabled in teleop mode. */
+  protected Trigger m_teleop = RobotModeTriggers.teleop();
 
-  /**
-   * A trigger that is true when the robot is disabled.
-   */
-  protected Trigger disabled = RobotModeTriggers.disabled();
+  /** A trigger that is true when the robot is disabled. */
+  protected Trigger m_disabled = RobotModeTriggers.disabled();
 
-  /**
-   * A trigger that is true when the robot is enabled in test mode.
-   */
-  protected Trigger test = RobotModeTriggers.test();
+  /** A trigger that is true when the robot is enabled in test mode. */
+  protected Trigger m_test = RobotModeTriggers.test();
 
   /** Constructor for CommandRobot. */
   protected CommandRobot() {

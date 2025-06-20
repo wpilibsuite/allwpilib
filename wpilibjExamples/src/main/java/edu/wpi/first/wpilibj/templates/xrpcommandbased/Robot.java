@@ -6,13 +6,13 @@ package edu.wpi.first.wpilibj.templates.xrpcommandbased;
 
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 
-import java.util.Set;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.templates.xrpcommandbased.commands.ExampleCommand;
 import edu.wpi.first.wpilibj.templates.xrpcommandbased.subsystems.XRPDrivetrain;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.CommandRobot;
+import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.Set;
 
 /**
  * This class automatically runs the {@link CommandScheduler} for you. If you change the name of

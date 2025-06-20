@@ -11,6 +11,8 @@
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/Commands.h"
+#include "frc2/command/button/RobotModeTriggers.h"
+#include "frc2/command/button/Trigger.h"
 
 namespace frc2 {
 /**
@@ -56,12 +58,9 @@ class CommandRobot : public frc::TimedRobot {
   /// The CommandScheduler instance.
   frc2::CommandScheduler& m_scheduler = frc2::CommandScheduler::GetInstance();
 
-  /// The autonomous chooser.
-  frc::SendableChooser<frc2::Command*> m_autoChooser;
-
- private:
-  frc2::CommandPtr m_defaultCommand = frc2::cmd::Print(
-      "No autos configured. Add Commands to m_autoChooser to fix this.");
-  frc2::Command* m_autonomousCommand = nullptr;
+  frc2::Trigger m_autonomous{RobotModeTriggers::Autonomous()};
+  frc2::Trigger m_teleop{RobotModeTriggers::Teleop()};
+  frc2::Trigger m_disabled{RobotModeTriggers::Disabled()};
+  frc2::Trigger m_test{RobotModeTriggers::Test()};
 };
 }  // namespace frc2
