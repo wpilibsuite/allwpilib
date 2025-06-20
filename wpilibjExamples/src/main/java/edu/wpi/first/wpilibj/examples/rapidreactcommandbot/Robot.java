@@ -90,6 +90,6 @@ public class Robot extends CommandRobot {
             .driveDistanceCommand(AutoConstants.kDriveDistanceMeters, AutoConstants.kDriveSpeed)
             .withTimeout(AutoConstants.kTimeoutSeconds));
 
-    autonomous().whileTrue(new SendableChooserCommand(m_autoChooser));
+    autonomous.whileTrue(new SendableChooserCommand(m_autoChooser));
   }
 }

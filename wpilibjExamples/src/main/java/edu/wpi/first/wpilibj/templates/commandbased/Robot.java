@@ -47,6 +47,6 @@ public class Robot extends CommandRobot {
     m_autoChooser.setDefaultOption(
         "Example Auto", Autos.exampleAuto(m_exampleSubsystem));
 
-    autonomous().whileTrue(new SendableChooserCommand(m_autoChooser));
+    autonomous.whileTrue(new SendableChooserCommand(m_autoChooser));
   }
 }

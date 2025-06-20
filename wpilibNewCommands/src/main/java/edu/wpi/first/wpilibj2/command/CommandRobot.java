@@ -47,6 +47,7 @@ public class CommandRobot extends TimedRobot {
    *
    * @param period Period in seconds.
    */
+  @SuppressWarnings("this-escape")
   protected CommandRobot(double period) {
     super(period);
     addPeriodic(() -> m_scheduler.run(), 0.02);
