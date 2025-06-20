@@ -108,7 +108,8 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
 constexpr Translation2d ApplyDeadband2d(const Translation2d& value,
                                         units::meter_t deadband,
                                         units::meter_t maxDistance) {
-  return Translation2d{ApplyDeadband(value.Norm(), deadband, maxDistance), value.Angle();
+  return Translation2d{ApplyDeadband(value.Norm(), deadband, maxDistance),
+                       value.Angle()};
 }
 
 /**
@@ -131,9 +132,9 @@ constexpr Translation2d ApplyDeadband2d(const Translation2d& value,
  *
  * The function normalizes the input value to the range [0, 1] based on the
  * maximum magnitude, raises it to the power of the exponent, then scales the
- * result back to the original range and copying the sign. This keeps the value
- * in the original range and gives consistent curve behavior regardless of the
- * input value's scale.
+ * result back to the original range and copying the sign. This keeps the
+ * value in the original range and gives consistent curve behavior regardless
+ * of the input value's scale.
  *
  * This is useful for applying smoother or more aggressive control response
  * curves (e.g. joystick input shaping).
@@ -176,13 +177,14 @@ constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
  * curve). Must be positive.
  * @param maxDistance The maximum expected distance from origin of input. Must
  * be positive.
- * @return The transformed value with the same direction and norm scaled to the
- * input range.
+ * @return The transformed value with the same direction and norm scaled to
+ * the input range.
  */
 constexpr Translation2d CopySignPow2d(const Translation2d& value,
                                       double exponent,
                                       units::meter_t maxDistance) {
-  return Translation2d{CopySignPow(value.Norm(), exponent, maxDistance), value.Angle()};
+  return Translation2d{CopySignPow(value.Norm(), exponent, maxDistance),
+                       value.Angle()};
 }
 
 /**

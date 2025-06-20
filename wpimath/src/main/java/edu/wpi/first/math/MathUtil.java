@@ -119,7 +119,8 @@ public final class MathUtil {
    */
   public static Translation2d applyDeadband2d(
       Translation2d value, double deadband, double maxDistance) {
-    return new Translation2d(applyDeadband(value.getNorm(), deadband, maxDistance), value.getAngle());
+    return new Translation2d(
+        applyDeadband(value.getNorm(), deadband, maxDistance), value.getAngle());
   }
 
   /**
