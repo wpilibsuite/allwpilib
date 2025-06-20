@@ -1152,7 +1152,7 @@ public final class DriverStation {
    * @return true if connected, false if timeout
    */
   public static boolean waitForDsConnection(double timeout) {
-    int event = WPIUtilJNI.createEvent(true, false);
+    int event = WPIUtilJNI.makeEvent(true, false);
     DriverStationJNI.provideNewDataEventHandle(event);
     boolean result;
     try {
