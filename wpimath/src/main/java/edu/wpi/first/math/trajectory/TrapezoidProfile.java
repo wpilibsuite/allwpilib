@@ -128,8 +128,8 @@ public class TrapezoidProfile {
     m_current = direct(current);
     goal = direct(goal);
 
-    if (m_current.velocity > m_constraints.maxVelocity) {
-      m_current.velocity = m_constraints.maxVelocity;
+    if (Math.abs(m_current.velocity) > m_constraints.maxVelocity) {
+      m_current.velocity = Math.copySign(m_constraints.maxVelocity, m_current.velocity);
     }
 
     // Deal with a possibly truncated motion profile (with nonzero initial or
