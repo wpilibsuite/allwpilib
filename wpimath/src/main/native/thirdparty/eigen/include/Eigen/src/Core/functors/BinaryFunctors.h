@@ -438,7 +438,6 @@ struct scalar_quotient_op : binary_op_base<LhsScalar, RhsScalar> {
   }
   template <typename Packet>
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Packet packetOp(const Packet& a, const Packet& b) const {
-    maybe_raise_div_by_zero<Packet>::run(b);
     return internal::pdiv(a, b);
   }
 };

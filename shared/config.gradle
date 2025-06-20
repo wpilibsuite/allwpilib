@@ -32,6 +32,13 @@ nativeUtils.enableSourceLink()
 
 nativeUtils.wpi.addMacMinimumVersionArg()
 
+nativeUtils.platformConfigs.each {
+    if (it.name.contains('osx')) {
+        it.linker.getArgs().add('-framework')
+        it.linker.getArgs().add('IOKit')
+    }
+}
+
 // Compress debug info on Linux
 nativeUtils.platformConfigs.each {
   if (it.name.contains('linux')) {

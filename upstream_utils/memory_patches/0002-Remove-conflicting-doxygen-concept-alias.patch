@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ryan Blue <ryanzblue@gmail.com>
 Date: Wed, 21 Aug 2024 21:47:32 -0400
-Subject: [PATCH 2/2] Remove conflicting doxygen 'concept' alias
+Subject: [PATCH 2/3] Remove conflicting doxygen 'concept' alias
 
 \concept was added as a doxygen command in 1.9.2 and is meant to be applied to concepts. Inserting them into standard comment paragraphs causes doxygen to interpret the following text as a concept name and add it to the documentation, as well as remove the text from the paragraph.
 In the upstream repo, this alias links to markdown documentation, so it's not usable for us anyways.

@@ -43,50 +43,90 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
     magnitude = units::math::abs(value);
   }
 
-  if (magnitude > deadband) {
-    if (maxMagnitude / deadband > 1.0E12) {
-      // If max magnitude is sufficiently large, the implementation encounters
-      // roundoff error.  Implementing the limiting behavior directly avoids
-      // the problem.
-      return value > T{0.0} ? value - deadband : value + deadband;
-    }
-    if (value > T{0.0}) {
-      // Map deadband to 0 and map max to max.
-      //
-      // y - y₁ = m(x - x₁)
-      // y - y₁ = (y₂ - y₁)/(x₂ - x₁) (x - x₁)
-      // y = (y₂ - y₁)/(x₂ - x₁) (x - x₁) + y₁
-      //
-      // (x₁, y₁) = (deadband, 0) and (x₂, y₂) = (max, max).
-      // x₁ = deadband
-      // y₁ = 0
-      // x₂ = max
-      // y₂ = max
-      //
-      // y = (max - 0)/(max - deadband) (x - deadband) + 0
-      // y = max/(max - deadband) (x - deadband)
-      // y = max (x - deadband)/(max - deadband)
-      return maxMagnitude * (value - deadband) / (maxMagnitude - deadband);
-    } else {
-      // Map -deadband to 0 and map -max to -max.
-      //
-      // y - y₁ = m(x - x₁)
-      // y - y₁ = (y₂ - y₁)/(x₂ - x₁) (x - x₁)
-      // y = (y₂ - y₁)/(x₂ - x₁) (x - x₁) + y₁
-      //
-      // (x₁, y₁) = (-deadband, 0) and (x₂, y₂) = (-max, -max).
-      // x₁ = -deadband
-      // y₁ = 0
-      // x₂ = -max
-      // y₂ = -max
-      //
-      // y = (-max - 0)/(-max + deadband) (x + deadband) + 0
-      // y = max/(max - deadband) (x + deadband)
-      // y = max (x + deadband)/(max - deadband)
-      return maxMagnitude * (value + deadband) / (maxMagnitude - deadband);
-    }
-  } else {
+  if (magnitude < deadband) {
     return T{0.0};
+  }
+
+  if (value > T{0.0}) {
+    // Map deadband to 0 and map max to max with a linear relationship.
+    //
+    //   y - y₁ = m(x - x₁)
+    //   y - y₁ = (y₂ - y₁)/(x₂ - x₁) (x - x₁)
+    //   y = (y₂ - y₁)/(x₂ - x₁) (x - x₁) + y₁
+    //
+    // (x₁, y₁) = (deadband, 0) and (x₂, y₂) = (max, max).
+    //
+    //   x₁ = deadband
+    //   y₁ = 0
+    //   x₂ = max
+    //   y₂ = max
+    //   y = (max - 0)/(max - deadband) (x - deadband) + 0
+    //   y = max/(max - deadband) (x - deadband)
+    //
+    // To handle high values of max, rewrite so that max only appears on the
+    // denominator.
+    //
+    //   y = ((max - deadband) + deadband)/(max - deadband) (x - deadband)
+    //   y = (1 + deadband/(max - deadband)) (x - deadband)
+    return (1.0 + deadband / (maxMagnitude - deadband)) * (value - deadband);
+  } else {
+    // Map -deadband to 0 and map -max to -max with a linear relationship.
+    //
+    //   y - y₁ = m(x - x₁)
+    //   y - y₁ = (y₂ - y₁)/(x₂ - x₁) (x - x₁)
+    //   y = (y₂ - y₁)/(x₂ - x₁) (x - x₁) + y₁
+    //
+    // (x₁, y₁) = (-deadband, 0) and (x₂, y₂) = (-max, -max).
+    //
+    //   x₁ = -deadband
+    //   y₁ = 0
+    //   x₂ = -max
+    //   y₂ = -max
+    //   y = (-max - 0)/(-max + deadband) (x + deadband) + 0
+    //   y = max/(max - deadband) (x + deadband)
+    //
+    // To handle high values of max, rewrite so that max only appears on the
+    // denominator.
+    //
+    //   y = ((max - deadband) + deadband)/(max - deadband) (x + deadband)
+    //   y = (1 + deadband/(max - deadband)) (x + deadband)
+    return (1.0 + deadband / (maxMagnitude - deadband)) * (value + deadband);
+  }
+}
+
+/**
+ * Raises the input to the power of the given exponent while preserving its
+ * sign.
+ *
+ * The function normalizes the input value to the range [0, 1] based on the
+ * maximum magnitude, raises it to the power of the exponent, then scales the
+ * result back to the original range and copying the sign. This keeps the value
+ * in the original range and gives consistent curve behavior regardless of the
+ * input value's scale.
+ *
+ * This is useful for applying smoother or more aggressive control response
+ * curves (e.g. joystick input shaping).
+ *
+ * @param value The input value to transform.
+ * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared
+ * curve). Must be positive.
+ * @param maxMagnitude The maximum expected absolute value of input. Must be
+ * positive.
+ * @return The transformed value with the same sign and scaled to the input
+ * range.
+ */
+template <typename T>
+  requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
+constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
+  if constexpr (std::is_arithmetic_v<T>) {
+    return gcem::copysign(
+        gcem::pow(gcem::abs(value) / maxMagnitude, exponent) * maxMagnitude,
+        value);
+  } else {
+    return units::math::copysign(
+        gcem::pow((units::math::abs(value) / maxMagnitude).value(), exponent) *
+            maxMagnitude,
+        value);
   }
 }
 
