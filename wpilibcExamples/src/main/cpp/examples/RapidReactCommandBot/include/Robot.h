@@ -31,6 +31,9 @@ class Robot : public frc2::CommandRobot {
   frc2::CommandXboxController m_driverController{
       OIConstants::kDriverControllerPort};
 
+  enum Autos { EXAMPLE_AUTO };
+
+  frc::SendableChooser<Autos> m_autoChooser;
   frc2::CommandPtr m_exampleAuto{
       m_drive
           .DriveDistanceCommand(AutoConstants::kDriveDistance,

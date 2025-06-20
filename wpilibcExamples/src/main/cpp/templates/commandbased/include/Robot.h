@@ -24,5 +24,8 @@ class Robot : public frc2::CommandRobot {
   // The robot's subsystems are defined here.
   ExampleSubsystem m_subsystem;
 
+  enum Autos { EXAMPLE_AUTO };
+
+  frc::SendableChooser<Autos> m_autoChooser;
   frc2::CommandPtr m_exampleAuto{autos::ExampleAuto(&m_subsystem)};
 };

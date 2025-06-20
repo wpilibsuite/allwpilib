@@ -4,6 +4,8 @@
 
 #include "Robot.h"
 
+#include <utility>
+
 #include "commands/ExampleCommand.h"
 
 Robot::Robot() {
@@ -18,7 +20,10 @@ Robot::Robot() {
 
   m_autoChooser.SetDefaultOption(
       "Example Auto",
-      m_exampleAuto.get());  // An example Command that will be run in auto.
+      EXAMPLE_AUTO);  // An example Command that will be run in auto.
+  m_autonomous.WhileTrue(frc2::cmd::Select<Autos>(
+      [this] { return m_autoChooser.GetSelected(); },
+      std::pair{EXAMPLE_AUTO, std::move(m_exampleAuto)}));
 }
 
 #ifndef RUNNING_FRC_TESTS

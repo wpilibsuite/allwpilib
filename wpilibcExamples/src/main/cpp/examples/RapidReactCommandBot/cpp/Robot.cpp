@@ -4,6 +4,8 @@
 
 #include "Robot.h"
 
+#include <utility>
+
 #include <frc2/command/Command.h>
 #include <frc2/command/Commands.h>
 #include <frc2/command/button/Trigger.h>
@@ -42,7 +44,10 @@ Robot::Robot() {
   m_driverController.Start().ToggleOnTrue(
       m_pneumatics.DisableCompressorCommand());
 
-  m_autoChooser.SetDefaultOption("Example Auto", m_exampleAuto.get());
+  m_autoChooser.SetDefaultOption("Example Auto", EXAMPLE_AUTO);
+  m_autonomous.WhileTrue(frc2::cmd::Select<Autos>(
+      [this] { return m_autoChooser.GetSelected(); },
+      std::pair{EXAMPLE_AUTO, std::move(m_exampleAuto)}));
 }
 
 #ifndef RUNNING_FRC_TESTS
