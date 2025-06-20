@@ -70,6 +70,17 @@ CommandPtr cmd::StartRun(std::function<void()> start, std::function<void()> run,
       .ToPtr();
 }
 
+CommandPtr cmd::StartRunEnd(std::function<void()> start,
+                            std::function<void()> run,
+                            std::function<void()> end,
+                            Requirements requirements) {
+  return FunctionalCommand(
+             std::move(start), std::move(run),
+             [end = std::move(end)](bool interrupted) { end(); },
+             [] { return false; }, requirements)
+      .ToPtr();
+}
+
 CommandPtr cmd::Print(std::string_view msg) {
   return PrintCommand(msg).ToPtr();
 }
