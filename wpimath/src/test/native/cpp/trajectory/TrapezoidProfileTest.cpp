@@ -243,12 +243,10 @@ TEST(TrapezoidProfileTest, InitalizationOfCurrentState) {
 }
 
 TEST(TrapezoidProfileTest, InitialVelocityConstraints) {
-  using units::unit_cast;
-
   frc::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
                                                               0.75_mps_sq};
-  frc::TrapezoidProfile<units::meter>::State goal(10_m, 0_mps);
-  frc::TrapezoidProfile<units::meter>::State state(0_m, -10_mps);
+  frc::TrapezoidProfile<units::meter>::State goal{10_m, 0_mps};
+  frc::TrapezoidProfile<units::meter>::State state{0_m, -10_mps};
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
 
@@ -259,12 +257,10 @@ TEST(TrapezoidProfileTest, InitialVelocityConstraints) {
 }
 
 TEST(TrapezoidProfileTest, GoalVelocityConstraints) {
-  using units::unit_cast;
-
   frc::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
                                                               0.75_mps_sq};
-  frc::TrapezoidProfile<units::meter>::State goal(10_m, 5_mps);
-  frc::TrapezoidProfile<units::meter>::State state(0_m, 0.75_mps);
+  frc::TrapezoidProfile<units::meter>::State goal{10_m, 5_mps};
+  frc::TrapezoidProfile<units::meter>::State state{0_m, 0.75_mps};
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
 
@@ -275,12 +271,10 @@ TEST(TrapezoidProfileTest, GoalVelocityConstraints) {
 }
 
 TEST(TrapezoidProfileTest, NegativeGoalVelocityConstraints) {
-  using units::unit_cast;
-
   frc::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
                                                               0.75_mps_sq};
-  frc::TrapezoidProfile<units::meter>::State goal(10_m, -5_mps);
-  frc::TrapezoidProfile<units::meter>::State state(0_m, 0.75_mps);
+  frc::TrapezoidProfile<units::meter>::State goal{10_m, -5_mps};
+  frc::TrapezoidProfile<units::meter>::State state{0_m, 0.75_mps};
 
   frc::TrapezoidProfile<units::meter> profile{constraints};
 
