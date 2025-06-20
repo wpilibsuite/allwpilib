@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SendableChooserCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
@@ -90,6 +89,6 @@ public class Robot extends CommandRobot {
             .driveDistanceCommand(AutoConstants.kDriveDistanceMeters, AutoConstants.kDriveSpeed)
             .withTimeout(AutoConstants.kTimeoutSeconds));
 
-    m_autonomous.whileTrue(new SendableChooserCommand(m_autoChooser));
+    m_autonomous.whileTrue(Commands.deferredProxy(() -> m_autoChooser.getSelected()));
   }
 }

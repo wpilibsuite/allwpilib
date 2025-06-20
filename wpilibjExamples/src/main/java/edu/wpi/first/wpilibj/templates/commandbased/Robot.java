@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj.templates.commandbased.commands.Autos;
 import edu.wpi.first.wpilibj.templates.commandbased.commands.ExampleCommand;
 import edu.wpi.first.wpilibj.templates.commandbased.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.CommandRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.SendableChooserCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -46,6 +46,6 @@ public class Robot extends CommandRobot {
 
     m_autoChooser.setDefaultOption("Example Auto", Autos.exampleAuto(m_exampleSubsystem));
 
-    m_autonomous.whileTrue(new SendableChooserCommand(m_autoChooser));
+    m_autonomous.whileTrue(Commands.deferredProxy(() -> m_autoChooser.getSelected());
   }
 }

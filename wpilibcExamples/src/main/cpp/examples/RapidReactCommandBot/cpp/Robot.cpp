@@ -45,9 +45,11 @@ Robot::Robot() {
       m_pneumatics.DisableCompressorCommand());
 
   m_autoChooser.SetDefaultOption("Example Auto", EXAMPLE_AUTO);
-  m_autonomous.WhileTrue(frc2::cmd::Select<Autos>(
-      [this] { return m_autoChooser.GetSelected(); },
-      std::pair{EXAMPLE_AUTO, std::move(m_exampleAuto)}));
+  m_autonomous.WhileTrue(frc2::cmd::DeferredProxy([this] {
+    return frc2::cmd::Select<Autos>(
+        [this] { return m_autoChooser.GetSelected(); },
+        std::pair{EXAMPLE_AUTO, std::move(m_exampleAuto)});
+  }));
 }
 
 #ifndef RUNNING_FRC_TESTS
