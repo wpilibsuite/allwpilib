@@ -241,3 +241,51 @@ TEST(TrapezoidProfileTest, InitalizationOfCurrentState) {
   EXPECT_NEAR_UNITS(profile.TimeLeftUntil(0_m), 0_s, 1e-10_s);
   EXPECT_NEAR_UNITS(profile.TotalTime(), 0_s, 1e-10_s);
 }
+
+TEST(TrapezoidProfileTest, InitialVelocityConstraints) {
+  using units::unit_cast;
+
+  frc::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
+                                                              0.75_mps_sq};
+  frc::TrapezoidProfile<units::meter>::State goal(10_m, 0_mps);
+  frc::TrapezoidProfile<units::meter>::State state(0_m, -10_mps);
+
+  frc::TrapezoidProfile<units::meter> profile{constraints};
+
+  for (int i = 0; i < 200; ++i) {
+    state = profile.Calculate(kDt, state, goal);
+    EXPECT_LE(units::math::abs(state.velocity), units::math::abs(constraints.maxVelocity));
+  }
+}
+
+TEST(TrapezoidProfileTest, GoalVelocityConstraints) {
+  using units::unit_cast;
+
+  frc::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
+                                                              0.75_mps_sq};
+  frc::TrapezoidProfile<units::meter>::State goal(10_m, 5_mps);
+  frc::TrapezoidProfile<units::meter>::State state(0_m, 0.75_mps);
+
+  frc::TrapezoidProfile<units::meter> profile{constraints};
+
+  for (int i = 0; i < 200; ++i) {
+    state = profile.Calculate(kDt, state, goal);
+    EXPECT_LE(units::math::abs(state.velocity), units::math::abs(constraints.maxVelocity));
+  }
+}
+
+TEST(TrapezoidProfileTest, NegativeGoalVelocityConstraints) {
+  using units::unit_cast;
+
+  frc::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
+                                                              0.75_mps_sq};
+  frc::TrapezoidProfile<units::meter>::State goal(10_m, -5_mps);
+  frc::TrapezoidProfile<units::meter>::State state(0_m, 0.75_mps);
+
+  frc::TrapezoidProfile<units::meter> profile{constraints};
+
+  for (int i = 0; i < 200; ++i) {
+    state = profile.Calculate(kDt, state, goal);
+    EXPECT_LE(units::math::abs(state.velocity), units::math::abs(constraints.maxVelocity));
+  }
+}
