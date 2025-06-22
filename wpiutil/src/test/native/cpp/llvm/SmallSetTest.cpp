@@ -17,6 +17,57 @@
 
 using namespace wpi;
 
+TEST(SmallSetTest, ConstructorIteratorPair) {
+  std::initializer_list<int> L = {1, 2, 3, 4, 5};
+  SmallSet<int, 4> S(std::begin(L), std::end(L));
+  EXPECT_THAT(S, testing::UnorderedElementsAreArray(L));
+}
+
+TEST(SmallSet, ConstructorRange) {
+  std::initializer_list<int> L = {1, 2, 3, 4, 5};
+
+  SmallSet<int, 4> S(wpi::make_range(std::begin(L), std::end(L)));
+  EXPECT_THAT(S, testing::UnorderedElementsAreArray(L));
+}
+
+TEST(SmallSet, ConstructorInitializerList) {
+  std::initializer_list<int> L = {1, 2, 3, 4, 5};
+  SmallSet<int, 4> S = {1, 2, 3, 4, 5};
+  EXPECT_THAT(S, testing::UnorderedElementsAreArray(L));
+}
+
+TEST(SmallSet, CopyConstructor) {
+  SmallSet<int, 4> S = {1, 2, 3};
+  SmallSet<int, 4> T = S;
+
+  EXPECT_THAT(S, testing::ContainerEq(T));
+}
+
+TEST(SmallSet, MoveConstructor) {
+  std::initializer_list<int> L = {1, 2, 3};
+  SmallSet<int, 4> S = L;
+  SmallSet<int, 4> T = std::move(S);
+
+  EXPECT_THAT(T, testing::UnorderedElementsAreArray(L));
+}
+
+TEST(SmallSet, CopyAssignment) {
+  SmallSet<int, 4> S = {1, 2, 3};
+  SmallSet<int, 4> T;
+  T = S;
+
+  EXPECT_THAT(S, testing::ContainerEq(T));
+}
+
+TEST(SmallSet, MoveAssignment) {
+  std::initializer_list<int> L = {1, 2, 3};
+  SmallSet<int, 4> S = L;
+  SmallSet<int, 4> T;
+  T = std::move(S);
+
+  EXPECT_THAT(T, testing::UnorderedElementsAreArray(L));
+}
+
 TEST(SmallSetTest, Insert) {
 
   SmallSet<int, 4> s1;
@@ -39,6 +90,40 @@ TEST(SmallSetTest, Insert) {
     EXPECT_EQ(1u, s1.count(i));
 
   EXPECT_EQ(0u, s1.count(4));
+}
+
+TEST(SmallSetTest, InsertPerfectFwd) {
+  struct Value {
+    int Key;
+    bool Moved;
+
+    Value(int Key) : Key(Key), Moved(false) {}
+    Value(const Value &) = default;
+    Value(Value &&Other) : Key(Other.Key), Moved(false) { Other.Moved = true; }
+    bool operator==(const Value &Other) const { return Key == Other.Key; }
+    bool operator<(const Value &Other) const { return Key < Other.Key; }
+  };
+
+  {
+    SmallSet<Value, 4> S;
+    Value V1(1), V2(2);
+
+    S.insert(V1);
+    EXPECT_EQ(V1.Moved, false);
+
+    S.insert(std::move(V2));
+    EXPECT_EQ(V2.Moved, true);
+  }
+  {
+    SmallSet<Value, 1> S;
+    Value V1(1), V2(2);
+
+    S.insert(V1);
+    EXPECT_EQ(V1.Moved, false);
+
+    S.insert(std::move(V2));
+    EXPECT_EQ(V2.Moved, true);
+  }
 }
 
 TEST(SmallSetTest, Grow) {

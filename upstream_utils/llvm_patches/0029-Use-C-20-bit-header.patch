@@ -5,13 +5,12 @@ Subject: [PATCH 29/37] Use C++20 <bit> header
 
 ---
  llvm/include/llvm/ADT/DenseMap.h       |   3 +-
- llvm/include/llvm/ADT/Hashing.h        |  35 +--
  llvm/include/llvm/ADT/bit.h            | 313 -------------------------
  llvm/include/llvm/Support/MathExtras.h |  21 +-
- 4 files changed, 31 insertions(+), 341 deletions(-)
+ 3 files changed, 13 insertions(+), 324 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index e77fa3bade8133ae73fd271a582d8500269bfe7e..bf39eaf5ac230221defcdd1b7711b77089d05642 100644
+index 69ce7982d732887642c7f46163b753ee17be9b30..927a9c72ec939d268ae7463f7113f051cc92cf3f 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
 @@ -23,6 +23,7 @@
@@ -22,7 +21,7 @@ index e77fa3bade8133ae73fd271a582d8500269bfe7e..bf39eaf5ac230221defcdd1b7711b770
  #include <cassert>
  #include <cstddef>
  #include <cstring>
-@@ -949,7 +950,7 @@ class SmallDenseMap
+@@ -906,7 +907,7 @@ class SmallDenseMap
  public:
    explicit SmallDenseMap(unsigned NumInitBuckets = 0) {
      if (NumInitBuckets > InlineBuckets)
@@ -31,97 +30,6 @@ index e77fa3bade8133ae73fd271a582d8500269bfe7e..bf39eaf5ac230221defcdd1b7711b770
      init(NumInitBuckets);
    }
  
-diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index a33c6eec308c8722f88b09f73f954d39558c3d62..36b4d4b58b414bd6f61437fb597cd596cb16e66f 100644
---- a/llvm/include/llvm/ADT/Hashing.h
-+++ b/llvm/include/llvm/ADT/Hashing.h
-@@ -50,6 +50,7 @@
- #include "llvm/Support/SwapByteOrder.h"
- #include "llvm/Support/type_traits.h"
- #include <algorithm>
-+#include <bit>
- #include <cassert>
- #include <cstring>
- #include <optional>
-@@ -208,30 +209,30 @@ inline uint64_t hash_17to32_bytes(const char *s, size_t len, uint64_t seed) {
-   uint64_t b = fetch64(s + 8);
-   uint64_t c = fetch64(s + len - 8) * k2;
-   uint64_t d = fetch64(s + len - 16) * k0;
--  return hash_16_bytes(llvm::rotr<uint64_t>(a - b, 43) +
--                           llvm::rotr<uint64_t>(c ^ seed, 30) + d,
--                       a + llvm::rotr<uint64_t>(b ^ k3, 20) - c + len + seed);
-+  return hash_16_bytes(std::rotr<uint64_t>(a - b, 43) +
-+                           std::rotr<uint64_t>(c ^ seed, 30) + d,
-+                       a + std::rotr<uint64_t>(b ^ k3, 20) - c + len + seed);
- }
- 
- inline uint64_t hash_33to64_bytes(const char *s, size_t len, uint64_t seed) {
-   uint64_t z = fetch64(s + 24);
-   uint64_t a = fetch64(s) + (len + fetch64(s + len - 16)) * k0;
--  uint64_t b = llvm::rotr<uint64_t>(a + z, 52);
--  uint64_t c = llvm::rotr<uint64_t>(a, 37);
-+  uint64_t b = std::rotr<uint64_t>(a + z, 52);
-+  uint64_t c = std::rotr<uint64_t>(a, 37);
-   a += fetch64(s + 8);
--  c += llvm::rotr<uint64_t>(a, 7);
-+  c += std::rotr<uint64_t>(a, 7);
-   a += fetch64(s + 16);
-   uint64_t vf = a + z;
--  uint64_t vs = b + llvm::rotr<uint64_t>(a, 31) + c;
-+  uint64_t vs = b + std::rotr<uint64_t>(a, 31) + c;
-   a = fetch64(s + 16) + fetch64(s + len - 32);
-   z = fetch64(s + len - 8);
--  b = llvm::rotr<uint64_t>(a + z, 52);
--  c = llvm::rotr<uint64_t>(a, 37);
-+  b = std::rotr<uint64_t>(a + z, 52);
-+  c = std::rotr<uint64_t>(a, 37);
-   a += fetch64(s + len - 24);
--  c += llvm::rotr<uint64_t>(a, 7);
-+  c += std::rotr<uint64_t>(a, 7);
-   a += fetch64(s + len - 16);
-   uint64_t wf = a + z;
--  uint64_t ws = b + llvm::rotr<uint64_t>(a, 31) + c;
-+  uint64_t ws = b + std::rotr<uint64_t>(a, 31) + c;
-   uint64_t r = shift_mix((vf + ws) * k2 + (wf + vs) * k0);
-   return shift_mix((seed ^ (r * k0)) + vs) * k2;
- }
-@@ -264,7 +265,7 @@ struct hash_state {
-     hash_state state = {0,
-                         seed,
-                         hash_16_bytes(seed, k1),
--                        llvm::rotr<uint64_t>(seed ^ k1, 49),
-+                        std::rotr<uint64_t>(seed ^ k1, 49),
-                         seed * k1,
-                         shift_mix(seed),
-                         0};
-@@ -278,10 +279,10 @@ struct hash_state {
-   static void mix_32_bytes(const char *s, uint64_t &a, uint64_t &b) {
-     a += fetch64(s);
-     uint64_t c = fetch64(s + 24);
--    b = llvm::rotr<uint64_t>(b + a + c, 21);
-+    b = std::rotr<uint64_t>(b + a + c, 21);
-     uint64_t d = a;
-     a += fetch64(s + 8) + fetch64(s + 16);
--    b += llvm::rotr<uint64_t>(a, 44) + d;
-+    b += std::rotr<uint64_t>(a, 44) + d;
-     a += c;
-   }
- 
-@@ -289,11 +290,11 @@ struct hash_state {
-   /// We mix all 64 bytes even when the chunk length is smaller, but we
-   /// record the actual length.
-   void mix(const char *s) {
--    h0 = llvm::rotr<uint64_t>(h0 + h1 + h3 + fetch64(s + 8), 37) * k1;
--    h1 = llvm::rotr<uint64_t>(h1 + h4 + fetch64(s + 48), 42) * k1;
-+    h0 = std::rotr<uint64_t>(h0 + h1 + h3 + fetch64(s + 8), 37) * k1;
-+    h1 = std::rotr<uint64_t>(h1 + h4 + fetch64(s + 48), 42) * k1;
-     h0 ^= h6;
-     h1 += h3 + fetch64(s + 40);
--    h2 = llvm::rotr<uint64_t>(h2 + h5, 33) * k1;
-+    h2 = std::rotr<uint64_t>(h2 + h5, 33) * k1;
-     h3 = h4 * k1;
-     h4 = h0 + h5;
-     mix_32_bytes(s, h3, h4);
 diff --git a/llvm/include/llvm/ADT/bit.h b/llvm/include/llvm/ADT/bit.h
 index c42b5e686bdc9cf3da71d8edaddc08216fe5fb2a..a19b6a9b80da2965f1308d3e7b0ade593b522a08 100644
 --- a/llvm/include/llvm/ADT/bit.h
@@ -454,7 +362,7 @@ index c42b5e686bdc9cf3da71d8edaddc08216fe5fb2a..a19b6a9b80da2965f1308d3e7b0ade59
  
  #endif
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 4033e032b5979a4f25b4c16f3988fb11087ed6bb..219f8894849e80ee70a4b4cf40194682740ec865 100644
+index acd16bb0e6cf73f565d44d654c34057d9b97dd95..5191831247ff668f22b6015d5b135fd9701afdd2 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -15,6 +15,7 @@

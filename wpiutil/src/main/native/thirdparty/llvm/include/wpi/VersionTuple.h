@@ -15,7 +15,6 @@
 #define WPIUTIL_WPI_VERSIONTUPLE_H
 
 #include "wpi/DenseMapInfo.h"
-#include "wpi/Hashing.h"
 #include <optional>
 #include <string>
 #include <tuple>

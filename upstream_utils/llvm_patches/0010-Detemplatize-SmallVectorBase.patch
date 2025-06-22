@@ -4,15 +4,15 @@ Date: Thu, 5 May 2022 23:18:34 -0400
 Subject: [PATCH 10/37] Detemplatize SmallVectorBase
 
 ---
- llvm/include/llvm/ADT/SmallVector.h | 35 ++++++++++-----------------
- llvm/lib/Support/SmallVector.cpp    | 37 +++++------------------------
- 2 files changed, 18 insertions(+), 54 deletions(-)
+ llvm/include/llvm/ADT/SmallVector.h | 35 ++++++++++-------------------
+ llvm/lib/Support/SmallVector.cpp    | 34 +++++-----------------------
+ 2 files changed, 17 insertions(+), 52 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index ec340afd4519f4070389434006bf7f2afdbf2993..6b12ea17aaa894dc9a719ade4c41a3f7df4304e9 100644
+index 3cab284f5b6105956d6fff49a27d37482a3c321d..b8981ab67322f7888ad63d953ba72dbfa53b2939 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -57,19 +57,19 @@ using EnableIfConvertibleToInputIterator = std::enable_if_t<std::is_convertible<
+@@ -56,19 +56,19 @@ using EnableIfConvertibleToInputIterator = std::enable_if_t<std::is_convertible<
  /// Using 64 bit size is desirable for cases like SmallVector<char>, where a
  /// 32 bit size would limit the vector to ~4GB. SmallVectors are used for
  /// buffering bitcode output - which can exceed 4GB.
@@ -37,7 +37,7 @@ index ec340afd4519f4070389434006bf7f2afdbf2993..6b12ea17aaa894dc9a719ade4c41a3f7
  
    /// This is a helper for \a grow() that's out of line to reduce code
    /// duplication.  This function will report a fatal error if it can't grow at
-@@ -108,7 +108,7 @@ protected:
+@@ -94,7 +94,7 @@ protected:
    /// This does not construct or destroy any elements in the vector.
    void set_size(size_t N) {
      assert(N <= capacity()); // implies no overflow in assignment
@@ -46,7 +46,7 @@ index ec340afd4519f4070389434006bf7f2afdbf2993..6b12ea17aaa894dc9a719ade4c41a3f7
    }
  
    /// Set the array data pointer to \p Begin and capacity to \p N.
-@@ -118,19 +118,14 @@ protected:
+@@ -104,19 +104,14 @@ protected:
    void set_allocation_range(void *Begin, size_t N) {
      assert(N <= SizeTypeMax());
      BeginX = Begin;
@@ -69,7 +69,7 @@ index ec340afd4519f4070389434006bf7f2afdbf2993..6b12ea17aaa894dc9a719ade4c41a3f7
    alignas(T) char FirstEl[sizeof(T)];
  };
  
-@@ -139,8 +134,8 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
+@@ -125,8 +120,8 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
  /// to avoid unnecessarily requiring T to be complete.
  template <typename T, typename = void>
  class SmallVectorTemplateCommon
@@ -80,7 +80,7 @@ index ec340afd4519f4070389434006bf7f2afdbf2993..6b12ea17aaa894dc9a719ade4c41a3f7
  
  protected:
    /// Find the address of the first element.  For this pointer math to be valid
-@@ -462,7 +457,7 @@ template <typename T, bool TriviallyCopyable>
+@@ -448,7 +443,7 @@ template <typename T, bool TriviallyCopyable>
  T *SmallVectorTemplateBase<T, TriviallyCopyable>::mallocForGrow(
      size_t MinSize, size_t &NewCapacity) {
    return static_cast<T *>(
@@ -89,7 +89,7 @@ index ec340afd4519f4070389434006bf7f2afdbf2993..6b12ea17aaa894dc9a719ade4c41a3f7
            this->getFirstEl(), MinSize, sizeof(T), NewCapacity));
  }
  
-@@ -1334,12 +1329,6 @@ template <typename Out, typename R> SmallVector<Out> to_vector_of(R &&Range) {
+@@ -1320,12 +1315,6 @@ template <typename Out, typename R> SmallVector<Out> to_vector_of(R &&Range) {
    return {std::begin(Range), std::end(Range)};
  }
  
@@ -103,7 +103,7 @@ index ec340afd4519f4070389434006bf7f2afdbf2993..6b12ea17aaa894dc9a719ade4c41a3f7
  
  namespace std {
 diff --git a/llvm/lib/Support/SmallVector.cpp b/llvm/lib/Support/SmallVector.cpp
-index 4f6fee18b659adcbfd79822832f914170cbb1635..7ef023084d791cf746c346cb1655c9da36a6beb5 100644
+index fba8fcb7cf56f4914e6ab6ede78eb8d8c8bf3424..5fe82c223193e7353d0576b84897422bed26186b 100644
 --- a/llvm/lib/Support/SmallVector.cpp
 +++ b/llvm/lib/Support/SmallVector.cpp
 @@ -51,10 +51,6 @@ static_assert(sizeof(SmallVector<void *, 1>) ==
@@ -128,17 +128,7 @@ index 4f6fee18b659adcbfd79822832f914170cbb1635..7ef023084d791cf746c346cb1655c9da
  
    // Ensure we can fit the new capacity.
    // This is only going to be applicable when the capacity is 32 bit.
-@@ -107,8 +102,7 @@ static size_t getNewCapacity(size_t MinSize, size_t TSize, size_t OldCapacity) {
-   return std::clamp(NewCapacity, MinSize, MaxSize);
- }
- 
--template <class Size_T>
--void *SmallVectorBase<Size_T>::replaceAllocation(void *NewElts, size_t TSize,
-+void *SmallVectorBase::replaceAllocation(void *NewElts, size_t TSize,
-                                                  size_t NewCapacity,
-                                                  size_t VSize) {
-   void *NewEltsReplace = llvm::safe_malloc(NewCapacity * TSize);
-@@ -119,11 +113,10 @@ void *SmallVectorBase<Size_T>::replaceAllocation(void *NewElts, size_t TSize,
+@@ -127,11 +122,10 @@ static void *replaceAllocation(void *NewElts, size_t TSize, size_t NewCapacity,
  }
  
  // Note: Moving this function into the header may cause performance regression.
@@ -152,7 +142,7 @@ index 4f6fee18b659adcbfd79822832f914170cbb1635..7ef023084d791cf746c346cb1655c9da
    // Even if capacity is not 0 now, if the vector was originally created with
    // capacity 0, it's possible for the malloc to return FirstEl.
    void *NewElts = llvm::safe_malloc(NewCapacity * TSize);
-@@ -133,10 +126,9 @@ void *SmallVectorBase<Size_T>::mallocForGrow(void *FirstEl, size_t MinSize,
+@@ -141,10 +135,9 @@ void *SmallVectorBase<Size_T>::mallocForGrow(void *FirstEl, size_t MinSize,
  }
  
  // Note: Moving this function into the header may cause performance regression.
@@ -165,7 +155,7 @@ index 4f6fee18b659adcbfd79822832f914170cbb1635..7ef023084d791cf746c346cb1655c9da
    void *NewElts;
    if (BeginX == FirstEl) {
      NewElts = llvm::safe_malloc(NewCapacity * TSize);
-@@ -154,20 +146,3 @@ void SmallVectorBase<Size_T>::grow_pod(void *FirstEl, size_t MinSize,
+@@ -162,20 +155,3 @@ void SmallVectorBase<Size_T>::grow_pod(void *FirstEl, size_t MinSize,
  
    this->set_allocation_range(NewElts, NewCapacity);
  }

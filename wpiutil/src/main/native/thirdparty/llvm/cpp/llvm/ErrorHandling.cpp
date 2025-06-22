@@ -13,6 +13,7 @@
 
 #include "wpi/ErrorHandling.h"
 #include "wpi/SmallVector.h"
+#include "wpi/llvm-config.h" // for LLVM_ENABLE_THREADS
 #include "wpi/Errc.h"
 #include "wpi/WindowsError.h"
 #include "wpi/print.h"
@@ -24,7 +25,7 @@
 #ifndef _WIN32
 #include <unistd.h>
 #endif
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 #include <io.h>
 #endif
 

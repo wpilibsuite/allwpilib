@@ -8,7 +8,7 @@ Subject: [PATCH 21/37] Prefer wpi's fs.h
  1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index a6799603a0106262520ba1c9fda14a7967b12a63..39a600c2ed7cd1cfecb46ff17929ffcb389207d7 100644
+index 2c37ff9c0966506c53d15d7cb84abc82335b9913..990d3e4cfe53e025df6ce797f46f9de5af8ca6dc 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -26,18 +26,15 @@

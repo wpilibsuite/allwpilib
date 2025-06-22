@@ -8,10 +8,10 @@ Subject: [PATCH 15/37] Add lerp and sgn
  1 file changed, 21 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index b9084182158757647cc9896320a353a373b0f9ec..4033e032b5979a4f25b4c16f3988fb11087ed6bb 100644
+index 60f8c48031b1809e9de66220103b3a504f32c225..acd16bb0e6cf73f565d44d654c34057d9b97dd95 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -751,6 +751,27 @@ using stack_float_t = volatile float;
+@@ -759,6 +759,27 @@ using stack_float_t = volatile float;
  using stack_float_t = float;
  #endif
  

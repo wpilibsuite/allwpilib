@@ -8,7 +8,7 @@ Subject: [PATCH 03/37] Change unique_function storage size
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 49e0e8ab0db400d0a362746342099578257b2eea..3ce85530b718666afa1dafbf60699c1add423ea6 100644
+index d92868e3715f40e1c2c305a784afc55726e3a812..df7fe3e19462ebecd30f7a9d006027c75751de5b 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
 @@ -79,7 +79,7 @@ using EnableIfCallable = std::enable_if_t<std::disjunction<
@@ -17,10 +17,10 @@ index 49e0e8ab0db400d0a362746342099578257b2eea..3ce85530b718666afa1dafbf60699c1a
  protected:
 -  static constexpr size_t InlineStorageSize = sizeof(void *) * 3;
 +  static constexpr size_t InlineStorageSize = sizeof(void *) * 4;
+   static constexpr size_t InlineStorageAlign = alignof(void *);
  
    template <typename T, class = void>
-   struct IsSizeLessThanThresholdT : std::false_type {};
-@@ -158,7 +158,7 @@ protected:
+@@ -159,7 +159,7 @@ protected:
          "Should always use all of the out-of-line storage for inline storage!");
  
      // For in-line storage, we just provide an aligned character buffer. We
@@ -28,4 +28,4 @@ index 49e0e8ab0db400d0a362746342099578257b2eea..3ce85530b718666afa1dafbf60699c1a
 +    // provide four pointers worth of storage here.
      // This is mutable as an inlined `const unique_function<void() const>` may
      // still modify its own mutable members.
-     alignas(void *) mutable std::byte InlineStorage[InlineStorageSize];
+     alignas(InlineStorageAlign) mutable std::byte

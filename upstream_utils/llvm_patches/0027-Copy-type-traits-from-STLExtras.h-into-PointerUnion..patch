@@ -8,7 +8,7 @@ Subject: [PATCH 27/37] Copy type traits from STLExtras.h into PointerUnion.h
  1 file changed, 46 insertions(+)
 
 diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
-index 8ac68dbc0a791b8ac0e0ca865e69024cb642aa70..273ba02934bd405ea4f1b911ebb58f7080837ff0 100644
+index 23394db93cfed492bb1747eb9c8c55ed9230120d..124b869c6974ac78d908b3c55d89455a471b5185 100644
 --- a/llvm/include/llvm/ADT/PointerUnion.h
 +++ b/llvm/include/llvm/ADT/PointerUnion.h
 @@ -23,9 +23,55 @@

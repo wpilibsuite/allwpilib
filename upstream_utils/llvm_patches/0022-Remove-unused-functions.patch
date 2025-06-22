@@ -11,7 +11,7 @@ Subject: [PATCH 22/37] Remove unused functions
  4 files changed, 23 insertions(+), 126 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 39a600c2ed7cd1cfecb46ff17929ffcb389207d7..9bb9260eecf35b0f71d144256fc956a80b2da8a3 100644
+index 990d3e4cfe53e025df6ce797f46f9de5af8ca6dc..264b8192a0473b94363765995517851cbf30d045 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -71,7 +71,6 @@ private:
@@ -35,10 +35,10 @@ index 39a600c2ed7cd1cfecb46ff17929ffcb389207d7..9bb9260eecf35b0f71d144256fc956a8
    //===--------------------------------------------------------------------===//
    // Subclass Interface
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 9b292a51dbd59ad700da22d008a5bcac1c334b26..51cc3edaa7b128725912e51757cd0b443fe064ae 100644
+index 3f772bdd8a65efc2cabdb2746b58ae9645507a5c..f0dd837c1aac7854126ee33bc69fc8a85df2a920 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -182,22 +182,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
+@@ -183,22 +183,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
  #endif
  }
  
@@ -62,7 +62,7 @@ index 9b292a51dbd59ad700da22d008a5bcac1c334b26..51cc3edaa7b128725912e51757cd0b44
  
  #define WIN32_NO_STATUS
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 6ed93793a64c523102626d581656d2f9509f7d5d..7e9a58db056e315cdcec22af0439017dee737c8f 100644
+index 9c079746a6ab3f70b62dbaa74d14e59405348e6a..3c87f82ec069d4f0f8552ab9ed891248d4368523 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -176,16 +176,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,

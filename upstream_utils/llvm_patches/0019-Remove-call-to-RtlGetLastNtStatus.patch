@@ -8,10 +8,10 @@ Subject: [PATCH 19/37] Remove call to RtlGetLastNtStatus()
  1 file changed, 23 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 5f53ec03a1c1e91659143f12abec145b95627826..c795f13065c820de772b56be7f59aab63f6ee084 100644
+index 888bc2c1beffab4239e977a8422a754d3e91209e..b448a23f304caf0ab7db54cfe7950592971c1f43 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -214,34 +214,11 @@ void LLVMResetFatalErrorHandler() {
+@@ -215,34 +215,11 @@ void LLVMResetFatalErrorHandler() {
  #include <ntstatus.h>
  #include <winerror.h>
  

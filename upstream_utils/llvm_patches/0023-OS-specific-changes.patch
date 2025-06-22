@@ -8,10 +8,10 @@ Subject: [PATCH 23/37] OS-specific changes
  1 file changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 51cc3edaa7b128725912e51757cd0b443fe064ae..fcfb90a614a99e333f56f8380e63ff89dd1d684f 100644
+index f0dd837c1aac7854126ee33bc69fc8a85df2a920..16b256945d90e47c51c795165a78b9b8b085028d 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -96,15 +96,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+@@ -97,15 +97,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
      wpi::print(stderr, "LLVM ERROR: {}\n", Reason);
    }
  
@@ -28,7 +28,7 @@ index 51cc3edaa7b128725912e51757cd0b443fe064ae..fcfb90a614a99e333f56f8380e63ff89
  }
  
  void llvm::install_bad_alloc_error_handler(fatal_error_handler_t handler,
-@@ -142,9 +134,15 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+@@ -143,9 +135,15 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
    // an OOM to stderr and abort.
    const char *OOMMessage = "LLVM ERROR: out of memory\n";
    const char *Newline = "\n";

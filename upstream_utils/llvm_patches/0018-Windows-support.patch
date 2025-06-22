@@ -10,10 +10,10 @@ Subject: [PATCH 18/37] Windows support
  3 files changed, 124 insertions(+), 17 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-index aabdb2f14668a990329b57f5454a0d7db73e12ce..2ac474092a62d488da1ec7f07a1cd10b0781d938 100644
+index 83d5586ae8a77ec585e7e59df3075ca59cfb9d0c..395965bc6fc969ed9a2d92743a0010ddf3923394 100644
 --- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
 +++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-@@ -35,8 +35,6 @@
+@@ -33,8 +33,6 @@
  
  #include "llvm/ADT/SmallVector.h"
  #include "llvm/ADT/StringExtras.h"
@@ -22,7 +22,7 @@ index aabdb2f14668a990329b57f5454a0d7db73e12ce..2ac474092a62d488da1ec7f07a1cd10b
  #include "llvm/Support/Chrono.h"
  #include "llvm/Support/Compiler.h"
  #include "llvm/Support/ErrorHandling.h"
-@@ -44,18 +42,46 @@
+@@ -42,18 +40,46 @@
  #include <cassert>
  #include <string>
  #include <system_error>
@@ -70,7 +70,7 @@ index aabdb2f14668a990329b57f5454a0d7db73e12ce..2ac474092a62d488da1ec7f07a1cd10b
  
  /// Determines if the program is running on Windows 11 or Windows Server 2022.
  bool RunningWindows11OrGreater();
-@@ -231,19 +257,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
+@@ -229,19 +255,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
    return Time;
  }
  
@@ -204,7 +204,7 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..57eb64a6017a6964ab14b40b8c6b3563
  
  ConvertUTF_RESTORE_WARNINGS
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index e173687cafdd04894c27ccd5efb109a7411f1398..6ed93793a64c523102626d581656d2f9509f7d5d 100644
+index df2ded3b04180344d0f4fdf98f84a79f92f01d43..9c079746a6ab3f70b62dbaa74d14e59405348e6a 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -532,7 +532,6 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {

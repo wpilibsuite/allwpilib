@@ -7,14 +7,14 @@ Subject: [PATCH 06/37] Explicitly use std::
  llvm/include/llvm/ADT/SmallSet.h       |  2 +-
  llvm/lib/Support/ErrorHandling.cpp     |  2 +-
  llvm/unittests/ADT/SmallPtrSetTest.cpp |  2 +-
- llvm/unittests/ADT/SmallSetTest.cpp    | 10 +++++-----
- 4 files changed, 8 insertions(+), 8 deletions(-)
+ llvm/unittests/ADT/SmallSetTest.cpp    | 11 +++++------
+ 4 files changed, 8 insertions(+), 9 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallSet.h b/llvm/include/llvm/ADT/SmallSet.h
-index aeee5f97799aea7e7588d7afba1e47b4fa3d8c7b..4969dfb0d61c2fad805c9cb7bc0184ea6d47bf23 100644
+index ed3c6bfd3418d70a92eb602d0eb3e5d88da2a095..c62a3a55d9bda188670e7d6042867943dcd44c68 100644
 --- a/llvm/include/llvm/ADT/SmallSet.h
 +++ b/llvm/include/llvm/ADT/SmallSet.h
-@@ -269,7 +269,7 @@ bool operator==(const SmallSet<T, LN, C> &LHS, const SmallSet<T, RN, C> &RHS) {
+@@ -280,7 +280,7 @@ bool operator==(const SmallSet<T, LN, C> &LHS, const SmallSet<T, RN, C> &RHS) {
      return false;
  
    // All elements in LHS must also be in RHS
@@ -24,10 +24,10 @@ index aeee5f97799aea7e7588d7afba1e47b4fa3d8c7b..4969dfb0d61c2fad805c9cb7bc0184ea
  
  /// Inequality comparison for SmallSet.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 89829dc4faff0b2667ded462444e0eaeec53fd01..ea8d60426ead7163550b73e0fdc32cb11bb089cb 100644
+index 4f405179d79ac29287c5bbdbaeb64c8be8a27434..9a92bf41fffd245d52c4d58fdf9e9f66eb623f79 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -249,7 +249,7 @@ std::error_code llvm::mapLastWindowsError() {
+@@ -250,7 +250,7 @@ std::error_code llvm::mapLastWindowsError() {
  // I'd rather not double the line count of the following.
  #define MAP_ERR_TO_COND(x, y)                                                  \
    case x:                                                                      \
@@ -37,10 +37,10 @@ index 89829dc4faff0b2667ded462444e0eaeec53fd01..ea8d60426ead7163550b73e0fdc32cb1
  std::error_code llvm::mapWindowsError(unsigned EV) {
    switch (EV) {
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index a39b11b9f82156a78b9ad7ce7b8c28855829e611..a6c2b329f072639706aa221feb8c08e33533f813 100644
+index 88be2b68915573a3b3a343ff53a84d86604d7bfd..65c0c564e91a40a98432d985c6949d3d4aa0717d 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-@@ -259,7 +259,7 @@ TEST(SmallPtrSetTest, dereferenceAndIterate) {
+@@ -261,7 +261,7 @@ TEST(SmallPtrSetTest, dereferenceAndIterate) {
  
    // Sort.  We should hit the first element just once and the final element N
    // times.
@@ -50,20 +50,21 @@ index a39b11b9f82156a78b9ad7ce7b8c28855829e611..a6c2b329f072639706aa221feb8c08e3
      EXPECT_EQ(F - Found + 1, *F);
  }
 diff --git a/llvm/unittests/ADT/SmallSetTest.cpp b/llvm/unittests/ADT/SmallSetTest.cpp
-index b50b368ae663614f050c220432c05b32c201db00..f9d84fa8a42a7feaaffa3aa080e84574dc3671b3 100644
+index 2feb0b1feb421bf734e6433ccce3d94dd2b0aeca..973460e729f6247bbca819ac63f8ad0a7bf75c46 100644
 --- a/llvm/unittests/ADT/SmallSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallSetTest.cpp
-@@ -11,8 +11,8 @@
+@@ -11,9 +11,8 @@
  //===----------------------------------------------------------------------===//
  
  #include "llvm/ADT/SmallSet.h"
 -#include "llvm/ADT/STLExtras.h"
+-#include "gmock/gmock.h"
  #include "gtest/gtest.h"
 +#include <algorithm>
  #include <string>
  
  using namespace llvm;
-@@ -94,7 +94,7 @@ TEST(SmallSetTest, IteratorInt) {
+@@ -180,7 +179,7 @@ TEST(SmallSetTest, IteratorInt) {
  
    std::vector<int> V(s1.begin(), s1.end());
    // Make sure the elements are in the expected order.
@@ -72,7 +73,7 @@ index b50b368ae663614f050c220432c05b32c201db00..f9d84fa8a42a7feaaffa3aa080e84574
    for (int i = 0; i < 3; i++)
      EXPECT_EQ(i, V[i]);
  
-@@ -105,7 +105,7 @@ TEST(SmallSetTest, IteratorInt) {
+@@ -191,7 +190,7 @@ TEST(SmallSetTest, IteratorInt) {
  
    V.assign(s1.begin(), s1.end());
    // Make sure the elements are in the expected order.
@@ -81,7 +82,7 @@ index b50b368ae663614f050c220432c05b32c201db00..f9d84fa8a42a7feaaffa3aa080e84574
    for (int i = 0; i < 6; i++)
      EXPECT_EQ(i, V[i]);
  }
-@@ -120,7 +120,7 @@ TEST(SmallSetTest, IteratorString) {
+@@ -206,7 +205,7 @@ TEST(SmallSetTest, IteratorString) {
    s1.insert("str 1");
  
    std::vector<std::string> V(s1.begin(), s1.end());
@@ -90,7 +91,7 @@ index b50b368ae663614f050c220432c05b32c201db00..f9d84fa8a42a7feaaffa3aa080e84574
    EXPECT_EQ(2u, s1.size());
    EXPECT_EQ("str 1", V[0]);
    EXPECT_EQ("str 2", V[1]);
-@@ -131,7 +131,7 @@ TEST(SmallSetTest, IteratorString) {
+@@ -217,7 +216,7 @@ TEST(SmallSetTest, IteratorString) {
  
    V.assign(s1.begin(), s1.end());
    // Make sure the elements are in the expected order.

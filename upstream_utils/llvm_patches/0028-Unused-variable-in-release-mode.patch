@@ -8,13 +8,13 @@ Subject: [PATCH 28/37] Unused variable in release mode
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index c4764fffa845a7f9eb69f262aa0ee728d08b1655..e77fa3bade8133ae73fd271a582d8500269bfe7e 100644
+index 4c852d2b142b4a3de76a1ce4049822cc449287f7..69ce7982d732887642c7f46163b753ee17be9b30 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -124,7 +124,7 @@ public:
-       for (BucketT *P = getBuckets(), *E = getBucketsEnd(); P != E; ++P)
+@@ -126,7 +126,7 @@ public:
          P->getFirst() = EmptyKey;
      } else {
+       const KeyT TombstoneKey = getTombstoneKey();
 -      unsigned NumEntries = getNumEntries();
 +      [[maybe_unused]] unsigned NumEntries = getNumEntries();
        for (BucketT *P = getBuckets(), *E = getBucketsEnd(); P != E; ++P) {

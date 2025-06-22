@@ -8,7 +8,7 @@ Subject: [PATCH 32/37] raw_ostream: Replace errnoAsErrorCode()
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index b417bebdef3a2f2e12e46e65ad7885d243b477a7..0330f8da01341a9b78a2e5e73e74d696285fbb51 100644
+index c80f95911259a8f4332ae20582a89fc8bd5b013a..f063d6831a368fa8fd05ca78ca0c9d91260c34b3 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -531,7 +531,7 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
