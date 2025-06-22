@@ -1,6 +1,6 @@
 {
-  "game": "Bounce Path",
-  "field-image": "2021-bounce.png",
+  "game": "2021 FRC Barrel Racing Path",
+  "field-image": "2021-frc-barrelracingpath.png",
   "field-corners": {
     "top-left": [
       20,
@@ -15,5 +15,5 @@
     30,
     15
   ],
-  "field-unit": "feet"
+  "field-unit": "foot"
 }
