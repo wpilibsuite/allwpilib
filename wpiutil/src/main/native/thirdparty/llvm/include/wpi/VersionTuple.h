@@ -20,7 +20,6 @@
 #include <tuple>
 
 namespace wpi {
-template <typename HasherT, wpi::endianness Endianness> class HashBuilder;
 class raw_ostream;
 
 /// Represents a version number in the form major[.minor[.subminor[.build]]].

@@ -126,7 +126,7 @@ public:
     size_type NewSize = NumEntries + (NumEntries / 3);
     NewSize = 1 << (Log2_32_Ceil(NewSize) + 1);
     // Like insert_imp_big, always allocate at least 128 elements.
-    NewSize = std::max(128u, NewSize);
+    NewSize = (std::max)(128u, NewSize);
     Grow(NewSize);
   }
 

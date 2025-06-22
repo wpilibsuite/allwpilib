@@ -1,14 +1,15 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:12:41 -0400
-Subject: [PATCH 02/37] Wrap std::min/max calls in parens, for Windows warnings
+Subject: [PATCH 02/36] Wrap std::min/max calls in parens, for Windows warnings
 
 ---
  llvm/include/llvm/ADT/DenseMap.h       |  4 ++--
+ llvm/include/llvm/ADT/SmallPtrSet.h    |  2 +-
  llvm/include/llvm/ADT/SmallVector.h    |  6 +++---
  llvm/include/llvm/Support/ConvertUTF.h |  2 +-
  llvm/include/llvm/Support/MathExtras.h | 20 ++++++++++----------
- 4 files changed, 16 insertions(+), 16 deletions(-)
+ 5 files changed, 17 insertions(+), 17 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
 index f0f992f8eac389e36156e369ea24e0387bdf0057..4c852d2b142b4a3de76a1ce4049822cc449287f7 100644
@@ -32,6 +33,19 @@ index f0f992f8eac389e36156e369ea24e0387bdf0057..4c852d2b142b4a3de76a1ce4049822cc
      if (NewNumBuckets == NumBuckets) {
        this->BaseT::initEmpty();
        return;
+diff --git a/llvm/include/llvm/ADT/SmallPtrSet.h b/llvm/include/llvm/ADT/SmallPtrSet.h
+index cf6abc9129b40eed6749213eb23439ec91621005..9115fc74363a9cccd0579427d88fa9edf5baae1b 100644
+--- a/llvm/include/llvm/ADT/SmallPtrSet.h
++++ b/llvm/include/llvm/ADT/SmallPtrSet.h
+@@ -126,7 +126,7 @@ public:
+     size_type NewSize = NumEntries + (NumEntries / 3);
+     NewSize = 1 << (Log2_32_Ceil(NewSize) + 1);
+     // Like insert_imp_big, always allocate at least 128 elements.
+-    NewSize = std::max(128u, NewSize);
++    NewSize = (std::max)(128u, NewSize);
+     Grow(NewSize);
+   }
+ 
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
 index be06bb817e24e723265f9a8038d94123de1fc53c..2232b741d5359a129adb0e5b3f0f70110c38e90d 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h

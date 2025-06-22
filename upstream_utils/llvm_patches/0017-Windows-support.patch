@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
-Subject: [PATCH 18/37] Windows support
+Subject: [PATCH 17/36] Windows support
 
 ---
  .../llvm/Support/Windows/WindowsSupport.h     | 45 +++++----
@@ -204,10 +204,10 @@ index bc04c5ab5113563fb82d7b3b168985369b611f4b..57eb64a6017a6964ab14b40b8c6b3563
  
  ConvertUTF_RESTORE_WARNINGS
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index df2ded3b04180344d0f4fdf98f84a79f92f01d43..9c079746a6ab3f70b62dbaa74d14e59405348e6a 100644
+index 87c890f7659ae9d59ae70557df464aaff4d2d77a..193ef061867c659e732bb1507b4ff0808f3b5f5c 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -532,7 +532,6 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+@@ -524,7 +524,6 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
        DWORD WinLastError = GetLastError();
        if (WinLastError == ERROR_BROKEN_PIPE ||
            (WinLastError == ERROR_NO_DATA && errno == EINVAL)) {

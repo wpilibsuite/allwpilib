@@ -330,6 +330,12 @@ TEST(UniqueFunctionTest, InlineStorageWorks) {
   UniqueFunctionWithInlineStorage(&UniqueFunctionWithInlineStorage);
 }
 
+
+// GCC warns that val in CountCopyAndMove is uninitialized
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#endif
 // Check that the moved-from captured state is properly destroyed during
 // move construction/assignment.
 TEST(UniqueFunctionTest, MovedFromStateIsDestroyedCorrectly) {

@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:37:34 -0400
-Subject: [PATCH 06/37] Explicitly use std::
+Subject: [PATCH 06/36] Explicitly use std::
 
 ---
  llvm/include/llvm/ADT/SmallSet.h       |  2 +-
  llvm/lib/Support/ErrorHandling.cpp     |  2 +-
  llvm/unittests/ADT/SmallPtrSetTest.cpp |  2 +-
- llvm/unittests/ADT/SmallSetTest.cpp    | 11 +++++------
- 4 files changed, 8 insertions(+), 9 deletions(-)
+ llvm/unittests/ADT/SmallSetTest.cpp    | 10 +++++-----
+ 4 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallSet.h b/llvm/include/llvm/ADT/SmallSet.h
 index ed3c6bfd3418d70a92eb602d0eb3e5d88da2a095..c62a3a55d9bda188670e7d6042867943dcd44c68 100644
@@ -24,10 +24,10 @@ index ed3c6bfd3418d70a92eb602d0eb3e5d88da2a095..c62a3a55d9bda188670e7d6042867943
  
  /// Inequality comparison for SmallSet.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 4f405179d79ac29287c5bbdbaeb64c8be8a27434..9a92bf41fffd245d52c4d58fdf9e9f66eb623f79 100644
+index 4e1dca80a21881bfb8fa886a5921c780ca021bf2..4de36d969b3776b72ff85888355b64f7f3262ccc 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -250,7 +250,7 @@ std::error_code llvm::mapLastWindowsError() {
+@@ -249,7 +249,7 @@ std::error_code llvm::mapLastWindowsError() {
  // I'd rather not double the line count of the following.
  #define MAP_ERR_TO_COND(x, y)                                                  \
    case x:                                                                      \
@@ -50,21 +50,21 @@ index 88be2b68915573a3b3a343ff53a84d86604d7bfd..65c0c564e91a40a98432d985c6949d3d
      EXPECT_EQ(F - Found + 1, *F);
  }
 diff --git a/llvm/unittests/ADT/SmallSetTest.cpp b/llvm/unittests/ADT/SmallSetTest.cpp
-index 2feb0b1feb421bf734e6433ccce3d94dd2b0aeca..973460e729f6247bbca819ac63f8ad0a7bf75c46 100644
+index 2feb0b1feb421bf734e6433ccce3d94dd2b0aeca..65d5998c63d9d7dd69c5a7054bcd82c4ce5d725f 100644
 --- a/llvm/unittests/ADT/SmallSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallSetTest.cpp
-@@ -11,9 +11,8 @@
+@@ -11,9 +11,9 @@
  //===----------------------------------------------------------------------===//
  
  #include "llvm/ADT/SmallSet.h"
 -#include "llvm/ADT/STLExtras.h"
--#include "gmock/gmock.h"
+ #include "gmock/gmock.h"
  #include "gtest/gtest.h"
 +#include <algorithm>
  #include <string>
  
  using namespace llvm;
-@@ -180,7 +179,7 @@ TEST(SmallSetTest, IteratorInt) {
+@@ -180,7 +180,7 @@ TEST(SmallSetTest, IteratorInt) {
  
    std::vector<int> V(s1.begin(), s1.end());
    // Make sure the elements are in the expected order.
@@ -73,7 +73,7 @@ index 2feb0b1feb421bf734e6433ccce3d94dd2b0aeca..973460e729f6247bbca819ac63f8ad0a
    for (int i = 0; i < 3; i++)
      EXPECT_EQ(i, V[i]);
  
-@@ -191,7 +190,7 @@ TEST(SmallSetTest, IteratorInt) {
+@@ -191,7 +191,7 @@ TEST(SmallSetTest, IteratorInt) {
  
    V.assign(s1.begin(), s1.end());
    // Make sure the elements are in the expected order.
@@ -82,7 +82,7 @@ index 2feb0b1feb421bf734e6433ccce3d94dd2b0aeca..973460e729f6247bbca819ac63f8ad0a
    for (int i = 0; i < 6; i++)
      EXPECT_EQ(i, V[i]);
  }
-@@ -206,7 +205,7 @@ TEST(SmallSetTest, IteratorString) {
+@@ -206,7 +206,7 @@ TEST(SmallSetTest, IteratorString) {
    s1.insert("str 1");
  
    std::vector<std::string> V(s1.begin(), s1.end());
@@ -91,7 +91,7 @@ index 2feb0b1feb421bf734e6433ccce3d94dd2b0aeca..973460e729f6247bbca819ac63f8ad0a
    EXPECT_EQ(2u, s1.size());
    EXPECT_EQ("str 1", V[0]);
    EXPECT_EQ("str 2", V[1]);
-@@ -217,7 +216,7 @@ TEST(SmallSetTest, IteratorString) {
+@@ -217,7 +217,7 @@ TEST(SmallSetTest, IteratorString) {
  
    V.assign(s1.begin(), s1.end());
    // Make sure the elements are in the expected order.

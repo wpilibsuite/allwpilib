@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:46:20 -0400
-Subject: [PATCH 20/37] Prefer fmtlib
+Subject: [PATCH 19/36] Prefer fmtlib
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 20 ++++++--------------
  1 file changed, 6 insertions(+), 14 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index b448a23f304caf0ab7db54cfe7950592971c1f43..3f772bdd8a65efc2cabdb2746b58ae9645507a5c 100644
+index d0fd67bd3c0d4cf33922cdda042531424d277951..b66f4a0d71f4897821084dc05a278d7c5194a847 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -23,7 +23,7 @@
+@@ -22,7 +22,7 @@
  #include "llvm/Support/Signals.h"
  #include "llvm/Support/Threading.h"
  #include "llvm/Support/WindowsError.h"
@@ -20,7 +20,7 @@ index b448a23f304caf0ab7db54cfe7950592971c1f43..3f772bdd8a65efc2cabdb2746b58ae96
  #include <cassert>
  #include <cstdlib>
  #include <mutex>
-@@ -94,15 +94,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
+@@ -93,15 +93,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
    if (handler) {
      handler(handlerData, std::string{Reason}.c_str(), GenCrashDiag);
    } else {
@@ -37,7 +37,7 @@ index b448a23f304caf0ab7db54cfe7950592971c1f43..3f772bdd8a65efc2cabdb2746b58ae96
    }
  
    // If we reached here, we are failing ungracefully. Run the interrupt handlers
-@@ -178,11 +170,11 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
+@@ -177,11 +169,11 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
    // llvm_unreachable is intended to be used to indicate "impossible"
    // situations, and not legitimate runtime errors.
    if (msg)

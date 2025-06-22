@@ -1,18 +1,19 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:34:07 -0400
-Subject: [PATCH 08/37] Add compiler warning pragmas
+Subject: [PATCH 08/36] Add compiler warning pragmas
 
 ---
- llvm/include/llvm/ADT/FunctionExtras.h | 11 +++++++++++
- llvm/include/llvm/ADT/SmallVector.h    |  8 ++++++++
- llvm/include/llvm/Support/MathExtras.h |  9 +++++++++
- llvm/include/llvm/Support/MemAlloc.h   | 13 +++++++++++++
- llvm/lib/Support/raw_ostream.cpp       |  4 ++++
- llvm/unittests/ADT/DenseMapTest.cpp    |  4 ++++
- llvm/unittests/ADT/SmallVectorTest.cpp |  4 ++++
- llvm/unittests/Support/AlignOfTest.cpp |  7 +++----
- 8 files changed, 56 insertions(+), 4 deletions(-)
+ llvm/include/llvm/ADT/FunctionExtras.h    | 11 +++++++++++
+ llvm/include/llvm/ADT/SmallVector.h       |  8 ++++++++
+ llvm/include/llvm/Support/MathExtras.h    |  9 +++++++++
+ llvm/include/llvm/Support/MemAlloc.h      | 13 +++++++++++++
+ llvm/lib/Support/raw_ostream.cpp          |  4 ++++
+ llvm/unittests/ADT/DenseMapTest.cpp       |  4 ++++
+ llvm/unittests/ADT/FunctionExtrasTest.cpp |  6 ++++++
+ llvm/unittests/ADT/SmallVectorTest.cpp    |  4 ++++
+ llvm/unittests/Support/AlignOfTest.cpp    |  7 +++----
+ 9 files changed, 62 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
 index df7fe3e19462ebecd30f7a9d006027c75751de5b..28a9ba756a4075987fbee28c6ed6387e99dfd14b 100644
@@ -148,6 +149,23 @@ index e93e18423507655ce8275a0718d8e5d01915985f..b930a21f8b43b64835436fcd27f4802a
  #include "llvm/ADT/DenseMap.h"
  #include "CountCopyAndMove.h"
  #include "llvm/ADT/DenseMapInfo.h"
+diff --git a/llvm/unittests/ADT/FunctionExtrasTest.cpp b/llvm/unittests/ADT/FunctionExtrasTest.cpp
+index 777c5784949fd3c07bbbcef8dc3fc8e5764896a9..3777eedff54639f0380218eaad767f27f1958a67 100644
+--- a/llvm/unittests/ADT/FunctionExtrasTest.cpp
++++ b/llvm/unittests/ADT/FunctionExtrasTest.cpp
+@@ -330,6 +330,12 @@ TEST(UniqueFunctionTest, InlineStorageWorks) {
+   UniqueFunctionWithInlineStorage(&UniqueFunctionWithInlineStorage);
+ }
+ 
++
++// GCC warns that val in CountCopyAndMove is uninitialized
++#if defined(__GNUC__) && !defined(__clang__)
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wuninitialized"
++#endif
+ // Check that the moved-from captured state is properly destroyed during
+ // move construction/assignment.
+ TEST(UniqueFunctionTest, MovedFromStateIsDestroyedCorrectly) {
 diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
 index 7029038d18d433cef987bedbfa4fda269b24fb8f..f8c37820ef9fdfe0af067f5aa8d2297ed15e73bc 100644
 --- a/llvm/unittests/ADT/SmallVectorTest.cpp

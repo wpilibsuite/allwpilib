@@ -70,14 +70,6 @@ constexpr raw_ostream::Colors raw_ostream::WHITE;
 constexpr raw_ostream::Colors raw_ostream::SAVEDCOLOR;
 constexpr raw_ostream::Colors raw_ostream::RESET;
 
-namespace {
-// Find the length of an array.
-template <class T, std::size_t N>
-constexpr inline size_t array_lengthof(T (&)[N]) {
-  return N;
-}
-}  // namespace
-
 raw_ostream::~raw_ostream() {
   // raw_ostream's subclasses should take care to flush the buffer
   // in their destructors.

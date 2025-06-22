@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:09:18 -0400
-Subject: [PATCH 01/37] Remove StringRef, ArrayRef, and Optional
+Subject: [PATCH 01/36] Remove StringRef, ArrayRef, and Optional
 
 ---
  llvm/include/llvm/ADT/PointerUnion.h          |   1 -

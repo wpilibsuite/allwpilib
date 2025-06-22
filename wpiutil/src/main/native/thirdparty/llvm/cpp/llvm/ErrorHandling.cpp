@@ -13,7 +13,6 @@
 
 #include "wpi/ErrorHandling.h"
 #include "wpi/SmallVector.h"
-#include "wpi/llvm-config.h" // for LLVM_ENABLE_THREADS
 #include "wpi/Errc.h"
 #include "wpi/WindowsError.h"
 #include "wpi/print.h"

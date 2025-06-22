@@ -1,15 +1,28 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:16:51 -0400
-Subject: [PATCH 22/37] Remove unused functions
+Subject: [PATCH 21/36] Remove unused functions
 
 ---
- llvm/include/llvm/Support/raw_ostream.h |  5 +-
- llvm/lib/Support/ErrorHandling.cpp      | 16 -----
- llvm/lib/Support/raw_ostream.cpp        | 47 +++++++-------
- llvm/unittests/ADT/SmallStringTest.cpp  | 81 -------------------------
- 4 files changed, 23 insertions(+), 126 deletions(-)
+ llvm/include/llvm/Support/VersionTuple.h |  1 -
+ llvm/include/llvm/Support/raw_ostream.h  |  5 +-
+ llvm/lib/Support/ErrorHandling.cpp       | 16 -----
+ llvm/lib/Support/raw_ostream.cpp         | 47 ++++++--------
+ llvm/unittests/ADT/SmallStringTest.cpp   | 81 ------------------------
+ 5 files changed, 23 insertions(+), 127 deletions(-)
 
+diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
+index 9102ff063afedc03bd524b2805cba98ea5afeba8..7638d1ab0d12e22608d4c3e3a14ec8e0ce15d2d5 100644
+--- a/llvm/include/llvm/Support/VersionTuple.h
++++ b/llvm/include/llvm/Support/VersionTuple.h
+@@ -21,7 +21,6 @@
+ #include <tuple>
+ 
+ namespace llvm {
+-template <typename HasherT, llvm::endianness Endianness> class HashBuilder;
+ class raw_ostream;
+ 
+ /// Represents a version number in the form major[.minor[.subminor[.build]]].
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
 index 990d3e4cfe53e025df6ce797f46f9de5af8ca6dc..264b8192a0473b94363765995517851cbf30d045 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
@@ -35,10 +48,10 @@ index 990d3e4cfe53e025df6ce797f46f9de5af8ca6dc..264b8192a0473b94363765995517851c
    //===--------------------------------------------------------------------===//
    // Subclass Interface
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 3f772bdd8a65efc2cabdb2746b58ae9645507a5c..f0dd837c1aac7854126ee33bc69fc8a85df2a920 100644
+index b66f4a0d71f4897821084dc05a278d7c5194a847..6c2b1c433285d2ec5d124f96919ff27f3328d74c 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -183,22 +183,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
+@@ -182,22 +182,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
  #endif
  }
  
@@ -62,10 +75,10 @@ index 3f772bdd8a65efc2cabdb2746b58ae9645507a5c..f0dd837c1aac7854126ee33bc69fc8a8
  
  #define WIN32_NO_STATUS
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 9c079746a6ab3f70b62dbaa74d14e59405348e6a..3c87f82ec069d4f0f8552ab9ed891248d4368523 100644
+index 193ef061867c659e732bb1507b4ff0808f3b5f5c..3bfebbb41f324d9525290d9105c11fe01502dd87 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -176,16 +176,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
+@@ -168,16 +168,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
    return *this;
  }
  
@@ -82,7 +95,7 @@ index 9c079746a6ab3f70b62dbaa74d14e59405348e6a..3c87f82ec069d4f0f8552ab9ed891248
  void raw_ostream::flush_nonempty() {
    assert(OutBufCur > OutBufStart && "Invalid call to flush_nonempty.");
    size_t Length = OutBufCur - OutBufStart;
-@@ -322,15 +312,22 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+@@ -314,15 +304,22 @@ static int getFD(std::string_view Filename, std::error_code &EC,
    if (Filename == "-") {
      EC = std::error_code();
      // Change stdout's text/binary mode based on the Flags.
@@ -110,7 +123,7 @@ index 9c079746a6ab3f70b62dbaa74d14e59405348e6a..3c87f82ec069d4f0f8552ab9ed891248
    if (EC)
      return -1;
  
-@@ -390,12 +387,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+@@ -382,12 +379,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
  
    // Get the starting position.
    off_t loc = ::lseek(FD, 0, SEEK_CUR);
@@ -124,7 +137,7 @@ index 9c079746a6ab3f70b62dbaa74d14e59405348e6a..3c87f82ec069d4f0f8552ab9ed891248
  #else
    SupportsSeeking = !EC && loc != (off_t)-1;
  #endif
-@@ -408,10 +401,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+@@ -400,10 +393,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
  raw_fd_ostream::~raw_fd_ostream() {
    if (FD >= 0) {
      flush();
@@ -137,7 +150,7 @@ index 9c079746a6ab3f70b62dbaa74d14e59405348e6a..3c87f82ec069d4f0f8552ab9ed891248
    }
  
  #ifdef __MINGW32__
-@@ -509,7 +500,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+@@ -501,7 +492,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
  
    do {
      size_t ChunkSize = std::min(Size, MaxWriteSize);
@@ -149,7 +162,7 @@ index 9c079746a6ab3f70b62dbaa74d14e59405348e6a..3c87f82ec069d4f0f8552ab9ed891248
  
      if (ret < 0) {
        // If it's a recoverable error, swallow it and retry the write.
-@@ -552,8 +547,8 @@ void raw_fd_ostream::close() {
+@@ -544,8 +539,8 @@ void raw_fd_ostream::close() {
    assert(ShouldClose);
    ShouldClose = false;
    flush();
