@@ -57,10 +57,10 @@ class SysIdRoutineTest {
         new SysIdRoutine(
             new SysIdRoutine.Config(null, null, null, m_mechanism::recordState),
             new SysIdRoutine.Mechanism(m_mechanism::drive, m_mechanism::log, new Subsystem() {}));
-    m_quasistaticForward = m_sysidRoutine.quasistatic(SysIdRoutine.Direction.kForward);
-    m_quasistaticReverse = m_sysidRoutine.quasistatic(SysIdRoutine.Direction.kReverse);
-    m_dynamicForward = m_sysidRoutine.dynamic(SysIdRoutine.Direction.kForward);
-    m_dynamicReverse = m_sysidRoutine.dynamic(SysIdRoutine.Direction.kReverse);
+    m_quasistaticForward = m_sysidRoutine.sweep(SysIdRoutine.Direction.kForward);
+    m_quasistaticReverse = m_sysidRoutine.sweep(SysIdRoutine.Direction.kReverse);
+    m_dynamicForward = m_sysidRoutine.step(SysIdRoutine.Direction.kForward);
+    m_dynamicReverse = m_sysidRoutine.step(SysIdRoutine.Direction.kReverse);
   }
 
   @AfterEach
@@ -74,7 +74,7 @@ class SysIdRoutineTest {
 
     var orderCheck = inOrder(m_mechanism);
 
-    orderCheck.verify(m_mechanism).recordState(SysIdRoutineLog.State.kQuasistaticForward);
+    orderCheck.verify(m_mechanism).recordState(SysIdRoutineLog.State.kSweepForward);
     orderCheck.verify(m_mechanism).drive(any());
     orderCheck.verify(m_mechanism).log(any());
     orderCheck.verify(m_mechanism).recordState(SysIdRoutineLog.State.kNone);
@@ -84,7 +84,7 @@ class SysIdRoutineTest {
     orderCheck = inOrder(m_mechanism);
     runCommand(m_dynamicForward);
 
-    orderCheck.verify(m_mechanism).recordState(SysIdRoutineLog.State.kDynamicForward);
+    orderCheck.verify(m_mechanism).recordState(SysIdRoutineLog.State.kStepForward);
     orderCheck.verify(m_mechanism).drive(any());
     orderCheck.verify(m_mechanism).log(any());
     orderCheck.verify(m_mechanism).recordState(SysIdRoutineLog.State.kNone);
@@ -94,16 +94,16 @@ class SysIdRoutineTest {
   @Test
   void testsDeclareCorrectState() {
     runCommand(m_quasistaticForward);
-    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.kQuasistaticForward);
+    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.kSweepForward);
 
     runCommand(m_quasistaticReverse);
-    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.kQuasistaticReverse);
+    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.kSweepReverse);
 
     runCommand(m_dynamicForward);
-    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.kDynamicForward);
+    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.kStepForward);
 
     runCommand(m_dynamicReverse);
-    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.kDynamicReverse);
+    verify(m_mechanism, atLeastOnce()).recordState(SysIdRoutineLog.State.kStepReverse);
   }
 
   @Test
