@@ -88,7 +88,7 @@ class TrapezoidProfile {
             wpi::math::MathUsageId::kTrajectory_TrapezoidProfile, 1);
       }
 
-      if (maxAcceleration < 0 || maxVelocity < 0) {
+      if (maxVelocity < 0_mps || maxAcceleration < 0_mps_sq) {
         throw std::domain_error("Constraints must be non-negative");
       }
     }
