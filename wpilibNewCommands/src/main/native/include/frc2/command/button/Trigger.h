@@ -273,6 +273,16 @@ class Trigger {
   }
 
   /**
+   * Allow converting this trigger to a std::function<bool()> that can be used 
+   * in places where a function is needed, eg, in Command decorators.
+   *
+   * @return A std::function<bool()> representing the condition of this trigger.
+   */
+  operator std::function<bool()>() const {
+    return m_condition;
+  }
+
+  /**
    * Creates a new debounced trigger from this trigger - it will become active
    * when this trigger has been active for longer than the specified period.
    *
