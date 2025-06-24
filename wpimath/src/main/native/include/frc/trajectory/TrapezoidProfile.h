@@ -77,8 +77,8 @@ class TrapezoidProfile {
     /**
      * Constructs constraints for a Trapezoid Profile.
      *
-     * @param maxVelocity Maximum velocity. must be non-negative.
-     * @param maxAcceleration Maximum acceleration. must be non-negative.
+     * @param maxVelocity Maximum velocity, must be non-negative.
+     * @param maxAcceleration Maximum acceleration, must be non-negative.
      */
     constexpr Constraints(Velocity_t maxVelocity,
                           Acceleration_t maxAcceleration)
@@ -89,7 +89,7 @@ class TrapezoidProfile {
       }
 
       if (maxAcceleration < 0 || maxVelocity < 0) {
-        throw std::domain_error("constraints must be non-negative");
+        throw std::domain_error("Constraints must be non-negative");
       }
     }
   };

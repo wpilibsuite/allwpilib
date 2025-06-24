@@ -60,12 +60,12 @@ public class TrapezoidProfile {
     /**
      * Constructs constraints for a TrapezoidProfile.
      *
-     * @param maxVelocity maximum velocity. must be non-negative.
-     * @param maxAcceleration maximum acceleration. must be non-negative.
+     * @param maxVelocity Maximum velocity, must be non-negative.
+     * @param maxAcceleration Maximum acceleration, must be non-negative.
      */
     public Constraints(double maxVelocity, double maxAcceleration) {
       if (maxAcceleration < 0 || maxVelocity < 0) {
-        throw new IllegalArgumentException("constraints must be non-negative");
+        throw new IllegalArgumentException("Constraints must be non-negative");
       }
 
       this.maxVelocity = maxVelocity;
