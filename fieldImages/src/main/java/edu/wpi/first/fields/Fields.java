@@ -4,31 +4,48 @@
 
 package edu.wpi.first.fields;
 
-public enum Fields {
-  // TODO(crueter): Naming could be better
-  k2018FRCPowerUp("2018-frc-powerup.json"),
-  k2019FRCDeepSpace("2019-frc-deepspace.json"),
-  k2020FRCInfiniteRecharge("2020-frc-infiniterecharge.json"),
-  k2021FRCInfiniteRecharge("2021-frc-infiniterecharge.json"),
-  k2021FRCBarrel("2021-frc-barrelracingpath.json"),
-  k2021FRCBounce("2021-frc-bouncepath.json"),
-  k2021FRCGalacticSearchA("2021-frc-galacticsearcha.json"),
-  k2021FRCGalacticSearchB("2021-frc-galacticsearchb.json"),
-  k2021FRCSlalom("2021-frc-slalompath.json"),
-  k2022FRCRapidReact("2022-frc-rapidreact.json"),
-  k2023FRCChargedUp("2023-frc-chargedup.json"),
-  k2024FRCCrescendo("2024-frc-crescendo.json"),
-  k20242025FTCIntoTheDeep("2024-2025-ftc-intothedeep.json"),
-  k2025FRCReefscape("2025-frc-reefscape.json");
-
+public class Fields {
   public static final String kBaseResourceDir = "/edu/wpi/first/fields/";
 
-  /** Alias to the current game. */
-  public static final Fields kDefaultField = k2025FRCReefscape;
+  public enum FRC implements IField {
+    k2018PowerUp("2018-frc-powerup.json"),
+    k2019DeepSpace("2019-frc-deepspace.json"),
+    k2020InfiniteRecharge("2020-frc-infiniterecharge.json"),
+    k2021InfiniteRecharge("2021-frc-infiniterecharge.json"),
+    k2021Barrel("2021-frc-barrelracingpath.json"),
+    k2021Bounce("2021-frc-bouncepath.json"),
+    k2021GalacticSearchA("2021-frc-galacticsearcha.json"),
+    k2021GalacticSearchB("2021-frc-galacticsearchb.json"),
+    k2021Slalom("2021-frc-slalompath.json"),
+    k2022RapidReact("2022-frc-rapidreact.json"),
+    k2023ChargedUp("2023-frc-chargedup.json"),
+    k2024Crescendo("2024-frc-crescendo.json"),
+    k2025Reefscape("2025-frc-reefscape.json");
 
-  public final String m_resourceFile;
+    public final String m_resourceFile;
 
-  Fields(String resourceFile) {
-    m_resourceFile = kBaseResourceDir + resourceFile;
+    @Override
+    public String getResourceFile() {
+      return m_resourceFile;
+    }
+
+    FRC(String resourceFile) {
+      m_resourceFile = kBaseResourceDir + resourceFile;
+    }
+  }
+
+  public enum FTC implements IField {
+    k20242025IntoTheDeep("2024-2025-ftc-intothedeep.json");
+
+    public final String m_resourceFile;
+
+    @Override
+    public String getResourceFile() {
+      return m_resourceFile;
+    }
+
+    FTC(String resourceFile) {
+      m_resourceFile = kBaseResourceDir + resourceFile;
+    }
   }
 }
