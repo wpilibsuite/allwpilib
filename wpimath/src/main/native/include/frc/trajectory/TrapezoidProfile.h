@@ -77,8 +77,8 @@ class TrapezoidProfile {
     /**
      * Constructs constraints for a Trapezoid Profile.
      *
-     * @param maxVelocity Maximum velocity.
-     * @param maxAcceleration Maximum acceleration.
+     * @param maxVelocity Maximum velocity. must be non-negative.
+     * @param maxAcceleration Maximum acceleration. must be non-negative.
      */
     constexpr Constraints(Velocity_t maxVelocity,
                           Acceleration_t maxAcceleration)
@@ -86,6 +86,10 @@ class TrapezoidProfile {
       if (!std::is_constant_evaluated()) {
         wpi::math::MathSharedStore::ReportUsage(
             wpi::math::MathUsageId::kTrajectory_TrapezoidProfile, 1);
+      }
+
+      if (maxAcceleration < 0 || maxVelocity < 0) {
+        throw std::domain_error("constraints must be non-negative");
       }
     }
   };
@@ -131,7 +135,7 @@ class TrapezoidProfile {
     m_direction = ShouldFlipAcceleration(current, goal) ? -1 : 1;
     m_current = Direct(current);
     goal = Direct(goal);
-    if (units::math::abs(m_current.velocity) > units::math::abs(m_constraints.maxVelocity)) {
+    if (units::math::abs(m_current.velocity) > m_constraints.maxVelocity) {
       m_current.velocity =
           units::math::copysign(m_constraints.maxVelocity, m_current.velocity);
     }

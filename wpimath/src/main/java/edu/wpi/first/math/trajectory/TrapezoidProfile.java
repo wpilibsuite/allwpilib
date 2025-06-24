@@ -60,10 +60,14 @@ public class TrapezoidProfile {
     /**
      * Constructs constraints for a TrapezoidProfile.
      *
-     * @param maxVelocity maximum velocity
-     * @param maxAcceleration maximum acceleration
+     * @param maxVelocity maximum velocity. must be non-negative.
+     * @param maxAcceleration maximum acceleration. must be non-negative.
      */
     public Constraints(double maxVelocity, double maxAcceleration) {
+      if (maxAcceleration < 0 || maxVelocity < 0) {
+        throw new IllegalArgumentException("constraints must be non-negative");
+      }
+
       this.maxVelocity = maxVelocity;
       this.maxAcceleration = maxAcceleration;
       MathSharedStore.reportUsage(MathUsageId.kTrajectory_TrapezoidProfile, 1);
@@ -128,7 +132,7 @@ public class TrapezoidProfile {
     m_current = direct(current);
     goal = direct(goal);
 
-    if (Math.abs(m_current.velocity) > Math.abs(m_constraints.maxVelocity)) {
+    if (Math.abs(m_current.velocity) > m_constraints.maxVelocity) {
       m_current.velocity = Math.copySign(m_constraints.maxVelocity, m_current.velocity);
     }
 
