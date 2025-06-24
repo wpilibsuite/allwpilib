@@ -252,10 +252,10 @@ TEST_F(TriggerTest, UntilTrigger) {
   auto& scheduler = CommandScheduler::GetInstance();
 
   bool triggerActive = false;
-  frc2::Trigger trigger([&triggerActive] { return triggerActive; });
+  Trigger trigger([&triggerActive] { return triggerActive; });
 
   CommandPtr command = cmd::Idle().Until(trigger);
-  
+
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(command));
 

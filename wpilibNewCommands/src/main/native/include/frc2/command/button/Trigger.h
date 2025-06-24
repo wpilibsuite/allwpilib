@@ -273,14 +273,12 @@ class Trigger {
   }
 
   /**
-   * Allow converting this trigger to a std::function<bool()> that can be used 
+   * Allow converting this trigger to a std::function<bool()> that can be used
    * in places where a function is needed, eg, in Command decorators.
    *
    * @return A std::function<bool()> representing the condition of this trigger.
    */
-  operator std::function<bool()>() const {
-    return m_condition;
-  }
+  operator std::function<bool()>() const { return m_condition; }
 
   /**
    * Creates a new debounced trigger from this trigger - it will become active
