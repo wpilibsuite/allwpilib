@@ -123,7 +123,7 @@ double HAL_GetIMUYawLandscape(int64_t* timestamp) {
 }
 
 double HAL_GetIMUYawPortrait(int64_t* timestamp) {
-  auto update = imu->yawFlatSub.GetAtomic();
+  auto update = imu->yawPortraitSub.GetAtomic();
   *timestamp = update.time;
   return update.value * kDegreesToRadians;
 }
