@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:53:50 -0400
-Subject: [PATCH 07/37] Remove format_provider
+Subject: [PATCH 07/36] Remove format_provider
 
 ---
  llvm/include/llvm/Support/Chrono.h      | 114 ------------------------
@@ -142,7 +142,7 @@ index 9c9ba7002310eba5113c14957f769702c61f4326..b269ff8bb5db7bb3c62c3a87daf255b1
  
  #endif // LLVM_SUPPORT_CHRONO_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 18bdf4b7d3b96d42d93ca1e4800233b34be42a78..6c2eedf99d003a29243fbb2a9a280fe12dd49d8a 100644
+index c43c68c9114d8cd564484b190456b0069818dc87..96b7a2463e2336a0f61a03ce11cf643bc253f422 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -27,12 +27,6 @@
@@ -159,7 +159,7 @@ index 18bdf4b7d3b96d42d93ca1e4800233b34be42a78..6c2eedf99d003a29243fbb2a9a280fe1
  
  namespace sys {
 diff --git a/llvm/unittests/Support/Chrono.cpp b/llvm/unittests/Support/Chrono.cpp
-index 7dfc5dd2c29348ea8df9ce87c80f357aaad1a73b..a4d166d435d6d679f773dcf3eab985f0631e12d2 100644
+index 3e3e5517a0aedbd72605adbdde932a5e5e92693b..a4d166d435d6d679f773dcf3eab985f0631e12d2 100644
 --- a/llvm/unittests/Support/Chrono.cpp
 +++ b/llvm/unittests/Support/Chrono.cpp
 @@ -29,43 +29,6 @@ TEST(Chrono, TimeTConversion) {
@@ -185,10 +185,10 @@ index 7dfc5dd2c29348ea8df9ce87c80f357aaad1a73b..a4d166d435d6d679f773dcf3eab985f0
 -  std::string S;
 -  raw_string_ostream OS(S);
 -  OS << T;
--  EXPECT_EQ("2006-01-02 15:04:05.123456789", OS.str());
+-  EXPECT_EQ("2006-01-02 15:04:05.123456789", S);
 -  S.clear();
 -  OS << T2;
--  EXPECT_EQ("2006-01-02 15:04:05.023456789", OS.str());
+-  EXPECT_EQ("2006-01-02 15:04:05.023456789", S);
 -
 -  // formatv default style matches operator<<.
 -  EXPECT_EQ("2006-01-02 15:04:05.123456789", formatv("{0}", T).str());

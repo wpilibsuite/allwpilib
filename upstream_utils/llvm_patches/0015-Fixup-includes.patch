@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:38:11 -0400
-Subject: [PATCH 16/37] Fixup includes
+Subject: [PATCH 15/36] Fixup includes
 
 ---
- llvm/include/llvm/Support/PointerLikeTypeTraits.h |  1 +
- llvm/lib/Support/ConvertUTFWrapper.cpp            |  1 +
- llvm/lib/Support/ErrorHandling.cpp                |  9 ++++-----
- llvm/lib/Support/raw_ostream.cpp                  | 11 ++++++-----
- llvm/unittests/ADT/SmallPtrSetTest.cpp            |  2 ++
- llvm/unittests/ADT/SmallVectorTest.cpp            |  1 +
- llvm/unittests/Support/ConvertUTFTest.cpp         |  2 ++
- 7 files changed, 17 insertions(+), 10 deletions(-)
+ llvm/include/llvm/Support/PointerLikeTypeTraits.h | 1 +
+ llvm/lib/Support/ConvertUTFWrapper.cpp            | 1 +
+ llvm/lib/Support/ErrorHandling.cpp                | 9 ++++-----
+ llvm/lib/Support/raw_ostream.cpp                  | 9 ++++++---
+ llvm/unittests/ADT/SmallPtrSetTest.cpp            | 2 ++
+ llvm/unittests/ADT/SmallVectorTest.cpp            | 1 +
+ llvm/unittests/Support/ConvertUTFTest.cpp         | 2 ++
+ 7 files changed, 17 insertions(+), 8 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/PointerLikeTypeTraits.h b/llvm/include/llvm/Support/PointerLikeTypeTraits.h
 index 1b15f930bd87d97d51824af5e62ea5f222a6b4c9..acadd5e89a1651cfbad67a5b1b0933d1f288d094 100644
@@ -38,7 +38,7 @@ index d53462e742e61d3476915d5b2c5aa63772e78a8a..34054140489e4d536ace4650207c783d
  #include "llvm/Support/SwapByteOrder.h"
  #include <span>
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index ea8d60426ead7163550b73e0fdc32cb11bb089cb..5f53ec03a1c1e91659143f12abec145b95627826 100644
+index 4de36d969b3776b72ff85888355b64f7f3262ccc..e813fd3faa9f76148f9802c4b7308e517df32269 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -28,12 +28,11 @@
@@ -50,7 +50,7 @@ index ea8d60426ead7163550b73e0fdc32cb11bb089cb..5f53ec03a1c1e91659143f12abec145b
 +#ifndef _WIN32
 +#include <unistd.h>
  #endif
- #if defined(_MSC_VER)
+ #if defined(_WIN32)
 -# include <io.h>
 -# include <fcntl.h>
 +#include <io.h>
@@ -67,7 +67,7 @@ index ea8d60426ead7163550b73e0fdc32cb11bb089cb..5f53ec03a1c1e91659143f12abec145b
  #include <ntstatus.h>
  #include <winerror.h>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 7086368a3598ccad9502112f734c9ad81252ebec..e173687cafdd04894c27ccd5efb109a7411f1398 100644
+index a74b6b00d616828a8e5ab25c1fd15f2528b4d76d..87c890f7659ae9d59ae70557df464aaff4d2d77a 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -15,6 +15,8 @@
@@ -79,13 +79,9 @@ index 7086368a3598ccad9502112f734c9ad81252ebec..e173687cafdd04894c27ccd5efb109a7
  #include "llvm/ADT/StringExtras.h"
  #include "llvm/Config/config.h"
  #include "llvm/Support/AutoConvert.h"
-@@ -33,12 +35,11 @@
- #include <sys/stat.h>
- 
+@@ -35,8 +37,9 @@
  // <fcntl.h> may provide O_BINARY.
--#if defined(HAVE_FCNTL_H)
  # include <fcntl.h>
--#endif
  
 -#if defined(HAVE_UNISTD_H)
 -# include <unistd.h>
@@ -95,7 +91,7 @@ index 7086368a3598ccad9502112f734c9ad81252ebec..e173687cafdd04894c27ccd5efb109a7
  #endif
  
  #if defined(__CYGWIN__)
-@@ -61,7 +62,7 @@
+@@ -59,7 +62,7 @@
  #ifdef _WIN32
  #include "llvm/Support/ConvertUTF.h"
  #include "llvm/Support/Signals.h"
@@ -105,18 +101,18 @@ index 7086368a3598ccad9502112f734c9ad81252ebec..e173687cafdd04894c27ccd5efb109a7
  
  using namespace llvm;
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index a6c2b329f072639706aa221feb8c08e33533f813..4c1a144a7a52eb38c7af2d20749901974b29f962 100644
+index 65c0c564e91a40a98432d985c6949d3d4aa0717d..98045c6349237c620ae7d4d1792bf93c9317e145 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-@@ -15,6 +15,8 @@
- #include "llvm/Support/PointerLikeTypeTraits.h"
+@@ -16,6 +16,8 @@
+ #include "gmock/gmock.h"
  #include "gtest/gtest.h"
  
 +#include <algorithm>
 +
  using namespace llvm;
+ using testing::UnorderedElementsAre;
  
- TEST(SmallPtrSetTest, Assignment) {
 diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
 index f8c37820ef9fdfe0af067f5aa8d2297ed15e73bc..5e91f71bc9ac0e499a64dd1591e581d0707417f6 100644
 --- a/llvm/unittests/ADT/SmallVectorTest.cpp

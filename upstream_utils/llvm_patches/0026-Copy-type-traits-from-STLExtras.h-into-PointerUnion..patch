@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 10 Aug 2022 17:07:52 -0700
-Subject: [PATCH 27/37] Copy type traits from STLExtras.h into PointerUnion.h
+Subject: [PATCH 26/36] Copy type traits from STLExtras.h into PointerUnion.h
 
 ---
  llvm/include/llvm/ADT/PointerUnion.h | 46 ++++++++++++++++++++++++++++
  1 file changed, 46 insertions(+)
 
 diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
-index 8ac68dbc0a791b8ac0e0ca865e69024cb642aa70..273ba02934bd405ea4f1b911ebb58f7080837ff0 100644
+index 23394db93cfed492bb1747eb9c8c55ed9230120d..124b869c6974ac78d908b3c55d89455a471b5185 100644
 --- a/llvm/include/llvm/ADT/PointerUnion.h
 +++ b/llvm/include/llvm/ADT/PointerUnion.h
 @@ -23,9 +23,55 @@

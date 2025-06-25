@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 19:30:43 -0400
-Subject: [PATCH 23/37] OS-specific changes
+Subject: [PATCH 22/36] OS-specific changes
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 16 +++++++---------
  1 file changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 51cc3edaa7b128725912e51757cd0b443fe064ae..fcfb90a614a99e333f56f8380e63ff89dd1d684f 100644
+index 6c2b1c433285d2ec5d124f96919ff27f3328d74c..05e7ee1d125bdd6ce9a8f0db97d4feed3832a7ba 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -96,15 +96,7 @@ void llvm::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
