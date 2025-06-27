@@ -1,7 +1,6 @@
 project(benchmark)
 
 include(CompileWarnings)
-include(FetchContent)
 
 file(GLOB benchmarkCpp_src src/main/native/cpp/*.cpp src/main/native/thirdparty/benchmark/src/*.cpp)
 
