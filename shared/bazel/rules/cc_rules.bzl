@@ -380,13 +380,27 @@ def _filter_inputs(
     linker_inputs = []
     for linker_input in dependency_linker_inputs:
         for lib in linker_input.libraries:
-            for o in lib.pic_objects:
-                if o not in used_objects_depset:
-                    linker_inputs.append(o)
+            if lib.pic_objects:
+                for o in lib.pic_objects:
+                    if o not in used_objects_depset:
+                        linker_inputs.append(o)
+            elif lib.objects:
+                for o in lib.objects:
+                    if o not in used_objects_depset:
+                        linker_inputs.append(o)
 
     return sorted(linker_inputs)
 
 def _cc_static_library_impl(ctx):
+    """
+    This is a modified version of built in cc_static_library implementation
+    https://github.com/bazelbuild/bazel/blob/8.2.1/src/main/starlark/builtins_bzl/common/cc/experimental_cc_static_library.bzl
+
+    The built in version amalgamates all of the transative dependency objects into a single shared library. However, we do not want our
+    static libraries to only have the symbols related to the objects for this library, and not anything transative. In order to do this,
+    we add the option to specify transative static_libraries. The rule then filters out the objects that are defines in the other static
+    libraries.
+    """
     deps = ctx.attr.deps
 
     cc_toolchain = find_cpp_toolchain(ctx)
@@ -412,12 +426,7 @@ def _cc_static_library_impl(ctx):
     used_objects_depset = depset(direct = libs, transitive = used_objects, order = "topological")
 
     # Generate the output library name if one isn't provided.
-    output_file = None
-    if ctx.attr.static_lib_name:
-        output_file = ctx.actions.declare_file(ctx.attr.static_lib_name)
-    else:
-        folder, lib = _folder_prefix(ctx.label.name)
-        output_file = ctx.actions.declare_file(folder + "/lib" + lib + ".a")
+    output_file = ctx.actions.declare_file(ctx.attr.static_lib_name)
 
     # And, now do it.
     linker_input = cc_common.create_linker_input(
@@ -453,6 +462,13 @@ def _cc_static_library_impl(ctx):
     args = ctx.actions.args()
     args.add_all(command_line)
     args.add_all(libs)
+
+    if cc_common.is_enabled(
+        feature_configuration = feature_configuration,
+        feature_name = "archive_param_file",
+    ):
+        # TODO: The flag file arg should come from the toolchain instead.
+        args.use_param_file("@%s", use_always = True)
 
     env = cc_common.get_environment_variables(
         feature_configuration = feature_configuration,
@@ -523,6 +539,7 @@ def wpilib_cc_static_library(
         folder, lib = _folder_prefix(name)
         static_lib_name = select({
             "//shared/bazel/rules:compilation_mode_dbg": folder + "/lib" + lib + "d.a",
+            "@bazel_tools//src/conditions:windows": folder + "/" + lib + ".lib",
             "//conditions:default": folder + "/lib" + lib + ".a",
         })
 

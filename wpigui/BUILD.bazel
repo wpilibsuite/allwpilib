@@ -71,7 +71,10 @@ wpilib_cc_static_library(
     static_deps = [
         "//thirdparty/imgui_suite:static/imguiSuite",
     ],
-    static_lib_name = "static/libwpigui.a",
+    static_lib_name = select({
+        "@bazel_tools//src/conditions:windows": "static/wpigui.lib",
+        "//conditions:default": "static/libwpigui.a",
+    }),
     visibility = ["//visibility:public"],
     deps = [
         ":wpigui",
