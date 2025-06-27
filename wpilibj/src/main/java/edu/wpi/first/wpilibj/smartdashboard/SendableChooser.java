@@ -98,7 +98,12 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
    * @return the option selected
    */
   public V getSelected() {
-    return m_map.get(getSelectedName());
+    m_mutex.lock();
+    try {
+      return m_map.get(getSelectedName());
+    } finally {
+      m_mutex.unlock();
+    }
   }
 
   /**

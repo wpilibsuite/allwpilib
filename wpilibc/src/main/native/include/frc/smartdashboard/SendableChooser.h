@@ -99,6 +99,7 @@ class SendableChooser : public SendableChooserBase {
     if (selected.empty()) {
       return CopyType{};
     } else {
+      std::scoped_lock lock(m_mutex);
       auto it = m_choices.find(selected);
       if (it == m_choices.end()) {
         return CopyType{};
