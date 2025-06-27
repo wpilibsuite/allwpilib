@@ -50,17 +50,27 @@ class UnitsTest extends UtilityClassTest<Units> {
   }
 
   @Test
-  void radiansPerSecondToRotationsPerMinute() {
+  void radiansPerSecondToRotationsPerMinuteTest() {
     assertEquals(76.39, Units.radiansPerSecondToRotationsPerMinute(8), 1e-2);
   }
 
   @Test
-  void millisecondsToSeconds() {
+  void milesPerHourToMetersPerSecondTest() {
+    assertEquals(0.44704, Units.milesPerHourToMetersPerSecond(1), 1e-2);
+  }
+
+  @Test
+  void metersPerSecondToMilesPerHourTest() {
+    assertEquals(2.2369, Units.metersPerSecondToMilesPerHour(1), 1e-2);
+  }
+
+  @Test
+  void millisecondsToSecondsTest() {
     assertEquals(0.5, Units.millisecondsToSeconds(500), 1e-2);
   }
 
   @Test
-  void secondsToMilliseconds() {
+  void secondsToMillisecondsTest() {
     assertEquals(1500, Units.secondsToMilliseconds(1.5), 1e-2);
   }
 
