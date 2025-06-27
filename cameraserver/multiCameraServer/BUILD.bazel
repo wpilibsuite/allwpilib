@@ -8,7 +8,7 @@ java_binary(
         "//cameraserver:cameraserver-java",
         "//cscore:cscore-java",
         "//hal:hal-java",
-        "//ntcore:networktables-java",
+        "//ntcore:ntcore-java",
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
         "@maven//:com_google_code_gson_gson",
