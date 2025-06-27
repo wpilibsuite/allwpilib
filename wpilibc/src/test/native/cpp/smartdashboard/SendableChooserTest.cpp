@@ -60,10 +60,29 @@ TEST(SendableChooserTest,
   EXPECT_EQ("", chooser.GetSelectedName());
 }
 
-TEST(SendableChooserTest, ChangeListener) {
+TEST(SendableChooserTest, ChangeListener1Arg) {
   frc::SendableChooser<int> chooser;
   frc::sim::SendableChooserSim chooserSim{
-      "/SmartDashboard/ChangeListenerChooser/"};
+      "/SmartDashboard/1ArgChangeListenerChooser/"};
+
+  for (int i = 1; i <= 3; i++) {
+    chooser.AddOption(std::to_string(i), i);
+  }
+  int currentVal = 0;
+  chooser.OnChange([&](int val) { currentVal = val; });
+
+  frc::SmartDashboard::PutData("1ArgChangeListenerChooser", &chooser);
+  frc::SmartDashboard::UpdateValues();
+  chooserSim.SetSelected("3");
+  frc::SmartDashboard::UpdateValues();
+
+  EXPECT_EQ(3, currentVal);
+}
+
+TEST(SendableChooserTest, ChangeListener2Arg) {
+  frc::SendableChooser<int> chooser;
+  frc::sim::SendableChooserSim chooserSim{
+      "/SmartDashboard/2ArgChangeListenerChooser/"};
 
   for (int i = 1; i <= 3; i++) {
     chooser.AddOption(std::to_string(i), i);
@@ -76,7 +95,7 @@ TEST(SendableChooserTest, ChangeListener) {
     currentVal = val;
   });
 
-  frc::SmartDashboard::PutData("ChangeListenerChooser", &chooser);
+  frc::SmartDashboard::PutData("2ArgChangeListenerChooser", &chooser);
   frc::SmartDashboard::UpdateValues();
   chooserSim.SetSelected("3");
   frc::SmartDashboard::UpdateValues();

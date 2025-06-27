@@ -73,9 +73,29 @@ class SendableChooserTest {
   }
 
   @Test
-  void testChangeListener() {
+  void test1ArgChangeListener() {
     try (var chooser = new SendableChooser<Integer>();
-        var chooserSim = new SendableChooserSim(m_inst, "/SmartDashboard/changeListenerChooser/")) {
+        var chooserSim =
+            new SendableChooserSim(m_inst, "/SmartDashboard/1ArgChangeListenerChooser/")) {
+      for (int i = 1; i <= 3; i++) {
+        chooser.addOption(String.valueOf(i), i);
+      }
+      AtomicInteger currentVal = new AtomicInteger();
+      chooser.onChange(currentVal::set);
+
+      SmartDashboard.putData("1ArgChangeListenerChooser", chooser);
+      SmartDashboard.updateValues();
+      chooserSim.setSelected("3");
+      SmartDashboard.updateValues();
+      assertEquals(3, currentVal.get());
+    }
+  }
+
+  @Test
+  void test2ArgChangeListener() {
+    try (var chooser = new SendableChooser<Integer>();
+        var chooserSim =
+            new SendableChooserSim(m_inst, "/SmartDashboard/2ArgChangeListenerChooser/")) {
       for (int i = 1; i <= 3; i++) {
         chooser.addOption(String.valueOf(i), i);
       }
@@ -88,7 +108,7 @@ class SendableChooserTest {
             currentVal.set(value);
           });
 
-      SmartDashboard.putData("changeListenerChooser", chooser);
+      SmartDashboard.putData("2ArgChangeListenerChooser", chooser);
       SmartDashboard.updateValues();
       chooserSim.setSelected("3");
       SmartDashboard.updateValues();
