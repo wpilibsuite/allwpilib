@@ -46,6 +46,20 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
                 units::radians_per_second_t angularVelocity);
 
   /**
+   * Sets the DC motor's angular position.
+   *
+   * @param angularPosition The new position in radians.
+   */
+  void SetAngle(units::radian_t angularPosition);
+
+  /**
+   * Sets the DC motor's angular velocity.
+   *
+   * @param angularVelocity The new velocity in radians per second.
+   */
+  void SetAngularVelocity(units::radians_per_second_t angularVelocity);
+
+  /**
    * Returns the DC motor position.
    *
    * @return The DC motor position.
@@ -97,17 +111,17 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Returns the gearbox.
    */
-  const DCMotor& Gearbox() const { return m_gearbox; }
+  const DCMotor& GetGearbox() const;
 
   /**
    * Returns the gearing;
    */
-  double Gearing() const { return m_gearing; }
+  double GetGearing() const;
 
   /**
    * Returns the moment of inertia
    */
-  units::kilogram_square_meter_t J() const { return m_j; }
+  units::kilogram_square_meter_t GetJ() const;
 
  private:
   DCMotor m_gearbox;

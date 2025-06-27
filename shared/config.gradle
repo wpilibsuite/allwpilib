@@ -14,7 +14,7 @@ nativeUtils {
     wpi {
         configureDependencies {
             opencvYear = "frc2025"
-            niLibVersion = "2025.0.0"
+            niLibVersion = "2025.2.0"
             opencvVersion = "4.10.0-3"
         }
     }
@@ -31,6 +31,13 @@ nativeUtils.setSinglePrintPerPlatform()
 nativeUtils.enableSourceLink()
 
 nativeUtils.wpi.addMacMinimumVersionArg()
+
+nativeUtils.platformConfigs.each {
+    if (it.name.contains('osx')) {
+        it.linker.getArgs().add('-framework')
+        it.linker.getArgs().add('IOKit')
+    }
+}
 
 // Compress debug info on Linux
 nativeUtils.platformConfigs.each {

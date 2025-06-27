@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Mon, 23 Dec 2024 22:56:29 -0800
+Subject: [PATCH 37/37] Fix minIntN() and maxIntN() assertions
+
+---
+ llvm/include/llvm/Support/MathExtras.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
+index 219f8894849e80ee70a4b4cf40194682740ec865..ce100e643b6a724895774d29c1855c8fb3d90bde 100644
+--- a/llvm/include/llvm/Support/MathExtras.h
++++ b/llvm/include/llvm/Support/MathExtras.h
+@@ -203,7 +203,7 @@ inline uint64_t maxUIntN(uint64_t N) {
+ 
+ /// Gets the minimum value for a N-bit signed integer.
+ inline int64_t minIntN(int64_t N) {
+-  assert(N <= 64 && "integer width out of range");
++  assert(N >= 0 && N <= 64 && "integer width out of range");
+ 
+   if (N == 0)
+     return 0;
+@@ -216,7 +216,7 @@ inline int64_t minIntN(int64_t N) {
+ 
+ /// Gets the maximum value for a N-bit signed integer.
+ inline int64_t maxIntN(int64_t N) {
+-  assert(N <= 64 && "integer width out of range");
++  assert(N >= 0 && N <= 64 && "integer width out of range");
+ 
+   // This relies on two's complement wraparound when N == 64, so we convert to
+   // int64_t only at the very end to avoid UB.

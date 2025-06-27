@@ -57,6 +57,33 @@ TEST(Translation3dTest, RotateBy) {
   EXPECT_NEAR(rotated3.Z().value(), 3.0, kEpsilon);
 }
 
+TEST(Translation3dTest, RotateAround) {
+  Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
+  Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
+  Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
+
+  const Translation3d translation{1_m, 2_m, 3_m};
+  const Translation3d around{3_m, 2_m, 1_m};
+
+  const auto rotated1 =
+      translation.RotateAround(around, Rotation3d{xAxis, 90_deg});
+  EXPECT_NEAR(rotated1.X().value(), 1.0, kEpsilon);
+  EXPECT_NEAR(rotated1.Y().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(rotated1.Z().value(), 1.0, kEpsilon);
+
+  const auto rotated2 =
+      translation.RotateAround(around, Rotation3d{yAxis, 90_deg});
+  EXPECT_NEAR(rotated2.X().value(), 5.0, kEpsilon);
+  EXPECT_NEAR(rotated2.Y().value(), 2.0, kEpsilon);
+  EXPECT_NEAR(rotated2.Z().value(), 3.0, kEpsilon);
+
+  const auto rotated3 =
+      translation.RotateAround(around, Rotation3d{zAxis, 90_deg});
+  EXPECT_NEAR(rotated3.X().value(), 3.0, kEpsilon);
+  EXPECT_NEAR(rotated3.Y().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(rotated3.Z().value(), 3.0, kEpsilon);
+}
+
 TEST(Translation3dTest, ToTranslation2d) {
   Translation3d translation{1_m, 2_m, 3_m};
   Translation2d expected{1_m, 2_m};
@@ -158,4 +185,32 @@ TEST(Translation3dTest, Constexpr) {
   static_assert(divided.Y() == 1_m);
   static_assert(projected.X() == 1_m);
   static_assert(projected.Y() == 2_m);
+}
+
+TEST(Translation3dTest, Nearest) {
+  const Translation3d origin{0_m, 0_m, 0_m};
+
+  // Distance sort
+  // translations are in order of closest to farthest away from the origin at
+  // various positions in 3D space.
+  const Translation3d translation1{1_m, 0_m, 0_m};
+  const Translation3d translation2{0_m, 2_m, 0_m};
+  const Translation3d translation3{0_m, 0_m, 3_m};
+  const Translation3d translation4{2_m, 2_m, 2_m};
+  const Translation3d translation5{3_m, 3_m, 3_m};
+
+  auto nearest1 = origin.Nearest({translation5, translation3, translation4});
+  EXPECT_DOUBLE_EQ(nearest1.X().value(), translation3.X().value());
+  EXPECT_DOUBLE_EQ(nearest1.Y().value(), translation3.Y().value());
+  EXPECT_DOUBLE_EQ(nearest1.Z().value(), translation3.Z().value());
+
+  auto nearest2 = origin.Nearest({translation1, translation2, translation3});
+  EXPECT_DOUBLE_EQ(nearest2.X().value(), translation1.X().value());
+  EXPECT_DOUBLE_EQ(nearest2.Y().value(), translation1.Y().value());
+  EXPECT_DOUBLE_EQ(nearest2.Z().value(), translation1.Z().value());
+
+  auto nearest3 = origin.Nearest({translation4, translation2, translation3});
+  EXPECT_DOUBLE_EQ(nearest3.X().value(), translation2.X().value());
+  EXPECT_DOUBLE_EQ(nearest3.Y().value(), translation2.Y().value());
+  EXPECT_DOUBLE_EQ(nearest3.Z().value(), translation2.Z().value());
 }

@@ -36,13 +36,13 @@ endif()
 
 generate_resources(
     src/main/native/resources/edu/wpi/first/fields
-    generated/main/cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/main/cpp
     FIELDS
     fields
     field_images_resources_src
 )
 
-add_library(fieldImages src/main/native/cpp/fields.cpp ${field_images_resources_src})
+add_library(fieldImages ${field_images_resources_src} src/main/native/cpp/fields.cpp)
 set_target_properties(fieldImages PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET fieldImages PROPERTY FOLDER "libraries")

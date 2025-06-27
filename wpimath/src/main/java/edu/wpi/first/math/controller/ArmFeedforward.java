@@ -4,16 +4,9 @@
 
 package edu.wpi.first.math.controller;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.math.controller.proto.ArmFeedforwardProto;
 import edu.wpi.first.math.controller.struct.ArmFeedforwardStruct;
 import edu.wpi.first.math.jni.ArmFeedforwardJNI;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
@@ -23,16 +16,16 @@ import edu.wpi.first.util.struct.StructSerializable;
  */
 public class ArmFeedforward implements ProtobufSerializable, StructSerializable {
   /** The static gain, in volts. */
-  private final double ks;
+  private double ks;
 
   /** The gravity gain, in volts. */
-  private final double kg;
+  private double kg;
 
   /** The velocity gain, in V/(rad/s). */
-  private final double kv;
+  private double kv;
 
   /** The acceleration gain, in V/(rad/s²). */
-  private final double ka;
+  private double ka;
 
   /** The period, in seconds. */
   private final double m_dt;
@@ -91,6 +84,42 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    */
   public ArmFeedforward(double ks, double kg, double kv) {
     this(ks, kg, kv, 0);
+  }
+
+  /**
+   * Sets the static gain.
+   *
+   * @param ks The static gain in volts.
+   */
+  public void setKs(double ks) {
+    this.ks = ks;
+  }
+
+  /**
+   * Sets the gravity gain.
+   *
+   * @param kg The gravity gain in volts.
+   */
+  public void setKg(double kg) {
+    this.kg = kg;
+  }
+
+  /**
+   * Sets the velocity gain.
+   *
+   * @param kv The velocity gain in V/(rad/s).
+   */
+  public void setKv(double kv) {
+    this.kv = kv;
+  }
+
+  /**
+   * Sets the acceleration gain.
+   *
+   * @param ka The acceleration gain in V/(rad/s²).
+   */
+  public void setKa(double ka) {
+    this.ka = ka;
   }
 
   /**
@@ -167,8 +196,6 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    * @param velocity The velocity setpoint.
    * @return The computed feedforward.
    */
-  @SuppressWarnings("removal")
-  @Deprecated(forRemoval = true, since = "2025")
   public double calculate(double positionRadians, double velocity) {
     return calculate(positionRadians, velocity, 0);
   }
@@ -193,44 +220,19 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete control when the
-   * velocity does not change.
-   *
-   * @param currentAngle The current angle. This angle should be measured from the horizontal (i.e.
-   *     if the provided angle is 0, the arm should be parallel to the floor). If your encoder does
-   *     not follow this convention, an offset should be added.
-   * @param currentVelocity The current velocity.
-   * @return The computed feedforward in volts.
-   */
-  public Voltage calculate(Angle currentAngle, AngularVelocity currentVelocity) {
-    return Volts.of(
-        kg * Math.cos(currentAngle.in(Radians))
-            + ks * Math.signum(currentVelocity.in(RadiansPerSecond))
-            + kv * currentVelocity.in(RadiansPerSecond));
-  }
-
-  /**
    * Calculates the feedforward from the gains and setpoints assuming discrete control.
    *
-   * @param currentAngle The current angle. This angle should be measured from the horizontal (i.e.
-   *     if the provided angle is 0, the arm should be parallel to the floor). If your encoder does
-   *     not follow this convention, an offset should be added.
-   * @param currentVelocity The current velocity setpoint.
-   * @param nextVelocity The next velocity setpoint.
+   * @param currentAngle The current angle in radians. This angle should be measured from the
+   *     horizontal (i.e. if the provided angle is 0, the arm should be parallel to the floor). If
+   *     your encoder does not follow this convention, an offset should be added.
+   * @param currentVelocity The current velocity setpoint in radians per second.
+   * @param nextVelocity The next velocity setpoint in radians per second.
    * @return The computed feedforward in volts.
    */
-  public Voltage calculate(
-      Angle currentAngle, AngularVelocity currentVelocity, AngularVelocity nextVelocity) {
-    return Volts.of(
-        ArmFeedforwardJNI.calculate(
-            ks,
-            kv,
-            ka,
-            kg,
-            currentAngle.in(Radians),
-            currentVelocity.in(RadiansPerSecond),
-            nextVelocity.in(RadiansPerSecond),
-            m_dt));
+  public double calculateWithVelocities(
+      double currentAngle, double currentVelocity, double nextVelocity) {
+    return ArmFeedforwardJNI.calculate(
+        ks, kv, ka, kg, currentAngle, currentVelocity, nextVelocity, m_dt);
   }
 
   // Rearranging the main equation from the calculate() method yields the

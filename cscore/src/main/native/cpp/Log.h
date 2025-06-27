@@ -50,7 +50,7 @@ inline void NamedLog(wpi::Logger& logger, unsigned int level, const char* file,
 
 #define SLOG(level, format, ...)                           \
   NamedLog(m_logger, level, __FILE__, __LINE__, GetName(), \
-           FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__)
+           format __VA_OPT__(, ) __VA_ARGS__)
 
 #define SERROR(format, ...) \
   SLOG(::wpi::WPI_LOG_ERROR, format __VA_OPT__(, ) __VA_ARGS__)

@@ -81,7 +81,18 @@ class AlertTest {
   }
 
   @Test
-  void setUnset() {
+  void setUnsetSingle() {
+    try (var one = makeAlert("one", AlertType.kInfo)) {
+      assertFalse(isAlertActive("one", AlertType.kInfo));
+      one.set(true);
+      assertTrue(isAlertActive("one", AlertType.kInfo));
+      one.set(false);
+      assertFalse(isAlertActive("one", AlertType.kInfo));
+    }
+  }
+
+  @Test
+  void setUnsetMultiple() {
     try (var one = makeAlert("one", AlertType.kError);
         var two = makeAlert("two", AlertType.kInfo)) {
       assertFalse(isAlertActive("one", AlertType.kError));

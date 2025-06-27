@@ -16,10 +16,13 @@
 #include "fields/2022-rapidreact.h"
 #include "fields/2023-chargedup.h"
 #include "fields/2024-crescendo.h"
+#include "fields/2025-reefscape.h"
 
 using namespace fields;
 
 static const Field kFields[] = {
+    {"2025 Reefscape", GetResource_2025_reefscape_json,
+     GetResource_2025_field_png},
     {"2024 Crescendo", GetResource_2024_crescendo_json,
      GetResource_2024_field_png},
     {"2023 Charged Up", GetResource_2023_chargedup_json,

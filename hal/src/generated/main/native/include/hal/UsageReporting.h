@@ -144,9 +144,9 @@ typedef enum
     kResourceType_PathWeaverTrajectory = 121,
     kResourceType_Koors40 = 122,
     kResourceType_ThriftyNova = 123,
-    kResourceType_PWFSEN36005 = 124,
-    kResourceType_LaserShark = 125,
-    kResourceType_RevServoHub = 126,
+    kResourceType_RevServoHub = 124,
+    kResourceType_PWFSEN36005 = 125,
+    kResourceType_LaserShark = 126,
 
 //    kResourceType_MaximumID = 255,
 } tResourceType;
@@ -170,6 +170,8 @@ typedef enum
     kFramework_RobotBuilder = 6,
     kFramework_AdvantageKit = 7,
     kFramework_MagicBot = 8,
+    kFramework_KitBotTraditional = 9,
+    kFramework_KitBotInline = 10,
     kRobotDrive_ArcadeStandard = 1,
     kRobotDrive_ArcadeButtonSpin = 2,
     kRobotDrive_ArcadeRatioCurve = 3,

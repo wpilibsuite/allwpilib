@@ -163,8 +163,8 @@ class ct_matrix {
     if (std::is_constant_evaluated()) {
       ct_matrix<Scalar, Rows, Cols> result;
 
-      for (int row = 0; row < 3; ++row) {
-        for (int col = 0; col < 3; ++col) {
+      for (int row = 0; row < rhs.rows(); ++row) {
+        for (int col = 0; col < rhs.cols(); ++col) {
           result(row, col) = lhs(row, col) + rhs(row, col);
         }
       }
@@ -188,8 +188,8 @@ class ct_matrix {
     if (std::is_constant_evaluated()) {
       ct_matrix<Scalar, Rows, Cols> result;
 
-      for (int row = 0; row < 3; ++row) {
-        for (int col = 0; col < 3; ++col) {
+      for (int row = 0; row < rhs.rows(); ++row) {
+        for (int col = 0; col < rhs.cols(); ++col) {
           result(row, col) = lhs(row, col) - rhs(row, col);
         }
       }
@@ -282,8 +282,8 @@ class ct_matrix {
     if (std::is_constant_evaluated()) {
       Scalar sum = 0.0;
 
-      for (int row = 0; row < Rows; ++row) {
-        for (int col = 0; col < Cols; ++col) {
+      for (int row = 0; row < rows(); ++row) {
+        for (int col = 0; col < cols(); ++col) {
           sum += (*this)(row, col) * (*this)(row, col);
         }
       }
@@ -334,7 +334,7 @@ class ct_matrix {
     requires(Rows == 3 && Cols == 3)
   {
     // |a  b  c|
-    // |d  e  f| = aei + bfg + cgh - ceg - bdi - afh
+    // |d  e  f| = aei + bfg + cdh - ceg - bdi - afh
     // |g  h  i|
     Scalar a = (*this)(0, 0);
     Scalar b = (*this)(0, 1);
@@ -345,7 +345,7 @@ class ct_matrix {
     Scalar g = (*this)(2, 0);
     Scalar h = (*this)(2, 1);
     Scalar i = (*this)(2, 2);
-    return a * e * i + b * f * g + c * g * h - c * e * g - b * d * i -
+    return a * e * i + b * f * g + c * d * h - c * e * g - b * d * i -
            a * f * h;
   }
 

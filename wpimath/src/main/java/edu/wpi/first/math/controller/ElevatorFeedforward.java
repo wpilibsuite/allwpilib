@@ -4,13 +4,8 @@
 
 package edu.wpi.first.math.controller;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.math.controller.proto.ElevatorFeedforwardProto;
 import edu.wpi.first.math.controller.struct.ElevatorFeedforwardStruct;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
@@ -20,16 +15,16 @@ import edu.wpi.first.util.struct.StructSerializable;
  */
 public class ElevatorFeedforward implements ProtobufSerializable, StructSerializable {
   /** The static gain, in volts. */
-  private final double ks;
+  private double ks;
 
   /** The gravity gain, in volts. */
-  private final double kg;
+  private double kg;
 
   /** The velocity gain, in V/(m/s). */
-  private final double kv;
+  private double kv;
 
   /** The acceleration gain, in V/(m/s²). */
-  private final double ka;
+  private double ka;
 
   /** The period, in seconds. */
   private final double m_dt;
@@ -89,6 +84,42 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    */
   public ElevatorFeedforward(double ks, double kg, double kv) {
     this(ks, kg, kv, 0);
+  }
+
+  /**
+   * Sets the static gain.
+   *
+   * @param ks The static gain in volts.
+   */
+  public void setKs(double ks) {
+    this.ks = ks;
+  }
+
+  /**
+   * Sets the gravity gain.
+   *
+   * @param kg The gravity gain in volts.
+   */
+  public void setKg(double kg) {
+    this.kg = kg;
+  }
+
+  /**
+   * Sets the velocity gain.
+   *
+   * @param kv The velocity gain in V/(m/s).
+   */
+  public void setKv(double kv) {
+    this.kv = kv;
+  }
+
+  /**
+   * Sets the acceleration gain.
+   *
+   * @param ka The acceleration gain in V/(m/s²).
+   */
+  public void setKa(double ka) {
+    this.ka = ka;
   }
 
   /**
@@ -156,21 +187,8 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    * @param velocity The velocity setpoint.
    * @return The computed feedforward.
    */
-  @SuppressWarnings("removal")
-  @Deprecated(forRemoval = true, since = "2025")
   public double calculate(double velocity) {
     return calculate(velocity, 0);
-  }
-
-  /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete control when the
-   * setpoint does not change.
-   *
-   * @param currentVelocity The velocity setpoint.
-   * @return The computed feedforward.
-   */
-  public Voltage calculate(LinearVelocity currentVelocity) {
-    return calculate(currentVelocity, currentVelocity);
   }
 
   /**
@@ -178,28 +196,22 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    *
    * <p>Note this method is inaccurate when the velocity crosses 0.
    *
-   * @param currentVelocity The current velocity setpoint.
-   * @param nextVelocity The next velocity setpoint.
-   * @return The computed feedforward.
+   * @param currentVelocity The current velocity setpoint in meters per second.
+   * @param nextVelocity The next velocity setpoint in meters per second.
+   * @return The computed feedforward in volts.
    */
-  public Voltage calculate(LinearVelocity currentVelocity, LinearVelocity nextVelocity) {
+  public double calculateWithVelocities(double currentVelocity, double nextVelocity) {
     // See wpimath/algorithms.md#Elevator_feedforward for derivation
-    if (ka == 0.0) {
-      return Volts.of(
-          ks * Math.signum(nextVelocity.in(MetersPerSecond))
-              + kg
-              + kv * nextVelocity.in(MetersPerSecond));
+    if (ka < 1e-9) {
+      return ks * Math.signum(nextVelocity) + kg + kv * nextVelocity;
     } else {
       double A = -kv / ka;
       double B = 1.0 / ka;
       double A_d = Math.exp(A * m_dt);
-      double B_d = 1.0 / A * (A_d - 1.0) * B;
-      return Volts.of(
-          kg
-              + ks * Math.signum(currentVelocity.magnitude())
-              + 1.0
-                  / B_d
-                  * (nextVelocity.in(MetersPerSecond) - A_d * currentVelocity.in(MetersPerSecond)));
+      double B_d = A > -1e-9 ? B * m_dt : 1.0 / A * (A_d - 1.0) * B;
+      return kg
+          + ks * Math.signum(currentVelocity)
+          + 1.0 / B_d * (nextVelocity - A_d * currentVelocity);
     }
   }
 

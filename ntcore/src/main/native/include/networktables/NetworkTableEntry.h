@@ -260,7 +260,7 @@ class NetworkTableEntry final {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultValue(const Value& defaultValue) {
     return SetDefaultEntryValue(m_handle, defaultValue);
@@ -270,7 +270,7 @@ class NetworkTableEntry final {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultBoolean(bool defaultValue) {
     return nt::SetDefaultBoolean(m_handle, defaultValue);
@@ -280,7 +280,7 @@ class NetworkTableEntry final {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultInteger(int64_t defaultValue) {
     return nt::SetDefaultInteger(m_handle, defaultValue);
@@ -290,7 +290,7 @@ class NetworkTableEntry final {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultFloat(float defaultValue) {
     return nt::SetDefaultFloat(m_handle, defaultValue);
@@ -300,7 +300,7 @@ class NetworkTableEntry final {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultDouble(double defaultValue) {
     return nt::SetDefaultDouble(m_handle, defaultValue);
@@ -310,7 +310,7 @@ class NetworkTableEntry final {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultString(std::string_view defaultValue) {
     return nt::SetDefaultString(m_handle, defaultValue);
@@ -320,7 +320,7 @@ class NetworkTableEntry final {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultRaw(std::span<const uint8_t> defaultValue) {
     return nt::SetDefaultRaw(m_handle, defaultValue);
@@ -330,7 +330,7 @@ class NetworkTableEntry final {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultBooleanArray(std::span<const int> defaultValue) {
     return nt::SetDefaultBooleanArray(m_handle, defaultValue);
@@ -340,7 +340,7 @@ class NetworkTableEntry final {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultIntegerArray(std::span<const int64_t> defaultValue) {
     return nt::SetDefaultIntegerArray(m_handle, defaultValue);
@@ -350,7 +350,7 @@ class NetworkTableEntry final {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultFloatArray(std::span<const float> defaultValue) {
     return nt::SetDefaultFloatArray(m_handle, defaultValue);
@@ -360,7 +360,7 @@ class NetworkTableEntry final {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultDoubleArray(std::span<const double> defaultValue) {
     return nt::SetDefaultDoubleArray(m_handle, defaultValue);
@@ -370,7 +370,7 @@ class NetworkTableEntry final {
    * Sets the entry's value if it does not exist.
    *
    * @param defaultValue the default value to set
-   * @return False if the entry exists with a different type
+   * @return True if the entry did not already have a value, otherwise False
    */
   bool SetDefaultStringArray(std::span<const std::string> defaultValue) {
     return nt::SetDefaultStringArray(m_handle, defaultValue);

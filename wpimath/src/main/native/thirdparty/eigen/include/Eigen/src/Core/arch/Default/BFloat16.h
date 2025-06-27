@@ -673,6 +673,11 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 fmax(const bfloat16& a, const bfl
   return bfloat16(::fmaxf(f1, f2));
 }
 
+EIGEN_DEVICE_FUNC inline bfloat16 fma(const bfloat16& a, const bfloat16& b, const bfloat16& c) {
+  // Emulate FMA via float.
+  return bfloat16(numext::fma(static_cast<float>(a), static_cast<float>(b), static_cast<float>(c)));
+}
+
 #ifndef EIGEN_NO_IO
 EIGEN_ALWAYS_INLINE std::ostream& operator<<(std::ostream& os, const bfloat16& v) {
   os << static_cast<float>(v);

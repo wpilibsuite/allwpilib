@@ -1104,7 +1104,15 @@ static void DriverStationExecute() {
     }
 
     ImGui::SetNextWindowPos(ImVec2{5, 20}, ImGuiCond_FirstUseEver);
-    ImGui::Begin("Robot State", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    const char* title = "Robot State";
+    // Accounts for size of title and collapse button
+    float minWidth = ImGui::CalcTextSize(title).x + ImGui::GetFontSize() +
+                     ImGui::GetStyle().ItemInnerSpacing.x * 2 +
+                     ImGui::GetStyle().FramePadding.x * 2 +
+                     ImGui::GetStyle().WindowBorderSize;
+    ImGui::SetNextWindowSizeConstraints(ImVec2{minWidth, 0},
+                                        ImVec2{FLT_MAX, FLT_MAX});
+    ImGui::Begin(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     if (ImGui::Selectable("Disconnected", !isAttached)) {
       HALSIM_SetDriverStationEnabled(false);
       HALSIM_SetDriverStationDsAttached(false);

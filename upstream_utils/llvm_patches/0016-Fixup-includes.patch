@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:38:11 -0400
-Subject: [PATCH 16/36] Fixup includes
+Subject: [PATCH 16/37] Fixup includes
 
 ---
  llvm/include/llvm/Support/PointerLikeTypeTraits.h |  1 +
  llvm/lib/Support/ConvertUTFWrapper.cpp            |  1 +
- llvm/lib/Support/ErrorHandling.cpp                |  7 +++----
+ llvm/lib/Support/ErrorHandling.cpp                |  9 ++++-----
  llvm/lib/Support/raw_ostream.cpp                  | 11 ++++++-----
  llvm/unittests/ADT/SmallPtrSetTest.cpp            |  2 ++
  llvm/unittests/ADT/SmallVectorTest.cpp            |  1 +
  llvm/unittests/Support/ConvertUTFTest.cpp         |  2 ++
- 7 files changed, 16 insertions(+), 9 deletions(-)
+ 7 files changed, 17 insertions(+), 10 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/PointerLikeTypeTraits.h b/llvm/include/llvm/Support/PointerLikeTypeTraits.h
 index 1b15f930bd87d97d51824af5e62ea5f222a6b4c9..acadd5e89a1651cfbad67a5b1b0933d1f288d094 100644
@@ -38,7 +38,7 @@ index d53462e742e61d3476915d5b2c5aa63772e78a8a..34054140489e4d536ace4650207c783d
  #include "llvm/Support/SwapByteOrder.h"
  #include <span>
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 0b87b375de67dc18647e3ebe646bf323dd05e8c5..3a88178cfbbcf7062a958c7de820247bc913ab33 100644
+index ea8d60426ead7163550b73e0fdc32cb11bb089cb..5f53ec03a1c1e91659143f12abec145b95627826 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -28,12 +28,11 @@
@@ -57,8 +57,17 @@ index 0b87b375de67dc18647e3ebe646bf323dd05e8c5..3a88178cfbbcf7062a958c7de820247b
  #endif
  
  using namespace llvm;
+@@ -210,7 +209,7 @@ void LLVMResetFatalErrorHandler() {
+ #ifdef _WIN32
+ 
+ #define WIN32_NO_STATUS
+-#include "llvm/Support/Windows/WindowsSupport.h"
++#include "Windows/WindowsSupport.h"
+ #undef WIN32_NO_STATUS
+ #include <ntstatus.h>
+ #include <winerror.h>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 5bec803ccc76ce287b7ff3ea037d5e490a7af20c..ae5428825f7f62ad8e742490448d40aea7506990 100644
+index 7086368a3598ccad9502112f734c9ad81252ebec..e173687cafdd04894c27ccd5efb109a7411f1398 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -15,6 +15,8 @@
@@ -96,7 +105,7 @@ index 5bec803ccc76ce287b7ff3ea037d5e490a7af20c..ae5428825f7f62ad8e742490448d40ae
  
  using namespace llvm;
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index 531f81ab5b3fc1dcff731230f3cb7649cb90aedf..3db8b6e37d31a0a3cc304da8fc4cbbe1d89252b5 100644
+index a6c2b329f072639706aa221feb8c08e33533f813..4c1a144a7a52eb38c7af2d20749901974b29f962 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
 @@ -15,6 +15,8 @@

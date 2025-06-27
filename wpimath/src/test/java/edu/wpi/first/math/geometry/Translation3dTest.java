@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class Translation3dTest {
@@ -75,6 +76,40 @@ class Translation3dTest {
     assertAll(
         () -> assertEquals(-2.0, rotated3.getX(), kEpsilon),
         () -> assertEquals(1.0, rotated3.getY(), kEpsilon),
+        () -> assertEquals(3.0, rotated3.getZ(), kEpsilon));
+  }
+
+  @Test
+  void testRotateAround() {
+    var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
+    var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
+    var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
+
+    var translation = new Translation3d(1.0, 2.0, 3.0);
+    var around = new Translation3d(3.0, 2.0, 1.0);
+
+    var rotated1 =
+        translation.rotateAround(around, new Rotation3d(xAxis, Units.degreesToRadians(90.0)));
+
+    assertAll(
+        () -> assertEquals(1.0, rotated1.getX(), kEpsilon),
+        () -> assertEquals(0.0, rotated1.getY(), kEpsilon),
+        () -> assertEquals(1.0, rotated1.getZ(), kEpsilon));
+
+    var rotated2 =
+        translation.rotateAround(around, new Rotation3d(yAxis, Units.degreesToRadians(90.0)));
+
+    assertAll(
+        () -> assertEquals(5.0, rotated2.getX(), kEpsilon),
+        () -> assertEquals(2.0, rotated2.getY(), kEpsilon),
+        () -> assertEquals(3.0, rotated2.getZ(), kEpsilon));
+
+    var rotated3 =
+        translation.rotateAround(around, new Rotation3d(zAxis, Units.degreesToRadians(90.0)));
+
+    assertAll(
+        () -> assertEquals(3.0, rotated3.getX(), kEpsilon),
+        () -> assertEquals(0.0, rotated3.getY(), kEpsilon),
         () -> assertEquals(3.0, rotated3.getZ(), kEpsilon));
   }
 
@@ -171,5 +206,23 @@ class Translation3dTest {
     assertEquals(vec.get(2), translation.getZ());
 
     assertEquals(vec, translation.toVector());
+  }
+
+  @Test
+  void testNearest() {
+    var origin = Translation3d.kZero;
+
+    // Distance sort
+    // translations are in order of closest to farthest away from the origin at various positions
+    // in 3D space.
+    final var translation1 = new Translation3d(1, 0, 0);
+    final var translation2 = new Translation3d(0, 2, 0);
+    final var translation3 = new Translation3d(0, 0, 3);
+    final var translation4 = new Translation3d(2, 2, 2);
+    final var translation5 = new Translation3d(3, 3, 3);
+
+    assertEquals(translation3, origin.nearest(List.of(translation5, translation3, translation4)));
+    assertEquals(translation1, origin.nearest(List.of(translation1, translation2, translation3)));
+    assertEquals(translation2, origin.nearest(List.of(translation4, translation2, translation3)));
   }
 }

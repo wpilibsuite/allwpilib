@@ -66,7 +66,8 @@
           "type": "object",
           "required": [
             "NameParts",
-            "value"
+            "value",
+            "PositiveDirection"
           ],
           "properties": {
             "NameParts": {
@@ -80,6 +81,10 @@
             "value": {
               "description": "The axis value",
               "type": "integer"
+            },
+            "PositiveDirection": {
+              "description": "The positive direction of the axis.",
+              "type": "string"
             }
           }
         }

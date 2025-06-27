@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <algorithm>
+#include <initializer_list>
+#include <span>
+
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
@@ -149,6 +153,18 @@ class WPILIB_DLLEXPORT Translation3d {
   }
 
   /**
+   * Rotates this translation around another translation in 3D space.
+   *
+   * @param other The other translation to rotate around.
+   * @param rot The rotation to rotate the translation by.
+   * @return The new rotated translation.
+   */
+  constexpr Translation3d RotateAround(const Translation3d& other,
+                                       const Rotation3d& rot) const {
+    return (*this - other).RotateBy(rot) + other;
+  }
+
+  /**
    * Returns a Translation2d representing this Translation3d projected into the
    * X-Y plane.
    */
@@ -230,6 +246,34 @@ class WPILIB_DLLEXPORT Translation3d {
     return units::math::abs(m_x - other.m_x) < 1E-9_m &&
            units::math::abs(m_y - other.m_y) < 1E-9_m &&
            units::math::abs(m_z - other.m_z) < 1E-9_m;
+  }
+
+  /**
+   * Returns the nearest Translation3d from a collection of translations
+   * @param translations The collection of translations.
+   * @return The nearest Translation3d from the collection.
+   */
+  constexpr Translation3d Nearest(
+      std::span<const Translation3d> translations) const {
+    return *std::min_element(
+        translations.begin(), translations.end(),
+        [this](const Translation3d& a, const Translation3d& b) {
+          return this->Distance(a) < this->Distance(b);
+        });
+  }
+
+  /**
+   * Returns the nearest Translation3d from a collection of translations
+   * @param translations The collection of translations.
+   * @return The nearest Translation3d from the collection.
+   */
+  constexpr Translation3d Nearest(
+      std::initializer_list<Translation3d> translations) const {
+    return *std::min_element(
+        translations.begin(), translations.end(),
+        [this](const Translation3d& a, const Translation3d& b) {
+          return this->Distance(a) < this->Distance(b);
+        });
   }
 
  private:

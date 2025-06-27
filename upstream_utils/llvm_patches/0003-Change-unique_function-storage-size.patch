@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:13:55 -0400
-Subject: [PATCH 03/36] Change unique_function storage size
+Subject: [PATCH 03/37] Change unique_function storage size
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index c0bc30c7450fe4b2bc6b9b448824eedc8b132e52..5641a913d0a35ee2911cf872ad90c3dc864f20f5 100644
+index 49e0e8ab0db400d0a362746342099578257b2eea..3ce85530b718666afa1dafbf60699c1add423ea6 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
 @@ -79,7 +79,7 @@ using EnableIfCallable = std::enable_if_t<std::disjunction<
@@ -28,4 +28,4 @@ index c0bc30c7450fe4b2bc6b9b448824eedc8b132e52..5641a913d0a35ee2911cf872ad90c3dc
 +    // provide four pointers worth of storage here.
      // This is mutable as an inlined `const unique_function<void() const>` may
      // still modify its own mutable members.
-     mutable std::aligned_storage_t<InlineStorageSize, alignof(void *)>
+     alignas(void *) mutable std::byte InlineStorage[InlineStorageSize];

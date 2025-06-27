@@ -117,11 +117,11 @@ public class Rotation2d
   public Rotation2d(double x, double y) {
     double magnitude = Math.hypot(x, y);
     if (magnitude > 1e-6) {
-      m_sin = y / magnitude;
       m_cos = x / magnitude;
+      m_sin = y / magnitude;
     } else {
-      m_sin = 0.0;
       m_cos = 1.0;
+      m_sin = 0.0;
       MathSharedStore.reportError(
           "x and y components of Rotation2d are zero\n", Thread.currentThread().getStackTrace());
     }

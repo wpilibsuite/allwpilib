@@ -68,7 +68,9 @@ public class AnnotationProcessor extends AbstractProcessor {
               customLoggers.putAll(processCustomLoggers(roundEnv, customLogger));
             });
 
+    // Get all root types (classes and interfaces), excluding packages and modules
     roundEnv.getRootElements().stream()
+        .filter(e -> e instanceof TypeElement)
         .filter(
             e ->
                 processingEnv
@@ -267,12 +269,18 @@ public class AnnotationProcessor extends AbstractProcessor {
       return false;
     }
 
-    processingEnv
-        .getMessager()
-        .printMessage(
-            Diagnostic.Kind.NOTE,
-            "[EPILOGUE] Excluded from logs because " + type + " is not a loggable data type",
-            element);
+    var classConfig = element.getEnclosingElement().getAnnotation(Logged.class);
+
+    if (classConfig == null || classConfig.warnForNonLoggableTypes()) {
+      // Not loggable and not explicitly opted out of logging; print a warning message
+      processingEnv
+          .getMessager()
+          .printMessage(
+              Diagnostic.Kind.NOTE,
+              "[EPILOGUE] Excluded from logs because " + type + " is not a loggable data type",
+              element);
+    }
+
     return true;
   }
 

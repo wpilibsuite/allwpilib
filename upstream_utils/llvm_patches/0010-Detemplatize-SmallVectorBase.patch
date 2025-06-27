@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 23:18:34 -0400
-Subject: [PATCH 10/36] Detemplatize SmallVectorBase
+Subject: [PATCH 10/37] Detemplatize SmallVectorBase
 
 ---
  llvm/include/llvm/ADT/SmallVector.h | 35 ++++++++++-----------------
@@ -9,10 +9,10 @@ Subject: [PATCH 10/36] Detemplatize SmallVectorBase
  2 files changed, 18 insertions(+), 54 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index d7788e94b5379f5eba6fbddee50e4b4359da9d80..b953ae45a34772eb7fd04c3af0275a7d093e1242 100644
+index ec340afd4519f4070389434006bf7f2afdbf2993..6b12ea17aaa894dc9a719ade4c41a3f7df4304e9 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -56,19 +56,19 @@ using EnableIfConvertibleToInputIterator = std::enable_if_t<std::is_convertible<
+@@ -57,19 +57,19 @@ using EnableIfConvertibleToInputIterator = std::enable_if_t<std::is_convertible<
  /// Using 64 bit size is desirable for cases like SmallVector<char>, where a
  /// 32 bit size would limit the vector to ~4GB. SmallVectors are used for
  /// buffering bitcode output - which can exceed 4GB.
@@ -37,7 +37,7 @@ index d7788e94b5379f5eba6fbddee50e4b4359da9d80..b953ae45a34772eb7fd04c3af0275a7d
  
    /// This is a helper for \a grow() that's out of line to reduce code
    /// duplication.  This function will report a fatal error if it can't grow at
-@@ -107,7 +107,7 @@ protected:
+@@ -108,7 +108,7 @@ protected:
    /// This does not construct or destroy any elements in the vector.
    void set_size(size_t N) {
      assert(N <= capacity()); // implies no overflow in assignment
@@ -46,7 +46,7 @@ index d7788e94b5379f5eba6fbddee50e4b4359da9d80..b953ae45a34772eb7fd04c3af0275a7d
    }
  
    /// Set the array data pointer to \p Begin and capacity to \p N.
-@@ -117,19 +117,14 @@ protected:
+@@ -118,19 +118,14 @@ protected:
    void set_allocation_range(void *Begin, size_t N) {
      assert(N <= SizeTypeMax());
      BeginX = Begin;
@@ -69,7 +69,7 @@ index d7788e94b5379f5eba6fbddee50e4b4359da9d80..b953ae45a34772eb7fd04c3af0275a7d
    alignas(T) char FirstEl[sizeof(T)];
  };
  
-@@ -138,8 +133,8 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
+@@ -139,8 +134,8 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
  /// to avoid unnecessarily requiring T to be complete.
  template <typename T, typename = void>
  class SmallVectorTemplateCommon
@@ -80,7 +80,7 @@ index d7788e94b5379f5eba6fbddee50e4b4359da9d80..b953ae45a34772eb7fd04c3af0275a7d
  
  protected:
    /// Find the address of the first element.  For this pointer math to be valid
-@@ -461,7 +456,7 @@ template <typename T, bool TriviallyCopyable>
+@@ -462,7 +457,7 @@ template <typename T, bool TriviallyCopyable>
  T *SmallVectorTemplateBase<T, TriviallyCopyable>::mallocForGrow(
      size_t MinSize, size_t &NewCapacity) {
    return static_cast<T *>(
@@ -89,7 +89,7 @@ index d7788e94b5379f5eba6fbddee50e4b4359da9d80..b953ae45a34772eb7fd04c3af0275a7d
            this->getFirstEl(), MinSize, sizeof(T), NewCapacity));
  }
  
-@@ -1333,12 +1328,6 @@ template <typename Out, typename R> SmallVector<Out> to_vector_of(R &&Range) {
+@@ -1334,12 +1329,6 @@ template <typename Out, typename R> SmallVector<Out> to_vector_of(R &&Range) {
    return {std::begin(Range), std::end(Range)};
  }
  

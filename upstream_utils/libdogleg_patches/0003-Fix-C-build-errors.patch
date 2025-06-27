@@ -1,0 +1,324 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Sun, 1 Dec 2024 00:28:14 -0500
+Subject: [PATCH 3/3] Fix C++ build errors
+
+---
+ dogleg.cpp | 110 +++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 65 insertions(+), 45 deletions(-)
+
+diff --git a/dogleg.cpp b/dogleg.cpp
+index 9ed95f64b232f41a51fe23d72885ecadd86dc065..c93f696a9427f0644b047308d2d99302cd246462 100644
+--- a/dogleg.cpp
++++ b/dogleg.cpp
+@@ -327,9 +327,9 @@ void _dogleg_testGradient(unsigned int var, const double* p0,
+ {
+   int is_sparse = NJnnz > 0;
+ 
+-  double* x0 = malloc(Nmeas  * sizeof(double));
+-  double* x  = malloc(Nmeas  * sizeof(double));
+-  double* p  = malloc(Nstate * sizeof(double));
++  double* x0 = static_cast<double*>(malloc(Nmeas  * sizeof(double)));
++  double* x  = static_cast<double*>(malloc(Nmeas  * sizeof(double)));
++  double* p  = static_cast<double*>(malloc(Nstate * sizeof(double)));
+   ASSERT(x0);
+   ASSERT(x);
+   ASSERT(p);
+@@ -376,8 +376,8 @@ void _dogleg_testGradient(unsigned int var, const double* p0,
+   }
+   else
+   {
+-    J_dense  = malloc( Nmeas * Nstate * sizeof(J_dense[0]) );
+-    J_dense0 = malloc( Nmeas * Nstate * sizeof(J_dense[0]) );
++    J_dense  = static_cast<double*>(malloc( Nmeas * Nstate * sizeof(J_dense[0]) ));
++    J_dense0 = static_cast<double*>(malloc( Nmeas * Nstate * sizeof(J_dense[0]) ));
+ 
+     dogleg_callback_dense_t* f_dense = (dogleg_callback_dense_t*)f;
+     p[var] -= GRADTEST_DELTA/2.0;
+@@ -487,11 +487,13 @@ static void computeCauchyUpdate(dogleg_operatingPoint_t* point,
+ 
+ // LAPACK prototypes for a packed cholesky factorization and a linear solve
+ // using that factorization, respectively
++extern "C" {
+ int dpptrf_(char* uplo, int* n, double* ap,
+             int* info, int uplo_len);
+ int dpptrs_(char* uplo, int* n, int* nrhs,
+             double* ap, double* b, int* ldb, int* info,
+             int uplo_len);
++}
+ 
+ 
+ void dogleg_computeJtJfactorization(dogleg_operatingPoint_t* point, dogleg_solverContext_t* ctx)
+@@ -538,8 +540,8 @@ void dogleg_computeJtJfactorization(dogleg_operatingPoint_t* point, dogleg_solve
+     if(ctx->factorization_dense == NULL)
+     {
+       // Need to store symmetric JtJ, so I only need one triangle of it
+-      ctx->factorization_dense = malloc( ctx->Nstate * (ctx->Nstate+1) / 2 *
+-                                         sizeof( ctx->factorization_dense[0]));
++      ctx->factorization_dense = static_cast<double*>(malloc( ctx->Nstate * (ctx->Nstate+1) / 2 *
++                                         sizeof( ctx->factorization_dense[0])));
+       ASSERT(ctx->factorization_dense);
+     }
+ 
+@@ -582,7 +584,9 @@ void dogleg_computeJtJfactorization(dogleg_operatingPoint_t* point, dogleg_solve
+ 
+ 
+       int info;
+-      dpptrf_(&(char){'L'}, &(int){ctx->Nstate}, ctx->factorization_dense,
++      char uplo = 'L';
++      int Nstate_copy = ctx->Nstate;
++      dpptrf_(&uplo, &Nstate_copy, ctx->factorization_dense,
+               &info, 1);
+       ASSERT(info >= 0); // we MUST either succeed or see complain of singular
+       // JtJ
+@@ -611,10 +615,10 @@ static void computeGaussNewtonUpdate(dogleg_operatingPoint_t* point, dogleg_solv
+     if( ctx->is_sparse )
+     {
+       // solve JtJ*updateGN = Jt*x. Gauss-Newton step is then -updateGN
+-      cholmod_dense Jt_x_dense = {.nrow  = ctx->Nstate,
++      cholmod_dense Jt_x_dense = {.nrow  = static_cast<size_t>(ctx->Nstate),
+                                   .ncol  = 1,
+-                                  .nzmax = ctx->Nstate,
+-                                  .d     = ctx->Nstate,
++                                  .nzmax = static_cast<size_t>(ctx->Nstate),
++                                  .d     = static_cast<size_t>(ctx->Nstate),
+                                   .x     = point->Jt_x,
+                                   .xtype = CHOLMOD_REAL,
+                                   .dtype = CHOLMOD_DOUBLE};
+@@ -626,18 +630,22 @@ static void computeGaussNewtonUpdate(dogleg_operatingPoint_t* point, dogleg_solv
+                                                    ctx->factorization,
+                                                    &Jt_x_dense,
+                                                    &ctx->common);
+-      vec_negate(point->updateGN_cholmoddense->x,
++      vec_negate(static_cast<double*>(point->updateGN_cholmoddense->x),
+                  ctx->Nstate); // should be more efficient than this later
+ 
+-      point->updateGN_lensq = norm2(point->updateGN_cholmoddense->x, ctx->Nstate);
++      point->updateGN_lensq = norm2(static_cast<double*>(point->updateGN_cholmoddense->x), ctx->Nstate);
+     }
+     else
+     {
+       memcpy( point->updateGN_dense, point->Jt_x, ctx->Nstate * sizeof(point->updateGN_dense[0]));
+       int info;
+-      dpptrs_(&(char){'L'}, &(int){ctx->Nstate}, &(int){1},
++      char uplo = 'L';
++      int nhrs = 1;
++      int Nstate_copy = ctx->Nstate;
++      int Nstate_copy2 = ctx->Nstate;
++      dpptrs_(&uplo, &Nstate_copy, &nhrs,
+               ctx->factorization_dense,
+-              point->updateGN_dense, &(int){ctx->Nstate}, &info, 1);
++              point->updateGN_dense, &Nstate_copy2, &info, 1);
+       vec_negate(point->updateGN_dense,
+                  ctx->Nstate); // should be more efficient than this later
+ 
+@@ -677,7 +685,7 @@ static void computeInterpolatedUpdate(double*                  update_dogleg,
+   double        dsq    = trustregion*trustregion;
+   double        norm2a = point->updateCauchy_lensq;
+   const double* a      = point->updateCauchy;
+-  const double* b      = ctx->is_sparse ? point->updateGN_cholmoddense->x : point->updateGN_dense;
++  const double* b      = ctx->is_sparse ? static_cast<double*>(point->updateGN_cholmoddense->x) : point->updateGN_dense;
+ 
+   double l2    = 0.0;
+   double neg_c = 0.0;
+@@ -1029,7 +1037,7 @@ dogleg_operatingPoint_t* allocOperatingPoint(int Nstate, int numMeasurements,
+ {
+   int is_sparse = NJnnz > 0;
+ 
+-  dogleg_operatingPoint_t* point = malloc(sizeof(dogleg_operatingPoint_t));
++  dogleg_operatingPoint_t* point = static_cast<dogleg_operatingPoint_t*>(malloc(sizeof(dogleg_operatingPoint_t)));
+   ASSERT(point != NULL);
+ 
+ 
+@@ -1042,7 +1050,7 @@ dogleg_operatingPoint_t* allocOperatingPoint(int Nstate, int numMeasurements,
+   if(!is_sparse)
+     Npool += numMeasurements*Nstate + Nstate;
+ 
+-  double* pool = malloc( Npool * sizeof(double) );
++  double* pool = static_cast<double*>(malloc( Npool * sizeof(double) ));
+   ASSERT( pool != NULL );
+ 
+   point->p            = &pool[0];
+@@ -1170,7 +1178,7 @@ static double _dogleg_optimize(double* p, unsigned int Nstate,
+   int is_sparse = NJnnz > 0;
+ 
+ 
+-  dogleg_solverContext_t* ctx = malloc(sizeof(dogleg_solverContext_t));
++  dogleg_solverContext_t* ctx = static_cast<dogleg_solverContext_t*>(malloc(sizeof(dogleg_solverContext_t)));
+   ctx->f                      = f;
+   ctx->cookie                 = cookie;
+   ctx->factorization          = NULL;
+@@ -1294,10 +1302,13 @@ static bool pseudoinverse_J_dense(// output
+   memcpy(out,
+          &point->J_dense[i_meas0*ctx->Nstate],
+          NmeasInChunk*ctx->Nstate*sizeof(double));
+-  dpptrs_(&(char){'L'}, &(int){ctx->Nstate}, &NmeasInChunk,
++  char uplo = 'L';
++  int Nstate_copy = ctx->Nstate;
++  int Nstate_copy2 = ctx->Nstate;
++  dpptrs_(&uplo, &Nstate_copy, &NmeasInChunk,
+           ctx->factorization_dense,
+           out,
+-          &(int){ctx->Nstate}, &info, 1);
++          &Nstate_copy2, &info, 1);
+   return info==0;
+ }
+ 
+@@ -1873,11 +1884,12 @@ static bool getOutliernessFactors_dense( // output
+   int  Nmeasurements = ctx->Nmeasurements;
+   bool result        = false;
+ 
+-  double* invJtJ_Jt = malloc(Nstate*chunk_size*sizeof(double));
++  double* invJtJ_Jt = static_cast<double*>(malloc(Nstate*chunk_size*sizeof(double)));
+   if(invJtJ_Jt == NULL)
+   {
+     SAY("Couldn't allocate invJtJ_Jt!");
+-    goto done;
++    free(invJtJ_Jt);
++    return result;
+   }
+ 
+   getOutliernessScale(scale,
+@@ -1895,7 +1907,8 @@ static bool getOutliernessFactors_dense( // output
+       if(!pinvresult)
+       {
+         SAY("Couldn't compute pinv!");
+-        goto done;
++        free(invJtJ_Jt);
++        return result;
+       }
+       i_measurement_valid_chunk_start = i_measurement;
+       i_measurement_valid_chunk_last  = i_measurement+chunk_size-1;
+@@ -1926,7 +1939,6 @@ static bool getOutliernessFactors_dense( // output
+   }
+ 
+   result = true;
+- done:
+   free(invJtJ_Jt);
+   return result;
+ }
+@@ -1975,7 +1987,9 @@ static bool getOutliernessFactors_sparse( // output
+   if(!Jt_chunk)
+   {
+     SAY("Couldn't allocate Jt_chunk!");
+-    goto done;
++    if(Jt_chunk)  cholmod_free_dense(&Jt_chunk,  &ctx->common);
++    if(invJtJ_Jt) cholmod_free_dense(&invJtJ_Jt, &ctx->common);
++    return result;
+   }
+ 
+   getOutliernessScale(scale,
+@@ -1995,7 +2009,9 @@ static bool getOutliernessFactors_sparse( // output
+       if(invJtJ_Jt == NULL)
+       {
+         SAY("Couldn't compute pinv!");
+-        goto done;
++        if(Jt_chunk)  cholmod_free_dense(&Jt_chunk,  &ctx->common);
++        if(invJtJ_Jt) cholmod_free_dense(&invJtJ_Jt, &ctx->common);
++        return result;
+       }
+ 
+       i_measurement_valid_chunk_start = i_measurement;
+@@ -2032,7 +2048,6 @@ static bool getOutliernessFactors_sparse( // output
+   }
+ 
+   result = true;
+- done:
+   if(Jt_chunk)  cholmod_free_dense(&Jt_chunk,  &ctx->common);
+   if(invJtJ_Jt) cholmod_free_dense(&invJtJ_Jt, &ctx->common);
+   return result;
+@@ -2222,18 +2237,18 @@ double dogleg_getOutliernessTrace_newFeature_sparse(const double*            Jqu
+     for(int j=0; j<NstateActive; j++)
+       Jt_i[j + i*NstateActive] = istateActive + j;
+   }
+-  cholmod_sparse Jt_query_sparse = {.nrow   = ctx->Nstate,
+-                                    .ncol   = featureSize,
+-                                    .nzmax  = NstateActive*featureSize,
+-                                    .p      = (void*)Jt_p.data(),
+-                                    .i      = (void*)Jt_i.data(),
+-                                    .x      = (double*)JqueryFeature,
+-                                    .sorted = 1,
+-                                    .packed = 1,
++  cholmod_sparse Jt_query_sparse = {.nrow   = static_cast<size_t>(ctx->Nstate),
++                                    .ncol   = static_cast<size_t>(featureSize),
++                                    .nzmax  = static_cast<size_t>(NstateActive*featureSize),
++                                    .p      = Jt_p.data(),
++                                    .i      = Jt_i.data(),
++                                    .x      = const_cast<double*>(JqueryFeature),
+                                     .stype  = 0, // NOT symmetric
+                                     .itype  = CHOLMOD_INT,
+                                     .xtype  = CHOLMOD_REAL,
+-                                    .dtype  = CHOLMOD_DOUBLE};
++                                    .dtype  = CHOLMOD_DOUBLE,
++                                    .sorted = 1,
++                                    .packed = 1};
+ 
+   // Really shouldn't need to do this every time. In fact I probably don't need
+   // to do it at all, since this will have been done by the solver during the
+@@ -2408,18 +2423,22 @@ bool dogleg_markOutliers(// output, input
+ 
+     bool markedAny = false;
+ 
+-    double* factors = malloc(Nfeatures * sizeof(double));
++    double* factors = static_cast<double*>(malloc(Nfeatures * sizeof(double)));
+     if(factors == NULL)
+     {
+         SAY("Error allocating factors");
+-        goto done;
++        free(factors);
++        return markedAny;
+     }
+ 
+     if(!dogleg_getOutliernessFactors(factors, scale,
+                                      featureSize, Nfeatures,
+                                      *Noutliers,
+                                      point, ctx))
+-        goto done;
++    {
++      free(factors);
++      return markedAny;
++    }
+ 
+     // I have my list of POTENTIAL outliers (any that have factor > 1.0). I
+     // check to see how much confidence I would lose if I were to throw out any
+@@ -2427,7 +2446,10 @@ bool dogleg_markOutliers(// output, input
+     // is acceptable
+     double confidence0 = getConfidence(-1);
+     if( confidence0 < 0.0 )
+-        goto done;
++    {
++      free(factors);
++      return markedAny;
++    }
+ 
+     SAY_IF_VERBOSE("Initial confidence: %g", confidence0);
+ 
+@@ -2466,7 +2488,6 @@ bool dogleg_markOutliers(// output, input
+         }
+     }
+ 
+- done:
+     free(factors);
+     return markedAny;
+ }
+@@ -2490,11 +2511,11 @@ void dogleg_reportOutliers( double (getConfidence)(int i_feature_exclude),
+     if(featureSize <= 1)
+       featureSize = 1;
+ 
+-    double* factors = malloc(Nfeatures * sizeof(double));
++    double* factors = static_cast<double*>(malloc(Nfeatures * sizeof(double)));
+     if(factors == NULL)
+     {
+         SAY("Error allocating factors");
+-        goto done;
++        free(factors);
+     }
+ 
+     dogleg_getOutliernessFactors(factors, scale,
+@@ -2516,6 +2537,5 @@ void dogleg_reportOutliers( double (getConfidence)(int i_feature_exclude),
+           rot_confidence_drop_relative);
+     }
+ 
+- done:
+     free(factors);
+ }

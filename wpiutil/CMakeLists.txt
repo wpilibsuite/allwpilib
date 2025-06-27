@@ -134,9 +134,8 @@ file(GLOB_RECURSE wpiutil_macos_src src/main/native/macOS/*.cpp)
 file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 
 file(GLOB fmtlib_native_src src/main/native/thirdparty/fmtlib/src/*.cpp)
-file(GLOB_RECURSE memory_native_src src/main/native/thirdparty/memory/src/*.cpp)
 
-add_library(wpiutil ${wpiutil_native_src} ${memory_native_src} ${wpiutil_resources_src})
+add_library(wpiutil ${wpiutil_native_src} ${wpiutil_resources_src})
 set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
@@ -203,7 +202,6 @@ install(
         src/main/native/thirdparty/expected/include/
         src/main/native/thirdparty/json/include/
         src/main/native/thirdparty/llvm/include/
-        src/main/native/thirdparty/memory/include/
         src/main/native/thirdparty/mpack/include/
         src/main/native/thirdparty/nanopb/include/
         src/main/native/thirdparty/sigslot/include/
@@ -218,7 +216,6 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/expected/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/memory/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/nanopb/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sigslot/include>

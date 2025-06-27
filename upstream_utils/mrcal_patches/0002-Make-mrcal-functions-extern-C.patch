@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Fri, 22 Nov 2024 09:54:00 -0500
+Subject: [PATCH 2/8] Make mrcal functions extern "C"
+
+---
+ mrcal.h | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/mrcal.h b/mrcal.h
+index 1eef334a79597cfae61f8111ab97ca04f02b83b2..488ddfe72b3407b3fcb7c3d9de43d1a07433744d 100644
+--- a/mrcal.h
++++ b/mrcal.h
+@@ -20,7 +20,9 @@
+ ////////////////////////////////////////////////////////////////////////////////
+ //////////////////// Lens models
+ ////////////////////////////////////////////////////////////////////////////////
+-
++#ifdef __cplusplus
++extern "C" {
++#endif
+ // Return an array of strings listing all the available lens models
+ //
+ // These are all "unconfigured" strings that use "..." placeholders for any
+@@ -846,6 +848,9 @@ void                 mrcal_free_cameramodel(mrcal_cameramodel_t** cameramodel);
+ bool mrcal_write_cameramodel_file(const char* filename,
+                                   const mrcal_cameramodel_t* cameramodel);
+ 
++#ifdef __cplusplus
++} // extern "C"
++#endif
+ #define DECLARE_mrcal_apply_color_map(T,Tname)                          \
+     bool mrcal_apply_color_map_##Tname(                                 \
+         mrcal_image_bgr_t*    out,                                      \

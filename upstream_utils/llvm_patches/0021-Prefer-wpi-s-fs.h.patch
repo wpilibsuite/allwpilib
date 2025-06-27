@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sun, 8 May 2022 16:49:36 -0400
+Subject: [PATCH 21/37] Prefer wpi's fs.h
+
+---
+ llvm/include/llvm/Support/raw_ostream.h | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
+index a6799603a0106262520ba1c9fda14a7967b12a63..39a600c2ed7cd1cfecb46ff17929ffcb389207d7 100644
+--- a/llvm/include/llvm/Support/raw_ostream.h
++++ b/llvm/include/llvm/Support/raw_ostream.h
+@@ -26,18 +26,15 @@
+ #include <type_traits>
+ #include <vector>
+ 
+-namespace llvm {
+-
+-template <class T> class [[nodiscard]] Expected;
+ 
+-namespace sys {
+ namespace fs {
+ enum FileAccess : unsigned;
+ enum OpenFlags : unsigned;
+ enum CreationDisposition : unsigned;
+ class FileLocker;
+ } // end namespace fs
+-} // end namespace sys
++
++namespace llvm {
+ 
+ /// This class implements an extremely fast bulk output stream that can *only*
+ /// output to a stream.  It does not support seeking, reopening, rewinding, line

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:53:50 -0400
-Subject: [PATCH 07/36] Remove format_provider
+Subject: [PATCH 07/37] Remove format_provider
 
 ---
  llvm/include/llvm/Support/Chrono.h      | 114 ------------------------
@@ -142,7 +142,7 @@ index 9c9ba7002310eba5113c14957f769702c61f4326..b269ff8bb5db7bb3c62c3a87daf255b1
  
  #endif // LLVM_SUPPORT_CHRONO_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 9345348d9ba555022b31f94299684316ffa15939..862a1db876e9b8467a8839dae8f6632f18d5e7a0 100644
+index 18bdf4b7d3b96d42d93ca1e4800233b34be42a78..6c2eedf99d003a29243fbb2a9a280fe12dd49d8a 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -27,12 +27,6 @@

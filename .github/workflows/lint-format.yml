@@ -11,6 +11,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validation:
+    name: "Validation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v4
+
   wpiformat:
     name: "wpiformat"
     runs-on: ubuntu-22.04
@@ -27,9 +34,11 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install wpiformat
-        run: pip3 install wpiformat==2024.51
+        run: |
+          python -m venv ${{ runner.temp }}/wpiformat
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2025.33
       - name: Run
-        run: wpiformat
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat
       - name: Check output
         run: git --no-pager diff --exit-code HEAD
       - name: Generate diff
@@ -51,6 +60,7 @@ jobs:
   tidy:
     name: "clang-tidy"
     runs-on: ubuntu-22.04
+    needs: [validation]
     container: wpilib/ubuntu-base:22.04
     steps:
       - uses: actions/checkout@v4
@@ -66,21 +76,24 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install wpiformat
-        run: pip3 install wpiformat==2024.51
+        run: |
+          python -m venv ${{ runner.temp }}/wpiformat
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2025.33
       - name: Create compile_commands.json
         run: |
           ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64release/compile_commands.json
           ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64debug/compile_commands.json
       - name: List changed files
-        run: wpiformat -list-changed-files
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -list-changed-files
       - name: Run clang-tidy release
-        run: wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64release -vv
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64release -vv
       - name: Run clang-tidy debug
-        run: wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64debug -vv
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64debug -vv
   javaformat:
     name: "Java format"
     runs-on: ubuntu-22.04
+    needs: [validation]
     container: wpilib/ubuntu-base:22.04
     steps:
       - uses: actions/checkout@v4
@@ -114,6 +127,7 @@ jobs:
   documentation:
     name: "Documentation"
     runs-on: ubuntu-22.04
+    needs: [validation]
     steps:
       - uses: actions/checkout@v4
         with:

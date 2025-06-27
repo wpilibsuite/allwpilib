@@ -31,7 +31,7 @@ model {
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':fieldImages', library: 'fieldImages', linkage: 'static'
-            lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
+            lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                 it.buildable = false
                 return

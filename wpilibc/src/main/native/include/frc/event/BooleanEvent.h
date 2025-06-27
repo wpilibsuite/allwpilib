@@ -129,8 +129,12 @@ class BooleanEvent {
                             frc::Debouncer::DebounceType::kRising);
 
  private:
+  /// Poller loop.
   EventLoop* m_loop;
+
   std::function<bool()> m_signal;
-  std::shared_ptr<bool> m_state;  // A programmer's worst nightmare.
+
+  /// The state of the condition in the current loop poll.
+  std::shared_ptr<bool> m_state;
 };
 }  // namespace frc

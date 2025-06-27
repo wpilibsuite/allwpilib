@@ -1,0 +1,434 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Wed, 4 Dec 2024 00:58:00 -0500
+Subject: [PATCH 6/8] Fix MSVC build errors
+
+---
+ minimath/minimath-extra.h |   1 +
+ mrcal.cpp                 |  57 ++++++-----
+ poseutils.c               | 209 --------------------------------------
+ 3 files changed, 32 insertions(+), 235 deletions(-)
+
+diff --git a/minimath/minimath-extra.h b/minimath/minimath-extra.h
+index 2930a5d6aa47af29a3255342838d679032ee4562..194b0ccf22c47a8d693eee24f6f563a2d651f338 100644
+--- a/minimath/minimath-extra.h
++++ b/minimath/minimath-extra.h
+@@ -5,6 +5,7 @@
+ // replacement, and I'm not going to be thorough and I'm not going to add tests
+ // until I do that.
+ 
++#define restrict __restrict
+ 
+ // Upper triangle is stored, in the usual row-major order.
+ __attribute__((unused))
+diff --git a/mrcal.cpp b/mrcal.cpp
+index e048bef1d1b5addfd137d3c492108c36e56eda7f..1560cd106ff5bcfe49476f785aa8108119318b3a 100644
+--- a/mrcal.cpp
++++ b/mrcal.cpp
+@@ -2742,11 +2742,10 @@ void project( // out
+             const mrcal_LENSMODEL_SPLINED_STEREOGRAPHIC__config_t* config =
+                 &lensmodel->LENSMODEL_SPLINED_STEREOGRAPHIC__config;
+             *gradient_sparse_meta =
+-                (gradient_sparse_meta_t)
+                 {
+-                    .run_side_length = config->order+1,
+-                    .ivar_stridey    = 2*config->Nx,
+-                    .pool            = &dq_dintrinsics_pool_double[ivar_pool]
++                    &dq_dintrinsics_pool_double[ivar_pool],
++                    static_cast<uint16_t>(config->order+1),
++                    static_cast<uint16_t>(2*config->Nx),
+                 };
+             ivar_pool += Npoints*2 * runlen;
+         }
+@@ -2765,10 +2764,11 @@ void project( // out
+ 
+     if( calibration_object_width_n == 0 )
+     { // projecting discrete points
++        mrcal_point3_t pt_ref = {}; // Unused
+         mrcal_point3_t p =
+             _propagate_extrinsics( _dp_drc,_dp_dtc,_dp_drf,_dp_dtf,
+                                    &dp_drc,&dp_dtc,&dp_drf,&dp_dtf,
+-                                   &(mrcal_point3_t){},
++                                   &pt_ref,
+                                    camera_at_identity ? NULL : &gg,
+                                    Rj, d_Rj_rj, &joint_rt[3]);
+         _project_point(  q,
+@@ -3227,10 +3227,11 @@ bool _mrcal_unproject_internal( // out
+         // MSG("init. q=(%g,%g)", q[i].x, q[i].y);
+ 
+         // initial estimate: pinhole projection
++        const mrcal_point3_t v = {.x = (q[i].x-cx)/fx,
++                                  .y = (q[i].y-cy)/fy,
++                                  .z = 1.};
+         mrcal_project_stereographic( (mrcal_point2_t*)out->xyz, NULL,
+-                                     &(mrcal_point3_t){.x = (q[i].x-cx)/fx,
+-                                                       .y = (q[i].y-cy)/fy,
+-                                                       .z = 1.},
++                                     &v,
+                                      1,
+                                      intrinsics );
+         // MSG("init. out->xyz[]=(%g,%g)", out->x, out->y);
+@@ -4670,10 +4671,10 @@ void optimizer_callback(// input state
+ 
+         // these are computed in respect to the real-unit parameters,
+         // NOT the unit-scale parameters used by the optimizer
+-        std::vector<mrcal_point3_t> dq_drcamera_vec       (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
+-        std::vector<mrcal_point3_t> dq_dtcamera_vec       (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
+-        std::vector<mrcal_point3_t> dq_drframe_vec        (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
+-        std::vector<mrcal_point3_t> dq_dtframe_vec        (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
++        std::vector<mrcal_point3_t> dq_drcamera       (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
++        std::vector<mrcal_point3_t> dq_dtcamera       (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
++        std::vector<mrcal_point3_t> dq_drframe        (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
++        std::vector<mrcal_point3_t> dq_dtframe        (ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
+         std::vector<mrcal_calobject_warp_t> dq_dcalobject_warp(ctx->calibration_object_width_n*ctx->calibration_object_height_n*2);
+         std::vector<mrcal_point2_t> q_hypothesis      (ctx->calibration_object_width_n*ctx->calibration_object_height_n);
+         // I get the intrinsics gradients in separate arrays, possibly sparsely.
+@@ -6242,7 +6243,7 @@ bool mrcal_optimizer_callback(// out
+            problem_selections.do_optimize_extrinsics ) )
+     {
+         MSG("ERROR: We have triangulated points. At this time this is only allowed if we're NOT optimizing intrinsics AND if we ARE optimizing extrinsics.");
+-        goto done;
++        return result;
+     }
+ 
+     if( Nobservations_board > 0 )
+@@ -6250,7 +6251,7 @@ bool mrcal_optimizer_callback(// out
+         if( problem_selections.do_optimize_calobject_warp && calobject_warp == NULL )
+         {
+             MSG("ERROR: We're optimizing the calibration object warp, so a buffer with a seed MUST be passed in.");
+-            goto done;
++            return result;
+         }
+     }
+     else
+@@ -6266,7 +6267,7 @@ bool mrcal_optimizer_callback(// out
+        !problem_selections.do_optimize_calobject_warp)
+     {
+         MSG("Not optimizing any of our variables!");
+-        goto done;
++        return result;
+     }
+ 
+ 
+@@ -6279,7 +6280,7 @@ bool mrcal_optimizer_callback(// out
+     {
+         MSG("The buffer passed to fill-in b_packed has the wrong size. Needed exactly %d bytes, but got %d bytes",
+             Nstate*(int)sizeof(double),buffer_size_b_packed);
+-        goto done;
++        return result;
+     }
+ 
+     int Nmeasurements = mrcal_num_measurements(Nobservations_board,
+@@ -6312,7 +6313,7 @@ bool mrcal_optimizer_callback(// out
+     {
+         MSG("The buffer passed to fill-in x has the wrong size. Needed exactly %d bytes, but got %d bytes",
+             Nmeasurements*(int)sizeof(double),buffer_size_x);
+-        goto done;
++        return result;
+     }
+ 
+     const int Npoints_fromBoards =
+@@ -6332,9 +6333,9 @@ bool mrcal_optimizer_callback(// out
+         .Npoints_fixed              = Npoints_fixed,
+         .observations_board         = observations_board,
+         .observations_board_pool    = observations_board_pool,
+-        .observations_point_pool    = observations_point_pool,
+         .Nobservations_board        = Nobservations_board,
+         .observations_point         = observations_point,
++        .observations_point_pool    = observations_point_pool,
+         .Nobservations_point        = Nobservations_point,
+         .observations_point_triangulated  = observations_point_triangulated,
+         .Nobservations_point_triangulated = Nobservations_point_triangulated,
+@@ -6367,7 +6368,6 @@ bool mrcal_optimizer_callback(// out
+ 
+     result = true;
+ 
+-done:
+     return result;
+ }
+ 
+@@ -6516,9 +6516,9 @@ mrcal_optimize( // out
+         .Npoints_fixed              = Npoints_fixed,
+         .observations_board         = observations_board,
+         .observations_board_pool    = observations_board_pool,
+-        .observations_point_pool    = observations_point_pool,
+         .Nobservations_board        = Nobservations_board,
+         .observations_point         = observations_point,
++        .observations_point_pool    = observations_point_pool,
+         .Nobservations_point        = Nobservations_point,
+         .observations_point_triangulated  = observations_point_triangulated,
+         .Nobservations_point_triangulated = Nobservations_point_triangulated,
+@@ -6635,10 +6635,13 @@ mrcal_optimize( // out
+                                            &dogleg_parameters,
+                                            &solver_context);
+ 
+-            if(norm2_error < 0)
++            if(norm2_error < 0) {
+                 // libdogleg barfed. I quit out
+-                goto done;
++                if(solver_context != NULL)
++                    dogleg_freeContext(&solver_context);
+ 
++                return stats;
++            }
+ #if 0
+             // Not using dogleg_markOutliers() (yet...)
+ 
+@@ -6810,7 +6813,6 @@ mrcal_optimize( // out
+     if(x_final)
+         memcpy(x_final, solver_context->beforeStep->x, ctx.Nmeasurements*sizeof(double));
+ 
+- done:
+     if(solver_context != NULL)
+         dogleg_freeContext(&solver_context);
+ 
+@@ -6834,7 +6836,9 @@ bool mrcal_write_cameramodel_file(const char* filename,
+     {
+         MSG("Couldn't construct lensmodel string. Unconfigured string: '%s'",
+             mrcal_lensmodel_name_unconfigured(&cameramodel->lensmodel));
+-        goto done;
++        if(fp != NULL)
++            fclose(fp);
++        return result;
+     }
+ 
+     int Nparams = mrcal_lensmodel_num_params(&cameramodel->lensmodel);
+@@ -6842,7 +6846,9 @@ bool mrcal_write_cameramodel_file(const char* filename,
+     {
+         MSG("Couldn't get valid Nparams from lensmodel string '%s'",
+             lensmodel_string);
+-        goto done;
++        if(fp != NULL)
++            fclose(fp);
++        return result;;
+     }
+ 
+     fprintf(fp, "{\n");
+@@ -6865,7 +6871,6 @@ bool mrcal_write_cameramodel_file(const char* filename,
+     fprintf(fp,"}\n");
+     result = true;
+ 
+- done:
+     if(fp != NULL)
+         fclose(fp);
+     return result;
+diff --git a/poseutils.c b/poseutils.c
+index 80d2b0d88dd5ad264bb579a7062b051d9972be74..59f7738477127829b87f490b5a2337c2378c2309 100644
+--- a/poseutils.c
++++ b/poseutils.c
+@@ -1079,215 +1079,6 @@ void mrcal_r_from_R_full( // output
+     }
+ }
+ 
+-// LAPACK SVD function
+-int dgesdd_(char* jobz,
+-            int* m,
+-            int* n,
+-            double*  a,
+-            int* lda,
+-            double* s,
+-            double* u,
+-            int* ldu,
+-            double* vt,
+-            int* ldvt,
+-            double* work,
+-            int* lwork,
+-            int* iwork,
+-            int* info,
+-            int jobz_len);
+-
+-// This is functionally identical to mrcal.align_procrustes_vectors_R01(). It
+-// should replace that function to provide a C implementation for mrcal users
+-//
+-// This solves:
+-//   https://en.wikipedia.org/wiki/Orthogonal_Procrustes_problem
+-// See the mrcal sources for implementation details
+-static
+-bool _align_procrustes_vectors_R01(// out
+-                                   double* R01,
+-                                   // in
+-                                   const int N,
+-                                   // (N,3) arrays
+-                                   const double* p0,
+-                                   const double* p1,
+-                                   // (3,) array; may be NULL
+-                                   const double* pmean0,
+-                                   const double* pmean1,
+-
+-                                   // (N,) array; may be NULL to use an even
+-                                   // weighting
+-                                   const double* weights)
+-{
+-    double M[9] = {};
+-
+-    double _pmean0[3] = {};
+-    double _pmean1[3] = {};
+-    if(pmean0 == NULL) pmean0 = _pmean0;
+-    if(pmean1 == NULL) pmean1 = _pmean1;
+-
+-    if(weights == NULL)
+-        for(int i=0; i<N; i++)
+-            // I compute outer(v0,v1)
+-            for(int j=0; j<3; j++)
+-                for(int k=0; k<3; k++)
+-                    M[j*3 + k] += (p0[i*3+j]-pmean0[j])*(p1[i*3+k]-pmean1[k]);
+-    else
+-        for(int i=0; i<N; i++)
+-            // I compute outer(v0,v1)
+-            for(int j=0; j<3; j++)
+-                for(int k=0; k<3; k++)
+-                    M[j*3 + k] += (p0[i*3+j]-pmean0[j])*(p1[i*3+k]-pmean1[k])*weights[i];
+-
+-
+-    double U[9];
+-    double Vt[9];
+-    double S[3];
+-    double lwork_query;
+-    int iwork[3*8];
+-    int info;
+-
+-    // lapack thinks about transposed matrices. So when I give it A, it sees At.
+-    // It computes A = U Vt -> At = V Ut. And the results it gives back to me
+-    // are transposed too. So I give it At. The "U" it gives me back is actually
+-    // Vt and the Vt is actually U
+-    dgesdd_("A",
+-            (int[]){3}, (int[]){3},
+-            M, (int[]){3},
+-            S,
+-            Vt,(int[]){3},
+-            U, (int[]){3},
+-            &lwork_query,
+-            (int[]){-1}, // query the optimal lwork
+-            iwork,
+-            &info,
+-            1);
+-    if(info != 0)
+-    {
+-        // secret value to indicate that this is a fatal error. Needed for the
+-        // Python layer
+-        R01[0] = 1.;
+-        return false;
+-    }
+-
+-    double work[(int)lwork_query];
+-
+-    dgesdd_("A",
+-            (int[]){3}, (int[]){3},
+-            M, (int[]){3},
+-            S,
+-            Vt,(int[]){3},
+-            U, (int[]){3},
+-            work,
+-            (int[]){(int)lwork_query},
+-            iwork,
+-            &info,
+-            1);
+-    if(info != 0)
+-    {
+-        // secret value to indicate that this is a fatal error. Needed for the
+-        // Python layer
+-        R01[0] = 1.;
+-        return false;
+-    }
+-
+-    // I look at the second-lowest singular value. One 0 singular value is OK
+-    // (the other two can uniquely define my 3D basis). But two isn't OK: the
+-    // basis is no longer unique
+-    if(S[1] < 1e-12)
+-    {
+-        // Poorly-defined problem
+-        //
+-        // secret value to indicate that this is a potentially non-fatal error.
+-        // Needed for the Python layer
+-        R01[0] = 0.;
+-        return false;
+-    }
+-
+-    memset(R01, 0, 9*sizeof(R01[0]));
+-    for(int i=0; i<3; i++)
+-        for(int j=0; j<3; j++)
+-            for(int k=0; k<3; k++)
+-                // inner( U[i,:], V[j,:]
+-                R01[i*3 + j] += U[i*3 + k]*Vt[j + k*3];
+-
+-    // det(R01) is now +1 or -1. If it's -1, then this contains a mirror, and thus
+-    // is not a physical rotation. I compensate by negating the least-important
+-    // pair of singular vectors
+-    const double det_R =
+-        R01[0]*(R01[4]*R01[8]-R01[5]*R01[7]) -
+-        R01[1]*(R01[3]*R01[8]-R01[5]*R01[6]) +
+-        R01[2]*(R01[3]*R01[7]-R01[4]*R01[6]);
+-    if(det_R < 0)
+-    {
+-        memset(R01, 0, 9*sizeof(R01[0]));
+-
+-        for(int i=0; i<3; i++)
+-            for(int j=0; j<3; j++)
+-            {
+-                int k;
+-                for(k=0; k<2; k++)
+-                    R01[i*3 + j] += U[i*3 + k]*Vt[j + k*3];
+-                R01[i*3 + j] -= U[i*3 + k]*Vt[j + k*3];
+-            }
+-    }
+-
+-    return true;
+-}
+-
+-bool mrcal_align_procrustes_vectors_R01(// out
+-                                        double* R01,
+-                                        // in
+-                                        const int N,
+-                                        // (N,3) arrays
+-                                        const double* v0,
+-                                        const double* v1,
+-
+-                                        // (N,) array; may be NULL to use an even
+-                                        // weighting
+-                                        const double* weights)
+-{
+-    return _align_procrustes_vectors_R01(R01,N,v0,v1,NULL,NULL,weights);
+-}
+-
+-bool mrcal_align_procrustes_points_Rt01(// out
+-                                        double* Rt01,
+-                                        // in
+-                                        const int N,
+-                                        // (N,3) arrays
+-                                        const double* p0,
+-                                        const double* p1,
+-
+-                                        // (N,) array; may be NULL to use an even
+-                                        // weighting
+-                                        const double* weights)
+-{
+-    double pmean0[3] = {};
+-    double pmean1[3] = {};
+-
+-    for(int i=0; i<N; i++)
+-        for(int j=0; j<3; j++)
+-        {
+-            pmean0[j] += p0[i*3+j];
+-            pmean1[j] += p1[i*3+j];
+-        }
+-    for(int j=0; j<3; j++)
+-    {
+-        pmean0[j] /= (double)N;
+-        pmean1[j] /= (double)N;
+-    }
+-    if(!_align_procrustes_vectors_R01(Rt01,N,p0,p1,pmean0,pmean1,weights))
+-        return false;
+-
+-    // t = pmean0 - R01 pmean1
+-    for(int i=0; i<3; i++)
+-    {
+-        Rt01[9 + i] = pmean0[i];
+-        for(int j=0; j<3; j++)
+-            Rt01[9 + i] -= Rt01[i*3 + j] * pmean1[j];
+-    }
+-    return true;
+-}
+-
+ // Compute a non-unique rotation to map a given vector to [0,0,1]
+ // See docstring for mrcal.R_aligned_to_vector() for details
+ void mrcal_R_aligned_to_vector(// out

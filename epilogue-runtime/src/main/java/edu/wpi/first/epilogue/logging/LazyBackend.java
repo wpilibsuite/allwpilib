@@ -117,7 +117,7 @@ public class LazyBackend implements EpilogueBackend {
       return;
     }
 
-    m_previousValues.put(identifier, value);
+    m_previousValues.put(identifier, value.clone());
     m_backend.log(identifier, value);
   }
 
@@ -130,7 +130,7 @@ public class LazyBackend implements EpilogueBackend {
       return;
     }
 
-    m_previousValues.put(identifier, value);
+    m_previousValues.put(identifier, value.clone());
     m_backend.log(identifier, value);
   }
 
@@ -143,7 +143,7 @@ public class LazyBackend implements EpilogueBackend {
       return;
     }
 
-    m_previousValues.put(identifier, value);
+    m_previousValues.put(identifier, value.clone());
     m_backend.log(identifier, value);
   }
 
@@ -156,7 +156,7 @@ public class LazyBackend implements EpilogueBackend {
       return;
     }
 
-    m_previousValues.put(identifier, value);
+    m_previousValues.put(identifier, value.clone());
     m_backend.log(identifier, value);
   }
 
@@ -169,7 +169,7 @@ public class LazyBackend implements EpilogueBackend {
       return;
     }
 
-    m_previousValues.put(identifier, value);
+    m_previousValues.put(identifier, value.clone());
     m_backend.log(identifier, value);
   }
 
@@ -182,7 +182,7 @@ public class LazyBackend implements EpilogueBackend {
       return;
     }
 
-    m_previousValues.put(identifier, value);
+    m_previousValues.put(identifier, value.clone());
     m_backend.log(identifier, value);
   }
 
@@ -208,7 +208,7 @@ public class LazyBackend implements EpilogueBackend {
       return;
     }
 
-    m_previousValues.put(identifier, value);
+    m_previousValues.put(identifier, value.clone());
     m_backend.log(identifier, value);
   }
 
@@ -234,7 +234,7 @@ public class LazyBackend implements EpilogueBackend {
       return;
     }
 
-    m_previousValues.put(identifier, value);
+    m_previousValues.put(identifier, value.clone());
     m_backend.log(identifier, value, struct);
   }
 }

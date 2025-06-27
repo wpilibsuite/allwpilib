@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Sat, 30 Nov 2024 17:52:37 -0500
+Subject: [PATCH] Support new mrcal version
+
+---
+ src/mrcal_wrapper.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/mrcal_wrapper.cpp b/src/mrcal_wrapper.cpp
+index 569f5928ba0b389e40476cbfc224a0c09ecd5814..3a9a5519e670b0c867281f1e05aa2046b938fa8d 100644
+--- a/src/mrcal_wrapper.cpp
++++ b/src/mrcal_wrapper.cpp
+@@ -212,7 +212,7 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
+   std::vector<double> residuals = {c_x_final, c_x_final + Nmeasurements};
+   return std::make_unique<mrcal_result>(
+       true, intrinsics, stats.rms_reproj_error__pixels, residuals,
+-      calobject_warp, stats.Noutliers);
++      calobject_warp, stats.Noutliers_board);
+ }
+ 
+ struct MrcalSolveOptions {

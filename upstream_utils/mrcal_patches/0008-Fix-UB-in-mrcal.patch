@@ -1,0 +1,70 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Matt <matthew.morley.ca@gmail.com>
+Date: Thu, 5 Dec 2024 00:10:15 -0500
+Subject: [PATCH 8/8] Fix UB in mrcal
+
+---
+ mrcal.cpp | 27 ++++++++++++++++-----------
+ 1 file changed, 16 insertions(+), 11 deletions(-)
+
+diff --git a/mrcal.cpp b/mrcal.cpp
+index d4a2415a5730a48671b2716960bc343cdbd01295..0b7263f58164bfe9f42447741a08366262195f7c 100644
+--- a/mrcal.cpp
++++ b/mrcal.cpp
+@@ -4582,7 +4582,6 @@ void optimizer_callback(// input state
+         // Construct the FULL intrinsics vector, based on either the
+         // optimization vector or the inputs, depending on what we're optimizing
+         double* intrinsics_here  = &intrinsics_all[icam_intrinsics][0];
+-        double* distortions_here = &intrinsics_all[icam_intrinsics][Ncore];
+ 
+         int i_var_intrinsics =
+             mrcal_state_index_intrinsics(icam_intrinsics,
+@@ -4604,15 +4603,20 @@ void optimizer_callback(// input state
+                         &ctx->intrinsics[ctx->Nintrinsics*icam_intrinsics],
+                         Ncore*sizeof(double) );
+         }
+-        if( ctx->problem_selections.do_optimize_intrinsics_distortions )
+-        {
+-            for(int i = 0; i<ctx->Nintrinsics-Ncore; i++)
+-                distortions_here[i] = packed_state[i_var_intrinsics++] * SCALE_DISTORTION;
++        int nDistortion = ctx->Nintrinsics-Ncore;
++        if (nDistortion) {
++            double* distortions_here = &intrinsics_all[icam_intrinsics][Ncore];
++            if( ctx->problem_selections.do_optimize_intrinsics_distortions )
++            {
++                for(int i = 0; i<ctx->Nintrinsics-Ncore; i++)
++                    distortions_here[i] = packed_state[i_var_intrinsics++] * SCALE_DISTORTION;
++            }
++            else {
++                memcpy( distortions_here,
++                        &ctx->intrinsics[ctx->Nintrinsics*icam_intrinsics + Ncore],
++                        (ctx->Nintrinsics-Ncore)*sizeof(double) );
++            }
+         }
+-        else
+-            memcpy( distortions_here,
+-                    &ctx->intrinsics[ctx->Nintrinsics*icam_intrinsics + Ncore],
+-                    (ctx->Nintrinsics-Ncore)*sizeof(double) );
+     }
+     for(int icam_extrinsics=0;
+         icam_extrinsics<ctx->Ncameras_extrinsics;
+@@ -4699,6 +4703,7 @@ void optimizer_callback(// input state
+ 
+         int splined_intrinsics_grad_irun = 0;
+ 
++        bool camera_at_identity = icam_extrinsics < 0;
+         project(q_hypothesis.data(),
+ 
+                 ctx->problem_selections.do_optimize_intrinsics_core || ctx->problem_selections.do_optimize_intrinsics_distortions ?
+@@ -4720,9 +4725,9 @@ void optimizer_callback(// input state
+ 
+                 // input
+                 intrinsics_all[icam_intrinsics].data(),
+-                &camera_rt[icam_extrinsics], &frame_rt,
++                camera_at_identity ? NULL : &camera_rt[icam_extrinsics], &frame_rt,
+                 ctx->calobject_warp == NULL ? NULL : &calobject_warp_local,
+-                icam_extrinsics < 0,
++                camera_at_identity,
+                 &ctx->lensmodel, &ctx->precomputed,
+                 ctx->calibration_object_spacing,
+                 ctx->calibration_object_width_n,

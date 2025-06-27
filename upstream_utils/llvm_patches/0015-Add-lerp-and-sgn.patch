@@ -1,19 +1,19 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:50:24 -0400
-Subject: [PATCH 15/36] Add lerp and sgn
+Subject: [PATCH 15/37] Add lerp and sgn
 
 ---
- llvm/include/llvm/Support/MathExtras.h | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ llvm/include/llvm/Support/MathExtras.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 60b3b9012a32dda5e7c3ba1dc5923ffa68df8215..daa79d99578e934ca001d1de5d2772ff961b8fc3 100644
+index b9084182158757647cc9896320a353a373b0f9ec..4033e032b5979a4f25b4c16f3988fb11087ed6bb 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -617,6 +617,26 @@ std::enable_if_t<std::is_signed_v<T>, T> MulOverflow(T X, T Y, T &Result) {
-     return UX > (static_cast<U>((std::numeric_limits<T>::max)())) / UY;
- }
+@@ -751,6 +751,27 @@ using stack_float_t = volatile float;
+ using stack_float_t = float;
+ #endif
  
 +// Typesafe implementation of the signum function.
 +// Returns -1 if negative, 1 if positive, 0 if 0.
@@ -35,6 +35,7 @@ index 60b3b9012a32dda5e7c3ba1dc5923ffa68df8215..daa79d99578e934ca001d1de5d2772ff
 +constexpr T Lerp(const T& startValue, const T& endValue, double t) {
 +  return startValue + (endValue - startValue) * t;
 +}
- } // End llvm namespace
++
+ } // namespace llvm
  
  #endif

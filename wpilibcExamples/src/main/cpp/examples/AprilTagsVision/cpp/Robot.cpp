@@ -59,7 +59,7 @@ class Robot : public frc::TimedRobot {
     // Set up Pose Estimator - parameters are for a Microsoft Lifecam HD-3000
     // (https://www.chiefdelphi.com/t/wpilib-apriltagdetector-sample-code/421411/21)
     frc::AprilTagPoseEstimator::Config poseEstConfig = {
-        .tagSize = units::length::inch_t(6.5),
+        .tagSize = 6.5_in,
         .fx = 699.3778103158814,
         .fy = 677.7161226393544,
         .cx = 345.6059345433618,

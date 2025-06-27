@@ -97,7 +97,7 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':fieldImages', library: 'fieldImages', linkage: 'shared'
-                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -127,7 +127,7 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':fieldImages', library: 'fieldImages', linkage: 'shared'
-                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -167,7 +167,7 @@ model {
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':fieldImages', library: 'fieldImages', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
-                lib project: ':thirdparty:imgui_suite', library: 'imgui', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                     it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'

@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <frc2/command/Commands.h>
+
 #include <utility>
 
 #include <gtest/gtest.h>
@@ -55,14 +57,14 @@ TEST_P(SchedulingRecursionTest, CancelFromInitialize) {
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
                                     GetParam()};
-  RunCommand other{[&hasOtherRun] { hasOtherRun = true; }, {&requirement}};
+  auto other = cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
 
   scheduler.Schedule(&selfCancels);
   scheduler.Run();
-  scheduler.Schedule(&other);
+  scheduler.Schedule(other);
 
   EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
-  EXPECT_TRUE(scheduler.IsScheduled(&other));
+  EXPECT_TRUE(scheduler.IsScheduled(other));
   EXPECT_EQ(1, counter);
   scheduler.Run();
   EXPECT_TRUE(hasOtherRun);
@@ -78,16 +80,16 @@ TEST_F(SchedulingRecursionTest, CancelFromInitializeAction) {
                                 [&counter](bool) { counter++; },
                                 [] { return false; },
                                 {&requirement}};
-  RunCommand other{[&hasOtherRun] { hasOtherRun = true; }, {&requirement}};
+  auto other = cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
   scheduler.OnCommandInitialize([&scheduler, &selfCancels](const Command&) {
     scheduler.Cancel(&selfCancels);
   });
   scheduler.Schedule(&selfCancels);
   scheduler.Run();
-  scheduler.Schedule(&other);
+  scheduler.Schedule(other);
 
   EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
-  EXPECT_TRUE(scheduler.IsScheduled(&other));
+  EXPECT_TRUE(scheduler.IsScheduled(other));
   EXPECT_EQ(1, counter);
   scheduler.Run();
   EXPECT_TRUE(hasOtherRun);
@@ -101,7 +103,7 @@ TEST_P(SchedulingRecursionTest,
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
                                     GetParam()};
-  RunCommand other{[&hasOtherRun] { hasOtherRun = true; }, {&requirement}};
+  auto other = cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
   scheduler.SetDefaultCommand(&requirement, std::move(other));
 
   scheduler.Schedule(&selfCancels);
@@ -202,6 +204,7 @@ TEST_F(SchedulingRecursionTest, CancelFromEndLoop) {
 TEST_F(SchedulingRecursionTest, CancelFromEndLoopWhileInRunLoop) {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
+
   EndCommand dCancelsAll([&](bool) {
     counter++;
     scheduler.CancelAll();
@@ -270,7 +273,6 @@ TEST_P(SchedulingRecursionTest, ScheduleFromEndCancel) {
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
                                     GetParam()};
-  RunCommand other{[] {}, {&requirement}};
 
   scheduler.Schedule(&selfCancels);
   EXPECT_NO_THROW({ scheduler.Cancel(&selfCancels); });
@@ -284,30 +286,30 @@ TEST_P(SchedulingRecursionTest, ScheduleFromEndInterrupt) {
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
                                     GetParam()};
-  RunCommand other{[] {}, {&requirement}};
+  auto other = cmd::Idle({&requirement});
 
   scheduler.Schedule(&selfCancels);
-  EXPECT_NO_THROW({ scheduler.Schedule(&other); });
+  EXPECT_NO_THROW({ scheduler.Schedule(other); });
   EXPECT_EQ(1, counter);
   EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
-  EXPECT_TRUE(scheduler.IsScheduled(&other));
+  EXPECT_TRUE(scheduler.IsScheduled(other));
 }
 
 TEST_F(SchedulingRecursionTest, ScheduleFromEndInterruptAction) {
   CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   TestSubsystem requirement;
-  RunCommand selfCancels{[] {}, {&requirement}};
-  RunCommand other{[] {}, {&requirement}};
+  auto selfCancels = cmd::Idle({&requirement});
+  auto other = cmd::Idle({&requirement});
   scheduler.OnCommandInterrupt([&](const Command&) {
     counter++;
-    scheduler.Schedule(&other);
+    scheduler.Schedule(other);
   });
-  scheduler.Schedule(&selfCancels);
-  EXPECT_NO_THROW({ scheduler.Schedule(&other); });
+  scheduler.Schedule(selfCancels);
+  EXPECT_NO_THROW({ scheduler.Schedule(other); });
   EXPECT_EQ(1, counter);
-  EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
-  EXPECT_TRUE(scheduler.IsScheduled(&other));
+  EXPECT_FALSE(scheduler.IsScheduled(selfCancels));
+  EXPECT_TRUE(scheduler.IsScheduled(other));
 }
 
 TEST_F(SchedulingRecursionTest, CancelDefaultCommandFromEnd) {
@@ -319,11 +321,11 @@ TEST_F(SchedulingRecursionTest, CancelDefaultCommandFromEnd) {
                                    [&counter](bool) { counter++; },
                                    [] { return false; },
                                    {&requirement}};
-  RunCommand other{[] {}, {&requirement}};
+  auto other = cmd::Idle({&requirement});
   FunctionalCommand cancelDefaultCommand{[] {}, [] {},
                                          [&](bool) {
                                            counter++;
-                                           scheduler.Schedule(&other);
+                                           scheduler.Schedule(other);
                                          },
                                          [] { return false; }};
 
@@ -336,7 +338,7 @@ TEST_F(SchedulingRecursionTest, CancelDefaultCommandFromEnd) {
   });
   EXPECT_EQ(2, counter);
   EXPECT_FALSE(scheduler.IsScheduled(&defaultCommand));
-  EXPECT_TRUE(scheduler.IsScheduled(&other));
+  EXPECT_TRUE(scheduler.IsScheduled(other));
 }
 
 TEST_F(SchedulingRecursionTest, CancelNextCommandFromCommand) {

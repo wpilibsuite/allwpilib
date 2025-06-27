@@ -19,10 +19,13 @@
 namespace frc {
 
 /**
- * A class for driving addressable LEDs, such as WS2812Bs and NeoPixels.
+ * A class for driving addressable LEDs, such as WS2812B, WS2815, and NeoPixels.
  *
- * By default, the timing supports WS2812B LEDs, but is configurable using
- * SetBitTiming()
+ * By default, the timing supports WS2812B and WS2815 LEDs, but is configurable
+ * using SetBitTiming()
+ *
+ * Some LEDs use a different color order than the default GRB. The color order
+ * is configurable using SetColorOrder().
  *
  * <p>Only 1 LED driver is currently supported by the roboRIO. However,
  * multiple LED strips can be connected in series and controlled from the
@@ -30,6 +33,18 @@ namespace frc {
  */
 class AddressableLED {
  public:
+  /**
+   * Order that color data is sent over the wire.
+   */
+  enum ColorOrder {
+    kRGB = HAL_ALED_RGB,  ///< RGB order
+    kRBG = HAL_ALED_RBG,  ///< RBG order
+    kBGR = HAL_ALED_BGR,  ///< BGR order
+    kBRG = HAL_ALED_BRG,  ///< BRG order
+    kGBR = HAL_ALED_GBR,  ///< GBR order
+    kGRB = HAL_ALED_GRB   ///< GRB order. This is the default order.
+  };
+
   class LEDData : public HAL_AddressableLEDData {
    public:
     LEDData() : LEDData(0, 0, 0) {}
@@ -96,6 +111,15 @@ class AddressableLED {
   AddressableLED& operator=(AddressableLED&&) = default;
 
   /**
+   * Sets the color order for this AddressableLED. The default order is GRB.
+   *
+   * This will take effect on the next call to SetData().
+   *
+   * @param order the color order
+   */
+  void SetColorOrder(ColorOrder order);
+
+  /**
    * Sets the length of the LED strip.
    *
    * <p>Calling this is an expensive call, so its best to call it once, then
@@ -130,8 +154,8 @@ class AddressableLED {
   /**
    * Sets the bit timing.
    *
-   * <p>By default, the driver is set up to drive WS2812Bs, so nothing needs to
-   * be set for those.
+   * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing
+   * needs to be set for those.
    *
    * @param highTime0 high time for 0 bit (default 400ns)
    * @param lowTime0 low time for 0 bit (default 900ns)
@@ -146,7 +170,7 @@ class AddressableLED {
    * Sets the sync time.
    *
    * <p>The sync time is the time to hold output so LEDs enable. Default set for
-   * WS2812B.
+   * WS2812B and WS2815.
    *
    * @param syncTime the sync time (default 280us)
    */
@@ -169,4 +193,9 @@ class AddressableLED {
   hal::Handle<HAL_AddressableLEDHandle, HAL_FreeAddressableLED> m_handle;
   int m_port;
 };
+
+constexpr auto format_as(AddressableLED::ColorOrder order) {
+  return static_cast<int32_t>(order);
+}
+
 }  // namespace frc

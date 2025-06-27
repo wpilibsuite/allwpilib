@@ -55,32 +55,32 @@ public class TestBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, byte[] value) {
-    m_entries.add(new LogEntry<>(identifier, value));
+    m_entries.add(new LogEntry<>(identifier, value.clone()));
   }
 
   @Override
   public void log(String identifier, int[] value) {
-    m_entries.add(new LogEntry<>(identifier, value));
+    m_entries.add(new LogEntry<>(identifier, value.clone()));
   }
 
   @Override
   public void log(String identifier, long[] value) {
-    m_entries.add(new LogEntry<>(identifier, value));
+    m_entries.add(new LogEntry<>(identifier, value.clone()));
   }
 
   @Override
   public void log(String identifier, float[] value) {
-    m_entries.add(new LogEntry<>(identifier, value));
+    m_entries.add(new LogEntry<>(identifier, value.clone()));
   }
 
   @Override
   public void log(String identifier, double[] value) {
-    m_entries.add(new LogEntry<>(identifier, value));
+    m_entries.add(new LogEntry<>(identifier, value.clone()));
   }
 
   @Override
   public void log(String identifier, boolean[] value) {
-    m_entries.add(new LogEntry<>(identifier, value));
+    m_entries.add(new LogEntry<>(identifier, value.clone()));
   }
 
   @Override
@@ -90,19 +90,27 @@ public class TestBackend implements EpilogueBackend {
 
   @Override
   public void log(String identifier, String[] value) {
-    m_entries.add(new LogEntry<>(identifier, value));
+    m_entries.add(new LogEntry<>(identifier, value.clone()));
   }
 
   @Override
   public <S> void log(String identifier, S value, Struct<S> struct) {
-    var serialized = StructBuffer.create(struct).write(value).array();
+    var buffer = StructBuffer.create(struct).write(value).position(0);
+    var serialized = new byte[buffer.capacity()];
+    for (int i = 0; i < buffer.capacity(); i++) {
+      serialized[i] = buffer.get();
+    }
 
     m_entries.add(new LogEntry<>(identifier, serialized));
   }
 
   @Override
   public <S> void log(String identifier, S[] value, Struct<S> struct) {
-    var serialized = StructBuffer.create(struct).writeArray(value).array();
+    var buffer = StructBuffer.create(struct).writeArray(value).position(0);
+    var serialized = new byte[buffer.capacity()];
+    for (int i = 0; i < buffer.capacity(); i++) {
+      serialized[i] = buffer.get();
+    }
 
     m_entries.add(new LogEntry<>(identifier, serialized));
   }

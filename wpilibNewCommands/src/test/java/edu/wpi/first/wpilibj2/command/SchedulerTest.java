@@ -23,7 +23,7 @@ class SchedulerTest extends CommandTestBase {
       scheduler.onCommandExecute(command -> counter.incrementAndGet());
       scheduler.onCommandFinish(command -> counter.incrementAndGet());
 
-      scheduler.schedule(new InstantCommand());
+      scheduler.schedule(Commands.none());
       scheduler.run();
 
       assertEquals(counter.get(), 3);
@@ -37,7 +37,7 @@ class SchedulerTest extends CommandTestBase {
 
       scheduler.onCommandInterrupt(command -> counter.incrementAndGet());
 
-      Command command = new WaitCommand(10);
+      Command command = Commands.idle();
 
       scheduler.schedule(command);
       scheduler.cancel(command);
@@ -162,8 +162,8 @@ class SchedulerTest extends CommandTestBase {
       scheduler.onCommandInterrupt(command -> counter.incrementAndGet());
       scheduler.onCommandInterrupt((command, interruptor) -> assertFalse(interruptor.isPresent()));
 
-      Command command = new WaitCommand(10);
-      Command command2 = new WaitCommand(10);
+      Command command = Commands.idle();
+      Command command2 = Commands.idle();
 
       scheduler.schedule(command);
       scheduler.schedule(command2);

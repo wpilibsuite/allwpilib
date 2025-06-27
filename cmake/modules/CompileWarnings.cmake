@@ -14,18 +14,20 @@ macro(wpilib_target_warnings target)
 
         target_compile_options(${target} PRIVATE ${WARNING_FLAGS})
     else()
-        target_compile_options(
-            ${target}
-            PRIVATE
-                /wd4146
-                /wd4244
-                /wd4251
-                /wd4267
-                /wd4324
-                /WX
-                /D_CRT_SECURE_NO_WARNINGS
-                ${WPILIB_TARGET_WARNINGS}
+        set(WARNING_FLAGS
+            /wd4146
+            /wd4244
+            /wd4251
+            /wd4267
+            /wd4324
+            /D_CRT_SECURE_NO_WARNINGS
+            ${WPILIB_TARGET_WARNINGS}
         )
+        if(NOT NO_WERROR)
+            set(WARNING_FLAGS ${WARNING_FLAGS} /WX)
+        endif()
+
+        target_compile_options(${target} PRIVATE ${WARNING_FLAGS})
     endif()
 
     # Suppress C++-specific OpenCV warning; C compiler rejects it with an error
@@ -44,7 +46,7 @@ macro(wpilib_target_warnings target)
 
     # Suppress warning "enumeration types with a fixed underlying type are a
     # Clang extension"
-    if(APPLE)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT EMSCRIPTEN)
         target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wno-fixed-enum-extension>)
     endif()
 

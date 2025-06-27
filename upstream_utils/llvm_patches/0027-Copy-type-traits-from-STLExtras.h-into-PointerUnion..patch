@@ -1,0 +1,69 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Wed, 10 Aug 2022 17:07:52 -0700
+Subject: [PATCH 27/37] Copy type traits from STLExtras.h into PointerUnion.h
+
+---
+ llvm/include/llvm/ADT/PointerUnion.h | 46 ++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+
+diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
+index 8ac68dbc0a791b8ac0e0ca865e69024cb642aa70..273ba02934bd405ea4f1b911ebb58f7080837ff0 100644
+--- a/llvm/include/llvm/ADT/PointerUnion.h
++++ b/llvm/include/llvm/ADT/PointerUnion.h
+@@ -23,9 +23,55 @@
+ #include <cassert>
+ #include <cstddef>
+ #include <cstdint>
++#include <type_traits>
+ 
+ namespace llvm {
+ 
++namespace detail {
++template <typename T, typename... Us> struct TypesAreDistinct;
++template <typename T, typename... Us>
++struct TypesAreDistinct
++    : std::integral_constant<bool, !std::disjunction_v<std::is_same<T, Us>...> &&
++                                       TypesAreDistinct<Us...>::value> {};
++template <typename T> struct TypesAreDistinct<T> : std::true_type {};
++} // namespace detail
++
++/// Determine if all types in Ts are distinct.
++///
++/// Useful to statically assert when Ts is intended to describe a non-multi set
++/// of types.
++///
++/// Expensive (currently quadratic in sizeof(Ts...)), and so should only be
++/// asserted once per instantiation of a type which requires it.
++template <typename... Ts> struct TypesAreDistinct;
++template <> struct TypesAreDistinct<> : std::true_type {};
++template <typename... Ts>
++struct TypesAreDistinct
++    : std::integral_constant<bool, detail::TypesAreDistinct<Ts...>::value> {};
++
++/// Find the first index where a type appears in a list of types.
++///
++/// FirstIndexOfType<T, Us...>::value is the first index of T in Us.
++///
++/// Typically only meaningful when it is otherwise statically known that the
++/// type pack has no duplicate types. This should be guaranteed explicitly with
++/// static_assert(TypesAreDistinct<Us...>::value).
++///
++/// It is a compile-time error to instantiate when T is not present in Us, i.e.
++/// if is_one_of<T, Us...>::value is false.
++template <typename T, typename... Us> struct FirstIndexOfType;
++template <typename T, typename U, typename... Us>
++struct FirstIndexOfType<T, U, Us...>
++    : std::integral_constant<size_t, 1 + FirstIndexOfType<T, Us...>::value> {};
++template <typename T, typename... Us>
++struct FirstIndexOfType<T, T, Us...> : std::integral_constant<size_t, 0> {};
++
++/// Find the type at a given index in a list of types.
++///
++/// TypeAtIndex<I, Ts...> is the type at index I in Ts.
++template <size_t I, typename... Ts>
++using TypeAtIndex = std::tuple_element_t<I, std::tuple<Ts...>>;
++
+ namespace pointer_union_detail {
+   /// Determine the number of bits required to store integers with values < n.
+   /// This is ceil(log2(n)).

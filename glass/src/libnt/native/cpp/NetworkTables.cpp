@@ -360,7 +360,7 @@ static void UpdateProtobufValueSource(NetworkTablesModel& model,
                                       const google::protobuf::Message& msg,
                                       std::string_view name, int64_t time) {
   auto desc = msg.GetDescriptor();
-  out->typeStr = "proto:" + desc->full_name();
+  out->typeStr = fmt::format("proto:{}", desc->full_name());
   if (!out->valueChildrenMap ||
       desc->field_count() != static_cast<int>(out->valueChildren.size())) {
     out->valueChildren.clear();
@@ -1404,7 +1404,7 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_INTEGER: {
       int64_t v = val.GetInteger();
-      if (InputExpr<int64_t>(typeStr, &v, "%d",
+      if (InputExpr<int64_t>(typeStr, &v, "%" PRId64,
                              ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
           entry.publisher = nt::Publish(entry.info.topic, NT_INTEGER, "int");

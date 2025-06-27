@@ -38,7 +38,6 @@
 #include "wpi/Compiler.h"
 #include "wpi/MemAlloc.h"
 #include "wpi/type_traits.h"
-#include <cstddef>
 #include <cstring>
 #include <memory>
 #include <type_traits>
@@ -169,7 +168,7 @@ protected:
     // provide four pointers worth of storage here.
     // This is mutable as an inlined `const unique_function<void() const>` may
     // still modify its own mutable members.
-    alignas(void*) mutable std::byte InlineStorage[InlineStorageSize];
+    alignas(void *) mutable std::byte InlineStorage[InlineStorageSize];
   } StorageUnion;
 
   // A compressed pointer to either our dispatching callback or our table of

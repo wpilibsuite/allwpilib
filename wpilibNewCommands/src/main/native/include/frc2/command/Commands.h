@@ -29,7 +29,6 @@ namespace cmd {
 /**
  * Constructs a command that does nothing, finishing immediately.
  */
-[[nodiscard]]
 CommandPtr None();
 
 /**
@@ -38,7 +37,6 @@ CommandPtr None();
  * @param requirements Subsystems to require
  * @return the command
  */
-[[nodiscard]]
 CommandPtr Idle(Requirements requirements = {});
 
 // Action Commands
@@ -49,7 +47,6 @@ CommandPtr Idle(Requirements requirements = {});
  * @param action the action to run
  * @param requirements subsystems the action requires
  */
-[[nodiscard]]
 CommandPtr RunOnce(std::function<void()> action,
                    Requirements requirements = {});
 
@@ -59,7 +56,6 @@ CommandPtr RunOnce(std::function<void()> action,
  * @param action the action to run
  * @param requirements subsystems the action requires
  */
-[[nodiscard]]
 CommandPtr Run(std::function<void()> action, Requirements requirements = {});
 
 /**
@@ -70,7 +66,6 @@ CommandPtr Run(std::function<void()> action, Requirements requirements = {});
  * @param end the action to run on interrupt
  * @param requirements subsystems the action requires
  */
-[[nodiscard]]
 CommandPtr StartEnd(std::function<void()> start, std::function<void()> end,
                     Requirements requirements = {});
 
@@ -82,7 +77,6 @@ CommandPtr StartEnd(std::function<void()> start, std::function<void()> end,
  * @param end the action to run on interrupt
  * @param requirements subsystems the action requires
  */
-[[nodiscard]]
 CommandPtr RunEnd(std::function<void()> run, std::function<void()> end,
                   Requirements requirements = {});
 
@@ -94,7 +88,6 @@ CommandPtr RunEnd(std::function<void()> run, std::function<void()> end,
  * @param run the action to run every iteration
  * @param requirements subsystems the action requires
  */
-[[nodiscard]]
 CommandPtr StartRun(std::function<void()> start, std::function<void()> run,
                     Requirements requirements = {});
 
@@ -103,7 +96,6 @@ CommandPtr StartRun(std::function<void()> start, std::function<void()> run,
  *
  * @param msg the message to print
  */
-[[nodiscard]]
 CommandPtr Print(std::string_view msg);
 
 // Idling Commands
@@ -113,7 +105,6 @@ CommandPtr Print(std::string_view msg);
  *
  * @param duration after how long the command finishes
  */
-[[nodiscard]]
 CommandPtr Wait(units::second_t duration);
 
 /**
@@ -122,7 +113,6 @@ CommandPtr Wait(units::second_t duration);
  *
  * @param condition the condition
  */
-[[nodiscard]]
 CommandPtr WaitUntil(std::function<bool()> condition);
 
 // Selector Commands
@@ -134,7 +124,6 @@ CommandPtr WaitUntil(std::function<bool()> condition);
  * @param onFalse the command to run if the selector function returns false
  * @param selector the selector function
  */
-[[nodiscard]]
 CommandPtr Either(CommandPtr&& onTrue, CommandPtr&& onFalse,
                   std::function<bool()> selector);
 
@@ -145,7 +134,6 @@ CommandPtr Either(CommandPtr&& onTrue, CommandPtr&& onFalse,
  * @param commands map of commands to select from
  */
 template <typename Key, std::convertible_to<CommandPtr>... CommandPtrs>
-[[nodiscard]]
 CommandPtr Select(std::function<Key()> selector,
                   std::pair<Key, CommandPtrs>&&... commands) {
   std::vector<std::pair<Key, std::unique_ptr<Command>>> vec;
@@ -162,22 +150,16 @@ CommandPtr Select(std::function<Key()> selector,
  * @param supplier the command supplier
  * @param requirements the set of requirements for this command
  */
-[[nodiscard]]
 CommandPtr Defer(wpi::unique_function<CommandPtr()> supplier,
                  Requirements requirements);
 
 /**
  * Constructs a command that schedules the command returned from the supplier
  * when initialized, and ends when it is no longer scheduled. The supplier is
- * called when the command is initialized. As a replacement, consider using
- * `Defer(supplier).AsProxy()`.
+ * called when the command is initialized.
  *
  * @param supplier the command supplier
  */
-WPI_IGNORE_DEPRECATED
-[[nodiscard]] [[deprecated(
-    "The ProxyCommand supplier constructor has been deprecated. Use "
-    "Defer(supplier).AsProxy() instead.")]]
 CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
 
 /**
@@ -187,11 +169,7 @@ CommandPtr DeferredProxy(wpi::unique_function<Command*()> supplier);
  *
  * @param supplier the command supplier
  */
-[[nodiscard]] [[deprecated(
-    "The ProxyCommand supplier constructor has been deprecated. Use "
-    "Defer(supplier).AsProxy() instead.")]]
 CommandPtr DeferredProxy(wpi::unique_function<CommandPtr()> supplier);
-WPI_UNIGNORE_DEPRECATED
 // Command Groups
 
 namespace impl {
@@ -212,14 +190,12 @@ std::vector<CommandPtr> MakeVector(Args&&... args) {
 /**
  * Runs a group of commands in series, one after the other.
  */
-[[nodiscard]]
 CommandPtr Sequence(std::vector<CommandPtr>&& commands);
 
 /**
  * Runs a group of commands in series, one after the other.
  */
 template <std::convertible_to<CommandPtr>... CommandPtrs>
-[[nodiscard]]
 CommandPtr Sequence(CommandPtrs&&... commands) {
   return Sequence(impl::MakeVector(std::forward<CommandPtrs>(commands)...));
 }
@@ -228,7 +204,6 @@ CommandPtr Sequence(CommandPtrs&&... commands) {
  * Runs a group of commands in series, one after the other. Once the last
  * command ends, the group is restarted.
  */
-[[nodiscard]]
 CommandPtr RepeatingSequence(std::vector<CommandPtr>&& commands);
 
 /**
@@ -236,7 +211,6 @@ CommandPtr RepeatingSequence(std::vector<CommandPtr>&& commands);
  * command ends, the group is restarted.
  */
 template <std::convertible_to<CommandPtr>... CommandPtrs>
-[[nodiscard]]
 CommandPtr RepeatingSequence(CommandPtrs&&... commands) {
   return RepeatingSequence(
       impl::MakeVector(std::forward<CommandPtrs>(commands)...));
@@ -246,7 +220,6 @@ CommandPtr RepeatingSequence(CommandPtrs&&... commands) {
  * Runs a group of commands at the same time. Ends once all commands in the
  * group finish.
  */
-[[nodiscard]]
 CommandPtr Parallel(std::vector<CommandPtr>&& commands);
 
 /**
@@ -254,7 +227,6 @@ CommandPtr Parallel(std::vector<CommandPtr>&& commands);
  * group finish.
  */
 template <std::convertible_to<CommandPtr>... CommandPtrs>
-[[nodiscard]]
 CommandPtr Parallel(CommandPtrs&&... commands) {
   return Parallel(impl::MakeVector(std::forward<CommandPtrs>(commands)...));
 }
@@ -263,7 +235,6 @@ CommandPtr Parallel(CommandPtrs&&... commands) {
  * Runs a group of commands at the same time. Ends once any command in the group
  * finishes, and cancels the others.
  */
-[[nodiscard]]
 CommandPtr Race(std::vector<CommandPtr>&& commands);
 
 /**
@@ -271,7 +242,6 @@ CommandPtr Race(std::vector<CommandPtr>&& commands);
  * finishes, and cancels the others.
  */
 template <std::convertible_to<CommandPtr>... CommandPtrs>
-[[nodiscard]]
 CommandPtr Race(CommandPtrs&&... commands) {
   return Race(impl::MakeVector(std::forward<CommandPtrs>(commands)...));
 }
@@ -280,7 +250,6 @@ CommandPtr Race(CommandPtrs&&... commands) {
  * Runs a group of commands at the same time. Ends once a specific command
  * finishes, and cancels the others.
  */
-[[nodiscard]]
 CommandPtr Deadline(CommandPtr&& deadline, std::vector<CommandPtr>&& others);
 
 /**
@@ -288,7 +257,6 @@ CommandPtr Deadline(CommandPtr&& deadline, std::vector<CommandPtr>&& others);
  * finishes, and cancels the others.
  */
 template <std::convertible_to<CommandPtr>... CommandPtrs>
-[[nodiscard]]
 CommandPtr Deadline(CommandPtr&& deadline, CommandPtrs&&... commands) {
   return Deadline(std::move(deadline),
                   impl::MakeVector(std::forward<CommandPtrs>(commands)...));

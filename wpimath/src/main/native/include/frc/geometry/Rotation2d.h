@@ -8,7 +8,6 @@
 #include <utility>
 
 #include <Eigen/Core>
-#include <Eigen/LU>
 #include <gcem.hpp>
 #include <wpi/StackTrace.h>
 #include <wpi/SymbolExports.h>
@@ -56,11 +55,11 @@ class WPILIB_DLLEXPORT Rotation2d {
   constexpr Rotation2d(double x, double y) {
     double magnitude = gcem::hypot(x, y);
     if (magnitude > 1e-6) {
-      m_sin = y / magnitude;
       m_cos = x / magnitude;
+      m_sin = y / magnitude;
     } else {
-      m_sin = 0.0;
       m_cos = 1.0;
+      m_sin = 0.0;
       if (!std::is_constant_evaluated()) {
         wpi::math::MathSharedStore::ReportError(
             "x and y components of Rotation2d are zero\n{}",
@@ -84,7 +83,11 @@ class WPILIB_DLLEXPORT Rotation2d {
       if ((R * R.transpose() - Matrix2d::Identity()).norm() > 1e-9) {
         throw std::domain_error("Rotation matrix isn't orthogonal");
       }
-      if (gcem::abs(R.determinant() - 1.0) > 1e-9) {
+      // HACK: Uses ct_matrix instead of <Eigen/LU> for determinant because
+      //       including <Eigen/LU> doubles compilation times on MSVC, even if
+      //       this constructor is unused. MSVC's frontend inefficiently parses
+      //       large headers; GCC and Clang are largely unaffected.
+      if (gcem::abs(ct_matrix{R}.determinant() - 1.0) > 1e-9) {
         throw std::domain_error(
             "Rotation matrix is orthogonal but not special orthogonal");
       }

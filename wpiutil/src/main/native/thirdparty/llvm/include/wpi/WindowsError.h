@@ -12,6 +12,7 @@
 #include <system_error>
 
 namespace wpi {
+std::error_code mapLastWindowsError();
 std::error_code mapWindowsError(unsigned EV);
 }
 

@@ -44,6 +44,7 @@
 #include <string_view>
 
 namespace wpi {
+
 uint64_t xxHash64(std::string_view Data);
 uint64_t xxHash64(std::span<const uint8_t> Data);
 
@@ -51,6 +52,30 @@ uint64_t xxh3_64bits(std::span<const uint8_t> data);
 inline uint64_t xxh3_64bits(std::string_view data) {
   return xxh3_64bits(std::span(reinterpret_cast<const uint8_t*>(data.data()), data.size()));
 }
-}
+
+/*-**********************************************************************
+ *  XXH3 128-bit variant
+ ************************************************************************/
+
+/*!
+ * @brief The return value from 128-bit hashes.
+ *
+ * Stored in little endian order, although the fields themselves are in native
+ * endianness.
+ */
+struct XXH128_hash_t {
+  uint64_t low64;  /*!< `value & 0xFFFFFFFFFFFFFFFF` */
+  uint64_t high64; /*!< `value >> 64` */
+
+  /// Convenience equality check operator.
+  bool operator==(const XXH128_hash_t rhs) const {
+    return low64 == rhs.low64 && high64 == rhs.high64;
+  }
+};
+
+/// XXH3's 128-bit variant.
+XXH128_hash_t xxh3_128bits(std::span<const uint8_t> data);
+
+} // namespace wpi
 
 #endif
