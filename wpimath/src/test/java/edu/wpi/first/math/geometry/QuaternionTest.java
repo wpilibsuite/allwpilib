@@ -123,9 +123,8 @@ class QuaternionTest {
         () -> assertEquals(expected.getZ(), actual.getZ(), 1e-9));
 
     // Identity
-    var q =
-        new Quaternion(
-            0.7276068751089989, 0.29104275004359953, 0.38805700005813276, 0.48507125007266594);
+    var q = new Quaternion(
+        0.7276068751089989, 0.29104275004359953, 0.38805700005813276, 0.48507125007266594);
     final var actual2 = q.times(q.inverse());
     assertAll(
         () -> assertEquals(1.0, actual2.getW()),
@@ -170,9 +169,8 @@ class QuaternionTest {
   @Test
   void testExponential() {
     var q = new Quaternion(1.1, 2.2, 3.3, 4.4);
-    var q_exp =
-        new Quaternion(
-            2.81211398529184, -0.392521193481878, -0.588781790222817, -0.785042386963756);
+    var q_exp = new Quaternion(
+        2.81211398529184, -0.392521193481878, -0.588781790222817, -0.785042386963756);
 
     assertEquals(q_exp, q.exp());
   }

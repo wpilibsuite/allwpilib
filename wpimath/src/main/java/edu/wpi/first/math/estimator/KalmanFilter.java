@@ -230,18 +230,18 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     //
     // Kᵀ = Sᵀ.solve(CPᵀ)
     // K = (Sᵀ.solve(CPᵀ))ᵀ
-    final Matrix<States, Outputs> K = S.transpose().solve(C.times(m_P.transpose())).transpose();
+    final Matrix<States, Outputs> K =
+        S.transpose().solve(C.times(m_P.transpose())).transpose();
 
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
     m_xHat = m_xHat.plus(K.times(y.minus(C.times(m_xHat).plus(D.times(u)))));
 
     // Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
     // Use Joseph form for numerical stability
-    m_P =
-        Matrix.eye(m_states)
-            .minus(K.times(C))
-            .times(m_P)
-            .times(Matrix.eye(m_states).minus(K.times(C)).transpose())
-            .plus(K.times(discR).times(K.transpose()));
+    m_P = Matrix.eye(m_states)
+        .minus(K.times(C))
+        .times(m_P)
+        .times(Matrix.eye(m_states).minus(K.times(C)).transpose())
+        .plus(K.times(discR).times(K.transpose()));
   }
 }

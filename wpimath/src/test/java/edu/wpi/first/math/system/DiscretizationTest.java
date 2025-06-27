@@ -26,9 +26,8 @@ class DiscretizationTest {
     final var x1Discrete = discA.times(x0);
 
     // We now have pos = vel = 1 and accel = 0, which should give us:
-    final var x1Truth =
-        VecBuilder.fill(
-            1.0 * x0.get(0, 0) + 1.0 * x0.get(1, 0), 0.0 * x0.get(0, 0) + 1.0 * x0.get(1, 0));
+    final var x1Truth = VecBuilder.fill(
+        1.0 * x0.get(0, 0) + 1.0 * x0.get(1, 0), 0.0 * x0.get(0, 0) + 1.0 * x0.get(1, 0));
 
     assertEquals(x1Truth, x1Discrete);
   }
@@ -50,10 +49,9 @@ class DiscretizationTest {
     var x1Discrete = discA.times(x0).plus(discB.times(u));
 
     // We now have pos = vel = accel = 1, which should give us:
-    final var x1Truth =
-        VecBuilder.fill(
-            1.0 * x0.get(0, 0) + 1.0 * x0.get(1, 0) + 0.5 * u.get(0, 0),
-            0.0 * x0.get(0, 0) + 1.0 * x0.get(1, 0) + 1.0 * u.get(0, 0));
+    final var x1Truth = VecBuilder.fill(
+        1.0 * x0.get(0, 0) + 1.0 * x0.get(1, 0) + 0.5 * u.get(0, 0),
+        0.0 * x0.get(0, 0) + 1.0 * x0.get(1, 0) + 1.0 * u.get(0, 0));
 
     assertEquals(x1Truth, x1Discrete);
   }
@@ -71,13 +69,12 @@ class DiscretizationTest {
     //       T
     // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
     //       0
-    final var discQIntegrated =
-        NumericalIntegration.rk4(
-            (Double t, Matrix<N2, N2> x) ->
-                contA.times(t).exp().times(contQ).times(contA.transpose().times(t).exp()),
-            0.0,
-            new Matrix<>(Nat.N2(), Nat.N2()),
-            dt);
+    final var discQIntegrated = NumericalIntegration.rk4(
+        (Double t, Matrix<N2, N2> x) ->
+            contA.times(t).exp().times(contQ).times(contA.transpose().times(t).exp()),
+        0.0,
+        new Matrix<>(Nat.N2(), Nat.N2()),
+        dt);
 
     var discAQPair = Discretization.discretizeAQ(contA, contQ, dt);
     var discQ = discAQPair.getSecond();
@@ -103,13 +100,12 @@ class DiscretizationTest {
     //       T
     // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
     //       0
-    final var discQIntegrated =
-        NumericalIntegration.rk4(
-            (Double t, Matrix<N2, N2> x) ->
-                contA.times(t).exp().times(contQ).times(contA.transpose().times(t).exp()),
-            0.0,
-            new Matrix<>(Nat.N2(), Nat.N2()),
-            dt);
+    final var discQIntegrated = NumericalIntegration.rk4(
+        (Double t, Matrix<N2, N2> x) ->
+            contA.times(t).exp().times(contQ).times(contA.transpose().times(t).exp()),
+        0.0,
+        new Matrix<>(Nat.N2(), Nat.N2()),
+        dt);
 
     var discAQPair = Discretization.discretizeAQ(contA, contQ, dt);
     var discQ = discAQPair.getSecond();

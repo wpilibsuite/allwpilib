@@ -18,16 +18,12 @@ class RectangularRegionConstraintTest {
   @Test
   void testConstraint() {
     double maxVelocity = Units.feetToMeters(2.0);
-    var rectangle =
-        new Rectangle2d(
-            new Translation2d(Units.feetToMeters(1.0), Units.feetToMeters(1.0)),
-            new Translation2d(Units.feetToMeters(5.0), Units.feetToMeters(27.0)));
+    var rectangle = new Rectangle2d(
+        new Translation2d(Units.feetToMeters(1.0), Units.feetToMeters(1.0)),
+        new Translation2d(Units.feetToMeters(5.0), Units.feetToMeters(27.0)));
 
-    var trajectory =
-        TrajectoryGeneratorTest.getTrajectory(
-            List.of(
-                new RectangularRegionConstraint(
-                    rectangle, new MaxVelocityConstraint(maxVelocity))));
+    var trajectory = TrajectoryGeneratorTest.getTrajectory(List.of(
+        new RectangularRegionConstraint(rectangle, new MaxVelocityConstraint(maxVelocity))));
 
     boolean exceededConstraintOutsideRegion = false;
     for (var point : trajectory.getStates()) {

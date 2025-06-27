@@ -546,12 +546,11 @@ public final class DriverStation {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickUnpluggedWarning(
-        "Joystick Button "
-            + button
-            + " on port "
-            + stick
-            + " not available, check if controller is plugged in");
+    reportJoystickUnpluggedWarning("Joystick Button "
+        + button
+        + " on port "
+        + stick
+        + " not available, check if controller is plugged in");
     return false;
   }
 
@@ -586,12 +585,11 @@ public final class DriverStation {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickUnpluggedWarning(
-        "Joystick Button "
-            + button
-            + " on port "
-            + stick
-            + " not available, check if controller is plugged in");
+    reportJoystickUnpluggedWarning("Joystick Button "
+        + button
+        + " on port "
+        + stick
+        + " not available, check if controller is plugged in");
     return false;
   }
 
@@ -626,12 +624,11 @@ public final class DriverStation {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickUnpluggedWarning(
-        "Joystick Button "
-            + button
-            + " on port "
-            + stick
-            + " not available, check if controller is plugged in");
+    reportJoystickUnpluggedWarning("Joystick Button "
+        + button
+        + " on port "
+        + stick
+        + " not available, check if controller is plugged in");
     return false;
   }
 
@@ -660,12 +657,11 @@ public final class DriverStation {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickUnpluggedWarning(
-        "Joystick axis "
-            + axis
-            + " on port "
-            + stick
-            + " not available, check if controller is plugged in");
+    reportJoystickUnpluggedWarning("Joystick axis "
+        + axis
+        + " on port "
+        + stick
+        + " not available, check if controller is plugged in");
     return 0.0;
   }
 
@@ -693,12 +689,11 @@ public final class DriverStation {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickUnpluggedWarning(
-        "Joystick POV "
-            + pov
-            + " on port "
-            + stick
-            + " not available, check if controller is plugged in");
+    reportJoystickUnpluggedWarning("Joystick POV "
+        + pov
+        + " on port "
+        + stick
+        + " not available, check if controller is plugged in");
     return -1;
   }
 
@@ -1081,25 +1076,23 @@ public final class DriverStation {
     }
   }
 
-  private static Map<AllianceStationID, Optional<Alliance>> m_allianceMap =
-      Map.of(
-          AllianceStationID.Unknown, Optional.empty(),
-          AllianceStationID.Red1, Optional.of(Alliance.Red),
-          AllianceStationID.Red2, Optional.of(Alliance.Red),
-          AllianceStationID.Red3, Optional.of(Alliance.Red),
-          AllianceStationID.Blue1, Optional.of(Alliance.Blue),
-          AllianceStationID.Blue2, Optional.of(Alliance.Blue),
-          AllianceStationID.Blue3, Optional.of(Alliance.Blue));
+  private static Map<AllianceStationID, Optional<Alliance>> m_allianceMap = Map.of(
+      AllianceStationID.Unknown, Optional.empty(),
+      AllianceStationID.Red1, Optional.of(Alliance.Red),
+      AllianceStationID.Red2, Optional.of(Alliance.Red),
+      AllianceStationID.Red3, Optional.of(Alliance.Red),
+      AllianceStationID.Blue1, Optional.of(Alliance.Blue),
+      AllianceStationID.Blue2, Optional.of(Alliance.Blue),
+      AllianceStationID.Blue3, Optional.of(Alliance.Blue));
 
-  private static Map<AllianceStationID, OptionalInt> m_stationMap =
-      Map.of(
-          AllianceStationID.Unknown, OptionalInt.empty(),
-          AllianceStationID.Red1, OptionalInt.of(1),
-          AllianceStationID.Red2, OptionalInt.of(2),
-          AllianceStationID.Red3, OptionalInt.of(3),
-          AllianceStationID.Blue1, OptionalInt.of(1),
-          AllianceStationID.Blue2, OptionalInt.of(2),
-          AllianceStationID.Blue3, OptionalInt.of(3));
+  private static Map<AllianceStationID, OptionalInt> m_stationMap = Map.of(
+      AllianceStationID.Unknown, OptionalInt.empty(),
+      AllianceStationID.Red1, OptionalInt.of(1),
+      AllianceStationID.Red2, OptionalInt.of(2),
+      AllianceStationID.Red3, OptionalInt.of(3),
+      AllianceStationID.Blue1, OptionalInt.of(1),
+      AllianceStationID.Blue2, OptionalInt.of(2),
+      AllianceStationID.Blue3, OptionalInt.of(3));
 
   /**
    * Get the current alliance from the FMS.

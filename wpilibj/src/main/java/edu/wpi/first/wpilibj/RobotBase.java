@@ -49,87 +49,85 @@ public abstract class RobotBase implements AutoCloseable {
   private boolean m_dashboardDetected;
 
   private static void setupCameraServerShared() {
-    CameraServerShared shared =
-        new CameraServerShared() {
-          @Override
-          public void reportVideoServer(int id) {
-            HAL.report(tResourceType.kResourceType_PCVideoServer, id + 1);
-          }
+    CameraServerShared shared = new CameraServerShared() {
+      @Override
+      public void reportVideoServer(int id) {
+        HAL.report(tResourceType.kResourceType_PCVideoServer, id + 1);
+      }
 
-          @Override
-          public void reportUsbCamera(int id) {
-            HAL.report(tResourceType.kResourceType_UsbCamera, id + 1);
-          }
+      @Override
+      public void reportUsbCamera(int id) {
+        HAL.report(tResourceType.kResourceType_UsbCamera, id + 1);
+      }
 
-          @Override
-          public void reportDriverStationError(String error) {
-            DriverStation.reportError(error, true);
-          }
+      @Override
+      public void reportDriverStationError(String error) {
+        DriverStation.reportError(error, true);
+      }
 
-          @Override
-          public void reportAxisCamera(int id) {
-            HAL.report(tResourceType.kResourceType_AxisCamera, id + 1);
-          }
+      @Override
+      public void reportAxisCamera(int id) {
+        HAL.report(tResourceType.kResourceType_AxisCamera, id + 1);
+      }
 
-          @Override
-          public Long getRobotMainThreadId() {
-            return RobotBase.getMainThreadId();
-          }
+      @Override
+      public Long getRobotMainThreadId() {
+        return RobotBase.getMainThreadId();
+      }
 
-          @Override
-          public boolean isRoboRIO() {
-            return !RobotBase.isSimulation();
-          }
-        };
+      @Override
+      public boolean isRoboRIO() {
+        return !RobotBase.isSimulation();
+      }
+    };
 
     CameraServerSharedStore.setCameraServerShared(shared);
   }
 
   private static void setupMathShared() {
-    MathSharedStore.setMathShared(
-        new MathShared() {
-          @Override
-          public void reportError(String error, StackTraceElement[] stackTrace) {
-            DriverStation.reportError(error, stackTrace);
-          }
+    MathSharedStore.setMathShared(new MathShared() {
+      @Override
+      public void reportError(String error, StackTraceElement[] stackTrace) {
+        DriverStation.reportError(error, stackTrace);
+      }
 
-          @Override
-          public void reportUsage(MathUsageId id, int count) {
-            switch (id) {
-              case kKinematics_DifferentialDrive -> HAL.report(
-                  tResourceType.kResourceType_Kinematics, tInstances.kKinematics_DifferentialDrive);
-              case kKinematics_MecanumDrive -> HAL.report(
-                  tResourceType.kResourceType_Kinematics, tInstances.kKinematics_MecanumDrive);
-              case kKinematics_SwerveDrive -> HAL.report(
-                  tResourceType.kResourceType_Kinematics, tInstances.kKinematics_SwerveDrive);
-              case kTrajectory_TrapezoidProfile -> HAL.report(
-                  tResourceType.kResourceType_TrapezoidProfile, count);
-              case kFilter_Linear -> HAL.report(tResourceType.kResourceType_LinearFilter, count);
-              case kOdometry_DifferentialDrive -> HAL.report(
-                  tResourceType.kResourceType_Odometry, tInstances.kOdometry_DifferentialDrive);
-              case kOdometry_SwerveDrive -> HAL.report(
-                  tResourceType.kResourceType_Odometry, tInstances.kOdometry_SwerveDrive);
-              case kOdometry_MecanumDrive -> HAL.report(
-                  tResourceType.kResourceType_Odometry, tInstances.kOdometry_MecanumDrive);
-              case kController_PIDController2 -> HAL.report(
-                  tResourceType.kResourceType_PIDController2, count);
-              case kController_ProfiledPIDController -> HAL.report(
-                  tResourceType.kResourceType_ProfiledPIDController, count);
-              case kController_BangBangController -> HAL.report(
-                  tResourceType.kResourceType_BangBangController, count);
-              case kTrajectory_PathWeaver -> HAL.report(
-                  tResourceType.kResourceType_PathWeaverTrajectory, count);
-              default -> {
-                // NOP
-              }
-            }
+      @Override
+      public void reportUsage(MathUsageId id, int count) {
+        switch (id) {
+          case kKinematics_DifferentialDrive -> HAL.report(
+              tResourceType.kResourceType_Kinematics, tInstances.kKinematics_DifferentialDrive);
+          case kKinematics_MecanumDrive -> HAL.report(
+              tResourceType.kResourceType_Kinematics, tInstances.kKinematics_MecanumDrive);
+          case kKinematics_SwerveDrive -> HAL.report(
+              tResourceType.kResourceType_Kinematics, tInstances.kKinematics_SwerveDrive);
+          case kTrajectory_TrapezoidProfile -> HAL.report(
+              tResourceType.kResourceType_TrapezoidProfile, count);
+          case kFilter_Linear -> HAL.report(tResourceType.kResourceType_LinearFilter, count);
+          case kOdometry_DifferentialDrive -> HAL.report(
+              tResourceType.kResourceType_Odometry, tInstances.kOdometry_DifferentialDrive);
+          case kOdometry_SwerveDrive -> HAL.report(
+              tResourceType.kResourceType_Odometry, tInstances.kOdometry_SwerveDrive);
+          case kOdometry_MecanumDrive -> HAL.report(
+              tResourceType.kResourceType_Odometry, tInstances.kOdometry_MecanumDrive);
+          case kController_PIDController2 -> HAL.report(
+              tResourceType.kResourceType_PIDController2, count);
+          case kController_ProfiledPIDController -> HAL.report(
+              tResourceType.kResourceType_ProfiledPIDController, count);
+          case kController_BangBangController -> HAL.report(
+              tResourceType.kResourceType_BangBangController, count);
+          case kTrajectory_PathWeaver -> HAL.report(
+              tResourceType.kResourceType_PathWeaverTrajectory, count);
+          default -> {
+            // NOP
           }
+        }
+      }
 
-          @Override
-          public double getTimestamp() {
-            return Timer.getTimestamp();
-          }
-        });
+      @Override
+      public double getTimestamp() {
+        return Timer.getTimestamp();
+      }
+    });
   }
 
   /**
@@ -167,64 +165,55 @@ public abstract class RobotBase implements AutoCloseable {
       System.err.println("timed out while waiting for NT server to start");
     }
 
-    m_connListenerHandle =
-        inst.addConnectionListener(
-            false,
-            event -> {
-              if (event.is(NetworkTableEvent.Kind.kConnected)) {
-                if (event.connInfo.remote_id.startsWith("glass")) {
-                  HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Glass);
-                  m_dashboardDetected = true;
-                } else if (event.connInfo.remote_id.startsWith("SmartDashboard")) {
-                  HAL.report(
-                      tResourceType.kResourceType_Dashboard, tInstances.kDashboard_SmartDashboard);
-                  m_dashboardDetected = true;
-                } else if (event.connInfo.remote_id.startsWith("shuffleboard")) {
-                  HAL.report(
-                      tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Shuffleboard);
-                  m_dashboardDetected = true;
-                } else if (event.connInfo.remote_id.startsWith("elastic")
-                    || event.connInfo.remote_id.startsWith("Elastic")) {
-                  HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Elastic);
-                  m_dashboardDetected = true;
-                } else if (event.connInfo.remote_id.startsWith("Dashboard")) {
-                  HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_LabVIEW);
-                  m_dashboardDetected = true;
-                } else if (event.connInfo.remote_id.startsWith("AdvantageScope")) {
-                  HAL.report(
-                      tResourceType.kResourceType_Dashboard, tInstances.kDashboard_AdvantageScope);
-                  m_dashboardDetected = true;
-                } else if (event.connInfo.remote_id.startsWith("QFRCDashboard")) {
-                  HAL.report(
-                      tResourceType.kResourceType_Dashboard, tInstances.kDashboard_QFRCDashboard);
-                  m_dashboardDetected = true;
-                } else if (event.connInfo.remote_id.startsWith("FRC Web Components")) {
-                  HAL.report(
-                      tResourceType.kResourceType_Dashboard,
-                      tInstances.kDashboard_FRCWebComponents);
-                  m_dashboardDetected = true;
-                } else {
-                  // Only report unknown if there wasn't another dashboard already reported
-                  // (unknown could also be another device)
-                  if (!m_dashboardDetected) {
-                    int delim = event.connInfo.remote_id.indexOf('@');
-                    if (delim != -1) {
-                      HAL.report(
-                          tResourceType.kResourceType_Dashboard,
-                          tInstances.kDashboard_Unknown,
-                          0,
-                          event.connInfo.remote_id.substring(0, delim));
-                    } else {
-                      HAL.report(
-                          tResourceType.kResourceType_Dashboard,
-                          tInstances.kDashboard_Unknown,
-                          0,
-                          event.connInfo.remote_id);
-                    }
-                  }
-                }
-              }
-            });
+    m_connListenerHandle = inst.addConnectionListener(false, event -> {
+      if (event.is(NetworkTableEvent.Kind.kConnected)) {
+        if (event.connInfo.remote_id.startsWith("glass")) {
+          HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Glass);
+          m_dashboardDetected = true;
+        } else if (event.connInfo.remote_id.startsWith("SmartDashboard")) {
+          HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_SmartDashboard);
+          m_dashboardDetected = true;
+        } else if (event.connInfo.remote_id.startsWith("shuffleboard")) {
+          HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Shuffleboard);
+          m_dashboardDetected = true;
+        } else if (event.connInfo.remote_id.startsWith("elastic")
+            || event.connInfo.remote_id.startsWith("Elastic")) {
+          HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_Elastic);
+          m_dashboardDetected = true;
+        } else if (event.connInfo.remote_id.startsWith("Dashboard")) {
+          HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_LabVIEW);
+          m_dashboardDetected = true;
+        } else if (event.connInfo.remote_id.startsWith("AdvantageScope")) {
+          HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_AdvantageScope);
+          m_dashboardDetected = true;
+        } else if (event.connInfo.remote_id.startsWith("QFRCDashboard")) {
+          HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_QFRCDashboard);
+          m_dashboardDetected = true;
+        } else if (event.connInfo.remote_id.startsWith("FRC Web Components")) {
+          HAL.report(tResourceType.kResourceType_Dashboard, tInstances.kDashboard_FRCWebComponents);
+          m_dashboardDetected = true;
+        } else {
+          // Only report unknown if there wasn't another dashboard already reported
+          // (unknown could also be another device)
+          if (!m_dashboardDetected) {
+            int delim = event.connInfo.remote_id.indexOf('@');
+            if (delim != -1) {
+              HAL.report(
+                  tResourceType.kResourceType_Dashboard,
+                  tInstances.kDashboard_Unknown,
+                  0,
+                  event.connInfo.remote_id.substring(0, delim));
+            } else {
+              HAL.report(
+                  tResourceType.kResourceType_Dashboard,
+                  tInstances.kDashboard_Unknown,
+                  0,
+                  event.connInfo.remote_id);
+            }
+          }
+        }
+      }
+    });
 
     LiveWindow.setEnabled(false);
     Shuffleboard.disableActuatorWidgets();
@@ -484,13 +473,12 @@ public abstract class RobotBase implements AutoCloseable {
     }
 
     if (HAL.hasMain()) {
-      Thread thread =
-          new Thread(
-              () -> {
-                runRobot(robotSupplier);
-                HAL.exitMain();
-              },
-              "robot main");
+      Thread thread = new Thread(
+          () -> {
+            runRobot(robotSupplier);
+            HAL.exitMain();
+          },
+          "robot main");
       thread.setDaemon(true);
       thread.start();
       HAL.runMain();

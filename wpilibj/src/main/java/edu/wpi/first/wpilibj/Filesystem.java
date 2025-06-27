@@ -25,10 +25,9 @@ public final class Filesystem {
   public static File getLaunchDirectory() {
     // workaround for
     // https://www.chiefdelphi.com/t/filesystem-getdeploydirectory-returning-wrong-location-how-to-fix/427292
-    String path =
-        System.getProperty("user.dir")
-            .replace(
-                File.separator + "build" + File.separator + "jni" + File.separator + "release", "");
+    String path = System.getProperty("user.dir")
+        .replace(
+            File.separator + "build" + File.separator + "jni" + File.separator + "release", "");
     return new File(path).getAbsoluteFile();
   }
 

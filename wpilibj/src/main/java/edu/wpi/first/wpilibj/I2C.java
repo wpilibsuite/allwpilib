@@ -109,12 +109,8 @@ public class I2C implements AutoCloseable {
           "dataReceived is too small, must be at least " + receiveSize);
     }
     return I2CJNI.i2CTransactionB(
-            m_port,
-            (byte) m_deviceAddress,
-            dataToSend,
-            (byte) sendSize,
-            dataReceived,
-            (byte) receiveSize)
+            m_port, (byte) m_deviceAddress, dataToSend, (byte) sendSize, dataReceived, (byte)
+                receiveSize)
         < 0;
   }
 
@@ -150,12 +146,8 @@ public class I2C implements AutoCloseable {
     }
 
     return I2CJNI.i2CTransaction(
-            m_port,
-            (byte) m_deviceAddress,
-            dataToSend,
-            (byte) sendSize,
-            dataReceived,
-            (byte) receiveSize)
+            m_port, (byte) m_deviceAddress, dataToSend, (byte) sendSize, dataReceived, (byte)
+                receiveSize)
         < 0;
   }
 

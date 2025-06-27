@@ -25,12 +25,11 @@ public final class VecBuilder {
 
   private static <N extends Num> Vector<N> fillVec(Nat<N> rows, double... data) {
     if (Objects.requireNonNull(data).length != rows.getNum()) {
-      throw new IllegalArgumentException(
-          "Invalid vector data provided. Wanted "
-              + rows.getNum()
-              + " vector, but got "
-              + data.length
-              + " elements");
+      throw new IllegalArgumentException("Invalid vector data provided. Wanted "
+          + rows.getNum()
+          + " vector, but got "
+          + data.length
+          + " elements");
     }
     return new Vector<>(new SimpleMatrix(data));
   }

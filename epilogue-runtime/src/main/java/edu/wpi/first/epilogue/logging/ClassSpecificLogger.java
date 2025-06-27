@@ -106,14 +106,11 @@ public abstract class ClassSpecificLogger<T> {
       return;
     }
 
-    var builder =
-        m_sendables.computeIfAbsent(
-            sendable,
-            s -> {
-              var b = new LogBackedSendableBuilder(backend);
-              s.initSendable(b);
-              return b;
-            });
+    var builder = m_sendables.computeIfAbsent(sendable, s -> {
+      var b = new LogBackedSendableBuilder(backend);
+      s.initSendable(b);
+      return b;
+    });
     builder.update();
   }
 }

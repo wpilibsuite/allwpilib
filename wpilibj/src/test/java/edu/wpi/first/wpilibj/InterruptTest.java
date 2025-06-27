@@ -21,13 +21,10 @@ class InterruptTest {
     AtomicInteger counter = new AtomicInteger(0);
 
     try (DigitalInput di = new DigitalInput(0);
-        AsynchronousInterrupt interrupt =
-            new AsynchronousInterrupt(
-                di,
-                (rising, falling) -> {
-                  counter.incrementAndGet();
-                  hasFired.set(true);
-                })) {
+        AsynchronousInterrupt interrupt = new AsynchronousInterrupt(di, (rising, falling) -> {
+          counter.incrementAndGet();
+          hasFired.set(true);
+        })) {
       interrupt.enable();
       Timer.delay(0.5);
       DIOSim digitalSim = new DIOSim(di);
@@ -52,13 +49,10 @@ class InterruptTest {
     AtomicBoolean hasFiredRisingEdge = new AtomicBoolean(false);
 
     try (DigitalInput di = new DigitalInput(0);
-        AsynchronousInterrupt interrupt =
-            new AsynchronousInterrupt(
-                di,
-                (rising, falling) -> {
-                  hasFiredFallingEdge.set(falling);
-                  hasFiredRisingEdge.set(rising);
-                })) {
+        AsynchronousInterrupt interrupt = new AsynchronousInterrupt(di, (rising, falling) -> {
+          hasFiredFallingEdge.set(falling);
+          hasFiredRisingEdge.set(rising);
+        })) {
       interrupt.setInterruptEdges(true, true);
       DIOSim digitalSim = new DIOSim(di);
       digitalSim.setValue(false);
@@ -76,9 +70,8 @@ class InterruptTest {
       assertAll(
           () ->
               assertFalse(hasFiredFallingEdge.get(), "The interrupt triggered on the falling edge"),
-          () ->
-              assertTrue(
-                  hasFiredRisingEdge.get(), "The interrupt did not trigger on the rising edge"));
+          () -> assertTrue(
+              hasFiredRisingEdge.get(), "The interrupt did not trigger on the rising edge"));
     }
   }
 
@@ -88,13 +81,10 @@ class InterruptTest {
     AtomicBoolean hasFiredRisingEdge = new AtomicBoolean(false);
 
     try (DigitalInput di = new DigitalInput(0);
-        AsynchronousInterrupt interrupt =
-            new AsynchronousInterrupt(
-                di,
-                (rising, falling) -> {
-                  hasFiredFallingEdge.set(falling);
-                  hasFiredRisingEdge.set(rising);
-                })) {
+        AsynchronousInterrupt interrupt = new AsynchronousInterrupt(di, (rising, falling) -> {
+          hasFiredFallingEdge.set(falling);
+          hasFiredRisingEdge.set(rising);
+        })) {
       interrupt.setInterruptEdges(true, true);
       DIOSim digitalSim = new DIOSim(di);
       digitalSim.setValue(true);
@@ -110,9 +100,8 @@ class InterruptTest {
         assertTrue(count < 1000);
       }
       assertAll(
-          () ->
-              assertTrue(
-                  hasFiredFallingEdge.get(), "The interrupt did not trigger on the rising edge"),
+          () -> assertTrue(
+              hasFiredFallingEdge.get(), "The interrupt did not trigger on the rising edge"),
           () ->
               assertFalse(hasFiredRisingEdge.get(), "The interrupt triggered on the rising edge"));
     }

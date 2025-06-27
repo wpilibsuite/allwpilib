@@ -145,12 +145,10 @@ public class RamseteCommand extends Command {
   public void initialize() {
     m_prevTime = -1;
     var initialState = m_trajectory.sample(0);
-    m_prevSpeeds =
-        m_kinematics.toWheelSpeeds(
-            new ChassisSpeeds(
-                initialState.velocityMetersPerSecond,
-                0,
-                initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
+    m_prevSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(
+        initialState.velocityMetersPerSecond,
+        0,
+        initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
     m_prevLeftSpeedSetpoint = m_prevSpeeds.leftMetersPerSecond;
     m_prevRightSpeedSetpoint = m_prevSpeeds.rightMetersPerSecond;
     m_timer.restart();
@@ -170,9 +168,8 @@ public class RamseteCommand extends Command {
       return;
     }
 
-    var targetWheelSpeeds =
-        m_kinematics.toWheelSpeeds(
-            m_follower.calculate(m_pose.get(), m_trajectory.sample(curTime)));
+    var targetWheelSpeeds = m_kinematics.toWheelSpeeds(
+        m_follower.calculate(m_pose.get(), m_trajectory.sample(curTime)));
 
     double leftSpeedSetpoint = targetWheelSpeeds.leftMetersPerSecond;
     double rightSpeedSetpoint = targetWheelSpeeds.rightMetersPerSecond;
@@ -187,14 +184,11 @@ public class RamseteCommand extends Command {
       double rightFeedforward =
           m_feedforward.calculateWithVelocities(m_prevRightSpeedSetpoint, rightSpeedSetpoint);
 
-      leftOutput =
-          leftFeedforward
-              + m_leftController.calculate(m_speeds.get().leftMetersPerSecond, leftSpeedSetpoint);
+      leftOutput = leftFeedforward
+          + m_leftController.calculate(m_speeds.get().leftMetersPerSecond, leftSpeedSetpoint);
 
-      rightOutput =
-          rightFeedforward
-              + m_rightController.calculate(
-                  m_speeds.get().rightMetersPerSecond, rightSpeedSetpoint);
+      rightOutput = rightFeedforward
+          + m_rightController.calculate(m_speeds.get().rightMetersPerSecond, rightSpeedSetpoint);
     } else {
       leftOutput = leftSpeedSetpoint;
       rightOutput = rightSpeedSetpoint;

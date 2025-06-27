@@ -595,12 +595,11 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   @SuppressWarnings("unchecked")
   default <Other extends Unit, M extends Measure<Other>> M timesConversionFactor(
       Measure<? extends PerUnit<Other, U>> conversionFactor) {
-    return (M)
-        conversionFactor
-            .unit()
-            .getBaseUnit()
-            .numerator()
-            .ofBaseUnits(baseUnitMagnitude() * conversionFactor.baseUnitMagnitude());
+    return (M) conversionFactor
+        .unit()
+        .getBaseUnit()
+        .numerator()
+        .ofBaseUnits(baseUnitMagnitude() * conversionFactor.baseUnitMagnitude());
   }
 
   /**

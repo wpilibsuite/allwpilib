@@ -229,103 +229,97 @@ public final class CameraServer {
 
   // Listener for video events
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
-  private static final VideoListener m_videoListener =
-      new VideoListener(
-          event -> {
-            synchronized (CameraServer.class) {
-              switch (event.kind) {
-                case kSourceCreated -> {
-                  // Create subtable for the camera
-                  NetworkTable table = m_publishTable.getSubTable(event.name);
-                  m_publishers.put(
-                      event.sourceHandle, new SourcePublisher(table, event.sourceHandle));
-                }
-                case kSourceDestroyed -> {
-                  SourcePublisher publisher = m_publishers.remove(event.sourceHandle);
-                  if (publisher != null) {
-                    try {
-                      publisher.close();
-                    } catch (Exception e) {
-                      // ignore (nothing we can do about it)
-                    }
-                  }
-                }
-                case kSourceConnected -> {
-                  SourcePublisher publisher = m_publishers.get(event.sourceHandle);
-                  if (publisher != null) {
-                    // update the description too (as it may have changed)
-                    publisher.m_descriptionPublisher.set(
-                        CameraServerJNI.getSourceDescription(event.sourceHandle));
-                    publisher.m_connectedPublisher.set(true);
-                  }
-                }
-                case kSourceDisconnected -> {
-                  SourcePublisher publisher = m_publishers.get(event.sourceHandle);
-                  if (publisher != null) {
-                    publisher.m_connectedPublisher.set(false);
-                  }
-                }
-                case kSourceVideoModesUpdated -> {
-                  SourcePublisher publisher = m_publishers.get(event.sourceHandle);
-                  if (publisher != null) {
-                    publisher.m_modesPublisher.set(getSourceModeValues(event.sourceHandle));
-                  }
-                }
-                case kSourceVideoModeChanged -> {
-                  SourcePublisher publisher = m_publishers.get(event.sourceHandle);
-                  if (publisher != null) {
-                    publisher.m_modeEntry.set(videoModeToString(event.mode));
-                  }
-                }
-                case kSourcePropertyCreated -> {
-                  SourcePublisher publisher = m_publishers.get(event.sourceHandle);
-                  if (publisher != null) {
-                    publisher.m_properties.put(
-                        event.propertyHandle, new PropertyPublisher(publisher.m_table, event));
-                  }
-                }
-                case kSourcePropertyValueUpdated -> {
-                  SourcePublisher publisher = m_publishers.get(event.sourceHandle);
-                  if (publisher != null) {
-                    PropertyPublisher pp = publisher.m_properties.get(event.propertyHandle);
-                    if (pp != null) {
-                      pp.update(event);
-                    }
-                  }
-                }
-                case kSourcePropertyChoicesUpdated -> {
-                  SourcePublisher publisher = m_publishers.get(event.sourceHandle);
-                  if (publisher != null) {
-                    PropertyPublisher pp = publisher.m_properties.get(event.propertyHandle);
-                    if (pp != null && pp.m_choicesTopic != null) {
-                      try {
-                        String[] choices =
-                            CameraServerJNI.getEnumPropertyChoices(event.propertyHandle);
-                        if (pp.m_choicesPublisher == null) {
-                          pp.m_choicesPublisher = pp.m_choicesTopic.publish();
-                        }
-                        pp.m_choicesPublisher.set(choices);
-                      } catch (VideoException ignored) {
-                        // ignore (just don't publish choices if we can't get them)
-                      }
-                    }
-                  }
-                }
-                case kSinkSourceChanged,
-                    kSinkCreated,
-                    kSinkDestroyed,
-                    kNetworkInterfacesChanged -> {
-                  m_addresses = CameraServerJNI.getNetworkInterfaces();
-                  updateStreamValues();
-                }
-                default -> {
-                  // NOP
+  private static final VideoListener m_videoListener = new VideoListener(
+      event -> {
+        synchronized (CameraServer.class) {
+          switch (event.kind) {
+            case kSourceCreated -> {
+              // Create subtable for the camera
+              NetworkTable table = m_publishTable.getSubTable(event.name);
+              m_publishers.put(event.sourceHandle, new SourcePublisher(table, event.sourceHandle));
+            }
+            case kSourceDestroyed -> {
+              SourcePublisher publisher = m_publishers.remove(event.sourceHandle);
+              if (publisher != null) {
+                try {
+                  publisher.close();
+                } catch (Exception e) {
+                  // ignore (nothing we can do about it)
                 }
               }
             }
-          },
-          0x4fff,
-          true);
+            case kSourceConnected -> {
+              SourcePublisher publisher = m_publishers.get(event.sourceHandle);
+              if (publisher != null) {
+                // update the description too (as it may have changed)
+                publisher.m_descriptionPublisher.set(
+                    CameraServerJNI.getSourceDescription(event.sourceHandle));
+                publisher.m_connectedPublisher.set(true);
+              }
+            }
+            case kSourceDisconnected -> {
+              SourcePublisher publisher = m_publishers.get(event.sourceHandle);
+              if (publisher != null) {
+                publisher.m_connectedPublisher.set(false);
+              }
+            }
+            case kSourceVideoModesUpdated -> {
+              SourcePublisher publisher = m_publishers.get(event.sourceHandle);
+              if (publisher != null) {
+                publisher.m_modesPublisher.set(getSourceModeValues(event.sourceHandle));
+              }
+            }
+            case kSourceVideoModeChanged -> {
+              SourcePublisher publisher = m_publishers.get(event.sourceHandle);
+              if (publisher != null) {
+                publisher.m_modeEntry.set(videoModeToString(event.mode));
+              }
+            }
+            case kSourcePropertyCreated -> {
+              SourcePublisher publisher = m_publishers.get(event.sourceHandle);
+              if (publisher != null) {
+                publisher.m_properties.put(
+                    event.propertyHandle, new PropertyPublisher(publisher.m_table, event));
+              }
+            }
+            case kSourcePropertyValueUpdated -> {
+              SourcePublisher publisher = m_publishers.get(event.sourceHandle);
+              if (publisher != null) {
+                PropertyPublisher pp = publisher.m_properties.get(event.propertyHandle);
+                if (pp != null) {
+                  pp.update(event);
+                }
+              }
+            }
+            case kSourcePropertyChoicesUpdated -> {
+              SourcePublisher publisher = m_publishers.get(event.sourceHandle);
+              if (publisher != null) {
+                PropertyPublisher pp = publisher.m_properties.get(event.propertyHandle);
+                if (pp != null && pp.m_choicesTopic != null) {
+                  try {
+                    String[] choices = CameraServerJNI.getEnumPropertyChoices(event.propertyHandle);
+                    if (pp.m_choicesPublisher == null) {
+                      pp.m_choicesPublisher = pp.m_choicesTopic.publish();
+                    }
+                    pp.m_choicesPublisher.set(choices);
+                  } catch (VideoException ignored) {
+                    // ignore (just don't publish choices if we can't get them)
+                  }
+                }
+              }
+            }
+            case kSinkSourceChanged, kSinkCreated, kSinkDestroyed, kNetworkInterfacesChanged -> {
+              m_addresses = CameraServerJNI.getNetworkInterfaces();
+              updateStreamValues();
+            }
+            default -> {
+              // NOP
+            }
+          }
+        }
+      },
+      0x4fff,
+      true);
 
   private static int m_nextPort = kBasePort;
   private static String[] m_addresses = new String[0];
@@ -442,9 +436,8 @@ public final class CameraServer {
       int sink = i.getHandle();
 
       // Get the source's subtable (if none exists, we're done)
-      int source =
-          Objects.requireNonNullElseGet(
-              m_fixedSources.get(sink), () -> CameraServerJNI.getSinkSource(sink));
+      int source = Objects.requireNonNullElseGet(
+          m_fixedSources.get(sink), () -> CameraServerJNI.getSinkSource(sink));
 
       if (source == 0) {
         continue;

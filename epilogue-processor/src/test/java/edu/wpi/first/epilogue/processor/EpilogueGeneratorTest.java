@@ -412,19 +412,17 @@ class EpilogueGeneratorTest {
 
   private void assertGeneratedEpilogueContents(
       String loggedClassContent, String loggerClassContent) {
-    Compilation compilation =
-        javac()
-            .withOptions(kJavaVersionOptions)
-            .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("", loggedClassContent));
+    Compilation compilation = javac()
+        .withOptions(kJavaVersionOptions)
+        .withProcessors(new AnnotationProcessor())
+        .compile(JavaFileObjects.forSourceString("", loggedClassContent));
 
     assertThat(compilation).succeededWithoutWarnings();
     var generatedFiles = compilation.generatedSourceFiles();
-    var generatedFile =
-        generatedFiles.stream()
-            .filter(jfo -> jfo.getName().contains("Epilogue"))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("Epilogue file was not generated!"));
+    var generatedFile = generatedFiles.stream()
+        .filter(jfo -> jfo.getName().contains("Epilogue"))
+        .findFirst()
+        .orElseThrow(() -> new IllegalStateException("Epilogue file was not generated!"));
     try {
       var content = generatedFile.getCharContent(false);
       assertEquals(

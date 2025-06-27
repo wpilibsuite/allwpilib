@@ -42,9 +42,8 @@ public class DifferentialDriveKinematicsConstraint implements TrajectoryConstrai
   public double getMaxVelocityMetersPerSecond(
       Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
     // Create an object to represent the current chassis speeds.
-    var chassisSpeeds =
-        new ChassisSpeeds(
-            velocityMetersPerSecond, 0, velocityMetersPerSecond * curvatureRadPerMeter);
+    var chassisSpeeds = new ChassisSpeeds(
+        velocityMetersPerSecond, 0, velocityMetersPerSecond * curvatureRadPerMeter);
 
     // Get the wheel speeds and normalize them to within the max velocity.
     var wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);

@@ -17,13 +17,11 @@ class TrajectoryTransformTest {
   @Test
   void testTransformBy() {
     var config = new TrajectoryConfig(3, 3);
-    var trajectory =
-        TrajectoryGenerator.generateTrajectory(
-            Pose2d.kZero, List.of(), new Pose2d(1, 1, Rotation2d.kCCW_Pi_2), config);
+    var trajectory = TrajectoryGenerator.generateTrajectory(
+        Pose2d.kZero, List.of(), new Pose2d(1, 1, Rotation2d.kCCW_Pi_2), config);
 
-    var transformedTrajectory =
-        trajectory.transformBy(
-            new Transform2d(new Translation2d(1, 2), Rotation2d.fromDegrees(30)));
+    var transformedTrajectory = trajectory.transformBy(
+        new Transform2d(new Translation2d(1, 2), Rotation2d.fromDegrees(30)));
 
     // Test initial pose.
     assertEquals(
@@ -35,12 +33,11 @@ class TrajectoryTransformTest {
   @Test
   void testRelativeTo() {
     var config = new TrajectoryConfig(3, 3);
-    var trajectory =
-        TrajectoryGenerator.generateTrajectory(
-            new Pose2d(1, 2, Rotation2d.fromDegrees(30.0)),
-            List.of(),
-            new Pose2d(5, 7, Rotation2d.kCCW_Pi_2),
-            config);
+    var trajectory = TrajectoryGenerator.generateTrajectory(
+        new Pose2d(1, 2, Rotation2d.fromDegrees(30.0)),
+        List.of(),
+        new Pose2d(5, 7, Rotation2d.kCCW_Pi_2),
+        config);
 
     var transformedTrajectory = trajectory.relativeTo(new Pose2d(1, 2, Rotation2d.fromDegrees(30)));
 

@@ -18,15 +18,14 @@ class NumericalIntegrationTest {
   void testExponential() {
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 
-    var y1 =
-        NumericalIntegration.rk4(
-            (Matrix<N1, N1> x) -> {
-              var y = new Matrix<>(Nat.N1(), Nat.N1());
-              y.set(0, 0, Math.exp(x.get(0, 0)));
-              return y;
-            },
-            y0,
-            0.1);
+    var y1 = NumericalIntegration.rk4(
+        (Matrix<N1, N1> x) -> {
+          var y = new Matrix<>(Nat.N1(), Nat.N1());
+          y.set(0, 0, Math.exp(x.get(0, 0)));
+          return y;
+        },
+        y0,
+        0.1);
 
     assertEquals(Math.exp(0.1) - Math.exp(0.0), y1.get(0, 0), 1e-3);
   }
@@ -42,22 +41,19 @@ class NumericalIntegrationTest {
   void testRK4TimeVarying() {
     final var y0 = VecBuilder.fill(12.0 * Math.exp(5.0) / Math.pow(Math.exp(5.0) + 1.0, 2.0));
 
-    final var y1 =
-        NumericalIntegration.rk4(
-            (Double t, Matrix<N1, N1> y) ->
-                MatBuilder.fill(
-                    Nat.N1(), Nat.N1(), y.get(0, 0) * (2.0 / (Math.exp(t) + 1.0) - 1.0)),
-            5.0,
-            y0,
-            1.0);
+    final var y1 = NumericalIntegration.rk4(
+        (Double t, Matrix<N1, N1> y) ->
+            MatBuilder.fill(Nat.N1(), Nat.N1(), y.get(0, 0) * (2.0 / (Math.exp(t) + 1.0) - 1.0)),
+        5.0,
+        y0,
+        1.0);
     assertEquals(12.0 * Math.exp(6.0) / Math.pow(Math.exp(6.0) + 1.0, 2.0), y1.get(0, 0), 1e-3);
   }
 
   @Test
   void testZeroRKDP() {
-    var y1 =
-        NumericalIntegration.rkdp(
-            (x, u) -> VecBuilder.fill(0), VecBuilder.fill(0), VecBuilder.fill(0), 0.1);
+    var y1 = NumericalIntegration.rkdp(
+        (x, u) -> VecBuilder.fill(0), VecBuilder.fill(0), VecBuilder.fill(0), 0.1);
 
     assertEquals(0.0, y1.get(0, 0), 1e-3);
   }
@@ -66,16 +62,15 @@ class NumericalIntegrationTest {
   void testExponentialRKDP() {
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 
-    var y1 =
-        NumericalIntegration.rkdp(
-            (x, u) -> {
-              var y = new Matrix<>(Nat.N1(), Nat.N1());
-              y.set(0, 0, Math.exp(x.get(0, 0)));
-              return y;
-            },
-            y0,
-            VecBuilder.fill(0),
-            0.1);
+    var y1 = NumericalIntegration.rkdp(
+        (x, u) -> {
+          var y = new Matrix<>(Nat.N1(), Nat.N1());
+          y.set(0, 0, Math.exp(x.get(0, 0)));
+          return y;
+        },
+        y0,
+        VecBuilder.fill(0),
+        0.1);
 
     assertEquals(Math.exp(0.1) - Math.exp(0.0), y1.get(0, 0), 1e-3);
   }
@@ -92,15 +87,13 @@ class NumericalIntegrationTest {
   void testRKDPTimeVarying() {
     final var y0 = VecBuilder.fill(12.0 * Math.exp(5.0) / Math.pow(Math.exp(5.0) + 1.0, 2.0));
 
-    final var y1 =
-        NumericalIntegration.rkdp(
-            (Double t, Matrix<N1, N1> y) ->
-                MatBuilder.fill(
-                    Nat.N1(), Nat.N1(), y.get(0, 0) * (2.0 / (Math.exp(t) + 1.0) - 1.0)),
-            5.0,
-            y0,
-            1.0,
-            1e-12);
+    final var y1 = NumericalIntegration.rkdp(
+        (Double t, Matrix<N1, N1> y) ->
+            MatBuilder.fill(Nat.N1(), Nat.N1(), y.get(0, 0) * (2.0 / (Math.exp(t) + 1.0) - 1.0)),
+        5.0,
+        y0,
+        1.0,
+        1e-12);
     assertEquals(12.0 * Math.exp(6.0) / Math.pow(Math.exp(6.0) + 1.0, 2.0), y1.get(0, 0), 1e-3);
   }
 }

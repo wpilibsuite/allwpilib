@@ -48,18 +48,17 @@ public class MatrixProto<R extends Num, C extends Num>
   @Override
   public Matrix<R, C> unpack(ProtobufMatrix msg) {
     if (msg.getNumRows() != m_rows.getNum() || msg.getNumCols() != m_cols.getNum()) {
-      throw new IllegalArgumentException(
-          "Tried to unpack msg "
-              + msg
-              + " with "
-              + msg.getNumRows()
-              + " rows and "
-              + msg.getNumCols()
-              + " columns into Matrix with "
-              + m_rows.getNum()
-              + " rows and "
-              + m_cols.getNum()
-              + " columns");
+      throw new IllegalArgumentException("Tried to unpack msg "
+          + msg
+          + " with "
+          + msg.getNumRows()
+          + " rows and "
+          + msg.getNumCols()
+          + " columns into Matrix with "
+          + m_rows.getNum()
+          + " rows and "
+          + m_cols.getNum()
+          + " columns");
     }
     return MatBuilder.fill(m_rows, m_cols, Protobuf.unpackArray(msg.getData()));
   }

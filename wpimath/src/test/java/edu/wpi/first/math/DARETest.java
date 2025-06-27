@@ -34,14 +34,12 @@ class DARETest extends UtilityClassTest<DARE> {
       Matrix<States, States> X) {
     // Check that X is the solution to the DARE
     // Y = AᵀXA − X − AᵀXB(BᵀXB + R)⁻¹BᵀXA + Q = 0
-    var Y =
-        (A.transpose().times(X).times(A))
-            .minus(X)
-            .minus(
-                (A.transpose().times(X).times(B))
-                    .times((B.transpose().times(X).times(B).plus(R)).inv())
-                    .times(B.transpose().times(X).times(A)))
-            .plus(Q);
+    var Y = (A.transpose().times(X).times(A))
+        .minus(X)
+        .minus((A.transpose().times(X).times(B))
+            .times((B.transpose().times(X).times(B).plus(R)).inv())
+            .times(B.transpose().times(X).times(A)))
+        .plus(Q);
     assertMatrixEqual(new Matrix<>(new SimpleMatrix(Y.getNumRows(), Y.getNumCols())), Y);
   }
 
@@ -54,14 +52,12 @@ class DARETest extends UtilityClassTest<DARE> {
       Matrix<States, States> X) {
     // Check that X is the solution to the DARE
     // Y = AᵀXA − X − (AᵀXB + N)(BᵀXB + R)⁻¹(BᵀXA + Nᵀ) + Q = 0
-    var Y =
-        (A.transpose().times(X).times(A))
-            .minus(X)
-            .minus(
-                (A.transpose().times(X).times(B).plus(N))
-                    .times((B.transpose().times(X).times(B).plus(R)).inv())
-                    .times(B.transpose().times(X).times(A).plus(N.transpose())))
-            .plus(Q);
+    var Y = (A.transpose().times(X).times(A))
+        .minus(X)
+        .minus((A.transpose().times(X).times(B).plus(N))
+            .times((B.transpose().times(X).times(B).plus(R)).inv())
+            .times(B.transpose().times(X).times(A).plus(N.transpose())))
+        .plus(Q);
     assertMatrixEqual(new Matrix<>(new SimpleMatrix(Y.getNumRows(), Y.getNumCols())), Y);
   }
 
@@ -70,13 +66,11 @@ class DARETest extends UtilityClassTest<DARE> {
     // Example 2 of "On the Numerical Solution of the Discrete-Time Algebraic
     // Riccati Equation"
 
-    var A =
-        new Matrix<>(
-            Nat.N4(), Nat.N4(), new double[] {0.5, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0});
+    var A = new Matrix<>(
+        Nat.N4(), Nat.N4(), new double[] {0.5, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0});
     var B = new Matrix<>(Nat.N4(), Nat.N1(), new double[] {0, 0, 0, 1});
-    var Q =
-        new Matrix<>(
-            Nat.N4(), Nat.N4(), new double[] {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+    var Q = new Matrix<>(
+        Nat.N4(), Nat.N4(), new double[] {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
     var R = new Matrix<>(Nat.N1(), Nat.N1(), new double[] {0.25});
 
     var X = DARE.dare(A, B, Q, R);
@@ -89,18 +83,15 @@ class DARETest extends UtilityClassTest<DARE> {
     // Example 2 of "On the Numerical Solution of the Discrete-Time Algebraic
     // Riccati Equation"
 
-    var A =
-        new Matrix<>(
-            Nat.N4(), Nat.N4(), new double[] {0.5, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0});
+    var A = new Matrix<>(
+        Nat.N4(), Nat.N4(), new double[] {0.5, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0});
     var B = new Matrix<>(Nat.N4(), Nat.N1(), new double[] {0, 0, 0, 1});
-    var Q =
-        new Matrix<>(
-            Nat.N4(), Nat.N4(), new double[] {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+    var Q = new Matrix<>(
+        Nat.N4(), Nat.N4(), new double[] {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
     var R = new Matrix<>(Nat.N1(), Nat.N1(), new double[] {0.25});
 
-    var Aref =
-        new Matrix<>(
-            Nat.N4(), Nat.N4(), new double[] {0.25, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0});
+    var Aref = new Matrix<>(
+        Nat.N4(), Nat.N4(), new double[] {0.25, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0});
     Q = A.minus(Aref).transpose().times(Q).times(A.minus(Aref));
     R = B.transpose().times(Q).times(B).plus(R);
     var N = A.minus(Aref).transpose().times(Q).times(B);

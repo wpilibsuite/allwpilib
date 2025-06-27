@@ -20,18 +20,14 @@ class LinearSystemIDTest {
   void testDrivetrainVelocitySystem() {
     var model =
         LinearSystemId.createDrivetrainVelocitySystem(DCMotor.getNEO(4), 70, 0.05, 0.4, 6.0, 6);
-    assertTrue(
-        model
-            .getA()
-            .isEqual(
-                MatBuilder.fill(Nat.N2(), Nat.N2(), -10.14132, 3.06598, 3.06598, -10.14132),
-                0.001));
+    assertTrue(model
+        .getA()
+        .isEqual(
+            MatBuilder.fill(Nat.N2(), Nat.N2(), -10.14132, 3.06598, 3.06598, -10.14132), 0.001));
 
-    assertTrue(
-        model
-            .getB()
-            .isEqual(
-                MatBuilder.fill(Nat.N2(), Nat.N2(), 4.2590, -1.28762, -1.2876, 4.2590), 0.001));
+    assertTrue(model
+        .getB()
+        .isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 4.2590, -1.28762, -1.2876, 4.2590), 0.001));
 
     assertTrue(
         model.getC().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 0.0, 0.0, 1.0), 0.001));

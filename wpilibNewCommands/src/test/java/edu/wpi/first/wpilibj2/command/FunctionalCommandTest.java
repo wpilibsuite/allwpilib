@@ -19,12 +19,8 @@ class FunctionalCommandTest extends CommandTestBase {
       AtomicBoolean cond3 = new AtomicBoolean();
       AtomicBoolean cond4 = new AtomicBoolean();
 
-      FunctionalCommand command =
-          new FunctionalCommand(
-              () -> cond1.set(true),
-              () -> cond2.set(true),
-              interrupted -> cond3.set(true),
-              cond4::get);
+      FunctionalCommand command = new FunctionalCommand(
+          () -> cond1.set(true), () -> cond2.set(true), interrupted -> cond3.set(true), cond4::get);
 
       scheduler.schedule(command);
       scheduler.run();

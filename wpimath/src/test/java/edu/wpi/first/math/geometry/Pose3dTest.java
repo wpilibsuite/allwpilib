@@ -21,13 +21,12 @@ class Pose3dTest {
   void testRotateBy() {
     final double x = 1.0;
     final double y = 2.0;
-    var initial =
-        new Pose3d(
-            new Translation3d(x, y, 0.0),
-            new Rotation3d(
-                Units.degreesToRadians(0.0),
-                Units.degreesToRadians(0.0),
-                Units.degreesToRadians(45.0)));
+    var initial = new Pose3d(
+        new Translation3d(x, y, 0.0),
+        new Rotation3d(
+            Units.degreesToRadians(0.0),
+            Units.degreesToRadians(0.0),
+            Units.degreesToRadians(45.0)));
 
     double yaw = Units.degreesToRadians(5.0);
     var rotation = new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(0.0), yaw);
@@ -42,40 +41,36 @@ class Pose3dTest {
         () -> assertEquals(0.0, rotated.getZ(), kEpsilon),
         () -> assertEquals(0.0, rotated.getRotation().getX(), kEpsilon),
         () -> assertEquals(0.0, rotated.getRotation().getY(), kEpsilon),
-        () ->
-            assertEquals(
-                initial.getRotation().getZ() + rotation.getZ(),
-                rotated.getRotation().getZ(),
-                kEpsilon));
+        () -> assertEquals(
+            initial.getRotation().getZ() + rotation.getZ(),
+            rotated.getRotation().getZ(),
+            kEpsilon));
   }
 
   @Test
   void testTransformByRotations() {
     var initialPose = Pose3d.kZero;
 
-    var transform1 =
-        new Transform3d(
-            Translation3d.kZero,
-            new Rotation3d(
-                Units.degreesToRadians(90.0),
-                Units.degreesToRadians(45.0),
-                Units.degreesToRadians(0.0)));
+    var transform1 = new Transform3d(
+        Translation3d.kZero,
+        new Rotation3d(
+            Units.degreesToRadians(90.0),
+            Units.degreesToRadians(45.0),
+            Units.degreesToRadians(0.0)));
 
-    var transform2 =
-        new Transform3d(
-            Translation3d.kZero,
-            new Rotation3d(
-                Units.degreesToRadians(-90.0),
-                Units.degreesToRadians(0.0),
-                Units.degreesToRadians(0.0)));
+    var transform2 = new Transform3d(
+        Translation3d.kZero,
+        new Rotation3d(
+            Units.degreesToRadians(-90.0),
+            Units.degreesToRadians(0.0),
+            Units.degreesToRadians(0.0)));
 
-    var transform3 =
-        new Transform3d(
-            Translation3d.kZero,
-            new Rotation3d(
-                Units.degreesToRadians(0.0),
-                Units.degreesToRadians(-45.0),
-                Units.degreesToRadians(0.0)));
+    var transform3 = new Transform3d(
+        Translation3d.kZero,
+        new Rotation3d(
+            Units.degreesToRadians(0.0),
+            Units.degreesToRadians(-45.0),
+            Units.degreesToRadians(0.0)));
 
     // This sequence of rotations should diverge from the origin and eventually
     // return to it. When
@@ -90,27 +85,22 @@ class Pose3dTest {
         initialPose.transformBy(transform1).transformBy(transform2).transformBy(transform3);
 
     assertAll(
-        () ->
-            assertEquals(
-                finalPose.getRotation().getX(), initialPose.getRotation().getX(), kEpsilon),
-        () ->
-            assertEquals(
-                finalPose.getRotation().getY(), initialPose.getRotation().getY(), kEpsilon),
-        () ->
-            assertEquals(
-                finalPose.getRotation().getZ(), initialPose.getRotation().getZ(), kEpsilon));
+        () -> assertEquals(
+            finalPose.getRotation().getX(), initialPose.getRotation().getX(), kEpsilon),
+        () -> assertEquals(
+            finalPose.getRotation().getY(), initialPose.getRotation().getY(), kEpsilon),
+        () -> assertEquals(
+            finalPose.getRotation().getZ(), initialPose.getRotation().getZ(), kEpsilon));
   }
 
   @Test
   void testTransformBy() {
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
-    var initial =
-        new Pose3d(
-            new Translation3d(1.0, 2.0, 0.0), new Rotation3d(zAxis, Units.degreesToRadians(45.0)));
-    var transformation =
-        new Transform3d(
-            new Translation3d(5.0, 0.0, 0.0), new Rotation3d(zAxis, Units.degreesToRadians(5.0)));
+    var initial = new Pose3d(
+        new Translation3d(1.0, 2.0, 0.0), new Rotation3d(zAxis, Units.degreesToRadians(45.0)));
+    var transformation = new Transform3d(
+        new Translation3d(5.0, 0.0, 0.0), new Rotation3d(zAxis, Units.degreesToRadians(5.0)));
 
     var transformed = initial.plus(transformation);
 
@@ -184,15 +174,14 @@ class Pose3dTest {
 
   @Test
   void testToMatrix() {
-    var before =
-        new Pose3d(
-            1.0,
-            2.0,
-            3.0,
-            new Rotation3d(
-                Units.degreesToRadians(20.0),
-                Units.degreesToRadians(30.0),
-                Units.degreesToRadians(40.0)));
+    var before = new Pose3d(
+        1.0,
+        2.0,
+        3.0,
+        new Rotation3d(
+            Units.degreesToRadians(20.0),
+            Units.degreesToRadians(30.0),
+            Units.degreesToRadians(40.0)));
     var after = new Pose3d(before.toMatrix());
 
     assertEquals(before, after);
@@ -200,15 +189,14 @@ class Pose3dTest {
 
   @Test
   void testToPose2d() {
-    var pose =
-        new Pose3d(
-            1.0,
-            2.0,
-            3.0,
-            new Rotation3d(
-                Units.degreesToRadians(20.0),
-                Units.degreesToRadians(30.0),
-                Units.degreesToRadians(40.0)));
+    var pose = new Pose3d(
+        1.0,
+        2.0,
+        3.0,
+        new Rotation3d(
+            Units.degreesToRadians(20.0),
+            Units.degreesToRadians(30.0),
+            Units.degreesToRadians(40.0)));
     var expected = new Pose2d(1.0, 2.0, new Rotation2d(Units.degreesToRadians(40.0)));
 
     assertEquals(expected, pose.toPose2d());
@@ -216,41 +204,39 @@ class Pose3dTest {
 
   @Test
   void testComplexTwists() {
-    var initial_poses =
-        List.of(
-            new Pose3d(
-                new Translation3d(0.698303, -0.959096, 0.271076),
-                new Rotation3d(new Quaternion(0.86403, -0.076866, 0.147234, 0.475254))),
-            new Pose3d(
-                new Translation3d(0.634892, -0.765209, 0.117543),
-                new Rotation3d(new Quaternion(0.84987, -0.070829, 0.162097, 0.496415))),
-            new Pose3d(
-                new Translation3d(0.584827, -0.590303, -0.02557),
-                new Rotation3d(new Quaternion(0.832743, -0.041991, 0.202188, 0.513708))),
-            new Pose3d(
-                new Translation3d(0.505038, -0.451479, -0.112835),
-                new Rotation3d(new Quaternion(0.816515, -0.002673, 0.226182, 0.531166))),
-            new Pose3d(
-                new Translation3d(0.428178, -0.329692, -0.189707),
-                new Rotation3d(new Quaternion(0.807886, 0.029298, 0.257788, 0.529157))));
+    var initial_poses = List.of(
+        new Pose3d(
+            new Translation3d(0.698303, -0.959096, 0.271076),
+            new Rotation3d(new Quaternion(0.86403, -0.076866, 0.147234, 0.475254))),
+        new Pose3d(
+            new Translation3d(0.634892, -0.765209, 0.117543),
+            new Rotation3d(new Quaternion(0.84987, -0.070829, 0.162097, 0.496415))),
+        new Pose3d(
+            new Translation3d(0.584827, -0.590303, -0.02557),
+            new Rotation3d(new Quaternion(0.832743, -0.041991, 0.202188, 0.513708))),
+        new Pose3d(
+            new Translation3d(0.505038, -0.451479, -0.112835),
+            new Rotation3d(new Quaternion(0.816515, -0.002673, 0.226182, 0.531166))),
+        new Pose3d(
+            new Translation3d(0.428178, -0.329692, -0.189707),
+            new Rotation3d(new Quaternion(0.807886, 0.029298, 0.257788, 0.529157))));
 
-    var final_poses =
-        List.of(
-            new Pose3d(
-                new Translation3d(-0.230448, -0.511957, 0.198406),
-                new Rotation3d(new Quaternion(0.753984, 0.347016, 0.409105, 0.379106))),
-            new Pose3d(
-                new Translation3d(-0.088932, -0.343253, 0.095018),
-                new Rotation3d(new Quaternion(0.638738, 0.413016, 0.536281, 0.365833))),
-            new Pose3d(
-                new Translation3d(-0.107908, -0.317552, 0.133946),
-                new Rotation3d(new Quaternion(0.653444, 0.417069, 0.465505, 0.427046))),
-            new Pose3d(
-                new Translation3d(-0.123383, -0.156411, -0.047435),
-                new Rotation3d(new Quaternion(0.652983, 0.40644, 0.431566, 0.47135))),
-            new Pose3d(
-                new Translation3d(-0.084654, -0.019305, -0.030022),
-                new Rotation3d(new Quaternion(0.620243, 0.429104, 0.479384, 0.44873))));
+    var final_poses = List.of(
+        new Pose3d(
+            new Translation3d(-0.230448, -0.511957, 0.198406),
+            new Rotation3d(new Quaternion(0.753984, 0.347016, 0.409105, 0.379106))),
+        new Pose3d(
+            new Translation3d(-0.088932, -0.343253, 0.095018),
+            new Rotation3d(new Quaternion(0.638738, 0.413016, 0.536281, 0.365833))),
+        new Pose3d(
+            new Translation3d(-0.107908, -0.317552, 0.133946),
+            new Rotation3d(new Quaternion(0.653444, 0.417069, 0.465505, 0.427046))),
+        new Pose3d(
+            new Translation3d(-0.123383, -0.156411, -0.047435),
+            new Rotation3d(new Quaternion(0.652983, 0.40644, 0.431566, 0.47135))),
+        new Pose3d(
+            new Translation3d(-0.084654, -0.019305, -0.030022),
+            new Rotation3d(new Quaternion(0.620243, 0.429104, 0.479384, 0.44873))));
 
     final var eps = 1E-5;
     for (int i = 0; i < initial_poses.size(); i++) {
@@ -264,51 +250,41 @@ class Pose3dTest {
           () -> assertEquals(start_exp.getX(), end.getX(), eps),
           () -> assertEquals(start_exp.getY(), end.getY(), eps),
           () -> assertEquals(start_exp.getZ(), end.getZ(), eps),
-          () ->
-              assertEquals(
-                  start_exp.getRotation().getQuaternion().getW(),
-                  end.getRotation().getQuaternion().getW(),
-                  eps),
-          () ->
-              assertEquals(
-                  start_exp.getRotation().getQuaternion().getX(),
-                  end.getRotation().getQuaternion().getX(),
-                  eps),
-          () ->
-              assertEquals(
-                  start_exp.getRotation().getQuaternion().getY(),
-                  end.getRotation().getQuaternion().getY(),
-                  eps),
-          () ->
-              assertEquals(
-                  start_exp.getRotation().getQuaternion().getZ(),
-                  end.getRotation().getQuaternion().getZ(),
-                  eps));
+          () -> assertEquals(
+              start_exp.getRotation().getQuaternion().getW(),
+              end.getRotation().getQuaternion().getW(),
+              eps),
+          () -> assertEquals(
+              start_exp.getRotation().getQuaternion().getX(),
+              end.getRotation().getQuaternion().getX(),
+              eps),
+          () -> assertEquals(
+              start_exp.getRotation().getQuaternion().getY(),
+              end.getRotation().getQuaternion().getY(),
+              eps),
+          () -> assertEquals(
+              start_exp.getRotation().getQuaternion().getZ(),
+              end.getRotation().getQuaternion().getZ(),
+              eps));
     }
   }
 
   @Test
   void testTwistNaN() {
-    var initial_poses =
-        List.of(
-            new Pose3d(
-                new Translation3d(6.32, 4.12, 0.00),
-                new Rotation3d(
-                    new Quaternion(-0.9999999999999999, 0.0, 0.0, 1.9208309264993548E-8))),
-            new Pose3d(
-                new Translation3d(3.75, 2.95, 0.00),
-                new Rotation3d(
-                    new Quaternion(0.9999999999999793, 0.0, 0.0, 2.0352360299846772E-7))));
-    var final_poses =
-        List.of(
-            new Pose3d(
-                new Translation3d(6.33, 4.15, 0.00),
-                new Rotation3d(
-                    new Quaternion(-0.9999999999999999, 0.0, 0.0, 2.416890209039172E-8))),
-            new Pose3d(
-                new Translation3d(3.66, 2.93, 0.00),
-                new Rotation3d(
-                    new Quaternion(0.9999999999999782, 0.0, 0.0, 2.0859477994905617E-7))));
+    var initial_poses = List.of(
+        new Pose3d(
+            new Translation3d(6.32, 4.12, 0.00),
+            new Rotation3d(new Quaternion(-0.9999999999999999, 0.0, 0.0, 1.9208309264993548E-8))),
+        new Pose3d(
+            new Translation3d(3.75, 2.95, 0.00),
+            new Rotation3d(new Quaternion(0.9999999999999793, 0.0, 0.0, 2.0352360299846772E-7))));
+    var final_poses = List.of(
+        new Pose3d(
+            new Translation3d(6.33, 4.15, 0.00),
+            new Rotation3d(new Quaternion(-0.9999999999999999, 0.0, 0.0, 2.416890209039172E-8))),
+        new Pose3d(
+            new Translation3d(3.66, 2.93, 0.00),
+            new Rotation3d(new Quaternion(0.9999999999999782, 0.0, 0.0, 2.0859477994905617E-7))));
 
     for (int i = 0; i < initial_poses.size(); i++) {
       var start = initial_poses.get(i);
@@ -372,18 +348,12 @@ class Pose3dTest {
             .nearest(List.of(poseA, poseD, poseE)));
 
     // Test with complex 3D rotations (combining roll, pitch, yaw)
-    final var complexPose1 =
-        new Pose3d(
-            translation,
-            new Rotation3d(Math.toRadians(45), Math.toRadians(30), Math.toRadians(60)));
-    final var complexPose2 =
-        new Pose3d(
-            translation,
-            new Rotation3d(Math.toRadians(90), Math.toRadians(45), Math.toRadians(90)));
-    final var complexPose3 =
-        new Pose3d(
-            translation,
-            new Rotation3d(Math.toRadians(10), Math.toRadians(15), Math.toRadians(20)));
+    final var complexPose1 = new Pose3d(
+        translation, new Rotation3d(Math.toRadians(45), Math.toRadians(30), Math.toRadians(60)));
+    final var complexPose2 = new Pose3d(
+        translation, new Rotation3d(Math.toRadians(90), Math.toRadians(45), Math.toRadians(90)));
+    final var complexPose3 = new Pose3d(
+        translation, new Rotation3d(Math.toRadians(10), Math.toRadians(15), Math.toRadians(20)));
 
     assertEquals(
         complexPose3,

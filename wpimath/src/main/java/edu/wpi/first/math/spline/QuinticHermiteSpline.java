@@ -157,16 +157,11 @@ public class QuinticHermiteSpline extends Spline
       // [a₂] = [  0.0   0.0   0.5   0.0   0.0   0.0][P(i+1) ]
       // [a₁] = [  0.0   1.0   0.0   0.0   0.0   0.0][P'(i+1)]
       // [a₀] = [  1.0   0.0   0.0   0.0   0.0   0.0][P"(i+1)]
-      hermiteBasis =
-          new SimpleMatrix(
-              6,
-              6,
-              true,
-              new double[] {
-                -06.0, -03.0, -00.5, +06.0, -03.0, +00.5, +15.0, +08.0, +01.5, -15.0, +07.0, -01.0,
-                -10.0, -06.0, -01.5, +10.0, -04.0, +00.5, +00.0, +00.0, +00.5, +00.0, +00.0, +00.0,
-                +00.0, +01.0, +00.0, +00.0, +00.0, +00.0, +01.0, +00.0, +00.0, +00.0, +00.0, +00.0
-              });
+      hermiteBasis = new SimpleMatrix(6, 6, true, new double[] {
+        -06.0, -03.0, -00.5, +06.0, -03.0, +00.5, +15.0, +08.0, +01.5, -15.0, +07.0, -01.0, -10.0,
+        -06.0, -01.5, +10.0, -04.0, +00.5, +00.0, +00.0, +00.5, +00.0, +00.0, +00.0, +00.0, +01.0,
+        +00.0, +00.0, +00.0, +00.0, +01.0, +00.0, +00.0, +00.0, +00.0, +00.0
+      });
     }
     return hermiteBasis;
   }
@@ -184,14 +179,10 @@ public class QuinticHermiteSpline extends Spline
     if (initialVector.length != 3 || finalVector.length != 3) {
       throw new IllegalArgumentException("Size of vectors must be 3");
     }
-    return new SimpleMatrix(
-        6,
-        1,
-        true,
-        new double[] {
-          initialVector[0], initialVector[1], initialVector[2],
-          finalVector[0], finalVector[1], finalVector[2]
-        });
+    return new SimpleMatrix(6, 1, true, new double[] {
+      initialVector[0], initialVector[1], initialVector[2],
+      finalVector[0], finalVector[1], finalVector[2]
+    });
   }
 
   /** QuinticHermiteSpline struct for serialization. */

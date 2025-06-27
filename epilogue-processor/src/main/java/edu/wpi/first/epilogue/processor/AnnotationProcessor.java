@@ -36,9 +36,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
-@SupportedAnnotationTypes({
-  "edu.wpi.first.epilogue.CustomLoggerFor",
-  "edu.wpi.first.epilogue.Logged"
+@SupportedAnnotationTypes({"edu.wpi.first.epilogue.CustomLoggerFor", "edu.wpi.first.epilogue.Logged"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class AnnotationProcessor extends AbstractProcessor {
@@ -63,57 +61,51 @@ public class AnnotationProcessor extends AbstractProcessor {
     annotations.stream()
         .filter(ann -> kCustomLoggerFqn.contentEquals(ann.getQualifiedName()))
         .findAny()
-        .ifPresent(
-            customLogger -> {
-              customLoggers.putAll(processCustomLoggers(roundEnv, customLogger));
-            });
+        .ifPresent(customLogger -> {
+          customLoggers.putAll(processCustomLoggers(roundEnv, customLogger));
+        });
 
     // Get all root types (classes and interfaces), excluding packages and modules
     roundEnv.getRootElements().stream()
         .filter(e -> e instanceof TypeElement)
-        .filter(
-            e ->
+        .filter(e -> processingEnv
+            .getTypeUtils()
+            .isAssignable(
+                e.asType(),
                 processingEnv
                     .getTypeUtils()
-                    .isAssignable(
-                        e.asType(),
-                        processingEnv
-                            .getTypeUtils()
-                            .erasure(
-                                processingEnv
-                                    .getElementUtils()
-                                    .getTypeElement(kClassSpecificLoggerFqn)
-                                    .asType())))
+                    .erasure(processingEnv
+                        .getElementUtils()
+                        .getTypeElement(kClassSpecificLoggerFqn)
+                        .asType())))
         .filter(e -> e.getAnnotation(CustomLoggerFor.class) == null)
-        .forEach(
-            e -> {
-              processingEnv
-                  .getMessager()
-                  .printMessage(
-                      Diagnostic.Kind.ERROR,
-                      "[EPILOGUE] Custom logger classes should have a @CustomLoggerFor annotation",
-                      e);
-            });
+        .forEach(e -> {
+          processingEnv
+              .getMessager()
+              .printMessage(
+                  Diagnostic.Kind.ERROR,
+                  "[EPILOGUE] Custom logger classes should have a @CustomLoggerFor annotation",
+                  e);
+        });
 
     var loggedTypes = getLoggedTypes(roundEnv);
 
     // Handlers are declared in order of priority. If an element could be logged in more than one
     // way (eg a class implements both Sendable and StructSerializable), the order of the handlers
     // in this list will determine how it gets logged.
-    m_handlers =
-        List.of(
-            new LoggableHandler(
-                processingEnv, loggedTypes), // prioritize epilogue logging over Sendable
-            new ConfiguredLoggerHandler(
-                processingEnv, customLoggers), // then customized logging configs
-            new ArrayHandler(processingEnv),
-            new CollectionHandler(processingEnv),
-            new EnumHandler(processingEnv),
-            new MeasureHandler(processingEnv),
-            new PrimitiveHandler(processingEnv),
-            new SupplierHandler(processingEnv),
-            new StructHandler(processingEnv), // prioritize struct over sendable
-            new SendableHandler(processingEnv));
+    m_handlers = List.of(
+        new LoggableHandler(
+            processingEnv, loggedTypes), // prioritize epilogue logging over Sendable
+        new ConfiguredLoggerHandler(
+            processingEnv, customLoggers), // then customized logging configs
+        new ArrayHandler(processingEnv),
+        new CollectionHandler(processingEnv),
+        new EnumHandler(processingEnv),
+        new MeasureHandler(processingEnv),
+        new PrimitiveHandler(processingEnv),
+        new SupplierHandler(processingEnv),
+        new StructHandler(processingEnv), // prioritize struct over sendable
+        new SendableHandler(processingEnv));
 
     m_epiloguerGenerator = new EpilogueGenerator(processingEnv, customLoggers);
     m_loggerGenerator = new LoggerGenerator(processingEnv, m_handlers);
@@ -121,10 +113,9 @@ public class AnnotationProcessor extends AbstractProcessor {
     annotations.stream()
         .filter(ann -> kLoggedFqn.contentEquals(ann.getQualifiedName()))
         .findAny()
-        .ifPresent(
-            epilogue -> {
-              processEpilogue(roundEnv, epilogue, loggedTypes);
-            });
+        .ifPresent(epilogue -> {
+          processEpilogue(roundEnv, epilogue, loggedTypes);
+        });
 
     return false;
   }
@@ -142,9 +133,8 @@ public class AnnotationProcessor extends AbstractProcessor {
     var annotatedElements = roundEnv.getElementsAnnotatedWith(Logged.class);
     return Stream.concat(
             // 1. All type elements (classes, interfaces, or enums) with the @Logged annotation
-            annotatedElements.stream()
-                .filter(e -> e instanceof TypeElement)
-                .map(e -> (TypeElement) e),
+            annotatedElements.stream().filter(e -> e instanceof TypeElement).map(e ->
+                (TypeElement) e),
             // 2. All type elements containing a field or method with the @Logged annotation
             annotatedElements.stream()
                 .filter(e -> e instanceof VariableElement || e instanceof ExecutableElement)
@@ -157,11 +147,10 @@ public class AnnotationProcessor extends AbstractProcessor {
   }
 
   private boolean validateFields(Set<? extends Element> annotatedElements) {
-    var fields =
-        annotatedElements.stream()
-            .filter(e -> e instanceof VariableElement)
-            .map(e -> (VariableElement) e)
-            .toList();
+    var fields = annotatedElements.stream()
+        .filter(e -> e instanceof VariableElement)
+        .map(e -> (VariableElement) e)
+        .toList();
 
     boolean valid = true;
 
@@ -184,11 +173,10 @@ public class AnnotationProcessor extends AbstractProcessor {
   }
 
   private boolean validateMethods(Set<? extends Element> annotatedElements) {
-    var methods =
-        annotatedElements.stream()
-            .filter(e -> e instanceof ExecutableElement)
-            .map(e -> (ExecutableElement) e)
-            .toList();
+    var methods = annotatedElements.stream()
+        .filter(e -> e instanceof ExecutableElement)
+        .map(e -> (ExecutableElement) e)
+        .toList();
 
     boolean valid = true;
 
@@ -293,10 +281,9 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     var annotatedElements = roundEnv.getElementsAnnotatedWith(customLoggerAnnotation);
 
-    var loggerSuperClass =
-        processingEnv
-            .getElementUtils()
-            .getTypeElement("edu.wpi.first.epilogue.logging.ClassSpecificLogger");
+    var loggerSuperClass = processingEnv
+        .getElementUtils()
+        .getTypeElement("edu.wpi.first.epilogue.logging.ClassSpecificLogger");
 
     for (Element annotatedElement : annotatedElements) {
       List<AnnotationValue> targetTypes = List.of();
@@ -308,14 +295,11 @@ public class AnnotationProcessor extends AbstractProcessor {
         }
       }
 
-      boolean hasPublicNoArgConstructor =
-          annotatedElement.getEnclosedElements().stream()
-              .anyMatch(
-                  enclosedElement ->
-                      enclosedElement instanceof ExecutableElement exe
-                          && exe.getKind() == ElementKind.CONSTRUCTOR
-                          && exe.getModifiers().contains(Modifier.PUBLIC)
-                          && exe.getParameters().isEmpty());
+      boolean hasPublicNoArgConstructor = annotatedElement.getEnclosedElements().stream()
+          .anyMatch(enclosedElement -> enclosedElement instanceof ExecutableElement exe
+              && exe.getKind() == ElementKind.CONSTRUCTOR
+              && exe.getModifiers().contains(Modifier.PUBLIC)
+              && exe.getParameters().isEmpty());
 
       if (!hasPublicNoArgConstructor) {
         processingEnv
@@ -332,12 +316,11 @@ public class AnnotationProcessor extends AbstractProcessor {
         var reflectedTarget = targetType.asElement();
 
         // eg ClassSpecificLogger<MyDataType>
-        var requiredSuperClass =
-            processingEnv
-                .getTypeUtils()
-                .getDeclaredType(
-                    loggerSuperClass,
-                    processingEnv.getTypeUtils().getWildcardType(null, reflectedTarget.asType()));
+        var requiredSuperClass = processingEnv
+            .getTypeUtils()
+            .getDeclaredType(
+                loggerSuperClass,
+                processingEnv.getTypeUtils().getWildcardType(null, reflectedTarget.asType()));
 
         if (customLoggers.containsKey(targetType)) {
           processingEnv
@@ -386,8 +369,10 @@ public class AnnotationProcessor extends AbstractProcessor {
     var mainRobotClasses = new ArrayList<TypeElement>();
 
     // Used to check for a main robot class
-    var robotBaseClass =
-        processingEnv.getElementUtils().getTypeElement("edu.wpi.first.wpilibj.TimedRobot").asType();
+    var robotBaseClass = processingEnv
+        .getElementUtils()
+        .getTypeElement("edu.wpi.first.wpilibj.TimedRobot")
+        .asType();
 
     boolean validFields = validateFields(annotatedElements);
     boolean validMethods = validateMethods(annotatedElements);

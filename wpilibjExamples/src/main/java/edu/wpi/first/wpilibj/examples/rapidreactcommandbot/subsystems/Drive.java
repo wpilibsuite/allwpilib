@@ -36,33 +36,28 @@ public class Drive extends SubsystemBase {
       new DifferentialDrive(m_leftLeader::set, m_rightLeader::set);
 
   // The left-side drive encoder
-  private final Encoder m_leftEncoder =
-      new Encoder(
-          DriveConstants.kLeftEncoderPorts[0],
-          DriveConstants.kLeftEncoderPorts[1],
-          DriveConstants.kLeftEncoderReversed);
+  private final Encoder m_leftEncoder = new Encoder(
+      DriveConstants.kLeftEncoderPorts[0],
+      DriveConstants.kLeftEncoderPorts[1],
+      DriveConstants.kLeftEncoderReversed);
 
   // The right-side drive encoder
-  private final Encoder m_rightEncoder =
-      new Encoder(
-          DriveConstants.kRightEncoderPorts[0],
-          DriveConstants.kRightEncoderPorts[1],
-          DriveConstants.kRightEncoderReversed);
+  private final Encoder m_rightEncoder = new Encoder(
+      DriveConstants.kRightEncoderPorts[0],
+      DriveConstants.kRightEncoderPorts[1],
+      DriveConstants.kRightEncoderReversed);
 
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
-  private final ProfiledPIDController m_controller =
-      new ProfiledPIDController(
-          DriveConstants.kTurnP,
-          DriveConstants.kTurnI,
-          DriveConstants.kTurnD,
-          new TrapezoidProfile.Constraints(
-              DriveConstants.kMaxTurnRateDegPerS,
-              DriveConstants.kMaxTurnAccelerationDegPerSSquared));
-  private final SimpleMotorFeedforward m_feedforward =
-      new SimpleMotorFeedforward(
-          DriveConstants.ksVolts,
-          DriveConstants.kvVoltSecondsPerDegree,
-          DriveConstants.kaVoltSecondsSquaredPerDegree);
+  private final ProfiledPIDController m_controller = new ProfiledPIDController(
+      DriveConstants.kTurnP,
+      DriveConstants.kTurnI,
+      DriveConstants.kTurnD,
+      new TrapezoidProfile.Constraints(
+          DriveConstants.kMaxTurnRateDegPerS, DriveConstants.kMaxTurnAccelerationDegPerSSquared));
+  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(
+      DriveConstants.ksVolts,
+      DriveConstants.kvVoltSecondsPerDegree,
+      DriveConstants.kaVoltSecondsSquaredPerDegree);
 
   /** Creates a new Drive subsystem. */
   public Drive() {
@@ -109,19 +104,16 @@ public class Drive extends SubsystemBase {
    * @param speed The fraction of max speed at which to drive
    */
   public Command driveDistanceCommand(double distanceMeters, double speed) {
-    return runOnce(
-            () -> {
-              // Reset encoders at the start of the command
-              m_leftEncoder.reset();
-              m_rightEncoder.reset();
-            })
+    return runOnce(() -> {
+          // Reset encoders at the start of the command
+          m_leftEncoder.reset();
+          m_rightEncoder.reset();
+        })
         // Drive forward at specified speed
         .andThen(run(() -> m_drive.arcadeDrive(speed, 0)))
         // End command when we've traveled the specified distance
-        .until(
-            () ->
-                Math.max(m_leftEncoder.getDistance(), m_rightEncoder.getDistance())
-                    >= distanceMeters)
+        .until(() ->
+            Math.max(m_leftEncoder.getDistance(), m_rightEncoder.getDistance()) >= distanceMeters)
         // Stop the drive when the command ends
         .finallyDo(interrupted -> m_drive.stopMotor());
   }
@@ -135,13 +127,12 @@ public class Drive extends SubsystemBase {
   public Command turnToAngleCommand(double angleDeg) {
     return startRun(
             () -> m_controller.reset(m_gyro.getRotation2d().getDegrees()),
-            () ->
-                m_drive.arcadeDrive(
-                    0,
-                    m_controller.calculate(m_gyro.getRotation2d().getDegrees(), angleDeg)
-                        // Divide feedforward voltage by battery voltage to normalize it to [-1, 1]
-                        + m_feedforward.calculate(m_controller.getSetpoint().velocity)
-                            / RobotController.getBatteryVoltage()))
+            () -> m_drive.arcadeDrive(
+                0,
+                m_controller.calculate(m_gyro.getRotation2d().getDegrees(), angleDeg)
+                    // Divide feedforward voltage by battery voltage to normalize it to [-1, 1]
+                    + m_feedforward.calculate(m_controller.getSetpoint().velocity)
+                        / RobotController.getBatteryVoltage()))
         .until(m_controller::atGoal)
         .finallyDo(() -> m_drive.arcadeDrive(0, 0));
   }

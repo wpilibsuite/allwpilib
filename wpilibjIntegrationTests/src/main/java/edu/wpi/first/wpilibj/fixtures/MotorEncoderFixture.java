@@ -191,9 +191,8 @@ public abstract class MotorEncoderFixture<T extends MotorController> implements 
     StringBuilder string = new StringBuilder("MotorEncoderFixture<");
     // Get the generic type as a class
     @SuppressWarnings("unchecked")
-    Class<T> class1 =
-        (Class<T>)
-            ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    Class<T> class1 = (Class<T>)
+        ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     string.append(class1.getSimpleName());
     string.append(">");
     return string.toString();

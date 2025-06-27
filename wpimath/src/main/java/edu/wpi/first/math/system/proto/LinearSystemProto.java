@@ -62,22 +62,21 @@ public final class LinearSystemProto<States extends Num, Inputs extends Num, Out
     if (msg.getNumStates() != m_states.getNum()
         || msg.getNumInputs() != m_inputs.getNum()
         || msg.getNumOutputs() != m_outputs.getNum()) {
-      throw new IllegalArgumentException(
-          "Tried to unpack msg "
-              + msg
-              + " with "
-              + msg.getNumStates()
-              + " states and "
-              + msg.getNumInputs()
-              + " inputs and "
-              + msg.getNumOutputs()
-              + " outputs into LinearSystem with "
-              + m_states.getNum()
-              + " states "
-              + m_inputs.getNum()
-              + " inputs "
-              + m_outputs.getNum()
-              + " outputs");
+      throw new IllegalArgumentException("Tried to unpack msg "
+          + msg
+          + " with "
+          + msg.getNumStates()
+          + " states and "
+          + msg.getNumInputs()
+          + " inputs and "
+          + msg.getNumOutputs()
+          + " outputs into LinearSystem with "
+          + m_states.getNum()
+          + " states "
+          + m_inputs.getNum()
+          + " inputs "
+          + m_outputs.getNum()
+          + " outputs");
     }
     return new LinearSystem<>(
         m_AProto.unpack(msg.getA()),

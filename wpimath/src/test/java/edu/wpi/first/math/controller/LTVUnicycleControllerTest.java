@@ -25,9 +25,8 @@ class LTVUnicycleControllerTest {
   void testReachesReference() {
     final double kDt = 0.02;
 
-    final var controller =
-        new LTVUnicycleController(
-            VecBuilder.fill(0.0625, 0.125, 2.5), VecBuilder.fill(4.0, 4.0), kDt);
+    final var controller = new LTVUnicycleController(
+        VecBuilder.fill(0.0625, 0.125, 2.5), VecBuilder.fill(4.0, 4.0), kDt);
     var robotPose = new Pose2d(2.7, 23.0, Rotation2d.kZero);
 
     final var waypoints = new ArrayList<Pose2d>();
@@ -41,9 +40,8 @@ class LTVUnicycleControllerTest {
       var state = trajectory.sample(kDt * i);
 
       var output = controller.calculate(robotPose, state);
-      robotPose =
-          robotPose.exp(
-              new Twist2d(output.vxMetersPerSecond * kDt, 0, output.omegaRadiansPerSecond * kDt));
+      robotPose = robotPose.exp(
+          new Twist2d(output.vxMetersPerSecond * kDt, 0, output.omegaRadiansPerSecond * kDt));
     }
 
     final var states = trajectory.getStates();
@@ -55,11 +53,10 @@ class LTVUnicycleControllerTest {
     assertAll(
         () -> assertEquals(endPose.getX(), finalRobotPose.getX(), kTolerance),
         () -> assertEquals(endPose.getY(), finalRobotPose.getY(), kTolerance),
-        () ->
-            assertEquals(
-                0.0,
-                MathUtil.angleModulus(
-                    endPose.getRotation().getRadians() - finalRobotPose.getRotation().getRadians()),
-                kAngularTolerance));
+        () -> assertEquals(
+            0.0,
+            MathUtil.angleModulus(endPose.getRotation().getRadians()
+                - finalRobotPose.getRotation().getRadians()),
+            kAngularTolerance));
   }
 }

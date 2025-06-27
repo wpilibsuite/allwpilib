@@ -40,25 +40,24 @@ class LEDPatternTest {
   long m_mockTime;
 
   // Applies a pattern of White, Yellow, Purple to LED triplets
-  LEDPattern m_whiteYellowPurple =
-      (reader, writer) -> {
-        for (int led = 0; led < reader.getLength(); led++) {
-          switch (led % 3) {
-            case 0:
-              writer.setLED(led, kWhite);
-              break;
-            case 1:
-              writer.setLED(led, kYellow);
-              break;
-            case 2:
-              writer.setLED(led, kPurple);
-              break;
-            default:
-              fail("Bad test setup");
-              break;
-          }
-        }
-      };
+  LEDPattern m_whiteYellowPurple = (reader, writer) -> {
+    for (int led = 0; led < reader.getLength(); led++) {
+      switch (led % 3) {
+        case 0:
+          writer.setLED(led, kWhite);
+          break;
+        case 1:
+          writer.setLED(led, kYellow);
+          break;
+        case 2:
+          writer.setLED(led, kPurple);
+          break;
+        default:
+          fail("Bad test setup");
+          break;
+      }
+    }
+  };
 
   @BeforeEach
   void setUp() {
@@ -211,12 +210,11 @@ class LEDPatternTest {
   void scrollForward() {
     var buffer = new AddressableLEDBuffer(256);
 
-    LEDPattern base =
-        (reader, writer) -> {
-          for (int led = 0; led < reader.getLength(); led++) {
-            writer.setRGB(led, led % 256, led % 256, led % 256);
-          }
-        };
+    LEDPattern base = (reader, writer) -> {
+      for (int led = 0; led < reader.getLength(); led++) {
+        writer.setRGB(led, led % 256, led % 256, led % 256);
+      }
+    };
 
     // scroll forwards 1/256th (1 LED) per microsecond - this makes mock time easier
     var scroll = base.scrollAtRelativeSpeed(Value.per(Microsecond).of(1 / 256.0));
@@ -245,12 +243,11 @@ class LEDPatternTest {
   void scrollBackward() {
     var buffer = new AddressableLEDBuffer(256);
 
-    LEDPattern base =
-        (reader, writer) -> {
-          for (int led = 0; led < reader.getLength(); led++) {
-            writer.setRGB(led, led % 256, led % 256, led % 256);
-          }
-        };
+    LEDPattern base = (reader, writer) -> {
+      for (int led = 0; led < reader.getLength(); led++) {
+        writer.setRGB(led, led % 256, led % 256, led % 256);
+      }
+    };
 
     // scroll backwards 1/256th (1 LED) per microsecond - this makes mock time easier
     var scroll = base.scrollAtRelativeSpeed(Value.per(Microsecond).of(-1 / 256.0));
@@ -279,12 +276,11 @@ class LEDPatternTest {
   void scrollAbsoluteSpeedForward() {
     var buffer = new AddressableLEDBuffer(256);
 
-    LEDPattern base =
-        (reader, writer) -> {
-          for (int led = 0; led < reader.getLength(); led++) {
-            writer.setRGB(led, led % 256, led % 256, led % 256);
-          }
-        };
+    LEDPattern base = (reader, writer) -> {
+      for (int led = 0; led < reader.getLength(); led++) {
+        writer.setRGB(led, led % 256, led % 256, led % 256);
+      }
+    };
 
     // scroll at 16 m/s, LED spacing = 2cm
     // buffer is 256 LEDs, so total length = 512cm = 5.12m
@@ -315,12 +311,11 @@ class LEDPatternTest {
   void scrollAbsoluteSpeedBackward() {
     var buffer = new AddressableLEDBuffer(256);
 
-    LEDPattern base =
-        (reader, writer) -> {
-          for (int led = 0; led < reader.getLength(); led++) {
-            writer.setRGB(led, led % 256, led % 256, led % 256);
-          }
-        };
+    LEDPattern base = (reader, writer) -> {
+      for (int led = 0; led < reader.getLength(); led++) {
+        writer.setRGB(led, led % 256, led % 256, led % 256);
+      }
+    };
 
     // scroll at 16 m/s, LED spacing = 2cm
     // buffer is 256 LEDs, so total length = 512cm = 5.12m
@@ -819,10 +814,9 @@ class LEDPatternTest {
 
   @Test
   void reverseMask() {
-    var pattern =
-        LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
-            .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
-            .reversed();
+    var pattern = LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
+        .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
+        .reversed();
     var buffer = new AddressableLEDBuffer(8);
 
     pattern.applyTo(buffer);
@@ -839,10 +833,9 @@ class LEDPatternTest {
 
   @Test
   void offsetMask() {
-    var pattern =
-        LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
-            .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
-            .offsetBy(4);
+    var pattern = LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
+        .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
+        .offsetBy(4);
     var buffer = new AddressableLEDBuffer(8);
 
     pattern.applyTo(buffer);
@@ -863,10 +856,9 @@ class LEDPatternTest {
     // under a mask of first 50% on, last 50% off
     // [red, red, blue, blue, black, black, black, black]
     // all scrolling at 1 LED per microsecond
-    var pattern =
-        LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
-            .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
-            .scrollAtRelativeSpeed(Percent.per(Microsecond).of(12.5));
+    var pattern = LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
+        .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
+        .scrollAtRelativeSpeed(Percent.per(Microsecond).of(12.5));
     var buffer = new AddressableLEDBuffer(8);
 
     {
@@ -928,10 +920,9 @@ class LEDPatternTest {
     // under a mask of first 50% on, last 50% off
     // [red, red, blue, blue, black, black, black, black]
     // all scrolling at 1 LED per microsecond
-    var pattern =
-        LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
-            .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
-            .scrollAtAbsoluteSpeed(Meters.per(Microsecond).of(1), Meters.one());
+    var pattern = LEDPattern.steps(Map.of(0, kRed, 0.25, kBlue, 0.5, kYellow, 0.75, kGreen))
+        .mask(LEDPattern.steps(Map.of(0, kWhite, 0.5, kBlack)))
+        .scrollAtAbsoluteSpeed(Meters.per(Microsecond).of(1), Meters.one());
     var buffer = new AddressableLEDBuffer(8);
 
     {

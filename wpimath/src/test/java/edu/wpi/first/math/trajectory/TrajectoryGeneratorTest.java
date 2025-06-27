@@ -31,14 +31,10 @@ class TrajectoryGeneratorTest {
 
     var waypoints = new ArrayList<Pose2d>();
     waypoints.add(sideStart);
-    waypoints.add(
-        sideStart.plus(
-            new Transform2d(
-                new Translation2d(feetToMeters(-13), feetToMeters(0)), Rotation2d.kZero)));
-    waypoints.add(
-        sideStart.plus(
-            new Transform2d(
-                new Translation2d(feetToMeters(-19.5), feetToMeters(5)), Rotation2d.kCW_Pi_2)));
+    waypoints.add(sideStart.plus(
+        new Transform2d(new Translation2d(feetToMeters(-13), feetToMeters(0)), Rotation2d.kZero)));
+    waypoints.add(sideStart.plus(new Transform2d(
+        new Translation2d(feetToMeters(-19.5), feetToMeters(5)), Rotation2d.kCW_Pi_2)));
     waypoints.add(crossScale);
 
     TrajectoryConfig config =
@@ -60,18 +56,16 @@ class TrajectoryGeneratorTest {
       t += dt;
       assertAll(
           () -> assertTrue(Math.abs(point.velocityMetersPerSecond) < feetToMeters(12.0) + 0.05),
-          () ->
-              assertTrue(
-                  Math.abs(point.accelerationMetersPerSecondSq) < feetToMeters(12.0) + 0.05));
+          () -> assertTrue(
+              Math.abs(point.accelerationMetersPerSecondSq) < feetToMeters(12.0) + 0.05));
     }
   }
 
   @Test
   void testMalformedTrajectory() {
-    var traj =
-        TrajectoryGenerator.generateTrajectory(
-            List.of(Pose2d.kZero, new Pose2d(1, 0, Rotation2d.kPi)),
-            new TrajectoryConfig(feetToMeters(12), feetToMeters(12)));
+    var traj = TrajectoryGenerator.generateTrajectory(
+        List.of(Pose2d.kZero, new Pose2d(1, 0, Rotation2d.kPi)),
+        new TrajectoryConfig(feetToMeters(12), feetToMeters(12)));
 
     assertEquals(traj.getStates().size(), 1);
     assertEquals(traj.getTotalTimeSeconds(), 0);
@@ -79,15 +73,14 @@ class TrajectoryGeneratorTest {
 
   @Test
   void testQuinticCurvatureOptimization() {
-    Trajectory t =
-        TrajectoryGenerator.generateTrajectory(
-            List.of(
-                new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
-                new Pose2d(0, 1, Rotation2d.kPi),
-                new Pose2d(-1, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, -1, Rotation2d.kZero),
-                new Pose2d(1, 0, Rotation2d.kCCW_Pi_2)),
-            new TrajectoryConfig(2, 2));
+    Trajectory t = TrajectoryGenerator.generateTrajectory(
+        List.of(
+            new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
+            new Pose2d(0, 1, Rotation2d.kPi),
+            new Pose2d(-1, 0, Rotation2d.kCW_Pi_2),
+            new Pose2d(0, -1, Rotation2d.kZero),
+            new Pose2d(1, 0, Rotation2d.kCCW_Pi_2)),
+        new TrajectoryConfig(2, 2));
 
     for (int i = 1; i < t.getStates().size() - 1; ++i) {
       assertNotEquals(0, t.getStates().get(i).curvatureRadPerMeter);

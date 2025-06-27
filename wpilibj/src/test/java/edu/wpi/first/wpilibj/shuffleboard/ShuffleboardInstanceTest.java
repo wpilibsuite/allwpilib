@@ -39,42 +39,38 @@ class ShuffleboardInstanceTest {
 
   @Test
   void testPathFluent() {
-    GenericEntry entry =
-        m_shuffleboardInstance
-            .getTab("Tab Title")
-            .getLayout("Layout Title", "List Layout")
-            .add("Data", "string")
-            .withWidget("Text View")
-            .getEntry();
+    GenericEntry entry = m_shuffleboardInstance
+        .getTab("Tab Title")
+        .getLayout("Layout Title", "List Layout")
+        .add("Data", "string")
+        .withWidget("Text View")
+        .getEntry();
 
     assertAll(
         () -> assertEquals("string", entry.getString(null), "Wrong entry value"),
-        () ->
-            assertEquals(
-                "/Shuffleboard/Tab Title/Layout Title/Data",
-                entry.getTopic().getName(),
-                "Entry path generated incorrectly"));
+        () -> assertEquals(
+            "/Shuffleboard/Tab Title/Layout Title/Data",
+            entry.getTopic().getName(),
+            "Entry path generated incorrectly"));
   }
 
   @Test
   void testNestedLayoutsFluent() {
-    GenericEntry entry =
-        m_shuffleboardInstance
-            .getTab("Tab")
-            .getLayout("First", "List")
-            .getLayout("Second", "List")
-            .getLayout("Third", "List")
-            .getLayout("Fourth", "List")
-            .add("Value", "string")
-            .getEntry();
+    GenericEntry entry = m_shuffleboardInstance
+        .getTab("Tab")
+        .getLayout("First", "List")
+        .getLayout("Second", "List")
+        .getLayout("Third", "List")
+        .getLayout("Fourth", "List")
+        .add("Value", "string")
+        .getEntry();
 
     assertAll(
         () -> assertEquals("string", entry.getString(null), "Wrong entry value"),
-        () ->
-            assertEquals(
-                "/Shuffleboard/Tab/First/Second/Third/Fourth/Value",
-                entry.getTopic().getName(),
-                "Entry path generated incorrectly"));
+        () -> assertEquals(
+            "/Shuffleboard/Tab/First/Second/Third/Fourth/Value",
+            entry.getTopic().getName(),
+            "Entry path generated incorrectly"));
   }
 
   @Test
@@ -89,11 +85,10 @@ class ShuffleboardInstanceTest {
 
     assertAll(
         () -> assertEquals("string", entry.getString(null), "Wrong entry value"),
-        () ->
-            assertEquals(
-                "/Shuffleboard/Tab/First/Second/Third/Fourth/Value",
-                entry.getTopic().getName(),
-                "Entry path generated incorrectly"));
+        () -> assertEquals(
+            "/Shuffleboard/Tab/First/Second/Third/Fourth/Value",
+            entry.getTopic().getName(),
+            "Entry path generated incorrectly"));
   }
 
   @Test
@@ -133,15 +128,13 @@ class ShuffleboardInstanceTest {
   void testDuplicateSelectTabs() {
     int listener = 0;
     AtomicInteger counter = new AtomicInteger();
-    try (StringSubscriber subscriber =
-        m_ntInstance
-            .getStringTopic("/Shuffleboard/.metadata/Selected")
-            .subscribe("", PubSubOption.keepDuplicates(true))) {
-      listener =
-          m_ntInstance.addListener(
-              subscriber,
-              EnumSet.of(Kind.kValueAll, Kind.kImmediate),
-              event -> counter.incrementAndGet());
+    try (StringSubscriber subscriber = m_ntInstance
+        .getStringTopic("/Shuffleboard/.metadata/Selected")
+        .subscribe("", PubSubOption.keepDuplicates(true))) {
+      listener = m_ntInstance.addListener(
+          subscriber,
+          EnumSet.of(Kind.kValueAll, Kind.kImmediate),
+          event -> counter.incrementAndGet());
 
       // There shouldn't be anything there
       assertEquals(0, counter.get());

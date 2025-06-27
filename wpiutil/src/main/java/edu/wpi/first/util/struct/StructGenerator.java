@@ -284,13 +284,12 @@ public final class StructGenerator {
           if (optStruct.isPresent()) {
             struct = optStruct.get();
           } else {
-            System.err.println(
-                "Could not structify record component: "
-                    + recordClass.getSimpleName()
-                    + "#"
-                    + name
-                    + "\n    Could not extract struct from marked class: "
-                    + type.getName());
+            System.err.println("Could not structify record component: "
+                + recordClass.getSimpleName()
+                + "#"
+                + name
+                + "\n    Could not extract struct from marked class: "
+                + type.getName());
             failed = true;
             continue;
           }
@@ -351,13 +350,12 @@ public final class StructGenerator {
           } catch (IllegalAccessException
               | IllegalArgumentException
               | InvocationTargetException e) {
-            System.err.println(
-                "Could not pack record component: "
-                    + recordClass.getSimpleName()
-                    + "#"
-                    + components[i].getName()
-                    + "\n    "
-                    + e.getMessage());
+            System.err.println("Could not pack record component: "
+                + recordClass.getSimpleName()
+                + "#"
+                + components[i].getName()
+                + "\n    "
+                + e.getMessage());
             failed = true;
             break;
           }
@@ -385,11 +383,10 @@ public final class StructGenerator {
             | InvocationTargetException
             | NoSuchMethodException
             | SecurityException e) {
-          System.err.println(
-              "Could not unpack record: "
-                  + recordClass.getSimpleName()
-                  + "\n    "
-                  + e.getMessage());
+          System.err.println("Could not unpack record: "
+              + recordClass.getSimpleName()
+              + "\n    "
+              + e.getMessage());
           return null;
         }
       }
@@ -426,11 +423,10 @@ public final class StructGenerator {
     final ArrayList<Packer<?>> packers = new ArrayList<>();
 
     if (enumVariants == null || enumVariants.length == 0) {
-      System.err.println(
-          "Could not structify enum: "
-              + enumClass.getSimpleName()
-              + "\n    "
-              + "Enum has no constants");
+      System.err.println("Could not structify enum: "
+          + enumClass.getSimpleName()
+          + "\n    "
+          + "Enum has no constants");
       return noopStruct(enumClass);
     }
 
@@ -447,10 +443,9 @@ public final class StructGenerator {
     schemaBuilder.addEnumField(enumFieldBuilder);
     size += 1;
 
-    final List<Field> enumFields =
-        List.of(allEnumFields).stream()
-            .filter(f -> !f.isEnumConstant() && !Modifier.isStatic(f.getModifiers()))
-            .toList();
+    final List<Field> enumFields = List.of(allEnumFields).stream()
+        .filter(f -> !f.isEnumConstant() && !Modifier.isStatic(f.getModifiers()))
+        .toList();
 
     for (final Field field : enumFields) {
       final Class<?> type = field.getType();
@@ -471,13 +466,12 @@ public final class StructGenerator {
           if (optStruct.isPresent()) {
             struct = optStruct.get();
           } else {
-            System.err.println(
-                "Could not structify record component: "
-                    + enumClass.getSimpleName()
-                    + "#"
-                    + name
-                    + "\n    Could not extract struct from marked class: "
-                    + type.getName());
+            System.err.println("Could not structify record component: "
+                + enumClass.getSimpleName()
+                + "#"
+                + name
+                + "\n    Could not extract struct from marked class: "
+                + type.getName());
             failed = true;
             continue;
           }
@@ -535,13 +529,12 @@ public final class StructGenerator {
             }
             packer.pack(buffer, fieldValue);
           } catch (IllegalArgumentException | IllegalAccessException e) {
-            System.err.println(
-                "Could not pack enum field: "
-                    + enumClass.getSimpleName()
-                    + "#"
-                    + field.getName()
-                    + "\n    "
-                    + e.getMessage());
+            System.err.println("Could not pack enum field: "
+                + enumClass.getSimpleName()
+                + "#"
+                + field.getName()
+                + "\n    "
+                + e.getMessage());
             failed = true;
             break;
           }

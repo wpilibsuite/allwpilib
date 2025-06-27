@@ -32,22 +32,19 @@ public class DriveSubsystem extends SubsystemBase {
       new ExampleSmartMotorController(DriveConstants.kRightMotor2Port);
 
   // The feedforward controller.
-  private final SimpleMotorFeedforward m_feedforward =
-      new SimpleMotorFeedforward(
-          DriveConstants.ksVolts,
-          DriveConstants.kvVoltSecondsPerMeter,
-          DriveConstants.kaVoltSecondsSquaredPerMeter);
+  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(
+      DriveConstants.ksVolts,
+      DriveConstants.kvVoltSecondsPerMeter,
+      DriveConstants.kaVoltSecondsSquaredPerMeter);
 
   // The robot's drive
   private final DifferentialDrive m_drive =
       new DifferentialDrive(m_leftLeader::set, m_rightLeader::set);
 
   // The trapezoid profile
-  private final TrapezoidProfile m_profile =
-      new TrapezoidProfile(
-          new TrapezoidProfile.Constraints(
-              DriveConstants.kMaxSpeedMetersPerSecond,
-              DriveConstants.kMaxAccelerationMetersPerSecondSquared));
+  private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
+      DriveConstants.kMaxSpeedMetersPerSecond,
+      DriveConstants.kMaxAccelerationMetersPerSecondSquared));
 
   // The timer
   private final Timer m_timer = new Timer();
@@ -157,9 +154,8 @@ public class DriveSubsystem extends SubsystemBase {
               var currentTime = m_timer.get();
               var currentSetpoint =
                   m_profile.calculate(currentTime, new State(), new State(distance, 0));
-              var nextSetpoint =
-                  m_profile.calculate(
-                      currentTime + DriveConstants.kDt, new State(), new State(distance, 0));
+              var nextSetpoint = m_profile.calculate(
+                  currentTime + DriveConstants.kDt, new State(), new State(distance, 0));
               setDriveStates(currentSetpoint, currentSetpoint, nextSetpoint, nextSetpoint);
             })
         .until(() -> m_profile.isFinished(0));
@@ -188,26 +184,22 @@ public class DriveSubsystem extends SubsystemBase {
               // Current state never changes for the duration of the command, so we need to use a
               // timer to get the setpoints we need to be at
               var currentTime = m_timer.get();
-              var currentLeftSetpoint =
-                  m_profile.calculate(
-                      currentTime,
-                      new State(m_initialLeftDistance, 0),
-                      new State(m_initialLeftDistance + distance, 0));
-              var currentRightSetpoint =
-                  m_profile.calculate(
-                      currentTime,
-                      new State(m_initialRightDistance, 0),
-                      new State(m_initialRightDistance + distance, 0));
-              var nextLeftSetpoint =
-                  m_profile.calculate(
-                      currentTime + DriveConstants.kDt,
-                      new State(m_initialLeftDistance, 0),
-                      new State(m_initialLeftDistance + distance, 0));
-              var nextRightSetpoint =
-                  m_profile.calculate(
-                      currentTime + DriveConstants.kDt,
-                      new State(m_initialRightDistance, 0),
-                      new State(m_initialRightDistance + distance, 0));
+              var currentLeftSetpoint = m_profile.calculate(
+                  currentTime,
+                  new State(m_initialLeftDistance, 0),
+                  new State(m_initialLeftDistance + distance, 0));
+              var currentRightSetpoint = m_profile.calculate(
+                  currentTime,
+                  new State(m_initialRightDistance, 0),
+                  new State(m_initialRightDistance + distance, 0));
+              var nextLeftSetpoint = m_profile.calculate(
+                  currentTime + DriveConstants.kDt,
+                  new State(m_initialLeftDistance, 0),
+                  new State(m_initialLeftDistance + distance, 0));
+              var nextRightSetpoint = m_profile.calculate(
+                  currentTime + DriveConstants.kDt,
+                  new State(m_initialRightDistance, 0),
+                  new State(m_initialRightDistance + distance, 0));
               setDriveStates(
                   currentLeftSetpoint, currentRightSetpoint, nextLeftSetpoint, nextRightSetpoint);
             })
