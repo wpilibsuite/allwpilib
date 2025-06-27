@@ -47,6 +47,7 @@ def run_global_replacements(wpiutil_llvm_files: list[Path]):
         content = content.replace('#include "wpi/Error.h"\n', "")
         content = content.replace('#include "wpi/Format.h"\n', "")
         content = content.replace('#include "wpi/FormatVariadic.h"\n', "")
+        content = content.replace('#include "wpi/Hashing.h"\n', "")
         content = content.replace('#include "wpi/NativeFormatting.h"\n', "")
         content = content.replace('#include "wpi/Threading.h"\n', "")
         content = content.replace('#include "wpi/DataTypes.h"\n', "")
@@ -179,7 +180,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "llvm"
     url = "https://github.com/llvm/llvm-project"
-    tag = "llvmorg-19.1.6"
+    tag = "llvmorg-20.1.7"
 
     patch_options = {
         "use_threeway": True,

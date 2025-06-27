@@ -72,7 +72,6 @@ wpilib_cc_library(
     ],
 )
 
-<<<<<<< HEAD
 wpilib_cc_shared_library(
     name = "shared/apriltag",
     dynamic_deps = [
@@ -85,8 +84,6 @@ wpilib_cc_shared_library(
     ],
 )
 
-=======
->>>>>>> bzlmodrio/bzl_simple_static_and_bundling
 wpilib_cc_static_library(
     name = "static/apriltag",
     static_deps = [
