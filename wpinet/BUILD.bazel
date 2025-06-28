@@ -1,7 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
-load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
@@ -149,6 +149,17 @@ wpilib_cc_library(
     ],
 )
 
+wpilib_cc_shared_library(
+    name = "shared/wpinet",
+    dynamic_deps = [
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpinet",
+    ],
+)
+
 wpilib_cc_static_library(
     name = "static/wpinet",
     static_deps = [
@@ -171,6 +182,17 @@ wpilib_jni_cc_library(
     deps = [
         ":wpinet",
     ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/wpinetjni",
+    auto_export_windows_symbols = False,
+    dynamic_deps = [
+        ":shared/wpinet",
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":wpinetjni"],
 )
 
 wpilib_jni_java_library(

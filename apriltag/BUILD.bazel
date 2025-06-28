@@ -3,7 +3,7 @@ load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
@@ -59,15 +59,28 @@ wpilib_cc_library(
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**/*"]),
-    defines = ["WPILIB_EXPORTS"],
     extra_hdr_pkg_files = [":thirdparty-apriltag-src-pkg"],
     extra_src_pkg_files = [":apriltag-java-jni-hdrs-pkg"],
+    local_defines = ["WPILIB_EXPORTS"],
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
         ":thirdparty-apriltag",
         "//wpimath",
         "//wpiutil",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/apriltag",
+    auto_export_windows_symbols = False,
+    dynamic_deps = [
+        "//wpimath:shared/wpimath",
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":apriltag",
     ],
 )
 
@@ -91,6 +104,18 @@ wpilib_jni_cc_library(
     deps = [
         ":apriltag",
     ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/apriltagjni",
+    auto_export_windows_symbols = False,
+    dynamic_deps = [
+        ":shared/apriltag",
+        "//wpimath:shared/wpimath",
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":apriltagjni"],
 )
 
 wpilib_jni_java_library(

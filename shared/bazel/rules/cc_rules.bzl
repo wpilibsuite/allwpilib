@@ -149,6 +149,32 @@ def wpilib_cc_library(
             tags = ["no-remote"],
         )
 
+def wpilib_cc_shared_library(
+        name,
+        auto_export_windows_symbols = True,
+        **kwargs):
+    features = []
+    if auto_export_windows_symbols:
+        features.append("windows_export_all_symbols")
+
+    native.cc_shared_library(
+        name = name,
+        features = features,
+        **kwargs
+    )
+
+    pkg_files(
+        name = name + "-shared.pkg",
+        srcs = [":" + name],
+        tags = ["manual"],
+    )
+
+    pkg_zip(
+        name = name + "-shared-zip",
+        srcs = ["//:license_pkg_files", name + "-shared.pkg"],
+        tags = ["no-remote", "manual"],
+    )
+
 CcStaticLibraryInfo = provider(
     "Information about a cc static library.",
     fields = {
@@ -347,4 +373,16 @@ def wpilib_cc_static_library(
         name = name,
         static_lib_name = static_lib_name,
         **kwargs
+    )
+
+    pkg_files(
+        name = name + "-static.pkg",
+        srcs = [":" + name],
+        tags = ["manual"],
+    )
+
+    pkg_zip(
+        name = name + "-static-zip",
+        srcs = ["//:license_pkg_files", name + "-static.pkg"],
+        tags = ["no-remote", "manual"],
     )
