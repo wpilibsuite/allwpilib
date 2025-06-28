@@ -56,6 +56,7 @@ wpilib_jni_cc_library(
 wpilib_cc_shared_library(
     name = "shared/datalogjni",
     dynamic_deps = [
+        "//wpiutil:shared/wpiutil",
         ":shared/datalog",
     ],
     use_debug_name = False,

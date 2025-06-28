@@ -49,6 +49,7 @@ wpilib_cc_shared_library(
     dynamic_deps = [
         "//hal:shared/wpiHal",
         "//wpinet:shared/wpinet",
+        "//wpiutil:shared/wpiutil",
     ],
     visibility = ["//visibility:public"],
     deps = [":halsim_ds_socket"],

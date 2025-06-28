@@ -241,17 +241,20 @@ def wpilib_cc_library(
 
 def wpilib_cc_shared_library(
         name,
-        dynamic_deps = None,
         user_link_flags = None,
         visibility = None,
         use_debug_name = True,
         additional_linker_inputs = None,
-        deps = None):
+	features = None,
+	**kwargs):
     folder, lib = _folder_prefix(name)
+    if not features:
+        features = []
+
+    features.append("windows_export_all_symbols")
     if use_debug_name:
         native.cc_shared_library(
             name = name,
-            dynamic_deps = dynamic_deps,
             user_link_flags = (user_link_flags or []) + select({
                 "//shared/bazel/rules:linux_compilation_mode_dbg": ["-Wl,-soname,lib" + lib + "d.so"],
                 "//shared/bazel/rules:osx_compilation_mode_dbg": ["-Wl,-install_name,lib" + lib + "d.so"],
@@ -259,9 +262,9 @@ def wpilib_cc_shared_library(
                 "@platforms//os:osx": ["-Wl,-install_name,lib" + lib + ".so"],
                 "//conditions:default": [],
             }),
-            additional_linker_inputs = additional_linker_inputs,
             visibility = visibility,
-            deps = deps,
+	    features=features,
+	    **kwargs,
         )
 
         _split_debug_symbols(
@@ -310,16 +313,15 @@ def wpilib_cc_shared_library(
     else:
         native.cc_shared_library(
             name = name,
-            dynamic_deps = dynamic_deps,
             user_link_flags = (user_link_flags or []) + select({
                 "@platforms//os:osx": ["-Wl,-install_name,lib" + lib + ".so"],
                 "//conditions:default": [
                     "-Wl,-soname,lib" + lib + ".so",
                 ],
             }),
+	    features=features,
             visibility = visibility,
-            additional_linker_inputs = additional_linker_inputs,
-            deps = deps,
+	    **kwargs,
         )
 
         _split_debug_symbols(

@@ -24,6 +24,7 @@ wpilib_cc_shared_library(
     dynamic_deps = [
         "//cscore:shared/cscore",
         "//ntcore:shared/ntcore",
+        "//wpiutil:shared/wpiutil",
     ],
     visibility = ["//visibility:public"],
     deps = [":cameraserver"],

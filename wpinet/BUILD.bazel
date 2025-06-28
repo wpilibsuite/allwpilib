@@ -188,6 +188,7 @@ wpilib_jni_cc_library(
 wpilib_cc_shared_library(
     name = "shared/wpinetjni",
     dynamic_deps = [
+        "//wpiutil:shared/wpiutil",
         ":shared/wpinet",
     ],
     use_debug_name = False,

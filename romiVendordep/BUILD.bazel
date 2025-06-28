@@ -24,6 +24,8 @@ wpilib_cc_shared_library(
         "//ntcore:shared/ntcore",
         "//wpilibc:shared/wpilibc",
         "//wpinet:shared/wpinet",
+        "//wpiutil:shared/wpiutil",
+        "//hal:shared/wpiHal",
     ],
     visibility = ["//visibility:public"],
     deps = [

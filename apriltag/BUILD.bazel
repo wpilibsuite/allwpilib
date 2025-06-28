@@ -109,6 +109,8 @@ wpilib_jni_cc_library(
 wpilib_cc_shared_library(
     name = "shared/apriltagjni",
     dynamic_deps = [
+        "//wpimath:shared/wpimath",
+        "//wpiutil:shared/wpiutil",
         ":shared/apriltag",
     ],
     use_debug_name = False,

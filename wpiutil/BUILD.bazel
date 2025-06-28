@@ -163,7 +163,7 @@ wpilib_cc_library(
         ":memory",
         ":mpack",
         ":nanopb",
-        ":protobuf",
+        ":protobuf"
     ],
     visibility = ["//visibility:public"],
     deps = select({

@@ -1,7 +1,7 @@
 try-import %workspace%/bazel_auth.rc
 try-import %workspace%/user.bazelrc
 
-common --noenable_bzlmod
+common --noenable_bzlmod --enable_workspace
 
 # Make bazel 8 work for us.
 common --enable_workspace

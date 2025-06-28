@@ -118,6 +118,7 @@ wpilib_cc_shared_library(
     name = "shared/cscorejni",
     dynamic_deps = [
         ":shared/cscore",
+        "//wpiutil:shared/wpiutil",
     ],
     use_debug_name = False,
     visibility = ["//visibility:public"],
