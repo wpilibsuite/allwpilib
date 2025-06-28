@@ -35,6 +35,10 @@
 #define WARN_CANSessionMux_NoToken_MESSAGE "CAN: No token"
 #define ERR_CANSessionMux_NotAllowed_MESSAGE "CAN: Not allowed"
 #define ERR_CANSessionMux_NotInitialized_MESSAGE "CAN: Not initialized"
+#define HAL_WARN_CANSessionMux_TxQueueFull_MESSAGE \
+  "CAN: TX Queue full. Generally caused by a disconnected bus."
+#define HAL_WARN_CANSessionMux_SocketBufferFull_MESSAGE \
+  "CAN: Socket Buffer full. Generally caused by sending too many packets."
 
 #define ERR_FRCSystem_NetCommNotResponding_MESSAGE \
   "FRCSystem: NetComm not responding"
