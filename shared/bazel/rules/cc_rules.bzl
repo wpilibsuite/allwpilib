@@ -315,9 +315,8 @@ def wpilib_cc_shared_library(
             name = name,
             user_link_flags = (user_link_flags or []) + select({
                 "@platforms//os:osx": ["-Wl,-install_name,lib" + lib + ".so"],
-                "//conditions:default": [
-                    "-Wl,-soname,lib" + lib + ".so",
-                ],
+                "@platforms//os:linux": ["-Wl,-soname,lib" + lib + ".so"],
+                "//conditions:default": [],
             }),
             features = features,
             visibility = visibility,
