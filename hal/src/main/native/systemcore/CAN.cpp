@@ -358,7 +358,7 @@ void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
       }
 
       // Print is here, and we can better debug this in the future.
-      std::printf("Send Error %d %d %s\n", result, errno, strerror(errno));
+      std::printf("Send Error %d %d %s\n", result, errno, std::strerror(errno));
       std::fflush(stdout);
       *status = HAL_ERR_CANSessionMux_InvalidBuffer;
       return;
