@@ -235,13 +235,14 @@ jbyteArray SetCANReceiveMessageObject(JNIEnv* env, jobject canData,
 }
 
 jbyteArray SetCANStreamObject(JNIEnv* env, jobject canStreamData,
-                              int32_t length, uint32_t messageId,
+                              int32_t length, int32_t flags,
+                              uint32_t messageId,
                               uint64_t timestamp) {
   static jmethodID func =
-      env->GetMethodID(canStreamMessageCls, "setStreamData", "(IIJ)[B");
+      env->GetMethodID(canStreamMessageCls, "setStreamData", "(IIIJ)[B");
 
   jbyteArray retVal = static_cast<jbyteArray>(env->CallObjectMethod(
-      canStreamData, func, static_cast<jint>(length),
+      canStreamData, func, static_cast<jint>(length), static_cast<jint>(flags),
       static_cast<jint>(messageId), static_cast<jlong>(timestamp)));
   return retVal;
 }

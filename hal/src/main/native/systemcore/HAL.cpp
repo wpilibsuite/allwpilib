@@ -130,6 +130,10 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return ERR_CANSessionMux_NotAllowed_MESSAGE;
     case HAL_ERR_CANSessionMux_NotInitialized:
       return ERR_CANSessionMux_NotInitialized_MESSAGE;
+    case HAL_WARN_CANSessionMux_TxQueueFull:
+      return HAL_WARN_CANSessionMux_TxQueueFull_MESSAGE;
+    case HAL_WARN_CANSessionMux_SocketBufferFull:
+      return HAL_WARN_CANSessionMux_SocketBufferFull_MESSAGE;
     case HAL_PWM_SCALE_ERROR:
       return HAL_PWM_SCALE_ERROR_MESSAGE;
     case HAL_SERIAL_PORT_NOT_FOUND:

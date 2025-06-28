@@ -72,6 +72,7 @@ enum class HAL_HandleEnum {
   CTREPDP = 25,
   REVPDH = 26,
   REVPH = 27,
+  CANStream = 28,
 };
 
 /**
