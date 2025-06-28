@@ -245,8 +245,8 @@ def wpilib_cc_shared_library(
         visibility = None,
         use_debug_name = True,
         additional_linker_inputs = None,
-	features = None,
-	**kwargs):
+        features = None,
+        **kwargs):
     folder, lib = _folder_prefix(name)
     if not features:
         features = []
@@ -263,8 +263,8 @@ def wpilib_cc_shared_library(
                 "//conditions:default": [],
             }),
             visibility = visibility,
-	    features=features,
-	    **kwargs,
+            features = features,
+            **kwargs
         )
 
         _split_debug_symbols(
@@ -319,9 +319,9 @@ def wpilib_cc_shared_library(
                     "-Wl,-soname,lib" + lib + ".so",
                 ],
             }),
-	    features=features,
+            features = features,
             visibility = visibility,
-	    **kwargs,
+            **kwargs
         )
 
         _split_debug_symbols(
