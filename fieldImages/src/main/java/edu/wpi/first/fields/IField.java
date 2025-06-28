@@ -2,11 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#pragma once
+package edu.wpi.first.fields;
 
-#include <string_view>
-
-namespace fields {
-std::string_view GetResource_2021_barrelracingpath_json();
-std::string_view GetResource_2021_barrel_png();
-}  // namespace fields
+public interface IField {
+  // TODO(crueter): add subdir param
+  String getResourceFile();
+}
