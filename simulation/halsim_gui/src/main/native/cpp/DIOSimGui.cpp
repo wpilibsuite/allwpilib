@@ -130,9 +130,9 @@ class DIOSimModel : public glass::DIOModel {
 class DIOsSimModel : public glass::DIOsModel {
  public:
   DIOsSimModel()
-      : m_dioModels(HAL_GetNumDigitalChannels()),
-        m_dpwmModels(HAL_GetNumDigitalPWMOutputs()),
-        m_dutyCycleModels(HAL_GetNumDutyCycles()) {}
+      : m_dioModels(HAL_GetNumSmartIo()),
+        m_dpwmModels(HAL_GetNumSmartIo()),
+        m_dutyCycleModels(HAL_GetNumSmartIo()) {}
 
   void Update() override;
 
@@ -221,7 +221,7 @@ void DIOsSimModel::ForEachDIO(
 }
 
 static bool DIOAnyInitialized() {
-  static const int32_t num = HAL_GetNumDigitalChannels();
+  static const int32_t num = HAL_GetNumSmartIo();
   for (int32_t i = 0; i < num; ++i) {
     if (HALSIM_GetDIOInitialized(i)) {
       return true;
