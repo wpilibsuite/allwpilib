@@ -50,7 +50,7 @@ void ResolverThread::RemoveServiceRefInThread(DNSServiceRef serviceRef) {
 WPI_EventHandle ResolverThread::RemoveServiceRefOutsideThread(
     DNSServiceRef serviceRef) {
   std::scoped_lock lock{serviceRefMutex};
-  WPI_EventHandle handle = CreateEvent(true);
+  WPI_EventHandle handle = MakeEvent(true);
   serviceRefsToRemove.push_back({serviceRef, handle});
   return handle;
 }
