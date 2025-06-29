@@ -1,17 +1,18 @@
-
-
 ###############################
 # Linux
 ###############################
-build:linux --config=base_linux
 
-# Warning level
-build:linux --copt=-Wall
-build:linux --copt=-Wextra
-build:linux --copt=-Werror
+# Start with configuring the autodetected toolchain.
+# The target toolchain should be captured already in its toolchain.
 
-# Not in nativetools
-build:linux --cxxopt=-Wno-deprecated-enum-enum-conversion
+# C++ only
+common:linux --repo_env=BAZEL_CXXOPTS="-Wall:-Wextra:-Werror:-std=c++20:-Wformat=2:-pedantic:-Wno-psabi:-Wno-unused-parameter:-fPIC:-pthread:-Wno-deprecated-enum-enum-conversion"
+
+# C Only
+common:linux --repo_env=BAZEL_CONLYOPTS="-Wall:-Wextra:-Werror:-Wformat=2:-pedantic:-Wno-psabi:-Wno-unused-parameter:-fPIC:-pthread"
+
+# Linker
+common:linux --repo_env=BAZEL_LINKOPTS="-rdynamic:-pthread:-ldl:-latomic:-Wl,-rpath,'$ORIGIN'"
 
 # Cleanup build output for tools
 build:linux --host_cxxopt=-Wno-missing-field-initializers
@@ -19,3 +20,11 @@ build:linux --host_cxxopt=-Wno-deprecated-enum-enum-conversion
 build:linux --host_cxxopt=-Wno-sign-compare
 build:linux --host_cxxopt=-Wno-unknown-pragmas
 build:linux --host_cxxopt=-Wno-attributes
+
+# Ignore potential issues in third party code on the host
+build:linux --host_cxxopt=-Wno-pedantic
+build:linux --host_cxxopt=-Wno-format-nonliteral
+build:linux --host_cxxopt=-Wno-missing-requires
+build:linux --host_cxxopt=-Wno-implicit-fallthrough
+
+build:linux --host_per_file_copt=external/zlib/.*\.c@-Wno-deprecated-non-prototype

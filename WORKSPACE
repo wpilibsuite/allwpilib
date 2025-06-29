@@ -57,6 +57,8 @@ http_archive(
 # Download toolchains
 http_archive(
     name = "rules_bzlmodrio_toolchains",
+    patch_args = ["-p1"],
+    patches = ["//:bzlmodrio.patch"],
     sha256 = "2bf0266dd899ce634549d5e610c04b871047b75b9d02ea72d37a4d3c28ac981f",
     url = "https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr3/rules_bzlmodrio_toolchains-2025-1.bcr3.tar.gz",
 )
