@@ -1,11 +1,9 @@
 "Rules for working with transitions."
 
-load("@bazel_skylib//lib:paths.bzl", "paths")
-
 def _transition_platform_impl(_, attr):
     return {
-        "//command_line_option:platforms": str(attr.target_platform),
         "//command_line_option:compilation_mode": attr.compilation_mode,
+        "//command_line_option:platforms": str(attr.target_platform),
     }
 
 # Transition from any input configuration to one that includes the
@@ -34,14 +32,6 @@ def _platform_transition_filegroup_impl(ctx):
 platform_transition_filegroup = rule(
     _platform_transition_filegroup_impl,
     attrs = {
-        # Required to Opt-in to the transitions feature.
-        "_allowlist_function_transition": attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
-        ),
-        "target_platform": attr.label(
-            doc = "The target platform to transition the srcs.",
-            mandatory = True,
-        ),
         "compilation_mode": attr.string(
             doc = "The compilation mode to transition the srcs.",
             mandatory = True,
@@ -50,6 +40,14 @@ platform_transition_filegroup = rule(
             allow_empty = False,
             cfg = _transition_platform,
             doc = "The input to be transitioned to the target platform.",
+        ),
+        "target_platform": attr.label(
+            doc = "The target platform to transition the srcs.",
+            mandatory = True,
+        ),
+        # Required to Opt-in to the transitions feature.
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
         ),
     },
     doc = "Transitions the srcs to use the provided platform. The filegroup will contain artifacts for the target platform.",

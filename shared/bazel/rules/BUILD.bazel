@@ -19,6 +19,7 @@ pkg_files(
     prefix = "META-INF",
     visibility = ["//visibility:public"],
 )
+
 config_setting(
     name = "is_linux_x86_64",
     constraint_values = [

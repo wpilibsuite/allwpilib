@@ -1,6 +1,6 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
-load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 load("//shared/bazel/rules:transitions.bzl", "platform_transition_filegroup")
 
 def publish_all(name, targets):
@@ -19,7 +19,7 @@ def publish_all(name, targets):
             "done",
         ],
     )
-    native.sh_binary(
+    sh_binary(
         name = name,
         srcs = [publish_name + ".sh"],
         args = ["$(location " + x + ".publish)" for x in targets],
