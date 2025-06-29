@@ -153,6 +153,8 @@ def wpilib_cc_shared_library(
         name,
         auto_export_windows_symbols = True,
         **kwargs):
+    folder, lib = _folder_prefix(name)
+
     features = []
     if auto_export_windows_symbols:
         features.append("windows_export_all_symbols")
@@ -164,15 +166,11 @@ def wpilib_cc_shared_library(
     )
 
     pkg_files(
-        name = name + "-shared.pkg",
-        srcs = [":" + name],
-        tags = ["manual"],
-    )
-
-    pkg_zip(
-        name = name + "-shared-zip",
-        srcs = ["//:license_pkg_files", name + "-shared.pkg"],
-        tags = ["no-remote", "manual"],
+        name = folder + "/lib" + lib + "-shared-files",
+        srcs = [
+            ":" + name,
+        ],
+        strip_prefix = folder,
     )
 
 CcStaticLibraryInfo = provider(
