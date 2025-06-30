@@ -29,19 +29,19 @@ jobs:
             ctest-env: ""
             ctest-flags: ""
     name: "${{ matrix.name }}"
-    runs-on: ubuntu-22.04
-    container: wpilib/roborio-cross-ubuntu:2025-22.04
+    runs-on: ubuntu-24.04
+    container: wpilib/roborio-cross-ubuntu:2025-24.04
     steps:
       - name: Install Dependencies
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java clang-14 libprotobuf-dev protobuf-compiler ninja-build
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java clang-17 libprotobuf-dev protobuf-compiler ninja-build
 
       - name: Install sccache
-        uses: mozilla-actions/sccache-action@v0.0.5
+        uses: mozilla-actions/sccache-action@v0.0.9
 
       - uses: actions/checkout@v4
 
       - name: configure
-        run: mkdir build && cd build && cmake -G Ninja -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_C_COMPILER:FILEPATH=/usr/bin/clang-14 -DCMAKE_CXX_COMPILER:FILEPATH=/usr/bin/clang++-14 -DWITH_JAVA=OFF ${{ matrix.cmake-flags }} ..
+        run: mkdir build && cd build && cmake -G Ninja -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_C_COMPILER:FILEPATH=/usr/bin/clang-17 -DCMAKE_CXX_COMPILER:FILEPATH=/usr/bin/clang++-17 -DWITH_JAVA=OFF ${{ matrix.cmake-flags }} ..
         env:
           SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}

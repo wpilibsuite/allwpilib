@@ -268,7 +268,7 @@ struct Assignment<DstXprType, Inverse<XprType>,
  * \note This matrix must be invertible, otherwise the result is undefined. If you need an
  * invertibility check, do the following:
  * \li for fixed sizes up to 4x4, use computeInverseAndDetWithCheck().
- * \li for the general case, use class FullPivLU.
+ * \li for the general case, use class PartialPivLU.
  *
  * Example: \include MatrixBase_inverse.cpp
  * Output: \verbinclude MatrixBase_inverse.out

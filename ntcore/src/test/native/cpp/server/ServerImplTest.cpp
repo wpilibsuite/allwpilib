@@ -423,4 +423,20 @@ TEST_F(ServerImplTest, ZeroTimestampNegativeTime) {
   }
 }
 
+TEST_F(ServerImplTest, InvalidPubUid) {
+  EXPECT_CALL(logger, Call(_, _, _, "0: pubuid out of range"));
+  server.SetLocal(&local, &queue);
+
+  // connect client
+  ::testing::StrictMock<net::MockWireConnection> wire;
+  MockSetPeriodicFunc setPeriodic;
+  auto [name, id] = server.AddClient("test", "connInfo", false, wire,
+                                     setPeriodic.AsStdFunction());
+
+  server.ProcessIncomingText(
+      id,
+      "[{\"method\":\"publish\",\"params\":{\"type\":\"string\",\"name\":"
+      "\"myvalue\",\"pubuid\":2147483647,\"properties\":{}}}]");
+}
+
 }  // namespace nt

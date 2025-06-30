@@ -5,10 +5,38 @@
 #pragma once
 
 #import <AVFoundation/AVFoundation.h>
-#import "UsbCameraDelegate.h"
+
 #include <memory>
 #include <string_view>
+
+#import "UsbCameraDelegate.h"
+#import "UvcControlImpl.h"
+
 #include "cscore_cpp.h"
+
+// Quirk: exposure auto is 3 for on, 1 for off
+#define kPropertyAutoExposureOn 3
+#define kPropertyAutoExposureOff 1
+
+// Property names
+#define kPropertyBrightness "brightness"
+#define kPropertyWhiteBalance "white_balance_temperature"
+#define kPropertyExposure "raw_exposure_time_absolute"
+#define kPropertyContrast "raw_contrast"
+#define kPropertySaturation "raw_saturation"
+#define kPropertySharpness "raw_sharpness"
+#define kPropertyGain "gain"
+#define kPropertyGamma "gamma"
+#define kPropertyHue "raw_hue"
+#define kPropertyFocus "focus_absolute"
+#define kPropertyZoom "zoom"
+#define kPropertyBackLightCompensation "backlight_compensation"
+#define kPropertyPowerLineFrequency "power_line_frequency"
+
+// Auto property names
+#define kPropertyAutoExposure "exposure_auto"
+#define kPropertyAutoWhiteBalance "white_balance_automatic"
+#define kPropertyAutoFocus "focus_auto"
 
 namespace cs {
 class UsbCameraImpl;
@@ -30,6 +58,7 @@ class UsbCameraImpl;
 @property(nonatomic) AVCaptureDevice* videoDevice;
 @property(nonatomic) AVCaptureDeviceInput* videoInput;
 @property(nonatomic) UsbCameraDelegate* callback;
+@property(nonatomic) UvcControlImpl* uvcControl;
 @property(nonatomic) AVCaptureVideoDataOutput* videoOutput;
 @property(nonatomic) AVCaptureSession* session;
 
@@ -67,5 +96,9 @@ class UsbCameraImpl;
 - (void)getCurrentCameraPath:(std::string*)path;
 - (void)getCameraName:(std::string*)name;
 - (void)setNewCameraPath:(std::string_view*)path;
+
+- (void)deviceCacheProperties;
+- (void)cacheProperty:(uint32_t)propID withName:(NSString *)name;
+- (void)cacheAutoProperty:(uint32_t)propID withName:(NSString *)baseName;
 
 @end

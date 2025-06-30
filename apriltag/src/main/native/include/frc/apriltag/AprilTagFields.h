@@ -20,10 +20,12 @@ enum class AprilTagField {
   k2023ChargedUp,
   /// 2024 Crescendo.
   k2024Crescendo,
-  /// 2025 Reefscape.
-  k2025Reefscape,
+  /// 2025 Reefscape AndyMark (see TU12).
+  k2025ReefscapeAndyMark,
+  /// 2025 Reefscape Welded (see TU12).
+  k2025ReefscapeWelded,
   /// Alias to the current game.
-  kDefaultField = k2025Reefscape,
+  kDefaultField = k2025ReefscapeWelded,
 
   // This is a placeholder for denoting the last supported field. This should
   // always be the last entry in the enum and should not be used by users

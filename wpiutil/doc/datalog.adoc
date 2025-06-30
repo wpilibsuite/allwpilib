@@ -190,3 +190,9 @@ Each entry's data type is an arbitrary string. The following data types are stan
 === Metadata
 
 Each entry has an associated metadata string. If not blank, the metadata should be <<JSON,JSON>>, but may be arbitrary text. Metadata is intended to convey additional information about the entry beyond what the type conveys--for example the source of the data.
+
+[[additional-resources]]
+== Additional Resources
+
+A https://kaitai.io/[Kaitai Struct] definition for the data log format is included in link:./wpilog.ksy[wpilog.ksy].
+Kaitai Struct is a declarative language used to describe various binary data structures.
