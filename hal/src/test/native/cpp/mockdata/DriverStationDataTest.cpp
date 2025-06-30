@@ -53,9 +53,9 @@ TEST(DriverStationTest, Joystick) {
   }
 
   set_povs.count = 3;
-  for (int i = 0; i < set_povs.count; ++i) {
-    set_povs.povs[i] = i * 15 + 12;
-  }
+  set_povs.povs[0] = HAL_JoystickPOV_kUp;
+  set_povs.povs[1] = HAL_JoystickPOV_kRight;
+  set_povs.povs[2] = HAL_JoystickPOV_kDown;
 
   set_buttons.count = 8;
   set_buttons.buttons = 0xDEADBEEF;
@@ -82,9 +82,9 @@ TEST(DriverStationTest, Joystick) {
   EXPECT_NEAR(0, axes.axes[6], 0.000001);  // Should not have been set, still 0
 
   EXPECT_EQ(3, povs.count);
-  EXPECT_EQ(12, povs.povs[0]);
-  EXPECT_EQ(27, povs.povs[1]);
-  EXPECT_EQ(42, povs.povs[2]);
+  EXPECT_EQ(HAL_JoystickPOV_kUp, povs.povs[0]);
+  EXPECT_EQ(HAL_JoystickPOV_kRight, povs.povs[1]);
+  EXPECT_EQ(HAL_JoystickPOV_kDown, povs.povs[2]);
   EXPECT_EQ(0, povs.povs[3]);  // Should not have been set, still 0
   EXPECT_EQ(0, povs.povs[4]);  // Should not have been set, still 0
   EXPECT_EQ(0, povs.povs[5]);  // Should not have been set, still 0

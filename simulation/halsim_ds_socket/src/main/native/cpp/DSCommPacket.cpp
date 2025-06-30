@@ -16,6 +16,30 @@
 
 using namespace halsim;
 
+HAL_JoystickPOV DegreesToPOV(int degrees) {
+  switch (degrees) {
+    case 0:
+      return HAL_JoystickPOV_kUp;
+    case 45:
+      return HAL_JoystickPOV_kRightUp;
+    case 90:
+      return HAL_JoystickPOV_kRight;
+    case 135:
+      return HAL_JoystickPOV_kRightDown;
+    case 180:
+      return HAL_JoystickPOV_kDown;
+    case 225:
+      return HAL_JoystickPOV_kLeftDown;
+    case 270:
+      return HAL_JoystickPOV_kLeft;
+    case 315:
+      return HAL_JoystickPOV_kLeftUp;
+    case -1:
+    default:
+      return HAL_JoystickPOV_kCentered;
+  }
+}
+
 DSCommPacket::DSCommPacket() {
   for (auto& i : m_joystick_packets) {
     i.ResetTcp();
@@ -101,7 +125,8 @@ void DSCommPacket::ReadJoystickTag(std::span<const uint8_t> dataInput,
 
   int povsLength = dataInput[0];
   for (int i = 0; i < povsLength * 2; i += 2) {
-    stick.povs.povs[i] = (dataInput[1 + i] << 8) | dataInput[2 + i];
+    stick.povs.povs[i] =
+        DegreesToPOV((dataInput[1 + i] << 8) | dataInput[2 + i]);
   }
 
   stick.povs.count = povsLength;
