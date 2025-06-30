@@ -4,3 +4,4 @@
 build:systemcore --platforms=@rules_bzlmodrio_toolchains//platforms/systemcore
 build:systemcore --build_tag_filters=-no-systemcore
 build:systemcore --platform_suffix=systemcore
+build:systemcore --toolchain_resolution_debug='@@bazel_tools//tools/jdk:runtime_toolchain_type'
