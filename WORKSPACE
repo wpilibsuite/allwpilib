@@ -237,6 +237,8 @@ load_toolchains()
 #
 http_archive(
     name = "rules_bzlmodrio_jdk",
+    patch_args = ["-p1"],
+    patches = ["//:systemcore_jdk.patch"],
     sha256 = "81869fe9860e39b17e4a9bc1d33c1ca2faede7e31d9538ed0712406f753a2163",
     url = "https://github.com/wpilibsuite/rules_bzlmodRio_jdk/releases/download/17.0.12-7/rules_bzlmodRio_jdk-17.0.12-7.tar.gz",
 )
