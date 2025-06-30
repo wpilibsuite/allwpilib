@@ -15,6 +15,12 @@ http_archive(
 )
 
 http_archive(
+    name = "build_bazel_apple_support",
+    sha256 = "b265beacfa477081caaf2bd05978ee7d11fdb8c202a1b76d0ef28d901d1e7b33",
+    url = "https://github.com/bazelbuild/apple_support/releases/download/1.22.0/apple_support.1.22.0.tar.gz",
+)
+
+http_archive(
     name = "rules_java",
     sha256 = "d31b6c69e479ffa45460b64dc9c7792a431cac721ef8d5219fc9f603fa2ff877",
     urls = [
@@ -68,6 +74,10 @@ http_archive(
 load("@bazel_features//:deps.bzl", "bazel_features_deps")
 
 bazel_features_deps()
+
+load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependencies")
+
+apple_support_dependencies()
 
 load("@rules_cc//cc:repositories.bzl", "rules_cc_toolchains")
 
@@ -298,19 +308,6 @@ http_archive(
 load("@bzlmodrio-libssh//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_libssh_cpp_dependencies")
 
 setup_legacy_bzlmodrio_libssh_cpp_dependencies()
-
-http_archive(
-    name = "build_bazel_apple_support",
-    sha256 = "c4bb2b7367c484382300aee75be598b92f847896fb31bbd22f3a2346adf66a80",
-    url = "https://github.com/bazelbuild/apple_support/releases/download/1.15.1/apple_support.1.15.1.tar.gz",
-)
-
-load(
-    "@build_bazel_apple_support//lib:repositories.bzl",
-    "apple_support_dependencies",
-)
-
-apple_support_dependencies()
 
 # Setup quickbuf compiler
 QUICKBUF_VERSION = "1.3.2"
