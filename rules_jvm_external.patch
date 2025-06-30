@@ -1,0 +1,76 @@
+diff --git a/private/rules/java_export.bzl b/private/rules/java_export.bzl
+index 9e4ad7f..73eea47 100644
+--- a/private/rules/java_export.bzl
++++ b/private/rules/java_export.bzl
+@@ -160,7 +160,8 @@ def maven_export(
+         doc_resources = [],
+         doc_excluded_packages = [],
+         doc_included_packages = [],
+-        toolchains = None):
++        toolchains = None,
++        target_compatible_with = None):
+     """
+     All arguments are the same as java_export with the addition of:
+       lib_name: Name of the library that has been built if a library is being exported.
+@@ -261,6 +262,7 @@ def maven_export(
+             tags = tags + maven_coordinates_tags,
+             testonly = testonly,
+             toolchains = toolchains,
++            target_compatible_with = target_compatible_with,
+         )
+ 
+         native.filegroup(
+@@ -272,6 +274,7 @@ def maven_export(
+             visibility = visibility,
+             tags = tags,
+             testonly = testonly,
++            target_compatible_with = target_compatible_with,
+         )
+ 
+         if not "no-sources" in tags:
+@@ -284,6 +287,7 @@ def maven_export(
+                 visibility = visibility,
+                 tags = tags,
+                 testonly = testonly,
++                target_compatible_with = target_compatible_with,
+             )
+             classifier_artifacts.setdefault("sources", ":%s-maven-source" % name)
+ 
+@@ -306,6 +310,7 @@ def maven_export(
+             visibility = visibility,
+             tags = tags,
+             testonly = testonly,
++            target_compatible_with = target_compatible_with,
+             toolchains = toolchains,
+         )
+         classifier_artifacts.setdefault("javadoc", docs_jar)
+@@ -317,6 +322,7 @@ def maven_export(
+         pom_template = pom_template,
+         additional_dependencies = additional_dependencies,
+         visibility = visibility,
++        target_compatible_with = target_compatible_with,
+         tags = tags,
+         testonly = testonly,
+         toolchains = toolchains,
+@@ -329,6 +335,7 @@ def maven_export(
+         artifact = (":%s-maven-artifact" % name) if lib_name else target,
+         classifier_artifacts = {v: k for (k, v) in classifier_artifacts.items() if v},
+         visibility = visibility,
++        target_compatible_with = target_compatible_with,
+         tags = tags,
+         testonly = testonly,
+         toolchains = toolchains,
+@@ -348,6 +355,7 @@ def maven_export(
+             tags = tags,
+             visibility = visibility,
+             toolchains = toolchains,
++            target_compatible_with = target_compatible_with,
+         )
+ 
+         # Finally, alias the primary output
+@@ -357,4 +365,5 @@ def maven_export(
+             visibility = visibility,
+             tags = tags,
+             testonly = testonly,
++            target_compatible_with = target_compatible_with,
+         )

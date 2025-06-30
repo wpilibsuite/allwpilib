@@ -41,6 +41,8 @@ http_archive(
 # Download Extra java rules
 http_archive(
     name = "rules_jvm_external",
+    patch_args = ["-p1"],
+    patches = ["//:rules_jvm_external.patch"],
     sha256 = "4f55980c25d0783b9fe43b049362018d8d79263476b5340a5491893ffcc06ab6",
     strip_prefix = "rules_jvm_external-30899314873b6ec69dc7d02c4457fbe52a6e535d",
     url = "https://github.com/bazel-contrib/rules_jvm_external/archive/30899314873b6ec69dc7d02c4457fbe52a6e535d.tar.gz",
@@ -66,6 +68,10 @@ http_archive(
 load("@bazel_features//:deps.bzl", "bazel_features_deps")
 
 bazel_features_deps()
+
+load("@rules_cc//cc:repositories.bzl", "rules_cc_toolchains")
+
+rules_cc_toolchains()
 
 load("@rules_java//java:rules_java_deps.bzl", "rules_java_dependencies")
 

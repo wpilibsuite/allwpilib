@@ -77,6 +77,9 @@ def architectures_pkg_zip(
 def platform_prefix(t):
     return select({
         "//shared/bazel/rules:is_linux_x86_64": "linux/x86-64/" + t,
+        "//shared/bazel/rules:is_osx": "osx/universal/" + t,
+        "//shared/bazel/rules:is_windows_arm64": "windows/arm64/" + t,
+        "//shared/bazel/rules:is_windows_x86_64": "windows/x86-64/" + t,
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": "linux/roborio/" + t,
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": "linux/systemcore/" + t,
     })
