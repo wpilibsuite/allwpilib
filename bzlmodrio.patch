@@ -1,0 +1,92 @@
+diff --git a/toolchains/cross_compiler/cc-toolchain-config.bzl b/toolchains/cross_compiler/cc-toolchain-config.bzl
+index 4fc0098..a188e4d 100644
+--- a/toolchains/cross_compiler/cc-toolchain-config.bzl
++++ b/toolchains/cross_compiler/cc-toolchain-config.bzl
+@@ -20,6 +20,12 @@ def _impl(ctx):
+         ACTION_NAMES.cpp_link_nodeps_dynamic_library,
+     ]
+ 
++    lto_index_actions = [
++        ACTION_NAMES.lto_index_for_executable,
++        ACTION_NAMES.lto_index_for_dynamic_library,
++        ACTION_NAMES.lto_index_for_nodeps_dynamic_library,
++    ]
++
+     all_compile_actions = [
+         ACTION_NAMES.c_compile,
+         ACTION_NAMES.cpp_compile,
+@@ -86,7 +92,7 @@ def _impl(ctx):
+         enabled = True,
+         flag_sets = [
+             flag_set(
+-                actions = all_link_actions,
++                actions = all_link_actions + lto_index_actions,
+                 flag_groups = ([
+                     flag_group(
+                         flags = ([
+@@ -98,6 +104,9 @@ def _impl(ctx):
+                             "-lstdc++",
+                             "-lm",
+                             "-fno-canonical-system-headers",
++                            "-rdynamic",
++                            "-ldl",
++                            "-Wl,-rpath,'$ORIGIN'",
+                         ],
+                     ),
+                 ]),
+@@ -137,6 +146,8 @@ def _impl(ctx):
+                             "-fstack-protector",
+                             "-Wall",
+                             "-fno-omit-frame-pointer",
++                            "-Wextra",
++                            "-Werror",
+                         ],
+                     ),
+                 ]),
+@@ -175,13 +186,36 @@ def _impl(ctx):
+             ),
+             flag_set(
+                 actions = [ACTION_NAMES.c_compile],
+-                flag_groups = [],
++                flag_groups = ([
++                    flag_group(
++                        flags = [
++                            "-Wformat=2",
++                            "-pedantic",
++                            "-DAUSTIN_TOOLCHAIN",
++                            "-Wno-psabi",
++                            "-Wno-unused-parameter",
++                            "-fPIC",
++                            "-pthread",
++                        ],
++                    ),
++                ]),
+             ),
+             flag_set(
+                 actions = all_cpp_compile_actions + [ACTION_NAMES.lto_backend],
+                 flag_groups = ([
+                     flag_group(
+-                        flags = ["-std=c++20"],
++                        flags = [
++                            "-std=c++20",
++                            "-Wno-error=deprecated-declarations",
++                            "-Wno-deprecated-enum-enum-conversion",
++                            "-Wformat=2",
++                            "-pedantic",
++                            "-DAUSTIN_TOOLCHAIN2",
++                            "-Wno-psabi",
++                            "-Wno-unused-parameter",
++                            "-fPIC",
++                            "-pthread",
++                        ],
+                     ),
+                 ]),
+             ),
+@@ -209,6 +243,7 @@ def _impl(ctx):
+ 
+     compiler_param_feature = feature(
+         name = "compiler_param_file",
++        enabled = True,
+     )
+ 
+     archive_param_file_feature = feature(

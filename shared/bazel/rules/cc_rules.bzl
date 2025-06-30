@@ -1,4 +1,5 @@
 load("@rules_cc//cc:action_names.bzl", "CPP_LINK_STATIC_LIBRARY_ACTION_NAME")
+load("@rules_cc//cc:cc_shared_library.bzl", "cc_shared_library")
 load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_library")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_ATTRS", "find_cpp_toolchain", "use_cc_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
@@ -148,6 +149,29 @@ def wpilib_cc_library(
             srcs = extra_hdr_pkg_files + maybe_license_pkg + [name + "-hdrs-pkg"] + [lib + "-hdrs-pkg" for lib in third_party_libraries + third_party_header_only_libraries],
             tags = ["no-remote"],
         )
+
+def wpilib_cc_shared_library(
+        name,
+        auto_export_windows_symbols = True,
+        **kwargs):
+    folder, lib = _folder_prefix(name)
+
+    features = []
+    if auto_export_windows_symbols:
+        features.append("windows_export_all_symbols")
+    cc_shared_library(
+        name = name,
+        features = features,
+        **kwargs
+    )
+
+    pkg_files(
+        name = folder + "/lib" + lib + "-shared-files",
+        srcs = [
+            ":" + name,
+        ],
+        strip_prefix = folder,
+    )
 
 CcStaticLibraryInfo = provider(
     "Information about a cc static library.",
@@ -347,4 +371,16 @@ def wpilib_cc_static_library(
         name = name,
         static_lib_name = static_lib_name,
         **kwargs
+    )
+
+    pkg_files(
+        name = name + "-static.pkg",
+        srcs = [":" + name],
+        tags = ["manual"],
+    )
+
+    pkg_zip(
+        name = name + "-static-zip",
+        srcs = ["//:license_pkg_files", name + "-static.pkg"],
+        tags = ["no-remote", "manual"],
     )

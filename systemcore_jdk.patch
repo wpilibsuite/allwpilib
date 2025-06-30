@@ -1,0 +1,12 @@
+--- a/maven_deps.bzl
++++ b/maven_deps.bzl
+@@ -19,8 +19,8 @@
+         version = "17",
+         target_compatible_with = [
+             "@platforms//os:linux",
+-            "@platforms//cpu:armv7",
++            "@platforms//cpu:aarch64",
+         ],
+         sha256 = "8257de06bf37f0c8f19f8d542e2ab5a4e17db3ca5f29d041bd0b02ab265db021",
+         urls = ["https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.12%2B7/OpenJDK17U-jdk_aarch64_linux_hotspot_17.0.12_7.tar.gz"],
+         strip_prefix = "jdk-17.0.12+7",
