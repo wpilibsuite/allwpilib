@@ -83,10 +83,10 @@ index 1ae7198..0ec89ba 100644
          "wrapped_clang": attr.label(
              allow_single_file = True,
 diff --git a/crosstool/osx_cc_configure.bzl b/crosstool/osx_cc_configure.bzl
-index 6ed0142..4f478a7 100644
+index 6ed0142..dd6d39d 100644
 --- a/crosstool/osx_cc_configure.bzl
 +++ b/crosstool/osx_cc_configure.bzl
-@@ -20,6 +20,94 @@ load(
+@@ -20,6 +20,108 @@ load(
  )
  load("@bazel_tools//tools/osx:xcode_configure.bzl", "run_xcode_locator")
  
@@ -110,6 +110,20 @@ index 6ed0142..4f478a7 100644
 +        return default
 +    auto_configure_fail("'%s' environment variable is not set" % name)
 +    return None
++
++def auto_configure_fail(msg):
++    """Output failure message when auto configuration fails."""
++    red = "\033[0;31m"
++    no_color = "\033[0m"
++    fail("\n%sAuto-Configuration Error:%s %s\n" % (red, no_color, msg))
++
++def auto_configure_warning(msg):
++    """Output warning message during auto configuration."""
++    yellow = "\033[1;33m"
++    no_color = "\033[0m"
++
++    # buildifier: disable=print
++    print("\n%sAuto-Configuration Warning:%s %s\n" % (yellow, no_color, msg))
 +
 +def split_escaped(string, delimiter):
 +    """Split string on the delimiter unless %-escaped.
@@ -181,7 +195,7 @@ index 6ed0142..4f478a7 100644
  def _get_escaped_xcode_cxx_inc_directories(repository_ctx, xcode_toolchains):
      """Compute the list of default C++ include paths on Xcode-enabled darwin.
  
-@@ -112,6 +200,26 @@ def configure_osx_toolchain(repository_ctx):
+@@ -112,6 +214,26 @@ def configure_osx_toolchain(repository_ctx):
          escaped_cxx_include_directories.append(("            \"%s\"," % path))
      if xcodeloc_err:
          escaped_cxx_include_directories.append("            # Error: " + xcodeloc_err)
@@ -208,7 +222,7 @@ index 6ed0142..4f478a7 100644
      repository_ctx.template(
          "BUILD",
          build_template,
-@@ -123,6 +231,9 @@ def configure_osx_toolchain(repository_ctx):
+@@ -123,6 +245,9 @@ def configure_osx_toolchain(repository_ctx):
              "%{tool_paths_overrides}": ",\n            ".join(
                  ['"%s": "%s"' % (k, v) for k, v in tool_paths.items()],
              ),
