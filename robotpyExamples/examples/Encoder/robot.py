@@ -12,7 +12,7 @@ import math
 
 class MyRobot(wpilib.TimedRobot):
     """
-    Sample program displaying the value of a quadrature encoder on the SmartDashboard. Quadrature
+    Sample program displaying the value of a quadrature encoder through telemetry. Quadrature
     Encoders are digital sensors which can detect the amount the encoder has rotated since starting
     as well as the direction in which the encoder shaft is rotating. However, encoders can not tell
     you the absolute position of the encoder shaft (ie, it considers where it starts to be the zero
@@ -37,7 +37,5 @@ class MyRobot(wpilib.TimedRobot):
         self.encoder.set_distance_per_pulse(1.0 / 360.0 * 2.0 * math.pi * 1.5)
 
     def teleop_periodic(self):
-        wpilib.SmartDashboard.put_number(
-            "Encoder Distance", self.encoder.get_distance()
-        )
-        wpilib.SmartDashboard.put_number("Encoder Rate", self.encoder.get_rate())
+        wpilib.Telemetry.log("Encoder Distance", self.encoder.get_distance())
+        wpilib.Telemetry.log("Encoder Rate", self.encoder.get_rate())

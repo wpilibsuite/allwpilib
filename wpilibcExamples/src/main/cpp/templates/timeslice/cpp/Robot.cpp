@@ -4,7 +4,7 @@
 
 #include "Robot.hpp"
 
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/tunable/Tunables.hpp"
 #include "wpi/util/print.hpp"
 
 // Run robot periodic() functions for 5 ms, and run controllers every 10 ms
@@ -19,9 +19,9 @@ Robot::Robot() : wpi::TimesliceRobot{5_ms, 10_ms} {
   // 5 ms (robot) + 2 ms (controller 1) + 2 ms (controller 2) = 9 ms
   // 9 ms / 10 ms -> 90% allocated
 
-  chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
-  chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
-  wpi::SmartDashboard::PutData("Auto Modes", &chooser);
+  chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
+  chooser.Add(kAutoNameCustom, kAutoNameCustom);
+  wpi::Tunables::Publish("Auto Modes", chooser);
 }
 
 /**
@@ -42,7 +42,7 @@ void Robot::RobotPeriodic() {}
  * auto name from the text box below the Gyro.
  *
  * You can add additional auto modes by adding additional comparisons to the
- * if-else structure below with additional strings. If using the SendableChooser
+ * if-else structure below with additional strings. If using Selectable
  * make sure to add them to the chooser code above as well.
  */
 void Robot::AutonomousInit() {

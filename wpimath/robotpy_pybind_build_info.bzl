@@ -1193,12 +1193,14 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
             header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/TrapezoidProfile.hpp",
             tmpl_class_names = [
-                ("TrapezoidProfile_tmpl1", "TrapezoidProfile"),
-                ("TrapezoidProfile_tmpl2", "TrapezoidProfileRadians"),
+                ("TrapezoidProfile_tmpl1", "_TrapezoidProfileConstraints"),
+                ("TrapezoidProfile_tmpl2", "_TrapezoidProfileRadiansConstraints"),
+                ("TrapezoidProfile_tmpl3", "TrapezoidProfile"),
+                ("TrapezoidProfile_tmpl4", "TrapezoidProfileRadians"),
             ],
             trampolines = [
                 ("wpi::math::TrapezoidProfile", "wpi__math__TrapezoidProfile.hpp"),
-                ("wpi::math::TrapezoidProfile::Constraints", "wpi__math__TrapezoidProfile__Constraints.hpp"),
+                ("wpi::math::detail::TrapezoidProfileConstraints", "wpi__math__detail__TrapezoidProfileConstraints.hpp"),
                 ("wpi::math::TrapezoidProfile::State", "wpi__math__TrapezoidProfile__State.hpp"),
                 ("wpi::math::TrapezoidProfile::ProfileTiming", "wpi__math__TrapezoidProfile__ProfileTiming.hpp"),
             ],
@@ -1343,6 +1345,8 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
         trampoline_subpath = "src/main/python/wpimath",
         deps = header_to_dat_deps,
         local_native_libraries = [
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunable:robotpy-native-tunable.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
@@ -1472,6 +1476,8 @@ def define_pybind_library(name, pkgcfgs = []):
         name = "{}-update-yaml".format(name),
         yaml_output_directory = "src/main/python/semiwrap",
         extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunable:robotpy-native-tunable.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],

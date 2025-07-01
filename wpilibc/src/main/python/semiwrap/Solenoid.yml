@@ -1,10 +1,10 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 
 classes:
   wpi::Solenoid:
     ignored_bases:
-    - wpi::util::SendableHelper<Solenoid>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
     methods:
       Solenoid:
         overloads:
@@ -17,4 +17,5 @@ classes:
       IsDisabled:
       SetPulseDuration:
       StartPulse:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:

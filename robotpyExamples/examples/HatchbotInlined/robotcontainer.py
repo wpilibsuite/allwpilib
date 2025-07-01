@@ -64,14 +64,14 @@ class RobotContainer:
         )
 
         # Chooser
-        self.chooser = wpilib.SendableChooser()
+        self.chooser = wpilib.Selectable()
 
         # Add commands to the autonomous command chooser
-        self.chooser.set_default_option("Simple Auto", self.simple_auto)
-        self.chooser.add_option("Complex Auto", self.complex_auto)
+        self.chooser.add_default("Simple Auto", self.simple_auto)
+        self.chooser.add("Complex Auto", self.complex_auto)
 
         # Put the chooser on the dashboard
-        wpilib.SmartDashboard.put_data("Autonomous", self.chooser)
+        wpilib.Tunables.publish("Autonomous", self.chooser)
 
     def configure_button_bindings(self):
         """

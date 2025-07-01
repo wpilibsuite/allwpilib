@@ -9,6 +9,7 @@
 
 #include <imgui.h>
 
+#include "wpi/glass/networktables/NTTunableTopic.hpp"
 #include "wpi/util/StringExtras.hpp"
 
 using namespace wpi::glass;
@@ -20,8 +21,6 @@ NTMecanumDriveModel::NTMecanumDriveModel(wpi::nt::NetworkTableInstance inst,
                                          std::string_view path)
     : m_inst{inst},
       m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
-      m_controllable{inst.GetBooleanTopic(std::format("{}/.controllable", path))
-                         .Subscribe(0)},
       m_flPercent{
           inst.GetDoubleTopic(std::format("{}/Front Left Motor Velocity", path))
               .GetEntry(0)},
@@ -68,9 +67,6 @@ void NTMecanumDriveModel::Update() {
   for (auto&& v : m_rrPercent.ReadQueue()) {
     m_rrPercentData.SetValue(v.value, v.time);
   }
-  for (auto&& v : m_controllable.ReadQueue()) {
-    m_controllableValue = v.value;
-  }
 
   double fl = m_flPercentData.GetValue();
   double fr = m_frPercentData.GetValue();
@@ -84,4 +80,11 @@ void NTMecanumDriveModel::Update() {
 
 bool NTMecanumDriveModel::Exists() {
   return m_flPercent.Exists();
+}
+
+bool NTMecanumDriveModel::IsReadOnly() {
+  return !IsTunableTopicMutable(m_flPercent.GetTopic()) ||
+         !IsTunableTopicMutable(m_frPercent.GetTopic()) ||
+         !IsTunableTopicMutable(m_rlPercent.GetTopic()) ||
+         !IsTunableTopicMutable(m_rrPercent.GetTopic());
 }

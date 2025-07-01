@@ -5,9 +5,10 @@
 package org.wpilib.math.controller;
 
 import org.wpilib.math.util.MathSharedStore;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.ComplexTunable;
+import org.wpilib.tunable.TunableTable;
 
 /**
  * Implements a bang-bang controller, which outputs either 0 or 1 depending on whether the
@@ -20,7 +21,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * hazardous. Always ensure that your motor controllers are set to "coast" before attempting to
  * control them with a bang-bang controller.
  */
-public class BangBangController implements Sendable {
+public class BangBangController implements TelemetryLoggable, ComplexTunable {
   private static int instances;
 
   private double m_tolerance;
@@ -38,12 +39,9 @@ public class BangBangController implements Sendable {
    */
   @SuppressWarnings("this-escape")
   public BangBangController(double tolerance) {
-    instances++;
-
     setTolerance(tolerance);
 
-    SendableRegistry.add(this, "BangBangController", instances);
-
+    instances++;
     MathSharedStore.reportUsage("BangBangController", String.valueOf(instances));
   }
 
@@ -148,12 +146,27 @@ public class BangBangController implements Sendable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("BangBangController");
-    builder.addDoubleProperty("tolerance", this::getTolerance, this::setTolerance);
-    builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
-    builder.addDoubleProperty("measurement", this::getMeasurement, null);
-    builder.addDoubleProperty("error", this::getError, null);
-    builder.addBooleanProperty("atSetpoint", this::atSetpoint, null);
+  public void logTo(TelemetryTable table) {
+    table.log("tolerance", getTolerance());
+    table.log("setpoint", getSetpoint());
+    table.log("measurement", getMeasurement());
+    table.log("error", getError());
+    table.log("atSetpoint", atSetpoint());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "BangBangController";
+  }
+
+  @Override
+  public void publishTunable(TunableTable table) {
+    table.publishDouble("tolerance", this::getTolerance, this::setTolerance);
+    table.publishDouble("setpoint", this::getSetpoint, this::setSetpoint);
+  }
+
+  @Override
+  public String getTunableType() {
+    return "BangBangController";
   }
 }

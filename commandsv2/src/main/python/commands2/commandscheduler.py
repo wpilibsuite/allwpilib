@@ -14,10 +14,12 @@ from wpilib import (
     RobotBase,
     TimedRobot,
     Watchdog,
+    ComplexTunable,
+    TelemetryLoggable,
+    TelemetryTable,
+    TunableTable,
     report_warning,
 )
-
-from wpiutil import Sendable, SendableBuilder, SendableRegistry
 
 from .command import Command, InterruptionBehavior
 from .exceptions import IllegalCommandUse
@@ -26,7 +28,7 @@ from .subsystem import Subsystem
 _cmd_path = os.path.dirname(__file__)
 
 
-class CommandScheduler(Sendable):
+class CommandScheduler(TelemetryLoggable, ComplexTunable):
     """
     The scheduler responsible for running Commands. A Command-based robot should call
     :meth:`.run` on the singleton instance in its periodic block in order to run commands
@@ -59,7 +61,6 @@ class CommandScheduler(Sendable):
         inst = CommandScheduler._instance
         if inst:
             inst._default_button_loop.clear()
-            SendableRegistry.remove(inst)
 
         CommandScheduler._instance = None
 
@@ -621,18 +622,22 @@ class CommandScheduler(Sendable):
         """
         return command in self._composed_commands
 
-    def init_sendable(self, builder: SendableBuilder):
-        builder.set_smart_dashboard_type("Scheduler")
-        builder.add_string_array_property(
+    def log_to(self, table: TelemetryTable) -> None:
+        table.log(
             "Names",
-            lambda: [command.get_name() for command in self._scheduled_commands],
-            lambda _: None,
+            [command.get_name() for command in self._scheduled_commands],
+            "string[]",
         )
-        builder.add_integer_array_property(
+        table.log(
             "Ids",
-            lambda: [id(command) for command in self._scheduled_commands],
-            lambda _: None,
+            [id(command) for command in self._scheduled_commands],
+            "integer[]",
         )
+
+    def get_telemetry_type(self) -> str:
+        return "Scheduler"
+
+    def publish_tunable(self, table: TunableTable) -> None:
 
         def cancel_commands(to_cancel: List[int]):
             ids = {id(command): command for command in self._scheduled_commands}
@@ -641,6 +646,7 @@ class CommandScheduler(Sendable):
                 if cancel_cmd is not None:
                     self.cancel(cancel_cmd)
 
-        builder.add_integer_array_property(
-            "Cancel", lambda: [], lambda to_cancel: cancel_commands(to_cancel)  # type: ignore
-        )
+        table.publish_integer_array("Cancel", lambda: [], cancel_commands)
+
+    def get_tunable_type(self) -> str:
+        return "Scheduler"

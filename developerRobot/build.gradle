@@ -50,6 +50,8 @@ dependencies {
     implementation project(':wpiutil')
     implementation project(':wpinet')
     implementation project(':ntcore')
+    implementation project(':telemetry')
+    implementation project(':tunable')
     implementation project(':cscore')
     implementation project(':cameraserver')
     implementation project(':commandsv2')
@@ -230,6 +232,8 @@ model {
                 project(':ntcore').addNtcoreJniDependency(binary)
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunable', library: 'tunable', linkage: 'shared'
                 def systemArch = getCurrentArch()
                 if (binary.targetPlatform.name == systemArch) {
                     simProjects.each {
@@ -269,6 +273,8 @@ model {
                 project(':ntcore').addNtcoreDependency(binary, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'static'
+                lib project: ':tunable', library: 'tunable', linkage: 'static'
             }
         }
     }

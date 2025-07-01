@@ -12,7 +12,7 @@ import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.smartdashboard.Mechanism2d;
 import org.wpilib.smartdashboard.MechanismLigament2d;
 import org.wpilib.smartdashboard.MechanismRoot2d;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 import org.wpilib.util.Color;
 import org.wpilib.util.Color8Bit;
 
@@ -33,6 +33,7 @@ public class Robot extends TimedRobot {
   private final Encoder elevatorEncoder = new Encoder(0, 1);
   private final Joystick joystick = new Joystick(0);
 
+  private final Mechanism2d mech;
   private final MechanismLigament2d elevator;
   private final MechanismLigament2d wrist;
 
@@ -41,7 +42,7 @@ public class Robot extends TimedRobot {
     elevatorEncoder.setDistancePerPulse(kMetersPerPulse);
 
     // the main mechanism object
-    Mechanism2d mech = new Mechanism2d(3, 3);
+    mech = new Mechanism2d(3, 3);
     // the mechanism root node
     MechanismRoot2d root = mech.getRoot("climber", 2, 0);
 
@@ -50,9 +51,6 @@ public class Robot extends TimedRobot {
     elevator = root.append(new MechanismLigament2d("elevator", kElevatorMinimumLength, 90));
     wrist =
         elevator.append(new MechanismLigament2d("wrist", 0.5, 90, 6, new Color8Bit(Color.PURPLE)));
-
-    // post the mechanism to the dashboard
-    SmartDashboard.putData("Mech2d", mech);
   }
 
   @Override
@@ -60,6 +58,9 @@ public class Robot extends TimedRobot {
     // update the dashboard mechanism's state
     elevator.setLength(kElevatorMinimumLength + elevatorEncoder.getDistance());
     wrist.setAngle(wristPot.get());
+
+    // post the mechanism to telemetry
+    Telemetry.log("Mech2d", mech);
   }
 
   @Override

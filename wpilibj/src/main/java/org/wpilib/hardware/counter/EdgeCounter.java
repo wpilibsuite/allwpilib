@@ -6,12 +6,11 @@ package org.wpilib.hardware.counter;
 
 import org.wpilib.hardware.hal.CounterJNI;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /** Counts rising or falling edges on a single digital input. */
-public class EdgeCounter implements Sendable, AutoCloseable {
+public class EdgeCounter implements TelemetryLoggable, AutoCloseable {
   private final int m_handle;
 
   /**
@@ -20,19 +19,16 @@ public class EdgeCounter implements Sendable, AutoCloseable {
    * @param channel The DIO channel.
    * @param configuration The edge configuration.
    */
-  @SuppressWarnings("this-escape")
   public EdgeCounter(int channel, EdgeConfiguration configuration) {
     m_handle = CounterJNI.initializeCounter(channel, configuration.rising);
 
     reset();
 
     HAL.reportUsage("IO", channel, "EdgeCounter");
-    SendableRegistry.add(this, "Edge Counter", channel);
   }
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     CounterJNI.freeCounter(m_handle);
   }
 
@@ -60,8 +56,12 @@ public class EdgeCounter implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Edge Counter");
-    builder.addDoubleProperty("Count", this::getCount, null);
+  public void logTo(TelemetryTable table) {
+    table.log("Count", getCount());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Edge Counter";
   }
 }

@@ -1,5 +1,5 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 - wpi/hardware/motor/MotorController.hpp
 
 classes:
@@ -7,7 +7,7 @@ classes:
     force_type_casters:
     - wpi::units::radian_t
     ignored_bases:
-    - wpi::util::SendableHelper<MecanumDrive>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
     methods:
       MecanumDrive:
         overloads:
@@ -29,7 +29,8 @@ classes:
             default: wpi::math::Rotation2d(0_rad)
       StopMotor:
       GetDescription:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:
   wpi::MecanumDrive::WheelVelocities:
     attributes:
       frontLeft:

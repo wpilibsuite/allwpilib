@@ -27,6 +27,7 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//ntcore",
+        "//telemetry",
         "//wpilibc",
         "//wpinet",
     ],
@@ -37,6 +38,7 @@ wpilib_cc_shared_library(
     dynamic_deps = [
         "//hal:shared/wpiHal",
         "//ntcore:shared/ntcore",
+        "//telemetry:shared/telemetry",
         "//wpilibc:shared/wpilibc",
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
@@ -51,6 +53,7 @@ wpilib_cc_static_library(
     name = "static/romiVendordep",
     static_deps = [
         "//ntcore:static/ntcore",
+        "//telemetry:static/telemetry",
         "//wpilibc:static/wpilibc",
         "//wpinet:static/wpinet",
     ],
@@ -68,6 +71,7 @@ wpilib_java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//hal:hal-java",
+        "//telemetry:telemetry-java",
         "//wpilibj:wpilibj-java",
     ],
 )
@@ -125,6 +129,10 @@ PKG_CONFIG_DEPS = [
     "//hal:robotpy-hal.generated_pkgcfg_files",
     "//ntcore:native/ntcore/robotpy-native-ntcore.pc",
     "//ntcore:pyntcore.generated_pkgcfg_files",
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//telemetry:robotpy-telemetry.generated_pkgcfg_files",
+    "//tunable:native/tunable/robotpy-native-tunable.pc",
+    "//tunable:robotpy-tunable.generated_pkgcfg_files",
     "//wpilibc:native/wpilib/robotpy-native-wpilib.pc",
     "//wpilibc:robotpy-wpilib.generated_pkgcfg_files",
     "//wpimath:native/wpimath/robotpy-native-wpimath.pc",

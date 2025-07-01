@@ -1,0 +1,11 @@
+classes:
+  wpi::backend::NetworkTablesTunableBackend:
+    force_no_trampoline: true
+    methods:
+      NetworkTablesTunableBackend:
+      Publish:
+        ignore: true
+      Remove:
+      RemovePrefix:
+      UnregisterTunable:
+      Update:

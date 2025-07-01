@@ -1,11 +1,11 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 - wpi/hardware/discrete/AnalogInput.hpp
 
 classes:
   wpi::AnalogEncoder:
     ignored_bases:
-    - wpi::util::SendableHelper<AnalogEncoder>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
     methods:
       AnalogEncoder:
         overloads:
@@ -25,4 +25,5 @@ classes:
       GetChannel:
       SetVoltagePercentageRange:
       SetInverted:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:

@@ -46,7 +46,8 @@ def tagList = [
         "Swerve Drive",
 
         /* --- Telemetry --- */
-        "SmartDashboard", "Shuffleboard", "Sendable", "DataLog", "Driver Station",
+        "SmartDashboard", "Shuffleboard", "Sendable", "DataLog", "Driver Station", "Telemetry",
+        "Tunable",
 
         /* --- Controls --- */
         "Exponential Profile", "PID", "State-Space", "LTVUnicycleController", "Path Following",

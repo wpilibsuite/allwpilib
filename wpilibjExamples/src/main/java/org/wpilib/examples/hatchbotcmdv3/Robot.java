@@ -12,9 +12,10 @@ import org.wpilib.examples.hatchbotcmdv3.commands.Autos;
 import org.wpilib.examples.hatchbotcmdv3.mechanisms.DriveMechanism;
 import org.wpilib.examples.hatchbotcmdv3.mechanisms.HatchMechanism;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.DataLogManager;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -26,7 +27,7 @@ public class Robot extends TimedRobot {
    * A chooser for autonomous commands. Drivers can choose between different autonomous modes on a
    * dashboard before the start of a match.
    */
-  private final SendableChooser<Command> autonomousChooser = new SendableChooser<>();
+  private final Selectable<Command> autonomousChooser = new Selectable<>();
 
   // The driver's controller
   private final CommandGamepad driverController =
@@ -52,11 +53,11 @@ public class Robot extends TimedRobot {
             () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
 
     // Add commands to the autonomous command chooser
-    autonomousChooser.setDefaultOption("Simple Auto", Autos.simpleAuto(robotDrive));
-    autonomousChooser.addOption("Complex Auto", Autos.complexAuto(robotDrive, hatchMechanism));
+    autonomousChooser.addDefault("Simple Auto", Autos.simpleAuto(robotDrive));
+    autonomousChooser.add("Complex Auto", Autos.complexAuto(robotDrive, hatchMechanism));
 
     // Put the chooser on the dashboard
-    SmartDashboard.putData("Autonomous", autonomousChooser);
+    Tunables.publish("Autonomous", autonomousChooser);
 
     // Start recording to data log
     DataLogManager.start();
@@ -93,6 +94,8 @@ public class Robot extends TimedRobot {
     // This must be called from the robot's periodic block in order for anything in the
     // Command-based framework to work.
     Scheduler.getDefault().run();
+    Telemetry.log("Drivetrain", robotDrive);
+    Telemetry.log("HatchMechanism", hatchMechanism);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

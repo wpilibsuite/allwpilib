@@ -64,6 +64,8 @@ include 'thirdparty:catch2'
 include 'thirdparty:imgui_suite'
 include 'tools:wpical'
 include 'datalog'
+include 'telemetry'
+include 'tunable'
 
 buildCache {
     def cred = {

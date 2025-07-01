@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import List
 
-from wpiutil import SendableBuilder
+from wpilib import TelemetryTable
 
 from .command import Command, InterruptionBehavior
 from .commandscheduler import CommandScheduler
@@ -94,8 +94,6 @@ class SequentialCommandGroup(Command):
     def get_interruption_behavior(self) -> InterruptionBehavior:
         return self._interrupt_behavior
 
-    def init_sendable(self, builder: SendableBuilder) -> None:
-        super().init_sendable(builder)
-        builder.add_integer_property(
-            "index", lambda: self._current_command_index, lambda _: None
-        )
+    def log_to(self, table: TelemetryTable) -> None:
+        super().log_to(table)
+        table.log("index", self._current_command_index)

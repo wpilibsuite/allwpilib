@@ -1,5 +1,5 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 - wpi/hardware/pneumatic/Compressor.hpp
 - wpi/hardware/pneumatic/Solenoid.hpp
 - wpi/hardware/pneumatic/DoubleSolenoid.hpp

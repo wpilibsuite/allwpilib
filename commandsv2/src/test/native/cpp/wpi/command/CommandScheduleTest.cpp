@@ -2,12 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "CommandTestBase.hpp"
 #include "wpi/commands2/FunctionalCommand.hpp"
 #include "wpi/commands2/InstantCommand.hpp"
 #include "wpi/commands2/RunCommand.hpp"
-#include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/tunable/MockTunableBackend.hpp"
+#include "wpi/tunable/TunableConfig.hpp"
+#include "wpi/tunable/TunableRegistry.hpp"
+#include "wpi/tunable/Tunables.hpp"
+#include "wpi/tunable/detail/TunableMember.hpp"
 
 using namespace wpi::cmd;
 class CommandScheduleTest : public CommandTestBase {};
@@ -150,25 +157,56 @@ TEST_CASE_METHOD(CommandScheduleTest, "CommandScheduleTest NotScheduledCancel",
   CHECK_NOTHROW(scheduler.Cancel(&command));
 }
 
-TEST_CASE_METHOD(CommandScheduleTest,
-                 "CommandScheduleTest SmartDashboardCancel",
+TEST_CASE_METHOD(CommandScheduleTest, "CommandScheduleTest TunableCancel",
                  "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
-  wpi::SmartDashboard::PutData("Scheduler", &scheduler);
-  wpi::SmartDashboard::UpdateValues();
+  auto backend = std::make_shared<wpi::MockTunableBackend>();
+  wpi::TunableRegistry::RegisterBackend("", backend);
+  wpi::Tunables::Publish("Scheduler", scheduler);
+
+  auto namesUid = backend->GetUid("/Scheduler/Names");
+  CHECK(namesUid);
+  auto namesInfo = wpi::TunableRegistry::GetTunable(*namesUid);
+  REQUIRE(namesInfo);
+  REQUIRE(namesInfo.config);
+  CHECK_FALSE(namesInfo.config->isMutable);
+  CHECK(namesInfo.config->alwaysGet);
+
+  auto idsUid = backend->GetUid("/Scheduler/Ids");
+  REQUIRE(idsUid);
+  auto idsInfo = wpi::TunableRegistry::GetTunable(*idsUid);
+  REQUIRE(idsInfo);
+  REQUIRE(idsInfo.config);
+  CHECK_FALSE(idsInfo.config->isMutable);
+  CHECK(idsInfo.config->alwaysGet);
 
   MockCommand command;
   scheduler.Schedule(&command);
   scheduler.Run();
-  wpi::SmartDashboard::UpdateValues();
   CHECK(scheduler.IsScheduled(&command));
+  wpi::TunableRegistry::Update();
+
+  const auto& names =
+      static_cast<
+          wpi::detail::TunableMemberValueBase<std::vector<std::string>>*>(
+          namesInfo.tunable)
+          ->Get(namesInfo.config->parent);
+  REQUIRE(1U == names.size());
+  CHECK(command.GetName() == names[0]);
+
+  const auto& ids =
+      static_cast<wpi::detail::TunableMemberValueBase<std::vector<int64_t>>*>(
+          idsInfo.tunable)
+          ->Get(idsInfo.config->parent);
+  REQUIRE(1U == ids.size());
 
   uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(&command);
-  wpi::nt::NetworkTableInstance::GetDefault()
-      .GetEntry("/SmartDashboard/Scheduler/Cancel")
-      .SetIntegerArray(
-          std::span<const int64_t>{{static_cast<int64_t>(ptrTmp)}});
-  wpi::SmartDashboard::UpdateValues();
+  CHECK(static_cast<int64_t>(ptrTmp) == ids[0]);
+  backend->SetInt64Vector(
+      "/Scheduler/Cancel",
+      std::span<const int64_t>{{static_cast<int64_t>(ptrTmp)}});
+  wpi::TunableRegistry::Update();
   scheduler.Run();
   CHECK_FALSE(scheduler.IsScheduled(&command));
+  wpi::TunableRegistry::Reset();
 }

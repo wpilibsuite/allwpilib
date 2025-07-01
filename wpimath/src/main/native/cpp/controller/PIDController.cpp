@@ -4,31 +4,36 @@
 
 #include "wpi/math/controller/PIDController.hpp"
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/tunable/TunableTable.hpp"
 
 using namespace wpi::math;
 
-void PIDController::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("PIDController");
-  builder.AddDoubleProperty(
-      "p", [this] { return GetP(); }, [this](double value) { SetP(value); });
-  builder.AddDoubleProperty(
-      "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
-  builder.AddDoubleProperty(
-      "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
-  builder.AddDoubleProperty(
-      "izone", [this] { return GetIZone(); },
-      [this](double value) { SetIZone(value); });
-  builder.AddDoubleProperty(
-      "setpoint", [this] { return GetSetpoint(); },
-      [this](double value) { SetSetpoint(value); });
-  builder.AddDoubleProperty(
-      "measurement", [this] { return m_measurement; }, nullptr);
-  builder.AddDoubleProperty("error", [this] { return GetError(); }, nullptr);
-  builder.AddDoubleProperty(
-      "error derivative", [this] { return GetErrorDerivative(); }, nullptr);
-  builder.AddDoubleProperty(
-      "previous error", [this] { return m_prevError; }, nullptr);
-  builder.AddDoubleProperty(
-      "total error", [this] { return GetAccumulatedError(); }, nullptr);
+void PIDController::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("p", GetP());
+  table.Log("i", GetI());
+  table.Log("d", GetD());
+  table.Log("izone", GetIZone());
+  table.Log("setpoint", GetSetpoint());
+  table.Log("measurement", m_measurement);
+  table.Log("error", GetError());
+  table.Log("error derivative", GetErrorDerivative());
+  table.Log("previous error", m_prevError);
+  table.Log("total error", GetAccumulatedError());
+}
+
+std::string_view PIDController::GetTelemetryType() const {
+  return "PIDController";
+}
+
+void PIDController::PublishTunable(wpi::TunableTable& table) {
+  table.Publish("p", m_Kp);
+  table.Publish("i", m_Ki);
+  table.Publish("d", m_Kd);
+  table.Publish("izone", m_iZone);
+  table.Publish("setpoint", m_setpoint);
+}
+
+std::string_view PIDController::GetTunableType() const {
+  return "PIDController";
 }

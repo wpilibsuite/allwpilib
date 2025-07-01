@@ -12,9 +12,11 @@ import org.wpilib.command3.Mechanism;
 import org.wpilib.examples.hatchbotcmdv3.Constants.HatchConstants;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /** A hatch mechanism actuated by a single {@link org.wpilib.hardware.pneumatic.DoubleSolenoid}. */
-public class HatchMechanism implements Mechanism {
+public class HatchMechanism implements Mechanism, TelemetryLoggable {
   private final DoubleSolenoid hatchSolenoid =
       new DoubleSolenoid(
           0,
@@ -34,10 +36,8 @@ public class HatchMechanism implements Mechanism {
     return this.run(coro -> hatchSolenoid.set(REVERSE)).named("Release Hatch");
   }
 
-  //  @Override
-  //  public void initSendable(SendableBuilder builder) {
-  //    super.initSendable(builder);
-  //    // Publish the solenoid state to telemetry.
-  //    builder.addBooleanProperty("extended", () -> hatchSolenoid.get() == kForward, null);
-  //  }
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("extended", hatchSolenoid.get() == FORWARD);
+  }
 }

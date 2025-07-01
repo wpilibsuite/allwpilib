@@ -4,7 +4,7 @@
 
 #include "subsystems/HatchSubsystem.hpp"
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace HatchConstants;
 
@@ -20,12 +20,9 @@ void HatchSubsystem::ReleaseHatch() {
   hatchSolenoid.Set(wpi::DoubleSolenoid::REVERSE);
 }
 
-void HatchSubsystem::InitSendable(wpi::util::SendableBuilder& builder) {
-  SubsystemBase::InitSendable(builder);
+void HatchSubsystem::LogTo(wpi::TelemetryTable& table) const {
+  SubsystemBase::LogTo(table);
 
   // Publish the solenoid state to telemetry.
-  builder.AddBooleanProperty(
-      "extended",
-      [this] { return hatchSolenoid.Get() == wpi::DoubleSolenoid::FORWARD; },
-      nullptr);
+  table.Log("extended", hatchSolenoid.Get() == wpi::DoubleSolenoid::FORWARD);
 }

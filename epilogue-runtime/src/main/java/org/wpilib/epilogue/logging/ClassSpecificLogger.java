@@ -8,8 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.wpilib.epilogue.CustomLoggerFor;
 import org.wpilib.epilogue.logging.errors.ErrorHandler;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Base class for class-specific generated loggers. Loggers are generated at compile time by the
@@ -22,10 +22,11 @@ import org.wpilib.util.sendable.SendableBuilder;
 @SuppressWarnings("unused") // Used by generated subclasses
 public abstract class ClassSpecificLogger<T> {
   private final Class<T> m_clazz;
-  // TODO: This will hold onto Sendables that are otherwise no longer referenced by a robot program.
+  // TODO: This will hold onto telemetry objects that are otherwise no longer referenced by a robot
+  //       program.
   //       Determine if that's a concern
   // Linked hashmap to maintain insert order
-  private final Map<Sendable, SendableBuilder> m_sendables = new LinkedHashMap<>();
+  private final Map<TelemetryLoggable, TelemetryTable> m_telemetryTables = new LinkedHashMap<>();
 
   private boolean m_disabled = false;
 
@@ -95,23 +96,23 @@ public abstract class ClassSpecificLogger<T> {
   }
 
   /**
-   * Logs a sendable type.
+   * Logs a telemetry type.
    *
    * @param backend the backend to log data into
-   * @param sendable the sendable object to log
+   * @param telemetry the telemetry object to log
    */
-  protected void logSendable(EpilogueBackend backend, Sendable sendable) {
-    if (sendable == null) {
+  protected void logTelemetry(EpilogueBackend backend, TelemetryLoggable telemetry) {
+    if (telemetry == null) {
       return;
     }
 
-    if (m_sendables.containsKey(sendable)) {
-      m_sendables.get(sendable).update();
-    } else {
-      var builder = new LogBackedSendableBuilder(backend);
-      sendable.initSendable(builder);
-      m_sendables.put(sendable, builder);
-      builder.update();
+    TelemetryTable table =
+        m_telemetryTables.computeIfAbsent(
+            telemetry, ignored -> new TelemetryTable(new EpilogueTelemetryBackend(backend)));
+    telemetry.logTo(table);
+    String type = telemetry.getTelemetryType();
+    if (type != null) {
+      table.setType(type);
     }
   }
 }

@@ -7,7 +7,7 @@
 #include <utility>
 
 #include "wpi/commands2/Commands.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi::cmd;
 
@@ -41,8 +41,7 @@ bool DeferredCommand::IsFinished() {
   return m_command->IsFinished();
 }
 
-void DeferredCommand::InitSendable(wpi::util::SendableBuilder& builder) {
-  Command::InitSendable(builder);
-  builder.AddStringProperty(
-      "deferred", [this] { return m_command->GetName(); }, nullptr);
+void DeferredCommand::LogTo(wpi::TelemetryTable& table) const {
+  Command::LogTo(table);
+  table.Log("deferred", m_command->GetName());
 }

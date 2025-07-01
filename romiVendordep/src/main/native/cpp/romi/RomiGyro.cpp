@@ -87,3 +87,16 @@ void RomiGyro::Reset() {
     m_angleZOffset = m_simAngleZ.Get();
   }
 }
+
+std::string_view RomiGyro::GetTelemetryType() const {
+  return "Romi Gyro";
+}
+
+void RomiGyro::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("rate x", GetRateX());
+  table.Log("rate y", GetRateY());
+  table.Log("rate z", GetRateZ());
+  table.Log("angle x", GetAngleX());
+  table.Log("angle y", GetAngleY());
+  table.Log("angle z", GetAngleZ());
+}

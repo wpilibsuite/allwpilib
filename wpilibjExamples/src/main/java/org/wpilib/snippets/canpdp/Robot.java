@@ -6,7 +6,7 @@ package org.wpilib.snippets.canpdp;
 
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.power.PowerDistribution;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 
 /**
  * This is a sample program showing how to retrieve information from the Power Distribution Panel
@@ -15,10 +15,7 @@ import org.wpilib.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   private final PowerDistribution pdp = new PowerDistribution(0);
 
-  public Robot() {
-    // Put the PDP itself to the dashboard
-    SmartDashboard.putData("PDP", pdp);
-  }
+  public Robot() {}
 
   @Override
   public void robotPeriodic() {
@@ -26,29 +23,32 @@ public class Robot extends TimedRobot {
     // The PDP returns the current in increments of 0.125A.
     // At low currents the current readings tend to be less accurate.
     double current7 = pdp.getCurrent(7);
-    SmartDashboard.putNumber("Current Channel 7", current7);
+    Telemetry.log("Current Channel 7", current7);
 
     // Get the voltage going into the PDP, in Volts.
     // The PDP returns the voltage in increments of 0.05 Volts.
     double voltage = pdp.getVoltage();
-    SmartDashboard.putNumber("Voltage", voltage);
+    Telemetry.log("Voltage", voltage);
 
     // Retrieves the temperature of the PDP, in degrees Celsius.
     double temperatureCelsius = pdp.getTemperature();
-    SmartDashboard.putNumber("Temperature", temperatureCelsius);
+    Telemetry.log("Temperature", temperatureCelsius);
 
     // Get the total current of all channels.
     double totalCurrent = pdp.getTotalCurrent();
-    SmartDashboard.putNumber("Total Current", totalCurrent);
+    Telemetry.log("Total Current", totalCurrent);
 
     // Get the total power of all channels.
     // Power is the bus voltage multiplied by the current with the units Watts.
     double totalPower = pdp.getTotalPower();
-    SmartDashboard.putNumber("Total Power", totalPower);
+    Telemetry.log("Total Power", totalPower);
 
     // Get the total energy of all channels.
     // Energy is the power summed over time with units Joules.
     double totalEnergy = pdp.getTotalEnergy();
-    SmartDashboard.putNumber("Total Energy", totalEnergy);
+    Telemetry.log("Total Energy", totalEnergy);
+
+    // Put the PDP itself to telemetry
+    Telemetry.log("PDP", pdp);
   }
 }

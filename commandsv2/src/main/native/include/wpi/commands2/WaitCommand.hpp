@@ -37,7 +37,7 @@ class WaitCommand : public CommandHelper<Command, WaitCommand> {
 
   bool RunsWhenDisabled() const override;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
  protected:
   /// The timer used for waiting.

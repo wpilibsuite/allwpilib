@@ -11,21 +11,32 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/nt/DoubleArrayTopic.hpp"
 #include "wpi/nt/MultiSubscriber.hpp"
+#include "wpi/nt/StructArrayTopic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
-#include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
 using namespace wpi::glass;
 
+namespace {
+constexpr std::string_view POSE2D_ARRAY_TYPE = "struct:Pose2d[]";
+
+bool IsPose2dArrayTopic(const wpi::nt::TopicInfo& info) {
+  return info.type == NT_RAW && info.type_str == POSE2D_ARRAY_TYPE;
+}
+}  // namespace
+
 class NTField2DModel::ObjectModel : public FieldObjectModel {
  public:
-  ObjectModel(std::string_view name, wpi::nt::DoubleArrayTopic topic)
+  ObjectModel(std::string_view name,
+              wpi::nt::StructArrayTopic<wpi::math::Pose2d> topic)
       : m_name{name}, m_topic{topic} {}
 
   const char* GetName() const override { return m_name.c_str(); }
-  wpi::nt::DoubleArrayTopic GetTopic() const { return m_topic; }
+  wpi::nt::StructArrayTopic<wpi::math::Pose2d> GetTopic() const {
+    return m_topic;
+  }
 
   void NTUpdate(const wpi::nt::Value& value);
 
@@ -43,41 +54,35 @@ class NTField2DModel::ObjectModel : public FieldObjectModel {
   void UpdateNT();
 
   std::string m_name;
-  wpi::nt::DoubleArrayTopic m_topic;
-  wpi::nt::DoubleArrayPublisher m_pub;
+  wpi::nt::StructArrayTopic<wpi::math::Pose2d> m_topic;
+  wpi::nt::StructArrayPublisher<wpi::math::Pose2d> m_pub;
 
   std::vector<wpi::math::Pose2d> m_poses;
 };
 
 void NTField2DModel::ObjectModel::NTUpdate(const wpi::nt::Value& value) {
-  if (value.IsDoubleArray()) {
-    auto arr = value.GetDoubleArray();
-    auto size = arr.size();
-    if ((size % 3) != 0) {
-      return;
-    }
-    m_poses.resize(size / 3);
-    for (size_t i = 0; i < size / 3; ++i) {
-      m_poses[i] = wpi::math::Pose2d{
-          wpi::units::meter_t{arr[i * 3 + 0]},
-          wpi::units::meter_t{arr[i * 3 + 1]},
-          wpi::math::Rotation2d{wpi::units::degree_t{arr[i * 3 + 2]}}};
-    }
+  if (!value.IsRaw()) {
+    return;
+  }
+
+  auto raw = value.GetRaw();
+  constexpr size_t kPoseSize = wpi::util::GetStructSize<wpi::math::Pose2d>();
+  if ((raw.size() % kPoseSize) != 0) {
+    return;
+  }
+
+  m_poses.resize(raw.size() / kPoseSize);
+  for (size_t i = 0; i < m_poses.size(); ++i) {
+    m_poses[i] = wpi::util::UnpackStruct<wpi::math::Pose2d>(
+        raw.subspan(i * kPoseSize, kPoseSize));
   }
 }
 
 void NTField2DModel::ObjectModel::UpdateNT() {
-  wpi::util::SmallVector<double, 9> arr;
-  for (auto&& pose : m_poses) {
-    auto& translation = pose.Translation();
-    arr.push_back(translation.X().value());
-    arr.push_back(translation.Y().value());
-    arr.push_back(pose.Rotation().Degrees().value());
-  }
   if (!m_pub) {
     m_pub = m_topic.Publish();
   }
-  m_pub.Set(arr);
+  m_pub.Set(m_poses);
 }
 
 void NTField2DModel::ObjectModel::SetPoses(
@@ -141,10 +146,17 @@ void NTField2DModel::Update() {
         }
         continue;
       } else if (event.flags & wpi::nt::EventFlags::PUBLISH) {
+        if (!IsPose2dArrayTopic(*info)) {
+          if (match) {
+            m_objects.erase(it);
+          }
+          continue;
+        }
         if (!match) {
           it = m_objects.emplace(
               it, std::make_unique<ObjectModel>(
-                      info->name, wpi::nt::DoubleArrayTopic{info->topic}));
+                      info->name, wpi::nt::StructArrayTopic<wpi::math::Pose2d>{
+                                      info->topic}));
         }
       } else if (!match) {
         continue;
@@ -183,9 +195,10 @@ FieldObjectModel* NTField2DModel::AddFieldObject(std::string_view name) {
   auto fullName = std::format("{}{}", m_path, name);
   auto [it, match] = Find(fullName);
   if (!match) {
-    it = m_objects.emplace(it,
-                           std::make_unique<ObjectModel>(
-                               fullName, m_inst.GetDoubleArrayTopic(fullName)));
+    it = m_objects.emplace(
+        it,
+        std::make_unique<ObjectModel>(
+            fullName, m_inst.GetStructArrayTopic<wpi::math::Pose2d>(fullName)));
   }
   return it->get();
 }

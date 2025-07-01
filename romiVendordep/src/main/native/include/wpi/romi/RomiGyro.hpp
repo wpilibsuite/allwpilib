@@ -5,6 +5,7 @@
 #pragma once
 
 #include "wpi/hal/SimDevice.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
 
@@ -21,7 +22,7 @@ namespace wpi::romi {
  * This class is for the Romi onboard gyro, and will only work in
  * simulation/Romi mode. Only one instance of a RomiGyro is supported.
  */
-class RomiGyro {
+class RomiGyro : public wpi::TelemetryLoggable {
  public:
   RomiGyro();
 
@@ -92,6 +93,9 @@ class RomiGyro {
    * Resets the gyro
    */
   void Reset();
+
+  std::string_view GetTelemetryType() const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
  private:
   hal::SimDevice m_simDevice;

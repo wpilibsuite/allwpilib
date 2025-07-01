@@ -30,6 +30,8 @@ def define_native_wrapper(name, pyproject_toml = None):
         name = name,
         pyproject_toml = pyproject_toml,
         pc_deps = [
+            "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+            "//tunable:native/tunable/robotpy-native-tunable.pc",
             "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
         ],
         libinit_files = libinit_files,
@@ -52,6 +54,8 @@ def define_native_wrapper(name, pyproject_toml = None):
             "{}.copy_headers".format(name),
         ],
         deps = [
+            "//telemetry:robotpy-native-telemetry",
+            "//tunable:robotpy-native-tunable",
             "//wpiutil:robotpy-native-wpiutil",
         ],
         summary = "WPILib Math Library",

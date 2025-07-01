@@ -8,9 +8,9 @@
 #include <vector>
 
 #include "wpi/math/util/ComputerVisionUtil.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/system/Timer.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 
 Drivetrain::Drivetrain() {
   leftLeader.AddFollower(leftFollower);
@@ -33,9 +33,6 @@ Drivetrain::Drivetrain() {
 
   leftEncoder.Reset();
   rightEncoder.Reset();
-
-  wpi::SmartDashboard::PutData("FieldSim", &fieldSim);
-  wpi::SmartDashboard::PutData("Approximation", &fieldApproximation);
 }
 
 void Drivetrain::SetVelocities(
@@ -140,4 +137,7 @@ void Drivetrain::Periodic() {
   UpdateOdometry();
   fieldSim.SetRobotPose(drivetrainSimulator.GetPose());
   fieldApproximation.SetRobotPose(poseEstimator.GetEstimatedPosition());
+
+  wpi::Telemetry::Log("Field", fieldSim);
+  wpi::Telemetry::Log("Approximation", fieldApproximation);
 }

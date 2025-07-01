@@ -202,6 +202,8 @@ PYBIND_PKGCFG_DEPS = [
     "//hal:native/wpihal/robotpy-native-wpihal.pc",
     "//ntcore:native/ntcore/robotpy-native-ntcore.pc",
     "//ntcore:pyntcore.generated_pkgcfg_files",
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//tunable:native/tunable/robotpy-native-tunable.pc",
     "//wpinet:native/wpinet/robotpy-native-wpinet.pc",
     "//wpinet:robotpy-wpinet.generated_pkgcfg_files",
     "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",

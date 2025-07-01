@@ -1,7 +1,7 @@
 # validated: 2024-01-24 DS 192a28af4731 DeferredCommand.java
 from typing import Callable
 
-from wpiutil import SendableBuilder
+from wpilib import TelemetryTable
 
 from .command import Command
 from .commandscheduler import CommandScheduler
@@ -58,14 +58,13 @@ class DeferredCommand(Command):
         self._command.end(interrupted)
         self._command = self._null_command
 
-    def init_sendable(self, builder: SendableBuilder):
-        super().init_sendable(builder)
-        builder.add_string_property(
+    def log_to(self, table: TelemetryTable) -> None:
+        super().log_to(table)
+        table.log(
             "deferred",
-            lambda: (
+            (
                 "null"
                 if self._command is self._null_command
                 else self._command.get_name()
             ),
-            lambda _: None,
         )

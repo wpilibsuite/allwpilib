@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi::cmd;
 
@@ -100,9 +100,7 @@ void ParallelDeadlineGroup::SetDeadline(std::unique_ptr<Command>&& deadline) {
   m_runWhenDisabled &= m_deadline->RunsWhenDisabled();
 }
 
-void ParallelDeadlineGroup::InitSendable(wpi::util::SendableBuilder& builder) {
-  Command::InitSendable(builder);
-
-  builder.AddStringProperty(
-      "deadline", [this] { return m_deadline->GetName(); }, nullptr);
+void ParallelDeadlineGroup::LogTo(wpi::TelemetryTable& table) const {
+  Command::LogTo(table);
+  table.Log("deadline", m_deadline->GetName());
 }

@@ -8,7 +8,7 @@
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/hal/UsageReporting.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
@@ -358,29 +358,31 @@ void SwitchProController::SetRumble(GenericHID::RumbleType type,
 
 
 
-void SwitchProController::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("HID");
-  builder.PublishConstString("ControllerType", "SwitchPro");
-  builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
-  builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
-  builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
-  builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
-  builder.AddDoubleProperty("ZL", [this] { return GetZL(); }, nullptr);
-  builder.AddDoubleProperty("ZR", [this] { return GetZR(); }, nullptr);
-  builder.AddBooleanProperty("B", [this] { return GetBButton(); }, nullptr);
-  builder.AddBooleanProperty("A", [this] { return GetAButton(); }, nullptr);
-  builder.AddBooleanProperty("Y", [this] { return GetYButton(); }, nullptr);
-  builder.AddBooleanProperty("X", [this] { return GetXButton(); }, nullptr);
-  builder.AddBooleanProperty("Minus", [this] { return GetMinusButton(); }, nullptr);
-  builder.AddBooleanProperty("Home", [this] { return GetHomeButton(); }, nullptr);
-  builder.AddBooleanProperty("Plus", [this] { return GetPlusButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftStick", [this] { return GetLeftStickButton(); }, nullptr);
-  builder.AddBooleanProperty("RightStick", [this] { return GetRightStickButton(); }, nullptr);
-  builder.AddBooleanProperty("L", [this] { return GetLButton(); }, nullptr);
-  builder.AddBooleanProperty("R", [this] { return GetRButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadUp", [this] { return GetDpadUpButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadDown", [this] { return GetDpadDownButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadLeft", [this] { return GetDpadLeftButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadRight", [this] { return GetDpadRightButton(); }, nullptr);
-  builder.AddBooleanProperty("Capture", [this] { return GetCaptureButton(); }, nullptr);
+std::string_view SwitchProController::GetTelemetryType() const {
+  return "HID:SwitchPro";
+}
+
+void SwitchProController::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("LeftX", GetLeftX());
+  table.Log("LeftY", GetLeftY());
+  table.Log("RightX", GetRightX());
+  table.Log("RightY", GetRightY());
+  table.Log("ZL", GetZL());
+  table.Log("ZR", GetZR());
+  table.Log("BButton", GetBButton());
+  table.Log("AButton", GetAButton());
+  table.Log("YButton", GetYButton());
+  table.Log("XButton", GetXButton());
+  table.Log("MinusButton", GetMinusButton());
+  table.Log("HomeButton", GetHomeButton());
+  table.Log("PlusButton", GetPlusButton());
+  table.Log("LeftStickButton", GetLeftStickButton());
+  table.Log("RightStickButton", GetRightStickButton());
+  table.Log("LButton", GetLButton());
+  table.Log("RButton", GetRButton());
+  table.Log("DpadUpButton", GetDpadUpButton());
+  table.Log("DpadDownButton", GetDpadDownButton());
+  table.Log("DpadLeftButton", GetDpadLeftButton());
+  table.Log("DpadRightButton", GetDpadRightButton());
+  table.Log("CaptureButton", GetCaptureButton());
 }
