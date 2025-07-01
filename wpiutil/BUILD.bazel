@@ -365,10 +365,10 @@ wpilib_maven_export(
     },
     maven_coordinates = "edu.wpi.first.wpiutil:wpiutil-cpp:" + VERSION,
     osx_artifacts = {
-        "osxuniversal": ":wpiutil_shared_zip-opt-osx",
-        "osxuniversaldebug": ":wpiutil_shared_zip-dbg-osx",
-        "osxuniversalstatic": ":wpiutil_static_zip-opt-osx",
-        "osxuniversalstaticdebug": ":wpiutil_static_zip-dbg-osx",
+        "osxuniversal": ":wpiutil_shared_zip-opt-osxuniversal",
+        "osxuniversaldebug": ":wpiutil_shared_zip-dbg-osxuniversal",
+        "osxuniversalstatic": ":wpiutil_static_zip-opt-osxuniversal",
+        "osxuniversalstaticdebug": ":wpiutil_static_zip-dbg-osxuniversal",
     },
     visibility = ["//visibility:public"],
     windows_artifacts = {
