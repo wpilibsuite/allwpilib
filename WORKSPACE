@@ -16,10 +16,10 @@ http_archive(
 
 http_archive(
     name = "build_bazel_apple_support",
-    sha256 = "b265beacfa477081caaf2bd05978ee7d11fdb8c202a1b76d0ef28d901d1e7b33",
-    url = "https://github.com/bazelbuild/apple_support/releases/download/1.22.0/apple_support.1.22.0.tar.gz",
     patch_args = ["-p1"],
     patches = ["//:apple_support.patch"],
+    sha256 = "b265beacfa477081caaf2bd05978ee7d11fdb8c202a1b76d0ef28d901d1e7b33",
+    url = "https://github.com/bazelbuild/apple_support/releases/download/1.22.0/apple_support.1.22.0.tar.gz",
 )
 
 http_archive(
