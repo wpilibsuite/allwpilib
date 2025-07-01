@@ -6,6 +6,7 @@ package org.wpilib.math.trajectory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -65,6 +66,18 @@ class TrapezoidProfileTest {
     assertLessThanOrNear(Math.abs(deltaV), maxAccel * kDt, 1e-10);
     assertLessThanOrNear(
         Math.abs(deltaX), Math.abs(state.velocity) * kDt + maxAccel / 2.0 * kDt * kDt, 1e-10);
+  }
+
+  @Test
+  void constraintsRequirePositiveValues() {
+    TrapezoidProfile.Constraints defaults = new TrapezoidProfile.Constraints();
+
+    assertEquals(0.0, defaults.maxVelocity);
+    assertEquals(0.0, defaults.maxAcceleration);
+    assertThrows(IllegalArgumentException.class, () -> new TrapezoidProfile.Constraints(0.0, 1.0));
+    assertThrows(IllegalArgumentException.class, () -> new TrapezoidProfile.Constraints(1.0, 0.0));
+    assertThrows(IllegalArgumentException.class, () -> new TrapezoidProfile.Constraints(-1.0, 1.0));
+    assertThrows(IllegalArgumentException.class, () -> new TrapezoidProfile.Constraints(1.0, -1.0));
   }
 
   @Test

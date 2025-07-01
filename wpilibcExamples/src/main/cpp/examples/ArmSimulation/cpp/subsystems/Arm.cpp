@@ -4,15 +4,12 @@
 
 #include "subsystems/Arm.hpp"
 
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/RobotController.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 #include "wpi/util/Preferences.hpp"
 
 Arm::Arm() {
   encoder.SetDistancePerPulse(kArmEncoderDistPerPulse);
-
-  // Put Mechanism 2d to SmartDashboard
-  wpi::SmartDashboard::PutData("Arm Sim", &mech2d);
 
   // Set the Arm position setpoint and P constant to Preferences if the keys
   // don't already exist
@@ -38,6 +35,9 @@ void Arm::SimulationPeriodic() {
 
   // Update the Mechanism Arm angle based on the simulated arm angle
   arm->SetAngle(armSim.GetAngle());
+
+  // Put Mechanism 2d to Telemetry
+  wpi::Telemetry::Log("Arm Sim", mech2d);
 }
 
 void Arm::LoadPreferences() {

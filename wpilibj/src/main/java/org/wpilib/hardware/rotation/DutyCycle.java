@@ -6,9 +6,8 @@ package org.wpilib.hardware.rotation;
 
 import org.wpilib.hardware.hal.DutyCycleJNI;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Class to read a duty cycle PWM input.
@@ -16,7 +15,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * <p>PWM input signals are specified with a frequency and a ratio of high to low in that frequency.
  * These can be attached to any SmartIO.
  */
-public class DutyCycle implements Sendable, AutoCloseable {
+public class DutyCycle implements TelemetryLoggable, AutoCloseable {
   // Explicitly package private
   final int m_handle;
   private final int m_channel;
@@ -26,19 +25,16 @@ public class DutyCycle implements Sendable, AutoCloseable {
    *
    * @param channel The channel to use.
    */
-  @SuppressWarnings("this-escape")
   public DutyCycle(int channel) {
     m_handle = DutyCycleJNI.initialize(channel);
 
     m_channel = channel;
     HAL.reportUsage("IO", channel, "DutyCycle");
-    SendableRegistry.add(this, "Duty Cycle", channel);
   }
 
   /** Close the DutyCycle and free all resources. */
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     DutyCycleJNI.free(m_handle);
   }
 
@@ -81,9 +77,13 @@ public class DutyCycle implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Duty Cycle");
-    builder.addDoubleProperty("Frequency", this::getFrequency, null);
-    builder.addDoubleProperty("Output", this::getOutput, null);
+  public void logTo(TelemetryTable table) {
+    table.log("Frequency", getFrequency());
+    table.log("Output", getOutput());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Duty Cycle";
   }
 }

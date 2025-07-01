@@ -9,15 +9,12 @@
 #include <vector>
 
 #include "wpi/hardware/motor/MotorController.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
-class PyMotorControllerGroup
-    : public wpi::util::Sendable,
-      public MotorController,
-      public wpi::util::SendableHelper<PyMotorControllerGroup> {
+class PyMotorControllerGroup : public MotorController,
+                               public wpi::TelemetryLoggable {
  public:
   explicit PyMotorControllerGroup(
       std::vector<std::shared_ptr<wpi::MotorController>>&& args)
@@ -34,11 +31,10 @@ class PyMotorControllerGroup
   bool GetInverted() const override;
   void Disable() override;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+  std::string_view GetTelemetryType() const override;
 
  private:
-  void Initialize();
-
   bool m_isInverted = false;
   std::vector<std::shared_ptr<wpi::MotorController>> m_motorControllers;
 };

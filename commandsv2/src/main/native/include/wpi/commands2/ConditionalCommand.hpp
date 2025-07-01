@@ -73,7 +73,7 @@ class ConditionalCommand : public CommandHelper<Command, ConditionalCommand> {
 
   InterruptionBehavior GetInterruptionBehavior() const override;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
  private:
   std::unique_ptr<Command> m_onTrue;

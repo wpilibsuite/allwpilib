@@ -65,6 +65,10 @@ class MyRobot(commands2.TimedCommandRobot):
         # autonomous chooser on the dashboard.
         self.container = RobotContainer()
 
+    def robot_periodic(self) -> None:
+        super().robot_periodic()
+        wpilib.Telemetry.log("", self.container)
+
     def disabled_init(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
 

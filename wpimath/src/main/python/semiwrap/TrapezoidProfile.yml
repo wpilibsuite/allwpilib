@@ -48,12 +48,7 @@ classes:
       {
       std::string clsNameCopy = clsName;
 
-      cls_Constraints
-        .def("__repr__", [clsNameCopy](const Constraints &self) {
-          return clsNameCopy + ".Constraints("
-            "max_velocity=" + std::to_string(self.maxVelocity()) + ", "
-            "max_acceleration=" + std::to_string(self.maxAcceleration()) + ")";
-        });
+      cls_TrapezoidProfile.attr("Constraints") = py::type::of<Constraints>();
 
       cls_State
         .def(
@@ -67,21 +62,29 @@ classes:
             "velocity=" + std::to_string(self.velocity()) + ")";
         });
       }
-  wpi::math::TrapezoidProfile::Constraints:
+  wpi::math::detail::TrapezoidProfileConstraints:
+    template_params:
+    - Distance
     attributes:
       maxVelocity:
       maxAcceleration:
     methods:
-      Constraints:
+      TrapezoidProfileConstraints:
         overloads:
           '':
-            ignore: true
           Velocity_t, Acceleration_t:
             param_override:
               maxVelocity:
                 default: '0'
               maxAcceleration:
                 default: '0'
+    template_inline_code: |
+      cls_TrapezoidProfileConstraints
+        .def("__repr__", [](const wpi::math::detail::TrapezoidProfileConstraints<Distance>& self) {
+          return "TrapezoidProfile.Constraints("
+            "max_velocity=" + std::to_string(self.maxVelocity()) + ", "
+            "max_acceleration=" + std::to_string(self.maxAcceleration()) + ")";
+        });
   wpi::math::TrapezoidProfile::State:
     force_no_default_constructor: true
     attributes:
@@ -98,6 +101,16 @@ classes:
     methods:
       operator==:
 templates:
+  _TrapezoidProfileConstraints:
+    qualname: wpi::math::detail::TrapezoidProfileConstraints
+    params:
+    - wpi::units::dimensionless::scalar
+
+  _TrapezoidProfileRadiansConstraints:
+    qualname: wpi::math::detail::TrapezoidProfileConstraints
+    params:
+    - wpi::units::radian
+
   TrapezoidProfile:
     qualname: wpi::math::TrapezoidProfile
     params:

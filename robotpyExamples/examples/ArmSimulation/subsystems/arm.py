@@ -63,8 +63,6 @@ class Arm:
         # Subsystem constructor.
         self.encoder.set_distance_per_pulse(Constants.ARM_ENCODER_DIST_PER_PULSE)
 
-        # Put Mechanism 2d to SmartDashboard
-        wpilib.SmartDashboard.put_data("Arm Sim", self.mech2d)
         self.arm_tower.set_color(wpiutil.Color8Bit(wpiutil.Color.BLUE))
 
         # Set the Arm position setpoint and P constant to Preferences if the keys don't already exist
@@ -94,6 +92,9 @@ class Arm:
         self.arm_ligament.set_angle(
             wpimath.units.radians_to_degrees(self.arm_sim.get_angle())
         )
+
+        # Publish the Mechanism2d visualization through telemetry.
+        wpilib.Telemetry.log("Arm Sim", self.mech2d)
 
     def load_preferences(self) -> None:
         # Read Preferences for Arm setpoint and kP on entering Teleop

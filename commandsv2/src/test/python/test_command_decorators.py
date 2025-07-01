@@ -202,3 +202,11 @@ def test_with_name(scheduler: commands2.CommandScheduler):
     name = "Named"
     named = command.with_name(name)
     assert named.get_name() == name
+
+
+def test_default_subsystem(scheduler: commands2.CommandScheduler):
+    command = commands2.Command()
+    assert command.get_subsystem() == "Ungrouped"
+
+    command.set_subsystem("Drive")
+    assert command.get_subsystem() == "Drive"

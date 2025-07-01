@@ -45,6 +45,11 @@ namespace {
 
 enum DisplayUnits { kDisplayMeters = 0, kDisplayFeet, kDisplayInches };
 
+constexpr const char* NT_POSE2D_DRAG_DROP_TYPE = "NT:struct:Pose2d";
+constexpr const char* NT_POSE2D_ARRAY_DRAG_DROP_TYPE = "NT:struct:Pose2d[]";
+constexpr std::string_view POSE2D_TYPE = "struct:Pose2d";
+constexpr std::string_view POSE2D_ARRAY_TYPE = "struct:Pose2d[]";
+
 // Per-frame field data (not persistent)
 struct FieldFrameData {
   wpi::math::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
@@ -284,6 +289,39 @@ static double ConvertDisplayLength(wpi::units::meter_t v) {
 
 static double ConvertDisplayAngle(wpi::units::degree_t v) {
   return v.value();
+}
+
+static std::string_view GetDefaultObjectName(std::string_view path) {
+  auto pos = path.find_last_of('/');
+  if (pos == std::string_view::npos || pos + 1 >= path.size()) {
+    return path;
+  }
+  return path.substr(pos + 1);
+}
+
+static void AcceptFieldObjectDropPayload(Field2DModel* model,
+                                         const char* dragDropType,
+                                         std::string_view type) {
+  if (const ImGuiPayload* payload =
+          ImGui::AcceptDragDropPayload(dragDropType)) {
+    std::string_view data{static_cast<const char*>(payload->Data),
+                          static_cast<size_t>(payload->DataSize)};
+    if (!data.empty()) {
+      model->AddFieldObject(GetDefaultObjectName(data), data, type);
+    }
+  }
+}
+
+static void AcceptFieldObjectDrop(Field2DModel* model) {
+  if (!ImGui::BeginDragDropTarget()) {
+    return;
+  }
+
+  AcceptFieldObjectDropPayload(model, NT_POSE2D_DRAG_DROP_TYPE, POSE2D_TYPE);
+  AcceptFieldObjectDropPayload(model, NT_POSE2D_ARRAY_DRAG_DROP_TYPE,
+                               POSE2D_ARRAY_TYPE);
+
+  ImGui::EndDragDropTarget();
 }
 
 static bool InputLength(const char* label, wpi::units::meter_t* v,
@@ -990,6 +1028,7 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
   m_mousePos = ImGui::GetIO().MousePos;
   m_drawList = ImGui::GetWindowDrawList();
   m_isHovered = ImGui::IsItemHovered();
+  AcceptFieldObjectDrop(model);
 
   // field
   field->LoadImage();
@@ -1043,7 +1082,10 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
   }
 
   // right-click popup for editing
-  if (m_isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+  bool canEditTarget = target && !target->objModel->IsReadOnly();
+  bool canInsertTarget = !target && !model->IsReadOnly();
+  if ((canEditTarget || canInsertTarget) && m_isHovered &&
+      ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
     gPopupState.Open(target, m_ffd.GetPosFromScreen(m_mousePos));
     ImGui::OpenPopup("edit");
   }
@@ -1079,6 +1121,7 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
   obj.LoadImage();
 
   auto displayOptions = obj.GetDisplayOptions();
+  bool readOnly = model.IsReadOnly();
 
   m_centerLine.resize(0);
   m_leftLine.resize(0);
@@ -1094,7 +1137,7 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
     PoseFrameData pfd{pose, model, i, m_ffd, displayOptions};
 
     // check for potential drag targets
-    if (displayOptions.selectable && m_isHovered &&
+    if (!readOnly && displayOptions.selectable && m_isHovered &&
         !gDragState.target.objModel) {
       auto [corner, dist] = pfd.IsHovered(m_mousePos);
       if (corner > 0) {
@@ -1105,7 +1148,8 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
     }
 
     // handle active dragging of this object
-    if (gDragState.target.objModel == &model && gDragState.target.index == i) {
+    if (!readOnly && gDragState.target.objModel == &model &&
+        gDragState.target.index == i) {
       pfd.HandleDrag(m_mousePos);
     }
 
@@ -1196,6 +1240,9 @@ void PopupState::DisplayInsert(Field2DModel* model) {
       ImGui::SetItemDefaultFocus();
     }
     model->ForEachFieldObject([&](auto& objModel, auto name) {
+      if (objModel.IsReadOnly()) {
+        return;
+      }
       bool selected = m_insertModel == &objModel;
       if (ImGui::Selectable(name.data(), selected)) {
         m_insertModel = &objModel;

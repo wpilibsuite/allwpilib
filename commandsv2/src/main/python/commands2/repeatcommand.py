@@ -1,7 +1,7 @@
 # validated: 2024-01-19 DS 6e58db398d63 RepeatCommand.java
 from __future__ import annotations
 
-from wpiutil import SendableBuilder
+from wpilib import TelemetryTable
 
 from .command import Command, InterruptionBehavior
 from .commandscheduler import CommandScheduler
@@ -63,6 +63,6 @@ class RepeatCommand(Command):
     def get_interruption_behavior(self) -> InterruptionBehavior:
         return self._command.get_interruption_behavior()
 
-    def init_sendable(self, builder: SendableBuilder) -> None:
-        super().init_sendable(builder)
-        builder.add_string_property("command", self._command.get_name, lambda _: None)
+    def log_to(self, table: TelemetryTable) -> None:
+        super().log_to(table)
+        table.log("command", self._command.get_name())

@@ -105,8 +105,8 @@ public class LoggerGenerator {
   /**
    * Generates the logger class used to handle data objects of the given type. The generated logger
    * class will subclass from {@link org.wpilib.epilogue.logging.ClassSpecificLogger} and implement
-   * the {@code update()} method to populate a data log with information from an instance of the
-   * data type.
+   * the {@code update()} method to populate telemetry with information from an instance of the data
+   * type.
    *
    * @param clazz the data type that the logger should support.
    * @throws IOException if the file could not be written
@@ -214,7 +214,7 @@ public class LoggerGenerator {
       out.println("import org.wpilib.epilogue.Logged;");
       out.println("import org.wpilib.epilogue.Epilogue;");
       out.println("import org.wpilib.epilogue.logging.ClassSpecificLogger;");
-      out.println("import org.wpilib.epilogue.logging.EpilogueBackend;");
+      out.println("import org.wpilib.telemetry.TelemetryTable;");
       if (requiresVarHandles) {
         out.println("import java.lang.invoke.MethodHandles;");
         out.println("import java.lang.invoke.VarHandle;");
@@ -301,10 +301,9 @@ public class LoggerGenerator {
       out.println();
 
       // @Override
-      // public void update(EpilogueBackend backend, Foo object) {
+      // public void update(TelemetryTable table, Foo object) {
       out.println("  @Override");
-      out.println(
-          "  public void update(EpilogueBackend backend, " + simpleClassName + " object) {");
+      out.println("  public void update(TelemetryTable table, " + simpleClassName + " object) {");
 
       // Build a map of importance levels to the fields logged at those levels
       // e.g. { DEBUG: [fieldA, fieldB], INFO: [fieldC], CRITICAL: [fieldD, fieldE, fieldF] }

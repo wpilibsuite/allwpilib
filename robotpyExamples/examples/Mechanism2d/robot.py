@@ -46,15 +46,15 @@ class MyRobot(wpilib.TimedRobot):
             "wrist", 0.5, 90, 6, wpiutil.Color8Bit(wpiutil.Color.PURPLE)
         )
 
-        # post the mechanism to the dashboard
-        wpilib.SmartDashboard.put_data("Mech2d", self.mech)
-
     def robot_periodic(self):
         # update the dashboard mechanism's state
         self.elevator.set_length(
             self.ELEVATOR_MINIMUM_LENGTH + self.elevator_encoder.get_distance()
         )
         self.wrist.set_angle(self.wrist_pot.get())
+
+        # post the mechanism to the dashboard
+        wpilib.Telemetry.log("Mech2d", self.mech)
 
     def teleop_periodic(self):
         self.elevator_motor.set_throttle(self.joystick.get_raw_axis(0))

@@ -9,9 +9,10 @@ import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;
 import org.wpilib.hardware.hal.SimDouble;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.internal.UnitTelemetry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.units.Units;
 
 /**
  * SharpIR analog distance sensor class. These distance measuring sensors output an analog voltage
@@ -21,7 +22,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * not be mounted on a metallic surface on an FRC robot.
  */
 @SuppressWarnings("MethodName")
-public class SharpIR implements Sendable, AutoCloseable {
+public class SharpIR implements TelemetryLoggable, AutoCloseable {
   private AnalogInput m_sensor;
 
   private SimDevice m_simDevice;
@@ -82,7 +83,6 @@ public class SharpIR implements Sendable, AutoCloseable {
    * @param min Minimum distance to report in meters
    * @param max Maximum distance to report in meters
    */
-  @SuppressWarnings("this-escape")
   public SharpIR(int channel, double a, double b, double min, double max) {
     m_sensor = new AnalogInput(channel);
 
@@ -92,7 +92,6 @@ public class SharpIR implements Sendable, AutoCloseable {
     m_max = max;
 
     HAL.reportUsage("IO", channel, "SharpIR");
-    SendableRegistry.add(this, "SharpIR", channel);
 
     m_simDevice = SimDevice.create("SharpIR", m_sensor.getChannel());
     if (m_simDevice != null) {
@@ -103,7 +102,6 @@ public class SharpIR implements Sendable, AutoCloseable {
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     m_sensor.close();
     m_sensor = null;
 
@@ -140,8 +138,12 @@ public class SharpIR implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Ultrasonic");
-    builder.addDoubleProperty("Value", this::getRange, null);
+  public void logTo(TelemetryTable table) {
+    UnitTelemetry.log(table, "Value", getRange(), Units.Meters);
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Ultrasonic";
   }
 }

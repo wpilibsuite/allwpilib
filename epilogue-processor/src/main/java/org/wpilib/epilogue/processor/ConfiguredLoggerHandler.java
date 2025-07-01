@@ -42,7 +42,7 @@ public class ConfiguredLoggerHandler extends ElementHandler {
 
     return "Epilogue."
         + loggerType.toString().replace('.', '_')
-        + ".tryUpdate(backend.getNested(\""
+        + ".tryUpdate(table.getTable(\""
         + loggedName(element)
         + "\"), "
         + elementAccess(element, loggedClass)

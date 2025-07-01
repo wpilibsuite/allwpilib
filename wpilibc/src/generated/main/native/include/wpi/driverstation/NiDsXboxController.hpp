@@ -10,8 +10,7 @@
 
 #include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/driverstation/HIDDevice.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -27,10 +26,7 @@ namespace wpi {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class NiDsXboxController
-    : public HIDDevice,
-      public wpi::util::Sendable,
-      public wpi::util::SendableHelper<NiDsXboxController> {
+class NiDsXboxController : public HIDDevice, public wpi::TelemetryLoggable {
  public:
   /**
    * Construct an instance of a controller.
@@ -552,7 +548,8 @@ class NiDsXboxController
    */
   void SetRumble(GenericHID::RumbleType type, double value);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  std::string_view GetTelemetryType() const override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
  private:
   GenericHID* m_hid;

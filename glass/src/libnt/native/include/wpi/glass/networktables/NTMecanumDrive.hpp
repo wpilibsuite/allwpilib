@@ -10,10 +10,8 @@
 
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/other/Drive.hpp"
-#include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/nt/StringTopic.hpp"
 
 namespace wpi::glass {
 class NTMecanumDriveModel : public DriveModel {
@@ -34,19 +32,16 @@ class NTMecanumDriveModel : public DriveModel {
 
   void Update() override;
   bool Exists() override;
-  bool IsReadOnly() override { return !m_controllableValue; }
+  bool IsReadOnly() override;
 
  private:
   wpi::nt::NetworkTableInstance m_inst;
-  wpi::nt::StringSubscriber m_name;
-  wpi::nt::BooleanSubscriber m_controllable;
   wpi::nt::DoubleEntry m_flPercent;
   wpi::nt::DoubleEntry m_frPercent;
   wpi::nt::DoubleEntry m_rlPercent;
   wpi::nt::DoubleEntry m_rrPercent;
 
   std::string m_nameValue;
-  bool m_controllableValue = false;
   DoubleSource m_flPercentData;
   DoubleSource m_frPercentData;
   DoubleSource m_rlPercentData;

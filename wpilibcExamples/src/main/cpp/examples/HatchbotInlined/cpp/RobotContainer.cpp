@@ -4,21 +4,19 @@
 
 #include "RobotContainer.hpp"
 
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
+#include "wpi/tunable/Tunables.hpp"
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
   // Add commands to the autonomous command chooser
   // Note that we do *not* move ownership into the chooser
-  chooser.SetDefaultOption("Simple Auto", simpleAuto.get());
-  chooser.AddOption("Complex Auto", complexAuto.get());
+  chooser.AddDefault("Simple Auto", simpleAuto.get());
+  chooser.Add("Complex Auto", complexAuto.get());
 
   // Put the chooser on the dashboard
-  wpi::SmartDashboard::PutData("Autonomous", &chooser);
-  // Put subsystems to dashboard.
-  wpi::SmartDashboard::PutData("Drivetrain", &drive);
-  wpi::SmartDashboard::PutData("HatchSubsystem", &hatch);
+  wpi::Tunables::Publish("Autonomous", chooser);
 
   // Configure the button bindings
   ConfigureButtonBindings();
@@ -48,4 +46,11 @@ void RobotContainer::ConfigureButtonBindings() {
 wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
   return chooser.GetSelected();
+}
+
+void RobotContainer::UpdateTelemetry() const {
+  // Update the telemetry for all subsystems
+  // Put subsystems to dashboard.
+  wpi::Telemetry::Log("Drivetrain", drive);
+  wpi::Telemetry::Log("HatchSubsystem", hatch);
 }

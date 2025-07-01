@@ -185,6 +185,8 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":nanopb-generated-headers",
+        "//telemetry",
+        "//tunable",
         "//wpiutil",
     ],
 )
@@ -205,6 +207,8 @@ wpilib_cc_shared_library(
     name = "shared/wpimath",
     auto_export_windows_symbols = False,
     dynamic_deps = [
+        "//telemetry:shared/telemetry",
+        "//tunable:shared/tunable",
         "//wpiutil:shared/wpiutil",
     ],
     visibility = ["//visibility:public"],
@@ -217,6 +221,8 @@ wpilib_cc_shared_library(
 wpilib_cc_static_library(
     name = "static/wpimath",
     static_deps = [
+        "//telemetry:static/telemetry",
+        "//tunable:static/tunable",
         "//wpiutil:static/wpiutil",
     ],
     visibility = ["//visibility:public"],
@@ -240,6 +246,8 @@ wpilib_cc_shared_library(
     auto_export_windows_symbols = False,
     dynamic_deps = [
         ":shared/wpimath",
+        "//telemetry:shared/telemetry",
+        "//tunable:shared/tunable",
         "//wpiutil:shared/wpiutil",
     ],
     use_debug_name = False,
@@ -264,6 +272,8 @@ wpilib_jni_java_library(
     resources = glob(["src/main/proto/**"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//telemetry:telemetry-java",
+        "//tunable:tunable-java",
         "//wpiannotations",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
@@ -304,6 +314,8 @@ wpilib_java_junit5_test(
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":wpimath-java",
+        "//telemetry:telemetry-java",
+        "//tunable:tunable-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
         "@maven//:io_avaje_avaje_jsonb",
@@ -326,6 +338,7 @@ java_binary(
     main_class = "org.wpilib.math.DevMain",
     deps = [
         ":wpimath-java",
+        "//telemetry:telemetry-java",
     ],
 )
 
@@ -361,6 +374,10 @@ define_native_wrapper(
 )
 
 PYBIND_PKGCFG_DEPS = [
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//telemetry:robotpy-telemetry.generated_pkgcfg_files",
+    "//tunable:native/tunable/robotpy-native-tunable.pc",
+    "//tunable:robotpy-tunable.generated_pkgcfg_files",
     "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
     "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
     "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
@@ -387,17 +404,23 @@ define_pybind_library(
     pkgcfgs = PYBIND_PKGCFG_DEPS,
 )
 
+TEST_PYBIND_PKGCFG_DEPS = [
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//telemetry:robotpy-telemetry.generated_pkgcfg_files",
+    "//tunable:native/tunable/robotpy-native-tunable.pc",
+    "//tunable:robotpy-tunable.generated_pkgcfg_files",
+    "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
+    "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
+]
+
 generate_robotpy_pybind_build_info(
     name = "robotpy-wpimath_test-generator",
     additional_srcs = ["src/test/python/cpp/wpimath_test/include/module.h"],
     generated_file_name = "robotpy_pybind_test_info.bzl",
     package_root_file = "src/test/python/cpp/wpimath_test/__init__.py",
-    pkgcfgs = [
-        "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
-        "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
-        "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
-        "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
-    ],
+    pkgcfgs = TEST_PYBIND_PKGCFG_DEPS,
     pyproject_toml = "src/test/python/cpp/pyproject.toml",
     stripped_include_prefix = "src/test/python/cpp",
     yaml_files = glob(["src/test/python/cpp/semiwrap/**/*.yml"]),
@@ -414,12 +437,7 @@ wpimath_test_extension(
 define_test_pybind_library(
     name = "robotpy-wpimath-test",
     extra_pybind_hdrs = glob(["src/test/python/cpp/**/*.h"]),
-    pkgcfgs = [
-        "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
-        "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
-        "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
-        "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
-    ],
+    pkgcfgs = TEST_PYBIND_PKGCFG_DEPS,
 )
 
 robotpy_py_test(
@@ -431,6 +449,8 @@ robotpy_py_test(
     deps = [
         ":robotpy-wpimath",
         ":robotpy-wpimath-test",
+        "//telemetry:robotpy-telemetry",
+        "//tunable:robotpy-tunable",
         requirement("numpy"),
         requirement("pytest"),
     ],

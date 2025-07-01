@@ -14,7 +14,7 @@ classes:
         ignore: true
       MechanismObject2d:
         ignore: true
-      UpdateEntries:
+      LogTo:
 
 # keep this in sync with MechanismRoot2d.yml
 inline_code: |-

@@ -31,3 +31,10 @@ class HatchSubsystem(commands2.Subsystem):
         return commands2.cmd.run_once(
             lambda: self.hatch_solenoid.set(wpilib.DoubleSolenoid.Value.REVERSE), self
         )
+
+    def log_to(self, table: wpilib.TelemetryTable) -> None:
+        super().log_to(table)
+        table.log(
+            "extended",
+            self.hatch_solenoid.get() == wpilib.DoubleSolenoid.Value.FORWARD,
+        )

@@ -7,7 +7,7 @@ package org.wpilib.command2;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * A command composition that runs a set of commands in parallel, ending only when a specific
@@ -145,9 +145,8 @@ public class ParallelDeadlineGroup extends Command {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-
-    builder.addStringProperty("deadline", m_deadline::getName, null);
+  public void logTo(TelemetryTable table) {
+    super.logTo(table);
+    table.log("deadline", m_deadline.getName());
   }
 }

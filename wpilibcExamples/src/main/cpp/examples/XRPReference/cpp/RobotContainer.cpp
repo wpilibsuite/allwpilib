@@ -7,7 +7,7 @@
 #include "commands/TeleopArcadeDrive.hpp"
 #include "wpi/commands2/Commands.hpp"
 #include "wpi/commands2/button/JoystickButton.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/tunable/Tunables.hpp"
 
 RobotContainer::RobotContainer() {
   // Configure the button bindings
@@ -32,10 +32,10 @@ void RobotContainer::ConfigureButtonBindings() {
       .OnTrue(wpi::cmd::RunOnce([this] { arm.SetAngle(90_deg); }, {}))
       .OnFalse(wpi::cmd::RunOnce([this] { arm.SetAngle(0_deg); }, {}));
 
-  // Setup SmartDashboard options.
-  chooser.SetDefaultOption("Auto Routine Distance", &autoDistance);
-  chooser.AddOption("Auto Routine Time", &autoTime);
-  wpi::SmartDashboard::PutData("Auto Selector", &chooser);
+  // Setup chooser options.
+  chooser.AddDefault("Auto Routine Distance", &autoDistance);
+  chooser.Add("Auto Routine Time", &autoTime);
+  wpi::Tunables::Publish("Auto Selector", chooser);
 }
 
 wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {

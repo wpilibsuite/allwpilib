@@ -26,3 +26,10 @@ class HatchSubsystem(commands2.Subsystem):
     def release_hatch(self) -> None:
         """Releases the hatch"""
         self.hatch_solenoid.set(wpilib.DoubleSolenoid.Value.REVERSE)
+
+    def log_to(self, table: wpilib.TelemetryTable) -> None:
+        super().log_to(table)
+        table.log(
+            "extended",
+            self.hatch_solenoid.get() == wpilib.DoubleSolenoid.Value.FORWARD,
+        )

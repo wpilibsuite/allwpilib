@@ -77,6 +77,8 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//ntcore",
+        "//telemetry",
+        "//tunable",
         "//wpilibc",
         "//wpinet",
     ],
@@ -87,6 +89,8 @@ wpilib_cc_shared_library(
     dynamic_deps = [
         "//hal:shared/wpiHal",
         "//ntcore:shared/ntcore",
+        "//telemetry:shared/telemetry",
+        "//tunable:shared/tunable",
         "//wpilibc:shared/wpilibc",
         "//wpimath:shared/wpimath",
         "//wpinet:shared/wpinet",
@@ -100,6 +104,8 @@ wpilib_cc_static_library(
     name = "static/commandsv2",
     static_deps = [
         "//ntcore:static/ntcore",
+        "//telemetry:static/telemetry",
+        "//tunable:static/tunable",
         "//wpilibc:static/wpilibc",
         "//wpinet:static/wpinet",
     ],
@@ -118,6 +124,8 @@ wpilib_java_library(
     deps = [
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunable:tunable-java",
         "//wpiannotations",
         "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",
@@ -153,6 +161,8 @@ wpilib_java_junit5_test(
         ":commandsv2-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunable:tunable-java",
         "//wpiannotations",
         "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",

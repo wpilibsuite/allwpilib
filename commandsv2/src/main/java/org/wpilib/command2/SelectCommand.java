@@ -8,7 +8,7 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.Map;
 import java.util.function.Supplier;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * A command composition that runs one of a selection of commands using a selector and a key to
@@ -88,10 +88,8 @@ public class SelectCommand<K> extends Command {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-
-    builder.addStringProperty(
-        "selected", () -> m_selectedCommand == null ? "null" : m_selectedCommand.getName(), null);
+  public void logTo(TelemetryTable table) {
+    super.logTo(table);
+    table.log("selected", m_selectedCommand == null ? "null" : m_selectedCommand.getName());
   }
 }

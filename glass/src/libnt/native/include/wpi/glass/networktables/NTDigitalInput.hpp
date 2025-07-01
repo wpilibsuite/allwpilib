@@ -4,14 +4,12 @@
 
 #pragma once
 
-#include <string>
 #include <string_view>
 
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/hardware/DIO.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/nt/StringTopic.hpp"
 
 namespace wpi::glass {
 
@@ -23,8 +21,6 @@ class NTDigitalInputModel : public DIOModel {
   explicit NTDigitalInputModel(std::string_view path);
   NTDigitalInputModel(wpi::nt::NetworkTableInstance inst,
                       std::string_view path);
-
-  const char* GetName() const override { return m_nameValue.c_str(); }
 
   const char* GetSimDevice() const override { return nullptr; }
 
@@ -45,10 +41,8 @@ class NTDigitalInputModel : public DIOModel {
  private:
   wpi::nt::NetworkTableInstance m_inst;
   wpi::nt::BooleanSubscriber m_value;
-  wpi::nt::StringSubscriber m_name;
 
   BooleanSource m_valueData;
-  std::string m_nameValue;
 };
 
 }  // namespace wpi::glass

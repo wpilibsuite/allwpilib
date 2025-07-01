@@ -87,7 +87,6 @@ class Drivetrain:
         self.right_encoder.reset()
 
         self.right_leader.set_inverted(True)
-        wpilib.SmartDashboard.put_data("Field", self.field_sim)
 
     def set_velocities(
         self, velocities: wpimath.DifferentialDriveWheelVelocities
@@ -167,3 +166,5 @@ class Drivetrain:
         """Update odometry - this should be run every robot loop."""
         self.update_odometry()
         self.field_sim.set_robot_pose(self.odometry.get_pose())
+
+        wpilib.Telemetry.log("Field", self.field_sim)

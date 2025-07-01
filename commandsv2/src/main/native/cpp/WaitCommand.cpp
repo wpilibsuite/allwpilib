@@ -6,7 +6,7 @@
 
 #include <format>
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi::cmd;
 
@@ -30,8 +30,7 @@ bool WaitCommand::RunsWhenDisabled() const {
   return true;
 }
 
-void WaitCommand::InitSendable(wpi::util::SendableBuilder& builder) {
-  Command::InitSendable(builder);
-  builder.AddDoubleProperty(
-      "duration", [this] { return m_duration.value(); }, nullptr);
+void WaitCommand::LogTo(wpi::TelemetryTable& table) const {
+  Command::LogTo(table);
+  table.Log("duration", m_duration);
 }
