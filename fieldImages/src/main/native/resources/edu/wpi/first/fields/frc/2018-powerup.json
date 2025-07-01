@@ -1,19 +1,19 @@
 {
-  "game": "2021 FRC Barrel Racing Path",
-  "field-image": "2021-frc-barrelracingpath.png",
+  "game": "frc/2018 FRC Power Up",
+  "field-image": "frc/2018-powerup.jpg",
   "field-corners": {
     "top-left": [
-      20,
+      125,
       20
     ],
     "bottom-right": [
-      780,
-      400
+      827,
+      370
     ]
   },
   "field-size": [
-    30,
-    15
+    54,
+    27
   ],
   "field-unit": "foot"
 }

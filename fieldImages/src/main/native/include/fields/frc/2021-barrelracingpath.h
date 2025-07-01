@@ -7,6 +7,6 @@
 #include <string_view>
 
 namespace fields {
-std::string_view GetResource_2021_frc_barrelracingpath_json();
-std::string_view GetResource_2021_frc_barrelracingpath_png();
+std::string_view GetResource_2021_barrelracingpath_json();
+std::string_view GetResource_2021_barrelracingpath_png();
 }  // namespace fields

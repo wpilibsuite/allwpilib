@@ -1,19 +1,19 @@
 {
-  "game": "2018 FRC Power Up",
-  "field-image": "2018-frc-powerup.jpg",
+  "game": "frc/2021 FRC Bounce Path",
+  "field-image": "frc/2021-bouncepath.png",
   "field-corners": {
     "top-left": [
-      125,
+      20,
       20
     ],
     "bottom-right": [
-      827,
-      370
+      780,
+      400
     ]
   },
   "field-size": [
-    54,
-    27
+    30,
+    15
   ],
   "field-unit": "foot"
 }

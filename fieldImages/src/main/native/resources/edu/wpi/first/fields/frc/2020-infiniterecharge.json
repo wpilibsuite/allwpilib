@@ -1,14 +1,14 @@
 {
-  "game": "2021 FRC Infinite Recharge",
-  "field-image": "2021-frc-infiniterecharge.png",
+  "game": "frc/2020 FRC Infinite Recharge",
+  "field-image": "frc/2020-infiniterecharge.png",
   "field-corners": {
     "top-left": [
-      127,
-      34
+      96,
+      25
     ],
     "bottom-right": [
-      1323,
-      649
+      1040,
+      514
     ]
   },
   "field-size": [

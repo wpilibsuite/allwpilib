@@ -7,6 +7,6 @@
 #include <string_view>
 
 namespace fields {
-std::string_view GetResource_2024_frc_crescendo_json();
-std::string_view GetResource_2024_frc_crescendo_png();
+std::string_view GetResource_2022_rapidreact_json();
+std::string_view GetResource_2022_rapidreact_png();
 }  // namespace fields

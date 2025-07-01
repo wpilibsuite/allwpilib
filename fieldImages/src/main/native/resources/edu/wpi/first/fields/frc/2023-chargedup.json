@@ -1,19 +1,19 @@
 {
-  "game": "2024 FRC Crescendo",
-  "field-image": "2024-frc-crescendo.png",
+  "game": "frc/2023 FRC Charged Up",
+  "field-image": "frc/2023-chargedup.png",
   "field-corners": {
     "top-left": [
-      150,
-      79
+      46,
+      36
     ],
     "bottom-right": [
-      2961,
-      1476
+      1088,
+      544
     ]
   },
   "field-size": [
     54.27083,
-    26.9375
+    26.2916
   ],
   "field-unit": "foot"
 }

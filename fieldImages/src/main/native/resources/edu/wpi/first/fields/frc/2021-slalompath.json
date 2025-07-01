@@ -1,6 +1,6 @@
 {
-  "game": "2021 FRC Galactic Search B",
-  "field-image": "2021-frc-galacticsearchb.png",
+  "game": "frc/2021 FRC Slalom Path",
+  "field-image": "frc/2021-slalompath.png",
   "field-corners": {
     "top-left": [
       20,
