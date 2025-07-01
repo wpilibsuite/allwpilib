@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 
 wpilib_cc_library(
     name = "halsim_gui",
@@ -53,6 +53,20 @@ wpilib_cc_library(
     deps = [
         "//glass:libglassnt",
         "//hal:wpiHal",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/halsim_gui",
+    dynamic_deps = [
+        "//hal:shared/wpiHal",
+        "//wpimath:shared/wpimath",
+        "//datalog:shared/datalog",
+        "//ntcore:shared/ntcore",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":halsim_gui",
     ],
 )
 

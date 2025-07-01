@@ -1,9 +1,99 @@
-load("@rules_cc//cc:action_names.bzl", "CPP_LINK_STATIC_LIBRARY_ACTION_NAME")
+load("@rules_cc//cc:action_names.bzl", "CPP_LINK_STATIC_LIBRARY_ACTION_NAME", "OBJ_COPY_ACTION_NAME", "STRIP_ACTION_NAME")
 load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_library")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_ATTRS", "find_cpp_toolchain", "use_cc_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
+
+def _split_debug_symbols_impl(ctx):
+    lib = ctx.outputs.output
+    debug = ctx.outputs.output_debug
+    outputs = [lib]
+
+    if ctx.attr.copy:
+        ctx.actions.run_shell(
+            command = " ".join([
+                "cp",
+                ctx.file.shared_library.path,
+                lib.path,
+                "&& touch",
+                debug.path,
+            ]),
+            inputs = depset(
+                direct = [ctx.file.shared_library],
+            ),
+            outputs = [lib, debug],
+        )
+    else:
+        cc_toolchain = find_cpp_toolchain(ctx)
+
+        feature_configuration = cc_common.configure_features(
+            ctx = ctx,
+            cc_toolchain = cc_toolchain,
+            requested_features = ctx.features,
+            unsupported_features = ctx.disabled_features,
+        )
+
+        objcopy = cc_common.get_tool_for_action(
+            feature_configuration = feature_configuration,
+            action_name = OBJ_COPY_ACTION_NAME,
+        )
+
+        strip = cc_common.get_tool_for_action(
+            feature_configuration = feature_configuration,
+            action_name = STRIP_ACTION_NAME,
+        )
+
+        # This is the set of commands we want to implement to strip debug symbols out and link them back together:
+        #   objcopy --only-keep-debug libmy-library.so libmy-library.so.debug
+        #   strip --strip-debug libmy-library.so
+        #   objcopy --strip-debug libmy-library.so
+
+        ctx.actions.run_shell(
+            command = " ".join([
+                "cp",
+                ctx.file.shared_library.path,
+                lib.path,
+                "&& chmod u+w",
+                lib.path,
+                "&&",
+                objcopy,
+                "--only-keep-debug",
+                lib.path,
+                debug.path,
+                "&&",
+                strip,
+                "--strip-debug",
+                lib.path,
+                "&&",
+                objcopy,
+                "--strip-debug",
+                lib.path,
+            ]),
+            inputs = depset(
+                direct = [ctx.file.shared_library],
+                transitive = [
+                    cc_toolchain.all_files,
+                ],
+            ),
+            outputs = [lib, debug],
+        )
+
+    return [
+        DefaultInfo(files = depset(outputs)),
+    ]
+
+_split_debug_symbols = rule(
+    implementation = _split_debug_symbols_impl,
+    attrs = {
+        "copy": attr.bool(mandatory = True),
+        "output": attr.output(mandatory = True),
+        "output_debug": attr.output(mandatory = True),
+        "shared_library": attr.label(mandatory = True, allow_single_file = True),
+    } | CC_TOOLCHAIN_ATTRS,
+    fragments = ["cpp"],
+    toolchains = use_cc_toolchain(),
+)
 
 def _folder_prefix(name):
     if "/" in name:
@@ -147,6 +237,116 @@ def wpilib_cc_library(
             name = name + "-hdrs-zip",
             srcs = extra_hdr_pkg_files + maybe_license_pkg + [name + "-hdrs-pkg"] + [lib + "-hdrs-pkg" for lib in third_party_libraries + third_party_header_only_libraries],
             tags = ["no-remote"],
+        )
+
+def wpilib_cc_shared_library(
+        name,
+        user_link_flags = None,
+        visibility = None,
+        use_debug_name = True,
+        additional_linker_inputs = None,
+        features = None,
+        **kwargs):
+    folder, lib = _folder_prefix(name)
+    if not features:
+        features = []
+
+    features.append("windows_export_all_symbols")
+    if use_debug_name:
+        native.cc_shared_library(
+            name = name,
+            user_link_flags = (user_link_flags or []) + select({
+                "//shared/bazel/rules:linux_compilation_mode_dbg": ["-Wl,-soname,lib" + lib + "d.so"],
+                "//shared/bazel/rules:osx_compilation_mode_dbg": ["-Wl,-install_name,lib" + lib + "d.so"],
+                "@platforms//os:linux": ["-Wl,-soname,lib" + lib + ".so"],
+                "@platforms//os:osx": ["-Wl,-install_name,lib" + lib + ".so"],
+                "//conditions:default": [],
+            }),
+            visibility = visibility,
+            features = features,
+            **kwargs
+        )
+
+        _split_debug_symbols(
+            name = name + "-symbolsplit",
+            copy = select({
+                "//shared/bazel/rules:is_linux_x86_64": False,
+                "//conditions:default": True,
+            }),
+            output = folder + "/split/lib" + lib + ".so",
+            output_debug = folder + "/split/lib" + lib + ".so.debug",
+            shared_library = name,
+        )
+
+        pkg_files(
+            name = folder + "/lib" + lib + "-shared-files",
+            srcs = select({
+                "//shared/bazel/rules:compilation_mode_dbg": [
+                    folder + "/split/lib" + lib + ".so",
+                    folder + "/split/lib" + lib + ".so.debug",
+                ],
+                "//shared/bazel/rules:is_linux_x86_64": [
+                    folder + "/split/lib" + lib + ".so",
+                ],
+                "//shared/bazel/rules:is_linux_x86_64_dbg": [
+                    folder + "/split/lib" + lib + ".so",
+                ],
+                "//conditions:default": [
+                    folder + "/split/lib" + lib + ".so",
+                    folder + "/split/lib" + lib + ".so.debug",
+                ],
+            }),
+            renames = select({
+                "//shared/bazel/rules:compilation_mode_dbg": {
+                    folder + "/split/lib" + lib + ".so": "lib" + lib + "d.so",
+                    folder + "/split/lib" + lib + ".so.debug": "lib" + lib + "d.so.debug",
+                },
+                "//shared/bazel/rules:is_linux_x86_64": {},
+                "//shared/bazel/rules:is_linux_x86_64_dbg": {
+                    folder + "/split/lib" + lib + ".so": "lib" + lib + "d.so",
+                },
+                "//conditions:default": {},
+            }),
+            visibility = visibility,
+            strip_prefix = folder + "/split",
+        )
+    else:
+        native.cc_shared_library(
+            name = name,
+            user_link_flags = (user_link_flags or []) + select({
+                "@platforms//os:linux": ["-Wl,-soname,lib" + lib + ".so"],
+                "@platforms//os:osx": ["-Wl,-install_name,lib" + lib + ".so"],
+                "//conditions:default": [],
+            }),
+            features = features,
+            visibility = visibility,
+            **kwargs
+        )
+
+        _split_debug_symbols(
+            name = name + "-symbolsplit",
+            copy = select({
+                "//shared/bazel/rules:is_linux_x86_64": False,
+                "//conditions:default": True,
+            }),
+            output = folder + "/split/lib" + lib + ".so",
+            output_debug = folder + "/split/lib" + lib + ".so.debug",
+            shared_library = name,
+        )
+
+        pkg_files(
+            name = folder + "/lib" + lib + "-shared-files",
+            srcs = select({
+                "//shared/bazel/rules:is_linux_x86_64": [
+                    folder + "/split/lib" + lib + ".so",
+                ],
+                "//conditions:default": [
+                    folder + "/split/lib" + lib + ".so",
+                    folder + "/split/lib" + lib + ".so.debug",
+                ],
+            }),
+            visibility = visibility,
+            strip_prefix = folder + "/split",
         )
 
 CcStaticLibraryInfo = provider(
@@ -339,6 +539,7 @@ def wpilib_cc_static_library(
     if not static_lib_name:
         folder, lib = _folder_prefix(name)
         static_lib_name = select({
+            "//shared/bazel/rules:compilation_mode_dbg": folder + "/lib" + lib + "d.a",
             "@bazel_tools//src/conditions:windows": folder + "/" + lib + ".lib",
             "//conditions:default": folder + "/lib" + lib + ".a",
         })

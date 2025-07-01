@@ -1,9 +1,11 @@
+load("//:version.bzl", "VERSION")
+
 def _generate_version_file_impl(ctx):
     out = ctx.actions.declare_file(ctx.attr.output_file)
     ctx.actions.expand_template(
         output = out,
         template = ctx.file.template,
-        substitutions = {"${wpilib_version}": "TODO - Built with bazel"},
+        substitutions = {"${wpilib_version}": VERSION},
     )
     return [DefaultInfo(files = depset([out]))]
 
