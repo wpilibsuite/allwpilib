@@ -4,12 +4,14 @@
 
 package org.wpilib.math.geometry;
 
+import static org.wpilib.math.autodiff.Variable.pow;
+import static org.wpilib.math.optimization.Constraints.eq;
 import static org.wpilib.units.Units.Meters;
 
 import java.util.Objects;
 import org.wpilib.math.geometry.proto.Ellipse2dProto;
 import org.wpilib.math.geometry.struct.Ellipse2dStruct;
-import org.wpilib.math.jni.Ellipse2dJNI;
+import org.wpilib.math.optimization.Problem;
 import org.wpilib.math.util.Pair;
 import org.wpilib.units.measure.Distance;
 import org.wpilib.util.protobuf.ProtobufSerializable;
@@ -224,18 +226,38 @@ public class Ellipse2d implements ProtobufSerializable, StructSerializable {
       return point;
     }
 
+    // Rotate the point by the inverse of the ellipse's rotation
+    var rotPoint =
+        point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
+
     // Find nearest point
-    var nearestPoint = new double[2];
-    Ellipse2dJNI.nearest(
-        m_center.getX(),
-        m_center.getY(),
-        m_center.getRotation().getRadians(),
-        m_xSemiAxis,
-        m_ySemiAxis,
-        point.getX(),
-        point.getY(),
-        nearestPoint);
-    return new Translation2d(nearestPoint[0], nearestPoint[1]);
+    try (var problem = new Problem()) {
+      // Point on ellipse
+      var x = problem.decisionVariable();
+      x.setValue(rotPoint.getX());
+      var y = problem.decisionVariable();
+      y.setValue(rotPoint.getY());
+
+      problem.minimize(pow(x.minus(rotPoint.getX()), 2).plus(pow(y.minus(rotPoint.getY()), 2)));
+
+      // (x − x_c)²/a² + (y − y_c)²/b² = 1
+      // b²(x − x_c)² + a²(y − y_c)² = a²b²
+      double a2 = m_xSemiAxis * m_xSemiAxis;
+      double b2 = m_ySemiAxis * m_ySemiAxis;
+      problem.subjectTo(
+          eq(
+              pow(x.minus(m_center.getX()), 2)
+                  .times(b2)
+                  .plus(pow(y.minus(m_center.getY()), 2).times(a2)),
+              a2 * b2));
+
+      problem.solve();
+
+      rotPoint = new Translation2d(x.value(), y.value());
+    }
+
+    // Undo rotation
+    return rotPoint.rotateAround(m_center.getTranslation(), m_center.getRotation());
   }
 
   @Override
