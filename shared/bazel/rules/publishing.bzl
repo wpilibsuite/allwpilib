@@ -138,12 +138,12 @@ def _wpilib_maven_export_impl(name, maven_coordinates, classifier_artifacts, lin
 wpilib_maven_export = macro(
     implementation = _wpilib_maven_export_impl,
     attrs = {
-        "maven_coordinates": attr.string(mandatory = True, configurable = False),
         "classifier_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
+        "lib_name": attr.string(configurable = False),
         "linux_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
+        "maven_coordinates": attr.string(mandatory = True, configurable = False),
         "osx_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
         "windows_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
-        "lib_name": attr.string(configurable = False),
     },
     doc = "A symbolic macro that wraps maven_export for wpilib.",
 )
