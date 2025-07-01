@@ -29,15 +29,13 @@ public class ConfiguredLoggerHandler extends ElementHandler {
   @Override
   public String logInvocation(Element element) {
     var dataType = dataType(element);
-    var loggerType =
-        m_customLoggers.entrySet().stream()
-            .filter(
-                e -> {
-                  return m_processingEnv.getTypeUtils().isAssignable(dataType, e.getKey());
-                })
-            .findFirst()
-            .orElseThrow()
-            .getValue();
+    var loggerType = m_customLoggers.entrySet().stream()
+        .filter(e -> {
+          return m_processingEnv.getTypeUtils().isAssignable(dataType, e.getKey());
+        })
+        .findFirst()
+        .orElseThrow()
+        .getValue();
 
     return "Epilogue."
         + StringUtils.lowerCamelCase(loggerType.asElement().getSimpleName())

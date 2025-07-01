@@ -64,9 +64,8 @@ class ConnectionListenerTest {
     // set up the poller
     int poller = NetworkTablesJNI.createListenerPoller(m_serverInst.getHandle());
     assertNotSame(poller, 0, "bad poller handle");
-    int handle =
-        NetworkTablesJNI.addListener(
-            poller, m_serverInst.getHandle(), EnumSet.of(NetworkTableEvent.Kind.kConnection));
+    int handle = NetworkTablesJNI.addListener(
+        poller, m_serverInst.getHandle(), EnumSet.of(NetworkTableEvent.Kind.kConnection));
     assertNotSame(handle, 0, "bad listener handle");
 
     // trigger a connect event
@@ -115,14 +114,11 @@ class ConnectionListenerTest {
   void testThreaded(String address) {
     m_serverInst.startServer("connectionlistenertest.json", address, 0, threadedPort);
     List<NetworkTableEvent> events = new ArrayList<>();
-    final int handle =
-        m_serverInst.addConnectionListener(
-            false,
-            e -> {
-              synchronized (events) {
-                events.add(e);
-              }
-            });
+    final int handle = m_serverInst.addConnectionListener(false, e -> {
+      synchronized (events) {
+        events.add(e);
+      }
+    });
 
     // trigger a connect event
     m_clientInst.startClient4("client");

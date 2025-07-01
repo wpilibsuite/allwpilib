@@ -45,18 +45,17 @@ public final class PrintLog {
       if (record.isStart()) {
         try {
           DataLogRecord.StartRecordData data = record.getStartData();
-          System.out.println(
-              "Start("
-                  + data.entry
-                  + ", name='"
-                  + data.name
-                  + "', type='"
-                  + data.type
-                  + "', metadata='"
-                  + data.metadata
-                  + "') ["
-                  + (record.getTimestamp() / 1000000.0)
-                  + "]");
+          System.out.println("Start("
+              + data.entry
+              + ", name='"
+              + data.name
+              + "', type='"
+              + data.type
+              + "', metadata='"
+              + data.metadata
+              + "') ["
+              + (record.getTimestamp() / 1000000.0)
+              + "]");
           if (entries.containsKey(data.entry)) {
             System.out.println("...DUPLICATE entry ID, overriding");
           }
@@ -79,14 +78,13 @@ public final class PrintLog {
       } else if (record.isSetMetadata()) {
         try {
           DataLogRecord.MetadataRecordData data = record.getSetMetadataData();
-          System.out.println(
-              "SetMetadata("
-                  + data.entry
-                  + ", '"
-                  + data.metadata
-                  + "') ["
-                  + (record.getTimestamp() / 1000000.0)
-                  + "]");
+          System.out.println("SetMetadata("
+              + data.entry
+              + ", '"
+              + data.metadata
+              + "') ["
+              + (record.getTimestamp() / 1000000.0)
+              + "]");
           if (!entries.containsKey(data.entry)) {
             System.out.println("...ID not found");
           }
@@ -102,25 +100,23 @@ public final class PrintLog {
           System.out.println("<ID not found>");
           continue;
         }
-        System.out.println(
-            "<name='"
-                + entry.name
-                + "', type='"
-                + entry.type
-                + "'> ["
-                + (record.getTimestamp() / 1000000.0)
-                + "]");
+        System.out.println("<name='"
+            + entry.name
+            + "', type='"
+            + entry.type
+            + "'> ["
+            + (record.getTimestamp() / 1000000.0)
+            + "]");
 
         try {
           // handle systemTime specially
           if ("systemTime".equals(entry.name) && "int64".equals(entry.type)) {
             long val = record.getInteger();
-            System.out.println(
-                "  "
-                    + m_timeFormatter.format(
-                        LocalDateTime.ofEpochSecond(val / 1000000, 0, ZoneOffset.UTC))
-                    + "."
-                    + String.format("%06d", val % 1000000));
+            System.out.println("  "
+                + m_timeFormatter.format(
+                    LocalDateTime.ofEpochSecond(val / 1000000, 0, ZoneOffset.UTC))
+                + "."
+                + String.format("%06d", val % 1000000));
             continue;
           }
 

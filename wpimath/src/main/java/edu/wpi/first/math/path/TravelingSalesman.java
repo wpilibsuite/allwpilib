@@ -51,21 +51,18 @@ public class TravelingSalesman {
    * @return The optimized path as an array of Pose2ds.
    */
   public <Poses extends Num> Pose2d[] solve(Pose2d[] poses, int iterations) {
-    var solver =
-        new SimulatedAnnealing<>(
-            1.0,
-            this::neighbor,
-            // Total cost is sum of all costs between adjacent pose pairs in path
-            (Vector<Poses> state) -> {
-              double sum = 0.0;
-              for (int i = 0; i < state.getNumRows(); ++i) {
-                sum +=
-                    m_cost.applyAsDouble(
-                        poses[(int) state.get(i, 0)],
-                        poses[(int) state.get((i + 1) % poses.length, 0)]);
-              }
-              return sum;
-            });
+    var solver = new SimulatedAnnealing<>(
+        1.0,
+        this::neighbor,
+        // Total cost is sum of all costs between adjacent pose pairs in path
+        (Vector<Poses> state) -> {
+          double sum = 0.0;
+          for (int i = 0; i < state.getNumRows(); ++i) {
+            sum += m_cost.applyAsDouble(
+                poses[(int) state.get(i, 0)], poses[(int) state.get((i + 1) % poses.length, 0)]);
+          }
+          return sum;
+        });
 
     var initial = new Vector<Poses>(() -> poses.length);
     for (int i = 0; i < poses.length; ++i) {

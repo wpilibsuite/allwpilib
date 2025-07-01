@@ -27,9 +27,8 @@ class SwerveDriveOdometryTest {
   private final SwerveDriveKinematics m_kinematics =
       new SwerveDriveKinematics(m_fl, m_fr, m_bl, m_br);
 
-  private final SwerveDriveOdometry m_odometry =
-      new SwerveDriveOdometry(
-          m_kinematics, Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
+  private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
+      m_kinematics, Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
 
   @Test
   void testTwoIterations() {
@@ -41,14 +40,12 @@ class SwerveDriveOdometryTest {
       new SwerveModulePosition(0.5, Rotation2d.kZero)
     };
 
-    m_odometry.update(
-        Rotation2d.kZero,
-        new SwerveModulePosition[] {
-          new SwerveModulePosition(),
-          new SwerveModulePosition(),
-          new SwerveModulePosition(),
-          new SwerveModulePosition()
-        });
+    m_odometry.update(Rotation2d.kZero, new SwerveModulePosition[] {
+      new SwerveModulePosition(),
+      new SwerveModulePosition(),
+      new SwerveModulePosition(),
+      new SwerveModulePosition()
+    });
     var pose = m_odometry.update(Rotation2d.kZero, wheelDeltas);
 
     assertAll(
@@ -103,30 +100,27 @@ class SwerveDriveOdometryTest {
 
   @Test
   void testAccuracyFacingTrajectory() {
-    var kinematics =
-        new SwerveDriveKinematics(
-            new Translation2d(1, 1),
-            new Translation2d(1, -1),
-            new Translation2d(-1, -1),
-            new Translation2d(-1, 1));
-    var odometry =
-        new SwerveDriveOdometry(
-            kinematics, Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
+    var kinematics = new SwerveDriveKinematics(
+        new Translation2d(1, 1),
+        new Translation2d(1, -1),
+        new Translation2d(-1, -1),
+        new Translation2d(-1, 1));
+    var odometry = new SwerveDriveOdometry(
+        kinematics, Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
 
     SwerveModulePosition fl = new SwerveModulePosition();
     SwerveModulePosition fr = new SwerveModulePosition();
     SwerveModulePosition bl = new SwerveModulePosition();
     SwerveModulePosition br = new SwerveModulePosition();
 
-    var trajectory =
-        TrajectoryGenerator.generateTrajectory(
-            List.of(
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
-                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(0.5, 2));
+    var trajectory = TrajectoryGenerator.generateTrajectory(
+        List.of(
+            new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+            new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+            new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+            new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+            new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
+        new TrajectoryConfig(0.5, 2));
 
     var rand = new Random(4915);
 
@@ -138,13 +132,10 @@ class SwerveDriveOdometryTest {
     while (t <= trajectory.getTotalTimeSeconds()) {
       var groundTruthState = trajectory.sample(t);
 
-      var moduleStates =
-          kinematics.toSwerveModuleStates(
-              new ChassisSpeeds(
-                  groundTruthState.velocityMetersPerSecond,
-                  0.0,
-                  groundTruthState.velocityMetersPerSecond
-                      * groundTruthState.curvatureRadPerMeter));
+      var moduleStates = kinematics.toSwerveModuleStates(new ChassisSpeeds(
+          groundTruthState.velocityMetersPerSecond,
+          0.0,
+          groundTruthState.velocityMetersPerSecond * groundTruthState.curvatureRadPerMeter));
       for (var moduleState : moduleStates) {
         moduleState.angle = moduleState.angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
         moduleState.speedMetersPerSecond += rand.nextGaussian() * 0.1;
@@ -160,13 +151,12 @@ class SwerveDriveOdometryTest {
       bl.angle = moduleStates[2].angle;
       br.angle = moduleStates[3].angle;
 
-      var xHat =
-          odometry.update(
-              groundTruthState
-                  .poseMeters
-                  .getRotation()
-                  .plus(new Rotation2d(rand.nextGaussian() * 0.05)),
-              new SwerveModulePosition[] {fl, fr, bl, br});
+      var xHat = odometry.update(
+          groundTruthState
+              .poseMeters
+              .getRotation()
+              .plus(new Rotation2d(rand.nextGaussian() * 0.05)),
+          new SwerveModulePosition[] {fl, fr, bl, br});
 
       double error =
           groundTruthState.poseMeters.getTranslation().getDistance(xHat.getTranslation());
@@ -193,30 +183,27 @@ class SwerveDriveOdometryTest {
 
   @Test
   void testAccuracyFacingXAxis() {
-    var kinematics =
-        new SwerveDriveKinematics(
-            new Translation2d(1, 1),
-            new Translation2d(1, -1),
-            new Translation2d(-1, -1),
-            new Translation2d(-1, 1));
-    var odometry =
-        new SwerveDriveOdometry(
-            kinematics, Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
+    var kinematics = new SwerveDriveKinematics(
+        new Translation2d(1, 1),
+        new Translation2d(1, -1),
+        new Translation2d(-1, -1),
+        new Translation2d(-1, 1));
+    var odometry = new SwerveDriveOdometry(
+        kinematics, Rotation2d.kZero, new SwerveModulePosition[] {zero, zero, zero, zero});
 
     SwerveModulePosition fl = new SwerveModulePosition();
     SwerveModulePosition fr = new SwerveModulePosition();
     SwerveModulePosition bl = new SwerveModulePosition();
     SwerveModulePosition br = new SwerveModulePosition();
 
-    var trajectory =
-        TrajectoryGenerator.generateTrajectory(
-            List.of(
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
-                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(0.5, 2));
+    var trajectory = TrajectoryGenerator.generateTrajectory(
+        List.of(
+            new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+            new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+            new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+            new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+            new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
+        new TrajectoryConfig(0.5, 2));
 
     var rand = new Random(4915);
 
@@ -228,28 +215,22 @@ class SwerveDriveOdometryTest {
     while (t <= trajectory.getTotalTimeSeconds()) {
       var groundTruthState = trajectory.sample(t);
 
-      fl.distanceMeters +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
-      fr.distanceMeters +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
-      bl.distanceMeters +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
-      br.distanceMeters +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+      fl.distanceMeters += groundTruthState.velocityMetersPerSecond * dt
+          + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+      fr.distanceMeters += groundTruthState.velocityMetersPerSecond * dt
+          + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+      bl.distanceMeters += groundTruthState.velocityMetersPerSecond * dt
+          + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+      br.distanceMeters += groundTruthState.velocityMetersPerSecond * dt
+          + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
 
       fl.angle = groundTruthState.poseMeters.getRotation();
       fr.angle = groundTruthState.poseMeters.getRotation();
       bl.angle = groundTruthState.poseMeters.getRotation();
       br.angle = groundTruthState.poseMeters.getRotation();
 
-      var xHat =
-          odometry.update(
-              new Rotation2d(rand.nextGaussian() * 0.05),
-              new SwerveModulePosition[] {fl, fr, bl, br});
+      var xHat = odometry.update(
+          new Rotation2d(rand.nextGaussian() * 0.05), new SwerveModulePosition[] {fl, fr, bl, br});
 
       double error =
           groundTruthState.poseMeters.getTranslation().getDistance(xHat.getTranslation());

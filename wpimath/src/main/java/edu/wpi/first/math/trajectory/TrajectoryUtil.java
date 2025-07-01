@@ -36,13 +36,12 @@ public final class TrajectoryUtil {
     // Create a list of states from the elements.
     List<Trajectory.State> states = new ArrayList<>();
     for (int i = 0; i < elements.length; i += 7) {
-      states.add(
-          new Trajectory.State(
-              elements[i],
-              elements[i + 1],
-              elements[i + 2],
-              new Pose2d(elements[i + 3], elements[i + 4], new Rotation2d(elements[i + 5])),
-              elements[i + 6]));
+      states.add(new Trajectory.State(
+          elements[i],
+          elements[i + 1],
+          elements[i + 2],
+          new Pose2d(elements[i + 3], elements[i + 4], new Rotation2d(elements[i + 5])),
+          elements[i + 6]));
     }
     return new Trajectory(states);
   }

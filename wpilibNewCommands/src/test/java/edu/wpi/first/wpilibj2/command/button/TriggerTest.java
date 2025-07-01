@@ -94,13 +94,12 @@ class TriggerTest extends CommandTestBase {
     AtomicInteger inits = new AtomicInteger(0);
     AtomicInteger counter = new AtomicInteger(0);
     // the repeatedly() here is the point!
-    Command command1 =
-        new FunctionalCommand(
-                inits::incrementAndGet,
-                () -> {},
-                interrupted -> {},
-                () -> counter.incrementAndGet() % 2 == 0)
-            .repeatedly();
+    Command command1 = new FunctionalCommand(
+            inits::incrementAndGet,
+            () -> {},
+            interrupted -> {},
+            () -> counter.incrementAndGet() % 2 == 0)
+        .repeatedly();
 
     InternalButton button = new InternalButton();
     button.setPressed(false);
@@ -202,9 +201,9 @@ class TriggerTest extends CommandTestBase {
     AtomicInteger endCounter = new AtomicInteger(0);
 
     InternalButton button = new InternalButton();
-    Command command1 =
-        new StartEndCommand(startCounter::incrementAndGet, endCounter::incrementAndGet)
-            .until(button);
+    Command command1 = new StartEndCommand(
+            startCounter::incrementAndGet, endCounter::incrementAndGet)
+        .until(button);
 
     button.setPressed(false);
     command1.schedule();

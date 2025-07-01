@@ -14,16 +14,15 @@ import org.junit.jupiter.api.Test;
 class SingleJointedArmSimTest {
   @Test
   void testArmDisabled() {
-    SingleJointedArmSim sim =
-        new SingleJointedArmSim(
-            DCMotor.getVex775Pro(2),
-            300,
-            3.0,
-            Units.inchesToMeters(30.0),
-            -Math.PI,
-            0.0,
-            true,
-            Math.PI / 2.0);
+    SingleJointedArmSim sim = new SingleJointedArmSim(
+        DCMotor.getVex775Pro(2),
+        300,
+        3.0,
+        Units.inchesToMeters(30.0),
+        -Math.PI,
+        0.0,
+        true,
+        Math.PI / 2.0);
 
     // Reset Arm angle to 0
     sim.setState(VecBuilder.fill(0.0, 0.0));
@@ -40,16 +39,15 @@ class SingleJointedArmSimTest {
   @Test
   void testInitialState() {
     double startingAngleRads = Math.PI / 4.0;
-    SingleJointedArmSim sim =
-        new SingleJointedArmSim(
-            DCMotor.getKrakenX60(2),
-            125,
-            3.0,
-            Units.inchesToMeters(30.0),
-            0,
-            Math.PI / 2.0,
-            true,
-            startingAngleRads);
+    SingleJointedArmSim sim = new SingleJointedArmSim(
+        DCMotor.getKrakenX60(2),
+        125,
+        3.0,
+        Units.inchesToMeters(30.0),
+        0,
+        Math.PI / 2.0,
+        true,
+        startingAngleRads);
 
     assertEquals(startingAngleRads, sim.getAngleRads());
     assertEquals(0, sim.getVelocityRadPerSec());

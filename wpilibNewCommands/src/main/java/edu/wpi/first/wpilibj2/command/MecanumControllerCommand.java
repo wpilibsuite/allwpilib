@@ -111,11 +111,10 @@ public class MecanumControllerCommand extends Command {
     m_feedforward = requireNonNullParam(feedforward, "feedforward", "MecanumControllerCommand");
     m_kinematics = requireNonNullParam(kinematics, "kinematics", "MecanumControllerCommand");
 
-    m_controller =
-        new HolonomicDriveController(
-            requireNonNullParam(xController, "xController", "MecanumControllerCommand"),
-            requireNonNullParam(yController, "yController", "MecanumControllerCommand"),
-            requireNonNullParam(thetaController, "thetaController", "MecanumControllerCommand"));
+    m_controller = new HolonomicDriveController(
+        requireNonNullParam(xController, "xController", "MecanumControllerCommand"),
+        requireNonNullParam(yController, "yController", "MecanumControllerCommand"),
+        requireNonNullParam(thetaController, "thetaController", "MecanumControllerCommand"));
 
     m_desiredRotation =
         requireNonNullParam(desiredRotation, "desiredRotation", "MecanumControllerCommand");
@@ -126,9 +125,8 @@ public class MecanumControllerCommand extends Command {
         requireNonNullParam(frontLeftController, "frontLeftController", "MecanumControllerCommand");
     m_rearLeftController =
         requireNonNullParam(rearLeftController, "rearLeftController", "MecanumControllerCommand");
-    m_frontRightController =
-        requireNonNullParam(
-            frontRightController, "frontRightController", "MecanumControllerCommand");
+    m_frontRightController = requireNonNullParam(
+        frontRightController, "frontRightController", "MecanumControllerCommand");
     m_rearRightController =
         requireNonNullParam(rearRightController, "rearRightController", "MecanumControllerCommand");
 
@@ -208,9 +206,8 @@ public class MecanumControllerCommand extends Command {
         frontRightController,
         rearRightController,
         currentWheelSpeeds,
-        (frontLeft, frontRight, rearLeft, rearRight) ->
-            outputDriveVoltages.accept(
-                new MecanumDriveMotorVoltages(frontLeft, frontRight, rearLeft, rearRight)),
+        (frontLeft, frontRight, rearLeft, rearRight) -> outputDriveVoltages.accept(
+            new MecanumDriveMotorVoltages(frontLeft, frontRight, rearLeft, rearRight)),
         requirements);
   }
 
@@ -268,8 +265,11 @@ public class MecanumControllerCommand extends Command {
         xController,
         yController,
         thetaController,
-        () ->
-            trajectory.getStates().get(trajectory.getStates().size() - 1).poseMeters.getRotation(),
+        () -> trajectory
+            .getStates()
+            .get(trajectory.getStates().size() - 1)
+            .poseMeters
+            .getRotation(),
         maxWheelVelocityMetersPerSecond,
         frontLeftController,
         rearLeftController,
@@ -344,9 +344,8 @@ public class MecanumControllerCommand extends Command {
         frontRightController,
         rearRightController,
         currentWheelSpeeds,
-        (frontLeft, frontRight, rearLeft, rearRight) ->
-            outputDriveVoltages.accept(
-                new MecanumDriveMotorVoltages(frontLeft, frontRight, rearLeft, rearRight)),
+        (frontLeft, frontRight, rearLeft, rearRight) -> outputDriveVoltages.accept(
+            new MecanumDriveMotorVoltages(frontLeft, frontRight, rearLeft, rearRight)),
         requirements);
   }
 
@@ -387,11 +386,10 @@ public class MecanumControllerCommand extends Command {
     m_feedforward = new SimpleMotorFeedforward(0, 0, 0);
     m_kinematics = requireNonNullParam(kinematics, "kinematics", "MecanumControllerCommand");
 
-    m_controller =
-        new HolonomicDriveController(
-            requireNonNullParam(xController, "xController", "MecanumControllerCommand"),
-            requireNonNullParam(yController, "yController", "MecanumControllerCommand"),
-            requireNonNullParam(thetaController, "thetaController", "MecanumControllerCommand"));
+    m_controller = new HolonomicDriveController(
+        requireNonNullParam(xController, "xController", "MecanumControllerCommand"),
+        requireNonNullParam(yController, "yController", "MecanumControllerCommand"),
+        requireNonNullParam(thetaController, "thetaController", "MecanumControllerCommand"));
 
     m_desiredRotation =
         requireNonNullParam(desiredRotation, "desiredRotation", "MecanumControllerCommand");
@@ -455,8 +453,11 @@ public class MecanumControllerCommand extends Command {
         xController,
         yController,
         thetaController,
-        () ->
-            trajectory.getStates().get(trajectory.getStates().size() - 1).poseMeters.getRotation(),
+        () -> trajectory
+            .getStates()
+            .get(trajectory.getStates().size() - 1)
+            .poseMeters
+            .getRotation(),
         maxWheelVelocityMetersPerSecond,
         outputWheelSpeeds,
         requirements);
@@ -466,10 +467,10 @@ public class MecanumControllerCommand extends Command {
   public void initialize() {
     var initialState = m_trajectory.sample(0);
 
-    var initialXVelocity =
-        initialState.velocityMetersPerSecond * initialState.poseMeters.getRotation().getCos();
-    var initialYVelocity =
-        initialState.velocityMetersPerSecond * initialState.poseMeters.getRotation().getSin();
+    var initialXVelocity = initialState.velocityMetersPerSecond
+        * initialState.poseMeters.getRotation().getCos();
+    var initialYVelocity = initialState.velocityMetersPerSecond
+        * initialState.poseMeters.getRotation().getSin();
 
     MecanumDriveWheelSpeeds prevSpeeds =
         m_kinematics.toWheelSpeeds(new ChassisSpeeds(initialXVelocity, initialYVelocity, 0.0));
@@ -505,51 +506,43 @@ public class MecanumControllerCommand extends Command {
     double rearRightOutput;
 
     if (m_usePID) {
-      final double frontLeftFeedforward =
-          m_feedforward.calculateWithVelocities(
-              m_prevFrontLeftSpeedSetpoint, frontLeftSpeedSetpoint);
+      final double frontLeftFeedforward = m_feedforward.calculateWithVelocities(
+          m_prevFrontLeftSpeedSetpoint, frontLeftSpeedSetpoint);
 
       final double rearLeftFeedforward =
           m_feedforward.calculateWithVelocities(m_prevRearLeftSpeedSetpoint, rearLeftSpeedSetpoint);
 
-      final double frontRightFeedforward =
-          m_feedforward.calculateWithVelocities(
-              m_prevFrontRightSpeedSetpoint, frontRightSpeedSetpoint);
+      final double frontRightFeedforward = m_feedforward.calculateWithVelocities(
+          m_prevFrontRightSpeedSetpoint, frontRightSpeedSetpoint);
 
-      final double rearRightFeedforward =
-          m_feedforward.calculateWithVelocities(
-              m_prevRearRightSpeedSetpoint, rearRightSpeedSetpoint);
+      final double rearRightFeedforward = m_feedforward.calculateWithVelocities(
+          m_prevRearRightSpeedSetpoint, rearRightSpeedSetpoint);
 
-      frontLeftOutput =
-          frontLeftFeedforward
-              + m_frontLeftController.calculate(
-                  m_currentWheelSpeeds.get().frontLeftMetersPerSecond, frontLeftSpeedSetpoint);
+      frontLeftOutput = frontLeftFeedforward
+          + m_frontLeftController.calculate(
+              m_currentWheelSpeeds.get().frontLeftMetersPerSecond, frontLeftSpeedSetpoint);
 
-      rearLeftOutput =
-          rearLeftFeedforward
-              + m_rearLeftController.calculate(
-                  m_currentWheelSpeeds.get().rearLeftMetersPerSecond, rearLeftSpeedSetpoint);
+      rearLeftOutput = rearLeftFeedforward
+          + m_rearLeftController.calculate(
+              m_currentWheelSpeeds.get().rearLeftMetersPerSecond, rearLeftSpeedSetpoint);
 
-      frontRightOutput =
-          frontRightFeedforward
-              + m_frontRightController.calculate(
-                  m_currentWheelSpeeds.get().frontRightMetersPerSecond, frontRightSpeedSetpoint);
+      frontRightOutput = frontRightFeedforward
+          + m_frontRightController.calculate(
+              m_currentWheelSpeeds.get().frontRightMetersPerSecond, frontRightSpeedSetpoint);
 
-      rearRightOutput =
-          rearRightFeedforward
-              + m_rearRightController.calculate(
-                  m_currentWheelSpeeds.get().rearRightMetersPerSecond, rearRightSpeedSetpoint);
+      rearRightOutput = rearRightFeedforward
+          + m_rearRightController.calculate(
+              m_currentWheelSpeeds.get().rearRightMetersPerSecond, rearRightSpeedSetpoint);
 
       m_outputDriveVoltages.accept(
           frontLeftOutput, frontRightOutput, rearLeftOutput, rearRightOutput);
 
     } else {
-      m_outputWheelSpeeds.accept(
-          new MecanumDriveWheelSpeeds(
-              frontLeftSpeedSetpoint,
-              frontRightSpeedSetpoint,
-              rearLeftSpeedSetpoint,
-              rearRightSpeedSetpoint));
+      m_outputWheelSpeeds.accept(new MecanumDriveWheelSpeeds(
+          frontLeftSpeedSetpoint,
+          frontRightSpeedSetpoint,
+          rearLeftSpeedSetpoint,
+          rearRightSpeedSetpoint));
     }
   }
 

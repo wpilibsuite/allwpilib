@@ -358,9 +358,8 @@ public class SwerveDriveKinematics
     double translationalK =
         Math.hypot(desiredChassisSpeed.vxMetersPerSecond, desiredChassisSpeed.vyMetersPerSecond)
             / attainableMaxTranslationalSpeedMetersPerSecond;
-    double rotationalK =
-        Math.abs(desiredChassisSpeed.omegaRadiansPerSecond)
-            / attainableMaxRotationalVelocityRadiansPerSecond;
+    double rotationalK = Math.abs(desiredChassisSpeed.omegaRadiansPerSecond)
+        / attainableMaxRotationalVelocityRadiansPerSecond;
     double k = Math.max(translationalK, rotationalK);
     double scale = Math.min(k * attainableMaxModuleSpeedMetersPerSecond / realMaxSpeed, 1);
     for (SwerveModuleState moduleState : moduleStates) {

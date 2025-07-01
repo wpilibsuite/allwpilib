@@ -19,9 +19,8 @@ public class CvSource extends ImageSource {
    * @param mode Video mode being generated
    */
   public CvSource(String name, VideoMode mode) {
-    super(
-        CameraServerJNI.createRawSource(
-            name, true, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
+    super(CameraServerJNI.createRawSource(
+        name, true, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
     OpenCvLoader.forceStaticLoad();
   }
 

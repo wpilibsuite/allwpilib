@@ -37,9 +37,8 @@ public class SysIdRoutineBot {
    */
   public void configureBindings() {
     // Control the drive with split-stick arcade controls
-    m_drive.setDefaultCommand(
-        m_drive.arcadeDriveCommand(
-            () -> -m_driverController.getLeftY(), () -> -m_driverController.getRightX()));
+    m_drive.setDefaultCommand(m_drive.arcadeDriveCommand(
+        () -> -m_driverController.getLeftY(), () -> -m_driverController.getRightX()));
 
     // Bind full set of SysId routine tests to buttons; a complete routine should run each of these
     // once.

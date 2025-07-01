@@ -48,9 +48,8 @@ public class Robot extends TimedRobot {
     // MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
     // off the root node or another ligament object
     m_elevator = root.append(new MechanismLigament2d("elevator", kElevatorMinimumLength, 90));
-    m_wrist =
-        m_elevator.append(
-            new MechanismLigament2d("wrist", 0.5, 90, 6, new Color8Bit(Color.kPurple)));
+    m_wrist = m_elevator.append(
+        new MechanismLigament2d("wrist", 0.5, 90, 6, new Color8Bit(Color.kPurple)));
 
     // post the mechanism to the dashboard
     SmartDashboard.putData("Mech2d", mech);

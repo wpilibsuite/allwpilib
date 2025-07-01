@@ -175,24 +175,22 @@ public class Trajectory implements ProtobufSerializable {
     var newFirstPose = firstPose.plus(transform);
     List<State> newStates = new ArrayList<>();
 
-    newStates.add(
-        new State(
-            firstState.timeSeconds,
-            firstState.velocityMetersPerSecond,
-            firstState.accelerationMetersPerSecondSq,
-            newFirstPose,
-            firstState.curvatureRadPerMeter));
+    newStates.add(new State(
+        firstState.timeSeconds,
+        firstState.velocityMetersPerSecond,
+        firstState.accelerationMetersPerSecondSq,
+        newFirstPose,
+        firstState.curvatureRadPerMeter));
 
     for (int i = 1; i < m_states.size(); i++) {
       var state = m_states.get(i);
       // We are transforming relative to the coordinate frame of the new initial pose.
-      newStates.add(
-          new State(
-              state.timeSeconds,
-              state.velocityMetersPerSecond,
-              state.accelerationMetersPerSecondSq,
-              newFirstPose.plus(state.poseMeters.minus(firstPose)),
-              state.curvatureRadPerMeter));
+      newStates.add(new State(
+          state.timeSeconds,
+          state.velocityMetersPerSecond,
+          state.accelerationMetersPerSecondSq,
+          newFirstPose.plus(state.poseMeters.minus(firstPose)),
+          state.curvatureRadPerMeter));
     }
 
     return new Trajectory(newStates);
@@ -207,17 +205,14 @@ public class Trajectory implements ProtobufSerializable {
    * @return The transformed trajectory.
    */
   public Trajectory relativeTo(Pose2d pose) {
-    return new Trajectory(
-        m_states.stream()
-            .map(
-                state ->
-                    new State(
-                        state.timeSeconds,
-                        state.velocityMetersPerSecond,
-                        state.accelerationMetersPerSecondSq,
-                        state.poseMeters.relativeTo(pose),
-                        state.curvatureRadPerMeter))
-            .collect(Collectors.toList()));
+    return new Trajectory(m_states.stream()
+        .map(state -> new State(
+            state.timeSeconds,
+            state.velocityMetersPerSecond,
+            state.accelerationMetersPerSecondSq,
+            state.poseMeters.relativeTo(pose),
+            state.curvatureRadPerMeter))
+        .collect(Collectors.toList()));
   }
 
   /**
@@ -236,17 +231,14 @@ public class Trajectory implements ProtobufSerializable {
     }
 
     // Deep copy the current states.
-    List<State> states =
-        m_states.stream()
-            .map(
-                state ->
-                    new State(
-                        state.timeSeconds,
-                        state.velocityMetersPerSecond,
-                        state.accelerationMetersPerSecondSq,
-                        state.poseMeters,
-                        state.curvatureRadPerMeter))
-            .collect(Collectors.toList());
+    List<State> states = m_states.stream()
+        .map(state -> new State(
+            state.timeSeconds,
+            state.velocityMetersPerSecond,
+            state.accelerationMetersPerSecondSq,
+            state.poseMeters,
+            state.curvatureRadPerMeter))
+        .collect(Collectors.toList());
 
     // Here we omit the first state of the other trajectory because we don't want
     // two time points with different states. Sample() will automatically
@@ -254,13 +246,12 @@ public class Trajectory implements ProtobufSerializable {
     // other trajectory.
     for (int i = 1; i < other.getStates().size(); ++i) {
       var s = other.getStates().get(i);
-      states.add(
-          new State(
-              s.timeSeconds + m_totalTimeSeconds,
-              s.velocityMetersPerSecond,
-              s.accelerationMetersPerSecondSq,
-              s.poseMeters,
-              s.curvatureRadPerMeter));
+      states.add(new State(
+          s.timeSeconds + m_totalTimeSeconds,
+          s.velocityMetersPerSecond,
+          s.accelerationMetersPerSecondSq,
+          s.poseMeters,
+          s.curvatureRadPerMeter));
     }
     return new Trajectory(states);
   }
@@ -340,9 +331,8 @@ public class Trajectory implements ProtobufSerializable {
       }
 
       // Check whether the robot is reversing at this stage.
-      final boolean reversing =
-          velocityMetersPerSecond < 0
-              || Math.abs(velocityMetersPerSecond) < 1E-9 && accelerationMetersPerSecondSq < 0;
+      final boolean reversing = velocityMetersPerSecond < 0
+          || Math.abs(velocityMetersPerSecond) < 1E-9 && accelerationMetersPerSecondSq < 0;
 
       // Calculate the new velocity
       // v_f = v_0 + at
@@ -350,10 +340,9 @@ public class Trajectory implements ProtobufSerializable {
 
       // Calculate the change in position.
       // delta_s = v_0 t + 0.5at²
-      final double newS =
-          (velocityMetersPerSecond * deltaT
-                  + 0.5 * accelerationMetersPerSecondSq * Math.pow(deltaT, 2))
-              * (reversing ? -1.0 : 1.0);
+      final double newS = (velocityMetersPerSecond * deltaT
+              + 0.5 * accelerationMetersPerSecondSq * Math.pow(deltaT, 2))
+          * (reversing ? -1.0 : 1.0);
 
       // Return the new state. To find the new position for the new state, we need
       // to interpolate between the two endpoint poses. The fraction for

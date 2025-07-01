@@ -25,13 +25,10 @@ class SelectCommandTest extends MultiCompositionTestBase<SelectCommand<Integer>>
       MockCommandHolder command3Holder = new MockCommandHolder(true);
       Command command3 = command3Holder.getMock();
 
-      SelectCommand<String> selectCommand =
-          new SelectCommand<>(
-              Map.ofEntries(
-                  Map.entry("one", command1),
-                  Map.entry("two", command2),
-                  Map.entry("three", command3)),
-              () -> "one");
+      SelectCommand<String> selectCommand = new SelectCommand<>(
+          Map.ofEntries(
+              Map.entry("one", command1), Map.entry("two", command2), Map.entry("three", command3)),
+          () -> "one");
 
       scheduler.schedule(selectCommand);
       scheduler.run();
@@ -61,13 +58,10 @@ class SelectCommandTest extends MultiCompositionTestBase<SelectCommand<Integer>>
       MockCommandHolder command3Holder = new MockCommandHolder(true);
       Command command3 = command3Holder.getMock();
 
-      SelectCommand<String> selectCommand =
-          new SelectCommand<>(
-              Map.ofEntries(
-                  Map.entry("one", command1),
-                  Map.entry("two", command2),
-                  Map.entry("three", command3)),
-              () -> "four");
+      SelectCommand<String> selectCommand = new SelectCommand<>(
+          Map.ofEntries(
+              Map.entry("one", command1), Map.entry("two", command2), Map.entry("three", command3)),
+          () -> "four");
 
       assertDoesNotThrow(() -> scheduler.schedule(selectCommand));
     }
@@ -88,13 +82,10 @@ class SelectCommandTest extends MultiCompositionTestBase<SelectCommand<Integer>>
       MockCommandHolder command3Holder = new MockCommandHolder(true, system3, system4);
       Command command3 = command3Holder.getMock();
 
-      SelectCommand<String> selectCommand =
-          new SelectCommand<>(
-              Map.ofEntries(
-                  Map.entry("one", command1),
-                  Map.entry("two", command2),
-                  Map.entry("three", command3)),
-              () -> "one");
+      SelectCommand<String> selectCommand = new SelectCommand<>(
+          Map.ofEntries(
+              Map.entry("one", command1), Map.entry("two", command2), Map.entry("three", command3)),
+          () -> "one");
 
       scheduler.schedule(selectCommand);
       scheduler.schedule(system3.runOnce(() -> {}));

@@ -44,16 +44,14 @@ class ArmFeedforwardTest {
         new Matrix<>(Nat.N2(), Nat.N2(), new double[] {0.0, 1.0, 0.0, -kv / ka});
     final Matrix<N2, N1> B = new Matrix<>(Nat.N2(), Nat.N1(), new double[] {0.0, 1.0 / ka});
 
-    final BiFunction<Matrix<N2, N1>, Matrix<N1, N1>, Matrix<N2, N1>> f =
-        (x, u) -> {
-          Matrix<N2, N1> c =
-              MatBuilder.fill(
-                  Nat.N2(),
-                  Nat.N1(),
-                  0.0,
-                  Math.signum(x.get(1, 0)) * (-ks / ka) - (kg / ka) * Math.cos(x.get(0, 0)));
-          return A.times(x).plus(B.times(u)).plus(c);
-        };
+    final BiFunction<Matrix<N2, N1>, Matrix<N1, N1>, Matrix<N2, N1>> f = (x, u) -> {
+      Matrix<N2, N1> c = MatBuilder.fill(
+          Nat.N2(),
+          Nat.N1(),
+          0.0,
+          Math.signum(x.get(1, 0)) * (-ks / ka) - (kg / ka) * Math.cos(x.get(0, 0)));
+      return A.times(x).plus(B.times(u)).plus(c);
+    };
 
     return NumericalIntegration.rk4(
         f,
@@ -178,8 +176,7 @@ class ArmFeedforwardTest {
     assertAll(
         () ->
             assertThrows(IllegalArgumentException.class, () -> new ArmFeedforward(ks, kg, -kv, ka)),
-        () ->
-            assertThrows(
-                IllegalArgumentException.class, () -> new ArmFeedforward(ks, kg, kv, -ka)));
+        () -> assertThrows(
+            IllegalArgumentException.class, () -> new ArmFeedforward(ks, kg, kv, -ka)));
   }
 }

@@ -75,7 +75,9 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
      * @return The value or an empty optional if there is no corresponding value.
      */
     public static Optional<Value> getValueOf(String value) {
-      return Arrays.stream(Value.values()).filter(v -> v.m_prettyValue.equals(value)).findFirst();
+      return Arrays.stream(Value.values())
+          .filter(v -> v.m_prettyValue.equals(value))
+          .findFirst();
     }
   }
 

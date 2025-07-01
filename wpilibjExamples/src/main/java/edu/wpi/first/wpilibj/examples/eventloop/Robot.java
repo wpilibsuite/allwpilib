@@ -60,20 +60,17 @@ public class Robot extends TimedRobot {
     // if the trigger is held
     shootTrigger
         // accelerate the shooter wheel
-        .ifHigh(
-        () -> {
-          m_shooter.setVoltage(
-              m_controller.calculate(m_shooterEncoder.getRate(), SHOT_VELOCITY)
-                  + m_ff.calculate(SHOT_VELOCITY));
-        });
+        .ifHigh(() -> {
+      m_shooter.setVoltage(m_controller.calculate(m_shooterEncoder.getRate(), SHOT_VELOCITY)
+          + m_ff.calculate(SHOT_VELOCITY));
+    });
 
     // if not, stop
     shootTrigger.negate().ifHigh(m_shooter::stopMotor);
 
-    BooleanEvent atTargetVelocity =
-        new BooleanEvent(m_loop, m_controller::atSetpoint)
-            // debounce for more stability
-            .debounce(0.2);
+    BooleanEvent atTargetVelocity = new BooleanEvent(m_loop, m_controller::atSetpoint)
+        // debounce for more stability
+        .debounce(0.2);
 
     // if we're at the target velocity, kick the ball into the shooter wheel
     atTargetVelocity.ifHigh(() -> m_kicker.set(0.7));

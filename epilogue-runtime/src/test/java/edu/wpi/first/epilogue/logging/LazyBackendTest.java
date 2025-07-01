@@ -147,8 +147,10 @@ class LazyBackendTest {
     lazy.log("arr", arr);
 
     assertEquals(2, backend.getEntries().size());
-    assertArrayEquals(new boolean[] {false}, (boolean[]) backend.getEntries().get(0).value());
-    assertArrayEquals(new boolean[] {true}, (boolean[]) backend.getEntries().get(1).value());
+    assertArrayEquals(
+        new boolean[] {false}, (boolean[]) backend.getEntries().get(0).value());
+    assertArrayEquals(
+        new boolean[] {true}, (boolean[]) backend.getEntries().get(1).value());
   }
 
   @Test
@@ -180,9 +182,9 @@ class LazyBackendTest {
     lazy.log("arr", arr, CustomStruct.struct);
 
     assertEquals(2, backend.getEntries().size());
-    assertArrayEquals(
-        new byte[] {0x00, 0x00, 0x00, 0x00}, (byte[]) backend.getEntries().get(0).value());
-    assertArrayEquals(
-        new byte[] {0x01, 0x00, 0x00, 0x00}, (byte[]) backend.getEntries().get(1).value());
+    assertArrayEquals(new byte[] {0x00, 0x00, 0x00, 0x00}, (byte[])
+        backend.getEntries().get(0).value());
+    assertArrayEquals(new byte[] {0x01, 0x00, 0x00, 0x00}, (byte[])
+        backend.getEntries().get(1).value());
   }
 }

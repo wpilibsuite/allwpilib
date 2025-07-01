@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 @Logged
 public class Storage extends SubsystemBase {
   private final PWMSparkMax m_motor = new PWMSparkMax(StorageConstants.kMotorPort);
+
   @NotLogged // We'll log a more meaningful boolean instead
   private final DigitalInput m_ballSensor = new DigitalInput(StorageConstants.kBallSensorPort);
 

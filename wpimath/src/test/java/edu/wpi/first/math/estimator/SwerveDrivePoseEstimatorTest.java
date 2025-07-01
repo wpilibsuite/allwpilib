@@ -31,46 +31,42 @@ class SwerveDrivePoseEstimatorTest {
 
   @Test
   void testAccuracyFacingTrajectory() {
-    var kinematics =
-        new SwerveDriveKinematics(
-            new Translation2d(1, 1),
-            new Translation2d(1, -1),
-            new Translation2d(-1, -1),
-            new Translation2d(-1, 1));
+    var kinematics = new SwerveDriveKinematics(
+        new Translation2d(1, 1),
+        new Translation2d(1, -1),
+        new Translation2d(-1, -1),
+        new Translation2d(-1, 1));
 
     var fl = new SwerveModulePosition();
     var fr = new SwerveModulePosition();
     var bl = new SwerveModulePosition();
     var br = new SwerveModulePosition();
 
-    var estimator =
-        new SwerveDrivePoseEstimator(
-            kinematics,
-            Rotation2d.kZero,
-            new SwerveModulePosition[] {fl, fr, bl, br},
-            Pose2d.kZero,
-            VecBuilder.fill(0.1, 0.1, 0.1),
-            VecBuilder.fill(0.5, 0.5, 0.5));
+    var estimator = new SwerveDrivePoseEstimator(
+        kinematics,
+        Rotation2d.kZero,
+        new SwerveModulePosition[] {fl, fr, bl, br},
+        Pose2d.kZero,
+        VecBuilder.fill(0.1, 0.1, 0.1),
+        VecBuilder.fill(0.5, 0.5, 0.5));
 
-    var trajectory =
-        TrajectoryGenerator.generateTrajectory(
-            List.of(
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
-                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(2, 2));
+    var trajectory = TrajectoryGenerator.generateTrajectory(
+        List.of(
+            new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+            new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+            new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+            new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+            new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
+        new TrajectoryConfig(2, 2));
 
     testFollowTrajectory(
         kinematics,
         estimator,
         trajectory,
-        state ->
-            new ChassisSpeeds(
-                state.velocityMetersPerSecond,
-                0,
-                state.velocityMetersPerSecond * state.curvatureRadPerMeter),
+        state -> new ChassisSpeeds(
+            state.velocityMetersPerSecond,
+            0,
+            state.velocityMetersPerSecond * state.curvatureRadPerMeter),
         state -> state.poseMeters,
         trajectory.getInitialPose(),
         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -82,58 +78,51 @@ class SwerveDrivePoseEstimatorTest {
 
   @Test
   void testBadInitialPose() {
-    var kinematics =
-        new SwerveDriveKinematics(
-            new Translation2d(1, 1),
-            new Translation2d(1, -1),
-            new Translation2d(-1, -1),
-            new Translation2d(-1, 1));
+    var kinematics = new SwerveDriveKinematics(
+        new Translation2d(1, 1),
+        new Translation2d(1, -1),
+        new Translation2d(-1, -1),
+        new Translation2d(-1, 1));
 
     var fl = new SwerveModulePosition();
     var fr = new SwerveModulePosition();
     var bl = new SwerveModulePosition();
     var br = new SwerveModulePosition();
 
-    var estimator =
-        new SwerveDrivePoseEstimator(
-            kinematics,
-            Rotation2d.kZero,
-            new SwerveModulePosition[] {fl, fr, bl, br},
-            new Pose2d(-1, -1, Rotation2d.fromRadians(-1)),
-            VecBuilder.fill(0.1, 0.1, 0.1),
-            VecBuilder.fill(0.9, 0.9, 0.9));
-    var trajectory =
-        TrajectoryGenerator.generateTrajectory(
-            List.of(
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
-                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(2, 2));
+    var estimator = new SwerveDrivePoseEstimator(
+        kinematics,
+        Rotation2d.kZero,
+        new SwerveModulePosition[] {fl, fr, bl, br},
+        new Pose2d(-1, -1, Rotation2d.fromRadians(-1)),
+        VecBuilder.fill(0.1, 0.1, 0.1),
+        VecBuilder.fill(0.9, 0.9, 0.9));
+    var trajectory = TrajectoryGenerator.generateTrajectory(
+        List.of(
+            new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+            new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+            new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+            new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+            new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
+        new TrajectoryConfig(2, 2));
 
     for (int offset_direction_degs = 0; offset_direction_degs < 360; offset_direction_degs += 45) {
       for (int offset_heading_degs = 0; offset_heading_degs < 360; offset_heading_degs += 45) {
         var pose_offset = Rotation2d.fromDegrees(offset_direction_degs);
         var heading_offset = Rotation2d.fromDegrees(offset_heading_degs);
 
-        var initial_pose =
-            trajectory
-                .getInitialPose()
-                .plus(
-                    new Transform2d(
-                        new Translation2d(pose_offset.getCos(), pose_offset.getSin()),
-                        heading_offset));
+        var initial_pose = trajectory
+            .getInitialPose()
+            .plus(new Transform2d(
+                new Translation2d(pose_offset.getCos(), pose_offset.getSin()), heading_offset));
 
         testFollowTrajectory(
             kinematics,
             estimator,
             trajectory,
-            state ->
-                new ChassisSpeeds(
-                    state.velocityMetersPerSecond,
-                    0,
-                    state.velocityMetersPerSecond * state.curvatureRadPerMeter),
+            state -> new ChassisSpeeds(
+                state.velocityMetersPerSecond,
+                0,
+                state.velocityMetersPerSecond * state.curvatureRadPerMeter),
             state -> state.poseMeters,
             initial_pose,
             new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -180,13 +169,11 @@ class SwerveDrivePoseEstimatorTest {
       // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
       // last vision measurement
       if (visionUpdateQueue.isEmpty() || visionUpdateQueue.lastKey() + visionUpdateRate < t) {
-        Pose2d newVisionPose =
-            visionMeasurementGenerator
-                .apply(groundTruthState)
-                .plus(
-                    new Transform2d(
-                        new Translation2d(rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.1),
-                        new Rotation2d(rand.nextGaussian() * 0.05)));
+        Pose2d newVisionPose = visionMeasurementGenerator
+            .apply(groundTruthState)
+            .plus(new Transform2d(
+                new Translation2d(rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.1),
+                new Rotation2d(rand.nextGaussian() * 0.05)));
 
         visionUpdateQueue.put(t, newVisionPose);
       }
@@ -209,15 +196,14 @@ class SwerveDrivePoseEstimatorTest {
             moduleStates[i].angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
       }
 
-      var xHat =
-          estimator.updateWithTime(
-              t,
-              groundTruthState
-                  .poseMeters
-                  .getRotation()
-                  .plus(new Rotation2d(rand.nextGaussian() * 0.05))
-                  .minus(trajectory.getInitialPose().getRotation()),
-              positions);
+      var xHat = estimator.updateWithTime(
+          t,
+          groundTruthState
+              .poseMeters
+              .getRotation()
+              .plus(new Rotation2d(rand.nextGaussian() * 0.05))
+              .minus(trajectory.getInitialPose().getRotation()),
+          positions);
 
       double error =
           groundTruthState.poseMeters.getTranslation().getDistance(xHat.getTranslation());
@@ -252,35 +238,32 @@ class SwerveDrivePoseEstimatorTest {
     // is that all measurements affect the estimated pose. The alternative result is that only one
     // vision measurement affects the outcome. If that were the case, after 1000 measurements, the
     // estimated pose would converge to that measurement.
-    var kinematics =
-        new SwerveDriveKinematics(
-            new Translation2d(1, 1),
-            new Translation2d(1, -1),
-            new Translation2d(-1, -1),
-            new Translation2d(-1, 1));
+    var kinematics = new SwerveDriveKinematics(
+        new Translation2d(1, 1),
+        new Translation2d(1, -1),
+        new Translation2d(-1, -1),
+        new Translation2d(-1, 1));
 
     var fl = new SwerveModulePosition();
     var fr = new SwerveModulePosition();
     var bl = new SwerveModulePosition();
     var br = new SwerveModulePosition();
 
-    var estimator =
-        new SwerveDrivePoseEstimator(
-            kinematics,
-            Rotation2d.kZero,
-            new SwerveModulePosition[] {fl, fr, bl, br},
-            new Pose2d(1, 2, Rotation2d.kCW_Pi_2),
-            VecBuilder.fill(0.1, 0.1, 0.1),
-            VecBuilder.fill(0.9, 0.9, 0.9));
+    var estimator = new SwerveDrivePoseEstimator(
+        kinematics,
+        Rotation2d.kZero,
+        new SwerveModulePosition[] {fl, fr, bl, br},
+        new Pose2d(1, 2, Rotation2d.kCW_Pi_2),
+        VecBuilder.fill(0.1, 0.1, 0.1),
+        VecBuilder.fill(0.9, 0.9, 0.9));
 
     estimator.updateWithTime(0, Rotation2d.kZero, new SwerveModulePosition[] {fl, fr, bl, br});
 
-    var visionMeasurements =
-        new Pose2d[] {
-          new Pose2d(0, 0, Rotation2d.kZero),
-          new Pose2d(3, 1, Rotation2d.kCCW_Pi_2),
-          new Pose2d(2, 4, Rotation2d.kPi),
-        };
+    var visionMeasurements = new Pose2d[] {
+      new Pose2d(0, 0, Rotation2d.kZero),
+      new Pose2d(3, 1, Rotation2d.kCCW_Pi_2),
+      new Pose2d(2, 4, Rotation2d.kPi),
+    };
 
     for (int i = 0; i < 1000; i++) {
       for (var measurement : visionMeasurements) {
@@ -289,18 +272,15 @@ class SwerveDrivePoseEstimatorTest {
     }
 
     for (var measurement : visionMeasurements) {
-      var errorLog =
-          "Estimator converged to one vision measurement: "
-              + estimator.getEstimatedPosition().toString()
-              + " -> "
-              + measurement;
+      var errorLog = "Estimator converged to one vision measurement: "
+          + estimator.getEstimatedPosition().toString()
+          + " -> "
+          + measurement;
 
       var dx = Math.abs(measurement.getX() - estimator.getEstimatedPosition().getX());
       var dy = Math.abs(measurement.getY() - estimator.getEstimatedPosition().getY());
-      var dtheta =
-          Math.abs(
-              measurement.getRotation().getDegrees()
-                  - estimator.getEstimatedPosition().getRotation().getDegrees());
+      var dtheta = Math.abs(measurement.getRotation().getDegrees()
+          - estimator.getEstimatedPosition().getRotation().getDegrees());
 
       assertTrue(dx > 0.08 || dy > 0.08 || dtheta > 0.08, errorLog);
     }
@@ -308,39 +288,34 @@ class SwerveDrivePoseEstimatorTest {
 
   @Test
   void testDiscardsOldVisionMeasurements() {
-    var kinematics =
-        new SwerveDriveKinematics(
-            new Translation2d(1, 1),
-            new Translation2d(-1, 1),
-            new Translation2d(1, -1),
-            new Translation2d(-1, -1));
-    var estimator =
-        new SwerveDrivePoseEstimator(
-            kinematics,
-            Rotation2d.kZero,
-            new SwerveModulePosition[] {
-              new SwerveModulePosition(),
-              new SwerveModulePosition(),
-              new SwerveModulePosition(),
-              new SwerveModulePosition()
-            },
-            Pose2d.kZero,
-            VecBuilder.fill(0.1, 0.1, 0.1),
-            VecBuilder.fill(0.9, 0.9, 0.9));
+    var kinematics = new SwerveDriveKinematics(
+        new Translation2d(1, 1),
+        new Translation2d(-1, 1),
+        new Translation2d(1, -1),
+        new Translation2d(-1, -1));
+    var estimator = new SwerveDrivePoseEstimator(
+        kinematics,
+        Rotation2d.kZero,
+        new SwerveModulePosition[] {
+          new SwerveModulePosition(),
+          new SwerveModulePosition(),
+          new SwerveModulePosition(),
+          new SwerveModulePosition()
+        },
+        Pose2d.kZero,
+        VecBuilder.fill(0.1, 0.1, 0.1),
+        VecBuilder.fill(0.9, 0.9, 0.9));
 
     double time = 0;
 
     // Add enough measurements to fill up the buffer
     for (; time < 4; time += 0.02) {
-      estimator.updateWithTime(
-          time,
-          Rotation2d.kZero,
-          new SwerveModulePosition[] {
-            new SwerveModulePosition(),
-            new SwerveModulePosition(),
-            new SwerveModulePosition(),
-            new SwerveModulePosition()
-          });
+      estimator.updateWithTime(time, Rotation2d.kZero, new SwerveModulePosition[] {
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition()
+      });
     }
 
     var odometryPose = estimator.getEstimatedPosition();
@@ -362,25 +337,23 @@ class SwerveDrivePoseEstimatorTest {
 
   @Test
   void testSampleAt() {
-    var kinematics =
-        new SwerveDriveKinematics(
-            new Translation2d(1, 1),
-            new Translation2d(-1, 1),
-            new Translation2d(1, -1),
-            new Translation2d(-1, -1));
-    var estimator =
-        new SwerveDrivePoseEstimator(
-            kinematics,
-            Rotation2d.kZero,
-            new SwerveModulePosition[] {
-              new SwerveModulePosition(),
-              new SwerveModulePosition(),
-              new SwerveModulePosition(),
-              new SwerveModulePosition()
-            },
-            Pose2d.kZero,
-            VecBuilder.fill(1, 1, 1),
-            VecBuilder.fill(1, 1, 1));
+    var kinematics = new SwerveDriveKinematics(
+        new Translation2d(1, 1),
+        new Translation2d(-1, 1),
+        new Translation2d(1, -1),
+        new Translation2d(-1, -1));
+    var estimator = new SwerveDrivePoseEstimator(
+        kinematics,
+        Rotation2d.kZero,
+        new SwerveModulePosition[] {
+          new SwerveModulePosition(),
+          new SwerveModulePosition(),
+          new SwerveModulePosition(),
+          new SwerveModulePosition()
+        },
+        Pose2d.kZero,
+        VecBuilder.fill(1, 1, 1),
+        VecBuilder.fill(1, 1, 1));
 
     // Returns empty when null
     assertEquals(Optional.empty(), estimator.sampleAt(1));
@@ -388,13 +361,12 @@ class SwerveDrivePoseEstimatorTest {
     // Add odometry measurements, but don't fill up the buffer
     // Add a tiny tolerance for the upper bound because of floating point rounding error
     for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
-      var wheelPositions =
-          new SwerveModulePosition[] {
-            new SwerveModulePosition(time, Rotation2d.kZero),
-            new SwerveModulePosition(time, Rotation2d.kZero),
-            new SwerveModulePosition(time, Rotation2d.kZero),
-            new SwerveModulePosition(time, Rotation2d.kZero)
-          };
+      var wheelPositions = new SwerveModulePosition[] {
+        new SwerveModulePosition(time, Rotation2d.kZero),
+        new SwerveModulePosition(time, Rotation2d.kZero),
+        new SwerveModulePosition(time, Rotation2d.kZero),
+        new SwerveModulePosition(time, Rotation2d.kZero)
+      };
       estimator.updateWithTime(time, Rotation2d.kZero, wheelPositions);
     }
 
@@ -428,33 +400,30 @@ class SwerveDrivePoseEstimatorTest {
 
   @Test
   void testReset() {
-    var kinematics =
-        new SwerveDriveKinematics(
-            new Translation2d(1, 1),
-            new Translation2d(-1, 1),
-            new Translation2d(1, -1),
-            new Translation2d(-1, -1));
-    var estimator =
-        new SwerveDrivePoseEstimator(
-            kinematics,
-            Rotation2d.kZero,
-            new SwerveModulePosition[] {
-              new SwerveModulePosition(),
-              new SwerveModulePosition(),
-              new SwerveModulePosition(),
-              new SwerveModulePosition()
-            },
-            Pose2d.kZero,
-            VecBuilder.fill(1, 1, 1),
-            VecBuilder.fill(1, 1, 1));
+    var kinematics = new SwerveDriveKinematics(
+        new Translation2d(1, 1),
+        new Translation2d(-1, 1),
+        new Translation2d(1, -1),
+        new Translation2d(-1, -1));
+    var estimator = new SwerveDrivePoseEstimator(
+        kinematics,
+        Rotation2d.kZero,
+        new SwerveModulePosition[] {
+          new SwerveModulePosition(),
+          new SwerveModulePosition(),
+          new SwerveModulePosition(),
+          new SwerveModulePosition()
+        },
+        Pose2d.kZero,
+        VecBuilder.fill(1, 1, 1),
+        VecBuilder.fill(1, 1, 1));
 
     // Test reset position
     {
       var modulePosition = new SwerveModulePosition(1, Rotation2d.kZero);
       estimator.resetPosition(
           Rotation2d.kZero,
-          new SwerveModulePosition[] {
-            modulePosition, modulePosition, modulePosition, modulePosition
+          new SwerveModulePosition[] {modulePosition, modulePosition, modulePosition, modulePosition
           },
           new Pose2d(1, 0, Rotation2d.kZero));
     }
@@ -468,11 +437,9 @@ class SwerveDrivePoseEstimatorTest {
     // Test orientation and wheel positions
     {
       var modulePosition = new SwerveModulePosition(2, Rotation2d.kZero);
-      estimator.update(
-          Rotation2d.kZero,
-          new SwerveModulePosition[] {
-            modulePosition, modulePosition, modulePosition, modulePosition
-          });
+      estimator.update(Rotation2d.kZero, new SwerveModulePosition[] {
+        modulePosition, modulePosition, modulePosition, modulePosition
+      });
     }
 
     assertAll(
@@ -487,30 +454,22 @@ class SwerveDrivePoseEstimatorTest {
     assertAll(
         () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
-        () ->
-            assertEquals(
-                Math.PI / 2,
-                estimator.getEstimatedPosition().getRotation().getRadians(),
-                kEpsilon));
+        () -> assertEquals(
+            Math.PI / 2, estimator.getEstimatedPosition().getRotation().getRadians(), kEpsilon));
 
     // Test orientation
     {
       var modulePosition = new SwerveModulePosition(3, Rotation2d.kZero);
-      estimator.update(
-          Rotation2d.kZero,
-          new SwerveModulePosition[] {
-            modulePosition, modulePosition, modulePosition, modulePosition
-          });
+      estimator.update(Rotation2d.kZero, new SwerveModulePosition[] {
+        modulePosition, modulePosition, modulePosition, modulePosition
+      });
     }
 
     assertAll(
         () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(1, estimator.getEstimatedPosition().getY(), kEpsilon),
-        () ->
-            assertEquals(
-                Math.PI / 2,
-                estimator.getEstimatedPosition().getRotation().getRadians(),
-                kEpsilon));
+        () -> assertEquals(
+            Math.PI / 2, estimator.getEstimatedPosition().getRotation().getRadians(), kEpsilon));
 
     // Test reset translation
     estimator.resetTranslation(new Translation2d(-1, -1));
@@ -518,11 +477,8 @@ class SwerveDrivePoseEstimatorTest {
     assertAll(
         () -> assertEquals(-1, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(-1, estimator.getEstimatedPosition().getY(), kEpsilon),
-        () ->
-            assertEquals(
-                Math.PI / 2,
-                estimator.getEstimatedPosition().getRotation().getRadians(),
-                kEpsilon));
+        () -> assertEquals(
+            Math.PI / 2, estimator.getEstimatedPosition().getRotation().getRadians(), kEpsilon));
 
     // Test reset pose
     estimator.resetPose(Pose2d.kZero);

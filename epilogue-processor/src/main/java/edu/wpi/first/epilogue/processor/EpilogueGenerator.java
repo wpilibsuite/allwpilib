@@ -59,28 +59,22 @@ public class EpilogueGenerator {
         out.println("import edu.wpi.first.hal.HAL;");
         out.println();
 
-        loggerClassNames.stream()
-            .sorted()
-            .forEach(
-                name -> {
-                  if (!name.contains(".")) {
-                    // Logger is in the global namespace, don't need to import
-                    return;
-                  }
+        loggerClassNames.stream().sorted().forEach(name -> {
+          if (!name.contains(".")) {
+            // Logger is in the global namespace, don't need to import
+            return;
+          }
 
-                  out.println("import " + name + ";");
-                });
-        m_customLoggers.values().stream()
-            .distinct()
-            .forEach(
-                loggerType -> {
-                  var name = loggerType.asElement().toString();
-                  if (!name.contains(".")) {
-                    // Logger is in the global namespace, don't need to import
-                    return;
-                  }
-                  out.println("import " + name + ";");
-                });
+          out.println("import " + name + ";");
+        });
+        m_customLoggers.values().stream().distinct().forEach(loggerType -> {
+          var name = loggerType.asElement().toString();
+          if (!name.contains(".")) {
+            // Logger is in the global namespace, don't need to import
+            return;
+          }
+          out.println("import " + name + ";");
+        });
         out.println();
 
         out.println("public final class Epilogue {");
@@ -100,33 +94,28 @@ public class EpilogueGenerator {
             "  private static final EpilogueConfiguration config = new EpilogueConfiguration();");
         out.println();
 
-        loggerClassNames.forEach(
-            name -> {
-              String simple = StringUtils.simpleName(name);
+        loggerClassNames.forEach(name -> {
+          String simple = StringUtils.simpleName(name);
 
-              // public static final FooLogger fooLogger = new FooLogger();
-              out.print("  public static final ");
-              out.print(simple);
-              out.print(" ");
-              out.print(StringUtils.lowerCamelCase(simple));
-              out.print(" = new ");
-              out.print(simple);
-              out.println("();");
-            });
-        m_customLoggers.values().stream()
-            .distinct()
-            .forEach(
-                loggerType -> {
-                  var loggerTypeName = loggerType.asElement().getSimpleName();
-                  out.println(
-                      "  public static final "
-                          + loggerTypeName
-                          + " "
-                          + StringUtils.lowerCamelCase(loggerTypeName)
-                          + " = new "
-                          + loggerTypeName
-                          + "();");
-                });
+          // public static final FooLogger fooLogger = new FooLogger();
+          out.print("  public static final ");
+          out.print(simple);
+          out.print(" ");
+          out.print(StringUtils.lowerCamelCase(simple));
+          out.print(" = new ");
+          out.print(simple);
+          out.println("();");
+        });
+        m_customLoggers.values().stream().distinct().forEach(loggerType -> {
+          var loggerTypeName = loggerType.asElement().getSimpleName();
+          out.println("  public static final "
+              + loggerTypeName
+              + " "
+              + StringUtils.lowerCamelCase(loggerTypeName)
+              + " = new "
+              + loggerTypeName
+              + "();");
+        });
         out.println();
 
         out.println(
@@ -167,10 +156,9 @@ public class EpilogueGenerator {
                 """);
             out.println("  public static void update(" + robotClassName + " robot) {");
             out.println("    long start = System.nanoTime();");
-            out.println(
-                "    "
-                    + StringUtils.loggerFieldName(mainRobotClass)
-                    + ".tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);");
+            out.println("    "
+                + StringUtils.loggerFieldName(mainRobotClass)
+                + ".tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);");
             out.println(
                 "    config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);");
             out.println("  }");

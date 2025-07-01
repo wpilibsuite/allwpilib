@@ -221,22 +221,17 @@ public class SysIdRoutine extends SysIdRoutineLog {
     return m_mechanism
         .m_subsystem
         .runOnce(timer::restart)
-        .andThen(
-            m_mechanism.m_subsystem.run(
-                () -> {
-                  m_mechanism.m_drive.accept(
-                      m_outputVolts.mut_replace(
-                          outputSign * timer.get() * m_config.m_rampRate.in(Volts.per(Second)),
-                          Volts));
-                  m_mechanism.m_log.accept(this);
-                  m_recordState.accept(state);
-                }))
-        .finallyDo(
-            () -> {
-              m_mechanism.m_drive.accept(Volts.of(0));
-              m_recordState.accept(State.kNone);
-              timer.stop();
-            })
+        .andThen(m_mechanism.m_subsystem.run(() -> {
+          m_mechanism.m_drive.accept(m_outputVolts.mut_replace(
+              outputSign * timer.get() * m_config.m_rampRate.in(Volts.per(Second)), Volts));
+          m_mechanism.m_log.accept(this);
+          m_recordState.accept(state);
+        }))
+        .finallyDo(() -> {
+          m_mechanism.m_drive.accept(Volts.of(0));
+          m_recordState.accept(State.kNone);
+          timer.stop();
+        })
         .withName("sysid-" + state.toString() + "-" + m_mechanism.m_name)
         .withTimeout(m_config.m_timeout.in(Seconds));
   }
@@ -253,28 +248,24 @@ public class SysIdRoutine extends SysIdRoutineLog {
    */
   public Command dynamic(Direction direction) {
     double outputSign = direction == Direction.kForward ? 1.0 : -1.0;
-    State state =
-        Map.ofEntries(
-                entry(Direction.kForward, State.kDynamicForward),
-                entry(Direction.kReverse, State.kDynamicReverse))
-            .get(direction);
+    State state = Map.ofEntries(
+            entry(Direction.kForward, State.kDynamicForward),
+            entry(Direction.kReverse, State.kDynamicReverse))
+        .get(direction);
 
     return m_mechanism
         .m_subsystem
         .runOnce(
             () -> m_outputVolts.mut_replace(m_config.m_stepVoltage.in(Volts) * outputSign, Volts))
-        .andThen(
-            m_mechanism.m_subsystem.run(
-                () -> {
-                  m_mechanism.m_drive.accept(m_outputVolts);
-                  m_mechanism.m_log.accept(this);
-                  m_recordState.accept(state);
-                }))
-        .finallyDo(
-            () -> {
-              m_mechanism.m_drive.accept(Volts.of(0));
-              m_recordState.accept(State.kNone);
-            })
+        .andThen(m_mechanism.m_subsystem.run(() -> {
+          m_mechanism.m_drive.accept(m_outputVolts);
+          m_mechanism.m_log.accept(this);
+          m_recordState.accept(state);
+        }))
+        .finallyDo(() -> {
+          m_mechanism.m_drive.accept(Volts.of(0));
+          m_recordState.accept(State.kNone);
+        })
         .withName("sysid-" + state.toString() + "-" + m_mechanism.m_name)
         .withTimeout(m_config.m_timeout.in(Seconds));
   }

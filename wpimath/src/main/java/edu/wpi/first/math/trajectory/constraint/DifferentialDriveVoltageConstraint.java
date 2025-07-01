@@ -51,10 +51,8 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
   @Override
   public MinMax getMinMaxAccelerationMetersPerSecondSq(
       Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
-    var wheelSpeeds =
-        m_kinematics.toWheelSpeeds(
-            new ChassisSpeeds(
-                velocityMetersPerSecond, 0, velocityMetersPerSecond * curvatureRadPerMeter));
+    var wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(
+        velocityMetersPerSecond, 0, velocityMetersPerSecond * curvatureRadPerMeter));
 
     double maxWheelSpeed =
         Math.max(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
@@ -88,27 +86,23 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
     double minChassisAcceleration;
 
     if (velocityMetersPerSecond == 0) {
-      maxChassisAcceleration =
-          maxWheelAcceleration
-              / (1 + m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter) / 2);
-      minChassisAcceleration =
-          minWheelAcceleration
-              / (1 + m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter) / 2);
+      maxChassisAcceleration = maxWheelAcceleration
+          / (1 + m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter) / 2);
+      minChassisAcceleration = minWheelAcceleration
+          / (1 + m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter) / 2);
     } else {
-      maxChassisAcceleration =
-          maxWheelAcceleration
-              / (1
-                  + m_kinematics.trackWidthMeters
-                      * Math.abs(curvatureRadPerMeter)
-                      * Math.signum(velocityMetersPerSecond)
-                      / 2);
-      minChassisAcceleration =
-          minWheelAcceleration
-              / (1
-                  - m_kinematics.trackWidthMeters
-                      * Math.abs(curvatureRadPerMeter)
-                      * Math.signum(velocityMetersPerSecond)
-                      / 2);
+      maxChassisAcceleration = maxWheelAcceleration
+          / (1
+              + m_kinematics.trackWidthMeters
+                  * Math.abs(curvatureRadPerMeter)
+                  * Math.signum(velocityMetersPerSecond)
+                  / 2);
+      minChassisAcceleration = minWheelAcceleration
+          / (1
+              - m_kinematics.trackWidthMeters
+                  * Math.abs(curvatureRadPerMeter)
+                  * Math.signum(velocityMetersPerSecond)
+                  / 2);
     }
 
     // When turning about a point inside the wheelbase (i.e. radius less than half

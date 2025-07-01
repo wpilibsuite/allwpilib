@@ -41,13 +41,12 @@ class LinearQuadraticRegulatorTest {
   void testFourMotorElevator() {
     var dt = 0.020;
 
-    var plant =
-        LinearSystemId.createElevatorSystem(
-            DCMotor.getVex775Pro(4), 8.0, 0.75 * 25.4 / 1000.0, 14.67);
+    var plant = LinearSystemId.createElevatorSystem(
+        DCMotor.getVex775Pro(4), 8.0, 0.75 * 25.4 / 1000.0, 14.67);
 
-    var K =
-        new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt)
-            .getK();
+    var K = new LinearQuadraticRegulator<>(
+            plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt)
+        .getK();
 
     assertEquals(10.381, K.get(0, 0), 1e-2);
     assertEquals(0.6929, K.get(0, 1), 1e-2);
@@ -159,9 +158,8 @@ class LinearQuadraticRegulatorTest {
   void testLatencyCompensate() {
     var dt = 0.02;
 
-    var plant =
-        LinearSystemId.createElevatorSystem(
-            DCMotor.getVex775Pro(4), 8.0, 0.75 * 25.4 / 1000.0, 14.67);
+    var plant = LinearSystemId.createElevatorSystem(
+        DCMotor.getVex775Pro(4), 8.0, 0.75 * 25.4 / 1000.0, 14.67);
 
     var regulator =
         new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt);

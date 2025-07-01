@@ -38,9 +38,8 @@ class I2CCommunicationTest {
     SimHooks.pauseTiming();
     DriverStationSim.resetData();
     m_future = new CompletableFuture<>();
-    m_callback =
-        m_i2c.registerWriteCallback(
-            (name, buffer, count) -> m_future.complete(new String(buffer, 0, count)));
+    m_callback = m_i2c.registerWriteCallback(
+        (name, buffer, count) -> m_future.complete(new String(buffer, 0, count)));
     m_robot = new Robot();
     m_thread = new Thread(m_robot::startCompetition);
     m_thread.start();

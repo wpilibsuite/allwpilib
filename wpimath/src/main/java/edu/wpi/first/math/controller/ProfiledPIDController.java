@@ -443,28 +443,23 @@ public class ProfiledPIDController implements Sendable {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
-    builder.addDoubleProperty(
-        "izone",
-        this::getIZone,
-        (double toSet) -> {
-          try {
-            setIZone(toSet);
-          } catch (IllegalArgumentException e) {
-            MathSharedStore.reportError("IZone must be a non-negative number!", e.getStackTrace());
-          }
-        });
+    builder.addDoubleProperty("izone", this::getIZone, (double toSet) -> {
+      try {
+        setIZone(toSet);
+      } catch (IllegalArgumentException e) {
+        MathSharedStore.reportError("IZone must be a non-negative number!", e.getStackTrace());
+      }
+    });
     builder.addDoubleProperty(
         "maxVelocity",
         () -> getConstraints().maxVelocity,
-        maxVelocity ->
-            setConstraints(
-                new TrapezoidProfile.Constraints(maxVelocity, getConstraints().maxAcceleration)));
+        maxVelocity -> setConstraints(
+            new TrapezoidProfile.Constraints(maxVelocity, getConstraints().maxAcceleration)));
     builder.addDoubleProperty(
         "maxAcceleration",
         () -> getConstraints().maxAcceleration,
-        maxAcceleration ->
-            setConstraints(
-                new TrapezoidProfile.Constraints(getConstraints().maxVelocity, maxAcceleration)));
+        maxAcceleration -> setConstraints(
+            new TrapezoidProfile.Constraints(getConstraints().maxVelocity, maxAcceleration)));
     builder.addDoubleProperty("goal", () -> getGoal().position, this::setGoal);
   }
 }

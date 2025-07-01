@@ -46,23 +46,21 @@ public class Robot extends TimedRobot {
       LinearSystemId.identifyVelocitySystem(kFlywheelKv, kFlywheelKa);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
-  private final KalmanFilter<N1, N1, N1> m_observer =
-      new KalmanFilter<>(
-          Nat.N1(),
-          Nat.N1(),
-          m_flywheelPlant,
-          VecBuilder.fill(3.0), // How accurate we think our model is
-          VecBuilder.fill(0.01), // How accurate we think our encoder
-          // data is
-          0.020);
+  private final KalmanFilter<N1, N1, N1> m_observer = new KalmanFilter<>(
+      Nat.N1(),
+      Nat.N1(),
+      m_flywheelPlant,
+      VecBuilder.fill(3.0), // How accurate we think our model is
+      VecBuilder.fill(0.01), // How accurate we think our encoder
+      // data is
+      0.020);
 
   // A LQR uses feedback to create voltage commands.
-  private final LinearQuadraticRegulator<N1, N1, N1> m_controller =
-      new LinearQuadraticRegulator<>(
-          m_flywheelPlant,
-          VecBuilder.fill(8.0), // Velocity error tolerance
-          VecBuilder.fill(12.0), // Control effort (voltage) tolerance
-          0.020);
+  private final LinearQuadraticRegulator<N1, N1, N1> m_controller = new LinearQuadraticRegulator<>(
+      m_flywheelPlant,
+      VecBuilder.fill(8.0), // Velocity error tolerance
+      VecBuilder.fill(12.0), // Control effort (voltage) tolerance
+      0.020);
 
   // The state-space loop combines a controller, observer, feedforward and plant for easy control.
   private final LinearSystemLoop<N1, N1, N1> m_loop =

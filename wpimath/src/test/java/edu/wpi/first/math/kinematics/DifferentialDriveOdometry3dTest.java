@@ -19,12 +19,11 @@ class DifferentialDriveOdometry3dTest {
 
   @Test
   void testInitialize() {
-    DifferentialDriveOdometry3d odometry =
-        new DifferentialDriveOdometry3d(
-            Rotation3d.kZero,
-            0,
-            0,
-            new Pose3d(1, 2, 0, new Rotation3d(0, 0, Units.degreesToRadians(45))));
+    DifferentialDriveOdometry3d odometry = new DifferentialDriveOdometry3d(
+        Rotation3d.kZero,
+        0,
+        0,
+        new Pose3d(1, 2, 0, new Rotation3d(0, 0, Units.degreesToRadians(45))));
     var pose = odometry.getPoseMeters();
     assertAll(
         () -> assertEquals(pose.getX(), 1.0, kEpsilon),

@@ -53,9 +53,8 @@ public class PneumaticHub implements PneumaticsBase {
           try (OutputStream output = Files.newOutputStream(file.toPath())) {
             output.write("[Version]\n".getBytes(StandardCharsets.UTF_8));
             output.write("model=REV PH\n".getBytes(StandardCharsets.UTF_8));
-            output.write(
-                ("deviceID=" + Integer.toHexString(0x9052600 | module) + "\n")
-                    .getBytes(StandardCharsets.UTF_8));
+            output.write(("deviceID=" + Integer.toHexString(0x9052600 | module) + "\n")
+                .getBytes(StandardCharsets.UTF_8));
             output.write(("currentVersion=" + fwVersion).getBytes(StandardCharsets.UTF_8));
           }
         } catch (IOException ex) {
@@ -65,11 +64,10 @@ public class PneumaticHub implements PneumaticsBase {
 
       // Check PH firmware version
       if (version.firmwareMajor > 0 && version.firmwareMajor < 22) {
-        throw new IllegalStateException(
-            "The Pneumatic Hub has firmware version "
-                + fwVersion
-                + ", and must be updated to version 2022.0.0 or later "
-                + "using the REV Hardware Client.");
+        throw new IllegalStateException("The Pneumatic Hub has firmware version "
+            + fwVersion
+            + ", and must be updated to version 2022.0.0 or later "
+            + "using the REV Hardware Client.");
       }
     }
 

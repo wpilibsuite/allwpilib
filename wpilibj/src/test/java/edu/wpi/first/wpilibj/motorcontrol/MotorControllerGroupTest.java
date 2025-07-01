@@ -18,19 +18,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 @SuppressWarnings("removal")
 class MotorControllerGroupTest {
   private static Stream<Arguments> motorControllerArguments() {
-    return IntStream.of(1, 2, 3)
-        .mapToObj(
-            number -> {
-              MotorController[] motorControllers =
-                  Stream.generate(MockMotorController::new)
-                      .limit(number)
-                      .toArray(MotorController[]::new);
-              MotorControllerGroup group =
-                  new MotorControllerGroup(
-                      motorControllers[0],
-                      Arrays.copyOfRange(motorControllers, 1, motorControllers.length));
-              return Arguments.of(group, motorControllers);
-            });
+    return IntStream.of(1, 2, 3).mapToObj(number -> {
+      MotorController[] motorControllers =
+          Stream.generate(MockMotorController::new).limit(number).toArray(MotorController[]::new);
+      MotorControllerGroup group = new MotorControllerGroup(
+          motorControllers[0], Arrays.copyOfRange(motorControllers, 1, motorControllers.length));
+      return Arguments.of(group, motorControllers);
+    });
   }
 
   @ParameterizedTest

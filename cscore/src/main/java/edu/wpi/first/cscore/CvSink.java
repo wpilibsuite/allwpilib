@@ -160,20 +160,15 @@ public class CvSink extends ImageSink {
       m_width = m_frame.getWidth();
       m_pixelFormat = m_frame.getPixelFormat();
       if (m_frame.getStride() == 0) {
-        m_tmpMat =
-            new Mat(
-                m_frame.getHeight(),
-                m_frame.getWidth(),
-                getCVFormat(m_pixelFormat),
-                m_origByteBuffer);
+        m_tmpMat = new Mat(
+            m_frame.getHeight(), m_frame.getWidth(), getCVFormat(m_pixelFormat), m_origByteBuffer);
       } else {
-        m_tmpMat =
-            new Mat(
-                m_frame.getHeight(),
-                m_frame.getWidth(),
-                getCVFormat(m_pixelFormat),
-                m_origByteBuffer,
-                m_frame.getStride());
+        m_tmpMat = new Mat(
+            m_frame.getHeight(),
+            m_frame.getWidth(),
+            getCVFormat(m_pixelFormat),
+            m_origByteBuffer,
+            m_frame.getStride());
       }
     }
     return rv;
@@ -203,20 +198,15 @@ public class CvSink extends ImageSink {
       m_width = m_frame.getWidth();
       m_pixelFormat = m_frame.getPixelFormat();
       if (m_frame.getStride() == 0) {
-        m_tmpMat =
-            new Mat(
-                m_frame.getHeight(),
-                m_frame.getWidth(),
-                getCVFormat(m_pixelFormat),
-                m_origByteBuffer);
+        m_tmpMat = new Mat(
+            m_frame.getHeight(), m_frame.getWidth(), getCVFormat(m_pixelFormat), m_origByteBuffer);
       } else {
-        m_tmpMat =
-            new Mat(
-                m_frame.getHeight(),
-                m_frame.getWidth(),
-                getCVFormat(m_pixelFormat),
-                m_origByteBuffer,
-                m_frame.getStride());
+        m_tmpMat = new Mat(
+            m_frame.getHeight(),
+            m_frame.getWidth(),
+            getCVFormat(m_pixelFormat),
+            m_origByteBuffer,
+            m_frame.getStride());
       }
     }
     return rv;
