@@ -7,14 +7,18 @@ include(DownloadAndCheck)
 
 file(
     GLOB wpimath_jni_src
-    src/main/native/cpp/jni/ArmFeedforwardJNI.cpp
     src/main/native/cpp/jni/DAREJNI.cpp
     src/main/native/cpp/jni/EigenJNI.cpp
-    src/main/native/cpp/jni/Ellipse2dJNI.cpp
     src/main/native/cpp/jni/Exceptions.cpp
     src/main/native/cpp/jni/Pose3dJNI.cpp
     src/main/native/cpp/jni/StateSpaceUtilJNI.cpp
     src/main/native/cpp/jni/TrajectoryUtilJNI.cpp
+    src/main/native/cpp/jni/autodiff/GradientJNI.cpp
+    src/main/native/cpp/jni/autodiff/HessianJNI.cpp
+    src/main/native/cpp/jni/autodiff/JacobianJNI.cpp
+    src/main/native/cpp/jni/autodiff/VariableJNI.cpp
+    src/main/native/cpp/jni/autodiff/VariableMatrixJNI.cpp
+    src/main/native/cpp/jni/optimization/ProblemJNI.cpp
 )
 
 # Java bindings

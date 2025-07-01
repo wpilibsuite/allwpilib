@@ -18,7 +18,7 @@
           "{}:{}: {}: Assertion `{}' failed.", location.file_name(), \
           location.line(), location.function_name(), #condition));   \
     }                                                                \
-  } while (0);
+  } while (0)
 #else
 #include <cassert>
 /**

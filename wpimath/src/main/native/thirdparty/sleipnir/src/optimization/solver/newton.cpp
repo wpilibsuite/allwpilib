@@ -39,9 +39,9 @@ ExitStatus newton(const NewtonMatrixCallbacks& matrix_callbacks,
   solve_profilers.emplace_back("  ↳ setup");
   solve_profilers.emplace_back("  ↳ iteration");
   solve_profilers.emplace_back("    ↳ feasibility ✓");
-  solve_profilers.emplace_back("    ↳ iteration callbacks");
-  solve_profilers.emplace_back("    ↳ iter matrix compute");
-  solve_profilers.emplace_back("    ↳ iter matrix solve");
+  solve_profilers.emplace_back("    ↳ iter callbacks");
+  solve_profilers.emplace_back("    ↳ KKT matrix decomp");
+  solve_profilers.emplace_back("    ↳ KKT system solve");
   solve_profilers.emplace_back("    ↳ line search");
   solve_profilers.emplace_back("    ↳ next iter prep");
   solve_profilers.emplace_back("    ↳ f(x)");
@@ -52,9 +52,9 @@ ExitStatus newton(const NewtonMatrixCallbacks& matrix_callbacks,
   auto& setup_prof = solve_profilers[1];
   auto& inner_iter_prof = solve_profilers[2];
   auto& feasibility_check_prof = solve_profilers[3];
-  auto& iteration_callbacks_prof = solve_profilers[4];
-  auto& linear_system_compute_prof = solve_profilers[5];
-  auto& linear_system_solve_prof = solve_profilers[6];
+  auto& iter_callbacks_prof = solve_profilers[4];
+  auto& kkt_matrix_decomp_prof = solve_profilers[5];
+  auto& kkt_system_solve_prof = solve_profilers[6];
   auto& line_search_prof = solve_profilers[7];
   auto& next_iter_prep_prof = solve_profilers[8];
 
@@ -137,7 +137,7 @@ ExitStatus newton(const NewtonMatrixCallbacks& matrix_callbacks,
     }
 
     feasibility_check_profiler.stop();
-    ScopedProfiler iteration_callbacks_profiler{iteration_callbacks_prof};
+    ScopedProfiler iter_callbacks_profiler{iter_callbacks_prof};
 
     // Call iteration callbacks
     for (const auto& callback : iteration_callbacks) {
@@ -147,20 +147,20 @@ ExitStatus newton(const NewtonMatrixCallbacks& matrix_callbacks,
       }
     }
 
-    iteration_callbacks_profiler.stop();
-    ScopedProfiler linear_system_compute_profiler{linear_system_compute_prof};
+    iter_callbacks_profiler.stop();
+    ScopedProfiler kkt_matrix_decomp_profiler{kkt_matrix_decomp_prof};
 
     // Solve the Newton-KKT system
     //
     // Hpˣ = −∇f
     solver.compute(H);
 
-    linear_system_compute_profiler.stop();
-    ScopedProfiler linear_system_solve_profiler{linear_system_solve_prof};
+    kkt_matrix_decomp_profiler.stop();
+    ScopedProfiler kkt_system_solve_profiler{kkt_system_solve_prof};
 
     Eigen::VectorXd p_x = solver.solve(-g);
 
-    linear_system_solve_profiler.stop();
+    kkt_system_solve_profiler.stop();
     ScopedProfiler line_search_profiler{line_search_prof};
 
     constexpr double α_max = 1.0;

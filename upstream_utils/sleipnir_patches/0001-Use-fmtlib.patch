@@ -23,7 +23,7 @@ index 1b6652d3d5886cf8c9eca0d855c21031775bad7c..4f4c76204071f90bf49eddb8c2aceb58
    ^gch/
  }
 diff --git a/include/sleipnir/util/assert.hpp b/include/sleipnir/util/assert.hpp
-index 75d8ffca32accbf66ffce30f073de1db2f42469b..53de01928b929793fa77885ec4a6d1a928bdc5a9 100644
+index 949c9842964a9094a2cc3674d1fb7821cf9412f4..b264b18ddb4d597949c67597b4bd9bf086f7d618 100644
 --- a/include/sleipnir/util/assert.hpp
 +++ b/include/sleipnir/util/assert.hpp
 @@ -3,9 +3,10 @@
