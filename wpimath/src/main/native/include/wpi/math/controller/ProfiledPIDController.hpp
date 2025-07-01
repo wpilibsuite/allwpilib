@@ -11,13 +11,14 @@
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/MathUtil.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/tunable/ComplexTunable.hpp"
+#include "wpi/tunable/Tunable.hpp"
+#include "wpi/tunable/TunableTable.hpp"
 #include "wpi/units/base.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
 
 namespace wpi::math {
 namespace detail {
@@ -30,9 +31,8 @@ int IncrementAndGetProfiledPIDControllerInstances();
  * profile.
  */
 template <class Distance>
-class ProfiledPIDController
-    : public wpi::util::Sendable,
-      public wpi::util::SendableHelper<ProfiledPIDController<Distance>> {
+class ProfiledPIDController : public wpi::TelemetryLoggable,
+                              public wpi::ComplexTunable {
  public:
   using Distance_t = wpi::units::unit_t<Distance>;
   using Velocity =
@@ -68,8 +68,6 @@ class ProfiledPIDController
       int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
       wpi::math::MathSharedStore::ReportUsage("ProfiledPIDController",
                                               std::to_string(instances));
-      wpi::util::SendableRegistry::Add(this, "ProfiledPIDController",
-                                       instances);
     }
   }
 
@@ -233,7 +231,7 @@ class ProfiledPIDController
    * Get the velocity and acceleration constraints for this controller.
    * @return Velocity and acceleration constraints.
    */
-  constexpr Constraints GetConstraints() { return m_constraints; }
+  constexpr Constraints GetConstraints() const { return m_constraints; }
 
   /**
    * Returns the current setpoint of the ProfiledPIDController.
@@ -418,33 +416,23 @@ class ProfiledPIDController
     Reset(measuredPosition, Velocity_t{0});
   }
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override {
-    builder.SetSmartDashboardType("ProfiledPIDController");
-    builder.AddDoubleProperty(
-        "p", [this] { return GetP(); }, [this](double value) { SetP(value); });
-    builder.AddDoubleProperty(
-        "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
-    builder.AddDoubleProperty(
-        "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
-    builder.AddDoubleProperty(
-        "izone", [this] { return GetIZone(); },
-        [this](double value) { SetIZone(value); });
-    builder.AddDoubleProperty(
-        "maxVelocity", [this] { return GetConstraints().maxVelocity.value(); },
-        [this](double value) {
-          SetConstraints(
-              Constraints{Velocity_t{value}, GetConstraints().maxAcceleration});
-        });
-    builder.AddDoubleProperty(
-        "maxAcceleration",
-        [this] { return GetConstraints().maxAcceleration.value(); },
-        [this](double value) {
-          SetConstraints(
-              Constraints{GetConstraints().maxVelocity, Acceleration_t{value}});
-        });
-    builder.AddDoubleProperty(
-        "goal", [this] { return GetGoal().position.value(); },
-        [this](double value) { SetGoal(Distance_t{value}); });
+  void LogTo(wpi::TelemetryTable& table) const override {
+    table.Log("controller", m_controller);
+    table.Log("constraints", m_constraints);
+    table.Log("goal", GetGoal().position);
+  }
+
+  std::string_view GetTelemetryType() const override {
+    return "ProfiledPIDController";
+  }
+
+  void PublishTunable(wpi::TunableTable& table) override {
+    table.Publish("controller", m_controller);
+    table.Publish("constraints", this, &ProfiledPIDController::m_constraints);
+  }
+
+  std::string_view GetTunableType() const override {
+    return "ProfiledPIDController";
   }
 
  private:

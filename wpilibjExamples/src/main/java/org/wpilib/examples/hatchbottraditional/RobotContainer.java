@@ -19,8 +19,9 @@ import org.wpilib.examples.hatchbottraditional.commands.HalveDriveVelocity;
 import org.wpilib.examples.hatchbottraditional.commands.ReleaseHatch;
 import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
 import org.wpilib.examples.hatchbottraditional.subsystems.HatchSubsystem;
-import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -44,7 +45,7 @@ public class RobotContainer {
   private final Command complexAuto = new ComplexAuto(robotDrive, hatchSubsystem);
 
   // A chooser for autonomous commands
-  SendableChooser<Command> chooser = new SendableChooser<>();
+  private final Selectable<Command> chooser = new Selectable<>();
 
   // The driver's controller
   Gamepad driverController = new Gamepad(OIConstants.kDriverControllerPort);
@@ -63,14 +64,11 @@ public class RobotContainer {
             robotDrive, () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
 
     // Add commands to the autonomous command chooser
-    chooser.setDefaultOption("Simple Auto", simpleAuto);
-    chooser.addOption("Complex Auto", complexAuto);
+    chooser.addDefault("Simple Auto", simpleAuto);
+    chooser.add("Complex Auto", complexAuto);
 
     // Put the chooser on the dashboard
-    SmartDashboard.putData("Autonomous", chooser);
-    // Put subsystems to dashboard.
-    SmartDashboard.putData("Drivetrain", robotDrive);
-    SmartDashboard.putData("HatchSubsystem", hatchSubsystem);
+    Tunables.publish("Autonomous", chooser);
   }
 
   /**
@@ -96,5 +94,11 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return chooser.getSelected();
+  }
+
+  /** Update telemetry. */
+  public void updateTelemetry() {
+    Telemetry.log("Drivetrain", robotDrive);
+    Telemetry.log("HatchSubsystem", hatchSubsystem);
   }
 }

@@ -23,6 +23,8 @@ dependencies {
     implementation project(':cameraserver')
     implementation project(':commandsv2')
     implementation project(':commandsv3')
+    implementation project(':telemetry')
+    implementation project(':tunable')
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')
     implementation project(':epilogue-runtime')
@@ -138,6 +140,8 @@ model {
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunable', library: 'tunable', linkage: 'shared'
 
                 def systemArch = getCurrentArch()
                 if (binary.targetPlatform.name == systemArch) {

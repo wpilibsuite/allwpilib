@@ -44,6 +44,7 @@ def build_examples(halsim_deps):
                 "//cscore:cscore-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
+                "//telemetry:telemetry-java",
                 "//wpimath:wpimath-java",
                 "//wpilibj:wpilibj-java",
                 "//commandsv2:commandsv2-java",

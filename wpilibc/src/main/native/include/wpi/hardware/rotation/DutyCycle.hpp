@@ -8,8 +8,7 @@
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Handle.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 /**
@@ -18,8 +17,7 @@ namespace wpi {
  * <p>PWM input signals are specified with a frequency and a ratio of high to
  * low in that frequency. These can be attached to any SmartIO.
  */
-class DutyCycle : public wpi::util::Sendable,
-                  public wpi::util::SendableHelper<DutyCycle> {
+class DutyCycle : public wpi::TelemetryLoggable {
  public:
   /**
    * Constructs a DutyCycle input from a smartio channel.
@@ -66,8 +64,9 @@ class DutyCycle : public wpi::util::Sendable,
    */
   int GetSourceChannel() const;
 
- protected:
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   void InitDutyCycle();

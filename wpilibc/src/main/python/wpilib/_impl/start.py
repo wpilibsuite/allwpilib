@@ -190,8 +190,6 @@ class RobotStarter:
                 "timed out while waiting for NT server to start", is_warning=True
             )
 
-        wpilib.SmartDashboard.init()
-
         # Call DriverStationBackend.refresh_data() to kick things off
         wpilib.DriverStationBackend.refresh_data()
 

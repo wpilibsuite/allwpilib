@@ -10,8 +10,7 @@
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Handle.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 /**
@@ -23,8 +22,7 @@ namespace wpi {
  * sensor, or optical sensor detecting tape on a shooter wheel. Unlike
  * encoders, this class only needs a single digital input.
  */
-class Tachometer : public wpi::util::Sendable,
-                   public wpi::util::SendableHelper<Tachometer> {
+class Tachometer : public wpi::TelemetryLoggable {
  public:
   /**
    * Constructs a new tachometer.
@@ -106,8 +104,9 @@ class Tachometer : public wpi::util::Sendable,
    */
   void SetMaxPeriod(wpi::units::second_t maxPeriod);
 
- protected:
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   wpi::util::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;

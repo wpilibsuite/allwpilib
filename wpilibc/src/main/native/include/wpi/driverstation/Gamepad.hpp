@@ -8,8 +8,7 @@
 
 #include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/driverstation/HIDDevice.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -25,9 +24,7 @@ namespace wpi {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class Gamepad : public HIDDevice,
-                public wpi::util::Sendable,
-                public wpi::util::SendableHelper<Gamepad> {
+class Gamepad : public HIDDevice, public wpi::TelemetryLoggable {
  public:
   /** Represents a digital button on an Gamepad. */
   enum class Button {
@@ -1267,11 +1264,11 @@ class Gamepad : public HIDDevice,
    */
   TouchpadFinger GetTouchpadFinger(int touchpad, int finger) const;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+  std::string_view GetTelemetryType() const override;
 
  private:
-  double GetAxisForSendable(Axis axis) const;
-  bool GetButtonForSendable(Button button) const;
+  double GetAxisForTelemetry(Axis axis) const;
 
   double m_leftXDeadband = 0.1;
   double m_leftYDeadband = 0.1;

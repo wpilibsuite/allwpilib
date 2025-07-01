@@ -36,8 +36,6 @@ class Drivetrain(commands2.Subsystem):
         )
 
         # TODO: these don't work
-        # wpiutil.SendableRegistry.addChild(self.drive, self.leftMotor)
-        # wpiutil.SendableRegistry.addChild(self.drive, self.rightMotor)
 
         # Set up the XRPGyro
         self.gyro = xrp.XRPGyro()

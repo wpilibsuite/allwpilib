@@ -11,8 +11,8 @@ import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Handle input from {{ ClassName }} controllers connected to the Driver Station.
@@ -20,7 +20,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * <p>This class handles {{ ClassName }} input that comes from the Driver Station. Each time a value
  * is requested the most recent value is returned.
  */
-public class {{ ClassName }}Controller implements HIDDevice, Sendable {
+public class {{ ClassName }}Controller implements HIDDevice, TelemetryLoggable {
   /** The number of touchpads supported by this controller. */
   public static final int TOUCHPAD_COUNT = {{ touchpads }};
 
@@ -339,14 +339,17 @@ public class {{ ClassName }}Controller implements HIDDevice, Sendable {
 {% endif %}
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "{{ ClassName }}");
+  public String getTelemetryType() {
+    return "HID:{{ ClassName }}";
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
 {%- for axis in axes %}
-    builder.addDoubleProperty("{{ axis.MethodName }}", this::get{{ axis.MethodName }}, null);
+    table.log("{{ axis.MethodName }}", get{{ axis.MethodName }}());
 {%- endfor -%}
 {% for button in buttons %}
-    builder.addBooleanProperty("{{ button.MethodName }}", this::get{{ button.MethodName }}Button, null);
+    table.log("{{ button.MethodName }}Button", get{{ button.MethodName }}Button());
 {%- endfor %}
   }
 }

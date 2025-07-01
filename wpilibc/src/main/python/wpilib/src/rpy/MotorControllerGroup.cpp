@@ -4,18 +4,9 @@
 
 #include "MotorControllerGroup.h"
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
-
-void PyMotorControllerGroup::Initialize() {
-  for (auto motorController : m_motorControllers) {
-    wpi::util::SendableRegistry::AddChild(this, motorController.get());
-  }
-  static int instances = 0;
-  ++instances;
-  wpi::util::SendableRegistry::Add(this, "MotorControllerGroup", instances);
-}
 
 void PyMotorControllerGroup::SetThrottle(double throttle) {
   for (auto motorController : m_motorControllers) {
@@ -50,10 +41,10 @@ void PyMotorControllerGroup::Disable() {
   }
 }
 
-void PyMotorControllerGroup::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Motor Controller");
-  builder.SetActuator(true);
-  builder.AddDoubleProperty(
-      "Value", [=, this]() { return GetThrottle(); },
-      [=, this](double value) { SetThrottle(value); });
+void PyMotorControllerGroup::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("Value", GetThrottle());
+}
+
+std::string_view PyMotorControllerGroup::GetTelemetryType() const {
+  return "Motor Controller";
 }

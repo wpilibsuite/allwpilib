@@ -10,9 +10,6 @@
 #include "wpi/system/RobotController.hpp"
 
 Drive::Drive() {
-  wpi::util::SendableRegistry::AddChild(&drive, &leftLeader);
-  wpi::util::SendableRegistry::AddChild(&drive, &rightLeader);
-
   leftLeader.AddFollower(leftFollower);
   rightLeader.AddFollower(rightFollower);
 

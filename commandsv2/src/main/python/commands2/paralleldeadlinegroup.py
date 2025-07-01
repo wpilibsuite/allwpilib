@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Dict
 
-from wpiutil import SendableBuilder
+from wpilib import TelemetryTable
 
 from .command import Command, InterruptionBehavior
 from .commandscheduler import CommandScheduler
@@ -132,9 +132,6 @@ class ParallelDeadlineGroup(Command):
     def get_interruption_behavior(self) -> InterruptionBehavior:
         return self._interrupt_behavior
 
-    def init_sendable(self, builder: SendableBuilder):
-        super().init_sendable(builder)
-
-        builder.add_string_property(
-            "deadline", lambda: self._deadline.get_name(), lambda _: None
-        )
+    def log_to(self, table: TelemetryTable) -> None:
+        super().log_to(table)
+        table.log("deadline", self._deadline.get_name())

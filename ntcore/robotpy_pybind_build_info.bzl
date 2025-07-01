@@ -197,26 +197,6 @@ def ntcore_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "NTSendable",
-            yml_file = "semiwrap/NTSendable.yml",
-            header_root = "$(execpath :robotpy-native-ntcore.copy_headers)",
-            header_file = "$(execpath :robotpy-native-ntcore.copy_headers)/wpi/nt/NTSendable.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::nt::NTSendable", "wpi__nt__NTSendable.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "NTSendableBuilder",
-            yml_file = "semiwrap/NTSendableBuilder.yml",
-            header_root = "$(execpath :robotpy-native-ntcore.copy_headers)",
-            header_file = "$(execpath :robotpy-native-ntcore.copy_headers)/wpi/nt/NTSendableBuilder.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::nt::NTSendableBuilder", "wpi__nt__NTSendableBuilder.hpp"),
-            ],
-        ),
-        struct(
             class_name = "NetworkTable",
             yml_file = "semiwrap/NetworkTable.yml",
             header_root = "$(execpath :robotpy-native-ntcore.copy_headers)",
@@ -451,6 +431,8 @@ def ntcore_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         local_native_libraries = [
             "//datalog:robotpy-native-datalog.copy_headers",
             "//ntcore:robotpy-native-ntcore.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunable:robotpy-native-tunable.copy_headers",
             "//wpinet:robotpy-native-wpinet.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
@@ -547,6 +529,7 @@ def define_pybind_library(name, pkgcfgs = []):
         deps = [
             "//datalog:robotpy-wpilog",
             "//ntcore:robotpy-native-ntcore",
+            "//tunable:robotpy-native-tunable",
             "//wpinet:robotpy-wpinet",
             "//wpiutil:robotpy-wpiutil",
         ],
@@ -554,7 +537,7 @@ def define_pybind_library(name, pkgcfgs = []):
         summary = "Binary wrappers for the FIRST ntcore library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
-        requires = ["robotpy-native-ntcore==0.0.0", "robotpy-wpiutil==0.0.0", "robotpy-wpinet==0.0.0", "robotpy-wpilog==0.0.0"],
+        requires = ["robotpy-native-ntcore==0.0.0", "robotpy-native-tunable==0.0.0", "robotpy-wpiutil==0.0.0", "robotpy-wpinet==0.0.0", "robotpy-wpilog==0.0.0"],
         python_requires = ">=3.11",
         entry_points = {
             "pkg_config": ["ntcore = ntcore"],
@@ -568,6 +551,8 @@ def define_pybind_library(name, pkgcfgs = []):
         extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
             "//datalog:robotpy-native-datalog.copy_headers",
             "//ntcore:robotpy-native-ntcore.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunable:robotpy-native-tunable.copy_headers",
             "//wpinet:robotpy-native-wpinet.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
@@ -580,7 +565,7 @@ def define_pybind_library(name, pkgcfgs = []):
     scan_headers(
         name = "{}-scan-headers".format(name),
         extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
-            "//ntcore:robotpy-native-ntcore.copy_headers",
+            "//ntcore:robotpy-native-ntcore.copy_headers","//tunable:robotpy-native-tunable.copy_headers",
         ],
         package_root_file = "src/main/python/ntcore/__init__.py",
         pkgcfgs = pkgcfgs,

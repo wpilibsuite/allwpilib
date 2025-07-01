@@ -1,7 +1,7 @@
 import pytest
 
 from ntcore import NetworkTableInstance, NetworkTableType
-from ntcore.util import ntproperty, ChooserControl
+from ntcore.util import ntproperty, SelectableControl
 
 # def test_autoupdatevalue(nt):
 
@@ -136,8 +136,8 @@ def test_ntproperty_multitest(nt: NetworkTableInstance):
         nt.start_local()
 
 
-def test_chooser_control(nt: NetworkTableInstance):
-    c = ChooserControl("Autonomous Mode", inst=nt)
+def test_selectable_control(nt: NetworkTableInstance):
+    c = SelectableControl("Autonomous Mode", inst=nt)
 
     assert c.get_choices() == []
     assert c.get_selected() is None
@@ -145,8 +145,8 @@ def test_chooser_control(nt: NetworkTableInstance):
     c.set_selected("foo")
     assert c.get_selected() == "foo"
 
-    t = nt.get_table("/SmartDashboard/Autonomous Mode")
-    assert t.get_string("selected", None) == "foo"
+    t = nt.get_table("/Tunables/Autonomous Mode")
+    assert t.get_string("selected/tune", None) == "foo"
 
     t.put_string_array("options", ("option1", "option2"))
     assert c.get_choices() == ["option1", "option2"]

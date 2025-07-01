@@ -9,8 +9,7 @@
 #include "wpi/hal/PWM.h"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Handle.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 class AddressableLED;
@@ -18,7 +17,7 @@ class AddressableLED;
 /**
  * Class for sending pulse-width modulation (PWM) signals.
  */
-class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
+class PWM : public wpi::TelemetryLoggable {
  public:
   friend class AddressableLED;
 
@@ -30,9 +29,8 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
    * assign channels.
    *
    * @param channel The SmartIO channel number.
-   * @param registerSendable If true, adds this instance to SendableRegistry
    */
-  explicit PWM(int channel, bool registerSendable = true);
+  explicit PWM(int channel);
 
   PWM(PWM&&) = default;
   PWM& operator=(PWM&&) = default;
@@ -85,8 +83,9 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
- protected:
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   int m_channel;

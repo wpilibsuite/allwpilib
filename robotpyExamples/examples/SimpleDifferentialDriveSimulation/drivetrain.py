@@ -86,7 +86,7 @@ class Drivetrain:
         self.right_encoder.reset()
 
         self.right_leader.set_inverted(True)
-        wpilib.SmartDashboard.put_data("Field", self.field_sim)
+        wpilib.Telemetry.log("Field", self.field_sim)
 
     def set_velocities(
         self, velocities: wpimath.DifferentialDriveWheelVelocities

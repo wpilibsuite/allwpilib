@@ -75,9 +75,8 @@ class Elevator:
         # Subsystem constructor.
         self.encoder.set_distance_per_pulse(constants.ELEVATOR_ENCODER_DIST_PER_PULSE)
 
-        # Publish Mechanism2d to SmartDashboard
-        # To view the Elevator visualization, select Network Tables -> SmartDashboard -> Elevator Sim
-        wpilib.SmartDashboard.put_data("Elevator Sim", self.mech2d)
+        # Publish the Mechanism2d visualization through telemetry.
+        wpilib.Telemetry.log("Elevator Sim", self.mech2d)
 
     def simulation_periodic(self) -> None:
         """Advance the simulation."""

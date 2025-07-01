@@ -10,6 +10,9 @@ evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':wpilibj')
+evaluationDependsOn(':datalog')
+evaluationDependsOn(':telemetry')
+evaluationDependsOn(':tunable')
 
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
@@ -23,6 +26,8 @@ dependencies {
     implementation project(':wpilibj')
     implementation project(':wpiannotations')
     api project(':datalog')
+    implementation project(':telemetry')
+    implementation project(':tunable')
     testImplementation libs.bundles.mockito
     annotationProcessor project(':javacPlugin')
     testAnnotationProcessor project(':javacPlugin')
@@ -65,6 +70,8 @@ model {
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            lib project: ':tunable', library: 'tunable', linkage: 'shared'
 
             if (it.component.name == "${nativeName}Dev") {
                 project(':ntcore').addNtcoreJniDependency(it)

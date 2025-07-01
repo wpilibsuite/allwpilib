@@ -5,21 +5,22 @@ import weakref
 import wpilib
 
 
-def test_sendable_chooser():
-    chooser = wpilib.SendableChooser()
+def test_selectable():
+    chooser = wpilib.Selectable()
     assert chooser.get_selected() is None
 
-    chooser.set_default_option("option", True)
+    chooser.add_default("option", True)
     assert chooser.get_selected() is True
 
 
-def test_smart_dashboard_putdata():
-    t = wpilib.Talon(4)
-    ref = weakref.ref(t)
-    wpilib.SmartDashboard.put_data("talon", t)
-    del t
+def test_tunables_publish_retains_value(nt):
+    value = wpilib.Selectable()
+    value.add_default("option", True)
+    ref = weakref.ref(value)
+    wpilib.Tunables.publish("selectable", value)
+    del value
     assert bool(ref) is True
-    assert wpilib.SmartDashboard.get_data("talon") is ref()
+    wpilib.Tunables.remove("selectable")
 
 
 def test_motorcontrollergroup():

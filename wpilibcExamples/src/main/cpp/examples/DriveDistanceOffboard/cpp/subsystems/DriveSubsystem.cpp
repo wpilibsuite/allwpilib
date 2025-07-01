@@ -14,9 +14,6 @@ DriveSubsystem::DriveSubsystem()
       rightLeader{kRightMotor1Port},
       rightFollower{kRightMotor2Port},
       feedforward{ks, kv, ka} {
-  wpi::util::SendableRegistry::AddChild(&drive, &leftLeader);
-  wpi::util::SendableRegistry::AddChild(&drive, &rightLeader);
-
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
   // gearbox is constructed, you might have to invert the left side instead.

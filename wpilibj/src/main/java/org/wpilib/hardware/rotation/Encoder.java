@@ -10,9 +10,8 @@ import org.wpilib.hardware.discrete.CounterBase;
 import org.wpilib.hardware.hal.EncoderJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Class to read quadrature encoders.
@@ -27,7 +26,9 @@ import org.wpilib.util.sendable.SendableRegistry;
  * <p>All encoders will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Encoder implements CounterBase, Sendable, AutoCloseable {
+public class Encoder implements CounterBase, TelemetryLoggable, AutoCloseable {
+  private final EncodingType m_encodingType;
+
   int m_encoder; // the HAL encoder object
 
   /**
@@ -52,9 +53,6 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
           default -> "Encoder";
         };
     HAL.reportUsage("IO[" + aChannel + "," + bChannel + "]", typeStr);
-
-    int fpgaIndex = getFPGAIndex();
-    SendableRegistry.add(this, "Encoder", fpgaIndex);
   }
 
   /**
@@ -92,13 +90,12 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    * @param channelB The 'b' SmartIO channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
    *     if necessary so forward represents positive values.
-   * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
+   * @param encodingType either X1, X2, or X4 to indicate 1X, 2X or 4X decoding. If 4X is
    *     selected, then an encoder FPGA object is used and the returned counts will be 4x the
    *     encoder spec'd value since all rising and falling edges are counted. If 1X or 2X are
    *     selected, then a counter object will be used and the returned value will either exactly
    *     match the spec'd count or be double (2x) the spec'd count.
    */
-  @SuppressWarnings("this-escape")
   public Encoder(
       final int channelA,
       final int channelB,
@@ -106,8 +103,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
       final EncodingType encodingType) {
     requireNonNullParam(encodingType, "encodingType", "Encoder");
 
-    // SendableRegistry.addChild(this, m_aSource);
-    // SendableRegistry.addChild(this, m_bSource);
+    m_encodingType = encodingType;
     initEncoder(channelA, channelB, reverseDirection, encodingType);
   }
 
@@ -131,7 +127,6 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     // if (m_aSource != null && m_allocatedA) {
     //   m_aSource.close();
     //   m_allocatedA = false;
@@ -270,15 +265,18 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    if (EncoderJNI.getEncoderEncodingType(m_encoder) == EncodingType.X4.value) {
-      builder.setSmartDashboardType("Quadrature Encoder");
-    } else {
-      builder.setSmartDashboardType("Encoder");
-    }
+  public void logTo(TelemetryTable table) {
+    table.log("Velocity", getRate());
+    table.log("Distance", getDistance());
+    table.log("Distance per Tick", getDistancePerPulse());
+  }
 
-    builder.addDoubleProperty("Velocity", this::getRate, null);
-    builder.addDoubleProperty("Distance", this::getDistance, null);
-    builder.addDoubleProperty("Distance per Tick", this::getDistancePerPulse, null);
+  @Override
+  public String getTelemetryType() {
+    if (m_encodingType == EncodingType.X4) {
+      return "Quadrature Encoder";
+    } else {
+      return "Encoder";
+    }
   }
 }

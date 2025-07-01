@@ -25,9 +25,15 @@ def wpilib_state():
 def nt(cfg_logging, wpilib_state):
     instance = ntcore.NetworkTableInstance.get_default()
     instance.start_local()
+    wpilib.TelemetryRegistry.reset()
+    wpilib.TelemetryRegistry.register_networktables_backend()
+    wpilib.TunableRegistry.reset()
+    wpilib.TunableRegistry.register_networktables_backend()
 
     try:
         yield instance
     finally:
+        wpilib.TelemetryRegistry.reset()
+        wpilib.TunableRegistry.reset()
         instance.stop_local()
         instance._reset()

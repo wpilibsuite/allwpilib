@@ -9,8 +9,7 @@
 #include "wpi/hal/Encoder.h"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
@@ -104,23 +103,18 @@ int Encoder::GetFPGAIndex() const {
   return val;
 }
 
-void Encoder::InitSendable(wpi::util::SendableBuilder& builder) {
-  int32_t status = 0;
-  HAL_EncoderEncodingType type = HAL_GetEncoderEncodingType(m_encoder, &status);
-  WPILIB_CheckErrorStatus(status, "GetEncodingType");
-  if (type == HAL_EncoderEncodingType::HAL_ENCODER_4X_ENCODING) {
-    builder.SetSmartDashboardType("Quadrature Encoder");
-  } else {
-    builder.SetSmartDashboardType("Encoder");
-  }
+void Encoder::LogTo(wpi::TelemetryTable& table) const {
+  table.Log("Velocity", GetRate());
+  table.Log("Distance", GetDistance());
+  table.Log("Distance per Tick", GetDistancePerPulse());
+}
 
-  builder.AddDoubleProperty(
-      "Velocity", [=, this] { return GetRate(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Distance", [=, this] { return GetDistance(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Distance per Tick", [=, this] { return GetDistancePerPulse(); },
-      nullptr);
+std::string_view Encoder::GetTelemetryType() const {
+  if (m_type == EncodingType::X4) {
+    return "Quadrature Encoder";
+  } else {
+    return "Encoder";
+  }
 }
 
 void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
@@ -129,6 +123,7 @@ void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
   m_encoder = HAL_InitializeEncoder(
       aChannel, bChannel, reverseDirection,
       static_cast<HAL_EncoderEncodingType>(encodingType), &status);
+  m_type = encodingType;
   WPILIB_CheckErrorStatus(status, "InitEncoder");
 
   const char* type = "Encoder";
@@ -144,7 +139,6 @@ void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
       break;
   }
   HAL_ReportUsage(std::format("IO[{},{}]", aChannel, bChannel), type);
-  // wpi::util::SendableRegistry::Add(this, "Encoder", m_aSource->GetChannel());
 }
 
 double Encoder::DecodingScaleFactor() const {

@@ -1,5 +1,5 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 - wpi/driverstation/internal/DriverStationBackend.hpp
 - wpi/event/BooleanEvent.hpp
 
@@ -7,7 +7,7 @@ classes:
   wpi::LogitechF310Controller:
     force_no_trampoline: true
     ignored_bases:
-    - wpi::util::SendableHelper<LogitechF310Controller>
+    - wpi::TelemetryLoggable
     attributes:
       TOUCHPAD_COUNT:
       SUPPORTS_RUMBLE:
@@ -104,7 +104,8 @@ classes:
         rename: button
       SetLeds:
       SetRumble:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:
     enums:
       Button:
       Axis:

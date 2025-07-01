@@ -71,7 +71,7 @@ if(MSVC)
     target_compile_options(wpimath PUBLIC /utf-8 /bigobj)
 endif()
 wpilib_target_warnings(wpimath)
-target_link_libraries(wpimath wpiutil)
+target_link_libraries(wpimath telemetry tunable wpiutil)
 
 if(NOT WPILIB_USE_SYSTEM_EIGEN)
     install(

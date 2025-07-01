@@ -20,9 +20,9 @@
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/opmode/OpMode.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
+#include "wpi/tunable/TunableRegistry.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/print.hpp"
 
@@ -163,8 +163,8 @@ void OpModeRobotBase::LoopFunc() {
   // Always observe user program state
   HAL_ObserveUserProgram(word.GetValue());
 
-  SmartDashboard::UpdateValues();
-  m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
+  TunableRegistry::Update();
+  m_watchdog.AddEpoch("TunableRegistry::Update()");
 
   if constexpr (IsSimulation()) {
     HAL_SimPeriodicBefore();
