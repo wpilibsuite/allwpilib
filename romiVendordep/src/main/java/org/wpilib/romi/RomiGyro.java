@@ -7,6 +7,8 @@ package org.wpilib.romi;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;
 import org.wpilib.hardware.hal.SimDouble;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.
@@ -14,7 +16,7 @@ import org.wpilib.hardware.hal.SimDouble;
  * <p>This class is for the Romi onboard gyro, and will only work in simulation/Romi mode. Only one
  * instance of a RomiGyro is supported.
  */
-public class RomiGyro {
+public class RomiGyro implements TelemetryLoggable {
   private final SimDevice m_simDevice;
   private final SimDouble m_simRateX;
   private final SimDouble m_simRateY;
@@ -166,5 +168,18 @@ public class RomiGyro {
     if (m_simDevice != null) {
       m_simDevice.close();
     }
+  }
+
+  @Override
+  public void updateTelemetry(TelemetryTable table) {
+    if (!table.setType("Romi Gyro")) {
+      return;
+    }
+    table.log("rate x", getRateX());
+    table.log("rate y", getRateY());
+    table.log("rate z", getRateZ());
+    table.log("angle x", getAngleX());
+    table.log("angle y", getAngleY());
+    table.log("angle z", getAngleZ());
   }
 }

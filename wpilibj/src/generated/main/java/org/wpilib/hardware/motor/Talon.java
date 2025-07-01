@@ -35,7 +35,7 @@ public class Talon extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public Talon(final int channel) {
-    super("Talon", channel);
+    super(channel);
 
     setBoundsMicroseconds(2037, 1539, 1513, 1487, 989);
     m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);

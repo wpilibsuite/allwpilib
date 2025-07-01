@@ -9,7 +9,6 @@ import org.wpilib.driverstation.XboxController;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.system.Timer;
-import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -26,9 +25,6 @@ public class Robot extends TimedRobot {
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    SendableRegistry.addChild(m_robotDrive, m_leftDrive);
-    SendableRegistry.addChild(m_robotDrive, m_rightDrive);
-
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.

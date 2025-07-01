@@ -14,6 +14,7 @@ import org.wpilib.examples.hatchbotinlined.subsystems.DriveSubsystem;
 import org.wpilib.examples.hatchbotinlined.subsystems.HatchSubsystem;
 import org.wpilib.smartdashboard.SendableChooser;
 import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -63,10 +64,13 @@ public class RobotContainer {
 
     // Put the chooser on the dashboard
     SmartDashboard.putData("Autonomous", m_chooser);
+  }
 
-    // Put subsystems to dashboard.
-    SmartDashboard.putData("Drivetrain", m_robotDrive);
-    SmartDashboard.putData("HatchSubsystem", m_hatchSubsystem);
+  /** Update telemetry. */
+  public void updateTelemetry() {
+    // Put subsystems to telemetry.
+    Telemetry.log("Drivetrain", m_robotDrive);
+    Telemetry.log("HatchSubsystem", m_hatchSubsystem);
   }
 
   /**

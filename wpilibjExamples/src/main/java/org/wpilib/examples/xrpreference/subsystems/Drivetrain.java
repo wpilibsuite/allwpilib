@@ -7,7 +7,6 @@ package org.wpilib.examples.xrpreference.subsystems;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.util.sendable.SendableRegistry;
 import org.wpilib.xrp.XRPGyro;
 import org.wpilib.xrp.XRPMotor;
 
@@ -37,9 +36,6 @@ public class Drivetrain extends SubsystemBase {
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
-    SendableRegistry.addChild(m_diffDrive, m_leftMotor);
-    SendableRegistry.addChild(m_diffDrive, m_rightMotor);
-
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.

@@ -28,6 +28,7 @@ Robot::Robot() {
  */
 void Robot::RobotPeriodic() {
   wpi::cmd::CommandScheduler::GetInstance().Run();
+  m_container.UpdateTelemetry();
 }
 
 /**

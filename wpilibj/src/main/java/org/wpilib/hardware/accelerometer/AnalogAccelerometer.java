@@ -8,16 +8,15 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import org.wpilib.hardware.discrete.AnalogInput;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Handle operation of an analog accelerometer. The accelerometer reads acceleration directly
  * through the sensor. Many sensors have multiple axis and can be treated as multiple devices. Each
  * is calibrated by finding the center value over a period of time.
  */
-public class AnalogAccelerometer implements Sendable, AutoCloseable {
+public class AnalogAccelerometer implements TelemetryLoggable, AutoCloseable {
   private AnalogInput m_analogChannel;
   private double m_voltsPerG = 1.0;
   private double m_zeroGVoltage = 2.5;
@@ -26,7 +25,6 @@ public class AnalogAccelerometer implements Sendable, AutoCloseable {
   /** Common initialization. */
   private void initAccelerometer() {
     HAL.reportUsage("IO", m_analogChannel.getChannel(), "Accelerometer");
-    SendableRegistry.add(this, "Accelerometer", m_analogChannel.getChannel());
   }
 
   /**
@@ -36,10 +34,8 @@ public class AnalogAccelerometer implements Sendable, AutoCloseable {
    *
    * @param channel The channel number for the analog input the accelerometer is connected to
    */
-  @SuppressWarnings("this-escape")
   public AnalogAccelerometer(final int channel) {
     this(new AnalogInput(channel), true);
-    SendableRegistry.addChild(this, m_analogChannel);
   }
 
   /**
@@ -50,12 +46,10 @@ public class AnalogAccelerometer implements Sendable, AutoCloseable {
    * @param channel The existing AnalogInput object for the analog input the accelerometer is
    *     connected to
    */
-  @SuppressWarnings("this-escape")
   public AnalogAccelerometer(final AnalogInput channel) {
     this(channel, false);
   }
 
-  @SuppressWarnings("this-escape")
   private AnalogAccelerometer(final AnalogInput channel, final boolean allocatedChannel) {
     requireNonNullParam(channel, "channel", "AnalogAccelerometer");
     m_allocatedChannel = allocatedChannel;
@@ -66,7 +60,6 @@ public class AnalogAccelerometer implements Sendable, AutoCloseable {
   /** Delete the analog components used for the accelerometer. */
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     if (m_analogChannel != null && m_allocatedChannel) {
       m_analogChannel.close();
     }
@@ -111,8 +104,12 @@ public class AnalogAccelerometer implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Accelerometer");
-    builder.addDoubleProperty("Value", this::getAcceleration, null);
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("Value", getAcceleration());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Accelerometer";
   }
 }

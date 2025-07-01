@@ -11,7 +11,7 @@ import org.wpilib.command2.SubsystemBase;
 import org.wpilib.examples.hatchbottraditional.Constants.HatchConstants;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryTable;
 
 /** A hatch mechanism actuated by a single {@link DoubleSolenoid}. */
 public class HatchSubsystem extends SubsystemBase {
@@ -33,9 +33,9 @@ public class HatchSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
+  public void updateTelemetry(TelemetryTable table) {
+    super.updateTelemetry(table);
     // Publish the solenoid state to telemetry.
-    builder.addBooleanProperty("extended", () -> m_hatchSolenoid.get() == kForward, null);
+    table.log("extended", m_hatchSolenoid.get() == kForward);
   }
 }

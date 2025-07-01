@@ -20,10 +20,12 @@
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/NetworkTablesTelemetryBackend.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Notifier.hpp"
 #include "wpi/system/WPILibVersion.hpp"
+#include "wpi/telemetry/TelemetryRegistry.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.h"
 
@@ -194,6 +196,10 @@ RobotBase::RobotBase() {
   } else {
     inst.StartServer();
   }
+
+  wpi::TelemetryRegistry::RegisterBackend(
+      "",
+      std::make_shared<nt::NetworkTablesTelemetryBackend>(inst, "/Telemetry"));
 
   // wait for the NT server to actually start
   int count = 0;

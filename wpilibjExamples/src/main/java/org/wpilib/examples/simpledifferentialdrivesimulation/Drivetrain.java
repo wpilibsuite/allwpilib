@@ -21,8 +21,8 @@ import org.wpilib.math.system.plant.LinearSystemId;
 import org.wpilib.simulation.DifferentialDrivetrainSim;
 import org.wpilib.simulation.EncoderSim;
 import org.wpilib.smartdashboard.Field2d;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
+import org.wpilib.telemetry.Telemetry;
 
 public class Drivetrain {
   // 3 meters per second.
@@ -87,7 +87,6 @@ public class Drivetrain {
     m_rightEncoder.reset();
 
     m_rightLeader.setInverted(true);
-    SmartDashboard.putData("Field", m_fieldSim);
   }
 
   /** Sets speeds to the drivetrain motors. */
@@ -151,5 +150,6 @@ public class Drivetrain {
   public void periodic() {
     updateOdometry();
     m_fieldSim.setRobotPose(m_odometry.getPose());
+    Telemetry.log("Field", m_fieldSim);
   }
 }
