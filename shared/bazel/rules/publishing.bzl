@@ -1,4 +1,5 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@rules_jvm_external//:defs.bzl", "maven_export")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 load("//shared/bazel/rules:transitions.bzl", "platform_transition_filegroup")
@@ -69,3 +70,80 @@ def platform_prefix(t):
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": "linux/roborio/" + t,
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": "linux/systemcore/" + t,
     })
+
+def _wpilib_maven_export_impl(name, maven_coordinates, classifier_artifacts, linux_artifacts, osx_artifacts, windows_artifacts, lib_name = None, visibility = None):
+    """Implementation of wpilib_maven_export."""
+    is_platform_specific = linux_artifacts or osx_artifacts or windows_artifacts
+
+    if not is_platform_specific:
+        maven_export(
+            name = name,
+            maven_coordinates = maven_coordinates,
+            classifier_artifacts = classifier_artifacts,
+            lib_name = lib_name,
+            visibility = visibility,
+        )
+        return
+
+    common_args = {"visibility": visibility}
+    if lib_name:
+        common_args["lib_name"] = lib_name
+
+    all_linux_artifacts = {}
+    all_linux_artifacts.update(classifier_artifacts)
+    all_linux_artifacts.update(linux_artifacts)
+
+    all_osx_artifacts = {}
+    all_osx_artifacts.update(classifier_artifacts)
+    all_osx_artifacts.update(osx_artifacts)
+
+    all_windows_artifacts = {}
+    all_windows_artifacts.update(classifier_artifacts)
+    all_windows_artifacts.update(windows_artifacts)
+
+    maven_export(
+        name = name + "-linux",
+        maven_coordinates = maven_coordinates,
+        classifier_artifacts = all_linux_artifacts,
+        target_compatible_with = ["@platforms//os:linux"],
+        **common_args
+    )
+
+    maven_export(
+        name = name + "-osx",
+        maven_coordinates = maven_coordinates,
+        classifier_artifacts = all_osx_artifacts,
+        target_compatible_with = ["@platforms//os:osx"],
+        **common_args
+    )
+
+    maven_export(
+        name = name + "-windows",
+        maven_coordinates = maven_coordinates,
+        classifier_artifacts = all_windows_artifacts,
+        target_compatible_with = ["@platforms//os:windows"],
+        **common_args
+    )
+
+    native.alias(
+        name = name + ".publish",
+        actual = select({
+            "@platforms//os:linux": name + "-linux.publish",
+            "@platforms//os:osx": name + "-osx.publish",
+            "@platforms//os:windows": name + "-windows.publish",
+        }),
+        visibility = visibility,
+    )
+
+wpilib_maven_export = macro(
+    implementation = _wpilib_maven_export_impl,
+    attrs = {
+        "maven_coordinates": attr.string(mandatory = True, configurable = False),
+        "classifier_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
+        "linux_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
+        "osx_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
+        "windows_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
+        "lib_name": attr.string(configurable = False),
+    },
+    doc = "A symbolic macro that wraps maven_export for wpilib.",
+)
