@@ -14,7 +14,7 @@ index 7e9b2c0..b04c44c 100644
          wrapped_clang = "@build_bazel_apple_support//crosstool:exec_wrapped_clang",
          wrapped_clang_pp = "@build_bazel_apple_support//crosstool:exec_wrapped_clang_pp",
 diff --git a/crosstool/cc_toolchain_config.bzl b/crosstool/cc_toolchain_config.bzl
-index 1ae7198..9a34bd0 100644
+index 1ae7198..26eb1e8 100644
 --- a/crosstool/cc_toolchain_config.bzl
 +++ b/crosstool/cc_toolchain_config.bzl
 @@ -176,6 +176,12 @@ please file an issue at https://github.com/bazelbuild/apple_support/issues/new
@@ -30,10 +30,10 @@ index 1ae7198..9a34bd0 100644
      strip_action = action_config(
          action_name = ACTION_NAMES.strip,
          flag_sets = [
-@@ -987,6 +993,14 @@ please file an issue at https://github.com/bazelbuild/apple_support/issues/new
-         name = "default_link_flags",
-         enabled = True,
-         flag_sets = [
+@@ -918,6 +924,14 @@ please file an issue at https://github.com/bazelbuild/apple_support/issues/new
+                     ),
+                 ],
+             ),
 +            flag_set(
 +                actions = all_link_actions + lto_index_actions,
 +                flag_groups = ([
@@ -42,9 +42,9 @@ index 1ae7198..9a34bd0 100644
 +                    ),
 +                ] if ctx.attr.link_flags else []),
 +            ),
-             flag_set(
-                 actions = _DYNAMIC_LINK_ACTIONS,
-                 flag_groups = [
+         ],
+     )
+ 
 @@ -1973,18 +1987,6 @@ please file an issue at https://github.com/bazelbuild/apple_support/issues/new
                  flag_groups = [flag_group(flags = ["-g"])],
                  with_features = [with_feature_set(features = ["dbg"])],
@@ -64,16 +64,23 @@ index 1ae7198..9a34bd0 100644
          ],
      )
  
-@@ -2263,7 +2265,35 @@ please file an issue at https://github.com/bazelbuild/apple_support/issues/new
-                         iterate_over = "user_compile_flags",
-                         expand_if_available = "user_compile_flags",
-                     ),
-+                ] + ([
+@@ -2257,7 +2259,11 @@ please file an issue at https://github.com/bazelbuild/apple_support/issues/new
+                     ACTION_NAMES.objc_compile,
+                     ACTION_NAMES.objcpp_compile,
+                 ],
+-                flag_groups = [
++                flag_groups = ([
 +                    flag_group(
 +                        flags = ctx.attr.c_flags,
 +                    ),
-+                ] if ctx.attr.c_flags else []),
-+            ),
++                ] if ctx.attr.c_flags else []) + [
+                     flag_group(
+                         flags = ["%{user_compile_flags}"],
+                         iterate_over = "user_compile_flags",
+@@ -2265,6 +2271,30 @@ please file an issue at https://github.com/bazelbuild/apple_support/issues/new
+                     ),
+                 ],
+             ),
 +            flag_set(
 +                actions = [ACTION_NAMES.c_compile],
 +                flag_groups = ([
@@ -91,15 +98,16 @@ index 1ae7198..9a34bd0 100644
 +                    ACTION_NAMES.cpp_module_codegen,
 +                    ACTION_NAMES.lto_backend,
 +                    ACTION_NAMES.clif_match,
-                 ],
++                ],
 +                flag_groups = ([
 +                    flag_group(
 +                        flags = ctx.attr.cxx_flags,
 +                    ),
 +                ] if ctx.attr.cxx_flags else []),
-             ),
++            ),
          ],
      )
+ 
 @@ -2725,6 +2755,10 @@ cc_toolchain_config = rule(
              mandatory = True,
          ),
