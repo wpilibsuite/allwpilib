@@ -4,7 +4,7 @@
 #build:macos --copt=-Werror
 
 # C++ only
-common:macos --repo_env=BAZEL_CXXOPTS="-Wall:-Wextra:-Werror:-std=c++20:-pedantic:-fPIC:-Wno-unused-parameter:-Wno-error=deprecated-enum-enum-conversion:-Wno-missing-field-initializers:-Wno-unused-private-field:-Wno-unused-const-variable:-Wno-error=c11-extensions:-pthread:-Wno-deprecated-anon-enum-enum-conversion:-Wno-shorten-64-to-32"
+common:macos --repo_env=BAZEL_CXXOPTS="-std=c++20:-pedantic:-fPIC:-Wno-unused-parameter:-Wno-error=deprecated-enum-enum-conversion:-Wno-missing-field-initializers:-Wno-unused-private-field:-Wno-unused-const-variable:-Wno-error=c11-extensions:-pthread:-Wno-deprecated-anon-enum-enum-conversion"
 #build:macos --cxxopt=-std=c++20
 #build:macos --cxxopt=-pedantic
 #build:macos --cxxopt=-fPIC
@@ -18,7 +18,7 @@ common:macos --repo_env=BAZEL_CXXOPTS="-Wall:-Wextra:-Werror:-std=c++20:-pedanti
 #build:macos --cxxopt=-Wno-deprecated-anon-enum-enum-conversion
 
 # C only
-common:macos --repo_env=BAZEL_CONLYOPTS="-Wall:-Wextra:-Werror:-pedantic:-fPIC:-Wno-unused-parameter:-Wno-missing-field-initializers:-Wno-unused-private-field:-Wno-fixed-enum-extension:-Wno-shorten-64-to-32"
+common:macos --repo_env=BAZEL_CONLYOPTS="-pedantic:-fPIC:-Wno-unused-parameter:-Wno-missing-field-initializers:-Wno-unused-private-field:-Wno-fixed-enum-extension"
 #build:macos --conlyopt=-pedantic
 #build:macos --conlyopt=-fPIC
 #build:macos --conlyopt=-Wno-unused-parameter
@@ -30,6 +30,8 @@ common:macos --repo_env=BAZEL_LINKOPTS="-headerpad_max_install_names:-Wl,-rpath,
 
 # Things not in nativetools
 #build:macos --copt=-Wno-shorten-64-to-32
+
+common:macos --repo_env=BAZEL_COPTS="-Wall:-Wextra:-Werror:-Wno-shorten-64-to-32"
 
 build:macos --host_per_file_copt=external/zlib/.*\.c@-Wno-deprecated-non-prototype
 build:macos --host_per_file_copt=external/com_google_protobuf/.*\.cc@-Wno-unused-function
