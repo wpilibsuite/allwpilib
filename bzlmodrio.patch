@@ -1,3 +1,19 @@
+diff --git a/toolchains/configure_cross_compiler.bzl b/toolchains/configure_cross_compiler.bzl
+index 0fa74b9..d852f54 100644
+--- a/toolchains/configure_cross_compiler.bzl
++++ b/toolchains/configure_cross_compiler.bzl
+@@ -28,7 +28,10 @@ def configure_cross_compiler_impl(repository_ctx):
+         substitutions["{arg_passthrough}"] = "%*"
+         substitutions["{wrapper_extension}"] = ".bat"
+     elif repository_ctx.os.name == "mac os x":
+-        substitutions["{compiler_repo}"] = "bazelrio_{}_toolchain_macos".format(repository_ctx.attr.repo_shortname)
++        if repository_ctx.os.arch == "aarch64":
++            substitutions["{compiler_repo}"] = "bazelrio_{}_toolchain_macosarm".format(repository_ctx.attr.repo_shortname)
++        else:
++            substitutions["{compiler_repo}"] = "bazelrio_{}_toolchain_macos".format(repository_ctx.attr.repo_shortname)
+     elif repository_ctx.os.name == "linux":
+         substitutions["{compiler_repo}"] = "bazelrio_{}_toolchain_linux".format(repository_ctx.attr.repo_shortname)
+     else:
 diff --git a/toolchains/cross_compiler/cc-toolchain-config.bzl b/toolchains/cross_compiler/cc-toolchain-config.bzl
 index 4fc0098..a188e4d 100644
 --- a/toolchains/cross_compiler/cc-toolchain-config.bzl

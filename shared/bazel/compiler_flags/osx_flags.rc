@@ -26,7 +26,7 @@ common:macos --repo_env=BAZEL_CONLYOPTS="-pedantic:-fPIC:-Wno-unused-parameter:-
 #build:macos --conlyopt=-Wno-unused-private-field
 #build:macos --conlyopt=-Wno-fixed-enum-extension
 
-common:macos --repo_env=BAZEL_LINKOPTS="-headerpad_max_install_names:-Wl,-rpath,'@loader_path'"
+common:macos --repo_env=BAZEL_LINKOPTS="-Wl,-rpath,'@loader_path'"
 
 # Things not in nativetools
 #build:macos --copt=-Wno-shorten-64-to-32
