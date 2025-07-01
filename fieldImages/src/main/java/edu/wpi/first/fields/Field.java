@@ -4,6 +4,14 @@
 
 package edu.wpi.first.fields;
 
-public interface IField {
+/**
+ * An interface that exposes a method to get a field image's JSON file.
+ */
+public interface Field {
+ /**
+  * Gets the field's resource file.
+  *
+  * @return The field's JSON resource file.
+  */
   String getResourceFile();
 }

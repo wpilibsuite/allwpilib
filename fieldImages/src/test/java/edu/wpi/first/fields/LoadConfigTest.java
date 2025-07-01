@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 class LoadConfigTest {
   @ParameterizedTest
   @EnumSource(FRC.class)
-  void testLoadFRC(IField field) {
+  void testLoadFRC(Field field) {
     FieldConfig config = Assertions.assertDoesNotThrow(() -> FieldConfig.loadField(field));
 
     Assertions.assertNotNull(config.getImageUrl());
@@ -21,7 +21,7 @@ class LoadConfigTest {
 
   @ParameterizedTest
   @EnumSource(FTC.class)
-  void testLoadFTC(IField field) {
+  void testLoadFTC(Field field) {
     FieldConfig config = Assertions.assertDoesNotThrow(() -> FieldConfig.loadField(field));
 
     Assertions.assertNotNull(config.getImageUrl());

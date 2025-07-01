@@ -56,7 +56,7 @@ public class FieldConfig {
    * @return The field configuration
    * @throws IOException Throws if the file could not be loaded
    */
-  public static FieldConfig loadField(IField field) throws IOException {
+  public static FieldConfig loadField(Field field) throws IOException {
     return loadFromResource(field.getResourceFile());
   }
 
