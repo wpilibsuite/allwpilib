@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.function.BiFunction;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.autodiff.Variable;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
@@ -95,6 +96,8 @@ class ArmFeedforwardTest {
 
   @Test
   void testCalculate() {
+    assertEquals(0, Variable.totalNativeMemoryUsage());
+
     final double ks = 0.5;
     final double kv = 1.5;
     final double ka = 2;
@@ -110,10 +113,14 @@ class ArmFeedforwardTest {
     calculateAndSimulate(armFF, ks, kv, ka, kg, Math.PI / 3, 1.0, 0.95, 0.020);
     calculateAndSimulate(armFF, ks, kv, ka, kg, -Math.PI / 3, 1.0, 1.05, 0.020);
     calculateAndSimulate(armFF, ks, kv, ka, kg, -Math.PI / 3, 1.0, 0.95, 0.020);
+
+    assertEquals(0, Variable.totalNativeMemoryUsage());
   }
 
   @Test
   void testCalculateIllConditionedModel() {
+    assertEquals(0, Variable.totalNativeMemoryUsage());
+
     final double ks = 0.39671;
     final double kv = 2.7167;
     final double ka = 1e-2;
@@ -129,10 +136,14 @@ class ArmFeedforwardTest {
     assertEquals(
         armFF.calculate(currentAngle, currentVelocity, nextVelocity),
         ks + kv * currentVelocity + ka * averageAccel + kg * Math.cos(currentAngle));
+
+    assertEquals(0, Variable.totalNativeMemoryUsage());
   }
 
   @Test
   void testCalculateIllConditionedGradient() {
+    assertEquals(0, Variable.totalNativeMemoryUsage());
+
     final double ks = 0.39671;
     final double kv = 2.7167;
     final double ka = 0.50799;
@@ -140,6 +151,8 @@ class ArmFeedforwardTest {
     final ArmFeedforward armFF = new ArmFeedforward(ks, kg, kv, ka);
 
     calculateAndSimulate(armFF, ks, kv, ka, kg, 1.0, 0.02, 0.0, 0.02);
+
+    assertEquals(0, Variable.totalNativeMemoryUsage());
   }
 
   @Test
