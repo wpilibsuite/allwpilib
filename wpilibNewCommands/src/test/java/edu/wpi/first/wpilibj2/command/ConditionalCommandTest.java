@@ -21,27 +21,24 @@ import org.junit.jupiter.params.provider.MethodSource;
 class ConditionalCommandTest extends CommandTestBase {
   @Test
   void conditionalCommandTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder command1Holder = new MockCommandHolder(true);
-      Command command1 = command1Holder.getMock();
-      command1Holder.setFinished(true);
-      MockCommandHolder command2Holder = new MockCommandHolder(true);
-      Command command2 = command2Holder.getMock();
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
+    Command command1 = command1Holder.getMock();
+    command1Holder.setFinished(true);
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
+    Command command2 = command2Holder.getMock();
 
-      ConditionalCommand conditionalCommand =
-          new ConditionalCommand(command1, command2, () -> true);
+    ConditionalCommand conditionalCommand = new ConditionalCommand(command1, command2, () -> true);
 
-      scheduler.schedule(conditionalCommand);
-      scheduler.run();
+    scheduler.schedule(conditionalCommand);
+    scheduler.run();
 
-      verify(command1).initialize();
-      verify(command1).execute();
-      verify(command1).end(false);
+    verify(command1).initialize();
+    verify(command1).execute();
+    verify(command1).end(false);
 
-      verify(command2, never()).initialize();
-      verify(command2, never()).execute();
-      verify(command2, never()).end(false);
-    }
+    verify(command2, never()).initialize();
+    verify(command2, never()).execute();
+    verify(command2, never()).end(false);
   }
 
   @Test
@@ -50,23 +47,20 @@ class ConditionalCommandTest extends CommandTestBase {
     Subsystem system2 = new SubsystemBase() {};
     Subsystem system3 = new SubsystemBase() {};
 
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
-      Command command1 = command1Holder.getMock();
-      MockCommandHolder command2Holder = new MockCommandHolder(true, system3);
-      Command command2 = command2Holder.getMock();
+    MockCommandHolder command1Holder = new MockCommandHolder(true, system1, system2);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true, system3);
+    Command command2 = command2Holder.getMock();
 
-      ConditionalCommand conditionalCommand =
-          new ConditionalCommand(command1, command2, () -> true);
+    ConditionalCommand conditionalCommand = new ConditionalCommand(command1, command2, () -> true);
 
-      scheduler.schedule(conditionalCommand);
-      scheduler.schedule(new InstantCommand(() -> {}, system3));
+    scheduler.schedule(conditionalCommand);
+    scheduler.schedule(new InstantCommand(() -> {}, system3));
 
-      assertFalse(scheduler.isScheduled(conditionalCommand));
+    assertFalse(scheduler.isScheduled(conditionalCommand));
 
-      verify(command1).end(true);
-      verify(command2, never()).end(true);
-    }
+    verify(command1).end(true);
+    verify(command2, never()).end(true);
   }
 
   static Stream<Arguments> interruptible() {

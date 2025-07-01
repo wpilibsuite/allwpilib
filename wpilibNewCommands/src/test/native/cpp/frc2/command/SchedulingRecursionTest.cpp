@@ -51,7 +51,6 @@ class SelfCancellingCommand
  * href="https://github.com/wpilibsuite/allwpilib/issues/4259">wpilibsuite/allwpilib#4259</a>.
  */
 TEST_P(SchedulingRecursionTest, CancelFromInitialize) {
-  CommandScheduler scheduler = GetScheduler();
   bool hasOtherRun = false;
   int counter = 0;
   TestSubsystem requirement;
@@ -71,7 +70,6 @@ TEST_P(SchedulingRecursionTest, CancelFromInitialize) {
 }
 
 TEST_F(SchedulingRecursionTest, CancelFromInitializeAction) {
-  CommandScheduler scheduler = GetScheduler();
   bool hasOtherRun = false;
   int counter = 0;
   TestSubsystem requirement;
@@ -81,9 +79,8 @@ TEST_F(SchedulingRecursionTest, CancelFromInitializeAction) {
                                 [] { return false; },
                                 {&requirement}};
   auto other = cmd::Run([&hasOtherRun] { hasOtherRun = true; }, {&requirement});
-  scheduler.OnCommandInitialize([&scheduler, &selfCancels](const Command&) {
-    scheduler.Cancel(&selfCancels);
-  });
+  scheduler.OnCommandInitialize(
+      [this, &selfCancels](const Command&) { scheduler.Cancel(&selfCancels); });
   scheduler.Schedule(&selfCancels);
   scheduler.Run();
   scheduler.Schedule(other);
@@ -97,7 +94,6 @@ TEST_F(SchedulingRecursionTest, CancelFromInitializeAction) {
 
 TEST_P(SchedulingRecursionTest,
        DefaultCommandGetsRescheduledAfterSelfCanceling) {
-  CommandScheduler scheduler = GetScheduler();
   bool hasOtherRun = false;
   int counter = 0;
   TestSubsystem requirement;
@@ -132,7 +128,6 @@ class CancelEndCommand : public CommandHelper<Command, CancelEndCommand> {
 };
 
 TEST_F(SchedulingRecursionTest, CancelFromEnd) {
-  CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   CancelEndCommand selfCancels{&scheduler, counter};
 
@@ -144,7 +139,6 @@ TEST_F(SchedulingRecursionTest, CancelFromEnd) {
 }
 
 TEST_F(SchedulingRecursionTest, CancelFromInterruptAction) {
-  CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   FunctionalCommand selfCancels{[] {}, [] {}, [](bool) {},
                                 [] { return false; }};
@@ -170,7 +164,6 @@ class EndCommand : public CommandHelper<Command, EndCommand> {
 };
 
 TEST_F(SchedulingRecursionTest, CancelFromEndLoop) {
-  CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   EndCommand dCancelsAll([&](bool) {
     counter++;
@@ -202,7 +195,6 @@ TEST_F(SchedulingRecursionTest, CancelFromEndLoop) {
 }
 
 TEST_F(SchedulingRecursionTest, CancelFromEndLoopWhileInRunLoop) {
-  CommandScheduler scheduler = GetScheduler();
   int counter = 0;
 
   EndCommand dCancelsAll([&](bool) {
@@ -253,7 +245,6 @@ class MultiCancelCommand : public CommandHelper<Command, MultiCancelCommand> {
 };
 
 TEST_F(SchedulingRecursionTest, MultiCancelFromEnd) {
-  CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   EndCommand bIncrementsCounter([&counter](bool) { counter++; });
   MultiCancelCommand aCancelsB{&scheduler, counter, &bIncrementsCounter};
@@ -268,7 +259,6 @@ TEST_F(SchedulingRecursionTest, MultiCancelFromEnd) {
 }
 
 TEST_P(SchedulingRecursionTest, ScheduleFromEndCancel) {
-  CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
@@ -281,7 +271,6 @@ TEST_P(SchedulingRecursionTest, ScheduleFromEndCancel) {
 }
 
 TEST_P(SchedulingRecursionTest, ScheduleFromEndInterrupt) {
-  CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   TestSubsystem requirement;
   SelfCancellingCommand selfCancels{&scheduler, counter, &requirement,
@@ -296,24 +285,26 @@ TEST_P(SchedulingRecursionTest, ScheduleFromEndInterrupt) {
 }
 
 TEST_F(SchedulingRecursionTest, ScheduleFromEndInterruptAction) {
-  CommandScheduler scheduler = GetScheduler();
+  bool inTest = true;
   int counter = 0;
   TestSubsystem requirement;
   auto selfCancels = cmd::Idle({&requirement});
   auto other = cmd::Idle({&requirement});
   scheduler.OnCommandInterrupt([&](const Command&) {
-    counter++;
-    scheduler.Schedule(other);
+    if (inTest) {
+      counter++;
+      scheduler.Schedule(other);
+    }
   });
   scheduler.Schedule(selfCancels);
   EXPECT_NO_THROW({ scheduler.Schedule(other); });
   EXPECT_EQ(1, counter);
   EXPECT_FALSE(scheduler.IsScheduled(selfCancels));
   EXPECT_TRUE(scheduler.IsScheduled(other));
+  inTest = false;
 }
 
 TEST_F(SchedulingRecursionTest, CancelDefaultCommandFromEnd) {
-  CommandScheduler scheduler = GetScheduler();
   int counter = 0;
   TestSubsystem requirement;
   FunctionalCommand defaultCommand{[] {},
@@ -342,17 +333,15 @@ TEST_F(SchedulingRecursionTest, CancelDefaultCommandFromEnd) {
 }
 
 TEST_F(SchedulingRecursionTest, CancelNextCommandFromCommand) {
-  CommandScheduler scheduler = GetScheduler();
-
   frc2::RunCommand* command1Ptr = nullptr;
   frc2::RunCommand* command2Ptr = nullptr;
   int counter = 0;
 
-  auto command1 = frc2::RunCommand([&counter, &command2Ptr, &scheduler] {
+  auto command1 = frc2::RunCommand([this, &counter, &command2Ptr] {
     scheduler.Cancel(command2Ptr);
     counter++;
   });
-  auto command2 = frc2::RunCommand([&counter, &command1Ptr, &scheduler] {
+  auto command2 = frc2::RunCommand([this, &counter, &command1Ptr] {
     scheduler.Cancel(command1Ptr);
     counter++;
   });

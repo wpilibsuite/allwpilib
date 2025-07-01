@@ -13,8 +13,6 @@ using namespace frc2;
 class ScheduleCommandTest : public CommandTestBase {};
 
 TEST_F(ScheduleCommandTest, ScheduleCommandSchedule) {
-  CommandScheduler& scheduler = CommandScheduler::GetInstance();
-
   bool scheduled = false;
 
   InstantCommand toSchedule([&scheduled] { scheduled = true; }, {});

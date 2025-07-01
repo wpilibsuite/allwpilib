@@ -23,442 +23,412 @@ class SchedulingRecursionTest extends CommandTestBase {
   @EnumSource(InterruptionBehavior.class)
   @ParameterizedTest
   void cancelFromInitialize(InterruptionBehavior interruptionBehavior) {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean hasOtherRun = new AtomicBoolean();
-      AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new SubsystemBase() {};
-      Command selfCancels =
-          new Command() {
-            {
-              addRequirements(requirement);
-            }
+    AtomicBoolean hasOtherRun = new AtomicBoolean();
+    AtomicInteger counter = new AtomicInteger();
+    Subsystem requirement = new SubsystemBase() {};
+    Command selfCancels =
+        new Command() {
+          {
+            addRequirements(requirement);
+          }
 
-            @Override
-            public void initialize() {
-              scheduler.cancel(this);
-            }
+          @Override
+          public void initialize() {
+            scheduler.cancel(this);
+          }
 
-            @Override
-            public void end(boolean interrupted) {
-              counter.incrementAndGet();
-            }
+          @Override
+          public void end(boolean interrupted) {
+            counter.incrementAndGet();
+          }
 
-            @Override
-            public InterruptionBehavior getInterruptionBehavior() {
-              return interruptionBehavior;
-            }
-          };
-      Command other = requirement.run(() -> hasOtherRun.set(true));
+          @Override
+          public InterruptionBehavior getInterruptionBehavior() {
+            return interruptionBehavior;
+          }
+        };
+    Command other = requirement.run(() -> hasOtherRun.set(true));
 
-      assertDoesNotThrow(
-          () -> {
-            scheduler.schedule(selfCancels);
-            scheduler.run();
-            scheduler.schedule(other);
-          });
-      assertFalse(scheduler.isScheduled(selfCancels));
-      assertTrue(scheduler.isScheduled(other));
-      assertEquals(1, counter.get());
-      scheduler.run();
-      assertTrue(hasOtherRun.get());
-    }
+    assertDoesNotThrow(
+        () -> {
+          scheduler.schedule(selfCancels);
+          scheduler.run();
+          scheduler.schedule(other);
+        });
+    assertFalse(scheduler.isScheduled(selfCancels));
+    assertTrue(scheduler.isScheduled(other));
+    assertEquals(1, counter.get());
+    scheduler.run();
+    assertTrue(hasOtherRun.get());
   }
 
   @EnumSource(InterruptionBehavior.class)
   @ParameterizedTest
   void cancelFromInitializeAction(InterruptionBehavior interruptionBehavior) {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean hasOtherRun = new AtomicBoolean();
-      AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new Subsystem() {};
-      Command selfCancels =
-          new Command() {
-            {
-              addRequirements(requirement);
-            }
+    AtomicBoolean hasOtherRun = new AtomicBoolean();
+    AtomicInteger counter = new AtomicInteger();
+    Subsystem requirement = new Subsystem() {};
+    Command selfCancels =
+        new Command() {
+          {
+            addRequirements(requirement);
+          }
 
-            @Override
-            public void end(boolean interrupted) {
-              counter.incrementAndGet();
-            }
+          @Override
+          public void end(boolean interrupted) {
+            counter.incrementAndGet();
+          }
 
-            @Override
-            public InterruptionBehavior getInterruptionBehavior() {
-              return interruptionBehavior;
-            }
-          };
-      Command other = requirement.run(() -> hasOtherRun.set(true));
+          @Override
+          public InterruptionBehavior getInterruptionBehavior() {
+            return interruptionBehavior;
+          }
+        };
+    Command other = requirement.run(() -> hasOtherRun.set(true));
 
-      assertDoesNotThrow(
-          () -> {
-            scheduler.onCommandInitialize(cmd -> scheduler.cancel(selfCancels));
-            scheduler.schedule(selfCancels);
-            scheduler.run();
-            scheduler.schedule(other);
-          });
-      assertFalse(scheduler.isScheduled(selfCancels));
-      assertTrue(scheduler.isScheduled(other));
-      assertEquals(1, counter.get());
-      scheduler.run();
-      assertTrue(hasOtherRun.get());
-    }
+    assertDoesNotThrow(
+        () -> {
+          scheduler.onCommandInitialize(cmd -> scheduler.cancel(selfCancels));
+          scheduler.schedule(selfCancels);
+          scheduler.run();
+          scheduler.schedule(other);
+        });
+    assertFalse(scheduler.isScheduled(selfCancels));
+    assertTrue(scheduler.isScheduled(other));
+    assertEquals(1, counter.get());
+    scheduler.run();
+    assertTrue(hasOtherRun.get());
   }
 
   @EnumSource(InterruptionBehavior.class)
   @ParameterizedTest
   void defaultCommandGetsRescheduledAfterSelfCanceling(InterruptionBehavior interruptionBehavior) {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicBoolean hasOtherRun = new AtomicBoolean();
-      AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new SubsystemBase() {};
-      Command selfCancels =
-          new Command() {
-            {
-              addRequirements(requirement);
-            }
+    AtomicBoolean hasOtherRun = new AtomicBoolean();
+    AtomicInteger counter = new AtomicInteger();
+    Subsystem requirement = new SubsystemBase() {};
+    Command selfCancels =
+        new Command() {
+          {
+            addRequirements(requirement);
+          }
 
-            @Override
-            public void initialize() {
-              scheduler.cancel(this);
-            }
+          @Override
+          public void initialize() {
+            scheduler.cancel(this);
+          }
 
-            @Override
-            public void end(boolean interrupted) {
-              counter.incrementAndGet();
-            }
+          @Override
+          public void end(boolean interrupted) {
+            counter.incrementAndGet();
+          }
 
-            @Override
-            public InterruptionBehavior getInterruptionBehavior() {
-              return interruptionBehavior;
-            }
-          };
-      Command other = requirement.run(() -> hasOtherRun.set(true));
-      scheduler.setDefaultCommand(requirement, other);
+          @Override
+          public InterruptionBehavior getInterruptionBehavior() {
+            return interruptionBehavior;
+          }
+        };
+    Command other = requirement.run(() -> hasOtherRun.set(true));
+    scheduler.setDefaultCommand(requirement, other);
 
-      assertDoesNotThrow(
-          () -> {
-            scheduler.schedule(selfCancels);
-            scheduler.run();
-          });
-      scheduler.run();
-      assertFalse(scheduler.isScheduled(selfCancels));
-      assertTrue(scheduler.isScheduled(other));
-      assertEquals(1, counter.get());
-      scheduler.run();
-      assertTrue(hasOtherRun.get());
-    }
+    assertDoesNotThrow(
+        () -> {
+          scheduler.schedule(selfCancels);
+          scheduler.run();
+        });
+    scheduler.run();
+    assertFalse(scheduler.isScheduled(selfCancels));
+    assertTrue(scheduler.isScheduled(other));
+    assertEquals(1, counter.get());
+    scheduler.run();
+    assertTrue(hasOtherRun.get());
   }
 
   @Test
   void cancelFromEnd() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
-      Command selfCancels =
-          new Command() {
-            @Override
-            public void end(boolean interrupted) {
-              counter.incrementAndGet();
-              scheduler.cancel(this);
-            }
-          };
-      scheduler.schedule(selfCancels);
+    AtomicInteger counter = new AtomicInteger();
+    Command selfCancels =
+        new Command() {
+          @Override
+          public void end(boolean interrupted) {
+            counter.incrementAndGet();
+            scheduler.cancel(this);
+          }
+        };
+    scheduler.schedule(selfCancels);
 
-      assertDoesNotThrow(() -> scheduler.cancel(selfCancels));
-      assertEquals(1, counter.get());
-      assertFalse(scheduler.isScheduled(selfCancels));
-    }
+    assertDoesNotThrow(() -> scheduler.cancel(selfCancels));
+    assertEquals(1, counter.get());
+    assertFalse(scheduler.isScheduled(selfCancels));
   }
 
   @Test
   void cancelFromInterruptAction() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
-      Command selfCancels = Commands.idle();
-      scheduler.onCommandInterrupt(
-          cmd -> {
-            counter.incrementAndGet();
-            scheduler.cancel(selfCancels);
-          });
-      scheduler.schedule(selfCancels);
+    AtomicInteger counter = new AtomicInteger();
+    Command selfCancels = Commands.idle();
+    scheduler.onCommandInterrupt(
+        cmd -> {
+          counter.incrementAndGet();
+          scheduler.cancel(selfCancels);
+        });
+    scheduler.schedule(selfCancels);
 
-      assertDoesNotThrow(() -> scheduler.cancel(selfCancels));
-      assertEquals(1, counter.get());
-      assertFalse(scheduler.isScheduled(selfCancels));
-    }
+    assertDoesNotThrow(() -> scheduler.cancel(selfCancels));
+    assertEquals(1, counter.get());
+    assertFalse(scheduler.isScheduled(selfCancels));
   }
 
   @Test
   void cancelFromEndLoop() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
-      FunctionalCommand dCancelsAll =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancelAll();
-              },
-              () -> true);
-      FunctionalCommand cCancelsD =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancel(dCancelsAll);
-              },
-              () -> true);
-      FunctionalCommand bCancelsC =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancel(cCancelsD);
-              },
-              () -> true);
-      FunctionalCommand aCancelsB =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancel(bCancelsC);
-              },
-              () -> true);
+    AtomicInteger counter = new AtomicInteger();
+    FunctionalCommand dCancelsAll =
+        new FunctionalCommand(
+            () -> {},
+            () -> {},
+            interrupted -> {
+              counter.incrementAndGet();
+              scheduler.cancelAll();
+            },
+            () -> true);
+    FunctionalCommand cCancelsD =
+        new FunctionalCommand(
+            () -> {},
+            () -> {},
+            interrupted -> {
+              counter.incrementAndGet();
+              scheduler.cancel(dCancelsAll);
+            },
+            () -> true);
+    FunctionalCommand bCancelsC =
+        new FunctionalCommand(
+            () -> {},
+            () -> {},
+            interrupted -> {
+              counter.incrementAndGet();
+              scheduler.cancel(cCancelsD);
+            },
+            () -> true);
+    FunctionalCommand aCancelsB =
+        new FunctionalCommand(
+            () -> {},
+            () -> {},
+            interrupted -> {
+              counter.incrementAndGet();
+              scheduler.cancel(bCancelsC);
+            },
+            () -> true);
 
-      scheduler.schedule(aCancelsB);
-      scheduler.schedule(bCancelsC);
-      scheduler.schedule(cCancelsD);
-      scheduler.schedule(dCancelsAll);
+    scheduler.schedule(aCancelsB);
+    scheduler.schedule(bCancelsC);
+    scheduler.schedule(cCancelsD);
+    scheduler.schedule(dCancelsAll);
 
-      assertDoesNotThrow(() -> scheduler.cancel(aCancelsB));
-      assertEquals(4, counter.get());
-      assertFalse(scheduler.isScheduled(aCancelsB));
-      assertFalse(scheduler.isScheduled(bCancelsC));
-      assertFalse(scheduler.isScheduled(cCancelsD));
-      assertFalse(scheduler.isScheduled(dCancelsAll));
-    }
+    assertDoesNotThrow(() -> scheduler.cancel(aCancelsB));
+    assertEquals(4, counter.get());
+    assertFalse(scheduler.isScheduled(aCancelsB));
+    assertFalse(scheduler.isScheduled(bCancelsC));
+    assertFalse(scheduler.isScheduled(cCancelsD));
+    assertFalse(scheduler.isScheduled(dCancelsAll));
   }
 
   @Test
   void cancelFromEndLoopWhileInRunLoop() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
-      FunctionalCommand dCancelsAll =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancelAll();
-              },
-              () -> true);
-      FunctionalCommand cCancelsD =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancel(dCancelsAll);
-              },
-              () -> true);
-      FunctionalCommand bCancelsC =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancel(cCancelsD);
-              },
-              () -> true);
-      FunctionalCommand aCancelsB =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.cancel(bCancelsC);
-              },
-              () -> true);
+    AtomicInteger counter = new AtomicInteger();
+    FunctionalCommand dCancelsAll =
+        new FunctionalCommand(
+            () -> {},
+            () -> {},
+            interrupted -> {
+              counter.incrementAndGet();
+              scheduler.cancelAll();
+            },
+            () -> true);
+    FunctionalCommand cCancelsD =
+        new FunctionalCommand(
+            () -> {},
+            () -> {},
+            interrupted -> {
+              counter.incrementAndGet();
+              scheduler.cancel(dCancelsAll);
+            },
+            () -> true);
+    FunctionalCommand bCancelsC =
+        new FunctionalCommand(
+            () -> {},
+            () -> {},
+            interrupted -> {
+              counter.incrementAndGet();
+              scheduler.cancel(cCancelsD);
+            },
+            () -> true);
+    FunctionalCommand aCancelsB =
+        new FunctionalCommand(
+            () -> {},
+            () -> {},
+            interrupted -> {
+              counter.incrementAndGet();
+              scheduler.cancel(bCancelsC);
+            },
+            () -> true);
 
-      scheduler.schedule(aCancelsB);
-      scheduler.schedule(bCancelsC);
-      scheduler.schedule(cCancelsD);
-      scheduler.schedule(dCancelsAll);
+    scheduler.schedule(aCancelsB);
+    scheduler.schedule(bCancelsC);
+    scheduler.schedule(cCancelsD);
+    scheduler.schedule(dCancelsAll);
 
-      assertDoesNotThrow(scheduler::run);
-      assertEquals(4, counter.get());
-      assertFalse(scheduler.isScheduled(aCancelsB));
-      assertFalse(scheduler.isScheduled(bCancelsC));
-      assertFalse(scheduler.isScheduled(cCancelsD));
-      assertFalse(scheduler.isScheduled(dCancelsAll));
-    }
+    assertDoesNotThrow(scheduler::run);
+    assertEquals(4, counter.get());
+    assertFalse(scheduler.isScheduled(aCancelsB));
+    assertFalse(scheduler.isScheduled(bCancelsC));
+    assertFalse(scheduler.isScheduled(cCancelsD));
+    assertFalse(scheduler.isScheduled(dCancelsAll));
   }
 
   @Test
   void multiCancelFromEnd() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
-      FunctionalCommand bIncrementsCounter =
-          new FunctionalCommand(
-              () -> {}, () -> {}, interrupted -> counter.incrementAndGet(), () -> true);
-      Command aCancelsB =
-          new Command() {
-            @Override
-            public void end(boolean interrupted) {
-              counter.incrementAndGet();
-              scheduler.cancel(bIncrementsCounter);
-              scheduler.cancel(this);
-            }
-          };
+    AtomicInteger counter = new AtomicInteger();
+    FunctionalCommand bIncrementsCounter =
+        new FunctionalCommand(
+            () -> {}, () -> {}, interrupted -> counter.incrementAndGet(), () -> true);
+    Command aCancelsB =
+        new Command() {
+          @Override
+          public void end(boolean interrupted) {
+            counter.incrementAndGet();
+            scheduler.cancel(bIncrementsCounter);
+            scheduler.cancel(this);
+          }
+        };
 
-      scheduler.schedule(aCancelsB);
-      scheduler.schedule(bIncrementsCounter);
+    scheduler.schedule(aCancelsB);
+    scheduler.schedule(bIncrementsCounter);
 
-      assertDoesNotThrow(() -> scheduler.cancel(aCancelsB));
-      assertEquals(2, counter.get());
-      assertFalse(scheduler.isScheduled(aCancelsB));
-      assertFalse(scheduler.isScheduled(bIncrementsCounter));
-    }
+    assertDoesNotThrow(() -> scheduler.cancel(aCancelsB));
+    assertEquals(2, counter.get());
+    assertFalse(scheduler.isScheduled(aCancelsB));
+    assertFalse(scheduler.isScheduled(bIncrementsCounter));
   }
 
   @Test
   void scheduleFromEndCancel() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new SubsystemBase() {};
-      Command other = requirement.runOnce(() -> {});
-      FunctionalCommand selfCancels =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.schedule(other);
-              },
-              () -> false,
-              requirement);
+    AtomicInteger counter = new AtomicInteger();
+    Subsystem requirement = new SubsystemBase() {};
+    Command other = requirement.runOnce(() -> {});
+    FunctionalCommand selfCancels =
+        new FunctionalCommand(
+            () -> {},
+            () -> {},
+            interrupted -> {
+              counter.incrementAndGet();
+              scheduler.schedule(other);
+            },
+            () -> false,
+            requirement);
 
-      scheduler.schedule(selfCancels);
+    scheduler.schedule(selfCancels);
 
-      assertDoesNotThrow(() -> scheduler.cancel(selfCancels));
-      assertEquals(1, counter.get());
-      assertFalse(scheduler.isScheduled(selfCancels));
-    }
+    assertDoesNotThrow(() -> scheduler.cancel(selfCancels));
+    assertEquals(1, counter.get());
+    assertFalse(scheduler.isScheduled(selfCancels));
   }
 
   @Test
   void scheduleFromEndInterrupt() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new SubsystemBase() {};
-      Command other = requirement.runOnce(() -> {});
-      FunctionalCommand selfCancels =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.schedule(other);
-              },
-              () -> false,
-              requirement);
+    AtomicInteger counter = new AtomicInteger();
+    Subsystem requirement = new SubsystemBase() {};
+    Command other = requirement.runOnce(() -> {});
+    FunctionalCommand selfCancels =
+        new FunctionalCommand(
+            () -> {},
+            () -> {},
+            interrupted -> {
+              counter.incrementAndGet();
+              scheduler.schedule(other);
+            },
+            () -> false,
+            requirement);
 
-      scheduler.schedule(selfCancels);
+    scheduler.schedule(selfCancels);
 
-      assertDoesNotThrow(() -> scheduler.schedule(other));
-      assertEquals(1, counter.get());
-      assertFalse(scheduler.isScheduled(selfCancels));
-      assertTrue(scheduler.isScheduled(other));
-    }
+    assertDoesNotThrow(() -> scheduler.schedule(other));
+    assertEquals(1, counter.get());
+    assertFalse(scheduler.isScheduled(selfCancels));
+    assertTrue(scheduler.isScheduled(other));
   }
 
   @Test
   void scheduleFromEndInterruptAction() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new Subsystem() {};
-      Command other = requirement.runOnce(() -> {});
-      Command selfCancels = requirement.runOnce(() -> {});
-      scheduler.onCommandInterrupt(
-          cmd -> {
-            counter.incrementAndGet();
-            scheduler.schedule(other);
-          });
-      scheduler.schedule(selfCancels);
+    AtomicInteger counter = new AtomicInteger();
+    Subsystem requirement = new Subsystem() {};
+    Command other = requirement.runOnce(() -> {});
+    Command selfCancels = requirement.runOnce(() -> {});
+    scheduler.onCommandInterrupt(
+        cmd -> {
+          counter.incrementAndGet();
+          scheduler.schedule(other);
+        });
+    scheduler.schedule(selfCancels);
 
-      assertDoesNotThrow(() -> scheduler.schedule(other));
-      assertEquals(1, counter.get());
-      assertFalse(scheduler.isScheduled(selfCancels));
-      assertTrue(scheduler.isScheduled(other));
-    }
+    assertDoesNotThrow(() -> scheduler.schedule(other));
+    assertEquals(1, counter.get());
+    assertFalse(scheduler.isScheduled(selfCancels));
+    assertTrue(scheduler.isScheduled(other));
   }
 
   @ParameterizedTest
   @EnumSource(InterruptionBehavior.class)
   void scheduleInitializeFromDefaultCommand(InterruptionBehavior interruptionBehavior) {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new SubsystemBase() {};
-      Command other = requirement.runOnce(() -> {}).withInterruptBehavior(interruptionBehavior);
-      FunctionalCommand defaultCommand =
-          new FunctionalCommand(
-              () -> {
-                counter.incrementAndGet();
-                scheduler.schedule(other);
-              },
-              () -> {},
-              interrupted -> {},
-              () -> false,
-              requirement);
+    AtomicInteger counter = new AtomicInteger();
+    Subsystem requirement = new SubsystemBase() {};
+    Command other = requirement.runOnce(() -> {}).withInterruptBehavior(interruptionBehavior);
+    FunctionalCommand defaultCommand =
+        new FunctionalCommand(
+            () -> {
+              counter.incrementAndGet();
+              scheduler.schedule(other);
+            },
+            () -> {},
+            interrupted -> {},
+            () -> false,
+            requirement);
 
-      scheduler.setDefaultCommand(requirement, defaultCommand);
+    scheduler.setDefaultCommand(requirement, defaultCommand);
 
-      scheduler.run();
-      scheduler.run();
-      scheduler.run();
-      assertEquals(3, counter.get());
-      assertFalse(scheduler.isScheduled(defaultCommand));
-      assertTrue(scheduler.isScheduled(other));
-    }
+    scheduler.run();
+    scheduler.run();
+    scheduler.run();
+    assertEquals(3, counter.get());
+    assertFalse(scheduler.isScheduled(defaultCommand));
+    assertTrue(scheduler.isScheduled(other));
   }
 
   @Test
   void cancelDefaultCommandFromEnd() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      AtomicInteger counter = new AtomicInteger();
-      Subsystem requirement = new Subsystem() {};
-      Command defaultCommand =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> counter.incrementAndGet(),
-              () -> false,
-              requirement);
-      Command other = requirement.runOnce(() -> {});
-      Command cancelDefaultCommand =
-          new FunctionalCommand(
-              () -> {},
-              () -> {},
-              interrupted -> {
-                counter.incrementAndGet();
-                scheduler.schedule(other);
-              },
-              () -> false);
+    AtomicInteger counter = new AtomicInteger();
+    Subsystem requirement = new Subsystem() {};
+    Command defaultCommand =
+        new FunctionalCommand(
+            () -> {}, () -> {}, interrupted -> counter.incrementAndGet(), () -> false, requirement);
+    Command other = requirement.runOnce(() -> {});
+    Command cancelDefaultCommand =
+        new FunctionalCommand(
+            () -> {},
+            () -> {},
+            interrupted -> {
+              counter.incrementAndGet();
+              scheduler.schedule(other);
+            },
+            () -> false);
 
-      assertDoesNotThrow(
-          () -> {
-            scheduler.schedule(cancelDefaultCommand);
-            scheduler.setDefaultCommand(requirement, defaultCommand);
+    assertDoesNotThrow(
+        () -> {
+          scheduler.schedule(cancelDefaultCommand);
+          scheduler.setDefaultCommand(requirement, defaultCommand);
 
-            scheduler.run();
-            scheduler.cancel(cancelDefaultCommand);
-          });
-      assertEquals(2, counter.get());
-      assertFalse(scheduler.isScheduled(defaultCommand));
-      assertTrue(scheduler.isScheduled(other));
-    }
+          scheduler.run();
+          scheduler.cancel(cancelDefaultCommand);
+        });
+    assertEquals(2, counter.get());
+    assertFalse(scheduler.isScheduled(defaultCommand));
+    assertTrue(scheduler.isScheduled(other));
   }
 }

@@ -12,32 +12,28 @@ import org.junit.jupiter.api.Test;
 class ScheduleCommandTest extends CommandTestBase {
   @Test
   void scheduleCommandScheduleTest() {
-    try (CommandScheduler scheduler = new CommandScheduler()) {
-      MockCommandHolder command1Holder = new MockCommandHolder(true);
-      Command command1 = command1Holder.getMock();
-      MockCommandHolder command2Holder = new MockCommandHolder(true);
-      Command command2 = command2Holder.getMock();
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
+    Command command2 = command2Holder.getMock();
 
-      ScheduleCommand scheduleCommand = new ScheduleCommand(command1, command2);
+    ScheduleCommand scheduleCommand = new ScheduleCommand(command1, command2);
 
-      scheduler.schedule(scheduleCommand);
+    scheduler.schedule(scheduleCommand);
 
-      verify(command1).schedule();
-      verify(command2).schedule();
-    }
+    verify(command1).schedule();
+    verify(command2).schedule();
   }
 
   @Test
   void scheduleCommandDuringRunTest() {
-    try (CommandScheduler scheduler = CommandScheduler.getInstance()) {
-      Command toSchedule = Commands.none();
-      ScheduleCommand scheduleCommand = new ScheduleCommand(toSchedule);
-      Command group = Commands.sequence(Commands.none(), scheduleCommand);
+    Command toSchedule = Commands.none();
+    ScheduleCommand scheduleCommand = new ScheduleCommand(toSchedule);
+    Command group = Commands.sequence(Commands.none(), scheduleCommand);
 
-      scheduler.schedule(group);
-      scheduler.schedule(Commands.idle());
-      scheduler.run();
-      assertDoesNotThrow(scheduler::run);
-    }
+    scheduler.schedule(group);
+    scheduler.schedule(Commands.idle());
+    scheduler.run();
+    assertDoesNotThrow(scheduler::run);
   }
 }
