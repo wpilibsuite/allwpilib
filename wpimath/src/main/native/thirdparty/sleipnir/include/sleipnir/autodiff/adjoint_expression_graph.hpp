@@ -61,7 +61,7 @@ class AdjointExpressionGraph {
     }
 
     // Set root node's adjoint to 1 since df/df is 1
-    m_top_list[0]->adjoint_expr = make_expression_ptr<ConstExpression>(1.0);
+    m_top_list[0]->adjoint_expr = constant_ptr(1.0);
 
     // df/dx = (df/dy)(dy/dx). The adjoint of x is equal to the adjoint of y
     // multiplied by dy/dx. If there are multiple "paths" from the root node to
@@ -72,9 +72,13 @@ class AdjointExpressionGraph {
       auto& rhs = node->args[1];
 
       if (lhs != nullptr) {
-        lhs->adjoint_expr += node->grad_expr_l(lhs, rhs, node->adjoint_expr);
         if (rhs != nullptr) {
+          // Binary operator
+          lhs->adjoint_expr += node->grad_expr_l(lhs, rhs, node->adjoint_expr);
           rhs->adjoint_expr += node->grad_expr_r(lhs, rhs, node->adjoint_expr);
+        } else {
+          // Unary operator
+          lhs->adjoint_expr += node->grad_expr_l(lhs, rhs, node->adjoint_expr);
         }
       }
     }
@@ -104,9 +108,11 @@ class AdjointExpressionGraph {
    * @param wrt Vector of variables with respect to which to compute the
    *   Jacobian.
    */
-  void append_adjoint_triplets(
+  void append_gradient_triplets(
       gch::small_vector<Eigen::Triplet<double>>& triplets, int row,
       const VariableMatrix& wrt) const {
+    slp_assert(wrt.cols() == 1);
+
     // Read docs/algorithms.md#Reverse_accumulation_automatic_differentiation
     // for background on reverse accumulation automatic differentiation.
 
@@ -139,9 +145,11 @@ class AdjointExpressionGraph {
 
       if (lhs != nullptr) {
         if (rhs != nullptr) {
+          // Binary operator
           lhs->adjoint += node->grad_l(lhs->val, rhs->val, node->adjoint);
           rhs->adjoint += node->grad_r(lhs->val, rhs->val, node->adjoint);
         } else {
+          // Unary operator
           lhs->adjoint += node->grad_l(lhs->val, 0.0, node->adjoint);
         }
       }

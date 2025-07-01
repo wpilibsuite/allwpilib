@@ -54,10 +54,10 @@ ExitStatus sqp(const SQPMatrixCallbacks& matrix_callbacks,
   solve_profilers.emplace_back("  ↳ setup");
   solve_profilers.emplace_back("  ↳ iteration");
   solve_profilers.emplace_back("    ↳ feasibility ✓");
-  solve_profilers.emplace_back("    ↳ iteration callbacks");
-  solve_profilers.emplace_back("    ↳ iter matrix build");
-  solve_profilers.emplace_back("    ↳ iter matrix compute");
-  solve_profilers.emplace_back("    ↳ iter matrix solve");
+  solve_profilers.emplace_back("    ↳ iter callbacks");
+  solve_profilers.emplace_back("    ↳ KKT matrix build");
+  solve_profilers.emplace_back("    ↳ KKT matrix decomp");
+  solve_profilers.emplace_back("    ↳ KKT system solve");
   solve_profilers.emplace_back("    ↳ line search");
   solve_profilers.emplace_back("      ↳ SOC");
   solve_profilers.emplace_back("    ↳ next iter prep");
@@ -71,10 +71,10 @@ ExitStatus sqp(const SQPMatrixCallbacks& matrix_callbacks,
   auto& setup_prof = solve_profilers[1];
   auto& inner_iter_prof = solve_profilers[2];
   auto& feasibility_check_prof = solve_profilers[3];
-  auto& iteration_callbacks_prof = solve_profilers[4];
-  auto& linear_system_build_prof = solve_profilers[5];
-  auto& linear_system_compute_prof = solve_profilers[6];
-  auto& linear_system_solve_prof = solve_profilers[7];
+  auto& iter_callbacks_prof = solve_profilers[4];
+  auto& kkt_matrix_build_prof = solve_profilers[5];
+  auto& kkt_matrix_decomp_prof = solve_profilers[6];
+  auto& kkt_system_solve_prof = solve_profilers[7];
   auto& line_search_prof = solve_profilers[8];
   auto& soc_prof = solve_profilers[9];
   auto& next_iter_prep_prof = solve_profilers[10];
@@ -200,7 +200,7 @@ ExitStatus sqp(const SQPMatrixCallbacks& matrix_callbacks,
     }
 
     feasibility_check_profiler.stop();
-    ScopedProfiler iteration_callbacks_profiler{iteration_callbacks_prof};
+    ScopedProfiler iter_callbacks_profiler{iter_callbacks_prof};
 
     // Call iteration callbacks
     for (const auto& callback : iteration_callbacks) {
@@ -209,8 +209,8 @@ ExitStatus sqp(const SQPMatrixCallbacks& matrix_callbacks,
       }
     }
 
-    iteration_callbacks_profiler.stop();
-    ScopedProfiler linear_system_build_profiler{linear_system_build_prof};
+    iter_callbacks_profiler.stop();
+    ScopedProfiler kkt_matrix_build_profiler{kkt_matrix_build_prof};
 
     // lhs = [H   Aₑᵀ]
     //       [Aₑ   0 ]
@@ -239,8 +239,8 @@ ExitStatus sqp(const SQPMatrixCallbacks& matrix_callbacks,
     rhs.segment(0, x.rows()) = -g + A_e.transpose() * y;
     rhs.segment(x.rows(), y.rows()) = -c_e;
 
-    linear_system_build_profiler.stop();
-    ScopedProfiler linear_system_compute_profiler{linear_system_compute_prof};
+    kkt_matrix_build_profiler.stop();
+    ScopedProfiler kkt_matrix_decomp_profiler{kkt_matrix_decomp_prof};
 
     Step step;
     constexpr double α_max = 1.0;
@@ -254,8 +254,8 @@ ExitStatus sqp(const SQPMatrixCallbacks& matrix_callbacks,
       return ExitStatus::FACTORIZATION_FAILED;
     }
 
-    linear_system_compute_profiler.stop();
-    ScopedProfiler linear_system_solve_profiler{linear_system_solve_prof};
+    kkt_matrix_decomp_profiler.stop();
+    ScopedProfiler kkt_system_solve_profiler{kkt_system_solve_prof};
 
     auto compute_step = [&](Step& step) {
       // p = [ pˣ]
@@ -266,7 +266,7 @@ ExitStatus sqp(const SQPMatrixCallbacks& matrix_callbacks,
     };
     compute_step(step);
 
-    linear_system_solve_profiler.stop();
+    kkt_system_solve_profiler.stop();
     ScopedProfiler line_search_profiler{line_search_prof};
 
     α = α_max;

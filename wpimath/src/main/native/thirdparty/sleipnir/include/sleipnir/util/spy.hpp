@@ -44,9 +44,6 @@ namespace slp {
  *   <li>Sign as a character ('+' for positive, '-' for negative, or '0' for
  *       zero)</li>
  * </ol>
- *
- * @param[out] file A file stream.
- * @param[in] mat The sparse matrix.
  */
 class SLEIPNIR_DLLEXPORT Spy {
  public:
