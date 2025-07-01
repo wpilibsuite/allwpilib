@@ -8,15 +8,14 @@ import org.wpilib.hardware.hal.DIOJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.system.SensorUtil;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Class to write digital outputs. This class will write digital outputs. Other devices that are
  * implemented elsewhere will automatically allocate digital inputs and outputs as required.
  */
-public class DigitalOutput implements AutoCloseable, Sendable {
+public class DigitalOutput implements AutoCloseable, TelemetryLoggable {
   private static final int invalidPwmGenerator = 0;
   private int m_pwmGenerator = invalidPwmGenerator;
 
@@ -29,7 +28,6 @@ public class DigitalOutput implements AutoCloseable, Sendable {
    * @param channel the DIO channel to use for the digital output. 0-9 are on-board, 10-25 are on
    *     the MXP
    */
-  @SuppressWarnings("this-escape")
   public DigitalOutput(int channel) {
     SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
@@ -37,12 +35,10 @@ public class DigitalOutput implements AutoCloseable, Sendable {
     m_handle = DIOJNI.initializeDIOPort(channel, false);
 
     HAL.reportUsage("IO", channel, "DigitalOutput");
-    SendableRegistry.add(this, "DigitalOutput", channel);
   }
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     // Disable the pwm only if we have allocated it
     if (m_pwmGenerator != invalidPwmGenerator) {
       disablePWM();
@@ -193,8 +189,12 @@ public class DigitalOutput implements AutoCloseable, Sendable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Digital Output");
-    builder.addBooleanProperty("Value", this::get, this::set);
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("Value", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Digital Output";
   }
 }

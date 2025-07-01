@@ -4,11 +4,8 @@
 
 #pragma once
 
-#include <memory>
 #include <string_view>
 
-#include "wpi/nt/DoubleTopic.hpp"
-#include "wpi/nt/StringTopic.hpp"
 #include "wpi/smartdashboard/MechanismObject2d.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/util/Color8Bit.hpp"
@@ -85,18 +82,14 @@ class MechanismLigament2d : public MechanismObject2d {
    */
   double GetLineWeight();
 
- protected:
-  void UpdateEntries(std::shared_ptr<wpi::nt::NetworkTable> table) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
-  wpi::nt::StringPublisher m_typePub;
   double m_length;
-  wpi::nt::DoubleEntry m_lengthEntry;
   double m_angle;
-  wpi::nt::DoubleEntry m_angleEntry;
   double m_weight;
-  wpi::nt::DoubleEntry m_weightEntry;
   char m_color[10];
-  wpi::nt::StringEntry m_colorEntry;
 };
 }  // namespace wpi

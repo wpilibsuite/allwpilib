@@ -9,7 +9,7 @@ import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.hardware.motor.Spark;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.romi.RomiGyro;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryTable;
 
 public class Drivetrain extends SubsystemBase {
   private static final double kCountsPerRevolution = 1440.0;
@@ -34,9 +34,6 @@ public class Drivetrain extends SubsystemBase {
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
-    SendableRegistry.addChild(m_diffDrive, m_leftMotor);
-    SendableRegistry.addChild(m_diffDrive, m_rightMotor);
-
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
@@ -112,5 +109,14 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  @Override
+  public void updateTelemetry(TelemetryTable table) {
+    super.updateTelemetry(table);
+    table.log("drive", m_diffDrive);
+    table.log("gyro", m_gyro);
+    table.log("left distance", getLeftDistanceInch());
+    table.log("right distance", getRightDistanceInch());
   }
 }

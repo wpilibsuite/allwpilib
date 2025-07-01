@@ -112,6 +112,7 @@ model {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
                 lib project: ':datalog', library: 'datalog', linkage: 'shared'
             }
         }
@@ -133,6 +134,8 @@ model {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':datalog', library: 'datalog', linkage: 'shared'
 
                 if (it instanceof SharedLibraryBinarySpec) {
                     cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
@@ -169,6 +172,8 @@ model {
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':datalog', library: 'datalog', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 nativeUtils.useRequiredLibrary(it, 'opencv_shared')
@@ -218,6 +223,8 @@ model {
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            lib project: ':datalog', library: 'datalog', linkage: 'shared'
             lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
             nativeUtils.useRequiredLibrary(it, 'opencv_shared')
             lib library: nativeName, linkage: 'shared'

@@ -9,7 +9,6 @@ import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.hardware.motor.PWMSparkMax;
-import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to maintain rotation vectors
@@ -41,11 +40,6 @@ public class Robot extends TimedRobot {
     rearRight.setInverted(true);
 
     m_robotDrive = new MecanumDrive(frontLeft::set, rearLeft::set, frontRight::set, rearRight::set);
-
-    SendableRegistry.addChild(m_robotDrive, frontLeft);
-    SendableRegistry.addChild(m_robotDrive, rearLeft);
-    SendableRegistry.addChild(m_robotDrive, frontRight);
-    SendableRegistry.addChild(m_robotDrive, rearRight);
   }
 
   /** Mecanum drive is used with the gyro angle as an input. */

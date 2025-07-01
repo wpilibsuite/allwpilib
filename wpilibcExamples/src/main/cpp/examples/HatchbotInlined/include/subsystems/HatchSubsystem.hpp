@@ -26,7 +26,7 @@ class HatchSubsystem : public wpi::cmd::SubsystemBase {
    */
   wpi::cmd::CommandPtr ReleaseHatchCommand();
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

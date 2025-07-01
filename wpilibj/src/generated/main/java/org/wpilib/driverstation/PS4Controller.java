@@ -9,8 +9,8 @@ package org.wpilib.driverstation;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Handle input from PS4 controllers connected to the Driver Station.
@@ -23,7 +23,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * only through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any
  * 3rd party controllers.
  */
-public class PS4Controller extends GenericHID implements Sendable {
+public class PS4Controller extends GenericHID implements TelemetryLoggable {
   /** Represents a digital button on a PS4Controller. */
   public enum Button {
     /** Square button. */
@@ -754,28 +754,31 @@ public class PS4Controller extends GenericHID implements Sendable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "PS4");
-    builder.addDoubleProperty("L2 Axis", this::getL2Axis, null);
-    builder.addDoubleProperty("R2 Axis", this::getR2Axis, null);
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("RightX", this::getRightX, null);
-    builder.addDoubleProperty("RightY", this::getRightY, null);
-    builder.addBooleanProperty("Square", this::getSquareButton, null);
-    builder.addBooleanProperty("Cross", this::getCrossButton, null);
-    builder.addBooleanProperty("Circle", this::getCircleButton, null);
-    builder.addBooleanProperty("Triangle", this::getTriangleButton, null);
-    builder.addBooleanProperty("L1", this::getL1Button, null);
-    builder.addBooleanProperty("R1", this::getR1Button, null);
-    builder.addBooleanProperty("L2", this::getL2Button, null);
-    builder.addBooleanProperty("R2", this::getR2Button, null);
-    builder.addBooleanProperty("Share", this::getShareButton, null);
-    builder.addBooleanProperty("Options", this::getOptionsButton, null);
-    builder.addBooleanProperty("L3", this::getL3Button, null);
-    builder.addBooleanProperty("R3", this::getR3Button, null);
-    builder.addBooleanProperty("PS", this::getPSButton, null);
-    builder.addBooleanProperty("Touchpad", this::getTouchpadButton, null);
+  public String getTelemetryType() {
+    return "HID:PS4";
+  }
+
+  @Override
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("L2", getL2Axis());
+    table.log("R2", getR2Axis());
+    table.log("LeftX", getLeftX());
+    table.log("LeftY", getLeftY());
+    table.log("RightX", getRightX());
+    table.log("RightY", getRightY());
+    table.log("Square", getSquareButton());
+    table.log("Cross", getCrossButton());
+    table.log("Circle", getCircleButton());
+    table.log("Triangle", getTriangleButton());
+    table.log("L1", getL1Button());
+    table.log("R1", getR1Button());
+    table.log("L2", getL2Button());
+    table.log("R2", getR2Button());
+    table.log("Share", getShareButton());
+    table.log("Options", getOptionsButton());
+    table.log("L3", getL3Button());
+    table.log("R3", getR3Button());
+    table.log("PS", getPSButton());
+    table.log("Touchpad", getTouchpadButton());
   }
 }

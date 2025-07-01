@@ -12,7 +12,6 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/nt/DoubleArrayTopic.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
@@ -102,12 +101,8 @@ class FieldObject2d {
       wpi::util::SmallVectorImpl<wpi::math::Pose2d>& out) const;
 
  private:
-  void UpdateEntry(bool setDefault = false);
-  void UpdateFromEntry() const;
-
   mutable wpi::util::mutex m_mutex;
   std::string m_name;
-  wpi::nt::DoubleArrayEntry m_entry;
   mutable wpi::util::SmallVector<wpi::math::Pose2d, 1> m_poses;
 };
 

@@ -35,7 +35,7 @@ public class PWMVictorSPX extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public PWMVictorSPX(final int channel) {
-    super("PWMVictorSPX", channel);
+    super(channel);
 
     setBoundsMicroseconds(2004, 1520, 1500, 1480, 997);
     m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);

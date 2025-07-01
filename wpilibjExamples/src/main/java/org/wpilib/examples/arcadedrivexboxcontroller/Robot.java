@@ -8,7 +8,6 @@ import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.driverstation.XboxController;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.motor.PWMSparkMax;
-import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class. Runs the motors with split
@@ -23,9 +22,6 @@ public class Robot extends TimedRobot {
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    SendableRegistry.addChild(m_robotDrive, m_leftMotor);
-    SendableRegistry.addChild(m_robotDrive, m_rightMotor);
-
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.

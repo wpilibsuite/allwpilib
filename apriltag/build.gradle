@@ -103,6 +103,7 @@ model {
                 return
             }
             it.cppCompiler.define 'WPILIB_EXPORTS'
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
         }

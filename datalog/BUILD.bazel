@@ -26,6 +26,7 @@ wpilib_cc_library(
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
+        "//telemetry",
         "//wpiutil",
     ],
 )
@@ -78,6 +79,7 @@ wpilib_jni_java_library(
     native_libs = [":datalogjni"],
     visibility = ["//visibility:public"],
     deps = [
+        "//telemetry:telemetry-java",
         "//wpiutil:wpiutil-java",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
@@ -159,6 +161,7 @@ wpilib_java_junit5_test(
     tags = ["exclusive"],
     deps = [
         ":datalog-java",
+        "//telemetry:telemetry-java",
         "//wpiutil:wpiutil-java",
     ],
 )

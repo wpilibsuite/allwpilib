@@ -38,6 +38,8 @@ If you want JNI and Java, you will need a JDK of at least version 21 installed. 
 
 If you are building with unit tests or simulation modules, you will also need an Internet connection for the initial setup process, as CMake will clone google-test and imgui from GitHub.
 
+Building the GUI on Linux requires libxcursor-dev, libxrandr-dev, libxinerama-dev, libxi-dev, and libgl-dev.
+
 ## Build Options
 
 The following build options are available:

@@ -7,6 +7,7 @@ package org.wpilib.examples.romireference;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.framework.TimedRobot;
+import org.wpilib.telemetry.Telemetry;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -41,6 +42,7 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    Telemetry.log("", m_robotContainer);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

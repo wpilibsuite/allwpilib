@@ -10,13 +10,10 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/nt/NTSendable.hpp"
-#include "wpi/nt/NetworkTable.hpp"
-#include "wpi/nt/NetworkTableEntry.hpp"
 #include "wpi/smartdashboard/FieldObject2d.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 
@@ -38,8 +35,7 @@ namespace wpi {
  * also be shown by using the GetObject() function.  Other objects can
  * also have multiple poses (which will show the object at multiple locations).
  */
-class Field2d : public wpi::nt::NTSendable,
-                public wpi::util::SendableHelper<Field2d> {
+class Field2d : public wpi::TelemetryLoggable {
  public:
   using Entry = size_t;
 
@@ -86,11 +82,11 @@ class Field2d : public wpi::nt::NTSendable,
    */
   FieldObject2d* GetRobotObject();
 
-  void InitSendable(wpi::nt::NTSendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
-  std::shared_ptr<wpi::nt::NetworkTable> m_table;
-
   mutable wpi::util::mutex m_mutex;
   std::vector<std::unique_ptr<FieldObject2d>> m_objects;
 };

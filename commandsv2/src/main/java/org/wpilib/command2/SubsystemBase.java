@@ -4,9 +4,8 @@
 
 package org.wpilib.command2;
 
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * A base for subsystems that handles registration in the constructor, and provides a more intuitive
@@ -14,13 +13,12 @@ import org.wpilib.util.sendable.SendableRegistry;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
-public abstract class SubsystemBase implements Subsystem, Sendable {
+public abstract class SubsystemBase implements Subsystem, TelemetryLoggable {
   /** Constructor. Telemetry/log name defaults to the classname. */
   @SuppressWarnings("this-escape")
   public SubsystemBase() {
     String name = this.getClass().getSimpleName();
-    name = name.substring(name.lastIndexOf('.') + 1);
-    SendableRegistry.add(this, name, name);
+    m_name = name.substring(name.lastIndexOf('.') + 1);
     CommandScheduler.getInstance().registerSubsystem(this);
   }
 
@@ -31,7 +29,7 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
    */
   @SuppressWarnings("this-escape")
   public SubsystemBase(String name) {
-    SendableRegistry.add(this, name, name);
+    m_name = name;
     CommandScheduler.getInstance().registerSubsystem(this);
   }
 
@@ -42,7 +40,7 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
    */
   @Override
   public String getName() {
-    return SendableRegistry.getName(this);
+    return m_name;
   }
 
   /**
@@ -51,50 +49,24 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
    * @param name name
    */
   public void setName(String name) {
-    SendableRegistry.setName(this, name);
-  }
-
-  /**
-   * Gets the subsystem name of this Subsystem.
-   *
-   * @return Subsystem name
-   */
-  public String getSubsystem() {
-    return SendableRegistry.getSubsystem(this);
-  }
-
-  /**
-   * Sets the subsystem name of this Subsystem.
-   *
-   * @param subsystem subsystem name
-   */
-  public void setSubsystem(String subsystem) {
-    SendableRegistry.setSubsystem(this, subsystem);
-  }
-
-  /**
-   * Associates a {@link Sendable} with this Subsystem. Also update the child's name.
-   *
-   * @param name name to give child
-   * @param child sendable
-   */
-  public void addChild(String name, Sendable child) {
-    SendableRegistry.add(child, getSubsystem(), name);
+    m_name = name;
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Subsystem");
+  public void updateTelemetry(TelemetryTable table) {
+    var defaultCommand = getDefaultCommand();
+    table.log(".hasDefault", defaultCommand != null);
+    table.log(".default", defaultCommand != null ? defaultCommand.getName() : "none");
 
-    builder.addBooleanProperty(".hasDefault", () -> getDefaultCommand() != null, null);
-    builder.addStringProperty(
-        ".default",
-        () -> getDefaultCommand() != null ? getDefaultCommand().getName() : "none",
-        null);
-    builder.addBooleanProperty(".hasCommand", () -> getCurrentCommand() != null, null);
-    builder.addStringProperty(
-        ".command",
-        () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "none",
-        null);
+    var currentCommand = getCurrentCommand();
+    table.log(".hasCommand", currentCommand != null);
+    table.log(".command", currentCommand != null ? currentCommand.getName() : "none");
   }
+
+  @Override
+  public String getTelemetryType() {
+    return "Subsystem";
+  }
+
+  private String m_name;
 }

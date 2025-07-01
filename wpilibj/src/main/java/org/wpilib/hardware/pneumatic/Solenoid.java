@@ -5,9 +5,8 @@
 package org.wpilib.hardware.pneumatic;
 
 import org.wpilib.hardware.hal.util.AllocationException;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Solenoid class for running high voltage Digital Output on a pneumatics module.
@@ -15,7 +14,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * <p>The Solenoid class is typically used for pneumatic solenoids, but could be used for any device
  * within the current spec of the module.
  */
-public class Solenoid implements Sendable, AutoCloseable {
+public class Solenoid implements TelemetryLoggable, AutoCloseable {
   private final int m_mask; // The channel mask
   private final int m_channel;
   private PneumaticsBase m_module;
@@ -39,7 +38,6 @@ public class Solenoid implements Sendable, AutoCloseable {
    * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
-  @SuppressWarnings("this-escape")
   public Solenoid(
       final int busId, final int module, final PneumaticsModuleType moduleType, final int channel) {
     m_module = PneumaticsBase.getForType(busId, module, moduleType);
@@ -58,12 +56,10 @@ public class Solenoid implements Sendable, AutoCloseable {
     }
 
     m_module.reportUsage("Solenoid[" + channel + "]", "Solenoid");
-    SendableRegistry.add(this, "Solenoid", m_module.getModuleNumber(), channel);
   }
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     m_module.unreserveSolenoids(m_mask);
     m_module.close();
     m_module = null;
@@ -146,9 +142,12 @@ public class Solenoid implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Solenoid");
-    builder.setActuator(true);
-    builder.addBooleanProperty("Value", this::get, this::set);
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("Value", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Solenoid";
   }
 }

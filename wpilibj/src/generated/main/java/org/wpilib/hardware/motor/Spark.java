@@ -35,7 +35,7 @@ public class Spark extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public Spark(final int channel) {
-    super("Spark", channel);
+    super(channel);
 
     setBoundsMicroseconds(2003, 1550, 1500, 1460, 999);
     m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);

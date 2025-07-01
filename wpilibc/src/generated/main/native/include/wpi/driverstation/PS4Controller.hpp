@@ -6,10 +6,8 @@
 
 #pragma once
 
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
-
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -26,8 +24,7 @@ namespace wpi {
  * to have the same mapping, as well as any 3rd party controllers.
  */
 class PS4Controller : public GenericHID,
-                                    public wpi::util::Sendable,
-                                    public wpi::util::SendableHelper<PS4Controller> {
+                                    public wpi::TelemetryLoggable {
  public:
   /**
    * Construct an instance of a controller.
@@ -602,7 +599,8 @@ class PS4Controller : public GenericHID,
     static constexpr int kR2 = 4;
   };
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  std::string_view GetTelemetryType() const override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 };
 
 }  // namespace wpi

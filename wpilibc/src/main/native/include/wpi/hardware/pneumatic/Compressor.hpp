@@ -10,9 +10,8 @@
 #include "wpi/hardware/pneumatic/CompressorConfigType.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/util/SensorUtil.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 
@@ -30,8 +29,7 @@ namespace wpi {
  * loop control. You can only turn off closed loop control, thereby stopping
  * the compressor from operating.
  */
-class Compressor : public wpi::util::Sendable,
-                   public wpi::util::SendableHelper<Compressor> {
+class Compressor : public wpi::TelemetryLoggable {
  public:
   /**
    * Constructs a compressor for a specified module and type.
@@ -172,7 +170,9 @@ class Compressor : public wpi::util::Sendable,
    */
   CompressorConfigType GetConfigType() const;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   std::shared_ptr<PneumaticsBase> m_module;

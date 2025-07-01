@@ -8,15 +8,14 @@ import org.wpilib.hardware.hal.SimBoolean;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDouble;
 import org.wpilib.math.util.MathUtil;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with PWM Output, the
  * CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag Encoder.
  */
-public class DutyCycleEncoder implements Sendable, AutoCloseable {
+public class DutyCycleEncoder implements TelemetryLoggable, AutoCloseable {
   private final DutyCycle m_dutyCycle;
   private boolean m_ownsDutyCycle;
   private double m_frequencyThreshold = 100;
@@ -38,7 +37,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    * @param fullRange the value to report at maximum travel
    * @param expectedZero the reading where you would expect a 0 from get()
    */
-  @SuppressWarnings("this-escape")
   public DutyCycleEncoder(int channel, double fullRange, double expectedZero) {
     m_ownsDutyCycle = true;
     m_dutyCycle = new DutyCycle(channel);
@@ -52,7 +50,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    * @param fullRange the value to report at maximum travel
    * @param expectedZero the reading where you would expect a 0 from get()
    */
-  @SuppressWarnings("this-escape")
   public DutyCycleEncoder(DutyCycle dutyCycle, double fullRange, double expectedZero) {
     m_dutyCycle = dutyCycle;
     init(fullRange, expectedZero);
@@ -65,7 +62,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    *
    * @param channel the channel to attach to
    */
-  @SuppressWarnings("this-escape")
   public DutyCycleEncoder(int channel) {
     this(channel, 1.0, 0.0);
   }
@@ -77,7 +73,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    *
    * @param dutyCycle the duty cycle to attach to
    */
-  @SuppressWarnings("this-escape")
   public DutyCycleEncoder(DutyCycle dutyCycle) {
     this(dutyCycle, 1.0, 0.0);
   }
@@ -92,8 +87,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
 
     m_fullRange = fullRange;
     m_expectedZero = expectedZero;
-
-    SendableRegistry.add(this, "DutyCycle Encoder", m_dutyCycle.getSourceChannel());
   }
 
   private double mapSensorRange(double pos) {
@@ -245,9 +238,13 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("AbsoluteEncoder");
-    builder.addDoubleProperty("Position", this::get, null);
-    builder.addBooleanProperty("Is Connected", this::isConnected, null);
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("Position", get());
+    table.log("Is Connected", isConnected());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "AbsoluteEncoder";
   }
 }

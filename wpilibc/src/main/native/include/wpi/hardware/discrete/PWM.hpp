@@ -8,9 +8,8 @@
 
 #include "wpi/hal/PWM.h"
 #include "wpi/hal/Types.h"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 class AddressableLED;
@@ -23,7 +22,7 @@ class AddressableLED;
  * (off) to 4096. Changes are immediately sent to the FPGA, and the update
  * occurs at the next FPGA cycle (5.05ms). There is no delay.
  */
-class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
+class PWM : public wpi::TelemetryLoggable {
  public:
   friend class AddressableLED;
   /**
@@ -53,9 +52,8 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
    *
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the
    *                MXP port
-   * @param registerSendable If true, adds this instance to SendableRegistry
    */
-  explicit PWM(int channel, bool registerSendable = true);
+  explicit PWM(int channel);
 
   PWM(PWM&&) = default;
   PWM& operator=(PWM&&) = default;
@@ -107,8 +105,9 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
- protected:
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   int m_channel;

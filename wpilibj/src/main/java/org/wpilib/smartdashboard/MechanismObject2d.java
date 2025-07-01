@@ -6,7 +6,9 @@ package org.wpilib.smartdashboard;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.wpilib.networktables.NetworkTable;
+import java.util.Map.Entry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Common base class for all Mechanism2d node types.
@@ -16,11 +18,10 @@ import org.wpilib.networktables.NetworkTable;
  *
  * @see Mechanism2d
  */
-public abstract class MechanismObject2d implements AutoCloseable {
+public abstract class MechanismObject2d implements TelemetryLoggable, AutoCloseable {
   /** Relative to parent. */
   private final String m_name;
 
-  private NetworkTable m_table;
   private final Map<String, MechanismObject2d> m_objects = new HashMap<>(1);
 
   /**
@@ -53,26 +54,8 @@ public abstract class MechanismObject2d implements AutoCloseable {
       throw new UnsupportedOperationException("Mechanism object names must be unique!");
     }
     m_objects.put(object.getName(), object);
-    if (m_table != null) {
-      object.update(m_table.getSubTable(object.getName()));
-    }
     return object;
   }
-
-  final synchronized void update(NetworkTable table) {
-    m_table = table;
-    updateEntries(m_table);
-    for (MechanismObject2d obj : m_objects.values()) {
-      obj.update(m_table.getSubTable(obj.m_name));
-    }
-  }
-
-  /**
-   * Update this object's entries with new ones from a new table.
-   *
-   * @param table the new table.
-   */
-  protected abstract void updateEntries(NetworkTable table);
 
   /**
    * Retrieve the object's name.
@@ -81,5 +64,14 @@ public abstract class MechanismObject2d implements AutoCloseable {
    */
   public final String getName() {
     return m_name;
+  }
+
+  @Override
+  public void updateTelemetry(TelemetryTable table) {
+    synchronized (this) {
+      for (Entry<String, MechanismObject2d> entry : m_objects.entrySet()) {
+        table.log(entry.getKey(), entry.getValue());
+      }
+    }
   }
 }

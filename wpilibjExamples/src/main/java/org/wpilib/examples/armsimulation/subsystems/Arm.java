@@ -17,8 +17,8 @@ import org.wpilib.simulation.SingleJointedArmSim;
 import org.wpilib.smartdashboard.Mechanism2d;
 import org.wpilib.smartdashboard.MechanismLigament2d;
 import org.wpilib.smartdashboard.MechanismRoot2d;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
+import org.wpilib.telemetry.Telemetry;
 import org.wpilib.util.Color;
 import org.wpilib.util.Color8Bit;
 import org.wpilib.util.Preferences;
@@ -73,8 +73,6 @@ public class Arm implements AutoCloseable {
   public Arm() {
     m_encoder.setDistancePerPulse(Constants.kArmEncoderDistPerPulse);
 
-    // Put Mechanism 2d to SmartDashboard
-    SmartDashboard.putData("Arm Sim", m_mech2d);
     m_armTower.setColor(new Color8Bit(Color.kBlue));
 
     // Set the Arm position setpoint and P constant to Preferences if the keys don't already exist
@@ -99,6 +97,9 @@ public class Arm implements AutoCloseable {
 
     // Update the Mechanism Arm angle based on the simulated arm angle
     m_arm.setAngle(Units.radiansToDegrees(m_armSim.getAngle()));
+
+    // Put Mechanism 2d to SmartDashboard
+    Telemetry.log("Arm Sim", m_mech2d);
   }
 
   /** Load setpoint and kP from preferences. */
@@ -129,7 +130,6 @@ public class Arm implements AutoCloseable {
     m_encoder.close();
     m_mech2d.close();
     m_armPivot.close();
-    m_controller.close();
     m_arm.close();
   }
 }

@@ -4,7 +4,8 @@
 
 #include "subsystems/DriveSubsystem.hpp"
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
+#include "Constants.h"
 
 using namespace DriveConstants;
 
@@ -15,9 +16,6 @@ DriveSubsystem::DriveSubsystem()
       m_right2{kRightMotor2Port},
       m_leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
       m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]} {
-  wpi::util::SendableRegistry::AddChild(&m_drive, &m_left1);
-  wpi::util::SendableRegistry::AddChild(&m_drive, &m_right1);
-
   m_left1.AddFollower(m_left2);
   m_right1.AddFollower(m_right2);
 
@@ -52,13 +50,10 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
   m_drive.SetMaxOutput(maxOutput);
 }
 
-void DriveSubsystem::InitSendable(wpi::util::SendableBuilder& builder) {
-  SubsystemBase::InitSendable(builder);
+void DriveSubsystem::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  SubsystemBase::UpdateTelemetry(table);
 
   // Publish encoder distances to telemetry.
-  builder.AddDoubleProperty(
-      "leftDistance", [this] { return m_leftEncoder.GetDistance(); }, nullptr);
-  builder.AddDoubleProperty(
-      "rightDistance", [this] { return m_rightEncoder.GetDistance(); },
-      nullptr);
+  table.Log("leftDistance", m_leftEncoder.GetDistance());
+  table.Log("rightDistance", m_rightEncoder.GetDistance());
 }

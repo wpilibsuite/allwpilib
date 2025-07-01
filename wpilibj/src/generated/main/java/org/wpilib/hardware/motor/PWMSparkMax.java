@@ -35,7 +35,7 @@ public class PWMSparkMax extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public PWMSparkMax(final int channel) {
-    super("PWMSparkMax", channel);
+    super(channel);
 
     setBoundsMicroseconds(2003, 1550, 1500, 1460, 999);
     m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);

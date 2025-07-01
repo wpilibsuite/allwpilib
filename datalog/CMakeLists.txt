@@ -18,7 +18,7 @@ target_include_directories(
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
 )
 
-target_link_libraries(datalog PUBLIC wpiutil)
+target_link_libraries(datalog PUBLIC telemetry wpiutil)
 
 subdir_list(datalog_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${datalog_examples})
@@ -43,7 +43,7 @@ if(WITH_JAVA)
     add_jar(
         datalog_jar
         ${JAVA_SOURCES}
-        INCLUDE_JARS wpiutil_jar ${QUICKBUF_JAR}
+        INCLUDE_JARS telemetry_jar wpiutil_jar ${QUICKBUF_JAR}
         OUTPUT_NAME datalog
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         GENERATE_NATIVE_HEADERS datalog_jni_headers

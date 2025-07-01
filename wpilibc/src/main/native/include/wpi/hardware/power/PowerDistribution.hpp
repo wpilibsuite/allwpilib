@@ -8,8 +8,7 @@
 
 #include "wpi/hal/PowerDistribution.h"
 #include "wpi/hal/Types.h"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -17,8 +16,7 @@ namespace wpi {
  * Class for getting voltage, current, temperature, power and energy from the
  * CTRE Power Distribution Panel (PDP) or REV Power Distribution Hub (PDH).
  */
-class PowerDistribution : public wpi::util::Sendable,
-                          public wpi::util::SendableHelper<PowerDistribution> {
+class PowerDistribution : public wpi::TelemetryLoggable {
  public:
   /// Default module number.
   static constexpr int kDefaultModule = -1;
@@ -343,7 +341,9 @@ class PowerDistribution : public wpi::util::Sendable,
    */
   StickyFaults GetStickyFaults() const;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   wpi::hal::Handle<HAL_PowerDistributionHandle, HAL_CleanPowerDistribution>

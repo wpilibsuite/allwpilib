@@ -6,16 +6,15 @@ package org.wpilib.hardware.rotation;
 
 import org.wpilib.hardware.discrete.AnalogInput;
 import org.wpilib.system.RobotController;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Class for reading analog potentiometers. Analog potentiometers read in an analog voltage that
  * corresponds to a position. The position is in whichever units you choose, by way of the scaling
  * and offset constants passed to the constructor.
  */
-public class AnalogPotentiometer implements Sendable, AutoCloseable {
+public class AnalogPotentiometer implements TelemetryLoggable, AutoCloseable {
   private AnalogInput m_analogInput;
   private boolean m_initAnalogInput;
   private double m_fullRange;
@@ -35,11 +34,9 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
    * @param fullRange The scaling to multiply the fraction by to get a meaningful unit.
    * @param offset The offset to add to the scaled value for controlling the zero value
    */
-  @SuppressWarnings("this-escape")
   public AnalogPotentiometer(final int channel, double fullRange, double offset) {
     this(new AnalogInput(channel), fullRange, offset);
     m_initAnalogInput = true;
-    SendableRegistry.addChild(this, m_analogInput);
   }
 
   /**
@@ -56,9 +53,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
    *     input.
    * @param offset The angular value (in desired units) representing the angular output at 0V.
    */
-  @SuppressWarnings("this-escape")
   public AnalogPotentiometer(final AnalogInput input, double fullRange, double offset) {
-    SendableRegistry.add(this, "AnalogPotentiometer", input.getChannel());
     m_analogInput = input;
     m_initAnalogInput = false;
 
@@ -131,20 +126,20 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    if (m_analogInput != null) {
-      builder.setSmartDashboardType("Analog Input");
-      builder.addDoubleProperty("Value", this::get, null);
-    }
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("Value", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Analog Input";
   }
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
-    if (m_initAnalogInput) {
+    if (m_analogInput != null && m_initAnalogInput) {
       m_analogInput.close();
-      m_analogInput = null;
-      m_initAnalogInput = false;
     }
+    m_analogInput = null;
   }
 }

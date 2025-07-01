@@ -72,7 +72,6 @@ public class Robot extends TimedRobot {
   public void close() {
     m_elevatorMotor.close();
     m_potentiometer.close();
-    m_pidController.close();
     m_index = 0;
     super.close();
   }

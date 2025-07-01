@@ -31,9 +31,9 @@ import org.wpilib.networktables.DoubleArrayTopic;
 import org.wpilib.simulation.DifferentialDrivetrainSim;
 import org.wpilib.simulation.EncoderSim;
 import org.wpilib.smartdashboard.Field2d;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 import org.wpilib.system.Timer;
+import org.wpilib.telemetry.Telemetry;
 import org.wpilib.vision.apriltag.AprilTagFieldLayout;
 import org.wpilib.vision.apriltag.AprilTagFields;
 
@@ -126,9 +126,6 @@ public class Drivetrain {
 
     m_objectInField =
         AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo).getTagPose(0).get();
-
-    SmartDashboard.putData("Field", m_fieldSim);
-    SmartDashboard.putData("FieldEstimation", m_fieldApproximation);
   }
 
   /**
@@ -263,5 +260,8 @@ public class Drivetrain {
     updateOdometry();
     m_fieldSim.setRobotPose(m_drivetrainSimulator.getPose());
     m_fieldApproximation.setRobotPose(m_poseEstimator.getEstimatedPosition());
+
+    Telemetry.log("Field", m_fieldSim);
+    Telemetry.log("FieldEstimation", m_fieldApproximation);
   }
 }

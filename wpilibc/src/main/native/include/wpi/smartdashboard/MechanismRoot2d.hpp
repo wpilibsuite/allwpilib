@@ -4,10 +4,8 @@
 
 #pragma once
 
-#include <memory>
 #include <string_view>
 
-#include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/smartdashboard/MechanismObject2d.hpp"
 
 namespace wpi {
@@ -42,12 +40,10 @@ class MechanismRoot2d : private MechanismObject2d {
 
   using MechanismObject2d::Append;
 
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
  private:
-  void UpdateEntries(std::shared_ptr<wpi::nt::NetworkTable> table) override;
-  inline void Flush();
   double m_x;
   double m_y;
-  wpi::nt::DoublePublisher m_xPub;
-  wpi::nt::DoublePublisher m_yPub;
 };
 }  // namespace wpi
