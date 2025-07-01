@@ -4,18 +4,13 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 
-#include "wpi/nt/DoubleArrayTopic.hpp"
-#include "wpi/nt/NTSendable.hpp"
-#include "wpi/nt/NetworkTable.hpp"
-#include "wpi/nt/StringTopic.hpp"
 #include "wpi/smartdashboard/MechanismRoot2d.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/util/Color8Bit.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 
@@ -38,8 +33,7 @@ namespace wpi {
  * @see MechanismLigament2d
  * @see MechanismRoot2d
  */
-class Mechanism2d : public wpi::nt::NTSendable,
-                    public wpi::util::SendableHelper<Mechanism2d> {
+class Mechanism2d : public wpi::TelemetryLoggable {
  public:
   /**
    * Create a new Mechanism2d with the given dimensions and background color.
@@ -75,16 +69,15 @@ class Mechanism2d : public wpi::nt::NTSendable,
    */
   void SetBackgroundColor(const wpi::util::Color8Bit& color);
 
-  void InitSendable(wpi::nt::NTSendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   double m_width;
   double m_height;
   std::string m_color;
   mutable wpi::util::mutex m_mutex;
-  std::shared_ptr<wpi::nt::NetworkTable> m_table;
   wpi::util::StringMap<MechanismRoot2d> m_roots;
-  wpi::nt::DoubleArrayPublisher m_dimsPub;
-  wpi::nt::StringPublisher m_colorPub;
 };
 }  // namespace wpi

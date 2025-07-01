@@ -9,8 +9,7 @@ import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.examples.hatchbotinlined.Constants.DriveConstants;
 import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryTable;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
@@ -41,9 +40,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    SendableRegistry.addChild(m_drive, m_leftLeader);
-    SendableRegistry.addChild(m_drive, m_rightLeader);
-
     m_leftLeader.addFollower(m_leftFollower);
     m_rightLeader.addFollower(m_rightFollower);
 
@@ -92,10 +88,10 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
+  public void updateTelemetry(TelemetryTable table) {
+    super.updateTelemetry(table);
     // Publish encoder distances to telemetry.
-    builder.addDoubleProperty("leftDistance", m_leftEncoder::getDistance, null);
-    builder.addDoubleProperty("rightDistance", m_rightEncoder::getDistance, null);
+    table.log("leftDistance", m_leftEncoder.getDistance());
+    table.log("rightDistance", m_rightEncoder.getDistance());
   }
 }

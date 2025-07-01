@@ -6,14 +6,14 @@
 
 #include <concepts>
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <utility>
 
-#include "wpi/nt/NetworkTable.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/util/StringMap.hpp"
+#include "wpi/util/mutex.hpp"
 
 namespace wpi {
 
@@ -27,18 +27,11 @@ namespace wpi {
  *
  * @see Mechanism2d.
  */
-class MechanismObject2d {
+class MechanismObject2d : public wpi::TelemetryLoggable {
   friend class Mechanism2d;
 
  protected:
   explicit MechanismObject2d(std::string_view name);
-
-  /**
-   * Update all entries with new ones from a new table.
-   *
-   * @param table the new table.
-   */
-  virtual void UpdateEntries(std::shared_ptr<wpi::nt::NetworkTable> table) = 0;
 
   mutable wpi::util::mutex m_mutex;
 
@@ -73,17 +66,13 @@ class MechanismObject2d {
           name);
     }
     obj = std::make_unique<T>(name, std::forward<Args>(args)...);
-    T* ex = static_cast<T*>(obj.get());
-    if (m_table) {
-      ex->Update(m_table->GetSubTable(name));
-    }
-    return ex;
+    return static_cast<T*>(obj.get());
   }
+
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
  private:
   std::string m_name;
   wpi::util::StringMap<std::unique_ptr<MechanismObject2d>> m_objects;
-  std::shared_ptr<wpi::nt::NetworkTable> m_table;
-  void Update(std::shared_ptr<wpi::nt::NetworkTable> table);
 };
 }  // namespace wpi

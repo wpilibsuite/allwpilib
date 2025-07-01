@@ -27,6 +27,8 @@ class RobotContainer {
 
   wpi::cmd::Command* GetAutonomousCommand();
 
+  void UpdateTelemetry() const;
+
  private:
   // The robot's subsystems and commands are defined here...
 

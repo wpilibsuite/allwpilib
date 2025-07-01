@@ -69,7 +69,8 @@ dependencies {
     implementation project(':wpimath')
     implementation project(':ntcore')
     implementation project(':cscore')
-    api project(':datalog')
+    implementation project(':telemetry')
+    implementation project(':datalog')
     implementation project(':cameraserver')
     testImplementation 'org.mockito:mockito-core:4.1.0'
     devImplementation sourceSets.main.output
@@ -109,6 +110,7 @@ model {
             binaries.all {
                 project(':ntcore').addNtcoreDependency(it, 'shared')
                 project(':ntcore').addNtcoreJniDependency(it)
+                lib project: ':datalog', library: 'datalog', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'

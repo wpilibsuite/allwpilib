@@ -16,6 +16,7 @@ if(WITH_JAVA)
             ntcore_jar
             cscore_jar
             cameraserver_jar
+            telemetry_jar
             wpimath_jar
             wpiunits_jar
             wpiutil_jar

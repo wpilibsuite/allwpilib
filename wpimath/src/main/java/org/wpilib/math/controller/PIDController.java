@@ -6,12 +6,11 @@ package org.wpilib.math.controller;
 
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.MathUtil;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /** Implements a PID control loop. */
-public class PIDController implements Sendable, AutoCloseable {
+public class PIDController implements TelemetryLoggable {
   private static int instances;
 
   // Factor for "proportional" control
@@ -108,14 +107,7 @@ public class PIDController implements Sendable, AutoCloseable {
     m_period = period;
 
     instances++;
-    SendableRegistry.add(this, "PIDController", instances);
-
     MathSharedStore.reportUsage("PIDController", String.valueOf(instances));
-  }
-
-  @Override
-  public void close() {
-    SendableRegistry.remove(this);
   }
 
   /**
@@ -474,26 +466,21 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("PIDController");
-    builder.addDoubleProperty("p", this::getP, this::setP);
-    builder.addDoubleProperty("i", this::getI, this::setI);
-    builder.addDoubleProperty("d", this::getD, this::setD);
-    builder.addDoubleProperty(
-        "izone",
-        this::getIZone,
-        (double toSet) -> {
-          try {
-            setIZone(toSet);
-          } catch (IllegalArgumentException e) {
-            MathSharedStore.reportError("IZone must be a non-negative number!", e.getStackTrace());
-          }
-        });
-    builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
-    builder.addDoubleProperty("measurement", () -> m_measurement, null);
-    builder.addDoubleProperty("error", this::getError, null);
-    builder.addDoubleProperty("error derivative", this::getErrorDerivative, null);
-    builder.addDoubleProperty("previous error", () -> this.m_prevError, null);
-    builder.addDoubleProperty("total error", this::getAccumulatedError, null);
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("p", getP());
+    table.log("i", getI());
+    table.log("d", getD());
+    table.log("izone", getIZone());
+    table.log("setpoint", getSetpoint());
+    table.log("measurement", m_measurement);
+    table.log("error", getError());
+    table.log("error derivative", getErrorDerivative());
+    table.log("previous error", m_prevError);
+    table.log("total error", getAccumulatedError());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "PIDController";
   }
 }
