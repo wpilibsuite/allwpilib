@@ -38,6 +38,14 @@ platform(
     visibility = ["//visibility:public"],
 )
 
+platform(
+    name = "osx",
+    constraint_values = [
+        "@platforms//os:osx",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 config_setting(
     name = "compilation_mode_dbg",
     values = {

@@ -26,32 +26,23 @@ def publish_all(name, targets):
         data = [x + ".publish" for x in targets],
     )
 
-def linux_architectures_pkg_zip(
-        name,
-        compilation_modes = ["dbg", "opt"],
-        architectures = {
-            "//shared/bazel/rules:linux_x86_64": "x86-64",
-            #"@rules_bzlmodrio_toolchains//platforms/roborio": "roborio",
-            "@rules_bzlmodrio_toolchains//platforms/systemcore": "systemcore",
-        },
-        **kwargs):
-    architectures_pkg_zip(
-        name,
-        compilation_modes,
-        architectures,
-        target_compatible_with = ["@platforms//os:linux"],
-        **kwargs
-    )
-
 # Unfortunately, rules_jvm_external really wants each of the classifier
 # artifacts to have a unique name so they can go in the runfiles together and
 # not collide.
 def architectures_pkg_zip(
         name,
-        compilation_modes,
-        architectures,
+        compilation_modes = ["dbg", "opt"],
+        architectures = {
+            "//shared/bazel/rules:linux_x86_64": "linux-x86-64",
+            "//shared/bazel/rules:osx": "osxuniversal",
+            "@rules_bzlmodrio_toolchains//platforms/systemcore": "systemcore",
+        },
         **kwargs):
-    zips = []
+    architectures_target_compatible_with = {
+        "linux-x86-64": ["@platforms//os:linux"],
+        "osxuniversal": ["@platforms//os:osx"],
+        "systemcore": None,
+    }
     for compilation_mode in compilation_modes:
         for platform, shortname in architectures.items():
             zip_name = name + "-" + compilation_mode + "-arch-" + shortname
@@ -66,13 +57,8 @@ def architectures_pkg_zip(
                 srcs = [":" + zip_name],
                 target_platform = platform,
                 compilation_mode = compilation_mode,
+                target_compatible_with = architectures_target_compatible_with[shortname],
             )
-            zips.append(package_name)
-
-    native.filegroup(
-        name = name,
-        srcs = zips,
-    )
 
 def platform_prefix(t):
     return select({
