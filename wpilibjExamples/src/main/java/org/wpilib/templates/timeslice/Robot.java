@@ -5,8 +5,8 @@
 package org.wpilib.templates.timeslice;
 
 import org.wpilib.framework.TimesliceRobot;
-import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -17,7 +17,7 @@ public class Robot extends TimesliceRobot {
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String autoSelected;
-  private final SendableChooser<String> chooser = new SendableChooser<>();
+  private final Selectable<String> chooser = new Selectable<>();
 
   /** Robot constructor. */
   public Robot() {
@@ -33,9 +33,9 @@ public class Robot extends TimesliceRobot {
     // Total usage: 5 ms (robot) + 2 ms (controller 1) + 2 ms (controller 2)
     // = 9 ms -> 90% allocated
 
-    chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", chooser);
+    chooser.addDefault("Default Auto", kDefaultAuto);
+    chooser.add("My Auto", kCustomAuto);
+    Tunables.publish("Auto choices", chooser);
   }
 
   /**

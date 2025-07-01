@@ -17,8 +17,9 @@ import org.wpilib.math.system.Models;
 import org.wpilib.math.util.Units;
 import org.wpilib.simulation.EncoderSim;
 import org.wpilib.simulation.FlywheelSim;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.tunable.Tunables;
 
 /**
  * This is a sample program to demonstrate the use of a BangBangController with a flywheel to
@@ -66,8 +67,8 @@ public class Robot extends TimedRobot {
   private final EncoderSim encoderSim = new EncoderSim(encoder);
 
   public Robot() {
-    // Add bang-bang controller to SmartDashboard and networktables.
-    SmartDashboard.putData(bangBangController);
+    // Add bang-bang controller to tunables.
+    Tunables.publish("BangBang Controller", bangBangController);
   }
 
   /** Controls flywheel to a set velocity (RPM) controlled by a joystick. */
@@ -86,6 +87,9 @@ public class Robot extends TimedRobot {
     // feedforward. The feedforward is reduced slightly to avoid overspeeding
     // the shooter.
     flywheelMotor.setVoltage(bangOutput + 0.9 * feedforward.calculate(setpoint));
+
+    // Log bang-bang controller to telemetry
+    Telemetry.log("BangBang Controller", bangBangController);
   }
 
   /** Update our simulation. This should be run every robot loop in simulation. */

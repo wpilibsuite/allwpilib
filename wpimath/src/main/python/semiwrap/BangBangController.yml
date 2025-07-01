@@ -1,7 +1,8 @@
 classes:
   wpi::math::BangBangController:
     ignored_bases:
-    - wpi::util::SendableHelper<BangBangController>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
+    - wpi::ComplexTunable  # TODO(telemetry PR)
     methods:
       BangBangController:
       SetSetpoint:
@@ -15,4 +16,7 @@ classes:
         overloads:
           double, double:
           double:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:
+      InitTunable:
+      GetTunableType:

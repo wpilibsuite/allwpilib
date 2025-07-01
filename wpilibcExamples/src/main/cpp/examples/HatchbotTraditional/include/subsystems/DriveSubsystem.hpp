@@ -49,7 +49,7 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
    */
   void SetMaxOutput(double maxOutput);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

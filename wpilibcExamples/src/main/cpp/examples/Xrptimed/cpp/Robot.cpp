@@ -5,9 +5,6 @@
 #include "Robot.hpp"
 
 Robot::Robot() {
-  wpi::util::SendableRegistry::AddChild(&drive, &leftMotor);
-  wpi::util::SendableRegistry::AddChild(&drive, &rightMotor);
-
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
   // gearbox is constructed, you might have to invert the left side instead.

@@ -12,7 +12,7 @@
 #include "subsystems/HatchSubsystem.hpp"
 #include "wpi/commands2/Command.hpp"
 #include "wpi/driverstation/Gamepad.hpp"
-#include "wpi/smartdashboard/SendableChooser.hpp"
+#include "wpi/tunable/Selectable.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -27,6 +27,8 @@ class RobotContainer {
 
   wpi::cmd::Command* GetAutonomousCommand();
 
+  void UpdateTelemetry() const;
+
  private:
   // The robot's subsystems and commands are defined here...
 
@@ -40,7 +42,7 @@ class RobotContainer {
   ComplexAuto complexAuto{&drive, &hatch};
 
   // The chooser for the autonomous routines
-  wpi::SendableChooser<wpi::cmd::Command*> chooser;
+  wpi::Selectable<wpi::cmd::Command*> chooser;
 
   // The driver's controller
   wpi::Gamepad driverController{OIConstants::kDriverControllerPort};

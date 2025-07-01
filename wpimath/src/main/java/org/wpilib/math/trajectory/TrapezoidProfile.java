@@ -51,7 +51,7 @@ public class TrapezoidProfile {
   private double m_endDecel;
 
   /** Profile constraints. */
-  public static class Constraints {
+  public static class Constraints implements TelemetryLoggable, ComplexTunable {
     /** Maximum velocity. */
     public final double maxVelocity;
 
@@ -72,6 +72,28 @@ public class TrapezoidProfile {
       this.maxVelocity = maxVelocity;
       this.maxAcceleration = maxAcceleration;
       MathSharedStore.reportUsage("TrapezoidProfile", "");
+    }
+
+    @Override
+    public void logTo(TelemetryTable table) {
+      table.log("maxVelocity", maxVelocity);
+      table.log("maxAcceleration", maxAcceleration);
+    }
+
+    @Override
+    public String getTelemetryType() {
+      return "TrapezoidProfile Constraints";
+    }
+
+    @Override
+    public void initTunable(TunableTable table) {
+      table.publish("maxVelocity", () -> maxVelocity, v -> maxVelocity = v);
+      table.publish("maxAcceleration", () -> maxAcceleration, a -> maxAcceleration = a);
+    }
+
+    @Override
+    public String getTunableType() {
+      return "TrapezoidProfile Constraints";
     }
   }
 

@@ -174,11 +174,11 @@ Java_org_wpilib_hardware_hal_PowerDistributionJNI_getChannelCurrent
 /*
  * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
  * Method:    getAllCurrents
- * Signature: (I[D)V
+ * Signature: (I)[D
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jdoubleArray JNICALL
 Java_org_wpilib_hardware_hal_PowerDistributionJNI_getAllCurrents
-  (JNIEnv* env, jclass, jint handle, jdoubleArray jarr)
+  (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
   int32_t size = HAL_GetPowerDistributionNumChannels(handle, &status);
@@ -188,10 +188,10 @@ Java_org_wpilib_hardware_hal_PowerDistributionJNI_getAllCurrents
   HAL_GetPowerDistributionAllChannelCurrents(handle, storage.data(), size,
                                              &status);
   if (!CheckStatus(env, status, false)) {
-    return;
+    return nullptr;
   }
 
-  env->SetDoubleArrayRegion(jarr, 0, size, storage.data());
+  return wpi::util::java::MakeJDoubleArray(env, storage);
 }
 
 /*
@@ -323,6 +323,24 @@ Java_org_wpilib_hardware_hal_PowerDistributionJNI_getChannelCurrentNoError
   double current =
       HAL_GetPowerDistributionChannelCurrent(handle, channel, &status);
   return current;
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_PowerDistributionJNI
+ * Method:    getAllCurrentsNoError
+ * Signature: (I)[D
+ */
+JNIEXPORT jdoubleArray JNICALL
+Java_org_wpilib_hardware_hal_PowerDistributionJNI_getAllCurrentsNoError
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  int32_t size = HAL_GetPowerDistributionNumChannels(handle, &status);
+  wpi::util::SmallVector<double, 24> storage;
+  storage.resize(size);
+  HAL_GetPowerDistributionAllChannelCurrents(handle, storage.data(), size,
+                                             &status);
+  return wpi::util::java::MakeJDoubleArray(env, storage);
 }
 
 /*

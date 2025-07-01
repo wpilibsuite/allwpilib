@@ -1,7 +1,10 @@
+extra_includes:
+- wpi/telemetry/TelemetryTable.hpp
+
 classes:
   wpi::UpDownCounter:
     ignored_bases:
-    - wpi::util::SendableHelper<UpDownCounter>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
     methods:
       UpDownCounter:
         overloads:
@@ -9,5 +12,6 @@ classes:
           std::shared_ptr<DigitalSource>, std::shared_ptr<DigitalSource>:
       GetCount:
       Reset:
-      InitSendable:
       SetEdgeConfiguration:
+      LogTo:
+      GetTelemetryType:

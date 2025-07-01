@@ -5,8 +5,7 @@
 #pragma once
 
 #include "wpi/driverstation/GenericHID.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -22,9 +21,7 @@ namespace wpi {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class Gamepad : public GenericHID,
-                public wpi::util::Sendable,
-                public wpi::util::SendableHelper<Gamepad> {
+class Gamepad : public GenericHID, public wpi::TelemetryLoggable {
  public:
   /** Represents a digital button on an Gamepad. */
   enum class Button {
@@ -1085,11 +1082,11 @@ class Gamepad : public GenericHID,
   BooleanEvent AxisGreaterThan(Axis axis, double threshold,
                                EventLoop* loop) const;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+  std::string_view GetTelemetryType() const override;
 
  private:
-  double GetAxisForSendable(Axis axis) const;
-  bool GetButtonForSendable(Button button) const;
+  double GetAxisForTelemetry(Axis axis) const;
 };
 
 }  // namespace wpi

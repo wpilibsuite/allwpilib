@@ -10,9 +10,11 @@
 
 #include "wpi/commands2/Requirements.hpp"
 #include "wpi/commands2/Subsystem.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/tunable/ComplexTunable.hpp"
+#include "wpi/tunable/Tunable.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SmallSet.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
 
 namespace wpi::cmd {
 
@@ -34,8 +36,8 @@ namespace wpi::cmd {
  * @see CommandScheduler
  * @see CommandHelper
  */
-class Command : public wpi::util::Sendable,
-                public wpi::util::SendableHelper<Command> {
+class Command : public wpi::TelemetryLoggable,
+                public wpi::ComplexTunable {
  public:
   ~Command() override;
 
@@ -463,7 +465,11 @@ class Command : public wpi::util::Sendable,
    */
   virtual CommandPtr ToPtr() && = 0;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::TelemetryTable& table) const override;
+  std::string_view GetTelemetryType() const override;
+  void PublishTunable(wpi::TunableTable& table) override;
+  void UpdateTunable() const override;
+  std::string_view GetTunableType() const override;
 
  protected:
   Command();
@@ -471,6 +477,9 @@ class Command : public wpi::util::Sendable,
  private:
   /// Requirements set.
   wpi::util::SmallSet<Subsystem*, 4> m_requirements;
+  std::string m_name;
+  std::string m_subsystem;
+  mutable bool m_running = false;
 
   std::optional<std::string> m_previousComposition;
 };

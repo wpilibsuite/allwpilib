@@ -8,8 +8,8 @@ import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Handle input from Gamepad controllers connected to the Driver Station.
@@ -22,7 +22,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any 3rd
  * party controllers.
  */
-public class Gamepad extends GenericHID implements Sendable {
+public class Gamepad extends GenericHID implements TelemetryLoggable {
   /** Represents a digital button on a Gamepad. */
   public enum Button {
     /** Face Down button. */
@@ -1334,56 +1334,50 @@ public class Gamepad extends GenericHID implements Sendable {
     return super.axisGreaterThan(axis.value, threshold, loop);
   }
 
-  private double getAxisForSendable(Axis axis) {
+  private double getAxisForTelemetry(Axis axis) {
     return DriverStationBackend.getStickAxisIfAvailable(getPort(), axis.value).orElse(0.0);
   }
 
-  private boolean getButtonForSendable(Button button) {
-    return DriverStationBackend.getStickButtonIfAvailable(getPort(), button.value).orElse(false);
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("LeftTriggerAxis", getAxisForTelemetry(Axis.LEFT_TRIGGER));
+    table.log("RightTriggerAxis", getAxisForTelemetry(Axis.RIGHT_TRIGGER));
+    table.log("LeftXAxis", getAxisForTelemetry(Axis.LEFT_X));
+    table.log("LeftYAxis", getAxisForTelemetry(Axis.LEFT_Y));
+    table.log("RightXAxis", getAxisForTelemetry(Axis.RIGHT_X));
+    table.log("RightYAxis", getAxisForTelemetry(Axis.RIGHT_Y));
+
+    long buttons = DriverStationBackend.getStickButtons(getPort());
+    table.log("FaceDown", (buttons & (1L << Button.FACE_DOWN.value)) != 0);
+    table.log("FaceRight", (buttons & (1L << Button.FACE_RIGHT.value)) != 0);
+    table.log("FaceLeft", (buttons & (1L << Button.FACE_LEFT.value)) != 0);
+    table.log("FaceUp", (buttons & (1L << Button.FACE_UP.value)) != 0);
+    table.log("Back", (buttons & (1L << Button.BACK.value)) != 0);
+    table.log("Guide", (buttons & (1L << Button.GUIDE.value)) != 0);
+    table.log("Start", (buttons & (1L << Button.START.value)) != 0);
+    table.log("LeftStick", (buttons & (1L << Button.LEFT_STICK.value)) != 0);
+    table.log("RightStick", (buttons & (1L << Button.RIGHT_STICK.value)) != 0);
+    table.log("LeftBumper", (buttons & (1L << Button.LEFT_BUMPER.value)) != 0);
+    table.log("RightBumper", (buttons & (1L << Button.RIGHT_BUMPER.value)) != 0);
+    table.log("DpadUp", (buttons & (1L << Button.DPAD_UP.value)) != 0);
+    table.log("DpadDown", (buttons & (1L << Button.DPAD_DOWN.value)) != 0);
+    table.log("DpadLeft", (buttons & (1L << Button.DPAD_LEFT.value)) != 0);
+    table.log("DpadRight", (buttons & (1L << Button.DPAD_RIGHT.value)) != 0);
+    table.log("Misc1", (buttons & (1L << Button.MISC_1.value)) != 0);
+    table.log("RightPaddle1", (buttons & (1L << Button.RIGHT_PADDLE_1.value)) != 0);
+    table.log("LeftPaddle1", (buttons & (1L << Button.LEFT_PADDLE_1.value)) != 0);
+    table.log("RightPaddle2", (buttons & (1L << Button.RIGHT_PADDLE_2.value)) != 0);
+    table.log("LeftPaddle2", (buttons & (1L << Button.LEFT_PADDLE_2.value)) != 0);
+    table.log("Touchpad", (buttons & (1L << Button.TOUCHPAD.value)) != 0);
+    table.log("Misc2", (buttons & (1L << Button.MISC_2.value)) != 0);
+    table.log("Misc3", (buttons & (1L << Button.MISC_3.value)) != 0);
+    table.log("Misc4", (buttons & (1L << Button.MISC_4.value)) != 0);
+    table.log("Misc5", (buttons & (1L << Button.MISC_5.value)) != 0);
+    table.log("Misc6", (buttons & (1L << Button.MISC_6.value)) != 0);
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "Gamepad");
-    builder.addDoubleProperty(
-        "LeftTrigger Axis", () -> getAxisForSendable(Axis.LEFT_TRIGGER), null);
-    builder.addDoubleProperty(
-        "RightTrigger Axis", () -> getAxisForSendable(Axis.RIGHT_TRIGGER), null);
-    builder.addDoubleProperty("LeftX", () -> getAxisForSendable(Axis.LEFT_X), null);
-    builder.addDoubleProperty("LeftY", () -> getAxisForSendable(Axis.LEFT_Y), null);
-    builder.addDoubleProperty("RightX", () -> getAxisForSendable(Axis.RIGHT_X), null);
-    builder.addDoubleProperty("RightY", () -> getAxisForSendable(Axis.RIGHT_Y), null);
-    builder.addBooleanProperty("FaceDown", () -> getButtonForSendable(Button.FACE_DOWN), null);
-    builder.addBooleanProperty("FaceRight", () -> getButtonForSendable(Button.FACE_RIGHT), null);
-    builder.addBooleanProperty("FaceLeft", () -> getButtonForSendable(Button.FACE_LEFT), null);
-    builder.addBooleanProperty("FaceUp", () -> getButtonForSendable(Button.FACE_UP), null);
-    builder.addBooleanProperty("Back", () -> getButtonForSendable(Button.BACK), null);
-    builder.addBooleanProperty("Guide", () -> getButtonForSendable(Button.GUIDE), null);
-    builder.addBooleanProperty("Start", () -> getButtonForSendable(Button.START), null);
-    builder.addBooleanProperty("LeftStick", () -> getButtonForSendable(Button.LEFT_STICK), null);
-    builder.addBooleanProperty("RightStick", () -> getButtonForSendable(Button.RIGHT_STICK), null);
-    builder.addBooleanProperty("LeftBumper", () -> getButtonForSendable(Button.LEFT_BUMPER), null);
-    builder.addBooleanProperty(
-        "RightBumper", () -> getButtonForSendable(Button.RIGHT_BUMPER), null);
-    builder.addBooleanProperty("DpadUp", () -> getButtonForSendable(Button.DPAD_UP), null);
-    builder.addBooleanProperty("DpadDown", () -> getButtonForSendable(Button.DPAD_DOWN), null);
-    builder.addBooleanProperty("DpadLeft", () -> getButtonForSendable(Button.DPAD_LEFT), null);
-    builder.addBooleanProperty("DpadRight", () -> getButtonForSendable(Button.DPAD_RIGHT), null);
-    builder.addBooleanProperty("Misc1", () -> getButtonForSendable(Button.MISC_1), null);
-    builder.addBooleanProperty(
-        "RightPaddle1", () -> getButtonForSendable(Button.RIGHT_PADDLE_1), null);
-    builder.addBooleanProperty(
-        "LeftPaddle1", () -> getButtonForSendable(Button.LEFT_PADDLE_1), null);
-    builder.addBooleanProperty(
-        "RightPaddle2", () -> getButtonForSendable(Button.RIGHT_PADDLE_2), null);
-    builder.addBooleanProperty(
-        "LeftPaddle2", () -> getButtonForSendable(Button.LEFT_PADDLE_2), null);
-    builder.addBooleanProperty("Touchpad", () -> getButtonForSendable(Button.TOUCHPAD), null);
-    builder.addBooleanProperty("Misc2", () -> getButtonForSendable(Button.MISC_2), null);
-    builder.addBooleanProperty("Misc3", () -> getButtonForSendable(Button.MISC_3), null);
-    builder.addBooleanProperty("Misc4", () -> getButtonForSendable(Button.MISC_4), null);
-    builder.addBooleanProperty("Misc5", () -> getButtonForSendable(Button.MISC_5), null);
-    builder.addBooleanProperty("Misc6", () -> getButtonForSendable(Button.MISC_6), null);
+  public String getTelemetryType() {
+    return "HID:Gamepad";
   }
 }

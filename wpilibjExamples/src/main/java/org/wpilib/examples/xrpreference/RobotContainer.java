@@ -17,8 +17,8 @@ import org.wpilib.examples.xrpreference.commands.AutonomousDistance;
 import org.wpilib.examples.xrpreference.commands.AutonomousTime;
 import org.wpilib.examples.xrpreference.subsystems.Arm;
 import org.wpilib.examples.xrpreference.subsystems.Drivetrain;
-import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
 import org.wpilib.xrp.XRPOnBoardIO;
 
 /**
@@ -37,7 +37,7 @@ public class RobotContainer {
   private final Joystick controller = new Joystick(0);
 
   // Create SmartDashboard chooser for autonomous routines
-  private final SendableChooser<Command> chooser = new SendableChooser<>();
+  private final Selectable<Command> chooser = new Selectable<>();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -73,9 +73,9 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> arm.setAngle(0.0), arm));
 
     // Setup SmartDashboard options
-    chooser.setDefaultOption("Auto Routine Distance", new AutonomousDistance(drivetrain));
-    chooser.addOption("Auto Routine Time", new AutonomousTime(drivetrain));
-    SmartDashboard.putData(chooser);
+    chooser.addDefault("Auto Routine Distance", new AutonomousDistance(m_drivetrain));
+    chooser.add("Auto Routine Time", new AutonomousTime(m_drivetrain));
+    Tunables.publish("Auto Chooser", chooser);
   }
 
   /**

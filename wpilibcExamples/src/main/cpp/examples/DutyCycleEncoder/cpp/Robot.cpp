@@ -5,7 +5,7 @@
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/rotation/DutyCycleEncoder.hpp"
 #include "wpi/math/util/MathUtil.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 
 constexpr double fullRange = 1.3;
 constexpr double expectedZero = 0.0;
@@ -59,10 +59,10 @@ class Robot : public wpi::TimedRobot {
     double shiftedOutput = wpi::math::InputModulus(output, 0 - percentOfRange,
                                                    fullRange - percentOfRange);
 
-    wpi::SmartDashboard::PutBoolean("Connected", connected);
-    wpi::SmartDashboard::PutNumber("Frequency", frequency.value());
-    wpi::SmartDashboard::PutNumber("Output", output);
-    wpi::SmartDashboard::PutNumber("ShiftedOutput", shiftedOutput);
+    wpi::Telemetry::Log("Connected", connected);
+    wpi::Telemetry::Log("Frequency", frequency);
+    wpi::Telemetry::Log("Output", output);
+    wpi::Telemetry::Log("ShiftedOutput", shiftedOutput);
   }
 };
 

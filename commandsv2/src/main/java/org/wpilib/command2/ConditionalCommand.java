@@ -7,7 +7,7 @@ package org.wpilib.command2;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.function.BooleanSupplier;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * A command composition that runs one of two commands, depending on the value of the given
@@ -85,19 +85,11 @@ public class ConditionalCommand extends Command {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-    builder.addStringProperty("onTrue", m_onTrue::getName, null);
-    builder.addStringProperty("onFalse", m_onFalse::getName, null);
-    builder.addStringProperty(
-        "selected",
-        () -> {
-          if (m_selectedCommand == null) {
-            return "null";
-          } else {
-            return m_selectedCommand.getName();
-          }
-        },
-        null);
+  public void logTo(TelemetryTable table) {
+    super.logTo(table);
+    table.log("onTrue", m_onTrue.getName());
+    table.log("onFalse", m_onFalse.getName());
+    table.log(
+        "selected", m_selectedCommand == null ? "null" : m_selectedCommand.getName());
   }
 }

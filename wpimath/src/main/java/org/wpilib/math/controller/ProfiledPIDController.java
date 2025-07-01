@@ -7,15 +7,16 @@ package org.wpilib.math.controller;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.MathUtil;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.ComplexTunable;
+import org.wpilib.tunable.TunableTable;
 
 /**
  * Implements a PID control loop whose setpoint is constrained by a trapezoid profile. Users should
  * call reset() when they first start running the controller to avoid unwanted behavior.
  */
-public class ProfiledPIDController implements Sendable {
+public class ProfiledPIDController implements TelemetryLoggable, ComplexTunable {
   private static int instances;
 
   private PIDController m_controller;
@@ -64,7 +65,6 @@ public class ProfiledPIDController implements Sendable {
     m_profile = new TrapezoidProfile(m_constraints);
     instances++;
 
-    SendableRegistry.add(this, "ProfiledPIDController", instances);
     MathSharedStore.reportUsage("ProfiledPIDController", String.valueOf(instances));
   }
 
@@ -437,33 +437,25 @@ public class ProfiledPIDController implements Sendable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("ProfiledPIDController");
-    builder.addDoubleProperty("p", this::getP, this::setP);
-    builder.addDoubleProperty("i", this::getI, this::setI);
-    builder.addDoubleProperty("d", this::getD, this::setD);
-    builder.addDoubleProperty(
-        "izone",
-        this::getIZone,
-        (double toSet) -> {
-          try {
-            setIZone(toSet);
-          } catch (IllegalArgumentException e) {
-            MathSharedStore.reportError("IZone must be a non-negative number!", e.getStackTrace());
-          }
-        });
-    builder.addDoubleProperty(
-        "maxVelocity",
-        () -> getConstraints().maxVelocity,
-        maxVelocity ->
-            setConstraints(
-                new TrapezoidProfile.Constraints(maxVelocity, getConstraints().maxAcceleration)));
-    builder.addDoubleProperty(
-        "maxAcceleration",
-        () -> getConstraints().maxAcceleration,
-        maxAcceleration ->
-            setConstraints(
-                new TrapezoidProfile.Constraints(getConstraints().maxVelocity, maxAcceleration)));
-    builder.addDoubleProperty("goal", () -> getGoal().position, this::setGoal);
+  public void logTo(TelemetryTable table) {
+    table.log("controller", m_controller);
+    table.log("constraints", m_constraints);
+    table.log("goal", getGoal().position);
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "ProfiledPIDController";
+  }
+
+  @Override
+  public void publishTunable(TunableTable table) {
+    table.publish("controller", m_controller);
+    table.publish("constraints", m_constraints);
+  }
+
+  @Override
+  public String getTunableType() {
+    return "ProfiledPIDController";
   }
 }

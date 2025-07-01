@@ -6,6 +6,8 @@
 
 #include <string>
 
+#include "wpi/telemetry/TelemetryTable.hpp"
+
 using namespace wpi;
 
 MechanismObject2d::MechanismObject2d(std::string_view name) : m_name{name} {}
@@ -14,11 +16,9 @@ const std::string& MechanismObject2d::GetName() const {
   return m_name;
 }
 
-void MechanismObject2d::Update(std::shared_ptr<wpi::nt::NetworkTable> table) {
+void MechanismObject2d::LogTo(wpi::TelemetryTable& table) const {
   std::scoped_lock lock(m_mutex);
-  m_table = table;
-  UpdateEntries(m_table);
   for (const auto& entry : m_objects) {
-    entry.second->Update(m_table->GetSubTable(entry.first));
+    table.Log(entry.first, *entry.second);
   }
 }

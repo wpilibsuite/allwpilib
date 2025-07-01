@@ -1,7 +1,11 @@
+extra_includes:
+- wpi/tunable/TunableTable.hpp
+
 classes:
   wpi::math::PIDController:
     ignored_bases:
-    - wpi::util::SendableHelper<PIDController>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
+    - wpi::ComplexTunable  # TODO(telemetry PR)
     methods:
       PIDController:
         param_override:
@@ -35,4 +39,7 @@ classes:
           double:
           double, double:
       Reset:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:
+      InitTunable:
+      GetTunableType:

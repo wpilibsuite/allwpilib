@@ -4,11 +4,16 @@
 
 #pragma once
 
+#include <string_view>
 #include <type_traits>
 
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/tunable/ComplexTunable.hpp"
+#include "wpi/tunable/TunableTable.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/units/tunable.hpp"
 
 namespace wpi::math {
 
@@ -58,7 +63,8 @@ class TrapezoidProfile {
   /**
    * Profile constraints.
    */
-  class Constraints {
+  class Constraints : public wpi::TelemetryLoggable,
+                      public wpi::ComplexTunable {
    public:
     /// Maximum velocity.
     Velocity_t maxVelocity{0};
@@ -91,6 +97,24 @@ class TrapezoidProfile {
       if (maxVelocity < Velocity_t{0} || maxAcceleration < Acceleration_t{0}) {
         throw std::domain_error("Constraints must be non-negative");
       }
+    }
+
+    void LogTo(wpi::TelemetryTable& table) const override {
+      table.Log("maxVelocity", maxVelocity);
+      table.Log("maxAcceleration", maxAcceleration);
+    }
+
+    std::string_view GetTelemetryType() const override {
+      return "TrapezoidProfile Constraints";
+    }
+
+    void PublishTunable(wpi::TunableTable& table) override {
+      table.Publish("maxVelocity", this, &Constraints::maxVelocity);
+      table.Publish("maxAcceleration", this, &Constraints::maxAcceleration);
+    }
+
+    std::string_view GetTunableType() const override {
+      return "TrapezoidProfile Constraints";
     }
   };
 

@@ -9,16 +9,15 @@
 
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/tunable/TunableConfig.hpp"
+#include "wpi/tunable/TunableTable.hpp"
 #include "wpi/util/Demangle.hpp"
 #include "wpi/util/StackTrace.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
 
 using namespace wpi::cmd;
 
-Command::Command() {
-  wpi::util::SendableRegistry::Add(this, GetTypeName(*this));
-}
+Command::Command() : m_name{wpi::util::GetTypeName(*this)} {}
 
 Command::~Command() {
   CommandScheduler::GetInstance().Cancel(this);
@@ -50,19 +49,19 @@ void Command::AddRequirements(Subsystem* requirement) {
 }
 
 void Command::SetName(std::string_view name) {
-  wpi::util::SendableRegistry::SetName(this, name);
+  m_name = name;
 }
 
 std::string Command::GetName() const {
-  return wpi::util::SendableRegistry::GetName(this);
+  return m_name;
 }
 
 std::string Command::GetSubsystem() const {
-  return wpi::util::SendableRegistry::GetSubsystem(this);
+  return m_subsystem;
 }
 
 void Command::SetSubsystem(std::string_view subsystem) {
-  wpi::util::SendableRegistry::SetSubsystem(this, subsystem);
+  m_subsystem = subsystem;
 }
 
 CommandPtr Command::WithTimeout(wpi::units::second_t duration) && {
@@ -185,36 +184,51 @@ std::optional<std::string> Command::GetPreviousCompositionSite() const {
   return m_previousComposition;
 }
 
-void Command::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Command");
-  builder.AddStringProperty(".name", [this] { return GetName(); }, nullptr);
-  builder.AddBooleanProperty(
-      "running", [this] { return IsScheduled(); },
-      [this](bool value) {
-        bool isScheduled = IsScheduled();
-        if (value && !isScheduled) {
-          CommandScheduler::GetInstance().Schedule(this);
-        } else if (!value && isScheduled) {
-          Cancel();
-        }
-      });
-  builder.AddBooleanProperty(
-      ".isParented", [this] { return IsComposed(); }, nullptr);
-  builder.AddStringProperty(
-      "interruptBehavior",
-      [this] {
-        switch (GetInterruptionBehavior()) {
-          case Command::InterruptionBehavior::kCancelIncoming:
-            return "kCancelIncoming";
-          case Command::InterruptionBehavior::kCancelSelf:
-            return "kCancelSelf";
-          default:
-            return "Invalid";
-        }
-      },
-      nullptr);
-  builder.AddBooleanProperty(
-      "runsWhenDisabled", [this] { return RunsWhenDisabled(); }, nullptr);
+void Command::LogTo(wpi::TelemetryTable& table) const {
+  table.Log(".name", m_name);
+  table.Log("running", IsScheduled());
+  table.Log(".isParented", IsComposed());
+
+  std::string_view behavior;
+  switch (GetInterruptionBehavior()) {
+    case Command::InterruptionBehavior::kCancelIncoming:
+      behavior = "kCancelIncoming";
+    case Command::InterruptionBehavior::kCancelSelf:
+      behavior = "kCancelSelf";
+    default:
+      behavior = "Invalid";
+  }
+  table.Log("interruptBehavior", behavior);
+  table.Log("runsWhenDisabled", RunsWhenDisabled());
+}
+
+std::string_view Command::GetTelemetryType() const {
+  return "Command";
+}
+
+void Command::PublishTunable(wpi::TunableTable& table) {
+  table.Publish("running", this, &Command::m_running,
+                wpi::TunableConfig{
+                    .onTune =
+                        [](TunableBase&, ComplexTunable* self) {
+                          if (auto command = static_cast<Command*>(self)) {
+                            bool isScheduled = command->IsScheduled();
+                            if (command->m_running && !isScheduled) {
+                              CommandScheduler::GetInstance().Schedule(command);
+                            } else if (!command->m_running && isScheduled) {
+                              command->Cancel();
+                            }
+                          }
+                        },
+                    .parent = this});
+}
+
+void Command::UpdateTunable() const {
+  m_running = IsScheduled();
+}
+
+std::string_view Command::GetTunableType() const {
+  return "Command";
 }
 
 namespace wpi::cmd {

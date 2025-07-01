@@ -4,13 +4,13 @@
 
 #include "Robot.hpp"
 
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/tunable/Tunables.hpp"
 #include "wpi/util/print.hpp"
 
 Robot::Robot() {
-  chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
-  chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
-  wpi::SmartDashboard::PutData("Auto Modes", &chooser);
+  chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
+  chooser.Add(kAutoNameCustom, kAutoNameCustom);
+  wpi::Tunables::Publish("Auto Modes", chooser);
 }
 
 /**

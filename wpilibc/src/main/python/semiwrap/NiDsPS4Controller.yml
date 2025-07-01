@@ -1,11 +1,11 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
+- wpi/telemetry/TelemetryTable.hpp
 - wpi/event/BooleanEvent.hpp
 
 classes:
   wpi::NiDsPS4Controller:
     ignored_bases:
-    - wpi::util::SendableHelper<NiDsPS4Controller>
+    - wpi::TelemetryLoggable  # TODO(telemetry PR)
     methods:
       NiDsPS4Controller:
       GetLeftX:
@@ -70,7 +70,8 @@ classes:
       GetTouchpadButton:
       GetTouchpadButtonPressed:
       GetTouchpadButtonReleased:
-      InitSendable:
+      GetTelemetryType:
+      LogTo:
   wpi::NiDsPS4Controller::Button:
     attributes:
       kSquare:

@@ -293,6 +293,8 @@ endif()
 
 add_subdirectory(wpiutil)
 
+add_subdirectory(telemetry)
+add_subdirectory(tunable)
 add_subdirectory(datalog)
 
 if(WITH_NTCORE)
