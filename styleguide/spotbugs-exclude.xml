@@ -83,6 +83,10 @@
     <Bug pattern="FL_FLOATS_AS_LOOP_COUNTERS" />
   </Match>
   <Match>
+    <Bug pattern="INT_BAD_COMPARISON_WITH_NONNEGATIVE_VALUE" />
+    <Class name="edu.wpi.first.math.optimization.DoubleIntegratorProblemTest" />
+  </Match>
+  <Match>
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
     <Class name="edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d" />
   </Match>
@@ -185,6 +189,10 @@
   </Match>
   <Match>
     <Bug pattern="THROWS_METHOD_THROWS_RUNTIMEEXCEPTION" />
+  </Match>
+  <Match>
+    <Bug pattern="UC_USELESS_CONDITION" />
+    <Class name="edu.wpi.first.math.optimization.DoubleIntegratorProblemTest" />
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
