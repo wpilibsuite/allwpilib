@@ -189,6 +189,7 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    * @param currentVelocity The current velocity setpoint in radians per second.
    * @param nextVelocity The next velocity setpoint in radians per second.
    * @return The computed feedforward in volts.
+   * @deprecated Use {@link #calculateWithVelocities(double, double, double)} instead.
    */
   public double calculate(double currentAngle, double currentVelocity, double nextVelocity) {
     return ArmFeedforwardJNI.calculate(

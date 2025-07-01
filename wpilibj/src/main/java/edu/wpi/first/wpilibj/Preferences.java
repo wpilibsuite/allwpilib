@@ -97,6 +97,15 @@ public final class Preferences {
   }
 
   /**
+   * Gets the network table used for preferences entries.
+   *
+   * @return the network table used for preferences entries
+   */
+  public static NetworkTable getNetworkTable() {
+    return m_table;
+  }
+
+  /**
    * Gets the preferences keys.
    *
    * @return a collection of the keys
