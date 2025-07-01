@@ -1,4 +1,5 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@host_platform//:constraints.bzl", _host_constraints = "HOST_CONSTRAINTS")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 
 # Generate this because otherwise the linter wants to change the format.
@@ -42,7 +43,7 @@ platform(
     name = "osx",
     constraint_values = [
         "@platforms//os:osx",
-    ],
+    ] + [x for x in _host_constraints if x.startswith("@platforms//cpu:")],
     visibility = ["//visibility:public"],
 )
 
