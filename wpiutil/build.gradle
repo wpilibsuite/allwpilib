@@ -177,6 +177,7 @@ cppHeadersZip {
         'src/main/native/thirdparty/debugging/include',
         'src/main/native/thirdparty/expected/include',
         'src/main/native/thirdparty/fmtlib/include',
+        'src/main/native/thirdparty/htrie/include',
         'src/main/native/thirdparty/json/include',
         'src/main/native/thirdparty/llvm/include',
         'src/main/native/thirdparty/mpack/include',
@@ -225,7 +226,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include', 'src/main/native/thirdparty/upb/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/htrie/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include', 'src/main/native/thirdparty/upb/include'
                 }
             }
         }
