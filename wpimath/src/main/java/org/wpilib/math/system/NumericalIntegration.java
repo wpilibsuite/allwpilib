@@ -8,6 +8,7 @@ import java.util.function.BiFunction;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.UnaryOperator;
+import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.util.Num;
@@ -54,6 +55,30 @@ public final class NumericalIntegration {
     final var k4 = f.applyAsDouble(x + h * k3, u);
 
     return x + h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+  }
+
+  /**
+   * Performs 4th order Runge-Kutta integration of dx/dt = f(x, u) for dt.
+   *
+   * @param f The function to integrate. It must take two arguments x and u.
+   * @param x The initial value of x.
+   * @param u The value u held constant over the integration period.
+   * @param dt The time over which to integrate.
+   * @return the integration of dx/dt = f(x, u) for dt.
+   */
+  public static SimpleMatrix rk4(
+      BiFunction<SimpleMatrix, SimpleMatrix, SimpleMatrix> f,
+      SimpleMatrix x,
+      SimpleMatrix u,
+      double dt) {
+    var h = dt;
+
+    var k1 = f.apply(x, u);
+    var k2 = f.apply(x.plus(k1.scale(h * 0.5)), u);
+    var k3 = f.apply(x.plus(k2.scale(h * 0.5)), u);
+    var k4 = f.apply(x.plus(k3.scale(h)), u);
+
+    return x.plus(k1.plus(k2.scale(2.0)).plus(k3.scale(2.0)).plus(k4).scale(h / 6.0));
   }
 
   /**
