@@ -4,13 +4,13 @@
 
 package edu.wpi.first.net;
 
-import edu.wpi.first.util.CombinedRuntimeLoader;
+import edu.wpi.first.util.RuntimeLoader;
 
 public final class DevMain {
   /** Main entry point. */
   public static void main(String[] args) {
     System.out.println("Hello World!");
-    System.out.println(CombinedRuntimeLoader.getPlatformPath());
+    System.out.println(RuntimeLoader.getPlatform());
   }
 
   private DevMain() {}
