@@ -8,7 +8,7 @@ wpilib_cc_library(
     srcs = glob(["src/lib/native/cpp/**/*.cpp"]),
     hdrs = glob(["src/lib/native/include/**"]),
     hdrs_pkg_root = "src/lib/native/include",
-    include_license_files = True,
+    include_third_party_notices = True,
     srcs_pkg_root = "src/lib/native/cpp",
     strip_include_prefix = "src/lib/native/include",
     tags = [
@@ -42,7 +42,7 @@ wpilib_cc_library(
     srcs = glob(["src/libnt/native/cpp/*.cpp"]),
     hdrs = glob(["src/libnt/native/include/**/*.h"]),
     hdrs_pkg_root = "src/libnt/native/include",
-    include_license_files = True,
+    include_third_party_notices = True,
     srcs_pkg_root = "src/libnt/native/cpp",
     strip_include_prefix = "src/libnt/native/include",
     tags = [

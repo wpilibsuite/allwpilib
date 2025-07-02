@@ -5,7 +5,7 @@ wpilib_cc_library(
     srcs = glob(["src/**"]),
     hdrs = glob(["include/**"]),
     hdrs_pkg_root = "include",
-    include_license_files = True,
+    include_third_party_notices = True,
     includes = ["src/googletest"],
     srcs_pkg_root = "src",
     strip_include_prefix = "include",

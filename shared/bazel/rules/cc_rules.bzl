@@ -1,4 +1,5 @@
 load("@rules_cc//cc:action_names.bzl", "CPP_LINK_STATIC_LIBRARY_ACTION_NAME")
+load("@rules_cc//cc:cc_shared_library.bzl", "cc_shared_library")
 load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_library")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_ATTRS", "find_cpp_toolchain", "use_cc_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
@@ -73,7 +74,7 @@ def wpilib_cc_library(
         third_party_header_only_libraries = [],
         extra_src_pkg_files = [],
         extra_hdr_pkg_files = [],
-        include_license_files = False,
+        include_third_party_notices = False,
         srcs_pkg_root = "src/main/native/cpp",
         hdrs_pkg_root = "src/main/native/include",
         strip_include_prefix = None,
@@ -103,7 +104,7 @@ def wpilib_cc_library(
         include_license_files: If the header / source / library zip files should automatically includes the license files. This is used to maintain
                 consistency with the gradle publishing, as not all of them export the license files.
     """
-    maybe_license_pkg = ["//:license_pkg_files"] if include_license_files else []
+    maybe_third_party_notices_pkg = ["//:third_party_notices_pkg_files"] if include_third_party_notices else []
 
     cc_library(
         name = name + "-headers",
@@ -132,8 +133,8 @@ def wpilib_cc_library(
 
         pkg_zip(
             name = name + "-srcs-zip",
-            srcs = maybe_license_pkg + extra_src_pkg_files + [name + "-srcs-pkg"] + [lib + "-srcs-pkg" for lib in third_party_libraries],
-            tags = ["no-remote"],
+            srcs = maybe_third_party_notices_pkg + extra_src_pkg_files + [name + "-srcs-pkg", "//:license_pkg_files"] + [lib + "-srcs-pkg" for lib in third_party_libraries],
+            tags = ["no-remote", "manual"],
         )
 
     if hdrs_pkg_root:
@@ -145,8 +146,8 @@ def wpilib_cc_library(
 
         pkg_zip(
             name = name + "-hdrs-zip",
-            srcs = extra_hdr_pkg_files + maybe_license_pkg + [name + "-hdrs-pkg"] + [lib + "-hdrs-pkg" for lib in third_party_libraries + third_party_header_only_libraries],
-            tags = ["no-remote"],
+            srcs = maybe_third_party_notices_pkg + extra_hdr_pkg_files + ["//:license_pkg_files"] + [name + "-hdrs-pkg"] + [lib + "-hdrs-pkg" for lib in third_party_libraries + third_party_header_only_libraries],
+            tags = ["no-remote", "manual"],
         )
 
 def wpilib_cc_shared_library(
@@ -157,7 +158,7 @@ def wpilib_cc_shared_library(
     if auto_export_windows_symbols:
         features.append("windows_export_all_symbols")
 
-    native.cc_shared_library(
+    cc_shared_library(
         name = name,
         features = features,
         **kwargs
@@ -171,7 +172,7 @@ def wpilib_cc_shared_library(
 
     pkg_zip(
         name = name + "-shared-zip",
-        srcs = ["//:license_pkg_files", name + "-shared.pkg"],
+        srcs = ["//:license_pkg_files", "//:third_party_notices_pkg_files", name + "-shared.pkg"],
         tags = ["no-remote", "manual"],
     )
 
@@ -378,12 +379,11 @@ def wpilib_cc_static_library(
     pkg_files(
         name = name + "-static.pkg",
         srcs = [":" + name],
-        tags = ["manual"],
     )
 
     pkg_zip(
         name = name + "-static-zip",
-        srcs = ["//:license_pkg_files", name + "-static.pkg"],
+        srcs = ["//:license_pkg_files", "//:third_party_notices_pkg_files", name + "-static.pkg"],
         tags = ["no-remote", "manual"],
     )
 
@@ -393,7 +393,24 @@ def wpilib_shared_and_static_library(
         static_deps = [],
         visibility = None,
         auto_export_windows_symbols = True,
+        shared_library_additional_linker_inputs = [],
+        shared_library_user_link_flags = [],
         **kwargs):
+    """
+    Helper for creating a library and a corresponding cc_static_library and cc_shared_library
+
+    Produces the following outputs:
+        - ":<name>"        - standard cc_library
+        - ":shared/<name>" - cc_shared_library
+        - ":static/<name>" - cc_static_library
+
+    Params:
+        dynamic_deps - Dynamic deps used to create the cc_shared_library
+        static_deps  - Static deps used to create the cc_st"atic_library
+        auto_export_windows_symbols - If true, will add the "windows_export_all_symbols" feature to auto-export symbols into the .dll
+        shared_library_additional_linker_inputs - Passthrough for additional_linker_inputs used to create the cc_shared_library
+        shared_library_user_link_flags - Passthrough for user_link_flags used to create the cc_shared_library
+    """
     wpilib_cc_library(
         name = name,
         visibility = visibility,
@@ -406,6 +423,8 @@ def wpilib_shared_and_static_library(
         dynamic_deps = dynamic_deps,
         visibility = visibility,
         auto_export_windows_symbols = auto_export_windows_symbols,
+        additional_linker_inputs = shared_library_additional_linker_inputs,
+        user_link_flags = shared_library_user_link_flags,
     )
 
     wpilib_cc_static_library(

@@ -37,4 +37,5 @@ def zip_java_srcs(name, extra_pkgs = []):
         name = "lib{}-java-sources".format(name),
         srcs = [":{}-java-srcs".format(name)] + extra_pkgs,
         out = "lib{}-java-sources.jar".format(name),
+        tags = ["manual"],
     )

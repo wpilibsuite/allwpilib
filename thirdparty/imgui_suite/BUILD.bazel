@@ -193,6 +193,7 @@ wpilib_objc_library(
     defines = DARWIN_DEFINES + ["GLFW_INVALID_CODEPOINT"],
     include_arc = False,
     is_cpp = False,
+    visibility = ["//visibility:public"],
     deps = [
         ":glfw_hdrs",
     ],
@@ -307,6 +308,7 @@ wpilib_objc_library(
         "imgui/include/backends",
         "imgui/include/misc/cpp",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":glfw",
     ],
@@ -421,8 +423,10 @@ pkg_zip(
         "implot-hdrs-pkg",
         "stb-hdrs-pkg",
         "//:license_pkg_files",
+        "//:third_party_notices_pkg_files",
     ],
     tags = [
+        "manual",
         "no-remote",
     ],
 )
@@ -473,8 +477,10 @@ pkg_zip(
         "implot-srcs-pkg",
         "stb-srcs-pkg",
         "//:license_pkg_files",
+        "//:third_party_notices_pkg_files",
     ],
     tags = [
+        "manual",
         "no-remote",
     ],
 )

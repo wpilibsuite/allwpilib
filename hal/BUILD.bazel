@@ -7,6 +7,7 @@ load("//hal:generate.bzl", "generate_hal")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_shared_and_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
+load("//shared/bazel/rules:packaging.bzl", "zip_java_srcs")
 
 filegroup(
     name = "proto_files",
@@ -154,6 +155,8 @@ wpilib_jni_java_library(
         "//wpiutil:wpiutil-java",
     ],
 )
+
+zip_java_srcs(name = "wpiHal")
 
 cc_test(
     name = "hal-cpp-test",

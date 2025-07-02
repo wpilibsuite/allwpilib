@@ -1,6 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:packaging.bzl", "zip_java_srcs")
 
 wpilib_cc_library(
     name = "cameraserver",
@@ -42,6 +43,8 @@ java_library(
         "@bzlmodrio-opencv//libraries/java/opencv",
     ],
 )
+
+zip_java_srcs(name = "cameraserver")
 
 cc_test(
     name = "cameraserver-cpp-test",

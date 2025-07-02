@@ -2,6 +2,7 @@ load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_shared_and_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
@@ -110,6 +111,12 @@ cc_library(
     strip_include_prefix = "src/generated/main/native/cpp",
 )
 
+pkg_files(
+    name = "protobuf_hdr_pkg",
+    srcs = glob(["src/generated/main/native/cpp/wpimath/protobuf/*.npb.h"]),
+    strip_prefix = "src/generated/main/native/cpp/",
+)
+
 wpilib_shared_and_static_library(
     name = "wpimath",
     srcs = glob(
@@ -124,6 +131,7 @@ wpilib_shared_and_static_library(
     dynamic_deps = [
         "//wpiutil:shared/wpiutil",
     ],
+    extra_hdr_pkg_files = [":protobuf_hdr_pkg"],
     extra_src_pkg_files = [
         ":wpimath-java-jni-hdrs-pkg",
     ],

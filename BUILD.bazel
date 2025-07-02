@@ -4,10 +4,13 @@ load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 
 pkg_files(
     name = "license_pkg_files",
-    srcs = [
-        "LICENSE.md",
-        "ThirdPartyNotices.txt",
-    ],
+    srcs = ["LICENSE.md"],
+    visibility = ["//visibility:public"],
+)
+
+pkg_files(
+    name = "third_party_notices_pkg_files",
+    srcs = ["ThirdPartyNotices.txt"],
     visibility = ["//visibility:public"],
 )
 

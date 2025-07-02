@@ -10,7 +10,7 @@ wpilib_shared_and_static_library(
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
     ],
-    include_license_files = True,
+    include_third_party_notices = True,
     static_deps = [
         "//hal:static/wpiHal",
         "//wpinet:static/wpinet",

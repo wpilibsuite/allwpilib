@@ -9,6 +9,8 @@ def wpilib_halsim_extension(
         static_deps = [],
         auto_export_windows_symbols = True,
         visibility = None,
+        shared_library_additional_linker_inputs = [],
+        shared_library_user_link_flags = [],
         **kwargs):
     """
     Helper wrapper for creating a HALSIM extension. Provides some of the default argments for creating the library.
@@ -16,7 +18,7 @@ def wpilib_halsim_extension(
     wpilib_cc_library(
         name = name,
         srcs = srcs,
-        include_license_files = True,
+        include_third_party_notices = True,
         target_compatible_with = select({
             "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
             "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
@@ -33,7 +35,7 @@ def wpilib_halsim_extension(
         copts = [
             "-DHALSIM_InitExtension=" + init_extension_name,
         ],
-        include_license_files = True,
+        include_third_party_notices = True,
         target_compatible_with = select({
             "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
             "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
@@ -50,6 +52,8 @@ def wpilib_halsim_extension(
         dynamic_deps = dynamic_deps,
         visibility = visibility,
         deps = [":{}".format(name)],
+        additional_linker_inputs = shared_library_additional_linker_inputs,
+        user_link_flags = shared_library_user_link_flags,
     )
 
     wpilib_cc_static_library(
