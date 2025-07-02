@@ -90,7 +90,7 @@ index ee26a55..23da019 100644
          "coverage_link_flags": attr.string_list(),
          "cpu": attr.string(mandatory = True),
 diff --git a/cc/private/toolchain/windows_cc_configure.bzl b/cc/private/toolchain/windows_cc_configure.bzl
-index 66ca5fb..3dddadc 100644
+index 66ca5fb..044625e 100644
 --- a/cc/private/toolchain/windows_cc_configure.bzl
 +++ b/cc/private/toolchain/windows_cc_configure.bzl
 @@ -21,7 +21,9 @@ load(
@@ -103,7 +103,7 @@ index 66ca5fb..3dddadc 100644
      "write_builtin_include_directory_paths",
  )
  
-@@ -848,6 +850,40 @@ def _get_msvc_deps_scanner_vars(repository_ctx, paths, template_vars, target_arc
+@@ -848,6 +850,36 @@ def _get_msvc_deps_scanner_vars(repository_ctx, paths, template_vars, target_arc
          "%{msvc_deps_scanner_wrapper_path_" + target_arch + "}": "msvc_deps_scanner_wrapper_" + target_arch + ".bat",
      }
  
@@ -113,25 +113,21 @@ index 66ca5fb..3dddadc 100644
 +        repository_ctx,
 +        "BAZEL_CONLYOPTS",
 +        "",
-+        False,
 +    ), ":")
 +    c_opts = split_escaped(_get_env_var(
 +        repository_ctx,
 +        "BAZEL_COPTS",
 +        "",
-+        False,
 +    ), ":")
 +    cxx_opts = split_escaped(_get_env_var(
 +        repository_ctx,
 +        "BAZEL_CXXOPTS",
 +        "",
-+        False,
 +    ), ":")
 +    link_opts = split_escaped(_get_env_var(
 +        repository_ctx,
 +        "BAZEL_LINKOPTS",
 +        "",
-+        False,
 +    ), ":")
 +    msys_mingw_vars = {
 +        "%{c_flags}": get_starlark_list(c_opts),
@@ -144,7 +140,7 @@ index 66ca5fb..3dddadc 100644
  def configure_windows_toolchain(repository_ctx):
      """Configure C++ toolchain on Windows.
  
-@@ -882,6 +918,7 @@ def configure_windows_toolchain(repository_ctx):
+@@ -882,6 +914,7 @@ def configure_windows_toolchain(repository_ctx):
      template_vars.update(msvc_vars_x64)
      template_vars.update(_get_clang_cl_vars(repository_ctx, paths, msvc_vars_x64, "x64"))
      template_vars.update(_get_msys_mingw_vars(repository_ctx))

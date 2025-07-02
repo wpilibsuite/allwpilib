@@ -40,7 +40,7 @@ build:windows --per_file_copt=wpiutil/src/main/native/cpp/timestamp.cpp,wpinet/s
 ################################
 # Standard Windows Flags
 ################################
-build:windows --config=windows_common
+#build:windows --config=windows_common
 
 build:windows --repo_env="BAZEL_LINKOPTS=/DEPENDENTLOADFLAG%:0x1100"
 
@@ -49,6 +49,6 @@ build:windows --repo_env="BAZEL_LINKOPTS=/DEPENDENTLOADFLAG%:0x1100"
 ################################
 #build:windows_arm --config=windows_common
 
-build:windows_arm --cpu=arm64_windows
+build:windows_arm --cpu=arm64_windows --config=windows
 
 build:windows_arm --linkopt=/IGNORE:4099
