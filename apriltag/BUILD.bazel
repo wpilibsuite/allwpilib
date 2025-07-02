@@ -1,7 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
-load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_shared_and_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
@@ -111,15 +110,16 @@ wpilib_jni_java_library(
     ],
 )
 
-
 pkg_files(
     name = "resources",
     srcs = glob(["src/main/native/resources/**"]),
     strip_prefix = "src/main/native/resources/",
 )
 
-
-zip_java_srcs(name = "apriltag", extra_pkgs = [":resources"])
+zip_java_srcs(
+    name = "apriltag",
+    extra_pkgs = [":resources"],
+)
 
 cc_test(
     name = "apriltag-cpp-test",

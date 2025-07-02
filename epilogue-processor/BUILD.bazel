@@ -1,6 +1,5 @@
 load("@rules_java//java:defs.bzl", "java_library", "java_plugin")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
-load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:packaging.bzl", "zip_java_srcs")
 
@@ -24,7 +23,10 @@ pkg_files(
     strip_prefix = "src/main/resources/",
 )
 
-zip_java_srcs(name = "epilogue-processor", extra_pkgs = [":resources"])
+zip_java_srcs(
+    name = "epilogue-processor",
+    extra_pkgs = [":resources"],
+)
 
 java_plugin(
     name = "plugin",

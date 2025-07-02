@@ -30,7 +30,6 @@ def pkg_java_src_files(name):
         ],
     )
 
-
 def zip_java_srcs(name, extra_pkgs = []):
     pkg_java_src_files("{}-java-srcs".format(name))
 
