@@ -76,39 +76,68 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
   @Test
   void testApplyDeadband2dUnityScale() {
     // Angles
-    assertEquals(new Translation2d(1.0, Rotation2d.kCW_Pi_2), MathUtil.applyDeadband2d(new Translation2d(1.0, Rotation2d.kCW_Pi_2), 0.02));
-    assertEquals(new Translation2d(1.0, Rotation2d.kCCW_Pi_2), MathUtil.applyDeadband2d(new Translation2d(1.0, Rotation2d.kCCW_Pi_2), 0.02));
-    assertEquals(new Translation2d(1.0, Rotation2d.kPi), MathUtil.applyDeadband2d(new Translation2d(1.0, Rotation2d.kPi), 0.02));
+    assertEquals(
+        new Translation2d(1.0, Rotation2d.kCW_Pi_2),
+        MathUtil.applyDeadband2d(new Translation2d(1.0, Rotation2d.kCW_Pi_2), 0.02));
+    assertEquals(
+        new Translation2d(1.0, Rotation2d.kCCW_Pi_2),
+        MathUtil.applyDeadband2d(new Translation2d(1.0, Rotation2d.kCCW_Pi_2), 0.02));
+    assertEquals(
+        new Translation2d(1.0, Rotation2d.kPi),
+        MathUtil.applyDeadband2d(new Translation2d(1.0, Rotation2d.kPi), 0.02));
 
     // == 0
     assertEquals(Translation2d.kZero, MathUtil.applyDeadband2d(Translation2d.kZero, 0.02));
 
     // > 0
-    assertEquals(Translation2d.kZero, MathUtil.applyDeadband2d(new Translation(0.01, Rotation2d.kZero), 0.02));
-    assertEquals(Translation2d.kZero, MathUtil.applyDeadband2d(new Translation2d(0.02, Rotation2d.kZero), 0.02));
-    assertEquals(new Translation2d((0.03 - 0.02) / (1.0 - 0.02), Rotation2d.kZero), MathUtil.applyDeadband2d(new Translation2d(0.03, Rotation2d.kZero), 0.02));
-    assertEquals(new Translation2d(1.0, Rotation2d.kZero), MathUtil.applyDeadband2d(new Translation2d(1.0, Rotation2d.kZero), 0.02));
+    assertEquals(
+        Translation2d.kZero,
+        MathUtil.applyDeadband2d(new Translation(0.01, Rotation2d.kZero), 0.02));
+    assertEquals(
+        Translation2d.kZero,
+        MathUtil.applyDeadband2d(new Translation2d(0.02, Rotation2d.kZero), 0.02));
+    assertEquals(
+        new Translation2d((0.03 - 0.02) / (1.0 - 0.02), Rotation2d.kZero),
+        MathUtil.applyDeadband2d(new Translation2d(0.03, Rotation2d.kZero), 0.02));
+    assertEquals(
+        new Translation2d(1.0, Rotation2d.kZero),
+        MathUtil.applyDeadband2d(new Translation2d(1.0, Rotation2d.kZero), 0.02));
   }
 
   @Test
   void testApplyDeadband2dArbitraryScale() {
     // Angles
-    assertEquals(new Translation2d(2.5, Rotation2d.kCW_Pi_2), MathUtil.applyDeadband2d(new Translation2d(2.5, Rotation2d.kCW_Pi_2), 0.02, 2.5));
-    assertEquals(new Translation2d(2.5, Rotation2d.kCCW_Pi_2), MathUtil.applyDeadband2d(new Translation2d(2.5, Rotation2d.kCCW_Pi_2), 0.02, 2.5));
-    assertEquals(new Translation2d(2.5, Rotation2d.kPi), MathUtil.applyDeadband2d(new Translation2d(2.5, Rotation2d.kPi), 0.02, 2.5));
-    
+    assertEquals(
+        new Translation2d(2.5, Rotation2d.kCW_Pi_2),
+        MathUtil.applyDeadband2d(new Translation2d(2.5, Rotation2d.kCW_Pi_2), 0.02, 2.5));
+    assertEquals(
+        new Translation2d(2.5, Rotation2d.kCCW_Pi_2),
+        MathUtil.applyDeadband2d(new Translation2d(2.5, Rotation2d.kCCW_Pi_2), 0.02, 2.5));
+    assertEquals(
+        new Translation2d(2.5, Rotation2d.kPi),
+        MathUtil.applyDeadband2d(new Translation2d(2.5, Rotation2d.kPi), 0.02, 2.5));
+
     // == 0
     assertEquals(Translation2d.kZero, MathUtil.applyDeadband2d(Translation2d.kZero, 0.02, 2.5));
-    
+
     // > 0
-    assertEquals(Translation2d.kZero, MathUtil.applyDeadband2d(new Translation(0.01, Rotation2d.kZero), 0.02, 2.5));
-    assertEquals(Translation2d.kZero, MathUtil.applyDeadband2d(new Translation2d(0.02, Rotation2d.kZero), 0.02, 2.5));
-    assertEquals(new Translation2d(2.5, Rotation2d.kZero), MathUtil.applyDeadband2d(new Translation2d(2.5, Rotation2d.kZero), 0.02, 2.5));
+    assertEquals(
+        Translation2d.kZero,
+        MathUtil.applyDeadband2d(new Translation(0.01, Rotation2d.kZero), 0.02, 2.5));
+    assertEquals(
+        Translation2d.kZero,
+        MathUtil.applyDeadband2d(new Translation2d(0.02, Rotation2d.kZero), 0.02, 2.5));
+    assertEquals(
+        new Translation2d(2.5, Rotation2d.kZero),
+        MathUtil.applyDeadband2d(new Translation2d(2.5, Rotation2d.kZero), 0.02, 2.5));
   }
 
   @Test
   void testApplyDeadband2dLargeMaxMagnitude() {
-    assertEquals(new Translation2d(90.0, Rotation2d.kZero), MathUtil.applyDeadband2d(new Translation2d(100.0, Rotation2d.kZero), 20, Double.POSITIVE_INFINITY));
+    assertEquals(
+        new Translation2d(90.0, Rotation2d.kZero),
+        MathUtil.applyDeadband2d(
+            new Translation2d(100.0, Rotation2d.kZero), 20, Double.POSITIVE_INFINITY));
   }
 
   @Test
@@ -151,40 +180,80 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
 
   @Test
   void testCopySignPow2d() {
-      assertEquals(new Translation2d(0.5, Rotation2d.kZero), MathUtil.copySignPow2d(new Translation2d(0.5, Rotation2d.kZero), 1.0));
-      assertEquals(new Translation2d(0.5, Rotation2d.kPi), MathUtil.copySignPow2d(new Translation2d(0.5, Rotation2d.kPi), 1.0));
+    assertEquals(
+        new Translation2d(0.5, Rotation2d.kZero),
+        MathUtil.copySignPow2d(new Translation2d(0.5, Rotation2d.kZero), 1.0));
+    assertEquals(
+        new Translation2d(0.5, Rotation2d.kPi),
+        MathUtil.copySignPow2d(new Translation2d(0.5, Rotation2d.kPi), 1.0));
 
-      assertEquals(new Translation2d(0.5 * 0.5, Rotation2d.kZero), MathUtil.copySignPow2d(new Translation2d(0.5, Rotation2d.kZero), 2.0));
-      assertEquals(new Translation2d(0.5 * 0.5, Rotation2d.kPi), MathUtil.copySignPow2d(new Translation2d(0.5, Rotation2d.kPi), 2.0));
+    assertEquals(
+        new Translation2d(0.5 * 0.5, Rotation2d.kZero),
+        MathUtil.copySignPow2d(new Translation2d(0.5, Rotation2d.kZero), 2.0));
+    assertEquals(
+        new Translation2d(0.5 * 0.5, Rotation2d.kPi),
+        MathUtil.copySignPow2d(new Translation2d(0.5, Rotation2d.kPi), 2.0));
 
-      assertEquals(new Translation2d(Math.sqrt(0.5), Rotation2d.kZero), MathUtil.copySignPow2d(new Translation2d(0.5, Rotation2d.kZero), 0.5));
-      assertEquals(new Translation2d(Math.sqrt(0.5), Rotation2d.kPi), MathUtil.copySignPow2d(new Translation2d(0.5, Rotation2d.kPi), 0.5));
+    assertEquals(
+        new Translation2d(Math.sqrt(0.5), Rotation2d.kZero),
+        MathUtil.copySignPow2d(new Translation2d(0.5, Rotation2d.kZero), 0.5));
+    assertEquals(
+        new Translation2d(Math.sqrt(0.5), Rotation2d.kPi),
+        MathUtil.copySignPow2d(new Translation2d(0.5, Rotation2d.kPi), 0.5));
 
-      assertEquals(Translation2d.kZero, MathUtil.copySignPow2d(Translation2d.kZero, 2.0));
-      assertEquals(new Translation2d(1.0, Rotation2d.kZero), MathUtil.copySignPow2d(new Translation2d(1.0, Rotation2d.kZero), 2.0));
-      assertEquals(new Translation2d(1.0, Rotation2d.kPi), MathUtil.copySignPow2d(new Translation2d(1.0, Rotation2d.kPi), 2.0));
+    assertEquals(Translation2d.kZero, MathUtil.copySignPow2d(Translation2d.kZero, 2.0));
+    assertEquals(
+        new Translation2d(1.0, Rotation2d.kZero),
+        MathUtil.copySignPow2d(new Translation2d(1.0, Rotation2d.kZero), 2.0));
+    assertEquals(
+        new Translation2d(1.0, Rotation2d.kPi),
+        MathUtil.copySignPow2d(new Translation2d(1.0, Rotation2d.kPi), 2.0));
 
-      assertEquals(new Translation2d(Math.pow(0.8, 0.3), Rotation2d.kCW_Pi_2), MathUtil.copySignPow2d(new Translation2d(0.8, Rotation2d.kCW_Pi_2), 0.3));
-      assertEquals(new Translation2d(Math.pow(0.8, 0.3), Rotation2d.kCCW_Pi_2), MathUtil.copySignPow2d(new Translation2d(0.8, Rotation2d.kCCW_Pi_2), 0.3));
+    assertEquals(
+        new Translation2d(Math.pow(0.8, 0.3), Rotation2d.kCW_Pi_2),
+        MathUtil.copySignPow2d(new Translation2d(0.8, Rotation2d.kCW_Pi_2), 0.3));
+    assertEquals(
+        new Translation2d(Math.pow(0.8, 0.3), Rotation2d.kCCW_Pi_2),
+        MathUtil.copySignPow2d(new Translation2d(0.8, Rotation2d.kCCW_Pi_2), 0.3));
   }
 
   @Test
   void testCopySignPow2dMaxDistance() {
-      assertEquals(new Translation2d(5, Rotation2d.kZero), MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kZero), 1.0, 10.0));
-      assertEquals(new Translation2d(5, Rotation2d.kPi), MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kPi), 1.0, 10.0));
+    assertEquals(
+        new Translation2d(5, Rotation2d.kZero),
+        MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kZero), 1.0, 10.0));
+    assertEquals(
+        new Translation2d(5, Rotation2d.kPi),
+        MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kPi), 1.0, 10.0));
 
-      assertEquals(new Translation2d(0.5 * 0.5 * 10, Rotation2d.kZero), MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kZero), 2.0, 10.0));
-      assertEquals(new Translation2d(0.5 * 0.5 * 10, Rotation2d.kPi), MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kPi), 2.0, 10.0));
+    assertEquals(
+        new Translation2d(0.5 * 0.5 * 10, Rotation2d.kZero),
+        MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kZero), 2.0, 10.0));
+    assertEquals(
+        new Translation2d(0.5 * 0.5 * 10, Rotation2d.kPi),
+        MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kPi), 2.0, 10.0));
 
-      assertEquals(new Translation2d(Math.sqrt(0.5) * 10, Rotation2d.kZero), MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kZero), 0.5, 10.0));
-      assertEquals(new Translation2d(Math.sqrt(0.5) * 10, Rotation2d.kPi), MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kPi), 0.5, 10.0));
+    assertEquals(
+        new Translation2d(Math.sqrt(0.5) * 10, Rotation2d.kZero),
+        MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kZero), 0.5, 10.0));
+    assertEquals(
+        new Translation2d(Math.sqrt(0.5) * 10, Rotation2d.kPi),
+        MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kPi), 0.5, 10.0));
 
-      assertEquals(Translation2d.kZero, MathUtil.copySignPow2d(Translation2d.kZero, 2.0, 5.0));
-      assertEquals(new Translation2d(5.0, Rotation2d.kZero), MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kZero), 2.0, 5.0));
-      assertEquals(new Translation2d(5.0, Rotation2d.kPi), MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kPi), 2.0, 5.0));
+    assertEquals(Translation2d.kZero, MathUtil.copySignPow2d(Translation2d.kZero, 2.0, 5.0));
+    assertEquals(
+        new Translation2d(5.0, Rotation2d.kZero),
+        MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kZero), 2.0, 5.0));
+    assertEquals(
+        new Translation2d(5.0, Rotation2d.kPi),
+        MathUtil.copySignPow2d(new Translation2d(5.0, Rotation2d.kPi), 2.0, 5.0));
 
-      assertEquals(new Translation2d(Math.pow(0.8, 0.3) * 100, Rotation2d.kCW_Pi_2), MathUtil.copySignPow2d(new Translation2d(80, Rotation2d.kCW_Pi_2), 0.3, 100.0));
-      assertEquals(new Translation2d(Math.pow(0.8, 0.3) * 100, Rotation2d.kCCW_Pi_2), MathUtil.copySignPow2d(new Translation2d(80, Rotation2d.kCCW_Pi_2), 0.3, 100.0));
+    assertEquals(
+        new Translation2d(Math.pow(0.8, 0.3) * 100, Rotation2d.kCW_Pi_2),
+        MathUtil.copySignPow2d(new Translation2d(80, Rotation2d.kCW_Pi_2), 0.3, 100.0));
+    assertEquals(
+        new Translation2d(Math.pow(0.8, 0.3) * 100, Rotation2d.kCCW_Pi_2),
+        MathUtil.copySignPow2d(new Translation2d(80, Rotation2d.kCCW_Pi_2), 0.3, 100.0));
   }
 
   @Test
