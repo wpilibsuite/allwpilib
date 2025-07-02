@@ -9,7 +9,7 @@ Subject: [PATCH 4/8] Replace std::to_underlying()
  2 files changed, 7 insertions(+), 8 deletions(-)
 
 diff --git a/src/optimization/problem.cpp b/src/optimization/problem.cpp
-index 81863808d329a53d4162ce0624a3b8e8afc32dfc..c3319fc0a927cf452871a2db08d5edff87ac8eea 100644
+index 09828cdb6d7cddff692b9d17603dc0c11cd5a3ec..886de24cc0532d31f1e186150da79e925f212556 100644
 --- a/src/optimization/problem.cpp
 +++ b/src/optimization/problem.cpp
 @@ -7,7 +7,6 @@
@@ -20,7 +20,7 @@ index 81863808d329a53d4162ce0624a3b8e8afc32dfc..c3319fc0a927cf452871a2db08d5edff
  
  #include <Eigen/Core>
  #include <Eigen/SparseCore>
-@@ -346,11 +345,11 @@ void Problem::print_problem_analysis() {
+@@ -350,11 +349,11 @@ void Problem::print_problem_analysis() {
    // Print problem structure
    slp::println("\nProblem structure:");
    slp::println("  ↳ {} cost function",
@@ -35,7 +35,7 @@ index 81863808d329a53d4162ce0624a3b8e8afc32dfc..c3319fc0a927cf452871a2db08d5edff
  
    if (m_decision_variables.size() == 1) {
      slp::print("\n1 decision variable\n");
-@@ -362,7 +361,7 @@ void Problem::print_problem_analysis() {
+@@ -366,7 +365,7 @@ void Problem::print_problem_analysis() {
        [](const gch::small_vector<Variable>& constraints) {
          std::array<size_t, 5> counts{};
          for (const auto& constraint : constraints) {
