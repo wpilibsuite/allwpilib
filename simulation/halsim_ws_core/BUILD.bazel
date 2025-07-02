@@ -1,4 +1,4 @@
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 
 wpilib_cc_library(
     name = "halsim_ws_core",
@@ -16,6 +16,20 @@ wpilib_cc_library(
         "//hal:wpiHal",
         "//wpinet",
         "//wpiutil",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/halsim_ws_core",
+    auto_export_windows_symbols = False,
+    dynamic_deps = [
+        "//hal:shared/wpiHal",
+        "//wpinet:shared/wpinet",
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":halsim_ws_core",
     ],
 )
 

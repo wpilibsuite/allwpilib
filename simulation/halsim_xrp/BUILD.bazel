@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 
 wpilib_cc_library(
     name = "halsim_xrp",
@@ -41,6 +41,19 @@ wpilib_cc_library(
     deps = [
         "//simulation/halsim_ws_core",
         "//wpinet",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/halsim_xrp",
+    auto_export_windows_symbols = False,
+    dynamic_deps = [
+        "//wpinet:shared/wpinet",
+        "//hal:shared/wpiHal",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":halsim_xrp",
     ],
 )
 
