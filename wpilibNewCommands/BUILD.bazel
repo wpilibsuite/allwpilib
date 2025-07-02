@@ -6,7 +6,7 @@ load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_shared_and_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
-load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
+load("//shared/bazel/rules:packaging.bzl", "zip_java_srcs")
 load("//wpilibNewCommands:generate.bzl", "generate_wpilib_new_commands")
 
 py_binary(
@@ -97,13 +97,7 @@ java_library(
     ],
 )
 
-pkg_java_files(name = "wpilibNewCommands-java-srcs")
-
-pkg_zip(
-    name = "libwpilibNewCommands-java-sources",
-    srcs = [":wpilibNewCommands-java-srcs"],
-    out = "libwpilibNewCommands-java-sources.jar",
-)
+zip_java_srcs(name = "wpilibNewCommands")
 
 cc_test(
     name = "wpilibNewCommands-cpp-test",

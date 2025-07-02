@@ -8,7 +8,7 @@ load("//ntcore:generate_ntcore.bzl", "generate_ntcore")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_shared_and_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
-load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
+load("//shared/bazel/rules:packaging.bzl", "zip_java_srcs")
 
 generate_ntcore(
     name = "generate_ntcore",
@@ -137,13 +137,7 @@ wpilib_jni_java_library(
     ],
 )
 
-pkg_java_files(name = "ntcore-java-srcs")
-
-pkg_zip(
-    name = "libntcore-java-sources",
-    srcs = [":ntcore-java-srcs"],
-    out = "libntcore-java-sources.jar",
-)
+zip_java_srcs(name = "ntcore")
 
 cc_test(
     name = "ntcore-cpp-test",

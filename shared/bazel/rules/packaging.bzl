@@ -1,6 +1,7 @@
 load("@rules_pkg//:mappings.bzl", "pkg_filegroup", "pkg_files")
+load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 
-def pkg_java_files(name):
+def pkg_java_src_files(name):
     pkg_files(
         name = name + "-java-srcs",
         srcs = native.glob(["src/main/java/**"]),
@@ -27,4 +28,14 @@ def pkg_java_files(name):
             name + "-generated-java-srcs",
             "//shared/bazel/rules:src_jar_dummy_manifest",
         ],
+    )
+
+
+def zip_java_srcs(name, extra_pkgs = []):
+    pkg_java_src_files("{}-java-srcs".format(name))
+
+    pkg_zip(
+        name = "lib{}-java-sources".format(name),
+        srcs = [":{}-java-srcs".format(name)] + extra_pkgs,
+        out = "lib{}-java-sources.jar".format(name),
     )
