@@ -9,6 +9,7 @@
 #include <utility>
 
 #ifdef _WIN32
+#undef _WIN32_WINNT
 #include <windows.h>
 
 #include <cassert>
