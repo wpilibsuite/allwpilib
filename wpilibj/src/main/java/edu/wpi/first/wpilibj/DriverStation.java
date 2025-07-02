@@ -14,6 +14,7 @@ import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.MatchInfoData;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -87,6 +88,79 @@ public final class DriverStation {
     Qualification,
     /** Elimination. */
     Elimination
+  }
+
+  /** A controller POV direction. */
+  public enum POVDirection {
+    /** POV center. */
+    Center(0x00),
+    /** POV up. */
+    Up(0x01),
+    /** POV up right. */
+    UpRight(0x01 | 0x02),
+    /** POV right. */
+    Right(0x02),
+    /** POV down right. */
+    DownRight(0x02 | 0x04),
+    /** POV down. */
+    Down(0x04),
+    /** POV down left. */
+    DownLeft(0x04 | 0x08),
+    /** POV left. */
+    Left(0x08),
+    /** POV up left. */
+    UpLeft(0x01 | 0x08);
+
+    private static final double INVALID_POV_VALUE_INTERVAL = 1.0;
+    private static double s_nextMessageTime;
+
+    /**
+     * Converts a byte value into a POVDirection enum value.
+     *
+     * @param value The byte value to convert.
+     * @return The corresponding POVDirection enum value.
+     * @throws IllegalArgumentException If value does not correspond to a POVDirection.
+     */
+    private static POVDirection of(byte value) {
+      for (var direction : values()) {
+        if (direction.value == value) {
+          return direction;
+        }
+      }
+      double currentTime = Timer.getTimestamp();
+      if (currentTime > s_nextMessageTime) {
+        reportError("Invalid POV value " + value + "!", false);
+        s_nextMessageTime = currentTime + INVALID_POV_VALUE_INTERVAL;
+      }
+      return Center;
+    }
+
+    /** The corresponding HAL value. */
+    public final byte value;
+
+    POVDirection(int value) {
+      this.value = (byte) value;
+    }
+
+    /**
+     * Gets the angle of a POVDirection.
+     *
+     * @return The angle clockwise from straight up, or Optional.empty() if this POVDirection is
+     *     Center.
+     */
+    public Optional<Rotation2d> getAngle() {
+      return switch (this) {
+        case Center -> Optional.empty();
+        case Up -> Optional.of(Rotation2d.fromDegrees(0));
+        case UpRight -> Optional.of(Rotation2d.fromDegrees(45));
+        case Right -> Optional.of(Rotation2d.fromDegrees(90));
+        case DownRight -> Optional.of(Rotation2d.fromDegrees(135));
+        case Down -> Optional.of(Rotation2d.fromDegrees(180));
+        case DownLeft -> Optional.of(Rotation2d.fromDegrees(225));
+        case Left -> Optional.of(Rotation2d.fromDegrees(270));
+        case UpLeft -> Optional.of(Rotation2d.fromDegrees(315));
+      };
+    }
   }
 
   private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
@@ -674,9 +748,9 @@ public final class DriverStation {
    *
    * @param stick The joystick to read.
    * @param pov The POV to read.
-   * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+   * @return the angle of the POV.
    */
-  public static int getStickPOV(int stick, int pov) {
+  public static POVDirection getStickPOV(int stick, int pov) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
@@ -687,7 +761,7 @@ public final class DriverStation {
     m_cacheDataMutex.lock();
     try {
       if (pov < m_joystickPOVs[stick].m_count) {
-        return m_joystickPOVs[stick].m_povs[pov];
+        return POVDirection.of(m_joystickPOVs[stick].m_povs[pov]);
       }
     } finally {
       m_cacheDataMutex.unlock();
@@ -699,7 +773,7 @@ public final class DriverStation {
             + " on port "
             + stick
             + " not available, check if controller is plugged in");
-    return -1;
+    return POVDirection.Center;
   }
 
   /**

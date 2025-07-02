@@ -96,12 +96,6 @@ third_party_cc_lib_helper(
 )
 
 third_party_cc_lib_helper(
-    name = "memory",
-    include_root = "src/main/native/thirdparty/memory/include",
-    src_root = "src/main/native/thirdparty/memory/src",
-)
-
-third_party_cc_lib_helper(
     name = "mpack",
     include_root = "src/main/native/thirdparty/mpack/include",
     src_root = "src/main/native/thirdparty/mpack/src",
@@ -162,7 +156,6 @@ wpilib_cc_library(
         ":debugging",
         ":fmtlib",
         ":llvm",
-        ":memory",
         ":mpack",
         ":nanopb",
         ":protobuf",
