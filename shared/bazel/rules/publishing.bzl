@@ -45,8 +45,14 @@ def architectures_pkg_zip(
         "linux-x86-64": ["@platforms//os:linux"],
         "osxuniversal": ["@platforms//os:osx"],
         "systemcore": None,
-        "windows-arm64": ["@platforms//os:windows"],
-        "windows-x86-64": ["@platforms//os:windows"],
+        "windows-arm64": select({
+            "//shared/bazel/rules:is_windows_arm64": ["@platforms//os:windows"],
+            "//conditions:default": ["@platforms//:incompatible"],
+        }),
+        "windows-x86-64": select({
+            "//shared/bazel/rules:is_windows_x86_64": ["@platforms//os:windows"],
+            "//conditions:default": ["@platforms//:incompatible"],
+        }),
     }
     for compilation_mode in compilation_modes:
         for platform, shortname in architectures.items():
@@ -75,9 +81,18 @@ def platform_prefix(t):
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": "linux/systemcore/" + t,
     })
 
-def _wpilib_maven_export_impl(name, maven_coordinates, classifier_artifacts, linux_artifacts, osx_artifacts, windows_artifacts, lib_name = None, visibility = None):
+def _wpilib_maven_export_impl(
+        name,
+        maven_coordinates,
+        classifier_artifacts,
+        linux_artifacts,
+        osx_artifacts,
+        windows_x86_64_artifacts,
+        windows_arm64_artifacts,
+        lib_name = None,
+        visibility = None):
     """Implementation of wpilib_maven_export."""
-    is_platform_specific = linux_artifacts or osx_artifacts or windows_artifacts
+    is_platform_specific = linux_artifacts or osx_artifacts or windows_x86_64_artifacts or windows_arm64_artifacts
 
     if not is_platform_specific:
         maven_export(
@@ -101,9 +116,13 @@ def _wpilib_maven_export_impl(name, maven_coordinates, classifier_artifacts, lin
     all_osx_artifacts.update(classifier_artifacts)
     all_osx_artifacts.update(osx_artifacts)
 
-    all_windows_artifacts = {}
-    all_windows_artifacts.update(classifier_artifacts)
-    all_windows_artifacts.update(windows_artifacts)
+    all_windows_x86_64_artifacts = {}
+    all_windows_x86_64_artifacts.update(classifier_artifacts)
+    all_windows_x86_64_artifacts.update(windows_x86_64_artifacts)
+
+    all_windows_arm64_artifacts = {}
+    all_windows_arm64_artifacts.update(classifier_artifacts)
+    all_windows_arm64_artifacts.update(windows_arm64_artifacts)
 
     maven_export(
         name = name + "-linux",
@@ -122,19 +141,28 @@ def _wpilib_maven_export_impl(name, maven_coordinates, classifier_artifacts, lin
     )
 
     maven_export(
-        name = name + "-windows",
+        name = name + "-windows-x86-64",
         maven_coordinates = maven_coordinates,
-        classifier_artifacts = all_windows_artifacts,
-        target_compatible_with = ["@platforms//os:windows"],
+        classifier_artifacts = all_windows_x86_64_artifacts,
+        target_compatible_with = ["@platforms//os:windows", "@platforms//cpu:x86_64"],
+        **common_args
+    )
+
+    maven_export(
+        name = name + "-windows-arm64",
+        maven_coordinates = maven_coordinates,
+        classifier_artifacts = all_windows_arm64_artifacts,
+        target_compatible_with = ["@platforms//os:windows", "@platforms//cpu:arm64"],
         **common_args
     )
 
     native.alias(
         name = name + ".publish",
         actual = select({
+            "//shared/bazel/rules:is_windows_arm64": name + "-windows-arm64.publish",
+            "//shared/bazel/rules:is_windows_x86_64": name + "-windows-x86-64.publish",
             "@platforms//os:linux": name + "-linux.publish",
             "@platforms//os:osx": name + "-osx.publish",
-            "@platforms//os:windows": name + "-windows.publish",
         }),
         visibility = visibility,
     )
@@ -147,7 +175,8 @@ wpilib_maven_export = macro(
         "linux_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
         "maven_coordinates": attr.string(mandatory = True, configurable = False),
         "osx_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
-        "windows_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
+        "windows_arm64_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
+        "windows_x86_64_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
     },
     doc = "A symbolic macro that wraps maven_export for wpilib.",
 )

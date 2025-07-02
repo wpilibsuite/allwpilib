@@ -364,11 +364,13 @@ wpilib_maven_export(
         "osxuniversalstaticdebug": ":wpiutil_static_zip-dbg-osxuniversal",
     },
     visibility = ["//visibility:public"],
-    windows_artifacts = {
+    windows_arm64_artifacts = {
         "windowsarm64": ":wpiutil_shared_zip-opt-windows-arm64",
         "windowsarm64debug": ":wpiutil_shared_zip-dbg-windows-arm64",
         "windowsarm64static": ":wpiutil_static_zip-opt-windows-arm64",
         "windowsarm64staticdebug": ":wpiutil_static_zip-dbg-windows-arm64",
+    },
+    windows_x86_64_artifacts = {
         "windowsx86-64": ":wpiutil_shared_zip-opt-windows-x86-64",
         "windowsx86-64debug": ":wpiutil_shared_zip-dbg-windows-x86-64",
         "windowsx86-64static": ":wpiutil_static_zip-opt-windows-x86-64",
