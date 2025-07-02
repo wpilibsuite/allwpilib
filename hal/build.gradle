@@ -80,6 +80,9 @@ cppHeadersZip {
     from(generatedHeaders) {
         into '/'
     }
+    from('src/mrc/include') {
+        into '/'
+    }
 }
 
 Action<List<String>> symbolFilter = { symbols ->

@@ -23,6 +23,9 @@ task cppSourcesZip(type: Zip) {
     from("$buildDir/generated/cpp") {
         into '/'
     }
+    from("src/generated/main/native/cpp") {
+        into '/'
+    }
 }
 
 task cppHeadersZip(type: Zip) {

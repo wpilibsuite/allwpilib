@@ -52,6 +52,12 @@ cppHeadersZip {
     }
 }
 
+cppSourcesZip {
+    from('src/main/native/thirdparty/sleipnir/src') {
+        into '/'
+    }
+}
+
 model {
     components {
         all {
