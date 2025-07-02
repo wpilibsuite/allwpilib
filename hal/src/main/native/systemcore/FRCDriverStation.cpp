@@ -121,7 +121,9 @@ struct SystemServerDriverStation {
     consoleLinePublisher =
         ntInst.GetStringTopic(ROBOT_CONSOLE_LINE_PATH).Publish(options);
 
-    hasSetWallClockSubscriber = ntInst.GetBooleanTopic(ROBOT_HAS_SET_WALL_CLOCK_PATH).Subscribe(false, options);
+    hasSetWallClockSubscriber =
+        ntInst.GetBooleanTopic(ROBOT_HAS_SET_WALL_CLOCK_PATH)
+            .Subscribe(false, options);
 
     errorInfoPublisher =
         ntInst.GetProtobufTopic<mrc::ErrorInfo>(ROBOT_ERROR_INFO_PATH)
