@@ -276,10 +276,6 @@ HAL_Bool HAL_GetRSLState(int32_t* status) {
   return false;
 }
 
-HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
-  return false;
-}
-
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
