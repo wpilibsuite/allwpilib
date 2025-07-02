@@ -24,7 +24,8 @@ compile_pip_requirements(
 alias(
     name = "quickbuf_protoc",
     actual = select({
-        "@bazel_tools//src/conditions:darwin": "@quickbuffer_protoc_osx//file",
+        "//shared/bazel/rules:is_osx_x86_64": "@quickbuffer_protoc_osx_x86-64//file",
+        "//shared/bazel/rules:is_osx_aarch64": "@quickbuffer_protoc_osx_aarch64//file",
         "@bazel_tools//src/conditions:windows": "@quickbuffer_protoc_windows//file",
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": "@quickbuffer_protoc_linux//file",
     }),

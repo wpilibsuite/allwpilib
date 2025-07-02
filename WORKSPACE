@@ -324,10 +324,17 @@ http_file(
 )
 
 http_file(
-    name = "quickbuffer_protoc_osx",
+    name = "quickbuffer_protoc_osx_x86-64",
     executable = True,
     sha256 = "ea307c2b69664ae7e7c69db4cddf5803187e5a34bceffd09a21652f0f16044f7",
     url = "https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/" + QUICKBUF_VERSION + "/protoc-gen-quickbuf-" + QUICKBUF_VERSION + "-osx-x86_64.exe   ",
+)
+
+http_file(
+    name = "quickbuffer_protoc_osx_aarch64",
+    executable = True,
+    sha256 = "a9abdee09d8b5ef0aa954b238536917313511deec11e1901994af26ade033e28",
+    url = "https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/" + QUICKBUF_VERSION + "/protoc-gen-quickbuf-" + QUICKBUF_VERSION + "-osx-aarch_64.exe   ",
 )
 
 http_file(

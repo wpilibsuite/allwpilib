@@ -22,7 +22,8 @@ def generate_quickbuf(
                 f"--quickbuf_out=gen_descriptors=true:{output_directory.absolute()}",
                 f"-I{absolute_filename.parent}",
                 absolute_filename,
-            ]
+            ],
+            check = True,
         )
     java_files = (output_directory / "edu/wpi/first/math/proto").glob("*.java")
     for java_file in java_files:
