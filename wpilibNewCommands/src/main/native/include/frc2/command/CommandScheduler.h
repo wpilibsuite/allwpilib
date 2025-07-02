@@ -11,6 +11,7 @@
 #include <optional>
 #include <span>
 #include <utility>
+#include <vector>
 
 #include <frc/Errors.h>
 #include <frc/Watchdog.h>
@@ -190,6 +191,12 @@ class CommandScheduler final : public wpi::Sendable,
 
   void UnregisterSubsystem(std::initializer_list<Subsystem*> subsystems);
   void UnregisterSubsystem(std::span<Subsystem* const> subsystems);
+
+  /**
+   * @brief Get all registered subsytems as an immutable vector
+   *
+   */
+  const std::vector<Subsystem*> GetAllRegisteredSubsystems();
 
   /**
    * Un-registers all registered Subsystems with the scheduler. All currently
