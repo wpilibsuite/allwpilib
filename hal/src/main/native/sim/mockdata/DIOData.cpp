@@ -9,7 +9,7 @@ using namespace hal;
 
 namespace hal::init {
 void InitializeDIOData() {
-  static DIOData sdd[kNumDigitalChannels];
+  static DIOData sdd[kNumSmartIo];
   ::hal::SimDIOData = sdd;
 }
 }  // namespace hal::init

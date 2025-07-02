@@ -51,7 +51,7 @@ class AnalogInputSimModel : public glass::AnalogInputModel {
 
 class AnalogInputsSimModel : public glass::AnalogInputsModel {
  public:
-  AnalogInputsSimModel() : m_models(HAL_GetNumAnalogInputs()) {}
+  AnalogInputsSimModel() : m_models(HAL_GetNumSmartIo()) {}
 
   void Update() override;
 
@@ -92,7 +92,7 @@ void AnalogInputsSimModel::ForEachAnalogInput(
 }
 
 static bool AnalogInputsAnyInitialized() {
-  static const int32_t num = HAL_GetNumAnalogInputs();
+  static const int32_t num = HAL_GetNumSmartIo();
   for (int32_t i = 0; i < num; ++i) {
     if (HALSIM_GetAnalogInInitialized(i)) {
       return true;
