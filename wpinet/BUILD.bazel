@@ -70,6 +70,10 @@ filegroup(
                "@bazel_tools//src/conditions:windows": WIN_UV_SRCS,
                "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_UV_SRCS,
            }) + glob(["src/main/native/thirdparty/libuv/src/*"]),
+    copts = select({
+        "@bazel_tools//src/conditions:windows": ["/U_WIN32_WINNT"],
+        "//conditions:default": [],
+    }),
     visibility = ["//wpinet:__subpackages__"],
 )
 
