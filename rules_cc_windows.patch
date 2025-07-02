@@ -11,20 +11,119 @@ index 522d67e..afc8a25 100644
      link_flags = [%{link_flags}],
      link_libs = [%{link_libs}],
 diff --git a/cc/private/toolchain/BUILD.windows.tpl b/cc/private/toolchain/BUILD.windows.tpl
-index 75fbd0a..3e7602b 100644
+index 75fbd0a..7c8bc60 100644
 --- a/cc/private/toolchain/BUILD.windows.tpl
 +++ b/cc/private/toolchain/BUILD.windows.tpl
-@@ -667,6 +667,10 @@ cc_toolchain_config(
-         "objdump": "wrapper/bin/msvc_nop.bat",
-         "strip": "wrapper/bin/msvc_nop.bat",
-     },
+@@ -124,6 +124,10 @@ cc_toolchain_config(
+     cxx_builtin_include_directories = [%{cxx_builtin_include_directories}],
+     tool_paths = {%{tool_paths}},
+     tool_bin_path = "%{tool_bin_path}",
 +    c_flags = [%{c_flags}],
 +    conly_flags = [%{conly_flags}],
 +    cxx_flags = [%{cxx_flags}],
 +    link_flags = [%{link_flags}],
-     archiver_flags = ["/MACHINE:ARM64"],
-     default_link_flags = ["/MACHINE:ARM64"],
+ )
+ 
+ toolchain(
+@@ -170,6 +174,10 @@ cc_toolchain_config(
+     tool_bin_path = "%{tool_bin_path}",
+     default_compile_flags = ["-m32"],
+     default_link_flags = ["-m32"],
++    c_flags = [%{c_flags}],
++    conly_flags = [%{conly_flags}],
++    cxx_flags = [%{cxx_flags}],
++    link_flags = [%{link_flags}],
+ )
+ 
+ toolchain(
+@@ -214,6 +222,10 @@ cc_toolchain_config(
+     tool_bin_path = "%{mingw_tool_bin_path}",
+     cxx_builtin_include_directories = [%{mingw_cxx_builtin_include_directories}],
+     tool_paths = {%{mingw_tool_paths}},
++    c_flags = [%{c_flags}],
++    conly_flags = [%{conly_flags}],
++    cxx_flags = [%{cxx_flags}],
++    link_flags = [%{link_flags}],
+ )
+ 
+ toolchain(
+@@ -260,6 +272,10 @@ cc_toolchain_config(
+     tool_paths = {%{mingw_tool_paths}},
+     default_compile_flags = ["-m32"],
+     default_link_flags = ["-m32"],
++    c_flags = [%{c_flags}],
++    conly_flags = [%{conly_flags}],
++    cxx_flags = [%{cxx_flags}],
++    link_flags = [%{link_flags}],
+ )
+ 
+ toolchain(
+@@ -330,6 +346,10 @@ cc_toolchain_config(
+     dbg_mode_debug_flag = "%{dbg_mode_debug_flag_x64}",
+     fastbuild_mode_debug_flag = "%{fastbuild_mode_debug_flag_x64}",
+     supports_parse_showincludes = %{msvc_parse_showincludes_x64},
++    c_flags = [%{c_flags}],
++    conly_flags = [%{conly_flags}],
++    cxx_flags = [%{cxx_flags}],
++    link_flags = [%{link_flags}],
+ )
+ 
+ toolchain(
+@@ -399,6 +419,10 @@ cc_toolchain_config(
+     dbg_mode_debug_flag = "%{dbg_mode_debug_flag_x86}",
+     fastbuild_mode_debug_flag = "%{fastbuild_mode_debug_flag_x86}",
+     supports_parse_showincludes = %{msvc_parse_showincludes_x86},
++    c_flags = [%{c_flags}],
++    conly_flags = [%{conly_flags}],
++    cxx_flags = [%{cxx_flags}],
++    link_flags = [%{link_flags}],
+ )
+ 
+ toolchain(
+@@ -468,6 +492,10 @@ cc_toolchain_config(
+     dbg_mode_debug_flag = "%{dbg_mode_debug_flag_arm}",
+     fastbuild_mode_debug_flag = "%{fastbuild_mode_debug_flag_arm}",
+     supports_parse_showincludes = %{msvc_parse_showincludes_arm},
++    c_flags = [%{c_flags}],
++    conly_flags = [%{conly_flags}],
++    cxx_flags = [%{cxx_flags}],
++    link_flags = [%{link_flags}],
+ )
+ 
+ toolchain(
+@@ -537,6 +565,10 @@ cc_toolchain_config(
+     dbg_mode_debug_flag = "%{dbg_mode_debug_flag_arm64}",
+     fastbuild_mode_debug_flag = "%{fastbuild_mode_debug_flag_arm64}",
+     supports_parse_showincludes = %{msvc_parse_showincludes_arm64},
++    c_flags = [%{c_flags}],
++    conly_flags = [%{conly_flags}],
++    cxx_flags = [%{cxx_flags}],
++    link_flags = [%{link_flags}],
+ )
+ 
+ toolchain(
+@@ -604,6 +636,10 @@ cc_toolchain_config(
+     dbg_mode_debug_flag = "%{clang_cl_dbg_mode_debug_flag_x64}",
+     fastbuild_mode_debug_flag = "%{clang_cl_fastbuild_mode_debug_flag_x64}",
+     supports_parse_showincludes = %{clang_cl_parse_showincludes_x64},
++    c_flags = [%{c_flags}],
++    conly_flags = [%{conly_flags}],
++    cxx_flags = [%{cxx_flags}],
++    link_flags = [%{link_flags}],
+ )
+ 
+ toolchain(
+@@ -672,6 +708,10 @@ cc_toolchain_config(
      dbg_mode_debug_flag = "%{clang_cl_dbg_mode_debug_flag_arm64}",
+     fastbuild_mode_debug_flag = "%{clang_cl_fastbuild_mode_debug_flag_arm64}",
+     supports_parse_showincludes = %{clang_cl_parse_showincludes_arm64},
++    c_flags = [%{c_flags}],
++    conly_flags = [%{conly_flags}],
++    cxx_flags = [%{cxx_flags}],
++    link_flags = [%{link_flags}],
+ )
+ 
+ toolchain(
 diff --git a/cc/private/toolchain/cc_configure.bzl b/cc/private/toolchain/cc_configure.bzl
 index ce0dac5..8cbf874 100644
 --- a/cc/private/toolchain/cc_configure.bzl
