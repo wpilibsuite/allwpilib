@@ -365,14 +365,14 @@ wpilib_maven_export(
     },
     visibility = ["//visibility:public"],
     windows_artifacts = {
-        "windowsarm64": ":wpiutil_shared_zip-opt-windowsarm64",
-        "windowsarm64debug": ":wpiutil_shared_zip-dbg-windowsarm64",
-        "windowsarm64static": ":wpiutil_static_zip-opt-windowsarm64",
-        "windowsarm64staticdebug": ":wpiutil_static_zip-dbg-windowsarm64",
-        "windowsx86-64": ":wpiutil_shared_zip-opt-windowsx86-64",
-        "windowsx86-64debug": ":wpiutil_shared_zip-dbg-windowsx86-64",
-        "windowsx86-64static": ":wpiutil_static_zip-opt-windowsx86-64",
-        "windowsx86-64staticdebug": ":wpiutil_static_zip-dbg-windowsx86-64",
+        "windowsarm64": ":wpiutil_shared_zip-opt-windows-arm64",
+        "windowsarm64debug": ":wpiutil_shared_zip-dbg-windows-arm64",
+        "windowsarm64static": ":wpiutil_static_zip-opt-windows-arm64",
+        "windowsarm64staticdebug": ":wpiutil_static_zip-dbg-windows-arm64",
+        "windowsx86-64": ":wpiutil_shared_zip-opt-windows-x86-64",
+        "windowsx86-64debug": ":wpiutil_shared_zip-dbg-windows-x86-64",
+        "windowsx86-64static": ":wpiutil_static_zip-opt-windows-x86-64",
+        "windowsx86-64staticdebug": ":wpiutil_static_zip-dbg-windows-x86-64",
     },
 )
 

@@ -36,6 +36,8 @@ def architectures_pkg_zip(
         architectures = {
             "//shared/bazel/rules:linux_x86_64": "linux-x86-64",
             "//shared/bazel/rules:osx": "osxuniversal",
+            "//shared/bazel/rules:windows_arm64": "windows-arm64",
+            "//shared/bazel/rules:windows_x86_64": "windows-x86-64",
             "@rules_bzlmodrio_toolchains//platforms/systemcore": "systemcore",
         },
         **kwargs):
@@ -43,6 +45,8 @@ def architectures_pkg_zip(
         "linux-x86-64": ["@platforms//os:linux"],
         "osxuniversal": ["@platforms//os:osx"],
         "systemcore": None,
+        "windows-arm64": ["@platforms//os:windows"],
+        "windows-x86-64": ["@platforms//os:windows"],
     }
     for compilation_mode in compilation_modes:
         for platform, shortname in architectures.items():
