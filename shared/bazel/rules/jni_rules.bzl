@@ -2,6 +2,7 @@ load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_java//java:defs.bzl", "java_library")
 load("@rules_pkg//:mappings.bzl", "filter_directory")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 
 def _jni_headers_impl(ctx):
     include_dir = ctx.actions.declare_directory(ctx.attr.name + ".h")
@@ -100,8 +101,28 @@ def wpilib_jni_java_library(
 def wpilib_jni_cc_library(
         name,
         deps = [],
+        dynamic_deps = [],
+        static_deps = [],
         java_dep = None,
         **kwargs):
+    """
+    Helper macro to create a JNI library, as well as some additional artifacts used
+    for publishing.
+
+    Produces the following outputs:
+        1. <name>        - standard cc_library
+        2. static/<name> - cc_static_library with transative object symbols stripped out
+        3. shared/<name> - cc_shared_library with transative object symbols stripped out
+
+    Params
+        deps: C++ Deps for the standard library
+        dynamic_deps: Dynamic deps, used in the creation of the cc_shared_library only
+        static_deps: Static deps, used in the creation of the cc_static_library only
+        java_dep: The java library that contains the native interface definition. Used to extract
+                  auto-generated jni header files.
+
+    """
+
     jni = "@rules_bzlmodrio_toolchains//jni"
 
     if java_dep[0] != ":":
@@ -111,4 +132,19 @@ def wpilib_jni_cc_library(
         name = name,
         deps = [jni, java_dep + ".hdrs"] + deps,
         **kwargs
+    )
+
+    wpilib_cc_shared_library(
+        name = "shared/{}".format(name),
+        auto_export_windows_symbols = False,
+        dynamic_deps = dynamic_deps,
+        visibility = ["//visibility:public"],
+        deps = [name],
+    )
+
+    wpilib_cc_static_library(
+        name = "static/{}".format(name),
+        static_deps = static_deps,
+        visibility = ["//visibility:public"],
+        deps = [name],
     )

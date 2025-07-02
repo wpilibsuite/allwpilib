@@ -177,22 +177,15 @@ wpilib_jni_cc_library(
         "src/main/native/cpp/jni/**",
         "src/main/native/cpp/**/*.h",
     ]),
+    dynamic_deps = [
+        ":shared/wpinet",
+        "//wpiutil:shared/wpiutil",
+    ],
     java_dep = ":wpinet-java",
     visibility = ["//visibility:public"],
     deps = [
         ":wpinet",
     ],
-)
-
-wpilib_cc_shared_library(
-    name = "shared/wpinetjni",
-    auto_export_windows_symbols = False,
-    dynamic_deps = [
-        ":shared/wpinet",
-        "//wpiutil:shared/wpiutil",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [":wpinetjni"],
 )
 
 wpilib_jni_java_library(
