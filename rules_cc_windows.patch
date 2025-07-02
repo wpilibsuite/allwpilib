@@ -1,0 +1,241 @@
+diff --git a/cc/private/toolchain/BUILD.tpl b/cc/private/toolchain/BUILD.tpl
+index 522d67e..afc8a25 100644
+--- a/cc/private/toolchain/BUILD.tpl
++++ b/cc/private/toolchain/BUILD.tpl
+@@ -115,6 +115,7 @@ cc_toolchain_config(
+     opt_compile_flags = [%{opt_compile_flags}],
+     dbg_compile_flags = [%{dbg_compile_flags}],
+     conly_flags = [%{conly_flags}],
++    c_flags = [%{c_flags}],
+     cxx_flags = [%{cxx_flags}],
+     link_flags = [%{link_flags}],
+     link_libs = [%{link_libs}],
+diff --git a/cc/private/toolchain/BUILD.windows.tpl b/cc/private/toolchain/BUILD.windows.tpl
+index 75fbd0a..3e7602b 100644
+--- a/cc/private/toolchain/BUILD.windows.tpl
++++ b/cc/private/toolchain/BUILD.windows.tpl
+@@ -667,6 +667,10 @@ cc_toolchain_config(
+         "objdump": "wrapper/bin/msvc_nop.bat",
+         "strip": "wrapper/bin/msvc_nop.bat",
+     },
++    c_flags = [%{c_flags}],
++    conly_flags = [%{conly_flags}],
++    cxx_flags = [%{cxx_flags}],
++    link_flags = [%{link_flags}],
+     archiver_flags = ["/MACHINE:ARM64"],
+     default_link_flags = ["/MACHINE:ARM64"],
+     dbg_mode_debug_flag = "%{clang_cl_dbg_mode_debug_flag_arm64}",
+diff --git a/cc/private/toolchain/cc_configure.bzl b/cc/private/toolchain/cc_configure.bzl
+index ce0dac5..8cbf874 100644
+--- a/cc/private/toolchain/cc_configure.bzl
++++ b/cc/private/toolchain/cc_configure.bzl
+@@ -113,6 +113,7 @@ cc_autoconf = repository_rule(
+         "BAZEL_COMPILER",
+         "BAZEL_HOST_SYSTEM",
+         "BAZEL_CONLYOPTS",
++        "BAZEL_COPTS",
+         "BAZEL_CXXOPTS",
+         "BAZEL_LINKOPTS",
+         "BAZEL_LINKLIBS",
+diff --git a/cc/private/toolchain/unix_cc_configure.bzl b/cc/private/toolchain/unix_cc_configure.bzl
+index 6a6f38a..50270a1 100644
+--- a/cc/private/toolchain/unix_cc_configure.bzl
++++ b/cc/private/toolchain/unix_cc_configure.bzl
+@@ -459,6 +459,12 @@ def configure_unix_toolchain(repository_ctx, cpu_value, overridden_tools):
+         },
+     )
+ 
++    c_opts = split_escaped(get_env_var(
++        repository_ctx,
++        "BAZEL_COPTS",
++        "",
++        False,
++    ), ":")
+     conly_opts = split_escaped(get_env_var(
+         repository_ctx,
+         "BAZEL_CONLYOPTS",
+@@ -662,6 +668,7 @@ def configure_unix_toolchain(repository_ctx, cpu_value, overridden_tools):
+                 False,
+             )),
+             "%{conly_flags}": get_starlark_list(conly_opts),
++            "%{c_flags}": get_starlark_list(c_opts),
+             "%{coverage_compile_flags}": coverage_compile_flags,
+             "%{coverage_link_flags}": coverage_link_flags,
+             "%{cxx_builtin_include_directories}": get_starlark_list(builtin_include_directories),
+diff --git a/cc/private/toolchain/unix_cc_toolchain_config.bzl b/cc/private/toolchain/unix_cc_toolchain_config.bzl
+index ee26a55..23da019 100644
+--- a/cc/private/toolchain/unix_cc_toolchain_config.bzl
++++ b/cc/private/toolchain/unix_cc_toolchain_config.bzl
+@@ -407,6 +407,14 @@ def _impl(ctx):
+                 ] if ctx.attr.opt_compile_flags else []),
+                 with_features = [with_feature_set(features = ["opt"])],
+             ),
++            flag_set(
++                actions = all_compile_actions,
++                flag_groups = ([
++                    flag_group(
++                        flags = ctx.attr.c_flags,
++                    ),
++                ] if ctx.attr.c_flags else []),
++            ),
+             flag_set(
+                 actions = [ACTION_NAMES.c_compile],
+                 flag_groups = ([
+@@ -1916,6 +1924,7 @@ cc_toolchain_config = rule(
+         "compile_flags": attr.string_list(),
+         "compiler": attr.string(mandatory = True),
+         "conly_flags": attr.string_list(),
++        "c_flags": attr.string_list(),
+         "coverage_compile_flags": attr.string_list(),
+         "coverage_link_flags": attr.string_list(),
+         "cpu": attr.string(mandatory = True),
+diff --git a/cc/private/toolchain/windows_cc_configure.bzl b/cc/private/toolchain/windows_cc_configure.bzl
+index 66ca5fb..3dddadc 100644
+--- a/cc/private/toolchain/windows_cc_configure.bzl
++++ b/cc/private/toolchain/windows_cc_configure.bzl
+@@ -21,7 +21,9 @@ load(
+     "auto_configure_warning_maybe",
+     "escape_string",
+     "execute",
++    "get_starlark_list",
+     "resolve_labels",
++    "split_escaped",
+     "write_builtin_include_directory_paths",
+ )
+ 
+@@ -848,6 +850,40 @@ def _get_msvc_deps_scanner_vars(repository_ctx, paths, template_vars, target_arc
+         "%{msvc_deps_scanner_wrapper_path_" + target_arch + "}": "msvc_deps_scanner_wrapper_" + target_arch + ".bat",
+     }
+ 
++def _get_copts(repository_ctx):
++    """Get the variables we need to populate the msys/mingw toolchains."""
++    conly_opts = split_escaped(_get_env_var(
++        repository_ctx,
++        "BAZEL_CONLYOPTS",
++        "",
++        False,
++    ), ":")
++    c_opts = split_escaped(_get_env_var(
++        repository_ctx,
++        "BAZEL_COPTS",
++        "",
++        False,
++    ), ":")
++    cxx_opts = split_escaped(_get_env_var(
++        repository_ctx,
++        "BAZEL_CXXOPTS",
++        "",
++        False,
++    ), ":")
++    link_opts = split_escaped(_get_env_var(
++        repository_ctx,
++        "BAZEL_LINKOPTS",
++        "",
++        False,
++    ), ":")
++    msys_mingw_vars = {
++        "%{c_flags}": get_starlark_list(c_opts),
++        "%{conly_flags}": get_starlark_list(conly_opts),
++        "%{cxx_flags}": get_starlark_list(cxx_opts),
++        "%{link_flags}": get_starlark_list(link_opts),
++    }
++    return msys_mingw_vars
++
+ def configure_windows_toolchain(repository_ctx):
+     """Configure C++ toolchain on Windows.
+ 
+@@ -882,6 +918,7 @@ def configure_windows_toolchain(repository_ctx):
+     template_vars.update(msvc_vars_x64)
+     template_vars.update(_get_clang_cl_vars(repository_ctx, paths, msvc_vars_x64, "x64"))
+     template_vars.update(_get_msys_mingw_vars(repository_ctx))
++    template_vars.update(_get_copts(repository_ctx))
+     template_vars.update(_get_msvc_vars(repository_ctx, paths, "x86", msvc_vars_x64))
+     template_vars.update(_get_msvc_vars(repository_ctx, paths, "arm", msvc_vars_x64))
+     msvc_vars_arm64 = _get_msvc_vars(repository_ctx, paths, "arm64", msvc_vars_x64)
+diff --git a/cc/private/toolchain/windows_cc_toolchain_config.bzl b/cc/private/toolchain/windows_cc_toolchain_config.bzl
+index 5564e9c..03b5d0c 100644
+--- a/cc/private/toolchain/windows_cc_toolchain_config.bzl
++++ b/cc/private/toolchain/windows_cc_toolchain_config.bzl
+@@ -88,6 +88,12 @@ all_link_actions = [
+     ACTION_NAMES.cpp_link_nodeps_dynamic_library,
+ ]
+ 
++lto_index_actions = [
++    ACTION_NAMES.lto_index_for_executable,
++    ACTION_NAMES.lto_index_for_dynamic_library,
++    ACTION_NAMES.lto_index_for_nodeps_dynamic_library,
++]
++
+ def _use_msvc_toolchain(ctx):
+     return ctx.attr.cpu in ["x64_windows", "arm64_windows"] and (ctx.attr.compiler == "msvc-cl" or ctx.attr.compiler == "clang-cl")
+ 
+@@ -725,6 +731,14 @@ def _impl(ctx):
+                         ),
+                     ],
+                 ),
++                flag_set(
++                    actions = all_link_actions + lto_index_actions,
++                    flag_groups = ([
++                        flag_group(
++                            flags = ctx.attr.link_flags,
++                        ),
++                    ] if ctx.attr.link_flags else []),
++                ),
+             ],
+         )
+ 
+@@ -1534,7 +1548,11 @@ def _impl(ctx):
+                             ACTION_NAMES.lto_backend,
+                             ACTION_NAMES.clif_match,
+                         ],
+-                        flag_groups = [
++                        flag_groups = ([
++                            flag_group(
++                                flags = ctx.attr.c_flags,
++                            ),
++                        ] if ctx.attr.c_flags else []) + [
+                             flag_group(
+                                 flags = ["%{user_compile_flags}"],
+                                 iterate_over = "user_compile_flags",
+@@ -1542,6 +1560,30 @@ def _impl(ctx):
+                             ),
+                         ],
+                     ),
++                    flag_set(
++                        actions = [ACTION_NAMES.c_compile],
++                        flag_groups = ([
++                            flag_group(
++                                flags = ctx.attr.conly_flags,
++                            ),
++                        ] if ctx.attr.conly_flags else []),
++                    ),
++                    flag_set(
++                        actions = [
++                            ACTION_NAMES.linkstamp_compile,
++                            ACTION_NAMES.cpp_compile,
++                            ACTION_NAMES.cpp_header_parsing,
++                            ACTION_NAMES.cpp_module_compile,
++                            ACTION_NAMES.cpp_module_codegen,
++                            ACTION_NAMES.lto_backend,
++                            ACTION_NAMES.clif_match,
++                        ],
++                        flag_groups = ([
++                            flag_group(
++                                flags = ctx.attr.cxx_flags,
++                            ),
++                        ] if ctx.attr.cxx_flags else []),
++                    ),
+                 ],
+             )
+ 
+@@ -1642,6 +1684,10 @@ cc_toolchain_config = rule(
+         "abi_libc_version": attr.string(),
+         "abi_version": attr.string(),
+         "archiver_flags": attr.string_list(default = []),
++        "cxx_flags": attr.string_list(),
++        "c_flags": attr.string_list(),
++        "conly_flags": attr.string_list(),
++        "link_flags": attr.string_list(),
+         "compiler": attr.string(),
+         "cpu": attr.string(mandatory = True),
+         "cxx_builtin_include_directories": attr.string_list(),
