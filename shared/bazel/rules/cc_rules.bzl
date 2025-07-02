@@ -386,3 +386,29 @@ def wpilib_cc_static_library(
         srcs = ["//:license_pkg_files", name + "-static.pkg"],
         tags = ["no-remote", "manual"],
     )
+
+def wpilib_shared_and_static_library(
+        name,
+        dynamic_deps = [],
+        static_deps = [],
+        visibility = None,
+        **kwargs):
+    wpilib_cc_library(
+        name = name,
+        visibility = visibility,
+        **kwargs
+    )
+
+    wpilib_cc_shared_library(
+        name = "shared/{}".format(name),
+        deps = [":{}".format(name)],
+        dynamic_deps = dynamic_deps,
+        visibility = visibility,
+    )
+
+    wpilib_cc_static_library(
+        name = "static/{}".format(name),
+        deps = [":{}".format(name)],
+        static_deps = static_deps,
+        visibility = visibility,
+    )

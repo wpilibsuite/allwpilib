@@ -4,7 +4,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_shared_and_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
@@ -130,7 +130,7 @@ filegroup(
     }),
 )
 
-wpilib_cc_library(
+wpilib_shared_and_static_library(
     name = "wpiutil",
     srcs = glob(
         ["src/main/native/cpp/**"],
@@ -162,22 +162,6 @@ wpilib_cc_library(
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@bzlmodrio-ni//libraries/cpp/ni:shared"],
         "//conditions:default": [],
     }),
-)
-
-wpilib_cc_shared_library(
-    name = "shared/wpiutil",
-    visibility = ["//visibility:public"],
-    deps = [
-        ":wpiutil",
-    ],
-)
-
-wpilib_cc_static_library(
-    name = "static/wpiutil",
-    visibility = ["//visibility:public"],
-    deps = [
-        ":wpiutil",
-    ],
 )
 
 cc_library(

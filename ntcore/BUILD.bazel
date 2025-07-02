@@ -5,7 +5,7 @@ load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//ntcore:generate_ntcore.bzl", "generate_ntcore")
-load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_shared_and_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
@@ -75,19 +75,29 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-wpilib_cc_library(
+wpilib_shared_and_static_library(
     name = "ntcore",
     srcs = glob(
         ["src/main/native/cpp/**"],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**/*"]),
+    dynamic_deps = [
+        "//datalog:shared/datalog",
+        "//wpinet:shared/wpinet",
+        "//wpiutil:shared/wpiutil",
+    ],
     extra_src_pkg_files = [
         ":ntcore-java-jni-hdrs-pkg",
     ],
     includes = [
         "src/main/native/cpp",
         "src/main/native/include",
+    ],
+    static_deps = [
+        "//datalog:static/datalog",
+        "//wpinet:static/wpinet",
+        "//wpiutil:static/wpiutil",
     ],
     strip_include_prefix = "src/main/native/include",
     third_party_libraries = [
@@ -98,32 +108,6 @@ wpilib_cc_library(
         "//datalog",
         "//wpinet",
         "//wpiutil",
-    ],
-)
-
-wpilib_cc_shared_library(
-    name = "shared/ntcore",
-    dynamic_deps = [
-        "//datalog:shared/datalog",
-        "//wpinet:shared/wpinet",
-        "//wpiutil:shared/wpiutil",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":ntcore",
-    ],
-)
-
-wpilib_cc_static_library(
-    name = "static/ntcore",
-    static_deps = [
-        "//datalog:static/datalog",
-        "//wpinet:static/wpinet",
-        "//wpiutil:static/wpiutil",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":ntcore",
     ],
 )
 

@@ -1,24 +1,13 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_shared_and_static_library")
 
-wpilib_cc_library(
+wpilib_shared_and_static_library(
     name = "romiVendordep",
     srcs = glob([
         "src/main/native/cpp/**",
     ]),
     hdrs = glob(["src/main/native/include/**"]),
-    strip_include_prefix = "src/main/native/include",
-    visibility = ["//visibility:public"],
-    deps = [
-        "//ntcore",
-        "//wpilibc",
-        "//wpinet",
-    ],
-)
-
-wpilib_cc_shared_library(
-    name = "shared/romiVendordep",
     dynamic_deps = [
         "//hal:shared/wpiHal",
         "//ntcore:shared/ntcore",
@@ -26,22 +15,17 @@ wpilib_cc_shared_library(
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
     ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":romiVendordep",
-    ],
-)
-
-wpilib_cc_static_library(
-    name = "static/romiVendordep",
     static_deps = [
         "//ntcore:static/ntcore",
         "//wpilibc:static/wpilibc",
         "//wpinet:static/wpinet",
     ],
+    strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
-        ":romiVendordep",
+        "//ntcore",
+        "//wpilibc",
+        "//wpinet",
     ],
 )
 
