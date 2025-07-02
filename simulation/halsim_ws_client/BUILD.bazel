@@ -7,6 +7,21 @@ wpilib_halsim_extension(
         "src/main/native/cpp/*.cpp",
         "src/main/native/include/*.h",
     ]),
+    auto_export_windows_symbols = False,
+    dynamic_deps = [
+        "//hal:shared/wpiHal",
+        "//wpinet:shared/wpinet",
+        "//wpiutil:shared/wpiutil",
+    ],
+    includes = ["src/main/native/include"],
+    init_extension_name = "HALSIM_InitExtension_WS_CLIENT",
+    static_deps = [
+        "//hal:static/wpiHal",
+        "//wpinet:static/wpinet",
+        "//wpiutil:static/wpiutil",
+        "//simulation/halsim_ws_core:static/halsim_ws_core",
+    ],
+    visibility = ["//visibility:public"],
     deps = [
         "//simulation/halsim_ws_core",
     ],

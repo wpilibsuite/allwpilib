@@ -392,6 +392,7 @@ def wpilib_shared_and_static_library(
         dynamic_deps = [],
         static_deps = [],
         visibility = None,
+        auto_export_windows_symbols = True,
         **kwargs):
     wpilib_cc_library(
         name = name,
@@ -404,6 +405,7 @@ def wpilib_shared_and_static_library(
         deps = [":{}".format(name)],
         dynamic_deps = dynamic_deps,
         visibility = visibility,
+        auto_export_windows_symbols = auto_export_windows_symbols,
     )
 
     wpilib_cc_static_library(

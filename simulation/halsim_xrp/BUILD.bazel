@@ -1,64 +1,19 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:halsim_library.bzl", "wpilib_halsim_extension")
 
-wpilib_cc_library(
+wpilib_halsim_extension(
     name = "halsim_xrp",
     srcs = glob([
         "src/main/native/cpp/*",
         "src/main/native/include/*.h",
     ]),
-    include_license_files = True,
-    includes = ["src/main/native/include"],
-    target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-    visibility = ["//visibility:public"],
-    deps = [
-        "//simulation/halsim_ws_core",
-        "//wpinet",
-    ],
-)
-
-wpilib_cc_library(
-    name = "halsim_xrp_static",
-    srcs = glob([
-        "src/main/native/cpp/*",
-        "src/main/native/include/*.h",
-    ]),
-    copts = [
-        "-DHALSIM_InitExtension=HALSIM_InitExtension_XRP",
-    ],
-    include_license_files = True,
-    includes = ["src/main/native/include"],
-    target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-    visibility = ["//visibility:public"],
-    deps = [
-        "//simulation/halsim_ws_core",
-        "//wpinet",
-    ],
-)
-
-wpilib_cc_shared_library(
-    name = "shared/halsim_xrp",
     auto_export_windows_symbols = False,
     dynamic_deps = [
         "//wpinet:shared/wpinet",
         "//hal:shared/wpiHal",
     ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":halsim_xrp",
-    ],
-)
-
-wpilib_cc_static_library(
-    name = "static/halsim_xrp",
+    includes = ["src/main/native/include"],
+    init_extension_name = "HALSIM_InitExtension_XRP",
     static_deps = [
         "//wpinet:static/wpinet",
         "//hal:static/wpiHal",
@@ -66,7 +21,8 @@ wpilib_cc_static_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":halsim_xrp_static",
+        "//simulation/halsim_ws_core",
+        "//wpinet",
     ],
 )
 
