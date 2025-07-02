@@ -1,3 +1,4 @@
+load("@build_bazel_apple_support//rules:universal_binary.bzl", "universal_binary")
 load("@rules_cc//cc:action_names.bzl", "CPP_LINK_STATIC_LIBRARY_ACTION_NAME")
 load("@rules_cc//cc:cc_shared_library.bzl", "cc_shared_library")
 load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_library")
@@ -165,12 +166,27 @@ def wpilib_cc_shared_library(
         **kwargs
     )
 
+    universal_name = "universal/lib" + lib + ".lib"
+    universal_binary(
+        name = universal_name,
+        binary = name,
+        target_compatible_with = [
+            "@platforms//os:osx",
+        ],
+    )
+
     pkg_files(
         name = folder + "/lib" + lib + "-shared-files",
-        srcs = [
-            ":" + name,
-        ],
-        strip_prefix = folder,
+        srcs = select({
+            "//shared/bazel/rules:is_osx": [universal_name],
+            "//conditions:default": [
+                ":" + name,
+            ],
+        }),
+        strip_prefix = select({
+            "//shared/bazel/rules:is_osx": "universal",
+            "//conditions:default": folder,
+        }),
     )
 
 CcStaticLibraryInfo = provider(
