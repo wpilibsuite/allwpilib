@@ -90,7 +90,7 @@ index ee26a55..23da019 100644
          "coverage_link_flags": attr.string_list(),
          "cpu": attr.string(mandatory = True),
 diff --git a/cc/private/toolchain/windows_cc_configure.bzl b/cc/private/toolchain/windows_cc_configure.bzl
-index 66ca5fb..044625e 100644
+index 66ca5fb..9dca952 100644
 --- a/cc/private/toolchain/windows_cc_configure.bzl
 +++ b/cc/private/toolchain/windows_cc_configure.bzl
 @@ -21,7 +21,9 @@ load(
@@ -129,13 +129,13 @@ index 66ca5fb..044625e 100644
 +        "BAZEL_LINKOPTS",
 +        "",
 +    ), ":")
-+    msys_mingw_vars = {
++    copts_vars = {
 +        "%{c_flags}": get_starlark_list(c_opts),
 +        "%{conly_flags}": get_starlark_list(conly_opts),
 +        "%{cxx_flags}": get_starlark_list(cxx_opts),
 +        "%{link_flags}": get_starlark_list(link_opts),
 +    }
-+    return msys_mingw_vars
++    return copts_vars
 +
  def configure_windows_toolchain(repository_ctx):
      """Configure C++ toolchain on Windows.
@@ -149,7 +149,7 @@ index 66ca5fb..044625e 100644
      template_vars.update(_get_msvc_vars(repository_ctx, paths, "arm", msvc_vars_x64))
      msvc_vars_arm64 = _get_msvc_vars(repository_ctx, paths, "arm64", msvc_vars_x64)
 diff --git a/cc/private/toolchain/windows_cc_toolchain_config.bzl b/cc/private/toolchain/windows_cc_toolchain_config.bzl
-index 5564e9c..03b5d0c 100644
+index 5564e9c..fbf63ad 100644
 --- a/cc/private/toolchain/windows_cc_toolchain_config.bzl
 +++ b/cc/private/toolchain/windows_cc_toolchain_config.bzl
 @@ -88,6 +88,12 @@ all_link_actions = [
@@ -165,7 +165,51 @@ index 5564e9c..03b5d0c 100644
  def _use_msvc_toolchain(ctx):
      return ctx.attr.cpu in ["x64_windows", "arm64_windows"] and (ctx.attr.compiler == "msvc-cl" or ctx.attr.compiler == "clang-cl")
  
-@@ -725,6 +731,14 @@ def _impl(ctx):
+@@ -579,7 +585,11 @@ def _impl(ctx):
+                         ACTION_NAMES.cpp20_module_compile,
+                         ACTION_NAMES.cpp20_module_codegen,
+                     ],
+-                    flag_groups = [
++                    flag_groups = ([
++                        flag_group(
++                            flags = ctx.attr.c_flags,
++                        ),
++                    ] if ctx.attr.c_flags else []) + [
+                         flag_group(
+                             flags = ["%{user_compile_flags}"],
+                             iterate_over = "user_compile_flags",
+@@ -587,6 +597,30 @@ def _impl(ctx):
+                         ),
+                     ],
+                 ),
++                flag_set(
++                    actions = [ACTION_NAMES.c_compile],
++                    flag_groups = ([
++                        flag_group(
++                            flags = ctx.attr.conly_flags,
++                        ),
++                    ] if ctx.attr.conly_flags else []),
++                ),
++                flag_set(
++                    actions = [
++                        ACTION_NAMES.linkstamp_compile,
++                        ACTION_NAMES.cpp_compile,
++                        ACTION_NAMES.cpp_header_parsing,
++                        ACTION_NAMES.cpp_module_compile,
++                        ACTION_NAMES.cpp_module_codegen,
++                        ACTION_NAMES.lto_backend,
++                        ACTION_NAMES.clif_match,
++                    ],
++                    flag_groups = ([
++                        flag_group(
++                            flags = ctx.attr.cxx_flags,
++                        ),
++                    ] if ctx.attr.cxx_flags else []),
++                ),
+             ],
+         )
+ 
+@@ -725,6 +759,14 @@ def _impl(ctx):
                          ),
                      ],
                  ),
@@ -180,7 +224,7 @@ index 5564e9c..03b5d0c 100644
              ],
          )
  
-@@ -1534,7 +1548,11 @@ def _impl(ctx):
+@@ -1534,7 +1576,11 @@ def _impl(ctx):
                              ACTION_NAMES.lto_backend,
                              ACTION_NAMES.clif_match,
                          ],
@@ -193,7 +237,7 @@ index 5564e9c..03b5d0c 100644
                              flag_group(
                                  flags = ["%{user_compile_flags}"],
                                  iterate_over = "user_compile_flags",
-@@ -1542,6 +1560,30 @@ def _impl(ctx):
+@@ -1542,6 +1588,30 @@ def _impl(ctx):
                              ),
                          ],
                      ),
@@ -224,7 +268,7 @@ index 5564e9c..03b5d0c 100644
                  ],
              )
  
-@@ -1642,6 +1684,10 @@ cc_toolchain_config = rule(
+@@ -1642,6 +1712,10 @@ cc_toolchain_config = rule(
          "abi_libc_version": attr.string(),
          "abi_version": attr.string(),
          "archiver_flags": attr.string_list(default = []),

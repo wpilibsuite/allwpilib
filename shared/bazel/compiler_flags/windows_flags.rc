@@ -35,7 +35,7 @@ common:windows --repo_env="BAZEL_CONLYOPTS=/FS:/Zc%:inline:/D_CRT_SECURE_NO_WARN
 # build:windows_common --linkopt=/IGNORE:4099
 
 # TODO there is a "bug" in bazel that forces "/D_WIN32_WINNT=0x0601". Remove it from the files that break because of this.
-build:windows --per_file_copt=wpiutil/src/main/native/cpp/timestamp.cpp,wpinet/src/main/native/thirdparty/libuv/src/win/util.cpp,hal/src/main/native/sim/HAL.cpp@/U_WIN32_WINNT
+#build:windows --per_file_copt=wpiutil/src/main/native/cpp/timestamp.cpp,wpinet/src/main/native/thirdparty/libuv/src/win/util.cpp,hal/src/main/native/sim/HAL.cpp@/U_WIN32_WINNT
 
 ################################
 # Standard Windows Flags
