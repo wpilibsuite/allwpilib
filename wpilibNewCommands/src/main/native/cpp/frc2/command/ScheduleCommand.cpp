@@ -18,7 +18,7 @@ ScheduleCommand::ScheduleCommand(Command* toSchedule) {
 
 void ScheduleCommand::Initialize() {
   for (auto command : m_toSchedule) {
-    command->Schedule();
+    frc2::CommandScheduler::GetInstance().Schedule(command);
   }
 }
 
