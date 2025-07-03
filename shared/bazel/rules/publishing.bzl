@@ -140,9 +140,9 @@ def _wpilib_maven_export_impl(
     native.alias(
         name = name + ".publish",
         actual = select({
-            "@platforms//os:windows": name + "-windows.publish",
             "@platforms//os:linux": name + "-linux.publish",
             "@platforms//os:osx": name + "-osx.publish",
+            "@platforms//os:windows": name + "-windows.publish",
         }),
         visibility = visibility,
     )
