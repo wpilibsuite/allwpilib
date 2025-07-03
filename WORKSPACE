@@ -294,6 +294,8 @@ http_archive(
     name = "bzlmodrio-opencv",
     sha256 = "6e8544fae07ed5b4fedc146f6ad083d0d8947e3efb5332a20abc46601a52a1b5",
     url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr2/bzlmodRio-opencv-2025.4.10.0-3.bcr2.tar.gz",
+    patch_args = ["-p1"],
+    patches = ["//:opencv.patch"],
 )
 
 load("@bzlmodrio-opencv//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_opencv_cpp_dependencies")
@@ -309,6 +311,8 @@ http_archive(
     sha256 = "65caef82554617403a16c79e8bcac6553d40eca3e23197e63275bba22db7d5b5",
     strip_prefix = "bzlmodRio-libssh-8405fbd5eb4e42b495f08f6ccf6fbbe5ced28bb7",
     urls = ["https://github.com/wpilibsuite/bzlmodRio-libssh/archive/8405fbd5eb4e42b495f08f6ccf6fbbe5ced28bb7.tar.gz"],
+    patch_args = ["-p1"],
+    patches = ["//:libssh.patch"],
 )
 
 load("@bzlmodrio-libssh//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_libssh_cpp_dependencies")

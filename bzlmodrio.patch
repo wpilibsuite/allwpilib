@@ -107,18 +107,49 @@ index 4fc0098..a188e4d 100644
  
      archive_param_file_feature = feature(
 diff --git a/conditions/BUILD.bazel b/conditions/BUILD.bazel
-index 89d91e6..f1c5931 100644
+index 89d91e6..7f198d0 100644
 --- a/conditions/BUILD.bazel
 +++ b/conditions/BUILD.bazel
-@@ -21,7 +21,6 @@ config_setting(
+@@ -1,13 +1,19 @@
+ # Mimics @bazel_tools/src/conditions:windows
+ config_setting(
+-    name = "windows",
+-    constraint_values = ["@platforms//os:windows"],
++    name = "windows_x86_64",
++    constraint_values = [
++        "@platforms//os:windows",
++        "@platforms//cpu:x86_64",
++    ],
+     visibility = ["//visibility:public"],
+ )
+ 
+ config_setting(
+-    name = "windows_debug",
+-    constraint_values = ["@platforms//os:windows"],
++    name = "windows_x86_64_debug",
++    constraint_values = [
++        "@platforms//os:windows",
++        "@platforms//cpu:x86_64",
++    ],
+     values = {
+         "compilation_mode": "dbg",
+     },
+@@ -19,20 +25,18 @@ config_setting(
+     name = "windows_arm64",
+     constraint_values = [
          "@platforms//os:windows",
-         "@platforms//cpu:x86_64",
+-        "@platforms//cpu:x86_64",
++        "@platforms//cpu:aarch64",
      ],
 -    values = {"cpu": "x64_arm64_windows"},
  )
  
  config_setting(
-@@ -32,7 +31,6 @@ config_setting(
+     name = "windows_arm64_debug",
+     constraint_values = [
+         "@platforms//os:windows",
+-        "@platforms//cpu:x86_64",
++        "@platforms//cpu:aarch64",
      ],
      values = {
          "compilation_mode": "dbg",
