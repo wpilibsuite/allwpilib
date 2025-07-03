@@ -124,11 +124,70 @@ index 75fbd0a..7c8bc60 100644
  )
  
  toolchain(
+diff --git a/cc/private/toolchain/BUILD.windows_toolchains.tpl b/cc/private/toolchain/BUILD.windows_toolchains.tpl
+index e69de29..63f5b6d 100644
+--- a/cc/private/toolchain/BUILD.windows_toolchains.tpl
++++ b/cc/private/toolchain/BUILD.windows_toolchains.tpl
+@@ -0,0 +1,34 @@
++load("@platforms//host:constraints.bzl", "HOST_CONSTRAINTS")
++
++toolchain(
++    name = "cc-toolchain-arm64_windows",
++    exec_compatible_with = HOST_CONSTRAINTS,
++    target_compatible_with = [
++        "@platforms//cpu:arm64",
++        "@platforms//os:windows",
++    ],
++    toolchain = "@local_config_cc//:cc-compiler-arm64_windows",
++    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
++)
++
++toolchain(
++    name = "cc-toolchain-x64_windows",
++    exec_compatible_with = HOST_CONSTRAINTS,
++    target_compatible_with = [
++        "@platforms//cpu:x86_64",
++        "@platforms//os:windows",
++    ],
++    toolchain = "@local_config_cc//:cc-compiler-x64_windows",
++    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
++)
++
++toolchain(
++    name = "cc-toolchain-armeabi-v7a",
++    exec_compatible_with = HOST_CONSTRAINTS,
++    target_compatible_with = [
++        "@platforms//cpu:armv7",
++        "@platforms//os:android",
++    ],
++    toolchain = "@local_config_cc//:cc-compiler-armeabi-v7a",
++    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
++)
 diff --git a/cc/private/toolchain/cc_configure.bzl b/cc/private/toolchain/cc_configure.bzl
-index ce0dac5..8cbf874 100644
+index ce0dac5..d8d8139 100644
 --- a/cc/private/toolchain/cc_configure.bzl
 +++ b/cc/private/toolchain/cc_configure.bzl
-@@ -113,6 +113,7 @@ cc_autoconf = repository_rule(
+@@ -33,12 +33,17 @@ def cc_autoconf_toolchains_impl(repository_ctx):
+     should_detect_cpp_toolchain = "BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN" not in env or env["BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN"] != "1"
+ 
+     if should_detect_cpp_toolchain:
++        if repository_ctx.os.name.find("windows") != -1:
++            build_path = "@rules_cc//cc/private/toolchain:BUILD.windows_toolchains.tpl"
++        else:
++            build_path = "@rules_cc//cc/private/toolchain:BUILD.toolchains.tpl"
+         paths = resolve_labels(repository_ctx, [
+-            "@rules_cc//cc/private/toolchain:BUILD.toolchains.tpl",
++            build_path,
+         ])
++
+         repository_ctx.template(
+             "BUILD",
+-            paths["@rules_cc//cc/private/toolchain:BUILD.toolchains.tpl"],
++            paths[build_path],
+             {"%{name}": get_cpu_value(repository_ctx)},
+         )
+     else:
+@@ -113,6 +118,7 @@ cc_autoconf = repository_rule(
          "BAZEL_COMPILER",
          "BAZEL_HOST_SYSTEM",
          "BAZEL_CONLYOPTS",

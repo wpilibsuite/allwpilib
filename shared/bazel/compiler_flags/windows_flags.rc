@@ -49,9 +49,9 @@ build:windows --repo_env="BAZEL_LINKOPTS=/DEPENDENTLOADFLAG%:0x1100"
 ################################
 #build:windows_arm --config=windows_common
 
-build:windows_arm --cpu=arm64_windows --config=windows
+build:windows_arm --platform="//shared/bazel/rules:windows_arm64" --platform_suffix=windowsarm64
 
-build:windows_arm --linkopt=/IGNORE:4099
+#build:windows_arm --linkopt=/IGNORE:4099
 
 # Ignore duplicate inline statment in tools
 build:windows --host_copt=/wd4141
