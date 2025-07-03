@@ -106,3 +106,23 @@ index 4fc0098..a188e4d 100644
      )
  
      archive_param_file_feature = feature(
+diff --git a/conditions/BUILD.bazel b/conditions/BUILD.bazel
+index 89d91e6..f1c5931 100644
+--- a/conditions/BUILD.bazel
++++ b/conditions/BUILD.bazel
+@@ -21,7 +21,6 @@ config_setting(
+         "@platforms//os:windows",
+         "@platforms//cpu:x86_64",
+     ],
+-    values = {"cpu": "x64_arm64_windows"},
+ )
+ 
+ config_setting(
+@@ -32,7 +31,6 @@ config_setting(
+     ],
+     values = {
+         "compilation_mode": "dbg",
+-        "cpu": "x64_arm64_windows",
+     },
+     visibility = ["//visibility:public"],
+ )
