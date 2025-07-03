@@ -120,6 +120,76 @@ TEST(MathUtilTest, CopySignPowWithUnits) {
           .value());
 }
 
+TEST(MathUtilTest, CopySignPow2d) {
+  const frc::Rotation2d zero{0_deg};
+  const frc::Rotation2d pi{180_deg};
+
+  EXPECT_EQ(frc::Translation2d(0.5, zero),
+            frc::CopySignPow2d(frc::Translation2d(0.5, zero), 1.0));
+  EXPECT_EQ(frc::Translation2d(0.5, pi),
+            frc::CopySignPow2d(frc::Translation2d(0.5, pi), 1.0));
+
+  EXPECT_EQ(frc::Translation2d(0.5 * 0.5, zero),
+            frc::CopySignPow2d(frc::Translation2d(0.5, zero), 2.0));
+  EXPECT_EQ(frc::Translation2d(0.5 * 0.5, pi),
+            frc::CopySignPow2d(frc::Translation2d(0.5, pi), 2.0));
+
+  EXPECT_EQ(frc::Translation2d(std::sqrt(0.5), zero),
+            frc::CopySignPow2d(frc::Translation2d(0.5, zero), 0.5));
+  EXPECT_EQ(frc::Translation2d(std::sqrt(0.5), pi),
+            frc::CopySignPow2d(frc::Translation2d(0.5, pi), 0.5));
+
+  EXPECT_EQ(frc::Translation2d(),
+            frc::CopySignPow2d(frc::Translation2d(), 2.0));
+  EXPECT_EQ(frc::Translation2d(1.0, zero),
+            frc::CopySignPow2d(frc::Translation2d(1.0, zero), 2.0));
+  EXPECT_EQ(frc::Translation2d(1.0, pi),
+            frc::CopySignPow2d(frc::Translation2d(1.0, pi), 2.0));
+
+  EXPECT_EQ(frc::Translation2d(std::pow(0.8, 0.3), frc::Rotation2d(-90_deg)),
+            frc::CopySignPow2d(
+                frc::Translation2d(0.8, frc::Rotation2d(-90_deg), 0.3)));
+  EXPECT_EQ(frc::Translation2d(std::pow(0.8, 0.3), frc::Rotation2d(90_deg)),
+            frc::CopySignPow2d(
+                frc::Translation2d(0.8, frc::Rotation2d(90_deg), 0.3)));
+}
+
+TEST(MathUtilTest, CopySignPow2dMaxDistance) {
+  const frc::Rotation2d zero{0_deg};
+  const frc::Rotation2d pi{180_deg};
+
+  EXPECT_EQ(frc::Translation2d(5, zero),
+            frc::CopySignPow2d(frc::Translation2d(5.0, zero), 1.0, 10.0));
+  EXPECT_EQ(frc::Translation2d(5, pi),
+            frc::CopySignPow2d(frc::Translation2d(5.0, pi), 1.0, 10.0));
+
+  EXPECT_EQ(frc::Translation2d(0.5 * 0.5 * 10, zero),
+            frc::CopySignPow2d(frc::Translation2d(5.0, zero), 2.0, 10.0));
+  EXPECT_EQ(frc::Translation2d(0.5 * 0.5 * 10, pi),
+            frc::CopySignPow2d(frc::Translation2d(5.0, pi), 2.0, 10.0));
+
+  EXPECT_EQ(frc::Translation2d(std::sqrt(0.5) * 10, zero),
+            frc::CopySignPow2d(frc::Translation2d(5.0, zero), 0.5, 10.0));
+  EXPECT_EQ(frc::Translation2d(std::sqrt(0.5) * 10, pi),
+            frc::CopySignPow2d(frc::Translation2d(5.0, pi), 0.5, 10.0));
+
+  EXPECT_EQ(frc::Translation2d(),
+            frc::CopySignPow2d(frc::Translation2d(), 2.0, 5.0));
+  EXPECT_EQ(frc::Translation2d(5.0, zero),
+            frc::CopySignPow2d(frc::Translation2d(5.0, zero), 2.0, 5.0));
+  EXPECT_EQ(frc::Translation2d(5.0, pi),
+            frc::CopySignPow2d(frc::Translation2d(5.0, pi), 2.0, 5.0));
+
+  EXPECT_EQ(
+      frc::Translation2d(std::pow(0.8, 0.3) * 100, frc::Rotation2d(-90_deg)),
+      frc::CopySignPow2d(
+          frc::Translation2d(80, frc::Rotation2d(-90_deg), 0.3, 100.0)));
+  EXPECT_EQ(
+      frc::Translation2d(std::pow(0.8, 0.3) * 100, frc::Rotation2d(90_deg)),
+      frc::CopySignPow2d(
+          frc::Translation2d(80, frc::Rotation2d(90_deg), 0.3, 100.0)));
+}
+
 TEST(MathUtilTest, InputModulus) {
   // These tests check error wrapping. That is, the result of wrapping the
   // result of an angle reference minus the measurement.
