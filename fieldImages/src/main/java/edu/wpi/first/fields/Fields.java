@@ -22,7 +22,7 @@ public class Fields {
     k2024Crescendo("2024-crescendo.json"),
     k2025Reefscape("2025-reefscape.json");
 
-    public final String m_resourceFile;
+    private final String m_resourceFile;
 
     @Override
     public String getResourceFile() {
@@ -37,7 +37,7 @@ public class Fields {
   public enum FTC implements Field {
     k20242025IntoTheDeep("2024-2025-intothedeep.json");
 
-    public final String m_resourceFile;
+    private final String m_resourceFile;
 
     @Override
     public String getResourceFile() {
