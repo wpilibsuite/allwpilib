@@ -24,12 +24,12 @@ includeOtherLibs {
   ^fmt/
   ^fields/
   ^frc/
-  ^google/
   ^imgui
   portable-file-dialogs.h
   ^networktables/
   ^ntcore
   ^units
+  ^upb/
   ^wpi/
   ^wpigui
   ^wpimath/
