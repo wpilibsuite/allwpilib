@@ -92,7 +92,7 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
     // > 0
     assertEquals(
         Translation2d.kZero,
-        MathUtil.applyDeadband2d(new Translation(0.01, Rotation2d.kZero), 0.02));
+        MathUtil.applyDeadband2d(new Translation2d(0.01, Rotation2d.kZero), 0.02));
     assertEquals(
         Translation2d.kZero,
         MathUtil.applyDeadband2d(new Translation2d(0.02, Rotation2d.kZero), 0.02));
@@ -123,7 +123,7 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
     // > 0
     assertEquals(
         Translation2d.kZero,
-        MathUtil.applyDeadband2d(new Translation(0.01, Rotation2d.kZero), 0.02, 2.5));
+        MathUtil.applyDeadband2d(new Translation2d(0.01, Rotation2d.kZero), 0.02, 2.5));
     assertEquals(
         Translation2d.kZero,
         MathUtil.applyDeadband2d(new Translation2d(0.02, Rotation2d.kZero), 0.02, 2.5));
