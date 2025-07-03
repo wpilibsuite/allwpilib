@@ -1,6 +1,7 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
 
 pkg_files(
     name = "license_pkg_files",
@@ -17,6 +18,7 @@ compile_pip_requirements(
     extra_args = ["--allow-unsafe"],
     requirements_in = "requirements.txt",
     requirements_txt = "requirements_lock.txt",
+    requirements_windows = "//:requirements_windows_lock.txt",
     # compile_pip_requirements does not respect target_compatible_with for some of the targets it generates under the hood
     tags = ["no-systemcore"],
 )

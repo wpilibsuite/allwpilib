@@ -4,6 +4,12 @@
 #
 #    bazel run //:requirements.update
 #
+colorama==0.4.6 \
+    --hash=sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44 \
+    --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
+    # via
+    #   pkgconf
+    #   pytest
 cxxheaderparser[pcpp]==1.5.0 \
     --hash=sha256:0b9600f817d7378794a0f5df10972fd85f73ba9d3ea0090a5b6b5c12be3b1f01 \
     --hash=sha256:2a93fc81c62d2e4de3e92a697336557debe13db44bfef0f2d4fa81501cd1f36f

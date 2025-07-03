@@ -1,4 +1,4 @@
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file", "http_jar")
 
 http_archive(
     name = "rules_cc",
@@ -54,6 +54,7 @@ pip_parse(
     name = "allwpilib_pip_deps",
     python_interpreter_target = "@python_3_10_host//:python",
     requirements_lock = "//:requirements_lock.txt",
+    requirements_windows = "//:requirements_windows_lock.txt",
 )
 
 load("@allwpilib_pip_deps//:requirements.bzl", "install_deps")
@@ -320,3 +321,28 @@ rules_proto_dependencies()
 load("@rules_proto//proto:setup.bzl", "rules_proto_setup")
 
 rules_proto_setup()
+
+http_archive(
+    name = "pybind11_bazel",
+    integrity = "sha256-iwRj1wuX2pDS6t6DqiCfhIXisv4y+7CvxSJtZoSAzGw=",
+    strip_prefix = "pybind11_bazel-2b6082a4d9d163a52299718113fa41e4b7978db5",
+    urls = ["https://github.com/pybind/pybind11_bazel/archive/2b6082a4d9d163a52299718113fa41e4b7978db5.tar.gz"],
+)
+
+http_archive(
+    name = "pybind11",
+    build_file = "@pybind11_bazel//:pybind11-BUILD.bazel",
+    strip_prefix = "pybind11-dfe7e65b4527eeb11036402aac3a394130960bb2",
+    urls = ["https://github.com/pybind/pybind11/archive/dfe7e65b4527eeb11036402aac3a394130960bb2.zip"],
+)
+
+http_archive(
+    name = "rules_python_pytest",
+    sha256 = "e2556404ef56ea3ec938597616afc51d78e1832cfe511b196e9f2b8fd7f8f149",
+    strip_prefix = "rules_python_pytest-1.1.1",
+    url = "https://github.com/caseyduquettesc/rules_python_pytest/releases/download/v1.1.1/rules_python_pytest-v1.1.1.tar.gz",
+)
+
+load("@rules_python_pytest//python_pytest:repositories.bzl", "rules_python_pytest_dependencies")
+
+rules_python_pytest_dependencies()
