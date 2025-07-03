@@ -49,7 +49,7 @@ build:windows --repo_env="BAZEL_LINKOPTS=/DEPENDENTLOADFLAG%:0x1100"
 ################################
 #build:windows_arm --config=windows_common
 
-build:windows_arm --platform="//shared/bazel/rules:windows_arm64" --platform_suffix=windowsarm64
+build:windows_arm --platforms="//shared/bazel/rules:windows_arm64" --platform_suffix=windowsarm64
 
 #build:windows_arm --linkopt=/IGNORE:4099
 
