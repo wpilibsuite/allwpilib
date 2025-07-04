@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.simulation.SendableChooserSim;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,7 @@ class SendableChooserTest {
       chooserSim.setSelected(String.valueOf(toSelect));
       SmartDashboard.updateValues();
       assertEquals(toSelect, chooser.getSelected());
+      assertEquals(String.valueOf(toSelect), chooser.getSelectedName());
     }
   }
 
@@ -54,6 +56,7 @@ class SendableChooserTest {
       chooser.setDefaultOption(String.valueOf(0), 0);
 
       assertEquals(0, chooser.getSelected());
+      assertEquals(String.valueOf(0), chooser.getSelectedName());
     }
   }
 
@@ -65,24 +68,52 @@ class SendableChooserTest {
       }
 
       assertNull(chooser.getSelected());
+      assertEquals("", chooser.getSelectedName());
     }
   }
 
   @Test
-  void testChangeListener() {
+  void test1ArgChangeListener() {
     try (var chooser = new SendableChooser<Integer>();
-        var chooserSim = new SendableChooserSim(m_inst, "/SmartDashboard/changeListenerChooser/")) {
+        var chooserSim =
+            new SendableChooserSim(m_inst, "/SmartDashboard/1ArgChangeListenerChooser/")) {
       for (int i = 1; i <= 3; i++) {
         chooser.addOption(String.valueOf(i), i);
       }
       AtomicInteger currentVal = new AtomicInteger();
       chooser.onChange(currentVal::set);
 
-      SmartDashboard.putData("changeListenerChooser", chooser);
+      SmartDashboard.putData("1ArgChangeListenerChooser", chooser);
       SmartDashboard.updateValues();
       chooserSim.setSelected("3");
       SmartDashboard.updateValues();
       assertEquals(3, currentVal.get());
+    }
+  }
+
+  @Test
+  void test2ArgChangeListener() {
+    try (var chooser = new SendableChooser<Integer>();
+        var chooserSim =
+            new SendableChooserSim(m_inst, "/SmartDashboard/2ArgChangeListenerChooser/")) {
+      for (int i = 1; i <= 3; i++) {
+        chooser.addOption(String.valueOf(i), i);
+      }
+
+      AtomicReference<String> currentName = new AtomicReference<>("");
+      AtomicInteger currentVal = new AtomicInteger();
+      chooser.onChange(
+          (String name, Integer value) -> {
+            currentName.set(name);
+            currentVal.set(value);
+          });
+
+      SmartDashboard.putData("2ArgChangeListenerChooser", chooser);
+      SmartDashboard.updateValues();
+      chooserSim.setSelected("3");
+      SmartDashboard.updateValues();
+      assertEquals(3, currentVal.get());
+      assertEquals("3", currentName.get());
     }
   }
 
