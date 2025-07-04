@@ -169,6 +169,8 @@ public class OnboardIMU {
       case kPortrait:
         IMUJNI.getIMUEulerAnglesPortrait(anglesRaw);
         break;
+      default:
+        break;
     }
     return anglesRaw;
   }
