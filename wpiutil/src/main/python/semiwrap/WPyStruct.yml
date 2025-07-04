@@ -1,0 +1,31 @@
+functions:
+  forEachNested:
+    subpackage: wpistruct
+    no_release_gil: true
+  getTypeName:
+    subpackage: wpistruct
+    no_release_gil: true
+  getSchema:
+    subpackage: wpistruct
+    no_release_gil: true
+  getSize:
+    subpackage: wpistruct
+    no_release_gil: true
+  pack:
+    subpackage: wpistruct
+    no_release_gil: true
+  packArray:
+    subpackage: wpistruct
+    no_release_gil: true
+  packInto:
+    subpackage: wpistruct
+    no_release_gil: true
+  unpack:
+    subpackage: wpistruct
+    no_release_gil: true
+  unpackArray:
+    subpackage: wpistruct
+    no_release_gil: true
+  unpackInto:
+    subpackage: wpistruct
+    no_release_gil: true

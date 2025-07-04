@@ -1,0 +1,9 @@
+---
+
+defaults:
+  ignore: true
+
+enums:
+  WPI_TimestampSource:
+    value_prefix: WPI_TIMESRC
+    rename: TimestampSource

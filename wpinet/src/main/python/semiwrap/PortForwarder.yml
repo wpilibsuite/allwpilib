@@ -1,0 +1,8 @@
+classes:
+  wpi::PortForwarder:
+    nodelete: true
+    methods:
+      GetInstance:
+        return_value_policy: reference
+      Add:
+      Remove:

@@ -3,6 +3,8 @@
 # Linux Common
 ###############################
 
+build:base_linux --features=set_soname
+
 # C++ only
 build:base_linux --cxxopt=-std=c++20
 build:base_linux --cxxopt=-Wformat=2
