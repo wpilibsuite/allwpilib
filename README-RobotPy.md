@@ -8,6 +8,6 @@ The upstream RobotPy repository uses toml configuration files and semiwrap to pr
 Building the robotpy software on top of the standard C++/Java software can result in more than doubling the amount of time it takes to compile. To skip building the robotpy tooling you can add `--config=skip_robotpy` to the command line or to your `user.bazelrc`
 
 # Syncing with robotpy
-NOTE: This process us currently unlanded while robotpy gets the 2027 branch stable
+NOTE: This process is currently unlanded while robotpy gets the 2027 branch stable
 
 [Copybara](https://github.com/google/copybara) is used to maintin synchronization between the upstream robotpy repositories and the allwpilib mirror. Github actions can be manually run which will create pull requests that will update all of the robotpy files between the two repositories. The ideal process is that the allwpilib mirror is always building in CI, and once a release is created the RobotPy team can run the `wpilib -> robotpy` copybara task, make any fine tuned adjustements and create their release. In the event that additional changes are made on the robotpy side, they can run the `robotpy -> wpilib` task to push the updates back to the mirror. However the goal of the mirroring the software here is to be able to more rapidly test changes and will hopefully overwhelmingly eliminate the need for syncs this direction.
