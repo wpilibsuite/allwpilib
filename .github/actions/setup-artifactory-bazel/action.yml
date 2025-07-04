@@ -1,0 +1,29 @@
+name: "Setup Artifactory Bazel caching"
+description: "Sets up the Artifactory Bazel cache to be readonly / writing based on the presence of environment variables"
+
+inputs:
+  username:
+    description: "Artifactory API username"
+  token:
+    description: "Artifactory API token"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup without key
+      env:
+        API_KEY: ${{ inputs.token }}
+      if: ${{ env.API_KEY == '' }}
+      shell: bash
+      run: |
+        echo "No API key secret detected, will setup readonly cache"
+        echo "build:ci --config=artifactory_readonly" > bazel_auth.rc
+
+    - name: Set with key
+      env:
+        API_KEY: ${{ inputs.token }}
+      if: ${{ env.API_KEY != '' }}
+      shell: bash
+      run: |
+        echo "API Key detected!"
+        echo "build:base_remote --remote_cache=https://${{ inputs.username }}:${{ inputs.token }}@frcmaven.wpi.edu/artifactory/wpilib-generic-cache-bazel-local" > bazel_auth.rc
