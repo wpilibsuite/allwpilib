@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -52,10 +51,7 @@ public class ParallelRaceGroup extends Command {
     CommandScheduler.getInstance().registerComposedCommands(commands);
 
     for (Command command : commands) {
-      if (!Collections.disjoint(command.getRequirements(), getRequirements())) {
-        throw new IllegalArgumentException(
-            "Multiple commands in a parallel composition cannot require the same subsystems");
-      }
+      ensureDisjointRequirements(command);
       m_commands.add(command);
       addRequirements(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
