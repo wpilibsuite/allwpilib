@@ -159,7 +159,17 @@ public class OnboardIMU {
 
   private double[] getRawEulerAngles() {
     double[] anglesRaw = new double[3];
-    IMUJNI.getIMUEulerAngles(anglesRaw);
+    switch (m_mountOrientation) {
+      case kFlat:
+        IMUJNI.getIMUEulerAnglesFlat(anglesRaw);
+        break;
+      case kLandscape:
+        IMUJNI.getIMUEulerAnglesLandscape(anglesRaw);
+        break;
+      case kPortrait:
+        IMUJNI.getIMUEulerAnglesPortrait(anglesRaw);
+        break;
+    }
     return anglesRaw;
   }
 
