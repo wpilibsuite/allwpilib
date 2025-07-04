@@ -72,11 +72,11 @@ Java_edu_wpi_first_hal_IMUJNI_getIMUGyroRates
 
 /*
  * Class:     edu_wpi_first_hal_IMUJNI
- * Method:    getIMUEulerAngles
+ * Method:    getIMUEulerAnglesFlat
  * Signature: ([D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_IMUJNI_getIMUEulerAngles
+Java_edu_wpi_first_hal_IMUJNI_getIMUEulerAnglesFlat
   (JNIEnv* env, jclass, jdoubleArray angles)
 {
   assertArraySize(env, angles, 3, "angles");
@@ -84,7 +84,49 @@ Java_edu_wpi_first_hal_IMUJNI_getIMUEulerAngles
   int32_t status = 0;
   HAL_EulerAngles3d data;
 
-  HAL_GetIMUEulerAngles(&data, &status);
+  HAL_GetIMUEulerAnglesFlat(&data, &status);
+  CheckStatus(env, status);
+
+  double arr[]{data.x, data.y, data.z};
+  env->SetDoubleArrayRegion(angles, 0, 3, arr);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_IMUJNI
+ * Method:    getIMUEulerAnglesLandscape
+ * Signature: ([D)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_IMUJNI_getIMUEulerAnglesLandscape
+  (JNIEnv* env, jclass, jdoubleArray angles)
+{
+  assertArraySize(env, angles, 3, "angles");
+
+  int32_t status = 0;
+  HAL_EulerAngles3d data;
+
+  HAL_GetIMUEulerAnglesLandscape(&data, &status);
+  CheckStatus(env, status);
+
+  double arr[]{data.x, data.y, data.z};
+  env->SetDoubleArrayRegion(angles, 0, 3, arr);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_IMUJNI
+ * Method:    getIMUEulerAnglesPortrait
+ * Signature: ([D)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_IMUJNI_getIMUEulerAnglesPortrait
+  (JNIEnv* env, jclass, jdoubleArray angles)
+{
+  assertArraySize(env, angles, 3, "angles");
+
+  int32_t status = 0;
+  HAL_EulerAngles3d data;
+
+  HAL_GetIMUEulerAnglesPortrait(&data, &status);
   CheckStatus(env, status);
 
   double arr[]{data.x, data.y, data.z};
