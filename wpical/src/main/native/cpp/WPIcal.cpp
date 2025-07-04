@@ -230,7 +230,8 @@ void SaveCalibratedField(const frc::AprilTagFieldLayout& field,
 void CalibrateCamera() {
   static std::unique_ptr<pfd::open_file> cameraVideoSelector;
   static std::string cameraVideoPath;
-  static int calibrationMethod = 0;
+  static std::unique_ptr<cameracalibration::VideoProcessor> videoProcessor;
+  static bool calibrateButtonPressed = false;
 
   static double squareWidth = 0.709;
   static double markerWidth = 0.551;
@@ -254,13 +255,6 @@ void CalibrateCamera() {
       ImGui::EndPopup();
     }
 
-    ImGui::RadioButton("MRcal", &calibrationMethod, 0);
-
-    ImGui::SameLine();
-    ImGui::Text("or");
-    ImGui::SameLine();
-    ImGui::RadioButton("OpenCV", &calibrationMethod, 1);
-
     SelectFileButton("Select Camera Calibration Video", cameraVideoPath,
                      cameraVideoSelector, "Video Files",
                      "*.mp4 *.mov *.m4v *.mkv *.avi");
@@ -277,33 +271,25 @@ void CalibrateCamera() {
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
     ImGui::InputInt("Board Height (squares)", &boardHeight);
     std::optional<cameracalibration::CameraModel> model;
-    bool calibrateButtonPressed = false;
-    if (calibrationMethod == 0) {  // mrcal
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputDouble("Image Width (pixels)", &imageWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputDouble("Image Height (pixels)", &imageHeight);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+    ImGui::InputDouble("Image Width (pixels)", &imageWidth);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+    ImGui::InputDouble("Image Height (pixels)", &imageHeight);
 
-      ImGui::Separator();
-      if (ImGui::Button("Calibrate") && !cameraVideoPath.empty()) {
-        std::cout << "calibration button pressed" << std::endl;
-        model = cameracalibration::calibrate(
-            cameraVideoPath, markerWidth, boardWidth, boardHeight, imageWidth,
-            imageHeight, showDebug);
-        calibrateButtonPressed = true;
-      }
-    } else {  // opencv
-      ImGui::Separator();
-      if (ImGui::Button("Calibrate") && !cameraVideoPath.empty()) {
-        std::cout << "calibration button pressed" << std::endl;
-        model = cameracalibration::calibrate(cameraVideoPath, squareWidth,
-                                             markerWidth, boardWidth,
-                                             boardHeight, showDebug);
-        calibrateButtonPressed = true;
-      }
+    ImGui::Separator();
+    if (ImGui::Button("Calibrate") && !cameraVideoPath.empty()) {
+      std::cout << "calibration button pressed" << std::endl;
+      videoProcessor = std::make_unique<cameracalibration::VideoProcessor>(
+          8, squareWidth, markerWidth, boardWidth, boardHeight);
+      videoProcessor->ProcessVideo(cameraVideoPath, true);
+      calibrateButtonPressed = true;
     }
-    if (calibrateButtonPressed && model) {
-      gCameraModel = *model;
+    if (calibrateButtonPressed && !videoProcessor->IsFinished()) {
+      videoProcessor->DisplayProgressBar();
+    }
+    if (calibrateButtonPressed && videoProcessor->IsFinished() &&
+        videoProcessor->GetCameraModel()) {
+      gCameraModel = *videoProcessor->GetCameraModel();
       std::filesystem::path myPath(cameraVideoPath);
       auto outputPath = myPath.parent_path() / "cameracalibration.json";
 
@@ -311,7 +297,8 @@ void CalibrateCamera() {
       output_file << wpi::json(gCameraModel).dump(4) << std::endl;
       ImGui::CloseCurrentPopup();
       calibrateButtonPressed = false;
-    } else if (calibrateButtonPressed && !model) {
+    } else if (calibrateButtonPressed && videoProcessor->IsFinished() &&
+               !videoProcessor->GetCameraModel()) {
       std::cout << "calibration failed and popup ready" << std::endl;
       ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
       ImGui::OpenPopup("Camera Calibration Error");
