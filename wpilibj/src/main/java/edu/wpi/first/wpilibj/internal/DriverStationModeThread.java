@@ -27,7 +27,7 @@ public class DriverStationModeThread implements AutoCloseable {
   }
 
   private void run() {
-    int handle = WPIUtilJNI.createEvent(false, false);
+    int handle = WPIUtilJNI.makeEvent(false, false);
     DriverStationJNI.provideNewDataEventHandle(handle);
 
     while (m_keepAlive.get()) {
