@@ -43,7 +43,9 @@ build:base_remote --nolegacy_important_outputs
 
 common:base_remote_readonly --noremote_upload_local_results
 build:artifactory_readonly --config=base_remote_readonly
-build:artifactory_readonly --remote_cache=https://frcmaven.wpi.edu/artifactory/wpilib-generic-cache-bazel-local --remote_cache_header=X-JFrog-Download-Redirect-To=None
+build:artifactory_readonly --remote_cache=https://frcmaven.wpi.edu/artifactory/wpilib-generic-cache-bazel-local
+# workaround for https://github.com/bazelbuild/bazel/issues/17700
+build:artifactory_readonly --remote_cache_header=X-JFrog-Download-Redirect-To=None
 
 # Build Buddy Cache Setup
 build:build_buddy --bes_results_url=https://app.buildbuddy.io/invocation/
