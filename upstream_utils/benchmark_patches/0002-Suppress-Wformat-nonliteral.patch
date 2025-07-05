@@ -1,0 +1,78 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
+Date: Wed, 25 Jun 2025 18:37:33 -0700
+Subject: [PATCH 2/2] Suppress -Wformat-nonliteral
+
+---
+ src/colorprint.cc  | 14 ++++++++++++++
+ src/string_util.cc | 14 ++++++++++++++
+ 2 files changed, 28 insertions(+)
+
+diff --git a/src/colorprint.cc b/src/colorprint.cc
+index c90232f20ff7b6dfdc09ee2df02a6d735b1d99ea..c4c48d15a049f39c77aeee47ae46741ec195a7d1 100644
+--- a/src/colorprint.cc
++++ b/src/colorprint.cc
+@@ -89,7 +89,14 @@ std::string FormatString(const char* msg, va_list args) {
+ 
+   std::size_t size = 256;
+   char local_buff[256];
++#ifdef __GNUC__
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
++#endif  // __GNUC__
+   auto ret = vsnprintf(local_buff, size, msg, args_cp);
++#ifdef __GNUC__
++#pragma GCC diagnostic pop
++#endif  // __GNUC__
+ 
+   va_end(args_cp);
+ 
+@@ -105,7 +112,14 @@ std::string FormatString(const char* msg, va_list args) {
+   // we did not provide a long enough buffer on our first attempt.
+   size = static_cast<size_t>(ret) + 1;  // + 1 for the null byte
+   std::unique_ptr<char[]> buff(new char[size]);
++#ifdef __GNUC__
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
++#endif  // __GNUC__
+   ret = vsnprintf(buff.get(), size, msg, args);
++#ifdef __GNUC__
++#pragma GCC diagnostic pop
++#endif  // __GNUC__
+   BM_CHECK(ret > 0 && (static_cast<size_t>(ret)) < size);
+   return buff.get();
+ }
+diff --git a/src/string_util.cc b/src/string_util.cc
+index 420de4cf259ce0bf3087b004b1f0d0b1c78028a7..698129453cd6ea1baf5f12ae58db467008b6ce8c 100644
+--- a/src/string_util.cc
++++ b/src/string_util.cc
+@@ -123,7 +123,14 @@ std::string StrFormatImp(const char* msg, va_list args) {
+ 
+   // 2015-10-08: vsnprintf is used instead of snd::vsnprintf due to a limitation
+   // in the android-ndk
++#ifdef __GNUC__
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
++#endif  // __GNUC__
+   auto ret = vsnprintf(local_buff.data(), local_buff.size(), msg, args_cp);
++#ifdef __GNUC__
++#pragma GCC diagnostic pop
++#endif  // __GNUC__
+ 
+   va_end(args_cp);
+ 
+@@ -141,7 +148,14 @@ std::string StrFormatImp(const char* msg, va_list args) {
+   auto buff_ptr = std::unique_ptr<char[]>(new char[size]);
+   // 2015-10-08: vsnprintf is used instead of snd::vsnprintf due to a limitation
+   // in the android-ndk
++#ifdef __GNUC__
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
++#endif  // __GNUC__
+   vsnprintf(buff_ptr.get(), size, msg, args);
++#ifdef __GNUC__
++#pragma GCC diagnostic pop
++#endif  // __GNUC__
+   return std::string(buff_ptr.get());
+ }
+ 
