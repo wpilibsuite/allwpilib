@@ -43,7 +43,7 @@ build:base_remote --nolegacy_important_outputs
 
 common:base_remote_readonly --noremote_upload_local_results
 build:artifactory_readonly --config=base_remote_readonly
-build:artifactory_readonly --remote_cache=https://frcmaven.wpi.edu/artifactory/wpilib-generic-cache-bazel-local
+build:artifactory_readonly --remote_cache=https://wpi-frcmaven.wpi.edu/artifactory/wpilib-generic-cache-bazel-local
 
 # Build Buddy Cache Setup
 build:build_buddy --bes_results_url=https://app.buildbuddy.io/invocation/
