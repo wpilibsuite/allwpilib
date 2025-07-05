@@ -7,8 +7,7 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc2/command/Subsystem.h"
 
@@ -19,11 +18,11 @@ namespace frc2 {
  *
  * This class is provided by the NewCommands VendorDep
  */
-class SubsystemBase : public Subsystem,
-                      public wpi::Sendable,
-                      public wpi::SendableHelper<SubsystemBase> {
+class SubsystemBase : public Subsystem, public wpi::TelemetryLoggable {
  public:
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
   /**
    * Gets the name of this Subsystem.
@@ -39,29 +38,6 @@ class SubsystemBase : public Subsystem,
    */
   void SetName(std::string_view name);
 
-  /**
-   * Gets the subsystem name of this Subsystem.
-   *
-   * @return Subsystem name
-   */
-  std::string GetSubsystem() const;
-
-  /**
-   * Sets the subsystem name of this Subsystem.
-   *
-   * @param name subsystem name
-   */
-  void SetSubsystem(std::string_view name);
-
-  /**
-   * Associate a Sendable with this Subsystem.
-   * Also update the child's name.
-   *
-   * @param name name to give child
-   * @param child sendable
-   */
-  void AddChild(std::string name, wpi::Sendable* child);
-
  protected:
   /**
    * Constructor.  Telemetry/log name defaults to the classname.
@@ -73,5 +49,8 @@ class SubsystemBase : public Subsystem,
    * @param name Name of the subsystem for telemetry and logging.
    */
   explicit SubsystemBase(std::string_view name);
+
+ private:
+  std::string m_name;
 };
 }  // namespace frc2

@@ -4,13 +4,12 @@
 
 #include "frc/counter/UpDownCounter.h"
 
-#include <memory>
 #include <string>
 
 #include <hal/Counter.h>
 #include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
-#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/Errors.h"
 
@@ -28,7 +27,6 @@ UpDownCounter::UpDownCounter(int channel, EdgeConfiguration configuration)
   Reset();
 
   HAL_ReportUsage("IO", channel, "UpDownCounter");
-  wpi::SendableRegistry::Add(this, "UpDown Counter", channel);
 }
 
 int UpDownCounter::GetCount() const {
@@ -51,7 +49,10 @@ void UpDownCounter::SetEdgeConfiguration(EdgeConfiguration configuration) {
   FRC_CheckErrorStatus(status, "{}", m_channel);
 }
 
-void UpDownCounter::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("UpDown Counter");
-  builder.AddDoubleProperty("Count", [&] { return GetCount(); }, nullptr);
+void UpDownCounter::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("Count", GetCount());
+}
+
+std::string_view UpDownCounter::GetTelemetryType() const {
+  return "UpDown Counter";
 }

@@ -6,8 +6,7 @@
 
 #pragma once
 
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc/GenericHID.h"
 
@@ -26,8 +25,7 @@ namespace frc {
  * to have the same mapping, as well as any 3rd party controllers.
  */
 class XboxController : public GenericHID,
-                                    public wpi::Sendable,
-                                    public wpi::SendableHelper<XboxController> {
+                                    public wpi::TelemetryLoggable {
  public:
   /**
    * Construct an instance of a controller.
@@ -548,7 +546,8 @@ class XboxController : public GenericHID,
     static constexpr int kRightTrigger = 3;
   };
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  std::string_view GetTelemetryType() const override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 };
 
 }  // namespace frc

@@ -11,12 +11,10 @@
 #include <hal/Ports.h>
 #include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/Timer.h"
 
 using namespace frc;
 
@@ -32,8 +30,6 @@ AnalogInput::AnalogInput(int channel) {
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_ReportUsage("IO", channel, "AnalogInput");
-
-  wpi::SendableRegistry::Add(this, "AnalogInput", channel);
 }
 
 int AnalogInput::GetValue() const {
@@ -125,8 +121,10 @@ void AnalogInput::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetAnalogInputSimDevice(m_port, device);
 }
 
-void AnalogInput::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Analog Input");
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return GetAverageVoltage(); }, nullptr);
+void AnalogInput::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("Value", GetAverageVoltage());
+}
+
+std::string_view AnalogInput::GetTelemetryType() const {
+  return "Analog Input";
 }

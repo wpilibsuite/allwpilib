@@ -4,13 +4,10 @@
 
 #pragma once
 
-#include <memory>
-
 #include <hal/DutyCycle.h>
 #include <hal/Types.h>
 #include <units/time.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 namespace frc {
 /**
@@ -24,7 +21,7 @@ namespace frc {
  * order to implement rollover checking.
  *
  */
-class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
+class DutyCycle : public wpi::TelemetryLoggable {
  public:
   /**
    * Constructs a DutyCycle input from a smartio channel.
@@ -89,8 +86,9 @@ class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
    */
   int GetSourceChannel() const;
 
- protected:
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   void InitDutyCycle();

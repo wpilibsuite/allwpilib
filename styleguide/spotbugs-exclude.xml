@@ -123,6 +123,10 @@
     <Class name="edu.wpi.first.wpilibj.templates.timesliceskeleton.Robot" />
   </Match>
   <Match>
+    <Bug pattern="UCF_USELESS_CONTROL_FLOW" />
+    <Class name="edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems.IntakeLogger" />
+  </Match>
+  <Match>
     <Bug pattern="URF_UNREAD_FIELD" />
     <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
   </Match>

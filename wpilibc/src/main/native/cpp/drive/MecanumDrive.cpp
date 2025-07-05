@@ -9,8 +9,7 @@
 #include <utility>
 
 #include <hal/UsageReporting.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/MathUtil.h"
 #include "frc/geometry/Translation2d.h"
@@ -27,12 +26,7 @@ MecanumDrive::MecanumDrive(MotorController& frontLeftMotor,
     : MecanumDrive{[&](double output) { frontLeftMotor.Set(output); },
                    [&](double output) { rearLeftMotor.Set(output); },
                    [&](double output) { frontRightMotor.Set(output); },
-                   [&](double output) { rearRightMotor.Set(output); }} {
-  wpi::SendableRegistry::AddChild(this, &frontLeftMotor);
-  wpi::SendableRegistry::AddChild(this, &rearLeftMotor);
-  wpi::SendableRegistry::AddChild(this, &frontRightMotor);
-  wpi::SendableRegistry::AddChild(this, &rearRightMotor);
-}
+                   [&](double output) { rearRightMotor.Set(output); }} {}
 
 WPI_UNIGNORE_DEPRECATED
 
@@ -43,11 +37,7 @@ MecanumDrive::MecanumDrive(std::function<void(double)> frontLeftMotor,
     : m_frontLeftMotor{std::move(frontLeftMotor)},
       m_rearLeftMotor{std::move(rearLeftMotor)},
       m_frontRightMotor{std::move(frontRightMotor)},
-      m_rearRightMotor{std::move(rearRightMotor)} {
-  static int instances = 0;
-  ++instances;
-  wpi::SendableRegistry::Add(this, "MecanumDrive", instances);
-}
+      m_rearRightMotor{std::move(rearRightMotor)} {}
 
 void MecanumDrive::DriveCartesian(double xSpeed, double ySpeed,
                                   double zRotation, Rotation2d gyroAngle) {
@@ -128,19 +118,13 @@ std::string MecanumDrive::GetDescription() const {
   return "MecanumDrive";
 }
 
-void MecanumDrive::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("MecanumDrive");
-  builder.SetActuator(true);
-  builder.AddDoubleProperty(
-      "Front Left Motor Speed", [&] { return m_frontLeftOutput; },
-      m_frontLeftMotor);
-  builder.AddDoubleProperty(
-      "Front Right Motor Speed", [&] { return m_frontRightOutput; },
-      m_frontRightMotor);
-  builder.AddDoubleProperty(
-      "Rear Left Motor Speed", [&] { return m_rearLeftOutput; },
-      m_rearLeftMotor);
-  builder.AddDoubleProperty(
-      "Rear Right Motor Speed", [&] { return m_rearRightOutput; },
-      m_rearRightMotor);
+void MecanumDrive::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("Front Left Motor Speed", m_frontLeftOutput);
+  table.Log("Front Right Motor Speed", m_frontRightOutput);
+  table.Log("Rear Left Motor Speed", m_rearLeftOutput);
+  table.Log("Rear Right Motor Speed", m_rearRightOutput);
+}
+
+std::string_view MecanumDrive::GetTelemetryType() const {
+  return "MecanumDrive";
 }

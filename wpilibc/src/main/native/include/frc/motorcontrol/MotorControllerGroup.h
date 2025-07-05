@@ -8,8 +8,7 @@
 #include <vector>
 
 #include <wpi/deprecated.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc/motorcontrol/MotorController.h"
 
@@ -23,9 +22,8 @@ namespace frc {
 class [[deprecated(
     "Use PWMMotorController::AddFollower() or if using CAN motor controllers,"
     "use their method of following.")]] MotorControllerGroup
-    : public wpi::Sendable,
-      public MotorController,
-      public wpi::SendableHelper<MotorControllerGroup> {
+    : public MotorController,
+      public wpi::TelemetryLoggable {
  public:
   /**
    * Create a new MotorControllerGroup with the provided MotorControllers.
@@ -38,9 +36,7 @@ class [[deprecated(
   explicit MotorControllerGroup(MotorController& motorController,
                                 MotorControllers&... motorControllers)
       : m_motorControllers(std::vector<std::reference_wrapper<MotorController>>{
-            motorController, motorControllers...}) {
-    Initialize();
-  }
+            motorController, motorControllers...}) {}
 
   /**
    * Create a new MotorControllerGroup with the provided MotorControllers.
@@ -61,13 +57,12 @@ class [[deprecated(
   void Disable() override;
   void StopMotor() override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  std::string_view GetTelemetryType() const override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
  private:
   bool m_isInverted = false;
   std::vector<std::reference_wrapper<MotorController>> m_motorControllers;
-
-  void Initialize();
 };
 
 }  // namespace frc

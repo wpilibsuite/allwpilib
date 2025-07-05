@@ -11,8 +11,7 @@
 #include <hal/PowerDistribution.h>
 #include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/Errors.h"
 
@@ -45,7 +44,6 @@ PowerDistribution::PowerDistribution(int busId) {
   } else {
     HAL_ReportUsage("PDH", m_module, "");
   }
-  wpi::SendableRegistry::Add(this, "PowerDistribution", m_module);
 }
 
 PowerDistribution::PowerDistribution(int busId, int module,
@@ -65,7 +63,6 @@ PowerDistribution::PowerDistribution(int busId, int module,
   } else {
     HAL_ReportUsage("PDH_REV", m_module, "");
   }
-  wpi::SendableRegistry::Add(this, "PowerDistribution", m_module);
 }
 
 int PowerDistribution::GetNumChannels() const {
@@ -320,41 +317,21 @@ PowerDistribution::StickyFaults PowerDistribution::GetStickyFaults() const {
   return stickyFaults;
 }
 
-void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("PowerDistribution");
-  int numChannels = GetNumChannels();
+void PowerDistribution::UpdateTelemetry(wpi::TelemetryTable& table) const {
   // Use manual reads to avoid printing errors
-  for (int i = 0; i < numChannels; ++i) {
-    builder.AddDoubleProperty(
-        fmt::format("Chan{}", i),
-        [=, this] {
-          int32_t lStatus = 0;
-          return HAL_GetPowerDistributionChannelCurrent(m_handle, i, &lStatus);
-        },
-        nullptr);
-  }
-  builder.AddDoubleProperty(
-      "Voltage",
-      [=, this] {
-        int32_t lStatus = 0;
-        return HAL_GetPowerDistributionVoltage(m_handle, &lStatus);
-      },
-      nullptr);
-  builder.AddDoubleProperty(
-      "TotalCurrent",
-      [=, this] {
-        int32_t lStatus = 0;
-        return HAL_GetPowerDistributionTotalCurrent(m_handle, &lStatus);
-      },
-      nullptr);
-  builder.AddBooleanProperty(
-      "SwitchableChannel",
-      [=, this] {
-        int32_t lStatus = 0;
-        return HAL_GetPowerDistributionSwitchableChannel(m_handle, &lStatus);
-      },
-      [=, this](bool value) {
-        int32_t lStatus = 0;
-        HAL_SetPowerDistributionSwitchableChannel(m_handle, value, &lStatus);
-      });
+  int32_t status = 0;
+  int32_t size = GetNumChannels();
+  std::vector<double> currents(size);
+  HAL_GetPowerDistributionAllChannelCurrents(m_handle, currents.data(), size,
+                                             &status);
+  table.Log("Current", currents);
+  table.Log("Voltage", HAL_GetPowerDistributionVoltage(m_handle, &status));
+  table.Log("TotalCurrent",
+            HAL_GetPowerDistributionTotalCurrent(m_handle, &status));
+  table.Log("SwitchableChannel",
+            HAL_GetPowerDistributionSwitchableChannel(m_handle, &status));
+}
+
+std::string_view PowerDistribution::GetTelemetryType() const {
+  return "PowerDistribution";
 }

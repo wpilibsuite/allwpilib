@@ -4,22 +4,19 @@
 
 #include "frc/PWM.h"
 
-#include <utility>
-
 #include <hal/HALBase.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
 #include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
 
 using namespace frc;
 
-PWM::PWM(int channel, bool registerSendable) {
+PWM::PWM(int channel) {
   if (!SensorUtil::CheckPWMChannel(channel)) {
     throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
   }
@@ -34,9 +31,6 @@ PWM::PWM(int channel, bool registerSendable) {
   SetDisabled();
 
   HAL_ReportUsage("IO", channel, "PWM");
-  if (registerSendable) {
-    wpi::SendableRegistry::Add(this, "PWM", channel);
-  }
 }
 
 PWM::~PWM() {
@@ -97,10 +91,10 @@ void PWM::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetPWMSimDevice(m_handle, device);
 }
 
-void PWM::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("PWM");
-  builder.SetActuator(true);
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return GetPulseTime().value(); },
-      [=, this](double value) { SetPulseTime(units::millisecond_t{value}); });
+void PWM::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("Value", GetPulseTime().value());
+}
+
+std::string_view PWM::GetTelemetryType() const {
+  return "PWM";
 }

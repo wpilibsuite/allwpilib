@@ -84,6 +84,12 @@ jobs:
           ./googletest.py clone
           ./googletest.py copy-src
           ./googletest.py format-patch
+      - name: Run htrie.py
+        run: |
+          cd upstream_utils
+          ./htrie.py clone
+          ./htrie.py copy-src
+          ./htrie.py format-patch
       - name: Run imgui.py
         run: |
           cd upstream_utils

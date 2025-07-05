@@ -8,8 +8,7 @@
 
 #include <hal/UsageReporting.h>
 #include <units/length.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/AnalogInput.h"
 
@@ -35,7 +34,6 @@ SharpIR::SharpIR(int channel, double a, double b, units::meter_t min,
                  units::meter_t max)
     : m_sensor(channel), m_A(a), m_B(b), m_min(min), m_max(max) {
   HAL_ReportUsage("IO", channel, "SharpIR");
-  wpi::SendableRegistry::Add(this, "SharpIR", channel);
 
   m_simDevice = hal::SimDevice("SharpIR", m_sensor.GetChannel());
   if (m_simDevice) {
@@ -60,8 +58,10 @@ units::meter_t SharpIR::GetRange() const {
   }
 }
 
-void SharpIR::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Ultrasonic");
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return GetRange().value(); }, nullptr);
+void SharpIR::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("Value", GetRange().value());
+}
+
+std::string_view SharpIR::GetTelemetryType() const {
+  return "Ultrasonic";
 }

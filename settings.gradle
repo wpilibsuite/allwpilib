@@ -60,6 +60,8 @@ include 'thirdparty:googletest'
 include 'thirdparty:imgui_suite'
 include 'wpical'
 include 'datalog'
+include 'telemetry'
+include 'tunable'
 
 buildCache {
     def cred = {

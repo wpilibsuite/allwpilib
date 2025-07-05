@@ -8,8 +8,7 @@
 
 #include <hal/Types.h>
 #include <units/time.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc/PneumaticsBase.h"
 #include "frc/PneumaticsModuleType.h"
@@ -23,7 +22,7 @@ namespace frc {
  * The Solenoid class is typically used for pneumatics solenoids, but could be
  * used for any device within the current spec of the module.
  */
-class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
+class Solenoid : public wpi::TelemetryLoggable {
  public:
   /**
    * Constructs a solenoid for a specified module and type.
@@ -111,7 +110,9 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
    */
   void StartPulse();
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   std::shared_ptr<PneumaticsBase> m_module;

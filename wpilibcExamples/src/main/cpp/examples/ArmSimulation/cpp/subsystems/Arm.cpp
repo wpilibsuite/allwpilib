@@ -7,13 +7,10 @@
 #include <frc/Preferences.h>
 #include <frc/RobotController.h>
 #include <frc/StateSpaceUtil.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include <wpi/telemetry/Telemetry.h>
 
 Arm::Arm() {
   m_encoder.SetDistancePerPulse(kArmEncoderDistPerPulse);
-
-  // Put Mechanism 2d to SmartDashboard
-  frc::SmartDashboard::PutData("Arm Sim", &m_mech2d);
 
   // Set the Arm position setpoint and P constant to Preferences if the keys
   // don't already exist
@@ -39,6 +36,9 @@ void Arm::SimulationPeriodic() {
 
   // Update the Mechanism Arm angle based on the simulated arm angle
   m_arm->SetAngle(m_armSim.GetAngle());
+
+  // Put Mechanism 2d to Telemetry
+  wpi::Telemetry::Log("Arm Sim", m_mech2d);
 }
 
 void Arm::LoadPreferences() {

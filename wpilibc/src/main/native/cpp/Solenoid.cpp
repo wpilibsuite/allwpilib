@@ -4,14 +4,10 @@
 
 #include "frc/Solenoid.h"
 
-#include <utility>
-
 #include <wpi/NullDeleter.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/Errors.h"
-#include "frc/SensorUtil.h"
 
 using namespace frc;
 
@@ -29,8 +25,6 @@ Solenoid::Solenoid(int busId, int module, PneumaticsModuleType moduleType,
   }
 
   m_module->ReportUsage(fmt::format("Solenoid[{}]", m_channel), "Solenoid");
-  wpi::SendableRegistry::Add(this, "Solenoid", m_module->GetModuleNumber(),
-                             m_channel);
 }
 
 Solenoid::Solenoid(int busId, PneumaticsModuleType moduleType, int channel)
@@ -73,10 +67,10 @@ void Solenoid::StartPulse() {
   m_module->FireOneShot(m_channel);
 }
 
-void Solenoid::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Solenoid");
-  builder.SetActuator(true);
-  builder.AddBooleanProperty(
-      "Value", [=, this] { return Get(); },
-      [=, this](bool value) { Set(value); });
+void Solenoid::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("Value", Get());
+}
+
+std::string_view Solenoid::GetTelemetryType() const {
+  return "Solenoid";
 }

@@ -9,9 +9,8 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 import edu.wpi.first.hal.EncoderJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.telemetry.TelemetryLoggable;
+import edu.wpi.first.telemetry.TelemetryTable;
 
 /**
  * Class to read quadrature encoders.
@@ -26,7 +25,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * <p>All encoders will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Encoder implements CounterBase, Sendable, AutoCloseable {
+public class Encoder implements CounterBase, TelemetryLoggable, AutoCloseable {
   private final EncodingType m_encodingType;
 
   int m_encoder; // the HAL encoder object
@@ -53,9 +52,6 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
           default -> "Encoder";
         };
     HAL.reportUsage("IO[" + aChannel + "," + bChannel + "]", typeStr);
-
-    int fpgaIndex = getFPGAIndex();
-    SendableRegistry.add(this, "Encoder", fpgaIndex);
   }
 
   /**
@@ -99,7 +95,6 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    *     selected, then a counter object will be used and the returned value will either exactly
    *     match the spec'd count or be double (2x) the spec'd count.
    */
-  @SuppressWarnings("this-escape")
   public Encoder(
       final int channelA,
       final int channelB,
@@ -108,8 +103,6 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
     requireNonNullParam(encodingType, "encodingType", "Encoder");
 
     m_encodingType = encodingType;
-    // SendableRegistry.addChild(this, m_aSource);
-    // SendableRegistry.addChild(this, m_bSource);
     initEncoder(channelA, channelB, reverseDirection, encodingType);
   }
 
@@ -133,7 +126,6 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     // if (m_aSource != null && m_allocatedA) {
     //   m_aSource.close();
     //   m_allocatedA = false;
@@ -343,15 +335,18 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    if (EncoderJNI.getEncoderEncodingType(m_encoder) == EncodingType.k4X.value) {
-      builder.setSmartDashboardType("Quadrature Encoder");
-    } else {
-      builder.setSmartDashboardType("Encoder");
-    }
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("Speed", getRate());
+    table.log("Distance", getDistance());
+    table.log("Distance per Tick", getDistancePerPulse());
+  }
 
-    builder.addDoubleProperty("Speed", this::getRate, null);
-    builder.addDoubleProperty("Distance", this::getDistance, null);
-    builder.addDoubleProperty("Distance per Tick", this::getDistancePerPulse, null);
+  @Override
+  public String getTelemetryType() {
+    if (EncoderJNI.getEncoderEncodingType(m_encoder) == EncodingType.k4X.value) {
+      return "Quadrature Encoder";
+    } else {
+      return "Encoder";
+    }
   }
 }

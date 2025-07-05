@@ -9,8 +9,6 @@
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 
-#include "Constants.h"
-
 class DriveSubsystem : public frc2::SubsystemBase {
  public:
   DriveSubsystem();
@@ -50,7 +48,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void SetMaxOutput(double maxOutput);
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

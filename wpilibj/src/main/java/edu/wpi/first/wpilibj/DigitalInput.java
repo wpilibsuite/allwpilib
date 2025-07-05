@@ -7,9 +7,8 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.DIOJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.telemetry.TelemetryLoggable;
+import edu.wpi.first.telemetry.TelemetryTable;
 
 /**
  * Class to read a digital input. This class will read digital inputs and return the current value
@@ -17,7 +16,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * elsewhere will automatically allocate digital inputs and outputs as required. This class is only
  * for devices like switches etc. that aren't implemented anywhere else.
  */
-public class DigitalInput implements AutoCloseable, Sendable {
+public class DigitalInput implements AutoCloseable, TelemetryLoggable {
   private final int m_channel;
   private int m_handle;
 
@@ -26,7 +25,6 @@ public class DigitalInput implements AutoCloseable, Sendable {
    *
    * @param channel the DIO channel for the digital input 0-9 are on-board, 10-25 are on the MXP
    */
-  @SuppressWarnings("this-escape")
   public DigitalInput(int channel) {
     SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
@@ -34,12 +32,10 @@ public class DigitalInput implements AutoCloseable, Sendable {
     m_handle = DIOJNI.initializeDIOPort(channel, true);
 
     HAL.reportUsage("IO", channel, "DigitalInput");
-    SendableRegistry.add(this, "DigitalInput", channel);
   }
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     DIOJNI.freeDIOPort(m_handle);
     m_handle = 0;
   }
@@ -73,8 +69,12 @@ public class DigitalInput implements AutoCloseable, Sendable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Digital Input");
-    builder.addBooleanProperty("Value", this::get, null);
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("Value", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Digital Input";
   }
 }

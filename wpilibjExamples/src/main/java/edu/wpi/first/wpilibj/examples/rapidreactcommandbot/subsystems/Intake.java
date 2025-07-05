@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.rapidreactcommandbot.subsystems;
 
-import static edu.wpi.first.wpilibj.examples.rapidreactcommandbot.Constants.IntakeConstants;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;

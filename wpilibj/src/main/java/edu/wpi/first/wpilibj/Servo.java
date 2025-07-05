@@ -9,9 +9,8 @@ import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.telemetry.TelemetryLoggable;
+import edu.wpi.first.telemetry.TelemetryTable;
 import edu.wpi.first.wpilibj.PWM.OutputPeriod;
 
 /**
@@ -20,7 +19,7 @@ import edu.wpi.first.wpilibj.PWM.OutputPeriod;
  * <p>The range parameters default to the appropriate values for the Hitec HS-322HD servo provided
  * in the FIRST Kit of Parts in 2008.
  */
-public class Servo implements Sendable, AutoCloseable {
+public class Servo implements TelemetryLoggable, AutoCloseable {
   private static final double kMaxServoAngle = 180.0;
   private static final double kMinServoAngle = 0.0;
 
@@ -44,10 +43,8 @@ public class Servo implements Sendable, AutoCloseable {
    * @param channel The PWM channel to which the servo is attached. 0-9 are on-board, 10-19 are on
    *     the MXP port
    */
-  @SuppressWarnings("this-escape")
   public Servo(final int channel) {
-    m_pwm = new PWM(channel, false);
-    SendableRegistry.add(this, "Servo", channel);
+    m_pwm = new PWM(channel);
 
     m_pwm.setOutputPeriod(OutputPeriod.k20Ms);
 
@@ -63,7 +60,6 @@ public class Servo implements Sendable, AutoCloseable {
   /** Free the resource associated with the PWM channel and set the value to 0. */
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     m_pwm.close();
 
     if (m_simDevice != null) {
@@ -173,8 +169,12 @@ public class Servo implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Servo");
-    builder.addDoubleProperty("Value", this::get, this::set);
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("Value", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Servo";
   }
 }

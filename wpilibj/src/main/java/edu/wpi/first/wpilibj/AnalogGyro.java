@@ -8,9 +8,8 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.telemetry.TelemetryLoggable;
+import edu.wpi.first.telemetry.TelemetryTable;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position. The Gyro class
@@ -21,14 +20,13 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  *
  * <p>This class is for gyro sensors that connect to an analog input.
  */
-public class AnalogGyro implements Sendable, AutoCloseable {
+public class AnalogGyro implements TelemetryLoggable, AutoCloseable {
   private AnalogInput m_analog;
   private boolean m_channelAllocated;
 
   /** Initialize the gyro. Calibration is handled by calibrate(). */
   private void initGyro() {
     HAL.reportUsage("AnalogGyro", m_analog.getChannel(), "");
-    SendableRegistry.add(this, "AnalogGyro", m_analog.getChannel());
   }
 
   /**
@@ -65,11 +63,9 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * @param channel The analog channel the gyro is connected to. Gyros can only be used on on-board
    *     channels 0-1.
    */
-  @SuppressWarnings("this-escape")
   public AnalogGyro(int channel) {
     this(new AnalogInput(channel));
     m_channelAllocated = true;
-    SendableRegistry.addChild(this, m_analog);
   }
 
   /**
@@ -97,11 +93,9 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * @param center Preset uncalibrated value to use as the accumulator center value.
    * @param offset Preset uncalibrated value to use as the gyro offset.
    */
-  @SuppressWarnings("this-escape")
   public AnalogGyro(int channel, int center, double offset) {
     this(new AnalogInput(channel), center, offset);
     m_channelAllocated = true;
-    SendableRegistry.addChild(this, m_analog);
   }
 
   /**
@@ -113,7 +107,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * @param center Preset uncalibrated value to use as the accumulator center value.
    * @param offset Preset uncalibrated value to use as the gyro offset.
    */
-  @SuppressWarnings({"this-escape", "PMD.UnusedFormalParameter"})
+  @SuppressWarnings({"PMD.UnusedFormalParameter", "this-escape"})
   public AnalogGyro(AnalogInput channel, int center, double offset) {
     requireNonNullParam(channel, "channel", "AnalogGyro");
 
@@ -133,7 +127,6 @@ public class AnalogGyro implements Sendable, AutoCloseable {
   /** Delete (free) the accumulator and the analog components used for the gyro. */
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     if (m_analog != null && m_channelAllocated) {
       m_analog.close();
     }
@@ -218,8 +211,12 @@ public class AnalogGyro implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Gyro");
-    builder.addDoubleProperty("Value", this::getAngle, null);
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("Value", getAngle());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Gyro";
   }
 }

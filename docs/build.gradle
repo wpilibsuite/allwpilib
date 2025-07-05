@@ -6,9 +6,11 @@ plugins {
 evaluationDependsOn(':apriltag')
 evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':cscore')
+evaluationDependsOn(':datalog')
 evaluationDependsOn(':epilogue-runtime')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
+evaluationDependsOn(':telemetry')
 evaluationDependsOn(':wpilibNewCommands')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
@@ -35,8 +37,10 @@ def cppIncludeRoots = []
 cppProjectZips.add(project(':apriltag').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
+cppProjectZips.add(project(':datalog').cppHeadersZip)
 cppProjectZips.add(project(':hal').cppHeadersZip)
 cppProjectZips.add(project(':ntcore').cppHeadersZip)
+cppProjectZips.add(project(':telemetry').cppHeadersZip)
 cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
 cppProjectZips.add(project(':wpilibc').cppHeadersZip)
 cppProjectZips.add(project(':wpimath').cppHeadersZip)
@@ -121,6 +125,9 @@ doxygen {
 
         // fmtlib
         exclude 'fmt/**'
+
+        // htrie
+        exclude 'wpi/array-hash/**'
 
         // libuv
         exclude 'uv.h'
@@ -214,9 +221,11 @@ task generateJavaDocs(type: Javadoc) {
     source project(':apriltag').sourceSets.main.java
     source project(':cameraserver').sourceSets.main.java
     source project(':cscore').sourceSets.main.java
+    source project(':datalog').sourceSets.main.java
     source project(':epilogue-runtime').sourceSets.main.java
     source project(':hal').sourceSets.main.java
     source project(':ntcore').sourceSets.main.java
+    source project(':telemetry').sourceSets.main.java
     source project(':wpilibNewCommands').sourceSets.main.java
     source project(':wpilibj').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java

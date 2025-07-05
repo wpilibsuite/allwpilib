@@ -7,7 +7,6 @@
 #include <concepts>
 #include <memory>
 #include <string>
-#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -15,8 +14,7 @@
 #include <hal/SimDevice.h>
 #include <units/voltage.h>
 #include <wpi/deprecated.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc/MotorSafety.h"
 #include "frc/PWM.h"
@@ -31,8 +29,7 @@ WPI_IGNORE_DEPRECATED
  */
 class PWMMotorController : public MotorController,
                            public MotorSafety,
-                           public wpi::Sendable,
-                           public wpi::SendableHelper<PWMMotorController> {
+                           public wpi::TelemetryLoggable {
  public:
   PWMMotorController(PWMMotorController&&) = default;
   PWMMotorController& operator=(PWMMotorController&&) = default;
@@ -119,17 +116,18 @@ class PWMMotorController : public MotorController,
         std::make_unique<std::decay_t<T>>(std::forward<T>(follower)));
   }
 
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
+
  protected:
   /**
    * Constructor for a PWM Motor %Controller connected via PWM.
    *
-   * @param name Name to use for SendableRegistry
    * @param channel The PWM channel that the controller is attached to. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
-  PWMMotorController(std::string_view name, int channel);
-
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  explicit PWMMotorController(int channel);
 
   /// PWM instances for motor controller.
   PWM m_pwm;
