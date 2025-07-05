@@ -181,7 +181,7 @@ configurations {
 
 task generateJavaDocs(type: Javadoc) {
     classpath += project(":wpilibj").sourceSets.main.compileClasspath
-    options.links("https://docs.oracle.com/en/java/javase/17/docs/api/")
+    options.links("https://docs.oracle.com/en/java/javase/21/docs/api/")
     options.links("https://docs.opencv.org/4.x/javadoc/")
     options.addStringOption("tag", "pre:a:Pre-Condition")
     options.addBooleanOption("Xdoclint/package:" +
