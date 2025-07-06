@@ -9,6 +9,8 @@ http_archive(
 
 http_archive(
     name = "rules_cc",
+    patch_args = ["-p1"],
+    patches = ["//:rules_cc_windows.patch"],
     sha256 = "712d77868b3152dd618c4d64faaddefcc5965f90f5de6e6dd1d5ddcd0be82d42",
     strip_prefix = "rules_cc-0.1.1",
     url = "https://github.com/bazelbuild/rules_cc/releases/download/0.1.1/rules_cc-0.1.1.tar.gz",
@@ -16,6 +18,8 @@ http_archive(
 
 http_archive(
     name = "build_bazel_apple_support",
+    patch_args = ["-p1"],
+    patches = ["//:apple_support.patch"],
     sha256 = "b265beacfa477081caaf2bd05978ee7d11fdb8c202a1b76d0ef28d901d1e7b33",
     url = "https://github.com/bazelbuild/apple_support/releases/download/1.22.0/apple_support.1.22.0.tar.gz",
 )
@@ -47,6 +51,8 @@ http_archive(
 # Download Extra java rules
 http_archive(
     name = "rules_jvm_external",
+    patch_args = ["-p1"],
+    patches = ["//:rules_jvm_external.patch"],
     sha256 = "4f55980c25d0783b9fe43b049362018d8d79263476b5340a5491893ffcc06ab6",
     strip_prefix = "rules_jvm_external-30899314873b6ec69dc7d02c4457fbe52a6e535d",
     url = "https://github.com/bazel-contrib/rules_jvm_external/archive/30899314873b6ec69dc7d02c4457fbe52a6e535d.tar.gz",
@@ -63,8 +69,8 @@ http_archive(
 # Download toolchains
 http_archive(
     name = "rules_bzlmodrio_toolchains",
-    sha256 = "2bf0266dd899ce634549d5e610c04b871047b75b9d02ea72d37a4d3c28ac981f",
-    url = "https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr3/rules_bzlmodrio_toolchains-2025-1.bcr3.tar.gz",
+    sha256 = "37780b3d3f30de72aaca12d9f80edc4216f6d708bed5b261c424d4dde49e8531",
+    url = "https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr4/rules_bzlmodrio_toolchains-2025-1.bcr4.tar.gz",
 )
 
 load("@bazel_features//:deps.bzl", "bazel_features_deps")
@@ -282,6 +288,8 @@ setup_legacy_bzlmodrio_ni_cpp_dependencies()
 
 http_archive(
     name = "bzlmodrio-opencv",
+    patch_args = ["-p1"],
+    patches = ["//:opencv.patch"],
     sha256 = "6e8544fae07ed5b4fedc146f6ad083d0d8947e3efb5332a20abc46601a52a1b5",
     url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr2/bzlmodRio-opencv-2025.4.10.0-3.bcr2.tar.gz",
 )
@@ -296,6 +304,8 @@ setup_legacy_bzlmodrio_opencv_java_dependencies()
 
 http_archive(
     name = "bzlmodrio-libssh",
+    patch_args = ["-p1"],
+    patches = ["//:libssh.patch"],
     sha256 = "65caef82554617403a16c79e8bcac6553d40eca3e23197e63275bba22db7d5b5",
     strip_prefix = "bzlmodRio-libssh-8405fbd5eb4e42b495f08f6ccf6fbbe5ced28bb7",
     urls = ["https://github.com/wpilibsuite/bzlmodRio-libssh/archive/8405fbd5eb4e42b495f08f6ccf6fbbe5ced28bb7.tar.gz"],
@@ -316,10 +326,17 @@ http_file(
 )
 
 http_file(
-    name = "quickbuffer_protoc_osx",
+    name = "quickbuffer_protoc_osx_x86-64",
     executable = True,
     sha256 = "ea307c2b69664ae7e7c69db4cddf5803187e5a34bceffd09a21652f0f16044f7",
     url = "https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/" + QUICKBUF_VERSION + "/protoc-gen-quickbuf-" + QUICKBUF_VERSION + "-osx-x86_64.exe   ",
+)
+
+http_file(
+    name = "quickbuffer_protoc_osx_aarch64",
+    executable = True,
+    sha256 = "a9abdee09d8b5ef0aa954b238536917313511deec11e1901994af26ade033e28",
+    url = "https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/" + QUICKBUF_VERSION + "/protoc-gen-quickbuf-" + QUICKBUF_VERSION + "-osx-aarch_64.exe   ",
 )
 
 http_file(
