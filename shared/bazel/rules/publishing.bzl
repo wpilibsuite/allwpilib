@@ -34,10 +34,10 @@ def architectures_pkg_zip(
         name,
         compilation_modes = ["dbg", "opt"],
         architectures = {
-            "//shared/bazel/rules:linux_x86_64": "linux-x86-64",
-            "//shared/bazel/rules:osx": "osxuniversal",
-            "//shared/bazel/rules:windows_arm64": "windows-arm64",
-            "//shared/bazel/rules:windows_x86_64": "windows-x86-64",
+            "@rules_bzlmodrio_toolchains//platforms/linux_x86_64": "linux-x86-64",
+            "@rules_bzlmodrio_toolchains//platforms/osx": "osxuniversal",
+            "@rules_bzlmodrio_toolchains//platforms/windows_arm64": "windows-arm64",
+            "@rules_bzlmodrio_toolchains//platforms/windows_x86_64": "windows-x86-64",
             "@rules_bzlmodrio_toolchains//platforms/systemcore": "systemcore",
         },
         **kwargs):
