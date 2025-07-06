@@ -13,7 +13,6 @@
 #include <wpi/spinlock.h>
 
 #ifdef _WIN32
-#undef _WIN32_WINNT
 #include <Windows.h>
 #pragma comment(lib, "Winmm.lib")
 #pragma comment(lib, "ntdll.lib")

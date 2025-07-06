@@ -124,10 +124,6 @@ wpilib_cc_library(
         ":libuv-srcs",
     ] + ["native-srcs"],
     hdrs = glob(["src/main/native/include/**/*"]),
-    copts = select({
-        "@bazel_tools//src/conditions:windows": ["/U_WIN32_WINNT"],
-        "//conditions:default": [],
-    }),
     extra_hdr_pkg_files = [":thirdparty-libuv-hdr-pkg"],
     extra_src_pkg_files = [
         ":wpinet-java-jni-hdrs-pkg",

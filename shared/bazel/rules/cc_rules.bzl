@@ -178,13 +178,13 @@ def wpilib_cc_shared_library(
     pkg_files(
         name = folder + "/lib" + lib + "-shared-files",
         srcs = select({
-            "//shared/bazel/rules:is_osx": [universal_name],
+            "@rules_bzlmodrio_toolchains//conditions:osx": [universal_name],
             "//conditions:default": [
                 ":" + name,
             ],
         }),
         strip_prefix = select({
-            "//shared/bazel/rules:is_osx": "universal",
+            "@rules_bzlmodrio_toolchains//conditions:osx": "universal",
             "//conditions:default": folder,
         }),
     )

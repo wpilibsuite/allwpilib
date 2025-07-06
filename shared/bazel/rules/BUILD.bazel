@@ -21,15 +21,6 @@ pkg_files(
     visibility = ["//visibility:public"],
 )
 
-config_setting(
-    name = "is_linux_x86_64",
-    constraint_values = [
-        "@platforms//cpu:x86_64",
-        "@platforms//os:linux",
-    ],
-    visibility = ["//visibility:public"],
-)
-
 platform(
     name = "linux_x86_64",
     constraint_values = [
@@ -44,69 +35,6 @@ platform(
     constraint_values = [
         "@platforms//os:osx",
     ] + [x for x in _host_constraints if x.startswith("@platforms//cpu:")],
-    visibility = ["//visibility:public"],
-)
-
-config_setting(
-    name = "compilation_mode_dbg",
-    values = {
-        "compilation_mode": "dbg",
-    },
-)
-
-config_setting(
-    name = "is_linux_x86_64_dbg",
-    constraint_values = [
-        "@platforms//cpu:x86_64",
-        "@platforms//os:linux",
-    ],
-    values = {
-        "compilation_mode": "dbg",
-    },
-    visibility = ["//visibility:public"],
-)
-
-config_setting(
-    name = "is_osx",
-    constraint_values = [
-        "@platforms//os:osx",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-config_setting(
-    name = "is_osx_x86_64",
-    constraint_values = [
-        "@platforms//os:osx",
-        "@platforms//cpu:x86_64",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-config_setting(
-    name = "is_osx_aarch64",
-    constraint_values = [
-        "@platforms//os:osx",
-        "@platforms//cpu:aarch64",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-config_setting(
-    name = "is_windows_x86_64",
-    constraint_values = [
-        "@platforms//os:windows",
-        "@platforms//cpu:x86_64",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-config_setting(
-    name = "is_windows_arm64",
-    constraint_values = [
-        "@platforms//os:windows",
-        "@platforms//cpu:arm64",
-    ],
     visibility = ["//visibility:public"],
 )
 
