@@ -2,5 +2,4 @@
 # Roborio
 ###############################
 build:roborio --platforms=@rules_bzlmodrio_toolchains//platforms/roborio
-#build:roborio --features=compiler_param_file
 build:roborio --platform_suffix=roborio
