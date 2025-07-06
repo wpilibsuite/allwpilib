@@ -127,7 +127,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Returns the DC motor's velocity.
    *
-   * @return The DC motor's velocity.
+   * @return The DC motor's velocity in radians per second.
    */
   public double getAngularVelocity() {
     return getOutput(1);
