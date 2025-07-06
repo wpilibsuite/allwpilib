@@ -21,7 +21,7 @@ build:windows --repo_env="BAZEL_LINKOPTS=/DEPENDENTLOADFLAG%:0x1100"
 ################################
 # ARM Windows Flags
 ################################
-build:windows_arm --platforms="//shared/bazel/rules:windows_arm64" --platform_suffix=windowsarm64
+build:windows_arm --platforms="@rules_bzlmodrio_toolchains//platforms/windows_arm64" --platform_suffix=windowsarm64
 
 # Ignore duplicate inline statment in tools
 build:windows --host_copt=/wd4141
