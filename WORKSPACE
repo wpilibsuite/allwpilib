@@ -69,8 +69,6 @@ http_archive(
 # Download toolchains
 http_archive(
     name = "rules_bzlmodrio_toolchains",
-    #patch_args = ["-p1"],
-    #patches = ["//:bzlmodrio.patch"],
     sha256 = "37780b3d3f30de72aaca12d9f80edc4216f6d708bed5b261c424d4dde49e8531",
     url = "https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr4/rules_bzlmodrio_toolchains-2025-1.bcr4.tar.gz",
 )
@@ -241,8 +239,6 @@ load_toolchains()
 #
 http_archive(
     name = "rules_bzlmodrio_jdk",
-    #patch_args = ["-p1"],
-    #patches = ["//:systemcore_jdk.patch"],
     sha256 = "623b8bcdba1c3140f56e940365f011d2e5d90d74c7a30ace6a8817c037c1dd61",
     url = "https://github.com/wpilibsuite/rules_bzlmodRio_jdk/releases/download/17.0.12-7.bcr1/rules_bzlmodrio_jdk-17.0.12-7.bcr1.tar.gz",
 )
