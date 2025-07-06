@@ -69,10 +69,10 @@ http_archive(
 # Download toolchains
 http_archive(
     name = "rules_bzlmodrio_toolchains",
-    patch_args = ["-p1"],
-    patches = ["//:bzlmodrio.patch"],
-    sha256 = "2bf0266dd899ce634549d5e610c04b871047b75b9d02ea72d37a4d3c28ac981f",
-    url = "https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr3/rules_bzlmodrio_toolchains-2025-1.bcr3.tar.gz",
+    #patch_args = ["-p1"],
+    #patches = ["//:bzlmodrio.patch"],
+    sha256 = "37780b3d3f30de72aaca12d9f80edc4216f6d708bed5b261c424d4dde49e8531",
+    url = "https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr4/rules_bzlmodrio_toolchains-2025-1.bcr4.tar.gz",
 )
 
 load("@bazel_features//:deps.bzl", "bazel_features_deps")
@@ -241,10 +241,10 @@ load_toolchains()
 #
 http_archive(
     name = "rules_bzlmodrio_jdk",
-    patch_args = ["-p1"],
-    patches = ["//:systemcore_jdk.patch"],
-    sha256 = "81869fe9860e39b17e4a9bc1d33c1ca2faede7e31d9538ed0712406f753a2163",
-    url = "https://github.com/wpilibsuite/rules_bzlmodRio_jdk/releases/download/17.0.12-7/rules_bzlmodRio_jdk-17.0.12-7.tar.gz",
+    #patch_args = ["-p1"],
+    #patches = ["//:systemcore_jdk.patch"],
+    sha256 = "623b8bcdba1c3140f56e940365f011d2e5d90d74c7a30ace6a8817c037c1dd61",
+    url = "https://github.com/wpilibsuite/rules_bzlmodRio_jdk/releases/download/17.0.12-7.bcr1/rules_bzlmodrio_jdk-17.0.12-7.bcr1.tar.gz",
 )
 
 load("@rules_bzlmodrio_jdk//:maven_deps.bzl", "setup_legacy_setup_jdk_dependencies")
