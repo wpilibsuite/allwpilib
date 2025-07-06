@@ -15,7 +15,7 @@ def generate_quickbuf(
     proto_files = proto_dir.glob("*.proto")
     for path in proto_files:
         absolute_filename = path.absolute()
-        subprocess.run(
+        subprocess.check_call(
             [
                 protoc,
                 f"--plugin=protoc-gen-quickbuf={quickbuf_plugin}",
