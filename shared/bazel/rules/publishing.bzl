@@ -36,9 +36,9 @@ def architectures_pkg_zip(
         architectures = {
             "@rules_bzlmodrio_toolchains//platforms/linux_x86_64": "linux-x86-64",
             "@rules_bzlmodrio_toolchains//platforms/osx": "osxuniversal",
+            "@rules_bzlmodrio_toolchains//platforms/systemcore": "systemcore",
             "@rules_bzlmodrio_toolchains//platforms/windows_arm64": "windows-arm64",
             "@rules_bzlmodrio_toolchains//platforms/windows_x86_64": "windows-x86-64",
-            "@rules_bzlmodrio_toolchains//platforms/systemcore": "systemcore",
         },
         **kwargs):
     architectures_target_compatible_with = {
