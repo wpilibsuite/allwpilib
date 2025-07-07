@@ -135,7 +135,7 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
   @Test
   void testApplyDeadband2dLargeMaxMagnitude() {
     assertEquals(
-        new Translation2d(90.0, Rotation2d.kZero),
+        new Translation2d(80.0, Rotation2d.kZero),
         MathUtil.applyDeadband2d(
             new Translation2d(100.0, Rotation2d.kZero), 20, Double.POSITIVE_INFINITY));
   }
