@@ -125,8 +125,6 @@ if(NOT WITH_PROTOBUF)
     list(APPEND wpiutil_native_src src/main/native/cpp/protobuf/Protobuf.cpp)
 endif()
 file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
-file(GLOB_RECURSE wpiutil_linux_src src/main/native/linux/*.cpp)
-file(GLOB_RECURSE wpiutil_macos_src src/main/native/macOS/*.cpp)
 file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 
 file(GLOB fmtlib_native_src src/main/native/thirdparty/fmtlib/src/*.cpp)
@@ -136,7 +134,7 @@ set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
 
-target_compile_features(wpiutil PUBLIC cxx_std_20)
+target_compile_features(wpiutil PUBLIC cxx_std_23)
 if(MSVC)
     target_compile_options(
         wpiutil
@@ -183,11 +181,6 @@ if(MSVC)
     target_sources(wpiutil PRIVATE ${wpiutil_windows_src})
 else()
     target_sources(wpiutil PRIVATE ${wpiutil_unix_src})
-    if(APPLE)
-        target_sources(wpiutil PRIVATE ${wpiutil_macos_src})
-    else()
-        target_sources(wpiutil PRIVATE ${wpiutil_linux_src})
-    endif()
 endif()
 
 install(
