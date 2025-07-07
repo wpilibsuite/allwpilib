@@ -48,6 +48,12 @@ cppHeadersZip {
     }
 }
 
+cppSourcesZip {
+    from(generatedSources) {
+        into '/'
+    }
+}
+
 Action<List<String>> symbolFilter = { symbols ->
     symbols.removeIf({ !it.startsWith('NT_') })
 } as Action<List<String>>;
