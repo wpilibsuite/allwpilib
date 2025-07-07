@@ -109,7 +109,7 @@ constexpr Translation2d ApplyDeadband2d(const Translation2d& value,
                                         units::meter_t deadband,
                                         units::meter_t maxDistance = 1_m) {
   units::meter_t norm = value.Norm();
-  if (norm  <= 1e-6_m) {
+  if (norm <= 1e-6_m) {
     return Translation2d{};
   }
   return Translation2d{ApplyDeadband(norm, deadband, maxDistance),
