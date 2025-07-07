@@ -119,8 +119,11 @@ public final class MathUtil {
    */
   public static Translation2d applyDeadband2d(
       Translation2d value, double deadband, double maxDistance) {
-    return new Translation2d(
-        applyDeadband(value.getNorm(), deadband, maxDistance), value.getAngle());
+    double norm = value.getNorm();
+    if (norm <= 1e-6) {
+      return Translation2d.kZero;
+    }
+    return new Translation2d(applyDeadband(norm, deadband, maxDistance), value.getAngle());
   }
 
   /**
@@ -188,7 +191,11 @@ public final class MathUtil {
    */
   public static Translation2d copySignPow2d(
       Translation2d value, double exponent, double maxDistance) {
-    return new Translation2d(copySignPow(value.getNorm(), exponent, maxDistance), value.getAngle());
+    double norm = value.getNorm();
+    if (norm <= 1e-6) {
+      return Translation2d.kZero;
+    }
+    return new Translation2d(copySignPow(norm, exponent, maxDistance), value.getAngle());
   }
 
   /**
