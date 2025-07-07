@@ -5,7 +5,8 @@
         "items.find": {
           "$or":[
             { "repo": "wpilib-generic-gradlecache" },
-            { "repo": "wpilib-generic-cache-cmake" }
+            { "repo": "wpilib-generic-cache-cmake" },
+            { "repo": "wpilib-generic-cache-bazel" }
           ],
           "$or":[
             {
