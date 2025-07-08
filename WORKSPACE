@@ -1,10 +1,23 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
 http_archive(
+    name = "bazel_features",
+    sha256 = "a015f3f2ebf4f1ac3f4ca8ea371610acb63e1903514fa8725272d381948d2747",
+    strip_prefix = "bazel_features-1.31.0",
+    url = "https://github.com/bazel-contrib/bazel_features/releases/download/v1.31.0/bazel_features-v1.31.0.tar.gz",
+)
+
+http_archive(
     name = "rules_cc",
     sha256 = "712d77868b3152dd618c4d64faaddefcc5965f90f5de6e6dd1d5ddcd0be82d42",
     strip_prefix = "rules_cc-0.1.1",
     url = "https://github.com/bazelbuild/rules_cc/releases/download/0.1.1/rules_cc-0.1.1.tar.gz",
+)
+
+http_archive(
+    name = "build_bazel_apple_support",
+    sha256 = "b265beacfa477081caaf2bd05978ee7d11fdb8c202a1b76d0ef28d901d1e7b33",
+    url = "https://github.com/bazelbuild/apple_support/releases/download/1.22.0/apple_support.1.22.0.tar.gz",
 )
 
 http_archive(
@@ -14,6 +27,57 @@ http_archive(
         "https://github.com/bazelbuild/rules_java/releases/download/8.11.0/rules_java-8.11.0.tar.gz",
     ],
 )
+
+http_archive(
+    name = "rules_pkg",
+    sha256 = "cad05f864a32799f6f9022891de91ac78f30e0fa07dc68abac92a628121b5b11",
+    urls = [
+        "https://github.com/bazelbuild/rules_pkg/releases/download/1.0.0/rules_pkg-1.0.0.tar.gz",
+    ],
+)
+
+# Rules Python
+http_archive(
+    name = "rules_python",
+    sha256 = "9f9f3b300a9264e4c77999312ce663be5dee9a56e361a1f6fe7ec60e1beef9a3",
+    strip_prefix = "rules_python-1.4.1",
+    url = "https://github.com/bazel-contrib/rules_python/releases/download/1.4.1/rules_python-1.4.1.tar.gz",
+)
+
+# Download Extra java rules
+http_archive(
+    name = "rules_jvm_external",
+    sha256 = "4f55980c25d0783b9fe43b049362018d8d79263476b5340a5491893ffcc06ab6",
+    strip_prefix = "rules_jvm_external-30899314873b6ec69dc7d02c4457fbe52a6e535d",
+    url = "https://github.com/bazel-contrib/rules_jvm_external/archive/30899314873b6ec69dc7d02c4457fbe52a6e535d.tar.gz",
+)
+
+# Setup aspect lib
+http_archive(
+    name = "aspect_bazel_lib",
+    sha256 = "a8a92645e7298bbf538aa880131c6adb4cf6239bbd27230f077a00414d58e4ce",
+    strip_prefix = "bazel-lib-2.7.2",
+    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.7.2/bazel-lib-v2.7.2.tar.gz",
+)
+
+# Download toolchains
+http_archive(
+    name = "rules_bzlmodrio_toolchains",
+    sha256 = "2bf0266dd899ce634549d5e610c04b871047b75b9d02ea72d37a4d3c28ac981f",
+    url = "https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr3/rules_bzlmodrio_toolchains-2025-1.bcr3.tar.gz",
+)
+
+load("@bazel_features//:deps.bzl", "bazel_features_deps")
+
+bazel_features_deps()
+
+load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependencies")
+
+apple_support_dependencies()
+
+load("@rules_cc//cc:repositories.bzl", "rules_cc_toolchains")
+
+rules_cc_toolchains()
 
 load("@rules_java//java:rules_java_deps.bzl", "rules_java_dependencies")
 
@@ -29,14 +93,6 @@ proto_bazel_features(name = "proto_bazel_features")
 load("@rules_java//java:repositories.bzl", "rules_java_toolchains")
 
 rules_java_toolchains()
-
-# Rules Python
-http_archive(
-    name = "rules_python",
-    sha256 = "9f9f3b300a9264e4c77999312ce663be5dee9a56e361a1f6fe7ec60e1beef9a3",
-    strip_prefix = "rules_python-1.4.1",
-    url = "https://github.com/bazel-contrib/rules_python/releases/download/1.4.1/rules_python-1.4.1.tar.gz",
-)
 
 load("@rules_python//python:repositories.bzl", "py_repositories", "python_register_toolchains")
 
@@ -61,17 +117,13 @@ load("@allwpilib_pip_deps//:requirements.bzl", "install_deps")
 
 install_deps()
 
-# Download Extra java rules
-http_archive(
-    name = "rules_jvm_external",
-    sha256 = "08ea921df02ffe9924123b0686dc04fd0ff875710bfadb7ad42badb931b0fd50",
-    strip_prefix = "rules_jvm_external-6.1",
-    url = "https://github.com/bazelbuild/rules_jvm_external/releases/download/6.1/rules_jvm_external-6.1.tar.gz",
-)
-
 load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
 
 rules_jvm_external_deps()
+
+load("@rules_jvm_external//:setup.bzl", "rules_jvm_external_setup")
+
+rules_jvm_external_setup()
 
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 load("@rules_jvm_external//:specs.bzl", "maven")
@@ -165,26 +217,11 @@ load("@maven//:defs.bzl", "pinned_maven_install")
 
 pinned_maven_install()
 
-# Setup aspect lib
-http_archive(
-    name = "aspect_bazel_lib",
-    sha256 = "a8a92645e7298bbf538aa880131c6adb4cf6239bbd27230f077a00414d58e4ce",
-    strip_prefix = "bazel-lib-2.7.2",
-    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.7.2/bazel-lib-v2.7.2.tar.gz",
-)
-
 load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "aspect_bazel_lib_register_toolchains")
 
 aspect_bazel_lib_dependencies()
 
 aspect_bazel_lib_register_toolchains()
-
-# Download toolchains
-http_archive(
-    name = "rules_bzlmodrio_toolchains",
-    sha256 = "ff25b5f9445cbd43759be4c6582b987d1065cf817c593eedc7ada1a699298c84",
-    url = "https://github.com/wpilibsuite/rules_bzlmodRio_toolchains/releases/download/2025-1.bcr2/rules_bzlmodRio_toolchains-2025-1.bcr2.tar.gz",
-)
 
 load("@rules_bzlmodrio_toolchains//:maven_deps.bzl", "setup_legacy_setup_toolchains_dependencies")
 
@@ -197,8 +234,8 @@ load_toolchains()
 #
 http_archive(
     name = "rules_bzlmodrio_jdk",
-    sha256 = "81869fe9860e39b17e4a9bc1d33c1ca2faede7e31d9538ed0712406f753a2163",
-    url = "https://github.com/wpilibsuite/rules_bzlmodRio_jdk/releases/download/17.0.12-7/rules_bzlmodRio_jdk-17.0.12-7.tar.gz",
+    sha256 = "623b8bcdba1c3140f56e940365f011d2e5d90d74c7a30ace6a8817c037c1dd61",
+    url = "https://github.com/wpilibsuite/rules_bzlmodRio_jdk/releases/download/17.0.12-7.bcr1/rules_bzlmodrio_jdk-17.0.12-7.bcr1.tar.gz",
 )
 
 load("@rules_bzlmodrio_jdk//:maven_deps.bzl", "setup_legacy_setup_jdk_dependencies")
@@ -269,19 +306,6 @@ load("@bzlmodrio-libssh//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_libssh_cp
 
 setup_legacy_bzlmodrio_libssh_cpp_dependencies()
 
-http_archive(
-    name = "build_bazel_apple_support",
-    sha256 = "c4bb2b7367c484382300aee75be598b92f847896fb31bbd22f3a2346adf66a80",
-    url = "https://github.com/bazelbuild/apple_support/releases/download/1.15.1/apple_support.1.15.1.tar.gz",
-)
-
-load(
-    "@build_bazel_apple_support//lib:repositories.bzl",
-    "apple_support_dependencies",
-)
-
-apple_support_dependencies()
-
 # Setup quickbuf compiler
 QUICKBUF_VERSION = "1.3.2"
 
@@ -321,6 +345,10 @@ rules_proto_dependencies()
 load("@rules_proto//proto:setup.bzl", "rules_proto_setup")
 
 rules_proto_setup()
+
+load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+
+rules_pkg_dependencies()
 
 http_archive(
     name = "pybind11_bazel",
