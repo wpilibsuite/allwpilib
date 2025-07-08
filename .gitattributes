@@ -28,3 +28,5 @@
 
 # Generated files
 */src/generated/** linguist-generated
+*/robotpy_native_build_info.bzl linguist-generated
+*/robotpy_pybind_build_info.bzl linguist-generated
