@@ -43,7 +43,7 @@ public class TrapezoidProfile {
   private int m_direction;
 
   private final Constraints m_constraints;
-  private State m_current;
+  private State m_current = new State();
 
   private double m_endAccel;
   private double m_endFullSpeed;
@@ -60,10 +60,14 @@ public class TrapezoidProfile {
     /**
      * Constructs constraints for a TrapezoidProfile.
      *
-     * @param maxVelocity maximum velocity
-     * @param maxAcceleration maximum acceleration
+     * @param maxVelocity Maximum velocity, must be non-negative.
+     * @param maxAcceleration Maximum acceleration, must be non-negative.
      */
     public Constraints(double maxVelocity, double maxAcceleration) {
+      if (maxVelocity < 0.0 || maxAcceleration < 0.0) {
+        throw new IllegalArgumentException("Constraints must be non-negative");
+      }
+
       this.maxVelocity = maxVelocity;
       this.maxAcceleration = maxAcceleration;
       MathSharedStore.reportUsage(MathUsageId.kTrajectory_TrapezoidProfile, 1);
@@ -128,8 +132,8 @@ public class TrapezoidProfile {
     m_current = direct(current);
     goal = direct(goal);
 
-    if (m_current.velocity > m_constraints.maxVelocity) {
-      m_current.velocity = m_constraints.maxVelocity;
+    if (Math.abs(m_current.velocity) > m_constraints.maxVelocity) {
+      m_current.velocity = Math.copySign(m_constraints.maxVelocity, m_current.velocity);
     }
 
     // Deal with a possibly truncated motion profile (with nonzero initial or
@@ -187,7 +191,8 @@ public class TrapezoidProfile {
    * Returns the time left until a target distance in the profile is reached.
    *
    * @param target The target distance.
-   * @return The time left until a target distance in the profile is reached.
+   * @return The time left until a target distance in the profile is reached, or zero if no goal was
+   *     set.
    */
   public double timeLeftUntil(double target) {
     double position = m_current.position * m_direction;
@@ -253,7 +258,7 @@ public class TrapezoidProfile {
   /**
    * Returns the total time the profile takes to reach the goal.
    *
-   * @return The total time the profile takes to reach the goal.
+   * @return The total time the profile takes to reach the goal, or zero if no goal was set.
    */
   public double totalTime() {
     return m_endDecel;

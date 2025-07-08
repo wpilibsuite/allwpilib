@@ -26,8 +26,10 @@ includeOtherLibs {
   ^frc/
   ^google/
   ^imgui
+  portable-file-dialogs.h
   ^networktables/
   ^ntcore
+  ^units
   ^wpi/
   ^wpigui
   ^wpimath/

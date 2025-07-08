@@ -92,7 +92,7 @@ struct CommaInitializer {
 
   EIGEN_DEVICE_FUNC inline ~CommaInitializer()
 #if defined VERIFY_RAISES_ASSERT && (!defined EIGEN_NO_ASSERTION_CHECKING) && defined EIGEN_EXCEPTIONS
-      EIGEN_EXCEPTION_SPEC(Eigen::eigen_assert_exception)
+      noexcept(false)  // Eigen::eigen_assert_exception
 #endif
   {
     finished();

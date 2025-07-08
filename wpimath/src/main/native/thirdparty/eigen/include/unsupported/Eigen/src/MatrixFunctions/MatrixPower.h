@@ -91,7 +91,7 @@ class MatrixPowerAtomic : internal::noncopyable {
   enum { RowsAtCompileTime = MatrixType::RowsAtCompileTime, MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime };
   typedef typename MatrixType::Scalar Scalar;
   typedef typename MatrixType::RealScalar RealScalar;
-  typedef std::complex<RealScalar> ComplexScalar;
+  typedef internal::make_complex_t<Scalar> ComplexScalar;
   typedef Block<MatrixType, Dynamic, Dynamic> ResultType;
 
   const MatrixType& m_A;
@@ -380,7 +380,7 @@ class MatrixPower : internal::noncopyable {
   Index cols() const { return m_A.cols(); }
 
  private:
-  typedef std::complex<RealScalar> ComplexScalar;
+  typedef internal::make_complex_t<Scalar> ComplexScalar;
   typedef Matrix<ComplexScalar, Dynamic, Dynamic, 0, MatrixType::RowsAtCompileTime, MatrixType::ColsAtCompileTime>
       ComplexMatrix;
 
@@ -628,7 +628,7 @@ template <typename Derived>
 class MatrixComplexPowerReturnValue : public ReturnByValue<MatrixComplexPowerReturnValue<Derived> > {
  public:
   typedef typename Derived::PlainObject PlainObject;
-  typedef typename std::complex<typename Derived::RealScalar> ComplexScalar;
+  typedef internal::make_complex_t<typename Derived::Scalar> ComplexScalar;
 
   /**
    * \brief Constructor.
@@ -685,7 +685,7 @@ const MatrixPowerReturnValue<Derived> MatrixBase<Derived>::pow(const RealScalar&
 }
 
 template <typename Derived>
-const MatrixComplexPowerReturnValue<Derived> MatrixBase<Derived>::pow(const std::complex<RealScalar>& p) const {
+const MatrixComplexPowerReturnValue<Derived> MatrixBase<Derived>::pow(const internal::make_complex_t<Scalar>& p) const {
   return MatrixComplexPowerReturnValue<Derived>(derived(), p);
 }
 

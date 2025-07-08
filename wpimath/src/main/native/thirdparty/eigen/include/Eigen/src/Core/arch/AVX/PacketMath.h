@@ -122,6 +122,7 @@ struct packet_traits<float> : default_packet_traits {
     HasBessel = 1,
     HasSqrt = 1,
     HasRsqrt = 1,
+    HasCbrt = 1,
     HasTanh = EIGEN_FAST_MATH,
     HasErf = EIGEN_FAST_MATH,
     HasErfc = EIGEN_FAST_MATH,
@@ -145,10 +146,12 @@ struct packet_traits<double> : default_packet_traits {
 #endif
     HasTanh = EIGEN_FAST_MATH,
     HasLog = 1,
+    HasErf = 1,
     HasErfc = 1,
     HasExp = 1,
     HasSqrt = 1,
     HasRsqrt = 1,
+    HasCbrt = 1,
     HasATan = 1,
     HasATanh = 1,
     HasBlend = 1
@@ -1838,10 +1841,13 @@ EIGEN_STRONG_INLINE Packet8ui pabs(const Packet8ui& a) {
   return a;
 }
 
+#ifndef EIGEN_VECTORIZE_AVX512FP16
 template <>
 EIGEN_STRONG_INLINE Packet8h psignbit(const Packet8h& a) {
   return _mm_cmpgt_epi16(_mm_setzero_si128(), a);
 }
+#endif  // EIGEN_VECTORIZE_AVX512FP16
+
 template <>
 EIGEN_STRONG_INLINE Packet8bf psignbit(const Packet8bf& a) {
   return _mm_cmpgt_epi16(_mm_setzero_si128(), a);
@@ -1931,6 +1937,22 @@ EIGEN_STRONG_INLINE Packet4d pldexp<Packet4d>(const Packet4d& a, const Packet4d&
   c = _mm256_castsi256_pd(_mm256_insertf128_si256(_mm256_castsi128_si256(lo), hi, 1));
   out = pmul(out, c);  // a * 2^e
   return out;
+}
+
+template <>
+EIGEN_STRONG_INLINE Packet4d pldexp_fast<Packet4d>(const Packet4d& a, const Packet4d& exponent) {
+  // Clamp exponent to [-1024, 1024]
+  const Packet4d min_exponent = pset1<Packet4d>(-1023.0);
+  const Packet4d max_exponent = pset1<Packet4d>(1024.0);
+  const Packet4i e = _mm256_cvtpd_epi32(pmin(pmax(exponent, min_exponent), max_exponent));
+  const Packet4i bias = pset1<Packet4i>(1023);
+
+  // 2^e
+  Packet4i hi = vec4i_swizzle1(padd(e, bias), 0, 2, 1, 3);
+  const Packet4i lo = _mm_slli_epi64(hi, 52);
+  hi = _mm_slli_epi64(_mm_srli_epi64(hi, 32), 52);
+  const Packet4d c = _mm256_castsi256_pd(_mm256_insertf128_si256(_mm256_castsi128_si256(lo), hi, 1));
+  return pmul(a, c);  // a * 2^e
 }
 
 template <>
@@ -2027,10 +2049,13 @@ EIGEN_STRONG_INLINE bool predux_any(const Packet8ui& x) {
   return _mm256_movemask_ps(_mm256_castsi256_ps(x)) != 0;
 }
 
+#ifndef EIGEN_VECTORIZE_AVX512FP16
 template <>
 EIGEN_STRONG_INLINE bool predux_any(const Packet8h& x) {
   return _mm_movemask_epi8(x) != 0;
 }
+#endif  // EIGEN_VECTORIZE_AVX512FP16
+
 template <>
 EIGEN_STRONG_INLINE bool predux_any(const Packet8bf& x) {
   return _mm_movemask_epi8(x) != 0;
@@ -2194,7 +2219,6 @@ struct unpacket_traits<Packet8h> {
   };
   typedef Packet8h half;
 };
-#endif
 
 template <>
 EIGEN_STRONG_INLINE Packet8h pset1<Packet8h>(const Eigen::half& from) {
@@ -2394,6 +2418,26 @@ EIGEN_STRONG_INLINE Packet8h pmul<Packet8h>(const Packet8h& a, const Packet8h& b
 }
 
 template <>
+EIGEN_STRONG_INLINE Packet8h pmadd<Packet8h>(const Packet8h& a, const Packet8h& b, const Packet8h& c) {
+  return float2half(pmadd(half2float(a), half2float(b), half2float(c)));
+}
+
+template <>
+EIGEN_STRONG_INLINE Packet8h pmsub<Packet8h>(const Packet8h& a, const Packet8h& b, const Packet8h& c) {
+  return float2half(pmsub(half2float(a), half2float(b), half2float(c)));
+}
+
+template <>
+EIGEN_STRONG_INLINE Packet8h pnmadd<Packet8h>(const Packet8h& a, const Packet8h& b, const Packet8h& c) {
+  return float2half(pnmadd(half2float(a), half2float(b), half2float(c)));
+}
+
+template <>
+EIGEN_STRONG_INLINE Packet8h pnmsub<Packet8h>(const Packet8h& a, const Packet8h& b, const Packet8h& c) {
+  return float2half(pnmsub(half2float(a), half2float(b), half2float(c)));
+}
+
+template <>
 EIGEN_STRONG_INLINE Packet8h pdiv<Packet8h>(const Packet8h& a, const Packet8h& b) {
   Packet8f af = half2float(a);
   Packet8f bf = half2float(b);
@@ -2429,14 +2473,12 @@ EIGEN_STRONG_INLINE void pscatter<Eigen::half, Packet8h>(Eigen::half* to, const 
   to[stride * 7] = aux[7];
 }
 
-#ifndef EIGEN_VECTORIZE_AVX512FP16
 template <>
 EIGEN_STRONG_INLINE Eigen::half predux<Packet8h>(const Packet8h& a) {
   Packet8f af = half2float(a);
   float reduced = predux<Packet8f>(af);
   return Eigen::half(reduced);
 }
-#endif
 
 template <>
 EIGEN_STRONG_INLINE Eigen::half predux_max<Packet8h>(const Packet8h& a) {
@@ -2535,6 +2577,8 @@ EIGEN_STRONG_INLINE void ptranspose(PacketBlock<Packet8h, 4>& kernel) {
   kernel.packet[2] = pload<Packet8h>(out[2]);
   kernel.packet[3] = pload<Packet8h>(out[3]);
 }
+
+#endif
 
 // BFloat16 implementation.
 
@@ -2764,6 +2808,26 @@ EIGEN_STRONG_INLINE Packet8bf pmul<Packet8bf>(const Packet8bf& a, const Packet8b
 }
 
 template <>
+EIGEN_STRONG_INLINE Packet8bf pmadd<Packet8bf>(const Packet8bf& a, const Packet8bf& b, const Packet8bf& c) {
+  return F32ToBf16(pmadd(Bf16ToF32(a), Bf16ToF32(b), Bf16ToF32(c)));
+}
+
+template <>
+EIGEN_STRONG_INLINE Packet8bf pmsub<Packet8bf>(const Packet8bf& a, const Packet8bf& b, const Packet8bf& c) {
+  return F32ToBf16(pmsub(Bf16ToF32(a), Bf16ToF32(b), Bf16ToF32(c)));
+}
+
+template <>
+EIGEN_STRONG_INLINE Packet8bf pnmadd<Packet8bf>(const Packet8bf& a, const Packet8bf& b, const Packet8bf& c) {
+  return F32ToBf16(pnmadd(Bf16ToF32(a), Bf16ToF32(b), Bf16ToF32(c)));
+}
+
+template <>
+EIGEN_STRONG_INLINE Packet8bf pnmsub<Packet8bf>(const Packet8bf& a, const Packet8bf& b, const Packet8bf& c) {
+  return F32ToBf16(pnmsub(Bf16ToF32(a), Bf16ToF32(b), Bf16ToF32(c)));
+}
+
+template <>
 EIGEN_STRONG_INLINE Packet8bf pdiv<Packet8bf>(const Packet8bf& a, const Packet8bf& b) {
   return F32ToBf16(pdiv<Packet8f>(Bf16ToF32(a), Bf16ToF32(b)));
 }
@@ -2875,6 +2939,258 @@ EIGEN_STRONG_INLINE void ptranspose(PacketBlock<Packet8bf, 4>& kernel) {
   kernel.packet[2] = _mm_unpacklo_epi32(ab_47, cd_47);
   kernel.packet[3] = _mm_unpackhi_epi32(ab_47, cd_47);
 }
+
+/*---------------- load/store segment support ----------------*/
+
+// returns a mask of 8-bit elements (at most 4) that are all 1's in the range [begin, begin + count) and 0 elsewhere.
+inline __m128i segment_mask_4x8(Index begin, Index count) {
+  eigen_assert(begin >= 0 && begin + count <= 4);
+  long long mask = 1;
+  mask <<= CHAR_BIT * count;
+  mask--;
+  mask <<= CHAR_BIT * begin;
+#if defined(_WIN32) && !defined(_WIN64)
+  return _mm_loadl_epi64(reinterpret_cast<const __m128i*>(&mask));
+#else
+  return _mm_cvtsi64_si128(mask);
+#endif
+}
+
+// returns a mask of 8-bit elements (at most 8) that are all 1's in the range [begin, begin + count) and 0 elsewhere.
+inline __m128i segment_mask_8x8(Index begin, Index count) {
+  eigen_assert(begin >= 0 && begin + count <= 8);
+  long long mask = 1;
+  // avoid UB when count == 8
+  mask <<= (CHAR_BIT / 2) * count;
+  mask <<= (CHAR_BIT / 2) * count;
+  mask--;
+  mask <<= CHAR_BIT * begin;
+#if defined(_WIN32) && !defined(_WIN64)
+  return _mm_loadl_epi64(reinterpret_cast<const __m128i*>(&mask));
+#else
+  return _mm_cvtsi64_si128(mask);
+#endif
+}
+
+// returns a mask of 32-bit elements (at most 4) that are all 1's in the range [begin, begin + count) and 0 elsewhere.
+inline __m128i segment_mask_4x32(Index begin, Index count) {
+  eigen_assert(begin >= 0 && begin + count <= 4);
+  return _mm_cvtepi8_epi32(segment_mask_4x8(begin, count));
+}
+
+// returns a mask of 64-bit elements (at most 2) that are all 1's in the range [begin, begin + count) and 0 elsewhere.
+inline __m128i segment_mask_2x64(Index begin, Index count) {
+  eigen_assert(begin >= 0 && begin + count <= 2);
+  return _mm_cvtepi8_epi64(segment_mask_4x8(begin, count));
+}
+
+// returns a mask of 32-bit elements (at most 8) that are all 1's in the range [begin, begin + count) and 0 elsewhere.
+inline __m256i segment_mask_8x32(Index begin, Index count) {
+  __m128i mask_epi8 = segment_mask_8x8(begin, count);
+#ifdef EIGEN_VECTORIZE_AVX2
+  __m256i mask_epi32 = _mm256_cvtepi8_epi32(mask_epi8);
+#else
+  __m128i mask_epi32_lo = _mm_cvtepi8_epi32(mask_epi8);
+  __m128i mask_epi32_hi = _mm_cvtepi8_epi32(_mm_srli_epi64(mask_epi8, 32));
+  __m256i mask_epi32 = _mm256_insertf128_si256(_mm256_castsi128_si256(mask_epi32_lo), mask_epi32_hi, 1);
+#endif
+  return mask_epi32;
+}
+
+// returns a mask of 64-bit elements (at most 4) that are all 1's in the range [begin, begin + count) and 0 elsewhere.
+inline __m256i segment_mask_4x64(Index begin, Index count) {
+  __m128i mask_epi8 = segment_mask_4x8(begin, count);
+#ifdef EIGEN_VECTORIZE_AVX2
+  __m256i mask_epi64 = _mm256_cvtepi8_epi64(mask_epi8);
+#else
+  __m128i mask_epi64_lo = _mm_cvtepi8_epi64(mask_epi8);
+  __m128i mask_epi64_hi = _mm_cvtepi8_epi64(_mm_srli_epi64(mask_epi8, 16));
+  __m256i mask_epi64 = _mm256_insertf128_si256(_mm256_castsi128_si256(mask_epi64_lo), mask_epi64_hi, 1);
+#endif
+  return mask_epi64;
+}
+
+/*---------------- float ----------------*/
+
+template <>
+struct has_packet_segment<Packet4f> : std::true_type {};
+
+template <>
+struct has_packet_segment<Packet8f> : std::true_type {};
+
+template <>
+inline Packet4f ploaduSegment<Packet4f>(const float* from, Index begin, Index count) {
+  return _mm_maskload_ps(from, segment_mask_4x32(begin, count));
+}
+
+template <>
+inline void pstoreuSegment<float, Packet4f>(float* to, const Packet4f& from, Index begin, Index count) {
+  _mm_maskstore_ps(to, segment_mask_4x32(begin, count), from);
+}
+
+template <>
+inline Packet8f ploaduSegment<Packet8f>(const float* from, Index begin, Index count) {
+  return _mm256_maskload_ps(from, segment_mask_8x32(begin, count));
+}
+
+template <>
+inline void pstoreuSegment<float, Packet8f>(float* to, const Packet8f& from, Index begin, Index count) {
+  _mm256_maskstore_ps(to, segment_mask_8x32(begin, count), from);
+}
+
+/*---------------- int32 ----------------*/
+
+template <>
+struct has_packet_segment<Packet4i> : std::true_type {};
+
+template <>
+struct has_packet_segment<Packet8i> : std::true_type {};
+
+#ifdef EIGEN_VECTORIZE_AVX2
+
+template <>
+inline Packet4i ploaduSegment<Packet4i>(const int* from, Index begin, Index count) {
+  return _mm_maskload_epi32(from, segment_mask_4x32(begin, count));
+}
+
+template <>
+inline void pstoreuSegment<int, Packet4i>(int* to, const Packet4i& from, Index begin, Index count) {
+  _mm_maskstore_epi32(to, segment_mask_4x32(begin, count), from);
+}
+
+template <>
+inline Packet8i ploaduSegment<Packet8i>(const int* from, Index begin, Index count) {
+  return _mm256_maskload_epi32(from, segment_mask_8x32(begin, count));
+}
+
+template <>
+inline void pstoreuSegment<int, Packet8i>(int* to, const Packet8i& from, Index begin, Index count) {
+  _mm256_maskstore_epi32(to, segment_mask_8x32(begin, count), from);
+}
+
+#else
+
+template <>
+inline Packet4i ploaduSegment<Packet4i>(const int* from, Index begin, Index count) {
+  return _mm_castps_si128(ploaduSegment<Packet4f>(reinterpret_cast<const float*>(from), begin, count));
+}
+
+template <>
+inline void pstoreuSegment<int, Packet4i>(int* to, const Packet4i& from, Index begin, Index count) {
+  pstoreuSegment<float, Packet4f>(reinterpret_cast<float*>(to), _mm_castsi128_ps(from), begin, count);
+}
+
+template <>
+inline Packet8i ploaduSegment<Packet8i>(const int* from, Index begin, Index count) {
+  return _mm256_castps_si256(ploaduSegment<Packet8f>(reinterpret_cast<const float*>(from), begin, count));
+}
+
+template <>
+inline void pstoreuSegment<int, Packet8i>(int* to, const Packet8i& from, Index begin, Index count) {
+  pstoreuSegment<float, Packet8f>(reinterpret_cast<float*>(to), _mm256_castsi256_ps(from), begin, count);
+}
+
+#endif
+
+/*---------------- uint32 ----------------*/
+
+template <>
+struct has_packet_segment<Packet4ui> : std::true_type {};
+
+template <>
+struct has_packet_segment<Packet8ui> : std::true_type {};
+
+template <>
+inline Packet4ui ploaduSegment<Packet4ui>(const uint32_t* from, Index begin, Index count) {
+  return Packet4ui(ploaduSegment<Packet4i>(reinterpret_cast<const int*>(from), begin, count));
+}
+
+template <>
+inline void pstoreuSegment<uint32_t, Packet4ui>(uint32_t* to, const Packet4ui& from, Index begin, Index count) {
+  pstoreuSegment<int, Packet4i>(reinterpret_cast<int*>(to), Packet4i(from), begin, count);
+}
+
+template <>
+inline Packet8ui ploaduSegment<Packet8ui>(const uint32_t* from, Index begin, Index count) {
+  return Packet8ui(ploaduSegment<Packet8i>(reinterpret_cast<const int*>(from), begin, count));
+}
+
+template <>
+inline void pstoreuSegment<uint32_t, Packet8ui>(uint32_t* to, const Packet8ui& from, Index begin, Index count) {
+  pstoreuSegment<int, Packet8i>(reinterpret_cast<int*>(to), Packet8i(from), begin, count);
+}
+
+/*---------------- double ----------------*/
+
+template <>
+struct has_packet_segment<Packet2d> : std::true_type {};
+
+template <>
+struct has_packet_segment<Packet4d> : std::true_type {};
+
+template <>
+inline Packet2d ploaduSegment<Packet2d>(const double* from, Index begin, Index count) {
+  return _mm_maskload_pd(from, segment_mask_2x64(begin, count));
+}
+
+template <>
+inline void pstoreuSegment<double, Packet2d>(double* to, const Packet2d& from, Index begin, Index count) {
+  _mm_maskstore_pd(to, segment_mask_2x64(begin, count), from);
+}
+
+template <>
+inline Packet4d ploaduSegment<Packet4d>(const double* from, Index begin, Index count) {
+  return _mm256_maskload_pd(from, segment_mask_4x64(begin, count));
+}
+
+template <>
+inline void pstoreuSegment<double, Packet4d>(double* to, const Packet4d& from, Index begin, Index count) {
+  _mm256_maskstore_pd(to, segment_mask_4x64(begin, count), from);
+}
+
+#ifdef EIGEN_VECTORIZE_AVX2
+
+/*---------------- int64_t ----------------*/
+
+template <>
+struct has_packet_segment<Packet2l> : std::true_type {};
+
+template <>
+struct has_packet_segment<Packet4l> : std::true_type {};
+
+template <>
+inline Packet2l ploaduSegment<Packet2l>(const int64_t* from, Index begin, Index count) {
+  return _mm_maskload_epi64(reinterpret_cast<const long long*>(from), segment_mask_2x64(begin, count));
+}
+template <>
+inline void pstoreuSegment<int64_t, Packet2l>(int64_t* to, const Packet2l& from, Index begin, Index count) {
+  _mm_maskstore_epi64(reinterpret_cast<long long*>(to), segment_mask_2x64(begin, count), from);
+}
+template <>
+inline Packet4l ploaduSegment<Packet4l>(const int64_t* from, Index begin, Index count) {
+  return _mm256_maskload_epi64(reinterpret_cast<const long long*>(from), segment_mask_4x64(begin, count));
+}
+template <>
+inline void pstoreuSegment<int64_t, Packet4l>(int64_t* to, const Packet4l& from, Index begin, Index count) {
+  _mm256_maskstore_epi64(reinterpret_cast<long long*>(to), segment_mask_4x64(begin, count), from);
+}
+
+/*---------------- uint64_t ----------------*/
+
+template <>
+struct has_packet_segment<Packet4ul> : std::true_type {};
+
+template <>
+inline Packet4ul ploaduSegment<Packet4ul>(const uint64_t* from, Index begin, Index count) {
+  return Packet4ul(ploaduSegment<Packet4l>(reinterpret_cast<const int64_t*>(from), begin, count));
+}
+template <>
+inline void pstoreuSegment<uint64_t, Packet4ul>(uint64_t* to, const Packet4ul& from, Index begin, Index count) {
+  pstoreuSegment<int64_t, Packet4l>(reinterpret_cast<int64_t*>(to), Packet4l(from), begin, count);
+}
+#endif
+
+/*---------------- end load/store segment support ----------------*/
 
 }  // end namespace internal
 

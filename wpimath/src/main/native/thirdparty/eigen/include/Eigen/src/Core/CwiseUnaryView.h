@@ -66,13 +66,13 @@ class CwiseUnaryViewImpl<ViewOp, MatrixType, StrideType, Dense, false>
 
   EIGEN_DEVICE_FUNC inline const Scalar* data() const { return &(this->coeffRef(0)); }
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index innerStride() const {
+  EIGEN_DEVICE_FUNC constexpr Index innerStride() const {
     return StrideType::InnerStrideAtCompileTime != 0 ? int(StrideType::InnerStrideAtCompileTime)
                                                      : derived().nestedExpression().innerStride() *
                                                            sizeof(typename traits<MatrixType>::Scalar) / sizeof(Scalar);
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index outerStride() const {
+  EIGEN_DEVICE_FUNC constexpr Index outerStride() const {
     return StrideType::OuterStrideAtCompileTime != 0 ? int(StrideType::OuterStrideAtCompileTime)
                                                      : derived().nestedExpression().outerStride() *
                                                            sizeof(typename traits<MatrixType>::Scalar) / sizeof(Scalar);
@@ -145,8 +145,8 @@ class CwiseUnaryView : public internal::CwiseUnaryViewImpl<ViewOp, MatrixType, S
 
   EIGEN_INHERIT_ASSIGNMENT_OPERATORS(CwiseUnaryView)
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT { return m_matrix.rows(); }
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return m_matrix.cols(); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index rows() const noexcept { return m_matrix.rows(); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index cols() const noexcept { return m_matrix.cols(); }
 
   /** \returns the functor representing unary operation */
   EIGEN_DEVICE_FUNC const ViewOp& functor() const { return m_functor; }
