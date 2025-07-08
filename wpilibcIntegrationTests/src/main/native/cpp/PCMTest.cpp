@@ -78,8 +78,8 @@ TEST_F(PCMTest, Solenoid) {
   frc::Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1.Get()) << "Solenoid #1 did not turn off";
   EXPECT_TRUE(m_fakeSolenoid2.Get()) << "Solenoid #2 did not turn off";
-  EXPECT_FALSE(solenoid1.Get()) << "Solenoid #1 did not read off";
-  EXPECT_FALSE(solenoid2.Get()) << "Solenoid #2 did not read off";
+  EXPECT_FALSE(solenoid1.IsOn()) << "Solenoid #1 did not read off";
+  EXPECT_FALSE(solenoid2.IsOn()) << "Solenoid #2 did not read off";
 
   // Turn one solenoid on and one off
   solenoid1.Set(true);
@@ -87,8 +87,8 @@ TEST_F(PCMTest, Solenoid) {
   frc::Wait(kSolenoidDelayTime);
   EXPECT_FALSE(m_fakeSolenoid1.Get()) << "Solenoid #1 did not turn on";
   EXPECT_TRUE(m_fakeSolenoid2.Get()) << "Solenoid #2 did not turn off";
-  EXPECT_TRUE(solenoid1.Get()) << "Solenoid #1 did not read on";
-  EXPECT_FALSE(solenoid2.Get()) << "Solenoid #2 did not read off";
+  EXPECT_TRUE(solenoid1.IsOn()) << "Solenoid #1 did not read on";
+  EXPECT_FALSE(solenoid2.IsOn()) << "Solenoid #2 did not read off";
 
   // Turn one solenoid on and one off
   solenoid1.Set(false);
@@ -96,8 +96,8 @@ TEST_F(PCMTest, Solenoid) {
   frc::Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1.Get()) << "Solenoid #1 did not turn off";
   EXPECT_FALSE(m_fakeSolenoid2.Get()) << "Solenoid #2 did not turn on";
-  EXPECT_FALSE(solenoid1.Get()) << "Solenoid #1 did not read off";
-  EXPECT_TRUE(solenoid2.Get()) << "Solenoid #2 did not read on";
+  EXPECT_FALSE(solenoid1.IsOn()) << "Solenoid #1 did not read off";
+  EXPECT_TRUE(solenoid2.IsOn()) << "Solenoid #2 did not read on";
 
   // Turn both on
   solenoid1.Set(true);
@@ -105,8 +105,8 @@ TEST_F(PCMTest, Solenoid) {
   frc::Wait(kSolenoidDelayTime);
   EXPECT_FALSE(m_fakeSolenoid1.Get()) << "Solenoid #1 did not turn on";
   EXPECT_FALSE(m_fakeSolenoid2.Get()) << "Solenoid #2 did not turn on";
-  EXPECT_TRUE(solenoid1.Get()) << "Solenoid #1 did not read on";
-  EXPECT_TRUE(solenoid2.Get()) << "Solenoid #2 did not read on";
+  EXPECT_TRUE(solenoid1.IsOn()) << "Solenoid #1 did not read on";
+  EXPECT_TRUE(solenoid2.IsOn()) << "Solenoid #2 did not read on";
 }
 
 /**
@@ -153,8 +153,8 @@ TEST_F(PCMTest, OneShot) {
   frc::Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1.Get()) << "Solenoid #1 did not turn off";
   EXPECT_TRUE(m_fakeSolenoid2.Get()) << "Solenoid #2 did not turn off";
-  EXPECT_FALSE(solenoid1.Get()) << "Solenoid #1 did not read off";
-  EXPECT_FALSE(solenoid2.Get()) << "Solenoid #2 did not read off";
+  EXPECT_FALSE(solenoid1.IsOn()) << "Solenoid #1 did not read off";
+  EXPECT_FALSE(solenoid2.IsOn()) << "Solenoid #2 did not read off";
 
   // Pulse Solenoid #1 on, and turn Solenoid #2 off
   solenoid1.SetPulseDuration(2 * kSolenoidDelayTime);
@@ -163,13 +163,13 @@ TEST_F(PCMTest, OneShot) {
   frc::Wait(kSolenoidDelayTime);
   EXPECT_FALSE(m_fakeSolenoid1.Get()) << "Solenoid #1 did not turn on";
   EXPECT_TRUE(m_fakeSolenoid2.Get()) << "Solenoid #2 did not turn off";
-  EXPECT_TRUE(solenoid1.Get()) << "Solenoid #1 did not read on";
-  EXPECT_FALSE(solenoid2.Get()) << "Solenoid #2 did not read off";
+  EXPECT_TRUE(solenoid1.IsOn()) << "Solenoid #1 did not read on";
+  EXPECT_FALSE(solenoid2.IsOn()) << "Solenoid #2 did not read off";
   frc::Wait(2 * kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1.Get()) << "Solenoid #1 did not turn off";
   EXPECT_TRUE(m_fakeSolenoid2.Get()) << "Solenoid #2 did not turn off";
-  EXPECT_FALSE(solenoid1.Get()) << "Solenoid #1 did not read off";
-  EXPECT_FALSE(solenoid2.Get()) << "Solenoid #2 did not read off";
+  EXPECT_FALSE(solenoid1.IsOn()) << "Solenoid #1 did not read off";
+  EXPECT_FALSE(solenoid2.IsOn()) << "Solenoid #2 did not read off";
 
   // Turn Solenoid #1 off, and pulse Solenoid #2 on
   solenoid1.Set(false);
@@ -178,13 +178,13 @@ TEST_F(PCMTest, OneShot) {
   frc::Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1.Get()) << "Solenoid #1 did not turn off";
   EXPECT_FALSE(m_fakeSolenoid2.Get()) << "Solenoid #2 did not turn on";
-  EXPECT_FALSE(solenoid1.Get()) << "Solenoid #1 did not read off";
-  EXPECT_TRUE(solenoid2.Get()) << "Solenoid #2 did not read on";
+  EXPECT_FALSE(solenoid1.IsOn()) << "Solenoid #1 did not read off";
+  EXPECT_TRUE(solenoid2.IsOn()) << "Solenoid #2 did not read on";
   frc::Wait(2 * kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1.Get()) << "Solenoid #1 did not turn off";
   EXPECT_TRUE(m_fakeSolenoid2.Get()) << "Solenoid #2 did not turn off";
-  EXPECT_FALSE(solenoid1.Get()) << "Solenoid #1 did not read off";
-  EXPECT_FALSE(solenoid2.Get()) << "Solenoid #2 did not read off";
+  EXPECT_FALSE(solenoid1.IsOn()) << "Solenoid #1 did not read off";
+  EXPECT_FALSE(solenoid2.IsOn()) << "Solenoid #2 did not read off";
 
   // Pulse both Solenoids on
   solenoid1.SetPulseDuration(2 * kSolenoidDelayTime);
@@ -194,13 +194,13 @@ TEST_F(PCMTest, OneShot) {
   frc::Wait(kSolenoidDelayTime);
   EXPECT_FALSE(m_fakeSolenoid1.Get()) << "Solenoid #1 did not turn on";
   EXPECT_FALSE(m_fakeSolenoid2.Get()) << "Solenoid #2 did not turn on";
-  EXPECT_TRUE(solenoid1.Get()) << "Solenoid #1 did not read on";
-  EXPECT_TRUE(solenoid2.Get()) << "Solenoid #2 did not read on";
+  EXPECT_TRUE(solenoid1.IsOn()) << "Solenoid #1 did not read on";
+  EXPECT_TRUE(solenoid2.IsOn()) << "Solenoid #2 did not read on";
   frc::Wait(2 * kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1.Get()) << "Solenoid #1 did not turn off";
   EXPECT_TRUE(m_fakeSolenoid2.Get()) << "Solenoid #2 did not turn off";
-  EXPECT_FALSE(solenoid1.Get()) << "Solenoid #1 did not read off";
-  EXPECT_FALSE(solenoid2.Get()) << "Solenoid #2 did not read off";
+  EXPECT_FALSE(solenoid1.IsOn()) << "Solenoid #1 did not read off";
+  EXPECT_FALSE(solenoid2.IsOn()) << "Solenoid #2 did not read off";
 
   // Pulse both Solenoids on with different durations
   solenoid1.SetPulseDuration(1.5 * kSolenoidDelayTime);
@@ -210,16 +210,16 @@ TEST_F(PCMTest, OneShot) {
   frc::Wait(kSolenoidDelayTime);
   EXPECT_FALSE(m_fakeSolenoid1.Get()) << "Solenoid #1 did not turn on";
   EXPECT_FALSE(m_fakeSolenoid2.Get()) << "Solenoid #2 did not turn on";
-  EXPECT_TRUE(solenoid1.Get()) << "Solenoid #1 did not read on";
-  EXPECT_TRUE(solenoid2.Get()) << "Solenoid #2 did not read on";
+  EXPECT_TRUE(solenoid1.IsOn()) << "Solenoid #1 did not read on";
+  EXPECT_TRUE(solenoid2.IsOn()) << "Solenoid #2 did not read on";
   frc::Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1.Get()) << "Solenoid #1 did not turn off";
   EXPECT_FALSE(m_fakeSolenoid2.Get()) << "Solenoid #2 did not turn on";
-  EXPECT_FALSE(solenoid1.Get()) << "Solenoid #1 did not read off";
-  EXPECT_TRUE(solenoid2.Get()) << "Solenoid #2 did not read on";
+  EXPECT_FALSE(solenoid1.IsOn()) << "Solenoid #1 did not read off";
+  EXPECT_TRUE(solenoid2.IsOn()) << "Solenoid #2 did not read on";
   frc::Wait(2 * kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1.Get()) << "Solenoid #1 did not turn off";
   EXPECT_TRUE(m_fakeSolenoid2.Get()) << "Solenoid #2 did not turn off";
-  EXPECT_FALSE(solenoid1.Get()) << "Solenoid #1 did not read off";
-  EXPECT_FALSE(solenoid2.Get()) << "Solenoid #2 did not read off";
+  EXPECT_FALSE(solenoid1.IsOn()) << "Solenoid #1 did not read off";
+  EXPECT_FALSE(solenoid2.IsOn()) << "Solenoid #2 did not read off";
 }
