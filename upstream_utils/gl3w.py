@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
-import os
+from pathlib import Path
 
 from upstream_utils import Lib, walk_cwd_and_copy_if
 
 
-def copy_upstream_src(wpilib_root):
-    gl3w = os.path.join(wpilib_root, "thirdparty", "imgui_suite", "gl3w")
+def copy_upstream_src(wpilib_root: Path):
+    gl3w = wpilib_root / "thirdparty/imgui_suite/gl3w"
 
     walk_cwd_and_copy_if(
         lambda dp, f: f == "gl3w_gen.py",
-        os.path.join(gl3w),
+        gl3w,
     )
 
 

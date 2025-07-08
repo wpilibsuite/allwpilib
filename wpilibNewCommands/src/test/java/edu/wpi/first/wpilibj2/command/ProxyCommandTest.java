@@ -22,7 +22,7 @@ class ProxyCommandTest extends CommandTestBase {
 
       scheduler.schedule(scheduleCommand);
 
-      verify(command1).schedule();
+      verify(command1).initialize();
     }
   }
 

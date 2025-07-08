@@ -87,6 +87,9 @@
 #if __GNUC__ >= 12
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
+#if __GNUC__ >= 13
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
 #endif
 
 #if defined __NVCC__ && defined __CUDACC__

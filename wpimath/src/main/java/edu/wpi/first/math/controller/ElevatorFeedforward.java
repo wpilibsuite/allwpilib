@@ -173,6 +173,7 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    * @param velocity The velocity setpoint.
    * @param acceleration The acceleration setpoint.
    * @return The computed feedforward.
+   * @deprecated Use {@link #calculateWithVelocities(double, double)}.
    */
   @SuppressWarnings("removal")
   @Deprecated(forRemoval = true, since = "2025")
@@ -202,13 +203,13 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    */
   public double calculateWithVelocities(double currentVelocity, double nextVelocity) {
     // See wpimath/algorithms.md#Elevator_feedforward for derivation
-    if (ka == 0.0) {
+    if (ka < 1e-9) {
       return ks * Math.signum(nextVelocity) + kg + kv * nextVelocity;
     } else {
       double A = -kv / ka;
       double B = 1.0 / ka;
       double A_d = Math.exp(A * m_dt);
-      double B_d = 1.0 / A * (A_d - 1.0) * B;
+      double B_d = A > -1e-9 ? B * m_dt : 1.0 / A * (A_d - 1.0) * B;
       return kg
           + ks * Math.signum(currentVelocity)
           + 1.0 / B_d * (nextVelocity - A_d * currentVelocity);

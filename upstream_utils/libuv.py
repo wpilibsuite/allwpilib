@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
-import os
 import shutil
+from pathlib import Path
 
-from upstream_utils import Lib, walk_cwd_and_copy_if
+from upstream_utils import Lib, has_prefix, walk_cwd_and_copy_if
 
 
-def copy_upstream_src(wpilib_root):
-    wpinet = os.path.join(wpilib_root, "wpinet")
+def copy_upstream_src(wpilib_root: Path):
+    wpinet = wpilib_root / "wpinet"
 
     # Delete old install
     for d in ["src/main/native/thirdparty/libuv"]:
-        shutil.rmtree(os.path.join(wpinet, d), ignore_errors=True)
+        shutil.rmtree(wpinet / d, ignore_errors=True)
 
     include_ignorelist = [
         "aix.h",
@@ -21,9 +21,8 @@ def copy_upstream_src(wpilib_root):
     ]
 
     walk_cwd_and_copy_if(
-        lambda dp, f: dp.startswith(os.path.join(".", "include"))
-        and f not in include_ignorelist,
-        os.path.join(wpinet, "src/main/native/thirdparty/libuv"),
+        lambda dp, f: has_prefix(dp, Path("include")) and f not in include_ignorelist,
+        wpinet / "src/main/native/thirdparty/libuv",
     )
 
     src_ignorelist = [
@@ -43,9 +42,8 @@ def copy_upstream_src(wpilib_root):
         "sysinfo-memory.c",
     ]
     walk_cwd_and_copy_if(
-        lambda dp, f: dp.startswith(os.path.join(".", "src"))
-        and f not in src_ignorelist,
-        os.path.join(wpinet, "src/main/native/thirdparty/libuv"),
+        lambda dp, f: has_prefix(dp, Path("src")) and f not in src_ignorelist,
+        wpinet / "src/main/native/thirdparty/libuv",
         rename_c_to_cpp=True,
     )
 

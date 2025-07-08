@@ -150,57 +150,47 @@ jobs:
             build/allOutputs/
           retention-days: 7
 
-  Robotpy:
-    name: "Build - Robotpy"
-    needs: [build-artifacts]
-    runs-on: ubuntu-22.04
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        repository: robotpy/mostrobotpy
-        fetch-depth: 0
-    - uses: actions/download-artifact@v4
-      with:
-        name: MavenArtifacts
-    - name: Move artifacts
-      run: mkdir -p ~/releases/maven/development && cp -r edu ~/releases/maven/development
-
-    - uses: actions/setup-python@v5
-      with:
-        python-version: 3.13
-
-    #
-    # Setup build caching
-    #
-
-    - name: Set ccache size
-      shell: bash
-      id: ccache
-      run: echo "MAX_SIZE=500M" >> $GITHUB_OUTPUT
-
-    - name: Setup ccache
-      # uses: hendrikmuhs/ccache-action@v1.2.10
-      uses: robotpy/ccache-action@fork
-      with:
-          key: ubuntu-22.04-3.13
-          variant: ccache
-          max-size: ${{ steps.ccache.outputs.max_size }}
-
-    - name: Install deps
-      shell: bash
-      run: |
-        python -m pip --disable-pip-version-check install -r rdev_requirements.txt
-
-    - name: Install numpy (needed for stubgen but broken in raspbian CI)
-      shell: bash
-      run: |
-        python -m pip --disable-pip-version-check install numpy
-    - name: Patch RobotPy rdev to use local development
-      run: git config user.name github-actions && git config user.email github-actions@github.com && set -- ~/releases/maven/development/edu/wpi/first/wpiutil/wpiutil-cpp/*/ ; wpilibversion=$(basename $1) && echo $wpilibversion && sed --regexp-extended -i 's@(wpilib_bin_url =).*@\1 \"file:\/\/'"$HOME"'\/releases\/maven\/development"@' rdev.toml && sed --regexp-extended -i 's/(wpilib_bin_version =).*/\1 \"'"$wpilibversion"'\"/' rdev.toml && ./rdev.sh update-pyproject --commit
-    - name: Build + test wheels
-      shell: bash
-      run: |
-        ./rdev.sh ci run
-      env:
-        RPYBUILD_STRIP_LIBPYTHON: "1"
-        RPYBUILD_CC_LAUNCHER: ccache
+#  Robotpy:
+#    name: "Build - Robotpy"
+#    needs: [build-artifacts]
+#    runs-on: ubuntu-22.04
+#    steps:
+#    - uses: actions/checkout@v4
+#      with:
+#        repository: robotpy/mostrobotpy
+#        fetch-depth: 0
+#    - uses: actions/download-artifact@v4
+#      with:
+#        name: MavenArtifacts
+#    - name: Move artifacts
+#      run: mkdir -p ~/releases/maven/development && cp -r edu ~/releases/maven/development
+#
+#    - uses: actions/setup-python@v5
+#      with:
+#        python-version: 3.13
+#
+#    - name: Install sccache
+#      uses: mozilla-actions/sccache-action@v0.0.9
+#
+#    - name: Install deps
+#      shell: bash
+#      run: |
+#        python -m pip --disable-pip-version-check install -r rdev_requirements.txt
+#
+#    - name: Install numpy (needed for stubgen but broken in raspbian CI)
+#      shell: bash
+#      run: |
+#        python -m pip --disable-pip-version-check install numpy
+#    - name: Patch RobotPy rdev to use local development
+#      run: git config user.name github-actions && git config user.email github-actions@github.com && set -- ~/releases/maven/development/edu/wpi/first/wpiutil/wpiutil-cpp/*/ ; wpilibversion=$(basename $1) && echo $wpilibversion && sed --regexp-extended -i 's@(wpilib_bin_url =).*@\1 \"file:\/\/'"$HOME"'\/releases\/maven\/development"@' rdev.toml && sed --regexp-extended -i 's/(wpilib_bin_version =).*/\1 \"'"$wpilibversion"'\"/' rdev.toml && ./rdev.sh update-pyproject --commit
+#    - name: Build + test wheels
+#      shell: bash
+#      run: |
+#        ./rdev.sh ci run
+#      env:
+#        RPYBUILD_STRIP_LIBPYTHON: "1"
+#        RPYBUILD_CC_LAUNCHER: sccache
+#        SCCACHE_WEBDAV_ENDPOINT: "https://frcmaven.wpi.edu/artifactory/wpilib-generic-cache-cmake-local"
+#        SCCACHE_WEBDAV_KEY_PREFIX: "sccache-robotpy"
+#        SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+#        SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}

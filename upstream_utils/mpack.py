@@ -3,36 +3,34 @@
 import os
 import shutil
 import subprocess
+from pathlib import Path
 
 from upstream_utils import Lib, walk_cwd_and_copy_if
 
 
-def copy_upstream_src(wpilib_root):
-    wpiutil = os.path.join(wpilib_root, "wpiutil")
+def copy_upstream_src(wpilib_root: Path):
+    wpiutil = wpilib_root / "wpiutil"
 
     # Delete old install
     for d in [
         "src/main/native/thirdparty/mpack/src",
         "src/main/native/thirdparty/mpack/include",
     ]:
-        shutil.rmtree(os.path.join(wpiutil, d), ignore_errors=True)
+        shutil.rmtree(wpiutil / d, ignore_errors=True)
 
     # Run the amalgmation script
     subprocess.check_call(["bash", "tools/amalgamate.sh"])
 
     # Copy the files
-    amalgamation_source_dir = os.path.join(
-        ".", ".build", "amalgamation", "src", "mpack"
-    )
-    os.chdir(amalgamation_source_dir)
+    os.chdir(Path(".build/amalgamation/src/mpack"))
 
     walk_cwd_and_copy_if(
         lambda dp, f: f.endswith(".h"),
-        os.path.join(wpiutil, "src/main/native/thirdparty/mpack/include/wpi"),
+        wpiutil / "src/main/native/thirdparty/mpack/include/wpi",
     )
     walk_cwd_and_copy_if(
         lambda dp, f: f.endswith(".c"),
-        os.path.join(wpiutil, "src/main/native/thirdparty/mpack/src"),
+        wpiutil / "src/main/native/thirdparty/mpack/src",
         rename_c_to_cpp=True,
     )
 

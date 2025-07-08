@@ -26,17 +26,6 @@ build:macos --conlyopt=-Wno-missing-field-initializers
 build:macos --conlyopt=-Wno-unused-private-field
 build:macos --conlyopt=-Wno-fixed-enum-extension"
 
-
-build:macos --linkopt=-framework
-build:macos --linkopt=CoreFoundation
-build:macos --linkopt=-framework
-build:macos --linkopt=AVFoundation
-build:macos --linkopt=-framework
-build:macos --linkopt=Foundation
-build:macos --linkopt=-framework
-build:macos --linkopt=CoreMedia
-build:macos --linkopt=-framework
-build:macos --linkopt=CoreVideo
 build:macos --linkopt=-headerpad_max_install_names
 build:macos --linkopt=-Wl,-rpath,'@loader_path'"
 
