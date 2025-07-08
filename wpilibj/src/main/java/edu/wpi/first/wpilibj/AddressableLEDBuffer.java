@@ -95,6 +95,7 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
    *
    * @return internal buffer byte array
    */
+  @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public byte[] getBytes() {
     return m_buffer;
   }
