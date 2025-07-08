@@ -373,9 +373,6 @@ def generate_pybind_build_file(
     with open(template_file, "r") as f:
         template_contents = f.read()
 
-    def dummy(*kargs):
-        raise
-
     def jsonify(item):
         if isinstance(item, jinja2.runtime.Undefined):
             return "None"
@@ -401,11 +398,6 @@ def generate_pybind_build_file(
 
     env = Environment(loader=BaseLoader)
     env.filters["jsonify"] = jsonify
-    env.filters["get_caster_pattern"] = dummy
-    env.filters["get_caster_includes"] = dummy
-    env.filters["get_caster_srcs"] = dummy
-    env.filters["get_caster_library_includes"] = dummy
-    env.filters["get_caster_library_headers"] = dummy
     template = env.from_string(template_contents)
 
     with open(output_file, "w") as f:
@@ -421,6 +413,7 @@ def generate_pybind_build_file(
                 raw_project_config=raw_config["project"],
                 entry_points=entry_points,
             )
+            + "\n"
         )
 
 
