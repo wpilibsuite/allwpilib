@@ -81,6 +81,14 @@ CommandPtr Command::IgnoringDisable(bool doesRunWhenDisabled) && {
   return std::move(*this).ToPtr().IgnoringDisable(doesRunWhenDisabled);
 }
 
+CommandPtr Command::IgnoreDisable() && {
+  return std::move(*this).ToPtr().IgnoringDisable(true);
+}
+
+CommandPtr Command::RespectDisable() && {
+  return std::move(*this).ToPtr().IgnoringDisable(false);
+}
+
 CommandPtr Command::WithInterruptBehavior(
     InterruptionBehavior interruptBehavior) && {
   return std::move(*this).ToPtr().WithInterruptBehavior(interruptBehavior);

@@ -71,6 +71,22 @@ CommandPtr final {
   CommandPtr IgnoringDisable(bool doesRunWhenDisabled) &&;
 
   /**
+   * Decorates this command to run when disabled.
+   *
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr IgnoreDisable() &&;
+
+  /**
+   * Decorates this command to stop when disabled.
+   *
+   * @return the decorated command
+   */
+  [[nodiscard]]
+  CommandPtr RespectDisable() &&;
+
+  /**
    * Decorates this command to have a different interrupt behavior.
    *
    * @param interruptBehavior the desired interrupt behavior
