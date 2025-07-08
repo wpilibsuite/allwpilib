@@ -67,6 +67,27 @@ http_archive(
     url = "https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr3/rules_bzlmodrio_toolchains-2025-1.bcr3.tar.gz",
 )
 
+http_archive(
+    name = "pybind11_bazel",
+    integrity = "sha256-iwRj1wuX2pDS6t6DqiCfhIXisv4y+7CvxSJtZoSAzGw=",
+    strip_prefix = "pybind11_bazel-2b6082a4d9d163a52299718113fa41e4b7978db5",
+    urls = ["https://github.com/pybind/pybind11_bazel/archive/2b6082a4d9d163a52299718113fa41e4b7978db5.tar.gz"],
+)
+
+http_archive(
+    name = "pybind11",
+    build_file = "@pybind11_bazel//:pybind11-BUILD.bazel",
+    strip_prefix = "pybind11-dfe7e65b4527eeb11036402aac3a394130960bb2",
+    urls = ["https://github.com/pybind/pybind11/archive/dfe7e65b4527eeb11036402aac3a394130960bb2.zip"],
+)
+
+http_archive(
+    name = "rules_python_pytest",
+    sha256 = "e2556404ef56ea3ec938597616afc51d78e1832cfe511b196e9f2b8fd7f8f149",
+    strip_prefix = "rules_python_pytest-1.1.1",
+    url = "https://github.com/caseyduquettesc/rules_python_pytest/releases/download/v1.1.1/rules_python_pytest-v1.1.1.tar.gz",
+)
+
 load("@bazel_features//:deps.bzl", "bazel_features_deps")
 
 bazel_features_deps()
@@ -349,27 +370,6 @@ rules_proto_setup()
 load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 
 rules_pkg_dependencies()
-
-http_archive(
-    name = "pybind11_bazel",
-    integrity = "sha256-iwRj1wuX2pDS6t6DqiCfhIXisv4y+7CvxSJtZoSAzGw=",
-    strip_prefix = "pybind11_bazel-2b6082a4d9d163a52299718113fa41e4b7978db5",
-    urls = ["https://github.com/pybind/pybind11_bazel/archive/2b6082a4d9d163a52299718113fa41e4b7978db5.tar.gz"],
-)
-
-http_archive(
-    name = "pybind11",
-    build_file = "@pybind11_bazel//:pybind11-BUILD.bazel",
-    strip_prefix = "pybind11-dfe7e65b4527eeb11036402aac3a394130960bb2",
-    urls = ["https://github.com/pybind/pybind11/archive/dfe7e65b4527eeb11036402aac3a394130960bb2.zip"],
-)
-
-http_archive(
-    name = "rules_python_pytest",
-    sha256 = "e2556404ef56ea3ec938597616afc51d78e1832cfe511b196e9f2b8fd7f8f149",
-    strip_prefix = "rules_python_pytest-1.1.1",
-    url = "https://github.com/caseyduquettesc/rules_python_pytest/releases/download/v1.1.1/rules_python_pytest-v1.1.1.tar.gz",
-)
 
 load("@rules_python_pytest//python_pytest:repositories.bzl", "rules_python_pytest_dependencies")
 
