@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
+Date: Wed, 25 Jun 2025 17:39:54 -0700
+Subject: [PATCH 1/2] Add roboRIO benchmark support
+
+---
+ src/sysinfo.cc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/sysinfo.cc b/src/sysinfo.cc
+index 60e9e5c219a470944609f36773b4d8effa019059..86922c0da6303e1c35b4f7cb92a751fb84ba6f95 100644
+--- a/src/sysinfo.cc
++++ b/src/sysinfo.cc
+@@ -441,6 +441,8 @@ std::vector<CPUInfo::CacheInfo> GetCacheSizes() {
+   return GetCacheSizesQNX();
+ #elif defined(BENCHMARK_OS_QURT) || defined(__EMSCRIPTEN__)
+   return std::vector<CPUInfo::CacheInfo>();
++#elif defined(__FRC_ROBORIO__)
++  return std::vector<CPUInfo::CacheInfo>();
+ #else
+   return GetCacheSizesFromKVFS();
+ #endif
