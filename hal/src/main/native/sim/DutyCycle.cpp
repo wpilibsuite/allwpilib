@@ -4,6 +4,8 @@
 
 #include "hal/DutyCycle.h"
 
+#include <string>
+
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"

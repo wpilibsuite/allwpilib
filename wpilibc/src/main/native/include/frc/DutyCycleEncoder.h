@@ -126,7 +126,7 @@ class DutyCycleEncoder : public wpi::Sendable,
    *
    * @param frequency the minimum frequency.
    */
-  void SetConnectedFrequencyThreshold(units::hertz_t period);
+  void SetConnectedFrequencyThreshold(units::hertz_t frequency);
 
   /**
    * Get the encoder value.
