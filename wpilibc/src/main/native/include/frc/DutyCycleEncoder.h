@@ -103,11 +103,11 @@ class DutyCycleEncoder : public wpi::Sendable,
   DutyCycleEncoder& operator=(DutyCycleEncoder&&) = default;
 
   /**
-   * Get the frequency in Hz of the duty cycle signal from the encoder.
+   * Get the frequency of the duty cycle signal from the encoder.
    *
-   * @return duty cycle frequency in Hz
+   * @return duty cycle frequency
    */
-  int GetFrequency() const;
+  units::hertz_t GetFrequency() const;
 
   /**
    * Get if the sensor is connected
@@ -124,9 +124,9 @@ class DutyCycleEncoder : public wpi::Sendable,
    * Change the frequency threshold for detecting connection used by
    * IsConnected.
    *
-   * @param frequency the minimum frequency in Hz.
+   * @param frequency the minimum frequency.
    */
-  void SetConnectedFrequencyThreshold(int frequency);
+  void SetConnectedFrequencyThreshold(units::hertz_t period);
 
   /**
    * Get the encoder value.
@@ -171,13 +171,6 @@ class DutyCycleEncoder : public wpi::Sendable,
   void SetInverted(bool inverted);
 
   /**
-   * Get the FPGA index for the DutyCycleEncoder.
-   *
-   * @return the FPGA index
-   */
-  int GetFPGAIndex() const;
-
-  /**
    * Get the channel of the source.
    *
    * @return the source channel
@@ -191,7 +184,7 @@ class DutyCycleEncoder : public wpi::Sendable,
   double MapSensorRange(double pos) const;
 
   std::shared_ptr<DutyCycle> m_dutyCycle;
-  int m_frequencyThreshold = 100;
+  units::hertz_t m_frequencyThreshold = {100_Hz};
   double m_fullRange;
   double m_expectedZero;
   units::second_t m_period{0_s};

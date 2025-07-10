@@ -5,10 +5,12 @@
 #include "hal/DutyCycle.h"
 
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
+#include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/DutyCycleDataInternal.h"
 
 using namespace hal;
@@ -16,16 +18,17 @@ using namespace hal;
 namespace {
 struct DutyCycle {
   uint8_t index;
+  std::string previousAllocation;
 };
 struct Empty {};
 }  // namespace
 
-static LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
+static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
                              HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
 
 namespace hal::init {
 void InitializeDutyCycle() {
-  static LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
+  static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
                                HAL_HandleEnum::DutyCycle>
       dcH;
   dutyCycleHandles = &dcH;
@@ -38,23 +41,25 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(int32_t channel,
                                             int32_t* status) {
   hal::init::CheckInit();
 
-  HAL_DutyCycleHandle handle = dutyCycleHandles->Allocate();
-  if (handle == HAL_kInvalidHandle) {
-    *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
-  }
+  HAL_DutyCycleHandle handle = HAL_kInvalidHandle;
+  auto dutyCycle = dutyCycleHandles->Allocate(channel, &handle, status);
 
-  auto dutyCycle = dutyCycleHandles->Get(handle);
-  if (dutyCycle == nullptr) {  // would only occur on thread issue
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
+  if (*status != 0) {
+    if (dutyCycle) {
+      hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
+                                           dutyCycle->previousAllocation);
+    } else {
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Duty Cycle",
+                                       0, kNumDutyCycles, channel);
+    }
+    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
 
   int16_t index = getHandleIndex(handle);
-  SimDutyCycleData[index].digitalChannel = channel;
   SimDutyCycleData[index].initialized = true;
   SimDutyCycleData[index].simDevice = 0;
   dutyCycle->index = index;
+  dutyCycle->previousAllocation = allocationLocation ? allocationLocation : "";
   return handle;
 }
 void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
@@ -75,8 +80,8 @@ void HAL_SetDutyCycleSimDevice(HAL_EncoderHandle handle,
   SimDutyCycleData[dutyCycle->index].simDevice = device;
 }
 
-int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
-                                  int32_t* status) {
+double HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
+                                 int32_t* status) {
   auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
   if (dutyCycle == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -109,20 +114,5 @@ int32_t HAL_GetDutyCycleHighTime(HAL_DutyCycleHandle dutyCycleHandle,
 
   double period = 1e9 / SimDutyCycleData[dutyCycle->index].frequency;  // ns
   return period * SimDutyCycleData[dutyCycle->index].output;
-}
-
-int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,
-                                          int32_t* status) {
-  return 4e7 - 1;
-}
-
-int32_t HAL_GetDutyCycleFPGAIndex(HAL_DutyCycleHandle dutyCycleHandle,
-                                  int32_t* status) {
-  auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
-  if (dutyCycle == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return -1;
-  }
-  return dutyCycle->index;
 }
 }  // extern "C"

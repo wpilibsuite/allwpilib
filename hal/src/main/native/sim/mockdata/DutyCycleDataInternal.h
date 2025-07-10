@@ -17,11 +17,10 @@ class DutyCycleData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Frequency)
 
  public:
-  std::atomic<int32_t> digitalChannel{0};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
       false};
   std::atomic<HAL_SimDeviceHandle> simDevice;
-  SimDataValue<int32_t, HAL_MakeInt, GetFrequencyName> frequency{0};
+  SimDataValue<double, HAL_MakeDouble, GetFrequencyName> frequency{0};
   SimDataValue<double, HAL_MakeDouble, GetOutputName> output{0};
 
   virtual void ResetData();
