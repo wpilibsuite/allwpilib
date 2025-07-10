@@ -11,7 +11,6 @@
 #include "PortsInternal.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
-#include "hal/handles/LimitedHandleResource.h"
 #include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/DutyCycleDataInternal.h"
 
