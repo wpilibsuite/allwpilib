@@ -1,0 +1,75 @@
+---
+
+defaults:
+  ignore: true
+
+extra_includes:
+- pybind11/stl.h
+
+functions:
+  CreateEvent:
+    subpackage: sync
+  DestroyEvent:
+    subpackage: sync
+  SetEvent:
+    subpackage: sync
+  ResetEvent: 
+    subpackage: sync
+  CreateSemaphore:
+    subpackage: sync
+  DestroySemaphore:
+    subpackage: sync
+  ReleaseSemaphore:
+    subpackage: sync
+    param_override:
+      prevCount:
+        default: "0"
+  WaitForObject:
+    overloads:
+      WPI_Handle:
+        subpackage: sync
+      WPI_Handle, double, bool*:
+        subpackage: sync
+  WaitForObjects:
+    overloads:
+      std::span<const WPI_Handle>, std::span<WPI_Handle>:
+        subpackage: sync
+        param_override:
+          signaled:
+            ignore: true
+        cpp_code: |
+          [](std::span<const WPI_Handle> handles) {
+            py::gil_scoped_release release;
+            std::vector<WPI_Handle> signaled(handles.size());
+            auto result = wpi::WaitForObjects(handles, signaled);
+            signaled.resize(result.size());
+            return signaled;
+          }
+      std::initializer_list<WPI_Handle>, std::span<WPI_Handle>:
+        ignore: true
+      std::span<const WPI_Handle>, std::span<WPI_Handle>, double, bool*:
+        subpackage: sync
+        param_override:
+          signaled:
+            ignore: true
+          timedOut:
+            ignore: true
+        cpp_code: |
+          [](std::span<const WPI_Handle> handles, double timeout) {
+            py::gil_scoped_release release;
+            std::vector<WPI_Handle> signaled(handles.size());
+            bool timedOut = false;
+            auto result = wpi::WaitForObjects(handles, signaled, timeout, &timedOut);
+            signaled.resize(result.size());
+            return std::make_tuple(signaled, timedOut);
+          }
+      std::initializer_list<WPI_Handle>, std::span<WPI_Handle>, double, bool*:
+        ignore: true
+  CreateSignalObject:
+    subpackage: sync
+  SetSignalObject:
+    subpackage: sync
+  ResetSignalObject:
+    subpackage: sync
+  DestroySignalObject:
+    subpackage: sync
