@@ -8,6 +8,7 @@ import edu.wpi.first.hal.simulation.AddressableLEDDataJNI;
 import edu.wpi.first.hal.simulation.ConstBufferCallback;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import java.util.NoSuchElementException;
 
 /** Class to control a simulated addressable LED. */
@@ -207,6 +208,15 @@ public class AddressableLEDSim {
    */
   public void setData(byte[] data) {
     AddressableLEDDataJNI.setData(m_index, data);
+  }
+
+  /**
+   * Change the LED data.
+   *
+   * @param buffer the new data buffer
+   */
+  public void setData(AddressableLEDBuffer buffer) {
+    setData(buffer.getBytes());
   }
 
   /** Reset all simulation data for this LED object. */
