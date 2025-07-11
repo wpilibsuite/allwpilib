@@ -11,9 +11,7 @@
 
 #include <gcem.hpp>
 #include <wpi/SymbolExports.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc/MathUtil.h"
 #include "units/time.h"
@@ -24,9 +22,7 @@ namespace frc {
 /**
  * Implements a PID control loop.
  */
-class WPILIB_DLLEXPORT PIDController
-    : public wpi::Sendable,
-      public wpi::SendableHelper<PIDController> {
+class WPILIB_DLLEXPORT PIDController : public wpi::TelemetryLoggable {
  public:
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
@@ -76,7 +72,6 @@ class WPILIB_DLLEXPORT PIDController
 
       wpi::math::MathSharedStore::ReportUsage("PIDController",
                                               std::to_string(instances));
-      wpi::SendableRegistry::Add(this, "PIDController", instances);
     }
   }
 
@@ -403,7 +398,9 @@ class WPILIB_DLLEXPORT PIDController
     m_haveMeasurement = false;
   }
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   // Factor for "proportional" control

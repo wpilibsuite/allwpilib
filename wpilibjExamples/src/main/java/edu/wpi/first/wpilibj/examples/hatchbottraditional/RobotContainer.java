@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.hatchbottraditional;
 
-import static edu.wpi.first.wpilibj.XboxController.Button;
-
+import edu.wpi.first.telemetry.Telemetry;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.ComplexAuto;
@@ -70,9 +70,6 @@ public class RobotContainer {
 
     // Put the chooser on the dashboard
     SmartDashboard.putData("Autonomous", m_chooser);
-    // Put subsystems to dashboard.
-    SmartDashboard.putData("Drivetrain", m_robotDrive);
-    SmartDashboard.putData("HatchSubsystem", m_hatchSubsystem);
   }
 
   /**
@@ -99,5 +96,11 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return m_chooser.getSelected();
+  }
+
+  /** Update telemetry. */
+  public void updateTelemetry() {
+    Telemetry.log("Drivetrain", m_robotDrive);
+    Telemetry.log("HatchSubsystem", m_hatchSubsystem);
   }
 }

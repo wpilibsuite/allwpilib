@@ -8,8 +8,7 @@
 
 #include <hal/PowerDistribution.h>
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 namespace frc {
 
@@ -17,8 +16,7 @@ namespace frc {
  * Class for getting voltage, current, temperature, power and energy from the
  * CTRE Power Distribution Panel (PDP) or REV Power Distribution Hub (PDH).
  */
-class PowerDistribution : public wpi::Sendable,
-                          public wpi::SendableHelper<PowerDistribution> {
+class PowerDistribution : public wpi::TelemetryLoggable {
  public:
   /// Default module number.
   static constexpr int kDefaultModule = -1;
@@ -343,7 +341,9 @@ class PowerDistribution : public wpi::Sendable,
    */
   StickyFaults GetStickyFaults() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   hal::Handle<HAL_PowerDistributionHandle, HAL_CleanPowerDistribution> m_handle;

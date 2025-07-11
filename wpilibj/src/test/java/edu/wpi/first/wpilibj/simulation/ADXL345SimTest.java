@@ -30,9 +30,9 @@ class ADXL345SimTest {
       assertEquals(2.29, accel.getZ());
 
       ADXL345_I2C.AllAxes allAccel = accel.getAccelerations();
-      assertEquals(1.91, allAccel.XAxis);
-      assertEquals(-3.405, allAccel.YAxis);
-      assertEquals(2.29, allAccel.ZAxis);
+      assertEquals(1.91, allAccel.x());
+      assertEquals(-3.405, allAccel.y());
+      assertEquals(2.29, allAccel.z());
     }
   }
 }

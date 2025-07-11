@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj.examples.armsimulation.subsystems;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.telemetry.Telemetry;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.RobotController;
@@ -19,7 +20,6 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
@@ -73,8 +73,6 @@ public class Arm implements AutoCloseable {
   public Arm() {
     m_encoder.setDistancePerPulse(Constants.kArmEncoderDistPerPulse);
 
-    // Put Mechanism 2d to SmartDashboard
-    SmartDashboard.putData("Arm Sim", m_mech2d);
     m_armTower.setColor(new Color8Bit(Color.kBlue));
 
     // Set the Arm position setpoint and P constant to Preferences if the keys don't already exist
@@ -99,6 +97,9 @@ public class Arm implements AutoCloseable {
 
     // Update the Mechanism Arm angle based on the simulated arm angle
     m_arm.setAngle(Units.radiansToDegrees(m_armSim.getAngle()));
+
+    // Put Mechanism 2d to SmartDashboard
+    Telemetry.log("Arm Sim", m_mech2d);
   }
 
   /** Load setpoint and kP from preferences. */
@@ -129,7 +130,6 @@ public class Arm implements AutoCloseable {
     m_encoder.close();
     m_mech2d.close();
     m_armPivot.close();
-    m_controller.close();
     m_arm.close();
   }
 }

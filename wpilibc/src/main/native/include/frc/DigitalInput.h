@@ -5,8 +5,7 @@
 #pragma once
 
 #include <hal/DIO.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 namespace frc {
 
@@ -19,8 +18,7 @@ namespace frc {
  * as required. This class is only for devices like switches etc. that aren't
  * implemented anywhere else.
  */
-class DigitalInput : public wpi::Sendable,
-                     public wpi::SendableHelper<DigitalInput> {
+class DigitalInput : public wpi::TelemetryLoggable {
  public:
   /**
    * Create an instance of a Digital Input class.
@@ -55,7 +53,9 @@ class DigitalInput : public wpi::Sendable,
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   int m_channel;

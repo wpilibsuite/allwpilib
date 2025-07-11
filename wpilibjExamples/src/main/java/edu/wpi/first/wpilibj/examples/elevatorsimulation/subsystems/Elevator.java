@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.telemetry.Telemetry;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.examples.elevatorsimulation.Constants;
@@ -20,7 +21,6 @@ import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator implements AutoCloseable {
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
@@ -68,10 +68,6 @@ public class Elevator implements AutoCloseable {
   /** Subsystem constructor. */
   public Elevator() {
     m_encoder.setDistancePerPulse(Constants.kElevatorEncoderDistPerPulse);
-
-    // Publish Mechanism2d to SmartDashboard
-    // To view the Elevator visualization, select Network Tables -> SmartDashboard -> Elevator Sim
-    SmartDashboard.putData("Elevator Sim", m_mech2d);
   }
 
   /** Advance the simulation. */
@@ -114,6 +110,10 @@ public class Elevator implements AutoCloseable {
   public void updateTelemetry() {
     // Update elevator visualization with position
     m_elevatorMech2d.setLength(m_encoder.getDistance());
+
+    // Publish Mechanism2d to telemetry
+    // To view the Elevator visualization, select Network Tables -> Telemetry -> Elevator Sim
+    Telemetry.log("Elevator Sim", m_mech2d);
   }
 
   @Override

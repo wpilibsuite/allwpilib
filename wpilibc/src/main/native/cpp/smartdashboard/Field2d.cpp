@@ -7,9 +7,7 @@
 #include <memory>
 #include <utility>
 
-#include <networktables/DoubleArrayTopic.h>
-#include <networktables/NTSendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 using namespace frc;
 
@@ -17,20 +15,14 @@ Field2d::Field2d() {
   m_objects.emplace_back(
       std::make_unique<FieldObject2d>("Robot", FieldObject2d::private_init{}));
   m_objects[0]->SetPose(Pose2d{});
-  wpi::SendableRegistry::Add(this, "Field");
 }
 
-Field2d::Field2d(Field2d&& rhs) : SendableHelper(std::move(rhs)) {
-  std::swap(m_table, rhs.m_table);
+Field2d::Field2d(Field2d&& rhs) {
   std::swap(m_objects, rhs.m_objects);
 }
 
 Field2d& Field2d::operator=(Field2d&& rhs) {
-  SendableHelper::operator=(std::move(rhs));
-
-  std::swap(m_table, rhs.m_table);
   std::swap(m_objects, rhs.m_objects);
-
   return *this;
 }
 
@@ -59,11 +51,7 @@ FieldObject2d* Field2d::GetObject(std::string_view name) {
   }
   m_objects.emplace_back(
       std::make_unique<FieldObject2d>(name, FieldObject2d::private_init{}));
-  auto obj = m_objects.back().get();
-  if (m_table) {
-    obj->m_entry = m_table->GetDoubleArrayTopic(obj->m_name).GetEntry({});
-  }
-  return obj;
+  return m_objects.back().get();
 }
 
 FieldObject2d* Field2d::GetRobotObject() {
@@ -71,14 +59,14 @@ FieldObject2d* Field2d::GetRobotObject() {
   return m_objects[0].get();
 }
 
-void Field2d::InitSendable(nt::NTSendableBuilder& builder) {
-  builder.SetSmartDashboardType("Field2d");
-
+void Field2d::UpdateTelemetry(wpi::TelemetryTable& table) const {
   std::scoped_lock lock(m_mutex);
-  m_table = builder.GetTable();
   for (auto&& obj : m_objects) {
     std::scoped_lock lock2(obj->m_mutex);
-    obj->m_entry = m_table->GetDoubleArrayTopic(obj->m_name).GetEntry({});
-    obj->UpdateEntry(true);
+    table.Log(obj->m_name, obj->m_poses);
   }
+}
+
+std::string_view Field2d::GetTelemetryType() const {
+  return "Field2d";
 }

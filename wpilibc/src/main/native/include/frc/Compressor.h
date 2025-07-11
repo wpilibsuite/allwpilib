@@ -7,8 +7,7 @@
 #include <memory>
 
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc/CompressorConfigType.h"
 #include "frc/PneumaticsBase.h"
@@ -31,8 +30,7 @@ namespace frc {
  * loop control. You can only turn off closed loop control, thereby stopping
  * the compressor from operating.
  */
-class Compressor : public wpi::Sendable,
-                   public wpi::SendableHelper<Compressor> {
+class Compressor : public wpi::TelemetryLoggable {
  public:
   /**
    * Constructs a compressor for a specified module and type.
@@ -173,7 +171,9 @@ class Compressor : public wpi::Sendable,
    */
   CompressorConfigType GetConfigType() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   std::shared_ptr<PneumaticsBase> m_module;

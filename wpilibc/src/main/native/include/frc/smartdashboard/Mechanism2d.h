@@ -4,16 +4,11 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 
-#include <networktables/DoubleArrayTopic.h>
-#include <networktables/NTSendable.h>
-#include <networktables/NetworkTable.h>
-#include <networktables/StringTopic.h>
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 #include "frc/smartdashboard/MechanismRoot2d.h"
 #include "frc/util/Color8Bit.h"
@@ -39,8 +34,7 @@ namespace frc {
  * @see MechanismLigament2d
  * @see MechanismRoot2d
  */
-class Mechanism2d : public nt::NTSendable,
-                    public wpi::SendableHelper<Mechanism2d> {
+class Mechanism2d : public wpi::TelemetryLoggable {
  public:
   /**
    * Create a new Mechanism2d with the given dimensions and background color.
@@ -76,16 +70,15 @@ class Mechanism2d : public nt::NTSendable,
    */
   void SetBackgroundColor(const Color8Bit& color);
 
-  void InitSendable(nt::NTSendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   double m_width;
   double m_height;
   std::string m_color;
   mutable wpi::mutex m_mutex;
-  std::shared_ptr<nt::NetworkTable> m_table;
   wpi::StringMap<MechanismRoot2d> m_roots;
-  nt::DoubleArrayPublisher m_dimsPub;
-  nt::StringPublisher m_colorPub;
 };
 }  // namespace frc

@@ -8,9 +8,8 @@
 #include <utility>
 
 #include <wpi/NullDeleter.h>
-#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
-#include "frc/DigitalInput.h"
 #include "frc/DutyCycle.h"
 #include "frc/MathUtil.h"
 
@@ -72,9 +71,6 @@ void DutyCycleEncoder::Init(double fullRange, double expectedZero) {
 
   m_fullRange = fullRange;
   m_expectedZero = expectedZero;
-
-  wpi::SendableRegistry::Add(this, "DutyCycle Encoder",
-                             m_dutyCycle->GetSourceChannel());
 }
 
 double DutyCycleEncoder::Get() const {
@@ -160,10 +156,11 @@ int DutyCycleEncoder::GetSourceChannel() const {
   return m_dutyCycle->GetSourceChannel();
 }
 
-void DutyCycleEncoder::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("AbsoluteEncoder");
-  builder.AddDoubleProperty(
-      "Position", [this] { return this->Get(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Is Connected", [this] { return this->IsConnected(); }, nullptr);
+void DutyCycleEncoder::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("Position", Get());
+  table.Log("Is Connected", IsConnected());
+}
+
+std::string_view DutyCycleEncoder::GetTelemetryType() const {
+  return "AbsoluteEncoder";
 }

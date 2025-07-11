@@ -13,6 +13,9 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTablesTelemetryBackend;
+import edu.wpi.first.telemetry.TelemetryRegistry;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
 import java.util.concurrent.locks.ReentrantLock;
@@ -103,6 +106,15 @@ public abstract class RobotBase implements AutoCloseable {
     } else {
       inst.startServer();
     }
+
+    // set up telemetry
+    TelemetryRegistry.registerBackend("", new NetworkTablesTelemetryBackend(inst, "/Telemetry"));
+    TelemetryRegistry.registerTypeHandler(
+        Measure.class,
+        (table, name, value) -> {
+          table.setProperty(name, "unit", value.unit().name());
+          table.log(name, value.magnitude());
+        });
 
     // wait for the NT server to actually start
     try {

@@ -4,10 +4,7 @@
 
 #pragma once
 
-#include <memory>
 #include <string_view>
-
-#include <networktables/DoubleTopic.h>
 
 #include "MechanismObject2d.h"
 
@@ -43,12 +40,10 @@ class MechanismRoot2d : private MechanismObject2d {
 
   using MechanismObject2d::Append;
 
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
  private:
-  void UpdateEntries(std::shared_ptr<nt::NetworkTable> table) override;
-  inline void Flush();
   double m_x;
   double m_y;
-  nt::DoublePublisher m_xPub;
-  nt::DoublePublisher m_yPub;
 };
 }  // namespace frc

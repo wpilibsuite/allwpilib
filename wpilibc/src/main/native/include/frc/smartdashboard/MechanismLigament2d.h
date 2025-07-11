@@ -4,11 +4,8 @@
 
 #pragma once
 
-#include <memory>
 #include <string_view>
 
-#include <networktables/DoubleTopic.h>
-#include <networktables/StringTopic.h>
 #include <units/angle.h>
 
 #include "frc/smartdashboard/MechanismObject2d.h"
@@ -86,18 +83,14 @@ class MechanismLigament2d : public MechanismObject2d {
    */
   double GetLineWeight();
 
- protected:
-  void UpdateEntries(std::shared_ptr<nt::NetworkTable> table) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
-  nt::StringPublisher m_typePub;
   double m_length;
-  nt::DoubleEntry m_lengthEntry;
   double m_angle;
-  nt::DoubleEntry m_angleEntry;
   double m_weight;
-  nt::DoubleEntry m_weightEntry;
   char m_color[10];
-  nt::StringEntry m_colorEntry;
 };
 }  // namespace frc

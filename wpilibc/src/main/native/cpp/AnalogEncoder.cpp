@@ -8,7 +8,7 @@
 
 #include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
-#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
 #include "frc/AnalogInput.h"
 #include "frc/MathUtil.h"
@@ -69,9 +69,6 @@ void AnalogEncoder::Init(double fullRange, double expectedZero) {
   m_expectedZero = expectedZero;
 
   HAL_ReportUsage("IO", m_analogInput->GetChannel(), "AnalogEncoder");
-
-  wpi::SendableRegistry::Add(this, "Analog Encoder",
-                             m_analogInput->GetChannel());
 }
 
 double AnalogEncoder::Get() const {
@@ -121,8 +118,10 @@ double AnalogEncoder::MapSensorRange(double pos) const {
   return pos;
 }
 
-void AnalogEncoder::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("AbsoluteEncoder");
-  builder.AddDoubleProperty(
-      "Position", [this] { return this->Get(); }, nullptr);
+void AnalogEncoder::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("Position", Get());
+}
+
+std::string_view AnalogEncoder::GetTelemetryType() const {
+  return "AbsoluteEncoder";
 }

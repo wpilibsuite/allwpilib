@@ -6,6 +6,8 @@
 
 #include <vector>
 
+#include <wpi/telemetry/Telemetry.h>
+
 Drivetrain::Drivetrain() {
   m_leftLeader.AddFollower(m_leftFollower);
   m_rightLeader.AddFollower(m_rightFollower);
@@ -27,9 +29,6 @@ Drivetrain::Drivetrain() {
 
   m_leftEncoder.Reset();
   m_rightEncoder.Reset();
-
-  frc::SmartDashboard::PutData("FieldSim", &m_fieldSim);
-  frc::SmartDashboard::PutData("Approximation", &m_fieldApproximation);
 }
 
 void Drivetrain::SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds) {
@@ -131,4 +130,7 @@ void Drivetrain::Periodic() {
   UpdateOdometry();
   m_fieldSim.SetRobotPose(m_drivetrainSimulator.GetPose());
   m_fieldApproximation.SetRobotPose(m_poseEstimator.GetEstimatedPosition());
+
+  wpi::Telemetry::Log("Field", m_fieldSim);
+  wpi::Telemetry::Log("Approximation", m_fieldApproximation);
 }

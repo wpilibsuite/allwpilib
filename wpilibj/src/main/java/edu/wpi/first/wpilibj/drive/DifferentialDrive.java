@@ -8,9 +8,8 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.telemetry.TelemetryLoggable;
+import edu.wpi.first.telemetry.TelemetryTable;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import java.util.function.DoubleConsumer;
 
@@ -50,13 +49,11 @@ import java.util.function.DoubleConsumer;
  * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default. The tankDrive, arcadeDrive,
  * or curvatureDrive methods should be called periodically to avoid Motor Safety timeouts.
  */
-public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoCloseable {
-  private static int instances;
-
+public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggable, AutoCloseable {
   private final DoubleConsumer m_leftMotor;
   private final DoubleConsumer m_rightMotor;
 
-  // Used for Sendable property getters
+  // Used for telemetry
   private double m_leftOutput;
   private double m_rightOutput;
 
@@ -100,11 +97,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param leftMotor Left motor.
    * @param rightMotor Right motor.
    */
-  @SuppressWarnings({"removal", "this-escape"})
   public DifferentialDrive(MotorController leftMotor, MotorController rightMotor) {
     this((double output) -> leftMotor.set(output), (double output) -> rightMotor.set(output));
-    SendableRegistry.addChild(this, leftMotor);
-    SendableRegistry.addChild(this, rightMotor);
   }
 
   /**
@@ -117,21 +111,16 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param leftMotor Left motor setter.
    * @param rightMotor Right motor setter.
    */
-  @SuppressWarnings("this-escape")
   public DifferentialDrive(DoubleConsumer leftMotor, DoubleConsumer rightMotor) {
     requireNonNullParam(leftMotor, "leftMotor", "DifferentialDrive");
     requireNonNullParam(rightMotor, "rightMotor", "DifferentialDrive");
 
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
-    instances++;
-    SendableRegistry.add(this, "DifferentialDrive", instances);
   }
 
   @Override
-  public void close() {
-    SendableRegistry.remove(this);
-  }
+  public void close() {}
 
   /**
    * Arcade drive method for differential drive platform. The calculated values will be squared to
@@ -359,10 +348,13 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("DifferentialDrive");
-    builder.setActuator(true);
-    builder.addDoubleProperty("Left Motor Speed", () -> m_leftOutput, m_leftMotor);
-    builder.addDoubleProperty("Right Motor Speed", () -> m_rightOutput, m_rightMotor);
+  public void updateTelemetry(TelemetryTable table) {
+    table.log("Left Motor Speed", m_leftOutput);
+    table.log("Right Motor Speed", m_rightOutput);
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "DifferentialDrive";
   }
 }

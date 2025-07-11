@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.tankdrive;
 
-import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -32,9 +31,6 @@ public class Robot extends TimedRobot {
     m_robotDrive = new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
     m_leftStick = new Joystick(0);
     m_rightStick = new Joystick(1);
-
-    SendableRegistry.addChild(m_robotDrive, m_leftMotor);
-    SendableRegistry.addChild(m_robotDrive, m_rightMotor);
   }
 
   @Override

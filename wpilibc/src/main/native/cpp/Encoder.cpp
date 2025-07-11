@@ -4,16 +4,11 @@
 
 #include "frc/Encoder.h"
 
-#include <memory>
-#include <utility>
-
 #include <hal/Encoder.h>
 #include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
+#include <wpi/telemetry/TelemetryTable.h>
 
-#include "frc/DigitalInput.h"
 #include "frc/Errors.h"
 
 using namespace frc;
@@ -146,22 +141,18 @@ int Encoder::GetFPGAIndex() const {
   return val;
 }
 
-void Encoder::InitSendable(wpi::SendableBuilder& builder) {
-  int32_t status = 0;
-  HAL_EncoderEncodingType type = HAL_GetEncoderEncodingType(m_encoder, &status);
-  FRC_CheckErrorStatus(status, "GetEncodingType");
-  if (type == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
-    builder.SetSmartDashboardType("Quadrature Encoder");
-  } else {
-    builder.SetSmartDashboardType("Encoder");
-  }
+void Encoder::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("Speed", GetRate());
+  table.Log("Distance", GetDistance());
+  table.Log("Distance per Tick", GetDistancePerPulse());
+}
 
-  builder.AddDoubleProperty("Speed", [=, this] { return GetRate(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Distance", [=, this] { return GetDistance(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Distance per Tick", [=, this] { return GetDistancePerPulse(); },
-      nullptr);
+std::string_view Encoder::GetTelemetryType() const {
+  if (m_type == EncodingType::k4X) {
+    return "Quadrature Encoder";
+  } else {
+    return "Encoder";
+  }
 }
 
 void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
@@ -170,6 +161,7 @@ void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
   m_encoder = HAL_InitializeEncoder(
       aChannel, bChannel, reverseDirection,
       static_cast<HAL_EncoderEncodingType>(encodingType), &status);
+  m_type = encodingType;
   FRC_CheckErrorStatus(status, "InitEncoder");
 
   const char* type = "Encoder";
@@ -185,7 +177,6 @@ void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
       break;
   }
   HAL_ReportUsage(fmt::format("IO[{},{}]", aChannel, bChannel), type);
-  // wpi::SendableRegistry::Add(this, "Encoder", m_aSource->GetChannel());
 }
 
 double Encoder::DecodingScaleFactor() const {

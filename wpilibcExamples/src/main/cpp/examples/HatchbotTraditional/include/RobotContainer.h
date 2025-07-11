@@ -10,7 +10,6 @@
 
 #include "Constants.h"
 #include "commands/ComplexAuto.h"
-#include "commands/DefaultDrive.h"
 #include "commands/DriveDistance.h"
 #include "subsystems/DriveSubsystem.h"
 #include "subsystems/HatchSubsystem.h"
@@ -27,6 +26,8 @@ class RobotContainer {
   RobotContainer();
 
   frc2::Command* GetAutonomousCommand();
+
+  void UpdateTelemetry() const;
 
  private:
   // The robot's subsystems and commands are defined here...

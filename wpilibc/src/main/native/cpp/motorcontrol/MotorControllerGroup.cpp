@@ -19,18 +19,7 @@ WPI_IGNORE_DEPRECATED
 
 MotorControllerGroup::MotorControllerGroup(
     std::vector<std::reference_wrapper<MotorController>>&& motorControllers)
-    : m_motorControllers(std::move(motorControllers)) {
-  Initialize();
-}
-
-void MotorControllerGroup::Initialize() {
-  for (auto& motorController : m_motorControllers) {
-    wpi::SendableRegistry::AddChild(this, &motorController.get());
-  }
-  static int instances = 0;
-  ++instances;
-  wpi::SendableRegistry::Add(this, "MotorControllerGroup", instances);
-}
+    : m_motorControllers(std::move(motorControllers)) {}
 
 void MotorControllerGroup::Set(double speed) {
   for (auto motorController : m_motorControllers) {
@@ -71,12 +60,12 @@ void MotorControllerGroup::StopMotor() {
   }
 }
 
-void MotorControllerGroup::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Motor Controller");
-  builder.SetActuator(true);
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return Get(); },
-      [=, this](double value) { Set(value); });
+std::string_view MotorControllerGroup::GetTelemetryType() const {
+  return "Motor Controller";
+}
+
+void MotorControllerGroup::UpdateTelemetry(wpi::TelemetryTable& table) const {
+  table.Log("Value", Get());
 }
 
 WPI_UNIGNORE_DEPRECATED

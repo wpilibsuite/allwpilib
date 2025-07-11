@@ -8,8 +8,7 @@
 
 #include <hal/SimDevice.h>
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/telemetry/TelemetryLoggable.h>
 
 namespace frc {
 class AnalogInput;
@@ -17,8 +16,7 @@ class AnalogInput;
 /**
  * Class for supporting continuous analog encoders, such as the US Digital MA3.
  */
-class AnalogEncoder : public wpi::Sendable,
-                      public wpi::SendableHelper<AnalogEncoder> {
+class AnalogEncoder : public wpi::TelemetryLoggable {
  public:
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
@@ -131,7 +129,9 @@ class AnalogEncoder : public wpi::Sendable,
    */
   int GetChannel() const;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry(wpi::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   void Init(double fullRange, double expectedZero);
