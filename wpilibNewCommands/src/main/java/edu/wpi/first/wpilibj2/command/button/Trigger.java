@@ -93,7 +93,7 @@ public class Trigger implements BooleanSupplier {
     addBinding(
         (previous, current) -> {
           if (previous != current) {
-            command.schedule();
+            CommandScheduler.getInstance().schedule(command);
           }
         });
     return this;
@@ -110,7 +110,7 @@ public class Trigger implements BooleanSupplier {
     addBinding(
         (previous, current) -> {
           if (!previous && current) {
-            command.schedule();
+            CommandScheduler.getInstance().schedule(command);
           }
         });
     return this;
@@ -127,7 +127,7 @@ public class Trigger implements BooleanSupplier {
     addBinding(
         (previous, current) -> {
           if (previous && !current) {
-            command.schedule();
+            CommandScheduler.getInstance().schedule(command);
           }
         });
     return this;
@@ -148,7 +148,7 @@ public class Trigger implements BooleanSupplier {
     addBinding(
         (previous, current) -> {
           if (!previous && current) {
-            command.schedule();
+            CommandScheduler.getInstance().schedule(command);
           } else if (previous && !current) {
             command.cancel();
           }
@@ -171,7 +171,7 @@ public class Trigger implements BooleanSupplier {
     addBinding(
         (previous, current) -> {
           if (previous && !current) {
-            command.schedule();
+            CommandScheduler.getInstance().schedule(command);
           } else if (!previous && current) {
             command.cancel();
           }
@@ -193,7 +193,7 @@ public class Trigger implements BooleanSupplier {
             if (command.isScheduled()) {
               command.cancel();
             } else {
-              command.schedule();
+              CommandScheduler.getInstance().schedule(command);
             }
           }
         });
@@ -214,7 +214,7 @@ public class Trigger implements BooleanSupplier {
             if (command.isScheduled()) {
               command.cancel();
             } else {
-              command.schedule();
+              CommandScheduler.getInstance().schedule(command);
             }
           }
         });
