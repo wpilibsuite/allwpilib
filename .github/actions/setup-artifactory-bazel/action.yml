@@ -26,5 +26,4 @@ runs:
       shell: bash
       run: |
         echo "API Key detected!"
-        # X-JFrog-Download-Redirect-To is a workaround for https://github.com/bazelbuild/bazel/issues/17700
-        echo "build:base_remote --remote_cache=https://${{ inputs.username }}:${{ inputs.token }}@frcmaven.wpi.edu/artifactory/wpilib-generic-cache-bazel-local --remote_cache_header=X-JFrog-Download-Redirect-To=None" > bazel_auth.rc
+        echo "build:base_remote --remote_cache=https://${{ inputs.username }}:${{ inputs.token }}@frcmaven.wpi.edu/artifactory/wpilib-generic-cache-bazel-local" > bazel_auth.rc
