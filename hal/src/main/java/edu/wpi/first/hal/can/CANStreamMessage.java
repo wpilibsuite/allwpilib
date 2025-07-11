@@ -8,9 +8,9 @@ package edu.wpi.first.hal.can;
 public class CANStreamMessage {
   /** The message data. */
   @SuppressWarnings("MemberName")
-  public final byte[] data = new byte[8];
+  public final byte[] data = new byte[64];
 
-  /** The length of the data received (0-8 bytes). */
+  /** The length of the data received (0-64 bytes). */
   @SuppressWarnings("MemberName")
   public int length;
 

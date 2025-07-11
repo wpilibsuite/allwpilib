@@ -19,6 +19,8 @@
 #define HAL_ERR_CANSessionMux_InvalidBuffer -44086
 #define HAL_ERR_CANSessionMux_MessageNotFound -44087
 #define HAL_WARN_CANSessionMux_NoToken 44087
+#define HAL_WARN_CANSessionMux_TxQueueFull 44086
+#define HAL_WARN_CANSessionMux_SocketBufferFull 44088
 #define HAL_ERR_CANSessionMux_NotAllowed -44088
 #define HAL_ERR_CANSessionMux_NotInitialized -44089
 #define HAL_ERR_CANSessionMux_SessionOverrun 44050
