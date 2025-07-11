@@ -3,8 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #import <Foundation/Foundation.h>
+#include "main.h"
+
+#include <iostream>
 #include <string>
-#include <filesystem>
 
 int main(int argc, char* argv[]) {
   (void)argc;
@@ -28,6 +30,24 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
+  if (exePath.stem() == (L"AdvantageScope")) {
+    std::filesystem::path AdvantageScopePath{
+        exePath.parent_path().parent_path() / L"advantagescope" /
+        L"Advantagescope (WPILib).app" / L"Contents" / L"MacOS" /
+        L"advantagescope"};
+    return StartExeTool(AdvantageScopePath);
+  } else if (exePath.stem() == (L"Elastic")) {
+    std::filesystem::path ElasticPath{exePath.parent_path().parent_path() /
+                                      L"elastic" / L"elastic_dashboard.app" /
+                                      L"Contents" / L"MacOS" /
+                                      L"elastic_dashboard"};
+    return StartExeTool(ElasticPath);
+  } else {
+    return StartJavaTool(exePath);
+  }
+}
+
+int StartJavaTool(std::filesystem::path& exePath) {
   std::filesystem::path jarPath{exePath};
   jarPath.replace_extension("jar");
   std::filesystem::path parentPath{exePath.parent_path()};
@@ -72,6 +92,25 @@ int main(int argc, char* argv[]) {
     if (![task launchAndReturnError:nil]) {
       return 1;
     }
+  }
+
+  CFRunLoopRunInMode(kCFRunLoopDefaultMode, 3, false);
+
+  return task.running ? 0 : 1;
+}
+
+int StartExeTool(std::filesystem::path& exePath) {
+  std::cout << "exePath: " << exePath.c_str() << std::endl;
+  NSTask* task = [[NSTask alloc] init];
+  task.launchPath = [NSString stringWithFormat:@"%s", exePath.c_str()];
+  // task.arguments = Arguments;
+  task.terminationHandler = ^(NSTask* t) {
+    (void)t;
+    CFRunLoopStop(CFRunLoopGetMain());
+  };
+
+  if (![task launchAndReturnError:nil]) {
+    return 1;
   }
 
   CFRunLoopRunInMode(kCFRunLoopDefaultMode, 3, false);
