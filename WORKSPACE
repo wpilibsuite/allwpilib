@@ -18,10 +18,8 @@ http_archive(
 
 http_archive(
     name = "build_bazel_apple_support",
-    patch_args = ["-p1"],
-    patches = ["//:apple_support.patch"],
-    sha256 = "b265beacfa477081caaf2bd05978ee7d11fdb8c202a1b76d0ef28d901d1e7b33",
-    url = "https://github.com/bazelbuild/apple_support/releases/download/1.22.0/apple_support.1.22.0.tar.gz",
+    sha256 = "7d542be113180bc1da3660e51fe4792a867fb85537c9ef36a0d3366665a76803",
+    url = "https://github.com/bazelbuild/apple_support/archive/7009b77c98a67d3fea081c9db4dbcee8effc3b7e.tar.gz",
 )
 
 http_archive(
