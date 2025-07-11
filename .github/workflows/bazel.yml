@@ -79,8 +79,8 @@ jobs:
           username: ${{ secrets.ARTIFACTORY_USERNAME }}
           token: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
-      - name: bazel ${{ matrix.action }} (release)
-        run: bazel ${{ matrix.action }} ... --config=ci -c opt ${{ matrix.config }} -k --verbose_failures
+      - name: bazelisk ${{ matrix.action }} (release)
+        run: bazelisk ${{ matrix.action }} ... --config=ci -c opt ${{ matrix.config }} -k --verbose_failures
 
   buildifier:
     name: "buildifier"
