@@ -21,7 +21,7 @@ class Robot : public frc::TimedRobot {
     // 1 is fully on, 0 is fully off
     auto output = m_dutyCycle.GetOutput();
 
-    frc::SmartDashboard::PutNumber("Frequency", frequency);
+    frc::SmartDashboard::PutNumber("Frequency", frequency.value());
     frc::SmartDashboard::PutNumber("Duty Cycle", output);
   }
 };

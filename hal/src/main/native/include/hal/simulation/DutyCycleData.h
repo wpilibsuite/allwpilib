@@ -11,10 +11,7 @@
 extern "C" {
 #endif
 
-int32_t HALSIM_FindDutyCycleForChannel(int32_t channel);
-
 void HALSIM_ResetDutyCycleData(int32_t index);
-int32_t HALSIM_GetDutyCycleDigitalChannel(int32_t index);
 
 int32_t HALSIM_RegisterDutyCycleInitializedCallback(int32_t index,
                                                     HAL_NotifyCallback callback,
@@ -39,8 +36,8 @@ int32_t HALSIM_RegisterDutyCycleFrequencyCallback(int32_t index,
                                                   void* param,
                                                   HAL_Bool initialNotify);
 void HALSIM_CancelDutyCycleFrequencyCallback(int32_t index, int32_t uid);
-int32_t HALSIM_GetDutyCycleFrequency(int32_t index);
-void HALSIM_SetDutyCycleFrequency(int32_t index, int32_t frequency);
+double HALSIM_GetDutyCycleFrequency(int32_t index);
+void HALSIM_SetDutyCycleFrequency(int32_t index, double frequency);
 
 void HALSIM_RegisterDutyCycleAllCallbacks(int32_t index,
                                           HAL_NotifyCallback callback,

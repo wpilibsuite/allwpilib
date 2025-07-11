@@ -88,16 +88,47 @@ void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
 void HAL_SetDutyCycleSimDevice(HAL_EncoderHandle handle,
                                HAL_SimDeviceHandle device) {}
 
-int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
-                                  int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+double HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
+                                 int32_t* status) {
+  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DutyCycle);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
+  uint16_t ret = 0;
+  *status = port->GetPwmInputPeriodMicroseconds(&ret);
+
+  if (ret == 0) {
+    return 0.0;
+  }
+
+  return 1000000.0 / ret;
 }
 
 double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
                               int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DutyCycle);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0.0;
+  }
+
+  uint16_t highTime = 0;
+  *status = port->GetPwmInputMicroseconds(&highTime);
+
+  uint16_t period = 0;
+  *status = port->GetPwmInputPeriodMicroseconds(&period);
+
+  if (period == 0) {
+    return 0.0;
+  }
+
+  if (highTime >= period) {
+    return 1.0;
+  }
+
+  return static_cast<double>(highTime) / static_cast<double>(period);
 }
 
 int32_t HAL_GetDutyCycleHighTime(HAL_DutyCycleHandle dutyCycleHandle,
@@ -105,23 +136,11 @@ int32_t HAL_GetDutyCycleHighTime(HAL_DutyCycleHandle dutyCycleHandle,
   auto port = smartIoHandles->Get(dutyCycleHandle, HAL_HandleEnum::DutyCycle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return false;
+    return 0;
   }
 
   uint16_t ret = 0;
   *status = port->GetPwmInputMicroseconds(&ret);
   return static_cast<int32_t>(ret) * 1000;
-}
-
-int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,
-                                          int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
-
-int32_t HAL_GetDutyCycleFPGAIndex(HAL_DutyCycleHandle dutyCycleHandle,
-                                  int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
 }
 }  // extern "C"

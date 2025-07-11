@@ -35,18 +35,11 @@ void DutyCycle::InitDutyCycle() {
   wpi::SendableRegistry::Add(this, "Duty Cycle", m_channel);
 }
 
-int DutyCycle::GetFPGAIndex() const {
-  int32_t status = 0;
-  auto retVal = HAL_GetDutyCycleFPGAIndex(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  return retVal;
-}
-
-int DutyCycle::GetFrequency() const {
+units::hertz_t DutyCycle::GetFrequency() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleFrequency(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  return retVal;
+  return units::hertz_t{retVal};
 }
 
 double DutyCycle::GetOutput() const {
@@ -63,13 +56,6 @@ units::second_t DutyCycle::GetHighTime() const {
   return units::nanosecond_t{static_cast<double>(retVal)};
 }
 
-unsigned int DutyCycle::GetOutputScaleFactor() const {
-  int32_t status = 0;
-  auto retVal = HAL_GetDutyCycleOutputScaleFactor(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  return retVal;
-}
-
 int DutyCycle::GetSourceChannel() const {
   return m_channel;
 }
@@ -77,7 +63,7 @@ int DutyCycle::GetSourceChannel() const {
 void DutyCycle::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Duty Cycle");
   builder.AddDoubleProperty(
-      "Frequency", [this] { return this->GetFrequency(); }, nullptr);
+      "Frequency", [this] { return this->GetFrequency().value(); }, nullptr);
   builder.AddDoubleProperty(
       "Output", [this] { return this->GetOutput(); }, nullptr);
 }

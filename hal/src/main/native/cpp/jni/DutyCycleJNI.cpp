@@ -46,9 +46,9 @@ Java_edu_wpi_first_hal_DutyCycleJNI_free
 /*
  * Class:     edu_wpi_first_hal_DutyCycleJNI
  * Method:    getFrequency
- * Signature: (I)I
+ * Signature: (I)D
  */
-JNIEXPORT jint JNICALL
+JNIEXPORT jdouble JNICALL
 Java_edu_wpi_first_hal_DutyCycleJNI_getFrequency
   (JNIEnv* env, jclass, jint handle)
 {
@@ -86,38 +86,6 @@ Java_edu_wpi_first_hal_DutyCycleJNI_getHighTime
 {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleHighTime(
-      static_cast<HAL_DutyCycleHandle>(handle), &status);
-  CheckStatus(env, status);
-  return retVal;
-}
-
-/*
- * Class:     edu_wpi_first_hal_DutyCycleJNI
- * Method:    getOutputScaleFactor
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DutyCycleJNI_getOutputScaleFactor
-  (JNIEnv* env, jclass, jint handle)
-{
-  int32_t status = 0;
-  auto retVal = HAL_GetDutyCycleOutputScaleFactor(
-      static_cast<HAL_DutyCycleHandle>(handle), &status);
-  CheckStatus(env, status);
-  return retVal;
-}
-
-/*
- * Class:     edu_wpi_first_hal_DutyCycleJNI
- * Method:    getFPGAIndex
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DutyCycleJNI_getFPGAIndex
-  (JNIEnv* env, jclass, jint handle)
-{
-  int32_t status = 0;
-  auto retVal = HAL_GetDutyCycleFPGAIndex(
       static_cast<HAL_DutyCycleHandle>(handle), &status);
   CheckStatus(env, status);
   return retVal;

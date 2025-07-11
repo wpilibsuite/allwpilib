@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
     boolean connected = m_dutyCycleEncoder.isConnected();
 
     // Duty Cycle Frequency in Hz
-    int frequency = m_dutyCycleEncoder.getFrequency();
+    double frequency = m_dutyCycleEncoder.getFrequency();
 
     // Output of encoder
     double output = m_dutyCycleEncoder.get();
