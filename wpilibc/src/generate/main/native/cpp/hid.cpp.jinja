@@ -96,7 +96,7 @@ void {{ ConsoleName }}Controller::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "{{ ConsoleName }}");
 {%- for trigger in triggers %}
-  builder.AddDoubleProperty("{{ capitalize_first(trigger.name) }}", [this] { return Get{{ capitalize_first(trigger.name) }}Axis(); }, nullptr);
+  builder.AddDoubleProperty("{{ capitalize_first(trigger.name) }} Axis", [this] { return Get{{ capitalize_first(trigger.name) }}Axis(); }, nullptr);
 {%- endfor -%}
 {% for stick in sticks %}
   builder.AddDoubleProperty("{{ stick.NameParts|map("capitalize")|join }}", [this] { return Get{{ stick.NameParts|map("capitalize")|join }}(); }, nullptr);

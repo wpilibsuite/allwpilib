@@ -309,7 +309,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
     builder.setSmartDashboardType("HID");
     builder.publishConstString("ControllerType", "{{ ConsoleName }}");
 {%- for trigger in triggers %}
-    builder.addDoubleProperty("{{ capitalize_first(trigger.name) }}", this::get{{ capitalize_first(trigger.name) }}Axis, null);
+    builder.addDoubleProperty("{{ capitalize_first(trigger.name) }} Axis", this::get{{ capitalize_first(trigger.name) }}Axis, null);
 {%- endfor -%}
 {% for stick in sticks %}
     builder.addDoubleProperty("{{ stick.NameParts|map("capitalize")|join }}", this::get{{ stick.NameParts|map("capitalize")|join }}, null);

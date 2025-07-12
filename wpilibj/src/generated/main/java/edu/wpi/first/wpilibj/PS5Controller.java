@@ -758,8 +758,8 @@ public class PS5Controller extends GenericHID implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("HID");
     builder.publishConstString("ControllerType", "PS5");
-    builder.addDoubleProperty("L2", this::getL2Axis, null);
-    builder.addDoubleProperty("R2", this::getR2Axis, null);
+    builder.addDoubleProperty("L2 Axis", this::getL2Axis, null);
+    builder.addDoubleProperty("R2 Axis", this::getR2Axis, null);
     builder.addDoubleProperty("LeftX", this::getLeftX, null);
     builder.addDoubleProperty("LeftY", this::getLeftY, null);
     builder.addDoubleProperty("RightX", this::getRightX, null);
