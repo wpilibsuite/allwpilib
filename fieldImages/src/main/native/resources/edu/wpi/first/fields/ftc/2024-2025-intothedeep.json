@@ -1,0 +1,19 @@
+{
+  "game": "2024-2025 FTC Into The Deep",
+  "field-image": "ftc/2024-2025-intothedeep.png",
+  "field-corners": {
+    "top-left": [
+      0,
+      0
+    ],
+    "bottom-right": [
+      2214,
+      2214
+    ]
+  },
+  "field-size": [
+    11.93183333,
+    11.93183333
+  ],
+  "field-unit": "foot"
+}
