@@ -9,6 +9,8 @@ http_archive(
 
 http_archive(
     name = "rules_cc",
+    patch_args = ["-p1"],
+    patches = ["//:rules_cc_windows.patch"],
     sha256 = "712d77868b3152dd618c4d64faaddefcc5965f90f5de6e6dd1d5ddcd0be82d42",
     strip_prefix = "rules_cc-0.1.1",
     url = "https://github.com/bazelbuild/rules_cc/releases/download/0.1.1/rules_cc-0.1.1.tar.gz",
@@ -16,8 +18,9 @@ http_archive(
 
 http_archive(
     name = "build_bazel_apple_support",
-    sha256 = "b265beacfa477081caaf2bd05978ee7d11fdb8c202a1b76d0ef28d901d1e7b33",
-    url = "https://github.com/bazelbuild/apple_support/releases/download/1.22.0/apple_support.1.22.0.tar.gz",
+    sha256 = "7d542be113180bc1da3660e51fe4792a867fb85537c9ef36a0d3366665a76803",
+    strip_prefix = "apple_support-7009b77c98a67d3fea081c9db4dbcee8effc3b7e",
+    url = "https://github.com/bazelbuild/apple_support/archive/7009b77c98a67d3fea081c9db4dbcee8effc3b7e.tar.gz",
 )
 
 http_archive(
@@ -47,6 +50,8 @@ http_archive(
 # Download Extra java rules
 http_archive(
     name = "rules_jvm_external",
+    patch_args = ["-p1"],
+    patches = ["//:rules_jvm_external.patch"],
     sha256 = "4f55980c25d0783b9fe43b049362018d8d79263476b5340a5491893ffcc06ab6",
     strip_prefix = "rules_jvm_external-30899314873b6ec69dc7d02c4457fbe52a6e535d",
     url = "https://github.com/bazel-contrib/rules_jvm_external/archive/30899314873b6ec69dc7d02c4457fbe52a6e535d.tar.gz",
