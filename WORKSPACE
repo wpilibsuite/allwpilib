@@ -19,6 +19,7 @@ http_archive(
 http_archive(
     name = "build_bazel_apple_support",
     sha256 = "7d542be113180bc1da3660e51fe4792a867fb85537c9ef36a0d3366665a76803",
+    strip_prefix = "apple_support-7009b77c98a67d3fea081c9db4dbcee8effc3b7e",
     url = "https://github.com/bazelbuild/apple_support/archive/7009b77c98a67d3fea081c9db4dbcee8effc3b7e.tar.gz",
 )
 
