@@ -58,26 +58,56 @@ Quaternion OnboardIMU::GetQuaternion() {
   return Quaternion{val.w, val.x, val.y, val.z};
 }
 
-units::radian_t GetAngleX() {
+units::radian_t OnboardIMU::GetAngleX() {
   HAL_EulerAngles3d val;
   int32_t status = 0;
-  HAL_GetIMUEulerAngles(&val, &status);
+  switch (m_mountOrientation) {
+    case kFlat:
+      HAL_GetIMUEulerAnglesFlat(&val, &status);
+      break;
+    case kLandscape:
+      HAL_GetIMUEulerAnglesLandscape(&val, &status);
+      break;
+    case kPortrait:
+      HAL_GetIMUEulerAnglesPortrait(&val, &status);
+      break;
+  }
   FRC_CheckErrorStatus(status, "Onboard IMU");
   return units::radian_t{val.x};
 }
 
-units::radian_t GetAngleY() {
+units::radian_t OnboardIMU::GetAngleY() {
   HAL_EulerAngles3d val;
   int32_t status = 0;
-  HAL_GetIMUEulerAngles(&val, &status);
+  switch (m_mountOrientation) {
+    case kFlat:
+      HAL_GetIMUEulerAnglesFlat(&val, &status);
+      break;
+    case kLandscape:
+      HAL_GetIMUEulerAnglesLandscape(&val, &status);
+      break;
+    case kPortrait:
+      HAL_GetIMUEulerAnglesPortrait(&val, &status);
+      break;
+  }
   FRC_CheckErrorStatus(status, "Onboard IMU");
   return units::radian_t{val.y};
 }
 
-units::radian_t GetAngleZ() {
+units::radian_t OnboardIMU::GetAngleZ() {
   HAL_EulerAngles3d val;
   int32_t status = 0;
-  HAL_GetIMUEulerAngles(&val, &status);
+  switch (m_mountOrientation) {
+    case kFlat:
+      HAL_GetIMUEulerAnglesFlat(&val, &status);
+      break;
+    case kLandscape:
+      HAL_GetIMUEulerAnglesLandscape(&val, &status);
+      break;
+    case kPortrait:
+      HAL_GetIMUEulerAnglesPortrait(&val, &status);
+      break;
+  }
   FRC_CheckErrorStatus(status, "Onboard IMU");
   return units::radian_t{val.z};
 }
