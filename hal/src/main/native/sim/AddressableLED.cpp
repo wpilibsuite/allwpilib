@@ -6,11 +6,11 @@
 
 #include <fmt/format.h>
 
-#include "DigitalInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/Errors.h"
+#include "SmartIo.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
 #include "mockdata/AddressableLEDDataInternal.h"
@@ -43,7 +43,7 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
   hal::init::CheckInit();
 
   auto digitalPort =
-      hal::digitalChannelHandles->Get(outputPort, hal::HAL_HandleEnum::PWM);
+      hal::smartIoHandles->Get(outputPort, hal::HAL_HandleEnum::PWM);
 
   if (!digitalPort) {
     // If DIO was passed, channel error, else generic error
@@ -55,7 +55,7 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
     return HAL_kInvalidHandle;
   }
 
-  if (digitalPort->channel >= kNumPWMHeaders) {
+  if (digitalPort->channel >= kNumSmartIo) {
     *status = HAL_LED_CHANNEL_ERROR;
     return HAL_kInvalidHandle;
   }
@@ -103,7 +103,7 @@ void HAL_SetAddressableLEDOutputPort(HAL_AddressableLEDHandle handle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  if (auto port = digitalChannelHandles->Get(outputPort, HAL_HandleEnum::PWM)) {
+  if (auto port = smartIoHandles->Get(outputPort, HAL_HandleEnum::PWM)) {
     SimAddressableLEDData[led->index].outputPort = port->channel;
   } else {
     SimAddressableLEDData[led->index].outputPort = -1;

@@ -9,7 +9,7 @@ using namespace hal;
 
 namespace hal::init {
 void InitializeDigitalPWMData() {
-  static DigitalPWMData sdpd[kNumDigitalPWMOutputs];
+  static DigitalPWMData sdpd[kNumSmartIo];
   ::hal::SimDigitalPWMData = sdpd;
 }
 }  // namespace hal::init
@@ -23,13 +23,7 @@ void DigitalPWMData::ResetData() {
 
 extern "C" {
 int32_t HALSIM_FindDigitalPWMForChannel(int32_t channel) {
-  for (int i = 0; i < kNumDigitalPWMOutputs; ++i) {
-    if (SimDigitalPWMData[i].initialized &&
-        SimDigitalPWMData[i].pin == channel) {
-      return i;
-    }
-  }
-  return -1;
+  return channel;
 }
 
 void HALSIM_ResetDigitalPWMData(int32_t index) {

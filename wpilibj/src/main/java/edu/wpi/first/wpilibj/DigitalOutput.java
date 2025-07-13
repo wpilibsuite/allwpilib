@@ -30,7 +30,6 @@ public class DigitalOutput implements AutoCloseable, Sendable {
    */
   @SuppressWarnings("this-escape")
   public DigitalOutput(int channel) {
-    SensorUtil.checkDigitalChannel(channel);
     m_channel = channel;
 
     m_handle = DIOJNI.initializeDIOPort(channel, false);
@@ -162,7 +161,6 @@ public class DigitalOutput implements AutoCloseable, Sendable {
       return;
     }
     // Disable the output by routing to a dead bit.
-    DIOJNI.setDigitalPWMOutputChannel(m_pwmGenerator, SensorUtil.kDigitalChannels);
     DIOJNI.freeDigitalPWM(m_pwmGenerator);
     m_pwmGenerator = invalidPwmGenerator;
   }

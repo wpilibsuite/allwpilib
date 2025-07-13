@@ -6,7 +6,6 @@
 
 #include <limits>
 
-#include "CounterInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
@@ -30,20 +29,13 @@ struct Empty {};
 }  // namespace
 
 static LimitedHandleResource<HAL_EncoderHandle, Encoder,
-                             kNumEncoders + kNumCounters,
+                             kNumEncoders,
                              HAL_HandleEnum::Encoder>* encoderHandles;
-
-static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
-                             HAL_HandleEnum::FPGAEncoder>* fpgaEncoderHandles;
 
 namespace hal::init {
 void InitializeEncoder() {
-  static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
-                               HAL_HandleEnum::FPGAEncoder>
-      feH;
-  fpgaEncoderHandles = &feH;
   static LimitedHandleResource<HAL_EncoderHandle, Encoder,
-                               kNumEncoders + kNumCounters,
+                               kNumEncoders,
                                HAL_HandleEnum::Encoder>
       eH;
   encoderHandles = &eH;
@@ -71,18 +63,6 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
                                         HAL_EncoderEncodingType encodingType,
                                         int32_t* status) {
   hal::init::CheckInit();
-  HAL_Handle nativeHandle = HAL_kInvalidHandle;
-  if (encodingType == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
-    // k4x, allocate encoder
-    nativeHandle = fpgaEncoderHandles->Allocate();
-  } else {
-    // k2x or k1x, allocate counter
-    nativeHandle = counterHandles->Allocate();
-  }
-  if (nativeHandle == HAL_kInvalidHandle) {
-    *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
-  }
   auto handle = encoderHandles->Allocate();
   if (handle == HAL_kInvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
@@ -101,16 +81,8 @@ HAL_EncoderHandle HAL_InitializeEncoder(int32_t aChannel, int32_t bChannel,
   SimEncoderData[index].simDevice = 0;
   // TODO: Add encoding type to Sim data
   encoder->index = index;
-  encoder->nativeHandle = nativeHandle;
   encoder->encodingType = encodingType;
   encoder->distancePerPulse = 1.0;
-  if (encodingType == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
-    encoder->fpgaHandle = nativeHandle;
-    encoder->counterHandle = HAL_kInvalidHandle;
-  } else {
-    encoder->fpgaHandle = HAL_kInvalidHandle;
-    encoder->counterHandle = nativeHandle;
-  }
   return handle;
 }
 
@@ -119,11 +91,6 @@ void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle) {
   encoderHandles->Free(encoderHandle);
   if (encoder == nullptr) {
     return;
-  }
-  if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::FPGAEncoder)) {
-    fpgaEncoderHandles->Free(encoder->nativeHandle);
-  } else if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::Counter)) {
-    counterHandles->Free(encoder->nativeHandle);
   }
   SimEncoderData[encoder->index].initialized = false;
 }
