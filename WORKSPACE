@@ -50,8 +50,6 @@ http_archive(
 # Download Extra java rules
 http_archive(
     name = "rules_jvm_external",
-    patch_args = ["-p1"],
-    patches = ["//:rules_jvm_external.patch"],
     sha256 = "4f55980c25d0783b9fe43b049362018d8d79263476b5340a5491893ffcc06ab6",
     strip_prefix = "rules_jvm_external-30899314873b6ec69dc7d02c4457fbe52a6e535d",
     url = "https://github.com/bazel-contrib/rules_jvm_external/archive/30899314873b6ec69dc7d02c4457fbe52a6e535d.tar.gz",
@@ -359,3 +357,10 @@ rules_proto_setup()
 load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 
 rules_pkg_dependencies()
+
+# Capture the repository environmental variables which specify the filter list for what architectures to build in CI.
+load("//shared/bazel/rules:publishing_rule.bzl", "publishing_repo")
+
+publishing_repo(
+    name = "com_wpilib_allwpilib_publishing_config",
+)

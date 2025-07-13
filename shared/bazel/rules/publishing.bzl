@@ -1,8 +1,23 @@
+"""Bazel rules for publishing maven artifacts."""
+
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@com_wpilib_allwpilib_publishing_config//:publishing_config.bzl", "CLASSIFIER_FILTER")
+load("@platforms//host:constraints.bzl", _host_constraints = "HOST_CONSTRAINTS")
 load("@rules_jvm_external//:defs.bzl", "maven_export")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 load("//shared/bazel/rules:transitions.bzl", "platform_transition_filegroup")
+
+def _get_host_os():
+    if "@platforms//os:linux" in _host_constraints:
+        return "linux"
+    if "@platforms//os:osx" in _host_constraints:
+        return "osx"
+    if "@platforms//os:windows" in _host_constraints:
+        return "windows"
+    fail("Unsupported host OS. Must be one of linux, osx, or windows.")
+
+HOST_OS = _get_host_os()
 
 def publish_all(name, targets):
     """Macro to publish multiple maven artifacts with 1 call."""
@@ -85,65 +100,31 @@ def _wpilib_maven_export_impl(
         lib_name = None,
         visibility = None):
     """Implementation of wpilib_maven_export."""
-    is_platform_specific = linux_artifacts or osx_artifacts or windows_artifacts
+    all_artifacts = {}
+    all_artifacts.update(classifier_artifacts)
 
-    if not is_platform_specific:
-        maven_export(
-            name = name,
-            maven_coordinates = maven_coordinates,
-            classifier_artifacts = classifier_artifacts,
-            lib_name = lib_name,
-            visibility = visibility,
-        )
-        return
+    if HOST_OS == "linux":
+        all_artifacts.update(linux_artifacts)
+    elif HOST_OS == "osx":
+        all_artifacts.update(osx_artifacts)
+    elif HOST_OS == "windows":
+        all_artifacts.update(windows_artifacts)
 
-    common_args = {"visibility": visibility}
-    if lib_name:
-        common_args["lib_name"] = lib_name
-
-    all_linux_artifacts = {}
-    all_linux_artifacts.update(classifier_artifacts)
-    all_linux_artifacts.update(linux_artifacts)
-
-    all_osx_artifacts = {}
-    all_osx_artifacts.update(classifier_artifacts)
-    all_osx_artifacts.update(osx_artifacts)
-
-    all_windows_artifacts = {}
-    all_windows_artifacts.update(classifier_artifacts)
-    all_windows_artifacts.update(windows_artifacts)
+    if CLASSIFIER_FILTER:
+        allowed_classifiers = CLASSIFIER_FILTER.split(",")
+        filtered_artifacts = {
+            key: value
+            for key, value in all_artifacts.items()
+            if key in allowed_classifiers
+        }
+    else:
+        filtered_artifacts = all_artifacts
 
     maven_export(
-        name = name + "-linux",
+        name = name,
         maven_coordinates = maven_coordinates,
-        classifier_artifacts = all_linux_artifacts,
-        target_compatible_with = ["@platforms//os:linux"],
-        **common_args
-    )
-
-    maven_export(
-        name = name + "-osx",
-        maven_coordinates = maven_coordinates,
-        classifier_artifacts = all_osx_artifacts,
-        target_compatible_with = ["@platforms//os:osx"],
-        **common_args
-    )
-
-    maven_export(
-        name = name + "-windows",
-        maven_coordinates = maven_coordinates,
-        classifier_artifacts = all_windows_artifacts,
-        target_compatible_with = ["@platforms//os:windows"],
-        **common_args
-    )
-
-    native.alias(
-        name = name + ".publish",
-        actual = select({
-            "@platforms//os:linux": name + "-linux.publish",
-            "@platforms//os:osx": name + "-osx.publish",
-            "@platforms//os:windows": name + "-windows.publish",
-        }),
+        classifier_artifacts = filtered_artifacts,
+        lib_name = lib_name,
         visibility = visibility,
     )
 

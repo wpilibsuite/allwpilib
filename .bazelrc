@@ -62,3 +62,9 @@ build:ci --config=build_buddy
 build:ci --remote_download_minimal
 
 build --build_metadata=REPO_URL=https://github.com/wpilibsuite/allwpilib.git
+
+common --define="WPILIB_VERSION=2025.424242.3.1-date-1-hash"
+
+# List of artifact types to build in CI.
+# Anything else gets skipped to speed up CI.
+common:ci --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug,linuxx86-64,linuxx86-64debug,linuxx86-64static,linuxx86-64staticdebug,osxuniversal,osxuniversaldebug,osxuniversalstatic,osxuniversalstaticdebug,windowsarm64,windowsarm64debug,windowsarm64static,windowsarm64staticdebug,windowsx86-64,windowsx86-64debug,windowsx86-64static,windowsx86-64staticdebug"
