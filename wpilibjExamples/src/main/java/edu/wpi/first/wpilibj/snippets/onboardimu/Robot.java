@@ -9,13 +9,12 @@ import edu.wpi.first.wpilibj.OnboardIMU.MountOrientation;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
- * Built-In Accelerometer snippets for frc-docs.
+ * on board IMU snippets for frc-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 public class Robot extends TimedRobot {
-  // Creates an object for the built-in accelerometer
-  // Range defaults to +- 8 G's
-  OnboardIMU m_accelerometer = new OnboardIMU(MountOrientation.kFlat);
+  // Creates an object for the on board IMU
+  OnboardIMU m_iMU = new OnboardIMU(MountOrientation.kFlat);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {}
@@ -23,10 +22,20 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // Gets the current acceleration in the X axis
-    m_accelerometer.getAccelX();
+    m_iMU.getAccelX();
     // Gets the current acceleration in the Y axis
-    m_accelerometer.getAccelY();
+    m_iMU.getAccelY();
     // Gets the current acceleration in the Z axis
-    m_accelerometer.getAccelZ();
+    m_iMU.getAccelZ();
+
+    // Gets the current angle in the X axis
+    m_iMU.getAngleX();
+    // Gets the current angle in the Y axis
+    m_iMU.getAngleY();
+    // Gets the current angle in the Z axis
+    m_iMU.getAngleZ();
+
+    // Gets the current angle as a Rotation2D
+    m_iMU.getRotation2d();
   }
 }
