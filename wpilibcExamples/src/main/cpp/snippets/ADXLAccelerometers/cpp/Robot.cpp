@@ -17,18 +17,18 @@ class Robot : public frc::TimedRobot {
 
   void TeleopPeriodic() override {
     // Gets the current acceleration in the X axis
-    m_accelerometer345I2C.GetX();
+    m_accelerometer.GetX();
     // Gets the current acceleration in the Y axis
-    m_accelerometer345I2C.GetY();
+    m_accelerometer.GetY();
     // Gets the current acceleration in the Z axis
-    m_accelerometer345I2C.GetZ();
+    m_accelerometer.GetZ();
   }
 
  private:
   // Creates an ADXL345 accelerometer object on the MXP I2C port
   // with a measurement range from -8 to 8 G's
-  frc::ADXL345_I2C m_accelerometer345I2C{frc::I2C::Port::kPort0,
-                                         frc::ADXL345_I2C::Range::kRange_8G};
+  frc::ADXL345_I2C m_accelerometer{frc::I2C::Port::kPort0,
+                                   frc::ADXL345_I2C::Range::kRange_8G};
 };
 
 #ifndef RUNNING_FRC_TESTS
