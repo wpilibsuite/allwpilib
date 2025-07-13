@@ -63,7 +63,7 @@ build:ci --remote_download_minimal
 
 build --build_metadata=REPO_URL=https://github.com/wpilibsuite/allwpilib.git
 
-common --define="WPILIB_VERSION=2025.424242.3.1-date-1-hash"
+common --define="WPILIB_VERSION=2025.424242.3.1-unknown"
 
 # List of artifact types to build in CI.
 # Anything else gets skipped to speed up CI.
