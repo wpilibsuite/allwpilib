@@ -2,6 +2,9 @@ try-import %workspace%/bazel_auth.rc
 try-import %workspace%/user.bazelrc
 
 common --noenable_bzlmod --enable_workspace
+# Resolves to --config=linux on Linux, --config=macos on Mac, --windows on windows
+build --enable_platform_specific_config
+query --enable_platform_specific_config
 
 # Make bazel 8 work for us.
 common --enable_workspace
@@ -17,7 +20,6 @@ test --test_output=errors
 test --test_verbose_timeout_warnings
 
 import %workspace%/shared/bazel/compiler_flags/sanitizers.rc
-import %workspace%/shared/bazel/compiler_flags/base_linux_flags.rc
 import %workspace%/shared/bazel/compiler_flags/linux_flags.rc
 import %workspace%/shared/bazel/compiler_flags/osx_flags.rc
 import %workspace%/shared/bazel/compiler_flags/roborio_flags.rc
@@ -42,7 +44,7 @@ build:build_buddy --remote_cache=grpcs://remote.buildbuddy.io
 build:build_buddy --remote_timeout=3600
 
 # Additional suggestions from buildbuddy for speed
-build:build_buddy --remote_cache_compression
+build:build_buddy --experimental_remote_cache_compression
 build:build_buddy --experimental_remote_cache_compression_threshold=100
 build:build_buddy --noslim_profile
 build:build_buddy --experimental_profile_include_target_label
@@ -60,3 +62,9 @@ build:ci --config=build_buddy
 build:ci --remote_download_minimal
 
 build --build_metadata=REPO_URL=https://github.com/wpilibsuite/allwpilib.git
+
+common --define="WPILIB_VERSION=2025.424242.3.1-unknown"
+
+# List of artifact types to build in CI.
+# Anything else gets skipped to speed up CI.
+common:ci --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug,linuxx86-64,linuxx86-64debug,linuxx86-64static,linuxx86-64staticdebug,osxuniversal,osxuniversaldebug,osxuniversalstatic,osxuniversalstaticdebug,windowsarm64,windowsarm64debug,windowsarm64static,windowsarm64staticdebug,windowsx86-64,windowsx86-64debug,windowsx86-64static,windowsx86-64staticdebug"

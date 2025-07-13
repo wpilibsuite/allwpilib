@@ -16,49 +16,51 @@ Trigger CommandGenericHID::Button(int button, frc::EventLoop* loop) const {
   return Trigger(loop, [this, button] { return m_hid.GetRawButton(button); });
 }
 
-Trigger CommandGenericHID::POV(int angle, frc::EventLoop* loop) const {
+Trigger CommandGenericHID::POV(frc::DriverStation::POVDirection angle,
+                               frc::EventLoop* loop) const {
   return POV(0, angle, loop);
 }
 
-Trigger CommandGenericHID::POV(int pov, int angle, frc::EventLoop* loop) const {
+Trigger CommandGenericHID::POV(int pov, frc::DriverStation::POVDirection angle,
+                               frc::EventLoop* loop) const {
   return Trigger(loop,
                  [this, pov, angle] { return m_hid.GetPOV(pov) == angle; });
 }
 
 Trigger CommandGenericHID::POVUp(frc::EventLoop* loop) const {
-  return POV(0, loop);
+  return POV(frc::DriverStation::POVDirection::kUp, loop);
 }
 
 Trigger CommandGenericHID::POVUpRight(frc::EventLoop* loop) const {
-  return POV(45, loop);
+  return POV(frc::DriverStation::POVDirection::kUpRight, loop);
 }
 
 Trigger CommandGenericHID::POVRight(frc::EventLoop* loop) const {
-  return POV(90, loop);
+  return POV(frc::DriverStation::POVDirection::kRight, loop);
 }
 
 Trigger CommandGenericHID::POVDownRight(frc::EventLoop* loop) const {
-  return POV(135, loop);
+  return POV(frc::DriverStation::POVDirection::kDownRight, loop);
 }
 
 Trigger CommandGenericHID::POVDown(frc::EventLoop* loop) const {
-  return POV(180, loop);
+  return POV(frc::DriverStation::POVDirection::kDown, loop);
 }
 
 Trigger CommandGenericHID::POVDownLeft(frc::EventLoop* loop) const {
-  return POV(225, loop);
+  return POV(frc::DriverStation::POVDirection::kDownLeft, loop);
 }
 
 Trigger CommandGenericHID::POVLeft(frc::EventLoop* loop) const {
-  return POV(270, loop);
+  return POV(frc::DriverStation::POVDirection::kLeft, loop);
 }
 
 Trigger CommandGenericHID::POVUpLeft(frc::EventLoop* loop) const {
-  return POV(315, loop);
+  return POV(frc::DriverStation::POVDirection::kUpLeft, loop);
 }
 
 Trigger CommandGenericHID::POVCenter(frc::EventLoop* loop) const {
-  return POV(360, loop);
+  return POV(frc::DriverStation::POVDirection::kCenter, loop);
 }
 
 Trigger CommandGenericHID::AxisLessThan(int axis, double threshold,

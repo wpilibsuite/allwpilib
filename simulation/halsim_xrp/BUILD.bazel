@@ -46,6 +46,7 @@ wpilib_cc_library(
 
 wpilib_cc_shared_library(
     name = "shared/halsim_xrp",
+    auto_export_windows_symbols = False,
     dynamic_deps = [
         "//wpinet:shared/wpinet",
         "//hal:shared/wpiHal",

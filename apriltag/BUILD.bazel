@@ -3,7 +3,6 @@ load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//:version.bzl", "VERSION")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
@@ -60,9 +59,9 @@ wpilib_cc_library(
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**/*"]),
-    defines = ["WPILIB_EXPORTS"],
     extra_hdr_pkg_files = [":thirdparty-apriltag-src-pkg"],
     extra_src_pkg_files = [":apriltag-java-jni-hdrs-pkg"],
+    local_defines = ["WPILIB_EXPORTS"],
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
@@ -74,6 +73,7 @@ wpilib_cc_library(
 
 wpilib_cc_shared_library(
     name = "shared/apriltag",
+    auto_export_windows_symbols = False,
     dynamic_deps = [
         "//wpimath:shared/wpimath",
         "//wpiutil:shared/wpiutil",
@@ -108,10 +108,11 @@ wpilib_jni_cc_library(
 
 wpilib_cc_shared_library(
     name = "shared/apriltagjni",
+    auto_export_windows_symbols = False,
     dynamic_deps = [
+        ":shared/apriltag",
         "//wpimath:shared/wpimath",
         "//wpiutil:shared/wpiutil",
-        ":shared/apriltag",
     ],
     use_debug_name = False,
     visibility = ["//visibility:public"],
@@ -124,7 +125,7 @@ wpilib_jni_java_library(
     native_libs = [":apriltagjni"],
     resource_strip_prefix = "apriltag/src/main/native/resources",
     resources = glob(["src/main/native/resources/**"]),
-    tags = ["maven_coordinates=edu.wpi.first.apriltag:apriltag-java:" + VERSION],
+    tags = ["maven_coordinates=edu.wpi.first.apriltag:apriltag-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "//wpimath:wpimath-java",

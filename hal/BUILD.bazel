@@ -3,7 +3,6 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//:version.bzl", "VERSION")
 load("//hal:generate.bzl", "generate_hal")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
@@ -158,6 +157,7 @@ wpilib_jni_cc_library(
 
 wpilib_cc_shared_library(
     name = "shared/wpiHaljni",
+    auto_export_windows_symbols = False,
     dynamic_deps = [
         ":shared/wpiHal",
         "//wpiutil:shared/wpiutil",
@@ -173,7 +173,7 @@ wpilib_jni_java_library(
     name = "hal-java",
     srcs = glob(["src/main/java/**/*.java"]),
     native_libs = [":wpiHaljni"],
-    tags = ["maven_coordinates=edu.wpi.first.hal:hal-java:" + VERSION],
+    tags = ["maven_coordinates=edu.wpi.first.hal:hal-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "//ntcore:ntcore-java",

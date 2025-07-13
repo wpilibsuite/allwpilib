@@ -1,6 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
-load("//:version.bzl", "VERSION")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 
 wpilib_cc_library(
@@ -46,7 +45,7 @@ wpilib_cc_static_library(
 java_library(
     name = "xrpVendordep-java",
     srcs = glob(["src/main/java/**/*.java"]),
-    tags = ["maven_coordinates=edu.wpi.first.xrpVendordep:xrpVendordep-java:" + VERSION],
+    tags = ["maven_coordinates=edu.wpi.first.xrpVendordep:xrpVendordep-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "//hal:hal-java",
