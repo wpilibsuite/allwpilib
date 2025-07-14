@@ -27,6 +27,8 @@ namespace frc {
 template <int States>
 class MerweScaledSigmaPoints {
  public:
+  static constexpr int NumSigmas = 2 * States + 1;
+
   /**
    * Constructs a generator for Van der Merwe scaled sigma points.
    *
@@ -43,11 +45,6 @@ class MerweScaledSigmaPoints {
 
     ComputeWeights(beta);
   }
-
-  /**
-   * Returns number of sigma points for each variable in the state x.
-   */
-  int NumSigmas() { return 2 * States + 1; }
 
   /**
    * Computes the sigma points for an unscented Kalman filter given the mean

@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-class UnscentedKalmanFilterTest {
+class S3UKFTest {
   private static Matrix<N5, N1> driveDynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {
     var motors = DCMotor.getCIM(2);
 
@@ -78,12 +78,12 @@ class UnscentedKalmanFilterTest {
     var dt = 0.005;
     assertDoesNotThrow(
         () -> {
-          UnscentedKalmanFilter<N5, N2, N3> observer =
-              new UnscentedKalmanFilter<>(
+          S3UKF<N5, N2, N3> observer =
+              new S3UKF<>(
                   Nat.N5(),
                   Nat.N3(),
-                  UnscentedKalmanFilterTest::driveDynamics,
-                  UnscentedKalmanFilterTest::driveLocalMeasurementModel,
+                  S3UKFTest::driveDynamics,
+                  S3UKFTest::driveLocalMeasurementModel,
                   VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
                   VecBuilder.fill(0.0001, 0.01, 0.01),
                   AngleStatistics.angleMean(2),
@@ -107,7 +107,7 @@ class UnscentedKalmanFilterTest {
               Nat.N5(),
               u,
               globalY,
-              UnscentedKalmanFilterTest::driveGlobalMeasurementModel,
+              S3UKFTest::driveGlobalMeasurementModel,
               R,
               AngleStatistics.angleMean(2),
               AngleStatistics.angleResidual(2),
@@ -121,12 +121,12 @@ class UnscentedKalmanFilterTest {
     final double dt = 0.005;
     final double rb = 0.8382 / 2.0; // Robot radius
 
-    UnscentedKalmanFilter<N5, N2, N3> observer =
-        new UnscentedKalmanFilter<>(
+    S3UKF<N5, N2, N3> observer =
+        new S3UKF<>(
             Nat.N5(),
             Nat.N3(),
-            UnscentedKalmanFilterTest::driveDynamics,
-            UnscentedKalmanFilterTest::driveLocalMeasurementModel,
+            S3UKFTest::driveDynamics,
+            S3UKFTest::driveLocalMeasurementModel,
             VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
             VecBuilder.fill(0.0001, 0.5, 0.5),
             AngleStatistics.angleMean(2),
@@ -150,7 +150,7 @@ class UnscentedKalmanFilterTest {
         NumericalJacobian.numericalJacobianU(
             Nat.N5(),
             Nat.N2(),
-            UnscentedKalmanFilterTest::driveDynamics,
+            S3UKFTest::driveDynamics,
             new Matrix<>(Nat.N5(), Nat.N1()),
             new Matrix<>(Nat.N2(), Nat.N1()));
 
@@ -190,8 +190,7 @@ class UnscentedKalmanFilterTest {
       observer.predict(u, dt);
 
       r = nextR;
-      trueXhat =
-          NumericalIntegration.rk4(UnscentedKalmanFilterTest::driveDynamics, trueXhat, u, dt);
+      trueXhat = NumericalIntegration.rk4(S3UKFTest::driveDynamics, trueXhat, u, dt);
     }
 
     var localY = driveLocalMeasurementModel(trueXhat, u);
@@ -205,7 +204,7 @@ class UnscentedKalmanFilterTest {
         Nat.N5(),
         u,
         globalY,
-        UnscentedKalmanFilterTest::driveGlobalMeasurementModel,
+        S3UKFTest::driveGlobalMeasurementModel,
         R,
         AngleStatistics.angleMean(2),
         AngleStatistics.angleResidual(2),
@@ -216,7 +215,7 @@ class UnscentedKalmanFilterTest {
 
     assertEquals(finalPosition.pose.getTranslation().getX(), observer.getXhat(0), 0.055);
     assertEquals(finalPosition.pose.getTranslation().getY(), observer.getXhat(1), 0.15);
-    assertEquals(finalPosition.pose.getRotation().getRadians(), observer.getXhat(2), 0.000005);
+    assertEquals(finalPosition.pose.getRotation().getRadians(), observer.getXhat(2), 0.00015);
     assertEquals(0.0, observer.getXhat(3), 0.1);
     assertEquals(0.0, observer.getXhat(4), 0.1);
   }
@@ -226,7 +225,7 @@ class UnscentedKalmanFilterTest {
     var dt = 0.020;
     var plant = LinearSystemId.identifyVelocitySystem(0.02, 0.006);
     var observer =
-        new UnscentedKalmanFilter<>(
+        new S3UKF<>(
             Nat.N1(),
             Nat.N1(),
             (x, u) -> plant.getA().times(x).plus(plant.getB().times(u)),
@@ -256,7 +255,7 @@ class UnscentedKalmanFilterTest {
     var dt = 0.005;
 
     var observer =
-        new UnscentedKalmanFilter<>(
+        new S3UKF<>(
             Nat.N2(),
             Nat.N2(),
             (x, u) -> x,
@@ -371,11 +370,11 @@ class UnscentedKalmanFilterTest {
             0.0, 0.0, 10);
 
     var observer =
-        new UnscentedKalmanFilter<N4, N1, N3>(
+        new S3UKF<N4, N1, N3>(
             Nat.N4(),
             Nat.N3(),
-            UnscentedKalmanFilterTest::motorDynamics,
-            UnscentedKalmanFilterTest::motorMeasurementModel,
+            S3UKFTest::motorDynamics,
+            S3UKFTest::motorMeasurementModel,
             VecBuilder.fill(0.1, 1.0, 1e-10, 1e-10),
             VecBuilder.fill(pos_stddev, vel_stddev, accel_stddev),
             dt);

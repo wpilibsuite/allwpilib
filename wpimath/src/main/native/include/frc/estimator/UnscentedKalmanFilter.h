@@ -13,7 +13,7 @@
 
 #include "frc/EigenCore.h"
 #include "frc/StateSpaceUtil.h"
-#include "frc/estimator/MerweScaledSigmaPoints.h"
+#include "frc/estimator/SigmaPoints.h"
 #include "frc/estimator/UnscentedTransform.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/NumericalIntegration.h"
@@ -51,10 +51,13 @@ namespace frc {
  * @tparam States Number of states.
  * @tparam Inputs Number of inputs.
  * @tparam Outputs Number of outputs.
+ * @tparam SigmaPoints Type used to generate sigma points and weights.
  */
-template <int States, int Inputs, int Outputs>
+template <int States, int Inputs, int Outputs, SigmaPoints<States> SigmaPoints>
 class UnscentedKalmanFilter {
  public:
+  static constexpr int NumSigmas = SigmaPoints::NumSigmas;
+
   using StateVector = Vectord<States>;
   using InputVector = Vectord<Inputs>;
   using OutputVector = Vectord<Outputs>;
@@ -87,12 +90,12 @@ class UnscentedKalmanFilter {
       : m_f(std::move(f)), m_h(std::move(h)) {
     m_contQ = MakeCovMatrix(stateStdDevs);
     m_contR = MakeCovMatrix(measurementStdDevs);
-    m_meanFuncX = [](const Matrixd<States, 2 * States + 1>& sigmas,
-                     const Vectord<2 * States + 1>& Wm) -> StateVector {
+    m_meanFuncX = [](const Matrixd<States, NumSigmas>& sigmas,
+                     const Vectord<NumSigmas>& Wm) -> StateVector {
       return sigmas * Wm;
     };
-    m_meanFuncY = [](const Matrixd<Outputs, 2 * States + 1>& sigmas,
-                     const Vectord<2 * States + 1>& Wc) -> OutputVector {
+    m_meanFuncY = [](const Matrixd<Outputs, NumSigmas>& sigmas,
+                     const Vectord<NumSigmas>& Wc) -> OutputVector {
       return sigmas * Wc;
     };
     m_residualFuncX = [](const StateVector& a,
@@ -141,11 +144,11 @@ class UnscentedKalmanFilter {
       std::function<StateVector(const StateVector&, const InputVector&)> f,
       std::function<OutputVector(const StateVector&, const InputVector&)> h,
       const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
-      std::function<StateVector(const Matrixd<States, 2 * States + 1>&,
-                                const Vectord<2 * States + 1>&)>
+      std::function<StateVector(const Matrixd<States, NumSigmas>&,
+                                const Vectord<NumSigmas>&)>
           meanFuncX,
-      std::function<OutputVector(const Matrixd<Outputs, 2 * States + 1>&,
-                                 const Vectord<2 * States + 1>&)>
+      std::function<OutputVector(const Matrixd<Outputs, NumSigmas>&,
+                                 const Vectord<NumSigmas>&)>
           meanFuncY,
       std::function<StateVector(const StateVector&, const StateVector&)>
           residualFuncX,
@@ -257,7 +260,7 @@ class UnscentedKalmanFilter {
     // Generate sigma points around the state mean
     //
     // equation (17)
-    Matrixd<States, 2 * States + 1> sigmas =
+    Matrixd<States, NumSigmas> sigmas =
         m_pts.SquareRootSigmaPoints(m_xHat, m_S);
 
     // Project each sigma point forward in time according to the
@@ -267,7 +270,7 @@ class UnscentedKalmanFilter {
     //   sigmasF = 𝒳ₖ,ₖ₋₁ or just 𝒳 for readability
     //
     // equation (18)
-    for (int i = 0; i < m_pts.NumSigmas(); ++i) {
+    for (int i = 0; i < NumSigmas; ++i) {
       StateVector x = sigmas.template block<States, 1>(0, i);
       m_sigmasF.template block<States, 1>(0, i) = RK4(m_f, x, u, dt);
     }
@@ -276,7 +279,7 @@ class UnscentedKalmanFilter {
     // to compute the prior state mean and covariance
     //
     // equations (18) (19) and (20)
-    auto [xHat, S] = SquareRootUnscentedTransform<States, States>(
+    auto [xHat, S] = SquareRootUnscentedTransform<States, NumSigmas>(
         m_sigmasF, m_pts.Wm(), m_pts.Wc(), m_meanFuncX, m_residualFuncX,
         discQ.template triangularView<Eigen::Lower>());
     m_xHat = xHat;
@@ -327,8 +330,8 @@ class UnscentedKalmanFilter {
       const InputVector& u, const Vectord<Rows>& y,
       std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
       const Matrixd<Rows, Rows>& R) {
-    auto meanFuncY = [](const Matrixd<Outputs, 2 * States + 1>& sigmas,
-                        const Vectord<2 * States + 1>& Wc) -> Vectord<Rows> {
+    auto meanFuncY = [](const Matrixd<Outputs, NumSigmas>& sigmas,
+                        const Vectord<NumSigmas>& Wc) -> Vectord<Rows> {
       return sigmas * Wc;
     };
     auto residualFuncX = [](const StateVector& a,
@@ -358,7 +361,7 @@ class UnscentedKalmanFilter {
    * @param h             A vector-valued function of x and u that returns the
    *                      measurement vector.
    * @param R             Continuous measurement noise covariance matrix.
-   * @param meanFuncY     A function that computes the mean of 2 * States + 1
+   * @param meanFuncY     A function that computes the mean of NumSigmas
    *                      measurement vectors using a given set of weights.
    * @param residualFuncY A function that computes the residual of two
    *                      measurement vectors (i.e. it subtracts them.)
@@ -371,8 +374,8 @@ class UnscentedKalmanFilter {
       const InputVector& u, const Vectord<Rows>& y,
       std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
       const Matrixd<Rows, Rows>& R,
-      std::function<Vectord<Rows>(const Matrixd<Rows, 2 * States + 1>&,
-                                  const Vectord<2 * States + 1>&)>
+      std::function<Vectord<Rows>(const Matrixd<Rows, NumSigmas>&,
+                                  const Vectord<NumSigmas>&)>
           meanFuncY,
       std::function<Vectord<Rows>(const Vectord<Rows>&, const Vectord<Rows>&)>
           residualFuncY,
@@ -392,10 +395,10 @@ class UnscentedKalmanFilter {
     // This differs from equation (22) which uses
     // the prior sigma points, regenerating them allows
     // multiple measurement updates per time update
-    Matrixd<Rows, 2 * States + 1> sigmasH;
-    Matrixd<States, 2 * States + 1> sigmas =
+    Matrixd<Rows, NumSigmas> sigmasH;
+    Matrixd<States, NumSigmas> sigmas =
         m_pts.SquareRootSigmaPoints(m_xHat, m_S);
-    for (int i = 0; i < m_pts.NumSigmas(); ++i) {
+    for (int i = 0; i < NumSigmas; ++i) {
       sigmasH.template block<Rows, 1>(0, i) =
           h(sigmas.template block<States, 1>(0, i), u);
     }
@@ -405,7 +408,7 @@ class UnscentedKalmanFilter {
     // covariance.
     //
     // equations (23) (24) and (25)
-    auto [yHat, Sy] = SquareRootUnscentedTransform<Rows, States>(
+    auto [yHat, Sy] = SquareRootUnscentedTransform<Rows, NumSigmas>(
         sigmasH, m_pts.Wm(), m_pts.Wc(), meanFuncY, residualFuncY,
         discR.template triangularView<Eigen::Lower>());
 
@@ -419,7 +422,7 @@ class UnscentedKalmanFilter {
     // equation (26)
     Matrixd<States, Rows> Pxy;
     Pxy.setZero();
-    for (int i = 0; i < m_pts.NumSigmas(); ++i) {
+    for (int i = 0; i < NumSigmas; ++i) {
       Pxy +=
           m_pts.Wc(i) *
           (residualFuncX(m_sigmasF.template block<States, 1>(0, i), m_xHat)) *
@@ -467,11 +470,11 @@ class UnscentedKalmanFilter {
  private:
   std::function<StateVector(const StateVector&, const InputVector&)> m_f;
   std::function<OutputVector(const StateVector&, const InputVector&)> m_h;
-  std::function<StateVector(const Matrixd<States, 2 * States + 1>&,
-                            const Vectord<2 * States + 1>&)>
+  std::function<StateVector(const Matrixd<States, NumSigmas>&,
+                            const Vectord<NumSigmas>&)>
       m_meanFuncX;
-  std::function<OutputVector(const Matrixd<Outputs, 2 * States + 1>&,
-                             const Vectord<2 * States + 1>&)>
+  std::function<OutputVector(const Matrixd<Outputs, NumSigmas>&,
+                             const Vectord<NumSigmas>&)>
       m_meanFuncY;
   std::function<StateVector(const StateVector&, const StateVector&)>
       m_residualFuncX;
@@ -482,15 +485,10 @@ class UnscentedKalmanFilter {
   StateMatrix m_S;
   StateMatrix m_contQ;
   Matrixd<Outputs, Outputs> m_contR;
-  Matrixd<States, 2 * States + 1> m_sigmasF;
+  Matrixd<States, NumSigmas> m_sigmasF;
   units::second_t m_dt;
 
-  MerweScaledSigmaPoints<States> m_pts;
+  SigmaPoints m_pts;
 };
-
-extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
-    UnscentedKalmanFilter<3, 3, 1>;
-extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
-    UnscentedKalmanFilter<5, 3, 3>;
 
 }  // namespace frc
