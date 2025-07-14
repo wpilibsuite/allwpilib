@@ -321,6 +321,15 @@ def wpilib_cc_shared_library(
         **kwargs
     )
 
+    universal_name = "universal/lib" + lib + ".lib"
+    universal_binary(
+        name = universal_name,
+        binary = name,
+        target_compatible_with = [
+            "@platforms//os:osx",
+        ],
+    )
+
     _split_debug_symbols(
         name = name + "-symbolsplit",
         copy = select({
@@ -336,7 +345,16 @@ def wpilib_cc_shared_library(
 
     pkg_files(
         name = folder + "/lib" + lib + "-shared-files",
-        srcs = [name + "-symbolsplit"],
+        srcs = select({
+            "@rules_bzlmodrio_toolchains//conditions:osx": [universal_name],
+            "//conditions:default": [
+                ":" + name + "-symbolsplit",
+            ],
+        }),
+        strip_prefix = select({
+            "@rules_bzlmodrio_toolchains//conditions:osx": "universal",
+            "//conditions:default": None,
+        }),
         visibility = visibility,
     )
 
