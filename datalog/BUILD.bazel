@@ -59,6 +59,7 @@ wpilib_cc_shared_library(
         ":shared/datalog",
         "//wpiutil:shared/wpiutil",
     ],
+    use_debug_name = False,
     visibility = ["//visibility:public"],
     deps = [":datalogjni"],
 )
@@ -67,6 +68,7 @@ wpilib_jni_java_library(
     name = "datalog-java",
     srcs = glob(["src/main/java/**/*.java"]),
     native_libs = [":datalogjni"],
+    tags = ["maven_coordinates=edu.wpi.first.datalog:datalog-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "//wpiutil:wpiutil-java",

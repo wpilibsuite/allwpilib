@@ -9,6 +9,7 @@ java_library(
     srcs = glob(["src/main/java/**/*.java"]),
     resource_strip_prefix = "epilogue-processor/src/main/resources/",
     resources = glob(["src/main/resources/**"]),
+    tags = ["maven_coordinates=edu.wpi.first.epilogue:epilogue-processor-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     runtime_deps = [
         "//wpilibNewCommands:wpilibNewCommands-java",

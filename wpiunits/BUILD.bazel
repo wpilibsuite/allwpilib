@@ -35,6 +35,7 @@ write_source_files(
 java_library(
     name = "wpiunits-java",
     srcs = glob(["src/main/java/**/*.java"]) + glob(["src/generated/main/java/**/*.java"]),
+    tags = ["maven_coordinates=edu.wpi.first.wpiunits:wpiunits-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [],
 )
