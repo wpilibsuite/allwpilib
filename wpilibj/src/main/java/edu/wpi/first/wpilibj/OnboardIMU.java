@@ -13,11 +13,11 @@ import edu.wpi.first.math.geometry.Rotation3d;
 public class OnboardIMU {
   /** A mount orientation of SystemCore. */
   public enum MountOrientation {
-    /** Flat. */
+    /** Flat (mounted parallel to the ground). */
     kFlat,
-    /** Landscape. */
+    /** Landscape (vertically mounted with long edge of SystemCore paralel to the ground). */
     kLandscape,
-    /** Portrait. */
+    /** Portrait (vertically mounted with the short edge of SystemCore parallel to the ground). */
     kPortrait
   }
 
