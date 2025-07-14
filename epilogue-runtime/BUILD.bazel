@@ -1,11 +1,10 @@
 load("@rules_java//java:defs.bzl", "java_library")
-load("//:version.bzl", "VERSION")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 
 java_library(
     name = "epilogue-java",
     srcs = glob(["src/main/java/**/*.java"]),
-    tags = ["maven_coordinates=edu.wpi.first.epilogue:epilogue-runtime-java:" + VERSION],
+    tags = ["maven_coordinates=edu.wpi.first.epilogue:epilogue-runtime-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "//datalog:datalog-java",

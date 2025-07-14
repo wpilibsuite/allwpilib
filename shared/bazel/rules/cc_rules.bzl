@@ -333,7 +333,7 @@ def wpilib_cc_shared_library(
     _split_debug_symbols(
         name = name + "-symbolsplit",
         copy = select({
-            "//shared/bazel/rules:is_linux_x86_64": False,
+            "@rules_bzlmodrio_toolchains//platforms/linux_x86_64": False,
             "//conditions:default": True,
         }),
         use_debug_name = select({

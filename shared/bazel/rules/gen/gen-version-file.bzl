@@ -1,11 +1,10 @@
-load("//:version.bzl", "VERSION")
-
 def _generate_version_file_impl(ctx):
     out = ctx.actions.declare_file(ctx.attr.output_file)
+    wpilib_version = ctx.var.get("WPILIB_VERSION")
     ctx.actions.expand_template(
         output = out,
         template = ctx.file.template,
-        substitutions = {"${wpilib_version}": VERSION},
+        substitutions = {"${wpilib_version}": wpilib_version},
     )
     return [DefaultInfo(files = depset([out]))]
 
