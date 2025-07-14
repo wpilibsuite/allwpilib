@@ -21,6 +21,16 @@ pkg_files(
 )
 
 config_setting(
+    name = "compilation_mode_windows_dbg",
+    constraint_values = [
+        "@platforms//os:windows",
+    ],
+    values = {
+        "compilation_mode": "dbg",
+    },
+)
+
+config_setting(
     name = "compilation_mode_dbg",
     values = {
         "compilation_mode": "dbg",
