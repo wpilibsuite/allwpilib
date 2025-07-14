@@ -21,5 +21,97 @@
     "foldername": "dutycycleencoder",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "AnalogEncoder",
+    "description": "Snippets of AnalogEncoder class usage for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Encoder",
+      "Analog"
+    ],
+    "foldername": "analogencoder",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "EncoderDrive",
+    "description": "Snippets of driving to a distance for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Encoder",
+      "Differential Drive"
+    ],
+    "foldername": "encoderdrive",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "EncoderHoming",
+    "description": "Snippets of homing a mechanism for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Encoder",
+      "Digital Input"
+    ],
+    "foldername": "encoderhoming",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "LimitSwitch",
+    "description": "Snippets of Limit Switch for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Digital Input"
+    ],
+    "foldername": "limitswitch",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "DigitalInput",
+    "description": "Snippets of Digital Input for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Digital Input"
+    ],
+    "foldername": "digitalinput",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "AnalogInput",
+    "description": "Snippets of Analog Input for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Analog"
+    ],
+    "foldername": "analoginput",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "AnalogPotentiometer",
+    "description": "Snippets of Analog Potentiometer for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Analog"
+    ],
+    "foldername": "analogpotentiometer",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "AnalogAccelerometer",
+    "description": "Snippets of Analog Accelerometer for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Analog",
+      "Accelerometer"
+    ],
+    "foldername": "analogaccelerometer",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]

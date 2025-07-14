@@ -59,6 +59,7 @@ void InitializeHAL() {
   InitializeEncoder();
   InitializeFRCDriverStation();
   InitializeI2C();
+  InitializeIMU();
   InitializeMain();
   InitializeNotifier();
   InitializeCTREPDP();
@@ -293,6 +294,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return true;
   }
 
+  // Initialize system server first, other things might use it
+  hal::InitializeSystemServer();
+
   hal::init::InitializeHAL();
 
   hal::init::HAL_IsInitialized.store(true);
@@ -306,8 +310,6 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     std::printf("Failed to initialize can buses\n");
     return false;
   }
-
-  hal::InitializeSystemServer();
 
   // // Return false if program failed to kill an existing program
   // if (!killExistingProgram(timeout, mode)) {

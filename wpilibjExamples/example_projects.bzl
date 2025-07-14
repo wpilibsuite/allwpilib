@@ -67,8 +67,16 @@ COMMANDS_V2_FOLDERS = [
 ]
 
 SNIPPETS_FOLDERS = [
+    "analogaccelerometer",
+    "analogencoder",
+    "analoginput",
+    "analogpotentiometer",
+    "digitalinput",
     "dutycycleencoder",
     "encoder",
+    "encoderdrive",
+    "encoderhoming",
+    "limitswitch",
 ]
 
 TEMPLATES_FOLDERS = [
@@ -89,5 +97,10 @@ TEMPLATES_FOLDERS = [
 ]
 
 TEST_FOLDERS = [
+    "armsimulation",
+    "digitalcommunication",
+    "elevatorsimulation",
+    "i2ccommunication",
+    "potentiometerpid",
     "unittest",
 ]

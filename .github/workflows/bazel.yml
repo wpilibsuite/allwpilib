@@ -56,8 +56,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Linux (native)",      os: ubuntu-24.04,   container: "wpilib/ubuntu-base:22.04", action: "test",   config: "--config=linux",    }
-          - { name: "Linux (systemcore)",  os: ubuntu-24.04,   container: "wpilib/ubuntu-base:22.04", action: "build",  config: "--config=systemcore",    }
+          - { name: "Linux (native)",      os: ubuntu-24.04,   container: "wpilib/ubuntu-base:24.04", action: "test",   config: "--config=linux",    }
+          - { name: "Linux (systemcore)",  os: ubuntu-24.04,   container: "wpilib/ubuntu-base:24.04", action: "build",  config: "--config=systemcore",    }
     name: "${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
@@ -70,6 +70,12 @@ jobs:
         uses: ./.github/actions/setup-build-buddy
         with:
           token: ${{ secrets.BUILDBUDDY_API_KEY }}
+
+      - uses: bazel-contrib/setup-bazel@0.15.0
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+          bazelisk-version: 1.x
 
       - name: bazel ${{ matrix.action }} (release)
         run: bazel ${{ matrix.action }} ... --config=ci -c opt ${{ matrix.config }} -k --verbose_failures

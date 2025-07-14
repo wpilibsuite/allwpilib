@@ -13,7 +13,7 @@
 
 namespace wpi {
 
-#if defined(__FRC_ROBORIO__) && !defined(WPI_USE_PRIORITY_MUTEX)
+#if defined(__FRC_SYSTEMCORE__) && !defined(WPI_USE_PRIORITY_MUTEX)
 #define WPI_USE_PRIORITY_MUTEX
 #endif
 
@@ -41,15 +41,11 @@ class priority_recursive_mutex {
   pthread_mutex_t* native_handle() { return &m_mutex; }
 
  private:
-// Do the equivalent of setting PTHREAD_PRIO_INHERIT and
-// PTHREAD_MUTEX_RECURSIVE_NP.
-#ifdef __PTHREAD_MUTEX_HAVE_PREV
+  // Do the equivalent of setting PTHREAD_PRIO_INHERIT and
+  // PTHREAD_MUTEX_RECURSIVE_NP.
+  // from glibc sysdeps/nptl/pthreadP.h: PTHREAD_MUTEX_PRIO_INHERIT_NP = 32
   pthread_mutex_t m_mutex = {
-      {0, 0, 0, 0, 0x20 | PTHREAD_MUTEX_RECURSIVE_NP, __PTHREAD_SPINS, {0, 0}}};
-#else
-  pthread_mutex_t m_mutex = {
-      {0, 0, 0, 0x20 | PTHREAD_MUTEX_RECURSIVE_NP, 0, {__PTHREAD_SPINS}}};
-#endif
+      {__PTHREAD_MUTEX_INITIALIZER(0x20 | PTHREAD_MUTEX_RECURSIVE_NP)}};
 };
 
 class priority_mutex {
@@ -72,12 +68,9 @@ class priority_mutex {
   pthread_mutex_t* native_handle() { return &m_mutex; }
 
  private:
-// Do the equivalent of setting PTHREAD_PRIO_INHERIT.
-#ifdef __PTHREAD_MUTEX_HAVE_PREV
-  pthread_mutex_t m_mutex = {{0, 0, 0, 0, 0x20, __PTHREAD_SPINS, {0, 0}}};
-#else
-  pthread_mutex_t m_mutex = {{0, 0, 0, 0x20, 0, {__PTHREAD_SPINS}}};
-#endif
+  // Do the equivalent of setting PTHREAD_PRIO_INHERIT.
+  // from glibc sysdeps/nptl/pthreadP.h: PTHREAD_MUTEX_PRIO_INHERIT_NP = 32
+  pthread_mutex_t m_mutex = {{__PTHREAD_MUTEX_INITIALIZER(0x20)}};
 };
 
 #endif  // defined(WPI_USE_PRIORITY_MUTEX) && defined(__linux__)

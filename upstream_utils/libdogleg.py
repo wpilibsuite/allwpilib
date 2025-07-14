@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 
-import os
 import shutil
+from pathlib import Path
 
 from upstream_utils import Lib, walk_cwd_and_copy_if
 
 
-def copy_upstream_src(wpilib_root):
-    wpical = os.path.join(wpilib_root, "wpical")
+def copy_upstream_src(wpilib_root: Path):
+    wpical = wpilib_root / "wpical"
 
     # Delete old install
     for d in [
         "src/main/native/thirdparty/libdogleg/src",
         "src/main/native/thirdparty/libdogleg/include",
     ]:
-        shutil.rmtree(os.path.join(wpical, d), ignore_errors=True)
+        shutil.rmtree(wpical / d, ignore_errors=True)
 
     files = walk_cwd_and_copy_if(
-        lambda dp, f: f.endswith("dogleg.h"),
-        os.path.join(wpical, "src/main/native/thirdparty/libdogleg/include"),
+        lambda dp, f: f == "dogleg.h",
+        wpical / "src/main/native/thirdparty/libdogleg/include",
     )
     for f in files:
         with open(f) as file:
@@ -30,8 +30,8 @@ def copy_upstream_src(wpilib_root):
             file.write(content)
 
     files = walk_cwd_and_copy_if(
-        lambda dp, f: f.endswith("dogleg.cpp"),
-        os.path.join(wpical, "src/main/native/thirdparty/libdogleg/src"),
+        lambda dp, f: f == "dogleg.cpp",
+        wpical / "src/main/native/thirdparty/libdogleg/src",
     )
     for f in files:
         with open(f) as file:
@@ -48,6 +48,7 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "libdogleg"
     url = "https://github.com/dkogan/libdogleg"
+    # master on 2024-06-22
     tag = "c971ea43088d286a3683c1039b9a85f761f7df15"
 
     libdogleg = Lib(name, url, tag, copy_upstream_src)

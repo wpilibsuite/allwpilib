@@ -1113,8 +1113,9 @@ void NT_StopLocal(NT_Inst inst);
  * @param inst              instance handle
  * @param persist_filename  the name of the persist file to use (UTF-8 string,
  *                          null terminated)
- * @param listen_address    the address to listen on, or null to listen on any
- *                          address. (UTF-8 string, null terminated)
+ * @param listen_address    the address to listen on, or an empty string to
+ *                          listen on any address. (UTF-8 string, null
+ *                          terminated)
  * @param port              port to communicate over
  */
 void NT_StartServer(NT_Inst inst, const struct WPI_String* persist_filename,

@@ -157,7 +157,7 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
    * @return The computed feedforward.
    */
   public double calculate(double velocity) {
-    return calculate(velocity, 0);
+    return calculate(velocity, velocity);
   }
 
   /**

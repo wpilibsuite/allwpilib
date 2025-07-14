@@ -1,12 +1,10 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 
-cc_library(
+wpilib_cc_library(
     name = "halsim_ws_core",
     srcs = glob(["src/main/native/cpp/*.cpp"]),
-    hdrs = glob([
-        "src/main/native/include/*.h",
-        "src/main/native/include/*.inc",
-    ]),
+    hdrs = glob(["src/main/native/include/*.h"]),
+    include_license_files = True,
     strip_include_prefix = "src/main/native/include",
     target_compatible_with = select({
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
@@ -15,8 +13,35 @@ cc_library(
     }),
     visibility = ["//visibility:public"],
     deps = [
-        "//hal:wpiHal.static",
-        "//wpinet:wpinet.static",
-        "//wpiutil:wpiutil.static",
+        "//hal:wpiHal",
+        "//wpinet",
+        "//wpiutil",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/halsim_ws_core",
+    auto_export_windows_symbols = False,
+    dynamic_deps = [
+        "//hal:shared/wpiHal",
+        "//wpinet:shared/wpinet",
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":halsim_ws_core",
+    ],
+)
+
+wpilib_cc_static_library(
+    name = "static/halsim_ws_core",
+    static_deps = [
+        "//hal:static/wpiHal",
+        "//wpinet:static/wpinet",
+        "//wpiutil:static/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":halsim_ws_core",
     ],
 )

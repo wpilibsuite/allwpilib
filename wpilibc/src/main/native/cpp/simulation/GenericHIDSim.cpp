@@ -4,6 +4,7 @@
 
 #include "frc/simulation/GenericHIDSim.h"
 
+#include "frc/DriverStation.h"
 #include "frc/GenericHID.h"
 #include "frc/simulation/DriverStationSim.h"
 
@@ -27,11 +28,11 @@ void GenericHIDSim::SetRawAxis(int axis, double value) {
   DriverStationSim::SetJoystickAxis(m_port, axis, value);
 }
 
-void GenericHIDSim::SetPOV(int pov, int value) {
+void GenericHIDSim::SetPOV(int pov, DriverStation::POVDirection value) {
   DriverStationSim::SetJoystickPOV(m_port, pov, value);
 }
 
-void GenericHIDSim::SetPOV(int value) {
+void GenericHIDSim::SetPOV(DriverStation::POVDirection value) {
   SetPOV(0, value);
 }
 

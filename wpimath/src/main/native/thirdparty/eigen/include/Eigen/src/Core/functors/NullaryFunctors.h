@@ -19,7 +19,6 @@ namespace internal {
 
 template <typename Scalar>
 struct scalar_constant_op {
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE scalar_constant_op(const scalar_constant_op& other) : m_other(other.m_other) {}
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE scalar_constant_op(const Scalar& other) : m_other(other) {}
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Scalar operator()() const { return m_other; }
   template <typename PacketType>
@@ -29,13 +28,25 @@ struct scalar_constant_op {
   const Scalar m_other;
 };
 template <typename Scalar>
-struct functor_traits<scalar_constant_op<Scalar> > {
+struct functor_traits<scalar_constant_op<Scalar>> {
   enum {
     Cost = 0 /* as the constant value should be loaded in register only once for the whole expression */,
     PacketAccess = packet_traits<Scalar>::Vectorizable,
     IsRepeatable = true
   };
 };
+
+template <typename Scalar>
+struct scalar_zero_op {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE scalar_zero_op() = default;
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Scalar operator()() const { return Scalar(0); }
+  template <typename PacketType>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const PacketType packetOp() const {
+    return internal::pzero<PacketType>(PacketType());
+  }
+};
+template <typename Scalar>
+struct functor_traits<scalar_zero_op<Scalar>> : functor_traits<scalar_constant_op<Scalar>> {};
 
 template <typename Scalar>
 struct scalar_identity_op {
@@ -45,7 +56,7 @@ struct scalar_identity_op {
   }
 };
 template <typename Scalar>
-struct functor_traits<scalar_identity_op<Scalar> > {
+struct functor_traits<scalar_identity_op<Scalar>> {
   enum { Cost = NumTraits<Scalar>::AddCost, PacketAccess = false, IsRepeatable = true };
 };
 
@@ -75,18 +86,19 @@ struct linspaced_op_impl<Scalar, /*IsInteger*/ false> {
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Packet packetOp(IndexType i) const {
     // Principle:
     // [low, ..., low] + ( [step, ..., step] * ( [i, ..., i] + [0, ..., size] ) )
+    Packet low = pset1<Packet>(m_low);
+    Packet high = pset1<Packet>(m_high);
+    Packet step = pset1<Packet>(m_step);
     if (m_flip) {
       Packet pi = plset<Packet>(Scalar(i - m_size1));
-      Packet res = padd(pset1<Packet>(m_high), pmul(pset1<Packet>(m_step), pi));
-      if (EIGEN_PREDICT_TRUE(i != 0)) return res;
-      Packet mask = pcmp_lt(pset1<Packet>(0), plset<Packet>(0));
-      return pselect<Packet>(mask, res, pset1<Packet>(m_low));
+      Packet res = pmadd(step, pi, high);
+      Packet mask = pcmp_lt(pzero(res), plset<Packet>(Scalar(i)));
+      return pselect<Packet>(mask, res, low);
     } else {
       Packet pi = plset<Packet>(Scalar(i));
-      Packet res = padd(pset1<Packet>(m_low), pmul(pset1<Packet>(m_step), pi));
-      if (EIGEN_PREDICT_TRUE(i != m_size1 - unpacket_traits<Packet>::size + 1)) return res;
-      Packet mask = pcmp_lt(plset<Packet>(0), pset1<Packet>(unpacket_traits<Packet>::size - 1));
-      return pselect<Packet>(mask, res, pset1<Packet>(m_high));
+      Packet res = pmadd(step, pi, low);
+      Packet mask = pcmp_lt(pi, pset1<Packet>(Scalar(m_size1)));
+      return pselect<Packet>(mask, res, high);
     }
   }
 
@@ -128,11 +140,10 @@ struct linspaced_op_impl<Scalar, /*IsInteger*/ true> {
 template <typename Scalar>
 struct linspaced_op;
 template <typename Scalar>
-struct functor_traits<linspaced_op<Scalar> > {
+struct functor_traits<linspaced_op<Scalar>> {
   enum {
     Cost = 1,
-    PacketAccess =
-        (!NumTraits<Scalar>::IsInteger) && packet_traits<Scalar>::HasSetLinear && packet_traits<Scalar>::HasBlend,
+    PacketAccess = (!NumTraits<Scalar>::IsInteger) && packet_traits<Scalar>::HasSetLinear,
     /*&& ((!NumTraits<Scalar>::IsInteger) || packet_traits<Scalar>::HasDiv),*/  // <- vectorization for integer is
                                                                                 // currently disabled
     IsRepeatable = true
@@ -182,7 +193,7 @@ struct equalspaced_op {
 };
 
 template <typename Scalar>
-struct functor_traits<equalspaced_op<Scalar> > {
+struct functor_traits<equalspaced_op<Scalar>> {
   enum {
     Cost = NumTraits<Scalar>::AddCost + NumTraits<Scalar>::MulCost,
     PacketAccess =

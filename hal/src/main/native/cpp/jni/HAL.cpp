@@ -6,7 +6,7 @@
 
 #include <jni.h>
 
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
 #include <signal.h>
 #endif
 
@@ -95,7 +95,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_HAL_terminate
   (JNIEnv*, jclass)
 {
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
   ::raise(SIGKILL);
 #endif
 }

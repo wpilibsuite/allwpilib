@@ -2,9 +2,12 @@ load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
+load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
 load("//wpiutil:generate.bzl", "generate_wpiutil")
 
@@ -33,7 +36,6 @@ py_binary(
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    visibility = ["//visibility:public"],
 )
 
 filegroup(
@@ -56,168 +58,61 @@ write_source_files(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
-    name = "argparse-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/argparse/include/**/*",
-    ]),
-    includes = ["src/main/native/thirdparty/argparse/include"],
-    strip_include_prefix = "src/main/native/thirdparty/argparse/include",
-    visibility = ["//wpiutil:__subpackages__"],
+third_party_cc_lib_helper(
+    name = "argparse",
+    include_root = "src/main/native/thirdparty/argparse/include",
+    src_root = None,
 )
 
-cc_library(
-    name = "debugging-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/debugging/include/**/*",
-    ]),
-    includes = ["src/main/native/thirdparty/debugging/include"],
-    strip_include_prefix = "src/main/native/thirdparty/debugging/include",
-    visibility = ["//wpiutil:__subpackages__"],
+third_party_cc_lib_helper(
+    name = "debugging",
+    include_root = "src/main/native/thirdparty/debugging/include",
+    src_root = "src/main/native/thirdparty/debugging/src",
 )
 
-filegroup(
-    name = "debugging-srcs",
-    srcs = glob(["src/main/native/thirdparty/debugging/src/**"]),
-    visibility = ["//wpiutil:__subpackages__"],
+third_party_cc_lib_helper(
+    name = "expected",
+    include_root = "src/main/native/thirdparty/expected/include",
 )
 
-cc_library(
-    name = "expected-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/expected/include/**/*",
-    ]),
-    includes = ["src/main/native/thirdparty/expected/include"],
-    strip_include_prefix = "src/main/native/thirdparty/expected/include",
-    visibility = ["//wpiutil:__subpackages__"],
+third_party_cc_lib_helper(
+    name = "fmtlib",
+    include_root = "src/main/native/thirdparty/fmtlib/include",
+    src_root = "src/main/native/thirdparty/fmtlib/src",
 )
 
-cc_library(
-    name = "concurrentqueue-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/concurrentqueue/include/**/*",
-    ]),
-    includes = ["src/main/native/thirdparty/concurrentqueue/include"],
-    strip_include_prefix = "src/main/native/thirdparty/concurrentqueue/include",
-    visibility = ["//wpiutil:__subpackages__"],
+third_party_cc_lib_helper(
+    name = "json",
+    include_root = "src/main/native/thirdparty/json/include",
 )
 
-cc_library(
-    name = "fmtlib-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/fmtlib/include/**/*.h",
-    ]),
-    includes = ["src/main/native/thirdparty/fmtlib/include"],
-    strip_include_prefix = "src/main/native/thirdparty/fmtlib/include",
-    visibility = ["//wpiutil:__subpackages__"],
+third_party_cc_lib_helper(
+    name = "llvm",
+    include_root = "src/main/native/thirdparty/llvm/include",
+    src_root = "src/main/native/thirdparty/llvm/cpp",
 )
 
-filegroup(
-    name = "fmtlib-srcs",
-    srcs = glob(["src/main/native/thirdparty/fmtlib/src/**"]),
-    visibility = ["//wpiutil:__subpackages__"],
+third_party_cc_lib_helper(
+    name = "mpack",
+    include_root = "src/main/native/thirdparty/mpack/include",
+    src_root = "src/main/native/thirdparty/mpack/src",
 )
 
-cc_library(
-    name = "json-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/json/include/**/*.h",
-    ]),
-    includes = ["src/main/native/thirdparty/json/include"],
-    strip_include_prefix = "src/main/native/thirdparty/json/include",
-    visibility = ["//wpiutil:__subpackages__"],
+third_party_cc_lib_helper(
+    name = "protobuf",
+    include_root = "src/main/native/thirdparty/protobuf/include",
+    src_root = "src/main/native/thirdparty/protobuf/src",
 )
 
-cc_library(
-    name = "llvm-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/llvm/include/**/*.h",
-    ]),
-    includes = ["src/main/native/thirdparty/llvm/include"],
-    strip_include_prefix = "src/main/native/thirdparty/llvm/include",
-    visibility = ["//wpiutil:__subpackages__"],
+third_party_cc_lib_helper(
+    name = "nanopb",
+    include_root = "src/main/native/thirdparty/nanopb/include",
+    src_root = "src/main/native/thirdparty/nanopb/src",
 )
 
-filegroup(
-    name = "llvm-srcs",
-    srcs = glob(["src/main/native/thirdparty/llvm/cpp/**"]),
-    visibility = ["//wpiutil:__subpackages__"],
-)
-
-cc_library(
-    name = "memory-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/memory/include/**/*.hpp",
-    ]),
-    includes = ["src/main/native/thirdparty/memory/include"],
-    strip_include_prefix = "src/main/native/thirdparty/memory/include",
-    visibility = ["//wpiutil:__subpackages__"],
-)
-
-filegroup(
-    name = "memory-srcs",
-    srcs = glob(["src/main/native/thirdparty/memory/src/**"]),
-    visibility = ["//wpiutil:__subpackages__"],
-)
-
-cc_library(
-    name = "mpack-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/mpack/include/**/*.h",
-    ]),
-    includes = ["src/main/native/thirdparty/mpack/include"],
-    strip_include_prefix = "src/main/native/thirdparty/mpack/include",
-    visibility = ["//wpiutil:__subpackages__"],
-)
-
-filegroup(
-    name = "mpack-srcs",
-    srcs = glob(["src/main/native/thirdparty/mpack/src/**"]),
-    visibility = ["//wpiutil:__subpackages__"],
-)
-
-cc_library(
-    name = "protobuf-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/protobuf/include/**/*.h",
-        "src/main/native/thirdparty/protobuf/include/**/*.inc",
-    ]),
-    includes = ["src/main/native/thirdparty/protobuf/include"],
-    strip_include_prefix = "src/main/native/thirdparty/protobuf/include",
-    visibility = ["//wpiutil:__subpackages__"],
-)
-
-filegroup(
-    name = "protobuf-srcs",
-    srcs = glob(["src/main/native/thirdparty/protobuf/src/**"]),
-    visibility = ["//wpiutil:__subpackages__"],
-)
-
-cc_library(
-    name = "nanopb-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/nanopb/include/**/*.h",
-        "src/main/native/thirdparty/nanopb/include/**/*.inc",
-    ]),
-    includes = ["src/main/native/thirdparty/nanopb/include"],
-    strip_include_prefix = "src/main/native/thirdparty/nanopb/include",
-    visibility = ["//wpiutil:__subpackages__"],
-)
-
-filegroup(
-    name = "nanopb-srcs",
-    srcs = glob(["src/main/native/thirdparty/nanopb/src/**"]),
-    visibility = ["//wpiutil:__subpackages__"],
-)
-
-cc_library(
-    name = "sigslot-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/sigslot/include/**/*.h",
-    ]),
-    includes = ["src/main/native/thirdparty/sigslot/include"],
-    strip_include_prefix = "src/main/native/thirdparty/sigslot/include",
-    visibility = ["//wpiutil:__subpackages__"],
+third_party_cc_lib_helper(
+    name = "sigslot",
+    include_root = "src/main/native/thirdparty/sigslot/include",
 )
 
 generate_resources(
@@ -230,51 +125,73 @@ generate_resources(
 filegroup(
     name = "native-srcs",
     srcs = select({
-        "@bazel_tools//src/conditions:windows": glob([
-            "src/main/native/windows/*.cpp",
-            "src/main/native/windows/*.h",
-        ]),
+        "@bazel_tools//src/conditions:windows": glob(["src/main/native/windows/*.cpp"]),
         "@rules_bzlmodrio_toolchains//constraints/combined:is_unix": glob(["src/main/native/unix/*.cpp"]),
     }),
 )
 
-cc_library(
-    name = "wpiutil.static",
+wpilib_cc_library(
+    name = "wpiutil",
     srcs = glob(
         ["src/main/native/cpp/**"],
         exclude = ["src/main/native/cpp/jni/**"],
     ) + [
-        ":debugging-srcs",
-        ":fmtlib-srcs",
         ":generate-resources",
-        ":llvm-srcs",
-        ":memory-srcs",
-        ":mpack-srcs",
-        ":nanopb-srcs",
         ":native-srcs",
-        ":protobuf-srcs",
     ],
     hdrs = glob(["src/main/native/include/**/*"]),
+    extra_src_pkg_files = [":wpiutil-java-jni-hdrs-pkg"],
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
+    third_party_header_only_libraries = [
+        ":argparse",
+        ":expected",
+        ":json",
+        ":sigslot",
+    ],
+    third_party_libraries = [
+        ":debugging",
+        ":fmtlib",
+        ":llvm",
+        ":mpack",
+        ":nanopb",
+        ":protobuf",
+    ],
     visibility = ["//visibility:public"],
-    deps = [
-        ":argparse-headers",
-        ":concurrentqueue-headers",
-        ":debugging-headers",
-        ":expected-headers",
-        ":fmtlib-headers",
-        ":json-headers",
-        ":llvm-headers",
-        ":memory-headers",
-        ":mpack-headers",
-        ":nanopb-headers",
-        ":protobuf-headers",
-        ":sigslot-headers",
-    ] + select({
+    deps = select({
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@bzlmodrio-ni//libraries/cpp/ni:shared"],
         "//conditions:default": [],
     }),
+)
+
+wpilib_cc_shared_library(
+    name = "shared/wpiutil",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpiutil",
+    ],
+)
+
+wpilib_cc_static_library(
+    name = "static/wpiutil",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpiutil",
+    ],
+)
+
+cc_library(
+    name = "wpiutil-jni-hdrs",
+    hdrs = glob([
+        "src/main/native/include/**",
+        "src/main/native/thirdparty/llvm/include/**",
+        "src/main/native/thirdparty/fmtlib/include/**",
+    ]),
+    includes = [
+        "src/main/native/include",
+        "src/main/native/thirdparty/fmtlib/include",
+        "src/main/native/thirdparty/llvm/include",
+    ],
 )
 
 wpilib_jni_cc_library(
@@ -283,7 +200,28 @@ wpilib_jni_cc_library(
     java_dep = ":wpiutil-java",
     visibility = ["//visibility:public"],
     deps = [
-        ":wpiutil.static",
+        ":wpiutil",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/wpiutiljni",
+    auto_export_windows_symbols = False,
+    dynamic_deps = [
+        ":shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":wpiutiljni"],
+)
+
+wpilib_cc_static_library(
+    name = "static/wpiutiljni",
+    static_deps = [
+        ":static/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpiutiljni",
     ],
 )
 
@@ -300,6 +238,14 @@ wpilib_jni_java_library(
     ],
 )
 
+pkg_java_files(name = "wpiutil-java-srcs")
+
+pkg_zip(
+    name = "libwpiutil-java-sources",
+    srcs = [":wpiutil-java-srcs"],
+    out = "libwpiutil-java-sources.jar",
+)
+
 cc_library(
     name = "wpiutil-testlib",
     hdrs = glob(["src/test/native/include/**"]),
@@ -312,7 +258,6 @@ cc_library(
     hdrs = glob(["src/generated/test/native/cpp/*.h"]),
     includes = ["src/generated/test/native/cpp"],
     strip_include_prefix = "src/generated/test/native/cpp",
-    visibility = ["//wpiutil:__subpackages__"],
 )
 
 cc_test(
@@ -326,9 +271,9 @@ cc_test(
     tags = ["no-tsan"],  # TODO(pj.reiniger) Find problem
     deps = [
         ":nanopb-test-headers",
-        ":wpiutil.static",
+        ":wpiutil",
         ":wpiutil-testlib",
-        "//thirdparty/googletest:googletest.static",
+        "//thirdparty/googletest",
     ],
 )
 
@@ -344,7 +289,7 @@ cc_binary(
     name = "DevMain-Cpp",
     srcs = ["src/dev/native/cpp/main.cpp"],
     deps = [
-        ":wpiutil.static",
+        ":wpiutil",
     ],
 )
 

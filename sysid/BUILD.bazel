@@ -6,7 +6,6 @@ generate_version_file(
     name = "generate-version",
     output_file = "WPILibVersion.cpp",
     template = "src/main/generate/WPILibVersion.cpp.in",
-    visibility = ["//sysid:__subpackages__"],
 )
 
 generate_resources(
@@ -27,11 +26,10 @@ cc_library(
     ],
     hdrs = glob(["src/main/native/include/**"]),
     strip_include_prefix = "src/main/native/include",
-    visibility = ["//sysid:__subpackages__"],
     deps = [
-        "//datalog:datalog.static",
+        "//datalog",
         "//glass:libglass",
-        "//wpinet:wpinet.static",
+        "//wpinet",
     ],
 )
 
@@ -54,6 +52,6 @@ cc_test(
     ],
     deps = [
         ":sysid-lib",
-        "//thirdparty/googletest:googletest.static",
+        "//thirdparty/googletest",
     ],
 )

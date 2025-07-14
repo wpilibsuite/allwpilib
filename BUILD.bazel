@@ -1,8 +1,9 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 
-filegroup(
-    name = "license",
+pkg_files(
+    name = "license_pkg_files",
     srcs = [
         "LICENSE.md",
         "ThirdPartyNotices.txt",
@@ -16,14 +17,16 @@ compile_pip_requirements(
     extra_args = ["--allow-unsafe"],
     requirements_in = "requirements.txt",
     requirements_txt = "requirements_lock.txt",
-    tags = ["no-roborio"],
+    # compile_pip_requirements does not respect target_compatible_with for some of the targets it generates under the hood
+    tags = ["no-systemcore"],
 )
 
 alias(
     name = "quickbuf_protoc",
     actual = select({
-        "@bazel_tools//src/conditions:darwin": "@quickbuffer_protoc_osx//file",
         "@bazel_tools//src/conditions:windows": "@quickbuffer_protoc_windows//file",
+        "@rules_bzlmodrio_toolchains//conditions:osx_aarch64": "@quickbuffer_protoc_osx_aarch64//file",
+        "@rules_bzlmodrio_toolchains//conditions:osx_x86_64": "@quickbuffer_protoc_osx_x86-64//file",
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": "@quickbuffer_protoc_linux//file",
     }),
     tags = ["pregeneration"],

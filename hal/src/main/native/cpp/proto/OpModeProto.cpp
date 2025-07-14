@@ -30,7 +30,7 @@ std::optional<mrc::OpMode> wpi::Protobuf<mrc::OpMode>::Unpack(
   mrc::OpMode OutputData;
   OutputData.MoveName(std::move(Name[0]));
 
-  OutputData.Hash = Msg.Hash;
+  OutputData.Hash = mrc::OpModeHash::FromValue(Msg.Hash);
 
   return OutputData;
 }
@@ -41,7 +41,7 @@ bool wpi::Protobuf<mrc::OpMode>::Pack(OutputStream& Stream,
   wpi::PackCallback EventName{&EventNameStr};
 
   mrc_proto_ProtobufOpMode Msg{
-      .Hash = Value.Hash,
+      .Hash = Value.Hash.ToValue(),
       .Name = EventName.Callback(),
   };
 

@@ -69,7 +69,7 @@ static MotorSafetyManager& GetManager() {
   return manager;
 }
 
-#ifndef __FRC_ROBORIO__
+#ifndef __FRC_SYSTEMCORE__
 namespace frc::impl {
 void ResetMotorSafety() {
   auto& manager = GetManager();

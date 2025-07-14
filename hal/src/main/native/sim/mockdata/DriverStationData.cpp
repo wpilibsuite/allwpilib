@@ -251,7 +251,7 @@ void DriverStationData::SetJoystickAxis(int32_t stick, int32_t axis,
 }
 
 void DriverStationData::SetJoystickPOV(int32_t stick, int32_t pov,
-                                       int32_t value) {
+                                       HAL_JoystickPOV value) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
@@ -507,7 +507,7 @@ void HALSIM_SetJoystickAxis(int32_t stick, int32_t axis, double value) {
   SimDriverStationData->SetJoystickAxis(stick, axis, value);
 }
 
-void HALSIM_SetJoystickPOV(int32_t stick, int32_t pov, int32_t value) {
+void HALSIM_SetJoystickPOV(int32_t stick, int32_t pov, HAL_JoystickPOV value) {
   SimDriverStationData->SetJoystickPOV(stick, pov, value);
 }
 

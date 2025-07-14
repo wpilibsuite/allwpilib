@@ -5,13 +5,14 @@ package mrc.proto;
 option java_package = "com.mrc.proto";
 
 message ProtobufJoystickData {
-    uint32 ButtonCount = 1;
+    uint64 AvailableButtons = 1;
     uint64 Buttons = 2;
-    repeated sint32 Axes = 3;
+    uint32 AvailableAxes = 3;
+    repeated sint32 Axes = 4;
     // Each POV takes up 4 bits
     // We can fit 8 in here.
-    uint32 POVCount = 4;
-    uint32 POVs = 5;
+    uint32 POVCount = 5;
+    uint32 POVs = 6;
 }
 
 message ProtobufControlData {

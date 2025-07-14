@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 
 cc_library(
     name = "headers",
@@ -6,9 +7,10 @@ cc_library(
     includes = ["src/main/native/include"],
 )
 
-cc_library(
+wpilib_cc_library(
     name = "halsim_ds_socket",
     srcs = glob(["src/main/native/cpp/**"]),
+    include_license_files = True,
     target_compatible_with = select({
         "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
@@ -17,21 +19,60 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":headers",
-        "//hal:wpiHal.static",
-        "//wpinet:wpinet.static",
+        "//hal:wpiHal",
+        "//wpinet",
     ],
+)
+
+wpilib_cc_library(
+    name = "halsim_ds_socket_static",
+    srcs = glob(["src/main/native/cpp/**"]),
+    copts = [
+        "-DHALSIM_InitExtension=HALSIM_InitExtension_DS_SOCKET",
+    ],
+    include_license_files = True,
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":headers",
+        "//hal:wpiHal",
+        "//wpinet",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/halsim_ds_socket",
+    auto_export_windows_symbols = False,
+    dynamic_deps = [
+        "//hal:shared/wpiHal",
+        "//wpinet:shared/wpinet",
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":halsim_ds_socket"],
+)
+
+wpilib_cc_static_library(
+    name = "static/halsim_ds_socket",
+    static_deps = [
+        "//hal:static/wpiHal",
+        "//wpinet:static/wpinet",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":halsim_ds_socket_static"],
 )
 
 cc_test(
     name = "halsim_ds_socket-test",
     size = "small",
-    srcs = glob([
-        "src/test/native/**/*.cpp",
-        "src/test/native/**/*.h",
-    ]),
+    srcs = glob(["src/test/native/**/*.cpp"]),
     deps = [
         "//simulation/halsim_ds_socket",
-        "//thirdparty/googletest:googletest.static",
+        "//thirdparty/googletest",
     ],
 )
 

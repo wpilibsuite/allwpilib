@@ -80,16 +80,6 @@ ext {
                     srcDirs 'src/main/native/thirdparty/sigslot/include'
                 }
             }
-            memoryCpp(CppSourceSet) {
-                source {
-                    srcDirs 'src/main/native/thirdparty/memory/src', 'src/main/native/thirdparty/memory/include/wpi/memory'
-                    include '**/*.cpp'
-                }
-                exportedHeaders {
-                    srcDirs 'src/main/native/thirdparty/memory/include'
-                    include '**/*.hpp'
-                }
-            }
             protobufCpp(CppSourceSet) {
                 source {
                     srcDirs 'src/main/native/thirdparty/protobuf/src'
@@ -191,7 +181,6 @@ cppHeadersZip {
         'src/main/native/thirdparty/mpack/include',
         'src/main/native/thirdparty/nanopb/include',
         'src/main/native/thirdparty/sigslot/include',
-        'src/main/native/thirdparty/memory/include',
         'src/main/native/thirdparty/protobuf/include'
     ]
 
@@ -213,9 +202,6 @@ cppSourcesZip {
     from('src/main/native/thirdparty/llvm/cpp') {
         into '/'
     }
-    from('src/main/native/thirdparty/memory/src') {
-        into '/'
-    }
     from('src/main/native/thirdparty/mpack/src') {
         into '/'
     }
@@ -235,7 +221,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include', 'src/main/native/thirdparty/nanopb/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/protobuf/include', 'src/main/native/thirdparty/nanopb/include'
                 }
             }
         }
