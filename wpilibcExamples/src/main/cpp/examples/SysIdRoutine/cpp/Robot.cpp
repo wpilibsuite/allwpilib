@@ -29,13 +29,13 @@ void Robot::AutonomousInit() {
 
 void Robot::AutonomousPeriodic() {}
 
-void Robot::AutonomousExit() {}
-
-void Robot::TeleopInit() {
+void Robot::AutonomousExit() {
   if (m_autonomousCommand) {
     m_autonomousCommand->Cancel();
   }
 }
+
+void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {}
 
