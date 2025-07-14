@@ -64,8 +64,8 @@ SquareRootUnscentedTransform(
   // the part of equations (20) and (24) within the "qr{}"
   //
   // Note that we allow a custom function instead of the difference to allow
-  // angle wrapping Furthermore, we allow an arbitrary number of sigma points to
-  // support similar methods such as the Scaled Spherical Simplex Filter (S3F)
+  // angle wrapping. Furthermore, we allow an arbitrary number of sigma points to
+  // support similar methods such as the Scaled Spherical Simplex Filter (S3F).
   Matrixd<CovDim, NumSigmas - 1 + CovDim> Sbar;
   for (int i = 0; i < NumSigmas - 1; i++) {
     Sbar.template block<CovDim, 1>(0, i) =

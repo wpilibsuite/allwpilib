@@ -214,8 +214,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     // the part of equations (20) and (24) within the "qr{}"
     //
     // Note that we allow a custom function instead of the difference to allow
-    // angle wrapping Furthermore, we allow an arbitrary number of sigma points to
-    // support similar methods such as the Scaled Spherical Simplex Filter (S3F)
+    // angle wrapping. Furthermore, we allow an arbitrary number of sigma points to
+    // support similar methods such as the Scaled Spherical Simplex Filter (S3F).
     Matrix<C, ?> Sbar =
         new Matrix<>(new SimpleMatrix(covdim.getNum(), numSigmas - 1 + covdim.getNum()));
     for (int i = 0; i < numSigmas - 1; i++) {
