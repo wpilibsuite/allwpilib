@@ -15,7 +15,7 @@ public class OnboardIMU {
   public enum MountOrientation {
     /** Flat (mounted parallel to the ground). */
     kFlat,
-    /** Landscape (vertically mounted with long edge of SystemCore paralel to the ground). */
+    /** Landscape (vertically mounted with long edge of SystemCore parallel to the ground). */
     kLandscape,
     /** Portrait (vertically mounted with the short edge of SystemCore parallel to the ground). */
     kPortrait
