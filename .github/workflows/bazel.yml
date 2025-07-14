@@ -26,11 +26,10 @@ jobs:
           java-version: 17
           architecture: x64
 
-      - name: Setup Artifactory
-        uses: ./.github/actions/setup-artifactory-bazel
+      - id: Setup_build_buddy
+        uses: ./.github/actions/setup-build-buddy
         with:
-          username: ${{ secrets.ARTIFACTORY_USERNAME }}
-          token: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       - name: bazel ${{ matrix.action }}
         run: bazel --output_user_root=C:\\bazelroot ${{ matrix.action }} -k ...   --config=ci ${{ matrix.config }} --verbose_failures
@@ -43,11 +42,10 @@ jobs:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
 
-      - name: Setup Artifactory
-        uses: ./.github/actions/setup-artifactory-bazel
+      - id: Setup_build_buddy
+        uses: ./.github/actions/setup-build-buddy
         with:
-          username: ${{ secrets.ARTIFACTORY_USERNAME }}
-          token: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       - name: bazel test (release)
         run: bazel test -k ...   --config=ci -c opt --config=macos --nojava_header_compilation --verbose_failures
@@ -66,12 +64,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
+      - uses: bazelbuild/setup-bazelisk@v3
 
-      - name: Setup Artifactory
-        uses: ./.github/actions/setup-artifactory-bazel
+      - id: Setup_build_buddy
+        uses: ./.github/actions/setup-build-buddy
         with:
-          username: ${{ secrets.ARTIFACTORY_USERNAME }}
-          token: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          token: ${{ secrets.BUILDBUDDY_API_KEY }}
+
+      - uses: bazel-contrib/setup-bazel@0.15.0
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+          bazelisk-version: 1.x
 
       - name: bazel ${{ matrix.action }} (release)
         run: bazel ${{ matrix.action }} ... --config=ci -c opt ${{ matrix.config }} -k --verbose_failures
