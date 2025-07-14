@@ -5,7 +5,7 @@ load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_library")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_ATTRS", "find_cpp_toolchain", "use_cc_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
-load("@rules_pkg//:pkg.bzl", "pkg_tar", "pkg_zip")
+load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
 def _split_debug_symbols_impl(ctx):
     label = ctx.attr.shared_library.label
@@ -131,8 +131,8 @@ _split_debug_symbols = rule(
         "shared_library": attr.label(mandatory = True),
         "use_debug_name": attr.bool(mandatory = True),
         "_darwin_constraint": attr.label(default = "@platforms//os:osx"),
-        "_windows_constraint": attr.label(default = "@platforms//os:windows"),
         "_linux_constraint": attr.label(default = "@platforms//os:linux"),
+        "_windows_constraint": attr.label(default = "@platforms//os:windows"),
     } | CC_TOOLCHAIN_ATTRS,
     fragments = ["cpp"],
     toolchains = use_cc_toolchain(),
