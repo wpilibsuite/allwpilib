@@ -20,7 +20,7 @@ import java.util.function.BiFunction;
 public class S3UKF<States extends Num, Inputs extends Num, Outputs extends Num>
     extends UnscentedKalmanFilter<States, Inputs, Outputs> {
   /**
-   * Constructs a Scaled Sphereical Simplex (S3) Unscented Kalman Filter.
+   * Constructs a Scaled Spherical Simplex (S3) Unscented Kalman Filter.
    *
    * <p>See <a
    * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices">https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices</a>
@@ -59,7 +59,7 @@ public class S3UKF<States extends Num, Inputs extends Num, Outputs extends Num>
   }
 
   /**
-   * Constructs a Scaled Sphereical Simplex (S3) Unscented Kalman filter with custom mean, residual,
+   * Constructs a Scaled Spherical Simplex (S3) Unscented Kalman filter with custom mean, residual,
    * and addition functions. Using custom functions for arithmetic can be useful if you have angles
    * in the state or measurements, because they allow you to correctly account for the modular
    * nature of angle arithmetic.
