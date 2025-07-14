@@ -39,6 +39,7 @@ java_library(
     srcs = glob(["src/main/java/**/*.java"]),
     resource_strip_prefix = "fieldImages/src/main/native/resources",
     resources = glob(["src/main/native/resources/**"]),
+    tags = ["maven_coordinates=edu.wpi.first.fieldImages:fieldImages-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "@maven//:com_fasterxml_jackson_core_jackson_annotations",

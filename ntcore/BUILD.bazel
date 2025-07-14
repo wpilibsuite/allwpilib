@@ -144,6 +144,7 @@ wpilib_cc_shared_library(
         ":shared/ntcore",
         "//wpiutil:shared/wpiutil",
     ],
+    use_debug_name = False,
     visibility = ["//visibility:public"],
     deps = [":ntcorejni"],
 )
@@ -152,6 +153,7 @@ wpilib_jni_java_library(
     name = "ntcore-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
     native_libs = [":ntcorejni"],
+    tags = ["maven_coordinates=edu.wpi.first.ntcore:ntcore-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "//datalog:datalog-java",

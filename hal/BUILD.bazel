@@ -162,6 +162,7 @@ wpilib_cc_shared_library(
         ":shared/wpiHal",
         "//wpiutil:shared/wpiutil",
     ],
+    use_debug_name = False,
     visibility = ["//visibility:public"],
     deps = [
         ":wpiHaljni",
@@ -172,6 +173,7 @@ wpilib_jni_java_library(
     name = "hal-java",
     srcs = glob(["src/main/java/**/*.java"]),
     native_libs = [":wpiHaljni"],
+    tags = ["maven_coordinates=edu.wpi.first.hal:hal-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "//ntcore:ntcore-java",
