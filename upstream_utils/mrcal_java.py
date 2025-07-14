@@ -62,6 +62,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "mrcal_java"
     url = "https://github.com/PhotonVision/mrcal-java"
+    # main on 2024-11-30
     tag = "5f9d3168ccf1ecdfca48da13ea07fffa47f95d00"
 
     mrcal_java = Lib(name, url, tag, copy_upstream_src)

@@ -55,6 +55,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "mrcal"
     url = "https://github.com/dkogan/mrcal"
+    # master on 2024-11-29
     tag = "662a539d3cbba4948c31d06a780569173b3fb6e6"
 
     mrcal = Lib(name, url, tag, copy_upstream_src)
