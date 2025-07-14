@@ -125,6 +125,16 @@ TEST(MathUtilTest, ApplyDeadband2dArbitraryScale) {
       frc::ApplyDeadband2d(frc::Translation2d(2.5_m, zero), 0.02_m, 2.5_m));
 }
 
+TEST(MathUtilTest, ApplyDeadband2dSmallNorm) {
+  const frc::Rotation2d zero = frc::Rotation2d(0_deg);
+  const frc::Translation2d zeroVec;
+
+  EXPECT_EQ(zeroVec,
+            frc::ApplyDeadband2d(frc::Translation2d(1e-6_m, zero), 0.02_m));
+  EXPECT_EQ(zeroVec, frc::ApplyDeadband2d(frc::Translation2d(1e-6_m, zero),
+                                          0.02_m, 2.5_m));
+}
+
 TEST(MathUtilTest, CopySignPow) {
   EXPECT_DOUBLE_EQ(0.5, frc::CopySignPow(0.5, 1.0));
   EXPECT_DOUBLE_EQ(-0.5, frc::CopySignPow(-0.5, 1.0));
@@ -251,6 +261,14 @@ TEST(MathUtilTest, CopySignPow2dMaxDistance) {
                                frc::Rotation2d(90_deg)),
             frc::CopySignPow2d(
                 frc::Translation2d(80_m, frc::Rotation2d(90_deg)), 0.3, 100_m));
+}
+
+TEST(MathUtilTest, CopySignPow2dSmallNorm) {
+  const frc::Rotation2d zero = frc::Rotation2d(0_deg);
+  const frc::Translation2d zeroVec;
+
+  EXPECT_EQ(zeroVec, frc::CopySignPow2d(frc::Translation2d(1e-6_m, zero), 2.0));
+  EXPECT_EQ(zeroVec, frc::CopySignPow2d(frc::Translation2d(1e-6_m, zero), 2.0));
 }
 
 TEST(MathUtilTest, InputModulus) {

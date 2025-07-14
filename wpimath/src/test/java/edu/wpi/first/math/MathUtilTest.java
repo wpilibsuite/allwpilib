@@ -141,6 +141,16 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
   }
 
   @Test
+  void testApplyDeadband2dSmallNorm() {
+    assertEquals(
+        Translation2d.kZero,
+        MathUtil.applyDeadband2d(new Translation2d(1e-6, Rotation2d.kZero), 0.02));
+    assertEquals(
+        Translation2d.kZero,
+        MathUtil.applyDeadband2d(new Translation2d(1e-6, Rotation2d.kZero), 0.02, 2.5));
+  }
+
+  @Test
   void testCopySignPow() {
     assertEquals(0.5, MathUtil.copySignPow(0.5, 1.0));
     assertEquals(-0.5, MathUtil.copySignPow(-0.5, 1.0));
@@ -254,6 +264,15 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
     assertEquals(
         new Translation2d(Math.pow(0.8, 0.3) * 100, Rotation2d.kCCW_Pi_2),
         MathUtil.copySignPow2d(new Translation2d(80, Rotation2d.kCCW_Pi_2), 0.3, 100.0));
+  }
+
+  @Test
+  void testCopySignPow2dSmallNorm() {
+    assertEquals(
+        Translation2d.kZero, MathUtil.copySignPow2d(new Translation2d(1e-6, Rotation2d.kZero), 2));
+    assertEquals(
+        Translation2d.kZero,
+        MathUtil.copySignPow2d(new Translation2d(1e-6, Rotation2d.kZero), 2, 2.5));
   }
 
   @Test
