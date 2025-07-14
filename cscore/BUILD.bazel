@@ -1,6 +1,7 @@
+load("@rules_cc//cc:cc_shared_library.bzl", "cc_shared_library")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
@@ -83,6 +84,16 @@ wpilib_cc_library(
     }),
 )
 
+wpilib_cc_shared_library(
+    name = "shared/cscore",
+    dynamic_deps = [
+        "//wpinet:shared/wpinet",
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":cscore"],
+)
+
 wpilib_cc_static_library(
     name = "static/cscore",
     static_deps = [
@@ -100,6 +111,46 @@ wpilib_jni_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":cscore",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/cscorejni",
+    dynamic_deps = [
+        ":shared/cscore",
+        "//wpiutil:shared/wpiutil",
+    ],
+    use_debug_name = False,
+    visibility = ["//visibility:public"],
+    deps = [":cscorejni"],
+)
+
+# TODO(austin): This links against /home/austin/.gradle/caches/8.11/transforms/97de52b6251cda5e7b952b826501a57e/transformed/opencv-cpp-4.10.0-3-linuxx86-64static/linux/x86-64/static/libopencv4100.a
+cc_shared_library(
+    name = "shared/cscorejnicvstatic",
+    additional_linker_inputs = [
+        ":src/main/native/LinuxSymbolScript.txt",
+        ":src/main/native/MacSymbolScript.txt",
+    ],
+    dynamic_deps = [
+        "//wpinet:shared/wpinet",
+        "//wpiutil:shared/wpiutil",
+    ],
+    user_link_flags = select({
+        "@platforms//os:osx": [
+            "-Wl,-install_name,libcscorejnicvstatic.so",
+            "-exported_symbols_list",
+            "$(location :src/main/native/MacSymbolScript.txt)",
+        ],
+        "//conditions:default": [
+            "-Wl,-soname,libcscorejnicvstatic.so",
+            "-Wl,--version-script=$(location :src/main/native/LinuxSymbolScript.txt)",
+        ],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":cscore",
+        ":cscorejni",
     ],
 )
 
