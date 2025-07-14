@@ -69,6 +69,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "apriltag"
     url = "https://github.com/AprilRobotics/apriltag.git"
+    # master on 2024-07-07
     tag = "3806edf38ac4400153677e510c9f9dcb81f472c8"
 
     patch_options = {
