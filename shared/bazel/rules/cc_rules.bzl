@@ -16,17 +16,36 @@ def _split_debug_symbols_impl(ctx):
 
     debug_suffix = "d" if ctx.attr.use_debug_name else ""
 
+    # For Windows and OSX, we just want to pass it all on through.  Don't be clever.
+    if (ctx.target_platform_has_constraint(ctx.attr._darwin_constraint[platform_common.ConstraintValueInfo]) or
+        ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])):
+        files = ctx.attr.shared_library[OutputGroupInfo].main_shared_library_output
+        return [
+            DefaultInfo(files = files),
+            OutputGroupInfo(
+                default = files,
+            ),
+        ]
+
+    # Linux
+    if not ctx.target_platform_has_constraint(ctx.attr._linux_constraint[platform_common.ConstraintValueInfo]):
+        fail("Unsupported platform")
+
     lib = ctx.actions.declare_file(folder + "/split/lib" + lib_name + debug_suffix + ".so")
 
     if ctx.attr.copy:
+        files = ctx.attr.shared_library[OutputGroupInfo].main_shared_library_output.to_list()
+        if len(files) != 1:
+            fail("Wrong number of files", files)
+
         ctx.actions.run_shell(
             command = " ".join([
                 "cp",
-                ctx.file.shared_library.path,
+                files[0].path,
                 lib.path,
             ]),
             inputs = depset(
-                direct = [ctx.file.shared_library],
+                direct = files,
             ),
             outputs = [lib],
         )
@@ -35,7 +54,6 @@ def _split_debug_symbols_impl(ctx):
             DefaultInfo(files = depset([lib])),
             OutputGroupInfo(
                 default = depset([lib]),
-                stripped_file = depset([lib]),
             ),
         ]
     else:
@@ -64,10 +82,15 @@ def _split_debug_symbols_impl(ctx):
         #   strip --strip-debug libmy-library.so
         #   objcopy --strip-debug libmy-library.so
 
+        files = ctx.attr.shared_library[OutputGroupInfo].main_shared_library_output.to_list()
+        if len(files) != 1:
+            fail("Wrong number of files", files)
+        shared_library = files[0]
+
         ctx.actions.run_shell(
             command = " ".join([
                 "cp",
-                ctx.file.shared_library.path,
+                shared_library.path,
                 lib.path,
                 "&& chmod u+w",
                 lib.path,
@@ -86,7 +109,7 @@ def _split_debug_symbols_impl(ctx):
                 lib.path,
             ]),
             inputs = depset(
-                direct = [ctx.file.shared_library],
+                direct = files,
                 transitive = [
                     cc_toolchain.all_files,
                 ],
@@ -98,8 +121,6 @@ def _split_debug_symbols_impl(ctx):
             DefaultInfo(files = depset([lib, debug])),
             OutputGroupInfo(
                 default = depset([lib, debug]),
-                stripped_file = depset([lib]),
-                debug_file = depset([debug]),
             ),
         ]
 
@@ -107,8 +128,11 @@ _split_debug_symbols = rule(
     implementation = _split_debug_symbols_impl,
     attrs = {
         "copy": attr.bool(mandatory = True),
-        "shared_library": attr.label(mandatory = True, allow_single_file = True),
+        "shared_library": attr.label(mandatory = True),
         "use_debug_name": attr.bool(mandatory = True),
+        "_darwin_constraint": attr.label(default = "@platforms//os:osx"),
+        "_windows_constraint": attr.label(default = "@platforms//os:windows"),
+        "_linux_constraint": attr.label(default = "@platforms//os:linux"),
     } | CC_TOOLCHAIN_ATTRS,
     fragments = ["cpp"],
     toolchains = use_cc_toolchain(),
