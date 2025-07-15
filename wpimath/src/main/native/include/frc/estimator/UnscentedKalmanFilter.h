@@ -28,6 +28,11 @@ namespace frc {
  * be measured directly as a result of sensor noise, or because the state is
  * "hidden".
  *
+ * This class requires a SigmaPoints template parameter. For convenience, S3UKF
+ * and MerweUKF type aliases are provided to specify a suitable generator for
+ * you. S3UKF is generally preferred over MerweUKF because of its greater
+ * performance while maintaining nearly identical accuracy.
+ *
  * Kalman filters use a K gain matrix to determine whether to trust the model or
  * measurements more. Kalman filter theory uses statistics to compute an optimal
  * K gain which minimizes the sum of squares error in the state estimate. This K

@@ -22,6 +22,11 @@ import org.ejml.simple.SimpleMatrix;
  * true system state. This is useful because many states cannot be measured directly as a result of
  * sensor noise, or because the state is "hidden".
  *
+ * <p>This class's constructors require a SigmaPoints generator. For convenience, {@link S3UKF} and
+ * {@link MerweUKF} subclasses are provided to create a suitable generator for you. S3UKF is
+ * generally preferred over MerweUKF because of its greater performance while maintaining nearly
+ * identical accuracy.
+ *
  * <p>Kalman filters use a K gain matrix to determine whether to trust the model or measurements
  * more. Kalman filter theory uses statistics to compute an optimal K gain which minimizes the sum
  * of squares error in the state estimate. This K gain is used to correct the state estimate by some

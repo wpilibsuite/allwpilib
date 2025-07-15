@@ -14,7 +14,8 @@ import org.ejml.simple.SimpleMatrix;
  * Generates sigma points and weights according to Papakonstantinou's paper[1] for the
  * UnscentedKalmanFilter class.
  *
- * <p>It parameterizes the sigma points using alpha and beta terms.
+ * <p>It parameterizes the sigma points using alpha and beta terms. Unless you know better, this
+ * should be your default choice due to its high accuracy and performance.
  *
  * <p>[1] K. Papakonstantinou "A Scaled Spherical Simplex Filter (S3F) with a decreased n + 2 sigma
  * points set size and equivalent 2n + 1 Unscented Kalman Filter (UKF) accuracy"

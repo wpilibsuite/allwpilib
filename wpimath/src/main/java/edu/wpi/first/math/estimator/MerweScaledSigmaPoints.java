@@ -15,7 +15,8 @@ import org.ejml.simple.SimpleMatrix;
  * UnscentedKalmanFilter class.
  *
  * <p>It parametrizes the sigma points using alpha, beta, kappa terms, and is the version seen in
- * most publications. Unless you know better, this should be your default choice.
+ * most publications. S3SigmaPoints is generally preferred due to its greater performance with
+ * nearly identical accuracy.
  *
  * <p>States is the dimensionality of the state. 2*States+1 weights will be generated.
  *

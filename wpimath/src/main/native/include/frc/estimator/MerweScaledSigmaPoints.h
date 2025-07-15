@@ -15,8 +15,8 @@ namespace frc {
  * dissertation[1] for the UnscentedKalmanFilter class.
  *
  * It parametrizes the sigma points using alpha, beta, kappa terms, and is the
- * version seen in most publications. Unless you know better, this should be
- * your default choice.
+ * version seen in most publications. S3SigmaPoints is generally preferred due
+ * to its greater performance with nearly identical accuracy.
  *
  * [1] R. Van der Merwe "Sigma-Point Kalman Filters for Probabilistic
  *     Inference in Dynamic State-Space Models" (Doctoral dissertation)

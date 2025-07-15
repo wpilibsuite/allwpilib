@@ -12,6 +12,7 @@ import java.util.function.BiFunction;
 
 /**
  * An Unscented Kalman Filter using sigma points and weights from Van der Merwe's 2004 dissertation.
+ * S3UKF is generally preferred due to its greater performance with nearly identical accuracy.
  *
  * @param <States> Number of states.
  * @param <Inputs> Number of inputs.

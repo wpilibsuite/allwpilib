@@ -11,7 +11,8 @@ import edu.wpi.first.math.numbers.N1;
 import java.util.function.BiFunction;
 
 /**
- * An Unscented Kalman Filter using sigma points and weights from Papakonstantinou's paper.
+ * An Unscented Kalman Filter using sigma points and weights from Papakonstantinou's paper. This is
+ * generally preferred over other UKF variants due to its high accuracy and performance.
  *
  * @param <States> Number of states.
  * @param <Inputs> Number of inputs.
