@@ -10,20 +10,27 @@ if(WITH_JAVA)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
     file(
-        GLOB_RECURSE JAVA_RESOURCES
+        GLOB_RECURSE JAVA_FRC_RESOURCES
         RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         src/main/native/resources/frc/*.json
         src/main/native/resources/frc/*.png
         src/main/native/resources/frc/*.jpg
+    )
+
+    file(
+        GLOB_RECURSE JAVA_FTC_RESOURCES
+        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         src/main/native/resources/ftc/*.json
         src/main/native/resources/ftc/*.png
         src/main/native/resources/ftc/*.jpg
     )
+
     add_jar(
         field_images_jar
         SOURCES ${JAVA_SOURCES}
         RESOURCES
-        NAMESPACE "edu/wpi/first/fields" ${JAVA_RESOURCES}
+        NAMESPACE "edu/wpi/first/fields/frc" ${JAVA_FRC_RESOURCES}
+        NAMESPACE "edu/wpi/first/fields/ftc" ${JAVA_FTC_RESOURCES}
         INCLUDE_JARS ${JACKSON_JARS}
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
         OUTPUT_NAME fieldImages
