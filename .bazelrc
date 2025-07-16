@@ -3,8 +3,7 @@ try-import %workspace%/user.bazelrc
 
 common --noenable_bzlmod
 # Resolves to --config=linux on Linux, --config=macos on Mac, --windows on windows
-build --enable_platform_specific_config
-query --enable_platform_specific_config
+common --enable_platform_specific_config
 
 # Make bazel 8 work for us.
 common --enable_workspace
