@@ -27,6 +27,8 @@
 
 using namespace fields;
 
+// TODO(crueter): namespace this somehow
+
 static const Field kFields[] = {
     {"2025 FRC Reefscape", GetResource_2025_frc_reefscape_json,
      GetResource_2025_frc_reefscape_png},

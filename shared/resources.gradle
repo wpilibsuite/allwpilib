@@ -17,6 +17,7 @@ ext.createGenerateResourcesTask = { name, prefix, namespace, project ->
                 if (inputFile.name.startsWith('.')) return
                     def fileBytes = inputFile.bytes
                 def outputFile = file("$generatedOutputDir/${inputFile.name}.cpp")
+                // TODO(crueter): Support for namespacing aka subdirs, unfortunately I have no idea how gradle works
                 def funcName = "GetResource_" + inputFile.name.replaceAll('[^a-zA-Z0-9]', '_')
                 outputFile.withWriter { out ->
                     def inputBytes = inputFile.bytes

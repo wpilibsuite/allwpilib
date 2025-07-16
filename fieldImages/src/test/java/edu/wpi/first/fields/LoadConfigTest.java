@@ -4,14 +4,24 @@
 
 package edu.wpi.first.fields;
 
+import edu.wpi.first.fields.Fields.FRC;
+import edu.wpi.first.fields.Fields.FTC;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 class LoadConfigTest {
   @ParameterizedTest
-  @EnumSource(Fields.class)
-  void testLoad(Fields field) {
+  @EnumSource(FRC.class)
+  void testLoadFRC(IField field) {
+    FieldConfig config = Assertions.assertDoesNotThrow(() -> FieldConfig.loadField(field));
+
+    Assertions.assertNotNull(config.getImageUrl());
+  }
+
+  @ParameterizedTest
+  @EnumSource(FTC.class)
+  void testLoadFTC(IField field) {
     FieldConfig config = Assertions.assertDoesNotThrow(() -> FieldConfig.loadField(field));
 
     Assertions.assertNotNull(config.getImageUrl());
