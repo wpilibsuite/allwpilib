@@ -19,7 +19,6 @@ TriggerGroup TriggerGroup::Add(const std::string& key, Trigger condition) const 
   }
 
   auto newConditions = m_conditions;
-  //newConditions[key] = std::move(condition);
   newConditions.emplace(key, condition);
   return TriggerGroup(std::move(newConditions));
 }
