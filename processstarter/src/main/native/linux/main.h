@@ -6,6 +6,6 @@
 
 #include <filesystem>
 
-int StartExeTool(std::filesystem::__cxx11::path& exePath);
-int StartJavaTool(std::filesystem::__cxx11::path& exePath);
+int StartExeTool(std::filesystem::path& exePath);
+int StartJavaTool(std::filesystem::path& exePath);
 int main(int argc, char* argv[]);

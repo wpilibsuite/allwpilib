@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
   }
 }
 
-int StartJavaTool(std::filesystem::__cxx11::path& exePath) {
+int StartJavaTool(std::filesystem::path& exePath) {
   pid_t pid = 0;
   std::filesystem::path jarPath{exePath};
   jarPath.replace_extension("jar");
@@ -103,7 +103,7 @@ int StartJavaTool(std::filesystem::__cxx11::path& exePath) {
   return poll(&pfd, 1, 3000);
 }
 
-int StartExeTool(std::filesystem::__cxx11::path& exePath) {
+int StartExeTool(std::filesystem::path& exePath) {
   char* const arguments[] = {nullptr};
   pid_t pid = 0;
 
