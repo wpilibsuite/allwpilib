@@ -7,6 +7,6 @@
 #include <string_view>
 
 namespace fields {
-std::string_view GetResource_2018_powerup_json();
-std::string_view GetResource_2018_field_jpg();
+std::string_view GetResource_2025_frc_reefscape_json();
+std::string_view GetResource_2025_frc_reefscape_png();
 }  // namespace fields

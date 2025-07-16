@@ -7,6 +7,6 @@
 #include <string_view>
 
 namespace fields {
-std::string_view GetResource_2021_bouncepath_json();
-std::string_view GetResource_2021_bounce_png();
+std::string_view GetResource_2024_frc_crescendo_json();
+std::string_view GetResource_2024_frc_crescendo_png();
 }  // namespace fields

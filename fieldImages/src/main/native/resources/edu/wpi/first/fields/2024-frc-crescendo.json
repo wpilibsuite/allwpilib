@@ -1,18 +1,18 @@
 {
-  "game": "Infinite Recharge 2021",
-  "field-image": "2021-field.png",
+  "game": "2024 FRC Crescendo",
+  "field-image": "2024-frc-crescendo.png",
   "field-corners": {
     "top-left": [
-      127,
-      34
+      150,
+      79
     ],
     "bottom-right": [
-      1323,
-      649
+      2961,
+      1476
     ]
   },
   "field-size": [
-    52.4375,
+    54.27083,
     26.9375
   ],
   "field-unit": "foot"

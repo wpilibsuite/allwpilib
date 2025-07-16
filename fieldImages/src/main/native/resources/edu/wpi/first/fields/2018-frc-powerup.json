@@ -1,6 +1,6 @@
 {
-  "game": "FIRST Power Up",
-  "field-image": "2018-field.jpg",
+  "game": "2018 FRC Power Up",
+  "field-image": "2018-frc-powerup.jpg",
   "field-corners": {
     "top-left": [
       125,
@@ -15,5 +15,5 @@
     54,
     27
   ],
-  "field-unit": "feet"
+  "field-unit": "foot"
 }
