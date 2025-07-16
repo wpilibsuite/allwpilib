@@ -1,6 +1,6 @@
 {
-  "game": "2021 FRC Slalom Path",
-  "field-image": "2021-frc-slalompath.png",
+  "game": "frc/2021 FRC Barrel Racing Path",
+  "field-image": "frc/2021-barrelracingpath.png",
   "field-corners": {
     "top-left": [
       20,

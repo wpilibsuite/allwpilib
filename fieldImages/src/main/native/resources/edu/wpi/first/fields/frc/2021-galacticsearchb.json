@@ -1,6 +1,6 @@
 {
-  "game": "2021 FRC Bounce Path",
-  "field-image": "2021-frc-bouncepath.png",
+  "game": "frc/2021 FRC Galactic Search B",
+  "field-image": "frc/2021-galacticsearchb.png",
   "field-corners": {
     "top-left": [
       20,

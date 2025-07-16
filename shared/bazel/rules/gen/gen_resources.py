@@ -4,8 +4,6 @@ import os
 
 
 def generate_file(resource_file, output_file, prefix, namespace):
-    # TODO(crueter): Support for namespacing aka subdirs
-
     func_name = "GetResource_" + os.path.basename(resource_file).replace(
         "-", "_"
     ).replace(".", "_")

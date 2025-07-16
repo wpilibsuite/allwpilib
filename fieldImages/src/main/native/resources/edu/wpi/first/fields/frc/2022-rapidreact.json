@@ -1,14 +1,14 @@
 {
-  "game": "2019 FRC Destination: Deep Space",
-  "field-image": "2019-frc-deepspace.jpg",
+  "game": "frc/2022 FRC Rapid React",
+  "field-image": "frc/2022-rapidreact.png",
   "field-corners": {
     "top-left": [
-      217,
-      40
+      74,
+      50
     ],
     "bottom-right": [
-      1372,
-      615
+      1774,
+      900
     ]
   },
   "field-size": [

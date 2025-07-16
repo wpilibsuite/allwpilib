@@ -12,9 +12,12 @@ if(WITH_JAVA)
     file(
         GLOB_RECURSE JAVA_RESOURCES
         RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-        src/main/native/resources/*.json
-        src/main/native/resources/*.png
-        src/main/native/resources/*.jpg
+        src/main/native/resources/frc/*.json
+        src/main/native/resources/frc/*.png
+        src/main/native/resources/frc/*.jpg
+        src/main/native/resources/ftc/*.json
+        src/main/native/resources/ftc/*.png
+        src/main/native/resources/ftc/*.jpg
     )
     add_jar(
         field_images_jar
@@ -35,7 +38,7 @@ if(WITH_JAVA)
 endif()
 
 generate_resources(
-    src/main/native/resources/edu/wpi/first/fields
+    src/main/native/resources/edu/wpi/first/fields/*
     ${CMAKE_CURRENT_BINARY_DIR}/generated/main/cpp
     FIELDS
     fields

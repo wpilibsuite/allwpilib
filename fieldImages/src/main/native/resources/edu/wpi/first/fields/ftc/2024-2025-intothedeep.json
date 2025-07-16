@@ -1,6 +1,6 @@
 {
-  "game": "2024-2025 FTC Into The Deep",
-  "field-image": "2024-2025-ftc-intothedeep.png",
+  "game": "ftc/2024-2025 FTC Into The Deep",
+  "field-image": "ftc/2024-2025-intothedeep.png",
   "field-corners": {
     "top-left": [
       0,

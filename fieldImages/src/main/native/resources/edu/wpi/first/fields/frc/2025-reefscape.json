@@ -1,6 +1,6 @@
 {
-  "game": "2025 FRC Reefscape",
-  "field-image": "2025-frc-reefscape.png",
+  "game": "frc/2025 FRC Reefscape",
+  "field-image": "frc/2025-reefscape.png",
   "field-corners": {
     "top-left": [
       534,
