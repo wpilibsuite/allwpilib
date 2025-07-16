@@ -4,18 +4,22 @@
 
 #include "frc2/command/button/TriggerGroup.h"
 
-#include <stdexcept>
 #include <set>
+#include <stdexcept>
+#include <string>
 #include <utility>
+#include <vector>
 
 using namespace frc2;
 
-TriggerGroup TriggerGroup::Add(const std::string& key, Trigger condition) const {
+TriggerGroup TriggerGroup::Add(const std::string& key,
+                               Trigger condition) const {
   if (key.empty()) {
     throw std::invalid_argument("Key must not be empty in Add()");
   }
   if (m_conditions.find(key) != m_conditions.end()) {
-    throw std::invalid_argument("Key '" + key + "' already exists in TriggerGroup");
+    throw std::invalid_argument("Key '" + key +
+                                "' already exists in TriggerGroup");
   }
 
   auto newConditions = m_conditions;
@@ -87,7 +91,8 @@ Trigger TriggerGroup::None() const {
 void TriggerGroup::CheckKeysExist(const std::vector<std::string>& keys) const {
   for (const auto& key : keys) {
     if (m_conditions.find(key) == m_conditions.end()) {
-      throw std::invalid_argument("Key '" + key + "' does not exist in TriggerGroup");
+      throw std::invalid_argument("Key '" + key +
+                                  "' does not exist in TriggerGroup");
     }
   }
 }

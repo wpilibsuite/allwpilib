@@ -4,16 +4,17 @@
 
 #include <utility>
 
+#include <gtest/gtest.h>
+
 #include "../CommandTestBase.h"
-#include "gtest/gtest.h"
-#include "frc2/command/button/TriggerGroup.h"
 #include "frc2/command/button/Trigger.h"
+#include "frc2/command/button/TriggerGroup.h"
 
 using namespace frc2;
 
 class TriggerGroupTest : public CommandTestBase {};
 
-TEST_F(TriggerGroupTest, AddTest) {
+TEST_F(TriggerGroupTest, Add) {
   TriggerGroup group1;
 
   TriggerGroup group2 = group1.Add("a", Trigger());
@@ -25,12 +26,10 @@ TEST_F(TriggerGroupTest, AddTest) {
   EXPECT_NO_THROW(group2.Only({"a"}));
 }
 
-TEST_F(TriggerGroupTest, OnlyTest) {
-  TriggerGroup group = TriggerGroup({
-    {"a", Trigger([] { return true; })},
-    {"b", Trigger([] { return true; })},
-    {"c", Trigger([] { return false; })}
-  });
+TEST_F(TriggerGroupTest, Only) {
+  TriggerGroup group = TriggerGroup({{"a", Trigger([] { return true; })},
+                                     {"b", Trigger([] { return true; })},
+                                     {"c", Trigger([] { return false; })}});
 
   EXPECT_TRUE(group.Only({"a", "b"}).Get());
   EXPECT_FALSE(group.Only({"a"}).Get());
@@ -38,64 +37,58 @@ TEST_F(TriggerGroupTest, OnlyTest) {
   EXPECT_FALSE(group.Only({"a", "b", "c"}).Get());
 }
 
-TEST_F(TriggerGroupTest, AnyTest) {
-  TriggerGroup group = TriggerGroup({
-    {"a", Trigger([] { return true; })},
-    {"b", Trigger([] { return true; })},
-    {"c", Trigger([] { return false; })}
-  });
+TEST_F(TriggerGroupTest, Any) {
+  TriggerGroup group = TriggerGroup({{"a", Trigger([] { return true; })},
+                                     {"b", Trigger([] { return true; })},
+                                     {"c", Trigger([] { return false; })}});
 
   EXPECT_TRUE(group.Any({"a", "b"}).Get());
   EXPECT_TRUE(group.Any({"a", "c"}).Get());
   EXPECT_FALSE(group.Any({"c"}).Get());
 }
 
-TEST_F(TriggerGroupTest, AllOfTest) {
-  TriggerGroup group = TriggerGroup({
-    {"a", Trigger([] { return true; })},
-    {"b", Trigger([] { return true; })},
-    {"c", Trigger([] { return false; })}
-  });
+TEST_F(TriggerGroupTest, AllOf) {
+  TriggerGroup group = TriggerGroup({{"a", Trigger([] { return true; })},
+                                     {"b", Trigger([] { return true; })},
+                                     {"c", Trigger([] { return false; })}});
 
   EXPECT_TRUE(group.AllOf({"a", "b"}).Get());
   EXPECT_TRUE(group.AllOf({"a"}).Get());
   EXPECT_FALSE(group.Any({"c"}).Get());
 }
 
-TEST_F(TriggerGroupTest, AllTest) {
+TEST_F(TriggerGroupTest, All) {
   TriggerGroup group1 = TriggerGroup({
-    {"a", Trigger([] { return true; })},
-    {"b", Trigger([] { return false; })},
+      {"a", Trigger([] { return true; })},
+      {"b", Trigger([] { return false; })},
   });
 
   TriggerGroup group2 = TriggerGroup({
-    {"a", Trigger([] { return true; })},
-    {"b", Trigger([] { return true; })},
+      {"a", Trigger([] { return true; })},
+      {"b", Trigger([] { return true; })},
   });
 
   EXPECT_FALSE(group1.All().Get());
   EXPECT_TRUE(group2.All().Get());
 }
 
-TEST_F(TriggerGroupTest, NoneTest) {
+TEST_F(TriggerGroupTest, None) {
   TriggerGroup group1 = TriggerGroup({
-    {"a", Trigger([] { return true; })},
-    {"b", Trigger([] { return false; })},
+      {"a", Trigger([] { return true; })},
+      {"b", Trigger([] { return false; })},
   });
 
   TriggerGroup group2 = TriggerGroup({
-    {"a", Trigger([] { return false; })},
-    {"b", Trigger([] { return false; })},
+      {"a", Trigger([] { return false; })},
+      {"b", Trigger([] { return false; })},
   });
 
   EXPECT_FALSE(group1.None().Get());
   EXPECT_TRUE(group2.None().Get());
 }
 
-TEST_F(TriggerGroupTest, InvalidNameTest) {
-  TriggerGroup group = TriggerGroup({
-    {"a", Trigger([] { return true; })}
-  });
+TEST_F(TriggerGroupTest, InvalidName) {
+  TriggerGroup group = TriggerGroup({{"a", Trigger([] { return true; })}});
 
   EXPECT_THROW(group.Only({"bogus"}), std::invalid_argument);
 }

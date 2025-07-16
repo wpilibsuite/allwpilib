@@ -15,7 +15,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class TriggerGroupTest extends CommandTestBase {
-
   @Test
   void addTest() {
     TriggerGroup group1 = new TriggerGroup();
