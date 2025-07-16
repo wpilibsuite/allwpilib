@@ -7,7 +7,7 @@ package edu.wpi.first.fields;
 public class Fields {
   public static final String kBaseResourceDir = "/edu/wpi/first/fields/";
 
-  public enum FRC implements IField {
+  public enum FRC implements Field {
     k2018PowerUp("2018-powerup.json"),
     k2019DeepSpace("2019-deepspace.json"),
     k2020InfiniteRecharge("2020-infiniterecharge.json"),
@@ -34,7 +34,7 @@ public class Fields {
     }
   }
 
-  public enum FTC implements IField {
+  public enum FTC implements Field {
     k20242025IntoTheDeep("2024-2025-intothedeep.json");
 
     public final String m_resourceFile;
