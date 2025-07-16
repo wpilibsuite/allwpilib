@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj2.command.button;
+#include <functional>
+#include <map>
+#include <string>
+#include <vector>
 
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+#include <frc2/command/button/Trigger.h>
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BooleanSupplier;
+namespace frc2 {
 
 /**
  * This class provides an easy way to combine multiple Triggers together in a single group. Each
@@ -19,19 +19,16 @@ import java.util.function.BooleanSupplier;
  * individual buttons perform individual actions. For example, the 'a' and 'b' buttons could be used
  * to perform 3 actions: one when just a is pressed, one when just b is pressed, and one when both
  * are pressed.
- *
+ * 
  * <p>This class is provided by the NewCommands VendorDep
  */
-public class TriggerGroup {
-  private final Map<String, BooleanSupplier> m_conditions;
-
+class TriggerGroup {
+ public:
   /**
    * Creates an empty TriggerGroup. This can be used as a starting point for creating TriggerGroups
-   * by chaining the {@link #add(String, BooleanSupplier)} method.
+   * by chaining the add(String, Trigger) method.
    */
-  public TriggerGroup() {
-    this(Map.of());
-  }
+  TriggerGroup() = default;
 
   /**
    * Creates a TriggerGroup from the given map of named conditions. The map is copied to ensure
@@ -39,9 +36,8 @@ public class TriggerGroup {
    *
    * @param conditions A map of named conditions (Triggers).
    */
-  public TriggerGroup(Map<String, BooleanSupplier> conditions) {
-    m_conditions = Map.copyOf(conditions);
-  }
+  explicit TriggerGroup(std::map<std::string, Trigger> conditions)
+      : m_conditions(std::move(conditions)) {}
 
   /**
    * Creates a new TriggerGroup with the same conditions as this one, plus an additional named
@@ -51,18 +47,7 @@ public class TriggerGroup {
    * @param condition The condition to add.
    * @return A new TriggerGroup.
    */
-  public TriggerGroup add(String key, BooleanSupplier condition) {
-    requireNonNullParam(key, "key", "add");
-    requireNonNullParam(condition, "condition", "add");
-
-    if (m_conditions.containsKey(key)) {
-      throw new IllegalArgumentException("Key " + key + " already exists in TriggerGroup");
-    }
-
-    HashMap<String, BooleanSupplier> newConditions = new HashMap<>(m_conditions);
-    newConditions.put(key, condition);
-    return new TriggerGroup(newConditions);
-  }
+  TriggerGroup Add(const std::string& key, Trigger condition) const;
 
   /**
    * Creates a Trigger that becomes true only when the specified named conditions are true and all
@@ -72,24 +57,7 @@ public class TriggerGroup {
    *     must be false.
    * @return A Trigger that is true if and only if exactly the specified conditions are true.
    */
-  public Trigger only(String... names) {
-    checkKeysExist(names);
-    Set<String> expected = Set.of(names);
-
-    return new Trigger(
-        () -> {
-          for (var condition : m_conditions.entrySet()) {
-            boolean expectedValue = expected.contains(condition.getKey());
-            boolean value = condition.getValue().getAsBoolean();
-
-            if (expectedValue != value) {
-              return false;
-            }
-          }
-
-          return true;
-        });
-  }
+  Trigger Only(const std::vector<std::string>& names) const;
 
   /**
    * Creates a Trigger that becomes true when any of the specified named conditions are true.
@@ -97,20 +65,7 @@ public class TriggerGroup {
    * @param names The names of the conditions to check.
    * @return A Trigger that is true only if at least one of the specified conditions are true.
    */
-  public Trigger any(String... names) {
-    checkKeysExist(names);
-
-    return new Trigger(
-        () -> {
-          for (var name : names) {
-            if (m_conditions.get(name).getAsBoolean()) {
-              return true;
-            }
-          }
-
-          return false;
-        });
-  }
+  Trigger Any(const std::vector<std::string>& names) const;
 
   /**
    * Creates a Trigger that becomes true when all of the specified named conditions are true,
@@ -120,47 +75,24 @@ public class TriggerGroup {
    * @return A Trigger that is true only if all of the specified conditions are true, regardless of
    *     the others.
    */
-  public Trigger allOf(String... names) {
-    checkKeysExist(names);
-
-    return new Trigger(
-        () -> {
-          for (var name : names) {
-            if (!m_conditions.get(name).getAsBoolean()) {
-              return false;
-            }
-          }
-
-          return true;
-        });
-  }
+  Trigger AllOf(const std::vector<std::string>& names) const;
 
   /**
    * Creates a Trigger that becomes true only when every single condition in this group is true.
    *
    * @return A Trigger that is true if every single condition in this group is true.
    */
-  public Trigger all() {
-    return allOf(m_conditions.keySet().toArray(new String[0]));
-  }
+  Trigger All() const;
 
   /**
    * Creates a Trigger that becomes true only when every single condition in this group is false.
    *
    * @return A Trigger that is true if every single condition in this group is false.
    */
-  public Trigger none() {
-    return new Trigger(
-        () -> {
-          for (var condition : m_conditions.values()) {
-            if (condition.getAsBoolean()) {
-              return false;
-            }
-          }
+  Trigger None() const;
 
-          return true;
-        });
-  }
+ private:
+  std::map<std::string, Trigger> m_conditions;
 
   /**
    * Helper method that checks that all the provided keys do exist in this TriggerGroup, throwing if
@@ -168,11 +100,7 @@ public class TriggerGroup {
    *
    * @param keys The list of keys to check.
    */
-  private void checkKeysExist(String... keys) {
-    for (String k : keys) {
-      if (!m_conditions.containsKey(k)) {
-        throw new IllegalArgumentException("Key " + k + " does not exist in TriggerGroup");
-      }
-    }
-  }
-}
+  void CheckKeysExist(const std::vector<std::string>& keys) const;
+};
+
+}  // namespace frc2
