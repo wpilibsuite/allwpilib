@@ -608,13 +608,14 @@ HAL_Bool HAL_RefreshDSData(void) {
   int64_t dataTime{0};
   bool dataValid = systemServerDs->GetLastControlData(&newestData, &dataTime);
 
-  auto now = wpi::Now();
-  auto delta = now - dataTime;
+  // auto now = wpi::Now();
+  // auto delta = now - dataTime;
 
   bool updatedData = false;
 
   // Data newer then 125ms, and we have a DS connected
-  if (dataValid && delta < 125000 && newestData.ControlWord.DsConnected) {
+  // TODO add a new way to detect if mrccomm has stopped.
+  if (dataValid /* && delta < 125000 */ && newestData.ControlWord.DsConnected) {
     // Update the cache.
     cacheToUpdate->Update(newestData);
     updatedData = true;
