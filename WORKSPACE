@@ -16,6 +16,7 @@ http_archive(
     url = "https://github.com/bazelbuild/rules_cc/releases/download/0.1.1/rules_cc-0.1.1.tar.gz",
 )
 
+# TODO(austinschuh): Update to the next released apple_support once it lands.
 http_archive(
     name = "build_bazel_apple_support",
     sha256 = "7d542be113180bc1da3660e51fe4792a867fb85537c9ef36a0d3366665a76803",
