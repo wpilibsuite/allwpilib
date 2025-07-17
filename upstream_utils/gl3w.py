@@ -17,6 +17,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "gl3w"
     url = "https://github.com/skaslev/gl3w"
+    # master on 2022-03-24
     tag = "5f8d7fd191ba22ff2b60c1106d7135bb9a335533"
 
     gl3w = Lib(name, url, tag, copy_upstream_src)
