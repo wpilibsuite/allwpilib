@@ -11,9 +11,11 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <networktables/BooleanTopic.h>
+#include <networktables/IntegerTopic.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/ProtobufTopic.h>
 #include <networktables/StringArrayTopic.h>
@@ -32,8 +34,9 @@
 #include "hal/proto/ControlData.h"
 #include "hal/proto/ErrorInfo.h"
 #include "hal/proto/JoystickDescriptor.h"
-#include "hal/proto/JoystickOutputData.h"
+#include "hal/proto/JoystickRumbleData.h"
 #include "hal/proto/MatchInfo.h"
+#include "hal/proto/OpMode.h"
 #include "mrc/NtNetComm.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
@@ -60,12 +63,10 @@ static_assert(std::is_standard_layout_v<JoystickDataCache>);
 
 struct SystemServerDriverStation {
   nt::NetworkTableInstance ntInst;
-  nt::BooleanPublisher robotProgramPublisher;
-  nt::BooleanPublisher codeStartedPublisher;
-  nt::BooleanPublisher userCodeDisabledPublisher;
-  nt::BooleanPublisher userCodeAutonomousPublisher;
-  nt::BooleanPublisher userCodeTeleopPublisher;
-  nt::BooleanPublisher userCodeTestPublisher;
+  nt::BooleanPublisher hasUserCodePublisher;
+  nt::BooleanPublisher hasUserCodeReadyPublisher;
+
+  nt::BooleanSubscriber hasSetWallClockSubscriber;
 
   nt::ProtobufSubscriber<mrc::ControlData> controlDataSubscriber;
   nt::ProtobufSubscriber<mrc::MatchInfo> matchInfoSubscriber;
@@ -79,9 +80,14 @@ struct SystemServerDriverStation {
   nt::StringPublisher consoleLinePublisher;
   nt::ProtobufPublisher<mrc::ErrorInfo> errorInfoPublisher;
 
-  std::array<nt::ProtobufPublisher<mrc::JoystickOutputData>,
+  std::array<nt::ProtobufPublisher<mrc::JoystickRumbleData>,
              MRC_MAX_NUM_JOYSTICKS>
-      joystickOutputsTopics;
+      joystickRumbleTopics;
+
+  nt::ProtobufPublisher<std::vector<mrc::OpMode>> teleopOpModes;
+  nt::ProtobufPublisher<std::vector<mrc::OpMode>> autoOpModes;
+  nt::ProtobufPublisher<std::vector<mrc::OpMode>> testOpModes;
+  nt::IntegerPublisher traceOpModePublisher;
 
   NT_Listener controlDataListener;
 
@@ -97,31 +103,27 @@ struct SystemServerDriverStation {
     options.keepDuplicates = true;
     options.periodic = 0.005;
 
-    codeStartedPublisher =
-        ntInst.GetBooleanTopic(ROBOT_CODE_STARTED_PATH).Publish(options);
-    userCodeDisabledPublisher =
-        ntInst.GetBooleanTopic(ROBOT_DISABLED_TRACE_PATH).Publish(options);
-    userCodeAutonomousPublisher =
-        ntInst.GetBooleanTopic(ROBOT_AUTON_TRACE_PATH).Publish(options);
-    userCodeTeleopPublisher =
-        ntInst.GetBooleanTopic(ROBOT_TELEOP_TRACE_PATH).Publish(options);
-    userCodeTestPublisher =
-        ntInst.GetBooleanTopic(ROBOT_TEST_TRACE_PATH).Publish(options);
+    hasUserCodeReadyPublisher =
+        ntInst.GetBooleanTopic(ROBOT_HAS_USER_CODE_READY_PATH).Publish(options);
 
-    for (size_t count = 0; count < joystickOutputsTopics.size(); count++) {
-      std::string name = ROBOT_JOYSTICK_OUTPUTS_PATH;
+    for (size_t count = 0; count < joystickRumbleTopics.size(); count++) {
+      std::string name = ROBOT_JOYSTICK_RUMBLE_PATH;
       name += std::to_string(count);
-      joystickOutputsTopics[count] =
-          ntInst.GetProtobufTopic<mrc::JoystickOutputData>(name).Publish(
+      joystickRumbleTopics[count] =
+          ntInst.GetProtobufTopic<mrc::JoystickRumbleData>(name).Publish(
               options);
     }
 
-    robotProgramPublisher =
-        ntInst.GetBooleanTopic(ROBOT_NEW_ROBOT_PROGRAM_PATH).Publish();
-    robotProgramPublisher.Set(true);
+    hasUserCodePublisher =
+        ntInst.GetBooleanTopic(ROBOT_HAS_USER_CODE_PATH).Publish();
+    hasUserCodePublisher.Set(true);
 
     consoleLinePublisher =
         ntInst.GetStringTopic(ROBOT_CONSOLE_LINE_PATH).Publish(options);
+
+    hasSetWallClockSubscriber =
+        ntInst.GetBooleanTopic(ROBOT_HAS_SET_WALL_CLOCK_PATH)
+            .Subscribe(false, options);
 
     errorInfoPublisher =
         ntInst.GetProtobufTopic<mrc::ErrorInfo>(ROBOT_ERROR_INFO_PATH)
@@ -147,9 +149,42 @@ struct SystemServerDriverStation {
           ntInst.GetProtobufTopic<mrc::JoystickDescriptor>(name).Subscribe({});
     }
 
+    teleopOpModes = ntInst
+                        .GetProtobufTopic<std::vector<mrc::OpMode>>(
+                            ROBOT_TELEOP_OP_MODES_PATH)
+                        .Publish();
+    autoOpModes = ntInst
+                      .GetProtobufTopic<std::vector<mrc::OpMode>>(
+                          ROBOT_AUTO_OP_MODES_PATH)
+                      .Publish();
+    testOpModes = ntInst
+                      .GetProtobufTopic<std::vector<mrc::OpMode>>(
+                          ROBOT_TEST_OP_MODES_PATH)
+                      .Publish();
+
+    std::vector<mrc::OpMode> staticTeleopOpModes;
+    staticTeleopOpModes.emplace_back(
+        mrc::OpMode{"TeleOp", mrc::OpModeHash::MakeTele(2)});
+    teleopOpModes.Set(staticTeleopOpModes);
+
+    std::vector<mrc::OpMode> staticAutoOpModes;
+    staticAutoOpModes.emplace_back(
+        mrc::OpMode{"Auto", mrc::OpModeHash::MakeAuto(1)});
+    autoOpModes.Set(staticAutoOpModes);
+
+    std::vector<mrc::OpMode> staticTestOpModes;
+    staticTestOpModes.emplace_back(
+        mrc::OpMode{"Test", mrc::OpModeHash::MakeTest(3)});
+    testOpModes.Set(staticTestOpModes);
+
     ntInst.AddListener(
         controlDataSubscriber, NT_EVENT_VALUE_REMOTE | NT_EVENT_UNPUBLISH,
         [this](const nt::Event& event) { HandleListener(event); });
+
+    traceOpModePublisher =
+        ntInst.GetIntegerTopic(ROBOT_CURRENT_OPMODE_TRACE_PATH)
+            .Publish(options);
+    traceOpModePublisher.GetTopic().SetCached(false);
   }
 
   void HandleListener(const nt::Event& event);
@@ -211,13 +246,8 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
   controlWord.fmsAttached = data.ControlWord.FmsConnected;
   controlWord.dsAttached = data.ControlWord.DsConnected;
   controlWord.eStop = data.ControlWord.EStop;
-
-  auto mode = data.GetOpMode();
-  if (mode == "Test") {
-    controlWord.test = true;
-  } else if (mode == "Auton") {
-    controlWord.autonomous = true;
-  }
+  controlWord.test = data.ControlWord.Test;
+  controlWord.autonomous = data.ControlWord.Auto;
 
   auto sticks = data.Joysticks();
 
@@ -228,16 +258,22 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
 
     axes[count].count = newAxes.size();
     for (size_t i = 0; i < newAxes.size(); i++) {
-      axes[count].axes[i] = newAxes[i];
+      axes[count].raw[i] = newAxes[i];
+      int16_t axisValue = newAxes[i];
+      if (axisValue < 0) {
+        axes[count].axes[i] = axisValue / 32768.0f;
+      } else {
+        axes[count].axes[i] = axisValue / 32767.0f;
+      }
     }
 
     povs[count].count = newPovs.size();
     for (size_t i = 0; i < newPovs.size(); i++) {
-      povs[count].povs[i] = newPovs[i];
+      povs[count].povs[i] = static_cast<HAL_JoystickPOV>(newPovs[i]);
     }
 
-    buttons->count = newStick.Buttons.GetCount();
-    buttons->buttons = newStick.Buttons.Buttons;
+    buttons[count].count = newStick.Buttons.GetMaxAvailableCount();
+    buttons[count].buttons = newStick.Buttons.Buttons;
   }
 }
 
@@ -301,7 +337,7 @@ void TcpCache::Update() {
 
     auto& desc = descriptors[count];
 
-    desc.isXbox = newDesc.IsXbox;
+    desc.isGamepad = newDesc.IsGamepad;
     desc.type = newDesc.Type;
     desc.buttonCount = newDesc.GetButtonsCount();
     desc.povCount = newDesc.GetPovsCount();
@@ -481,12 +517,12 @@ HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
   return currentRead->allianceStation;
 }
 
-HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum) {
+HAL_Bool HAL_GetJoystickIsGamepad(int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     return 0;
   } else {
-    return joystickDesc.isXbox;
+    return joystickDesc.isGamepad;
   }
 }
 
@@ -523,15 +559,17 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble) {
   CHECK_JOYSTICK_NUMBER(joystickNum);
 
-  mrc::JoystickOutputData outputData{
-      .HidOutputs = static_cast<uint32_t>(outputs),
-      .LeftRumble = std::clamp(leftRumble, 0, UINT16_MAX) /
-                    static_cast<float>(UINT16_MAX),
-      .RightRumble = std::clamp(rightRumble, 0, UINT16_MAX) /
-                     static_cast<float>(UINT16_MAX),
-  };
+  // TODO Update this API
 
-  systemServerDs->joystickOutputsTopics[joystickNum].Set(outputData);
+  // mrc::JoystickOutputData outputData{
+  //     .HidOutputs = static_cast<uint32_t>(outputs),
+  //     .LeftRumble = std::clamp(leftRumble, 0, UINT16_MAX) /
+  //                   static_cast<float>(UINT16_MAX),
+  //     .RightRumble = std::clamp(rightRumble, 0, UINT16_MAX) /
+  //                    static_cast<float>(UINT16_MAX),
+  // };
+
+  // systemServerDs->joystickRumbleTopics[joystickNum].Set(outputData);
 
   return 0;
 }
@@ -542,23 +580,27 @@ double HAL_GetMatchTime(int32_t* status) {
 }
 
 void HAL_ObserveUserProgramStarting(void) {
-  systemServerDs->codeStartedPublisher.Set(true);
+  systemServerDs->hasUserCodeReadyPublisher.Set(true);
 }
 
 void HAL_ObserveUserProgramDisabled(void) {
-  systemServerDs->userCodeDisabledPublisher.Set(true);
+  systemServerDs->traceOpModePublisher.Set(
+      mrc::OpModeHash::MakeTele(1, false).ToValue());
 }
 
 void HAL_ObserveUserProgramAutonomous(void) {
-  systemServerDs->userCodeAutonomousPublisher.Set(true);
+  auto tVal = mrc::OpModeHash::MakeAuto(2, true).ToValue();
+  systemServerDs->traceOpModePublisher.Set(tVal);
 }
 
 void HAL_ObserveUserProgramTeleop(void) {
-  systemServerDs->userCodeTeleopPublisher.Set(true);
+  auto tVal = mrc::OpModeHash::MakeTele(1, true).ToValue();
+  systemServerDs->traceOpModePublisher.Set(tVal);
 }
 
 void HAL_ObserveUserProgramTest(void) {
-  systemServerDs->userCodeTestPublisher.Set(true);
+  systemServerDs->traceOpModePublisher.Set(
+      mrc::OpModeHash::MakeTest(3, true).ToValue());
 }
 
 HAL_Bool HAL_RefreshDSData(void) {
@@ -566,13 +608,14 @@ HAL_Bool HAL_RefreshDSData(void) {
   int64_t dataTime{0};
   bool dataValid = systemServerDs->GetLastControlData(&newestData, &dataTime);
 
-  auto now = wpi::Now();
-  auto delta = now - dataTime;
+  // auto now = wpi::Now();
+  // auto delta = now - dataTime;
 
   bool updatedData = false;
 
   // Data newer then 125ms, and we have a DS connected
-  if (dataValid && delta < 125000 && newestData.ControlWord.DsConnected) {
+  // TODO add a new way to detect if mrccomm has stopped.
+  if (dataValid /* && delta < 125000 */ && newestData.ControlWord.DsConnected) {
     // Update the cache.
     cacheToUpdate->Update(newestData);
     updatedData = true;
@@ -605,6 +648,10 @@ void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {
 
 HAL_Bool HAL_GetOutputsEnabled(void) {
   return systemServerDs->controlDataSubscriber.Get().ControlWord.WatchdogActive;
+}
+
+HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
+  return systemServerDs->hasSetWallClockSubscriber.Get(false);
 }
 
 }  // extern "C"

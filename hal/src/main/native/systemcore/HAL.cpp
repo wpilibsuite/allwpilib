@@ -59,7 +59,7 @@ void InitializeHAL() {
   InitializeEncoder();
   InitializeFRCDriverStation();
   InitializeI2C();
-  InitializeLEDs();
+  InitializeIMU();
   InitializeMain();
   InitializeNotifier();
   InitializeCTREPDP();
@@ -130,6 +130,10 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return ERR_CANSessionMux_NotAllowed_MESSAGE;
     case HAL_ERR_CANSessionMux_NotInitialized:
       return ERR_CANSessionMux_NotInitialized_MESSAGE;
+    case HAL_WARN_CANSessionMux_TxQueueFull:
+      return HAL_WARN_CANSessionMux_TxQueueFull_MESSAGE;
+    case HAL_WARN_CANSessionMux_SocketBufferFull:
+      return HAL_WARN_CANSessionMux_SocketBufferFull_MESSAGE;
     case HAL_PWM_SCALE_ERROR:
       return HAL_PWM_SCALE_ERROR_MESSAGE;
     case HAL_SERIAL_PORT_NOT_FOUND:
@@ -252,12 +256,6 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
   return (upper << 32) + static_cast<uint64_t>(unexpandedLower);
 }
 
-HAL_Bool HAL_GetFPGAButton(int32_t* status) {
-  hal::init::CheckInit();
-  *status = HAL_HANDLE_ERROR;
-  return false;
-}
-
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
   hal::init::CheckInit();
   *status = HAL_HANDLE_ERROR;
@@ -282,10 +280,6 @@ HAL_Bool HAL_GetRSLState(int32_t* status) {
   return false;
 }
 
-HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
-  return false;
-}
-
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
@@ -300,6 +294,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     return true;
   }
 
+  // Initialize system server first, other things might use it
+  hal::InitializeSystemServer();
+
   hal::init::InitializeHAL();
 
   hal::init::HAL_IsInitialized.store(true);
@@ -313,8 +310,6 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     std::printf("Failed to initialize can buses\n");
     return false;
   }
-
-  hal::InitializeSystemServer();
 
   // // Return false if program failed to kill an existing program
   // if (!killExistingProgram(timeout, mode)) {

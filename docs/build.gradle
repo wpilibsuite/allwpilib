@@ -98,11 +98,9 @@ doxygen {
         exclude 'wpi/fs.h'
         exclude 'wpi/FunctionExtras.h'
         exclude 'wpi/function_ref.h'
-        exclude 'wpi/Hashing.h'
         exclude 'wpi/iterator.h'
         exclude 'wpi/iterator_range.h'
         exclude 'wpi/ManagedStatic.h'
-        exclude 'wpi/MapVector.h'
         exclude 'wpi/MathExtras.h'
         exclude 'wpi/MemAlloc.h'
         exclude 'wpi/PointerIntPair.h'
@@ -137,9 +135,6 @@ doxygen {
         exclude 'wpi/json_fwd.h'
         exclude 'wpi/ordered_map.h'
         exclude 'wpi/thirdparty/**'
-
-        // memory
-        exclude 'wpi/memory/**'
 
         // mpack
         exclude 'wpi/mpack.h'

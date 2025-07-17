@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <frc/DriverStation.h>
 #include <frc/Joystick.h>
 #include <frc/simulation/JoystickSim.h>
 #include <gtest/gtest.h>
@@ -17,7 +18,7 @@ class POVButtonTest : public CommandTestBase {};
 
 TEST_F(POVButtonTest, SetPOV) {
   frc::sim::JoystickSim joysim(1);
-  joysim.SetPOV(0);
+  joysim.SetPOV(frc::DriverStation::kUp);
   joysim.NotifyNewData();
 
   auto& scheduler = CommandScheduler::GetInstance();
@@ -26,11 +27,11 @@ TEST_F(POVButtonTest, SetPOV) {
   WaitUntilCommand command([&finished] { return finished; });
 
   frc::Joystick joy(1);
-  POVButton(&joy, 90).OnTrue(&command);
+  POVButton(&joy, frc::DriverStation::kRight).OnTrue(&command);
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 
-  joysim.SetPOV(90);
+  joysim.SetPOV(frc::DriverStation::kRight);
   joysim.NotifyNewData();
 
   scheduler.Run();

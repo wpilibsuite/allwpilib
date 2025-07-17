@@ -24,7 +24,7 @@ namespace frc {
 int RunHALInitialization();
 
 namespace impl {
-#ifndef __FRC_ROBORIO__
+#ifndef __FRC_SYSTEMCORE__
 void ResetMotorSafety();
 #endif
 
@@ -124,7 +124,7 @@ int StartRobot() {
     impl::RunRobot<Robot>(m, &robot);
   }
 
-#ifndef __FRC_ROBORIO__
+#ifndef __FRC_SYSTEMCORE__
   frc::impl::ResetMotorSafety();
 #endif
   HAL_Shutdown();
@@ -235,7 +235,7 @@ class RobotBase {
    * @return If the robot is running in the real world.
    */
   static constexpr bool IsReal() {
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
     return true;
 #else
     return false;
@@ -248,7 +248,7 @@ class RobotBase {
    * @return If the robot is running in simulation.
    */
   static constexpr bool IsSimulation() {
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
     return false;
 #else
     return true;

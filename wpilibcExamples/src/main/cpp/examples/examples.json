@@ -164,7 +164,8 @@
     ],
     "foldername": "PotentiometerPID",
     "gradlebase": "cpp",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "Elevator with exponential profiled PID",
@@ -257,7 +258,8 @@
     ],
     "foldername": "I2CCommunication",
     "gradlebase": "cpp",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "Digital Communication Sample",
@@ -268,7 +270,8 @@
     ],
     "foldername": "DigitalCommunication",
     "gradlebase": "cpp",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "HTTP Camera",
@@ -474,7 +477,8 @@
     ],
     "foldername": "MecanumControllerCommand",
     "gradlebase": "cpp",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "SwerveControllerCommand",
@@ -491,11 +495,12 @@
     ],
     "foldername": "SwerveControllerCommand",
     "gradlebase": "cpp",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "DriveDistanceOffboard",
-    "description": "Drive a differential drivetrain a set distance using TrapezoidProfileCommand and smart motor controller PID.",
+    "description": "Drive a differential drivetrain a set distance using TrapezoidProfile and smart motor controller PID.",
     "tags": [
       "Command-based",
       "Differential Drive",
@@ -615,7 +620,8 @@
     ],
     "foldername": "ElevatorSimulation",
     "gradlebase": "cpp",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "Elevator Exponential Profile Simulation",
@@ -675,7 +681,8 @@
     ],
     "foldername": "ArmSimulation",
     "gradlebase": "cpp",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "UnitTesting",

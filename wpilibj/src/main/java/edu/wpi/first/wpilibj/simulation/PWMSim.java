@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj.simulation;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.hal.simulation.PWMDataJNI;
 import edu.wpi.first.wpilibj.PWM;
-import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
 
 /** Class to control a simulated PWM output. */
 public class PWMSim {
@@ -20,15 +19,6 @@ public class PWMSim {
    */
   public PWMSim(PWM pwm) {
     m_index = pwm.getChannel();
-  }
-
-  /**
-   * Constructs from a PWMMotorController object.
-   *
-   * @param motorctrl PWMMotorController to simulate
-   */
-  public PWMSim(PWMMotorController motorctrl) {
-    m_index = motorctrl.getChannel();
   }
 
   /**
@@ -102,75 +92,16 @@ public class PWMSim {
   }
 
   /**
-   * Register a callback to be run when the PWM speed changes.
-   *
-   * @param callback the callback
-   * @param initialNotify whether to run the callback with the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public CallbackStore registerSpeedCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = PWMDataJNI.registerSpeedCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, PWMDataJNI::cancelSpeedCallback);
-  }
-
-  /**
-   * Get the PWM speed.
-   *
-   * @return the PWM speed (-1.0 to 1.0)
-   */
-  public double getSpeed() {
-    return PWMDataJNI.getSpeed(m_index);
-  }
-
-  /**
-   * Set the PWM speed.
-   *
-   * @param speed the PWM speed (-1.0 to 1.0)
-   */
-  public void setSpeed(double speed) {
-    PWMDataJNI.setSpeed(m_index, speed);
-  }
-
-  /**
-   * Register a callback to be run when the PWM position changes.
-   *
-   * @param callback the callback
-   * @param initialNotify whether to run the callback with the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public CallbackStore registerPositionCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = PWMDataJNI.registerPositionCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, PWMDataJNI::cancelPositionCallback);
-  }
-
-  /**
-   * Get the PWM position.
-   *
-   * @return the PWM position (0.0 to 1.0)
-   */
-  public double getPosition() {
-    return PWMDataJNI.getPosition(m_index);
-  }
-
-  /**
-   * Set the PWM position.
-   *
-   * @param position the PWM position (0.0 to 1.0)
-   */
-  public void setPosition(double position) {
-    PWMDataJNI.setPosition(m_index, position);
-  }
-
-  /**
    * Register a callback to be run when the PWM period scale changes.
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial value
    * @return the {@link CallbackStore} object associated with this callback.
    */
-  public CallbackStore registerPeriodScaleCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = PWMDataJNI.registerPeriodScaleCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, PWMDataJNI::cancelPeriodScaleCallback);
+  public CallbackStore registerOutputPeriodCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid = PWMDataJNI.registerOutputPeriodCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, PWMDataJNI::cancelOutputPeriodCallback);
   }
 
   /**
@@ -178,47 +109,17 @@ public class PWMSim {
    *
    * @return the PWM period scale
    */
-  public int getPeriodScale() {
-    return PWMDataJNI.getPeriodScale(m_index);
+  public int getOutputPeriod() {
+    return PWMDataJNI.getOutputPeriod(m_index);
   }
 
   /**
    * Set the PWM period scale.
    *
-   * @param periodScale the PWM period scale
+   * @param period the PWM period scale
    */
-  public void setPeriodScale(int periodScale) {
-    PWMDataJNI.setPeriodScale(m_index, periodScale);
-  }
-
-  /**
-   * Register a callback to be run when the PWM zero latch state changes.
-   *
-   * @param callback the callback
-   * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public CallbackStore registerZeroLatchCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = PWMDataJNI.registerZeroLatchCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, PWMDataJNI::cancelZeroLatchCallback);
-  }
-
-  /**
-   * Check whether the PWM is zero latched.
-   *
-   * @return true if zero latched
-   */
-  public boolean getZeroLatch() {
-    return PWMDataJNI.getZeroLatch(m_index);
-  }
-
-  /**
-   * Define whether the PWM has been zero latched.
-   *
-   * @param zeroLatch true to indicate zero latched
-   */
-  public void setZeroLatch(boolean zeroLatch) {
-    PWMDataJNI.setZeroLatch(m_index, zeroLatch);
+  public void setOutputPeriod(int period) {
+    PWMDataJNI.setOutputPeriod(m_index, period);
   }
 
   /** Reset all simulation data. */

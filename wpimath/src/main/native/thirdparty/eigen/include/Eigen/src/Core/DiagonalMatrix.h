@@ -76,9 +76,9 @@ class DiagonalBase : public EigenBase<Derived> {
   }
 
   /** \returns the number of rows. */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const { return diagonal().size(); }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const { return diagonal().size(); }
   /** \returns the number of columns. */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const { return diagonal().size(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const { return diagonal().size(); }
 
   /** \returns the diagonal matrix product of \c *this by the dense matrix, \a matrix */
   template <typename MatrixDerived>
@@ -256,10 +256,13 @@ class DiagonalMatrix : public DiagonalBase<DiagonalMatrix<Scalar_, SizeAtCompile
   typedef DiagonalWrapper<const CwiseNullaryOp<internal::scalar_constant_op<Scalar>, DiagonalVectorType>>
       InitializeReturnType;
 
+  typedef DiagonalWrapper<const CwiseNullaryOp<internal::scalar_zero_op<Scalar>, DiagonalVectorType>>
+      ZeroInitializeReturnType;
+
   /** Initializes a diagonal matrix of size SizeAtCompileTime with coefficients set to zero */
-  EIGEN_DEVICE_FUNC static const InitializeReturnType Zero() { return DiagonalVectorType::Zero().asDiagonal(); }
+  EIGEN_DEVICE_FUNC static const ZeroInitializeReturnType Zero() { return DiagonalVectorType::Zero().asDiagonal(); }
   /** Initializes a diagonal matrix of size dim with coefficients set to zero */
-  EIGEN_DEVICE_FUNC static const InitializeReturnType Zero(Index size) {
+  EIGEN_DEVICE_FUNC static const ZeroInitializeReturnType Zero(Index size) {
     return DiagonalVectorType::Zero(size).asDiagonal();
   }
   /** Initializes a identity matrix of size SizeAtCompileTime */
@@ -386,8 +389,9 @@ struct AssignmentKind<DenseShape, DiagonalShape> {
 // Diagonal matrix to Dense assignment
 template <typename DstXprType, typename SrcXprType, typename Functor>
 struct Assignment<DstXprType, SrcXprType, Functor, Diagonal2Dense> {
-  static void run(DstXprType& dst, const SrcXprType& src,
-                  const internal::assign_op<typename DstXprType::Scalar, typename SrcXprType::Scalar>& /*func*/) {
+  static EIGEN_DEVICE_FUNC void run(
+      DstXprType& dst, const SrcXprType& src,
+      const internal::assign_op<typename DstXprType::Scalar, typename SrcXprType::Scalar>& /*func*/) {
     Index dstRows = src.rows();
     Index dstCols = src.cols();
     if ((dst.rows() != dstRows) || (dst.cols() != dstCols)) dst.resize(dstRows, dstCols);
@@ -396,13 +400,15 @@ struct Assignment<DstXprType, SrcXprType, Functor, Diagonal2Dense> {
     dst.diagonal() = src.diagonal();
   }
 
-  static void run(DstXprType& dst, const SrcXprType& src,
-                  const internal::add_assign_op<typename DstXprType::Scalar, typename SrcXprType::Scalar>& /*func*/) {
+  static EIGEN_DEVICE_FUNC void run(
+      DstXprType& dst, const SrcXprType& src,
+      const internal::add_assign_op<typename DstXprType::Scalar, typename SrcXprType::Scalar>& /*func*/) {
     dst.diagonal() += src.diagonal();
   }
 
-  static void run(DstXprType& dst, const SrcXprType& src,
-                  const internal::sub_assign_op<typename DstXprType::Scalar, typename SrcXprType::Scalar>& /*func*/) {
+  static EIGEN_DEVICE_FUNC void run(
+      DstXprType& dst, const SrcXprType& src,
+      const internal::sub_assign_op<typename DstXprType::Scalar, typename SrcXprType::Scalar>& /*func*/) {
     dst.diagonal() -= src.diagonal();
   }
 };

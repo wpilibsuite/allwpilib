@@ -75,7 +75,7 @@ HAL_ENUM(HAL_MatchType) {
  * struct. This is used for allocating buffers, not bounds checking, since there
  * are usually less POVs in practice.
  */
-#define HAL_kMaxJoystickPOVs 12
+#define HAL_kMaxJoystickPOVs 8
 /**
  * The maximum number of joysticks.
  */
@@ -84,13 +84,34 @@ HAL_ENUM(HAL_MatchType) {
 struct HAL_JoystickAxes {
   int16_t count;
   float axes[HAL_kMaxJoystickAxes];
-  uint8_t raw[HAL_kMaxJoystickAxes];
+  int16_t raw[HAL_kMaxJoystickAxes];
 };
 typedef struct HAL_JoystickAxes HAL_JoystickAxes;
 
+HAL_ENUM_WITH_UNDERLYING_TYPE(HAL_JoystickPOV, uint8_t){
+    /** Centered */
+    HAL_JoystickPOV_kCentered = 0x00u,
+    /** Up */
+    HAL_JoystickPOV_kUp = 0x01u,
+    /** Right */
+    HAL_JoystickPOV_kRight = 0x02u,
+    /** Down */
+    HAL_JoystickPOV_kDown = 0x04u,
+    /** Left */
+    HAL_JoystickPOV_kLeft = 0x08u,
+    /** Right-Up */
+    HAL_JoystickPOV_kRightUp = HAL_JoystickPOV_kRight | HAL_JoystickPOV_kUp,
+    /** Right-Down */
+    HAL_JoystickPOV_kRightDown = HAL_JoystickPOV_kRight | HAL_JoystickPOV_kDown,
+    /** Left-Up */
+    HAL_JoystickPOV_kLeftUp = HAL_JoystickPOV_kLeft | HAL_JoystickPOV_kUp,
+    /** Left-Down */
+    HAL_JoystickPOV_kLeftDown = HAL_JoystickPOV_kLeft | HAL_JoystickPOV_kDown,
+};
+
 struct HAL_JoystickPOVs {
   int16_t count;
-  int16_t povs[HAL_kMaxJoystickPOVs];
+  HAL_JoystickPOV povs[HAL_kMaxJoystickPOVs];
 };
 typedef struct HAL_JoystickPOVs HAL_JoystickPOVs;
 
@@ -101,7 +122,7 @@ struct HAL_JoystickButtons {
 typedef struct HAL_JoystickButtons HAL_JoystickButtons;
 
 struct HAL_JoystickDescriptor {
-  uint8_t isXbox;
+  uint8_t isGamepad;
   uint8_t type;
   char name[256];
   uint8_t axisCount;

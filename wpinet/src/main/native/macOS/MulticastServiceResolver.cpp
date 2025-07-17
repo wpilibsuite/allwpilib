@@ -72,8 +72,8 @@ void ServiceGetAddrInfoReply(DNSServiceRef sdRef, DNSServiceFlags flags,
   DnsResolveState* resolveState = static_cast<DnsResolveState*>(context);
 
   resolveState->data.hostName = hostname;
-  resolveState->data.ipv4Address =
-      reinterpret_cast<const struct sockaddr_in*>(address)->sin_addr.s_addr;
+  resolveState->data.ipv4Address = ntohl(
+      reinterpret_cast<const struct sockaddr_in*>(address)->sin_addr.s_addr);
 
   resolveState->pImpl->onFound(std::move(resolveState->data));
 
@@ -176,6 +176,24 @@ static void DnsCompletion(DNSServiceRef sdRef, DNSServiceFlags flags,
 }
 
 bool MulticastServiceResolver::HasImplementation() const {
+  return true;
+}
+
+bool MulticastServiceResolver::SetCopyCallback(
+    std::function<bool(const ServiceData&)> callback) {
+  if (pImpl->serviceRef) {
+    return false;
+  }
+  copyCallback = std::move(callback);
+  return true;
+}
+
+bool MulticastServiceResolver::SetMoveCallback(
+    std::function<void(ServiceData&&)> callback) {
+  if (pImpl->serviceRef) {
+    return false;
+  }
+  moveCallback = std::move(callback);
   return true;
 }
 

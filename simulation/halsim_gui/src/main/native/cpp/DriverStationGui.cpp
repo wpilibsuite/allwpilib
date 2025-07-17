@@ -142,14 +142,14 @@ class KeyboardJoystick : public SystemJoystick {
   struct PovConfig {
     explicit PovConfig(glass::Storage& storage);
 
-    int& key0;
-    int& key45;
-    int& key90;
-    int& key135;
-    int& key180;
-    int& key225;
-    int& key270;
-    int& key315;
+    int& keyUp;
+    int& keyUpRight;
+    int& keyRight;
+    int& keyDownRight;
+    int& keyDown;
+    int& keyDownLeft;
+    int& keyLeft;
+    int& keyUpLeft;
   };
 
   std::vector<std::unique_ptr<glass::Storage>>& m_povStorage;
@@ -393,29 +393,6 @@ void GlfwSystemJoystick::Update() {
   }
 }
 
-static int HatToAngle(unsigned char hat) {
-  switch (hat) {
-    case GLFW_HAT_UP:
-      return 0;
-    case GLFW_HAT_RIGHT:
-      return 90;
-    case GLFW_HAT_DOWN:
-      return 180;
-    case GLFW_HAT_LEFT:
-      return 270;
-    case GLFW_HAT_RIGHT_UP:
-      return 45;
-    case GLFW_HAT_RIGHT_DOWN:
-      return 135;
-    case GLFW_HAT_LEFT_UP:
-      return 315;
-    case GLFW_HAT_LEFT_DOWN:
-      return 225;
-    default:
-      return -1;
-  }
-}
-
 void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
   if (!m_present) {
     return;
@@ -438,7 +415,7 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
   }
 
   // copy into HAL structures
-  data->desc.isXbox = m_isGamepad ? 1 : 0;
+  data->desc.isGamepad = m_isGamepad ? 1 : 0;
   data->desc.type = m_isGamepad ? 21 : 20;
   std::strncpy(data->desc.name, m_name, sizeof(data->desc.name) - 1);
   data->desc.name[sizeof(data->desc.name) - 1] = '\0';
@@ -478,7 +455,16 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
 
   data->povs.count = data->desc.povCount;
   for (int j = 0; j < data->povs.count; ++j) {
-    data->povs.povs[j] = HatToAngle(m_hats[j]);
+#if __GNUC__ >= 12
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
+#endif  // __GNUC__ >= 12
+    // From https://www.glfw.org/docs/latest/group__hat__state.html, GLFW hat
+    // states use the same format
+    data->povs.povs[j] = static_cast<HAL_JoystickPOV>(m_hats[j]);
+#if __GNUC__ >= 12
+#pragma GCC diagnostic pop
+#endif  // __GNUC__ >= 12
   }
 }
 
@@ -498,38 +484,38 @@ KeyboardJoystick::AxisConfig::AxisConfig(glass::Storage& storage)
 }
 
 KeyboardJoystick::PovConfig::PovConfig(glass::Storage& storage)
-    : key0{storage.GetInt("key0", -1)},
-      key45{storage.GetInt("key45", -1)},
-      key90{storage.GetInt("key90", -1)},
-      key135{storage.GetInt("key135", -1)},
-      key180{storage.GetInt("key180", -1)},
-      key225{storage.GetInt("key225", -1)},
-      key270{storage.GetInt("key270", -1)},
-      key315{storage.GetInt("key315", -1)} {
+    : keyUp{storage.GetInt("keyUp", -1)},
+      keyUpRight{storage.GetInt("keyUpRight", -1)},
+      keyRight{storage.GetInt("keyRight", -1)},
+      keyDownRight{storage.GetInt("keyDownRight", -1)},
+      keyDown{storage.GetInt("keyDown", -1)},
+      keyDownLeft{storage.GetInt("keyDownLeft", -1)},
+      keyLeft{storage.GetInt("keyLeft", -1)},
+      keyUpLeft{storage.GetInt("keyUpLeft", -1)} {
   // sanity check the key ranges
-  if (key0 < -1 || key0 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
-    key0 = -1;
+  if (keyUp < -1 || keyUp >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    keyUp = -1;
   }
-  if (key45 < -1 || key45 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
-    key45 = -1;
+  if (keyUpRight < -1 || keyUpRight >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    keyUpRight = -1;
   }
-  if (key90 < -1 || key90 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
-    key90 = -1;
+  if (keyRight < -1 || keyRight >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    keyRight = -1;
   }
-  if (key135 < -1 || key135 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
-    key135 = -1;
+  if (keyDownRight < -1 || keyDownRight >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    keyDownRight = -1;
   }
-  if (key180 < -1 || key180 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
-    key180 = -1;
+  if (keyDown < -1 || keyDown >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    keyDown = -1;
   }
-  if (key225 < -1 || key225 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
-    key225 = -1;
+  if (keyDownLeft < -1 || keyDownLeft >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    keyDownLeft = -1;
   }
-  if (key270 < -1 || key270 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
-    key270 = -1;
+  if (keyLeft < -1 || keyLeft >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    keyLeft = -1;
   }
-  if (key315 < -1 || key315 >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
-    key315 = -1;
+  if (keyUpLeft < -1 || keyUpLeft >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+    keyUpLeft = -1;
   }
 }
 
@@ -562,7 +548,7 @@ KeyboardJoystick::KeyboardJoystick(glass::Storage& storage, int index)
   }
 
   // init desc structure
-  m_data.desc.isXbox = 0;
+  m_data.desc.isGamepad = 0;
   m_data.desc.type = 20;
   std::strncpy(m_data.desc.name, m_name, 256);
 }
@@ -686,14 +672,14 @@ void KeyboardJoystick::SettingsDisplay() {
       wpi::format_to_n_c_str(label, sizeof(label), "POV {}", i);
 
       if (ImGui::TreeNodeEx(label, ImGuiTreeNodeFlags_DefaultOpen)) {
-        EditKey("  0 deg", &m_povConfig[i].key0);
-        EditKey(" 45 deg", &m_povConfig[i].key45);
-        EditKey(" 90 deg", &m_povConfig[i].key90);
-        EditKey("135 deg", &m_povConfig[i].key135);
-        EditKey("180 deg", &m_povConfig[i].key180);
-        EditKey("225 deg", &m_povConfig[i].key225);
-        EditKey("270 deg", &m_povConfig[i].key270);
-        EditKey("315 deg", &m_povConfig[i].key315);
+        EditKey("        Up", &m_povConfig[i].keyUp);
+        EditKey("  Up Right", &m_povConfig[i].keyUpRight);
+        EditKey("     Right", &m_povConfig[i].keyRight);
+        EditKey("Down Right", &m_povConfig[i].keyDownRight);
+        EditKey("      Down", &m_povConfig[i].keyDown);
+        EditKey(" Down Left", &m_povConfig[i].keyDownLeft);
+        EditKey("      Left", &m_povConfig[i].keyLeft);
+        EditKey("   Up Left", &m_povConfig[i].keyUpLeft);
         ImGui::TreePop();
       }
     }
@@ -778,23 +764,23 @@ void KeyboardJoystick::Update() {
   for (int i = 0; i < m_data.povs.count; ++i) {
     auto& config = m_povConfig[i];
     auto& povValue = m_data.povs.povs[i];
-    povValue = -1;
-    if (IsKeyDown(io, config.key0)) {
-      povValue = 0;
-    } else if (IsKeyDown(io, config.key45)) {
-      povValue = 45;
-    } else if (IsKeyDown(io, config.key90)) {
-      povValue = 90;
-    } else if (IsKeyDown(io, config.key135)) {
-      povValue = 135;
-    } else if (IsKeyDown(io, config.key180)) {
-      povValue = 180;
-    } else if (IsKeyDown(io, config.key225)) {
-      povValue = 225;
-    } else if (IsKeyDown(io, config.key270)) {
-      povValue = 270;
-    } else if (IsKeyDown(io, config.key315)) {
-      povValue = 315;
+    povValue = HAL_JoystickPOV_kCentered;
+    if (IsKeyDown(io, config.keyUp)) {
+      povValue = HAL_JoystickPOV_kUp;
+    } else if (IsKeyDown(io, config.keyUpRight)) {
+      povValue = HAL_JoystickPOV_kRightUp;
+    } else if (IsKeyDown(io, config.keyRight)) {
+      povValue = HAL_JoystickPOV_kRight;
+    } else if (IsKeyDown(io, config.keyDownRight)) {
+      povValue = HAL_JoystickPOV_kRightDown;
+    } else if (IsKeyDown(io, config.keyDown)) {
+      povValue = HAL_JoystickPOV_kDown;
+    } else if (IsKeyDown(io, config.keyDownLeft)) {
+      povValue = HAL_JoystickPOV_kLeftDown;
+    } else if (IsKeyDown(io, config.keyLeft)) {
+      povValue = HAL_JoystickPOV_kLeft;
+    } else if (IsKeyDown(io, config.keyUpLeft)) {
+      povValue = HAL_JoystickPOV_kLeftUp;
     }
   }
 
@@ -827,29 +813,29 @@ void KeyboardJoystick::ClearKey(int key) {
     }
   }
   for (auto&& config : m_povConfig) {
-    if (config.key0 == key) {
-      config.key0 = -1;
+    if (config.keyUp == key) {
+      config.keyUp = -1;
     }
-    if (config.key45 == key) {
-      config.key45 = -1;
+    if (config.keyUpRight == key) {
+      config.keyUpRight = -1;
     }
-    if (config.key90 == key) {
-      config.key90 = -1;
+    if (config.keyRight == key) {
+      config.keyRight = -1;
     }
-    if (config.key135 == key) {
-      config.key135 = -1;
+    if (config.keyDownRight == key) {
+      config.keyDownRight = -1;
     }
-    if (config.key180 == key) {
-      config.key180 = -1;
+    if (config.keyDown == key) {
+      config.keyDown = -1;
     }
-    if (config.key225 == key) {
-      config.key225 = -1;
+    if (config.keyDownLeft == key) {
+      config.keyDownLeft = -1;
     }
-    if (config.key270 == key) {
-      config.key270 = -1;
+    if (config.keyLeft == key) {
+      config.keyLeft = -1;
     }
-    if (config.key315 == key) {
-      config.key315 = -1;
+    if (config.keyUpLeft == key) {
+      config.keyUpLeft = -1;
     }
   }
 }
@@ -885,14 +871,14 @@ GlfwKeyboardJoystick::GlfwKeyboardJoystick(glass::Storage& storage, int index)
       m_povCount = 1;
       m_povStorage.emplace_back(std::make_unique<glass::Storage>());
       m_povConfig.emplace_back(*m_povStorage.back());
-      m_povConfig[0].key0 = GLFW_KEY_KP_8;
-      m_povConfig[0].key45 = GLFW_KEY_KP_9;
-      m_povConfig[0].key90 = GLFW_KEY_KP_6;
-      m_povConfig[0].key135 = GLFW_KEY_KP_3;
-      m_povConfig[0].key180 = GLFW_KEY_KP_2;
-      m_povConfig[0].key225 = GLFW_KEY_KP_1;
-      m_povConfig[0].key270 = GLFW_KEY_KP_4;
-      m_povConfig[0].key315 = GLFW_KEY_KP_7;
+      m_povConfig[0].keyUp = GLFW_KEY_KP_8;
+      m_povConfig[0].keyUpRight = GLFW_KEY_KP_9;
+      m_povConfig[0].keyRight = GLFW_KEY_KP_6;
+      m_povConfig[0].keyDownRight = GLFW_KEY_KP_3;
+      m_povConfig[0].keyDown = GLFW_KEY_KP_2;
+      m_povConfig[0].keyDownLeft = GLFW_KEY_KP_1;
+      m_povConfig[0].keyLeft = GLFW_KEY_KP_4;
+      m_povConfig[0].keyUpLeft = GLFW_KEY_KP_7;
     }
   } else if (index == 1) {
     if (m_axisCount == -1 && m_axisStorage.empty()) {
@@ -1326,7 +1312,7 @@ static void DisplayJoysticks() {
       ImGui::PushID(i);
       if (disableDS) {
         ImGui::Text("%s", joy.data.desc.name);
-        ImGui::Text("Gamepad: %s", joy.data.desc.isXbox ? "Yes" : "No");
+        ImGui::Text("Gamepad: %s", joy.data.desc.isGamepad ? "Yes" : "No");
       } else {
         ImGui::Text("%d: %s", joy.sys->GetIndex(), joy.sys->GetName());
 

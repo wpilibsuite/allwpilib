@@ -11,20 +11,15 @@ namespace hal {
 class PWMData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(PulseMicrosecond)
-  HAL_SIMDATAVALUE_DEFINE_NAME(Speed)
-  HAL_SIMDATAVALUE_DEFINE_NAME(Position)
-  HAL_SIMDATAVALUE_DEFINE_NAME(PeriodScale)
-  HAL_SIMDATAVALUE_DEFINE_NAME(ZeroLatch)
+  HAL_SIMDATAVALUE_DEFINE_NAME(OutputPeriod)
 
  public:
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
       false};
+  std::atomic<HAL_SimDeviceHandle> simDevice;
   SimDataValue<int32_t, HAL_MakeInt, GetPulseMicrosecondName> pulseMicrosecond{
       0};
-  SimDataValue<double, HAL_MakeDouble, GetSpeedName> speed{0};
-  SimDataValue<double, HAL_MakeDouble, GetPositionName> position{0};
-  SimDataValue<int32_t, HAL_MakeInt, GetPeriodScaleName> periodScale{0};
-  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetZeroLatchName> zeroLatch{false};
+  SimDataValue<int32_t, HAL_MakeInt, GetOutputPeriodName> outputPeriod{0};
 
   virtual void ResetData();
 };

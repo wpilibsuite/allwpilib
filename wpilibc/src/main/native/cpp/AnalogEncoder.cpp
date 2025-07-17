@@ -80,7 +80,7 @@ double AnalogEncoder::Get() const {
   }
 
   double analog = m_analogInput->GetVoltage();
-  double pos = analog / RobotController::GetVoltage5V();
+  double pos = analog / RobotController::GetVoltage3V3();
 
   // Map sensor range if range isn't full
   pos = MapSensorRange(pos);

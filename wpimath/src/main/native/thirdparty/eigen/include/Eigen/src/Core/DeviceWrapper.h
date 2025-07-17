@@ -66,7 +66,7 @@ struct AssignmentWithDevice<DstXprType, Product<Lhs, Rhs, Options>, Functor, Dev
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void run(DstXprType& dst, const SrcXprType& src, const Functor& func,
                                                         Device&) {
     Base::run(dst, src, func);
-  };
+  }
 };
 
 // specialization for coeffcient-wise assignment
@@ -87,13 +87,13 @@ template <typename Kernel, typename Device, int Traversal = Kernel::AssignmentTr
           int Unrolling = Kernel::AssignmentTraits::Unrolling>
 struct dense_assignment_loop_with_device {
   using Base = dense_assignment_loop<Kernel, Traversal, Unrolling>;
-  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR void run(Kernel& kernel, Device&) { Base::run(kernel); }
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void run(Kernel& kernel, Device&) { Base::run(kernel); }
 };
 
 // entry point for a generic expression with device
 template <typename Dst, typename Src, typename Func, typename Device>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR void call_assignment_no_alias(DeviceWrapper<Dst, Device> dst,
-                                                                                    const Src& src, const Func& func) {
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void call_assignment_no_alias(DeviceWrapper<Dst, Device> dst,
+                                                                              const Src& src, const Func& func) {
   enum {
     NeedToTranspose = ((int(Dst::RowsAtCompileTime) == 1 && int(Src::ColsAtCompileTime) == 1) ||
                        (int(Dst::ColsAtCompileTime) == 1 && int(Src::RowsAtCompileTime) == 1)) &&
@@ -115,10 +115,8 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR void call_assignment_no_al
 
 // copy and pasted from AssignEvaluator except forward device to kernel
 template <typename DstXprType, typename SrcXprType, typename Functor, typename Device>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR void call_dense_assignment_loop(DstXprType& dst,
-                                                                                      const SrcXprType& src,
-                                                                                      const Functor& func,
-                                                                                      Device& device) {
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void call_dense_assignment_loop(DstXprType& dst, const SrcXprType& src,
+                                                                                const Functor& func, Device& device) {
   using DstEvaluatorType = evaluator<DstXprType>;
   using SrcEvaluatorType = evaluator<SrcXprType>;
 

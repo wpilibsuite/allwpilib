@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <frc/DriverStation.h>
 #include <frc/GenericHID.h>
 
 #include "Trigger.h"
@@ -26,7 +27,8 @@ class POVButton : public Trigger {
    * @param angle The angle of the POV corresponding to a button press.
    * @param povNumber The number of the POV on the joystick.
    */
-  POVButton(frc::GenericHID* joystick, int angle, int povNumber = 0)
+  POVButton(frc::GenericHID* joystick, frc::DriverStation::POVDirection angle,
+            int povNumber = 0)
       : Trigger([joystick, angle, povNumber] {
           return joystick->GetPOV(povNumber) == angle;
         }) {}

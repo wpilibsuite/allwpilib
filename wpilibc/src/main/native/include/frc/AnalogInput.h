@@ -44,7 +44,7 @@ class AnalogInput : public wpi::Sendable,
   /**
    * Get a sample straight from this channel.
    *
-   * The sample is a 12-bit value representing the 0V to 5V range of the A/D
+   * The sample is a 12-bit value representing the 0V to 3.3V range of the A/D
    * converter in the module.  The units are in A/D converter codes.  Use
    * GetVoltage() to get the analog value in calibrated units.
    *

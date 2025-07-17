@@ -1,5 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
@@ -55,7 +57,6 @@ cc_library(
     ]),
     includes = ["src/main/native/thirdparty/libuv/src"],
     strip_include_prefix = "src/main/native/thirdparty/libuv/include",
-    visibility = ["//wpinet:__subpackages__"],
 )
 
 filegroup(
@@ -72,20 +73,22 @@ filegroup(
     visibility = ["//wpinet:__subpackages__"],
 )
 
-cc_library(
-    name = "tcpsockets-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/tcpsockets/include/**/*.h",
-    ]),
-    includes = ["src/main/native/thirdparty/tcpsockets/include"],
-    strip_include_prefix = "src/main/native/thirdparty/tcpsockets/include",
-    visibility = ["//wpinet:__subpackages__"],
+pkg_files(
+    name = "thirdparty-libuv-hdr-pkg",
+    srcs = glob(["src/main/native/thirdparty/libuv/include/**"]),
+    strip_prefix = "src/main/native/thirdparty/libuv/include",
 )
 
-filegroup(
-    name = "tcpsockets-srcs",
-    srcs = glob(["src/main/native/thirdparty/tcpsockets/cpp/**"]),
-    visibility = ["//wpinet:__subpackages__"],
+pkg_files(
+    name = "thirdparty-libuv-src-pkg",
+    srcs = glob(["src/main/native/thirdparty/libuv/src/**"]),
+    strip_prefix = "src/main/native/thirdparty/libuv/src",
+)
+
+third_party_cc_lib_helper(
+    name = "tcpsockets",
+    include_root = "src/main/native/thirdparty/tcpsockets/include",
+    src_root = "src/main/native/thirdparty/tcpsockets/cpp",
 )
 
 generate_resources(
@@ -112,28 +115,59 @@ cc_library(
     strip_include_prefix = "src/main/native/cpp",
 )
 
-cc_library(
-    name = "wpinet.static",
+wpilib_cc_library(
+    name = "wpinet",
     srcs = glob(
         ["src/main/native/cpp/**"],
         exclude = ["src/main/native/cpp/jni/**"],
     ) + [
         ":libuv-srcs",
-        ":tcpsockets-srcs",
     ] + ["native-srcs"],
     hdrs = glob(["src/main/native/include/**/*"]),
+    extra_hdr_pkg_files = [":thirdparty-libuv-hdr-pkg"],
+    extra_src_pkg_files = [
+        ":wpinet-java-jni-hdrs-pkg",
+    ],
     includes = ["src/main/native/include"],
     linkopts = select({
-        "@bazel_tools//src/conditions:linux": ["-ldl"],
+        "@bazel_tools//src/conditions:linux": [
+            "-Wl,--push-state,-as-needed",
+            "-ldl",
+            "-Wl,--pop-state",
+        ],
         "//conditions:default": [],
     }),
     strip_include_prefix = "src/main/native/include",
+    third_party_libraries = [
+        ":tcpsockets",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":libuv-headers",
         ":private_includes",
-        ":tcpsockets-headers",
-        "//wpiutil:wpiutil.static",
+        "//wpiutil",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/wpinet",
+    dynamic_deps = [
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpinet",
+    ],
+)
+
+wpilib_cc_static_library(
+    name = "static/wpinet",
+    static_deps = [
+        "//wpiutil:static/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpinet",
     ],
 )
 
@@ -146,8 +180,19 @@ wpilib_jni_cc_library(
     java_dep = ":wpinet-java",
     visibility = ["//visibility:public"],
     deps = [
-        ":wpinet.static",
+        ":wpinet",
     ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/wpinetjni",
+    auto_export_windows_symbols = False,
+    dynamic_deps = [
+        ":shared/wpinet",
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":wpinetjni"],
 )
 
 wpilib_jni_java_library(
@@ -169,8 +214,8 @@ cc_test(
     ]),
     tags = ["no-asan"],
     deps = [
-        ":wpinet.static",
-        "//thirdparty/googletest:googletest.static",
+        ":wpinet",
+        "//thirdparty/googletest",
         "//wpiutil:wpiutil-testlib",
     ],
 )
@@ -187,7 +232,7 @@ cc_binary(
     name = "DevMain-Cpp",
     srcs = ["src/dev/native/cpp/main.cpp"],
     deps = [
-        ":wpinet.static",
+        ":wpinet",
     ],
 )
 
@@ -209,7 +254,7 @@ cc_binary(
         "//conditions:default": [],
     }),
     deps = [
-        ":wpinet.static",
+        ":wpinet",
     ],
 )
 
@@ -217,7 +262,7 @@ cc_binary(
     name = "netconsoleTee",
     srcs = ["src/netconsoleTee/native/cpp/main.cpp"],
     deps = [
-        ":wpinet.static",
+        ":wpinet",
     ],
 )
 
@@ -225,7 +270,7 @@ cc_binary(
     name = "dsclient",
     srcs = ["examples/dsclient/dsclient.cpp"],
     deps = [
-        ":wpinet.static",
+        ":wpinet",
     ],
 )
 
@@ -233,7 +278,7 @@ cc_binary(
     name = "parallelconnect",
     srcs = ["examples/parallelconnect/parallelconnect.cpp"],
     deps = [
-        ":wpinet.static",
+        ":wpinet",
     ],
 )
 
@@ -241,6 +286,6 @@ cc_binary(
     name = "webserver",
     srcs = ["examples/webserver/webserver.cpp"],
     deps = [
-        ":wpinet.static",
+        ":wpinet",
     ],
 )

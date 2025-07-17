@@ -13,11 +13,11 @@ import edu.wpi.first.math.util.Units;
 /**
  * This holonomic drive controller can be used to follow trajectories using a holonomic drivetrain
  * (i.e. swerve or mecanum). Holonomic trajectory following is a much simpler problem to solve
- * compared to skid-steer style drivetrains because it is possible to individually control forward,
- * sideways, and angular velocity.
+ * compared to skid-steer style drivetrains because it is possible to individually control
+ * field-relative x, y, and angular velocity.
  *
- * <p>The holonomic drive controller takes in one PID controller for each direction, forward and
- * sideways, and one profiled PID controller for the angular direction. Because the heading dynamics
+ * <p>The holonomic drive controller takes in one PID controller for each direction, field-relative
+ * x and y, and one profiled PID controller for the angular direction. Because the heading dynamics
  * are decoupled from translations, users can specify a custom heading that the drivetrain should
  * point toward. This heading reference is profiled for smoothness.
  */

@@ -118,7 +118,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Returns the DC motor's position.
    *
-   * @return The DC motor's position in meters.
+   * @return The DC motor's position in radians.
    */
   public double getAngularPosition() {
     return getOutput(0);
@@ -127,7 +127,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
   /**
    * Returns the DC motor's velocity.
    *
-   * @return The DC motor's velocity.
+   * @return The DC motor's velocity in radians per second.
    */
   public double getAngularVelocity() {
     return getOutput(1);

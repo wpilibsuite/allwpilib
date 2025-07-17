@@ -41,8 +41,9 @@ wpi::Protobuf<mrc::JoystickDescriptor>::Unpack(InputStream& Stream) {
   OutputData.SetPovsCount(Msg.PovCount);
   OutputData.SetButtonsCount(Msg.ButtonCount);
 
-  OutputData.IsXbox = Msg.IsXbox ? 1 : 0;
+  OutputData.IsGamepad = Msg.IsGamepad ? 1 : 0;
   OutputData.Type = Msg.JoystickType;
+  OutputData.RumbleCount = Msg.RumbleCount;
 
   return OutputData;
 }
@@ -58,10 +59,11 @@ bool wpi::Protobuf<mrc::JoystickDescriptor>::Pack(
   mrc_proto_ProtobufJoystickDescriptor Msg{
       .JoystickName = JoystickNameCb.Callback(),
       .AxisTypes = AxisTypesCb.Callback(),
-      .IsXbox = Value.IsXbox ? true : false,
+      .IsGamepad = Value.IsGamepad ? true : false,
       .JoystickType = Value.Type,
       .ButtonCount = static_cast<int32_t>(Value.GetButtonsCount()),
       .PovCount = static_cast<int32_t>(Value.GetPovsCount()),
+      .RumbleCount = Value.RumbleCount,
   };
 
   return Stream.Encode(Msg);

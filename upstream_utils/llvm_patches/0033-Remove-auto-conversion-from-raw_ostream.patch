@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sun, 17 Mar 2024 14:51:11 -0700
+Subject: [PATCH 33/36] Remove auto-conversion from raw_ostream
+
+---
+ llvm/lib/Support/raw_ostream.cpp | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
+
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index c9e62f5c1c4a194fb12ad604bc7f2a72d421c2e1..e387577d7a040a1698b14c821eb4197d376fc631 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -19,7 +19,6 @@
+ #include "wpi/SmallVector.h"
+ #include "llvm/ADT/StringExtras.h"
+ #include "llvm/Config/config.h"
+-#include "llvm/Support/AutoConvert.h"
+ #include "llvm/Support/Compiler.h"
+ #include "llvm/Support/ErrorHandling.h"
+ #include "llvm/Support/FileSystem.h"
+@@ -604,21 +603,13 @@ void raw_fd_ostream::anchor() {}
+ raw_fd_ostream &llvm::outs() {
+   // Set buffer settings to model stdout behavior.
+   std::error_code EC;
+-#ifdef __MVS__
+-  EC = enablezOSAutoConversion(STDOUT_FILENO);
+-  assert(!EC);
+-#endif
+   static raw_fd_ostream* S = new raw_fd_ostream("-", EC, sys::fs::OF_None);
+   assert(!EC);
+   return *S;
+ }
+ 
+ raw_fd_ostream &llvm::errs() {
+-  // Set standard error to be unbuffered.
+-#ifdef __MVS__
+-  std::error_code EC = enablezOSAutoConversion(STDERR_FILENO);
+-  assert(!EC);
+-#endif
++  // Set standard error to be unbuffered and tied to outs() by default.
+   static raw_fd_ostream* S = new raw_fd_ostream(STDERR_FILENO, false, true);
+   return *S;
+ }

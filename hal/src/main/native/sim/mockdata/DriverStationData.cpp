@@ -251,7 +251,7 @@ void DriverStationData::SetJoystickAxis(int32_t stick, int32_t axis,
 }
 
 void DriverStationData::SetJoystickPOV(int32_t stick, int32_t pov,
-                                       int32_t value) {
+                                       HAL_JoystickPOV value) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
@@ -320,12 +320,13 @@ void DriverStationData::GetJoystickCounts(int32_t stick, int32_t* axisCount,
   *povCount = m_joystickData[stick].povs.count;
 }
 
-void DriverStationData::SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox) {
+void DriverStationData::SetJoystickIsGamepad(int32_t stick,
+                                             HAL_Bool isGamepad) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
-  m_joystickData[stick].descriptor.isXbox = isXbox;
+  m_joystickData[stick].descriptor.isGamepad = isGamepad;
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
@@ -506,7 +507,7 @@ void HALSIM_SetJoystickAxis(int32_t stick, int32_t axis, double value) {
   SimDriverStationData->SetJoystickAxis(stick, axis, value);
 }
 
-void HALSIM_SetJoystickPOV(int32_t stick, int32_t pov, int32_t value) {
+void HALSIM_SetJoystickPOV(int32_t stick, int32_t pov, HAL_JoystickPOV value) {
   SimDriverStationData->SetJoystickPOV(stick, pov, value);
 }
 
@@ -532,8 +533,8 @@ void HALSIM_GetJoystickCounts(int32_t stick, int32_t* axisCount,
                                           povCount);
 }
 
-void HALSIM_SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox) {
-  SimDriverStationData->SetJoystickIsXbox(stick, isXbox);
+void HALSIM_SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad) {
+  SimDriverStationData->SetJoystickIsGamepad(stick, isGamepad);
 }
 
 void HALSIM_SetJoystickType(int32_t stick, int32_t type) {

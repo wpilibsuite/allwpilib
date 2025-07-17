@@ -15,9 +15,8 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
 public class RomiMotor extends PWMMotorController {
   /** Common initialization code called by all constructors. */
   protected final void initRomiMotor() {
-    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
-    m_pwm.setSpeed(0.0);
-    m_pwm.setZeroLatch();
+    m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
+    setSpeed(0.0);
   }
 
   /**
@@ -26,6 +25,7 @@ public class RomiMotor extends PWMMotorController {
    * @param channel The PWM channel that the RomiMotor is attached to. 0 is the left motor, 1 is the
    *     right.
    */
+  @SuppressWarnings("this-escape")
   public RomiMotor(final int channel) {
     super("Romi Motor", channel);
     initRomiMotor();

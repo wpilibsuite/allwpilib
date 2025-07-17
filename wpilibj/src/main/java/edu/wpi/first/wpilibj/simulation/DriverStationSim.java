@@ -364,10 +364,10 @@ public final class DriverStationSim {
    *
    * @param stick The joystick number
    * @param pov The POV number
-   * @param value the angle of the POV in degrees, or -1 for not pressed
+   * @param value the angle of the POV
    */
-  public static void setJoystickPOV(int stick, int pov, int value) {
-    DriverStationDataJNI.setJoystickPOV(stick, pov, value);
+  public static void setJoystickPOV(int stick, int pov, DriverStation.POVDirection value) {
+    DriverStationDataJNI.setJoystickPOV(stick, pov, value.value);
   }
 
   /**
@@ -411,13 +411,13 @@ public final class DriverStationSim {
   }
 
   /**
-   * Sets the value of isXbox for a joystick.
+   * Sets the value of isGamepad for a joystick.
    *
    * @param stick The joystick number
-   * @param isXbox The value of isXbox
+   * @param isGamepad The value of isGamepad
    */
-  public static void setJoystickIsXbox(int stick, boolean isXbox) {
-    DriverStationDataJNI.setJoystickIsXbox(stick, isXbox);
+  public static void setJoystickIsGamepad(int stick, boolean isGamepad) {
+    DriverStationDataJNI.setJoystickIsGamepad(stick, isGamepad);
   }
 
   /**

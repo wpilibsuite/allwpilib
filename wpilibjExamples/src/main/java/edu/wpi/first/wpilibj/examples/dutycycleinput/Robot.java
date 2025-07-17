@@ -18,7 +18,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     // Duty Cycle Frequency in Hz
-    int frequency = m_dutyCycle.getFrequency();
+    double frequency = m_dutyCycle.getFrequency();
 
     // Output of duty cycle, ranging from 0 to 1
     // 1 is fully on, 0 is fully off

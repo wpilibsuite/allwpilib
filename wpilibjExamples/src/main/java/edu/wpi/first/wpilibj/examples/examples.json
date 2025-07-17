@@ -114,7 +114,8 @@
     "foldername": "potentiometerpid",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "Elevator with trapezoid profiled PID",
@@ -461,7 +462,7 @@
   },
   {
     "name": "DriveDistanceOffboard",
-    "description": "Drive a differential drivetrain a set distance using TrapezoidProfileCommand and smart motor controller PID.",
+    "description": "Drive a differential drivetrain a set distance using TrapezoidProfile and smart motor controller PID.",
     "tags": [
       "Command-based",
       "Differential Drive",
@@ -607,7 +608,8 @@
     "foldername": "elevatorsimulation",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "Elevator Exponential Profile Simulation",
@@ -640,7 +642,8 @@
     "foldername": "armsimulation",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "UnitTesting",
@@ -749,7 +752,8 @@
     "foldername": "digitalcommunication",
     "gradlebase": "java",
     "commandversion": 2,
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "hasunittests": true
   },
   {
     "name": "I2C Communication Sample",
@@ -761,7 +765,8 @@
     "foldername": "i2ccommunication",
     "gradlebase": "java",
     "commandversion": 2,
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "hasunittests": true
   },
   {
     "name": "Flywheel BangBangController",

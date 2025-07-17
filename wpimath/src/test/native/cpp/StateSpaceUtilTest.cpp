@@ -33,6 +33,19 @@ TEST(StateSpaceUtilTest, CostArray) {
   EXPECT_NEAR(mat(2, 2), 1.0 / 9.0, 1e-3);
 }
 
+TEST(StateSpaceUtilTest, CostDynamic) {
+  Eigen::MatrixXd mat = frc::MakeCostMatrix(std::vector{1.0, 2.0, 3.0});
+  EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
+  EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
+  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
+  EXPECT_NEAR(mat(1, 0), 0.0, 1e-3);
+  EXPECT_NEAR(mat(1, 1), 1.0 / 4.0, 1e-3);
+  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
+  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
+  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
+  EXPECT_NEAR(mat(2, 2), 1.0 / 9.0, 1e-3);
+}
+
 TEST(StateSpaceUtilTest, CovParameterPack) {
   constexpr frc::Matrixd<3, 3> mat = frc::MakeCovMatrix(1.0, 2.0, 3.0);
   EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
@@ -59,6 +72,19 @@ TEST(StateSpaceUtilTest, CovArray) {
   EXPECT_NEAR(mat(2, 2), 9.0, 1e-3);
 }
 
+TEST(StateSpaceUtilTest, CovDynamic) {
+  Eigen::MatrixXd mat = frc::MakeCovMatrix(std::vector{1.0, 2.0, 3.0});
+  EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
+  EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
+  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
+  EXPECT_NEAR(mat(1, 0), 0.0, 1e-3);
+  EXPECT_NEAR(mat(1, 1), 4.0, 1e-3);
+  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
+  EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
+  EXPECT_NEAR(mat(1, 2), 0.0, 1e-3);
+  EXPECT_NEAR(mat(2, 2), 9.0, 1e-3);
+}
+
 TEST(StateSpaceUtilTest, WhiteNoiseVectorParameterPack) {
   [[maybe_unused]]
   frc::Vectord<2> vec = frc::MakeWhiteNoiseVector(2.0, 3.0);
@@ -67,6 +93,11 @@ TEST(StateSpaceUtilTest, WhiteNoiseVectorParameterPack) {
 TEST(StateSpaceUtilTest, WhiteNoiseVectorArray) {
   [[maybe_unused]]
   frc::Vectord<2> vec = frc::MakeWhiteNoiseVector<2>({2.0, 3.0});
+}
+
+TEST(StateSpaceUtilTest, WhiteNoiseVectorDynamic) {
+  [[maybe_unused]]
+  Eigen::VectorXd vec = frc::MakeWhiteNoiseVector(std::vector{2.0, 3.0});
 }
 
 TEST(StateSpaceUtilTest, IsStabilizable) {

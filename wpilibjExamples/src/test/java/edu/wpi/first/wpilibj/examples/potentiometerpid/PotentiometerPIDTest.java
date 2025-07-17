@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.JoystickSim;
-import edu.wpi.first.wpilibj.simulation.PWMSim;
+import edu.wpi.first.wpilibj.simulation.PWMMotorControllerSim;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +34,7 @@ class PotentiometerPIDTest {
   private Thread m_thread;
 
   private ElevatorSim m_elevatorSim;
-  private PWMSim m_motorSim;
+  private PWMMotorControllerSim m_motorSim;
   private AnalogInputSim m_analogSim;
   private SimPeriodicBeforeCallback m_callback;
   private JoystickSim m_joystickSim;
@@ -57,7 +57,7 @@ class PotentiometerPIDTest {
             true,
             0);
     m_analogSim = new AnalogInputSim(Robot.kPotChannel);
-    m_motorSim = new PWMSim(Robot.kMotorChannel);
+    m_motorSim = new PWMMotorControllerSim(Robot.kMotorChannel);
     m_joystickSim = new JoystickSim(Robot.kJoystickChannel);
 
     m_callback =
@@ -68,12 +68,12 @@ class PotentiometerPIDTest {
               m_elevatorSim.update(0.02);
 
               /*
-              meters = (v / 5v) * range
-              meters / range = v / 5v
-              5v * (meters / range) = v
+              meters = (v / 3.3v) * range
+              meters / range = v / 3.3v
+              3.3v * (meters / range) = v
                */
               m_analogSim.setVoltage(
-                  RobotController.getVoltage5V()
+                  RobotController.getVoltage3V3()
                       * (m_elevatorSim.getPosition() / Robot.kFullHeight));
             });
 
@@ -93,7 +93,6 @@ class PotentiometerPIDTest {
     m_robot.close();
     m_callback.close();
     m_analogSim.resetData();
-    m_motorSim.resetData();
   }
 
   @Test
@@ -104,7 +103,6 @@ class PotentiometerPIDTest {
       DriverStationSim.setEnabled(true);
       DriverStationSim.notifyNewData();
 
-      assertTrue(m_motorSim.getInitialized());
       assertTrue(m_analogSim.getInitialized());
     }
 

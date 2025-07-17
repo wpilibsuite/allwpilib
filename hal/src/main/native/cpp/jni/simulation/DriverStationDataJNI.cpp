@@ -452,22 +452,22 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxes
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickPOVs
- * Signature: (B[S)V
+ * Signature: (B[B)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVs
-  (JNIEnv* env, jclass, jbyte joystickNum, jshortArray povsArray)
+  (JNIEnv* env, jclass, jbyte joystickNum, jbyteArray povsArray)
 {
   HAL_JoystickPOVs povs;
   {
-    JSpan<const jshort> jArrayRef(env, povsArray);
+    JSpan<const jbyte> jArrayRef(env, povsArray);
     auto arrayRef = jArrayRef.array();
     auto arraySize = arrayRef.size();
     int maxCount =
         arraySize < HAL_kMaxJoystickPOVs ? arraySize : HAL_kMaxJoystickPOVs;
     povs.count = maxCount;
     for (int i = 0; i < maxCount; i++) {
-      povs.povs[i] = arrayRef[i];
+      povs.povs[i] = static_cast<HAL_JoystickPOV>(arrayRef[i]);
     }
   }
   HALSIM_SetJoystickPOVs(joystickNum, &povs);
@@ -642,13 +642,13 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxis
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickPOV
- * Signature: (III)V
+ * Signature: (IIB)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOV
-  (JNIEnv*, jclass, jint stick, jint pov, jint value)
+  (JNIEnv*, jclass, jint stick, jint pov, jbyte value)
 {
-  HALSIM_SetJoystickPOV(stick, pov, value);
+  HALSIM_SetJoystickPOV(stick, pov, static_cast<HAL_JoystickPOV>(value));
 }
 
 /*
@@ -701,14 +701,14 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButtonCount
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    setJoystickIsXbox
+ * Method:    setJoystickIsGamepad
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickIsXbox
-  (JNIEnv*, jclass, jint stick, jboolean isXbox)
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickIsGamepad
+  (JNIEnv*, jclass, jint stick, jboolean isGamepad)
 {
-  HALSIM_SetJoystickIsXbox(stick, isXbox);
+  HALSIM_SetJoystickIsGamepad(stick, isGamepad);
 }
 
 /*

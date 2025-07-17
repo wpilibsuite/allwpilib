@@ -15,18 +15,10 @@ using namespace frc;
 using namespace frc::sim;
 
 DutyCycleSim::DutyCycleSim(const DutyCycle& dutyCycle)
-    : m_index{dutyCycle.GetFPGAIndex()} {}
+    : m_index{dutyCycle.GetSourceChannel()} {}
 
 DutyCycleSim DutyCycleSim::CreateForChannel(int channel) {
-  int index = HALSIM_FindDutyCycleForChannel(channel);
-  if (index < 0) {
-    throw std::out_of_range("no duty cycle found for channel");
-  }
-  return DutyCycleSim{index};
-}
-
-DutyCycleSim DutyCycleSim::CreateForIndex(int index) {
-  return DutyCycleSim{index};
+  return DutyCycleSim{channel};
 }
 
 std::unique_ptr<CallbackStore> DutyCycleSim::RegisterInitializedCallback(
@@ -55,12 +47,12 @@ std::unique_ptr<CallbackStore> DutyCycleSim::RegisterFrequencyCallback(
   return store;
 }
 
-int DutyCycleSim::GetFrequency() const {
-  return HALSIM_GetDutyCycleFrequency(m_index);
+units::hertz_t DutyCycleSim::GetFrequency() const {
+  return units::hertz_t{HALSIM_GetDutyCycleFrequency(m_index)};
 }
 
-void DutyCycleSim::SetFrequency(int frequency) {
-  HALSIM_SetDutyCycleFrequency(m_index, frequency);
+void DutyCycleSim::SetFrequency(units::hertz_t frequency) {
+  HALSIM_SetDutyCycleFrequency(m_index, frequency.value());
 }
 
 std::unique_ptr<CallbackStore> DutyCycleSim::RegisterOutputCallback(

@@ -31,8 +31,6 @@ namespace internal {
 template <typename MatrixType, typename Rhs, typename Dest, typename Preconditioner>
 bool bicgstab(const MatrixType& mat, const Rhs& rhs, Dest& x, const Preconditioner& precond, Index& iters,
               typename Dest::RealScalar& tol_error) {
-  using std::abs;
-  using std::sqrt;
   typedef typename Dest::RealScalar RealScalar;
   typedef typename Dest::Scalar Scalar;
   typedef Matrix<Scalar, Dynamic, 1> VectorType;
@@ -43,14 +41,15 @@ bool bicgstab(const MatrixType& mat, const Rhs& rhs, Dest& x, const Precondition
   VectorType r = rhs - mat * x;
   VectorType r0 = r;
 
-  RealScalar r0_sqnorm = r0.squaredNorm();
-  RealScalar rhs_sqnorm = rhs.squaredNorm();
-  if (rhs_sqnorm == 0) {
+  RealScalar r0_norm = r0.stableNorm();
+  RealScalar r_norm = r0_norm;
+  RealScalar rhs_norm = rhs.stableNorm();
+  if (rhs_norm == 0) {
     x.setZero();
     return true;
   }
   Scalar rho(1);
-  Scalar alpha(1);
+  Scalar alpha(0);
   Scalar w(1);
 
   VectorType v = VectorType::Zero(n), p = VectorType::Zero(n);
@@ -59,21 +58,22 @@ bool bicgstab(const MatrixType& mat, const Rhs& rhs, Dest& x, const Precondition
 
   VectorType s(n), t(n);
 
-  RealScalar tol2 = tol * tol * rhs_sqnorm;
-  RealScalar eps2 = NumTraits<Scalar>::epsilon() * NumTraits<Scalar>::epsilon();
+  RealScalar eps = NumTraits<Scalar>::epsilon();
   Index i = 0;
   Index restarts = 0;
 
-  while (r.squaredNorm() > tol2 && i < maxIters) {
+  while (r_norm > tol && i < maxIters) {
     Scalar rho_old = rho;
-
     rho = r0.dot(r);
-    if (abs(rho) < eps2 * r0_sqnorm) {
+    if (Eigen::numext::abs(rho) / Eigen::numext::maxi(r0_norm, r_norm) < eps * Eigen::numext::mini(r0_norm, r_norm)) {
       // The new residual vector became too orthogonal to the arbitrarily chosen direction r0
       // Let's restart with a new r0:
       r = rhs - mat * x;
       r0 = r;
-      rho = r0_sqnorm = r.squaredNorm();
+      rho = r.squaredNorm();
+      r0_norm = r.stableNorm();
+      alpha = Scalar(0);
+      w = Scalar(1);
       if (restarts++ == 0) i = 0;
     }
     Scalar beta = (rho / rho_old) * (alpha / w);
@@ -82,23 +82,38 @@ bool bicgstab(const MatrixType& mat, const Rhs& rhs, Dest& x, const Precondition
     y = precond.solve(p);
 
     v.noalias() = mat * y;
-
-    alpha = rho / r0.dot(v);
+    Scalar theta = r0.dot(v);
+    // For small angles ∠(r0, v) < eps, random restart.
+    RealScalar v_norm = v.stableNorm();
+    if (Eigen::numext::abs(theta) / Eigen::numext::maxi(r0_norm, v_norm) < eps * Eigen::numext::mini(r0_norm, v_norm)) {
+      r = rhs - mat * x;
+      r0.setRandom();
+      r0_norm = r0.stableNorm();
+      rho = Scalar(1);
+      alpha = Scalar(0);
+      w = Scalar(1);
+      if (restarts++ == 0) i = 0;
+      continue;
+    }
+    alpha = rho / theta;
     s = r - alpha * v;
 
     z = precond.solve(s);
     t.noalias() = mat * z;
 
     RealScalar tmp = t.squaredNorm();
-    if (tmp > RealScalar(0))
+    if (tmp > RealScalar(0)) {
       w = t.dot(s) / tmp;
-    else
+    } else {
       w = Scalar(0);
+    }
     x += alpha * y + w * z;
     r = s - w * t;
+    r_norm = r.stableNorm();
     ++i;
   }
-  tol_error = sqrt(r.squaredNorm() / rhs_sqnorm);
+
+  tol_error = r_norm / rhs_norm;
   iters = i;
   return true;
 }

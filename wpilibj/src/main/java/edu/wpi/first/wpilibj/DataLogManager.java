@@ -29,7 +29,7 @@ import java.util.Random;
  * Centralized data log that provides automatic data log file management. It automatically cleans up
  * old files when disk space is low and renames the file based either on current date/time or (if
  * available) competition match number. The data file will be saved to a USB flash drive in a folder
- * named "logs" if one is attached, or to /home/lvuser/logs otherwise.
+ * named "logs" if one is attached, or to /home/systemcore/logs otherwise.
  *
  * <p>Log files are initially named "FRC_TBD_{random}.wpilog" until the DS connects. After the DS
  * connects, the log file is renamed to "FRC_yyyyMMdd_HHmmss.wpilog" (where the date/time is UTC).
@@ -251,17 +251,11 @@ public final class DataLogManager {
       } catch (IOException ex) {
         // ignored
       }
-      if (RobotBase.getRuntimeType() == RuntimeType.kRoboRIO) {
-        DriverStation.reportWarning(
-            "DataLogManager: Logging to RoboRIO 1 internal storage is not recommended!"
-                + " Plug in a FAT32 formatted flash drive!",
-            false);
-      }
-      if (!new File("/home/lvuser/logs").mkdir()) {
+      if (!new File("/home/systemcore/logs").mkdir()) {
         // ignored
       }
       HAL.reportUsage("DataLogManager", "Onboard");
-      return "/home/lvuser/logs";
+      return "/home/systemcore/logs";
     }
     String logDir = Filesystem.getOperatingDirectory().getAbsolutePath() + "/logs";
     if (!new File(logDir).mkdir()) {
@@ -297,7 +291,7 @@ public final class DataLogManager {
 
   private static void startConsoleLog() {
     if (RobotBase.isReal()) {
-      m_consoleLogger = new FileLogger("/home/lvuser/FRC_UserProgram.log", m_log, "console");
+      m_consoleLogger = new FileLogger("/home/systemcore/FRC_UserProgram.log", m_log, "console");
     }
   }
 

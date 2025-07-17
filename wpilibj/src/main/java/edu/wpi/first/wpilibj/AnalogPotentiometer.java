@@ -50,7 +50,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
    * fraction of the supply voltage, plus the offset.
    *
    * @param input The {@link AnalogInput} this potentiometer is plugged into.
-   * @param fullRange The angular value (in desired units) representing the full 0-5V range of the
+   * @param fullRange The angular value (in desired units) representing the full 0-3.3V range of the
    *     input.
    * @param offset The angular value (in desired units) representing the angular output at 0V.
    */
@@ -125,7 +125,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
     if (m_analogInput == null) {
       return m_offset;
     }
-    return (m_analogInput.getAverageVoltage() / RobotController.getVoltage5V()) * m_fullRange
+    return (m_analogInput.getAverageVoltage() / RobotController.getVoltage3V3()) * m_fullRange
         + m_offset;
   }
 

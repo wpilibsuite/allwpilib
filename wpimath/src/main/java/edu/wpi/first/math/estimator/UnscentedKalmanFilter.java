@@ -22,6 +22,11 @@ import org.ejml.simple.SimpleMatrix;
  * true system state. This is useful because many states cannot be measured directly as a result of
  * sensor noise, or because the state is "hidden".
  *
+ * <p>This class's constructors require a SigmaPoints generator. For convenience, {@link S3UKF} and
+ * {@link MerweUKF} subclasses are provided to create a suitable generator for you. S3UKF is
+ * generally preferred over MerweUKF because of its greater performance while maintaining nearly
+ * identical accuracy.
+ *
  * <p>Kalman filters use a K gain matrix to determine whether to trust the model or measurements
  * more. Kalman filter theory uses statistics to compute an optimal K gain which minimizes the sum
  * of squares error in the state estimate. This K gain is used to correct the state estimate by some
@@ -35,9 +40,9 @@ import org.ejml.simple.SimpleMatrix;
  * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>
  * chapter 9 "Stochastic control theory".
  *
- * <p>This class implements a square-root-form unscented Kalman filter (SR-UKF). For more
- * information about the SR-UKF, see <a
- * href="https://www.researchgate.net/publication/3908304">https://www.researchgate.net/publication/3908304</a>.
+ * <p>This class implements a square-root-form unscented Kalman filter (SR-UKF). The main reason for
+ * this is to guarantee that the covariance matrix remains positive definite. For more information
+ * about the SR-UKF, see https://www.researchgate.net/publication/3908304.
  *
  * @param <States> Number of states.
  * @param <Inputs> Number of inputs.
@@ -64,7 +69,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
   private Matrix<States, ?> m_sigmasF;
   private double m_dt;
 
-  private final MerweScaledSigmaPoints<States> m_pts;
+  private final SigmaPoints<States> m_pts;
 
   /**
    * Constructs an Unscented Kalman Filter.
@@ -73,6 +78,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices">https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices</a>
    * for how to select the standard deviations.
    *
+   * @param pts A sigma points and weights generator.
    * @param states A Nat representing the number of states.
    * @param outputs A Nat representing the number of outputs.
    * @param f A vector-valued function of x and u that returns the derivative of the state vector.
@@ -82,6 +88,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param nominalDt Nominal discretization timestep in seconds.
    */
   public UnscentedKalmanFilter(
+      SigmaPoints<States> pts,
       Nat<States> states,
       Nat<Outputs> outputs,
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
@@ -90,6 +97,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
       Matrix<Outputs, N1> measurementStdDevs,
       double nominalDt) {
     this(
+        pts,
         states,
         outputs,
         f,
@@ -105,7 +113,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
   }
 
   /**
-   * Constructs an unscented Kalman filter with custom mean, residual, and addition functions. Using
+   * Constructs an Unscented Kalman filter with custom mean, residual, and addition functions. Using
    * custom functions for arithmetic can be useful if you have angles in the state or measurements,
    * because they allow you to correctly account for the modular nature of angle arithmetic.
    *
@@ -113,16 +121,17 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices">https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices</a>
    * for how to select the standard deviations.
    *
+   * @param pts A sigma points and weights generator.
    * @param states A Nat representing the number of states.
    * @param outputs A Nat representing the number of outputs.
    * @param f A vector-valued function of x and u that returns the derivative of the state vector.
    * @param h A vector-valued function of x and u that returns the measurement vector.
    * @param stateStdDevs Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
-   * @param meanFuncX A function that computes the mean of 2 * States + 1 state vectors using a
+   * @param meanFuncX A function that computes the mean of NumSigmas state vectors using a given set
+   *     of weights.
+   * @param meanFuncY A function that computes the mean of NumSigmas measurement vectors using a
    *     given set of weights.
-   * @param meanFuncY A function that computes the mean of 2 * States + 1 measurement vectors using
-   *     a given set of weights.
    * @param residualFuncX A function that computes the residual of two state vectors (i.e. it
    *     subtracts them.)
    * @param residualFuncY A function that computes the residual of two measurement vectors (i.e. it
@@ -131,6 +140,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param nominalDt Nominal discretization timestep in seconds.
    */
   public UnscentedKalmanFilter(
+      SigmaPoints<States> pts,
       Nat<States> states,
       Nat<Outputs> outputs,
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
@@ -160,52 +170,65 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     m_contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
     m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
 
-    m_pts = new MerweScaledSigmaPoints<>(states);
+    m_pts = pts;
 
     reset();
   }
 
-  static <S extends Num, C extends Num>
-      Pair<Matrix<C, N1>, Matrix<C, C>> squareRootUnscentedTransform(
-          Nat<S> s,
-          Nat<C> dim,
-          Matrix<C, ?> sigmas,
-          Matrix<?, N1> Wm,
-          Matrix<?, N1> Wc,
-          BiFunction<Matrix<C, ?>, Matrix<?, N1>, Matrix<C, N1>> meanFunc,
-          BiFunction<Matrix<C, N1>, Matrix<C, N1>, Matrix<C, N1>> residualFunc,
-          Matrix<C, C> squareRootR) {
-    if (sigmas.getNumRows() != dim.getNum() || sigmas.getNumCols() != 2 * s.getNum() + 1) {
+  static <C extends Num> Pair<Matrix<C, N1>, Matrix<C, C>> squareRootUnscentedTransform(
+      Nat<C> covdim,
+      int numSigmas,
+      Matrix<C, ?> sigmas,
+      Matrix<?, N1> Wm,
+      Matrix<?, N1> Wc,
+      BiFunction<Matrix<C, ?>, Matrix<?, N1>, Matrix<C, N1>> meanFunc,
+      BiFunction<Matrix<C, N1>, Matrix<C, N1>, Matrix<C, N1>> residualFunc,
+      Matrix<C, C> squareRootR) {
+    if (sigmas.getNumRows() != covdim.getNum() || sigmas.getNumCols() != numSigmas) {
       throw new IllegalArgumentException(
-          "Sigmas must be covDim by 2 * states + 1! Got "
+          "Sigmas must be covDim by numSigmas! Got "
               + sigmas.getNumRows()
               + " by "
               + sigmas.getNumCols());
     }
 
-    if (Wm.getNumRows() != 2 * s.getNum() + 1 || Wm.getNumCols() != 1) {
+    if (Wm.getNumRows() != numSigmas || Wm.getNumCols() != 1) {
       throw new IllegalArgumentException(
-          "Wm must be 2 * states + 1 by 1! Got " + Wm.getNumRows() + " by " + Wm.getNumCols());
+          "Wm must be numSigmas by 1! Got " + Wm.getNumRows() + " by " + Wm.getNumCols());
     }
 
-    if (Wc.getNumRows() != 2 * s.getNum() + 1 || Wc.getNumCols() != 1) {
+    if (Wc.getNumRows() != numSigmas || Wc.getNumCols() != 1) {
       throw new IllegalArgumentException(
-          "Wc must be 2 * states + 1 by 1! Got " + Wc.getNumRows() + " by " + Wc.getNumCols());
+          "Wc must be numSigmas by 1! Got " + Wc.getNumRows() + " by " + Wc.getNumCols());
     }
 
-    // New mean is usually just the sum of the sigmas * weight:
-    //       n
-    // dot = Σ W[k] Xᵢ[k]
-    //      k=1
+    // New mean is usually just the sum of the sigmas * weights:
+    //
+    //      2n
+    //   x̂ = Σ Wᵢ⁽ᵐ⁾𝒳ᵢ
+    //      i=0
+    //
+    // equations (19) and (23) in the paper show this,
+    // but we allow a custom function, usually for angle wrapping
     Matrix<C, N1> x = meanFunc.apply(sigmas, Wm);
 
-    Matrix<C, ?> Sbar = new Matrix<>(new SimpleMatrix(dim.getNum(), 2 * s.getNum() + dim.getNum()));
-    for (int i = 0; i < 2 * s.getNum(); i++) {
+    // Form an intermediate matrix S⁻ as:
+    //
+    //   [√{W₁⁽ᶜ⁾}(𝒳_{1:2L} - x̂) √{Rᵛ}]
+    //
+    // the part of equations (20) and (24) within the "qr{}"
+    //
+    // Note that we allow a custom function instead of the difference to allow
+    // angle wrapping. Furthermore, we allow an arbitrary number of sigma points to
+    // support similar methods such as the Scaled Spherical Simplex Filter (S3F).
+    Matrix<C, ?> Sbar =
+        new Matrix<>(new SimpleMatrix(covdim.getNum(), numSigmas - 1 + covdim.getNum()));
+    for (int i = 0; i < numSigmas - 1; i++) {
       Sbar.setColumn(
           i,
           residualFunc.apply(sigmas.extractColumnVector(1 + i), x).times(Math.sqrt(Wc.get(1, 0))));
     }
-    Sbar.assignBlock(0, 2 * s.getNum(), squareRootR);
+    Sbar.assignBlock(0, numSigmas - 1, squareRootR);
 
     QRDecompositionHouseholder_DDRM qr = new QRDecompositionHouseholder_DDRM();
     var qrStorage = Sbar.transpose().getStorage();
@@ -214,8 +237,24 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
       throw new RuntimeException("QR decomposition failed! Input matrix:\n" + qrStorage);
     }
 
-    Matrix<C, C> newS = new Matrix<>(new SimpleMatrix(qr.getR(null, true)));
-    newS.rankUpdate(residualFunc.apply(sigmas.extractColumnVector(0), x), Wc.get(0, 0), false);
+    // Compute the square-root covariance of the sigma points
+    //
+    // We transpose S⁻ first because we formed it by horizontally
+    // concatenating each part; it should be vertical so we can take
+    // the QR decomposition as defined in the "QR Decomposition" passage
+    // of section 3. "EFFICIENT SQUARE-ROOT IMPLEMENTATION"
+    //
+    // The resulting matrix R is the square-root covariance S, but it
+    // is upper triangular, so we need to transpose it.
+    //
+    // equations (20) and (24)
+    Matrix<C, C> newS = new Matrix<>(new SimpleMatrix(qr.getR(null, true)).transpose());
+
+    // Update or downdate the square-root covariance with (𝒳₀-x̂)
+    // depending on whether its weight (W₀⁽ᶜ⁾) is positive or negative.
+    //
+    // equations (21) and (25)
+    newS.rankUpdate(residualFunc.apply(sigmas.extractColumnVector(0), x), Wc.get(0, 0), true);
 
     return new Pair<>(x, newS);
   }
@@ -256,7 +295,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    */
   @Override
   public Matrix<States, States> getP() {
-    return m_S.transpose().times(m_S);
+    return m_S.times(m_S.transpose());
   }
 
   /**
@@ -280,7 +319,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    */
   @Override
   public void setP(Matrix<States, States> newP) {
-    m_S = newP.lltDecompose(false);
+    m_S = newP.lltDecompose(true);
   }
 
   /**
@@ -330,7 +369,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
   public final void reset() {
     m_xHat = new Matrix<>(m_states, Nat.N1());
     m_S = new Matrix<>(m_states, m_states);
-    m_sigmasF = new Matrix<>(new SimpleMatrix(m_states.getNum(), 2 * m_states.getNum() + 1));
+    m_sigmasF = new Matrix<>(new SimpleMatrix(m_states.getNum(), m_pts.getNumSigmas()));
   }
 
   /**
@@ -347,18 +386,32 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     var discQ = Discretization.discretizeAQ(contA, m_contQ, dt).getSecond();
     var squareRootDiscQ = discQ.lltDecompose(true);
 
+    // Generate sigma points around the state mean
+    //
+    // equation (17)
     var sigmas = m_pts.squareRootSigmaPoints(m_xHat, m_S);
 
+    // Project each sigma point forward in time according to the
+    // dynamics f(x, u)
+    //
+    //   sigmas  = 𝒳ₖ₋₁
+    //   sigmasF = 𝒳ₖ,ₖ₋₁ or just 𝒳 for readability
+    //
+    // equation (18)
     for (int i = 0; i < m_pts.getNumSigmas(); ++i) {
       Matrix<States, N1> x = sigmas.extractColumnVector(i);
 
       m_sigmasF.setColumn(i, NumericalIntegration.rk4(m_f, x, u, dt));
     }
 
+    // Pass the predicted sigmas (𝒳) through the Unscented Transform
+    // to compute the prior state mean and covariance
+    //
+    // equations (18) (19) and (20)
     var ret =
         squareRootUnscentedTransform(
             m_states,
-            m_states,
+            m_pts.getNumSigmas(),
             m_sigmasF,
             m_pts.getWm(),
             m_pts.getWc(),
@@ -438,8 +491,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param y Measurement vector.
    * @param h A vector-valued function of x and u that returns the measurement vector.
    * @param R Continuous measurement noise covariance matrix.
-   * @param meanFuncY A function that computes the mean of 2 * States + 1 measurement vectors using
-   *     a given set of weights.
+   * @param meanFuncY A function that computes the mean of NumSigmas measurement vectors using a
+   *     given set of weights.
    * @param residualFuncY A function that computes the residual of two measurement vectors (i.e. it
    *     subtracts them.)
    * @param residualFuncX A function that computes the residual of two state vectors (i.e. it
@@ -459,19 +512,31 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     final var discR = Discretization.discretizeR(R, m_dt);
     final var squareRootDiscR = discR.lltDecompose(true);
 
-    // Transform sigma points into measurement space
-    Matrix<R, ?> sigmasH = new Matrix<>(new SimpleMatrix(rows.getNum(), 2 * m_states.getNum() + 1));
+    // Generate new sigma points from the prior mean and covariance
+    // and transform them into measurement space using h(x, u)
+    //
+    //   sigmas  = 𝒳
+    //   sigmasH = 𝒴
+    //
+    // This differs from equation (22) which uses
+    // the prior sigma points, regenerating them allows
+    // multiple measurement updates per time update
+    Matrix<R, ?> sigmasH = new Matrix<>(new SimpleMatrix(rows.getNum(), m_pts.getNumSigmas()));
     var sigmas = m_pts.squareRootSigmaPoints(m_xHat, m_S);
     for (int i = 0; i < m_pts.getNumSigmas(); i++) {
       Matrix<R, N1> hRet = h.apply(sigmas.extractColumnVector(i), u);
       sigmasH.setColumn(i, hRet);
     }
 
-    // Mean and covariance of prediction passed through unscented transform
+    // Pass the predicted measurement sigmas through the Unscented Transform
+    // to compute the mean predicted measurement and square-root innovation
+    // covariance.
+    //
+    // equations (23) (24) and (25)
     var transRet =
         squareRootUnscentedTransform(
-            m_states,
             rows,
+            m_pts.getNumSigmas(),
             sigmasH,
             m_pts.getWm(),
             m_pts.getWc(),
@@ -481,30 +546,54 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     var yHat = transRet.getFirst();
     var Sy = transRet.getSecond();
 
-    // Compute cross covariance of the state and the measurements
+    // Compute cross covariance of the predicted state and measurement sigma
+    // points given as:
+    //
+    //           2n
+    //   P_{xy} = Σ Wᵢ⁽ᶜ⁾[𝒳ᵢ - x̂][𝒴ᵢ - ŷ⁻]ᵀ
+    //           i=0
+    //
+    // equation (26)
     Matrix<States, R> Pxy = new Matrix<>(m_states, rows);
     for (int i = 0; i < m_pts.getNumSigmas(); i++) {
-      // Pxy += (sigmas_f[:, i] - x̂)(sigmas_h[:, i] - ŷ)ᵀ W_c[i]
       var dx = residualFuncX.apply(m_sigmasF.extractColumnVector(i), m_xHat);
       var dy = residualFuncY.apply(sigmasH.extractColumnVector(i), yHat).transpose();
 
       Pxy = Pxy.plus(dx.times(dy).times(m_pts.getWc(i)));
     }
 
-    // K = (P_{xy} / S_yᵀ) / S_y
-    // K = (S_y \ P_{xy}ᵀ)ᵀ / S_y
-    // K = (S_yᵀ \ (S_y \ P_{xy}ᵀ))ᵀ
+    // Compute the Kalman gain. We use Eigen's QR decomposition to solve. This
+    // is equivalent to MATLAB's \ operator, so we need to rearrange to use
+    // that.
+    //
+    //   K = (P_{xy} / S_{y}ᵀ) / S_{y}
+    //   K = (S_{y} \ P_{xy})ᵀ / S_{y}
+    //   K = (S_{y}ᵀ \ (S_{y} \ P_{xy}ᵀ))ᵀ
+    //
+    // equation (27)
     Matrix<States, R> K =
         Sy.transpose()
             .solveFullPivHouseholderQr(Sy.solveFullPivHouseholderQr(Pxy.transpose()))
             .transpose();
 
-    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − ŷ)
+    // Compute the posterior state mean
+    //
+    // x̂ = x̂⁻ + K(y − ŷ⁻)
+    //
+    // second part of equation (27)
     m_xHat = addFuncX.apply(m_xHat, K.times(residualFuncY.apply(y, yHat)));
 
+    // Compute the intermediate matrix U for downdating
+    // the square-root covariance
+    //
+    // equation (28)
     Matrix<States, R> U = K.times(Sy);
+
+    // Downdate the posterior square-root state covariance
+    //
+    // equation (29)
     for (int i = 0; i < rows.getNum(); i++) {
-      m_S.rankUpdate(U.extractColumnVector(i), -1, false);
+      m_S.rankUpdate(U.extractColumnVector(i), -1, true);
     }
   }
 }

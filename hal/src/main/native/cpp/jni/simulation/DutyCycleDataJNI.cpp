@@ -91,9 +91,9 @@ Java_edu_wpi_first_hal_simulation_DutyCycleDataJNI_cancelFrequencyCallback
 /*
  * Class:     edu_wpi_first_hal_simulation_DutyCycleDataJNI
  * Method:    getFrequency
- * Signature: (I)I
+ * Signature: (I)D
  */
-JNIEXPORT jint JNICALL
+JNIEXPORT jdouble JNICALL
 Java_edu_wpi_first_hal_simulation_DutyCycleDataJNI_getFrequency
   (JNIEnv*, jclass, jint index)
 {
@@ -103,11 +103,11 @@ Java_edu_wpi_first_hal_simulation_DutyCycleDataJNI_getFrequency
 /*
  * Class:     edu_wpi_first_hal_simulation_DutyCycleDataJNI
  * Method:    setFrequency
- * Signature: (II)V
+ * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_DutyCycleDataJNI_setFrequency
-  (JNIEnv*, jclass, jint index, jint value)
+  (JNIEnv*, jclass, jint index, jdouble value)
 {
   HALSIM_SetDutyCycleFrequency(index, value);
 }
@@ -172,18 +172,6 @@ Java_edu_wpi_first_hal_simulation_DutyCycleDataJNI_resetData
   (JNIEnv*, jclass, jint index)
 {
   HALSIM_ResetDutyCycleData(index);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DutyCycleDataJNI
- * Method:    findForChannel
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_DutyCycleDataJNI_findForChannel
-  (JNIEnv*, jclass, jint channel)
-{
-  return HALSIM_FindDutyCycleForChannel(channel);
 }
 
 }  // extern "C"
