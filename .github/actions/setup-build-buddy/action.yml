@@ -18,8 +18,8 @@ runs:
           echo "No API key secret detected, will setup readonly cache"
           echo "build:ci --config=build_buddy_readonly" > bazel_auth.rc
 
-          # Set up the readonly key only if this build is for a pull request. Push builds happen in the forks repository, 
-          # so the user should set their own buildbuddy api keys up there. Only enabling it for PR's should reduce heavy 
+          # Set up the readonly key only if this build is for a pull request. Push builds happen in the forks repository,
+          # so the user should set their own buildbuddy api keys up there. Only enabling it for PR's should reduce heavy
           # and more random load on the cache.
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             echo "Assuming this is a pull request from a fork. Setting up the readonly api key"
