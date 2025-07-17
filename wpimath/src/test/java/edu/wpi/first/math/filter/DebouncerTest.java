@@ -71,6 +71,20 @@ class DebouncerTest {
   }
 
   @Test
+  void debounceResetTest() {
+    var debouncer = new Debouncer(1.0, Debouncer.DebounceType.kFalling);
+
+    assertTrue(debouncer.calculate(false));
+    
+    debouncer.reset();
+
+    assertFalse(debouncer.calculate(false));
+    assertTrue(debouncer.calculate(true));
+
+    assertTrue(debouncer.calculate(false));
+  }
+
+  @Test
   void debounceParamsTest() {
     var debouncer = new Debouncer(0.02, Debouncer.DebounceType.kBoth);
 
