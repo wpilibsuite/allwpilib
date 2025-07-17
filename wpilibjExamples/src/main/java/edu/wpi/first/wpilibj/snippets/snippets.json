@@ -81,18 +81,6 @@
     "mainclass": "Main"
   },
   {
-    "name": "AnalogTrigger",
-    "description": "Snippets of Analog Trigger for frc-docs.",
-    "tags": [
-      "Hardware",
-      "Analog",
-      "Digital Input"
-    ],
-    "foldername": "analogtrigger",
-    "gradlebase": "java",
-    "mainclass": "Main"
-  },
-  {
     "name": "AnalogInput",
     "description": "Snippets of Analog Input for frc-docs.",
     "tags": [
@@ -123,50 +111,6 @@
       "Accelerometer"
     ],
     "foldername": "analogaccelerometer",
-    "gradlebase": "java",
-    "mainclass": "Main"
-  },
-  {
-    "name": "ADXLAccelerometers",
-    "description": "Snippets of ADXL 345 and 362 accelerometers for frc-docs.",
-    "tags": [
-      "Hardware",
-      "Accelerometer"
-    ],
-    "foldername": "adxlaccelerometers",
-    "gradlebase": "java",
-    "mainclass": "Main"
-  },
-  {
-    "name": "BuiltInAccelerometer",
-    "description": "Snippets of BuiltIn accelerometer for frc-docs.",
-    "tags": [
-      "Hardware",
-      "Accelerometer"
-    ],
-    "foldername": "builtinaccelerometer",
-    "gradlebase": "java",
-    "mainclass": "Main"
-  },
-  {
-    "name": "AccelerometerCollisionDetection",
-    "description": "Snippets of Accelerometer for collision detection for frc-docs.",
-    "tags": [
-      "Hardware",
-      "Accelerometer"
-    ],
-    "foldername": "accelerometercollision",
-    "gradlebase": "java",
-    "mainclass": "Main"
-  },
-  {
-    "name": "AccelerometerFilter",
-    "description": "Snippets of filtering Accelerometer for frc-docs.",
-    "tags": [
-      "Hardware",
-      "Accelerometer"
-    ],
-    "foldername": "accelerometerfilter",
     "gradlebase": "java",
     "mainclass": "Main"
   }

@@ -26,12 +26,12 @@ extern "C" {
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_DIOJNI_initializeDIOPort
-  (JNIEnv* env, jclass, jint id, jboolean input)
+  (JNIEnv* env, jclass, jint channel, jboolean input)
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  auto dio = HAL_InitializeDIOPort(
-      (HAL_PortHandle)id, static_cast<uint8_t>(input), stack.c_str(), &status);
+  auto dio = HAL_InitializeDIOPort(channel, static_cast<uint8_t>(input),
+                                   stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return (jint)dio;
 }
@@ -186,21 +186,6 @@ Java_edu_wpi_first_hal_DIOJNI_isAnyPulsing
 {
   int32_t status = 0;
   jboolean returnValue = HAL_IsAnyPulsing(&status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_DIOJNI
- * Method:    getLoopTiming
- * Signature: ()S
- */
-JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_hal_DIOJNI_getLoopTiming
-  (JNIEnv* env, jclass)
-{
-  int32_t status = 0;
-  jshort returnValue = HAL_GetPWMLoopTiming(&status);
   CheckStatus(env, status);
   return returnValue;
 }

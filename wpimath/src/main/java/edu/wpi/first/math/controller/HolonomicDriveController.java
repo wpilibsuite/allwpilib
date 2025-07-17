@@ -77,14 +77,14 @@ public class HolonomicDriveController {
    *
    * @param currentPose The current pose, as measured by odometry or pose estimator.
    * @param trajectoryPose The desired trajectory pose, as sampled for the current timestep.
-   * @param desiredLinearVelocityMetersPerSecond The desired linear velocity.
+   * @param desiredLinearVelocity The desired linear velocity in m/s.
    * @param desiredHeading The desired heading.
    * @return The next output of the holonomic drive controller.
    */
   public ChassisSpeeds calculate(
       Pose2d currentPose,
       Pose2d trajectoryPose,
-      double desiredLinearVelocityMetersPerSecond,
+      double desiredLinearVelocity,
       Rotation2d desiredHeading) {
     // If this is the first run, then we need to reset the theta controller to the current pose's
     // heading.
@@ -94,8 +94,8 @@ public class HolonomicDriveController {
     }
 
     // Calculate feedforward velocities (field-relative).
-    double xFF = desiredLinearVelocityMetersPerSecond * trajectoryPose.getRotation().getCos();
-    double yFF = desiredLinearVelocityMetersPerSecond * trajectoryPose.getRotation().getSin();
+    double xFF = desiredLinearVelocity * trajectoryPose.getRotation().getCos();
+    double yFF = desiredLinearVelocity * trajectoryPose.getRotation().getSin();
     double thetaFF =
         m_thetaController.calculate(
             currentPose.getRotation().getRadians(), desiredHeading.getRadians());
@@ -104,7 +104,7 @@ public class HolonomicDriveController {
     m_rotationError = desiredHeading.minus(currentPose.getRotation());
 
     if (!m_enabled) {
-      return ChassisSpeeds.fromFieldRelativeSpeeds(xFF, yFF, thetaFF, currentPose.getRotation());
+      return new ChassisSpeeds(xFF, yFF, thetaFF).toRobotRelative(currentPose.getRotation());
     }
 
     // Calculate feedback velocities (based on position error).
@@ -112,8 +112,8 @@ public class HolonomicDriveController {
     double yFeedback = m_yController.calculate(currentPose.getY(), trajectoryPose.getY());
 
     // Return next output.
-    return ChassisSpeeds.fromFieldRelativeSpeeds(
-        xFF + xFeedback, yFF + yFeedback, thetaFF, currentPose.getRotation());
+    return new ChassisSpeeds(xFF + xFeedback, yFF + yFeedback, thetaFF)
+        .toRobotRelative(currentPose.getRotation());
   }
 
   /**
@@ -126,8 +126,7 @@ public class HolonomicDriveController {
    */
   public ChassisSpeeds calculate(
       Pose2d currentPose, Trajectory.State desiredState, Rotation2d desiredHeading) {
-    return calculate(
-        currentPose, desiredState.poseMeters, desiredState.velocityMetersPerSecond, desiredHeading);
+    return calculate(currentPose, desiredState.pose, desiredState.velocity, desiredHeading);
   }
 
   /**

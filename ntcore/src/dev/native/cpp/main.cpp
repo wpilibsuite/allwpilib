@@ -30,10 +30,9 @@ void bench();
 void bench2();
 void stress();
 void stress2();
+void latency();
 
 int main(int argc, char* argv[]) {
-  wpi::impl::SetupNowDefaultOnRio();
-
   if (argc == 2 && std::string_view{argv[1]} == "bench") {
     bench();
     return EXIT_SUCCESS;
@@ -48,6 +47,10 @@ int main(int argc, char* argv[]) {
   }
   if (argc == 2 && std::string_view{argv[1]} == "stress2") {
     stress2();
+    return EXIT_SUCCESS;
+  }
+  if (argc == 2 && std::string_view{argv[1]} == "latency") {
+    latency();
     return EXIT_SUCCESS;
   }
 
@@ -81,8 +84,8 @@ void bench() {
   auto server = nt::CreateInstance();
 
   // connect client and server
-  nt::StartServer(server, "bench.json", "127.0.0.1", 0, 10000);
-  nt::StartClient4(client, "client");
+  nt::StartServer(server, "bench.json", "127.0.0.1", 10000);
+  nt::StartClient(client, "client");
   nt::SetServer(client, "127.0.0.1", 10000);
 
   using namespace std::chrono_literals;
@@ -142,11 +145,11 @@ void bench2() {
   auto server = nt::CreateInstance();
 
   // connect client and server
-  nt::StartServer(server, "bench2.json", "127.0.0.1", 10001, 10000);
-  nt::StartClient4(client1, "client1");
-  nt::StartClient3(client2, "client2");
+  nt::StartServer(server, "bench2.json", "127.0.0.1", 10000);
+  nt::StartClient(client1, "client1");
+  nt::StartClient(client2, "client2");
   nt::SetServer(client1, "127.0.0.1", 10000);
-  nt::SetServer(client2, "127.0.0.1", 10001);
+  nt::SetServer(client2, "127.0.0.1", 10000);
 
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(1s);
@@ -214,7 +217,7 @@ static std::uniform_real_distribution<double> dist;
 
 void stress() {
   auto server = nt::CreateInstance();
-  nt::StartServer(server, "stress.json", "127.0.0.1", 0, 10000);
+  nt::StartServer(server, "stress.json", "127.0.0.1", 10000);
   nt::SubscribeMultiple(server, {{std::string_view{}}});
 
   using namespace std::chrono_literals;
@@ -228,7 +231,7 @@ void stress() {
         std::this_thread::sleep_for(0.1s * dist(gen));
 
         // connect
-        nt::StartClient4(client, "client");
+        nt::StartClient(client, "client");
         nt::SetServer(client, "127.0.0.1", 10000);
 
         // sleep a random amount of time
@@ -308,7 +311,7 @@ void stress2() {
   auto client = nt::NetworkTableInstance::Create();
   client.SetServer("localhost");
   auto clientName = "test client";
-  client.StartClient4(clientName);
+  client.StartClient(clientName);
   std::this_thread::sleep_for(2s);  // Startup time.
   int sentCount = 0;
   while (sentCount < count) {
@@ -326,4 +329,72 @@ void stress2() {
 
   std::this_thread::sleep_for(10s);
   fmt::print("isDone: {}", isDone.load());
+}
+
+void latency() {
+  // set up instances
+  auto client1 = nt::CreateInstance();
+  auto client2 = nt::CreateInstance();
+  auto server = nt::CreateInstance();
+
+  // connect client and server
+  nt::StartServer(server, "latency.json", "127.0.0.1", 10000);
+  nt::StartClient(client1, "client1");
+  nt::SetServer(client1, "127.0.0.1", 10000);
+  nt::StartClient(client2, "client2");
+  nt::SetServer(client2, "127.0.0.1", 10000);
+
+  using namespace std::chrono_literals;
+  std::this_thread::sleep_for(1s);
+
+  // create publishers and subscribers
+  auto pub =
+      nt::Publish(nt::GetTopic(client1, "highrate"), NT_DOUBLE, "double");
+  nt::SubscribeMultiple(server, {{std::string_view{}}});
+  auto sub =
+      nt::Subscribe(nt::GetTopic(server, "highrate"), NT_DOUBLE, "double");
+  auto sub2 =
+      nt::Subscribe(nt::GetTopic(client2, "highrate"), NT_DOUBLE, "double");
+
+  std::this_thread::sleep_for(1s);
+
+  nt::SetDouble(pub, 0);
+#if 0
+  // warm up
+  for (int i = 1; i <= 10000; ++i) {
+    nt::SetDouble(pub, i * 0.01);
+    if (i % 2000 == 0) {
+      std::this_thread::sleep_for(0.02s);
+    }
+  }
+#endif
+
+  std::vector<int64_t> times;
+  times.reserve(1001);
+
+  // benchmark client to server
+  for (int i = 1; i <= 1000; ++i) {
+    int64_t sendTime = nt::Now();
+    nt::SetDouble(pub, i, sendTime);
+    nt::Flush(client1);
+    while (nt::GetDouble(sub, 0) != i) {
+      wpi::WaitForObject(sub);
+    }
+    times.emplace_back(nt::Now() - sendTime);
+  }
+  PrintTimes(times);
+
+  // benchmark client to client
+  times.resize(0);
+  for (int i = 2001; i <= 3000; ++i) {
+    int64_t sendTime = nt::Now();
+    nt::SetDouble(pub, i, sendTime);
+    nt::Flush(client1);
+    while (nt::GetDouble(sub2, 0) != i) {
+      wpi::WaitForObject(sub2);
+    }
+    times.emplace_back(nt::Now() - sendTime);
+  }
+
+  PrintTimes(times);
 }

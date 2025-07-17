@@ -65,7 +65,7 @@ public class Arm implements AutoCloseable {
           new MechanismLigament2d(
               "Arm",
               30,
-              Units.radiansToDegrees(m_armSim.getAngleRads()),
+              Units.radiansToDegrees(m_armSim.getAngle()),
               6,
               new Color8Bit(Color.kYellow)));
 
@@ -92,13 +92,13 @@ public class Arm implements AutoCloseable {
     m_armSim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-    m_encoderSim.setDistance(m_armSim.getAngleRads());
+    m_encoderSim.setDistance(m_armSim.getAngle());
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps()));
+        BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDraw()));
 
     // Update the Mechanism Arm angle based on the simulated arm angle
-    m_arm.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
+    m_arm.setAngle(Units.radiansToDegrees(m_armSim.getAngle()));
   }
 
   /** Load setpoint and kP from preferences. */

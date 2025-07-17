@@ -38,34 +38,13 @@ class Robot : public frc::TimedRobot {
     // Gets the averaged voltage from the analog input.  Rescaling,
     // oversampling, and averaging are all applied.
     m_analog.GetAverageVoltage();
-
-    // Sets the initial value of the accumulator to 0
-    // This is the "starting point" from which the value will change over time
-    m_analog.SetAccumulatorInitialValue(0);
-    // Sets the "center" of the accumulator to 0.  This value is subtracted from
-    // all measured values prior to accumulation.
-    m_analog.SetAccumulatorCenter(0);
-    // Returns the number of accumulated samples since the accumulator was last
-    // started/reset
-    m_analog.GetAccumulatorCount();
-    // Returns the value of the accumulator.  Return type is long.
-    m_analog.GetAccumulatorValue();
-    // Resets the accumulator to the initial value
-    m_analog.ResetAccumulator();
   }
 
-  void TeleopPeriodic() override {
-    // Fill the count and value variables with the matched measurements
-    m_analog.GetAccumulatorOutput(count, value);
-  }
+  void TeleopPeriodic() override {}
 
  private:
   // Initializes an AnalogInput on port 0
   frc::AnalogInput m_analog{0};
-
-  // The count and value variables to fill
-  int64_t count;
-  int64_t value;
 };
 
 #ifndef RUNNING_FRC_TESTS

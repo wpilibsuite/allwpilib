@@ -9,7 +9,7 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <networktables/MultiSubscriber.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
@@ -41,7 +41,7 @@ static Instance& GetInstance() {
   return instance;
 }
 
-#ifndef __FRC_ROBORIO__
+#ifndef __FRC_SYSTEMCORE__
 namespace frc::impl {
 void ResetPreferencesInstance() {
   GetInstance() = Instance();
@@ -179,5 +179,5 @@ Instance::Instance() {
           }
         }
       });
-  HAL_Report(HALUsageReporting::kResourceType_Preferences, 0);
+  HAL_ReportUsage("Preferences", "");
 }

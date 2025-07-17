@@ -12,7 +12,7 @@ env:
 jobs:
   build-artifacts:
     name: "Build - WPILib"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       DISPLAY: ':10'
     steps:
@@ -33,164 +33,12 @@ jobs:
       - name: Build WPILib with Gradle
         uses: addnab/docker-run-action@v3
         with:
-          image: wpilib/roborio-cross-ubuntu:2025-22.04
+          image: wpilib/systemcore-cross-ubuntu:2025-24.04
           options: -v ${{ github.workspace }}:/work -w /work -e GITHUB_REF -e CI -e DISPLAY
-          run: df . && rm -f semicolon_delimited_script && ./gradlew :wpilibc:publish :wpilibj:publish :wpilibNewCommands:publish :hal:publish :cameraserver:publish :ntcore:publish :cscore:publish :wpimath:publish :wpinet:publish :wpiutil:publish :apriltag:publish :wpiunits:publish :simulation:halsim_gui:publish :simulation:halsim_ds_socket:publish :simulation:halsim_ws_server:publish :simulation:halsim_ws_client:publish :simulation:halsim_xrp:publish :fieldImages:publish :romiVendordep:publish :xrpVendordep:publish :epilogue-processor:publish :epilogue-runtime:publish :thirdparty:googletest:publish -x test -x Javadoc -x doxygen --build-cache && cp -r /root/releases/maven/development /work
+          run: df . && rm -f semicolon_delimited_script && ./gradlew -Pskiplinuxarm64 :wpilibc:publish :wpilibj:publish :wpilibNewCommands:publish :hal:publish :cameraserver:publish :ntcore:publish :cscore:publish :wpimath:publish :wpinet:publish :wpiutil:publish :apriltag:publish :wpiunits:publish :simulation:halsim_gui:publish :simulation:halsim_ds_socket:publish :fieldImages:publish :epilogue-processor:publish :epilogue-runtime:publish :thirdparty:googletest:publish -x test -x Javadoc -x doxygen --build-cache && cp -r /root/releases/maven/development /work
       - uses: actions/upload-artifact@v4
         with:
           name: MavenArtifacts
           path: |
             development
           retention-days: 1
-
-  Robotbuilder:
-    name: "Build - RobotBuilder"
-    needs: [build-artifacts]
-    runs-on: ubuntu-22.04
-    env:
-      DISPLAY: ':10'
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: wpilibsuite/robotbuilder
-          fetch-depth: 0
-      - uses: actions/download-artifact@v4
-        with:
-          name: MavenArtifacts
-      - name: Patch RobotBuilder to use local development
-        run: cd src/main/resources/export && echo "wpi.maven.useLocal = false" >> java/build.gradle && echo "wpi.maven.useFrcMavenLocalDevelopment = true" >> java/build.gradle && echo "wpi.versions.wpilibVersion = '$YEAR.424242.+'" >> java/build.gradle && echo "wpi.versions.wpimathVersion = '$YEAR.424242.+'" >> java/build.gradle && echo "wpi.maven.useLocal = false" >> cpp/build.gradle && echo "wpi.maven.useFrcMavenLocalDevelopment = true" >> cpp/build.gradle && echo "wpi.versions.wpilibVersion = '$YEAR.424242.+'" >> cpp/build.gradle && echo "wpi.versions.wpimathVersion = '$YEAR.424242.+'" >> cpp/build.gradle
-      - name: Install and run xvfb
-        run: sudo apt-get update && sudo apt-get install -y xvfb && Xvfb $DISPLAY &
-      - name: Move artifacts
-        run: mkdir -p ~/releases/maven/development && cp -r edu ~/releases/maven/development
-      - uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
-      - name: Build RobotBuilder with Gradle
-        run: ./gradlew build test --tests 'robotbuilder.exporters.*' -x htmlSanityCheck -PbuildServer -PreleaseMode ; cat build/test-results/test/TEST-robotbuilder.exporters.*.xml ;
-      - name: Summarize RobotBuilder Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          files: |
-            build/test-results/test/TEST*.xml
-          check_run: false
-          comment_mode: off
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: RobotBuilderTestResults
-          path: |
-            build/reports/
-      - uses: actions/upload-artifact@v4
-        with:
-          name: RobotBuilder Build
-          path: |
-            build/libs/
-          retention-days: 7
-
-  Shuffleboard:
-    name: "Build - Shuffleboard"
-    needs: [build-artifacts]
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: wpilibsuite/shuffleboard
-          fetch-depth: 0
-      - name: Patch Shuffleboard to use local development
-        run: sed -i "s/wpilibTools.deps.wpilibVersion.*/wpilibTools.deps.wpilibVersion = \'$YEAR\.424242\.+\'/" app/app.gradle && sed -i "s/wpilibTools.deps.wpilibVersion.*/wpilibTools.deps.wpilibVersion = \'$YEAR\.424242\.+\'/" plugins/cameraserver/cameraserver.gradle && sed -i "s/wpilibTools.deps.wpilibVersion.*/wpilibTools.deps.wpilibVersion = \'$YEAR\.424242\.+\'/" plugins/networktables/networktables.gradle
-      - uses: actions/download-artifact@v4
-        with:
-          name: MavenArtifacts
-      - uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
-      - name: Move artifacts
-        run: mkdir -p ~/releases/maven/development && cp -r edu ~/releases/maven/development
-      - name: Install dependencies
-        run: sudo apt-get install -y libgtk2.0-0
-      - name: Build with Gradle
-        run: ./gradlew build -x Javadoc
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Shuffleboard Build
-          path: |
-            build/allOutputs/
-          retention-days: 7
-
-  PathWeaver:
-    name: "Build - PathWeaver"
-    needs: [build-artifacts]
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: wpilibsuite/PathWeaver
-          fetch-depth: 0
-      - name: Patch PathWeaver to use local development
-        run: sed -i "s/wpilibTools.deps.wpilibVersion.*/wpilibTools.deps.wpilibVersion = \'$YEAR\.424242\.+\'/" dependencies.gradle
-      - uses: actions/download-artifact@v4
-        with:
-          name: MavenArtifacts
-      - uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
-      - name: Move artifacts
-        run: mkdir -p ~/releases/maven/development && cp -r edu ~/releases/maven/development
-      - name: Build with Gradle
-        run: ./gradlew build
-      - uses: actions/upload-artifact@v4
-        with:
-          name: PathWeaver Build
-          path: |
-            build/allOutputs/
-          retention-days: 7
-
-#  Robotpy:
-#    name: "Build - Robotpy"
-#    needs: [build-artifacts]
-#    runs-on: ubuntu-22.04
-#    steps:
-#    - uses: actions/checkout@v4
-#      with:
-#        repository: robotpy/mostrobotpy
-#        fetch-depth: 0
-#    - uses: actions/download-artifact@v4
-#      with:
-#        name: MavenArtifacts
-#    - name: Move artifacts
-#      run: mkdir -p ~/releases/maven/development && cp -r edu ~/releases/maven/development
-#
-#    - uses: actions/setup-python@v5
-#      with:
-#        python-version: 3.13
-#
-#    - name: Install sccache
-#      uses: mozilla-actions/sccache-action@v0.0.9
-#
-#    - name: Install deps
-#      shell: bash
-#      run: |
-#        python -m pip --disable-pip-version-check install -r rdev_requirements.txt
-#
-#    - name: Install numpy (needed for stubgen but broken in raspbian CI)
-#      shell: bash
-#      run: |
-#        python -m pip --disable-pip-version-check install numpy
-#    - name: Patch RobotPy rdev to use local development
-#      run: git config user.name github-actions && git config user.email github-actions@github.com && set -- ~/releases/maven/development/edu/wpi/first/wpiutil/wpiutil-cpp/*/ ; wpilibversion=$(basename $1) && echo $wpilibversion && sed --regexp-extended -i 's@(wpilib_bin_url =).*@\1 \"file:\/\/'"$HOME"'\/releases\/maven\/development"@' rdev.toml && sed --regexp-extended -i 's/(wpilib_bin_version =).*/\1 \"'"$wpilibversion"'\"/' rdev.toml && ./rdev.sh update-pyproject --commit
-#    - name: Build + test wheels
-#      shell: bash
-#      run: |
-#        ./rdev.sh ci run
-#      env:
-#        RPYBUILD_STRIP_LIBPYTHON: "1"
-#        RPYBUILD_CC_LAUNCHER: sccache
-#        SCCACHE_WEBDAV_ENDPOINT: "https://frcmaven.wpi.edu/artifactory/wpilib-generic-cache-cmake-local"
-#        SCCACHE_WEBDAV_KEY_PREFIX: "sccache-robotpy"
-#        SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-#        SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}

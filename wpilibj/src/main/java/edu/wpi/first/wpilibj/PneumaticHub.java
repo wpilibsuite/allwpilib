@@ -4,16 +4,12 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.PortsJNI;
 import edu.wpi.first.hal.REVPHFaults;
 import edu.wpi.first.hal.REVPHJNI;
 import edu.wpi.first.hal.REVPHStickyFaults;
 import edu.wpi.first.hal.REVPHVersion;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,46 +18,22 @@ public class PneumaticHub implements PneumaticsBase {
   private static class DataStore implements AutoCloseable {
     public final int m_module;
     public final int m_handle;
+    private final int m_busId;
     private int m_refCount;
     private int m_reservedMask;
     private boolean m_compressorReserved;
     public final int[] m_oneShotDurMs = new int[PortsJNI.getNumREVPHChannels()];
     private final Object m_reserveLock = new Object();
 
-    DataStore(int module) {
-      m_handle = REVPHJNI.initialize(module);
+    DataStore(int busId, int module) {
+      m_handle = REVPHJNI.initialize(busId, module);
       m_module = module;
-      m_handleMap.put(module, this);
+      m_busId = busId;
+      m_handleMaps[busId].put(module, this);
 
       final REVPHVersion version = REVPHJNI.getVersion(m_handle);
       final String fwVersion =
           version.firmwareMajor + "." + version.firmwareMinor + "." + version.firmwareFix;
-
-      if (version.firmwareMajor > 0 && RobotBase.isReal()) {
-        // Write PH firmware version to roboRIO
-        final String fileName = "REV_PH_" + String.format("%02d", module) + "_WPILib_Version.ini";
-        final File file = new File("/tmp/frc_versions/" + fileName);
-        try {
-          if (file.exists() && !file.delete()) {
-            throw new IOException("Failed to delete " + fileName);
-          }
-
-          if (!file.createNewFile()) {
-            throw new IOException("Failed to create new " + fileName);
-          }
-
-          try (OutputStream output = Files.newOutputStream(file.toPath())) {
-            output.write("[Version]\n".getBytes(StandardCharsets.UTF_8));
-            output.write("model=REV PH\n".getBytes(StandardCharsets.UTF_8));
-            output.write(
-                ("deviceID=" + Integer.toHexString(0x9052600 | module) + "\n")
-                    .getBytes(StandardCharsets.UTF_8));
-            output.write(("currentVersion=" + fwVersion).getBytes(StandardCharsets.UTF_8));
-          }
-        } catch (IOException ex) {
-          DriverStation.reportError("Could not write " + fileName + ": " + ex, ex.getStackTrace());
-        }
-      }
 
       // Check PH firmware version
       if (version.firmwareMajor > 0 && version.firmwareMajor < 22) {
@@ -76,7 +48,7 @@ public class PneumaticHub implements PneumaticsBase {
     @Override
     public void close() {
       REVPHJNI.free(m_handle);
-      m_handleMap.remove(m_module);
+      m_handleMaps[m_busId].remove(m_module);
     }
 
     public void addRef() {
@@ -91,14 +63,23 @@ public class PneumaticHub implements PneumaticsBase {
     }
   }
 
-  private static final Map<Integer, DataStore> m_handleMap = new HashMap<>();
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private static final Map<Integer, DataStore>[] m_handleMaps =
+      (Map<Integer, DataStore>[]) new Map[PortsJNI.getNumCanBuses()];
+
   private static final Object m_handleLock = new Object();
 
-  private static DataStore getForModule(int module) {
+  private static DataStore getForModule(int busId, int module) {
     synchronized (m_handleLock) {
-      DataStore pcm = m_handleMap.get(module);
+      Map<Integer, DataStore> handleMap = m_handleMaps[busId];
+      if (handleMap == null) {
+        handleMap = new HashMap<>();
+        m_handleMaps[busId] = handleMap;
+      }
+
+      DataStore pcm = handleMap.get(module);
       if (pcm == null) {
-        pcm = new DataStore(module);
+        pcm = new DataStore(busId, module);
       }
       pcm.addRef();
       return pcm;
@@ -124,18 +105,23 @@ public class PneumaticHub implements PneumaticsBase {
   private final DataStore m_dataStore;
   private final int m_handle;
 
-  /** Constructs a PneumaticHub with the default ID (1). */
-  public PneumaticHub() {
-    this(SensorUtil.getDefaultREVPHModule());
+  /**
+   * Constructs a PneumaticHub with the default ID (1).
+   *
+   * @param busId The bus ID
+   */
+  public PneumaticHub(int busId) {
+    this(busId, SensorUtil.getDefaultREVPHModule());
   }
 
   /**
    * Constructs a PneumaticHub.
    *
+   * @param busId The bus ID
    * @param module module number to construct
    */
-  public PneumaticHub(int module) {
-    m_dataStore = getForModule(module);
+  public PneumaticHub(int busId, int module) {
+    m_dataStore = getForModule(busId, module);
     m_handle = m_dataStore.m_handle;
   }
 
@@ -437,5 +423,10 @@ public class PneumaticHub implements PneumaticsBase {
    */
   public double getSolenoidsVoltage() {
     return REVPHJNI.getSolenoidVoltage(m_handle);
+  }
+
+  @Override
+  public void reportUsage(String device, String data) {
+    HAL.reportUsage("PH[" + m_dataStore.m_module + "]/" + device, data);
   }
 }

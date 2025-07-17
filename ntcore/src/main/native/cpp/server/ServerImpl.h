@@ -43,6 +43,7 @@ class ServerImpl final {
 
   void SendAllOutgoing(uint64_t curTimeMs, bool flush);
   void SendOutgoing(int clientId, uint64_t curTimeMs);
+  void SendAllLocalOutgoing(uint64_t curTimeMs);
 
   void SetLocal(net::ServerMessageHandler* local,
                 net::ClientMessageQueue* queue);
@@ -61,9 +62,6 @@ class ServerImpl final {
                                         std::string_view connInfo, bool local,
                                         net::WireConnection& wire,
                                         SetPeriodicFunc setPeriodic);
-  int AddClient3(std::string_view connInfo, bool local,
-                 net3::WireConnection3& wire, Connected3Func connected,
-                 SetPeriodicFunc setPeriodic);
   std::shared_ptr<void> RemoveClient(int clientId);
 
   void ConnectionsChanged(const std::vector<ConnectionInfo>& conns) {

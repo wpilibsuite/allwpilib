@@ -6,7 +6,6 @@
 
 #include <frc/PneumaticHub.h>
 
-#include <hal/FRCUsageReporting.h>
 #include <hal/Ports.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -15,8 +14,8 @@
 
 using namespace frc;
 
-Compressor::Compressor(int module, PneumaticsModuleType moduleType)
-    : m_module{PneumaticsBase::GetForType(module, moduleType)},
+Compressor::Compressor(int busId, int module, PneumaticsModuleType moduleType)
+    : m_module{PneumaticsBase::GetForType(busId, module, moduleType)},
       m_moduleType{moduleType} {
   if (!m_module->ReserveCompressor()) {
     throw FRC_MakeError(err::ResourceAlreadyAllocated, "{}", module);
@@ -24,12 +23,13 @@ Compressor::Compressor(int module, PneumaticsModuleType moduleType)
 
   m_module->EnableCompressorDigital();
 
-  HAL_Report(HALUsageReporting::kResourceType_Compressor, module + 1);
-  wpi::SendableRegistry::AddLW(this, "Compressor", module);
+  m_module->ReportUsage("Compressor", "");
+  wpi::SendableRegistry::Add(this, "Compressor", module);
 }
 
-Compressor::Compressor(PneumaticsModuleType moduleType)
-    : Compressor{PneumaticsBase::GetDefaultForType(moduleType), moduleType} {}
+Compressor::Compressor(int busId, PneumaticsModuleType moduleType)
+    : Compressor{busId, PneumaticsBase::GetDefaultForType(moduleType),
+                 moduleType} {}
 
 Compressor::~Compressor() {
   if (m_module) {

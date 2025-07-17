@@ -13,17 +13,12 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/DataLogBackgroundWriter.h>
-#include <wpi/FileLogger.h>
 #include <wpi/SafeThread.h>
 #include <wpi/StringExtras.h>
+#include <wpi/datalog/DataLogBackgroundWriter.h>
+#include <wpi/datalog/FileLogger.h>
 #include <wpi/fs.h>
 #include <wpi/print.h>
-
-#ifdef __FRC_ROBORIO__
-#include <FRC_NetworkCommunication/FRCComm.h>
-#include <FRC_NetworkCommunication/LoadOut.h>
-#endif
 
 using namespace wpi;
 
@@ -38,17 +33,18 @@ namespace frc {
 void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
                   const char* funcName, fmt::string_view format,
                   fmt::format_args args) {
-#ifdef __FRC_ROBORIO__
-  if (status == 0) {
-    return;
-  }
-  fmt::memory_buffer out;
-  fmt::format_to(fmt::appender{out}, "Warning: ");
-  fmt::vformat_to(fmt::appender{out}, format, args);
-  out.push_back('\0');
-  FRC_NetworkCommunication_sendError(status < 0, status, 0, out.data(),
-                                     "DataLogManager", "");
-#endif
+  // TODO when we get a low level interface
+  // #ifdef __FRC_SYSTEMCORE__
+  //   if (status == 0) {
+  //     return;
+  //   }
+  //   fmt::memory_buffer out;
+  //   fmt::format_to(fmt::appender{out}, "Warning: ");
+  //   fmt::vformat_to(fmt::appender{out}, format, args);
+  //   out.push_back('\0');
+  //   FRC_NetworkCommunication_sendError(status < 0, status, 0, out.data(),
+  //                                      "DataLogManager", "");
+  // #endif
 }
 
 template <typename... Args>
@@ -70,10 +66,12 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
 
 namespace RobotController {
 inline bool IsSystemTimeValid() {
-#ifdef __FRC_ROBORIO__
-  uint8_t timeWasSet = 0;
-  FRC_NetworkCommunication_getTimeWasSet(&timeWasSet);
-  return timeWasSet != 0;
+#ifdef __FRC_SYSTEMCORE__
+  // TODO when we get a proper low level library, and time setting
+  return false;
+  // uint8_t timeWasSet = 0;
+  // FRC_NetworkCommunication_getTimeWasSet(&timeWasSet);
+  // return timeWasSet != 0;
 #else
   return true;
 #endif
@@ -82,8 +80,8 @@ inline bool IsSystemTimeValid() {
 
 namespace filesystem {
 inline std::string GetOperatingDirectory() {
-#ifdef __FRC_ROBORIO__
-  return "/home/lvuser";
+#ifdef __FRC_SYSTEMCORE__
+  return "/home/systemcore";
 #else
   return fs::current_path().string();
 #endif
@@ -91,73 +89,75 @@ inline std::string GetOperatingDirectory() {
 }  // namespace filesystem
 
 namespace DriverStation {
-#ifdef __FRC_ROBORIO__
-using MatchType = MatchType_t;
-constexpr int kNone = kMatchType_none;
-constexpr int kPractice = kMatchType_practice;
-constexpr int kQualification = kMatchType_qualification;
-constexpr int kElimination = kMatchType_elimination;
-char gEventName[128];
-MatchType_t gMatchType;
-uint16_t gMatchNumber;
-uint8_t gReplayNumber;
-uint8_t gGameSpecificMessage[16];
-uint16_t gGameSpecificMessageSize;
-#else
+// #ifdef __FRC_SYSTEMCORE__
+// using MatchType = MatchType_t;
+// constexpr int kNone = kMatchType_none;
+// constexpr int kPractice = kMatchType_practice;
+// constexpr int kQualification = kMatchType_qualification;
+// constexpr int kElimination = kMatchType_elimination;
+// char gEventName[128];
+// MatchType_t gMatchType;
+// uint16_t gMatchNumber;
+// uint8_t gReplayNumber;
+// uint8_t gGameSpecificMessage[16];
+// uint16_t gGameSpecificMessageSize;
+// #else
 enum MatchType { kNone, kPractice, kQualification, kElimination };
-#endif
+// #endif
 
 inline void UpdateMatchInfo() {
-#ifdef __FRC_ROBORIO__
-  gGameSpecificMessageSize = sizeof(gGameSpecificMessage);
-  FRC_NetworkCommunication_getMatchInfo(gEventName, &gMatchType, &gMatchNumber,
-                                        &gReplayNumber, gGameSpecificMessage,
-                                        &gGameSpecificMessageSize);
-#endif
+  // #ifdef __FRC_SYSTEMCORE__
+  //   gGameSpecificMessageSize = sizeof(gGameSpecificMessage);
+  //   FRC_NetworkCommunication_getMatchInfo(gEventName, &gMatchType,
+  //   &gMatchNumber,
+  //                                         &gReplayNumber,
+  //                                         gGameSpecificMessage,
+  //                                         &gGameSpecificMessageSize);
+  // #endif
 }
 
 inline MatchType GetMatchType() {
-#ifdef __FRC_ROBORIO__
-  return gMatchType;
-#else
+  // #ifdef __FRC_SYSTEMCORE__
+  //   return gMatchType;
+  // #else
   return kNone;
-#endif
+  // #endif
 }
 
 inline std::string_view GetEventName() {
-#ifdef __FRC_ROBORIO__
-  return gEventName;
-#else
+  // #ifdef __FRC_SYSTEMCORE__
+  //   return gEventName;
+  // #else
   return "";
-#endif
+  // #endif
 }
 
 inline uint16_t GetMatchNumber() {
-#ifdef __FRC_ROBORIO__
-  return gMatchNumber;
-#else
+  // #ifdef __FRC_SYSTEMCORE__
+  //   return gMatchNumber;
+  // #else
   return 0;
-#endif
+  // #endif
 }
 
 inline bool IsDSAttached() {
-#ifdef __FRC_ROBORIO__
-  struct ControlWord_t cw;
-  FRC_NetworkCommunication_getControlWord(&cw);
-  return cw.dsAttached;
-#else
+  // #ifdef __FRC_SYSTEMCORE__
+  //   struct ControlWord_t cw;
+  //   FRC_NetworkCommunication_getControlWord(&cw);
+  //   return cw.dsAttached;
+  // #else
   return true;
-#endif
+  // #endif
 }
 
 inline bool IsFMSAttached() {
-#ifdef __FRC_ROBORIO__
-  struct ControlWord_t cw;
-  FRC_NetworkCommunication_getControlWord(&cw);
-  return cw.fmsAttached;
-#else
+  // #ifdef __FRC_SYSTEMCORE__
+  //   struct ControlWord_t cw;
+  //   FRC_NetworkCommunication_getControlWord(&cw);
+  //   return cw.fmsAttached;
+  // #else
   return false;
-#endif
+  // #endif
 }
 
 WPI_EventHandle gNewDataEvent;
@@ -170,19 +170,19 @@ inline void RemoveRefreshedDataEventHandle(WPI_EventHandle event) {}
 
 }  // namespace DriverStation
 
-#ifdef __FRC_ROBORIO__
-static constexpr int kRoboRIO = 0;
-namespace RobotBase {
-inline int GetRuntimeType() {
-  nLoadOut::tTargetClass targetClass = nLoadOut::getTargetClass();
-  if (targetClass == nLoadOut::kTargetClass_RoboRIO2) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-}  // namespace RobotBase
-#endif
+// #ifdef __FRC_SYSTEMCORE__
+// static constexpr int kRoboRIO = 0;
+// namespace RobotBase {
+// inline int GetRuntimeType() {
+//   nLoadOut::tTargetClass targetClass = nLoadOut::getTargetClass();
+//   if (targetClass == nLoadOut::kTargetClass_RoboRIO2) {
+//     return 1;
+//   } else {
+//     return 0;
+//   }
+// }
+// }  // namespace RobotBase
+// #endif
 
 struct Thread final : public wpi::SafeThread {
   Thread(std::string_view dir, std::string_view filename, double period);
@@ -202,7 +202,7 @@ struct Thread final : public wpi::SafeThread {
   NT_DataLogger m_ntEntryLogger = 0;
   NT_ConnectionDataLogger m_ntConnLogger = 0;
   bool m_consoleLoggerEnabled = false;
-  wpi::FileLogger m_consoleLogger;
+  wpi::log::FileLogger m_consoleLogger;
   wpi::log::StringLogEntry m_messageLog;
 };
 
@@ -222,7 +222,7 @@ static std::string MakeLogDir(std::string_view dir) {
   if (!dir.empty()) {
     return std::string{dir};
   }
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
   // prefer a mounted USB drive if one is accessible
   std::error_code ec;
   auto s = fs::status("/u", ec);
@@ -231,13 +231,8 @@ static std::string MakeLogDir(std::string_view dir) {
     fs::create_directory("/u/logs", ec);
     return "/u/logs";
   }
-  if (RobotBase::GetRuntimeType() == kRoboRIO) {
-    FRC_ReportError(warn::Warning,
-                    "DataLogManager: Logging to RoboRIO 1 internal storage is "
-                    "not recommended! Plug in a FAT32 formatted flash drive!");
-  }
-  fs::create_directory("/home/lvuser/logs", ec);
-  return "/home/lvuser/logs";
+  fs::create_directory("/home/systemcore/logs", ec);
+  return "/home/systemcore/logs";
 #else
   std::string logDir = filesystem::GetOperatingDirectory() + "/logs";
   std::error_code ec;
@@ -460,7 +455,7 @@ void Thread::StopNTLog() {
 void Thread::StartConsoleLog() {
   if (!m_consoleLoggerEnabled) {
     m_consoleLoggerEnabled = true;
-    m_consoleLogger = {"/home/lvuser/FRC_UserProgram.log", m_log, "output"};
+    m_consoleLogger = {"/home/systemcore/FRC_UserProgram.log", m_log, "output"};
   }
 }
 

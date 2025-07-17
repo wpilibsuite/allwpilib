@@ -4,12 +4,9 @@
 
 #pragma once
 
-#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
-
-#include "wpi/function_ref.h"
 
 namespace wpi {
 
@@ -18,7 +15,7 @@ class SendableBuilder;
 
 /**
  * The SendableRegistry class is the public interface for registering sensors
- * and actuators for use on dashboards and LiveWindow.
+ * and actuators for use on dashboards.
  */
 class SendableRegistry final {
  public:
@@ -31,14 +28,6 @@ class SendableRegistry final {
    * destruction order relative to Sendables.
    */
   static void EnsureInitialized();
-
-  /**
-   * Sets the factory for LiveWindow builders.
-   *
-   * @param factory factory function
-   */
-  static void SetLiveWindowBuilderFactory(
-      std::function<std::unique_ptr<SendableBuilder>()> factory);
 
   /**
    * Adds an object to the registry.
@@ -79,47 +68,6 @@ class SendableRegistry final {
    */
   static void Add(Sendable* sendable, std::string_view subsystem,
                   std::string_view name);
-
-  /**
-   * Adds an object to the registry and LiveWindow.
-   *
-   * @param sendable object to add
-   * @param name component name
-   */
-  static void AddLW(Sendable* sendable, std::string_view name);
-
-  /**
-   * Adds an object to the registry and LiveWindow.
-   *
-   * @param sendable     object to add
-   * @param moduleType   A string that defines the module name in the label for
-   *                     the value
-   * @param channel      The channel number the device is plugged into
-   */
-  static void AddLW(Sendable* sendable, std::string_view moduleType,
-                    int channel);
-
-  /**
-   * Adds an object to the registry and LiveWindow.
-   *
-   * @param sendable     object to add
-   * @param moduleType   A string that defines the module name in the label for
-   *                     the value
-   * @param moduleNumber The number of the particular module type
-   * @param channel      The channel number the device is plugged into
-   */
-  static void AddLW(Sendable* sendable, std::string_view moduleType,
-                    int moduleNumber, int channel);
-
-  /**
-   * Adds an object to the registry and LiveWindow.
-   *
-   * @param sendable object to add
-   * @param subsystem subsystem name
-   * @param name component name
-   */
-  static void AddLW(Sendable* sendable, std::string_view subsystem,
-                    std::string_view name);
 
   /**
    * Adds a child object to an object.  Adds the child object to the registry
@@ -256,20 +204,6 @@ class SendableRegistry final {
   static std::shared_ptr<void> GetData(Sendable* sendable, int handle);
 
   /**
-   * Enables LiveWindow for an object.
-   *
-   * @param sendable object
-   */
-  static void EnableLiveWindow(Sendable* sendable);
-
-  /**
-   * Disables LiveWindow for an object.
-   *
-   * @param sendable object
-   */
-  static void DisableLiveWindow(Sendable* sendable);
-
-  /**
    * Get unique id for an object.  Since objects can move, use this instead
    * of storing Sendable* directly if ownership is in question.
    *
@@ -301,39 +235,6 @@ class SendableRegistry final {
    * @param sendableUid sendable unique id
    */
   static void Update(UID sendableUid);
-
-  /**
-   * Data passed to ForeachLiveWindow() callback function
-   */
-  struct CallbackData {
-    CallbackData(Sendable* sendable_, std::string_view name_,
-                 std::string_view subsystem_, wpi::Sendable* parent_,
-                 std::shared_ptr<void>& data_, SendableBuilder& builder_)
-        : sendable(sendable_),
-          name(name_),
-          subsystem(subsystem_),
-          parent(parent_),
-          data(data_),
-          builder(builder_) {}
-
-    Sendable* sendable;
-    std::string_view name;
-    std::string_view subsystem;
-    Sendable* parent;
-    std::shared_ptr<void>& data;
-    SendableBuilder& builder;
-  };
-
-  /**
-   * Iterates over LiveWindow-enabled objects in the registry.
-   * It is *not* safe to call other SendableRegistry functions from the
-   * callback (this will likely deadlock).
-   *
-   * @param dataHandle data handle to get data pointer passed to callback
-   * @param callback function to call for each object
-   */
-  static void ForeachLiveWindow(
-      int dataHandle, wpi::function_ref<void(CallbackData& cbdata)> callback);
 };
 
 }  // namespace wpi

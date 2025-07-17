@@ -6,7 +6,6 @@
 
 #include <memory>
 
-#include <hal/AnalogGyro.h>
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -33,19 +32,13 @@ class AnalogInput;
 class AnalogGyro : public wpi::Sendable,
                    public wpi::SendableHelper<AnalogGyro> {
  public:
-  static constexpr int kOversampleBits = 10;
-  static constexpr int kAverageBits = 0;
-  static constexpr double kSamplesPerSecond = 50.0;
-  static constexpr double kCalibrationSampleTime = 5.0;
-  static constexpr double kDefaultVoltsPerDegreePerSecond = 0.007;
-
   /**
    * %Gyro constructor using the Analog Input channel number.
    *
    * @param channel The analog channel the gyro is connected to. Gyros can only
    *                be used on on-board Analog Inputs 0-1.
    */
-  explicit AnalogGyro(int channel);
+  explicit AnalogGyro(int channel) {}
 
   /**
    * Gyro constructor with a precreated AnalogInput object.
@@ -59,7 +52,7 @@ class AnalogGyro : public wpi::Sendable,
    * @param channel A pointer to the AnalogInput object that the gyro is
    *                connected to.
    */
-  explicit AnalogGyro(AnalogInput* channel);
+  explicit AnalogGyro(AnalogInput* channel) {}
 
   /**
    * %Gyro constructor with a precreated AnalogInput object.
@@ -71,7 +64,7 @@ class AnalogGyro : public wpi::Sendable,
    * @param channel A pointer to the AnalogInput object that the gyro is
    *                connected to.
    */
-  explicit AnalogGyro(std::shared_ptr<AnalogInput> channel);
+  explicit AnalogGyro(std::shared_ptr<AnalogInput> channel) {}
 
   /**
    * %Gyro constructor using the Analog Input channel number with parameters for
@@ -83,7 +76,7 @@ class AnalogGyro : public wpi::Sendable,
    *                value.
    * @param offset  Preset uncalibrated value to use as the gyro offset.
    */
-  AnalogGyro(int channel, int center, double offset);
+  AnalogGyro(int channel, int center, double offset) {}
 
   /**
    * %Gyro constructor with a precreated AnalogInput object and calibrated
@@ -99,7 +92,7 @@ class AnalogGyro : public wpi::Sendable,
    *                value.
    * @param offset  Preset uncalibrated value to use as the gyro offset.
    */
-  AnalogGyro(std::shared_ptr<AnalogInput> channel, int center, double offset);
+  AnalogGyro(std::shared_ptr<AnalogInput> channel, int center, double offset) {}
 
   AnalogGyro(AnalogGyro&& rhs) = default;
   AnalogGyro& operator=(AnalogGyro&& rhs) = default;
@@ -118,7 +111,7 @@ class AnalogGyro : public wpi::Sendable,
    * @return The current heading of the robot in degrees. This heading is based
    *         on integration of the returned rate from the gyro.
    */
-  double GetAngle() const;
+  double GetAngle() const { return 0; }
 
   /**
    * Return the rate of rotation of the gyro
@@ -127,7 +120,7 @@ class AnalogGyro : public wpi::Sendable,
    *
    * @return the current rate in degrees per second
    */
-  double GetRate() const;
+  double GetRate() const { return 0; }
 
   /**
    * Return the gyro center value. If run after calibration,
@@ -135,7 +128,7 @@ class AnalogGyro : public wpi::Sendable,
    *
    * @return the current center value
    */
-  virtual int GetCenter() const;
+  virtual int GetCenter() const { return 0; }
 
   /**
    * Return the gyro offset value. If run after calibration,
@@ -143,7 +136,7 @@ class AnalogGyro : public wpi::Sendable,
    *
    * @return the current offset value
    */
-  virtual double GetOffset() const;
+  virtual double GetOffset() const { return 0; }
 
   /**
    * Set the gyro sensitivity.
@@ -154,7 +147,7 @@ class AnalogGyro : public wpi::Sendable,
    *
    * @param voltsPerDegreePerSecond The sensitivity in Volts/degree/second
    */
-  void SetSensitivity(double voltsPerDegreePerSecond);
+  void SetSensitivity(double voltsPerDegreePerSecond) {}
 
   /**
    * Set the size of the neutral zone.
@@ -165,7 +158,7 @@ class AnalogGyro : public wpi::Sendable,
    *
    * @param volts The size of the deadband in volts
    */
-  void SetDeadband(double volts);
+  void SetDeadband(double volts) {}
 
   /**
    * Reset the gyro.
@@ -174,14 +167,14 @@ class AnalogGyro : public wpi::Sendable,
    * significant drift in the gyro and it needs to be recalibrated after it has
    * been running.
    */
-  void Reset();
+  void Reset() {}
 
   /**
    * Initialize the gyro.
    *
    * Calibration is handled by Calibrate().
    */
-  void InitGyro();
+  void InitGyro() {}
 
   /**
    * Calibrate the gyro by running for a number of samples and computing the
@@ -193,7 +186,7 @@ class AnalogGyro : public wpi::Sendable,
    * robot is first turned on while it's sitting at rest before the competition
    * starts.
    */
-  void Calibrate();
+  void Calibrate() {}
 
   /**
    * Return the heading of the robot as a Rotation2d.
@@ -208,20 +201,16 @@ class AnalogGyro : public wpi::Sendable,
    * @return the current heading of the robot as a Rotation2d. This heading is
    *         based on integration of the returned rate from the gyro.
    */
-  Rotation2d GetRotation2d() const;
+  Rotation2d GetRotation2d() const { return {}; }
 
   /**
    * Gets the analog input for the gyro.
    *
    * @return AnalogInput
    */
-  std::shared_ptr<AnalogInput> GetAnalogInput() const;
+  std::shared_ptr<AnalogInput> GetAnalogInput() const { return nullptr; }
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
-
- private:
-  std::shared_ptr<AnalogInput> m_analog;
-  hal::Handle<HAL_GyroHandle, HAL_FreeAnalogGyro> m_gyroHandle;
+  void InitSendable(wpi::SendableBuilder& builder) override {}
 };
 
 }  // namespace frc

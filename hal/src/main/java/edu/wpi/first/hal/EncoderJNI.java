@@ -13,22 +13,15 @@ public class EncoderJNI extends JNIWrapper {
   /**
    * Initializes an encoder.
    *
-   * @param digitalSourceHandleA the A source handle (either a digital or analog trigger)
-   * @param analogTriggerTypeA the analog trigger type of the A source if it is an analog trigger
-   * @param digitalSourceHandleB the B source handle (either a digital or analog trigger)
-   * @param analogTriggerTypeB the analog trigger type of the B source if it is an analog trigger
+   * @param aChannel the A channel
+   * @param bChannel the B channel
    * @param reverseDirection true to reverse the counting direction from standard, otherwise false
    * @param encodingType the encoding type
    * @return the created encoder handle
    * @see "HAL_InitializeEncoder"
    */
   public static native int initializeEncoder(
-      int digitalSourceHandleA,
-      int analogTriggerTypeA,
-      int digitalSourceHandleB,
-      int analogTriggerTypeB,
-      boolean reverseDirection,
-      int encodingType);
+      int aChannel, int bChannel, boolean reverseDirection, int encodingType);
 
   /**
    * Frees an encoder.
@@ -211,21 +204,6 @@ public class EncoderJNI extends JNIWrapper {
    * @see "HAL_GetEncoderSamplesToAverage"
    */
   public static native int getEncoderSamplesToAverage(int encoderHandle);
-
-  /**
-   * Sets the source for an index pulse on the encoder.
-   *
-   * <p>The index pulse can be used to cause an encoder to reset based on an external input.
-   *
-   * @param encoderHandle the encoder handle
-   * @param digitalSourceHandle the index source handle (either a HAL_AnalogTriggerHandle or a
-   *     HAL_DigitalHandle)
-   * @param analogTriggerType the analog trigger type if the source is an analog trigger
-   * @param indexingType the index triggering type
-   * @see "HAL_SetEncoderIndexSource"
-   */
-  public static native void setEncoderIndexSource(
-      int encoderHandle, int digitalSourceHandle, int analogTriggerType, int indexingType);
 
   /**
    * Gets the FPGA index of the encoder.

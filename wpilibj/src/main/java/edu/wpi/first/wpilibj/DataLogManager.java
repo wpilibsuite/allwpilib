@@ -4,17 +4,15 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.datalog.DataLog;
+import edu.wpi.first.datalog.DataLogBackgroundWriter;
+import edu.wpi.first.datalog.FileLogger;
+import edu.wpi.first.datalog.IntegerLogEntry;
+import edu.wpi.first.datalog.StringLogEntry;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.util.FileLogger;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.concurrent.Event;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DataLogBackgroundWriter;
-import edu.wpi.first.util.datalog.IntegerLogEntry;
-import edu.wpi.first.util.datalog.StringLogEntry;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,7 +29,7 @@ import java.util.Random;
  * Centralized data log that provides automatic data log file management. It automatically cleans up
  * old files when disk space is low and renames the file based either on current date/time or (if
  * available) competition match number. The data file will be saved to a USB flash drive in a folder
- * named "logs" if one is attached, or to /home/lvuser/logs otherwise.
+ * named "logs" if one is attached, or to /home/systemcore/logs otherwise.
  *
  * <p>Log files are initially named "FRC_TBD_{random}.wpilog" until the DS connects. After the DS
  * connects, the log file is renamed to "FRC_yyyyMMdd_HHmmss.wpilog" (where the date/time is UTC).
@@ -247,23 +245,17 @@ public final class DataLogManager {
           if (!new File("/u/logs").mkdir()) {
             // ignored
           }
-          HAL.report(tResourceType.kResourceType_DataLogManager, tInstances.kDataLogLocation_USB);
+          HAL.reportUsage("DataLogManager", "USB");
           return "/u/logs";
         }
       } catch (IOException ex) {
         // ignored
       }
-      if (RobotBase.getRuntimeType() == RuntimeType.kRoboRIO) {
-        DriverStation.reportWarning(
-            "DataLogManager: Logging to RoboRIO 1 internal storage is not recommended!"
-                + " Plug in a FAT32 formatted flash drive!",
-            false);
-      }
-      if (!new File("/home/lvuser/logs").mkdir()) {
+      if (!new File("/home/systemcore/logs").mkdir()) {
         // ignored
       }
-      HAL.report(tResourceType.kResourceType_DataLogManager, tInstances.kDataLogLocation_Onboard);
-      return "/home/lvuser/logs";
+      HAL.reportUsage("DataLogManager", "Onboard");
+      return "/home/systemcore/logs";
     }
     String logDir = Filesystem.getOperatingDirectory().getAbsolutePath() + "/logs";
     if (!new File(logDir).mkdir()) {
@@ -299,7 +291,7 @@ public final class DataLogManager {
 
   private static void startConsoleLog() {
     if (RobotBase.isReal()) {
-      m_consoleLogger = new FileLogger("/home/lvuser/FRC_UserProgram.log", m_log, "console");
+      m_consoleLogger = new FileLogger("/home/systemcore/FRC_UserProgram.log", m_log, "console");
     }
   }
 

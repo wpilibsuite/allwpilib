@@ -18,8 +18,7 @@ class DifferentialDriveWheelSpeedsTest {
     final var wheelSpeeds = left.plus(right);
 
     assertAll(
-        () -> assertEquals(3.0, wheelSpeeds.leftMetersPerSecond),
-        () -> assertEquals(2.0, wheelSpeeds.rightMetersPerSecond));
+        () -> assertEquals(3.0, wheelSpeeds.left), () -> assertEquals(2.0, wheelSpeeds.right));
   }
 
   @Test
@@ -30,8 +29,7 @@ class DifferentialDriveWheelSpeedsTest {
     final var wheelSpeeds = left.minus(right);
 
     assertAll(
-        () -> assertEquals(-1.0, wheelSpeeds.leftMetersPerSecond),
-        () -> assertEquals(0.0, wheelSpeeds.rightMetersPerSecond));
+        () -> assertEquals(-1.0, wheelSpeeds.left), () -> assertEquals(0.0, wheelSpeeds.right));
   }
 
   @Test
@@ -39,8 +37,7 @@ class DifferentialDriveWheelSpeedsTest {
     final var wheelSpeeds = new DifferentialDriveWheelSpeeds(1.0, 0.5).unaryMinus();
 
     assertAll(
-        () -> assertEquals(-1.0, wheelSpeeds.leftMetersPerSecond),
-        () -> assertEquals(-0.5, wheelSpeeds.rightMetersPerSecond));
+        () -> assertEquals(-1.0, wheelSpeeds.left), () -> assertEquals(-0.5, wheelSpeeds.right));
   }
 
   @Test
@@ -48,8 +45,7 @@ class DifferentialDriveWheelSpeedsTest {
     final var wheelSpeeds = new DifferentialDriveWheelSpeeds(1.0, 0.5).times(2.0);
 
     assertAll(
-        () -> assertEquals(2.0, wheelSpeeds.leftMetersPerSecond),
-        () -> assertEquals(1.0, wheelSpeeds.rightMetersPerSecond));
+        () -> assertEquals(2.0, wheelSpeeds.left), () -> assertEquals(1.0, wheelSpeeds.right));
   }
 
   @Test
@@ -57,7 +53,6 @@ class DifferentialDriveWheelSpeedsTest {
     final var wheelSpeeds = new DifferentialDriveWheelSpeeds(1.0, 0.5).div(2.0);
 
     assertAll(
-        () -> assertEquals(0.5, wheelSpeeds.leftMetersPerSecond),
-        () -> assertEquals(0.25, wheelSpeeds.rightMetersPerSecond));
+        () -> assertEquals(0.5, wheelSpeeds.left), () -> assertEquals(0.25, wheelSpeeds.right));
   }
 }

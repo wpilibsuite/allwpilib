@@ -29,11 +29,11 @@ static_assert(
     HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kHybrid);
 
 std::shared_ptr<PneumaticsBase> PneumaticsBase::GetForType(
-    int module, PneumaticsModuleType moduleType) {
+    int busId, int module, PneumaticsModuleType moduleType) {
   if (moduleType == PneumaticsModuleType::CTREPCM) {
-    return PneumaticsControlModule::GetForModule(module);
+    return PneumaticsControlModule::GetForModule(busId, module);
   } else if (moduleType == PneumaticsModuleType::REVPH) {
-    return PneumaticHub::GetForModule(module);
+    return PneumaticHub::GetForModule(busId, module);
   }
   throw FRC_MakeError(err::InvalidParameter, "{}",
                       static_cast<int>(moduleType));

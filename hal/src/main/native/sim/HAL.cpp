@@ -66,12 +66,8 @@ void InitializeDriverStation();
 
 namespace hal::init {
 void InitializeHAL() {
-  InitializeAccelerometerData();
   InitializeAddressableLEDData();
-  InitializeAnalogGyroData();
   InitializeAnalogInData();
-  InitializeAnalogOutData();
-  InitializeAnalogTriggerData();
   InitializeCanData();
   InitializeCANAPI();
   InitializeDigitalPWMData();
@@ -84,19 +80,11 @@ void InitializeHAL() {
   InitializeREVPHData();
   InitializePowerDistributionData();
   InitializePWMData();
-  InitializeRelayData();
   InitializeRoboRioData();
   InitializeSimDeviceData();
-  InitializeSPIAccelerometerData();
-  InitializeSPIData();
-  InitializeAccelerometer();
   InitializeAddressableLED();
-  InitializeAnalogAccumulator();
-  InitializeAnalogGyro();
   InitializeAnalogInput();
   InitializeAnalogInternal();
-  InitializeAnalogOutput();
-  InitializeAnalogTrigger();
   InitializeCAN();
   InitializeConstants();
   InitializeCounter();
@@ -107,7 +95,6 @@ void InitializeHAL() {
   InitializeEncoder();
   InitializeExtensions();
   InitializeI2C();
-  InitializeInterrupts();
   InitializeMain();
   InitializeMockHooks();
   InitializeNotifier();
@@ -117,34 +104,13 @@ void InitializeHAL() {
   InitializeCTREPCM();
   InitializeREVPH();
   InitializePWM();
-  InitializeRelay();
   InitializeSerialPort();
   InitializeSimDevice();
-  InitializeSPI();
   InitializeThreads();
 }
 }  // namespace hal::init
 
 extern "C" {
-
-HAL_PortHandle HAL_GetPort(int32_t channel) {
-  // Dont allow a number that wouldn't fit in a uint8_t
-  if (channel < 0 || channel >= 255) {
-    return HAL_kInvalidHandle;
-  }
-  return createPortHandle(channel, 1);
-}
-
-HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel) {
-  // Dont allow a number that wouldn't fit in a uint8_t
-  if (channel < 0 || channel >= 255) {
-    return HAL_kInvalidHandle;
-  }
-  if (module < 0 || module >= 255) {
-    return HAL_kInvalidHandle;
-  }
-  return createPortHandle(channel, module);
-}
 
 const char* HAL_GetErrorMessage(int32_t code) {
   switch (code) {
@@ -323,10 +289,6 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
   return (upper << 32) + static_cast<uint64_t>(unexpandedLower);
 }
 
-HAL_Bool HAL_GetFPGAButton(int32_t* status) {
-  return SimRoboRioData[0].fpgaButton;
-}
-
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
   return HALSIM_GetDriverStationEnabled();
 }
@@ -492,8 +454,8 @@ void HALSIM_CancelAllSimPeriodicCallbacks(void) {
   gSimPeriodicAfter.Reset();
 }
 
-int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
-                   const char* feature) {
+int32_t HAL_ReportUsage(const struct WPI_String* resource,
+                        const struct WPI_String* data) {
   return 0;  // Do nothing for now
 }
 

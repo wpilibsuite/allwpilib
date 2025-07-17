@@ -14,58 +14,54 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
  * drivetrain stay below a certain limit.
  */
 public class DifferentialDriveKinematicsConstraint implements TrajectoryConstraint {
-  private final double m_maxSpeedMetersPerSecond;
+  private final double m_maxSpeed;
   private final DifferentialDriveKinematics m_kinematics;
 
   /**
    * Constructs a differential drive dynamics constraint.
    *
    * @param kinematics A kinematics component describing the drive geometry.
-   * @param maxSpeedMetersPerSecond The max speed that a side of the robot can travel at.
+   * @param maxSpeed The max speed that a side of the robot can travel at in m/s.
    */
   public DifferentialDriveKinematicsConstraint(
-      final DifferentialDriveKinematics kinematics, double maxSpeedMetersPerSecond) {
-    m_maxSpeedMetersPerSecond = maxSpeedMetersPerSecond;
+      final DifferentialDriveKinematics kinematics, double maxSpeed) {
+    m_maxSpeed = maxSpeed;
     m_kinematics = kinematics;
   }
 
   /**
    * Returns the max velocity given the current pose and curvature.
    *
-   * @param poseMeters The pose at the current point in the trajectory.
-   * @param curvatureRadPerMeter The curvature at the current point in the trajectory.
-   * @param velocityMetersPerSecond The velocity at the current point in the trajectory before
-   *     constraints are applied.
+   * @param pose The pose at the current point in the trajectory.
+   * @param curvature The curvature at the current point in the trajectory in rad/m.
+   * @param velocity The velocity at the current point in the trajectory before constraints are
+   *     applied in m/s.
    * @return The absolute maximum velocity.
    */
   @Override
-  public double getMaxVelocityMetersPerSecond(
-      Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
+  public double getMaxVelocity(Pose2d pose, double curvature, double velocity) {
     // Create an object to represent the current chassis speeds.
-    var chassisSpeeds =
-        new ChassisSpeeds(
-            velocityMetersPerSecond, 0, velocityMetersPerSecond * curvatureRadPerMeter);
+    var chassisSpeeds = new ChassisSpeeds(velocity, 0, velocity * curvature);
 
     // Get the wheel speeds and normalize them to within the max velocity.
     var wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
-    wheelSpeeds.desaturate(m_maxSpeedMetersPerSecond);
+    wheelSpeeds.desaturate(m_maxSpeed);
 
     // Return the new linear chassis speed.
-    return m_kinematics.toChassisSpeeds(wheelSpeeds).vxMetersPerSecond;
+    return m_kinematics.toChassisSpeeds(wheelSpeeds).vx;
   }
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory given pose,
    * curvature, and speed.
    *
-   * @param poseMeters The pose at the current point in the trajectory.
-   * @param curvatureRadPerMeter The curvature at the current point in the trajectory.
-   * @param velocityMetersPerSecond The speed at the current point in the trajectory.
+   * @param pose The pose at the current point in the trajectory.
+   * @param curvature The curvature at the current point in the trajectory in rad/m.
+   * @param velocity The speed at the current point in the trajectory in m/s.
    * @return The min and max acceleration bounds.
    */
   @Override
-  public MinMax getMinMaxAccelerationMetersPerSecondSq(
-      Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
+  public MinMax getMinMaxAcceleration(Pose2d pose, double curvature, double velocity) {
     return new MinMax();
   }
 }

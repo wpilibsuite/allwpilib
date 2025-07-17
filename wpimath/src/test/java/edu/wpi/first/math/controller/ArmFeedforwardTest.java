@@ -86,7 +86,7 @@ class ArmFeedforwardTest {
       double currentVelocity,
       double nextVelocity,
       double dt) {
-    final double input = armFF.calculateWithVelocities(currentAngle, currentVelocity, nextVelocity);
+    final double input = armFF.calculate(currentAngle, currentVelocity, nextVelocity);
     assertEquals(
         nextVelocity,
         simulate(ks, kv, ka, kg, currentAngle, currentVelocity, input, dt).get(1, 0),
@@ -127,7 +127,7 @@ class ArmFeedforwardTest {
     var averageAccel = (nextVelocity - currentVelocity) / 0.02;
 
     assertEquals(
-        armFF.calculateWithVelocities(currentAngle, currentVelocity, nextVelocity),
+        armFF.calculate(currentAngle, currentVelocity, nextVelocity),
         ks + kv * currentVelocity + ka * averageAccel + kg * Math.cos(currentAngle));
   }
 

@@ -6,15 +6,14 @@
 
 #include "frc/motorcontrol/{{ name }}.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 
 using namespace frc;
 
 {{ name }}::{{ name }}(int channel) : PWMMotorController("{{ name }}", channel) {
-  m_pwm.SetBounds({{ pulse_width_ms.max }}_ms, {{ pulse_width_ms.deadbandMax }}_ms, {{ pulse_width_ms.center }}_ms, {{ pulse_width_ms.deadbandMin }}_ms, {{ pulse_width_ms.min }}_ms);
-  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_{{ PeriodMultiplier | default("1", true)}}X);
-  m_pwm.SetSpeed(0.0);
-  m_pwm.SetZeroLatch();
+  SetBounds({{ pulse_width_ms.max }}_ms, {{ pulse_width_ms.deadbandMax }}_ms, {{ pulse_width_ms.center }}_ms, {{ pulse_width_ms.deadbandMin }}_ms, {{ pulse_width_ms.min }}_ms);
+  m_pwm.SetOutputPeriod(PWM::kOutputPeriod_{{ OutputPeriod | default("5", true)}}Ms);
+  SetSpeed(0.0);
 
-  HAL_Report(HALUsageReporting::kResourceType_{{ ResourceName }}, GetChannel() + 1);
+  HAL_ReportUsage("IO", GetChannel(), "{{ ResourceName }}");
 }

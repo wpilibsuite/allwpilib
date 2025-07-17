@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -25,23 +23,26 @@ public class Solenoid implements Sendable, AutoCloseable {
   /**
    * Constructs a solenoid for a default module and specified type.
    *
+   * @param busId The bus ID
    * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
-  public Solenoid(final PneumaticsModuleType moduleType, final int channel) {
-    this(PneumaticsBase.getDefaultForType(moduleType), moduleType, channel);
+  public Solenoid(final int busId, final PneumaticsModuleType moduleType, final int channel) {
+    this(busId, PneumaticsBase.getDefaultForType(moduleType), moduleType, channel);
   }
 
   /**
    * Constructs a solenoid for a specified module and type.
    *
+   * @param busId The bus ID
    * @param module The module ID to use.
    * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
   @SuppressWarnings("this-escape")
-  public Solenoid(final int module, final PneumaticsModuleType moduleType, final int channel) {
-    m_module = PneumaticsBase.getForType(module, moduleType);
+  public Solenoid(
+      final int busId, final int module, final PneumaticsModuleType moduleType, final int channel) {
+    m_module = PneumaticsBase.getForType(busId, module, moduleType);
 
     m_mask = 1 << channel;
     m_channel = channel;
@@ -56,8 +57,8 @@ public class Solenoid implements Sendable, AutoCloseable {
       throw new AllocationException("Solenoid already allocated");
     }
 
-    HAL.report(tResourceType.kResourceType_Solenoid, channel + 1, m_module.getModuleNumber() + 1);
-    SendableRegistry.addLW(this, "Solenoid", m_module.getModuleNumber(), channel);
+    m_module.reportUsage("Solenoid[" + channel + "]", "Solenoid");
+    SendableRegistry.add(this, "Solenoid", m_module.getModuleNumber(), channel);
   }
 
   @Override
@@ -127,11 +128,11 @@ public class Solenoid implements Sendable, AutoCloseable {
    * <p>On the PH, the timing can be controlled in 0.001 second increments, with a maximum of 65.534
    * seconds.
    *
-   * @param durationSeconds The duration of the pulse in seconds.
+   * @param duration The duration of the pulse in seconds.
    * @see #startPulse()
    */
-  public void setPulseDuration(double durationSeconds) {
-    long durationMS = (long) (durationSeconds * 1000);
+  public void setPulseDuration(double duration) {
+    long durationMS = (long) (duration * 1000);
     m_module.setOneShotDuration(m_channel, (int) durationMS);
   }
 
@@ -148,7 +149,6 @@ public class Solenoid implements Sendable, AutoCloseable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Solenoid");
     builder.setActuator(true);
-    builder.setSafeState(() -> set(false));
     builder.addBooleanProperty("Value", this::get, this::set);
   }
 }

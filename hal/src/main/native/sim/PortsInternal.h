@@ -7,9 +7,9 @@
 #include <stdint.h>
 
 namespace hal {
+constexpr int32_t kNumCanBuses = 5;
 constexpr int32_t kAccelerometers = 1;
 constexpr int32_t kNumAccumulators = 2;
-constexpr int32_t kNumAnalogTriggers = 8;
 constexpr int32_t kNumAnalogInputs = 8;
 constexpr int32_t kNumAnalogOutputs = 2;
 constexpr int32_t kNumCounters = 8;
@@ -31,7 +31,7 @@ constexpr int32_t kNumREVPDHModules = 63;
 constexpr int32_t kNumREVPDHChannels = 24;
 constexpr int32_t kNumPDSimModules = kNumREVPDHModules;
 constexpr int32_t kNumPDSimChannels = kNumREVPDHChannels;
-constexpr int32_t kNumDutyCycles = 8;
+constexpr int32_t kNumDutyCycles = 6;
 constexpr int32_t kNumAddressableLEDs = 1;
 constexpr int32_t kNumREVPHModules = 63;
 constexpr int32_t kNumREVPHChannels = 16;

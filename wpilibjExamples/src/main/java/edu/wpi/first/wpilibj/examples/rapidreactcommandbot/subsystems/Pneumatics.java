@@ -25,7 +25,7 @@ public class Pneumatics extends SubsystemBase {
       new AnalogPotentiometer(/* the AnalogIn port*/ 2, kScale, kOffset);
 
   // Compressor connected to a PCM with a default CAN ID (0)
-  private final Compressor m_compressor = new Compressor(PneumaticsModuleType.CTREPCM);
+  private final Compressor m_compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
 
   /**
    * Query the analog pressure sensor.

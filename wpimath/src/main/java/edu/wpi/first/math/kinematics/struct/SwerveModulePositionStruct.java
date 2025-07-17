@@ -44,7 +44,7 @@ public class SwerveModulePositionStruct implements Struct<SwerveModulePosition> 
 
   @Override
   public void pack(ByteBuffer bb, SwerveModulePosition value) {
-    bb.putDouble(value.distanceMeters);
+    bb.putDouble(value.distance);
     Rotation2d.struct.pack(bb, value.angle);
   }
 }

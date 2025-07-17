@@ -21,6 +21,7 @@ dependencies {
     implementation project(':hal')
     implementation project(':wpimath')
     implementation project(':wpilibj')
+    api project(':datalog')
     testImplementation 'org.mockito:mockito-core:4.1.0'
 }
 
@@ -73,9 +74,6 @@ model {
             if (it instanceof GoogleTestTestSuiteBinarySpec) {
                 nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
-            }
-            if ((it instanceof NativeExecutableBinarySpec || it instanceof GoogleTestTestSuiteBinarySpec) && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
             }
         }
     }

@@ -12,7 +12,6 @@
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_DriverStationJNI.h"
 #include "hal/DriverStation.h"
-#include "hal/FRCUsageReporting.h"
 #include "hal/HALBase.h"
 
 static_assert(edu_wpi_first_hal_DriverStationJNI_kUnknownAllianceStation ==
@@ -104,22 +103,6 @@ Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramTest
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    report
- * Signature: (IIILjava/lang/String;)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_report
-  (JNIEnv* paramEnv, jclass, jint paramResource, jint paramInstanceNumber,
-   jint paramContext, jstring paramFeature)
-{
-  JStringRef featureStr{paramEnv, paramFeature};
-  jint returnValue = HAL_Report(paramResource, paramInstanceNumber,
-                                paramContext, featureStr.c_str());
-  return returnValue;
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
  * Method:    nativeGetControlWord
  * Signature: ()I
  */
@@ -153,11 +136,11 @@ Java_edu_wpi_first_hal_DriverStationJNI_nativeGetAllianceStation
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
  * Method:    getJoystickAxesRaw
- * Signature: (B[I)I
+ * Signature: (B[S)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxesRaw
-  (JNIEnv* env, jclass, jbyte joystickNum, jintArray axesRawArray)
+  (JNIEnv* env, jclass, jbyte joystickNum, jshortArray axesRawArray)
 {
   HAL_JoystickAxes axes;
   HAL_GetJoystickAxes(joystickNum, &axes);
@@ -172,11 +155,7 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxesRaw
     return 0;
   }
 
-  jint raw[HAL_kMaxJoystickAxes];
-  for (int16_t i = 0; i < axes.count; i++) {
-    raw[i] = axes.raw[i];
-  }
-  env->SetIntArrayRegion(axesRawArray, 0, axes.count, raw);
+  env->SetShortArrayRegion(axesRawArray, 0, axes.count, axes.raw);
 
   return axes.count;
 }
@@ -211,11 +190,11 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxes
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
  * Method:    getJoystickPOVs
- * Signature: (B[S)I
+ * Signature: (B[B)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs
-  (JNIEnv* env, jclass, jbyte joystickNum, jshortArray povsArray)
+  (JNIEnv* env, jclass, jbyte joystickNum, jbyteArray povsArray)
 {
   HAL_JoystickPOVs povs;
   HAL_GetJoystickPOVs(joystickNum, &povs);
@@ -230,7 +209,8 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs
     return 0;
   }
 
-  env->SetShortArrayRegion(povsArray, 0, povs.count, povs.povs);
+  env->SetByteArrayRegion(povsArray, 0, povs.count,
+                          reinterpret_cast<const jbyte*>(povs.povs));
 
   return povs.count;
 }
@@ -238,12 +218,12 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
  * Method:    getAllJoystickData
- * Signature: ([F[B[S[J)V
+ * Signature: ([F[S[B[J)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
-  (JNIEnv* env, jclass cls, jfloatArray axesArray, jbyteArray rawAxesArray,
-   jshortArray povsArray, jlongArray buttonsAndMetadataArray)
+  (JNIEnv* env, jclass cls, jfloatArray axesArray, jshortArray rawAxesArray,
+   jbyteArray povsArray, jlongArray buttonsAndMetadataArray)
 {
   HAL_JoystickAxes axes[HAL_kMaxJoysticks];
   HAL_JoystickPOVs povs[HAL_kMaxJoysticks];
@@ -252,8 +232,8 @@ Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
   HAL_GetAllJoystickData(axes, povs, buttons);
 
   CriticalJSpan<jfloat> jAxes(env, axesArray);
-  CriticalJSpan<jbyte> jRawAxes(env, rawAxesArray);
-  CriticalJSpan<jshort> jPovs(env, povsArray);
+  CriticalJSpan<jshort> jRawAxes(env, rawAxesArray);
+  CriticalJSpan<jbyte> jPovs(env, povsArray);
   CriticalJSpan<jlong> jButtons(env, buttonsAndMetadataArray);
 
   static_assert(sizeof(jAxes[0]) == sizeof(axes[0].axes[0]));
@@ -305,14 +285,14 @@ Java_edu_wpi_first_hal_DriverStationJNI_setJoystickOutputs
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getJoystickIsXbox
+ * Method:    getJoystickIsGamepad
  * Signature: (B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickIsXbox
+Java_edu_wpi_first_hal_DriverStationJNI_getJoystickIsGamepad
   (JNIEnv*, jclass, jbyte port)
 {
-  return HAL_GetJoystickIsXbox(port);
+  return HAL_GetJoystickIsGamepad(port);
 }
 
 /*

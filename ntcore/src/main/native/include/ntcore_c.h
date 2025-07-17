@@ -43,11 +43,8 @@ typedef NT_Handle NT_Topic;
 typedef NT_Handle NT_Subscriber;
 typedef NT_Handle NT_Publisher;
 
-/** Default network tables port number (NT3) */
-#define NT_DEFAULT_PORT3 1735
-
-/** Default network tables port number (NT4) */
-#define NT_DEFAULT_PORT4 5810
+/** Default network tables port number */
+#define NT_DEFAULT_PORT 5810
 
 /** NetworkTables data types. */
 enum NT_Type {
@@ -90,8 +87,7 @@ enum NT_LogLevel {
 enum NT_NetworkMode {
   NT_NET_MODE_NONE = 0x00,     /* not running */
   NT_NET_MODE_SERVER = 0x01,   /* running in server mode */
-  NT_NET_MODE_CLIENT3 = 0x02,  /* running in NT3 client mode */
-  NT_NET_MODE_CLIENT4 = 0x04,  /* running in NT4 client mode */
+  NT_NET_MODE_CLIENT = 0x04,   /* running in client mode */
   NT_NET_MODE_STARTING = 0x08, /* flag for starting (either client or server) */
   NT_NET_MODE_LOCAL = 0x10,    /* running in local-only mode */
 };
@@ -190,7 +186,7 @@ struct NT_TopicInfo {
 /** NetworkTables Connection Information */
 struct NT_ConnectionInfo {
   /**
-   * The remote identifier (as set on the remote node by NT_StartClient4().
+   * The remote identifier (as set on the remote node by NT_StartClient().
    */
   struct WPI_String remote_id;
 
@@ -1117,14 +1113,13 @@ void NT_StopLocal(NT_Inst inst);
  * @param inst              instance handle
  * @param persist_filename  the name of the persist file to use (UTF-8 string,
  *                          null terminated)
- * @param listen_address    the address to listen on, or null to listen on any
- *                          address. (UTF-8 string, null terminated)
- * @param port3             port to communicate over (NT3)
- * @param port4             port to communicate over (NT4)
+ * @param listen_address    the address to listen on, or an empty string to
+ *                          listen on any address. (UTF-8 string, null
+ *                          terminated)
+ * @param port              port to communicate over
  */
 void NT_StartServer(NT_Inst inst, const struct WPI_String* persist_filename,
-                    const struct WPI_String* listen_address, unsigned int port3,
-                    unsigned int port4);
+                    const struct WPI_String* listen_address, unsigned int port);
 
 /**
  * Stops the server if it is running.
@@ -1134,22 +1129,13 @@ void NT_StartServer(NT_Inst inst, const struct WPI_String* persist_filename,
 void NT_StopServer(NT_Inst inst);
 
 /**
- * Starts a NT3 client.  Use NT_SetServer or NT_SetServerTeam to set the server
+ * Starts a client.  Use NT_SetServer or NT_SetServerTeam to set the server
  * name and port.
  *
  * @param inst      instance handle
  * @param identity  network identity to advertise (cannot be empty string)
  */
-void NT_StartClient3(NT_Inst inst, const struct WPI_String* identity);
-
-/**
- * Starts a NT4 client.  Use NT_SetServer or NT_SetServerTeam to set the server
- * name and port.
- *
- * @param inst      instance handle
- * @param identity  network identity to advertise (cannot be empty string)
- */
-void NT_StartClient4(NT_Inst inst, const struct WPI_String* identity);
+void NT_StartClient(NT_Inst inst, const struct WPI_String* identity);
 
 /**
  * Stops the client if it is running.

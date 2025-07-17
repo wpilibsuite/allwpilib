@@ -74,8 +74,7 @@ class NetworkTableInstance final {
   enum NetworkMode {
     kNetModeNone = NT_NET_MODE_NONE,
     kNetModeServer = NT_NET_MODE_SERVER,
-    kNetModeClient3 = NT_NET_MODE_CLIENT3,
-    kNetModeClient4 = NT_NET_MODE_CLIENT4,
+    kNetModeClient = NT_NET_MODE_CLIENT,
     kNetModeLocal = NT_NET_MODE_LOCAL
   };
 
@@ -95,14 +94,9 @@ class NetworkTableInstance final {
   };
 
   /**
-   * The default port that network tables operates on for NT3.
+   * The default port that network tables operates on.
    */
-  static constexpr unsigned int kDefaultPort3 = NT_DEFAULT_PORT3;
-
-  /**
-   * The default port that network tables operates on for NT4.
-   */
-  static constexpr unsigned int kDefaultPort4 = NT_DEFAULT_PORT4;
+  static constexpr unsigned int kDefaultPort = NT_DEFAULT_PORT;
 
   /**
    * Construct invalid instance.
@@ -609,16 +603,15 @@ class NetworkTableInstance final {
    *
    * @param persist_filename  the name of the persist file to use (UTF-8 string,
    *                          null terminated)
-   * @param listen_address    the address to listen on, or null to listen on any
-   *                          address (UTF-8 string, null terminated)
-   * @param port3             port to communicate over (NT3)
-   * @param port4             port to communicate over (NT4)
+   * @param listen_address    the address to listen on, or an empty string to
+   *                          listen on any address. (UTF-8 string, null
+   *                          terminated)
+   * @param port              port to communicate over
    */
   void StartServer(std::string_view persist_filename = "networktables.json",
                    const char* listen_address = "",
-                   unsigned int port3 = kDefaultPort3,
-                   unsigned int port4 = kDefaultPort4) {
-    ::nt::StartServer(m_handle, persist_filename, listen_address, port3, port4);
+                   unsigned int port = kDefaultPort) {
+    ::nt::StartServer(m_handle, persist_filename, listen_address, port);
   }
 
   /**
@@ -627,23 +620,13 @@ class NetworkTableInstance final {
   void StopServer() { ::nt::StopServer(m_handle); }
 
   /**
-   * Starts a NT3 client.  Use SetServer or SetServerTeam to set the server name
+   * Starts a client.  Use SetServer or SetServerTeam to set the server name
    * and port.
    *
    * @param identity  network identity to advertise (cannot be empty string)
    */
-  void StartClient3(std::string_view identity) {
-    ::nt::StartClient3(m_handle, identity);
-  }
-
-  /**
-   * Starts a NT4 client.  Use SetServer or SetServerTeam to set the server name
-   * and port.
-   *
-   * @param identity  network identity to advertise (cannot be empty string)
-   */
-  void StartClient4(std::string_view identity) {
-    ::nt::StartClient4(m_handle, identity);
+  void StartClient(std::string_view identity) {
+    ::nt::StartClient(m_handle, identity);
   }
 
   /**

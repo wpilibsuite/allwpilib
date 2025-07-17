@@ -16,10 +16,6 @@ namespace frc {
  *
  * This class is intended to be used by sensor (and other I2C device) drivers.
  * It probably should not be used directly.
- *
- * The Onboard I2C port is subject to system lockups. See <a
- * href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">
- * WPILib Known Issues</a> page for details.
  */
 class I2C {
  public:
@@ -27,10 +23,10 @@ class I2C {
    * I2C connection ports.
    */
   enum Port {
-    /// Onboard I2C port.
-    kOnboard = 0,
-    /// MXP (roboRIO MXP) I2C port.
-    kMXP
+    /// I2C Port 0.
+    kPort0 = 0,
+    /// I2C Port 1.
+    kPort1
   };
 
   /**

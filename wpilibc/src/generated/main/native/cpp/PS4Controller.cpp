@@ -6,7 +6,7 @@
 
 #include "frc/PS4Controller.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/event/BooleanEvent.h"
@@ -14,7 +14,7 @@
 using namespace frc;
 
 PS4Controller::PS4Controller(int port) : GenericHID(port) {
-  HAL_Report(HALUsageReporting::kResourceType_PS4Controller, port + 1);
+  HAL_ReportUsage("HID", port, "PS4Controller");
 }
 
 double PS4Controller::GetLeftX() const {

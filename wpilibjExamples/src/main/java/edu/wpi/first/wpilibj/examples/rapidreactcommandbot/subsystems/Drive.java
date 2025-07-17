@@ -10,7 +10,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -49,7 +49,7 @@ public class Drive extends SubsystemBase {
           DriveConstants.kRightEncoderPorts[1],
           DriveConstants.kRightEncoderReversed);
 
-  private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
+  private final AnalogGyro m_gyro = new AnalogGyro(0);
   private final ProfiledPIDController m_controller =
       new ProfiledPIDController(
           DriveConstants.kTurnP,
@@ -59,10 +59,7 @@ public class Drive extends SubsystemBase {
               DriveConstants.kMaxTurnRateDegPerS,
               DriveConstants.kMaxTurnAccelerationDegPerSSquared));
   private final SimpleMotorFeedforward m_feedforward =
-      new SimpleMotorFeedforward(
-          DriveConstants.ksVolts,
-          DriveConstants.kvVoltSecondsPerDegree,
-          DriveConstants.kaVoltSecondsSquaredPerDegree);
+      new SimpleMotorFeedforward(DriveConstants.ks, DriveConstants.kv, DriveConstants.ka);
 
   /** Creates a new Drive subsystem. */
   public Drive() {
@@ -105,10 +102,10 @@ public class Drive extends SubsystemBase {
   /**
    * Returns a command that drives the robot forward a specified distance at a specified speed.
    *
-   * @param distanceMeters The distance to drive forward in meters
+   * @param distance The distance to drive forward in meters
    * @param speed The fraction of max speed at which to drive
    */
-  public Command driveDistanceCommand(double distanceMeters, double speed) {
+  public Command driveDistanceCommand(double distance, double speed) {
     return runOnce(
             () -> {
               // Reset encoders at the start of the command
@@ -119,9 +116,7 @@ public class Drive extends SubsystemBase {
         .andThen(run(() -> m_drive.arcadeDrive(speed, 0)))
         // End command when we've traveled the specified distance
         .until(
-            () ->
-                Math.max(m_leftEncoder.getDistance(), m_rightEncoder.getDistance())
-                    >= distanceMeters)
+            () -> Math.max(m_leftEncoder.getDistance(), m_rightEncoder.getDistance()) >= distance)
         // Stop the drive when the command ends
         .finallyDo(interrupted -> m_drive.stopMotor());
   }

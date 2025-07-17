@@ -2085,9 +2085,9 @@ Java_edu_wpi_first_cscore_CameraServerJNI_runMainRunLoop
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_cscore_CameraServerJNI_runMainRunLoopTimeout
-  (JNIEnv*, jclass, jdouble timeoutSeconds)
+  (JNIEnv*, jclass, jdouble timeout)
 {
-  return cs::RunMainRunLoopTimeout(timeoutSeconds);
+  return cs::RunMainRunLoopTimeout(timeout);
 }
 
 /*

@@ -19,20 +19,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/roborio-cross-ubuntu:2025-22.04
-            artifact-name: Athena
-            build-options: "-Ponlylinuxathena"
-          - container: wpilib/raspbian-cross-ubuntu:bookworm-22.04
+          - container: wpilib/systemcore-cross-ubuntu:2025-24.04
+            artifact-name: SystemCore
+            build-options: "-Ponlylinuxsystemcore"
+          - container: wpilib/raspbian-cross-ubuntu:bookworm-24.04
             artifact-name: Arm32
             build-options: "-Ponlylinuxarm32"
-          - container: wpilib/aarch64-cross-ubuntu:bookworm-22.04
+          - container: wpilib/aarch64-cross-ubuntu:bookworm-24.04
             artifact-name: Arm64
             build-options: "-Ponlylinuxarm64"
-          - container: wpilib/ubuntu-base:22.04
+          - container: wpilib/ubuntu-base:24.04
             artifact-name: Linux
             build-options: "-Ponlylinuxx86-64"
     name: "Build - ${{ matrix.artifact-name }}"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [validation]
     steps:
       - name: Free Disk Space
@@ -50,7 +50,7 @@ jobs:
           fetch-depth: 0
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
-        if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')
+        if: startsWith(github.ref, 'refs/tags/v2027')
       - name: Build with Gradle
         uses: addnab/docker-run-action@v3
         with:
@@ -104,12 +104,6 @@ jobs:
             task: "build"
             outputs: "build/allOutputs"
           - os: windows-2022
-            artifact-name: Win32FFI
-            architecture: x86
-            task: ":ntcoreffi:build"
-            build-options: "-Pntcoreffibuild \"-Dorg.gradle.jvmargs=-Xmx1096m\""
-            outputs: "ntcoreffi/build/outputs"
-          - os: windows-2022
             artifact-name: Win64FFI
             architecture: x64
             task: ":ntcoreffi:build"
@@ -135,19 +129,16 @@ jobs:
           keychain-password: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
         if: |
           matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027'))))
+          (github.ref == 'refs/heads/2027' || startsWith(github.ref, 'refs/tags/v2027')))
       - name: Set Keychain Lock Timeout
         run: security set-keychain-settings -lut 21600
         if: |
           matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027'))))
+          (github.ref == 'refs/heads/2027' || startsWith(github.ref, 'refs/tags/v2027')))
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         shell: bash
-        if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')
-      - name: Set Java Heap Size
-        run: sed -i 's/-Xmx2g/-Xmx1g/g' gradle.properties
-        if: matrix.artifact-name == 'Win32'
+        if: startsWith(github.ref, 'refs/tags/v2027')
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
         if: matrix.os == 'windows-2022'
@@ -175,7 +166,7 @@ jobs:
         run: ./gradlew copyAllOutputs --build-cache -PbuildServer -PskipJavaFormat -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         if: |
           matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027'))))
+          (github.ref == 'refs/heads/2027' || startsWith(github.ref, 'refs/tags/v2027')))
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
         if: matrix.os == 'windows-2022'
@@ -189,7 +180,7 @@ jobs:
 
   build-documentation:
     name: "Build - Documentation"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [validation]
     steps:
       - uses: actions/checkout@v4
@@ -201,7 +192,7 @@ jobs:
           java-version: 17
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
-        if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')
+        if: startsWith(github.ref, 'refs/tags/v2027')
       - name: Build with Gradle
         run: ./gradlew docs:zipDocs --build-cache -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
         env:
@@ -215,12 +206,12 @@ jobs:
   combine:
     name: Combine
     needs: [build-docker, build-host, build-documentation]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Free Disk Space
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
+          (github.ref == 'refs/heads/2027' || startsWith(github.ref, 'refs/tags/v2027'))
         uses: jlumbroso/free-disk-space@main
         with:
           tool-cache: false
@@ -233,48 +224,48 @@ jobs:
       - uses: actions/checkout@v4
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
+          (github.ref == 'refs/heads/2027' || startsWith(github.ref, 'refs/tags/v2027'))
         with:
           repository: wpilibsuite/build-tools
       - uses: actions/download-artifact@v4
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
+          (github.ref == 'refs/heads/2027' || startsWith(github.ref, 'refs/tags/v2027'))
         with:
           path: combiner/products/build/allOutputs
       - name: Flatten Artifacts
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
+          (github.ref == 'refs/heads/2027' || startsWith(github.ref, 'refs/tags/v2027'))
         run: rsync -a --delete combiner/products/build/allOutputs/*/* combiner/products/build/allOutputs/
       - name: Check version number exists
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
+          (github.ref == 'refs/heads/2027' || startsWith(github.ref, 'refs/tags/v2027'))
         run: |
           cat combiner/products/build/allOutputs/version.txt
           test -s combiner/products/build/allOutputs/version.txt
       - uses: actions/setup-java@v4
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
+          (github.ref == 'refs/heads/2027' || startsWith(github.ref, 'refs/tags/v2027'))
         with:
           distribution: 'temurin'
           java-version: 17
-      - name: Combine (Main)
+      - name: Combine (2027)
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
-          github.ref == 'refs/heads/main'
-        run: cd combiner && ./gradlew publish -Pallwpilib
+          github.ref == 'refs/heads/2027'
+        run: cd combiner && ./gradlew publish -Pallwpilib -Pbuild2027
         env:
           RUN_AZURE_ARTIFACTORY_RELEASE: "TRUE"
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-      - name: Combine (Release)
+      - name: Combine (2027 Release)
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
-          startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')
-        run: cd combiner && ./gradlew publish -Pallwpilib -PreleaseRepoPublish
+          startsWith(github.ref, 'refs/tags/v2027')
+        run: cd combiner && ./gradlew publish -Pallwpilib -PreleaseRepoPublish -Pbuild2027
         env:
           RUN_AZURE_ARTIFACTORY_RELEASE: "TRUE"
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
@@ -282,25 +273,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
-          (github.ref == 'refs/heads/main' || (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')))
+          (github.ref == 'refs/heads/2027' || startsWith(github.ref, 'refs/tags/v2027'))
         with:
           name: Maven
           path: ~/releases
-
-  dispatch:
-    name: dispatch
-    needs: [combine]
-    strategy:
-      matrix:
-        repo: ['SmartDashboard', 'PathWeaver', 'Shuffleboard', 'RobotBuilder']
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: peter-evans/repository-dispatch@v3
-        if: |
-          github.repository == 'wpilibsuite/allwpilib' &&
-          startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '2027')
-        with:
-          token: ${{ secrets.TOOL_REPO_ACCESS_TOKEN }}
-          repository: wpilibsuite/${{ matrix.repo }}
-          event-type: tag
-          client-payload: '{"package_name": "allwpilib", "package_version": "${{ github.ref_name }}"}'

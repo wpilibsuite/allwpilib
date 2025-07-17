@@ -22,5 +22,5 @@ TEST(DifferentialDriveKinematicsStructTest, Roundtrip) {
 
   DifferentialDriveKinematics unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.trackWidth.value(), unpacked_data.trackWidth.value());
+  EXPECT_EQ(kExpectedData.trackwidth.value(), unpacked_data.trackwidth.value());
 }

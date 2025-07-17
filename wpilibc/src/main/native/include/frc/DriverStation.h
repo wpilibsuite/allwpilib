@@ -4,9 +4,12 @@
 
 #pragma once
 
+#include <frc/geometry/Rotation2d.h>
+
 #include <optional>
 #include <string>
 
+#include <hal/DriverStationTypes.h>
 #include <units/time.h>
 #include <wpi/Synchronization.h>
 
@@ -45,6 +48,62 @@ class DriverStation final {
     /// Elimination.
     kElimination
   };
+
+  /**
+   * A controller POV direction.
+   */
+  enum POVDirection : uint8_t {
+    /// POV center.
+    kCenter = HAL_JoystickPOV_kCentered,
+    /// POV up.
+    kUp = HAL_JoystickPOV_kUp,
+    /// POV up right.
+    kUpRight = HAL_JoystickPOV_kRightUp,
+    /// POV right.
+    kRight = HAL_JoystickPOV_kRight,
+    /// POV down right.
+    kDownRight = HAL_JoystickPOV_kRightDown,
+    /// POV down.
+    kDown = HAL_JoystickPOV_kDown,
+    /// POV down left.
+    kDownLeft = HAL_JoystickPOV_kLeftDown,
+    /// POV left.
+    kLeft = HAL_JoystickPOV_kLeft,
+    /// POV up left.
+    kUpLeft = HAL_JoystickPOV_kLeftUp,
+  };
+
+  /**
+   * Gets the angle of a POVDirection.
+   *
+   * @param angle The POVDirection to convert.
+   * @return The angle clockwise from straight up, or std::nullopt if the
+   * POVDirection is kCenter.
+   */
+  static constexpr std::optional<Rotation2d> GetAngle(POVDirection angle) {
+    switch (angle) {
+      case kCenter:
+        return std::nullopt;
+      case kUp:
+        return Rotation2d{0_deg};
+      case kUpRight:
+        return Rotation2d{45_deg};
+      case kRight:
+        return Rotation2d{90_deg};
+      case kDownRight:
+        return Rotation2d{135_deg};
+      case kDown:
+        return Rotation2d{180_deg};
+      case kDownLeft:
+        return Rotation2d{225_deg};
+      case kLeft:
+        return Rotation2d{270_deg};
+      case kUpLeft:
+        return Rotation2d{315_deg};
+      default:
+        return std::nullopt;
+    }
+  }
 
   /// Number of Joystick ports.
   static constexpr int kJoystickPorts = 6;
@@ -93,9 +152,9 @@ class DriverStation final {
   /**
    * Get the state of a POV on the joystick.
    *
-   * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+   * @return the angle of the POV.
    */
-  static int GetStickPOV(int stick, int pov);
+  static POVDirection GetStickPOV(int stick, int pov);
 
   /**
    * The state of the buttons on the joystick.
@@ -135,7 +194,7 @@ class DriverStation final {
    * @param stick The joystick port number
    * @return A boolean that is true if the controller is an xbox controller.
    */
-  static bool GetJoystickIsXbox(int stick);
+  static bool GetJoystickIsGamepad(int stick);
 
   /**
    * Returns the type of joystick at a given port.

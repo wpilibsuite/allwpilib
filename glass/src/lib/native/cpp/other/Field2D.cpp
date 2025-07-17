@@ -374,7 +374,8 @@ void FieldInfo::DisplaySettings() {
   if (m_builtin.empty() && ImGui::Button("Load JSON/image...")) {
     m_fileOpener = std::make_unique<pfd::open_file>(
         "Choose field JSON/image", "",
-        std::vector<std::string>{"PathWeaver JSON File", "*.json", "Image File",
+        std::vector<std::string>{"Field Image JSON File", "*.json",
+                                 "Image File",
                                  "*.jpg *.jpeg *.png *.bmp *.psd *.tga *.gif "
                                  "*.hdr *.pic *.ppm *.pgm"});
   }

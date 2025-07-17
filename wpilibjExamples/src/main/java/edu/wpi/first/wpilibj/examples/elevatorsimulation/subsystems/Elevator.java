@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.simulation.PWMSim;
+import edu.wpi.first.wpilibj.simulation.PWMMotorControllerSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -50,21 +50,20 @@ public class Elevator implements AutoCloseable {
           Constants.kElevatorGearing,
           Constants.kCarriageMass,
           Constants.kElevatorDrumRadius,
-          Constants.kMinElevatorHeightMeters,
-          Constants.kMaxElevatorHeightMeters,
+          Constants.kMinElevatorHeight,
+          Constants.kMaxElevatorHeight,
           true,
           0,
           0.01,
           0.0);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
-  private final PWMSim m_motorSim = new PWMSim(m_motor);
+  private final PWMMotorControllerSim m_motorSim = new PWMMotorControllerSim(m_motor);
 
   // Create a Mechanism2d visualization of the elevator
   private final Mechanism2d m_mech2d = new Mechanism2d(20, 50);
   private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("Elevator Root", 10, 0);
   private final MechanismLigament2d m_elevatorMech2d =
-      m_mech2dRoot.append(
-          new MechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90));
+      m_mech2dRoot.append(new MechanismLigament2d("Elevator", m_elevatorSim.getPosition(), 90));
 
   /** Subsystem constructor. */
   public Elevator() {
@@ -85,10 +84,10 @@ public class Elevator implements AutoCloseable {
     m_elevatorSim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-    m_encoderSim.setDistance(m_elevatorSim.getPositionMeters());
+    m_encoderSim.setDistance(m_elevatorSim.getPosition());
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
+        BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDraw()));
   }
 
   /**

@@ -11,15 +11,13 @@
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/DigitalInput.h"
-#include "frc/DigitalSource.h"
 #include "frc/DutyCycle.h"
 #include "frc/MathUtil.h"
 
 using namespace frc;
 
 DutyCycleEncoder::DutyCycleEncoder(int channel)
-    : m_dutyCycle{std::make_shared<DutyCycle>(
-          std::make_shared<DigitalInput>(channel))} {
+    : m_dutyCycle{std::make_shared<DutyCycle>(channel)} {
   Init(1.0, 0.0);
 }
 
@@ -38,25 +36,9 @@ DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle)
   Init(1.0, 0.0);
 }
 
-DutyCycleEncoder::DutyCycleEncoder(DigitalSource& digitalSource)
-    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
-  Init(1.0, 0.0);
-}
-
-DutyCycleEncoder::DutyCycleEncoder(DigitalSource* digitalSource)
-    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
-  Init(1.0, 0.0);
-}
-
-DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource)
-    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
-  Init(1.0, 0.0);
-}
-
 DutyCycleEncoder::DutyCycleEncoder(int channel, double fullRange,
                                    double expectedZero)
-    : m_dutyCycle{std::make_shared<DutyCycle>(
-          std::make_shared<DigitalInput>(channel))} {
+    : m_dutyCycle{std::make_shared<DutyCycle>(channel)} {
   Init(fullRange, expectedZero);
 }
 
@@ -78,24 +60,6 @@ DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle,
   Init(fullRange, expectedZero);
 }
 
-DutyCycleEncoder::DutyCycleEncoder(DigitalSource& digitalSource,
-                                   double fullRange, double expectedZero)
-    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
-  Init(fullRange, expectedZero);
-}
-
-DutyCycleEncoder::DutyCycleEncoder(DigitalSource* digitalSource,
-                                   double fullRange, double expectedZero)
-    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
-  Init(fullRange, expectedZero);
-}
-
-DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource,
-                                   double fullRange, double expectedZero)
-    : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)} {
-  Init(fullRange, expectedZero);
-}
-
 void DutyCycleEncoder::Init(double fullRange, double expectedZero) {
   m_simDevice = hal::SimDevice{"DutyCycle:DutyCycleEncoder",
                                m_dutyCycle->GetSourceChannel()};
@@ -109,8 +73,8 @@ void DutyCycleEncoder::Init(double fullRange, double expectedZero) {
   m_fullRange = fullRange;
   m_expectedZero = expectedZero;
 
-  wpi::SendableRegistry::AddLW(this, "DutyCycle Encoder",
-                               m_dutyCycle->GetSourceChannel());
+  wpi::SendableRegistry::Add(this, "DutyCycle Encoder",
+                             m_dutyCycle->GetSourceChannel());
 }
 
 double DutyCycleEncoder::Get() const {
@@ -158,7 +122,7 @@ void DutyCycleEncoder::SetDutyCycleRange(double min, double max) {
   m_sensorMax = std::clamp(max, 0.0, 1.0);
 }
 
-int DutyCycleEncoder::GetFrequency() const {
+units::hertz_t DutyCycleEncoder::GetFrequency() const {
   return m_dutyCycle->GetFrequency();
 }
 
@@ -169,9 +133,10 @@ bool DutyCycleEncoder::IsConnected() const {
   return GetFrequency() > m_frequencyThreshold;
 }
 
-void DutyCycleEncoder::SetConnectedFrequencyThreshold(int frequency) {
-  if (frequency < 0) {
-    frequency = 0;
+void DutyCycleEncoder::SetConnectedFrequencyThreshold(
+    units::hertz_t frequency) {
+  if (frequency < 0_Hz) {
+    frequency = 0_Hz;
   }
   m_frequencyThreshold = frequency;
 }
@@ -186,10 +151,6 @@ void DutyCycleEncoder::SetAssumedFrequency(units::hertz_t frequency) {
   } else {
     m_period = 1.0 / frequency;
   }
-}
-
-int DutyCycleEncoder::GetFPGAIndex() const {
-  return m_dutyCycle->GetFPGAIndex();
 }
 
 int DutyCycleEncoder::GetSourceChannel() const {

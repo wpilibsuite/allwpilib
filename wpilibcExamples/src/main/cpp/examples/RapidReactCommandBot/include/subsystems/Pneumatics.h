@@ -39,5 +39,5 @@ class Pneumatics : frc2::SubsystemBase {
                                                 kScale, kOffset};
 
   // Compressor connected to a PH with a default CAN ID
-  frc::Compressor m_compressor{frc::PneumaticsModuleType::CTREPCM};
+  frc::Compressor m_compressor{0, frc::PneumaticsModuleType::CTREPCM};
 };

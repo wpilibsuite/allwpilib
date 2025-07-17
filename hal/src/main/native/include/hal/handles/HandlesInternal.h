@@ -72,6 +72,7 @@ enum class HAL_HandleEnum {
   CTREPDP = 25,
   REVPDH = 26,
   REVPH = 27,
+  CANStream = 28,
 };
 
 /**
@@ -136,7 +137,7 @@ inline int16_t getHandleTypedIndex(HAL_Handle handle, HAL_HandleEnum enumType,
   if (!isHandleType(handle, enumType)) {
     return InvalidHandleIndex;
   }
-#if !defined(__FRC_ROBORIO__)
+#if !defined(__FRC_SYSTEMCORE__)
   if (!isHandleCorrectVersion(handle, version)) {
     return InvalidHandleIndex;
   }
@@ -152,65 +153,6 @@ inline int16_t getHandleTypedIndex(HAL_Handle handle, HAL_HandleEnum enumType,
  * Bits 24-30: Handle Type
  * Bit 31:     1 if handle error, 0 if no error
  */
-
-// using a 16 bit value so we can store 0-255 and still report error
-/**
- * Gets the port channel of a port handle.
- *
- * @param handle the port handle
- * @return the port channel
- */
-inline int16_t getPortHandleChannel(HAL_PortHandle handle) {
-  if (!isHandleType(handle, HAL_HandleEnum::Port)) {
-    return InvalidHandleIndex;
-  }
-  return static_cast<uint8_t>(handle & 0xff);
-}
-
-// using a 16 bit value so we can store 0-255 and still report error
-/**
- * Gets the port module of a port handle.
- *
- * @param handle the port handle
- * @return the port module
- */
-inline int16_t getPortHandleModule(HAL_PortHandle handle) {
-  if (!isHandleType(handle, HAL_HandleEnum::Port)) {
-    return InvalidHandleIndex;
-  }
-  return static_cast<uint8_t>((handle >> 8) & 0xff);
-}
-
-// using a 16 bit value so we can store 0-255 and still report error
-/**
- * Gets the SPI channel of a port handle.
- *
- * @param handle the port handle
- * @return the port SPI channel
- */
-inline int16_t getPortHandleSPIEnable(HAL_PortHandle handle) {
-  if (!isHandleType(handle, HAL_HandleEnum::Port)) {
-    return InvalidHandleIndex;
-  }
-  return static_cast<uint8_t>((handle >> 16) & 0xff);
-}
-
-/**
- * Create a port handle.
- *
- * @param channel the channel
- * @param module  the module
- * @return port handle for the module and channel
- */
-HAL_PortHandle createPortHandle(uint8_t channel, uint8_t module);
-
-/**
- * Create a port handle for SPI.
- *
- * @param channel the SPI channel
- * @return port handle for the channel
- */
-HAL_PortHandle createPortHandleForSPI(uint8_t channel);
 
 /**
  * Create a handle for a specific index, type and version.

@@ -33,13 +33,13 @@ AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
     : m_analog_input(std::move(input)),
       m_fullRange(fullRange),
       m_offset(offset) {
-  wpi::SendableRegistry::AddLW(this, "AnalogPotentiometer",
-                               m_analog_input->GetChannel());
+  wpi::SendableRegistry::Add(this, "AnalogPotentiometer",
+                             m_analog_input->GetChannel());
 }
 
 double AnalogPotentiometer::Get() const {
   return (m_analog_input->GetAverageVoltage() /
-          RobotController::GetVoltage5V()) *
+          RobotController::GetVoltage3V3()) *
              m_fullRange +
          m_offset;
 }

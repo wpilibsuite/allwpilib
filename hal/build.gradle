@@ -10,19 +10,20 @@ ext {
     nativeName = 'hal'
     setBaseName = 'wpiHal'
     devMain = 'edu.wpi.first.hal.DevMain'
-    niLibraries = true
     generatedHeaders = "src/generated/main/native/include"
     splitSetup = {
-        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+        if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
             it.sources {
-                athenaCpp(CppSourceSet) {
+                systemCoreCpp(CppSourceSet) {
                     source {
-                        srcDirs = ['src/main/native/athena']
+                        srcDirs = ['src/main/native/systemcore']
                         include '**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
                         srcDir generatedHeaders
+                        srcDir 'src/mrc/include'
+                        srcDir 'src/generated/main/native/cpp/mrc/protobuf'
                     }
                 }
             }
@@ -36,15 +37,24 @@ ext {
                     exportedHeaders {
                         srcDir 'src/main/native/include'
                         srcDir generatedHeaders
+                        srcDir 'src/mrc/include'
                     }
+                }
+            }
+        }
+        it.sources {
+            nanopbCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/generated/main/native/cpp'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/generated/main/native/cpp'
                 }
             }
         }
     }
     exeSplitSetup = {
-        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-            nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
-        }
     }
 }
 
@@ -57,6 +67,10 @@ cppSourcesZip {
         into '/athena'
     }
 
+    from('src/main/native/systemcore') {
+        into '/systemcore'
+    }
+
     from('src/main/native/sim') {
         into '/sim'
     }
@@ -64,6 +78,9 @@ cppSourcesZip {
 
 cppHeadersZip {
     from(generatedHeaders) {
+        into '/'
+    }
+    from('src/mrc/include') {
         into '/'
     }
 }
@@ -81,12 +98,30 @@ nativeUtils.exportsConfigs {
 }
 
 model {
+    components {
+        all {
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/mrc/include',
+                            'src/generated/main/native/cpp/mrc/protobuf'
+                }
+            }
+        }
+    }
     binaries {
         all {
-            if (!(it instanceof NativeBinarySpec)) return
-                if (it.component.name != 'hal' && it.component.name != 'halBase') return
-                if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) return
-                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries')
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            if (it.component.name == "${nativeName}JNI") {
+                project(':ntcore').addNtcoreDependency(it, 'static')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+            } else {
+                project(':ntcore').addNtcoreDependency(it, 'shared')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            }
         }
     }
 }

@@ -4,10 +4,8 @@
 
 package edu.wpi.first.wpilibj.snippets.analoginput;
 
-import edu.wpi.first.hal.AccumulatorResult;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * AnalogInput snippets for frc-docs.
@@ -16,9 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   // Initializes an AnalogInput on port 0
   AnalogInput m_analog = new AnalogInput(0);
-
-  // Instantiate an AccumulatorResult object to hold the matched measurements
-  AccumulatorResult m_result = new AccumulatorResult();
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
@@ -50,27 +45,5 @@ public class Robot extends TimedRobot {
     // Gets the averaged voltage from the analog input.  Rescaling,
     // oversampling, and averaging are all applied.
     m_analog.getAverageVoltage();
-
-    // Sets the initial value of the accumulator to 0
-    // This is the "starting point" from which the value will change over time
-    m_analog.setAccumulatorInitialValue(0);
-    // Sets the "center" of the accumulator to 0.  This value is subtracted from
-    // all measured values prior to accumulation.
-    m_analog.setAccumulatorCenter(0);
-    // Returns the number of accumulated samples since the accumulator was last started/reset
-    m_analog.getAccumulatorCount();
-    // Returns the value of the accumulator.  Return type is long.
-    m_analog.getAccumulatorValue();
-    // Resets the accumulator to the initial value
-    m_analog.resetAccumulator();
-
-    // Fill the AccumulatorResult with the matched measurements
-    m_analog.getAccumulatorOutput(m_result);
-    // Read the values from the AccumulatorResult
-    long count = m_result.count;
-    long value = m_result.value;
-
-    SmartDashboard.putNumber("Accumulator Count", count);
-    SmartDashboard.putNumber("Accumulator Value", value);
   }
 }

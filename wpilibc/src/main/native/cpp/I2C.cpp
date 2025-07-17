@@ -6,8 +6,8 @@
 
 #include <algorithm>
 
-#include <hal/FRCUsageReporting.h>
 #include <hal/I2C.h>
+#include <hal/UsageReporting.h>
 
 #include "frc/Errors.h"
 
@@ -17,17 +17,11 @@ I2C::I2C(Port port, int deviceAddress)
     : m_port(static_cast<HAL_I2CPort>(port)), m_deviceAddress(deviceAddress) {
   int32_t status = 0;
 
-  if (port == I2C::Port::kOnboard) {
-    FRC_ReportWarning(
-        "Onboard I2C port is subject to system lockups. See Known "
-        "Issues page for "
-        "details");
-  }
-
   HAL_InitializeI2C(m_port, &status);
   FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(port));
 
-  HAL_Report(HALUsageReporting::kResourceType_I2C, deviceAddress);
+  HAL_ReportUsage(
+      fmt::format("I2C[{}][{}]", static_cast<int>(port), deviceAddress), "");
 }
 
 I2C::Port I2C::GetPort() const {

@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -39,18 +37,28 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   /**
    * Constructs a double solenoid for a default module of a specific module type.
    *
+   * @param busId The bus ID
    * @param moduleType The module type to use.
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
   public DoubleSolenoid(
-      final PneumaticsModuleType moduleType, final int forwardChannel, final int reverseChannel) {
-    this(PneumaticsBase.getDefaultForType(moduleType), moduleType, forwardChannel, reverseChannel);
+      final int busId,
+      final PneumaticsModuleType moduleType,
+      final int forwardChannel,
+      final int reverseChannel) {
+    this(
+        busId,
+        PneumaticsBase.getDefaultForType(moduleType),
+        moduleType,
+        forwardChannel,
+        reverseChannel);
   }
 
   /**
    * Constructs a double solenoid for a specified module of a specific module type.
    *
+   * @param busId The bus ID
    * @param module The module of the solenoid module to use.
    * @param moduleType The module type to use.
    * @param forwardChannel The forward channel on the module to control.
@@ -58,11 +66,12 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    */
   @SuppressWarnings({"PMD.UseTryWithResources", "this-escape"})
   public DoubleSolenoid(
+      final int busId,
       final int module,
       final PneumaticsModuleType moduleType,
       final int forwardChannel,
       final int reverseChannel) {
-    m_module = PneumaticsBase.getForType(module, moduleType);
+    m_module = PneumaticsBase.getForType(busId, module, moduleType);
     boolean allocatedSolenoids = false;
     boolean successfulCompletion = false;
 
@@ -95,11 +104,9 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
       }
       allocatedSolenoids = true;
 
-      HAL.report(
-          tResourceType.kResourceType_Solenoid, forwardChannel + 1, m_module.getModuleNumber() + 1);
-      HAL.report(
-          tResourceType.kResourceType_Solenoid, reverseChannel + 1, m_module.getModuleNumber() + 1);
-      SendableRegistry.addLW(this, "DoubleSolenoid", m_module.getModuleNumber(), forwardChannel);
+      m_module.reportUsage(
+          "Solenoid[" + forwardChannel + "," + reverseChannel + "]", "DoubleSolenoid");
+      SendableRegistry.add(this, "DoubleSolenoid", m_module.getModuleNumber(), forwardChannel);
       successfulCompletion = true;
     } finally {
       if (!successfulCompletion) {
@@ -210,7 +217,6 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Double Solenoid");
     builder.setActuator(true);
-    builder.setSafeState(() -> set(Value.kOff));
     builder.addStringProperty(
         "Value",
         () -> get().name().substring(1),

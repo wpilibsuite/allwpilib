@@ -11,16 +11,9 @@
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
-#include "frc/Counter.h"
 #include "frc/CounterBase.h"
 
 namespace frc {
-
-class DigitalSource;
-class DigitalGlitchFilter;
-class DMA;
-class DMASample;
-
 /**
  * Class to read quad encoders.
  *
@@ -39,24 +32,7 @@ class DMASample;
 class Encoder : public CounterBase,
                 public wpi::Sendable,
                 public wpi::SendableHelper<Encoder> {
-  friend class DMA;
-  friend class DMASample;
-
  public:
-  /**
-   * Encoder indexing types.
-   */
-  enum IndexingType {
-    /// Reset while the signal is high.
-    kResetWhileHigh,
-    /// Reset while the signal is low.
-    kResetWhileLow,
-    /// Reset on falling edge of the signal.
-    kResetOnFallingEdge,
-    /// Reset on rising edge of the signal.
-    kResetOnRisingEdge
-  };
-
   /**
    * Encoder constructor.
    *
@@ -81,62 +57,6 @@ class Encoder : public CounterBase,
    *                         be double (2x) the spec'd count.
    */
   Encoder(int aChannel, int bChannel, bool reverseDirection = false,
-          EncodingType encodingType = k4X);
-
-  /**
-   * Encoder constructor.
-   *
-   * Construct a Encoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The Encoder class will not
-   * allocate the digital inputs and assume that they already are counted.
-   *
-   * The counter will start counting immediately.
-   *
-   * @param aSource          The source that should be used for the a channel.
-   * @param bSource          the source that should be used for the b channel.
-   * @param reverseDirection represents the orientation of the encoder and
-   *                         inverts the output values if necessary so forward
-   *                         represents positive values.
-   * @param encodingType     either k1X, k2X, or k4X to indicate 1X, 2X or 4X
-   *                         decoding. If 4X is selected, then an encoder FPGA
-   *                         object is used and the returned counts will be 4x
-   *                         the encoder spec'd value since all rising and
-   *                         falling edges are counted. If 1X or 2X are selected
-   *                         then a counter object will be used and the returned
-   *                         value will either exactly match the spec'd count or
-   *                         be double (2x) the spec'd count.
-   */
-  Encoder(DigitalSource* aSource, DigitalSource* bSource,
-          bool reverseDirection = false, EncodingType encodingType = k4X);
-
-  /**
-   * Encoder constructor.
-   *
-   * Construct a Encoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The Encoder class will not
-   * allocate the digital inputs and assume that they already are counted.
-   *
-   * The counter will start counting immediately.
-   *
-   * @param aSource          The source that should be used for the a channel.
-   * @param bSource          the source that should be used for the b channel.
-   * @param reverseDirection represents the orientation of the encoder and
-   *                         inverts the output values if necessary so forward
-   *                         represents positive values.
-   * @param encodingType     either k1X, k2X, or k4X to indicate 1X, 2X or 4X
-   *                         decoding. If 4X is selected, then an encoder FPGA
-   *                         object is used and the returned counts will be 4x
-   *                         the encoder spec'd value since all rising and
-   *                         falling edges are counted. If 1X or 2X are selected
-   *                         then a counter object will be used and the returned
-   *                         value will either exactly match the spec'd count or
-   *                         be double (2x) the spec'd count.
-   */
-  Encoder(DigitalSource& aSource, DigitalSource& bSource,
-          bool reverseDirection = false, EncodingType encodingType = k4X);
-
-  Encoder(std::shared_ptr<DigitalSource> aSource,
-          std::shared_ptr<DigitalSource> bSource, bool reverseDirection = false,
           EncodingType encodingType = k4X);
 
   Encoder(Encoder&&) = default;
@@ -319,27 +239,6 @@ class Encoder : public CounterBase,
   int GetSamplesToAverage() const;
 
   /**
-   * Set the index source for the encoder.
-   *
-   * When this source is activated, the encoder count automatically resets.
-   *
-   * @param channel A DIO channel to set as the encoder index
-   * @param type    The state that will cause the encoder to reset
-   */
-  void SetIndexSource(int channel, IndexingType type = kResetOnRisingEdge);
-
-  /**
-   * Set the index source for the encoder.
-   *
-   * When this source is activated, the encoder count automatically resets.
-   *
-   * @param source A digital source to set as the encoder index
-   * @param type   The state that will cause the encoder to reset
-   */
-  void SetIndexSource(const DigitalSource& source,
-                      IndexingType type = kResetOnRisingEdge);
-
-  /**
    * Indicates this encoder is used by a simulated device.
    *
    * @param device simulated device handle
@@ -356,7 +255,8 @@ class Encoder : public CounterBase,
    *
    * This code allocates resources for Encoders and is common to all
    * constructors. The counter will start counting immediately.
-   *
+   * @param aChannel         The a channel.
+   * @param bChannel         The b channel.
    * @param reverseDirection If true, counts down instead of up (this is all
    *                         relative)
    * @param encodingType     either k1X, k2X, or k4X to indicate 1X, 2X or 4X
@@ -368,7 +268,8 @@ class Encoder : public CounterBase,
    *                         value will either exactly match the spec'd count or
    *                         be double (2x) the spec'd count.
    */
-  void InitEncoder(bool reverseDirection, EncodingType encodingType);
+  void InitEncoder(int aChannel, int bChannel, bool reverseDirection,
+                   EncodingType encodingType);
 
   /**
    * The scale needed to convert a raw counter value into a number of encoder
@@ -376,12 +277,7 @@ class Encoder : public CounterBase,
    */
   double DecodingScaleFactor() const;
 
-  std::shared_ptr<DigitalSource> m_aSource;  // The A phase of the quad encoder
-  std::shared_ptr<DigitalSource> m_bSource;  // The B phase of the quad encoder
-  std::shared_ptr<DigitalSource> m_indexSource = nullptr;
   hal::Handle<HAL_EncoderHandle, HAL_FreeEncoder> m_encoder;
-
-  friend class DigitalGlitchFilter;
 };
 
 }  // namespace frc

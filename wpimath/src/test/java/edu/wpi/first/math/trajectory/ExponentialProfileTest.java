@@ -43,7 +43,7 @@ class ExponentialProfileTest {
   private static ExponentialProfile.State checkDynamics(
       ExponentialProfile profile, ExponentialProfile.State current, ExponentialProfile.State goal) {
     var next = profile.calculate(kDt, current, goal);
-    var signal = feedforward.calculateWithVelocities(current.velocity, next.velocity);
+    var signal = feedforward.calculate(current.velocity, next.velocity);
 
     assertTrue(Math.abs(signal) < constraints.maxInput + 1e-9);
 

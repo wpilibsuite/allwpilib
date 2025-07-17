@@ -4,14 +4,8 @@
 
 #include "Robot.h"
 
-#include <frc/livewindow/LiveWindow.h>
-
 // Run robot periodic() functions for 5 ms, and run controllers every 10 ms
 Robot::Robot() : frc::TimesliceRobot{5_ms, 10_ms} {
-  // LiveWindow causes drastic overruns in robot periodic functions that will
-  // interfere with controllers
-  frc::LiveWindow::DisableAllTelemetry();
-
   // Runs for 2 ms after robot periodic functions
   Schedule([=] {}, 2_ms);
 

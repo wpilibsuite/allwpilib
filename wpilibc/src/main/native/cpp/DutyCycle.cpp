@@ -4,64 +4,42 @@
 
 #include "frc/DutyCycle.h"
 
+#include <string>
 #include <utility>
 
 #include <hal/DutyCycle.h>
-#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
+#include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
+#include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 
-#include "frc/DigitalSource.h"
 #include "frc/Errors.h"
+#include "frc/SensorUtil.h"
 
 using namespace frc;
 
-DutyCycle::DutyCycle(DigitalSource* source)
-    : m_source{source, wpi::NullDeleter<DigitalSource>()} {
-  if (!m_source) {
-    throw FRC_MakeError(err::NullParameter, "source");
-  }
-  InitDutyCycle();
-}
-
-DutyCycle::DutyCycle(DigitalSource& source)
-    : m_source{&source, wpi::NullDeleter<DigitalSource>()} {
-  InitDutyCycle();
-}
-
-DutyCycle::DutyCycle(std::shared_ptr<DigitalSource> source)
-    : m_source{std::move(source)} {
-  if (!m_source) {
-    throw FRC_MakeError(err::NullParameter, "source");
+DutyCycle::DutyCycle(int channel) : m_channel{channel} {
+  if (!SensorUtil::CheckDigitalChannel(channel)) {
+    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
   }
   InitDutyCycle();
 }
 
 void DutyCycle::InitDutyCycle() {
   int32_t status = 0;
-  m_handle =
-      HAL_InitializeDutyCycle(m_source->GetPortHandleForRouting(),
-                              static_cast<HAL_AnalogTriggerType>(
-                                  m_source->GetAnalogTriggerTypeForRouting()),
-                              &status);
+  std::string stackTrace = wpi::GetStackTrace(1);
+  m_handle = HAL_InitializeDutyCycle(m_channel, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  int index = GetFPGAIndex();
-  HAL_Report(HALUsageReporting::kResourceType_DutyCycle, index + 1);
-  wpi::SendableRegistry::AddLW(this, "Duty Cycle", index);
+  HAL_ReportUsage("IO", m_channel, "DutyCycle");
+  wpi::SendableRegistry::Add(this, "Duty Cycle", m_channel);
 }
 
-int DutyCycle::GetFPGAIndex() const {
-  int32_t status = 0;
-  auto retVal = HAL_GetDutyCycleFPGAIndex(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  return retVal;
-}
-
-int DutyCycle::GetFrequency() const {
+units::hertz_t DutyCycle::GetFrequency() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleFrequency(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  return retVal;
+  return units::hertz_t{retVal};
 }
 
 double DutyCycle::GetOutput() const {
@@ -78,21 +56,14 @@ units::second_t DutyCycle::GetHighTime() const {
   return units::nanosecond_t{static_cast<double>(retVal)};
 }
 
-unsigned int DutyCycle::GetOutputScaleFactor() const {
-  int32_t status = 0;
-  auto retVal = HAL_GetDutyCycleOutputScaleFactor(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  return retVal;
-}
-
 int DutyCycle::GetSourceChannel() const {
-  return m_source->GetChannel();
+  return m_channel;
 }
 
 void DutyCycle::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Duty Cycle");
   builder.AddDoubleProperty(
-      "Frequency", [this] { return this->GetFrequency(); }, nullptr);
+      "Frequency", [this] { return this->GetFrequency().value(); }, nullptr);
   builder.AddDoubleProperty(
       "Output", [this] { return this->GetOutput(); }, nullptr);
 }

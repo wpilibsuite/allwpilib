@@ -6,11 +6,7 @@ include(CompileWarnings)
 include(AddTest)
 include(DownloadAndCheck)
 
-file(
-    GLOB wpiutil_jni_src
-    src/main/native/cpp/jni/WPIUtilJNI.cpp
-    src/main/native/cpp/jni/DataLogJNI.cpp
-)
+file(GLOB wpiutil_jni_src src/main/native/cpp/jni/WPIUtilJNI.cpp)
 
 # Java bindings
 if(WITH_JAVA)

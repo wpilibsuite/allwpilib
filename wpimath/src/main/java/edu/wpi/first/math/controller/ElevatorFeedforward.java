@@ -36,12 +36,12 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    * @param kg The gravity gain in volts.
    * @param kv The velocity gain in V/(m/s).
    * @param ka The acceleration gain in V/(m/s²).
-   * @param dtSeconds The period in seconds.
+   * @param dt The period in seconds.
    * @throws IllegalArgumentException for kv &lt; zero.
    * @throws IllegalArgumentException for ka &lt; zero.
    * @throws IllegalArgumentException for period &le; zero.
    */
-  public ElevatorFeedforward(double ks, double kg, double kv, double ka, double dtSeconds) {
+  public ElevatorFeedforward(double ks, double kg, double kv, double ka, double dt) {
     this.ks = ks;
     this.kg = kg;
     this.kv = kv;
@@ -52,11 +52,10 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
     if (ka < 0.0) {
       throw new IllegalArgumentException("ka must be a non-negative number, got " + ka + "!");
     }
-    if (dtSeconds <= 0.0) {
-      throw new IllegalArgumentException(
-          "period must be a positive number, got " + dtSeconds + "!");
+    if (dt <= 0.0) {
+      throw new IllegalArgumentException("period must be a positive number, got " + dt + "!");
     }
-    m_dt = dtSeconds;
+    m_dt = dt;
   }
 
   /**
@@ -168,28 +167,14 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming continuous control.
-   *
-   * @param velocity The velocity setpoint.
-   * @param acceleration The acceleration setpoint.
-   * @return The computed feedforward.
-   * @deprecated Use {@link #calculateWithVelocities(double, double)}.
-   */
-  @SuppressWarnings("removal")
-  @Deprecated(forRemoval = true, since = "2025")
-  public double calculate(double velocity, double acceleration) {
-    return ks * Math.signum(velocity) + kg + kv * velocity + ka * acceleration;
-  }
-
-  /**
    * Calculates the feedforward from the gains and velocity setpoint assuming continuous control
    * (acceleration is assumed to be zero).
    *
-   * @param velocity The velocity setpoint.
+   * @param velocity The velocity setpoint in meters per second.
    * @return The computed feedforward.
    */
   public double calculate(double velocity) {
-    return calculate(velocity, 0);
+    return calculate(velocity, velocity);
   }
 
   /**
@@ -199,9 +184,9 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    *
    * @param currentVelocity The current velocity setpoint in meters per second.
    * @param nextVelocity The next velocity setpoint in meters per second.
-   * @return The computed feedforward in volts.
+   * @return The computed feedforward.
    */
-  public double calculateWithVelocities(double currentVelocity, double nextVelocity) {
+  public double calculate(double currentVelocity, double nextVelocity) {
     // See wpimath/algorithms.md#Elevator_feedforward for derivation
     if (ka < 1e-9) {
       return ks * Math.signum(nextVelocity) + kg + kv * nextVelocity;

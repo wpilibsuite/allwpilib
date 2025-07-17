@@ -1,62 +1,181 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("@rules_java//java:defs.bzl", "java_binary", "java_library")
-
-cc_library(
-    name = "generated_cc_headers",
-    hdrs = glob(["src/generated/main/native/include/**"]),
-    includes = ["src/generated/main/native/include"],
-    strip_include_prefix = "src/generated/main/native/include",
-    visibility = ["//hal:__subpackages__"],
-)
+load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//hal:generate.bzl", "generate_hal")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 
 filegroup(
-    name = "generated_java",
-    srcs = glob(["src/generated/main/java/**/*.java"]),
-    visibility = ["//hal:__subpackages__"],
+    name = "proto_files",
+    srcs = glob(["src/mrc/proto/**/*.proto"]),
 )
 
-ATHENA_SRCS = glob(["src/main/native/athena/**"])
+py_binary(
+    name = "generate_nanopb",
+    srcs = ["generate_nanopb.py"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
 
-ATHENA_DEPS = ["@bzlmodrio-ni//libraries/cpp/ni:shared"]
+generate_hal(
+    name = "generate_hal_files",
+    proto_files = ":proto_files",
+)
+
+write_source_files(
+    name = "write_hal",
+    files = {
+        "src/generated": ":generate_hal_files",
+    },
+    suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
+    visibility = ["//visibility:public"],
+)
+
+third_party_cc_lib_helper(
+    name = "mrc",
+    include_root = "src/mrc/include",
+)
+
+cc_library(
+    name = "generated_mrc_cc_headers",
+    hdrs = glob(["src/generated/main/native/cpp/mrc/protobuf/*.npb.h"]),
+    includes = ["src/generated/main/native/cpp/mrc/protobuf"],
+    strip_include_prefix = "src/generated/main/native/cpp/mrc/protobuf",
+    visibility = ["//hal:__subpackages__"],
+    alwayslink = True,
+)
+
+SYSTEMCORE_SRCS = glob(["src/main/native/systemcore/**"])
 
 SIM_SRCS = glob(["src/main/native/sim/**"])
-
-SIM_DEPS = []
-
-HAL_DEPS = select({
-    "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ATHENA_DEPS,
-    "//conditions:default": SIM_DEPS,
-})
 
 filegroup(
     name = "platform-srcs",
     srcs = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ATHENA_SRCS,
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": SYSTEMCORE_SRCS,
         "//conditions:default": SIM_SRCS,
     }),
 )
 
-cc_library(
-    name = "wpiHal.static",
+pkg_files(
+    name = "hal-sim-pkg",
+    srcs = glob(["src/main/native/sim/**"]),
+    strip_prefix = "src/main/native",
+)
+
+pkg_files(
+    name = "hal-systemcore-pkg",
+    srcs = glob(["src/main/native/systemcore/**"]),
+    strip_prefix = "src/main/native",
+)
+
+wpilib_cc_library(
+    name = "wpiHal",
     srcs = [":platform-srcs"] + glob(
-        ["src/main/native/cpp/**"],
+        [
+            "src/main/native/cpp/**",
+            "src/generated/main/native/cpp/**",
+        ],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**/*"]),
+    extra_src_pkg_files = [
+        ":hal-sim-pkg",
+        ":hal-systemcore-pkg",
+        ":hal-java-jni-hdrs-pkg",
+    ],
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
+    third_party_header_only_libraries = [
+        ":mrc",
+    ],
     visibility = ["//visibility:public"],
     deps = [
-        ":generated_cc_headers",
-        "//wpiutil:wpiutil.static",
-    ] + HAL_DEPS,
+        ":generated_mrc_cc_headers",
+        "//wpiutil",
+    ] + select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": [
+            "//ntcore",
+            "//wpinet",
+        ],
+        "//conditions:default": [
+            "//ntcore:ntcore_c_headers",
+        ],
+    }),
 )
 
-java_library(
-    name = "hal-java",
-    srcs = [":generated_java"] + glob(["src/main/java/**/*.java"]),
+wpilib_cc_shared_library(
+    name = "shared/wpiHal",
+    dynamic_deps = [
+        "//wpiutil:shared/wpiutil",
+    ] + select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": [
+            "//ntcore:shared/ntcore",
+            "//wpinet:shared/wpinet",
+        ],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [
+        ":wpiHal",
+    ],
+)
+
+wpilib_cc_static_library(
+    name = "static/wpiHal",
+    static_deps = [
+        "//wpiutil:static/wpiutil",
+    ] + select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": [
+            "//ntcore:static/ntcore",
+            "//wpinet:static/wpinet",
+        ],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpiHal",
+    ],
+)
+
+wpilib_jni_cc_library(
+    name = "wpiHaljni",
+    srcs = glob(["src/main/native/cpp/jni/**"]),
+    java_dep = ":hal-java",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpiHal",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/wpiHaljni",
+    auto_export_windows_symbols = False,
+    dynamic_deps = [
+        ":shared/wpiHal",
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpiHaljni",
+    ],
+)
+
+wpilib_jni_java_library(
+    name = "hal-java",
+    srcs = glob(["src/main/java/**/*.java"]),
+    native_libs = [":wpiHaljni"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//ntcore:ntcore-java",
+        "//wpinet:wpinet-java",
         "//wpiutil:wpiutil-java",
     ],
 )
@@ -64,13 +183,18 @@ java_library(
 cc_test(
     name = "hal-cpp-test",
     size = "small",
-    srcs = glob([
-        "src/test/native/**/*.cpp",
-        "src/test/native/**/*.h",
-    ]),
+    srcs = glob(["src/test/native/**/*.cpp"]),
     deps = [
-        ":wpiHal.static",
-        "//thirdparty/googletest:googletest.static",
+        ":wpiHal",
+        "//thirdparty/googletest",
+    ],
+)
+
+wpilib_java_junit5_test(
+    name = "hal-java-test",
+    srcs = glob(["src/test/java/**/*.java"]),
+    deps = [
+        ":hal-java",
     ],
 )
 
@@ -78,7 +202,7 @@ cc_binary(
     name = "DevMain-Cpp",
     srcs = ["src/dev/native/cpp/main.cpp"],
     deps = [
-        ":wpiHal.static",
+        ":wpiHal",
     ],
 )
 

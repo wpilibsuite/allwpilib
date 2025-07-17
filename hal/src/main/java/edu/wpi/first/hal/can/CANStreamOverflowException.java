@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal.can;
 
-import edu.wpi.first.hal.CANStreamMessage;
 import java.io.IOException;
 
 /**

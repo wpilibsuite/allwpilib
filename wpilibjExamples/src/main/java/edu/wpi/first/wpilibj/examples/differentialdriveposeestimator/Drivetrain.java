@@ -32,7 +32,6 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -43,7 +42,7 @@ public class Drivetrain {
   public static final double kMaxSpeed = 3.0; // meters per second
   public static final double kMaxAngularSpeed = 2 * Math.PI; // one rotation per second
 
-  private static final double kTrackWidth = 0.381 * 2; // meters
+  private static final double kTrackwidth = 0.381 * 2; // meters
   private static final double kWheelRadius = 0.0508; // meters
   private static final int kEncoderResolution = 4096;
 
@@ -61,7 +60,7 @@ public class Drivetrain {
   private final PIDController m_rightPIDController = new PIDController(1, 0, 0);
 
   private final DifferentialDriveKinematics m_kinematics =
-      new DifferentialDriveKinematics(kTrackWidth);
+      new DifferentialDriveKinematics(kTrackwidth);
 
   private final Pose3d m_objectInField;
 
@@ -91,14 +90,13 @@ public class Drivetrain {
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
 
   // Simulation classes
-  private final AnalogGyroSim m_gyroSim = new AnalogGyroSim(m_gyro);
   private final EncoderSim m_leftEncoderSim = new EncoderSim(m_leftEncoder);
   private final EncoderSim m_rightEncoderSim = new EncoderSim(m_rightEncoder);
   private final LinearSystem<N2, N2, N2> m_drivetrainSystem =
       LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
   private final DifferentialDrivetrainSim m_drivetrainSimulator =
       new DifferentialDrivetrainSim(
-          m_drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
+          m_drivetrainSystem, DCMotor.getCIM(2), 8, kTrackwidth, kWheelRadius, null);
 
   /**
    * Constructs a differential drive object. Sets the encoder distance per pulse and resets the
@@ -139,13 +137,12 @@ public class Drivetrain {
    * @param speeds The desired wheel speeds.
    */
   public void setSpeeds(DifferentialDriveWheelSpeeds speeds) {
-    final double leftFeedforward = m_feedforward.calculate(speeds.leftMetersPerSecond);
-    final double rightFeedforward = m_feedforward.calculate(speeds.rightMetersPerSecond);
+    final double leftFeedforward = m_feedforward.calculate(speeds.left);
+    final double rightFeedforward = m_feedforward.calculate(speeds.right);
 
-    final double leftOutput =
-        m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.leftMetersPerSecond);
+    final double leftOutput = m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.left);
     final double rightOutput =
-        m_rightPIDController.calculate(m_rightEncoder.getRate(), speeds.rightMetersPerSecond);
+        m_rightPIDController.calculate(m_rightEncoder.getRate(), speeds.right);
     m_leftLeader.setVoltage(leftOutput + leftFeedforward);
     m_rightLeader.setVoltage(rightOutput + rightFeedforward);
   }
@@ -253,11 +250,11 @@ public class Drivetrain {
         m_rightLeader.get() * RobotController.getInputVoltage());
     m_drivetrainSimulator.update(0.02);
 
-    m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPositionMeters());
-    m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocityMetersPerSecond());
-    m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPositionMeters());
-    m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocityMetersPerSecond());
-    m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
+    m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPosition());
+    m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocity());
+    m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPosition());
+    m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocity());
+    // m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
   }
 
   /** This function is called periodically, no matter the mode. */

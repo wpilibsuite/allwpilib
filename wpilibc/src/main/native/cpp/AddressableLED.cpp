@@ -5,10 +5,10 @@
 #include "frc/AddressableLED.h"
 
 #include <hal/AddressableLED.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
+#include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
 
 #include "frc/Errors.h"
@@ -19,8 +19,7 @@ AddressableLED::AddressableLED(int port) : m_port{port} {
   int32_t status = 0;
 
   auto stack = wpi::GetStackTrace(1);
-  m_pwmHandle =
-      HAL_InitializePWMPort(HAL_GetPort(port), stack.c_str(), &status);
+  m_pwmHandle = HAL_InitializePWMPort(port, stack.c_str(), &status);
   FRC_CheckErrorStatus(status, "Port {}", port);
   if (m_pwmHandle == HAL_kInvalidHandle) {
     return;
@@ -32,7 +31,7 @@ AddressableLED::AddressableLED(int port) : m_port{port} {
     HAL_FreePWMPort(m_pwmHandle);
   }
 
-  HAL_Report(HALUsageReporting::kResourceType_AddressableLEDs, port + 1);
+  HAL_ReportUsage("IO", port, "AddressableLED");
 }
 
 void AddressableLED::SetColorOrder(AddressableLED::ColorOrder order) {

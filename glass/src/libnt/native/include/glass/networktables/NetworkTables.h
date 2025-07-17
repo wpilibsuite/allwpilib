@@ -58,13 +58,16 @@ class NetworkTablesModel : public Model {
     bool valueChildrenMap = false;
 
    private:
-    void UpdateDiscreteSource(std::string_view name, double value, int64_t time,
-                              bool digital = false);
+    void UpdateDiscreteSource(std::string_view name, bool value, int64_t time);
+    void UpdateDiscreteSource(std::string_view name, float value, int64_t time);
+    void UpdateDiscreteSource(std::string_view name, double value,
+                              int64_t time);
+    void UpdateDiscreteSource(std::string_view name, int64_t value,
+                              int64_t time);
 
-    template <typename T, typename MakeValue>
+    template <bool IsBoolean, typename T, typename MakeValue>
     void UpdateDiscreteArray(std::string_view name, std::span<const T> arr,
-                             int64_t time, MakeValue makeValue,
-                             bool digital = false);
+                             int64_t time, MakeValue makeValue);
   };
 
   struct EntryValueTreeNode : public ValueSource {

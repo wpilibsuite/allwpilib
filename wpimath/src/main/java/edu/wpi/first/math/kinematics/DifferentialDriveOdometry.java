@@ -7,7 +7,6 @@ package edu.wpi.first.math.kinematics;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Distance;
@@ -27,21 +26,18 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    * Constructs a DifferentialDriveOdometry object.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistanceMeters The distance traveled by the left encoder.
-   * @param rightDistanceMeters The distance traveled by the right encoder.
-   * @param initialPoseMeters The starting position of the robot on the field.
+   * @param leftDistance The distance traveled by the left encoder in meters.
+   * @param rightDistance The distance traveled by the right encoder in meters.
+   * @param initialPose The starting position of the robot on the field.
    */
   public DifferentialDriveOdometry(
-      Rotation2d gyroAngle,
-      double leftDistanceMeters,
-      double rightDistanceMeters,
-      Pose2d initialPoseMeters) {
+      Rotation2d gyroAngle, double leftDistance, double rightDistance, Pose2d initialPose) {
     super(
         new DifferentialDriveKinematics(1),
         gyroAngle,
-        new DifferentialDriveWheelPositions(leftDistanceMeters, rightDistanceMeters),
-        initialPoseMeters);
-    MathSharedStore.reportUsage(MathUsageId.kOdometry_DifferentialDrive, 1);
+        new DifferentialDriveWheelPositions(leftDistance, rightDistance),
+        initialPose);
+    MathSharedStore.reportUsage("DifferentialDriveOdometry", "");
   }
 
   /**
@@ -50,26 +46,23 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    * @param gyroAngle The angle reported by the gyroscope.
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
-   * @param initialPoseMeters The starting position of the robot on the field.
+   * @param initialPose The starting position of the robot on the field.
    */
   public DifferentialDriveOdometry(
-      Rotation2d gyroAngle,
-      Distance leftDistance,
-      Distance rightDistance,
-      Pose2d initialPoseMeters) {
-    this(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), initialPoseMeters);
+      Rotation2d gyroAngle, Distance leftDistance, Distance rightDistance, Pose2d initialPose) {
+    this(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), initialPose);
   }
 
   /**
    * Constructs a DifferentialDriveOdometry object.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistanceMeters The distance traveled by the left encoder.
-   * @param rightDistanceMeters The distance traveled by the right encoder.
+   * @param leftDistance The distance traveled by the left encoder in meters.
+   * @param rightDistance The distance traveled by the right encoder in meters.
    */
   public DifferentialDriveOdometry(
-      Rotation2d gyroAngle, double leftDistanceMeters, double rightDistanceMeters) {
-    this(gyroAngle, leftDistanceMeters, rightDistanceMeters, Pose2d.kZero);
+      Rotation2d gyroAngle, double leftDistance, double rightDistance) {
+    this(gyroAngle, leftDistance, rightDistance, Pose2d.kZero);
   }
 
   /**
@@ -91,19 +84,14 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    * automatically takes care of offsetting the gyro angle.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistanceMeters The distance traveled by the left encoder.
-   * @param rightDistanceMeters The distance traveled by the right encoder.
-   * @param poseMeters The position on the field that your robot is at.
+   * @param leftDistance The distance traveled by the left encoder in meters.
+   * @param rightDistance The distance traveled by the right encoder in meters.
+   * @param pose The position on the field that your robot is at.
    */
   public void resetPosition(
-      Rotation2d gyroAngle,
-      double leftDistanceMeters,
-      double rightDistanceMeters,
-      Pose2d poseMeters) {
+      Rotation2d gyroAngle, double leftDistance, double rightDistance, Pose2d pose) {
     super.resetPosition(
-        gyroAngle,
-        new DifferentialDriveWheelPositions(leftDistanceMeters, rightDistanceMeters),
-        poseMeters);
+        gyroAngle, new DifferentialDriveWheelPositions(leftDistance, rightDistance), pose);
   }
 
   /**
@@ -115,11 +103,11 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    * @param gyroAngle The angle reported by the gyroscope.
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
-   * @param poseMeters The position on the field that your robot is at.
+   * @param pose The position on the field that your robot is at.
    */
   public void resetPosition(
-      Rotation2d gyroAngle, Distance leftDistance, Distance rightDistance, Pose2d poseMeters) {
-    resetPosition(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), poseMeters);
+      Rotation2d gyroAngle, Distance leftDistance, Distance rightDistance, Pose2d pose) {
+    resetPosition(gyroAngle, leftDistance.in(Meters), rightDistance.in(Meters), pose);
   }
 
   /**
@@ -128,13 +116,12 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    * advantageous for teams that are using lower CPR encoders.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistanceMeters The distance traveled by the left encoder.
-   * @param rightDistanceMeters The distance traveled by the right encoder.
+   * @param leftDistance The distance traveled by the left encoder in meters.
+   * @param rightDistance The distance traveled by the right encoder in meters.
    * @return The new pose of the robot.
    */
-  public Pose2d update(
-      Rotation2d gyroAngle, double leftDistanceMeters, double rightDistanceMeters) {
+  public Pose2d update(Rotation2d gyroAngle, double leftDistance, double rightDistance) {
     return super.update(
-        gyroAngle, new DifferentialDriveWheelPositions(leftDistanceMeters, rightDistanceMeters));
+        gyroAngle, new DifferentialDriveWheelPositions(leftDistance, rightDistance));
   }
 }

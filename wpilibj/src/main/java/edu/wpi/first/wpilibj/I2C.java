@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.I2CJNI;
 import edu.wpi.first.hal.util.BoundaryException;
@@ -17,18 +16,14 @@ import java.nio.ByteBuffer;
  *
  * <p>This class is intended to be used by sensor (and other I2C device) drivers. It probably should
  * not be used directly.
- *
- * <p>The Onboard I2C port is subject to system lockups. See <a
- * href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">
- * WPILib Known Issues</a> page for details.
  */
 public class I2C implements AutoCloseable {
   /** I2C connection ports. */
   public enum Port {
-    /** Onboard I2C port. */
-    kOnboard(0),
-    /** MXP (roboRIO MXP) I2C port. */
-    kMXP(1);
+    /** I2C Port 0. */
+    kPort0(0),
+    /** I2C Port 1. */
+    kPort1(1);
 
     /** Port value. */
     public final int value;
@@ -51,15 +46,9 @@ public class I2C implements AutoCloseable {
     m_port = port.value;
     m_deviceAddress = deviceAddress;
 
-    if (port == I2C.Port.kOnboard) {
-      DriverStation.reportWarning(
-          "Onboard I2C port is subject to system lockups. See Known Issues page for details",
-          false);
-    }
-
     I2CJNI.i2CInitialize((byte) port.value);
 
-    HAL.report(tResourceType.kResourceType_I2C, deviceAddress);
+    HAL.reportUsage("I2C[" + port.value + "][" + deviceAddress + "]", "");
   }
 
   /**

@@ -37,12 +37,12 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    * @param kg The gravity gain in volts.
    * @param kv The velocity gain in V/(rad/s).
    * @param ka The acceleration gain in V/(rad/s²).
-   * @param dtSeconds The period in seconds.
+   * @param dt The period in seconds.
    * @throws IllegalArgumentException for kv &lt; zero.
    * @throws IllegalArgumentException for ka &lt; zero.
    * @throws IllegalArgumentException for period &le; zero.
    */
-  public ArmFeedforward(double ks, double kg, double kv, double ka, double dtSeconds) {
+  public ArmFeedforward(double ks, double kg, double kv, double ka, double dt) {
     this.ks = ks;
     this.kg = kg;
     this.kv = kv;
@@ -53,11 +53,10 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
     if (ka < 0.0) {
       throw new IllegalArgumentException("ka must be a non-negative number, got " + ka + "!");
     }
-    if (dtSeconds <= 0.0) {
-      throw new IllegalArgumentException(
-          "period must be a positive number, got " + dtSeconds + "!");
+    if (dt <= 0.0) {
+      throw new IllegalArgumentException("period must be a positive number, got " + dt + "!");
     }
-    m_dt = dtSeconds;
+    m_dt = dt;
   }
 
   /**
@@ -168,37 +167,17 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints.
-   *
-   * @param positionRadians The position (angle) setpoint. This angle should be measured from the
-   *     horizontal (i.e. if the provided angle is 0, the arm should be parallel with the floor). If
-   *     your encoder does not follow this convention, an offset should be added.
-   * @param velocityRadPerSec The velocity setpoint.
-   * @param accelRadPerSecSquared The acceleration setpoint.
-   * @return The computed feedforward.
-   * @deprecated Use {@link #calculateWithVelocities(double, double, double)} instead
-   */
-  @Deprecated(forRemoval = true, since = "2025")
-  public double calculate(
-      double positionRadians, double velocityRadPerSec, double accelRadPerSecSquared) {
-    return ks * Math.signum(velocityRadPerSec)
-        + kg * Math.cos(positionRadians)
-        + kv * velocityRadPerSec
-        + ka * accelRadPerSecSquared;
-  }
-
-  /**
    * Calculates the feedforward from the gains and velocity setpoint assuming continuous control
    * (acceleration is assumed to be zero).
    *
-   * @param positionRadians The position (angle) setpoint. This angle should be measured from the
+   * @param position The position setpoint in radians. This angle should be measured from the
    *     horizontal (i.e. if the provided angle is 0, the arm should be parallel with the floor). If
    *     your encoder does not follow this convention, an offset should be added.
-   * @param velocity The velocity setpoint.
+   * @param velocity The velocity setpoint in radians per second.
    * @return The computed feedforward.
    */
-  public double calculate(double positionRadians, double velocity) {
-    return calculate(positionRadians, velocity, 0);
+  public double calculate(double position, double velocity) {
+    return ks * Math.signum(velocity) + kg * Math.cos(position) + kv * velocity;
   }
 
   /**
@@ -209,30 +188,9 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
    *     your encoder does not follow this convention, an offset should be added.
    * @param currentVelocity The current velocity setpoint in radians per second.
    * @param nextVelocity The next velocity setpoint in radians per second.
-   * @param dt Time between velocity setpoints in seconds.
-   * @return The computed feedforward in volts.
-   * @deprecated Use {@link #calculateWithVelocities(double, double, double)} instead.
-   */
-  @SuppressWarnings("removal")
-  @Deprecated(forRemoval = true, since = "2025")
-  public double calculate(
-      double currentAngle, double currentVelocity, double nextVelocity, double dt) {
-    return ArmFeedforwardJNI.calculate(
-        ks, kv, ka, kg, currentAngle, currentVelocity, nextVelocity, dt);
-  }
-
-  /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete control.
-   *
-   * @param currentAngle The current angle in radians. This angle should be measured from the
-   *     horizontal (i.e. if the provided angle is 0, the arm should be parallel to the floor). If
-   *     your encoder does not follow this convention, an offset should be added.
-   * @param currentVelocity The current velocity setpoint in radians per second.
-   * @param nextVelocity The next velocity setpoint in radians per second.
    * @return The computed feedforward in volts.
    */
-  public double calculateWithVelocities(
-      double currentAngle, double currentVelocity, double nextVelocity) {
+  public double calculate(double currentAngle, double currentVelocity, double nextVelocity) {
     return ArmFeedforwardJNI.calculate(
         ks, kv, ka, kg, currentAngle, currentVelocity, nextVelocity, m_dt);
   }

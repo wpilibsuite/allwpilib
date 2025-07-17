@@ -6,7 +6,7 @@
 
 #include "frc/PS5Controller.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/event/BooleanEvent.h"
@@ -14,7 +14,7 @@
 using namespace frc;
 
 PS5Controller::PS5Controller(int port) : GenericHID(port) {
-  // HAL_Report(HALUsageReporting::kResourceType_PS5Controller, port + 1);
+  HAL_ReportUsage("HID", port, "PS5Controller");
 }
 
 double PS5Controller::GetLeftX() const {

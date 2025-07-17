@@ -98,7 +98,6 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   }
 
   private final List<Property<?, ?>> m_properties = new ArrayList<>();
-  private Runnable m_safeState;
   private final List<Runnable> m_updateTables = new ArrayList<>();
   private NetworkTable m_table;
   private boolean m_controllable;
@@ -205,28 +204,6 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     }
   }
 
-  /**
-   * Start LiveWindow mode by hooking the setters for all properties. Also calls the safeState
-   * function if one was provided.
-   */
-  public void startLiveWindowMode() {
-    if (m_safeState != null) {
-      m_safeState.run();
-    }
-    startListeners();
-  }
-
-  /**
-   * Stop LiveWindow mode by unhooking the setters for all properties. Also calls the safeState
-   * function if one was provided.
-   */
-  public void stopLiveWindowMode() {
-    stopListeners();
-    if (m_safeState != null) {
-      m_safeState.run();
-    }
-  }
-
   /** Clear properties. */
   @Override
   public void clearProperties() {
@@ -272,17 +249,6 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     }
     m_actuatorPub.set(value);
     m_actuator = value;
-  }
-
-  /**
-   * Set the function that should be called to set the Sendable into a safe state. This is called
-   * when entering and exiting Live Window mode.
-   *
-   * @param func function
-   */
-  @Override
-  public void setSafeState(Runnable func) {
-    m_safeState = func;
   }
 
   /**

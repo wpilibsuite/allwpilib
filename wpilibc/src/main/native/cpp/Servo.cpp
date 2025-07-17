@@ -4,39 +4,50 @@
 
 #include "frc/Servo.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;
 
-constexpr double Servo::kMaxServoAngle;
-constexpr double Servo::kMinServoAngle;
-
-constexpr units::millisecond_t Servo::kDefaultMaxServoPWM;
-constexpr units::millisecond_t Servo::kDefaultMinServoPWM;
-
-Servo::Servo(int channel) : PWM(channel) {
-  // Set minimum and maximum PWM values supported by the servo
-  SetBounds(kDefaultMaxServoPWM, 0.0_ms, 0.0_ms, 0.0_ms, kDefaultMinServoPWM);
+Servo::Servo(int channel) : m_pwm(channel, false) {
+  wpi::SendableRegistry::Add(this, "Servo", channel);
 
   // Assign defaults for period multiplier for the servo PWM control signal
-  SetPeriodMultiplier(kPeriodMultiplier_4X);
+  m_pwm.SetOutputPeriod(PWM::kOutputPeriod_20Ms);
 
-  HAL_Report(HALUsageReporting::kResourceType_Servo, channel + 1);
+  HAL_ReportUsage("IO", channel, "Servo");
   wpi::SendableRegistry::SetName(this, "Servo", channel);
+
+  m_simDevice = hal::SimDevice{"Servo", channel};
+  if (m_simDevice) {
+    m_simPosition = m_simDevice.CreateDouble("Position", true, 0.0);
+    m_pwm.SetSimDevice(m_simDevice);
+  }
 }
 
 void Servo::Set(double value) {
-  SetPosition(value);
-}
+  value = std::clamp(value, 0.0, 1.0);
+  if (m_simPosition) {
+    m_simPosition.Set(value);
+  }
 
-void Servo::SetOffline() {
-  SetDisabled();
+  units::microsecond_t rawValue =
+      (value * GetFullRangeScaleFactor()) + m_minPwm;
+
+  m_pwm.SetPulseTime(rawValue);
 }
 
 double Servo::Get() const {
-  return GetPosition();
+  units::microsecond_t rawValue = m_pwm.GetPulseTime();
+
+  if (rawValue < m_minPwm) {
+    return 0.0;
+  } else if (rawValue > m_maxPwm) {
+    return 1.0;
+  }
+  return (rawValue - m_minPwm).to<double>() /
+         GetFullRangeScaleFactor().to<double>();
 }
 
 void Servo::SetAngle(double degrees) {
@@ -46,19 +57,11 @@ void Servo::SetAngle(double degrees) {
     degrees = kMaxServoAngle;
   }
 
-  SetPosition((degrees - kMinServoAngle) / GetServoAngleRange());
+  Set((degrees - kMinServoAngle) / GetServoAngleRange());
 }
 
 double Servo::GetAngle() const {
-  return GetPosition() * GetServoAngleRange() + kMinServoAngle;
-}
-
-double Servo::GetMaxAngle() const {
-  return kMaxServoAngle;
-}
-
-double Servo::GetMinAngle() const {
-  return kMinServoAngle;
+  return Get() * GetServoAngleRange() + kMinServoAngle;
 }
 
 void Servo::InitSendable(wpi::SendableBuilder& builder) {
@@ -68,6 +71,14 @@ void Servo::InitSendable(wpi::SendableBuilder& builder) {
       [=, this](double value) { Set(value); });
 }
 
-double Servo::GetServoAngleRange() const {
+double Servo::GetServoAngleRange() {
   return kMaxServoAngle - kMinServoAngle;
+}
+
+units::microsecond_t Servo::GetFullRangeScaleFactor() const {
+  return m_maxPwm - m_minPwm;
+}
+
+int Servo::GetChannel() const {
+  return m_pwm.GetChannel();
 }

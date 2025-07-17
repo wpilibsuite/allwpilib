@@ -1,6 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (project.hasProperty('onlylinuxathena')) {
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore')) {
     return;
 }
 
@@ -92,15 +92,16 @@ model {
                 }
             }
             binaries.all {
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     it.buildable = false
                     return
                 }
                 lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                lib project: ':datalog', library: 'datalog', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                     it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'
@@ -131,15 +132,16 @@ model {
                 include "**/*.cpp"
             }
             binaries.all {
-                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     it.buildable = false
                     return
                 }
                 lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':datalog', library: 'datalog', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                     it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'

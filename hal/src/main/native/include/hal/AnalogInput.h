@@ -21,14 +21,14 @@ extern "C" {
 /**
  * Initializes the analog input port using the given port object.
  *
- * @param[in] portHandle Handle to the port to initialize.
+ * @param[in] channel the smartio channel.
  * @param[in] allocationLocation the location where the allocation is occurring
  *                               (can be null)
  * @param[out] status the error code, or 0 for success
  * @return the created analog input handle
  */
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
-    HAL_PortHandle portHandle, const char* allocationLocation, int32_t* status);
+    int32_t channel, const char* allocationLocation, int32_t* status);
 
 /**
  * Frees an analog input port.
@@ -144,7 +144,7 @@ int32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
 /**
  * Gets a sample straight from the channel on this module.
  *
- * The sample is a 12-bit value representing the 0V to 5V range of the A/D
+ * The sample is a 12-bit value representing the 0V to 3.3V range of the A/D
  * converter in the module. The units are in A/D converter codes.  Use
  * GetVoltage() to get the analog value in calibrated units.
  *

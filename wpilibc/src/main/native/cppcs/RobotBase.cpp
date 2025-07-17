@@ -4,7 +4,7 @@
 
 #include "frc/RobotBase.h"
 
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
 #include <dlfcn.h>
 #endif
 
@@ -14,8 +14,8 @@
 #include <utility>
 
 #include <cameraserver/CameraServerShared.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
+#include <hal/UsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/print.h>
@@ -26,7 +26,6 @@
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
 #include "frc/Notifier.h"
-#include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
 static_assert(frc::RuntimeType::kRoboRIO ==
@@ -35,6 +34,8 @@ static_assert(frc::RuntimeType::kRoboRIO2 ==
               static_cast<frc::RuntimeType>(HAL_Runtime_RoboRIO2));
 static_assert(frc::RuntimeType::kSimulation ==
               static_cast<frc::RuntimeType>(HAL_Runtime_Simulation));
+static_assert(frc::RuntimeType::kSystemCore ==
+              static_cast<frc::RuntimeType>(HAL_Runtime_SystemCore));
 
 using SetCameraServerSharedFP = void (*)(frc::CameraServerShared*);
 
@@ -46,8 +47,8 @@ int frc::RunHALInitialization() {
     return -1;
   }
   DriverStation::RefreshData();
-  HAL_Report(HALUsageReporting::kResourceType_Language,
-             HALUsageReporting::kLanguage_CPlusPlus, 0, GetWPILibVersion());
+  HAL_ReportUsage("Language", "C++");
+  HAL_ReportUsage("WPILibVersion", GetWPILibVersion());
 
   if (!frc::Notifier::SetHALThreadPriority(true, 40)) {
     FRC_ReportWarning("Setting HAL Notifier RT priority to 40 failed\n");
@@ -62,14 +63,8 @@ std::thread::id RobotBase::m_threadId;
 namespace {
 class WPILibCameraServerShared : public frc::CameraServerShared {
  public:
-  void ReportUsbCamera(int id) override {
-    HAL_Report(HALUsageReporting::kResourceType_UsbCamera, id);
-  }
-  void ReportAxisCamera(int id) override {
-    HAL_Report(HALUsageReporting::kResourceType_AxisCamera, id);
-  }
-  void ReportVideoServer(int id) override {
-    HAL_Report(HALUsageReporting::kResourceType_PCVideoServer, id);
+  void ReportUsage(std::string_view resource, std::string_view data) override {
+    HAL_ReportUsage(resource, data);
   }
   void SetCameraServerErrorV(fmt::string_view format,
                              fmt::format_args args) override {
@@ -100,53 +95,8 @@ class WPILibMathShared : public wpi::math::MathShared {
                       args);
   }
 
-  void ReportUsage(wpi::math::MathUsageId id, int count) override {
-    switch (id) {
-      case wpi::math::MathUsageId::kKinematics_DifferentialDrive:
-        HAL_Report(HALUsageReporting::kResourceType_Kinematics,
-                   HALUsageReporting::kKinematics_DifferentialDrive);
-        break;
-      case wpi::math::MathUsageId::kKinematics_MecanumDrive:
-        HAL_Report(HALUsageReporting::kResourceType_Kinematics,
-                   HALUsageReporting::kKinematics_MecanumDrive);
-        break;
-      case wpi::math::MathUsageId::kKinematics_SwerveDrive:
-        HAL_Report(HALUsageReporting::kResourceType_Kinematics,
-                   HALUsageReporting::kKinematics_SwerveDrive);
-        break;
-      case wpi::math::MathUsageId::kTrajectory_TrapezoidProfile:
-        HAL_Report(HALUsageReporting::kResourceType_TrapezoidProfile, count);
-        break;
-      case wpi::math::MathUsageId::kFilter_Linear:
-        HAL_Report(HALUsageReporting::kResourceType_LinearFilter, count);
-        break;
-      case wpi::math::MathUsageId::kOdometry_DifferentialDrive:
-        HAL_Report(HALUsageReporting::kResourceType_Odometry,
-                   HALUsageReporting::kOdometry_DifferentialDrive);
-        break;
-      case wpi::math::MathUsageId::kOdometry_SwerveDrive:
-        HAL_Report(HALUsageReporting::kResourceType_Odometry,
-                   HALUsageReporting::kOdometry_SwerveDrive);
-        break;
-      case wpi::math::MathUsageId::kOdometry_MecanumDrive:
-        HAL_Report(HALUsageReporting::kResourceType_Odometry,
-                   HALUsageReporting::kOdometry_MecanumDrive);
-        break;
-      case wpi::math::MathUsageId::kController_PIDController2:
-        HAL_Report(HALUsageReporting::kResourceType_PIDController2, count);
-        break;
-      case wpi::math::MathUsageId::kController_ProfiledPIDController:
-        HAL_Report(HALUsageReporting::kResourceType_ProfiledPIDController,
-                   count);
-        break;
-      case wpi::math::MathUsageId::kController_BangBangController:
-        HAL_Report(HALUsageReporting::kResourceType_BangBangController, count);
-        break;
-      case wpi::math::MathUsageId::kTrajectory_PathWeaver:
-        HAL_Report(HALUsageReporting::kResourceType_PathWeaverTrajectory,
-                   count);
-        break;
-    }
+  void ReportUsage(std::string_view resource, std::string_view data) override {
+    HAL_ReportUsage(resource, data);
   }
 
   units::second_t GetTimestamp() override {
@@ -156,7 +106,7 @@ class WPILibMathShared : public wpi::math::MathShared {
 }  // namespace
 
 static void SetupCameraServerShared() {
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
 #ifdef DYNAMIC_CAMERA_SERVER
 #ifdef DYNAMIC_CAMERA_SERVER_DEBUG
   auto cameraServerLib = dlopen("libcameraserverd.so", RTLD_NOW);
@@ -241,7 +191,7 @@ RobotBase::RobotBase() {
   // subscribe to "" to force persistent values to propagate to local
   nt::SubscribeMultiple(inst.GetHandle(), {{std::string_view{}}});
   if constexpr (!IsSimulation()) {
-    inst.StartServer("/home/lvuser/networktables.json");
+    inst.StartServer("/home/systemcore/networktables.json");
   } else {
     inst.StartServer();
   }
@@ -258,82 +208,16 @@ RobotBase::RobotBase() {
     }
   }
 
-  connListenerHandle = inst.AddConnectionListener(false, [&](const nt::Event&
-                                                                 event) {
-    if (event.Is(nt::EventFlags::kConnected)) {
-      if (event.GetConnectionInfo()->remote_id.starts_with("glass")) {
-        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
-                   HALUsageReporting::kDashboard_Glass);
-        m_dashboardDetected = true;
-      } else if (event.GetConnectionInfo()->remote_id.starts_with(
-                     "SmartDashboard")) {
-        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
-                   HALUsageReporting::kDashboard_SmartDashboard);
-        m_dashboardDetected = true;
-      } else if (event.GetConnectionInfo()->remote_id.starts_with(
-                     "shuffleboard")) {
-        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
-                   HALUsageReporting::kDashboard_Shuffleboard);
-        m_dashboardDetected = true;
-      } else if (event.GetConnectionInfo()->remote_id.starts_with("elastic") ||
-                 event.GetConnectionInfo()->remote_id.starts_with("Elastic")) {
-        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
-                   HALUsageReporting::kDashboard_Elastic);
-        m_dashboardDetected = true;
-      } else if (event.GetConnectionInfo()->remote_id.starts_with(
-                     "Dashboard")) {
-        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
-                   HALUsageReporting::kDashboard_LabVIEW);
-        m_dashboardDetected = true;
-      } else if (event.GetConnectionInfo()->remote_id.starts_with(
-                     "AdvantageScope")) {
-        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
-                   HALUsageReporting::kDashboard_AdvantageScope);
-        m_dashboardDetected = true;
-      } else if (event.GetConnectionInfo()->remote_id.starts_with(
-                     "QFRCDashboard")) {
-        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
-                   HALUsageReporting::kDashboard_QFRCDashboard);
-        m_dashboardDetected = true;
-      } else if (event.GetConnectionInfo()->remote_id.starts_with(
-                     "FRC Web Components")) {
-        HAL_Report(HALUsageReporting::kResourceType_Dashboard,
-                   HALUsageReporting::kDashboard_FRCWebComponents);
-        m_dashboardDetected = true;
-      } else {
-        if (!m_dashboardDetected) {
-          size_t delim = event.GetConnectionInfo()->remote_id.find('@');
-          if (delim != std::string::npos) {
-            HAL_Report(
-                HALUsageReporting::kResourceType_Dashboard,
-                HALUsageReporting::kDashboard_Unknown, 0,
-                event.GetConnectionInfo()->remote_id.substr(0, delim).c_str());
-          } else {
-            HAL_Report(HALUsageReporting::kResourceType_Dashboard,
-                       HALUsageReporting::kDashboard_Unknown, 0,
-                       event.GetConnectionInfo()->remote_id.c_str());
-          }
+  connListenerHandle =
+      inst.AddConnectionListener(false, [&](const nt::Event& event) {
+        if (event.Is(nt::EventFlags::kConnected)) {
+          auto connInfo = event.GetConnectionInfo();
+          HAL_ReportUsage(fmt::format("NT/{}", connInfo->remote_id), "");
         }
-      }
-    }
-  });
+      });
 
   SmartDashboard::init();
 
-  if constexpr (!IsSimulation()) {
-    std::FILE* file = nullptr;
-    file = std::fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
-
-    if (file != nullptr) {
-      std::fputs("C++ ", file);
-      std::fputs(GetWPILibVersion(), file);
-      std::fclose(file);
-    }
-  }
-
   // Call DriverStation::RefreshData() to kick things off
   DriverStation::RefreshData();
-
-  // First and one-time initialization
-  LiveWindow::SetEnabled(false);
 }

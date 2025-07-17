@@ -135,25 +135,24 @@ class SwerveDriveOdometryTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.getTotalTimeSeconds()) {
+    while (t <= trajectory.getTotalTime()) {
       var groundTruthState = trajectory.sample(t);
 
       var moduleStates =
           kinematics.toSwerveModuleStates(
               new ChassisSpeeds(
-                  groundTruthState.velocityMetersPerSecond,
+                  groundTruthState.velocity,
                   0.0,
-                  groundTruthState.velocityMetersPerSecond
-                      * groundTruthState.curvatureRadPerMeter));
+                  groundTruthState.velocity * groundTruthState.curvature));
       for (var moduleState : moduleStates) {
         moduleState.angle = moduleState.angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
-        moduleState.speedMetersPerSecond += rand.nextGaussian() * 0.1;
+        moduleState.speed += rand.nextGaussian() * 0.1;
       }
 
-      fl.distanceMeters += moduleStates[0].speedMetersPerSecond * dt;
-      fr.distanceMeters += moduleStates[1].speedMetersPerSecond * dt;
-      bl.distanceMeters += moduleStates[2].speedMetersPerSecond * dt;
-      br.distanceMeters += moduleStates[3].speedMetersPerSecond * dt;
+      fl.distance += moduleStates[0].speed * dt;
+      fr.distance += moduleStates[1].speed * dt;
+      bl.distance += moduleStates[2].speed * dt;
+      br.distance += moduleStates[3].speed * dt;
 
       fl.angle = moduleStates[0].angle;
       fr.angle = moduleStates[1].angle;
@@ -162,14 +161,10 @@ class SwerveDriveOdometryTest {
 
       var xHat =
           odometry.update(
-              groundTruthState
-                  .poseMeters
-                  .getRotation()
-                  .plus(new Rotation2d(rand.nextGaussian() * 0.05)),
+              groundTruthState.pose.getRotation().plus(new Rotation2d(rand.nextGaussian() * 0.05)),
               new SwerveModulePosition[] {fl, fr, bl, br});
 
-      double error =
-          groundTruthState.poseMeters.getTranslation().getDistance(xHat.getTranslation());
+      double error = groundTruthState.pose.getTranslation().getDistance(xHat.getTranslation());
       if (error > maxError) {
         maxError = error;
       }
@@ -178,16 +173,15 @@ class SwerveDriveOdometryTest {
       t += dt;
     }
 
-    assertEquals(0.0, odometry.getPoseMeters().getX(), 1e-1, "Incorrect Final X");
-    assertEquals(0.0, odometry.getPoseMeters().getY(), 1e-1, "Incorrect Final Y");
+    assertEquals(0.0, odometry.getPose().getX(), 1e-1, "Incorrect Final X");
+    assertEquals(0.0, odometry.getPose().getY(), 1e-1, "Incorrect Final Y");
     assertEquals(
         Math.PI / 4,
-        odometry.getPoseMeters().getRotation().getRadians(),
+        odometry.getPose().getRotation().getRadians(),
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
-    assertEquals(
-        0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.05, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.getTotalTime() / dt), 0.05, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
   }
 
@@ -225,34 +219,25 @@ class SwerveDriveOdometryTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.getTotalTimeSeconds()) {
+    while (t <= trajectory.getTotalTime()) {
       var groundTruthState = trajectory.sample(t);
 
-      fl.distanceMeters +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
-      fr.distanceMeters +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
-      bl.distanceMeters +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
-      br.distanceMeters +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+      fl.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
+      fr.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
+      bl.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
+      br.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
 
-      fl.angle = groundTruthState.poseMeters.getRotation();
-      fr.angle = groundTruthState.poseMeters.getRotation();
-      bl.angle = groundTruthState.poseMeters.getRotation();
-      br.angle = groundTruthState.poseMeters.getRotation();
+      fl.angle = groundTruthState.pose.getRotation();
+      fr.angle = groundTruthState.pose.getRotation();
+      bl.angle = groundTruthState.pose.getRotation();
+      br.angle = groundTruthState.pose.getRotation();
 
       var xHat =
           odometry.update(
               new Rotation2d(rand.nextGaussian() * 0.05),
               new SwerveModulePosition[] {fl, fr, bl, br});
 
-      double error =
-          groundTruthState.poseMeters.getTranslation().getDistance(xHat.getTranslation());
+      double error = groundTruthState.pose.getTranslation().getDistance(xHat.getTranslation());
       if (error > maxError) {
         maxError = error;
       }
@@ -261,16 +246,15 @@ class SwerveDriveOdometryTest {
       t += dt;
     }
 
-    assertEquals(0.0, odometry.getPoseMeters().getX(), 1e-1, "Incorrect Final X");
-    assertEquals(0.0, odometry.getPoseMeters().getY(), 1e-1, "Incorrect Final Y");
+    assertEquals(0.0, odometry.getPose().getX(), 1e-1, "Incorrect Final X");
+    assertEquals(0.0, odometry.getPose().getY(), 1e-1, "Incorrect Final Y");
     assertEquals(
         0.0,
-        odometry.getPoseMeters().getRotation().getRadians(),
+        odometry.getPose().getRotation().getRadians(),
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
-    assertEquals(
-        0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.06, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.getTotalTime() / dt), 0.06, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
   }
 }

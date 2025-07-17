@@ -18,10 +18,7 @@ JException trajectorySerializationEx;
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgEx},
-    {"java/io/IOException", &ioEx},
-    {"edu/wpi/first/math/trajectory/"
-     "TrajectoryUtil$TrajectorySerializationException",
-     &trajectorySerializationEx}};
+    {"java/io/IOException", &ioEx}};
 
 extern "C" {
 

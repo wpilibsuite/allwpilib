@@ -44,7 +44,7 @@ class DPWMSimModel : public glass::DPWMModel {
     }
   }
 
-  glass::DataSource* GetValueData() override { return &m_valueData; }
+  glass::DoubleSource* GetValueData() override { return &m_valueData; }
 
   void SetValue(double val) override {
     HALSIM_SetDigitalPWMDutyCycle(m_index, val);
@@ -73,7 +73,7 @@ class DutyCycleSimModel : public glass::DutyCycleModel {
     }
   }
 
-  glass::DataSource* GetValueData() override { return &m_valueData; }
+  glass::DoubleSource* GetValueData() override { return &m_valueData; }
 
   void SetValue(double val) override {
     HALSIM_SetDutyCycleOutput(m_index, val);
@@ -115,7 +115,7 @@ class DIOSimModel : public glass::DIOModel {
 
   bool IsInput() const override { return HALSIM_GetDIOIsInput(m_channel); }
 
-  glass::DataSource* GetValueData() override { return &m_valueData; }
+  glass::BooleanSource* GetValueData() override { return &m_valueData; }
 
   void SetValue(bool val) override { HALSIM_SetDIOValue(m_channel, val); }
 
@@ -187,7 +187,7 @@ void DIOsSimModel::Update() {
     auto& model = m_dutyCycleModels[i];
     if (HALSIM_GetDutyCycleInitialized(i)) {
       if (!model) {
-        int channel = HALSIM_GetDutyCycleDigitalChannel(i);
+        int channel = i;
         if (channel >= 0 && channel < numDIO && m_dioModels[channel]) {
           model = std::make_unique<DutyCycleSimModel>(i);
           m_dioModels[channel]->SetDutyCycle(model.get());

@@ -17,7 +17,7 @@ class Robot : public frc::TimedRobot {
  public:
   void RobotPeriodic() override;
 
-  static constexpr frc::I2C::Port kPort = frc::I2C::Port::kOnboard;
+  static constexpr frc::I2C::Port kPort = frc::I2C::Port::kPort0;
 
  private:
   static constexpr int deviceAddress = 4;

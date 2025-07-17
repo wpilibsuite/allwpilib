@@ -43,6 +43,9 @@ public final class HALUtil extends JNIWrapper {
   /** Simulation runtime. */
   public static final int RUNTIME_SIMULATION = 2;
 
+  /** SystemCore. */
+  public static final int RUNTIME_SYSTEMCORE = 3;
+
   /**
    * Returns the FPGA Version number.
    *
@@ -106,18 +109,6 @@ public final class HALUtil extends JNIWrapper {
    * @see "HAL_GetRuntimeType"
    */
   public static native int getHALRuntimeType();
-
-  /**
-   * Gets the state of the "USER" button on the roboRIO.
-   *
-   * <p>Warning: the User Button is used to stop user programs from automatically loading if it is
-   * held for more then 5 seconds. Because of this, it's not recommended to be used by teams for any
-   * other purpose.
-   *
-   * @return true if the button is currently pressed down
-   * @see "HAL_GetFPGAButton"
-   */
-  public static native boolean getFPGAButton();
 
   /**
    * Gets the error message for a specific status code.

@@ -285,12 +285,12 @@ int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
   return 0;
 }
 
-HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum) {
+HAL_Bool HAL_GetJoystickIsGamepad(int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     return 0;
   } else {
-    return joystickDesc.isXbox;
+    return joystickDesc.isGamepad;
   }
 }
 

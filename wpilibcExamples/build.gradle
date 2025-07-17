@@ -120,9 +120,6 @@ model {
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                        nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
-                    }
                     if (binary.targetPlatform.name == getCurrentArch()) {
                         simModules.each {
                             lib project: ":simulation:$it", library: it, linkage: 'shared'
@@ -171,9 +168,6 @@ model {
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                        nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
-                    }
                 }
                 sources {
                     cpp {
@@ -325,9 +319,6 @@ model {
             lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries', 'ni_runtime_libraries')
-            }
             nativeUtils.useRequiredLibrary(it, 'opencv_shared')
 
             it.cppCompiler.define('RUNNING_FRC_TESTS')

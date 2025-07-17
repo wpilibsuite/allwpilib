@@ -10,7 +10,7 @@
 
 namespace glass {
 
-class DataSource;
+class BooleanSource;
 
 /**
  * DrawLEDs() configuration for 2D arrays.
@@ -80,7 +80,7 @@ void DrawLEDs(const int* values, int numValues, int cols, const ImU32* colors,
  *                if 0, defaults to 1/3 of font size
  * @param config 2D array configuration
  */
-void DrawLEDSources(const int* values, DataSource** sources, int numValues,
+void DrawLEDSources(const int* values, BooleanSource** sources, int numValues,
                     int cols, const ImU32* colors, float size = 0.0f,
                     float spacing = 0.0f,
                     const LEDConfig& config = LEDConfig{});

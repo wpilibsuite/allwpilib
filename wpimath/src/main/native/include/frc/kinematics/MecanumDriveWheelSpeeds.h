@@ -49,8 +49,10 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
    * threshold, while maintaining the ratio of speeds between wheels.
    *
    * @param attainableMaxSpeed The absolute max speed that a wheel can reach.
+   * @return Desaturated MecanumDriveWheelSpeeds.
    */
-  constexpr void Desaturate(units::meters_per_second_t attainableMaxSpeed) {
+  constexpr MecanumDriveWheelSpeeds Desaturate(
+      units::meters_per_second_t attainableMaxSpeed) const {
     std::array<units::meters_per_second_t, 4> wheelSpeeds{frontLeft, frontRight,
                                                           rearLeft, rearRight};
     units::meters_per_second_t realMaxSpeed = units::math::abs(
@@ -63,11 +65,11 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
       for (int i = 0; i < 4; ++i) {
         wheelSpeeds[i] = wheelSpeeds[i] / realMaxSpeed * attainableMaxSpeed;
       }
-      frontLeft = wheelSpeeds[0];
-      frontRight = wheelSpeeds[1];
-      rearLeft = wheelSpeeds[2];
-      rearRight = wheelSpeeds[3];
+      return MecanumDriveWheelSpeeds{wheelSpeeds[0], wheelSpeeds[1],
+                                     wheelSpeeds[2], wheelSpeeds[3]};
     }
+
+    return *this;
   }
 
   /**

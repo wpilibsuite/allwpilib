@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Tue, 18 Jun 2024 09:07:33 -0700
+Subject: [PATCH 34/36] Add SmallVector erase_if()
+
+---
+ llvm/include/llvm/ADT/SmallVector.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
+index b8981ab67322f7888ad63d953ba72dbfa53b2939..9a22c95aaf84d276b1c097c0997de3e6b04ea05e 100644
+--- a/llvm/include/llvm/ADT/SmallVector.h
++++ b/llvm/include/llvm/ADT/SmallVector.h
+@@ -1315,6 +1315,14 @@ template <typename Out, typename R> SmallVector<Out> to_vector_of(R &&Range) {
+   return {std::begin(Range), std::end(Range)};
+ }
+ 
++template <typename T, typename Pred>
++typename SmallVectorImpl<T>::size_type erase_if(
++    SmallVectorImpl<T>& c, Pred pred) {
++  const auto original_size = c.size();
++  c.erase(std::remove_if(c.begin(), c.end(), pred), c.end());
++  return original_size - c.size();
++}
++
+ } // end namespace llvm
+ 
+ namespace std {

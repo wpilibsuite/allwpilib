@@ -67,74 +67,71 @@ def simProjects = ['halsim_gui']
 
 deploy {
     targets {
-        roborio(RemoteTarget) {
-            directory = '/home/lvuser'
+        systemcore(RemoteTarget) {
+            directory = '/home/systemcore'
             maxChannels = 4
             locations {
-                ssh(SshDeployLocation) {
-                    address = "172.22.11.2"
-                    user = 'admin'
-                    password = ''
+                mdns(SshDeployLocation) {
+                    address = "robot.local"
+                    user = 'systemcore'
+                    password = 'systemcore'
+                    ipv6 = false
+                }
+                usb(SshDeployLocation) {
+                    address = "172.28.0.1"
+                    user = 'systemcore'
+                    password = 'systemcore'
                     ipv6 = false
                 }
             }
 
-            def remote = it
+            timeout = 7
 
-            artifacts.registerFactory(WPIJREArtifact) {
-                return objects.newInstance(WPIJREArtifact, it, remote)
-            }
+            def remote = it
 
             artifacts {
                 all {
-                    predeploy << { ctx ->
-                        ctx.execute('. /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKillRobot.sh -t 2> /dev/null')
-                        ctx.execute("sed -i -e 's/\"exec /\"/' /usr/local/frc/bin/frcRunRobot.sh")
-                    }
                     postdeploy << { ctx ->
                         ctx.execute("sync")
-                        ctx.execute("ldconfig")
+                        ctx.execute("sudo ldconfig /home/systemcore/frc/third-party/lib")
                     }
                 }
 
                 developerRobotCpp(NativeExecutableArtifact) {
-                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    libraryDirectory = '/home/systemcore/frc/third-party/lib'
                     def excludes = getLibraryFilter().getExcludes()
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/home/lvuser/developerRobotCpp' > /home/lvuser/robotCommand")
-                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
-                        ctx.execute("setcap cap_sys_nice+eip \"/home/lvuser/developerRobotCpp\"")
+                        ctx.execute("echo 'LD_LIBRARY_PATH=/home/systemcore/frc/third-party/lib /home/systemcore/developerRobotCpp' > /home/systemcore/robotCommand")
+                        ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
+                        ctx.execute("setcap cap_sys_nice+eip \"/home/systemcore/developerRobotCpp\"")
                         ctx.execute('chmod +x developerRobotCpp')
                     }
                 }
 
                 developerRobotCppStatic(NativeExecutableArtifact) {
-                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    libraryDirectory = '/home/systemcore/frc/third-party/lib'
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/home/lvuser/developerRobotCppStatic' > /home/lvuser/robotCommand")
-                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
-                        ctx.execute("setcap cap_sys_nice+eip \"/home/lvuser/developerRobotCppStatic\"")
+                        ctx.execute("echo ''LD_LIBRARY_PATH=/home/systemcore/frc/third-party/lib /home/systemcore/developerRobotCppStatic' > /home/systemcore/robotCommand")
+                        ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
+                        ctx.execute("sudo setcap cap_sys_nice+eip \"/home/systemcore/developerRobotCppStatic\"")
                         ctx.execute('chmod +x developerRobotCppStatic')
                     }
                 }
 
                 developerRobotCppJava(NativeExecutableArtifact) {
-                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    libraryDirectory = '/home/systemcore/frc/third-party/lib'
                     def excludes = getLibraryFilter().getExcludes()
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
                 }
 
-                jre(WPIJREArtifact) {
-                }
-
                 developerRobotJava(JavaArtifact) {
                     jarTask = shadowJar
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseSerialGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/lvuser/developerRobot-all.jar' > /home/lvuser/robotCommand")
-                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
+                        ctx.execute("echo '/usr/bin/java -XX:+UseG1GC -Djava.library.path=/home/systemcore/frc/third-party/lib -jar /home/systemcore/developerRobot-all.jar' > /home/systemcore/robotCommand")
+                        ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                     }
                 }
             }
@@ -157,23 +154,22 @@ eclipse {
 
 tasks.register('deployJava') {
     try {
-        dependsOn tasks.named('deployjreroborio')
-        dependsOn tasks.named('deploydeveloperRobotJavaroborio')
-        dependsOn tasks.named('deploydeveloperRobotCppJavaroborio') // Deploying shared C++ is how to get the Java shared libraries.
+        dependsOn tasks.named('deploydeveloperRobotJavasystemcore')
+        dependsOn tasks.named('deploydeveloperRobotCppJavasystemcore') // Deploying shared C++ is how to get the Java shared libraries.
     } catch (ignored) {
     }
 }
 
 tasks.register('deployShared') {
     try {
-        dependsOn tasks.named('deploydeveloperRobotCpproborio')
+        dependsOn tasks.named('deploydeveloperRobotCppsystemcore')
     } catch (ignored) {
     }
 }
 
 tasks.register('deployStatic') {
     try {
-        dependsOn tasks.named('deploydeveloperRobotCppStaticroborio')
+        dependsOn tasks.named('deploydeveloperRobotCppStaticsystemcore')
     } catch (ignored) {
     }
 }
@@ -195,10 +191,10 @@ model {
                 }
             }
             binaries.all { binary ->
-                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     if (binary.buildType.name == 'debug') {
-                        deploy.targets.roborio.artifacts.developerRobotCpp.binary = binary
-                        deploy.targets.roborio.artifacts.developerRobotCppJava.binary = binary
+                        deploy.targets.systemcore.artifacts.developerRobotCpp.binary = binary
+                        deploy.targets.systemcore.artifacts.developerRobotCppJava.binary = binary
                     }
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
@@ -206,8 +202,6 @@ model {
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
-                project(':ntcore').addNtcoreDependency(binary, 'shared')
-                project(':ntcore').addNtcoreJniDependency(binary)
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
@@ -215,16 +209,14 @@ model {
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 project(':hal').addHalDependency(binary, 'shared')
                 project(':hal').addHalJniDependency(binary)
+                project(':ntcore').addNtcoreDependency(binary, 'shared')
+                project(':ntcore').addNtcoreJniDependency(binary)
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
-                } else {
-                    def systemArch = getCurrentArch()
-                    if (binary.targetPlatform.name == systemArch) {
-                        simProjects.each {
-                            lib project: ":simulation:$it", library: it, linkage: 'shared'
-                        }
+                def systemArch = getCurrentArch()
+                if (binary.targetPlatform.name == systemArch) {
+                    simProjects.each {
+                        lib project: ":simulation:$it", library: it, linkage: 'shared'
                     }
                 }
             }
@@ -245,9 +237,9 @@ model {
                 }
             }
             binaries.all { binary ->
-                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                     if (binary.buildType.name == 'debug') {
-                        deploy.targets.roborio.artifacts.developerRobotCppStatic.binary = binary
+                        deploy.targets.systemcore.artifacts.developerRobotCppStatic.binary = binary
                     }
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
@@ -255,14 +247,11 @@ model {
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
-                project(':ntcore').addNtcoreDependency(binary, 'static')
                 lib project: ':cscore', library: 'cscore', linkage: 'static'
                 project(':hal').addHalDependency(binary, 'static')
+                project(':ntcore').addNtcoreDependency(binary, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
-                }
             }
         }
     }
@@ -318,16 +307,18 @@ model {
                 }
             }
         }
-        installAthena(Task) {
+
+        installSystemCore(Task) {
             $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.component.name == 'developerRobotCpp') {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore && it.component.name == 'developerRobotCpp') {
                     dependsOn it.tasks.install
                 }
             }
         }
-        installAthenaStatic(Task) {
+
+        installSystemCoreStatic(Task) {
             $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.component.name == 'developerRobotCppStatic') {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore && it.component.name == 'developerRobotCppStatic') {
                     dependsOn it.tasks.install
                 }
             }

@@ -23,20 +23,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/roborio-cross-ubuntu:2025-22.04
+          - container: wpilib/roborio-cross-ubuntu:2025-24.04
             artifact-name: Athena
             build-options: "-Ponlylinuxathena"
-          - container: wpilib/raspbian-cross-ubuntu:bookworm-22.04
+          - container: wpilib/raspbian-cross-ubuntu:bookworm-24.04
             artifact-name: Arm32
             build-options: "-Ponlylinuxarm32"
-          - container: wpilib/aarch64-cross-ubuntu:bookworm-22.04
+          - container: wpilib/aarch64-cross-ubuntu:bookworm-24.04
             artifact-name: Arm64
             build-options: "-Ponlylinuxarm64"
-          - container: wpilib/ubuntu-base:22.04
+          - container: wpilib/ubuntu-base:24.04
             artifact-name: Linux
             build-options: "-Ponlylinuxx86-64"
     name: "Build - ${{ matrix.artifact-name }}"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [validation]
     steps:
       - name: Free Disk Space
@@ -102,11 +102,6 @@ jobs:
             architecture: aarch64
             task: "build"
             outputs: "build/allOutputs"
-          - os: windows-2022
-            artifact-name: Win32
-            architecture: x86
-            task: ":ntcoreffi:build"
-            outputs: "ntcoreffi/build/outputs"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
     needs: [validation]
@@ -131,9 +126,6 @@ jobs:
         run: security set-keychain-settings -lut 21600
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main')
-      - name: Set Java Heap Size
-        run: sed -i 's/-Xmx2g/-Xmx1g/g' gradle.properties
-        if: matrix.artifact-name == 'Win32'
       - name: Check disk free space (Windows)
         run: wmic logicaldisk get caption, freespace
         if: matrix.os == 'windows-2022'

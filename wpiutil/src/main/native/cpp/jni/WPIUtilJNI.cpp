@@ -7,8 +7,6 @@
 #include <jni.h>
 
 #include "edu_wpi_first_util_WPIUtilJNI.h"
-#include "wpi/DataLog.h"
-#include "wpi/FileLogger.h"
 #include "wpi/RawFrame.h"
 #include "wpi/RuntimeCheck.h"
 #include "wpi/Synchronization.h"
@@ -130,8 +128,8 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_enableMockTime
   (JNIEnv*, jclass)
 {
-#ifdef __FRC_ROBORIO__
-  wpi::print(stderr, "WPIUtil: Mocking time is not available on the Rio\n");
+#ifdef __FRC_SYSTEMCORE__
+  wpi::print(stderr, "WPIUtil: Mocking time is not available on systemcore\n");
 #else
   mockTimeEnabled = true;
   wpi::SetNowImpl([] { return mockNow; });
@@ -463,43 +461,5 @@ Java_edu_wpi_first_util_WPIUtilJNI_setRawFrameInfo
   f->height = height;
   f->stride = stride;
   f->pixelFormat = pixelFormat;
-}
-
-/*
- * Class:     edu_wpi_first_util_WPIUtilJNI
- * Method:    createFileLogger
- * Signature: (Ljava/lang/String;JLjava/lang/String;)J
- */
-JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_createFileLogger
-  (JNIEnv* env, jclass, jstring file, jlong log, jstring key)
-{
-  if (!file) {
-    wpi::ThrowNullPointerException(env, "file is null");
-    return 0;
-  }
-  auto* f = reinterpret_cast<wpi::log::DataLog*>(log);
-  if (!f) {
-    wpi::ThrowNullPointerException(env, "log is null");
-    return 0;
-  }
-  if (!key) {
-    wpi::ThrowNullPointerException(env, "key is null");
-    return 0;
-  }
-  return reinterpret_cast<jlong>(
-      new wpi::FileLogger{JStringRef{env, file}, *f, JStringRef{env, key}});
-}
-
-/*
- * Class:     edu_wpi_first_util_WPIUtilJNI
- * Method:    freeFileLogger
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_util_WPIUtilJNI_freeFileLogger
-  (JNIEnv* env, jclass, jlong fileTail)
-{
-  delete reinterpret_cast<wpi::FileLogger*>(fileTail);
 }
 }  // extern "C"

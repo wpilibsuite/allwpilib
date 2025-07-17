@@ -6,7 +6,6 @@
 
 #include <utility>
 
-#include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -16,8 +15,9 @@
 
 using namespace frc;
 
-Solenoid::Solenoid(int module, PneumaticsModuleType moduleType, int channel)
-    : m_module{PneumaticsBase::GetForType(module, moduleType)},
+Solenoid::Solenoid(int busId, int module, PneumaticsModuleType moduleType,
+                   int channel)
+    : m_module{PneumaticsBase::GetForType(busId, module, moduleType)},
       m_channel{channel} {
   if (!m_module->CheckSolenoidChannel(m_channel)) {
     throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", m_channel);
@@ -28,14 +28,13 @@ Solenoid::Solenoid(int module, PneumaticsModuleType moduleType, int channel)
     throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channel {}", m_channel);
   }
 
-  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_channel + 1,
-             m_module->GetModuleNumber() + 1);
-  wpi::SendableRegistry::AddLW(this, "Solenoid", m_module->GetModuleNumber(),
-                               m_channel);
+  m_module->ReportUsage(fmt::format("Solenoid[{}]", m_channel), "Solenoid");
+  wpi::SendableRegistry::Add(this, "Solenoid", m_module->GetModuleNumber(),
+                             m_channel);
 }
 
-Solenoid::Solenoid(PneumaticsModuleType moduleType, int channel)
-    : Solenoid{PneumaticsBase::GetDefaultForType(moduleType), moduleType,
+Solenoid::Solenoid(int busId, PneumaticsModuleType moduleType, int channel)
+    : Solenoid{busId, PneumaticsBase::GetDefaultForType(moduleType), moduleType,
                channel} {}
 
 Solenoid::~Solenoid() {
@@ -77,7 +76,6 @@ void Solenoid::StartPulse() {
 void Solenoid::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Solenoid");
   builder.SetActuator(true);
-  builder.SetSafeState([=, this] { Set(false); });
   builder.AddBooleanProperty(
       "Value", [=, this] { return Get(); },
       [=, this](bool value) { Set(value); });

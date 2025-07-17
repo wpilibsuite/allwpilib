@@ -31,11 +31,11 @@ public class Notifier implements AutoCloseable {
 
   // The time, in seconds, at which the callback should be called. Has the same
   // zero as RobotController.getFPGATime().
-  private double m_expirationTimeSeconds;
+  private double m_expirationTime;
 
-  // If periodic, stores the callback period; if single, stores the time until
-  // the callback call.
-  private double m_periodSeconds;
+  // If periodic, stores the callback period in seconds; if single, stores the time until
+  // the callback call in seconds.
+  private double m_period;
 
   // True if the callback is periodic
   private boolean m_periodic;
@@ -75,7 +75,7 @@ public class Notifier implements AutoCloseable {
 
   /** Update the alarm hardware to reflect the next alarm. */
   private void updateAlarm() {
-    updateAlarm((long) (m_expirationTimeSeconds * 1e6));
+    updateAlarm((long) (m_expirationTime * 1e6));
   }
 
   /**
@@ -109,7 +109,7 @@ public class Notifier implements AutoCloseable {
                 try {
                   threadHandler = m_callback;
                   if (m_periodic) {
-                    m_expirationTimeSeconds += m_periodSeconds;
+                    m_expirationTime += m_period;
                     updateAlarm();
                   } else {
                     // Need to update the alarm to cause it to wait again
@@ -172,14 +172,14 @@ public class Notifier implements AutoCloseable {
   /**
    * Run the callback once after the given delay.
    *
-   * @param delaySeconds Time in seconds to wait before the callback is called.
+   * @param delay Time in seconds to wait before the callback is called.
    */
-  public void startSingle(double delaySeconds) {
+  public void startSingle(double delay) {
     m_processLock.lock();
     try {
       m_periodic = false;
-      m_periodSeconds = delaySeconds;
-      m_expirationTimeSeconds = RobotController.getFPGATime() * 1e-6 + delaySeconds;
+      m_period = delay;
+      m_expirationTime = RobotController.getFPGATime() * 1e-6 + delay;
       updateAlarm();
     } finally {
       m_processLock.unlock();
@@ -192,15 +192,15 @@ public class Notifier implements AutoCloseable {
    * <p>The user-provided callback should be written so that it completes before the next time it's
    * scheduled to run.
    *
-   * @param periodSeconds Period in seconds after which to call the callback starting one period
-   *     after the call to this method.
+   * @param period Period in seconds after which to call the callback starting one period after the
+   *     call to this method.
    */
-  public void startPeriodic(double periodSeconds) {
+  public void startPeriodic(double period) {
     m_processLock.lock();
     try {
       m_periodic = true;
-      m_periodSeconds = periodSeconds;
-      m_expirationTimeSeconds = RobotController.getFPGATime() * 1e-6 + periodSeconds;
+      m_period = period;
+      m_expirationTime = RobotController.getFPGATime() * 1e-6 + period;
       updateAlarm();
     } finally {
       m_processLock.unlock();

@@ -1,8 +1,9 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 
-cc_library(
-    name = "romi-cpp.static",
+wpilib_cc_library(
+    name = "romiVendordep",
     srcs = glob([
         "src/main/native/cpp/**",
     ]),
@@ -10,17 +11,47 @@ cc_library(
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
-        "//wpilibc:wpilibc.static",
+        "//ntcore",
+        "//wpilibc",
+        "//wpinet",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/romiVendordep",
+    dynamic_deps = [
+        "//hal:shared/wpiHal",
+        "//ntcore:shared/ntcore",
+        "//wpilibc:shared/wpilibc",
+        "//wpinet:shared/wpinet",
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":romiVendordep",
+    ],
+)
+
+wpilib_cc_static_library(
+    name = "static/romiVendordep",
+    static_deps = [
+        "//ntcore:static/ntcore",
+        "//wpilibc:static/wpilibc",
+        "//wpinet:static/wpinet",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":romiVendordep",
     ],
 )
 
 java_library(
-    name = "romi-java",
+    name = "romiVendordep-java",
     srcs = glob(["src/main/java/**/*.java"]),
     visibility = ["//visibility:public"],
     deps = [
         "//hal:hal-java",
-        "//wpilibj",
+        "//wpilibj:wpilibj-java",
     ],
 )
 
@@ -29,7 +60,8 @@ cc_test(
     size = "small",
     srcs = glob(["src/test/native/cpp/**"]),
     deps = [
-        "//thirdparty/googletest:googletest.static",
+        ":romiVendordep",
+        "//thirdparty/googletest",
     ],
 )
 
@@ -37,7 +69,7 @@ cc_binary(
     name = "DevMain-Cpp",
     srcs = ["src/dev/native/cpp/main.cpp"],
     deps = [
-        ":romi-cpp.static",
+        ":romiVendordep",
     ],
 )
 
@@ -47,7 +79,7 @@ java_binary(
     main_class = "edu.wpi.first.wpilibj.romi.DevMain",
     deps = [
         "//hal:hal-java",
-        "//ntcore:networktables-java",
+        "//ntcore:ntcore-java",
         "//wpiutil:wpiutil-java",
     ],
 )

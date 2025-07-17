@@ -15,7 +15,6 @@
 
 namespace frc {
 class DutyCycle;
-class DigitalSource;
 
 /**
  * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with
@@ -62,33 +61,6 @@ class DutyCycleEncoder : public wpi::Sendable,
   explicit DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle);
 
   /**
-   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   *
-   * <p>This has a fullRange of 1 and an expectedZero of 0.
-   *
-   * @param digitalSource the digital source to attach to
-   */
-  explicit DutyCycleEncoder(DigitalSource& digitalSource);
-
-  /**
-   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   *
-   * <p>This has a fullRange of 1 and an expectedZero of 0.
-   *
-   * @param digitalSource the digital source to attach to
-   */
-  explicit DutyCycleEncoder(DigitalSource* digitalSource);
-
-  /**
-   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   *
-   * <p>This has a fullRange of 1 and an expectedZero of 0.
-   *
-   * @param digitalSource the digital source to attach to
-   */
-  explicit DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource);
-
-  /**
    * Construct a new DutyCycleEncoder on a specific channel.
    *
    * @param channel the channel to attach to
@@ -125,47 +97,17 @@ class DutyCycleEncoder : public wpi::Sendable,
   DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle, double fullRange,
                    double expectedZero);
 
-  /**
-   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   *
-   * @param digitalSource the digital source to attach to
-   * @param fullRange the value to report at maximum travel
-   * @param expectedZero the reading where you would expect a 0 from get()
-   */
-  DutyCycleEncoder(DigitalSource& digitalSource, double fullRange,
-                   double expectedZero);
-
-  /**
-   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   *
-   * @param digitalSource the digital source to attach to
-   * @param fullRange the value to report at maximum travel
-   * @param expectedZero the reading where you would expect a 0 from get()
-   */
-  DutyCycleEncoder(DigitalSource* digitalSource, double fullRange,
-                   double expectedZero);
-
-  /**
-   * Construct a new DutyCycleEncoder attached to a DigitalSource object.
-   *
-   * @param digitalSource the digital source to attach to
-   * @param fullRange the value to report at maximum travel
-   * @param expectedZero the reading where you would expect a 0 from get()
-   */
-  DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource,
-                   double fullRange, double expectedZero);
-
   ~DutyCycleEncoder() override = default;
 
   DutyCycleEncoder(DutyCycleEncoder&&) = default;
   DutyCycleEncoder& operator=(DutyCycleEncoder&&) = default;
 
   /**
-   * Get the frequency in Hz of the duty cycle signal from the encoder.
+   * Get the frequency of the duty cycle signal from the encoder.
    *
-   * @return duty cycle frequency in Hz
+   * @return duty cycle frequency
    */
-  int GetFrequency() const;
+  units::hertz_t GetFrequency() const;
 
   /**
    * Get if the sensor is connected
@@ -182,9 +124,9 @@ class DutyCycleEncoder : public wpi::Sendable,
    * Change the frequency threshold for detecting connection used by
    * IsConnected.
    *
-   * @param frequency the minimum frequency in Hz.
+   * @param frequency the minimum frequency.
    */
-  void SetConnectedFrequencyThreshold(int frequency);
+  void SetConnectedFrequencyThreshold(units::hertz_t frequency);
 
   /**
    * Get the encoder value.
@@ -229,13 +171,6 @@ class DutyCycleEncoder : public wpi::Sendable,
   void SetInverted(bool inverted);
 
   /**
-   * Get the FPGA index for the DutyCycleEncoder.
-   *
-   * @return the FPGA index
-   */
-  int GetFPGAIndex() const;
-
-  /**
    * Get the channel of the source.
    *
    * @return the source channel
@@ -249,7 +184,7 @@ class DutyCycleEncoder : public wpi::Sendable,
   double MapSensorRange(double pos) const;
 
   std::shared_ptr<DutyCycle> m_dutyCycle;
-  int m_frequencyThreshold = 100;
+  units::hertz_t m_frequencyThreshold = {100_Hz};
   double m_fullRange;
   double m_expectedZero;
   units::second_t m_period{0_s};

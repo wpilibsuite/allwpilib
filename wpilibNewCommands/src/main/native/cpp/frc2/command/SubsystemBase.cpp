@@ -15,12 +15,12 @@
 using namespace frc2;
 
 SubsystemBase::SubsystemBase() {
-  wpi::SendableRegistry::AddLW(this, GetTypeName(*this));
+  wpi::SendableRegistry::Add(this, GetTypeName(*this));
   CommandScheduler::GetInstance().RegisterSubsystem({this});
 }
 
 SubsystemBase::SubsystemBase(std::string_view name) {
-  wpi::SendableRegistry::AddLW(this, name);
+  wpi::SendableRegistry::Add(this, name);
   CommandScheduler::GetInstance().RegisterSubsystem({this});
 }
 
@@ -71,5 +71,5 @@ void SubsystemBase::SetSubsystem(std::string_view name) {
 }
 
 void SubsystemBase::AddChild(std::string name, wpi::Sendable* child) {
-  wpi::SendableRegistry::AddLW(child, GetSubsystem(), name);
+  wpi::SendableRegistry::Add(child, GetSubsystem(), name);
 }

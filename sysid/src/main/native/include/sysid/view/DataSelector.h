@@ -13,17 +13,19 @@
 #include <vector>
 
 #include <glass/View.h>
-#include <glass/support/DataLogReaderThread.h>
 #include <wpi/StringMap.h>
+#include <wpi/datalog/DataLogReaderThread.h>
 
 #include "sysid/analysis/Storage.h"
 
 namespace glass {
-class DataLogReaderEntry;
 class Storage;
 }  // namespace glass
 
 namespace wpi {
+namespace log {
+class DataLogReaderEntry;
+}  // namespace log
 class Logger;
 }  // namespace wpi
 
@@ -66,10 +68,10 @@ class DataSelector : public glass::View {
   std::future<Tests> m_testsFuture;
   Tests m_tests;
   std::string m_selectedTest;
-  const glass::DataLogReaderEntry* m_testStateEntry = nullptr;
-  const glass::DataLogReaderEntry* m_velocityEntry = nullptr;
-  const glass::DataLogReaderEntry* m_positionEntry = nullptr;
-  const glass::DataLogReaderEntry* m_voltageEntry = nullptr;
+  const wpi::log::DataLogReaderEntry* m_testStateEntry = nullptr;
+  const wpi::log::DataLogReaderEntry* m_velocityEntry = nullptr;
+  const wpi::log::DataLogReaderEntry* m_positionEntry = nullptr;
+  const wpi::log::DataLogReaderEntry* m_voltageEntry = nullptr;
   double m_velocityScale = 1.0;
   double m_positionScale = 1.0;
   int m_selectedUnit = 0;
@@ -82,7 +84,7 @@ class DataSelector : public glass::View {
   std::set<std::string> m_executedTests;
   bool m_testCountValidated = false;
 
-  static Tests LoadTests(const glass::DataLogReaderEntry& testStateEntry);
+  static Tests LoadTests(const wpi::log::DataLogReaderEntry& testStateEntry);
   TestData BuildTestData();
 };
 }  // namespace sysid

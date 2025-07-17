@@ -68,7 +68,6 @@
     "tags": [
       "Hardware",
       "Joystick",
-      "Shuffleboard",
       "Pneumatics"
     ],
     "foldername": "solenoid",
@@ -103,47 +102,6 @@
     "commandversion": 2
   },
   {
-    "name": "Relay",
-    "description": "Control a relay from joystick buttons.",
-    "tags": [
-      "Hardware",
-      "Relay",
-      "Joystick"
-    ],
-    "foldername": "relay",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "Ultrasonic",
-    "description": "View values from a ping-response ultrasonic sensor.",
-    "tags": [
-      "Hardware",
-      "Ultrasonic",
-      "SmartDashboard",
-      "Shuffleboard"
-    ],
-    "foldername": "ultrasonic",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "Ultrasonic PID",
-    "description": "Maintain a set distance from an obstacle with an ultrasonic sensor and PID control.",
-    "tags": [
-      "Basic Robot",
-      "Ultrasonic",
-      "PID",
-      "Differential Drive"
-    ],
-    "foldername": "ultrasonicpid",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
     "name": "Potentiometer PID",
     "description": "Maintain elevator position setpoints with a potentiometer and PID control.",
     "tags": [
@@ -156,7 +114,8 @@
     "foldername": "potentiometerpid",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "Elevator with trapezoid profiled PID",
@@ -322,22 +281,6 @@
     "commandversion": 2
   },
   {
-    "name": "Shuffleboard",
-    "description": "Present various data via the Shuffleboard API.",
-    "tags": [
-      "Basic Robot",
-      "Differential Drive",
-      "Elevator",
-      "Analog",
-      "Encoder",
-      "Shuffleboard"
-    ],
-    "foldername": "shuffleboard",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
     "name": "'Traditional' Hatchbot",
     "description": "A fully-functional command-based hatchbot for the 2019 game, written in the 'traditional' style, i.e. commands are given their own classes.",
     "tags": [
@@ -346,7 +289,6 @@
       "Differential Drive",
       "Encoder",
       "Pneumatics",
-      "Shuffleboard",
       "Sendable",
       "DataLog",
       "XboxController"
@@ -365,7 +307,6 @@
       "Differential Drive",
       "Encoder",
       "Pneumatics",
-      "Shuffleboard",
       "Sendable",
       "DataLog",
       "PS4Controller"
@@ -520,21 +461,8 @@
     "commandversion": 2
   },
   {
-    "name": "DMA",
-    "description": "Read various sensors using DMA.",
-    "tags": [
-      "Hardware",
-      "DMA",
-      "SmartDashboard"
-    ],
-    "foldername": "dma",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
     "name": "DriveDistanceOffboard",
-    "description": "Drive a differential drivetrain a set distance using TrapezoidProfileCommand and smart motor controller PID.",
+    "description": "Drive a differential drivetrain a set distance using TrapezoidProfile and smart motor controller PID.",
     "tags": [
       "Command-based",
       "Differential Drive",
@@ -680,7 +608,8 @@
     "foldername": "elevatorsimulation",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "Elevator Exponential Profile Simulation",
@@ -713,7 +642,8 @@
     "foldername": "armsimulation",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 2
+    "commandversion": 2,
+    "hasunittests": true
   },
   {
     "name": "UnitTesting",
@@ -822,7 +752,8 @@
     "foldername": "digitalcommunication",
     "gradlebase": "java",
     "commandversion": 2,
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "hasunittests": true
   },
   {
     "name": "I2C Communication Sample",
@@ -834,7 +765,8 @@
     "foldername": "i2ccommunication",
     "gradlebase": "java",
     "commandversion": 2,
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "hasunittests": true
   },
   {
     "name": "Flywheel BangBangController",

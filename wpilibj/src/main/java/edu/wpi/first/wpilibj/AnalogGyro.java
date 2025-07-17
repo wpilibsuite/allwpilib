@@ -6,8 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.AnalogGyroJNI;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.sendable.Sendable;
@@ -24,22 +22,13 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * <p>This class is for gyro sensors that connect to an analog input.
  */
 public class AnalogGyro implements Sendable, AutoCloseable {
-  private static final double kDefaultVoltsPerDegreePerSecond = 0.007;
   private AnalogInput m_analog;
   private boolean m_channelAllocated;
 
-  private int m_gyroHandle;
-
   /** Initialize the gyro. Calibration is handled by calibrate(). */
   private void initGyro() {
-    if (m_gyroHandle == 0) {
-      m_gyroHandle = AnalogGyroJNI.initializeAnalogGyro(m_analog.m_port);
-    }
-
-    AnalogGyroJNI.setupAnalogGyro(m_gyroHandle);
-
-    HAL.report(tResourceType.kResourceType_Gyro, m_analog.getChannel() + 1);
-    SendableRegistry.addLW(this, "AnalogGyro", m_analog.getChannel());
+    HAL.reportUsage("AnalogGyro", m_analog.getChannel(), "");
+    SendableRegistry.add(this, "AnalogGyro", m_analog.getChannel());
   }
 
   /**
@@ -50,9 +39,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * are in progress, this is typically done when the robot is first turned on while it's sitting at
    * rest before the competition starts.
    */
-  public void calibrate() {
-    AnalogGyroJNI.calibrateAnalogGyro(m_gyroHandle);
-  }
+  public void calibrate() {}
 
   /**
    * Return the heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
@@ -126,15 +113,12 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * @param center Preset uncalibrated value to use as the accumulator center value.
    * @param offset Preset uncalibrated value to use as the gyro offset.
    */
-  @SuppressWarnings("this-escape")
+  @SuppressWarnings({"this-escape", "PMD.UnusedFormalParameter"})
   public AnalogGyro(AnalogInput channel, int center, double offset) {
     requireNonNullParam(channel, "channel", "AnalogGyro");
 
     m_analog = channel;
     initGyro();
-    AnalogGyroJNI.setAnalogGyroParameters(
-        m_gyroHandle, kDefaultVoltsPerDegreePerSecond,
-        offset, center);
     reset();
   }
 
@@ -144,9 +128,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * <p>Resets the gyro to a heading of zero. This can be used if there is significant drift in the
    * gyro, and it needs to be recalibrated after it has been running.
    */
-  public void reset() {
-    AnalogGyroJNI.resetAnalogGyro(m_gyroHandle);
-  }
+  public void reset() {}
 
   /** Delete (free) the accumulator and the analog components used for the gyro. */
   @Override
@@ -156,7 +138,6 @@ public class AnalogGyro implements Sendable, AutoCloseable {
       m_analog.close();
     }
     m_analog = null;
-    AnalogGyroJNI.freeAnalogGyro(m_gyroHandle);
   }
 
   /**
@@ -174,11 +155,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * @return the current heading of the robot in degrees.
    */
   public double getAngle() {
-    if (m_analog == null) {
-      return 0.0;
-    } else {
-      return AnalogGyroJNI.getAnalogGyroAngle(m_gyroHandle);
-    }
+    return 0.0;
   }
 
   /**
@@ -192,11 +169,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * @return the current rate in degrees per second
    */
   public double getRate() {
-    if (m_analog == null) {
-      return 0.0;
-    } else {
-      return AnalogGyroJNI.getAnalogGyroRate(m_gyroHandle);
-    }
+    return 0.0;
   }
 
   /**
@@ -205,7 +178,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * @return the current offset value
    */
   public double getOffset() {
-    return AnalogGyroJNI.getAnalogGyroOffset(m_gyroHandle);
+    return 0.0;
   }
 
   /**
@@ -214,7 +187,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    * @return the current center value
    */
   public int getCenter() {
-    return AnalogGyroJNI.getAnalogGyroCenter(m_gyroHandle);
+    return 0;
   }
 
   /**
@@ -224,9 +197,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    *
    * @param voltsPerDegreePerSecond The sensitivity in Volts/degree/second.
    */
-  public void setSensitivity(double voltsPerDegreePerSecond) {
-    AnalogGyroJNI.setAnalogGyroVoltsPerDegreePerSecond(m_gyroHandle, voltsPerDegreePerSecond);
-  }
+  public void setSensitivity(double voltsPerDegreePerSecond) {}
 
   /**
    * Set the size of the neutral zone. Any voltage from the gyro less than this amount from the
@@ -235,9 +206,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    *
    * @param volts The size of the deadband in volts
    */
-  public void setDeadband(double volts) {
-    AnalogGyroJNI.setAnalogGyroDeadband(m_gyroHandle, volts);
-  }
+  public void setDeadband(double volts) {}
 
   /**
    * Gets the analog input for the gyro.

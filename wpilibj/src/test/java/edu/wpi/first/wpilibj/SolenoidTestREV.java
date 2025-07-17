@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 class SolenoidTestREV {
   @Test
   void testValidInitialization() {
-    try (Solenoid solenoid = new Solenoid(3, PneumaticsModuleType.REVPH, 2)) {
+    try (Solenoid solenoid = new Solenoid(0, 3, PneumaticsModuleType.REVPH, 2)) {
       assertEquals(2, solenoid.getChannel());
 
       solenoid.set(true);
@@ -28,27 +28,29 @@ class SolenoidTestREV {
 
   @Test
   void testDoubleInitialization() {
-    try (Solenoid solenoid = new Solenoid(3, PneumaticsModuleType.REVPH, 2)) {
-      assertThrows(AllocationException.class, () -> new Solenoid(3, PneumaticsModuleType.REVPH, 2));
+    try (Solenoid solenoid = new Solenoid(0, 3, PneumaticsModuleType.REVPH, 2)) {
+      assertThrows(
+          AllocationException.class, () -> new Solenoid(0, 3, PneumaticsModuleType.REVPH, 2));
     }
   }
 
   @Test
   void testDoubleInitializationFromDoubleSolenoid() {
-    try (DoubleSolenoid solenoid = new DoubleSolenoid(3, PneumaticsModuleType.REVPH, 2, 3)) {
-      assertThrows(AllocationException.class, () -> new Solenoid(3, PneumaticsModuleType.REVPH, 2));
+    try (DoubleSolenoid solenoid = new DoubleSolenoid(0, 3, PneumaticsModuleType.REVPH, 2, 3)) {
+      assertThrows(
+          AllocationException.class, () -> new Solenoid(0, 3, PneumaticsModuleType.REVPH, 2));
     }
   }
 
   @Test
   void testInvalidChannel() {
     assertThrows(
-        IllegalArgumentException.class, () -> new Solenoid(3, PneumaticsModuleType.REVPH, 100));
+        IllegalArgumentException.class, () -> new Solenoid(0, 3, PneumaticsModuleType.REVPH, 100));
   }
 
   @Test
   void testToggle() {
-    try (Solenoid solenoid = new Solenoid(3, PneumaticsModuleType.REVPH, 2)) {
+    try (Solenoid solenoid = new Solenoid(0, 3, PneumaticsModuleType.REVPH, 2)) {
       solenoid.set(true);
       assertTrue(solenoid.get());
 

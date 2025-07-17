@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:28:13 -0400
-Subject: [PATCH 05/37] \#ifdef guard safety
+Subject: [PATCH 05/36] \#ifdef guard safety
 
 Prevents redefinition if someone is pulling in real LLVM, since the macros are in global namespace
 ---
@@ -9,10 +9,10 @@ Prevents redefinition if someone is pulling in real LLVM, since the macros are i
  1 file changed, 42 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28998bcbe9 100644
+index 586242b53bbf4ceb9bad5c9c8b495f83cb088cda..1d601fbc5d8d80d88e2da98a1874fb48c55b18eb 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
-@@ -90,6 +90,7 @@
+@@ -86,6 +86,7 @@
  /// * 1928: VS2019, version 16.8 + 16.9
  /// * 1929: VS2019, version 16.10 + 16.11
  /// * 1930: VS2022, version 17.0
@@ -20,7 +20,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  #ifdef _MSC_VER
  #define LLVM_MSC_PREREQ(version) (_MSC_VER >= (version))
  
-@@ -103,6 +104,7 @@
+@@ -99,6 +100,7 @@
  #else
  #define LLVM_MSC_PREREQ(version) 0
  #endif
@@ -28,8 +28,8 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  
  /// LLVM_LIBRARY_VISIBILITY - If a class marked with this attribute is linked
  /// into a shared library, then the class should be private to the library and
-@@ -139,17 +141,21 @@
- #define LLVM_EXTERNAL_VISIBILITY
+@@ -218,17 +220,21 @@
+ #define LLVM_C_ABI LLVM_ABI
  #endif
  
 +#ifndef LLVM_PREFETCH
@@ -50,7 +50,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  
  #if defined(__clang__)
  #define LLVM_DEPRECATED(MSG, FIX) __attribute__((deprecated(MSG, FIX)))
-@@ -197,11 +203,13 @@
+@@ -276,11 +282,13 @@
  // more portable solution:
  //   (void)unused_var_name;
  // Prefer cast-to-void wherever it is sufficient.
@@ -64,7 +64,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  
  // FIXME: Provide this for PE/COFF targets.
  #if __has_attribute(weak) && !defined(__MINGW32__) && !defined(__CYGWIN__) &&  \
-@@ -211,6 +219,7 @@
+@@ -290,6 +298,7 @@
  #define LLVM_ATTRIBUTE_WEAK
  #endif
  
@@ -72,7 +72,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  // Prior to clang 3.2, clang did not accept any spelling of
  // __has_attribute(const), so assume it is supported.
  #if defined(__clang__) || defined(__GNUC__)
-@@ -219,13 +228,16 @@
+@@ -298,13 +307,16 @@
  #else
  #define LLVM_READNONE
  #endif
@@ -89,7 +89,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  
  #if __has_attribute(minsize)
  #define LLVM_ATTRIBUTE_MINSIZE __attribute__((minsize))
-@@ -233,6 +245,7 @@
+@@ -312,6 +324,7 @@
  #define LLVM_ATTRIBUTE_MINSIZE
  #endif
  
@@ -97,7 +97,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  #if __has_builtin(__builtin_expect) || defined(__GNUC__)
  #define LLVM_LIKELY(EXPR) __builtin_expect((bool)(EXPR), true)
  #define LLVM_UNLIKELY(EXPR) __builtin_expect((bool)(EXPR), false)
-@@ -240,9 +253,11 @@
+@@ -319,9 +332,11 @@
  #define LLVM_LIKELY(EXPR) (EXPR)
  #define LLVM_UNLIKELY(EXPR) (EXPR)
  #endif
@@ -109,7 +109,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  #if __has_attribute(noinline)
  #define LLVM_ATTRIBUTE_NOINLINE __attribute__((noinline))
  #elif defined(_MSC_VER)
-@@ -250,9 +265,11 @@
+@@ -329,9 +344,11 @@
  #else
  #define LLVM_ATTRIBUTE_NOINLINE
  #endif
@@ -121,7 +121,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  #if __has_attribute(always_inline)
  #define LLVM_ATTRIBUTE_ALWAYS_INLINE inline __attribute__((always_inline))
  #elif defined(_MSC_VER)
-@@ -260,6 +277,7 @@
+@@ -339,6 +356,7 @@
  #else
  #define LLVM_ATTRIBUTE_ALWAYS_INLINE inline
  #endif
@@ -129,7 +129,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  
  /// LLVM_ATTRIBUTE_NO_DEBUG - On compilers where we have a directive to do
  /// so, mark a method "no debug" because debug info makes the debugger
-@@ -270,6 +288,7 @@
+@@ -349,6 +367,7 @@
  #define LLVM_ATTRIBUTE_NODEBUG
  #endif
  
@@ -137,7 +137,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  #if __has_attribute(returns_nonnull)
  #define LLVM_ATTRIBUTE_RETURNS_NONNULL __attribute__((returns_nonnull))
  #elif defined(_MSC_VER)
-@@ -277,6 +296,7 @@
+@@ -356,6 +375,7 @@
  #else
  #define LLVM_ATTRIBUTE_RETURNS_NONNULL
  #endif
@@ -145,7 +145,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  
  /// LLVM_ATTRIBUTE_RESTRICT - Annotates a pointer to tell the compiler that
  /// it is not aliased in the current scope.
-@@ -288,6 +308,7 @@
+@@ -367,6 +387,7 @@
  
  /// \macro LLVM_ATTRIBUTE_RETURNS_NOALIAS Used to mark a function as returning a
  /// pointer that does not alias any other valid pointer.
@@ -153,7 +153,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  #ifdef __GNUC__
  #define LLVM_ATTRIBUTE_RETURNS_NOALIAS __attribute__((__malloc__))
  #elif defined(_MSC_VER)
-@@ -295,8 +316,10 @@
+@@ -374,8 +395,10 @@
  #else
  #define LLVM_ATTRIBUTE_RETURNS_NOALIAS
  #endif
@@ -164,7 +164,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  #if defined(__cplusplus) && __cplusplus > 201402L && LLVM_HAS_CPP_ATTRIBUTE(fallthrough)
  #define LLVM_FALLTHROUGH [[fallthrough]]
  #elif LLVM_HAS_CPP_ATTRIBUTE(gnu::fallthrough)
-@@ -308,6 +331,7 @@
+@@ -387,6 +410,7 @@
  #else
  #define LLVM_FALLTHROUGH
  #endif
@@ -172,7 +172,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  
  /// LLVM_REQUIRE_CONSTANT_INITIALIZATION - Apply this to globals to ensure that
  /// they are constant initialized.
-@@ -342,11 +366,13 @@
+@@ -427,11 +451,13 @@
  
  /// LLVM_EXTENSION - Support compilers where we have a keyword to suppress
  /// pedantic diagnostics.
@@ -186,7 +186,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  
  /// LLVM_BUILTIN_UNREACHABLE - On compilers which support it, expands
  /// to an expression which states that it is undefined behavior for the
-@@ -355,14 +381,17 @@
+@@ -440,14 +466,17 @@
  /// '#else' is intentionally left out so that other macro logic (e.g.,
  /// LLVM_ASSUME_ALIGNED and llvm_unreachable()) can detect whether
  /// LLVM_BUILTIN_UNREACHABLE has a definition.
@@ -204,7 +204,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  #if __has_builtin(__builtin_trap) || defined(__GNUC__)
  # define LLVM_BUILTIN_TRAP __builtin_trap()
  #elif defined(_MSC_VER)
-@@ -374,10 +403,12 @@
+@@ -459,10 +488,12 @@
  #else
  # define LLVM_BUILTIN_TRAP *(volatile int*)0x11 = 0
  #endif
@@ -217,7 +217,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  #if __has_builtin(__builtin_debugtrap)
  # define LLVM_BUILTIN_DEBUGTRAP __builtin_debugtrap()
  #elif defined(_MSC_VER)
-@@ -391,9 +422,11 @@
+@@ -476,9 +507,11 @@
  // program to abort if encountered.
  # define LLVM_BUILTIN_DEBUGTRAP
  #endif
@@ -229,7 +229,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  #if __has_builtin(__builtin_assume_aligned) || defined(__GNUC__)
  # define LLVM_ASSUME_ALIGNED(p, a) __builtin_assume_aligned(p, a)
  #elif defined(LLVM_BUILTIN_UNREACHABLE)
-@@ -402,6 +435,7 @@
+@@ -487,6 +520,7 @@
  #else
  # define LLVM_ASSUME_ALIGNED(p, a) (p)
  #endif
@@ -237,7 +237,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  
  /// \macro LLVM_PACKED
  /// Used to specify a packed structure.
-@@ -421,6 +455,7 @@
+@@ -506,6 +540,7 @@
  ///   long long l;
  /// };
  /// LLVM_PACKED_END
@@ -245,7 +245,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  #ifdef _MSC_VER
  # define LLVM_PACKED(d) __pragma(pack(push, 1)) d __pragma(pack(pop))
  # define LLVM_PACKED_START __pragma(pack(push, 1))
-@@ -430,6 +465,7 @@
+@@ -515,6 +550,7 @@
  # define LLVM_PACKED_START _Pragma("pack(push, 1)")
  # define LLVM_PACKED_END   _Pragma("pack(pop)")
  #endif
@@ -253,7 +253,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  
  /// \macro LLVM_MEMORY_SANITIZER_BUILD
  /// Whether LLVM itself is built with MemorySanitizer instrumentation.
-@@ -521,11 +557,13 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -606,11 +642,13 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  
  /// \macro LLVM_NO_SANITIZE
  /// Disable a particular sanitizer for a function.
@@ -267,7 +267,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  
  /// Mark debug helper function definitions like dump() that should not be
  /// stripped from debug builds.
-@@ -533,17 +571,20 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -618,17 +656,20 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  /// `#if !defined(NDEBUG) || defined(LLVM_ENABLE_DUMP)` so they do always
  /// get stripped in release builds.
  // FIXME: Move this to a private config.h as it's not usable in public headers.
@@ -288,7 +288,7 @@ index 2a6accec1e74c9869d724c7733cc75ab6af9dc8d..cb99bf5efe87d98fd73108c189182a28
  #if defined(_MSC_VER)
  #define LLVM_PRETTY_FUNCTION __FUNCSIG__
  #elif defined(__GNUC__) || defined(__clang__)
-@@ -551,6 +592,7 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -636,6 +677,7 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  #else
  #define LLVM_PRETTY_FUNCTION __func__
  #endif

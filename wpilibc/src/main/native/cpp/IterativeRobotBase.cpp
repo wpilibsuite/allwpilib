@@ -7,14 +7,11 @@
 #include <frc/DriverStation.h>
 
 #include <hal/DriverStation.h>
-#include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/print.h>
 
 #include "frc/DSControlWord.h"
 #include "frc/Errors.h"
-#include "frc/livewindow/LiveWindow.h"
-#include "frc/shuffleboard/Shuffleboard.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
 using namespace frc;
@@ -97,24 +94,6 @@ void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
   m_ntFlushEnabled = enabled;
 }
 
-void IterativeRobotBase::EnableLiveWindowInTest(bool testLW) {
-  static bool hasReported;
-  if (IsTestEnabled()) {
-    throw FRC_MakeError(err::IncompatibleMode,
-                        "Can't configure test mode while in test mode!");
-  }
-  if (!hasReported && testLW) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard,
-               HALUsageReporting::kSmartDashboard_LiveWindow);
-    hasReported = true;
-  }
-  m_lwEnabledInTest = testLW;
-}
-
-bool IterativeRobotBase::IsLiveWindowEnabledInTest() {
-  return m_lwEnabledInTest;
-}
-
 units::second_t IterativeRobotBase::GetPeriod() const {
   return m_period;
 }
@@ -151,10 +130,6 @@ void IterativeRobotBase::LoopFunc() {
     } else if (m_lastMode == Mode::kTeleop) {
       TeleopExit();
     } else if (m_lastMode == Mode::kTest) {
-      if (m_lwEnabledInTest) {
-        LiveWindow::SetEnabled(false);
-        Shuffleboard::DisableActuatorWidgets();
-      }
       TestExit();
     }
 
@@ -169,10 +144,6 @@ void IterativeRobotBase::LoopFunc() {
       TeleopInit();
       m_watchdog.AddEpoch("TeleopInit()");
     } else if (mode == Mode::kTest) {
-      if (m_lwEnabledInTest) {
-        LiveWindow::SetEnabled(true);
-        Shuffleboard::EnableActuatorWidgets();
-      }
       TestInit();
       m_watchdog.AddEpoch("TestInit()");
     }
@@ -204,10 +175,6 @@ void IterativeRobotBase::LoopFunc() {
 
   SmartDashboard::UpdateValues();
   m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
-  LiveWindow::UpdateValues();
-  m_watchdog.AddEpoch("LiveWindow::UpdateValues()");
-  Shuffleboard::Update();
-  m_watchdog.AddEpoch("Shuffleboard::Update()");
 
   if constexpr (IsSimulation()) {
     HAL_SimPeriodicBefore();

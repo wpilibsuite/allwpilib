@@ -6,8 +6,8 @@
 
 package edu.wpi.first.networktables;
 
+import edu.wpi.first.datalog.DataLog;
 import edu.wpi.first.util.RuntimeLoader;
-import edu.wpi.first.util.datalog.DataLog;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.EnumSet;
@@ -1404,11 +1404,10 @@ public final class NetworkTablesJNI {
    * @param inst NT instance handle.
    * @param persistFilename the name of the persist file to use
    * @param listenAddress the address to listen on, or empty to listen on any address
-   * @param port3 port to communicate over (NT3)
-   * @param port4 port to communicate over (NT4)
+   * @param port port to communicate over
    */
   public static native void startServer(
-      int inst, String persistFilename, String listenAddress, int port3, int port4);
+      int inst, String persistFilename, String listenAddress, int port);
 
   /**
    * Stops the server if it is running.
@@ -1418,20 +1417,12 @@ public final class NetworkTablesJNI {
   public static native void stopServer(int inst);
 
   /**
-   * Starts a NT3 client. Use SetServer or SetServerTeam to set the server name and port.
+   * Starts a client. Use SetServer or SetServerTeam to set the server name and port.
    *
    * @param inst NT instance handle.
    * @param identity network identity to advertise (cannot be empty string)
    */
-  public static native void startClient3(int inst, String identity);
-
-  /**
-   * Starts a NT4 client. Use SetServer or SetServerTeam to set the server name and port.
-   *
-   * @param inst NT instance handle.
-   * @param identity network identity to advertise (cannot be empty string)
-   */
-  public static native void startClient4(int inst, String identity);
+  public static native void startClient(int inst, String identity);
 
   /**
    * Stops the client if it is running.

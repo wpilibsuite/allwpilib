@@ -14,7 +14,6 @@
 
 namespace frc {
 class AddressableLED;
-class DMA;
 
 /**
  * Class implements the PWM generation in the FPGA.
@@ -27,23 +26,22 @@ class DMA;
 class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
  public:
   friend class AddressableLED;
-  friend class DMA;
   /**
-   * Represents the amount to multiply the minimum servo-pulse pwm period by.
+   * Represents the output period in microseconds.
    */
-  enum PeriodMultiplier {
+  enum OutputPeriod {
     /**
-     * Don't skip pulses. PWM pulses occur every 5.05 ms
+     * PWM pulses occur every 5 ms
      */
-    kPeriodMultiplier_1X = 1,
+    kOutputPeriod_5Ms = 1,
     /**
-     * Skip every other pulse. PWM pulses occur every 10.10 ms
+     * PWM pulses occur every 10 ms
      */
-    kPeriodMultiplier_2X = 2,
+    kOutputPeriod_10Ms = 2,
     /**
-     * Skip three out of four pulses. PWM pulses occur every 20.20 ms
+     * PWM pulses occur every 20 ms
      */
-    kPeriodMultiplier_4X = 4
+    kOutputPeriod_20Ms = 4
   };
 
   /**
@@ -56,7 +54,6 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the
    *                MXP port
    * @param registerSendable If true, adds this instance to SendableRegistry
-   *                         and LiveWindow
    */
   explicit PWM(int channel, bool registerSendable = true);
 
@@ -77,7 +74,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    *
    * @param time Microsecond PWM value.
    */
-  virtual void SetPulseTime(units::microsecond_t time);
+  void SetPulseTime(units::microsecond_t time);
 
   /**
    * Get the PWM pulse time directly from the hardware.
@@ -86,121 +83,29 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    *
    * @return Microsecond PWM control value.
    */
-  virtual units::microsecond_t GetPulseTime() const;
-
-  /**
-   * Set the PWM value based on a position.
-   *
-   * This is intended to be used by servos.
-   *
-   * @pre SetBounds() called.
-   *
-   * @param pos The position to set the servo between 0.0 and 1.0.
-   */
-  virtual void SetPosition(double pos);
-
-  /**
-   * Get the PWM value in terms of a position.
-   *
-   * This is intended to be used by servos.
-   *
-   * @pre SetBounds() called.
-   *
-   * @return The position the servo is set to between 0.0 and 1.0.
-   */
-  virtual double GetPosition() const;
-
-  /**
-   * Set the PWM value based on a speed.
-   *
-   * This is intended to be used by motor controllers.
-   *
-   * @pre SetBounds() called.
-   *
-   * @param speed The speed to set the motor controller between -1.0 and 1.0.
-   */
-  virtual void SetSpeed(double speed);
-
-  /**
-   * Get the PWM value in terms of speed.
-   *
-   * This is intended to be used by motor controllers.
-   *
-   * @pre SetBounds() called.
-   *
-   * @return The most recently set speed between -1.0 and 1.0.
-   */
-  virtual double GetSpeed() const;
+  units::microsecond_t GetPulseTime() const;
 
   /**
    * Temporarily disables the PWM output. The next set call will re-enable
    * the output.
    */
-  virtual void SetDisabled();
+  void SetDisabled();
 
   /**
-   * Slow down the PWM signal for old devices.
+   * Sets the PWM output period.
    *
-   * @param mult The period multiplier to apply to this channel
+   * @param mult The output period to apply to this channel
    */
-  void SetPeriodMultiplier(PeriodMultiplier mult);
-
-  /**
-   * Latches PWM to zero.
-   */
-  void SetZeroLatch();
-
-  /**
-   * Optionally eliminate the deadband from a motor controller.
-   *
-   * @param eliminateDeadband If true, set the motor curve on the motor
-   *                          controller to eliminate the deadband in the middle
-   *                          of the range. Otherwise, keep the full range
-   *                          without modifying any values.
-   */
-  void EnableDeadbandElimination(bool eliminateDeadband);
-
-  /**
-   * Set the bounds on the PWM pulse widths.
-   *
-   * This sets the bounds on the PWM values for a particular type of controller.
-   * The values determine the upper and lower speeds as well as the deadband
-   * bracket.
-   *
-   * @param max         The max PWM pulse width in us
-   * @param deadbandMax The high end of the deadband range pulse width in us
-   * @param center      The center (off) pulse width in us
-   * @param deadbandMin The low end of the deadband pulse width in us
-   * @param min         The minimum pulse width in us
-   */
-  void SetBounds(units::microsecond_t max, units::microsecond_t deadbandMax,
-                 units::microsecond_t center, units::microsecond_t deadbandMin,
-                 units::microsecond_t min);
-
-  /**
-   * Get the bounds on the PWM values.
-   *
-   * This gets the bounds on the PWM values for a particular each type of
-   * controller. The values determine the upper and lower speeds as well as the
-   * deadband bracket.
-   *
-   * @param max         The maximum pwm value
-   * @param deadbandMax The high end of the deadband range
-   * @param center      The center speed (off)
-   * @param deadbandMin The low end of the deadband range
-   * @param min         The minimum pwm value
-   */
-  void GetBounds(units::microsecond_t* max, units::microsecond_t* deadbandMax,
-                 units::microsecond_t* center,
-                 units::microsecond_t* deadbandMin, units::microsecond_t* min);
-
-  /**
-   * Sets the PWM output to be a continuous high signal while enabled.
-   *
-   */
-  void SetAlwaysHighMode();
+  void SetOutputPeriod(OutputPeriod mult);
 
   int GetChannel() const;
+
+  /**
+   * Indicates this input is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  void SetSimDevice(HAL_SimDeviceHandle device);
 
  protected:
   void InitSendable(wpi::SendableBuilder& builder) override;

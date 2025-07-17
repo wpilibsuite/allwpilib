@@ -7,9 +7,9 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/Ports.h>
 #include <hal/PowerDistribution.h>
+#include <hal/UsageReporting.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -27,12 +27,12 @@ static_assert(frc::PowerDistribution::kDefaultModule ==
 
 using namespace frc;
 
-PowerDistribution::PowerDistribution() {
+PowerDistribution::PowerDistribution(int busId) {
   auto stack = wpi::GetStackTrace(1);
 
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
-      kDefaultModule,
+      busId, kDefaultModule,
       HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic,
       stack.c_str(), &status);
   FRC_CheckErrorStatus(status, "Module {}", kDefaultModule);
@@ -41,34 +41,31 @@ PowerDistribution::PowerDistribution() {
 
   if (HAL_GetPowerDistributionType(m_handle, &status) ==
       HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
-    HAL_Report(HALUsageReporting::kResourceType_PDP,
-               HALUsageReporting::kPDP_CTRE);
+    HAL_ReportUsage("PDP", m_module, "");
   } else {
-    HAL_Report(HALUsageReporting::kResourceType_PDP,
-               HALUsageReporting::kPDP_REV);
+    HAL_ReportUsage("PDH", m_module, "");
   }
-  wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
+  wpi::SendableRegistry::Add(this, "PowerDistribution", m_module);
 }
 
-PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
+PowerDistribution::PowerDistribution(int busId, int module,
+                                     ModuleType moduleType) {
   auto stack = wpi::GetStackTrace(1);
 
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
-      module, static_cast<HAL_PowerDistributionType>(moduleType), stack.c_str(),
-      &status);
+      busId, module, static_cast<HAL_PowerDistributionType>(moduleType),
+      stack.c_str(), &status);
   FRC_CheckErrorStatus(status, "Module {}", module);
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   FRC_ReportError(status, "Module {}", module);
 
   if (moduleType == ModuleType::kCTRE) {
-    HAL_Report(HALUsageReporting::kResourceType_PDP,
-               HALUsageReporting::kPDP_CTRE);
+    HAL_ReportUsage("PDP_CTRE", m_module, "");
   } else {
-    HAL_Report(HALUsageReporting::kResourceType_PDP,
-               HALUsageReporting::kPDP_REV);
+    HAL_ReportUsage("PDH_REV", m_module, "");
   }
-  wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
+  wpi::SendableRegistry::Add(this, "PowerDistribution", m_module);
 }
 
 int PowerDistribution::GetNumChannels() const {

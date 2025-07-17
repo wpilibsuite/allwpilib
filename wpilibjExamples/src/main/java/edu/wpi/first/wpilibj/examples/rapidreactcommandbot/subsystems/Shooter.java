@@ -26,8 +26,7 @@ public class Shooter extends SubsystemBase {
           ShooterConstants.kEncoderPorts[1],
           ShooterConstants.kEncoderReversed);
   private final SimpleMotorFeedforward m_shooterFeedforward =
-      new SimpleMotorFeedforward(
-          ShooterConstants.kSVolts, ShooterConstants.kVVoltSecondsPerRotation);
+      new SimpleMotorFeedforward(ShooterConstants.kS, ShooterConstants.kV);
   private final PIDController m_shooterFeedback = new PIDController(ShooterConstants.kP, 0.0, 0.0);
 
   /** The shooter subsystem for the robot. */

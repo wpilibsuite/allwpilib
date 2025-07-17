@@ -21,8 +21,8 @@ class AnalogPotentiometerTest {
       AnalogInputSim sim = new AnalogInputSim(ai);
 
       RoboRioSim.resetData();
-      sim.setVoltage(4.0);
-      assertEquals(0.8, pot.get());
+      sim.setVoltage(2.8);
+      assertEquals(2.8 / 3.3, pot.get());
     }
   }
 
@@ -35,11 +35,11 @@ class AnalogPotentiometerTest {
       RoboRioSim.resetData();
       AnalogInputSim sim = new AnalogInputSim(ai);
 
-      sim.setVoltage(5.0);
+      sim.setVoltage(3.3);
       assertEquals(270.0, pot.get());
 
       sim.setVoltage(2.5);
-      assertEquals(135, pot.get());
+      assertEquals((2.5 / 3.3) * 270.0, pot.get());
 
       sim.setVoltage(0.0);
       assertEquals(0.0, pot.get());
@@ -54,7 +54,7 @@ class AnalogPotentiometerTest {
       RoboRioSim.resetData();
       AnalogInputSim sim = new AnalogInputSim(1);
 
-      sim.setVoltage(5.0);
+      sim.setVoltage(3.3);
       assertEquals(1.0, pot.get());
     }
   }
@@ -67,7 +67,7 @@ class AnalogPotentiometerTest {
       RoboRioSim.resetData();
       AnalogInputSim sim = new AnalogInputSim(1);
 
-      sim.setVoltage(5.0);
+      sim.setVoltage(3.3);
       assertEquals(180.0, pot.get());
 
       sim.setVoltage(0.0);
@@ -81,15 +81,15 @@ class AnalogPotentiometerTest {
       RoboRioSim.resetData();
       AnalogInputSim sim = new AnalogInputSim(1);
 
-      // Test at 5v
-      sim.setVoltage(5.0);
+      // Test at 3.3v
+      sim.setVoltage(3.3);
       assertEquals(270, pot.get());
 
       sim.setVoltage(0.0);
       assertEquals(90, pot.get());
 
       // Simulate a lower battery voltage
-      RoboRioSim.setUserVoltage5V(2.5);
+      RoboRioSim.setUserVoltage3V3(2.5);
 
       sim.setVoltage(2.5);
       assertEquals(270, pot.get());

@@ -5,7 +5,6 @@
 package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.DARE;
-import edu.wpi.first.math.InterpolatingMatrixTreeMap;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -28,11 +27,10 @@ import edu.wpi.first.math.trajectory.Trajectory;
  * state-space, then interpolate between them with a lookup table to save computational resources.
  *
  * <p>This controller has a flat hierarchy with pose and wheel velocity references and voltage
- * outputs. This is different from a Ramsete controller's nested hierarchy where the top-level
+ * outputs. This is different from a unicycle controller's nested hierarchy where the top-level
  * controller has a pose reference and chassis velocity command outputs, and the low-level
  * controller has wheel velocity references and voltage outputs. Flat hierarchies are easier to tune
- * in one shot. Furthermore, this controller is more optimal in the "least-squares error" sense than
- * a controller based on Ramsete.
+ * in one shot.
  *
  * <p>See section 8.7 in Controls Engineering in FRC for a derivation of the control law we used
  * shown in theorem 8.7.4.
@@ -40,27 +38,18 @@ import edu.wpi.first.math.trajectory.Trajectory;
 public class LTVDifferentialDriveController {
   private final double m_trackwidth;
 
-  // LUT from drivetrain linear velocity to LQR gain
-  private final InterpolatingMatrixTreeMap<Double, N2, N5> m_table =
-      new InterpolatingMatrixTreeMap<>();
+  // Continuous velocity dynamics
+  private final Matrix<N2, N2> m_A;
+  private final Matrix<N2, N2> m_B;
+
+  // LQR cost matrices
+  private final Matrix<N5, N5> m_Q;
+  private final Matrix<N2, N2> m_R;
+
+  private final double m_dt;
 
   private Matrix<N5, N1> m_error = new Matrix<>(Nat.N5(), Nat.N1());
   private Matrix<N5, N1> m_tolerance = new Matrix<>(Nat.N5(), Nat.N1());
-
-  /** States of the drivetrain system. */
-  private enum State {
-    kX(0),
-    kY(1),
-    kHeading(2),
-    kLeftVelocity(3),
-    kRightVelocity(4);
-
-    public final int value;
-
-    State(int i) {
-      this.value = i;
-    }
-  }
 
   /**
    * Constructs a linear time-varying differential drive controller.
@@ -75,8 +64,6 @@ public class LTVDifferentialDriveController {
    * @param qelems The maximum desired error tolerance for each state.
    * @param relems The maximum desired control effort for each input.
    * @param dt Discretization timestep in seconds.
-   * @throws IllegalArgumentException if max velocity of plant with 12 V input &lt;= 0 m/s or &gt;=
-   *     15 m/s.
    */
   public LTVDifferentialDriveController(
       LinearSystem<N2, N2, N2> plant,
@@ -85,96 +72,11 @@ public class LTVDifferentialDriveController {
       Vector<N2> relems,
       double dt) {
     m_trackwidth = trackwidth;
-
-    // Control law derivation is in section 8.7 of
-    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
-    var A =
-        MatBuilder.fill(
-            Nat.N5(),
-            Nat.N5(),
-            0.0,
-            0.0,
-            0.0,
-            0.5,
-            0.5,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            -1.0 / m_trackwidth,
-            1.0 / m_trackwidth,
-            0.0,
-            0.0,
-            0.0,
-            plant.getA(0, 0),
-            plant.getA(0, 1),
-            0.0,
-            0.0,
-            0.0,
-            plant.getA(1, 0),
-            plant.getA(1, 1));
-    var B =
-        MatBuilder.fill(
-            Nat.N5(),
-            Nat.N2(),
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            plant.getB(0, 0),
-            plant.getB(0, 1),
-            plant.getB(1, 0),
-            plant.getB(1, 1));
-    var Q = StateSpaceUtil.makeCostMatrix(qelems);
-    var R = StateSpaceUtil.makeCostMatrix(relems);
-
-    // dx/dt = Ax + Bu
-    // 0 = Ax + Bu
-    // Ax = -Bu
-    // x = -A⁻¹Bu
-    double maxV =
-        plant.getA().solve(plant.getB().times(VecBuilder.fill(12.0, 12.0))).times(-1.0).get(0, 0);
-
-    if (maxV <= 0.0) {
-      throw new IllegalArgumentException(
-          "Max velocity of plant with 12 V input must be greater than 0 m/s.");
-    }
-    if (maxV >= 15.0) {
-      throw new IllegalArgumentException(
-          "Max velocity of plant with 12 V input must be less than 15 m/s.");
-    }
-
-    for (double velocity = -maxV; velocity < maxV; velocity += 0.01) {
-      // The DARE is ill-conditioned if the velocity is close to zero, so don't
-      // let the system stop.
-      if (Math.abs(velocity) < 1e-4) {
-        A.set(State.kY.value, State.kHeading.value, 1e-4);
-      } else {
-        A.set(State.kY.value, State.kHeading.value, velocity);
-      }
-
-      var discABPair = Discretization.discretizeAB(A, B, dt);
-      var discA = discABPair.getFirst();
-      var discB = discABPair.getSecond();
-
-      var S = DARE.dareNoPrecond(discA, discB, Q, R);
-
-      // K = (BᵀSB + R)⁻¹BᵀSA
-      m_table.put(
-          velocity,
-          discB
-              .transpose()
-              .times(S)
-              .times(discB)
-              .plus(R)
-              .solve(discB.transpose().times(S).times(discA)));
-    }
+    m_A = plant.getA();
+    m_B = plant.getB();
+    m_Q = StateSpaceUtil.makeCostMatrix(qelems);
+    m_R = StateSpaceUtil.makeCostMatrix(relems);
+    m_dt = dt;
   }
 
   /**
@@ -230,20 +132,21 @@ public class LTVDifferentialDriveController {
       double leftVelocityRef,
       double rightVelocityRef) {
     // This implements the linear time-varying differential drive controller in
-    // theorem 9.6.3 of https://tavsys.net/controls-in-frc.
-    var x =
-        VecBuilder.fill(
-            currentPose.getX(),
-            currentPose.getY(),
-            currentPose.getRotation().getRadians(),
-            leftVelocity,
-            rightVelocity);
+    // theorem 8.7.4 of https://controls-in-frc.link/
+    //
+    //     [x ]
+    //     [y ]       [Vₗ]
+    // x = [θ ]   u = [Vᵣ]
+    //     [vₗ]
+    //     [vᵣ]
 
-    var inRobotFrame = Matrix.eye(Nat.N5());
-    inRobotFrame.set(0, 0, Math.cos(x.get(State.kHeading.value, 0)));
-    inRobotFrame.set(0, 1, Math.sin(x.get(State.kHeading.value, 0)));
-    inRobotFrame.set(1, 0, -Math.sin(x.get(State.kHeading.value, 0)));
-    inRobotFrame.set(1, 1, Math.cos(x.get(State.kHeading.value, 0)));
+    double velocity = (leftVelocity + rightVelocity) / 2.0;
+
+    // The DARE is ill-conditioned if the velocity is close to zero, so don't
+    // let the system stop.
+    if (Math.abs(velocity) < 1e-4) {
+      velocity = 1e-4;
+    }
 
     var r =
         VecBuilder.fill(
@@ -252,12 +155,55 @@ public class LTVDifferentialDriveController {
             poseRef.getRotation().getRadians(),
             leftVelocityRef,
             rightVelocityRef);
-    m_error = r.minus(x);
-    m_error.set(
-        State.kHeading.value, 0, MathUtil.angleModulus(m_error.get(State.kHeading.value, 0)));
+    var x =
+        VecBuilder.fill(
+            currentPose.getX(),
+            currentPose.getY(),
+            currentPose.getRotation().getRadians(),
+            leftVelocity,
+            rightVelocity);
 
-    double velocity = (leftVelocity + rightVelocity) / 2.0;
-    var K = m_table.get(velocity);
+    m_error = r.minus(x);
+    m_error.set(2, 0, MathUtil.angleModulus(m_error.get(2, 0)));
+
+    // spotless:off
+    var A = MatBuilder.fill(Nat.N5(), Nat.N5(),
+        0.0, 0.0, 0.0, 0.5, 0.5,
+        0.0, 0.0, velocity, 0.0, 0.0,
+        0.0, 0.0, 0.0, -1.0 / m_trackwidth, 1.0 / m_trackwidth,
+        0.0, 0.0, 0.0, m_A.get(0, 0), m_A.get(0, 1),
+        0.0, 0.0, 0.0, m_A.get(1, 0), m_A.get(1, 1));
+    var B = MatBuilder.fill(Nat.N5(), Nat.N2(),
+        0.0, 0.0,
+        0.0, 0.0,
+        0.0, 0.0,
+        m_B.get(0, 0), m_B.get(0, 1),
+        m_B.get(1, 0), m_B.get(1, 1));
+    // spotless:on
+
+    var discABPair = Discretization.discretizeAB(A, B, m_dt);
+    var discA = discABPair.getFirst();
+    var discB = discABPair.getSecond();
+
+    var S = DARE.dareNoPrecond(discA, discB, m_Q, m_R);
+
+    // K = (BᵀSB + R)⁻¹BᵀSA
+    var K =
+        discB
+            .transpose()
+            .times(S)
+            .times(discB)
+            .plus(m_R)
+            .solve(discB.transpose().times(S).times(discA));
+
+    // spotless:off
+    var inRobotFrame = MatBuilder.fill(Nat.N5(), Nat.N5(),
+        Math.cos(x.get(2, 0)), Math.sin(x.get(2, 0)), 0.0, 0.0, 0.0,
+        -Math.sin(x.get(2, 0)), Math.cos(x.get(2, 0)), 0.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 1.0);
+    // spotless:on
 
     var u = K.times(inRobotFrame).times(m_error);
 
@@ -296,10 +242,8 @@ public class LTVDifferentialDriveController {
         currentPose,
         leftVelocity,
         rightVelocity,
-        desiredState.poseMeters,
-        desiredState.velocityMetersPerSecond
-            * (1 - (desiredState.curvatureRadPerMeter * m_trackwidth / 2.0)),
-        desiredState.velocityMetersPerSecond
-            * (1 + (desiredState.curvatureRadPerMeter * m_trackwidth / 2.0)));
+        desiredState.pose,
+        desiredState.velocity * (1 - (desiredState.curvature * m_trackwidth / 2.0)),
+        desiredState.velocity * (1 + (desiredState.curvature * m_trackwidth / 2.0)));
   }
 }

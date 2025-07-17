@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <frc/ADXRS450_Gyro.h>
+#include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
 #include <frc/drive/MecanumDrive.h>
 #include <frc/geometry/Pose2d.h>
@@ -88,16 +88,16 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void ResetOdometry(frc::Pose2d pose);
 
-  units::meter_t kTrackWidth =
+  units::meter_t kTrackwidth =
       0.5_m;  // Distance between centers of right and left wheels on robot
   units::meter_t kWheelBase =
       0.7_m;  // Distance between centers of front and back wheels on robot
 
   frc::SwerveDriveKinematics<4> kDriveKinematics{
-      frc::Translation2d{kWheelBase / 2, kTrackWidth / 2},
-      frc::Translation2d{kWheelBase / 2, -kTrackWidth / 2},
-      frc::Translation2d{-kWheelBase / 2, kTrackWidth / 2},
-      frc::Translation2d{-kWheelBase / 2, -kTrackWidth / 2}};
+      frc::Translation2d{kWheelBase / 2, kTrackwidth / 2},
+      frc::Translation2d{kWheelBase / 2, -kTrackwidth / 2},
+      frc::Translation2d{-kWheelBase / 2, kTrackwidth / 2},
+      frc::Translation2d{-kWheelBase / 2, -kTrackwidth / 2}};
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be
@@ -109,7 +109,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   SwerveModule m_rearRight;
 
   // The gyro sensor
-  frc::ADXRS450_Gyro m_gyro;
+  frc::AnalogGyro m_gyro{0};
 
   // Odometry class for tracking robot pose
   // 4 defines the number of modules

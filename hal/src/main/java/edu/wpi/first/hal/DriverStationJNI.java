@@ -10,7 +10,6 @@ import java.nio.ByteBuffer;
  * Driver Station JNI Functions.
  *
  * @see "hal/DriverStation.h"
- * @see "hal/FRCUsageReporting.h"
  */
 public class DriverStationJNI extends JNIWrapper {
   /**
@@ -61,53 +60,6 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_ObserveUserProgramTest"
    */
   public static native void observeUserProgramTest();
-
-  /**
-   * Report the usage of a resource of interest.
-   *
-   * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
-   * char*)</code>
-   *
-   * @param resource one of the values in the tResourceType above.
-   * @param instanceNumber an index that identifies the resource instance.
-   * @see "HAL_Report"
-   */
-  public static void report(int resource, int instanceNumber) {
-    report(resource, instanceNumber, 0, "");
-  }
-
-  /**
-   * Report the usage of a resource of interest.
-   *
-   * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
-   * char*)</code>
-   *
-   * @param resource one of the values in the tResourceType above.
-   * @param instanceNumber an index that identifies the resource instance.
-   * @param context an optional additional context number for some cases (such as module number).
-   *     Set to 0 to omit.
-   * @see "HAL_Report"
-   */
-  public static void report(int resource, int instanceNumber, int context) {
-    report(resource, instanceNumber, context, "");
-  }
-
-  /**
-   * Report the usage of a resource of interest.
-   *
-   * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
-   * char*)</code>
-   *
-   * @param resource one of the values in the tResourceType above.
-   * @param instanceNumber an index that identifies the resource instance.
-   * @param context an optional additional context number for some cases (such as module number).
-   *     Set to 0 to omit.
-   * @param feature a string to be included describing features in use on a specific resource.
-   *     Setting the same resource more than once allows you to change the feature string.
-   * @return the index of the added value in NetComm
-   * @see "HAL_Report"
-   */
-  public static native int report(int resource, int instanceNumber, int context, String feature);
 
   /**
    * Gets the current control word of the driver station.
@@ -191,7 +143,7 @@ public class DriverStationJNI extends JNIWrapper {
   public static final int kMaxJoystickAxes = 12;
 
   /** The maximum number of POVs. */
-  public static final int kMaxJoystickPOVs = 12;
+  public static final int kMaxJoystickPOVs = 8;
 
   /** The maximum number of joysticks. */
   public static final int kMaxJoysticks = 6;
@@ -210,11 +162,11 @@ public class DriverStationJNI extends JNIWrapper {
    * Gets the axes of a specific joystick.
    *
    * @param joystickNum the joystick number
-   * @param rawAxesArray the raw int axes values (0-255)
+   * @param rawAxesArray the raw int axes values (-32767-32768)
    * @return number of joystick axes, or 0 for error
    * @see "HAL_GetJoystickAxes"
    */
-  public static native int getJoystickAxesRaw(byte joystickNum, int[] rawAxesArray);
+  public static native int getJoystickAxesRaw(byte joystickNum, short[] rawAxesArray);
 
   /**
    * Gets the POVs of a specific joystick.
@@ -224,7 +176,7 @@ public class DriverStationJNI extends JNIWrapper {
    * @return number of POVs, or 0 for error
    * @see "HAL_GetJoystickPOVs"
    */
-  public static native int getJoystickPOVs(byte joystickNum, short[] povsArray);
+  public static native int getJoystickPOVs(byte joystickNum, byte[] povsArray);
 
   /**
    * Gets the buttons of a specific joystick.
@@ -247,7 +199,7 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_GetAllJoystickData"
    */
   public static native void getAllJoystickData(
-      float[] axesArray, byte[] rawAxesArray, short[] povsArray, long[] buttonsAndMetadata);
+      float[] axesArray, short[] rawAxesArray, byte[] povsArray, long[] buttonsAndMetadata);
 
   /**
    * Set joystick outputs.
@@ -263,13 +215,13 @@ public class DriverStationJNI extends JNIWrapper {
       byte joystickNum, int outputs, int leftRumble, int rightRumble);
 
   /**
-   * Gets whether a specific joystick is considered to be an XBox controller.
+   * Gets whether a specific joystick is considered to be an Gamepad.
    *
    * @param joystickNum the joystick number
-   * @return 1 if xbox, 0 otherwise
-   * @see "HAL_GetJoystickIsXbox"
+   * @return 1 if gamepad, 0 otherwise
+   * @see "HAL_GetJoystickIsGamepad"
    */
-  public static native int getJoystickIsXbox(byte joystickNum);
+  public static native int getJoystickIsGamepad(byte joystickNum);
 
   /**
    * Gets the type of joystick connected.

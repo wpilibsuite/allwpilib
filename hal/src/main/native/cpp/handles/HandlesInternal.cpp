@@ -49,32 +49,6 @@ void HandleBase::ResetGlobalHandles() {
     }
   }
 }
-HAL_PortHandle createPortHandle(uint8_t channel, uint8_t module) {
-  // set last 8 bits, then shift to first 8 bits
-  HAL_PortHandle handle = static_cast<HAL_PortHandle>(HAL_HandleEnum::Port);
-  handle = handle << 24;
-  // shift module and add to 3rd set of 8 bits
-  int32_t temp = module;
-  temp = (temp << 8) & 0xff00;
-  handle += temp;
-  // add channel to last 8 bits
-  handle += channel;
-  return handle;
-}
-HAL_PortHandle createPortHandleForSPI(uint8_t channel) {
-  // set last 8 bits, then shift to first 8 bits
-  HAL_PortHandle handle = static_cast<HAL_PortHandle>(HAL_HandleEnum::Port);
-  handle = handle << 16;
-  // set second set up bits to 1
-  int32_t temp = 1;
-  temp = (temp << 8) & 0xff00;
-  handle += temp;
-  // shift to last set of bits
-  handle = handle << 8;
-  // add channel to last 8 bits
-  handle += channel;
-  return handle;
-}
 HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType,
                         int16_t version) {
   if (index < 0) {

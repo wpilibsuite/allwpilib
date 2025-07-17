@@ -13,9 +13,8 @@
 #include <frc/RobotBase.h>
 #include <frc/RobotState.h>
 #include <frc/TimedRobot.h>
-#include <frc/livewindow/LiveWindow.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
+#include <hal/UsageReporting.h>
 #include <networktables/IntegerArrayTopic.h>
 #include <networktables/StringArrayTopic.h>
 #include <wpi/DenseMap.h>
@@ -70,21 +69,12 @@ CommandScheduler::CommandScheduler()
     : m_impl(new Impl), m_watchdog(frc::TimedRobot::kDefaultPeriod, [] {
         std::puts("CommandScheduler loop time overrun.");
       }) {
-  HAL_Report(HALUsageReporting::kResourceType_Command,
-             HALUsageReporting::kCommand2_Scheduler);
-  wpi::SendableRegistry::AddLW(this, "Scheduler");
-  frc::LiveWindow::SetEnabledCallback([this] {
-    this->Disable();
-    this->CancelAll();
-  });
-  frc::LiveWindow::SetDisabledCallback([this] { this->Enable(); });
+  HAL_ReportUsage("CommandScheduler", "");
+  wpi::SendableRegistry::Add(this, "Scheduler");
 }
 
 CommandScheduler::~CommandScheduler() {
   wpi::SendableRegistry::Remove(this);
-  frc::LiveWindow::SetEnabledCallback(nullptr);
-  frc::LiveWindow::SetDisabledCallback(nullptr);
-
   std::unique_ptr<Impl>().swap(m_impl);
 }
 

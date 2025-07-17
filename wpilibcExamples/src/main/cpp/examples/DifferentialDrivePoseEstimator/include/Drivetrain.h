@@ -22,7 +22,6 @@
 #include <frc/geometry/Transform3d.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/simulation/AnalogGyroSim.h>
 #include <frc/simulation/DifferentialDrivetrainSim.h>
 #include <frc/simulation/EncoderSim.h>
 #include <frc/smartdashboard/Field2d.h>
@@ -112,7 +111,7 @@ class Drivetrain {
                                 nt::DoubleArrayEntry& cameraToObjectEntry);
 
  private:
-  static constexpr units::meter_t kTrackWidth = 0.381_m * 2;
+  static constexpr units::meter_t kTrackwidth = 0.381_m * 2;
   static constexpr units::meter_t kWheelRadius = 0.0508_m;
   static constexpr int kEncoderResolution = 4096;
 
@@ -147,7 +146,7 @@ class Drivetrain {
 
   frc::AnalogGyro m_gyro{0};
 
-  frc::DifferentialDriveKinematics m_kinematics{kTrackWidth};
+  frc::DifferentialDriveKinematics m_kinematics{kTrackwidth};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
@@ -165,7 +164,6 @@ class Drivetrain {
   frc::SimpleMotorFeedforward<units::meters> m_feedforward{1_V, 3_V / 1_mps};
 
   // Simulation classes
-  frc::sim::AnalogGyroSim m_gyroSim{m_gyro};
   frc::sim::EncoderSim m_leftEncoderSim{m_leftEncoder};
   frc::sim::EncoderSim m_rightEncoderSim{m_rightEncoder};
   frc::Field2d m_fieldSim;
@@ -174,5 +172,5 @@ class Drivetrain {
       frc::LinearSystemId::IdentifyDrivetrainSystem(
           1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
   frc::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
-      m_drivetrainSystem, kTrackWidth, frc::DCMotor::CIM(2), 8, 2_in};
+      m_drivetrainSystem, kTrackwidth, frc::DCMotor::CIM(2), 8, 2_in};
 };

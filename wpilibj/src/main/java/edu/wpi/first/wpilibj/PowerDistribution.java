@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.PowerDistributionFaults;
 import edu.wpi.first.hal.PowerDistributionJNI;
@@ -44,39 +42,43 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   /**
    * Constructs a PowerDistribution object.
    *
+   * @param busId The bus ID
    * @param module The CAN ID of the PDP/PDH.
    * @param moduleType Module type (CTRE or REV).
    */
   @SuppressWarnings("this-escape")
-  public PowerDistribution(int module, ModuleType moduleType) {
-    m_handle = PowerDistributionJNI.initialize(module, moduleType.value);
+  public PowerDistribution(int busId, int module, ModuleType moduleType) {
+    m_handle = PowerDistributionJNI.initialize(busId, module, moduleType.value);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     if (moduleType == ModuleType.kCTRE) {
-      HAL.report(tResourceType.kResourceType_PDP, tInstances.kPDP_CTRE);
+      HAL.reportUsage("PDP", m_module, "");
     } else {
-      HAL.report(tResourceType.kResourceType_PDP, tInstances.kPDP_REV);
+      HAL.reportUsage("PDH", m_module, "");
     }
-    SendableRegistry.addLW(this, "PowerDistribution", m_module);
+    SendableRegistry.add(this, "PowerDistribution", m_module);
   }
 
   /**
    * Constructs a PowerDistribution object.
    *
    * <p>Detects the connected PDP/PDH using the default CAN ID (0 for CTRE and 1 for REV).
+   *
+   * @param busId The bus ID
    */
   @SuppressWarnings("this-escape")
-  public PowerDistribution() {
-    m_handle = PowerDistributionJNI.initialize(kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
+  public PowerDistribution(int busId) {
+    m_handle =
+        PowerDistributionJNI.initialize(busId, kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     if (PowerDistributionJNI.getType(m_handle) == PowerDistributionJNI.CTRE_TYPE) {
-      HAL.report(tResourceType.kResourceType_PDP, tInstances.kPDP_CTRE);
+      HAL.reportUsage("PowerDistribution", m_module, "CTRE");
     } else {
-      HAL.report(tResourceType.kResourceType_PDP, tInstances.kPDP_REV);
+      HAL.reportUsage("PowerDistribution", m_module, "Rev");
     }
 
-    SendableRegistry.addLW(this, "PowerDistribution", m_module);
+    SendableRegistry.add(this, "PowerDistribution", m_module);
   }
 
   @Override

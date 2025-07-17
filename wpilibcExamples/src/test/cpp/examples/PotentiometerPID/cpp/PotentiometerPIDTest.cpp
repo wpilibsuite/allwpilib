@@ -10,7 +10,7 @@
 #include <frc/simulation/DriverStationSim.h>
 #include <frc/simulation/ElevatorSim.h>
 #include <frc/simulation/JoystickSim.h>
-#include <frc/simulation/PWMSim.h>
+#include <frc/simulation/PWMMotorControllerSim.h>
 #include <frc/simulation/SimHooks.h>
 #include <frc/system/plant/DCMotor.h>
 #include <gtest/gtest.h>
@@ -39,7 +39,7 @@ class PotentiometerPIDTest : public testing::Test {
                                       Robot::kFullHeight,
                                       true,
                                       0.0_m};
-  frc::sim::PWMSim m_motorSim{Robot::kMotorChannel};
+  frc::sim::PWMMotorControllerSim m_motorSim{Robot::kMotorChannel};
   frc::sim::AnalogInputSim m_analogSim{Robot::kPotChannel};
   frc::sim::JoystickSim m_joystickSim{Robot::kJoystickChannel};
   int32_t m_callback;
@@ -52,12 +52,12 @@ class PotentiometerPIDTest : public testing::Test {
     m_elevatorSim.Update(20_ms);
 
     /*
-    meters = (v / 5v) * range
-    meters / range = v / 5v
-    5v * (meters / range) = v
+    meters = (v / 3.3v) * range
+    meters / range = v / 3.3v
+    3.3v * (meters / range) = v
      */
     m_analogSim.SetVoltage(
-        (frc::RobotController::GetVoltage5V() *
+        (frc::RobotController::GetVoltage3V3() *
          (m_elevatorSim.GetPosition().value() / Robot::kFullHeight))
             .value());
   }
@@ -85,7 +85,6 @@ class PotentiometerPIDTest : public testing::Test {
 
     HALSIM_CancelSimPeriodicBeforeCallback(m_callback);
     m_analogSim.ResetData();
-    m_motorSim.ResetData();
   }
 };
 
@@ -96,7 +95,6 @@ TEST_F(PotentiometerPIDTest, Teleop) {
     frc::sim::DriverStationSim::SetEnabled(true);
     frc::sim::DriverStationSim::NotifyNewData();
 
-    EXPECT_TRUE(m_motorSim.GetInitialized());
     EXPECT_TRUE(m_analogSim.GetInitialized());
   }
 

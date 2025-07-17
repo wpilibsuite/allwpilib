@@ -6,7 +6,6 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PWM;
 
@@ -38,11 +37,10 @@ public class PWMSparkMax extends PWMMotorController {
   public PWMSparkMax(final int channel) {
     super("PWMSparkMax", channel);
 
-    m_pwm.setBoundsMicroseconds(2003, 1550, 1500, 1460, 999);
-    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
-    m_pwm.setSpeed(0.0);
-    m_pwm.setZeroLatch();
+    setBoundsMicroseconds(2003, 1550, 1500, 1460, 999);
+    m_pwm.setOutputPeriod(PWM.OutputPeriod.k5Ms);
+    setSpeed(0.0);
 
-    HAL.report(tResourceType.kResourceType_RevSparkMaxPWM, getChannel() + 1);
+    HAL.reportUsage("IO", getChannel(), "RevSparkMaxPWM");
   }
 }

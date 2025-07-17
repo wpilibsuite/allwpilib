@@ -76,7 +76,6 @@ The “hardware“ (which might be a full-fledged 3D simulation engine, a physic
 
 | Type value              | Description                | Device value              |
 | ----------------------- | -------------------------- | ------------------------- |
-| [``"Accel"``][]         | Accelerometer              | Arbitrary device name     |
 | [``"AddressableLED"``][]| Addressable LED Strip      | Arbitrary device number   |
 | [``"AI"``][]            | Analog input               | Port index, e.g. "1", "2" |
 | [``"AO"``][]            | Analog output              | Port index, e.g. "1", "2" |
@@ -90,24 +89,7 @@ The “hardware“ (which might be a full-fledged 3D simulation engine, a physic
 | [``"HAL"``][]           | HAL data                   | ``"HAL"``                 |
 | [``"Joystick"``][]      | Joystick data              | Joystick number           |
 | [``"PWM"``][]           | PWM output                 | Port index, e.g. "1", "2" |
-| [``"Relay"``][]         | Relay output               | Port index, e.g. "1", "2" |
 | [``"Solenoid"``][]      | Solenoid output            | Module +Port index, e.g. "0,1", "2,5" |
-
-#### Accelerometer ("Accel")
-
-[``"Accel"``]:#accelerometer-accel
-
-A 3-axis accelerometer.
-
-C++/Java implementation note: these are created as either BuiltInAccelerometer or SimDevice nodes where the device name is prefixed by ``"Accel:"``. For example, the device ``"Accel:ADXL362[1]"`` would have a device value of ``ADXL362[1]``.  The BuiltInAccelerometer uses a device name of ``"BuiltInAccel"``.
-
-| Data Key     | Type    | Description                                          |
-| ------------ | ------- | ---------------------------------------------------- |
-| ``"<init"``  | Boolean | If accelerometer is initialized in the robot program |
-| ``"<range"`` | Float   | Desired range in G’s                                 |
-| ``">x"``     | Float   | Acceleration in G’s                                  |
-| ``">y"``     | Float   | Acceleration in G’s                                  |
-| ``">z"``     | Float   | Acceleration in G’s                                  |
 
 #### Addressable LED Strip ("AddressableLED")
 
@@ -133,11 +115,6 @@ The basic analog input just reads a voltage. An analog input can also be configu
 | ``"<avg_bits"``        | Integer | The number of averaging bits                        |
 | ``"<oversample_bits"`` | Integer | The number of oversampling bits                     |
 | ``">voltage"``         | Float   | Input voltage, in volts                             |
-| ``"<accum_init"``      | Boolean | If the accumulator is initialized in the robot program |
-| ``">accum_value"``     | Integer | The accumulated value                               |
-| ``">accum_count"``     | Integer | The number of accumulated values                    |
-| ``"<accum_center"``    | Integer | The center value of the accumulator                 |
-| ``"<accum_deadband"``  | Integer | The accumulator's deadband                          |
 
 #### Analog Output ("AO")
 
@@ -288,22 +265,8 @@ PWMs may be used to control either motor controllers or servos.  Typically only 
 | Data Key            | Type    | Description                                |
 | ------------------- | ------- | ------------------------------------------ |
 | ``"<init"``         | Boolean | If PWM is initialized in the robot program |
-| ``"<speed"``        | Float   | Speed, -1.0 to 1.0 range                   |
-| ``"<position"``     | Float   | Servo position, 0.0 to 1.0 range           |
 | ``"<raw"``          | Integer | The pulse time in microseconds             |
-| ``"<period_scale"`` | Integer | Scales the PWM signal by squelching setting a 2-bit mask of outputs to squelch (ex. `1` -> squelch every other value; `3` -> squelch 3 of 4 values) |
-| ``"<zero_latch"``   | Boolean | Whether the PWM should be latched to 0     |
-
-#### Relay Output ("Relay")
-
-[``"Relay"``]:#relay-output-relay
-
-| Data Key        | Type    | Description                                                    |
-| --------------- | ------- | -------------------------------------------------------------- |
-| ``"<init_fwd"`` | Boolean | If relay forward direction is initialized in the robot program |
-| ``"<init_rev"`` | Boolean | If relay reverse direction is initialized in the robot program |
-| ``"<fwd"``      | Boolean | True if forward direction is enabled                           |
-| ``"<rev"``      | Boolean | True if reverse direction is enabled                           |
+| ``"<output_period"``| Integer | Scales the PWM signal by squelching setting a 2-bit mask of outputs to squelch (ex. `1` -> squelch every other value; `3` -> squelch 3 of 4 values) |
 
 #### Solenoid Output ("Solenoid")
 

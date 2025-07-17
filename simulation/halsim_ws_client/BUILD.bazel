@@ -1,0 +1,21 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("//shared/bazel/rules:halsim_library.bzl", "wpilib_halsim_extension")
+
+wpilib_halsim_extension(
+    name = "halsim_ws_client",
+    srcs = glob([
+        "src/main/native/cpp/*.cpp",
+        "src/main/native/include/*.h",
+    ]),
+    deps = [
+        "//simulation/halsim_ws_core",
+    ],
+)
+
+cc_binary(
+    name = "DevMain-Cpp",
+    srcs = ["src/dev/native/cpp/main.cpp"],
+    deps = [
+        ":halsim_ws_client",
+    ],
+)

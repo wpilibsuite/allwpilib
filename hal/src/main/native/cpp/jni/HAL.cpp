@@ -6,7 +6,7 @@
 
 #include <jni.h>
 
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
 #include <signal.h>
 #endif
 
@@ -95,7 +95,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_HAL_terminate
   (JNIEnv*, jclass)
 {
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
   ::raise(SIGKILL);
 #endif
 }
@@ -197,32 +197,6 @@ Java_edu_wpi_first_hal_HAL_getSystemTimeValid
   bool val = HAL_GetSystemTimeValid(&status);
   CheckStatus(env, status);
   return val;
-}
-
-/*
- * Class:     edu_wpi_first_hal_HAL
- * Method:    getPortWithModule
- * Signature: (BB)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HAL_getPortWithModule
-  (JNIEnv* env, jclass, jbyte module, jbyte channel)
-{
-  HAL_PortHandle port = HAL_GetPortWithModule(module, channel);
-  return (jint)port;
-}
-
-/*
- * Class:     edu_wpi_first_hal_HAL
- * Method:    getPort
- * Signature: (B)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HAL_getPort
-  (JNIEnv* env, jclass, jbyte channel)
-{
-  HAL_PortHandle port = HAL_GetPort(channel);
-  return (jint)port;
 }
 
 }  // extern "C"

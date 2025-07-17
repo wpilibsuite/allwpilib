@@ -14,17 +14,17 @@ import edu.wpi.first.util.struct.StructSerializable;
 
 /** Represents the wheel speeds for a mecanum drive drivetrain. */
 public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSerializable {
-  /** Speed of the front left wheel. */
-  public double frontLeftMetersPerSecond;
+  /** Speed of the front left wheel in meters per second. */
+  public double frontLeft;
 
-  /** Speed of the front right wheel. */
-  public double frontRightMetersPerSecond;
+  /** Speed of the front right wheel in meters per second. */
+  public double frontRight;
 
-  /** Speed of the rear left wheel. */
-  public double rearLeftMetersPerSecond;
+  /** Speed of the rear left wheel in meters per second. */
+  public double rearLeft;
 
-  /** Speed of the rear right wheel. */
-  public double rearRightMetersPerSecond;
+  /** Speed of the rear right wheel in meters per second. */
+  public double rearRight;
 
   /** MecanumDriveWheelSpeeds protobuf for serialization. */
   public static final MecanumDriveWheelSpeedsProto proto = new MecanumDriveWheelSpeedsProto();
@@ -38,29 +38,26 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
   /**
    * Constructs a MecanumDriveWheelSpeeds.
    *
-   * @param frontLeftMetersPerSecond Speed of the front left wheel.
-   * @param frontRightMetersPerSecond Speed of the front right wheel.
-   * @param rearLeftMetersPerSecond Speed of the rear left wheel.
-   * @param rearRightMetersPerSecond Speed of the rear right wheel.
+   * @param frontLeft Speed of the front left wheel in meters per second.
+   * @param frontRight Speed of the front right wheel in meters per second.
+   * @param rearLeft Speed of the rear left wheel in meters per second.
+   * @param rearRight Speed of the rear right wheel in meters per second.
    */
   public MecanumDriveWheelSpeeds(
-      double frontLeftMetersPerSecond,
-      double frontRightMetersPerSecond,
-      double rearLeftMetersPerSecond,
-      double rearRightMetersPerSecond) {
-    this.frontLeftMetersPerSecond = frontLeftMetersPerSecond;
-    this.frontRightMetersPerSecond = frontRightMetersPerSecond;
-    this.rearLeftMetersPerSecond = rearLeftMetersPerSecond;
-    this.rearRightMetersPerSecond = rearRightMetersPerSecond;
+      double frontLeft, double frontRight, double rearLeft, double rearRight) {
+    this.frontLeft = frontLeft;
+    this.frontRight = frontRight;
+    this.rearLeft = rearLeft;
+    this.rearRight = rearRight;
   }
 
   /**
    * Constructs a MecanumDriveWheelSpeeds.
    *
-   * @param frontLeft Speed of the front left wheel.
-   * @param frontRight Speed of the front right wheel.
-   * @param rearLeft Speed of the rear left wheel.
-   * @param rearRight Speed of the rear right wheel.
+   * @param frontLeft Speed of the front left wheel in meters per second.
+   * @param frontRight Speed of the front right wheel in meters per second.
+   * @param rearLeft Speed of the rear left wheel in meters per second.
+   * @param rearRight Speed of the rear right wheel in meters per second.
    */
   public MecanumDriveWheelSpeeds(
       LinearVelocity frontLeft,
@@ -82,24 +79,23 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
    * reduce all the wheel speeds to make sure that all requested module speeds are at-or-below the
    * absolute threshold, while maintaining the ratio of speeds between wheels.
    *
-   * @param attainableMaxSpeedMetersPerSecond The absolute max speed that a wheel can reach.
+   * @param attainableMaxSpeed The absolute max speed in meters per second that a wheel can reach.
+   * @return Desaturated MecanumDriveWheelSpeeds.
    */
-  public void desaturate(double attainableMaxSpeedMetersPerSecond) {
-    double realMaxSpeed =
-        Math.max(Math.abs(frontLeftMetersPerSecond), Math.abs(frontRightMetersPerSecond));
-    realMaxSpeed = Math.max(realMaxSpeed, Math.abs(rearLeftMetersPerSecond));
-    realMaxSpeed = Math.max(realMaxSpeed, Math.abs(rearRightMetersPerSecond));
+  public MecanumDriveWheelSpeeds desaturate(double attainableMaxSpeed) {
+    double realMaxSpeed = Math.max(Math.abs(frontLeft), Math.abs(frontRight));
+    realMaxSpeed = Math.max(realMaxSpeed, Math.abs(rearLeft));
+    realMaxSpeed = Math.max(realMaxSpeed, Math.abs(rearRight));
 
-    if (realMaxSpeed > attainableMaxSpeedMetersPerSecond) {
-      frontLeftMetersPerSecond =
-          frontLeftMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond;
-      frontRightMetersPerSecond =
-          frontRightMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond;
-      rearLeftMetersPerSecond =
-          rearLeftMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond;
-      rearRightMetersPerSecond =
-          rearRightMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond;
+    if (realMaxSpeed > attainableMaxSpeed) {
+      return new MecanumDriveWheelSpeeds(
+          frontLeft / realMaxSpeed * attainableMaxSpeed,
+          frontRight / realMaxSpeed * attainableMaxSpeed,
+          rearLeft / realMaxSpeed * attainableMaxSpeed,
+          rearRight / realMaxSpeed * attainableMaxSpeed);
     }
+
+    return new MecanumDriveWheelSpeeds(frontLeft, frontRight, rearLeft, rearRight);
   }
 
   /**
@@ -111,9 +107,10 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
    * absolute threshold, while maintaining the ratio of speeds between wheels.
    *
    * @param attainableMaxSpeed The absolute max speed that a wheel can reach.
+   * @return Desaturated MecanumDriveWheelSpeeds.
    */
-  public void desaturate(LinearVelocity attainableMaxSpeed) {
-    desaturate(attainableMaxSpeed.in(MetersPerSecond));
+  public MecanumDriveWheelSpeeds desaturate(LinearVelocity attainableMaxSpeed) {
+    return desaturate(attainableMaxSpeed.in(MetersPerSecond));
   }
 
   /**
@@ -127,10 +124,10 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
    */
   public MecanumDriveWheelSpeeds plus(MecanumDriveWheelSpeeds other) {
     return new MecanumDriveWheelSpeeds(
-        frontLeftMetersPerSecond + other.frontLeftMetersPerSecond,
-        frontRightMetersPerSecond + other.frontRightMetersPerSecond,
-        rearLeftMetersPerSecond + other.rearLeftMetersPerSecond,
-        rearRightMetersPerSecond + other.rearRightMetersPerSecond);
+        frontLeft + other.frontLeft,
+        frontRight + other.frontRight,
+        rearLeft + other.rearLeft,
+        rearRight + other.rearRight);
   }
 
   /**
@@ -145,10 +142,10 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
    */
   public MecanumDriveWheelSpeeds minus(MecanumDriveWheelSpeeds other) {
     return new MecanumDriveWheelSpeeds(
-        frontLeftMetersPerSecond - other.frontLeftMetersPerSecond,
-        frontRightMetersPerSecond - other.frontRightMetersPerSecond,
-        rearLeftMetersPerSecond - other.rearLeftMetersPerSecond,
-        rearRightMetersPerSecond - other.rearRightMetersPerSecond);
+        frontLeft - other.frontLeft,
+        frontRight - other.frontRight,
+        rearLeft - other.rearLeft,
+        rearRight - other.rearRight);
   }
 
   /**
@@ -158,11 +155,7 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
    * @return The inverse of the current MecanumDriveWheelSpeeds.
    */
   public MecanumDriveWheelSpeeds unaryMinus() {
-    return new MecanumDriveWheelSpeeds(
-        -frontLeftMetersPerSecond,
-        -frontRightMetersPerSecond,
-        -rearLeftMetersPerSecond,
-        -rearRightMetersPerSecond);
+    return new MecanumDriveWheelSpeeds(-frontLeft, -frontRight, -rearLeft, -rearRight);
   }
 
   /**
@@ -176,10 +169,7 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
    */
   public MecanumDriveWheelSpeeds times(double scalar) {
     return new MecanumDriveWheelSpeeds(
-        frontLeftMetersPerSecond * scalar,
-        frontRightMetersPerSecond * scalar,
-        rearLeftMetersPerSecond * scalar,
-        rearRightMetersPerSecond * scalar);
+        frontLeft * scalar, frontRight * scalar, rearLeft * scalar, rearRight * scalar);
   }
 
   /**
@@ -193,10 +183,7 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
    */
   public MecanumDriveWheelSpeeds div(double scalar) {
     return new MecanumDriveWheelSpeeds(
-        frontLeftMetersPerSecond / scalar,
-        frontRightMetersPerSecond / scalar,
-        rearLeftMetersPerSecond / scalar,
-        rearRightMetersPerSecond / scalar);
+        frontLeft / scalar, frontRight / scalar, rearLeft / scalar, rearRight / scalar);
   }
 
   @Override
@@ -204,9 +191,6 @@ public class MecanumDriveWheelSpeeds implements ProtobufSerializable, StructSeri
     return String.format(
         "MecanumDriveWheelSpeeds(Front Left: %.2f m/s, Front Right: %.2f m/s, "
             + "Rear Left: %.2f m/s, Rear Right: %.2f m/s)",
-        frontLeftMetersPerSecond,
-        frontRightMetersPerSecond,
-        rearLeftMetersPerSecond,
-        rearRightMetersPerSecond);
+        frontLeft, frontRight, rearLeft, rearRight);
   }
 }

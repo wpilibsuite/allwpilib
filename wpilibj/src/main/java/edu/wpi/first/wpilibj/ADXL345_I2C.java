@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
@@ -18,13 +16,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-/**
- * ADXL345 I2C Accelerometer.
- *
- * <p>The Onboard I2C port is subject to system lockups. See <a
- * href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">
- * WPILib Known Issues</a> page for details.
- */
+/** ADXL345 I2C Accelerometer. */
 @SuppressWarnings("TypeName")
 public class ADXL345_I2C implements NTSendable, AutoCloseable {
   /** Default I2C device address. */
@@ -140,8 +132,8 @@ public class ADXL345_I2C implements NTSendable, AutoCloseable {
 
     setRange(range);
 
-    HAL.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C);
-    SendableRegistry.addLW(this, "ADXL345_I2C", port.value);
+    HAL.reportUsage("I2C[" + port.value + "][" + deviceAddress + "]", "ADXL345");
+    SendableRegistry.add(this, "ADXL345_I2C", port.value);
   }
 
   /**

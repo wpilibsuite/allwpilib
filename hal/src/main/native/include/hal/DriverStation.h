@@ -122,12 +122,12 @@ int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc);
 
 /**
- * Gets whether a specific joystick is considered to be an XBox controller.
+ * Gets whether a specific joystick is considered to be an Gamepad.
  *
  * @param joystickNum the joystick number
- * @return true if xbox, false otherwise
+ * @return true if gamepad, false otherwise
  */
-HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum);
+HAL_Bool HAL_GetJoystickIsGamepad(int32_t joystickNum);
 
 /**
  * Gets the type of joystick connected.

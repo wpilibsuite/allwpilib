@@ -16,9 +16,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             name: Linux
-            container: wpilib/roborio-cross-ubuntu:2025-22.04
+            container: wpilib/roborio-cross-ubuntu:2025-24.04
             flags: "--preset with-java-and-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
           - os: ubuntu-22.04-arm
             name: Linux ARM

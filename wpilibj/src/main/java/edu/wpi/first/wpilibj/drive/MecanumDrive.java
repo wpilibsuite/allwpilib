@@ -6,8 +6,6 @@ package edu.wpi.first.wpilibj.drive;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -158,7 +156,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     m_frontRightMotor = frontRightMotor;
     m_rearRightMotor = rearRightMotor;
     instances++;
-    SendableRegistry.addLW(this, "MecanumDrive", instances);
+    SendableRegistry.add(this, "MecanumDrive", instances);
   }
 
   @Override
@@ -196,8 +194,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    */
   public void driveCartesian(double xSpeed, double ySpeed, double zRotation, Rotation2d gyroAngle) {
     if (!m_reported) {
-      HAL.report(
-          tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_MecanumCartesian, 4);
+      HAL.reportUsage("RobotDrive", "MecanumCartesian");
       m_reported = true;
     }
 
@@ -232,7 +229,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    */
   public void drivePolar(double magnitude, Rotation2d angle, double zRotation) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_MecanumPolar, 4);
+      HAL.reportUsage("RobotDrive", "MecanumPolar");
       m_reported = true;
     }
 
@@ -317,7 +314,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("MecanumDrive");
     builder.setActuator(true);
-    builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Front Left Motor Speed", () -> m_frontLeftOutput, m_frontLeftMotor);
     builder.addDoubleProperty(
         "Front Right Motor Speed", () -> m_frontRightOutput, m_frontRightMotor);

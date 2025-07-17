@@ -1173,12 +1173,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_stopLocal
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    startServer
- * Signature: (ILjava/lang/String;Ljava/lang/String;II)V
+ * Signature: (ILjava/lang/String;Ljava/lang/String;I)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_startServer
   (JNIEnv* env, jclass, jint inst, jstring persistFilename,
-   jstring listenAddress, jint port3, jint port4)
+   jstring listenAddress, jint port)
 {
   if (!persistFilename) {
     nullPointerEx.Throw(env, "persistFilename cannot be null");
@@ -1189,7 +1189,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startServer
     return;
   }
   nt::StartServer(inst, JStringRef{env, persistFilename}.str(),
-                  JStringRef{env, listenAddress}.c_str(), port3, port4);
+                  JStringRef{env, listenAddress}.c_str(), port);
 }
 
 /*
@@ -1206,34 +1206,18 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_stopServer
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    startClient3
+ * Method:    startClient
  * Signature: (ILjava/lang/String;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient3
+Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient
   (JNIEnv* env, jclass, jint inst, jstring identity)
 {
   if (!identity) {
     nullPointerEx.Throw(env, "identity cannot be null");
     return;
   }
-  nt::StartClient3(inst, JStringRef{env, identity}.str());
-}
-
-/*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    startClient4
- * Signature: (ILjava/lang/String;)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient4
-  (JNIEnv* env, jclass, jint inst, jstring identity)
-{
-  if (!identity) {
-    nullPointerEx.Throw(env, "identity cannot be null");
-    return;
-  }
-  nt::StartClient4(inst, JStringRef{env, identity}.str());
+  nt::StartClient(inst, JStringRef{env, identity}.str());
 }
 
 /*

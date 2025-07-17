@@ -23,9 +23,9 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringTopic.h>
-#include <wpi/DataLog.h>
 #include <wpi/EventVector.h>
 #include <wpi/condition_variable.h>
+#include <wpi/datalog/DataLog.h>
 #include <wpi/json.h>
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
@@ -315,14 +315,14 @@ double DriverStation::GetStickAxis(int stick, int axis) {
   return axes.axes[axis];
 }
 
-int DriverStation::GetStickPOV(int stick, int pov) {
+DriverStation::POVDirection DriverStation::GetStickPOV(int stick, int pov) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
-    return -1;
+    return kCenter;
   }
   if (pov < 0 || pov >= HAL_kMaxJoystickPOVs) {
     FRC_ReportError(warn::BadJoystickAxis, "POV {} out of range", pov);
-    return -1;
+    return kCenter;
   }
 
   HAL_JoystickPOVs povs;
@@ -333,10 +333,10 @@ int DriverStation::GetStickPOV(int stick, int pov) {
         "Joystick POV {} missing (max {}), check if all controllers are "
         "plugged in",
         pov, povs.count);
-    return -1;
+    return kCenter;
   }
 
-  return povs.povs[pov];
+  return static_cast<POVDirection>(povs.povs[pov]);
 }
 
 int DriverStation::GetStickButtons(int stick) {
@@ -387,7 +387,7 @@ int DriverStation::GetStickButtonCount(int stick) {
   return buttons.count;
 }
 
-bool DriverStation::GetJoystickIsXbox(int stick) {
+bool DriverStation::GetJoystickIsGamepad(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
@@ -396,7 +396,7 @@ bool DriverStation::GetJoystickIsXbox(int stick) {
   HAL_JoystickDescriptor descriptor;
   HAL_GetJoystickDescriptor(stick, &descriptor);
 
-  return static_cast<bool>(descriptor.isXbox);
+  return static_cast<bool>(descriptor.isGamepad);
 }
 
 int DriverStation::GetJoystickType(int stick) {

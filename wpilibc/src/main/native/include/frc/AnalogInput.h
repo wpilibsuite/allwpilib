@@ -13,9 +13,6 @@
 
 namespace frc {
 
-class DMA;
-class DMASample;
-
 /**
  * Analog input class.
  *
@@ -30,16 +27,7 @@ class DMASample;
  */
 class AnalogInput : public wpi::Sendable,
                     public wpi::SendableHelper<AnalogInput> {
-  friend class AnalogTrigger;
-  friend class AnalogGyro;
-  friend class DMA;
-  friend class DMASample;
-
  public:
-  static constexpr int kAccumulatorModuleNumber = 1;
-  static constexpr int kAccumulatorNumChannels = 2;
-  static constexpr int kAccumulatorChannels[kAccumulatorNumChannels] = {0, 1};
-
   /**
    * Construct an analog input.
    *
@@ -56,7 +44,7 @@ class AnalogInput : public wpi::Sendable,
   /**
    * Get a sample straight from this channel.
    *
-   * The sample is a 12-bit value representing the 0V to 5V range of the A/D
+   * The sample is a 12-bit value representing the 0V to 3.3V range of the A/D
    * converter in the module.  The units are in A/D converter codes.  Use
    * GetVoltage() to get the analog value in calibrated units.
    *
@@ -183,81 +171,6 @@ class AnalogInput : public wpi::Sendable,
   int GetOffset() const;
 
   /**
-   * Is the channel attached to an accumulator.
-   *
-   * @return The analog input is attached to an accumulator.
-   */
-  bool IsAccumulatorChannel() const;
-
-  /**
-   * Initialize the accumulator.
-   */
-  void InitAccumulator();
-
-  /**
-   * Set an initial value for the accumulator.
-   *
-   * This will be added to all values returned to the user.
-   *
-   * @param value The value that the accumulator should start from when reset.
-   */
-  void SetAccumulatorInitialValue(int64_t value);
-
-  /**
-   * Resets the accumulator to the initial value.
-   */
-  void ResetAccumulator();
-
-  /**
-   * Set the center value of the accumulator.
-   *
-   * The center value is subtracted from each A/D value before it is added to
-   * the accumulator. This is used for the center value of devices like gyros
-   * and accelerometers to take the device offset into account when integrating.
-   *
-   * This center value is based on the output of the oversampled and averaged
-   * source from the accumulator channel. Because of this, any non-zero
-   * oversample bits will affect the size of the value for this field.
-   */
-  void SetAccumulatorCenter(int center);
-
-  /**
-   * Set the accumulator's deadband.
-   */
-  void SetAccumulatorDeadband(int deadband);
-
-  /**
-   * Read the accumulated value.
-   *
-   * Read the value that has been accumulating.
-   * The accumulator is attached after the oversample and average engine.
-   *
-   * @return The 64-bit value accumulated since the last Reset().
-   */
-  int64_t GetAccumulatorValue() const;
-
-  /**
-   * Read the number of accumulated values.
-   *
-   * Read the count of the accumulated values since the accumulator was last
-   * Reset().
-   *
-   * @return The number of times samples from the channel were accumulated.
-   */
-  int64_t GetAccumulatorCount() const;
-
-  /**
-   * Read the accumulated value and the number of accumulated values atomically.
-   *
-   * This function reads the value and count from the FPGA atomically.
-   * This can be used for averaging.
-   *
-   * @param value Reference to the 64-bit accumulated output.
-   * @param count Reference to the number of accumulation cycles.
-   */
-  void GetAccumulatorOutput(int64_t& value, int64_t& count) const;
-
-  /**
    * Set the sample rate per channel for all analog channels.
    *
    * The maximum rate is 500kS/s divided by the number of channels in use.
@@ -286,7 +199,6 @@ class AnalogInput : public wpi::Sendable,
  private:
   int m_channel;
   hal::Handle<HAL_AnalogInputHandle, HAL_FreeAnalogInputPort> m_port;
-  int64_t m_accumulatorOffset;
 };
 
 }  // namespace frc

@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/StringMap.h>
@@ -41,7 +41,7 @@ static Instance& GetInstance() {
   return *GetInstanceHolder();
 }
 
-#ifndef __FRC_ROBORIO__
+#ifndef __FRC_SYSTEMCORE__
 namespace frc::impl {
 void ResetSmartDashboardInstance() {
   std::make_unique<Instance>().swap(GetInstanceHolder());
@@ -77,8 +77,7 @@ bool SmartDashboard::IsPersistent(std::string_view key) {
 
 nt::NetworkTableEntry SmartDashboard::GetEntry(std::string_view key) {
   if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard,
-               HALUsageReporting::kSmartDashboard_Instance);
+    HAL_ReportUsage("SmartDashboard", "");
     gReported = true;
   }
   return GetInstance().table->GetEntry(key);
@@ -89,8 +88,7 @@ void SmartDashboard::PutData(std::string_view key, wpi::Sendable* data) {
     throw FRC_MakeError(err::NullParameter, "value");
   }
   if (!gReported) {
-    HAL_Report(HALUsageReporting::kResourceType_SmartDashboard,
-               HALUsageReporting::kSmartDashboard_Instance);
+    HAL_ReportUsage("SmartDashboard", "");
     gReported = true;
   }
   auto& inst = GetInstance();

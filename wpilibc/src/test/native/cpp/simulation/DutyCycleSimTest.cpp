@@ -15,14 +15,13 @@ namespace frc::sim {
 
 TEST(DutyCycleSimTest, Initialization) {
   HAL_Initialize(500, 0);
-  DutyCycleSim sim = DutyCycleSim::CreateForIndex(0);
+  DutyCycleSim sim = DutyCycleSim::CreateForChannel(2);
   EXPECT_FALSE(sim.GetInitialized());
 
   BooleanCallback callback;
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
 
-  DigitalInput di{2};
-  DutyCycle dc{&di};
+  DutyCycle dc{2};
   EXPECT_TRUE(sim.GetInitialized());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
@@ -36,16 +35,15 @@ TEST(DutyCycleSimTest, Initialization) {
 TEST(DutyCycleSimTest, SetFrequency) {
   HAL_Initialize(500, 0);
 
-  DigitalInput di{2};
-  DutyCycle dc{di};
+  DutyCycle dc{2};
   DutyCycleSim sim(dc);
 
-  IntCallback callback;
+  DoubleCallback callback;
   auto cb = sim.RegisterFrequencyCallback(callback.GetCallback(), false);
 
-  sim.SetFrequency(191);
-  EXPECT_EQ(191, sim.GetFrequency());
-  EXPECT_EQ(191, dc.GetFrequency());
+  sim.SetFrequency(191_Hz);
+  EXPECT_EQ(191_Hz, sim.GetFrequency());
+  EXPECT_EQ(191_Hz, dc.GetFrequency());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(191, callback.GetLastValue());
 }
@@ -53,8 +51,7 @@ TEST(DutyCycleSimTest, SetFrequency) {
 TEST(DutyCycleSimTest, SetOutput) {
   HAL_Initialize(500, 0);
 
-  DigitalInput di{2};
-  DutyCycle dc{di};
+  DutyCycle dc{2};
   DutyCycleSim sim(dc);
 
   DoubleCallback callback;

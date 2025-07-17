@@ -6,7 +6,6 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PWM;
 
@@ -38,11 +37,10 @@ public class {{ name }} extends PWMMotorController {
   public {{ name }}(final int channel) {
     super("{{ name }}", channel);
 
-    m_pwm.setBoundsMicroseconds({{ (pulse_width_ms.max * 1000) | int }}, {{ (pulse_width_ms.deadbandMax * 1000) | int }}, {{ (pulse_width_ms.center * 1000) | int }}, {{ (pulse_width_ms.deadbandMin * 1000) | int }}, {{ (pulse_width_ms.min * 1000) | int }});
-    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k{{ PeriodMultiplier | default("1", true)}}X);
-    m_pwm.setSpeed(0.0);
-    m_pwm.setZeroLatch();
+    setBoundsMicroseconds({{ (pulse_width_ms.max * 1000) | int }}, {{ (pulse_width_ms.deadbandMax * 1000) | int }}, {{ (pulse_width_ms.center * 1000) | int }}, {{ (pulse_width_ms.deadbandMin * 1000) | int }}, {{ (pulse_width_ms.min * 1000) | int }});
+    m_pwm.setOutputPeriod(PWM.OutputPeriod.k{{ OutputPeriod | default("5", true)}}Ms);
+    setSpeed(0.0);
 
-    HAL.report(tResourceType.kResourceType_{{ ResourceName }}, getChannel() + 1);
+    HAL.reportUsage("IO", getChannel(), "{{ ResourceName }}");
   }
 }

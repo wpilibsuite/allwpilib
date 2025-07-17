@@ -11,20 +11,12 @@ package edu.wpi.first.hal;
  */
 public class PortsJNI extends JNIWrapper {
   /**
-   * Gets the number of analog accumulators in the current system.
+   * Gets the number of can buses in the current system.
    *
-   * @return the number of analog accumulators
-   * @see "HAL_GetNumAccumulators"
+   * @return the number of can buses
+   * @see "HAL_GetNumCanBuses"
    */
-  public static native int getNumAccumulators();
-
-  /**
-   * Gets the number of analog triggers in the current system.
-   *
-   * @return the number of analog triggers
-   * @see "HAL_GetNumAnalogTriggers"
-   */
-  public static native int getNumAnalogTriggers();
+  public static native int getNumCanBuses();
 
   /**
    * Gets the number of analog inputs in the current system.
@@ -33,14 +25,6 @@ public class PortsJNI extends JNIWrapper {
    * @see "HAL_GetNumAnalogInputs"
    */
   public static native int getNumAnalogInputs();
-
-  /**
-   * Gets the number of analog outputs in the current system.
-   *
-   * @return the number of analog outputs
-   * @see "HAL_GetNumAnalogOutputs"
-   */
-  public static native int getNumAnalogOutputs();
 
   /**
    * Gets the number of counters in the current system.
@@ -105,22 +89,6 @@ public class PortsJNI extends JNIWrapper {
    * @see "HAL_GetNumInterrupts"
    */
   public static native int getNumInterrupts();
-
-  /**
-   * Gets the number of relay channels in the current system.
-   *
-   * @return the number of relay channels
-   * @see "HAL_GetNumRelayChannels"
-   */
-  public static native int getNumRelayChannels();
-
-  /**
-   * Gets the number of relay headers in the current system.
-   *
-   * @return the number of relay headers
-   * @see "HAL_GetNumRelayHeaders"
-   */
-  public static native int getNumRelayHeaders();
 
   /**
    * Gets the number of PCM modules in the current system.

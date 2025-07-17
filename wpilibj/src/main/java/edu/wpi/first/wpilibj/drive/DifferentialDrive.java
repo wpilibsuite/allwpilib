@@ -6,8 +6,6 @@ package edu.wpi.first.wpilibj.drive;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
@@ -127,7 +125,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
     instances++;
-    SendableRegistry.addLW(this, "DifferentialDrive", instances);
+    SendableRegistry.add(this, "DifferentialDrive", instances);
   }
 
   @Override
@@ -157,8 +155,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    */
   public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(
-          tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_DifferentialArcade, 2);
+      HAL.reportUsage("RobotDrive", "DifferentialArcade");
       m_reported = true;
     }
 
@@ -189,8 +186,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    */
   public void curvatureDrive(double xSpeed, double zRotation, boolean allowTurnInPlace) {
     if (!m_reported) {
-      HAL.report(
-          tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_DifferentialCurvature, 2);
+      HAL.reportUsage("RobotDrive", "DifferentialCurvature");
       m_reported = true;
     }
 
@@ -230,8 +226,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    */
   public void tankDrive(double leftSpeed, double rightSpeed, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(
-          tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_DifferentialTank, 2);
+      HAL.reportUsage("RobotDrive", "DifferentialTank");
       m_reported = true;
     }
 
@@ -367,7 +362,6 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("DifferentialDrive");
     builder.setActuator(true);
-    builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Left Motor Speed", () -> m_leftOutput, m_leftMotor);
     builder.addDoubleProperty("Right Motor Speed", () -> m_rightOutput, m_rightMotor);
   }

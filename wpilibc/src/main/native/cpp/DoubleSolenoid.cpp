@@ -6,8 +6,6 @@
 
 #include <utility>
 
-#include <hal/FRCUsageReporting.h>
-#include <hal/HALBase.h>
 #include <hal/Ports.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
@@ -18,9 +16,10 @@
 
 using namespace frc;
 
-DoubleSolenoid::DoubleSolenoid(int module, PneumaticsModuleType moduleType,
+DoubleSolenoid::DoubleSolenoid(int busId, int module,
+                               PneumaticsModuleType moduleType,
                                int forwardChannel, int reverseChannel)
-    : m_module{PneumaticsBase::GetForType(module, moduleType)},
+    : m_module{PneumaticsBase::GetForType(busId, module, moduleType)},
       m_forwardChannel{forwardChannel},
       m_reverseChannel{reverseChannel} {
   if (!m_module->CheckSolenoidChannel(m_forwardChannel)) {
@@ -50,19 +49,18 @@ DoubleSolenoid::DoubleSolenoid(int module, PneumaticsModuleType moduleType,
     }
   }
 
-  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_forwardChannel + 1,
-             m_module->GetModuleNumber() + 1);
-  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel + 1,
-             m_module->GetModuleNumber() + 1);
+  m_module->ReportUsage(
+      fmt::format("Solenoid[{},{}]", m_forwardChannel, m_reverseChannel),
+      "DoubleSolenoid");
 
-  wpi::SendableRegistry::AddLW(this, "DoubleSolenoid",
-                               m_module->GetModuleNumber(), m_forwardChannel);
+  wpi::SendableRegistry::Add(this, "DoubleSolenoid",
+                             m_module->GetModuleNumber(), m_forwardChannel);
 }
 
-DoubleSolenoid::DoubleSolenoid(PneumaticsModuleType moduleType,
+DoubleSolenoid::DoubleSolenoid(int busId, PneumaticsModuleType moduleType,
                                int forwardChannel, int reverseChannel)
-    : DoubleSolenoid{PneumaticsBase::GetDefaultForType(moduleType), moduleType,
-                     forwardChannel, reverseChannel} {}
+    : DoubleSolenoid{busId, PneumaticsBase::GetDefaultForType(moduleType),
+                     moduleType, forwardChannel, reverseChannel} {}
 
 DoubleSolenoid::~DoubleSolenoid() {
   if (m_module) {
@@ -129,7 +127,6 @@ bool DoubleSolenoid::IsRevSolenoidDisabled() const {
 void DoubleSolenoid::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Double Solenoid");
   builder.SetActuator(true);
-  builder.SetSafeState([=, this] { Set(kOff); });
   builder.AddSmallStringProperty(
       "Value",
       [=, this](wpi::SmallVectorImpl<char>& buf) -> std::string_view {

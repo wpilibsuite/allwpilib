@@ -8,7 +8,6 @@
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/AnalogAccumulator.h"
 #include "hal/handles/HandlesInternal.h"
 #include "mockdata/AnalogInDataInternal.h"
 
@@ -20,11 +19,9 @@ void InitializeAnalogInput() {}
 
 extern "C" {
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
-    HAL_PortHandle portHandle, const char* allocationLocation,
-    int32_t* status) {
+    int32_t channel, const char* allocationLocation, int32_t* status) {
   hal::init::CheckInit();
-  int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex || channel >= kNumAnalogInputs) {
+  if (channel < 0 || channel >= kNumAnalogInputs) {
     *status = RESOURCE_OUT_OF_RANGE;
     hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Input",
                                      0, kNumAnalogInputs, channel);
@@ -46,14 +43,9 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   }
 
   analog_port->channel = static_cast<uint8_t>(channel);
-  if (HAL_IsAccumulatorChannel(handle, status)) {
-    analog_port->isAccumulator = true;
-  } else {
-    analog_port->isAccumulator = false;
-  }
+  analog_port->isAccumulator = false;
 
   SimAnalogInData[channel].initialized = true;
-  SimAnalogInData[channel].accumulatorInitialized = false;
   SimAnalogInData[channel].simDevice = 0;
 
   analog_port->previousAllocation =
@@ -69,7 +61,6 @@ void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle) {
     return;
   }
   SimAnalogInData[port->channel].initialized = false;
-  SimAnalogInData[port->channel].accumulatorInitialized = false;
 }
 
 HAL_Bool HAL_CheckAnalogModule(int32_t module) {

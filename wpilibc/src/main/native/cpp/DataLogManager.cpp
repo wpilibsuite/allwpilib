@@ -13,13 +13,13 @@
 #include <vector>
 
 #include <fmt/chrono.h>
-#include <hal/FRCUsageReporting.h>
+#include <hal/UsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/DataLog.h>
-#include <wpi/DataLogBackgroundWriter.h>
-#include <wpi/FileLogger.h>
 #include <wpi/SafeThread.h>
 #include <wpi/StringExtras.h>
+#include <wpi/datalog/DataLog.h>
+#include <wpi/datalog/DataLogBackgroundWriter.h>
+#include <wpi/datalog/FileLogger.h>
 #include <wpi/fs.h>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
@@ -51,7 +51,7 @@ struct Thread final : public wpi::SafeThread {
   NT_DataLogger m_ntEntryLogger = 0;
   NT_ConnectionDataLogger m_ntConnLogger = 0;
   bool m_consoleLoggerEnabled = false;
-  wpi::FileLogger m_consoleLogger;
+  wpi::log::FileLogger m_consoleLogger;
   wpi::log::StringLogEntry m_messageLog;
 };
 
@@ -71,7 +71,7 @@ static std::string MakeLogDir(std::string_view dir) {
   if (!dir.empty()) {
     return std::string{dir};
   }
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
   // prefer a mounted USB drive if one is accessible
   std::error_code ec;
   auto s = fs::status("/u", ec);
@@ -79,18 +79,11 @@ static std::string MakeLogDir(std::string_view dir) {
       (s.permissions() & fs::perms::others_write) != fs::perms::none) {
     fs::create_directory("/u/logs", ec);
     return "/u/logs";
-    HAL_Report(HALUsageReporting::kResourceType_DataLogManager,
-               HALUsageReporting::kDataLogLocation_USB);
+    HAL_ReportUsage("DataLogManager", "USB");
   }
-  if (RobotBase::GetRuntimeType() == kRoboRIO) {
-    FRC_ReportWarning(
-        "DataLogManager: Logging to RoboRIO 1 internal storage is "
-        "not recommended! Plug in a FAT32 formatted flash drive!");
-  }
-  fs::create_directory("/home/lvuser/logs", ec);
-  HAL_Report(HALUsageReporting::kResourceType_DataLogManager,
-             HALUsageReporting::kDataLogLocation_Onboard);
-  return "/home/lvuser/logs";
+  fs::create_directory("/home/systemcore/logs", ec);
+  HAL_ReportUsage("DataLogManager", "Onboard");
+  return "/home/systemcore/logs";
 #else
   std::string logDir = filesystem::GetOperatingDirectory() + "/logs";
   std::error_code ec;
@@ -314,7 +307,8 @@ void Thread::StopNTLog() {
 void Thread::StartConsoleLog() {
   if (!m_consoleLoggerEnabled && RobotBase::IsReal()) {
     m_consoleLoggerEnabled = true;
-    m_consoleLogger = {"/home/lvuser/FRC_UserProgram.log", m_log, "console"};
+    m_consoleLogger = {"/home/systemcore/FRC_UserProgram.log", m_log,
+                       "console"};
   }
 }
 

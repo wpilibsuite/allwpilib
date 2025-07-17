@@ -5,7 +5,6 @@
 package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -109,9 +108,9 @@ public class PIDController implements Sendable, AutoCloseable {
     m_period = period;
 
     instances++;
-    SendableRegistry.addLW(this, "PIDController", instances);
+    SendableRegistry.add(this, "PIDController", instances);
 
-    MathSharedStore.reportUsage(MathUsageId.kController_PIDController2, instances);
+    MathSharedStore.reportUsage("PIDController", String.valueOf(instances));
   }
 
   @Override

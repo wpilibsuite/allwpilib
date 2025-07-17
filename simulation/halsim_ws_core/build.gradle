@@ -1,4 +1,4 @@
-if (project.hasProperty('onlylinuxathena')) {
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore')) {
     return;
 }
 
@@ -41,6 +41,7 @@ model {
             }
             binaries.all {
                 project(':hal').addHalDependency(it, 'shared')
+                project(':ntcore').addNtcoreDependency(it, 'shared')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
@@ -49,7 +50,7 @@ model {
     }
     binaries {
         all {
-            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                 it.buildable = false
                 return
             }
