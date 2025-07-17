@@ -52,9 +52,9 @@ class PotentiometerPIDTest : public testing::Test {
     m_elevatorSim.Update(20_ms);
 
     /*
-    meters = (v / 5v) * range
-    meters / range = v / 5v
-    5v * (meters / range) = v
+    meters = (v / 3.3v) * range
+    meters / range = v / 3.3v
+    3.3v * (meters / range) = v
      */
     m_analogSim.SetVoltage(
         (frc::RobotController::GetVoltage3V3() *

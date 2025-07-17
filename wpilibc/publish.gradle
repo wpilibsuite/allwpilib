@@ -21,6 +21,9 @@ task cppSourcesZip(type: Zip) {
     from("$buildDir/generated/cpp") {
         into '/'
     }
+    from("src/generated/main/native/cpp") {
+        into '/'
+    }
 }
 
 cppSourcesZip.dependsOn generateCppVersion

@@ -81,7 +81,7 @@ class AnalogPotentiometerTest {
       RoboRioSim.resetData();
       AnalogInputSim sim = new AnalogInputSim(1);
 
-      // Test at 5v
+      // Test at 3.3v
       sim.setVoltage(3.3);
       assertEquals(270, pot.get());
 

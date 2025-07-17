@@ -39,6 +39,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "stb"
     url = "https://github.com/nothings/stb.git"
+    # master on 2021-04-01
     tag = "c9064e317699d2e495f36ba4f9ac037e88ee371a"
 
     stb = Lib(name, url, tag, copy_upstream_src)

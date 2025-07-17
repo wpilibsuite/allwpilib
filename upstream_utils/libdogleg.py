@@ -48,6 +48,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "libdogleg"
     url = "https://github.com/dkogan/libdogleg"
+    # master on 2024-06-22
     tag = "c971ea43088d286a3683c1039b9a85f761f7df15"
 
     libdogleg = Lib(name, url, tag, copy_upstream_src)

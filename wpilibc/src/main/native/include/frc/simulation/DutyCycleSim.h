@@ -6,6 +6,8 @@
 
 #include <memory>
 
+#include <units/frequency.h>
+
 #include "frc/simulation/CallbackStore.h"
 
 namespace frc {
@@ -27,22 +29,12 @@ class DutyCycleSim {
   explicit DutyCycleSim(const DutyCycle& dutyCycle);
 
   /**
-   * Creates a DutyCycleSim for a digital input channel.
+   * Creates a DutyCycleSim for a SmartIO channel.
    *
-   * @param channel digital input channel
+   * @param channel SmartIO channel
    * @return Simulated object
-   * @throws std::out_of_range if no DutyCycle is configured for that channel
    */
   static DutyCycleSim CreateForChannel(int channel);
-
-  /**
-   * Creates a DutyCycleSim for a simulated index.
-   * The index is incremented for each simulated DutyCycle.
-   *
-   * @param index simulator index
-   * @return Simulated object
-   */
-  static DutyCycleSim CreateForIndex(int index);
 
   /**
    * Register a callback to be run when this duty cycle input is initialized.
@@ -85,14 +77,14 @@ class DutyCycleSim {
    *
    * @return the duty cycle frequency
    */
-  int GetFrequency() const;
+  units::hertz_t GetFrequency() const;
 
   /**
    * Change the duty cycle frequency.
    *
    * @param frequency the new frequency
    */
-  void SetFrequency(int frequency);
+  void SetFrequency(units::hertz_t frequency);
 
   /**
    * Register a callback to be run whenever the output changes.

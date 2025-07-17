@@ -207,7 +207,7 @@ class TriggerTest extends CommandTestBase {
             .until(button);
 
     button.setPressed(false);
-    command1.schedule();
+    scheduler.schedule(command1);
     scheduler.run();
     assertEquals(1, startCounter.get());
     assertEquals(0, endCounter.get());
@@ -258,13 +258,13 @@ class TriggerTest extends CommandTestBase {
 
     button.setPressed(true);
     scheduler.run();
-    verify(command, never()).schedule();
+    verify(command, never()).initialize();
 
     SimHooks.stepTiming(0.3);
 
     button.setPressed(true);
     scheduler.run();
-    verify(command).schedule();
+    verify(command).initialize();
   }
 
   @Test

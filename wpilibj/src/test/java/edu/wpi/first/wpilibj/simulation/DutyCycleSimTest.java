@@ -12,13 +12,12 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
-import edu.wpi.first.wpilibj.simulation.testutils.IntCallback;
 import org.junit.jupiter.api.Test;
 
 class DutyCycleSimTest {
   @Test
   void testInitialization() {
-    DutyCycleSim sim = DutyCycleSim.createForIndex(0);
+    DutyCycleSim sim = DutyCycleSim.createForChannel(2);
     assertFalse(sim.getInitialized());
 
     BooleanCallback callback = new BooleanCallback();
@@ -36,7 +35,7 @@ class DutyCycleSimTest {
     HAL.initialize(500, 0);
 
     try (DutyCycle dc = new DutyCycle(2)) {
-      IntCallback callback = new IntCallback();
+      DoubleCallback callback = new DoubleCallback();
       DutyCycleSim sim = new DutyCycleSim(dc);
       try (CallbackStore cb = sim.registerFrequencyCallback(callback, false)) {
         sim.setFrequency(191);

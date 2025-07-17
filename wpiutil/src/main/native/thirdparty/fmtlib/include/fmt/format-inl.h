@@ -22,7 +22,7 @@
 
 #include "format.h"
 
-#if FMT_USE_LOCALE
+#if FMT_USE_LOCALE && !defined(FMT_MODULE)
 #  include <locale>
 #endif
 
@@ -212,7 +212,7 @@ inline auto floor_log10_pow2_minus_log10_4_over_3(int e) noexcept -> int {
   return (e * 631305 - 261663) >> 21;
 }
 
-FMT_INLINE_VARIABLE constexpr struct {
+FMT_INLINE_VARIABLE constexpr struct div_small_pow10_infos_struct {
   uint32_t divisor;
   int shift_amount;
 } div_small_pow10_infos[] = {{10, 16}, {100, 16}};
@@ -275,7 +275,7 @@ template <> struct cache_accessor<float> {
   static auto get_cached_power(int k) noexcept -> uint64_t {
     FMT_ASSERT(k >= float_info<float>::min_k && k <= float_info<float>::max_k,
                "k is out of range");
-    static constexpr const uint64_t pow10_significands[] = {
+    static constexpr uint64_t pow10_significands[] = {
         0x81ceb32c4b43fcf5, 0xa2425ff75e14fc32, 0xcad2f7f5359a3b3f,
         0xfd87b5f28300ca0e, 0x9e74d1b791e07e49, 0xc612062576589ddb,
         0xf79687aed3eec552, 0x9abe14cd44753b53, 0xc16d9a0095928a28,
@@ -370,7 +370,7 @@ template <> struct cache_accessor<double> {
     FMT_ASSERT(k >= float_info<double>::min_k && k <= float_info<double>::max_k,
                "k is out of range");
 
-    static constexpr const uint128_fallback pow10_significands[] = {
+    static constexpr uint128_fallback pow10_significands[] = {
 #if FMT_USE_FULL_CACHE_DRAGONBOX
       {0xff77b1fcbebcdc4f, 0x25e8e89c13bb0f7b},
       {0x9faacf3df73609b1, 0x77b191618c54e9ad},
@@ -1037,7 +1037,7 @@ template <> struct cache_accessor<double> {
 #if FMT_USE_FULL_CACHE_DRAGONBOX
     return pow10_significands[k - float_info<double>::min_k];
 #else
-    static constexpr const uint64_t powers_of_5_64[] = {
+    static constexpr uint64_t powers_of_5_64[] = {
         0x0000000000000001, 0x0000000000000005, 0x0000000000000019,
         0x000000000000007d, 0x0000000000000271, 0x0000000000000c35,
         0x0000000000003d09, 0x000000000001312d, 0x000000000005f5e1,
@@ -1097,7 +1097,7 @@ template <> struct cache_accessor<double> {
     return {r.high(), r.low() == 0};
   }
 
-  static auto compute_delta(cache_entry_type const& cache, int beta) noexcept
+  static auto compute_delta(const cache_entry_type& cache, int beta) noexcept
       -> uint32_t {
     return static_cast<uint32_t>(cache.high() >> (64 - 1 - beta));
   }
@@ -1526,9 +1526,8 @@ template <typename F> class glibc_file : public file_base<F> {
   }
 
   void init_buffer() {
-    if (this->file_->_IO_write_ptr) return;
+    if (this->file_->_IO_write_ptr < this->file_->_IO_write_end) return;
     // Force buffer initialization by placing and removing a char in a buffer.
-    assume(this->file_->_IO_write_ptr >= this->file_->_IO_write_end);
     putc_unlocked(0, this->file_);
     --this->file_->_IO_write_ptr;
   }
@@ -1550,7 +1549,8 @@ template <typename F> class glibc_file : public file_base<F> {
   bool needs_flush() const {
     if ((this->file_->_flags & line_buffered) == 0) return false;
     char* end = this->file_->_IO_write_end;
-    return memchr(end, '\n', to_unsigned(this->file_->_IO_write_ptr - end));
+    auto size = max_of<ptrdiff_t>(this->file_->_IO_write_ptr - end, 0);
+    return memchr(end, '\n', static_cast<size_t>(size));
   }
 
   void flush() { fflush_unlocked(this->file_); }

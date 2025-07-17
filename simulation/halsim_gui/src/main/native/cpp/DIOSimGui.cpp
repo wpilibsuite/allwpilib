@@ -187,7 +187,7 @@ void DIOsSimModel::Update() {
     auto& model = m_dutyCycleModels[i];
     if (HALSIM_GetDutyCycleInitialized(i)) {
       if (!model) {
-        int channel = HALSIM_GetDutyCycleDigitalChannel(i);
+        int channel = i;
         if (channel >= 0 && channel < numDIO && m_dioModels[channel]) {
           model = std::make_unique<DutyCycleSimModel>(i);
           m_dioModels[channel]->SetDutyCycle(model.get());

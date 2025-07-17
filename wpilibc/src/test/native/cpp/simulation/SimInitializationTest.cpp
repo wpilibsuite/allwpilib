@@ -35,7 +35,7 @@ TEST(SimInitializationTest, AllInitialize) {
   PWMSim pwmsim{0};
   RoboRioSim rrsim;
   (void)rrsim;
-  DutyCycleSim dcsim = DutyCycleSim::CreateForIndex(0);
+  DutyCycleSim dcsim = DutyCycleSim::CreateForChannel(0);
   (void)dcsim;
   AddressableLEDSim adLED;
 }
