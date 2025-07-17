@@ -4,11 +4,8 @@
 
 #include "fieldcalibration.h"
 
-#include <algorithm>
 #include <filesystem>
-#include <fstream>
 #include <functional>
-#include <iostream>
 #include <map>
 #include <string>
 #include <utility>
@@ -96,9 +93,9 @@ class PoseGraphError {
 
 const double tagSizeMeters = 0.1651;
 
-inline Eigen::Matrix4d EstimateTagPose(
-    std::span<double, 8> tagCorners,
-    const cameracalibration::CameraModel& cameraModel, double tagSize) {
+inline Eigen::Matrix4d EstimateTagPose(std::span<double, 8> tagCorners,
+                                       const wpical::CameraModel& cameraModel,
+                                       double tagSize) {
   cv::Mat cameraMatrix;
   cv::Mat cameraDistortion;
 
@@ -138,7 +135,7 @@ inline Eigen::Matrix4d EstimateTagPose(
 }
 
 inline void DrawTagCube(cv::Mat& frame, Eigen::Matrix4d cameraToTag,
-                        const cameracalibration::CameraModel& cameraModel,
+                        const wpical::CameraModel& cameraModel,
                         double tagSize) {
   cv::Mat cameraMatrix;
   cv::Mat cameraDistortion;
@@ -196,9 +193,8 @@ inline void DrawTagCube(cv::Mat& frame, Eigen::Matrix4d cameraToTag,
 }
 
 inline bool ProcessVideoFile(
-    frc::AprilTagDetector& detector,
-    const cameracalibration::CameraModel& cameraModel, double tagSize,
-    const std::string& path,
+    frc::AprilTagDetector& detector, const wpical::CameraModel& cameraModel,
+    double tagSize, const std::string& path,
     std::map<int, Pose, std::less<int>,
              Eigen::aligned_allocator<std::pair<const int, Pose>>>& poses,
     std::vector<Constraint, Eigen::aligned_allocator<Constraint>>& constraints,
@@ -209,7 +205,6 @@ inline bool ProcessVideoFile(
   cv::VideoCapture videoInput(path);
 
   if (!videoInput.isOpened()) {
-    std::cout << "Unable to open video " << path << std::endl;
     return false;
   }
 
@@ -217,12 +212,7 @@ inline bool ProcessVideoFile(
   cv::Mat frameGray;
   cv::Mat frameDebug;
 
-  int frameNum = 0;
-
   while (videoInput.read(frame)) {
-    std::cout << "Processing " << path << " - Frame " << frameNum++
-              << std::endl;
-
     // Convert color frame to grayscale frame
     cv::cvtColor(frame, frameGray, cv::COLOR_BGR2GRAY);
 
@@ -233,7 +223,6 @@ inline bool ProcessVideoFile(
 
     // Skip this loop if there are no tags detected
     if (results.empty()) {
-      std::cout << "No tags detected" << std::endl;
       continue;
     }
 
@@ -309,8 +298,14 @@ inline bool ProcessVideoFile(
   return true;
 }
 
-std::optional<frc::AprilTagFieldLayout> fieldcalibration::calibrate(
-    std::string inputDirPath, cameracalibration::CameraModel& cameraModel,
+wpical::FieldCalibrator::~FieldCalibrator() {
+  if (m_processingThread.joinable()) {
+    m_processingThread.detach();
+  }
+}
+
+std::optional<frc::AprilTagFieldLayout> wpical::calibrate(
+    std::string inputDirPath, wpical::CameraModel& cameraModel,
     const frc::AprilTagFieldLayout& idealLayout, int pinnedTagId,
     bool showDebugWindow) {
   // Silence OpenCV logging
@@ -345,14 +340,9 @@ std::optional<frc::AprilTagFieldLayout> fieldcalibration::calibrate(
     if (entry.path().filename().string()[0] == '.') {
       continue;
     }
-
-    const std::string path = entry.path().string();
-
-    bool success = ProcessVideoFile(detector, cameraModel, tagSizeMeters, path,
-                                    poses, constraints, showDebugWindow);
-
-    if (!success) {
-      std::cout << "Unable to process video " << path << std::endl;
+    if (!ProcessVideoFile(detector, cameraModel, tagSizeMeters,
+                          entry.path().string(), poses, constraints,
+                          showDebugWindow)) {
       return std::nullopt;
     }
   }
@@ -394,8 +384,6 @@ std::optional<frc::AprilTagFieldLayout> fieldcalibration::calibrate(
 
   ceres::Solver::Summary summary;
   ceres::Solve(options, &problem, &summary);
-
-  std::cout << summary.BriefReport() << std::endl;
 
   Eigen::Matrix4d correctionA;
   correctionA << 0, 0, -1, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1;
