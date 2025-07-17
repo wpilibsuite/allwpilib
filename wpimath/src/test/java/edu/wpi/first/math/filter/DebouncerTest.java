@@ -75,7 +75,7 @@ class DebouncerTest {
     var debouncer = new Debouncer(1.0, Debouncer.DebounceType.kFalling);
 
     assertTrue(debouncer.calculate(false));
-    
+
     debouncer.reset();
 
     assertFalse(debouncer.calculate(false));
