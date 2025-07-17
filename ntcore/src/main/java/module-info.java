@@ -8,6 +8,7 @@
  */
 open module wpilib.ntcore {
   requires wpilib.util;
+  requires transitive wpilib.datalog; // Part of the public API
 
   exports edu.wpi.first.networktables;
 }

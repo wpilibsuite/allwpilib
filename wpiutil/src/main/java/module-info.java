@@ -15,7 +15,6 @@ open module wpilib.util {
   exports edu.wpi.first.util;
   exports edu.wpi.first.util.cleanup;
   exports edu.wpi.first.util.concurrent;
-  exports edu.wpi.first.util.datalog;
   exports edu.wpi.first.util.function;
   exports edu.wpi.first.util.protobuf;
   exports edu.wpi.first.util.sendable;
