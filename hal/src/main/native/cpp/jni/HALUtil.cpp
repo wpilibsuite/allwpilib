@@ -35,6 +35,8 @@ static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_ROBORIO2 ==
               HAL_Runtime_RoboRIO2);
 static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_SIMULATION ==
               HAL_Runtime_Simulation);
+static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_SYSTEMCORE ==
+              HAL_Runtime_SystemCore);
 
 static JavaVM* jvm = nullptr;
 static JException illegalArgExCls;
@@ -233,13 +235,13 @@ jbyteArray SetCANReceiveMessageObject(JNIEnv* env, jobject canData,
 }
 
 jbyteArray SetCANStreamObject(JNIEnv* env, jobject canStreamData,
-                              int32_t length, uint32_t messageId,
+                              int32_t length, int32_t flags, uint32_t messageId,
                               uint64_t timestamp) {
   static jmethodID func =
-      env->GetMethodID(canStreamMessageCls, "setStreamData", "(IIJ)[B");
+      env->GetMethodID(canStreamMessageCls, "setStreamData", "(IIIJ)[B");
 
   jbyteArray retVal = static_cast<jbyteArray>(env->CallObjectMethod(
-      canStreamData, func, static_cast<jint>(length),
+      canStreamData, func, static_cast<jint>(length), static_cast<jint>(flags),
       static_cast<jint>(messageId), static_cast<jlong>(timestamp)));
   return retVal;
 }

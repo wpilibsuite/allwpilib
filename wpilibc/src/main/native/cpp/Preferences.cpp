@@ -41,7 +41,7 @@ static Instance& GetInstance() {
   return instance;
 }
 
-#ifndef __FRC_ROBORIO__
+#ifndef __FRC_SYSTEMCORE__
 namespace frc::impl {
 void ResetPreferencesInstance() {
   GetInstance() = Instance();

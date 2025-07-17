@@ -38,7 +38,7 @@ class AnalogPotentiometer : public wpi::Sendable,
    *                  potentiometer is plugged into. 0-3 are on-board and 4-7
    *                  are on the MXP port.
    * @param fullRange The value (in desired units) representing the full
-   *                  0-5V range of the input.
+   *                  0-3.3V range of the input.
    * @param offset    The value (in desired units) representing the
    *                  angular output at 0V.
    */
@@ -60,7 +60,7 @@ class AnalogPotentiometer : public wpi::Sendable,
    *
    * @param input     The existing Analog Input pointer
    * @param fullRange The value (in desired units) representing the full
-   *                  0-5V range of the input.
+   *                  0-3.3V range of the input.
    * @param offset    The value (in desired units) representing the
    *                  angular output at 0V.
    */
@@ -82,7 +82,7 @@ class AnalogPotentiometer : public wpi::Sendable,
    *
    * @param input     The existing Analog Input pointer
    * @param fullRange The value (in desired units) representing the full
-   *                  0-5V range of the input.
+   *                  0-3.3V range of the input.
    * @param offset    The value (in desired units) representing the
    *                  angular output at 0V.
    */

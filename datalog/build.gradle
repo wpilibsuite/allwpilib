@@ -27,6 +27,50 @@ model {
     }
 }
 
+def examplesMap = [:];
+file("$projectDir/examples").list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        }).each {
+            examplesMap.put(it, [])
+        }
+
+model {
+    components {
+        examplesMap.each { key, value ->
+            "${key}"(NativeExecutableSpec) {
+                targetBuildTypes 'debug'
+                binaries.all {
+                    lib library: 'datalog', linkage: 'shared'
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'examples/' + "${key}"
+                            include '**/*.cpp'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+sourceSets {
+    printlog
+}
+
+task runPrintLog(type: JavaExec) {
+    classpath = sourceSets.printlog.runtimeClasspath
+
+    mainClass = 'printlog.PrintLog'
+}
+
 dependencies {
     api project(":wpiutil")
+
+    printlogImplementation sourceSets.main.output
 }

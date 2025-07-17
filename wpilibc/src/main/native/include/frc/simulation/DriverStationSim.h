@@ -286,9 +286,10 @@ class DriverStationSim {
    *
    * @param stick The joystick number
    * @param pov The POV number
-   * @param value the angle of the POV in degrees, or -1 for not pressed
+   * @param value the angle of the POV
    */
-  static void SetJoystickPOV(int stick, int pov, int value);
+  static void SetJoystickPOV(int stick, int pov,
+                             DriverStation::POVDirection value);
 
   /**
    * Sets the state of all the buttons on a joystick.
@@ -323,12 +324,12 @@ class DriverStationSim {
   static void SetJoystickButtonCount(int stick, int count);
 
   /**
-   * Sets the value of isXbox for a joystick.
+   * Sets the value of isGamepad for a joystick.
    *
    * @param stick The joystick number
-   * @param isXbox The value of isXbox
+   * @param isGamepad The value of isGamepad
    */
-  static void SetJoystickIsXbox(int stick, bool isXbox);
+  static void SetJoystickIsGamepad(int stick, bool isGamepad);
 
   /**
    * Sets the value of type for a joystick.

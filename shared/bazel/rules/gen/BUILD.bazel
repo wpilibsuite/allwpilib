@@ -3,6 +3,9 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "gen_resources",
     srcs = ["gen_resources.py"],
-    tags = ["manual"],
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
 )

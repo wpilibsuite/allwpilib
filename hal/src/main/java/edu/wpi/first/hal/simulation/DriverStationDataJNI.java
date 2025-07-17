@@ -79,7 +79,7 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setJoystickAxes(byte joystickNum, float[] axesArray);
 
-  public static native void setJoystickPOVs(byte joystickNum, short[] povsArray);
+  public static native void setJoystickPOVs(byte joystickNum, byte[] povsArray);
 
   public static native void setJoystickButtons(byte joystickNum, int buttons, int count);
 
@@ -106,7 +106,7 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setJoystickAxis(int stick, int axis, double value);
 
-  public static native void setJoystickPOV(int stick, int pov, int value);
+  public static native void setJoystickPOV(int stick, int pov, byte value);
 
   public static native void setJoystickButtonsValue(int stick, int buttons);
 
@@ -116,7 +116,7 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setJoystickButtonCount(int stick, int count);
 
-  public static native void setJoystickIsXbox(int stick, boolean isXbox);
+  public static native void setJoystickIsGamepad(int stick, boolean isGamepad);
 
   public static native void setJoystickType(int stick, int type);
 

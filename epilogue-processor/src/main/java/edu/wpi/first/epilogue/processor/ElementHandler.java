@@ -13,7 +13,9 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
 
 /**
  * Handles logging of fields or methods. An element that passes the {@link #isLoggable(Element)}
@@ -126,11 +128,15 @@ public abstract class ElementHandler {
   }
 
   private static String fieldAccess(VariableElement field) {
-    if (field.getModifiers().contains(Modifier.PRIVATE)) {
+    if (!field.getModifiers().contains(Modifier.PUBLIC)) {
       // ((com.example.Foo) $fooField.get(object))
       // Extra parentheses so cast evaluates before appended methods
       // (e.g. when appending .getAsDouble())
-      return "((" + field.asType() + ") $" + field.getSimpleName() + ".get(object))";
+      TypeMirror type = field.asType();
+      if (type.getKind() == TypeKind.TYPEVAR) {
+        type = ((TypeVariable) type).getUpperBound();
+      }
+      return "((" + type.toString() + ") $" + field.getSimpleName() + ".get(object))";
     } else {
       // object.fooField
       return "object." + field.getSimpleName();

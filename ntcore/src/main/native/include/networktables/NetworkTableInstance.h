@@ -603,8 +603,9 @@ class NetworkTableInstance final {
    *
    * @param persist_filename  the name of the persist file to use (UTF-8 string,
    *                          null terminated)
-   * @param listen_address    the address to listen on, or null to listen on any
-   *                          address (UTF-8 string, null terminated)
+   * @param listen_address    the address to listen on, or an empty string to
+   *                          listen on any address. (UTF-8 string, null
+   *                          terminated)
    * @param port              port to communicate over
    */
   void StartServer(std::string_view persist_filename = "networktables.json",

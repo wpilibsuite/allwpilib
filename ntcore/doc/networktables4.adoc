@@ -163,6 +163,11 @@ Clients may publish a value at any time following clock synchronization.  Client
 
 Clients should subscribe to the `$sub$<topic>` meta topic for each topic published and use this metadata to determine how frequently to send updates to the network. However, this is not required--clients may choose to ignore this and send updates at any time.
 
+[[ids]]
+=== IDs and UIDs
+
+IDs and UIDs should be selected by clients and servers to be as small as possible for transmission efficiency.  Clients and servers should support a signed 32-bit range for IDs and UIDs, but exceptions can be made for implementation reasons.  Clients and servers must ignore messages with unsupported IDs and UIDs, and should report a diagnostic if this occurs.
+
 [[meta-topics]]
 === Server-Published Meta Topics
 

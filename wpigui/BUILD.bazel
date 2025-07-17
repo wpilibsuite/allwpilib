@@ -1,0 +1,82 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
+
+WIN_SRCS = glob(["src/main/native/directx11/**/*.cpp"])
+
+LINUX_SRCS = glob(["src/main/native/opengl3/**/*.cpp"])
+
+MAC_SRCS = glob(["src/main/native/metal/**/*.mm"])
+
+cc_library(
+    name = "headers",
+    hdrs = glob(["src/main/native/include/**/*"]),
+    strip_include_prefix = "src/main/native/include",
+)
+
+wpilib_objc_library(
+    name = "wpigui-mac",
+    srcs = MAC_SRCS,
+    sdk_frameworks = [
+        "Metal",
+        "MetalKit",
+        "Cocoa",
+        "IOKit",
+        "CoreFoundation",
+        "CoreVideo",
+        "QuartzCore",
+    ],
+    deps = [
+        ":headers",
+        "//thirdparty/imgui_suite",
+    ],
+)
+
+pkg_files(
+    name = "native-pkg",
+    srcs = glob([
+        "src/main/native/directx11/**",
+        "src/main/native/opengl3/**",
+        "src/main/native/metal/**",
+    ]),
+)
+
+wpilib_cc_library(
+    name = "wpigui",
+    srcs = glob(["src/main/native/cpp/**/*.cpp"]) +
+           select({
+               "@bazel_tools//src/conditions:darwin": [],
+               "@bazel_tools//src/conditions:windows": WIN_SRCS,
+               "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_SRCS,
+           }),
+    extra_src_pkg_files = [":native-pkg"],
+    include_license_files = True,
+    strip_include_prefix = "include",
+    tags = [
+        "wpi-cpp-gui",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":headers",
+        "//thirdparty/imgui_suite",
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": [":wpigui-mac"],
+        "//conditions:default": [],
+    }),
+)
+
+wpilib_cc_static_library(
+    name = "static/wpigui",
+    static_deps = [
+        "//thirdparty/imgui_suite:static/imguiSuite",
+    ],
+    static_lib_name = select({
+        "@bazel_tools//src/conditions:windows": "static/wpigui.lib",
+        "//conditions:default": "static/libwpigui.a",
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpigui",
+    ],
+)

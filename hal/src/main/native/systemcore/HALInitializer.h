@@ -32,6 +32,7 @@ extern void InitializeEncoder();
 extern void InitializeFRCDriverStation();
 extern void InitializeHAL();
 extern void InitializeI2C();
+extern void InitializeIMU();
 extern void InitializeMain();
 extern void InitializeNotifier();
 extern void InitializeCTREPDP();

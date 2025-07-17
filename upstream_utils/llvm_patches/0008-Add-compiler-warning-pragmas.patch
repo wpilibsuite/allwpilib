@@ -1,23 +1,22 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:34:07 -0400
-Subject: [PATCH 08/37] Add compiler warning pragmas
+Subject: [PATCH 08/36] Add compiler warning pragmas
 
 ---
- llvm/include/llvm/ADT/FunctionExtras.h | 11 +++++++++++
- llvm/include/llvm/ADT/Hashing.h        |  9 +++++++++
- llvm/include/llvm/ADT/SmallVector.h    |  8 ++++++++
- llvm/include/llvm/Support/MathExtras.h |  9 +++++++++
- llvm/include/llvm/Support/MemAlloc.h   | 13 +++++++++++++
- llvm/lib/Support/raw_ostream.cpp       |  4 ++++
- llvm/unittests/ADT/DenseMapTest.cpp    |  4 ++++
- llvm/unittests/ADT/MapVectorTest.cpp   |  7 +++++++
- llvm/unittests/ADT/SmallVectorTest.cpp |  4 ++++
- llvm/unittests/Support/AlignOfTest.cpp |  7 +++----
- 10 files changed, 72 insertions(+), 4 deletions(-)
+ llvm/include/llvm/ADT/FunctionExtras.h    | 11 +++++++++++
+ llvm/include/llvm/ADT/SmallVector.h       |  8 ++++++++
+ llvm/include/llvm/Support/MathExtras.h    |  9 +++++++++
+ llvm/include/llvm/Support/MemAlloc.h      | 13 +++++++++++++
+ llvm/lib/Support/raw_ostream.cpp          |  4 ++++
+ llvm/unittests/ADT/DenseMapTest.cpp       |  4 ++++
+ llvm/unittests/ADT/FunctionExtrasTest.cpp |  6 ++++++
+ llvm/unittests/ADT/SmallVectorTest.cpp    |  4 ++++
+ llvm/unittests/Support/AlignOfTest.cpp    |  7 +++----
+ 9 files changed, 62 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 3ce85530b718666afa1dafbf60699c1add423ea6..da61b606eb44bdbdeb4674c9c7eab9f691124f9c 100644
+index df7fe3e19462ebecd30f7a9d006027c75751de5b..28a9ba756a4075987fbee28c6ed6387e99dfd14b 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
 @@ -56,6 +56,13 @@ namespace llvm {
@@ -34,7 +33,7 @@ index 3ce85530b718666afa1dafbf60699c1add423ea6..da61b606eb44bdbdeb4674c9c7eab9f6
  namespace detail {
  
  template <typename T>
-@@ -411,6 +418,10 @@ public:
+@@ -414,6 +421,10 @@ public:
    }
  };
  
@@ -45,33 +44,8 @@ index 3ce85530b718666afa1dafbf60699c1add423ea6..da61b606eb44bdbdeb4674c9c7eab9f6
  } // end namespace llvm
  
  #endif // LLVM_ADT_FUNCTIONEXTRAS_H
-diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index 109966257b51c015754f6410aec5fa9b8de435ae..a33c6eec308c8722f88b09f73f954d39558c3d62 100644
---- a/llvm/include/llvm/ADT/Hashing.h
-+++ b/llvm/include/llvm/ADT/Hashing.h
-@@ -57,6 +57,11 @@
- #include <tuple>
- #include <utility>
- 
-+#ifdef _WIN32
-+#pragma warning(push)
-+#pragma warning(disable : 26495)
-+#endif
-+
- namespace llvm {
- template <typename T, typename Enable> struct DenseMapInfo;
- 
-@@ -677,4 +682,8 @@ struct hash<llvm::hash_code> {
- 
- } // namespace std;
- 
-+#ifdef _WIN32
-+#pragma warning(pop)
-+#endif
-+
- #endif
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 85bf5172e419b1b58f53d3cf00d4aabb58877c33..ec340afd4519f4070389434006bf7f2afdbf2993 100644
+index 2232b741d5359a129adb0e5b3f0f70110c38e90d..3cab284f5b6105956d6fff49a27d37482a3c321d 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -14,6 +14,14 @@
@@ -87,13 +61,13 @@ index 85bf5172e419b1b58f53d3cf00d4aabb58877c33..ec340afd4519f4070389434006bf7f2a
 +#endif
 +
  #include "llvm/Support/Compiler.h"
- #include "llvm/Support/type_traits.h"
  #include <algorithm>
+ #include <cassert>
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index d9de2e92d5b07bce1d02ffcfda614b9079d2df91..6028ba8ead7627b4821aa8642f5069b305605c5e 100644
+index 5db59bb848024fca622b2919efd773d185a93f1e..b2c62d833038f92d2621ca2e6838d0d6b3b48760 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -231,6 +231,11 @@ inline uint64_t maxUIntN(uint64_t N) {
+@@ -232,6 +232,11 @@ inline uint64_t maxUIntN(uint64_t N) {
    return UINT64_MAX >> (64 - N);
  }
  
@@ -105,7 +79,7 @@ index d9de2e92d5b07bce1d02ffcfda614b9079d2df91..6028ba8ead7627b4821aa8642f5069b3
  /// Gets the minimum value for a N-bit signed integer.
  inline int64_t minIntN(int64_t N) {
    assert(N <= 64 && "integer width out of range");
-@@ -240,6 +245,10 @@ inline int64_t minIntN(int64_t N) {
+@@ -241,6 +246,10 @@ inline int64_t minIntN(int64_t N) {
    return UINT64_C(1) + ~(UINT64_C(1) << (N - 1));
  }
  
@@ -146,7 +120,7 @@ index f3f378b7697a18f57b189c5322b080fe23d45bec..0028e871f6a05baf6172c60c602b8b26
 +
  #endif
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 2dbb0674406e1860fdd0c266df64003e45b12fa3..e248eb67df9144bb4cf14e3d3acab161a95d1ce3 100644
+index 681b6fdc95eb4fda4f23d0b381b83417d82b3b78..a75abb7a4abf71e214ea6342352cfbaa5ce3ea27 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -10,6 +10,10 @@
@@ -175,24 +149,23 @@ index e93e18423507655ce8275a0718d8e5d01915985f..b930a21f8b43b64835436fcd27f4802a
  #include "llvm/ADT/DenseMap.h"
  #include "CountCopyAndMove.h"
  #include "llvm/ADT/DenseMapInfo.h"
-diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
-index e0f11b60a0223da7c00a47c20b61136bd608bae6..9c802ab30721c9ce58ed65052a6ab467039226ff 100644
---- a/llvm/unittests/ADT/MapVectorTest.cpp
-+++ b/llvm/unittests/ADT/MapVectorTest.cpp
-@@ -6,6 +6,13 @@
- //
- //===----------------------------------------------------------------------===//
+diff --git a/llvm/unittests/ADT/FunctionExtrasTest.cpp b/llvm/unittests/ADT/FunctionExtrasTest.cpp
+index 777c5784949fd3c07bbbcef8dc3fc8e5764896a9..3777eedff54639f0380218eaad767f27f1958a67 100644
+--- a/llvm/unittests/ADT/FunctionExtrasTest.cpp
++++ b/llvm/unittests/ADT/FunctionExtrasTest.cpp
+@@ -330,6 +330,12 @@ TEST(UniqueFunctionTest, InlineStorageWorks) {
+   UniqueFunctionWithInlineStorage(&UniqueFunctionWithInlineStorage);
+ }
  
-+#if defined(__GNUC__)
-+#pragma GCC diagnostic ignored "-Wpedantic"
-+#if !defined(__clang__)
-+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-+#endif
-+#endif
 +
- #include "llvm/ADT/MapVector.h"
- #include "llvm/ADT/iterator_range.h"
- #include "gtest/gtest.h"
++// GCC warns that val in CountCopyAndMove is uninitialized
++#if defined(__GNUC__) && !defined(__clang__)
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wuninitialized"
++#endif
+ // Check that the moved-from captured state is properly destroyed during
+ // move construction/assignment.
+ TEST(UniqueFunctionTest, MovedFromStateIsDestroyedCorrectly) {
 diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
 index 7029038d18d433cef987bedbfa4fda269b24fb8f..f8c37820ef9fdfe0af067f5aa8d2297ed15e73bc 100644
 --- a/llvm/unittests/ADT/SmallVectorTest.cpp

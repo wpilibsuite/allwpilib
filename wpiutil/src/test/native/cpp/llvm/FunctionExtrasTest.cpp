@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/FunctionExtras.h"
+#include "CountCopyAndMove.h"
 #include "gtest/gtest.h"
 
 #include <memory>
@@ -309,5 +310,44 @@ TEST(UniqueFunctionTest, IncompleteCallableType) {
 class Incomplete {};
 Incomplete incompleteFunction() { return {}; }
 const Incomplete incompleteFunctionConst() { return {}; }
+
+// Check that we can store a pointer-sized payload inline in the unique_function.
+TEST(UniqueFunctionTest, InlineStorageWorks) {
+  // We do assume a couple of implementation details of the unique_function here:
+  //  - It can store certain small-enough payload inline
+  //  - Inline storage size is at least >= sizeof(void*)
+  void *ptr = nullptr;
+  unique_function<void(void *)> UniqueFunctionWithInlineStorage{
+      [ptr](void *self) {
+        auto mid = reinterpret_cast<uintptr_t>(&ptr);
+        auto beg = reinterpret_cast<uintptr_t>(self);
+        auto end = reinterpret_cast<uintptr_t>(self) +
+                   sizeof(unique_function<void(void *)>);
+        // Make sure the address of the captured pointer lies somewhere within
+        // the unique_function object.
+        EXPECT_TRUE(mid >= beg && mid < end);
+      }};
+  UniqueFunctionWithInlineStorage(&UniqueFunctionWithInlineStorage);
+}
+
+
+// GCC warns that val in CountCopyAndMove is uninitialized
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#endif
+// Check that the moved-from captured state is properly destroyed during
+// move construction/assignment.
+TEST(UniqueFunctionTest, MovedFromStateIsDestroyedCorrectly) {
+  CountCopyAndMove::ResetCounts();
+  {
+    unique_function<void()> CapturingFunction{
+        [Counter = CountCopyAndMove{}] {}};
+    unique_function<void()> CapturingFunctionMoved{
+        std::move(CapturingFunction)};
+  }
+  EXPECT_EQ(CountCopyAndMove::TotalConstructions(),
+            CountCopyAndMove::Destructions);
+}
 
 } // anonymous namespace

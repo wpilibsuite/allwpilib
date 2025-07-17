@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Thu, 21 Nov 2024 17:23:48 -0800
-Subject: [PATCH 2/4] Remove debugger_query argument from Windows and macOS
+Subject: [PATCH 2/5] Remove debugger_query argument from Windows and macOS
 
 ---
  src/macos.cxx   | 2 +-

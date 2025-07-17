@@ -70,7 +70,7 @@ class ComplexEigenSolver {
    * \c float or \c double) and just \c Scalar if #Scalar is
    * complex.
    */
-  typedef std::complex<RealScalar> ComplexScalar;
+  typedef internal::make_complex_t<Scalar> ComplexScalar;
 
   /** \brief Type for vector of eigenvalues as returned by eigenvalues().
    *

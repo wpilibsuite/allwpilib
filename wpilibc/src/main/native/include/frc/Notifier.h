@@ -102,7 +102,7 @@ class Notifier {
    * The user-provided callback should be written so that it completes before
    * the next time it's scheduled to run.
    *
-   * @param period Period after which to to call the callback starting one
+   * @param period Period after which to call the callback starting one
    *               period after the call to this method.
    */
   void StartPeriodic(units::second_t period);

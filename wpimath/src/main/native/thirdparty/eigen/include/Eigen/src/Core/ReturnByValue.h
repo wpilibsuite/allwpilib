@@ -58,12 +58,8 @@ class ReturnByValue : public internal::dense_xpr_base<ReturnByValue<Derived> >::
   EIGEN_DEVICE_FUNC inline void evalTo(Dest& dst) const {
     static_cast<const Derived*>(this)->evalTo(dst);
   }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const EIGEN_NOEXCEPT {
-    return static_cast<const Derived*>(this)->rows();
-  }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const EIGEN_NOEXCEPT {
-    return static_cast<const Derived*>(this)->cols();
-  }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept { return static_cast<const Derived*>(this)->rows(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return static_cast<const Derived*>(this)->cols(); }
 
 #ifndef EIGEN_PARSED_BY_DOXYGEN
 #define Unusable \

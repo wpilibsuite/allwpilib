@@ -79,7 +79,6 @@ typedef EIGEN_DEFAULT_DENSE_INDEX_TYPE DenseIndex;
  * \details To change this, \c \#define the preprocessor symbol \c EIGEN_DEFAULT_DENSE_INDEX_TYPE.
  * \sa \blank \ref TopicPreprocessorDirectives, StorageIndex.
  */
-
 typedef EIGEN_DEFAULT_DENSE_INDEX_TYPE Index;
 
 namespace internal {
@@ -91,12 +90,8 @@ namespace internal {
  * we however don't want to add a dependency to Boost.
  */
 
-struct true_type {
-  enum { value = 1 };
-};
-struct false_type {
-  enum { value = 0 };
-};
+using std::false_type;
+using std::true_type;
 
 template <bool Condition>
 struct bool_constant;
@@ -221,7 +216,7 @@ struct is_void : is_same<void, std::remove_const_t<T>> {};
  *
  * Post C++17: Uses std::void_t
  */
-#if EIGEN_COMP_CXXVER >= 17
+#if EIGEN_COMP_CXXVER >= 17 && defined(__cpp_lib_void_t) && __cpp_lib_void_t >= 201411L
 using std::void_t;
 #else
 template <typename...>
@@ -339,24 +334,27 @@ struct array_size<std::array<T, N>> {
  *
  * For C++20, this function just forwards to `std::ssize`, or any ADL discoverable `ssize` function.
  */
-#if EIGEN_COMP_CXXVER < 20 || EIGEN_GNUC_STRICT_LESS_THAN(10, 0, 0)
+#if EIGEN_COMP_CXXVER >= 20 && defined(__cpp_lib_ssize) && __cpp_lib_ssize >= 201902L
+
 template <typename T>
-EIGEN_CONSTEXPR auto index_list_size(const T& x) {
+constexpr auto index_list_size(T&& x) {
+  using std::ssize;
+  return ssize(std::forward<T>(x));
+}
+
+#else
+
+template <typename T>
+constexpr auto index_list_size(const T& x) {
   using R = std::common_type_t<std::ptrdiff_t, std::make_signed_t<decltype(x.size())>>;
   return static_cast<R>(x.size());
 }
 
 template <typename T, std::ptrdiff_t N>
-EIGEN_CONSTEXPR std::ptrdiff_t index_list_size(const T (&)[N]) {
+constexpr std::ptrdiff_t index_list_size(const T (&)[N]) {
   return N;
 }
-#else
-template <typename T>
-EIGEN_CONSTEXPR auto index_list_size(T&& x) {
-  using std::ssize;
-  return ssize(std::forward<T>(x));
-}
-#endif  // EIGEN_COMP_CXXVER
+#endif
 
 /** \internal
  * Convenient struct to get the result type of a nullary, unary, binary, or
@@ -639,21 +637,21 @@ template <typename A>
 constexpr bool is_int_or_enum_v = std::is_enum<A>::value || std::is_integral<A>::value;
 
 template <typename A, typename B>
-inline constexpr void plain_enum_asserts(A, B) {
+constexpr void plain_enum_asserts(A, B) {
   static_assert(is_int_or_enum_v<A>, "Argument a must be an integer or enum");
   static_assert(is_int_or_enum_v<B>, "Argument b must be an integer or enum");
 }
 
 /// \internal Gets the minimum of two values which may be integers or enums
 template <typename A, typename B>
-inline constexpr int plain_enum_min(A a, B b) {
+constexpr int plain_enum_min(A a, B b) {
   plain_enum_asserts(a, b);
   return ((int)a <= (int)b) ? (int)a : (int)b;
 }
 
 /// \internal Gets the maximum of two values which may be integers or enums
 template <typename A, typename B>
-inline constexpr int plain_enum_max(A a, B b) {
+constexpr int plain_enum_max(A a, B b) {
   plain_enum_asserts(a, b);
   return ((int)a >= (int)b) ? (int)a : (int)b;
 }
@@ -665,7 +663,7 @@ inline constexpr int plain_enum_max(A a, B b) {
  *  finite values is that min(3, Dynamic) should be Dynamic, since that could be anything between 0 and 3.
  */
 template <typename A, typename B>
-inline constexpr int min_size_prefer_dynamic(A a, B b) {
+constexpr int min_size_prefer_dynamic(A a, B b) {
   plain_enum_asserts(a, b);
   if ((int)a == 0 || (int)b == 0) return 0;
   if ((int)a == 1 || (int)b == 1) return 1;
@@ -680,7 +678,7 @@ inline constexpr int min_size_prefer_dynamic(A a, B b) {
  * 0 and 3), it is not more than 3.
  */
 template <typename A, typename B>
-inline constexpr int min_size_prefer_fixed(A a, B b) {
+constexpr int min_size_prefer_fixed(A a, B b) {
   plain_enum_asserts(a, b);
   if ((int)a == 0 || (int)b == 0) return 0;
   if ((int)a == 1 || (int)b == 1) return 1;
@@ -692,10 +690,16 @@ inline constexpr int min_size_prefer_fixed(A a, B b) {
 
 /// \internal see `min_size_prefer_fixed`. No need for a separate variant for MaxSizes here.
 template <typename A, typename B>
-inline constexpr int max_size_prefer_dynamic(A a, B b) {
+constexpr int max_size_prefer_dynamic(A a, B b) {
   plain_enum_asserts(a, b);
   if ((int)a == Dynamic || (int)b == Dynamic) return Dynamic;
   return plain_enum_max(a, b);
+}
+
+template <typename A, typename B>
+inline constexpr int size_prefer_fixed(A a, B b) {
+  plain_enum_asserts(a, b);
+  return int(a) == Dynamic ? int(b) : int(a);
 }
 
 template <typename A, typename B>
@@ -706,45 +710,48 @@ inline constexpr bool enum_eq_not_dynamic(A a, B b) {
 }
 
 template <typename A, typename B>
-inline constexpr bool enum_lt_not_dynamic(A a, B b) {
+constexpr bool enum_lt_not_dynamic(A a, B b) {
   plain_enum_asserts(a, b);
   if ((int)a == Dynamic || (int)b == Dynamic) return false;
   return (int)a < (int)b;
 }
 
 template <typename A, typename B>
-inline constexpr bool enum_le_not_dynamic(A a, B b) {
+constexpr bool enum_le_not_dynamic(A a, B b) {
   plain_enum_asserts(a, b);
   if ((int)a == Dynamic || (int)b == Dynamic) return false;
   return (int)a <= (int)b;
 }
 
 template <typename A, typename B>
-inline constexpr bool enum_gt_not_dynamic(A a, B b) {
+constexpr bool enum_gt_not_dynamic(A a, B b) {
   plain_enum_asserts(a, b);
   if ((int)a == Dynamic || (int)b == Dynamic) return false;
   return (int)a > (int)b;
 }
 
 template <typename A, typename B>
-inline constexpr bool enum_ge_not_dynamic(A a, B b) {
+constexpr bool enum_ge_not_dynamic(A a, B b) {
   plain_enum_asserts(a, b);
   if ((int)a == Dynamic || (int)b == Dynamic) return false;
   return (int)a >= (int)b;
 }
 
 /// \internal Calculate logical XOR at compile time
-inline constexpr bool logical_xor(bool a, bool b) { return a != b; }
+constexpr bool logical_xor(bool a, bool b) { return a != b; }
 
 /// \internal Calculate logical IMPLIES at compile time
-inline constexpr bool check_implication(bool a, bool b) { return !a || b; }
+constexpr bool check_implication(bool a, bool b) { return !a || b; }
 
 /// \internal Provide fallback for std::is_constant_evaluated for pre-C++20.
-#if EIGEN_COMP_CXXVER >= 20
+#if EIGEN_COMP_CXXVER >= 20 && defined(__cpp_lib_is_constant_evaluated) && __cpp_lib_is_constant_evaluated >= 201811L
 using std::is_constant_evaluated;
 #else
 constexpr bool is_constant_evaluated() { return false; }
 #endif
+
+template <typename Scalar>
+using make_complex_t = std::conditional_t<NumTraits<Scalar>::IsComplex, Scalar, std::complex<Scalar>>;
 
 }  // end namespace internal
 

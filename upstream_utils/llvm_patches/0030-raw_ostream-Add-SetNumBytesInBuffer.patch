@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sun, 29 Oct 2023 23:00:08 -0700
+Subject: [PATCH 30/36] raw_ostream: Add SetNumBytesInBuffer
+
+---
+ llvm/include/llvm/Support/raw_ostream.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
+index 264b8192a0473b94363765995517851cbf30d045..d0e5ba46a9e748037c2ad444207fc8fc236ec5d5 100644
+--- a/llvm/include/llvm/Support/raw_ostream.h
++++ b/llvm/include/llvm/Support/raw_ostream.h
+@@ -365,6 +365,11 @@ protected:
+     SetBufferAndMode(BufferStart, Size, BufferKind::ExternalBuffer);
+   }
+ 
++  /// Force-set the number of bytes in the raw_ostream buffer.
++  void SetNumBytesInBuffer(size_t Size) {
++    OutBufCur = OutBufStart + Size;
++  }
++
+   /// Return an efficient buffer size for the underlying output mechanism.
+   virtual size_t preferred_buffer_size() const;
+ 

@@ -40,7 +40,8 @@ This command deploys the Java project and all required dependencies. It also ins
 
 Those commands won't start the robot executable, so you have to manually ssh in and start it. The following command will do that.
 ```bash
-ssh lvuser@172.22.11.2 frcRunRobot.sh
+ssh systemcore@172.28.0.1 sudo systemctl stop robot
+ssh systemcore@172.22.11.2 sudo ~/robotCommand
 ```
 
 Console log prints will appear in the terminal.

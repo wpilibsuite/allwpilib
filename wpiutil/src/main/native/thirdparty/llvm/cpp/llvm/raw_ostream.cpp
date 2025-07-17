@@ -70,14 +70,6 @@ constexpr raw_ostream::Colors raw_ostream::WHITE;
 constexpr raw_ostream::Colors raw_ostream::SAVEDCOLOR;
 constexpr raw_ostream::Colors raw_ostream::RESET;
 
-namespace {
-// Find the length of an array.
-template <class T, std::size_t N>
-constexpr inline size_t array_lengthof(T (&)[N]) {
-  return N;
-}
-}  // namespace
-
 raw_ostream::~raw_ostream() {
   // raw_ostream's subclasses should take care to flush the buffer
   // in their destructors.
@@ -574,6 +566,10 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
   // complexity.
   if (IsWindowsConsole)
     return 0;
+  return raw_ostream::preferred_buffer_size();
+#elif defined(__MVS__)
+  // The buffer size on z/OS is defined with macro BUFSIZ, which can be
+  // retrieved by invoking function raw_ostream::preferred_buffer_size().
   return raw_ostream::preferred_buffer_size();
 #else
   assert(FD >= 0 && "File not yet open!");

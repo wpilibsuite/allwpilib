@@ -56,12 +56,12 @@ struct EigenBase {
   EIGEN_DEVICE_FUNC inline const Derived& const_derived() const { return *static_cast<const Derived*>(this); }
 
   /** \returns the number of rows. \sa cols(), RowsAtCompileTime */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const EIGEN_NOEXCEPT { return derived().rows(); }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept { return derived().rows(); }
   /** \returns the number of columns. \sa rows(), ColsAtCompileTime*/
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const EIGEN_NOEXCEPT { return derived().cols(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return derived().cols(); }
   /** \returns the number of coefficients, which is rows()*cols().
    * \sa rows(), cols(), SizeAtCompileTime. */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index size() const EIGEN_NOEXCEPT { return rows() * cols(); }
+  EIGEN_DEVICE_FUNC constexpr Index size() const noexcept { return rows() * cols(); }
 
   /** \internal Don't use it, but do the equivalent: \code dst = *this; \endcode */
   template <typename Dest>

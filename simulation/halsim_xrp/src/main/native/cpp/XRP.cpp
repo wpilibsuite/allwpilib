@@ -139,6 +139,10 @@ void XRP::HandleServoSimValueChanged(const wpi::json& data) {
     deviceId = 4;
   } else if (data["device"] == "servo2") {
     deviceId = 5;
+  } else if (data["device"] == "servo3") {
+    deviceId = 6;
+  } else if (data["device"] == "servo4") {
+    deviceId = 7;
   }
 
   if (deviceId != -1 && servoData.find("<position") != servoData.end()) {

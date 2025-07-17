@@ -97,9 +97,6 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const
 
 /** \returns an expression of the coefficient-wise absdiff of \c *this and \a other
  *
- * Example: \include Cwise_absolute_difference.cpp
- * Output: \verbinclude Cwise_absolute_difference.out
- *
  * \sa absolute_difference()
  */
 EIGEN_MAKE_CWISE_BINARY_OP(absolute_difference, absolute_difference)

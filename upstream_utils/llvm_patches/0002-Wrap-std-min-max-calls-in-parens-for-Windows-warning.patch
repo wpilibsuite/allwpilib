@@ -1,20 +1,21 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:12:41 -0400
-Subject: [PATCH 02/37] Wrap std::min/max calls in parens, for Windows warnings
+Subject: [PATCH 02/36] Wrap std::min/max calls in parens, for Windows warnings
 
 ---
  llvm/include/llvm/ADT/DenseMap.h       |  4 ++--
+ llvm/include/llvm/ADT/SmallPtrSet.h    |  2 +-
  llvm/include/llvm/ADT/SmallVector.h    |  6 +++---
  llvm/include/llvm/Support/ConvertUTF.h |  2 +-
  llvm/include/llvm/Support/MathExtras.h | 20 ++++++++++----------
- 4 files changed, 16 insertions(+), 16 deletions(-)
+ 5 files changed, 17 insertions(+), 17 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index 7ccc9445c0a7b882b424b2431858ea596d0eb58f..c4764fffa845a7f9eb69f262aa0ee728d08b1655 100644
+index f0f992f8eac389e36156e369ea24e0387bdf0057..4c852d2b142b4a3de76a1ce4049822cc449287f7 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -432,7 +432,7 @@ protected:
+@@ -400,7 +400,7 @@ protected:
        return 0;
      // +1 is required because of the strict equality.
      // For example if NumEntries is 48, we need to return 401.
@@ -23,7 +24,7 @@ index 7ccc9445c0a7b882b424b2431858ea596d0eb58f..c4764fffa845a7f9eb69f262aa0ee728
    }
  
    void moveFromOldBuckets(BucketT *OldBucketsBegin, BucketT *OldBucketsEnd) {
-@@ -868,7 +868,7 @@ public:
+@@ -837,7 +837,7 @@ public:
      // Reduce the number of buckets.
      unsigned NewNumBuckets = 0;
      if (OldNumEntries)
@@ -32,11 +33,24 @@ index 7ccc9445c0a7b882b424b2431858ea596d0eb58f..c4764fffa845a7f9eb69f262aa0ee728
      if (NewNumBuckets == NumBuckets) {
        this->BaseT::initEmpty();
        return;
+diff --git a/llvm/include/llvm/ADT/SmallPtrSet.h b/llvm/include/llvm/ADT/SmallPtrSet.h
+index cf6abc9129b40eed6749213eb23439ec91621005..9115fc74363a9cccd0579427d88fa9edf5baae1b 100644
+--- a/llvm/include/llvm/ADT/SmallPtrSet.h
++++ b/llvm/include/llvm/ADT/SmallPtrSet.h
+@@ -126,7 +126,7 @@ public:
+     size_type NewSize = NumEntries + (NumEntries / 3);
+     NewSize = 1 << (Log2_32_Ceil(NewSize) + 1);
+     // Like insert_imp_big, always allocate at least 128 elements.
+-    NewSize = std::max(128u, NewSize);
++    NewSize = (std::max)(128u, NewSize);
+     Grow(NewSize);
+   }
+ 
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 94d8da059f4f8bad50039b0d0b7993396707829c..85bf5172e419b1b58f53d3cf00d4aabb58877c33 100644
+index be06bb817e24e723265f9a8038d94123de1fc53c..2232b741d5359a129adb0e5b3f0f70110c38e90d 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -56,7 +56,7 @@ protected:
+@@ -55,7 +55,7 @@ protected:
  
    /// The maximum value of the Size_T used.
    static constexpr size_t SizeTypeMax() {
@@ -45,7 +59,7 @@ index 94d8da059f4f8bad50039b0d0b7993396707829c..85bf5172e419b1b58f53d3cf00d4aabb
    }
  
    SmallVectorBase() = delete;
-@@ -290,7 +290,7 @@ public:
+@@ -276,7 +276,7 @@ public:
  
    size_type size_in_bytes() const { return size() * sizeof(T); }
    size_type max_size() const {
@@ -54,7 +68,7 @@ index 94d8da059f4f8bad50039b0d0b7993396707829c..85bf5172e419b1b58f53d3cf00d4aabb
    }
  
    size_t capacity_in_bytes() const { return capacity() * sizeof(T); }
-@@ -722,7 +722,7 @@ public:
+@@ -708,7 +708,7 @@ public:
      }
  
      // Assign over existing elements.
@@ -77,10 +91,10 @@ index 5c0e3009c25446a34882fb98329b1d955231bb39..72321022beb373945f7935ed72944fd6
  /* Some fundamental constants */
  #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index e568e42afcf4d20dba137346953ff4be9d27ffc7..d9de2e92d5b07bce1d02ffcfda614b9079d2df91 100644
+index 5a6f51adc07f3976bdf8f3412bdb119b220a0e9b..5db59bb848024fca622b2919efd773d185a93f1e 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -338,26 +338,26 @@ template <> constexpr size_t CTLog2<1>() { return 0; }
+@@ -339,26 +339,26 @@ template <> constexpr size_t CTLog2<1>() { return 0; }
  /// (32 bit edition.)
  /// Ex. Log2_32(32) == 5, Log2_32(1) == 0, Log2_32(0) == -1, Log2_32(6) == 2
  inline unsigned Log2_32(uint32_t Value) {
@@ -111,7 +125,7 @@ index e568e42afcf4d20dba137346953ff4be9d27ffc7..d9de2e92d5b07bce1d02ffcfda614b90
  }
  
  /// A and B are either alignments or offsets. Return the minimum alignment that
-@@ -417,7 +417,7 @@ constexpr uint64_t divideCeil(uint64_t Numerator, uint64_t Denominator) {
+@@ -418,7 +418,7 @@ constexpr uint64_t divideCeil(uint64_t Numerator, uint64_t Denominator) {
  // happens only when Numerator = INT_MIN and Denominator = -1.
  template <typename U, typename V>
  constexpr bool divideSignedWouldOverflow(U Numerator, V Denominator) {
@@ -120,7 +134,7 @@ index e568e42afcf4d20dba137346953ff4be9d27ffc7..d9de2e92d5b07bce1d02ffcfda614b90
  }
  
  /// Returns the integer ceil(Numerator / Denominator). Signed version.
-@@ -605,7 +605,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
+@@ -614,7 +614,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
    T Z = X + Y;
    Overflowed = (Z < X || Z < Y);
    if (Overflowed)
@@ -129,7 +143,7 @@ index e568e42afcf4d20dba137346953ff4be9d27ffc7..d9de2e92d5b07bce1d02ffcfda614b90
    else
      return Z;
  }
-@@ -618,7 +618,7 @@ std::enable_if_t<std::is_unsigned_v<T>, T> SaturatingAdd(T X, T Y, T Z,
+@@ -627,7 +627,7 @@ std::enable_if_t<std::is_unsigned_v<T>, T> SaturatingAdd(T X, T Y, T Z,
    bool Overflowed = false;
    T XY = SaturatingAdd(X, Y, &Overflowed);
    if (Overflowed)
@@ -138,7 +152,7 @@ index e568e42afcf4d20dba137346953ff4be9d27ffc7..d9de2e92d5b07bce1d02ffcfda614b90
    return SaturatingAdd(XY, Z, Args...);
  }
  
-@@ -642,7 +642,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
+@@ -651,7 +651,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
    // Special case: if X or Y is 0, Log2_64 gives -1, and Log2Z
    // will necessarily be less than Log2Max as desired.
    int Log2Z = Log2_64(X) + Log2_64(Y);
@@ -147,7 +161,7 @@ index e568e42afcf4d20dba137346953ff4be9d27ffc7..d9de2e92d5b07bce1d02ffcfda614b90
    int Log2Max = Log2_64(Max);
    if (Log2Z < Log2Max) {
      return X * Y;
-@@ -764,9 +764,9 @@ std::enable_if_t<std::is_signed_v<T>, T> MulOverflow(T X, T Y, T &Result) {
+@@ -773,9 +773,9 @@ std::enable_if_t<std::is_signed_v<T>, T> MulOverflow(T X, T Y, T &Result) {
    // Check how the max allowed absolute value (2^n for negative, 2^(n-1) for
    // positive) divided by an argument compares to the other.
    if (IsNegative)

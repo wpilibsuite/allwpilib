@@ -52,8 +52,8 @@ void HAL_SetDutyCycleSimDevice(HAL_DutyCycleHandle handle,
  * @param[out] status Error status variable. 0 on success.
  * @return frequency in Hertz
  */
-int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
-                                  int32_t* status);
+double HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
+                                 int32_t* status);
 
 /**
  * Get the output ratio of the duty cycle signal.
@@ -76,30 +76,6 @@ double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
  */
 int32_t HAL_GetDutyCycleHighTime(HAL_DutyCycleHandle dutyCycleHandle,
                                  int32_t* status);
-
-/**
- * Get the scale factor of the output.
- *
- * <p> An output equal to this value is always high, and then linearly scales
- * down to 0. Divide a raw result by this in order to get the
- * percentage between 0 and 1. Used by DMA.
- *
- * @param[in] dutyCycleHandle the duty cycle handle
- * @param[out] status Error status variable. 0 on success.
- * @return the output scale factor
- */
-int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,
-                                          int32_t* status);
-
-/**
- * Get the FPGA index for the DutyCycle.
- *
- * @param[in] dutyCycleHandle the duty cycle handle
- * @param[out] status Error status variable. 0 on success.
- * @return the FPGA index
- */
-int32_t HAL_GetDutyCycleFPGAIndex(HAL_DutyCycleHandle dutyCycleHandle,
-                                  int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

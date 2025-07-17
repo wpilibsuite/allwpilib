@@ -25,14 +25,12 @@ struct visitor_impl;
 template <typename Visitor, bool ShortCircuitEvaluation = false>
 struct short_circuit_eval_impl {
   // if short circuit evaluation is not used, do nothing
-  static EIGEN_CONSTEXPR EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool run(const Visitor&) { return false; }
+  static constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool run(const Visitor&) { return false; }
 };
 template <typename Visitor>
 struct short_circuit_eval_impl<Visitor, true> {
   // if short circuit evaluation is used, check the visitor
-  static EIGEN_CONSTEXPR EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool run(const Visitor& visitor) {
-    return visitor.done();
-  }
+  static constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool run(const Visitor& visitor) { return visitor.done(); }
 };
 
 // unrolled inner-outer traversal
@@ -296,9 +294,9 @@ class visitor_evaluator {
 
   EIGEN_DEVICE_FUNC explicit visitor_evaluator(const XprType& xpr) : m_evaluator(xpr), m_xpr(xpr) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT { return m_xpr.rows(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return m_xpr.cols(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index size() const EIGEN_NOEXCEPT { return m_xpr.size(); }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept { return m_xpr.rows(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return m_xpr.cols(); }
+  EIGEN_DEVICE_FUNC constexpr Index size() const noexcept { return m_xpr.size(); }
   // outer-inner access
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType coeff(Index row, Index col) const {
     return m_evaluator.coeff(row, col);
@@ -632,6 +630,17 @@ struct functor_traits<count_visitor<Scalar>> {
   };
 };
 
+template <typename Derived, bool AlwaysTrue = NumTraits<typename traits<Derived>::Scalar>::IsInteger>
+struct all_finite_impl {
+  static EIGEN_DEVICE_FUNC inline bool run(const Derived& /*derived*/) { return true; }
+};
+#if !defined(__FINITE_MATH_ONLY__) || !(__FINITE_MATH_ONLY__)
+template <typename Derived>
+struct all_finite_impl<Derived, false> {
+  static EIGEN_DEVICE_FUNC inline bool run(const Derived& derived) { return derived.array().isFiniteTyped().all(); }
+};
+#endif
+
 }  // end namespace internal
 
 /** \fn DenseBase<Derived>::minCoeff(IndexType* rowId, IndexType* colId) const
@@ -781,7 +790,7 @@ EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::hasNaN() const {
  */
 template <typename Derived>
 EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::allFinite() const {
-  return derived().array().isFiniteTyped().all();
+  return internal::all_finite_impl<Derived>::run(derived());
 }
 
 }  // end namespace Eigen

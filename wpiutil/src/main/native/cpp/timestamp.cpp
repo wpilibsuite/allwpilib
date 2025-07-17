@@ -87,6 +87,9 @@ uint64_t wpi::NowDefault() {
   // delta by 1,000,000
   uint64_t delta_in_us = delta * 1000000ull / frequency_val;
   return delta_in_us + zerotime_val;
+#elif defined(__FRC_SYSTEMCORE__)
+  // We want clock synchronized across the system, so just use steady_clock.
+  return timestamp();
 #else
   return zerotime_val + timestamp() - offset_val;
 #endif

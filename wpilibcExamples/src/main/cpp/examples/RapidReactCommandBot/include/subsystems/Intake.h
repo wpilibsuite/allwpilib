@@ -19,11 +19,9 @@ class Intake : public frc2::SubsystemBase {
 
   /** Returns a command that deploys the intake, and then runs the intake motor
    * indefinitely. */
-  [[nodiscard]]
   frc2::CommandPtr IntakeCommand();
 
   /** Returns a command that turns off and retracts the intake. */
-  [[nodiscard]]
   frc2::CommandPtr RetractCommand();
 
  private:

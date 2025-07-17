@@ -139,7 +139,7 @@ void HALSIM_SetMatchInfo(const HAL_MatchInfo* info);
 
 void HALSIM_SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state);
 void HALSIM_SetJoystickAxis(int32_t stick, int32_t axis, double value);
-void HALSIM_SetJoystickPOV(int32_t stick, int32_t pov, int32_t value);
+void HALSIM_SetJoystickPOV(int32_t stick, int32_t pov, HAL_JoystickPOV value);
 void HALSIM_SetJoystickButtonsValue(int32_t stick, uint32_t buttons);
 void HALSIM_SetJoystickAxisCount(int32_t stick, int32_t count);
 void HALSIM_SetJoystickPOVCount(int32_t stick, int32_t count);
@@ -147,7 +147,7 @@ void HALSIM_SetJoystickButtonCount(int32_t stick, int32_t count);
 void HALSIM_GetJoystickCounts(int32_t stick, int32_t* axisCount,
                               int32_t* buttonCount, int32_t* povCount);
 
-void HALSIM_SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox);
+void HALSIM_SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad);
 void HALSIM_SetJoystickType(int32_t stick, int32_t type);
 void HALSIM_SetJoystickName(int32_t stick, const struct WPI_String* name);
 void HALSIM_SetJoystickAxisType(int32_t stick, int32_t axis, int32_t type);

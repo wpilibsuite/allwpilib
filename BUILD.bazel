@@ -1,0 +1,52 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+
+pkg_files(
+    name = "license_pkg_files",
+    srcs = [
+        "LICENSE.md",
+        "ThirdPartyNotices.txt",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# bazel build //:requirements.lock
+compile_pip_requirements(
+    name = "requirements",
+    extra_args = ["--allow-unsafe"],
+    requirements_in = "requirements.txt",
+    requirements_txt = "requirements_lock.txt",
+    # compile_pip_requirements does not respect target_compatible_with for some of the targets it generates under the hood
+    tags = ["no-systemcore"],
+)
+
+alias(
+    name = "quickbuf_protoc",
+    actual = select({
+        "@bazel_tools//src/conditions:windows": "@quickbuffer_protoc_windows//file",
+        "@rules_bzlmodrio_toolchains//conditions:osx_aarch64": "@quickbuffer_protoc_osx_aarch64//file",
+        "@rules_bzlmodrio_toolchains//conditions:osx_x86_64": "@quickbuffer_protoc_osx_x86-64//file",
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": "@quickbuffer_protoc_linux//file",
+    }),
+    tags = ["pregeneration"],
+    visibility = ["//visibility:public"],
+)
+
+# This is a helper to run all of the pregeneration scripts at once.
+write_source_files(
+    name = "write_all",
+    additional_update_targets = [
+        "//hal:write_hal",
+        "//ntcore:write_ntcore",
+        "//wpilibc:write_wpilibc",
+        "//wpilibcExamples:write_example_project_list",
+        "//wpilibj:write_wpilibj",
+        "//wpilibjExamples:write_example_project_list",
+        "//wpilibNewCommands:write_wpilib_new_commands",
+        "//wpimath:write_wpimath",
+        "//wpiunits:write_wpiunits",
+        "//wpiutil:write_wpiutil",
+    ],
+    tags = ["pregeneration"],
+)

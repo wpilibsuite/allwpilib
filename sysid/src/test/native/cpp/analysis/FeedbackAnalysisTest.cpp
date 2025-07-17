@@ -7,7 +7,7 @@
 #include "sysid/analysis/FeedbackAnalysis.h"
 #include "sysid/analysis/FeedbackControllerPreset.h"
 
-TEST(FeedbackAnalysisTest, Velocity1) {
+TEST(FeedbackAnalysisTest, VelocitySystem1) {
   auto Kv = 3.060;
   auto Ka = 0.327;
 
@@ -20,7 +20,7 @@ TEST(FeedbackAnalysisTest, Velocity1) {
   EXPECT_NEAR(Kd, 0.00, 0.05);
 }
 
-TEST(FeedbackAnalysisTest, Velocity2) {
+TEST(FeedbackAnalysisTest, VelocitySystem2) {
   auto Kv = 0.0693;
   auto Ka = 0.1170;
 
@@ -30,6 +30,19 @@ TEST(FeedbackAnalysisTest, Velocity2) {
       sysid::presets::kDefault, params, Kv, Ka);
 
   EXPECT_NEAR(Kp, 3.11, 0.05);
+  EXPECT_NEAR(Kd, 0.00, 0.05);
+}
+
+TEST(FeedbackAnalysisTest, VelocitySystemWithSmallKa) {
+  auto Kv = 3.060;
+  auto Ka = 0.0;
+
+  sysid::LQRParameters params{1, 1.5, 7};
+
+  auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(
+      sysid::presets::kDefault, params, Kv, Ka);
+
+  EXPECT_NEAR(Kp, 0.00, 0.05);
   EXPECT_NEAR(Kd, 0.00, 0.05);
 }
 
@@ -115,6 +128,19 @@ TEST(FeedbackAnalysisTest, Position) {
 
   EXPECT_NEAR(Kp, 6.41, 0.05);
   EXPECT_NEAR(Kd, 2.48, 0.05);
+}
+
+TEST(FeedbackAnalysisTest, PositionWithSmallKa) {
+  auto Kv = 3.060;
+  auto Ka = 1e-10;
+
+  sysid::LQRParameters params{1, 1.5, 7};
+
+  auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(
+      sysid::presets::kDefault, params, Kv, Ka);
+
+  EXPECT_NEAR(Kp, 19.97, 0.05);
+  EXPECT_NEAR(Kd, 0.00, 0.05);
 }
 
 TEST(FeedbackAnalysisTest, PositionWithLatencyCompensation) {

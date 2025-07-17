@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:48:59 -0400
-Subject: [PATCH 11/37] Add vectors to raw_ostream
+Subject: [PATCH 11/36] Add vectors to raw_ostream
 
 ---
  llvm/include/llvm/Support/raw_ostream.h | 115 ++++++++++++++++++++++++
@@ -9,7 +9,7 @@ Subject: [PATCH 11/37] Add vectors to raw_ostream
  2 files changed, 162 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index cbeb712e2a69426d83457cb1065fff4ca80a669d..a6799603a0106262520ba1c9fda14a7967b12a63 100644
+index fed78518c3b6c44b366d04f45a1d74819e794a3c..2c37ff9c0966506c53d15d7cb84abc82335b9913 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -24,6 +24,7 @@
@@ -155,10 +155,10 @@ index cbeb712e2a69426d83457cb1065fff4ca80a669d..a6799603a0106262520ba1c9fda14a79
  class raw_null_ostream : public raw_pwrite_stream {
    /// See raw_ostream::write_impl.
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index ee9d2b0cda0a4f338e4b089304203f220a5ed1c4..6c330c92e7dbeb27310b053d1a82de73b42ee6f8 100644
+index e06253e8f3a16dc09573cdec74cf54e0e3fcf848..a74b6b00d616828a8e5ab25c1fd15f2528b4d76d 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -677,6 +677,53 @@ bool raw_svector_ostream::classof(const raw_ostream *OS) {
+@@ -679,6 +679,53 @@ bool raw_svector_ostream::classof(const raw_ostream *OS) {
    return OS->get_kind() == OStreamKind::OK_SVecStream;
  }
  

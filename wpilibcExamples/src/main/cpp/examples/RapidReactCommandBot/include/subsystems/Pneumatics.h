@@ -17,7 +17,6 @@ class Pneumatics : frc2::SubsystemBase {
  public:
   Pneumatics();
   /** Returns a command that disables the compressor indefinitely. */
-  [[nodiscard]]
   frc2::CommandPtr DisableCompressorCommand();
 
   /**

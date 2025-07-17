@@ -214,8 +214,9 @@ Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
       }
     }
     JLocal<jbyteArray> toSetArray{
-        env, SetCANStreamObject(env, elem, msg->message.message.dataSize,
-                                msg->messageId, msg->message.timeStamp)};
+        env, SetCANStreamObject(env, elem, msg->message.message.flags,
+                                msg->message.message.dataSize, msg->messageId,
+                                msg->message.timeStamp)};
     auto javaLen = env->GetArrayLength(toSetArray);
     if (javaLen < msg->message.message.dataSize) {
       ThrowIllegalArgumentException(

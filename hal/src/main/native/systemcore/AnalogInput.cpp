@@ -169,7 +169,8 @@ double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
 
   uint16_t ret = 0;
   *status = port->GetAnalogInput(&ret);
-  return ret / 4095.0 * 3.3;
+  // Returns millivolts
+  return ret / 1000.0;
 }
 
 double HAL_GetAnalogValueToVolts(HAL_AnalogInputHandle analogPortHandle,

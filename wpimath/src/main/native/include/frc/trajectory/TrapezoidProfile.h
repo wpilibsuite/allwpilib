@@ -76,14 +76,18 @@ class TrapezoidProfile {
     /**
      * Constructs constraints for a Trapezoid Profile.
      *
-     * @param maxVelocity Maximum velocity.
-     * @param maxAcceleration Maximum acceleration.
+     * @param maxVelocity Maximum velocity, must be non-negative.
+     * @param maxAcceleration Maximum acceleration, must be non-negative.
      */
     constexpr Constraints(Velocity_t maxVelocity,
                           Acceleration_t maxAcceleration)
         : maxVelocity{maxVelocity}, maxAcceleration{maxAcceleration} {
       if (!std::is_constant_evaluated()) {
         wpi::math::MathSharedStore::ReportUsage("TrapezoidProfile", "");
+      }
+
+      if (maxVelocity < Velocity_t{0} || maxAcceleration < Acceleration_t{0}) {
+        throw std::domain_error("Constraints must be non-negative");
       }
     }
   };
@@ -129,8 +133,9 @@ class TrapezoidProfile {
     m_direction = ShouldFlipAcceleration(current, goal) ? -1 : 1;
     m_current = Direct(current);
     goal = Direct(goal);
-    if (m_current.velocity > m_constraints.maxVelocity) {
-      m_current.velocity = m_constraints.maxVelocity;
+    if (units::math::abs(m_current.velocity) > m_constraints.maxVelocity) {
+      m_current.velocity =
+          units::math::copysign(m_constraints.maxVelocity, m_current.velocity);
     }
 
     // Deal with a possibly truncated motion profile (with nonzero initial or
@@ -198,7 +203,8 @@ class TrapezoidProfile {
    * Returns the time left until a target distance in the profile is reached.
    *
    * @param target The target distance.
-   * @return The time left until a target distance in the profile is reached.
+   * @return The time left until a target distance in the profile is reached, or
+   * zero if no goal was set.
    */
   constexpr units::second_t TimeLeftUntil(Distance_t target) const {
     Distance_t position = m_current.position * m_direction;
@@ -269,7 +275,8 @@ class TrapezoidProfile {
   /**
    * Returns the total time the profile takes to reach the goal.
    *
-   * @return The total time the profile takes to reach the goal.
+   * @return The total time the profile takes to reach the goal, or zero if no
+   * goal was set.
    */
   constexpr units::second_t TotalTime() const { return m_endDecel; }
 
@@ -309,14 +316,14 @@ class TrapezoidProfile {
   }
 
   // The direction of the profile, either 1 for forwards or -1 for inverted
-  int m_direction;
+  int m_direction = 1;
 
   Constraints m_constraints;
   State m_current;
 
-  units::second_t m_endAccel;
-  units::second_t m_endFullSpeed;
-  units::second_t m_endDecel;
+  units::second_t m_endAccel = 0_s;
+  units::second_t m_endFullSpeed = 0_s;
+  units::second_t m_endDecel = 0_s;
 };
 
 }  // namespace frc

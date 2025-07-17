@@ -324,4 +324,71 @@ class Pose3dTest {
           () -> assertFalse(((Double) twist.rz).isNaN()));
     }
   }
+
+  @Test
+  void testNearest() {
+    var origin = Pose3d.kZero;
+
+    // Distance sort
+    // poses are in order of closest to farthest away from the origin at various positions in 3D
+    // space.
+    final var pose1 = new Pose3d(1, 0, 0, Rotation3d.kZero);
+    final var pose2 = new Pose3d(0, 2, 0, Rotation3d.kZero);
+    final var pose3 = new Pose3d(0, 0, 3, Rotation3d.kZero);
+    final var pose4 = new Pose3d(2, 2, 2, Rotation3d.kZero);
+    final var pose5 = new Pose3d(3, 3, 3, Rotation3d.kZero);
+
+    assertEquals(pose3, origin.nearest(List.of(pose5, pose3, pose4)));
+    assertEquals(pose1, origin.nearest(List.of(pose1, pose2, pose3)));
+    assertEquals(pose2, origin.nearest(List.of(pose4, pose2, pose3)));
+
+    // Rotation component sort (when distance is the same)
+    // Use the same translation to avoid distance differences
+    final var translation = new Translation3d(1, 0, 0);
+
+    final var poseA = new Pose3d(translation, Rotation3d.kZero); // No rotation
+    final var poseB = new Pose3d(translation, new Rotation3d(Math.toRadians(30), 0, 0));
+    final var poseC = new Pose3d(translation, new Rotation3d(0, Math.toRadians(45), 0));
+    final var poseD = new Pose3d(translation, new Rotation3d(0, 0, Math.toRadians(90)));
+    final var poseE = new Pose3d(translation, new Rotation3d(Math.toRadians(180), 0, 0));
+
+    assertEquals(
+        poseA, new Pose3d(0, 0, 0, Rotation3d.kZero).nearest(List.of(poseA, poseB, poseD)));
+    assertEquals(
+        poseB,
+        new Pose3d(0, 0, 0, new Rotation3d(Math.toRadians(25), 0, 0))
+            .nearest(List.of(poseB, poseC, poseD)));
+    assertEquals(
+        poseC,
+        new Pose3d(0, 0, 0, new Rotation3d(0, Math.toRadians(50), 0))
+            .nearest(List.of(poseB, poseC, poseD)));
+    assertEquals(
+        poseD,
+        new Pose3d(0, 0, 0, new Rotation3d(0, 0, Math.toRadians(85)))
+            .nearest(List.of(poseA, poseC, poseD)));
+    assertEquals(
+        poseE,
+        new Pose3d(0, 0, 0, new Rotation3d(Math.toRadians(170), 0, 0))
+            .nearest(List.of(poseA, poseD, poseE)));
+
+    // Test with complex 3D rotations (combining roll, pitch, yaw)
+    final var complexPose1 =
+        new Pose3d(
+            translation,
+            new Rotation3d(Math.toRadians(45), Math.toRadians(30), Math.toRadians(60)));
+    final var complexPose2 =
+        new Pose3d(
+            translation,
+            new Rotation3d(Math.toRadians(90), Math.toRadians(45), Math.toRadians(90)));
+    final var complexPose3 =
+        new Pose3d(
+            translation,
+            new Rotation3d(Math.toRadians(10), Math.toRadians(15), Math.toRadians(20)));
+
+    assertEquals(
+        complexPose3,
+        new Pose3d(
+                0, 0, 0, new Rotation3d(Math.toRadians(5), Math.toRadians(10), Math.toRadians(15)))
+            .nearest(List.of(complexPose1, complexPose2, complexPose3)));
+  }
 }

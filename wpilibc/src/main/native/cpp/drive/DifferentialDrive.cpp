@@ -112,8 +112,8 @@ DifferentialDrive::WheelSpeeds DifferentialDrive::ArcadeDriveIK(
   // Square the inputs (while preserving the sign) to increase fine control
   // while permitting full power.
   if (squareInputs) {
-    xSpeed = std::copysign(xSpeed * xSpeed, xSpeed);
-    zRotation = std::copysign(zRotation * zRotation, zRotation);
+    xSpeed = CopySignPow(xSpeed, 2);
+    zRotation = CopySignPow(zRotation, 2);
   }
 
   double leftSpeed = xSpeed - zRotation;
@@ -167,8 +167,8 @@ DifferentialDrive::WheelSpeeds DifferentialDrive::TankDriveIK(
   // Square the inputs (while preserving the sign) to increase fine control
   // while permitting full power.
   if (squareInputs) {
-    leftSpeed = std::copysign(leftSpeed * leftSpeed, leftSpeed);
-    rightSpeed = std::copysign(rightSpeed * rightSpeed, rightSpeed);
+    leftSpeed = CopySignPow(leftSpeed, 2);
+    rightSpeed = CopySignPow(rightSpeed, 2);
   }
 
   return {leftSpeed, rightSpeed};

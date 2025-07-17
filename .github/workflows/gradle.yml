@@ -277,21 +277,3 @@ jobs:
         with:
           name: Maven
           path: ~/releases
-
-  dispatch:
-    name: dispatch
-    needs: [combine]
-    strategy:
-      matrix:
-        repo: ["SmartDashboard", "Shuffleboard", "RobotBuilder"]
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: peter-evans/repository-dispatch@v3
-        if: |
-          github.repository == 'wpilibsuite/allwpilib' &&
-          startsWith(github.ref, 'refs/tags/v2027')
-        with:
-          token: ${{ secrets.TOOL_REPO_ACCESS_TOKEN }}
-          repository: wpilibsuite/${{ matrix.repo }}
-          event-type: tag
-          client-payload: '{"package_name": "allwpilib", "package_version": "${{ github.ref_name }}"}'

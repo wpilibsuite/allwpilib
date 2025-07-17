@@ -172,7 +172,7 @@ void upperbidiagonalization_blocked_helper(
     // 1 - update the k-th column of A
     SubColumnType v_k = A.col(k).tail(remainingRows);
     v_k -= V_k1 * Y.row(k).head(k).adjoint();
-    if (k) v_k -= X_k1 * A.col(k).head(k);
+    if (k) v_k.noalias() -= X_k1 * A.col(k).head(k);
 
     // 2 - construct left Householder transform in-place
     v_k.makeHouseholderInPlace(tau_v, diagonal[k]);
@@ -203,7 +203,7 @@ void upperbidiagonalization_blocked_helper(
       SubRowType u_k(A.row(k).tail(remainingCols));
       u_k = u_k.conjugate();
       {
-        u_k -= Y_k * A.row(k).head(k + 1).adjoint();
+        u_k.noalias() -= Y_k * A.row(k).head(k + 1).adjoint();
         if (k) u_k -= U_k1.adjoint() * X.row(k).head(k).adjoint();
       }
 

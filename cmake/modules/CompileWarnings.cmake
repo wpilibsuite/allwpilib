@@ -46,8 +46,15 @@ macro(wpilib_target_warnings target)
 
     # Suppress warning "enumeration types with a fixed underlying type are a
     # Clang extension"
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wno-fixed-enum-extension>)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT EMSCRIPTEN)
+        if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 20.0)
+            target_compile_options(
+                ${target}
+                PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wno-fixed-enum-extension>
+            )
+        else()
+            target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wno-c23-extensions>)
+        endif()
     endif()
 
     # Compress debug info with GCC

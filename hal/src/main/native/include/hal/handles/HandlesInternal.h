@@ -72,6 +72,7 @@ enum class HAL_HandleEnum {
   CTREPDP = 25,
   REVPDH = 26,
   REVPH = 27,
+  CANStream = 28,
 };
 
 /**
@@ -136,7 +137,7 @@ inline int16_t getHandleTypedIndex(HAL_Handle handle, HAL_HandleEnum enumType,
   if (!isHandleType(handle, enumType)) {
     return InvalidHandleIndex;
   }
-#if !defined(__FRC_ROBORIO__)
+#if !defined(__FRC_SYSTEMCORE__)
   if (!isHandleCorrectVersion(handle, version)) {
     return InvalidHandleIndex;
   }

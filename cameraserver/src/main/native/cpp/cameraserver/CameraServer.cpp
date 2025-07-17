@@ -184,9 +184,9 @@ std::vector<std::string> Instance::GetSourceStreamValues(CS_Source source) {
     value = "mjpg:" + value;
   }
 
-#ifdef __FRC_ROBORIO__
+#ifdef __FRC_SYSTEMCORE__
   // Look to see if we have a passthrough server for this source
-  // Only do this on the roboRIO
+  // Only do this on the systemcore
   for (const auto& i : m_sinks) {
     CS_Sink sink = i.second.GetHandle();
     CS_Source sinkSource = cs::GetSinkSource(sink, &status);

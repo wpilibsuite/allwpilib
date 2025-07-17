@@ -37,7 +37,7 @@ ProxyCommand::ProxyCommand(std::unique_ptr<Command> command) {
 
 void ProxyCommand::Initialize() {
   m_command = m_supplier();
-  m_command->Schedule();
+  frc2::CommandScheduler::GetInstance().Schedule(m_command);
 }
 
 void ProxyCommand::End(bool interrupted) {

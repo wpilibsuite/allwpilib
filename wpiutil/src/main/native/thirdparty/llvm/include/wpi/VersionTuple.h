@@ -15,13 +15,11 @@
 #define WPIUTIL_WPI_VERSIONTUPLE_H
 
 #include "wpi/DenseMapInfo.h"
-#include "wpi/Hashing.h"
 #include <optional>
 #include <string>
 #include <tuple>
 
 namespace wpi {
-template <typename HasherT, wpi::endianness Endianness> class HashBuilder;
 class raw_ostream;
 
 /// Represents a version number in the form major[.minor[.subminor[.build]]].

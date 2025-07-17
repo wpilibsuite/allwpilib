@@ -1,0 +1,140 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Sun, 8 May 2022 16:38:11 -0400
+Subject: [PATCH 15/36] Fixup includes
+
+---
+ llvm/include/llvm/Support/PointerLikeTypeTraits.h | 1 +
+ llvm/lib/Support/ConvertUTFWrapper.cpp            | 1 +
+ llvm/lib/Support/ErrorHandling.cpp                | 9 ++++-----
+ llvm/lib/Support/raw_ostream.cpp                  | 9 ++++++---
+ llvm/unittests/ADT/SmallPtrSetTest.cpp            | 2 ++
+ llvm/unittests/ADT/SmallVectorTest.cpp            | 1 +
+ llvm/unittests/Support/ConvertUTFTest.cpp         | 2 ++
+ 7 files changed, 17 insertions(+), 8 deletions(-)
+
+diff --git a/llvm/include/llvm/Support/PointerLikeTypeTraits.h b/llvm/include/llvm/Support/PointerLikeTypeTraits.h
+index 1b15f930bd87d97d51824af5e62ea5f222a6b4c9..acadd5e89a1651cfbad67a5b1b0933d1f288d094 100644
+--- a/llvm/include/llvm/Support/PointerLikeTypeTraits.h
++++ b/llvm/include/llvm/Support/PointerLikeTypeTraits.h
+@@ -16,6 +16,7 @@
+ 
+ #include "llvm/Support/DataTypes.h"
+ #include <cassert>
++#include <cstdint>
+ #include <type_traits>
+ 
+ namespace llvm {
+diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
+index d53462e742e61d3476915d5b2c5aa63772e78a8a..34054140489e4d536ace4650207c783d669d850e 100644
+--- a/llvm/lib/Support/ConvertUTFWrapper.cpp
++++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
+@@ -7,6 +7,7 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include "llvm/Support/ConvertUTF.h"
++#include "llvm/Support/SmallVector.h"
+ #include "llvm/Support/ErrorHandling.h"
+ #include "llvm/Support/SwapByteOrder.h"
+ #include <span>
+diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+index 4de36d969b3776b72ff85888355b64f7f3262ccc..e813fd3faa9f76148f9802c4b7308e517df32269 100644
+--- a/llvm/lib/Support/ErrorHandling.cpp
++++ b/llvm/lib/Support/ErrorHandling.cpp
+@@ -28,12 +28,11 @@
+ #include <mutex>
+ #include <new>
+ 
+-#if defined(HAVE_UNISTD_H)
+-# include <unistd.h>
++#ifndef _WIN32
++#include <unistd.h>
+ #endif
+ #if defined(_WIN32)
+-# include <io.h>
+-# include <fcntl.h>
++#include <io.h>
+ #endif
+ 
+ using namespace llvm;
+@@ -210,7 +209,7 @@ void LLVMResetFatalErrorHandler() {
+ #ifdef _WIN32
+ 
+ #define WIN32_NO_STATUS
+-#include "llvm/Support/Windows/WindowsSupport.h"
++#include "Windows/WindowsSupport.h"
+ #undef WIN32_NO_STATUS
+ #include <ntstatus.h>
+ #include <winerror.h>
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index a74b6b00d616828a8e5ab25c1fd15f2528b4d76d..87c890f7659ae9d59ae70557df464aaff4d2d77a 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -15,6 +15,8 @@
+ #endif
+ 
+ #include "llvm/Support/raw_ostream.h"
++#include "wpi/SmallString.h"
++#include "wpi/SmallVector.h"
+ #include "llvm/ADT/StringExtras.h"
+ #include "llvm/Config/config.h"
+ #include "llvm/Support/AutoConvert.h"
+@@ -35,8 +37,9 @@
+ // <fcntl.h> may provide O_BINARY.
+ # include <fcntl.h>
+ 
+-#if defined(HAVE_UNISTD_H)
+-# include <unistd.h>
++#ifndef _WIN32
++#include <unistd.h>
++#include <sys/uio.h>
+ #endif
+ 
+ #if defined(__CYGWIN__)
+@@ -59,7 +62,7 @@
+ #ifdef _WIN32
+ #include "llvm/Support/ConvertUTF.h"
+ #include "llvm/Support/Signals.h"
+-#include "llvm/Support/Windows/WindowsSupport.h"
++#include "Windows/WindowsSupport.h"
+ #endif
+ 
+ using namespace llvm;
+diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
+index 65c0c564e91a40a98432d985c6949d3d4aa0717d..98045c6349237c620ae7d4d1792bf93c9317e145 100644
+--- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
++++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
+@@ -16,6 +16,8 @@
+ #include "gmock/gmock.h"
+ #include "gtest/gtest.h"
+ 
++#include <algorithm>
++
+ using namespace llvm;
+ using testing::UnorderedElementsAre;
+ 
+diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
+index f8c37820ef9fdfe0af067f5aa8d2297ed15e73bc..5e91f71bc9ac0e499a64dd1591e581d0707417f6 100644
+--- a/llvm/unittests/ADT/SmallVectorTest.cpp
++++ b/llvm/unittests/ADT/SmallVectorTest.cpp
+@@ -13,6 +13,7 @@
+ #include "llvm/ADT/SmallVector.h"
+ #include "llvm/Support/Compiler.h"
+ #include "gtest/gtest.h"
++#include <array>
+ #include <list>
+ #include <span>
+ #include <stdarg.h>
+diff --git a/llvm/unittests/Support/ConvertUTFTest.cpp b/llvm/unittests/Support/ConvertUTFTest.cpp
+index 3b07d344f15a555f11ad5f8177a0a65b8a4fa472..77e70a46d3621ecfaed923d87256184addfda721 100644
+--- a/llvm/unittests/Support/ConvertUTFTest.cpp
++++ b/llvm/unittests/Support/ConvertUTFTest.cpp
+@@ -7,6 +7,8 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include "llvm/Support/ConvertUTF.h"
++#include "llvm/Support/SmallString.h"
++#include "llvm/Support/SmallVector.h"
+ #include "gtest/gtest.h"
+ #include <string>
+ #include <vector>

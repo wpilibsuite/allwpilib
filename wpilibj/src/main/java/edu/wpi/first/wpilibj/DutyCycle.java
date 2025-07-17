@@ -50,7 +50,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
    *
    * @return frequency in Hertz
    */
-  public int getFrequency() {
+  public double getFrequency() {
     return DutyCycleJNI.getFrequency(m_handle);
   }
 
@@ -72,27 +72,6 @@ public class DutyCycle implements Sendable, AutoCloseable {
    */
   public int getHighTimeNanoseconds() {
     return DutyCycleJNI.getHighTime(m_handle);
-  }
-
-  /**
-   * Get the scale factor of the output.
-   *
-   * <p>An output equal to this value is always high, and then linearly scales down to 0. Divide a
-   * raw result by this in order to get the percentage between 0 and 1. Used by DMA.
-   *
-   * @return the output scale factor
-   */
-  public int getOutputScaleFactor() {
-    return DutyCycleJNI.getOutputScaleFactor(m_handle);
-  }
-
-  /**
-   * Get the FPGA index for the DutyCycle.
-   *
-   * @return the FPGA index
-   */
-  public final int getFPGAIndex() {
-    return DutyCycleJNI.getFPGAIndex(m_handle);
   }
 
   /**

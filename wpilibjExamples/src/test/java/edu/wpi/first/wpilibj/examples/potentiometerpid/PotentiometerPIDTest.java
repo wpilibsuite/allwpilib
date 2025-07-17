@@ -68,9 +68,9 @@ class PotentiometerPIDTest {
               m_elevatorSim.update(0.02);
 
               /*
-              meters = (v / 5v) * range
-              meters / range = v / 5v
-              5v * (meters / range) = v
+              meters = (v / 3.3v) * range
+              meters / range = v / 3.3v
+              3.3v * (meters / range) = v
                */
               m_analogSim.setVoltage(
                   RobotController.getVoltage3V3()

@@ -1,18 +1,57 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
+load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
+load("//wpiunits:generate_wpiunits.bzl", "generate_wpiunits")
+
+py_binary(
+    name = "generate_units",
+    srcs = ["generate_units.py"],
+    data = glob(["src/generate/main/java/**"]),
+    target_compatible_with = select({
+        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [requirement("jinja2")],
+)
+
+generate_wpiunits(
+    name = "gen_units",
+)
+
+write_source_files(
+    name = "write_wpiunits",
+    files = {
+        "src/generated": ":gen_units",
+    },
+    suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
+    visibility = ["//visibility:public"],
+)
 
 java_library(
-    name = "wpiunits",
+    name = "wpiunits-java",
     srcs = glob(["src/main/java/**/*.java"]) + glob(["src/generated/main/java/**/*.java"]),
     visibility = ["//visibility:public"],
     deps = [],
+)
+
+pkg_java_files(name = "wpiunits-java-srcs")
+
+pkg_zip(
+    name = "libwpiunits-java-sources",
+    srcs = [":wpiunits-java-srcs"],
+    out = "libwpiunits-java-sources.jar",
 )
 
 wpilib_java_junit5_test(
     name = "wpiunits-test",
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
-        ":wpiunits",
+        ":wpiunits-java",
     ],
 )
 
@@ -21,6 +60,6 @@ java_binary(
     srcs = ["src/dev/java/edu/wpi/first/units/DevMain.java"],
     main_class = "edu.wpi.first.units.DevMain",
     deps = [
-        ":wpiunits",
+        ":wpiunits-java",
     ],
 )

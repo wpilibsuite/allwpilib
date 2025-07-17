@@ -2,35 +2,32 @@
 
 import os
 import shutil
+from pathlib import Path
 
 from upstream_utils import Lib, walk_if
 
 
-def copy_upstream_src(wpilib_root):
-    wpiutil = os.path.join(wpilib_root, "wpiutil")
+def copy_upstream_src(wpilib_root: Path):
+    wpiutil = wpilib_root / "wpiutil"
 
     # Delete old install
     for d in [
         "src/main/native/thirdparty/json/include",
     ]:
-        shutil.rmtree(os.path.join(wpiutil, d), ignore_errors=True)
+        shutil.rmtree(wpiutil / d, ignore_errors=True)
 
     # Create lists of source and destination files
     os.chdir("include/nlohmann")
-    files = walk_if(".", lambda dp, f: True)
-    src_include_files = [os.path.abspath(f) for f in files]
-    wpiutil_json_root = os.path.join(
-        wpiutil, "src/main/native/thirdparty/json/include/wpi"
-    )
-    dest_include_files = [
-        os.path.join(wpiutil_json_root, f.replace(".hpp", ".h")) for f in files
-    ]
+    files = walk_if(Path("."), lambda dp, f: True)
+    src_include_files = [f.absolute() for f in files]
+    wpiutil_json_root = wpiutil / "src/main/native/thirdparty/json/include/wpi"
+    dest_include_files = [wpiutil_json_root / f.with_suffix(".h") for f in files]
 
     # Copy json header files into allwpilib
     for i in range(len(src_include_files)):
-        dest_dir = os.path.dirname(dest_include_files[i])
-        if not os.path.exists(dest_dir):
-            os.makedirs(dest_dir)
+        dest_dir = dest_include_files[i].parent
+        if not dest_dir.exists():
+            dest_dir.mkdir(parents=True)
         shutil.copyfile(src_include_files[i], dest_include_files[i])
 
     for include_file in dest_include_files:

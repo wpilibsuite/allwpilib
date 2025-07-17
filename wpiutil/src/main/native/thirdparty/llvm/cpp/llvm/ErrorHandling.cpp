@@ -24,7 +24,7 @@
 #ifndef _WIN32
 #include <unistd.h>
 #endif
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 #include <io.h>
 #endif
 

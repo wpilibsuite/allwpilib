@@ -143,7 +143,7 @@ public class DriverStationJNI extends JNIWrapper {
   public static final int kMaxJoystickAxes = 12;
 
   /** The maximum number of POVs. */
-  public static final int kMaxJoystickPOVs = 12;
+  public static final int kMaxJoystickPOVs = 8;
 
   /** The maximum number of joysticks. */
   public static final int kMaxJoysticks = 6;
@@ -162,11 +162,11 @@ public class DriverStationJNI extends JNIWrapper {
    * Gets the axes of a specific joystick.
    *
    * @param joystickNum the joystick number
-   * @param rawAxesArray the raw int axes values (0-255)
+   * @param rawAxesArray the raw int axes values (-32767-32768)
    * @return number of joystick axes, or 0 for error
    * @see "HAL_GetJoystickAxes"
    */
-  public static native int getJoystickAxesRaw(byte joystickNum, int[] rawAxesArray);
+  public static native int getJoystickAxesRaw(byte joystickNum, short[] rawAxesArray);
 
   /**
    * Gets the POVs of a specific joystick.
@@ -176,7 +176,7 @@ public class DriverStationJNI extends JNIWrapper {
    * @return number of POVs, or 0 for error
    * @see "HAL_GetJoystickPOVs"
    */
-  public static native int getJoystickPOVs(byte joystickNum, short[] povsArray);
+  public static native int getJoystickPOVs(byte joystickNum, byte[] povsArray);
 
   /**
    * Gets the buttons of a specific joystick.
@@ -199,7 +199,7 @@ public class DriverStationJNI extends JNIWrapper {
    * @see "HAL_GetAllJoystickData"
    */
   public static native void getAllJoystickData(
-      float[] axesArray, byte[] rawAxesArray, short[] povsArray, long[] buttonsAndMetadata);
+      float[] axesArray, short[] rawAxesArray, byte[] povsArray, long[] buttonsAndMetadata);
 
   /**
    * Set joystick outputs.
@@ -215,13 +215,13 @@ public class DriverStationJNI extends JNIWrapper {
       byte joystickNum, int outputs, int leftRumble, int rightRumble);
 
   /**
-   * Gets whether a specific joystick is considered to be an XBox controller.
+   * Gets whether a specific joystick is considered to be an Gamepad.
    *
    * @param joystickNum the joystick number
-   * @return 1 if xbox, 0 otherwise
-   * @see "HAL_GetJoystickIsXbox"
+   * @return 1 if gamepad, 0 otherwise
+   * @see "HAL_GetJoystickIsGamepad"
    */
-  public static native int getJoystickIsXbox(byte joystickNum);
+  public static native int getJoystickIsGamepad(byte joystickNum);
 
   /**
    * Gets the type of joystick connected.

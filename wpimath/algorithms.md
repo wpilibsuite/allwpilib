@@ -92,7 +92,7 @@ Substitute these into the feedforward equation.
   uₖ = kₛ sgn(x) + kᵥxₖ₊₁
 ```
 
-Simplify the model when ka ≠ 0
+Simplify the model when kₐ ≠ 0
 
 ```
   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ)
@@ -105,6 +105,21 @@ where
   B = 1/kₐ
   A_d = eᴬᵀ
   B_d = A⁻¹(eᴬᵀ - I)B
+```
+
+When kᵥ = 0, A = 0 and B_d has a singularity. We can eliminate the singularity using the matrix exponential discretization method.
+
+```
+ [A  B]
+ [0  0]T   [A_d  B_d]
+e        = [ 0    I ]
+
+ [0  B]
+ [0  0]T   [1  BT]
+e        = [0   1]
+
+A_d = 1
+B_d = BT
 ```
 
 ## Elevator feedforward
@@ -199,7 +214,7 @@ Substitute these into the feedforward equation.
   uₖ = kₛ sgn(x) + kg + kᵥxₖ₊₁
 ```
 
-Simplify the model when ka ≠ 0
+Simplify the model when kₐ ≠ 0
 
 ```
   uₖ = B_d⁺(xₖ₊₁ − A_d xₖ)
@@ -212,6 +227,21 @@ where
   B = 1/kₐ
   A_d = eᴬᵀ
   B_d = A⁻¹(eᴬᵀ - I)B
+```
+
+When kᵥ = 0, A = 0 and B_d has a singularity. We can eliminate the singularity using the matrix exponential discretization method.
+
+```
+ [A  B]
+ [0  0]T   [A_d  B_d]
+e        = [ 0    I ]
+
+ [0  B]
+ [0  0]T   [1  BT]
+e        = [0   1]
+
+A_d = 1
+B_d = BT
 ```
 
 ## Closed form Kalman gain for continuous Kalman filter with A = 0 and C = I

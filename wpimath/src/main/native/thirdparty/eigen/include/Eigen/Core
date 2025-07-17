@@ -193,21 +193,27 @@ using std::ptrdiff_t;
 #include "src/Core/arch/Default/GenericPacketMathFunctionsFwd.h"
 
 #if defined EIGEN_VECTORIZE_AVX512
+#include "src/Core/arch/SSE/PacketMath.h"
+#include "src/Core/arch/AVX/PacketMath.h"
+// #include "src/Core/arch/AVX512/PacketMath.h"
 #if defined EIGEN_VECTORIZE_AVX512FP16
 // #include "src/Core/arch/AVX512/PacketMathFP16.h"
 #endif
-#include "src/Core/arch/SSE/PacketMath.h"
 #include "src/Core/arch/SSE/TypeCasting.h"
-#include "src/Core/arch/SSE/Complex.h"
-#include "src/Core/arch/AVX/PacketMath.h"
 #include "src/Core/arch/AVX/TypeCasting.h"
-#include "src/Core/arch/AVX/Complex.h"
-// #include "src/Core/arch/AVX512/PacketMath.h"
 // #include "src/Core/arch/AVX512/TypeCasting.h"
+#if defined EIGEN_VECTORIZE_AVX512FP16
+// #include "src/Core/arch/AVX512/TypeCastingFP16.h"
+#endif
+#include "src/Core/arch/SSE/Complex.h"
+#include "src/Core/arch/AVX/Complex.h"
 // #include "src/Core/arch/AVX512/Complex.h"
 #include "src/Core/arch/SSE/MathFunctions.h"
 #include "src/Core/arch/AVX/MathFunctions.h"
 // #include "src/Core/arch/AVX512/MathFunctions.h"
+#if defined EIGEN_VECTORIZE_AVX512FP16
+// #include "src/Core/arch/AVX512/MathFunctionsFP16.h"
+#endif
 // #include "src/Core/arch/AVX512/TrsmKernel.h"
 #elif defined EIGEN_VECTORIZE_AVX
    // Use AVX for floats and doubles, SSE for integers
@@ -234,6 +240,11 @@ using std::ptrdiff_t;
 #include "src/Core/arch/NEON/TypeCasting.h"
 #include "src/Core/arch/NEON/MathFunctions.h"
 #include "src/Core/arch/NEON/Complex.h"
+#elif defined EIGEN_VECTORIZE_LSX
+// #include "src/Core/arch/LSX/PacketMath.h"
+// #include "src/Core/arch/LSX/TypeCasting.h"
+// #include "src/Core/arch/LSX/MathFunctions.h"
+// #include "src/Core/arch/LSX/Complex.h"
 #elif defined EIGEN_VECTORIZE_SVE
 // #include "src/Core/arch/SVE/PacketMath.h"
 // #include "src/Core/arch/SVE/TypeCasting.h"
@@ -300,11 +311,7 @@ using std::ptrdiff_t;
 #include "src/Core/Product.h"
 #include "src/Core/CoreEvaluators.h"
 #include "src/Core/AssignEvaluator.h"
-
-#ifndef EIGEN_PARSED_BY_DOXYGEN  // work around Doxygen bug triggered by Assign.h r814874
-                                 // at least confirmed with Doxygen 1.5.5 and 1.5.6
 #include "src/Core/Assign.h"
-#endif
 
 #include "src/Core/ArrayBase.h"
 #include "src/Core/util/BlasUtil.h"
@@ -318,6 +325,7 @@ using std::ptrdiff_t;
 #include "src/Core/PlainObjectBase.h"
 #include "src/Core/Matrix.h"
 #include "src/Core/Array.h"
+#include "src/Core/Fill.h"
 #include "src/Core/CwiseTernaryOp.h"
 #include "src/Core/CwiseBinaryOp.h"
 #include "src/Core/CwiseUnaryOp.h"
@@ -380,6 +388,8 @@ using std::ptrdiff_t;
 // #include "src/Core/arch/AltiVec/MatrixProduct.h"
 #elif defined EIGEN_VECTORIZE_NEON
 #include "src/Core/arch/NEON/GeneralBlockPanelKernel.h"
+#elif defined EIGEN_VECTORIZE_LSX
+// #include "src/Core/arch/LSX/GeneralBlockPanelKernel.h"
 #endif
 
 #if defined(EIGEN_VECTORIZE_AVX512)

@@ -56,3 +56,22 @@ TEST_F(DebouncerTest, DebounceBoth) {
 
   EXPECT_FALSE(debouncer.Calculate(false));
 }
+
+TEST_F(DebouncerTest, DebounceParams) {
+  frc::Debouncer debouncer{20_ms, frc::Debouncer::DebounceType::kBoth};
+
+  EXPECT_TRUE(debouncer.GetDebounceTime() == 20_ms);
+  EXPECT_TRUE(debouncer.GetDebounceType() ==
+              frc::Debouncer::DebounceType::kBoth);
+
+  debouncer.SetDebounceTime(100_ms);
+
+  EXPECT_TRUE(debouncer.GetDebounceTime() == 100_ms);
+
+  debouncer.SetDebounceType(frc::Debouncer::DebounceType::kFalling);
+
+  EXPECT_TRUE(debouncer.GetDebounceType() ==
+              frc::Debouncer::DebounceType::kFalling);
+
+  EXPECT_TRUE(debouncer.Calculate(false));
+}

@@ -15,8 +15,8 @@ namespace frc {
  * dissertation[1] for the UnscentedKalmanFilter class.
  *
  * It parametrizes the sigma points using alpha, beta, kappa terms, and is the
- * version seen in most publications. Unless you know better, this should be
- * your default choice.
+ * version seen in most publications. S3SigmaPoints is generally preferred due
+ * to its greater performance with nearly identical accuracy.
  *
  * [1] R. Van der Merwe "Sigma-Point Kalman Filters for Probabilistic
  *     Inference in Dynamic State-Space Models" (Doctoral dissertation)
@@ -27,6 +27,8 @@ namespace frc {
 template <int States>
 class MerweScaledSigmaPoints {
  public:
+  static constexpr int NumSigmas = 2 * States + 1;
+
   /**
    * Constructs a generator for Van der Merwe scaled sigma points.
    *
@@ -45,13 +47,8 @@ class MerweScaledSigmaPoints {
   }
 
   /**
-   * Returns number of sigma points for each variable in the state x.
-   */
-  int NumSigmas() { return 2 * States + 1; }
-
-  /**
    * Computes the sigma points for an unscented Kalman filter given the mean
-   * (x) and square-root covariance(S) of the filter.
+   * (x) and square-root covariance (S) of the filter.
    *
    * @param x An array of the means.
    * @param S Square-root covariance of the filter.
@@ -68,6 +65,8 @@ class MerweScaledSigmaPoints {
     Matrixd<States, States> U = eta * S;
 
     Matrixd<States, 2 * States + 1> sigmas;
+
+    // equation (17)
     sigmas.template block<States, 1>(0, 0) = x;
     for (int k = 0; k < States; ++k) {
       sigmas.template block<States, 1>(0, k + 1) =

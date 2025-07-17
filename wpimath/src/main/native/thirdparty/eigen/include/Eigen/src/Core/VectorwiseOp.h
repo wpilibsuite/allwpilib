@@ -36,6 +36,7 @@ template <typename MatrixType, typename MemberOp, int Direction>
 class PartialReduxExpr;
 
 namespace internal {
+
 template <typename MatrixType, typename MemberOp, int Direction>
 struct traits<PartialReduxExpr<MatrixType, MemberOp, Direction> > : traits<MatrixType> {
   typedef typename MemberOp::result_type Scalar;
@@ -63,12 +64,8 @@ class PartialReduxExpr : public internal::dense_xpr_base<PartialReduxExpr<Matrix
   EIGEN_DEVICE_FUNC explicit PartialReduxExpr(const MatrixType& mat, const MemberOp& func = MemberOp())
       : m_matrix(mat), m_functor(func) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT {
-    return (Direction == Vertical ? 1 : m_matrix.rows());
-  }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT {
-    return (Direction == Horizontal ? 1 : m_matrix.cols());
-  }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept { return (Direction == Vertical ? 1 : m_matrix.rows()); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return (Direction == Horizontal ? 1 : m_matrix.cols()); }
 
   EIGEN_DEVICE_FUNC typename MatrixType::Nested nestedExpression() const { return m_matrix; }
 
@@ -606,10 +603,9 @@ class VectorwiseOp {
   /** Returns the expression where each subvector is the product of the vector \a other
    * by the corresponding subvector of \c *this */
   template <typename OtherDerived>
-  EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC
-      CwiseBinaryOp<internal::scalar_product_op<Scalar>, const ExpressionTypeNestedCleaned,
-                    const typename ExtendedType<OtherDerived>::Type> EIGEN_DEVICE_FUNC
-      operator*(const DenseBase<OtherDerived>& other) const {
+  EIGEN_DEVICE_FUNC CwiseBinaryOp<internal::scalar_product_op<Scalar, typename OtherDerived::Scalar>,
+                                  const ExpressionTypeNestedCleaned, const typename ExtendedType<OtherDerived>::Type>
+  operator*(const DenseBase<OtherDerived>& other) const {
     EIGEN_STATIC_ASSERT_VECTOR_ONLY(OtherDerived)
     EIGEN_STATIC_ASSERT_ARRAYXPR(ExpressionType)
     EIGEN_STATIC_ASSERT_SAME_XPR_KIND(ExpressionType, OtherDerived)
@@ -619,8 +615,8 @@ class VectorwiseOp {
   /** Returns the expression where each subvector is the quotient of the corresponding
    * subvector of \c *this by the vector \a other */
   template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC CwiseBinaryOp<internal::scalar_quotient_op<Scalar>, const ExpressionTypeNestedCleaned,
-                                  const typename ExtendedType<OtherDerived>::Type>
+  EIGEN_DEVICE_FUNC CwiseBinaryOp<internal::scalar_quotient_op<Scalar, typename OtherDerived::Scalar>,
+                                  const ExpressionTypeNestedCleaned, const typename ExtendedType<OtherDerived>::Type>
   operator/(const DenseBase<OtherDerived>& other) const {
     EIGEN_STATIC_ASSERT_VECTOR_ONLY(OtherDerived)
     EIGEN_STATIC_ASSERT_ARRAYXPR(ExpressionType)

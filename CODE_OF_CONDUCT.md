@@ -1,69 +1,46 @@
-# Contributor Covenant Code of Conduct
+# Contributor Community Code of Conduct
 
 ## Our Pledge
 
-We as members, contributors, and leaders pledge to make participation in our
-community a harassment-free experience for everyone, regardless of age, body
-size, visible or invisible disability, ethnicity, sex characteristics, gender
-identity and expression, level of experience, education, socio-economic status,
-nationality, personal appearance, race, religion, or sexual identity
-and orientation.
+As members, contributors, and leaders, we commit to fostering a community where everyone feels safe, respected, and valued. We are dedicated to ensuring that participation in this community is harassment-free, inclusive, and welcoming, regardless of age, body type, abilities (visible or invisible), ethnicity, gender identity or expression, sexual orientation, socioeconomic background, education, nationality, personal appearance, race, or religion.
 
-We pledge to act and interact in ways that contribute to an open, welcoming,
-diverse, inclusive, and healthy community.
+We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.
 
 ## Our Standards
 
-Examples of behavior that contributes to a positive environment for our
-community include:
+Positive and respectful behavior is essential to creating a thriving community. This includes:
 
-* Exhibiting Gracious Professionalism® at all times. Gracious Professionalism
+* Practicing **Gracious Professionalism®** at all times. Gracious Professionalism
   is a way of doing things that encourages high-quality work, emphasizes the
   value of others, and respects individuals and the community.
-* Demonstrating empathy and kindness toward other people
-* Being respectful of differing opinions, viewpoints, and experiences
-* Giving and gracefully accepting constructive feedback
-* Accepting responsibility and apologizing to those affected by our mistakes,
-  and learning from the experience
-* Focusing on what is best not just for us as individuals, but for the
-  overall community
+* Showing empathy, kindness, and patience.
+* Respecting diverse perspectives and experiences.
+* Giving and receiving constructive feedback with openness and humility.
+* Owning mistakes, apologizing when necessary, and learning from them.
+* Prioritizing the well-being and success of the entire community over individual interests.
 
-Examples of unacceptable behavior include:
+Unacceptable behavior include:
 
-* The use of sexualized language or imagery, and sexual attention or
-  advances of any kind
+* Using sexualized language, imagery, or making inappropriate advances
 * Trolling, insulting or derogatory comments, and personal or political attacks
-* Public or private harassment
-* Publishing others' private information, such as a physical or email
-  address, without their explicit permission
-* Other conduct which could reasonably be considered inappropriate in a
-  professional setting
+* Harassment in any form, whether public or private.
+* Sharing private information (e.g., email or physical addresses) without explicit consent.
+
+* Any behavior that is unprofessional, harmful, or exclusionary.
 
 ## Enforcement Responsibilities
 
-Community leaders are responsible for clarifying and enforcing our standards of
-acceptable behavior and will take appropriate and fair corrective action in
-response to any behavior that they deem inappropriate, threatening, offensive,
-or harmful.
-
-Community leaders have the right and responsibility to remove, edit, or reject
-comments, commits, code, wiki edits, issues, and other contributions that are
-not aligned to this Code of Conduct, and will communicate reasons for moderation
-decisions when appropriate.
+Community leaders are responsible for maintaining these standards and will take appropriate action to address any behavior deemed harmful, threatening, or inappropriate. Actions may include removing content, issuing warnings, or, when necessary, banning individuals. Moderation decisions will be communicated transparently where appropriate.
 
 ## Scope
 
-This Code of Conduct applies within all community spaces, and also applies when
-an individual is officially representing the community in public spaces.
-Examples of representing our community include using an official e-mail address,
-posting via an official social media account, or acting as an appointed
-representative at an online or offline event.
+This Code of Conduct applies to all community spaces, events, and instances where individuals represent the community (e.g., official email accounts, social media posts, or in-person/virtual events).
 
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement at
-[conduct@wpilib.org](mailto:conduct@wpilib.org).
+[wpilib@wpi.edu](mailto:wpilib@wpi.edu).
 All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the
@@ -114,6 +91,9 @@ individual, or aggression toward or disparagement of classes of individuals.
 
 **Consequence**: A permanent ban from any sort of public interaction within
 the community.
+
+## A Note on Kindness
+Building a community isn’t just about rules—it’s about connection. Every interaction is an opportunity to be understanding, compassionate, and supportive. Being a good human is the key to our ethos.
 
 ## Attribution
 

@@ -57,22 +57,22 @@ class QuaternionBase : public RotationBase<Derived, 3> {
   typedef AngleAxis<Scalar> AngleAxisType;
 
   /** \returns the \c x coefficient */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline CoeffReturnType x() const { return this->derived().coeffs().coeff(0); }
+  EIGEN_DEVICE_FUNC constexpr CoeffReturnType x() const { return this->derived().coeffs().coeff(0); }
   /** \returns the \c y coefficient */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline CoeffReturnType y() const { return this->derived().coeffs().coeff(1); }
+  EIGEN_DEVICE_FUNC constexpr CoeffReturnType y() const { return this->derived().coeffs().coeff(1); }
   /** \returns the \c z coefficient */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline CoeffReturnType z() const { return this->derived().coeffs().coeff(2); }
+  EIGEN_DEVICE_FUNC constexpr CoeffReturnType z() const { return this->derived().coeffs().coeff(2); }
   /** \returns the \c w coefficient */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline CoeffReturnType w() const { return this->derived().coeffs().coeff(3); }
+  EIGEN_DEVICE_FUNC constexpr CoeffReturnType w() const { return this->derived().coeffs().coeff(3); }
 
   /** \returns a reference to the \c x coefficient (if Derived is a non-const lvalue) */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline NonConstCoeffReturnType x() { return this->derived().coeffs().x(); }
+  EIGEN_DEVICE_FUNC constexpr NonConstCoeffReturnType x() { return this->derived().coeffs().x(); }
   /** \returns a reference to the \c y coefficient (if Derived is a non-const lvalue) */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline NonConstCoeffReturnType y() { return this->derived().coeffs().y(); }
+  EIGEN_DEVICE_FUNC constexpr NonConstCoeffReturnType y() { return this->derived().coeffs().y(); }
   /** \returns a reference to the \c z coefficient (if Derived is a non-const lvalue) */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline NonConstCoeffReturnType z() { return this->derived().coeffs().z(); }
+  EIGEN_DEVICE_FUNC constexpr NonConstCoeffReturnType z() { return this->derived().coeffs().z(); }
   /** \returns a reference to the \c w coefficient (if Derived is a non-const lvalue) */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline NonConstCoeffReturnType w() { return this->derived().coeffs().w(); }
+  EIGEN_DEVICE_FUNC constexpr NonConstCoeffReturnType w() { return this->derived().coeffs().w(); }
 
   /** \returns a read-only vector expression of the imaginary part (x,y,z) */
   EIGEN_DEVICE_FUNC inline const VectorBlock<const Coefficients, 3> vec() const { return coeffs().template head<3>(); }
@@ -346,13 +346,11 @@ class Quaternion : public QuaternionBase<Quaternion<Scalar_, Options_> > {
 
   // We define a copy constructor, which means we don't get an implicit move constructor or assignment operator.
   /** Default move constructor */
-  EIGEN_DEVICE_FUNC inline Quaternion(Quaternion&& other)
-      EIGEN_NOEXCEPT_IF(std::is_nothrow_move_constructible<Scalar>::value)
+  EIGEN_DEVICE_FUNC inline Quaternion(Quaternion&& other) noexcept(std::is_nothrow_move_constructible<Scalar>::value)
       : m_coeffs(std::move(other.coeffs())) {}
 
   /** Default move assignment operator */
-  EIGEN_DEVICE_FUNC Quaternion& operator=(Quaternion&& other)
-      EIGEN_NOEXCEPT_IF(std::is_nothrow_move_assignable<Scalar>::value) {
+  EIGEN_DEVICE_FUNC Quaternion& operator=(Quaternion&& other) noexcept(std::is_nothrow_move_assignable<Scalar>::value) {
     m_coeffs = std::move(other.coeffs());
     return *this;
   }
@@ -793,7 +791,7 @@ EIGEN_DEVICE_FUNC Quaternion<typename internal::traits<Derived>::Scalar> Quatern
   } else {
     // theta is the angle between the 2 quaternions
     Scalar theta = acos(absD);
-    Scalar sinTheta = sin(theta);
+    Scalar sinTheta = numext::sqrt(Scalar(1) - absD * absD);
 
     scale0 = sin((Scalar(1) - t) * theta) / sinTheta;
     scale1 = sin((t * theta)) / sinTheta;

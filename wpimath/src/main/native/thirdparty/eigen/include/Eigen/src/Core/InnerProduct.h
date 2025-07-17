@@ -57,16 +57,20 @@ struct inner_product_assert {
 
 template <typename Func, typename Lhs, typename Rhs>
 struct inner_product_evaluator {
-  static constexpr int LhsFlags = evaluator<Lhs>::Flags, RhsFlags = evaluator<Rhs>::Flags,
-                       SizeAtCompileTime = min_size_prefer_fixed(Lhs::SizeAtCompileTime, Rhs::SizeAtCompileTime),
-                       LhsAlignment = evaluator<Lhs>::Alignment, RhsAlignment = evaluator<Rhs>::Alignment;
+  static constexpr int LhsFlags = evaluator<Lhs>::Flags;
+  static constexpr int RhsFlags = evaluator<Rhs>::Flags;
+  static constexpr int SizeAtCompileTime = size_prefer_fixed(Lhs::SizeAtCompileTime, Rhs::SizeAtCompileTime);
+  static constexpr int MaxSizeAtCompileTime =
+      min_size_prefer_fixed(Lhs::MaxSizeAtCompileTime, Rhs::MaxSizeAtCompileTime);
+  static constexpr int LhsAlignment = evaluator<Lhs>::Alignment;
+  static constexpr int RhsAlignment = evaluator<Rhs>::Alignment;
 
   using Scalar = typename Func::result_type;
   using Packet = typename find_inner_product_packet<Scalar, SizeAtCompileTime>::type;
 
   static constexpr bool Vectorize =
       bool(LhsFlags & RhsFlags & PacketAccessBit) && Func::PacketAccess &&
-      ((SizeAtCompileTime == Dynamic) || (unpacket_traits<Packet>::size <= SizeAtCompileTime));
+      ((MaxSizeAtCompileTime == Dynamic) || (unpacket_traits<Packet>::size <= MaxSizeAtCompileTime));
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit inner_product_evaluator(const Lhs& lhs, const Rhs& rhs,
                                                                          Func func = Func())

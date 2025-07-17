@@ -2,12 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#import "UsbCameraImplObjc.h"
-#include "UsbCameraImpl.h"
+#include <wpi/SmallString.h>
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#import "UsbCameraImplObjc.h"
+
 #include "Notifier.h"
 #include "Log.h"
+#include "UsbCameraImpl.h"
 
 template <typename S, typename... Args>
 inline void NamedLog(UsbCameraImplObjc* objc, unsigned int level,
@@ -104,44 +106,300 @@ using namespace cs;
                name:AVCaptureDeviceWasDisconnectedNotification
              object:nil];
     [self deviceConnect];
+    [self deviceCacheProperties];
   });
+}
+
+- (BOOL)getEnabledWithProperty:(int)property withValue:(int)value {
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    return false;
+  }
+
+  // There is room for quirk handling improvement here, but I will leave it
+  // for now.
+  if (property == sharedThis->GetPropertyIndex(kPropertyAutoExposure)) {
+    return value == kPropertyAutoExposureOn;
+  }
+
+  return value != 0;
+}
+
+
+- (int)clampToPercent:(int)value {
+  if (value < 0) {
+    return 0;
+  }
+  if (value > 100) {
+    return 100;
+  }
+  return value;
+}
+
+- (int)percentageToRaw:(int)propID percentage:(int)percentage min:(int)min max:(int)max {
+  if (min == max) {
+    return min;
+  }
+
+  return min + (max - min) * percentage / 100;
+}
+
+- (BOOL)isPercentageProperty:(int)propID {
+    return propID == CAPPROPID_BRIGHTNESS ||
+           propID == CAPPROPID_CONTRAST ||
+           propID == CAPPROPID_SATURATION ||
+           propID == CAPPROPID_HUE ||
+           propID == CAPPROPID_SHARPNESS ||
+           propID == CAPPROPID_GAIN;
 }
 
 // Property functions
 - (void)setProperty:(int)property
           withValue:(int)value
              status:(CS_Status*)status {
+    auto sharedThis = self.cppImpl.lock();
+    if (!sharedThis) {
+        *status = CS_INVALID_HANDLE;
+        return;
+    }
+    
+    // Make sure properties are cached
+    if (!self.propertiesCached) {
+        [self deviceCacheProperties];
+    }
+    
+    // Get the property name from the property index
+    wpi::SmallString<128> nameBuf;
+    std::string_view propName = sharedThis->GetPropertyName(property, nameBuf, status);
+    if (*status != 0) {
+        OBJCERROR("Failed to get property name for index {}", property);
+        return;
+    }
+    
+    std::string nameStr(propName);
+    
+    // Check if it's an auto property
+    auto& propertyAutoCache = sharedThis->GetPropertyAutoCache();
+    auto autoIt = propertyAutoCache.find(nameStr);
+    if (autoIt != propertyAutoCache.end()) {
+        uint32_t propID = autoIt->second;
+        bool enabled = [self getEnabledWithProperty:property withValue:value];
+        dispatch_async_and_wait(self.sessionQueue, ^{
+            if (self.uvcControl == nil) {
+                *status = CS_INVALID_PROPERTY;
+                return;
+            }
+            
+            if (![self.uvcControl setAutoProperty:propID enabled:enabled status:status]) {
+                OBJCERROR("Failed to set auto property {} to {}",
+                        nameStr, enabled);
+                return;
+            }
+            
+            // Update property value
+            sharedThis->UpdatePropertyValuePublic(property, false, value, {});
+        });
+        return;
+    }
+    
+    // Handle regular property
+    auto& propertyCache = sharedThis->GetPropertyCache();
+    auto it = propertyCache.find(nameStr);
+    if (it == propertyCache.end()) {
+        OBJCERROR("Property not found in cache: {}", nameStr);
+        *status = CS_INVALID_PROPERTY;
+        return;
+    }
+    
+    uint32_t propID = it->second;
+    
+    dispatch_async_and_wait(self.sessionQueue, ^{
+        if (self.uvcControl == nil) {
+            *status = CS_INVALID_PROPERTY;
+            return;
+        }
+        
+        // Get the property implementation to access its limits
+        const PropertyImpl* prop = sharedThis->GetPropertyPublic(property);
+        if (!prop) {
+            *status = CS_INVALID_PROPERTY;
+            return;
+        }
+        
+
+        int32_t realValue = value;
+        if ([self isPercentageProperty:propID]) {
+            // Clamp to 0-100
+            realValue = [self clampToPercent:realValue];
+
+            // Scale to min/max
+            realValue = [self percentageToRaw:propID percentage:realValue min:prop->minimum max:prop->maximum];
+        }
+
+        if (![self.uvcControl setProperty:propID withValue:realValue status:status]) {
+            OBJCERROR("Failed to set property {} to value {}", nameStr, realValue);
+            return;
+        }
+        
+        // Update property value in the container
+        sharedThis->UpdatePropertyValuePublic(property, false, value, {});
+    });
 }
+
 - (void)setStringProperty:(int)property
                 withValue:(std::string_view*)value
                    status:(CS_Status*)status {
+  *status = CS_INVALID_PROPERTY;
+  return;
 }
 
 // Standard common camera properties
 - (void)setBrightness:(int)brightness status:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  // Get the property index and set it
+  int prop = sharedThis->GetPropertyIndex(kPropertyBrightness);
+  sharedThis->SetProperty(prop, brightness, status);
 }
+
 - (int)getBrightness:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
-  return 0;
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  // Get the property index and its value
+  int prop = sharedThis->GetPropertyIndex(kPropertyBrightness);
+  return sharedThis->GetProperty(prop, status);
 }
+
 - (void)setWhiteBalanceAuto:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  int prop = sharedThis->GetPropertyIndex(kPropertyAutoWhiteBalance);
+  sharedThis->SetProperty(prop, 1, status);
 }
+
 - (void)setWhiteBalanceHoldCurrent:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  int prop = sharedThis->GetPropertyIndex(kPropertyAutoWhiteBalance);
+  sharedThis->SetProperty(prop, 0, status);
 }
+
 - (void)setWhiteBalanceManual:(int)value status:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  // First disable auto white balance
+  int autoProp = sharedThis->GetPropertyIndex(kPropertyAutoWhiteBalance);
+  sharedThis->SetProperty(autoProp, 0, status);
+  if (*status != 0) {
+    return;
+  }
+  
+  // Then set the white balance value
+  int prop = sharedThis->GetPropertyIndex(kPropertyWhiteBalance);
+  sharedThis->SetProperty(prop, value, status);
 }
+
 - (void)setExposureAuto:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  // Set the auto exposure property to enabled (1)
+  int prop = sharedThis->GetPropertyIndex(kPropertyAutoExposure);
+  sharedThis->SetProperty(prop, kPropertyAutoExposureOn, status);
 }
+
 - (void)setExposureHoldCurrent:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  // Set the auto exposure property to disabled (0)
+  int prop = sharedThis->GetPropertyIndex(kPropertyAutoExposure);
+  sharedThis->SetProperty(prop, kPropertyAutoExposureOff, status);
 }
+
 - (void)setExposureManual:(int)value status:(CS_Status*)status {
-  *status = CS_INVALID_PROPERTY;
+  auto sharedThis = self.cppImpl.lock();
+  if (!sharedThis) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  
+  // Make sure properties are cached
+  if (!self.propertiesCached) {
+    [self deviceCacheProperties];
+  }
+  
+  // First disable auto exposure
+  int autoProp = sharedThis->GetPropertyIndex(kPropertyAutoExposure);
+  sharedThis->SetProperty(autoProp, kPropertyAutoExposureOff, status);
+  if (*status != 0) {
+    return;
+  }
+  
+  // Then set the exposure value
+  int prop = sharedThis->GetPropertyIndex(kPropertyExposure);
+  sharedThis->SetProperty(prop, value, status);
 }
 
 - (bool)setVideoMode:(const cs::VideoMode&)mode status:(CS_Status*)status {
@@ -295,10 +553,144 @@ using namespace cs;
 
 // All above are called from C++, must always dispatch to loop
 
+// Property caching methods
 - (void)deviceCacheProperties {
-  if (self.session == nil) {
-    return;
-  }
+    if (self.uvcControl == nil) {
+        return;
+    }
+
+    auto sharedThis = self.cppImpl.lock();
+    if (!sharedThis) {
+        OBJCERROR("Cannot cache properties: UsbCameraImpl not available");
+        return;
+    }
+
+    // Cache basic properties
+    [self cacheProperty:CAPPROPID_BRIGHTNESS withName:@kPropertyBrightness];
+    [self cacheProperty:CAPPROPID_WHITEBALANCE withName:@kPropertyWhiteBalance];
+    [self cacheProperty:CAPPROPID_EXPOSURE withName:@kPropertyExposure];
+    [self cacheProperty:CAPPROPID_CONTRAST withName:@kPropertyContrast];
+    [self cacheProperty:CAPPROPID_SATURATION withName:@kPropertySaturation];
+    [self cacheProperty:CAPPROPID_SHARPNESS withName:@kPropertySharpness];
+    [self cacheProperty:CAPPROPID_GAIN withName:@kPropertyGain];
+    [self cacheProperty:CAPPROPID_GAMMA withName:@kPropertyGamma];
+    [self cacheProperty:CAPPROPID_HUE withName:@kPropertyHue];
+    [self cacheProperty:CAPPROPID_FOCUS withName:@kPropertyFocus];
+    [self cacheProperty:CAPPROPID_ZOOM withName:@kPropertyZoom];
+    [self cacheProperty:CAPPROPID_BACKLIGHTCOMP withName:@kPropertyBackLightCompensation];
+    [self cacheProperty:CAPPROPID_POWERLINEFREQ withName:@kPropertyPowerLineFrequency];
+    
+    // Cache auto properties
+    [self cacheAutoProperty:CAPPROPID_EXPOSURE withName:@kPropertyAutoExposure];
+    [self cacheAutoProperty:CAPPROPID_WHITEBALANCE withName:@kPropertyAutoWhiteBalance];
+    [self cacheAutoProperty:CAPPROPID_FOCUS withName:@kPropertyAutoFocus];
+    
+    self.propertiesCached = true;
+}
+
+- (void)cacheProperty:(uint32_t)propID withName:(NSString *)name {
+    auto sharedThis = self.cppImpl.lock();
+    if (!sharedThis) {
+        OBJCERROR("Cannot cache property: UsbCameraImpl not available");
+        return;
+    }
+    
+    if (self.uvcControl == nil) {
+        OBJCWARNING("Cannot cache property {}: UVC control not initialized", [name UTF8String]);
+        return;
+    }
+    
+    // Get property limits
+    int32_t minimum = 0, maximum = 0, defaultValue = 0;
+    int32_t value = defaultValue;
+    CS_Status status;
+    
+    std::string nameStr = std::string([name UTF8String]);
+    
+    // Get the property limits
+    if (![self.uvcControl getPropertyLimits:propID 
+                                      min:&minimum 
+                                      max:&maximum 
+                                 defValue:&defaultValue 
+                                   status:&status]) {
+        OBJCWARNING("Failed to get property limits for {}", nameStr);
+        return;
+    }
+    
+    // Get current value
+    if (![self.uvcControl getProperty:propID withValue:&value status:&status]) {
+        value = defaultValue;
+        OBJCWARNING("Failed to get current value for {}: {}", 
+                  nameStr, value);
+        return;
+    }
+    
+    // Create property
+    auto& propertyCache = sharedThis->GetPropertyCache();
+    propertyCache[nameStr] = propID;
+    
+    // Create the property implementation
+    std::unique_ptr<PropertyImpl> prop;
+    prop = std::make_unique<PropertyImpl>(nameStr);
+    prop->propKind = CS_PROP_INTEGER;
+    prop->value = value;
+    prop->minimum = minimum;
+    prop->maximum = maximum;
+    prop->step = 1;  // Most camera properties use a step of 1
+    prop->defaultValue = defaultValue;
+    
+    // Add the property to the container
+    std::scoped_lock lock(sharedThis->GetMutex());
+    int ndx = sharedThis->CreatePropertyPublic(nameStr, [&] { return std::move(prop); });
+    
+    // Notify that property has been created
+    sharedThis->NotifyPropertyCreatedPublic(ndx, *sharedThis->GetPropertyPublic(ndx));
+}
+
+- (void)cacheAutoProperty:(uint32_t)propID withName:(NSString *)baseName {
+    auto sharedThis = self.cppImpl.lock();
+    if (!sharedThis) {
+        OBJCERROR("Cannot cache auto property: UsbCameraImpl not available");
+        return;
+    }
+    
+    if (self.uvcControl == nil) {
+        OBJCWARNING("Cannot cache auto property {}: UVC control not initialized", [baseName UTF8String]);
+        return;
+    }
+    
+    // Build auto mode property name
+    std::string nameStr = std::string([baseName UTF8String]);
+    
+    // Get current auto mode status
+    bool enabled = false;
+    CS_Status status = 0;
+    
+    if(![self.uvcControl getAutoProperty:propID enabled:&enabled status:&status]) {
+        OBJCWARNING("Failed to get auto property {}", nameStr);
+        return;
+    }
+    
+    // Create property
+    std::unique_ptr<PropertyImpl> prop;
+    prop = std::make_unique<PropertyImpl>(nameStr);
+    prop->propKind = CS_PROP_BOOLEAN;
+    prop->value = enabled ? 1 : 0;
+    prop->minimum = 0;
+    prop->maximum = 1;
+    prop->step = 1;
+    prop->defaultValue = 0;  // Default is manual mode
+    
+    // Add property to container
+    std::scoped_lock lock(sharedThis->GetMutex());
+    int ndx = sharedThis->CreatePropertyPublic(nameStr, [&] { return std::move(prop); });
+    
+    // Notify property created
+    sharedThis->NotifyPropertyCreatedPublic(ndx, *sharedThis->GetPropertyPublic(ndx));
+    
+    // Map property name to ID
+    auto& propertyAutoCache = sharedThis->GetPropertyAutoCache();
+    propertyAutoCache[nameStr] = propID;
 }
 
 static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
@@ -380,22 +772,27 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
              toCheck->height, toCheck->fps);
   std::vector<CameraModeStore>& platformModes =
       sharedThis->objcGetPlatformVideoModes();
-  // Find the matching mode
-  auto match = std::find_if(platformModes.begin(), platformModes.end(),
-                            [&](CameraModeStore& input) {
-                              return input.mode.CompareWithoutFps(*toCheck);
-                            });
+  
+  // Find all matching modes
+  std::vector<CameraModeStore*> matchingModes;
+  for (auto& mode : platformModes) {
+    if (mode.mode.CompareWithoutFps(*toCheck)) {
+      matchingModes.push_back(&mode);
+    }
+  }
 
-  if (match == platformModes.end()) {
+  if (matchingModes.empty()) {
     return nil;
   }
 
   // Check FPS
-  for (CameraFPSRange& range : match->fpsRanges) {
-    OBJCDEBUG3("Checking Range {} {}", range.min, range.max);
-    if (range.IsWithinRange(toCheck->fps)) {
-      *fps = toCheck->fps;
-      return match->format;
+  for (auto mode : matchingModes) {
+    for (CameraFPSRange& range : mode->fpsRanges) {
+      OBJCDEBUG3("Checking Range {} {}", range.min, range.max);
+      if (range.IsWithinRange(toCheck->fps)) {
+        *fps = toCheck->fps;
+        return mode->format;
+      }
     }
   }
 
@@ -454,6 +851,53 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   self.deviceValid = true;
 }
 
+- (CMTime)findNearestFrameDuration:(int)fps {
+  if (self.currentFormat == nil) {
+    return CMTimeMake(1, fps);
+  }
+
+  NSArray<AVFrameRateRange*>* frameRates = self.currentFormat.videoSupportedFrameRateRanges;
+  if (frameRates.count == 0) {
+    return CMTimeMake(1, fps);
+  }
+
+  // Find the nearest frame duration
+  CMTime nearestDuration = CMTimeMake(1, fps);
+  double minDiff = DBL_MAX;
+
+  for (AVFrameRateRange* range in frameRates) {
+    CMTime minDuration = range.minFrameDuration;
+    CMTime maxDuration = range.maxFrameDuration;
+    
+    // Calculate frame duration for current fps
+    CMTime targetDuration = CMTimeMake(1, fps);
+    
+    // Check if within range
+    if (CMTimeCompare(targetDuration, minDuration) >= 0 && 
+        CMTimeCompare(targetDuration, maxDuration) <= 0) {
+      return targetDuration;
+    }
+    
+    // Calculate difference with min value
+    double minDiffValue = fabs(CMTimeGetSeconds(targetDuration) - CMTimeGetSeconds(minDuration));
+    if (minDiffValue < minDiff) {
+      minDiff = minDiffValue;
+      nearestDuration = minDuration;
+    }
+    
+    // Calculate difference with max value
+    double maxDiffValue = fabs(CMTimeGetSeconds(targetDuration) - CMTimeGetSeconds(maxDuration));
+    if (maxDiffValue < minDiff) {
+      minDiff = maxDiffValue;
+      nearestDuration = maxDuration;
+    }
+  }
+
+  OBJCDEBUG("Nearest fps: {}", nearestDuration.timescale / static_cast<double>(nearestDuration.value));
+  
+  return nearestDuration;
+}
+
 - (bool)deviceStreamOn {
   if (self.streaming) {
     return false;
@@ -461,24 +905,32 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
   if (!self.deviceValid) {
     return false;
   }
-  self.streaming = true;
 
+  if (![self.videoDevice lockForConfiguration:nil]) {
+    OBJCERROR("Failed to lock for configuration");
+    return false;
+  }
+
+  [self.session beginConfiguration];
+
+  if (self.currentFormat != nil) {
+    self.videoDevice.activeFormat = self.currentFormat;
+  }
+
+  if (self.currentFPS != 0) {
+    CMTime frameDuration = [self findNearestFrameDuration:self.currentFPS];
+    self.videoDevice.activeVideoMinFrameDuration = frameDuration;
+    self.videoDevice.activeVideoMaxFrameDuration = frameDuration;
+  }
+
+  [self.session commitConfiguration];
+
+  self.streaming = true;
+  // Start the capture session before device unlock to ensure
+  // the session preset settings are preserved
   [self.session startRunning];
 
-  if ([self.videoDevice lockForConfiguration:nil]) {
-    if (self.currentFormat != nil) {
-      self.videoDevice.activeFormat = self.currentFormat;
-    }
-    if (self.currentFPS != 0) {
-      self.videoDevice.activeVideoMinFrameDuration =
-          CMTimeMake(1, self.currentFPS);
-      self.videoDevice.activeVideoMaxFrameDuration =
-          CMTimeMake(1, self.currentFPS);
-    }
-    [self.videoDevice unlockForConfiguration];
-  } else {
-    OBJCERROR("Failed to lock for configuration");
-  }
+  [self.videoDevice unlockForConfiguration];
 
   return true;
 }
@@ -568,6 +1020,16 @@ static cs::VideoMode::PixelFormat FourCCToPixelFormat(FourCharCode fourcc) {
     OBJCWARNING("Creating AVCaptureDeviceInput failed");
     goto err;
   }
+
+  CS_Status status;
+  self.uvcControl = [UvcControlImpl createFromAVCaptureDevice:self.videoDevice status:&status];
+  if (self.uvcControl == nil) {
+    OBJCWARNING("Failed to initialize UVC control for camera: {}", status);
+  } else {
+    OBJCINFO("UVC control initialized successfully");
+  }
+  
+  self.uvcControl.cppImpl = self.cppImpl;
 
   self.callback = [[UsbCameraDelegate alloc] init];
   if (self.callback == nil) {

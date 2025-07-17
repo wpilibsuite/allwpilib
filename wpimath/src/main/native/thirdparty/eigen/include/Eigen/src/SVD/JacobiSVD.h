@@ -547,6 +547,8 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
    * One \b cannot request unitaries using both the \a Options template parameter
    * and the constructor. If possible, prefer using the \a Options template parameter.
    *
+   * \param rows number of rows for the input matrix
+   * \param cols number of columns for the input matrix
    * \param computationOptions specify whether to compute Thin/Full unitaries U/V
    * \sa JacobiSVD()
    *
@@ -563,7 +565,10 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
    *
    * \param matrix the matrix to decompose
    */
-  explicit JacobiSVD(const MatrixType& matrix) { compute_impl(matrix, internal::get_computation_options(Options)); }
+  template <typename Derived>
+  explicit JacobiSVD(const MatrixBase<Derived>& matrix) {
+    compute_impl(matrix, internal::get_computation_options(Options));
+  }
 
   /** \brief Constructor performing the decomposition of given matrix using specified options
    *         for computing unitaries.
@@ -578,8 +583,10 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
    * be specified in the \a Options template parameter.
    */
   // EIGEN_DEPRECATED // TODO(cantonios): re-enable after fixing a few 3p libraries that error on deprecation warnings.
-  JacobiSVD(const MatrixType& matrix, unsigned int computationOptions) {
-    internal::check_svd_options_assertions<MatrixType, Options>(computationOptions, matrix.rows(), matrix.cols());
+  template <typename Derived>
+  JacobiSVD(const MatrixBase<Derived>& matrix, unsigned int computationOptions) {
+    internal::check_svd_options_assertions<MatrixBase<Derived>, Options>(computationOptions, matrix.rows(),
+                                                                         matrix.cols());
     compute_impl(matrix, computationOptions);
   }
 
@@ -588,7 +595,10 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
    *
    * \param matrix the matrix to decompose
    */
-  JacobiSVD& compute(const MatrixType& matrix) { return compute_impl(matrix, m_computationOptions); }
+  template <typename Derived>
+  JacobiSVD& compute(const MatrixBase<Derived>& matrix) {
+    return compute_impl(matrix, m_computationOptions);
+  }
 
   /** \brief Method performing the decomposition of given matrix, as specified by
    *         the `computationOptions` parameter.
@@ -599,8 +609,10 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
    * \deprecated Will be removed in the next major Eigen version. Options should
    * be specified in the \a Options template parameter.
    */
-  EIGEN_DEPRECATED JacobiSVD& compute(const MatrixType& matrix, unsigned int computationOptions) {
-    internal::check_svd_options_assertions<MatrixType, Options>(m_computationOptions, matrix.rows(), matrix.cols());
+  template <typename Derived>
+  EIGEN_DEPRECATED JacobiSVD& compute(const MatrixBase<Derived>& matrix, unsigned int computationOptions) {
+    internal::check_svd_options_assertions<MatrixBase<Derived>, Options>(m_computationOptions, matrix.rows(),
+                                                                         matrix.cols());
     return compute_impl(matrix, computationOptions);
   }
 
@@ -624,7 +636,8 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
   }
 
  private:
-  JacobiSVD& compute_impl(const MatrixType& matrix, unsigned int computationOptions);
+  template <typename Derived>
+  JacobiSVD& compute_impl(const MatrixBase<Derived>& matrix, unsigned int computationOptions);
 
  protected:
   using Base::m_computationOptions;
@@ -662,8 +675,13 @@ class JacobiSVD : public SVDBase<JacobiSVD<MatrixType_, Options_> > {
 };
 
 template <typename MatrixType, int Options>
-JacobiSVD<MatrixType, Options>& JacobiSVD<MatrixType, Options>::compute_impl(const MatrixType& matrix,
+template <typename Derived>
+JacobiSVD<MatrixType, Options>& JacobiSVD<MatrixType, Options>::compute_impl(const MatrixBase<Derived>& matrix,
                                                                              unsigned int computationOptions) {
+  EIGEN_STATIC_ASSERT_SAME_MATRIX_SIZE(Derived, MatrixType);
+  EIGEN_STATIC_ASSERT((std::is_same<typename Derived::Scalar, typename MatrixType::Scalar>::value),
+                      Input matrix must have the same Scalar type as the BDCSVD object.);
+
   using std::abs;
 
   allocate(matrix.rows(), matrix.cols(), computationOptions);

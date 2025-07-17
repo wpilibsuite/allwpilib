@@ -43,34 +43,17 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const CwiseBinaryOp<CustomBinaryOp, const 
   return CwiseBinaryOp<CustomBinaryOp, const Derived, const OtherDerived>(derived(), other.derived(), func);
 }
 
-#ifndef EIGEN_PARSED_BY_DOXYGEN
-EIGEN_MAKE_SCALAR_BINARY_OP(operator*, product)
-#else
 /** \returns an expression of \c *this scaled by the scalar factor \a scalar
  *
  * \tparam T is the scalar type of \a scalar. It must be compatible with the scalar type of the given expression.
  */
-template <typename T>
-const CwiseBinaryOp<internal::scalar_product_op<Scalar, T>, Derived, Constant<T> > operator*(const T& scalar) const;
-/** \returns an expression of \a expr scaled by the scalar factor \a scalar
- *
- * \tparam T is the scalar type of \a scalar. It must be compatible with the scalar type of the given expression.
- */
-template <typename T>
-friend const CwiseBinaryOp<internal::scalar_product_op<T, Scalar>, Constant<T>, Derived> operator*(
-    const T& scalar, const StorageBaseType& expr);
-#endif
+EIGEN_MAKE_SCALAR_BINARY_OP(operator*, product)
 
-#ifndef EIGEN_PARSED_BY_DOXYGEN
-EIGEN_MAKE_SCALAR_BINARY_OP_ONTHERIGHT(operator/, quotient)
-#else
 /** \returns an expression of \c *this divided by the scalar value \a scalar
  *
  * \tparam T is the scalar type of \a scalar. It must be compatible with the scalar type of the given expression.
  */
-template <typename T>
-const CwiseBinaryOp<internal::scalar_quotient_op<Scalar, T>, Derived, Constant<T> > operator/(const T& scalar) const;
-#endif
+EIGEN_MAKE_SCALAR_BINARY_OP_ONTHERIGHT(operator/, quotient)
 
 /** \returns an expression of the coefficient-wise boolean \b and operator of \c *this and \a other
  *

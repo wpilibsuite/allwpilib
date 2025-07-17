@@ -46,8 +46,8 @@
 #ifndef EIGEN_COLAMD_H
 #define EIGEN_COLAMD_H
 
+namespace Eigen {
 namespace internal {
-
 namespace Colamd {
 
 /* Ensure that debugging is turned off: */
@@ -318,7 +318,7 @@ static inline void set_defaults(double knobs[NKnobs]) {
  *
  * \param n_row number of rows in A
  * \param n_col number of columns in A
- * \param Alen, size of the array A
+ * \param Alen size of the array A
  * \param A row indices of the matrix, of size ALen
  * \param p column pointers of A, of size n_col+1
  * \param knobs parameter settings for colamd
@@ -1685,6 +1685,6 @@ static inline IndexType clear_mark /* return the new value for tag_mark */
 }
 
 }  // namespace Colamd
-
 }  // namespace internal
+}  // namespace Eigen
 #endif
