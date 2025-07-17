@@ -35,7 +35,6 @@ class EpilogueGeneratorTest {
 
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.EpilogueConfiguration;
-        import edu.wpi.first.hal.FRCNetComm;
         import edu.wpi.first.hal.HAL;
 
         import edu.wpi.first.epilogue.ExampleLogger;
@@ -93,7 +92,6 @@ class EpilogueGeneratorTest {
 
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.EpilogueConfiguration;
-        import edu.wpi.first.hal.FRCNetComm;
         import edu.wpi.first.hal.HAL;
 
         import edu.wpi.first.epilogue.ExampleLogger;
@@ -146,7 +144,6 @@ class EpilogueGeneratorTest {
 
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.EpilogueConfiguration;
-        import edu.wpi.first.hal.FRCNetComm;
         import edu.wpi.first.hal.HAL;
 
         import edu.wpi.first.epilogue.ExampleLogger;
@@ -235,7 +232,6 @@ class EpilogueGeneratorTest {
 
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.EpilogueConfiguration;
-        import edu.wpi.first.hal.FRCNetComm;
         import edu.wpi.first.hal.HAL;
 
         import edu.wpi.first.epilogue.generated.AlphaBotLogger;
@@ -371,7 +367,6 @@ class EpilogueGeneratorTest {
 
         import edu.wpi.first.epilogue.Logged;
         import edu.wpi.first.epilogue.EpilogueConfiguration;
-        import edu.wpi.first.hal.FRCNetComm;
         import edu.wpi.first.hal.HAL;
 
         import edu.wpi.first.epilogue.ExampleLogger;

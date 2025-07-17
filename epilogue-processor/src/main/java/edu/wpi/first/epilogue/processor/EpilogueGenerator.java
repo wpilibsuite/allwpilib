@@ -57,7 +57,6 @@ public class EpilogueGenerator {
 
         out.println("import edu.wpi.first.epilogue.Logged;");
         out.println("import edu.wpi.first.epilogue.EpilogueConfiguration;");
-        out.println("import edu.wpi.first.hal.FRCNetComm;");
         out.println("import edu.wpi.first.hal.HAL;");
         out.println();
 

@@ -90,7 +90,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.generated.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
@@ -144,7 +144,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.generated.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
@@ -314,7 +314,7 @@ class AnnotationProcessorTest {
     package edu.wpi.first.epilogue;
 
     import edu.wpi.first.epilogue.Logged;
-    import edu.wpi.first.epilogue.Epilogue;
+    import edu.wpi.first.epilogue.generated.Epilogue;
     import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
     import edu.wpi.first.epilogue.logging.EpilogueBackend;
     import java.lang.invoke.MethodHandles;
@@ -540,7 +540,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.generated.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
@@ -608,7 +608,7 @@ class AnnotationProcessorTest {
       package edu.wpi.first.epilogue;
 
       import edu.wpi.first.epilogue.Logged;
-      import edu.wpi.first.epilogue.Epilogue;
+      import edu.wpi.first.epilogue.generated.Epilogue;
       import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
       import edu.wpi.first.epilogue.logging.EpilogueBackend;
       import java.lang.invoke.MethodHandles;
@@ -2070,7 +2070,7 @@ class AnnotationProcessorTest {
         package edu.wpi.first.epilogue;
 
         import edu.wpi.first.epilogue.Logged;
-        import edu.wpi.first.epilogue.Epilogue;
+        import edu.wpi.first.epilogue.generated.Epilogue;
         import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
         import edu.wpi.first.epilogue.logging.EpilogueBackend;
         import java.lang.invoke.MethodHandles;
