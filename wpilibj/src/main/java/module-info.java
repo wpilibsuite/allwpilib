@@ -20,9 +20,7 @@ open module wpilib {
   exports edu.wpi.first.wpilibj.drive;
   exports edu.wpi.first.wpilibj.event;
   exports edu.wpi.first.wpilibj.internal;
-  exports edu.wpi.first.wpilibj.livewindow;
   exports edu.wpi.first.wpilibj.motorcontrol;
-  exports edu.wpi.first.wpilibj.shuffleboard;
   exports edu.wpi.first.wpilibj.simulation;
   exports edu.wpi.first.wpilibj.smartdashboard;
   exports edu.wpi.first.wpilibj.sysid;
