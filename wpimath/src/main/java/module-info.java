@@ -6,11 +6,12 @@
  * The WPILib math module. This defines APIs for geometry, kinematics, odometry, path planning,
  * control algorithms, and physics simulators for simple mechanisms.
  */
+@SuppressWarnings("requires-transitive-automatic")
 open module wpilib.math {
-  requires com.fasterxml.jackson.annotation;
-  requires transitive ejml.all;
-  requires us.hebi.quickbuf.runtime;
+  requires transitive ejml.unified;
   requires transitive wpilib.units;
+  requires com.fasterxml.jackson.annotation;
+  requires us.hebi.quickbuf.runtime;
   requires wpilib.util;
 
   exports edu.wpi.first.math;
