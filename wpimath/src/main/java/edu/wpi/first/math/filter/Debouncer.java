@@ -60,7 +60,7 @@ public class Debouncer {
 
   private boolean hasElapsed() {
     return m_prevTimeSeconds.isEmpty()
-      || MathSharedStore.getTimestamp() - m_prevTimeSeconds.get() >= m_debounceTimeSeconds;
+        || MathSharedStore.getTimestamp() - m_prevTimeSeconds.get() >= m_debounceTimeSeconds;
   }
 
   /**
