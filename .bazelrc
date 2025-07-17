@@ -42,7 +42,7 @@ build:build_buddy --remote_cache=grpcs://remote.buildbuddy.io
 build:build_buddy --remote_timeout=3600
 
 # Additional suggestions from buildbuddy for speed
-build:build_buddy --remote_cache_compression
+build:build_buddy --experimental_remote_cache_compression
 build:build_buddy --experimental_remote_cache_compression_threshold=100
 build:build_buddy --noslim_profile
 build:build_buddy --experimental_profile_include_target_label

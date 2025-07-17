@@ -17,7 +17,6 @@ void InitializeDutyCycleData() {
 DutyCycleData* hal::SimDutyCycleData;
 
 void DutyCycleData::ResetData() {
-  digitalChannel = 0;
   initialized.Reset(false);
   simDevice = 0;
   frequency.Reset(0);
@@ -25,21 +24,9 @@ void DutyCycleData::ResetData() {
 }
 
 extern "C" {
-int32_t HALSIM_FindDutyCycleForChannel(int32_t channel) {
-  for (int i = 0; i < kNumDutyCycles; ++i) {
-    if (SimDutyCycleData[i].initialized &&
-        SimDutyCycleData[i].digitalChannel == channel) {
-      return i;
-    }
-  }
-  return -1;
-}
 
 void HALSIM_ResetDutyCycleData(int32_t index) {
   SimDutyCycleData[index].ResetData();
-}
-int32_t HALSIM_GetDutyCycleDigitalChannel(int32_t index) {
-  return SimDutyCycleData[index].digitalChannel;
 }
 
 HAL_SimDeviceHandle HALSIM_GetDutyCycleSimDevice(int32_t index) {
@@ -51,7 +38,7 @@ HAL_SimDeviceHandle HALSIM_GetDutyCycleSimDevice(int32_t index) {
                                SimDutyCycleData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)
-DEFINE_CAPI(int32_t, Frequency, frequency)
+DEFINE_CAPI(double, Frequency, frequency)
 DEFINE_CAPI(double, Output, output)
 
 #define REGISTER(NAME) \

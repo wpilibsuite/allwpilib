@@ -122,7 +122,7 @@ void DutyCycleEncoder::SetDutyCycleRange(double min, double max) {
   m_sensorMax = std::clamp(max, 0.0, 1.0);
 }
 
-int DutyCycleEncoder::GetFrequency() const {
+units::hertz_t DutyCycleEncoder::GetFrequency() const {
   return m_dutyCycle->GetFrequency();
 }
 
@@ -133,9 +133,10 @@ bool DutyCycleEncoder::IsConnected() const {
   return GetFrequency() > m_frequencyThreshold;
 }
 
-void DutyCycleEncoder::SetConnectedFrequencyThreshold(int frequency) {
-  if (frequency < 0) {
-    frequency = 0;
+void DutyCycleEncoder::SetConnectedFrequencyThreshold(
+    units::hertz_t frequency) {
+  if (frequency < 0_Hz) {
+    frequency = 0_Hz;
   }
   m_frequencyThreshold = frequency;
 }
@@ -150,10 +151,6 @@ void DutyCycleEncoder::SetAssumedFrequency(units::hertz_t frequency) {
   } else {
     m_period = 1.0 / frequency;
   }
-}
-
-int DutyCycleEncoder::GetFPGAIndex() const {
-  return m_dutyCycle->GetFPGAIndex();
 }
 
 int DutyCycleEncoder::GetSourceChannel() const {

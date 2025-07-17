@@ -71,6 +71,12 @@ jobs:
         with:
           token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
+      - uses: bazel-contrib/setup-bazel@0.15.0
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+          bazelisk-version: 1.x
+
       - name: bazel ${{ matrix.action }} (release)
         run: bazel ${{ matrix.action }} ... --config=ci -c opt ${{ matrix.config }} -k --verbose_failures
 

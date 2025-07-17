@@ -34,7 +34,7 @@ public class DutyCycleJNI extends JNIWrapper {
    * @return frequency in Hertz
    * @see "HAL_GetDutyCycleFrequency"
    */
-  public static native int getFrequency(int handle);
+  public static native double getFrequency(int handle);
 
   /**
    * Get the output ratio of the duty cycle signal.
@@ -55,27 +55,6 @@ public class DutyCycleJNI extends JNIWrapper {
    * @see "HAL_GetDutyCycleHighTime"
    */
   public static native int getHighTime(int handle);
-
-  /**
-   * Get the scale factor of the output.
-   *
-   * <p>An output equal to this value is always high, and then linearly scales down to 0. Divide a
-   * raw result by this in order to get the percentage between 0 and 1. Used by DMA.
-   *
-   * @param handle the duty cycle handle
-   * @return the output scale factor
-   * @see "HAL_GetDutyCycleOutputScaleFactor"
-   */
-  public static native int getOutputScaleFactor(int handle);
-
-  /**
-   * Get the FPGA index for the DutyCycle.
-   *
-   * @param handle the duty cycle handle
-   * @return the FPGA index
-   * @see "HAL_GetDutyCycleFPGAIndex"
-   */
-  public static native int getFPGAIndex(int handle);
 
   /** Utility class. */
   private DutyCycleJNI() {}

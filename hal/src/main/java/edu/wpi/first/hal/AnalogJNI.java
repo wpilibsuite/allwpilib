@@ -129,7 +129,7 @@ public class AnalogJNI extends JNIWrapper {
   /**
    * Gets a sample straight from the channel on this module.
    *
-   * <p>The sample is a 12-bit value representing the 0V to 5V range of the A/D converter in the
+   * <p>The sample is a 12-bit value representing the 0V to 3.3V range of the A/D converter in the
    * module. The units are in A/D converter codes. Use GetVoltage() to get the analog value in
    * calibrated units.
    *
