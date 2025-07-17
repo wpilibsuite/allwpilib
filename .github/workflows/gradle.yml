@@ -19,16 +19,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/systemcore-cross-ubuntu:2025-24.04
+          - container: wpilib/systemcore-cross-ubuntu:2027-24.04
             artifact-name: SystemCore
             build-options: "-Ponlylinuxsystemcore"
-          - container: wpilib/raspbian-cross-ubuntu:bookworm-24.04
+          - container: wpilib/raspbian-cross-ubuntu:2027-bookworm-24.04
             artifact-name: Arm32
             build-options: "-Ponlylinuxarm32"
-          - container: wpilib/aarch64-cross-ubuntu:bookworm-24.04
+          - container: wpilib/aarch64-cross-ubuntu:2027-bookworm-24.04
             artifact-name: Arm64
             build-options: "-Ponlylinuxarm64"
-          - container: wpilib/ubuntu-base:24.04
+          - container: wpilib/systemcore-cross-ubuntu:2027-24.04
             artifact-name: Linux
             build-options: "-Ponlylinuxx86-64"
     name: "Build - ${{ matrix.artifact-name }}"
@@ -56,7 +56,7 @@ jobs:
         with:
           image: ${{ matrix.container }}
           options: -v ${{ github.workspace }}:/work -w /work -e ARTIFACTORY_PUBLISH_USERNAME -e ARTIFACTORY_PUBLISH_PASSWORD -e GITHUB_REF -e CI
-          run: df . && rm -f semicolon_delimited_script && echo $GITHUB_REF && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+          run: df . && java --version && rm -f semicolon_delimited_script && echo $GITHUB_REF && ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         env:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
@@ -158,7 +158,7 @@ jobs:
         run: df -h .
         if: matrix.os == 'macOS-14'
       - name: Build with Gradle
-        run: ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+        run: java --version && ./gradlew ${{ matrix.task }} --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
         env:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
