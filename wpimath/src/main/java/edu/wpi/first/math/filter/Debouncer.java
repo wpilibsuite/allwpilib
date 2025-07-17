@@ -4,9 +4,8 @@
 
 package edu.wpi.first.math.filter;
 
-import java.util.Optional;
-
 import edu.wpi.first.math.MathSharedStore;
+import java.util.Optional;
 
 /**
  * A simple debounce filter for boolean streams. Requires that the boolean change value from
@@ -60,10 +59,8 @@ public class Debouncer {
   }
 
   private boolean hasElapsed() {
-    if (m_prevTimeSeconds.isEmpty()) {
-      return true;
-    }
-    return MathSharedStore.getTimestamp() - m_prevTimeSeconds.get() >= m_debounceTimeSeconds;
+    return m_prevTimeSeconds.isEmpty()
+      || MathSharedStore.getTimestamp() - m_prevTimeSeconds.get() >= m_debounceTimeSeconds;
   }
 
   /**
@@ -90,9 +87,8 @@ public class Debouncer {
 
   /**
    * Resets the debouncer such that it will now behave as if enough time has passed, even if the
-   * actual elapsed time is below the limit.
-   *
-   * This is helpful if you want to clear the internal "memory" or state.
+   * actual elapsed time is below the limit. This is helpful if you want to clear the internal
+   * "memory" or state.
    */
   public void reset() {
     m_prevTimeSeconds = Optional.empty();
