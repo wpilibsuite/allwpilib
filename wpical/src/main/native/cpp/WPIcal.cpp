@@ -4,7 +4,6 @@
 
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <map>
 #include <memory>
 #include <optional>
@@ -47,7 +46,7 @@ std::string_view GetResource_wpical_512_png();
 }  // namespace wpical
 static frc::AprilTagFieldLayout gIdealFieldLayout;
 static std::string gInvalidLayoutPath;
-static cameracalibration::CameraModel gCameraModel;
+static wpical::CameraModel gCameraModel;
 
 void DrawCheck() {
   ImGui::SameLine();
@@ -153,8 +152,8 @@ void MissingTagInField() {
   }
 }
 
-void CameraCalibrationSelectorButton(
-    const char* text, cameracalibration::CameraModel& cameraModel) {
+void CameraCalibrationSelectorButton(const char* text,
+                                     wpical::CameraModel& cameraModel) {
   static std::unique_ptr<pfd::open_file> selector;
   if (ImGui::Button(text)) {
     selector = std::make_unique<pfd::open_file>(
@@ -166,7 +165,7 @@ void CameraCalibrationSelectorButton(
     if (!selectedFiles.empty()) {
       try {
         cameraModel = wpi::json::parse(std::ifstream(selectedFiles[0]))
-                          .get<cameracalibration::CameraModel>();
+                          .get<wpical::CameraModel>();
       } catch (...) {
         ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
         ImGui::OpenPopup("Camera Calibration Loading Error");
@@ -214,7 +213,6 @@ void SaveCalibratedField(const frc::AprilTagFieldLayout& field,
   static std::string saveDir;
   ProcessDirectorySelector(saveDirSelector, saveDir);
   if (!saveDir.empty()) {
-    std::cout << "Saving calibration to " << saveDir << std::endl;
     std::ofstream out(saveDir + "/" + outputName + ".json");
     out << wpi::json{field}.dump(4);
 
@@ -228,14 +226,14 @@ void SaveCalibratedField(const frc::AprilTagFieldLayout& field,
 void CalibrateCamera() {
   static std::unique_ptr<pfd::open_file> cameraVideoSelector;
   static std::string cameraVideoPath;
-  static bool mrcal = true;
+  static std::unique_ptr<wpical::CameraCalibrator> videoProcessor;
+  static bool calibrating = false;
 
   static double squareWidth = 0.709;
   static double markerWidth = 0.551;
   static int boardWidth = 12;
   static int boardHeight = 8;
-  static double imageWidth = 1920;
-  static double imageHeight = 1080;
+  static int numWorkers = 8;
 
   if (ImGui::BeginPopupModal("Camera Calibration", NULL,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -252,25 +250,10 @@ void CalibrateCamera() {
       ImGui::EndPopup();
     }
 
-    if (ImGui::Button("MRcal")) {
-      mrcal = true;
-    }
-
-    ImGui::SameLine();
-    ImGui::Text("or");
-    ImGui::SameLine();
-
-    if (ImGui::Button("OpenCV")) {
-      mrcal = false;
-    }
-
     SelectFileButton("Select Camera Calibration Video", cameraVideoPath,
                      cameraVideoSelector, "Video Files",
                      "*.mp4 *.mov *.m4v *.mkv *.avi");
-
-#ifndef __linux__
-    ImGui::Checkbox("Show Debug Window", &showDebug);
-#endif
+    ImGui::Text("%s", cameraVideoPath.c_str());
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
     ImGui::InputDouble("Square Width (in)", &squareWidth);
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
@@ -279,49 +262,50 @@ void CalibrateCamera() {
     ImGui::InputInt("Board Width (squares)", &boardWidth);
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
     ImGui::InputInt("Board Height (squares)", &boardHeight);
-    std::optional<cameracalibration::CameraModel> model;
-    bool calibrateButtonPressed = false;
-    if (mrcal) {
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputDouble("Image Width (pixels)", &imageWidth);
-      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
-      ImGui::InputDouble("Image Height (pixels)", &imageHeight);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
+    ImGui::InputInt("Number of Workers", &numWorkers);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
 
-      ImGui::Separator();
-      if (ImGui::Button("Calibrate") && !cameraVideoPath.empty()) {
-        std::cout << "calibration button pressed" << std::endl;
-        model = cameracalibration::calibrate(
-            cameraVideoPath, markerWidth, boardWidth, boardHeight, imageWidth,
-            imageHeight, showDebug);
-        calibrateButtonPressed = true;
-      }
-    } else {
-      ImGui::Separator();
-      if (ImGui::Button("Calibrate") && !cameraVideoPath.empty()) {
-        std::cout << "calibration button pressed" << std::endl;
-        model = cameracalibration::calibrate(cameraVideoPath, squareWidth,
-                                             markerWidth, boardWidth,
-                                             boardHeight, showDebug);
-        calibrateButtonPressed = true;
-      }
-    }
-    if (calibrateButtonPressed && model) {
-      gCameraModel = *model;
-      std::filesystem::path myPath(cameraVideoPath);
-      auto outputPath = myPath.parent_path() / "cameracalibration.json";
+    ImGui::Separator();
+    if (calibrating) {
+      if (videoProcessor->IsFinished() && videoProcessor->GetCameraModel()) {
+        gCameraModel = *videoProcessor->GetCameraModel();
+        std::filesystem::path myPath(cameraVideoPath);
+        auto outputPath = myPath.parent_path() / "cameracalibration.json";
 
-      std::ofstream output_file(outputPath);
-      output_file << wpi::json(gCameraModel).dump(4) << std::endl;
-      ImGui::CloseCurrentPopup();
-      calibrateButtonPressed = false;
-    } else if (calibrateButtonPressed && !model) {
-      std::cout << "calibration failed and popup ready" << std::endl;
-      ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
-      ImGui::OpenPopup("Camera Calibration Error");
-      calibrateButtonPressed = false;
+        std::ofstream output_file(outputPath);
+        output_file << wpi::json(gCameraModel).dump(4) << std::endl;
+        ImGui::CloseCurrentPopup();
+        calibrating = false;
+      } else if (!videoProcessor->IsFinished()) {
+        double processed = videoProcessor->TotalFramesProcessed();
+        double total = videoProcessor->TotalFrames();
+        if (processed == total) {
+          // Done processing frames, show that calibration is happening
+          ImGui::Text("Calibrating, this may take a few minutes %c",
+                      "|/-\\"[static_cast<int>(ImGui::GetTime() / 0.05f) & 3]);
+        } else {
+          ImGui::ProgressBar(
+              processed / total, ImVec2(0.0f, 0.0f),
+              fmt::format("{}/{} frames", processed, total).c_str());
+        }
+      } else {
+        ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
+        ImGui::OpenPopup("Camera Calibration Error");
+        calibrating = false;
+      }
+    } else if (ImGui::Button("Calibrate") && !cameraVideoPath.empty()) {
+      videoProcessor = std::make_unique<wpical::CameraCalibrator>(
+          numWorkers, squareWidth, markerWidth, boardWidth, boardHeight,
+          cameraVideoPath);
+      calibrating = true;
     }
     ImGui::SameLine();
     if (ImGui::Button("Close")) {
+      if (videoProcessor) {
+        videoProcessor->Stop();
+      }
+      calibrating = false;
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
@@ -553,6 +537,8 @@ static void DisplayGui() {
   static std::string fieldVideoDir;
   static int pinnedTag = 1;
   static int maxFRCTag = 22;
+  static std::unique_ptr<wpical::FieldCalibrator> fieldCalibrator;
+  static bool calibrateButtonPressed = false;
 
   // camera matrix selector button
   CameraCalibrationSelectorButton("Select Camera Intrinsics JSON",
@@ -590,17 +576,22 @@ static void DisplayGui() {
 
   if (ImGui::Button("Calibrate!!!")) {
     if (!isMissingInputs) {
-      auto layout = fieldcalibration::calibrate(
-          fieldVideoDir, gCameraModel, gIdealFieldLayout, pinnedTag, showDebug);
-      if (layout) {
-        calibratedFieldLayout = *layout;
-        saveDirSelector = std::make_unique<pfd::select_folder>(
-            "Select Download Directory", "");
-      } else {
-        ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
-        ImGui::OpenPopup("Field Calibration Error");
-      }
+      fieldCalibrator = std::make_unique<wpical::FieldCalibrator>();
+      fieldCalibrator->Calibrate(fieldVideoDir, gCameraModel, gIdealFieldLayout,
+                                 pinnedTag, showDebug);
+      calibrateButtonPressed = true;
     }
+  }
+  if (calibrateButtonPressed && fieldCalibrator->IsFinished()) {
+    if (auto layout = fieldCalibrator->GetAprilTagFieldLayout()) {
+      calibratedFieldLayout = *layout;
+      saveDirSelector =
+          std::make_unique<pfd::select_folder>("Select Download Directory", "");
+    } else {
+      ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
+      ImGui::OpenPopup("Field Calibration Error");
+    }
+    calibrateButtonPressed = false;
   }
   SaveCalibratedField(calibratedFieldLayout, "field_calibration",
                       saveDirSelector);
