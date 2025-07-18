@@ -32,7 +32,8 @@ int32_t SmartIo::InitializeMode(SmartIoMode mode) {
   auto channelString = std::to_string(channel);
   auto subTableString = "/io/" + channelString + "/";
 
-  modePublisher = inst.GetIntegerTopic(subTableString + "type").Publish();
+  modePublisher =
+      inst.GetIntegerTopic(subTableString + "type").Publish(options);
   getSubscriber =
       inst.GetIntegerTopic(subTableString + "valget").Subscribe(0, options);
   periodGetSubscriber =
