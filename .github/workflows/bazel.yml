@@ -42,6 +42,11 @@ jobs:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+
       - id: Setup_build_buddy
         uses: ./.github/actions/setup-build-buddy
         with:
@@ -56,8 +61,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Linux (native)",      os: ubuntu-24.04,   container: "wpilib/ubuntu-base:24.04", action: "test",   config: "--config=linux",    }
-          - { name: "Linux (systemcore)",  os: ubuntu-24.04,   container: "wpilib/ubuntu-base:24.04", action: "build",  config: "--config=systemcore",    }
+          - { name: "Linux (native)",      os: ubuntu-24.04,   container: "wpilib/systemcore-cross-ubuntu:2027-24.04", action: "test",   config: "--config=linux",    }
+          - { name: "Linux (systemcore)",  os: ubuntu-24.04,   container: "wpilib/systemcore-cross-ubuntu:2027-24.04", action: "build",  config: "--config=systemcore",    }
     name: "${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
