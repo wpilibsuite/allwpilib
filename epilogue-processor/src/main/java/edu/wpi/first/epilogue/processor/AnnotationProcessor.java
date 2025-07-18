@@ -40,7 +40,7 @@ import javax.tools.Diagnostic;
   "edu.wpi.first.epilogue.CustomLoggerFor",
   "edu.wpi.first.epilogue.Logged"
 })
-@SupportedSourceVersion(SourceVersion.RELEASE_17)
+@SupportedSourceVersion(SourceVersion.RELEASE_21)
 public class AnnotationProcessor extends AbstractProcessor {
   private static final String kCustomLoggerFqn = "edu.wpi.first.epilogue.CustomLoggerFor";
   private static final String kClassSpecificLoggerFqn =

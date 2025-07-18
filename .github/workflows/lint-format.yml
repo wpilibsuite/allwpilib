@@ -94,7 +94,7 @@ jobs:
     name: "Java format"
     runs-on: ubuntu-24.04
     needs: [validation]
-    container: wpilib/ubuntu-base:24.04
+    container: wpilib/systemcore-cross-ubuntu:2027-24.04
     steps:
       - uses: actions/checkout@v4
         with:

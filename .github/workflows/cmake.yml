@@ -18,7 +18,7 @@ jobs:
         include:
           - os: ubuntu-24.04
             name: Linux
-            container: wpilib/roborio-cross-ubuntu:2025-24.04
+            container: wpilib/systemcore-cross-ubuntu:2027-24.04
             flags: "--preset with-java-and-sccache -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON"
           - os: macOS-14
             name: macOS
