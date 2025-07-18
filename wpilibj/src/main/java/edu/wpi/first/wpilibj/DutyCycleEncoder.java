@@ -19,7 +19,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 public class DutyCycleEncoder implements Sendable, AutoCloseable {
   private final DutyCycle m_dutyCycle;
   private boolean m_ownsDutyCycle;
-  private int m_frequencyThreshold = 100;
+  private double m_frequencyThreshold = 100;
   private double m_fullRange;
   private double m_expectedZero;
   private double m_periodNanos;
@@ -165,7 +165,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    *
    * @return duty cycle frequency in Hz
    */
-  public int getFrequency() {
+  public double getFrequency() {
     return m_dutyCycle.getFrequency();
   }
 
@@ -190,7 +190,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    *
    * @param frequency the minimum frequency in Hz.
    */
-  public void setConnectedFrequencyThreshold(int frequency) {
+  public void setConnectedFrequencyThreshold(double frequency) {
     if (frequency < 0) {
       frequency = 0;
     }
@@ -233,15 +233,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     if (m_simDevice != null) {
       m_simDevice.close();
     }
-  }
-
-  /**
-   * Get the FPGA index for the DutyCycleEncoder.
-   *
-   * @return the FPGA index
-   */
-  public int getFPGAIndex() {
-    return m_dutyCycle.getFPGAIndex();
   }
 
   /**

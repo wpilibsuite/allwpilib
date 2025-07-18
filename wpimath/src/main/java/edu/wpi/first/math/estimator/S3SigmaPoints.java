@@ -11,53 +11,48 @@ import edu.wpi.first.math.numbers.N1;
 import org.ejml.simple.SimpleMatrix;
 
 /**
- * Generates sigma points and weights according to Van der Merwe's 2004 dissertation[1] for the
+ * Generates sigma points and weights according to Papakonstantinou's paper[1] for the
  * UnscentedKalmanFilter class.
  *
- * <p>It parametrizes the sigma points using alpha, beta, kappa terms, and is the version seen in
- * most publications. S3SigmaPoints is generally preferred due to its greater performance with
- * nearly identical accuracy.
+ * <p>It parameterizes the sigma points using alpha and beta terms. Unless you know better, this
+ * should be your default choice due to its high accuracy and performance.
  *
- * <p>States is the dimensionality of the state. 2*States+1 weights will be generated.
+ * <p>[1] K. Papakonstantinou "A Scaled Spherical Simplex Filter (S3F) with a decreased n + 2 sigma
+ * points set size and equivalent 2n + 1 Unscented Kalman Filter (UKF) accuracy"
  *
- * <p>[1] R. Van der Merwe "Sigma-Point Kalman Filters for Probabilistic Inference in Dynamic
- * State-Space Models" (Doctoral dissertation)
- *
- * @param <S> The dimensionality of the state. 2 * States + 1 weights will be generated.
+ * @param <States> The dimenstionality of the state. States + 2 weights will be generated.
  */
-public class MerweScaledSigmaPoints<S extends Num> implements SigmaPoints<S> {
+public class S3SigmaPoints<States extends Num> implements SigmaPoints<States> {
+  private final Nat<States> m_states;
   private final double m_alpha;
-  private final int m_kappa;
-  private final Nat<S> m_states;
   private Matrix<?, N1> m_wm;
   private Matrix<?, N1> m_wc;
 
   /**
-   * Constructs a generator for Van der Merwe scaled sigma points.
+   * Constructs a generator for Papakonstantinou sigma points.
    *
    * @param states an instance of Num that represents the number of states.
    * @param alpha Determines the spread of the sigma points around the mean. Usually a small
    *     positive value (1e-3).
    * @param beta Incorporates prior knowledge of the distribution of the mean. For Gaussian
    *     distributions, beta = 2 is optimal.
-   * @param kappa Secondary scaling parameter usually set to 0 or 3 - States.
    */
-  public MerweScaledSigmaPoints(Nat<S> states, double alpha, double beta, int kappa) {
-    this.m_states = states;
-    this.m_alpha = alpha;
-    this.m_kappa = kappa;
+  @SuppressWarnings("this-escape")
+  public S3SigmaPoints(Nat<States> states, double alpha, double beta) {
+    m_states = states;
+    m_alpha = alpha;
 
     computeWeights(beta);
   }
 
   /**
-   * Constructs a generator for Van der Merwe scaled sigma points with default values for alpha,
-   * beta, and kappa.
+   * Constructs a generator for Papakonstantinou sigma points with default values for alpha, beta,
+   * and kappa.
    *
    * @param states an instance of Num that represents the number of states.
    */
-  public MerweScaledSigmaPoints(Nat<S> states) {
-    this(states, 1e-3, 2, 3 - states.getNum());
+  public S3SigmaPoints(Nat<States> states) {
+    this(states, 1e-3, 2);
   }
 
   /**
@@ -67,7 +62,7 @@ public class MerweScaledSigmaPoints<S extends Num> implements SigmaPoints<S> {
    */
   @Override
   public int getNumSigmas() {
-    return 2 * m_states.getNum() + 1;
+    return m_states.getNum() + 2;
   }
 
   /**
@@ -80,26 +75,35 @@ public class MerweScaledSigmaPoints<S extends Num> implements SigmaPoints<S> {
    *     dimension in the problem space. Ordered by Xi_0, Xi_{1..n}, Xi_{n+1..2n}.
    */
   @Override
-  public Matrix<S, ?> squareRootSigmaPoints(Matrix<S, N1> x, Matrix<S, S> s) {
-    double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
-    double eta = Math.sqrt(lambda + m_states.getNum());
-
-    Matrix<S, S> U = s.times(eta);
-
-    // 2 * states + 1 by states
-    Matrix<S, ?> sigmas =
-        new Matrix<>(new SimpleMatrix(m_states.getNum(), 2 * m_states.getNum() + 1));
-
-    // equation (17)
-    sigmas.setColumn(0, x);
-    for (int k = 0; k < m_states.getNum(); k++) {
-      var xPlusU = x.plus(U.extractColumnVector(k));
-      var xMinusU = x.minus(U.extractColumnVector(k));
-      sigmas.setColumn(k + 1, xPlusU);
-      sigmas.setColumn(m_states.getNum() + k + 1, xMinusU);
+  public Matrix<States, ?> squareRootSigmaPoints(Matrix<States, N1> x, Matrix<States, States> s) {
+    // table (1), equation (12)
+    double[] q = new double[m_states.getNum()];
+    for (int t = 1; t <= m_states.getNum(); ++t) {
+      q[t - 1] = m_alpha * Math.sqrt(t * (m_states.getNum() + 1) / (double) (t + 1));
     }
 
-    return new Matrix<>(sigmas);
+    Matrix<States, ?> C = new Matrix<>(new SimpleMatrix(m_states.getNum(), getNumSigmas()));
+    for (int row = 0; row < m_states.getNum(); ++row) {
+      C.set(row, 0, 0.0);
+    }
+    for (int col = 1; col < getNumSigmas(); ++col) {
+      for (int row = 0; row < m_states.getNum(); ++row) {
+        if (row < col - 2) {
+          C.set(row, col, 0.0);
+        } else if (row == col - 2) {
+          C.set(row, col, q[row]);
+        } else {
+          C.set(row, col, -q[row] / (row + 1));
+        }
+      }
+    }
+
+    Matrix<States, ?> sigmas = new Matrix<>(new SimpleMatrix(m_states.getNum(), getNumSigmas()));
+    for (int col = 0; col < getNumSigmas(); ++col) {
+      sigmas.setColumn(col, x.plus(s.times(C.extractColumnVector(col))));
+    }
+
+    return sigmas;
   }
 
   /**
@@ -108,16 +112,17 @@ public class MerweScaledSigmaPoints<S extends Num> implements SigmaPoints<S> {
    * @param beta Incorporates prior knowledge of the distribution of the mean.
    */
   private void computeWeights(double beta) {
-    double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
-    double c = 0.5 / (m_states.getNum() + lambda);
+    double alpha_sq = m_alpha * m_alpha;
 
-    Matrix<?, N1> wM = new Matrix<>(new SimpleMatrix(2 * m_states.getNum() + 1, 1));
-    Matrix<?, N1> wC = new Matrix<>(new SimpleMatrix(2 * m_states.getNum() + 1, 1));
+    double c = 1.0 / (alpha_sq * (m_states.getNum() + 1));
+
+    Matrix<?, N1> wM = new Matrix<>(new SimpleMatrix(getNumSigmas(), 1));
+    Matrix<?, N1> wC = new Matrix<>(new SimpleMatrix(getNumSigmas(), 1));
     wM.fill(c);
     wC.fill(c);
 
-    wM.set(0, 0, lambda / (m_states.getNum() + lambda));
-    wC.set(0, 0, lambda / (m_states.getNum() + lambda) + (1 - Math.pow(m_alpha, 2) + beta));
+    wM.set(0, 0, 1.0 - 1.0 / alpha_sq);
+    wC.set(0, 0, 1.0 - 1.0 / alpha_sq + (1 - alpha_sq + beta));
 
     this.m_wm = wM;
     this.m_wc = wC;
