@@ -194,7 +194,20 @@ public interface EpilogueBackend {
   }
 
   /**
+   * Logs a unit's symbol.
+   *
+   * @param identifier the identifier of the data field
+   * @param value the new value of the data field
+   */
+  default void log(String identifier, Unit value) {
+    log(identifier, value.symbol());
+  }
+
+  /**
    * Logs a measurement's value in terms of its base unit.
+   *
+   * <p>If the base unit is different from a prior call with the same identifier the value will be
+   * ignored.
    *
    * @param identifier the identifier of the data field
    * @param value the new value of the data field
