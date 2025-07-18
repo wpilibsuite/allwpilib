@@ -18,6 +18,7 @@
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
 #include <imgui.h>
+#include <opencv2/aruco/charuco.hpp>
 #include <portable-file-dialogs.h>
 #include <tagpose.h>
 #include <wpi/json.h>
@@ -225,6 +226,27 @@ static void DisplayGui() {
   static int boardHeight = 8;
   static double imagerWidth = 1920;
   static double imagerHeight = 1080;
+
+  static constexpr const char* charucoDictNames[] = {
+      "DICT_4X4_50", "DICT_4X4_100", "DICT_4X4_250", "DICT_4X4_1000",
+      "DICT_5X5_50", "DICT_5X5_100", "DICT_5X5_250", "DICT_5X5_1000",
+      "DICT_6X6_50", "DICT_6X6_100", "DICT_6X6_250", "DICT_6X6_1000",
+      "DICT_7X7_50", "DICT_7X7_100", "DICT_7X7_250", "DICT_7X7_1000"};
+
+  static constexpr int charucoDictEnums[] = {
+      cv::aruco::DICT_4X4_50,  cv::aruco::DICT_4X4_100,
+      cv::aruco::DICT_4X4_250, cv::aruco::DICT_4X4_1000,
+      cv::aruco::DICT_5X5_50,  cv::aruco::DICT_5X5_100,
+      cv::aruco::DICT_5X5_250, cv::aruco::DICT_5X5_1000,
+      cv::aruco::DICT_6X6_50,  cv::aruco::DICT_6X6_100,
+      cv::aruco::DICT_6X6_250, cv::aruco::DICT_6X6_1000,
+      cv::aruco::DICT_7X7_50,  cv::aruco::DICT_7X7_100,
+      cv::aruco::DICT_7X7_250, cv::aruco::DICT_7X7_1000};
+
+  static int currentDictIdx =
+      7;  // Default to DICT_5X5_1000, used by default by wpical
+
+  static constexpr int numCharucoDicts = IM_ARRAYSIZE(charucoDictNames);
 
   static int pinnedTag = 1;
 
@@ -464,12 +486,33 @@ static void DisplayGui() {
       ImGui::SetNextItemWidth(ImGui::GetFontSize() * 12);
       ImGui::InputInt("Board Height (squares)", &boardHeight);
 
+      if (ImGui::BeginCombo("ChArUco Dictionary",
+                            charucoDictNames[currentDictIdx])) {
+        for (int i = 0; i < numCharucoDicts; ++i) {
+          bool isSelected = (currentDictIdx == i);
+          if (ImGui::Selectable(charucoDictNames[i], isSelected)) {
+            currentDictIdx = i;
+          }
+          if (isSelected) {
+            ImGui::SetItemDefaultFocus();
+          }
+        }
+        ImGui::EndCombo();
+      }
+
+      if (ImGui::IsItemHovered(ImGuiHoveredFlags_None)) {
+        ImGui::SetTooltip(
+            "Sets the ChArUco dictionary used for camera calibration.\nOnly "
+            "change if you know what you're doing.");
+      }
+
       ImGui::Separator();
       if (ImGui::Button("Calibrate") && !selected_camera_intrinsics.empty()) {
         std::cout << "calibration button pressed" << std::endl;
         int ret = cameracalibration::calibrate(
             selected_camera_intrinsics.c_str(), cameraModel, squareWidth,
-            markerWidth, boardWidth, boardHeight, showDebug);
+            markerWidth, boardWidth, boardHeight, showDebug,
+            charucoDictEnums[currentDictIdx]);
         if (ret == 0) {
           size_t lastSeparatorPos =
               selected_camera_intrinsics.find_last_of("/\\");
