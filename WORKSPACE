@@ -7,6 +7,10 @@ http_archive(
     url = "https://github.com/bazel-contrib/bazel_features/releases/download/v1.31.0/bazel_features-v1.31.0.tar.gz",
 )
 
+# TODO(austin): Upgrade when the patches land.
+# https://github.com/bazelbuild/rules_cc/pull/430
+# https://github.com/bazelbuild/rules_cc/pull/431
+# https://github.com/bazelbuild/rules_cc/pull/432
 http_archive(
     name = "rules_cc",
     patch_args = ["-p1"],
@@ -17,6 +21,7 @@ http_archive(
 )
 
 # TODO(austinschuh): Update to the next released apple_support once it lands.
+# This needs to contain https://github.com/bazelbuild/apple_support/commit/7009b77c98a67d3fea081c9db4dbcee8effc3b7e and should be the next release after 1.22.1
 http_archive(
     name = "build_bazel_apple_support",
     sha256 = "7d542be113180bc1da3660e51fe4792a867fb85537c9ef36a0d3366665a76803",
