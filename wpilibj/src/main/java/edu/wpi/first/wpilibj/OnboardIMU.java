@@ -159,7 +159,14 @@ public class OnboardIMU {
 
   private double[] getRawEulerAngles() {
     double[] anglesRaw = new double[3];
-    IMUJNI.getIMUEulerAngles(anglesRaw);
+    switch (m_mountOrientation) {
+      case kFlat -> IMUJNI.getIMUEulerAnglesFlat(anglesRaw);
+      case kLandscape -> IMUJNI.getIMUEulerAnglesLandscape(anglesRaw);
+      case kPortrait -> IMUJNI.getIMUEulerAnglesPortrait(anglesRaw);
+      default -> {
+        // NOP
+      }
+    }
     return anglesRaw;
   }
 
@@ -176,16 +183,12 @@ public class OnboardIMU {
   }
 
   private double getYawNoOffset() {
-    switch (m_mountOrientation) {
-      case kFlat:
-        return IMUJNI.getIMUYawFlat();
-      case kLandscape:
-        return IMUJNI.getIMUYawLandscape();
-      case kPortrait:
-        return IMUJNI.getIMUYawPortrait();
-      default:
-        return 0;
-    }
+    return switch (m_mountOrientation) {
+      case kFlat -> IMUJNI.getIMUYawFlat();
+      case kLandscape -> IMUJNI.getIMUYawLandscape();
+      case kPortrait -> IMUJNI.getIMUYawPortrait();
+      default -> 0;
+    };
   }
 
   private final MountOrientation m_mountOrientation;

@@ -12,7 +12,14 @@ void HAL_GetIMUAcceleration(HAL_Acceleration3d* accel, int32_t* status) {
 void HAL_GetIMUGyroRates(HAL_GyroRate3d* rate, int32_t* status) {
   *rate = {};
 }
-void HAL_GetIMUEulerAngles(HAL_EulerAngles3d* angles, int32_t* status) {
+void HAL_GetIMUEulerAnglesFlat(HAL_EulerAngles3d* angles, int32_t* status) {
+  *angles = {};
+}
+void HAL_GetIMUEulerAnglesLandscape(HAL_EulerAngles3d* angles,
+                                    int32_t* status) {
+  *angles = {};
+}
+void HAL_GetIMUEulerAnglesPortrait(HAL_EulerAngles3d* angles, int32_t* status) {
   *angles = {};
 }
 void HAL_GetIMUQuaternion(HAL_Quaternion* quat, int32_t* status) {
