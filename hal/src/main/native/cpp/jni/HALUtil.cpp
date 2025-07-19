@@ -40,6 +40,7 @@ static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_SYSTEMCORE ==
 
 static JavaVM* jvm = nullptr;
 static JException illegalArgExCls;
+static JException indexOobExCls;
 static JException boundaryExCls;
 static JException allocationExCls;
 static JException halHandleExCls;
@@ -68,6 +69,7 @@ static const JClassInit classes[] = {
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
+    {"java/lang/IndexOutOfBoundsException", &indexOobExCls},
     {"edu/wpi/first/hal/util/BoundaryException", &boundaryExCls},
     {"edu/wpi/first/hal/util/AllocationException", &allocationExCls},
     {"edu/wpi/first/hal/util/HalHandleException", &halHandleExCls},
@@ -157,6 +159,10 @@ void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages,
 
 void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
   illegalArgExCls.Throw(env, msg);
+}
+
+void ThrowIndexOutOfBoundsException(JNIEnv* env, std::string_view msg) {
+  indexOobExCls.Throw(env, msg);
 }
 
 void ThrowBoundaryException(JNIEnv* env, double value, double lower,

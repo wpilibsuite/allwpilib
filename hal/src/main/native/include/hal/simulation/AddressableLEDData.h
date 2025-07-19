@@ -12,8 +12,6 @@
 extern "C" {
 #endif
 
-int32_t HALSIM_FindAddressableLEDForChannel(int32_t channel);
-
 void HALSIM_ResetAddressableLEDData(int32_t index);
 
 int32_t HALSIM_RegisterAddressableLEDInitializedCallback(
@@ -23,12 +21,13 @@ void HALSIM_CancelAddressableLEDInitializedCallback(int32_t index, int32_t uid);
 HAL_Bool HALSIM_GetAddressableLEDInitialized(int32_t index);
 void HALSIM_SetAddressableLEDInitialized(int32_t index, HAL_Bool initialized);
 
-int32_t HALSIM_RegisterAddressableLEDOutputPortCallback(
-    int32_t index, HAL_NotifyCallback callback, void* param,
-    HAL_Bool initialNotify);
-void HALSIM_CancelAddressableLEDOutputPortCallback(int32_t index, int32_t uid);
-int32_t HALSIM_GetAddressableLEDOutputPort(int32_t index);
-void HALSIM_SetAddressableLEDOutputPort(int32_t index, int32_t outputPort);
+int32_t HALSIM_RegisterAddressableLEDStartCallback(int32_t index,
+                                                   HAL_NotifyCallback callback,
+                                                   void* param,
+                                                   HAL_Bool initialNotify);
+void HALSIM_CancelAddressableLEDStartCallback(int32_t index, int32_t uid);
+int32_t HALSIM_GetAddressableLEDStart(int32_t index);
+void HALSIM_SetAddressableLEDStart(int32_t index, int32_t start);
 
 int32_t HALSIM_RegisterAddressableLEDLengthCallback(int32_t index,
                                                     HAL_NotifyCallback callback,
@@ -38,21 +37,13 @@ void HALSIM_CancelAddressableLEDLengthCallback(int32_t index, int32_t uid);
 int32_t HALSIM_GetAddressableLEDLength(int32_t index);
 void HALSIM_SetAddressableLEDLength(int32_t index, int32_t length);
 
-int32_t HALSIM_RegisterAddressableLEDRunningCallback(
-    int32_t index, HAL_NotifyCallback callback, void* param,
-    HAL_Bool initialNotify);
-void HALSIM_CancelAddressableLEDRunningCallback(int32_t index, int32_t uid);
-HAL_Bool HALSIM_GetAddressableLEDRunning(int32_t index);
-void HALSIM_SetAddressableLEDRunning(int32_t index, HAL_Bool running);
-
 int32_t HALSIM_RegisterAddressableLEDDataCallback(
-    int32_t index, HAL_ConstBufferCallback callback, void* param);
-void HALSIM_CancelAddressableLEDDataCallback(int32_t index, int32_t uid);
-int32_t HALSIM_GetAddressableLEDData(int32_t index,
+    HAL_ConstBufferCallback callback, void* param);
+void HALSIM_CancelAddressableLEDDataCallback(int32_t uid);
+int32_t HALSIM_GetAddressableLEDData(int32_t start, int32_t length,
                                      struct HAL_AddressableLEDData* data);
-void HALSIM_SetAddressableLEDData(int32_t index,
-                                  const struct HAL_AddressableLEDData* data,
-                                  int32_t length);
+void HALSIM_SetAddressableLEDData(int32_t start, int32_t length,
+                                  const struct HAL_AddressableLEDData* data);
 
 void HALSIM_RegisterAddressableLEDAllCallbacks(int32_t index,
                                                HAL_NotifyCallback callback,

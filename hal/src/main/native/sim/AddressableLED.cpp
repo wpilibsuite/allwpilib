@@ -12,108 +12,90 @@
 #include "PortsInternal.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
-#include "hal/handles/LimitedHandleResource.h"
+#include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/AddressableLEDDataInternal.h"
 
 using namespace hal;
 
-namespace {
-struct AddressableLED {
-  uint8_t index;
-};
-}  // namespace
-
-static LimitedHandleResource<HAL_AddressableLEDHandle, AddressableLED,
-                             kNumAddressableLEDs,
-                             HAL_HandleEnum::AddressableLED>* ledHandles;
-
 namespace hal::init {
-void InitializeAddressableLED() {
-  static LimitedHandleResource<HAL_AddressableLEDHandle, AddressableLED,
-                               kNumAddressableLEDs,
-                               HAL_HandleEnum::AddressableLED>
-      dcH;
-  ledHandles = &dcH;
-}
+void InitializeAddressableLED() {}
 }  // namespace hal::init
 
 extern "C" {
 HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
-    HAL_DigitalHandle outputPort, int32_t* status) {
+    int32_t channel, const char* allocationLocation, int32_t* status) {
   hal::init::CheckInit();
 
-  auto digitalPort =
-      hal::digitalChannelHandles->Get(outputPort, hal::HAL_HandleEnum::PWM);
+  if (channel < 0 || channel >= kNumAddressableLEDs) {
+    *status = RESOURCE_OUT_OF_RANGE;
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for AddressableLED",
+                                     0, kNumAddressableLEDs, channel);
+    return HAL_kInvalidHandle;
+  }
 
-  if (!digitalPort) {
-    // If DIO was passed, channel error, else generic error
-    if (getHandleType(outputPort) == hal::HAL_HandleEnum::DIO) {
-      *status = HAL_LED_CHANNEL_ERROR;
+  HAL_DigitalHandle handle;
+
+  auto port = digitalChannelHandles->Allocate(
+      channel, HAL_HandleEnum::AddressableLED, &handle, status);
+
+  if (*status != 0) {
+    if (port) {
+      hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+                                           port->previousAllocation);
     } else {
-      *status = HAL_HANDLE_ERROR;
+      hal::SetLastErrorIndexOutOfRange(status,
+                                       "Invalid Index for AddressableLED", 0,
+                                       kNumAddressableLEDs, channel);
     }
-    return HAL_kInvalidHandle;
+    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
 
-  if (digitalPort->channel >= kNumPWMHeaders) {
-    *status = HAL_LED_CHANNEL_ERROR;
-    return HAL_kInvalidHandle;
-  }
+  port->channel = static_cast<uint8_t>(channel);
 
-  HAL_AddressableLEDHandle handle = ledHandles->Allocate();
-  if (handle == HAL_kInvalidHandle) {
-    *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
-  }
+  SimAddressableLEDData[channel].start = 0;
+  SimAddressableLEDData[channel].length = 0;
+  SimAddressableLEDData[channel].initialized = true;
+  port->previousAllocation = allocationLocation ? allocationLocation : "";
 
-  auto led = ledHandles->Get(handle);
-  if (!led) {  // would only occur on thread issue
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
-  }
-
-  int16_t index = getHandleIndex(handle);
-  SimAddressableLEDData[index].outputPort = digitalPort->channel;
-  SimAddressableLEDData[index].length = 1;
-  SimAddressableLEDData[index].running = false;
-  SimAddressableLEDData[index].initialized = true;
-  led->index = index;
   return handle;
 }
 
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
-  auto led = ledHandles->Get(handle);
-  ledHandles->Free(handle);
-  if (!led) {
+  auto port =
+      digitalChannelHandles->Get(handle, HAL_HandleEnum::AddressableLED);
+  // no status, so no need to check for a proper free.
+  digitalChannelHandles->Free(handle, HAL_HandleEnum::AddressableLED);
+  if (port == nullptr) {
     return;
   }
-  SimAddressableLEDData[led->index].running = false;
-  SimAddressableLEDData[led->index].initialized = false;
+  SimAddressableLEDData[port->channel].initialized = false;
 }
 
-void HAL_SetAddressableLEDColorOrder(HAL_AddressableLEDHandle handle,
-                                     HAL_AddressableLEDColorOrder colorOrder,
-                                     int32_t* status) {}
-
-void HAL_SetAddressableLEDOutputPort(HAL_AddressableLEDHandle handle,
-                                     HAL_DigitalHandle outputPort,
-                                     int32_t* status) {
-  auto led = ledHandles->Get(handle);
-  if (!led) {
+void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
+                                int32_t* status) {
+  auto port =
+      digitalChannelHandles->Get(handle, HAL_HandleEnum::AddressableLED);
+  if (!port) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  if (auto port = digitalChannelHandles->Get(outputPort, HAL_HandleEnum::PWM)) {
-    SimAddressableLEDData[led->index].outputPort = port->channel;
-  } else {
-    SimAddressableLEDData[led->index].outputPort = -1;
+  if (start > HAL_kAddressableLEDMaxLength || start < 0) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(
+        status,
+        fmt::format(
+            "LED start must be less than or equal to {}. {} was requested",
+            HAL_kAddressableLEDMaxLength, start));
+    return;
   }
+  SimAddressableLEDData[port->channel].start = start;
 }
 
 void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
                                  int32_t length, int32_t* status) {
-  auto led = ledHandles->Get(handle);
-  if (!led) {
+  auto port =
+      digitalChannelHandles->Get(handle, HAL_HandleEnum::AddressableLED);
+  if (!port) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
@@ -126,54 +108,13 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
             HAL_kAddressableLEDMaxLength, length));
     return;
   }
-  SimAddressableLEDData[led->index].length = length;
+  SimAddressableLEDData[port->channel].length = length;
 }
 
-void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
-                                 const struct HAL_AddressableLEDData* data,
-                                 int32_t length, int32_t* status) {
-  auto led = ledHandles->Get(handle);
-  if (!led) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-  if (length > SimAddressableLEDData[led->index].length) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(
-        status,
-        fmt::format(
-            "Data length must be less than or equal to {}. {} was requested",
-            SimAddressableLEDData[led->index].length.Get(), length));
-    return;
-  }
-  SimAddressableLEDData[led->index].SetData(data, length);
-}
-
-void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
-                                    int32_t highTime0, int32_t lowTime0,
-                                    int32_t highTime1, int32_t lowTime1,
-                                    int32_t* status) {}
-
-void HAL_SetAddressableLEDSyncTime(HAL_AddressableLEDHandle handle,
-                                   int32_t syncTime, int32_t* status) {}
-
-void HAL_StartAddressableLEDOutput(HAL_AddressableLEDHandle handle,
-                                   int32_t* status) {
-  auto led = ledHandles->Get(handle);
-  if (!led) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-  SimAddressableLEDData[led->index].running = true;
-}
-
-void HAL_StopAddressableLEDOutput(HAL_AddressableLEDHandle handle,
-                                  int32_t* status) {
-  auto led = ledHandles->Get(handle);
-  if (!led) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-  SimAddressableLEDData[led->index].running = false;
+void HAL_SetAddressableLEDData(int32_t start, int32_t length,
+                               HAL_AddressableLEDColorOrder colorOrder,
+                               const struct HAL_AddressableLEDData* data,
+                               int32_t* status) {
+  SimAddressableLEDDataBuffer->SetData(start, length, data);
 }
 }  // extern "C"

@@ -18,9 +18,8 @@ class Robot : public frc::TimedRobot {
  private:
   static constexpr int kLength = 60;
 
-  // PWM port 9
-  // Must be a PWM header, not MXP or DIO
-  frc::AddressableLED m_led{9};
+  // SmartIO port 1
+  frc::AddressableLED m_led{1};
   std::array<frc::AddressableLED::LEDData, kLength>
       m_ledBuffer;  // Reuse the buffer
 

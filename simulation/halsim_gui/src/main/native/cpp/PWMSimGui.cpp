@@ -28,9 +28,6 @@ class PWMSimModel : public glass::PWMModel {
 
   bool Exists() override { return HALSIM_GetPWMInitialized(m_index); }
 
-  void SetAddressableLED(int led) { m_led = led; }
-  int GetAddressableLED() const override { return m_led; }
-
   glass::DoubleSource* GetSpeedData() override { return &m_speed; }
 
   void SetSpeed(double val) override {
@@ -39,7 +36,6 @@ class PWMSimModel : public glass::PWMModel {
 
  private:
   int32_t m_index;
-  int m_led = -1;
   PWMPulseMicrosecondSource m_speed;
 };
 
@@ -68,19 +64,8 @@ void PWMsSimModel::Update() {
       if (!model) {
         model = std::make_unique<PWMSimModel>(i);
       }
-      model->SetAddressableLED(-1);
     } else {
       model.reset();
-    }
-  }
-
-  static const int32_t numLED = HAL_GetNumAddressableLEDs();
-  for (int32_t i = 0; i < numLED; ++i) {
-    if (HALSIM_GetAddressableLEDInitialized(i)) {
-      int32_t channel = HALSIM_GetAddressableLEDOutputPort(i);
-      if (channel >= 0 && channel < numPWM && m_sources[channel]) {
-        m_sources[channel]->SetAddressableLED(i);
-      }
     }
   }
 }

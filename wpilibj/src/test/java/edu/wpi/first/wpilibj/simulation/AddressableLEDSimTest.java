@@ -21,7 +21,7 @@ class AddressableLEDSimTest {
   @Test
   void testInitialization() {
     HAL.initialize(500, 0);
-    AddressableLEDSim sim = new AddressableLEDSim();
+    AddressableLEDSim sim = new AddressableLEDSim(0);
     assertFalse(sim.getInitialized());
 
     BooleanCallback initializedCallback = new BooleanCallback();
@@ -36,11 +36,11 @@ class AddressableLEDSimTest {
 
   @Test
   void testLength() {
-    AddressableLEDSim sim = new AddressableLEDSim();
+    AddressableLEDSim sim = new AddressableLEDSim(0);
     IntCallback callback = new IntCallback();
     try (CallbackStore cb = sim.registerLengthCallback(callback, false);
         AddressableLED led = new AddressableLED(0)) {
-      assertEquals(1, sim.getLength()); // Defaults to 1 led
+      assertEquals(0, sim.getLength()); // Defaults to 0 leds
 
       AddressableLEDBuffer ledData = new AddressableLEDBuffer(50);
       led.setLength(ledData.getLength());
@@ -53,36 +53,13 @@ class AddressableLEDSimTest {
   }
 
   @Test
-  void testSetRunning() {
-    AddressableLEDSim sim = AddressableLEDSim.createForIndex(0);
-    BooleanCallback callback = new BooleanCallback();
-    try (CallbackStore cb = sim.registerRunningCallback(callback, false);
-        AddressableLED led = new AddressableLED(0)) {
-      assertFalse(sim.getRunning());
-
-      led.start();
-      assertTrue(sim.getRunning());
-      assertTrue(callback.wasTriggered());
-      assertTrue(callback.getSetValue());
-
-      callback.reset();
-      led.stop();
-      assertFalse(sim.getRunning());
-      assertTrue(callback.wasTriggered());
-      assertFalse(callback.getSetValue());
-    }
-  }
-
-  @Test
   void testSetData() {
-    AddressableLEDSim sim = new AddressableLEDSim();
+    AddressableLEDSim sim = new AddressableLEDSim(0);
     BufferCallback callback = new BufferCallback();
 
     try (AddressableLED led = new AddressableLED(0);
         CallbackStore cb = sim.registerDataCallback(callback)) {
-      assertFalse(sim.getRunning());
-
-      assertEquals(1, sim.getLength()); // Defaults to 1 led
+      assertEquals(0, sim.getLength()); // Defaults to 0 leds
 
       AddressableLEDBuffer ledData = new AddressableLEDBuffer(3);
       led.setLength(ledData.getLength());
@@ -94,22 +71,19 @@ class AddressableLEDSimTest {
 
       byte[] data = sim.getData();
       System.out.println(Arrays.toString(data));
-      assertEquals(12, data.length);
+      assertEquals(9, data.length);
 
       assertEquals((byte) 0, data[0]);
       assertEquals((byte) 0, data[1]);
       assertEquals((byte) 255, data[2]);
+
       assertEquals((byte) 0, data[3]);
+      assertEquals((byte) 255, data[4]);
+      assertEquals((byte) 0, data[5]);
 
-      assertEquals((byte) 0, data[4]);
-      assertEquals((byte) 255, data[5]);
-      assertEquals((byte) 0, data[6]);
+      assertEquals((byte) 255, data[6]);
       assertEquals((byte) 0, data[7]);
-
-      assertEquals((byte) 255, data[8]);
-      assertEquals((byte) 0, data[9]);
-      assertEquals((byte) 0, data[10]);
-      assertEquals((byte) 0, data[11]);
+      assertEquals((byte) 0, data[8]);
 
       assertTrue(callback.wasTriggered());
       data = callback.getSetValue();
@@ -117,17 +91,14 @@ class AddressableLEDSimTest {
       assertEquals((byte) 0, data[0]);
       assertEquals((byte) 0, data[1]);
       assertEquals((byte) 255, data[2]);
+
       assertEquals((byte) 0, data[3]);
+      assertEquals((byte) 255, data[4]);
+      assertEquals((byte) 0, data[5]);
 
-      assertEquals((byte) 0, data[4]);
-      assertEquals((byte) 255, data[5]);
-      assertEquals((byte) 0, data[6]);
+      assertEquals((byte) 255, data[6]);
       assertEquals((byte) 0, data[7]);
-
-      assertEquals((byte) 255, data[8]);
-      assertEquals((byte) 0, data[9]);
-      assertEquals((byte) 0, data[10]);
-      assertEquals((byte) 0, data[11]);
+      assertEquals((byte) 0, data[8]);
     }
   }
 }

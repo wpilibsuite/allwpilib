@@ -23,10 +23,7 @@ class LEDDisplayModel : public glass::Model {
     uint8_t b;
     uint8_t g;
     uint8_t r;
-    uint8_t padding;
   };
-
-  virtual bool IsRunning() = 0;
 
   virtual std::span<const Data> GetData(wpi::SmallVectorImpl<Data>& buf) = 0;
 };

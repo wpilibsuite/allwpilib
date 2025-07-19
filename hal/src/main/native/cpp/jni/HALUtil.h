@@ -46,6 +46,7 @@ void ThrowNullPointerException(JNIEnv* env, std::string_view msg);
 void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages,
                                      jint length);
 void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg);
+void ThrowIndexOutOfBoundsException(JNIEnv* env, std::string_view msg);
 void ThrowBoundaryException(JNIEnv* env, double value, double lower,
                             double upper);
 

@@ -21,9 +21,8 @@ class HALSimWSProviderAddressableLED : public HALSimWSHalChanProvider {
 
  private:
   int32_t m_initCbKey = 0;
-  int32_t m_outputPortCbKey = 0;
+  int32_t m_startCbKey = 0;
   int32_t m_lengthCbKey = 0;
-  int32_t m_runningCbKey = 0;
   int32_t m_dataCbKey = 0;
 };
 }  // namespace wpilibws

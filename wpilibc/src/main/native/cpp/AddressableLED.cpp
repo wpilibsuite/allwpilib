@@ -4,6 +4,8 @@
 
 #include "frc/AddressableLED.h"
 
+#include <algorithm>
+
 #include <hal/AddressableLED.h>
 #include <hal/HALBase.h>
 #include <hal/PWM.h>
@@ -12,39 +14,39 @@
 #include <wpi/StackTrace.h>
 
 #include "frc/Errors.h"
+#include "frc/SensorUtil.h"
 
 using namespace frc;
 
-AddressableLED::AddressableLED(int port) : m_port{port} {
+AddressableLED::AddressableLED(int channel) : m_channel{channel} {
+  if (!SensorUtil::CheckDigitalChannel(channel)) {
+    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
+  }
+
   int32_t status = 0;
-
   auto stack = wpi::GetStackTrace(1);
-  m_pwmHandle = HAL_InitializePWMPort(port, stack.c_str(), &status);
-  FRC_CheckErrorStatus(status, "Port {}", port);
-  if (m_pwmHandle == HAL_kInvalidHandle) {
-    return;
-  }
+  m_handle = HAL_InitializeAddressableLED(channel, stack.c_str(), &status);
+  FRC_CheckErrorStatus(status, "Channel {}", channel);
 
-  m_handle = HAL_InitializeAddressableLED(m_pwmHandle, &status);
-  FRC_CheckErrorStatus(status, "Port {}", port);
-  if (m_handle == HAL_kInvalidHandle) {
-    HAL_FreePWMPort(m_pwmHandle);
-  }
-
-  HAL_ReportUsage("IO", port, "AddressableLED");
+  HAL_ReportUsage("IO", channel, "AddressableLED");
 }
 
 void AddressableLED::SetColorOrder(AddressableLED::ColorOrder order) {
+  m_colorOrder = order;
+}
+
+void AddressableLED::SetStart(int start) {
+  m_start = start;
   int32_t status = 0;
-  HAL_SetAddressableLEDColorOrder(
-      m_handle, static_cast<HAL_AddressableLEDColorOrder>(order), &status);
-  FRC_CheckErrorStatus(status, "Port {} Color order {}", m_port, order);
+  HAL_SetAddressableLEDStart(m_handle, start, &status);
+  FRC_CheckErrorStatus(status, "Channel {} start {}", m_channel, start);
 }
 
 void AddressableLED::SetLength(int length) {
+  m_length = length;
   int32_t status = 0;
   HAL_SetAddressableLEDLength(m_handle, length, &status);
-  FRC_CheckErrorStatus(status, "Port {} length {}", m_port, length);
+  FRC_CheckErrorStatus(status, "Channel {} length {}", m_channel, length);
 }
 
 static_assert(sizeof(AddressableLED::LEDData) == sizeof(HAL_AddressableLEDData),
@@ -52,45 +54,25 @@ static_assert(sizeof(AddressableLED::LEDData) == sizeof(HAL_AddressableLEDData),
 
 void AddressableLED::SetData(std::span<const LEDData> ledData) {
   int32_t status = 0;
-  HAL_WriteAddressableLEDData(m_handle, ledData.data(), ledData.size(),
-                              &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  HAL_SetAddressableLEDData(
+      m_start, std::min(static_cast<size_t>(m_length), ledData.size()),
+      static_cast<HAL_AddressableLEDColorOrder>(m_colorOrder), ledData.data(),
+      &status);
+  FRC_CheckErrorStatus(status, "Port {}", m_channel);
 }
 
 void AddressableLED::SetData(std::initializer_list<LEDData> ledData) {
-  int32_t status = 0;
-  HAL_WriteAddressableLEDData(m_handle, ledData.begin(), ledData.size(),
-                              &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  SetData(std::span{ledData.begin(), ledData.end()});
 }
 
-void AddressableLED::SetBitTiming(units::nanosecond_t highTime0,
-                                  units::nanosecond_t lowTime0,
-                                  units::nanosecond_t highTime1,
-                                  units::nanosecond_t lowTime1) {
+void AddressableLED::SetGlobalData(int start, ColorOrder colorOrder,
+                                   std::span<const LEDData> ledData) {
   int32_t status = 0;
-  HAL_SetAddressableLEDBitTiming(
-      m_handle, highTime0.to<int32_t>(), lowTime0.to<int32_t>(),
-      highTime1.to<int32_t>(), lowTime1.to<int32_t>(), &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
-}
-
-void AddressableLED::SetSyncTime(units::microsecond_t syncTime) {
-  int32_t status = 0;
-  HAL_SetAddressableLEDSyncTime(m_handle, syncTime.to<int32_t>(), &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
-}
-
-void AddressableLED::Start() {
-  int32_t status = 0;
-  HAL_StartAddressableLEDOutput(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
-}
-
-void AddressableLED::Stop() {
-  int32_t status = 0;
-  HAL_StopAddressableLEDOutput(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Port {}", m_port);
+  HAL_SetAddressableLEDData(
+      start, ledData.size(),
+      static_cast<HAL_AddressableLEDColorOrder>(colorOrder), ledData.data(),
+      &status);
+  FRC_CheckErrorStatus(status, "");
 }
 
 void AddressableLED::LEDData::SetHSV(int h, int s, int v) {
