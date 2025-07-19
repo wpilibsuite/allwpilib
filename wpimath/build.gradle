@@ -89,12 +89,14 @@ nativeUtils.exportsConfigs {
 
 dependencies {
     api project(":wpiunits")
-    api "org.ejml:ejml-simple:0.43.1"
+    api "org.ejml:ejml-java9module:+"
     api "com.fasterxml.jackson.core:jackson-annotations:2.15.2"
     api "com.fasterxml.jackson.core:jackson-core:2.15.2"
     api "com.fasterxml.jackson.core:jackson-databind:2.15.2"
     api "us.hebi.quickbuf:quickbuf-runtime:1.3.3"
 }
+
+apply from: "${rootDir}/shared/java/wpimath-module-patches.gradle"
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 sourceSets.main.resources.srcDir "${projectDir}/src/main/proto"

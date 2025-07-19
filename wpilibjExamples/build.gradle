@@ -2,6 +2,8 @@ import edu.wpi.first.toolchain.NativePlatforms
 
 apply plugin: 'java'
 apply plugin: 'jacoco'
+apply plugin: 'org.gradlex.extra-java-module-info'
+apply plugin: 'org.javamodularity.moduleplugin'
 
 ext {
     useJava = true
@@ -10,6 +12,7 @@ ext {
 }
 
 apply from: "${rootDir}/shared/opencv.gradle"
+apply from: "${rootDir}/shared/java/opencv-module-patches.gradle"
 
 dependencies {
     implementation project(':wpilibj')

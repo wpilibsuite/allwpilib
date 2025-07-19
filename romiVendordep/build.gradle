@@ -23,6 +23,8 @@ dependencies {
     implementation project(":wpilibj")
 }
 
+apply from: "${rootDir}/shared/java/wpimath-module-patches.gradle"
+
 nativeUtils.exportsConfigs {
     // Main library is just default empty. This will export everything
     romiVendordep {

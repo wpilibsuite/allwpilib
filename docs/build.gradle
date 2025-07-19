@@ -227,7 +227,16 @@ task generateJavaDocs(type: Javadoc) {
     source project(':xrpVendordep').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
+    // Need to exclude all the module info files from subprojects. Otherwise, they'd conflict
+    // and we'd get a "too many module declarations found" error
+    exclude '**/module-info.java'
+
     failOnError = true
+    // By default, everything is placed on the module path
+    // But because we exclude all the module-info files, there is no module graph and javadoc generation fails
+    // with errors like this:
+    // error: package com.fasterxml.jackson.annotation is not visible (package com.fasterxml.jackson.annotation is declared in module com.fasterxml.jackson.annotation, which is not in the module graph)
+    modularity.inferModulePath = false
 
     title = "WPILib API ${wpilibVersioning.version.get()}"
     ext.entryPoint = "$destinationDir/index.html"
