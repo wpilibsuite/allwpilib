@@ -5,7 +5,7 @@ if (project.hasProperty('skipJavaFormat')) {
 apply plugin: 'checkstyle'
 
 checkstyle {
-    toolVersion = "10.12.2"
+    toolVersion = "10.26.1"
     configDirectory = file("${project.rootDir}/styleguide")
     config = resources.text.fromFile(new File(configDirectory.get().getAsFile(), "checkstyle.xml"))
 }

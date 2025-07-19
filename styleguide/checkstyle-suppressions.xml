@@ -16,4 +16,6 @@ suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
     checks="MethodName" />
   <!-- Disable checkstyle for generated unit files -->
   <suppress files="wpiunits[/\\]src[/\\]generated.*" checks=".*"/>
+  <suppress files="wpilibj[/\\]src[/\\]main[/\\]java[/\\]edu[/\\]wpi[/\\]first[/\\]wpilibj[/\\]I2C.java"
+    checks="OverloadMethodsDeclarationOrder" />
 </suppressions>
