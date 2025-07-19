@@ -82,15 +82,14 @@ AngleAdd(int angleStateIdx) {
  *
  * @tparam CovDim Dimension of covariance of sigma points after passing through
  *                the transform.
- * @tparam States Number of states.
+ * @tparam NumSigmas Number of sigma points.
  * @param sigmas Sigma points.
  * @param Wm Weights for the mean.
  * @param angleStatesIdx The row containing the angles.
  */
-template <int CovDim, int States>
-Vectord<CovDim> AngleMean(const Matrixd<CovDim, 2 * States + 1>& sigmas,
-                          const Vectord<2 * States + 1>& Wm,
-                          int angleStatesIdx) {
+template <int CovDim, int NumSigmas>
+Vectord<CovDim> AngleMean(const Matrixd<CovDim, NumSigmas>& sigmas,
+                          const Vectord<NumSigmas>& Wm, int angleStatesIdx) {
   double sumSin = (sigmas.row(angleStatesIdx).unaryExpr([](auto it) {
                     return std::sin(it);
                   }) *
@@ -113,15 +112,15 @@ Vectord<CovDim> AngleMean(const Matrixd<CovDim, 2 * States + 1>& sigmas,
  *
  * @tparam CovDim Dimension of covariance of sigma points after passing through
  *                the transform.
- * @tparam States Number of states.
+ * @tparam NumSigmas Number of sigma points.
  * @param angleStateIdx The row containing the angles.
  */
-template <int CovDim, int States>
-std::function<Vectord<CovDim>(const Matrixd<CovDim, 2 * States + 1>&,
-                              const Vectord<2 * States + 1>&)>
+template <int CovDim, int NumSigmas>
+std::function<Vectord<CovDim>(const Matrixd<CovDim, NumSigmas>&,
+                              const Vectord<NumSigmas>&)>
 AngleMean(int angleStateIdx) {
   return [=](auto sigmas, auto Wm) {
-    return AngleMean<CovDim, States>(sigmas, Wm, angleStateIdx);
+    return AngleMean<CovDim, NumSigmas>(sigmas, Wm, angleStateIdx);
   };
 }
 

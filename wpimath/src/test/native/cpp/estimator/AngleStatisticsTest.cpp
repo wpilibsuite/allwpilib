@@ -19,7 +19,7 @@ TEST(AngleStatisticsTest, Mean) {
   weights.fill(1.0 / sigmas.cols());
 
   EXPECT_TRUE(Eigen::Vector3d(0.7333333, 0.01163323, 1)
-                  .isApprox(frc::AngleMean<3, 1>(sigmas, weights, 1), 1e-3));
+                  .isApprox(frc::AngleMean<3, 3>(sigmas, weights, 1), 1e-3));
 }
 
 TEST(AngleStatisticsTest, Mean_DynamicSize) {

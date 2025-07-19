@@ -13,7 +13,7 @@
 #include "frc/EigenCore.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
-#include "frc/estimator/MerweUKF.h"
+#include "frc/estimator/S3UKF.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/NumericalJacobian.h"
@@ -67,19 +67,19 @@ frc::Vectord<5> DriveGlobalMeasurementModel(
   return frc::Vectord<5>{x(0), x(1), x(2), x(3), x(4)};
 }
 
-TEST(MerweUKFTest, DriveInit) {
+TEST(S3UKFTest, DriveInit) {
   constexpr auto dt = 5_ms;
 
-  frc::MerweUKF<5, 2, 3> observer{DriveDynamics,
-                                  DriveLocalMeasurementModel,
-                                  {0.5, 0.5, 10.0, 1.0, 1.0},
-                                  {0.0001, 0.01, 0.01},
-                                  frc::AngleMean<5, 5>(2),
-                                  frc::AngleMean<3, 5>(0),
-                                  frc::AngleResidual<5>(2),
-                                  frc::AngleResidual<3>(0),
-                                  frc::AngleAdd<5>(2),
-                                  dt};
+  frc::S3UKF<5, 2, 3> observer{DriveDynamics,
+                               DriveLocalMeasurementModel,
+                               {0.5, 0.5, 10.0, 1.0, 1.0},
+                               {0.0001, 0.01, 0.01},
+                               frc::AngleMean<5, 5 + 2>(2),
+                               frc::AngleMean<3, 5 + 2>(0),
+                               frc::AngleResidual<5>(2),
+                               frc::AngleResidual<3>(0),
+                               frc::AngleAdd<5>(2),
+                               dt};
   frc::Vectord<2> u{12.0, 12.0};
   observer.Predict(u, dt);
 
@@ -89,24 +89,24 @@ TEST(MerweUKFTest, DriveInit) {
   auto globalY = DriveGlobalMeasurementModel(observer.Xhat(), u);
   auto R = frc::MakeCovMatrix(0.01, 0.01, 0.0001, 0.01, 0.01);
   observer.Correct<5>(u, globalY, DriveGlobalMeasurementModel, R,
-                      frc::AngleMean<5, 5>(2), frc::AngleResidual<5>(2),
+                      frc::AngleMean<5, 5 + 2>(2), frc::AngleResidual<5>(2),
                       frc::AngleResidual<5>(2), frc::AngleAdd<5>(2));
 }
 
-TEST(MerweUKFTest, DriveConvergence) {
+TEST(S3UKFTest, DriveConvergence) {
   constexpr auto dt = 5_ms;
   constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
 
-  frc::MerweUKF<5, 2, 3> observer{DriveDynamics,
-                                  DriveLocalMeasurementModel,
-                                  {0.5, 0.5, 10.0, 1.0, 1.0},
-                                  {0.0001, 0.5, 0.5},
-                                  frc::AngleMean<5, 5>(2),
-                                  frc::AngleMean<3, 5>(0),
-                                  frc::AngleResidual<5>(2),
-                                  frc::AngleResidual<3>(0),
-                                  frc::AngleAdd<5>(2),
-                                  dt};
+  frc::S3UKF<5, 2, 3> observer{DriveDynamics,
+                               DriveLocalMeasurementModel,
+                               {0.5, 0.5, 10.0, 1.0, 1.0},
+                               {0.0001, 0.5, 0.5},
+                               frc::AngleMean<5, 5 + 2>(2),
+                               frc::AngleMean<3, 5 + 2>(0),
+                               frc::AngleResidual<5>(2),
+                               frc::AngleResidual<3>(0),
+                               frc::AngleAdd<5>(2),
+                               dt};
 
   auto waypoints =
       std::vector<frc::Pose2d>{frc::Pose2d{2.75_m, 22.521_m, 0_rad},
@@ -158,7 +158,7 @@ TEST(MerweUKFTest, DriveConvergence) {
   auto globalY = DriveGlobalMeasurementModel(trueXhat, u);
   auto R = frc::MakeCovMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
   observer.Correct<5>(u, globalY, DriveGlobalMeasurementModel, R,
-                      frc::AngleMean<5, 5>(2), frc::AngleResidual<5>(2),
+                      frc::AngleMean<5, 5 + 2>(2), frc::AngleResidual<5>(2),
                       frc::AngleResidual<5>(2), frc::AngleAdd<5>(2)
 
   );
@@ -169,16 +169,16 @@ TEST(MerweUKFTest, DriveConvergence) {
   EXPECT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
               0.15);
   EXPECT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
-              0.000005);
+              0.00015);
   EXPECT_NEAR(0.0, observer.Xhat(3), 0.1);
   EXPECT_NEAR(0.0, observer.Xhat(4), 0.1);
 }
 
-TEST(MerweUKFTest, LinearUKF) {
+TEST(S3UKFTest, LinearUKF) {
   constexpr units::second_t dt = 20_ms;
   auto plant = frc::LinearSystemId::IdentifyVelocitySystem<units::meters>(
       0.02_V / 1_mps, 0.006_V / 1_mps_sq);
-  frc::MerweUKF<1, 1, 1> observer{
+  frc::S3UKF<1, 1, 1> observer{
       [&](const frc::Vectord<1>& x, const frc::Vectord<1>& u) {
         return plant.A() * x + plant.B() * u;
       },
@@ -205,10 +205,10 @@ TEST(MerweUKFTest, LinearUKF) {
   EXPECT_NEAR(ref(0, 0), observer.Xhat(0), 5);
 }
 
-TEST(MerweUKFTest, RoundTripP) {
+TEST(S3UKFTest, RoundTripP) {
   constexpr auto dt = 5_ms;
 
-  frc::MerweUKF<2, 2, 2> observer{
+  frc::S3UKF<2, 2, 2> observer{
       [](const frc::Vectord<2>& x, const frc::Vectord<2>& u) { return x; },
       [](const frc::Vectord<2>& x, const frc::Vectord<2>& u) { return x; },
       {0.0, 0.0},
@@ -255,7 +255,7 @@ frc::Vectord<1> MotorControlInput(double t) {
                  -12.0, 12.0)};
 }
 
-TEST(MerweUKFTest, MotorConvergence) {
+TEST(S3UKFTest, MotorConvergence) {
   constexpr units::second_t dt = 10_ms;
   constexpr int steps = 500;
   constexpr double true_kV = 3;
@@ -290,7 +290,7 @@ TEST(MerweUKFTest, MotorConvergence) {
 
   frc::Vectord<4> P0{0.001, 0.001, 10, 10};
 
-  frc::MerweUKF<4, 1, 3> observer{
+  frc::S3UKF<4, 1, 3> observer{
       MotorDynamics, MotorMeasurementModel, wpi::array{0.1, 1.0, 1e-10, 1e-10},
       wpi::array{pos_stddev, vel_stddev, accel_stddev}, dt};
 
