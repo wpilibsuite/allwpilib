@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 open module wpilib.xrp {
-  requires transitive wpilib;
+  requires transitive wpilib.core;
   requires wpilib.hal;
 
   exports edu.wpi.first.wpilibj.xrp;

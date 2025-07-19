@@ -4,7 +4,7 @@
 
 open module wpilib.commands2 {
   requires wpilib.units;
-  requires wpilib;
+  requires wpilib.core;
   requires wpilib.hal;
   requires wpilib.ntcore;
 

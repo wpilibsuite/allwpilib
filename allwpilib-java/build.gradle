@@ -1,0 +1,30 @@
+ext {
+    useJava = true
+    useCpp = false
+    baseId = 'allwpilib'
+    groupId = 'edu.wpi.first.allwpilib'
+
+    nativeName = ''
+    devMain = ''
+}
+
+apply from: "${rootDir}/shared/java/javacommon.gradle"
+apply from: "${rootDir}/shared/opencv.gradle"
+apply from: "${rootDir}/shared/java/opencv-module-patches.gradle"
+
+dependencies {
+    implementation project(":cameraserver")
+    implementation project(":cscore")
+    implementation project(":datalog")
+    implementation project(":epilogue-runtime")
+    implementation project(":hal")
+    implementation project(":ntcore")
+    implementation project(":wpilibj")
+    implementation project(":wpimath")
+    implementation project(":wpinet")
+    implementation project(":wpiunits")
+    implementation project(":wpiutil")
+}
+
+// Nothing to document
+tasks.withType(Javadoc).all { enabled = false }

@@ -6,7 +6,7 @@
  * The core WPILib module. This defines APIs for interacting with robot sensors and actuators,
  * dashboard applications, and high-level program control frameworks.
  */
-open module wpilib {
+open module wpilib.core {
   requires transitive wpilib.math;
   requires transitive wpilib.units;
   requires transitive wpilib.util;
