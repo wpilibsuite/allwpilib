@@ -15,7 +15,7 @@ namespace frc::sim {
 
 TEST(DutyCycleSimTest, Initialization) {
   HAL_Initialize(500, 0);
-  DutyCycleSim sim = DutyCycleSim::CreateForIndex(0);
+  DutyCycleSim sim = DutyCycleSim::CreateForChannel(2);
   EXPECT_FALSE(sim.GetInitialized());
 
   BooleanCallback callback;
@@ -38,12 +38,12 @@ TEST(DutyCycleSimTest, SetFrequency) {
   DutyCycle dc{2};
   DutyCycleSim sim(dc);
 
-  IntCallback callback;
+  DoubleCallback callback;
   auto cb = sim.RegisterFrequencyCallback(callback.GetCallback(), false);
 
-  sim.SetFrequency(191);
-  EXPECT_EQ(191, sim.GetFrequency());
-  EXPECT_EQ(191, dc.GetFrequency());
+  sim.SetFrequency(191_Hz);
+  EXPECT_EQ(191_Hz, sim.GetFrequency());
+  EXPECT_EQ(191_Hz, dc.GetFrequency());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(191, callback.GetLastValue());
 }

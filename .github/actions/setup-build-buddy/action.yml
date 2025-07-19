@@ -1,0 +1,38 @@
+name: 'Setup BuildBuddy acache'
+description: 'Sets up the build buddy cache to be readonly / writing based on the presence of environment variables'
+
+inputs:
+  token:
+    description: 'Build Buddy API token'
+
+runs:
+  using: "composite"
+  steps:
+    # Sets up build buddy when no secret is found for the API key. This is most likely because this is triggered from an action from a fork instead of the main allwpilib repo.
+    - name: Setup without key
+      env:
+        API_KEY: ${{ inputs.token }}
+      if: ${{ env.API_KEY == '' }}
+      shell: bash
+      run: |
+          echo "No API key secret detected, will setup readonly cache"
+          echo "build:ci --config=build_buddy_readonly" > bazel_auth.rc
+
+          # Set up the readonly key only if this build is for a pull request. Push builds happen in the forks repository,
+          # so the user should set their own buildbuddy api keys up there. Only enabling it for PR's should reduce heavy
+          # and more random load on the cache.
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "Assuming this is a pull request from a fork. Setting up the readonly api key"
+            echo "build:ci --remote_header=x-buildbuddy-api-key=QIOV65PTW1tVal3AJbe7" >> bazel_auth.rc
+          else
+            echo "Not setting up readonly key for trigger ${{ github.event_name }} since this is not a pull request, it is most likely a forks push. See the buildbuddy setup guide in README-Bazel.md to set up caching on your fork"
+          fi
+
+    - name: Set with key
+      env:
+        API_KEY: ${{ inputs.token }}
+      if: ${{ env.API_KEY != '' }}
+      shell: bash
+      run: |
+          echo "API Key detected!"
+          echo "build:build_buddy --remote_header=x-buildbuddy-api-key=${{ env.API_KEY }}" > bazel_auth.rc

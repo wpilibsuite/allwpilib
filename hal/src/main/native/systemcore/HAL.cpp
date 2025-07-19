@@ -130,6 +130,10 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return ERR_CANSessionMux_NotAllowed_MESSAGE;
     case HAL_ERR_CANSessionMux_NotInitialized:
       return ERR_CANSessionMux_NotInitialized_MESSAGE;
+    case HAL_WARN_CANSessionMux_TxQueueFull:
+      return HAL_WARN_CANSessionMux_TxQueueFull_MESSAGE;
+    case HAL_WARN_CANSessionMux_SocketBufferFull:
+      return HAL_WARN_CANSessionMux_SocketBufferFull_MESSAGE;
     case HAL_PWM_SCALE_ERROR:
       return HAL_PWM_SCALE_ERROR_MESSAGE;
     case HAL_SERIAL_PORT_NOT_FOUND:
@@ -273,10 +277,6 @@ int32_t HAL_GetCommsDisableCount(int32_t* status) {
 HAL_Bool HAL_GetRSLState(int32_t* status) {
   hal::init::CheckInit();
   *status = HAL_HANDLE_ERROR;
-  return false;
-}
-
-HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
   return false;
 }
 

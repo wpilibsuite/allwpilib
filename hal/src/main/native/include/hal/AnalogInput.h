@@ -144,7 +144,7 @@ int32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
 /**
  * Gets a sample straight from the channel on this module.
  *
- * The sample is a 12-bit value representing the 0V to 5V range of the A/D
+ * The sample is a 12-bit value representing the 0V to 3.3V range of the A/D
  * converter in the module. The units are in A/D converter codes.  Use
  * GetVoltage() to get the analog value in calibrated units.
  *
