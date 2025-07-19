@@ -22,12 +22,6 @@ int32_t HAL_GetNumAnalogInputs(void) {
 int32_t HAL_GetNumCounters(void) {
   return kNumCounters;
 }
-int32_t HAL_GetNumDigitalHeaders(void) {
-  return kNumDigitalHeaders;
-}
-int32_t HAL_GetNumPWMHeaders(void) {
-  return kNumPWMHeaders;
-}
 int32_t HAL_GetNumDigitalChannels(void) {
   return kNumDigitalChannels;
 }
