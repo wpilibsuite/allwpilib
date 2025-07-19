@@ -24,6 +24,15 @@ Examples:
   build --local_cpu_resources=HOST_CPUS-1 # Leave one core alone
   ```
 
+The default settings build all the release artifact variants relevant for your platform.  The overall list of options ends up being, essentially, all the variants of (linux, osx, windows) x (debug, release) x (static, shared) x (aarch64, x86).  OSX and Windows are hard to compile for from any other OS, so we by default build for your local OS and the system core, with all the variants.
+
+This can be a bit expensive.  If you would like to build a subset, you can specify the repo environmental variable, `WPI_PUBLISH_CLASSIFIER_FILTER`, and pick what you build for.  The default is, in the .bazelrc file,
+```
+common --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug,linuxx86-64,linuxx86-64debug,linuxx86-64static,linuxx86-64staticdebug,osxuniversal,osxuniversaldebug,osxuniversalstatic,osxuniversalstaticdebug,windowsarm64,windowsarm64debug,windowsarm64static,windowsarm64staticdebug,windowsx86-64,windowsx86-64debug,windowsx86-64static,windowsx86-64staticdebug"
+```
+
+Modify this to your likings if you want to build less.
+
 ## Pregenerating Files
 allwpilib uses extensive use of pre-generating files that are later used to build C++ / Java libraries that are tracked by version control. Quite often,
 these pre-generation scripts use some configuration file to create multipile files inside of an output directory. While this process could be accomplished
