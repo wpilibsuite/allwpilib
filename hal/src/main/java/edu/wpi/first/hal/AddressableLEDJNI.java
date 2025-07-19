@@ -4,6 +4,8 @@
 
 package edu.wpi.first.hal;
 
+import java.nio.ByteBuffer;
+
 /**
  * Addressable LED HAL JNI Methods.
  *
@@ -18,13 +20,13 @@ public class AddressableLEDJNI extends JNIWrapper {
   public static final int COLOR_ORDER_GRB = 5;
 
   /**
-   * Initialize Addressable LED using a PWM Digital handle.
+   * Create a new instance of an Addressable LED port.
    *
-   * @param pwmHandle handle of the digital port for PWM
+   * @param channel the smartio channel
    * @return Addressable LED handle
    * @see "HAL_InitializeAddressableLED"
    */
-  public static native int initialize(int pwmHandle);
+  public static native int initialize(int channel);
 
   /**
    * Free the Addressable LED Handle.
@@ -35,82 +37,116 @@ public class AddressableLEDJNI extends JNIWrapper {
   public static native void free(int handle);
 
   /**
-   * Sets the color order for the addressable LED output. The default order is GRB.
+   * Sets the start buffer location used for the LED strip.
    *
-   * <p>This will take effect on the next call to {@link #setData(int, byte[])}.
+   * <p>All addressable LEDs use a single backing buffer 1024 LEDs in size. The max length for a
+   * single output is 1024 LEDs (with an offset of zero).
    *
    * @param handle the Addressable LED handle
-   * @param colorOrder the color order
+   * @param start the strip start, in LEDs
    */
-  public static native void setColorOrder(int handle, int colorOrder);
+  public static native void setStart(int handle, int start);
 
   /**
    * Sets the length of the LED strip.
    *
-   * <p>The max length is 5460 LEDs.
+   * <p>All addressable LEDs use a single backing buffer 1024 LEDs in size. The max length for a
+   * single output is 1024 LEDs (with an offset of zero).
    *
    * @param handle the Addressable LED handle
-   * @param length the strip length
-   * @see "HAL_SetAddressableLEDLength"
+   * @param length the strip length, in LEDs
    */
   public static native void setLength(int handle, int length);
 
   /**
    * Sets the led output data.
    *
-   * <p>If the output is enabled, this will start writing the next data cycle. It is safe to call,
-   * even while output is enabled.
+   * <p>All addressable LEDs use a single backing buffer 1024 LEDs in size. This function may be
+   * used to set part of or all of the buffer.
    *
-   * @param handle the Addressable LED handle
+   * @param outStart the strip start in the backing buffer, in LEDs
+   * @param colorOrder the color order
    * @param data the buffer to write
    * @see "HAL_WriteAddressableLEDData"
    */
-  public static native void setData(int handle, byte[] data);
+  public static void setData(int outStart, int colorOrder, byte[] data) {
+    setData(outStart, colorOrder, data, 0, data.length);
+  }
 
   /**
-   * Sets the bit timing.
+   * Sets the led output data.
    *
-   * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing needs to be set for
-   * those.
+   * <p>All addressable LEDs use a single backing buffer 1024 LEDs in size. This function may be
+   * used to set part of or all of the buffer.
    *
-   * @param handle the Addressable LED handle
-   * @param highTime0 high time for 0 bit in nanoseconds (default 400 ns)
-   * @param lowTime0 low time for 0 bit in nanoseconds (default 900 ns)
-   * @param highTime1 high time for 1 bit in nanoseconds (default 900 ns)
-   * @param lowTime1 low time for 1 bit in nanoseconds (default 600 ns)
-   * @see "HAL_SetAddressableLEDBitTiming"
+   * @param outStart the strip start in the backing buffer, in LEDs
+   * @param colorOrder the color order
+   * @param data the buffer to write
+   * @param start offset into data, in bytes
+   * @param len Length of data, in bytes
    */
-  public static native void setBitTiming(
-      int handle, int highTime0, int lowTime0, int highTime1, int lowTime1);
+  public static native void setData(int outStart, int colorOrder, byte[] data, int start, int len);
 
   /**
-   * Sets the sync time.
+   * Sets the led output data.
    *
-   * <p>The sync time is the time to hold output so LEDs enable. Default set for WS2812B and WS2815.
+   * <p>All addressable LEDs use a single backing buffer 1024 LEDs in size. This function may be
+   * used to set part of or all of the buffer.
    *
-   * @param handle the Addressable LED handle
-   * @param syncTime the sync time in microseconds (default 280 μs)
-   * @see "HAL_SetAddressableLEDSyncTime"
+   * @param outStart the strip start in the backing buffer, in LEDs
+   * @param colorOrder the color order
+   * @param data the buffer to write
    */
-  public static native void setSyncTime(int handle, int syncTime);
+  public static void setData(int outStart, int colorOrder, ByteBuffer data) {
+    int pos = data.position();
+    setData(outStart, colorOrder, data, pos, data.capacity() - pos);
+  }
 
   /**
-   * Starts the output.
+   * Sets the led output data.
    *
-   * <p>The output writes continuously.
+   * <p>All addressable LEDs use a single backing buffer 1024 LEDs in size. This function may be
+   * used to set part of or all of the buffer.
    *
-   * @param handle the Addressable LED handle
-   * @see "HAL_StartAddressableLEDOutput"
+   * @param outStart the strip start in the backing buffer, in LEDs
+   * @param colorOrder the color order
+   * @param data the buffer to write
+   * @param start offset into data, in bytes
+   * @param len Length of data, in bytes
    */
-  public static native void start(int handle);
+  public static void setData(int outStart, int colorOrder, ByteBuffer data, int start, int len) {
+    if (data.isDirect()) {
+      if (start < 0) {
+        throw new IndexOutOfBoundsException("start must be >= 0");
+      }
+      if (len < 0) {
+        throw new IndexOutOfBoundsException("len must be >= 0");
+      }
+      if ((start + len) > data.capacity()) {
+        throw new IndexOutOfBoundsException("start + len must be smaller than buffer capacity");
+      }
+      setDataFromBuffer(outStart, colorOrder, data, start, len);
+    } else if (data.hasArray()) {
+      setData(outStart, colorOrder, data.array(), data.arrayOffset() + start, len);
+    } else {
+      throw new UnsupportedOperationException("ByteBuffer must be direct or have a backing array");
+    }
+  }
 
   /**
-   * Stops the output.
+   * Sets the led output data.
    *
-   * @param handle the Addressable LED handle
-   * @see "HAL_StopAddressableLEDOutput"
+   * <p>All addressable LEDs use a single backing buffer 1024 LEDs in size. This function may be
+   * used to set part of or all of the buffer.
+   *
+   * @param outStart the strip start in the backing buffer, in LEDs
+   * @param colorOrder the color order
+   * @param data the buffer to write
+   * @param start offset into data, in bytes
+   * @param len Length of data, in bytes
    */
-  public static native void stop(int handle);
+  private static native void setDataFromBuffer(
+      int outStart, int colorOrder, ByteBuffer data, int start, int len);
 
   /** Utility class. */
   private AddressableLEDJNI() {}

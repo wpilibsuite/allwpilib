@@ -22,9 +22,11 @@ namespace sim {
 class AddressableLEDSim {
  public:
   /**
-   * Constructs for the first addressable LED.
+   * Constructs an addressable LED for a specific channel.
+   *
+   * @param channel output channel
    */
-  AddressableLEDSim();
+  explicit AddressableLEDSim(int channel);
 
   /**
    * Constructs from an AddressableLED object.
@@ -32,25 +34,6 @@ class AddressableLEDSim {
    * @param addressableLED AddressableLED to simulate
    */
   explicit AddressableLEDSim(const AddressableLED& addressableLED);
-
-  /**
-   * Creates an AddressableLEDSim for a PWM channel.
-   *
-   * @param pwmChannel PWM channel
-   * @return Simulated object
-   * @throws std::out_of_range if no AddressableLED is configured for that
-   *         channel
-   */
-  static AddressableLEDSim CreateForChannel(int pwmChannel);
-
-  /**
-   * Creates an AddressableLEDSim for a simulated index.
-   * The index is incremented for each simulated AddressableLED.
-   *
-   * @param index simulator index
-   * @return Simulated object
-   */
-  static AddressableLEDSim CreateForIndex(int index);
 
   /**
    * Register a callback on the Initialized property.
@@ -79,30 +62,30 @@ class AddressableLEDSim {
   void SetInitialized(bool initialized);
 
   /**
-   * Register a callback on the output port.
+   * Register a callback on the start.
    *
-   * @param callback the callback that will be called whenever the output port
+   * @param callback the callback that will be called whenever the start
    *                 is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the CallbackStore object associated with this callback
    */
   [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterOutputPortCallback(
-      NotifyCallback callback, bool initialNotify);
+  std::unique_ptr<CallbackStore> RegisterStartCallback(NotifyCallback callback,
+                                                       bool initialNotify);
 
   /**
-   * Get the output port.
+   * Get the start.
    *
    * @return the output port
    */
-  int GetOutputPort() const;
+  int GetStart() const;
 
   /**
-   * Change the output port.
+   * Change the start.
    *
    * @param outputPort the new output port
    */
-  void SetOutputPort(int outputPort);
+  void SetStart(int start);
 
   /**
    * Register a callback on the length.
@@ -131,44 +114,6 @@ class AddressableLEDSim {
   void SetLength(int length);
 
   /**
-   * Register a callback on whether the LEDs are running.
-   *
-   * @param callback the callback that will be called whenever the LED state is
-   *                 changed
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterRunningCallback(
-      NotifyCallback callback, bool initialNotify);
-
-  /**
-   * Check if the LEDs are running.
-   *
-   * @return true if they are
-   */
-  int GetRunning() const;
-
-  /**
-   * Change whether the LEDs are active.
-   *
-   * @param running the new value
-   */
-  void SetRunning(bool running);
-
-  /**
-   * Register a callback on the LED data.
-   *
-   * @param callback the callback that will be called whenever the LED data is
-   *                 changed
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterDataCallback(
-      ConstBufferCallback callback, bool initialNotify);
-
-  /**
    * Get the LED data.
    *
    * @param data output parameter to fill with LED data
@@ -180,14 +125,44 @@ class AddressableLEDSim {
    * Change the LED data.
    *
    * @param data the new data
-   * @param length the length of the LED data
    */
-  void SetData(struct HAL_AddressableLEDData* data, int length);
+  void SetData(struct HAL_AddressableLEDData* data);
+
+  /**
+   * Register a callback on the LED data.
+   *
+   * @param callback the callback that will be called whenever the LED data is
+   *                 changed
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterDataCallback(
+      ConstBufferCallback callback, bool initialNotify);
+
+  /**
+   * Get the global LED data.
+   *
+   * @param start the start of the LED data
+   * @param length the length of the LED data
+   * @param data output parameter to fill with LED data
+   * @return the length of the LED data
+   */
+  static int GetGlobalData(int start, int length,
+                           struct HAL_AddressableLEDData* data);
+
+  /**
+   * Change the global LED data.
+   *
+   * @param start the start of the LED data
+   * @param length the length of the LED data
+   * @param data the new data
+   */
+  static void SetGlobalData(int start, int length,
+                            struct HAL_AddressableLEDData* data);
 
  private:
-  explicit AddressableLEDSim(int index) : m_index{index} {}
-
-  int m_index;
+  int m_channel;
 };
 }  // namespace sim
 }  // namespace frc

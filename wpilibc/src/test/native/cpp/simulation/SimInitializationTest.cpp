@@ -37,5 +37,5 @@ TEST(SimInitializationTest, AllInitialize) {
   (void)rrsim;
   DutyCycleSim dcsim = DutyCycleSim::CreateForChannel(0);
   (void)dcsim;
-  AddressableLEDSim adLED;
+  AddressableLEDSim adLED{0};
 }

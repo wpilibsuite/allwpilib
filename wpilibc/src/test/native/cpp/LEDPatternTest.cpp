@@ -1031,7 +1031,6 @@ void AssertIndexColor(std::span<AddressableLED::LEDData> data, int index,
                       Color color) {
   frc::Color8Bit color8bit{color};
 
-  EXPECT_EQ(0, data[index].padding);
   EXPECT_EQ(color8bit.red, data[index].r & 0xFF);
   EXPECT_EQ(color8bit.green, data[index].g & 0xFF);
   EXPECT_EQ(color8bit.blue, data[index].b & 0xFF);

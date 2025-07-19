@@ -25,6 +25,7 @@ enum class SmartIoMode {
   PwmOutput = 4,
   SingleCounterRising = 5,
   SingleCounterFalling = 6,
+  AddressableLED = 13,
 };
 
 enum class PwmOutputPeriod {
@@ -46,6 +47,9 @@ struct SmartIo {
   nt::IntegerPublisher periodSetPublisher;
   nt::IntegerSubscriber periodGetSubscriber;
 
+  nt::IntegerPublisher ledcountPublisher;
+  nt::IntegerPublisher ledoffsetPublisher;
+
   int32_t InitializeMode(SmartIoMode mode);
   int32_t SwitchDioDirection(bool input);
 
@@ -63,6 +67,9 @@ struct SmartIo {
   int32_t GetAnalogInput(uint16_t* value);
 
   int32_t GetCounter(int32_t* count);
+
+  int32_t SetLedStart(int32_t start);
+  int32_t SetLedLength(int32_t length);
 };
 
 extern DigitalHandleResource<HAL_DigitalHandle, SmartIo, kNumSmartIo>*

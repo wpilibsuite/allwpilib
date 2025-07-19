@@ -6,19 +6,18 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.AddressableLEDJNI;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.PWMJNI;
 
 /**
  * A class for driving addressable LEDs, such as WS2812B, WS2815, and NeoPixels.
  *
- * <p>By default, the timing supports WS2812B and WS2815 LEDs, but is configurable using {@link
- * #setBitTiming(int, int, int, int)}
- *
  * <p>Some LEDs use a different color order than the default GRB. The color order is configurable
  * using {@link #setColorOrder(ColorOrder)}.
  *
- * <p>Only 1 LED driver is currently supported by the roboRIO. However, multiple LED strips can be
- * connected in series and controlled from the single driver.
+ * <p>Up to 1024 LEDs may be controlled in total across all AddressableLED instances. A single
+ * global buffer is used for all instances. The start position used for LED data for the output is
+ * set via SetStart() and the length of the strip is set via SetLength(). Both of these default to
+ * zero, so multiple instances will access the same pixel data unless SetStart() is called to adjust
+ * the starting point.
  */
 public class AddressableLED implements AutoCloseable {
   /** Order that color data is sent over the wire. */
@@ -62,18 +61,21 @@ public class AddressableLED implements AutoCloseable {
     }
   }
 
-  private final int m_pwmHandle;
+  private final int m_channel;
   private final int m_handle;
+  private int m_start;
+  private int m_length;
+  private ColorOrder m_colorOrder = ColorOrder.kGRB;
 
   /**
-   * Constructs a new driver for a specific port.
+   * Constructs a new driver for a specific channel.
    *
-   * @param port the output port to use (Must be a PWM header, not on MXP)
+   * @param channel the output channel to use
    */
-  public AddressableLED(int port) {
-    m_pwmHandle = PWMJNI.initializePWMPort(port);
-    m_handle = AddressableLEDJNI.initialize(m_pwmHandle);
-    HAL.reportUsage("IO", port, "AddressableLED");
+  public AddressableLED(int channel) {
+    m_channel = channel;
+    m_handle = AddressableLEDJNI.initialize(channel);
+    HAL.reportUsage("IO", channel, "AddressableLED");
   }
 
   @Override
@@ -81,9 +83,15 @@ public class AddressableLED implements AutoCloseable {
     if (m_handle != 0) {
       AddressableLEDJNI.free(m_handle);
     }
-    if (m_pwmHandle != 0) {
-      PWMJNI.freePWMPort(m_pwmHandle);
-    }
+  }
+
+  /**
+   * Gets the output channel.
+   *
+   * @return the output channel
+   */
+  public int getChannel() {
+    return m_channel;
   }
 
   /**
@@ -94,71 +102,63 @@ public class AddressableLED implements AutoCloseable {
    * @param order the color order
    */
   public void setColorOrder(ColorOrder order) {
-    AddressableLEDJNI.setColorOrder(m_handle, order.value);
+    m_colorOrder = order;
+  }
+
+  /**
+   * Sets the display start of the LED strip in the global buffer.
+   *
+   * @param start the strip start, in LEDs
+   */
+  void setStart(int start) {
+    m_start = start;
+    AddressableLEDJNI.setStart(m_handle, start);
+  }
+
+  /**
+   * Gets the display start of the LED strip in the global buffer.
+   *
+   * @return the strip start, in LEDs
+   */
+  int getStart() {
+    return m_start;
   }
 
   /**
    * Sets the length of the LED strip.
    *
-   * <p>Calling this is an expensive call, so it's best to call it once, then just update data.
-   *
-   * <p>The max length is 5460 LEDs.
-   *
-   * @param length the strip length
+   * @param length the strip length, in LEDs
    */
   public void setLength(int length) {
+    m_length = length;
     AddressableLEDJNI.setLength(m_handle, length);
   }
 
   /**
    * Sets the LED output data.
    *
-   * <p>If the output is enabled, this will start writing the next data cycle. It is safe to call,
-   * even while output is enabled.
+   * <p>This will write to the global buffer starting at the location set by setStart() and up to
+   * the length set by setLength().
    *
    * @param buffer the buffer to write
    */
   public void setData(AddressableLEDBuffer buffer) {
-    AddressableLEDJNI.setData(m_handle, buffer.m_buffer);
+    AddressableLEDJNI.setData(
+        m_start,
+        m_colorOrder.value,
+        buffer.m_buffer,
+        0,
+        3 * Math.min(m_length, buffer.getLength()));
   }
 
   /**
-   * Sets the bit timing.
+   * Sets the LED output data at an arbitrary location in the global buffer.
    *
-   * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing needs to be set for
-   * those.
-   *
-   * @param highTime0 high time for 0 bit in nanoseconds (default 400 ns)
-   * @param lowTime0 low time for 0 bit in nanoseconds (default 900 ns)
-   * @param highTime1 high time for 1 bit in nanoseconds (default 900 ns)
-   * @param lowTime1 low time for 1 bit in nanoseconds (default 600 ns)
+   * @param start the start location, in LEDs
+   * @param colorOrder the color order
+   * @param buffer the buffer to write
    */
-  public void setBitTiming(int highTime0, int lowTime0, int highTime1, int lowTime1) {
-    AddressableLEDJNI.setBitTiming(m_handle, highTime0, lowTime0, highTime1, lowTime1);
-  }
-
-  /**
-   * Sets the sync time.
-   *
-   * <p>The sync time is the time to hold output so LEDs enable. Default set for WS2812B and WS2815.
-   *
-   * @param syncTime the sync time in microseconds (default 280 μs)
-   */
-  public void setSyncTime(int syncTime) {
-    AddressableLEDJNI.setSyncTime(m_handle, syncTime);
-  }
-
-  /**
-   * Starts the output.
-   *
-   * <p>The output writes continuously.
-   */
-  public void start() {
-    AddressableLEDJNI.start(m_handle);
-  }
-
-  /** Stops the output. */
-  public void stop() {
-    AddressableLEDJNI.stop(m_handle);
+  public void setGlobalData(int start, ColorOrder colorOrder, AddressableLEDBuffer buffer) {
+    AddressableLEDJNI.setData(start, colorOrder.value, buffer.m_buffer);
   }
 }

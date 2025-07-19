@@ -8,15 +8,18 @@ import edu.wpi.first.hal.simulation.AddressableLEDDataJNI;
 import edu.wpi.first.hal.simulation.ConstBufferCallback;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.AddressableLED;
-import java.util.NoSuchElementException;
 
 /** Class to control a simulated addressable LED. */
 public class AddressableLEDSim {
-  private final int m_index;
+  private final int m_channel;
 
-  /** Constructs for the first addressable LED. */
-  public AddressableLEDSim() {
-    m_index = 0;
+  /**
+   * Constructs an addressable LED for a specific channel.
+   *
+   * @param channel output channel
+   */
+  public AddressableLEDSim(int channel) {
+    m_channel = channel;
   }
 
   /**
@@ -26,38 +29,7 @@ public class AddressableLEDSim {
    */
   @SuppressWarnings("PMD.UnusedFormalParameter")
   public AddressableLEDSim(AddressableLED addressableLED) {
-    // there is only support for a single AddressableLED, so no lookup
-    m_index = 0;
-  }
-
-  private AddressableLEDSim(int index) {
-    m_index = index;
-  }
-
-  /**
-   * Creates an AddressableLEDSim for a PWM channel.
-   *
-   * @param pwmChannel PWM channel
-   * @return Simulated object
-   * @throws NoSuchElementException if no AddressableLED is configured for that channel
-   */
-  public static AddressableLEDSim createForChannel(int pwmChannel) {
-    int index = AddressableLEDDataJNI.findForChannel(pwmChannel);
-    if (index < 0) {
-      throw new NoSuchElementException("no addressable LED found for PWM channel " + pwmChannel);
-    }
-    return new AddressableLEDSim(index);
-  }
-
-  /**
-   * Creates an AddressableLEDSim for a simulated index. The index is incremented for each simulated
-   * AddressableLED.
-   *
-   * @param index simulator index
-   * @return Simulated object
-   */
-  public static AddressableLEDSim createForIndex(int index) {
-    return new AddressableLEDSim(index);
+    m_channel = addressableLED.getChannel();
   }
 
   /**
@@ -68,8 +40,8 @@ public class AddressableLEDSim {
    * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = AddressableLEDDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, AddressableLEDDataJNI::cancelInitializedCallback);
+    int uid = AddressableLEDDataJNI.registerInitializedCallback(m_channel, callback, initialNotify);
+    return new CallbackStore(m_channel, uid, AddressableLEDDataJNI::cancelInitializedCallback);
   }
 
   /**
@@ -78,7 +50,7 @@ public class AddressableLEDSim {
    * @return true if initialized
    */
   public boolean getInitialized() {
-    return AddressableLEDDataJNI.getInitialized(m_index);
+    return AddressableLEDDataJNI.getInitialized(m_channel);
   }
 
   /**
@@ -87,37 +59,37 @@ public class AddressableLEDSim {
    * @param initialized the new value
    */
   public void setInitialized(boolean initialized) {
-    AddressableLEDDataJNI.setInitialized(m_index, initialized);
+    AddressableLEDDataJNI.setInitialized(m_channel, initialized);
   }
 
   /**
-   * Register a callback on the output port.
+   * Register a callback on the start.
    *
-   * @param callback the callback that will be called whenever the output port is changed
+   * @param callback the callback that will be called whenever the start is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback.
    */
-  public CallbackStore registerOutputPortCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = AddressableLEDDataJNI.registerOutputPortCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, AddressableLEDDataJNI::cancelOutputPortCallback);
+  public CallbackStore registerStartCallback(NotifyCallback callback, boolean initialNotify) {
+    int uid = AddressableLEDDataJNI.registerStartCallback(m_channel, callback, initialNotify);
+    return new CallbackStore(m_channel, uid, AddressableLEDDataJNI::cancelStartCallback);
   }
 
   /**
-   * Get the output port.
+   * Get the start.
    *
-   * @return the output port
+   * @return the start
    */
-  public int getOutputPort() {
-    return AddressableLEDDataJNI.getOutputPort(m_index);
+  public int getStart() {
+    return AddressableLEDDataJNI.getStart(m_channel);
   }
 
   /**
-   * Change the output port.
+   * Change the start.
    *
-   * @param outputPort the new output port
+   * @param start the new start
    */
-  public void setOutputPort(int outputPort) {
-    AddressableLEDDataJNI.setOutputPort(m_index, outputPort);
+  public void setStart(int start) {
+    AddressableLEDDataJNI.setStart(m_channel, start);
   }
 
   /**
@@ -128,8 +100,8 @@ public class AddressableLEDSim {
    * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerLengthCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = AddressableLEDDataJNI.registerLengthCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, AddressableLEDDataJNI::cancelLengthCallback);
+    int uid = AddressableLEDDataJNI.registerLengthCallback(m_channel, callback, initialNotify);
+    return new CallbackStore(m_channel, uid, AddressableLEDDataJNI::cancelLengthCallback);
   }
 
   /**
@@ -138,7 +110,7 @@ public class AddressableLEDSim {
    * @return the length
    */
   public int getLength() {
-    return AddressableLEDDataJNI.getLength(m_index);
+    return AddressableLEDDataJNI.getLength(m_channel);
   }
 
   /**
@@ -147,37 +119,7 @@ public class AddressableLEDSim {
    * @param length the new value
    */
   public void setLength(int length) {
-    AddressableLEDDataJNI.setLength(m_index, length);
-  }
-
-  /**
-   * Register a callback on whether the LEDs are running.
-   *
-   * @param callback the callback that will be called whenever the LED state is changed
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public CallbackStore registerRunningCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = AddressableLEDDataJNI.registerRunningCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, AddressableLEDDataJNI::cancelRunningCallback);
-  }
-
-  /**
-   * Check if the LEDs are running.
-   *
-   * @return true if they are
-   */
-  public boolean getRunning() {
-    return AddressableLEDDataJNI.getRunning(m_index);
-  }
-
-  /**
-   * Change whether the LEDs are active.
-   *
-   * @param running the new value
-   */
-  public void setRunning(boolean running) {
-    AddressableLEDDataJNI.setRunning(m_index, running);
+    AddressableLEDDataJNI.setLength(m_channel, length);
   }
 
   /**
@@ -187,8 +129,8 @@ public class AddressableLEDSim {
    * @return the {@link CallbackStore} object associated with this callback.
    */
   public CallbackStore registerDataCallback(ConstBufferCallback callback) {
-    int uid = AddressableLEDDataJNI.registerDataCallback(m_index, callback);
-    return new CallbackStore(m_index, uid, AddressableLEDDataJNI::cancelDataCallback);
+    int uid = AddressableLEDDataJNI.registerDataCallback(callback);
+    return new CallbackStore(uid, AddressableLEDDataJNI::cancelDataCallback);
   }
 
   /**
@@ -197,7 +139,7 @@ public class AddressableLEDSim {
    * @return the LED data
    */
   public byte[] getData() {
-    return AddressableLEDDataJNI.getData(m_index);
+    return getGlobalData(getStart(), getLength());
   }
 
   /**
@@ -206,11 +148,29 @@ public class AddressableLEDSim {
    * @param data the new data
    */
   public void setData(byte[] data) {
-    AddressableLEDDataJNI.setData(m_index, data);
+    setGlobalData(getStart(), data);
+  }
+
+  /**
+   * Get the global LED data.
+   *
+   * @return the LED data
+   */
+  public byte[] getGlobalData(int start, int length) {
+    return AddressableLEDDataJNI.getData(start, length);
+  }
+
+  /**
+   * Change the global LED data.
+   *
+   * @param data the new data
+   */
+  public void setGlobalData(int start, byte[] data) {
+    AddressableLEDDataJNI.setData(start, data);
   }
 
   /** Reset all simulation data for this LED object. */
   public void resetData() {
-    AddressableLEDDataJNI.resetData(m_index);
+    AddressableLEDDataJNI.resetData(m_channel);
   }
 }
