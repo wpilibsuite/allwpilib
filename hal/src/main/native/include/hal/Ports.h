@@ -38,20 +38,6 @@ int32_t HAL_GetNumAnalogInputs(void);
 int32_t HAL_GetNumCounters(void);
 
 /**
- * Gets the number of digital headers in the current system.
- *
- * @return the number of digital headers
- */
-int32_t HAL_GetNumDigitalHeaders(void);
-
-/**
- * Gets the number of PWM headers in the current system.
- *
- * @return the number of PWM headers
- */
-int32_t HAL_GetNumPWMHeaders(void);
-
-/**
  * Gets the number of digital channels in the current system.
  *
  * @return the number of digital channels
