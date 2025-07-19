@@ -113,5 +113,52 @@
     "foldername": "analogaccelerometer",
     "gradlebase": "java",
     "mainclass": "Main"
+  },
+  {
+    "name": "AccelerometerCollisionDetection",
+    "description": "Snippets of Accelerometer for collision detection for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Accelerometer",
+      "IMU"
+    ],
+    "foldername": "accelerometercollision",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "AccelerometerFilter",
+    "description": "Snippets of filtering Accelerometer for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Accelerometer",
+      "IMU"
+    ],
+    "foldername": "accelerometerfilter",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "ADXLAccelerometers",
+    "description": "Snippets of ADXL 345 and 362 accelerometers for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Accelerometer"
+    ],
+    "foldername": "adxlaccelerometers",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "OnboardIMU",
+    "description": "Snippets of Onboard IMU for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Accelerometer",
+      "IMU"
+    ],
+    "foldername": "onboardimu",
+    "gradlebase": "java",
+    "mainclass": "Main"
   }
 ]
