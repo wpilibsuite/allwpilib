@@ -154,6 +154,8 @@ public class AddressableLEDSim {
   /**
    * Get the global LED data.
    *
+   * @param start start, in LEDs
+   * @param length length, in LEDs
    * @return the LED data
    */
   public static byte[] getGlobalData(int start, int length) {
@@ -163,6 +165,7 @@ public class AddressableLEDSim {
   /**
    * Change the global LED data.
    *
+   * @param start start, in LEDs
    * @param data the new data
    */
   public static void setGlobalData(int start, byte[] data) {
