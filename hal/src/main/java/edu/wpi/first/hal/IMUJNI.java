@@ -27,12 +27,28 @@ public class IMUJNI extends JNIWrapper {
   public static native void getIMUGyroRates(double[] rates);
 
   /**
-   * Get the angle about the axes of the IMU in radians.
+   * Get the angle, in radians, about the axes of the IMU in the "flat" orientation.
    *
    * @param angles array of size >= 3 to place the angle data in. The data will be in the form [x,
    *     y, z].
    */
-  public static native void getIMUEulerAngles(double[] angles);
+  public static native void getIMUEulerAnglesFlat(double[] angles);
+
+  /**
+   * Get the angle, in radians, about the axes of the IMU in the "landscape" orientation.
+   *
+   * @param angles array of size >= 3 to place the angle data in. The data will be in the form [x,
+   *     y, z].
+   */
+  public static native void getIMUEulerAnglesLandscape(double[] angles);
+
+  /**
+   * Get the angle, in radians, about the axes of the IMU in the "portrait" orientation.
+   *
+   * @param angles array of size >= 3 to place the angle data in. The data will be in the form [x,
+   *     y, z].
+   */
+  public static native void getIMUEulerAnglesPortrait(double[] angles);
 
   /**
    * Get the orientation of the IMU as a quaternion.

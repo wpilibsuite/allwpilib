@@ -14,7 +14,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 /**
  * Analog channel class.
  *
- * <p>Each analog channel is read from hardware as a 12-bit number representing 0V to 5V.
+ * <p>Each analog channel is read from hardware as a 12-bit number representing 0V to 3.3V.
  *
  * <p>Connected to each analog channel is an averaging and oversampling engine. This engine
  * accumulates the specified ( by setAverageBits() and setOversampleBits() ) number of samples
@@ -52,9 +52,9 @@ public class AnalogInput implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get a sample straight from this channel. The sample is a 12-bit value representing the 0V to 5V
-   * range of the A/D converter. The units are in A/D converter codes. Use GetVoltage() to get the
-   * analog value in calibrated units.
+   * Get a sample straight from this channel. The sample is a 12-bit value representing the 0V to
+   * 3.3V range of the A/D converter. The units are in A/D converter codes. Use GetVoltage() to get
+   * the analog value in calibrated units.
    *
    * @return A sample straight from this channel.
    */

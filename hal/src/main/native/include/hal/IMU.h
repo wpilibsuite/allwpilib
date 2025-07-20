@@ -35,12 +35,31 @@ void HAL_GetIMUAcceleration(HAL_Acceleration3d* accel, int32_t* status);
 void HAL_GetIMUGyroRates(HAL_GyroRate3d* rates, int32_t* status);
 
 /**
- * Get the angle about the axes of the IMU in radians.
+ * Get the angle, in radians, about the axes of the IMU in the "flat"
+ * orientation.
  *
  * @param[out] angles the angle data
  * @param[out] status the error code, or 0 for success
  */
-void HAL_GetIMUEulerAngles(HAL_EulerAngles3d* angles, int32_t* status);
+void HAL_GetIMUEulerAnglesFlat(HAL_EulerAngles3d* angles, int32_t* status);
+
+/**
+ * Get the angle, in radians, about the axes of the IMU in the "landscape"
+ * orientation.
+ *
+ * @param[out] angles the angle data
+ * @param[out] status the error code, or 0 for success
+ */
+void HAL_GetIMUEulerAnglesLandscape(HAL_EulerAngles3d* angles, int32_t* status);
+
+/**
+ * Get the angle, in radians, about the axes of the IMU in the "portrait"
+ * orientation.
+ *
+ * @param[out] angles the angle data
+ * @param[out] status the error code, or 0 for success
+ */
+void HAL_GetIMUEulerAnglesPortrait(HAL_EulerAngles3d* angles, int32_t* status);
 
 /**
  * Get the orientation of the IMU as a quaternion.

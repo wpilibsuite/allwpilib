@@ -32,14 +32,15 @@ int32_t SmartIo::InitializeMode(SmartIoMode mode) {
   auto channelString = std::to_string(channel);
   auto subTableString = "/io/" + channelString + "/";
 
-  modePublisher = inst.GetIntegerTopic(subTableString + "type").Publish();
+  modePublisher =
+      inst.GetIntegerTopic(subTableString + "type").Publish(options);
   getSubscriber =
       inst.GetIntegerTopic(subTableString + "valget").Subscribe(0, options);
-  frequencySubscriber =
-      inst.GetIntegerTopic(subTableString + "freqget").Subscribe(0, options);
+  periodGetSubscriber =
+      inst.GetIntegerTopic(subTableString + "periodget").Subscribe(0, options);
   setPublisher =
       inst.GetIntegerTopic(subTableString + "valset").Publish(options);
-  periodPublisher =
+  periodSetPublisher =
       inst.GetIntegerTopic(subTableString + "periodset").Publish(options);
 
   currentMode = mode;
@@ -107,6 +108,17 @@ int32_t SmartIo::GetPwmInputMicroseconds(uint16_t* microseconds) {
   return 0;
 }
 
+int32_t SmartIo::GetPwmInputPeriodMicroseconds(uint16_t* microseconds) {
+  if (currentMode != SmartIoMode::PwmInput) {
+    return INCOMPATIBLE_STATE;
+  }
+
+  int val = periodGetSubscriber.Get();
+  *microseconds = val;
+
+  return 0;
+}
+
 int32_t SmartIo::SetPwmOutputPeriod(PwmOutputPeriod period) {
   if (currentMode != SmartIoMode::PwmOutput) {
     return INCOMPATIBLE_STATE;
@@ -117,7 +129,7 @@ int32_t SmartIo::SetPwmOutputPeriod(PwmOutputPeriod period) {
     case PwmOutputPeriod::k10ms:
     case PwmOutputPeriod::k5ms:
     case PwmOutputPeriod::k2ms:
-      periodPublisher.Set(static_cast<int>(period));
+      periodSetPublisher.Set(static_cast<int>(period));
       return 0;
 
     default:

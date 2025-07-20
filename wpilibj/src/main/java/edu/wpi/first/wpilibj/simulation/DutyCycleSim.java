@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj.simulation;
 import edu.wpi.first.hal.simulation.DutyCycleDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.DutyCycle;
-import java.util.NoSuchElementException;
 
 /** Class to control a simulated duty cycle digital input. */
 public class DutyCycleSim {
@@ -19,7 +18,7 @@ public class DutyCycleSim {
    * @param dutyCycle DutyCycle to simulate
    */
   public DutyCycleSim(DutyCycle dutyCycle) {
-    m_index = dutyCycle.getFPGAIndex();
+    m_index = dutyCycle.getSourceChannel();
   }
 
   private DutyCycleSim(int index) {
@@ -27,29 +26,13 @@ public class DutyCycleSim {
   }
 
   /**
-   * Creates a DutyCycleSim for a digital input channel.
+   * Creates a DutyCycleSim for a SmartIO channel.
    *
-   * @param channel digital input channel
+   * @param channel SmartIO channel
    * @return Simulated object
-   * @throws NoSuchElementException if no DutyCycle is configured for that channel
    */
   public static DutyCycleSim createForChannel(int channel) {
-    int index = DutyCycleDataJNI.findForChannel(channel);
-    if (index < 0) {
-      throw new NoSuchElementException("no duty cycle found for channel " + channel);
-    }
-    return new DutyCycleSim(index);
-  }
-
-  /**
-   * Creates a DutyCycleSim for a simulated index. The index is incremented for each simulated
-   * DutyCycle.
-   *
-   * @param index simulator index
-   * @return Simulated object
-   */
-  public static DutyCycleSim createForIndex(int index) {
-    return new DutyCycleSim(index);
+    return new DutyCycleSim(channel);
   }
 
   /**
@@ -99,7 +82,7 @@ public class DutyCycleSim {
    *
    * @return the duty cycle frequency
    */
-  public int getFrequency() {
+  public double getFrequency() {
     return DutyCycleDataJNI.getFrequency(m_index);
   }
 
@@ -108,7 +91,7 @@ public class DutyCycleSim {
    *
    * @param frequency the new frequency
    */
-  public void setFrequency(int frequency) {
+  public void setFrequency(double frequency) {
     DutyCycleDataJNI.setFrequency(m_index, frequency);
   }
 

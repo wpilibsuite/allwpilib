@@ -48,7 +48,7 @@ jobs:
           token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       - name: bazel test (release)
-        run: bazel test -k ...   --config=ci -c opt --config=macos --nojava_header_compilation --verbose_failures
+        run: bazel test -k ...   --config=ci -c opt --nojava_header_compilation --verbose_failures
         shell: bash
 
   build-linux:
@@ -56,8 +56,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Linux (native)",      os: ubuntu-24.04,   container: "wpilib/ubuntu-base:24.04", action: "test",   config: "--config=linux",    }
-          - { name: "Linux (systemcore)",  os: ubuntu-24.04,   container: "wpilib/ubuntu-base:24.04", action: "build",  config: "--config=systemcore",    }
+          - { name: "Linux",      os: ubuntu-24.04,   container: "wpilib/ubuntu-base:24.04", action: "test",   config: "",    }
     name: "${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
@@ -70,6 +69,12 @@ jobs:
         uses: ./.github/actions/setup-build-buddy
         with:
           token: ${{ secrets.BUILDBUDDY_API_KEY }}
+
+      - uses: bazel-contrib/setup-bazel@0.15.0
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+          bazelisk-version: 1.x
 
       - name: bazel ${{ matrix.action }} (release)
         run: bazel ${{ matrix.action }} ... --config=ci -c opt ${{ matrix.config }} -k --verbose_failures

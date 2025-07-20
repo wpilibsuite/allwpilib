@@ -193,6 +193,9 @@ cppHeadersZip {
 }
 
 cppSourcesZip {
+    from('src/main/native/thirdparty/debugging/src') {
+        into '/'
+    }
     from('src/main/native/thirdparty/fmtlib/src') {
         into '/'
     }

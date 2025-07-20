@@ -60,7 +60,7 @@ class Robot : public frc::TimedRobot {
                                              fullRange - percentOfRange);
 
     frc::SmartDashboard::PutBoolean("Connected", connected);
-    frc::SmartDashboard::PutNumber("Frequency", frequency);
+    frc::SmartDashboard::PutNumber("Frequency", frequency.value());
     frc::SmartDashboard::PutNumber("Output", output);
     frc::SmartDashboard::PutNumber("ShiftedOutput", shiftedOutput);
   }
