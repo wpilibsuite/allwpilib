@@ -227,7 +227,8 @@ Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setData
   JSpan<const jbyte> jArrRef{env, arr};
   auto arrRef = jArrRef.array();
   HALSIM_SetAddressableLEDData(
-      start, arrRef.size() / 3, reinterpret_cast<const HAL_AddressableLEDData*>(arrRef.data()));
+      start, arrRef.size() / 3,
+      reinterpret_cast<const HAL_AddressableLEDData*>(arrRef.data()));
 }
 
 /*

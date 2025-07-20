@@ -132,7 +132,7 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setData
 /*
  * Class:     edu_wpi_first_hal_AddressableLEDJNI
  * Method:    setDataFromBuffer
- * Signature: (IILjava/nio/ByteBuffer;II)V
+ * Signature: (IILjava/lang/Object;II)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_AddressableLEDJNI_setDataFromBuffer
