@@ -18,9 +18,11 @@ import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -184,25 +186,9 @@ public class LoggerGenerator {
 
     var loggerFile = m_processingEnv.getFiler().createSourceFile(loggerClassName);
 
-    var varHandleFields =
-        loggableFields.stream()
-            .filter(
-                e -> {
-                  return e.getEnclosingElement().equals(clazz)
-                      && e.getModifiers().contains(Modifier.PRIVATE);
-                })
-            .toList();
-    boolean requiresVarHandles = !varHandleFields.isEmpty();
-
-    var reflectionFields =
-        loggableFields.stream()
-            .filter(
-                e -> {
-                  return !e.getEnclosingElement().equals(clazz)
-                      && !e.getModifiers().contains(Modifier.PUBLIC);
-                })
-            .toList();
-    boolean requiresReflection = !reflectionFields.isEmpty();
+    var privateFields =
+        loggableFields.stream().filter(e -> e.getModifiers().contains(Modifier.PRIVATE)).toList();
+    boolean requiresVarHandles = !privateFields.isEmpty();
 
     try (var out = new PrintWriter(loggerFile.openWriter())) {
       if (packageName != null) {
@@ -219,9 +205,6 @@ public class LoggerGenerator {
         out.println("import java.lang.invoke.MethodHandles;");
         out.println("import java.lang.invoke.VarHandle;");
       }
-      if (requiresReflection) {
-        out.println("import java.lang.reflect.Field;");
-      }
       out.println();
 
       // public class FooLogger implements ClassSpecificLogger<Foo> {
@@ -233,80 +216,66 @@ public class LoggerGenerator {
               + "> {");
 
       if (requiresVarHandles) {
-        for (var varHandleField : varHandleFields) {
+        for (var privateField : privateFields) {
           // This field needs a VarHandle to access.
           // Cache it in the class to avoid lookups
-          out.println("  private static final VarHandle $" + varHandleField.getSimpleName() + ";");
-        }
-        out.println();
-      }
-
-      if (requiresReflection) {
-        for (var reflectionField : reflectionFields) {
-          // This field needs reflection to access.
-          // Cache it in the class to avoid lookups
-          out.println("  private static final Field $" + reflectionField.getSimpleName() + ";");
+          out.printf(
+              "  // Accesses private field %s.%s%n",
+              privateField.getEnclosingElement(), privateField.getSimpleName());
+          out.println("  private static final VarHandle $" + privateField.getSimpleName() + ";");
         }
         out.println();
       }
 
       // Static initializer block to load VarHandles and reflection fields
-      if (requiresVarHandles || requiresReflection) {
+      if (requiresVarHandles) {
         out.println("  static {");
 
-        if (requiresVarHandles) {
-          out.println("    try {");
+        out.println("    try {");
 
-          var classReference = simpleClassName + ".class";
-          out.println(
-              "      var lookup = MethodHandles.privateLookupIn("
-                  + classReference
-                  + ", MethodHandles.lookup());");
+        out.println("      var rootLookup = MethodHandles.lookup();");
 
-          for (var varHandleField : varHandleFields) {
-            var fieldName = varHandleField.getSimpleName();
-            out.println(
-                "      $"
-                    + fieldName
-                    + " = lookup.findVarHandle("
-                    + classReference
-                    + ", \""
-                    + fieldName
-                    + "\", "
-                    + m_processingEnv.getTypeUtils().erasure(varHandleField.asType())
-                    + ".class);");
-          }
+        // Group private fields by class, then generate a private lookup for each class
+        // and a VarHandle for each field using that lookup. Sorting and then collecting into a
+        // LinkedHashMap gives deterministic output ordering (mostly for tests, which check exact
+        // file contents, but also results in less churn when regenerating files for users who like
+        // to read the generated logger classes).
+        //
+        // This lets us read private fields from superclasses.
+        Map<Element, List<VariableElement>> privateFieldsByClass =
+            privateFields.stream()
+                .sorted(Comparator.comparing(e -> e.getSimpleName().toString()))
+                .collect(
+                    Collectors.groupingBy(
+                        VariableElement::getEnclosingElement,
+                        LinkedHashMap::new,
+                        Collectors.toList()));
 
-          out.println("    } catch (ReflectiveOperationException e) {");
-          out.println(
-              "      throw new RuntimeException("
-                  + "\"[EPILOGUE] Could not load private fields for logging!\", e);");
-          out.println("    }");
-        }
+        privateFieldsByClass.forEach(
+            (enclosingClass, fields) -> {
+              String className = enclosingClass.toString();
+              String lookupName = "lookup$$" + className.replace(".", "_");
+              out.printf(
+                  "      var %s = MethodHandles.privateLookupIn(%s.class, rootLookup);%n",
+                  lookupName, className);
 
-        if (requiresReflection) {
-          out.println("    try {");
+              for (var field : fields) {
+                var fieldname = field.getSimpleName();
+                out.printf(
+                    "      $%s = %s.findVarHandle(%s.class, \"%s\", %s.class);%n",
+                    fieldname,
+                    lookupName,
+                    className,
+                    fieldname,
+                    m_processingEnv.getTypeUtils().erasure(field.asType()));
+              }
+            });
 
-          for (var reflectionField : reflectionFields) {
-            var fieldName = reflectionField.getSimpleName();
-            var fieldClass = reflectionField.getEnclosingElement().toString();
-            out.println(
-                "      $"
-                    + fieldName
-                    + " = "
-                    + fieldClass
-                    + ".class.getDeclaredField(\""
-                    + fieldName
-                    + "\");");
-            out.println("      $" + fieldName + ".setAccessible(true);");
-          }
-
-          out.println("    } catch (NoSuchFieldException e) {");
-          out.println(
-              "      throw new RuntimeException("
-                  + "\"[EPILOGUE] Could not load superclass fields for logging!\", e);");
-          out.println("    }");
-        }
+        out.println("    } catch (ReflectiveOperationException e) {");
+        out.println(
+            "      throw new RuntimeException("
+                + "\"[EPILOGUE] Could not load private fields for logging!\", e);");
+        out.println("    }");
 
         out.println("  }");
         out.println();
@@ -355,25 +324,13 @@ public class LoggerGenerator {
 
               handler.ifPresent(
                   h -> {
-                    boolean reflection = reflectionFields.contains(loggableElement);
                     // May be null if the handler consumes the element but does not actually want it
                     // to be logged. For example, the sendable handler consumes all sendable types
                     // but does not log commands or subsystems, to prevent excessive warnings about
                     // unloggable commands.
                     var logInvocation = h.logInvocation(loggableElement, clazz);
                     if (logInvocation != null) {
-                      if (reflection) {
-                        out.println("      try {");
-                      }
-                      out.println(logInvocation.indent(reflection ? 8 : 6).stripTrailing() + ";");
-                      if (reflection) {
-                        out.println("      } catch (IllegalAccessException e) {");
-                        out.println(
-                            "        throw new RuntimeException(\"[EPILOGUE] Could not access '"
-                                + loggableElement.getSimpleName()
-                                + "' for logging!\", e);");
-                        out.println("      }");
-                      }
+                      out.println(logInvocation.indent(6).stripTrailing() + ";");
                     }
                   });
             }

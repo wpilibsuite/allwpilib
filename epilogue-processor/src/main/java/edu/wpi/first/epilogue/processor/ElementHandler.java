@@ -117,9 +117,9 @@ public abstract class ElementHandler {
    * @param element the element to generate the access for
    * @return the generated access snippet
    */
-  public String elementAccess(Element element, TypeElement loggedClass) {
+  public String elementAccess(Element element) {
     if (element instanceof VariableElement field) {
-      return fieldAccess(field, loggedClass);
+      return fieldAccess(field);
     } else if (element instanceof ExecutableElement method) {
       return methodAccess(method);
     } else {
@@ -127,14 +127,12 @@ public abstract class ElementHandler {
     }
   }
 
-  private static String fieldAccess(VariableElement field, TypeElement loggedClass) {
-    boolean superclassField = !field.getEnclosingElement().equals(loggedClass);
+  private static String fieldAccess(VariableElement field) {
     var mods = field.getModifiers();
 
-    boolean isVarHandle = !superclassField && mods.contains(Modifier.PRIVATE);
-    boolean isReflection = superclassField && !mods.contains(Modifier.PUBLIC);
+    boolean isVarHandle = mods.contains(Modifier.PRIVATE);
 
-    if (isVarHandle || isReflection) {
+    if (isVarHandle) {
       // ((com.example.Foo) $fooField.get(object))
       // Extra parentheses so cast evaluates before appended methods
       // (e.g. when appending .getAsDouble())

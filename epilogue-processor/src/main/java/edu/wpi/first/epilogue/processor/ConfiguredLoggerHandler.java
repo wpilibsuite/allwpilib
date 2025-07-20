@@ -45,7 +45,7 @@ public class ConfiguredLoggerHandler extends ElementHandler {
         + ".tryUpdate(backend.getNested(\""
         + loggedName(element)
         + "\"), "
-        + elementAccess(element, loggedClass)
+        + elementAccess(element)
         + ", Epilogue.getConfig().errorHandler)";
   }
 }

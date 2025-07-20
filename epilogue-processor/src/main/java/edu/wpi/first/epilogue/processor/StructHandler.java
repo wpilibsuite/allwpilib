@@ -43,7 +43,7 @@ public class StructHandler extends ElementHandler {
     return "backend.log(\""
         + loggedName(element)
         + "\", "
-        + elementAccess(element, loggedClass)
+        + elementAccess(element)
         + ", "
         + structAccess(dataType(element))
         + ")";

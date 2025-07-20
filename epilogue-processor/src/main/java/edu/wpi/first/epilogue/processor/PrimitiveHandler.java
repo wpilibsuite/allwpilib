@@ -37,10 +37,6 @@ public class PrimitiveHandler extends ElementHandler {
 
   @Override
   public String logInvocation(Element element, TypeElement loggedClass) {
-    return "backend.log(\""
-        + loggedName(element)
-        + "\", "
-        + elementAccess(element, loggedClass)
-        + ")";
+    return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
   }
 }

@@ -44,18 +44,14 @@ public class SupplierHandler extends ElementHandler {
 
   @Override
   public String logInvocation(Element element, TypeElement loggedClass) {
-    return "backend.log(\""
-        + loggedName(element)
-        + "\", "
-        + elementAccess(element, loggedClass)
-        + ")";
+    return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
   }
 
   @Override
-  public String elementAccess(Element element, TypeElement loggedClass) {
+  public String elementAccess(Element element) {
     var typeUtils = m_processingEnv.getTypeUtils();
     var dataType = dataType(element);
-    String base = super.elementAccess(element, loggedClass);
+    String base = super.elementAccess(element);
 
     if (typeUtils.isAssignable(dataType, m_booleanSupplier)) {
       return base + ".getAsBoolean()";

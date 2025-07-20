@@ -33,10 +33,6 @@ public class MeasureHandler extends ElementHandler {
   @Override
   public String logInvocation(Element element, TypeElement loggedClass) {
     // EpilogueBackend has builtin support for logging measures
-    return "backend.log(\""
-        + loggedName(element)
-        + "\", "
-        + elementAccess(element, loggedClass)
-        + ")";
+    return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
   }
 }

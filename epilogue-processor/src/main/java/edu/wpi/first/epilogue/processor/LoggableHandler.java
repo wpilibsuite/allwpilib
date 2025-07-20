@@ -61,7 +61,7 @@ public class LoggableHandler extends ElementHandler {
 
     // If there are no known loggable subtypes, return just the single logger call
     if (size == 1) {
-      return generateLoggerCall(element, declaredType, elementAccess(element, loggedClass));
+      return generateLoggerCall(element, declaredType, elementAccess(element));
     }
 
     // Otherwise, generate an if-else chain to compare the element with its known loggable subtypes
@@ -73,7 +73,7 @@ public class LoggableHandler extends ElementHandler {
     StringBuilder builder = new StringBuilder();
 
     // Cache the value in a variable so it's only read once
-    builder.append("var %s = %s;\n".formatted(varName, elementAccess(element, loggedClass)));
+    builder.append("var %s = %s;\n".formatted(varName, elementAccess(element)));
 
     for (int i = 0; i < size; i++) {
       TypeElement type = loggableSubtypes.get(i);
