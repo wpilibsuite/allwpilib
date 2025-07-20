@@ -76,14 +76,14 @@ class AddressableLEDSim {
   /**
    * Get the start.
    *
-   * @return the output port
+   * @return the start
    */
   int GetStart() const;
 
   /**
    * Change the start.
    *
-   * @param outputPort the new output port
+   * @param start the new start
    */
   void SetStart(int start);
 
