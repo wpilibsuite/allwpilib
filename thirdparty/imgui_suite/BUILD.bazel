@@ -171,6 +171,10 @@ cc_library(
         "@bazel_tools//src/conditions:windows": WINDOWS_DEFINES,
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_DEFINES,
     }),
+    linkopts = select({
+        "@bazel_tools//src/conditions:windows": WINDOWS_LINKOPTS,
+        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_LINKOPTS,
+    }),
     target_compatible_with = select({
         "@bazel_tools//src/conditions:windows": [],
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": [],
