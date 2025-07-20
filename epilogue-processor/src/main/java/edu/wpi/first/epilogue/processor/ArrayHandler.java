@@ -64,13 +64,17 @@ public class ArrayHandler extends ElementHandler {
       return "backend.log(\""
           + loggedName(element)
           + "\", "
-          + elementAccess(element)
+          + elementAccess(element, loggedClass)
           + ", "
           + m_structHandler.structAccess(componentType)
           + ")";
     } else {
       // Primitive or string array
-      return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
+      return "backend.log(\""
+          + loggedName(element)
+          + "\", "
+          + elementAccess(element, loggedClass)
+          + ")";
     }
   }
 }

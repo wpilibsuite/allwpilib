@@ -186,9 +186,23 @@ public class LoggerGenerator {
 
     var loggerFile = m_processingEnv.getFiler().createSourceFile(loggerClassName);
 
-    var privateFields =
-        loggableFields.stream().filter(e -> e.getModifiers().contains(Modifier.PRIVATE)).toList();
-    boolean requiresVarHandles = !privateFields.isEmpty();
+    var varHandleFields =
+        loggableFields.stream()
+            .filter(
+                e -> {
+                  if (e.getEnclosingElement().equals(clazz)) {
+                    // The generated logger is in the same package as the logged class, so the
+                    // only fields it can't read are private ones.
+                    return e.getModifiers().contains(Modifier.PRIVATE);
+                  } else {
+                    // Logging from a superclass. Can only read public fields, unless the superclass
+                    // is in the same package, in which case protected and package-private fields
+                    // are also readable.
+                    return !e.getModifiers().contains(Modifier.PUBLIC);
+                  }
+                })
+            .toList();
+    boolean requiresVarHandles = !varHandleFields.isEmpty();
 
     try (var out = new PrintWriter(loggerFile.openWriter())) {
       if (packageName != null) {
@@ -216,11 +230,11 @@ public class LoggerGenerator {
               + "> {");
 
       if (requiresVarHandles) {
-        for (var privateField : privateFields) {
+        for (var privateField : varHandleFields) {
           // This field needs a VarHandle to access.
           // Cache it in the class to avoid lookups
           out.printf(
-              "  // Accesses private field %s.%s%n",
+              "  // Accesses private or superclass field %s.%s%n",
               privateField.getEnclosingElement(), privateField.getSimpleName());
           out.println("  private static final VarHandle $" + privateField.getSimpleName() + ";");
         }
@@ -243,7 +257,7 @@ public class LoggerGenerator {
         //
         // This lets us read private fields from superclasses.
         Map<Element, List<VariableElement>> privateFieldsByClass =
-            privateFields.stream()
+            varHandleFields.stream()
                 .sorted(Comparator.comparing(e -> e.getSimpleName().toString()))
                 .collect(
                     Collectors.groupingBy(

@@ -117,9 +117,9 @@ public abstract class ElementHandler {
    * @param element the element to generate the access for
    * @return the generated access snippet
    */
-  public String elementAccess(Element element) {
+  public String elementAccess(Element element, TypeElement loggedClass) {
     if (element instanceof VariableElement field) {
-      return fieldAccess(field);
+      return fieldAccess(field, loggedClass);
     } else if (element instanceof ExecutableElement method) {
       return methodAccess(method);
     } else {
@@ -127,10 +127,18 @@ public abstract class ElementHandler {
     }
   }
 
-  private static String fieldAccess(VariableElement field) {
+  private static String fieldAccess(VariableElement field, TypeElement loggedClass) {
     var mods = field.getModifiers();
 
-    boolean isVarHandle = mods.contains(Modifier.PRIVATE);
+    // To be directly accessible, the field needs to be:
+    // - public; or
+    // - protected or package-private, and declared by a superclass in the same package
+    // However, we can't cleanly access package information, so we'll always emit a VarHandle
+    // for any field declared in a superclass unless it's public and we know we can read it.
+    boolean isVarHandle =
+        field.getEnclosingElement().equals(loggedClass)
+            ? mods.contains(Modifier.PRIVATE)
+            : !mods.contains(Modifier.PUBLIC);
 
     if (isVarHandle) {
       // ((com.example.Foo) $fooField.get(object))

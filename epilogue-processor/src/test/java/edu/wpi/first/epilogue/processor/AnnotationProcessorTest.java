@@ -225,7 +225,7 @@ class AnnotationProcessorTest {
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        // Accesses private field edu.wpi.first.epilogue.Example.x
+        // Accesses private or superclass field edu.wpi.first.epilogue.Example.x
         private static final VarHandle $x;
 
         static {
@@ -280,7 +280,7 @@ class AnnotationProcessorTest {
     import java.lang.invoke.VarHandle;
 
     public class ExampleLogger extends ClassSpecificLogger<Example> {
-      // Accesses private field edu.wpi.first.epilogue.Example.x
+      // Accesses private or superclass field edu.wpi.first.epilogue.Example.x
       private static final VarHandle $x;
 
       static {
@@ -333,7 +333,7 @@ class AnnotationProcessorTest {
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        // Accesses private field edu.wpi.first.epilogue.Example.chooser
+        // Accesses private or superclass field edu.wpi.first.epilogue.Example.chooser
         private static final VarHandle $chooser;
 
         static {
@@ -526,14 +526,20 @@ class AnnotationProcessorTest {
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        // Accesses private field edu.wpi.first.epilogue.BaseExample.c
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.b
+        private static final VarHandle $b;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.c
         private static final VarHandle $c;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.d
+        private static final VarHandle $d;
 
         static {
           try {
             var rootLookup = MethodHandles.lookup();
             var lookup$$edu_wpi_first_epilogue_BaseExample = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.BaseExample.class, rootLookup);
+            $b = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "b", double.class);
             $c = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "c", double.class);
+            $d = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "d", double.class);
           } catch (ReflectiveOperationException e) {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
@@ -548,9 +554,9 @@ class AnnotationProcessorTest {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             backend.log("e", object.e);
             backend.log("a", object.a);
-            backend.log("b", object.b);
+            backend.log("b", ((double) $b.get(object)));
             backend.log("c", ((double) $c.get(object)));
-            backend.log("d", object.d);
+            backend.log("d", ((double) $d.get(object)));
           }
         }
       }
@@ -601,16 +607,22 @@ class AnnotationProcessorTest {
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        // Accesses private field edu.wpi.first.epilogue.Example.i
+        // Accesses private or superclass field edu.wpi.first.epilogue.Example.i
         private static final VarHandle $i;
-        // Accesses private field edu.wpi.first.epilogue.BaseExample.f
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.d
+        private static final VarHandle $d;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.f
         private static final VarHandle $f;
+        // Accesses private or superclass field edu.wpi.first.epilogue.BaseExample.g
+        private static final VarHandle $g;
 
         static {
           try {
             var rootLookup = MethodHandles.lookup();
             var lookup$$edu_wpi_first_epilogue_BaseExample = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.BaseExample.class, rootLookup);
+            $d = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "d", double.class);
             $f = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "f", double.class);
+            $g = lookup$$edu_wpi_first_epilogue_BaseExample.findVarHandle(edu.wpi.first.epilogue.BaseExample.class, "g", double.class);
             var lookup$$edu_wpi_first_epilogue_Example = MethodHandles.privateLookupIn(edu.wpi.first.epilogue.Example.class, rootLookup);
             $i = lookup$$edu_wpi_first_epilogue_Example.findVarHandle(edu.wpi.first.epilogue.Example.class, "i", double.class);
           } catch (ReflectiveOperationException e) {
@@ -627,10 +639,10 @@ class AnnotationProcessorTest {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
             backend.log("h", object.h);
             backend.log("i", ((double) $i.get(object)));
-            backend.log("d", object.d);
+            backend.log("d", ((double) $d.get(object)));
             backend.log("e", object.e);
             backend.log("f", ((double) $f.get(object)));
-            backend.log("g", object.g);
+            backend.log("g", ((double) $g.get(object)));
             backend.log("a", object.a);
             backend.log("getValue", object.getValue());
             backend.log("getB", object.getB());
@@ -1344,7 +1356,7 @@ class AnnotationProcessorTest {
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        // Accesses private field edu.wpi.first.epilogue.Example.valueB
+        // Accesses private or superclass field edu.wpi.first.epilogue.Example.valueB
         private static final VarHandle $valueB;
 
         static {
@@ -1753,7 +1765,7 @@ class AnnotationProcessorTest {
         import java.lang.invoke.VarHandle;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
-          // Accesses private field edu.wpi.first.epilogue.Example.theField
+          // Accesses private or superclass field edu.wpi.first.epilogue.Example.theField
           private static final VarHandle $theField;
 
           static {

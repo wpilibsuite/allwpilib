@@ -47,12 +47,16 @@ public class CollectionHandler extends ElementHandler {
       return "backend.log(\""
           + loggedName(element)
           + "\", "
-          + elementAccess(element)
+          + elementAccess(element, loggedClass)
           + ", "
           + m_structHandler.structAccess(componentType)
           + ")";
     } else {
-      return "backend.log(\"" + loggedName(element) + "\", " + elementAccess(element) + ")";
+      return "backend.log(\""
+          + loggedName(element)
+          + "\", "
+          + elementAccess(element, loggedClass)
+          + ")";
     }
   }
 }
