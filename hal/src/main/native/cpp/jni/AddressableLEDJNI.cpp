@@ -96,7 +96,8 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setLength
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_AddressableLEDJNI_setData
-  (JNIEnv* env, jclass, jint outStart, jint colorOrder, jbyteArray data, jint start, jint len)
+  (JNIEnv* env, jclass, jint outStart, jint colorOrder, jbyteArray data,
+   jint start, jint len)
 {
   if (!data) {
     ThrowNullPointerException(env, "data is null");
@@ -112,7 +113,8 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setData
   }
   JSpan<const jbyte> cdata{env, data};
   if (static_cast<unsigned int>(start + len) > cdata.size()) {
-    ThrowIndexOutOfBoundsException(env, "start + len must be smaller than array length");
+    ThrowIndexOutOfBoundsException(
+        env, "start + len must be smaller than array length");
     return;
   }
   if ((len % 3) != 0) {
@@ -124,8 +126,7 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setData
   HAL_SetAddressableLEDData(
       outStart, rawdata.size() / 3,
       static_cast<HAL_AddressableLEDColorOrder>(colorOrder),
-      reinterpret_cast<const HAL_AddressableLEDData*>(rawdata.data()),
-      &status);
+      reinterpret_cast<const HAL_AddressableLEDData*>(rawdata.data()), &status);
 }
 
 /*
@@ -135,7 +136,8 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setData
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_AddressableLEDJNI_setDataFromBuffer
-  (JNIEnv* env, jclass, jint outStart, jint colorOrder, jobject data, jint start, jint len)
+  (JNIEnv* env, jclass, jint outStart, jint colorOrder, jobject data,
+   jint start, jint len)
 {
   if (!data) {
     ThrowNullPointerException(env, "data is null");
@@ -163,7 +165,6 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setDataFromBuffer
   HAL_SetAddressableLEDData(
       outStart, rawdata.size() / 3,
       static_cast<HAL_AddressableLEDColorOrder>(colorOrder),
-      reinterpret_cast<const HAL_AddressableLEDData*>(rawdata.data()),
-      &status);
+      reinterpret_cast<const HAL_AddressableLEDData*>(rawdata.data()), &status);
 }
 }  // extern "C"

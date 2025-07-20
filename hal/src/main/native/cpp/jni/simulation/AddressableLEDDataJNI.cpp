@@ -78,9 +78,8 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_registerStartCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
-  return sim::AllocateCallback(
-      env, index, callback, initialNotify,
-      &HALSIM_RegisterAddressableLEDStartCallback);
+  return sim::AllocateCallback(env, index, callback, initialNotify,
+                               &HALSIM_RegisterAddressableLEDStartCallback);
 }
 
 /*
@@ -180,15 +179,16 @@ Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_registerDataCallback
   (JNIEnv* env, jclass, jobject callback)
 {
   return sim::AllocateConstBufferCallback(
-      env, -1, callback, [](int32_t, HAL_ConstBufferCallback callback, void* param) {
+      env, -1, callback,
+      [](int32_t, HAL_ConstBufferCallback callback, void* param) {
         return HALSIM_RegisterAddressableLEDDataCallback(callback, param);
-  });
+      });
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    cancelDataCallback
- * Signature: (II)V
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_cancelDataCallback
@@ -218,7 +218,7 @@ Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_getData
 /*
  * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    setData
- * Signature: (II[B)V
+ * Signature: (I[B)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setData

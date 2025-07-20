@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <cstdio>
 #include <cstring>
 #include <memory>
 #include <thread>
