@@ -236,7 +236,7 @@ public class LoggerGenerator {
           out.printf(
               "  // Accesses private or superclass field %s.%s%n",
               privateField.getEnclosingElement(), privateField.getSimpleName());
-          out.println("  private static final VarHandle $" + privateField.getSimpleName() + ";");
+          out.printf("  private static final VarHandle %s;%n", varHandleName(privateField));
         }
         out.println();
       }
@@ -276,8 +276,8 @@ public class LoggerGenerator {
               for (var field : fields) {
                 var fieldname = field.getSimpleName();
                 out.printf(
-                    "      $%s = %s.findVarHandle(%s.class, \"%s\", %s.class);%n",
-                    fieldname,
+                    "      %s = %s.findVarHandle(%s.class, \"%s\", %s.class);%n",
+                    varHandleName(field),
                     lookupName,
                     className,
                     fieldname,
@@ -355,6 +355,18 @@ public class LoggerGenerator {
       out.println("  }");
       out.println("}");
     }
+  }
+
+  /**
+   * Generates the name of a VarHandle for access to the given field. The VarHandle variable's name
+   * is guaranteed to be unique.
+   *
+   * @param field The field to generate a VarHandle for
+   * @return The name of the generated VarHandle variable
+   */
+  public static String varHandleName(VariableElement field) {
+    return "$%s_%s"
+        .formatted(field.getEnclosingElement().toString().replace(".", "_"), field.getSimpleName());
   }
 
   private void collectLoggables(

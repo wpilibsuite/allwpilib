@@ -148,7 +148,7 @@ public abstract class ElementHandler {
       if (type.getKind() == TypeKind.TYPEVAR) {
         type = ((TypeVariable) type).getUpperBound();
       }
-      return "((" + type.toString() + ") $" + field.getSimpleName() + ".get(object))";
+      return "((" + type.toString() + ") " + LoggerGenerator.varHandleName(field) + ".get(object))";
     } else {
       // object.fooField
       return "object." + field.getSimpleName();
