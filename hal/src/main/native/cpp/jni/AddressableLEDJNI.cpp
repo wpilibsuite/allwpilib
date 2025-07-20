@@ -110,7 +110,7 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setData
     ThrowIndexOutOfBoundsException(env, "len must be >= 0");
     return;
   }
-  CriticalJSpan<const jbyte> cdata{env, data};
+  JSpan<const jbyte> cdata{env, data};
   if (static_cast<unsigned int>(start + len) > cdata.size()) {
     ThrowIndexOutOfBoundsException(env, "start + len must be smaller than array length");
     return;

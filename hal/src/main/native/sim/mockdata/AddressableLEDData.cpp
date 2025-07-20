@@ -30,8 +30,10 @@ void AddressableLEDData::ResetData() {
 
 void AddressableLEDDataBuffer::SetData(int32_t start, int32_t len,
                                        const HAL_AddressableLEDData* d) {
-  len = (std::min)(HAL_kAddressableLEDMaxLength, len - start);
-  if (len < 0) {
+  if ((start + len) > HAL_kAddressableLEDMaxLength) {
+    len = HAL_kAddressableLEDMaxLength - start;
+  }
+  if (len <= 0) {
     return;
   }
   {
@@ -43,8 +45,10 @@ void AddressableLEDDataBuffer::SetData(int32_t start, int32_t len,
 
 int32_t AddressableLEDDataBuffer::GetData(int32_t start, int32_t len,
                                           HAL_AddressableLEDData* d) {
-  len = (std::min)(HAL_kAddressableLEDMaxLength, len - start);
-  if (len < 0) {
+  if ((start + len) > HAL_kAddressableLEDMaxLength) {
+    len = HAL_kAddressableLEDMaxLength - start;
+  }
+  if (len <= 0) {
     return 0;
   }
   std::scoped_lock lock(m_dataMutex);

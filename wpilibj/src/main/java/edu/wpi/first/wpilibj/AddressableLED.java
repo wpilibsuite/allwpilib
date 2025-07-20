@@ -110,7 +110,7 @@ public class AddressableLED implements AutoCloseable {
    *
    * @param start the strip start, in LEDs
    */
-  void setStart(int start) {
+  public void setStart(int start) {
     m_start = start;
     AddressableLEDJNI.setStart(m_handle, start);
   }
@@ -120,7 +120,7 @@ public class AddressableLED implements AutoCloseable {
    *
    * @return the strip start, in LEDs
    */
-  int getStart() {
+  public int getStart() {
     return m_start;
   }
 
@@ -158,7 +158,7 @@ public class AddressableLED implements AutoCloseable {
    * @param colorOrder the color order
    * @param buffer the buffer to write
    */
-  public void setGlobalData(int start, ColorOrder colorOrder, AddressableLEDBuffer buffer) {
+  public static void setGlobalData(int start, ColorOrder colorOrder, AddressableLEDBuffer buffer) {
     AddressableLEDJNI.setData(start, colorOrder.value, buffer.m_buffer);
   }
 }

@@ -156,7 +156,7 @@ public class AddressableLEDSim {
    *
    * @return the LED data
    */
-  public byte[] getGlobalData(int start, int length) {
+  public static byte[] getGlobalData(int start, int length) {
     return AddressableLEDDataJNI.getData(start, length);
   }
 
@@ -165,7 +165,7 @@ public class AddressableLEDSim {
    *
    * @param data the new data
    */
-  public void setGlobalData(int start, byte[] data) {
+  public static void setGlobalData(int start, byte[] data) {
     AddressableLEDDataJNI.setData(start, data);
   }
 
