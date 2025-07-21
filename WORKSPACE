@@ -290,16 +290,16 @@ load("@bzlmodrio-ni//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_ni_cpp_depend
 setup_legacy_bzlmodrio_ni_cpp_dependencies()
 
 #local_repository(
-  #name = "bzlmodrio-opencv",
-  #path = "../bzlmodRio-opencv/"
+#name = "bzlmodrio-opencv",
+#path = "../bzlmodRio-opencv/"
 #)
 
 http_archive(
     name = "bzlmodrio-opencv",
-    sha256 = "27dff7aaedd00165b1a94867616ebf383220532e3956892cec649197077a9d01",
-    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr3/bzlmodRio-opencv-2025.4.10.0-3.bcr3.tar.gz",
     patch_args = ["-p1"],
     patches = ["//:opencv.patch"],
+    sha256 = "27dff7aaedd00165b1a94867616ebf383220532e3956892cec649197077a9d01",
+    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr3/bzlmodRio-opencv-2025.4.10.0-3.bcr3.tar.gz",
 )
 
 load("@bzlmodrio-opencv//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_opencv_cpp_dependencies")
