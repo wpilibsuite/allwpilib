@@ -5,6 +5,7 @@ load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
+load("@bzlmodrio-opencv//libraries/cpp/opencv:libraries.bzl", "opencv_shared_libraries")
 
 WIN_SRCS = glob([
     "src/main/native/windows/**/*.cpp",
@@ -89,7 +90,7 @@ wpilib_cc_shared_library(
     dynamic_deps = [
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
-    ],
+    ] + opencv_shared_libraries,
     visibility = ["//visibility:public"],
     deps = [":cscore"],
 )
@@ -214,6 +215,7 @@ java_binary(
     deps = [
         "//cscore",
         "//wpigui",
+        "@bzlmodrio-opencv//libraries/cpp/opencv",
     ],
 ) for example in [
     "enum_usb",
