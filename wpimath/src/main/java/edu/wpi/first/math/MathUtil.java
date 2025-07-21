@@ -183,7 +183,7 @@ public final class MathUtil {
    * <p>The function normalizes the norm of the input to the range [0, 1] based on the maximum
    * distance, raises it to the power of the exponent, then scales the result back to the original
    * range. This keeps the value in the original max distance and gives consistent curve behavior
-   * regardless of the input norms's scale.
+   * regardless of the input norm's scale.
    *
    * @param value The input translation to transform.
    * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be
