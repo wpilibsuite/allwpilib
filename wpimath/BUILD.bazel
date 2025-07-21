@@ -121,6 +121,11 @@ wpilib_cc_library(
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**"]),
+    copts = select({
+        "//shared/bazel/rules:compilation_mode_windows_dbg": ["/O1"],
+        "//shared/bazel/rules:compilation_mode_windows_fastbuild": ["/O1"],
+        "//conditions:default": [],
+    }),
     extra_src_pkg_files = [
         ":wpimath-java-jni-hdrs-pkg",
     ],
