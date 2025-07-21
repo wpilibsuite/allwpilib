@@ -801,10 +801,10 @@ index efeac77..dd0a0b1 100644
  )
 diff --git a/private/cpp/opencv/wrapped_cc_import.bzl b/private/cpp/opencv/wrapped_cc_import.bzl
 new file mode 100644
-index 0000000..098b027
+index 0000000..3928054
 --- /dev/null
 +++ b/private/cpp/opencv/wrapped_cc_import.bzl
-@@ -0,0 +1,108 @@
+@@ -0,0 +1,109 @@
 +load("@rules_cc//cc:defs.bzl", "cc_import")
 +load("@bzlmodrio-opencv//:rules/cc_shared_import_adapter.bzl", "cc_shared_info_adapter")
 +
@@ -887,6 +887,7 @@ index 0000000..098b027
 +
 +    cc_import(
 +        name = base_name + "_shared_import",
++        interface_library = interface_library,
 +        shared_library = shared_library_file,
 +        hdrs = hdrs,
 +        includes = includes,

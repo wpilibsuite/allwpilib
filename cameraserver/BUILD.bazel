@@ -1,6 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("@bzlmodrio-opencv//libraries/cpp/opencv:libraries.bzl", "opencv_shared_libraries")
 
 wpilib_cc_library(
     name = "cameraserver",
@@ -24,7 +25,7 @@ wpilib_cc_shared_library(
         "//cscore:shared/cscore",
         "//ntcore:shared/ntcore",
         "//wpiutil:shared/wpiutil",
-    ],
+    ] + opencv_shared_libraries,
     visibility = ["//visibility:public"],
     deps = [":cameraserver"],
 )
