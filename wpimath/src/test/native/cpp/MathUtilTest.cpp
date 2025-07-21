@@ -202,7 +202,7 @@ TEST(MathUtilTest, CopySignPowWithUnits) {
 }
 
 TEST(MathUtilTest, CopySignPow2d) {
-  const frc::Rotation2d zero{0_deg};
+  const frc::Rotation2d zero;
   const frc::Rotation2d pi{180_deg};
 
   EXPECT_EQ(frc::Translation2d(0.5_m, zero),
