@@ -138,9 +138,6 @@ doxygen {
         exclude 'wpi/ordered_map.h'
         exclude 'wpi/thirdparty/**'
 
-        // memory
-        exclude 'wpi/memory/**'
-
         // mpack
         exclude 'wpi/mpack.h'
 

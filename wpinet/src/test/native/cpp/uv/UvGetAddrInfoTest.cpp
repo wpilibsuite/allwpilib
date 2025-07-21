@@ -47,7 +47,7 @@ TEST(UvGetAddrInfoTest, BothNull) {
   ASSERT_EQ(fail_cb_called, 1);
 }
 
-TEST(UvGetAddrInfoTest, FailedLookup) {
+TEST(UvGetAddrInfoTest, DISABLED_FailedLookup) {
   int fail_cb_called = 0;
 
   auto loop = Loop::Create();

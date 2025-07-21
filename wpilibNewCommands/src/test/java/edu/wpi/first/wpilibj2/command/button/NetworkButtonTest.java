@@ -39,10 +39,10 @@ class NetworkButtonTest extends CommandTestBase {
     pub.set(false);
     button.onTrue(command);
     scheduler.run();
-    verify(command, never()).schedule();
+    verify(command, never()).initialize();
     pub.set(true);
     scheduler.run();
     scheduler.run();
-    verify(command).schedule();
+    verify(command).initialize();
   }
 }
