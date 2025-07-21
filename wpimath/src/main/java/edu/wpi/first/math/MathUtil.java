@@ -117,7 +117,7 @@ public final class MathUtil {
    * @param maxDistance The maximum distance from the origin of the input. Can be infinite.
    * @return The value after the deadband is applied.
    */
-  public static Translation2d applyDeadband2d(
+  public static Translation2d applyDeadband(
       Translation2d value, double deadband, double maxDistance) {
     double norm = value.getNorm();
     if (norm <= 1e-6) {
@@ -135,8 +135,8 @@ public final class MathUtil {
    * @param deadband Distance from origin.
    * @return The value after the deadband is applied.
    */
-  public static Translation2d applyDeadband2d(Translation2d value, double deadband) {
-    return applyDeadband2d(value, deadband, 1);
+  public static Translation2d applyDeadband(Translation2d value, double deadband) {
+    return applyDeadband(value, deadband, 1);
   }
 
   /**
@@ -189,7 +189,7 @@ public final class MathUtil {
    * @param maxDistance The maximum expected distance from origin of input. Must be positive.
    * @return The transformed value with the same direction and norm scaled to the input range.
    */
-  public static Translation2d copySignPow2d(
+  public static Translation2d copySignPow(
       Translation2d value, double exponent, double maxDistance) {
     double norm = value.getNorm();
     if (norm <= 1e-6) {
@@ -206,8 +206,8 @@ public final class MathUtil {
    *     positive.
    * @return The transformed value with the same direction.
    */
-  public static Translation2d copySignPow2d(Translation2d value, double exponent) {
-    return copySignPow2d(value, exponent, 1);
+  public static Translation2d copySignPow(Translation2d value, double exponent) {
+    return copySignPow(value, exponent, 1);
   }
 
   /**

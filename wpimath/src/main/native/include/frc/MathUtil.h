@@ -105,7 +105,7 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
  * (defaults to 1). Can be infinite.
  * @return The value after the deadband is applied.
  */
-constexpr Translation2d ApplyDeadband2d(const Translation2d& value,
+constexpr Translation2d ApplyDeadband(const Translation2d& value,
                                         units::meter_t deadband,
                                         units::meter_t maxDistance = 1_m) {
   units::meter_t norm = value.Norm();
@@ -170,7 +170,7 @@ constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
  * @return The transformed value with the same direction and norm scaled to
  * the input range.
  */
-constexpr Translation2d CopySignPow2d(const Translation2d& value,
+constexpr Translation2d CopySignPow(const Translation2d& value,
                                       double exponent,
                                       units::meter_t maxDistance = 1_m) {
   units::meter_t norm = value.Norm();
