@@ -129,7 +129,7 @@ TEST(MathUtilTest, ApplyDeadband2dArbitraryScale) {
 TEST(MathUtilTest, ApplyDeadband2dLargeMaxMagnitude) {
   const frc::Rotation2d zero;
 
-  EXPECT_EQ(frc::Translation2d(80_m zero),
+  EXPECT_EQ(frc::Translation2d(80_m, zero),
             frc::ApplyDeadband(
                 frc::Translation2d(100_m, zero), 20_m,
                 units::meter_t{std::numeric_limits<double>::infinity()}));
@@ -201,7 +201,7 @@ TEST(MathUtilTest, CopySignPowWithUnits) {
           .value());
 }
 
-TEST(MathUtilTest, CopySignPow) {
+TEST(MathUtilTest, CopySignPow2d) {
   const frc::Rotation2d zero{0_deg};
   const frc::Rotation2d pi{180_deg};
 
