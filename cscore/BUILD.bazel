@@ -92,7 +92,12 @@ wpilib_cc_shared_library(
         "//wpiutil:shared/wpiutil",
     ] + opencv_shared_libraries,
     visibility = ["//visibility:public"],
-    deps = [":cscore"],
+    deps = [
+        ":cscore",
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
+        "//conditions:default": [],
+    }),
 )
 
 wpilib_cc_static_library(

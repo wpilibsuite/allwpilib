@@ -66,7 +66,7 @@ index 8394b52..50551ce 100644
 +    #],
  )
 diff --git a/maven_cpp_deps.bzl b/maven_cpp_deps.bzl
-index 73a5e7f..2debe30 100644
+index 73a5e7f..1c982bd 100644
 --- a/maven_cpp_deps.bzl
 +++ b/maven_cpp_deps.bzl
 @@ -1,5 +1,6 @@
@@ -76,7 +76,7 @@ index 73a5e7f..2debe30 100644
  
  cc_library_headers = """cc_library(
      name = "headers",
-@@ -22,6 +23,121 @@ cc_library_sources = """filegroup(
+@@ -22,6 +23,126 @@ cc_library_sources = """filegroup(
   )
   """
  
@@ -88,6 +88,11 @@ index 73a5e7f..2debe30 100644
 +        "**/*.dll",
 +        "**/*.so*",
 +        "**/*.dylib",
++    ],
++    exclude = [
++        "**/*opencv_java*.so*",
++        "**/*opencv_java*.dylib",
++        "**/*opencv_java*.dll",
 +    ],
 +    allow_empty = True,
 +)
@@ -198,7 +203,7 @@ index 73a5e7f..2debe30 100644
  def __setup_bzlmodrio_opencv_cpp_dependencies(mctx):
      maybe(
          http_archive,
-@@ -37,313 +153,137 @@ def __setup_bzlmodrio_opencv_cpp_dependencies(mctx):
+@@ -37,313 +158,137 @@ def __setup_bzlmodrio_opencv_cpp_dependencies(mctx):
          sha256 = "894d273ee8eece2e1f588aad8e7cf61f56a900279c864433984bd5299a31776c",
          build_file_content = cc_library_sources,
      )
