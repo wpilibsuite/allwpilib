@@ -58,7 +58,7 @@ class S3SigmaPoints {
   Matrixd<States, NumSigmas> SquareRootSigmaPoints(
       const Vectord<States>& x, const Matrixd<States, States>& S) const {
     // table (1), equation (12)
-    wpi::array<double, States> q(wpi::empty_array);
+    wpi::array<double, States> q{wpi::empty_array};
     for (size_t t = 1; t <= States; ++t) {
       q[t - 1] = m_alpha * std::sqrt(static_cast<double>(t * (States + 1)) /
                                      static_cast<double>(t + 1));
