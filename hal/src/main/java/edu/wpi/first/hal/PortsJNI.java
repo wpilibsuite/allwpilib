@@ -35,22 +35,6 @@ public class PortsJNI extends JNIWrapper {
   public static native int getNumCounters();
 
   /**
-   * Gets the number of digital headers in the current system.
-   *
-   * @return the number of digital headers
-   * @see "HAL_GetNumDigitalHeaders"
-   */
-  public static native int getNumDigitalHeaders();
-
-  /**
-   * Gets the number of PWM headers in the current system.
-   *
-   * @return the number of PWM headers
-   * @see "HAL_GetNumPWMHeaders"
-   */
-  public static native int getNumPWMHeaders();
-
-  /**
    * Gets the number of digital channels in the current system.
    *
    * @return the number of digital channels

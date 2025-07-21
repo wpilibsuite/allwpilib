@@ -54,32 +54,6 @@ Java_edu_wpi_first_hal_PortsJNI_getNumCounters
 
 /*
  * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumDigitalHeaders
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumDigitalHeaders
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumDigitalHeaders();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumPWMHeaders
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumPWMHeaders
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumPWMHeaders();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
  * Method:    getNumDigitalChannels
  * Signature: ()I
  */
