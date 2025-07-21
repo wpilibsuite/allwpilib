@@ -106,10 +106,11 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
  * @return The value after the deadband is applied.
  */
 constexpr Translation2d ApplyDeadband(const Translation2d& value,
-                                        units::meter_t deadband,
-                                        units::meter_t maxDistance = 1_m) {
+                                      units::meter_t deadband,
+                                      units::meter_t maxDistance = 1_m) {
   units::meter_t norm = value.Norm();
-  // If norm is less than 1e-6 then return zero vector. Transitions with norm less than or equal to 1e-6 do not have an angle due to logic of Rotation2d
+  // If norm is less than 1e-6 then return zero vector. Transitions with norm
+  // less than or equal to 1e-6 do not have an angle due to logic of Rotation2d
   if (norm <= 1e-6_m) {
     return Translation2d{};
   }
@@ -171,11 +172,11 @@ constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
  * @return The transformed value with the same direction and norm scaled to
  * the input range.
  */
-constexpr Translation2d CopySignPow(const Translation2d& value,
-                                      double exponent,
-                                      units::meter_t maxDistance = 1_m) {
+constexpr Translation2d CopySignPow(const Translation2d& value, double exponent,
+                                    units::meter_t maxDistance = 1_m) {
   units::meter_t norm = value.Norm();
-  // If norm is less than 1e-6 then return zero vector. Transitions with norm less than or equal to 1e-6 do not have an angle due to logic of Rotation2d
+  // If norm is less than 1e-6 then return zero vector. Transitions with norm
+  // less than or equal to 1e-6 do not have an angle due to logic of Rotation2d
   if (norm <= 1e-6_m) {
     return Translation2d{};
   }

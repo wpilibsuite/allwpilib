@@ -103,12 +103,12 @@ TEST(MathUtilTest, ApplyDeadband2dArbitraryScale) {
   const frc::Translation2d zeroVec;
 
   // Angles
-  EXPECT_EQ(frc::Translation2d(2.5_m, cwPiOver2),
-            frc::ApplyDeadband(frc::Translation2d(2.5_m, cwPiOver2), 0.02_m,
-                                 2.5_m));
-  EXPECT_EQ(frc::Translation2d(2.5_m, ccwPiOver2),
-            frc::ApplyDeadband(frc::Translation2d(2.5_m, ccwPiOver2), 0.02_m,
-                                 2.5_m));
+  EXPECT_EQ(
+      frc::Translation2d(2.5_m, cwPiOver2),
+      frc::ApplyDeadband(frc::Translation2d(2.5_m, cwPiOver2), 0.02_m, 2.5_m));
+  EXPECT_EQ(
+      frc::Translation2d(2.5_m, ccwPiOver2),
+      frc::ApplyDeadband(frc::Translation2d(2.5_m, ccwPiOver2), 0.02_m, 2.5_m));
   EXPECT_EQ(frc::Translation2d(2.5_m, pi),
             frc::ApplyDeadband(frc::Translation2d(2.5_m, pi), 0.02_m, 2.5_m));
 
@@ -117,12 +117,11 @@ TEST(MathUtilTest, ApplyDeadband2dArbitraryScale) {
 
   // > 0
   EXPECT_EQ(zeroVec, frc::ApplyDeadband(frc::Translation2d(0.01_m, zero),
-                                          0.02_m, 2.5_m));
+                                        0.02_m, 2.5_m));
   EXPECT_EQ(zeroVec, frc::ApplyDeadband(frc::Translation2d(0.02_m, zero),
-                                          0.02_m, 2.5_m));
-  EXPECT_EQ(
-      frc::Translation2d(2.5_m, zero),
-      frc::ApplyDeadband(frc::Translation2d(2.5_m, zero), 0.02_m, 2.5_m));
+                                        0.02_m, 2.5_m));
+  EXPECT_EQ(frc::Translation2d(2.5_m, zero),
+            frc::ApplyDeadband(frc::Translation2d(2.5_m, zero), 0.02_m, 2.5_m));
 }
 
 TEST(MathUtilTest, ApplyDeadband2dSmallNorm) {
@@ -132,7 +131,7 @@ TEST(MathUtilTest, ApplyDeadband2dSmallNorm) {
   EXPECT_EQ(zeroVec,
             frc::ApplyDeadband(frc::Translation2d(1e-6_m, zero), 0.02_m));
   EXPECT_EQ(zeroVec, frc::ApplyDeadband(frc::Translation2d(1e-6_m, zero),
-                                          0.02_m, 2.5_m));
+                                        0.02_m, 2.5_m));
 }
 
 TEST(MathUtilTest, CopySignPow) {
@@ -209,8 +208,7 @@ TEST(MathUtilTest, CopySignPow) {
   EXPECT_EQ(frc::Translation2d(units::meter_t{std::sqrt(0.5)}, pi),
             frc::CopySignPow(frc::Translation2d(0.5_m, pi), 0.5));
 
-  EXPECT_EQ(frc::Translation2d(),
-            frc::CopySignPow(frc::Translation2d(), 2.0));
+  EXPECT_EQ(frc::Translation2d(), frc::CopySignPow(frc::Translation2d(), 2.0));
   EXPECT_EQ(frc::Translation2d(1_m, zero),
             frc::CopySignPow(frc::Translation2d(1_m, zero), 2.0));
   EXPECT_EQ(frc::Translation2d(1_m, pi),
@@ -222,8 +220,8 @@ TEST(MathUtilTest, CopySignPow) {
                 frc::Translation2d(0.8_m, frc::Rotation2d(-90_deg)), 0.3));
   EXPECT_EQ(frc::Translation2d(units::meter_t{std::pow(0.8, 0.3)},
                                frc::Rotation2d(90_deg)),
-            frc::CopySignPow(
-                frc::Translation2d(0.8_m, frc::Rotation2d(90_deg)), 0.3));
+            frc::CopySignPow(frc::Translation2d(0.8_m, frc::Rotation2d(90_deg)),
+                             0.3));
 }
 
 TEST(MathUtilTest, CopySignPow2dMaxDistance) {
@@ -252,15 +250,14 @@ TEST(MathUtilTest, CopySignPow2dMaxDistance) {
   EXPECT_EQ(frc::Translation2d(5_m, pi),
             frc::CopySignPow(frc::Translation2d(5_m, pi), 2.0, 5_m));
 
-  EXPECT_EQ(
-      frc::Translation2d(units::meter_t{std::pow(0.8, 0.3) * 100.0},
-                         frc::Rotation2d(-90_deg)),
-      frc::CopySignPow(frc::Translation2d(80_m, frc::Rotation2d(-90_deg)),
-                         0.3, 100_m));
+  EXPECT_EQ(frc::Translation2d(units::meter_t{std::pow(0.8, 0.3) * 100.0},
+                               frc::Rotation2d(-90_deg)),
+            frc::CopySignPow(frc::Translation2d(80_m, frc::Rotation2d(-90_deg)),
+                             0.3, 100_m));
   EXPECT_EQ(frc::Translation2d(units::meter_t{std::pow(0.8, 0.3) * 100.0},
                                frc::Rotation2d(90_deg)),
-            frc::CopySignPow(
-                frc::Translation2d(80_m, frc::Rotation2d(90_deg)), 0.3, 100_m));
+            frc::CopySignPow(frc::Translation2d(80_m, frc::Rotation2d(90_deg)),
+                             0.3, 100_m));
 }
 
 TEST(MathUtilTest, CopySignPow2dSmallNorm) {
