@@ -241,11 +241,12 @@ cc_test(
         "src/test/native/cpp/**/*.cpp",
         "src/test/native/cpp/**/*.h",
     ]),
-    dynamic_deps = [
-        ":shared/wpimath",
-        # TODO(austin): Why is this required?  Probably Brian's bug...
-        "//wpiutil:shared/wpiutil",
-    ],
+    # TODO(austin): Debug this on Windows.  This should work.
+    #dynamic_deps = [
+    #    ":shared/wpimath",
+    #    # TODO(austin): Why is this required?  Probably Brian's bug...
+    #    "//wpiutil:shared/wpiutil",
+    #],
     tags = [
         "no-bullseye",
         "no-raspi",
