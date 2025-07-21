@@ -126,6 +126,15 @@ TEST(MathUtilTest, ApplyDeadband2dArbitraryScale) {
             frc::ApplyDeadband(frc::Translation2d(2.5_m, zero), 0.02_m, 2.5_m));
 }
 
+TEST(MathUtilTest, ApplyDeadband2dLargeMaxMagnitude) {
+  const frc::Rotation2d zero;
+
+  EXPECT_EQ(frc::Translation2d(80_m zero),
+            frc::ApplyDeadband(
+                frc::Translation2d(100_m, zero), 20_m,
+                units::meter_t{std::numeric_limits<double>::infinity()}));
+}
+
 TEST(MathUtilTest, ApplyDeadband2dSmallNorm) {
   const frc::Rotation2d zero;
 
