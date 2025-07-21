@@ -66,10 +66,11 @@ TEST(MathUtilTest, ApplyDeadbandLargeMaxMagnitude) {
 }
 
 TEST(MathUtilTest, ApplyDeadband2dUnityScale) {
-  const frc::Rotation2d cwPiOver2 = frc::Rotation2d(-90_deg);
-  const frc::Rotation2d ccwPiOver2 = frc::Rotation2d(90_deg);
-  const frc::Rotation2d pi = frc::Rotation2d(180_deg);
-  const frc::Rotation2d zero = frc::Rotation2d(0_deg);
+  const frc::Rotation2d zero;
+  const frc::Rotation2d cwPiOver2{-90_deg};
+  const frc::Rotation2d ccwPiOver2{90_deg};
+  const frc::Rotation2d pi{180_deg};
+
   const frc::Translation2d zeroVec;
 
   // Angles
@@ -96,10 +97,11 @@ TEST(MathUtilTest, ApplyDeadband2dUnityScale) {
 }
 
 TEST(MathUtilTest, ApplyDeadband2dArbitraryScale) {
-  const frc::Rotation2d cwPiOver2 = frc::Rotation2d(-90_deg);
-  const frc::Rotation2d ccwPiOver2 = frc::Rotation2d(90_deg);
-  const frc::Rotation2d pi = frc::Rotation2d(180_deg);
-  const frc::Rotation2d zero = frc::Rotation2d(0_deg);
+  const frc::Rotation2d zero;
+  const frc::Rotation2d cwPiOver2{-90_deg};
+  const frc::Rotation2d ccwPiOver2{90_deg};
+  const frc::Rotation2d pi{180_deg};
+
   const frc::Translation2d zeroVec;
 
   // Angles
@@ -125,7 +127,8 @@ TEST(MathUtilTest, ApplyDeadband2dArbitraryScale) {
 }
 
 TEST(MathUtilTest, ApplyDeadband2dSmallNorm) {
-  const frc::Rotation2d zero = frc::Rotation2d(0_deg);
+  const frc::Rotation2d zero;
+
   const frc::Translation2d zeroVec;
 
   EXPECT_EQ(zeroVec,
@@ -225,7 +228,7 @@ TEST(MathUtilTest, CopySignPow) {
 }
 
 TEST(MathUtilTest, CopySignPow2dMaxDistance) {
-  const frc::Rotation2d zero{0_deg};
+  const frc::Rotation2d zero;
   const frc::Rotation2d pi{180_deg};
 
   EXPECT_EQ(frc::Translation2d(5_m, zero),
@@ -261,7 +264,7 @@ TEST(MathUtilTest, CopySignPow2dMaxDistance) {
 }
 
 TEST(MathUtilTest, CopySignPow2dSmallNorm) {
-  const frc::Rotation2d zero = frc::Rotation2d(0_deg);
+  const frc::Rotation2d zero;
   const frc::Translation2d zeroVec;
 
   EXPECT_EQ(zeroVec, frc::CopySignPow(frc::Translation2d(1e-6_m, zero), 2.0));
