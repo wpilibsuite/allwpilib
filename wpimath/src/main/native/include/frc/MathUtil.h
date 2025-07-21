@@ -96,8 +96,8 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
 
 /**
  * Returns a zero translation if the given translation is within the specified
- * distance from the origin. The remaining distance between the deadband and
- * the maximum distance is scaled from the origin to the maximum distance.
+ * distance from the origin. The remaining distance between the deadband and the
+ * maximum distance is scaled from the origin to the maximum distance.
  *
  * @param value Value to clip.
  * @param deadband Distance from origin.
@@ -124,9 +124,9 @@ constexpr Translation2d ApplyDeadband(const Translation2d& value,
  *
  * The function normalizes the input value to the range [0, 1] based on the
  * maximum magnitude, raises it to the power of the exponent, then scales the
- * result back to the original range and copying the sign. This keeps the
- * value in the original range and gives consistent curve behavior regardless
- * of the input value's scale.
+ * result back to the original range and copying the sign. This keeps the value
+ * in the original range and gives consistent curve behavior regardless of the
+ * input value's scale.
  *
  * This is useful for applying smoother or more aggressive control response
  * curves (e.g. joystick input shaping).
@@ -159,10 +159,10 @@ constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
  * preserving its direction.
  *
  * The function normalizes the norm of the input to the range [0, 1] based on
- * the maximum distance, raises it to the power of the exponent, then scales
- * the result back to the original range. This keeps the value in the original
- * max distance and gives consistent curve behavior regardless of the input
- * norm's scale.
+ * the maximum distance, raises it to the power of the exponent, then scales the
+ * result back to the original range. This keeps the value in the original max
+ * distance and gives consistent curve behavior regardless of the input norm's
+ * scale.
  *
  * @param value The input translation to transform.
  * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared
