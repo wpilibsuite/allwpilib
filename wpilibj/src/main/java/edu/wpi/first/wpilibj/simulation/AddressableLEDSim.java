@@ -128,7 +128,7 @@ public class AddressableLEDSim {
    * @param callback the callback that will be called whenever the LED data is changed
    * @return the {@link CallbackStore} object associated with this callback.
    */
-  public CallbackStore registerDataCallback(ConstBufferCallback callback) {
+  public static CallbackStore registerDataCallback(ConstBufferCallback callback) {
     int uid = AddressableLEDDataJNI.registerDataCallback(callback);
     return new CallbackStore(uid, AddressableLEDDataJNI::cancelDataCallback);
   }
