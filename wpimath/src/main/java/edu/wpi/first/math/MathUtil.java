@@ -120,7 +120,8 @@ public final class MathUtil {
   public static Translation2d applyDeadband(
       Translation2d value, double deadband, double maxDistance) {
     double norm = value.getNorm();
-    // If norm is less than 1e-6 then return zero vector. Transitions with norm less than or equal to 1e-6 do not have an angle due to logic of Rotation2d
+    // If norm is less than 1e-6 then return zero vector. Transitions with norm less than or equal
+    // to 1e-6 do not have an angle due to logic of Rotation2d
     if (norm <= 1e-6) {
       return Translation2d.kZero;
     }
@@ -193,7 +194,8 @@ public final class MathUtil {
   public static Translation2d copySignPow(
       Translation2d value, double exponent, double maxDistance) {
     double norm = value.getNorm();
-    // If norm is less than 1e-6 then return zero vector. Transitions with norm less than or equal to 1e-6 do not have an angle due to logic of Rotation2d
+    // If norm is less than 1e-6 then return zero vector. Transitions with norm less than or equal
+    // to 1e-6 do not have an angle due to logic of Rotation2d
     if (norm <= 1e-6) {
       return Translation2d.kZero;
     }
