@@ -109,6 +109,7 @@ constexpr Translation2d ApplyDeadband(const Translation2d& value,
                                         units::meter_t deadband,
                                         units::meter_t maxDistance = 1_m) {
   units::meter_t norm = value.Norm();
+  // If norm is less than 1e-6 then return zero vector. Transitions with norm less than or equal to 1e-6 do not have an angle due to logic of Rotation2d
   if (norm <= 1e-6_m) {
     return Translation2d{};
   }
@@ -174,6 +175,7 @@ constexpr Translation2d CopySignPow(const Translation2d& value,
                                       double exponent,
                                       units::meter_t maxDistance = 1_m) {
   units::meter_t norm = value.Norm();
+  // If norm is less than 1e-6 then return zero vector. Transitions with norm less than or equal to 1e-6 do not have an angle due to logic of Rotation2d
   if (norm <= 1e-6_m) {
     return Translation2d{};
   }
