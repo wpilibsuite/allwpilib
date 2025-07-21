@@ -67,6 +67,9 @@ COMMANDS_V2_FOLDERS = [
 ]
 
 SNIPPETS_FOLDERS = [
+    "accelerometercollision",
+    "accelerometerfilter",
+    "adxlaccelerometers",
     "analogaccelerometer",
     "analogencoder",
     "analoginput",
@@ -77,6 +80,7 @@ SNIPPETS_FOLDERS = [
     "encoderdrive",
     "encoderhoming",
     "limitswitch",
+    "onboardimu",
 ]
 
 TEMPLATES_FOLDERS = [
