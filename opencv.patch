@@ -801,10 +801,10 @@ index efeac77..dd0a0b1 100644
  )
 diff --git a/private/cpp/opencv/wrapped_cc_import.bzl b/private/cpp/opencv/wrapped_cc_import.bzl
 new file mode 100644
-index 0000000..30551d8
+index 0000000..b5a417d
 --- /dev/null
 +++ b/private/cpp/opencv/wrapped_cc_import.bzl
-@@ -0,0 +1,110 @@
+@@ -0,0 +1,109 @@
 +load("@rules_cc//cc:defs.bzl", "cc_import")
 +load("@bzlmodrio-opencv//:rules/cc_shared_import_adapter.bzl", "cc_shared_info_adapter")
 +
@@ -819,7 +819,6 @@ index 0000000..30551d8
 +    "opencv_highgui",
 +    "opencv_imgcodecs",
 +    "opencv_imgproc",
-+    "opencv_java",
 +    "opencv_ml",
 +    "opencv_objdetect",
 +    "opencv_photo",
@@ -852,7 +851,7 @@ index 0000000..30551d8
 +
 +    result = result[:i+1]
 +
-+    if result not in opencv_libraries:
++    if result not in opencv_libraries + ['opencv_java']:
 +      fail('Unexpected opencv library %s', result)
 +
 +    return result
