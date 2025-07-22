@@ -312,7 +312,6 @@ def wpilib_cc_shared_library(
         user_link_flags = None,
         visibility = None,
         use_debug_name = True,
-        additional_linker_inputs = None,
         features = None,
         win_def_file = None,
         **kwargs):
