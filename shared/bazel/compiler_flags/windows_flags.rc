@@ -29,4 +29,4 @@ build:windows --host_copt=/wd4141
 build:windows --host_copt=/wd4715
 
 # Disable the C++17 feature in the windows compiler
-build:windows --features=-default_cpp_std
+build:windows --features=-default_cpp_std --host_features=-default_cpp_std
