@@ -161,6 +161,10 @@ wpilib_cc_shared_library(
 # TODO(austin): This links against /home/austin/.gradle/caches/8.11/transforms/97de52b6251cda5e7b952b826501a57e/transformed/opencv-cpp-4.10.0-3-linuxx86-64static/linux/x86-64/static/libopencv4100.a
 cc_shared_library(
     name = "shared/cscorejnicvstatic",
+    additional_linker_inputs = select({
+        "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
+        "//conditions:default": [],
+    }),
     additional_linker_inputs = [
         ":src/main/native/LinuxSymbolScript.txt",
         ":src/main/native/MacSymbolScript.txt",
@@ -168,7 +172,7 @@ cc_shared_library(
     dynamic_deps = [
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
-    ],
+    ] + opencv_shared_libraries,
     user_link_flags = select({
         "@platforms//os:osx": [
             "-Wl,-install_name,libcscorejnicvstatic.so",
@@ -179,6 +183,31 @@ cc_shared_library(
             "-Wl,-soname,libcscorejnicvstatic.so",
             "-Wl,--version-script=$(location :src/main/native/LinuxSymbolScript.txt)",
         ],
+    }) + select({
+        "@bazel_tools//src/conditions:darwin": [
+            "-Wl,-force_load,$(location :cscore-mac)",
+            "-framework",
+            "Metal",
+            "-framework",
+            "MetalKit",
+            "-framework",
+            "Cocoa",
+            "-framework",
+            "IOKit",
+            "-framework",
+            "CoreFoundation",
+            "-framework",
+            "AVFoundation",
+            "-framework",
+            "Foundation",
+            "-framework",
+            "CoreMedia",
+            "-framework",
+            "CoreVideo",
+            "-framework",
+            "QuartzCore",
+        ],
+        "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
     deps = [
