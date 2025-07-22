@@ -6,6 +6,7 @@ package edu.wpi.first.epilogue.processor;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
@@ -38,11 +39,11 @@ public class StructHandler extends ElementHandler {
   }
 
   @Override
-  public String logInvocation(Element element) {
+  public String logInvocation(Element element, TypeElement loggedClass) {
     return "backend.log(\""
         + loggedName(element)
         + "\", "
-        + elementAccess(element)
+        + elementAccess(element, loggedClass)
         + ", "
         + structAccess(dataType(element))
         + ")";
