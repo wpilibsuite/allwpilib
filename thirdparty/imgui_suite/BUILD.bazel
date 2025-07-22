@@ -197,6 +197,7 @@ wpilib_objc_library(
     defines = DARWIN_DEFINES + ["GLFW_INVALID_CODEPOINT"],
     include_arc = False,
     is_cpp = False,
+    visibility = ["//visibility:public"],
     deps = [
         ":glfw_hdrs",
     ],
@@ -311,6 +312,7 @@ wpilib_objc_library(
         "imgui/include/backends",
         "imgui/include/misc/cpp",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":glfw",
     ],
