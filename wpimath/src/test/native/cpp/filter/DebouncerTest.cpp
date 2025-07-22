@@ -57,6 +57,28 @@ TEST_F(DebouncerTest, DebounceBoth) {
   EXPECT_FALSE(debouncer.Calculate(false));
 }
 
+TEST_F(DebouncerTest, DebounceReset) {
+  frc::Debouncer debouncer{1_s, frc::Debouncer::DebounceType::kFalling};
+
+  // This is true because the timer hasn't yet elapsed, so it returns the
+  // baseline.
+  EXPECT_TRUE(debouncer.Calculate(false));
+
+  // Clears timer to be (effectively) elapsed.
+  debouncer.Reset();
+
+  // Now, the debouncer accepts the new input and returns it rather than the
+  // baseline.
+  EXPECT_FALSE(debouncer.Calculate(false));
+
+  // The baseline here returns true and also resets the timer so that it now
+  // behaves like it did at the start of the test.
+  EXPECT_TRUE(debouncer.Calculate(true));
+
+  // Ensure consistency with previous behavior.
+  EXPECT_TRUE(debouncer.Calculate(false));
+}
+
 TEST_F(DebouncerTest, DebounceParams) {
   frc::Debouncer debouncer{20_ms, frc::Debouncer::DebounceType::kBoth};
 
