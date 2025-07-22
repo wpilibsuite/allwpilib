@@ -72,7 +72,7 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
    */
   @Override
   public int getBlue(int index) {
-    return m_buffer[index * 3 +  2] & 0xFF;
+    return m_buffer[index * 3 + 2] & 0xFF;
   }
 
   /**
