@@ -164,8 +164,7 @@ cc_shared_library(
     additional_linker_inputs = select({
         "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
         "//conditions:default": [],
-    }),
-    additional_linker_inputs = [
+    }) + [
         ":src/main/native/LinuxSymbolScript.txt",
         ":src/main/native/MacSymbolScript.txt",
     ],
