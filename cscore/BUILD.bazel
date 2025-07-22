@@ -87,17 +87,44 @@ wpilib_cc_library(
 
 wpilib_cc_shared_library(
     name = "shared/cscore",
+    additional_linker_inputs = select({
+        "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
+        "//conditions:default": [],
+    }),
     dynamic_deps = [
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
     ] + opencv_shared_libraries,
+    user_link_flags = select({
+        "@bazel_tools//src/conditions:darwin": [
+            "-Wl,-force_load,$(location :cscore-mac)",
+            "-framework",
+            "Metal",
+            "-framework",
+            "MetalKit",
+            "-framework",
+            "Cocoa",
+            "-framework",
+            "IOKit",
+            "-framework",
+            "CoreFoundation",
+            "-framework",
+            "AVFoundation",
+            "-framework",
+            "Foundation",
+            "-framework",
+            "CoreMedia",
+            "-framework",
+            "CoreVideo",
+            "-framework",
+            "QuartzCore",
+        ],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [
         ":cscore",
-    ] + select({
-        "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
-        "//conditions:default": [],
-    }),
+    ],
 )
 
 wpilib_cc_static_library(
