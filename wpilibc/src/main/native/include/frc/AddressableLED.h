@@ -9,7 +9,6 @@
 
 #include <hal/AddressableLED.h>
 #include <hal/AddressableLEDTypes.h>
-#include <hal/PWM.h>
 #include <hal/Types.h>
 #include <units/time.h>
 
@@ -21,15 +20,15 @@ namespace frc {
 /**
  * A class for driving addressable LEDs, such as WS2812B, WS2815, and NeoPixels.
  *
- * By default, the timing supports WS2812B and WS2815 LEDs, but is configurable
- * using SetBitTiming()
- *
  * Some LEDs use a different color order than the default GRB. The color order
  * is configurable using SetColorOrder().
  *
- * <p>Only 1 LED driver is currently supported by the roboRIO. However,
- * multiple LED strips can be connected in series and controlled from the
- * single driver.
+ * Up to 1024 LEDs may be controlled in total across all AddressableLED
+ * instances. A single global buffer is used for all instances. The start
+ * position used for LED data for the output is set via SetStart() and the
+ * length of the strip is set via SetLength(). Both of these default to zero, so
+ * multiple instances will access the same pixel data unless SetStart() is
+ * called to adjust the starting point.
  */
 class AddressableLED {
  public:
@@ -52,7 +51,6 @@ class AddressableLED {
       r = _r;
       g = _g;
       b = _b;
-      padding = 0;
     }
 
     /**
@@ -101,14 +99,21 @@ class AddressableLED {
   };
 
   /**
-   * Constructs a new driver for a specific port.
+   * Constructs a new driver for a specific channel.
    *
-   * @param port the output port to use (Must be a PWM header)
+   * @param channel the output channel to use
    */
-  explicit AddressableLED(int port);
+  explicit AddressableLED(int channel);
 
   AddressableLED(AddressableLED&&) = default;
   AddressableLED& operator=(AddressableLED&&) = default;
+
+  /**
+   * Gets the channel for this addressable LED.
+   *
+   * @return channel
+   */
+  int GetChannel() const { return m_channel; }
 
   /**
    * Sets the color order for this AddressableLED. The default order is GRB.
@@ -120,78 +125,58 @@ class AddressableLED {
   void SetColorOrder(ColorOrder order);
 
   /**
+   * Sets the display start of the LED strip in the global buffer.
+   *
+   * @param start the strip start, in LEDs
+   */
+  void SetStart(int start);
+
+  /**
+   * Gets the display start of the LED strip in the global buffer.
+   *
+   * @return the strip start, in LEDs
+   */
+  int GetStart() const { return m_start; }
+
+  /**
    * Sets the length of the LED strip.
    *
-   * <p>Calling this is an expensive call, so its best to call it once, then
-   * just update data.
-   *
-   * <p>The max length is 5460 LEDs.
-   *
-   * @param length the strip length
+   * @param length the strip length, in LEDs
    */
   void SetLength(int length);
 
   /**
-   * Sets the led output data.
-   *
-   * <p>If the output is enabled, this will start writing the next data cycle.
-   * It is safe to call, even while output is enabled.
+   * Sets the LED output data. This will write to the global buffer starting at
+   * the location set by SetStart() and up to the length set by SetLength().
    *
    * @param ledData the buffer to write
    */
   void SetData(std::span<const LEDData> ledData);
 
   /**
-   * Sets the led output data.
-   *
-   * <p>If the output is enabled, this will start writing the next data cycle.
-   * It is safe to call, even while output is enabled.
+   * Sets the LED output data. This will write to the global buffer starting at
+   * the location set by SetStart() and up to the length set by SetLength().
    *
    * @param ledData the buffer to write
    */
   void SetData(std::initializer_list<LEDData> ledData);
 
   /**
-   * Sets the bit timing.
+   * Sets the LED output data at an arbitrary location in the global buffer.
    *
-   * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing
-   * needs to be set for those.
-   *
-   * @param highTime0 high time for 0 bit (default 400 ns)
-   * @param lowTime0 low time for 0 bit (default 900 ns)
-   * @param highTime1 high time for 1 bit (default 900 ns)
-   * @param lowTime1 low time for 1 bit (default 600 ns)
+   * @param start the start location, in LEDs
+   * @param colorOrder the color order
+   * @param ledData the buffer to write
    */
-  void SetBitTiming(units::nanosecond_t highTime0, units::nanosecond_t lowTime0,
-                    units::nanosecond_t highTime1,
-                    units::nanosecond_t lowTime1);
-
-  /**
-   * Sets the sync time.
-   *
-   * <p>The sync time is the time to hold output so LEDs enable. Default set for
-   * WS2812B and WS2815.
-   *
-   * @param syncTime the sync time (default 280us)
-   */
-  void SetSyncTime(units::microsecond_t syncTime);
-
-  /**
-   * Starts the output.
-   *
-   * <p>The output writes continuously.
-   */
-  void Start();
-
-  /**
-   * Stops the output.
-   */
-  void Stop();
+  static void SetGlobalData(int start, ColorOrder colorOrder,
+                            std::span<const LEDData> ledData);
 
  private:
-  hal::Handle<HAL_DigitalHandle, HAL_FreePWMPort> m_pwmHandle;
   hal::Handle<HAL_AddressableLEDHandle, HAL_FreeAddressableLED> m_handle;
-  int m_port;
+  int m_channel;
+  int m_start{0};
+  int m_length{0};
+  ColorOrder m_colorOrder{kGRB};
 };
 
 constexpr auto format_as(AddressableLED::ColorOrder order) {

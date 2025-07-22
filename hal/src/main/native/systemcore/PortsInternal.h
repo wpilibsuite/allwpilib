@@ -29,7 +29,7 @@ constexpr int32_t kNumCTREPDPChannels = 16;
 constexpr int32_t kNumREVPDHModules = 63;
 constexpr int32_t kNumREVPDHChannels = 24;
 constexpr int32_t kNumDutyCycles = 0;
-constexpr int32_t kNumAddressableLEDs = 0;
+constexpr int32_t kNumAddressableLEDs = 6;
 constexpr int32_t kNumREVPHModules = 63;
 constexpr int32_t kNumREVPHChannels = 16;
 
