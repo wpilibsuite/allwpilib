@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "main.h"
+
 #include <poll.h>
 #include <spawn.h>
 #include <sys/syscall.h>
@@ -11,7 +13,6 @@
 #include <climits>
 #include <cstdio>
 #include <cstring>
-#include <filesystem>
 #include <string>
 
 int main(int argc, char* argv[]) {
@@ -42,6 +43,22 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
+  if (exePath.stem() == (L"AdvantageScope")) {
+    std::filesystem::path AdvantageScopePath{
+        exePath.parent_path().parent_path() / L"advantagescope" /
+        L"advantagescope-wpilib"};
+    return StartExeTool(AdvantageScopePath);
+  } else if (exePath.stem() == (L"Elastic")) {
+    std::filesystem::path ElasticPath{exePath.parent_path().parent_path() /
+                                      L"elastic" / L"elastic_dashboard"};
+    return StartExeTool(ElasticPath);
+  } else {
+    return StartJavaTool(exePath);
+  }
+}
+
+int StartJavaTool(std::filesystem::path& exePath) {
+  pid_t pid = 0;
   std::filesystem::path jarPath{exePath};
   jarPath.replace_extension("jar");
   std::filesystem::path parentPath{exePath.parent_path()};
@@ -53,10 +70,10 @@ int main(int argc, char* argv[]) {
 
   std::filesystem::path Java = toolsFolder / "jdk" / "bin" / "java";
 
-  pid = 0;
   std::string data = jarPath;
   std::string jarArg = "-jar";
-  char* const arguments[] = {jarArg.data(), data.data(), nullptr};
+  char* const arguments[] = {Java.generic_string().data(), jarArg.data(),
+                             data.data(), nullptr};
 
   int status =
       posix_spawn(&pid, Java.c_str(), nullptr, nullptr, arguments, environ);
@@ -84,4 +101,23 @@ int main(int argc, char* argv[]) {
 
   struct pollfd pfd = {childPid, POLLIN, 0};
   return poll(&pfd, 1, 3000);
+}
+
+int StartExeTool(std::filesystem::path& exePath) {
+  char* const arguments[] = {nullptr};
+  pid_t pid = 0;
+
+  int status =
+      posix_spawn(&pid, exePath.c_str(), nullptr, nullptr, arguments, environ);
+
+  if (status != 0) {
+    return 1;
+  }
+  int childPid = syscall(SYS_pidfd_open, pid, 0);
+  if (childPid <= 0) {
+    return 1;
+  }
+
+  struct pollfd pfd = {childPid, POLLIN, 0};
+  return poll(&pfd, 1, 5000);
 }

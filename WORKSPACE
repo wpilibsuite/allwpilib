@@ -289,11 +289,6 @@ load("@bzlmodrio-ni//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_ni_cpp_depend
 
 setup_legacy_bzlmodrio_ni_cpp_dependencies()
 
-#local_repository(
-#name = "bzlmodrio-opencv",
-#path = "../bzlmodRio-opencv/"
-#)
-
 http_archive(
     name = "bzlmodrio-opencv",
     patch_args = ["-p1"],

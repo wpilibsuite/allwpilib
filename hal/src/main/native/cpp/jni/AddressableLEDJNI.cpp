@@ -13,7 +13,7 @@
 using namespace hal;
 using namespace wpi::java;
 
-static_assert(sizeof(jbyte) * 4 == sizeof(HAL_AddressableLEDData));
+static_assert(sizeof(jbyte) * 3 == sizeof(HAL_AddressableLEDData));
 
 static_assert(edu_wpi_first_hal_AddressableLEDJNI_COLOR_ORDER_RGB ==
               HAL_ALED_RGB);
@@ -36,12 +36,12 @@ extern "C" {
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_AddressableLEDJNI_initialize
-  (JNIEnv* env, jclass, jint handle)
+  (JNIEnv* env, jclass, jint channel)
 {
   int32_t status = 0;
-  auto ret = HAL_InitializeAddressableLED(
-      static_cast<HAL_DigitalHandle>(handle), &status);
-  CheckStatus(env, status);
+  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto ret = HAL_InitializeAddressableLED(channel, stack.c_str(), &status);
+  CheckStatusForceThrow(env, status);
   return ret;
 }
 
@@ -61,17 +61,16 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_free
 
 /*
  * Class:     edu_wpi_first_hal_AddressableLEDJNI
- * Method:    setColorOrder
+ * Method:    setStart
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_AddressableLEDJNI_setColorOrder
-  (JNIEnv* env, jclass, jint handle, jint colorOrder)
+Java_edu_wpi_first_hal_AddressableLEDJNI_setStart
+  (JNIEnv* env, jclass, jint handle, jint start)
 {
   int32_t status = 0;
-  HAL_SetAddressableLEDColorOrder(
-      static_cast<HAL_AddressableLEDHandle>(handle),
-      static_cast<HAL_AddressableLEDColorOrder>(colorOrder), &status);
+  HAL_SetAddressableLEDStart(static_cast<HAL_AddressableLEDHandle>(handle),
+                             start, &status);
   CheckStatus(env, status);
 }
 
@@ -93,80 +92,79 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setLength
 /*
  * Class:     edu_wpi_first_hal_AddressableLEDJNI
  * Method:    setData
- * Signature: (I[B)V
+ * Signature: (II[BII)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_AddressableLEDJNI_setData
-  (JNIEnv* env, jclass, jint handle, jbyteArray arr)
+  (JNIEnv* env, jclass, jint outStart, jint colorOrder, jbyteArray data,
+   jint start, jint len)
 {
+  if (!data) {
+    ThrowNullPointerException(env, "data is null");
+    return;
+  }
+  if (start < 0) {
+    ThrowIndexOutOfBoundsException(env, "start must be >= 0");
+    return;
+  }
+  if (len < 0) {
+    ThrowIndexOutOfBoundsException(env, "len must be >= 0");
+    return;
+  }
+  JSpan<const jbyte> cdata{env, data};
+  if (static_cast<unsigned int>(start + len) > cdata.size()) {
+    ThrowIndexOutOfBoundsException(
+        env, "start + len must be smaller than array length");
+    return;
+  }
+  if ((len % 3) != 0) {
+    ThrowIndexOutOfBoundsException(env, "len must be a multiple of 3");
+    return;
+  }
+  auto rawdata = cdata.uarray().subspan(start, len);
   int32_t status = 0;
-  JSpan<const jbyte> jArrRef{env, arr};
-  HAL_WriteAddressableLEDData(
-      static_cast<HAL_AddressableLEDHandle>(handle),
-      reinterpret_cast<const HAL_AddressableLEDData*>(jArrRef.data()),
-      jArrRef.size() / 4, &status);
-  CheckStatus(env, status);
+  HAL_SetAddressableLEDData(
+      outStart, rawdata.size() / 3,
+      static_cast<HAL_AddressableLEDColorOrder>(colorOrder),
+      reinterpret_cast<const HAL_AddressableLEDData*>(rawdata.data()), &status);
 }
 
 /*
  * Class:     edu_wpi_first_hal_AddressableLEDJNI
- * Method:    setBitTiming
- * Signature: (IIIII)V
+ * Method:    setDataFromBuffer
+ * Signature: (IILjava/lang/Object;II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_AddressableLEDJNI_setBitTiming
-  (JNIEnv* env, jclass, jint handle, jint highTime0, jint lowTime0,
-   jint highTime1, jint lowTime1)
+Java_edu_wpi_first_hal_AddressableLEDJNI_setDataFromBuffer
+  (JNIEnv* env, jclass, jint outStart, jint colorOrder, jobject data,
+   jint start, jint len)
 {
+  if (!data) {
+    ThrowNullPointerException(env, "data is null");
+    return;
+  }
+  if (start < 0) {
+    ThrowIndexOutOfBoundsException(env, "start must be >= 0");
+    return;
+  }
+  if (len < 0) {
+    ThrowIndexOutOfBoundsException(env, "len must be >= 0");
+    return;
+  }
+  JSpan<const jbyte> cdata{env, data, static_cast<size_t>(start + len)};
+  if (!cdata) {
+    ThrowIllegalArgumentException(env, "data must be a native ByteBuffer");
+    return;
+  }
+  if ((len % 3) != 0) {
+    ThrowIndexOutOfBoundsException(env, "len must be a multiple of 3");
+    return;
+  }
+  auto rawdata = cdata.uarray().subspan(start, len);
   int32_t status = 0;
-  HAL_SetAddressableLEDBitTiming(static_cast<HAL_AddressableLEDHandle>(handle),
-                                 highTime0, lowTime0, highTime1, lowTime1,
-                                 &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_first_hal_AddressableLEDJNI
- * Method:    setSyncTime
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_AddressableLEDJNI_setSyncTime
-  (JNIEnv* env, jclass, jint handle, jint syncTime)
-{
-  int32_t status = 0;
-  HAL_SetAddressableLEDSyncTime(static_cast<HAL_AddressableLEDHandle>(handle),
-                                syncTime, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_first_hal_AddressableLEDJNI
- * Method:    start
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_AddressableLEDJNI_start
-  (JNIEnv* env, jclass, jint handle)
-{
-  int32_t status = 0;
-  HAL_StartAddressableLEDOutput(static_cast<HAL_AddressableLEDHandle>(handle),
-                                &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_first_hal_AddressableLEDJNI
- * Method:    stop
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_AddressableLEDJNI_stop
-  (JNIEnv* env, jclass, jint handle)
-{
-  int32_t status = 0;
-  HAL_StopAddressableLEDOutput(static_cast<HAL_AddressableLEDHandle>(handle),
-                               &status);
-  CheckStatus(env, status);
+  HAL_SetAddressableLEDData(
+      outStart, rawdata.size() / 3,
+      static_cast<HAL_AddressableLEDColorOrder>(colorOrder),
+      reinterpret_cast<const HAL_AddressableLEDData*>(rawdata.data()), &status);
 }
 }  // extern "C"

@@ -320,7 +320,8 @@ def wpilib_cc_shared_library(
     if not features:
         features = []
 
-    features.append("windows_export_all_symbols")
+    if auto_export_windows_symbols:
+        features.append("windows_export_all_symbols")
 
     if use_debug_name:
         user_link_flags = (user_link_flags or []) + select({

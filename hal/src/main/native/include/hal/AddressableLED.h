@@ -20,14 +20,16 @@ extern "C" {
 #endif
 
 /**
- * Initialize Addressable LED using a PWM Digital handle.
+ * Creates a new instance of an addressable LED.
  *
- * @param[in] outputPort handle of the digital port for PWM
+ * @param[in] channel            the smartio channel
+ * @param[in] allocationLocation the location where the allocation is occurring
+ *                               (can be null)
  * @param[out] status the error code, or 0 for success
  * @return Addressable LED handle
  */
 HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
-    HAL_DigitalHandle outputPort, int32_t* status);
+    int32_t channel, const char* allocationLocation, int32_t* status);
 
 /**
  * Free the Addressable LED Handle.
@@ -37,34 +39,26 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle);
 
 /**
- * Sets the color order for the addressable LED output. The default order is
- * GRB. This will take effect on the next call to HAL_WriteAddressableLEDData().
- * @param[in] handle the Addressable LED handle
- * @param[in] colorOrder the color order
- * @param[out] status the error code, or 0 for success
- */
-void HAL_SetAddressableLEDColorOrder(HAL_AddressableLEDHandle handle,
-                                     HAL_AddressableLEDColorOrder colorOrder,
-                                     int32_t* status);
-
-/**
- * Set the Addressable LED PWM Digital port.
+ * Sets the start buffer location used for the LED strip.
+ *
+ * <p>All addressable LEDs use a single backing buffer 1024 LEDs in size.
+ * The max length for a single output is 1024 LEDs (with an offset of zero).
  *
  * @param[in] handle the Addressable LED handle
- * @param[in] outputPort The digital handle of the PWM port
+ * @param[in] start the strip start, in LEDs
  * @param[out] status the error code, or 0 for success
  */
-void HAL_SetAddressableLEDOutputPort(HAL_AddressableLEDHandle handle,
-                                     HAL_DigitalHandle outputPort,
-                                     int32_t* status);
+void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
+                                int32_t* status);
 
 /**
  * Sets the length of the LED strip.
  *
- * <p>The max length is 5460 LEDs.
+ * <p>All addressable LEDs use a single backing buffer 1024 LEDs in size.
+ * The max length for a single output is 1024 LEDs (with an offset of zero).
  *
  * @param[in] handle the Addressable LED handle
- * @param[in] length the strip length
+ * @param[in] length the strip length, in LEDs
  * @param[out] status the error code, or 0 for success
  */
 void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
@@ -73,68 +67,19 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
 /**
  * Sets the led output data.
  *
- * <p>If the output is enabled, this will start writing the next data cycle.
- * It is safe to call, even while output is enabled.
+ * <p>All addressable LEDs use a single backing buffer 1024 LEDs in size.
+ * This function may be used to set part of or all of the buffer.
  *
- * @param[in] handle the Addressable LED handle
+ * @param[in] start the strip start, in LEDs
+ * @param[in] length the strip length, in LEDs
+ * @param[in] colorOrder the color order
  * @param[in] data the buffer to write
- * @param[in] length the strip length
  * @param[out] status the error code, or 0 for success
  */
-void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
-                                 const struct HAL_AddressableLEDData* data,
-                                 int32_t length, int32_t* status);
-
-/**
- * Sets the bit timing.
- *
- * <p>By default, the driver is set up to drive WS2812B and WS2815, so nothing
- * needs to be set for those.
- *
- * @param[in] handle the Addressable LED handle
- * @param[in] highTime0 high time for 0 bit in nanoseconds (default 400 ns)
- * @param[in] lowTime0 low time for 0 bit in nanoseconds (default 900 ns)
- * @param[in] highTime1 high time for 1 bit in nanoseconds (default 900 ns)
- * @param[in] lowTime1 low time for 1 bit in nanoseconds (default 600 ns)
- * @param[out] status the error code, or 0 for success
- */
-void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
-                                    int32_t highTime0, int32_t lowTime0,
-                                    int32_t highTime1, int32_t lowTime1,
-                                    int32_t* status);
-
-/**
- * Sets the sync time.
- *
- * <p>The sync time is the time to hold output so LEDs enable. Default set for
- * WS2812B and WS2815.
- *
- * @param[in] handle the Addressable LED handle
- * @param[in] syncTime the sync time in microseconds (default 280 μs)
- * @param[out] status the error code, or 0 for success
- */
-void HAL_SetAddressableLEDSyncTime(HAL_AddressableLEDHandle handle,
-                                   int32_t syncTime, int32_t* status);
-
-/**
- * Starts the output.
- *
- * <p>The output writes continuously.
- *
- * @param[in] handle the Addressable LED handle
- * @param[out] status the error code, or 0 for success
- */
-void HAL_StartAddressableLEDOutput(HAL_AddressableLEDHandle handle,
-                                   int32_t* status);
-
-/**
- * Stops the output.
- *
- * @param[in] handle the Addressable LED handle
- * @param[out] status the error code, or 0 for success
- */
-void HAL_StopAddressableLEDOutput(HAL_AddressableLEDHandle handle,
-                                  int32_t* status);
+void HAL_SetAddressableLEDData(int32_t start, int32_t length,
+                               HAL_AddressableLEDColorOrder colorOrder,
+                               const struct HAL_AddressableLEDData* data,
+                               int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"
