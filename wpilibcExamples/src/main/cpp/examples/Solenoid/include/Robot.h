@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <frc/AnalogPotentiometer.h>
 #include <frc/Compressor.h>
 #include <frc/DoubleSolenoid.h>
 #include <frc/Joystick.h>
