@@ -24,9 +24,9 @@ class AddressableLEDBufferTest {
     var buffer = new AddressableLEDBuffer(1);
     buffer.setHSV(0, h, s, v);
     assertAll(
-        () -> assertEquals((byte) r, buffer.m_buffer[2], "R value didn't match"),
+        () -> assertEquals((byte) r, buffer.m_buffer[0], "R value didn't match"),
         () -> assertEquals((byte) g, buffer.m_buffer[1], "G value didn't match"),
-        () -> assertEquals((byte) b, buffer.m_buffer[0], "B value didn't match"));
+        () -> assertEquals((byte) b, buffer.m_buffer[2], "B value didn't match"));
   }
 
   static Stream<Arguments> hsvToRgbProvider() {
