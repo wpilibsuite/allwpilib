@@ -87,7 +87,10 @@ wpilib_cc_library(
     copts = [
         # TODO(austin): this needs to be different for shared vs dynamic.
         "-DDYNAMIC_CAMERA_SERVER",
-    ],
+    ] + select({
+        "//shared/bazel/rules:compilation_mode_dbg": ["-DDYNAMIC_CAMERA_SERVER_DEBUG"],
+        "//conditions:default": [],
+    }),
     include_license_files = True,
     strip_include_prefix = "src/main/native/include",
     third_party_libraries = [
