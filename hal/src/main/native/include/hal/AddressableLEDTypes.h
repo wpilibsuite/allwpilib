@@ -12,9 +12,9 @@
 
 /** structure for holding one LED's color data. */
 struct HAL_AddressableLEDData {
-  uint8_t b;  ///< blue value
-  uint8_t g;  ///< green value
   uint8_t r;  ///< red value
+  uint8_t g;  ///< green value
+  uint8_t b;  ///< blue value
 };
 
 /**
