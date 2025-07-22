@@ -27,3 +27,6 @@ build:windows_arm --platforms="@rules_bzlmodrio_toolchains//platforms/windows_ar
 build:windows --host_copt=/wd4141
 # Ignore utf8 warning in tools
 build:windows --host_copt=/wd4715
+
+# Disable the C++17 feature in the windows compiler
+build:windows --features=-default_cpp_std
