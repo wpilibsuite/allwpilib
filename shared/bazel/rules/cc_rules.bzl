@@ -7,7 +7,8 @@ load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
-# Coppied from bazel since it isn't exposed publicly that I can find.
+# Copied from bazel since it isn't exposed publicly that I can find.
+# https://github.com/bazelbuild/bazel/blob/cc4e3b25a89cd8294406d9489ece706cfcc019bd/src/main/starlark/builtins_bzl/common/cc/cc_helper.bzl#L272
 def generate_def_file(ctx, def_parser, object_files, dll_name):
     def_file = ctx.actions.declare_file(ctx.label.name + ".gen.def")
 
