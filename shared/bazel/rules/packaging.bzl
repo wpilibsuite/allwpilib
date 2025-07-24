@@ -48,7 +48,7 @@ def package_default_jni_project(
     """
     Packages a the C++ libraries for a project that has a JNI component.
 
-    This assumes that static and shared libraries exist for the project, and 
+    This assumes that static and shared libraries exist for the project, and
     that it is built for all native platforms plus systemcore. It runs the
     per-platform transitions and bundles them all into a single maven_export target.
     """
