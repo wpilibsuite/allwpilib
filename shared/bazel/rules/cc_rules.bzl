@@ -7,6 +7,30 @@ load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
+# Coppied from bazel since it isn't exposed publicly that I can find.
+def generate_def_file(ctx, def_parser, object_files, dll_name):
+    def_file = ctx.actions.declare_file(ctx.label.name + ".gen.def")
+
+    args = ctx.actions.args()
+    args.add(def_file)
+    args.add(dll_name)
+    argv = ctx.actions.args()
+    argv.use_param_file("@%s", use_always = True)
+    argv.set_param_file_format("shell")
+    for object_file in object_files:
+        argv.add(object_file.path)
+
+    ctx.actions.run(
+        mnemonic = "DefParser",
+        executable = def_parser,
+        toolchain = None,
+        arguments = [args, argv],
+        inputs = object_files,
+        outputs = [def_file],
+        use_default_shell_env = True,
+    )
+    return def_file
+
 def _folder_prefix(name):
     if "/" in name:
         last_slash = name.rfind("/")
@@ -154,15 +178,23 @@ def wpilib_cc_library(
 def wpilib_cc_shared_library(
         name,
         auto_export_windows_symbols = True,
+        win_def_file = None,
         **kwargs):
     folder, lib = _folder_prefix(name)
 
     features = []
     if auto_export_windows_symbols:
         features.append("windows_export_all_symbols")
+
     cc_shared_library(
         name = name,
         features = features,
+        # Only include a .def file on windows.  This makes it so we can mark
+        # the .def file as only compatible with windows.
+        win_def_file = select({
+            "@platforms//os:windows": win_def_file,
+            "//conditions:default": None,
+        }),
         **kwargs
     )
 
@@ -399,4 +431,92 @@ def wpilib_cc_static_library(
         name = name + "-static-zip",
         srcs = ["//:license_pkg_files", name + "-static.pkg"],
         tags = ["no-remote", "manual"],
+    )
+
+def _generate_def_windows_impl(ctx):
+    deps = ctx.attr.deps
+
+    cc_toolchain = find_cpp_toolchain(ctx)
+
+    feature_configuration = cc_common.configure_features(
+        ctx = ctx,
+        cc_toolchain = cc_toolchain,
+        requested_features = ctx.features + ["force_no_whole_archive"],
+        unsupported_features = ctx.disabled_features,
+    )
+
+    def_parser = ctx.file._def_parser
+    win_def_file = []
+
+    if cc_common.is_enabled(feature_configuration = feature_configuration, feature_name = "targets_windows"):
+        object_files = []
+
+        # Now, hunt down all the linker inputs directly specified.
+        for dep in deps:
+            linker_input = dep[CcInfo].linking_context.linker_inputs
+
+            for l in linker_input.to_list():
+                # Find the linker stanza owned directly by the dependency, not transitively
+                if l.owner != dep.label:
+                    continue
+
+                # Grab all the .o's out of it.
+                for library in l.libraries:
+                    if library.pic_static_library != None:
+                        if library.pic_objects != None:
+                            object_files.extend(library.pic_objects)
+                    elif library.static_library != None:
+                        if library.objects != None:
+                            object_files.extend(library.objects)
+
+        # Filter the list so we only generate def files for the provided dependencies.
+        filtered_object_files = []
+        for o in object_files:
+            for f in ctx.attr.filters:
+                if f in o.path:
+                    filtered_object_files.append(o)
+                    break
+
+        if def_parser != None:
+            generated_def_file = generate_def_file(ctx, def_parser, filtered_object_files, ctx.label.name)
+
+        win_def_file = [generated_def_file]
+
+    files = depset(direct = win_def_file)
+    return [
+        DefaultInfo(files = files),
+        OutputGroupInfo(default = files),
+    ]
+
+_generate_def_windows = rule(
+    implementation = _generate_def_windows_impl,
+    attrs = {
+        "deps": attr.label_list(
+            providers = [CcInfo],
+            doc = """
+List of all static libraries to not duplicate .o files from.
+""",
+        ),
+        "filters": attr.string_list(),
+        "_def_parser": attr.label(default = "@bazel_tools//tools/def_parser:def_parser", allow_single_file = True, cfg = "exec"),
+    } | CC_TOOLCHAIN_ATTRS,
+    toolchains = use_cc_toolchain(),
+    fragments = ["cpp"],
+)
+
+def generate_def_windows(name, deps = None, **kwargs):
+    """Generates a .def file for linking a windows .dll for the provided cc_library and filters
+
+    Args:
+      deps: A list of cc_libraries to export symbols from.
+      filters: All object files in the provided cc_libraries (but not their
+               dependencies) are checked against this list.  If a string in
+               this list appears inside the name of the object file, it is
+               added to the export list.
+    """
+    _generate_def_windows(
+        name = name,
+        deps = deps,
+        target_compatible_with = ["@platforms//os:windows"],
+        **kwargs
     )
