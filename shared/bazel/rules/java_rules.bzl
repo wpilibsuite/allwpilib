@@ -1,4 +1,34 @@
-load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("//shared/bazel/rules:packaging.bzl", "zip_java_srcs")
+load("//shared/bazel/rules:publishing.bzl", "wpilib_maven_export")
+
+def wpilib_java_library(
+        name,
+        maven_group_id,
+        maven_artifact_name,
+        tags = [],
+        extra_source_pkgs = [],
+        **kwargs):
+    tags = list(tags) if tags else []
+
+    maven_coordinates = "{}:{}:$(WPILIB_VERSION)".format(maven_group_id, maven_artifact_name)
+    tags.append("maven_coordinates=" + maven_coordinates)
+
+    java_library(
+        name = name,
+        tags = tags,
+        **kwargs
+    )
+
+    zip_java_srcs(name = name, extra_pkgs = extra_source_pkgs)
+
+    wpilib_maven_export(
+        name = "{}_publish".format(name),
+        classifier_artifacts = {"sources": ":lib{}-sources.jar".format(name)},
+        lib_name = name,
+        maven_coordinates = maven_coordinates,
+        visibility = ["//visibility:public"],
+    )
 
 def wpilib_java_junit5_test(
         name,
