@@ -54,6 +54,11 @@ void Robot::AutonomousExit() {
 }
 
 /**
+ * This function is called once each time the robot enters operator control.
+ */
+void Robot::TeleopInit() {}
+
+/**
  * This function is called periodically during operator control.
  */
 void Robot::TeleopPeriodic() {}

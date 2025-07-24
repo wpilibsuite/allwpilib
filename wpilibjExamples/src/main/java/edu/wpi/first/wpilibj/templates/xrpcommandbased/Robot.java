@@ -77,6 +77,10 @@ public class Robot extends TimedRobot {
     }
   }
 
+  /** This function is called once each time the robot enters operator control. */
+  @Override
+  public void teleopInit() {}
+
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {}
