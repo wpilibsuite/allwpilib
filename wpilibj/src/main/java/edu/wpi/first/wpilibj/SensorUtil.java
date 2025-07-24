@@ -19,16 +19,16 @@ public final class SensorUtil {
   public static final int kSystemClockTicksPerMicrosecond =
       ConstantsJNI.getSystemClockTicksPerMicrosecond();
 
-  /** Number of digital channels per roboRIO. */
+  /** Number of digital channels per Systemcore. */
   public static final int kDigitalChannels = PortsJNI.getNumDigitalChannels();
 
-  /** Number of analog input channels per roboRIO. */
+  /** Number of analog input channels per Systemcore. */
   public static final int kAnalogInputChannels = PortsJNI.getNumAnalogInputs();
 
   /** Number of solenoid channels per module. */
   public static final int kCTRESolenoidChannels = PortsJNI.getNumCTRESolenoidChannels();
 
-  /** Number of PWM channels per roboRIO. */
+  /** Number of PWM channels per Systemcore. */
   public static final int kPwmChannels = PortsJNI.getNumPWMChannels();
 
   /** Number of power distribution channels per PDP. */
@@ -64,8 +64,8 @@ public final class SensorUtil {
   }
 
   /**
-   * Check that the digital channel number is valid. Verify that the channel number is one of the
-   * legal channel numbers. Channel numbers are 0-based.
+   * Check that the PWM channel number is valid. Verify that the channel number is one of the legal
+   * channel numbers. Channel numbers are 0-based.
    *
    * @param channel The channel number to check.
    */

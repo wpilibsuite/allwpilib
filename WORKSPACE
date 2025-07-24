@@ -7,17 +7,26 @@ http_archive(
     url = "https://github.com/bazel-contrib/bazel_features/releases/download/v1.31.0/bazel_features-v1.31.0.tar.gz",
 )
 
+# TODO(austin): Upgrade when the patches land.
+# https://github.com/bazelbuild/rules_cc/pull/430
+# https://github.com/bazelbuild/rules_cc/pull/431
+# https://github.com/bazelbuild/rules_cc/pull/432
 http_archive(
     name = "rules_cc",
+    patch_args = ["-p1"],
+    patches = ["//:shared/bazel/patches/rules_cc_windows.patch"],
     sha256 = "712d77868b3152dd618c4d64faaddefcc5965f90f5de6e6dd1d5ddcd0be82d42",
     strip_prefix = "rules_cc-0.1.1",
     url = "https://github.com/bazelbuild/rules_cc/releases/download/0.1.1/rules_cc-0.1.1.tar.gz",
 )
 
+# TODO(austinschuh): Update to the next released apple_support once it lands.
+# This needs to contain https://github.com/bazelbuild/apple_support/commit/7009b77c98a67d3fea081c9db4dbcee8effc3b7e and should be the next release after 1.22.1
 http_archive(
     name = "build_bazel_apple_support",
-    sha256 = "b265beacfa477081caaf2bd05978ee7d11fdb8c202a1b76d0ef28d901d1e7b33",
-    url = "https://github.com/bazelbuild/apple_support/releases/download/1.22.0/apple_support.1.22.0.tar.gz",
+    sha256 = "7d542be113180bc1da3660e51fe4792a867fb85537c9ef36a0d3366665a76803",
+    strip_prefix = "apple_support-7009b77c98a67d3fea081c9db4dbcee8effc3b7e",
+    url = "https://github.com/bazelbuild/apple_support/archive/7009b77c98a67d3fea081c9db4dbcee8effc3b7e.tar.gz",
 )
 
 http_archive(
@@ -380,3 +389,10 @@ rules_pkg_dependencies()
 load("@rules_python_pytest//python_pytest:repositories.bzl", "rules_python_pytest_dependencies")
 
 rules_python_pytest_dependencies()
+
+# Capture the repository environmental variables which specify the filter list for what architectures to build in CI.
+load("//shared/bazel/rules:publishing_rule.bzl", "publishing_repo")
+
+publishing_repo(
+    name = "com_wpilib_allwpilib_publishing_config",
+)

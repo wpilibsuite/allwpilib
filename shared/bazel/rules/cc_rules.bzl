@@ -1,3 +1,4 @@
+load("@build_bazel_apple_support//rules:universal_binary.bzl", "universal_binary")
 load("@rules_cc//cc:action_names.bzl", "CPP_LINK_STATIC_LIBRARY_ACTION_NAME")
 load("@rules_cc//cc:cc_shared_library.bzl", "cc_shared_library")
 load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_library")
@@ -154,6 +155,8 @@ def wpilib_cc_shared_library(
         name,
         auto_export_windows_symbols = True,
         **kwargs):
+    folder, lib = _folder_prefix(name)
+
     features = []
     if auto_export_windows_symbols:
         features.append("windows_export_all_symbols")
@@ -163,16 +166,27 @@ def wpilib_cc_shared_library(
         **kwargs
     )
 
-    pkg_files(
-        name = name + "-shared.pkg",
-        srcs = [":" + name],
-        tags = ["manual"],
+    universal_name = "universal/lib" + lib + ".lib"
+    universal_binary(
+        name = universal_name,
+        binary = name,
+        target_compatible_with = [
+            "@platforms//os:osx",
+        ],
     )
 
-    pkg_zip(
-        name = name + "-shared-zip",
-        srcs = ["//:license_pkg_files", name + "-shared.pkg"],
-        tags = ["no-remote", "manual"],
+    pkg_files(
+        name = folder + "/lib" + lib + "-shared-files",
+        srcs = select({
+            "@rules_bzlmodrio_toolchains//conditions:osx": [universal_name],
+            "//conditions:default": [
+                ":" + name,
+            ],
+        }),
+        strip_prefix = select({
+            "@rules_bzlmodrio_toolchains//conditions:osx": "universal",
+            "//conditions:default": folder,
+        }),
     )
 
 CcStaticLibraryInfo = provider(

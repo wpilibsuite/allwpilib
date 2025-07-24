@@ -21,7 +21,9 @@ namespace {
 constexpr const char* kRawAccelKey = IMU_PREFIX "rawaccel";
 constexpr const char* kRawGyroKey = IMU_PREFIX "rawgyro";
 constexpr const char* kQuaternionKey = IMU_PREFIX "quat";
-constexpr const char* kEulerAngleKey = IMU_PREFIX "euler";
+constexpr const char* kEulerAnglesFlatKey = IMU_PREFIX "euler_flat";
+constexpr const char* kEulerAnglesLandscapeKey = IMU_PREFIX "euler_landscape";
+constexpr const char* kEulerAnglesPortraitKey = IMU_PREFIX "euler_portrait";
 constexpr const char* kYawFlatKey = IMU_PREFIX "yaw_flat";
 constexpr const char* kYawLandscapeKey = IMU_PREFIX "yaw_landscape";
 constexpr const char* kYawPortraitKey = IMU_PREFIX "yaw_portrait";
@@ -31,7 +33,12 @@ struct IMU {
       : rawAccelSub{inst.GetDoubleArrayTopic(kRawAccelKey).Subscribe({})},
         rawGyroSub{inst.GetDoubleArrayTopic(kRawGyroKey).Subscribe({})},
         quatSub{inst.GetDoubleArrayTopic(kQuaternionKey).Subscribe({})},
-        eulerAngleSub{inst.GetDoubleArrayTopic(kEulerAngleKey).Subscribe({})},
+        eulerFlatSub{
+            inst.GetDoubleArrayTopic(kEulerAnglesFlatKey).Subscribe({})},
+        eulerLandscapeSub{
+            inst.GetDoubleArrayTopic(kEulerAnglesLandscapeKey).Subscribe({})},
+        eulerPortraitSub{
+            inst.GetDoubleArrayTopic(kEulerAnglesPortraitKey).Subscribe({})},
         yawFlatSub{inst.GetDoubleTopic(kYawFlatKey).Subscribe(0)},
         yawLandscapeSub{inst.GetDoubleTopic(kYawLandscapeKey).Subscribe(0)},
         yawPortraitSub{inst.GetDoubleTopic(kYawPortraitKey).Subscribe(0)} {}
@@ -39,7 +46,9 @@ struct IMU {
   nt::DoubleArraySubscriber rawAccelSub;
   nt::DoubleArraySubscriber rawGyroSub;
   nt::DoubleArraySubscriber quatSub;
-  nt::DoubleArraySubscriber eulerAngleSub;
+  nt::DoubleArraySubscriber eulerFlatSub;
+  nt::DoubleArraySubscriber eulerLandscapeSub;
+  nt::DoubleArraySubscriber eulerPortraitSub;
   nt::DoubleSubscriber yawFlatSub;
   nt::DoubleSubscriber yawLandscapeSub;
   nt::DoubleSubscriber yawPortraitSub;
@@ -85,8 +94,33 @@ void HAL_GetIMUGyroRates(HAL_GyroRate3d* rate, int32_t* status) {
                          .z = update.value[2] * kDegreesToRadians};
 }
 
-void HAL_GetIMUEulerAngles(HAL_EulerAngles3d* angles, int32_t* status) {
-  auto update = imu->eulerAngleSub.GetAtomic();
+void HAL_GetIMUEulerAnglesFlat(HAL_EulerAngles3d* angles, int32_t* status) {
+  auto update = imu->eulerFlatSub.GetAtomic();
+  if (update.value.size() != 3) {
+    *status = INCOMPATIBLE_STATE;
+    return;
+  }
+  *angles = HAL_EulerAngles3d{.timestamp = update.time,
+                              .x = update.value[0] * kDegreesToRadians,
+                              .y = update.value[1] * kDegreesToRadians,
+                              .z = update.value[2] * kDegreesToRadians};
+}
+
+void HAL_GetIMUEulerAnglesLandscape(HAL_EulerAngles3d* angles,
+                                    int32_t* status) {
+  auto update = imu->eulerLandscapeSub.GetAtomic();
+  if (update.value.size() != 3) {
+    *status = INCOMPATIBLE_STATE;
+    return;
+  }
+  *angles = HAL_EulerAngles3d{.timestamp = update.time,
+                              .x = update.value[0] * kDegreesToRadians,
+                              .y = update.value[1] * kDegreesToRadians,
+                              .z = update.value[2] * kDegreesToRadians};
+}
+
+void HAL_GetIMUEulerAnglesPortrait(HAL_EulerAngles3d* angles, int32_t* status) {
+  auto update = imu->eulerPortraitSub.GetAtomic();
   if (update.value.size() != 3) {
     *status = INCOMPATIBLE_STATE;
     return;
