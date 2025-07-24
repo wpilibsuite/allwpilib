@@ -15,9 +15,9 @@ http_archive(
     name = "rules_cc",
     patch_args = ["-p1"],
     patches = ["//:shared/bazel/patches/rules_cc_windows.patch"],
-    sha256 = "712d77868b3152dd618c4d64faaddefcc5965f90f5de6e6dd1d5ddcd0be82d42",
-    strip_prefix = "rules_cc-0.1.1",
-    url = "https://github.com/bazelbuild/rules_cc/releases/download/0.1.1/rules_cc-0.1.1.tar.gz",
+    sha256 = "0d3b4f984c4c2e1acfd1378e0148d35caf2ef1d9eb95b688f8e19ce0c41bdf5b",
+    strip_prefix = "rules_cc-0.1.4",
+    url = "https://github.com/bazelbuild/rules_cc/releases/download/0.1.4/rules_cc-0.1.4.tar.gz",
 )
 
 # TODO(austinschuh): Update to the next released apple_support once it lands.
@@ -95,6 +95,15 @@ http_archive(
     sha256 = "e2556404ef56ea3ec938597616afc51d78e1832cfe511b196e9f2b8fd7f8f149",
     strip_prefix = "rules_python_pytest-1.1.1",
     url = "https://github.com/caseyduquettesc/rules_python_pytest/releases/download/v1.1.1/rules_python_pytest-v1.1.1.tar.gz",
+)
+
+http_archive(
+    name = "bazel_skylib",
+    sha256 = "51b5105a760b353773f904d2bbc5e664d0987fbaf22265164de65d43e910d8ac",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.8.1/bazel-skylib-1.8.1.tar.gz",
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.8.1/bazel-skylib-1.8.1.tar.gz",
+    ],
 )
 
 load("@bazel_features//:deps.bzl", "bazel_features_deps")
@@ -396,3 +405,7 @@ load("//shared/bazel/rules:publishing_rule.bzl", "publishing_repo")
 publishing_repo(
     name = "com_wpilib_allwpilib_publishing_config",
 )
+
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+
+bazel_skylib_workspace()

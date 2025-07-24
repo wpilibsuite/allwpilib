@@ -1,6 +1,8 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
-load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("@rules_java//java:defs.bzl", "java_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
+load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
 
 wpilib_cc_library(
     name = "romiVendordep",
@@ -45,9 +47,11 @@ wpilib_cc_static_library(
     ],
 )
 
-java_library(
+wpilib_java_library(
     name = "romiVendordep-java",
     srcs = glob(["src/main/java/**/*.java"]),
+    maven_artifact_name = "romiVendordep-java",
+    maven_group_id = "edu.wpi.first.romiVendordep",
     visibility = ["//visibility:public"],
     deps = [
         "//hal:hal-java",
@@ -82,4 +86,10 @@ java_binary(
         "//ntcore:ntcore-java",
         "//wpiutil:wpiutil-java",
     ],
+)
+
+package_minimal_cc_project(
+    name = "romiVendordep",
+    maven_artifact_name = "romiVendordep-cpp",
+    maven_group_id = "edu.wpi.first.romiVendordep",
 )

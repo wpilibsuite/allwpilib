@@ -34,12 +34,14 @@ def publish_all(name, targets):
             '  "$arg"',
             "done",
         ],
+        tags = ["manual"],
     )
     sh_binary(
         name = name,
         srcs = [publish_name + ".sh"],
         args = ["$(location " + x + ".publish)" for x in targets],
         data = [x + ".publish" for x in targets],
+        tags = ["manual"],
     )
 
 # Unfortunately, rules_jvm_external really wants each of the classifier
@@ -68,6 +70,7 @@ def architectures_pkg_zip(
             zip_name = name + "-" + compilation_mode + "-arch-" + shortname
             pkg_zip(
                 name = zip_name,
+                tags = ["manual"],
                 **kwargs
             )
 
@@ -78,6 +81,7 @@ def architectures_pkg_zip(
                 target_platform = platform,
                 compilation_mode = compilation_mode,
                 target_compatible_with = architectures_target_compatible_with[shortname],
+                tags = ["manual"],
             )
 
 def platform_prefix(t):

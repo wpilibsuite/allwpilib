@@ -5,11 +5,11 @@ load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_filegroup", "pkg_files")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
-load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
-load("//shared/bazel/rules:publishing.bzl", "architectures_pkg_zip", "platform_prefix", "wpilib_maven_export")
+load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
 load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library")
@@ -235,8 +235,9 @@ wpilib_cc_static_library(
 wpilib_jni_java_library(
     name = "wpiutil-java",
     srcs = glob(["src/main/java/**/*.java"]),
+    maven_artifact_name = "wpiutil-java",
+    maven_group_id = "edu.wpi.first.wpiutil",
     native_libs = [":wpiutiljni"],
-    tags = ["maven_coordinates=edu.wpi.first.wpiutil:wpiutil-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "@maven//:com_fasterxml_jackson_core_jackson_annotations",
@@ -244,14 +245,6 @@ wpilib_jni_java_library(
         "@maven//:com_fasterxml_jackson_core_jackson_databind",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
-)
-
-pkg_java_files(name = "wpiutil-java-srcs")
-
-pkg_zip(
-    name = "libwpiutil-java-sources",
-    srcs = [":wpiutil-java-srcs"],
-    out = "libwpiutil-java-sources.jar",
 )
 
 cc_library(
@@ -398,80 +391,8 @@ robotpy_py_test(
     ],
 )
 
-pkg_files(
-    name = "wpiutil-static-files",
-    srcs = [
-        ":static/wpiutil",
-    ],
-    prefix = platform_prefix("static"),
-    strip_prefix = "static",
-)
-
-pkg_filegroup(
-    name = "wpiutil-shared-files",
-    srcs = [
-        ":shared/libwpiutil-shared-files",
-        ":shared/libwpiutiljni-shared-files",
-    ],
-    prefix = platform_prefix("shared"),
-)
-
-architectures_pkg_zip(
-    name = "wpiutil_static_zip",
-    srcs = [
-        ":wpiutil-static-files",
-        "//:license_pkg_files",
-    ],
-)
-
-architectures_pkg_zip(
-    name = "wpiutil_shared_zip",
-    srcs = [
-        ":wpiutil-shared-files",
-        "//:license_pkg_files",
-    ],
-)
-
-wpilib_maven_export(
-    name = "wpiutil-cpp_publish",
-    classifier_artifacts = {
-        "headers": ":wpiutil-hdrs-zip",
-        "linuxsystemcore": ":wpiutil_shared_zip-opt-systemcore",
-        "linuxsystemcoredebug": ":wpiutil_shared_zip-dbg-systemcore",
-        "linuxsystemcorestatic": ":wpiutil_static_zip-opt-systemcore",
-        "linuxsystemcorestaticdebug": ":wpiutil_static_zip-dbg-systemcore",
-        "sources": ":wpiutil-srcs-zip",
-    },
-    linux_artifacts = {
-        "linuxx86-64": ":wpiutil_shared_zip-opt-linux-x86-64",
-        "linuxx86-64debug": ":wpiutil_shared_zip-dbg-linux-x86-64",
-        "linuxx86-64static": ":wpiutil_static_zip-opt-linux-x86-64",
-        "linuxx86-64staticdebug": ":wpiutil_static_zip-dbg-linux-x86-64",
-    },
-    maven_coordinates = "edu.wpi.first.wpiutil:wpiutil-cpp:$(WPILIB_VERSION)",
-    osx_artifacts = {
-        "osxuniversal": ":wpiutil_shared_zip-opt-osxuniversal",
-        "osxuniversaldebug": ":wpiutil_shared_zip-dbg-osxuniversal",
-        "osxuniversalstatic": ":wpiutil_static_zip-opt-osxuniversal",
-        "osxuniversalstaticdebug": ":wpiutil_static_zip-dbg-osxuniversal",
-    },
-    visibility = ["//visibility:public"],
-    windows_artifacts = {
-        "windowsarm64": ":wpiutil_shared_zip-opt-windows-arm64",
-        "windowsarm64debug": ":wpiutil_shared_zip-dbg-windows-arm64",
-        "windowsarm64static": ":wpiutil_static_zip-opt-windows-arm64",
-        "windowsarm64staticdebug": ":wpiutil_static_zip-dbg-windows-arm64",
-        "windowsx86-64": ":wpiutil_shared_zip-opt-windows-x86-64",
-        "windowsx86-64debug": ":wpiutil_shared_zip-dbg-windows-x86-64",
-        "windowsx86-64static": ":wpiutil_static_zip-opt-windows-x86-64",
-        "windowsx86-64staticdebug": ":wpiutil_static_zip-dbg-windows-x86-64",
-    },
-)
-
-wpilib_maven_export(
-    name = "wpiutil-java_publish",
-    classifier_artifacts = {"sources": ":libwpiutil-java-sources.jar"},
-    lib_name = "wpiutil-java",
-    maven_coordinates = "edu.wpi.first.wpiutil:wpiutil-java:$(WPILIB_VERSION)",
-    visibility = ["//visibility:public"],
+package_default_jni_project(
+    name = "wpiutil",
+    maven_artifact_name = "wpiutil-cpp",
+    maven_group_id = "edu.wpi.first.wpiutil",
 )
