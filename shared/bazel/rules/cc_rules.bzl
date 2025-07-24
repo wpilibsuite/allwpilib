@@ -397,6 +397,7 @@ def wpilib_shared_and_static_library(
         auto_export_windows_symbols = True,
         shared_library_additional_linker_inputs = [],
         shared_library_user_link_flags = [],
+        static_lib_name = None,
         **kwargs):
     """
     Helper for creating a library and a corresponding cc_static_library and cc_shared_library
@@ -434,4 +435,5 @@ def wpilib_shared_and_static_library(
         deps = [":{}".format(name)],
         static_deps = static_deps,
         visibility = visibility,
+        static_lib_name=static_lib_name,
     )
