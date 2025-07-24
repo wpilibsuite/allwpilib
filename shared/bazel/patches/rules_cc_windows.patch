@@ -11,7 +11,7 @@ index 522d67e..afc8a25 100644
      link_flags = [%{link_flags}],
      link_libs = [%{link_libs}],
 diff --git a/cc/private/toolchain/BUILD.windows.tpl b/cc/private/toolchain/BUILD.windows.tpl
-index 75fbd0a..2ff8c3a 100644
+index 1d0f8a0..b36212f 100644
 --- a/cc/private/toolchain/BUILD.windows.tpl
 +++ b/cc/private/toolchain/BUILD.windows.tpl
 @@ -124,6 +124,11 @@ cc_toolchain_config(
@@ -24,7 +24,7 @@ index 75fbd0a..2ff8c3a 100644
 +    link_flags = [%{link_flags}],
 +    win32_winnt_flag = "%{win32_winnt_flag}",
  )
-
+ 
  toolchain(
 @@ -170,6 +175,11 @@ cc_toolchain_config(
      tool_bin_path = "%{tool_bin_path}",
@@ -36,7 +36,7 @@ index 75fbd0a..2ff8c3a 100644
 +    link_flags = [%{link_flags}],
 +    win32_winnt_flag = "%{win32_winnt_flag}",
  )
-
+ 
  toolchain(
 @@ -214,6 +224,11 @@ cc_toolchain_config(
      tool_bin_path = "%{mingw_tool_bin_path}",
@@ -48,7 +48,7 @@ index 75fbd0a..2ff8c3a 100644
 +    link_flags = [%{link_flags}],
 +    win32_winnt_flag = "%{win32_winnt_flag}",
  )
-
+ 
  toolchain(
 @@ -260,6 +275,11 @@ cc_toolchain_config(
      tool_paths = {%{mingw_tool_paths}},
@@ -60,57 +60,57 @@ index 75fbd0a..2ff8c3a 100644
 +    link_flags = [%{link_flags}],
 +    win32_winnt_flag = "%{win32_winnt_flag}",
  )
-
+ 
  toolchain(
-@@ -330,6 +350,11 @@ cc_toolchain_config(
-     dbg_mode_debug_flag = "%{dbg_mode_debug_flag_x64}",
+@@ -331,6 +351,11 @@ cc_toolchain_config(
      fastbuild_mode_debug_flag = "%{fastbuild_mode_debug_flag_x64}",
      supports_parse_showincludes = %{msvc_parse_showincludes_x64},
+     shorten_virtual_includes = True,
 +    c_flags = [%{c_flags}],
 +    conly_flags = [%{conly_flags}],
 +    cxx_flags = [%{cxx_flags}],
 +    link_flags = [%{link_flags}],
 +    win32_winnt_flag = "%{win32_winnt_flag}",
  )
-
+ 
  toolchain(
-@@ -399,6 +424,11 @@ cc_toolchain_config(
-     dbg_mode_debug_flag = "%{dbg_mode_debug_flag_x86}",
+@@ -401,6 +426,11 @@ cc_toolchain_config(
      fastbuild_mode_debug_flag = "%{fastbuild_mode_debug_flag_x86}",
      supports_parse_showincludes = %{msvc_parse_showincludes_x86},
+     shorten_virtual_includes = True,
 +    c_flags = [%{c_flags}],
 +    conly_flags = [%{conly_flags}],
 +    cxx_flags = [%{cxx_flags}],
 +    link_flags = [%{link_flags}],
 +    win32_winnt_flag = "%{win32_winnt_flag}",
  )
-
+ 
  toolchain(
-@@ -468,6 +498,11 @@ cc_toolchain_config(
-     dbg_mode_debug_flag = "%{dbg_mode_debug_flag_arm}",
+@@ -471,6 +501,11 @@ cc_toolchain_config(
      fastbuild_mode_debug_flag = "%{fastbuild_mode_debug_flag_arm}",
      supports_parse_showincludes = %{msvc_parse_showincludes_arm},
+     shorten_virtual_includes = True,
 +    c_flags = [%{c_flags}],
 +    conly_flags = [%{conly_flags}],
 +    cxx_flags = [%{cxx_flags}],
 +    link_flags = [%{link_flags}],
 +    win32_winnt_flag = "%{win32_winnt_flag}",
  )
-
+ 
  toolchain(
-@@ -537,6 +572,11 @@ cc_toolchain_config(
-     dbg_mode_debug_flag = "%{dbg_mode_debug_flag_arm64}",
+@@ -541,6 +576,11 @@ cc_toolchain_config(
      fastbuild_mode_debug_flag = "%{fastbuild_mode_debug_flag_arm64}",
      supports_parse_showincludes = %{msvc_parse_showincludes_arm64},
+     shorten_virtual_includes = True,
 +    c_flags = [%{c_flags}],
 +    conly_flags = [%{conly_flags}],
 +    cxx_flags = [%{cxx_flags}],
 +    link_flags = [%{link_flags}],
 +    win32_winnt_flag = "%{win32_winnt_flag}",
  )
-
+ 
  toolchain(
-@@ -604,6 +644,11 @@ cc_toolchain_config(
+@@ -608,6 +648,11 @@ cc_toolchain_config(
      dbg_mode_debug_flag = "%{clang_cl_dbg_mode_debug_flag_x64}",
      fastbuild_mode_debug_flag = "%{clang_cl_fastbuild_mode_debug_flag_x64}",
      supports_parse_showincludes = %{clang_cl_parse_showincludes_x64},
@@ -120,9 +120,9 @@ index 75fbd0a..2ff8c3a 100644
 +    link_flags = [%{link_flags}],
 +    win32_winnt_flag = "%{win32_winnt_flag}",
  )
-
+ 
  toolchain(
-@@ -672,6 +717,11 @@ cc_toolchain_config(
+@@ -676,6 +721,11 @@ cc_toolchain_config(
      dbg_mode_debug_flag = "%{clang_cl_dbg_mode_debug_flag_arm64}",
      fastbuild_mode_debug_flag = "%{clang_cl_fastbuild_mode_debug_flag_arm64}",
      supports_parse_showincludes = %{clang_cl_parse_showincludes_arm64},
@@ -132,23 +132,12 @@ index 75fbd0a..2ff8c3a 100644
 +    link_flags = [%{link_flags}],
 +    win32_winnt_flag = "%{win32_winnt_flag}",
  )
-
+ 
  toolchain(
-diff --git a/cc/private/toolchain/cc_configure.bzl b/cc/private/toolchain/cc_configure.bzl
-index ce0dac5..475a9dd 100644
---- a/cc/private/toolchain/cc_configure.bzl
-+++ b/cc/private/toolchain/cc_configure.bzl
-@@ -125,6 +125,7 @@ cc_autoconf = repository_rule(
-         "BAZEL_TARGET_SYSTEM",
-         "BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN",
-         "BAZEL_USE_LLVM_NATIVE_COVERAGE",
-+        "BAZEL_WIN32_WINNT",
-         "BAZEL_LLVM",
-         "BAZEL_IGNORE_SYSTEM_HEADERS_VERSIONS",
-         "USE_CLANG_CL",
 diff --git a/cc/private/toolchain/BUILD.windows_toolchains.tpl b/cc/private/toolchain/BUILD.windows_toolchains.tpl
-index e69de29..63f5b6d 100644
---- a/cc/private/toolchain/BUILD.windows_toolchains.tpl
+new file mode 100644
+index 0000000..63f5b6d
+--- /dev/null
 +++ b/cc/private/toolchain/BUILD.windows_toolchains.tpl
 @@ -0,0 +1,34 @@
 +load("@platforms//host:constraints.bzl", "HOST_CONSTRAINTS")
@@ -186,7 +175,7 @@ index e69de29..63f5b6d 100644
 +    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 +)
 diff --git a/cc/private/toolchain/cc_configure.bzl b/cc/private/toolchain/cc_configure.bzl
-index ce0dac5..d8d8139 100644
+index ce0dac5..ec68ab9 100644
 --- a/cc/private/toolchain/cc_configure.bzl
 +++ b/cc/private/toolchain/cc_configure.bzl
 @@ -33,12 +33,17 @@ def cc_autoconf_toolchains_impl(repository_ctx):
@@ -217,6 +206,14 @@ index ce0dac5..d8d8139 100644
          "BAZEL_CXXOPTS",
          "BAZEL_LINKOPTS",
          "BAZEL_LINKLIBS",
+@@ -125,6 +131,7 @@ cc_autoconf = repository_rule(
+         "BAZEL_TARGET_SYSTEM",
+         "BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN",
+         "BAZEL_USE_LLVM_NATIVE_COVERAGE",
++        "BAZEL_WIN32_WINNT",
+         "BAZEL_LLVM",
+         "BAZEL_IGNORE_SYSTEM_HEADERS_VERSIONS",
+         "USE_CLANG_CL",
 diff --git a/cc/private/toolchain/unix_cc_configure.bzl b/cc/private/toolchain/unix_cc_configure.bzl
 index 6a6f38a..50270a1 100644
 --- a/cc/private/toolchain/unix_cc_configure.bzl
@@ -243,10 +240,10 @@ index 6a6f38a..50270a1 100644
              "%{coverage_link_flags}": coverage_link_flags,
              "%{cxx_builtin_include_directories}": get_starlark_list(builtin_include_directories),
 diff --git a/cc/private/toolchain/unix_cc_toolchain_config.bzl b/cc/private/toolchain/unix_cc_toolchain_config.bzl
-index ee26a55..23da019 100644
+index e3bb775..5df9ed4 100644
 --- a/cc/private/toolchain/unix_cc_toolchain_config.bzl
 +++ b/cc/private/toolchain/unix_cc_toolchain_config.bzl
-@@ -407,6 +407,14 @@ def _impl(ctx):
+@@ -416,6 +416,14 @@ def _impl(ctx):
                  ] if ctx.attr.opt_compile_flags else []),
                  with_features = [with_feature_set(features = ["opt"])],
              ),
@@ -261,7 +258,7 @@ index ee26a55..23da019 100644
              flag_set(
                  actions = [ACTION_NAMES.c_compile],
                  flag_groups = ([
-@@ -1916,6 +1924,7 @@ cc_toolchain_config = rule(
+@@ -1949,6 +1957,7 @@ cc_toolchain_config = rule(
          "compile_flags": attr.string_list(),
          "compiler": attr.string(mandatory = True),
          "conly_flags": attr.string_list(),
@@ -282,11 +279,11 @@ index 66ca5fb..7581ce7 100644
 +    "split_escaped",
      "write_builtin_include_directory_paths",
  )
-
+ 
 @@ -848,6 +850,42 @@ def _get_msvc_deps_scanner_vars(repository_ctx, paths, template_vars, target_arc
          "%{msvc_deps_scanner_wrapper_path_" + target_arch + "}": "msvc_deps_scanner_wrapper_" + target_arch + ".bat",
      }
-
+ 
 +def _get_copts(repository_ctx):
 +    """Get the variables we need to populate the msys/mingw toolchains."""
 +    conly_opts = split_escaped(_get_env_var(
@@ -325,7 +322,7 @@ index 66ca5fb..7581ce7 100644
 +
  def configure_windows_toolchain(repository_ctx):
      """Configure C++ toolchain on Windows.
-
+ 
 @@ -882,6 +920,7 @@ def configure_windows_toolchain(repository_ctx):
      template_vars.update(msvc_vars_x64)
      template_vars.update(_get_clang_cl_vars(repository_ctx, paths, msvc_vars_x64, "x64"))
@@ -335,13 +332,13 @@ index 66ca5fb..7581ce7 100644
      template_vars.update(_get_msvc_vars(repository_ctx, paths, "arm", msvc_vars_x64))
      msvc_vars_arm64 = _get_msvc_vars(repository_ctx, paths, "arm64", msvc_vars_x64)
 diff --git a/cc/private/toolchain/windows_cc_toolchain_config.bzl b/cc/private/toolchain/windows_cc_toolchain_config.bzl
-index d8cf50e..f1c97ab 100644
+index 5d0d40f..c6e7f94 100644
 --- a/cc/private/toolchain/windows_cc_toolchain_config.bzl
 +++ b/cc/private/toolchain/windows_cc_toolchain_config.bzl
 @@ -88,6 +88,12 @@ all_link_actions = [
      ACTION_NAMES.cpp_link_nodeps_dynamic_library,
  ]
-
+ 
 +lto_index_actions = [
 +    ACTION_NAMES.lto_index_for_executable,
 +    ACTION_NAMES.lto_index_for_dynamic_library,
@@ -350,7 +347,7 @@ index d8cf50e..f1c97ab 100644
 +
  def _use_msvc_toolchain(ctx):
      return ctx.attr.cpu in ["x64_windows", "arm64_windows"] and (ctx.attr.compiler == "msvc-cl" or ctx.attr.compiler == "clang-cl")
-
+ 
 @@ -579,7 +585,11 @@ def _impl(ctx):
                          ACTION_NAMES.cpp20_module_compile,
                          ACTION_NAMES.cpp20_module_codegen,
@@ -394,8 +391,8 @@ index d8cf50e..f1c97ab 100644
 +                ),
              ],
          )
-
-@@ -725,9 +759,33 @@ def _impl(ctx):
+ 
+@@ -725,6 +759,14 @@ def _impl(ctx):
                          ),
                      ],
                  ),
@@ -409,9 +406,12 @@ index d8cf50e..f1c97ab 100644
 +                ),
              ],
          )
-
+ 
+@@ -743,6 +785,21 @@ def _impl(ctx):
+             ],
+         )
+ 
 +        default_compile_flags_list = [
-+            "/DCOMPILER_MSVC",
 +            "/DNOMINMAX",
 +            "/D_CRT_SECURE_NO_DEPRECATE",
 +            "/D_CRT_SECURE_NO_WARNINGS",
@@ -429,12 +429,11 @@ index d8cf50e..f1c97ab 100644
          default_compile_flags_feature = feature(
              name = "default_compile_flags",
              enabled = True,
-@@ -750,20 +808,7 @@ def _impl(ctx):
+@@ -765,19 +822,7 @@ def _impl(ctx):
                      ],
                      flag_groups = [
                          flag_group(
 -                            flags = [
--                                "/DCOMPILER_MSVC",
 -                                "/DNOMINMAX",
 -                                "/D_WIN32_WINNT=0x0601",
 -                                "/D_CRT_SECURE_NO_DEPRECATE",
@@ -451,7 +450,7 @@ index d8cf50e..f1c97ab 100644
                          ),
                      ],
                  ),
-@@ -1534,7 +1579,11 @@ def _impl(ctx):
+@@ -1555,7 +1600,11 @@ def _impl(ctx):
                              ACTION_NAMES.lto_backend,
                              ACTION_NAMES.clif_match,
                          ],
@@ -464,7 +463,7 @@ index d8cf50e..f1c97ab 100644
                              flag_group(
                                  flags = ["%{user_compile_flags}"],
                                  iterate_over = "user_compile_flags",
-@@ -1542,6 +1591,30 @@ def _impl(ctx):
+@@ -1563,6 +1612,30 @@ def _impl(ctx):
                              ),
                          ],
                      ),
@@ -494,8 +493,8 @@ index d8cf50e..f1c97ab 100644
 +                    ),
                  ],
              )
-
-@@ -1642,14 +1715,18 @@ cc_toolchain_config = rule(
+ 
+@@ -1663,14 +1736,18 @@ cc_toolchain_config = rule(
          "abi_libc_version": attr.string(),
          "abi_version": attr.string(),
          "archiver_flags": attr.string_list(default = []),
@@ -514,7 +513,7 @@ index d8cf50e..f1c97ab 100644
          "msvc_cl_path": attr.string(default = "vc_installation_error.bat"),
          "msvc_env_include": attr.string(default = "msvc_not_found"),
          "msvc_env_lib": attr.string(default = "msvc_not_found"),
-@@ -1664,6 +1741,7 @@ cc_toolchain_config = rule(
+@@ -1686,6 +1763,7 @@ cc_toolchain_config = rule(
          "tool_bin_path": attr.string(default = "not_found"),
          "tool_paths": attr.string_dict(),
          "toolchain_identifier": attr.string(),
