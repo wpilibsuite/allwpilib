@@ -75,7 +75,7 @@ def wpilib_cc_library(
         third_party_header_only_libraries = [],
         extra_src_pkg_files = [],
         extra_hdr_pkg_files = [],
-        include_third_party_notices = False,
+        include_license_files = False,
         srcs_pkg_root = "src/main/native/cpp",
         hdrs_pkg_root = "src/main/native/include",
         strip_include_prefix = None,
@@ -105,7 +105,7 @@ def wpilib_cc_library(
         include_license_files: If the header / source / library zip files should automatically includes the license files. This is used to maintain
                 consistency with the gradle publishing, as not all of them export the license files.
     """
-    maybe_third_party_notices_pkg = ["//:third_party_notices_pkg_files"] if include_third_party_notices else []
+    maybe_license_pkg = ["//:license_pkg_files"] if include_license_files else []
 
     cc_library(
         name = name + "-headers",
@@ -160,7 +160,6 @@ def wpilib_cc_shared_library(
     features = []
     if auto_export_windows_symbols:
         features.append("windows_export_all_symbols")
-
     cc_shared_library(
         name = name,
         features = features,

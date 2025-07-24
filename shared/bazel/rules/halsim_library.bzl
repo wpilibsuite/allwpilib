@@ -1,4 +1,5 @@
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
 
 def wpilib_halsim_extension(
         name,
@@ -18,7 +19,7 @@ def wpilib_halsim_extension(
     wpilib_cc_library(
         name = name,
         srcs = srcs,
-        include_third_party_notices = True,
+        include_license_files = True,
         target_compatible_with = select({
             "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
             "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
@@ -35,7 +36,7 @@ def wpilib_halsim_extension(
         copts = [
             "-DHALSIM_InitExtension=" + init_extension_name,
         ],
-        include_third_party_notices = True,
+        include_license_files = True,
         target_compatible_with = select({
             "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
             "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
@@ -61,4 +62,10 @@ def wpilib_halsim_extension(
         static_deps = static_deps,
         deps = [":{}".format(name)],
         visibility = visibility,
+    )
+
+    package_minimal_cc_project(
+        name = name,
+        maven_artifact_name = name,
+        maven_group_id = "edu.wpi.first.halsim",
     )

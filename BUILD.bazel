@@ -5,13 +5,10 @@ load("//shared/bazel/rules:publishing.bzl", "publish_all")
 
 pkg_files(
     name = "license_pkg_files",
-    srcs = ["LICENSE.md"],
-    visibility = ["//visibility:public"],
-)
-
-pkg_files(
-    name = "third_party_notices_pkg_files",
-    srcs = ["ThirdPartyNotices.txt"],
+    srcs = [
+        "LICENSE.md",
+        "ThirdPartyNotices.txt",
+    ],
     visibility = ["//visibility:public"],
 )
 

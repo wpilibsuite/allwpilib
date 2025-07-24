@@ -53,7 +53,7 @@ wpilib_cc_library(
                "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_SRCS,
            }),
     extra_src_pkg_files = [":native-pkg"],
-    include_third_party_notices = True,
+    include_license_files = True,
     strip_include_prefix = "include",
     tags = [
         "wpi-cpp-gui",

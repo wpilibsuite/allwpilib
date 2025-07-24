@@ -4,7 +4,7 @@ load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_shared_an
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project", "zip_java_srcs")
+load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
 
 WIN_SRCS = glob([
     "src/main/native/windows/**/*.cpp",
@@ -151,8 +151,6 @@ wpilib_jni_java_library(
         "@bzlmodrio-opencv//libraries/java/opencv",
     ],
 )
-
-zip_java_srcs(name = "cscore")
 
 cc_test(
     name = "cscore-cpp-test",

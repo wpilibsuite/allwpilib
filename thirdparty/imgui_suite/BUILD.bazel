@@ -424,7 +424,6 @@ pkg_zip(
         "implot-hdrs-pkg",
         "stb-hdrs-pkg",
         "//:license_pkg_files",
-        "//:third_party_notices_pkg_files",
     ],
     tags = [
         "manual",
@@ -477,7 +476,6 @@ pkg_zip(
         "implot-srcs-pkg",
         "stb-srcs-pkg",
         "//:license_pkg_files",
-        "//:third_party_notices_pkg_files",
     ],
     tags = [
         "manual",
