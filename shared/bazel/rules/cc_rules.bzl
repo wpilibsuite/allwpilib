@@ -159,7 +159,7 @@ def wpilib_cc_library(
         pkg_zip(
             name = name + "-srcs-zip",
             srcs = maybe_license_pkg + extra_src_pkg_files + [name + "-srcs-pkg"] + [lib + "-srcs-pkg" for lib in third_party_libraries],
-            tags = ["no-remote"],
+            tags = ["manual"],
         )
 
     if hdrs_pkg_root:
@@ -172,7 +172,7 @@ def wpilib_cc_library(
         pkg_zip(
             name = name + "-hdrs-zip",
             srcs = extra_hdr_pkg_files + maybe_license_pkg + [name + "-hdrs-pkg"] + [lib + "-hdrs-pkg" for lib in third_party_libraries + third_party_header_only_libraries],
-            tags = ["no-remote"],
+            tags = ["manual"],
         )
 
 def wpilib_cc_shared_library(
@@ -419,18 +419,6 @@ def wpilib_cc_static_library(
         name = name,
         static_lib_name = static_lib_name,
         **kwargs
-    )
-
-    pkg_files(
-        name = name + "-static.pkg",
-        srcs = [":" + name],
-        tags = ["manual"],
-    )
-
-    pkg_zip(
-        name = name + "-static-zip",
-        srcs = ["//:license_pkg_files", name + "-static.pkg"],
-        tags = ["no-remote", "manual"],
     )
 
 def _generate_def_windows_impl(ctx):

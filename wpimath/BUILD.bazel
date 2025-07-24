@@ -2,12 +2,12 @@ load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
-load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
+load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "generate_def_windows", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
-load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
+load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
 load("//wpimath:generate.bzl", "generate_wpimath")
 
 filegroup(
@@ -111,6 +111,12 @@ cc_library(
     strip_include_prefix = "src/generated/main/native/cpp",
 )
 
+pkg_files(
+    name = "protobuf_hdr_pkg",
+    srcs = glob(["src/generated/main/native/cpp/wpimath/protobuf/*.npb.h"]),
+    strip_prefix = "src/generated/main/native/cpp/",
+)
+
 wpilib_cc_library(
     name = "wpimath",
     srcs = glob(
@@ -121,6 +127,7 @@ wpilib_cc_library(
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**"]),
+    extra_hdr_pkg_files = [":protobuf_hdr_pkg"],
     extra_src_pkg_files = [
         ":wpimath-java-jni-hdrs-pkg",
     ],
@@ -206,6 +213,8 @@ wpilib_cc_shared_library(
 wpilib_jni_java_library(
     name = "wpimath-java",
     srcs = [":generated_java"] + glob(["src/main/java/**/*.java"]),
+    maven_artifact_name = "wpimath-java",
+    maven_group_id = "edu.wpi.first.wpimath",
     native_libs = [":wpimathjni"],
     resource_strip_prefix = "wpimath/src/main/proto",
     resources = glob(["src/main/proto/**"]),
@@ -221,14 +230,6 @@ wpilib_jni_java_library(
         "@maven//:org_ejml_ejml_simple",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
-)
-
-pkg_java_files(name = "wpimath-java-srcs")
-
-pkg_zip(
-    name = "libwpimath-java-sources",
-    srcs = [":wpimath-java-srcs"],
-    out = "libwpimath-java-sources.jar",
 )
 
 cc_library(
@@ -294,4 +295,10 @@ py_binary(
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
+)
+
+package_minimal_jni_project(
+    name = "wpimath",
+    maven_artifact_name = "wpimath-cpp",
+    maven_group_id = "edu.wpi.first.wpimath",
 )
