@@ -10,6 +10,13 @@ checkstyle {
     config = resources.text.fromFile(new File(configDirectory.get().getAsFile(), "checkstyle.xml"))
 }
 
+tasks.withType(Checkstyle) {
+    // Checkstyle falls over if module-info files are included in the check scope
+    // The suppressions file does not appear to work for this, so we need to configure the task
+    // itself
+    exclude("**/module-info.java")
+}
+
 apply plugin: 'pmd'
 
 pmd {

@@ -8,10 +8,17 @@ ext {
 }
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"
+//apply from: "${rootDir}/shared/java/opencv-module-patches.gradle"
 
 dependencies {
     implementation(project(':epilogue-runtime'))
     api project(':wpilibNewCommands')
 
     testImplementation 'com.google.testing.compile:compile-testing:+'
+}
+
+test {
+    moduleOptions {
+        runOnClasspath = true
+    }
 }

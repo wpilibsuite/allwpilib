@@ -48,6 +48,9 @@ dependencies {
     implementation project(':wpimath')
 }
 
+apply from: "${rootDir}/shared/java/wpimath-module-patches.gradle"
+apply from: "${rootDir}/shared/java/opencv-module-patches.gradle"
+
 sourceSets {
     main {
         resources {
