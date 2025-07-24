@@ -1,11 +1,11 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
-load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_shared_and_static_library")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
-load("//shared/bazel/rules:packaging.bzl", "zip_java_srcs")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
+load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
 load("//wpilibNewCommands:generate.bzl", "generate_wpilib_new_commands")
 
 py_binary(
@@ -80,9 +80,11 @@ wpilib_shared_and_static_library(
     ],
 )
 
-java_library(
+wpilib_java_library(
     name = "wpilibNewCommands-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
+    maven_artifact_name = "wpilibNewCommands-java",
+    maven_group_id = "edu.wpi.first.wpilibNewCommands",
     visibility = ["//visibility:public"],
     deps = [
         "//cscore:cscore-java",
@@ -95,8 +97,6 @@ java_library(
         "//wpiutil:wpiutil-java",
     ],
 )
-
-zip_java_srcs(name = "wpilibNewCommands")
 
 cc_test(
     name = "wpilibNewCommands-cpp-test",
@@ -149,4 +149,10 @@ java_binary(
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
     ],
+)
+
+package_minimal_cc_project(
+    name = "wpilibNewCommands",
+    maven_artifact_name = "wpilibNewCommands-cpp",
+    maven_group_id = "edu.wpi.first.wpilibNewCommands",
 )

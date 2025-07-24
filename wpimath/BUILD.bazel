@@ -7,7 +7,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_shared_and_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
-load("//shared/bazel/rules:packaging.bzl", "zip_java_srcs")
+load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
 load("//wpimath:generate.bzl", "generate_wpimath")
 
 filegroup(
@@ -178,6 +178,8 @@ wpilib_jni_cc_library(
 wpilib_jni_java_library(
     name = "wpimath-java",
     srcs = [":generated_java"] + glob(["src/main/java/**/*.java"]),
+    maven_artifact_name = "wpimath-java",
+    maven_group_id = "edu.wpi.first.wpimath",
     native_libs = [":wpimathjni"],
     resource_strip_prefix = "wpimath/src/main/proto",
     resources = glob(["src/main/proto/**"]),
@@ -194,8 +196,6 @@ wpilib_jni_java_library(
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
-
-zip_java_srcs(name = "wpimath")
 
 cc_library(
     name = "test_headers",
@@ -260,4 +260,10 @@ py_binary(
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
+)
+
+package_minimal_jni_project(
+    name = "wpimath",
+    maven_artifact_name = "wpimath-cpp",
+    maven_group_id = "edu.wpi.first.wpimath",
 )

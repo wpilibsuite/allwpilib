@@ -1,10 +1,11 @@
-load("@rules_java//java:defs.bzl", "java_library")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
 load("//shared/bazel/rules:packaging.bzl", "zip_java_srcs")
 
-java_library(
+wpilib_java_library(
     name = "epilogue-java",
     srcs = glob(["src/main/java/**/*.java"]),
+    maven_artifact_name = "epilogue-runtime-java",
+    maven_group_id = "edu.wpi.first.epilogue",
     visibility = ["//visibility:public"],
     deps = [
         "//datalog:datalog-java",

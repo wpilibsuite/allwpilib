@@ -23,7 +23,7 @@ def _package_type(package_type):
     pkg_zip(
         name = package_type + "-zip",
         srcs = pkgs,
-        tags = ["manual", "no-remote"],
+        tags = ["manual"],
     )
 
 def build_examples(halsim_deps = []):
