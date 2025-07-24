@@ -9,108 +9,90 @@
 
 #include <hal/simulation/AddressableLEDData.h>
 
+#include "frc/AddressableLED.h"
+
 using namespace frc;
 using namespace frc::sim;
 
-AddressableLEDSim::AddressableLEDSim() : m_index{0} {}
+AddressableLEDSim::AddressableLEDSim(int channel) : m_channel{channel} {}
 
 AddressableLEDSim::AddressableLEDSim(const AddressableLED& addressableLED)
-    : m_index{0} {}
-
-AddressableLEDSim AddressableLEDSim::CreateForChannel(int pwmChannel) {
-  int index = HALSIM_FindAddressableLEDForChannel(pwmChannel);
-  if (index < 0) {
-    throw std::out_of_range("no addressable LED found for PWM channel");
-  }
-  return AddressableLEDSim{index};
-}
-
-AddressableLEDSim AddressableLEDSim::CreateForIndex(int index) {
-  return AddressableLEDSim{index};
-}
+    : m_channel{addressableLED.GetChannel()} {}
 
 std::unique_ptr<CallbackStore> AddressableLEDSim::RegisterInitializedCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelAddressableLEDInitializedCallback);
+      m_channel, -1, callback, &HALSIM_CancelAddressableLEDInitializedCallback);
   store->SetUid(HALSIM_RegisterAddressableLEDInitializedCallback(
-      m_index, &CallbackStoreThunk, store.get(), initialNotify));
+      m_channel, &CallbackStoreThunk, store.get(), initialNotify));
   return store;
 }
 
 bool AddressableLEDSim::GetInitialized() const {
-  return HALSIM_GetAddressableLEDInitialized(m_index);
+  return HALSIM_GetAddressableLEDInitialized(m_channel);
 }
 
 void AddressableLEDSim::SetInitialized(bool initialized) {
-  HALSIM_SetAddressableLEDInitialized(m_index, initialized);
+  HALSIM_SetAddressableLEDInitialized(m_channel, initialized);
 }
 
-std::unique_ptr<CallbackStore> AddressableLEDSim::RegisterOutputPortCallback(
+std::unique_ptr<CallbackStore> AddressableLEDSim::RegisterStartCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelAddressableLEDOutputPortCallback);
-  store->SetUid(HALSIM_RegisterAddressableLEDOutputPortCallback(
-      m_index, &CallbackStoreThunk, store.get(), initialNotify));
+      m_channel, -1, callback, &HALSIM_CancelAddressableLEDStartCallback);
+  store->SetUid(HALSIM_RegisterAddressableLEDStartCallback(
+      m_channel, &CallbackStoreThunk, store.get(), initialNotify));
   return store;
 }
 
-int AddressableLEDSim::GetOutputPort() const {
-  return HALSIM_GetAddressableLEDOutputPort(m_index);
+int AddressableLEDSim::GetStart() const {
+  return HALSIM_GetAddressableLEDStart(m_channel);
 }
 
-void AddressableLEDSim::SetOutputPort(int outputPort) {
-  HALSIM_SetAddressableLEDOutputPort(m_index, outputPort);
+void AddressableLEDSim::SetStart(int start) {
+  HALSIM_SetAddressableLEDStart(m_channel, start);
 }
 
 std::unique_ptr<CallbackStore> AddressableLEDSim::RegisterLengthCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelAddressableLEDLengthCallback);
+      m_channel, -1, callback, &HALSIM_CancelAddressableLEDLengthCallback);
   store->SetUid(HALSIM_RegisterAddressableLEDLengthCallback(
-      m_index, &CallbackStoreThunk, store.get(), initialNotify));
+      m_channel, &CallbackStoreThunk, store.get(), initialNotify));
   return store;
 }
 
 int AddressableLEDSim::GetLength() const {
-  return HALSIM_GetAddressableLEDLength(m_index);
+  return HALSIM_GetAddressableLEDLength(m_channel);
 }
 
 void AddressableLEDSim::SetLength(int length) {
-  HALSIM_SetAddressableLEDLength(m_index, length);
+  HALSIM_SetAddressableLEDLength(m_channel, length);
 }
 
-std::unique_ptr<CallbackStore> AddressableLEDSim::RegisterRunningCallback(
-    NotifyCallback callback, bool initialNotify) {
-  auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelAddressableLEDRunningCallback);
-  store->SetUid(HALSIM_RegisterAddressableLEDRunningCallback(
-      m_index, &CallbackStoreThunk, store.get(), initialNotify));
-  return store;
+int AddressableLEDSim::GetData(struct HAL_AddressableLEDData* data) const {
+  return GetGlobalData(GetStart(), GetLength(), data);
 }
 
-int AddressableLEDSim::GetRunning() const {
-  return HALSIM_GetAddressableLEDRunning(m_index);
-}
-
-void AddressableLEDSim::SetRunning(bool running) {
-  HALSIM_SetAddressableLEDRunning(m_index, running);
+void AddressableLEDSim::SetData(struct HAL_AddressableLEDData* data) {
+  SetGlobalData(GetStart(), GetLength(), data);
 }
 
 std::unique_ptr<CallbackStore> AddressableLEDSim::RegisterDataCallback(
     ConstBufferCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelAddressableLEDDataCallback);
+      -1, callback, &HALSIM_CancelAddressableLEDDataCallback);
   store->SetUid(HALSIM_RegisterAddressableLEDDataCallback(
-      m_index, &ConstBufferCallbackStoreThunk, store.get()));
+      &ConstBufferCallbackStoreThunk, store.get()));
   return store;
 }
 
-int AddressableLEDSim::GetData(struct HAL_AddressableLEDData* data) const {
-  return HALSIM_GetAddressableLEDData(m_index, data);
+int AddressableLEDSim::GetGlobalData(int start, int length,
+                                     struct HAL_AddressableLEDData* data) {
+  return HALSIM_GetAddressableLEDData(start, length, data);
 }
 
-void AddressableLEDSim::SetData(struct HAL_AddressableLEDData* data,
-                                int length) {
-  HALSIM_SetAddressableLEDData(m_index, data, length);
+void AddressableLEDSim::SetGlobalData(int start, int length,
+                                      struct HAL_AddressableLEDData* data) {
+  HALSIM_SetAddressableLEDData(start, length, data);
 }

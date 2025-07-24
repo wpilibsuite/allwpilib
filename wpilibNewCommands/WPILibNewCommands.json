@@ -25,6 +25,7 @@
       "sharedLibrary": true,
       "skipInvalidPlatforms": true,
       "binaryPlatforms": [
+        "linuxsystemcore",
         "linuxathena",
         "linuxarm32",
         "linuxarm64",

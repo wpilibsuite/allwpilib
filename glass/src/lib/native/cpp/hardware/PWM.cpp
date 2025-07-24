@@ -30,15 +30,9 @@ void glass::DisplayPWM(PWMModel* model, int index, bool outputsEnabled) {
     wpi::format_to_n_c_str(label, sizeof(label), "PWM[{}]###name", index);
   }
 
-  int led = model->GetAddressableLED();
-
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
-  if (led >= 0) {
-    ImGui::LabelText(label, "LED[%d]", led);
-  } else {
-    float val = outputsEnabled ? data->GetValue() : 0;
-    data->LabelText(label, "%0.3f", val);
-  }
+  float val = outputsEnabled ? data->GetValue() : 0;
+  data->LabelText(label, "%0.3f", val);
   if (PopupEditName("name", &name)) {
     data->SetName(name);
   }

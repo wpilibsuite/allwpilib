@@ -14,7 +14,7 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
    * @param length The length of the buffer in pixels
    */
   public AddressableLEDBuffer(int length) {
-    m_buffer = new byte[length * 4];
+    m_buffer = new byte[length * 3];
   }
 
   /**
@@ -27,10 +27,9 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
    */
   @Override
   public void setRGB(int index, int r, int g, int b) {
-    m_buffer[index * 4] = (byte) b;
-    m_buffer[(index * 4) + 1] = (byte) g;
-    m_buffer[(index * 4) + 2] = (byte) r;
-    m_buffer[(index * 4) + 3] = 0;
+    m_buffer[index * 3] = (byte) r;
+    m_buffer[(index * 3) + 1] = (byte) g;
+    m_buffer[(index * 3) + 2] = (byte) b;
   }
 
   /**
@@ -40,7 +39,7 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
    */
   @Override
   public int getLength() {
-    return m_buffer.length / 4;
+    return m_buffer.length / 3;
   }
 
   /**
@@ -51,7 +50,7 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
    */
   @Override
   public int getRed(int index) {
-    return m_buffer[index * 4 + 2] & 0xFF;
+    return m_buffer[index * 3] & 0xFF;
   }
 
   /**
@@ -62,7 +61,7 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
    */
   @Override
   public int getGreen(int index) {
-    return m_buffer[index * 4 + 1] & 0xFF;
+    return m_buffer[index * 3 + 1] & 0xFF;
   }
 
   /**
@@ -73,7 +72,7 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
    */
   @Override
   public int getBlue(int index) {
-    return m_buffer[index * 4] & 0xFF;
+    return m_buffer[index * 3 + 2] & 0xFF;
   }
 
   /**

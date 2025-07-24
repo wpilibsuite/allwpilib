@@ -19,22 +19,22 @@ using namespace halsimgui;
 namespace {
 class AddressableLEDModel : public glass::LEDDisplayModel {
  public:
-  explicit AddressableLEDModel(int32_t index) : m_index{index} {}
+  explicit AddressableLEDModel(int32_t channel) : m_channel{channel} {}
 
   void Update() override {}
   bool Exists() override {
-    return HALSIM_GetAddressableLEDInitialized(m_index);
+    return HALSIM_GetAddressableLEDInitialized(m_channel);
   }
 
-  bool IsRunning() override { return HALSIM_GetAddressableLEDRunning(m_index); }
-
   std::span<const Data> GetData(wpi::SmallVectorImpl<Data>&) override {
-    size_t length = HALSIM_GetAddressableLEDData(m_index, m_data);
+    size_t length = HALSIM_GetAddressableLEDData(
+        HALSIM_GetAddressableLEDStart(m_channel),
+        HALSIM_GetAddressableLEDLength(m_channel), m_data);
     return {reinterpret_cast<Data*>(m_data), length};
   }
 
  private:
-  int32_t m_index;
+  int32_t m_channel;
 
   HAL_AddressableLEDData m_data[HAL_kAddressableLEDMaxLength];
 };
@@ -49,7 +49,7 @@ class AddressableLEDsModel : public glass::LEDDisplaysModel {
   size_t GetNumLEDDisplays() override { return m_models.size(); }
 
   void ForEachLEDDisplay(
-      wpi::function_ref<void(glass::LEDDisplayModel& model, int index)> func)
+      wpi::function_ref<void(glass::LEDDisplayModel& model, int channel)> func)
       override;
 
  private:
@@ -83,7 +83,7 @@ bool AddressableLEDsModel::Exists() {
 }
 
 void AddressableLEDsModel::ForEachLEDDisplay(
-    wpi::function_ref<void(glass::LEDDisplayModel& model, int index)> func) {
+    wpi::function_ref<void(glass::LEDDisplayModel& model, int channel)> func) {
   for (int i = 0; i < static_cast<int>(m_models.size()); ++i) {
     if (m_models[i]) {
       func(*m_models[i], i);

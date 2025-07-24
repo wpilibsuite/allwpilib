@@ -1,0 +1,335 @@
+import edu.wpi.first.deployutils.deploy.target.RemoteTarget
+import edu.wpi.first.deployutils.deploy.target.location.SshDeployLocation
+import edu.wpi.first.deployutils.deploy.artifact.*
+import org.gradle.internal.os.OperatingSystem
+
+plugins {
+    id 'java'
+    id 'application'
+    id 'cpp'
+    id 'visual-studio'
+}
+
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'edu.wpi.first.DeployUtils'
+
+apply from: "${rootDir}/shared/config.gradle"
+
+application {
+    if (OperatingSystem.current().isMacOsX()) {
+        applicationDefaultJvmArgs = ['-XstartOnFirstThread']
+    }
+}
+
+ext {
+    sharedCvConfigs = [benchmarkCpp: []]
+    staticCvConfigs = [benchmarkCppStatic: []]
+    useJava = true
+    useCpp = true
+    skipDev = true
+}
+
+apply from: "${rootDir}/shared/opencv.gradle"
+
+application {
+    mainClass = 'frc.robot.Main'
+}
+
+apply plugin: 'com.gradleup.shadow'
+
+repositories {
+    maven {
+        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+    }
+}
+
+dependencies {
+    implementation project(':apriltag')
+    implementation project(':cameraserver')
+    implementation project(':cscore')
+    implementation project(':epilogue-runtime')
+    implementation project(':hal')
+    implementation project(':ntcore')
+    implementation project(':wpilibj')
+    implementation project(':wpilibNewCommands')
+    implementation project(':wpimath')
+    implementation project(':wpinet')
+    implementation project(':wpiunits')
+    implementation project(':wpiutil')
+    annotationProcessor project(':epilogue-processor')
+    implementation "org.openjdk.jmh:jmh-core:1.37"
+    annotationProcessor "org.openjdk.jmh:jmh-generator-annprocess:1.37"
+}
+
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
+    onlyIf { false }
+}
+
+deploy {
+    targets {
+        roborio(RemoteTarget) {
+            directory = '/home/lvuser'
+            maxChannels = 4
+            locations {
+                ssh(SshDeployLocation) {
+                    address = "172.22.11.2"
+                    user = 'admin'
+                    password = ''
+                    ipv6 = false
+                }
+            }
+
+            def remote = it
+
+            artifacts.registerFactory(WPIJREArtifact) {
+                return objects.newInstance(WPIJREArtifact, it, remote)
+            }
+
+            artifacts {
+                all {
+                    predeploy << { ctx ->
+                        ctx.execute('. /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKillRobot.sh -t 2> /dev/null')
+                        ctx.execute("sed -i -e 's/\"exec /\"/' /usr/local/frc/bin/frcRunRobot.sh")
+                    }
+                    postdeploy << { ctx ->
+                        ctx.execute("sync")
+                        ctx.execute("ldconfig")
+                    }
+                }
+
+                benchmarkCpp(NativeExecutableArtifact) {
+                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    def excludes = getLibraryFilter().getExcludes()
+                    excludes.add('**/*.so.debug')
+                    excludes.add('**/*.so.*.debug')
+                    postdeploy << { ctx ->
+                        ctx.execute("echo '/home/lvuser/benchmarkCpp' > /home/lvuser/robotCommand")
+                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
+                        ctx.execute("setcap cap_sys_nice+eip \"/home/lvuser/benchmarkCpp\"")
+                        ctx.execute('chmod +x benchmarkCpp')
+                    }
+                }
+
+                benchmarkCppStatic(NativeExecutableArtifact) {
+                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    postdeploy << { ctx ->
+                        ctx.execute("echo '/home/lvuser/benchmarkCppStatic' > /home/lvuser/robotCommand")
+                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
+                        ctx.execute("setcap cap_sys_nice+eip \"/home/lvuser/benchmarkCppStatic\"")
+                        ctx.execute('chmod +x benchmarkCppStatic')
+                    }
+                }
+
+                benchmarkCppJava(NativeExecutableArtifact) {
+                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    def excludes = getLibraryFilter().getExcludes()
+                    excludes.add('**/*.so.debug')
+                    excludes.add('**/*.so.*.debug')
+                }
+
+                jre(WPIJREArtifact) {
+                }
+
+                benchmarkJava(JavaArtifact) {
+                    jarTask = shadowJar
+                    postdeploy << { ctx ->
+                        ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseSerialGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/lvuser/benchmark-all.jar' > /home/lvuser/robotCommand")
+                        ctx.execute("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Prevent the eclipse compiler (used by the VS Code extension for intellisense and debugging)
+// from generating bad class files from annotation processors like Epilogue
+eclipse {
+    classpath {
+        containers 'org.eclipse.buildship.core.gradleclasspathcontainer'
+        file.whenMerged { cp ->
+            def entries = cp.entries;
+            def src = new org.gradle.plugins.ide.eclipse.model.SourceFolder('build/generated/sources/annotationProcessor/java/main/', null)
+            entries.add(src)
+        }
+    }
+}
+
+tasks.register('deployJava') {
+    try {
+        dependsOn tasks.named('deployjreroborio')
+        dependsOn tasks.named('deploybenchmarkJavaroborio')
+        dependsOn tasks.named('deploybenchmarkCppJavaroborio') // Deploying shared C++ is how to get the Java shared libraries.
+    } catch (ignored) {
+    }
+}
+
+tasks.register('deployShared') {
+    try {
+        dependsOn tasks.named('deploybenchmarkCpproborio')
+    } catch (ignored) {
+    }
+}
+
+tasks.register('deployStatic') {
+    try {
+        dependsOn tasks.named('deploybenchmarkCppStaticroborio')
+    } catch (ignored) {
+    }
+}
+
+model {
+    components {
+        benchmarkCpp(NativeExecutableSpec) {
+            targetBuildTypes 'debug'
+            sources {
+                cpp {
+                    source {
+                        srcDirs = [
+                            'src/main/native/cpp',
+                            'src/main/native/thirdparty/benchmark/src'
+                        ]
+                        includes = ['**/*.cpp']
+                    }
+                    exportedHeaders {
+                        srcDirs = [
+                            'src/main/native/include',
+                            'src/main/native/thirdparty/benchmark/include',
+                            'src/main/native/thirdparty/benchmark/src'
+                        ]
+                        includes = ['**/*.h']
+                    }
+                }
+            }
+            binaries.all { binary ->
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    if (binary.buildType.name == 'debug') {
+                        deploy.targets.roborio.artifacts.benchmarkCpp.binary = binary
+                        deploy.targets.roborio.artifacts.benchmarkCppJava.binary = binary
+                    }
+                }
+                lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
+                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
+                project(':hal').addHalDependency(binary, 'shared')
+                project(':hal').addHalJniDependency(binary)
+                project(':ntcore').addNtcoreDependency(binary, 'shared')
+                project(':ntcore').addNtcoreJniDependency(binary)
+                lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+                lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
+                }
+                if (binary.targetPlatform.operatingSystem.isWindows()) {
+                    // Shlwapi.lib is needed for SHGetValueA() inside thirdparty benchmark
+                    binary.linker.args << "Shlwapi.lib"
+                }
+                binary.cppCompiler.define 'benchmark_EXPORTS'
+            }
+        }
+        benchmarkCppStatic(NativeExecutableSpec) {
+            targetBuildTypes 'debug'
+            nativeUtils.excludeBinariesFromStrip(it)
+            sources {
+                cpp {
+                    source {
+                        srcDirs = [
+                            'src/main/native/cpp',
+                            'src/main/native/thirdparty/benchmark/src'
+                        ]
+                        includes = ['**/*.cpp']
+                    }
+                    exportedHeaders {
+                        srcDirs = [
+                            'src/main/native/include',
+                            'src/main/native/thirdparty/benchmark/include',
+                            'src/main/native/thirdparty/benchmark/src'
+                        ]
+                        includes = ['**/*.h']
+                    }
+                }
+            }
+            binaries.all { binary ->
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    if (binary.buildType.name == 'debug') {
+                        deploy.targets.roborio.artifacts.benchmarkCppStatic.binary = binary
+                    }
+                }
+                lib project: ':apriltag', library: 'apriltag', linkage: 'static'
+                lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
+                lib project: ':cscore', library: 'cscore', linkage: 'static'
+                project(':hal').addHalDependency(binary, 'static')
+                project(':ntcore').addNtcoreDependency(binary, 'static')
+                lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
+                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
+                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
+                }
+                if (binary.targetPlatform.operatingSystem.isWindows()) {
+                    // Shlwapi.lib is needed for SHGetValueA() inside thirdparty benchmark
+                    binary.linker.args << "Shlwapi.lib"
+                }
+                binary.cppCompiler.define 'benchmark_EXPORTS'
+                binary.cppCompiler.define 'BENCHMARK_STATIC_DEFINE'
+            }
+        }
+        all {
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/main/native/thirdparty/benchmark/include'
+                }
+            }
+        }
+    }
+    tasks {
+        def c = $.components
+        project.tasks.create('runCpp', Exec) {
+            group = 'WPILib'
+            description = "Run the benchmarkCpp executable"
+            def found = false
+            def systemArch = getCurrentArch()
+            c.each {
+                if (it in NativeExecutableSpec && it.name == "benchmarkCpp") {
+                    it.binaries.each {
+                        if (!found) {
+                            def arch = it.targetPlatform.name
+                            if (arch == systemArch) {
+                                dependsOn it.tasks.install
+                                commandLine it.tasks.install.runScriptFile.get().asFile.toString()
+                                def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
+                                run.dependsOn it.tasks.install
+                                run.systemProperty 'java.library.path', filePath
+
+                                found = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        installAthena(Task) {
+            $.binaries.each {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.component.name == 'benchmarkCpp') {
+                    dependsOn it.tasks.install
+                }
+            }
+        }
+        installAthenaStatic(Task) {
+            $.binaries.each {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.component.name == 'benchmarkCppStatic') {
+                    dependsOn it.tasks.install
+                }
+            }
+        }
+    }
+}

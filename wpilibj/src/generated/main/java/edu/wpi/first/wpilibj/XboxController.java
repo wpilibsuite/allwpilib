@@ -687,8 +687,8 @@ public class XboxController extends GenericHID implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("HID");
     builder.publishConstString("ControllerType", "Xbox");
-    builder.addDoubleProperty("LeftTrigger", this::getLeftTriggerAxis, null);
-    builder.addDoubleProperty("RightTrigger", this::getRightTriggerAxis, null);
+    builder.addDoubleProperty("LeftTrigger Axis", this::getLeftTriggerAxis, null);
+    builder.addDoubleProperty("RightTrigger Axis", this::getRightTriggerAxis, null);
     builder.addDoubleProperty("LeftX", this::getLeftX, null);
     builder.addDoubleProperty("RightX", this::getRightX, null);
     builder.addDoubleProperty("LeftY", this::getLeftY, null);
