@@ -435,5 +435,5 @@ def wpilib_shared_and_static_library(
         deps = [":{}".format(name)],
         static_deps = static_deps,
         visibility = visibility,
-        static_lib_name=static_lib_name,
+        static_lib_name = static_lib_name,
     )

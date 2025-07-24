@@ -16,12 +16,12 @@ wpilib_shared_and_static_library(
     srcs = [":generate-resources"] + glob(["src/main/native/cpp/**"]),
     hdrs = glob(["src/main/native/include/**/*"]),
     include_license_files = True,
-    strip_include_prefix = "src/main/native/include",
-    visibility = ["//visibility:public"],
     static_lib_name = select({
         "@bazel_tools//src/conditions:windows": "static/fieldImages.lib",
         "//conditions:default": "static/libfieldImages.a",
     }),
+    strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
 )
 
 wpilib_java_library(

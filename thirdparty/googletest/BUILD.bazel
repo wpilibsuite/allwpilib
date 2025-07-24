@@ -9,12 +9,12 @@ wpilib_shared_and_static_library(
     include_license_files = True,
     includes = ["src/googletest"],
     srcs_pkg_root = "src",
-    strip_include_prefix = "include",
-    visibility = ["//visibility:public"],
     static_lib_name = select({
         "@bazel_tools//src/conditions:windows": "static/googletest.lib",
         "//conditions:default": "static/libgoogletest.a",
     }),
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
 )
 
 package_minimal_cc_project(
