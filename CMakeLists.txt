@@ -91,6 +91,7 @@ option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
 option(WITH_GUI "Build GUI items" ON)
 option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
 option(WITH_PROTOBUF "Build protobuf support" ON)
+option(WITH_BENCHMARK "Build the benchmark project" ON)
 
 # Options for using a package manager (e.g., vcpkg) for certain dependencies.
 option(USE_SYSTEM_FMTLIB "Use system fmtlib" OFF)
@@ -358,6 +359,10 @@ if(WITH_WPILIB)
         add_subdirectory(wpilibcExamples)
     endif()
     add_subdirectory(developerRobot)
+endif()
+
+if(WITH_BENCHMARK)
+    add_subdirectory(benchmark)
 endif()
 
 if(WITH_SIMULATION_MODULES)

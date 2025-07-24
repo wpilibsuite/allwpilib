@@ -81,7 +81,9 @@ def build_snippets():
             name = folder + "-snippet",
             srcs = native.glob(["src/main/java/edu/wpi/first/wpilibj/snippets/" + folder + "/**/*.java"]),
             deps = [
+                "//hal:hal-java",
                 "//wpilibj:wpilibj-java",
+                "//wpimath:wpimath-java",
             ],
             tags = ["wpi-example"],
         )

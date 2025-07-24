@@ -3,6 +3,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("@rules_java//java:defs.bzl", "java_library")
+load("@rules_java//java/common:java_info.bzl", "JavaInfo")
 load("@rules_pkg//:mappings.bzl", "filter_directory")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 

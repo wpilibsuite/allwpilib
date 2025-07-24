@@ -74,8 +74,8 @@ TEST(MerweUKFTest, DriveInit) {
                                   DriveLocalMeasurementModel,
                                   {0.5, 0.5, 10.0, 1.0, 1.0},
                                   {0.0001, 0.01, 0.01},
-                                  frc::AngleMean<5, 5>(2),
-                                  frc::AngleMean<3, 5>(0),
+                                  frc::AngleMean<5, 2 * 5 + 1>(2),
+                                  frc::AngleMean<3, 2 * 5 + 1>(0),
                                   frc::AngleResidual<5>(2),
                                   frc::AngleResidual<3>(0),
                                   frc::AngleAdd<5>(2),
@@ -89,7 +89,7 @@ TEST(MerweUKFTest, DriveInit) {
   auto globalY = DriveGlobalMeasurementModel(observer.Xhat(), u);
   auto R = frc::MakeCovMatrix(0.01, 0.01, 0.0001, 0.01, 0.01);
   observer.Correct<5>(u, globalY, DriveGlobalMeasurementModel, R,
-                      frc::AngleMean<5, 5>(2), frc::AngleResidual<5>(2),
+                      frc::AngleMean<5, 2 * 5 + 1>(2), frc::AngleResidual<5>(2),
                       frc::AngleResidual<5>(2), frc::AngleAdd<5>(2));
 }
 
@@ -101,8 +101,8 @@ TEST(MerweUKFTest, DriveConvergence) {
                                   DriveLocalMeasurementModel,
                                   {0.5, 0.5, 10.0, 1.0, 1.0},
                                   {0.0001, 0.5, 0.5},
-                                  frc::AngleMean<5, 5>(2),
-                                  frc::AngleMean<3, 5>(0),
+                                  frc::AngleMean<5, 2 * 5 + 1>(2),
+                                  frc::AngleMean<3, 2 * 5 + 1>(0),
                                   frc::AngleResidual<5>(2),
                                   frc::AngleResidual<3>(0),
                                   frc::AngleAdd<5>(2),
@@ -158,7 +158,7 @@ TEST(MerweUKFTest, DriveConvergence) {
   auto globalY = DriveGlobalMeasurementModel(trueXhat, u);
   auto R = frc::MakeCovMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
   observer.Correct<5>(u, globalY, DriveGlobalMeasurementModel, R,
-                      frc::AngleMean<5, 5>(2), frc::AngleResidual<5>(2),
+                      frc::AngleMean<5, 2 * 5 + 1>(2), frc::AngleResidual<5>(2),
                       frc::AngleResidual<5>(2), frc::AngleAdd<5>(2)
 
   );

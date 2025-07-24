@@ -280,8 +280,8 @@ bool PS5Controller::GetTouchpadReleased() {
 void PS5Controller::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("HID");
   builder.PublishConstString("ControllerType", "PS5");
-  builder.AddDoubleProperty("L2", [this] { return GetL2Axis(); }, nullptr);
-  builder.AddDoubleProperty("R2", [this] { return GetR2Axis(); }, nullptr);
+  builder.AddDoubleProperty("L2 Axis", [this] { return GetL2Axis(); }, nullptr);
+  builder.AddDoubleProperty("R2 Axis", [this] { return GetR2Axis(); }, nullptr);
   builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
   builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
   builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
