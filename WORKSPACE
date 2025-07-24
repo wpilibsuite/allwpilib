@@ -76,6 +76,15 @@ http_archive(
     url = "https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr4/rules_bzlmodrio_toolchains-2025-1.bcr4.tar.gz",
 )
 
+http_archive(
+    name = "bazel_skylib",
+    sha256 = "51b5105a760b353773f904d2bbc5e664d0987fbaf22265164de65d43e910d8ac",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.8.1/bazel-skylib-1.8.1.tar.gz",
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.8.1/bazel-skylib-1.8.1.tar.gz",
+    ],
+)
+
 load("@bazel_features//:deps.bzl", "bazel_features_deps")
 
 bazel_features_deps()
@@ -370,3 +379,7 @@ load("//shared/bazel/rules:publishing_rule.bzl", "publishing_repo")
 publishing_repo(
     name = "com_wpilib_allwpilib_publishing_config",
 )
+
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+
+bazel_skylib_workspace()
