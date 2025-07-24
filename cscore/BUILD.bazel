@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_shared_and_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
@@ -58,60 +58,19 @@ wpilib_objc_library(
     ],
 )
 
-wpilib_shared_and_static_library(
+wpilib_cc_library(
     name = "cscore",
     srcs = [":native-srcs"] + glob(
         ["src/main/native/cpp/**"],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**/*"]),
-    dynamic_deps = [
-        "//wpinet:shared/wpinet",
-        "//wpiutil:shared/wpiutil",
-    ],
     extra_src_pkg_files = [
         ":cscore-java-jni-hdrs-pkg",
     ],
     includes = [
         "src/main/native/cpp",
         "src/main/native/include",
-    ],
-    # Bazel does not pull transative objc libraries in for cc_shared_libraries, so you must add these functions to get them to link properly
-    #
-    # https://github.com/bazelbuild/bazel/issues/21893
-    shared_library_additional_linker_inputs = select({
-        "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
-        "//conditions:default": [],
-    }),
-    shared_library_user_link_flags = select({
-        "@bazel_tools//src/conditions:darwin": [
-            "-Wl,-force_load,$(location :cscore-mac)",
-            "-framework",
-            "Metal",
-            "-framework",
-            "MetalKit",
-            "-framework",
-            "Cocoa",
-            "-framework",
-            "IOKit",
-            "-framework",
-            "CoreFoundation",
-            "-framework",
-            "AVFoundation",
-            "-framework",
-            "Foundation",
-            "-framework",
-            "CoreMedia",
-            "-framework",
-            "CoreVideo",
-            "-framework",
-            "QuartzCore",
-        ],
-        "//conditions:default": [],
-    }),
-    static_deps = [
-        "//wpinet:static/wpinet",
-        "//wpiutil:static/wpiutil",
     ],
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
@@ -125,13 +84,19 @@ wpilib_shared_and_static_library(
     }),
 )
 
+wpilib_cc_static_library(
+    name = "static/cscore",
+    static_deps = [
+        "//wpinet:static/wpinet",
+        "//wpiutil:static/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":cscore"],
+)
+
 wpilib_jni_cc_library(
     name = "cscorejni",
     srcs = glob(["src/main/native/cpp/jni/**"]),
-    dynamic_deps = [
-        ":shared/cscore",
-        "//wpiutil:shared/wpiutil",
-    ],
     java_dep = ":cscore-java",
     visibility = ["//visibility:public"],
     deps = [
