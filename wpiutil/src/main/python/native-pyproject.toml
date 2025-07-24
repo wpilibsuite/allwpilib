@@ -3,12 +3,12 @@ build-backend = "hatchling.build"
 requires = [
     "hatchling",
     "hatch-nativelib~=0.2.0",
-    "hatch-robotpy~=0.2",
+    "hatch-robotpy~=0.2.1",
 ]
 
 [project]
 name = "robotpy-native-wpiutil"
-version = "2027.0.0a1.dev0"
+version = "2027.0.0a2"
 description = "WPILib Utility Library"
 license = "BSD-3-Clause"
 
@@ -22,8 +22,8 @@ packages = ["src/native"]
 [[tool.hatch.build.hooks.robotpy.maven_lib_download]]
 artifact_id = "wpiutil-cpp"
 group_id = "edu.wpi.first.wpiutil"
-repo_url = "https://frcmaven.wpi.edu/artifactory/development-2027"
-version = "2025.3.2-123-g22d12d2"
+repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
+version = "2027.0.0-alpha-2"
 
 extract_to = "src/native/wpiutil"
 libs = ["wpiutil"]

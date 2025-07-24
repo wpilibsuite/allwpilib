@@ -3,18 +3,18 @@ build-backend = "hatchling.build"
 requires = [
     "hatchling",
     "hatch-nativelib~=0.2.0",
-    "hatch-robotpy~=0.2",
-    "robotpy-native-wpiutil==2027.0.0a1.dev0",
+    "hatch-robotpy~=0.2.1",
+    "robotpy-native-wpiutil==2027.0.0a2",
 ]
 
 [project]
 name = "robotpy-native-wpinet"
-version = "2027.0.0a1.dev0"
+version = "2027.0.0a2"
 description = "WPILib Networking Library"
 license = "BSD-3-Clause"
 
 dependencies = [
-    "robotpy-native-wpiutil==2027.0.0a1.dev0",
+    "robotpy-native-wpiutil==2027.0.0a2",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -23,8 +23,8 @@ packages = ["src/native"]
 [[tool.hatch.build.hooks.robotpy.maven_lib_download]]
 artifact_id = "wpinet-cpp"
 group_id = "edu.wpi.first.wpinet"
-repo_url = "https://frcmaven.wpi.edu/artifactory/development-2027"
-version = "2025.3.2-123-g22d12d2"
+repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
+version = "2027.0.0-alpha-2"
 
 extract_to = "src/native/wpinet"
 libs = ["wpinet"]

@@ -1,24 +1,24 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.1.2",
+    "semiwrap~=0.1.4",
     "hatch-meson~=0.1.0b2",
     "hatchling",
-    "robotpy-native-wpinet==2027.0.0a1.dev0",
-    "robotpy-wpiutil==2027.0.0a1.dev0"
+    "robotpy-native-wpinet==2027.0.0a2",
+    "robotpy-wpiutil==2027.0.0a2"
 ]
 
 [project]
 name = "robotpy-wpinet"
-version = "2027.0.0a1.dev0"
+version = "2027.0.0a2"
 description = "Binary wrapper for FRC wpinet library"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
 license = "BSD-3-Clause"
 dependencies = [
-    "robotpy-native-wpinet==2027.0.0a1.dev0",
-    "robotpy-wpiutil==2027.0.0a1.dev0"
+    "robotpy-native-wpinet==2027.0.0a2",
+    "robotpy-wpiutil==2027.0.0a2"
 ]
 
 [project.urls]

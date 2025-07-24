@@ -1,39 +1,29 @@
----
 
 defaults:
   ignore: true
 
+  subpackage: sync
 extra_includes:
 - pybind11/stl.h
 
 functions:
   CreateEvent:
-    subpackage: sync
   DestroyEvent:
-    subpackage: sync
   SetEvent:
-    subpackage: sync
-  ResetEvent: 
-    subpackage: sync
+  ResetEvent:
   CreateSemaphore:
-    subpackage: sync
   DestroySemaphore:
-    subpackage: sync
   ReleaseSemaphore:
-    subpackage: sync
     param_override:
       prevCount:
         default: "0"
   WaitForObject:
     overloads:
       WPI_Handle:
-        subpackage: sync
       WPI_Handle, double, bool*:
-        subpackage: sync
   WaitForObjects:
     overloads:
       std::span<const WPI_Handle>, std::span<WPI_Handle>:
-        subpackage: sync
         param_override:
           signaled:
             ignore: true
@@ -48,7 +38,6 @@ functions:
       std::initializer_list<WPI_Handle>, std::span<WPI_Handle>:
         ignore: true
       std::span<const WPI_Handle>, std::span<WPI_Handle>, double, bool*:
-        subpackage: sync
         param_override:
           signaled:
             ignore: true
@@ -66,10 +55,6 @@ functions:
       std::initializer_list<WPI_Handle>, std::span<WPI_Handle>, double, bool*:
         ignore: true
   CreateSignalObject:
-    subpackage: sync
   SetSignalObject:
-    subpackage: sync
   ResetSignalObject:
-    subpackage: sync
   DestroySignalObject:
-    subpackage: sync

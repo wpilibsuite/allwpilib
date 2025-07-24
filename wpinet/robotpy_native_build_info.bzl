@@ -37,7 +37,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         native_shared_library = "shared/wpinet",
         install_path = "native/wpinet/",
         strip_path_prefixes = ["wpinet"],
-        requires = ["robotpy-native-wpiutil==2027.0.0a1.dev0"],
+        requires = ["robotpy-native-wpiutil==2027.0.0a2"],
         summary = "WPILib Networking Library",
         entry_points = {
             "pkg_config": [

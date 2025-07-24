@@ -210,7 +210,7 @@ def define_pybind_library(name):
         summary = "Binary wrapper for FRC WPIUtil library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
-        requires = ["robotpy-native-wpiutil==2027.0.0a1.dev0"],
+        requires = ["robotpy-native-wpiutil==2027.0.0a2"],
         entry_points = {
             "pkg_config": ["wpiutil-casters = wpiutil", "wpiutil = wpiutil"],
         },

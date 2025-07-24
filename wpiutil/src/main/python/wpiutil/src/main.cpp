@@ -7,7 +7,7 @@ void cleanup_stack_trace_hook();
 void setup_safethread_gil();
 void cleanup_safethread_gil();
 
-#ifndef __FRC_ROBORIO__
+#ifndef __FRC_SYSTEMCORE__
 
 namespace wpi::impl {
 void ResetSendableRegistry();

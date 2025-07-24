@@ -380,9 +380,9 @@ pyyaml==6.0.2 \
     --hash=sha256:f753120cb8181e736c57ef7636e83f31b9c0d1722c516f7e86cf15b7aa57ff12 \
     --hash=sha256:ff3824dc5261f50c9b0dfb3be22b4567a6f938ccce4587b38952d85fd9e9afe4
     # via semiwrap
-semiwrap==0.1.2 \
-    --hash=sha256:0d3421ba43f6f974da5d0e5d2e792812a3b3e4f2273e61e876dd91d571cd246d \
-    --hash=sha256:1db5a27c36196e18c45c6672f056c7953b17d1d23d9e262607f3c00a15ec4d2e
+semiwrap==0.1.4 \
+    --hash=sha256:2c84bf565bd02b4cfa3ca0790c55ed67c0f0b7a0747dae7cffefaa8ff2fd94e1 \
+    --hash=sha256:eaf29587ca51ed38cc6033494d08edafb9c4d796ecc4336282ccb156d7946401
     # via -r requirements.txt
 sphinxify==0.12 \
     --hash=sha256:3ec299e78babac7d3457f47bf263411b48e10b9c8add18d7159fa0327cc4a061 \
