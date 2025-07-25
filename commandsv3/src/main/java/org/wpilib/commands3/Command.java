@@ -57,7 +57,7 @@ import java.util.function.Consumer;
  *       ).withName("The Command");
  *
  *     // Can be represented with a 2025-style async-based definition
- *     Command command = requiredSubsystem.run((coroutine) -> {
+ *     Command command = requiredSubsystem.run(coroutine -> {
  *       initialize();
  *       while (!isFinished()) {
  *         coroutine.yield();
