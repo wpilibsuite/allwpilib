@@ -38,19 +38,15 @@ public class Trigger implements BooleanSupplier {
    * first run, when the previous signal value is undefined and unknown.
    */
   private enum Signal {
-    /**
-     * The signal is high.
-     */
+    /** The signal is high. */
     HIGH,
-    /**
-     * The signal is low.
-     */
+    /** The signal is low. */
     LOW
   }
 
   /**
-   * Creates a new trigger based on the given condition. Polled by the scheduler's
-   * {@link Scheduler#getDefaultEventLoop() default event loop}.
+   * Creates a new trigger based on the given condition. Polled by the scheduler's {@link
+   * Scheduler#getDefaultEventLoop() default event loop}.
    *
    * @param scheduler The scheduler that should execute triggered commands.
    * @param condition the condition represented by this trigger
@@ -274,13 +270,12 @@ public class Trigger implements BooleanSupplier {
     }
   }
 
-  /**
-   * Removes bindings in inactive scopes.
-   */
+  /** Removes bindings in inactive scopes. */
   private void clearStaleBindings() {
-    m_bindings.forEach((_bindingType, bindings) -> {
-      bindings.removeIf(binding -> !binding.scope().active());
-    });
+    m_bindings.forEach(
+        (_bindingType, bindings) -> {
+          bindings.removeIf(binding -> !binding.scope().active());
+        });
   }
 
   /**
@@ -289,8 +284,7 @@ public class Trigger implements BooleanSupplier {
    * @param bindingType the binding type to schedule
    */
   private void scheduleBindings(BindingType bindingType) {
-    m_bindings.getOrDefault(bindingType, List.of())
-        .forEach(m_scheduler::schedule);
+    m_bindings.getOrDefault(bindingType, List.of()).forEach(m_scheduler::schedule);
   }
 
   /**
@@ -299,7 +293,8 @@ public class Trigger implements BooleanSupplier {
    * @param bindingType the binding type to cancel
    */
   private void cancelBindings(BindingType bindingType) {
-    m_bindings.getOrDefault(bindingType, List.of())
+    m_bindings
+        .getOrDefault(bindingType, List.of())
         .forEach(binding -> m_scheduler.cancel(binding.command()));
   }
 
@@ -324,18 +319,23 @@ public class Trigger implements BooleanSupplier {
   }
 
   private void addBinding(BindingType bindingType, Command command) {
-    BindingScope scope = switch (m_scheduler.currentCommand()) {
-      // A command is creating a binding - make it scoped to that specific command
-      case Command c -> BindingScope.forCommand(m_scheduler, c);
-
-      // Creating a binding outside a command - it's global in scope
-      case null -> BindingScope.global();
-    };
+    BindingScope scope =
+        switch (m_scheduler.currentCommand()) {
+          case Command c -> {
+            // A command is creating a binding - make it scoped to that specific command
+            yield BindingScope.forCommand(m_scheduler, c);
+          }
+          case null -> {
+            // Creating a binding outside a command - it's global in scope
+            yield BindingScope.global();
+          }
+        };
 
     Throwable t = new Throwable("Dummy error to get the binding trace");
     StackTraceElement[] frames = t.getStackTrace();
 
-    m_bindings.computeIfAbsent(bindingType, _k -> new ArrayList<>())
+    m_bindings
+        .computeIfAbsent(bindingType, _k -> new ArrayList<>())
         .add(new Binding(scope, bindingType, command, frames));
 
     // Ensure this trigger is bound to the event loop. NOP if already bound

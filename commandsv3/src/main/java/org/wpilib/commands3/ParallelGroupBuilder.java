@@ -11,10 +11,9 @@ import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 /**
- * A builder class to configure and then create a {@link ParallelGroup}. Like
- * {@link CommandBuilder}, the final command is created by calling the terminal
- * {@link #named(String)} method, or with an automatically generated name using
- * {@link #withAutomaticName()}.
+ * A builder class to configure and then create a {@link ParallelGroup}. Like {@link
+ * CommandBuilder}, the final command is created by calling the terminal {@link #named(String)}
+ * method, or with an automatically generated name using {@link #withAutomaticName()}.
  */
 public class ParallelGroupBuilder {
   private final Set<Command> m_commands = new LinkedHashSet<>();
@@ -22,8 +21,8 @@ public class ParallelGroupBuilder {
   private BooleanSupplier m_endCondition;
 
   /**
-   * Adds one or more optional commands to the group. They will not be required to complete for
-   * the parallel group to exit, and will be canceled once all required commands have finished.
+   * Adds one or more optional commands to the group. They will not be required to complete for the
+   * parallel group to exit, and will be canceled once all required commands have finished.
    *
    * @param commands The optional commands to add to the group
    * @return The builder object, for chaining
@@ -59,8 +58,8 @@ public class ParallelGroupBuilder {
   }
 
   /**
-   * Forces the group to be a pure race, where the group will finish after the first command in
-   * the group completes. All other commands in the group will be canceled.
+   * Forces the group to be a pure race, where the group will finish after the first command in the
+   * group completes. All other commands in the group will be canceled.
    *
    * @return The builder object, for chaining
    */
@@ -83,9 +82,9 @@ public class ParallelGroupBuilder {
 
   /**
    * Adds an end condition to the command group. If this condition is met before all required
-   * commands have completed, the group will exit early. If multiple end conditions are added
-   * (e.g. {@code .until(() -> conditionA()).until(() -> conditionB())}), then the last end
-   * condition added will be used and any previously configured condition will be overridden.
+   * commands have completed, the group will exit early. If multiple end conditions are added (e.g.
+   * {@code .until(() -> conditionA()).until(() -> conditionB())}), then the last end condition
+   * added will be used and any previously configured condition will be overridden.
    *
    * @param condition The end condition for the group
    * @return The builder object, for chaining
@@ -112,8 +111,8 @@ public class ParallelGroupBuilder {
 
     // We have a custom end condition, so we need to wrap the group in a race
     return ParallelGroup.builder()
-               .optional(group, Command.waitUntil(m_endCondition).named("Until Condition"))
-               .named(name);
+        .optional(group, Command.waitUntil(m_endCondition).named("Until Condition"))
+        .named(name);
   }
 
   /**

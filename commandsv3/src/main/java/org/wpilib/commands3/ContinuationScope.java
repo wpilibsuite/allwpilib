@@ -33,6 +33,7 @@ public final class ContinuationScope {
 
   /**
    * Constructs a new scope.
+   *
    * @param name The scope's name
    */
   public ContinuationScope(String name) {

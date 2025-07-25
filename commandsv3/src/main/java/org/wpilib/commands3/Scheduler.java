@@ -61,7 +61,6 @@ public class Scheduler implements ProtobufSerializable {
   /** The default scheduler instance. */
   private static final Scheduler s_defaultScheduler = new Scheduler();
 
-
   /**
    * Gets the default scheduler instance for use in a robot program. Some built in command types use
    * the default scheduler and will not work as expected if used on another scheduler instance.
@@ -183,12 +182,9 @@ public class Scheduler implements ProtobufSerializable {
    *     scheduled another command that shares at least one required resource
    */
   public ScheduleResult schedule(Command command) {
-    var binding = new Binding(
-        BindingScope.global(),
-        BindingType.IMMEDIATE,
-        command,
-        new Throwable().getStackTrace()
-    );
+    var binding =
+        new Binding(
+            BindingScope.global(), BindingType.IMMEDIATE, command, new Throwable().getStackTrace());
 
     return schedule(binding);
   }
@@ -222,11 +218,7 @@ public class Scheduler implements ProtobufSerializable {
     // so at this point we're guaranteed to be >= priority than anything already on deck
     evictConflictingOnDeckCommands(command);
 
-    var state = new CommandState(
-        command,
-        currentCommand(),
-        buildCoroutine(command),
-        binding);
+    var state = new CommandState(command, currentCommand(), buildCoroutine(command), binding);
 
     emitEvent(SchedulerEvent.scheduled(command));
 

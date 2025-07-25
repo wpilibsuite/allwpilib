@@ -72,8 +72,8 @@ public class RequireableResource {
   }
 
   /**
-   * Gets the default command that was set by the latest call to
-   * {@link #setDefaultCommand(Command)}.
+   * Gets the default command that was set by the latest call to {@link
+   * #setDefaultCommand(Command)}.
    *
    * @return The currently configured default command
    */
@@ -100,12 +100,13 @@ public class RequireableResource {
    * @return The command builder, for further configuration.
    */
   public CommandBuilder runRepeatedly(Runnable loopBody) {
-    return run(coroutine -> {
-      while (true) {
-        loopBody.run();
-        coroutine.yield();
-      }
-    });
+    return run(
+        coroutine -> {
+          while (true) {
+            loopBody.run();
+            coroutine.yield();
+          }
+        });
   }
 
   /**
@@ -113,7 +114,8 @@ public class RequireableResource {
    * has {@link Command#LOWEST_PRIORITY the lowest priority} and can be interrupted by any other
    * command.
    *
-   * <p>The default command for every claimable resource is an idle command.</p>
+   * <p>The default command for every claimable resource is an idle command.
+   *
    * @return A new idle command.
    */
   public Command idle() {
@@ -122,6 +124,7 @@ public class RequireableResource {
 
   /**
    * Returns a command that idles this resource for the given duration of time.
+   *
    * @param duration How long the resource should idle for.
    * @return A new idle command.
    */

@@ -41,7 +41,8 @@ public class CommandProto implements Protobuf<Command, ProtobufCommand> {
   @Override
   public void pack(ProtobufCommand msg, Command command) {
     msg.setId(m_scheduler.runId(command));
-    if (m_scheduler.getParentOf(command) instanceof Command parent) {
+    Command parent = m_scheduler.getParentOf(command);
+    if (parent != null) {
       msg.setParentId(m_scheduler.runId(parent));
     }
     msg.setName(command.name());

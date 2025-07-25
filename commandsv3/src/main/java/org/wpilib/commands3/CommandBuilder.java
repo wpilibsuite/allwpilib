@@ -149,8 +149,9 @@ public class CommandBuilder {
   }
 
   /**
-   * Makes the command run until some end condition is met, if it hasn't already finished by then
-   * on its own.
+   * Makes the command run until some end condition is met, if it hasn't already finished by then on
+   * its own.
+   *
    * @param endCondition The hard end condition for the command.
    * @return The builder object, for chaining.
    */
@@ -161,6 +162,7 @@ public class CommandBuilder {
 
   /**
    * Makes the command run while some condition is true, ending when the condition becomes inactive.
+   *
    * @param active The command active condition.
    * @return The builder object, for chaining.
    */
@@ -179,37 +181,38 @@ public class CommandBuilder {
     Objects.requireNonNull(m_name, "Name was not specified");
     Objects.requireNonNull(m_impl, "Command logic was not specified");
 
-    var command = new Command() {
-      @Override
-      public void run(Coroutine coroutine) {
-        m_impl.accept(coroutine);
-      }
+    var command =
+        new Command() {
+          @Override
+          public void run(Coroutine coroutine) {
+            m_impl.accept(coroutine);
+          }
 
-      @Override
-      public void onCancel() {
-        m_onCancel.run();
-      }
+          @Override
+          public void onCancel() {
+            m_onCancel.run();
+          }
 
-      @Override
-      public String name() {
-        return m_name;
-      }
+          @Override
+          public String name() {
+            return m_name;
+          }
 
-      @Override
-      public Set<RequireableResource> requirements() {
-        return m_requirements;
-      }
+          @Override
+          public Set<RequireableResource> requirements() {
+            return m_requirements;
+          }
 
-      @Override
-      public int priority() {
-        return m_priority;
-      }
+          @Override
+          public int priority() {
+            return m_priority;
+          }
 
-      @Override
-      public String toString() {
-        return m_name;
-      }
-    };
+          @Override
+          public String toString() {
+            return m_name;
+          }
+        };
 
     if (m_endCondition == null) {
       // No custom end condition, just return the raw command

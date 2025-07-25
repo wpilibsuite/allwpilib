@@ -153,6 +153,21 @@
     <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
   </Match>
   <Match>
+    <!-- Spotbugs can't tell the difference between a default instance and a singleton instance -->
+    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
+    <Class name="org.wpilib.commands3.Scheduler" />
+  </Match>
+  <Match>
+    <!-- We deliberately use a .get(-1) call here to force an exception to be raised outside of wpilib code -->
+    <Bug pattern="URF_UNREAD_FIELD" />
+    <Class name="org.wpilib.commands3.SchedulerTest" />
+  </Match>
+  <Match>
+    <!-- We deliberately use a .get(-1) call here to force an exception to be raised outside of wpilib code -->
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
+    <Class name="org.wpilib.commands3.SchedulerTest" />
+  </Match>
+  <Match>
     <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
     <Class name="~edu.wpi.first.math.geometry.Coordinate\w+" />
   </Match>

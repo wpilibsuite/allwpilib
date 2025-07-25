@@ -20,12 +20,10 @@ import org.junit.jupiter.api.Test;
 
 class CoroutineTest {
   Scheduler m_scheduler;
-  ContinuationScope m_scope;
 
   @BeforeEach
   void setup() {
     m_scheduler = new Scheduler();
-    m_scope = new ContinuationScope("Test Scope");
     RobotController.setTimeSource(() -> System.nanoTime() / 1000L);
   }
 
@@ -35,10 +33,13 @@ class CoroutineTest {
     var b = new NullCommand();
     var c = new NullCommand();
 
-    var all = Command.noRequirements(co -> {
-      co.fork(a, b, c);
-      co.park();
-    }).named("Fork Many");
+    var all =
+        Command.noRequirements(
+                co -> {
+                  co.fork(a, b, c);
+                  co.park();
+                })
+            .named("Fork Many");
 
     m_scheduler.schedule(all);
     m_scheduler.run();
@@ -52,14 +53,17 @@ class CoroutineTest {
     Object mutex = new Object();
     AtomicInteger i = new AtomicInteger(0);
 
-    var yieldInSynchronized = Command.noRequirements(co -> {
-      while (true) {
-        synchronized (mutex) {
-          i.incrementAndGet();
-          co.yield();
-        }
-      }
-    }).named("Yield In Synchronized Block");
+    var yieldInSynchronized =
+        Command.noRequirements(
+                co -> {
+                  while (true) {
+                    synchronized (mutex) {
+                      i.incrementAndGet();
+                      co.yield();
+                    }
+                  }
+                })
+            .named("Yield In Synchronized Block");
 
     m_scheduler.schedule(yieldInSynchronized);
 
@@ -80,17 +84,20 @@ class CoroutineTest {
     Lock lock = new ReentrantLock();
     AtomicInteger i = new AtomicInteger(0);
 
-    var yieldInLock = Command.noRequirements(co -> {
-      while (true) {
-        lock.lock();
-        try {
-          i.incrementAndGet();
-          co.yield();
-        } finally {
-          lock.unlock();
-        }
-      }
-    }).named("Increment In Lock Block");
+    var yieldInLock =
+        Command.noRequirements(
+                co -> {
+                  while (true) {
+                    lock.lock();
+                    try {
+                      i.incrementAndGet();
+                      co.yield();
+                    } finally {
+                      lock.unlock();
+                    }
+                  }
+                })
+            .named("Increment In Lock Block");
 
     m_scheduler.schedule(yieldInLock);
     m_scheduler.run();
@@ -101,9 +108,12 @@ class CoroutineTest {
   void coroutineEscapingCommand() {
     AtomicReference<Runnable> escapeeCallback = new AtomicReference<>();
 
-    var badCommand = Command.noRequirements(co -> {
-      escapeeCallback.set(co::yield);
-    }).named("Bad Command");
+    var badCommand =
+        Command.noRequirements(
+                co -> {
+                  escapeeCallback.set(co::yield);
+                })
+            .named("Bad Command");
 
     m_scheduler.schedule(badCommand);
     m_scheduler.run();
@@ -123,17 +133,23 @@ class CoroutineTest {
     AtomicBoolean ranAfterAwait = new AtomicBoolean(false);
 
     var firstInner = Command.noRequirements(c2 -> firstRan.set(true)).named("First");
-    var secondInner = Command.noRequirements(c2 -> {
-      secondRan.set(true);
-      c2.park();
-    }).named("Second");
+    var secondInner =
+        Command.noRequirements(
+                c2 -> {
+                  secondRan.set(true);
+                  c2.park();
+                })
+            .named("Second");
 
-    var outer = Command.noRequirements(co -> {
-      co.awaitAny(firstInner, secondInner);
+    var outer =
+        Command.noRequirements(
+                co -> {
+                  co.awaitAny(firstInner, secondInner);
 
-      ranAfterAwait.set(true);
-      co.park(); // prevent exiting
-    }).named("Command");
+                  ranAfterAwait.set(true);
+                  co.park(); // prevent exiting
+                })
+            .named("Command");
 
     m_scheduler.schedule(outer);
     m_scheduler.run();

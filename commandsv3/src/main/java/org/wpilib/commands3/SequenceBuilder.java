@@ -12,9 +12,9 @@ import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 /**
- * A builder class to configure and then create a {@link Sequence}. Like {@link CommandBuilder},
- * the final command is created by calling the terminal {@link #named(String)} method, or with
- * an automatically generated name using {@link #withAutomaticName()}.
+ * A builder class to configure and then create a {@link Sequence}. Like {@link CommandBuilder}, the
+ * final command is created by calling the terminal {@link #named(String)} method, or with an
+ * automatically generated name using {@link #withAutomaticName()}.
  */
 public class SequenceBuilder {
   private final List<Command> m_steps = new ArrayList<>();
@@ -35,9 +35,9 @@ public class SequenceBuilder {
 
   /**
    * Adds an end condition to the command group. If this condition is met before all required
-   * commands have completed, the group will exit early. If multiple end conditions are added
-   * (e.g. {@code .until(() -> conditionA()).until(() -> conditionB())}), then the last end
-   * condition added will be used and any previously configured condition will be overridden.
+   * commands have completed, the group will exit early. If multiple end conditions are added (e.g.
+   * {@code .until(() -> conditionA()).until(() -> conditionB())}), then the last end condition
+   * added will be used and any previously configured condition will be overridden.
    *
    * @param endCondition The end condition for the group
    * @return The builder object, for chaining
@@ -62,8 +62,8 @@ public class SequenceBuilder {
 
     // We have a custom end condition, so we need to wrap the group in a race
     return ParallelGroup.builder()
-               .optional(seq, Command.waitUntil(m_endCondition).named("Until Condition"))
-               .named(name);
+        .optional(seq, Command.waitUntil(m_endCondition).named("Until Condition"))
+        .named(name);
   }
 
   /**

@@ -28,7 +28,7 @@ public class Sequence implements Command {
   /**
    * Creates a new command sequence.
    *
-   * @param name     the name of the sequence
+   * @param name the name of the sequence
    * @param commands the commands to execute within the sequence
    */
   public Sequence(String name, List<Command> commands) {

@@ -45,14 +45,12 @@ class TriggerTest {
 
     m_scheduler.run();
     assertTrue(
-        m_scheduler.isRunning(command),
-        "Command should be scheduled when signal starts low");
+        m_scheduler.isRunning(command), "Command should be scheduled when signal starts low");
 
     signal.set(true);
     m_scheduler.run();
     assertTrue(
-        m_scheduler.isRunning(command),
-        "Command should still be running rising falling edge");
+        m_scheduler.isRunning(command), "Command should still be running rising falling edge");
   }
 
   @Test
@@ -65,15 +63,11 @@ class TriggerTest {
     signal.set(true);
     m_scheduler.run();
 
-    assertTrue(
-        m_scheduler.isRunning(command),
-        "Command was not scheduled on rising edge");
+    assertTrue(m_scheduler.isRunning(command), "Command was not scheduled on rising edge");
 
     signal.set(false);
     m_scheduler.run();
-    assertFalse(
-        m_scheduler.isRunning(command),
-        "Command should be cancelled on falling edge");
+    assertFalse(m_scheduler.isRunning(command), "Command should be cancelled on falling edge");
   }
 
   @Test
@@ -85,14 +79,11 @@ class TriggerTest {
 
     m_scheduler.run();
     assertTrue(
-        m_scheduler.isRunning(command),
-        "Command should be scheduled when signal starts low");
+        m_scheduler.isRunning(command), "Command should be scheduled when signal starts low");
 
     signal.set(true);
     m_scheduler.run();
-    assertFalse(
-        m_scheduler.isRunning(command),
-        "Command should be cancelled on rising edge");
+    assertFalse(m_scheduler.isRunning(command), "Command should be cancelled on rising edge");
   }
 
   @Test
@@ -142,17 +133,23 @@ class TriggerTest {
     var innerRan = new AtomicBoolean(false);
     var innerSignal = new AtomicBoolean(false);
 
-    var inner = Command.noRequirements(co -> {
-      while (true) {
-        innerRan.set(true);
-        co.park();
-      }
-    }).named("Inner");
+    var inner =
+        Command.noRequirements(
+                co -> {
+                  while (true) {
+                    innerRan.set(true);
+                    co.park();
+                  }
+                })
+            .named("Inner");
 
-    var outer = Command.noRequirements(co -> {
-      new Trigger(m_scheduler, innerSignal::get).onTrue(inner);
-      co.yield();
-    }).named("Outer");
+    var outer =
+        Command.noRequirements(
+                co -> {
+                  new Trigger(m_scheduler, innerSignal::get).onTrue(inner);
+                  co.yield();
+                })
+            .named("Outer");
 
     m_scheduler.schedule(outer);
     m_scheduler.run();

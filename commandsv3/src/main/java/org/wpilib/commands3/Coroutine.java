@@ -25,7 +25,7 @@ public final class Coroutine {
    * @param scheduler The scheduler running the coroutine
    * @param scope The continuation scope the coroutine's backing continuation runs in
    * @param callback The callback for the continuation to execute when mounted. Often a command
-   *                 function's body.
+   *     function's body.
    */
   Coroutine(Scheduler scheduler, ContinuationScope scope, Consumer<Coroutine> callback) {
     m_scheduler = scheduler;
@@ -51,8 +51,7 @@ public final class Coroutine {
             "Coroutine.yield() cannot be called inside a synchronized block or method. "
                 + "Consider using a Lock instead of synchronized, "
                 + "or rewrite your code to avoid locks and mutexes altogether.",
-            e
-        );
+            e);
       } else {
         // rethrow
         throw e;
@@ -75,21 +74,13 @@ public final class Coroutine {
   }
 
   /**
-   * Forks off a command. It will run until its natural completion, the parent command exits,
-   * or the parent command cancels it. The parent command will continue executing while the
-   * forked command runs, and can resync with the forked command using {@link #await(Command)}.
+   * Forks off a command. It will run until its natural completion, the parent command exits, or the
+   * parent command cancels it. The parent command will continue executing while the forked command
+   * runs, and can resync with the forked command using {@link #await(Command)}.
    *
-   * <p>{@snippet lang = java:
-   * Command example() {
-   *   return Command.noRequirements((coroutine) -> {
-   *     Command inner = ...;
-   *     coroutine.fork(inner);
-   *     // ... do more things
-   *     // then sync back up with the inner command
-   *     coroutine.await(inner);
-   *   }).named("Example");
-   * }
-   * }
+   * <p>{@snippet lang = java: Command example() { return Command.noRequirements((coroutine) -> {
+   * Command inner = ...; coroutine.fork(inner); // ... do more things // then sync back up with the
+   * inner command coroutine.await(inner); }).named("Example"); } }
    *
    * @param commands The commands to fork.
    */
@@ -203,8 +194,8 @@ public final class Coroutine {
    * a conflict is detected.
    *
    * @param commands The commands to validate
-   * @throws IllegalArgumentException If at least one pair of commands is found in the input
-   *     where both commands have at least one required resource in common
+   * @throws IllegalArgumentException If at least one pair of commands is found in the input where
+   *     both commands have at least one required resource in common
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   private static void validateNoConflicts(Collection<Command> commands) {
@@ -225,8 +216,7 @@ public final class Coroutine {
 
           throw new IllegalArgumentException(
               "Command %s requires resources that are already used by %s. Both require %s"
-                  .formatted(c2.name(), c1.name(), conflictNames)
-          );
+                  .formatted(c2.name(), c1.name(), conflictNames));
         }
       }
     }
@@ -238,15 +228,9 @@ public final class Coroutine {
    *
    * <p>For example, a basic autonomous routine that drives straight for 5 seconds:
    *
-   * {@snippet lang = java :
-   * Command timedDrive() {
-   *   return drivebase.run((coroutine) -> {
-   *     drivebase.tankDrive(1, 1);
-   *     coroutine.wait(Seconds.of(5));
-   *     drivebase.stop();
-   *   }).named("Timed Drive");
-   * }
-   * }
+   * <p>{@snippet lang = java : Command timedDrive() { return drivebase.run((coroutine) -> {
+   * drivebase.tankDrive(1, 1); coroutine.wait(Seconds.of(5)); drivebase.stop(); }).named("Timed
+   * Drive"); } }
    *
    * @param duration the duration of time to wait
    */
@@ -258,6 +242,7 @@ public final class Coroutine {
 
   /**
    * Yields until a condition is met.
+   *
    * @param condition The condition to wait for
    */
   public void waitUntil(BooleanSupplier condition) {

@@ -24,9 +24,7 @@ sealed interface BindingScope {
     return new ForCommand(scheduler, command);
   }
 
-  /**
-   * A global binding scope. Bindings in this scope are always active.
-   */
+  /** A global binding scope. Bindings in this scope are always active. */
   final class Global implements BindingScope {
     // No reason not to be a singleton.
     public static final Global INSTANCE = new Global();
@@ -38,8 +36,8 @@ sealed interface BindingScope {
   }
 
   /**
-   * A binding scoped to the lifetime of a specific command. This should be used when a binding
-   * is created within a command, tying the lifetime of the binding to the declaring command.
+   * A binding scoped to the lifetime of a specific command. This should be used when a binding is
+   * created within a command, tying the lifetime of the binding to the declaring command.
    *
    * @param scheduler The scheduler managing the command.
    * @param command The command being scoped to.

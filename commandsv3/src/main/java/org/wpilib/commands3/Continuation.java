@@ -16,10 +16,13 @@ public final class Continuation {
 
   static final Class<?> jdk_internal_vm_Continuation;
   private static final MethodHandle CONSTRUCTOR;
+
   @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
   private static final MethodHandle YIELD;
+
   @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
   private static final MethodHandle RUN;
+
   private static final MethodHandle IS_DONE;
 
   private static final MethodHandle java_lang_thread_setContinuation;
@@ -184,7 +187,6 @@ public final class Continuation {
   public String toString() {
     return m_continuation.toString();
   }
-
 
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   boolean isMounted() {
