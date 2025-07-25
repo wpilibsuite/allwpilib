@@ -47,10 +47,18 @@ def eigen_inclusions(dp: Path, f: str):
             or "SSE" in dp.parts
         )
 
+    if (
+        "StlSupport" in dp.parts
+        and not f.endswith("StdList.h")
+        and not f.endswith("StdDeque.h")
+    ):
+        return True
+
     # Include the following modules
     modules = [
         "Cholesky",
         "Core",
+        "Dense",
         "Eigenvalues",
         "Geometry",
         "Householder",
@@ -64,6 +72,7 @@ def eigen_inclusions(dp: Path, f: str):
         "SparseCore",
         "SparseLU",
         "SparseQR",
+        "StdVector",
         "misc",
         "plugins",
     ]
