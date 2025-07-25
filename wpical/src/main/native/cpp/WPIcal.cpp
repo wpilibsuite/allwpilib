@@ -20,11 +20,15 @@
 #include <frc/MathUtil.h>
 #include <frc/apriltag/AprilTag.h>
 #include <frc/apriltag/AprilTagFieldLayout.h>
+#include <glass/Context.h>
+#include <glass/MainMenuBar.h>
+#include <glass/Storage.h>
 #include <imgui.h>
 #include <portable-file-dialogs.h>
 #include <units/length.h>
 #include <wpi/json.h>
 #include <wpigui.h>
+#include <wpigui_openurl.h>
 
 namespace gui = wpi::gui;
 
@@ -47,6 +51,7 @@ std::string_view GetResource_wpical_512_png();
 }  // namespace wpical
 static frc::AprilTagFieldLayout gIdealFieldLayout;
 static std::string gInvalidLayoutPath;
+static glass::MainMenuBar gMainMenu;
 static wpical::CameraModel gCameraModel;
 
 void DrawCheck() {
@@ -506,6 +511,51 @@ void VisualizeCalibration() {
   }
 }
 
+static void DisplayMainMenu() {
+  ImGui::BeginMenuBar();
+
+  gMainMenu.WorkspaceMenu();
+  gui::EmitViewMenu();
+
+  bool about = false;
+  if (ImGui::BeginMenu("Info")) {
+    if (ImGui::MenuItem("About")) {
+      about = true;
+    }
+    ImGui::EndMenu();
+  }
+
+  if (ImGui::BeginMenu("Docs")) {
+    if (ImGui::MenuItem("Online documentation")) {
+      wpi::gui::OpenURL(
+          "https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/wpical/"
+          "index.html");
+    }
+    ImGui::EndMenu();
+  }
+
+  ImGui::EndMenuBar();
+
+  if (about) {
+    ImGui::OpenPopup("About");
+    about = false;
+  }
+  if (ImGui::BeginPopupModal("About", NULL,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::Text("WPIcal");
+    ImGui::Separator();
+    ImGui::Text("v%s", GetWPILibVersion());
+    ImGui::Separator();
+    ImGui::Text("Save location: %s", glass::GetStorageDir().c_str());
+    ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+                ImGui::GetIO().Framerate);
+    if (ImGui::Button("Close")) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+}
+
 static void DisplayGui() {
   ImGui::GetStyle().WindowRounding = 0;
 
@@ -521,13 +571,7 @@ static void DisplayGui() {
                    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                    ImGuiWindowFlags_NoCollapse);
 
-  // main menu
-  ImGui::BeginMenuBar();
-  gui::EmitViewMenu();
-  if (ImGui::BeginMenu("View")) {
-    ImGui::EndMenu();
-  }
-  ImGui::EndMenuBar();
+  DisplayMainMenu();
 
   static frc::AprilTagFieldLayout calibratedFieldLayout;
   static std::unique_ptr<pfd::select_folder> saveDirSelector;
@@ -674,6 +718,7 @@ int main(int argc, char** argv) {
   }
 
   gui::CreateContext();
+  glass::CreateContext();
 
   gui::AddIcon(wpical::GetResource_wpical_16_png());
   gui::AddIcon(wpical::GetResource_wpical_32_png());
@@ -683,11 +728,16 @@ int main(int argc, char** argv) {
   gui::AddIcon(wpical::GetResource_wpical_256_png());
   gui::AddIcon(wpical::GetResource_wpical_512_png());
 
+  glass::SetStorageName("wpical");
+  glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
+                                       : saveDir);
+
   gui::AddLateExecute(DisplayGui);
 
-  gui::Initialize("wpical", 900, 600);
+  gui::Initialize("WPIcal", 900, 600);
   gui::Main();
 
+  glass::DestroyContext();
   gui::DestroyContext();
 
   return 0;
