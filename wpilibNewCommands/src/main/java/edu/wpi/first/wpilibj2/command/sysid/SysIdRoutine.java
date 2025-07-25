@@ -10,7 +10,6 @@ import static edu.wpi.first.units.Units.Volts;
 import static java.util.Map.entry;
 
 import edu.wpi.first.units.VoltageUnit;
-import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -42,7 +41,6 @@ import java.util.function.Consumer;
 public class SysIdRoutine extends SysIdRoutineLog {
   private final Config m_config;
   private final Mechanism m_mechanism;
-  private final MutVoltage m_outputVolts = Volts.mutable(0);
   private final Consumer<State> m_recordState;
 
   /**
@@ -225,9 +223,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
             m_mechanism.m_subsystem.run(
                 () -> {
                   m_mechanism.m_drive.accept(
-                      m_outputVolts.mut_replace(
-                          outputSign * timer.get() * m_config.m_rampRate.in(Volts.per(Second)),
-                          Volts));
+                      (Voltage) m_config.m_rampRate.times(Seconds.of(timer.get() * outputSign)));
                   m_mechanism.m_log.accept(this);
                   m_recordState.accept(state);
                 }))
@@ -258,15 +254,15 @@ public class SysIdRoutine extends SysIdRoutineLog {
                 entry(Direction.kForward, State.kDynamicForward),
                 entry(Direction.kReverse, State.kDynamicReverse))
             .get(direction);
+    Voltage[] output = {Volts.zero()};
 
     return m_mechanism
         .m_subsystem
-        .runOnce(
-            () -> m_outputVolts.mut_replace(m_config.m_stepVoltage.in(Volts) * outputSign, Volts))
+        .runOnce(() -> output[0] = m_config.m_stepVoltage.times(outputSign))
         .andThen(
             m_mechanism.m_subsystem.run(
                 () -> {
-                  m_mechanism.m_drive.accept(m_outputVolts);
+                  m_mechanism.m_drive.accept(output[0]);
                   m_mechanism.m_log.accept(this);
                   m_recordState.accept(state);
                 }))

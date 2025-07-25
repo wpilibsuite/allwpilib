@@ -8,9 +8,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.units.measure.MutDistance;
-import edu.wpi.first.units.measure.MutLinearVelocity;
-import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -46,13 +43,6 @@ public class Drive extends SubsystemBase {
           DriveConstants.kRightEncoderPorts[1],
           DriveConstants.kRightEncoderReversed);
 
-  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
-  private final MutVoltage m_appliedVoltage = Volts.mutable(0);
-  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-  private final MutDistance m_distance = Meters.mutable(0);
-  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-  private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
-
   // Create a new SysId routine for characterizing the drive.
   private final SysIdRoutine m_sysIdRoutine =
       new SysIdRoutine(
@@ -70,21 +60,15 @@ public class Drive extends SubsystemBase {
                 // Record a frame for the left motors.  Since these share an encoder, we consider
                 // the entire group to be one motor.
                 log.motor("drive-left")
-                    .voltage(
-                        m_appliedVoltage.mut_replace(
-                            m_leftMotor.get() * RobotController.getBatteryVoltage(), Volts))
-                    .linearPosition(m_distance.mut_replace(m_leftEncoder.getDistance(), Meters))
-                    .linearVelocity(
-                        m_velocity.mut_replace(m_leftEncoder.getRate(), MetersPerSecond));
+                    .voltage(Volts.of(m_leftMotor.get() * RobotController.getBatteryVoltage()))
+                    .linearPosition(Meters.of(m_leftEncoder.getDistance()))
+                    .linearVelocity(MetersPerSecond.of(m_leftEncoder.getRate()));
                 // Record a frame for the right motors.  Since these share an encoder, we consider
                 // the entire group to be one motor.
                 log.motor("drive-right")
-                    .voltage(
-                        m_appliedVoltage.mut_replace(
-                            m_rightMotor.get() * RobotController.getBatteryVoltage(), Volts))
-                    .linearPosition(m_distance.mut_replace(m_rightEncoder.getDistance(), Meters))
-                    .linearVelocity(
-                        m_velocity.mut_replace(m_rightEncoder.getRate(), MetersPerSecond));
+                    .voltage(Volts.of(m_rightMotor.get() * RobotController.getBatteryVoltage()))
+                    .linearPosition(Meters.of(m_rightEncoder.getDistance()))
+                    .linearVelocity(MetersPerSecond.of(m_rightEncoder.getRate()));
               },
               // Tell SysId to make generated commands require this subsystem, suffix test state in
               // WPILog with this subsystem's name ("drive")

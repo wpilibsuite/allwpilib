@@ -86,16 +86,6 @@ public abstract class Unit {
   public abstract Measure<?> ofBaseUnits(double baseUnitMagnitude);
 
   /**
-   * Creates a new mutable measurement that is initialized to the given magnitude in terms of this
-   * unit. Implementations are <strong>strongly</strong> recommended to sharpen the return type to a
-   * unit-specific measurement implementation.
-   *
-   * @param initialMagnitude the initial magnitude of the mutable measurement
-   * @return the mutable measurement object
-   */
-  public abstract MutableMeasure<?, ?, ?> mutable(double initialMagnitude);
-
-  /**
    * Gets a measure of zero magnitude in terms of this unit. The returned object is guaranteed to be
    * of the same type returned by {@link #of(double)}. Subclasses are encouraged to override this
    * method to sharpen the return type.
