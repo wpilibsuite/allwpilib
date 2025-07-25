@@ -91,6 +91,7 @@ target_link_libraries(
     apriltag
     wpimath
     ${OpenCV_LIBS}
+    libglass
     wpigui
     wpiutil
     SuiteSparse::CHOLMOD_static
@@ -129,6 +130,7 @@ if(WITH_TESTS)
         apriltag
         wpimath
         ${OpenCV_LIBS}
+        libglass
         wpigui
         wpiutil
         SuiteSparse::CHOLMOD_static
