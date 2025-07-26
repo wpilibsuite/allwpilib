@@ -2,13 +2,12 @@ load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
-load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//ntcore:generate_ntcore.bzl", "generate_ntcore")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
-load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
+load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
 
 generate_ntcore(
     name = "generate_ntcore",
@@ -152,6 +151,8 @@ wpilib_cc_shared_library(
 wpilib_jni_java_library(
     name = "ntcore-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
+    maven_artifact_name = "ntcore-java",
+    maven_group_id = "edu.wpi.first.ntcore",
     native_libs = [":ntcorejni"],
     tags = ["maven_coordinates=edu.wpi.first.ntcore:ntcore-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
@@ -160,14 +161,6 @@ wpilib_jni_java_library(
         "//wpiutil:wpiutil-java",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
-)
-
-pkg_java_files(name = "ntcore-java-srcs")
-
-pkg_zip(
-    name = "libntcore-java-sources",
-    srcs = [":ntcore-java-srcs"],
-    out = "libntcore-java-sources.jar",
 )
 
 cc_test(
@@ -215,4 +208,10 @@ java_binary(
         "ntcore-java",
         "//wpiutil:wpiutil-java",
     ],
+)
+
+package_minimal_jni_project(
+    name = "ntcore",
+    maven_artifact_name = "ntcore-cpp",
+    maven_group_id = "edu.wpi.first.ntcore",
 )

@@ -1,10 +1,8 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
-load("@rules_java//java:defs.bzl", "java_binary", "java_library")
-load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
+load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
-load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
 load("//wpiunits:generate_wpiunits.bzl", "generate_wpiunits")
 
 py_binary(
@@ -32,20 +30,13 @@ write_source_files(
     visibility = ["//visibility:public"],
 )
 
-java_library(
+wpilib_java_library(
     name = "wpiunits-java",
     srcs = glob(["src/main/java/**/*.java"]) + glob(["src/generated/main/java/**/*.java"]),
-    tags = ["maven_coordinates=edu.wpi.first.wpiunits:wpiunits-java:$(WPILIB_VERSION)"],
+    maven_artifact_name = "wpiunits-java",
+    maven_group_id = "edu.wpi.first.wpiunits",
     visibility = ["//visibility:public"],
     deps = [],
-)
-
-pkg_java_files(name = "wpiunits-java-srcs")
-
-pkg_zip(
-    name = "libwpiunits-java-sources",
-    srcs = [":wpiunits-java-srcs"],
-    out = "libwpiunits-java-sources.jar",
 )
 
 wpilib_java_junit5_test(

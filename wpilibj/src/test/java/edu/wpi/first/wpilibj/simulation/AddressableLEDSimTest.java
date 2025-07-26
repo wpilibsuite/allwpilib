@@ -73,32 +73,32 @@ class AddressableLEDSimTest {
       System.out.println(Arrays.toString(data));
       assertEquals(9, data.length);
 
-      assertEquals((byte) 0, data[0]);
+      assertEquals((byte) 255, data[0]);
       assertEquals((byte) 0, data[1]);
-      assertEquals((byte) 255, data[2]);
+      assertEquals((byte) 0, data[2]);
 
       assertEquals((byte) 0, data[3]);
       assertEquals((byte) 255, data[4]);
       assertEquals((byte) 0, data[5]);
 
-      assertEquals((byte) 255, data[6]);
+      assertEquals((byte) 0, data[6]);
       assertEquals((byte) 0, data[7]);
-      assertEquals((byte) 0, data[8]);
+      assertEquals((byte) 255, data[8]);
 
       assertTrue(callback.wasTriggered());
       data = callback.getSetValue();
 
-      assertEquals((byte) 0, data[0]);
+      assertEquals((byte) 255, data[0]);
       assertEquals((byte) 0, data[1]);
-      assertEquals((byte) 255, data[2]);
+      assertEquals((byte) 0, data[2]);
 
       assertEquals((byte) 0, data[3]);
       assertEquals((byte) 255, data[4]);
       assertEquals((byte) 0, data[5]);
 
-      assertEquals((byte) 255, data[6]);
+      assertEquals((byte) 0, data[6]);
       assertEquals((byte) 0, data[7]);
-      assertEquals((byte) 0, data[8]);
+      assertEquals((byte) 255, data[8]);
     }
   }
 }

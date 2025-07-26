@@ -26,15 +26,15 @@
 
 using namespace hal;
 
-#define LEDS_PREFIX "/leds/"
+#define IO_PREFIX "/io/"
 
 namespace {
 
-constexpr const char* kRawKey = LEDS_PREFIX "raw";
+constexpr const char* kLedsKey = IO_PREFIX "leds";
 
 struct AddressableLEDs {
   explicit AddressableLEDs(nt::NetworkTableInstance inst)
-      : rawPub{inst.GetRawTopic(kRawKey).Publish(
+      : rawPub{inst.GetRawTopic(kLedsKey).Publish(
             "raw", {.periodic = 0.005, .sendAll = true})} {}
 
   nt::RawPublisher rawPub;

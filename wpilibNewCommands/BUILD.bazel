@@ -1,12 +1,11 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
-load("@rules_java//java:defs.bzl", "java_binary", "java_library")
-load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
+load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
-load("//shared/bazel/rules:packaging.bzl", "pkg_java_files")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
+load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
 load("//wpilibNewCommands:generate.bzl", "generate_wpilib_new_commands")
 
 py_binary(
@@ -93,10 +92,11 @@ wpilib_cc_static_library(
     deps = [":wpilibNewCommands"],
 )
 
-java_library(
+wpilib_java_library(
     name = "wpilibNewCommands-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
-    tags = ["maven_coordinates=edu.wpi.first.wpilibNewCommands:wpilibNewCommands-java:$(WPILIB_VERSION)"],
+    maven_artifact_name = "wpilibNewCommands-java",
+    maven_group_id = "edu.wpi.first.wpilibNewCommands",
     visibility = ["//visibility:public"],
     deps = [
         "//cscore:cscore-java",
@@ -108,14 +108,6 @@ java_library(
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
     ],
-)
-
-pkg_java_files(name = "wpilibNewCommands-java-srcs")
-
-pkg_zip(
-    name = "libwpilibNewCommands-java-sources",
-    srcs = [":wpilibNewCommands-java-srcs"],
-    out = "libwpilibNewCommands-java-sources.jar",
 )
 
 cc_test(
@@ -169,4 +161,10 @@ java_binary(
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
     ],
+)
+
+package_minimal_cc_project(
+    name = "wpilibNewCommands",
+    maven_artifact_name = "wpilibNewCommands-cpp",
+    maven_group_id = "edu.wpi.first.wpilibNewCommands",
 )

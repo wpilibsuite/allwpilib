@@ -2,9 +2,9 @@ load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
-load("@rules_java//java:defs.bzl", "java_library")
 load("@rules_java//java/common:java_info.bzl", "JavaInfo")
 load("@rules_pkg//:mappings.bzl", "filter_directory")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
 
 def _jni_headers_impl(ctx):
     include_dir = ctx.actions.declare_directory(ctx.attr.name + ".h")
@@ -75,7 +75,8 @@ def wpilib_jni_java_library(
     visibility = java_library_args.pop("visibility", default = None)
     testonly = java_library_args.pop("testonly", default = None)
     headers_name = name + ".hdrs"
-    java_library(
+
+    wpilib_java_library(
         name = name,
         visibility = visibility,
         testonly = testonly,

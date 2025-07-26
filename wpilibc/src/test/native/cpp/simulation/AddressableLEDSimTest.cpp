@@ -78,17 +78,17 @@ TEST(AddressableLEDSimTest, SetData) {
   auto cb = sim.RegisterDataCallback(
       [&](std::string_view, const unsigned char* buffer, unsigned int count) {
         ASSERT_EQ(count, 9u);
-        EXPECT_EQ(0, buffer[0]);
+        EXPECT_EQ(255u, buffer[0]);
         EXPECT_EQ(0, buffer[1]);
-        EXPECT_EQ(255u, buffer[2]);
+        EXPECT_EQ(0, buffer[2]);
 
         EXPECT_EQ(0, buffer[3]);
         EXPECT_EQ(255u, buffer[4]);
         EXPECT_EQ(0, buffer[5]);
 
-        EXPECT_EQ(255u, buffer[6]);
+        EXPECT_EQ(0, buffer[6]);
         EXPECT_EQ(0, buffer[7]);
-        EXPECT_EQ(0, buffer[8]);
+        EXPECT_EQ(255u, buffer[8]);
 
         callbackHit = true;
       },
