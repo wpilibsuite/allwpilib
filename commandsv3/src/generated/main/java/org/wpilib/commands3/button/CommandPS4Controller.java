@@ -29,7 +29,7 @@ public class CommandPS4Controller extends CommandGenericHID {
     super(port);
     m_hid = new PS4Controller(port);
   }
-  
+
   /**
    * Construct an instance of a controller.
    *

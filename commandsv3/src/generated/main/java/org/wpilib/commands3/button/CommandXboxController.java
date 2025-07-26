@@ -29,7 +29,7 @@ public class CommandXboxController extends CommandGenericHID {
     super(port);
     m_hid = new XboxController(port);
   }
-  
+
   /**
    * Construct an instance of a controller.
    *

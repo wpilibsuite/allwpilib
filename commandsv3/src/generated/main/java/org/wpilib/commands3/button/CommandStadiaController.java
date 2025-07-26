@@ -29,7 +29,7 @@ public class CommandStadiaController extends CommandGenericHID {
     super(port);
     m_hid = new StadiaController(port);
   }
-  
+
   /**
    * Construct an instance of a controller.
    *

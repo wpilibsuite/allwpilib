@@ -93,7 +93,7 @@ requires `innerResource` will cancel a running `outerCommand` - but only if `out
 *currently using* the inner resource at the time.
 
 **Effectively, all child commands in v3 are "proxied"**, using the v2 framework's definition, unless
-using the built-in ParallelGroup and Sequence compositions or explicitly adding child command 
+using the built-in ParallelGroup and Sequence compositions or explicitly adding child command
 requirements to the parent. However, child commands _cannot_ interrupt their parent, even if they
 share requirements, unlike proxy commands in v2.
 
@@ -177,7 +177,7 @@ co.yield(); // IllegalStateException
 
 ## Implementation Details
 
-### Nomenclature 
+### Nomenclature
 
 **Schedule**: Adding a command to a queue in the scheduler, requesting that that command start
 running in the next call to the scheduler’s `run()` method.
@@ -330,7 +330,7 @@ caused by loop timings for deeply nested commands.
 Scheduler state is serialized using protobuf. The scheduler will send a list of the currently queued
 commands and a list of the current running commands. Commands are serialized as (id: uint32,
 parent_id: uint32, name: string, priority: int32, required_resources: string array,
-last_time_ms: double, total_time_ms: double). Consumers can use the `id` and `parent_id` attributes 
+last_time_ms: double, total_time_ms: double). Consumers can use the `id` and `parent_id` attributes
 to reconstruct the tree structure, if desired. `id` and `parent_id` marginally increase the size of
 serialized data, but make the schema and deserialization quite simple.
 
