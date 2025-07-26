@@ -30,10 +30,13 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param gearing            The gear ratio of the arm (numbers greater than 1
    *                           represent reductions).
    * @param armLength          The length of the arm.
-   * @param minAngle           The minimum angle that the arm is capable of.
-   * @param maxAngle           The maximum angle that the arm is capable of.
+   * @param minAngle           The minimum angle that the arm is capable of,
+   *                           with 0 being horizontal.
+   * @param maxAngle           The maximum angle that the arm is capable of,
+   *                           with 0 being horizontal.
    * @param simulateGravity    Whether gravity should be simulated or not.
-   * @param startingAngle      The initial position of the arm.
+   * @param startingAngle      The initial position of the arm, with 0 being
+   *                           horizontal.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
   SingleJointedArmSim(const LinearSystem<2, 1, 2>& system,
@@ -52,10 +55,13 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * @param moi                The moment of inertia of the arm. This can be
    *                           calculated from CAD software.
    * @param armLength          The length of the arm.
-   * @param minAngle           The minimum angle that the arm is capable of.
-   * @param maxAngle           The maximum angle that the arm is capable of.
+   * @param minAngle           The minimum angle that the arm is capable of,
+   *                           with 0 being horizontal.
+   * @param maxAngle           The maximum angle that the arm is capable of,
+   *                           with 0 being horizontal.
    * @param simulateGravity    Whether gravity should be simulated or not.
-   * @param startingAngle      The initial position of the arm.
+   * @param startingAngle      The initial position of the arm, with 0 being
+   *                           horizontal.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
   SingleJointedArmSim(const DCMotor& gearbox, double gearing,
