@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Windows (native)",             os: windows-2022, action: "test",  config: "--config=windows",     }
+          - { name: "Windows (native)",             os: windows-2022, action: "test",  config: "",     }
           - { name: "Windows (arm)",                os: windows-2022, action: "build", config: "--config=windows_arm", }
 
     name: "Build ${{ matrix.name }}"
