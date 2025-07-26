@@ -5,15 +5,14 @@ include(CompileWarnings)
 include(AddTest)
 
 if(WITH_JAVA)
-    find_package(Java REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java src/generated/main/java/*.java)
     add_jar(
         commandsv3_jar
         ${JAVA_SOURCES}
         INCLUDE_JARS
+            datalog_jar
             hal_jar
             ntcore_jar
             cscore_jar
@@ -23,6 +22,7 @@ if(WITH_JAVA)
             wpiutil_jar
             wpilibj_jar
         OUTPUT_NAME commandsv3
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
 
     install_jar(commandsv3_jar DESTINATION ${java_lib_dest})
@@ -34,22 +34,18 @@ if(WITH_JAVA)
 endif()
 
 if(WITH_JAVA_SOURCE)
-    find_package(Java REQUIRED)
     include(UseJava)
-    file(GLOB commandsv3_SOURCES src/main/java/edu/wpi/first/wpilibj/commandsv3/*.java)
-    file(GLOB commandsv3_BUTTON_SOURCES src/main/java/edu/wpi/first/wpilibj2/command/button*.java)
-    add_jar(
+    include(CreateSourceJar)
+    add_source_jar(
         commandsv3_src_jar
-        RESOURCES
-        NAMESPACE "edu/wpi/first/wpilibj/commandsv3" ${commandsv3_SOURCES}
-        NAMESPACE "edu/wpi/first/wpilibj/commandsv3/button" ${commandsv3_BUTTON_SOURCES}
+        BASE_DIRECTORIES
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/java
         OUTPUT_NAME commandsv3-sources
+        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
     )
-
-    get_property(commandsv3_SRC_JAR_FILE TARGET commandsv3_src_jar PROPERTY JAR_FILE)
-    install(FILES ${commandsv3_SRC_JAR_FILE} DESTINATION "${java_lib_dest}")
-
     set_property(TARGET commandsv3_src_jar PROPERTY FOLDER "java")
+    install_jar(commandsv3_src_jar DESTINATION ${java_lib_dest})
 endif()
 
 install(TARGETS commandsv3 EXPORT commandsv3)
