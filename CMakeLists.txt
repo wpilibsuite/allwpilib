@@ -290,6 +290,7 @@ set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIS
 set(SELF_DIR "$\{SELF_DIR\}")
 set(WPIUNITS_DEP_REPLACE_IMPL "find_dependency(wpiunits)")
 set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
+set(DATALOG_DEP_REPLACE "find_dependency(datalog)")
 add_subdirectory(wpiutil)
 
 add_subdirectory(datalog)
