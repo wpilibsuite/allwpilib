@@ -127,7 +127,6 @@ wpilib_jni_java_library(
     native_libs = [":apriltagjni"],
     resource_strip_prefix = "apriltag/src/main/native/resources",
     resources = glob(["src/main/native/resources/**"]),
-    tags = ["maven_coordinates=edu.wpi.first.apriltag:apriltag-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "//wpimath:wpimath-java",

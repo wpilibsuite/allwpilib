@@ -203,7 +203,6 @@ wpilib_jni_java_library(
     maven_artifact_name = "wpinet-java",
     maven_group_id = "edu.wpi.first.wpinet",
     native_libs = [":wpinetjni"],
-    tags = ["maven_coordinates=edu.wpi.first.wpinet:wpinet-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "//wpiutil:wpiutil-java",

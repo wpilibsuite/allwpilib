@@ -154,7 +154,6 @@ wpilib_jni_java_library(
     maven_artifact_name = "ntcore-java",
     maven_group_id = "edu.wpi.first.ntcore",
     native_libs = [":ntcorejni"],
-    tags = ["maven_coordinates=edu.wpi.first.ntcore:ntcore-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "//datalog:datalog-java",

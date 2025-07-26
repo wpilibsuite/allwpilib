@@ -40,7 +40,6 @@ wpilib_java_library(
     maven_group_id = "edu.wpi.first.fieldImages",
     resource_strip_prefix = "fieldImages/src/main/native/resources",
     resources = glob(["src/main/native/resources/**"]),
-    tags = ["maven_coordinates=edu.wpi.first.fieldImages:fieldImages-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "@maven//:com_fasterxml_jackson_core_jackson_annotations",

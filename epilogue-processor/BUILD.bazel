@@ -10,7 +10,6 @@ wpilib_java_library(
     maven_group_id = "edu.wpi.first.epilogue",
     resource_strip_prefix = "epilogue-processor/src/main/resources/",
     resources = glob(["src/main/resources/**"]),
-    tags = ["maven_coordinates=edu.wpi.first.epilogue:epilogue-processor-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     runtime_deps = [
         "//wpilibNewCommands:wpilibNewCommands-java",

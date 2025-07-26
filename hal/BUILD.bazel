@@ -176,7 +176,6 @@ wpilib_jni_java_library(
     maven_artifact_name = "hal-java",
     maven_group_id = "edu.wpi.first.hal",
     native_libs = [":wpiHaljni"],
-    tags = ["maven_coordinates=edu.wpi.first.hal:hal-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "//ntcore:ntcore-java",

@@ -71,7 +71,6 @@ wpilib_jni_java_library(
     maven_artifact_name = "datalog-java",
     maven_group_id = "edu.wpi.first.datalog",
     native_libs = [":datalogjni"],
-    tags = ["maven_coordinates=edu.wpi.first.datalog:datalog-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "//wpiutil:wpiutil-java",

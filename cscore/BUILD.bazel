@@ -222,7 +222,6 @@ wpilib_jni_java_library(
     maven_artifact_name = "cscore-java",
     maven_group_id = "edu.wpi.first.cscore",
     native_libs = [":cscorejni"],
-    tags = ["maven_coordinates=edu.wpi.first.cscore:cscore-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "//wpiutil:wpiutil-java",

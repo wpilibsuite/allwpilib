@@ -219,7 +219,6 @@ wpilib_jni_java_library(
     native_libs = [":wpimathjni"],
     resource_strip_prefix = "wpimath/src/main/proto",
     resources = glob(["src/main/proto/**"]),
-    tags = ["maven_coordinates=edu.wpi.first.wpimath:wpimath-java:$(WPILIB_VERSION)"],
     visibility = ["//visibility:public"],
     deps = [
         "//wpiunits:wpiunits-java",
