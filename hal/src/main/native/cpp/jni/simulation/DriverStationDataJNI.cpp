@@ -427,11 +427,11 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setMatchTime
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickAxes
- * Signature: (B[F)V
+ * Signature: (B[FS)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxes
-  (JNIEnv* env, jclass, jbyte joystickNum, jfloatArray axesArray)
+  (JNIEnv* env, jclass, jbyte joystickNum, jfloatArray axesArray, jshort availableAxes)
 {
   HAL_JoystickAxes axes;
   {
@@ -440,7 +440,7 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxes
     auto arraySize = arrayRef.size();
     int maxCount =
         arraySize < HAL_kMaxJoystickAxes ? arraySize : HAL_kMaxJoystickAxes;
-    axes.count = maxCount;
+    axes.available = availableAxes;
     for (int i = 0; i < maxCount; i++) {
       axes.axes[i] = arrayRef[i];
     }
@@ -452,11 +452,11 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxes
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickPOVs
- * Signature: (B[B)V
+ * Signature: (B[BS)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVs
-  (JNIEnv* env, jclass, jbyte joystickNum, jbyteArray povsArray)
+  (JNIEnv* env, jclass, jbyte joystickNum, jbyteArray povsArray, jshort availablePovs)
 {
   HAL_JoystickPOVs povs;
   {
@@ -465,7 +465,7 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVs
     auto arraySize = arrayRef.size();
     int maxCount =
         arraySize < HAL_kMaxJoystickPOVs ? arraySize : HAL_kMaxJoystickPOVs;
-    povs.count = maxCount;
+    povs.available = availablePovs;
     for (int i = 0; i < maxCount; i++) {
       povs.povs[i] = static_cast<HAL_JoystickPOV>(arrayRef[i]);
     }
@@ -477,17 +477,14 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVs
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickButtons
- * Signature: (BII)V
+ * Signature: (BIZZ)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButtons
-  (JNIEnv* env, jclass, jbyte joystickNum, jint buttons, jint count)
+  (JNIEnv* env, jclass, jbyte joystickNum, jlong buttons, jlong availableButtons)
 {
-  if (count > 32) {
-    count = 32;
-  }
   HAL_JoystickButtons joystickButtons;
-  joystickButtons.count = count;
+  joystickButtons.available = availableButtons;
   joystickButtons.buttons = buttons;
   HALSIM_SetJoystickButtons(joystickNum, &joystickButtons);
 }
@@ -665,38 +662,38 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButtonsValue
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    setJoystickAxisCount
+ * Method:    setJoystickAxesAvailable
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxisCount
-  (JNIEnv*, jclass, jint stick, jint count)
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxesAvailable
+  (JNIEnv*, jclass, jint stick, jint available)
 {
-  HALSIM_SetJoystickAxisCount(stick, count);
+  HALSIM_SetJoystickAxesAvailable(stick, available);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    setJoystickPOVCount
+ * Method:    setJoystickPOVsAvailable
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVCount
-  (JNIEnv*, jclass, jint stick, jint count)
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVsAvailable
+  (JNIEnv*, jclass, jint stick, jint available)
 {
-  HALSIM_SetJoystickPOVCount(stick, count);
+  HALSIM_SetJoystickPOVsAvailable(stick, available);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    setJoystickButtonCount
+ * Method:    setJoystickButtonsAvailable
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButtonCount
-  (JNIEnv*, jclass, jint stick, jint count)
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButtonsAvailable
+  (JNIEnv*, jclass, jint stick, jlong available)
 {
-  HALSIM_SetJoystickButtonCount(stick, count);
+  HALSIM_SetJoystickButtonsAvailable(stick, available);
 }
 
 /*
@@ -735,18 +732,6 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickName
   JStringRef nameJString{env, name};
   auto str = wpi::make_string(nameJString);
   HALSIM_SetJoystickName(stick, &str);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    setJoystickAxisType
- * Signature: (III)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxisType
-  (JNIEnv*, jclass, jint stick, jint axis, jint type)
-{
-  HALSIM_SetJoystickAxisType(stick, axis, type);
 }
 
 /*

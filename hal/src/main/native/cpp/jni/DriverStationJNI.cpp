@@ -135,140 +135,39 @@ Java_edu_wpi_first_hal_DriverStationJNI_nativeGetAllianceStation
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getJoystickAxesRaw
- * Signature: (B[S)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxesRaw
-  (JNIEnv* env, jclass, jbyte joystickNum, jshortArray axesRawArray)
-{
-  HAL_JoystickAxes axes;
-  HAL_GetJoystickAxes(joystickNum, &axes);
-
-  jsize javaSize = env->GetArrayLength(axesRawArray);
-  if (axes.count > javaSize) {
-    ThrowIllegalArgumentException(
-        env,
-        fmt::format("Native array size larger then passed in java array "
-                    "size\nNative Size: {} Java Size: {}",
-                    static_cast<int>(axes.count), static_cast<int>(javaSize)));
-    return 0;
-  }
-
-  env->SetShortArrayRegion(axesRawArray, 0, axes.count, axes.raw);
-
-  return axes.count;
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getJoystickAxes
- * Signature: (B[F)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxes
-  (JNIEnv* env, jclass, jbyte joystickNum, jfloatArray axesArray)
-{
-  HAL_JoystickAxes axes;
-  HAL_GetJoystickAxes(joystickNum, &axes);
-
-  jsize javaSize = env->GetArrayLength(axesArray);
-  if (axes.count > javaSize) {
-    ThrowIllegalArgumentException(
-        env,
-        fmt::format("Native array size larger then passed in java array "
-                    "size\nNative Size: {} Java Size: {}",
-                    static_cast<int>(axes.count), static_cast<int>(javaSize)));
-    return 0;
-  }
-
-  env->SetFloatArrayRegion(axesArray, 0, axes.count, axes.axes);
-
-  return axes.count;
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getJoystickPOVs
- * Signature: (B[B)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickPOVs
-  (JNIEnv* env, jclass, jbyte joystickNum, jbyteArray povsArray)
-{
-  HAL_JoystickPOVs povs;
-  HAL_GetJoystickPOVs(joystickNum, &povs);
-
-  jsize javaSize = env->GetArrayLength(povsArray);
-  if (povs.count > javaSize) {
-    ThrowIllegalArgumentException(
-        env,
-        fmt::format("Native array size larger then passed in java array "
-                    "size\nNative Size: {} Java Size: {}",
-                    static_cast<int>(povs.count), static_cast<int>(javaSize)));
-    return 0;
-  }
-
-  env->SetByteArrayRegion(povsArray, 0, povs.count,
-                          reinterpret_cast<const jbyte*>(povs.povs));
-
-  return povs.count;
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
  * Method:    getAllJoystickData
- * Signature: ([F[S[B[J)V
+ * Signature: (I[F[S[B[J)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_DriverStationJNI_getAllJoystickData
-  (JNIEnv* env, jclass cls, jfloatArray axesArray, jshortArray rawAxesArray,
+  (JNIEnv* env, jclass cls, jint stick, jfloatArray axesArray, jshortArray rawAxesArray,
    jbyteArray povsArray, jlongArray buttonsAndMetadataArray)
 {
-  HAL_JoystickAxes axes[HAL_kMaxJoysticks];
-  HAL_JoystickPOVs povs[HAL_kMaxJoysticks];
-  HAL_JoystickButtons buttons[HAL_kMaxJoysticks];
+  HAL_JoystickAxes axes;
+  HAL_JoystickPOVs povs;
+  HAL_JoystickButtons buttons;
 
-  HAL_GetAllJoystickData(axes, povs, buttons);
+  HAL_GetAllJoystickData(stick, &axes, &povs, &buttons);
 
   CriticalJSpan<jfloat> jAxes(env, axesArray);
   CriticalJSpan<jshort> jRawAxes(env, rawAxesArray);
   CriticalJSpan<jbyte> jPovs(env, povsArray);
   CriticalJSpan<jlong> jButtons(env, buttonsAndMetadataArray);
 
-  static_assert(sizeof(jAxes[0]) == sizeof(axes[0].axes[0]));
-  static_assert(sizeof(jRawAxes[0]) == sizeof(axes[0].raw[0]));
-  static_assert(sizeof(jPovs[0]) == sizeof(povs[0].povs[0]));
+  static_assert(sizeof(jAxes[0]) == sizeof(axes.axes[0]));
+  static_assert(sizeof(jRawAxes[0]) == sizeof(axes.raw[0]));
+  static_assert(sizeof(jPovs[0]) == sizeof(povs.povs[0]));
 
-  for (size_t i = 0; i < HAL_kMaxJoysticks; i++) {
-    std::memcpy(&jAxes[i * HAL_kMaxJoystickAxes], axes[i].axes,
-                sizeof(axes[i].axes));
-    std::memcpy(&jRawAxes[i * HAL_kMaxJoystickAxes], axes[i].raw,
-                sizeof(axes[i].raw));
-    std::memcpy(&jPovs[i * HAL_kMaxJoystickPOVs], povs[i].povs,
-                sizeof(povs[i].povs));
-    jButtons[i * 4] = axes[i].count;
-    jButtons[(i * 4) + 1] = povs[i].count;
-    jButtons[(i * 4) + 2] = buttons[i].count;
-    jButtons[(i * 4) + 3] = buttons[i].buttons;
-  }
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getJoystickButtons
- * Signature: (BLjava/lang/Object;)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickButtons
-  (JNIEnv* env, jclass, jbyte joystickNum, jobject count)
-{
-  HAL_JoystickButtons joystickButtons;
-  HAL_GetJoystickButtons(joystickNum, &joystickButtons);
-  jbyte* countPtr =
-      reinterpret_cast<jbyte*>(env->GetDirectBufferAddress(count));
-  *countPtr = joystickButtons.count;
-  return joystickButtons.buttons;
+  std::memcpy(&jAxes[0], axes.axes,
+              sizeof(axes.axes));
+  std::memcpy(&jRawAxes[0], axes.raw,
+              sizeof(axes.raw));
+  std::memcpy(&jPovs[0], povs.povs,
+              sizeof(povs.povs));
+  jButtons[0] = axes.available;
+  jButtons[1] = povs.available;
+  jButtons[2] = buttons.available;
+  jButtons[3] = buttons.buttons;
 }
 
 /*
@@ -321,18 +220,6 @@ Java_edu_wpi_first_hal_DriverStationJNI_getJoystickName
   jstring str = MakeJString(env, wpi::to_string_view(&joystickName));
   WPI_FreeString(&joystickName);
   return str;
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    getJoystickAxisType
- * Signature: (BB)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_getJoystickAxisType
-  (JNIEnv*, jclass, jbyte joystickNum, jbyte axis)
-{
-  return HAL_GetJoystickAxisType(joystickNum, axis);
 }
 
 /*

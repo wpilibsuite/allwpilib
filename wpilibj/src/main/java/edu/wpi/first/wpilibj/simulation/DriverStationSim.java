@@ -380,14 +380,22 @@ public final class DriverStationSim {
     DriverStationDataJNI.setJoystickButtonsValue(stick, buttons);
   }
 
+  public static void setJoystickAxesMaximumIndex(int stick, int maximumIndex) {
+    setJoystickAxesAvailable(stick, (1 << maximumIndex) - 1);
+  }
+
   /**
    * Sets the number of axes for a joystick.
    *
    * @param stick The joystick number
    * @param count The number of axes on the indicated joystick
    */
-  public static void setJoystickAxisCount(int stick, int count) {
-    DriverStationDataJNI.setJoystickAxisCount(stick, count);
+  public static void setJoystickAxesAvailable(int stick, int count) {
+    DriverStationDataJNI.setJoystickAxesAvailable(stick, count);
+  }
+
+  public static void setJoystickPOVsMaximumIndex(int stick, int maximumIndex) {
+    setJoystickPOVsAvailable(stick, (1 << maximumIndex) - 1);
   }
 
   /**
@@ -396,8 +404,16 @@ public final class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of POVs on the indicated joystick
    */
-  public static void setJoystickPOVCount(int stick, int count) {
-    DriverStationDataJNI.setJoystickPOVCount(stick, count);
+  public static void setJoystickPOVsAvailable(int stick, int count) {
+    DriverStationDataJNI.setJoystickPOVsAvailable(stick, count);
+  }
+
+  public static void setJoystickButtonsMaximumIndex(int stick, int maximumIndex) {
+    if (maximumIndex >= 64) {
+      setJoystickButtonsAvailable(stick, 0xFFFFFFFFFFFFFFFFL);
+    } else {
+      setJoystickButtonsAvailable(stick, (1L << maximumIndex) - 1);
+    }
   }
 
   /**
@@ -406,8 +422,8 @@ public final class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of buttons on the indicated joystick
    */
-  public static void setJoystickButtonCount(int stick, int count) {
-    DriverStationDataJNI.setJoystickButtonCount(stick, count);
+  public static void setJoystickButtonsAvailable(int stick, long count) {
+    DriverStationDataJNI.setJoystickButtonsAvailable(stick, count);
   }
 
   /**
@@ -438,17 +454,6 @@ public final class DriverStationSim {
    */
   public static void setJoystickName(int stick, String name) {
     DriverStationDataJNI.setJoystickName(stick, name);
-  }
-
-  /**
-   * Sets the types of Axes for a joystick.
-   *
-   * @param stick The joystick number
-   * @param axis The target axis
-   * @param type The type of axis
-   */
-  public static void setJoystickAxisType(int stick, int axis, int type) {
-    DriverStationDataJNI.setJoystickAxisType(stick, axis, type);
   }
 
   /**

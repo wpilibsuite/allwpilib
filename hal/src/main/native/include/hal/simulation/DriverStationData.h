@@ -137,20 +137,20 @@ void HALSIM_CancelMatchInfoCallback(int32_t uid);
 void HALSIM_GetMatchInfo(HAL_MatchInfo* info);
 void HALSIM_SetMatchInfo(const HAL_MatchInfo* info);
 
-void HALSIM_SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state);
+void HALSIM_SetJoystickButton(int32_t stick, uint64_t button, HAL_Bool state);
 void HALSIM_SetJoystickAxis(int32_t stick, int32_t axis, double value);
 void HALSIM_SetJoystickPOV(int32_t stick, int32_t pov, HAL_JoystickPOV value);
-void HALSIM_SetJoystickButtonsValue(int32_t stick, uint32_t buttons);
-void HALSIM_SetJoystickAxisCount(int32_t stick, int32_t count);
-void HALSIM_SetJoystickPOVCount(int32_t stick, int32_t count);
-void HALSIM_SetJoystickButtonCount(int32_t stick, int32_t count);
-void HALSIM_GetJoystickCounts(int32_t stick, int32_t* axisCount,
-                              int32_t* buttonCount, int32_t* povCount);
+void HALSIM_SetJoystickButtonsValue(int32_t stick, uint64_t buttons);
+void HALSIM_SetJoystickAxesAvailable(int32_t stick, uint16_t available);
+void HALSIM_SetJoystickPOVsAvailable(int32_t stick, uint8_t available);
+void HALSIM_SetJoystickButtonsAvailable(int32_t stick, uint64_t available);
+void HALSIM_GetJoystickAvailables(int32_t stick, uint16_t* axesAvailable,
+                                  uint64_t* buttonsAvailable,
+                                  uint8_t* povsAvailable);
 
 void HALSIM_SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad);
 void HALSIM_SetJoystickType(int32_t stick, int32_t type);
 void HALSIM_SetJoystickName(int32_t stick, const struct WPI_String* name);
-void HALSIM_SetJoystickAxisType(int32_t stick, int32_t axis, int32_t type);
 
 void HALSIM_SetGameSpecificMessage(const struct WPI_String* message);
 void HALSIM_SetEventName(const struct WPI_String* name);

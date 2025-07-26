@@ -22,7 +22,6 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.util.EventVector;
 import edu.wpi.first.util.WPIUtilJNI;
-import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -33,14 +32,32 @@ public final class DriverStation {
   /** Number of Joystick ports. */
   public static final int kJoystickPorts = 6;
 
+  private static final long[] m_metadataCache = new long[4];
+
+  private static int availableToCount(long available) {
+    // Top bit has to be set
+    if (available < 0) {
+      return 64;
+    }
+
+    int count = 0;
+
+    // Top bit not set, we will eventually get a 0 bit
+    while ((available & 0x1) != 0) {
+      count++;
+      available >>= 1;
+    }
+    return count;
+  }
+
   private static final class HALJoystickButtons {
-    public int m_buttons;
-    public byte m_count;
+    public long m_buttons;
+    public long m_available;
   }
 
   private static class HALJoystickAxes {
     public final float[] m_axes;
-    public int m_count;
+    public int m_available;
 
     HALJoystickAxes(int count) {
       m_axes = new float[count];
@@ -51,7 +68,7 @@ public final class DriverStation {
     public final short[] m_axes;
 
     @SuppressWarnings("unused")
-    public int m_count;
+    public int m_available;
 
     HALJoystickAxesRaw(int count) {
       m_axes = new short[count];
@@ -60,7 +77,7 @@ public final class DriverStation {
 
   private static class HALJoystickPOVs {
     public final byte[] m_povs;
-    public int m_count;
+    public int m_available;
 
     HALJoystickPOVs(int count) {
       m_povs = new byte[count];
@@ -294,18 +311,18 @@ public final class DriverStation {
 
     public void send(long timestamp) {
       HALJoystickButtons buttons = m_joystickButtons[m_stick];
-      if (buttons.m_count != m_prevButtons.m_count
+      if (buttons.m_available != m_prevButtons.m_available
           || buttons.m_buttons != m_prevButtons.m_buttons) {
         appendButtons(buttons, timestamp);
       }
 
       HALJoystickAxes axes = m_joystickAxes[m_stick];
-      int count = axes.m_count;
+      int available = axes.m_available;
       boolean needToLog = false;
-      if (count != m_prevAxes.m_count) {
+      if (available != m_prevAxes.m_available) {
         needToLog = true;
       } else {
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < m_prevAxes.m_axes.length; i++) {
           if (axes.m_axes[i] != m_prevAxes.m_axes[i]) {
             needToLog = true;
             break;
@@ -317,12 +334,12 @@ public final class DriverStation {
       }
 
       HALJoystickPOVs povs = m_joystickPOVs[m_stick];
-      count = m_joystickPOVs[m_stick].m_count;
+      available = m_joystickPOVs[m_stick].m_available;
       needToLog = false;
-      if (count != m_prevPOVs.m_count) {
+      if (available != m_prevPOVs.m_available) {
         needToLog = true;
       } else {
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < m_prevPOVs.m_povs.length; i++) {
           if (povs.m_povs[i] != m_prevPOVs.m_povs[i]) {
             needToLog = true;
             break;
@@ -335,33 +352,33 @@ public final class DriverStation {
     }
 
     void appendButtons(HALJoystickButtons buttons, long timestamp) {
-      byte count = buttons.m_count;
+      int count = availableToCount(buttons.m_available);
       if (m_sizedButtons == null || m_sizedButtons.length != count) {
         m_sizedButtons = new boolean[count];
       }
-      int buttonsValue = buttons.m_buttons;
+      long buttonsValue = buttons.m_buttons;
       for (int i = 0; i < count; i++) {
-        m_sizedButtons[i] = (buttonsValue & (1 << i)) != 0;
+        m_sizedButtons[i] = (buttonsValue & (1L << i)) != 0;
       }
       m_logButtons.append(m_sizedButtons, timestamp);
-      m_prevButtons.m_count = count;
+      m_prevButtons.m_available = buttons.m_available;
       m_prevButtons.m_buttons = buttons.m_buttons;
     }
 
     void appendAxes(HALJoystickAxes axes, long timestamp) {
-      int count = axes.m_count;
+      int count = availableToCount(axes.m_available);
       if (m_sizedAxes == null || m_sizedAxes.length != count) {
         m_sizedAxes = new float[count];
       }
       System.arraycopy(axes.m_axes, 0, m_sizedAxes, 0, count);
       m_logAxes.append(m_sizedAxes, timestamp);
-      m_prevAxes.m_count = count;
+      m_prevAxes.m_available = axes.m_available;
       System.arraycopy(axes.m_axes, 0, m_prevAxes.m_axes, 0, count);
     }
 
     @SuppressWarnings("PMD.AvoidArrayLoops")
     void appendPOVs(HALJoystickPOVs povs, long timestamp) {
-      int count = povs.m_count;
+      int count = availableToCount(povs.m_available);
       if (m_sizedPOVs == null || m_sizedPOVs.length != count) {
         m_sizedPOVs = new long[count];
       }
@@ -369,7 +386,7 @@ public final class DriverStation {
         m_sizedPOVs[i] = povs.m_povs[i];
       }
       m_logPOVs.append(m_sizedPOVs, timestamp);
-      m_prevPOVs.m_count = count;
+      m_prevPOVs.m_available = povs.m_available;
       System.arraycopy(povs.m_povs, 0, m_prevPOVs.m_povs, 0, count);
     }
 
@@ -477,11 +494,8 @@ public final class DriverStation {
   private static ControlWord m_controlWordCache = new ControlWord();
 
   // Joystick button rising/falling edge flags
-  private static int[] m_joystickButtonsPressed = new int[kJoystickPorts];
-  private static int[] m_joystickButtonsReleased = new int[kJoystickPorts];
-
-  // preallocated byte buffer for button count
-  private static final ByteBuffer m_buttonCountBuffer = ByteBuffer.allocateDirect(1);
+  private static long[] m_joystickButtonsPressed = new long[kJoystickPorts];
+  private static long[] m_joystickButtonsReleased = new long[kJoystickPorts];
 
   private static final MatchDataSender m_matchDataSender;
   private static DataLogSender m_dataLogSender;
@@ -596,25 +610,26 @@ public final class DriverStation {
   }
 
   /**
-   * The state of one joystick button. Button indexes begin at 1.
+   * The state of one joystick button.
    *
    * @param stick The joystick to read.
-   * @param button The button index, beginning at 1.
+   * @param button The button index.
    * @return The state of the joystick button.
    */
   public static boolean getStickButton(final int stick, final int button) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
-    if (button <= 0) {
-      reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
-      return false;
+    if (button < 0 || button >= DriverStationJNI.kMaxJoystickButtons) {
+      throw new IllegalArgumentException("Joystick Button is out of range");
     }
+
+    long mask = 1l << button;
 
     m_cacheDataMutex.lock();
     try {
-      if (button <= m_joystickButtons[stick].m_count) {
-        return (m_joystickButtons[stick].m_buttons & 1 << (button - 1)) != 0;
+      if ((m_joystickButtons[stick].m_available & mask) != 0) {
+        return (m_joystickButtons[stick].m_buttons & mask) != 0;
       }
     } finally {
       m_cacheDataMutex.unlock();
@@ -630,27 +645,28 @@ public final class DriverStation {
   }
 
   /**
-   * Whether one joystick button was pressed since the last check. Button indexes begin at 1.
+   * Whether one joystick button was pressed since the last check.
    *
    * @param stick The joystick to read.
-   * @param button The button index, beginning at 1.
+   * @param button The button index.
    * @return Whether the joystick button was pressed since the last check.
    */
   public static boolean getStickButtonPressed(final int stick, final int button) {
-    if (button <= 0) {
-      reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
-      return false;
-    }
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
+    if (button < 0 || button >= DriverStationJNI.kMaxJoystickButtons) {
+      throw new IllegalArgumentException("Joystick Button is out of range");
+    }
+
+    long mask = 1l << button;
 
     m_cacheDataMutex.lock();
     try {
-      if (button <= m_joystickButtons[stick].m_count) {
+      if ((m_joystickButtons[stick].m_available & mask) != 0) {
         // If button was pressed, clear flag and return true
-        if ((m_joystickButtonsPressed[stick] & 1 << (button - 1)) != 0) {
-          m_joystickButtonsPressed[stick] &= ~(1 << (button - 1));
+        if ((m_joystickButtonsPressed[stick] & mask) != 0) {
+          m_joystickButtonsPressed[stick] &= ~(mask);
           return true;
         } else {
           return false;
@@ -670,27 +686,28 @@ public final class DriverStation {
   }
 
   /**
-   * Whether one joystick button was released since the last check. Button indexes begin at 1.
+   * Whether one joystick button was released since the last check.
    *
    * @param stick The joystick to read.
    * @param button The button index, beginning at 1.
    * @return Whether the joystick button was released since the last check.
    */
   public static boolean getStickButtonReleased(final int stick, final int button) {
-    if (button <= 0) {
-      reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
-      return false;
-    }
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
+    if (button < 0 || button >= DriverStationJNI.kMaxJoystickButtons) {
+      throw new IllegalArgumentException("Joystick Button is out of range");
+    }
+
+    long mask = 1l << button;
 
     m_cacheDataMutex.lock();
     try {
-      if (button <= m_joystickButtons[stick].m_count) {
+      if ((m_joystickButtons[stick].m_available & mask) != 0) {
         // If button was released, clear flag and return true
-        if ((m_joystickButtonsReleased[stick] & 1 << (button - 1)) != 0) {
-          m_joystickButtonsReleased[stick] &= ~(1 << (button - 1));
+        if ((m_joystickButtonsReleased[stick] & mask) != 0) {
+          m_joystickButtonsReleased[stick] &= ~(mask);
           return true;
         } else {
           return false;
@@ -725,9 +742,11 @@ public final class DriverStation {
       throw new IllegalArgumentException("Joystick axis is out of range");
     }
 
+    int mask = 1 << axis;
+
     m_cacheDataMutex.lock();
     try {
-      if (axis < m_joystickAxes[stick].m_count) {
+      if ((m_joystickAxes[stick].m_available & mask) != 0) {
         return m_joystickAxes[stick].m_axes[axis];
       }
     } finally {
@@ -758,9 +777,11 @@ public final class DriverStation {
       throw new IllegalArgumentException("Joystick POV is out of range");
     }
 
+    int mask = 1 << pov;
+
     m_cacheDataMutex.lock();
     try {
-      if (pov < m_joystickPOVs[stick].m_count) {
+      if ((m_joystickPOVs[stick].m_available & mask) != 0) {
         return POVDirection.of(m_joystickPOVs[stick].m_povs[pov]);
       }
     } finally {
@@ -782,7 +803,7 @@ public final class DriverStation {
    * @param stick The joystick to read.
    * @return The state of the buttons on the joystick.
    */
-  public static int getStickButtons(final int stick) {
+  public static long getStickButtons(final int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
@@ -795,58 +816,70 @@ public final class DriverStation {
     }
   }
 
+  public static int getStickAxesMaximumIndex(int stick) {
+    return availableToCount(getStickAxesAvailable(stick));
+  }
+
   /**
-   * Returns the number of axes on a given joystick port.
+   * Returns the available bitmask of axes on a given joystick port.
    *
    * @param stick The joystick port number
-   * @return The number of axes on the indicated joystick
+   * @return The number of axes available on the indicated joystick
    */
-  public static int getStickAxisCount(int stick) {
+  public static int getStickAxesAvailable(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
     try {
-      return m_joystickAxes[stick].m_count;
+      return m_joystickAxes[stick].m_available;
     } finally {
       m_cacheDataMutex.unlock();
     }
   }
 
+  public static int getStickPOVsMaximumIndex(int stick) {
+    return availableToCount(getStickPOVsAvailable(stick));
+  }
+
   /**
-   * Returns the number of povs on a given joystick port.
+   * Returns the available bitmask of povs on a given joystick port.
    *
    * @param stick The joystick port number
-   * @return The number of povs on the indicated joystick
+   * @return The number of povs available on the indicated joystick
    */
-  public static int getStickPOVCount(int stick) {
+  public static int getStickPOVsAvailable(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
     try {
-      return m_joystickPOVs[stick].m_count;
+      return m_joystickPOVs[stick].m_available;
     } finally {
       m_cacheDataMutex.unlock();
     }
   }
 
+  public static int getStickButtonsMaximumIndex(int stick) {
+    return availableToCount(getStickButtonsAvailable(stick));
+  }
+
   /**
-   * Gets the number of buttons on a joystick.
+   * Gets the bitmask of buttons available.
    *
    * @param stick The joystick port number
-   * @return The number of buttons on the indicated joystick
+   * @return The buttons available on the indicated joystick
    */
-  public static int getStickButtonCount(int stick) {
+  public static long getStickButtonsAvailable(int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
     try {
-      return m_joystickButtons[stick].m_count;
+      return m_joystickButtons[stick].m_available;
     } finally {
       m_cacheDataMutex.unlock();
     }
@@ -895,21 +928,6 @@ public final class DriverStation {
   }
 
   /**
-   * Returns the types of Axes on a given joystick port.
-   *
-   * @param stick The joystick port number
-   * @param axis The target axis
-   * @return What type of axis the axis is reporting to be
-   */
-  public static int getJoystickAxisType(int stick, int axis) {
-    if (stick < 0 || stick >= kJoystickPorts) {
-      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
-    }
-
-    return DriverStationJNI.getJoystickAxisType((byte) stick, (byte) axis);
-  }
-
-  /**
    * Returns if a joystick is connected to the Driver Station.
    *
    * <p>This makes a best effort guess by looking at the reported number of axis, buttons, and POVs
@@ -919,9 +937,9 @@ public final class DriverStation {
    * @return true if a joystick is connected
    */
   public static boolean isJoystickConnected(int stick) {
-    return getStickAxisCount(stick) > 0
-        || getStickButtonCount(stick) > 0
-        || getStickPOVCount(stick) > 0;
+    return getStickAxesAvailable(stick) != 0
+        || getStickButtonsAvailable(stick) != 0
+        || getStickPOVsAvailable(stick) != 0;
   }
 
   /**
@@ -1312,15 +1330,17 @@ public final class DriverStation {
 
     // Get the status of all the joysticks
     for (byte stick = 0; stick < kJoystickPorts; stick++) {
-      m_joystickAxesCache[stick].m_count =
-          DriverStationJNI.getJoystickAxes(stick, m_joystickAxesCache[stick].m_axes);
-      m_joystickAxesRawCache[stick].m_count =
-          DriverStationJNI.getJoystickAxesRaw(stick, m_joystickAxesRawCache[stick].m_axes);
-      m_joystickPOVsCache[stick].m_count =
-          DriverStationJNI.getJoystickPOVs(stick, m_joystickPOVsCache[stick].m_povs);
-      m_joystickButtonsCache[stick].m_buttons =
-          DriverStationJNI.getJoystickButtons(stick, m_buttonCountBuffer);
-      m_joystickButtonsCache[stick].m_count = m_buttonCountBuffer.get(0);
+      DriverStationJNI.getAllJoystickData(
+          stick,
+          m_joystickAxesCache[stick].m_axes,
+          m_joystickAxesRawCache[stick].m_axes,
+          m_joystickPOVsCache[stick].m_povs,
+          m_metadataCache);
+      m_joystickAxesCache[stick].m_available = (int) m_metadataCache[0];
+      m_joystickAxesRawCache[stick].m_available = (int) m_metadataCache[0];
+      m_joystickPOVsCache[stick].m_available = (int) m_metadataCache[1];
+      m_joystickButtonsCache[stick].m_available = m_metadataCache[2];
+      m_joystickButtonsCache[stick].m_buttons = m_metadataCache[3];
     }
 
     DriverStationJNI.getMatchInfo(m_matchInfoCache);
@@ -1395,18 +1415,6 @@ public final class DriverStation {
    */
   public static void removeRefreshedDataEventHandle(int handle) {
     m_refreshEvents.remove(handle);
-  }
-
-  /**
-   * Reports errors related to unplugged joysticks Throttles the errors so that they don't overwhelm
-   * the DS.
-   */
-  private static void reportJoystickUnpluggedError(String message) {
-    double currentTime = Timer.getTimestamp();
-    if (currentTime > m_nextMessageTime) {
-      reportError(message, false);
-      m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
-    }
   }
 
   /**

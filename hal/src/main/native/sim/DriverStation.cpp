@@ -266,15 +266,15 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
   return 0;
 }
 
-void HAL_GetAllJoystickData(HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
+void HAL_GetAllJoystickData(int32_t joystickNum, HAL_JoystickAxes* axes, HAL_JoystickPOVs* povs,
                             HAL_JoystickButtons* buttons) {
   if (gShutdown) {
     return;
   }
   std::scoped_lock lock{driverStation->cacheMutex};
-  std::memcpy(axes, currentRead->axes, sizeof(currentRead->axes));
-  std::memcpy(povs, currentRead->povs, sizeof(currentRead->povs));
-  std::memcpy(buttons, currentRead->buttons, sizeof(currentRead->buttons));
+  *axes = currentRead->axes[joystickNum];
+  *povs = currentRead->povs[joystickNum];
+  *buttons = currentRead->buttons[joystickNum];
 }
 
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
@@ -312,15 +312,6 @@ void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
   auto len = std::strlen(cName);
   auto write = WPI_AllocateString(name, len);
   std::memcpy(write, cName, len);
-}
-
-int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
-  HAL_JoystickDescriptor joystickDesc;
-  if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
-    return -1;
-  } else {
-    return joystickDesc.axisTypes[axis];
-  }
 }
 
 int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,

@@ -14,21 +14,6 @@
  * @{
  */
 
-#define HAL_IO_CONFIG_DATA_SIZE 32
-#define HAL_SYS_STATUS_DATA_SIZE 44
-#define HAL_USER_STATUS_DATA_SIZE \
-  (984 - HAL_IO_CONFIG_DATA_SIZE - HAL_SYS_STATUS_DATA_SIZE)
-
-#define HALFRC_NetworkCommunication_DynamicType_DSEnhancedIO_Input 17
-#define HALFRC_NetworkCommunication_DynamicType_DSEnhancedIO_Output 18
-#define HALFRC_NetworkCommunication_DynamicType_Kinect_Header 19
-#define HALFRC_NetworkCommunication_DynamicType_Kinect_Extra1 20
-#define HALFRC_NetworkCommunication_DynamicType_Kinect_Vertices1 21
-#define HALFRC_NetworkCommunication_DynamicType_Kinect_Extra2 22
-#define HALFRC_NetworkCommunication_DynamicType_Kinect_Vertices2 23
-#define HALFRC_NetworkCommunication_DynamicType_Kinect_Joystick 24
-#define HALFRC_NetworkCommunication_DynamicType_Kinect_Custom 25
-
 struct HAL_ControlWord {
   uint32_t enabled : 1;
   uint32_t autonomous : 1;
@@ -36,7 +21,8 @@ struct HAL_ControlWord {
   uint32_t eStop : 1;
   uint32_t fmsAttached : 1;
   uint32_t dsAttached : 1;
-  uint32_t control_reserved : 26;
+  uint32_t watchdogEnabled: 1;
+  uint32_t control_reserved : 25;
 };
 typedef struct HAL_ControlWord HAL_ControlWord;
 
@@ -82,7 +68,7 @@ HAL_ENUM(HAL_MatchType) {
 #define HAL_kMaxJoysticks 6
 
 struct HAL_JoystickAxes {
-  int16_t count;
+  uint16_t available;
   float axes[HAL_kMaxJoystickAxes];
   int16_t raw[HAL_kMaxJoystickAxes];
 };
@@ -110,14 +96,14 @@ HAL_ENUM_WITH_UNDERLYING_TYPE(HAL_JoystickPOV, uint8_t){
 };
 
 struct HAL_JoystickPOVs {
-  int16_t count;
+  uint8_t available;
   HAL_JoystickPOV povs[HAL_kMaxJoystickPOVs];
 };
 typedef struct HAL_JoystickPOVs HAL_JoystickPOVs;
 
 struct HAL_JoystickButtons {
-  uint32_t buttons;
-  uint8_t count;
+  uint64_t buttons;
+  uint64_t available;
 };
 typedef struct HAL_JoystickButtons HAL_JoystickButtons;
 
@@ -125,10 +111,6 @@ struct HAL_JoystickDescriptor {
   uint8_t isGamepad;
   uint8_t type;
   char name[256];
-  uint8_t axisCount;
-  uint8_t axisTypes[HAL_kMaxJoystickAxes];
-  uint8_t buttonCount;
-  uint8_t povCount;
 };
 typedef struct HAL_JoystickDescriptor HAL_JoystickDescriptor;
 

@@ -223,16 +223,16 @@ void DriverStationData::NotifyNewData() {
   hal::NewDriverStationData();
 }
 
-void DriverStationData::SetJoystickButton(int32_t stick, int32_t button,
+void DriverStationData::SetJoystickButton(int32_t stick, uint64_t button,
                                           HAL_Bool state) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
   if (state) {
-    m_joystickData[stick].buttons.buttons |= 1 << (button - 1);
+    m_joystickData[stick].buttons.buttons |= 1llu << (button - 1);
   } else {
-    m_joystickData[stick].buttons.buttons &= ~(1 << (button - 1));
+    m_joystickData[stick].buttons.buttons &= ~(1llu << (button - 1));
   }
   m_joystickButtonsCallbacks(stick, &m_joystickData[stick].buttons);
 }
@@ -263,7 +263,7 @@ void DriverStationData::SetJoystickPOV(int32_t stick, int32_t pov,
   m_joystickPOVsCallbacks(stick, &m_joystickData[stick].povs);
 }
 
-void DriverStationData::SetJoystickButtons(int32_t stick, uint32_t buttons) {
+void DriverStationData::SetJoystickButtons(int32_t stick, uint64_t buttons) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
@@ -272,52 +272,47 @@ void DriverStationData::SetJoystickButtons(int32_t stick, uint32_t buttons) {
   m_joystickButtonsCallbacks(stick, &m_joystickData[stick].buttons);
 }
 
-void DriverStationData::SetJoystickAxisCount(int32_t stick, int32_t count) {
+void DriverStationData::SetJoystickAxesAvailable(int32_t stick, uint16_t available) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
-  m_joystickData[stick].axes.count = count;
-  m_joystickData[stick].descriptor.axisCount = count;
+  m_joystickData[stick].axes.available = available;
   m_joystickAxesCallbacks(stick, &m_joystickData[stick].axes);
-  m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
-void DriverStationData::SetJoystickPOVCount(int32_t stick, int32_t count) {
+void DriverStationData::SetJoystickPOVsAvailable(int32_t stick, uint8_t available) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
-  m_joystickData[stick].povs.count = count;
-  m_joystickData[stick].descriptor.povCount = count;
+  m_joystickData[stick].povs.available = available;
   m_joystickPOVsCallbacks(stick, &m_joystickData[stick].povs);
-  m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
-void DriverStationData::SetJoystickButtonCount(int32_t stick, int32_t count) {
+void DriverStationData::SetJoystickButtonsAvailable(int32_t stick, uint64_t available)
+{
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
-  m_joystickData[stick].buttons.count = count;
-  m_joystickData[stick].descriptor.buttonCount = count;
+  m_joystickData[stick].buttons.available = available;
   m_joystickButtonsCallbacks(stick, &m_joystickData[stick].buttons);
-  m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
-void DriverStationData::GetJoystickCounts(int32_t stick, int32_t* axisCount,
-                                          int32_t* buttonCount,
-                                          int32_t* povCount) {
+void DriverStationData::GetJoystickAvailables(int32_t stick, uint16_t* axesAvailable,
+                                  uint64_t* buttonsAvailable,
+                                  uint8_t* povsAvailable) {
   if (stick < 0 || stick >= kNumJoysticks) {
-    *axisCount = 0;
-    *buttonCount = 0;
-    *povCount = 0;
+    *axesAvailable = 0;
+    *buttonsAvailable = 0;
+    *povsAvailable = 0;
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
-  *axisCount = m_joystickData[stick].axes.count;
-  *buttonCount = m_joystickData[stick].buttons.count;
-  *povCount = m_joystickData[stick].povs.count;
+  *axesAvailable = m_joystickData[stick].axes.available;
+  *buttonsAvailable = m_joystickData[stick].buttons.available;
+  *povsAvailable = m_joystickData[stick].povs.available;
 }
 
 void DriverStationData::SetJoystickIsGamepad(int32_t stick,
@@ -347,19 +342,6 @@ void DriverStationData::SetJoystickName(int32_t stick, std::string_view name) {
   auto copied = name.copy(m_joystickData[stick].descriptor.name,
                           sizeof(m_joystickData[stick].descriptor.name) - 1);
   m_joystickData[stick].descriptor.name[copied] = '\0';
-  m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
-}
-
-void DriverStationData::SetJoystickAxisType(int32_t stick, int32_t axis,
-                                            int32_t type) {
-  if (stick < 0 || stick >= kNumJoysticks) {
-    return;
-  }
-  if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
-    return;
-  }
-  std::scoped_lock lock(m_joystickDataMutex);
-  m_joystickData[stick].descriptor.axisTypes[axis] = type;
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
@@ -499,7 +481,7 @@ void HALSIM_NotifyDriverStationNewData(void) {
   SimDriverStationData->NotifyNewData();
 }
 
-void HALSIM_SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state) {
+void HALSIM_SetJoystickButton(int32_t stick, uint64_t button, HAL_Bool state) {
   SimDriverStationData->SetJoystickButton(stick, button, state);
 }
 
@@ -511,26 +493,27 @@ void HALSIM_SetJoystickPOV(int32_t stick, int32_t pov, HAL_JoystickPOV value) {
   SimDriverStationData->SetJoystickPOV(stick, pov, value);
 }
 
-void HALSIM_SetJoystickButtonsValue(int32_t stick, uint32_t buttons) {
+void HALSIM_SetJoystickButtonsValue(int32_t stick, uint64_t buttons) {
   SimDriverStationData->SetJoystickButtons(stick, buttons);
 }
 
-void HALSIM_SetJoystickAxisCount(int32_t stick, int32_t count) {
-  SimDriverStationData->SetJoystickAxisCount(stick, count);
+void HALSIM_SetJoystickAxesAvailable(int32_t stick, uint16_t available) {
+  SimDriverStationData->SetJoystickAxesAvailable(stick, available);
 }
 
-void HALSIM_SetJoystickPOVCount(int32_t stick, int32_t count) {
-  SimDriverStationData->SetJoystickPOVCount(stick, count);
+void HALSIM_SetJoystickPOVsAvailable(int32_t stick, uint8_t available) {
+  SimDriverStationData->SetJoystickPOVsAvailable(stick, available);
 }
 
-void HALSIM_SetJoystickButtonCount(int32_t stick, int32_t count) {
-  SimDriverStationData->SetJoystickButtonCount(stick, count);
+void HALSIM_SetJoystickButtonsAvailable(int32_t stick, uint64_t available) {
+  SimDriverStationData->SetJoystickButtonsAvailable(stick, available);
 }
 
-void HALSIM_GetJoystickCounts(int32_t stick, int32_t* axisCount,
-                              int32_t* buttonCount, int32_t* povCount) {
-  SimDriverStationData->GetJoystickCounts(stick, axisCount, buttonCount,
-                                          povCount);
+void HALSIM_GetJoystickAvailables(int32_t stick, uint16_t* axesAvailable,
+                                  uint64_t* buttonsAvailable,
+                                  uint8_t* povsAvailable) {
+  SimDriverStationData->GetJoystickAvailables(stick, axesAvailable,
+                                              buttonsAvailable, povsAvailable);
 }
 
 void HALSIM_SetJoystickIsGamepad(int32_t stick, HAL_Bool isGamepad) {
@@ -543,10 +526,6 @@ void HALSIM_SetJoystickType(int32_t stick, int32_t type) {
 
 void HALSIM_SetJoystickName(int32_t stick, const WPI_String* name) {
   SimDriverStationData->SetJoystickName(stick, wpi::to_string_view(name));
-}
-
-void HALSIM_SetJoystickAxisType(int32_t stick, int32_t axis, int32_t type) {
-  SimDriverStationData->SetJoystickAxisType(stick, axis, type);
 }
 
 void HALSIM_SetGameSpecificMessage(const WPI_String* message) {
