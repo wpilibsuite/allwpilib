@@ -9,8 +9,11 @@ load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
+# Copied from bazel since it isn't exposed publicly that I can find.
+# https://github.com/bazelbuild/bazel/blob/cc4e3b25a89cd8294406d9489ece706cfcc019bd/src/main/starlark/builtins_bzl/common/cc/cc_helper.bzl#L272
 def generate_def_file(ctx, def_parser, object_files, dll_name):
     def_file = ctx.actions.declare_file(ctx.label.name + ".gen.def")
+
     args = ctx.actions.args()
     args.add(def_file)
     args.add(dll_name)
@@ -343,6 +346,8 @@ def wpilib_cc_shared_library(
         user_link_flags = user_link_flags,
         features = features,
         visibility = visibility,
+        # Only include a .def file on windows.  This makes it so we can mark
+        # the .def file as only compatible with windows.
         win_def_file = select({
             "@platforms//os:windows": win_def_file,
             "//conditions:default": None,
@@ -670,4 +675,18 @@ List of all static libraries to not duplicate .o files from.
 )
 
 def generate_def_windows(name, deps = None, **kwargs):
-    _generate_def_windows(name = name, deps = deps, target_compatible_with = ["@platforms//os:windows"], **kwargs)
+    """Generates a .def file for linking a windows .dll for the provided cc_library and filters
+
+    Args:
+      deps: A list of cc_libraries to export symbols from.
+      filters: All object files in the provided cc_libraries (but not their
+               dependencies) are checked against this list.  If a string in
+               this list appears inside the name of the object file, it is
+               added to the export list.
+    """
+    _generate_def_windows(
+        name = name,
+        deps = deps,
+        target_compatible_with = ["@platforms//os:windows"],
+        **kwargs
+    )
