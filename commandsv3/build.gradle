@@ -30,11 +30,6 @@ dependencies {
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 sourceSets.main.resources.srcDir "${projectDir}/src/main/proto"
 
-tasks.withType(Javadoc) {
-    options.addBooleanOption("-enable-preview", true)
-    options.addStringOption("-release", "21")
-}
-
 test {
     testLogging {
         outputs.upToDateWhen {false}
