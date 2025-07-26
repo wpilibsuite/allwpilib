@@ -146,7 +146,6 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    *
    * @param ip The address to which to bind.
    * @param port The port to which to bind.
-   * @param flags Optional additional flags.
    */
   void Connect6(std::string_view ip, unsigned int port);
 
