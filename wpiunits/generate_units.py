@@ -81,7 +81,7 @@ UNIT_CONFIGURATIONS = {
         "divide": {"Time": "AngularAcceleration"},
         "extra": inspect.cleandoc(
             """
-          default Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
+          public Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
         """
         ),
     },
@@ -164,7 +164,7 @@ UNIT_CONFIGURATIONS = {
         "extra": inspect.cleandoc(
             """
           /** Converts this frequency to the time period between cycles. */
-          default Time asPeriod() { return Seconds.of(1 / baseUnitMagnitude()); }
+          public Time asPeriod() { return Seconds.of(1 / baseUnitMagnitude()); }
         """
         ),
     },
@@ -206,11 +206,11 @@ UNIT_CONFIGURATIONS = {
         "divide": {},
         "extra": inspect.cleandoc(
             """
-          default Measure<Dividend> timesDivisor(Measure<? extends Divisor> multiplier) {
+          public Measure<Dividend> timesDivisor(Measure<? extends Divisor> multiplier) {
             return (Measure<Dividend>) baseUnit().numerator().ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
           }
 
-          default Measure<? extends PerUnit<Divisor, Dividend>> reciprocal() {
+          public Measure<? extends PerUnit<Divisor, Dividend>> reciprocal() {
             // May return a velocity if Divisor == TimeUnit, so we can't guarantee a "Per" instance
             return baseUnit().reciprocal().ofBaseUnits(1 / baseUnitMagnitude());
           }
@@ -252,7 +252,7 @@ UNIT_CONFIGURATIONS = {
         },
         "extra": inspect.cleandoc(
             """
-          default Frequency asFrequency() { return Hertz.of(1 / baseUnitMagnitude()); }
+          public Frequency asFrequency() { return Hertz.of(1 / baseUnitMagnitude()); }
         """
         ),
     },
@@ -269,7 +269,7 @@ UNIT_CONFIGURATIONS = {
                 "implementation": inspect.cleandoc(
                     """
                   @Override
-                  default Measure<D> times(Time multiplier) {
+                  public Measure<D> times(Time multiplier) {
                     return (Measure<D>) unit().numerator().ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
                   }
                 """
@@ -352,9 +352,7 @@ def generate_units(output_directory: Path, template_directory: Path):
         keep_trailing_newline=True,
     )
 
-    interfaceTemplate = env.get_template("Measure-interface.java.jinja")
-    immutableTemplate = env.get_template("Measure-immutable.java.jinja")
-    mutableTemplate = env.get_template("Measure-mutable.java.jinja")
+    interfaceTemplate = env.get_template("Measure-implementation.java.jinja")
     rootPath = output_directory / "main/java/edu/wpi/first/units"
 
     helpers = {
@@ -373,22 +371,8 @@ def generate_units(output_directory: Path, template_directory: Path):
             config=UNIT_CONFIGURATIONS,
             helpers=helpers,
         )
-        immutableContents = immutableTemplate.render(
-            name=unit_name,
-            units=MATH_OPERATION_UNITS,
-            config=UNIT_CONFIGURATIONS,
-            helpers=helpers,
-        )
-        mutableContents = mutableTemplate.render(
-            name=unit_name,
-            units=MATH_OPERATION_UNITS,
-            config=UNIT_CONFIGURATIONS,
-            helpers=helpers,
-        )
 
         output(rootPath / "measure", f"{unit_name}.java", interfaceContents)
-        output(rootPath / "measure", f"Immutable{unit_name}.java", immutableContents)
-        output(rootPath / "measure", f"Mut{unit_name}.java", mutableContents)
 
 
 def main():

@@ -4,9 +4,7 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.measure.ImmutableLinearAcceleration;
 import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.units.measure.MutLinearAcceleration;
 
 /**
  * A unit of linear acceleration like {@link edu.wpi.first.units.Units#MetersPerSecondPerSecond}.
@@ -51,13 +49,12 @@ public final class LinearAccelerationUnit extends PerUnit<LinearVelocityUnit, Ti
 
   @Override
   public LinearAcceleration of(double magnitude) {
-    return new ImmutableLinearAcceleration(magnitude, toBaseUnits(magnitude), this);
+    return new LinearAcceleration(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public LinearAcceleration ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableLinearAcceleration(
-        fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new LinearAcceleration(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -68,11 +65,6 @@ public final class LinearAccelerationUnit extends PerUnit<LinearVelocityUnit, Ti
   @Override
   public LinearAcceleration one() {
     return (LinearAcceleration) super.one();
-  }
-
-  @Override
-  public MutLinearAcceleration mutable(double initialMagnitude) {
-    return new MutLinearAcceleration(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @Override

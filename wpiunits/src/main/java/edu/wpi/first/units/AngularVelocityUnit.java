@@ -5,8 +5,6 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.ImmutableAngularVelocity;
-import edu.wpi.first.units.measure.MutAngularVelocity;
 
 /** A unit of angular velocity like {@link Units#RadiansPerSecond}. */
 public final class AngularVelocityUnit extends PerUnit<AngleUnit, TimeUnit> {
@@ -49,12 +47,12 @@ public final class AngularVelocityUnit extends PerUnit<AngleUnit, TimeUnit> {
 
   @Override
   public AngularVelocity of(double magnitude) {
-    return new ImmutableAngularVelocity(magnitude, toBaseUnits(magnitude), this);
+    return new AngularVelocity(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public AngularVelocity ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableAngularVelocity(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new AngularVelocity(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -65,11 +63,6 @@ public final class AngularVelocityUnit extends PerUnit<AngleUnit, TimeUnit> {
   @Override
   public AngularVelocity one() {
     return (AngularVelocity) super.one();
-  }
-
-  @Override
-  public MutAngularVelocity mutable(double initialMagnitude) {
-    return new MutAngularVelocity(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @Override

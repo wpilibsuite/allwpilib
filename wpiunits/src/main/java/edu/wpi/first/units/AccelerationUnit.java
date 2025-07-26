@@ -5,8 +5,6 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.measure.Acceleration;
-import edu.wpi.first.units.measure.ImmutableAcceleration;
-import edu.wpi.first.units.measure.MutAcceleration;
 
 /**
  * A generic unit of acceleration.
@@ -45,12 +43,12 @@ public final class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit
 
   @Override
   public Acceleration<D> of(double magnitude) {
-    return new ImmutableAcceleration<>(magnitude, toBaseUnits(magnitude), this);
+    return new Acceleration<>(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Acceleration<D> ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableAcceleration<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new Acceleration<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -63,11 +61,6 @@ public final class AccelerationUnit<D extends Unit> extends PerUnit<VelocityUnit
   @SuppressWarnings({"unchecked", "rawtypes"})
   public Acceleration<D> one() {
     return (Acceleration<D>) (Acceleration) super.one();
-  }
-
-  @Override
-  public MutAcceleration<D> mutable(double initialMagnitude) {
-    return new MutAcceleration<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @Override

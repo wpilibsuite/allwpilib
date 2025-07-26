@@ -5,8 +5,6 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.ImmutableAngularAcceleration;
-import edu.wpi.first.units.measure.MutAngularAcceleration;
 
 /** A unit of angular acceleration, such as {@link Units#RadiansPerSecondPerSecond}. */
 public final class AngularAccelerationUnit extends PerUnit<AngularVelocityUnit, TimeUnit> {
@@ -49,13 +47,12 @@ public final class AngularAccelerationUnit extends PerUnit<AngularVelocityUnit, 
 
   @Override
   public AngularAcceleration of(double magnitude) {
-    return new ImmutableAngularAcceleration(magnitude, toBaseUnits(magnitude), this);
+    return new AngularAcceleration(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public AngularAcceleration ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableAngularAcceleration(
-        fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new AngularAcceleration(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -66,11 +63,6 @@ public final class AngularAccelerationUnit extends PerUnit<AngularVelocityUnit, 
   @Override
   public AngularAcceleration one() {
     return (AngularAcceleration) super.one();
-  }
-
-  @Override
-  public MutAngularAcceleration mutable(double initialMagnitude) {
-    return new MutAngularAcceleration(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @Override

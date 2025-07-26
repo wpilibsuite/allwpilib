@@ -4,8 +4,6 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
-
 class ExampleUnit extends Unit {
   ExampleUnit(double baseUnitEquivalent) {
     this(baseUnitEquivalent, "Example", "ex");
@@ -36,11 +34,6 @@ class ExampleUnit extends Unit {
   @Override
   public Measure<ExampleUnit> ofBaseUnits(double baseUnitMagnitude) {
     return ImmutableMeasure.ofBaseUnits(baseUnitMagnitude, this);
-  }
-
-  @Override
-  public MutableMeasure<ExampleUnit, ?, ?> mutable(double initialMagnitude) {
-    return new GenericMutableMeasureImpl<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @Override

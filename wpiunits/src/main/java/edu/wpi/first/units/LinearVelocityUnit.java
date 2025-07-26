@@ -4,9 +4,7 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.measure.ImmutableLinearVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.MutLinearVelocity;
 
 /** A unit of linear velocity like {@link edu.wpi.first.units.Units#MetersPerSecond}. */
 public final class LinearVelocityUnit extends PerUnit<DistanceUnit, TimeUnit> {
@@ -49,12 +47,12 @@ public final class LinearVelocityUnit extends PerUnit<DistanceUnit, TimeUnit> {
 
   @Override
   public LinearVelocity of(double magnitude) {
-    return new ImmutableLinearVelocity(magnitude, toBaseUnits(magnitude), this);
+    return new LinearVelocity(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public LinearVelocity ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableLinearVelocity(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new LinearVelocity(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -65,11 +63,6 @@ public final class LinearVelocityUnit extends PerUnit<DistanceUnit, TimeUnit> {
   @Override
   public LinearVelocity one() {
     return (LinearVelocity) super.one();
-  }
-
-  @Override
-  public MutLinearVelocity mutable(double value) {
-    return new MutLinearVelocity(value, toBaseUnits(value), this);
   }
 
   /**
