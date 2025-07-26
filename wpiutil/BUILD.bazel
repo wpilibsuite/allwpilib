@@ -195,9 +195,7 @@ cc_library(
 
 wpilib_jni_cc_library(
     name = "wpiutiljni",
-    srcs = glob([
-        "src/main/native/cpp/jni/**",
-    ]),
+    srcs = glob(["src/main/native/cpp/jni/**"]),
     java_dep = ":wpiutil-java",
     visibility = ["//visibility:public"],
     deps = [
