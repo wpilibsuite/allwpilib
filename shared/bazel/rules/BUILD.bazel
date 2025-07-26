@@ -19,3 +19,50 @@ pkg_files(
     prefix = "META-INF",
     visibility = ["//visibility:public"],
 )
+
+config_setting(
+    name = "compilation_mode_windows_fastbuild",
+    constraint_values = [
+        "@platforms//os:windows",
+    ],
+    values = {
+        "compilation_mode": "fastbuild",
+    },
+)
+
+config_setting(
+    name = "compilation_mode_windows_dbg",
+    constraint_values = [
+        "@platforms//os:windows",
+    ],
+    values = {
+        "compilation_mode": "dbg",
+    },
+)
+
+config_setting(
+    name = "compilation_mode_dbg",
+    values = {
+        "compilation_mode": "dbg",
+    },
+)
+
+config_setting(
+    name = "linux_compilation_mode_dbg",
+    constraint_values = [
+        "@platforms//os:linux",
+    ],
+    values = {
+        "compilation_mode": "dbg",
+    },
+)
+
+config_setting(
+    name = "osx_compilation_mode_dbg",
+    constraint_values = [
+        "@platforms//os:osx",
+    ],
+    values = {
+        "compilation_mode": "dbg",
+    },
+)

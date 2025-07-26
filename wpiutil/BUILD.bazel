@@ -209,6 +209,7 @@ wpilib_cc_shared_library(
     dynamic_deps = [
         ":shared/wpiutil",
     ],
+    use_debug_name = False,
     visibility = ["//visibility:public"],
     deps = [":wpiutiljni"],
 )
