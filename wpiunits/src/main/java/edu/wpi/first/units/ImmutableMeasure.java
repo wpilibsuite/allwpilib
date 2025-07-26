@@ -5,7 +5,6 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.measure.Dimensionless;
-import edu.wpi.first.units.mutable.GenericMutableMeasureImpl;
 
 /**
  * A measure holds the magnitude and unit of some dimension, such as distance, time, or speed. An
@@ -43,16 +42,6 @@ public record ImmutableMeasure<U extends Unit>(double magnitude, double baseUnit
   public static <U extends Unit> ImmutableMeasure<U> ofRelativeUnits(
       double relativeMagnitude, U unit) {
     return new ImmutableMeasure<>(relativeMagnitude, unit.toBaseUnits(relativeMagnitude), unit);
-  }
-
-  @Override
-  public Measure<U> copy() {
-    return this; // already immutable, no need to allocate a new object
-  }
-
-  @Override
-  public MutableMeasure<U, ?, ?> mutableCopy() {
-    return new GenericMutableMeasureImpl<>(magnitude, baseUnitMagnitude, unit);
   }
 
   @Override

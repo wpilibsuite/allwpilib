@@ -4,8 +4,6 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.measure.ImmutableTemperature;
-import edu.wpi.first.units.measure.MutTemperature;
 import edu.wpi.first.units.measure.Temperature;
 
 /**
@@ -34,12 +32,12 @@ public final class TemperatureUnit extends Unit {
 
   @Override
   public Temperature of(double magnitude) {
-    return new ImmutableTemperature(magnitude, toBaseUnits(magnitude), this);
+    return new Temperature(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Temperature ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableTemperature(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new Temperature(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -50,11 +48,6 @@ public final class TemperatureUnit extends Unit {
   @Override
   public Temperature one() {
     return (Temperature) super.one();
-  }
-
-  @Override
-  public MutTemperature mutable(double initialMagnitude) {
-    return new MutTemperature(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @Override

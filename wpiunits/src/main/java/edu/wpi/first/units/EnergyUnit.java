@@ -5,8 +5,6 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.measure.Energy;
-import edu.wpi.first.units.measure.ImmutableEnergy;
-import edu.wpi.first.units.measure.MutEnergy;
 
 /**
  * Unit of energy dimension.
@@ -71,12 +69,12 @@ public final class EnergyUnit extends Unit {
 
   @Override
   public Energy of(double magnitude) {
-    return new ImmutableEnergy(magnitude, toBaseUnits(magnitude), this);
+    return new Energy(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Energy ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableEnergy(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new Energy(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -87,10 +85,5 @@ public final class EnergyUnit extends Unit {
   @Override
   public Energy one() {
     return (Energy) super.one();
-  }
-
-  @Override
-  public MutEnergy mutable(double initialMagnitude) {
-    return new MutEnergy(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 }

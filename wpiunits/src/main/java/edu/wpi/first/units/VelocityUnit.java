@@ -4,8 +4,6 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.measure.ImmutableVelocity;
-import edu.wpi.first.units.measure.MutVelocity;
 import edu.wpi.first.units.measure.Velocity;
 
 /**
@@ -80,12 +78,12 @@ public final class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
 
   @Override
   public Velocity<D> of(double magnitude) {
-    return new ImmutableVelocity<>(magnitude, toBaseUnits(magnitude), this);
+    return new Velocity<>(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Velocity<D> ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableVelocity<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new Velocity<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -98,11 +96,6 @@ public final class VelocityUnit<D extends Unit> extends PerUnit<D, TimeUnit> {
   @SuppressWarnings("unchecked")
   public Velocity<D> one() {
     return (Velocity<D>) super.one();
-  }
-
-  @Override
-  public MutableMeasure<VelocityUnit<D>, ?, ?> mutable(double initialMagnitude) {
-    return new MutVelocity<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   /**

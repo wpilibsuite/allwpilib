@@ -120,22 +120,6 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
   }
 
   /**
-   * Returns an immutable copy of this measure. The copy can be used freely and is guaranteed never
-   * to change.
-   *
-   * @return the copied measure
-   */
-  Measure<U> copy();
-
-  /**
-   * Returns a mutable copy of this measure. It will be initialized to the current state of this
-   * measure, but can be changed over time without needing to allocate new measurement objects.
-   *
-   * @return the copied measure
-   */
-  MutableMeasure<U, ?, ?> mutableCopy();
-
-  /**
    * Returns a measure equivalent to this one equal to zero minus its current value. For non-linear
    * unit types like temperature, the zero point is treated as the zero value of the base unit (eg
    * Kelvin). In effect, this means code like {@code Celsius.of(10).unaryMinus()} returns a value

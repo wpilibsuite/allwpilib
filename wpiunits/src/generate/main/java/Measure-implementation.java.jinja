@@ -10,36 +10,45 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
 @SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
-public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mtou'](name) }}> {
-  static {{ helpers['generics_list'](name) }} {{ helpers['type_usage'](name) }} ofRelativeUnits(double magnitude, {{ helpers['mtou'](name) }} unit) {
-    return new Immutable{{ helpers['type_usage'](name) }}(magnitude, unit.toBaseUnits(magnitude), unit);
+public record {{ helpers['type_decl'](name) }}(double magnitude, double baseUnitMagnitude, {{ helpers['mtou'](name) }} unit) implements Measure<{{ helpers['mtou'](name) }}> {
+  /**
+   * For doing math with measures of a known dimension but an unknown unit. Most users should use
+   * {@link {{ name }}Unit#of(double)} on a known unit from {@link Units} instead of calling this method.
+   * @param magnitude the magnitude of the measurement in terms of the given unit
+   * @param unit the unit of the measurement
+   * @return a measurement object
+   */
+  public static {{ helpers['generics_list'](name) }} {{ helpers['type_usage'](name) }} ofRelativeUnits(double magnitude, {{ helpers['mtou'](name) }} unit) {
+    return new {{ helpers['type_usage'](name) }}(magnitude, unit.toBaseUnits(magnitude), unit);
   }
 
-  static {{ helpers['generics_list'](name) }} {{ helpers['type_usage'](name) }} ofBaseUnits(double baseUnitMagnitude, {{ helpers['mtou'](name) }} unit) {
-    return new Immutable{{ helpers['type_usage'](name) }}(unit.fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, unit);
+  /**
+   * For doing math with measures of a known dimension but an unknown unit. Most users should use
+   * {@link {{ name }}Unit#of(double)} on a known unit from {@link Units} instead of calling this method.
+   * @param magnitude the magnitude of the measurement in terms of the given unit's base unit
+   * @param unit the unit of the measurement
+   * @return a measurement object
+   */
+  public static {{ helpers['generics_list'](name) }} {{ helpers['type_usage'](name) }} ofBaseUnits(double baseUnitMagnitude, {{ helpers['mtou'](name) }} unit) {
+    return new {{ helpers['type_usage'](name) }}(unit.fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, unit);
   }
 
   @Override
-  {{ helpers['type_usage'](name) }} copy();
+  public {{ helpers['mtou'](name) }} baseUnit() { return ({{ helpers['mtou'](name) }}) unit().getBaseUnit(); }
 
   @Override
-  default Mut{{ helpers['type_usage'](name) }} mutableCopy() {
-    return new Mut{{ helpers['type_usage'](name) }}(magnitude(), baseUnitMagnitude(), unit());
-  }
-
-  @Override
-  {{ helpers['mtou'](name) }} unit();
-
-  @Override
-  default {{ helpers['mtou'](name) }} baseUnit() { return ({{ helpers['mtou'](name) }}) unit().getBaseUnit(); }
-
-  @Override
-  default double in({{ helpers['mtou'](name) }} unit) {
+  public double in({{ helpers['mtou'](name) }} unit) {
     return unit.fromBaseUnits(baseUnitMagnitude());
   }
 
   @Override
-  default {{ helpers['type_usage'](name) }} unaryMinus() {
+  @SuppressWarnings("rawtypes")
+  public boolean equals(Object object) {
+    return object instanceof {{ name }} m && isEquivalent(m);
+  }
+
+  @Override
+  public {{ helpers['type_usage'](name) }} unaryMinus() {
     return ({{ helpers['type_usage'](name) }}) unit().ofBaseUnits(0 - baseUnitMagnitude());
   }
 
@@ -51,27 +60,27 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default {{ helpers['type_usage'](name) }} negate() {
+  public {{ helpers['type_usage'](name) }} negate() {
     return ({{ helpers['type_usage'](name) }}) unaryMinus();
   }
 
   @Override
-  default {{ helpers['type_usage'](name) }} plus(Measure<? extends {{ helpers['mtou'](name) }}> other) {
+  public {{ helpers['type_usage'](name) }} plus(Measure<? extends {{ helpers['mtou'](name) }}> other) {
     return ({{ helpers['type_usage'](name) }}) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
 
   @Override
-  default {{ helpers['type_usage'](name) }} minus(Measure<? extends {{ helpers['mtou'](name) }}> other) {
+  public {{ helpers['type_usage'](name) }} minus(Measure<? extends {{ helpers['mtou'](name) }}> other) {
     return ({{ helpers['type_usage'](name) }}) unit().ofBaseUnits(baseUnitMagnitude() - other.baseUnitMagnitude());
   }
 
   @Override
-  default {{ helpers['type_usage'](name) }} times(double multiplier) {
+  public {{ helpers['type_usage'](name) }} times(double multiplier) {
     return ({{ helpers['type_usage'](name) }}) unit().ofBaseUnits(baseUnitMagnitude() * multiplier);
   }
 
   @Override
-  default {{ helpers['type_usage'](name) }} div(double divisor) {
+  public {{ helpers['type_usage'](name) }} div(double divisor) {
     return ({{ helpers['type_usage'](name) }}) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
   }
 
@@ -83,13 +92,13 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default {{ helpers['type_usage'](name) }} divide(double divisor) {
+  public {{ helpers['type_usage'](name) }} divide(double divisor) {
     return ({{ helpers['type_usage'](name) }}) div(divisor);
   }
 {% for unit in math_units -%}
 {% if unit == "Dimensionless" %}
   @Override
-  default {{ helpers['type_usage'](name) }} div({{ unit }} divisor) {
+  public {{ helpers['type_usage'](name) }} div({{ unit }} divisor) {
     return ({{ helpers['type_usage'](name) }}) {{ config[name]['base_unit'] }}.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -101,12 +110,12 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default {{ helpers['type_usage'](name) }} divide({{ unit }} divisor) {
+  public {{ helpers['type_usage'](name) }} divide({{ unit }} divisor) {
     return ({{ helpers['type_usage'](name) }}) div(divisor);
   }
 
   @Override
-  default {{ helpers['type_usage'](name) }} times({{ unit }} multiplier) {
+  public {{ helpers['type_usage'](name) }} times({{ unit }} multiplier) {
     return ({{ helpers['type_usage'](name) }}) {{ config[name]['base_unit'] }}.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 {% else %}
@@ -115,19 +124,19 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
 {{ helpers['indent'](config[name]['multiply'][unit]['implementation'], 2) }}
 {%- else %}
   @Override
-  default {{ config[name]['multiply'][unit] }} times({{ unit }} multiplier) {
+  public {{ config[name]['multiply'][unit] }} times({{ unit }} multiplier) {
     return {{ config[config[name]['multiply'][unit]]['base_unit'] }}.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 {%- endif %}
 {% else %}
   @Override
-  default Mult<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> times({{ unit }} multiplier) {
+  public Mult<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> times({{ unit }} multiplier) {
     return (Mult<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}>) Measure.super.times(multiplier);
   }
 {% endif -%}
 {% if unit in config[name]['divide'] %}
   @Override
-  default {{ config[name]['divide'][unit] }} div({{ unit }} divisor) {
+  public {{ config[name]['divide'][unit] }} div({{ unit }} divisor) {
     return {{ config[config[name]['divide'][unit]]['base_unit'] }}.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -139,12 +148,12 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default {{ config[name]['divide'][unit] }} divide({{ unit }} divisor) {
+  public {{ config[name]['divide'][unit] }} divide({{ unit }} divisor) {
     return div(divisor);
   }
 
   @Override
-  default {{ config[name]['divide'][unit] }} per({{ helpers['mtou'](unit) }} divisorUnit) {
+  public {{ config[name]['divide'][unit] }} per({{ helpers['mtou'](unit) }} divisorUnit) {
 {%- if unit == "Mult<?, ?>" or unit == "Per<?, ?>" %}
     return div(divisorUnit.ofNative(1));
 {%- else %}
@@ -153,7 +162,7 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   }
 {% elif unit == "Time" %}
   @Override
-  default Velocity<{{ helpers['mtou'](name) }}> div({{ unit }} divisor) {
+  public Velocity<{{ helpers['mtou'](name) }}> div({{ unit }} divisor) {
     return VelocityUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -165,12 +174,12 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Velocity<{{ helpers['mtou'](name) }}> divide({{ unit }} divisor) {
+  public Velocity<{{ helpers['mtou'](name) }}> divide({{ unit }} divisor) {
     return div(divisor);
   }
 
   @Override
-  default Velocity<{{ helpers['mtou'](name) }}> per({{ helpers['mtou'](unit) }} divisorUnit) {
+  public Velocity<{{ helpers['mtou'](name) }}> per({{ helpers['mtou'](unit) }} divisorUnit) {
 {%- if unit == "Mult<?, ?>" or unit == "Per<?, ?>" %}
     return div(divisorUnit.ofNative(1));
 {%- else %}
@@ -179,7 +188,7 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   }
 {% elif unit == name %}
   @Override
-  default Dimensionless div({{ unit }} divisor) {
+  public Dimensionless div({{ unit }} divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -191,17 +200,17 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Dimensionless divide({{ unit }} divisor) {
+  public Dimensionless divide({{ unit }} divisor) {
     return div(divisor);
   }
 
   @Override
-  default Dimensionless per({{ helpers['mtou'](unit) }} divisorUnit) {
+  public Dimensionless per({{ helpers['mtou'](unit) }} divisorUnit) {
     return div(divisorUnit.one());
   }
 {% else %}
   @Override
-  default Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> div({{ unit }} divisor) {
+  public Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> div({{ unit }} divisor) {
     return (Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}>) Measure.super.div(divisor);
   }
 
@@ -213,12 +222,12 @@ public interface {{ helpers['type_decl'](name) }} extends Measure<{{ helpers['mt
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> divide({{ unit }} divisor) {
+  public Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> divide({{ unit }} divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> per({{ helpers['mtou'](unit) }} divisorUnit) {
+  public Per<{{ helpers['mtou'](name) }}, {{ helpers['mtou'](unit) }}> per({{ helpers['mtou'](unit) }} divisorUnit) {
 {%- if unit == "Mult<?, ?>" or unit == "Per<?, ?>" %}
     return div(divisorUnit.ofNative(1));
 {%- else %}
