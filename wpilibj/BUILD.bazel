@@ -97,9 +97,7 @@ wpilib_java_library(
 
 pkg_files(
     name = "generated_version_files",
-    srcs = [
-        ":generate-version",
-    ],
+    srcs = [":generate-version"],
     prefix = "edu/wpi/first/wpilibj/util/",
 )
 

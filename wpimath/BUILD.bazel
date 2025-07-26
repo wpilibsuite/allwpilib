@@ -4,7 +4,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_shared_and_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
@@ -117,7 +117,7 @@ pkg_files(
     strip_prefix = "src/generated/main/native/cpp/",
 )
 
-wpilib_cc_library(
+wpilib_shared_and_static_library(
     name = "wpimath",
     srcs = glob(
         [
@@ -127,6 +127,10 @@ wpilib_cc_library(
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**"]),
+    auto_export_windows_symbols = False,
+    dynamic_deps = [
+        "//wpiutil:shared/wpiutil",
+    ],
     extra_hdr_pkg_files = [":protobuf_hdr_pkg"],
     extra_src_pkg_files = [
         ":wpimath-java-jni-hdrs-pkg",
@@ -138,6 +142,9 @@ wpilib_cc_library(
     local_defines = [
         "WPILIB_EXPORTS",
         "SLEIPNIR_EXPORTS",
+    ],
+    static_deps = [
+        "//wpiutil:static/wpiutil",
     ],
     strip_include_prefix = "src/main/native/include",
     third_party_header_only_libraries = [
@@ -154,48 +161,18 @@ wpilib_cc_library(
     ],
 )
 
-wpilib_cc_shared_library(
-    name = "shared/wpimath",
-    auto_export_windows_symbols = False,
-    dynamic_deps = [
-        "//wpiutil:shared/wpiutil",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":wpimath",
-    ],
-)
-
-wpilib_cc_static_library(
-    name = "static/wpimath",
-    static_deps = [
-        "//wpiutil:static/wpiutil",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":wpimath",
-    ],
-)
-
 wpilib_jni_cc_library(
     name = "wpimathjni",
     srcs = glob(["src/main/native/cpp/jni/**"]),
+    dynamic_deps = [
+        ":shared/wpimath",
+        "//wpiutil:shared/wpiutil",
+    ],
     java_dep = ":wpimath-java",
     visibility = ["//visibility:public"],
     deps = [
         ":wpimath",
     ],
-)
-
-wpilib_cc_shared_library(
-    name = "shared/wpimathjni",
-    auto_export_windows_symbols = False,
-    dynamic_deps = [
-        ":shared/wpimath",
-        "//wpiutil:shared/wpiutil",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [":wpimathjni"],
 )
 
 wpilib_jni_java_library(

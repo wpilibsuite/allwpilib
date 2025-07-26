@@ -3,7 +3,7 @@ load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_shared_and_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
@@ -129,7 +129,7 @@ filegroup(
     }),
 )
 
-wpilib_cc_library(
+wpilib_shared_and_static_library(
     name = "wpiutil",
     srcs = glob(
         ["src/main/native/cpp/**"],
@@ -163,22 +163,6 @@ wpilib_cc_library(
     }),
 )
 
-wpilib_cc_shared_library(
-    name = "shared/wpiutil",
-    visibility = ["//visibility:public"],
-    deps = [
-        ":wpiutil",
-    ],
-)
-
-wpilib_cc_static_library(
-    name = "static/wpiutil",
-    visibility = ["//visibility:public"],
-    deps = [
-        ":wpiutil",
-    ],
-)
-
 cc_library(
     name = "wpiutil-jni-hdrs",
     hdrs = glob([
@@ -196,31 +180,16 @@ cc_library(
 wpilib_jni_cc_library(
     name = "wpiutiljni",
     srcs = glob(["src/main/native/cpp/jni/**"]),
-    java_dep = ":wpiutil-java",
-    visibility = ["//visibility:public"],
-    deps = [
-        ":wpiutil",
-    ],
-)
-
-wpilib_cc_shared_library(
-    name = "shared/wpiutiljni",
-    auto_export_windows_symbols = False,
     dynamic_deps = [
         ":shared/wpiutil",
     ],
-    visibility = ["//visibility:public"],
-    deps = [":wpiutiljni"],
-)
-
-wpilib_cc_static_library(
-    name = "static/wpiutiljni",
+    java_dep = ":wpiutil-java",
     static_deps = [
         ":static/wpiutil",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":wpiutiljni",
+        ":wpiutil",
     ],
 )
 
