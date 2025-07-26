@@ -4,8 +4,6 @@ load("@rules_cc//cc:cc_shared_library.bzl", "cc_shared_library")
 load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_library")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_ATTRS", "find_cpp_toolchain", "use_cc_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
-
-#load("@rules_cc//cc/common:semantics.bzl", "semantics")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
@@ -35,13 +33,24 @@ def generate_def_file(ctx, def_parser, object_files, dll_name):
     return def_file
 
 def _split_debug_symbols_impl(ctx):
+    """This splits debug symbols out from the main shared library where supported.
+
+    WPILIB doesn't split them out for osx or Windows, so just pass them through.
+    For some builds, like for the systemcore, we don't want them split.
+
+    Args:
+      copy: If true, pass the file right on through, though make sure the name
+            is right.
+      use_debug_name: If true, the file should be named 'libfood.so' when done
+                      rather than 'libfoo.so'.  This only makes sense on Linux.
+      shared_library: The library to split apart.
+    """
+
     label = ctx.attr.shared_library.label
     target_name = label.name
     if label.package:
         target_name = label.package + "/" + label.name
     folder, lib_name = _folder_prefix(target_name)
-
-    debug_suffix = "d" if ctx.attr.use_debug_name else ""
 
     # For Windows and OSX, we just want to pass it all on through.  Don't be clever.
     if (ctx.target_platform_has_constraint(ctx.attr._darwin_constraint[platform_common.ConstraintValueInfo]) or
@@ -55,6 +64,8 @@ def _split_debug_symbols_impl(ctx):
         ]
 
     # Linux
+    debug_suffix = "d" if ctx.attr.use_debug_name else ""
+
     if not ctx.target_platform_has_constraint(ctx.attr._linux_constraint[platform_common.ConstraintValueInfo]):
         fail("Unsupported platform")
 
@@ -318,6 +329,28 @@ def wpilib_cc_shared_library(
         features = None,
         win_def_file = None,
         **kwargs):
+    """Builds a cc_shared_library with some wpilib conventions applied.
+
+    The main workhorse of this rule is cc_shared_library and a pkg_files on the
+    back end to collect up the outputs.  wpilib has some extra conventions we
+    can commonalize.
+
+    Args:
+      auto_export_windows_symbols: If true, export all the symbols found in the
+                                   shared library on Windows.
+      user_link_flags: User link flags to add to the linking process.  Note:
+                       this gets augmented with extra flags to produce libfoo.so
+                       or libfood.so if in debug mode.
+      use_debug_name: If true, (default): when in debug mode, produce
+                      libfood.so, otherwise produce libfoo.so.  This matches the
+                      wpilib convention for debug library naming.  JNI libraries
+                      though want to be loaded with the same name for all builds,
+                      which necesitates turning this off.
+      win_def_file: The .def file used to specify symbols used in linking on
+                    Windows.  This is selected automatically such that it is
+                    only used on Windows.
+    """
+
     folder, lib = _folder_prefix(name)
 
     if not features:
@@ -595,15 +628,8 @@ def wpilib_cc_static_library(
     )
 
 def _generate_def_windows_impl(ctx):
-    """
-    This is a modified version of built in cc_static_library implementation
-    https://github.com/bazelbuild/bazel/blob/8.2.1/src/main/starlark/builtins_bzl/common/cc/experimental_cc_static_library.bzl
-
-    The built in version amalgamates all of the transative dependency objects into a single shared library. However, we do not want our
-    static libraries to only have the symbols related to the objects for this library, and not anything transative. In order to do this,
-    we add the option to specify transative static_libraries. The rule then filters out the objects that are defines in the other static
-    libraries.
-    """
+    # Generate the .def file for Windows.  Do this by finding the .obj files
+    # specified, and then passing those into the def file generator.
     deps = ctx.attr.deps
 
     cc_toolchain = find_cpp_toolchain(ctx)
