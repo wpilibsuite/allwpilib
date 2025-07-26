@@ -72,9 +72,8 @@ http_archive(
 # Download toolchains
 http_archive(
     name = "rules_bzlmodrio_toolchains",
-    integrity = "sha256-nxPvrL/9FI5uzHUhQJEOpT9XWiscNirjVPf503jnlt8=",
-    strip_prefix = "rules_bzlmodrio_toolchains-45eace241218430150e96ba5c0e25bd9932ce7c4",
-    urls = ["https://github.com/AustinSchuh/rules_bzlmodRio_toolchains/archive/45eace241218430150e96ba5c0e25bd9932ce7c4.tar.gz"],
+    sha256 = "b86f16f282a767bf73a341efcbd955613e4a20aa6f1fe7f229583af68e51acf8",
+    urls = ["https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr5/rules_bzlmodrio_toolchains-2025-1.bcr5.tar.gz"],
 )
 
 http_archive(
@@ -301,8 +300,6 @@ setup_legacy_bzlmodrio_ni_cpp_dependencies()
 
 http_archive(
     name = "bzlmodrio-opencv",
-    #patch_args = ["-p1"],
-    #patches = ["//:opencv.patch"],
     sha256 = "cbeec54aafafb795c57fbd9c7b681963a3174850ce525c06ff2681c3327f38a8",
     strip_prefix = "bzlmodRio-opencv-f995c28ab095dc505525bc13a68047b3986411b8",
     url = "https://github.com/wpilibsuite/bzlmodRio-opencv/archive/f995c28ab095dc505525bc13a68047b3986411b8.tar.gz",
