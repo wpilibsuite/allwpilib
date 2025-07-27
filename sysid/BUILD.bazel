@@ -31,7 +31,7 @@ cc_library(
     strip_include_prefix = "src/main/native/include",
     deps = [
         "//datalog",
-        "//glass:glass",
+        "//glass",
         "//wpinet",
     ],
 )
