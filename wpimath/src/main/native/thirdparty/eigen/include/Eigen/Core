@@ -92,6 +92,7 @@
 #include <algorithm>
 
 #include <array>
+#include <memory>
 #include <vector>
 
 // for std::is_nothrow_move_assignable
@@ -100,6 +101,11 @@
 // for std::this_thread::yield().
 #if !defined(EIGEN_USE_BLAS) && (defined(EIGEN_HAS_OPENMP) || defined(EIGEN_GEMM_THREADPOOL))
 #include <thread>
+#endif
+
+// for std::bit_cast()
+#if defined(__cpp_lib_bit_cast) && __cpp_lib_bit_cast >= 201806L
+#include <bit>
 #endif
 
 // for outputting debug info
@@ -121,7 +127,6 @@
 #undef isfinite
 #include <CL/sycl.hpp>
 #include <map>
-#include <memory>
 #include <thread>
 #include <utility>
 #ifndef EIGEN_SYCL_LOCAL_THREAD_DIM0
@@ -194,8 +199,11 @@ using std::ptrdiff_t;
 
 #if defined EIGEN_VECTORIZE_AVX512
 #include "src/Core/arch/SSE/PacketMath.h"
+#include "src/Core/arch/SSE/Reductions.h"
 #include "src/Core/arch/AVX/PacketMath.h"
+#include "src/Core/arch/AVX/Reductions.h"
 // #include "src/Core/arch/AVX512/PacketMath.h"
+// #include "src/Core/arch/AVX512/Reductions.h"
 #if defined EIGEN_VECTORIZE_AVX512FP16
 // #include "src/Core/arch/AVX512/PacketMathFP16.h"
 #endif
@@ -216,21 +224,26 @@ using std::ptrdiff_t;
 #endif
 // #include "src/Core/arch/AVX512/TrsmKernel.h"
 #elif defined EIGEN_VECTORIZE_AVX
-   // Use AVX for floats and doubles, SSE for integers
+// Use AVX for floats and doubles, SSE for integers
 #include "src/Core/arch/SSE/PacketMath.h"
+#include "src/Core/arch/SSE/Reductions.h"
 #include "src/Core/arch/SSE/TypeCasting.h"
 #include "src/Core/arch/SSE/Complex.h"
 #include "src/Core/arch/AVX/PacketMath.h"
+#include "src/Core/arch/AVX/Reductions.h"
 #include "src/Core/arch/AVX/TypeCasting.h"
 #include "src/Core/arch/AVX/Complex.h"
 #include "src/Core/arch/SSE/MathFunctions.h"
 #include "src/Core/arch/AVX/MathFunctions.h"
 #elif defined EIGEN_VECTORIZE_SSE
 #include "src/Core/arch/SSE/PacketMath.h"
+#include "src/Core/arch/SSE/Reductions.h"
 #include "src/Core/arch/SSE/TypeCasting.h"
 #include "src/Core/arch/SSE/MathFunctions.h"
 #include "src/Core/arch/SSE/Complex.h"
-#elif defined(EIGEN_VECTORIZE_ALTIVEC) || defined(EIGEN_VECTORIZE_VSX)
+#endif
+
+#if defined(EIGEN_VECTORIZE_ALTIVEC) || defined(EIGEN_VECTORIZE_VSX)
 // #include "src/Core/arch/AltiVec/PacketMath.h"
 // #include "src/Core/arch/AltiVec/TypeCasting.h"
 // #include "src/Core/arch/AltiVec/MathFunctions.h"
@@ -311,6 +324,7 @@ using std::ptrdiff_t;
 #include "src/Core/Product.h"
 #include "src/Core/CoreEvaluators.h"
 #include "src/Core/AssignEvaluator.h"
+#include "src/Core/RealView.h"
 #include "src/Core/Assign.h"
 
 #include "src/Core/ArrayBase.h"
@@ -350,6 +364,7 @@ using std::ptrdiff_t;
 #include "src/Core/SkewSymmetricMatrix3.h"
 #include "src/Core/Redux.h"
 #include "src/Core/Visitor.h"
+#include "src/Core/FindCoeff.h"
 #include "src/Core/Fuzzy.h"
 #include "src/Core/Swap.h"
 #include "src/Core/CommaInitializer.h"

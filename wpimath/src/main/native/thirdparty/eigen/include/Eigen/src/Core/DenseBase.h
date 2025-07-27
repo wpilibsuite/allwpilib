@@ -367,7 +367,12 @@ class DenseBase
   EIGEN_DEVICE_FUNC inline bool allFinite() const;
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator*=(const Scalar& other);
+  template <bool Enable = !internal::is_same<Scalar, RealScalar>::value, typename = std::enable_if_t<Enable>>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator*=(const RealScalar& other);
+
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator/=(const Scalar& other);
+  template <bool Enable = !internal::is_same<Scalar, RealScalar>::value, typename = std::enable_if_t<Enable>>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator/=(const RealScalar& other);
 
   typedef internal::add_const_on_value_type_t<typename internal::eval<Derived>::type> EvalReturnType;
   /** \returns the matrix or vector obtained by evaluating this expression.
@@ -596,6 +601,13 @@ class DenseBase
   inline iterator end();
   inline const_iterator end() const;
   inline const_iterator cend() const;
+
+  using RealViewReturnType = std::conditional_t<NumTraits<Scalar>::IsComplex, RealView<Derived>, Derived&>;
+  using ConstRealViewReturnType =
+      std::conditional_t<NumTraits<Scalar>::IsComplex, RealView<const Derived>, const Derived&>;
+
+  EIGEN_DEVICE_FUNC RealViewReturnType realView();
+  EIGEN_DEVICE_FUNC ConstRealViewReturnType realView() const;
 
 #define EIGEN_CURRENT_STORAGE_BASE_CLASS Eigen::DenseBase
 #define EIGEN_DOC_BLOCK_ADDONS_NOT_INNER_PANEL
