@@ -292,9 +292,9 @@ setup_legacy_bzlmodrio_ni_cpp_dependencies()
 
 http_archive(
     name = "bzlmodrio-opencv",
-    sha256 = "7b7cfd039d60fe9ef36ca0ed910db063c5274330ce9c5a8303aa54e52b58774d",
-    strip_prefix = "bzlmodRio-opencv-32d257016148d6f82a0a21bcc2cbf4a7a19a0050",
-    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/archive/32d257016148d6f82a0a21bcc2cbf4a7a19a0050.tar.gz",
+    sha256 = "fa1c2a930ef6507b6d61ce9661cb9645753ee049b72be345c7e5152b572e04e4",
+    strip_prefix = "bzlmodRio-opencv-0a2984cd03000274b5ab348242ebbcc6a487a86c",
+    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/archive/0a2984cd03000274b5ab348242ebbcc6a487a86c.tar.gz",
 )
 
 load("@bzlmodrio-opencv//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_opencv_cpp_dependencies")
