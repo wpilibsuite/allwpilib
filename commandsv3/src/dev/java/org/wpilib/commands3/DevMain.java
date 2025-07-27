@@ -8,7 +8,9 @@ import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.util.CombinedRuntimeLoader;
 
+/** Dev main. */
 public class DevMain {
+  /** Main entry point. */
   public static void main(String[] args) {
     System.out.println("Commands V3 DevMain");
 
