@@ -162,7 +162,7 @@ wpilib_cc_shared_library(
 wpilib_cc_shared_library(
     name = "shared/cscorejnicvstatic",
     additional_linker_inputs = select({
-        "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
+        "@platforms//os:osx": [":cscore-mac"],
         "//conditions:default": [],
     }) + [
         ":src/main/native/LinuxSymbolScript.txt",
@@ -171,19 +171,20 @@ wpilib_cc_shared_library(
     dynamic_deps = [
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
-    ] + opencv_shared_libraries,
+    ],
     user_link_flags = select({
         "@platforms//os:osx": [
             "-Wl,-install_name,libcscorejnicvstatic.so",
             "-exported_symbols_list",
             "$(location :src/main/native/MacSymbolScript.txt)",
         ],
-        "//conditions:default": [
+        "@platforms//os:linux": [
             "-Wl,-soname,libcscorejnicvstatic.so",
             "-Wl,--version-script=$(location :src/main/native/LinuxSymbolScript.txt)",
         ],
+        "//conditions:default": [],
     }) + select({
-        "@bazel_tools//src/conditions:darwin": [
+        "@platforms//os:osx": [
             "-Wl,-force_load,$(location :cscore-mac)",
             "-framework",
             "Metal",
