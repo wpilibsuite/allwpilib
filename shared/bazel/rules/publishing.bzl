@@ -44,20 +44,30 @@ def publish_all(name, targets):
         tags = ["manual"],
     )
 
+host_architectures = {
+    "@rules_bzlmodrio_toolchains//platforms/linux_x86_64": "linux-x86-64",
+    "@rules_bzlmodrio_toolchains//platforms/osx": "osxuniversal",
+    "@rules_bzlmodrio_toolchains//platforms/windows_arm64": "windows-arm64",
+    "@rules_bzlmodrio_toolchains//platforms/windows_x86_64": "windows-x86-64",
+}
+
 # Unfortunately, rules_jvm_external really wants each of the classifier
 # artifacts to have a unique name so they can go in the runfiles together and
 # not collide.
 def architectures_pkg_zip(
         name,
         compilation_modes = ["dbg", "opt"],
+        architectures = None,
+        **kwargs):
+    if architectures == None:
         architectures = {
             "@rules_bzlmodrio_toolchains//platforms/linux_x86_64": "linux-x86-64",
             "@rules_bzlmodrio_toolchains//platforms/osx": "osxuniversal",
             "@rules_bzlmodrio_toolchains//platforms/systemcore": "systemcore",
             "@rules_bzlmodrio_toolchains//platforms/windows_arm64": "windows-arm64",
             "@rules_bzlmodrio_toolchains//platforms/windows_x86_64": "windows-x86-64",
-        },
-        **kwargs):
+        }
+
     architectures_target_compatible_with = {
         "linux-x86-64": ["@platforms//os:linux"],
         "osxuniversal": ["@platforms//os:osx"],

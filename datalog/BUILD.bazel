@@ -4,7 +4,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
+load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 
 wpilib_cc_library(
     name = "datalog",
@@ -141,7 +141,7 @@ wpilib_java_junit5_test(
     ],
 )
 
-package_minimal_jni_project(
+package_default_jni_project(
     name = "datalog",
     maven_artifact_name = "datalog-cpp",
     maven_group_id = "edu.wpi.first.datalog",

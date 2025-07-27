@@ -72,8 +72,9 @@ http_archive(
 # Download toolchains
 http_archive(
     name = "rules_bzlmodrio_toolchains",
-    sha256 = "b86f16f282a767bf73a341efcbd955613e4a20aa6f1fe7f229583af68e51acf8",
-    urls = ["https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr5/rules_bzlmodrio_toolchains-2025-1.bcr5.tar.gz"],
+    sha256 = "8dc9ec4e35bdbb8a4ee79095671865400d16fcb19bad0c71aa0b5c8b6b06f2d7",
+    strip_prefix = "rules_bzlmodrio_toolchains-e46d5c571ea54a302d7bf68d4cccf47a78b5604c",
+    urls = ["https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/archive/e46d5c571ea54a302d7bf68d4cccf47a78b5604c.tar.gz"],
 )
 
 http_archive(
@@ -266,18 +267,9 @@ register_toolchains(
     "@local_systemcore//:macos",
     "@local_systemcore//:linux",
     "@local_systemcore//:windows",
-    "@local_raspi_bullseye_32//:macos",
-    "@local_raspi_bullseye_32//:linux",
-    "@local_raspi_bullseye_32//:windows",
     "@local_raspi_bookworm_32//:macos",
     "@local_raspi_bookworm_32//:linux",
     "@local_raspi_bookworm_32//:windows",
-    "@local_bullseye_32//:macos",
-    "@local_bullseye_32//:linux",
-    "@local_bullseye_32//:windows",
-    "@local_bullseye_64//:macos",
-    "@local_bullseye_64//:linux",
-    "@local_bullseye_64//:windows",
     "@local_bookworm_32//:macos",
     "@local_bookworm_32//:linux",
     "@local_bookworm_32//:windows",

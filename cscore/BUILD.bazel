@@ -6,7 +6,7 @@ load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
+load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project", "package_shared_cc_project")
 
 WIN_SRCS = glob([
     "src/main/native/windows/**/*.cpp",
@@ -160,7 +160,7 @@ wpilib_cc_shared_library(
 )
 
 # TODO(austin): This links against /home/austin/.gradle/caches/8.11/transforms/97de52b6251cda5e7b952b826501a57e/transformed/opencv-cpp-4.10.0-3-linuxx86-64static/linux/x86-64/static/libopencv4100.a
-cc_shared_library(
+wpilib_cc_shared_library(
     name = "shared/cscorejnicvstatic",
     additional_linker_inputs = select({
         "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
@@ -288,8 +288,24 @@ java_binary(
     "usbviewer",
 ]]
 
-package_minimal_jni_project(
+package_default_jni_project(
     name = "cscore",
     maven_artifact_name = "cscore-cpp",
+    maven_group_id = "edu.wpi.first.cscore",
+)
+
+alias(
+    name = "cscorejnicvstatic-hdrs-zip",
+    actual = "cscore-hdrs-zip",
+)
+
+alias(
+    name = "cscorejnicvstatic-srcs-zip",
+    actual = "cscore-srcs-zip",
+)
+
+package_shared_cc_project(
+    name = "cscorejnicvstatic",
+    maven_artifact_name = "cscore-jnicvstatic",
     maven_group_id = "edu.wpi.first.cscore",
 )
