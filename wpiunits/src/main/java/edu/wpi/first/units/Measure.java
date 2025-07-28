@@ -76,6 +76,8 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    *   Seconds.of(15).in(Minutes) // 0.25
    * </pre>
    *
+   * Equivalent to calling {@link #as(Unit)}.
+   *
    * @param unit the unit to convert this measure to
    * @return the value of this measure in the given unit
    */
@@ -85,6 +87,25 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
     } else {
       return unit.fromBaseUnits(baseUnitMagnitude());
     }
+  }
+
+  /**
+   * Converts this measure to a measure with a different unit of the same type,
+   * eg minutes to seconds.
+   * Converting to the same unit is equivalent to calling {@link #magnitude()}.
+   *
+   * <pre>
+   *   Meters.of(12).as(Feet) // 39.3701
+   *   Seconds.of(15).as(Minutes) // 0.25
+   * </pre>
+   *
+   * Equivalent to calling {@link #in(Unit)}.
+   *
+   * @param unit the unit to convert this measure to
+   * @return the value of this measure in the given unit
+   */
+  default double as(U unit) {
+    return in(unit);
   }
 
   /**
