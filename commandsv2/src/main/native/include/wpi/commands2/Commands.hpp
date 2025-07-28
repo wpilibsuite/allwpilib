@@ -15,7 +15,6 @@
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/Requirements.hpp"
 #include "wpi/commands2/SelectCommand.hpp"
-#include "wpi/util/deprecated.hpp"
 
 namespace wpi::cmd {
 class Subsystem;

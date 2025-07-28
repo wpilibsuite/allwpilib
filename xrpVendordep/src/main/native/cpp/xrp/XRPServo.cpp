@@ -62,25 +62,3 @@ wpi::units::radian_t XRPServo::GetAngle() const {
 
   return 90_deg;
 }
-
-void XRPServo::SetPosition(double pos) {
-  if (pos < 0.0) {
-    pos = 0.0;
-  }
-
-  if (pos > 1.0) {
-    pos = 1.0;
-  }
-
-  if (m_simPosition) {
-    m_simPosition.Set(pos);
-  }
-}
-
-double XRPServo::GetPosition() const {
-  if (m_simPosition) {
-    return m_simPosition.Get();
-  }
-
-  return 0.5;
-}

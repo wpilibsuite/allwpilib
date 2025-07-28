@@ -731,7 +731,6 @@ public class NiDsStadiaController extends GenericHID implements Sendable {
     return button(Button.kFrame.value, loop);
   }
 
-
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("HID");

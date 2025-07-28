@@ -188,16 +188,6 @@ class IterativeRobotBase : public RobotBase {
   virtual void TestExit();
 
   /**
-   * Enables or disables flushing NetworkTables every loop iteration.
-   * By default, this is enabled.
-   *
-   * @param enabled True to enable, false to disable
-   * @deprecated Deprecated without replacement.
-   */
-  [[deprecated("Deprecated without replacement.")]]
-  void SetNetworkTablesFlushEnabled(bool enabled);
-
-  /**
    * Gets time period between calls to Periodic() functions.
    */
   wpi::units::second_t GetPeriod() const;
@@ -229,7 +219,6 @@ class IterativeRobotBase : public RobotBase {
   int m_lastMode = -1;
   wpi::units::second_t m_period;
   Watchdog m_watchdog;
-  bool m_ntFlushEnabled = true;
   bool m_calledDsConnected = false;
 
   void PrintLoopOverrunMessage();
