@@ -371,6 +371,15 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
+   * Get all registered subsystems.
+   *
+   * @return Returns the list of registered subsystems as an immutable collection.
+   */
+  public Set<Subsystem> getAllRegisteredSubsystems() {
+    return Set.copyOf(m_subsystems.keySet());
+  }
+
+  /**
    * Un-registers all registered Subsystems with the scheduler. All currently registered subsystems
    * will no longer have their periodic block called, and will not have their default command
    * scheduled.
