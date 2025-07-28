@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
@@ -22,7 +23,6 @@
 
 #include "networktables/DoubleArrayTopic.h"
 #include "networktables/NetworkTableInstance.h"
-#include "ntcore.h"
 #include "ntcore_c.h"
 #include "ntcore_cpp.h"
 
