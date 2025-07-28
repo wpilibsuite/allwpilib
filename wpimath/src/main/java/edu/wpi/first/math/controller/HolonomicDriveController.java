@@ -20,7 +20,10 @@ import edu.wpi.first.math.util.Units;
  * x and y, and one profiled PID controller for the angular direction. Because the heading dynamics
  * are decoupled from translations, users can specify a custom heading that the drivetrain should
  * point toward. This heading reference is profiled for smoothness.
+ *
+ * @deprecated Use individual PID controllers instead.
  */
+@Deprecated(forRemoval = true, since = "2026")
 public class HolonomicDriveController {
   private Pose2d m_poseError = Pose2d.kZero;
   private Rotation2d m_rotationError = Rotation2d.kZero;

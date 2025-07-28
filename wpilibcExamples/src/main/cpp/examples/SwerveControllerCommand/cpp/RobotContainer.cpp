@@ -18,6 +18,7 @@
 #include <frc2/command/button/JoystickButton.h>
 #include <units/angle.h>
 #include <units/velocity.h>
+#include <wpi/deprecated.h>
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
@@ -74,6 +75,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
                                         units::radian_t{std::numbers::pi});
 
+  WPI_IGNORE_DEPRECATED
   frc2::CommandPtr swerveControllerCommand =
       frc2::SwerveControllerCommand<4>(
           exampleTrajectory, [this]() { return m_drive.GetPose(); },
@@ -88,6 +90,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
 
           {&m_drive})
           .ToPtr();
+  WPI_UNIGNORE_DEPRECATED
 
   // Reset odometry to the initial pose of the trajectory, run path following
   // command, then stop at the end.

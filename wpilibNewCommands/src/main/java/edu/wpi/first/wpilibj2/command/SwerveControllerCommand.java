@@ -30,7 +30,11 @@ import java.util.function.Supplier;
  * to the angle given in the final state of the trajectory.
  *
  * <p>This class is provided by the NewCommands VendorDep
+ *
+ * @deprecated Will be removed with no replacement.
  */
+@Deprecated(forRemoval = true, since = "2026")
+@SuppressWarnings("removal")
 public class SwerveControllerCommand extends Command {
   private final Timer m_timer = new Timer();
   private final Trajectory m_trajectory;

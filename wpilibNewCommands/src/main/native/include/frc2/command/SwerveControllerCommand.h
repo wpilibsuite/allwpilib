@@ -18,12 +18,14 @@
 #include <units/length.h>
 #include <units/time.h>
 #include <units/voltage.h>
+#include <wpi/deprecated.h>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/Requirements.h"
 
 #pragma once
+WPI_IGNORE_DEPRECATED
 
 namespace frc2 {
 
@@ -47,9 +49,11 @@ namespace frc2 {
  * trajectory.
  *
  * This class is provided by the NewCommands VendorDep
+ * @deprecated Will be removed with no replacement.
  */
 template <size_t NumModules>
-class SwerveControllerCommand
+class [[deprecated("Will be removed with no replacement.")]]
+SwerveControllerCommand
     : public CommandHelper<Command, SwerveControllerCommand<NumModules>> {
   using voltsecondspermeter =
       units::compound_unit<units::voltage::volt, units::second,
@@ -266,5 +270,5 @@ class SwerveControllerCommand
   units::second_t m_prevTime;
   frc::Rotation2d m_finalRotation;
 };
-
 }  // namespace frc2
+WPI_UNIGNORE_DEPRECATED

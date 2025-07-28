@@ -19,12 +19,14 @@
 #include <units/length.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
+#include <wpi/deprecated.h>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/Requirements.h"
 
 #pragma once
+WPI_IGNORE_DEPRECATED
 
 namespace frc2 {
 /**
@@ -47,8 +49,10 @@ namespace frc2 {
  * trajectory.
  *
  * This class is provided by the NewCommands VendorDep
+ * @deprecated Will be removed with no replacement.
  */
-class MecanumControllerCommand
+class [[deprecated("Will be removed with no replacement.")]]
+MecanumControllerCommand
     : public CommandHelper<Command, MecanumControllerCommand> {
  public:
   /**
@@ -267,3 +271,4 @@ class MecanumControllerCommand
   units::second_t m_prevTime;
 };
 }  // namespace frc2
+WPI_UNIGNORE_DEPRECATED

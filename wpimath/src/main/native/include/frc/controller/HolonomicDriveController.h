@@ -31,6 +31,7 @@ namespace frc {
  * angular direction. Because the heading dynamics are decoupled from
  * translations, users can specify a custom heading that the drivetrain should
  * point toward. This heading reference is profiled for smoothness.
+ * @deprecated Use individual PID controllers instead.
  */
 class WPILIB_DLLEXPORT HolonomicDriveController {
  public:
@@ -44,6 +45,7 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
    * @param thetaController A profiled PID controller to respond to error in
    * angle.
    */
+  [[deprecated("Use individual PID controllers instead.")]]
   constexpr HolonomicDriveController(
       PIDController xController, PIDController yController,
       ProfiledPIDController<units::radian> thetaController)

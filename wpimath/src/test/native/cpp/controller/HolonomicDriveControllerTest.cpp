@@ -5,6 +5,7 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
+#include <wpi/deprecated.h>
 
 #include "frc/MathUtil.h"
 #include "frc/controller/HolonomicDriveController.h"
@@ -20,6 +21,7 @@ static constexpr units::meter_t kTolerance{1 / 12.0};
 static constexpr units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
                                                    180.0};
 
+WPI_IGNORE_DEPRECATED
 TEST(HolonomicDriveControllerTest, ReachesReference) {
   frc::HolonomicDriveController controller{
       frc::PIDController{1.0, 0.0, 0.0}, frc::PIDController{1.0, 0.0, 0.0},

@@ -18,6 +18,7 @@
 #include <frc/simulation/SimHooks.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <gtest/gtest.h>
+#include <wpi/deprecated.h>
 
 #include "CommandTestBase.h"
 
@@ -82,6 +83,7 @@ TEST_F(SwerveControllerCommandTest, ReachesReference) {
 
   auto endState = trajectory.Sample(trajectory.TotalTime());
 
+  WPI_IGNORE_DEPRECATED
   auto command = frc2::SwerveControllerCommand<4>(
       trajectory, [&]() { return getRobotPose(); }, m_kinematics,
 
@@ -105,6 +107,7 @@ TEST_F(SwerveControllerCommandTest, ReachesReference) {
   }
   m_timer.Stop();
   command.End(false);
+  WPI_UNIGNORE_DEPRECATED
 
   EXPECT_NEAR_UNITS(endState.pose.X(), getRobotPose().X(), kxTolerance);
   EXPECT_NEAR_UNITS(endState.pose.Y(), getRobotPose().Y(), kyTolerance);

@@ -17,6 +17,7 @@
 #include <frc/simulation/SimHooks.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <gtest/gtest.h>
+#include <wpi/deprecated.h>
 
 #include "CommandTestBase.h"
 
@@ -97,9 +98,9 @@ TEST_F(MecanumControllerCommandTest, ReachesReference) {
 
   auto endState = trajectory.Sample(trajectory.TotalTime());
 
+  WPI_IGNORE_DEPRECATED
   auto command = frc2::MecanumControllerCommand(
       trajectory, [&]() { return getRobotPose(); }, m_kinematics,
-
       frc::PIDController(0.6, 0, 0), frc::PIDController(0.6, 0, 0),
       m_rotController, 8.8_mps,
       [&](units::meters_per_second_t frontLeft,
@@ -127,6 +128,7 @@ TEST_F(MecanumControllerCommandTest, ReachesReference) {
   }
   m_timer.Stop();
   command.End(false);
+  WPI_UNIGNORE_DEPRECATED
 
   EXPECT_NEAR_UNITS(endState.pose.X(), getRobotPose().X(), kxTolerance);
   EXPECT_NEAR_UNITS(endState.pose.Y(), getRobotPose().Y(), kyTolerance);

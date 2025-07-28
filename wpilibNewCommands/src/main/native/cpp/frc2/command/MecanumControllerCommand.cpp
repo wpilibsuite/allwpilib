@@ -10,6 +10,8 @@
 #include <units/velocity.h>
 #include <units/voltage.h>
 
+WPI_IGNORE_DEPRECATED
+
 using namespace frc2;
 using kv_unit = units::compound_unit<units::volts,
                                      units::inverse<units::meters_per_second>>;

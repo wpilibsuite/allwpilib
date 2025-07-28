@@ -100,6 +100,7 @@ public class RobotContainer {
             AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
+    @SuppressWarnings("removal")
     SwerveControllerCommand swerveControllerCommand =
         new SwerveControllerCommand(
             exampleTrajectory,

@@ -17,6 +17,7 @@
 #include <frc2/command/MecanumControllerCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/button/JoystickButton.h>
+#include <wpi/deprecated.h>
 
 #include "Constants.h"
 
@@ -66,6 +67,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       // Pass the config
       config);
 
+  WPI_IGNORE_DEPRECATED
   frc2::CommandPtr mecanumControllerCommand =
       frc2::MecanumControllerCommand(
           exampleTrajectory, [this]() { return m_drive.GetPose(); },
@@ -106,6 +108,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
 
           {&m_drive})
           .ToPtr();
+  WPI_UNIGNORE_DEPRECATED
 
   // Reset odometry to the initial pose of the trajectory, run path following
   // command, then stop at the end.

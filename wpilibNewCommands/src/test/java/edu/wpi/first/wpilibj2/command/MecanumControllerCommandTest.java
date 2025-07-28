@@ -28,6 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
+@SuppressWarnings("removal")
 class MecanumControllerCommandTest {
   @BeforeEach
   void setupAll() {

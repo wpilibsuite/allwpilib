@@ -97,6 +97,7 @@ public class RobotContainer {
             new Pose2d(3, 0, Rotation2d.kZero),
             config);
 
+    @SuppressWarnings("removal")
     MecanumControllerCommand mecanumControllerCommand =
         new MecanumControllerCommand(
             exampleTrajectory,

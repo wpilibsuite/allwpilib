@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("removal")
 class HolonomicDriveControllerTest {
   private static final double kTolerance = 1 / 12.0;
   private static final double kAngularTolerance = Math.toRadians(2);
