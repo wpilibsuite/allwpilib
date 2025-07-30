@@ -398,8 +398,9 @@ void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
   }
 
   std::scoped_lock lock{pcm->lock};
-  pcm->oneShot.sol10MsPerUnit[index] = (std::min)(
-      static_cast<uint32_t>(durMs) / 10, static_cast<uint32_t>(0xFF));
+  pcm->oneShot.sol10MsPerUnit[index] =
+      (std::min)(static_cast<uint32_t>(durMs) / 10,
+                 static_cast<uint32_t>(0xFF));
   HAL_WriteCANPacketRepeating(pcm->canHandle, pcm->oneShot.sol10MsPerUnit, 8,
                               Control3, SendPeriod, status);
 }
