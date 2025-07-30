@@ -270,11 +270,19 @@ public class Trigger implements BooleanSupplier {
     }
   }
 
-  /** Removes bindings in inactive scopes. */
+  /** Removes bindings in inactive scopes. Running commands tied to those bindings are cancelled. */
   private void clearStaleBindings() {
     m_bindings.forEach(
         (_bindingType, bindings) -> {
-          bindings.removeIf(binding -> !binding.scope().active());
+          for (var iterator = bindings.iterator(); iterator.hasNext(); ) {
+            var binding = iterator.next();
+            if (binding.scope().active()) {
+              continue;
+            }
+
+            iterator.remove();
+            m_scheduler.cancel(binding.command());
+          }
         });
   }
 
@@ -318,6 +326,19 @@ public class Trigger implements BooleanSupplier {
             });
   }
 
+  // package-private for testing
+  void addBinding(BindingScope scope, BindingType bindingType, Command command) {
+    Throwable t = new Throwable("Dummy error to get the binding trace");
+    StackTraceElement[] frames = t.getStackTrace();
+
+    m_bindings
+        .computeIfAbsent(bindingType, _k -> new ArrayList<>())
+        .add(new Binding(scope, bindingType, command, frames));
+
+    // Ensure this trigger is bound to the event loop. NOP if already bound
+    m_loop.bind(m_eventLoopCallback);
+  }
+
   private void addBinding(BindingType bindingType, Command command) {
     BindingScope scope =
         switch (m_scheduler.currentCommand()) {
@@ -331,14 +352,6 @@ public class Trigger implements BooleanSupplier {
           }
         };
 
-    Throwable t = new Throwable("Dummy error to get the binding trace");
-    StackTraceElement[] frames = t.getStackTrace();
-
-    m_bindings
-        .computeIfAbsent(bindingType, _k -> new ArrayList<>())
-        .add(new Binding(scope, bindingType, command, frames));
-
-    // Ensure this trigger is bound to the event loop. NOP if already bound
-    m_loop.bind(m_eventLoopCallback);
+    addBinding(scope, bindingType, command);
   }
 }

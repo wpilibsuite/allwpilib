@@ -8,7 +8,7 @@ package org.wpilib.commands3;
  * A scope for when a binding is live. Bindings tied to a scope must be deleted when the scope
  * becomes inactive.
  */
-sealed interface BindingScope {
+interface BindingScope {
   /**
    * Checks if the scope is active. Bindings for inactive scopes are removed from the scheduler.
    *

@@ -117,6 +117,42 @@ its children, even if some of those children are suspendable.
 Suspending a command that already has suspended children will still suspend everything; however,
 upon resume, those suspended children will remain suspended.
 
+### Inner Triggers
+
+Teams often want to use triggers only within the scope of certain commands. For example, running an
+autonomous mode that follows a particular path, and do certain actions when various points along the
+path are reached, but not have those actions be bound to globally visible triggers that may fire at
+other times during a match. In v2, such triggers need to be composed either a with a function that
+checks if a valid autonomous mode is running or with the same trigger that can cause that routine to
+run. This leads to many, many triggers being defined in robot programs and makes it difficult to
+understand when all those triggers may be used.
+
+The v3 framework will track the scopes in which trigger bindings are created, and automatically
+delete those bindings (and cancel any running commands bound to them) when their scopes become
+inactive. Users who manually schedule a command create a binding in a "global" scope that is always
+active. Binding commands to a trigger, however, will use whatever the narrowest available scope is
+at the time - creating a binding inside a running command will be scoped to that command's lifetime;
+creating a binding outside a command (for example, in a main Robot class constructor) will also use
+the "global" scope.
+
+```java
+void bindDriveButtons() {
+  // Globally bound and will always be active
+  controller.a().onTrue(...)
+}
+
+Trigger atScoringPosition = new Trigger(() -> getPosition().isNear(kScoringPosition));
+    
+Command autonomous() {
+  return Command.noRequirements(coroutine -> {
+    // This binding only exists while the autonomous command is running
+    atScoringPosition.onTrue(score());
+
+    coroutine.await(driveToScoringPosition());
+  }).named("Autonomous");
+}
+```
+
 ### Improved Transparency
 
 The v2 commands framework only runs top-level commands in the scheduler; commands nested within a

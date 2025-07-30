@@ -163,4 +163,26 @@ class TriggerTest {
     m_scheduler.run();
     assertFalse(innerRan.get(), "Trigger should not have fired again");
   }
+
+  @Test
+  void scopeGoingInactiveCancelsBoundCommand() {
+    var activeScope = new AtomicBoolean(true);
+    BindingScope scope = activeScope::get;
+
+    var triggerSignal = new AtomicBoolean(false);
+    var trigger = new Trigger(m_scheduler, triggerSignal::get);
+
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    trigger.addBinding(scope, BindingType.RUN_WHILE_HIGH, command);
+
+    triggerSignal.set(true);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command), "Command should have started when triggered");
+
+    activeScope.set(false);
+    m_scheduler.run();
+    assertFalse(
+        m_scheduler.isRunning(command),
+        "Command should have been cancelled when scope became inactive");
+  }
 }
