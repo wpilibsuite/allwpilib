@@ -10,11 +10,11 @@ struct ImGuiContext;
 
 namespace glass {
 class Context;
-}
+}  // namespace glass
 
 namespace wpi::gui {
 struct Context;
-}
+}  // namespace wpi::gui
 
 namespace halsimgui {
 
