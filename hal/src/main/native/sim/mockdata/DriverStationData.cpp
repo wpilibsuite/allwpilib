@@ -92,17 +92,46 @@ int64_t DriverStationData::AddOpMode(HAL_RobotMode mode, std::string_view name,
   }
 
   static constexpr int64_t HashMask = 0x00FFFFFFFFFFFFFF;
-  int64_t h = std::hash<std::string_view>{}(name) & HashMask;
+  int64_t h = baseVal | (std::hash<std::string_view>{}(name)&HashMask);
+  std::scoped_lock lock{m_opModeMutex};
   // TODO: handle hash collisions
   if (map->try_emplace(h, vec->size()).second) {
     return 0;
   }
+  vec->emplace_back(mode, std::string{name}, std::string{group},
+                    std::string{description}, textColor, backgroundColor);
+  switch (mode) {
+    case HAL_kRobotMode_autonomous:
+      m_autoOpModesCallbacks();
+      break;
+    case HAL_kRobotMode_teleop:
+      m_teleopOpModesCallbacks();
+      break;
+    case HAL_kRobotMode_test:
+      m_testOpModesCallbacks();
+      break;
+    default:
+      break;
+  }
+  return h;
+}
+
+int64_t DriverStationData::RemoveOpMode(int32_t mode, std::string_view name) {
 
 }
 
-int64_t DriverStationData::RemoveOpMode(int32_t mode, std::string_view name);
-
-void DriverStationData::ClearOpModes();
+void DriverStationData::ClearOpModes() {
+  std::scoped_lock lock{m_opModeMutex};
+  m_autoOpModes.clear();
+  m_autoOpModesMap.clear();
+  m_teleopOpModes.clear();
+  m_teleopOpModesMap.clear();
+  m_testOpModes.clear();
+  m_testOpModesMap.clear();
+  m_autoOpModesCallbacks();
+  m_teleopOpModesCallbacks();
+  m_testOpModesCallbacks();
+}
 
 #define DEFINE_CPPAPI_CALLBACKS(name, data, data2)                             \
   int32_t DriverStationData::RegisterJoystick##name##Callback(                 \
