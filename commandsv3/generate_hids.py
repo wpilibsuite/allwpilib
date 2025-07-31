@@ -5,8 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 
 import argparse
-import subprocess
 import json
+import subprocess
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
@@ -108,7 +108,12 @@ def main():
     args = parser.parse_args()
 
     generate_hids(args.output_directory, args.template_root, args.schema_file)
-    generate_quickbuf(args.protoc, args.quickbuf_plugin, args.output_directory / "main/java", args.proto_directory)
+    generate_quickbuf(
+        args.protoc,
+        args.quickbuf_plugin,
+        args.output_directory / "main/java",
+        args.proto_directory,
+    )
 
 
 if __name__ == "__main__":
