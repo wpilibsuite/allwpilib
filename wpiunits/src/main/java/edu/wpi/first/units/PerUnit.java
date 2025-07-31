@@ -4,8 +4,6 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.measure.ImmutablePer;
-import edu.wpi.first.units.measure.MutPer;
 import edu.wpi.first.units.measure.Per;
 import java.util.Objects;
 
@@ -195,7 +193,7 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
    * @see #of(double)
    */
   public final Per<N, D> ofNative(double magnitude) {
-    return new ImmutablePer<>(magnitude, toBaseUnits(magnitude), this);
+    return new Per<>(magnitude, toBaseUnits(magnitude), this);
   }
 
   /**
@@ -207,7 +205,7 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
    * @see #ofBaseUnits(double)
    */
   public final Per<N, D> ofNativeBaseUnits(double baseUnitMagnitude) {
-    return new ImmutablePer<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new Per<>(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -220,32 +218,6 @@ public class PerUnit<N extends Unit, D extends Unit> extends Unit {
   @SuppressWarnings("unchecked")
   public Measure<? extends PerUnit<N, D>> one() {
     return (Measure<? extends PerUnit<N, D>>) super.one();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * <p>Note: When called on an object of type {@code PerUnit} (and <i>not</i> a subclass!), this
-   * method will always return a {@link edu.wpi.first.units.measure.MutPer} instance.
-   *
-   * @param initialMagnitude the starting magnitude of the measure
-   * @return the ratio measure
-   */
-  @Override
-  public MutableMeasure<? extends PerUnit<N, D>, ?, ?> mutable(double initialMagnitude) {
-    return mutableNative(initialMagnitude);
-  }
-
-  /**
-   * Creates a new mutable measurement of the given magnitude in terms of the ratio unit. This will
-   * always return a {@code Per} object and cannot be overridden by subclasses.
-   *
-   * @param initialMagnitude the starting magnitude of the measure
-   * @return the ratio measure
-   * @see #mutable(double)
-   */
-  public final MutPer<N, D> mutableNative(double initialMagnitude) {
-    return new MutPer<>(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @Override

@@ -5,8 +5,6 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.measure.AngularMomentum;
-import edu.wpi.first.units.measure.ImmutableAngularMomentum;
-import edu.wpi.first.units.measure.MutAngularMomentum;
 
 /**
  * A unit of angular momentum, modeled as linear momentum of an object rotating some distance away
@@ -52,12 +50,12 @@ public final class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, Dist
 
   @Override
   public AngularMomentum of(double magnitude) {
-    return new ImmutableAngularMomentum(magnitude, toBaseUnits(magnitude), this);
+    return new AngularMomentum(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public AngularMomentum ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableAngularMomentum(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new AngularMomentum(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -68,11 +66,6 @@ public final class AngularMomentumUnit extends MultUnit<LinearMomentumUnit, Dist
   @Override
   public AngularMomentum one() {
     return (AngularMomentum) super.one();
-  }
-
-  @Override
-  public MutAngularMomentum mutable(double magnitude) {
-    return new MutAngularMomentum(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override

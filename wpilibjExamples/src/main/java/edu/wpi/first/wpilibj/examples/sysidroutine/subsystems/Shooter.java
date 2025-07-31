@@ -4,17 +4,12 @@
 
 package edu.wpi.first.wpilibj.examples.sysidroutine.subsystems;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.units.measure.MutAngle;
-import edu.wpi.first.units.measure.MutAngularVelocity;
-import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.examples.sysidroutine.Constants.ShooterConstants;
@@ -38,13 +33,6 @@ public class Shooter extends SubsystemBase {
           ShooterConstants.kEncoderPorts[1],
           ShooterConstants.kEncoderReversed);
 
-  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
-  private final MutVoltage m_appliedVoltage = Volts.mutable(0);
-  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-  private final MutAngle m_angle = Radians.mutable(0);
-  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-  private final MutAngularVelocity m_velocity = RadiansPerSecond.mutable(0);
-
   // Create a new SysId routine for characterizing the shooter.
   private final SysIdRoutine m_sysIdRoutine =
       new SysIdRoutine(
@@ -58,12 +46,9 @@ public class Shooter extends SubsystemBase {
               log -> {
                 // Record a frame for the shooter motor.
                 log.motor("shooter-wheel")
-                    .voltage(
-                        m_appliedVoltage.mut_replace(
-                            m_shooterMotor.get() * RobotController.getBatteryVoltage(), Volts))
-                    .angularPosition(m_angle.mut_replace(m_shooterEncoder.getDistance(), Rotations))
-                    .angularVelocity(
-                        m_velocity.mut_replace(m_shooterEncoder.getRate(), RotationsPerSecond));
+                    .voltage(Volts.of(m_shooterMotor.get() * RobotController.getBatteryVoltage()))
+                    .angularPosition(Rotations.of(m_shooterEncoder.getDistance()))
+                    .angularVelocity(RotationsPerSecond.of(m_shooterEncoder.getRate()));
               },
               // Tell SysId to make generated commands require this subsystem, suffix test state in
               // WPILog with this subsystem's name ("shooter")

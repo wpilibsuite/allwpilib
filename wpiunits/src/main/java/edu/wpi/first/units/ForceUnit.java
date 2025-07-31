@@ -5,8 +5,6 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.measure.Force;
-import edu.wpi.first.units.measure.ImmutableForce;
-import edu.wpi.first.units.measure.MutForce;
 
 /** A unit of force like {@link Units#Newtons}. */
 public final class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> {
@@ -61,12 +59,12 @@ public final class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> 
 
   @Override
   public Force of(double magnitude) {
-    return new ImmutableForce(magnitude, toBaseUnits(magnitude), this);
+    return new Force(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Force ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableForce(toBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new Force(toBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -77,11 +75,6 @@ public final class ForceUnit extends MultUnit<MassUnit, LinearAccelerationUnit> 
   @Override
   public Force one() {
     return (Force) super.one();
-  }
-
-  @Override
-  public MutForce mutable(double initialMagnitude) {
-    return new MutForce(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @Override
