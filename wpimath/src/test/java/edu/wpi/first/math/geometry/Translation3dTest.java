@@ -150,10 +150,23 @@ class Translation3dTest {
   }
 
   @Test
+  void testNormSquared() {
+    var one = new Translation3d(3.0, 5.0, 7.0);
+    assertEquals(83.0, one.getNormSquared(), kEpsilon);
+  }
+
+  @Test
   void testDistance() {
     var one = new Translation3d(1.0, 1.0, 1.0);
     var two = new Translation3d(6.0, 6.0, 6.0);
     assertEquals(5.0 * Math.sqrt(3.0), one.getDistance(two), kEpsilon);
+  }
+
+  @Test
+  void testDistanceSquared() {
+    var one = new Translation3d(1.0, 1.0, 1.0);
+    var two = new Translation3d(6.0, 6.0, 6.0);
+    assertEquals(75.0, one.getDistanceSquared(two), kEpsilon);
   }
 
   @Test
@@ -224,5 +237,23 @@ class Translation3dTest {
     assertEquals(translation3, origin.nearest(List.of(translation5, translation3, translation4)));
     assertEquals(translation1, origin.nearest(List.of(translation1, translation2, translation3)));
     assertEquals(translation2, origin.nearest(List.of(translation4, translation2, translation3)));
+  }
+
+  @Test
+  void testDot() {
+    var one = new Translation3d(1.0, 2.0, 3.0);
+    var two = new Translation3d(4.0, 5.0, 6.0);
+    assertEquals(32.0, one.dot(two));
+  }
+
+  @Test
+  void testCross() {
+    var one = new Translation3d(1.0, 2.0, 3.0);
+    var two = new Translation3d(4.0, 5.0, 6.0);
+    var cross = one.cross(two);
+    assertAll(
+        () -> assertEquals(-3.0, cross.getX(), kEpsilon),
+        () -> assertEquals(6.0, cross.getY(), kEpsilon),
+        () -> assertEquals(-3.0, cross.getZ(), kEpsilon));
   }
 }
