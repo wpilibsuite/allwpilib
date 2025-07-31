@@ -159,7 +159,6 @@ wpilib_cc_shared_library(
     deps = [":cscorejni"],
 )
 
-# TODO(austin): This links against /home/austin/.gradle/caches/8.11/transforms/97de52b6251cda5e7b952b826501a57e/transformed/opencv-cpp-4.10.0-3-linuxx86-64static/linux/x86-64/static/libopencv4100.a
 cc_shared_library(
     name = "shared/cscorejnicvstatic",
     additional_linker_inputs = select({
