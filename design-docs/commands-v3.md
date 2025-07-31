@@ -142,7 +142,7 @@ void bindDriveButtons() {
 }
 
 Trigger atScoringPosition = new Trigger(() -> getPosition().isNear(kScoringPosition));
-    
+
 Command autonomous() {
   return Command.noRequirements(coroutine -> {
     // This binding only exists while the autonomous command is running
