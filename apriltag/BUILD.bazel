@@ -19,14 +19,14 @@ cc_library(
     srcs = glob(["src/main/native/thirdparty/apriltag/src/**"]),
     hdrs = glob(["src/main/native/thirdparty/apriltag/include/**"]),
     copts = select({
-        "@bazel_tools//src/conditions:darwin": [
+        "@platforms//os:osx": [
             "-Wno-format-nonliteral",
             "-Wno-gnu-zero-variadic-macro-arguments",
             "-Wno-uninitialized",
             "-Wno-sign-compare",
             "-Wno-type-limits",
         ],
-        "@bazel_tools//src/conditions:windows": [
+        "@platforms//os:windows": [
             "/wd4005",
             "/wd4018",
             "/wd4244",

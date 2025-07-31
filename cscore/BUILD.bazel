@@ -23,8 +23,8 @@ MAC_SRCS = glob(["src/main/native/osx/**/*.cpp"])
 filegroup(
     name = "native-srcs",
     srcs = select({
-        "@bazel_tools//src/conditions:darwin": MAC_SRCS,
-        "@bazel_tools//src/conditions:windows": WIN_SRCS,
+        "@platforms//os:osx": MAC_SRCS,
+        "@platforms//os:windows": WIN_SRCS,
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_SRCS,
     }),
 )
@@ -81,15 +81,38 @@ wpilib_cc_library(
         "//wpiutil",
         "@bzlmodrio-opencv//libraries/cpp/opencv",
     ] + select({
-        "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
+        "@platforms//os:osx": [":cscore-mac"],
         "//conditions:default": [],
     }),
 )
 
+sdk_framework_flags = [
+    "-framework",
+    "Metal",
+    "-framework",
+    "MetalKit",
+    "-framework",
+    "Cocoa",
+    "-framework",
+    "IOKit",
+    "-framework",
+    "CoreFoundation",
+    "-framework",
+    "AVFoundation",
+    "-framework",
+    "Foundation",
+    "-framework",
+    "CoreMedia",
+    "-framework",
+    "CoreVideo",
+    "-framework",
+    "QuartzCore",
+]
+
 wpilib_cc_shared_library(
     name = "shared/cscore",
     additional_linker_inputs = select({
-        "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
+        "@platforms//os:osx": [":cscore-mac"],
         "//conditions:default": [],
     }),
     dynamic_deps = [
@@ -97,29 +120,9 @@ wpilib_cc_shared_library(
         "//wpiutil:shared/wpiutil",
     ] + opencv_shared_libraries,
     user_link_flags = select({
-        "@bazel_tools//src/conditions:darwin": [
+        "@platforms//os:osx": [
             "-Wl,-force_load,$(location :cscore-mac)",
-            "-framework",
-            "Metal",
-            "-framework",
-            "MetalKit",
-            "-framework",
-            "Cocoa",
-            "-framework",
-            "IOKit",
-            "-framework",
-            "CoreFoundation",
-            "-framework",
-            "AVFoundation",
-            "-framework",
-            "Foundation",
-            "-framework",
-            "CoreMedia",
-            "-framework",
-            "CoreVideo",
-            "-framework",
-            "QuartzCore",
-        ],
+        ] + sdk_framework_flags,
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
@@ -162,7 +165,7 @@ wpilib_cc_shared_library(
 cc_shared_library(
     name = "shared/cscorejnicvstatic",
     additional_linker_inputs = select({
-        "@bazel_tools//src/conditions:darwin": [":cscore-mac"],
+        "@platforms//os:osx": [":cscore-mac"],
         "//conditions:default": [],
     }) + [
         ":src/main/native/LinuxSymbolScript.txt",
@@ -183,29 +186,9 @@ cc_shared_library(
             "-Wl,--version-script=$(location :src/main/native/LinuxSymbolScript.txt)",
         ],
     }) + select({
-        "@bazel_tools//src/conditions:darwin": [
+        "@platforms//os:osx": [
             "-Wl,-force_load,$(location :cscore-mac)",
-            "-framework",
-            "Metal",
-            "-framework",
-            "MetalKit",
-            "-framework",
-            "Cocoa",
-            "-framework",
-            "IOKit",
-            "-framework",
-            "CoreFoundation",
-            "-framework",
-            "AVFoundation",
-            "-framework",
-            "Foundation",
-            "-framework",
-            "CoreMedia",
-            "-framework",
-            "CoreVideo",
-            "-framework",
-            "QuartzCore",
-        ],
+        ] + sdk_framework_flags,
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],

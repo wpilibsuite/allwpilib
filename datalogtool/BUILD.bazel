@@ -23,12 +23,11 @@ cc_binary(
     ],
     defines = ["LIBSSH_STATIC"],
     linkopts = select({
-        "@bazel_tools//src/conditions:darwin": [
+        "@platforms//os:osx": [
             "-framework",
             "Kerberos",
         ],
-        "@bazel_tools//src/conditions:linux_x86_64": [],
-        "@bazel_tools//src/conditions:windows": [
+        "@platforms//os:windows": [
             "-DEFAULTLIB:Gdi32.lib",
             "-DEFAULTLIB:Shell32.lib",
             "-DEFAULTLIB:d3d11.lib",
@@ -39,6 +38,7 @@ cc_binary(
             "-DEFAULTLIB:user32.lib",
             "-SUBSYSTEM:WINDOWS",
         ],
+        "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": [],
         "@rules_bzlmodrio_toolchains//constraints/combined:is_cross_compiler": [],
     }),
     tags = [

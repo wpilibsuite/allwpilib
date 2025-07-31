@@ -48,8 +48,8 @@ wpilib_cc_library(
     name = "wpigui",
     srcs = glob(["src/main/native/cpp/**/*.cpp"]) +
            select({
-               "@bazel_tools//src/conditions:darwin": [],
-               "@bazel_tools//src/conditions:windows": WIN_SRCS,
+               "@platforms//os:osx": [],
+               "@platforms//os:windows": WIN_SRCS,
                "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_SRCS,
            }),
     extra_src_pkg_files = [":native-pkg"],
@@ -63,7 +63,7 @@ wpilib_cc_library(
         ":headers",
         "//thirdparty/imgui_suite",
     ] + select({
-        "@bazel_tools//src/conditions:darwin": [":wpigui-mac"],
+        "@platforms//os:osx": [":wpigui-mac"],
         "//conditions:default": [],
     }),
 )
@@ -74,7 +74,7 @@ wpilib_cc_static_library(
         "//thirdparty/imgui_suite:static/imguiSuite",
     ],
     static_lib_name = select({
-        "@bazel_tools//src/conditions:windows": "static/wpigui.lib",
+        "@platforms//os:windows": "static/wpigui.lib",
         "//conditions:default": "static/libwpigui.a",
     }),
     visibility = ["//visibility:public"],
