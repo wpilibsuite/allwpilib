@@ -21,51 +21,51 @@ import java.util.function.Consumer;
  * command implementation <strong>must</strong> call {@link Coroutine#yield()} within any periodic
  * loop. Failure to do so may result in an unrecoverable infinite loop.
  *
- * <p>{@snippet lang="java":
- *     // A 2013-style class-based command definition
- *     class ClassBasedCommand extends Command {
- *       public ClassBasedCommand(Subsystem requiredSubsystem) {
- *         addRequirements(requiredSubsystem);
- *       }
+ * <pre>{@code
+ * // A 2013-style class-based command definition
+ * class ClassBasedCommand extends Command {
+ *   public ClassBasedCommand(Subsystem requiredSubsystem) {
+ *     addRequirements(requiredSubsystem);
+ *   }
  *
- *       @Override
- *       public void initialize() {}
+ *   @Override
+ *   public void initialize() {}
  *
- *       @Override
- *       public void execute() {}
+ *   @Override
+ *   public void execute() {}
  *
- *       @Override
- *       public void end(boolean interrupted) {}
+ *   @Override
+ *   public void end(boolean interrupted) {}
  *
- *       @Override
- *       public void isFinished() { return true; }
+ *   @Override
+ *   public void isFinished() { return true; }
  *
- *       @Override
- *       public String getName() { return "The Command"; }
- *     }
+ *   @Override
+ *   public String getName() { return "The Command"; }
+ * }
  *
- *     Command command = new ClassBasedCommand(requiredSubsystem);
+ * Command command = new ClassBasedCommand(requiredSubsystem);
  *
- *     // Or a 2020-style function-based command
- *     Command command = requiredSubsystem
- *       .runOnce(() -> initialize())
- *       .andThen(
- *         requiredSubsystem
- *           .run(() -> execute())
- *           .until(() -> isFinished())
- *           .onFinish(() -> end())
- *       ).withName("The Command");
+ * // Or a 2020-style function-based command
+ * Command command = requiredSubsystem
+ *   .runOnce(() -> initialize())
+ *   .andThen(
+ *     requiredSubsystem
+ *       .run(() -> execute())
+ *       .until(() -> isFinished())
+ *       .onFinish(() -> end())
+ *   ).withName("The Command");
  *
- *     // Can be represented with a 2025-style async-based definition
- *     Command command = requiredSubsystem.run(coroutine -> {
- *       initialize();
- *       while (!isFinished()) {
- *         coroutine.yield();
- *         execute();
- *       }
- *       end();
- *     }).named("The Command");
- *     }
+ * // Can be represented with a 2027-style async-based definition
+ * Command command = requiredSubsystem.run(coroutine -> {
+ *   initialize();
+ *   while (!isFinished()) {
+ *     coroutine.yield();
+ *     execute();
+ *   }
+ *   end();
+ * }).named("The Command");
+ * }</pre>
  */
 public interface Command {
   /** The default command priority. */
@@ -267,13 +267,13 @@ public interface Command {
    * Starts creating a command sequence, starting from this command and then running the next one.
    * More commands can be added with the builder before naming and creating the sequence.
    *
-   * <p>{@snippet lang="java":
+   * <pre>{@code
    * Sequence aThenBThenC =
    *   commandA()
    *     .andThen(commandB())
    *     .andThen(commandC())
    *     .withAutomaticName();
-   * }
+   * }</pre>
    *
    * @param next The command to run after this one in the sequence
    * @return A sequence builder
@@ -286,12 +286,12 @@ public interface Command {
    * Starts creating a parallel command group, running this command alongside one or more other
    * commands. The group will exit once every command has finished.
    *
-   * <p>{@snippet lang="java":
+   * <pre>{@code
    * ParallelGroup abc =
    *   commandA()
    *     .alongWith(commandB(), commandC())
    *     .withAutomaticName();
-   * }
+   * }</pre>
    *
    * @param parallel The commands to run in parallel with this one
    * @return A parallel group builder

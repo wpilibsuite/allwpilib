@@ -78,7 +78,7 @@ public final class Coroutine {
    * parent command cancels it. The parent command will continue executing while the forked command
    * runs, and can resync with the forked command using {@link #await(Command)}.
    *
-   * <p>{@snippet lang="java":
+   * <pre>{@code
    * Command example() {
    *   return Command.noRequirements(coroutine -> {
    *     Command inner = ...;
@@ -88,7 +88,7 @@ public final class Coroutine {
    *     coroutine.await(inner);
    *   }).named("Example");
    * }
-   * }
+   * }</pre>
    *
    * @param commands The commands to fork.
    */
@@ -236,7 +236,7 @@ public final class Coroutine {
    *
    * <p>For example, a basic autonomous routine that drives straight for 5 seconds:
    *
-   * <p>{@snippet lang="java":
+   * <pre>{@code
    * Command timedDrive() {
    *   return drivebase.run(coroutine -> {
    *     drivebase.tankDrive(1, 1);
@@ -244,7 +244,7 @@ public final class Coroutine {
    *     drivebase.stop();
    *   }).named("Timed Drive");
    * }
-   * }
+   * }</pre>
    *
    * @param duration the duration of time to wait
    */
