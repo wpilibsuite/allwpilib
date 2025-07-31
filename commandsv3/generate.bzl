@@ -23,14 +23,6 @@ def __generate_commandsv3_impl(ctx):
 generate_commandsv3 = rule(
     implementation = __generate_commandsv3_impl,
     attrs = {
-        "_templates": attr.label(
-            default = Label("//commandsv3:templates"),
-        ),
-        "_tool": attr.label(
-            default = Label("//commandsv3:generate_hids"),
-            cfg = "exec",
-            executable = True,
-        ),
         "_protoc": attr.label(
             default = Label("@com_google_protobuf//:protoc"),
             cfg = "exec",
@@ -38,6 +30,14 @@ generate_commandsv3 = rule(
         ),
         "_quickbuf": attr.label(
             default = Label("//:quickbuf_protoc"),
+            cfg = "exec",
+            executable = True,
+        ),
+        "_templates": attr.label(
+            default = Label("//commandsv3:templates"),
+        ),
+        "_tool": attr.label(
+            default = Label("//commandsv3:generate_hids"),
             cfg = "exec",
             executable = True,
         ),
