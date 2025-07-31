@@ -72,8 +72,8 @@ http_archive(
 # Download toolchains
 http_archive(
     name = "rules_bzlmodrio_toolchains",
-    sha256 = "37780b3d3f30de72aaca12d9f80edc4216f6d708bed5b261c424d4dde49e8531",
-    url = "https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr4/rules_bzlmodrio_toolchains-2025-1.bcr4.tar.gz",
+    sha256 = "102b4507628e9724b0c1e441727762c344e40170f65ac60516168178ea33a89a",
+    url = "https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr6/rules_bzlmodrio_toolchains-2025-1.bcr6.tar.gz",
 )
 
 http_archive(
@@ -266,18 +266,9 @@ register_toolchains(
     "@local_systemcore//:macos",
     "@local_systemcore//:linux",
     "@local_systemcore//:windows",
-    "@local_raspi_bullseye_32//:macos",
-    "@local_raspi_bullseye_32//:linux",
-    "@local_raspi_bullseye_32//:windows",
     "@local_raspi_bookworm_32//:macos",
     "@local_raspi_bookworm_32//:linux",
     "@local_raspi_bookworm_32//:windows",
-    "@local_bullseye_32//:macos",
-    "@local_bullseye_32//:linux",
-    "@local_bullseye_32//:windows",
-    "@local_bullseye_64//:macos",
-    "@local_bullseye_64//:linux",
-    "@local_bullseye_64//:windows",
     "@local_bookworm_32//:macos",
     "@local_bookworm_32//:linux",
     "@local_bookworm_32//:windows",
@@ -300,8 +291,8 @@ setup_legacy_bzlmodrio_ni_cpp_dependencies()
 
 http_archive(
     name = "bzlmodrio-opencv",
-    sha256 = "27dff7aaedd00165b1a94867616ebf383220532e3956892cec649197077a9d01",
-    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr3/bzlmodRio-opencv-2025.4.10.0-3.bcr3.tar.gz",
+    sha256 = "391e99abe3be9d7b5e3aa3e822fc287be4dddb3333d00b90a29b6e7d0464d490",
+    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr4/bzlmodRio-opencv-2025.4.10.0-3.bcr4.tar.gz",
 )
 
 load("@bzlmodrio-opencv//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_opencv_cpp_dependencies")
