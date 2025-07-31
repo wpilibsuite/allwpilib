@@ -60,6 +60,7 @@ wpilib_cc_shared_library(
         ":shared/datalog",
         "//wpiutil:shared/wpiutil",
     ],
+    use_debug_name = False,
     visibility = ["//visibility:public"],
     deps = [":datalogjni"],
 )

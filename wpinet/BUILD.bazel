@@ -189,9 +189,10 @@ wpilib_cc_shared_library(
     name = "shared/wpinetjni",
     auto_export_windows_symbols = False,
     dynamic_deps = [
-        ":shared/wpinet",
         "//wpiutil:shared/wpiutil",
+        ":shared/wpinet",
     ],
+    use_debug_name = False,
     visibility = ["//visibility:public"],
     deps = [":wpinetjni"],
 )
