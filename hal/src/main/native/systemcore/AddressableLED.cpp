@@ -178,7 +178,6 @@ void HAL_SetAddressableLEDData(int32_t start, int32_t length,
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
-  // TODO: handle color order
   ConvertAndCopyLEDData(&leds->s_buffer[start * 3], data, length * 3,
                         colorOrder);
   leds->rawPub.Set(leds->s_buffer);
