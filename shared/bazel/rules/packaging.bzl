@@ -347,11 +347,13 @@ def package_binary_cc_project(
         name,
         maven_group_id,
         maven_artifact_name,
-        architectures = None):
+        architectures = None,
+        renames = None):
     pkg_files(
         name = "{}-files".format(name),
         srcs = [name],
         prefix = platform_prefix(""),
+        renames = renames,
     )
 
     architectures_pkg_zip(
