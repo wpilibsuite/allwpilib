@@ -80,6 +80,7 @@ wpilib_cc_shared_library(
     visibility = ["//visibility:public"],
     deps = [
         ":apriltag",
+        ":thirdparty-apriltag",
     ],
 )
 
