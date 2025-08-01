@@ -37,7 +37,7 @@ cc_binary(
     name = "sysid",
     srcs = ["src/main/native/cpp/Main.cpp"],
     linkopts = select({
-        "@bazel_tools//src/conditions:windows": ["-SUBSYSTEM:WINDOWS"],
+        "@platforms//os:windows": ["-SUBSYSTEM:WINDOWS"],
         "//conditions:default": [],
     }),
     deps = ["sysid-lib"],

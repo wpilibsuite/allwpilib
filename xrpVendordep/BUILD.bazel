@@ -22,11 +22,12 @@ wpilib_cc_library(
 wpilib_cc_shared_library(
     name = "shared/xrpVendordep",
     dynamic_deps = [
-        "//hal:shared/wpiHal",
         "//ntcore:shared/ntcore",
         "//wpilibc:shared/wpilibc",
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
+        "//wpimath:shared/wpimath",
+        "//hal:shared/wpiHal",
     ],
     visibility = ["//visibility:public"],
     deps = [":xrpVendordep"],

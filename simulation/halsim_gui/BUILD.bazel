@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
 
 wpilib_cc_library(
@@ -54,6 +54,50 @@ wpilib_cc_library(
     deps = [
         "//glass:libglassnt",
         "//hal:wpiHal",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/halsim_gui",
+    additional_linker_inputs = select({
+        "@platforms//os:osx": [
+            "//thirdparty/imgui_suite:glfw_src_darwin",
+            "//thirdparty/imgui_suite:imgui_src_darwin",
+            "//wpigui:wpigui-mac",
+        ],
+        "//conditions:default": [],
+    }),
+    dynamic_deps = [
+        "//hal:shared/wpiHal",
+        "//wpimath:shared/wpimath",
+        "//datalog:shared/datalog",
+        "//ntcore:shared/ntcore",
+    ],
+    user_link_flags = select({
+        "@platforms//os:osx": [
+            "-Wl,-force_load,$(location //thirdparty/imgui_suite:glfw_src_darwin)",
+            "-Wl,-force_load,$(location //thirdparty/imgui_suite:imgui_src_darwin)",
+            "-Wl,-force_load,$(location //wpigui:wpigui-mac)",
+            "-framework",
+            "Metal",
+            "-framework",
+            "MetalKit",
+            "-framework",
+            "Cocoa",
+            "-framework",
+            "IOKit",
+            "-framework",
+            "CoreFoundation",
+            "-framework",
+            "CoreVideo",
+            "-framework",
+            "QuartzCore",
+        ],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":halsim_gui",
     ],
 )
 
