@@ -52,25 +52,24 @@ void SwerveModule::SetDesiredState(
   wpi::math::Rotation2d encoderRotation{
       wpi::units::radian_t{m_turningEncoder.GetDistance()}};
 
-  // Optimize the reference state to avoid spinning further than 90 degrees
-  referenceState.Optimize(encoderRotation);
-
-  // Scale speed by cosine of angle error. This scales down movement
+  // Optimize the reference state to avoid spinning further than 90 degrees,
+  // then scale speed by cosine of angle error. This scales down movement
   // perpendicular to the desired direction of travel that can occur when
   // modules change directions. This results in smoother driving.
-  referenceState.CosineScale(encoderRotation);
+  // Optimize the reference state to avoid spinning further than 90 degrees
+  auto state =
+      referenceState.Optimize(encoderRotation).CosineScale(encoderRotation);
 
   // Calculate the drive output from the drive PID controller.
   const auto driveOutput = m_drivePIDController.Calculate(
-      m_driveEncoder.GetRate(), referenceState.speed.value());
+      m_driveEncoder.GetRate(), state.speed.value());
 
-  const auto driveFeedforward =
-      m_driveFeedforward.Calculate(referenceState.speed);
+  const auto driveFeedforward = m_driveFeedforward.Calculate(state.speed);
 
   // Calculate the turning motor output from the turning PID controller.
   const auto turnOutput = m_turningPIDController.Calculate(
       wpi::units::radian_t{m_turningEncoder.GetDistance()},
-      referenceState.angle.Radians());
+      state.angle.Radians());
 
   const auto turnFeedforward = m_turnFeedforward.Calculate(
       m_turningPIDController.GetSetpoint().velocity);
