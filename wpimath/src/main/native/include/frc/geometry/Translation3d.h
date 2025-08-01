@@ -110,9 +110,9 @@ class WPILIB_DLLEXPORT Translation3d {
    */
   constexpr units::square_meter_t DistanceSquared(
       const Translation3d& other) const {
-      return units::math::pow<2>(other.m_x - m_x) +
-             units::math::pow<2>(other.m_y - m_y) +
-             units::math::pow<2>(other.m_z - m_z);
+    return units::math::pow<2>(other.m_x - m_x) +
+           units::math::pow<2>(other.m_y - m_y) +
+           units::math::pow<2>(other.m_z - m_z);
   }
 
   /**
@@ -219,12 +219,10 @@ class WPILIB_DLLEXPORT Translation3d {
    * @return The cross product between the two translations.
    */
   constexpr Translation3d Cross(const Translation3d& other) const {
-    return Translation3d{units::meter_t{(m_y * other.Z() - other.Y() * m_z)
-                                            .value()},
-                         units::meter_t{(m_z * other.X() - other.Z() * m_x)
-                                            .value()},
-                         units::meter_t{(m_x * other.Y() - other.X() * m_y)
-                                            .value()}};
+    return Translation3d{
+        units::meter_t{(m_y * other.Z() - other.Y() * m_z).value()},
+        units::meter_t{(m_z * other.X() - other.Z() * m_x).value()},
+        units::meter_t{(m_x * other.Y() - other.X() * m_y).value()}};
   }
 
   /**
