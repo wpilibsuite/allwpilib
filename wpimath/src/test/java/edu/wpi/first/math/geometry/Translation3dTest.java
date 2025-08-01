@@ -253,8 +253,8 @@ class Translation3dTest {
 
     var cross = one.cross(two);
     assertAll(
-        () -> assertEquals(-3.0, cross.getX(), kEpsilon),
-        () -> assertEquals(6.0, cross.getY(), kEpsilon),
-        () -> assertEquals(-3.0, cross.getZ(), kEpsilon));
+        () -> assertEquals(-3.0, cross.get(0, 0), kEpsilon),
+        () -> assertEquals(6.0, cross.get(1, 0), kEpsilon),
+        () -> assertEquals(-3.0, cross.get(2, 0), kEpsilon));
   }
 }

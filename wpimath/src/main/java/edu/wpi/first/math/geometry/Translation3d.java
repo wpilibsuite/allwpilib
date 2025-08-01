@@ -274,14 +274,14 @@ public class Translation3d
    * Computes the cross product between this translation and another translation in 3D space. The
    * resulting translation will be perpendicular to both translations.
    *
-   * <p>The 3D cross product between two translations is defined as Translation3d(y₁z₂-y₂z₁,
-   * z₁x₂-z₂x₁, x₁y₂-x₂y₁).
+   * <p>The 3D cross product between two translations is defined as &lt;y₁z₂-y₂z₁, z₁x₂-z₂x₁,
+   * x₁y₂-x₂y₁&gt;.
    *
    * @param other The translation to compute the cross product with.
    * @return The cross product between the two translations.
    */
-  public Translation3d cross(Translation3d other) {
-    return new Translation3d(
+  public Vector<N3> cross(Translation3d other) {
+    return VecBuilder.fill(
         m_y * other.m_z - other.m_y * m_z,
         m_z * other.m_x - other.m_z * m_x,
         m_x * other.m_y - other.m_x * m_y);

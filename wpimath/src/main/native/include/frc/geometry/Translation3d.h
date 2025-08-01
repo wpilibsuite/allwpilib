@@ -212,17 +212,18 @@ class WPILIB_DLLEXPORT Translation3d {
    * translation in 3D space. The resulting translation will be perpendicular to
    * both translations.
    *
-   * The 3D cross product between two translations is defined as
-   * Translation3d{y₁z₂-y₂z₁, z₁x₂-z₂x₁, x₁y₂-x₂y₁}.
+   * The 3D cross product between two translations is defined as <y₁z₂-y₂z₁,
+   * z₁x₂-z₂x₁, x₁y₂-x₂y₁>.
    *
    * @param other The translation to compute the cross product with.
    * @return The cross product between the two translations.
    */
-  constexpr Translation3d Cross(const Translation3d& other) const {
-    return Translation3d{
-        units::meter_t{(m_y * other.Z() - other.Y() * m_z).value()},
-        units::meter_t{(m_z * other.X() - other.Z() * m_x).value()},
-        units::meter_t{(m_x * other.Y() - other.X() * m_y).value()}};
+  constexpr Eigen::Vector<units::square_meter_t, 3> Cross(
+      const Translation3d& other) const {
+    return Eigen::Vector<units::square_meter_t, 3>{
+        {m_y * other.Z() - other.Y() * m_z},
+        {m_z * other.X() - other.Z() * m_x},
+        {m_x * other.Y() - other.X() * m_y}};
   }
 
   /**

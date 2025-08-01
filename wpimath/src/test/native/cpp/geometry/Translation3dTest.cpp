@@ -237,7 +237,7 @@ TEST(Translation3dTest, Cross) {
   const Translation3d two{4_m, 5_m, 6_m};
 
   auto cross = one.Cross(two);
-  EXPECT_NEAR(cross.X().value(), -3.0, kEpsilon);
-  EXPECT_NEAR(cross.Y().value(), 6.0, kEpsilon);
-  EXPECT_NEAR(cross.Z().value(), -3.0, kEpsilon);
+  EXPECT_NEAR(cross[0].value(), -3.0, kEpsilon);
+  EXPECT_NEAR(cross[1].value(), 6.0, kEpsilon);
+  EXPECT_NEAR(cross[2].value(), -3.0, kEpsilon);
 }
