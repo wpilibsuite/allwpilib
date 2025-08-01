@@ -43,32 +43,14 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
    * furthest a wheel will ever rotate is 90 degrees.
    *
    * @param currentAngle The current module angle.
+   * @return The optimized module state.
    */
-  constexpr void Optimize(const Rotation2d& currentAngle) {
+  constexpr SwerveModuleState Optimize(const Rotation2d& currentAngle) {
     auto delta = angle - currentAngle;
     if (wpi::units::math::abs(delta.Degrees()) > 90_deg) {
-      speed *= -1;
-      angle = angle + Rotation2d{180_deg};
-    }
-  }
-
-  /**
-   * Minimize the change in heading the desired swerve module state would
-   * require by potentially reversing the direction the wheel spins. If this is
-   * used with the PIDController class's continuous input functionality, the
-   * furthest a wheel will ever rotate is 90 degrees.
-   *
-   * @param desiredState The desired state.
-   * @param currentAngle The current module angle.
-   */
-  [[deprecated("Use instance method instead.")]]
-  constexpr static SwerveModuleState Optimize(
-      const SwerveModuleState& desiredState, const Rotation2d& currentAngle) {
-    auto delta = desiredState.angle - currentAngle;
-    if (wpi::units::math::abs(delta.Degrees()) > 90_deg) {
-      return {-desiredState.speed, desiredState.angle + Rotation2d{180_deg}};
+      return {-speed, angle + Rotation2d{180_deg}};
     } else {
-      return {desiredState.speed, desiredState.angle};
+      return {speed, angle};
     }
   }
 
@@ -78,9 +60,10 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
    * modules change directions. This results in smoother driving.
    *
    * @param currentAngle The current module angle.
+   * @return The scaled module state.
    */
-  constexpr void CosineScale(const Rotation2d& currentAngle) {
-    speed *= (angle - currentAngle).Cos();
+  constexpr SwerveModuleState CosineScale(const Rotation2d& currentAngle) {
+    return {speed * (angle - currentAngle).Cos(), angle};
   }
 };
 }  // namespace wpi::math
