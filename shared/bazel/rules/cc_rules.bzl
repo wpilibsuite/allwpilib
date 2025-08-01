@@ -400,7 +400,8 @@ def wpilib_cc_shared_library(
     _split_debug_symbols(
         name = name + "-symbolsplit",
         copy = select({
-            "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": False,
+            "@rules_bzlmodrio_toolchains//conditions:linux_arm64": False,
+            "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": True,
             "//conditions:default": True,
         }),
         use_debug_name = select({
