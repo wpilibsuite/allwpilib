@@ -264,7 +264,7 @@ public class Translation3d
    * <p>The dot product between two translations is defined as x₁x₂+y₁y₂+z₁z₂.
    *
    * @param other The translation to compute the dot product with.
-   * @return The dot product between the two translations.
+   * @return The dot product between the two translations, in square meters.
    */
   public double dot(Translation3d other) {
     return m_x * other.m_x + m_y * other.m_y + m_z * other.m_z;
