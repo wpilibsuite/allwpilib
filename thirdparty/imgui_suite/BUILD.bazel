@@ -419,7 +419,7 @@ pkg_files(
 )
 
 pkg_zip(
-    name = "imgui-hdrs-zip",
+    name = "imguiSuite-hdrs-zip",
     srcs = [
         "generated-fonts-hdrs-pkg",
         "generated-gl3w-hdrs-pkg",
@@ -471,7 +471,7 @@ pkg_files(
 )
 
 pkg_zip(
-    name = "imgui-srcs-zip",
+    name = "imguiSuite-srcs-zip",
     srcs = [
         "generated-fonts-srcs-pkg",
         "generated-gl3w-srcs-pkg",
@@ -487,7 +487,7 @@ pkg_zip(
 )
 
 package_minimal_cc_project(
-    name = "imgui",
+    name = "imguiSuite",
     maven_artifact_name = "imguiSuite-cpp",
     maven_group_id = "edu.wpi.first.thirdparty.imguiSuite",
 )

@@ -82,7 +82,7 @@ publish_all(
         "//simulation/halsim_ws_server:halsim_ws_server-cpp_publish",
         "//simulation/halsim_xrp:halsim_xrp-cpp_publish",
         "//thirdparty/googletest:googletest-cpp_publish",
-        "//thirdparty/imgui_suite:imgui-cpp_publish",
+        "//thirdparty/imgui_suite:imguiSuite-cpp_publish",
         "//wpigui:wpigui-cpp_publish",
         "//wpilibNewCommands:wpilibNewCommands-cpp_publish",
         "//wpilibNewCommands:wpilibNewCommands-java_publish",
