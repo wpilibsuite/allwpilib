@@ -7,6 +7,7 @@ package edu.wpi.first.epilogue.processor;
 import java.util.Map;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
@@ -27,7 +28,7 @@ public class ConfiguredLoggerHandler extends ElementHandler {
   }
 
   @Override
-  public String logInvocation(Element element) {
+  public String logInvocation(Element element, TypeElement loggedClass) {
     var dataType = dataType(element);
     var loggerType =
         m_customLoggers.entrySet().stream()
@@ -44,7 +45,7 @@ public class ConfiguredLoggerHandler extends ElementHandler {
         + ".tryUpdate(backend.getNested(\""
         + loggedName(element)
         + "\"), "
-        + elementAccess(element)
+        + elementAccess(element, loggedClass)
         + ", Epilogue.getConfig().errorHandler)";
   }
 }
