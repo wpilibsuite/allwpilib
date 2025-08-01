@@ -236,6 +236,8 @@ def package_minimal_cc_project(
         windows_artifacts = {},
     )
 
+package_minimal_jni_project = package_minimal_cc_project
+
 def package_shared_cc_project(
         name,
         maven_group_id,
