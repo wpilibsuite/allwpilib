@@ -87,9 +87,9 @@ class Translation2dTest {
   }
 
   @Test
-  void testNormSquared() {
+  void testSquaredNorm() {
     var one = new Translation2d(3.0, 5.0);
-    assertEquals(34.0, one.getNormSquared(), kEpsilon);
+    assertEquals(34.0, one.getSquaredNorm(), kEpsilon);
   }
 
   @Test
@@ -100,10 +100,10 @@ class Translation2dTest {
   }
 
   @Test
-  void testDistanceSquared() {
+  void testSquaredDistance() {
     var one = new Translation2d(1, 1);
     var two = new Translation2d(6, 6);
-    assertEquals(50.0, one.getDistanceSquared(two), kEpsilon);
+    assertEquals(50.0, one.getSquaredDistance(two), kEpsilon);
   }
 
   @Test

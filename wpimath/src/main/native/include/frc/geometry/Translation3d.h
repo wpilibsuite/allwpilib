@@ -108,7 +108,7 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param other The translation to compute the squared distance to.
    * @return The squared distance between the two translations.
    */
-  constexpr units::square_meter_t DistanceSquared(
+  constexpr units::square_meter_t SquaredDistance(
       const Translation3d& other) const {
     return units::math::pow<2>(other.m_x - m_x) +
            units::math::pow<2>(other.m_y - m_y) +
@@ -161,7 +161,7 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The squared norm of the translation.
    */
-  constexpr units::square_meter_t NormSquared() const {
+  constexpr units::square_meter_t SquaredNorm() const {
     return m_x * m_x + m_y * m_y + m_z * m_z;
   }
 

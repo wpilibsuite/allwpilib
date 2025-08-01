@@ -114,9 +114,9 @@ TEST(Translation3dTest, Norm) {
   EXPECT_NEAR(one.Norm().value(), std::hypot(3, 5, 7), kEpsilon);
 }
 
-TEST(Translation3dTest, NormSquared) {
+TEST(Translation3dTest, SquaredNorm) {
   const Translation3d one{3_m, 5_m, 7_m};
-  EXPECT_NEAR(one.NormSquared().value(), 83.0, kEpsilon);
+  EXPECT_NEAR(one.SquaredNorm().value(), 83.0, kEpsilon);
 }
 
 TEST(Translation3dTest, Distance) {
@@ -125,10 +125,10 @@ TEST(Translation3dTest, Distance) {
   EXPECT_NEAR(one.Distance(two).value(), 5 * std::sqrt(3), kEpsilon);
 }
 
-TEST(Translation3dTest, DistanceSquared) {
+TEST(Translation3dTest, SquaredDistance) {
   const Translation3d one{1_m, 1_m, 1_m};
   const Translation3d two{6_m, 6_m, 6_m};
-  EXPECT_NEAR(one.DistanceSquared(two).value(), 75.0, kEpsilon);
+  EXPECT_NEAR(one.SquaredDistance(two).value(), 75.0, kEpsilon);
 }
 
 TEST(Translation3dTest, UnaryMinus) {

@@ -117,9 +117,9 @@ public class Translation2d
    * <p>The square of the distance between translations is defined as (x₂−x₁)²+(y₂−y₁)².
    *
    * @param other The translation to compute the squared distance to.
-   * @return The square of the distance between the two translations.
+   * @return The square of the distance between the two translations, in square meters.
    */
-  public double getDistanceSquared(Translation2d other) {
+  public double getSquaredDistance(Translation2d other) {
     double dx = other.m_x - m_x;
     double dy = other.m_y - m_y;
     return dx * dx + dy * dy;
@@ -185,9 +185,9 @@ public class Translation2d
    * Returns the squared norm, or squared distance from the origin to the translation. This is
    * equivalent to squaring the result of {@link #getNorm()}, but avoids computing a square root.
    *
-   * @return The squared norm of the translation.
+   * @return The squared norm of the translation, in square meters.
    */
-  public double getNormSquared() {
+  public double getSquaredNorm() {
     return m_x * m_x + m_y * m_y;
   }
 
@@ -246,7 +246,7 @@ public class Translation2d
    * <p>The dot product between two translations is defined as x₁x₂+y₁y₂.
    *
    * @param other The translation to compute the dot product with.
-   * @return The dot product between the two translations.
+   * @return The dot product between the two translations, in square meters.
    */
   public double dot(Translation2d other) {
     return m_x * other.m_x + m_y * other.m_y;
@@ -258,7 +258,7 @@ public class Translation2d
    * <p>The 2D cross product between two translations is defined as x₁y₂-x₂y₁.
    *
    * @param other The translation to compute the cross product with.
-   * @return The cross product between the two translations.
+   * @return The cross product between the two translations, in square meters.
    */
   public double cross(Translation2d other) {
     return m_x * other.m_y - m_y * other.m_x;

@@ -140,7 +140,7 @@ public class Translation3d
    * @param other The translation to compute the squared distance to.
    * @return The squared distance between the two translations.
    */
-  public double getDistanceSquared(Translation3d other) {
+  public double getSquaredDistance(Translation3d other) {
     double dx = other.m_x - m_x;
     double dy = other.m_y - m_y;
     double dz = other.m_z - m_z;
@@ -228,7 +228,7 @@ public class Translation3d
    *
    * @return The squared norm of the translation.
    */
-  public double getNormSquared() {
+  public double getSquaredNorm() {
     return m_x * m_x + m_y * m_y + m_z * m_z;
   }
 

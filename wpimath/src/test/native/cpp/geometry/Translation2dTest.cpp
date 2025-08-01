@@ -68,9 +68,9 @@ TEST(Translation2dTest, Norm) {
   EXPECT_DOUBLE_EQ(std::hypot(3.0, 5.0), one.Norm().value());
 }
 
-TEST(Translation2dTest, NormSquared) {
+TEST(Translation2dTest, SquaredNorm) {
   const Translation2d one{3_m, 5_m};
-  EXPECT_DOUBLE_EQ(34.0, one.NormSquared().value());
+  EXPECT_DOUBLE_EQ(34.0, one.SquaredNorm().value());
 }
 
 TEST(Translation2dTest, Distance) {
@@ -79,10 +79,10 @@ TEST(Translation2dTest, Distance) {
   EXPECT_DOUBLE_EQ(5.0 * std::sqrt(2.0), one.Distance(two).value());
 }
 
-TEST(Translation2dTest, DistanceSquared) {
+TEST(Translation2dTest, SquaredDistance) {
   const Translation2d one{1_m, 1_m};
   const Translation2d two{6_m, 6_m};
-  EXPECT_DOUBLE_EQ(50.0, one.DistanceSquared(two).value());
+  EXPECT_DOUBLE_EQ(50.0, one.SquaredDistance(two).value());
 }
 
 TEST(Translation2dTest, UnaryMinus) {

@@ -150,9 +150,9 @@ class Translation3dTest {
   }
 
   @Test
-  void testNormSquared() {
+  void testSquaredNorm() {
     var one = new Translation3d(3.0, 5.0, 7.0);
-    assertEquals(83.0, one.getNormSquared(), kEpsilon);
+    assertEquals(83.0, one.getSquaredNorm(), kEpsilon);
   }
 
   @Test
@@ -163,10 +163,10 @@ class Translation3dTest {
   }
 
   @Test
-  void testDistanceSquared() {
+  void testSquaredDistance() {
     var one = new Translation3d(1.0, 1.0, 1.0);
     var two = new Translation3d(6.0, 6.0, 6.0);
-    assertEquals(75.0, one.getDistanceSquared(two), kEpsilon);
+    assertEquals(75.0, one.getSquaredDistance(two), kEpsilon);
   }
 
   @Test
