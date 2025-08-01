@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.ControlWord;
+import edu.wpi.first.hal.RobotMode;
 
 /** A wrapper around Driver Station control word. */
 public class DSControlWord {
@@ -58,7 +59,7 @@ public class DSControlWord {
    * @return True if autonomous mode should be enabled, false otherwise.
    */
   public boolean isAutonomous() {
-    return m_controlWord.getAutonomous();
+    return m_controlWord.getMode() == RobotMode.Autonomous;
   }
 
   /**
@@ -68,7 +69,7 @@ public class DSControlWord {
    * @return True if autonomous should be set and the robot should be enabled.
    */
   public boolean isAutonomousEnabled() {
-    return m_controlWord.getAutonomous()
+    return m_controlWord.getMode() == RobotMode.Autonomous
         && m_controlWord.getEnabled()
         && m_controlWord.getDSAttached();
   }
@@ -80,7 +81,7 @@ public class DSControlWord {
    * @return True if operator-controlled mode should be enabled, false otherwise.
    */
   public boolean isTeleop() {
-    return !(isAutonomous() || isTest());
+    return m_controlWord.getMode() == RobotMode.Teleoperated;
   }
 
   /**
@@ -90,8 +91,7 @@ public class DSControlWord {
    * @return True if operator-controlled mode should be set and the robot should be enabled.
    */
   public boolean isTeleopEnabled() {
-    return !m_controlWord.getAutonomous()
-        && !m_controlWord.getTest()
+    return m_controlWord.getMode() == RobotMode.Autonomous
         && m_controlWord.getEnabled()
         && m_controlWord.getDSAttached();
   }
@@ -103,7 +103,7 @@ public class DSControlWord {
    * @return True if test mode should be enabled, false otherwise.
    */
   public boolean isTest() {
-    return m_controlWord.getTest();
+    return m_controlWord.getMode() == RobotMode.Test;
   }
 
   /**

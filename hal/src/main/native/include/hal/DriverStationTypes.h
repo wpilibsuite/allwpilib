@@ -64,6 +64,13 @@ HAL_ENUM(HAL_MatchType) {
   HAL_kMatchType_elimination,
 };
 
+HAL_ENUM(HAL_RobotMode) {
+  HAL_kRobotMode_unknown = 0,
+  HAL_kRobotMode_autonomous,
+  HAL_kRobotMode_teleop,
+  HAL_kRobotMode_test,
+};
+
 /**
  * The maximum number of axes that will be stored in a single HAL_JoystickAxes
  * struct. This is used for allocating buffers, not bounds checking, since there

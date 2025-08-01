@@ -57,6 +57,7 @@ struct JoystickDataCache {
   HAL_AllianceStationID allianceStation;
   float matchTime;
   HAL_ControlWord controlWord;
+  mrc::OpModeHash opMode;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -243,11 +244,15 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
 
   std::memset(&controlWord, 0, sizeof(controlWord));
   controlWord.enabled = data.ControlWord.Enabled;
+  controlWord.autonomous = data.ControlWord.Autonomous;
+  controlWord.test = data.ControlWord.Test;
   controlWord.fmsAttached = data.ControlWord.FmsConnected;
   controlWord.dsAttached = data.ControlWord.DsConnected;
   controlWord.eStop = data.ControlWord.EStop;
-  controlWord.test = data.ControlWord.Test;
-  controlWord.autonomous = data.ControlWord.Auto;
+
+  opMode = data.CurrentOpMode;
+  opMode.IsEnabled = 0;  // unique id ignores enable state
+  opMode.Reserved = 0;
 
   auto sticks = data.Joysticks();
 
@@ -282,6 +287,7 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
   return PARAMETER_OUT_OF_RANGE
 
 static HAL_ControlWord newestControlWord;
+static int64_t newestOpMode;
 static JoystickDataCache caches[2];
 static JoystickDataCache* currentRead = &caches[0];
 static JoystickDataCache* cacheToUpdate = &caches[1];
@@ -364,6 +370,7 @@ void TcpCache::Update() {
 namespace hal::init {
 void InitializeFRCDriverStation() {
   std::memset(&newestControlWord, 0, sizeof(newestControlWord));
+  newestOpMode = 0;
   static FRCDriverStation ds;
   driverStation = &ds;
 }
@@ -466,6 +473,20 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   std::scoped_lock lock{cacheMutex};
   *controlWord = newestControlWord;
   return 0;
+}
+
+int64_t HAL_AddOpMode(int32_t mode, const struct WPI_String* name,
+                      const struct WPI_String* group,
+                      const struct WPI_String* description, int32_t textColor,
+                      int32_t backgroundColor);
+
+int64_t HAL_RemoveOpMode(int32_t mode, const struct WPI_String* name);
+
+void HAL_ClearOpModes(void);
+
+int64_t HAL_GetOpMode(void) {
+  std::scoped_lock lock{cacheMutex};
+  return newestOpMode;
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
@@ -583,24 +604,9 @@ void HAL_ObserveUserProgramStarting(void) {
   systemServerDs->hasUserCodeReadyPublisher.Set(true);
 }
 
-void HAL_ObserveUserProgramDisabled(void) {
-  systemServerDs->traceOpModePublisher.Set(
-      mrc::OpModeHash::MakeTele(1, false).ToValue());
-}
-
-void HAL_ObserveUserProgramAutonomous(void) {
-  auto tVal = mrc::OpModeHash::MakeAuto(2, true).ToValue();
-  systemServerDs->traceOpModePublisher.Set(tVal);
-}
-
-void HAL_ObserveUserProgramTeleop(void) {
-  auto tVal = mrc::OpModeHash::MakeTele(1, true).ToValue();
-  systemServerDs->traceOpModePublisher.Set(tVal);
-}
-
-void HAL_ObserveUserProgramTest(void) {
-  systemServerDs->traceOpModePublisher.Set(
-      mrc::OpModeHash::MakeTest(3, true).ToValue());
+void HAL_ObserveUserProgramOpMode(int64_t hash, HAL_Bool enabled) {
+  auto tVal = mrc::OpModeHash::FromValue(hash).IsEnabled = enabled ? 1 : 0;
+  systemServerDs->traceOpModePublisher.Set(tVal.ToValue());
 }
 
 HAL_Bool HAL_RefreshDSData(void) {
@@ -629,6 +635,7 @@ HAL_Bool HAL_RefreshDSData(void) {
     std::scoped_lock lock{cacheMutex};
     std::swap(cacheToUpdate, currentRead);
     newestControlWord = currentRead->controlWord;
+    newestOpMode = currentRead->opMode.ToValue();
   }
 
   tcpCacheToUpdate->Update();
