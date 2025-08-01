@@ -16,7 +16,7 @@ wpilib_cc_library(
 wpilib_cc_static_library(
     name = "static/googletest",
     static_lib_name = select({
-        "@bazel_tools//src/conditions:windows": "static/googletest.lib",
+        "@platforms//os:windows": "static/googletest.lib",
         "//conditions:default": "static/libgoogletest.a",
     }),
     visibility = ["//visibility:public"],

@@ -166,19 +166,19 @@ cc_library(
 cc_library(
     name = "glfw_src",
     srcs = select({
-        "@bazel_tools//src/conditions:windows": WINDOWS_SOURCES,
+        "@platforms//os:windows": WINDOWS_SOURCES,
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_SOURCES,
     }),
     defines = select({
-        "@bazel_tools//src/conditions:windows": WINDOWS_DEFINES,
+        "@platforms//os:windows": WINDOWS_DEFINES,
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_DEFINES,
     }),
     linkopts = select({
-        "@bazel_tools//src/conditions:windows": WINDOWS_LINKOPTS,
+        "@platforms//os:windows": WINDOWS_LINKOPTS,
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_LINKOPTS,
     }),
     target_compatible_with = select({
-        "@bazel_tools//src/conditions:windows": [],
+        "@platforms//os:windows": [],
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
@@ -208,8 +208,8 @@ wpilib_objc_library(
 cc_library(
     name = "glfw",
     linkopts = select({
-        "@bazel_tools//src/conditions:darwin": DARWIN_LINKOPTS,
-        "@bazel_tools//src/conditions:windows": WINDOWS_LINKOPTS,
+        "@platforms//os:osx": DARWIN_LINKOPTS,
+        "@platforms//os:windows": WINDOWS_LINKOPTS,
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_LINKOPTS,
     }),
     linkstatic = True,
@@ -218,8 +218,8 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [":glfw_hdrs"] + select({
-        "@bazel_tools//src/conditions:darwin": [":glfw_src_darwin"],
-        "@bazel_tools//src/conditions:windows": [":glfw_src"],
+        "@platforms//os:osx": [":glfw_src_darwin"],
+        "@platforms//os:windows": [":glfw_src"],
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": [":glfw_src"],
     }),
 )
@@ -280,11 +280,11 @@ IMGUI_WIN_HDRS = [
 cc_library(
     name = "imgui_src",
     srcs = IMGUI_COMMON_SOURCES + select({
-        "@bazel_tools//src/conditions:windows": IMGUI_WIN_SRCS,
+        "@platforms//os:windows": IMGUI_WIN_SRCS,
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": IMGUI_LINUX_SRCS,
     }),
     hdrs = IMGUI_COMMON_HEADERS + select({
-        "@bazel_tools//src/conditions:windows": IMGUI_WIN_HDRS,
+        "@platforms//os:windows": IMGUI_WIN_HDRS,
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": IMGUI_LINUX_HDRS,
     }),
     includes = [
@@ -295,7 +295,7 @@ cc_library(
     linkstatic = True,
     strip_include_prefix = "imgui/include",
     target_compatible_with = select({
-        "@bazel_tools//src/conditions:windows": [],
+        "@platforms//os:windows": [],
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
@@ -323,8 +323,8 @@ wpilib_objc_library(
 cc_library(
     name = "imgui",
     deps = select({
-        "@bazel_tools//src/conditions:darwin": [":imgui_src_darwin"],
-        "@bazel_tools//src/conditions:windows": [":imgui_src"],
+        "@platforms//os:osx": [":imgui_src_darwin"],
+        "@platforms//os:windows": [":imgui_src"],
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": [":imgui_src"],
     }),
 )

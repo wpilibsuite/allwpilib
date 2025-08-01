@@ -61,7 +61,7 @@ wpilib_cc_library(
 wpilib_cc_shared_library(
     name = "shared/halsim_gui",
     additional_linker_inputs = select({
-        "@bazel_tools//src/conditions:darwin": [
+        "@platforms//os:osx": [
             "//thirdparty/imgui_suite:glfw_src_darwin",
             "//thirdparty/imgui_suite:imgui_src_darwin",
             "//wpigui:wpigui-mac",
@@ -75,7 +75,7 @@ wpilib_cc_shared_library(
         "//ntcore:shared/ntcore",
     ],
     user_link_flags = select({
-        "@bazel_tools//src/conditions:darwin": [
+        "@platforms//os:osx": [
             "-Wl,-force_load,$(location //thirdparty/imgui_suite:glfw_src_darwin)",
             "-Wl,-force_load,$(location //thirdparty/imgui_suite:imgui_src_darwin)",
             "-Wl,-force_load,$(location //wpigui:wpigui-mac)",

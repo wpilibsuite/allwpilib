@@ -91,7 +91,7 @@ cc_binary(
         ":generate-version",
     ] + glob(["src/app/native/cpp/**"]),
     linkopts = select({
-        "@bazel_tools//src/conditions:windows": ["-SUBSYSTEM:WINDOWS"],
+        "@platforms//os:windows": ["-SUBSYSTEM:WINDOWS"],
         "//conditions:default": [],
     }),
     tags = [

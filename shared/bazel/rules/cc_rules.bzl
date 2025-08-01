@@ -620,7 +620,7 @@ def wpilib_cc_static_library(
         static_lib_name = select({
             "//shared/bazel/rules:compilation_mode_dbg": folder + "/lib" + lib + "d.a",
             "//shared/bazel/rules:compilation_mode_windows_dbg": folder + "/" + lib + ".lib",
-            "@bazel_tools//src/conditions:windows": folder + "/" + lib + ".lib",
+            "@platforms//os:windows": folder + "/" + lib + ".lib",
             "//conditions:default": folder + "/lib" + lib + ".a",
         })
 

@@ -23,7 +23,7 @@ wpilib_cc_library(
 wpilib_cc_static_library(
     name = "static/fieldImages",
     static_lib_name = select({
-        "@bazel_tools//src/conditions:windows": "static/fieldImages.lib",
+        "@platforms//os:windows": "static/fieldImages.lib",
         "//conditions:default": "static/libfieldImages.a",
     }),
     visibility = ["//visibility:public"],
