@@ -1,5 +1,4 @@
 load("@bzlmodrio-opencv//libraries/cpp/opencv:libraries.bzl", "opencv_shared_libraries")
-load("@rules_cc//cc:cc_shared_library.bzl", "cc_shared_library")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
@@ -162,7 +161,7 @@ wpilib_cc_shared_library(
     deps = [":cscorejni"],
 )
 
-cc_shared_library(
+wpilib_cc_shared_library(
     name = "shared/cscorejnicvstatic",
     additional_linker_inputs = select({
         "@platforms//os:osx": [":cscore-mac"],
@@ -174,17 +173,18 @@ cc_shared_library(
     dynamic_deps = [
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
-    ] + opencv_shared_libraries,
+    ],
     user_link_flags = select({
+        "@platforms//os:linux": [
+            "-Wl,-soname,libcscorejnicvstatic.so",
+            "-Wl,--version-script=$(location :src/main/native/LinuxSymbolScript.txt)",
+        ],
         "@platforms//os:osx": [
             "-Wl,-install_name,libcscorejnicvstatic.so",
             "-exported_symbols_list",
             "$(location :src/main/native/MacSymbolScript.txt)",
         ],
-        "//conditions:default": [
-            "-Wl,-soname,libcscorejnicvstatic.so",
-            "-Wl,--version-script=$(location :src/main/native/LinuxSymbolScript.txt)",
-        ],
+        "//conditions:default": [],
     }) + select({
         "@platforms//os:osx": [
             "-Wl,-force_load,$(location :cscore-mac)",
@@ -274,4 +274,14 @@ package_minimal_jni_project(
     name = "cscore",
     maven_artifact_name = "cscore-cpp",
     maven_group_id = "edu.wpi.first.cscore",
+)
+
+alias(
+    name = "cscorejnicvstatic-hdrs-zip",
+    actual = "cscore-hdrs-zip",
+)
+
+alias(
+    name = "cscorejnicvstatic-srcs-zip",
+    actual = "cscore-srcs-zip",
 )
