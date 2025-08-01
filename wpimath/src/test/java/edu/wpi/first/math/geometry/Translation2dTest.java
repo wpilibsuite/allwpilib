@@ -89,7 +89,7 @@ class Translation2dTest {
   @Test
   void testNormSquared() {
     var one = new Translation2d(3.0, 5.0);
-    assertEquals(Math.pow(Math.hypot(3.0, 5.0), 2.0), one.getNormSquared(), kEpsilon);
+    assertEquals(34.0, one.getNormSquared(), kEpsilon);
   }
 
   @Test

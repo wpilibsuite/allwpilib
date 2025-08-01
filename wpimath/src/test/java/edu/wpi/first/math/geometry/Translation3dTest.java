@@ -250,6 +250,7 @@ class Translation3dTest {
   void testCross() {
     var one = new Translation3d(1.0, 2.0, 3.0);
     var two = new Translation3d(4.0, 5.0, 6.0);
+
     var cross = one.cross(two);
     assertAll(
         () -> assertEquals(-3.0, cross.getX(), kEpsilon),

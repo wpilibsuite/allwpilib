@@ -13,6 +13,7 @@
 #include <wpi/json_fwd.h>
 
 #include "frc/geometry/Rotation2d.h"
+#include "units/area.h"
 #include "units/length.h"
 #include "units/math.h"
 
@@ -76,6 +77,23 @@ class WPILIB_DLLEXPORT Translation2d {
   }
 
   /**
+   * Calculates the square of the distance between two translations in 2D space.
+   * This is equivalent to squaring the result of Distance(Translation2d), but
+   * avoids computing a square root.
+   *
+   * The square of the distance between translations is defined as
+   * (x₂−x₁)²+(y₂−y₁)².
+   *
+   * @param other The translation to compute the squared distance to.
+   * @return The square of the distance between the two translations.
+   */
+  constexpr units::square_meter_t DistanceSquared(
+      const Translation2d& other) const {
+    return units::math::pow<2>(other.m_x - m_x) +
+           units::math::pow<2>(other.m_y - m_y);
+  }
+
+  /**
    * Returns the X component of the translation.
    *
    * @return The X component of the translation.
@@ -104,6 +122,17 @@ class WPILIB_DLLEXPORT Translation2d {
    * @return The norm of the translation.
    */
   constexpr units::meter_t Norm() const { return units::math::hypot(m_x, m_y); }
+
+  /**
+   * Returns the squared norm, or squared distance from the origin to the
+   * translation. This is equivalent to squaring the result of Norm(), but
+   * avoids computing a square root.
+   *
+   * @return The squared norm of the translation.
+   */
+  constexpr units::square_meter_t NormSquared() const {
+    return units::math::pow<2>(m_x) + units::math::pow<2>(m_y);
+  }
 
   /**
    * Returns the angle this translation forms with the positive X axis.
@@ -155,6 +184,32 @@ class WPILIB_DLLEXPORT Translation2d {
                 other.X(),
             (m_x - other.X()) * rot.Sin() + (m_y - other.Y()) * rot.Cos() +
                 other.Y()};
+  }
+
+  /**
+   * Computes the dot product between this translation and another translation
+   * in 2D space.
+   *
+   * The dot product between two translations is defined as x₁x₂+y₁y₂.
+   *
+   * @param other The translation to compute the dot product with.
+   * @return The dot product between the two translations.
+   */
+  constexpr units::square_meter_t Dot(const Translation2d& other) const {
+    return m_x * other.X() + m_y * other.Y();
+  }
+
+  /**
+   * Computes the cross product between this translation and another translation
+   * in 2D space.
+   *
+   * The 2D cross product between two translations is defined as x₁y₂-x₂y₁.
+   *
+   * @param other The translation to compute the cross product with.
+   * @return The cross product between the two translations.
+   */
+  constexpr units::square_meter_t Cross(const Translation2d& other) const {
+    return m_x * other.Y() - m_y * other.X();
   }
 
   /**
