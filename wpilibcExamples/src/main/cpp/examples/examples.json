@@ -463,42 +463,6 @@
     "commandversion": 2
   },
   {
-    "name": "MecanumControllerCommand",
-    "description": "Follow a pre-generated trajectory with a mecanum drive using MecanumControllerCommand.",
-    "tags": [
-      "Command-based",
-      "Mecanum Drive",
-      "Gyro",
-      "Encoder",
-      "Odometry",
-      "Trajectory",
-      "Path Following",
-      "XboxController"
-    ],
-    "foldername": "MecanumControllerCommand",
-    "gradlebase": "cpp",
-    "commandversion": 2,
-    "hasunittests": true
-  },
-  {
-    "name": "SwerveControllerCommand",
-    "description": "Follow a pre-generated trajectory with a swerve drive using SwerveControllerCommand.",
-    "tags": [
-      "Command-based",
-      "Swerve Drive",
-      "Gyro",
-      "Encoder",
-      "Odometry",
-      "Trajectory",
-      "Path Following",
-      "XboxController"
-    ],
-    "foldername": "SwerveControllerCommand",
-    "gradlebase": "cpp",
-    "commandversion": 2,
-    "hasunittests": true
-  },
-  {
     "name": "DriveDistanceOffboard",
     "description": "Drive a differential drivetrain a set distance using TrapezoidProfile and smart motor controller PID.",
     "tags": [
