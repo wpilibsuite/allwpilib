@@ -23,7 +23,7 @@ wpilib_cc_library(
     }),
     visibility = ["//visibility:public"],
     deps = [
-        "//glass:libglassnt",
+        "//glass:glassnt",
         "//hal:wpiHal",
     ],
 )
@@ -52,7 +52,7 @@ wpilib_cc_library(
     }),
     visibility = ["//visibility:public"],
     deps = [
-        "//glass:libglassnt",
+        "//glass:glassnt",
         "//hal:wpiHal",
     ],
 )
