@@ -76,6 +76,7 @@ publish_all(
         "//hal:wpiHal-cpp_publish",
         "//ntcore:ntcore-cpp_publish",
         "//ntcore:ntcore-java_publish",
+        "//ntcoreffi:ntcoreffi-cpp_publish",
         "//outlineviewer:outlineviewer_publish",
         "//romiVendordep:romiVendordep-cpp_publish",
         "//romiVendordep:romiVendordep-java_publish",

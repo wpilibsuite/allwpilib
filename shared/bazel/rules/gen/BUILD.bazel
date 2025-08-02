@@ -1,5 +1,14 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 
+exports_files(["defs.bzl"])
+
+py_binary(
+    name = "gen_versionscript",
+    srcs = ["gen_versionscript.py"],
+    main = "gen_versionscript.py",
+    visibility = ["//visibility:public"],
+)
+
 py_binary(
     name = "gen_resources",
     srcs = ["gen_resources.py"],
