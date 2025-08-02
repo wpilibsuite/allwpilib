@@ -1,5 +1,4 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
-load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
 load("//shared/bazel/rules:packaging.bzl", "package_binary_cc_project")
 
