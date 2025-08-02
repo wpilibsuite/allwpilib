@@ -64,6 +64,7 @@ publish_all(
         "//datalog:datalog-cpp_publish",
         "//datalog:datalog-java_publish",
         "//epilogue-processor:processor-java_publish",
+        "//processstarter:processstarter_publish",
         "//epilogue-runtime:epilogue-java_publish",
         "//fieldImages:fieldImages-cpp_publish",
         "//fieldImages:fieldImages-java_publish",
