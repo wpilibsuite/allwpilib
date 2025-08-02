@@ -32,20 +32,15 @@ wpilib_objc_library(
     srcs = [":native-srcs"],
 )
 
-cc_library(
-    name = "processstarter-default",
-    srcs = [":native-srcs"],
-    target_compatible_with = select({
-        "@platforms//os:osx": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-)
-
 cc_binary(
     name = "processstarter",
+    srcs = select({
+        "@platforms//os:osx": [],
+        "//conditions:default": [":native-srcs"],
+    }),
     deps = select({
         "@platforms//os:osx": ["processstarter-osx"],
-        "//conditions:default": ["processstarter-default"],
+        "//conditions:default": [],
     }),
 )
 
