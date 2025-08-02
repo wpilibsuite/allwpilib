@@ -37,6 +37,10 @@ cc_binary(
         "@platforms//os:osx": [],
         "//conditions:default": [":native-srcs"],
     }),
+    linkopts = select({
+        "@platforms//os:windows": ["-SUBSYSTEM:WINDOWS"],
+        "//conditions:default": [],
+    }),
     deps = select({
         "@platforms//os:osx": ["processstarter-osx"],
         "//conditions:default": [],
