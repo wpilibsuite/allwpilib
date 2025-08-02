@@ -43,6 +43,7 @@ nativeUtils.platformConfigs.each {
 nativeUtils.platformConfigs.each {
   if (it.name.contains('linux')) {
     it.cppCompiler.debugArgs.add("-gz=zlib")
+    it.cppCompiler.args.add("-Wno-overloaded-virtual")
   }
 }
 
