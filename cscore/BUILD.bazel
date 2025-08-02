@@ -174,6 +174,7 @@ wpilib_cc_shared_library(
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
     ],
+    use_debug_name = False,
     user_link_flags = select({
         "@platforms//os:linux": [
             "-Wl,-soname,libcscorejnicvstatic.so",
