@@ -1,3 +1,5 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library")
 load("//shared/bazel/rules:packaging.bzl", "package_shared_cc_project")
 
@@ -44,10 +46,10 @@ wpilib_cc_library(
 
 wpilib_cc_shared_library(
     name = "shared/ntcoreffi",
+    symbols = "src/main/native/symbols.txt",
     use_debug_name = False,
     visibility = ["//visibility:public"],
     deps = [":ntcoreffi"],
-    symbols = "src/main/native/symbols.txt",
 )
 
 package_shared_cc_project(

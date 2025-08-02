@@ -5,8 +5,8 @@ load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_library")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_ATTRS", "find_cpp_toolchain", "use_cc_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
-load("//shared/bazel/rules/gen:defs.bzl", "gen_versionscript")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
+load("//shared/bazel/rules/gen:defs.bzl", "gen_versionscript")
 
 # Copied from bazel since it isn't exposed publicly that I can find.
 # https://github.com/bazelbuild/bazel/blob/cc4e3b25a89cd8294406d9489ece706cfcc019bd/src/main/starlark/builtins_bzl/common/cc/cc_helper.bzl#L272
@@ -363,7 +363,7 @@ def wpilib_cc_shared_library(
 
     if symbols:
         if win_def_file:
-            fail('Can\'t specify symbols and win_def_file')
+            fail("Can't specify symbols and win_def_file")
 
         exports_target = name + "_exports"
         gen_versionscript(
@@ -371,9 +371,9 @@ def wpilib_cc_shared_library(
             src = symbols,
             lib_name = lib,
             format = select({
-                "@platforms//os:windows": "windows",
-                "@platforms//os:osx": "osx",
                 "@platforms//os:linux": "linux",
+                "@platforms//os:osx": "osx",
+                "@platforms//os:windows": "windows",
             }),
         )
 
@@ -382,9 +382,9 @@ def wpilib_cc_shared_library(
             "//conditions:default": [exports_target],
         })
         user_link_flags = (user_link_flags or []) + select({
-            "@platforms//os:windows": [],
-            "@platforms//os:osx": ["-Wl,-exported_symbols_list,$(location " + exports_target + ")"],
             "@platforms//os:linux": ["-Wl,--version-script,$(location " + exports_target + ")"],
+            "@platforms//os:osx": ["-Wl,-exported_symbols_list,$(location " + exports_target + ")"],
+            "@platforms//os:windows": [],
         })
         win_def_file = exports_target
 

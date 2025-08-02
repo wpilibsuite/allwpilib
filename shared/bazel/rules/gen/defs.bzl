@@ -10,10 +10,10 @@ def _gen_versionscript_impl(ctx):
     output_file = ctx.actions.declare_file(ctx.label.name + ext)
 
     ctx.actions.run(
-        outputs=[output_file],
-        inputs=[ctx.file.src],
-        executable=ctx.executable._tool,
-        arguments=[
+        outputs = [output_file],
+        inputs = [ctx.file.src],
+        executable = ctx.executable._tool,
+        arguments = [
             "--input",
             ctx.file.src.path,
             "--output",
@@ -23,34 +23,34 @@ def _gen_versionscript_impl(ctx):
             "--format",
             ctx.attr.format,
         ],
-        mnemonic="GenVersionScript",
-        progress_message="Generating version script for %{label}",
+        mnemonic = "GenVersionScript",
+        progress_message = "Generating version script for %{label}",
     )
 
-    return [DefaultInfo(files=depset([output_file]), runfiles=ctx.runfiles(files=[output_file])), OutputGroupInfo(version_script_file = depset([output_file]))]
+    return [DefaultInfo(files = depset([output_file]), runfiles = ctx.runfiles(files = [output_file])), OutputGroupInfo(version_script_file = depset([output_file]))]
 
 gen_versionscript = rule(
-    implementation=_gen_versionscript_impl,
-    attrs={
-        "src": attr.label(
-            mandatory=True,
-            allow_single_file=True,
-            doc="The input symbols file.",
+    implementation = _gen_versionscript_impl,
+    attrs = {
+        "format": attr.string(
+            mandatory = True,
+            values = ["linux", "windows", "osx"],
+            doc = "The output format.",
         ),
         "lib_name": attr.string(
-            mandatory=True,
-            doc="The name of the library.",
+            mandatory = True,
+            doc = "The name of the library.",
         ),
-        "format": attr.string(
-            mandatory=True,
-            values=["linux", "windows", "osx"],
-            doc="The output format.",
+        "src": attr.label(
+            mandatory = True,
+            allow_single_file = True,
+            doc = "The input symbols file.",
         ),
         "_tool": attr.label(
-            default=Label("//shared/bazel/rules/gen:gen_versionscript"),
-            executable=True,
-            cfg="exec",
+            default = Label("//shared/bazel/rules/gen:gen_versionscript"),
+            executable = True,
+            cfg = "exec",
         ),
     },
-    doc="Generates a version script from a symbols file.",
+    doc = "Generates a version script from a symbols file.",
 )
