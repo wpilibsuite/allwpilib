@@ -2,11 +2,12 @@
 import argparse
 from pathlib import Path
 
+
 def generate_symbol_text(output_directory, symbols):
     with open(output_directory, "w") as out:
-     with open(symbols, "r") as f:
-        for line in f:
-            out.write(f"AddFunctionToLink({line.strip()});\n")
+        with open(symbols, "r") as f:
+            for line in f:
+                out.write(f"AddFunctionToLink({line.strip()});\n")
 
 
 def main():
