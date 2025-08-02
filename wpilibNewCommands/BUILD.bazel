@@ -5,7 +5,7 @@ load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
+load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//wpilibNewCommands:generate.bzl", "generate_wpilib_new_commands")
 
 py_binary(
@@ -163,7 +163,7 @@ java_binary(
     ],
 )
 
-package_minimal_cc_project(
+package_default_cc_project(
     name = "wpilibNewCommands",
     maven_artifact_name = "wpilibNewCommands-cpp",
     maven_group_id = "edu.wpi.first.wpilibNewCommands",
