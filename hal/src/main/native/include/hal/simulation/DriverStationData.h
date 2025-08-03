@@ -118,7 +118,7 @@ int32_t HALSIM_RegisterTestOpModesCallback(HAL_OpModeOptionsCallback callback,
 void HALSIM_CancelTestOpModesCallback(int32_t uid);
 struct HALSIM_OpModeOption* HALSIM_GetTestOpModes(int32_t* len);
 
-void HALSIM_FreeOpModeOptionsArray(const struct HALSIM_OpModeOption* arr,
+void HALSIM_FreeOpModeOptionsArray(struct HALSIM_OpModeOption* arr,
                                    size_t length);
 
 int32_t HALSIM_RegisterJoystickAxesCallback(int32_t joystickNum,

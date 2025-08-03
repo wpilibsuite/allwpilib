@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -49,40 +50,34 @@ class DriverStationData {
   }
 
  public:
-  struct OpModeOption {
-    int64_t id;
-    std::string name;
-    std::string group;
-    std::string description;
-    int32_t textColor;
-    int32_t backgroundColor;
-  };
-
   DriverStationData();
+  ~DriverStationData();
+  DriverStationData(const DriverStationData&) = delete;
+  DriverStationData& operator=(const DriverStationData&) = delete;
   void ResetData();
 
   int64_t AddOpMode(HAL_RobotMode mode, std::string_view name,
                     std::string_view group, std::string_view description,
                     int32_t textColor, int32_t backgroundColor);
 
-  int64_t RemoveOpMode(int32_t mode, std::string_view name);
+  int64_t RemoveOpMode(HAL_RobotMode mode, std::string_view name);
 
-  void ClearOpModes(void);
+  void ClearOpModes();
 
   int32_t RegisterAutoOpModesCallback(HAL_OpModeOptionsCallback callback,
                                       void* param, HAL_Bool initialNotify);
   void CancelAutoOpModesCallback(int32_t uid);
-  std::vector<OpModeOption> GetAutoOpModes();
+  HALSIM_OpModeOption* GetAutoOpModes(int32_t* len);
 
   int32_t RegisterTeleopOpModesCallback(HAL_OpModeOptionsCallback callback,
                                         void* param, HAL_Bool initialNotify);
   void CancelTeleopOpModesCallback(int32_t uid);
-  std::vector<OpModeOption> GetTeleopOpModes();
+  HALSIM_OpModeOption* GetTeleopOpModes(int32_t* len);
 
   int32_t RegisterTestOpModesCallback(HAL_OpModeOptionsCallback callback,
                                       void* param, HAL_Bool initialNotify);
   void CancelTestOpModesCallback(int32_t uid);
-  std::vector<OpModeOption> GetTestOpModes();
+  HALSIM_OpModeOption* GetTestOpModes(int32_t* len);
 
   int32_t RegisterJoystickAxesCallback(int32_t joystickNum,
                                        HAL_JoystickAxesCallback callback,
@@ -217,13 +212,20 @@ class DriverStationData {
 
   wpi::spinlock m_opModeMutex;
   wpi::DenseMap<int64_t, uint32_t> m_autoOpModesMap;
-  std::vector<OpModeOption> m_autoOpModes;
+  std::vector<HALSIM_OpModeOption> m_autoOpModes;
 
   wpi::DenseMap<int64_t, uint32_t> m_teleopOpModesMap;
-  std::vector<OpModeOption> m_teleopOpModes;
+  std::vector<HALSIM_OpModeOption> m_teleopOpModes;
 
   wpi::DenseMap<int64_t, uint32_t> m_testOpModesMap;
-  std::vector<OpModeOption> m_testOpModes;
+  std::vector<HALSIM_OpModeOption> m_testOpModes;
+
+  static constexpr int64_t kOpModeHashMask = 0x00FFFFFFFFFFFFFF;
+  bool GetOpModeMapVec(HAL_RobotMode mode,
+                       wpi::DenseMap<int64_t, uint32_t>** map,
+                       std::vector<HALSIM_OpModeOption>** vec,
+                       int64_t* hashBase);
+  void CallOpModesCallbacks(HAL_RobotMode mode);
 };
 extern DriverStationData* SimDriverStationData;
 }  // namespace hal
