@@ -11,7 +11,8 @@
 using namespace frc;
 using namespace frc::sim;
 
-DCMotorSim::DCMotorSim(const LinearSystem<2, 1, 2>& plant,
+DCMotorSim::DCMotorSim(const units::volt_t ks,
+                       const LinearSystem<2, 1, 2>& plant,
                        const DCMotor& gearbox,
                        const std::array<double, 2>& measurementStdDevs)
     : LinearSystemSim<2, 1, 2>(plant, measurementStdDevs),
@@ -33,9 +34,17 @@ DCMotorSim::DCMotorSim(const LinearSystem<2, 1, 2>& plant,
       //
       //   B = GKₜ/(RJ)
       //   J = GKₜ/(RB)
+      // Solve for frictionAcceleration (f)
+      //
+      //   f = ks/ka
+      //   ka = 1/B
+      //   ka = RJ/(GKₜ)
+      //   f = ksGKₜ/RJ
       m_gearing(-gearbox.Kv.value() * m_plant.A(1, 1) / m_plant.B(1, 0)),
       m_j(m_gearing * gearbox.Kt.value() /
-          (gearbox.R.value() * m_plant.B(1, 0))) {}
+          (gearbox.R.value() * m_plant.B(1, 0))),
+      m_frictionAcceleration{ks.value() * m_gearing * gearbox.Kt.value() /
+                             (gearbox.R.value() * m_j.value())} {}
 
 void DCMotorSim::SetState(units::radian_t angularPosition,
                           units::radians_per_second_t angularVelocity) {
@@ -84,6 +93,11 @@ units::volt_t DCMotorSim::GetInputVoltage() const {
 void DCMotorSim::SetInputVoltage(units::volt_t voltage) {
   SetInput(Vectord<1>{voltage.value()});
   ClampInput(frc::RobotController::GetBatteryVoltage().value());
+}
+
+Vectord<2> DCMotorSim::UpdateX(const Vectord<2>& currentXhat,
+                               const Vectord<1>& u, units::second_t dt) {
+  return m_plant.CalculateX(currentXhat, u, dt);
 }
 
 const DCMotor& DCMotorSim::GetGearbox() const {
