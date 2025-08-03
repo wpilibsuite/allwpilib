@@ -1,0 +1,46 @@
+"""
+Ceres Solver files
+"""
+
+load("@rules_cc//cc:defs.bzl", "cc_import", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_import(
+    name = "ceres-impl",
+    static_library = select({
+        "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": "@ceres_linuxx86-64static//:lib",
+        "@rules_bzlmodrio_toolchains//conditions:linux_x86_64_debug": "@ceres_linuxx86-64staticdebug//:lib",
+        "@rules_bzlmodrio_toolchains//conditions:osx": "@ceres_osxuniversalstatic//:lib",
+        "@rules_bzlmodrio_toolchains//conditions:osx_debug": "@ceres_osxuniversalstaticdebug//:lib",
+        "@rules_bzlmodrio_toolchains//conditions:windows_arm64": "@ceres_windowsarm64static//:lib",
+        "@rules_bzlmodrio_toolchains//conditions:windows_arm64_debug": "@ceres_windowsarm64staticdebug//:lib",
+        "@rules_bzlmodrio_toolchains//conditions:windows_x86_64": "@ceres_windowsx86-64static//:lib",
+        "@rules_bzlmodrio_toolchains//conditions:windows_x86_64_debug": "@ceres_windowsx86-64staticdebug//:lib",
+        "@rules_bzlmodrio_toolchains//constraints/is_bookworm64:bookworm64": "@ceres_linuxarm64static//:lib",
+        "@rules_bzlmodrio_toolchains//constraints/is_bookworm64:bookworm64_debug": "@ceres_linuxarm64staticdebug//:lib",
+        "@rules_bzlmodrio_toolchains//constraints/is_raspibookworm32:raspibookworm32": "@ceres_linuxarm32static//:lib",
+        "@rules_bzlmodrio_toolchains//constraints/is_raspibookworm32:raspibookworm32_debug": "@ceres_linuxarm32staticdebug//:lib",
+        "//conditions:default": None,
+    }),
+)
+
+cc_library(
+    name = "ceres",
+    defines = [
+        "GLOG_NO_GFLAGS",
+        "GLOG_USE_GLOG_EXPORT",
+    ] + select({
+        "@platforms//os:windows": ["GLOG_DEPRECATED=__declspec(deprecated)"],
+        "//conditions:default": ["GLOG_DEPRECATED=[[deprecated]]"],
+    }),
+    linkopts = select({
+        "@platforms//os:linux": ["-lgfortran"],
+        "@platforms//os:windows": ["dbghelp.lib"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        ":ceres-impl",
+        "@ceres_headers//:headers",
+    ],
+)

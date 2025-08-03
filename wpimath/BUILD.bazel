@@ -91,6 +91,7 @@ filegroup(
 third_party_cc_lib_helper(
     name = "eigen",
     include_root = "src/main/native/thirdparty/eigen/include",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(

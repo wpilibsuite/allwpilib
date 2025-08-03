@@ -13,6 +13,8 @@
 #include <gtest/gtest.h>
 #include <mrcal_wrapper.h>
 
+#include "path_lookup.h"
+
 using namespace cv;
 
 struct cmpByFilename {
@@ -147,8 +149,9 @@ std::vector<double> calibrate(const std::string& fname, cv::Size boardSize,
 const std::string projectRootPath = PROJECT_ROOT_PATH;
 
 TEST(MrcalResultExactlyMatchesTest, lifecam_1280) {
-  auto calculated_intrinsics{calibrate(
-      projectRootPath + "/lifecam_1280p_10x10.vnl", {10, 10}, {1280, 720})};
+  auto calculated_intrinsics{
+      calibrate(LookupPath(projectRootPath + "/lifecam_1280p_10x10.vnl"),
+                {10, 10}, {1280, 720})};
 
   // ## generated with mrgingham --jobs 4 --gridn 10
   // /home/mmorley/photonvision/test-resources/calibrationSquaresImg/lifecam/2024-01-02_lifecam_1280/*.png
