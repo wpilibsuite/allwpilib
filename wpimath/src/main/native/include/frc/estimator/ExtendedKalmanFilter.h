@@ -397,8 +397,11 @@ class ExtendedKalmanFilter {
     //
     // Kᵀ = Sᵀ.solve(CPᵀ)
     // K = (Sᵀ.solve(CPᵀ))ᵀ
-    Matrixd<States, Rows> K =
-        S.transpose().ldlt().solve(C * m_P.transpose()).transpose();
+    //
+    // Drop the transposes on symmetric matrices S and P.
+    //
+    // K = (S.solve(CP))ᵀ
+    Matrixd<States, Rows> K = S.ldlt().solve(C * m_P).transpose();
 
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + Kₖ₊₁(y − h(x̂ₖ₊₁⁻, uₖ₊₁))
     m_xHat = addFuncX(m_xHat, K * residualFuncY(y, h(m_xHat, u)));

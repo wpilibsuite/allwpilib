@@ -1,0 +1,59 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library")
+load("//shared/bazel/rules:packaging.bzl", "package_shared_cc_project")
+
+py_binary(
+    name = "generate_exported_symbols",
+    srcs = [
+        "generate_exported_symbols.py",
+    ],
+)
+
+genrule(
+    name = "do_generate_exported_symbols",
+    srcs = ["src/main/native/symbols.txt"],
+    outs = ["src/generated/headers/ExportedSymbols.h"],
+    cmd = "$(location :generate_exported_symbols) --output $(OUTS) --symbols $(SRCS)",
+    tools = [":generate_exported_symbols"],
+)
+
+cc_library(
+    name = "exported_symbols",
+    hdrs = [
+        "src/generated/headers/ExportedSymbols.h",
+    ],
+    strip_include_prefix = "src/generated/headers/",
+)
+
+wpilib_cc_library(
+    name = "ntcoreffi",
+    srcs = glob([
+        "src/main/native/c/**",
+        "src/main/native/cpp/**",
+    ]),
+    hdrs = glob(["src/main/native/include/**"]),
+    include_license_files = True,
+    strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":exported_symbols",
+        "//ntcore",
+        "//wpinet",
+        "//wpiutil",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/ntcoreffi",
+    symbols = "src/main/native/symbols.txt",
+    use_debug_name = False,
+    visibility = ["//visibility:public"],
+    deps = [":ntcoreffi"],
+)
+
+package_shared_cc_project(
+    name = "ntcoreffi",
+    maven_artifact_name = "ntcoreffi-cpp",
+    maven_group_id = "edu.wpi.first.ntcoreffi",
+)

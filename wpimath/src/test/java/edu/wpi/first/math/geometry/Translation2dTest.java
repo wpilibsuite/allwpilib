@@ -87,10 +87,23 @@ class Translation2dTest {
   }
 
   @Test
+  void testSquaredNorm() {
+    var one = new Translation2d(3.0, 5.0);
+    assertEquals(34.0, one.getSquaredNorm(), kEpsilon);
+  }
+
+  @Test
   void testDistance() {
     var one = new Translation2d(1, 1);
     var two = new Translation2d(6, 6);
     assertEquals(5.0 * Math.sqrt(2.0), one.getDistance(two), kEpsilon);
+  }
+
+  @Test
+  void testSquaredDistance() {
+    var one = new Translation2d(1, 1);
+    var two = new Translation2d(6, 6);
+    assertEquals(50.0, one.getSquaredDistance(two), kEpsilon);
   }
 
   @Test
@@ -153,5 +166,19 @@ class Translation2dTest {
     assertEquals(vec.get(1), translation.getY());
 
     assertEquals(vec, translation.toVector());
+  }
+
+  @Test
+  void testDot() {
+    var one = new Translation2d(2.0, 3.0);
+    var two = new Translation2d(3.0, 4.0);
+    assertEquals(18.0, one.dot(two), kEpsilon);
+  }
+
+  @Test
+  void testCross() {
+    var one = new Translation2d(2.0, 3.0);
+    var two = new Translation2d(3.0, 4.0);
+    assertEquals(-1.0, one.cross(two), kEpsilon);
   }
 }
