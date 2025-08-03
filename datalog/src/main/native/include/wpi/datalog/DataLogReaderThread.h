@@ -7,6 +7,7 @@
 #include <atomic>
 #include <functional>
 #include <map>
+#include <mutex>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -76,6 +77,15 @@ class DataLogReaderThread {
       return nullptr;
     }
     return &it->second;
+  }
+
+  const DataLogReaderEntry* GetEntry(int entry) const {
+    std::scoped_lock lock{m_mutex};
+    auto it = m_entriesById.find(entry);
+    if (it == m_entriesById.end()) {
+      return nullptr;
+    }
+    return it->second;
   }
 
   wpi::StructDescriptorDatabase& GetStructDatabase() { return m_structDb; }
