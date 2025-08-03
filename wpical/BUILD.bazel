@@ -73,7 +73,7 @@ cc_library(
     strip_include_prefix = "src/main/native/thirdparty/mrcal_java/include/",
 )
 
-osx_copts = [
+unix_copts = [
     "-Wno-pedantic",
     "-Wno-format-nonliteral",
     "-Wno-unused-variable",
@@ -81,13 +81,10 @@ osx_copts = [
     "-Wno-sign-compare",
 ]
 
+osx_copts = unix_copts
+
 copts = select({
-    "@platforms//os:linux": [
-        "-Wno-pedantic",
-        "-Wno-format-nonliteral",
-        "-Wno-unused-variable",
-        "-Wno-unused-function",
-        "-Wno-sign-compare",
+    "@platforms//os:linux": unix_copts + [
         "-Wno-maybe-uninitialized",
     ],
     "@platforms//os:osx": osx_copts,
@@ -98,31 +95,27 @@ copts = select({
     ],
 })
 
-osx_cxxopts = [
+unix_cxxopts = [
     "-Wno-missing-field-initializers",
     "-Wno-pedantic",
-    "-Wno-unused-variable",
-    "-Wno-unused-function",
-    "-Wno-sign-compare",
     "-fpermissive",
+    "-Wno-deprecated-declarations",
     "-Wno-return-type",
     "-Wno-missing-braces",
     "-Wno-null-conversion",
     "-Wno-unused-but-set-variable",
+]
+
+osx_cxxopts = unix_cxxopts + [
+    "-Wno-unused-variable",
+    "-Wno-unused-function",
+    "-Wno-sign-compare",
     "-Wno-sometimes-uninitialized",
-    "-Wno-deprecated-declarations",
 ]
 
 cxxopts = select({
-    "@platforms//os:linux": [
-        "-Wno-missing-field-initializers",
-        "-Wno-deprecated-declarations",
+    "@platforms//os:linux": unix_cxxopts + [
         "-Wno-deprecated-enum-enum-conversion",
-        "-fpermissive",
-        "-Wno-return-type",
-        "-Wno-missing-braces",
-        "-Wno-null-conversion",
-        "-Wno-unused-but-set-variable",
     ],
     "@platforms//os:osx": osx_cxxopts,
     "@platforms//os:windows": [

@@ -14,7 +14,6 @@ load(\"@rules_cc//cc:defs.bzl\", \"cc_library\")
 
 cc_library(
     name = \"headers\",
-    #hdrs = glob(["**"], exclude = ["LICENSE.md", "signature_of_eigen3_matrix_library"]),
     hdrs = glob(["ceres/**", "glog/**", "suitesparse/**", "openblas/**"]),
     includes = ["."],
     deps = ["@//wpimath:eigen-headers"],
