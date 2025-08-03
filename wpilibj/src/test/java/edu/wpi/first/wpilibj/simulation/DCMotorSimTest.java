@@ -24,7 +24,8 @@ class DCMotorSimTest {
 
     DCMotor gearbox = DCMotor.getNEO(1);
     LinearSystem<N2, N1, N2> plant = LinearSystemId.createDCMotorSystem(gearbox, 0.0005, 1);
-    DCMotorSim sim = new DCMotorSim(plant, gearbox);
+    double ks = 0.12;
+    DCMotorSim sim = new DCMotorSim(ks, plant, gearbox);
 
     try (var motor = new PWMVictorSPX(0);
         var encoder = new Encoder(0, 1)) {
@@ -42,7 +43,7 @@ class DCMotorSimTest {
         encoderSim.setRate(sim.getAngularVelocityRadPerSec());
       }
 
-      assertEquals(gearbox.KvRadPerSecPerVolt * 12, encoder.getRate(), 0.1);
+      assertEquals(gearbox.KvRadPerSecPerVolt * (12 - ks), encoder.getRate(), 0.1);
 
       for (int i = 0; i < 100; i++) {
         motor.setVoltage(0);
@@ -65,7 +66,8 @@ class DCMotorSimTest {
 
     DCMotor gearbox = DCMotor.getNEO(1);
     LinearSystem<N2, N1, N2> plant = LinearSystemId.createDCMotorSystem(gearbox, 0.0005, 1);
-    DCMotorSim sim = new DCMotorSim(plant, gearbox);
+    double ks = 0.12;
+    DCMotorSim sim = new DCMotorSim(ks, plant, gearbox);
 
     try (var motor = new PWMVictorSPX(0);
         var encoder = new Encoder(0, 1);

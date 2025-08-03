@@ -22,6 +22,7 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   /**
    * Creates a simulated flywheel mechanism.
    *
+   * @param ks                 The static friction voltage.
    * @param plant              The linear system representing the flywheel. This
    *                           system can be created with
    *                           LinearSystemId::FlywheelSystem() or
@@ -30,7 +31,8 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    *                           gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  FlywheelSim(const LinearSystem<1, 1, 1>& plant, const DCMotor& gearbox,
+  FlywheelSim(const units::volt_t ks, const LinearSystem<1, 1, 1>& plant,
+              const DCMotor& gearbox,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   using LinearSystemSim::SetState;
@@ -99,9 +101,22 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    */
   units::kilogram_square_meter_t J() const { return m_j; }
 
+ protected:
+  /**
+   * Updates the state estimate of the DC motor.
+   *
+   * @param currentXhat The current state estimate.
+   * @param u           The system inputs (voltage).
+   * @param dt          The time difference between controller updates.
+   */
+  Vectord<1> UpdateX(const Vectord<1>& currentXhat, const Vectord<1>& u,
+                     units::second_t dt) override;
+
  private:
   DCMotor m_gearbox;
   double m_gearing;
   units::kilogram_square_meter_t m_j;
+  units::volt_t m_ks;
+  units::radians_per_second_squared_t m_frictionAcceleration;
 };
 }  // namespace frc::sim

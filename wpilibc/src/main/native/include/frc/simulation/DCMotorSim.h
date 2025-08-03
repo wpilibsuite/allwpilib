@@ -140,6 +140,7 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   DCMotor m_gearbox;
   double m_gearing;
   units::kilogram_square_meter_t m_j;
+  units::volt_t m_ks;
   units::radians_per_second_squared_t m_frictionAcceleration;
 };
 }  // namespace frc::sim
