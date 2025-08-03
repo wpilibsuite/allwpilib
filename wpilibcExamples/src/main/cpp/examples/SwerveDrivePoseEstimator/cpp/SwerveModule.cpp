@@ -61,9 +61,9 @@ void SwerveModule::SetDesiredVelocity(
 
   // Calculate the drive output from the drive PID controller.
   const auto driveOutput = m_drivePIDController.Calculate(
-      m_driveEncoder.GetRate(), velocity.speed.value());
+      m_driveEncoder.GetRate(), velocity.velocity.value());
 
-  const auto driveFeedforward = m_driveFeedforward.Calculate(velocity.speed);
+  const auto driveFeedforward = m_driveFeedforward.Calculate(velocity.velocity);
 
   // Calculate the turning motor output from the turning PID controller.
   const auto turnOutput = m_turningPIDController.Calculate(
