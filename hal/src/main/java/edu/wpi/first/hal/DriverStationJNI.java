@@ -159,8 +159,12 @@ public class DriverStationJNI extends JNIWrapper {
    *     joystick buttons count, long joystick buttons values
    * @see "HAL_GetAllJoystickData"
    */
-  public static native void getAllJoystickData(int stick,
-      float[] axesArray, short[] rawAxesArray, byte[] povsArray, long[] buttonsAndMetadata);
+  public static native void getAllJoystickData(
+      int stick,
+      float[] axesArray,
+      short[] rawAxesArray,
+      byte[] povsArray,
+      long[] buttonsAndMetadata);
 
   /**
    * Set joystick outputs.
