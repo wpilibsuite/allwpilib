@@ -338,10 +338,10 @@ public final class DriverStationSim {
   }
 
   /**
-   * Sets the state of one joystick button. Button indexes begin at 1.
+   * Sets the state of one joystick button. Button indexes begin at 0.
    *
    * @param stick The joystick number
-   * @param button The button index, beginning at 1
+   * @param button The button index, beginning at 0
    * @param state The state of the joystick button
    */
   public static void setJoystickButton(int stick, int button, boolean state) {
@@ -368,16 +368,6 @@ public final class DriverStationSim {
    */
   public static void setJoystickPOV(int stick, int pov, DriverStation.POVDirection value) {
     DriverStationDataJNI.setJoystickPOV(stick, pov, value.value);
-  }
-
-  /**
-   * Sets the state of all the buttons on a joystick.
-   *
-   * @param stick The joystick number
-   * @param buttons The bitmap state of the buttons on the joystick
-   */
-  public static void setJoystickButtons(int stick, int buttons) {
-    DriverStationDataJNI.setJoystickButtonsValue(stick, buttons);
   }
 
   /**

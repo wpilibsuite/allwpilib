@@ -56,10 +56,6 @@ void GenericHIDSim::SetName(const char* name) {
   DriverStationSim::SetJoystickName(m_port, name);
 }
 
-void GenericHIDSim::SetAxisType(int axis, int type) {
-  DriverStationSim::SetJoystickAxisType(m_port, axis, type);
-}
-
 bool GenericHIDSim::GetOutput(int outputNumber) {
   int64_t outputs = GetOutputs();
   return (outputs & (static_cast<int64_t>(1) << (outputNumber - 1))) != 0;

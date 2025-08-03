@@ -264,10 +264,10 @@ class DriverStationSim {
   static int GetJoystickRumble(int stick, int rumbleNum);
 
   /**
-   * Sets the state of one joystick button. %Button indexes begin at 1.
+   * Sets the state of one joystick button. %Button indexes begin at 0.
    *
    * @param stick The joystick number
-   * @param button The button index, beginning at 1
+   * @param button The button index, beginning at 0
    * @param state The state of the joystick button
    */
   static void SetJoystickButton(int stick, int button, bool state);
@@ -292,12 +292,12 @@ class DriverStationSim {
                              DriverStation::POVDirection value);
 
   /**
-   * Sets the state of all the buttons on a joystick.
+   * Sets the number of axes for a joystick.
    *
    * @param stick The joystick number
-   * @param buttons The bitmap state of the buttons on the joystick
+   * @param count The number of axes on the indicated joystick
    */
-  static void SetJoystickButtons(int stick, uint32_t buttons);
+  static void SetJoystickAxisMaximumIndex(int stick, int maximumIndex);
 
   /**
    * Sets the number of axes for a joystick.
@@ -305,7 +305,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of axes on the indicated joystick
    */
-  static void SetJoystickAxisCount(int stick, int count);
+  static void SetJoystickAxisAvailable(int stick, int available);
 
   /**
    * Sets the number of POVs for a joystick.
@@ -313,7 +313,9 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of POVs on the indicated joystick
    */
-  static void SetJoystickPOVCount(int stick, int count);
+  static void SetJoystickPOVMaximumIndex(int stick, int count);
+
+  static void SetJoystickPOVAvailable(int stick, int count);
 
   /**
    * Sets the number of buttons for a joystick.
@@ -321,7 +323,9 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of buttons on the indicated joystick
    */
-  static void SetJoystickButtonCount(int stick, int count);
+  static void SetJoystickButtonMaximumIndex(int stick, int count);
+
+  static void SetJoystickButtonAvailable(int stick, uint64_t available);
 
   /**
    * Sets the value of isGamepad for a joystick.
@@ -346,15 +350,6 @@ class DriverStationSim {
    * @param name The value of name
    */
   static void SetJoystickName(int stick, std::string_view name);
-
-  /**
-   * Sets the types of Axes for a joystick.
-   *
-   * @param stick The joystick number
-   * @param axis The target axis
-   * @param type The type of axis
-   */
-  static void SetJoystickAxisType(int stick, int axis, int type);
 
   /**
    * Sets the game specific message.

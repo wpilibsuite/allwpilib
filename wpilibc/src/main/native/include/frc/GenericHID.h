@@ -280,26 +280,32 @@ class GenericHID {
   BooleanEvent AxisGreaterThan(int axis, double threshold,
                                EventLoop* loop) const;
 
+    int GetAxesMaximumIndex() const;
+
   /**
    * Get the number of axes for the HID.
    *
    * @return the number of axis for the current HID
    */
-  int GetAxisCount() const;
+  int GetAxesAvailable() const;
+
+  int GetPOVsMaximumIndex() const;
 
   /**
    * Get the number of POVs for the HID.
    *
    * @return the number of POVs for the current HID
    */
-  int GetPOVCount() const;
+  int GetPOVsAvailable() const;
+
+  int GetButtonsMaximumIndex() const;
 
   /**
    * Get the number of buttons for the HID.
    *
    * @return the number of buttons on the current HID
    */
-  int GetButtonCount() const;
+  uint64_t GetButtonsAvailable() const;
 
   /**
    * Get if the HID is connected.
@@ -321,13 +327,6 @@ class GenericHID {
    * @return the name of the HID.
    */
   std::string GetName() const;
-
-  /**
-   * Get the axis type of a joystick axis.
-   *
-   * @return the axis type of a joystick axis.
-   */
-  int GetAxisType(int axis) const;
 
   /**
    * Get the port number of the HID.

@@ -106,8 +106,6 @@ void HALSIM_SetJoystickType(int32_t stick, int32_t type) {}
 
 void HALSIM_SetJoystickName(int32_t stick, const struct WPI_String* name) {}
 
-void HALSIM_SetJoystickAxisType(int32_t stick, int32_t axis, int32_t type) {}
-
 void HALSIM_SetGameSpecificMessage(const struct WPI_String* message) {}
 
 void HALSIM_SetEventName(const struct WPI_String* name) {}

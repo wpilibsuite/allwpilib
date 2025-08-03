@@ -655,7 +655,7 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOV
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButtonsValue
-  (JNIEnv*, jclass, jint stick, jint buttons)
+  (JNIEnv*, jclass, jint stick, jlong buttons)
 {
   HALSIM_SetJoystickButtonsValue(stick, buttons);
 }

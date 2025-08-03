@@ -210,21 +210,21 @@ void DriverStationSim::SetJoystickPOV(int stick, int pov,
   HALSIM_SetJoystickPOV(stick, pov, static_cast<HAL_JoystickPOV>(value));
 }
 
-void DriverStationSim::SetJoystickButtons(int stick, uint32_t buttons) {
-  HALSIM_SetJoystickButtonsValue(stick, buttons);
-}
+// void DriverStationSim::SetJoystickButtons(int stick, uint32_t buttons) {
+//   HALSIM_SetJoystickButtonsValue(stick, buttons);
+// }
 
-void DriverStationSim::SetJoystickAxisCount(int stick, int count) {
-  HALSIM_SetJoystickAxisCount(stick, count);
-}
+// void DriverStationSim::SetJoystickAxisCount(int stick, int count) {
+//   HALSIM_SetJoystickAxisCount(stick, count);
+// }
 
-void DriverStationSim::SetJoystickPOVCount(int stick, int count) {
-  HALSIM_SetJoystickPOVCount(stick, count);
-}
+// void DriverStationSim::SetJoystickPOVCount(int stick, int count) {
+//   HALSIM_SetJoystickPOVCount(stick, count);
+// }
 
-void DriverStationSim::SetJoystickButtonCount(int stick, int count) {
-  HALSIM_SetJoystickButtonCount(stick, count);
-}
+// void DriverStationSim::SetJoystickButtonCount(int stick, int count) {
+//   HALSIM_SetJoystickButtonCount(stick, count);
+// }
 
 void DriverStationSim::SetJoystickIsGamepad(int stick, bool isGamepad) {
   HALSIM_SetJoystickIsGamepad(stick, isGamepad);
@@ -237,10 +237,6 @@ void DriverStationSim::SetJoystickType(int stick, int type) {
 void DriverStationSim::SetJoystickName(int stick, std::string_view name) {
   auto str = wpi::make_string(name);
   HALSIM_SetJoystickName(stick, &str);
-}
-
-void DriverStationSim::SetJoystickAxisType(int stick, int axis, int type) {
-  HALSIM_SetJoystickAxisType(stick, axis, type);
 }
 
 void DriverStationSim::SetGameSpecificMessage(std::string_view message) {

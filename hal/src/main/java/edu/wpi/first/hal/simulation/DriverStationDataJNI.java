@@ -111,7 +111,7 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setJoystickPOV(int stick, int pov, byte value);
 
-  public static native void setJoystickButtonsValue(int stick, int buttons);
+  public static native void setJoystickButtonsValue(int stick, long buttons);
 
   public static native void setJoystickAxesAvailable(int stick, int available);
 

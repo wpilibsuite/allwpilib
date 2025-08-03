@@ -164,13 +164,17 @@ class DriverStation final {
    */
   static int GetStickButtons(int stick);
 
+  static int GetStickAxesMaximumIndex(int stick);
+
   /**
    * Returns the number of axes on a given joystick port.
    *
    * @param stick The joystick port number
    * @return The number of axes on the indicated joystick
    */
-  static int GetStickAxisCount(int stick);
+  static int GetStickAxesAvailable(int stick);
+
+  static int GetStickPOVsMaximumIndex(int stick);
 
   /**
    * Returns the number of POVs on a given joystick port.
@@ -178,7 +182,9 @@ class DriverStation final {
    * @param stick The joystick port number
    * @return The number of POVs on the indicated joystick
    */
-  static int GetStickPOVCount(int stick);
+  static int GetStickPOVsAvailable(int stick);
+
+  static int GetStickButtonsMaximumIndex(int stick);
 
   /**
    * Returns the number of buttons on a given joystick port.
@@ -186,7 +192,7 @@ class DriverStation final {
    * @param stick The joystick port number
    * @return The number of buttons on the indicated joystick
    */
-  static int GetStickButtonCount(int stick);
+  static uint64_t GetStickButtonsAvailable(int stick);
 
   /**
    * Returns a boolean indicating if the controller is an xbox controller.
@@ -211,15 +217,6 @@ class DriverStation final {
    * @return The name of the joystick at the given port
    */
   static std::string GetJoystickName(int stick);
-
-  /**
-   * Returns the types of Axes on a given joystick port.
-   *
-   * @param stick The joystick port number and the target axis
-   * @param axis  The analog axis value to read from the joystick.
-   * @return What type of axis the axis is reporting to be
-   */
-  static int GetJoystickAxisType(int stick, int axis);
 
   /**
    * Returns if a joystick is connected to the Driver Station.
