@@ -5,8 +5,6 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.measure.Dimensionless;
-import edu.wpi.first.units.measure.ImmutableDimensionless;
-import edu.wpi.first.units.measure.MutDimensionless;
 
 /**
  * A type of unit that corresponds to raw values and not any physical dimension, such as percentage.
@@ -40,12 +38,12 @@ public final class DimensionlessUnit extends Unit {
 
   @Override
   public Dimensionless of(double magnitude) {
-    return new ImmutableDimensionless(magnitude, toBaseUnits(magnitude), this);
+    return new Dimensionless(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Dimensionless ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableDimensionless(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new Dimensionless(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -56,11 +54,6 @@ public final class DimensionlessUnit extends Unit {
   @Override
   public Dimensionless one() {
     return (Dimensionless) super.one();
-  }
-
-  @Override
-  public MutDimensionless mutable(double initialMagnitude) {
-    return new MutDimensionless(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   /**

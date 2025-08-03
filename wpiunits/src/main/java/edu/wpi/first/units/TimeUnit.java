@@ -4,8 +4,6 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.measure.ImmutableTime;
-import edu.wpi.first.units.measure.MutTime;
 import edu.wpi.first.units.measure.Time;
 
 /**
@@ -77,12 +75,12 @@ public final class TimeUnit extends Unit {
 
   @Override
   public Time of(double magnitude) {
-    return new ImmutableTime(magnitude, toBaseUnits(magnitude), this);
+    return new Time(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Time ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableTime(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new Time(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -93,10 +91,5 @@ public final class TimeUnit extends Unit {
   @Override
   public Time one() {
     return (Time) super.one();
-  }
-
-  @Override
-  public MutTime mutable(double initialMagnitude) {
-    return new MutTime(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 }

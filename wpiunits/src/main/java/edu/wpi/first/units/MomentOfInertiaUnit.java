@@ -4,9 +4,7 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.measure.ImmutableMomentOfInertia;
 import edu.wpi.first.units.measure.MomentOfInertia;
-import edu.wpi.first.units.measure.MutMomentOfInertia;
 
 /**
  * A unit of moment of inertia, like {@link edu.wpi.first.units.Units#KilogramSquareMeters}. Moments
@@ -55,12 +53,12 @@ public final class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, Angu
 
   @Override
   public MomentOfInertia of(double magnitude) {
-    return new ImmutableMomentOfInertia(magnitude, toBaseUnits(magnitude), this);
+    return new MomentOfInertia(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public MomentOfInertia ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableMomentOfInertia(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new MomentOfInertia(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -71,11 +69,6 @@ public final class MomentOfInertiaUnit extends PerUnit<AngularMomentumUnit, Angu
   @Override
   public MomentOfInertia one() {
     return (MomentOfInertia) super.one();
-  }
-
-  @Override
-  public MutMomentOfInertia mutable(double initialMagnitude) {
-    return new MutMomentOfInertia(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @Override

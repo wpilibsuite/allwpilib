@@ -1,7 +1,7 @@
 try-import %workspace%/bazel_auth.rc
 try-import %workspace%/user.bazelrc
 
-common --noenable_bzlmod
+common --noenable_bzlmod --enable_workspace
 # Resolves to --config=linux on Linux, --config=macos on Mac, --windows on windows
 common --enable_platform_specific_config
 
@@ -10,10 +10,10 @@ common --enable_workspace
 build --experimental_cc_static_library
 build --experimental_cc_shared_library
 
-build --java_language_version=17
-build --java_runtime_version=roboriojdk_17
-build --tool_java_language_version=17
-build --tool_java_runtime_version=remotejdk_17
+build --java_language_version=21
+build --java_runtime_version=remotejdk_21
+build --tool_java_language_version=21
+build --tool_java_runtime_version=remotejdk_21
 
 test --test_output=errors
 test --test_verbose_timeout_warnings

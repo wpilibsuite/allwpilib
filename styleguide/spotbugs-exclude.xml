@@ -38,18 +38,10 @@
     <Source name="MechanismLigament2d.java" />
   </Match>
   <Match>
-    <Bug pattern="MS_CANNOT_BE_FINAL" />
-    <Class name="edu.wpi.first.wpilibj.examples.pacgoat.Robot" />
-  </Match>
-  <Match>
     <Bug pattern="MS_EXPOSE_REP" />
   </Match>
   <Match>
     <Bug pattern="MS_MUTABLE_ARRAY" />
-  </Match>
-  <Match>
-    <Bug pattern="NM_CLASS_NAMING_CONVENTION" />
-    <Source name="FRCNetComm.java" />
   </Match>
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
@@ -155,5 +147,13 @@
   <Match>
     <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
     <Class name="edu.wpi.first.epilogue.EpilogueConfiguration" />
+  </Match>
+  <Match>
+    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
+    <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
+  </Match>
+  <Match>
+    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
+    <Class name="~edu.wpi.first.math.geometry.Coordinate\w+" />
   </Match>
 </FindBugsFilter>
