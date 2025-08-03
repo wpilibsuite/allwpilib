@@ -86,8 +86,9 @@ Vectord<1> FlywheelSim::UpdateX(const Vectord<1>& currentXhat,
                                 const Vectord<1>& u, units::second_t dt) {
   Vectord<1> updatedXhat = RKDP(
       [&](const auto& x, const auto& u) -> Vectord<1> {
-        Vectord<1> xdot = m_plant.A() * x + m_plant.B() * u +
-                          Vectord<1>{-m_frictionAcceleration.value()} * wpi::sgn(x(0));
+        Vectord<1> xdot =
+            m_plant.A() * x + m_plant.B() * u +
+            Vectord<1>{-m_frictionAcceleration.value()} * wpi::sgn(x(0));
         return xdot;
       },
       currentXhat, u, dt);
