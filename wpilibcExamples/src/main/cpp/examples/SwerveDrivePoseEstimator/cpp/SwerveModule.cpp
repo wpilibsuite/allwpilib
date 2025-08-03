@@ -56,7 +56,6 @@ void SwerveModule::SetDesiredState(
   // then scale speed by cosine of angle error. This scales down movement
   // perpendicular to the desired direction of travel that can occur when
   // modules change directions. This results in smoother driving.
-  // Optimize the reference state to avoid spinning further than 90 degrees
   auto state =
       referenceState.Optimize(encoderRotation).CosineScale(encoderRotation);
 

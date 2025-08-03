@@ -82,8 +82,8 @@ class SwerveModuleStateTest {
     var optimizedD = refD.cosineScale(angleD);
 
     assertAll(
-        () -> assertEquals(0.0, refD.speed, kEpsilon),
-        () -> assertEquals(45.0, refD.angle.getDegrees(), kEpsilon));
+        () -> assertEquals(0.0, optimizedD.speed, kEpsilon),
+        () -> assertEquals(45.0, optimizedD.angle.getDegrees(), kEpsilon));
 
     var angleE = Rotation2d.fromDegrees(-135.0);
     var refE = new SwerveModuleState(2.0, Rotation2d.fromDegrees(45.0));
