@@ -353,6 +353,7 @@ def package_binary_cc_project(
         name,
         maven_group_id,
         maven_artifact_name,
+        extra_files = [],
         architectures = None,
         renames = None):
     """Packages the C++ binary targets for a project.
@@ -374,7 +375,7 @@ def package_binary_cc_project(
         srcs = [
             ":{}-files".format(name),
             "//:license_pkg_files",
-        ],
+        ] + extra_files,
         architectures = architectures,
     )
 
