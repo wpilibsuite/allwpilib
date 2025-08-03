@@ -5,6 +5,7 @@
 #pragma once
 
 #ifdef __cplusplus
+#include <cstring>
 #include <string_view>
 #endif
 
@@ -106,3 +107,16 @@ void WPI_FreeStringArray(const struct WPI_String* wpiStringArray,
 #ifdef __cplusplus
 }  // extern "C"
 #endif  // __cplusplus
+
+#ifdef __cplusplus
+namespace wpi {
+
+/** Allocates a copy of a string_view and stores the result into a WPI_String */
+inline WPI_String alloc_wpi_string(std::string_view view) {
+  WPI_String out;
+  size_t len = view.size();
+  std::memcpy(WPI_AllocateString(&out, len), view.data(), len);
+  return out;
+}
+}  // namespace wpi
+#endif
