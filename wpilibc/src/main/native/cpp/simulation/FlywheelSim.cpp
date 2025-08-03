@@ -53,7 +53,8 @@ units::radians_per_second_t FlywheelSim::GetAngularVelocity() const {
 units::radians_per_second_squared_t FlywheelSim::GetAngularAcceleration()
     const {
   return units::radians_per_second_squared_t{
-      (m_plant.A() * m_x + m_plant.B() * m_u)(0, 0)};
+      (m_plant.A() * m_x + m_plant.B() * m_u -
+       Vectord<1>{-m_frictionAcceleration.value() * wpi::sgn(m_x(0))})(0, 0)};
 }
 
 units::newton_meter_t FlywheelSim::GetTorque() const {
