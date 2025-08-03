@@ -12,8 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Windows (native)",             os: windows-2022, action: "test",  config: "",     }
-          - { name: "Windows (arm)",                os: windows-2022, action: "build", config: "--config=windows_arm", }
+          - { name: "Windows (native)",             os: windows-2022, action: "test",  config: "--config=ci_windows_x86",     }
+          - { name: "Windows (arm)",                os: windows-2022, action: "build", config: "--config=windows_arm --config=ci_windows_arm", }
 
     name: "Build ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
