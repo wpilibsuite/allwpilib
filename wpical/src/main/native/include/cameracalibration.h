@@ -4,48 +4,102 @@
 
 #pragma once
 
-#include <fstream>
+#include <memory>
+#include <optional>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <Eigen/Core>
+#include <mrcal_wrapper.h>
+#include <opencv2/core/eigen.hpp>
+#include <opencv2/core/mat.hpp>
+#include <opencv2/objdetect/aruco_board.hpp>
+#include <opencv2/objdetect/charuco_detector.hpp>
+#include <opencv2/videoio.hpp>
 #include <wpi/json.h>
+#include <wpi/mutex.h>
+#include <wpi/print.h>
 
-namespace cameracalibration {
+namespace wpical {
 struct CameraModel {
-  Eigen::Matrix<double, 3, 3> intrinsic_matrix;
-  Eigen::Matrix<double, 8, 1> distortion_coefficients;
-  double avg_reprojection_error;
+  Eigen::Matrix<double, 3, 3, Eigen::RowMajor> intrinsicMatrix;
+  Eigen::Matrix<double, 8, 1> distortionCoefficients;
+  double avgReprojectionError = -1;
 };
 
-int calibrate(const std::string& input_video, CameraModel& camera_model,
-              float square_width, float marker_width, int board_width,
-              int board_height, bool show_debug_window);
-int calibrate(const std::string& input_video, CameraModel& camera_model,
-              float square_width, float marker_width, int board_width,
-              int board_height, double imagerWidthPixels,
-              double imagerHeightPixels, bool show_debug_window);
-int calibrate(const std::string& input_video, CameraModel& camera_model,
-              float square_width, int board_width, int board_height,
-              double imagerWidthPixels, double imagerHeightPixels,
-              bool show_debug_window);
-static void dumpJson(CameraModel& camera_model,
-                     const std::string& output_file_path) {
-  std::vector<double> camera_matrix(camera_model.intrinsic_matrix.data(),
-                                    camera_model.intrinsic_matrix.data() +
-                                        camera_model.intrinsic_matrix.size());
-  std::vector<double> distortion_coefficients(
-      camera_model.distortion_coefficients.data(),
-      camera_model.distortion_coefficients.data() +
-          camera_model.distortion_coefficients.size());
+CameraModel MrcalResultToCameraModel(mrcal_result& stats);
 
-  wpi::json result = {
-      {"camera_matrix", camera_matrix},
-      {"distortion_coefficients", distortion_coefficients},
-      {"avg_reprojection_error", camera_model.avg_reprojection_error}};
+class Data;
+class Worker;
 
-  std::ofstream output_file(output_file_path);
-  output_file << result.dump(4) << std::endl;
-  output_file.close();
-}
-}  // namespace cameracalibration
+class CameraCalibrator {
+ public:
+  /**
+   * @param squareWidth The width of the full square in meters
+   * @param markerWidth The width of the marker in meters
+   * @param boardWidth How many markers wide the board is
+   * @param boardHeight How many markers tall the board is
+   */
+  CameraCalibrator(size_t numWorkers, double squareWidth, double markerWidth,
+                   int boardWidth, int boardHeight);
+
+  ~CameraCalibrator();
+
+  /**
+   * Opens the video at the path, and performs camera calibration using the
+   * frames in the video.
+   * @param videoPath The absolute path to the video.
+   */
+  void ProcessVideo(std::string& videoPath);
+
+  /**
+   * Returns whether or not all frames have been processed or whether or not the
+   * camera calibrator has been stopped.
+   * @return true if all frames have been processed or if the camera calibrator
+   * has been stopped, false otherwise.
+   */
+  bool IsFinished();
+
+  /**
+   * Gets the camera model.
+   * @return std::nullopt if the camera calibrator is not finished processing or
+   * if calibration failed. Returns CameraModel if it's finished and calibration
+   * was successful. If calibration is successful, there will always be a valid
+   * CameraModel before IsFinished returns true.
+   */
+  std::optional<CameraModel> GetCameraModel();
+
+  /**
+   * Returns the total number of frames that have been processed.
+   * @return The total number of processed frames.
+   */
+  int TotalFramesProcessed();
+
+  /**
+   * Returns the total number of frames in the video.
+   * @return The total number of frames.
+   */
+  int TotalFrames();
+
+  /**
+   * Stops all worker threads.
+   */
+  void Stop();
+
+ private:
+  // Ensures that shared state lives until everything else is destroyed
+  std::shared_ptr<Data> m_state;
+
+  cv::Size m_cornerSize;
+  double m_squareWidth;
+  std::atomic_bool m_isFinished{false};
+  std::atomic_int m_totalFrames;
+  std::thread m_processingThread;
+  std::vector<std::shared_ptr<Worker>> m_workers;
+};
+
+void to_json(wpi::json& json, const CameraModel& cameraModel);
+
+void from_json(const wpi::json& json, CameraModel& cameraModel);
+}  // namespace wpical
