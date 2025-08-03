@@ -36,7 +36,7 @@ jobs:
       - name: Install wpiformat
         run: |
           python -m venv ${{ runner.temp }}/wpiformat
-          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2025.33
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2025.34
       - name: Run
         run: ${{ runner.temp }}/wpiformat/bin/wpiformat
       - name: Check output
@@ -78,7 +78,7 @@ jobs:
       - name: Install wpiformat
         run: |
           python -m venv ${{ runner.temp }}/wpiformat
-          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2025.33
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2025.34
       - name: Create compile_commands.json
         run: |
           ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio

@@ -6,6 +6,16 @@
 
 #include <functional>
 
+struct ImGuiContext;
+
+namespace glass {
+class Context;
+}  // namespace glass
+
+namespace wpi::gui {
+struct Context;
+}  // namespace wpi::gui
+
 namespace halsimgui {
 
 // These functions can be used to hook into the GUI, and can be accessed
@@ -22,5 +32,14 @@ using AddGuiEarlyExecuteFn = void (*)(std::function<void()> execute);
 
 #define HALSIMGUI_EXT_GUIEXIT "halsimgui::GuiExit"
 using GuiExitFn = void (*)();
+
+#define HALSIMGUI_EXT_GETIMGUICONTEXT "halsimgui::GetImguiContext"
+using GetImguiContextFn = ImGuiContext* (*)();
+
+#define HALSIMGUI_EXT_GETGUICONTEXT "halsimgui::GetGuiContext"
+using GetGuiContextFn = wpi::gui::Context* (*)();
+
+#define HALSIMGUI_EXT_GETGLASSCONTEXT "halsimgui::GetGlassContext"
+using GetGlassContextFn = glass::Context* (*)();
 
 }  // namespace halsimgui
