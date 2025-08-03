@@ -35,7 +35,6 @@ cc_library(
         "//conditions:default": ["GLOG_DEPRECATED=[[deprecated]]"],
     }),
     linkopts = select({
-        "@platforms//os:linux": ["-lgfortran"],
         "@platforms//os:windows": ["dbghelp.lib"],
         "//conditions:default": [],
     }),

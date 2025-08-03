@@ -66,11 +66,6 @@ cc_library(
     strip_include_prefix = "src/main/native/thirdparty/mrcal_java/include/",
 )
 
-pkg_files(
-    name = "native-pkg",
-    srcs = [],
-)
-
 osx_copts = [
     "-Wno-pedantic",
     "-Wno-format-nonliteral",
