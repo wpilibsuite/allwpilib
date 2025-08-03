@@ -624,7 +624,7 @@ public final class DriverStation {
       throw new IllegalArgumentException("Joystick Button is out of range");
     }
 
-    long mask = 1l << button;
+    long mask = 1L << button;
 
     m_cacheDataMutex.lock();
     try {
@@ -659,14 +659,14 @@ public final class DriverStation {
       throw new IllegalArgumentException("Joystick Button is out of range");
     }
 
-    long mask = 1l << button;
+    long mask = 1L << button;
 
     m_cacheDataMutex.lock();
     try {
       if ((m_joystickButtons[stick].m_available & mask) != 0) {
         // If button was pressed, clear flag and return true
         if ((m_joystickButtonsPressed[stick] & mask) != 0) {
-          m_joystickButtonsPressed[stick] &= ~(mask);
+          m_joystickButtonsPressed[stick] &= ~mask;
           return true;
         } else {
           return false;
@@ -700,14 +700,14 @@ public final class DriverStation {
       throw new IllegalArgumentException("Joystick Button is out of range");
     }
 
-    long mask = 1l << button;
+    long mask = 1L << button;
 
     m_cacheDataMutex.lock();
     try {
       if ((m_joystickButtons[stick].m_available & mask) != 0) {
         // If button was released, clear flag and return true
         if ((m_joystickButtonsReleased[stick] & mask) != 0) {
-          m_joystickButtonsReleased[stick] &= ~(mask);
+          m_joystickButtonsReleased[stick] &= ~mask;
           return true;
         } else {
           return false;

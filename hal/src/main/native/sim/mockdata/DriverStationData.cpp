@@ -223,16 +223,16 @@ void DriverStationData::NotifyNewData() {
   hal::NewDriverStationData();
 }
 
-void DriverStationData::SetJoystickButton(int32_t stick, uint64_t button,
+void DriverStationData::SetJoystickButton(int32_t stick, int32_t button,
                                           HAL_Bool state) {
   if (stick < 0 || stick >= kNumJoysticks) {
     return;
   }
   std::scoped_lock lock(m_joystickDataMutex);
   if (state) {
-    m_joystickData[stick].buttons.buttons |= 1llu << (button - 1);
+    m_joystickData[stick].buttons.buttons |= 1llu << button;
   } else {
-    m_joystickData[stick].buttons.buttons &= ~(1llu << (button - 1));
+    m_joystickData[stick].buttons.buttons &= ~(1llu << button);
   }
   m_joystickButtonsCallbacks(stick, &m_joystickData[stick].buttons);
 }
@@ -481,7 +481,7 @@ void HALSIM_NotifyDriverStationNewData(void) {
   SimDriverStationData->NotifyNewData();
 }
 
-void HALSIM_SetJoystickButton(int32_t stick, uint64_t button, HAL_Bool state) {
+void HALSIM_SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state) {
   SimDriverStationData->SetJoystickButton(stick, button, state);
 }
 

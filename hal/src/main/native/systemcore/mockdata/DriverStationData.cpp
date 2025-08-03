@@ -78,7 +78,7 @@ void HALSIM_CancelDriverStationNewDataCallback(int32_t uid) {}
 
 void HALSIM_NotifyDriverStationNewData(void) {}
 
-void HALSIM_SetJoystickButton(int32_t stick, uint64_t button, HAL_Bool state) {}
+void HALSIM_SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state) {}
 
 void HALSIM_SetJoystickAxis(int32_t stick, int32_t axis, double value) {}
 

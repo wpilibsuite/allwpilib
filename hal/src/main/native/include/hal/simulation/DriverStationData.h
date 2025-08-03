@@ -137,7 +137,7 @@ void HALSIM_CancelMatchInfoCallback(int32_t uid);
 void HALSIM_GetMatchInfo(HAL_MatchInfo* info);
 void HALSIM_SetMatchInfo(const HAL_MatchInfo* info);
 
-void HALSIM_SetJoystickButton(int32_t stick, uint64_t button, HAL_Bool state);
+void HALSIM_SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state);
 void HALSIM_SetJoystickAxis(int32_t stick, int32_t axis, double value);
 void HALSIM_SetJoystickPOV(int32_t stick, int32_t pov, HAL_JoystickPOV value);
 void HALSIM_SetJoystickButtonsValue(int32_t stick, uint64_t buttons);

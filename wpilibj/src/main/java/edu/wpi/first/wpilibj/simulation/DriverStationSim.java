@@ -380,6 +380,12 @@ public final class DriverStationSim {
     DriverStationDataJNI.setJoystickButtonsValue(stick, buttons);
   }
 
+  /**
+   * Sets the maximum index that an axis is available at.
+   *
+   * @param stick The joystick number
+   * @param maximumIndex The maximum index an axis is available at.
+   */
   public static void setJoystickAxesMaximumIndex(int stick, int maximumIndex) {
     setJoystickAxesAvailable(stick, (1 << maximumIndex) - 1);
   }
@@ -394,6 +400,12 @@ public final class DriverStationSim {
     DriverStationDataJNI.setJoystickAxesAvailable(stick, count);
   }
 
+  /**
+   * Sets the maximum index that a pov is available at.
+   *
+   * @param stick The joystick number
+   * @param maximumIndex The maximum index a pov is available at.
+   */
   public static void setJoystickPOVsMaximumIndex(int stick, int maximumIndex) {
     setJoystickPOVsAvailable(stick, (1 << maximumIndex) - 1);
   }
@@ -408,6 +420,12 @@ public final class DriverStationSim {
     DriverStationDataJNI.setJoystickPOVsAvailable(stick, count);
   }
 
+  /**
+   * Sets the maximum index that a button is available at.
+   *
+   * @param stick The joystick number
+   * @param maximumIndex The maximum index a button is available at.
+   */
   public static void setJoystickButtonsMaximumIndex(int stick, int maximumIndex) {
     if (maximumIndex >= 64) {
       setJoystickButtonsAvailable(stick, 0xFFFFFFFFFFFFFFFFL);
