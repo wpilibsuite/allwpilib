@@ -89,4 +89,14 @@ public class AddressableLEDBuffer implements LEDReader, LEDWriter {
   public AddressableLEDBufferView createView(int startingIndex, int endingIndex) {
     return new AddressableLEDBufferView(this, startingIndex, endingIndex);
   }
+
+  /**
+   * Returns the internal byte array of the buffer.
+   *
+   * @return internal buffer byte array
+   */
+  @SuppressWarnings("PMD.MethodReturnsInternalArray")
+  public byte[] getBytes() {
+    return m_buffer;
+  }
 }
