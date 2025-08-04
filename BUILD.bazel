@@ -3,6 +3,11 @@ load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("//shared/bazel/rules:publishing.bzl", "publish_all")
 
+exports_files([
+    "LICENSE.md",
+    "ThirdPartyNotices.txt",
+])
+
 pkg_files(
     name = "license_pkg_files",
     srcs = [
@@ -64,6 +69,7 @@ publish_all(
         "//datalog:datalog-cpp_publish",
         "//datalog:datalog-java_publish",
         "//datalogtool:datalogtool_publish",
+        "//docs:wpilibc_publish",
         "//epilogue-processor:processor-java_publish",
         "//processstarter:processstarter_publish",
         "//epilogue-runtime:epilogue-java_publish",
