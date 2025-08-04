@@ -1,3 +1,4 @@
+load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@doxygen//:doxygen.bzl", "doxygen")
 load("@rules_jvm_external//:defs.bzl", "maven_export")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
@@ -32,9 +33,31 @@ paths = [
     "xrpVendordep/src/main/native/include",
 ]
 
+# Doxygen library includes '.' if we include these from their original path.
+# That pulls in external/* and all sorts of other mess.
+# Instead, copy them here so we instead include 'docs'
+copy_file(
+    name = "license",
+    src = "//:LICENSE.md",
+    out = "LICENSE.md",
+    allow_symlink = False,
+    is_executable = False,
+)
+
+copy_file(
+    name = "third_party_notices",
+    src = "//:ThirdPartyNotices.txt",
+    out = "ThirdPartyNotices.txt",
+    allow_symlink = False,
+    is_executable = False,
+)
+
 doxygen(
     name = "doxygen",
     srcs = [
+        ":license",
+        ":theme.css",
+        ":third_party_notices",
         "//apriltag:doxygen-files",
         "//cameraserver:doxygen-files",
         "//cscore:doxygen-files",
@@ -46,11 +69,8 @@ doxygen(
         "//wpimath:doxygen-files",
         "//wpinet:doxygen-files",
         "//wpiutil:doxygen-files",
-        "//xrpVendordep:doxygen-files",
-        #"//:LICENSE.md",
-        #"//:ThirdPartyNotices.txt",
         "//wpiutil:src/main/native/resources/wpilib-128.png",
-        ":theme.css",
+        "//xrpVendordep:doxygen-files",
     ],
     outs = ["html"],
     doxyfile_template = "Doxyfile",
