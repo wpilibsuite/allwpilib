@@ -81,6 +81,10 @@ doxygen(
     project_number = "$(WPILIB_VERSION)",
     strip_from_inc_path = paths,
     strip_from_path = paths,
+    target_compatible_with = select({
+        "@platforms//cpu:x86_64": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )
 
 pkg_zip(
