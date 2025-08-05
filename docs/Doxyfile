@@ -972,6 +972,7 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  =
+# {{INPUT}}
 
 # This tag can be used to specify the character encoding of the source files
 # that Doxygen parses. Internally Doxygen uses the UTF-8 encoding. Doxygen uses
@@ -2783,6 +2784,7 @@ INTERACTIVE_SVG        = NO
 # This tag requires that the tag HAVE_DOT is set to YES.
 
 DOT_PATH               =
+# {{DOT_PATH}}
 
 # The DOTFILE_DIRS tag can be used to specify one or more directories that
 # contain dot files that are included in the documentation (see the \dotfile
@@ -2889,3 +2891,7 @@ MSCGEN_TOOL            =
 # command).
 
 MSCFILE_DIRS           =
+
+# {{ADDITIONAL PARAMETERS}}
+
+# {{OUTPUT DIRECTORY}}

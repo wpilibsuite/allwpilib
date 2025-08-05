@@ -88,6 +88,13 @@ http_archive(
     ],
 )
 
+http_archive(
+    name = "rules_doxygen",
+    sha256 = "5d154d3d011208510392b5aee8ea23ec61ab858cc1f3382b6eb8c729d3b4b336",
+    strip_prefix = "rules_doxygen-2.4.2",
+    url = "https://github.com/TendTo/rules_doxygen/releases/download/2.4.2/rules_doxygen-2.4.2.tar.gz",
+)
+
 load("@bazel_features//:deps.bzl", "bazel_features_deps")
 
 bazel_features_deps()
@@ -377,3 +384,30 @@ publishing_repo(
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
 bazel_skylib_workspace()
+
+load("@rules_doxygen//:extensions.bzl", "doxygen_repository")
+
+# Download the os specific version 1.12.0 of doxygen supporting all the indicated platforms
+doxygen_repository(
+    name = "doxygen",
+    executables = [
+        "",
+        "",
+        "",
+    ],
+    platforms = [
+        "windows",
+        "mac",
+        "linux",
+    ],
+    sha256s = [
+        "07f1c92cbbb32816689c725539c0951f92c6371d3d7f66dfa3192cbe88dd3138",
+        "6ace7dde967d41f4e293d034a67eb2c7edd61318491ee3131112173a77344001",
+        "3c42c3f3fb206732b503862d9c9c11978920a8214f223a3950bbf2520be5f647",
+    ],
+    versions = [
+        "1.12.0",
+        "1.12.0",
+        "1.12.0",
+    ],
+)

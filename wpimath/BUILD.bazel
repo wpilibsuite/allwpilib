@@ -11,6 +11,17 @@ load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 load("//wpimath:generate.bzl", "generate_wpimath")
 
 filegroup(
+    name = "doxygen-files",
+    srcs = glob([
+        "src/generated/main/native/cpp/wpimath/protobuf/*.h",
+        "src/main/native/include/**/*",
+        "src/main/native/thirdparty/gcem/include/**/*",
+        "src/main/native/thirdparty/sleipnir/include/**/*",
+    ]),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
     name = "templates",
     srcs = glob(["src/generate/main/java/*.jinja"]),
 )
