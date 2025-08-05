@@ -152,6 +152,7 @@ maven_artifacts = [
     "com.fasterxml.jackson.core:jackson-databind:2.15.2",
     "us.hebi.quickbuf:quickbuf-runtime:1.3.3",
     "com.google.code.gson:gson:2.10.1",
+    "edu.wpi.first.thirdparty.frc2025.opencv:opencv-java:4.10.0-3",
     maven.artifact(
         "org.junit.jupiter",
         "junit-jupiter",
