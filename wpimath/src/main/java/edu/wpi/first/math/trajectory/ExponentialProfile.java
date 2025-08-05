@@ -5,6 +5,8 @@
 package edu.wpi.first.math.trajectory;
 
 import edu.wpi.first.math.trajectory.struct.ExponentialProfileStateStruct;
+import edu.wpi.first.math.trajectory.struct.ExponentialProfileTimingStruct;
+import edu.wpi.first.util.struct.StructSerializable;
 
 import java.util.Objects;
 
@@ -42,7 +44,10 @@ public class ExponentialProfile {
   private final Constraints m_constraints;
 
   /** Profile timing. */
-  public static class ProfileTiming {
+  public static class ProfileTiming implements StructSerializable {
+    /** The struct used for serializing this class. */
+    public static final ExponentialProfileTimingStruct struct = new ExponentialProfileTimingStruct();
+
     /** Profile inflection time. */
     public final double inflectionTime;
 
@@ -55,7 +60,7 @@ public class ExponentialProfile {
      * @param inflectionTime Profile inflection time.
      * @param totalTime Total profile time.
      */
-    protected ProfileTiming(double inflectionTime, double totalTime) {
+    public ProfileTiming(double inflectionTime, double totalTime) {
       this.inflectionTime = inflectionTime;
       this.totalTime = totalTime;
     }
