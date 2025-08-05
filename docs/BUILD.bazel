@@ -1,0 +1,102 @@
+load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
+load("@doxygen//:doxygen.bzl", "doxygen")
+load("@rules_jvm_external//:defs.bzl", "maven_export")
+load("@rules_pkg//:pkg.bzl", "pkg_zip")
+
+paths = [
+    "apriltag/src/main/native/include",
+    "cameraserver/src/generated/main/native/include",
+    "cameraserver/src/main/native/include",
+    "cscore/src/main/native/include",
+    "hal/src/main/native/include",
+    "ntcore/src/main/native/include",
+    "romiVendordep/src/generated/main/native/include",
+    "romiVendordep/src/main/native/include",
+    "wpilibNewCommands/src/generated/main/native/include",
+    "wpilibNewCommands/src/main/native/include",
+    "wpilibc/src/generated/main/native/include",
+    "wpilibc/src/main/native/include",
+    "wpimath/src/main/native/include",
+    "wpinet/src/main/native/include",
+    "wpiutil/src/main/native/include",
+    "wpiutil/src/main/native/thirdparty/argparse/include",
+    "wpiutil/src/main/native/thirdparty/debugging/include",
+    "wpiutil/src/main/native/thirdparty/expected/include",
+    "wpiutil/src/main/native/thirdparty/fmtlib/include",
+    "wpiutil/src/main/native/thirdparty/json/include",
+    "wpiutil/src/main/native/thirdparty/llvm/include",
+    "wpiutil/src/main/native/thirdparty/mpack/include",
+    "wpiutil/src/main/native/thirdparty/nanopb/include",
+    "wpiutil/src/main/native/thirdparty/protobuf/include",
+    "wpiutil/src/main/native/thirdparty/sigslot/include",
+    "xrpVendordep/src/generated/main/native/include",
+    "xrpVendordep/src/main/native/include",
+]
+
+# Doxygen library includes '.' if we include these from their original path.
+# That pulls in external/* and all sorts of other mess.
+# Instead, copy them here so we instead include 'docs'
+copy_file(
+    name = "license",
+    src = "//:LICENSE.md",
+    out = "LICENSE.md",
+    allow_symlink = False,
+    is_executable = False,
+)
+
+copy_file(
+    name = "third_party_notices",
+    src = "//:ThirdPartyNotices.txt",
+    out = "ThirdPartyNotices.txt",
+    allow_symlink = False,
+    is_executable = False,
+)
+
+doxygen(
+    name = "doxygen",
+    srcs = [
+        ":license",
+        ":theme.css",
+        ":third_party_notices",
+        "//apriltag:doxygen-files",
+        "//cameraserver:doxygen-files",
+        "//cscore:doxygen-files",
+        "//hal:doxygen-files",
+        "//ntcore:doxygen-files",
+        "//romiVendordep:doxygen-files",
+        "//wpilibNewCommands:doxygen-files",
+        "//wpilibc:doxygen-files",
+        "//wpimath:doxygen-files",
+        "//wpinet:doxygen-files",
+        "//wpiutil:doxygen-files",
+        "//wpiutil:src/main/native/resources/wpilib-128.png",
+        "//xrpVendordep:doxygen-files",
+    ],
+    outs = ["html"],
+    doxyfile_template = "Doxyfile",
+    exclude = "wpiutil/src/main/native/resources/wpilib-128.png docs/theme.css",
+    html_extra_stylesheet = "docs/theme.css",
+    project_logo = "wpiutil/src/main/native/resources/wpilib-128.png",
+    project_name = "WPILibC++",
+    project_number = "$(WPILIB_VERSION)",
+    strip_from_inc_path = paths,
+    strip_from_path = paths,
+    target_compatible_with = select({
+        "@platforms//cpu:x86_64": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    warnings = "NO",
+)
+
+pkg_zip(
+    name = "doxygen-zip",
+    srcs = [":doxygen"],
+    strip_prefix = "html",
+)
+
+maven_export(
+    name = "wpilibc_publish",
+    maven_coordinates = "edu.wpi.first.wpilibc:documentation:$(WPILIB_VERSION)",
+    target = ":doxygen-zip",
+    visibility = ["//visibility:public"],
+)

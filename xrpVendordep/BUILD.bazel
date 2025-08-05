@@ -4,6 +4,14 @@ load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 
+filegroup(
+    name = "doxygen-files",
+    srcs = glob([
+        "src/main/native/include/**/*",
+    ]),
+    visibility = ["//visibility:public"],
+)
+
 wpilib_cc_library(
     name = "xrpVendordep",
     srcs = glob([

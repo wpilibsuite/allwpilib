@@ -7,6 +7,14 @@ load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_
 load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project", "package_shared_cc_project")
 
+filegroup(
+    name = "doxygen-files",
+    srcs = glob([
+        "src/main/native/include/**/*",
+    ]),
+    visibility = ["//visibility:public"],
+)
+
 WIN_SRCS = glob([
     "src/main/native/windows/**/*.cpp",
     "src/main/native/windows/**/*.h",
