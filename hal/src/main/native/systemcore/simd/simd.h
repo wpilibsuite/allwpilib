@@ -69,11 +69,11 @@ SIMD_INLINE bool Aligned(const void* ptr, size_t align = sizeof(uint8x16_t)) {
 
 // SimdConst.h
 namespace Simd::Neon {
-const size_t A = sizeof(uint8x16_t);
-const size_t DA = 2 * A;
-const size_t QA = 4 * A;
-const size_t OA = 8 * A;
-const size_t HA = A / 2;
+constexpr size_t A = sizeof(uint8x16_t);
+constexpr size_t DA = 2 * A;
+constexpr size_t QA = 4 * A;
+constexpr size_t OA = 8 * A;
+constexpr size_t HA = A / 2;
 }  // namespace Simd::Neon
 
 // SimdLoad.h
