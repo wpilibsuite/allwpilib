@@ -190,16 +190,17 @@ inline void Convert1Pixel(HAL_AddressableLEDColorOrder order,
 template <HAL_AddressableLEDColorOrder order>
 void ConvertPixels(const uint8_t* src, uint8_t* dst, size_t len) {
   if (len >= 16) {
-    constexpr size_t A3 = A * kPixelSize;  // Stride of 1 16-pixel conversion
-                                           // operation. (3 NEON registers)
+    // Stride of 1 16-pixel conversion operation. (3 NEON Q registers)
+    constexpr size_t stride = A * kPixelSize;
+    // size of whole copy in bytes
     const size_t size = len * kPixelSize;
-    const size_t aligned = Simd::AlignLo(
-        size, A3);  // number of bytes we can copy with whole 16-pixel strides
-    for (size_t i = 0; i < aligned; i += A3) {
+    // number of bytes we can copy with whole 16-pixel strides
+    const size_t aligned = Simd::AlignLo(size, stride);
+    for (size_t i = 0; i < aligned; i += stride) {
       Convert16Pixels<order>(src + i, dst + i);
     }
     if (aligned < size) {
-      const size_t recopyOffset = size - A3;
+      const size_t recopyOffset = size - stride;
       Convert16Pixels<order>(
           src + recopyOffset,
           dst + recopyOffset);  // copy last 16 pixels, possibly recopying.
