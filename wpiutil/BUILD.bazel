@@ -92,22 +92,6 @@ filegroup(
 )
 
 cc_library(
-    name = "memory-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/memory/include/**/*.hpp",
-    ]),
-    includes = ["src/main/native/thirdparty/memory/include"],
-    strip_include_prefix = "src/main/native/thirdparty/memory/include",
-    visibility = ["//wpiutil:__subpackages__"],
-)
-
-filegroup(
-    name = "memory-srcs",
-    srcs = glob(["src/main/native/thirdparty/memory/src/**"]),
-    visibility = ["//wpiutil:__subpackages__"],
-)
-
-cc_library(
     name = "mpack-headers",
     hdrs = glob([
         "src/main/native/thirdparty/mpack/include/**/*.h",
@@ -195,7 +179,6 @@ cc_library(
         ":fmtlib-srcs",
         ":generate-resources",
         ":llvm-srcs",
-        ":memory-srcs",
         ":mpack-srcs",
         ":nanopb-srcs",
         ":native-srcs",
@@ -213,7 +196,6 @@ cc_library(
         ":fmtlib-headers",
         ":json-headers",
         ":llvm-headers",
-        ":memory-headers",
         ":mpack-headers",
         ":nanopb-headers",
         ":protobuf-headers",

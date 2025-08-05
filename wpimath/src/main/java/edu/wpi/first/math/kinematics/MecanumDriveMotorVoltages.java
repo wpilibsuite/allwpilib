@@ -4,7 +4,12 @@
 
 package edu.wpi.first.math.kinematics;
 
-/** Represents the motor voltages for a mecanum drive drivetrain. */
+/**
+ * Represents the motor voltages for a mecanum drive drivetrain.
+ *
+ * @deprecated Use {@link
+ *     edu.wpi.first.wpilibj2.command.MecanumControllerCommand.MecanumVoltagesConsumer}
+ */
 @Deprecated(since = "2025", forRemoval = true)
 public class MecanumDriveMotorVoltages {
   /** Voltage of the front left motor. */

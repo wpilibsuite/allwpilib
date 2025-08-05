@@ -50,8 +50,8 @@ class SolveWithGuess : public internal::generic_xpr_base<SolveWithGuess<Decompos
   SolveWithGuess(const Decomposition &dec, const RhsType &rhs, const GuessType &guess)
       : m_dec(dec), m_rhs(rhs), m_guess(guess) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT { return m_dec.cols(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return m_rhs.cols(); }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept { return m_dec.cols(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return m_rhs.cols(); }
 
   EIGEN_DEVICE_FUNC const Decomposition &dec() const { return m_dec; }
   EIGEN_DEVICE_FUNC const RhsType &rhs() const { return m_rhs; }

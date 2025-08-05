@@ -189,6 +189,31 @@ std::optional<std::string> Command::GetPreviousCompositionSite() const {
   return m_previousComposition;
 }
 
+void Command::EnsureDisjointRequirements(Command* toAdd) {
+  std::string sharedRequirementsStr = "";
+  bool hasSharedRequirements = false;
+  auto&& requirementsToAdd = toAdd->GetRequirements();
+  for (auto&& requirement : this->GetRequirements()) {
+    if (requirementsToAdd.find(requirement) != requirementsToAdd.end()) {
+      if (!hasSharedRequirements) {
+        hasSharedRequirements = true; // ensures formatting like "a, b, c"
+      } else {
+        sharedRequirementsStr.append(", ");
+      }
+      sharedRequirementsStr.append(requirement->GetName());
+    }
+  }
+  if (hasSharedRequirements) {
+    throw FRC_MakeError(
+      frc::err::CommandIllegalUse,
+      "Command {} could not be added to this Parallel Group"
+      " because the subsystems [{}] are already required in this command."
+      " Multiple commands in a parallel composition cannot require the "
+      "same subsystems.",
+      toAdd->GetName(), sharedRequirementsStr);
+  }
+}
+
 void Command::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Command");
   builder.AddStringProperty(".name", [this] { return GetName(); }, nullptr);
@@ -197,7 +222,7 @@ void Command::InitSendable(wpi::SendableBuilder& builder) {
       [this](bool value) {
         bool isScheduled = IsScheduled();
         if (value && !isScheduled) {
-          Schedule();
+          CommandScheduler::GetInstance().Schedule(this);
         } else if (!value && isScheduled) {
           Cancel();
         }
@@ -220,14 +245,3 @@ void Command::InitSendable(wpi::SendableBuilder& builder) {
   builder.AddBooleanProperty(
       "runsWhenDisabled", [this] { return RunsWhenDisabled(); }, nullptr);
 }
-
-namespace frc2 {
-bool RequirementsDisjoint(Command* first, Command* second) {
-  bool disjoint = true;
-  auto&& requirements = second->GetRequirements();
-  for (auto&& requirement : first->GetRequirements()) {
-    disjoint &= requirements.find(requirement) == requirements.end();
-  }
-  return disjoint;
-}
-}  // namespace frc2

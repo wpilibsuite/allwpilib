@@ -14,9 +14,20 @@ apply from: "${rootDir}/shared/googletest.gradle"
 
 ext.examplesMap = [:]
 ext.templatesMap = [:]
+ext.snippetsMap = [:]
 
-File examplesTree = file("$projectDir/src/main/cpp/examples")
-examplesTree.list(new FilenameFilter() {
+ext {
+    templateDirectory = new File("$projectDir/src/main/cpp/templates/")
+    templateFile = new File("$projectDir/src/main/cpp/templates/templates.json")
+    exampleDirectory = new File("$projectDir/src/main/cpp/examples/")
+    exampleFile = new File("$projectDir/src/main/cpp/examples/examples.json")
+    commandDirectory = new File("$projectDir/src/main/cpp/commands/")
+    commandFile = new File("$projectDir/src/main/cpp/commands/commands.json")
+    snippetsDirectory = new File("$projectDir/src/main/cpp/snippets/")
+    snippetsFile = new File("$projectDir/src/main/cpp/snippets/snippets.json")
+}
+
+exampleDirectory.list(new FilenameFilter() {
             @Override
             public boolean accept(File current, String name) {
                 return new File(current, name).isDirectory();
@@ -24,14 +35,21 @@ examplesTree.list(new FilenameFilter() {
         }).each {
             examplesMap.put(it, [])
         }
-File templatesTree = file("$projectDir/src/main/cpp/templates")
-templatesTree.list(new FilenameFilter() {
+templateDirectory.list(new FilenameFilter() {
             @Override
             public boolean accept(File current, String name) {
                 return new File(current, name).isDirectory();
             }
         }).each {
             templatesMap.put(it, [])
+        }
+snippetsDirectory.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        }).each {
+            snippetsMap.put(it, [])
         }
 
 nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.windowsx64).configure {
@@ -41,7 +59,7 @@ nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.windowsx64).configur
 }
 
 ext {
-    sharedCvConfigs = examplesMap + templatesMap + [commands: []]
+    sharedCvConfigs = examplesMap + templatesMap + snippetsMap.collectEntries { key, value -> ['snippets' + key, value] } + [commands: []]
     staticCvConfigs = [:]
     useJava = false
     useCpp = true
@@ -171,12 +189,98 @@ model {
                 }
             }
         }
+        snippetsMap.each { key, value ->
+            "snippets${key}"(NativeExecutableSpec) {
+                targetBuildTypes 'debug'
+                binaries.all { binary ->
+                    lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                    lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
+                    lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
+                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
+                    lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                    project(':ntcore').addNtcoreDependency(binary, 'shared')
+                    lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                    project(':hal').addHalDependency(binary, 'shared')
+                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                    lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
+                    }
+                    if (binary.targetPlatform.name == getCurrentArch()) {
+                        simModules.each {
+                            lib project: ":simulation:$it", library: it, linkage: 'shared'
+                        }
+                    }
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'src/main/cpp/snippets/' + "${key}" + "/cpp"
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/main/cpp/snippets/' + "${key}" + "/include"
+                            include '**/*.h'
+                        }
+                    }
+                }
+                sources {
+                    c {
+                        source {
+                            srcDirs 'src/main/cpp/snippets/' + "${key}" + "/c"
+                            include '**/*.c'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/main/cpp/snippets/' + "${key}" + "/include"
+                            include '**/*.h'
+                        }
+                    }
+                }
+            }
+        }
     }
     testSuites {
         examplesMap.each { key, value ->
             def testFolder = new File("${rootDir}/wpilibcExamples/src/test/cpp/examples/${key}")
             if (testFolder.exists()) {
                 "${key}Test"(GoogleTestTestSuiteSpec) {
+                    for (NativeComponentSpec c : $.components) {
+                        if (c.name == key) {
+                            testing c
+                            break
+                        }
+                    }
+                    sources {
+                        cpp {
+                            source {
+                                srcDirs "src/test/cpp/examples/${key}/cpp"
+                                include '**/*.cpp'
+                            }
+                            exportedHeaders {
+                                srcDirs "src/test/cpp/examples/${key}/include"
+                            }
+                        }
+                        c {
+                            source {
+                                srcDirs "src/test/cpp/examples/${key}/c"
+                                include '**/*.c'
+                            }
+                            exportedHeaders {
+                                srcDirs "src/test/cpp/examples/${key}/include"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    testSuites {
+        snippetsMap.each { key, value ->
+            def testFolder = new File("${rootDir}/wpilibcExamples/src/test/cpp/snippets/${key}")
+            if (testFolder.exists()) {
+                "snippets${key}Test"(GoogleTestTestSuiteSpec) {
                     for (NativeComponentSpec c : $.components) {
                         if (c.name == key) {
                             testing c
@@ -251,15 +355,6 @@ model {
             }
         }
     }
-}
-
-ext {
-    templateDirectory = new File("$projectDir/src/main/cpp/templates/")
-    templateFile = new File("$projectDir/src/main/cpp/templates/templates.json")
-    exampleDirectory = new File("$projectDir/src/main/cpp/examples/")
-    exampleFile = new File("$projectDir/src/main/cpp/examples/examples.json")
-    commandDirectory = new File("$projectDir/src/main/cpp/commands/")
-    commandFile = new File("$projectDir/src/main/cpp/commands/commands.json")
 }
 
 model {

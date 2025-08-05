@@ -22,7 +22,6 @@
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <implot.h>

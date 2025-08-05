@@ -12,6 +12,8 @@
 #include <string>
 #include <optional>
 
+#include <wpi/StringMap.h>
+
 #include "SourceImpl.h"
 
 namespace cs {
@@ -88,9 +90,34 @@ class UsbCameraImpl : public SourceImpl {
 
   UsbCameraImplObjc* cppGetObjc() { return m_objc; }
 
+  int CreatePropertyPublic(std::string_view name, std::function<std::unique_ptr<PropertyImpl>()> newFunc) {
+    return CreateProperty(name, newFunc);
+  }
+
+  PropertyImpl* GetPropertyPublic(int property) {
+    return GetProperty(property);
+  }
+
+  void NotifyPropertyCreatedPublic(int propIndex, PropertyImpl& prop) {
+    NotifyPropertyCreated(propIndex, prop);
+  }
+
+  void UpdatePropertyValuePublic(int property, bool setString, int value, std::string_view valueStr) {
+    UpdatePropertyValue(property, setString, value, valueStr);
+  }
+
+  wpi::mutex& GetMutex() { return m_mutex; }
+
+  // Property cache accessors
+  wpi::StringMap<uint32_t>& GetPropertyCache() { return m_propertyCache; }
+  wpi::StringMap<uint32_t>& GetPropertyAutoCache() { return m_propertyAutoCache; }
+
  private:
   UsbCameraImplObjc* m_objc;
   std::vector<CameraModeStore> m_platformModes;
-  VideoMode m_mode;
+  
+  // Property caches
+  wpi::StringMap<uint32_t> m_propertyCache;
+  wpi::StringMap<uint32_t> m_propertyAutoCache;
 };
 }  // namespace cs

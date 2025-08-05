@@ -74,7 +74,7 @@ def tagList = [
         /* --- Hardware --- */
         "Analog", "Ultrasonic", "Gyro", "Pneumatics", "I2C", "Duty Cycle", "PDP", "DMA", "Relay",
         "AddressableLEDs", "HAL", "Encoder", "Smart Motor Controller", "Digital Input",
-        "Digital Output",
+        "Digital Output", "Accelerometer",
 
         /* --- HID --- */
         "XboxController", "PS4Controller", "PS5Controller", "Joystick",
@@ -96,6 +96,24 @@ task checkExamples(type: Task) {
             assert it.foldername != null
             assert it.gradlebase != null
             assert it.commandversion != null
+            if (it.gradlebase == 'java') {
+                assert it.mainclass != null
+            }
+        }
+    }
+}
+
+task checkSnippets(type: Task) {
+    doLast {
+        def parsedJson = new groovy.json.JsonSlurper().parseText(snippetsFile.text)
+        fileCheck(parsedJson, snippetsDirectory)
+        parsedJson.each {
+            assert it.name != null
+            assert it.description != null
+            assert it.tags != null
+            assert it.tags.findAll { !tagList.contains(it) }.empty
+            assert it.foldername != null
+            assert it.gradlebase != null
             if (it.gradlebase == 'java') {
                 assert it.mainclass != null
             }
@@ -127,3 +145,4 @@ task checkCommands(type: Task) {
 check.dependsOn checkTemplates
 check.dependsOn checkExamples
 check.dependsOn checkCommands
+check.dependsOn checkSnippets

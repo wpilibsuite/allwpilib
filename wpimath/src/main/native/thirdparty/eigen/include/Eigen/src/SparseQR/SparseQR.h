@@ -73,7 +73,7 @@ struct traits<SparseQR_QProduct<SparseQRType, Derived> > {
  * detailed in the following paper:
  * <i>
  * Tim Davis, "Algorithm 915, SuiteSparseQR: Multifrontal Multithreaded Rank-Revealing
- * Sparse QR Factorization, ACM Trans. on Math. Soft. 38(1), 2011.
+ * Sparse QR Factorization", ACM Trans. on Math. Soft. 38(1), 2011.
  * </i>
  * Even though it is qualified as "rank-revealing", this strategy might fail for some
  * rank deficient problems. When this class is used to solve linear or least-square problems
@@ -365,7 +365,6 @@ void SparseQR<MatrixType, OrderingType>::factorize(const MatrixType& mat) {
   IndexVector Ridx(n), Qidx(m);  // Store temporarily the row indexes for the current column of R and Q
   Index nzcolR, nzcolQ;          // Number of nonzero for the current column of R and Q
   ScalarVector tval(m);          // The dense vector used to compute the current column
-  RealScalar pivotThreshold = m_threshold;
 
   m_R.setZero();
   m_Q.setZero();
@@ -401,11 +400,14 @@ void SparseQR<MatrixType, OrderingType>::factorize(const MatrixType& mat) {
    * Tim Davis, "Algorithm 915, SuiteSparseQR: Multifrontal Multithreaded Rank-Revealing
    * Sparse QR Factorization, ACM Trans. on Math. Soft. 38(1), 2011, Page 8:3
    */
+  RealScalar pivotThreshold;
   if (m_useDefaultThreshold) {
     RealScalar max2Norm = 0.0;
     for (int j = 0; j < n; j++) max2Norm = numext::maxi(max2Norm, m_pmat.col(j).norm());
     if (max2Norm == RealScalar(0)) max2Norm = RealScalar(1);
     pivotThreshold = 20 * (m + n) * max2Norm * NumTraits<RealScalar>::epsilon();
+  } else {
+    pivotThreshold = m_threshold;
   }
 
   // Initialize the numerical permutation

@@ -66,7 +66,7 @@ class RealSchur {
     MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime
   };
   typedef typename MatrixType::Scalar Scalar;
-  typedef std::complex<typename NumTraits<Scalar>::Real> ComplexScalar;
+  typedef internal::make_complex_t<Scalar> ComplexScalar;
   typedef Eigen::Index Index;  ///< \deprecated since Eigen 3.3
 
   typedef Matrix<ComplexScalar, ColsAtCompileTime, 1, Options & ~RowMajor, MaxColsAtCompileTime, 1> EigenvalueType;

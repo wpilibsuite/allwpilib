@@ -61,12 +61,12 @@ public class SPIJNI extends JNIWrapper {
    * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
    * @param dataToSend Buffer of data to send as part of the transaction.
    * @param dataReceived Buffer to read data into.
-   * @param size Number of bytes to transfer. [0..7]
+   * @param size Number of bytes to transfer.
    * @return Number of bytes transferred, -1 for error
    * @see "HAL_TransactionSPI"
    */
   public static native int spiTransaction(
-      int port, ByteBuffer dataToSend, ByteBuffer dataReceived, byte size);
+      int port, ByteBuffer dataToSend, ByteBuffer dataReceived, int size);
 
   /**
    * Performs an SPI send/receive transaction.
@@ -77,12 +77,12 @@ public class SPIJNI extends JNIWrapper {
    * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
    * @param dataToSend Buffer of data to send as part of the transaction.
    * @param dataReceived Buffer to read data into.
-   * @param size Number of bytes to transfer. [0..7]
+   * @param size Number of bytes to transfer.
    * @return Number of bytes transferred, -1 for error
    * @see "HAL_TransactionSPI"
    */
   public static native int spiTransactionB(
-      int port, byte[] dataToSend, byte[] dataReceived, byte size);
+      int port, byte[] dataToSend, byte[] dataReceived, int size);
 
   /**
    * Executes a write transaction with the device.
@@ -95,7 +95,7 @@ public class SPIJNI extends JNIWrapper {
    * @return The number of bytes written. -1 for an error
    * @see "HAL_WriteSPI"
    */
-  public static native int spiWrite(int port, ByteBuffer dataToSend, byte sendSize);
+  public static native int spiWrite(int port, ByteBuffer dataToSend, int sendSize);
 
   /**
    * Executes a write transaction with the device.
@@ -108,7 +108,7 @@ public class SPIJNI extends JNIWrapper {
    * @return The number of bytes written. -1 for an error
    * @see "HAL_WriteSPI"
    */
-  public static native int spiWriteB(int port, byte[] dataToSend, byte sendSize);
+  public static native int spiWriteB(int port, byte[] dataToSend, int sendSize);
 
   /**
    * Executes a read from the device.
@@ -121,11 +121,11 @@ public class SPIJNI extends JNIWrapper {
    * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
    * @param initiate initiates a transaction when true. Just reads when false.
    * @param dataReceived A pointer to the array of bytes to store the data read from the device.
-   * @param size The number of bytes to read in the transaction. [1..7]
+   * @param size The number of bytes to read in the transaction.
    * @return Number of bytes read. -1 for error.
    * @see "HAL_ReadSPI"
    */
-  public static native int spiRead(int port, boolean initiate, ByteBuffer dataReceived, byte size);
+  public static native int spiRead(int port, boolean initiate, ByteBuffer dataReceived, int size);
 
   /**
    * Executes a read from the device.
@@ -138,11 +138,11 @@ public class SPIJNI extends JNIWrapper {
    * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
    * @param initiate initiates a transaction when true. Just reads when false.
    * @param dataReceived A pointer to the array of bytes to store the data read from the device.
-   * @param size The number of bytes to read in the transaction. [1..7]
+   * @param size The number of bytes to read in the transaction.
    * @return Number of bytes read. -1 for error.
    * @see "HAL_ReadSPI"
    */
-  public static native int spiReadB(int port, boolean initiate, byte[] dataReceived, byte size);
+  public static native int spiReadB(int port, boolean initiate, byte[] dataReceived, int size);
 
   /**
    * Closes the SPI port.

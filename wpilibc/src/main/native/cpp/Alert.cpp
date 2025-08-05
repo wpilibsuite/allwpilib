@@ -82,17 +82,18 @@ class Alert::SendableAlerts : public nt::NTSendable,
    * @return the SendableAlerts for the group
    */
   static SendableAlerts& ForGroup(std::string_view group) {
-    // Force initialization of SendableRegistry before our magic static to
-    // prevent incorrect destruction order.
-    wpi::SendableRegistry::EnsureInitialized();
-    static wpi::StringMap<Alert::SendableAlerts> groups;
-
-    auto [iter, inserted] = groups.try_emplace(group);
-    SendableAlerts& sendable = iter->second;
-    if (inserted) {
-      frc::SmartDashboard::PutData(group, &iter->second);
+    SendableAlerts* salert = nullptr;
+    try {
+      auto* sendable = frc::SmartDashboard::GetData(group);
+      salert = dynamic_cast<SendableAlerts*>(sendable);
+    } catch (frc::RuntimeError&) {
     }
-    return sendable;
+    if (!salert) {
+      // this leaks if ResetSmartDashboardInstance is called, but that's fine
+      salert = new Alert::SendableAlerts;
+      frc::SmartDashboard::PutData(group, salert);
+    }
+    return *salert;
   }
 
  private:

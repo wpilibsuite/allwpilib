@@ -102,11 +102,11 @@ class Map : public MapBase<Map<PlainObjectType, MapOptions, StrideType> > {
   typedef PointerType PointerArgType;
   EIGEN_DEVICE_FUNC inline PointerType cast_to_pointer_type(PointerArgType ptr) { return ptr; }
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index innerStride() const {
+  EIGEN_DEVICE_FUNC constexpr Index innerStride() const {
     return StrideType::InnerStrideAtCompileTime != 0 ? m_stride.inner() : 1;
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index outerStride() const {
+  EIGEN_DEVICE_FUNC constexpr Index outerStride() const {
     return StrideType::OuterStrideAtCompileTime != 0 ? m_stride.outer()
            : internal::traits<Map>::OuterStrideAtCompileTime != Dynamic
                ? Index(internal::traits<Map>::OuterStrideAtCompileTime)
