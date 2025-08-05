@@ -1,11 +1,9 @@
 """Bazel rules for publishing maven artifacts."""
 
-load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@com_wpilib_allwpilib_publishing_config//:publishing_config.bzl", "CLASSIFIER_FILTER")
 load("@platforms//host:constraints.bzl", _host_constraints = "HOST_CONSTRAINTS")
 load("@rules_jvm_external//:defs.bzl", "maven_export")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
-load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 load("//shared/bazel/rules:transitions.bzl", "platform_transition_filegroup")
 
 def _get_host_os():
@@ -19,30 +17,58 @@ def _get_host_os():
 
 HOST_OS = _get_host_os()
 
-def publish_all(name, targets):
-    """Macro to publish multiple maven artifacts with 1 call."""
-    publish_name = name + "_publish_all"
-    write_file(
-        name = publish_name,
-        out = publish_name + ".sh",
-        content = [
-            "#!/bin/bash",
-            "set -e",
-            "",
-            'for arg in "$@";',
-            "do",
-            '  "$arg"',
-            "done",
-        ],
-        tags = ["manual"],
+def _publish_all_impl(ctx):
+    # This is a rule, not a macro, to allow the `targets` attribute to be
+    # configurable with `select()`. Macros are expanded during the loading phase,
+    # before `select()` is resolved, which makes this impossible with a macro.
+    #
+    # This rule works by generating a shell script that executes all of the publisher
+    # scripts from the `targets` attribute. This runs at execution time (`bazel run`)
+    # rather than build time.
+
+    script = ctx.actions.declare_file(ctx.label.name + "_runner.sh")
+    executables = [target.files_to_run.executable for target in ctx.attr.targets]
+
+    script_content = """#!/bin/bash
+set -e
+
+for arg in {publish_scripts}; do
+    "$arg" "$@"
+done
+""".format(
+        publish_scripts = " ".join(["'" + e.short_path + "'" for e in executables]),
     )
-    sh_binary(
-        name = name,
-        srcs = [publish_name + ".sh"],
-        args = ["$(location " + x + ".publish)" for x in targets],
-        data = [x + ".publish" for x in targets],
-        tags = ["manual"],
+
+    ctx.actions.write(
+        output = script,
+        content = script_content,
+        is_executable = True,
     )
+
+    # The publisher scripts have their own dependencies (runfiles), which must be
+    # collected and merged so they are available when our runner script executes.
+    all_runfiles = [ctx.runfiles(files = executables)]
+    for target in ctx.attr.targets:
+        all_runfiles.append(target[DefaultInfo].default_runfiles)
+
+    return [
+        DefaultInfo(
+            runfiles = ctx.runfiles().merge_all(all_runfiles),
+            executable = script,
+        ),
+    ]
+
+publish_all = rule(
+    doc = "Rule to publish multiple maven artifacts with a single `bazel run` command.",
+    implementation = _publish_all_impl,
+    attrs = {
+        "targets": attr.label_list(
+            doc = "A list of targets to publish. These are typically the `.publish` targets from `maven_export`.",
+            providers = [DefaultInfo],
+        ),
+    },
+    executable = True,
+)
 
 host_architectures = {
     "@rules_bzlmodrio_toolchains//platforms/linux_x86_64": "linux-x86-64",

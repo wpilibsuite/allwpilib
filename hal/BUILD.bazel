@@ -10,6 +10,15 @@ load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_
 load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
 
 filegroup(
+    name = "doxygen-files",
+    srcs = glob([
+        "src/main/native/include/**/*.h",
+        "src/mrc/include/**/*.h",
+    ]),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
     name = "proto_files",
     srcs = glob(["src/mrc/proto/**/*.proto"]),
 )
