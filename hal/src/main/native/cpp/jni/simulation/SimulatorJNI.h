@@ -15,4 +15,5 @@ JavaVM* GetJVM();
 jmethodID GetNotifyCallback();
 jmethodID GetBufferCallback();
 jmethodID GetConstBufferCallback();
+jmethodID GetConsumerCallback();
 }  // namespace hal::sim

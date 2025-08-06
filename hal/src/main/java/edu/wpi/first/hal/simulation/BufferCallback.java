@@ -5,6 +5,7 @@
 package edu.wpi.first.hal.simulation;
 
 /** Interface for simulation buffer callbacks. */
+@FunctionalInterface
 public interface BufferCallback {
   /**
    * Simulation buffer callback function.
