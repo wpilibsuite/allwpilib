@@ -205,7 +205,7 @@ cc_binary(
     cxxopts = cxxopts,
     linkopts = select({
         "@platforms//os:linux": [],
-        "@platforms//os:osx": mac_linkopts,
+        "@platforms//os:osx": [],
         "@platforms//os:windows": [
             "-SUBSYSTEM:WINDOWS",
         ],
@@ -231,7 +231,6 @@ cc_test(
         'PROJECT_ROOT_PATH=\\"wpical/src/main/native/assets\\"',
         "__BAZEL__=1",
     ],
-    linkopts = linkopts,
     deps = [
         ":wpical_lib",
         "//thirdparty/ceres",
