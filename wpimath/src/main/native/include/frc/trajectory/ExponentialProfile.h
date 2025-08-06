@@ -481,5 +481,3 @@ class ExponentialProfile {
 };
 
 }  // namespace frc
-
-#include "frc/trajectory/struct/ExponentialProfileStateStruct.h"
