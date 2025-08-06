@@ -196,7 +196,7 @@ void Command::EnsureDisjointRequirements(Command* toAdd) {
   for (auto&& requirement : this->GetRequirements()) {
     if (requirementsToAdd.find(requirement) != requirementsToAdd.end()) {
       if (!hasSharedRequirements) {
-        hasSharedRequirements = true; // ensures formatting like "a, b, c"
+        hasSharedRequirements = true;  // ensures formatting like "a, b, c"
       } else {
         sharedRequirementsStr.append(", ");
       }
@@ -205,12 +205,12 @@ void Command::EnsureDisjointRequirements(Command* toAdd) {
   }
   if (hasSharedRequirements) {
     throw FRC_MakeError(
-      frc::err::CommandIllegalUse,
-      "Command {} could not be added to this Parallel Group"
-      " because the subsystems [{}] are already required in this command."
-      " Multiple commands in a parallel composition cannot require the "
-      "same subsystems.",
-      toAdd->GetName(), sharedRequirementsStr);
+        frc::err::CommandIllegalUse,
+        "Command {} could not be added to this Parallel Group"
+        " because the subsystems [{}] are already required in this command."
+        " Multiple commands in a parallel composition cannot require the "
+        "same subsystems.",
+        toAdd->GetName(), sharedRequirementsStr);
   }
 }
 

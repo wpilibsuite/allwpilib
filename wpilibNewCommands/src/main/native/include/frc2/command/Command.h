@@ -496,4 +496,4 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   std::optional<std::string> m_previousComposition;
 };
 
-} // namespace frc2
+}  // namespace frc2

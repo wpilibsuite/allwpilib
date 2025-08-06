@@ -138,7 +138,7 @@ public class ExponentialProfile {
   public static class State implements StructSerializable {
     /** The struct used for serializing this class. */
     public static final ExponentialProfileStateStruct struct = new ExponentialProfileStateStruct();
-    
+
     /** The position at this state. */
     public double position;
 

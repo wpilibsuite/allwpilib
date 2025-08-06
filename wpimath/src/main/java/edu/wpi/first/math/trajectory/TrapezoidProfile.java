@@ -81,7 +81,7 @@ public class TrapezoidProfile {
   public static class State implements StructSerializable {
     /** The struct used for serializing this class. */
     public static final TrapezoidProfileStateStruct struct = new TrapezoidProfileStateStruct();
-    
+
     /** The position at this state. */
     public double position;
 
