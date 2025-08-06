@@ -14,9 +14,10 @@
 #include "units/voltage.h"
 #include "wpimath/MathShared.h"
 
+
 template <class Distance, class Input>
-struct WPILIB_DLLEXPORT wpi::Struct<
-    typename frc::ExponentialProfile<Distance, Input>::State<Distance, Input>> {
+struct wpi::Struct<
+    typename frc::ExponentialProfile<Distance, Input>::template State<Distance, Input>> {
   static constexpr std::string_view GetTypeName() {
     return "ExponentialProfileState";
   }
@@ -25,18 +26,18 @@ struct WPILIB_DLLEXPORT wpi::Struct<
     return "double position;double velocity";
   }
 
-  static frc::ExponentialProfile<Distance, Input>::State<Distance, Input>
+  static frc::ExponentialProfile<Distance, Input>::State
   Unpack(std::span<const uint8_t> data) {
     constexpr size_t kPositionOff = 0;
     constexpr size_t kVelocityOff = 8;
-    return frc::ExponentialProfile<Distance, Input>::State<Distance, Input>{
+    return frc::ExponentialProfile<Distance, Input>::State{
         wpi::UnpackStruct<double, kPositionOff>(data),
         wpi::UnpackStruct<double, kVelocityOff>(data)};
   }
 
   static void Pack(
       std::span<uint8_t> data,
-      const frc::ExponentialProfile<Distance, Input>::State<Distance, Input>&
+      const frc::ExponentialProfile<Distance, Input>::State&
           value) {
     wpi::PackStruct<0>(data, value.position.value());
     wpi::PackStruct<8>(data, value.velocity.value());

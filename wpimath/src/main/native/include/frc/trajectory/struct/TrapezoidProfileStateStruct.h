@@ -14,9 +14,9 @@
 #include "units/time.h"
 #include "wpimath/MathShared.h"
 
-namespace wpi {
+
 template <class Distance>
-struct wpi::Struct<typename frc::TrapezoidProfile<Distance>::State<Distance>> {
+struct wpi::Struct<typename frc::TrapezoidProfile<Distance>::template State<Distance>> {
   static constexpr std::string_view GetTypeName() {
     return "TrapezoidProfileState";
   }
@@ -25,34 +25,18 @@ struct wpi::Struct<typename frc::TrapezoidProfile<Distance>::State<Distance>> {
     return "double position;double velocity";
   }
 
-  static frc::TrapezoidProfile<Distance>::State<Distance> Unpack(
+  static frc::TrapezoidProfile<Distance>::State Unpack(
       std::span<const uint8_t> data) {
-    return frc::TrapezoidProfile<Distance>::State<Distance>{
+    return frc::TrapezoidProfile<Distance>::State{
         wpi::UnpackStruct<double, 0>(data), wpi::UnpackStruct<double, 8>(data)};
   }
 
-  static void Pack(
-      std::span<uint8_t> data,
-      const frc::TrapezoidProfile<Distance>::State<Distance>& value) {
+  static void Pack(std::span<uint8_t> data,
+                   const frc::TrapezoidProfile<Distance>::State& value) {
     wpi::PackStruct<0>(data, value.position.value());
     wpi::PackStruct<8>(data, value.velocity.value());
   }
 };
-}  // namespace wpi
 
-namespace wpi {
-template <typename T, typename... I>
-concept StructSerializableTest =
-    requires(std::span<const uint8_t> in, std::span<uint8_t> out, T&& value,
-             const I&... info) {
-      typename Struct<typename std::remove_cvref_t<T>,
-                      typename std::remove_cvref_t<I>...>;
-      {
-        Struct<typename std::remove_cvref_t<T>,
-               typename std::remove_cvref_t<I>...>::GetTypeName(info...)
-      } -> std::convertible_to<std::string_view>;
-    };
-}  // namespace wpi
-
-static_assert(wpi::StructSerializableTest<
+static_assert(wpi::StructSerializable<
               typename frc::TrapezoidProfile<units::meter>::State>);
