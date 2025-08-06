@@ -1,6 +1,6 @@
 load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@doxygen//:doxygen.bzl", "doxygen")
-load("@rules_jvm_external//:defs.bzl", "maven_export")
+load("@rules_jvm_external//:defs.bzl", "javadoc", "maven_export")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
 paths = [
@@ -98,5 +98,38 @@ maven_export(
     name = "wpilibc_publish",
     maven_coordinates = "edu.wpi.first.wpilibc:documentation:$(WPILIB_VERSION)",
     target = ":doxygen-zip",
+    visibility = ["//visibility:public"],
+)
+
+javadoc(
+    name = "javadoc",
+    deps = [
+        "//apriltag:apriltag-java",
+        "//cameraserver:cameraserver-java",
+        "//cscore:cscore-java",
+        "//epilogue-runtime:epilogue-java",
+        "//hal:hal-java",
+        "//ntcore:ntcore-java",
+        "//romiVendordep:romiVendordep-java",
+        "//wpilibNewCommands:wpilibNewCommands-java",
+        "//wpilibj:wpilibj-java",
+        "//wpimath:wpimath-java",
+        "//wpinet:wpinet-java",
+        "//wpiunits:wpiunits-java",
+        "//wpiutil:wpiutil-java",
+        "//xrpVendordep:xrpVendordep-java",
+    ],
+)
+
+copy_file(
+    name = "javadoc-zip",
+    src = ":javadoc",
+    out = "javadoc-zip.zip",
+)
+
+maven_export(
+    name = "wpilibj_publish",
+    maven_coordinates = "edu.wpi.first.wpilibj:documentation:$(WPILIB_VERSION)",
+    target = ":javadoc-zip",
     visibility = ["//visibility:public"],
 )
