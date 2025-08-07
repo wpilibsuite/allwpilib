@@ -9,7 +9,24 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.WrongMethodTypeException;
 
-/** A wrapper around the JDK internal Continuation class. */
+/**
+ * A wrapper around the JDK internal Continuation class. Continuations are one-shot (i.e., not
+ * reusable after completion) and allow stack frames to be paused and resumed at a later time. They
+ * are the underpinning for {@link VirtualThread virtual threads}, which have their own scheduler
+ * and JVM support. Bare continuations are designed for internal use by the JVM; we have forcibly
+ * opened access to them for use by the commands framework due to limitations of virtual threads;
+ * notably, their complete lack of determinism and timing, which are critically important for
+ * real-time systems like robots.
+ *
+ * <p><strong>ONLY USE CONTINUATIONS IN A SINGLE THREADED CONTEXT.</strong> The JVM and JIT
+ * compilers make fundamental assumptions about how continuations are used, and rely on the code
+ * that uses it (which was intended to be virtual threads) to use it safely. <strong>Failure to use
+ * this API safely can result in JIT compilers to issue invalid code causing buggy behavior and JVM
+ * crashes at any time, up to and including on a field during an official match.</strong>
+ *
+ * <p>Teams don't need to use continuations directly with the commands framework; all mounting and
+ * unmounting is handled by the command scheduler and a coroutine wrapper.
+ */
 public final class Continuation {
   // The underlying jdk.internal.vm.Continuation object
   final Object m_continuation;

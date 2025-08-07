@@ -27,7 +27,69 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.wpilib.commands3.proto.SchedulerProto;
 
-/** Manages the lifecycles of {@link Coroutine}-based {@link Command Commands}. */
+/**
+ * Manages the lifecycles of {@link Coroutine}-based {@link Command Commands}. Commands may be
+ * scheduled directly using {@link #schedule(Command)}, or be bound to {@link Trigger Triggers} to
+ * automatically handle scheduling and cancellation based on internal or external events. User code
+ * is responsible for calling {@link #run()} periodically to update trigger conditions and execute
+ * scheduled commands. Most often, this is done by overriding {@link TimedRobot#robotPeriodic()} to
+ * include a call to {@code Scheduler.getDefault().run()}:
+ *
+ * <pre>{@code
+ * public class Robot extends TimedRobot {
+ *   @Override
+ *   public void robotPeriodic() {
+ *     // Update the scheduler on every loop
+ *     Scheduler.getDefault().run();
+ *   }
+ * }
+ * }</pre>
+ *
+ * <h2>Danger</h2>
+ *
+ * <p>The scheduler <i>must</i> be used in a single-threaded program. Commands must be scheduled and
+ * cancelled by the same thread that runs the scheduler, and cannot be run in a virtual thread.
+ *
+ * <p><strong>Using the commands framework in a multithreaded environment can cause crashes in the
+ * Java virtual machine at any time, including on an official field during a match.</strong> The
+ * Java JIT compilers make assumptions that rely on coroutines being used on a single thread.
+ * Breaking those assumptions can cause incorrect JIT code to be generated with undefined behavior,
+ * potentially causing control issues or crashes deep in JIT-generated native code.
+ *
+ * <p><strong>Normal concurrency constructs like locks, atomic references, and synchronized blocks
+ * or methods cannot save you.</strong>
+ *
+ * <h2>Lifecycle</h2>
+ *
+ * <p>The {@link #run()} method runs five steps:
+ *
+ * <ol>
+ *   <li>Poll all registered triggers to queue and cancel commands
+ *   <li>Call {@link #sideload(Consumer) periodic sideload functions}
+ *   <li>Start all queued commands. This happens after all triggers are checked in case multiple
+ *       commands with conflicting requirements are queued in the same update; the last command to
+ *       be queued takes precedence over the rest.
+ *   <li>Loop over all running commands, mounting and calling each in turn until they either exit or
+ *       call {@link Coroutine#yield()}. Commands run in the order in which they were scheduled.
+ *   <li>Queue default commands for any resources without a running command. The queued commands can
+ *       be superseded by any manual scheduling or commands scheduled by triggers in the next run.
+ * </ol>
+ *
+ * <h2>Telemetry</h2>
+ *
+ * <p>There are two mechanisms for telemetry for a scheduler. A protobuf serializer can be used to
+ * take a snapshot of a scheduler instance, and report what commands are queued (scheduled but have
+ * not yet started to run), commands that are running (along with timing data for each command), and
+ * total time spent in the most recent {@link #run()} call. However, it cannot detect one-shot
+ * commands that are scheduled, run, and complete all in a single {@code run()} invocation -
+ * effectively, commands that never call {@link Coroutine#yield()} are invisible.
+ *
+ * <p>A second telemetry mechanism is provided by {@link #addEventListener(Consumer)}. The scheduler
+ * will issue events to all registered listeners when certain events occur (see {@link
+ * SchedulerEvent} for all event types). These events are emitted immediately and can be used to
+ * detect lifecycle events for all commands, including one-shots that would be invisible to the
+ * protobuf serializer. However, it is up to the user to log those events themselves.
+ */
 public class Scheduler implements ProtobufSerializable {
   private final Map<RequireableResource, Command> m_defaultCommands = new LinkedHashMap<>();
 
@@ -63,8 +125,10 @@ public class Scheduler implements ProtobufSerializable {
   private static final Scheduler s_defaultScheduler = new Scheduler();
 
   /**
-   * Gets the default scheduler instance for use in a robot program. Some built in command types use
-   * the default scheduler and will not work as expected if used on another scheduler instance.
+   * Gets the default scheduler instance for use in a robot program. Unless otherwise specified,
+   * triggers and resources will be registered with the default scheduler and require the default
+   * scheduler to run. However, triggers and resources can be constructed to be registered with a
+   * specific scheduler instance, which may be useful for isolation for unit tests.
    *
    * @return the default scheduler instance.
    */
@@ -437,6 +501,10 @@ public class Scheduler implements ProtobufSerializable {
     }
   }
 
+  /**
+   * Mounts and runs a command until it yields or exits.
+   * @param state The command state to run
+   */
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private void runCommand(CommandState state) {
     final var command = state.command();
