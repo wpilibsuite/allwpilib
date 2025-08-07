@@ -7,7 +7,6 @@
 #include <atomic>
 #include <functional>
 #include <map>
-#include <mutex>
 #include <string>
 #include <string_view>
 #include <thread>
