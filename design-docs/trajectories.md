@@ -25,10 +25,19 @@ for both types of robot.
 ## Non-Goals
 
 1. Replace tools like Choreo and PathPlanner. 
-   This API is intended to be used by those tools,
+   The new Trajectory API is intended to be used by those tools,
    not to replace them.
+   We do not expect the external libraries to use our generation API,
+   but they should be able to generate trajectories that extend our `Trajectory` class.
+2. Implement a full trajectory following system.
+   This document only describes the trajectory API and generator.
 
-## Design
+## Design: Trajectory API
+
+External libraries such as Choreo and PathPlanner should be able to
+generate trajectories that extend the `Trajectory` class presented here,
+to allow for users to add external trajectory generation algorithms
+without changing their trajectory *following* code.
 
 There are a few new classes that this API will use:
 
@@ -90,6 +99,17 @@ public class Trajectory {
 }
 ```
 
+## Design: Trajectory Generator
+
+In addition to the main API,
+this API will also provide a trajectory generator.
+The trajectory generator will be used to generate trajectories
+for both differential drive and holonomic robots.
+
+It is intended to be used to generate trajectories that 
+are more complex than WPILib's previous trajectory API,
+but not to replace tools like Choreo and PathPlanner.
+
 ### Builders
 
 The `TrajectoryBuilder` class is used to generate trajectories.
@@ -144,7 +164,9 @@ The following paths will be supported:
 The `VelocityConstraint` and `AccelerationConstraint` classes
 will be used to define the constraints of the trajectory.
 
-## Implementation
+WPILib currently contains a `TrajectoryConstraint` interface,
+which will be replaced by `VelocityConstraint` and `AccelerationConstraint`,
+and its implementations refactored to match the new interfaces.
 
 ### Paths 
 
