@@ -5,8 +5,6 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.ImmutableDistance;
-import edu.wpi.first.units.measure.MutDistance;
 
 /**
  * Unit of linear dimension.
@@ -65,12 +63,12 @@ public final class DistanceUnit extends Unit {
 
   @Override
   public Distance of(double magnitude) {
-    return new ImmutableDistance(magnitude, toBaseUnits(magnitude), this);
+    return new Distance(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Distance ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableDistance(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new Distance(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -81,11 +79,6 @@ public final class DistanceUnit extends Unit {
   @Override
   public Distance one() {
     return (Distance) super.one();
-  }
-
-  @Override
-  public MutDistance mutable(double initialMagnitude) {
-    return new MutDistance(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   /**

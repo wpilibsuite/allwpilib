@@ -127,7 +127,7 @@ class SimDataValue final : public impl::SimDataValueBase<T, MakeValue> {
  */
 #define HAL_SIMDATAVALUE_DEFINE_NAME(NAME)                  \
   static LLVM_ATTRIBUTE_ALWAYS_INLINE constexpr const char* \
-      Get##NAME##Name() {                                   \
+  Get##NAME##Name() {                                       \
     return #NAME;                                           \
   }
 

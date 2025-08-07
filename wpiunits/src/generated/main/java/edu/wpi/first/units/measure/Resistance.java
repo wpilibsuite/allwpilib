@@ -10,36 +10,45 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
 @SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
-public interface Resistance extends Measure<ResistanceUnit> {
-  static  Resistance ofRelativeUnits(double magnitude, ResistanceUnit unit) {
-    return new ImmutableResistance(magnitude, unit.toBaseUnits(magnitude), unit);
+public record Resistance(double magnitude, double baseUnitMagnitude, ResistanceUnit unit) implements Measure<ResistanceUnit> {
+  /**
+   * For doing math with measures of a known dimension but an unknown unit. Most users should use
+   * {@link ResistanceUnit#of(double)} on a known unit from {@link Units} instead of calling this method.
+   * @param magnitude the magnitude of the measurement in terms of the given unit
+   * @param unit the unit of the measurement
+   * @return a measurement object
+   */
+  public static  Resistance ofRelativeUnits(double magnitude, ResistanceUnit unit) {
+    return new Resistance(magnitude, unit.toBaseUnits(magnitude), unit);
   }
 
-  static  Resistance ofBaseUnits(double baseUnitMagnitude, ResistanceUnit unit) {
-    return new ImmutableResistance(unit.fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, unit);
+  /**
+   * For doing math with measures of a known dimension but an unknown unit. Most users should use
+   * {@link ResistanceUnit#of(double)} on a known unit from {@link Units} instead of calling this method.
+   * @param magnitude the magnitude of the measurement in terms of the given unit's base unit
+   * @param unit the unit of the measurement
+   * @return a measurement object
+   */
+  public static  Resistance ofBaseUnits(double baseUnitMagnitude, ResistanceUnit unit) {
+    return new Resistance(unit.fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, unit);
   }
 
   @Override
-  Resistance copy();
+  public ResistanceUnit baseUnit() { return (ResistanceUnit) unit().getBaseUnit(); }
 
   @Override
-  default MutResistance mutableCopy() {
-    return new MutResistance(magnitude(), baseUnitMagnitude(), unit());
-  }
-
-  @Override
-  ResistanceUnit unit();
-
-  @Override
-  default ResistanceUnit baseUnit() { return (ResistanceUnit) unit().getBaseUnit(); }
-
-  @Override
-  default double in(ResistanceUnit unit) {
+  public double in(ResistanceUnit unit) {
     return unit.fromBaseUnits(baseUnitMagnitude());
   }
 
   @Override
-  default Resistance unaryMinus() {
+  @SuppressWarnings("rawtypes")
+  public boolean equals(Object object) {
+    return object instanceof Resistance m && isEquivalent(m);
+  }
+
+  @Override
+  public Resistance unaryMinus() {
     return (Resistance) unit().ofBaseUnits(0 - baseUnitMagnitude());
   }
 
@@ -51,27 +60,27 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default Resistance negate() {
+  public Resistance negate() {
     return (Resistance) unaryMinus();
   }
 
   @Override
-  default Resistance plus(Measure<? extends ResistanceUnit> other) {
+  public Resistance plus(Measure<? extends ResistanceUnit> other) {
     return (Resistance) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
 
   @Override
-  default Resistance minus(Measure<? extends ResistanceUnit> other) {
+  public Resistance minus(Measure<? extends ResistanceUnit> other) {
     return (Resistance) unit().ofBaseUnits(baseUnitMagnitude() - other.baseUnitMagnitude());
   }
 
   @Override
-  default Resistance times(double multiplier) {
+  public Resistance times(double multiplier) {
     return (Resistance) unit().ofBaseUnits(baseUnitMagnitude() * multiplier);
   }
 
   @Override
-  default Resistance div(double divisor) {
+  public Resistance div(double divisor) {
     return (Resistance) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
   }
 
@@ -83,18 +92,18 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default Resistance divide(double divisor) {
+  public Resistance divide(double divisor) {
     return (Resistance) div(divisor);
   }
 
 
   @Override
-  default Mult<ResistanceUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
+  public Mult<ResistanceUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
     return (Mult<ResistanceUnit, AccelerationUnit<?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
+  public Per<ResistanceUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
     return (Per<ResistanceUnit, AccelerationUnit<?>>) Measure.super.div(divisor);
   }
 
@@ -106,23 +115,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
+  public Per<ResistanceUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
+  public Per<ResistanceUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, AngleUnit> times(Angle multiplier) {
+  public Mult<ResistanceUnit, AngleUnit> times(Angle multiplier) {
     return (Mult<ResistanceUnit, AngleUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, AngleUnit> div(Angle divisor) {
+  public Per<ResistanceUnit, AngleUnit> div(Angle divisor) {
     return (Per<ResistanceUnit, AngleUnit>) Measure.super.div(divisor);
   }
 
@@ -134,23 +143,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, AngleUnit> divide(Angle divisor) {
+  public Per<ResistanceUnit, AngleUnit> divide(Angle divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, AngleUnit> per(AngleUnit divisorUnit) {
+  public Per<ResistanceUnit, AngleUnit> per(AngleUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
+  public Mult<ResistanceUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
     return (Mult<ResistanceUnit, AngularAccelerationUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
+  public Per<ResistanceUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
     return (Per<ResistanceUnit, AngularAccelerationUnit>) Measure.super.div(divisor);
   }
 
@@ -162,23 +171,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
+  public Per<ResistanceUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+  public Per<ResistanceUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, AngularMomentumUnit> times(AngularMomentum multiplier) {
+  public Mult<ResistanceUnit, AngularMomentumUnit> times(AngularMomentum multiplier) {
     return (Mult<ResistanceUnit, AngularMomentumUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
+  public Per<ResistanceUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
     return (Per<ResistanceUnit, AngularMomentumUnit>) Measure.super.div(divisor);
   }
 
@@ -190,23 +199,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
+  public Per<ResistanceUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
+  public Per<ResistanceUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, AngularVelocityUnit> times(AngularVelocity multiplier) {
+  public Mult<ResistanceUnit, AngularVelocityUnit> times(AngularVelocity multiplier) {
     return (Mult<ResistanceUnit, AngularVelocityUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
+  public Per<ResistanceUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
     return (Per<ResistanceUnit, AngularVelocityUnit>) Measure.super.div(divisor);
   }
 
@@ -218,23 +227,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
+  public Per<ResistanceUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+  public Per<ResistanceUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Voltage times(Current multiplier) {
+  public Voltage times(Current multiplier) {
     return Volts.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<ResistanceUnit, CurrentUnit> div(Current divisor) {
+  public Per<ResistanceUnit, CurrentUnit> div(Current divisor) {
     return (Per<ResistanceUnit, CurrentUnit>) Measure.super.div(divisor);
   }
 
@@ -246,17 +255,17 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, CurrentUnit> divide(Current divisor) {
+  public Per<ResistanceUnit, CurrentUnit> divide(Current divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
+  public Per<ResistanceUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
   @Override
-  default Resistance div(Dimensionless divisor) {
+  public Resistance div(Dimensionless divisor) {
     return (Resistance) Ohms.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -268,23 +277,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default Resistance divide(Dimensionless divisor) {
+  public Resistance divide(Dimensionless divisor) {
     return (Resistance) div(divisor);
   }
 
   @Override
-  default Resistance times(Dimensionless multiplier) {
+  public Resistance times(Dimensionless multiplier) {
     return (Resistance) Ohms.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, DistanceUnit> times(Distance multiplier) {
+  public Mult<ResistanceUnit, DistanceUnit> times(Distance multiplier) {
     return (Mult<ResistanceUnit, DistanceUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, DistanceUnit> div(Distance divisor) {
+  public Per<ResistanceUnit, DistanceUnit> div(Distance divisor) {
     return (Per<ResistanceUnit, DistanceUnit>) Measure.super.div(divisor);
   }
 
@@ -296,23 +305,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, DistanceUnit> divide(Distance divisor) {
+  public Per<ResistanceUnit, DistanceUnit> divide(Distance divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+  public Per<ResistanceUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, EnergyUnit> times(Energy multiplier) {
+  public Mult<ResistanceUnit, EnergyUnit> times(Energy multiplier) {
     return (Mult<ResistanceUnit, EnergyUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, EnergyUnit> div(Energy divisor) {
+  public Per<ResistanceUnit, EnergyUnit> div(Energy divisor) {
     return (Per<ResistanceUnit, EnergyUnit>) Measure.super.div(divisor);
   }
 
@@ -324,23 +333,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, EnergyUnit> divide(Energy divisor) {
+  public Per<ResistanceUnit, EnergyUnit> divide(Energy divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
+  public Per<ResistanceUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, ForceUnit> times(Force multiplier) {
+  public Mult<ResistanceUnit, ForceUnit> times(Force multiplier) {
     return (Mult<ResistanceUnit, ForceUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, ForceUnit> div(Force divisor) {
+  public Per<ResistanceUnit, ForceUnit> div(Force divisor) {
     return (Per<ResistanceUnit, ForceUnit>) Measure.super.div(divisor);
   }
 
@@ -352,23 +361,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, ForceUnit> divide(Force divisor) {
+  public Per<ResistanceUnit, ForceUnit> divide(Force divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, ForceUnit> per(ForceUnit divisorUnit) {
+  public Per<ResistanceUnit, ForceUnit> per(ForceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, FrequencyUnit> times(Frequency multiplier) {
+  public Mult<ResistanceUnit, FrequencyUnit> times(Frequency multiplier) {
     return (Mult<ResistanceUnit, FrequencyUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, FrequencyUnit> div(Frequency divisor) {
+  public Per<ResistanceUnit, FrequencyUnit> div(Frequency divisor) {
     return (Per<ResistanceUnit, FrequencyUnit>) Measure.super.div(divisor);
   }
 
@@ -380,23 +389,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, FrequencyUnit> divide(Frequency divisor) {
+  public Per<ResistanceUnit, FrequencyUnit> divide(Frequency divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+  public Per<ResistanceUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, LinearAccelerationUnit> times(LinearAcceleration multiplier) {
+  public Mult<ResistanceUnit, LinearAccelerationUnit> times(LinearAcceleration multiplier) {
     return (Mult<ResistanceUnit, LinearAccelerationUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
+  public Per<ResistanceUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
     return (Per<ResistanceUnit, LinearAccelerationUnit>) Measure.super.div(divisor);
   }
 
@@ -408,23 +417,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
+  public Per<ResistanceUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
+  public Per<ResistanceUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
+  public Mult<ResistanceUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
     return (Mult<ResistanceUnit, LinearMomentumUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
+  public Per<ResistanceUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
     return (Per<ResistanceUnit, LinearMomentumUnit>) Measure.super.div(divisor);
   }
 
@@ -436,23 +445,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
+  public Per<ResistanceUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
+  public Per<ResistanceUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, LinearVelocityUnit> times(LinearVelocity multiplier) {
+  public Mult<ResistanceUnit, LinearVelocityUnit> times(LinearVelocity multiplier) {
     return (Mult<ResistanceUnit, LinearVelocityUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
+  public Per<ResistanceUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
     return (Per<ResistanceUnit, LinearVelocityUnit>) Measure.super.div(divisor);
   }
 
@@ -464,23 +473,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
+  public Per<ResistanceUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+  public Per<ResistanceUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, MassUnit> times(Mass multiplier) {
+  public Mult<ResistanceUnit, MassUnit> times(Mass multiplier) {
     return (Mult<ResistanceUnit, MassUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, MassUnit> div(Mass divisor) {
+  public Per<ResistanceUnit, MassUnit> div(Mass divisor) {
     return (Per<ResistanceUnit, MassUnit>) Measure.super.div(divisor);
   }
 
@@ -492,23 +501,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, MassUnit> divide(Mass divisor) {
+  public Per<ResistanceUnit, MassUnit> divide(Mass divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, MassUnit> per(MassUnit divisorUnit) {
+  public Per<ResistanceUnit, MassUnit> per(MassUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, MomentOfInertiaUnit> times(MomentOfInertia multiplier) {
+  public Mult<ResistanceUnit, MomentOfInertiaUnit> times(MomentOfInertia multiplier) {
     return (Mult<ResistanceUnit, MomentOfInertiaUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
+  public Per<ResistanceUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
     return (Per<ResistanceUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
   }
 
@@ -520,23 +529,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
+  public Per<ResistanceUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+  public Per<ResistanceUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
+  public Mult<ResistanceUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
     return (Mult<ResistanceUnit, MultUnit<?, ?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
+  public Per<ResistanceUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
     return (Per<ResistanceUnit, MultUnit<?, ?>>) Measure.super.div(divisor);
   }
 
@@ -548,23 +557,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
+  public Per<ResistanceUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
+  public Per<ResistanceUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
     return div(divisorUnit.ofNative(1));
   }
 
 
   @Override
-  default Mult<ResistanceUnit, PerUnit<?, ?>> times(Per<?, ?> multiplier) {
+  public Mult<ResistanceUnit, PerUnit<?, ?>> times(Per<?, ?> multiplier) {
     return (Mult<ResistanceUnit, PerUnit<?, ?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, PerUnit<?, ?>> div(Per<?, ?> divisor) {
+  public Per<ResistanceUnit, PerUnit<?, ?>> div(Per<?, ?> divisor) {
     return (Per<ResistanceUnit, PerUnit<?, ?>>) Measure.super.div(divisor);
   }
 
@@ -576,23 +585,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
+  public Per<ResistanceUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
+  public Per<ResistanceUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
     return div(divisorUnit.ofNative(1));
   }
 
 
   @Override
-  default Mult<ResistanceUnit, PowerUnit> times(Power multiplier) {
+  public Mult<ResistanceUnit, PowerUnit> times(Power multiplier) {
     return (Mult<ResistanceUnit, PowerUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, PowerUnit> div(Power divisor) {
+  public Per<ResistanceUnit, PowerUnit> div(Power divisor) {
     return (Per<ResistanceUnit, PowerUnit>) Measure.super.div(divisor);
   }
 
@@ -604,23 +613,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, PowerUnit> divide(Power divisor) {
+  public Per<ResistanceUnit, PowerUnit> divide(Power divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, PowerUnit> per(PowerUnit divisorUnit) {
+  public Per<ResistanceUnit, PowerUnit> per(PowerUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, ResistanceUnit> times(Resistance multiplier) {
+  public Mult<ResistanceUnit, ResistanceUnit> times(Resistance multiplier) {
     return (Mult<ResistanceUnit, ResistanceUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Dimensionless div(Resistance divisor) {
+  public Dimensionless div(Resistance divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -632,23 +641,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Dimensionless divide(Resistance divisor) {
+  public Dimensionless divide(Resistance divisor) {
     return div(divisor);
   }
 
   @Override
-  default Dimensionless per(ResistanceUnit divisorUnit) {
+  public Dimensionless per(ResistanceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, TemperatureUnit> times(Temperature multiplier) {
+  public Mult<ResistanceUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<ResistanceUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, TemperatureUnit> div(Temperature divisor) {
+  public Per<ResistanceUnit, TemperatureUnit> div(Temperature divisor) {
     return (Per<ResistanceUnit, TemperatureUnit>) Measure.super.div(divisor);
   }
 
@@ -660,23 +669,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, TemperatureUnit> divide(Temperature divisor) {
+  public Per<ResistanceUnit, TemperatureUnit> divide(Temperature divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
+  public Per<ResistanceUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, TimeUnit> times(Time multiplier) {
+  public Mult<ResistanceUnit, TimeUnit> times(Time multiplier) {
     return (Mult<ResistanceUnit, TimeUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Velocity<ResistanceUnit> div(Time divisor) {
+  public Velocity<ResistanceUnit> div(Time divisor) {
     return VelocityUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -688,23 +697,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Velocity<ResistanceUnit> divide(Time divisor) {
+  public Velocity<ResistanceUnit> divide(Time divisor) {
     return div(divisor);
   }
 
   @Override
-  default Velocity<ResistanceUnit> per(TimeUnit divisorUnit) {
+  public Velocity<ResistanceUnit> per(TimeUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, TorqueUnit> times(Torque multiplier) {
+  public Mult<ResistanceUnit, TorqueUnit> times(Torque multiplier) {
     return (Mult<ResistanceUnit, TorqueUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, TorqueUnit> div(Torque divisor) {
+  public Per<ResistanceUnit, TorqueUnit> div(Torque divisor) {
     return (Per<ResistanceUnit, TorqueUnit>) Measure.super.div(divisor);
   }
 
@@ -716,23 +725,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, TorqueUnit> divide(Torque divisor) {
+  public Per<ResistanceUnit, TorqueUnit> divide(Torque divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+  public Per<ResistanceUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, VelocityUnit<?>> times(Velocity<?> multiplier) {
+  public Mult<ResistanceUnit, VelocityUnit<?>> times(Velocity<?> multiplier) {
     return (Mult<ResistanceUnit, VelocityUnit<?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, VelocityUnit<?>> div(Velocity<?> divisor) {
+  public Per<ResistanceUnit, VelocityUnit<?>> div(Velocity<?> divisor) {
     return (Per<ResistanceUnit, VelocityUnit<?>>) Measure.super.div(divisor);
   }
 
@@ -744,23 +753,23 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
+  public Per<ResistanceUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
+  public Per<ResistanceUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<ResistanceUnit, VoltageUnit> times(Voltage multiplier) {
+  public Mult<ResistanceUnit, VoltageUnit> times(Voltage multiplier) {
     return (Mult<ResistanceUnit, VoltageUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<ResistanceUnit, VoltageUnit> div(Voltage divisor) {
+  public Per<ResistanceUnit, VoltageUnit> div(Voltage divisor) {
     return (Per<ResistanceUnit, VoltageUnit>) Measure.super.div(divisor);
   }
 
@@ -772,12 +781,12 @@ public interface Resistance extends Measure<ResistanceUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<ResistanceUnit, VoltageUnit> divide(Voltage divisor) {
+  public Per<ResistanceUnit, VoltageUnit> divide(Voltage divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<ResistanceUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
+  public Per<ResistanceUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

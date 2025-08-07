@@ -11,13 +11,6 @@ add_library(datalog ${datalog_native_src})
 set_target_properties(datalog PROPERTIES DEBUG_POSTFIX "d")
 
 target_compile_features(datalog PUBLIC cxx_std_20)
-if(MSVC)
-    target_compile_options(
-        datalog
-        PUBLIC /permissive- /Zc:preprocessor /Zc:__cplusplus /Zc:throwingNew /MP /bigobj /utf-8
-    )
-    target_compile_definitions(datalog PRIVATE -D_CRT_SECURE_NO_WARNINGS)
-endif()
 wpilib_target_warnings(datalog)
 
 target_include_directories(
@@ -25,7 +18,7 @@ target_include_directories(
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
 )
 
-target_link_libraries(datalog PRIVATE wpiutil)
+target_link_libraries(datalog PUBLIC wpiutil)
 
 subdir_list(datalog_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${datalog_examples})
@@ -50,7 +43,6 @@ if(WITH_JAVA)
     add_jar(
         datalog_jar
         ${JAVA_SOURCES}
-        # INCLUDE_JARS ${JACKSON_JARS} ${QUICKBUF_JAR}
         INCLUDE_JARS wpiutil_jar ${QUICKBUF_JAR}
         OUTPUT_NAME datalog
         OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}

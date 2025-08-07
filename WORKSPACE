@@ -1,4 +1,7 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
+load("//thirdparty/ceres:repositories.bzl", "ceres_repositories")
+
+ceres_repositories()
 
 http_archive(
     name = "bazel_features",
@@ -72,8 +75,8 @@ http_archive(
 # Download toolchains
 http_archive(
     name = "rules_bzlmodrio_toolchains",
-    sha256 = "37780b3d3f30de72aaca12d9f80edc4216f6d708bed5b261c424d4dde49e8531",
-    url = "https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr4/rules_bzlmodrio_toolchains-2025-1.bcr4.tar.gz",
+    sha256 = "102b4507628e9724b0c1e441727762c344e40170f65ac60516168178ea33a89a",
+    url = "https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr6/rules_bzlmodrio_toolchains-2025-1.bcr6.tar.gz",
 )
 
 http_archive(
@@ -83,6 +86,13 @@ http_archive(
         "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.8.1/bazel-skylib-1.8.1.tar.gz",
         "https://github.com/bazelbuild/bazel-skylib/releases/download/1.8.1/bazel-skylib-1.8.1.tar.gz",
     ],
+)
+
+http_archive(
+    name = "rules_doxygen",
+    sha256 = "5d154d3d011208510392b5aee8ea23ec61ab858cc1f3382b6eb8c729d3b4b336",
+    strip_prefix = "rules_doxygen-2.4.2",
+    url = "https://github.com/TendTo/rules_doxygen/releases/download/2.4.2/rules_doxygen-2.4.2.tar.gz",
 )
 
 load("@bazel_features//:deps.bzl", "bazel_features_deps")
@@ -152,6 +162,7 @@ maven_artifacts = [
     "com.fasterxml.jackson.core:jackson-databind:2.15.2",
     "us.hebi.quickbuf:quickbuf-runtime:1.3.3",
     "com.google.code.gson:gson:2.10.1",
+    "edu.wpi.first.thirdparty.frc2025.opencv:opencv-java:4.10.0-3",
     maven.artifact(
         "org.junit.jupiter",
         "junit-jupiter",
@@ -266,18 +277,9 @@ register_toolchains(
     "@local_systemcore//:macos",
     "@local_systemcore//:linux",
     "@local_systemcore//:windows",
-    "@local_raspi_bullseye_32//:macos",
-    "@local_raspi_bullseye_32//:linux",
-    "@local_raspi_bullseye_32//:windows",
     "@local_raspi_bookworm_32//:macos",
     "@local_raspi_bookworm_32//:linux",
     "@local_raspi_bookworm_32//:windows",
-    "@local_bullseye_32//:macos",
-    "@local_bullseye_32//:linux",
-    "@local_bullseye_32//:windows",
-    "@local_bullseye_64//:macos",
-    "@local_bullseye_64//:linux",
-    "@local_bullseye_64//:windows",
     "@local_bookworm_32//:macos",
     "@local_bookworm_32//:linux",
     "@local_bookworm_32//:windows",
@@ -300,17 +302,13 @@ setup_legacy_bzlmodrio_ni_cpp_dependencies()
 
 http_archive(
     name = "bzlmodrio-opencv",
-    sha256 = "27dff7aaedd00165b1a94867616ebf383220532e3956892cec649197077a9d01",
-    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr3/bzlmodRio-opencv-2025.4.10.0-3.bcr3.tar.gz",
+    sha256 = "867ec3e90b7efc30ff6eb68d14050e7f1e800656d390505b135069f080c5cd91",
+    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr5/bzlmodRio-opencv-2025.4.10.0-3.bcr5.tar.gz",
 )
 
 load("@bzlmodrio-opencv//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_opencv_cpp_dependencies")
 
 setup_legacy_bzlmodrio_opencv_cpp_dependencies()
-
-load("@bzlmodrio-opencv//:maven_java_deps.bzl", "setup_legacy_bzlmodrio_opencv_java_dependencies")
-
-setup_legacy_bzlmodrio_opencv_java_dependencies()
 
 http_archive(
     name = "bzlmodrio-libssh",
@@ -383,3 +381,30 @@ publishing_repo(
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
 bazel_skylib_workspace()
+
+load("@rules_doxygen//:extensions.bzl", "doxygen_repository")
+
+# Download the os specific version 1.12.0 of doxygen supporting all the indicated platforms
+doxygen_repository(
+    name = "doxygen",
+    executables = [
+        "",
+        "",
+        "",
+    ],
+    platforms = [
+        "windows",
+        "mac",
+        "linux",
+    ],
+    sha256s = [
+        "07f1c92cbbb32816689c725539c0951f92c6371d3d7f66dfa3192cbe88dd3138",
+        "6ace7dde967d41f4e293d034a67eb2c7edd61318491ee3131112173a77344001",
+        "3c42c3f3fb206732b503862d9c9c11978920a8214f223a3950bbf2520be5f647",
+    ],
+    versions = [
+        "1.12.0",
+        "1.12.0",
+        "1.12.0",
+    ],
+)

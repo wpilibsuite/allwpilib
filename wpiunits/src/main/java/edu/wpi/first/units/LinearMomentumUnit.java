@@ -4,9 +4,7 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.measure.ImmutableLinearMomentum;
 import edu.wpi.first.units.measure.LinearMomentum;
-import edu.wpi.first.units.measure.MutLinearMomentum;
 
 /** A unit of linear momentum like {@link edu.wpi.first.units.Units#KilogramMetersPerSecond}. */
 public final class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityUnit> {
@@ -49,12 +47,12 @@ public final class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityU
 
   @Override
   public LinearMomentum of(double magnitude) {
-    return new ImmutableLinearMomentum(magnitude, toBaseUnits(magnitude), this);
+    return new LinearMomentum(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public LinearMomentum ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableLinearMomentum(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new LinearMomentum(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -65,11 +63,6 @@ public final class LinearMomentumUnit extends MultUnit<MassUnit, LinearVelocityU
   @Override
   public LinearMomentum one() {
     return (LinearMomentum) super.one();
-  }
-
-  @Override
-  public MutLinearMomentum mutable(double initialMagnitude) {
-    return new MutLinearMomentum(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @Override

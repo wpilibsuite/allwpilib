@@ -4,8 +4,6 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.measure.ImmutableResistance;
-import edu.wpi.first.units.measure.MutResistance;
 import edu.wpi.first.units.measure.Resistance;
 
 /**
@@ -57,12 +55,12 @@ public final class ResistanceUnit extends PerUnit<VoltageUnit, CurrentUnit> {
 
   @Override
   public Resistance of(double magnitude) {
-    return new ImmutableResistance(magnitude, toBaseUnits(magnitude), this);
+    return new Resistance(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Resistance ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableResistance(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new Resistance(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -73,11 +71,6 @@ public final class ResistanceUnit extends PerUnit<VoltageUnit, CurrentUnit> {
   @Override
   public Resistance one() {
     return (Resistance) super.one();
-  }
-
-  @Override
-  public MutResistance mutable(double initialMagnitude) {
-    return new MutResistance(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   /**

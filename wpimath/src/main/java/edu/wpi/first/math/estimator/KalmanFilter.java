@@ -230,7 +230,11 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     //
     // Kᵀ = Sᵀ.solve(CPᵀ)
     // K = (Sᵀ.solve(CPᵀ))ᵀ
-    final Matrix<States, Outputs> K = S.transpose().solve(C.times(m_P.transpose())).transpose();
+    //
+    // Drop the transposes on symmetric matrices S and P.
+    //
+    // K = (S.solve(CP))ᵀ
+    final Matrix<States, Outputs> K = S.solve(C.times(m_P)).transpose();
 
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
     m_xHat = m_xHat.plus(K.times(y.minus(C.times(m_xHat).plus(D.times(u)))));
