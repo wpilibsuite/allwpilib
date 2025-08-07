@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -239,17 +240,29 @@ public class Scheduler implements ProtobufSerializable {
     return ScheduleResult.SUCCESS;
   }
 
+  /**
+   * Checks if a command can be scheduled. Requirements are that the command either does not
+   * conflict with any running commands, or is at least the same priority as every running command
+   * with which it conflicts. If a parent command is attempting to schedule a child, the child will
+   * never be considered to be conflicting with the parent or any ancestors.
+   *
+   * @param command The command to check
+   * @return True if the command meets all scheduling requirements, false if not
+   */
   private boolean isSchedulable(Command command) {
-    if (currentState() != null) {
-      // Bypass scheduling check if being scheduled as a nested command.
-      // The schedule() method will throw an error when attempting to schedule a nested command
-      // that requires a resource that the parent doesn't
-      return true;
+    Set<CommandState> ancestors = new HashSet<>();
+    for (var state = currentState(); state != null; state = m_commandStates.get(state.parent())) {
+      ancestors.add(state);
     }
 
-    // Scheduling from outside a command, eg a trigger binding or manual schedule call
     // Check for conflicts with the commands that are already running
-    for (Command c : m_commandStates.keySet()) {
+    for (var state : m_commandStates.values()) {
+      if (ancestors.contains(state)) {
+        // Can't conflict with an ancestor command
+        continue;
+      }
+
+      var c = state.command();
       if (c.conflictsWith(command) && command.isLowerPriorityThan(c)) {
         return false;
       }

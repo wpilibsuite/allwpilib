@@ -459,6 +459,7 @@ class SchedulerTest {
     m_scheduler.schedule(group);
     m_scheduler.run();
 
+    // second child interrupts first child
     assertEquals(
         List.of("Group", "Second Child"),
         m_scheduler.getRunningCommands().stream().map(Command::name).toList());
@@ -822,6 +823,44 @@ class SchedulerTest {
     m_scheduler.run();
     assertEquals(5, runs.get(), "All oneshot commands should have run");
     assertFalse(m_scheduler.isRunning(command), "Command should have exited after one cycle");
+  }
+
+  @Test
+  void childConflictsWithHigherPriorityTopLevel() {
+    var resource = new RequireableResource("Resource", m_scheduler);
+    var top = resource.run(Coroutine::park).withPriority(10).named("Top");
+
+    // Child conflicts with and is lower priority than the Top command
+    // It should not be scheduled, and the parent command should exit immediately
+    var child = resource.run(Coroutine::park).named("Child");
+    var parent = Command.noRequirements(co -> co.await(child)).named("Parent");
+
+    m_scheduler.schedule(top);
+    m_scheduler.schedule(parent);
+    m_scheduler.run();
+
+    assertTrue(m_scheduler.isRunning(top), "Top command should not have been interrupted");
+    assertFalse(m_scheduler.isRunning(child), "Conflicting child should not have run");
+    assertFalse(m_scheduler.isRunning(parent), "Parent of conflicting child should have exited");
+  }
+
+  @Test
+  void childConflictsWithLowerPriorityTopLevel() {
+    var resource = new RequireableResource("Resource", m_scheduler);
+    var top = resource.run(Coroutine::park).withPriority(-10).named("Top");
+
+    // Child conflicts with and is lower priority than the Top command
+    // It should not be scheduled, and the parent command should exit immediately
+    var child = resource.run(Coroutine::park).named("Child");
+    var parent = Command.noRequirements(co -> co.await(child)).named("Parent");
+
+    m_scheduler.schedule(top);
+    m_scheduler.schedule(parent);
+    m_scheduler.run();
+
+    assertFalse(m_scheduler.isRunning(top), "Top command should have been interrupted");
+    assertTrue(m_scheduler.isRunning(child), "Conflicting child should be running");
+    assertTrue(m_scheduler.isRunning(parent), "Parent of conflicting child should be running");
   }
 
   record PriorityCommand(int priority, RequireableResource... subsystems) implements Command {
