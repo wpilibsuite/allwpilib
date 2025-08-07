@@ -1,8 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: iris <snazzsinclair@gmail.com>
 Date: Thu, 7 Aug 2025 15:02:46 -0500
-Subject: [PATCH 15/15] ignore a warning that GCC15 introduced
-
+Subject: [PATCH 15/15] Ignore GCC 15 warning
 ---
  src/google/protobuf/generated_message_tctable_lite.cc | 4 ++++
  1 file changed, 4 insertions(+)
