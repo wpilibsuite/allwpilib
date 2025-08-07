@@ -95,6 +95,7 @@ publish_all(
         "//sysid:sysid_publish.publish",
         "//thirdparty/googletest:googletest-cpp_publish.publish",
         "//thirdparty/imgui_suite:imguiSuite-cpp_publish.publish",
+        "//wpical:wpical_publish.publish",
         "//wpigui:wpigui-cpp_publish.publish",
         "//wpilibNewCommands:wpilibNewCommands-cpp_publish.publish",
         "//wpilibNewCommands:wpilibNewCommands-java_publish.publish",
