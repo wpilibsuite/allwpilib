@@ -7,6 +7,7 @@ package org.wpilib.commands3;
 import edu.wpi.first.units.measure.Time;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -90,10 +91,16 @@ public final class Coroutine {
    * }
    * }</pre>
    *
+   * <p>Note: forking a command that conflicts with a higher-priority command will fail. The forked
+   * command will not be scheduled, and the existing command will continue to run.</p>
+   *
    * @param commands The commands to fork.
    */
   public void fork(Command... commands) {
     requireMounted();
+
+    // Check for user error; there's no reason to fork conflicting commands simultaneously
+    validateNoConflicts(List.of(commands));
 
     // Shorthand; this is handy for user-defined compositions
     for (var command : commands) {
@@ -112,9 +119,7 @@ public final class Coroutine {
   public void await(Command command) {
     requireMounted();
 
-    if (!m_scheduler.isScheduledOrRunning(command)) {
-      m_scheduler.schedule(command);
-    }
+    m_scheduler.schedule(command);
 
     while (m_scheduler.isScheduledOrRunning(command)) {
       // If the command is a one-shot, then the schedule call will completely execute the command.
@@ -135,11 +140,8 @@ public final class Coroutine {
 
     validateNoConflicts(commands);
 
-    // Schedule anything that's not already queued or running
     for (var command : commands) {
-      if (!m_scheduler.isScheduledOrRunning(command)) {
-        m_scheduler.schedule(command);
-      }
+      m_scheduler.schedule(command);
     }
 
     while (commands.stream().anyMatch(m_scheduler::isScheduledOrRunning)) {
@@ -174,15 +176,14 @@ public final class Coroutine {
 
     // Schedule anything that's not already queued or running
     for (var command : commands) {
-      if (!m_scheduler.isScheduledOrRunning(command)) {
-        m_scheduler.schedule(command);
-      }
+      m_scheduler.schedule(command);
     }
 
     while (commands.stream().allMatch(m_scheduler::isScheduledOrRunning)) {
       this.yield();
     }
 
+    // At least one command exited; cancel the rest.
     commands.forEach(m_scheduler::cancel);
   }
 
