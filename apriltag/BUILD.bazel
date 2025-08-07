@@ -132,11 +132,10 @@ wpilib_jni_java_library(
     deps = [
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
-        "@bzlmodrio-opencv//libraries/cpp/opencv:jni",
+        "@bzlmodrio-opencv//libraries/java/opencv",
         "@maven//:com_fasterxml_jackson_core_jackson_annotations",
         "@maven//:com_fasterxml_jackson_core_jackson_core",
         "@maven//:com_fasterxml_jackson_core_jackson_databind",
-        "@maven//:edu_wpi_first_thirdparty_frc2025_opencv_opencv_java",
     ],
 )
 
@@ -168,9 +167,8 @@ wpilib_java_junit5_test(
         ":apriltag-java",
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
-        "@bzlmodrio-opencv//libraries/cpp/opencv:jni",
+        "@bzlmodrio-opencv//libraries/java/opencv",
         "@maven//:com_fasterxml_jackson_core_jackson_databind",
-        "@maven//:edu_wpi_first_thirdparty_frc2025_opencv_opencv_java",
     ],
 )
 

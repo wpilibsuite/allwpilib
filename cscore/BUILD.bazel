@@ -207,8 +207,7 @@ wpilib_jni_java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//wpiutil:wpiutil-java",
-        "@bzlmodrio-opencv//libraries/cpp/opencv:jni",
-        "@maven//:edu_wpi_first_thirdparty_frc2025_opencv_opencv_java",
+        "@bzlmodrio-opencv//libraries/java/opencv",
     ],
 )
 
