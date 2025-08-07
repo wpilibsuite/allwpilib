@@ -92,7 +92,7 @@ public final class Coroutine {
    * }</pre>
    *
    * <p>Note: forking a command that conflicts with a higher-priority command will fail. The forked
-   * command will not be scheduled, and the existing command will continue to run.</p>
+   * command will not be scheduled, and the existing command will continue to run.
    *
    * @param commands The commands to fork.
    */

@@ -503,6 +503,7 @@ public class Scheduler implements ProtobufSerializable {
 
   /**
    * Mounts and runs a command until it yields or exits.
+   *
    * @param state The command state to run
    */
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
