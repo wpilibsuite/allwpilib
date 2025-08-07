@@ -29,7 +29,7 @@ import java.lang.invoke.WrongMethodTypeException;
  */
 public final class Continuation {
   // The underlying jdk.internal.vm.Continuation object
-  final Object m_continuation;
+  private final Object m_continuation;
 
   static final Class<?> jdk_internal_vm_Continuation;
   private static final MethodHandle CONSTRUCTOR;
