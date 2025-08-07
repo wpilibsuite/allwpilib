@@ -189,6 +189,7 @@ def third_party_cc_lib_helper(
         include_root,
         src_root = None,
         src_excludes = [],
+        defines = [],
         visibility = None):
     """
     Helper for src / headers pairs that aren't directly compiled, but rather pulled into a bigger library.
@@ -212,6 +213,7 @@ def third_party_cc_lib_helper(
             include_root + "/**",
         ]),
         includes = [include_root],
+        defines = defines,
         strip_include_prefix = include_root,
         visibility = visibility,
     )
@@ -292,6 +294,7 @@ def wpilib_cc_library(
         srcs = srcs + [lib + "-srcs" for lib in third_party_libraries],
         deps = deps + [lib + "-headers" for lib in third_party_libraries + third_party_header_only_libraries],
         strip_include_prefix = strip_include_prefix,
+        linkopts = linkopts,
         **kwargs
     )
 

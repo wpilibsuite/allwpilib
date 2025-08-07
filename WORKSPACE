@@ -1,4 +1,7 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
+load("//thirdparty/ceres:repositories.bzl", "ceres_repositories")
+
+ceres_repositories()
 
 http_archive(
     name = "bazel_features",
@@ -159,6 +162,7 @@ maven_artifacts = [
     "com.fasterxml.jackson.core:jackson-databind:2.15.2",
     "us.hebi.quickbuf:quickbuf-runtime:1.3.3",
     "com.google.code.gson:gson:2.10.1",
+    "edu.wpi.first.thirdparty.frc2025.opencv:opencv-java:4.10.0-3",
     maven.artifact(
         "org.junit.jupiter",
         "junit-jupiter",
@@ -298,17 +302,13 @@ setup_legacy_bzlmodrio_ni_cpp_dependencies()
 
 http_archive(
     name = "bzlmodrio-opencv",
-    sha256 = "391e99abe3be9d7b5e3aa3e822fc287be4dddb3333d00b90a29b6e7d0464d490",
-    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr4/bzlmodRio-opencv-2025.4.10.0-3.bcr4.tar.gz",
+    sha256 = "867ec3e90b7efc30ff6eb68d14050e7f1e800656d390505b135069f080c5cd91",
+    url = "https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2025.4.10.0-3.bcr5/bzlmodRio-opencv-2025.4.10.0-3.bcr5.tar.gz",
 )
 
 load("@bzlmodrio-opencv//:maven_cpp_deps.bzl", "setup_legacy_bzlmodrio_opencv_cpp_dependencies")
 
 setup_legacy_bzlmodrio_opencv_cpp_dependencies()
-
-load("@bzlmodrio-opencv//:maven_java_deps.bzl", "setup_legacy_bzlmodrio_opencv_java_dependencies")
-
-setup_legacy_bzlmodrio_opencv_java_dependencies()
 
 http_archive(
     name = "bzlmodrio-libssh",

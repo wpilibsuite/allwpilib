@@ -10,10 +10,18 @@
 #include <gtest/gtest.h>
 #include <wpi/json.h>
 
+#include "path_lookup.h"
+
 const std::string projectRootPath = PROJECT_ROOT_PATH;
+
+const char* const tmpdir_c_str = std::getenv("TEST_TMPDIR");
+
 const std::string calSavePath =
-    projectRootPath.substr(0, projectRootPath.find("/src/main/native/assets")) +
-    "/build";
+    tmpdir_c_str == nullptr
+        ? (projectRootPath.substr(
+               0, projectRootPath.find("/src/main/native/assets")) +
+           "/build")
+        : std::string(tmpdir_c_str);
 cameracalibration::CameraModel cameraModel = {
     .intrinsic_matrix = Eigen::Matrix<double, 3, 3>::Identity(),
     .distortion_coefficients = Eigen::Matrix<double, 8, 1>::Zero(),
@@ -28,10 +36,11 @@ const std::string videoLocation = "/altfieldvideo";
 const std::string fileSuffix = ".mp4";
 const std::string videoLocation = "/fieldvideo";
 #endif
+
 TEST(Camera_CalibrationTest, OpenCV_Typical) {
   int ret = cameracalibration::calibrate(
-      projectRootPath + "/testcalibration" + fileSuffix, cameraModel, 0.709f,
-      0.551f, 12, 8, false);
+      LookupPath(projectRootPath + "/testcalibration" + fileSuffix),
+      cameraModel, 0.709f, 0.551f, 12, 8, false);
   cameracalibration::dumpJson(cameraModel,
                               calSavePath + "/cameracalibration.json");
   EXPECT_EQ(ret, 0);
@@ -39,44 +48,44 @@ TEST(Camera_CalibrationTest, OpenCV_Typical) {
 
 TEST(Camera_CalibrationTest, OpenCV_Atypical) {
   int ret = cameracalibration::calibrate(
-      projectRootPath + videoLocation + "/long" + fileSuffix, cameraModel,
-      0.709f, 0.551f, 12, 8, false);
+      LookupPath(projectRootPath + videoLocation + "/long" + fileSuffix),
+      cameraModel, 0.709f, 0.551f, 12, 8, false);
   EXPECT_EQ(ret, 1);
 }
 
 TEST(Camera_CalibrationTest, MRcal_Typical) {
   int ret = cameracalibration::calibrate(
-      projectRootPath + "/testcalibration" + fileSuffix, cameraModel, .709f, 12,
-      8, 1080, 1920, false);
+      LookupPath(projectRootPath + "/testcalibration" + fileSuffix),
+      cameraModel, .709f, 12, 8, 1080, 1920, false);
   EXPECT_EQ(ret, 0);
 }
 
 TEST(Camera_CalibrationTest, MRcal_Atypical) {
   int ret = cameracalibration::calibrate(
-      projectRootPath + videoLocation + "/short" + fileSuffix, cameraModel,
-      0.709f, 12, 8, 1080, 1920, false);
+      LookupPath(projectRootPath + videoLocation + "/short" + fileSuffix),
+      cameraModel, 0.709f, 12, 8, 1080, 1920, false);
   EXPECT_EQ(ret, 1);
 }
 
 TEST(Field_CalibrationTest, Typical) {
   int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, output_json,
+      LookupPath(projectRootPath + videoLocation), output_json,
       calSavePath + "/cameracalibration.json",
-      projectRootPath + "/2024-crescendo.json", 3, false);
+      LookupPath(projectRootPath + "/2024-crescendo.json"), 3, false);
   EXPECT_EQ(ret, 0);
 }
 
 TEST(Field_CalibrationTest, Atypical_Bad_Camera_Model_Directory) {
   int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, output_json,
-      projectRootPath + videoLocation + "/long" + fileSuffix,
-      projectRootPath + "/2024-crescendo.json", 3, false);
+      LookupPath(projectRootPath + videoLocation), output_json,
+      LookupPath(projectRootPath + videoLocation + "/long" + fileSuffix),
+      LookupPath(projectRootPath + "/2024-crescendo.json"), 3, false);
   EXPECT_EQ(ret, 1);
 }
 
 TEST(Field_CalibrationTest, Atypical_Bad_Ideal_JSON) {
   int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, output_json,
+      LookupPath(projectRootPath + videoLocation), output_json,
       calSavePath + "/cameracalibration.json",
       calSavePath + "/cameracalibration.json", 3, false);
   EXPECT_EQ(ret, 1);
@@ -84,24 +93,24 @@ TEST(Field_CalibrationTest, Atypical_Bad_Ideal_JSON) {
 
 TEST(Field_CalibrationTest, Atypical_Bad_Input_Directory) {
   int ret = fieldcalibration::calibrate(
-      projectRootPath + "", output_json,
+      LookupPath(projectRootPath + ""), output_json,
       calSavePath + "/cameracalibration.json",
-      projectRootPath + "/2024-crescendo.json", 3, false);
+      LookupPath(projectRootPath + "/2024-crescendo.json"), 3, false);
   EXPECT_EQ(ret, 1);
 }
 
 TEST(Field_CalibrationTest, Atypical_Bad_Pinned_Tag) {
   int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, output_json,
+      LookupPath(projectRootPath + videoLocation), output_json,
       calSavePath + "/cameracalibration.json",
-      projectRootPath + "/2024-crescendo.json", 42, false);
+      LookupPath(projectRootPath + "/2024-crescendo.json"), 42, false);
   EXPECT_EQ(ret, 1);
 }
 
 TEST(Field_CalibrationTest, Atypical_Bad_Pinned_Tag_Negative) {
   int ret = fieldcalibration::calibrate(
-      projectRootPath + videoLocation, output_json,
+      LookupPath(projectRootPath + videoLocation), output_json,
       calSavePath + "/cameracalibration.json",
-      projectRootPath + "/2024-crescendo.json", -1, false);
+      LookupPath(projectRootPath + "/2024-crescendo.json"), -1, false);
   EXPECT_EQ(ret, 1);
 }
