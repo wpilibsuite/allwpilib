@@ -1,22 +1,22 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Peter Johnson <johnson.peter@gmail.com>
-Date: Tue, 13 Jun 2023 23:58:50 -0700
-Subject: [PATCH 09/15] Disable unused function warning
+From: iris <snazzsinclair@gmail.com>
+Date: Thu, 7 Aug 2025 15:02:46 -0500
+Subject: [PATCH 15/15] ignore a warning that GCC15 introduced
 
 ---
  src/google/protobuf/generated_message_tctable_lite.cc | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/src/google/protobuf/generated_message_tctable_lite.cc b/src/google/protobuf/generated_message_tctable_lite.cc
-index 2268b2be4d4c60c545765469549d73c6a468dac8..23557a614752a9f0c93d8bd56724f3bc0f962185 100644
+index 23557a614752a9f0c93d8bd56724f3bc0f962185..ddb29cbddac62914b42e26d1758bb31e7e0d9204 100644
 --- a/src/google/protobuf/generated_message_tctable_lite.cc
 +++ b/src/google/protobuf/generated_message_tctable_lite.cc
-@@ -43,6 +43,10 @@
- #include <google/protobuf/port_def.inc>
- // clang-format on
+@@ -47,6 +47,10 @@
+ #pragma GCC diagnostic ignored "-Wunused-function"
+ #endif
  
-+#ifdef __GNUC__
-+#pragma GCC diagnostic ignored "-Wunused-function"
++#if __GNUC__ >= 15
++#pragma GCC diagnostic ignored "-Wmaybe-musttail-local-addr"
 +#endif
 +
  namespace google {
