@@ -39,6 +39,7 @@ DigitalGlitchFilter::~DigitalGlitchFilter() {
   if (m_channelIndex >= 0) {
     std::scoped_lock lock(m_mutex);
     m_filterAllocated[m_channelIndex] = false;
+    m_channelIndex = -1;
   }
 }
 

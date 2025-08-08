@@ -13,6 +13,7 @@ import org.opencv.core.Mat;
  * @see VisionRunner
  * @see VisionThread
  */
+@FunctionalInterface
 public interface VisionPipeline {
   /**
    * Processes the image input and sets the result objects. Implementations should make these

@@ -7,7 +7,6 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables Double implementation. */
-@SuppressWarnings("PMD.ArrayIsStoredDirectly")
 final class DoubleEntryImpl extends EntryBase implements DoubleEntry {
   /**
    * Constructor.

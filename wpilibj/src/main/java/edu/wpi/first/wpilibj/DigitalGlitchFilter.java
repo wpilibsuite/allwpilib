@@ -38,11 +38,10 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
       m_mutex.lock();
       try {
         m_filterAllocated[m_channelIndex] = false;
+        m_channelIndex = -1;
       } finally {
         m_mutex.unlock();
       }
-
-      m_channelIndex = -1;
     }
   }
 

@@ -2536,7 +2536,8 @@ class AnnotationProcessorTest {
         class Example {}
         """;
 
-    String packageInfo = """
+    String packageInfo =
+        """
         package example;
         """;
 

@@ -9,7 +9,7 @@ package edu.wpi.first.networktables;
 import java.util.Objects;
 
 /** A network table entry value. */
-@SuppressWarnings({"UnnecessaryParentheses", "PMD.MethodReturnsInternalArray"})
+@SuppressWarnings("UnnecessaryParentheses")
 public final class NetworkTableValue {
   NetworkTableValue(NetworkTableType type, Object value, long time, long serverTime) {
     m_type = type;
@@ -668,7 +668,6 @@ public final class NetworkTableValue {
     return out;
   }
 
-  @SuppressWarnings("PMD.AvoidArrayLoops")
   static double[] toNativeDoubleArray(Number[] arr) {
     double[] out = new double[arr.length];
     for (int i = 0; i < arr.length; i++) {
@@ -677,7 +676,6 @@ public final class NetworkTableValue {
     return out;
   }
 
-  @SuppressWarnings("PMD.AvoidArrayLoops")
   static long[] toNativeIntegerArray(Number[] arr) {
     long[] out = new long[arr.length];
     for (int i = 0; i < arr.length; i++) {
@@ -686,7 +684,6 @@ public final class NetworkTableValue {
     return out;
   }
 
-  @SuppressWarnings("PMD.AvoidArrayLoops")
   static float[] toNativeFloatArray(Number[] arr) {
     float[] out = new float[arr.length];
     for (int i = 0; i < arr.length; i++) {

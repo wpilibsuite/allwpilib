@@ -10,7 +10,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle"})
 public final class MutAcceleration<D extends Unit>
   extends MutableMeasureBase<AccelerationUnit<D>, Acceleration<D>, MutAcceleration<D>>
   implements Acceleration<D> {
