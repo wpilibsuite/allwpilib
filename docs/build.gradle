@@ -177,7 +177,7 @@ tasks.register("zipCppDocs", Zip) {
 // Java
 configurations {
     javaSource {
-        transitive false
+        transitive = false
     }
 }
 
@@ -265,15 +265,15 @@ publishing {
             artifact zipJavaDocs
 
             artifactId = "${baseArtifactIdJava}"
-            groupId artifactGroupIdJava
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupIdJava
+            version = wpilibVersioning.version.get()
         }
         cpp(MavenPublication) {
             artifact zipCppDocs
 
             artifactId = "${baseArtifactIdCpp}"
-            groupId artifactGroupIdCpp
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupIdCpp
+            version = wpilibVersioning.version.get()
         }
     }
 }
