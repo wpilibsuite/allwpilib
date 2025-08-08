@@ -247,6 +247,8 @@ public class Scheduler implements ProtobufSerializable {
    *     scheduled another command that shares at least one required resource
    */
   public ScheduleResult schedule(Command command) {
+    // Note: we use a throwable here instead of Thread.currentThread().getStackTrace() for easier
+    //       stack frame filtering and modification.
     var binding =
         new Binding(
             BindingScope.global(), BindingType.IMMEDIATE, command, new Throwable().getStackTrace());

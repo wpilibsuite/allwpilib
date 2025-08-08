@@ -328,12 +328,11 @@ public class Trigger implements BooleanSupplier {
 
   // package-private for testing
   void addBinding(BindingScope scope, BindingType bindingType, Command command) {
-    Throwable t = new Throwable("Dummy error to get the binding trace");
-    StackTraceElement[] frames = t.getStackTrace();
-
+    // Note: we use a throwable here instead of Thread.currentThread().getStackTrace() for easier
+    //       stack frame filtering and modification.
     m_bindings
         .computeIfAbsent(bindingType, _k -> new ArrayList<>())
-        .add(new Binding(scope, bindingType, command, frames));
+        .add(new Binding(scope, bindingType, command, new Throwable().getStackTrace()));
 
     // Ensure this trigger is bound to the event loop. NOP if already bound
     m_loop.bind(m_eventLoopCallback);
