@@ -65,8 +65,8 @@ publishing {
             artifact javadocJar
 
             artifactId = "${baseArtifactId}-java"
-            groupId artifactGroupId
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupId
+            version = wpilibVersioning.version.get()
         }
     }
 }
@@ -76,7 +76,7 @@ test {
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
     testLogging {
         events "failed"
-        exceptionFormat "full"
+        exceptionFormat = "full"
     }
     finalizedBy jacocoTestReport
 }
