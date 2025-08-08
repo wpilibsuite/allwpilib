@@ -217,17 +217,8 @@ public class Trigger implements BooleanSupplier {
    * @return The debounced trigger.
    */
   public Trigger debounce(Time duration, Debouncer.DebounceType type) {
-    return new Trigger(
-        m_scheduler,
-        m_loop,
-        new BooleanSupplier() {
-          final Debouncer m_debouncer = new Debouncer(duration.in(Seconds), type);
-
-          @Override
-          public boolean getAsBoolean() {
-            return m_debouncer.calculate(m_condition.getAsBoolean());
-          }
-        });
+    var debouncer = new Debouncer(duration.in(Seconds), type);
+    return new Trigger(m_scheduler, m_loop, () -> debouncer.calculate(m_condition.getAsBoolean()));
   }
 
   private void poll() {
