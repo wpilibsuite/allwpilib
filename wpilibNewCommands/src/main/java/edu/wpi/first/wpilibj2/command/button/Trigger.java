@@ -83,141 +83,155 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Starts the command when the condition changes.
+   * Starts the commands when the condition changes.
    *
-   * @param command the command to start
+   * @param commands the commands to start
    * @return this trigger, so calls can be chained
    */
-  public Trigger onChange(Command command) {
-    requireNonNullParam(command, "command", "onChange");
-    addBinding(
-        (previous, current) -> {
-          if (previous != current) {
-            CommandScheduler.getInstance().schedule(command);
-          }
-        });
+  public Trigger onChange(Command... commands) {
+    requireNonNullParam(commands, "commands", "onChange");
+    for (Command command : commands) {
+      addBinding(
+          (previous, current) -> {
+            if (previous != current) {
+              CommandScheduler.getInstance().schedule(command);
+            }
+          });
+    }
     return this;
   }
 
   /**
-   * Starts the given command whenever the condition changes from `false` to `true`.
+   * Starts the given commands whenever the condition changes from `false` to `true`.
    *
-   * @param command the command to start
+   * @param commands the commands to start
    * @return this trigger, so calls can be chained
    */
-  public Trigger onTrue(Command command) {
-    requireNonNullParam(command, "command", "onTrue");
-    addBinding(
-        (previous, current) -> {
-          if (!previous && current) {
-            CommandScheduler.getInstance().schedule(command);
-          }
-        });
+  public Trigger onTrue(Command... commands) {
+    requireNonNullParam(commands, "commands", "onTrue");
+    for (Command command : commands) {
+      addBinding(
+          (previous, current) -> {
+            if (!previous && current) {
+              CommandScheduler.getInstance().schedule(command);
+            }
+          });
+    }
     return this;
   }
 
   /**
-   * Starts the given command whenever the condition changes from `true` to `false`.
+   * Starts the given commands whenever the condition changes from `true` to `false`.
    *
-   * @param command the command to start
+   * @param commands the commands to start
    * @return this trigger, so calls can be chained
    */
-  public Trigger onFalse(Command command) {
-    requireNonNullParam(command, "command", "onFalse");
-    addBinding(
-        (previous, current) -> {
-          if (previous && !current) {
-            CommandScheduler.getInstance().schedule(command);
-          }
-        });
+  public Trigger onFalse(Command... commands) {
+    requireNonNullParam(commands, "commands", "onFalse");
+    for (Command command : commands) {
+      addBinding(
+          (previous, current) -> {
+            if (previous && !current) {
+              CommandScheduler.getInstance().schedule(command);
+            }
+          });
+    }
     return this;
   }
 
   /**
-   * Starts the given command when the condition changes to `true` and cancels it when the condition
-   * changes to `false`.
+   * Starts the given commands when the condition changes to `true` and cancels them when the
+   * condition changes to `false`.
    *
-   * <p>Doesn't re-start the command if it ends while the condition is still `true`. If the command
-   * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
+   * <p>Doesn't re-start the commands if they end while the condition is still `true`. If the
+   * commands should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
    *
-   * @param command the command to start
+   * @param commands the commands to start
    * @return this trigger, so calls can be chained
    */
-  public Trigger whileTrue(Command command) {
-    requireNonNullParam(command, "command", "whileTrue");
-    addBinding(
-        (previous, current) -> {
-          if (!previous && current) {
-            CommandScheduler.getInstance().schedule(command);
-          } else if (previous && !current) {
-            command.cancel();
-          }
-        });
+  public Trigger whileTrue(Command... commands) {
+    requireNonNullParam(commands, "commands", "whileTrue");
+    for (Command command : commands) {
+      addBinding(
+          (previous, current) -> {
+            if (!previous && current) {
+              CommandScheduler.getInstance().schedule(command);
+            } else if (previous && !current) {
+              command.cancel();
+            }
+          });
+    }
     return this;
   }
 
   /**
-   * Starts the given command when the condition changes to `false` and cancels it when the
+   * Starts the given commands when the condition changes to `false` and cancels them when the
    * condition changes to `true`.
    *
-   * <p>Doesn't re-start the command if it ends while the condition is still `false`. If the command
-   * should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
+   * <p>Doesn't re-start the commands if they end while the condition is still `false`. If the
+   * commands should restart, see {@link edu.wpi.first.wpilibj2.command.RepeatCommand}.
    *
-   * @param command the command to start
+   * @param commands the commands to start
    * @return this trigger, so calls can be chained
    */
-  public Trigger whileFalse(Command command) {
-    requireNonNullParam(command, "command", "whileFalse");
-    addBinding(
-        (previous, current) -> {
-          if (previous && !current) {
-            CommandScheduler.getInstance().schedule(command);
-          } else if (!previous && current) {
-            command.cancel();
-          }
-        });
+  public Trigger whileFalse(Command... commands) {
+    requireNonNullParam(commands, "commands", "whileFalse");
+    for (Command command : commands) {
+      addBinding(
+          (previous, current) -> {
+            if (previous && !current) {
+              CommandScheduler.getInstance().schedule(command);
+            } else if (!previous && current) {
+              command.cancel();
+            }
+          });
+    }
     return this;
   }
 
   /**
-   * Toggles a command when the condition changes from `false` to `true`.
+   * Toggles commands when the condition changes from `false` to `true`.
    *
-   * @param command the command to toggle
+   * @param commands the commands to toggle
    * @return this trigger, so calls can be chained
    */
-  public Trigger toggleOnTrue(Command command) {
-    requireNonNullParam(command, "command", "toggleOnTrue");
-    addBinding(
-        (previous, current) -> {
-          if (!previous && current) {
-            if (command.isScheduled()) {
-              command.cancel();
-            } else {
-              CommandScheduler.getInstance().schedule(command);
+  public Trigger toggleOnTrue(Command... commands) {
+    requireNonNullParam(commands, "commands", "toggleOnTrue");
+    for (Command command : commands) {
+      addBinding(
+          (previous, current) -> {
+            if (!previous && current) {
+              if (command.isScheduled()) {
+                command.cancel();
+              } else {
+                CommandScheduler.getInstance().schedule(command);
+              }
             }
-          }
-        });
+          });
+    }
     return this;
   }
 
   /**
-   * Toggles a command when the condition changes from `true` to `false`.
+   * Toggles commands when the condition changes from `true` to `false`.
    *
-   * @param command the command to toggle
+   * @param commands the commands to toggle
    * @return this trigger, so calls can be chained
    */
-  public Trigger toggleOnFalse(Command command) {
-    requireNonNullParam(command, "command", "toggleOnFalse");
-    addBinding(
-        (previous, current) -> {
-          if (previous && !current) {
-            if (command.isScheduled()) {
-              command.cancel();
-            } else {
-              CommandScheduler.getInstance().schedule(command);
+  public Trigger toggleOnFalse(Command... commands) {
+    requireNonNullParam(commands, "commands", "toggleOnFalse");
+    for (Command command : commands) {
+      addBinding(
+          (previous, current) -> {
+            if (previous && !current) {
+              if (command.isScheduled()) {
+                command.cancel();
+              } else {
+                CommandScheduler.getInstance().schedule(command);
+              }
             }
-          }
-        });
+          });
+    }
     return this;
   }
 
