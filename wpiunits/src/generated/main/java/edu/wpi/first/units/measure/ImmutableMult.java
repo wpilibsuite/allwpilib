@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle"})
 public record ImmutableMult<A extends Unit, B extends Unit>(double magnitude, double baseUnitMagnitude, MultUnit<A, B> unit) implements Mult<A, B> {
   @Override
   public Mult<A, B> copy() {

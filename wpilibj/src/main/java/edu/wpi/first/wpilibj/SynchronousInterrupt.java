@@ -16,7 +16,6 @@ import edu.wpi.first.hal.InterruptJNI;
  * <p>Asynchronous interrupts are handled by the AsynchronousInterrupt class.
  */
 public class SynchronousInterrupt implements AutoCloseable {
-  @SuppressWarnings("PMD.SingularField")
   private final DigitalSource m_source;
 
   private final int m_handle;

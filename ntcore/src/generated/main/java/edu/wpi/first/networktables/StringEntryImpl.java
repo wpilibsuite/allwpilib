@@ -7,7 +7,6 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables String implementation. */
-@SuppressWarnings("PMD.ArrayIsStoredDirectly")
 final class StringEntryImpl extends EntryBase implements StringEntry {
   /**
    * Constructor.

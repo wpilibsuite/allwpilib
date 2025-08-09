@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id "org.ysb33r.doxygen" version "1.0.4"
+    id "org.ysb33r.doxygen" version "2.0.0"
 }
 
 evaluationDependsOn(':apriltag')
@@ -62,12 +62,12 @@ doxygen {
     }
 }
 
-doxygen {
-    template 'Doxyfile'
+doxygen.sourceSets.main {
+    template = 'Doxyfile'
 
     cppProjectZips.each {
-        dependsOn it
-        source it.source
+        doxygenDox.dependsOn it
+        sources it.source
         it.ext.includeDirs.each {
             cppIncludeRoots.add(it.absolutePath)
         }
@@ -169,7 +169,7 @@ doxygen {
 tasks.register("zipCppDocs", Zip) {
     archiveBaseName = zipBaseNameCpp
     destinationDirectory = outputsFolder
-    dependsOn doxygen
+    dependsOn doxygenDox
     from ("$buildDir/docs/doxygen/html")
     into '/'
 }
