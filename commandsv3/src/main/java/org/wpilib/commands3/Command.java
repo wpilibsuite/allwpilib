@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 /**
  * Performs some task using one or more {@link RequireableResource resources} using the
  * collaborative concurrency tools added in Java 21; namely, continuations. Continuations allow
- * commands to be executed concurrently in a collaborative manner as coroutines. Instead of needing
+ * commands to be executed concurrently in a collaborative manner as coroutines; instead of needing
  * to split command behavior into distinct functions (initialize(), execute(), end(), and
  * isFinished()), commands can be implemented with a single, imperative loop.
  *
@@ -21,50 +21,60 @@ import java.util.function.Consumer;
  * command implementation <strong>must</strong> call {@link Coroutine#yield()} within any periodic
  * loop. Failure to do so may result in an unrecoverable infinite loop.
  *
+ * <h2>Requirements</h2>
+ *
+ * <p>Commands require zero or more resources. To prevent conflicting control requests from running
+ * simultaneously (for example, commanding an elevator to both raise and lower at the same time), a
+ * running command has <i>exclusive ownership</i> of all of its required resources. If another
+ * command with an equal or greater {@link #priority()} is scheduled that requires one or more of
+ * those same resources, it will interrupt and cancel the running command.
+ *
+ * <p>The recommended way to create a command is using {@link RequireableResource#run(Consumer)} or
+ * a related factory method to create commands that require a single resource (for example, a
+ * command that drives an elevator up and down or rotates an arm). Commands may be <i>composed</i>
+ * into {@link ParallelGroup parallel groups} and {@link Sequence sequences} to build more complex
+ * behavior out of fundamental building blocks. These built-in compositions will require every
+ * resource used by every command in them, even if those commands aren't always running, and thus
+ * can leave certain required resources in an <i>uncommanded</i> state: owned, but not used, this
+ * can lead to mechanisms sagging under gravity or running the motor control request they were
+ * given.
+ *
+ * <h2>Advanced Usage</h2>
+ *
+ * <p>For example, a hypothetical drive-and-score sequence could be coded in two ways: one with a
+ * sequence chain, or one that uses the lower-level coroutine API. Coroutines can be used in an
+ * async/await style that you may be familiar with from languages like JavaScript, Python, or C#
+ * (note that there is no {@code async} keyword; commands are inherently asynchronous). Nested
+ * commands may be forked and awaited, but will not outlive the command that forked them; there is
+ * no analog for something like a {@code ScheduleCommand} from the v2 commands framework.
+ *
  * <pre>{@code
- * // A 2013-style class-based command definition
- * class ClassBasedCommand extends Command {
- *   public ClassBasedCommand(Subsystem requiredSubsystem) {
- *     addRequirements(requiredSubsystem);
+ * class Robot extends TimedRobot {
+ *   private final Drivetrain drivetrain = new Drivetrain();
+ *   private final Elevator elevator = new Elevator();
+ *   private final Gripper gripper = new Gripper();
+ *
+ *  // Basic sequence builder - owns all 3 mechanisms for the full duration,
+ *  // even when they're not being used
+ *  private Command basicScoringSequence() {
+ *     return drivetrain.driveToScoringLocation()
+ *       .andThen(elevator.moveToScoringHeight())
+ *       .andThen(gripper.release())
+ *       .named("Scoring Sequence (Basic)");
  *   }
  *
- *   @Override
- *   public void initialize() {}
- *
- *   @Override
- *   public void execute() {}
- *
- *   @Override
- *   public void end(boolean interrupted) {}
- *
- *   @Override
- *   public void isFinished() { return true; }
- *
- *   @Override
- *   public String getName() { return "The Command"; }
+ *   // Advanced sequence with async/await - only owns mechanisms while they're
+ *   // being used, allowing default commands or other user-triggered commands
+ *   // to run when not in use. Interrupting one of the inner commands while it's
+ *   // running will cancel the entire sequence.
+ *   private Command advancedScoringSequence() {
+ *     return Command.noRequirements(co -> {
+ *       co.await(drivetrain.driveToScoringLocation());
+ *       co.await(elevator.moveToScoringHeight());
+ *       co.await(gripper.release());
+ *     }).named("Scoring Sequence (Advanced)");
+ *   }
  * }
- *
- * Command command = new ClassBasedCommand(requiredSubsystem);
- *
- * // Or a 2020-style function-based command
- * Command command = requiredSubsystem
- *   .runOnce(() -> initialize())
- *   .andThen(
- *     requiredSubsystem
- *       .run(() -> execute())
- *       .until(() -> isFinished())
- *       .onFinish(() -> end())
- *   ).withName("The Command");
- *
- * // Can be represented with a 2027-style async-based definition
- * Command command = requiredSubsystem.run(coroutine -> {
- *   initialize();
- *   while (!isFinished()) {
- *     coroutine.yield();
- *     execute();
- *   }
- *   end();
- * }).named("The Command");
  * }</pre>
  */
 public interface Command {
