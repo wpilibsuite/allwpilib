@@ -6,8 +6,8 @@ Subject: [PATCH 3/3] Add build files from bzlmod for eigen
 This makes it so our vendored version of eigen matches the same API as
 the upstream eigen in bcr.
 ---
- BUILD.bazel      | 64 +++++++++++++++++++
- WORKSPACE        |  0
+ BUILD.bazel | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ WORKSPACE   |  0
  2 files changed, 64 insertions(+)
  create mode 100644 BUILD.bazel
  create mode 100644 WORKSPACE
@@ -84,3 +84,4 @@ index 0000000000000000000000000000000000000000..38ce6cb417485fb37cafaf1e0f536e7a
 +)
 diff --git a/WORKSPACE b/WORKSPACE
 new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
