@@ -99,10 +99,19 @@ filegroup(
     srcs = glob(["src/generated/main/java/**/*.java"]),
 )
 
-third_party_cc_lib_helper(
-    name = "eigen",
-    include_root = "src/main/native/thirdparty/eigen/include",
+cc_library(
+    name = "eigen-headers",
     visibility = ["//visibility:public"],
+    deps = [
+        "@eigen",
+    ],
+)
+
+pkg_files(
+    name = "eigen-hdrs-pkg",
+    srcs = [
+        "@eigen",
+    ],
 )
 
 third_party_cc_lib_helper(
