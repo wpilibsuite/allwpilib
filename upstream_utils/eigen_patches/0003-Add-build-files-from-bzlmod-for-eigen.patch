@@ -1,7 +1,7 @@
-From 6c9418872ac6cf574795bd2712dbc04ba5645c1d Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Austin Schuh <austin.linux@gmail.com>
 Date: Sat, 9 Aug 2025 12:45:23 -0700
-Subject: Add build files from bzlmod for eigen
+Subject: [PATCH 3/3] Add build files from bzlmod for eigen
 
 This makes it so our vendored version of eigen matches the same API as
 the upstream eigen in bcr.
@@ -12,9 +12,9 @@ the upstream eigen in bcr.
  create mode 100644 wpimath/src/main/native/thirdparty/eigen/include/BUILD.bazel
  create mode 100644 wpimath/src/main/native/thirdparty/eigen/include/WORKSPACE
 
-diff --git a/wpimath/src/main/native/thirdparty/eigen/include/BUILD.bazel b/wpimath/src/main/native/thirdparty/eigen/include/BUILD.bazel
+diff --git a/BUILD.bazel b/BUILD.bazel
 new file mode 100644
-index 000000000..38ce6cb41
+index 0000000000000000000000000000000000000000..38ce6cb417485fb37cafaf1e0f536e7ac56706b0
 --- /dev/null
 +++ b/wpimath/src/main/native/thirdparty/eigen/include/BUILD.bazel
 @@ -0,0 +1,64 @@
@@ -82,9 +82,5 @@ index 000000000..38ce6cb41
 +    includes = ["."],
 +    visibility = ["//visibility:public"],
 +)
-diff --git a/wpimath/src/main/native/thirdparty/eigen/include/WORKSPACE b/wpimath/src/main/native/thirdparty/eigen/include/WORKSPACE
+diff --git a/WORKSPACE b/WORKSPACE
 new file mode 100644
-index 000000000..e69de29bb
--- 
-2.39.5
-

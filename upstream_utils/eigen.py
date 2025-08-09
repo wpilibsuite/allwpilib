@@ -131,11 +131,17 @@ def copy_upstream_src(wpilib_root: Path):
             f, [wpimath / "src/main/native/thirdparty/eigen/include"]
         )
 
-    for f in ["COPYING.APACHE", ".clang-format", "COPYING.BSD", "COPYING.MINPACK", "COPYING.MPL2"]:
-      shutil.copyfile(
-          f,
-          wpimath / "src/main/native/thirdparty/eigen/include" / f,
-      )
+    for f in [
+        ".clang-format",
+        "COPYING.APACHE",
+        "COPYING.BSD",
+        "COPYING.MINPACK",
+        "COPYING.MPL2",
+    ]:
+        shutil.copyfile(
+            f,
+            wpimath / "src/main/native/thirdparty/eigen/include" / f,
+        )
 
 
 def main():
