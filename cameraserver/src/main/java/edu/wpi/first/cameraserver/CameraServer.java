@@ -45,7 +45,7 @@ public final class CameraServer {
   private static final String kPublishName = "/CameraPublisher";
 
   private static final class PropertyPublisher implements AutoCloseable {
-    @SuppressWarnings({"PMD.MissingBreakInSwitch", "PMD.ImplicitSwitchFallThrough", "fallthrough"})
+    @SuppressWarnings("fallthrough")
     PropertyPublisher(NetworkTable table, VideoEvent event) {
       String name;
       String infoName;
@@ -65,7 +65,7 @@ public final class CameraServer {
             break;
           case kEnum:
             m_choicesTopic = table.getStringArrayTopic(infoName + "/choices");
-            // fall through
+          // fallthrough
           case kInteger:
             m_integerValueEntry = table.getIntegerTopic(name).getEntry(0);
             m_minPublisher = table.getIntegerTopic(infoName + "/min").publish();

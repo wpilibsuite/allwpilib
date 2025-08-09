@@ -42,7 +42,6 @@ public class ParallelRaceGroup extends Command {
    *
    * @param commands Commands to add to the group.
    */
-  @SuppressWarnings("PMD.UseArraysAsList")
   public final void addCommands(Command... commands) {
     if (!m_finished) {
       throw new IllegalStateException(

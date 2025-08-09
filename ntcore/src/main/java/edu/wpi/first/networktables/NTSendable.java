@@ -8,6 +8,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
 /** Interface for NetworkTable Sendable objects. */
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface NTSendable extends Sendable {
   /**
    * Initializes this {@link Sendable} object.

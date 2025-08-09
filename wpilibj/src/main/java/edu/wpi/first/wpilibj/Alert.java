@@ -8,6 +8,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -186,7 +187,7 @@ public class Alert implements AutoCloseable {
   private static final class SendableAlerts implements Sendable {
     private static final Map<String, SendableAlerts> groups = new HashMap<String, SendableAlerts>();
 
-    private final Map<AlertType, Set<PublishedAlert>> m_alerts = new HashMap<>();
+    private final EnumMap<AlertType, Set<PublishedAlert>> m_alerts = new EnumMap<>(AlertType.class);
 
     /**
      * Returns a reference to the set of active alerts for the given type.

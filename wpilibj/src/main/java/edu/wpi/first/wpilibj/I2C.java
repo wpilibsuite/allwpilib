@@ -35,6 +35,7 @@ public class I2C implements AutoCloseable {
 
   private final int m_port;
   private final int m_deviceAddress;
+  private ByteBuffer m_readDataToSendBuffer;
 
   /**
    * Constructor.
@@ -253,8 +254,6 @@ public class I2C implements AutoCloseable {
 
     return transaction(registerAddressArray, registerAddressArray.length, buffer, count);
   }
-
-  private ByteBuffer m_readDataToSendBuffer;
 
   /**
    * Execute a read transaction with the device.

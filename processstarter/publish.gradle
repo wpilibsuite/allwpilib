@@ -30,7 +30,7 @@ model {
 
                         // Create the ZIP.
                         def task = project.tasks.create("copyprocessstarterExecutable" + binary.targetPlatform.architecture.name, Zip) {
-                            description("Copies the processstarter executable to the outputs directory.")
+                            description = "Copies the processstarter executable to the outputs directory."
                             destinationDirectory = outputsFolder
 
                             archiveBaseName = zipBaseName
@@ -60,7 +60,7 @@ model {
 
                 artifactId = baseArtifactId
                 groupId = artifactGroupId
-                version wpilibVersioning.version.get()
+                version = wpilibVersioning.version.get()
             }
         }
     }
