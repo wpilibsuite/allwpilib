@@ -135,12 +135,12 @@ python_register_toolchains(
 load("@rules_python//python:pip.bzl", "pip_parse")
 
 pip_parse(
-    name = "allwpilib_pip_deps",
+    name = "pip_deps",
     python_interpreter_target = "@python_3_10_host//:python",
     requirements_lock = "//:requirements_lock.txt",
 )
 
-load("@allwpilib_pip_deps//:requirements.bzl", "install_deps")
+load("@pip_deps//:requirements.bzl", "install_deps")
 
 install_deps()
 
