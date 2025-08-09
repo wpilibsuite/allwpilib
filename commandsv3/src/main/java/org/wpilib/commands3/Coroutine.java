@@ -49,6 +49,7 @@ public final class Coroutine {
       return m_backingContinuation.yield();
     } catch (IllegalStateException e) {
       if ("Pinned: MONITOR".equals(e.getMessage())) {
+        // Note: Not a thing in Java 24+
         // Yielding inside a synchronized block or method
         // Throw with an error message that's more helpful for our users
         throw new IllegalStateException(
