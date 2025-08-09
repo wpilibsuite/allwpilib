@@ -133,10 +133,12 @@ def copy_upstream_src(wpilib_root: Path):
 
     for f in [
         ".clang-format",
+        "BUILD.bazel",
         "COPYING.APACHE",
         "COPYING.BSD",
         "COPYING.MINPACK",
         "COPYING.MPL2",
+        "WORKSPACE",
     ]:
         shutil.copyfile(
             f,
