@@ -6,17 +6,17 @@ Subject: [PATCH 3/3] Add build files from bzlmod for eigen
 This makes it so our vendored version of eigen matches the same API as
 the upstream eigen in bcr.
 ---
- .../thirdparty/eigen/include/BUILD.bazel      | 64 +++++++++++++++++++
- .../native/thirdparty/eigen/include/WORKSPACE |  0
+ BUILD.bazel      | 64 +++++++++++++++++++
+ WORKSPACE        |  0
  2 files changed, 64 insertions(+)
- create mode 100644 wpimath/src/main/native/thirdparty/eigen/include/BUILD.bazel
- create mode 100644 wpimath/src/main/native/thirdparty/eigen/include/WORKSPACE
+ create mode 100644 BUILD.bazel
+ create mode 100644 WORKSPACE
 
 diff --git a/BUILD.bazel b/BUILD.bazel
 new file mode 100644
 index 0000000000000000000000000000000000000000..38ce6cb417485fb37cafaf1e0f536e7ac56706b0
 --- /dev/null
-+++ b/wpimath/src/main/native/thirdparty/eigen/include/BUILD.bazel
++++ b/BUILD.bazel
 @@ -0,0 +1,64 @@
 +load("@rules_cc//cc:cc_library.bzl", "cc_library")
 +load("@rules_license//rules:license.bzl", "license")
