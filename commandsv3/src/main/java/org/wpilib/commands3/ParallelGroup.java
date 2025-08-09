@@ -70,8 +70,8 @@ public class ParallelGroup implements Command {
     }
 
     m_name = name;
-    this.m_commands.addAll(allCommands);
-    this.m_requiredCommands.addAll(requiredCommands);
+    m_commands.addAll(allCommands);
+    m_requiredCommands.addAll(requiredCommands);
 
     for (var command : allCommands) {
       m_requirements.addAll(command.requirements());

@@ -54,7 +54,7 @@ public final class IdleCommand implements Command {
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof IdleCommand other && Objects.equals(this.m_resource, other.m_resource);
+    return obj instanceof IdleCommand other && Objects.equals(m_resource, other.m_resource);
   }
 
   @Override

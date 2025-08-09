@@ -28,7 +28,7 @@ public class ParallelGroupBuilder {
    * @return The builder object, for chaining
    */
   public ParallelGroupBuilder optional(Command... commands) {
-    this.m_commands.addAll(Arrays.asList(commands));
+    m_commands.addAll(Arrays.asList(commands));
     return this;
   }
 
@@ -41,7 +41,7 @@ public class ParallelGroupBuilder {
    */
   public ParallelGroupBuilder requiring(Command... commands) {
     m_requiredCommands.addAll(Arrays.asList(commands));
-    this.m_commands.addAll(m_requiredCommands);
+    m_commands.addAll(m_requiredCommands);
     return this;
   }
 

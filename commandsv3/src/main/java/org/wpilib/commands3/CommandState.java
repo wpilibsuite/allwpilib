@@ -61,7 +61,7 @@ final class CommandState {
   }
 
   public void setLastRuntimeMs(double lastRuntimeMs) {
-    this.m_lastRuntimeMs = lastRuntimeMs;
+    m_lastRuntimeMs = lastRuntimeMs;
     m_totalRuntimeMs += lastRuntimeMs;
   }
 
@@ -75,7 +75,7 @@ final class CommandState {
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof CommandState that && this.m_id == that.m_id;
+    return obj instanceof CommandState that && m_id == that.m_id;
   }
 
   @Override
