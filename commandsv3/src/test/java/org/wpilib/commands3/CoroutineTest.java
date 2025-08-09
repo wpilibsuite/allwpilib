@@ -122,7 +122,32 @@ class CoroutineTest {
       escapeeCallback.get().run();
       fail("Calling coroutine.yield() outside of a command should error");
     } catch (IllegalStateException expected) {
-      assertEquals("Coroutines can only be used while running in a command", expected.getMessage());
+      assertEquals(
+          "Coroutines can only be used by the command bound to them", expected.getMessage());
+    }
+  }
+
+  @Test
+  void usingParentCoroutineInChildThrows() {
+    var parent =
+        Command.noRequirements(
+                parentCoroutine -> {
+                  parentCoroutine.await(
+                      Command.noRequirements(
+                              childCoroutine -> {
+                                parentCoroutine.yield();
+                              })
+                          .named("Child"));
+                })
+            .named("Parent");
+
+    m_scheduler.schedule(parent);
+    try {
+      m_scheduler.run();
+      fail("Calling parentCoroutine.yield() in a child command should error");
+    } catch (IllegalStateException expected) {
+      assertEquals(
+          "Coroutines can only be used by the command bound to them", expected.getMessage());
     }
   }
 

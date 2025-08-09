@@ -14,7 +14,9 @@ import java.util.stream.Collectors;
 
 /**
  * A coroutine object is injected into command's {@link Command#run(Coroutine)} method to allow
- * commands to yield and compositions to run other commands.
+ * commands to yield and compositions to run other commands. Commands are considered <i>bound</i> to
+ * a coroutine while they're scheduled; attempting to use a coroutine outside the command bound to
+ * it will result in an {@code IllegalStateException} being thrown.
  */
 public final class Coroutine {
   private final Scheduler m_scheduler;
@@ -38,6 +40,7 @@ public final class Coroutine {
    * as "pausing" the currently executing command.
    *
    * @return true
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
   public boolean yield() {
     requireMounted();
@@ -63,6 +66,8 @@ public final class Coroutine {
   /**
    * Parks the current command. No code in a command declared after calling {@code park()} will be
    * executed. A parked command will never complete naturally and must be interrupted or cancelled.
+   *
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
   @SuppressWarnings("InfiniteLoopStatement")
   public void park() {
@@ -95,6 +100,7 @@ public final class Coroutine {
    * command will not be scheduled, and the existing command will continue to run.
    *
    * @param commands The commands to fork.
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
   public void fork(Command... commands) {
     requireMounted();
@@ -113,8 +119,7 @@ public final class Coroutine {
    * be scheduled automatically.
    *
    * @param command the command to await
-   * @throws IllegalStateException if the given command uses a resource not owned by the calling
-   *     command
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
   public void await(Command command) {
     requireMounted();
@@ -134,6 +139,7 @@ public final class Coroutine {
    *
    * @param commands the commands to await
    * @throws IllegalArgumentException if any of the commands conflict with each other
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
   public void awaitAll(Collection<Command> commands) {
     requireMounted();
@@ -157,6 +163,7 @@ public final class Coroutine {
    *
    * @param commands the commands to await
    * @throws IllegalArgumentException if any of the commands conflict with each other
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
   public void awaitAll(Command... commands) {
     awaitAll(Arrays.asList(commands));
@@ -168,6 +175,7 @@ public final class Coroutine {
    *
    * @param commands the commands to await
    * @throws IllegalArgumentException if any of the commands conflict with each other
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
   public void awaitAny(Collection<Command> commands) {
     requireMounted();
@@ -193,6 +201,7 @@ public final class Coroutine {
    *
    * @param commands the commands to await
    * @throws IllegalArgumentException if any of the commands conflict with each other
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
   public void awaitAny(Command... commands) {
     awaitAny(Arrays.asList(commands));
@@ -248,6 +257,7 @@ public final class Coroutine {
    * }</pre>
    *
    * @param duration the duration of time to wait
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
   public void wait(Time duration) {
     requireMounted();
@@ -259,6 +269,7 @@ public final class Coroutine {
    * Yields until a condition is met.
    *
    * @param condition The condition to wait for
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
   public void waitUntil(BooleanSupplier condition) {
     requireMounted();
@@ -275,8 +286,11 @@ public final class Coroutine {
    * lives longer than the command that scheduled it.
    *
    * @return the command scheduler backing this coroutine
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
   public Scheduler scheduler() {
+    requireMounted();
+
     return m_scheduler;
   }
 
@@ -294,7 +308,7 @@ public final class Coroutine {
       return;
     }
 
-    throw new IllegalStateException("Coroutines can only be used while running in a command");
+    throw new IllegalStateException("Coroutines can only be used by the command bound to them");
   }
 
   // Package-private for interaction with the scheduler.
