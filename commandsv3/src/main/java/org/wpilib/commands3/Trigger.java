@@ -15,15 +15,30 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import org.wpilib.commands3.button.CommandXboxController;
 
 /**
- * This class provides an easy way to link commands to conditions.
+ * Triggers allow users to specify conditions for when commands should run. Triggers can be set up
+ * to read from joystick and controller buttons (eg {@link CommandXboxController#x()}) or be
+ * customized to read sensor values or any other arbitrary true/false condition.
  *
  * <p>It is very easy to link a button to a command. For instance, you could link the trigger button
  * of a joystick to a "score" command.
  *
  * <p>Triggers can easily be composed for advanced functionality using the {@link
  * #and(BooleanSupplier)}, {@link #or(BooleanSupplier)}, {@link #negate()} operators.
+ *
+ * <p>Trigger bindings created inside a running command will only be active while that command is
+ * running. This is useful for defining trigger-based behavior only in a certain scope and avoids
+ * needing to create dozens of global triggers.
+ *
+ * <pre>{@code
+ * Command shootWhileAiming = Command.noRequirements(co -> {
+ *   turret.atTarget.onTrue(shooter.shootOnce());
+ *   co.await(turret.lockOnGoal());
+ * }).named("Shoot While Aiming");
+ * controller.rightBumper().whileTrue(shootWhileAiming);
+ * }</pre>
  */
 public class Trigger implements BooleanSupplier {
   private final BooleanSupplier m_condition;

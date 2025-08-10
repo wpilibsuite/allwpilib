@@ -4,9 +4,12 @@
 
 package org.wpilib.commands3;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.wpilibj.RobotController;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +20,7 @@ class TriggerTest {
   @BeforeEach
   void setup() {
     m_scheduler = new Scheduler();
+    RobotController.setTimeSource(() -> System.nanoTime() / 1000);
   }
 
   @Test
@@ -147,7 +151,9 @@ class TriggerTest {
         Command.noRequirements(
                 co -> {
                   new Trigger(m_scheduler, innerSignal::get).onTrue(inner);
-                  co.yield();
+                  // If we yield, then the outer command exits and immediately cancels the
+                  // on-deck inner command before it can run
+                  co.park();
                 })
             .named("Outer");
 
@@ -184,5 +190,61 @@ class TriggerTest {
     assertFalse(
         m_scheduler.isRunning(command),
         "Command should have been cancelled when scope became inactive");
+  }
+
+  // The scheduler lifecycle polls triggers at the start of `run()`
+  // Even though the trigger condition is set, the command exits and the trigger's scope goes
+  // inactive before the next `run()` call can poll the trigger
+  @Test
+  void triggerFromExitingCommandDoesNotFire() {
+    var condition = new AtomicBoolean(false);
+    var triggeredCommandRan = new AtomicBoolean(false);
+
+    var inner =
+        Command.noRequirements(
+                co -> {
+                  triggeredCommandRan.set(true);
+                  co.park();
+                })
+            .named("Inner");
+
+    var awaited =
+        Command.noRequirements(
+                co -> {
+                  co.yield();
+                  condition.set(true);
+                })
+            .named("Awaited");
+
+    var outer =
+        Command.noRequirements(
+                co -> {
+                  new Trigger(m_scheduler, condition::get).onTrue(inner);
+                  co.await(awaited);
+                })
+            .named("Outer");
+
+    m_scheduler.schedule(outer);
+
+    // First run: schedules `awaited`, yields
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(outer));
+    assertTrue(m_scheduler.isRunning(awaited));
+
+    // Second run: `awaited` resumes, sets the condition, exits. `outer` exits its final `yield`
+    // and will exit on the next run. The trigger condition has been set, but the trigger is checked
+    // on the next call to `run()`
+    m_scheduler.run();
+    assertEquals(
+        List.of("Outer"), m_scheduler.getRunningCommands().stream().map(Command::name).toList());
+    assertTrue(condition.get(), "Condition wasn't set");
+    assertFalse(triggeredCommandRan.get(), "Command was unexpectedly triggered");
+
+    // Third run: trigger binding fires (outside a running command) and queues up `inner`.
+    // However, the inner command's lifetime is bound to `outer`, and is immediately canceled before
+    // it can run when the outer command exits.
+    m_scheduler.run();
+    assertEquals(List.of(), m_scheduler.getRunningCommands().stream().map(Command::name).toList());
+    assertFalse(triggeredCommandRan.get(), "Command was unexpectedly triggered");
   }
 }

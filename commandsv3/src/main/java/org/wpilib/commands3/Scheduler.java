@@ -285,7 +285,15 @@ public class Scheduler implements ProtobufSerializable {
     // so at this point we're guaranteed to be >= priority than anything already on deck
     evictConflictingOnDeckCommands(command);
 
-    var state = new CommandState(command, currentCommand(), buildCoroutine(command), binding);
+    // If the binding was declared inside a running command, that command is the parent (the current
+    // command will always be null in this case, since triggers are polled before commands are
+    // mounted and run). Otherwise, the parent is the command that's running at the time `schedule`
+    // is called - which may be null.
+    var parent =
+        binding.scope() instanceof BindingScope.ForCommand scope
+            ? scope.command()
+            : currentCommand();
+    var state = new CommandState(command, parent, buildCoroutine(command), binding);
 
     emitEvent(SchedulerEvent.scheduled(command));
 
