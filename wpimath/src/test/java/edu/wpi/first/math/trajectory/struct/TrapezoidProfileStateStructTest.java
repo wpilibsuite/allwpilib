@@ -4,23 +4,22 @@
 
 package edu.wpi.first.math.trajectory.struct;
 
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import org.junit.jupiter.api.Test;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TrapezoidProfileStateStructTest {
-    private static final TrapezoidProfile.State STATE = new TrapezoidProfile.State(4.0, 5.0);
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import org.junit.jupiter.api.Test;
 
-    @Test
-    void testRoundtrip() {
-        ByteBuffer buffer = ByteBuffer.allocate(TrapezoidProfile.State.struct.getSize());
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-        TrapezoidProfile.State.struct.pack(buffer, STATE);
-        buffer.rewind();
-        assertEquals(STATE, TrapezoidProfile.State.struct.unpack(buffer));
-    }
+class TrapezoidProfileStateStructTest {
+  private static final TrapezoidProfile.State STATE = new TrapezoidProfile.State(4.0, 5.0);
+
+  @Test
+  void testRoundtrip() {
+    ByteBuffer buffer = ByteBuffer.allocate(TrapezoidProfile.State.struct.getSize());
+    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    TrapezoidProfile.State.struct.pack(buffer, STATE);
+    buffer.rewind();
+    assertEquals(STATE, TrapezoidProfile.State.struct.unpack(buffer));
+  }
 }
