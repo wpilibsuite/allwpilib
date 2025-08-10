@@ -71,6 +71,27 @@ class DebouncerTest {
   }
 
   @Test
+  void debounceResetTest() {
+    var debouncer = new Debouncer(1.0, Debouncer.DebounceType.kFalling);
+
+    // This is true because the timer hasn't yet elapsed, so it returns the baseline.
+    assertTrue(debouncer.calculate(false));
+
+    // Clears timer to be (effectively) elapsed.
+    debouncer.reset();
+
+    // Now, the debouncer accepts the new input and returns it rather than the baseline.
+    assertFalse(debouncer.calculate(false));
+
+    // The baseline here returns true and also resets the timer so that it now behaves like it did
+    // at the start of the test.
+    assertTrue(debouncer.calculate(true));
+
+    // Ensure consistency with previous behavior.
+    assertTrue(debouncer.calculate(false));
+  }
+
+  @Test
   void debounceParamsTest() {
     var debouncer = new Debouncer(0.02, Debouncer.DebounceType.kBoth);
 
