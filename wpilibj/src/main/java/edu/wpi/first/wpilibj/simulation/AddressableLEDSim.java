@@ -27,7 +27,6 @@ public class AddressableLEDSim {
    *
    * @param addressableLED AddressableLED to simulate
    */
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public AddressableLEDSim(AddressableLED addressableLED) {
     m_channel = addressableLED.getChannel();
   }

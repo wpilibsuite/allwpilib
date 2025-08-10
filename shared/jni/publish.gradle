@@ -85,8 +85,8 @@ model {
                 artifact cppSourcesZip
 
                 artifactId = "${baseArtifactId}-cpp"
-                groupId artifactGroupId
-                version wpilibVersioning.version.get()
+                groupId = artifactGroupId
+                version = wpilibVersioning.version.get()
             }
         }
 
@@ -118,8 +118,8 @@ model {
                     }
 
                     artifactId = "${baseArtifactId}-jnicvstatic"
-                    groupId artifactGroupId
-                    version wpilibVersioning.version.get()
+                    groupId = artifactGroupId
+                    version = wpilibVersioning.version.get()
                 }
             }
         }

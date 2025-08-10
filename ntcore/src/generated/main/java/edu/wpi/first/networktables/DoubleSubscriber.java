@@ -9,7 +9,6 @@ package edu.wpi.first.networktables;
 import java.util.function.DoubleSupplier;
 
 /** NetworkTables Double subscriber. */
-@SuppressWarnings("PMD.MissingOverride")
 public interface DoubleSubscriber extends Subscriber, DoubleSupplier {
   /**
    * Get the corresponding topic.
