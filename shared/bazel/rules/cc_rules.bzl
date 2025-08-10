@@ -222,6 +222,7 @@ def third_party_cc_lib_helper(
         name = name + "-hdrs-pkg",
         srcs = native.glob([include_root + "/**"]),
         strip_prefix = include_root,
+        visibility = visibility,
     )
 
     if src_root:
@@ -252,6 +253,7 @@ def wpilib_cc_library(
         hdrs_pkg_root = "src/main/native/include",
         strip_include_prefix = None,
         linkopts = None,
+        visibility = None,
         **kwargs):
     """
     This function is used to ease the creation of a cc_library with publishing given the standard allwpilib directory structure.
@@ -284,6 +286,7 @@ def wpilib_cc_library(
         hdrs = hdrs,
         deps = [lib + "-headers" for lib in third_party_libraries + third_party_header_only_libraries],
         strip_include_prefix = strip_include_prefix,
+        visibility = visibility,
         **kwargs
     )
 
@@ -295,6 +298,7 @@ def wpilib_cc_library(
         deps = deps + [lib + "-headers" for lib in third_party_libraries + third_party_header_only_libraries],
         strip_include_prefix = strip_include_prefix,
         linkopts = linkopts,
+        visibility = visibility,
         **kwargs
     )
 
@@ -316,6 +320,7 @@ def wpilib_cc_library(
             name = name + "-hdrs-pkg",
             srcs = native.glob([hdrs_pkg_root + "/**"]),
             strip_prefix = hdrs_pkg_root,
+            visibility = visibility,
         )
 
         pkg_zip(
