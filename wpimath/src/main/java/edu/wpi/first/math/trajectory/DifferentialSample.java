@@ -7,9 +7,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.units.measure.Time;
 
-/**
- * Represents a single sample in a differential drive trajectory.
- */
+/** Represents a single sample in a differential drive trajectory. */
 public class DifferentialSample extends TrajectorySample
     implements Interpolatable<TrajectorySample> {
   private final DifferentialDriveKinematics kinematics;
