@@ -542,7 +542,7 @@
   },
   {
     "name": "SimpleDifferentialDriveSimulation",
-    "description": "Simulate a differential drivetrain and follow trajectories with LTVUnicycleController (non-command-based).",
+    "description": "Simulate a differential drivetrain.",
     "tags": [
       "Differential Drive",
       "State-Space",
