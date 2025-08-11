@@ -6,7 +6,6 @@ package edu.wpi.first.math.kinematics.struct;
 
 import edu.wpi.first.math.kinematics.ChassisAccelerations;
 import edu.wpi.first.util.struct.Struct;
-
 import java.nio.ByteBuffer;
 
 public class ChassisAccelerationsStruct implements Struct<ChassisAccelerations> {

@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -11,17 +13,14 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.struct.ChassisAccelerationsStruct;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
-
 import java.util.Objects;
 
-import static edu.wpi.first.units.Units.*;
-
 /**
- * Represents the acceleration of a robot chassis. Although this class contains similar members compared to
- * a Twist2d, they do NOT represent the same thing. Whereas a Twist2d represents a change in pose
- * w.r.t to the robot frame of reference, a ChassisAccelerations object represents a robot's velocity.
+ * Represents the acceleration of a robot chassis. Although this class contains similar members
+ * compared to a Twist2d, they do NOT represent the same thing. Whereas a Twist2d represents a
+ * change in pose w.r.t to the robot frame of reference, a ChassisAccelerations object represents a
+ * robot's velocity.
  *
  * <p>A strictly non-holonomic drivetrain, such as a differential drive, should never have an ay
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
@@ -63,8 +62,12 @@ public class ChassisAccelerations implements StructSerializable {
    * @param ay Sideways velocity.
    * @param alpha Angular velocity.
    */
-  public ChassisAccelerations(LinearAcceleration ax, LinearAcceleration ay, AngularAcceleration alpha) {
-    this(ax.in(MetersPerSecondPerSecond), ay.in(MetersPerSecondPerSecond), alpha.in(RadiansPerSecondPerSecond));
+  public ChassisAccelerations(
+      LinearAcceleration ax, LinearAcceleration ay, AngularAcceleration alpha) {
+    this(
+        ax.in(MetersPerSecondPerSecond),
+        ay.in(MetersPerSecondPerSecond),
+        alpha.in(RadiansPerSecondPerSecond));
   }
 
   /**
@@ -149,7 +152,8 @@ public class ChassisAccelerations implements StructSerializable {
   }
 
   /**
-   * Subtracts the other ChassisAccelerations from the current ChassisAccelerations and returns the difference.
+   * Subtracts the other ChassisAccelerations from the current ChassisAccelerations and returns the
+   * difference.
    *
    * <p>For example, ChassisAccelerations{5.0, 4.0, 2.0} - ChassisAccelerations{1.0, 2.0, 1.0} =
    * ChassisAccelerations{4.0, 2.0, 1.0}
@@ -162,8 +166,8 @@ public class ChassisAccelerations implements StructSerializable {
   }
 
   /**
-   * Returns the inverse of the current ChassisAccelerations. This is equivalent to negating all components
-   * of the ChassisAccelerations.
+   * Returns the inverse of the current ChassisAccelerations. This is equivalent to negating all
+   * components of the ChassisAccelerations.
    *
    * @return The inverse of the current ChassisAccelerations.
    */

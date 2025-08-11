@@ -476,42 +476,6 @@
     "commandversion": 2
   },
   {
-    "name": "MecanumControllerCommand",
-    "description": "Follow a pre-generated trajectory with a mecanum drive using MecanumControllerCommand.",
-    "tags": [
-      "Command-based",
-      "Mecanum Drive",
-      "Gyro",
-      "Encoder",
-      "Odometry",
-      "Trajectory",
-      "Path Following",
-      "XboxController"
-    ],
-    "foldername": "mecanumcontrollercommand",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "SwerveControllerCommand",
-    "description": "Follow a pre-generated trajectory with a swerve drive using SwerveControllerCommand.",
-    "tags": [
-      "Command-based",
-      "Swerve Drive",
-      "Gyro",
-      "Encoder",
-      "Odometry",
-      "Trajectory",
-      "Path Following",
-      "XboxController"
-    ],
-    "foldername": "swervecontrollercommand",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
     "name": "StateSpaceFlywheel",
     "description": "Control a flywheel using a state-space model (based on values from CAD), with a Kalman Filter and LQR.",
     "tags": [
@@ -578,7 +542,7 @@
   },
   {
     "name": "SimpleDifferentialDriveSimulation",
-    "description": "Simulate a differential drivetrain and follow trajectories with LTVUnicycleController (non-command-based).",
+    "description": "Simulate a differential drivetrain.",
     "tags": [
       "Differential Drive",
       "State-Space",
