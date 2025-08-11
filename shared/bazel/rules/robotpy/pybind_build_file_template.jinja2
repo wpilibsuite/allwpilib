@@ -143,7 +143,7 @@ def publish_library_casters():
         tags = ["robotpy"],
     )
 {% endfor %}
-def define_pybind_library(name, pkgcfgs=[]):
+def define_pybind_library(name, pkgcfgs = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -216,7 +216,7 @@ def define_pybind_library(name, pkgcfgs=[]):
 
     scan_headers(
         name = "{}-scan-headers".format(name),
-        extra_hdrs = native.glob(["{{stripped_include_prefix}}/**/*.h"], allow_empty=True),
+        extra_hdrs = native.glob(["{{stripped_include_prefix}}/**/*.h"], allow_empty = True),
         package_root_file = "{{package_root_file}}",
         pkgcfgs = pkgcfgs,
         pyproject_toml = "{{ stripped_include_prefix }}/pyproject.toml",
