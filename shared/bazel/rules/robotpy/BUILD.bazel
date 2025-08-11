@@ -1,0 +1,85 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement", "whl_requirement")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("@rules_python//python:pip.bzl", "whl_filegroup")
+
+exports_files(["wrapper.py"])
+
+py_library(
+    name = "hack_pkgcfgs",
+    srcs = ["hack_pkgcfgs.py"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "generation_utils",
+    srcs = ["generation_utils.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        requirement("semiwrap"),
+        requirement("jinja2"),
+    ],
+)
+
+py_binary(
+    name = "generate_native_build_file",
+    srcs = ["generate_native_build_file.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":generation_utils",
+        ":hack_pkgcfgs",
+        requirement("semiwrap"),
+        requirement("jinja2"),
+    ],
+)
+
+filegroup(
+    name = "jinja_templates",
+    srcs = glob(["*.jinja2"]),
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "generate_pybind_build_file",
+    srcs = ["generate_pybind_build_file.py"],
+    data = [
+        ":jinja_templates",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":generation_utils",
+        ":hack_pkgcfgs",
+        requirement("semiwrap"),
+        requirement("jinja2"),
+    ],
+)
+
+py_binary(
+    name = "wrapper",
+    srcs = ["wrapper.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//shared/bazel/rules/robotpy:hack_pkgcfgs",
+        requirement("semiwrap"),
+    ],
+)
+
+whl_filegroup(
+    name = "semiwrap_header_files",
+    pattern = "semiwrap/include",
+    whl = whl_requirement("semiwrap"),
+)
+
+cc_library(
+    name = "semiwrap_headers",
+    hdrs = [":semiwrap_header_files"],
+    includes = ["semiwrap_header_files/semiwrap/include"],
+    visibility = ["//visibility:public"],
+)
+
+whl_filegroup(
+    name = "semiwrap_casters_files",
+    pattern = "semiwrap/semiwrap.pybind11.json",
+    visibility = ["//visibility:public"],
+    whl = whl_requirement("semiwrap"),
+)
