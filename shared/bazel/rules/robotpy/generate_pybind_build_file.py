@@ -134,7 +134,7 @@ class GenPkgConfConfig:
     def __init__(self, item: BuildTarget):
         self.module_pkg_name = item.args[0]
         self.pkg_name = item.args[1]
-        self.project_file = pathlib.Path(*item.args[2].path.parts[1:])
+        self.project_file = item.args[2].path
         self.output_file = item.args[3].name
         # --libinit-py = 4
         self.libinit_py = item.args[5]
@@ -159,7 +159,7 @@ class GenModInitHpp:
 
 class PublishCastersConfig:
     def __init__(self, projectcfg, item: BuildTarget):
-        self.project_file = pathlib.Path(*item.args[0].path.parts[1:])
+        self.project_file = item.args[0].path
         self.casters_name = item.args[1]
         self.json_output = item.args[2].name
         self.pc_output = item.args[3].name

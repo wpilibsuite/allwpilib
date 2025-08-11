@@ -55,7 +55,7 @@ def {{extension_module.name}}_extension(srcs = [], header_to_dat_deps = [], extr
         output_file = "{{ extension_module.gen_pkgconf.output_file }}",
         pkg_name = "{{ extension_module.gen_pkgconf.pkg_name }}",
         install_path = "{{stripped_include_prefix}}/{{ extension_module.gen_pkgconf.install_path }}",
-        project_file = "{{ extension_module.gen_pkgconf.project_file }}",
+        project_file = "{{ stripped_include_prefix }}/{{ extension_module.gen_pkgconf.project_file }}",
         package_root = "{{package_root_file}}",
     )
 
@@ -129,7 +129,7 @@ def publish_library_casters():
         caster_name = "{{caster_info.casters_name}}",
         output_json = "{{stripped_include_prefix}}/{{caster_info.install_path}}/{{caster_info.json_output}}",
         output_pc = "{{stripped_include_prefix}}/{{caster_info.install_path}}/{{caster_info.pc_output}}",
-        project_config = "{{caster_info.project_file}}",
+        project_config = "{{ stripped_include_prefix }}/{{caster_info.project_file}}",
         package_root = "{{package_root_file}}",
         typecasters_srcs = native.glob([{% for inc in caster_info.include_paths %}"{{ inc }}/**"{% if not loop.last%}, {% endif %}{% endfor %}]),
     )
