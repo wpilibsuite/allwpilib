@@ -7,7 +7,6 @@ package edu.wpi.first.math.controller;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -114,19 +113,6 @@ public class HolonomicDriveController {
     // Return next output.
     return new ChassisSpeeds(xFF + xFeedback, yFF + yFeedback, thetaFF)
         .toRobotRelative(currentPose.getRotation());
-  }
-
-  /**
-   * Returns the next output of the holonomic drive controller.
-   *
-   * @param currentPose The current pose, as measured by odometry or pose estimator.
-   * @param desiredState The desired trajectory pose, as sampled for the current timestep.
-   * @param desiredHeading The desired heading.
-   * @return The next output of the holonomic drive controller.
-   */
-  public ChassisSpeeds calculate(
-      Pose2d currentPose, Trajectory.State desiredState, Rotation2d desiredHeading) {
-    return calculate(currentPose, desiredState.pose, desiredState.velocity, desiredHeading);
   }
 
   /**

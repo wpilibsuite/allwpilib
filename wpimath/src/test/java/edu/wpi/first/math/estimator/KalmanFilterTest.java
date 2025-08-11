@@ -4,15 +4,10 @@
 
 package edu.wpi.first.math.estimator;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
@@ -20,11 +15,12 @@ import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import java.util.List;
-import java.util.Random;
 import org.junit.jupiter.api.Test;
+
+import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class KalmanFilterTest {
   private static LinearSystem<N2, N1, N2> elevatorPlant;
@@ -138,56 +134,4 @@ class KalmanFilterTest {
     assertEquals(0.0, filter.getXhat(1), 0.2);
   }
 
-  @Test
-  void testSwerveKFMovingOverTrajectory() {
-    var random = new Random();
-
-    var filter =
-        new KalmanFilter<>(
-            Nat.N6(),
-            Nat.N3(),
-            m_swerveObserverSystem,
-            VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1), // state
-            // weights
-            VecBuilder.fill(4, 4, 4), // measurement weights
-            0.020);
-
-    var trajectory =
-        TrajectoryGenerator.generateTrajectory(
-            List.of(new Pose2d(0, 0, Rotation2d.kZero), new Pose2d(5, 5, Rotation2d.kZero)),
-            new TrajectoryConfig(2, 2));
-    var time = 0.0;
-    var lastVelocity = VecBuilder.fill(0.0, 0.0, 0.0);
-
-    while (time <= trajectory.getTotalTime()) {
-      var sample = trajectory.sample(time);
-      var measurement =
-          VecBuilder.fill(
-              sample.pose.getTranslation().getX() + random.nextGaussian() / 5d,
-              sample.pose.getTranslation().getY() + random.nextGaussian() / 5d,
-              sample.pose.getRotation().getRadians() + random.nextGaussian() / 3d);
-
-      var velocity =
-          VecBuilder.fill(
-              sample.velocity * sample.pose.getRotation().getCos(),
-              sample.velocity * sample.pose.getRotation().getSin(),
-              sample.curvature * sample.velocity);
-      var u = (velocity.minus(lastVelocity)).div(0.020);
-      lastVelocity = velocity;
-
-      filter.correct(u, measurement);
-      filter.predict(u, 0.020);
-
-      time += 0.020;
-    }
-
-    assertEquals(
-        trajectory.sample(trajectory.getTotalTime()).pose.getTranslation().getX(),
-        filter.getXhat(0),
-        0.2);
-    assertEquals(
-        trajectory.sample(trajectory.getTotalTime()).pose.getTranslation().getY(),
-        filter.getXhat(1),
-        0.2);
-  }
 }

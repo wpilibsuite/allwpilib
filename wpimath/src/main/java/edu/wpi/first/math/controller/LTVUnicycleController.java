@@ -16,7 +16,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.Discretization;
-import edu.wpi.first.math.trajectory.Trajectory;
 
 /**
  * The linear time-varying unicycle controller has a similar form to the LQR, but the model used to
@@ -190,24 +189,6 @@ public class LTVUnicycleController {
 
     return new ChassisSpeeds(
         linearVelocityRef + u.get(0, 0), 0.0, angularVelocityRef + u.get(1, 0));
-  }
-
-  /**
-   * Returns the next output of the LTV controller.
-   *
-   * <p>The reference pose, linear velocity, and angular velocity should come from a drivetrain
-   * trajectory.
-   *
-   * @param currentPose The current pose.
-   * @param desiredState The desired pose, linear velocity, and angular velocity from a trajectory.
-   * @return The linear and angular velocity outputs of the LTV controller.
-   */
-  public ChassisSpeeds calculate(Pose2d currentPose, Trajectory.State desiredState) {
-    return calculate(
-        currentPose,
-        desiredState.pose,
-        desiredState.velocity,
-        desiredState.velocity * desiredState.curvature);
   }
 
   /**
