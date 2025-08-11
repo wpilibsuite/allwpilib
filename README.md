@@ -42,11 +42,11 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 
 ## Requirements
 
-- [JDK 17](https://adoptium.net/temurin/releases/?version=17)
+- [JDK 21](https://adoptium.net/temurin/releases/?version=21)
     - Note that the JRE is insufficient; the full JDK is required
-    - On Ubuntu, run `sudo apt install openjdk-17-jdk`
-    - On Windows, install the JDK 17 .msi from the link above
-    - On macOS, install the JDK 17 .pkg from the link above
+    - On Ubuntu, run `sudo apt install openjdk-21-jdk`
+    - On Windows, install the JDK 21 .msi from the link above
+    - On macOS, install the JDK 21 .pkg from the link above
 - C++ compiler
     - On Linux, install GCC 11 or greater
     - On Windows, install [Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio)
@@ -57,9 +57,12 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 - Raspberry Pi toolchain (optional)
     - Run `./gradlew installArm32Toolchain` after cloning this repository
 
+
 On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be able to use the macOS x86 roboRIO toolchain on ARM.
 
 On linux, run `sudo apt install gfortran`. This is necessary to be able to build WPIcal on linux platforms.
+
+On linux, run `sudo apt install libx11-dev libgl-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev` to be able to build things depending on glfw.
 
 ## Setup
 

@@ -61,6 +61,12 @@ __declspec(dllexport)
       reinterpret_cast<void*>((AddGuiEarlyExecuteFn)&AddGuiEarlyExecute));
   HAL_RegisterExtension(HALSIMGUI_EXT_GUIEXIT,
                         reinterpret_cast<void*>((GuiExitFn)&GuiExit));
+  HAL_RegisterExtension(
+      HALSIMGUI_EXT_GETGUICONTEXT,
+      reinterpret_cast<void*>((GetGuiContextFn)&gui::GetCurrentContext));
+  HAL_RegisterExtension(
+      HALSIMGUI_EXT_GETGLASSCONTEXT,
+      reinterpret_cast<void*>((GetGlassContextFn)&glass::GetCurrentContext));
 
   HALSimGui::GlobalInit();
   DriverStationGui::GlobalInit();
@@ -150,6 +156,9 @@ __declspec(dllexport)
                        ImGuiConfigFlags_DockingEnable)) {
     return 0;
   }
+  HAL_RegisterExtension(
+      HALSIMGUI_EXT_GETIMGUICONTEXT,
+      reinterpret_cast<void*>((GetImguiContextFn)&ImGui::GetCurrentContext));
   HAL_RegisterExtensionListener(
       nullptr, [](void*, const char* name, void* data) {
         if (std::string_view{name} == "ds_socket") {

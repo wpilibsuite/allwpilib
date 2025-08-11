@@ -114,10 +114,21 @@ TEST(Translation3dTest, Norm) {
   EXPECT_NEAR(one.Norm().value(), std::hypot(3, 5, 7), kEpsilon);
 }
 
+TEST(Translation3dTest, SquaredNorm) {
+  const Translation3d one{3_m, 5_m, 7_m};
+  EXPECT_NEAR(one.SquaredNorm().value(), 83.0, kEpsilon);
+}
+
 TEST(Translation3dTest, Distance) {
   const Translation3d one{1_m, 1_m, 1_m};
   const Translation3d two{6_m, 6_m, 6_m};
   EXPECT_NEAR(one.Distance(two).value(), 5 * std::sqrt(3), kEpsilon);
+}
+
+TEST(Translation3dTest, SquaredDistance) {
+  const Translation3d one{1_m, 1_m, 1_m};
+  const Translation3d two{6_m, 6_m, 6_m};
+  EXPECT_NEAR(one.SquaredDistance(two).value(), 75.0, kEpsilon);
 }
 
 TEST(Translation3dTest, UnaryMinus) {
@@ -213,4 +224,20 @@ TEST(Translation3dTest, Nearest) {
   EXPECT_DOUBLE_EQ(nearest3.X().value(), translation2.X().value());
   EXPECT_DOUBLE_EQ(nearest3.Y().value(), translation2.Y().value());
   EXPECT_DOUBLE_EQ(nearest3.Z().value(), translation2.Z().value());
+}
+
+TEST(Translation3dTest, Dot) {
+  const Translation3d one{1_m, 2_m, 3_m};
+  const Translation3d two{4_m, 5_m, 6_m};
+  EXPECT_NEAR(one.Dot(two).value(), 32.0, kEpsilon);
+}
+
+TEST(Translation3dTest, Cross) {
+  const Translation3d one{1_m, 2_m, 3_m};
+  const Translation3d two{4_m, 5_m, 6_m};
+
+  auto cross = one.Cross(two);
+  EXPECT_NEAR(cross[0].value(), -3.0, kEpsilon);
+  EXPECT_NEAR(cross[1].value(), 6.0, kEpsilon);
+  EXPECT_NEAR(cross[2].value(), -3.0, kEpsilon);
 }

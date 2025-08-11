@@ -42,6 +42,8 @@ nativeUtils.platformConfigs.each {
 nativeUtils.platformConfigs.each {
   if (it.name.contains('linux')) {
     it.cppCompiler.debugArgs.add("-gz=zlib")
+    // Make warning in OpenCV 4.10 from GCC 15 not an error
+    it.cppCompiler.args.add("-Wno-error=overloaded-virtual")
   }
 }
 

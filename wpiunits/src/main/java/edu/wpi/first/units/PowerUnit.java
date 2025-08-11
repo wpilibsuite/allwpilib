@@ -7,8 +7,6 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Joules;
 import static edu.wpi.first.units.Units.Seconds;
 
-import edu.wpi.first.units.measure.ImmutablePower;
-import edu.wpi.first.units.measure.MutPower;
 import edu.wpi.first.units.measure.Power;
 
 /**
@@ -112,12 +110,12 @@ public final class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
 
   @Override
   public Power of(double magnitude) {
-    return new ImmutablePower(magnitude, toBaseUnits(magnitude), this);
+    return new Power(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Power ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutablePower(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new Power(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -128,11 +126,6 @@ public final class PowerUnit extends PerUnit<EnergyUnit, TimeUnit> {
   @Override
   public Power one() {
     return (Power) super.one();
-  }
-
-  @Override
-  public MutPower mutable(double initialMagnitude) {
-    return new MutPower(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @Override

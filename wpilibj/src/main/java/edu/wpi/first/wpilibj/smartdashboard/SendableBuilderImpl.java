@@ -58,7 +58,6 @@ import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 /** Implementation detail for SendableBuilder. */
-@SuppressWarnings("PMD.CompareObjectsWithEquals")
 public class SendableBuilderImpl implements NTSendableBuilder {
   @FunctionalInterface
   private interface TimedConsumer<T> {

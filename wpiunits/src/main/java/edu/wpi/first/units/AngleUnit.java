@@ -5,7 +5,6 @@
 package edu.wpi.first.units;
 
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.MutAngle;
 
 /**
  * Unit of angular dimension.
@@ -47,11 +46,6 @@ public final class AngleUnit extends Unit {
   @Override
   public Angle ofBaseUnits(double baseUnitMagnitude) {
     return Angle.ofBaseUnits(baseUnitMagnitude, this);
-  }
-
-  @Override
-  public MutAngle mutable(double initialMagnitude) {
-    return new MutAngle(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @Override

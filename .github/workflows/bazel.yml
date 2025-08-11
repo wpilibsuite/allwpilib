@@ -12,8 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Windows (native)",             os: windows-2022, action: "test",  config: "--config=windows",     }
-          - { name: "Windows (arm)",                os: windows-2022, action: "build", config: "--config=windows_arm", }
+          - { name: "Windows (native)",             os: windows-2022, action: "test",  config: "--config=ci_windows_x86",     }
+          - { name: "Windows (arm)",                os: windows-2022, action: "build", config: "--config=windows_arm --config=ci_windows_arm", }
 
     name: "Build ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -22,8 +22,8 @@ jobs:
         with: { fetch-depth: 0 }
       - uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: 17
+          distribution: 'temurin'
+          java-version: 21
           architecture: x64
 
       - id: Setup_build_buddy
@@ -42,6 +42,11 @@ jobs:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+
       - id: Setup_build_buddy
         uses: ./.github/actions/setup-build-buddy
         with:
@@ -56,7 +61,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Linux",      os: ubuntu-24.04,   container: "wpilib/ubuntu-base:24.04", action: "test",   config: "",    }
+          - { name: "Linux",      os: ubuntu-24.04,   container: "wpilib/systemcore-cross-ubuntu:2027-24.04", action: "test",   config: "",    }
     name: "${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}

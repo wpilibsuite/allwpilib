@@ -9,7 +9,6 @@ package edu.wpi.first.networktables;
 import java.util.function.Supplier;
 
 /** NetworkTables generic subscriber. */
-@SuppressWarnings("PMD.MissingOverride")
 public interface GenericSubscriber extends Subscriber, Supplier<NetworkTableValue> {
   /**
    * Get the corresponding topic.

@@ -7,8 +7,6 @@ package edu.wpi.first.units;
 import static edu.wpi.first.units.Units.Value;
 
 import edu.wpi.first.units.measure.Frequency;
-import edu.wpi.first.units.measure.ImmutableFrequency;
-import edu.wpi.first.units.measure.MutFrequency;
 
 /** A unit of frequency like {@link edu.wpi.first.units.Units#Hertz}. */
 public final class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
@@ -62,12 +60,12 @@ public final class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
 
   @Override
   public Frequency of(double magnitude) {
-    return new ImmutableFrequency(magnitude, toBaseUnits(magnitude), this);
+    return new Frequency(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Frequency ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableFrequency(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new Frequency(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -78,11 +76,6 @@ public final class FrequencyUnit extends PerUnit<DimensionlessUnit, TimeUnit> {
   @Override
   public Frequency one() {
     return (Frequency) super.one();
-  }
-
-  @Override
-  public MutFrequency mutable(double initialMagnitude) {
-    return new MutFrequency(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @Override

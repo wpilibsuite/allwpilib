@@ -4,11 +4,22 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "generate_def_windows", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
+load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 load("//wpimath:generate.bzl", "generate_wpimath")
+
+filegroup(
+    name = "doxygen-files",
+    srcs = glob([
+        "src/generated/main/native/cpp/wpimath/protobuf/*.h",
+        "src/main/native/include/**/*",
+        "src/main/native/thirdparty/gcem/include/**/*",
+        "src/main/native/thirdparty/sleipnir/include/**/*",
+    ]),
+    visibility = ["//visibility:public"],
+)
 
 filegroup(
     name = "templates",
@@ -91,6 +102,7 @@ filegroup(
 third_party_cc_lib_helper(
     name = "eigen",
     include_root = "src/main/native/thirdparty/eigen/include",
+    visibility = ["//visibility:public"],
 )
 
 third_party_cc_lib_helper(
@@ -154,6 +166,17 @@ wpilib_cc_library(
     ],
 )
 
+generate_def_windows(
+    name = "wpimath_def",
+    filters = [
+        ".pb.obj",
+        ".npb.obj",
+    ],
+    deps = [
+        ":wpimath",
+    ],
+)
+
 wpilib_cc_shared_library(
     name = "shared/wpimath",
     auto_export_windows_symbols = False,
@@ -161,6 +184,7 @@ wpilib_cc_shared_library(
         "//wpiutil:shared/wpiutil",
     ],
     visibility = ["//visibility:public"],
+    win_def_file = ":wpimath_def",
     deps = [
         ":wpimath",
     ],
@@ -194,6 +218,7 @@ wpilib_cc_shared_library(
         ":shared/wpimath",
         "//wpiutil:shared/wpiutil",
     ],
+    use_debug_name = False,
     visibility = ["//visibility:public"],
     deps = [":wpimathjni"],
 )
@@ -236,7 +261,6 @@ cc_test(
         "src/test/native/cpp/**/*.h",
     ]),
     tags = [
-        "no-bullseye",
         "no-raspi",
     ],
     deps = [
@@ -285,7 +309,7 @@ py_binary(
     }),
 )
 
-package_minimal_jni_project(
+package_default_jni_project(
     name = "wpimath",
     maven_artifact_name = "wpimath-cpp",
     maven_group_id = "edu.wpi.first.wpimath",

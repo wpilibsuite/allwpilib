@@ -9,37 +9,46 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
-public interface Dimensionless extends Measure<DimensionlessUnit> {
-  static  Dimensionless ofRelativeUnits(double magnitude, DimensionlessUnit unit) {
-    return new ImmutableDimensionless(magnitude, unit.toBaseUnits(magnitude), unit);
+@SuppressWarnings({"unchecked", "cast", "checkstyle"})
+public record Dimensionless(double magnitude, double baseUnitMagnitude, DimensionlessUnit unit) implements Measure<DimensionlessUnit> {
+  /**
+   * For doing math with measures of a known dimension but an unknown unit. Most users should use
+   * {@link DimensionlessUnit#of(double)} on a known unit from {@link Units} instead of calling this method.
+   * @param magnitude the magnitude of the measurement in terms of the given unit
+   * @param unit the unit of the measurement
+   * @return a measurement object
+   */
+  public static  Dimensionless ofRelativeUnits(double magnitude, DimensionlessUnit unit) {
+    return new Dimensionless(magnitude, unit.toBaseUnits(magnitude), unit);
   }
 
-  static  Dimensionless ofBaseUnits(double baseUnitMagnitude, DimensionlessUnit unit) {
-    return new ImmutableDimensionless(unit.fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, unit);
+  /**
+   * For doing math with measures of a known dimension but an unknown unit. Most users should use
+   * {@link DimensionlessUnit#of(double)} on a known unit from {@link Units} instead of calling this method.
+   * @param baseUnitMagnitude the magnitude of the measurement in terms of the given unit's base unit
+   * @param unit the unit of the measurement
+   * @return a measurement object
+   */
+  public static  Dimensionless ofBaseUnits(double baseUnitMagnitude, DimensionlessUnit unit) {
+    return new Dimensionless(unit.fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, unit);
   }
 
   @Override
-  Dimensionless copy();
+  public DimensionlessUnit baseUnit() { return (DimensionlessUnit) unit().getBaseUnit(); }
 
   @Override
-  default MutDimensionless mutableCopy() {
-    return new MutDimensionless(magnitude(), baseUnitMagnitude(), unit());
-  }
-
-  @Override
-  DimensionlessUnit unit();
-
-  @Override
-  default DimensionlessUnit baseUnit() { return (DimensionlessUnit) unit().getBaseUnit(); }
-
-  @Override
-  default double in(DimensionlessUnit unit) {
+  public double in(DimensionlessUnit unit) {
     return unit.fromBaseUnits(baseUnitMagnitude());
   }
 
   @Override
-  default Dimensionless unaryMinus() {
+  @SuppressWarnings("rawtypes")
+  public boolean equals(Object object) {
+    return object instanceof Dimensionless m && isEquivalent(m);
+  }
+
+  @Override
+  public Dimensionless unaryMinus() {
     return (Dimensionless) unit().ofBaseUnits(0 - baseUnitMagnitude());
   }
 
@@ -51,27 +60,27 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default Dimensionless negate() {
+  public Dimensionless negate() {
     return (Dimensionless) unaryMinus();
   }
 
   @Override
-  default Dimensionless plus(Measure<? extends DimensionlessUnit> other) {
+  public Dimensionless plus(Measure<? extends DimensionlessUnit> other) {
     return (Dimensionless) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
 
   @Override
-  default Dimensionless minus(Measure<? extends DimensionlessUnit> other) {
+  public Dimensionless minus(Measure<? extends DimensionlessUnit> other) {
     return (Dimensionless) unit().ofBaseUnits(baseUnitMagnitude() - other.baseUnitMagnitude());
   }
 
   @Override
-  default Dimensionless times(double multiplier) {
+  public Dimensionless times(double multiplier) {
     return (Dimensionless) unit().ofBaseUnits(baseUnitMagnitude() * multiplier);
   }
 
   @Override
-  default Dimensionless div(double divisor) {
+  public Dimensionless div(double divisor) {
     return (Dimensionless) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
   }
 
@@ -83,18 +92,18 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default Dimensionless divide(double divisor) {
+  public Dimensionless divide(double divisor) {
     return (Dimensionless) div(divisor);
   }
 
 
   @Override
-  default Mult<DimensionlessUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
+  public Mult<DimensionlessUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
     return (Mult<DimensionlessUnit, AccelerationUnit<?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<DimensionlessUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
+  public Per<DimensionlessUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
     return (Per<DimensionlessUnit, AccelerationUnit<?>>) Measure.super.div(divisor);
   }
 
@@ -106,23 +115,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
+  public Per<DimensionlessUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
+  public Per<DimensionlessUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Angle times(Angle multiplier) {
+  public Angle times(Angle multiplier) {
     return Radians.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, AngleUnit> div(Angle divisor) {
+  public Per<DimensionlessUnit, AngleUnit> div(Angle divisor) {
     return (Per<DimensionlessUnit, AngleUnit>) Measure.super.div(divisor);
   }
 
@@ -134,23 +143,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, AngleUnit> divide(Angle divisor) {
+  public Per<DimensionlessUnit, AngleUnit> divide(Angle divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, AngleUnit> per(AngleUnit divisorUnit) {
+  public Per<DimensionlessUnit, AngleUnit> per(AngleUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default AngularAcceleration times(AngularAcceleration multiplier) {
+  public AngularAcceleration times(AngularAcceleration multiplier) {
     return RadiansPerSecondPerSecond.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
+  public Per<DimensionlessUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
     return (Per<DimensionlessUnit, AngularAccelerationUnit>) Measure.super.div(divisor);
   }
 
@@ -162,23 +171,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
+  public Per<DimensionlessUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+  public Per<DimensionlessUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default AngularMomentum times(AngularMomentum multiplier) {
+  public AngularMomentum times(AngularMomentum multiplier) {
     return KilogramMetersSquaredPerSecond.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
+  public Per<DimensionlessUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
     return (Per<DimensionlessUnit, AngularMomentumUnit>) Measure.super.div(divisor);
   }
 
@@ -190,23 +199,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
+  public Per<DimensionlessUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
+  public Per<DimensionlessUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default AngularVelocity times(AngularVelocity multiplier) {
+  public AngularVelocity times(AngularVelocity multiplier) {
     return RadiansPerSecond.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
+  public Per<DimensionlessUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
     return (Per<DimensionlessUnit, AngularVelocityUnit>) Measure.super.div(divisor);
   }
 
@@ -218,23 +227,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
+  public Per<DimensionlessUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+  public Per<DimensionlessUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Current times(Current multiplier) {
+  public Current times(Current multiplier) {
     return Amps.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, CurrentUnit> div(Current divisor) {
+  public Per<DimensionlessUnit, CurrentUnit> div(Current divisor) {
     return (Per<DimensionlessUnit, CurrentUnit>) Measure.super.div(divisor);
   }
 
@@ -246,17 +255,17 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, CurrentUnit> divide(Current divisor) {
+  public Per<DimensionlessUnit, CurrentUnit> divide(Current divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
+  public Per<DimensionlessUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
   @Override
-  default Dimensionless div(Dimensionless divisor) {
+  public Dimensionless div(Dimensionless divisor) {
     return (Dimensionless) Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -268,23 +277,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default Dimensionless divide(Dimensionless divisor) {
+  public Dimensionless divide(Dimensionless divisor) {
     return (Dimensionless) div(divisor);
   }
 
   @Override
-  default Dimensionless times(Dimensionless multiplier) {
+  public Dimensionless times(Dimensionless multiplier) {
     return (Dimensionless) Value.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
 
   @Override
-  default Distance times(Distance multiplier) {
+  public Distance times(Distance multiplier) {
     return Meters.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, DistanceUnit> div(Distance divisor) {
+  public Per<DimensionlessUnit, DistanceUnit> div(Distance divisor) {
     return (Per<DimensionlessUnit, DistanceUnit>) Measure.super.div(divisor);
   }
 
@@ -296,23 +305,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, DistanceUnit> divide(Distance divisor) {
+  public Per<DimensionlessUnit, DistanceUnit> divide(Distance divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+  public Per<DimensionlessUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Energy times(Energy multiplier) {
+  public Energy times(Energy multiplier) {
     return Joules.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, EnergyUnit> div(Energy divisor) {
+  public Per<DimensionlessUnit, EnergyUnit> div(Energy divisor) {
     return (Per<DimensionlessUnit, EnergyUnit>) Measure.super.div(divisor);
   }
 
@@ -324,23 +333,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, EnergyUnit> divide(Energy divisor) {
+  public Per<DimensionlessUnit, EnergyUnit> divide(Energy divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
+  public Per<DimensionlessUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Force times(Force multiplier) {
+  public Force times(Force multiplier) {
     return Newtons.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, ForceUnit> div(Force divisor) {
+  public Per<DimensionlessUnit, ForceUnit> div(Force divisor) {
     return (Per<DimensionlessUnit, ForceUnit>) Measure.super.div(divisor);
   }
 
@@ -352,23 +361,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, ForceUnit> divide(Force divisor) {
+  public Per<DimensionlessUnit, ForceUnit> divide(Force divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, ForceUnit> per(ForceUnit divisorUnit) {
+  public Per<DimensionlessUnit, ForceUnit> per(ForceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Frequency times(Frequency multiplier) {
+  public Frequency times(Frequency multiplier) {
     return Hertz.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, FrequencyUnit> div(Frequency divisor) {
+  public Per<DimensionlessUnit, FrequencyUnit> div(Frequency divisor) {
     return (Per<DimensionlessUnit, FrequencyUnit>) Measure.super.div(divisor);
   }
 
@@ -380,23 +389,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, FrequencyUnit> divide(Frequency divisor) {
+  public Per<DimensionlessUnit, FrequencyUnit> divide(Frequency divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+  public Per<DimensionlessUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default LinearAcceleration times(LinearAcceleration multiplier) {
+  public LinearAcceleration times(LinearAcceleration multiplier) {
     return MetersPerSecondPerSecond.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
+  public Per<DimensionlessUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
     return (Per<DimensionlessUnit, LinearAccelerationUnit>) Measure.super.div(divisor);
   }
 
@@ -408,23 +417,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
+  public Per<DimensionlessUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
+  public Per<DimensionlessUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default LinearMomentum times(LinearMomentum multiplier) {
+  public LinearMomentum times(LinearMomentum multiplier) {
     return KilogramMetersPerSecond.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
+  public Per<DimensionlessUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
     return (Per<DimensionlessUnit, LinearMomentumUnit>) Measure.super.div(divisor);
   }
 
@@ -436,23 +445,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
+  public Per<DimensionlessUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
+  public Per<DimensionlessUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default LinearVelocity times(LinearVelocity multiplier) {
+  public LinearVelocity times(LinearVelocity multiplier) {
     return MetersPerSecond.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
+  public Per<DimensionlessUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
     return (Per<DimensionlessUnit, LinearVelocityUnit>) Measure.super.div(divisor);
   }
 
@@ -464,23 +473,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
+  public Per<DimensionlessUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+  public Per<DimensionlessUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mass times(Mass multiplier) {
+  public Mass times(Mass multiplier) {
     return Kilograms.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, MassUnit> div(Mass divisor) {
+  public Per<DimensionlessUnit, MassUnit> div(Mass divisor) {
     return (Per<DimensionlessUnit, MassUnit>) Measure.super.div(divisor);
   }
 
@@ -492,23 +501,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, MassUnit> divide(Mass divisor) {
+  public Per<DimensionlessUnit, MassUnit> divide(Mass divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, MassUnit> per(MassUnit divisorUnit) {
+  public Per<DimensionlessUnit, MassUnit> per(MassUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default MomentOfInertia times(MomentOfInertia multiplier) {
+  public MomentOfInertia times(MomentOfInertia multiplier) {
     return KilogramSquareMeters.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
+  public Per<DimensionlessUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
     return (Per<DimensionlessUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
   }
 
@@ -520,23 +529,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
+  public Per<DimensionlessUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+  public Per<DimensionlessUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<DimensionlessUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
+  public Mult<DimensionlessUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
     return (Mult<DimensionlessUnit, MultUnit<?, ?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<DimensionlessUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
+  public Per<DimensionlessUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
     return (Per<DimensionlessUnit, MultUnit<?, ?>>) Measure.super.div(divisor);
   }
 
@@ -548,23 +557,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
+  public Per<DimensionlessUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
+  public Per<DimensionlessUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
     return div(divisorUnit.ofNative(1));
   }
 
 
   @Override
-  default Mult<DimensionlessUnit, PerUnit<?, ?>> times(Per<?, ?> multiplier) {
+  public Mult<DimensionlessUnit, PerUnit<?, ?>> times(Per<?, ?> multiplier) {
     return (Mult<DimensionlessUnit, PerUnit<?, ?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<DimensionlessUnit, PerUnit<?, ?>> div(Per<?, ?> divisor) {
+  public Per<DimensionlessUnit, PerUnit<?, ?>> div(Per<?, ?> divisor) {
     return (Per<DimensionlessUnit, PerUnit<?, ?>>) Measure.super.div(divisor);
   }
 
@@ -576,23 +585,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
+  public Per<DimensionlessUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
+  public Per<DimensionlessUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
     return div(divisorUnit.ofNative(1));
   }
 
 
   @Override
-  default Power times(Power multiplier) {
+  public Power times(Power multiplier) {
     return Watts.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, PowerUnit> div(Power divisor) {
+  public Per<DimensionlessUnit, PowerUnit> div(Power divisor) {
     return (Per<DimensionlessUnit, PowerUnit>) Measure.super.div(divisor);
   }
 
@@ -604,23 +613,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, PowerUnit> divide(Power divisor) {
+  public Per<DimensionlessUnit, PowerUnit> divide(Power divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, PowerUnit> per(PowerUnit divisorUnit) {
+  public Per<DimensionlessUnit, PowerUnit> per(PowerUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Resistance times(Resistance multiplier) {
+  public Resistance times(Resistance multiplier) {
     return Ohms.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, ResistanceUnit> div(Resistance divisor) {
+  public Per<DimensionlessUnit, ResistanceUnit> div(Resistance divisor) {
     return (Per<DimensionlessUnit, ResistanceUnit>) Measure.super.div(divisor);
   }
 
@@ -632,23 +641,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, ResistanceUnit> divide(Resistance divisor) {
+  public Per<DimensionlessUnit, ResistanceUnit> divide(Resistance divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
+  public Per<DimensionlessUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Temperature times(Temperature multiplier) {
+  public Temperature times(Temperature multiplier) {
     return Kelvin.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, TemperatureUnit> div(Temperature divisor) {
+  public Per<DimensionlessUnit, TemperatureUnit> div(Temperature divisor) {
     return (Per<DimensionlessUnit, TemperatureUnit>) Measure.super.div(divisor);
   }
 
@@ -660,23 +669,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, TemperatureUnit> divide(Temperature divisor) {
+  public Per<DimensionlessUnit, TemperatureUnit> divide(Temperature divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
+  public Per<DimensionlessUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Time times(Time multiplier) {
+  public Time times(Time multiplier) {
     return Seconds.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Frequency div(Time divisor) {
+  public Frequency div(Time divisor) {
     return Hertz.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -688,23 +697,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default Frequency divide(Time divisor) {
+  public Frequency divide(Time divisor) {
     return div(divisor);
   }
 
   @Override
-  default Frequency per(TimeUnit divisorUnit) {
+  public Frequency per(TimeUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Torque times(Torque multiplier) {
+  public Torque times(Torque multiplier) {
     return NewtonMeters.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, TorqueUnit> div(Torque divisor) {
+  public Per<DimensionlessUnit, TorqueUnit> div(Torque divisor) {
     return (Per<DimensionlessUnit, TorqueUnit>) Measure.super.div(divisor);
   }
 
@@ -716,23 +725,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, TorqueUnit> divide(Torque divisor) {
+  public Per<DimensionlessUnit, TorqueUnit> divide(Torque divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+  public Per<DimensionlessUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<DimensionlessUnit, VelocityUnit<?>> times(Velocity<?> multiplier) {
+  public Mult<DimensionlessUnit, VelocityUnit<?>> times(Velocity<?> multiplier) {
     return (Mult<DimensionlessUnit, VelocityUnit<?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<DimensionlessUnit, VelocityUnit<?>> div(Velocity<?> divisor) {
+  public Per<DimensionlessUnit, VelocityUnit<?>> div(Velocity<?> divisor) {
     return (Per<DimensionlessUnit, VelocityUnit<?>>) Measure.super.div(divisor);
   }
 
@@ -744,23 +753,23 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
+  public Per<DimensionlessUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
+  public Per<DimensionlessUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Voltage times(Voltage multiplier) {
+  public Voltage times(Voltage multiplier) {
     return Volts.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<DimensionlessUnit, VoltageUnit> div(Voltage divisor) {
+  public Per<DimensionlessUnit, VoltageUnit> div(Voltage divisor) {
     return (Per<DimensionlessUnit, VoltageUnit>) Measure.super.div(divisor);
   }
 
@@ -772,12 +781,12 @@ public interface Dimensionless extends Measure<DimensionlessUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<DimensionlessUnit, VoltageUnit> divide(Voltage divisor) {
+  public Per<DimensionlessUnit, VoltageUnit> divide(Voltage divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<DimensionlessUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
+  public Per<DimensionlessUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

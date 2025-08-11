@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("//shared/bazel/rules:packaging.bzl", "package_binary_cc_project")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
 
@@ -23,12 +24,11 @@ cc_binary(
     ],
     defines = ["LIBSSH_STATIC"],
     linkopts = select({
-        "@bazel_tools//src/conditions:darwin": [
+        "@platforms//os:osx": [
             "-framework",
             "Kerberos",
         ],
-        "@bazel_tools//src/conditions:linux_x86_64": [],
-        "@bazel_tools//src/conditions:windows": [
+        "@platforms//os:windows": [
             "-DEFAULTLIB:Gdi32.lib",
             "-DEFAULTLIB:Shell32.lib",
             "-DEFAULTLIB:d3d11.lib",
@@ -39,6 +39,7 @@ cc_binary(
             "-DEFAULTLIB:user32.lib",
             "-SUBSYSTEM:WINDOWS",
         ],
+        "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": [],
         "@rules_bzlmodrio_toolchains//constraints/combined:is_cross_compiler": [],
     }),
     tags = [
@@ -51,7 +52,13 @@ cc_binary(
     }),
     deps = [
         "//datalog",
-        "//glass:libglass",
+        "//glass",
         "@bzlmodrio-libssh//libraries/cpp/libssh",
     ],
+)
+
+package_binary_cc_project(
+    name = "datalogtool",
+    maven_artifact_name = "DataLogTool",
+    maven_group_id = "edu.wpi.first.tools",
 )

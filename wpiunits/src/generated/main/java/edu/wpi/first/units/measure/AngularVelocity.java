@@ -9,37 +9,46 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
-public interface AngularVelocity extends Measure<AngularVelocityUnit> {
-  static  AngularVelocity ofRelativeUnits(double magnitude, AngularVelocityUnit unit) {
-    return new ImmutableAngularVelocity(magnitude, unit.toBaseUnits(magnitude), unit);
+@SuppressWarnings({"unchecked", "cast", "checkstyle"})
+public record AngularVelocity(double magnitude, double baseUnitMagnitude, AngularVelocityUnit unit) implements Measure<AngularVelocityUnit> {
+  /**
+   * For doing math with measures of a known dimension but an unknown unit. Most users should use
+   * {@link AngularVelocityUnit#of(double)} on a known unit from {@link Units} instead of calling this method.
+   * @param magnitude the magnitude of the measurement in terms of the given unit
+   * @param unit the unit of the measurement
+   * @return a measurement object
+   */
+  public static  AngularVelocity ofRelativeUnits(double magnitude, AngularVelocityUnit unit) {
+    return new AngularVelocity(magnitude, unit.toBaseUnits(magnitude), unit);
   }
 
-  static  AngularVelocity ofBaseUnits(double baseUnitMagnitude, AngularVelocityUnit unit) {
-    return new ImmutableAngularVelocity(unit.fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, unit);
+  /**
+   * For doing math with measures of a known dimension but an unknown unit. Most users should use
+   * {@link AngularVelocityUnit#of(double)} on a known unit from {@link Units} instead of calling this method.
+   * @param baseUnitMagnitude the magnitude of the measurement in terms of the given unit's base unit
+   * @param unit the unit of the measurement
+   * @return a measurement object
+   */
+  public static  AngularVelocity ofBaseUnits(double baseUnitMagnitude, AngularVelocityUnit unit) {
+    return new AngularVelocity(unit.fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, unit);
   }
 
   @Override
-  AngularVelocity copy();
+  public AngularVelocityUnit baseUnit() { return (AngularVelocityUnit) unit().getBaseUnit(); }
 
   @Override
-  default MutAngularVelocity mutableCopy() {
-    return new MutAngularVelocity(magnitude(), baseUnitMagnitude(), unit());
-  }
-
-  @Override
-  AngularVelocityUnit unit();
-
-  @Override
-  default AngularVelocityUnit baseUnit() { return (AngularVelocityUnit) unit().getBaseUnit(); }
-
-  @Override
-  default double in(AngularVelocityUnit unit) {
+  public double in(AngularVelocityUnit unit) {
     return unit.fromBaseUnits(baseUnitMagnitude());
   }
 
   @Override
-  default AngularVelocity unaryMinus() {
+  @SuppressWarnings("rawtypes")
+  public boolean equals(Object object) {
+    return object instanceof AngularVelocity m && isEquivalent(m);
+  }
+
+  @Override
+  public AngularVelocity unaryMinus() {
     return (AngularVelocity) unit().ofBaseUnits(0 - baseUnitMagnitude());
   }
 
@@ -51,27 +60,27 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default AngularVelocity negate() {
+  public AngularVelocity negate() {
     return (AngularVelocity) unaryMinus();
   }
 
   @Override
-  default AngularVelocity plus(Measure<? extends AngularVelocityUnit> other) {
+  public AngularVelocity plus(Measure<? extends AngularVelocityUnit> other) {
     return (AngularVelocity) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
 
   @Override
-  default AngularVelocity minus(Measure<? extends AngularVelocityUnit> other) {
+  public AngularVelocity minus(Measure<? extends AngularVelocityUnit> other) {
     return (AngularVelocity) unit().ofBaseUnits(baseUnitMagnitude() - other.baseUnitMagnitude());
   }
 
   @Override
-  default AngularVelocity times(double multiplier) {
+  public AngularVelocity times(double multiplier) {
     return (AngularVelocity) unit().ofBaseUnits(baseUnitMagnitude() * multiplier);
   }
 
   @Override
-  default AngularVelocity div(double divisor) {
+  public AngularVelocity div(double divisor) {
     return (AngularVelocity) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
   }
 
@@ -83,18 +92,18 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default AngularVelocity divide(double divisor) {
+  public AngularVelocity divide(double divisor) {
     return (AngularVelocity) div(divisor);
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
+  public Mult<AngularVelocityUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
     return (Mult<AngularVelocityUnit, AccelerationUnit<?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
+  public Per<AngularVelocityUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
     return (Per<AngularVelocityUnit, AccelerationUnit<?>>) Measure.super.div(divisor);
   }
 
@@ -106,23 +115,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
+  public Per<AngularVelocityUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
+  public Per<AngularVelocityUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, AngleUnit> times(Angle multiplier) {
+  public Mult<AngularVelocityUnit, AngleUnit> times(Angle multiplier) {
     return (Mult<AngularVelocityUnit, AngleUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, AngleUnit> div(Angle divisor) {
+  public Per<AngularVelocityUnit, AngleUnit> div(Angle divisor) {
     return (Per<AngularVelocityUnit, AngleUnit>) Measure.super.div(divisor);
   }
 
@@ -134,23 +143,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, AngleUnit> divide(Angle divisor) {
+  public Per<AngularVelocityUnit, AngleUnit> divide(Angle divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, AngleUnit> per(AngleUnit divisorUnit) {
+  public Per<AngularVelocityUnit, AngleUnit> per(AngleUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
+  public Mult<AngularVelocityUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
     return (Mult<AngularVelocityUnit, AngularAccelerationUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
+  public Per<AngularVelocityUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
     return (Per<AngularVelocityUnit, AngularAccelerationUnit>) Measure.super.div(divisor);
   }
 
@@ -162,23 +171,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
+  public Per<AngularVelocityUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+  public Per<AngularVelocityUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, AngularMomentumUnit> times(AngularMomentum multiplier) {
+  public Mult<AngularVelocityUnit, AngularMomentumUnit> times(AngularMomentum multiplier) {
     return (Mult<AngularVelocityUnit, AngularMomentumUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
+  public Per<AngularVelocityUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
     return (Per<AngularVelocityUnit, AngularMomentumUnit>) Measure.super.div(divisor);
   }
 
@@ -190,23 +199,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
+  public Per<AngularVelocityUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
+  public Per<AngularVelocityUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, AngularVelocityUnit> times(AngularVelocity multiplier) {
+  public Mult<AngularVelocityUnit, AngularVelocityUnit> times(AngularVelocity multiplier) {
     return (Mult<AngularVelocityUnit, AngularVelocityUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Dimensionless div(AngularVelocity divisor) {
+  public Dimensionless div(AngularVelocity divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -218,23 +227,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Dimensionless divide(AngularVelocity divisor) {
+  public Dimensionless divide(AngularVelocity divisor) {
     return div(divisor);
   }
 
   @Override
-  default Dimensionless per(AngularVelocityUnit divisorUnit) {
+  public Dimensionless per(AngularVelocityUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, CurrentUnit> times(Current multiplier) {
+  public Mult<AngularVelocityUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<AngularVelocityUnit, CurrentUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, CurrentUnit> div(Current divisor) {
+  public Per<AngularVelocityUnit, CurrentUnit> div(Current divisor) {
     return (Per<AngularVelocityUnit, CurrentUnit>) Measure.super.div(divisor);
   }
 
@@ -246,17 +255,17 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, CurrentUnit> divide(Current divisor) {
+  public Per<AngularVelocityUnit, CurrentUnit> divide(Current divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
+  public Per<AngularVelocityUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
   @Override
-  default AngularVelocity div(Dimensionless divisor) {
+  public AngularVelocity div(Dimensionless divisor) {
     return (AngularVelocity) RadiansPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -268,23 +277,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default AngularVelocity divide(Dimensionless divisor) {
+  public AngularVelocity divide(Dimensionless divisor) {
     return (AngularVelocity) div(divisor);
   }
 
   @Override
-  default AngularVelocity times(Dimensionless multiplier) {
+  public AngularVelocity times(Dimensionless multiplier) {
     return (AngularVelocity) RadiansPerSecond.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, DistanceUnit> times(Distance multiplier) {
+  public Mult<AngularVelocityUnit, DistanceUnit> times(Distance multiplier) {
     return (Mult<AngularVelocityUnit, DistanceUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, DistanceUnit> div(Distance divisor) {
+  public Per<AngularVelocityUnit, DistanceUnit> div(Distance divisor) {
     return (Per<AngularVelocityUnit, DistanceUnit>) Measure.super.div(divisor);
   }
 
@@ -296,23 +305,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, DistanceUnit> divide(Distance divisor) {
+  public Per<AngularVelocityUnit, DistanceUnit> divide(Distance divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+  public Per<AngularVelocityUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, EnergyUnit> times(Energy multiplier) {
+  public Mult<AngularVelocityUnit, EnergyUnit> times(Energy multiplier) {
     return (Mult<AngularVelocityUnit, EnergyUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, EnergyUnit> div(Energy divisor) {
+  public Per<AngularVelocityUnit, EnergyUnit> div(Energy divisor) {
     return (Per<AngularVelocityUnit, EnergyUnit>) Measure.super.div(divisor);
   }
 
@@ -324,23 +333,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, EnergyUnit> divide(Energy divisor) {
+  public Per<AngularVelocityUnit, EnergyUnit> divide(Energy divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
+  public Per<AngularVelocityUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, ForceUnit> times(Force multiplier) {
+  public Mult<AngularVelocityUnit, ForceUnit> times(Force multiplier) {
     return (Mult<AngularVelocityUnit, ForceUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, ForceUnit> div(Force divisor) {
+  public Per<AngularVelocityUnit, ForceUnit> div(Force divisor) {
     return (Per<AngularVelocityUnit, ForceUnit>) Measure.super.div(divisor);
   }
 
@@ -352,23 +361,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, ForceUnit> divide(Force divisor) {
+  public Per<AngularVelocityUnit, ForceUnit> divide(Force divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, ForceUnit> per(ForceUnit divisorUnit) {
+  public Per<AngularVelocityUnit, ForceUnit> per(ForceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default AngularAcceleration times(Frequency multiplier) {
+  public AngularAcceleration times(Frequency multiplier) {
     return RadiansPerSecondPerSecond.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<AngularVelocityUnit, FrequencyUnit> div(Frequency divisor) {
+  public Per<AngularVelocityUnit, FrequencyUnit> div(Frequency divisor) {
     return (Per<AngularVelocityUnit, FrequencyUnit>) Measure.super.div(divisor);
   }
 
@@ -380,23 +389,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, FrequencyUnit> divide(Frequency divisor) {
+  public Per<AngularVelocityUnit, FrequencyUnit> divide(Frequency divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+  public Per<AngularVelocityUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, LinearAccelerationUnit> times(LinearAcceleration multiplier) {
+  public Mult<AngularVelocityUnit, LinearAccelerationUnit> times(LinearAcceleration multiplier) {
     return (Mult<AngularVelocityUnit, LinearAccelerationUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
+  public Per<AngularVelocityUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
     return (Per<AngularVelocityUnit, LinearAccelerationUnit>) Measure.super.div(divisor);
   }
 
@@ -408,23 +417,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
+  public Per<AngularVelocityUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
+  public Per<AngularVelocityUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
+  public Mult<AngularVelocityUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
     return (Mult<AngularVelocityUnit, LinearMomentumUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
+  public Per<AngularVelocityUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
     return (Per<AngularVelocityUnit, LinearMomentumUnit>) Measure.super.div(divisor);
   }
 
@@ -436,23 +445,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
+  public Per<AngularVelocityUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
+  public Per<AngularVelocityUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, LinearVelocityUnit> times(LinearVelocity multiplier) {
+  public Mult<AngularVelocityUnit, LinearVelocityUnit> times(LinearVelocity multiplier) {
     return (Mult<AngularVelocityUnit, LinearVelocityUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
+  public Per<AngularVelocityUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
     return (Per<AngularVelocityUnit, LinearVelocityUnit>) Measure.super.div(divisor);
   }
 
@@ -464,23 +473,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
+  public Per<AngularVelocityUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+  public Per<AngularVelocityUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, MassUnit> times(Mass multiplier) {
+  public Mult<AngularVelocityUnit, MassUnit> times(Mass multiplier) {
     return (Mult<AngularVelocityUnit, MassUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, MassUnit> div(Mass divisor) {
+  public Per<AngularVelocityUnit, MassUnit> div(Mass divisor) {
     return (Per<AngularVelocityUnit, MassUnit>) Measure.super.div(divisor);
   }
 
@@ -492,23 +501,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, MassUnit> divide(Mass divisor) {
+  public Per<AngularVelocityUnit, MassUnit> divide(Mass divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, MassUnit> per(MassUnit divisorUnit) {
+  public Per<AngularVelocityUnit, MassUnit> per(MassUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, MomentOfInertiaUnit> times(MomentOfInertia multiplier) {
+  public Mult<AngularVelocityUnit, MomentOfInertiaUnit> times(MomentOfInertia multiplier) {
     return (Mult<AngularVelocityUnit, MomentOfInertiaUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
+  public Per<AngularVelocityUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
     return (Per<AngularVelocityUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
   }
 
@@ -520,23 +529,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
+  public Per<AngularVelocityUnit, MomentOfInertiaUnit> divide(MomentOfInertia divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+  public Per<AngularVelocityUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
+  public Mult<AngularVelocityUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
     return (Mult<AngularVelocityUnit, MultUnit<?, ?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
+  public Per<AngularVelocityUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
     return (Per<AngularVelocityUnit, MultUnit<?, ?>>) Measure.super.div(divisor);
   }
 
@@ -548,23 +557,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
+  public Per<AngularVelocityUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
+  public Per<AngularVelocityUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
     return div(divisorUnit.ofNative(1));
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, PerUnit<?, ?>> times(Per<?, ?> multiplier) {
+  public Mult<AngularVelocityUnit, PerUnit<?, ?>> times(Per<?, ?> multiplier) {
     return (Mult<AngularVelocityUnit, PerUnit<?, ?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, PerUnit<?, ?>> div(Per<?, ?> divisor) {
+  public Per<AngularVelocityUnit, PerUnit<?, ?>> div(Per<?, ?> divisor) {
     return (Per<AngularVelocityUnit, PerUnit<?, ?>>) Measure.super.div(divisor);
   }
 
@@ -576,23 +585,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
+  public Per<AngularVelocityUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
+  public Per<AngularVelocityUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
     return div(divisorUnit.ofNative(1));
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, PowerUnit> times(Power multiplier) {
+  public Mult<AngularVelocityUnit, PowerUnit> times(Power multiplier) {
     return (Mult<AngularVelocityUnit, PowerUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, PowerUnit> div(Power divisor) {
+  public Per<AngularVelocityUnit, PowerUnit> div(Power divisor) {
     return (Per<AngularVelocityUnit, PowerUnit>) Measure.super.div(divisor);
   }
 
@@ -604,23 +613,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, PowerUnit> divide(Power divisor) {
+  public Per<AngularVelocityUnit, PowerUnit> divide(Power divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, PowerUnit> per(PowerUnit divisorUnit) {
+  public Per<AngularVelocityUnit, PowerUnit> per(PowerUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, ResistanceUnit> times(Resistance multiplier) {
+  public Mult<AngularVelocityUnit, ResistanceUnit> times(Resistance multiplier) {
     return (Mult<AngularVelocityUnit, ResistanceUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, ResistanceUnit> div(Resistance divisor) {
+  public Per<AngularVelocityUnit, ResistanceUnit> div(Resistance divisor) {
     return (Per<AngularVelocityUnit, ResistanceUnit>) Measure.super.div(divisor);
   }
 
@@ -632,23 +641,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, ResistanceUnit> divide(Resistance divisor) {
+  public Per<AngularVelocityUnit, ResistanceUnit> divide(Resistance divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
+  public Per<AngularVelocityUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, TemperatureUnit> times(Temperature multiplier) {
+  public Mult<AngularVelocityUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<AngularVelocityUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, TemperatureUnit> div(Temperature divisor) {
+  public Per<AngularVelocityUnit, TemperatureUnit> div(Temperature divisor) {
     return (Per<AngularVelocityUnit, TemperatureUnit>) Measure.super.div(divisor);
   }
 
@@ -660,23 +669,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, TemperatureUnit> divide(Temperature divisor) {
+  public Per<AngularVelocityUnit, TemperatureUnit> divide(Temperature divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
+  public Per<AngularVelocityUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Angle times(Time multiplier) {
+  public Angle times(Time multiplier) {
     return Radians.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default AngularAcceleration div(Time divisor) {
+  public AngularAcceleration div(Time divisor) {
     return RadiansPerSecondPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -688,23 +697,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default AngularAcceleration divide(Time divisor) {
+  public AngularAcceleration divide(Time divisor) {
     return div(divisor);
   }
 
   @Override
-  default AngularAcceleration per(TimeUnit divisorUnit) {
+  public AngularAcceleration per(TimeUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, TorqueUnit> times(Torque multiplier) {
+  public Mult<AngularVelocityUnit, TorqueUnit> times(Torque multiplier) {
     return (Mult<AngularVelocityUnit, TorqueUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, TorqueUnit> div(Torque divisor) {
+  public Per<AngularVelocityUnit, TorqueUnit> div(Torque divisor) {
     return (Per<AngularVelocityUnit, TorqueUnit>) Measure.super.div(divisor);
   }
 
@@ -716,23 +725,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, TorqueUnit> divide(Torque divisor) {
+  public Per<AngularVelocityUnit, TorqueUnit> divide(Torque divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+  public Per<AngularVelocityUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, VelocityUnit<?>> times(Velocity<?> multiplier) {
+  public Mult<AngularVelocityUnit, VelocityUnit<?>> times(Velocity<?> multiplier) {
     return (Mult<AngularVelocityUnit, VelocityUnit<?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, VelocityUnit<?>> div(Velocity<?> divisor) {
+  public Per<AngularVelocityUnit, VelocityUnit<?>> div(Velocity<?> divisor) {
     return (Per<AngularVelocityUnit, VelocityUnit<?>>) Measure.super.div(divisor);
   }
 
@@ -744,23 +753,23 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
+  public Per<AngularVelocityUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
+  public Per<AngularVelocityUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<AngularVelocityUnit, VoltageUnit> times(Voltage multiplier) {
+  public Mult<AngularVelocityUnit, VoltageUnit> times(Voltage multiplier) {
     return (Mult<AngularVelocityUnit, VoltageUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<AngularVelocityUnit, VoltageUnit> div(Voltage divisor) {
+  public Per<AngularVelocityUnit, VoltageUnit> div(Voltage divisor) {
     return (Per<AngularVelocityUnit, VoltageUnit>) Measure.super.div(divisor);
   }
 
@@ -772,13 +781,13 @@ public interface AngularVelocity extends Measure<AngularVelocityUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<AngularVelocityUnit, VoltageUnit> divide(Voltage divisor) {
+  public Per<AngularVelocityUnit, VoltageUnit> divide(Voltage divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<AngularVelocityUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
+  public Per<AngularVelocityUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
     return div(divisorUnit.one());
   }
-default Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
+public Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
 }

@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id "org.ysb33r.doxygen" version "1.0.4"
+    id "org.ysb33r.doxygen" version "2.0.0"
 }
 
 evaluationDependsOn(':apriltag')
@@ -62,12 +62,12 @@ doxygen {
     }
 }
 
-doxygen {
-    template 'Doxyfile'
+doxygen.sourceSets.main {
+    template = 'Doxyfile'
 
     cppProjectZips.each {
-        dependsOn it
-        source it.source
+        doxygenDox.dependsOn it
+        sources it.source
         it.ext.includeDirs.each {
             cppIncludeRoots.add(it.absolutePath)
         }
@@ -167,7 +167,7 @@ doxygen {
 tasks.register("zipCppDocs", Zip) {
     archiveBaseName = zipBaseNameCpp
     destinationDirectory = outputsFolder
-    dependsOn doxygen
+    dependsOn doxygenDox
     from ("$buildDir/docs/doxygen/html")
     into '/'
 }
@@ -175,13 +175,13 @@ tasks.register("zipCppDocs", Zip) {
 // Java
 configurations {
     javaSource {
-        transitive false
+        transitive = false
     }
 }
 
 task generateJavaDocs(type: Javadoc) {
     classpath += project(":wpilibj").sourceSets.main.compileClasspath
-    options.links("https://docs.oracle.com/en/java/javase/17/docs/api/")
+    options.links("https://docs.oracle.com/en/java/javase/21/docs/api/")
     options.links("https://docs.opencv.org/4.x/javadoc/")
     options.addStringOption("tag", "pre:a:Pre-Condition")
     options.addBooleanOption("Xdoclint/package:" +
@@ -263,15 +263,15 @@ publishing {
             artifact zipJavaDocs
 
             artifactId = "${baseArtifactIdJava}"
-            groupId artifactGroupIdJava
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupIdJava
+            version = wpilibVersioning.version.get()
         }
         cpp(MavenPublication) {
             artifact zipCppDocs
 
             artifactId = "${baseArtifactIdCpp}"
-            groupId artifactGroupIdCpp
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupIdCpp
+            version = wpilibVersioning.version.get()
         }
     }
 }

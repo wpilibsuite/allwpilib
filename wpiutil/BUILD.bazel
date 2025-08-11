@@ -15,6 +15,25 @@ load("//wpiutil:generate.bzl", "generate_wpiutil")
 load("//wpiutil:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//wpiutil:robotpy_pybind_build_info.bzl", "define_pybind_library", "publish_library_casters", "wpiutil_extension")
 
+filegroup(
+    name = "doxygen-files",
+    srcs = glob([
+        "src/main/native/include/**/*",
+        "src/main/native/thirdparty/argparse/include/**/*",
+        "src/main/native/thirdparty/debugging/include/**/*",
+        "src/main/native/thirdparty/expected/include/**/*",
+        "src/main/native/thirdparty/fmtlib/include/**/*",
+        "src/main/native/thirdparty/json/include/**/*",
+        "src/main/native/thirdparty/llvm/include/**/*",
+        "src/main/native/thirdparty/mpack/include/**/*",
+        "src/main/native/thirdparty/nanopb/include/**/*",
+        "src/main/native/thirdparty/sigslot/include/**/*",
+    ]),
+    visibility = ["//visibility:public"],
+)
+
+exports_files(["src/main/native/resources/wpilib-128.png"])
+
 py_binary(
     name = "nanopb_generator",
     srcs = glob(["src/main/native/thirdparty/nanopb/generator/**/*.py"]),
@@ -129,7 +148,7 @@ generate_resources(
 filegroup(
     name = "native-srcs",
     srcs = select({
-        "@bazel_tools//src/conditions:windows": glob(["src/main/native/windows/*.cpp"]),
+        "@platforms//os:windows": glob(["src/main/native/windows/*.cpp"]),
         "@rules_bzlmodrio_toolchains//constraints/combined:is_unix": glob(["src/main/native/unix/*.cpp"]),
     }),
 )
@@ -214,6 +233,7 @@ wpilib_cc_shared_library(
     dynamic_deps = [
         ":shared/wpiutil",
     ],
+    use_debug_name = False,
     visibility = ["//visibility:public"],
     deps = [":wpiutiljni"],
 )

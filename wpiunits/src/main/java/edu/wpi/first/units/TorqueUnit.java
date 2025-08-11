@@ -4,8 +4,6 @@
 
 package edu.wpi.first.units;
 
-import edu.wpi.first.units.measure.ImmutableTorque;
-import edu.wpi.first.units.measure.MutTorque;
 import edu.wpi.first.units.measure.Torque;
 
 /** A unit of torque like {@link edu.wpi.first.units.Units#NewtonMeters}. */
@@ -49,12 +47,12 @@ public final class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
 
   @Override
   public Torque of(double magnitude) {
-    return new ImmutableTorque(magnitude, toBaseUnits(magnitude), this);
+    return new Torque(magnitude, toBaseUnits(magnitude), this);
   }
 
   @Override
   public Torque ofBaseUnits(double baseUnitMagnitude) {
-    return new ImmutableTorque(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
+    return new Torque(fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, this);
   }
 
   @Override
@@ -65,11 +63,6 @@ public final class TorqueUnit extends MultUnit<DistanceUnit, ForceUnit> {
   @Override
   public Torque one() {
     return (Torque) super.one();
-  }
-
-  @Override
-  public MutTorque mutable(double initialMagnitude) {
-    return new MutTorque(initialMagnitude, toBaseUnits(initialMagnitude), this);
   }
 
   @Override

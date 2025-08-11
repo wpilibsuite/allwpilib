@@ -7,16 +7,19 @@ package edu.wpi.first.wpilibj.simulation;
 /** Manages simulation callbacks; each object is associated with a callback. */
 public class CallbackStore implements AutoCloseable {
   /** <b>Note: This interface is for simulation classes only. It should not be used by teams!</b> */
+  @SuppressWarnings("PMD.ImplicitFunctionalInterface")
   interface CancelCallbackFunc {
     void cancel(int index, int uid);
   }
 
   /** <b>Note: This interface is for simulation classes only. It should not be used by teams!</b> */
+  @SuppressWarnings("PMD.ImplicitFunctionalInterface")
   interface CancelCallbackChannelFunc {
     void cancel(int index, int channel, int uid);
   }
 
   /** <b>Note: This interface is for simulation classes only. It should not be used by teams!</b> */
+  @SuppressWarnings("PMD.ImplicitFunctionalInterface")
   interface CancelCallbackNoIndexFunc {
     void cancel(int uid);
   }

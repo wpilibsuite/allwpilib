@@ -9,37 +9,46 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
-public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
-  static  MomentOfInertia ofRelativeUnits(double magnitude, MomentOfInertiaUnit unit) {
-    return new ImmutableMomentOfInertia(magnitude, unit.toBaseUnits(magnitude), unit);
+@SuppressWarnings({"unchecked", "cast", "checkstyle"})
+public record MomentOfInertia(double magnitude, double baseUnitMagnitude, MomentOfInertiaUnit unit) implements Measure<MomentOfInertiaUnit> {
+  /**
+   * For doing math with measures of a known dimension but an unknown unit. Most users should use
+   * {@link MomentOfInertiaUnit#of(double)} on a known unit from {@link Units} instead of calling this method.
+   * @param magnitude the magnitude of the measurement in terms of the given unit
+   * @param unit the unit of the measurement
+   * @return a measurement object
+   */
+  public static  MomentOfInertia ofRelativeUnits(double magnitude, MomentOfInertiaUnit unit) {
+    return new MomentOfInertia(magnitude, unit.toBaseUnits(magnitude), unit);
   }
 
-  static  MomentOfInertia ofBaseUnits(double baseUnitMagnitude, MomentOfInertiaUnit unit) {
-    return new ImmutableMomentOfInertia(unit.fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, unit);
+  /**
+   * For doing math with measures of a known dimension but an unknown unit. Most users should use
+   * {@link MomentOfInertiaUnit#of(double)} on a known unit from {@link Units} instead of calling this method.
+   * @param baseUnitMagnitude the magnitude of the measurement in terms of the given unit's base unit
+   * @param unit the unit of the measurement
+   * @return a measurement object
+   */
+  public static  MomentOfInertia ofBaseUnits(double baseUnitMagnitude, MomentOfInertiaUnit unit) {
+    return new MomentOfInertia(unit.fromBaseUnits(baseUnitMagnitude), baseUnitMagnitude, unit);
   }
 
   @Override
-  MomentOfInertia copy();
+  public MomentOfInertiaUnit baseUnit() { return (MomentOfInertiaUnit) unit().getBaseUnit(); }
 
   @Override
-  default MutMomentOfInertia mutableCopy() {
-    return new MutMomentOfInertia(magnitude(), baseUnitMagnitude(), unit());
-  }
-
-  @Override
-  MomentOfInertiaUnit unit();
-
-  @Override
-  default MomentOfInertiaUnit baseUnit() { return (MomentOfInertiaUnit) unit().getBaseUnit(); }
-
-  @Override
-  default double in(MomentOfInertiaUnit unit) {
+  public double in(MomentOfInertiaUnit unit) {
     return unit.fromBaseUnits(baseUnitMagnitude());
   }
 
   @Override
-  default MomentOfInertia unaryMinus() {
+  @SuppressWarnings("rawtypes")
+  public boolean equals(Object object) {
+    return object instanceof MomentOfInertia m && isEquivalent(m);
+  }
+
+  @Override
+  public MomentOfInertia unaryMinus() {
     return (MomentOfInertia) unit().ofBaseUnits(0 - baseUnitMagnitude());
   }
 
@@ -51,27 +60,27 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default MomentOfInertia negate() {
+  public MomentOfInertia negate() {
     return (MomentOfInertia) unaryMinus();
   }
 
   @Override
-  default MomentOfInertia plus(Measure<? extends MomentOfInertiaUnit> other) {
+  public MomentOfInertia plus(Measure<? extends MomentOfInertiaUnit> other) {
     return (MomentOfInertia) unit().ofBaseUnits(baseUnitMagnitude() + other.baseUnitMagnitude());
   }
 
   @Override
-  default MomentOfInertia minus(Measure<? extends MomentOfInertiaUnit> other) {
+  public MomentOfInertia minus(Measure<? extends MomentOfInertiaUnit> other) {
     return (MomentOfInertia) unit().ofBaseUnits(baseUnitMagnitude() - other.baseUnitMagnitude());
   }
 
   @Override
-  default MomentOfInertia times(double multiplier) {
+  public MomentOfInertia times(double multiplier) {
     return (MomentOfInertia) unit().ofBaseUnits(baseUnitMagnitude() * multiplier);
   }
 
   @Override
-  default MomentOfInertia div(double divisor) {
+  public MomentOfInertia div(double divisor) {
     return (MomentOfInertia) unit().ofBaseUnits(baseUnitMagnitude() / divisor);
   }
 
@@ -83,18 +92,18 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default MomentOfInertia divide(double divisor) {
+  public MomentOfInertia divide(double divisor) {
     return (MomentOfInertia) div(divisor);
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
+  public Mult<MomentOfInertiaUnit, AccelerationUnit<?>> times(Acceleration<?> multiplier) {
     return (Mult<MomentOfInertiaUnit, AccelerationUnit<?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
+  public Per<MomentOfInertiaUnit, AccelerationUnit<?>> div(Acceleration<?> divisor) {
     return (Per<MomentOfInertiaUnit, AccelerationUnit<?>>) Measure.super.div(divisor);
   }
 
@@ -106,23 +115,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
+  public Per<MomentOfInertiaUnit, AccelerationUnit<?>> divide(Acceleration<?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
+  public Per<MomentOfInertiaUnit, AccelerationUnit<?>> per(AccelerationUnit<?> divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, AngleUnit> times(Angle multiplier) {
+  public Mult<MomentOfInertiaUnit, AngleUnit> times(Angle multiplier) {
     return (Mult<MomentOfInertiaUnit, AngleUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, AngleUnit> div(Angle divisor) {
+  public Per<MomentOfInertiaUnit, AngleUnit> div(Angle divisor) {
     return (Per<MomentOfInertiaUnit, AngleUnit>) Measure.super.div(divisor);
   }
 
@@ -134,23 +143,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, AngleUnit> divide(Angle divisor) {
+  public Per<MomentOfInertiaUnit, AngleUnit> divide(Angle divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, AngleUnit> per(AngleUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, AngleUnit> per(AngleUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
+  public Mult<MomentOfInertiaUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
     return (Mult<MomentOfInertiaUnit, AngularAccelerationUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
+  public Per<MomentOfInertiaUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
     return (Per<MomentOfInertiaUnit, AngularAccelerationUnit>) Measure.super.div(divisor);
   }
 
@@ -162,23 +171,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
+  public Per<MomentOfInertiaUnit, AngularAccelerationUnit> divide(AngularAcceleration divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, AngularMomentumUnit> times(AngularMomentum multiplier) {
+  public Mult<MomentOfInertiaUnit, AngularMomentumUnit> times(AngularMomentum multiplier) {
     return (Mult<MomentOfInertiaUnit, AngularMomentumUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
+  public Per<MomentOfInertiaUnit, AngularMomentumUnit> div(AngularMomentum divisor) {
     return (Per<MomentOfInertiaUnit, AngularMomentumUnit>) Measure.super.div(divisor);
   }
 
@@ -190,23 +199,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
+  public Per<MomentOfInertiaUnit, AngularMomentumUnit> divide(AngularMomentum divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, AngularMomentumUnit> per(AngularMomentumUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default AngularMomentum times(AngularVelocity multiplier) {
+  public AngularMomentum times(AngularVelocity multiplier) {
     return KilogramMetersSquaredPerSecond.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
+  public Per<MomentOfInertiaUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
     return (Per<MomentOfInertiaUnit, AngularVelocityUnit>) Measure.super.div(divisor);
   }
 
@@ -218,23 +227,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
+  public Per<MomentOfInertiaUnit, AngularVelocityUnit> divide(AngularVelocity divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, CurrentUnit> times(Current multiplier) {
+  public Mult<MomentOfInertiaUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<MomentOfInertiaUnit, CurrentUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, CurrentUnit> div(Current divisor) {
+  public Per<MomentOfInertiaUnit, CurrentUnit> div(Current divisor) {
     return (Per<MomentOfInertiaUnit, CurrentUnit>) Measure.super.div(divisor);
   }
 
@@ -246,17 +255,17 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, CurrentUnit> divide(Current divisor) {
+  public Per<MomentOfInertiaUnit, CurrentUnit> divide(Current divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, CurrentUnit> per(CurrentUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
   @Override
-  default MomentOfInertia div(Dimensionless divisor) {
+  public MomentOfInertia div(Dimensionless divisor) {
     return (MomentOfInertia) KilogramSquareMeters.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -268,23 +277,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Override
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
-  default MomentOfInertia divide(Dimensionless divisor) {
+  public MomentOfInertia divide(Dimensionless divisor) {
     return (MomentOfInertia) div(divisor);
   }
 
   @Override
-  default MomentOfInertia times(Dimensionless multiplier) {
+  public MomentOfInertia times(Dimensionless multiplier) {
     return (MomentOfInertia) KilogramSquareMeters.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, DistanceUnit> times(Distance multiplier) {
+  public Mult<MomentOfInertiaUnit, DistanceUnit> times(Distance multiplier) {
     return (Mult<MomentOfInertiaUnit, DistanceUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, DistanceUnit> div(Distance divisor) {
+  public Per<MomentOfInertiaUnit, DistanceUnit> div(Distance divisor) {
     return (Per<MomentOfInertiaUnit, DistanceUnit>) Measure.super.div(divisor);
   }
 
@@ -296,23 +305,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, DistanceUnit> divide(Distance divisor) {
+  public Per<MomentOfInertiaUnit, DistanceUnit> divide(Distance divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, EnergyUnit> times(Energy multiplier) {
+  public Mult<MomentOfInertiaUnit, EnergyUnit> times(Energy multiplier) {
     return (Mult<MomentOfInertiaUnit, EnergyUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, EnergyUnit> div(Energy divisor) {
+  public Per<MomentOfInertiaUnit, EnergyUnit> div(Energy divisor) {
     return (Per<MomentOfInertiaUnit, EnergyUnit>) Measure.super.div(divisor);
   }
 
@@ -324,23 +333,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, EnergyUnit> divide(Energy divisor) {
+  public Per<MomentOfInertiaUnit, EnergyUnit> divide(Energy divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, EnergyUnit> per(EnergyUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, ForceUnit> times(Force multiplier) {
+  public Mult<MomentOfInertiaUnit, ForceUnit> times(Force multiplier) {
     return (Mult<MomentOfInertiaUnit, ForceUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, ForceUnit> div(Force divisor) {
+  public Per<MomentOfInertiaUnit, ForceUnit> div(Force divisor) {
     return (Per<MomentOfInertiaUnit, ForceUnit>) Measure.super.div(divisor);
   }
 
@@ -352,23 +361,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, ForceUnit> divide(Force divisor) {
+  public Per<MomentOfInertiaUnit, ForceUnit> divide(Force divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, ForceUnit> per(ForceUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, ForceUnit> per(ForceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, FrequencyUnit> times(Frequency multiplier) {
+  public Mult<MomentOfInertiaUnit, FrequencyUnit> times(Frequency multiplier) {
     return (Mult<MomentOfInertiaUnit, FrequencyUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, FrequencyUnit> div(Frequency divisor) {
+  public Per<MomentOfInertiaUnit, FrequencyUnit> div(Frequency divisor) {
     return (Per<MomentOfInertiaUnit, FrequencyUnit>) Measure.super.div(divisor);
   }
 
@@ -380,23 +389,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, FrequencyUnit> divide(Frequency divisor) {
+  public Per<MomentOfInertiaUnit, FrequencyUnit> divide(Frequency divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, LinearAccelerationUnit> times(LinearAcceleration multiplier) {
+  public Mult<MomentOfInertiaUnit, LinearAccelerationUnit> times(LinearAcceleration multiplier) {
     return (Mult<MomentOfInertiaUnit, LinearAccelerationUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
+  public Per<MomentOfInertiaUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
     return (Per<MomentOfInertiaUnit, LinearAccelerationUnit>) Measure.super.div(divisor);
   }
 
@@ -408,23 +417,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
+  public Per<MomentOfInertiaUnit, LinearAccelerationUnit> divide(LinearAcceleration divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
+  public Mult<MomentOfInertiaUnit, LinearMomentumUnit> times(LinearMomentum multiplier) {
     return (Mult<MomentOfInertiaUnit, LinearMomentumUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
+  public Per<MomentOfInertiaUnit, LinearMomentumUnit> div(LinearMomentum divisor) {
     return (Per<MomentOfInertiaUnit, LinearMomentumUnit>) Measure.super.div(divisor);
   }
 
@@ -436,23 +445,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
+  public Per<MomentOfInertiaUnit, LinearMomentumUnit> divide(LinearMomentum divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, LinearMomentumUnit> per(LinearMomentumUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, LinearVelocityUnit> times(LinearVelocity multiplier) {
+  public Mult<MomentOfInertiaUnit, LinearVelocityUnit> times(LinearVelocity multiplier) {
     return (Mult<MomentOfInertiaUnit, LinearVelocityUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
+  public Per<MomentOfInertiaUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
     return (Per<MomentOfInertiaUnit, LinearVelocityUnit>) Measure.super.div(divisor);
   }
 
@@ -464,23 +473,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
+  public Per<MomentOfInertiaUnit, LinearVelocityUnit> divide(LinearVelocity divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, MassUnit> times(Mass multiplier) {
+  public Mult<MomentOfInertiaUnit, MassUnit> times(Mass multiplier) {
     return (Mult<MomentOfInertiaUnit, MassUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, MassUnit> div(Mass divisor) {
+  public Per<MomentOfInertiaUnit, MassUnit> div(Mass divisor) {
     return (Per<MomentOfInertiaUnit, MassUnit>) Measure.super.div(divisor);
   }
 
@@ -492,23 +501,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, MassUnit> divide(Mass divisor) {
+  public Per<MomentOfInertiaUnit, MassUnit> divide(Mass divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, MassUnit> per(MassUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, MassUnit> per(MassUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, MomentOfInertiaUnit> times(MomentOfInertia multiplier) {
+  public Mult<MomentOfInertiaUnit, MomentOfInertiaUnit> times(MomentOfInertia multiplier) {
     return (Mult<MomentOfInertiaUnit, MomentOfInertiaUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Dimensionless div(MomentOfInertia divisor) {
+  public Dimensionless div(MomentOfInertia divisor) {
     return Value.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -520,23 +529,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Dimensionless divide(MomentOfInertia divisor) {
+  public Dimensionless divide(MomentOfInertia divisor) {
     return div(divisor);
   }
 
   @Override
-  default Dimensionless per(MomentOfInertiaUnit divisorUnit) {
+  public Dimensionless per(MomentOfInertiaUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
+  public Mult<MomentOfInertiaUnit, MultUnit<?, ?>> times(Mult<?, ?> multiplier) {
     return (Mult<MomentOfInertiaUnit, MultUnit<?, ?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
+  public Per<MomentOfInertiaUnit, MultUnit<?, ?>> div(Mult<?, ?> divisor) {
     return (Per<MomentOfInertiaUnit, MultUnit<?, ?>>) Measure.super.div(divisor);
   }
 
@@ -548,23 +557,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
+  public Per<MomentOfInertiaUnit, MultUnit<?, ?>> divide(Mult<?, ?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
+  public Per<MomentOfInertiaUnit, MultUnit<?, ?>> per(MultUnit<?, ?> divisorUnit) {
     return div(divisorUnit.ofNative(1));
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, PerUnit<?, ?>> times(Per<?, ?> multiplier) {
+  public Mult<MomentOfInertiaUnit, PerUnit<?, ?>> times(Per<?, ?> multiplier) {
     return (Mult<MomentOfInertiaUnit, PerUnit<?, ?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, PerUnit<?, ?>> div(Per<?, ?> divisor) {
+  public Per<MomentOfInertiaUnit, PerUnit<?, ?>> div(Per<?, ?> divisor) {
     return (Per<MomentOfInertiaUnit, PerUnit<?, ?>>) Measure.super.div(divisor);
   }
 
@@ -576,23 +585,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
+  public Per<MomentOfInertiaUnit, PerUnit<?, ?>> divide(Per<?, ?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
+  public Per<MomentOfInertiaUnit, PerUnit<?, ?>> per(PerUnit<?, ?> divisorUnit) {
     return div(divisorUnit.ofNative(1));
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, PowerUnit> times(Power multiplier) {
+  public Mult<MomentOfInertiaUnit, PowerUnit> times(Power multiplier) {
     return (Mult<MomentOfInertiaUnit, PowerUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, PowerUnit> div(Power divisor) {
+  public Per<MomentOfInertiaUnit, PowerUnit> div(Power divisor) {
     return (Per<MomentOfInertiaUnit, PowerUnit>) Measure.super.div(divisor);
   }
 
@@ -604,23 +613,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, PowerUnit> divide(Power divisor) {
+  public Per<MomentOfInertiaUnit, PowerUnit> divide(Power divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, PowerUnit> per(PowerUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, PowerUnit> per(PowerUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, ResistanceUnit> times(Resistance multiplier) {
+  public Mult<MomentOfInertiaUnit, ResistanceUnit> times(Resistance multiplier) {
     return (Mult<MomentOfInertiaUnit, ResistanceUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, ResistanceUnit> div(Resistance divisor) {
+  public Per<MomentOfInertiaUnit, ResistanceUnit> div(Resistance divisor) {
     return (Per<MomentOfInertiaUnit, ResistanceUnit>) Measure.super.div(divisor);
   }
 
@@ -632,23 +641,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, ResistanceUnit> divide(Resistance divisor) {
+  public Per<MomentOfInertiaUnit, ResistanceUnit> divide(Resistance divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, ResistanceUnit> per(ResistanceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, TemperatureUnit> times(Temperature multiplier) {
+  public Mult<MomentOfInertiaUnit, TemperatureUnit> times(Temperature multiplier) {
     return (Mult<MomentOfInertiaUnit, TemperatureUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, TemperatureUnit> div(Temperature divisor) {
+  public Per<MomentOfInertiaUnit, TemperatureUnit> div(Temperature divisor) {
     return (Per<MomentOfInertiaUnit, TemperatureUnit>) Measure.super.div(divisor);
   }
 
@@ -660,23 +669,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, TemperatureUnit> divide(Temperature divisor) {
+  public Per<MomentOfInertiaUnit, TemperatureUnit> divide(Temperature divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, TemperatureUnit> per(TemperatureUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, TimeUnit> times(Time multiplier) {
+  public Mult<MomentOfInertiaUnit, TimeUnit> times(Time multiplier) {
     return (Mult<MomentOfInertiaUnit, TimeUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Velocity<MomentOfInertiaUnit> div(Time divisor) {
+  public Velocity<MomentOfInertiaUnit> div(Time divisor) {
     return VelocityUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
@@ -688,23 +697,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Velocity<MomentOfInertiaUnit> divide(Time divisor) {
+  public Velocity<MomentOfInertiaUnit> divide(Time divisor) {
     return div(divisor);
   }
 
   @Override
-  default Velocity<MomentOfInertiaUnit> per(TimeUnit divisorUnit) {
+  public Velocity<MomentOfInertiaUnit> per(TimeUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, TorqueUnit> times(Torque multiplier) {
+  public Mult<MomentOfInertiaUnit, TorqueUnit> times(Torque multiplier) {
     return (Mult<MomentOfInertiaUnit, TorqueUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, TorqueUnit> div(Torque divisor) {
+  public Per<MomentOfInertiaUnit, TorqueUnit> div(Torque divisor) {
     return (Per<MomentOfInertiaUnit, TorqueUnit>) Measure.super.div(divisor);
   }
 
@@ -716,23 +725,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, TorqueUnit> divide(Torque divisor) {
+  public Per<MomentOfInertiaUnit, TorqueUnit> divide(Torque divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, VelocityUnit<?>> times(Velocity<?> multiplier) {
+  public Mult<MomentOfInertiaUnit, VelocityUnit<?>> times(Velocity<?> multiplier) {
     return (Mult<MomentOfInertiaUnit, VelocityUnit<?>>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, VelocityUnit<?>> div(Velocity<?> divisor) {
+  public Per<MomentOfInertiaUnit, VelocityUnit<?>> div(Velocity<?> divisor) {
     return (Per<MomentOfInertiaUnit, VelocityUnit<?>>) Measure.super.div(divisor);
   }
 
@@ -744,23 +753,23 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
+  public Per<MomentOfInertiaUnit, VelocityUnit<?>> divide(Velocity<?> divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
+  public Per<MomentOfInertiaUnit, VelocityUnit<?>> per(VelocityUnit<?> divisorUnit) {
     return div(divisorUnit.one());
   }
 
 
   @Override
-  default Mult<MomentOfInertiaUnit, VoltageUnit> times(Voltage multiplier) {
+  public Mult<MomentOfInertiaUnit, VoltageUnit> times(Voltage multiplier) {
     return (Mult<MomentOfInertiaUnit, VoltageUnit>) Measure.super.times(multiplier);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, VoltageUnit> div(Voltage divisor) {
+  public Per<MomentOfInertiaUnit, VoltageUnit> div(Voltage divisor) {
     return (Per<MomentOfInertiaUnit, VoltageUnit>) Measure.super.div(divisor);
   }
 
@@ -772,12 +781,12 @@ public interface MomentOfInertia extends Measure<MomentOfInertiaUnit> {
   @Deprecated(since = "2025", forRemoval = true)
   @SuppressWarnings({"deprecation", "removal"})
   @Override
-  default Per<MomentOfInertiaUnit, VoltageUnit> divide(Voltage divisor) {
+  public Per<MomentOfInertiaUnit, VoltageUnit> divide(Voltage divisor) {
     return div(divisor);
   }
 
   @Override
-  default Per<MomentOfInertiaUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
+  public Per<MomentOfInertiaUnit, VoltageUnit> per(VoltageUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

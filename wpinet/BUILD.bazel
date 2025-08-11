@@ -12,6 +12,16 @@ load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 load("//wpinet:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//wpinet:robotpy_pybind_build_info.bzl", "define_pybind_library", "wpinet_extension")
 
+filegroup(
+    name = "doxygen-files",
+    srcs = glob([
+        "src/main/native/include/**/*",
+        "src/main/native/thirdparty/libuv/include/**/*",
+        "src/main/native/thirdparty/tcpsockets/include/**/*",
+    ]),
+    visibility = ["//visibility:public"],
+)
+
 WIN_UV_SRCS = glob([
     "src/main/native/thirdparty/libuv/src/win/*.cpp",
     "src/main/native/thirdparty/libuv/src/win/*.h",
@@ -72,8 +82,8 @@ filegroup(
                "//conditions:default": [],
            }) +
            select({
-               "@bazel_tools//src/conditions:darwin": MAC_UV_SRCS,
-               "@bazel_tools//src/conditions:windows": WIN_UV_SRCS,
+               "@platforms//os:osx": MAC_UV_SRCS,
+               "@platforms//os:windows": WIN_UV_SRCS,
                "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_UV_SRCS,
            }) + glob(["src/main/native/thirdparty/libuv/src/*"]),
     visibility = ["//wpinet:__subpackages__"],
@@ -107,8 +117,8 @@ generate_resources(
 filegroup(
     name = "native-srcs",
     srcs = ["generate-resources"] + select({
-        "@bazel_tools//src/conditions:darwin": glob(["src/main/native/macOS/*"]),
-        "@bazel_tools//src/conditions:windows": glob(["src/main/native/windows/*"]),
+        "@platforms//os:osx": glob(["src/main/native/macOS/*"]),
+        "@platforms//os:windows": glob(["src/main/native/windows/*"]),
         "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": glob(["src/main/native/linux/*"]),
     }),
 )
@@ -136,7 +146,7 @@ wpilib_cc_library(
     ],
     includes = ["src/main/native/include"],
     linkopts = select({
-        "@bazel_tools//src/conditions:linux": [
+        "@platforms//os:linux": [
             "-Wl,--push-state,-as-needed",
             "-ldl",
             "-Wl,--pop-state",
@@ -194,9 +204,10 @@ wpilib_cc_shared_library(
     name = "shared/wpinetjni",
     auto_export_windows_symbols = False,
     dynamic_deps = [
-        ":shared/wpinet",
         "//wpiutil:shared/wpiutil",
+        ":shared/wpinet",
     ],
+    use_debug_name = False,
     visibility = ["//visibility:public"],
     deps = [":wpinetjni"],
 )

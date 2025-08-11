@@ -31,7 +31,7 @@ model {
 
                         // Create the ZIP.
                         def task = project.tasks.create("copyOutlineViewerExecutable" + binary.targetPlatform.operatingSystem.name + binary.targetPlatform.architecture.name, Zip) {
-                            description("Copies the OutlineViewer executable to the outputs directory.")
+                            description = "Copies the OutlineViewer executable to the outputs directory."
                             destinationDirectory = outputsFolder
 
                             archiveBaseName = zipBaseName
@@ -117,7 +117,7 @@ model {
 
                 artifactId = baseArtifactId
                 groupId = artifactGroupId
-                version wpilibVersioning.version.get()
+                version = wpilibVersioning.version.get()
             }
         }
     }
