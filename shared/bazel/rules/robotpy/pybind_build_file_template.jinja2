@@ -4,6 +4,7 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 {%- endif %}
 load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", {% if publish_casters_targets %}"publish_casters", {% endif %}"resolve_casters", "run_header_gen")
+load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers")
 {% for extension_module in extension_modules%}
 def {{extension_module.name}}_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
     {{extension_module.name|upper}}_HEADER_GEN = [
@@ -142,7 +143,7 @@ def publish_library_casters():
         tags = ["robotpy"],
     )
 {% endfor %}
-def define_pybind_library(name):
+def define_pybind_library(name, pkgcfgs=[]):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -211,4 +212,12 @@ def define_pybind_library(name):
             {%- endfor %}
         },
         visibility = ["//visibility:public"],
+    )
+
+    scan_headers(
+        name = "{}-scan-headers".format(name),
+        extra_hdrs = native.glob(["{{stripped_include_prefix}}/**/*.h"], allow_empty=True),
+        package_root_file = "{{package_root_file}}",
+        pkgcfgs = pkgcfgs,
+        pyproject_toml = "{{ stripped_include_prefix }}/pyproject.toml",
     )

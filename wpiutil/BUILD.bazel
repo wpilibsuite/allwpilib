@@ -341,11 +341,13 @@ define_native_wrapper(
     name = "robotpy-native-wpiutil",
 )
 
+PYBIND_PKGCFG_DEPS = ["//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc"]
+
 generate_robotpy_pybind_build_info(
     name = "robotpy-wpiutil-generator",
     additional_srcs = ["src/main/python/wpiutil/src/wpistruct/wpystruct_fns.h"] + [":robotpy-native-wpiutil.copy_headers"],
     package_root_file = "src/main/python/wpiutil/__init__.py",
-    pkgcfgs = ["//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc"],
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
     pyproject_toml = "src/main/python/pyproject.toml",
     yaml_files = glob(["src/main/python/semiwrap/*.yml"]),
 )
@@ -366,7 +368,10 @@ wpiutil_extension(
     ],
 )
 
-define_pybind_library(name = "robotpy-wpiutil")
+define_pybind_library(
+    name = "robotpy-wpiutil",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+)
 
 create_pybind_library(
     name = "module",

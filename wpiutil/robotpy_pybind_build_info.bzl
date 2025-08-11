@@ -3,6 +3,7 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "publish_casters", "resolve_casters", "run_header_gen")
+load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers")
 
 def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
     WPIUTIL_HEADER_GEN = [
@@ -162,7 +163,7 @@ def publish_library_casters():
         tags = ["robotpy"],
     )
 
-def define_pybind_library(name):
+def define_pybind_library(name, pkgcfgs = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -215,4 +216,12 @@ def define_pybind_library(name):
             "pkg_config": ["wpiutil-casters = wpiutil", "wpiutil = wpiutil"],
         },
         visibility = ["//visibility:public"],
+    )
+
+    scan_headers(
+        name = "{}-scan-headers".format(name),
+        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True),
+        package_root_file = "src/main/python/wpiutil/__init__.py",
+        pkgcfgs = pkgcfgs,
+        pyproject_toml = "src/main/python/pyproject.toml",
     )

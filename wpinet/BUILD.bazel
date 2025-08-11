@@ -323,17 +323,19 @@ define_native_wrapper(
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 
+PYBIND_PKGCFG_DEPS = [
+    "//wpinet:native/wpinet/robotpy-native-wpinet.pc",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil:src/main/python/wpiutil/wpiutil.pc",
+    "//wpiutil:src/main/python/wpiutil/wpiutil-casters.pc",
+    "//wpiutil:src/main/python/wpiutil/wpiutil-casters.pybind11.json",
+]
+
 generate_robotpy_pybind_build_info(
     name = "robotpy-wpinet-generator",
     additional_srcs = [":robotpy-native-wpinet.copy_headers"],
     package_root_file = "src/main/python/wpinet/__init__.py",
-    pkgcfgs = [
-        "//wpinet:native/wpinet/robotpy-native-wpinet.pc",
-        "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
-        "//wpiutil:src/main/python/wpiutil/wpiutil.pc",
-        "//wpiutil:src/main/python/wpiutil/wpiutil-casters.pc",
-        "//wpiutil:src/main/python/wpiutil/wpiutil-casters.pybind11.json",
-    ],
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
     yaml_files = glob(["src/main/python/semiwrap/*.yml"]),
 )
 
@@ -344,7 +346,10 @@ wpinet_extension(
     ],
 )
 
-define_pybind_library(name = "robotpy-wpinet")
+define_pybind_library(
+    name = "robotpy-wpinet",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+)
 
 robotpy_py_test(
     "python_tests",
