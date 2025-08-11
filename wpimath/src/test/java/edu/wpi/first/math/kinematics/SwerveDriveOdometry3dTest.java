@@ -4,12 +4,12 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SwerveDriveOdometry3dTest {
   private final Translation2d m_fl = new Translation2d(12, 12);

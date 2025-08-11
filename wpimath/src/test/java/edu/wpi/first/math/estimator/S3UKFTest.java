@@ -4,17 +4,16 @@
 
 package edu.wpi.first.math.estimator;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import edu.wpi.first.math.*;
 import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.Collections;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class S3UKFTest {
   private static Matrix<N5, N1> driveDynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {
@@ -99,7 +98,7 @@ class S3UKFTest {
         });
   }
 
-    @Test
+  @Test
   void testLinearUKF() {
     var dt = 0.020;
     var plant = LinearSystemId.identifyVelocitySystem(0.02, 0.006);

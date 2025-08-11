@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 class DifferentialDrivePoseEstimatorTest {
   private static final double kEpsilon = 1e-9;
 
-    @Test
+  @Test
   void testSimultaneousVisionMeasurements() {
     // This tests for multiple vision measurements applied at the same time. The expected behavior
     // is that all measurements affect the estimated pose. The alternative result is that only one

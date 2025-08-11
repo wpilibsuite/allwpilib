@@ -4,13 +4,13 @@
 
 package edu.wpi.first.math.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.profile.TrapezoidProfile;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class HolonomicDriveControllerTest {
 
