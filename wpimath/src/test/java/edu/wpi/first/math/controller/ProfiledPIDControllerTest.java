@@ -4,10 +4,10 @@
 
 package edu.wpi.first.math.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.profile.TrapezoidProfile;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ProfiledPIDControllerTest {
   @Test

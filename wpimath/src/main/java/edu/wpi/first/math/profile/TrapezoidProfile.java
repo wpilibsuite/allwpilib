@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math.trajectory;
+package edu.wpi.first.math.profile;
 
 import edu.wpi.first.math.MathSharedStore;
 import java.util.Objects;

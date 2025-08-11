@@ -6,12 +6,13 @@ package edu.wpi.first.math.filter;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.profile.TrapezoidProfile;
 
 /**
  * A class that limits the rate of change of an input value. Useful for implementing voltage,
  * setpoint, and/or output ramps. A slew-rate limit is most appropriate when the quantity being
  * controlled is a velocity or a voltage; when controlling a position, consider using a {@link
- * edu.wpi.first.math.trajectory.TrapezoidProfile} instead.
+ * TrapezoidProfile} instead.
  */
 public class SlewRateLimiter {
   private final double m_positiveRateLimit;
