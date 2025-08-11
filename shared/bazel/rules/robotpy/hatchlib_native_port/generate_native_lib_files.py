@@ -1,5 +1,4 @@
 import functools
-import os
 import pathlib
 import platform
 import sys
@@ -9,9 +8,9 @@ import pkgconf
 import tomli
 from packaging.markers import Marker
 
+from shared.bazel.rules.robotpy.hack_pkgcfgs import hack_pkgconfig
 from shared.bazel.rules.robotpy.hatchlib_native_port.config import PcFileConfig
 from shared.bazel.rules.robotpy.hatchlib_native_port.validate import parse_input
-from shared.bazel.rules.robotpy.hack_pkgcfgs import hack_pkgconfig
 
 # Port of https://github.com/robotpy/hatch-nativelib/blob/main/src/hatch_nativelib/plugin.py
 

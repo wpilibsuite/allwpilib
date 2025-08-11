@@ -1,7 +1,6 @@
 import argparse
 import collections
 import json
-import os
 import pathlib
 import re
 from typing import Dict, List, Union
@@ -28,8 +27,6 @@ from shared.bazel.rules.robotpy.generation_utils import (
     fixup_shared_lib_name,
 )
 from shared.bazel.rules.robotpy.hack_pkgcfgs import hack_pkgconfig
-
-
 
 
 class HeaderToDatConfig:

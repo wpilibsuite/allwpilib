@@ -1,7 +1,8 @@
 import importlib
 import os
-import sys
 import pathlib
+import sys
+
 from shared.bazel.rules.robotpy.hack_pkgcfgs import hack_pkgconfig
 
 """
@@ -21,11 +22,11 @@ def main():
     if "--pkgcfgs" in sys.argv[2:]:
         pkgcfg_index = sys.argv.index("--pkgcfgs")
         args = sys.argv[2:pkgcfg_index]
-        pkgcfgs = [pathlib.Path(x) for x in sys.argv[pkgcfg_index + 1:]]
+        pkgcfgs = [pathlib.Path(x) for x in sys.argv[pkgcfg_index + 1 :]]
     else:
         args = sys.argv[2:]
         pkgcfgs = []
-    
+
     hack_pkgconfig(pkgcfgs)
 
     module = importlib.import_module(tool)
