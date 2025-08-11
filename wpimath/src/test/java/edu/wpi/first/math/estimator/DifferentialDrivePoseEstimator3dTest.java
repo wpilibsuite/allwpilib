@@ -4,19 +4,18 @@
 
 package edu.wpi.first.math.estimator;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
-import org.junit.jupiter.api.Test;
-
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class DifferentialDrivePoseEstimator3dTest {
   private static final double kEpsilon = 1e-9;
 
-    @Test
+  @Test
   void testSimultaneousVisionMeasurements() {
     // This tests for multiple vision measurements applied at the same time. The expected behavior
     // is that all measurements affect the estimated pose. The alternative result is that only one

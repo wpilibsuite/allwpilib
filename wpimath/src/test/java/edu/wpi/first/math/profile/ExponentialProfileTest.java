@@ -4,12 +4,11 @@
 
 package edu.wpi.first.math.profile;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 class ExponentialProfileTest {
   private static final double kDt = 0.01;

@@ -4,6 +4,9 @@
 
 package edu.wpi.first.math.estimator;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -15,12 +18,8 @@ import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import org.junit.jupiter.api.Test;
-
 import java.util.Random;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 class KalmanFilterTest {
   private static LinearSystem<N2, N1, N2> elevatorPlant;
@@ -133,5 +132,4 @@ class KalmanFilterTest {
     assertEquals(0.0, filter.getXhat(0), 0.2);
     assertEquals(0.0, filter.getXhat(1), 0.2);
   }
-
 }

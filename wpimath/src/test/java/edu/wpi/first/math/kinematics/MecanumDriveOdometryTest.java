@@ -4,13 +4,13 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MecanumDriveOdometryTest {
   private final Translation2d m_fl = new Translation2d(12, 12);
@@ -87,5 +87,4 @@ class MecanumDriveOdometryTest {
         () -> assertEquals(0.0, pose.getY(), 0.1),
         () -> assertEquals(0.0, pose.getRotation().getRadians(), 0.1));
   }
-
 }

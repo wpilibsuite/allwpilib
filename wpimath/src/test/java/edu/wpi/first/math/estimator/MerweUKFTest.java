@@ -22,9 +22,9 @@ import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Collections;
+import org.junit.jupiter.api.Test;
 
 class MerweUKFTest {
   private static Matrix<N5, N1> driveDynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {

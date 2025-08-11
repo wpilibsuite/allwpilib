@@ -4,9 +4,9 @@
 
 package edu.wpi.first.math.profile;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 class TrapezoidProfileTest {
   private static final double kDt = 0.01;
