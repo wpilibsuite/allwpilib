@@ -15,7 +15,8 @@ import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /** Represents a single sample in a trajectory. */
-public class TrajectorySample implements Interpolatable<TrajectorySample>, StructSerializable {
+public abstract class TrajectorySample<SampleType extends TrajectorySample<SampleType>>
+    implements Interpolatable<SampleType>, StructSerializable {
   /** The timestamp of the sample relative to the trajectory start. */
   public final Time timestamp;
 
@@ -54,7 +55,7 @@ public class TrajectorySample implements Interpolatable<TrajectorySample>, Struc
 
   @Override
   public final boolean equals(Object o) {
-    if (!(o instanceof TrajectorySample that)) {
+    if (!(o instanceof TrajectorySample<?> that)) {
       return false;
     }
 
@@ -70,7 +71,7 @@ public class TrajectorySample implements Interpolatable<TrajectorySample>, Struc
    * @param dt timestamp
    * @return new sample
    */
-  public TrajectorySample integrate(Time dt) {
+  public Base integrate(Time dt) {
     var dts = dt.in(Seconds);
 
     var newVel =
@@ -79,62 +80,62 @@ public class TrajectorySample implements Interpolatable<TrajectorySample>, Struc
 
     var newPose = pose.exp(new Twist2d(newVel.vx * dts, newVel.vy * dts, newVel.omega * dts));
 
-    return new TrajectorySample(timestamp.plus(dt), newPose, newVel, accel);
+    return new Base(timestamp.plus(dt), newPose, newVel, accel);
   }
 
-  /**
-   * Interpolates between this sample and the end sample using constant-jerk kinematic equations.
-   *
-   * @param end The end sample.
-   * @param t The time between this sample and the end sample. Should be in the range [0, 1].
-   * @return new sample
-   */
-  @Override
-  public TrajectorySample interpolate(TrajectorySample end, double t) {
-    if (t <= 0) {
-      return this;
-    } else if (t >= 1) {
-      return end;
+  /** A base class for trajectory samples. */
+  public static class Base extends TrajectorySample<Base> {
+    public Base(Time timestamp, Pose2d pose, ChassisSpeeds vel, ChassisAccelerations accel) {
+      super(timestamp, pose, vel, accel);
     }
 
-    var totalDt = this.timestamp.minus(end.timestamp).in(Seconds);
-    var interpDt = MathUtil.interpolate(this.timestamp.in(Seconds), end.timestamp.in(Seconds), t);
+    public Base(TrajectorySample<?> sample) {
+      super(sample.timestamp, sample.pose, sample.vel, sample.accel);
+    }
 
-    // note that the units of jerk are m/s³ and rad/s³
-    // do not add this to an acceleration object unless you know units are accurate
-    var jerk = this.accel.minus(end.accel).div(totalDt);
+    /**
+     * Interpolates between this sample and the end sample using constant-acceleratopm kinematic
+     * equations.
+     *
+     * @param end The end sample.
+     * @param t The time between this sample and the end sample. Should be in the range [0, 1].
+     * @return new sample
+     */
+    @Override
+    public Base interpolate(Base endValue, double t) {
+      if (t <= 0) {
+        return new Base(this);
+      } else if (t >= 1) {
+        return new Base(this);
+      }
 
-    // aₖ₊₁ = aₖ + jΔt
-    var newAccel =
-        new ChassisAccelerations(
-            accel.ax + jerk.ax * interpDt,
-            accel.ay + jerk.ay * interpDt,
-            accel.alpha + jerk.alpha * interpDt);
+      var interpDt =
+          MathUtil.interpolate(this.timestamp.in(Seconds), endValue.timestamp.in(Seconds), t);
 
-    // vₖ₊₁ = vₖ + aₖΔt + ½jₖ(Δt)²
-    var newVel =
-        new ChassisSpeeds(
-            vel.vx + accel.ax * interpDt + 0.5 * jerk.ax * interpDt * interpDt,
-            vel.vy + accel.ay * interpDt + 0.5 * jerk.ay * interpDt * interpDt,
-            vel.omega + accel.alpha * interpDt + 0.5 * jerk.alpha * interpDt * interpDt);
+      var newAccel =
+          new ChassisAccelerations(
+              MathUtil.interpolate(this.accel.ax, endValue.accel.ax, t),
+              MathUtil.interpolate(this.accel.ay, endValue.accel.ay, t),
+              MathUtil.interpolate(this.accel.alpha, endValue.accel.alpha, t));
 
-    // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)² + ⅙j(Δt)³
-    var newPose =
-        new Pose2d(
-            pose.getX()
-                + vel.vx * interpDt
-                + 0.5 * accel.ax * interpDt * interpDt
-                + (1.0 / 6) * jerk.ax * Math.pow(interpDt, 3),
-            pose.getY()
-                + vel.vy * interpDt
-                + 0.5 * accel.ay * interpDt * interpDt
-                + (1.0 / 6) * jerk.ay * Math.pow(interpDt, 3),
-            new Rotation2d(
-                pose.getRotation().getRadians()
-                    + vel.omega * interpDt
-                    + 0.5 * accel.alpha * interpDt * interpDt
-                    + (1.0 / 6) * jerk.alpha * Math.pow(interpDt, 3)));
+      // vₖ₊₁ = vₖ + aₖΔt
+      var newVel =
+          new ChassisSpeeds(
+              vel.vx + accel.ax * interpDt,
+              vel.vy + accel.ay * interpDt,
+              vel.omega + accel.alpha * interpDt);
 
-    return new TrajectorySample(Seconds.of(interpDt), newPose, newVel, newAccel);
+      // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)²
+      var newPose =
+          new Pose2d(
+              pose.getX() + vel.vx * interpDt + 0.5 * accel.ax * interpDt * interpDt,
+              pose.getY() + vel.vy * interpDt + 0.5 * accel.ay * interpDt * interpDt,
+              new Rotation2d(
+                  pose.getRotation().getRadians()
+                      + vel.omega * interpDt
+                      + 0.5 * accel.alpha * interpDt * interpDt));
+
+      return new Base(Seconds.of(interpDt), newPose, newVel, newAccel);
+    }
   }
 }

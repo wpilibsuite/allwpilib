@@ -14,8 +14,8 @@ import java.util.List;
  * Represents a trajectory consisting of a list of {@link TrajectorySample}s, kinematically
  * interpolating between them.
  */
-public class Trajectory {
-  private final InterpolatingTreeMap<Time, TrajectorySample> samples;
+public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
+  private final InterpolatingTreeMap<Time, SampleType> samples;
   private final Time duration;
 
   private static final InverseInterpolator<Time> timeInverseInterpolator =
@@ -28,9 +28,8 @@ public class Trajectory {
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
    */
-  public Trajectory(List<TrajectorySample> samples) {
-    this.samples =
-        new InterpolatingTreeMap<>(timeInverseInterpolator, TrajectorySample::interpolate);
+  public Trajectory(List<SampleType> samples) {
+    this.samples = new InterpolatingTreeMap<>(timeInverseInterpolator, SampleType::interpolate);
 
     samples.forEach(
         sample -> {
@@ -49,11 +48,19 @@ public class Trajectory {
     return duration;
   }
 
-  public TrajectorySample sampleAt(Time timestamp) {
+  public SampleType start() {
+    return sampleAt(0.0);
+  }
+
+  public SampleType end() {
+    return sampleAt(duration);
+  }
+
+  public SampleType sampleAt(Time timestamp) {
     return samples.get(timestamp);
   }
 
-  public TrajectorySample sampleAt(double timestamp) {
+  public SampleType sampleAt(double timestamp) {
     return sampleAt(Seconds.of(timestamp));
   }
 }
