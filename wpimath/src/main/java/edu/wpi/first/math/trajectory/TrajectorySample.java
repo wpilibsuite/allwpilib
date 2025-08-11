@@ -14,9 +14,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
-/**
- * Represents a single sample in a trajectory.
- */
+/** Represents a single sample in a trajectory. */
 public class TrajectorySample implements Interpolatable<TrajectorySample>, StructSerializable {
   /** The timestamp of the sample relative to the trajectory start. */
   public final Time timestamp;
@@ -56,7 +54,9 @@ public class TrajectorySample implements Interpolatable<TrajectorySample>, Struc
 
   @Override
   public final boolean equals(Object o) {
-    if (!(o instanceof TrajectorySample that)) return false;
+    if (!(o instanceof TrajectorySample that)) {
+      return false;
+    }
 
     return timestamp.equals(that.timestamp)
         && pose.equals(that.pose)
@@ -100,7 +100,8 @@ public class TrajectorySample implements Interpolatable<TrajectorySample>, Struc
     var totalDt = this.timestamp.minus(end.timestamp).in(Seconds);
     var interpDt = MathUtil.interpolate(this.timestamp.in(Seconds), end.timestamp.in(Seconds), t);
 
-    // note that the units of jerk are m/s³ and rad/s³; do not add this to a
+    // note that the units of jerk are m/s³ and rad/s³
+    // do not add this to an acceleration object unless you know units are accurate
     var jerk = this.accel.minus(end.accel).div(totalDt);
 
     // aₖ₊₁ = aₖ + jΔt
@@ -117,7 +118,7 @@ public class TrajectorySample implements Interpolatable<TrajectorySample>, Struc
             vel.vy + accel.ay * interpDt + 0.5 * jerk.ay * interpDt * interpDt,
             vel.omega + accel.alpha * interpDt + 0.5 * jerk.alpha * interpDt * interpDt);
 
-    // vₖ₊₁ = vₖ + ½aₖ(Δt)²
+    // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)² + ⅙j(Δt)³
     var newPose =
         new Pose2d(
             pose.getX()
