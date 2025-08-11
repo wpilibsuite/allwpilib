@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj.smartdashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.networktables.DoubleArrayEntry;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,19 +82,6 @@ public class FieldObject2d implements AutoCloseable {
   public synchronized void setPoses(Pose2d... poses) {
     m_poses.clear();
     Collections.addAll(m_poses, poses);
-    updateEntry();
-  }
-
-  /**
-   * Sets poses from a trajectory.
-   *
-   * @param trajectory The trajectory from which the poses should be added.
-   */
-  public synchronized void setTrajectory(Trajectory trajectory) {
-    m_poses.clear();
-    for (Trajectory.State state : trajectory.getStates()) {
-      m_poses.add(state.pose);
-    }
     updateEntry();
   }
 
