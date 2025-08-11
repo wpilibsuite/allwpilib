@@ -11,6 +11,7 @@ from packaging.markers import Marker
 
 from shared.bazel.rules.robotpy.hatchlib_native_port.config import PcFileConfig
 from shared.bazel.rules.robotpy.hatchlib_native_port.validate import parse_input
+from shared.bazel.rules.robotpy.hack_pkgcfgs import hack_pkgconfig
 
 # Port of https://github.com/robotpy/hatch-nativelib/blob/main/src/hatch_nativelib/plugin.py
 
@@ -294,17 +295,6 @@ def _write_libinit_py(
     init_py.parent.mkdir(parents=True, exist_ok=True)
     with open(init_py, "w") as fp:
         fp.write(content)
-
-
-def hack_pkgconfig(pkgcfgs):
-
-    pkg_config_paths = os.environ.get("PKG_CONFIG_PATH", "").split(os.pathsep)
-
-    if pkgcfgs:
-        for pc in pkgcfgs:
-            pkg_config_paths.append(str(pc.parent))
-
-    os.environ["PKG_CONFIG_PATH"] = os.pathsep.join(pkg_config_paths)
 
 
 def main():

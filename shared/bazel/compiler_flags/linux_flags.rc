@@ -14,7 +14,6 @@ common:linux --repo_env=BAZEL_CONLYOPTS="-Wformat=2:-pedantic:-Wno-psabi:-Wno-un
 
 # Linker
 common:linux --repo_env=BAZEL_LINKOPTS="-rdynamic:-pthread:-ldl:-latomic:-Wl,-rpath,'$ORIGIN'"
-common:linux --features=set_soname
 
 # Cleanup build output for tools
 build:linux --host_cxxopt=-Wno-missing-field-initializers
@@ -30,3 +29,7 @@ build:linux --host_cxxopt=-Wno-missing-requires
 build:linux --host_cxxopt=-Wno-implicit-fallthrough
 
 build:linux --host_per_file_copt=external/zlib/.*\.c@-Wno-deprecated-non-prototype
+
+# Set soname. Needed for robotpy
+build:linux --features=set_soname
+build:linux --host_features=set_soname

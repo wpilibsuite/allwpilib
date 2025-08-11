@@ -4,6 +4,12 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_python//python:pip.bzl", "whl_filegroup")
 
 py_library(
+    name = "hack_pkgcfgs",
+    srcs = ["hack_pkgcfgs.py"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
     name = "generation_utils",
     srcs = ["generation_utils.py"],
     visibility = ["//visibility:public"],
@@ -19,6 +25,7 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":generation_utils",
+        ":hack_pkgcfgs",
         requirement("semiwrap"),
         requirement("jinja2"),
     ],
@@ -39,6 +46,7 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":generation_utils",
+        ":hack_pkgcfgs",
         requirement("semiwrap"),
         requirement("jinja2"),
     ],
@@ -49,6 +57,7 @@ py_binary(
     srcs = ["wrapper.py"],
     visibility = ["//visibility:public"],
     deps = [
+        "//shared/bazel/rules/robotpy:hack_pkgcfgs",
         requirement("semiwrap"),
     ],
 )

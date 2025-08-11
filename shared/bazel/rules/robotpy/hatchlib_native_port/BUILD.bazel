@@ -5,5 +5,8 @@ py_binary(
     name = "generate_native_lib_files",
     srcs = glob(["*.py"]),
     visibility = ["//visibility:public"],
-    deps = [requirement("semiwrap")],
+    deps = [
+        "//shared/bazel/rules/robotpy:hack_pkgcfgs",
+        requirement("semiwrap"),
+    ],
 )

@@ -28,12 +28,12 @@ def main():
 
     def get_pc_dep(library):
         base_project = library.replace("robotpy-native-", "")
-        wpilib_project = "hal" if base_project == "wpihal" else base_project
+        wpilib_project = fixup_root_package_name(base_project)
         return f"//{wpilib_project}:native/{base_project}/{library}.pc"
 
     def get_python_dep(library):
         base_project = library.replace("robotpy-native-", "")
-        wpilib_project = "hal" if base_project == "wpihal" else base_project
+        wpilib_project = fixup_root_package_name(base_project)
         return f"//{fixup_root_package_name(wpilib_project)}:{fixup_python_dep_name(library)}"
 
     env = Environment(loader=BaseLoader)

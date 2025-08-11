@@ -1,16 +1,32 @@
 import importlib
 import os
 import sys
+import pathlib
+from shared.bazel.rules.robotpy.hack_pkgcfgs import hack_pkgconfig
 
 """
 This file will wrap various semiwrap.tools executables. In the event that it fails
-it will provide more helpful debug information for bazel users
+it will provide more helpful debug information for bazel users.
+
+It can also "hack" the PKG_CONFIG_PATH environment variable. This allows us to use
+generated package config files without having to install the libraries which decreases
+build dependencies and increases the amount of parallelization that can happen during
+the build.
 """
 
 
 def main():
     tool = sys.argv[1]
-    args = sys.argv[2:]
+
+    if "--pkgcfgs" in sys.argv[2:]:
+        pkgcfg_index = sys.argv.index("--pkgcfgs")
+        args = sys.argv[2:pkgcfg_index]
+        pkgcfgs = [pathlib.Path(x) for x in sys.argv[pkgcfg_index + 1:]]
+    else:
+        args = sys.argv[2:]
+        pkgcfgs = []
+    
+    hack_pkgconfig(pkgcfgs)
 
     module = importlib.import_module(tool)
     tool_main = getattr(module, "main")

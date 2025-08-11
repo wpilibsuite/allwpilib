@@ -27,21 +27,9 @@ from shared.bazel.rules.robotpy.generation_utils import (
     fixup_root_package_name,
     fixup_shared_lib_name,
 )
+from shared.bazel.rules.robotpy.hack_pkgcfgs import hack_pkgconfig
 
 
-def hack_pkgconfig(pkgcfgs: List[pathlib.Path]):
-    """
-    This will place the given files in the PKG_CONFIG_PATH in such a way that will trick
-    semiwrap into thinking the libraries have been installed
-    """
-
-    pkg_config_paths = os.environ.get("PKG_CONFIG_PATH", "").split(os.pathsep)
-
-    if pkgcfgs:
-        for pc in pkgcfgs:
-            pkg_config_paths.append(str(pc.parent))
-
-    os.environ["PKG_CONFIG_PATH"] = os.pathsep.join(pkg_config_paths)
 
 
 class HeaderToDatConfig:
@@ -215,7 +203,7 @@ class BazelExtensionModule:
                 self._get_transative_native_dependencies(dep_name, transative_deps)
                 for d in transative_deps:
                     base_library = fixup_root_package_name(
-                        re.search("robotpy-native-(.*)", d)[1]
+                        d.replace("robotpy-native-", "")
                     )
                     native_wrapper_dependencies.add(
                         f"//{base_library}:{fixup_native_lib_name(d)}.copy_headers"
@@ -299,12 +287,13 @@ class BazelExtensionModule:
 
 def generate_pybind_build_file(
     pkgcfgs: List[pathlib.Path],
-    project_dir: pathlib.Path,
+    project_file: pathlib.Path,
     package_root_file: str,
     stripped_include_prefix: str,
     yml_prefix: Union[str, None],
     output_file: pathlib.Path,
 ):
+    project_dir = project_file.parent
     plan = makeplan(project_dir)
 
     hack_pkgconfig(pkgcfgs)
@@ -312,7 +301,7 @@ def generate_pybind_build_file(
     extension_modules = []
     entry_points = collections.defaultdict(list)
 
-    pyproject = PyProject(project_dir / "pyproject.toml")
+    pyproject = PyProject(project_file)
     projectcfg = pyproject.project
 
     # Cache built up for an extension module. Gets reset when an ExtensionModule is encountered
@@ -357,7 +346,7 @@ def generate_pybind_build_file(
         else:
             raise Exception(f"Unknown item {type(item)}")
 
-    with open(project_dir / "pyproject.toml", "rb") as fp:
+    with open(project_file, "rb") as fp:
         raw_config = tomli.load(fp)
 
     try:
@@ -379,13 +368,11 @@ def generate_pybind_build_file(
         return json.dumps(item)
 
     def target_from_python_dep(python_dep):
-        if python_dep == "pyntcore":
-            return "//ntcore:pyntcore"
-        elif "native" in python_dep:
-            base_library = re.search("robotpy-native-(.*)", python_dep)[1]
+        if "native" in python_dep:
+            base_library = python_dep.replace("robotpy-native-", "")
             return f"//{fixup_root_package_name(base_library)}:{fixup_python_dep_name(python_dep)}"
         else:
-            base_library = re.search("robotpy-(.*)", python_dep)[1]
+            base_library = python_dep.replace("robotpy-", "")
             return f"//{fixup_root_package_name(base_library)}:{fixup_python_dep_name(python_dep)}"
 
     python_deps = []
@@ -432,7 +419,7 @@ def main():
 
     generate_pybind_build_file(
         args.pkgcfgs,
-        args.project_file.parent,
+        args.project_file,
         args.package_root_file,
         args.stripped_include_prefix,
         args.yml_prefix,
