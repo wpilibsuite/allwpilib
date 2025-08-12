@@ -10,10 +10,12 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
 
-public class TrajectorySampleStruct implements Struct<TrajectorySample.Base> {
+public class TrajectorySampleStruct implements Struct<TrajectorySample<?>> {
   @Override
-  public Class<TrajectorySample.Base> getTypeClass() {
-    return TrajectorySample.Base.class;
+  @SuppressWarnings("unchecked")
+  // unfortunately we have to cast here to allow for the wildcard type
+  public Class<TrajectorySample<?>> getTypeClass() {
+    return (Class<TrajectorySample<?>>) (Class<?>) TrajectorySample.class;
   }
 
   @Override
@@ -34,6 +36,9 @@ public class TrajectorySampleStruct implements Struct<TrajectorySample.Base> {
     return "double timestamp;Pose2d pose;ChassisSpeeds vel;ChassisAccelerations accel";
   }
 
+  // this method will only unpack a TrajectorySample.Base;
+  // if drivetrain specific values are needed, a kinematics object must be passed in
+  // to the relevant constructor
   @Override
   public TrajectorySample.Base unpack(ByteBuffer bb) {
     double dt = bb.getDouble();
@@ -43,8 +48,9 @@ public class TrajectorySampleStruct implements Struct<TrajectorySample.Base> {
     return new TrajectorySample.Base(Units.Seconds.of(dt), pose, vel, accel);
   }
 
+  // this method can pack any trajectory sample, but drivetrain-specific values will be lost
   @Override
-  public void pack(ByteBuffer bb, TrajectorySample.Base value) {
+  public void pack(ByteBuffer bb, TrajectorySample<?> value) {
     bb.putDouble(value.timestamp.in(Seconds));
     Pose2d.struct.pack(bb, value.pose);
     ChassisSpeeds.struct.pack(bb, value.vel);

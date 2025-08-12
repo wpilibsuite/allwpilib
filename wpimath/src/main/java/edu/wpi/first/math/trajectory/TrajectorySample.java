@@ -14,7 +14,16 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
-/** Represents a single sample in a trajectory. */
+/**
+ * Represents a single sample in a trajectory.
+ * This is intended to be used as a value type, with the expectation that it will be immutable.
+ * The generic type parameter allows for different types of trajectory samples,
+ * which are used to add values for the different types of drivetrains in order to make
+ * following a trajectory easier.
+ * If no drivetrain-specific values are needed, use {@link TrajectorySample.Base}.
+ *
+ * @param <SampleType> The type of the sample.
+ */
 public abstract class TrajectorySample<SampleType extends TrajectorySample<SampleType>>
     implements Interpolatable<SampleType>, StructSerializable {
   /** The timestamp of the sample relative to the trajectory start. */
@@ -83,7 +92,24 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
     return new Base(timestamp.plus(dt), newPose, newVel, accel);
   }
 
-  /** A base class for trajectory samples. */
+  /**
+   * Interpolates between this sample and the end sample using constant-acceleration kinematic
+   * equations.
+   * Does not work for differential drive samples because differential drivetrains couple translation and rotation,
+   * which this method does not account for.
+   * @param start Sample to interpolate from.
+   * @param end Sample to interpolate to.
+   * @param t Time between the two samples. Should be in the range [0, 1].
+   * @return Interpolated sample.
+   */
+  public static Base kinematicInterpolate(TrajectorySample<?> start, TrajectorySample<?> end, double t) {
+    return new Base(start).interpolate(new Base(end), t);
+  }
+
+  /**
+   * A base trajectory sample that does not include any drivetrain-specific values.
+   * This is intended to be used as a value type, with the expectation that it will be immutable.
+   */
   public static class Base extends TrajectorySample<Base> {
     public Base(Time timestamp, Pose2d pose, ChassisSpeeds vel, ChassisAccelerations accel) {
       super(timestamp, pose, vel, accel);
