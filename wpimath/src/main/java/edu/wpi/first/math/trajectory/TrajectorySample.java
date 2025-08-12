@@ -94,10 +94,10 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
     }
 
     /**
-     * Interpolates between this sample and the end sample using constant-acceleratopm kinematic
+     * Interpolates between this sample and the end sample using constant-acceleration kinematic
      * equations.
      *
-     * @param end The end sample.
+     * @param endValue The end sample.
      * @param t The time between this sample and the end sample. Should be in the range [0, 1].
      * @return new sample
      */
@@ -109,8 +109,10 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
         return new Base(this);
       }
 
-      var interpDt =
+      double interpTime =
           MathUtil.interpolate(this.timestamp.in(Seconds), endValue.timestamp.in(Seconds), t);
+
+      double interpDt = interpTime - this.timestamp.in(Seconds);
 
       var newAccel =
           new ChassisAccelerations(
@@ -135,7 +137,7 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
                       + vel.omega * interpDt
                       + 0.5 * accel.alpha * interpDt * interpDt));
 
-      return new Base(Seconds.of(interpDt), newPose, newVel, newAccel);
+      return new Base(Seconds.of(interpTime), newPose, newVel, newAccel);
     }
   }
 }

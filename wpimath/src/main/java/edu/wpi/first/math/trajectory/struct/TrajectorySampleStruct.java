@@ -10,10 +10,10 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
 
-public class TrajectorySampleStruct implements Struct<TrajectorySample> {
+public class TrajectorySampleStruct implements Struct<TrajectorySample.Base> {
   @Override
-  public Class<TrajectorySample> getTypeClass() {
-    return TrajectorySample.class;
+  public Class<TrajectorySample.Base> getTypeClass() {
+    return TrajectorySample.Base.class;
   }
 
   @Override
@@ -35,16 +35,16 @@ public class TrajectorySampleStruct implements Struct<TrajectorySample> {
   }
 
   @Override
-  public TrajectorySample unpack(ByteBuffer bb) {
+  public TrajectorySample.Base unpack(ByteBuffer bb) {
     double dt = bb.getDouble();
     Pose2d pose = Pose2d.struct.unpack(bb);
     ChassisSpeeds vel = ChassisSpeeds.struct.unpack(bb);
     ChassisAccelerations accel = ChassisAccelerations.struct.unpack(bb);
-    return new TrajectorySample(Units.Seconds.of(dt), pose, vel, accel);
+    return new TrajectorySample.Base(Units.Seconds.of(dt), pose, vel, accel);
   }
 
   @Override
-  public void pack(ByteBuffer bb, TrajectorySample value) {
+  public void pack(ByteBuffer bb, TrajectorySample.Base value) {
     bb.putDouble(value.timestamp.in(Seconds));
     Pose2d.struct.pack(bb, value.pose);
     ChassisSpeeds.struct.pack(bb, value.vel);
