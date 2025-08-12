@@ -145,7 +145,7 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample> {
 
   /**
    * Interpolates between this sample and the given sample using numerical integration of the
-   * differential drive differential equation.
+   * differential drive differential equation on this sample state.
    *
    * @param endValue The end sample.
    * @param t The time between this sample and the end sample. Should be in the range [0, 1].
