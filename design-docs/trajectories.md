@@ -60,41 +60,94 @@ The `Sample` class represents a single point on a trajectory.
 It contains the position, velocity, and acceleration of the chassis
 at that point, as well as the time at which the point occurs.
 
-It is implemented as a static inner class of `Trajectory`.
+It is implemented as an abstract class of `Trajectory` with a recursive type parameter.
+This allows for different types of samples as described below.
+It also implements the `Interpolable` interface,
+to which the `Trajectory` class will delegate interpolation to.
+Implementations are expected to use kinematic interpolations rather than linear interpolations
+for more accurate results.
 
 ```java
-public static class Sample {
-    public final double time;
+public abstract class TrajectorySample<SampleType extends TrajectorySample<SampleType>> {
+    public final Time time;
     public final Pose2d pose;
     public final ChassisSpeeds chassisSpeeds;
     public final ChassisAccelerations chassisAccelerations;
     
     /* constructors and stuff */
+   
+   public abstract SampleType interpolate(SampleType endValue, double t);
 }
 ```
 
+All `TrajectorySample` implementations will be immutable,
+and contain constructors that accept another `TrajectorySample`
+object to allow converting between different sample types.
+
 A `DifferentialSample` class will be used to represent a sample
 for a differential drive robot, 
-which extends `Sample` and calculates the left and right wheel speeds
+which extends `TrajectorySample<DifferentialSample>` and includes the left and right wheel speeds
 given the chassis speeds and the drivetrain kinematics.
+`DifferentialSample.interpolate` uses numerical integration to integrate the differential drive equation
+to calculate the wheel speeds.
 
 Similarly, `SwerveSample` and `MecanumSample` classes will be used
-for holonomic robots and include calculations for motor powers there.
+for holonomic robots. These classes will include the wheel speeds
+given the chassis speeds and the drivetrain kinematics.
+Their implementations' `interpolate` methods use Euler integration for the superclass fields
+and delegate the wheel speed calculations to the drivetrain kinematics.
+
+Finally, a `TrajectorySample.Base` class is provided to represent a sample
+that is not specific to a drivetrain method.
+This is intended to be used for trajectory creation and serialization,
+and drivetrain-specific sample implementations will be used for trajectory following.
 
 ### Trajectory
 
 The `Trajectory` class represents a trajectory,
-which will be implemented as a list of `Sample`s
+which will be implemented as an InterpolatingTreeMap of `TrajectorySample`s
 that are linearly interpolated between.
 
 The following methods will be implemented as 
 part of the public API of the `Trajectory` class:
 
 ```java
-public class Trajectory {
-    public Time duration();
+public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
+    public final Time duration;
     
-    public Sample sampleAt(double time);
+    public SamplType sampleAt(double time);
     public Pose2d poseAt(double time);
+}
+```
+
+## Design: Serialization
+
+Users will be able to serialize and deserialize trajectories
+in both JSON and WPILib struct formats.
+
+Trajectory samples are intended to serialize only the four base fields
+of the `TrajectorySample` class.
+Drivetrain-specific sample implementations provided with the API
+will not serialize the drivetrain-specific fields,
+as they are not needed for trajectory generation.
+Deserialization will result in a `TrajectorySample.Base` object.
+
+A `TrajectoryGenerator` class will be provided to generate trajectories
+from a JSON file. 
+It will not create the trajectories itself,
+but will create the `Trajectory` objects.
+
+The `TrajectoryGenerator` class will have the following methods,
+allowing users to generate trajectories for any drivetrain method:
+
+```java
+public class TrajectoryGenerator {
+    private TrajectoryGenerator() {}
+   
+    public static Trajectory<TrajectorySample.Base> readTrajectory(String jsonFile);
+    
+    public static Trajectory<DifferentialSample> readTrajectory(String jsonFile, DifferentialDriveKinematics kinematics);
+    public static Trajectory<MecanumSample> readTrajectory(String jsonFile, MecanumDriveKinematics kinematics);
+    public static Trajectory<SwerveSample> readTrajectory(String jsonFile, SwerveDriveKinematics kinematics);
 }
 ```
