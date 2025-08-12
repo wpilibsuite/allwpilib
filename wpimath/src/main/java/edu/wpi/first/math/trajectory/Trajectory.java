@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
   private final InterpolatingTreeMap<Time, SampleType> samples;
-  private final Time duration;
+  public final Time duration;
 
   private static final InverseInterpolator<Time> timeInverseInterpolator =
       (start, end, q) ->
@@ -42,10 +42,6 @@ public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
             .toList()
             .get(samples.size() - 1)
             .timestamp;
-  }
-
-  public Time duration() {
-    return duration;
   }
 
   public SampleType start() {
