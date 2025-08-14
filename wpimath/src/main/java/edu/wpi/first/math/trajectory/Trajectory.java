@@ -1,11 +1,12 @@
 package edu.wpi.first.math.trajectory;
 
-import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
-import edu.wpi.first.math.interpolation.InverseInterpolator;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.units.measure.Time;
 import java.util.Comparator;
 import java.util.List;
@@ -15,12 +16,14 @@ import java.util.List;
  * interpolating between them.
  */
 public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
-  private final InterpolatingTreeMap<Time, SampleType> samples;
-  public final Time duration;
 
-  private static final InverseInterpolator<Time> timeInverseInterpolator =
-      (start, end, q) ->
-          MathUtil.inverseInterpolate(start.in(Seconds), end.in(Seconds), q.in(Seconds));
+  /** The samples this Trajectory is composed of. */
+  public final List<SampleType> samples;
+
+  private final InterpolatingTreeMap<Time, SampleType> sampleMap;
+
+  /** The total duration of the trajectory. */
+  public final Time duration;
 
   /**
    * Constructs a Trajectory.
@@ -29,34 +32,74 @@ public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
    *     internally.
    */
   public Trajectory(List<SampleType> samples) {
-    this.samples = new InterpolatingTreeMap<>(timeInverseInterpolator, SampleType::interpolate);
+    this.samples =
+        samples.stream().sorted(Comparator.comparingDouble(s -> s.timestamp.in(Seconds))).toList();
 
-    samples.forEach(
+    this.sampleMap =
+        new InterpolatingTreeMap<>(
+            (start, end, q) ->
+                MathUtil.inverseInterpolate(start.in(Seconds), end.in(Seconds), q.in(Seconds)),
+            SampleType::interpolate);
+
+    this.samples.forEach(
         sample -> {
-          this.samples.put(sample.timestamp, sample);
+          this.sampleMap.put(sample.timestamp, sample);
         });
 
-    this.duration =
-        samples.stream()
-            .sorted(Comparator.comparingDouble(s -> s.timestamp.in(Milliseconds)))
-            .toList()
-            .get(samples.size() - 1)
-            .timestamp;
+    this.duration = this.samples.getLast().timestamp;
   }
 
+  /**
+   * Gets the first sample in the trajectory.
+   */
   public SampleType start() {
     return sampleAt(0.0);
   }
 
+  /**
+   * Gets the last sample in the trajectory.
+   */
   public SampleType end() {
     return sampleAt(duration);
   }
 
+  /**
+   * Gets the sample at the given timestamp.
+   */
   public SampleType sampleAt(Time timestamp) {
-    return samples.get(timestamp);
+    return sampleMap.get(timestamp);
   }
 
+  /**
+   * Gets the sample at the given timestamp.
+   * @param timestamp timestamp in seconds
+   */
   public SampleType sampleAt(double timestamp) {
     return sampleAt(Seconds.of(timestamp));
   }
+
+  /**
+   * Converts this trajectory to a differential trajectory, allowing for easier following by differential drives.
+   * @param kinematics DifferentialDriveKinematics object representing the drivetrain.
+   */
+  public Trajectory<DifferentialSample> toDifferentialTrajectory(DifferentialDriveKinematics kinematics) {
+    return new Trajectory<>(samples.stream().map(s -> new DifferentialSample(s, kinematics)).toList());
+  }
+
+  /**
+   * Converts this trajectory to a mecanum trajectory, allowing for easier following by mecanum drives.
+   * @param kinematics MecanumDriveKinematics object representing the drivetrain.
+   */
+  public Trajectory<MecanumSample> toMecanumTrajectory(MecanumDriveKinematics kinematics) {
+    return new Trajectory<>(samples.stream().map(s -> new MecanumSample(s, kinematics)).toList());
+  }
+
+  /**
+   * Converts this trajectory to a swerve trajectory, allowing for easier following by swerve drives.
+   * @param kinematics SwerveDriveKinematics object representing the drivetrain.
+   */
+  public Trajectory<SwerveSample> toSwerveTrajectory(SwerveDriveKinematics kinematics) {
+    return new Trajectory<>(samples.stream().map(s -> new SwerveSample(s, kinematics)).toList());
+  }
+
 }
