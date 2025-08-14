@@ -119,6 +119,10 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
       super(sample.timestamp, sample.pose, sample.vel, sample.accel);
     }
 
+    public Base() {
+      super(Seconds.of(0.0), Pose2d.kZero, new ChassisSpeeds(), new ChassisAccelerations());
+    }
+
     /**
      * Interpolates between this sample and the end sample using constant-acceleration kinematic
      * equations.
