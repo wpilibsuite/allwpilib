@@ -330,6 +330,22 @@ class SchedulerTest {
   }
 
   @Test
+  void cancelsEvictsOnDeck() {
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    m_scheduler.schedule(command);
+    m_scheduler.cancel(command);
+    assertFalse(m_scheduler.isScheduledOrRunning(command));
+  }
+
+  @Test
+  void cancelAlEvictsOnDeck() {
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    m_scheduler.schedule(command);
+    m_scheduler.cancelAll();
+    assertFalse(m_scheduler.isScheduledOrRunning(command));
+  }
+
+  @Test
   void cancelAllCancelsAll() {
     var commands = new ArrayList<Command>(10);
     for (int i = 1; i <= 10; i++) {

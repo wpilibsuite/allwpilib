@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -691,22 +690,22 @@ public class Scheduler implements ProtobufSerializable {
   }
 
   /**
-   * Cancels all currently running commands. Commands that are scheduled that haven't yet started
-   * will remain scheduled, and will start on the next call to {@link #run()}.
+   * Cancels all currently running and scheduled commands. All default commands will be scheduled on
+   * the next call to {@link #run()}, unless a higher priority command is scheduled or triggered
+   * after {@code cancelAll()} is used.
    */
   public void cancelAll() {
-    // Remove scheduled children of running commands
-    for (Iterator<CommandState> iterator = m_onDeck.iterator(); iterator.hasNext(); ) {
-      CommandState state = iterator.next();
-      if (m_commandStates.containsKey(state.parent())) {
-        iterator.remove();
-        emitEvent(SchedulerEvent.evicted(state.command()));
-      }
+    for (var onDeckIter = m_onDeck.iterator(); onDeckIter.hasNext(); ) {
+      var state = onDeckIter.next();
+      onDeckIter.remove();
+      emitEvent(SchedulerEvent.evicted(state.command()));
     }
 
-    // Finally, remove running commands
-    m_commandStates.forEach((command, _state) -> emitEvent(SchedulerEvent.evicted(command)));
-    m_commandStates.clear();
+    for (var liveIter = m_commandStates.entrySet().iterator(); liveIter.hasNext(); ) {
+      var entry = liveIter.next();
+      liveIter.remove();
+      emitEvent(SchedulerEvent.evicted(entry.getKey()));
+    }
   }
 
   /**
