@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -877,6 +878,55 @@ class SchedulerTest {
     assertFalse(m_scheduler.isRunning(top), "Top command should have been interrupted");
     assertTrue(m_scheduler.isRunning(child), "Conflicting child should be running");
     assertTrue(m_scheduler.isRunning(parent), "Parent of conflicting child should be running");
+  }
+
+  @Test
+  void commandAwaitingItself() {
+    // This command deadlocks on itself. It's calling yield() in an infinite loop, which is
+    // equivalent to calling Coroutine.park(). No deleterious side effects other than stalling
+    // the command
+    AtomicReference<Command> commandRef = new AtomicReference<>();
+    var command = Command.noRequirements(co -> co.await(commandRef.get())).named("Self Await");
+    commandRef.set(command);
+
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command));
+  }
+
+  @Test
+  void commandDeadlock() {
+    AtomicReference<Command> ref1 = new AtomicReference<>();
+    AtomicReference<Command> ref2 = new AtomicReference<>();
+
+    // Deadlock scenario:
+    // command1 starts, schedules command2, then waits for command2 to exit
+    // command2 starts, waits for command1 to exit
+    //
+    // Each successive run sees command1 mount, check for command2, then yield.
+    // Then sees command2 mount, check for command1, then also yield.
+    // This is like two threads spinwaiting for the other to exit.
+    //
+    // Externally cancelling command2 allows command1 to continue
+    // Externally cancelling command1 cancels both
+    var command1 = Command.noRequirements(co -> co.await(ref2.get())).named("Command 1");
+    var command2 = Command.noRequirements(co -> co.await(ref1.get())).named("Command 2");
+    ref1.set(command1);
+    ref2.set(command2);
+
+    m_scheduler.schedule(command1);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command1));
+    assertTrue(m_scheduler.isRunning(command2));
+
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command1));
+    assertTrue(m_scheduler.isRunning(command2));
+
+    m_scheduler.cancel(command1);
+    m_scheduler.run();
+    assertFalse(m_scheduler.isRunning(command1));
+    assertFalse(m_scheduler.isRunning(command2));
   }
 
   record PriorityCommand(int priority, RequireableResource... subsystems) implements Command {
