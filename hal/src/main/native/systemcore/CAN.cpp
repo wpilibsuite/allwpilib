@@ -186,6 +186,25 @@ bool SocketCanState::InitializeBuses() {
         return;
       }
 
+      if (ioctl(socketHandle[i], SIOCGIFMTU, &ifr) == -1) {
+        wpi::print("ioctl(SIOCGIFMTU) for CAN {} failed with {}\n",
+                   ifr.ifr_name, std::strerror(errno));
+        success = false;
+        return;
+      }
+
+      if (ifr.ifr_mtu == CANFD_MTU) {
+        int fdSet = 1;
+        if (setsockopt(socketHandle[i], SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &fdSet,
+                       sizeof(fdSet)) != 0) {
+          wpi::print(
+              "setsockopt(CAN_RAW_FD_FRAMES) for CAN {} failed with {}\n",
+              ifr.ifr_name, std::strerror(errno));
+          success = false;
+          return;
+        }
+      }
+
       auto poll = wpi::uv::Poll::Create(loop, socketHandle[i]);
       if (!poll) {
         wpi::print("wpi::uv::Poll::Create for CAN {} failed\n", ifr.ifr_name);
