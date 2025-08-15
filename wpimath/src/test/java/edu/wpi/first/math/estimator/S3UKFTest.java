@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -156,19 +157,19 @@ class S3UKFTest {
 
     observer.setXhat(
         VecBuilder.fill(
-            trajectory.getInitialPose().getTranslation().getX(),
-            trajectory.getInitialPose().getTranslation().getY(),
-            trajectory.getInitialPose().getRotation().getRadians(),
+            trajectory.start().pose.getTranslation().getX(),
+            trajectory.start().pose.getTranslation().getY(),
+            trajectory.start().pose.getRotation().getRadians(),
             0.0,
             0.0));
 
     var trueXhat = observer.getXhat();
 
-    double totalTime = trajectory.getTotalTime();
+    double totalTime = trajectory.duration.in(Seconds);
     for (int i = 0; i < (totalTime / dt); ++i) {
-      var ref = trajectory.sample(dt * i);
-      double vl = ref.velocity * (1 - (ref.curvature * rb));
-      double vr = ref.velocity * (1 + (ref.curvature * rb));
+      var ref = trajectory.sampleAt(dt * i);
+      double vl = ref.vel.vx * (1 - (ref.curvature * rb));
+      double vr = ref.vel.vx * (1 + (ref.curvature * rb));
 
       var nextR =
           VecBuilder.fill(
@@ -211,7 +212,7 @@ class S3UKFTest {
         AngleStatistics.angleResidual(2),
         AngleStatistics.angleAdd(2));
 
-    final var finalPosition = trajectory.sample(trajectory.getTotalTime());
+    final var finalPosition = trajectory.sampleAt(trajectory.duration.in(Seconds));
 
     assertEquals(finalPosition.pose.getTranslation().getX(), observer.getXhat(0), 0.055);
     assertEquals(finalPosition.pose.getTranslation().getY(), observer.getXhat(1), 0.15);

@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.SplineSample;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -54,7 +55,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     double elapsed = m_timer.get();
-    Trajectory.State reference = m_trajectory.sample(elapsed);
+    SplineSample reference = m_trajectory.sample(elapsed);
     ChassisSpeeds speeds = m_feedback.calculate(m_drive.getPose(), reference);
     m_drive.drive(speeds.vx, speeds.omega);
   }

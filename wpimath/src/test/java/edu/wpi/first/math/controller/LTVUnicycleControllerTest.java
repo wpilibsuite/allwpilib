@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.controller;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -36,15 +37,15 @@ class LTVUnicycleControllerTest {
     var config = new TrajectoryConfig(8.8, 0.1);
     final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
 
-    final var totalTime = trajectory.getTotalTime();
+    final var totalTime = trajectory.duration.in(Seconds);
     for (int i = 0; i < (totalTime / kDt); ++i) {
-      var state = trajectory.sample(kDt * i);
+      var state = trajectory.sampleAt(kDt * i);
 
       var output = controller.calculate(robotPose, state);
       robotPose = robotPose.exp(new Twist2d(output.vx * kDt, 0, output.omega * kDt));
     }
 
-    final var states = trajectory.getStates();
+    final var states = trajectory.samples;
     final var endPose = states.get(states.size() - 1).pose;
 
     // Java lambdas require local variables referenced from a lambda expression
