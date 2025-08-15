@@ -295,4 +295,24 @@ class TrapezoidProfileTest {
       assertLessThanOrEquals(Math.abs(state.velocity), Math.abs(constraints.maxVelocity));
     }
   }
+
+  @Test
+  void returnsCorrectAcceleration() {
+    TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(1.0, 1.0);
+    TrapezoidProfile.State goal = new TrapezoidProfile.State(2.0, 0.0);
+    TrapezoidProfile.State state = new TrapezoidProfile.State(0.0, 0.0);
+
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
+    for (int i = 0; i < 100; ++i) {
+      state = profile.calculate(kDt, state, goal);
+      if (Math.abs(Math.abs(state.velocity) - constraints.maxVelocity) > 1e-5) {
+        // During acceleration, the acceleration should be equal to the max
+        // acceleration.
+        assertEquals(constraints.maxAcceleration, Math.abs(state.acceleration), 1e-5);
+      } else {
+        // Once the max velocity is reached, the acceleration should be zero.
+        assertEquals(0.0, state.acceleration, 1e-5);
+      }
+    }
+  }
 }
