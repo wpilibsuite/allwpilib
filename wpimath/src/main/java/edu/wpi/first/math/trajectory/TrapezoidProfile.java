@@ -118,7 +118,8 @@ public class TrapezoidProfile {
     public boolean equals(Object other) {
       return other instanceof State rhs
           && this.position == rhs.position
-          && this.velocity == rhs.velocity;
+          && this.velocity == rhs.velocity
+          && this.acceleration == rhs.acceleration;
     }
 
     @Override
@@ -312,9 +313,10 @@ public class TrapezoidProfile {
 
   // Flip the sign of the velocity and position if the profile is inverted
   private State direct(State in) {
-    State result = new State(in.position, in.velocity);
+    State result = new State(in.position, in.velocity, in.acceleration);
     result.position = result.position * m_direction;
     result.velocity = result.velocity * m_direction;
+    result.acceleration = result.acceleration * m_direction;
     return result;
   }
 }
