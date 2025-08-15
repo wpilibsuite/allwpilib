@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -14,16 +15,23 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.system.Discretization;
+import edu.wpi.first.math.system.NumericalIntegration;
+import edu.wpi.first.math.system.NumericalJacobian;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class S3UKFTest {
@@ -107,6 +115,110 @@ class S3UKFTest {
               AngleStatistics.angleResidual(2),
               AngleStatistics.angleAdd(2));
         });
+  }
+
+  @Test
+  void testDriveConvergence() {
+    final double dt = 0.005;
+    final double rb = 0.8382 / 2.0; // Robot radius
+
+    S3UKF<N5, N2, N3> observer =
+        new S3UKF<>(
+            Nat.N5(),
+            Nat.N3(),
+            S3UKFTest::driveDynamics,
+            S3UKFTest::driveLocalMeasurementModel,
+            VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
+            VecBuilder.fill(0.0001, 0.5, 0.5),
+            AngleStatistics.angleMean(2),
+            AngleStatistics.angleMean(0),
+            AngleStatistics.angleResidual(2),
+            AngleStatistics.angleResidual(0),
+            AngleStatistics.angleAdd(2),
+            dt);
+
+    List<Pose2d> waypoints =
+        List.of(
+            new Pose2d(2.75, 22.521, Rotation2d.kZero),
+            new Pose2d(24.73, 19.68, Rotation2d.fromRadians(5.846)));
+    var trajectory =
+        TrajectoryGenerator.generateTrajectory(waypoints, new TrajectoryConfig(8.8, 0.1));
+
+    Matrix<N5, N1> r = new Matrix<>(Nat.N5(), Nat.N1());
+    Matrix<N2, N1> u = new Matrix<>(Nat.N2(), Nat.N1());
+
+    var B =
+        NumericalJacobian.numericalJacobianU(
+            Nat.N5(),
+            Nat.N2(),
+            S3UKFTest::driveDynamics,
+            new Matrix<>(Nat.N5(), Nat.N1()),
+            new Matrix<>(Nat.N2(), Nat.N1()));
+
+    observer.setXhat(
+        VecBuilder.fill(
+            trajectory.start().pose.getTranslation().getX(),
+            trajectory.start().pose.getTranslation().getY(),
+            trajectory.start().pose.getRotation().getRadians(),
+            0.0,
+            0.0));
+
+    var trueXhat = observer.getXhat();
+
+    double totalTime = trajectory.duration.in(Seconds);
+    for (int i = 0; i < (totalTime / dt); ++i) {
+      var ref = trajectory.sampleAt(dt * i);
+      double vl = ref.vel.vx * (1 - (ref.curvature * rb));
+      double vr = ref.vel.vx * (1 + (ref.curvature * rb));
+
+      var nextR =
+          VecBuilder.fill(
+              ref.pose.getTranslation().getX(),
+              ref.pose.getTranslation().getY(),
+              ref.pose.getRotation().getRadians(),
+              vl,
+              vr);
+
+      Matrix<N3, N1> localY =
+          driveLocalMeasurementModel(trueXhat, new Matrix<>(Nat.N2(), Nat.N1()));
+      var noiseStdDev = VecBuilder.fill(0.0001, 0.5, 0.5);
+
+      observer.correct(u, localY.plus(StateSpaceUtil.makeWhiteNoiseVector(noiseStdDev)));
+
+      var rdot = nextR.minus(r).div(dt);
+      u = new Matrix<>(B.solve(rdot.minus(driveDynamics(r, new Matrix<>(Nat.N2(), Nat.N1())))));
+
+      observer.predict(u, dt);
+
+      r = nextR;
+      trueXhat = NumericalIntegration.rk4(S3UKFTest::driveDynamics, trueXhat, u, dt);
+    }
+
+    var localY = driveLocalMeasurementModel(trueXhat, u);
+    observer.correct(u, localY);
+
+    var globalY = driveGlobalMeasurementModel(trueXhat, u);
+    var R =
+        StateSpaceUtil.makeCovarianceMatrix(
+            Nat.N5(), VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
+    observer.correct(
+        Nat.N5(),
+        u,
+        globalY,
+        S3UKFTest::driveGlobalMeasurementModel,
+        R,
+        AngleStatistics.angleMean(2),
+        AngleStatistics.angleResidual(2),
+        AngleStatistics.angleResidual(2),
+        AngleStatistics.angleAdd(2));
+
+    final var finalPosition = trajectory.sampleAt(trajectory.duration.in(Seconds));
+
+    assertEquals(finalPosition.pose.getTranslation().getX(), observer.getXhat(0), 0.055);
+    assertEquals(finalPosition.pose.getTranslation().getY(), observer.getXhat(1), 0.15);
+    assertEquals(finalPosition.pose.getRotation().getRadians(), observer.getXhat(2), 0.00015);
+    assertEquals(0.0, observer.getXhat(3), 0.1);
+    assertEquals(0.0, observer.getXhat(4), 0.1);
   }
 
   @Test

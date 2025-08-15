@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -13,15 +14,238 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.trajectory.SplineSample;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.TreeMap;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 
 class SwerveDrivePoseEstimator3dTest {
   private static final double kEpsilon = 1e-9;
+
+  @Test
+  void testAccuracyFacingTrajectory() {
+    var kinematics =
+        new SwerveDriveKinematics(
+            new Translation2d(1, 1),
+            new Translation2d(1, -1),
+            new Translation2d(-1, -1),
+            new Translation2d(-1, 1));
+
+    var fl = new SwerveModulePosition();
+    var fr = new SwerveModulePosition();
+    var bl = new SwerveModulePosition();
+    var br = new SwerveModulePosition();
+
+    var estimator =
+        new SwerveDrivePoseEstimator3d(
+            kinematics,
+            Rotation3d.kZero,
+            new SwerveModulePosition[] {fl, fr, bl, br},
+            Pose3d.kZero,
+            VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
+            VecBuilder.fill(0.5, 0.5, 0.5, 0.5));
+
+    var trajectory =
+        TrajectoryGenerator.generateTrajectory(
+            List.of(
+                new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+                new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+                new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
+            new TrajectoryConfig(2, 2));
+
+    testFollowTrajectory(
+        kinematics,
+        estimator,
+        trajectory,
+        state -> state.vel,
+        state -> state.pose,
+        trajectory.start().pose,
+        new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+        0.02,
+        0.1,
+        0.25,
+        true);
+  }
+
+  @Test
+  void testBadInitialPose() {
+    var kinematics =
+        new SwerveDriveKinematics(
+            new Translation2d(1, 1),
+            new Translation2d(1, -1),
+            new Translation2d(-1, -1),
+            new Translation2d(-1, 1));
+
+    var fl = new SwerveModulePosition();
+    var fr = new SwerveModulePosition();
+    var bl = new SwerveModulePosition();
+    var br = new SwerveModulePosition();
+
+    var estimator =
+        new SwerveDrivePoseEstimator3d(
+            kinematics,
+            Rotation3d.kZero,
+            new SwerveModulePosition[] {fl, fr, bl, br},
+            Pose3d.kZero,
+            VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
+            VecBuilder.fill(0.9, 0.9, 0.9, 0.9));
+    var trajectory =
+        TrajectoryGenerator.generateTrajectory(
+            List.of(
+                new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+                new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+                new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
+            new TrajectoryConfig(2, 2));
+
+    for (int offset_direction_degs = 0; offset_direction_degs < 360; offset_direction_degs += 45) {
+      for (int offset_heading_degs = 0; offset_heading_degs < 360; offset_heading_degs += 45) {
+        var pose_offset = Rotation2d.fromDegrees(offset_direction_degs);
+        var heading_offset = Rotation2d.fromDegrees(offset_heading_degs);
+
+        var initial_pose =
+            trajectory
+                .start()
+                .pose
+                .plus(
+                    new Transform2d(
+                        new Translation2d(pose_offset.getCos(), pose_offset.getSin()),
+                        heading_offset));
+
+        testFollowTrajectory(
+            kinematics,
+            estimator,
+            trajectory,
+            state -> state.vel,
+            state -> state.pose,
+            initial_pose,
+            new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+            0.02,
+            0.1,
+            1.0,
+            false);
+      }
+    }
+  }
+
+  void testFollowTrajectory(
+      final SwerveDriveKinematics kinematics,
+      final SwerveDrivePoseEstimator3d estimator,
+      final Trajectory<SplineSample> trajectory,
+      final Function<SplineSample, ChassisSpeeds> chassisSpeedsGenerator,
+      final Function<SplineSample, Pose2d> visionMeasurementGenerator,
+      final Pose2d startingPose,
+      final Pose2d endingPose,
+      final double dt,
+      final double visionUpdateRate,
+      final double visionUpdateDelay,
+      final boolean checkError) {
+    SwerveModulePosition[] positions = {
+      new SwerveModulePosition(),
+      new SwerveModulePosition(),
+      new SwerveModulePosition(),
+      new SwerveModulePosition()
+    };
+
+    estimator.resetPosition(Rotation3d.kZero, positions, new Pose3d(startingPose));
+
+    var rand = new Random(3538);
+
+    double t = 0.0;
+
+    final TreeMap<Double, Pose2d> visionUpdateQueue = new TreeMap<>();
+
+    double maxError = Double.NEGATIVE_INFINITY;
+    double errorSum = 0;
+    while (t <= trajectory.duration.in(Seconds)) {
+      var groundTruthState = trajectory.sampleAt(t);
+
+      // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
+      // last vision measurement
+      if (visionUpdateQueue.isEmpty() || visionUpdateQueue.lastKey() + visionUpdateRate < t) {
+        Pose2d newVisionPose =
+            visionMeasurementGenerator
+                .apply(groundTruthState)
+                .plus(
+                    new Transform2d(
+                        new Translation2d(rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.1),
+                        new Rotation2d(rand.nextGaussian() * 0.05)));
+
+        visionUpdateQueue.put(t, newVisionPose);
+      }
+
+      // We should apply the oldest vision measurement if it has been `visionUpdateDelay` seconds
+      // since it was measured
+      if (!visionUpdateQueue.isEmpty() && visionUpdateQueue.firstKey() + visionUpdateDelay < t) {
+        var visionEntry = visionUpdateQueue.pollFirstEntry();
+        estimator.addVisionMeasurement(new Pose3d(visionEntry.getValue()), visionEntry.getKey());
+      }
+
+      var chassisSpeeds = chassisSpeedsGenerator.apply(groundTruthState);
+
+      var moduleStates = kinematics.toSwerveModuleStates(chassisSpeeds);
+
+      for (int i = 0; i < moduleStates.length; i++) {
+        positions[i].distance += moduleStates[i].speed * (1 - rand.nextGaussian() * 0.05) * dt;
+        positions[i].angle =
+            moduleStates[i].angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
+      }
+
+      var xHat =
+          estimator.updateWithTime(
+              t,
+              new Rotation3d(
+                  groundTruthState
+                      .pose
+                      .getRotation()
+                      .plus(new Rotation2d(rand.nextGaussian() * 0.05))
+                      .minus(trajectory.start().pose.getRotation())),
+              positions);
+
+      double error =
+          groundTruthState
+              .pose
+              .getTranslation()
+              .getDistance(xHat.getTranslation().toTranslation2d());
+      if (error > maxError) {
+        maxError = error;
+      }
+      errorSum += error;
+
+      t += dt;
+    }
+
+    assertEquals(
+        endingPose.getX(), estimator.getEstimatedPosition().getX(), 0.08, "Incorrect Final X");
+    assertEquals(
+        endingPose.getY(), estimator.getEstimatedPosition().getY(), 0.08, "Incorrect Final Y");
+    assertEquals(
+        endingPose.getRotation().getRadians(),
+        estimator.getEstimatedPosition().getRotation().toRotation2d().getRadians(),
+        0.15,
+        "Incorrect Final Theta");
+
+    if (checkError) {
+      assertEquals(
+          0.0, errorSum / (trajectory.duration.in(Seconds) / dt), 0.07, "Incorrect mean error");
+      assertEquals(0.0, maxError, 0.2, "Incorrect max error");
+    }
+  }
 
   @Test
   void testSimultaneousVisionMeasurements() {

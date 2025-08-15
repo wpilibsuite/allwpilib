@@ -18,6 +18,7 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.trajectory.DifferentialSample;
 
 /**
  * The linear time-varying differential drive controller has a similar form to the LQR, but the
@@ -207,5 +208,42 @@ public class LTVDifferentialDriveController {
     var u = K.times(inRobotFrame).times(m_error);
 
     return new DifferentialDriveWheelVoltages(u.get(0, 0), u.get(1, 0));
+  }
+
+  /**
+   * Returns the left and right output voltages of the LTV controller.
+   *
+   * <p>The reference pose, linear velocity, and angular velocity should come from a drivetrain
+   * trajectory.
+   *
+   * @param currentPose The current pose.
+   * @param leftVelocity The left velocity in meters per second.
+   * @param rightVelocity The right velocity in meters per second.
+   * @param desiredState The desired pose, linear velocity, and angular velocity from a trajectory.
+   * @return The left and right output voltages of the LTV controller.
+   */
+  public DifferentialDriveWheelVoltages calculate(
+      Pose2d currentPose,
+      double leftVelocity,
+      double rightVelocity,
+      DifferentialSample desiredState) {
+    // v = (v_r + v_l) / 2     (1)
+    // w = (v_r - v_l) / (2r)  (2)
+    // k = w / v               (3)
+    //
+    // v_l = v - wr
+    // v_l = v - (vk)r
+    // v_l = v(1 - kr)
+    //
+    // v_r = v + wr
+    // v_r = v + (vk)r
+    // v_r = v(1 + kr)
+    return calculate(
+        currentPose,
+        leftVelocity,
+        rightVelocity,
+        desiredState.pose,
+        desiredState.leftSpeed,
+        desiredState.rightSpeed);
   }
 }

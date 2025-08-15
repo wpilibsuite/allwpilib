@@ -145,7 +145,7 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample> {
 
   /**
    * Interpolates between this sample and the given sample using numerical integration of the
-   * differential drive differential equation on this sample state.
+   * differential drive differential equation.
    *
    * @param endValue The end sample.
    * @param t The time between this sample and the end sample. Should be in the range [0, 1].
@@ -190,5 +190,15 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample> {
         new ChassisAccelerations(ax, ay, alpha),
         vl,
         vr);
+  }
+
+  @Override
+  public DifferentialSample fromSample(TrajectorySample<?> sample) {
+    double trackwidth = (rightSpeed - leftSpeed) / 2.0;
+
+    return new DifferentialSample(
+        sample,
+        sample.vel.vx - trackwidth / 2 * sample.vel.omega,
+        sample.vel.vx + trackwidth / 2 * sample.vel.omega);
   }
 }

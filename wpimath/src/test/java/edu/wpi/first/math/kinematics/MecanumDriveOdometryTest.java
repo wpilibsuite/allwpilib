@@ -4,12 +4,17 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import java.util.List;
+import java.util.Random;
 import org.junit.jupiter.api.Test;
 
 class MecanumDriveOdometryTest {
@@ -86,5 +91,168 @@ class MecanumDriveOdometryTest {
         () -> assertEquals(3.536, pose.getX(), 0.1),
         () -> assertEquals(0.0, pose.getY(), 0.1),
         () -> assertEquals(0.0, pose.getRotation().getRadians(), 0.1));
+  }
+
+  @Test
+  void testAccuracyFacingTrajectory() {
+    var kinematics =
+        new MecanumDriveKinematics(
+            new Translation2d(1, 1), new Translation2d(1, -1),
+            new Translation2d(-1, -1), new Translation2d(-1, 1));
+
+    var wheelPositions = new MecanumDriveWheelPositions();
+
+    var odometry =
+        new MecanumDriveOdometry(kinematics, Rotation2d.kZero, wheelPositions, Pose2d.kZero);
+
+    var trajectory =
+        TrajectoryGenerator.generateTrajectory(
+            List.of(
+                Pose2d.kZero,
+                new Pose2d(20, 20, Rotation2d.kZero),
+                new Pose2d(10, 10, Rotation2d.kPi),
+                new Pose2d(30, 30, Rotation2d.kZero),
+                new Pose2d(20, 20, Rotation2d.kPi),
+                new Pose2d(10, 10, Rotation2d.kZero)),
+            new TrajectoryConfig(0.5, 2));
+
+    var rand = new Random(5190);
+
+    final double dt = 0.02;
+    double t = 0.0;
+
+    double maxError = Double.NEGATIVE_INFINITY;
+    double errorSum = 0;
+    double odometryDistanceTravelled = 0;
+    double trajectoryDistanceTravelled = 0;
+    while (t <= trajectory.duration.in(Seconds)) {
+      var groundTruthState = trajectory.sampleAt(t);
+
+      trajectoryDistanceTravelled +=
+          groundTruthState.vel.vx * dt + 0.5 * groundTruthState.accel.ax * dt * dt;
+
+      var wheelSpeeds =
+          kinematics.toWheelSpeeds(
+              new ChassisSpeeds(
+                  groundTruthState.vel.vx,
+                  0,
+                  groundTruthState.vel.vx * groundTruthState.curvature));
+
+      wheelSpeeds.frontLeft += rand.nextGaussian() * 0.1;
+      wheelSpeeds.frontRight += rand.nextGaussian() * 0.1;
+      wheelSpeeds.rearLeft += rand.nextGaussian() * 0.1;
+      wheelSpeeds.rearRight += rand.nextGaussian() * 0.1;
+
+      wheelPositions.frontLeft += wheelSpeeds.frontLeft * dt;
+      wheelPositions.frontRight += wheelSpeeds.frontRight * dt;
+      wheelPositions.rearLeft += wheelSpeeds.rearLeft * dt;
+      wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
+
+      var lastPose = odometry.getPose();
+
+      var xHat =
+          odometry.update(
+              groundTruthState.pose.getRotation().plus(new Rotation2d(rand.nextGaussian() * 0.05)),
+              wheelPositions);
+
+      odometryDistanceTravelled += lastPose.getTranslation().getDistance(xHat.getTranslation());
+
+      double error = groundTruthState.pose.getTranslation().getDistance(xHat.getTranslation());
+      if (error > maxError) {
+        maxError = error;
+      }
+      errorSum += error;
+
+      t += dt;
+    }
+
+    assertEquals(
+        0.0, errorSum / (trajectory.duration.in(Seconds) / dt), 0.35, "Incorrect mean error");
+    assertEquals(0.0, maxError, 0.35, "Incorrect max error");
+    assertEquals(
+        1.0,
+        odometryDistanceTravelled / trajectoryDistanceTravelled,
+        0.05,
+        "Incorrect distance travelled");
+  }
+
+  @Test
+  void testAccuracyFacingXAxis() {
+    var kinematics =
+        new MecanumDriveKinematics(
+            new Translation2d(1, 1), new Translation2d(1, -1),
+            new Translation2d(-1, -1), new Translation2d(-1, 1));
+
+    var wheelPositions = new MecanumDriveWheelPositions();
+
+    var odometry =
+        new MecanumDriveOdometry(kinematics, Rotation2d.kZero, wheelPositions, Pose2d.kZero);
+
+    var trajectory =
+        TrajectoryGenerator.generateTrajectory(
+            List.of(
+                Pose2d.kZero,
+                new Pose2d(20, 20, Rotation2d.kZero),
+                new Pose2d(10, 10, Rotation2d.kPi),
+                new Pose2d(30, 30, Rotation2d.kZero),
+                new Pose2d(20, 20, Rotation2d.kPi),
+                new Pose2d(10, 10, Rotation2d.kZero)),
+            new TrajectoryConfig(0.5, 2));
+
+    var rand = new Random(5190);
+
+    final double dt = 0.02;
+    double t = 0.0;
+
+    double maxError = Double.NEGATIVE_INFINITY;
+    double errorSum = 0;
+    double odometryDistanceTravelled = 0;
+    double trajectoryDistanceTravelled = 0;
+    while (t <= trajectory.duration.in(Seconds)) {
+      var groundTruthState = trajectory.sampleAt(t);
+
+      trajectoryDistanceTravelled +=
+          groundTruthState.vel.vx * dt + 0.5 * groundTruthState.accel.ax * dt * dt;
+
+      var wheelSpeeds =
+          kinematics.toWheelSpeeds(
+              new ChassisSpeeds(
+                  groundTruthState.vel.vx * groundTruthState.pose.getRotation().getCos(),
+                  groundTruthState.vel.vx * groundTruthState.pose.getRotation().getSin(),
+                  0));
+
+      wheelSpeeds.frontLeft += rand.nextGaussian() * 0.1;
+      wheelSpeeds.frontRight += rand.nextGaussian() * 0.1;
+      wheelSpeeds.rearLeft += rand.nextGaussian() * 0.1;
+      wheelSpeeds.rearRight += rand.nextGaussian() * 0.1;
+
+      wheelPositions.frontLeft += wheelSpeeds.frontLeft * dt;
+      wheelPositions.frontRight += wheelSpeeds.frontRight * dt;
+      wheelPositions.rearLeft += wheelSpeeds.rearLeft * dt;
+      wheelPositions.rearRight += wheelSpeeds.rearRight * dt;
+
+      var lastPose = odometry.getPose();
+
+      var xHat = odometry.update(new Rotation2d(rand.nextGaussian() * 0.05), wheelPositions);
+
+      odometryDistanceTravelled += lastPose.getTranslation().getDistance(xHat.getTranslation());
+
+      double error = groundTruthState.pose.getTranslation().getDistance(xHat.getTranslation());
+      if (error > maxError) {
+        maxError = error;
+      }
+      errorSum += error;
+
+      t += dt;
+    }
+
+    assertEquals(
+        0.0, errorSum / (trajectory.duration.in(Seconds) / dt), 0.15, "Incorrect mean error");
+    assertEquals(0.0, maxError, 0.3, "Incorrect max error");
+    assertEquals(
+        1.0,
+        odometryDistanceTravelled / trajectoryDistanceTravelled,
+        0.05,
+        "Incorrect distance travelled");
   }
 }
