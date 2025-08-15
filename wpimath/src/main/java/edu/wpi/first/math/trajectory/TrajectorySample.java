@@ -5,26 +5,17 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.ChassisAccelerations;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.struct.TrajectorySampleStruct;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
-/**
- * Represents a single sample in a trajectory. This is intended to be used as a value type, with the
- * expectation that it will be immutable. The generic type parameter allows for different types of
- * trajectory samples, which are used to add values for the different types of drivetrains in order
- * to make following a trajectory easier. If no drivetrain-specific values are needed, use {@link
- * TrajectorySample.Base}.
- *
- * @param <SampleType> The type of the sample.
- */
+/** Represents a single sample in a trajectory. */
 public abstract class TrajectorySample<SampleType extends TrajectorySample<SampleType>>
-    implements Interpolatable<SampleType>, StructSerializable {
+    implements Interpolatable<SampleType> {
   /** The timestamp of the sample relative to the trajectory start. */
   public final Time timestamp;
 
@@ -36,9 +27,6 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
 
   /** The robot acceleration at this sample (in the robot's reference frame). */
   public final ChassisAccelerations accel;
-
-  /** TrajectorySample struct for serialization. */
-  public static final TrajectorySampleStruct struct = new TrajectorySampleStruct();
 
   /**
    * Constructs a TrajectorySample.
@@ -91,25 +79,22 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
     return new Base(timestamp.plus(dt), newPose, newVel, accel);
   }
 
-  /**
-   * Interpolates between this sample and the end sample using constant-acceleration kinematic
-   * equations. Does not work for differential drive samples because differential drivetrains couple
-   * translation and rotation, which this method does not account for.
-   *
-   * @param start Sample to interpolate from.
-   * @param end Sample to interpolate to.
-   * @param t Time between the two samples. Should be in the range [0, 1].
-   * @return Interpolated sample.
-   */
-  public static Base kinematicInterpolate(
-      TrajectorySample<?> start, TrajectorySample<?> end, double t) {
-    return new Base(start).interpolate(new Base(end), t);
-  }
+  /** Creates a new sample from the given sample. */
+  public abstract SampleType fromSample(TrajectorySample<?> sample);
 
   /**
-   * A base trajectory sample that does not include any drivetrain-specific values. This is intended
-   * to be used as a value type, with the expectation that it will be immutable.
+   * Transforms the pose of this sample by the given transform.
+   *
+   * @param transform2d The transform to apply to the pose.
+   * @return A new sample with the transformed pose.
    */
+  public SampleType transform(Transform2d transform2d) {
+    var newPose = pose.transformBy(transform2d);
+
+    return fromSample(new Base(timestamp, newPose, vel, accel));
+  }
+
+  /** A base class for trajectory samples. */
   public static class Base extends TrajectorySample<Base> {
     public Base(Time timestamp, Pose2d pose, ChassisSpeeds vel, ChassisAccelerations accel) {
       super(timestamp, pose, vel, accel);
@@ -119,12 +104,8 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
       super(sample.timestamp, sample.pose, sample.vel, sample.accel);
     }
 
-    public Base() {
-      super(Seconds.of(0.0), Pose2d.kZero, new ChassisSpeeds(), new ChassisAccelerations());
-    }
-
     /**
-     * Interpolates between this sample and the end sample using constant-acceleration kinematic
+     * Interpolates between this sample and the end sample using constant-acceleratopm kinematic
      * equations.
      *
      * @param endValue The end sample.
@@ -139,10 +120,8 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
         return new Base(this);
       }
 
-      double interpTime =
+      var interpDt =
           MathUtil.interpolate(this.timestamp.in(Seconds), endValue.timestamp.in(Seconds), t);
-
-      double interpDt = interpTime - this.timestamp.in(Seconds);
 
       var newAccel =
           new ChassisAccelerations(
@@ -167,7 +146,12 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
                       + vel.omega * interpDt
                       + 0.5 * accel.alpha * interpDt * interpDt));
 
-      return new Base(Seconds.of(interpTime), newPose, newVel, newAccel);
+      return new Base(Seconds.of(interpDt), newPose, newVel, newAccel);
+    }
+
+    @Override
+    public Base fromSample(TrajectorySample<?> sample) {
+      return new Base(sample);
     }
   }
 }

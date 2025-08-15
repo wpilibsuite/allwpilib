@@ -112,12 +112,14 @@ public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
     }
 
     var combinedSamples = new ArrayList<>(this.samples);
-    combinedSamples.addAll(other.samples.stream().map(
-      s ->
-        s.fromSample(
-            new TrajectorySample.Base(
-                s.timestamp.plus(this.duration), s.pose, s.vel, s.accel))
-    ).toList());
+    combinedSamples.addAll(
+        other.samples.stream()
+            .map(
+                s ->
+                    s.fromSample(
+                        new TrajectorySample.Base(
+                            s.timestamp.plus(this.duration), s.pose, s.vel, s.accel)))
+            .toList());
 
     return new Trajectory<>(combinedSamples);
   }
