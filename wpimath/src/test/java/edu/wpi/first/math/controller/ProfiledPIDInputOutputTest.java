@@ -7,7 +7,7 @@ package edu.wpi.first.math.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.math.profile.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import org.junit.jupiter.api.Test;
 
 class ProfiledPIDInputOutputTest {

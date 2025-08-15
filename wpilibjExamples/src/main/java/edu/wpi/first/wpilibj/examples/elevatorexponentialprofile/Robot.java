@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.elevatorexponentialprofile;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.profile.ExponentialProfile;
+import edu.wpi.first.math.trajectory.ExponentialProfile;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 

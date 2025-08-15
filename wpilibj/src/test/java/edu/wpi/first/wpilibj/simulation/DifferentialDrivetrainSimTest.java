@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,11 +22,78 @@ import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 import edu.wpi.first.math.util.Units;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class DifferentialDrivetrainSimTest {
+  @Test
+  void testConvergence() {
+    var motor = DCMotor.getNEO(2);
+    var plant =
+        LinearSystemId.createDrivetrainVelocitySystem(
+            motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5, 1.0);
+
+    var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
+    var sim =
+        new DifferentialDrivetrainSim(
+            plant,
+            motor,
+            1,
+            kinematics.trackwidth,
+            Units.inchesToMeters(2),
+            VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
+
+    var feedforward = new LinearPlantInversionFeedforward<>(plant, 0.020);
+    var feedback = new LTVUnicycleController(0.020);
+    feedforward.reset(VecBuilder.fill(0, 0));
+
+    // ground truth
+    Matrix<N7, N1> groundTruthX = new Vector<>(Nat.N7());
+
+    var traj =
+        TrajectoryGenerator.generateTrajectory(
+            Pose2d.kZero,
+            List.of(),
+            new Pose2d(2, 2, Rotation2d.kZero),
+            new TrajectoryConfig(1, 1)
+                .addConstraint(new DifferentialDriveKinematicsConstraint(kinematics, 1)));
+
+    for (double t = 0; t < traj.duration.in(Seconds); t += 0.020) {
+      var state = traj.sampleAt(t);
+      var feedbackOut = feedback.calculate(sim.getPose(), state);
+
+      var wheelSpeeds = kinematics.toWheelSpeeds(feedbackOut);
+
+      var voltages = feedforward.calculate(VecBuilder.fill(wheelSpeeds.left, wheelSpeeds.right));
+
+      // Sim periodic code
+      sim.setInputs(voltages.get(0, 0), voltages.get(1, 0));
+      sim.update(0.020);
+
+      // Update our ground truth
+      groundTruthX = NumericalIntegration.rkdp(sim::getDynamics, groundTruthX, voltages, 0.020);
+    }
+
+    // 2 inch tolerance is OK since our ground truth is an approximation of the
+    // ODE solution using RKDP anyway
+    assertEquals(
+        groundTruthX.get(DifferentialDrivetrainSim.State.kX.value, 0),
+        sim.getState(DifferentialDrivetrainSim.State.kX),
+        0.05);
+    assertEquals(
+        groundTruthX.get(DifferentialDrivetrainSim.State.kY.value, 0),
+        sim.getState(DifferentialDrivetrainSim.State.kY),
+        0.05);
+    assertEquals(
+        groundTruthX.get(DifferentialDrivetrainSim.State.kHeading.value, 0),
+        sim.getState(DifferentialDrivetrainSim.State.kHeading),
+        0.01);
+  }
+
   @Test
   void testCurrent() {
     var motor = DCMotor.getNEO(2);
