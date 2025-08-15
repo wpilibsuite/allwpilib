@@ -6,6 +6,8 @@ package edu.wpi.first.math;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
 
 /** Math utility functions. */
 public final class MathUtil {
@@ -27,6 +29,20 @@ public final class MathUtil {
   }
 
   /**
+   * Perform linear interpolation between two values with units.
+   *
+   * @param startValue The value to start at.
+   * @param endValue The value to end at.
+   * @param t How far between the two values to interpolate. This is clamped to [0, 1].
+   * @return The interpolated value.
+   */
+  @SuppressWarnings("unchecked")
+  public static <U extends Unit, M extends Measure<U>> M interpolate(
+      M startValue, M endValue, double t) {
+    return (M) startValue.plus(endValue.minus(startValue).times(MathUtil.clamp(t, 0, 1)));
+  }
+
+  /**
    * Returns the interpolant t that reflects where q is with respect to the range (a, b). In other
    * words, returns t such that q = a + (b - a)t. If a = b, then returns 0.
    *
@@ -44,6 +60,51 @@ public final class MathUtil {
     } else {
       return (q - a) / (b - a);
     }
+  }
+
+  /**
+   * Return where within interpolation range [0, 1] q is between startValue and endValue.
+   *
+   * @param startValue Lower part of interpolation range.
+   * @param endValue Upper part of interpolation range.
+   * @param q Query.
+   * @return Interpolant in range [0, 1].
+   */
+  public static <U extends Unit, M extends Measure<U>> double inverseInterpolate(
+      M startValue, M endValue, M q) {
+    double totalRange = endValue.minus(startValue).in(startValue.unit());
+    if (totalRange <= 0) {
+      return 0.0;
+    }
+    double queryToStart = q.minus(startValue).in(startValue.unit());
+    if (queryToStart <= 0) {
+      return 0.0;
+    }
+    return queryToStart / totalRange;
+  }
+
+  /**
+   * Returns value clamped between low and high boundaries.
+   *
+   * @param value Value to clamp.
+   * @param low The lower boundary to which to clamp value.
+   * @param high The higher boundary to which to clamp value.
+   * @return The clamped value.
+   */
+  public static int clamp(int value, int low, int high) {
+    return Math.max(low, Math.min(value, high));
+  }
+
+  /**
+   * Returns value clamped between low and high boundaries.
+   *
+   * @param value Value to clamp.
+   * @param low The lower boundary to which to clamp value.
+   * @param high The higher boundary to which to clamp value.
+   * @return The clamped value.
+   */
+  public static double clamp(double value, double low, double high) {
+    return Math.max(low, Math.min(value, high));
   }
 
   /**

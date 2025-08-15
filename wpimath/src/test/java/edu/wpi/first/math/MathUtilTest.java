@@ -4,6 +4,10 @@
 
 package edu.wpi.first.math;
 
+import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.Feet;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -47,6 +51,43 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
     // Above maximum
     assertEquals(4.0, MathUtil.lerp(2.0, 3.0, 2.0));
     assertEquals(9.0, MathUtil.lerp(1.0, 5.0, 2.0));
+  }
+
+  @Test
+  void testInterpolateWithSameUnits() {
+    assertEquals(Meters.of(50), MathUtil.interpolate(Meters.of(0), Meters.of(100), 0.5));
+    assertEquals(Meters.of(-50), MathUtil.interpolate(Meters.of(0), Meters.of(-100), 0.5));
+    assertEquals(Meters.of(0), MathUtil.interpolate(Meters.of(-50), Meters.of(50), 0.5));
+    assertEquals(Meters.of(-25), MathUtil.interpolate(Meters.of(-50), Meters.of(50), 0.25));
+    assertEquals(Meters.of(25), MathUtil.interpolate(Meters.of(-50), Meters.of(50), 0.75));
+
+    assertEquals(Meters.of(0), MathUtil.interpolate(Meters.of(0), Meters.of(-100), -0.5));
+  }
+
+  @Test
+  void testInterpolateWithDifferentUnits() {
+    assertEquals(Inches.of(6), MathUtil.interpolate(Meters.of(0), Feet.of(1), 0.5));
+    assertEquals(Inches.of(-6), MathUtil.interpolate(Meters.of(0), Feet.of(-1), 0.5));
+    assertEquals(Inches.of(0), MathUtil.interpolate(Centimeters.of(-500), Meters.of(5), 0.5));
+    assertEquals(Inches.of(-6), MathUtil.interpolate(Feet.of(-1), Inches.of(12), 0.25));
+    assertEquals(Inches.of(6), MathUtil.interpolate(Feet.of(-1), Inches.of(12), 0.75));
+
+    assertEquals(Inches.of(0), MathUtil.interpolate(Inches.of(0), Feet.of(-1), -0.5));
+  }
+
+  @Test
+  void testClamp() {
+    // int
+    assertEquals(5, MathUtil.clamp(10, 1, 5));
+
+    // double
+    assertEquals(5.5, MathUtil.clamp(10.5, 1.5, 5.5));
+
+    // negative int
+    assertEquals(-5, MathUtil.clamp(-10, -5, -1));
+
+    // negative double
+    assertEquals(-5.5, MathUtil.clamp(-10.5, -5.5, -1.5));
   }
 
   @Test
