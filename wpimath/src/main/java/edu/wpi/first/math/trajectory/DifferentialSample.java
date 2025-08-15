@@ -191,4 +191,14 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample> {
         vl,
         vr);
   }
+
+  @Override
+  public DifferentialSample fromSample(TrajectorySample<?> sample) {
+    double trackwidth = (rightSpeed - leftSpeed) / 2.0;
+
+    return new DifferentialSample(
+        sample,
+        sample.vel.vx - trackwidth / 2 * sample.vel.omega,
+        sample.vel.vx + trackwidth / 2 * sample.vel.omega);
+  }
 }

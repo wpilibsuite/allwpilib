@@ -54,7 +54,7 @@ public final class TrajectoryParameterizer {
    *     from a -&gt; b -&gt; ... -&gt; z as defined in the waypoints.
    * @return The trajectory.
    */
-  public static Trajectory timeParameterizeTrajectory(
+  public static Trajectory<SplineSample> timeParameterizeTrajectory(
       List<PoseWithCurvature> points,
       List<TrajectoryConstraint> constraints,
       double startVelocity,
@@ -196,7 +196,7 @@ public final class TrajectoryParameterizer {
 
     // Now we can integrate the constrained states forward in time to obtain our
     // trajectory states.
-    var states = new ArrayList<Trajectory.State>(points.size());
+    var states = new ArrayList<SplineSample>(points.size());
     double time = 0.0;
     double distance = 0.0;
     double velocity = 0.0;
@@ -215,7 +215,7 @@ public final class TrajectoryParameterizer {
       // Calculate dt
       double dt = 0.0;
       if (i > 0) {
-        states.get(i - 1).acceleration = reversed ? -accel : accel;
+        states.get(i - 1).accel.ax = reversed ? -accel : accel;
         if (Math.abs(accel) > 1E-6) {
           // v_f = v_0 + a * t
           dt = (state.maxVelocity - velocity) / accel;
@@ -234,15 +234,15 @@ public final class TrajectoryParameterizer {
       time += dt;
 
       states.add(
-          new Trajectory.State(
+          new SplineSample(
               time,
+              state.pose.pose,
               reversed ? -velocity : velocity,
               reversed ? -accel : accel,
-              state.pose.pose,
               state.pose.curvature));
     }
 
-    return new Trajectory(states);
+    return new Trajectory<>(states);
   }
 
   private static void enforceAccelerationLimits(

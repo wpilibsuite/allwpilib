@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.ChassisAccelerations;
@@ -78,6 +79,21 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
     return new Base(timestamp.plus(dt), newPose, newVel, accel);
   }
 
+  /** Creates a new sample from the given sample. */
+  public abstract SampleType fromSample(TrajectorySample<?> sample);
+
+  /**
+   * Transforms the pose of this sample by the given transform.
+   *
+   * @param transform2d The transform to apply to the pose.
+   * @return A new sample with the transformed pose.
+   */
+  public SampleType transform(Transform2d transform2d) {
+    var newPose = pose.transformBy(transform2d);
+
+    return fromSample(new Base(timestamp, newPose, vel, accel));
+  }
+
   /** A base class for trajectory samples. */
   public static class Base extends TrajectorySample<Base> {
     public Base(Time timestamp, Pose2d pose, ChassisSpeeds vel, ChassisAccelerations accel) {
@@ -131,6 +147,11 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
                       + 0.5 * accel.alpha * interpDt * interpDt));
 
       return new Base(Seconds.of(interpDt), newPose, newVel, newAccel);
+    }
+
+    @Override
+    public Base fromSample(TrajectorySample<?> sample) {
+      return new Base(sample);
     }
   }
 }
