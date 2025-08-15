@@ -81,11 +81,17 @@ public class TrapezoidProfile {
     /** The velocity at this state. */
     public double velocity;
 
+    /**
+     * The acceleration at this state. This is not used in the calculation of the profile, but is
+     * included in the result.
+     */
+    public double acceleration;
+
     /** Default constructor. */
     public State() {}
 
     /**
-     * Constructs constraints for a Trapezoid Profile.
+     * Constructs a Trapezoid Profile state with zero acceleration.
      *
      * @param position The position at this state.
      * @param velocity The velocity at this state.
@@ -93,6 +99,19 @@ public class TrapezoidProfile {
     public State(double position, double velocity) {
       this.position = position;
       this.velocity = velocity;
+    }
+
+    /**
+     * Constructs a Trapezoid Profile state with acceleration.
+     *
+     * @param position The position at this state.
+     * @param velocity The velocity at this state.
+     * @param acceleration The acceleration at this state.
+     */
+    private State(double position, double velocity, double acceleration) {
+      this.position = position;
+      this.velocity = velocity;
+      this.acceleration = acceleration;
     }
 
     @Override
@@ -168,17 +187,20 @@ public class TrapezoidProfile {
     if (t < m_endAccel) {
       result.velocity += t * m_constraints.maxAcceleration;
       result.position += (m_current.velocity + t * m_constraints.maxAcceleration / 2.0) * t;
+      result.acceleration = m_constraints.maxAcceleration * m_direction;
     } else if (t < m_endFullSpeed) {
       result.velocity = m_constraints.maxVelocity;
       result.position +=
           (m_current.velocity + m_endAccel * m_constraints.maxAcceleration / 2.0) * m_endAccel
               + m_constraints.maxVelocity * (t - m_endAccel);
+      result.acceleration = 0;
     } else if (t <= m_endDecel) {
       result.velocity = goal.velocity + (m_endDecel - t) * m_constraints.maxAcceleration;
       double timeLeft = m_endDecel - t;
       result.position =
           goal.position
               - (goal.velocity + timeLeft * m_constraints.maxAcceleration / 2.0) * timeLeft;
+      result.acceleration = -m_constraints.maxAcceleration * m_direction;
     } else {
       result = goal;
     }
