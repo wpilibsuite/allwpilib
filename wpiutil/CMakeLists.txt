@@ -117,13 +117,9 @@ file(
     src/main/native/thirdparty/llvm/cpp/*.cpp
     src/main/native/thirdparty/mpack/src/*.cpp
     src/main/native/thirdparty/nanopb/src/*.cpp
+    src/main/native/thirdparty/upb/src/*.c
 )
 list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
-if(NOT WITH_PROTOBUF)
-    list(FILTER wpiutil_native_src EXCLUDE REGEX "/protobuf/")
-    # Don't filter out protobuf cpp file, it only uses nanopb
-    list(APPEND wpiutil_native_src src/main/native/cpp/protobuf/Protobuf.cpp)
-endif()
 file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
 file(GLOB_RECURSE wpiutil_linux_src src/main/native/linux/*.cpp)
 file(GLOB_RECURSE wpiutil_macos_src src/main/native/macOS/*.cpp)
@@ -145,12 +141,7 @@ if(MSVC)
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 wpilib_target_warnings(wpiutil)
-if(WITH_PROTOBUF)
-    target_link_libraries(wpiutil protobuf::libprotobuf Threads::Threads ${CMAKE_DL_LIBS})
-else()
-    target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS})
-    target_compile_definitions(wpiutil PUBLIC NO_PROTOBUF)
-endif()
+target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS})
 
 if(ATOMIC)
     target_link_libraries(wpiutil ${ATOMIC})
@@ -201,6 +192,7 @@ install(
         src/main/native/thirdparty/mpack/include/
         src/main/native/thirdparty/nanopb/include/
         src/main/native/thirdparty/sigslot/include/
+        src/main/native/thirdparty/upb/include/
     DESTINATION "${include_dest}/wpiutil"
 )
 target_include_directories(
@@ -215,6 +207,7 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/nanopb/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sigslot/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/upb/include>
         $<INSTALL_INTERFACE:${include_dest}/wpiutil>
 )
 
