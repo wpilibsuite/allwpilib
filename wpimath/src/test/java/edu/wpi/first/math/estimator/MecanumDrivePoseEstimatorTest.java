@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
+import edu.wpi.first.math.trajectory.SplineSample;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -61,9 +63,9 @@ class MecanumDrivePoseEstimatorTest {
         kinematics,
         estimator,
         trajectory,
-        state -> new ChassisSpeeds(state.velocity, 0, state.velocity * state.curvature),
+        state -> state.vel,
         state -> state.pose,
-        trajectory.getInitialPose(),
+        trajectory.start().pose,
         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
         0.02,
         0.1,
@@ -106,7 +108,8 @@ class MecanumDrivePoseEstimatorTest {
 
         var initial_pose =
             trajectory
-                .getInitialPose()
+                .start()
+                .pose
                 .plus(
                     new Transform2d(
                         new Translation2d(pose_offset.getCos(), pose_offset.getSin()),
@@ -116,7 +119,7 @@ class MecanumDrivePoseEstimatorTest {
             kinematics,
             estimator,
             trajectory,
-            state -> new ChassisSpeeds(state.velocity, 0, state.velocity * state.curvature),
+            state -> state.vel,
             state -> state.pose,
             initial_pose,
             new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -131,9 +134,9 @@ class MecanumDrivePoseEstimatorTest {
   void testFollowTrajectory(
       final MecanumDriveKinematics kinematics,
       final MecanumDrivePoseEstimator estimator,
-      final Trajectory trajectory,
-      final Function<Trajectory.State, ChassisSpeeds> chassisSpeedsGenerator,
-      final Function<Trajectory.State, Pose2d> visionMeasurementGenerator,
+      final Trajectory<SplineSample> trajectory,
+      final Function<SplineSample, ChassisSpeeds> chassisSpeedsGenerator,
+      final Function<SplineSample, Pose2d> visionMeasurementGenerator,
       final Pose2d startingPose,
       final Pose2d endingPose,
       final double dt,
@@ -152,8 +155,8 @@ class MecanumDrivePoseEstimatorTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.getTotalTime()) {
-      var groundTruthState = trajectory.sample(t);
+    while (t <= trajectory.duration.in(Seconds)) {
+      var groundTruthState = trajectory.sampleAt(t);
 
       // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
       // last vision measurement
@@ -192,7 +195,7 @@ class MecanumDrivePoseEstimatorTest {
                   .pose
                   .getRotation()
                   .plus(new Rotation2d(rand.nextGaussian() * 0.05))
-                  .minus(trajectory.getInitialPose().getRotation()),
+                  .minus(trajectory.start().pose.getRotation()),
               wheelPositions);
 
       double error = groundTruthState.pose.getTranslation().getDistance(xHat.getTranslation());
@@ -215,7 +218,8 @@ class MecanumDrivePoseEstimatorTest {
         "Incorrect Final Theta");
 
     if (checkError) {
-      assertEquals(0.0, errorSum / (trajectory.getTotalTime() / dt), 0.07, "Incorrect mean error");
+      assertEquals(
+          0.0, errorSum / (trajectory.duration.in(Seconds) / dt), 0.07, "Incorrect mean error");
       assertEquals(0.0, maxError, 0.2, "Incorrect max error");
     }
   }

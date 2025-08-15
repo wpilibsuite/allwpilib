@@ -18,7 +18,7 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.DifferentialSample;
 
 /**
  * The linear time-varying differential drive controller has a similar form to the LQR, but the
@@ -226,7 +226,7 @@ public class LTVDifferentialDriveController {
       Pose2d currentPose,
       double leftVelocity,
       double rightVelocity,
-      Trajectory.State desiredState) {
+      DifferentialSample desiredState) {
     // v = (v_r + v_l) / 2     (1)
     // w = (v_r - v_l) / (2r)  (2)
     // k = w / v               (3)
@@ -243,7 +243,7 @@ public class LTVDifferentialDriveController {
         leftVelocity,
         rightVelocity,
         desiredState.pose,
-        desiredState.velocity * (1 - (desiredState.curvature * m_trackwidth / 2.0)),
-        desiredState.velocity * (1 + (desiredState.curvature * m_trackwidth / 2.0)));
+        desiredState.leftSpeed,
+        desiredState.rightSpeed);
   }
 }

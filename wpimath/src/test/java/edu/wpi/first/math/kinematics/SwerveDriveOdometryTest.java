@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.kinematics;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -135,15 +136,15 @@ class SwerveDriveOdometryTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.getTotalTime()) {
-      var groundTruthState = trajectory.sample(t);
+    while (t <= trajectory.duration.in(Seconds)) {
+      var groundTruthState = trajectory.sampleAt(t);
 
       var moduleStates =
           kinematics.toSwerveModuleStates(
               new ChassisSpeeds(
-                  groundTruthState.velocity,
+                  groundTruthState.vel.vx,
                   0.0,
-                  groundTruthState.velocity * groundTruthState.curvature));
+                  groundTruthState.vel.vx * groundTruthState.curvature));
       for (var moduleState : moduleStates) {
         moduleState.angle = moduleState.angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
         moduleState.speed += rand.nextGaussian() * 0.1;
@@ -181,7 +182,8 @@ class SwerveDriveOdometryTest {
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
-    assertEquals(0.0, errorSum / (trajectory.getTotalTime() / dt), 0.05, "Incorrect mean error");
+    assertEquals(
+        0.0, errorSum / (trajectory.duration.in(Seconds) / dt), 0.05, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
   }
 
@@ -219,13 +221,13 @@ class SwerveDriveOdometryTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.getTotalTime()) {
-      var groundTruthState = trajectory.sample(t);
+    while (t <= trajectory.duration.in(Seconds)) {
+      var groundTruthState = trajectory.sampleAt(t);
 
-      fl.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
-      fr.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
-      bl.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
-      br.distance += groundTruthState.velocity * dt + 0.5 * groundTruthState.acceleration * dt * dt;
+      fl.distance += groundTruthState.vel.vx * dt + 0.5 * groundTruthState.accel.ax * dt * dt;
+      fr.distance += groundTruthState.vel.vx * dt + 0.5 * groundTruthState.accel.ax * dt * dt;
+      bl.distance += groundTruthState.vel.vx * dt + 0.5 * groundTruthState.accel.ax * dt * dt;
+      br.distance += groundTruthState.vel.vx * dt + 0.5 * groundTruthState.accel.ax * dt * dt;
 
       fl.angle = groundTruthState.pose.getRotation();
       fr.angle = groundTruthState.pose.getRotation();
@@ -254,7 +256,8 @@ class SwerveDriveOdometryTest {
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
-    assertEquals(0.0, errorSum / (trajectory.getTotalTime() / dt), 0.06, "Incorrect mean error");
+    assertEquals(
+        0.0, errorSum / (trajectory.duration.in(Seconds) / dt), 0.06, "Incorrect max error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
   }
 }
