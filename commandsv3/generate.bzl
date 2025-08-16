@@ -37,7 +37,7 @@ generate_commandsv3 = rule(
             default = Label("//commandsv3:templates"),
         ),
         "_tool": attr.label(
-            default = Label("//commandsv3:generate_hids"),
+            default = Label("//commandsv3:generate_files"),
             cfg = "exec",
             executable = True,
         ),

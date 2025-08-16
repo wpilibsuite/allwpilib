@@ -6,8 +6,8 @@ load("//commandsv3:generate.bzl", "generate_commandsv3")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
 
 py_binary(
-    name = "generate_hids",
-    srcs = ["generate_hids.py"],
+    name = "generate_files",
+    srcs = ["generate_files.py"],
     target_compatible_with = select({
         "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
