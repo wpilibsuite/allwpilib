@@ -23,9 +23,9 @@ public class Mechanism {
   private final Scheduler m_registeredScheduler;
 
   /**
-   * Creates a new mechanism registered with the default scheduler instance and named
-   * using the name of the class. Intended to be used by subclasses to get sane defaults without
-   * needing to manually declare a constructor.
+   * Creates a new mechanism registered with the default scheduler instance and named using the name
+   * of the class. Intended to be used by subclasses to get sane defaults without needing to
+   * manually declare a constructor.
    */
   @SuppressWarnings("this-escape")
   protected Mechanism() {

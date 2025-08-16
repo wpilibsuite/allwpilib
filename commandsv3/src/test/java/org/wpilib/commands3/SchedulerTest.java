@@ -278,7 +278,10 @@ class SchedulerTest {
     var mechanism = new Mechanism("mechanism", m_scheduler);
 
     var interrupter =
-        Command.requiring(mechanism).executing(coroutine -> {}).withPriority(2).named("Interrupter");
+        Command.requiring(mechanism)
+            .executing(coroutine -> {})
+            .withPriority(2)
+            .named("Interrupter");
 
     var canceledCommand =
         Command.requiring(mechanism)
@@ -633,8 +636,7 @@ class SchedulerTest {
   void nestedmechanisms() {
     var superstructure =
         new Mechanism("Superstructure", m_scheduler) {
-          private final Mechanism m_elevator =
-              new Mechanism("Elevator", m_scheduler);
+          private final Mechanism m_elevator = new Mechanism("Elevator", m_scheduler);
           private final Mechanism m_arm = new Mechanism("Arm", m_scheduler);
 
           public Command superCommand() {

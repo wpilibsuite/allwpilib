@@ -148,7 +148,8 @@ public class Scheduler implements ProtobufSerializable {
    */
   public void scheduleAsDefaultCommand(Mechanism mechanism, Command defaultCommand) {
     if (!defaultCommand.requires(mechanism)) {
-      throw new IllegalArgumentException("A mechanism's default command must require that mechanism");
+      throw new IllegalArgumentException(
+          "A mechanism's default command must require that mechanism");
     }
 
     if (defaultCommand.requirements().size() > 1) {
@@ -172,10 +173,10 @@ public class Scheduler implements ProtobufSerializable {
 
   /**
    * Adds a callback to run as part of the scheduler. The callback should not manipulate or control
-   * any mechanisms, but can be used to log information, update data (such as simulations or LED data
-   * buffers), or perform some other helpful task. The callback is responsible for managing its own
-   * control flow and end conditions. If you want to run a single task periodically for the entire
-   * lifespan of the scheduler, use {@link #addPeriodic(Runnable)}.
+   * any mechanisms, but can be used to log information, update data (such as simulations or LED
+   * data buffers), or perform some other helpful task. The callback is responsible for managing its
+   * own control flow and end conditions. If you want to run a single task periodically for the
+   * entire lifespan of the scheduler, use {@link #addPeriodic(Runnable)}.
    *
    * <p><strong>Note:</strong> Like commands, any loops in the callback must appropriately yield
    * control back to the scheduler with {@link Coroutine#yield} or risk stalling your program in an
@@ -686,7 +687,9 @@ public class Scheduler implements ProtobufSerializable {
    * @return the currently running commands that require the mechanism.
    */
   public List<Command> getRunningCommandsFor(Mechanism mechanism) {
-    return m_commandStates.keySet().stream().filter(command -> command.requires(mechanism)).toList();
+    return m_commandStates.keySet().stream()
+        .filter(command -> command.requires(mechanism))
+        .toList();
   }
 
   /**

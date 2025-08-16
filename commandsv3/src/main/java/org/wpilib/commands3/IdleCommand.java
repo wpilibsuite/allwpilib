@@ -10,9 +10,9 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * An idle command that owns a mechanism without doing anything. It has the lowest possible priority,
- * and can be interrupted by any other command that requires the same mechanism. Cancellation and
- * interruption function like a normal command.
+ * An idle command that owns a mechanism without doing anything. It has the lowest possible
+ * priority, and can be interrupted by any other command that requires the same mechanism.
+ * Cancellation and interruption function like a normal command.
  */
 public final class IdleCommand implements Command {
   private final Mechanism m_mechanism;

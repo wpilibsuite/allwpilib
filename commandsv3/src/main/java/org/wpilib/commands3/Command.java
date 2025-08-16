@@ -11,11 +11,11 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 /**
- * Performs some task using one or more {@link Mechanism resources} using the
- * collaborative concurrency tools added in Java 21; namely, continuations. Continuations allow
- * commands to be executed concurrently in a collaborative manner as coroutines; instead of needing
- * to split command behavior into distinct functions (initialize(), execute(), end(), and
- * isFinished()), commands can be implemented with a single, imperative loop.
+ * Performs some task using one or more {@link Mechanism resources} using the collaborative
+ * concurrency tools added in Java 21; namely, continuations. Continuations allow commands to be
+ * executed concurrently in a collaborative manner as coroutines; instead of needing to split
+ * command behavior into distinct functions (initialize(), execute(), end(), and isFinished()),
+ * commands can be implemented with a single, imperative loop.
  *
  * <p><strong>Note:</strong> Because coroutines are <i>opt-in</i> collaborate constructs, every
  * command implementation <strong>must</strong> call {@link Coroutine#yield()} within any periodic
@@ -29,15 +29,14 @@ import java.util.function.Consumer;
  * command with an equal or greater {@link #priority()} is scheduled that requires one or more of
  * those same resources, it will interrupt and cancel the running command.
  *
- * <p>The recommended way to create a command is using {@link Mechanism#run(Consumer)} or
- * a related factory method to create commands that require a single resource (for example, a
- * command that drives an elevator up and down or rotates an arm). Commands may be <i>composed</i>
- * into {@link ParallelGroup parallel groups} and {@link Sequence sequences} to build more complex
- * behavior out of fundamental building blocks. These built-in compositions will require every
- * resource used by every command in them, even if those commands aren't always running, and thus
- * can leave certain required resources in an <i>uncommanded</i> state: owned, but not used, this
- * can lead to mechanisms sagging under gravity or running the motor control request they were
- * given.
+ * <p>The recommended way to create a command is using {@link Mechanism#run(Consumer)} or a related
+ * factory method to create commands that require a single resource (for example, a command that
+ * drives an elevator up and down or rotates an arm). Commands may be <i>composed</i> into {@link
+ * ParallelGroup parallel groups} and {@link Sequence sequences} to build more complex behavior out
+ * of fundamental building blocks. These built-in compositions will require every resource used by
+ * every command in them, even if those commands aren't always running, and thus can leave certain
+ * required resources in an <i>uncommanded</i> state: owned, but not used, this can lead to
+ * mechanisms sagging under gravity or running the motor control request they were given.
  *
  * <h2>Advanced Usage</h2>
  *
@@ -167,8 +166,8 @@ public interface Command {
    * Checks if this command conflicts with another command.
    *
    * @param other the commands to check against
-   * @return true if both commands require at least one of the same mechanism, false if both commands
-   *     have completely different requirements
+   * @return true if both commands require at least one of the same mechanism, false if both
+   *     commands have completely different requirements
    */
   default boolean conflictsWith(Command other) {
     return !Collections.disjoint(requirements(), other.requirements());

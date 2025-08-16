@@ -16,8 +16,8 @@ import java.util.Set;
  * then the sequence itself will be allowed to run while the robot is disabled.
  *
  * <p>The sequence will <i>own</i> all mechanisms required by all commands in the sequence for the
- * entire duration of the sequence. This means that a mechanism owned by one command in the sequence,
- * but not by a later one, will be <i>uncommanded</i> while that later command executes.
+ * entire duration of the sequence. This means that a mechanism owned by one command in the
+ * sequence, but not by a later one, will be <i>uncommanded</i> while that later command executes.
  */
 public class Sequence implements Command {
   private final String m_name;
