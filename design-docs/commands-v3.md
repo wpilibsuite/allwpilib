@@ -55,12 +55,12 @@ required in order for commands to be constructed. See [Telemetry](#telemetry) fo
 ### Uncommanded Behavior
 
 Command groups - or, more generally, commands that schedule other commands - need to own all
-resources needed by all their inner commands. However, if they don’t *directly* control a resource,
-then they will still own the resource whenever they’re not running an inner command that uses it,
-causing the resource to be in an *uncommanded state*. This can cause unexpected behavior with
+mechanisms needed by all their inner commands. However, if they don’t *directly* control a mechanism,
+then they will still own the mechanism whenever they’re not running an inner command that uses it,
+causing the mechanism to be in an *uncommanded state*. This can cause unexpected behavior with
 parallel groups where inner commands don’t all end at the same time, and especially with sequential
 groups. For example, something as seemingly basic as `elevator.toL4().andThen(coral.score())` would
-*own* the elevator and coral resources for the entire sequence, but not control the elevator during
+*own* the elevator and coral mechanisms for the entire sequence, but not control the elevator during
 the coral scoring section, nor control the coral scoring mechanism while the elevator is moving.
 
 The v2 framework worked around this problem with so-called proxy commands, which have no
@@ -70,27 +70,27 @@ command to run after the proxied command completed. It also meant that *every* c
 that subsystem would also need to be proxied; otherwise, the group would still have ownership of the
 subsystem, and the proxied command would interrupt it (and thus itself).
 
-The v3 framework allows nested commands to use resources not required by the parent command;
-however, the built-in parallel and sequential groups will take full ownership of all resources
+The v3 framework allows nested commands to use mechanisms not required by the parent command;
+however, the built-in parallel and sequential groups will take full ownership of all mechanisms
 required by their nested commands for safety and to keep behavior parity with previous command
 frameworks.
 
 ```java
 public Command outerCommand() {
-  // The outer command only requires the outer resource
+  // The outer command only requires the outer mechanism
   return run(coroutine -> {
-    // But can schedule a command that requires any other resource
-    coroutine.await(innerResource.innerCommand());
-    // And only requires that inner resource while its command runs
-    coroutine.await(otherResource().otherCommand());
+    // But can schedule a command that requires any other mechanism
+    coroutine.await(innerMechanism.innerCommand());
+    // And only requires that inner mechanism while its command runs
+    coroutine.await(otherMechanism().otherCommand());
   }).named("Outer");
 }
 ```
 
-Scheduling a command that requires an inner resource will also cancel its parent, even if the parent
-does not require that inner resource. Using the above example, directly scheduling a command that
-requires `innerResource` will cancel a running `outerCommand` - but only if `outerCommand` is
-*currently using* the inner resource at the time.
+Scheduling a command that requires an inner mechanism will also cancel its parent, even if the parent
+does not require that inner mechanism. Using the above example, directly scheduling a command that
+requires `innerMechanism` will cancel a running `outerCommand` - but only if `outerCommand` is
+*currently using* the inner mechanism at the time.
 
 **Effectively, all child commands in v3 are "proxied"**, using the v2 framework's definition, unless
 using the built-in ParallelGroup and Sequence compositions or explicitly adding child command
@@ -162,7 +162,7 @@ scheduler and do not appear in its sendable implementation, making telemetry dif
 groups will automatically include the names of all their constituent commands, with options to
 override when desired.
 
-The v3 framework will also provide a map of what command each resource is owned by. The v2 framework
+The v3 framework will also provide a map of what command each mechanism is owned by. The v2 framework
 only provides a list of the names of the running commands, without mapping those to subsystems. This
 also makes telemetry difficult, since the order of commands in the list does not correspond with
 subsystems; a command at a particular index may require different subsystems than a different
@@ -171,7 +171,7 @@ AdvantageScope difficult since we can’t rely on consistent ordering.
 
 Telemetry will send lists of the on-deck and running commands. Commands in those lists will appear
 as an ID number, parent command ID (if any; top level commands have no parent), name, names of
-the required resources, priority level, last time to process, and total processing time. Separate
+the required mechanisms, priority level, last time to process, and total processing time. Separate
 runs of the same command object have different ID numbers and processing time data. The total time
 spent in the scheduler loop will also be included, but not the aggregate total of _all_ loops.
 
@@ -232,7 +232,7 @@ running will be removed from the queue of scheduled commands. Cancellation reque
 the end of each `run() `invocation. Cancelled commands are unmounted and will not be re-mounted;
 they must be rescheduled and be issued new carrier coroutines.
 
-**Interrupt**: Scheduling a command that requires one or more resources already in use by a running
+**Interrupt**: Scheduling a command that requires one or more mechanisms already in use by a running
 command will interrupt and cancel that running command, so long as the running command has an equal
 or lower priority level. Higher-priority commands cannot be interrupted by lower-priority ones.
 
@@ -350,7 +350,7 @@ caused by loop timings for deeply nested commands.
 
 ### Interruption
 
-* Caused by scheduling a command that requires resources already in use by one or more running
+* Caused by scheduling a command that requires mechanisms already in use by one or more running
   commands
 * Results in cancellation of the conflicting commands
     * Commands are moved to a pending-cancellation state
@@ -365,7 +365,7 @@ caused by loop timings for deeply nested commands.
 
 Scheduler state is serialized using protobuf. The scheduler will send a list of the currently queued
 commands and a list of the current running commands. Commands are serialized as (id: uint32,
-parent_id: uint32, name: string, priority: int32, required_resources: string array,
+parent_id: uint32, name: string, priority: int32, requirements: string array,
 last_time_ms: double, total_time_ms: double). Consumers can use the `id` and `parent_id` attributes
 to reconstruct the tree structure, if desired. `id` and `parent_id` marginally increase the size of
 serialized data, but make the schema and deserialization quite simple.
@@ -380,20 +380,20 @@ will always appear _after_ their parent.
 For example, if a scheduler is running a command like this:
 
 ```java
-RequireableResource r1, r2;
+Mechansism m1, m2;
 
 Command theCommand() {
   return ParallelGroup.all(
-      r1.run(/* ... */).withPriority(1).named("Command 1"),
-      r2.run(/* ... */).withPriority(2).named("Command 2")
+      m1.run(/* ... */).withPriority(1).named("Command 1"),
+      m2.run(/* ... */).withPriority(2).named("Command 2")
   ).withAutomaticName();
 }
 ```
 
 Telemetry for commands in the scheduler would look like:
 
-| `id`   | `parent_id` | `name`                    | `priority` | `required_resources` | `last_time_ms` | `total_time_ms` |
-|--------|-------------|---------------------------|------------|----------------------|----------------|-----------------|
-| 347123 | --          | "(Command 1 & Command 2)" | 2          | ["R1", "R2"]         | 0.210          | 5.122           |
-| 998712 | 347123      | "Command 1"               | 1          | ["R1"]               | 0.051          | 1.241           |
-| 591564 | 347123      | "Command 2"               | 2          | ["R2"]               | 0.108          | 3.249           |
+| `id`   | `parent_id` | `name`                    | `priority` | `requirements` | `last_time_ms` | `total_time_ms` |
+|--------|-------------|---------------------------|------------|----------------|----------------|-----------------|
+| 347123 | --          | "(Command 1 & Command 2)" | 2          | ["M1", "M2"]   | 0.210          | 5.122           |
+| 998712 | 347123      | "Command 1"               | 1          | ["M1"]         | 0.051          | 1.241           |
+| 591564 | 347123      | "Command 2"               | 2          | ["M2"]         | 0.108          | 3.249           |
