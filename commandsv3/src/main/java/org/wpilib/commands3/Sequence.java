@@ -15,14 +15,14 @@ import java.util.Set;
  * any of its commands. If all commands in the sequence are able to run while the robot is disabled,
  * then the sequence itself will be allowed to run while the robot is disabled.
  *
- * <p>The sequence will <i>own</i> all resources required by all commands in the sequence for the
- * entire duration of the sequence. This means that a resource owned by one command in the sequence,
+ * <p>The sequence will <i>own</i> all mechanisms required by all commands in the sequence for the
+ * entire duration of the sequence. This means that a mechanism owned by one command in the sequence,
  * but not by a later one, will be <i>uncommanded</i> while that later command executes.
  */
 public class Sequence implements Command {
   private final String m_name;
   private final List<Command> m_commands = new ArrayList<>();
-  private final Set<RequireableResource> m_requirements = new HashSet<>();
+  private final Set<Mechanism> m_requirements = new HashSet<>();
   private final int m_priority;
 
   /**
@@ -56,7 +56,7 @@ public class Sequence implements Command {
   }
 
   @Override
-  public Set<RequireableResource> requirements() {
+  public Set<Mechanism> requirements() {
     return m_requirements;
   }
 
@@ -91,7 +91,7 @@ public class Sequence implements Command {
 
   /**
    * Creates a command that executes the given commands in sequence. The returned command will
-   * require all the resources required by every command in the sequence, and will have a priority
+   * require all the mechanisms required by every command in the sequence, and will have a priority
    * equal to the highest priority of all the given commands.
    *
    * @param commands The commands to execute in sequence

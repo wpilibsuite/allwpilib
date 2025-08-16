@@ -10,20 +10,20 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * An idle command that owns a resource without doing anything. It has the lowest possible priority,
- * and can be interrupted by any other command that requires the same resource. Cancellation and
+ * An idle command that owns a mechanism without doing anything. It has the lowest possible priority,
+ * and can be interrupted by any other command that requires the same mechanism. Cancellation and
  * interruption function like a normal command.
  */
 public final class IdleCommand implements Command {
-  private final RequireableResource m_resource;
+  private final Mechanism m_mechanism;
 
   /**
    * Creates a new idle command.
    *
-   * @param resource the resource to idle.
+   * @param mechanism the mechanism to idle.
    */
-  public IdleCommand(RequireableResource resource) {
-    m_resource = requireNonNullParam(resource, "resource", "IdleCommand");
+  public IdleCommand(Mechanism mechanism) {
+    m_mechanism = requireNonNullParam(mechanism, "mechanism", "IdleCommand");
   }
 
   @Override
@@ -32,13 +32,13 @@ public final class IdleCommand implements Command {
   }
 
   @Override
-  public Set<RequireableResource> requirements() {
-    return Set.of(m_resource);
+  public Set<Mechanism> requirements() {
+    return Set.of(m_mechanism);
   }
 
   @Override
   public String name() {
-    return m_resource.getName() + "[IDLE]";
+    return m_mechanism.getName() + "[IDLE]";
   }
 
   @Override
@@ -54,11 +54,11 @@ public final class IdleCommand implements Command {
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof IdleCommand other && Objects.equals(m_resource, other.m_resource);
+    return obj instanceof IdleCommand other && Objects.equals(m_mechanism, other.m_mechanism);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_resource);
+    return Objects.hash(m_mechanism);
   }
 }

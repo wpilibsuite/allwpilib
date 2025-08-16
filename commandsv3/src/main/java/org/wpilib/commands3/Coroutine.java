@@ -214,7 +214,7 @@ public final class Coroutine {
    *
    * @param commands The commands to validate
    * @throws IllegalArgumentException If at least one pair of commands is found in the input where
-   *     both commands have at least one required resource in common
+   *     both commands have at least one required mechanism in common
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   private static void validateNoConflicts(Collection<Command> commands) {
@@ -230,11 +230,11 @@ public final class Coroutine {
           var conflictNames =
               c1.requirements().stream()
                   .filter(c2::requires)
-                  .map(RequireableResource::getName)
+                  .map(Mechanism::getName)
                   .collect(Collectors.joining(", "));
 
           throw new IllegalArgumentException(
-              "Command %s requires resources that are already used by %s. Both require %s"
+              "Command %s requires mechanisms that are already used by %s. Both require %s"
                   .formatted(c2.name(), c1.name(), conflictNames));
         }
       }

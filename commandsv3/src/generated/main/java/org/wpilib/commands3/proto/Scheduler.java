@@ -9,57 +9,57 @@ import us.hebi.quickbuf.ProtoUtil;
 import us.hebi.quickbuf.RepeatedByte;
 
 public final class Scheduler {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(2495,
-    "Cg9zY2hlZHVsZXIucHJvdG8SCXdwaS5wcm90byIxChtQcm90b2J1ZlJlcXVpcmVhYmxlUmVzb3VyY2US" + 
-    "EgoEbmFtZRgBIAEoCVIEbmFtZSLAAgoPUHJvdG9idWZDb21tYW5kEg4KAmlkGAEgASgNUgJpZBIgCglw" + 
-    "YXJlbnRfaWQYAiABKA1IAFIIcGFyZW50SWSIAQESEgoEbmFtZRgDIAEoCVIEbmFtZRIaCghwcmlvcml0" + 
-    "eRgEIAEoBVIIcHJpb3JpdHkSSgoMcmVxdWlyZW1lbnRzGAUgAygLMiYud3BpLnByb3RvLlByb3RvYnVm" + 
-    "UmVxdWlyZWFibGVSZXNvdXJjZVIMcmVxdWlyZW1lbnRzEiUKDGxhc3RfdGltZV9tcxgGIAEoAUgBUgps" + 
-    "YXN0VGltZU1ziAEBEicKDXRvdGFsX3RpbWVfbXMYByABKAFIAlILdG90YWxUaW1lTXOIAQFCDAoKX3Bh" + 
-    "cmVudF9pZEIPCg1fbGFzdF90aW1lX21zQhAKDl90b3RhbF90aW1lX21zIsEBChFQcm90b2J1ZlNjaGVk" + 
-    "dWxlchJDCg9xdWV1ZWRfY29tbWFuZHMYASADKAsyGi53cGkucHJvdG8uUHJvdG9idWZDb21tYW5kUg5x" + 
-    "dWV1ZWRDb21tYW5kcxJFChBydW5uaW5nX2NvbW1hbmRzGAIgAygLMhoud3BpLnByb3RvLlByb3RvYnVm" + 
-    "Q29tbWFuZFIPcnVubmluZ0NvbW1hbmRzEiAKDGxhc3RfdGltZV9tcxgDIAEoAVIKbGFzdFRpbWVNc0Ie" + 
-    "Chpvcmcud3BpbGliLmNvbW1hbmRzMy5wcm90b1ABSr4OCgYSBAAANQEKCAoBDBIDAAASCggKAQISAwIA" + 
-    "EgoICgEIEgMEADMKCQoCCAESAwQAMwoICgEIEgMFACIKCQoCCAoSAwUAIgqfAQoCBAASBA0ADwEykgEK" + 
-    "YWxsd3BpbGliICQgcHJvdG9jLXF1aWNrYnVmIFwKLS1xdWlja2J1Zl9vdXQ9Z2VuX2Rlc2NyaXB0b3Jz" + 
-    "PXRydWU6Y29tbWFuZHN2My9zcmMvZ2VuZXJhdGVkL21haW4vamF2YSBcCmNvbW1hbmRzdjMvc3JjL21h" + 
-    "aW4vcHJvdG8vc2NoZWR1bGVyLnByb3RvCgoKCgMEAAESAw0IIwoLCgQEAAIAEgMOAhIKDAoFBAACAAUS" + 
-    "Aw4CCAoMCgUEAAIAARIDDgkNCgwKBQQAAgADEgMOEBEKCgoCBAESBBEAKgEKCgoDBAEBEgMRCBcKcQoE" + 
-    "BAECABIDFAIQGmQgQSB1bmlxdWUgSUQgZm9yIHRoZSBjb21tYW5kLgogRGlmZmVyZW50IGludm9jYXRp" + 
-    "b25zIG9mIHRoZSBzYW1lIGNvbW1hbmQgb2JqZWN0IGhhdmUgZGlmZmVyZW50IElEcy4KCgwKBQQBAgAF" + 
-    "EgMUAggKDAoFBAECAAESAxQJCwoMCgUEAQIAAxIDFA4PCmEKBAQBAgESAxgCIBpUIFRoZSBJRCBvZiB0" + 
-    "aGUgcGFyZW50IGNvbW1hbmQuCiBOb3QgaW5jbHVkZWQgaW4gdGhlIG1lc3NhZ2UgZm9yIHRvcC1sZXZl",
-    "bCBjb21tYW5kcy4KCgwKBQQBAgEEEgMYAgoKDAoFBAECAQUSAxgLEQoMCgUEAQIBARIDGBIbCgwKBQQB" + 
-    "AgEDEgMYHh8KJwoEBAECAhIDGwISGhogVGhlIG5hbWUgb2YgdGhlIGNvbW1hbmQuCgoMCgUEAQICBRID" + 
-    "GwIICgwKBQQBAgIBEgMbCQ0KDAoFBAECAgMSAxsQEQoxCgQEAQIDEgMeAhUaJCBUaGUgcHJpb3JpdHkg" + 
-    "bGV2ZWwgb2YgdGhlIGNvbW1hbmQuCgoMCgUEAQIDBRIDHgIHCgwKBQQBAgMBEgMeCBAKDAoFBAECAwMS" + 
-    "Ax4TFAo1CgQEAQIEEgMhAjgaKCBUaGUgcmVzb3VyY2VzIHJlcXVpcmVkIGJ5IHRoZSBjb21tYW5kLgoK" + 
-    "DAoFBAECBAQSAyECCgoMCgUEAQIEBhIDIQsmCgwKBQQBAgQBEgMhJzMKDAoFBAECBAMSAyE2NwqOAQoE" + 
-    "BAECBRIDJQIjGoABIEhvdyBtdWNoIHRpbWUgdGhlIGNvbW1hbmQgdG9vayB0byBleGVjdXRlIGluIGl0" + 
-    "cyBtb3N0IHJlY2VudCBydW4uCiBPbmx5IGluY2x1ZGVkIGluIGEgbWVzc2FnZSBmb3IgYW4gYWN0aXZl" + 
-    "bHkgcnVubmluZyBjb21tYW5kLgoKDAoFBAECBQQSAyUCCgoMCgUEAQIFBRIDJQsRCgwKBQQBAgUBEgMl" + 
-    "Eh4KDAoFBAECBQMSAyUhIgqAAQoEBAECBhIDKQIkGnMgSG93IGxvbmcgdGhlIGNvbW1hbmQgaGFzIHRh" + 
-    "a2VuIHRvIHJ1biwgaW4gYWdncmVnYXRlLgogT25seSBpbmNsdWRlZCBpbiBhIG1lc3NhZ2UgZm9yIGFu" + 
-    "IGFjdGl2ZWx5IHJ1bm5pbmcgY29tbWFuZC4KCgwKBQQBAgYEEgMpAgoKDAoFBAECBgUSAykLEQoMCgUE" + 
-    "AQIGARIDKRIfCgwKBQQBAgYDEgMpIiMKCgoCBAISBCwANQEKCgoDBAIBEgMsCBkKjQIKBAQCAgASAzAC" + 
-    "Lxr/ASBOb3RlOiBjb21tYW5kcyBhcmUgZ2VuZXJhbGx5IHF1ZXVlZCBieSB0cmlnZ2Vycywgd2hpY2gg" + 
-    "b2NjdXJzIGltbWVkaWF0ZWx5IGJlZm9yZSB0aGV5IGFyZQogcHJvbW90ZWQgYW5kIHN0YXJ0IHJ1bm5p" + 
-    "bmcuIEVudHJpZXMgd2lsbCBvbmx5IGFwcGVhciBoZXJlIHdoZW4gc2VyaWFsaXppbmcgYSBzY2hlZHVs" + 
-    "ZXIKIF9hZnRlcl8gbWFudWFsbHkgc2NoZWR1bGluZyBhIGNvbW1hbmQgYnV0IF9iZWZvcmVfIGNhbGxp" + 
-    "bmcgc2NoZWR1bGVyLnJ1bigpCgoMCgUEAgIABBIDMAIKCgwKBQQCAgAGEgMwCxoKDAoFBAICAAESAzAb" + 
-    "KgoMCgUEAgIAAxIDMC0uCgsKBAQCAgESAzECMAoMCgUEAgIBBBIDMQIKCgwKBQQCAgEGEgMxCxoKDAoF" + 
-    "BAICAQESAzEbKwoMCgUEAgIBAxIDMS4vCk8KBAQCAgISAzQCGhpCIEhvdyBtdWNoIHRpbWUgdGhlIHNj",
-    "aGVkdWxlciB0b29rIGluIGl0cyBsYXN0IGBydW4oKWAgaW52b2NhdGlvbi4KCgwKBQQCAgIFEgM0AggK" + 
-    "DAoFBAICAgESAzQJFQoMCgUEAgICAxIDNBgZYgZwcm90bzM=");
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(2476,
+    "Cg9zY2hlZHVsZXIucHJvdG8SCXdwaS5wcm90byInChFQcm90b2J1Zk1lY2hhbmlzbRISCgRuYW1lGAEg" + 
+    "ASgJUgRuYW1lIrYCCg9Qcm90b2J1ZkNvbW1hbmQSDgoCaWQYASABKA1SAmlkEiAKCXBhcmVudF9pZBgC" + 
+    "IAEoDUgAUghwYXJlbnRJZIgBARISCgRuYW1lGAMgASgJUgRuYW1lEhoKCHByaW9yaXR5GAQgASgFUghw" + 
+    "cmlvcml0eRJACgxyZXF1aXJlbWVudHMYBSADKAsyHC53cGkucHJvdG8uUHJvdG9idWZNZWNoYW5pc21S" + 
+    "DHJlcXVpcmVtZW50cxIlCgxsYXN0X3RpbWVfbXMYBiABKAFIAVIKbGFzdFRpbWVNc4gBARInCg10b3Rh" + 
+    "bF90aW1lX21zGAcgASgBSAJSC3RvdGFsVGltZU1ziAEBQgwKCl9wYXJlbnRfaWRCDwoNX2xhc3RfdGlt" + 
+    "ZV9tc0IQCg5fdG90YWxfdGltZV9tcyLBAQoRUHJvdG9idWZTY2hlZHVsZXISQwoPcXVldWVkX2NvbW1h" + 
+    "bmRzGAEgAygLMhoud3BpLnByb3RvLlByb3RvYnVmQ29tbWFuZFIOcXVldWVkQ29tbWFuZHMSRQoQcnVu" + 
+    "bmluZ19jb21tYW5kcxgCIAMoCzIaLndwaS5wcm90by5Qcm90b2J1ZkNvbW1hbmRSD3J1bm5pbmdDb21t" + 
+    "YW5kcxIgCgxsYXN0X3RpbWVfbXMYAyABKAFSCmxhc3RUaW1lTXNCHgoab3JnLndwaWxpYi5jb21tYW5k" + 
+    "czMucHJvdG9QAUq/DgoGEgQAADUBCggKAQwSAwAAEgoICgECEgMCABIKCAoBCBIDBAAzCgkKAggBEgME" + 
+    "ADMKCAoBCBIDBQAiCgkKAggKEgMFACIKnwEKAgQAEgQNAA8BMpIBCmFsbHdwaWxpYiAkIHByb3RvYy1x" + 
+    "dWlja2J1ZiBcCi0tcXVpY2tidWZfb3V0PWdlbl9kZXNjcmlwdG9ycz10cnVlOmNvbW1hbmRzdjMvc3Jj" + 
+    "L2dlbmVyYXRlZC9tYWluL2phdmEgXApjb21tYW5kc3YzL3NyYy9tYWluL3Byb3RvL3NjaGVkdWxlci5w" + 
+    "cm90bwoKCgoDBAABEgMNCBkKCwoEBAACABIDDgISCgwKBQQAAgAFEgMOAggKDAoFBAACAAESAw4JDQoM" + 
+    "CgUEAAIAAxIDDhARCgoKAgQBEgQRACoBCgoKAwQBARIDEQgXCnEKBAQBAgASAxQCEBpkIEEgdW5pcXVl" + 
+    "IElEIGZvciB0aGUgY29tbWFuZC4KIERpZmZlcmVudCBpbnZvY2F0aW9ucyBvZiB0aGUgc2FtZSBjb21t" + 
+    "YW5kIG9iamVjdCBoYXZlIGRpZmZlcmVudCBJRHMuCgoMCgUEAQIABRIDFAIICgwKBQQBAgABEgMUCQsK" + 
+    "DAoFBAECAAMSAxQODwphCgQEAQIBEgMYAiAaVCBUaGUgSUQgb2YgdGhlIHBhcmVudCBjb21tYW5kLgog" + 
+    "Tm90IGluY2x1ZGVkIGluIHRoZSBtZXNzYWdlIGZvciB0b3AtbGV2ZWwgY29tbWFuZHMuCgoMCgUEAQIB",
+    "BBIDGAIKCgwKBQQBAgEFEgMYCxEKDAoFBAECAQESAxgSGwoMCgUEAQIBAxIDGB4fCicKBAQBAgISAxsC" + 
+    "EhoaIFRoZSBuYW1lIG9mIHRoZSBjb21tYW5kLgoKDAoFBAECAgUSAxsCCAoMCgUEAQICARIDGwkNCgwK" + 
+    "BQQBAgIDEgMbEBEKMQoEBAECAxIDHgIVGiQgVGhlIHByaW9yaXR5IGxldmVsIG9mIHRoZSBjb21tYW5k" + 
+    "LgoKDAoFBAECAwUSAx4CBwoMCgUEAQIDARIDHggQCgwKBQQBAgMDEgMeExQKNgoEBAECBBIDIQIuGikg" + 
+    "VGhlIG1lY2hhbmlzbXMgcmVxdWlyZWQgYnkgdGhlIGNvbW1hbmQuCgoMCgUEAQIEBBIDIQIKCgwKBQQB" + 
+    "AgQGEgMhCxwKDAoFBAECBAESAyEdKQoMCgUEAQIEAxIDISwtCo4BCgQEAQIFEgMlAiMagAEgSG93IG11" + 
+    "Y2ggdGltZSB0aGUgY29tbWFuZCB0b29rIHRvIGV4ZWN1dGUgaW4gaXRzIG1vc3QgcmVjZW50IHJ1bi4K" + 
+    "IE9ubHkgaW5jbHVkZWQgaW4gYSBtZXNzYWdlIGZvciBhbiBhY3RpdmVseSBydW5uaW5nIGNvbW1hbmQu" + 
+    "CgoMCgUEAQIFBBIDJQIKCgwKBQQBAgUFEgMlCxEKDAoFBAECBQESAyUSHgoMCgUEAQIFAxIDJSEiCoAB" + 
+    "CgQEAQIGEgMpAiQacyBIb3cgbG9uZyB0aGUgY29tbWFuZCBoYXMgdGFrZW4gdG8gcnVuLCBpbiBhZ2dy" + 
+    "ZWdhdGUuCiBPbmx5IGluY2x1ZGVkIGluIGEgbWVzc2FnZSBmb3IgYW4gYWN0aXZlbHkgcnVubmluZyBj" + 
+    "b21tYW5kLgoKDAoFBAECBgQSAykCCgoMCgUEAQIGBRIDKQsRCgwKBQQBAgYBEgMpEh8KDAoFBAECBgMS" + 
+    "AykiIwoKCgIEAhIELAA1AQoKCgMEAgESAywIGQqNAgoEBAICABIDMAIvGv8BIE5vdGU6IGNvbW1hbmRz" + 
+    "IGFyZSBnZW5lcmFsbHkgcXVldWVkIGJ5IHRyaWdnZXJzLCB3aGljaCBvY2N1cnMgaW1tZWRpYXRlbHkg" + 
+    "YmVmb3JlIHRoZXkgYXJlCiBwcm9tb3RlZCBhbmQgc3RhcnQgcnVubmluZy4gRW50cmllcyB3aWxsIG9u" + 
+    "bHkgYXBwZWFyIGhlcmUgd2hlbiBzZXJpYWxpemluZyBhIHNjaGVkdWxlcgogX2FmdGVyXyBtYW51YWxs" + 
+    "eSBzY2hlZHVsaW5nIGEgY29tbWFuZCBidXQgX2JlZm9yZV8gY2FsbGluZyBzY2hlZHVsZXIucnVuKCkK" + 
+    "CgwKBQQCAgAEEgMwAgoKDAoFBAICAAYSAzALGgoMCgUEAgIAARIDMBsqCgwKBQQCAgADEgMwLS4KCwoE" + 
+    "BAICARIDMQIwCgwKBQQCAgEEEgMxAgoKDAoFBAICAQYSAzELGgoMCgUEAgIBARIDMRsrCgwKBQQCAgED" + 
+    "EgMxLi8KTwoEBAICAhIDNAIaGkIgSG93IG11Y2ggdGltZSB0aGUgc2NoZWR1bGVyIHRvb2sgaW4gaXRz",
+    "IGxhc3QgYHJ1bigpYCBpbnZvY2F0aW9uLgoKDAoFBAICAgUSAzQCCAoMCgUEAgICARIDNAkVCgwKBQQC" + 
+    "AgIDEgM0GBliBnByb3RvMw==");
 
   static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("scheduler.proto", "wpi.proto", descriptorData);
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufRequireableResource_descriptor = descriptor.internalContainedType(30, 49, "ProtobufRequireableResource", "wpi.proto.ProtobufRequireableResource");
+  static final Descriptors.Descriptor wpi_proto_ProtobufMechanism_descriptor = descriptor.internalContainedType(30, 39, "ProtobufMechanism", "wpi.proto.ProtobufMechanism");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufCommand_descriptor = descriptor.internalContainedType(82, 320, "ProtobufCommand", "wpi.proto.ProtobufCommand");
+  static final Descriptors.Descriptor wpi_proto_ProtobufCommand_descriptor = descriptor.internalContainedType(72, 310, "ProtobufCommand", "wpi.proto.ProtobufCommand");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufScheduler_descriptor = descriptor.internalContainedType(405, 193, "ProtobufScheduler", "wpi.proto.ProtobufScheduler");
+  static final Descriptors.Descriptor wpi_proto_ProtobufScheduler_descriptor = descriptor.internalContainedType(385, 193, "ProtobufScheduler", "wpi.proto.ProtobufScheduler");
 
   /**
    * @return this proto file's descriptor.

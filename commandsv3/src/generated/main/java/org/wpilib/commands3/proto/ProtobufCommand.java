@@ -85,12 +85,12 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
 
   /**
    * <pre>
-   *  The resources required by the command.
+   *  The mechanisms required by the command.
    * </pre>
    *
-   * <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code>
+   * <code>repeated .wpi.proto.ProtobufMechanism requirements = 5;</code>
    */
-  private final RepeatedMessage<ProtobufRequireableResource> requirements = RepeatedMessage.newEmptyInstance(ProtobufRequireableResource.getFactory());
+  private final RepeatedMessage<ProtobufMechanism> requirements = RepeatedMessage.newEmptyInstance(ProtobufMechanism.getFactory());
 
   private ProtobufCommand() {
   }
@@ -478,10 +478,10 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
 
   /**
    * <pre>
-   *  The resources required by the command.
+   *  The mechanisms required by the command.
    * </pre>
    *
-   * <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code>
+   * <code>repeated .wpi.proto.ProtobufMechanism requirements = 5;</code>
    * @return whether the requirements field is set
    */
   public boolean hasRequirements() {
@@ -490,10 +490,10 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
 
   /**
    * <pre>
-   *  The resources required by the command.
+   *  The mechanisms required by the command.
    * </pre>
    *
-   * <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code>
+   * <code>repeated .wpi.proto.ProtobufMechanism requirements = 5;</code>
    * @return this
    */
   public ProtobufCommand clearRequirements() {
@@ -504,10 +504,10 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
 
   /**
    * <pre>
-   *  The resources required by the command.
+   *  The mechanisms required by the command.
    * </pre>
    *
-   * <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code>
+   * <code>repeated .wpi.proto.ProtobufMechanism requirements = 5;</code>
    *
    * This method returns the internal storage object without modifying any has state.
    * The returned object should not be modified and be treated as read-only.
@@ -516,16 +516,16 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
    *
    * @return internal storage object for reading
    */
-  public RepeatedMessage<ProtobufRequireableResource> getRequirements() {
+  public RepeatedMessage<ProtobufMechanism> getRequirements() {
     return requirements;
   }
 
   /**
    * <pre>
-   *  The resources required by the command.
+   *  The mechanisms required by the command.
    * </pre>
    *
-   * <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code>
+   * <code>repeated .wpi.proto.ProtobufMechanism requirements = 5;</code>
    *
    * This method returns the internal storage object and sets the corresponding
    * has state. The returned object will become part of this message and its
@@ -533,21 +533,21 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
    *
    * @return internal storage object for modifications
    */
-  public RepeatedMessage<ProtobufRequireableResource> getMutableRequirements() {
+  public RepeatedMessage<ProtobufMechanism> getMutableRequirements() {
     bitField0_ |= 0x00000040;
     return requirements;
   }
 
   /**
    * <pre>
-   *  The resources required by the command.
+   *  The mechanisms required by the command.
    * </pre>
    *
-   * <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code>
+   * <code>repeated .wpi.proto.ProtobufMechanism requirements = 5;</code>
    * @param value the requirements to add
    * @return this
    */
-  public ProtobufCommand addRequirements(final ProtobufRequireableResource value) {
+  public ProtobufCommand addRequirements(final ProtobufMechanism value) {
     bitField0_ |= 0x00000040;
     requirements.add(value);
     return this;
@@ -555,14 +555,14 @@ public final class ProtobufCommand extends ProtoMessage<ProtobufCommand> impleme
 
   /**
    * <pre>
-   *  The resources required by the command.
+   *  The mechanisms required by the command.
    * </pre>
    *
-   * <code>repeated .wpi.proto.ProtobufRequireableResource requirements = 5;</code>
+   * <code>repeated .wpi.proto.ProtobufMechanism requirements = 5;</code>
    * @param values the requirements to add
    * @return this
    */
-  public ProtobufCommand addAllRequirements(final ProtobufRequireableResource... values) {
+  public ProtobufCommand addAllRequirements(final ProtobufMechanism... values) {
     bitField0_ |= 0x00000040;
     requirements.addAll(values);
     return this;

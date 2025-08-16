@@ -20,7 +20,7 @@ import java.util.Set;
 public class ParallelGroup implements Command {
   private final Collection<Command> m_commands = new LinkedHashSet<>();
   private final Collection<Command> m_requiredCommands = new HashSet<>();
-  private final Set<RequireableResource> m_requirements = new HashSet<>();
+  private final Set<Mechanism> m_requirements = new HashSet<>();
   private final String m_name;
   private final int m_priority;
 
@@ -60,7 +60,7 @@ public class ParallelGroup implements Command {
         }
         if (c1.conflictsWith(c2)) {
           throw new IllegalArgumentException(
-              "Commands in a parallel composition cannot require the same resources. "
+              "Commands in a parallel composition cannot require the same mechanisms. "
                   + c1.name()
                   + " and "
                   + c2.name()
@@ -93,7 +93,7 @@ public class ParallelGroup implements Command {
 
   /**
    * Creates a parallel group that runs all the given commands until they all finish. If a command
-   * finishes early, its required resources will be idle (uncommanded) until the group completes.
+   * finishes early, its required mechanisms will be idle (uncommanded) until the group completes.
    *
    * @param commands the commands to run in parallel
    * @return the group
@@ -123,7 +123,7 @@ public class ParallelGroup implements Command {
   }
 
   @Override
-  public Set<RequireableResource> requirements() {
+  public Set<Mechanism> requirements() {
     return m_requirements;
   }
 

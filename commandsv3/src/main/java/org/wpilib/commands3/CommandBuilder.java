@@ -19,7 +19,7 @@ import java.util.function.Consumer;
  * A builder that allows for all functionality of a command to be configured prior to creating it.
  */
 public class CommandBuilder {
-  private final Set<RequireableResource> m_requirements = new HashSet<>();
+  private final Set<Mechanism> m_requirements = new HashSet<>();
   private Consumer<Coroutine> m_impl;
   private Runnable m_onCancel = () -> {};
   private String m_name;
@@ -27,57 +27,57 @@ public class CommandBuilder {
   private BooleanSupplier m_endCondition;
 
   /**
-   * Adds a resource as a requirement for the command.
+   * Adds a mechanism as a requirement for the command.
    *
-   * @param resource The required resource
+   * @param mechanism The required mechanism
    * @return The builder object, for chaining
    * @see Command#requirements()
    */
-  public CommandBuilder requiring(RequireableResource resource) {
-    requireNonNullParam(resource, "resource", "CommandBuilder.requiring");
+  public CommandBuilder requiring(Mechanism mechanism) {
+    requireNonNullParam(mechanism, "mechanism", "CommandBuilder.requiring");
 
-    m_requirements.add(resource);
+    m_requirements.add(mechanism);
     return this;
   }
 
   /**
-   * Adds resources as requirements for the command.
+   * Adds mechanisms as requirements for the command.
    *
-   * @param resources The required resources
+   * @param mechanisms The required mechanisms
    * @return The builder object, for chaining
    * @see Command#requirements()
    */
-  public CommandBuilder requiring(RequireableResource... resources) {
-    requireNonNullParam(resources, "resources", "CommandBuilder.requiring");
-    for (int i = 0; i < resources.length; i++) {
-      requireNonNullParam(resources[i], "resources[" + i + "]", "CommandBuilder.requiring");
+  public CommandBuilder requiring(Mechanism... mechanisms) {
+    requireNonNullParam(mechanisms, "mechanisms", "CommandBuilder.requiring");
+    for (int i = 0; i < mechanisms.length; i++) {
+      requireNonNullParam(mechanisms[i], "mechanisms[" + i + "]", "CommandBuilder.requiring");
     }
 
-    m_requirements.addAll(Arrays.asList(resources));
+    m_requirements.addAll(Arrays.asList(mechanisms));
     return this;
   }
 
   /**
-   * Adds resources as requirements for the command.
+   * Adds mechanisms as requirements for the command.
    *
-   * @param resources The required resources
+   * @param mechanisms The required mechanisms
    * @return The builder object, for chaining
    * @see Command#requirements()
    */
-  public CommandBuilder requiring(Collection<RequireableResource> resources) {
-    requireNonNullParam(resources, "resources", "CommandBuilder.requiring");
-    if (resources instanceof List<RequireableResource> l) {
+  public CommandBuilder requiring(Collection<Mechanism> mechanisms) {
+    requireNonNullParam(mechanisms, "mechanisms", "CommandBuilder.requiring");
+    if (mechanisms instanceof List<Mechanism> l) {
       for (int i = 0; i < l.size(); i++) {
-        requireNonNullParam(l.get(i), "resources[" + i + "]", "CommandBuilder.requiring");
+        requireNonNullParam(l.get(i), "mechanisms[" + i + "]", "CommandBuilder.requiring");
       }
     } else {
       // non-indexable collection
-      for (var resource : resources) {
-        requireNonNullParam(resource, "resources", "CommandBuilder.requiring");
+      for (var mechanism : mechanisms) {
+        requireNonNullParam(mechanism, "mechanisms", "CommandBuilder.requiring");
       }
     }
 
-    m_requirements.addAll(resources);
+    m_requirements.addAll(mechanisms);
     return this;
   }
 
@@ -199,7 +199,7 @@ public class CommandBuilder {
           }
 
           @Override
-          public Set<RequireableResource> requirements() {
+          public Set<Mechanism> requirements() {
             return m_requirements;
           }
 

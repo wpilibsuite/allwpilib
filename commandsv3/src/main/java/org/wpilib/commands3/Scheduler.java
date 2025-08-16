@@ -90,7 +90,7 @@ import org.wpilib.commands3.proto.SchedulerProto;
  * protobuf serializer. However, it is up to the user to log those events themselves.
  */
 public class Scheduler implements ProtobufSerializable {
-  private final Map<RequireableResource, Command> m_defaultCommands = new LinkedHashMap<>();
+  private final Map<Mechanism, Command> m_defaultCommands = new LinkedHashMap<>();
 
   /** The set of commands scheduled since the start of the previous run. */
   private final Set<CommandState> m_onDeck = new LinkedHashSet<>();
@@ -125,8 +125,8 @@ public class Scheduler implements ProtobufSerializable {
 
   /**
    * Gets the default scheduler instance for use in a robot program. Unless otherwise specified,
-   * triggers and resources will be registered with the default scheduler and require the default
-   * scheduler to run. However, triggers and resources can be constructed to be registered with a
+   * triggers and mechanisms will be registered with the default scheduler and require the default
+   * scheduler to run. However, triggers and mechanisms can be constructed to be registered with a
    * specific scheduler instance, which may be useful for isolation for unit tests.
    *
    * @return the default scheduler instance.
@@ -138,41 +138,41 @@ public class Scheduler implements ProtobufSerializable {
   public Scheduler() {}
 
   /**
-   * Sets the default command for a resource. The command must require that resource, and cannot
-   * require any other resources.
+   * Sets the default command for a mechanism. The command must require that mechanism, and cannot
+   * require any other mechanisms.
    *
-   * @param resource the resource for which to set the default command
-   * @param defaultCommand the default command to execute on the resource
+   * @param mechanism the mechanism for which to set the default command
+   * @param defaultCommand the default command to execute on the mechanism
    * @throws IllegalArgumentException if the command does not meet the requirements for being a
    *     default command
    */
-  public void scheduleAsDefaultCommand(RequireableResource resource, Command defaultCommand) {
-    if (!defaultCommand.requires(resource)) {
-      throw new IllegalArgumentException("A resource's default command must require that resource");
+  public void scheduleAsDefaultCommand(Mechanism mechanism, Command defaultCommand) {
+    if (!defaultCommand.requires(mechanism)) {
+      throw new IllegalArgumentException("A mechanism's default command must require that mechanism");
     }
 
     if (defaultCommand.requirements().size() > 1) {
       throw new IllegalArgumentException(
-          "A resource's default command cannot require other resources");
+          "A mechanism's default command cannot require other mechanisms");
     }
 
-    m_defaultCommands.put(resource, defaultCommand);
+    m_defaultCommands.put(mechanism, defaultCommand);
     schedule(defaultCommand);
   }
 
   /**
-   * Gets the default command set for a resource.
+   * Gets the default command set for a mechanism.
    *
-   * @param resource The resource
+   * @param mechanism The mechanism
    * @return The default command, or null if no default command was ever set
    */
-  public Command getDefaultCommandFor(RequireableResource resource) {
-    return m_defaultCommands.get(resource);
+  public Command getDefaultCommandFor(Mechanism mechanism) {
+    return m_defaultCommands.get(mechanism);
   }
 
   /**
    * Adds a callback to run as part of the scheduler. The callback should not manipulate or control
-   * any resources, but can be used to log information, update data (such as simulations or LED data
+   * any mechanisms, but can be used to log information, update data (such as simulations or LED data
    * buffers), or perform some other helpful task. The callback is responsible for managing its own
    * control flow and end conditions. If you want to run a single task periodically for the entire
    * lifespan of the scheduler, use {@link #addPeriodic(Runnable)}.
@@ -235,7 +235,7 @@ public class Scheduler implements ProtobufSerializable {
    * would be enough to delay actions by 100 milliseconds - instead of only 20.
    *
    * <p>Does nothing if the command is already scheduled or running, or requires at least one
-   * resource already used by a higher priority command.
+   * mechanism already used by a higher priority command.
    *
    * <p>If one command schedules another ("parent" and "fork"), the forked command will be canceled
    * when the parent command completes. It is not possible to fork a command and have it live longer
@@ -243,7 +243,7 @@ public class Scheduler implements ProtobufSerializable {
    *
    * @param command the command to schedule
    * @throws IllegalArgumentException if scheduled by a command composition that has already
-   *     scheduled another command that shares at least one required resource
+   *     scheduled another command that shares at least one required mechanism
    */
   public ScheduleResult schedule(Command command) {
     // Note: we use a throwable here instead of Thread.currentThread().getStackTrace() for easier
@@ -274,7 +274,7 @@ public class Scheduler implements ProtobufSerializable {
       }
       if (command.isLowerPriorityThan(scheduledState.command())) {
         // Lower priority than an already-scheduled (but not yet running) command that requires at
-        // one of the same resource. Ignore it.
+        // one of the same mechanism. Ignore it.
         return ScheduleResult.LOWER_PRIORITY_THAN_RUNNING_COMMAND;
       }
     }
@@ -431,7 +431,7 @@ public class Scheduler implements ProtobufSerializable {
     boolean running = isRunning(command);
 
     // Evict the command. The next call to run() will schedule the default command for all its
-    // required resources, unless another command requiring those resources is scheduled between
+    // required mechanisms, unless another command requiring those mechanisms is scheduled between
     // calling cancel() and calling run()
     m_commandStates.remove(command);
     m_onDeck.removeIf(state -> state.command() == command);
@@ -452,7 +452,7 @@ public class Scheduler implements ProtobufSerializable {
    * {@link #getDefaultEventLoop() default event loop}, begin running any commands scheduled since
    * the previous call to {@code run()}, process periodic callbacks added with {@link
    * #addPeriodic(Runnable)} and {@link #sideload(Consumer)}, update running commands, and schedule
-   * default commands for any resources that are not owned by a running command.
+   * default commands for any mechanisms that are not owned by a running command.
    *
    * <p>This method is intended to be called in a periodic loop like {@link
    * TimedRobot#robotPeriodic()}
@@ -598,15 +598,15 @@ public class Scheduler implements ProtobufSerializable {
   }
 
   private void scheduleDefaultCommands() {
-    // Schedule the default commands for every resource that doesn't currently have a running or
+    // Schedule the default commands for every mechanism that doesn't currently have a running or
     // scheduled command.
     m_defaultCommands.forEach(
-        (resource, defaultCommand) -> {
-          if (m_commandStates.keySet().stream().noneMatch(c -> c.requires(resource))
-              && m_onDeck.stream().noneMatch(c -> c.command().requires(resource))
+        (mechanism, defaultCommand) -> {
+          if (m_commandStates.keySet().stream().noneMatch(c -> c.requires(mechanism))
+              && m_onDeck.stream().noneMatch(c -> c.command().requires(mechanism))
               && defaultCommand != null) {
             // Nothing currently running or scheduled
-            // Schedule the resource's default command, if it has one
+            // Schedule the mechanism's default command, if it has one
             schedule(defaultCommand);
           }
         });
@@ -679,14 +679,14 @@ public class Scheduler implements ProtobufSerializable {
   }
 
   /**
-   * Gets all the currently running commands that require a particular resource. Commands are
+   * Gets all the currently running commands that require a particular mechanism. Commands are
    * returned in the order in which they were scheduled. The returned list is read-only.
    *
-   * @param resource the resource to get the commands for
-   * @return the currently running commands that require the resource.
+   * @param mechanism the mechanism to get the commands for
+   * @return the currently running commands that require the mechanism.
    */
-  public List<Command> getRunningCommandsFor(RequireableResource resource) {
-    return m_commandStates.keySet().stream().filter(command -> command.requires(resource)).toList();
+  public List<Command> getRunningCommandsFor(Mechanism mechanism) {
+    return m_commandStates.keySet().stream().filter(command -> command.requires(mechanism)).toList();
   }
 
   /**

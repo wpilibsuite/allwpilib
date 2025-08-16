@@ -23,8 +23,8 @@ class ParallelGroupTest {
 
   @Test
   void parallelAll() {
-    var r1 = new RequireableResource("R1", m_scheduler);
-    var r2 = new RequireableResource("R2", m_scheduler);
+    var r1 = new Mechanism("R1", m_scheduler);
+    var r2 = new Mechanism("R2", m_scheduler);
 
     var c1Count = new AtomicInteger(0);
     var c2Count = new AtomicInteger(0);
@@ -89,8 +89,8 @@ class ParallelGroupTest {
 
   @Test
   void race() {
-    var r1 = new RequireableResource("R1", m_scheduler);
-    var r2 = new RequireableResource("R2", m_scheduler);
+    var r1 = new Mechanism("R1", m_scheduler);
+    var r2 = new Mechanism("R2", m_scheduler);
 
     var c1Count = new AtomicInteger(0);
     var c2Count = new AtomicInteger(0);
@@ -146,12 +146,12 @@ class ParallelGroupTest {
 
   @Test
   void nested() {
-    var resource = new RequireableResource("Resource", m_scheduler);
+    var mechanism = new Mechanism("mechanism", m_scheduler);
 
     var count = new AtomicInteger(0);
 
     var command =
-        resource
+        mechanism
             .run(
                 coroutine -> {
                   for (int i = 0; i < 5; i++) {

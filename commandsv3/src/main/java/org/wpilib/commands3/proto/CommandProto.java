@@ -49,8 +49,8 @@ public class CommandProto implements Protobuf<Command, ProtobufCommand> {
     msg.setPriority(command.priority());
 
     for (var requirement : command.requirements()) {
-      var rrp = new RequireableResourceProto();
-      ProtobufRequireableResource requirementMessage = rrp.createMessage();
+      var rrp = new MechanismProto();
+      ProtobufMechanism requirementMessage = rrp.createMessage();
       rrp.pack(requirementMessage, requirement);
       msg.addRequirements(requirementMessage);
     }

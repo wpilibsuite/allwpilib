@@ -11,7 +11,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 /**
- * Performs some task using one or more {@link RequireableResource resources} using the
+ * Performs some task using one or more {@link Mechanism resources} using the
  * collaborative concurrency tools added in Java 21; namely, continuations. Continuations allow
  * commands to be executed concurrently in a collaborative manner as coroutines; instead of needing
  * to split command behavior into distinct functions (initialize(), execute(), end(), and
@@ -29,7 +29,7 @@ import java.util.function.Consumer;
  * command with an equal or greater {@link #priority()} is scheduled that requires one or more of
  * those same resources, it will interrupt and cancel the running command.
  *
- * <p>The recommended way to create a command is using {@link RequireableResource#run(Consumer)} or
+ * <p>The recommended way to create a command is using {@link Mechanism#run(Consumer)} or
  * a related factory method to create commands that require a single resource (for example, a
  * command that drives an elevator up and down or rotates an arm). Commands may be <i>composed</i>
  * into {@link ParallelGroup parallel groups} and {@link Sequence sequences} to build more complex
@@ -122,13 +122,13 @@ public interface Command {
   String name();
 
   /**
-   * The set of resources required by the command. This is used by the scheduler to determine if two
-   * commands conflict with each other. Any singular resource may only be required by a single
+   * The mechanisms required by the command. This is used by the scheduler to determine if two
+   * commands conflict with each other. Any singular mechanism may only be required by a single
    * running command at a time.
    *
-   * @return the set of resources required by the command
+   * @return the set of mechanisms required by the command
    */
-  Set<RequireableResource> requirements();
+  Set<Mechanism> requirements();
 
   /**
    * The priority of the command. If a command is scheduled that conflicts with another running or
@@ -154,20 +154,20 @@ public interface Command {
   }
 
   /**
-   * Checks if this command requires a particular resource.
+   * Checks if this command requires a particular mechanism.
    *
-   * @param resource the resource to check
-   * @return true if the resource is a member of the required resources, false if not
+   * @param mechanism the mechanism to check
+   * @return true if the mechanism is a member of the required mechanisms, false if not
    */
-  default boolean requires(RequireableResource resource) {
-    return requirements().contains(resource);
+  default boolean requires(Mechanism mechanism) {
+    return requirements().contains(mechanism);
   }
 
   /**
    * Checks if this command conflicts with another command.
    *
    * @param other the commands to check against
-   * @return true if both commands require at least one of the same resource, false if both commands
+   * @return true if both commands require at least one of the same mechanism, false if both commands
    *     have completely different requirements
    */
   default boolean conflictsWith(Command other) {
@@ -194,7 +194,7 @@ public interface Command {
    * Creates a command that does not require any hardware; that is, it does not affect the state of
    * any physical objects. This is useful for commands that do some house cleaning work like
    * resetting odometry and sensors that you don't want to interrupt a command that's controlling
-   * the resources it affects.
+   * the mechanisms it affects.
    *
    * @param impl the implementation of the command logic
    * @return a builder that can be used to configure the resulting command
@@ -204,13 +204,13 @@ public interface Command {
   }
 
   /**
-   * Starts creating a command that requires one or more resources.
+   * Starts creating a command that requires one or more mechanisms.
    *
-   * @param requirement The first required resource
-   * @param rest Any other required resources
+   * @param requirement The first required mechanism
+   * @param rest Any other required mechanisms
    * @return A command builder
    */
-  static CommandBuilder requiring(RequireableResource requirement, RequireableResource... rest) {
+  static CommandBuilder requiring(Mechanism requirement, Mechanism... rest) {
     return new CommandBuilder().requiring(requirement).requiring(rest);
   }
 
@@ -252,7 +252,7 @@ public interface Command {
   /**
    * Starts creating a command that simply waits for some condition to be met. The command will
    * start without any requirements, but some may be added (if necessary) using {@link
-   * CommandBuilder#requiring(RequireableResource)}.
+   * CommandBuilder#requiring(Mechanism)}.
    *
    * @param condition The condition to wait for
    * @return A command builder

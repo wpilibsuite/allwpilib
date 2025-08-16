@@ -11,7 +11,7 @@ allwpilib $ protoc-quickbuf \
               commandsv3/src/main/proto/scheduler.proto
  */
 
-message ProtobufRequireableResource {
+message ProtobufMechanism {
   string name = 1;
 }
 
@@ -30,8 +30,8 @@ message ProtobufCommand {
   // The priority level of the command.
   int32 priority = 4;
 
-  // The resources required by the command.
-  repeated ProtobufRequireableResource requirements = 5;
+  // The mechanisms required by the command.
+  repeated ProtobufMechanism requirements = 5;
 
   // How much time the command took to execute in its most recent run.
   // Only included in a message for an actively running command.

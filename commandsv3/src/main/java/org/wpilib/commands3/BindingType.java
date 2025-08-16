@@ -13,12 +13,12 @@ enum BindingType {
   IMMEDIATE,
   /**
    * Schedules (forks) a command on a rising edge signal. The command will run until it completes or
-   * is interrupted by another command requiring the same resources.
+   * is interrupted by another command requiring the same mechanisms.
    */
   SCHEDULE_ON_RISING_EDGE,
   /**
    * Schedules (forks) a command on a falling edge signal. The command will run until it completes
-   * or is interrupted by another command requiring the same resources.
+   * or is interrupted by another command requiring the same mechanisms.
    */
   SCHEDULE_ON_FALLING_EDGE,
   /**

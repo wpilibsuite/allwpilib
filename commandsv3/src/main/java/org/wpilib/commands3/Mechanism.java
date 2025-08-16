@@ -9,61 +9,71 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * A resource that may be claimed by a command. A single claimable resource cannot be claimed by
- * more than one running command at a time.
+ * Generic base class to represent mechanisms on a robot. Commands can require sole ownership of a
+ * mechanism; when a command that requires a mechanism is running, no other commands may use it at
+ * the same time.
+ *
+ * <p>Even though this class is named "Mechanism", it may be used to represent other physical
+ * hardware on a robot that should be controlled with commands - for example, an LED strip or a
+ * vision processor that can switch between different pipelines could be represented as mechanisms.
  */
-public class RequireableResource {
+public class Mechanism {
   private final String m_name;
 
   private final Scheduler m_registeredScheduler;
 
   /**
-   * Creates a new requireable resource registered with the default scheduler instance and named
+   * Creates a new mechanism registered with the default scheduler instance and named
    * using the name of the class. Intended to be used by subclasses to get sane defaults without
    * needing to manually declare a constructor.
    */
   @SuppressWarnings("this-escape")
-  protected RequireableResource() {
+  protected Mechanism() {
     m_name = getClass().getSimpleName();
     m_registeredScheduler = Scheduler.getDefault();
     setDefaultCommand(idle());
   }
 
   /**
-   * Creates a new claimable resource, registered with the default scheduler instance.
+   * Creates a new mechanism, registered with the default scheduler instance.
    *
-   * @param name The name of the resource. Cannot be null.
+   * @param name The name of the mechanism. Cannot be null.
    */
-  public RequireableResource(String name) {
+  public Mechanism(String name) {
     this(name, Scheduler.getDefault());
   }
 
   /**
-   * Creates a new claimable resource, registered with the given scheduler instance.
+   * Creates a new mechanism, registered with the given scheduler instance.
    *
-   * @param name The name of the resource. Cannot be null.
+   * @param name The name of the mechanism. Cannot be null.
    * @param scheduler The registered scheduler. Cannot be null.
    */
   @SuppressWarnings("this-escape")
-  public RequireableResource(String name, Scheduler scheduler) {
+  public Mechanism(String name, Scheduler scheduler) {
     m_name = name;
     m_registeredScheduler = scheduler;
     setDefaultCommand(idle());
   }
 
+  /**
+   * Gets the name of this mechanism.
+   *
+   * @return The name of the mechanism.
+   */
   public String getName() {
     return m_name;
   }
 
   /**
-   * Sets the default command to run on the resource when no other command is scheduled. The default
-   * command's priority is effectively the minimum allowable priority for any command requiring a
-   * resource. For this reason, it's required that a default command have a priority less than
-   * {@link Command#DEFAULT_PRIORITY} to prevent it from blocking other, non-default commands from
-   * running.
+   * Sets the default command to run on the mechanism when no other command is scheduled. The
+   * default command's priority is effectively the minimum allowable priority for any command
+   * requiring a mechanism. For this reason, it's recommended that a default command have a priority
+   * less than{@link Command#DEFAULT_PRIORITY} to prevent it from blocking other, non-default
+   * commands from running.
    *
-   * <p>The default command is initially an idle command that merely parks the execution thread.
-   * This command has the lowest possible priority so as to allow any other command to run.
+   * <p>The default command is initially an idle command that only owns the mechanism without doing
+   * anything. This command has the lowest possible priority to allow any other command to run.
    *
    * @param defaultCommand the new default command
    */
@@ -82,7 +92,7 @@ public class RequireableResource {
   }
 
   /**
-   * Starts building a command that requires this resource.
+   * Starts building a command that requires this mechanism.
    *
    * @param commandBody The main function body of the command.
    * @return The command builder, for further configuration.
@@ -92,7 +102,7 @@ public class RequireableResource {
   }
 
   /**
-   * Starts building a command that requires this resource. The given function will be called
+   * Starts building a command that requires this mechanism. The given function will be called
    * repeatedly in an infinite loop. Useful for building commands that don't need state or multiple
    * stages of logic.
    *
@@ -110,11 +120,12 @@ public class RequireableResource {
   }
 
   /**
-   * Returns a command that idles this resource until another command claims it. The idle command
+   * Returns a command that idles this mechanism until another command claims it. The idle command
    * has {@link Command#LOWEST_PRIORITY the lowest priority} and can be interrupted by any other
    * command.
    *
-   * <p>The default command for every claimable resource is an idle command.
+   * <p>The {@link #getDefaultCommand() default command} for every mechanism is an idle command
+   * unless a different default command has been configured.
    *
    * @return A new idle command.
    */
@@ -123,9 +134,9 @@ public class RequireableResource {
   }
 
   /**
-   * Returns a command that idles this resource for the given duration of time.
+   * Returns a command that idles this mechanism for the given duration of time.
    *
-   * @param duration How long the resource should idle for.
+   * @param duration How long the mechanism should idle for.
    * @return A new idle command.
    */
   public Command idle(Time duration) {

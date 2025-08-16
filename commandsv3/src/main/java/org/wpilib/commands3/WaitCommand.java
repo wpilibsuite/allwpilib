@@ -34,7 +34,7 @@ public class WaitCommand implements Command {
   }
 
   @Override
-  public Set<RequireableResource> requirements() {
+  public Set<Mechanism> requirements() {
     return Set.of();
   }
 }

@@ -96,10 +96,10 @@ public sealed interface SchedulerEvent {
 
   /**
    * An event marking when a command was evicted from the scheduler. Commands may be evicted when
-   * they've been scheduled, then another command requiring a shared resource is scheduled
+   * they've been scheduled, then another command requiring a shared mechanism is scheduled
    * afterward; when cancelled via {@link Scheduler#cancel(Command)} or {@link
    * Scheduler#cancelAll()}; or when they're running and interrupted by another command requiring a
-   * shared resource.
+   * shared mechanism.
    *
    * @param command The command that was evicted
    * @param timestampMicros When the command was evicted

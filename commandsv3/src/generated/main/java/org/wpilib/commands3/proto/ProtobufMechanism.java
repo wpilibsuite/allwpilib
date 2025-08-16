@@ -17,10 +17,10 @@ import us.hebi.quickbuf.ProtoSource;
 import us.hebi.quickbuf.Utf8String;
 
 /**
- * Protobuf type {@code ProtobufRequireableResource}
+ * Protobuf type {@code ProtobufMechanism}
  */
 @SuppressWarnings("hiding")
-public final class ProtobufRequireableResource extends ProtoMessage<ProtobufRequireableResource> implements Cloneable {
+public final class ProtobufMechanism extends ProtoMessage<ProtobufMechanism> implements Cloneable {
   private static final long serialVersionUID = 0L;
 
   /**
@@ -28,14 +28,14 @@ public final class ProtobufRequireableResource extends ProtoMessage<ProtobufRequ
    */
   private final Utf8String name = Utf8String.newEmptyInstance();
 
-  private ProtobufRequireableResource() {
+  private ProtobufMechanism() {
   }
 
   /**
-   * @return a new empty instance of {@code ProtobufRequireableResource}
+   * @return a new empty instance of {@code ProtobufMechanism}
    */
-  public static ProtobufRequireableResource newInstance() {
-    return new ProtobufRequireableResource();
+  public static ProtobufMechanism newInstance() {
+    return new ProtobufMechanism();
   }
 
   /**
@@ -50,7 +50,7 @@ public final class ProtobufRequireableResource extends ProtoMessage<ProtobufRequ
    * <code>optional string name = 1;</code>
    * @return this
    */
-  public ProtobufRequireableResource clearName() {
+  public ProtobufMechanism clearName() {
     bitField0_ &= ~0x00000001;
     name.clear();
     return this;
@@ -86,7 +86,7 @@ public final class ProtobufRequireableResource extends ProtoMessage<ProtobufRequ
    * @param value the name to set
    * @return this
    */
-  public ProtobufRequireableResource setName(final CharSequence value) {
+  public ProtobufMechanism setName(final CharSequence value) {
     bitField0_ |= 0x00000001;
     name.copyFrom(value);
     return this;
@@ -97,14 +97,14 @@ public final class ProtobufRequireableResource extends ProtoMessage<ProtobufRequ
    * @param value the name to set
    * @return this
    */
-  public ProtobufRequireableResource setName(final Utf8String value) {
+  public ProtobufMechanism setName(final Utf8String value) {
     bitField0_ |= 0x00000001;
     name.copyFrom(value);
     return this;
   }
 
   @Override
-  public ProtobufRequireableResource copyFrom(final ProtobufRequireableResource other) {
+  public ProtobufMechanism copyFrom(final ProtobufMechanism other) {
     cachedSize = other.cachedSize;
     if ((bitField0_ | other.bitField0_) != 0) {
       bitField0_ = other.bitField0_;
@@ -114,7 +114,7 @@ public final class ProtobufRequireableResource extends ProtoMessage<ProtobufRequ
   }
 
   @Override
-  public ProtobufRequireableResource mergeFrom(final ProtobufRequireableResource other) {
+  public ProtobufMechanism mergeFrom(final ProtobufMechanism other) {
     if (other.isEmpty()) {
       return this;
     }
@@ -126,7 +126,7 @@ public final class ProtobufRequireableResource extends ProtoMessage<ProtobufRequ
   }
 
   @Override
-  public ProtobufRequireableResource clear() {
+  public ProtobufMechanism clear() {
     if (isEmpty()) {
       return this;
     }
@@ -137,7 +137,7 @@ public final class ProtobufRequireableResource extends ProtoMessage<ProtobufRequ
   }
 
   @Override
-  public ProtobufRequireableResource clearQuick() {
+  public ProtobufMechanism clearQuick() {
     if (isEmpty()) {
       return this;
     }
@@ -152,10 +152,10 @@ public final class ProtobufRequireableResource extends ProtoMessage<ProtobufRequ
     if (o == this) {
       return true;
     }
-    if (!(o instanceof ProtobufRequireableResource)) {
+    if (!(o instanceof ProtobufMechanism)) {
       return false;
     }
-    ProtobufRequireableResource other = (ProtobufRequireableResource) o;
+    ProtobufMechanism other = (ProtobufMechanism) o;
     return bitField0_ == other.bitField0_
       && (!hasName() || name.equals(other.name));
   }
@@ -179,7 +179,7 @@ public final class ProtobufRequireableResource extends ProtoMessage<ProtobufRequ
 
   @Override
   @SuppressWarnings("fallthrough")
-  public ProtobufRequireableResource mergeFrom(final ProtoSource input) throws IOException {
+  public ProtobufMechanism mergeFrom(final ProtoSource input) throws IOException {
     // Enabled Fall-Through Optimization (QuickBuffers)
     int tag = input.readTag();
     while (true) {
@@ -217,7 +217,7 @@ public final class ProtobufRequireableResource extends ProtoMessage<ProtobufRequ
   }
 
   @Override
-  public ProtobufRequireableResource mergeFrom(final JsonSource input) throws IOException {
+  public ProtobufMechanism mergeFrom(final JsonSource input) throws IOException {
     if (!input.beginObject()) {
       return this;
     }
@@ -245,8 +245,8 @@ public final class ProtobufRequireableResource extends ProtoMessage<ProtobufRequ
   }
 
   @Override
-  public ProtobufRequireableResource clone() {
-    return new ProtobufRequireableResource().copyFrom(this);
+  public ProtobufMechanism clone() {
+    return new ProtobufMechanism().copyFrom(this);
   }
 
   @Override
@@ -254,39 +254,39 @@ public final class ProtobufRequireableResource extends ProtoMessage<ProtobufRequ
     return ((bitField0_) == 0);
   }
 
-  public static ProtobufRequireableResource parseFrom(final byte[] data) throws
+  public static ProtobufMechanism parseFrom(final byte[] data) throws
       InvalidProtocolBufferException {
-    return ProtoMessage.mergeFrom(new ProtobufRequireableResource(), data).checkInitialized();
+    return ProtoMessage.mergeFrom(new ProtobufMechanism(), data).checkInitialized();
   }
 
-  public static ProtobufRequireableResource parseFrom(final ProtoSource input) throws IOException {
-    return ProtoMessage.mergeFrom(new ProtobufRequireableResource(), input).checkInitialized();
+  public static ProtobufMechanism parseFrom(final ProtoSource input) throws IOException {
+    return ProtoMessage.mergeFrom(new ProtobufMechanism(), input).checkInitialized();
   }
 
-  public static ProtobufRequireableResource parseFrom(final JsonSource input) throws IOException {
-    return ProtoMessage.mergeFrom(new ProtobufRequireableResource(), input).checkInitialized();
+  public static ProtobufMechanism parseFrom(final JsonSource input) throws IOException {
+    return ProtoMessage.mergeFrom(new ProtobufMechanism(), input).checkInitialized();
   }
 
   /**
-   * @return factory for creating ProtobufRequireableResource messages
+   * @return factory for creating ProtobufMechanism messages
    */
-  public static MessageFactory<ProtobufRequireableResource> getFactory() {
-    return ProtobufRequireableResourceFactory.INSTANCE;
+  public static MessageFactory<ProtobufMechanism> getFactory() {
+    return ProtobufMechanismFactory.INSTANCE;
   }
 
   /**
    * @return this type's descriptor.
    */
   public static Descriptors.Descriptor getDescriptor() {
-    return Scheduler.wpi_proto_ProtobufRequireableResource_descriptor;
+    return Scheduler.wpi_proto_ProtobufMechanism_descriptor;
   }
 
-  private enum ProtobufRequireableResourceFactory implements MessageFactory<ProtobufRequireableResource> {
+  private enum ProtobufMechanismFactory implements MessageFactory<ProtobufMechanism> {
     INSTANCE;
 
     @Override
-    public ProtobufRequireableResource create() {
-      return ProtobufRequireableResource.newInstance();
+    public ProtobufMechanism create() {
+      return ProtobufMechanism.newInstance();
     }
   }
 
