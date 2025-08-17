@@ -21,14 +21,14 @@ def generate_nanopb(nanopb: Path, output_directory: Path, proto_dir: Path):
         absolute_filename = path.absolute()
         subprocess.check_call(
             [
-                sys.executable,
                 nanopb,
                 f"-I{absolute_filename.parent}",
                 f"-D{output_directory.absolute()}",
                 "-S.cpp",
                 "-e.npb",
                 absolute_filename,
-            ]
+            ],
+            env={"TMPDIR": os.environ["TMPDIR"]},
         )
     java_files = (output_directory).glob("*")
     for java_file in java_files:
