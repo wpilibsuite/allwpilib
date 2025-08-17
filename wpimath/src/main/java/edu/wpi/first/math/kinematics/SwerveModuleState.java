@@ -6,7 +6,9 @@ package edu.wpi.first.math.kinematics;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.proto.SwerveModuleStateProto;
 import edu.wpi.first.math.kinematics.struct.SwerveModuleStateStruct;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -16,7 +18,7 @@ import java.util.Objects;
 
 /** Represents the state of one swerve module. */
 public class SwerveModuleState
-    implements Comparable<SwerveModuleState>, ProtobufSerializable, StructSerializable {
+    implements Comparable<SwerveModuleState>, ProtobufSerializable, StructSerializable, Interpolatable<SwerveModuleState> {
   /** Speed of the wheel of the module in meters per second. */
   public double speed;
 
@@ -128,5 +130,19 @@ public class SwerveModuleState
    */
   public void cosineScale(Rotation2d currentAngle) {
     speed *= angle.minus(currentAngle).getCos();
+  }
+
+  @Override
+  public SwerveModuleState interpolate(SwerveModuleState endValue, double t) {
+    if (t <= 0) {
+      return this;
+    } else if (t >= 1) {
+      return endValue;
+    } else {
+      return new SwerveModuleState(
+          MathUtil.interpolate(this.speed, endValue.speed, t),
+          this.angle.interpolate(endValue.angle, t)
+      );
+    }
   }
 }
