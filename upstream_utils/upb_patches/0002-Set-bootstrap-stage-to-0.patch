@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Fri, 23 May 2025 23:57:11 -0400
+Subject: [PATCH 2/5] Set bootstrap stage to 0
+
+---
+ upb/port/def.inc                      | 2 ++
+ upb/reflection/descriptor_bootstrap.h | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/upb/port/def.inc b/upb/port/def.inc
+index d8ccc7b8ffe36d263a1f14731223ca8500ecb376..237aa87648661b05ce9a47fce00561bd2f262b13 100644
+--- a/upb/port/def.inc
++++ b/upb/port/def.inc
+@@ -33,6 +33,8 @@
+ #error upb requires C99 or C++17 or MSVC >= 2015.
+ #endif
+ 
++#define UPB_BOOTSTRAP_STAGE 0
++
+ // Portable check for GCC minimum version:
+ // https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
+ #if defined(__GNUC__) && defined(__GNUC_MINOR__) && defined(__GNUC_PATCHLEVEL__)
+diff --git a/upb/reflection/descriptor_bootstrap.h b/upb/reflection/descriptor_bootstrap.h
+index 8c501447e7ce4f7f404e075cb6be9301470ed0f9..ffb30ea949836dc0c9d1d3f73d0dfccc509e7d0d 100644
+--- a/upb/reflection/descriptor_bootstrap.h
++++ b/upb/reflection/descriptor_bootstrap.h
+@@ -2,7 +2,7 @@
+ #define GOOGLE_UPB_UPB_REFLECTION_DESCRIPTOR_BOOTSTRAP_H__
+ 
+ // IWYU pragma: begin_exports
+-
++#define UPB_BOOTSTRAP_STAGE 0
+ #if defined(UPB_BOOTSTRAP_STAGE) && UPB_BOOTSTRAP_STAGE == 0
+ // This header is checked in.
+ #include "upb/reflection/stage0/google/protobuf/descriptor.upb.h"

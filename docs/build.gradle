@@ -145,10 +145,9 @@ doxygen.sourceSets.main {
 
     exclude '*.pb.h'
 
-    // Save space by excluding protobuf and eigen
+    // Save space by excluding eigen
     exclude 'Eigen/**'
     exclude 'unsupported/**'
-    exclude 'google/protobuf/**'
 
     exclude '**/.clang-tidy'
     exclude '**/.clang-format'
