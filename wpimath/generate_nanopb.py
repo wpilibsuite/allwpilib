@@ -22,6 +22,7 @@ def generate_nanopb(nanopb: Path, output_directory: Path, proto_dir: Path):
     for path in proto_files:
         absolute_filename = path.absolute()
         subprocess.check_call(
+            ([sys.executable] if nanopb.endswith(".py") else []) +
             [
                 nanopb,
                 f"-I{absolute_filename.parent}",
