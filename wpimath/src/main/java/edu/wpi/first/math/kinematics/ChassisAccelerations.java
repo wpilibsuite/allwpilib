@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.struct.ChassisAccelerationsStruct;
+import edu.wpi.first.math.kinematics.proto.ChassisAccelerationsProto;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.util.struct.StructSerializable;
@@ -41,6 +42,9 @@ public class ChassisAccelerations implements StructSerializable, Interpolatable<
 
   /** ChassisAccelerations struct for serialization. */
   public static final ChassisAccelerationsStruct struct = new ChassisAccelerationsStruct();
+
+  /** ChassisAccelerations proto for serialization. */
+  public static final ChassisAccelerationsProto proto = new ChassisAccelerationsProto();
 
   /** Constructs a ChassisAccelerations with zeros for ax, ay, and omega. */
   public ChassisAccelerations() {}
