@@ -7,10 +7,12 @@ package edu.wpi.first.math.kinematics;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.struct.ChassisAccelerationsStruct;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.LinearAcceleration;
@@ -27,7 +29,7 @@ import java.util.Objects;
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
  * will often have all three components.
  */
-public class ChassisAccelerations implements StructSerializable {
+public class ChassisAccelerations implements StructSerializable, Interpolatable<ChassisAccelerations> {
   /** Velocity along the x-axis in meters per second². (Fwd is +) */
   public double ax;
 
@@ -198,6 +200,21 @@ public class ChassisAccelerations implements StructSerializable {
    */
   public ChassisAccelerations div(double scalar) {
     return new ChassisAccelerations(ax / scalar, ay / scalar, alpha / scalar);
+  }
+
+  @Override
+  public ChassisAccelerations interpolate(ChassisAccelerations endValue, double t) {
+    if (t <= 0) {
+      return this;
+    } else if (t >= 1) {
+      return endValue;
+    } else {
+      return new ChassisAccelerations(
+          MathUtil.interpolate(this.ax, endValue.ax, t),
+          MathUtil.interpolate(this.ay, endValue.ay, t),
+          MathUtil.interpolate(this.alpha, endValue.alpha, t)
+      );
+    }
   }
 
   @Override
