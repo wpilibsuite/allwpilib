@@ -4,8 +4,10 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisAccelerations;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Time;
 
 public class SplineSample extends TrajectorySample<SplineSample> {
   public final double curvature;
@@ -20,6 +22,13 @@ public class SplineSample extends TrajectorySample<SplineSample> {
     this.curvature = curvature;
   }
 
+  /** Constructs a SplineSample. */
+  public SplineSample(Time timestamp, Pose2d pose, ChassisSpeeds vel, ChassisAccelerations accel, double curvature) {
+    super(timestamp, pose, vel, accel);
+    this.curvature = curvature;
+  }
+
+  /** Constructs a SplineSample from another TrajectorySample, assuming the other sample's linear velocity is not zero. */
   public SplineSample(TrajectorySample<?> sample) {
     super(sample.timestamp, sample.pose, sample.vel, sample.accel);
     this.curvature = sample.vel.omega / (sample.vel.vx == 0.0 ? 1E-9 : sample.vel.vx);
@@ -71,7 +80,8 @@ public class SplineSample extends TrajectorySample<SplineSample> {
   }
 
   @Override
-  public SplineSample fromSample(TrajectorySample<?> sample) {
-    return new SplineSample(sample);
+  public SplineSample transform(Transform2d transform) {
+    return new SplineSample(
+        timestamp, pose.transformBy(transform), vel, accel, curvature);
   }
 }

@@ -3,12 +3,15 @@ package edu.wpi.first.math.trajectory;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisAccelerations;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
@@ -18,11 +21,37 @@ import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /** Represents a single sample in a differential drive trajectory. */
-public class DifferentialSample extends TrajectorySample<DifferentialSample> {
+public class DifferentialSample extends TrajectorySample<DifferentialSample>
+    implements StructSerializable {
   public final double leftSpeed; // meters per second
   public final double rightSpeed; // meters per second
+
+  /**
+   * Constructs a DifferentialSample.
+   *
+   * @param timestamp The timestamp of the sample relative to the trajectory start, in seconds.
+   * @param pose The robot pose at this sample (in the field reference frame).
+   * @param vel The robot velocity at this sample (in the robot's reference frame).
+   * @param accel The robot acceleration at this sample (in the robot's reference frame).
+   * @param leftSpeed The left-wheel speed at this sample in meters per second.
+   * @param rightSpeed The right-wheel speed at this sample in meters per second.
+   */
+  @JsonCreator
+  public DifferentialSample(
+      @JsonProperty("timestamp") double timestamp,
+      @JsonProperty("pose") Pose2d pose,
+      @JsonProperty("vel") ChassisSpeeds vel,
+      @JsonProperty("accel") ChassisAccelerations accel,
+      @JsonProperty("leftSpeed") double leftSpeed,
+      @JsonProperty("rightSpeed") double rightSpeed) {
+    super(timestamp, pose, vel, accel);
+
+    this.leftSpeed = leftSpeed;
+    this.rightSpeed = rightSpeed;
+  }
 
   /**
    * Constructs a DifferentialSample.
@@ -193,12 +222,9 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample> {
   }
 
   @Override
-  public DifferentialSample fromSample(TrajectorySample<?> sample) {
-    double trackwidth = (rightSpeed - leftSpeed) / 2.0;
-
+  public DifferentialSample transform(Transform2d transform) {
     return new DifferentialSample(
-        sample,
-        sample.vel.vx - trackwidth / 2 * sample.vel.omega,
-        sample.vel.vx + trackwidth / 2 * sample.vel.omega);
+        timestamp, pose.transformBy(transform), vel, accel, leftSpeed, rightSpeed
+    );
   }
 }
