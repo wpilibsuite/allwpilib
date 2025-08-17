@@ -70,8 +70,9 @@ import org.wpilib.commands3.proto.SchedulerProto;
  *       be queued takes precedence over the rest.
  *   <li>Loop over all running commands, mounting and calling each in turn until they either exit or
  *       call {@link Coroutine#yield()}. Commands run in the order in which they were scheduled.
- *   <li>Queue default commands for any resources without a running command. The queued commands can
- *       be superseded by any manual scheduling or commands scheduled by triggers in the next run.
+ *   <li>Queue default commands for any mechanisms without a running command. The queued commands
+ *       can be superseded by any manual scheduling or commands scheduled by triggers in the next
+ *       run.
  * </ol>
  *
  * <h2>Telemetry</h2>

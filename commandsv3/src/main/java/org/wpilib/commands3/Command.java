@@ -11,7 +11,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 /**
- * Performs some task using one or more {@link Mechanism resources} using the collaborative
+ * Performs some task using one or more {@link Mechanism mechanisms} using the collaborative
  * concurrency tools added in Java 21; namely, continuations. Continuations allow commands to be
  * executed concurrently in a collaborative manner as coroutines; instead of needing to split
  * command behavior into distinct functions (initialize(), execute(), end(), and isFinished()),
@@ -23,19 +23,19 @@ import java.util.function.Consumer;
  *
  * <h2>Requirements</h2>
  *
- * <p>Commands require zero or more resources. To prevent conflicting control requests from running
+ * <p>Commands require zero or more mechanisms. To prevent conflicting control requests from running
  * simultaneously (for example, commanding an elevator to both raise and lower at the same time), a
- * running command has <i>exclusive ownership</i> of all of its required resources. If another
+ * running command has <i>exclusive ownership</i> of all of its required mechanisms. If another
  * command with an equal or greater {@link #priority()} is scheduled that requires one or more of
- * those same resources, it will interrupt and cancel the running command.
+ * those same mechanisms, it will interrupt and cancel the running command.
  *
  * <p>The recommended way to create a command is using {@link Mechanism#run(Consumer)} or a related
- * factory method to create commands that require a single resource (for example, a command that
+ * factory method to create commands that require a single mechanism (for example, a command that
  * drives an elevator up and down or rotates an arm). Commands may be <i>composed</i> into {@link
  * ParallelGroup parallel groups} and {@link Sequence sequences} to build more complex behavior out
- * of fundamental building blocks. These built-in compositions will require every resource used by
+ * of fundamental building blocks. These built-in compositions will require every mechanism used by
  * every command in them, even if those commands aren't always running, and thus can leave certain
- * required resources in an <i>uncommanded</i> state: owned, but not used, this can lead to
+ * required mechanisms in an <i>uncommanded</i> state: owned, but not used, this can lead to
  * mechanisms sagging under gravity or running the motor control request they were given.
  *
  * <h2>Advanced Usage</h2>
