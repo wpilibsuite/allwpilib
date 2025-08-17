@@ -61,7 +61,7 @@ frc::Vectord<5> GlobalMeasurementModel(
 }  // namespace
 
 TEST(ExtendedKalmanFilterTest, Init) {
-  constexpr auto dt = 0.00505_s;
+  constexpr units::second_t dt = 5_ms;
 
   frc::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
                                               LocalMeasurementModel,
@@ -80,7 +80,7 @@ TEST(ExtendedKalmanFilterTest, Init) {
 }
 
 TEST(ExtendedKalmanFilterTest, Convergence) {
-  constexpr auto dt = 0.00505_s;
+  constexpr units::second_t dt = 5_ms;
   constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
 
   frc::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
