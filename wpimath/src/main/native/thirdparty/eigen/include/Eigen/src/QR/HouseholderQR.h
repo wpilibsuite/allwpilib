@@ -75,6 +75,17 @@ class HouseholderQR : public SolverBase<HouseholderQR<MatrixType_>> {
   typedef HouseholderSequence<MatrixType, internal::remove_all_t<typename HCoeffsType::ConjugateReturnType>>
       HouseholderSequenceType;
 
+  /** \brief Reports whether the QR factorization was successful.
+   *
+   * \note This function always returns \c Success. It is provided for compatibility
+   * with other factorization routines.
+   * \returns \c Success
+   */
+  ComputationInfo info() const {
+    eigen_assert(m_isInitialized && "HouseHolderQR is not initialized.");
+    return Success;
+  }
+
   /**
    * \brief Default Constructor.
    *

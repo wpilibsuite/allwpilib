@@ -225,14 +225,14 @@ class IndexedViewImpl<XprType, RowIndices, ColIndices, StorageKind, true>
     return this->nestedExpression().data() + row_offset + col_offset;
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index innerStride() const EIGEN_NOEXCEPT {
+  EIGEN_DEVICE_FUNC constexpr Index innerStride() const noexcept {
     if (traits<Derived>::InnerStrideAtCompileTime != Dynamic) {
       return traits<Derived>::InnerStrideAtCompileTime;
     }
     return innerIncrement() * this->nestedExpression().innerStride();
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index outerStride() const EIGEN_NOEXCEPT {
+  EIGEN_DEVICE_FUNC constexpr Index outerStride() const noexcept {
     if (traits<Derived>::OuterStrideAtCompileTime != Dynamic) {
       return traits<Derived>::OuterStrideAtCompileTime;
     }

@@ -74,7 +74,7 @@ def tagList = [
         /* --- Hardware --- */
         "Analog", "Ultrasonic", "Gyro", "Pneumatics", "I2C", "Duty Cycle", "PDP", "DMA", "Relay",
         "AddressableLEDs", "HAL", "Encoder", "Smart Motor Controller", "Digital Input",
-        "Digital Output",
+        "Digital Output", "Accelerometer",
 
         /* --- HID --- */
         "XboxController", "PS4Controller", "PS5Controller", "Joystick",
@@ -103,7 +103,26 @@ task checkExamples(type: Task) {
     }
 }
 
+task checkSnippets(type: Task) {
+    doLast {
+        def parsedJson = new groovy.json.JsonSlurper().parseText(snippetsFile.text)
+        fileCheck(parsedJson, snippetsDirectory)
+        parsedJson.each {
+            assert it.name != null
+            assert it.description != null
+            assert it.tags != null
+            assert it.tags.findAll { !tagList.contains(it) }.empty
+            assert it.foldername != null
+            assert it.gradlebase != null
+            if (it.gradlebase == 'java') {
+                assert it.mainclass != null
+            }
+        }
+    }
+}
+
 task checkCommands(type: Task) {
+    def isCppCommands = project.isCppCommands;
     doLast {
         def parsedJson = new groovy.json.JsonSlurper().parseText(commandFile.text)
         fileCheck(parsedJson, commandDirectory)
@@ -114,7 +133,7 @@ task checkCommands(type: Task) {
             assert it.foldername != null
             assert it.replacename != null
             assert it.commandversion != null
-            if (project.isCppCommands) {
+            if (isCppCommands) {
                 assert it.headers != null
                 assert !it.headers.isEmpty()
                 assert it.source != null
@@ -127,3 +146,4 @@ task checkCommands(type: Task) {
 check.dependsOn checkTemplates
 check.dependsOn checkExamples
 check.dependsOn checkCommands
+check.dependsOn checkSnippets

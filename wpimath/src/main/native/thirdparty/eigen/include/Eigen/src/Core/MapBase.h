@@ -84,9 +84,9 @@ class MapBase<Derived, ReadOnlyAccessors> : public internal::dense_xpr_base<Deri
   typedef typename Base::CoeffReturnType CoeffReturnType;
 
   /** \copydoc DenseBase::rows() */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const EIGEN_NOEXCEPT { return m_rows.value(); }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const noexcept { return m_rows.value(); }
   /** \copydoc DenseBase::cols() */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const EIGEN_NOEXCEPT { return m_cols.value(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const noexcept { return m_cols.value(); }
 
   /** Returns a pointer to the first coefficient of the matrix or vector.
    *

@@ -246,4 +246,53 @@ class TrapezoidProfileTest {
       }
     }
   }
+
+  @Test
+  void initalizationOfCurrentState() {
+    var profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(1, 1));
+    assertNear(profile.timeLeftUntil(0), 0, 1e-10);
+    assertNear(profile.totalTime(), 0, 1e-10);
+  }
+
+  @Test
+  void initialVelocityConstraints() {
+    TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
+    TrapezoidProfile.State goal = new TrapezoidProfile.State(10, 0);
+    TrapezoidProfile.State state = new TrapezoidProfile.State(0, -10);
+
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
+
+    for (int i = 0; i < 200; ++i) {
+      state = profile.calculate(kDt, state, goal);
+      assertLessThanOrEquals(Math.abs(state.velocity), Math.abs(constraints.maxVelocity));
+    }
+  }
+
+  @Test
+  void goalVelocityConstraints() {
+    TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
+    TrapezoidProfile.State goal = new TrapezoidProfile.State(10, 5);
+    TrapezoidProfile.State state = new TrapezoidProfile.State(0, 0.75);
+
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
+
+    for (int i = 0; i < 200; ++i) {
+      state = profile.calculate(kDt, state, goal);
+      assertLessThanOrEquals(Math.abs(state.velocity), Math.abs(constraints.maxVelocity));
+    }
+  }
+
+  @Test
+  void negativeGoalVelocityConstraints() {
+    TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
+    TrapezoidProfile.State goal = new TrapezoidProfile.State(10, -5);
+    TrapezoidProfile.State state = new TrapezoidProfile.State(0, 0.75);
+
+    TrapezoidProfile profile = new TrapezoidProfile(constraints);
+
+    for (int i = 0; i < 200; ++i) {
+      state = profile.calculate(kDt, state, goal);
+      assertLessThanOrEquals(Math.abs(state.velocity), Math.abs(constraints.maxVelocity));
+    }
+  }
 }

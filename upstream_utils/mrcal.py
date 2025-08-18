@@ -1,27 +1,27 @@
 #!/usr/bin/env python3
 
-import os
 import shutil
+from pathlib import Path
 
-from upstream_utils import Lib, walk_cwd_and_copy_if
+from upstream_utils import Lib, has_prefix, walk_cwd_and_copy_if
 
 
-def copy_upstream_src(wpilib_root):
-    wpical = os.path.join(wpilib_root, "wpical")
+def copy_upstream_src(wpilib_root: Path):
+    wpical = wpilib_root / "wpical"
 
     # Delete old install
     for d in [
         "src/main/native/thirdparty/mrcal/src",
         "src/main/native/thirdparty/mrcal/include",
     ]:
-        shutil.rmtree(os.path.join(wpical, d), ignore_errors=True)
+        shutil.rmtree(wpical / d, ignore_errors=True)
 
     files = walk_cwd_and_copy_if(
         lambda dp, f: (f.endswith(".h") or f.endswith(".hh"))
-        and not f.endswith("heap.h")
-        and not f.endswith("stereo-matching-libelas.h")
-        and not dp.startswith(os.path.join(".", "test")),
-        os.path.join(wpical, "src/main/native/thirdparty/mrcal/include"),
+        and not f == "heap.h"
+        and not f == "stereo-matching-libelas.h"
+        and not has_prefix(dp, Path("test")),
+        wpical / "src/main/native/thirdparty/mrcal/include",
     )
     files = files + walk_cwd_and_copy_if(
         lambda dp, f: (
@@ -30,16 +30,16 @@ def copy_upstream_src(wpilib_root):
             or f.endswith(".cpp")
             or f.endswith(".pl")
         )
-        and not f.endswith("heap.cc")
-        and not f.endswith("mrcal-pywrap.c")
-        and not f.endswith("image.c")
-        and not f.endswith("stereo.c")
-        and not f.endswith("stereo-matching-libelas.cc")
-        and not f.endswith("uncertainty.c")
-        and not f.endswith("traverse-sensor-links.c")
-        and not dp.startswith(os.path.join(".", "doc"))
-        and not dp.startswith(os.path.join(".", "test")),
-        os.path.join(wpical, "src/main/native/thirdparty/mrcal/src"),
+        and not f == "heap.cc"
+        and not f == "mrcal-pywrap.c"
+        and not f == "image.c"
+        and not f == "stereo.c"
+        and not f == "stereo-matching-libelas.cc"
+        and not f == "uncertainty.c"
+        and not f == "traverse-sensor-links.c"
+        and not has_prefix(dp, Path("doc"))
+        and not has_prefix(dp, Path("test")),
+        wpical / "src/main/native/thirdparty/mrcal/src",
     )
 
     for f in files:
@@ -55,6 +55,7 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "mrcal"
     url = "https://github.com/dkogan/mrcal"
+    # master on 2024-11-29
     tag = "662a539d3cbba4948c31d06a780569173b3fb6e6"
 
     mrcal = Lib(name, url, tag, copy_upstream_src)

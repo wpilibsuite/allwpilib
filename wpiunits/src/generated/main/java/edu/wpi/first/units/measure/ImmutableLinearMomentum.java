@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle"})
 public record ImmutableLinearMomentum(double magnitude, double baseUnitMagnitude, LinearMomentumUnit unit) implements LinearMomentum {
   @Override
   public LinearMomentum copy() {

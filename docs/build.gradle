@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id "org.ysb33r.doxygen" version "1.0.4"
+    id "org.ysb33r.doxygen" version "2.0.0"
 }
 
 evaluationDependsOn(':apriltag')
@@ -62,12 +62,12 @@ doxygen {
     }
 }
 
-doxygen {
-    template 'Doxyfile'
+doxygen.sourceSets.main {
+    template = 'Doxyfile'
 
     cppProjectZips.each {
-        dependsOn it
-        source it.source
+        doxygenDox.dependsOn it
+        sources it.source
         it.ext.includeDirs.each {
             cppIncludeRoots.add(it.absolutePath)
         }
@@ -138,9 +138,6 @@ doxygen {
         exclude 'wpi/ordered_map.h'
         exclude 'wpi/thirdparty/**'
 
-        // memory
-        exclude 'wpi/memory/**'
-
         // mpack
         exclude 'wpi/mpack.h'
 
@@ -172,7 +169,7 @@ doxygen {
 tasks.register("zipCppDocs", Zip) {
     archiveBaseName = zipBaseNameCpp
     destinationDirectory = outputsFolder
-    dependsOn doxygen
+    dependsOn doxygenDox
     from ("$buildDir/docs/doxygen/html")
     into '/'
 }
@@ -180,7 +177,7 @@ tasks.register("zipCppDocs", Zip) {
 // Java
 configurations {
     javaSource {
-        transitive false
+        transitive = false
     }
 }
 
@@ -209,6 +206,7 @@ task generateJavaDocs(type: Javadoc) {
             "-edu.wpi.first.math.system.plant.proto," +
             "-edu.wpi.first.math.system.plant.struct," +
             "-edu.wpi.first.math.trajectory.proto," +
+            "-edu.wpi.first.math.trajectory.struct," +
             // The .measure package contains generated source files for which automatic javadoc
             // generation is very difficult to do meaningfully.
             "-edu.wpi.first.units.measure", true)
@@ -268,15 +266,15 @@ publishing {
             artifact zipJavaDocs
 
             artifactId = "${baseArtifactIdJava}"
-            groupId artifactGroupIdJava
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupIdJava
+            version = wpilibVersioning.version.get()
         }
         cpp(MavenPublication) {
             artifact zipCppDocs
 
             artifactId = "${baseArtifactIdCpp}"
-            groupId artifactGroupIdCpp
-            version wpilibVersioning.version.get()
+            groupId = artifactGroupIdCpp
+            version = wpilibVersioning.version.get()
         }
     }
 }

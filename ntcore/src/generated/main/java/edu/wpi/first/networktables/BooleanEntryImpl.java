@@ -7,7 +7,6 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables Boolean implementation. */
-@SuppressWarnings("PMD.ArrayIsStoredDirectly")
 final class BooleanEntryImpl extends EntryBase implements BooleanEntry {
   /**
    * Constructor.

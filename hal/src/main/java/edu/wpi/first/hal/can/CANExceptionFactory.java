@@ -32,15 +32,14 @@ public final class CANExceptionFactory {
       case NIRioStatus.kRioStatusSuccess -> {
         // Everything is ok... don't throw.
       }
-      case ERR_CANSessionMux_InvalidBuffer,
-          NIRioStatus.kRIOStatusBufferInvalidSize -> throw new CANInvalidBufferException();
-      case ERR_CANSessionMux_MessageNotFound,
-          NIRioStatus.kRIOStatusOperationTimedOut -> throw new CANMessageNotFoundException();
-      case ERR_CANSessionMux_NotAllowed,
-          NIRioStatus.kRIOStatusFeatureNotSupported -> throw new CANMessageNotAllowedException(
-          "MessageID = " + messageID);
-      case ERR_CANSessionMux_NotInitialized,
-          NIRioStatus.kRIOStatusResourceNotInitialized -> throw new CANNotInitializedException();
+      case ERR_CANSessionMux_InvalidBuffer, NIRioStatus.kRIOStatusBufferInvalidSize ->
+          throw new CANInvalidBufferException();
+      case ERR_CANSessionMux_MessageNotFound, NIRioStatus.kRIOStatusOperationTimedOut ->
+          throw new CANMessageNotFoundException();
+      case ERR_CANSessionMux_NotAllowed, NIRioStatus.kRIOStatusFeatureNotSupported ->
+          throw new CANMessageNotAllowedException("MessageID = " + messageID);
+      case ERR_CANSessionMux_NotInitialized, NIRioStatus.kRIOStatusResourceNotInitialized ->
+          throw new CANNotInitializedException();
       default -> throw new UncleanStatusException("Fatal status code detected:  " + status);
     }
   }

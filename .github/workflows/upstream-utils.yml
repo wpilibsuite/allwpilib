@@ -120,12 +120,6 @@ jobs:
           ./mpack.py clone
           ./mpack.py copy-src
           ./mpack.py format-patch
-      - name: Run memory.py
-        run: |
-          cd upstream_utils
-          ./memory.py clone
-          ./memory.py copy-src
-          ./memory.py format-patch
       - name: Run protobuf.py
         run: |
           cd upstream_utils
@@ -147,4 +141,11 @@ jobs:
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output
-        run: git --no-pager diff --exit-code HEAD ':!*.bazel'
+        run: |
+          set +e
+          git --no-pager diff --exit-code HEAD ':!*.bazel'
+          git_exit_code=$?
+          if test "$git_exit_code" -ne "0"; then
+            echo "::error ::upstream_utils check failed. This is usually caused by a bad script or the copied files differing from what the script outputs. You can learn more about using upstream_utils to modify thirdparty libraries at https://github.com/wpilibsuite/allwpilib/blob/main/upstream_utils/README.md"
+            exit $git_exit_code
+          fi

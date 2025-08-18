@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class Translation3dTest {
@@ -149,10 +150,23 @@ class Translation3dTest {
   }
 
   @Test
+  void testSquaredNorm() {
+    var one = new Translation3d(3.0, 5.0, 7.0);
+    assertEquals(83.0, one.getSquaredNorm(), kEpsilon);
+  }
+
+  @Test
   void testDistance() {
     var one = new Translation3d(1.0, 1.0, 1.0);
     var two = new Translation3d(6.0, 6.0, 6.0);
     assertEquals(5.0 * Math.sqrt(3.0), one.getDistance(two), kEpsilon);
+  }
+
+  @Test
+  void testSquaredDistance() {
+    var one = new Translation3d(1.0, 1.0, 1.0);
+    var two = new Translation3d(6.0, 6.0, 6.0);
+    assertEquals(75.0, one.getSquaredDistance(two), kEpsilon);
   }
 
   @Test
@@ -205,5 +219,42 @@ class Translation3dTest {
     assertEquals(vec.get(2), translation.getZ());
 
     assertEquals(vec, translation.toVector());
+  }
+
+  @Test
+  void testNearest() {
+    var origin = Translation3d.kZero;
+
+    // Distance sort
+    // translations are in order of closest to farthest away from the origin at various positions
+    // in 3D space.
+    final var translation1 = new Translation3d(1, 0, 0);
+    final var translation2 = new Translation3d(0, 2, 0);
+    final var translation3 = new Translation3d(0, 0, 3);
+    final var translation4 = new Translation3d(2, 2, 2);
+    final var translation5 = new Translation3d(3, 3, 3);
+
+    assertEquals(translation3, origin.nearest(List.of(translation5, translation3, translation4)));
+    assertEquals(translation1, origin.nearest(List.of(translation1, translation2, translation3)));
+    assertEquals(translation2, origin.nearest(List.of(translation4, translation2, translation3)));
+  }
+
+  @Test
+  void testDot() {
+    var one = new Translation3d(1.0, 2.0, 3.0);
+    var two = new Translation3d(4.0, 5.0, 6.0);
+    assertEquals(32.0, one.dot(two));
+  }
+
+  @Test
+  void testCross() {
+    var one = new Translation3d(1.0, 2.0, 3.0);
+    var two = new Translation3d(4.0, 5.0, 6.0);
+
+    var cross = one.cross(two);
+    assertAll(
+        () -> assertEquals(-3.0, cross.get(0, 0), kEpsilon),
+        () -> assertEquals(6.0, cross.get(1, 0), kEpsilon),
+        () -> assertEquals(-3.0, cross.get(2, 0), kEpsilon));
   }
 }

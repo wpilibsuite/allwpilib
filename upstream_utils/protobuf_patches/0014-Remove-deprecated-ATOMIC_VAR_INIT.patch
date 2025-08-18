@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: braykoff <99614905+Braykoff@users.noreply.github.com>
 Date: Mon, 23 Dec 2024 15:12:02 -0500
-Subject: [PATCH 14/14] Remove deprecated ATOMIC_VAR_INIT
+Subject: [PATCH 14/15] Remove deprecated ATOMIC_VAR_INIT
 
 ---
  src/google/protobuf/stubs/common.cc | 2 +-

@@ -48,14 +48,13 @@ apriltag              apriltag/src/main/native/thirdparty/apriltag
 glfw                  thirdparty/imgui_suite/glfw
 Dear ImGui            thirdparty/imgui_suite/imgui
 implot                thirdparty/imgui_suite/implot
-memory                wpiutil/src/main/native/thirdparty/memory
 nanopb                wpiutil/src/main/native/thirdparty/nanopb
 protobuf              wpiutil/src/main/native/thirdparty/protobuf
 mrcal                 wpical/src/main/native/thirdparty/mrcal
 libdogleg             wpical/src/main/native/thirdparty/libdogleg
 Simd                  hal/src/main/native/athena/simd
 
-Additionally, glfw, memory, and nanopb were all modified for use in WPILib.
+Additionally, glfw and nanopb were modified for use in WPILib.
 
 ==============================================================================
 Google Test License
@@ -1330,31 +1329,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-==============
-memory License
-==============
-Copyright (C) 2015-2023 Jonathan Müller and foonathan/memory contributors
-
-This software is provided 'as-is', without any express or
-implied warranty. In no event will the authors be held
-liable for any damages arising from the use of this software.
-
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute
-it freely, subject to the following restrictions:
-
-1. The origin of this software must not be misrepresented;
-   you must not claim that you wrote the original software.
-   If you use this software in a product, an acknowledgment
-   in the product documentation would be appreciated but
-   is not required.
-
-2. Altered source versions must be plainly marked as such,
-   and must not be misrepresented as being the original software.
-
-3. This notice may not be removed or altered from any
-   source distribution.
 
 ==============
 nanopb License

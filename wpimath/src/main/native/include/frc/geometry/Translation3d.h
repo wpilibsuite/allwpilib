@@ -4,12 +4,17 @@
 
 #pragma once
 
+#include <algorithm>
+#include <initializer_list>
+#include <span>
+
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Translation2d.h"
+#include "units/area.h"
 #include "units/length.h"
 #include "units/math.h"
 
@@ -93,6 +98,24 @@ class WPILIB_DLLEXPORT Translation3d {
   }
 
   /**
+   * Calculates the squared distance between two translations in 3D space. This
+   * is equivalent to squaring the result of Distance(Translation3d), but avoids
+   * computing a square root.
+   *
+   * The squared distance between translations is defined as
+   * (x₂−x₁)²+(y₂−y₁)²+(z₂−z₁)².
+   *
+   * @param other The translation to compute the squared distance to.
+   * @return The squared distance between the two translations.
+   */
+  constexpr units::square_meter_t SquaredDistance(
+      const Translation3d& other) const {
+    return units::math::pow<2>(other.m_x - m_x) +
+           units::math::pow<2>(other.m_y - m_y) +
+           units::math::pow<2>(other.m_z - m_z);
+  }
+
+  /**
    * Returns the X component of the translation.
    *
    * @return The Z component of the translation.
@@ -132,6 +155,17 @@ class WPILIB_DLLEXPORT Translation3d {
   }
 
   /**
+   * Returns the squared norm, or squared distance from the origin to the
+   * translation. This is equivalent to squaring the result of Norm(), but
+   * avoids computing a square root.
+   *
+   * @return The squared norm of the translation.
+   */
+  constexpr units::square_meter_t SquaredNorm() const {
+    return m_x * m_x + m_y * m_y + m_z * m_z;
+  }
+
+  /**
    * Applies a rotation to the translation in 3D space.
    *
    * For example, rotating a Translation3d of &lt;2, 0, 0&gt; by 90 degrees
@@ -158,6 +192,38 @@ class WPILIB_DLLEXPORT Translation3d {
   constexpr Translation3d RotateAround(const Translation3d& other,
                                        const Rotation3d& rot) const {
     return (*this - other).RotateBy(rot) + other;
+  }
+
+  /**
+   * Computes the dot product between this translation and another translation
+   * in 3D space.
+   *
+   * The dot product between two translations is defined as x₁x₂+y₁y₂+z₁z₂.
+   *
+   * @param other The translation to compute the dot product with.
+   * @return The dot product between the two translations.
+   */
+  constexpr units::square_meter_t Dot(const Translation3d& other) const {
+    return m_x * other.X() + m_y * other.Y() + m_z * other.Z();
+  }
+
+  /**
+   * Computes the cross product between this translation and another
+   * translation in 3D space. The resulting translation will be perpendicular to
+   * both translations.
+   *
+   * The 3D cross product between two translations is defined as <y₁z₂-y₂z₁,
+   * z₁x₂-z₂x₁, x₁y₂-x₂y₁>.
+   *
+   * @param other The translation to compute the cross product with.
+   * @return The cross product between the two translations.
+   */
+  constexpr Eigen::Vector<units::square_meter_t, 3> Cross(
+      const Translation3d& other) const {
+    return Eigen::Vector<units::square_meter_t, 3>{
+        {m_y * other.Z() - other.Y() * m_z},
+        {m_z * other.X() - other.Z() * m_x},
+        {m_x * other.Y() - other.X() * m_y}};
   }
 
   /**
@@ -242,6 +308,34 @@ class WPILIB_DLLEXPORT Translation3d {
     return units::math::abs(m_x - other.m_x) < 1E-9_m &&
            units::math::abs(m_y - other.m_y) < 1E-9_m &&
            units::math::abs(m_z - other.m_z) < 1E-9_m;
+  }
+
+  /**
+   * Returns the nearest Translation3d from a collection of translations
+   * @param translations The collection of translations.
+   * @return The nearest Translation3d from the collection.
+   */
+  constexpr Translation3d Nearest(
+      std::span<const Translation3d> translations) const {
+    return *std::min_element(
+        translations.begin(), translations.end(),
+        [this](const Translation3d& a, const Translation3d& b) {
+          return this->Distance(a) < this->Distance(b);
+        });
+  }
+
+  /**
+   * Returns the nearest Translation3d from a collection of translations
+   * @param translations The collection of translations.
+   * @return The nearest Translation3d from the collection.
+   */
+  constexpr Translation3d Nearest(
+      std::initializer_list<Translation3d> translations) const {
+    return *std::min_element(
+        translations.begin(), translations.end(),
+        [this](const Translation3d& a, const Translation3d& b) {
+          return this->Distance(a) < this->Distance(b);
+        });
   }
 
  private:

@@ -36,7 +36,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv-java clang-17 libprotobuf-dev protobuf-compiler ninja-build
 
       - name: Install sccache
-        uses: mozilla-actions/sccache-action@v0.0.5
+        uses: mozilla-actions/sccache-action@v0.0.9
 
       - uses: actions/checkout@v4
 

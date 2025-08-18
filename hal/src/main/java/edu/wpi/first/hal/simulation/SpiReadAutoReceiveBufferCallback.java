@@ -4,6 +4,7 @@
 
 package edu.wpi.first.hal.simulation;
 
+@FunctionalInterface
 public interface SpiReadAutoReceiveBufferCallback {
   int callback(String name, int[] buffer, int numToRead);
 }

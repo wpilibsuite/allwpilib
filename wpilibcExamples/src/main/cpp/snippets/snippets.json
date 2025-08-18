@@ -1,0 +1,158 @@
+[
+  {
+    "name": "Encoder",
+    "description": "Snippets of Encoder class usage for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Encoder"
+    ],
+    "foldername": "Encoder",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "DutyCycleEncoder",
+    "description": "Snippets of DutyCycleEncoder class usage for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Encoder",
+      "Duty Cycle"
+    ],
+    "foldername": "DutyCycleEncoder",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "AnalogEncoder",
+    "description": "Snippets of AnalogEncoder class usage for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Encoder",
+      "Analog"
+    ],
+    "foldername": "AnalogEncoder",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "EncoderDrive",
+    "description": "Snippets of driving to a distance for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Encoder",
+      "Differential Drive"
+    ],
+    "foldername": "EncoderDrive",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "EncoderHoming",
+    "description": "Snippets of homing a mechanism for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Encoder",
+      "Digital Input"
+    ],
+    "foldername": "EncoderHoming",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "LimitSwitch",
+    "description": "Snippets of Limit Switch for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Digital Input"
+    ],
+    "foldername": "LimitSwitch",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "DigitalInput",
+    "description": "Snippets of Digital Input for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Digital Input"
+    ],
+    "foldername": "DigitalInput",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "AnalogTrigger",
+    "description": "Snippets of Analog Trigger for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Analog",
+      "Digital Input"
+    ],
+    "foldername": "AnalogTrigger",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "AnalogInput",
+    "description": "Snippets of Analog Input for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Analog"
+    ],
+    "foldername": "AnalogInput",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "AnalogPotentiometer",
+    "description": "Snippets of Analog Potentiometer for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Analog"
+    ],
+    "foldername": "AnalogPotentiometer",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "AnalogAccelerometer",
+    "description": "Snippets of Analog Accelerometer for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Analog",
+      "Accelerometer"
+    ],
+    "foldername": "AnalogAccelerometer",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "ADXLAccelerometers",
+    "description": "Snippets of ADXL 345 and 362 Accelerometers for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Accelerometer"
+    ],
+    "foldername": "ADXLAccelerometers",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "BuiltInAccelerometer",
+    "description": "Snippets of BuiltIn Accelerometer for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Accelerometer"
+    ],
+    "foldername": "BuiltInAccelerometer",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "AccelerometerCollisionDetection",
+    "description": "Snippets of Accelerometer collision detection for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Accelerometer"
+    ],
+    "foldername": "AccelerometerCollision",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "AccelerometerFilter",
+    "description": "Snippets of filterning Accelerometer for frc-docs.",
+    "tags": [
+      "Hardware",
+      "Accelerometer"
+    ],
+    "foldername": "AccelerometerFilter",
+    "gradlebase": "cpp"
+  }
+]

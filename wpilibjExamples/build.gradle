@@ -27,12 +27,12 @@ dependencies {
     implementation project(':epilogue-runtime')
     annotationProcessor project(':epilogue-processor')
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 jacoco {
-    toolVersion = "0.8.10"
+    toolVersion = "0.8.13"
 }
 
 jacocoTestReport {
@@ -72,6 +72,8 @@ ext {
     exampleFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/examples/examples.json")
     commandDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/")
     commandFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/commands.json")
+    snippetsDirectory = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/snippets/")
+    snippetsFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/snippets/snippets.json")
 }
 
 apply plugin: 'cpp'
@@ -160,7 +162,7 @@ model {
 
                             new groovy.json.JsonSlurper().parseText(exampleFile.text).each { entry ->
                                 project.tasks.create("run${entry.foldername}", JavaExec) { run ->
-                                    run.group "run examples"
+                                    run.group = "run examples"
                                     run.mainClass = "edu.wpi.first.wpilibj.examples." + entry.foldername + "." + entry.mainclass
                                     run.classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
@@ -172,7 +174,7 @@ model {
                                     }
                                 }
                                 project.tasks.create("test${entry.foldername}", Test) { testTask ->
-                                    testTask.group "verification"
+                                    testTask.group = "verification"
                                     testTask.useJUnitPlatform()
                                     testTask.filter {
                                         includeTestsMatching("edu.wpi.first.wpilibj.examples.${entry.foldername}.*")
@@ -193,7 +195,48 @@ model {
                                     testTask.systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
                                     testTask.testLogging {
                                         events "failed"
-                                        exceptionFormat "full"
+                                        exceptionFormat = "full"
+                                    }
+                                    testTask.systemProperty 'java.library.path', filePath
+
+                                    if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
+                                        testTask.enabled = false
+                                    }
+                                    test.dependsOn(testTask)
+                                }
+                            }
+                            new groovy.json.JsonSlurper().parseText(snippetsFile.text).each { entry ->
+                                project.tasks.create("runSnippet${entry.foldername}", JavaExec) { run ->
+                                    run.group = "run snippets"
+                                    run.mainClass = "edu.wpi.first.wpilibj.snippets." + entry.foldername + "." + entry.mainclass
+                                    run.classpath = sourceSets.main.runtimeClasspath
+                                    run.dependsOn it.tasks.install
+                                    run.systemProperty 'java.library.path', filePath
+                                    doFirst { doFirstTask(run) }
+
+                                    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+                                        run.jvmArgs = ['-XstartOnFirstThread']
+                                    }
+                                }
+                                project.tasks.create("testSnippet${entry.foldername}", Test) { testTask ->
+                                    testTask.group = "verification"
+                                    testTask.useJUnitPlatform()
+                                    testTask.filter {
+                                        includeTestsMatching("edu.wpi.first.wpilibj.snippets.${entry.foldername}.*")
+                                        setFailOnNoMatchingTests(false)
+                                    }
+                                    test.filter {
+                                        excludeTestsMatching("edu.wpi.first.wpilibj.snippets.${entry.foldername}.*")
+                                        setFailOnNoMatchingTests(false)
+                                    }
+                                    testTask.testClassesDirs = sourceSets.test.output.classesDirs
+                                    testTask.classpath = sourceSets.test.runtimeClasspath
+                                    testTask.dependsOn it.tasks.install
+
+                                    testTask.systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+                                    testTask.testLogging {
+                                        events "failed"
+                                        exceptionFormat = "full"
                                     }
                                     testTask.systemProperty 'java.library.path', filePath
 
