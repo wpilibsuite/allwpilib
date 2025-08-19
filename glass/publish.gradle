@@ -12,6 +12,10 @@ def libntBaseArtifactId = 'libglassnt'
 def libntArtifactGroupId = 'edu.wpi.first.glass'
 def libntZipBaseName = '_GROUP_edu_wpi_first_glass_ID_libglassnt_CLS'
 
+def libcsBaseArtifactId = 'libglasscs'
+def libcsArtifactGroupId = 'edu.wpi.first.glass'
+def libcsZipBaseName = '_GROUP_edu_wpi_first_glass_ID_libglasscs_CLS'
+
 def outputsFolder = file("$project.buildDir/outputs")
 
 task libCppSourcesZip(type: Zip) {
@@ -50,15 +54,37 @@ task libntCppHeadersZip(type: Zip) {
     from('src/libnt/native/include') { into '/' }
 }
 
+task libcsCppSourcesZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = libcsZipBaseName
+    classifier = "sources"
+
+    from(licenseFile) { into '/' }
+    from('src/libcs/native/cpp') { into '/' }
+}
+
+task libcsCppHeadersZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = libcsZipBaseName
+    classifier = "headers"
+
+    from(licenseFile) { into '/' }
+    from('src/libcs/native/include') { into '/' }
+}
+
 build.dependsOn libCppHeadersZip
 build.dependsOn libCppSourcesZip
 build.dependsOn libntCppHeadersZip
 build.dependsOn libntCppSourcesZip
+build.dependsOn libcsCppHeadersZip
+build.dependsOn libcsCppSourcesZip
 
 addTaskToCopyAllOutputs(libCppHeadersZip)
 addTaskToCopyAllOutputs(libCppSourcesZip)
 addTaskToCopyAllOutputs(libntCppHeadersZip)
 addTaskToCopyAllOutputs(libntCppSourcesZip)
+addTaskToCopyAllOutputs(libcsCppHeadersZip)
+addTaskToCopyAllOutputs(libcsCppSourcesZip)
 
 model {
     tasks {
@@ -168,6 +194,7 @@ model {
 
         def libGlassTaskList = createComponentZipTasks($.components, ['glass'], libZipBaseName, Zip, project, includeStandardZipFormat)
         def libGlassntTaskList = createComponentZipTasks($.components, ['glassnt'], libntZipBaseName, Zip, project, includeStandardZipFormat)
+        def libGlasscsTaskList = createComponentZipTasks($.components, ['glasscs'], libcsZipBaseName, Zip, project, includeStandardZipFormat)
 
         publications {
             glassApp(MavenPublication) {
@@ -196,6 +223,16 @@ model {
                 artifactId = libntBaseArtifactId
                 groupId = libntArtifactGroupId
                 version = wpilibVersioning.version.get()
+            }
+            libglasscs(MavenPublication) {
+                libGlasscsTaskList.each { artifact it }
+
+                artifact libcsCppHeadersZip
+                artifact libcsCppSourcesZip
+
+                artifactId = libcsBaseArtifactId
+                groupId = libcsArtifactGroupId
+                version wpilibVersioning.version.get()
             }
         }
     }
