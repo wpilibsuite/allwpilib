@@ -1,10 +1,10 @@
 ext {
     useJava = true
     useCpp = false
-    baseId = 'commandsv3'
+    baseId = 'commands3'
     groupId = 'org.wpilib'
 
-    nativeName = 'commandsv3'
+    nativeName = 'commands3'
     devMain = ''
 }
 

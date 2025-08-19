@@ -44,7 +44,7 @@ filegroup(
 wpilib_java_library(
     name = "commandsv3-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
-    maven_artifact_name = "commandsv3-java",
+    maven_artifact_name = "commands3-java",
     maven_group_id = "org.wpilib.commands3",
     visibility = ["//visibility:public"],
     deps = [
