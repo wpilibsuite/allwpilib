@@ -144,7 +144,7 @@ void bindDriveButtons() {
 Trigger atScoringPosition = new Trigger(() -> getPosition().isNear(kScoringPosition));
 
 Command autonomous() {
-  return Command.noRequirements(coroutine -> {
+  return Command.noRequirements().executing(coroutine -> {
     // This binding only exists while the autonomous command is running
     atScoringPosition.onTrue(score());
 
@@ -199,7 +199,7 @@ outside its command makes no sense, and an error will be thrown if attempting to
 
 ```java
 Coroutine coroutine;
-var badCommand = Command.noRequirements(co -> {
+var badCommand = Command.noRequirements().executing(co -> {
   coroutine = co;
 }).named("Do not do this");
 
@@ -291,6 +291,24 @@ are cancelled at this point.
 In contrast with v2’s decorator API that returns a new command object for each modification (which
 had some issues with naming and making telemetry difficult with deeply nested wrapper objects), v3
 uses builder objects that allow configuration to be set before creating a single command at the end.
+Builders are defined in stages, with a different type representing each stage, in order to leverage
+the type system to prevent users from creating invalid commands and only discovering so at runtime.
+Failure to apply required configuration options (eg the main command function or a name) will leave
+users with an intermediate-stage builder that cannot be used to create a command, resulting in a
+compilation error.
+
+```java
+// OK - requirements, body, and name are all provided
+// Each builder method returns a different builder object that provides methods
+// for progressing to the next stage.
+Command command = Command.noRequirements().executing(...).withName("Name").make()
+
+// Compilation error! Missing the command body
+Command command = Command.noRequirements().withName("Name").make();
+
+// Compilation error! Missing the command name
+Command command = Command.noRequirements().executing(...).make();
+```
 
 #### Forced Naming
 
