@@ -22,44 +22,15 @@ public class DriverStationJNI extends JNIWrapper {
   public static native void observeUserProgramStarting();
 
   /**
-   * Sets the disabled flag in the DS.
+   * Sets the op mode returned to the DS.
    *
    * <p>This is used for the DS to ensure the robot is properly responding to its state request.
    * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
    *
-   * @see "HAL_ObserveUserProgramDisabled"
+   * @param id operating mode unique ID returned by getOpMode()
+   * @param enabled true if robot is enabled, false if disabled
    */
-  public static native void observeUserProgramDisabled();
-
-  /**
-   * Sets the autonomous enabled flag in the DS.
-   *
-   * <p>This is used for the DS to ensure the robot is properly responding to its state request.
-   * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
-   *
-   * @see "HAL_ObserveUserProgramAutonomous"
-   */
-  public static native void observeUserProgramAutonomous();
-
-  /**
-   * Sets the teleoperated enabled flag in the DS.
-   *
-   * <p>This is used for the DS to ensure the robot is properly responding to its state request.
-   * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
-   *
-   * @see "HAL_ObserveUserProgramTeleop"
-   */
-  public static native void observeUserProgramTeleop();
-
-  /**
-   * Sets the test mode flag in the DS.
-   *
-   * <p>This is used for the DS to ensure the robot is properly responding to its state request.
-   * Ensure this gets called about every 50ms, or the robot will be disabled by the DS.
-   *
-   * @see "HAL_ObserveUserProgramTest"
-   */
-  public static native void observeUserProgramTest();
+  public static native void observeUserProgramOpMode(long id, boolean enabled);
 
   /**
    * Gets the current control word of the driver station.
@@ -90,6 +61,73 @@ public class DriverStationJNI extends JNIWrapper {
         ((word >> 4) & 1) != 0,
         ((word >> 5) & 1) != 0);
   }
+
+  /**
+   * Adds an operating mode option.
+   *
+   * @param mode robot mode (HAL_RobotMode enum value)
+   * @param name name of the operating mode
+   * @param group group of the operating mode
+   * @param description description of the operating mode
+   * @param textColor text color, in 0xRRGGBB format, or -1 for default
+   * @param backgroundColor background color, in 0xRRGGBB format, or -1 for default
+   * @return unique ID used to later identify the operating mode; if an empty
+   * string is passed, 0 is returned; identical names for the same robot
+   * mode result in identical unique IDs
+   */
+  private static native long nativeAddOpMode(int mode, String name, String group, String description, int textColor, int backgroundColor);
+
+  /**
+   * Adds an operating mode option.
+   *
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param group group of the operating mode
+   * @param description description of the operating mode
+   * @param textColor text color, in 0xRRGGBB format, or -1 for default
+   * @param backgroundColor background color, in 0xRRGGBB format, or -1 for default
+   * @return unique ID used to later identify the operating mode; if an empty
+   * string is passed, 0 is returned; identical names for the same robot
+   * mode result in identical unique IDs
+   */
+  public static long addOpMode(RobotMode mode, String name, String group, String description, int textColor, int backgroundColor) {
+    return nativeAddOpMode(mode.getValue(), name, group, description, textColor, backgroundColor);
+  }
+
+  /**
+   * Removes an operating mode option.
+   *
+   * @param mode robot mode (HAL_RobotMode enum value)
+   * @param name name of the operating mode
+   * @return unique ID, 0 if not present
+   */
+  private static native long nativeRemoveOpMode(int mode, String name);
+
+  /**
+   * Removes an operating mode option.
+   *
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @return unique ID, 0 if not present
+   */
+  public static long removeOpMode(RobotMode mode, String name) {
+    return nativeRemoveOpMode(mode.getValue(), name);
+  }
+
+  /**
+   * Clears all operating mode options.
+   */
+  public static native void clearOpModes();
+
+  /**
+   * Gets the currently selected operating mode of the driver station.
+   * Note this does not mean the robot is enabled; use the control word for that.
+   *
+   * @return the unique ID provided by the addOpMode() function; may return 0
+   * or a unique ID not added, so callers should be prepared to handle
+   * that case
+   */
+  public static native long getOpMode();
 
   /**
    * Gets the current alliance station ID.

@@ -7,11 +7,10 @@ package edu.wpi.first.hal;
 /** A wrapper for the HALControlWord bitfield. */
 public class ControlWord {
   private boolean m_enabled;
-  private boolean m_autonomous;
-  private boolean m_test;
   private boolean m_emergencyStop;
   private boolean m_fmsAttached;
   private boolean m_dsAttached;
+  private RobotMode m_mode = RobotMode.Unknown;
 
   /** Default constructor. */
   public ControlWord() {}
@@ -24,8 +23,13 @@ public class ControlWord {
       boolean fmsAttached,
       boolean dsAttached) {
     m_enabled = enabled;
-    m_autonomous = autonomous;
-    m_test = test;
+    if (autonomous) {
+      m_mode = RobotMode.Autonomous;
+    } else if (test) {
+      m_mode = RobotMode.Test;
+    } else {
+      m_mode = RobotMode.Teleoperated;
+    }
     m_emergencyStop = emergencyStop;
     m_fmsAttached = fmsAttached;
     m_dsAttached = dsAttached;
@@ -38,8 +42,7 @@ public class ControlWord {
    */
   public void update(ControlWord word) {
     m_enabled = word.m_enabled;
-    m_autonomous = word.m_autonomous;
-    m_test = word.m_test;
+    m_mode = word.m_mode;
     m_emergencyStop = word.m_emergencyStop;
     m_fmsAttached = word.m_fmsAttached;
     m_dsAttached = word.m_dsAttached;
@@ -55,21 +58,12 @@ public class ControlWord {
   }
 
   /**
-   * Gets the Autonomous mode flag.
+   * Gets the robot mode.
    *
-   * @return the Autonomous mode flag
+   * @return the robot mode
    */
-  public boolean getAutonomous() {
-    return m_autonomous;
-  }
-
-  /**
-   * Gets the Test mode flag.
-   *
-   * @return the Test mode flag
-   */
-  public boolean getTest() {
-    return m_test;
+  public RobotMode getMode() {
+    return m_mode;
   }
 
   /**

@@ -4,10 +4,14 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import java.util.function.Consumer;
+
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.hal.RobotMode;
 import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
+import edu.wpi.first.hal.simulation.OpModeOption;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -49,64 +53,34 @@ public final class DriverStationSim {
   }
 
   /**
-   * Register a callback on whether the DS is in autonomous mode.
+   * Register a callback on robot mode changes.
    *
-   * @param callback the callback that will be called on autonomous mode entrance/exit
+   * @param callback the callback that will be called when the robot mode changes
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback.
    */
-  public static CallbackStore registerAutonomousCallback(
+  public static CallbackStore registerRobotModeCallback(
       NotifyCallback callback, boolean initialNotify) {
-    int uid = DriverStationDataJNI.registerAutonomousCallback(callback, initialNotify);
-    return new CallbackStore(uid, DriverStationDataJNI::cancelAutonomousCallback);
+    int uid = DriverStationDataJNI.registerRobotModeCallback(callback, initialNotify);
+    return new CallbackStore(uid, DriverStationDataJNI::cancelRobotModeCallback);
   }
 
   /**
-   * Check if the DS is in autonomous.
+   * Gets the robot mode.
    *
-   * @return true if autonomous
+   * @return robot mode
    */
-  public static boolean getAutonomous() {
-    return DriverStationDataJNI.getAutonomous();
+  public static RobotMode getRobotMode() {
+    return DriverStationDataJNI.getRobotMode();
   }
 
   /**
-   * Change whether the DS is in autonomous.
+   * Change the robot mode.
    *
-   * @param autonomous the new value
+   * @param mode the new value
    */
-  public static void setAutonomous(boolean autonomous) {
-    DriverStationDataJNI.setAutonomous(autonomous);
-  }
-
-  /**
-   * Register a callback on whether the DS is in test mode.
-   *
-   * @param callback the callback that will be called whenever the test mode is entered or left
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public static CallbackStore registerTestCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = DriverStationDataJNI.registerTestCallback(callback, initialNotify);
-    return new CallbackStore(uid, DriverStationDataJNI::cancelTestCallback);
-  }
-
-  /**
-   * Check if the DS is in test.
-   *
-   * @return true if test
-   */
-  public static boolean getTest() {
-    return DriverStationDataJNI.getTest();
-  }
-
-  /**
-   * Change whether the DS is in test.
-   *
-   * @param test the new value
-   */
-  public static void setTest(boolean test) {
-    DriverStationDataJNI.setTest(test);
+  public static void setRobotMode(RobotMode mode) {
+    DriverStationDataJNI.setRobotMode(mode);
   }
 
   /**
@@ -281,6 +255,103 @@ public final class DriverStationSim {
    */
   public static void setMatchTime(double matchTime) {
     DriverStationDataJNI.setMatchTime(matchTime);
+  }
+
+  /**
+   * Register a callback on opmode changes.
+   *
+   * @param callback the callback that will be called when the opmode changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback.
+   */
+  public static CallbackStore registerOpModeCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid = DriverStationDataJNI.registerOpModeCallback(callback, initialNotify);
+    return new CallbackStore(uid, DriverStationDataJNI::cancelOpModeCallback);
+  }
+
+  /**
+   * Gets the opmode.
+   *
+   * @return opmode
+   */
+  public static long getOpMode() {
+    return DriverStationDataJNI.getOpMode();
+  }
+
+  /**
+   * Change the opmode.
+   *
+   * @param opmode the new value
+   */
+  public static void setOpMode(long opmode) {
+    DriverStationDataJNI.setOpMode(opmode);
+  }
+
+  /**
+   * Register a callback on autonomous opmode list changes.
+   *
+   * @param callback the callback that will be called when the list of opmodes changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback.
+   */
+  public static CallbackStore registerAutoOpModesCallback(
+      Consumer<OpModeOption[]> callback, boolean initialNotify) {
+    int uid = DriverStationDataJNI.registerAutoOpModesCallback(callback, initialNotify);
+    return new CallbackStore(uid, DriverStationDataJNI::cancelAutoOpModesCallback);
+  }
+
+  /**
+   * Gets the list of autonomous opmodes.
+   *
+   * @return opmodes list
+   */
+  public static OpModeOption[] getAutoOpModes() {
+    return DriverStationDataJNI.getAutoOpModes();
+  }
+
+  /**
+   * Register a callback on teleoperated opmode list changes.
+   *
+   * @param callback the callback that will be called when the list of opmodes changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback.
+   */
+  public static CallbackStore registerTeleopOpModesCallback(
+      Consumer<OpModeOption[]> callback, boolean initialNotify) {
+    int uid = DriverStationDataJNI.registerAutoOpModesCallback(callback, initialNotify);
+    return new CallbackStore(uid, DriverStationDataJNI::cancelTeleopOpModesCallback);
+  }
+
+  /**
+   * Gets the list of teleoperated opmodes.
+   *
+   * @return opmodes list
+   */
+  public static OpModeOption[] getTeleopOpModes() {
+    return DriverStationDataJNI.getTeleopOpModes();
+  }
+
+  /**
+   * Register a callback on test opmode list changes.
+   *
+   * @param callback the callback that will be called when the list of opmodes changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback.
+   */
+  public static CallbackStore registerTestOpModesCallback(
+      Consumer<OpModeOption[]> callback, boolean initialNotify) {
+    int uid = DriverStationDataJNI.registerTestOpModesCallback(callback, initialNotify);
+    return new CallbackStore(uid, DriverStationDataJNI::cancelTestOpModesCallback);
+  }
+
+  /**
+   * Gets the list of test opmodes.
+   *
+   * @return opmodes list
+   */
+  public static OpModeOption[] getTestOpModes() {
+    return DriverStationDataJNI.getTestOpModes();
   }
 
   /** Updates DriverStation data so that new values are visible to the user program. */

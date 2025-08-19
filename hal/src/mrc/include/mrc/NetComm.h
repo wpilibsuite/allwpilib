@@ -414,8 +414,13 @@ struct ErrorInfo {
 };
 
 struct OpMode {
-  OpMode(std::string_view _Name, OpModeHash _Hash) : Hash(_Hash) {
+  OpMode(OpModeHash _Hash, std::string_view _Name, std::string_view _Group,
+         std::string_view _Description, int32_t _TextColor = -1,
+         int32_t _BackgroundColor = -1)
+      : Hash(_Hash), TextColor{_TextColor}, BackgroundColor{_BackgroundColor} {
     SetName(_Name);
+    SetGroup(_Group);
+    SetDescription(_Description);
   }
 
   OpMode() = default;
@@ -447,8 +452,72 @@ struct OpMode {
                               Name.size()};
   }
 
+  void SetGroup(std::string_view NewGroup) {
+    if (NewGroup.size() > MRC_MAX_OPMODE_LEN) {
+      NewGroup = NewGroup.substr(0, MRC_MAX_OPMODE_LEN);
+    }
+    Group = NewGroup;
+  }
+
+  void MoveGroup(std::string&& NewGroup) {
+    Group = std::move(NewGroup);
+    if (Group.size() > MRC_MAX_OPMODE_LEN) {
+      Group.resize(MRC_MAX_OPMODE_LEN);
+    }
+  }
+
+  std::string_view GetGroup() const { return Group; }
+
+  std::span<uint8_t> WritableGroupBuffer(size_t Len) {
+    if (Len > MRC_MAX_OPMODE_LEN) {
+      Len = MRC_MAX_OPMODE_LEN;
+    }
+    Group.resize(Len);
+    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Group.data()),
+                              Group.size()};
+  }
+
+  void SetDescription(std::string_view NewDescription) {
+    if (NewDescription.size() > MRC_MAX_OPMODE_LEN) {
+      NewDescription = NewDescription.substr(0, MRC_MAX_OPMODE_LEN);
+    }
+    Description = NewDescription;
+  }
+
+  void MoveGroup(std::string&& NewDescription) {
+    Description = std::move(NewDescription);
+    if (Description.size() > MRC_MAX_OPMODE_LEN) {
+      Description.resize(MRC_MAX_OPMODE_LEN);
+    }
+  }
+
+  std::string_view GetDescription() const { return Description; }
+
+  std::span<uint8_t> WritableDescriptionBuffer(size_t Len) {
+    if (Len > MRC_MAX_OPMODE_LEN) {
+      Len = MRC_MAX_OPMODE_LEN;
+    }
+    Description.resize(Len);
+    return std::span<uint8_t>{reinterpret_cast<uint8_t*>(Description.data()),
+                              Description.size()};
+  }
+
+  void SetTextColor(int32_t NewTextColor) { TextColor = NewTextColor; }
+
+  int32_t GetTextColor() const { return TextColor; }
+
+  void SetBackgroundColor(int32_t NewBackgroundColor) {
+    BackgroundColor = NewBackgroundColor;
+  }
+
+  int32_t GetBackgroundColor() const { return BackgroundColor; }
+
  private:
   std::string Name;
+  std::string Group;
+  std::string Description;
+  int32_t TextColor{-1};
+  int32_t BackgroundColor{-1};
 };
 
 }  // namespace mrc
