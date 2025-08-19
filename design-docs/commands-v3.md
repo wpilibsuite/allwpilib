@@ -301,13 +301,13 @@ compilation error.
 // OK - requirements, body, and name are all provided
 // Each builder method returns a different builder object that provides methods
 // for progressing to the next stage.
-Command command = Command.noRequirements().executing(...).withName("Name").make()
+Command command = Command.noRequirements().executing(...).named("Name");
 
 // Compilation error! Missing the command body
-Command command = Command.noRequirements().withName("Name").make();
+Command command = Command.noRequirements().named("Name");
 
 // Compilation error! Missing the command name
-Command command = Command.noRequirements().executing(...).make();
+Command command = Command.noRequirements().executing(...);
 ```
 
 #### Forced Naming

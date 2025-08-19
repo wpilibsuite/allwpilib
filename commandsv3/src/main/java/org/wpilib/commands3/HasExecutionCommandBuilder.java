@@ -9,9 +9,8 @@ import java.util.function.Consumer;
 
 /**
  * A stage in a command builder where requirements and main command execution logic have been set.
- * No more changes to requirements or command implementation may happen after this point. The next
- * stage is a {@link TerminalCommandBuilder} with {@link #withName(String)}, or straight to a new
- * command using {@link #named(String)} as shorthand for {@code withName(name).make()}.
+ * No more changes to requirements or command implementation may happen after this point. This is
+ * the final step in command creation
  */
 public interface HasExecutionCommandBuilder {
   /**
@@ -44,25 +43,12 @@ public interface HasExecutionCommandBuilder {
   HasExecutionCommandBuilder until(BooleanSupplier endCondition);
 
   /**
-   * Sets the name of the command. {@link #named(String)} can be used instead if no other
-   * configuration is necessary after this point.
-   *
-   * @param name The name of the command. Cannot be null.
-   * @return A terminal builder object that can be used to create the command.
-   * @throws NullPointerException If {@code name} is null.
-   */
-  TerminalCommandBuilder withName(String name);
-
-  /**
-   * Creates the command based on the options set during the previous builder stages. The builders
-   * will no longer be usable after calling this method. Shorthand for {@code
-   * withName(name).make()}.
+   * Creates the command based on the options set during previous builder stages. The builders will
+   * no longer be usable after calling this method.
    *
    * @param name The name of the command
    * @return The built command.
    * @throws NullPointerException If {@code name} is null.
    */
-  default Command named(String name) {
-    return withName(name).make();
-  }
+  Command named(String name);
 }

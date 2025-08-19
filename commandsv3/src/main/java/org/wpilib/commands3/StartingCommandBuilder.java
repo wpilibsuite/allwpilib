@@ -11,8 +11,7 @@ import java.util.function.Consumer;
  * The first stage in a command builder. Requirements (or lack thereof) may be specified with {@link
  * #requiring(Mechanism)}, {@link #requiring(Mechanism, Mechanism...)}, {@link
  * #requiring(Collection)}, or {@link #noRequirements()}, which goes to a {@link
- * HasRequirementsCommandBuilder} stage. {@link #withPriority(int)} may be used before requirements
- * are specified.
+ * HasRequirementsCommandBuilder} stage.
  */
 public interface StartingCommandBuilder {
   /**
@@ -48,12 +47,4 @@ public interface StartingCommandBuilder {
    * @return A builder object that can be used to further configure the command.
    */
   HasRequirementsCommandBuilder requiring(Collection<Mechanism> requirements);
-
-  /**
-   * Sets the priority level of the command.
-   *
-   * @param priority The desired priority level.
-   * @return This builder object, for chaining.
-   */
-  StartingCommandBuilder withPriority(int priority);
 }

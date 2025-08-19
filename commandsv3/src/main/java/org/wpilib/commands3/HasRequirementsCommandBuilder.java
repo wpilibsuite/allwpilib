@@ -14,14 +14,6 @@ import java.util.function.Consumer;
  */
 public interface HasRequirementsCommandBuilder {
   /**
-   * Sets the priority level of the command.
-   *
-   * @param priority The desired priority level.
-   * @return This builder object, for chaining.
-   */
-  HasRequirementsCommandBuilder withPriority(int priority);
-
-  /**
    * Adds a required mechanism for the command.
    *
    * @param requirement A required mechanism. Cannot be null.
@@ -49,17 +41,6 @@ public interface HasRequirementsCommandBuilder {
    * @throws NullPointerException If {@code requirements} is null or contains a null value.
    */
   HasRequirementsCommandBuilder requiring(Collection<Mechanism> requirements);
-
-  /**
-   * Optionally sets a callback to execute when the command is canceled. The callback will not run
-   * if the command was canceled after being scheduled but before starting to run, and will not run
-   * if the command completes naturally or from encountering an unhandled exception.
-   *
-   * @param onCancel The function to execute when the command is canceled while running. May be
-   *     null.
-   * @return This builder object, for chaining
-   */
-  HasRequirementsCommandBuilder whenCanceled(Runnable onCancel);
 
   /**
    * Sets the function body of the executing command.

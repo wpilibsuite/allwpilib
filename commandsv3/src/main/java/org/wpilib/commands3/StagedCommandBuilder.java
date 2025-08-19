@@ -27,8 +27,7 @@ import java.util.function.Consumer;
  * StagedCommandBuilder start = new StagedCommandBuilder();
  * HasRequirementsCommandBuilder withRequirements = start.requiring(mechanism1, mechanism2);
  * HasExecutionCommandBuilder withExecution = withRequirements.executing(coroutine -> ...);
- * TerminalCommandBuilder terminal = withExecution.withName("Example Command");
- * Command exampleCommand = terminal.make();
+ * Command exampleCommand = withExecution.named("Example Command");
  * }</pre>
  *
  * <p>Because every method on the builders returns a builder object, these calls can be chained to
@@ -39,8 +38,7 @@ import java.util.function.Consumer;
  *   new StagedCommandBuilder()
  *     .requiring(mechanism1, mechanism2)
  *     .executing(coroutine -> ...)
- *     .withName("Example Command")
- *     .make();
+ *     .named("Example Command");
  * }</pre>
  *
  * <p>And can be cut down even further by using helper methods provided by the library:
@@ -50,10 +48,10 @@ import java.util.function.Consumer;
  *   Command
  *     .requiring(mechanism1, mechanism2)
  *     .executing(coroutine -> ...)
- *     .named("Example Command")
+ *     .named("Example Command");
  * }</pre>
  */
-public class StagedCommandBuilder implements StartingCommandBuilder {
+public final class StagedCommandBuilder implements StartingCommandBuilder {
   private final Set<Mechanism> m_requirements = new HashSet<>();
   private Consumer<Coroutine> m_impl;
   private Runnable m_onCancel = () -> {};
@@ -68,14 +66,6 @@ public class StagedCommandBuilder implements StartingCommandBuilder {
 
   private final HasRequirementsCommandBuilder m_requirementsView =
       new HasRequirementsCommandBuilder() {
-        @Override
-        public HasRequirementsCommandBuilder withPriority(int priority) {
-          throwIfAlreadyBuilt();
-
-          m_priority = priority;
-          return this;
-        }
-
         @Override
         public HasRequirementsCommandBuilder requiring(Mechanism requirement) {
           throwIfAlreadyBuilt();
@@ -106,6 +96,13 @@ public class StagedCommandBuilder implements StartingCommandBuilder {
           throwIfAlreadyBuilt();
 
           requireNonNullParam(requirements, "requirements", "StagedCommandBuilder.requiring");
+          int i = 0;
+          for (Mechanism requirement : requirements) {
+            requireNonNullParam(
+                requirement, "requirements[" + i + "]", "StagedCommandBuilder.requiring");
+            i++;
+          }
+
           m_requirements.addAll(requirements);
           return this;
         }
@@ -117,18 +114,6 @@ public class StagedCommandBuilder implements StartingCommandBuilder {
           requireNonNullParam(impl, "impl", "StagedCommandBuilder.executing");
           m_impl = impl;
           return m_executionView;
-        }
-
-        @Override
-        public HasRequirementsCommandBuilder whenCanceled(Runnable onCancel) {
-          throwIfAlreadyBuilt();
-
-          if (onCancel == null) {
-            m_onCancel = () -> {};
-          } else {
-            m_onCancel = onCancel;
-          }
-          return this;
         }
       };
 
@@ -163,40 +148,11 @@ public class StagedCommandBuilder implements StartingCommandBuilder {
         }
 
         @Override
-        public TerminalCommandBuilder withName(String name) {
+        public Command named(String name) {
           throwIfAlreadyBuilt();
 
           requireNonNullParam(name, "name", "StagedCommandBuilder.withName");
           m_name = name;
-          return m_terminalView;
-        }
-      };
-
-  private final TerminalCommandBuilder m_terminalView =
-      new TerminalCommandBuilder() {
-        @Override
-        public TerminalCommandBuilder whenCanceled(Runnable onCancel) {
-          throwIfAlreadyBuilt();
-
-          if (onCancel == null) {
-            m_onCancel = () -> {};
-          } else {
-            m_onCancel = onCancel;
-          }
-          return this;
-        }
-
-        @Override
-        public TerminalCommandBuilder withPriority(int priority) {
-          throwIfAlreadyBuilt();
-
-          m_priority = priority;
-          return this;
-        }
-
-        @Override
-        public Command make() {
-          throwIfAlreadyBuilt();
 
           var command = new BuilderBackedCommand(StagedCommandBuilder.this);
 
@@ -216,35 +172,44 @@ public class StagedCommandBuilder implements StartingCommandBuilder {
       };
 
   private static final class BuilderBackedCommand implements Command {
-    private final StagedCommandBuilder m_builder;
+    private final Set<Mechanism> m_requirements;
+    private final Consumer<Coroutine> m_impl;
+    private final Runnable m_onCancel;
+    private final String m_name;
+    private final int m_priority;
 
     private BuilderBackedCommand(StagedCommandBuilder builder) {
-      m_builder = builder;
+      // Copy builder fields into the command so the builder object can be garbage collected
+      m_requirements = new HashSet<>(builder.m_requirements);
+      m_impl = builder.m_impl;
+      m_onCancel = builder.m_onCancel;
+      m_name = builder.m_name;
+      m_priority = builder.m_priority;
     }
 
     @Override
     public void run(Coroutine coroutine) {
-      m_builder.m_impl.accept(coroutine);
+      m_impl.accept(coroutine);
     }
 
     @Override
     public void onCancel() {
-      m_builder.m_onCancel.run();
+      m_onCancel.run();
     }
 
     @Override
     public String name() {
-      return m_builder.m_name;
+      return m_name;
     }
 
     @Override
     public Set<Mechanism> requirements() {
-      return m_builder.m_requirements;
+      return m_requirements;
     }
 
     @Override
     public int priority() {
-      return m_builder.m_priority;
+      return m_priority;
     }
 
     @Override
@@ -289,14 +254,6 @@ public class StagedCommandBuilder implements StartingCommandBuilder {
 
     m_requirements.addAll(requirements);
     return m_requirementsView;
-  }
-
-  @Override
-  public StartingCommandBuilder withPriority(int priority) {
-    throwIfAlreadyBuilt();
-
-    m_priority = priority;
-    return this;
   }
 
   // Prevent builders from being mutated after command creation
