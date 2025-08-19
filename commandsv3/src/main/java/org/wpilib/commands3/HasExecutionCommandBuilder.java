@@ -19,9 +19,9 @@ public interface HasExecutionCommandBuilder {
    * if the command was canceled after being scheduled but before starting to run, and will not run
    * if the command completes naturally or from encountering an unhandled exception.
    *
-   * @param onCancel The function to execute when the command is canceled while running.
+   * @param onCancel The function to execute when the command is canceled while running. May be
+   *     null.
    * @return This builder object, for chaining
-   * @throws NullPointerException If {@code onCancel} is null.
    */
   HasExecutionCommandBuilder whenCanceled(Runnable onCancel);
 

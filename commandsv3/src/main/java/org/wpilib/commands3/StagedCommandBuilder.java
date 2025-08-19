@@ -123,8 +123,11 @@ public class StagedCommandBuilder implements StartingCommandBuilder {
         public HasRequirementsCommandBuilder whenCanceled(Runnable onCancel) {
           throwIfAlreadyBuilt();
 
-          requireNonNullParam(onCancel, "onCancel", "StagedCommandBuilder.whenCanceled");
-          m_onCancel = onCancel;
+          if (onCancel == null) {
+            m_onCancel = () -> {};
+          } else {
+            m_onCancel = onCancel;
+          }
           return this;
         }
       };
@@ -135,8 +138,11 @@ public class StagedCommandBuilder implements StartingCommandBuilder {
         public HasExecutionCommandBuilder whenCanceled(Runnable onCancel) {
           throwIfAlreadyBuilt();
 
-          requireNonNullParam(onCancel, "onCancel", "StagedCommandBuilder.whenCanceled");
-          m_onCancel = onCancel;
+          if (onCancel == null) {
+            m_onCancel = () -> {};
+          } else {
+            m_onCancel = onCancel;
+          }
           return this;
         }
 
@@ -172,8 +178,11 @@ public class StagedCommandBuilder implements StartingCommandBuilder {
         public TerminalCommandBuilder whenCanceled(Runnable onCancel) {
           throwIfAlreadyBuilt();
 
-          requireNonNullParam(onCancel, "onCancel", "StagedCommandBuilder.whenCanceled");
-          m_onCancel = onCancel;
+          if (onCancel == null) {
+            m_onCancel = () -> {};
+          } else {
+            m_onCancel = onCancel;
+          }
           return this;
         }
 
