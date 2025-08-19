@@ -1,0 +1,55 @@
+extra_includes:
+- wpystruct.h
+
+classes:
+  frc::Twist2d:
+    force_no_default_constructor: true
+    attributes:
+      dx:
+      dy:
+      dtheta:
+    methods:
+      operator==:
+      operator*:
+
+inline_code: |
+  cls_Twist2d
+    .def(
+      py::init<units::meter_t, units::meter_t, units::radian_t>(),
+      py::arg("dx") = 0, py::arg("dy") = 0, py::arg("dtheta") = 0
+    )
+    .def_static("fromFeet", [](units::foot_t dx, units::foot_t dy, units::radian_t dtheta){
+      return Twist2d{dx, dy, dtheta};
+    }, py::arg("dx") = 0, py::arg("dy") = 0, py::arg("dtheta") = 0)
+    .def_property("dx_feet", 
+      [](Twist2d * self) -> units::foot_t {
+        return self->dx;
+      },
+      [](Twist2d * self, units::foot_t dx) {
+        self->dx = dx;
+      }
+    )
+    .def_property("dy_feet", 
+      [](Twist2d * self) -> units::foot_t {
+        return self->dy;
+      },
+      [](Twist2d * self, units::foot_t dy) {
+        self->dy = dy;
+      }
+    )
+    .def_property("dtheta_degrees", 
+      [](Twist2d * self) -> units::degree_t {
+        return self->dtheta;
+      },
+      [](Twist2d * self, units::degree_t dtheta) {
+        self->dtheta = dtheta;
+      }
+    )
+    .def("__repr__", [](const Twist2d &tw) -> std::string {
+      return "Twist2d(dx=" + std::to_string(tw.dx()) + ", "
+                     "dy=" + std::to_string(tw.dy()) + ", "
+                     "dtheta=" + std::to_string(tw.dtheta()) + ")";
+    })
+  ;
+
+  SetupWPyStruct<frc::Twist2d>(cls_Twist2d);

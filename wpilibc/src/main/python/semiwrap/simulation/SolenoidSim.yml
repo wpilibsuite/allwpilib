@@ -1,0 +1,16 @@
+classes:
+  frc::sim::SolenoidSim:
+    force_type_casters:
+    - std::function
+    typealias:
+    - frc::PneumaticsModuleType
+    methods:
+      SolenoidSim:
+        overloads:
+          std::shared_ptr<PneumaticsBaseSim>, int:
+          int, PneumaticsModuleType, int:
+          PneumaticsModuleType, int:
+      GetOutput:
+      SetOutput:
+      RegisterOutputCallback:
+      GetModuleSim:

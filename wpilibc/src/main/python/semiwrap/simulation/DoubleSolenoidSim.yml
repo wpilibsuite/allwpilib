@@ -1,0 +1,13 @@
+classes:
+  frc::sim::DoubleSolenoidSim:
+    typealias:
+    - frc::PneumaticsModuleType
+    methods:
+      DoubleSolenoidSim:
+        overloads:
+          std::shared_ptr<PneumaticsBaseSim>, int, int:
+          int, PneumaticsModuleType, int, int:
+          PneumaticsModuleType, int, int:
+      Get:
+      Set:
+      GetModuleSim:

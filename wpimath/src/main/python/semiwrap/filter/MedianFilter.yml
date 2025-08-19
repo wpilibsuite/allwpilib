@@ -1,0 +1,15 @@
+classes:
+  frc::MedianFilter:
+    template_params:
+    - T
+    methods:
+      MedianFilter:
+      Calculate:
+      LastValue:
+      Reset:
+
+templates:
+  MedianFilter:
+    qualname: frc::MedianFilter
+    params:
+    - double

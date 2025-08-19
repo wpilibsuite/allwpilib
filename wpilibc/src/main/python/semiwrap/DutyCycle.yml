@@ -1,0 +1,26 @@
+extra_includes:
+- wpi/sendable/SendableBuilder.h
+
+classes:
+  frc::DutyCycle:
+    ignored_bases:
+    - wpi::SendableHelper<DutyCycle>
+    methods:
+      DutyCycle:
+        overloads:
+          DigitalSource&:
+            ignore: true
+          DigitalSource*:
+            ignore: true
+          std::shared_ptr<DigitalSource>:
+      GetFrequency:
+      GetOutput:
+      GetHighTime:
+      GetSourceChannel:
+      InitSendable:
+
+inline_code: |
+  cls_DutyCycle
+    .def("__repr__", [](const DutyCycle &self) {
+      return py::str("<DutyCycle {}>").format(self.GetSourceChannel());
+    });

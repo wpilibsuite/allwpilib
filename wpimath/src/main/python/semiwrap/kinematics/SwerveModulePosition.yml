@@ -1,0 +1,34 @@
+extra_includes:
+- wpystruct.h
+
+classes:
+  frc::SwerveModulePosition:
+    force_no_default_constructor: true
+    attributes:
+      distance:
+      angle:
+    methods:
+      Interpolate:
+      operator==:
+    inline_code: |
+      .def(
+        py::init<
+          units::meter_t, frc::Rotation2d
+        >(),
+        py::arg("distance") = 0, py::arg("angle") = frc::Rotation2d()
+      )
+      .def_property("distance_ft",
+        [](SwerveModulePosition * self) -> units::foot_t {
+          return self->distance;
+        },
+        [](SwerveModulePosition * self, units::foot_t distance) {
+          self->distance = distance;
+        }
+      )
+      .def("__repr__", [](const SwerveModulePosition &ss) -> std::string {
+        return "SwerveModulePosition(distance=" + std::to_string(ss.distance()) + ", "
+                                    "angle=" + std::to_string(ss.angle.Radians()()) + ")";
+      })
+
+inline_code: |
+  SetupWPyStruct<frc::SwerveModulePosition>(cls_SwerveModulePosition);

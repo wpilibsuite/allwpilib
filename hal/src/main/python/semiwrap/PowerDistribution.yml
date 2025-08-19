@@ -1,0 +1,105 @@
+strip_prefixes:
+- HAL_
+
+enums:
+  HAL_PowerDistributionType:
+functions:
+  HAL_InitializePowerDistribution:
+  HAL_GetPowerDistributionModuleNumber:
+  HAL_CleanPowerDistribution:
+  HAL_CheckPowerDistributionChannel:
+  HAL_CheckPowerDistributionModule:
+  HAL_GetPowerDistributionType:
+  HAL_GetPowerDistributionNumChannels:
+  HAL_GetPowerDistributionTemperature:
+  HAL_GetPowerDistributionVoltage:
+  HAL_GetPowerDistributionChannelCurrent:
+  HAL_GetPowerDistributionAllChannelCurrents:
+  HAL_GetPowerDistributionTotalCurrent:
+  HAL_GetPowerDistributionTotalPower:
+  HAL_GetPowerDistributionTotalEnergy:
+  HAL_ResetPowerDistributionTotalEnergy:
+  HAL_ClearPowerDistributionStickyFaults:
+  HAL_SetPowerDistributionSwitchableChannel:
+  HAL_GetPowerDistributionSwitchableChannel:
+  HAL_GetPowerDistributionVersion:
+  HAL_GetPowerDistributionFaults:
+  HAL_GetPowerDistributionStickyFaults:
+  HAL_StartPowerDistributionStream:
+    ifdef: __FRC_SYSTEMCORE__
+  HAL_GetPowerDistributionStreamData:
+    ifdef: __FRC_SYSTEMCORE__
+  HAL_FreePowerDistributionStreamData:
+    ifdef: __FRC_SYSTEMCORE__
+  HAL_StopPowerDistributionStream:
+    ifdef: __FRC_SYSTEMCORE__
+classes:
+  HAL_PowerDistributionVersion:
+    attributes:
+      firmwareMajor:
+      firmwareMinor:
+      firmwareFix:
+      hardwareMinor:
+      hardwareMajor:
+      uniqueId:
+  HAL_PowerDistributionFaults:
+    attributes:
+      channel0BreakerFault:
+      channel1BreakerFault:
+      channel2BreakerFault:
+      channel3BreakerFault:
+      channel4BreakerFault:
+      channel5BreakerFault:
+      channel6BreakerFault:
+      channel7BreakerFault:
+      channel8BreakerFault:
+      channel9BreakerFault:
+      channel10BreakerFault:
+      channel11BreakerFault:
+      channel12BreakerFault:
+      channel13BreakerFault:
+      channel14BreakerFault:
+      channel15BreakerFault:
+      channel16BreakerFault:
+      channel17BreakerFault:
+      channel18BreakerFault:
+      channel19BreakerFault:
+      channel20BreakerFault:
+      channel21BreakerFault:
+      channel22BreakerFault:
+      channel23BreakerFault:
+      brownout:
+      canWarning:
+      hardwareFault:
+  HAL_PowerDistributionStickyFaults:
+    attributes:
+      channel0BreakerFault:
+      channel1BreakerFault:
+      channel2BreakerFault:
+      channel3BreakerFault:
+      channel4BreakerFault:
+      channel5BreakerFault:
+      channel6BreakerFault:
+      channel7BreakerFault:
+      channel8BreakerFault:
+      channel9BreakerFault:
+      channel10BreakerFault:
+      channel11BreakerFault:
+      channel12BreakerFault:
+      channel13BreakerFault:
+      channel14BreakerFault:
+      channel15BreakerFault:
+      channel16BreakerFault:
+      channel17BreakerFault:
+      channel18BreakerFault:
+      channel19BreakerFault:
+      channel20BreakerFault:
+      channel21BreakerFault:
+      channel22BreakerFault:
+      channel23BreakerFault:
+      brownout:
+      canWarning:
+      canBusOff:
+      hasReset:
+      hardwareFault:
+      firmwareFault:
