@@ -77,17 +77,17 @@ jobs:
     name: "buildifier"
     runs-on: ubuntu-22.04
     steps:
-      - name: Set up Go 1.15.x
+      - name: Set up Go 1.24.4
         uses: actions/setup-go@v5
         with:
           cache: false
-          go-version: 1.15.x
+          go-version: 1.24.4
         id: go
 
       - name: Install Buildifier
         run: |
           cd $(mktemp -d)
-          GO111MODULE=on go get github.com/bazelbuild/buildtools/buildifier@6.0.0
+          GO111MODULE=on go install github.com/bazelbuild/buildtools/buildifier@v0.0.0-20250703141324-fdc626802fbc
 
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
