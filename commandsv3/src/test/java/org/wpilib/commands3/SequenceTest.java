@@ -21,7 +21,7 @@ class SequenceTest {
 
   @Test
   void single() {
-    var command = Command.noRequirements(Coroutine::yield).named("The Command");
+    var command = Command.noRequirements().executing(Coroutine::yield).named("The Command");
 
     var sequence = new Sequence("The Sequence", List.of(command));
     m_scheduler.schedule(sequence);
@@ -44,8 +44,8 @@ class SequenceTest {
 
   @Test
   void twoCommands() {
-    var c1 = Command.noRequirements(Coroutine::yield).named("C1");
-    var c2 = Command.noRequirements(Coroutine::yield).named("C2");
+    var c1 = Command.noRequirements().executing(Coroutine::yield).named("C1");
+    var c2 = Command.noRequirements().executing(Coroutine::yield).named("C2");
 
     var sequence = new Sequence("C1 > C2", List.of(c1, c2));
     m_scheduler.schedule(sequence);

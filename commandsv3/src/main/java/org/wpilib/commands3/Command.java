@@ -5,6 +5,7 @@
 package org.wpilib.commands3;
 
 import edu.wpi.first.units.measure.Time;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -67,7 +68,7 @@ import java.util.function.Consumer;
  *   // to run when not in use. Interrupting one of the inner commands while it's
  *   // running will cancel the entire sequence.
  *   private Command advancedScoringSequence() {
- *     return Command.noRequirements(co -> {
+ *     return Command.noRequirements().executing(co -> {
  *       co.await(drivetrain.driveToScoringLocation());
  *       co.await(elevator.moveToScoringHeight());
  *       co.await(gripper.release());
@@ -195,11 +196,10 @@ public interface Command {
    * resetting odometry and sensors that you don't want to interrupt a command that's controlling
    * the mechanisms it affects.
    *
-   * @param impl the implementation of the command logic
    * @return a builder that can be used to configure the resulting command
    */
-  static CommandBuilder noRequirements(Consumer<Coroutine> impl) {
-    return new CommandBuilder().executing(impl);
+  static HasRequirementsCommandBuilder noRequirements() {
+    return new StagedCommandBuilder().noRequirements();
   }
 
   /**
@@ -209,8 +209,18 @@ public interface Command {
    * @param rest Any other required mechanisms
    * @return A command builder
    */
-  static CommandBuilder requiring(Mechanism requirement, Mechanism... rest) {
-    return new CommandBuilder().requiring(requirement).requiring(rest);
+  static HasRequirementsCommandBuilder requiring(Mechanism requirement, Mechanism... rest) {
+    return new StagedCommandBuilder().requiring(requirement, rest);
+  }
+
+  /**
+   * Starts creating a command that requires some number of mechanisms.
+   *
+   * @param requirements The required mechanisms. May be empty, but cannot contain null values.
+   * @return A command builder
+   */
+  static HasRequirementsCommandBuilder requiring(Collection<Mechanism> requirements) {
+    return new StagedCommandBuilder().requiring(requirements);
   }
 
   /**
@@ -251,13 +261,13 @@ public interface Command {
   /**
    * Starts creating a command that simply waits for some condition to be met. The command will
    * start without any requirements, but some may be added (if necessary) using {@link
-   * CommandBuilder#requiring(Mechanism)}.
+   * StagedCommandBuilder#requiring(Mechanism)}.
    *
    * @param condition The condition to wait for
    * @return A command builder
    */
-  static CommandBuilder waitUntil(BooleanSupplier condition) {
-    return noRequirements(coroutine -> coroutine.waitUntil(condition));
+  static HasExecutionCommandBuilder waitUntil(BooleanSupplier condition) {
+    return noRequirements().executing(coroutine -> coroutine.waitUntil(condition));
   }
 
   /**

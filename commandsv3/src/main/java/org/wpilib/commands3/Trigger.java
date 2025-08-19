@@ -33,7 +33,7 @@ import org.wpilib.commands3.button.CommandXboxController;
  * needing to create dozens of global triggers.
  *
  * <pre>{@code
- * Command shootWhileAiming = Command.noRequirements(co -> {
+ * Command shootWhileAiming = Command.noRequirements().executing(co -> {
  *   turret.atTarget.onTrue(shooter.shootOnce());
  *   co.await(turret.lockOnGoal());
  * }).named("Shoot While Aiming");

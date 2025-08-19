@@ -39,7 +39,8 @@ class SchedulerTest {
     var enabled = new AtomicBoolean(false);
     var ran = new AtomicBoolean(false);
     var command =
-        Command.noRequirements(
+        Command.noRequirements()
+            .executing(
                 coroutine -> {
                   do {
                     coroutine.yield();
@@ -133,7 +134,8 @@ class SchedulerTest {
 
     for (int cmdCount = 0; cmdCount < numCommands; cmdCount++) {
       var command =
-          Command.noRequirements(
+          Command.noRequirements()
+              .executing(
                   coroutine -> {
                     for (int i = 0; i < iterations; i++) {
                       coroutine.yield();
@@ -189,14 +191,17 @@ class SchedulerTest {
   @Test
   void nestedErrorDetection() {
     var command =
-        Command.noRequirements(
+        Command.noRequirements()
+            .executing(
                 co -> {
                   co.await(
-                      Command.noRequirements(
+                      Command.noRequirements()
+                          .executing(
                               c2 -> {
                                 new Trigger(m_scheduler, () -> true)
                                     .onTrue(
-                                        Command.noRequirements(
+                                        Command.noRequirements()
+                                            .executing(
                                                 c3 -> {
                                                   // Throws IndexOutOfBoundsException
                                                   new ArrayList<>(0).get(-1);
@@ -335,7 +340,7 @@ class SchedulerTest {
 
   @Test
   void cancelsEvictsOnDeck() {
-    var command = Command.noRequirements(Coroutine::park).named("Command");
+    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
     m_scheduler.schedule(command);
     m_scheduler.cancel(command);
     assertFalse(m_scheduler.isScheduledOrRunning(command));
@@ -343,7 +348,7 @@ class SchedulerTest {
 
   @Test
   void cancelAlEvictsOnDeck() {
-    var command = Command.noRequirements(Coroutine::park).named("Command");
+    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
     m_scheduler.schedule(command);
     m_scheduler.cancelAll();
     assertFalse(m_scheduler.isScheduledOrRunning(command));
@@ -353,7 +358,7 @@ class SchedulerTest {
   void cancelAllCancelsAll() {
     var commands = new ArrayList<Command>(10);
     for (int i = 1; i <= 10; i++) {
-      commands.add(Command.noRequirements(Coroutine::yield).named("Command " + i));
+      commands.add(Command.noRequirements().executing(Coroutine::yield).named("Command " + i));
     }
     commands.forEach(m_scheduler::schedule);
     m_scheduler.run();
@@ -372,8 +377,7 @@ class SchedulerTest {
       mechanisms.add(new Mechanism("System " + i, m_scheduler));
     }
 
-    var command =
-        new CommandBuilder().requiring(mechanisms).executing(Coroutine::yield).named("Big Command");
+    var command = Command.requiring(mechanisms).executing(Coroutine::yield).named("Big Command");
 
     // Scheduling the command should evict the on-deck default commands
     m_scheduler.schedule(command);
@@ -411,16 +415,20 @@ class SchedulerTest {
   @Test
   void cancelDeeplyNestedCompositions() {
     Command root =
-        Command.noRequirements(
+        Command.noRequirements()
+            .executing(
                 co -> {
                   co.await(
-                      Command.noRequirements(
+                      Command.noRequirements()
+                          .executing(
                               co2 -> {
                                 co2.await(
-                                    Command.noRequirements(
+                                    Command.noRequirements()
+                                        .executing(
                                             co3 -> {
                                               co3.await(
-                                                  Command.noRequirements(Coroutine::park)
+                                                  Command.noRequirements()
+                                                      .executing(Coroutine::park)
                                                       .named("Park"));
                                             })
                                         .named("C3"));
@@ -492,7 +500,8 @@ class SchedulerTest {
 
     // the group has no requirements, but can schedule child commands that do
     var group =
-        Command.noRequirements(
+        Command.noRequirements()
+            .executing(
                 co -> {
                   co.awaitAll(
                       m1.run(Coroutine::park).named("M1 Command"),
@@ -511,7 +520,8 @@ class SchedulerTest {
     var mech = new Mechanism("The mechanism", m_scheduler);
 
     var group =
-        Command.noRequirements(
+        Command.noRequirements()
+            .executing(
                 co -> {
                   co.awaitAll(
                       mech.run(Coroutine::park).named("First"),
@@ -674,8 +684,8 @@ class SchedulerTest {
     m_scheduler.schedule(group);
     m_scheduler.run();
 
-    var scheduledCommand1 = Command.noRequirements(Coroutine::park).named("Command 1");
-    var scheduledCommand2 = Command.noRequirements(Coroutine::park).named("Command 2");
+    var scheduledCommand1 = Command.noRequirements().executing(Coroutine::park).named("Command 1");
+    var scheduledCommand2 = Command.noRequirements().executing(Coroutine::park).named("Command 2");
     m_scheduler.schedule(scheduledCommand1);
     m_scheduler.schedule(scheduledCommand2);
 
@@ -791,7 +801,8 @@ class SchedulerTest {
             .named("Second");
 
     var group =
-        Command.noRequirements(
+        Command.noRequirements()
+            .executing(
                 co -> {
                   co.fork(first);
                   co.fork(second);
@@ -814,21 +825,25 @@ class SchedulerTest {
   void nestedOneShotCompositionsAllRunInOneCycle() {
     var runs = new AtomicInteger(0);
     Supplier<Command> makeOneShot =
-        () -> Command.noRequirements(_c -> runs.incrementAndGet()).named("One Shot");
+        () -> Command.noRequirements().executing(_c -> runs.incrementAndGet()).named("One Shot");
     var command =
-        Command.noRequirements(
+        Command.noRequirements()
+            .executing(
                 co -> {
                   co.fork(makeOneShot.get());
                   co.fork(makeOneShot.get());
                   co.fork(
-                      Command.noRequirements(inner -> inner.fork(makeOneShot.get()))
+                      Command.noRequirements()
+                          .executing(inner -> inner.fork(makeOneShot.get()))
                           .named("Inner"));
                   co.fork(
-                      Command.noRequirements(
+                      Command.noRequirements()
+                          .executing(
                               co2 -> {
                                 co2.fork(makeOneShot.get());
                                 co2.fork(
-                                    Command.noRequirements(
+                                    Command.noRequirements()
+                                        .executing(
                                             co3 -> {
                                               co3.fork(makeOneShot.get());
                                             })
@@ -852,7 +867,7 @@ class SchedulerTest {
     // Child conflicts with and is lower priority than the Top command
     // It should not be scheduled, and the parent command should exit immediately
     var child = mechanism.run(Coroutine::park).named("Child");
-    var parent = Command.noRequirements(co -> co.await(child)).named("Parent");
+    var parent = Command.noRequirements().executing(co -> co.await(child)).named("Parent");
 
     m_scheduler.schedule(top);
     m_scheduler.schedule(parent);
@@ -871,7 +886,7 @@ class SchedulerTest {
     // Child conflicts with and is lower priority than the Top command
     // It should not be scheduled, and the parent command should exit immediately
     var child = mechanism.run(Coroutine::park).named("Child");
-    var parent = Command.noRequirements(co -> co.await(child)).named("Parent");
+    var parent = Command.noRequirements().executing(co -> co.await(child)).named("Parent");
 
     m_scheduler.schedule(top);
     m_scheduler.schedule(parent);
@@ -888,7 +903,8 @@ class SchedulerTest {
     // equivalent to calling Coroutine.park(). No deleterious side effects other than stalling
     // the command
     AtomicReference<Command> commandRef = new AtomicReference<>();
-    var command = Command.noRequirements(co -> co.await(commandRef.get())).named("Self Await");
+    var command =
+        Command.noRequirements().executing(co -> co.await(commandRef.get())).named("Self Await");
     commandRef.set(command);
 
     m_scheduler.schedule(command);
@@ -911,8 +927,10 @@ class SchedulerTest {
     //
     // Externally cancelling command2 allows command1 to continue
     // Externally cancelling command1 cancels both
-    var command1 = Command.noRequirements(co -> co.await(ref2.get())).named("Command 1");
-    var command2 = Command.noRequirements(co -> co.await(ref1.get())).named("Command 2");
+    var command1 =
+        Command.noRequirements().executing(co -> co.await(ref2.get())).named("Command 1");
+    var command2 =
+        Command.noRequirements().executing(co -> co.await(ref1.get())).named("Command 2");
     ref1.set(command1);
     ref2.set(command2);
 

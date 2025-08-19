@@ -30,7 +30,7 @@ final class CommandTraceHelper {
             Coroutine.class.getName(),
             Continuation.class.getName(),
             Scheduler.class.getName(),
-            "org.wpilib.commands3.CommandBuilder$1",
+            "org.wpilib.commands3.StagedCommandBuilder$BuilderBackedCommand",
             "jdk.internal.vm.Continuation");
 
     boolean sawRun = false;

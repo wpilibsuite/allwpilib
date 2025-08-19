@@ -34,7 +34,8 @@ class CoroutineTest {
     var c = new NullCommand();
 
     var all =
-        Command.noRequirements(
+        Command.noRequirements()
+            .executing(
                 co -> {
                   co.fork(a, b, c);
                   co.park();
@@ -54,7 +55,8 @@ class CoroutineTest {
     AtomicInteger i = new AtomicInteger(0);
 
     var yieldInSynchronized =
-        Command.noRequirements(
+        Command.noRequirements()
+            .executing(
                 co -> {
                   while (true) {
                     synchronized (mutex) {
@@ -85,7 +87,8 @@ class CoroutineTest {
     AtomicInteger i = new AtomicInteger(0);
 
     var yieldInLock =
-        Command.noRequirements(
+        Command.noRequirements()
+            .executing(
                 co -> {
                   while (true) {
                     lock.lock();
@@ -109,7 +112,8 @@ class CoroutineTest {
     AtomicReference<Runnable> escapeeCallback = new AtomicReference<>();
 
     var badCommand =
-        Command.noRequirements(
+        Command.noRequirements()
+            .executing(
                 co -> {
                   escapeeCallback.set(co::yield);
                 })
@@ -130,10 +134,12 @@ class CoroutineTest {
   @Test
   void usingParentCoroutineInChildThrows() {
     var parent =
-        Command.noRequirements(
+        Command.noRequirements()
+            .executing(
                 parentCoroutine -> {
                   parentCoroutine.await(
-                      Command.noRequirements(
+                      Command.noRequirements()
+                          .executing(
                               childCoroutine -> {
                                 parentCoroutine.yield();
                               })
@@ -157,9 +163,10 @@ class CoroutineTest {
     AtomicBoolean secondRan = new AtomicBoolean(false);
     AtomicBoolean ranAfterAwait = new AtomicBoolean(false);
 
-    var firstInner = Command.noRequirements(c2 -> firstRan.set(true)).named("First");
+    var firstInner = Command.noRequirements().executing(c2 -> firstRan.set(true)).named("First");
     var secondInner =
-        Command.noRequirements(
+        Command.noRequirements()
+            .executing(
                 c2 -> {
                   secondRan.set(true);
                   c2.park();
@@ -167,7 +174,8 @@ class CoroutineTest {
             .named("Second");
 
     var outer =
-        Command.noRequirements(
+        Command.noRequirements()
+            .executing(
                 co -> {
                   co.awaitAny(firstInner, secondInner);
 

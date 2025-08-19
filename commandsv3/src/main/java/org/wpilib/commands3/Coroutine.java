@@ -87,7 +87,7 @@ public final class Coroutine {
    *
    * <pre>{@code
    * Command example() {
-   *   return Command.noRequirements(coroutine -> {
+   *   return Command.noRequirements().executing(coroutine -> {
    *     Command inner = ...;
    *     coroutine.fork(inner);
    *     // ... do more things
