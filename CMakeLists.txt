@@ -40,8 +40,9 @@ include(OptionValidation)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+set(IS_CLANG $<CXX_COMPILER_ID:Clang>)
 if(MSVC)
-    add_compile_options(/Zc:__cplusplus)
+    add_compile_options($<$<NOT:${IS_CLANG}>:/Zc:__cplusplus>)
 endif()
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
