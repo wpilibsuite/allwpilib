@@ -586,6 +586,7 @@ bool DriverStation::WaitForDsConnection(units::second_t timeout) {
   }
 
   HAL_RemoveNewDataEventHandle(event.GetHandle());
+  RefreshData();
   return result;
 }
 

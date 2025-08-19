@@ -1168,6 +1168,7 @@ public final class DriverStation {
       DriverStationJNI.removeNewDataEventHandle(event);
       WPIUtilJNI.destroyEvent(event);
     }
+    refreshData();
     return result;
   }
 
