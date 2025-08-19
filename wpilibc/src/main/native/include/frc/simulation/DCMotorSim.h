@@ -23,6 +23,7 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Creates a simulated DC motor mechanism.
    *
+   * @param ks                 The static friction voltage.
    * @param plant              The linear system representing the DC motor. This
    * system can be created with LinearSystemId::DCMotorSystem(). If
    * LinearSystemId::DCMotorSystem(kV, kA) is used, the distance unit must be
@@ -31,7 +32,8 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
    * gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  DCMotorSim(const LinearSystem<2, 1, 2>& plant, const DCMotor& gearbox,
+  DCMotorSim(const units::volt_t ks, const LinearSystem<2, 1, 2>& plant,
+             const DCMotor& gearbox,
              const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   using LinearSystemSim::SetState;
@@ -123,9 +125,22 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
    */
   units::kilogram_square_meter_t GetJ() const;
 
+ protected:
+  /**
+   * Updates the state estimate of the DC motor.
+   *
+   * @param currentXhat The current state estimate.
+   * @param u           The system inputs (voltage).
+   * @param dt          The time difference between controller updates.
+   */
+  Vectord<2> UpdateX(const Vectord<2>& currentXhat, const Vectord<1>& u,
+                     units::second_t dt) override;
+
  private:
   DCMotor m_gearbox;
   double m_gearing;
   units::kilogram_square_meter_t m_j;
+  units::volt_t m_ks;
+  units::radians_per_second_squared_t m_frictionAcceleration;
 };
 }  // namespace frc::sim
