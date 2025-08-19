@@ -343,7 +343,7 @@ static bool InputPose(frc::Pose2d* pose) {
 }
 
 FieldInfo::FieldInfo(Storage& storage)
-    : m_builtin{storage.GetString("builtin", "2025 Reefscape")},
+    : m_builtin{storage.GetString("builtin", "Custom")},
       m_filename{storage.GetString("image")},
       m_width{storage.GetFloat("width", kDefaultWidth.to<float>())},
       m_height{storage.GetFloat("height", kDefaultHeight.to<float>())},
