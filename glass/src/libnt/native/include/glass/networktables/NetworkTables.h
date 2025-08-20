@@ -16,13 +16,11 @@
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTableListener.h>
 #include <ntcore_cpp.h>
+#include <upb/mem/arena.h>
+#include <upb/reflection/def.h>
 #include <wpi/DenseMap.h>
 #include <wpi/json.h>
 #include <wpi/struct/DynamicStruct.h>
-
-#ifndef NO_PROTOBUF
-#include <wpi/protobuf/ProtobufMessageDatabase.h>
-#endif
 
 #include "glass/Model.h"
 #include "glass/View.h"
@@ -174,9 +172,8 @@ class NetworkTablesModel : public Model {
   Entry* AddEntry(NT_Topic topic);
 
   wpi::StructDescriptorDatabase& GetStructDatabase() { return m_structDb; }
-#ifndef NO_PROTOBUF
-  wpi::ProtobufMessageDatabase& GetProtobufDatabase() { return m_protoDb; }
-#endif
+  upb_DefPool* GetProtobufDatabase() { return m_protoPool; }
+  upb_Arena* GetProtobufArena() { return m_arena; }
 
  private:
   void RebuildTree();
@@ -199,9 +196,8 @@ class NetworkTablesModel : public Model {
   Client m_server;
 
   wpi::StructDescriptorDatabase m_structDb;
-#ifndef NO_PROTOBUF
-  wpi::ProtobufMessageDatabase m_protoDb;
-#endif
+  upb_DefPool* m_protoPool = upb_DefPool_New();
+  upb_Arena* m_arena = upb_Arena_New();
 };
 
 using NetworkTablesFlags = int;

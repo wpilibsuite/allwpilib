@@ -122,12 +122,6 @@ third_party_cc_lib_helper(
 )
 
 third_party_cc_lib_helper(
-    name = "protobuf",
-    include_root = "src/main/native/thirdparty/protobuf/include",
-    src_root = "src/main/native/thirdparty/protobuf/src",
-)
-
-third_party_cc_lib_helper(
     name = "nanopb",
     include_root = "src/main/native/thirdparty/nanopb/include",
     src_root = "src/main/native/thirdparty/nanopb/src",
@@ -136,6 +130,12 @@ third_party_cc_lib_helper(
 third_party_cc_lib_helper(
     name = "sigslot",
     include_root = "src/main/native/thirdparty/sigslot/include",
+)
+
+third_party_cc_lib_helper(
+    name = "upb",
+    include_root = "src/main/native/thirdparty/upb/include",
+    src_root = "src/main/native/thirdparty/upb/src",
 )
 
 generate_resources(
@@ -178,7 +178,7 @@ wpilib_cc_library(
         ":llvm",
         ":mpack",
         ":nanopb",
-        ":protobuf",
+        ":upb",
     ],
     visibility = ["//visibility:public"],
     deps = select({
