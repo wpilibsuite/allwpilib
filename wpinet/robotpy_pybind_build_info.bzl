@@ -117,11 +117,12 @@ def define_pybind_library(name, pkgcfgs = []):
 
     # Files that will be included in the wheel as data deps
     native.filegroup(
-        name = "{}.generated_data_files".format(name),
+        name = "{}.generated_pkgcfg_files".format(name),
         srcs = [
             "src/main/python/wpinet/wpinet.pc",
         ],
         tags = ["manual", "robotpy"],
+        visibility = ["//visibility:public"],
     )
 
     # Contains all of the non-python files that need to be included in the wheel
@@ -137,7 +138,7 @@ def define_pybind_library(name, pkgcfgs = []):
             "src/main/python/wpinet/_init__wpinet.py",
         ],
         data = [
-            "{}.generated_data_files".format(name),
+            "{}.generated_pkgcfg_files".format(name),
             "{}.extra_files".format(name),
             ":src/main/python/wpinet/_wpinet",
             ":wpinet.trampoline_hdr_files",
@@ -160,7 +161,9 @@ def define_pybind_library(name, pkgcfgs = []):
 
     scan_headers(
         name = "{}-scan-headers".format(name),
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True),
+        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+            "//wpinet:robotpy-native-wpinet.copy_headers",
+        ],
         package_root_file = "src/main/python/wpinet/__init__.py",
         pkgcfgs = pkgcfgs,
         pyproject_toml = "src/main/python/pyproject.toml",

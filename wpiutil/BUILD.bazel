@@ -332,8 +332,8 @@ generate_robotpy_native_wrapper_build_info(
         "llvm",
         "mpack",
         "nanopb",
-        "protobuf",
         "sigslot",
+        "upb",
     ],
 )
 
@@ -398,13 +398,9 @@ py_library(
 
 robotpy_py_test(
     "wpiutil_tests",
-    extra_sources = ["src/test/python/conftest.py"],
-    tests = glob(
-        ["src/test/python/*.py"],
-        exclude = [
-            "src/test/python/conftest.py",
-            "src/test/python/run_tests.py",
-        ],
+    srcs = glob(
+        ["src/test/python/**/*.py"],
+        exclude = ["src/test/python/cpp/**"],
     ),
     deps = [
         ":robotpy-wpiutil",

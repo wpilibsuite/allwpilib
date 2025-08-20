@@ -20,5 +20,3 @@ functions:
     no_release_gil: true
   unpackArray:
     no_release_gil: true
-  unpackInto:
-    no_release_gil: true

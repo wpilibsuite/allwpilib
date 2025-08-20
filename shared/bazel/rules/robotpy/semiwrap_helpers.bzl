@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
 
 RESOLVE_CASTERS_DIR = "generated/resolve_casters/"
 HEADER_DAT_DIR = "generated/header_to_dat/"
@@ -39,6 +40,7 @@ def publish_casters(
         outs = [output_json, output_pc],
         cmd = cmd,
         tools = _wrapper_dep() + typecasters_srcs + [package_root],
+        target_compatible_with = robotpy_compatibility_select(),
         visibility = ["//visibility:public"],
         tags = ["robotpy"],
     )
@@ -77,6 +79,7 @@ def resolve_casters(
         outs = [RESOLVE_CASTERS_DIR + casters_pkl_file, RESOLVE_CASTERS_DIR + dep_file],
         cmd = cmd,
         tools = _wrapper_dep() + [_semiwrap_caster()],
+        target_compatible_with = robotpy_compatibility_select(),
         tags = ["robotpy"],
     )
 
@@ -96,6 +99,7 @@ def gen_libinit(
         outs = [output_file],
         cmd = cmd,
         tools = _wrapper_dep(),
+        target_compatible_with = robotpy_compatibility_select(),
         tags = ["robotpy"],
     )
 
@@ -125,6 +129,7 @@ def gen_pkgconf(
         outs = [OUT_FILE],
         cmd = cmd,
         tools = _wrapper_dep() + [project_file],
+        target_compatible_with = robotpy_compatibility_select(),
         visibility = ["//visibility:public"],
         tags = ["robotpy"],
     )
@@ -167,6 +172,7 @@ def header_to_dat(
         outs = [HEADER_DAT_DIR + class_name + ".dat", HEADER_DAT_DIR + class_name + ".d"],
         cmd = cmd,
         tools = _wrapper_dep() + [yml_file],
+        target_compatible_with = robotpy_compatibility_select(),
         tags = ["robotpy"],
     )
 
@@ -182,6 +188,7 @@ def dat_to_cc(
         outs = [DAT_TO_CC_DIR + class_name + ".cpp"],
         cmd = cmd,
         tools = _wrapper_dep() + [dat_file],
+        target_compatible_with = robotpy_compatibility_select(),
         tags = ["robotpy"],
     )
 
@@ -195,6 +202,7 @@ def dat_to_tmpl_cpp(name, base_class_name, specialization, tmp_class_name):
         outs = [DAT_TO_TMPL_CC_DIR + tmp_class_name + ".cpp"],
         cmd = cmd,
         tools = _wrapper_dep() + [HEADER_DAT_DIR + base_class_name + ".dat"],
+        target_compatible_with = robotpy_compatibility_select(),
         tags = ["robotpy"],
     )
 
@@ -209,6 +217,7 @@ def dat_to_tmpl_hpp(name, class_name):
         outs = [DAT_TO_TMPL_HDR_DIR + class_name + "_tmpl.hpp"],
         cmd = cmd,
         tools = _wrapper_dep() + [dat_file],
+        target_compatible_with = robotpy_compatibility_select(),
         tags = ["robotpy"],
     )
 
@@ -224,6 +233,7 @@ def dat_to_trampoline(name, dat_file, class_name, output_file):
         outs = [output_file],
         cmd = cmd,
         tools = _wrapper_dep() + [HEADER_DAT_DIR + dat_file],
+        target_compatible_with = robotpy_compatibility_select(),
         tags = ["robotpy"],
     )
 
@@ -245,6 +255,7 @@ def gen_modinit_hpp(
         outs = [GEN_MODINIT_HDR_DIR + output_file],
         cmd = cmd,
         tools = _wrapper_dep() + input_dats,
+        target_compatible_with = robotpy_compatibility_select(),
         tags = ["robotpy"],
     )
     cc_library(
@@ -252,6 +263,7 @@ def gen_modinit_hpp(
         hdrs = [GEN_MODINIT_HDR_DIR + output_file],
         strip_include_prefix = GEN_MODINIT_HDR_DIR,
         tags = ["robotpy"],
+        target_compatible_with = robotpy_compatibility_select(),
     )
 
 def run_header_gen(name, casters_pickle, trampoline_subpath, header_gen_config, deps = [], generation_defines = [], local_native_libraries = [], header_to_dat_deps = [], yml_prefix = "src/main/python/"):

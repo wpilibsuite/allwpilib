@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.1.4",
+    "semiwrap~=0.1.7",
     "hatch-meson~=0.1.0b2",
     "hatch-robotpy~=0.2.1",
     "hatchling",

@@ -326,9 +326,7 @@ define_native_wrapper(
 PYBIND_PKGCFG_DEPS = [
     "//wpinet:native/wpinet/robotpy-native-wpinet.pc",
     "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
-    "//wpiutil:src/main/python/wpiutil/wpiutil.pc",
-    "//wpiutil:src/main/python/wpiutil/wpiutil-casters.pc",
-    "//wpiutil:src/main/python/wpiutil/wpiutil-casters.pybind11.json",
+    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
 ]
 
 generate_robotpy_pybind_build_info(
@@ -353,14 +351,7 @@ define_pybind_library(
 
 robotpy_py_test(
     "python_tests",
-    extra_sources = ["src/test/python/conftest.py"],
-    tests = glob(
-        ["src/test/python/**/*.py"],
-        exclude = [
-            "src/test/python/conftest.py",
-            "src/test/python/run_tests.py",
-        ],
-    ),
+    srcs = glob(["src/test/python/**/*.py"]),
     deps = [
         ":robotpy-wpinet",
         requirement("pytest"),

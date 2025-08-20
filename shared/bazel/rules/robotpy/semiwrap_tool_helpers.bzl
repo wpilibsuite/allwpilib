@@ -6,7 +6,7 @@ def scan_headers(name, pyproject_toml, package_root_file, extra_hdrs, pkgcfgs):
     if pkgcfgs:
         pkgcfg_args = ["--pkgcfgs"]
         for pkgcfg in pkgcfgs:
-            pkgcfg_args.append(" $(location " + pkgcfg + ")")
+            pkgcfg_args.append(" $(locations " + pkgcfg + ")")
     else:
         pkgcfg_args = []
 

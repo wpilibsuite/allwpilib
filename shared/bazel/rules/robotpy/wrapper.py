@@ -35,6 +35,11 @@ def main():
     sys.argv = [""] + args
     try:
         tool_main()
+    except SystemExit as e:
+        if e.code != 0:
+            raise Exception(
+                "sys.exit() explicitly called with a non-zero error code", e
+            )
     except:
         print("-------------------------------------")
         print("Failed to run wrapped tool.")
