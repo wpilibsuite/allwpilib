@@ -56,7 +56,8 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
     - If the WPILib installer was used, this toolchain is already installed
 - Raspberry Pi toolchain (optional)
     - Run `./gradlew installArm32Toolchain` after cloning this repository
-
+- SystemCore toolchain (required for SystemCore development)
+    - Run `./gradlew installSystemCoreToolchain` after cloning this repository
 
 On macOS ARM, run `softwareupdate --install-rosetta`. This is necessary to be able to use the macOS x86 roboRIO toolchain on ARM.
 
