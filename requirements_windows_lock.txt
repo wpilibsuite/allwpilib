@@ -436,9 +436,9 @@ ruamel-yaml-clib==0.2.12 \
     --hash=sha256:fc4b630cd3fa2cf7fce38afa91d7cfe844a9f75d7f0f36393fa98815e911d987 \
     --hash=sha256:fd5415dded15c3822597455bc02bcd66e81ef8b7a48cb71a33628fc9fdde39df
     # via ruamel-yaml
-semiwrap==0.1.5 \
-    --hash=sha256:9bebbddb944fb2c36e0bf33b61a88cb735a983ad50d5169cd6508cbf999e0f87 \
-    --hash=sha256:f638d0822d6e6807ea192b93f7daeb1c28bc335d10eb7f1293a123083353ee48
+semiwrap==0.1.8 \
+    --hash=sha256:af5fe5aa3fb9c39b9924ab2f763f41a7a8128ffbaf743a3cb0c3bef6a30c8233 \
+    --hash=sha256:e176f9f4cca2409a104fab7d14956e1e371ee36264c8478b78a2d142e104537d
     # via -r requirements.txt
 sphinxify==0.12 \
     --hash=sha256:3ec299e78babac7d3457f47bf263411b48e10b9c8add18d7159fa0327cc4a061 \

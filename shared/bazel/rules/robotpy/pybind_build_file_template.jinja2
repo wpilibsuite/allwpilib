@@ -4,7 +4,7 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 {%- endif %}
 load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", {% if publish_casters_targets %}"publish_casters", {% endif %}"resolve_casters", "run_header_gen")
-load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers")
+load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 {% for extension_module in extension_modules%}
 def {{extension_module.name}}_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
     {{extension_module.name|upper}}_HEADER_GEN = [
@@ -213,6 +213,22 @@ def define_pybind_library(name, pkgcfgs = []):
             {%- endfor %}
         },
         visibility = ["//visibility:public"],
+    )
+
+    update_yaml_files(
+        name = "{}-update-yaml".format(name),
+        yaml_output_directory = "{{ stripped_include_prefix }}/semiwrap",
+        extra_hdrs = native.glob(["{{stripped_include_prefix}}/**/*.h"], allow_empty = True) + [
+{%- if python_deps %}
+            {% for d in python_deps %}
+            {%- if "native" in d %}"{{d}}.copy_headers",{%- endif %}
+            {%- endfor %}
+{%- endif %}
+        ],
+        package_root_file = "{{package_root_file}}",
+        pkgcfgs = pkgcfgs,
+        pyproject_toml = "{{ stripped_include_prefix }}/pyproject.toml",
+        yaml_files = native.glob(["{{stripped_include_prefix}}/semiwrap/**"]),
     )
 
     scan_headers(
