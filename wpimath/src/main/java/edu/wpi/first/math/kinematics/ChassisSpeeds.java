@@ -30,7 +30,8 @@ import java.util.Objects;
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
  * will often have all three components.
  */
-public class ChassisSpeeds implements ProtobufSerializable, StructSerializable, Interpolatable<ChassisSpeeds> {
+public class ChassisSpeeds
+    implements ProtobufSerializable, StructSerializable, Interpolatable<ChassisSpeeds> {
   /** Velocity along the x-axis in meters per second. (Fwd is +) */
   public double vx;
 
@@ -211,8 +212,7 @@ public class ChassisSpeeds implements ProtobufSerializable, StructSerializable, 
       return new ChassisSpeeds(
           MathUtil.interpolate(this.vx, endValue.vx, t),
           MathUtil.interpolate(this.vy, endValue.vy, t),
-          MathUtil.interpolate(this.omega, endValue.omega, t)
-      );
+          MathUtil.interpolate(this.omega, endValue.omega, t));
     }
   }
 

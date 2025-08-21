@@ -9,7 +9,8 @@ import edu.wpi.first.math.proto.Kinematics.ProtobufChassisAccelerations;
 import edu.wpi.first.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
-public class ChassisAccelerationsProto implements Protobuf<ChassisAccelerations, ProtobufChassisAccelerations> {
+public class ChassisAccelerationsProto
+    implements Protobuf<ChassisAccelerations, ProtobufChassisAccelerations> {
   @Override
   public Class<ChassisAccelerations> getTypeClass() {
     return ChassisAccelerations.class;
