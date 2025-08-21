@@ -13,10 +13,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.kinematics.struct.ChassisAccelerationsStruct;
 import edu.wpi.first.math.kinematics.proto.ChassisAccelerationsProto;
+import edu.wpi.first.math.kinematics.struct.ChassisAccelerationsStruct;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
@@ -30,7 +31,8 @@ import java.util.Objects;
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
  * will often have all three components.
  */
-public class ChassisAccelerations implements StructSerializable, Interpolatable<ChassisAccelerations> {
+public class ChassisAccelerations
+    implements ProtobufSerializable, StructSerializable, Interpolatable<ChassisAccelerations> {
   /** Velocity along the x-axis in meters per second². (Fwd is +) */
   public double ax;
 
@@ -216,8 +218,7 @@ public class ChassisAccelerations implements StructSerializable, Interpolatable<
       return new ChassisAccelerations(
           MathUtil.interpolate(this.ax, endValue.ax, t),
           MathUtil.interpolate(this.ay, endValue.ay, t),
-          MathUtil.interpolate(this.alpha, endValue.alpha, t)
-      );
+          MathUtil.interpolate(this.alpha, endValue.alpha, t));
     }
   }
 
@@ -235,6 +236,6 @@ public class ChassisAccelerations implements StructSerializable, Interpolatable<
   @Override
   public String toString() {
     return String.format(
-        "ChassisAccelerations(Vx: %.2f m/s, Vy: %.2f m/s, Omega: %.2f rad/s)", ax, ay, alpha);
+        "ChassisAccelerations(Ax: %.2f m/s², Ay: %.2f m/s², Alpha: %.2f rad/s²)", ax, ay, alpha);
   }
 }
