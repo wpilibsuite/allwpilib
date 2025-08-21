@@ -6,13 +6,16 @@ package org.wpilib.commands3;
 
 /** Represents the state of a command as it is executed by the scheduler. */
 final class CommandState {
+  // Two billion unique IDs should be enough for anybody.
+  private static int s_lastId = 0;
+
   private final Command m_command;
   private final Command m_parent;
   private final Coroutine m_coroutine;
   private final Binding m_binding;
   private double m_lastRuntimeMs = -1;
   private double m_totalRuntimeMs;
-  private final int m_id = System.identityHashCode(this);
+  private final int m_id;
 
   /**
    * Creates a new command state object.
@@ -31,6 +34,11 @@ final class CommandState {
     m_parent = parent;
     m_coroutine = coroutine;
     m_binding = binding;
+
+    // This is incredibly non-thread safe, but nobody should be using the command framework across
+    // multiple threads anyway. Worst case scenario, we'll get duplicate IDs for commands scheduled
+    // by different threads and cause bad telemetry data without affecting program correctness.
+    m_id = ++s_lastId;
   }
 
   public Command command() {
@@ -85,15 +93,7 @@ final class CommandState {
 
   @Override
   public String toString() {
-    return "CommandState["
-        + "command="
-        + m_command
-        + ", "
-        + "parent="
-        + m_parent
-        + ", "
-        + "coroutine="
-        + m_coroutine
-        + ']';
+    return "CommandState[command=%s, parent=%s, coroutine=%s, id=%d]"
+        .formatted(m_command, m_parent, m_coroutine, m_id);
   }
 }

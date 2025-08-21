@@ -388,9 +388,12 @@ last_time_ms: double, total_time_ms: double). Consumers can use the `id` and `pa
 to reconstruct the tree structure, if desired. `id` and `parent_id` marginally increase the size of
 serialized data, but make the schema and deserialization quite simple.
 
-Command IDs are the Java system identity hashcode (_not_ object hashcode, which can be overridden
-and be identical for different command objects). If a command has no parent, no parent ID will
-appear in its message.
+Command IDs are unique across all commands, including those that are not currently running. Every time
+a command is scheduled, the scheduler will assign that run a unique ID. Note that this is stored as a
+32-bit signed integer, so the maximum number of unique IDs is 2^31. No guarantee is made that IDs will
+be unique across runs of the same program, nor to the order in which ID numbers are assigned; however,
+IDs will be issued in a monotonically increasing fashion - a command scheduled before another will
+always have a lower ID number.
 
 Records in the serialized output will be ordered by scheduling order. As a result, child commands
 will always appear _after_ their parent.
