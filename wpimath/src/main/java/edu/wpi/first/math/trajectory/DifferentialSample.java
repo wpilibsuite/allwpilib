@@ -141,13 +141,13 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
   }
 
   /**
-   * Computes the state derivatives from the input vectors.
+   * Computes the differential drive dynamics: ẋ = Ax + Bu
    *
    * @param state [x, y, θ, vₗ, vᵣ, ω]
    * @param input [aₗ, aᵣ]
    * @return the state derivatives [vₗ, vᵣ, ω, aₗ, aᵣ, α]
    */
-  private Vector<N6> computeStateDerivatives(Vector<N6> state, Vector<N2> input) {
+  private Vector<N6> dynamics(Vector<N6> state, Vector<N2> input) {
     double theta = state.get(2);
     double vl = state.get(3);
     double vr = state.get(4);
@@ -155,20 +155,20 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
     double leftAccel = input.get(0);
     double rightAccel = input.get(1);
 
-    double vx = (vl + vr) / 2.0;
+    double v = (vl + vr) / 2.0;
     double trackwidth = (vr - vl) / omega;
     double alpha = (rightAccel - leftAccel) / trackwidth;
 
     return VecBuilder.fill(
-        vx * Math.cos(theta), vx * Math.sin(theta), omega, leftAccel, rightAccel, alpha);
+        v * Math.cos(theta), v * Math.sin(theta), omega, leftAccel, rightAccel, alpha);
   }
 
   /**
-   * Matrix version of {@link #computeStateDerivatives(Vector, Vector)} for use with {@link
+   * Matrix version of {@link #dynamics(Vector, Vector)} for use with {@link
    * NumericalIntegration}'s rkdp method.
    */
-  private Matrix<N6, N1> computeStateDerivatives(Matrix<N6, N1> state, Matrix<N2, N1> input) {
-    return computeStateDerivatives(
+  private Matrix<N6, N1> dynamics(Matrix<N6, N1> state, Matrix<N2, N1> input) {
+    return dynamics(
         new Vector<>(state.extractColumnVector(0)), new Vector<>(input.extractColumnVector(0)));
   }
 
@@ -196,7 +196,7 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
     // integrate state derivatives [vₗ, vᵣ, ω, aₗ, aᵣ, α] to new states [x, y, θ, vₗ, vᵣ, ω]
     Matrix<N6, N1> endState =
         NumericalIntegration.rkdp(
-            this::computeStateDerivatives, initialState, initialInput, interpDt);
+            this::dynamics, initialState, initialInput, interpDt);
 
     double x = endState.get(0, 0);
     double y = endState.get(1, 0);
