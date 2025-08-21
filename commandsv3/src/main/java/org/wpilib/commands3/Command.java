@@ -198,7 +198,7 @@ public interface Command {
    *
    * @return a builder that can be used to configure the resulting command
    */
-  static HasRequirementsCommandBuilder noRequirements() {
+  static NeedsExecutionBuilderStage noRequirements() {
     return new StagedCommandBuilder().noRequirements();
   }
 
@@ -209,7 +209,7 @@ public interface Command {
    * @param rest Any other required mechanisms
    * @return A command builder
    */
-  static HasRequirementsCommandBuilder requiring(Mechanism requirement, Mechanism... rest) {
+  static NeedsExecutionBuilderStage requiring(Mechanism requirement, Mechanism... rest) {
     return new StagedCommandBuilder().requiring(requirement, rest);
   }
 
@@ -219,7 +219,7 @@ public interface Command {
    * @param requirements The required mechanisms. May be empty, but cannot contain null values.
    * @return A command builder
    */
-  static HasRequirementsCommandBuilder requiring(Collection<Mechanism> requirements) {
+  static NeedsExecutionBuilderStage requiring(Collection<Mechanism> requirements) {
     return new StagedCommandBuilder().requiring(requirements);
   }
 
@@ -266,7 +266,7 @@ public interface Command {
    * @param condition The condition to wait for
    * @return A command builder
    */
-  static HasExecutionCommandBuilder waitUntil(BooleanSupplier condition) {
+  static NeedsNameBuilderStage waitUntil(BooleanSupplier condition) {
     return noRequirements().executing(coroutine -> coroutine.waitUntil(condition));
   }
 

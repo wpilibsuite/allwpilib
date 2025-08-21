@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  * No more changes to requirements or command implementation may happen after this point. This is
  * the final step in command creation
  */
-public interface HasExecutionCommandBuilder {
+public interface NeedsNameBuilderStage {
   /**
    * Optionally sets a callback to execute when the command is canceled. The callback will not run
    * if the command was canceled after being scheduled but before starting to run, and will not run
@@ -22,7 +22,7 @@ public interface HasExecutionCommandBuilder {
    *     null.
    * @return This builder object, for chaining
    */
-  HasExecutionCommandBuilder whenCanceled(Runnable onCancel);
+  NeedsNameBuilderStage whenCanceled(Runnable onCancel);
 
   /**
    * Sets the priority level of the command.
@@ -30,17 +30,17 @@ public interface HasExecutionCommandBuilder {
    * @param priority The desired priority level.
    * @return This builder object, for chaining.
    */
-  HasExecutionCommandBuilder withPriority(int priority);
+  NeedsNameBuilderStage withPriority(int priority);
 
   /**
    * Optionally sets an end condition for the command. If the end condition returns {@code true}
-   * before the command body set in {@link HasRequirementsCommandBuilder#executing(Consumer)} would
+   * before the command body set in {@link NeedsExecutionBuilderStage#executing(Consumer)} would
    * exit, the command will be cancelled by the scheduler.
    *
    * @param endCondition An optional end condition for the command. May be null.
    * @return This builder object, for chaining.
    */
-  HasExecutionCommandBuilder until(BooleanSupplier endCondition);
+  NeedsNameBuilderStage until(BooleanSupplier endCondition);
 
   /**
    * Creates the command based on the options set during previous builder stages. The builders will

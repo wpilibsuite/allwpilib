@@ -97,7 +97,7 @@ public class Mechanism {
    * @param commandBody The main function body of the command.
    * @return The command builder, for further configuration.
    */
-  public HasExecutionCommandBuilder run(Consumer<Coroutine> commandBody) {
+  public NeedsNameBuilderStage run(Consumer<Coroutine> commandBody) {
     return new StagedCommandBuilder().requiring(this).executing(commandBody);
   }
 
@@ -109,7 +109,7 @@ public class Mechanism {
    * @param loopBody The body of the infinite loop.
    * @return The command builder, for further configuration.
    */
-  public HasExecutionCommandBuilder runRepeatedly(Runnable loopBody) {
+  public NeedsNameBuilderStage runRepeatedly(Runnable loopBody) {
     return run(
         coroutine -> {
           while (true) {

@@ -8,11 +8,12 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 /**
- * A stage in a command builder where requirements have already been specified. The next stage is a
- * {@link HasExecutionCommandBuilder} from {@link #executing(Consumer)}. Additional requirements may
- * still be added before moving on to the next stage.
+ * A stage in a command builder where requirements have already been specified and execution details
+ * are required. The next stage is a {@link NeedsNameBuilderStage} from {@link
+ * #executing(Consumer)}. Additional requirements may still be added before moving on to the next
+ * stage.
  */
-public interface HasRequirementsCommandBuilder {
+public interface NeedsExecutionBuilderStage {
   /**
    * Adds a required mechanism for the command.
    *
@@ -20,7 +21,7 @@ public interface HasRequirementsCommandBuilder {
    * @return This builder object, for chaining
    * @throws NullPointerException If {@code requirement} is null
    */
-  HasRequirementsCommandBuilder requiring(Mechanism requirement);
+  NeedsExecutionBuilderStage requiring(Mechanism requirement);
 
   /**
    * Adds one or more required mechanisms for the command.
@@ -31,7 +32,7 @@ public interface HasRequirementsCommandBuilder {
    * @throws NullPointerException If {@code requirement} is null or {@code extra} contains a null
    *     value
    */
-  HasRequirementsCommandBuilder requiring(Mechanism requirement, Mechanism... extra);
+  NeedsExecutionBuilderStage requiring(Mechanism requirement, Mechanism... extra);
 
   /**
    * Adds required mechanisms for the command.
@@ -40,7 +41,7 @@ public interface HasRequirementsCommandBuilder {
    * @return This builder object, for chaining
    * @throws NullPointerException If {@code requirements} is null or contains a null value.
    */
-  HasRequirementsCommandBuilder requiring(Collection<Mechanism> requirements);
+  NeedsExecutionBuilderStage requiring(Collection<Mechanism> requirements);
 
   /**
    * Sets the function body of the executing command.
@@ -49,5 +50,5 @@ public interface HasRequirementsCommandBuilder {
    * @return A builder for the next stage of command construction.
    * @throws NullPointerException If {@code impl} is null.
    */
-  HasExecutionCommandBuilder executing(Consumer<Coroutine> impl);
+  NeedsNameBuilderStage executing(Consumer<Coroutine> impl);
 }
