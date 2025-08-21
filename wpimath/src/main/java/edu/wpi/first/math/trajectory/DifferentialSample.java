@@ -16,7 +16,7 @@ import edu.wpi.first.math.kinematics.ChassisAccelerations;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -27,7 +27,7 @@ import edu.wpi.first.util.struct.StructSerializable;
 public class DifferentialSample extends TrajectorySample<DifferentialSample>
     implements StructSerializable {
   public final double leftSpeed; // meters per second
-  public final double rightSpeed; // meters per second
+  public final double rightSpeed; // meters per second\
 
   /**
    * Constructs a DifferentialSample.
@@ -38,6 +38,8 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
    * @param accel The robot acceleration at this sample (in the robot's reference frame).
    * @param leftSpeed The left-wheel speed at this sample in meters per second.
    * @param rightSpeed The right-wheel speed at this sample in meters per second.
+   * @param leftAccel The left-wheel acceleration at this sample in meters per second squared.
+   * @param rightAccel The right-wheel acceleration at this sample in meters per second squared.
    */
   @JsonCreator
   public DifferentialSample(
@@ -144,20 +146,19 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
    * Computes the differential drive dynamics: ẋ = Ax + Bu
    *
    * @param state [x, y, θ, vₗ, vᵣ, ω]
-   * @param input [aₗ, aᵣ]
+   * @param input [aₗ, aᵣ, α]
    * @return the state derivatives [vₗ, vᵣ, ω, aₗ, aᵣ, α]
    */
-  private Vector<N6> dynamics(Vector<N6> state, Vector<N2> input) {
+  private Vector<N6> dynamics(Vector<N6> state, Vector<N3> input) {
     double theta = state.get(2);
     double vl = state.get(3);
     double vr = state.get(4);
     double omega = state.get(5);
     double leftAccel = input.get(0);
     double rightAccel = input.get(1);
+    double alpha = input.get(2);
 
     double v = (vl + vr) / 2.0;
-    double trackwidth = (vr - vl) / omega;
-    double alpha = (rightAccel - leftAccel) / trackwidth;
 
     return VecBuilder.fill(
         v * Math.cos(theta), v * Math.sin(theta), omega, leftAccel, rightAccel, alpha);
@@ -167,7 +168,7 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
    * Matrix version of {@link #dynamics(Vector, Vector)} for use with {@link
    * NumericalIntegration}'s rkdp method.
    */
-  private Matrix<N6, N1> dynamics(Matrix<N6, N1> state, Matrix<N2, N1> input) {
+  private Matrix<N6, N1> dynamics(Matrix<N6, N1> state, Matrix<N3, N1> input) {
     return dynamics(
         new Vector<>(state.extractColumnVector(0)), new Vector<>(input.extractColumnVector(0)));
   }
@@ -191,7 +192,9 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
         VecBuilder.fill(
             pose.getX(), pose.getY(), pose.getRotation().getRadians(), vel.vx, vel.vy, vel.omega);
 
-    Matrix<N2, N1> initialInput = VecBuilder.fill(accel.ax, accel.ay);
+
+
+    Vector<N3> initialInput = VecBuilder.fill(accel.ax, accel.ay, accel.alpha);
 
     // integrate state derivatives [vₗ, vᵣ, ω, aₗ, aᵣ, α] to new states [x, y, θ, vₗ, vᵣ, ω]
     Matrix<N6, N1> endState =
