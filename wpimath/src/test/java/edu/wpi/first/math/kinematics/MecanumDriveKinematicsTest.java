@@ -206,7 +206,8 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testStrafeForwardAccelerations() {
-    var wheelAccelerations = new MecanumDriveWheelAccelerations(-2.828427, 2.828427, 2.828427, -2.828427);
+    var wheelAccelerations =
+        new MecanumDriveWheelAccelerations(-2.828427, 2.828427, 2.828427, -2.828427);
     var chassisAccelerations = m_kinematics.toChassisAccelerations(wheelAccelerations);
 
     assertAll(
@@ -229,7 +230,8 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testRotationForwardAccelerations() {
-    var wheelAccelerations = new MecanumDriveWheelAccelerations(-150.79645, 150.79645, -150.79645, 150.79645);
+    var wheelAccelerations =
+        new MecanumDriveWheelAccelerations(-150.79645, 150.79645, -150.79645, 150.79645);
     var chassisAccelerations = m_kinematics.toChassisAccelerations(wheelAccelerations);
 
     assertAll(

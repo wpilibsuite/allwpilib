@@ -131,7 +131,8 @@ class DifferentialDriveKinematicsTest {
 
   @Test
   void testForwardAccelerationsForRotateInPlace() {
-    var wheelAccelerations = new DifferentialDriveWheelAccelerations(+0.381 * Math.PI, -0.381 * Math.PI);
+    var wheelAccelerations =
+        new DifferentialDriveWheelAccelerations(+0.381 * Math.PI, -0.381 * Math.PI);
     var chassisAccelerations = m_kinematics.toChassisAccelerations(wheelAccelerations);
 
     assertAll(

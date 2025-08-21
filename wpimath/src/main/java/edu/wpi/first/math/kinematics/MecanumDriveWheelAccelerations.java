@@ -6,6 +6,7 @@ package edu.wpi.first.math.kinematics;
 
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 
+import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.proto.MecanumDriveWheelAccelerationsProto;
 import edu.wpi.first.math.kinematics.struct.MecanumDriveWheelAccelerationsStruct;
 import edu.wpi.first.units.measure.LinearAcceleration;
@@ -13,7 +14,10 @@ import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
 /** Represents the wheel accelerations for a mecanum drive drivetrain. */
-public class MecanumDriveWheelAccelerations implements ProtobufSerializable, StructSerializable {
+public class MecanumDriveWheelAccelerations
+    implements Interpolatable<MecanumDriveWheelAccelerations>,
+        ProtobufSerializable,
+        StructSerializable {
   /** Acceleration of the front left wheel in meters per second squared. */
   public double frontLeft;
 
@@ -148,6 +152,26 @@ public class MecanumDriveWheelAccelerations implements ProtobufSerializable, Str
   public MecanumDriveWheelAccelerations div(double scalar) {
     return new MecanumDriveWheelAccelerations(
         frontLeft / scalar, frontRight / scalar, rearLeft / scalar, rearRight / scalar);
+  }
+
+  /**
+   * Returns the linear interpolation of this MecanumDriveWheelAccelerations and another.
+   *
+   * @param endValue The end value for the interpolation.
+   * @param t How far between the two values to interpolate. This is clamped to [0, 1].
+   * @return The interpolated value.
+   */
+  @Override
+  public MecanumDriveWheelAccelerations interpolate(
+      MecanumDriveWheelAccelerations endValue, double t) {
+    // Clamp t to [0, 1]
+    t = Math.max(0.0, Math.min(1.0, t));
+
+    return new MecanumDriveWheelAccelerations(
+        frontLeft + t * (endValue.frontLeft - frontLeft),
+        frontRight + t * (endValue.frontRight - frontRight),
+        rearLeft + t * (endValue.rearLeft - rearLeft),
+        rearRight + t * (endValue.rearRight - rearRight));
   }
 
   @Override

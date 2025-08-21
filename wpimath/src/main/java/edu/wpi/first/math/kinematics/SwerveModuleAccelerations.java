@@ -7,6 +7,7 @@ package edu.wpi.first.math.kinematics;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
+import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.proto.SwerveModuleAccelerationsProto;
 import edu.wpi.first.math.kinematics.struct.SwerveModuleAccelerationsStruct;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -17,7 +18,10 @@ import java.util.Objects;
 
 /** Represents the accelerations of one swerve module. */
 public class SwerveModuleAccelerations
-    implements Comparable<SwerveModuleAccelerations>, ProtobufSerializable, StructSerializable {
+    implements Interpolatable<SwerveModuleAccelerations>,
+        Comparable<SwerveModuleAccelerations>,
+        ProtobufSerializable,
+        StructSerializable {
   /** Acceleration of the wheel of the module in meters per second squared. */
   public double acceleration;
 
@@ -114,6 +118,23 @@ public class SwerveModuleAccelerations
    */
   public SwerveModuleAccelerations div(double scalar) {
     return new SwerveModuleAccelerations(acceleration / scalar, angularAcceleration / scalar);
+  }
+
+  /**
+   * Returns the linear interpolation of this SwerveModuleAccelerations and another.
+   *
+   * @param endValue The end value for the interpolation.
+   * @param t How far between the two values to interpolate. This is clamped to [0, 1].
+   * @return The interpolated value.
+   */
+  @Override
+  public SwerveModuleAccelerations interpolate(SwerveModuleAccelerations endValue, double t) {
+    // Clamp t to [0, 1]
+    t = Math.max(0.0, Math.min(1.0, t));
+
+    return new SwerveModuleAccelerations(
+        acceleration + t * (endValue.acceleration - acceleration),
+        angularAcceleration + t * (endValue.angularAcceleration - angularAcceleration));
   }
 
   @Override

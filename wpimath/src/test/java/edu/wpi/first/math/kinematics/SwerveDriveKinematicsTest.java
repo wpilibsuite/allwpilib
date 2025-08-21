@@ -415,7 +415,8 @@ class SwerveDriveKinematicsTest {
     /*
     The circumference of the wheels about the COR is π * diameter, or 2π * radius
     the radius is the √(12²in + 12²in), or 16.9706in, so the circumference the wheels
-    trace out is 106.629190516in. since we want our robot to rotate at 1 rotation per second squared,
+    trace out is 106.629190516in.
+    since we want our robot to rotate at 1 rotation per second squared,
     our wheels must trace out 1 rotation (or 106.63 inches) per second squared.
       */
 
@@ -444,7 +445,8 @@ class SwerveDriveKinematicsTest {
         Rotation2d.fromDegrees(-135),
         Rotation2d.fromDegrees(-45));
 
-    var chassisAccelerations = m_kinematics.toChassisAccelerations(flAccel, frAccel, blAccel, brAccel);
+    var chassisAccelerations =
+        m_kinematics.toChassisAccelerations(flAccel, frAccel, blAccel, brAccel);
 
     assertAll(
         () -> assertEquals(0.0, chassisAccelerations.ax, kEpsilon),

@@ -41,7 +41,8 @@ class MecanumDriveWheelAccelerationsTest {
     var frontRight = MetersPerSecondPerSecond.of(2.5);
     var rearLeft = MetersPerSecondPerSecond.of(3.5);
     var rearRight = MetersPerSecondPerSecond.of(4.5);
-    var wheelAccelerations = new MecanumDriveWheelAccelerations(frontLeft, frontRight, rearLeft, rearRight);
+    var wheelAccelerations =
+        new MecanumDriveWheelAccelerations(frontLeft, frontRight, rearLeft, rearRight);
 
     assertAll(
         () -> assertEquals(1.5, wheelAccelerations.frontLeft, kEpsilon),
@@ -80,7 +81,8 @@ class MecanumDriveWheelAccelerationsTest {
 
   @Test
   void testUnaryMinus() {
-    final var wheelAccelerations = new MecanumDriveWheelAccelerations(1.0, -2.0, 3.0, -4.0).unaryMinus();
+    final var wheelAccelerations =
+        new MecanumDriveWheelAccelerations(1.0, -2.0, 3.0, -4.0).unaryMinus();
 
     assertAll(
         () -> assertEquals(-1.0, wheelAccelerations.frontLeft),
@@ -91,7 +93,8 @@ class MecanumDriveWheelAccelerationsTest {
 
   @Test
   void testMultiplication() {
-    final var wheelAccelerations = new MecanumDriveWheelAccelerations(2.0, 2.5, 3.0, 3.5).times(2.0);
+    final var wheelAccelerations =
+        new MecanumDriveWheelAccelerations(2.0, 2.5, 3.0, 3.5).times(2.0);
 
     assertAll(
         () -> assertEquals(4.0, wheelAccelerations.frontLeft),
@@ -109,5 +112,59 @@ class MecanumDriveWheelAccelerationsTest {
         () -> assertEquals(1.25, wheelAccelerations.frontRight),
         () -> assertEquals(0.75, wheelAccelerations.rearLeft),
         () -> assertEquals(0.5, wheelAccelerations.rearRight));
+  }
+
+  @Test
+  void testInterpolate() {
+    final var start = new MecanumDriveWheelAccelerations(1.0, 2.0, 3.0, 4.0);
+    final var end = new MecanumDriveWheelAccelerations(5.0, 6.0, 7.0, 8.0);
+
+    // Test interpolation at t=0 (should return start)
+    final var atStart = start.interpolate(end, 0.0);
+    assertAll(
+        () -> assertEquals(1.0, atStart.frontLeft, kEpsilon),
+        () -> assertEquals(2.0, atStart.frontRight, kEpsilon),
+        () -> assertEquals(3.0, atStart.rearLeft, kEpsilon),
+        () -> assertEquals(4.0, atStart.rearRight, kEpsilon));
+
+    // Test interpolation at t=1 (should return end)
+    final var atEnd = start.interpolate(end, 1.0);
+    assertAll(
+        () -> assertEquals(5.0, atEnd.frontLeft, kEpsilon),
+        () -> assertEquals(6.0, atEnd.frontRight, kEpsilon),
+        () -> assertEquals(7.0, atEnd.rearLeft, kEpsilon),
+        () -> assertEquals(8.0, atEnd.rearRight, kEpsilon));
+
+    // Test interpolation at t=0.5 (should return midpoint)
+    final var atMidpoint = start.interpolate(end, 0.5);
+    assertAll(
+        () -> assertEquals(3.0, atMidpoint.frontLeft, kEpsilon),
+        () -> assertEquals(4.0, atMidpoint.frontRight, kEpsilon),
+        () -> assertEquals(5.0, atMidpoint.rearLeft, kEpsilon),
+        () -> assertEquals(6.0, atMidpoint.rearRight, kEpsilon));
+
+    // Test interpolation at t=0.25
+    final var atQuarter = start.interpolate(end, 0.25);
+    assertAll(
+        () -> assertEquals(2.0, atQuarter.frontLeft, kEpsilon),
+        () -> assertEquals(3.0, atQuarter.frontRight, kEpsilon),
+        () -> assertEquals(4.0, atQuarter.rearLeft, kEpsilon),
+        () -> assertEquals(5.0, atQuarter.rearRight, kEpsilon));
+
+    // Test clamping: t < 0 should clamp to 0
+    final var belowRange = start.interpolate(end, -0.5);
+    assertAll(
+        () -> assertEquals(1.0, belowRange.frontLeft, kEpsilon),
+        () -> assertEquals(2.0, belowRange.frontRight, kEpsilon),
+        () -> assertEquals(3.0, belowRange.rearLeft, kEpsilon),
+        () -> assertEquals(4.0, belowRange.rearRight, kEpsilon));
+
+    // Test clamping: t > 1 should clamp to 1
+    final var aboveRange = start.interpolate(end, 1.5);
+    assertAll(
+        () -> assertEquals(5.0, aboveRange.frontLeft, kEpsilon),
+        () -> assertEquals(6.0, aboveRange.frontRight, kEpsilon),
+        () -> assertEquals(7.0, aboveRange.rearLeft, kEpsilon),
+        () -> assertEquals(8.0, aboveRange.rearRight, kEpsilon));
   }
 }

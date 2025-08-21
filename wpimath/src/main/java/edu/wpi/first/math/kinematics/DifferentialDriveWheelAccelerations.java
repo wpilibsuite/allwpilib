@@ -6,6 +6,7 @@ package edu.wpi.first.math.kinematics;
 
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 
+import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.proto.DifferentialDriveWheelAccelerationsProto;
 import edu.wpi.first.math.kinematics.struct.DifferentialDriveWheelAccelerationsStruct;
 import edu.wpi.first.units.measure.LinearAcceleration;
@@ -14,7 +15,9 @@ import edu.wpi.first.util.struct.StructSerializable;
 
 /** Represents the wheel accelerations for a differential drive drivetrain. */
 public class DifferentialDriveWheelAccelerations
-    implements ProtobufSerializable, StructSerializable {
+    implements Interpolatable<DifferentialDriveWheelAccelerations>,
+        ProtobufSerializable,
+        StructSerializable {
   /** Acceleration of the left side of the robot in meters per second squared. */
   public double left;
 
@@ -118,6 +121,23 @@ public class DifferentialDriveWheelAccelerations
    */
   public DifferentialDriveWheelAccelerations div(double scalar) {
     return new DifferentialDriveWheelAccelerations(left / scalar, right / scalar);
+  }
+
+  /**
+   * Returns the linear interpolation of this DifferentialDriveWheelAccelerations and another.
+   *
+   * @param endValue The end value for the interpolation.
+   * @param t How far between the two values to interpolate. This is clamped to [0, 1].
+   * @return The interpolated value.
+   */
+  @Override
+  public DifferentialDriveWheelAccelerations interpolate(
+      DifferentialDriveWheelAccelerations endValue, double t) {
+    // Clamp t to [0, 1]
+    t = Math.max(0.0, Math.min(1.0, t));
+
+    return new DifferentialDriveWheelAccelerations(
+        left + t * (endValue.left - left), right + t * (endValue.right - right));
   }
 
   @Override

@@ -92,4 +92,46 @@ class DifferentialDriveWheelAccelerationsTest {
         () -> assertEquals(0.5, wheelAccelerations.left),
         () -> assertEquals(0.25, wheelAccelerations.right));
   }
+
+  @Test
+  void testInterpolate() {
+    final var start = new DifferentialDriveWheelAccelerations(1.0, 2.0);
+    final var end = new DifferentialDriveWheelAccelerations(5.0, 6.0);
+
+    // Test interpolation at t=0 (should return start)
+    final var atStart = start.interpolate(end, 0.0);
+    assertAll(
+        () -> assertEquals(1.0, atStart.left, kEpsilon),
+        () -> assertEquals(2.0, atStart.right, kEpsilon));
+
+    // Test interpolation at t=1 (should return end)
+    final var atEnd = start.interpolate(end, 1.0);
+    assertAll(
+        () -> assertEquals(5.0, atEnd.left, kEpsilon),
+        () -> assertEquals(6.0, atEnd.right, kEpsilon));
+
+    // Test interpolation at t=0.5 (should return midpoint)
+    final var atMidpoint = start.interpolate(end, 0.5);
+    assertAll(
+        () -> assertEquals(3.0, atMidpoint.left, kEpsilon),
+        () -> assertEquals(4.0, atMidpoint.right, kEpsilon));
+
+    // Test interpolation at t=0.25
+    final var atQuarter = start.interpolate(end, 0.25);
+    assertAll(
+        () -> assertEquals(2.0, atQuarter.left, kEpsilon),
+        () -> assertEquals(3.0, atQuarter.right, kEpsilon));
+
+    // Test clamping: t < 0 should clamp to 0
+    final var belowRange = start.interpolate(end, -0.5);
+    assertAll(
+        () -> assertEquals(1.0, belowRange.left, kEpsilon),
+        () -> assertEquals(2.0, belowRange.right, kEpsilon));
+
+    // Test clamping: t > 1 should clamp to 1
+    final var aboveRange = start.interpolate(end, 1.5);
+    assertAll(
+        () -> assertEquals(5.0, aboveRange.left, kEpsilon),
+        () -> assertEquals(6.0, aboveRange.right, kEpsilon));
+  }
 }
