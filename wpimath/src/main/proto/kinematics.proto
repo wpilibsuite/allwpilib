@@ -27,6 +27,11 @@ message ProtobufDifferentialDriveWheelSpeeds {
   double right = 2;
 }
 
+message ProtobufDifferentialDriveWheelAccelerations {
+  double left = 1;
+  double right = 2;
+}
+
 message ProtobufDifferentialDriveWheelPositions {
   double left = 1;
   double right = 2;
@@ -53,6 +58,13 @@ message ProtobufMecanumDriveWheelSpeeds {
   double rear_right = 4;
 }
 
+message ProtobufMecanumDriveWheelAccelerations {
+  double front_left = 1;
+  double front_right = 2;
+  double rear_left = 3;
+  double rear_right = 4;
+}
+
 message ProtobufSwerveDriveKinematics {
   repeated ProtobufTranslation2d modules = 1;
 }
@@ -65,4 +77,9 @@ message ProtobufSwerveModulePosition {
 message ProtobufSwerveModuleState {
   double speed = 1;
   ProtobufRotation2d angle = 2;
+}
+
+message ProtobufSwerveModuleAccelerations {
+  double acceleration = 1;
+  double angular_acceleration = 2;
 }
