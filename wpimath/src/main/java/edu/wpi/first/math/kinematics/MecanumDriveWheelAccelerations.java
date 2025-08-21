@@ -27,10 +27,12 @@ public class MecanumDriveWheelAccelerations implements ProtobufSerializable, Str
   public double rearRight;
 
   /** MecanumDriveWheelAccelerations protobuf for serialization. */
-  public static final MecanumDriveWheelAccelerationsProto proto = new MecanumDriveWheelAccelerationsProto();
+  public static final MecanumDriveWheelAccelerationsProto proto =
+      new MecanumDriveWheelAccelerationsProto();
 
   /** MecanumDriveWheelAccelerations struct for serialization. */
-  public static final MecanumDriveWheelAccelerationsStruct struct = new MecanumDriveWheelAccelerationsStruct();
+  public static final MecanumDriveWheelAccelerationsStruct struct =
+      new MecanumDriveWheelAccelerationsStruct();
 
   /** Constructs a MecanumDriveWheelAccelerations with zeros for all member fields. */
   public MecanumDriveWheelAccelerations() {}
@@ -74,8 +76,9 @@ public class MecanumDriveWheelAccelerations implements ProtobufSerializable, Str
   /**
    * Adds two MecanumDriveWheelAccelerations and returns the sum.
    *
-   * <p>For example, MecanumDriveWheelAccelerations{1.0, 0.5, 2.0, 1.5} + MecanumDriveWheelAccelerations{2.0, 1.5,
-   * 0.5, 1.0} = MecanumDriveWheelAccelerations{3.0, 2.0, 2.5, 2.5}
+   * <p>For example, MecanumDriveWheelAccelerations{1.0, 0.5, 2.0, 1.5} +
+   * MecanumDriveWheelAccelerations{2.0, 1.5, 0.5, 1.0} = MecanumDriveWheelAccelerations{3.0, 2.0,
+   * 2.5, 2.5}
    *
    * @param other The MecanumDriveWheelAccelerations to add.
    * @return The sum of the MecanumDriveWheelAccelerations.
@@ -89,11 +92,12 @@ public class MecanumDriveWheelAccelerations implements ProtobufSerializable, Str
   }
 
   /**
-   * Subtracts the other MecanumDriveWheelAccelerations from the current MecanumDriveWheelAccelerations and
-   * returns the difference.
+   * Subtracts the other MecanumDriveWheelAccelerations from the current
+   * MecanumDriveWheelAccelerations and returns the difference.
    *
-   * <p>For example, MecanumDriveWheelAccelerations{5.0, 4.0, 6.0, 2.5} - MecanumDriveWheelAccelerations{1.0, 2.0,
-   * 3.0, 0.5} = MecanumDriveWheelAccelerations{4.0, 2.0, 3.0, 2.0}
+   * <p>For example, MecanumDriveWheelAccelerations{5.0, 4.0, 6.0, 2.5} -
+   * MecanumDriveWheelAccelerations{1.0, 2.0, 3.0, 0.5} = MecanumDriveWheelAccelerations{4.0, 2.0,
+   * 3.0, 2.0}
    *
    * @param other The MecanumDriveWheelAccelerations to subtract.
    * @return The difference between the two MecanumDriveWheelAccelerations.
@@ -107,8 +111,8 @@ public class MecanumDriveWheelAccelerations implements ProtobufSerializable, Str
   }
 
   /**
-   * Returns the inverse of the current MecanumDriveWheelAccelerations. This is equivalent to negating all
-   * components of the MecanumDriveWheelAccelerations.
+   * Returns the inverse of the current MecanumDriveWheelAccelerations. This is equivalent to
+   * negating all components of the MecanumDriveWheelAccelerations.
    *
    * @return The inverse of the current MecanumDriveWheelAccelerations.
    */
@@ -117,10 +121,11 @@ public class MecanumDriveWheelAccelerations implements ProtobufSerializable, Str
   }
 
   /**
-   * Multiplies the MecanumDriveWheelAccelerations by a scalar and returns the new MecanumDriveWheelAccelerations.
+   * Multiplies the MecanumDriveWheelAccelerations by a scalar and returns the new
+   * MecanumDriveWheelAccelerations.
    *
-   * <p>For example, MecanumDriveWheelAccelerations{2.0, 2.5, 3.0, 3.5} * 2 = MecanumDriveWheelAccelerations{4.0,
-   * 5.0, 6.0, 7.0}
+   * <p>For example, MecanumDriveWheelAccelerations{2.0, 2.5, 3.0, 3.5} * 2 =
+   * MecanumDriveWheelAccelerations{4.0, 5.0, 6.0, 7.0}
    *
    * @param scalar The scalar to multiply by.
    * @return The scaled MecanumDriveWheelAccelerations.
@@ -131,10 +136,11 @@ public class MecanumDriveWheelAccelerations implements ProtobufSerializable, Str
   }
 
   /**
-   * Divides the MecanumDriveWheelAccelerations by a scalar and returns the new MecanumDriveWheelAccelerations.
+   * Divides the MecanumDriveWheelAccelerations by a scalar and returns the new
+   * MecanumDriveWheelAccelerations.
    *
-   * <p>For example, MecanumDriveWheelAccelerations{2.0, 2.5, 1.5, 1.0} / 2 = MecanumDriveWheelAccelerations{1.0,
-   * 1.25, 0.75, 0.5}
+   * <p>For example, MecanumDriveWheelAccelerations{2.0, 2.5, 1.5, 1.0} / 2 =
+   * MecanumDriveWheelAccelerations{1.0, 1.25, 0.75, 0.5}
    *
    * @param scalar The scalar to divide by.
    * @return The scaled MecanumDriveWheelAccelerations.

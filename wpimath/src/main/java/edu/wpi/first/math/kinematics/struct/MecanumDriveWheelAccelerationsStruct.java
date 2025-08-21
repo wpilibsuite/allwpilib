@@ -8,7 +8,8 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelAccelerations;
 import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
 
-public class MecanumDriveWheelAccelerationsStruct implements Struct<MecanumDriveWheelAccelerations> {
+public class MecanumDriveWheelAccelerationsStruct
+    implements Struct<MecanumDriveWheelAccelerations> {
   @Override
   public Class<MecanumDriveWheelAccelerations> getTypeClass() {
     return MecanumDriveWheelAccelerations.class;

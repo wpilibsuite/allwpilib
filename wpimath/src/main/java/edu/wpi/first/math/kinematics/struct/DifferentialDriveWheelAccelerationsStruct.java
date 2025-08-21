@@ -8,7 +8,8 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelAccelerations;
 import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
 
-public class DifferentialDriveWheelAccelerationsStruct implements Struct<DifferentialDriveWheelAccelerations> {
+public class DifferentialDriveWheelAccelerationsStruct
+    implements Struct<DifferentialDriveWheelAccelerations> {
   @Override
   public Class<DifferentialDriveWheelAccelerations> getTypeClass() {
     return DifferentialDriveWheelAccelerations.class;

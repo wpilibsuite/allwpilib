@@ -10,7 +10,8 @@ import edu.wpi.first.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
 public class DifferentialDriveWheelAccelerationsProto
-    implements Protobuf<DifferentialDriveWheelAccelerations, ProtobufDifferentialDriveWheelAccelerations> {
+    implements Protobuf<
+        DifferentialDriveWheelAccelerations, ProtobufDifferentialDriveWheelAccelerations> {
   @Override
   public Class<DifferentialDriveWheelAccelerations> getTypeClass() {
     return DifferentialDriveWheelAccelerations.class;
@@ -27,12 +28,14 @@ public class DifferentialDriveWheelAccelerationsProto
   }
 
   @Override
-  public DifferentialDriveWheelAccelerations unpack(ProtobufDifferentialDriveWheelAccelerations msg) {
+  public DifferentialDriveWheelAccelerations unpack(
+      ProtobufDifferentialDriveWheelAccelerations msg) {
     return new DifferentialDriveWheelAccelerations(msg.getLeft(), msg.getRight());
   }
 
   @Override
-  public void pack(ProtobufDifferentialDriveWheelAccelerations msg, DifferentialDriveWheelAccelerations value) {
+  public void pack(
+      ProtobufDifferentialDriveWheelAccelerations msg, DifferentialDriveWheelAccelerations value) {
     msg.setLeft(value.left);
     msg.setRight(value.right);
   }

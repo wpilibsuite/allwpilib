@@ -33,7 +33,8 @@ public class MecanumDriveWheelAccelerationsProto
   }
 
   @Override
-  public void pack(ProtobufMecanumDriveWheelAccelerations msg, MecanumDriveWheelAccelerations value) {
+  public void pack(
+      ProtobufMecanumDriveWheelAccelerations msg, MecanumDriveWheelAccelerations value) {
     msg.setFrontLeft(value.frontLeft);
     msg.setFrontRight(value.frontRight);
     msg.setRearLeft(value.rearLeft);

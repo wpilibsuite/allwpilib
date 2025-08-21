@@ -13,7 +13,8 @@ import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
 
 /** Represents the wheel accelerations for a differential drive drivetrain. */
-public class DifferentialDriveWheelAccelerations implements ProtobufSerializable, StructSerializable {
+public class DifferentialDriveWheelAccelerations
+    implements ProtobufSerializable, StructSerializable {
   /** Acceleration of the left side of the robot in meters per second squared. */
   public double left;
 
@@ -28,7 +29,9 @@ public class DifferentialDriveWheelAccelerations implements ProtobufSerializable
   public static final DifferentialDriveWheelAccelerationsStruct struct =
       new DifferentialDriveWheelAccelerationsStruct();
 
-  /** Constructs a DifferentialDriveWheelAccelerations with zeros for left and right accelerations. */
+  /**
+   * Constructs a DifferentialDriveWheelAccelerations with zeros for left and right accelerations.
+   */
   public DifferentialDriveWheelAccelerations() {}
 
   /**
@@ -55,8 +58,8 @@ public class DifferentialDriveWheelAccelerations implements ProtobufSerializable
   /**
    * Adds two DifferentialDriveWheelAccelerations and returns the sum.
    *
-   * <p>For example, DifferentialDriveWheelAccelerations{1.0, 0.5} + DifferentialDriveWheelAccelerations{2.0, 1.5}
-   * = DifferentialDriveWheelAccelerations{3.0, 2.0}
+   * <p>For example, DifferentialDriveWheelAccelerations{1.0, 0.5} +
+   * DifferentialDriveWheelAccelerations{2.0, 1.5} = DifferentialDriveWheelAccelerations{3.0, 2.0}
    *
    * @param other The DifferentialDriveWheelAccelerations to add.
    * @return The sum of the DifferentialDriveWheelAccelerations.
@@ -66,11 +69,11 @@ public class DifferentialDriveWheelAccelerations implements ProtobufSerializable
   }
 
   /**
-   * Subtracts the other DifferentialDriveWheelAccelerations from the current DifferentialDriveWheelAccelerations
-   * and returns the difference.
+   * Subtracts the other DifferentialDriveWheelAccelerations from the current
+   * DifferentialDriveWheelAccelerations and returns the difference.
    *
-   * <p>For example, DifferentialDriveWheelAccelerations{5.0, 4.0} - DifferentialDriveWheelAccelerations{1.0, 2.0}
-   * = DifferentialDriveWheelAccelerations{4.0, 2.0}
+   * <p>For example, DifferentialDriveWheelAccelerations{5.0, 4.0} -
+   * DifferentialDriveWheelAccelerations{1.0, 2.0} = DifferentialDriveWheelAccelerations{4.0, 2.0}
    *
    * @param other The DifferentialDriveWheelAccelerations to subtract.
    * @return The difference between the two DifferentialDriveWheelAccelerations.
@@ -80,8 +83,8 @@ public class DifferentialDriveWheelAccelerations implements ProtobufSerializable
   }
 
   /**
-   * Returns the inverse of the current DifferentialDriveWheelAccelerations. This is equivalent to negating
-   * all components of the DifferentialDriveWheelAccelerations.
+   * Returns the inverse of the current DifferentialDriveWheelAccelerations. This is equivalent to
+   * negating all components of the DifferentialDriveWheelAccelerations.
    *
    * @return The inverse of the current DifferentialDriveWheelAccelerations.
    */
@@ -93,8 +96,8 @@ public class DifferentialDriveWheelAccelerations implements ProtobufSerializable
    * Multiplies the DifferentialDriveWheelAccelerations by a scalar and returns the new
    * DifferentialDriveWheelAccelerations.
    *
-   * <p>For example, DifferentialDriveWheelAccelerations{2.0, 2.5} * 2 = DifferentialDriveWheelAccelerations{4.0,
-   * 5.0}
+   * <p>For example, DifferentialDriveWheelAccelerations{2.0, 2.5} * 2 =
+   * DifferentialDriveWheelAccelerations{4.0, 5.0}
    *
    * @param scalar The scalar to multiply by.
    * @return The scaled DifferentialDriveWheelAccelerations.
@@ -107,8 +110,8 @@ public class DifferentialDriveWheelAccelerations implements ProtobufSerializable
    * Divides the DifferentialDriveWheelAccelerations by a scalar and returns the new
    * DifferentialDriveWheelAccelerations.
    *
-   * <p>For example, DifferentialDriveWheelAccelerations{2.0, 2.5} / 2 = DifferentialDriveWheelAccelerations{1.0,
-   * 1.25}
+   * <p>For example, DifferentialDriveWheelAccelerations{2.0, 2.5} / 2 =
+   * DifferentialDriveWheelAccelerations{1.0, 1.25}
    *
    * @param scalar The scalar to divide by.
    * @return The scaled DifferentialDriveWheelAccelerations.

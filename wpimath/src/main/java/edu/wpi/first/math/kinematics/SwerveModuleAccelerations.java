@@ -28,16 +28,20 @@ public class SwerveModuleAccelerations
   public static final SwerveModuleAccelerationsProto proto = new SwerveModuleAccelerationsProto();
 
   /** SwerveModuleAccelerations struct for serialization. */
-  public static final SwerveModuleAccelerationsStruct struct = new SwerveModuleAccelerationsStruct();
+  public static final SwerveModuleAccelerationsStruct struct =
+      new SwerveModuleAccelerationsStruct();
 
-  /** Constructs a SwerveModuleAccelerations with zeros for acceleration and angular acceleration. */
+  /**
+   * Constructs a SwerveModuleAccelerations with zeros for acceleration and angular acceleration.
+   */
   public SwerveModuleAccelerations() {}
 
   /**
    * Constructs a SwerveModuleAccelerations.
    *
    * @param acceleration The acceleration of the wheel of the module in meters per second squared.
-   * @param angularAcceleration The angular acceleration of the module in radians per second squared.
+   * @param angularAcceleration The angular acceleration of the module in radians per second
+   *     squared.
    */
   public SwerveModuleAccelerations(double acceleration, double angularAcceleration) {
     this.acceleration = acceleration;
