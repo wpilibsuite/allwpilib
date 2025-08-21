@@ -127,4 +127,36 @@ class ChassisSpeedsTest {
         () -> assertEquals(0.25, chassisSpeeds.vy),
         () -> assertEquals(0.375, chassisSpeeds.omega));
   }
+
+  @Test
+  void testInterpolation() {
+    var start = new ChassisSpeeds(0.0, 0.0, 0.0);
+    var end = new ChassisSpeeds(10.0, 20.0, 30.0);
+    var result = start.interpolate(end, 0.5);
+
+    assertAll(
+        () -> assertEquals(5.0, result.vx, kEpsilon),
+        () -> assertEquals(10.0, result.vy, kEpsilon),
+        () -> assertEquals(15.0, result.omega, kEpsilon));
+  }
+
+  @Test
+  void testInterpolationAtBounds() {
+    var start = new ChassisSpeeds(1.0, 2.0, 3.0);
+    var end = new ChassisSpeeds(4.0, 5.0, 6.0);
+
+    // Test t = 0 (should return start)
+    var resultStart = start.interpolate(end, 0.0);
+    assertAll(
+        () -> assertEquals(1.0, resultStart.vx, kEpsilon),
+        () -> assertEquals(2.0, resultStart.vy, kEpsilon),
+        () -> assertEquals(3.0, resultStart.omega, kEpsilon));
+
+    // Test t = 1 (should return end)
+    var resultEnd = start.interpolate(end, 1.0);
+    assertAll(
+        () -> assertEquals(4.0, resultEnd.vx, kEpsilon),
+        () -> assertEquals(5.0, resultEnd.vy, kEpsilon),
+        () -> assertEquals(6.0, resultEnd.omega, kEpsilon));
+  }
 }
