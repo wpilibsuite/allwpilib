@@ -170,6 +170,110 @@ class MecanumDriveKinematicsTest {
   }
 
   @Test
+  void testStraightLineInverseAccelerations() {
+    ChassisAccelerations accelerations = new ChassisAccelerations(5, 0, 0);
+    var wheelAccelerations = m_kinematics.toWheelAccelerations(accelerations);
+
+    assertAll(
+        () -> assertEquals(5.0, wheelAccelerations.frontLeft, 0.1),
+        () -> assertEquals(5.0, wheelAccelerations.frontRight, 0.1),
+        () -> assertEquals(5.0, wheelAccelerations.rearLeft, 0.1),
+        () -> assertEquals(5.0, wheelAccelerations.rearRight, 0.1));
+  }
+
+  @Test
+  void testStraightLineForwardAccelerations() {
+    var wheelAccelerations = new MecanumDriveWheelAccelerations(3.536, 3.536, 3.536, 3.536);
+    var chassisAccelerations = m_kinematics.toChassisAccelerations(wheelAccelerations);
+
+    assertAll(
+        () -> assertEquals(3.536, chassisAccelerations.ax, 0.1),
+        () -> assertEquals(0, chassisAccelerations.ay, 0.1),
+        () -> assertEquals(0, chassisAccelerations.alpha, 0.1));
+  }
+
+  @Test
+  void testStrafeInverseAccelerations() {
+    ChassisAccelerations accelerations = new ChassisAccelerations(0, 4, 0);
+    var wheelAccelerations = m_kinematics.toWheelAccelerations(accelerations);
+
+    assertAll(
+        () -> assertEquals(-4.0, wheelAccelerations.frontLeft, 0.1),
+        () -> assertEquals(4.0, wheelAccelerations.frontRight, 0.1),
+        () -> assertEquals(4.0, wheelAccelerations.rearLeft, 0.1),
+        () -> assertEquals(-4.0, wheelAccelerations.rearRight, 0.1));
+  }
+
+  @Test
+  void testStrafeForwardAccelerations() {
+    var wheelAccelerations = new MecanumDriveWheelAccelerations(-2.828427, 2.828427, 2.828427, -2.828427);
+    var chassisAccelerations = m_kinematics.toChassisAccelerations(wheelAccelerations);
+
+    assertAll(
+        () -> assertEquals(0, chassisAccelerations.ax, 0.1),
+        () -> assertEquals(2.8284, chassisAccelerations.ay, 0.1),
+        () -> assertEquals(0, chassisAccelerations.alpha, 0.1));
+  }
+
+  @Test
+  void testRotationInverseAccelerations() {
+    ChassisAccelerations accelerations = new ChassisAccelerations(0, 0, 2 * Math.PI);
+    var wheelAccelerations = m_kinematics.toWheelAccelerations(accelerations);
+
+    assertAll(
+        () -> assertEquals(-150.79645, wheelAccelerations.frontLeft, 0.1),
+        () -> assertEquals(150.79645, wheelAccelerations.frontRight, 0.1),
+        () -> assertEquals(-150.79645, wheelAccelerations.rearLeft, 0.1),
+        () -> assertEquals(150.79645, wheelAccelerations.rearRight, 0.1));
+  }
+
+  @Test
+  void testRotationForwardAccelerations() {
+    var wheelAccelerations = new MecanumDriveWheelAccelerations(-150.79645, 150.79645, -150.79645, 150.79645);
+    var chassisAccelerations = m_kinematics.toChassisAccelerations(wheelAccelerations);
+
+    assertAll(
+        () -> assertEquals(0, chassisAccelerations.ax, 0.1),
+        () -> assertEquals(0, chassisAccelerations.ay, 0.1),
+        () -> assertEquals(2 * Math.PI, chassisAccelerations.alpha, 0.1));
+  }
+
+  @Test
+  void testMixedTranslationRotationInverseAccelerations() {
+    ChassisAccelerations accelerations = new ChassisAccelerations(2, 3, 1);
+    var wheelAccelerations = m_kinematics.toWheelAccelerations(accelerations);
+
+    assertAll(
+        () -> assertEquals(-25.0, wheelAccelerations.frontLeft, 0.1),
+        () -> assertEquals(29.0, wheelAccelerations.frontRight, 0.1),
+        () -> assertEquals(-19.0, wheelAccelerations.rearLeft, 0.1),
+        () -> assertEquals(23.0, wheelAccelerations.rearRight, 0.1));
+  }
+
+  @Test
+  void testMixedTranslationRotationForwardAccelerations() {
+    var wheelAccelerations = new MecanumDriveWheelAccelerations(-17.677670, 20.51, -13.44, 16.26);
+    var chassisAccelerations = m_kinematics.toChassisAccelerations(wheelAccelerations);
+
+    assertAll(
+        () -> assertEquals(1.413, chassisAccelerations.ax, 0.1),
+        () -> assertEquals(2.122, chassisAccelerations.ay, 0.1),
+        () -> assertEquals(0.707, chassisAccelerations.alpha, 0.1));
+  }
+
+  @Test
+  void testOffCenterRotationInverseAccelerations() {
+    ChassisAccelerations accelerations = new ChassisAccelerations(0, 0, 1);
+    var wheelAccelerations = m_kinematics.toWheelAccelerations(accelerations, m_fl);
+
+    assertAll(
+        () -> assertEquals(0, wheelAccelerations.frontLeft, 0.1),
+        () -> assertEquals(24.0, wheelAccelerations.frontRight, 0.1),
+        () -> assertEquals(-24.0, wheelAccelerations.rearLeft, 0.1),
+        () -> assertEquals(48.0, wheelAccelerations.rearRight, 0.1));
+  }
+
+  @Test
   void testOffCenterRotationForwardKinematicsKinematics() {
     var wheelSpeeds = new MecanumDriveWheelSpeeds(0, 16.971, -16.971, 33.941);
     var moduleStates = m_kinematics.toChassisSpeeds(wheelSpeeds);

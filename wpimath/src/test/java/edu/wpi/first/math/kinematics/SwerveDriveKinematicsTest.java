@@ -406,4 +406,65 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(-1.0, arr[2].speed, kEpsilon),
         () -> assertEquals(-1.0, arr[3].speed, kEpsilon));
   }
+
+  @Test
+  void testTurnInPlaceInverseAccelerations() {
+    ChassisAccelerations accelerations = new ChassisAccelerations(0, 0, 2 * Math.PI);
+    var moduleAccelerations = m_kinematics.toSwerveModuleAccelerations(accelerations);
+
+    /*
+    The circumference of the wheels about the COR is π * diameter, or 2π * radius
+    the radius is the √(12²in + 12²in), or 16.9706in, so the circumference the wheels
+    trace out is 106.629190516in. since we want our robot to rotate at 1 rotation per second squared,
+    our wheels must trace out 1 rotation (or 106.63 inches) per second squared.
+      */
+
+    assertAll(
+        () -> assertEquals(106.63, moduleAccelerations[0].acceleration, 0.1),
+        () -> assertEquals(106.63, moduleAccelerations[1].acceleration, 0.1),
+        () -> assertEquals(106.63, moduleAccelerations[2].acceleration, 0.1),
+        () -> assertEquals(106.63, moduleAccelerations[3].acceleration, 0.1),
+        () -> assertEquals(0.0, moduleAccelerations[0].angularAcceleration, kEpsilon),
+        () -> assertEquals(0.0, moduleAccelerations[1].angularAcceleration, kEpsilon),
+        () -> assertEquals(0.0, moduleAccelerations[2].angularAcceleration, kEpsilon),
+        () -> assertEquals(0.0, moduleAccelerations[3].angularAcceleration, kEpsilon));
+  }
+
+  @Test
+  void testTurnInPlaceForwardAccelerations() {
+    SwerveModuleAccelerations flAccel = new SwerveModuleAccelerations(106.629, 0.0);
+    SwerveModuleAccelerations frAccel = new SwerveModuleAccelerations(106.629, 0.0);
+    SwerveModuleAccelerations blAccel = new SwerveModuleAccelerations(106.629, 0.0);
+    SwerveModuleAccelerations brAccel = new SwerveModuleAccelerations(106.629, 0.0);
+
+    // Set the headings to match the turn-in-place configuration
+    m_kinematics.resetHeadings(
+        Rotation2d.fromDegrees(135),
+        Rotation2d.fromDegrees(45),
+        Rotation2d.fromDegrees(-135),
+        Rotation2d.fromDegrees(-45));
+
+    var chassisAccelerations = m_kinematics.toChassisAccelerations(flAccel, frAccel, blAccel, brAccel);
+
+    assertAll(
+        () -> assertEquals(0.0, chassisAccelerations.ax, kEpsilon),
+        () -> assertEquals(0.0, chassisAccelerations.ay, kEpsilon),
+        () -> assertEquals(2 * Math.PI, chassisAccelerations.alpha, 0.1));
+  }
+
+  @Test
+  void testOffCenterRotationInverseAccelerations() {
+    ChassisAccelerations accelerations = new ChassisAccelerations(0, 0, 1);
+    var moduleAccelerations = m_kinematics.toSwerveModuleAccelerations(accelerations, m_fl);
+
+    assertAll(
+        () -> assertEquals(0, moduleAccelerations[0].acceleration, 0.1),
+        () -> assertEquals(24.0, moduleAccelerations[1].acceleration, 0.1),
+        () -> assertEquals(24.0, moduleAccelerations[2].acceleration, 0.1),
+        () -> assertEquals(33.941, moduleAccelerations[3].acceleration, 0.1),
+        () -> assertEquals(0.0, moduleAccelerations[0].angularAcceleration, kEpsilon),
+        () -> assertEquals(0.0, moduleAccelerations[1].angularAcceleration, kEpsilon),
+        () -> assertEquals(0.0, moduleAccelerations[2].angularAcceleration, kEpsilon),
+        () -> assertEquals(0.0, moduleAccelerations[3].angularAcceleration, kEpsilon));
+  }
 }
