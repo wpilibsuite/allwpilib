@@ -43,7 +43,7 @@ import org.ejml.simple.SimpleMatrix;
  */
 @SuppressWarnings("overrides")
 public class SwerveDriveKinematics
-    implements Kinematics<SwerveModuleState[], SwerveModulePosition[]>,
+    implements Kinematics<SwerveModuleState[], SwerveModuleAccelerations[], SwerveModulePosition[]>,
         ProtobufSerializable,
         StructSerializable {
   private final SimpleMatrix m_inverseKinematics;
@@ -440,5 +440,130 @@ public class SwerveDriveKinematics
    */
   public static final SwerveDriveKinematicsStruct getStruct(int numModules) {
     return new SwerveDriveKinematicsStruct(numModules);
+  }
+
+  /**
+   * Performs inverse kinematics to return the module accelerations from a desired chassis
+   * acceleration. This method is often used for dynamics calculations -- converting desired robot
+   * accelerations into individual module accelerations.
+   *
+   * <p>This function also supports variable centers of rotation. During normal operations, the
+   * center of rotation is usually the same as the physical center of the robot; therefore, the
+   * argument is defaulted to that use case. However, if you wish to change the center of rotation
+   * for evasive maneuvers, vision alignment, or for any other use case, you can do so.
+   *
+   * <p>In the case that the desired chassis accelerations are zero (i.e. the robot will be
+   * stationary), the previously calculated module angle will be maintained.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @param centerOfRotation The center of rotation. For example, if you set the center of rotation
+   *     at one corner of the robot and provide a chassis acceleration that only has a dtheta
+   *     component, the robot will rotate around that corner.
+   * @return An array containing the module accelerations.
+   */
+  public SwerveModuleAccelerations[] toSwerveModuleAccelerations(
+      ChassisAccelerations chassisAccelerations, Translation2d centerOfRotation) {
+    var moduleAccelerations = new SwerveModuleAccelerations[m_numModules];
+
+    if (chassisAccelerations.ax == 0.0
+        && chassisAccelerations.ay == 0.0
+        && chassisAccelerations.alpha == 0.0) {
+      for (int i = 0; i < m_numModules; i++) {
+        moduleAccelerations[i] = new SwerveModuleAccelerations(0.0, 0.0);
+      }
+      return moduleAccelerations;
+    }
+
+    if (!centerOfRotation.equals(m_prevCoR)) {
+      for (int i = 0; i < m_numModules; i++) {
+        m_inverseKinematics.setRow(
+            i * 2 + 0, 0, /* Start Data */ 1, 0, -m_modules[i].getY() + centerOfRotation.getY());
+        m_inverseKinematics.setRow(
+            i * 2 + 1, 0, /* Start Data */ 0, 1, +m_modules[i].getX() - centerOfRotation.getX());
+      }
+      m_prevCoR = centerOfRotation;
+    }
+
+    var chassisAccelerationsVector = new SimpleMatrix(3, 1);
+    chassisAccelerationsVector.setColumn(
+        0, 0, chassisAccelerations.ax, chassisAccelerations.ay, chassisAccelerations.alpha);
+
+    var moduleAccelerationsMatrix = m_inverseKinematics.mult(chassisAccelerationsVector);
+
+    for (int i = 0; i < m_numModules; i++) {
+      double x = moduleAccelerationsMatrix.get(i * 2, 0);
+      double y = moduleAccelerationsMatrix.get(i * 2 + 1, 0);
+
+      // For swerve modules, we need to compute both linear acceleration and angular acceleration
+      // The linear acceleration is the magnitude of the acceleration vector
+      double linearAcceleration = Math.hypot(x, y);
+
+      // Angular acceleration represents how fast the module angle is changing
+      // This would typically come from higher-level control algorithms
+      // For basic kinematics, we set it to 0 (constant steering angle)
+      double angularAcceleration = 0.0;
+
+      moduleAccelerations[i] =
+          new SwerveModuleAccelerations(linearAcceleration, angularAcceleration);
+    }
+
+    return moduleAccelerations;
+  }
+
+  /**
+   * Performs inverse kinematics. See {@link #toSwerveModuleAccelerations(ChassisAccelerations,
+   * Translation2d)} toSwerveModuleAccelerations for more information.
+   *
+   * @param chassisAccelerations The desired chassis accelerations.
+   * @return An array containing the module accelerations.
+   */
+  public SwerveModuleAccelerations[] toSwerveModuleAccelerations(
+      ChassisAccelerations chassisAccelerations) {
+    return toSwerveModuleAccelerations(chassisAccelerations, Translation2d.kZero);
+  }
+
+  @Override
+  public SwerveModuleAccelerations[] toWheelAccelerations(
+      ChassisAccelerations chassisAccelerations) {
+    return toSwerveModuleAccelerations(chassisAccelerations);
+  }
+
+  /**
+   * Performs forward kinematics to return the resulting chassis accelerations from the given module
+   * accelerations. This method is often used for dynamics calculations -- determining the robot's
+   * acceleration on the field using data from the real-world acceleration of each module on the
+   * robot.
+   *
+   * @param moduleAccelerations The accelerations of the modules as measured from respective
+   *     encoders and gyros. The order of the swerve module accelerations should be same as passed
+   *     into the constructor of this class.
+   * @return The resulting chassis accelerations.
+   */
+  @Override
+  public ChassisAccelerations toChassisAccelerations(
+      SwerveModuleAccelerations... moduleAccelerations) {
+    if (moduleAccelerations.length != m_numModules) {
+      throw new IllegalArgumentException(
+          "Number of modules is not consistent with number of module locations provided in "
+              + "constructor");
+    }
+    var moduleAccelerationsMatrix = new SimpleMatrix(m_numModules * 2, 1);
+
+    for (int i = 0; i < m_numModules; i++) {
+      var module = moduleAccelerations[i];
+      // For forward kinematics, we need to know the current steering angle of each module
+      // Since we don't have it directly in the accelerations, we'll use the stored headings
+      // In practice, this would come from the current module state
+      Rotation2d moduleAngle = m_moduleHeadings[i];
+
+      moduleAccelerationsMatrix.set(i * 2, 0, module.acceleration * moduleAngle.getCos());
+      moduleAccelerationsMatrix.set(i * 2 + 1, module.acceleration * moduleAngle.getSin());
+    }
+
+    var chassisAccelerationsVector = m_forwardKinematics.mult(moduleAccelerationsMatrix);
+    return new ChassisAccelerations(
+        chassisAccelerationsVector.get(0, 0),
+        chassisAccelerationsVector.get(1, 0),
+        chassisAccelerationsVector.get(2, 0));
   }
 }
