@@ -80,46 +80,6 @@ public class ChassisAccelerations
   }
 
   /**
-   * Creates a Twist2d from ChassisAccelerations.
-   *
-   * @param dt The duration of the timestep in seconds.
-   * @return Twist2d.
-   */
-  public Twist2d toTwist2d(double dt) {
-    return new Twist2d(ax * dt, ay * dt, alpha * dt);
-  }
-
-  /**
-   * Discretizes a continuous-time chassis speed.
-   *
-   * <p>This function converts this continuous-time chassis speed into a discrete-time one such that
-   * when the discrete-time chassis speed is applied for one timestep, the robot moves as if the
-   * velocity components are independent (i.e., the robot moves v_x * dt along the x-axis, v_y * dt
-   * along the y-axis, and alpha * dt around the z-axis).
-   *
-   * <p>This is useful for compensating for translational skew when translating and rotating a
-   * holonomic (swerve or mecanum) drivetrain. However, scaling down the ChassisAccelerations after
-   * discretizing (e.g., when desaturating swerve module speeds) rotates the direction of net motion
-   * in the opposite direction of rotational velocity, introducing a different translational skew
-   * which is not accounted for by discretization.
-   *
-   * @param dt The duration of the timestep in seconds the speeds should be applied for.
-   * @return Discretized ChassisAccelerations.
-   */
-  public ChassisAccelerations discretize(double dt) {
-    // Construct the desired pose after a timestep, relative to the current pose. The desired pose
-    // has decoupled translation and rotation.
-    var desiredDeltaPose = new Pose2d(ax * dt, ay * dt, new Rotation2d(alpha * dt));
-
-    // Find the chassis translation/rotation deltas in the robot frame that move the robot from its
-    // current pose to the desired pose
-    var twist = Pose2d.kZero.log(desiredDeltaPose);
-
-    // Turn the chassis translation/rotation deltas into average velocities
-    return new ChassisAccelerations(twist.dx / dt, twist.dy / dt, twist.dtheta / dt);
-  }
-
-  /**
    * Converts this field-relative set of speeds into a robot-relative ChassisAccelerations object.
    *
    * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
