@@ -469,7 +469,7 @@ public class SwerveDriveKinematics
         && chassisAccelerations.ay == 0.0
         && chassisAccelerations.alpha == 0.0) {
       for (int i = 0; i < m_numModules; i++) {
-        moduleAccelerations[i] = new SwerveModuleAccelerations(0.0, 0.0);
+        moduleAccelerations[i] = new SwerveModuleAccelerations(0.0, Rotation2d.kZero);
       }
       return moduleAccelerations;
     }
@@ -504,7 +504,7 @@ public class SwerveDriveKinematics
       double angularAcceleration = 0.0;
 
       moduleAccelerations[i] =
-          new SwerveModuleAccelerations(linearAcceleration, angularAcceleration);
+          new SwerveModuleAccelerations(linearAcceleration, new Rotation2d(x, y));
     }
 
     return moduleAccelerations;
