@@ -21,9 +21,8 @@ import java.util.Objects;
 
 /**
  * Represents the acceleration of a robot chassis. Although this class contains similar members
- * compared to a Twist2d, they do NOT represent the same thing. Whereas a Twist2d represents a
- * change in pose w.r.t to the robot frame of reference, a ChassisAccelerations object represents a
- * robot's velocity.
+ * compared to a ChassisSpeeds, they do NOT represent the same thing. Whereas a ChassisSpeeds object
+ * represents a robot's velocity, a ChassisAccelerations object represents a robot's acceleration.
  *
  * <p>A strictly non-holonomic drivetrain, such as a differential drive, should never have an ay
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
@@ -31,13 +30,13 @@ import java.util.Objects;
  */
 public class ChassisAccelerations
     implements ProtobufSerializable, StructSerializable, Interpolatable<ChassisAccelerations> {
-  /** Velocity along the x-axis in meters per second². (Fwd is +) */
+  /** Acceleration along the x-axis in meters per second squared. (Fwd is +) */
   public double ax;
 
-  /** Velocity along the y-axis in meters per second². (Left is +) */
+  /** Acceleration along the y-axis in meters per second squared. (Left is +) */
   public double ay;
 
-  /** Angular velocity of the robot frame in radians per second². (CCW is +) */
+  /** Angular acceleration of the robot frame in radians per second squared. (CCW is +) */
   public double alpha;
 
   /** ChassisAccelerations struct for serialization. */
@@ -52,9 +51,9 @@ public class ChassisAccelerations
   /**
    * Constructs a ChassisAccelerations object.
    *
-   * @param ax Forward acceleration in meters per second².
-   * @param ay Sideways acceleration in meters per second².
-   * @param alpha Angular acceleration in radians per second.
+   * @param ax Forward acceleration in meters per second squared.
+   * @param ay Sideways acceleration in meters per second squared.
+   * @param alpha Angular acceleration in radians per second squared.
    */
   public ChassisAccelerations(double ax, double ay, double alpha) {
     this.ax = ax;
@@ -78,12 +77,14 @@ public class ChassisAccelerations
   }
 
   /**
-   * Converts this field-relative set of speeds into a robot-relative ChassisAccelerations object.
+   * Converts this field-relative set of accelerations into a robot-relative ChassisAccelerations
+   * object.
    *
    * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
-   * @return ChassisAccelerations object representing the speeds in the robot's frame of reference.
+   * @return ChassisAccelerations object representing the accelerations in the robot's frame of
+   *     reference.
    */
   public ChassisAccelerations toRobotRelative(Rotation2d robotAngle) {
     // CW rotation into chassis frame
@@ -92,12 +93,14 @@ public class ChassisAccelerations
   }
 
   /**
-   * Converts this robot-relative set of speeds into a field-relative ChassisAccelerations object.
+   * Converts this robot-relative set of accelerations into a field-relative ChassisAccelerations
+   * object.
    *
    * @param robotAngle The angle of the robot as measured by a gyroscope. The robot's angle is
    *     considered to be zero when it is facing directly away from your alliance station wall.
    *     Remember that this should be CCW positive.
-   * @return ChassisAccelerations object representing the speeds in the field's frame of reference.
+   * @return ChassisAccelerations object representing the accelerations in the field's frame of
+   *     reference.
    */
   public ChassisAccelerations toFieldRelative(Rotation2d robotAngle) {
     // CCW rotation out of chassis frame
