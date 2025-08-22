@@ -410,29 +410,33 @@ class SwerveDriveKinematicsTest {
   @Test
   void testTurnInPlaceInverseAccelerations() {
     ChassisAccelerations accelerations = new ChassisAccelerations(0, 0, 2 * Math.PI);
-    var moduleAccelerations = m_kinematics.toSwerveModuleAccelerations(accelerations);
+    double angularVelocity = 2 * Math.PI;
+    var moduleAccelerations =
+        m_kinematics.toSwerveModuleAccelerations(accelerations, angularVelocity);
 
     /*
-    The circumference of the wheels about the COR is π * diameter, or 2π * radius
-    the radius is the √(12²in + 12²in), or 16.9706in, so the circumference the wheels
-    trace out is 106.629190516in.
-    since we want our robot to rotate at 1 rotation per second squared,
-    our wheels must trace out 1 rotation (or 106.63 inches) per second squared.
+    For turn-in-place with angular acceleration of 2π rad/s² and angular velocity of 2π rad/s,
+    each module has both tangential acceleration (from angular acceleration) and centripetal
+    acceleration (from angular velocity). The total acceleration magnitude is approximately 678.4.
 
-    For turn-in-place, each module accelerates tangentially to the circle, so the angle
-    of acceleration should match the expected turning angles:
-    FL: 135°, FR: 45°, BL: -135°, BR: -45°
-      */
+    The acceleration angles are not simply tangential (as in pure rotation) because the
+    centripetal component from the existing angular velocity affects the direction:
+    FL: -144°, FR: 126°, BL: -54°, BR: 36°
+
+    These angles reflect the combination of:
+    - Tangential acceleration from angular acceleration (2π rad/s²)
+    - Centripetal acceleration from angular velocity (2π rad/s)
+    */
 
     assertAll(
-        () -> assertEquals(106.63, moduleAccelerations[0].acceleration, 0.1),
-        () -> assertEquals(106.63, moduleAccelerations[1].acceleration, 0.1),
-        () -> assertEquals(106.63, moduleAccelerations[2].acceleration, 0.1),
-        () -> assertEquals(106.63, moduleAccelerations[3].acceleration, 0.1),
-        () -> assertEquals(135.0, moduleAccelerations[0].angle.getDegrees(), 0.1),
-        () -> assertEquals(45.0, moduleAccelerations[1].angle.getDegrees(), 0.1),
-        () -> assertEquals(-135.0, moduleAccelerations[2].angle.getDegrees(), 0.1),
-        () -> assertEquals(-45.0, moduleAccelerations[3].angle.getDegrees(), 0.1));
+        () -> assertEquals(678.4, moduleAccelerations[0].acceleration, 0.1),
+        () -> assertEquals(678.4, moduleAccelerations[1].acceleration, 0.1),
+        () -> assertEquals(678.4, moduleAccelerations[2].acceleration, 0.1),
+        () -> assertEquals(678.4, moduleAccelerations[3].acceleration, 0.1),
+        () -> assertEquals(-144.0, moduleAccelerations[0].angle.getDegrees(), 0.1),
+        () -> assertEquals(126.0, moduleAccelerations[1].angle.getDegrees(), 0.1),
+        () -> assertEquals(-54.0, moduleAccelerations[2].angle.getDegrees(), 0.1),
+        () -> assertEquals(36.0, moduleAccelerations[3].angle.getDegrees(), 0.1));
   }
 
   @Test
@@ -458,25 +462,32 @@ class SwerveDriveKinematicsTest {
   @Test
   void testOffCenterRotationInverseAccelerations() {
     ChassisAccelerations accelerations = new ChassisAccelerations(0, 0, 1);
-    var moduleAccelerations = m_kinematics.toSwerveModuleAccelerations(accelerations, m_fl);
+    // For this test, assume an angular velocity of 1 rad/s
+    double angularVelocity = 1.0;
+    var moduleAccelerations = m_kinematics.toSwerveModuleAccelerations(accelerations, angularVelocity, m_fl);
 
     /*
-    When rotating about the front-left module position, each module accelerates
-    tangentially to its circular path. The angles should be:
-    FL: stationary (0 acceleration)
-    FR: straight forward (0°)
-    BL: straight right (-90°)
-    BR: -45° (tangent to the diagonal path)
+    When rotating about the front-left module position with both angular acceleration (1 rad/s²)
+    and angular velocity (1 rad/s), each module experiences both tangential and centripetal
+    accelerations that combine vectorially.
+
+    FL: at center of rotation (0 acceleration)
+    FR: 24 units from center, experiences combined acceleration → ~33.94
+    BL: 24 units from center, experiences combined acceleration → ~33.94
+    BR: ~33.94 units from center, experiences combined acceleration → ~48.0
+
+    Angles reflect the vector combination of tangential and centripetal components:
+    FL: -45° (though magnitude is 0), FR: -45°, BL: 45°, BR: 0°
     */
 
     assertAll(
         () -> assertEquals(0, moduleAccelerations[0].acceleration, 0.1),
-        () -> assertEquals(24.0, moduleAccelerations[1].acceleration, 0.1),
-        () -> assertEquals(24.0, moduleAccelerations[2].acceleration, 0.1),
-        () -> assertEquals(33.941, moduleAccelerations[3].acceleration, 0.1),
-        () -> assertEquals(0.0, moduleAccelerations[0].angle.getDegrees(), 0.1), // FL stationary
-        () -> assertEquals(0.0, moduleAccelerations[1].angle.getDegrees(), 0.1), // FR forward
-        () -> assertEquals(-90.0, moduleAccelerations[2].angle.getDegrees(), 0.1), // BL right
-        () -> assertEquals(-45.0, moduleAccelerations[3].angle.getDegrees(), 0.1)); // BR diagonal
+        () -> assertEquals(33.94, moduleAccelerations[1].acceleration, 0.1),
+        () -> assertEquals(33.94, moduleAccelerations[2].acceleration, 0.1),
+        () -> assertEquals(48.0, moduleAccelerations[3].acceleration, 0.1),
+        () -> assertEquals(0.0, moduleAccelerations[0].angle.getDegrees(), 0.1),
+        () -> assertEquals(-45.0, moduleAccelerations[1].angle.getDegrees(), 0.1),
+        () -> assertEquals(45.0, moduleAccelerations[2].angle.getDegrees(), 0.1),
+        () -> assertEquals(0.0, moduleAccelerations[3].angle.getDegrees(), 0.1));
   }
 }
