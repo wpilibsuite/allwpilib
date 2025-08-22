@@ -110,6 +110,22 @@ public class Translation2d
   }
 
   /**
+   * Calculates the square of the distance between two translations in 2D space. This is equivalent
+   * to squaring the result of {@link #getDistance(Translation2d)}, but avoids computing a square
+   * root.
+   *
+   * <p>The square of the distance between translations is defined as (x₂−x₁)²+(y₂−y₁)².
+   *
+   * @param other The translation to compute the squared distance to.
+   * @return The square of the distance between the two translations, in square meters.
+   */
+  public double getSquaredDistance(Translation2d other) {
+    double dx = other.m_x - m_x;
+    double dy = other.m_y - m_y;
+    return dx * dx + dy * dy;
+  }
+
+  /**
    * Returns the X component of the translation.
    *
    * @return The X component of the translation.
@@ -166,6 +182,16 @@ public class Translation2d
   }
 
   /**
+   * Returns the squared norm, or squared distance from the origin to the translation. This is
+   * equivalent to squaring the result of {@link #getNorm()}, but avoids computing a square root.
+   *
+   * @return The squared norm of the translation, in square meters.
+   */
+  public double getSquaredNorm() {
+    return m_x * m_x + m_y * m_y;
+  }
+
+  /**
    * Returns the angle this translation forms with the positive X axis.
    *
    * @return The angle of the translation
@@ -212,6 +238,30 @@ public class Translation2d
     return new Translation2d(
         (m_x - other.getX()) * rot.getCos() - (m_y - other.getY()) * rot.getSin() + other.getX(),
         (m_x - other.getX()) * rot.getSin() + (m_y - other.getY()) * rot.getCos() + other.getY());
+  }
+
+  /**
+   * Computes the dot product between this translation and another translation in 2D space.
+   *
+   * <p>The dot product between two translations is defined as x₁x₂+y₁y₂.
+   *
+   * @param other The translation to compute the dot product with.
+   * @return The dot product between the two translations, in square meters.
+   */
+  public double dot(Translation2d other) {
+    return m_x * other.m_x + m_y * other.m_y;
+  }
+
+  /**
+   * Computes the cross product between this translation and another translation in 2D space.
+   *
+   * <p>The 2D cross product between two translations is defined as x₁y₂-x₂y₁.
+   *
+   * @param other The translation to compute the cross product with.
+   * @return The cross product between the two translations, in square meters.
+   */
+  public double cross(Translation2d other) {
+    return m_x * other.m_y - m_y * other.m_x;
   }
 
   /**

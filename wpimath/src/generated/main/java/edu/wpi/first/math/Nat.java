@@ -37,6 +37,7 @@ import edu.wpi.first.math.numbers.N20;
  *
  * @param <T> The {@link Num} this represents.
  */
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface Nat<T extends Num> {
   /**
    * The number this interface represents.

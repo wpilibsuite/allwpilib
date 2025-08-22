@@ -68,8 +68,9 @@ public class CvSource extends ImageSource {
             case 2 -> PixelFormat.kYUYV; // 2 channels is assumed YUYV
             case 3 -> PixelFormat.kBGR; // 3 channels is assumed BGR
             case 4 -> PixelFormat.kBGRA; // 4 channels is assumed BGRA
-            default -> throw new VideoException(
-                "Unable to get pixel format for " + channels + " channels");
+            default ->
+                throw new VideoException(
+                    "Unable to get pixel format for " + channels + " channels");
           };
 
       putFrame(finalImage, format, true);

@@ -87,7 +87,6 @@ class CleanupPoolTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   void cleanupStackWithExceptionInCloseWorks() {
     List<AutoCloseableObject> objects = new ArrayList<>();
     objects.add(new AutoCloseableObject());

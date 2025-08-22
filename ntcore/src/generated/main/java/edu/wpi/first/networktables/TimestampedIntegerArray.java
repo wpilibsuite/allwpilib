@@ -7,7 +7,6 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables timestamped IntegerArray. */
-@SuppressWarnings("PMD.ArrayIsStoredDirectly")
 public final class TimestampedIntegerArray {
   /**
    * Create a timestamped value.

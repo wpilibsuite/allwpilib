@@ -24,7 +24,6 @@ import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-@SuppressWarnings("PMD.MutableStaticState")
 class AprilTagDetectorTest {
   @SuppressWarnings("MemberName")
   AprilTagDetector detector;

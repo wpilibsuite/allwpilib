@@ -9,7 +9,6 @@ package edu.wpi.first.networktables;
 import edu.wpi.first.util.function.FloatSupplier;
 
 /** NetworkTables Float subscriber. */
-@SuppressWarnings("PMD.MissingOverride")
 public interface FloatSubscriber extends Subscriber, FloatSupplier {
   /**
    * Get the corresponding topic.

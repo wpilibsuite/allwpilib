@@ -7,7 +7,6 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables Float implementation. */
-@SuppressWarnings("PMD.ArrayIsStoredDirectly")
 final class FloatEntryImpl extends EntryBase implements FloatEntry {
   /**
    * Constructor.

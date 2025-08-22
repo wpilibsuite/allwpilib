@@ -134,8 +134,8 @@ public class PowerDistributionStickyFaults {
       case 21 -> Channel21BreakerFault;
       case 22 -> Channel22BreakerFault;
       case 23 -> Channel23BreakerFault;
-      default -> throw new IndexOutOfBoundsException(
-          "Power distribution fault channel out of bounds!");
+      default ->
+          throw new IndexOutOfBoundsException("Power distribution fault channel out of bounds!");
     };
   }
 

@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
  * your `close` method, that will use reflection to find all `AutoCloseable` instance members and
  * close them.
  */
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface ReflectionCleanup extends AutoCloseable {
   /**
    * Default implementation that uses reflection to find all AutoCloseable fields not marked
