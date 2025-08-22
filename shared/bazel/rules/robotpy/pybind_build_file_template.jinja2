@@ -202,16 +202,6 @@ def define_pybind_library(name, pkgcfgs = []):
             "{{d}}",
             {%- endfor %}
         ],
-        strip_path_prefixes = ["{% if top_level_name == "robotpy_apriltag" %}{{"apriltag"}}{% else %}{{top_level_name}}{% endif %}/{{stripped_include_prefix}}/"],
-        summary = "{{raw_project_config.description}}",
-        project_urls = {{raw_project_config.urls | jsonify}},
-        author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
-        requires = {{raw_project_config.dependencies | jsonify}},
-        entry_points = {
-            {%- for group, entries in entry_points.items() %}
-            "{{ group }}": {{entries | jsonify}},
-            {%- endfor %}
-        },
         visibility = ["//visibility:public"],
     )
 

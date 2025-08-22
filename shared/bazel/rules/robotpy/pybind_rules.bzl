@@ -1,7 +1,6 @@
 load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 load("@rules_python//python:defs.bzl", "py_library")
-load("@rules_python//python:packaging.bzl", "py_wheel")
 load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
 
 def create_pybind_library(
@@ -83,50 +82,19 @@ def create_pybind_library(
 
 def robotpy_library(
         name,
-        strip_path_prefixes,
         data = [],
-        python_tag = "cp310",  # TODO(pj) Select based on python version
-        abi = "cp310",  # TODO(pj) Select based on python version
-        summary = None,
-        project_urls = None,
-        author_email = None,
-        entry_points = None,
-        requires = None,
         **kwargs):
     """
     Defines a python library that is wrapping a series of pybind extensions.
 
     Outputs:
         <name> - The python library
-        <name>-wheel - A wheel for the library
     """
     py_library(
         name = name,
         data = data,
         tags = ["robotpy"],
         **kwargs
-    )
-
-    py_wheel(
-        name = "{}-wheel".format(name),
-        distribution = name,
-        platform = select({
-            "@bazel_tools//src/conditions:darwin": "macosx_11_0_x86_64",
-            "@bazel_tools//src/conditions:windows": "win_amd64",
-            "//conditions:default": "manylinux_2_35_x86_64",
-        }),
-        abi = abi,
-        python_tag = python_tag,
-        stamp = 1,
-        version = "2027.0.0a1.dev0",  # TODO(pj)
-        summary = summary,
-        requires = requires,
-        project_urls = project_urls,
-        author_email = author_email,
-        deps = data + [":{}".format(name)],
-        strip_path_prefixes = strip_path_prefixes,
-        entry_points = entry_points,
-        tags = ["robotpy"],
     )
 
 def copy_native_file(name, library, base_path):
@@ -185,14 +153,6 @@ def native_wrappery_library(
         native_shared_library,
         install_path,
         headers,
-        strip_path_prefixes = [],
-        python_tag = "py3",  # TODO(pj)
-        abi = "none",
-        summary = None,
-        project_urls = None,
-        author_email = None,
-        entry_points = None,
-        requires = None,
         deps = []):
     """
     This function provides a sugar wrapper for defining a python library that wraps an allwpilib native library
@@ -233,27 +193,5 @@ def native_wrappery_library(
         deps = deps,
         imports = ["."],
         visibility = ["//visibility:public"],
-        tags = ["robotpy"],
-    )
-
-    py_wheel(
-        name = "{}-wheel".format(name),
-        distribution = name,
-        platform = select({
-            "@bazel_tools//src/conditions:darwin": "macosx_11_0_x86_64",
-            "@bazel_tools//src/conditions:windows": "win_amd64",
-            "//conditions:default": "manylinux_2_35_x86_64",
-        }),
-        abi = abi,
-        python_tag = python_tag,
-        stamp = 1,
-        version = "2027.0.0a1.dev0",  # TODO(pj)
-        summary = summary,
-        requires = requires,
-        project_urls = project_urls,
-        author_email = author_email,
-        deps = [name, ":{}.copy_lib".format(libname), headers, name + ".pc_wrapper"],
-        strip_path_prefixes = strip_path_prefixes,
-        entry_points = entry_points,
         tags = ["robotpy"],
     )

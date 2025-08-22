@@ -102,14 +102,6 @@ def define_native_wrapper(name, pyproject_toml = None):
         headers = "{}.copy_headers".format(name),
         native_shared_library = "shared/{{shared_library_name}}",
         install_path = "native/{{nativelib_config.pcfile[0].name}}/",
-        strip_path_prefixes = ["{{root_package}}"],
-        requires = {{raw_project_config.dependencies | double_quotes}},
-        summary = "{{raw_project_config.description}}",
-        entry_points = {
-            "pkg_config": [
-                "{{nativelib_config.pcfile[0].name}} = native.{{nativelib_config.pcfile[0].name}}",
-            ],
-        },
     )
 
 """

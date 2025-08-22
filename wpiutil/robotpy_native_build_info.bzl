@@ -50,12 +50,4 @@ def define_native_wrapper(name, pyproject_toml = None):
         headers = "{}.copy_headers".format(name),
         native_shared_library = "shared/wpiutil",
         install_path = "native/wpiutil/",
-        strip_path_prefixes = ["wpiutil"],
-        requires = ["msvc-runtime>=14.42.34433; platform_system == 'Windows'"],
-        summary = "WPILib Utility Library",
-        entry_points = {
-            "pkg_config": [
-                "wpiutil = native.wpiutil",
-            ],
-        },
     )
