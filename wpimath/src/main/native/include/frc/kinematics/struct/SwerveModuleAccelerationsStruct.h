@@ -14,7 +14,7 @@ struct WPILIB_DLLEXPORT wpi::Struct<frc::SwerveModuleAccelerations> {
   static constexpr std::string_view GetTypeName() { return "SwerveModuleAccelerations"; }
   static constexpr size_t GetSize() { return 16; }
   static constexpr std::string_view GetSchema() {
-    return "double acceleration;double angular_acceleration";
+    return "double acceleration;double angle";
   }
 
   static frc::SwerveModuleAccelerations Unpack(std::span<const uint8_t> data);

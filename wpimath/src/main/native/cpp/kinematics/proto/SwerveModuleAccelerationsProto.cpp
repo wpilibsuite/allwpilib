@@ -15,7 +15,7 @@ std::optional<frc::SwerveModuleAccelerations> wpi::Protobuf<frc::SwerveModuleAcc
 
   return frc::SwerveModuleAccelerations{
       units::meters_per_second_squared_t{msg.acceleration},
-      units::radians_per_second_squared_t{msg.angular_acceleration},
+      frc::Rotation2d{units::radian_t{msg.angle}},
   };
 }
 
@@ -23,7 +23,7 @@ bool wpi::Protobuf<frc::SwerveModuleAccelerations>::Pack(OutputStream& stream,
                                                         const frc::SwerveModuleAccelerations& value) {
   wpi_proto_ProtobufSwerveModuleAccelerations msg{
       .acceleration = value.acceleration.value(),
-      .angular_acceleration = value.angularAcceleration.value(),
+      .angle = value.angle.Radians().value(),
   };
   return stream.Encode(msg);
 }

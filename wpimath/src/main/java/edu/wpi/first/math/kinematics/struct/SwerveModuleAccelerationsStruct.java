@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.kinematics.struct;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleAccelerations;
 import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
@@ -26,19 +27,19 @@ public class SwerveModuleAccelerationsStruct implements Struct<SwerveModuleAccel
 
   @Override
   public String getSchema() {
-    return "double acceleration;double angular_acceleration";
+    return "double acceleration;double angle";
   }
 
   @Override
   public SwerveModuleAccelerations unpack(ByteBuffer bb) {
     double acceleration = bb.getDouble();
-    double angularAcceleration = bb.getDouble();
-    return new SwerveModuleAccelerations(acceleration, angularAcceleration);
+    double angle = bb.getDouble();
+    return new SwerveModuleAccelerations(acceleration, new Rotation2d(angle));
   }
 
   @Override
   public void pack(ByteBuffer bb, SwerveModuleAccelerations value) {
     bb.putDouble(value.acceleration);
-    bb.putDouble(value.angularAcceleration);
+    bb.putDouble(value.angle.getRadians());
   }
 }

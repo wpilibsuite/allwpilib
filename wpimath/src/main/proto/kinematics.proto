@@ -81,5 +81,5 @@ message ProtobufSwerveModuleState {
 
 message ProtobufSwerveModuleAccelerations {
   double acceleration = 1;
-  double angular_acceleration = 2;
+  double angle = 2;
 }

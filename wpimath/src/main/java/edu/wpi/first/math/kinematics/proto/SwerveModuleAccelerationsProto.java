@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.kinematics.proto;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleAccelerations;
 import edu.wpi.first.math.proto.Kinematics.ProtobufSwerveModuleAccelerations;
 import edu.wpi.first.util.protobuf.Protobuf;
@@ -28,12 +29,12 @@ public class SwerveModuleAccelerationsProto
 
   @Override
   public SwerveModuleAccelerations unpack(ProtobufSwerveModuleAccelerations msg) {
-    return new SwerveModuleAccelerations(msg.getAcceleration(), msg.getAngularAcceleration());
+    return new SwerveModuleAccelerations(msg.getAcceleration(), new Rotation2d(msg.getAngle()));
   }
 
   @Override
   public void pack(ProtobufSwerveModuleAccelerations msg, SwerveModuleAccelerations value) {
     msg.setAcceleration(value.acceleration);
-    msg.setAngularAcceleration(value.angularAcceleration);
+    msg.setAngle(value.angle.getRadians());
   }
 }

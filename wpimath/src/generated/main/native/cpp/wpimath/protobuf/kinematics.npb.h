@@ -147,7 +147,7 @@ typedef struct _wpi_proto_ProtobufSwerveModuleAccelerations {
     static pb_filedesc_t file_descriptor(void) noexcept;
 
     double acceleration;
-    double angular_acceleration;
+    double angle;
 } wpi_proto_ProtobufSwerveModuleAccelerations;
 
 
@@ -217,7 +217,7 @@ typedef struct _wpi_proto_ProtobufSwerveModuleAccelerations {
 #define wpi_proto_ProtobufSwerveModuleState_speed_tag 1
 #define wpi_proto_ProtobufSwerveModuleState_angle_tag 2
 #define wpi_proto_ProtobufSwerveModuleAccelerations_acceleration_tag 1
-#define wpi_proto_ProtobufSwerveModuleAccelerations_angular_acceleration_tag 2
+#define wpi_proto_ProtobufSwerveModuleAccelerations_angle_tag 2
 
 /* Struct field encoding specification for nanopb */
 #define wpi_proto_ProtobufChassisSpeeds_FIELDLIST(X, a) \
@@ -315,7 +315,7 @@ X(a, CALLBACK, OPTIONAL, MESSAGE,  angle,             2)
 
 #define wpi_proto_ProtobufSwerveModuleAccelerations_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, DOUBLE,   acceleration,      1) \
-X(a, STATIC,   SINGULAR, DOUBLE,   angular_acceleration,   2)
+X(a, STATIC,   SINGULAR, DOUBLE,   angle,             2)
 #define wpi_proto_ProtobufSwerveModuleAccelerations_CALLBACK NULL
 #define wpi_proto_ProtobufSwerveModuleAccelerations_DEFAULT NULL
 

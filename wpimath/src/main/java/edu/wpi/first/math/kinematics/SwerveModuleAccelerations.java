@@ -5,12 +5,11 @@
 package edu.wpi.first.math.kinematics;
 
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.proto.SwerveModuleAccelerationsProto;
 import edu.wpi.first.math.kinematics.struct.SwerveModuleAccelerationsStruct;
-import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
@@ -25,8 +24,8 @@ public class SwerveModuleAccelerations
   /** Acceleration of the wheel of the module in meters per second squared. */
   public double acceleration;
 
-  /** Angular acceleration of the module in radians per second squared. */
-  public double angularAcceleration;
+  /** Angle of the acceleration vector. */
+  public Rotation2d angle = new Rotation2d();
 
   /** SwerveModuleAccelerations protobuf for serialization. */
   public static final SwerveModuleAccelerationsProto proto = new SwerveModuleAccelerationsProto();
@@ -36,7 +35,7 @@ public class SwerveModuleAccelerations
       new SwerveModuleAccelerationsStruct();
 
   /**
-   * Constructs a SwerveModuleAccelerations with zeros for acceleration and angular acceleration.
+   * Constructs a SwerveModuleAccelerations with zeros for acceleration and angle.
    */
   public SwerveModuleAccelerations() {}
 
@@ -44,80 +43,21 @@ public class SwerveModuleAccelerations
    * Constructs a SwerveModuleAccelerations.
    *
    * @param acceleration The acceleration of the wheel of the module in meters per second squared.
-   * @param angularAcceleration The angular acceleration of the module in radians per second
-   *     squared.
+   * @param angle The angle of the acceleration vector.
    */
-  public SwerveModuleAccelerations(double acceleration, double angularAcceleration) {
+  public SwerveModuleAccelerations(double acceleration, Rotation2d angle) {
     this.acceleration = acceleration;
-    this.angularAcceleration = angularAcceleration;
+    this.angle = angle;
   }
 
   /**
    * Constructs a SwerveModuleAccelerations.
    *
    * @param acceleration The acceleration of the wheel of the module.
-   * @param angularAcceleration The angular acceleration of the module.
+   * @param angle The angle of the acceleration vector.
    */
-  public SwerveModuleAccelerations(
-      LinearAcceleration acceleration, AngularAcceleration angularAcceleration) {
-    this(
-        acceleration.in(MetersPerSecondPerSecond),
-        angularAcceleration.in(RadiansPerSecondPerSecond));
-  }
-
-  /**
-   * Adds two SwerveModuleAccelerations and returns the sum.
-   *
-   * @param other The SwerveModuleAccelerations to add.
-   * @return The sum of the SwerveModuleAccelerations.
-   */
-  public SwerveModuleAccelerations plus(SwerveModuleAccelerations other) {
-    return new SwerveModuleAccelerations(
-        acceleration + other.acceleration, angularAcceleration + other.angularAcceleration);
-  }
-
-  /**
-   * Subtracts the other SwerveModuleAccelerations from the current SwerveModuleAccelerations and
-   * returns the difference.
-   *
-   * @param other The SwerveModuleAccelerations to subtract.
-   * @return The difference between the two SwerveModuleAccelerations.
-   */
-  public SwerveModuleAccelerations minus(SwerveModuleAccelerations other) {
-    return new SwerveModuleAccelerations(
-        acceleration - other.acceleration, angularAcceleration - other.angularAcceleration);
-  }
-
-  /**
-   * Returns the inverse of the current SwerveModuleAccelerations. This is equivalent to negating
-   * all components of the SwerveModuleAccelerations.
-   *
-   * @return The inverse of the current SwerveModuleAccelerations.
-   */
-  public SwerveModuleAccelerations unaryMinus() {
-    return new SwerveModuleAccelerations(-acceleration, -angularAcceleration);
-  }
-
-  /**
-   * Multiplies the SwerveModuleAccelerations by a scalar and returns the new
-   * SwerveModuleAccelerations.
-   *
-   * @param scalar The scalar to multiply by.
-   * @return The scaled SwerveModuleAccelerations.
-   */
-  public SwerveModuleAccelerations times(double scalar) {
-    return new SwerveModuleAccelerations(acceleration * scalar, angularAcceleration * scalar);
-  }
-
-  /**
-   * Divides the SwerveModuleAccelerations by a scalar and returns the new
-   * SwerveModuleAccelerations.
-   *
-   * @param scalar The scalar to divide by.
-   * @return The scaled SwerveModuleAccelerations.
-   */
-  public SwerveModuleAccelerations div(double scalar) {
-    return new SwerveModuleAccelerations(acceleration / scalar, angularAcceleration / scalar);
+  public SwerveModuleAccelerations(LinearAcceleration acceleration, Rotation2d angle) {
+    this(acceleration.in(MetersPerSecondPerSecond), angle);
   }
 
   /**
@@ -134,24 +74,24 @@ public class SwerveModuleAccelerations
 
     return new SwerveModuleAccelerations(
         acceleration + t * (endValue.acceleration - acceleration),
-        angularAcceleration + t * (endValue.angularAcceleration - angularAcceleration));
+        angle.interpolate(endValue.angle, t));
   }
 
   @Override
   public boolean equals(Object obj) {
     return obj instanceof SwerveModuleAccelerations other
         && Math.abs(other.acceleration - acceleration) < 1E-9
-        && Math.abs(other.angularAcceleration - angularAcceleration) < 1E-9;
+        && angle.equals(other.angle);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(acceleration, angularAcceleration);
+    return Objects.hash(acceleration, angle);
   }
 
   /**
    * Compares two swerve module accelerations. One swerve module is "greater" than the other if its
-   * acceleration is higher than the other.
+   * acceleration magnitude is higher than the other.
    *
    * @param other The other swerve module.
    * @return 1 if this is greater, 0 if both are equal, -1 if other is greater.
@@ -164,7 +104,7 @@ public class SwerveModuleAccelerations
   @Override
   public String toString() {
     return String.format(
-        "SwerveModuleAccelerations(Acceleration: %.2f m/s², Angular Acceleration: %.2f rad/s²)",
-        acceleration, angularAcceleration);
+        "SwerveModuleAccelerations(Acceleration: %.2f m/s², Angle: %s)",
+        acceleration, angle);
   }
 }
