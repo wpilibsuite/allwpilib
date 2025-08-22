@@ -418,6 +418,10 @@ class SwerveDriveKinematicsTest {
     trace out is 106.629190516in.
     since we want our robot to rotate at 1 rotation per second squared,
     our wheels must trace out 1 rotation (or 106.63 inches) per second squared.
+
+    For turn-in-place, each module accelerates tangentially to the circle, so the angle
+    of acceleration should match the expected turning angles:
+    FL: 135°, FR: 45°, BL: -135°, BR: -45°
       */
 
     assertAll(
@@ -425,32 +429,29 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(106.63, moduleAccelerations[1].acceleration, 0.1),
         () -> assertEquals(106.63, moduleAccelerations[2].acceleration, 0.1),
         () -> assertEquals(106.63, moduleAccelerations[3].acceleration, 0.1),
-        () -> assertEquals(0.0, moduleAccelerations[0].angularAcceleration, kEpsilon),
-        () -> assertEquals(0.0, moduleAccelerations[1].angularAcceleration, kEpsilon),
-        () -> assertEquals(0.0, moduleAccelerations[2].angularAcceleration, kEpsilon),
-        () -> assertEquals(0.0, moduleAccelerations[3].angularAcceleration, kEpsilon));
+        () -> assertEquals(135.0, moduleAccelerations[0].angle.getDegrees(), 0.1),
+        () -> assertEquals(45.0, moduleAccelerations[1].angle.getDegrees(), 0.1),
+        () -> assertEquals(-135.0, moduleAccelerations[2].angle.getDegrees(), 0.1),
+        () -> assertEquals(-45.0, moduleAccelerations[3].angle.getDegrees(), 0.1));
   }
 
   @Test
   void testTurnInPlaceForwardAccelerations() {
-    SwerveModuleAccelerations flAccel = new SwerveModuleAccelerations(106.629, 0.0);
-    SwerveModuleAccelerations frAccel = new SwerveModuleAccelerations(106.629, 0.0);
-    SwerveModuleAccelerations blAccel = new SwerveModuleAccelerations(106.629, 0.0);
-    SwerveModuleAccelerations brAccel = new SwerveModuleAccelerations(106.629, 0.0);
-
-    // Set the headings to match the turn-in-place configuration
-    m_kinematics.resetHeadings(
-        Rotation2d.fromDegrees(135),
-        Rotation2d.fromDegrees(45),
-        Rotation2d.fromDegrees(-135),
-        Rotation2d.fromDegrees(-45));
+    SwerveModuleAccelerations flAccel =
+        new SwerveModuleAccelerations(106.629, Rotation2d.fromDegrees(135));
+    SwerveModuleAccelerations frAccel =
+        new SwerveModuleAccelerations(106.629, Rotation2d.fromDegrees(45));
+    SwerveModuleAccelerations blAccel =
+        new SwerveModuleAccelerations(106.629, Rotation2d.fromDegrees(-135));
+    SwerveModuleAccelerations brAccel =
+        new SwerveModuleAccelerations(106.629, Rotation2d.fromDegrees(-45));
 
     var chassisAccelerations =
         m_kinematics.toChassisAccelerations(flAccel, frAccel, blAccel, brAccel);
 
     assertAll(
-        () -> assertEquals(0.0, chassisAccelerations.ax, kEpsilon),
-        () -> assertEquals(0.0, chassisAccelerations.ay, kEpsilon),
+        () -> assertEquals(0.0, chassisAccelerations.ax, 0.1),
+        () -> assertEquals(0.0, chassisAccelerations.ay, 0.1),
         () -> assertEquals(2 * Math.PI, chassisAccelerations.alpha, 0.1));
   }
 
@@ -459,14 +460,23 @@ class SwerveDriveKinematicsTest {
     ChassisAccelerations accelerations = new ChassisAccelerations(0, 0, 1);
     var moduleAccelerations = m_kinematics.toSwerveModuleAccelerations(accelerations, m_fl);
 
+    /*
+    When rotating about the front-left module position, each module accelerates
+    tangentially to its circular path. The angles should be:
+    FL: stationary (0 acceleration)
+    FR: straight forward (0°)
+    BL: straight right (-90°)
+    BR: -45° (tangent to the diagonal path)
+    */
+
     assertAll(
         () -> assertEquals(0, moduleAccelerations[0].acceleration, 0.1),
         () -> assertEquals(24.0, moduleAccelerations[1].acceleration, 0.1),
         () -> assertEquals(24.0, moduleAccelerations[2].acceleration, 0.1),
         () -> assertEquals(33.941, moduleAccelerations[3].acceleration, 0.1),
-        () -> assertEquals(0.0, moduleAccelerations[0].angularAcceleration, kEpsilon),
-        () -> assertEquals(0.0, moduleAccelerations[1].angularAcceleration, kEpsilon),
-        () -> assertEquals(0.0, moduleAccelerations[2].angularAcceleration, kEpsilon),
-        () -> assertEquals(0.0, moduleAccelerations[3].angularAcceleration, kEpsilon));
+        () -> assertEquals(0.0, moduleAccelerations[0].angle.getDegrees(), 0.1), // FL stationary
+        () -> assertEquals(0.0, moduleAccelerations[1].angle.getDegrees(), 0.1), // FR forward
+        () -> assertEquals(-90.0, moduleAccelerations[2].angle.getDegrees(), 0.1), // BL right
+        () -> assertEquals(-45.0, moduleAccelerations[3].angle.getDegrees(), 0.1)); // BR diagonal
   }
 }

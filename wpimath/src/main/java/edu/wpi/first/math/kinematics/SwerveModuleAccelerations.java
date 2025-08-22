@@ -34,9 +34,7 @@ public class SwerveModuleAccelerations
   public static final SwerveModuleAccelerationsStruct struct =
       new SwerveModuleAccelerationsStruct();
 
-  /**
-   * Constructs a SwerveModuleAccelerations with zeros for acceleration and angle.
-   */
+  /** Constructs a SwerveModuleAccelerations with zeros for acceleration and angle. */
   public SwerveModuleAccelerations() {}
 
   /**
@@ -104,7 +102,6 @@ public class SwerveModuleAccelerations
   @Override
   public String toString() {
     return String.format(
-        "SwerveModuleAccelerations(Acceleration: %.2f m/s², Angle: %s)",
-        acceleration, angle);
+        "SwerveModuleAccelerations(Acceleration: %.2f m/s², Angle: %s)", acceleration, angle);
   }
 }

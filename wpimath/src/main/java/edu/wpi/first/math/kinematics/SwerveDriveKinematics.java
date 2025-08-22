@@ -498,13 +498,8 @@ public class SwerveDriveKinematics
       // The linear acceleration is the magnitude of the acceleration vector
       double linearAcceleration = Math.hypot(x, y);
 
-      // Angular acceleration represents how fast the module angle is changing
-      // This would typically come from higher-level control algorithms
-      // For basic kinematics, we set it to 0 (constant steering angle)
-      double angularAcceleration = 0.0;
-
       moduleAccelerations[i] =
-          new SwerveModuleAccelerations(linearAcceleration, new Rotation2d(x, y));
+          new SwerveModuleAccelerations(linearAcceleration, Rotation2d.fromRadians(Math.atan2(y, x)));
     }
 
     return moduleAccelerations;
@@ -551,13 +546,9 @@ public class SwerveDriveKinematics
 
     for (int i = 0; i < m_numModules; i++) {
       var module = moduleAccelerations[i];
-      // For forward kinematics, we need to know the current steering angle of each module
-      // Since we don't have it directly in the accelerations, we'll use the stored headings
-      // In practice, this would come from the current module state
-      Rotation2d moduleAngle = m_moduleHeadings[i];
 
-      moduleAccelerationsMatrix.set(i * 2, 0, module.acceleration * moduleAngle.getCos());
-      moduleAccelerationsMatrix.set(i * 2 + 1, module.acceleration * moduleAngle.getSin());
+      moduleAccelerationsMatrix.set(i * 2, 0, module.acceleration * module.angle.getCos());
+      moduleAccelerationsMatrix.set(i * 2 + 1, module.acceleration * module.angle.getSin());
     }
 
     var chassisAccelerationsVector = m_forwardKinematics.mult(moduleAccelerationsMatrix);
