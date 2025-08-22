@@ -110,7 +110,6 @@ public class ReadOnlyPrimitiveLongSet implements Iterable<Long> {
   @Override
   public Iterator<Long> iterator() {
     return new Iterator<>() {
-      @SuppressWarnings("PMD.RedundantFieldInitializer")
       private int m_index = 0;
 
       @Override
