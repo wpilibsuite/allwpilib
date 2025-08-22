@@ -226,7 +226,7 @@ public final class SplineHelper {
    * @param splines An array of un-optimized quintic splines.
    * @return An array of optimized quintic splines.
    */
-  @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
+  @SuppressWarnings("LocalVariableName")
   public static QuinticHermiteSpline[] optimizeCurvature(QuinticHermiteSpline[] splines) {
     // If there's only spline in the array, we can't optimize anything so just return that.
     if (splines.length < 2) {

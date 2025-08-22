@@ -10,7 +10,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.mutable.MutableMeasureBase;
 
-@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle"})
 public final class MutTorque
   extends MutableMeasureBase<TorqueUnit, Torque, MutTorque>
   implements Torque {

@@ -9,6 +9,7 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
+  src/main/native/assets/
   src/main/native/resources/
   src/main/native/thirdparty/
   src/main/native/win/wpical.ico

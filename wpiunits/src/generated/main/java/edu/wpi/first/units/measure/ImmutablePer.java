@@ -9,7 +9,7 @@ package edu.wpi.first.units.measure;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 
-@SuppressWarnings({"unchecked", "cast", "checkstyle", "PMD"})
+@SuppressWarnings({"unchecked", "cast", "checkstyle"})
 public record ImmutablePer<Dividend extends Unit, Divisor extends Unit>(double magnitude, double baseUnitMagnitude, PerUnit<Dividend, Divisor> unit) implements Per<Dividend, Divisor> {
   @Override
   public Per<Dividend, Divisor> copy() {

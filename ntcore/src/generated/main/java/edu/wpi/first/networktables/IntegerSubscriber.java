@@ -9,7 +9,6 @@ package edu.wpi.first.networktables;
 import java.util.function.LongSupplier;
 
 /** NetworkTables Integer subscriber. */
-@SuppressWarnings("PMD.MissingOverride")
 public interface IntegerSubscriber extends Subscriber, LongSupplier {
   /**
    * Get the corresponding topic.
