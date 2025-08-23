@@ -108,9 +108,9 @@ public final class MathUtil {
   }
 
   /**
-   * Returns a zero vector if the given vector is within the specified distance from the
-   * origin. The remaining distance between the deadband and the maximum distance is scaled from the
-   * origin to the maximum distance.
+   * Returns a zero vector if the given vector is within the specified distance from the origin. The
+   * remaining distance between the deadband and the maximum distance is scaled from the origin to
+   * the maximum distance.
    *
    * @param value Value to clip.
    * @param deadband Distance from origin.
@@ -126,9 +126,9 @@ public final class MathUtil {
   }
 
   /**
-   * Returns a zero vector if the given vector is within the specified distance from the
-   * origin. The remaining distance between the deadband and a distance of 1.0 is scaled from the
-   * origin to a distance of 1.0.
+   * Returns a zero vector if the given vector is within the specified distance from the origin. The
+   * remaining distance between the deadband and a distance of 1.0 is scaled from the origin to a
+   * distance of 1.0.
    *
    * @param value Value to clip.
    * @param deadband Distance from origin.
@@ -193,8 +193,7 @@ public final class MathUtil {
     if (value.norm() < 1e-9) {
       return value.times(0);
     }
-    return value.unit()
-        .times(copySignPow(value.norm(), exponent, maxDistance));
+    return value.unit().times(copySignPow(value.norm(), exponent, maxDistance));
   }
 
   /**

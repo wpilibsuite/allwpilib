@@ -87,7 +87,9 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
         MathUtil.applyDeadband(new Translation2d(1.0, Rotation2d.kPi).toVector(), 0.02));
 
     // == 0
-    assertEquals(Translation2d.kZero.toVector(), MathUtil.applyDeadband(Translation2d.kZero.toVector(), 0.02));
+    assertEquals(
+        Translation2d.kZero.toVector(),
+        MathUtil.applyDeadband(Translation2d.kZero.toVector(), 0.02));
 
     // > 0
     assertEquals(
@@ -118,7 +120,9 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
         MathUtil.applyDeadband(new Translation2d(2.5, Rotation2d.kPi).toVector(), 0.02, 2.5));
 
     // == 0
-    assertEquals(Translation2d.kZero.toVector(), MathUtil.applyDeadband(Translation2d.kZero.toVector(), 0.02, 2.5));
+    assertEquals(
+        Translation2d.kZero.toVector(),
+        MathUtil.applyDeadband(Translation2d.kZero.toVector(), 0.02, 2.5));
 
     // > 0
     assertEquals(
@@ -211,7 +215,8 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
         new Translation2d(Math.sqrt(0.5), Rotation2d.kPi).toVector(),
         MathUtil.copySignPow(new Translation2d(0.5, Rotation2d.kPi).toVector(), 0.5));
 
-    assertEquals(Translation2d.kZero.toVector(), MathUtil.copySignPow(Translation2d.kZero.toVector(), 2.0));
+    assertEquals(
+        Translation2d.kZero.toVector(), MathUtil.copySignPow(Translation2d.kZero.toVector(), 2.0));
     assertEquals(
         new Translation2d(1.0, Rotation2d.kZero).toVector(),
         MathUtil.copySignPow(new Translation2d(1.0, Rotation2d.kZero).toVector(), 2.0));
@@ -250,7 +255,9 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
         new Translation2d(Math.sqrt(0.5) * 10, Rotation2d.kPi).toVector(),
         MathUtil.copySignPow(new Translation2d(5.0, Rotation2d.kPi).toVector(), 0.5, 10.0));
 
-    assertEquals(Translation2d.kZero.toVector(), MathUtil.copySignPow(Translation2d.kZero.toVector(), 2.0, 5.0));
+    assertEquals(
+        Translation2d.kZero.toVector(),
+        MathUtil.copySignPow(Translation2d.kZero.toVector(), 2.0, 5.0));
     assertEquals(
         new Translation2d(5.0, Rotation2d.kZero).toVector(),
         MathUtil.copySignPow(new Translation2d(5.0, Rotation2d.kZero).toVector(), 2.0, 5.0));
@@ -269,7 +276,8 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
   @Test
   void testCopySignPow2dSmallNorm() {
     assertEquals(
-        Translation2d.kZero.toVector(), MathUtil.copySignPow(new Translation2d(1e-6, Rotation2d.kZero).toVector(), 2));
+        Translation2d.kZero.toVector(),
+        MathUtil.copySignPow(new Translation2d(1e-6, Rotation2d.kZero).toVector(), 2));
     assertEquals(
         Translation2d.kZero.toVector(),
         MathUtil.copySignPow(new Translation2d(1e-6, Rotation2d.kZero).toVector(), 2, 2.5));
