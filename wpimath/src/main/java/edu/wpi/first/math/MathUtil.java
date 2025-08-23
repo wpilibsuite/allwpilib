@@ -114,15 +114,15 @@ public final class MathUtil {
    *
    * @param value Value to clip.
    * @param deadband Distance from origin.
-   * @param maxDistance The maximum distance from the origin of the input. Can be infinite.
+   * @param maxMagnitude The maximum distance from the origin of the input. Can be infinite.
    * @return The value after the deadband is applied.
    */
   public static <C extends Num> Vector<C> applyDeadband(
-      Vector<C> value, double deadband, double maxDistance) {
+      Vector<C> value, double deadband, double maxMagnitude) {
     if (value.norm() < 1e-9) {
       return value.times(0);
     }
-    return value.unit().times(applyDeadband(value.norm(), deadband, maxDistance));
+    return value.unit().times(applyDeadband(value.norm(), deadband, maxMagnitude));
   }
 
   /**
@@ -185,15 +185,15 @@ public final class MathUtil {
    * @param value The input vector to transform.
    * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be
    *     positive.
-   * @param maxDistance The maximum expected distance from origin of input. Must be positive.
+   * @param maxMagnitude The maximum expected distance from origin of input. Must be positive.
    * @return The transformed value with the same direction and norm scaled to the input range.
    */
   public static <C extends Num> Vector<C> copySignPow(
-      Vector<C> value, double exponent, double maxDistance) {
+      Vector<C> value, double exponent, double maxMagnitude) {
     if (value.norm() < 1e-9) {
       return value.times(0);
     }
-    return value.unit().times(copySignPow(value.norm(), exponent, maxDistance));
+    return value.unit().times(copySignPow(value.norm(), exponent, maxMagnitude));
   }
 
   /**
