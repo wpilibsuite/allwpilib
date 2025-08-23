@@ -12,13 +12,20 @@ import java.util.stream.Collectors;
 
 /**
  * A builder class to configure and then create a {@link ParallelGroup}. Like {@link
- * CommandBuilder}, the final command is created by calling the terminal {@link #named(String)}
- * method, or with an automatically generated name using {@link #withAutomaticName()}.
+ * StagedCommandBuilder}, the final command is created by calling the terminal {@link
+ * #named(String)} method, or with an automatically generated name using {@link
+ * #withAutomaticName()}.
  */
 public class ParallelGroupBuilder {
   private final Set<Command> m_commands = new LinkedHashSet<>();
   private final Set<Command> m_requiredCommands = new LinkedHashSet<>();
   private BooleanSupplier m_endCondition;
+
+  /**
+   * Creates a new parallel group builder. The builder will have no commands and have no preapplied
+   * configuration options.
+   */
+  public ParallelGroupBuilder() {}
 
   /**
    * Adds one or more optional commands to the group. They will not be required to complete for the

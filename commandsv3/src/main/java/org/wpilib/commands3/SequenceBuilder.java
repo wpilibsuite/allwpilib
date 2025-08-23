@@ -12,13 +12,20 @@ import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 /**
- * A builder class to configure and then create a {@link Sequence}. Like {@link CommandBuilder}, the
- * final command is created by calling the terminal {@link #named(String)} method, or with an
- * automatically generated name using {@link #withAutomaticName()}.
+ * A builder class to configure and then create a {@link Sequence}. Like {@link
+ * StagedCommandBuilder}, the final command is created by calling the terminal {@link
+ * #named(String)} method, or with an automatically generated name using {@link
+ * #withAutomaticName()}.
  */
 public class SequenceBuilder {
   private final List<Command> m_steps = new ArrayList<>();
   private BooleanSupplier m_endCondition;
+
+  /**
+   * Creates new SequenceBuilder. The builder will have no commands and have no preapplied
+   * configuration options. Use {@link #andThen(Command)} to add commands to the sequence.
+   */
+  public SequenceBuilder() {}
 
   /**
    * Adds a command to the sequence.

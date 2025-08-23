@@ -143,6 +143,14 @@ public class Mechanism {
     return idle().withTimeout(duration);
   }
 
+  /**
+   * Gets all running commands that require this mechanism. Commands are returned in the order in
+   * which they were scheduled. The returned list is read-only. Every command in the list will have
+   * been scheduled by the previous entry in the list or by intermediate commands that do not
+   * require the mechanism.
+   *
+   * @return The currently running commands that require the mechanism.
+   */
   public List<Command> getRunningCommands() {
     return m_registeredScheduler.getRunningCommandsFor(this);
   }

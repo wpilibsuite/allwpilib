@@ -12,11 +12,10 @@ import java.lang.invoke.WrongMethodTypeException;
 /**
  * A wrapper around the JDK internal Continuation class. Continuations are one-shot (i.e., not
  * reusable after completion) and allow stack frames to be paused and resumed at a later time. They
- * are the underpinning for {@link VirtualThread virtual threads}, which have their own scheduler
- * and JVM support. Bare continuations are designed for internal use by the JVM; we have forcibly
- * opened access to them for use by the commands framework due to limitations of virtual threads;
- * notably, their complete lack of determinism and timing, which are critically important for
- * real-time systems like robots.
+ * are the underpinning for virtual threads, which have their own scheduler and JVM support. Bare
+ * continuations are designed for internal use by the JVM; we have forcibly opened access to them
+ * for use by the commands framework due to limitations of virtual threads; notably, their complete
+ * lack of determinism and timing, which are critically important for real-time systems like robots.
  *
  * <p><strong>ONLY USE CONTINUATIONS IN A SINGLE THREADED CONTEXT.</strong> The JVM and JIT
  * compilers make fundamental assumptions about how continuations are used, and rely on the code

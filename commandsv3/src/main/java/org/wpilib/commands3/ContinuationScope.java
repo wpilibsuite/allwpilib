@@ -9,6 +9,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Objects;
 
+/** A continuation scope. */
 public final class ContinuationScope {
   // The underlying jdk.internal.vm.ContinuationScope object
   final Object m_continuationScope;

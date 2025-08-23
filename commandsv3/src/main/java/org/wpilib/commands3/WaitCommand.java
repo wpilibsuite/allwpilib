@@ -15,6 +15,12 @@ import java.util.Set;
 public class WaitCommand implements Command {
   private final Time m_duration;
 
+  /**
+   * Creates a new WaitCommand. The command will wait for the given duration of time before
+   * completing.
+   *
+   * @param duration How long to wait for.
+   */
   public WaitCommand(Time duration) {
     m_duration = requireNonNullParam(duration, "duration", "WaitCommand");
   }
@@ -30,6 +36,7 @@ public class WaitCommand implements Command {
 
   @Override
   public String name() {
+    // Normalize to seconds so all wait commands have the same name format
     return "Wait " + m_duration.in(Seconds) + " Seconds";
   }
 

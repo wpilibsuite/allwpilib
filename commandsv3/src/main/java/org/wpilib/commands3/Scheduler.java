@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.wpilib.commands3.button.CommandGenericHID;
 import org.wpilib.commands3.proto.SchedulerProto;
 
 /**
@@ -116,7 +117,9 @@ public class Scheduler implements ProtobufSerializable {
   private final ContinuationScope m_scope = new ContinuationScope("coroutine commands");
 
   // Telemetry
+  /** Protobuf serializer for a scheduler. */
   public static final SchedulerProto proto = new SchedulerProto();
+
   private double m_lastRunTimeMs = -1;
 
   private final Set<Consumer<? super SchedulerEvent>> m_eventListeners = new LinkedHashSet<>();
@@ -136,6 +139,13 @@ public class Scheduler implements ProtobufSerializable {
     return s_defaultScheduler;
   }
 
+  /**
+   * Creates a new scheduler object. Note that most built-in constructs like {@link Trigger} and
+   * {@link CommandGenericHID} will use the {@link #getDefault() default scheduler instance} unless
+   * they were explicitly constructed with a different scheduler instance. Teams should use the
+   * default instance for convenience; however, new scheduler instances can be useful for unit
+   * tests.
+   */
   public Scheduler() {}
 
   /**
@@ -217,6 +227,7 @@ public class Scheduler implements ProtobufSerializable {
         });
   }
 
+  /** Represents possible results of a command scheduling attempt. */
   public enum ScheduleResult {
     /** The command was successfully scheduled and added to the queue. */
     SUCCESS,
@@ -244,6 +255,7 @@ public class Scheduler implements ProtobufSerializable {
    * than the command that forked it.
    *
    * @param command the command to schedule
+   * @return the result of the scheduling attempt. See {@link ScheduleResult} for details.
    * @throws IllegalArgumentException if scheduled by a command composition that has already
    *     scheduled another command that shares at least one required mechanism
    */
@@ -296,7 +308,7 @@ public class Scheduler implements ProtobufSerializable {
             : currentCommand();
     var state = new CommandState(command, parent, buildCoroutine(command), binding);
 
-    emitEvent(SchedulerEvent.scheduled(command));
+    emitEvent(scheduled(command));
 
     if (currentState() != null) {
       // Scheduling a child command while running. Start it immediately instead of waiting a full
@@ -355,7 +367,7 @@ public class Scheduler implements ProtobufSerializable {
         // We don't need to call removeOrphanedChildren here because it hasn't started yet,
         // meaning it hasn't had a chance to schedule any children
         iterator.remove();
-        emitEvent(SchedulerEvent.interrupted(scheduledCommand, command));
+        emitEvent(interrupted(scheduledCommand, command));
       }
     }
   }
@@ -387,7 +399,7 @@ public class Scheduler implements ProtobufSerializable {
 
     // Cancel the root commands
     for (var conflictingState : conflictingRootStates) {
-      emitEvent(SchedulerEvent.interrupted(conflictingState.command(), incomingState.command()));
+      emitEvent(interrupted(conflictingState.command(), incomingState.command()));
       cancel(conflictingState.command());
     }
   }
@@ -442,7 +454,7 @@ public class Scheduler implements ProtobufSerializable {
       // Only run the hook if the command was running. If it was on deck or not
       // even in the scheduler at the time, then there's nothing to do
       command.onCancel();
-      emitEvent(SchedulerEvent.evicted(command));
+      emitEvent(evicted(command));
     }
 
     // Clean up any orphaned child commands; their lifespan must not exceed the parent's
@@ -531,7 +543,7 @@ public class Scheduler implements ProtobufSerializable {
 
     m_executingCommands.push(state);
     long startMicros = RobotController.getTime();
-    emitEvent(SchedulerEvent.mounted(command));
+    emitEvent(mounted(command));
     coroutine.mount();
     try {
       coroutine.runToYieldPoint();
@@ -539,7 +551,7 @@ public class Scheduler implements ProtobufSerializable {
       // Intercept the exception, inject stack frames from the schedule site, and rethrow it
       var binding = state.binding();
       e.setStackTrace(CommandTraceHelper.modifyTrace(e.getStackTrace(), binding.frames()));
-      emitEvent(SchedulerEvent.completedWithError(command, e));
+      emitEvent(completedWithError(command, e));
       throw e;
     } finally {
       long endMicros = RobotController.getTime();
@@ -562,12 +574,12 @@ public class Scheduler implements ProtobufSerializable {
     if (coroutine.isDone()) {
       // Immediately check if the command has completed and remove any children commands.
       // This prevents child commands from being executed one extra time in the run() loop
-      emitEvent(SchedulerEvent.completed(command));
+      emitEvent(completed(command));
       m_commandStates.remove(command);
       removeOrphanedChildren(command);
     } else {
       // Yielded
-      emitEvent(SchedulerEvent.yielded(command));
+      emitEvent(yielded(command));
     }
   }
 
@@ -702,13 +714,13 @@ public class Scheduler implements ProtobufSerializable {
     for (var onDeckIter = m_onDeck.iterator(); onDeckIter.hasNext(); ) {
       var state = onDeckIter.next();
       onDeckIter.remove();
-      emitEvent(SchedulerEvent.evicted(state.command()));
+      emitEvent(evicted(state.command()));
     }
 
     for (var liveIter = m_commandStates.entrySet().iterator(); liveIter.hasNext(); ) {
       var entry = liveIter.next();
       liveIter.remove();
-      emitEvent(SchedulerEvent.evicted(entry.getKey()));
+      emitEvent(evicted(entry.getKey()));
     }
   }
 
@@ -724,12 +736,22 @@ public class Scheduler implements ProtobufSerializable {
     return m_eventLoop;
   }
 
-  /** For internal use. */
+  /**
+   * For internal use.
+   *
+   * @return The commands that have been scheduled but not yet started.
+   */
   public Collection<Command> getQueuedCommands() {
     return m_onDeck.stream().map(CommandState::command).toList();
   }
 
-  /** For internal use. */
+  /**
+   * For internal use.
+   *
+   * @param command The command to check
+   * @return The command that forked the provided command. Null if the command is not a child of
+   *     another command.
+   */
   public Command getParentOf(Command command) {
     var state = m_commandStates.get(command);
     if (state == null) {
@@ -800,6 +822,37 @@ public class Scheduler implements ProtobufSerializable {
    */
   public double lastRuntimeMs() {
     return m_lastRunTimeMs;
+  }
+
+  // Event-base telemetry and helpers. The static factories are for convenience to automatically
+  // set the timestamp instead of littering RobotController.getTime() everywhere.
+
+  private static SchedulerEvent scheduled(Command command) {
+    return new SchedulerEvent.Scheduled(command, RobotController.getTime());
+  }
+
+  private static SchedulerEvent mounted(Command command) {
+    return new SchedulerEvent.Mounted(command, RobotController.getTime());
+  }
+
+  private static SchedulerEvent yielded(Command command) {
+    return new SchedulerEvent.Yielded(command, RobotController.getTime());
+  }
+
+  private static SchedulerEvent completed(Command command) {
+    return new SchedulerEvent.Completed(command, RobotController.getTime());
+  }
+
+  private static SchedulerEvent completedWithError(Command command, Throwable error) {
+    return new SchedulerEvent.CompletedWithError(command, error, RobotController.getTime());
+  }
+
+  private static SchedulerEvent evicted(Command command) {
+    return new SchedulerEvent.Evicted(command, RobotController.getTime());
+  }
+
+  private static SchedulerEvent interrupted(Command command, Command interrupter) {
+    return new SchedulerEvent.Interrupted(command, interrupter, RobotController.getTime());
   }
 
   /**

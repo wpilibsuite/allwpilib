@@ -217,6 +217,13 @@ public final class StagedCommandBuilder {
   }
 
   /**
+   * Creates a new command builder. All required options must be set on each stage before a command
+   * is able to be created. Attempting to create a command without setting all required options will
+   * result in a compilation error.
+   */
+  public StagedCommandBuilder() {}
+
+  /**
    * Explicitly marks the command as requiring no mechanisms. Unless overridden later with {@link
    * NeedsExecutionBuilderStage#requiring(Mechanism)} or a similar method, the built command will
    * not have ownership over any mechanisms when it runs. Use this for commands that don't need to

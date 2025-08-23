@@ -8,6 +8,12 @@ import edu.wpi.first.util.protobuf.Protobuf;
 import org.wpilib.commands3.Scheduler;
 import us.hebi.quickbuf.Descriptors;
 
+/**
+ * Serializes a {@link Scheduler} to a protobuf message. Deserialization is not supported. A
+ * serialized message will include information about commands that are currently running or
+ * scheduled (but not yet started), as well as how long the most recent call to {@link
+ * Scheduler#run()} took to execute.
+ */
 public class SchedulerProto implements Protobuf<Scheduler, ProtobufScheduler> {
   @Override
   public Class<Scheduler> getTypeClass() {

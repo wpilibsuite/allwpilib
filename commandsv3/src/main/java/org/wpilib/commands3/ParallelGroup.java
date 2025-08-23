@@ -137,6 +137,11 @@ public class ParallelGroup implements Command {
     return "ParallelGroup[name=" + m_name + "]";
   }
 
+  /**
+   * Creates a new parallel group builder with no commands or configurations applied.
+   *
+   * @return A new builder.
+   */
   public static ParallelGroupBuilder builder() {
     return new ParallelGroupBuilder();
   }

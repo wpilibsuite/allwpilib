@@ -337,6 +337,12 @@ public class CommandGenericHID {
     return m_hid.isConnected();
   }
 
+  /**
+   * Gets the scheduler that should execute the triggered commands. This scheduler is set in the
+   * constructor, defaulting to {@link Scheduler#getDefault()} if one was not provided.
+   *
+   * @return the scheduler that should execute the triggered commands
+   */
   protected final Scheduler getScheduler() {
     return m_scheduler;
   }

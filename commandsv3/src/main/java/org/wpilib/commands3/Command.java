@@ -12,11 +12,25 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 /**
- * Performs some task using one or more {@link Mechanism mechanisms} using the collaborative
- * concurrency tools added in Java 21; namely, continuations. Continuations allow commands to be
- * executed concurrently in a collaborative manner as coroutines; instead of needing to split
- * command behavior into distinct functions (initialize(), execute(), end(), and isFinished()),
- * commands can be implemented with a single, imperative loop.
+ * Performs some task using one or more {@link Mechanism mechanisms}. Commands are fundamentally
+ * backed by a {@link Coroutine} that can be used to write normal-looking code that runs
+ * asynchronously.
+ *
+ * <p>Programmers familiar with the earlier versions of the command framework can think of a v3
+ * command similar to a v1 or v2 command that executes the lifecycle methods in a single method.
+ * (Note, however, that more complex logic can be written than only what the v1 and v2 frameworks
+ * allowed for!)
+ *
+ * <pre>{@code
+ * coroutine -> {
+ *   initialize();
+ *   while (!isFinished()) {
+ *     execute();
+ *     coroutine.yield(); // be sure to yield at the end of the loop
+ *   }
+ *   end();
+ * }
+ * }</pre>
  *
  * <p><strong>Note:</strong> Because coroutines are <i>opt-in</i> collaborate constructs, every
  * command implementation <strong>must</strong> call {@link Coroutine#yield()} within any periodic
@@ -259,9 +273,8 @@ public interface Command {
   }
 
   /**
-   * Starts creating a command that simply waits for some condition to be met. The command will
-   * start without any requirements, but some may be added (if necessary) using {@link
-   * StagedCommandBuilder#requiring(Mechanism)}.
+   * Starts creating a command that simply waits for some condition to be met. The command will not
+   * require any mechanisms.
    *
    * @param condition The condition to wait for
    * @return A command builder

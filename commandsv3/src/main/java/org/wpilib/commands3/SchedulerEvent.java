@@ -24,34 +24,6 @@ public sealed interface SchedulerEvent {
    */
   long timestampMicros();
 
-  static SchedulerEvent scheduled(Command command) {
-    return new Scheduled(command, RobotController.getTime());
-  }
-
-  static SchedulerEvent mounted(Command command) {
-    return new Mounted(command, RobotController.getTime());
-  }
-
-  static SchedulerEvent yielded(Command command) {
-    return new Yielded(command, RobotController.getTime());
-  }
-
-  static SchedulerEvent completed(Command command) {
-    return new Completed(command, RobotController.getTime());
-  }
-
-  static SchedulerEvent completedWithError(Command command, Throwable error) {
-    return new CompletedWithError(command, error, RobotController.getTime());
-  }
-
-  static SchedulerEvent evicted(Command command) {
-    return new Evicted(command, RobotController.getTime());
-  }
-
-  static SchedulerEvent interrupted(Command command, Command interrupter) {
-    return new Interrupted(command, interrupter, RobotController.getTime());
-  }
-
   /**
    * An event marking when a command is scheduled in {@link Scheduler#schedule(Command)}.
    *
