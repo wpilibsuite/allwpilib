@@ -95,7 +95,7 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
 }
 
 /**
- * Returns a zero translation if the given translation is within the specified
+ * Returns a zero vector if the given vector is within the specified
  * distance from the origin. The remaining distance between the deadband and the
  * maximum distance is scaled from the origin to the maximum distance.
  *
@@ -105,17 +105,15 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
  * (defaults to 1). Can be infinite.
  * @return The value after the deadband is applied.
  */
-constexpr Translation2d ApplyDeadband(const Translation2d& value,
-                                      units::meter_t deadband,
-                                      units::meter_t maxDistance = 1_m) {
-  units::meter_t norm = value.Norm();
-  // If norm is less than 1e-6 then return zero vector. Translations with norm
-  // less than or equal to 1e-6 do not have an angle due to logic of Rotation2d
-  if (norm <= 1e-6_m) {
-    return Translation2d{};
+template <int N>
+Eigen::Matrix<double, N, 1> ApplyDeadband(
+    const Eigen::Matrix<double, N, 1>& value, double deadband,
+    double maxMagnitude = 1.0) {
+  if (value.norm() < 1e-6) {
+    return Eigen::Matrix<double, N, 1>::Zero();
   }
-  return Translation2d{ApplyDeadband(norm, deadband, maxDistance),
-                       value.Angle()};
+  return value.normalized() *
+         ApplyDeadband(value.norm(), deadband, maxMagnitude);
 }
 
 /**
@@ -164,7 +162,7 @@ constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
  * distance and gives consistent curve behavior regardless of the input norm's
  * scale.
  *
- * @param value The input translation to transform.
+ * @param value The input vector to transform.
  * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared
  * curve). Must be positive.
  * @param maxDistance The maximum expected distance from origin of input
@@ -172,15 +170,14 @@ constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
  * @return The transformed value with the same direction and norm scaled to
  * the input range.
  */
-constexpr Translation2d CopySignPow(const Translation2d& value, double exponent,
-                                    units::meter_t maxDistance = 1_m) {
-  units::meter_t norm = value.Norm();
-  // If norm is less than 1e-6 then return zero vector. Translations with norm
-  // less than or equal to 1e-6 do not have an angle due to logic of Rotation2d
-  if (norm <= 1e-6_m) {
-    return Translation2d{};
+template <int N>
+Eigen::Matrix<double, N, 1> CopySignPow(
+    const Eigen::Matrix<double, N, 1>& value, double deadband,
+    double maxMagnitude = 1.0) {
+  if (value.norm() < 1e-6) {
+    return Eigen::Matrix<double, N, 1>::Zero();
   }
-  return Translation2d{CopySignPow(norm, exponent, maxDistance), value.Angle()};
+  return value.normalized() * CopySignPow(value.norm(), deadband, maxMagnitude);
 }
 
 /**
