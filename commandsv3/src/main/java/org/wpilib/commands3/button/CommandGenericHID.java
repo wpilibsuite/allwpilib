@@ -19,7 +19,7 @@ import org.wpilib.commands3.Trigger;
  * @see GenericHID
  */
 public class CommandGenericHID {
-  protected final Scheduler m_scheduler;
+  private final Scheduler m_scheduler;
   private final GenericHID m_hid;
   private final Map<EventLoop, Map<Integer, Trigger>> m_buttonCache = new HashMap<>();
   private final Map<EventLoop, Map<Pair<Integer, Double>, Trigger>> m_axisLessThanCache =
