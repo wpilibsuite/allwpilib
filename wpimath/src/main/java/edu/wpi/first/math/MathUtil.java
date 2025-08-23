@@ -108,7 +108,7 @@ public final class MathUtil {
   }
 
   /**
-   * Returns a zero translation if the given translation is within the specified distance from the
+   * Returns a zero vector if the given vector is within the specified distance from the
    * origin. The remaining distance between the deadband and the maximum distance is scaled from the
    * origin to the maximum distance.
    *
@@ -117,19 +117,16 @@ public final class MathUtil {
    * @param maxDistance The maximum distance from the origin of the input. Can be infinite.
    * @return The value after the deadband is applied.
    */
-  public static Translation2d applyDeadband(
-      Translation2d value, double deadband, double maxDistance) {
-    double norm = value.getNorm();
-    // If norm is less than 1e-6 then return zero vector. Translations with norm less than or equal
-    // to 1e-6 do not have an angle due to logic of Rotation2d
-    if (norm <= 1e-6) {
-      return Translation2d.kZero;
+  public static <C extends Num> Vector<C> applyDeadband(
+      Vector<C> value, double deadband, double maxDistance) {
+    if (value.norm() < 1e-9) {
+      return value.times(0);
     }
-    return new Translation2d(applyDeadband(norm, deadband, maxDistance), value.getAngle());
+    return value.unit().times(applyDeadband(value.norm(), deadband, maxDistance));
   }
 
   /**
-   * Returns a zero translation if the given translation is within the specified distance from the
+   * Returns a zero vector if the given vector is within the specified distance from the
    * origin. The remaining distance between the deadband and a distance of 1.0 is scaled from the
    * origin to a distance of 1.0.
    *
@@ -137,7 +134,7 @@ public final class MathUtil {
    * @param deadband Distance from origin.
    * @return The value after the deadband is applied.
    */
-  public static Translation2d applyDeadband(Translation2d value, double deadband) {
+  public static <C extends Num> Vector<C> applyDeadband(Vector<C> value, double deadband) {
     return applyDeadband(value, deadband, 1);
   }
 
@@ -185,32 +182,30 @@ public final class MathUtil {
    * range. This keeps the value in the original max distance and gives consistent curve behavior
    * regardless of the input norm's scale.
    *
-   * @param value The input translation to transform.
+   * @param value The input vector to transform.
    * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be
    *     positive.
    * @param maxDistance The maximum expected distance from origin of input. Must be positive.
    * @return The transformed value with the same direction and norm scaled to the input range.
    */
-  public static Translation2d copySignPow(
-      Translation2d value, double exponent, double maxDistance) {
-    double norm = value.getNorm();
-    // If norm is less than 1e-6 then return zero vector. Translations with norm less than or equal
-    // to 1e-6 do not have an angle due to logic of Rotation2d
-    if (norm <= 1e-6) {
-      return Translation2d.kZero;
+  public static <C extends Num> Vector<C> copySignPow(
+      Vector<C> value, double exponent, double maxDistance) {
+    if (value.norm() < 1e-9) {
+      return value.times(0);
     }
-    return new Translation2d(copySignPow(norm, exponent, maxDistance), value.getAngle());
+    return value.unit()
+        .times(copySignPow(value.norm(), exponent, maxDistance));
   }
 
   /**
    * Raises the norm of the input to the power of the given exponent while preserving its direction.
    *
-   * @param value The input translation to transform.
+   * @param value The input vector to transform.
    * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be
    *     positive.
    * @return The transformed value with the same direction.
    */
-  public static Translation2d copySignPow(Translation2d value, double exponent) {
+  public static <C extends Num> Vector<C> copySignPow(Vector<C> value, double exponent) {
     return copySignPow(value, exponent, 1);
   }
 
