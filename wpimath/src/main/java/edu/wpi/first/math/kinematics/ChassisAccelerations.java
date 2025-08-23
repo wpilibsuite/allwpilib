@@ -64,9 +64,9 @@ public class ChassisAccelerations
   /**
    * Constructs a ChassisAccelerations object.
    *
-   * @param ax Forward velocity.
-   * @param ay Sideways velocity.
-   * @param alpha Angular velocity.
+   * @param ax Forward acceleration.
+   * @param ay Sideways acceleration.
+   * @param alpha Angular acceleration.
    */
   public ChassisAccelerations(
       LinearAcceleration ax, LinearAcceleration ay, AngularAcceleration alpha) {
