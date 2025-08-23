@@ -464,7 +464,8 @@ class SwerveDriveKinematicsTest {
     ChassisAccelerations accelerations = new ChassisAccelerations(0, 0, 1);
     // For this test, assume an angular velocity of 1 rad/s
     double angularVelocity = 1.0;
-    var moduleAccelerations = m_kinematics.toSwerveModuleAccelerations(accelerations, angularVelocity, m_fl);
+    var moduleAccelerations =
+        m_kinematics.toSwerveModuleAccelerations(accelerations, angularVelocity, m_fl);
 
     /*
     When rotating about the front-left module position with both angular acceleration (1 rad/s²)
@@ -477,7 +478,7 @@ class SwerveDriveKinematicsTest {
     BR: ~33.94 units from center, experiences combined acceleration → ~48.0
 
     Angles reflect the vector combination of tangential and centripetal components:
-    FL: -45° (though magnitude is 0), FR: -45°, BL: 45°, BR: 0°
+    FL: -45° (though magnitude is 0), FR: 45°, BL: -45°, BR: 0°
     */
 
     assertAll(
@@ -486,8 +487,8 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(33.94, moduleAccelerations[2].acceleration, 0.1),
         () -> assertEquals(48.0, moduleAccelerations[3].acceleration, 0.1),
         () -> assertEquals(0.0, moduleAccelerations[0].angle.getDegrees(), 0.1),
-        () -> assertEquals(-45.0, moduleAccelerations[1].angle.getDegrees(), 0.1),
-        () -> assertEquals(45.0, moduleAccelerations[2].angle.getDegrees(), 0.1),
+        () -> assertEquals(45.0, moduleAccelerations[1].angle.getDegrees(), 0.1),
+        () -> assertEquals(-45.0, moduleAccelerations[2].angle.getDegrees(), 0.1),
         () -> assertEquals(0.0, moduleAccelerations[3].angle.getDegrees(), 0.1));
   }
 }

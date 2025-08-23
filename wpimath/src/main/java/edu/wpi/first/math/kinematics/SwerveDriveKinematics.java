@@ -77,17 +77,8 @@ public class SwerveDriveKinematics
     m_firstOrderInverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
     m_secondOrderInverseKinematics = new SimpleMatrix(m_numModules * 2, 4);
 
-    for (int i = 0; i < m_numModules; i++) {
-      m_firstOrderInverseKinematics.setRow(
-          i * 2 + 0, 0, /* Start Data */ 1, 0, -m_modules[i].getY());
-      m_firstOrderInverseKinematics.setRow(
-          i * 2 + 1, 0, /* Start Data */ 0, 1, +m_modules[i].getX());
+    setInverseKinematics(Translation2d.kZero);
 
-      m_secondOrderInverseKinematics.setRow(
-          i * 2 + 0, 0, /* Start Data */ 1, 0, -m_modules[i].getX(), -m_modules[i].getY());
-      m_secondOrderInverseKinematics.setRow(
-          i * 2 + 1, 0, /* Start Data */ 0, 1, -m_modules[i].getY(), +m_modules[i].getX());
-    }
     m_firstOrderForwardKinematics = m_firstOrderInverseKinematics.pseudoInverse();
     m_secondOrderForwardKinematics = m_secondOrderInverseKinematics.pseudoInverse();
 
@@ -143,13 +134,7 @@ public class SwerveDriveKinematics
     }
 
     if (!centerOfRotation.equals(m_prevCoR)) {
-      for (int i = 0; i < m_numModules; i++) {
-        m_firstOrderInverseKinematics.setRow(
-            i * 2 + 0, 0, /* Start Data */ 1, 0, -m_modules[i].getY() + centerOfRotation.getY());
-        m_firstOrderInverseKinematics.setRow(
-            i * 2 + 1, 0, /* Start Data */ 0, 1, +m_modules[i].getX() - centerOfRotation.getX());
-      }
-      m_prevCoR = centerOfRotation;
+      setInverseKinematics(centerOfRotation);
     }
 
     var chassisSpeedsVector = new SimpleMatrix(3, 1);
@@ -489,20 +474,7 @@ public class SwerveDriveKinematics
     }
 
     if (!centerOfRotation.equals(m_prevCoR)) {
-      for (int i = 0; i < m_numModules; i++) {
-        // Map chassis accelerations [ax, ay, ω², α] to module acceleration vector components [x,
-        // y].
-        // We intentionally exclude the centripetal (−ω² r) contribution from module accelerations
-        // so
-        // modules receive only the tangential component (α × r) plus chassis [ax, ay]. This matches
-        // the expected behavior in tests that command tangential module accelerations for a given
-        // α.
-        var rx = m_modules[i].getX() - centerOfRotation.getX();
-        var ry = m_modules[i].getY() - centerOfRotation.getY();
-        m_secondOrderInverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */1, 0, -ry, -rx);
-        m_secondOrderInverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, -rx, +ry);
-      }
-      m_prevCoR = centerOfRotation;
+      setInverseKinematics(centerOfRotation);
     }
 
     var chassisAccelerationsVector = new SimpleMatrix(4, 1);
@@ -511,7 +483,7 @@ public class SwerveDriveKinematics
         0,
         chassisAccelerations.ax,
         chassisAccelerations.ay,
-        Math.pow(angularVelocity, 2),
+        angularVelocity * angularVelocity,
         chassisAccelerations.alpha);
 
     var moduleAccelerationsMatrix = m_secondOrderInverseKinematics.mult(chassisAccelerationsVector);
@@ -525,8 +497,7 @@ public class SwerveDriveKinematics
       double linearAcceleration = Math.hypot(x, y);
 
       moduleAccelerations[i] =
-          new SwerveModuleAccelerations(
-              linearAcceleration, Rotation2d.fromRadians(Math.atan2(y, x)));
+          new SwerveModuleAccelerations(linearAcceleration, new Rotation2d(x, y));
     }
 
     return moduleAccelerations;
@@ -586,5 +557,26 @@ public class SwerveDriveKinematics
         chassisAccelerationsVector.get(0, 0),
         chassisAccelerationsVector.get(1, 0),
         chassisAccelerationsVector.get(3, 0));
+  }
+
+  /**
+   * Sets both inverse kinematics matrices based on the new center of rotation. This does not check
+   * if the new center of rotation is different from the previous one, so a check should be included
+   * before the call to this function.
+   *
+   * @param centerOfRotation new center of rotation
+   */
+  private void setInverseKinematics(Translation2d centerOfRotation) {
+    for (int i = 0; i < m_numModules; i++) {
+      var rx = m_modules[i].getX() - centerOfRotation.getX();
+      var ry = m_modules[i].getY() - centerOfRotation.getY();
+
+      m_firstOrderInverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0, -ry);
+      m_firstOrderInverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, rx);
+
+      m_secondOrderInverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0, -rx, -ry);
+      m_secondOrderInverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, -ry, +rx);
+    }
+    m_prevCoR = centerOfRotation;
   }
 }
