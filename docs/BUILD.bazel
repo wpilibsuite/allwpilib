@@ -107,6 +107,7 @@ javadoc(
         "//apriltag:apriltag-java",
         "//cameraserver:cameraserver-java",
         "//cscore:cscore-java",
+        "//commandsv3:commandsv3-java",
         "//epilogue-runtime:epilogue-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
