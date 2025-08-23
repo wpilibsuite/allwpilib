@@ -152,7 +152,7 @@ public class Color {
   }
 
   private static double roundAndClamp(double value) {
-    return MathUtil.clamp(Math.ceil(value * (1 << 12)) / (1 << 12), 0.0, 1.0);
+    return Math.clamp(Math.ceil(value * (1 << 12)) / (1 << 12), 0.0, 1.0);
   }
 
   // Helper methods

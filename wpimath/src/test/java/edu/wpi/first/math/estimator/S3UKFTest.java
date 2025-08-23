@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.StateSpaceUtil;
@@ -297,7 +296,7 @@ class S3UKFTest {
     return MatBuilder.fill(
         Nat.N1(),
         Nat.N1(),
-        MathUtil.clamp(
+        Math.clamp(
             8 * Math.sin(Math.PI * Math.sqrt(2.0) * t)
                 + 6 * Math.sin(Math.PI * Math.sqrt(3.0) * t)
                 + 4 * Math.sin(Math.PI * Math.sqrt(5.0) * t),

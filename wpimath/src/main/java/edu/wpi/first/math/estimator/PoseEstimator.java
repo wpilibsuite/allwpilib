@@ -5,7 +5,6 @@
 package edu.wpi.first.math.estimator;
 
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
@@ -187,7 +186,7 @@ public class PoseEstimator<T> {
     // the buffer will always use a timestamp between the first and last timestamps)
     double oldestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().firstKey();
     double newestOdometryTimestamp = m_odometryPoseBuffer.getInternalBuffer().lastKey();
-    timestamp = MathUtil.clamp(timestamp, oldestOdometryTimestamp, newestOdometryTimestamp);
+    timestamp = Math.clamp(timestamp, oldestOdometryTimestamp, newestOdometryTimestamp);
 
     // Step 2: If there are no applicable vision updates, use the odometry-only information.
     if (m_visionUpdates.isEmpty() || timestamp < m_visionUpdates.firstKey()) {

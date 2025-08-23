@@ -6,7 +6,6 @@ package edu.wpi.first.math.optimization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.MathUtil;
 import java.util.function.DoubleUnaryOperator;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +19,7 @@ class SimulatedAnnealingTest {
     var simulatedAnnealing =
         new SimulatedAnnealing<Double>(
             2.0,
-            x -> MathUtil.clamp(x + (Math.random() - 0.5) * stepSize, -3, 3),
+            x -> Math.clamp(x + (Math.random() - 0.5) * stepSize, -3, 3),
             function::applyAsDouble);
 
     double solution = simulatedAnnealing.solve(-1.0, 5000);
@@ -37,7 +36,7 @@ class SimulatedAnnealingTest {
     var simulatedAnnealing =
         new SimulatedAnnealing<Double>(
             2.0,
-            x -> MathUtil.clamp(x + (Math.random() - 0.5) * stepSize, 0, 7),
+            x -> Math.clamp(x + (Math.random() - 0.5) * stepSize, 0, 7),
             function::applyAsDouble);
 
     double solution = simulatedAnnealing.solve(-1.0, 5000);
