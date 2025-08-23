@@ -97,6 +97,12 @@
 
   <rule ref="category/java/performance.xml">
     <exclude name="AvoidInstantiatingObjectsInLoops" />
+    <!--
+      This rule is in place to save three (!) bytecode instructions when initializing a field to its default value.
+      Code that's more readable due to having explicit initial values is more important than reducing class size by a
+      few bytes.
+    -->
+    <exclude name="RedundantFieldInitializer" />
   </rule>
 
   <rule name="UnnecessaryCastRule" language="java"
