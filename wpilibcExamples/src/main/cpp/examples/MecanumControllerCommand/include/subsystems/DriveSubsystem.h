@@ -148,8 +148,8 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   // The robot's drive
   frc::MecanumDrive m_drive{[&](double output) { m_frontLeft.Set(output); },
-                            [&](double output) { m_rearLeft.Set(output); },
                             [&](double output) { m_frontRight.Set(output); },
+                            [&](double output) { m_rearLeft.Set(output); },
                             [&](double output) { m_rearRight.Set(output); }};
 
   // The front-left-side drive encoder

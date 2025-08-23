@@ -87,8 +87,8 @@ TEST(MecanumDriveTest, Cartesian) {
   frc::MockPWMMotorController fr;
   frc::MockPWMMotorController rr;
   frc::MecanumDrive drive{[&](double output) { fl.Set(output); },
-                          [&](double output) { rl.Set(output); },
                           [&](double output) { fr.Set(output); },
+                          [&](double output) { rl.Set(output); },
                           [&](double output) { rr.Set(output); }};
   drive.SetDeadband(0.0);
 
@@ -134,8 +134,8 @@ TEST(MecanumDriveTest, CartesianGyro90CW) {
   frc::MockPWMMotorController fr;
   frc::MockPWMMotorController rr;
   frc::MecanumDrive drive{[&](double output) { fl.Set(output); },
-                          [&](double output) { rl.Set(output); },
                           [&](double output) { fr.Set(output); },
+                          [&](double output) { rl.Set(output); },
                           [&](double output) { rr.Set(output); }};
   drive.SetDeadband(0.0);
 
@@ -181,8 +181,8 @@ TEST(MecanumDriveTest, Polar) {
   frc::MockPWMMotorController fr;
   frc::MockPWMMotorController rr;
   frc::MecanumDrive drive{[&](double output) { fl.Set(output); },
-                          [&](double output) { rl.Set(output); },
                           [&](double output) { fr.Set(output); },
+                          [&](double output) { rl.Set(output); },
                           [&](double output) { rr.Set(output); }};
   drive.SetDeadband(0.0);
 

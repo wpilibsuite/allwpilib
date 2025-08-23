@@ -111,20 +111,20 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * <p>If a motor needs to be inverted, do so before passing it in.
    *
    * @param frontLeftMotor The motor on the front-left corner.
-   * @param rearLeftMotor The motor on the rear-left corner.
    * @param frontRightMotor The motor on the front-right corner.
+   * @param rearLeftMotor The motor on the rear-left corner.
    * @param rearRightMotor The motor on the rear-right corner.
    */
   @SuppressWarnings({"removal", "this-escape"})
   public MecanumDrive(
       MotorController frontLeftMotor,
-      MotorController rearLeftMotor,
       MotorController frontRightMotor,
+      MotorController rearLeftMotor,
       MotorController rearRightMotor) {
     this(
         (double output) -> frontLeftMotor.set(output),
-        (double output) -> rearLeftMotor.set(output),
         (double output) -> frontRightMotor.set(output),
+        (double output) -> rearLeftMotor.set(output),
         (double output) -> rearRightMotor.set(output));
     SendableRegistry.addChild(this, frontLeftMotor);
     SendableRegistry.addChild(this, rearLeftMotor);
@@ -138,15 +138,15 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * <p>If a motor needs to be inverted, do so before passing it in.
    *
    * @param frontLeftMotor The setter for the motor on the front-left corner.
-   * @param rearLeftMotor The setter for the motor on the rear-left corner.
    * @param frontRightMotor The setter for the motor on the front-right corner.
+   * @param rearLeftMotor The setter for the motor on the rear-left corner.
    * @param rearRightMotor The setter for the motor on the rear-right corner.
    */
   @SuppressWarnings("this-escape")
   public MecanumDrive(
       DoubleConsumer frontLeftMotor,
-      DoubleConsumer rearLeftMotor,
       DoubleConsumer frontRightMotor,
+      DoubleConsumer rearLeftMotor,
       DoubleConsumer rearRightMotor) {
     requireNonNullParam(frontLeftMotor, "frontLeftMotor", "MecanumDrive");
     requireNonNullParam(rearLeftMotor, "rearLeftMotor", "MecanumDrive");

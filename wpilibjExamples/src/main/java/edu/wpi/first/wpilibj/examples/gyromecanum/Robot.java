@@ -43,7 +43,7 @@ public class Robot extends TimedRobot {
     frontRight.setInverted(true);
     rearRight.setInverted(true);
 
-    m_robotDrive = new MecanumDrive(frontLeft::set, rearLeft::set, frontRight::set, rearRight::set);
+    m_robotDrive = new MecanumDrive(frontLeft::set, frontRight::set, rearLeft::set, rearRight::set);
 
     m_gyro.setSensitivity(kVoltsPerDegreePerSecond);
 

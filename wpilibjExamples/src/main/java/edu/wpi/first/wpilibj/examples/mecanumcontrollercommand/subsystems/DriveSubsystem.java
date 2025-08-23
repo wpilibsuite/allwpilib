@@ -23,7 +23,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final PWMSparkMax m_rearRight = new PWMSparkMax(DriveConstants.kRearRightMotorPort);
 
   private final MecanumDrive m_drive =
-      new MecanumDrive(m_frontLeft::set, m_rearLeft::set, m_frontRight::set, m_rearRight::set);
+      new MecanumDrive(m_frontLeft::set, m_frontRight::set, m_rearLeft::set, m_rearRight::set);
 
   // The front-left-side drive encoder
   private final Encoder m_frontLeftEncoder =
