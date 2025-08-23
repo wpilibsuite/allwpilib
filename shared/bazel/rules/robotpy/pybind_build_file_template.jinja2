@@ -1,0 +1,236 @@
+# THIS FILE IS AUTO GENERATED
+{% if publish_casters_targets %}
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+{%- endif %}
+load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "robotpy_library")
+load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", {% if publish_casters_targets %}"publish_casters", {% endif %}"resolve_casters", "run_header_gen")
+load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
+{% for extension_module in extension_modules%}
+def {{extension_module.name}}_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = [], extra_pyi_deps = []):
+    {{extension_module.name|upper}}_HEADER_GEN = [
+    {%- for header_cfg in extension_module.generation_data.values() %}
+        struct(
+            class_name = "{{header_cfg.class_name}}",
+            yml_file = "{{header_cfg.yml_file}}",
+            header_root = "{{header_cfg.include_root}}",
+            header_file = "{{header_cfg.include_file}}",
+            {%- if header_cfg.templates|length > 0 %}
+            tmpl_class_names = [
+            {%- for tmpl in header_cfg.templates %}
+                ("{{ tmpl[0] }}", "{{ tmpl[1] }}"),
+            {%- endfor %}
+            ],
+            {%- else %}
+            tmpl_class_names = [],
+            {%- endif %}
+            {%- if header_cfg.trampolines|length > 0 %}
+            trampolines = [
+            {%- for trampoline in header_cfg.trampolines %}
+                ("{{ trampoline[0] }}", "{{ trampoline[1] }}"),
+            {%- endfor %}
+            ],
+            {%- else %}
+            trampolines = [],
+            {%- endif %}
+        ),
+    {%- endfor %}
+    ]
+
+    resolve_casters(
+        name = "{{extension_module.name}}.resolve_casters",
+        caster_deps = {{ extension_module.resolve_casters.caster_deps | jsonify }},
+        casters_pkl_file = "{{ extension_module.resolve_casters.pkl_file }}",
+        dep_file = "{{ extension_module.resolve_casters.dep_file }}",
+    )
+
+    gen_libinit(
+        name = "{{extension_module.name}}.gen_lib_init",
+        output_file = "{{stripped_include_prefix}}/{{extension_module.gen_libinit.install_path}}/{{extension_module.gen_libinit.output_file}}",
+        modules = {{extension_module.gen_libinit.modules | jsonify}},
+    )
+
+    gen_pkgconf(
+        name = "{{extension_module.name}}.gen_pkgconf",
+        libinit_py = "{{ extension_module.gen_pkgconf.libinit_py }}",
+        module_pkg_name = "{{ extension_module.gen_pkgconf.module_pkg_name }}",
+        output_file = "{{ extension_module.gen_pkgconf.output_file }}",
+        pkg_name = "{{ extension_module.gen_pkgconf.pkg_name }}",
+        install_path = "{{stripped_include_prefix}}/{{ extension_module.gen_pkgconf.install_path }}",
+        project_file = "{{ stripped_include_prefix }}/{{ extension_module.gen_pkgconf.project_file }}",
+        package_root = "{{package_root_file}}",
+    )
+
+    gen_modinit_hpp(
+        name = "{{extension_module.name}}.gen_modinit_hpp",
+        input_dats = [x.class_name for x in {{extension_module.name|upper}}_HEADER_GEN],
+        libname = "{{ extension_module.gen_modinit.lib_name }}",
+        output_file = "{{ extension_module.gen_modinit.output_file }}",
+    )
+
+    run_header_gen(
+        name = "{{extension_module.name}}",
+        casters_pickle = "{{ extension_module.resolve_casters.pkl_file }}",
+        header_gen_config = {{extension_module.name|upper}}_HEADER_GEN,
+        trampoline_subpath = "{{stripped_include_prefix}}/{{ extension_module.install_path }}",
+        deps = header_to_dat_deps,
+        local_native_libraries = [
+        {%- for header_path in extension_module.native_wrapper_dependencies|sort %}
+            "{{header_path}}",
+        {%- endfor %}
+        ],
+        {%- if extension_module.get_defines() %}
+        generation_defines = [{%-for da in extension_module.get_defines() %}"{{da.replace("=", " ")}}"{% endfor %}],
+        {%- endif %}
+        {%- if yml_prefix %}
+        yml_prefix = "{{yml_prefix}}",
+        {%- endif %}
+    )
+
+    create_pybind_library(
+        name = "{{extension_module.name}}",
+        install_path = "{{stripped_include_prefix}}/{{extension_module.install_path}}/",
+        extension_name = "{{ extension_module.gen_modinit.lib_name }}",
+        generated_srcs = [":{{extension_module.name}}.generated_srcs"],
+        semiwrap_header = [":{{extension_module.name}}.gen_modinit_hpp"],
+        deps = [
+            ":{{extension_module.name}}.tmpl_hdrs",
+            ":{{extension_module.name}}.trampoline_hdrs",
+            {%- for dep in extension_module.local_extension_dependencies %}
+            "{{dep}}",
+            {%- endfor %}
+        ],
+        dynamic_deps = [
+            {%- for dep in extension_module.dynamic_dependencies %}
+            "{{dep}}",
+            {%- endfor %}
+        ],
+        extra_hdrs = extra_hdrs,
+        extra_srcs = srcs,
+        includes = includes,
+        {%- if extension_module.get_defines() %}
+        local_defines = [{%-for da in extension_module.get_defines() %}"{{da.replace(' ', '=')}}"{% endfor %}],
+        {%- endif %}
+    )
+
+    native.filegroup(
+        name = "{{extension_module.name}}.generated_files",
+        srcs = [
+            "{{extension_module.name}}.gen_modinit_hpp.gen",
+            "{{extension_module.name}}.header_gen_files",
+            "{{extension_module.name}}.gen_pkgconf",
+            "{{extension_module.name}}.gen_lib_init",
+        ],
+        tags = ["manual", "robotpy"],
+    )
+{% endfor %}
+{%- for caster_info in publish_casters_targets %}
+def publish_library_casters():
+    publish_casters(
+        name = "publish_casters",
+        caster_name = "{{caster_info.casters_name}}",
+        output_json = "{{stripped_include_prefix}}/{{caster_info.install_path}}/{{caster_info.json_output}}",
+        output_pc = "{{stripped_include_prefix}}/{{caster_info.install_path}}/{{caster_info.pc_output}}",
+        project_config = "{{ stripped_include_prefix }}/{{caster_info.project_file}}",
+        package_root = "{{package_root_file}}",
+        typecasters_srcs = native.glob([{% for inc in caster_info.include_paths %}"{{ inc }}/**"{% if not loop.last%}, {% endif %}{% endfor %}]),
+    )
+
+    cc_library(
+        name = "{{caster_info.casters_name}}",
+        hdrs = native.glob([{% for inc in caster_info.include_paths %}"{{ inc }}/*.h"{% if not loop.last%}, {% endif %}{% endfor %}]),
+        includes = [{% for inc in caster_info.include_paths %}"{{ inc }}"{% if not loop.last%}, {% endif %}{% endfor %}],
+        visibility = ["//visibility:public"],
+        tags = ["robotpy"],
+    )
+{% endfor %}
+def define_pybind_library(name, pkgcfgs = []):
+    # Helper used to generate all files with one target.
+    native.filegroup(
+        name = "{}.generated_files".format(name),
+        srcs = [
+            {%- for em in extension_modules %}
+            "{{em.name}}.generated_files",
+            {%- endfor %}
+        ],
+        tags = ["manual", "robotpy"],
+        visibility = ["//visibility:public"],
+    )
+
+    # Files that will be included in the wheel as data deps
+    native.filegroup(
+        name = "{}.generated_pkgcfg_files".format(name),
+        srcs = [
+            {%- for em in extension_modules %}
+            "{{stripped_include_prefix}}/{{em.gen_pkgconf.install_path}}/{{ em.gen_pkgconf.output_file }}",
+            {%- endfor %}
+            {%- for caster_info in publish_casters_targets %}
+            "{{stripped_include_prefix}}/{{caster_info.install_path}}/{{caster_info.pc_output}}",
+            "{{stripped_include_prefix}}/{{caster_info.install_path}}/{{caster_info.json_output}}",
+            {%- endfor %}
+        ],
+        tags = ["manual", "robotpy"],
+        visibility = ["//visibility:public"],
+    )
+
+    # Contains all of the non-python files that need to be included in the wheel
+    native.filegroup(
+        name = "{}.extra_files".format(name),
+        srcs = native.glob(["{{stripped_include_prefix}}/{{top_level_name}}/**"], exclude = ["{{stripped_include_prefix}}/{{top_level_name}}/**/*.py"], allow_empty = True),
+        tags = ["manual", "robotpy"],
+    )
+
+    robotpy_library(
+        name = name,
+        srcs = native.glob(["{{stripped_include_prefix}}/{{top_level_name}}/**/*.py"]) + [
+        {%- for em in extension_modules %}
+            "{{stripped_include_prefix}}/{{ em.gen_pkgconf.libinit_py.replace(".", "/") }}.py",
+        {%- endfor %}
+        ],
+        data = [
+            "{}.generated_pkgcfg_files".format(name),
+            "{}.extra_files".format(name),
+        {%- for em in extension_modules %}
+            ":{{stripped_include_prefix}}/{{em.install_path}}/{{em.gen_modinit.lib_name}}",
+        {%- endfor %}
+        {%- for em in extension_modules %}
+            ":{{em.name}}.trampoline_hdr_files",
+        {%- endfor %}
+        ],
+        imports = ["{{stripped_include_prefix}}"],
+        deps = [
+            {%- for d in python_deps %}
+            "{{d}}",
+            {%- endfor %}
+        ],
+        visibility = ["//visibility:public"],
+    )
+
+    update_yaml_files(
+        name = "{}-update-yaml".format(name),
+        yaml_output_directory = "{{ stripped_include_prefix }}/semiwrap",
+        extra_hdrs = native.glob(["{{stripped_include_prefix}}/**/*.h"], allow_empty = True) + [
+{%- if python_deps %}
+            {% for d in python_deps %}
+            {%- if "native" in d %}"{{d}}.copy_headers",{%- endif %}
+            {%- endfor %}
+{%- endif %}
+        ],
+        package_root_file = "{{package_root_file}}",
+        pkgcfgs = pkgcfgs,
+        pyproject_toml = "{{ stripped_include_prefix }}/pyproject.toml",
+        yaml_files = native.glob(["{{stripped_include_prefix}}/semiwrap/**"]),
+    )
+
+    scan_headers(
+        name = "{}-scan-headers".format(name),
+        extra_hdrs = native.glob(["{{stripped_include_prefix}}/**/*.h"], allow_empty = True) + [
+{%- if python_deps %}
+            {% for d in python_deps %}
+            {%- if "native" in d %}"{{d}}.copy_headers",{%- endif %}
+            {%- endfor %}
+{%- endif %}
+        ],
+        package_root_file = "{{package_root_file}}",
+        pkgcfgs = pkgcfgs,
+        pyproject_toml = "{{ stripped_include_prefix }}/pyproject.toml",
+    )

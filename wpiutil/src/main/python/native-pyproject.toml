@@ -1,0 +1,52 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "hatchling",
+    "hatch-nativelib~=0.2.0",
+    "hatch-robotpy~=0.2.1",
+]
+
+[project]
+name = "robotpy-native-wpiutil"
+version = "2027.0.0a2"
+description = "WPILib Utility Library"
+license = "BSD-3-Clause"
+
+dependencies = [
+    "msvc-runtime>=14.42.34433; platform_system == 'Windows'"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/native"]
+
+[[tool.hatch.build.hooks.robotpy.maven_lib_download]]
+artifact_id = "wpiutil-cpp"
+group_id = "edu.wpi.first.wpiutil"
+repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
+version = "2027.0.0-alpha-2"
+
+extract_to = "src/native/wpiutil"
+libs = ["wpiutil"]
+
+[[tool.hatch.build.hooks.nativelib.pcfile]]
+pcfile = "src/native/wpiutil/robotpy-native-wpiutil.pc"
+name = "wpiutil"
+
+includedir = "src/native/wpiutil/include"
+libdir = "src/native/wpiutil/lib"
+shared_libraries = ["wpiutil"]
+
+enable_if = "platform_system != 'Windows'"
+
+[[tool.hatch.build.hooks.nativelib.pcfile]]
+pcfile = "src/native/wpiutil/robotpy-native-wpiutil.pc"
+name = "wpiutil"
+
+includedir = "src/native/wpiutil/include"
+libdir = "src/native/wpiutil/lib"
+shared_libraries = ["wpiutil"]
+
+# All wpilib projects require this flag
+extra_cflags = "/Zc:preprocessor"
+
+enable_if = "platform_system == 'Windows'"
