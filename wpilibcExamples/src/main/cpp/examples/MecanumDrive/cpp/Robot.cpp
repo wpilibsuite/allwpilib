@@ -15,8 +15,8 @@ class Robot : public frc::TimedRobot {
  public:
   Robot() {
     wpi::SendableRegistry::AddChild(&m_robotDrive, &m_frontLeft);
-    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_rearLeft);
     wpi::SendableRegistry::AddChild(&m_robotDrive, &m_frontRight);
+    wpi::SendableRegistry::AddChild(&m_robotDrive, &m_rearLeft);
     wpi::SendableRegistry::AddChild(&m_robotDrive, &m_rearRight);
 
     // Invert the right side motors. You may need to change or remove this to
@@ -47,8 +47,8 @@ class Robot : public frc::TimedRobot {
   frc::PWMSparkMax m_rearRight{kRearRightChannel};
   frc::MecanumDrive m_robotDrive{
       [&](double output) { m_frontLeft.Set(output); },
-      [&](double output) { m_rearLeft.Set(output); },
       [&](double output) { m_frontRight.Set(output); },
+      [&](double output) { m_rearLeft.Set(output); },
       [&](double output) { m_rearRight.Set(output); }};
 
   frc::Joystick m_stick{kJoystickChannel};

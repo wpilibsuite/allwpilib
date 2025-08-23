@@ -84,8 +84,9 @@ class MecanumDrive : public RobotDriveBase,
    * @param frontRightMotor Front-right motor.
    * @param rearRightMotor Rear-right motor.
    */
-  MecanumDrive(MotorController& frontLeftMotor, MotorController& rearLeftMotor,
+  MecanumDrive(MotorController& frontLeftMotor,
                MotorController& frontRightMotor,
+               MotorController& rearLeftMotor,
                MotorController& rearRightMotor);
 
   WPI_UNIGNORE_DEPRECATED
@@ -101,8 +102,8 @@ class MecanumDrive : public RobotDriveBase,
    * @param rearRightMotor Rear-right motor setter.
    */
   MecanumDrive(std::function<void(double)> frontLeftMotor,
-               std::function<void(double)> rearLeftMotor,
                std::function<void(double)> frontRightMotor,
+               std::function<void(double)> rearLeftMotor,
                std::function<void(double)> rearRightMotor);
 
   ~MecanumDrive() override = default;

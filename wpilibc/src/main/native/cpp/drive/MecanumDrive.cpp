@@ -21,8 +21,8 @@ using namespace frc;
 WPI_IGNORE_DEPRECATED
 
 MecanumDrive::MecanumDrive(MotorController& frontLeftMotor,
-                           MotorController& rearLeftMotor,
                            MotorController& frontRightMotor,
+                           MotorController& rearLeftMotor,
                            MotorController& rearRightMotor)
     : MecanumDrive{[&](double output) { frontLeftMotor.Set(output); },
                    [&](double output) { rearLeftMotor.Set(output); },
@@ -37,8 +37,8 @@ MecanumDrive::MecanumDrive(MotorController& frontLeftMotor,
 WPI_UNIGNORE_DEPRECATED
 
 MecanumDrive::MecanumDrive(std::function<void(double)> frontLeftMotor,
-                           std::function<void(double)> rearLeftMotor,
                            std::function<void(double)> frontRightMotor,
+                           std::function<void(double)> rearLeftMotor,
                            std::function<void(double)> rearRightMotor)
     : m_frontLeftMotor{std::move(frontLeftMotor)},
       m_rearLeftMotor{std::move(rearLeftMotor)},

@@ -94,7 +94,7 @@ class MecanumDriveTest {
     var rl = new MockPWMMotorController();
     var fr = new MockPWMMotorController();
     var rr = new MockPWMMotorController();
-    var drive = new MecanumDrive(fl::set, rl::set, fr::set, rr::set);
+    var drive = new MecanumDrive(fl::set, fr::set, rl::set, rr::set);
     drive.setDeadband(0.0);
 
     // Forward
@@ -139,7 +139,7 @@ class MecanumDriveTest {
     var rl = new MockPWMMotorController();
     var fr = new MockPWMMotorController();
     var rr = new MockPWMMotorController();
-    var drive = new MecanumDrive(fl::set, rl::set, fr::set, rr::set);
+    var drive = new MecanumDrive(fl::set, fr::set, rl::set, rr::set);
     drive.setDeadband(0.0);
 
     // Forward in global frame; left in robot frame
@@ -184,7 +184,7 @@ class MecanumDriveTest {
     var rl = new MockPWMMotorController();
     var fr = new MockPWMMotorController();
     var rr = new MockPWMMotorController();
-    var drive = new MecanumDrive(fl::set, rl::set, fr::set, rr::set);
+    var drive = new MecanumDrive(fl::set, fr::set, rl::set, rr::set);
     drive.setDeadband(0.0);
 
     // Forward
