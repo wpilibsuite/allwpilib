@@ -4,26 +4,39 @@
 
 #include "frc/kinematics/proto/SwerveModuleAccelerationsProto.h"
 
+#include <wpi/protobuf/ProtobufCallbacks.h>
+
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<frc::SwerveModuleAccelerations> wpi::Protobuf<frc::SwerveModuleAccelerations>::Unpack(
-    InputStream& stream) {
-  wpi_proto_ProtobufSwerveModuleAccelerations msg;
+std::optional<frc::SwerveModuleAccelerations>
+wpi::Protobuf<frc::SwerveModuleAccelerations>::Unpack(InputStream& stream) {
+  wpi::UnpackCallback<frc::Rotation2d> angle;
+  wpi_proto_ProtobufSwerveModuleAccelerations msg{
+    .acceleration = 0,
+    .angle = angle.Callback(),
+};
   if (!stream.Decode(msg)) {
     return {};
   }
 
+  auto iangle = angle.Items();
+
+  if (iangle.empty()) {
+    return {};
+  }
+
   return frc::SwerveModuleAccelerations{
-      units::meters_per_second_squared_t{msg.acceleration},
-      frc::Rotation2d{units::radian_t{msg.angle}},
-  };
+    units::meters_per_second_squared_t{msg.acceleration},
+    iangle[0],
+};
 }
 
-bool wpi::Protobuf<frc::SwerveModuleAccelerations>::Pack(OutputStream& stream,
-                                                        const frc::SwerveModuleAccelerations& value) {
+bool wpi::Protobuf<frc::SwerveModuleAccelerations>::Pack(
+    OutputStream& stream, const frc::SwerveModuleAccelerations& value) {
+  wpi::PackCallback angle{&value.angle};
   wpi_proto_ProtobufSwerveModuleAccelerations msg{
-      .acceleration = value.acceleration.value(),
-      .angle = value.angle.Radians().value(),
-  };
+    .acceleration = value.acceleration.value(),
+    .angle = angle.Callback(),
+};
   return stream.Encode(msg);
 }

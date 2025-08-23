@@ -147,7 +147,7 @@ typedef struct _wpi_proto_ProtobufSwerveModuleAccelerations {
     static pb_filedesc_t file_descriptor(void) noexcept;
 
     double acceleration;
-    double angle;
+    pb_callback_t angle;
 } wpi_proto_ProtobufSwerveModuleAccelerations;
 
 
@@ -165,7 +165,7 @@ typedef struct _wpi_proto_ProtobufSwerveModuleAccelerations {
 #define wpi_proto_ProtobufSwerveDriveKinematics_init_default {{{NULL}, NULL}}
 #define wpi_proto_ProtobufSwerveModulePosition_init_default {0, {{NULL}, NULL}}
 #define wpi_proto_ProtobufSwerveModuleState_init_default {0, {{NULL}, NULL}}
-#define wpi_proto_ProtobufSwerveModuleAccelerations_init_default {0, 0}
+#define wpi_proto_ProtobufSwerveModuleAccelerations_init_default {0, {{NULL}, NULL}}
 #define wpi_proto_ProtobufChassisSpeeds_init_zero {0, 0, 0}
 #define wpi_proto_ProtobufChassisAccelerations_init_zero {0, 0, 0}
 #define wpi_proto_ProtobufDifferentialDriveKinematics_init_zero {0}
@@ -179,7 +179,7 @@ typedef struct _wpi_proto_ProtobufSwerveModuleAccelerations {
 #define wpi_proto_ProtobufSwerveDriveKinematics_init_zero {{{NULL}, NULL}}
 #define wpi_proto_ProtobufSwerveModulePosition_init_zero {0, {{NULL}, NULL}}
 #define wpi_proto_ProtobufSwerveModuleState_init_zero {0, {{NULL}, NULL}}
-#define wpi_proto_ProtobufSwerveModuleAccelerations_init_zero {0, 0}
+#define wpi_proto_ProtobufSwerveModuleAccelerations_init_zero {0, {{NULL}, NULL}}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define wpi_proto_ProtobufChassisSpeeds_vx_tag   1
@@ -315,15 +315,17 @@ X(a, CALLBACK, OPTIONAL, MESSAGE,  angle,             2)
 
 #define wpi_proto_ProtobufSwerveModuleAccelerations_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, DOUBLE,   acceleration,      1) \
-X(a, STATIC,   SINGULAR, DOUBLE,   angle,             2)
-#define wpi_proto_ProtobufSwerveModuleAccelerations_CALLBACK NULL
+X(a, CALLBACK, OPTIONAL, MESSAGE,  angle,             2)
+#define wpi_proto_ProtobufSwerveModuleAccelerations_CALLBACK pb_default_field_callback
 #define wpi_proto_ProtobufSwerveModuleAccelerations_DEFAULT NULL
+#define wpi_proto_ProtobufSwerveModuleAccelerations_angle_MSGTYPE wpi_proto_ProtobufRotation2d
 
 /* Maximum encoded size of messages (where known) */
 /* wpi_proto_ProtobufMecanumDriveKinematics_size depends on runtime parameters */
 /* wpi_proto_ProtobufSwerveDriveKinematics_size depends on runtime parameters */
 /* wpi_proto_ProtobufSwerveModulePosition_size depends on runtime parameters */
 /* wpi_proto_ProtobufSwerveModuleState_size depends on runtime parameters */
+/* wpi_proto_ProtobufSwerveModuleAccelerations_size depends on runtime parameters */
 #define WPI_PROTO_KINEMATICS_NPB_H_MAX_SIZE      wpi_proto_ProtobufMecanumDriveWheelPositions_size
 #define wpi_proto_ProtobufChassisAccelerations_size 27
 #define wpi_proto_ProtobufChassisSpeeds_size     27
@@ -334,7 +336,6 @@ X(a, STATIC,   SINGULAR, DOUBLE,   angle,             2)
 #define wpi_proto_ProtobufMecanumDriveWheelAccelerations_size 36
 #define wpi_proto_ProtobufMecanumDriveWheelPositions_size 36
 #define wpi_proto_ProtobufMecanumDriveWheelSpeeds_size 36
-#define wpi_proto_ProtobufSwerveModuleAccelerations_size 18
 
 
 #endif

@@ -15,8 +15,7 @@ frc::SwerveModuleAccelerations wpi::Struct<frc::SwerveModuleAccelerations>::Unpa
   return frc::SwerveModuleAccelerations{
       units::meters_per_second_squared_t{
           wpi::UnpackStruct<double, kAccelerationOff>(data)},
-      frc::Rotation2d{units::radian_t{
-          wpi::UnpackStruct<double, kAngleOff>(data)}},
+      wpi::UnpackStruct<frc::Rotation2d, kAngleOff>(data)
   };
 }
 
@@ -25,5 +24,5 @@ void wpi::Struct<frc::SwerveModuleAccelerations>::Pack(
   constexpr size_t kAccelerationOff = 0;
   constexpr size_t kAngleOff = kAccelerationOff + 8;
   wpi::PackStruct<kAccelerationOff>(data, value.acceleration.value());
-  wpi::PackStruct<kAngleOff>(data, value.angle.Radians().value());
+  wpi::PackStruct<kAngleOff>(data, value.angle);
 }

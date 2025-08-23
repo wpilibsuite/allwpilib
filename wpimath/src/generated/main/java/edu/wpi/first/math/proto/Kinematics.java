@@ -19,7 +19,7 @@ import us.hebi.quickbuf.RepeatedByte;
 import us.hebi.quickbuf.RepeatedMessage;
 
 public final class Kinematics {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(4158,
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(4189,
     "ChBraW5lbWF0aWNzLnByb3RvEgl3cGkucHJvdG8aEGdlb21ldHJ5MmQucHJvdG8iTQoVUHJvdG9idWZD" + 
     "aGFzc2lzU3BlZWRzEg4KAnZ4GAEgASgBUgJ2eBIOCgJ2eRgCIAEoAVICdnkSFAoFb21lZ2EYAyABKAFS" + 
     "BW9tZWdhIlQKHFByb3RvYnVmQ2hhc3Npc0FjY2VsZXJhdGlvbnMSDgoCYXgYASABKAFSAmF4Eg4KAmF5" + 
@@ -47,49 +47,49 @@ public final class Kinematics {
     "ZVBvc2l0aW9uEhoKCGRpc3RhbmNlGAEgASgBUghkaXN0YW5jZRIzCgVhbmdsZRgCIAEoCzIdLndwaS5w" + 
     "cm90by5Qcm90b2J1ZlJvdGF0aW9uMmRSBWFuZ2xlImYKGVByb3RvYnVmU3dlcnZlTW9kdWxlU3RhdGUS" + 
     "FAoFc3BlZWQYASABKAFSBXNwZWVkEjMKBWFuZ2xlGAIgASgLMh0ud3BpLnByb3RvLlByb3RvYnVmUm90" + 
-    "YXRpb24yZFIFYW5nbGUiXQohUHJvdG9idWZTd2VydmVNb2R1bGVBY2NlbGVyYXRpb25zEiIKDGFjY2Vs" + 
-    "ZXJhdGlvbhgBIAEoAVIMYWNjZWxlcmF0aW9uEhQKBWFuZ2xlGAIgASgBUgVhbmdsZUIaChhlZHUud3Bp" + 
-    "LmZpcnN0Lm1hdGgucHJvdG9K1hIKBhIEAABUAQoICgEMEgMAABIKCAoBAhIDAgASCgkKAgMAEgMEABoK" + 
-    "CAoBCBIDBgAxCgkKAggBEgMGADEKCgoCBAASBAgADAEKCgoDBAABEgMICB0KCwoEBAACABIDCQIQCgwK" + 
-    "BQQAAgAFEgMJAggKDAoFBAACAAESAwkJCwoMCgUEAAIAAxIDCQ4PCgsKBAQAAgESAwoCEAoMCgUEAAIB" + 
-    "BRIDCgIICgwKBQQAAgEBEgMKCQsKDAoFBAACAQMSAwoODwoLCgQEAAICEgMLAhMKDAoFBAACAgUSAwsC" + 
-    "CAoMCgUEAAICARIDCwkOCgwKBQQAAgIDEgMLERIKCgoCBAESBA4AEgEKCgoDBAEBEgMOCCQKCwoEBAEC" + 
-    "ABIDDwIQCgwKBQQBAgAFEgMPAggKDAoFBAECAAESAw8JCwoMCgUEAQIAAxIDDw4PCgsKBAQBAgESAxAC" + 
-    "EAoMCgUEAQIBBRIDEAIICgwKBQQBAgEBEgMQCQsKDAoFBAECAQMSAxAODwoLCgQEAQICEgMRAhMKDAoF" + 
-    "BAECAgUSAxECCAoMCgUEAQICARIDEQkOCgwKBQQBAgIDEgMRERIKCgoCBAISBBQAFgEKCgoDBAIBEgMU" + 
-    "CCsKCwoEBAICABIDFQIYCgwKBQQCAgAFEgMVAggKDAoFBAICAAESAxUJEwoMCgUEAgIAAxIDFRYXCgoK" + 
-    "AgQDEgQYABsBCgoKAwQDARIDGAgsCgsKBAQDAgASAxkCEgoMCgUEAwIABRIDGQIICgwKBQQDAgABEgMZ" + 
-    "CQ0KDAoFBAMCAAMSAxkQEQoLCgQEAwIBEgMaAhMKDAoFBAMCAQUSAxoCCAoMCgUEAwIBARIDGgkOCgwK",
-    "BQQDAgEDEgMaERIKCgoCBAQSBB0AIAEKCgoDBAQBEgMdCDMKCwoEBAQCABIDHgISCgwKBQQEAgAFEgMe" + 
-    "AggKDAoFBAQCAAESAx4JDQoMCgUEBAIAAxIDHhARCgsKBAQEAgESAx8CEwoMCgUEBAIBBRIDHwIICgwK" + 
-    "BQQEAgEBEgMfCQ4KDAoFBAQCAQMSAx8REgoKCgIEBRIEIgAlAQoKCgMEBQESAyIILwoLCgQEBQIAEgMj" + 
-    "AhIKDAoFBAUCAAUSAyMCCAoMCgUEBQIAARIDIwkNCgwKBQQFAgADEgMjEBEKCwoEBAUCARIDJAITCgwK" + 
-    "BQQFAgEFEgMkAggKDAoFBAUCAQESAyQJDgoMCgUEBQIBAxIDJBESCgoKAgQGEgQnACwBCgoKAwQGARID" + 
-    "JwgmCgsKBAQGAgASAygCJwoMCgUEBgIABhIDKAIXCgwKBQQGAgABEgMoGCIKDAoFBAYCAAMSAyglJgoL" + 
-    "CgQEBgIBEgMpAigKDAoFBAYCAQYSAykCFwoMCgUEBgIBARIDKRgjCgwKBQQGAgEDEgMpJicKCwoEBAYC" + 
-    "AhIDKgImCgwKBQQGAgIGEgMqAhcKDAoFBAYCAgESAyoYIQoMCgUEBgICAxIDKiQlCgsKBAQGAgMSAysC" + 
-    "JwoMCgUEBgIDBhIDKwIXCgwKBQQGAgMBEgMrGCIKDAoFBAYCAwMSAyslJgoKCgIEBxIELgAzAQoKCgME" + 
-    "BwESAy4IKgoLCgQEBwIAEgMvAhgKDAoFBAcCAAUSAy8CCAoMCgUEBwIAARIDLwkTCgwKBQQHAgADEgMv" + 
-    "FhcKCwoEBAcCARIDMAIZCgwKBQQHAgEFEgMwAggKDAoFBAcCAQESAzAJFAoMCgUEBwIBAxIDMBcYCgsK" + 
-    "BAQHAgISAzECFwoMCgUEBwICBRIDMQIICgwKBQQHAgIBEgMxCRIKDAoFBAcCAgMSAzEVFgoLCgQEBwID" + 
-    "EgMyAhgKDAoFBAcCAwUSAzICCAoMCgUEBwIDARIDMgkTCgwKBQQHAgMDEgMyFhcKCgoCBAgSBDUAOgEK" + 
-    "CgoDBAgBEgM1CCcKCwoEBAgCABIDNgIYCgwKBQQIAgAFEgM2AggKDAoFBAgCAAESAzYJEwoMCgUECAIA" + 
-    "AxIDNhYXCgsKBAQIAgESAzcCGQoMCgUECAIBBRIDNwIICgwKBQQIAgEBEgM3CRQKDAoFBAgCAQMSAzcX" + 
-    "GAoLCgQECAICEgM4AhcKDAoFBAgCAgUSAzgCCAoMCgUECAICARIDOAkSCgwKBQQIAgIDEgM4FRYKCwoE" + 
-    "BAgCAxIDOQIYCgwKBQQIAgMFEgM5AggKDAoFBAgCAwESAzkJEwoMCgUECAIDAxIDORYXCgoKAgQJEgQ8" + 
-    "AEEBCgoKAwQJARIDPAguCgsKBAQJAgASAz0CGAoMCgUECQIABRIDPQIICgwKBQQJAgABEgM9CRMKDAoF" + 
-    "BAkCAAMSAz0WFwoLCgQECQIBEgM+AhkKDAoFBAkCAQUSAz4CCAoMCgUECQIBARIDPgkUCgwKBQQJAgED" + 
-    "EgM+FxgKCwoEBAkCAhIDPwIXCgwKBQQJAgIFEgM/AggKDAoFBAkCAgESAz8JEgoMCgUECQICAxIDPxUW",
-    "CgsKBAQJAgMSA0ACGAoMCgUECQIDBRIDQAIICgwKBQQJAgMBEgNACRMKDAoFBAkCAwMSA0AWFwoKCgIE" + 
-    "ChIEQwBFAQoKCgMECgESA0MIJQoLCgQECgIAEgNEAi0KDAoFBAoCAAQSA0QCCgoMCgUECgIABhIDRAsg" + 
-    "CgwKBQQKAgABEgNEISgKDAoFBAoCAAMSA0QrLAoKCgIECxIERwBKAQoKCgMECwESA0cIJAoLCgQECwIA" + 
-    "EgNIAhYKDAoFBAsCAAUSA0gCCAoMCgUECwIAARIDSAkRCgwKBQQLAgADEgNIFBUKCwoEBAsCARIDSQIf" + 
-    "CgwKBQQLAgEGEgNJAhQKDAoFBAsCAQESA0kVGgoMCgUECwIBAxIDSR0eCgoKAgQMEgRMAE8BCgoKAwQM" + 
-    "ARIDTAghCgsKBAQMAgASA00CEwoMCgUEDAIABRIDTQIICgwKBQQMAgABEgNNCQ4KDAoFBAwCAAMSA00R" + 
-    "EgoLCgQEDAIBEgNOAh8KDAoFBAwCAQYSA04CFAoMCgUEDAIBARIDThUaCgwKBQQMAgEDEgNOHR4KCgoC" + 
-    "BA0SBFEAVAEKCgoDBA0BEgNRCCkKCwoEBA0CABIDUgIaCgwKBQQNAgAFEgNSAggKDAoFBA0CAAESA1IJ" + 
-    "FQoMCgUEDQIAAxIDUhgZCgsKBAQNAgESA1MCEwoMCgUEDQIBBRIDUwIICgwKBQQNAgEBEgNTCQ4KDAoF" + 
-    "BA0CAQMSA1MREmIGcHJvdG8z");
+    "YXRpb24yZFIFYW5nbGUifAohUHJvdG9idWZTd2VydmVNb2R1bGVBY2NlbGVyYXRpb25zEiIKDGFjY2Vs" + 
+    "ZXJhdGlvbhgBIAEoAVIMYWNjZWxlcmF0aW9uEjMKBWFuZ2xlGAIgASgLMh0ud3BpLnByb3RvLlByb3Rv" + 
+    "YnVmUm90YXRpb24yZFIFYW5nbGVCGgoYZWR1LndwaS5maXJzdC5tYXRoLnByb3RvStYSCgYSBAAAVAEK" + 
+    "CAoBDBIDAAASCggKAQISAwIAEgoJCgIDABIDBAAaCggKAQgSAwYAMQoJCgIIARIDBgAxCgoKAgQAEgQI" + 
+    "AAwBCgoKAwQAARIDCAgdCgsKBAQAAgASAwkCEAoMCgUEAAIABRIDCQIICgwKBQQAAgABEgMJCQsKDAoF" + 
+    "BAACAAMSAwkODwoLCgQEAAIBEgMKAhAKDAoFBAACAQUSAwoCCAoMCgUEAAIBARIDCgkLCgwKBQQAAgED" + 
+    "EgMKDg8KCwoEBAACAhIDCwITCgwKBQQAAgIFEgMLAggKDAoFBAACAgESAwsJDgoMCgUEAAICAxIDCxES" + 
+    "CgoKAgQBEgQOABIBCgoKAwQBARIDDggkCgsKBAQBAgASAw8CEAoMCgUEAQIABRIDDwIICgwKBQQBAgAB" + 
+    "EgMPCQsKDAoFBAECAAMSAw8ODwoLCgQEAQIBEgMQAhAKDAoFBAECAQUSAxACCAoMCgUEAQIBARIDEAkL" + 
+    "CgwKBQQBAgEDEgMQDg8KCwoEBAECAhIDEQITCgwKBQQBAgIFEgMRAggKDAoFBAECAgESAxEJDgoMCgUE" + 
+    "AQICAxIDERESCgoKAgQCEgQUABYBCgoKAwQCARIDFAgrCgsKBAQCAgASAxUCGAoMCgUEAgIABRIDFQII" + 
+    "CgwKBQQCAgABEgMVCRMKDAoFBAICAAMSAxUWFwoKCgIEAxIEGAAbAQoKCgMEAwESAxgILAoLCgQEAwIA" + 
+    "EgMZAhIKDAoFBAMCAAUSAxkCCAoMCgUEAwIAARIDGQkNCgwKBQQDAgADEgMZEBEKCwoEBAMCARIDGgIT",
+    "CgwKBQQDAgEFEgMaAggKDAoFBAMCAQESAxoJDgoMCgUEAwIBAxIDGhESCgoKAgQEEgQdACABCgoKAwQE" + 
+    "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");
 
   static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("kinematics.proto", "wpi.proto", descriptorData, Geometry2D.getDescriptor());
 
@@ -119,7 +119,7 @@ public final class Kinematics {
 
   static final Descriptors.Descriptor wpi_proto_ProtobufSwerveModuleState_descriptor = descriptor.internalContainedType(1532, 102, "ProtobufSwerveModuleState", "wpi.proto.ProtobufSwerveModuleState");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufSwerveModuleAccelerations_descriptor = descriptor.internalContainedType(1636, 93, "ProtobufSwerveModuleAccelerations", "wpi.proto.ProtobufSwerveModuleAccelerations");
+  static final Descriptors.Descriptor wpi_proto_ProtobufSwerveModuleAccelerations_descriptor = descriptor.internalContainedType(1636, 124, "ProtobufSwerveModuleAccelerations", "wpi.proto.ProtobufSwerveModuleAccelerations");
 
   /**
    * @return this proto file's descriptor.
@@ -5321,9 +5321,9 @@ public final class Kinematics {
     private double acceleration;
 
     /**
-     * <code>optional double angle = 2;</code>
+     * <code>optional .wpi.proto.ProtobufRotation2d angle = 2;</code>
      */
-    private double angle;
+    private final Geometry2D.ProtobufRotation2d angle = Geometry2D.ProtobufRotation2d.newInstance();
 
     private ProtobufSwerveModuleAccelerations() {
     }
@@ -5373,7 +5373,7 @@ public final class Kinematics {
     }
 
     /**
-     * <code>optional double angle = 2;</code>
+     * <code>optional .wpi.proto.ProtobufRotation2d angle = 2;</code>
      * @return whether the angle field is set
      */
     public boolean hasAngle() {
@@ -5381,31 +5381,51 @@ public final class Kinematics {
     }
 
     /**
-     * <code>optional double angle = 2;</code>
+     * <code>optional .wpi.proto.ProtobufRotation2d angle = 2;</code>
      * @return this
      */
     public ProtobufSwerveModuleAccelerations clearAngle() {
       bitField0_ &= ~0x00000002;
-      angle = 0D;
+      angle.clear();
       return this;
     }
 
     /**
-     * <code>optional double angle = 2;</code>
-     * @return the angle
+     * <code>optional .wpi.proto.ProtobufRotation2d angle = 2;</code>
+     *
+     * This method returns the internal storage object without modifying any has state.
+     * The returned object should not be modified and be treated as read-only.
+     *
+     * Use {@link #getMutableAngle()} if you want to modify it.
+     *
+     * @return internal storage object for reading
      */
-    public double getAngle() {
+    public Geometry2D.ProtobufRotation2d getAngle() {
       return angle;
     }
 
     /**
-     * <code>optional double angle = 2;</code>
+     * <code>optional .wpi.proto.ProtobufRotation2d angle = 2;</code>
+     *
+     * This method returns the internal storage object and sets the corresponding
+     * has state. The returned object will become part of this message and its
+     * contents may be modified as long as the has state is not cleared.
+     *
+     * @return internal storage object for modifications
+     */
+    public Geometry2D.ProtobufRotation2d getMutableAngle() {
+      bitField0_ |= 0x00000002;
+      return angle;
+    }
+
+    /**
+     * <code>optional .wpi.proto.ProtobufRotation2d angle = 2;</code>
      * @param value the angle to set
      * @return this
      */
-    public ProtobufSwerveModuleAccelerations setAngle(final double value) {
+    public ProtobufSwerveModuleAccelerations setAngle(final Geometry2D.ProtobufRotation2d value) {
       bitField0_ |= 0x00000002;
-      angle = value;
+      angle.copyFrom(value);
       return this;
     }
 
@@ -5416,7 +5436,7 @@ public final class Kinematics {
       if ((bitField0_ | other.bitField0_) != 0) {
         bitField0_ = other.bitField0_;
         acceleration = other.acceleration;
-        angle = other.angle;
+        angle.copyFrom(other.angle);
       }
       return this;
     }
@@ -5432,7 +5452,7 @@ public final class Kinematics {
         setAcceleration(other.acceleration);
       }
       if (other.hasAngle()) {
-        setAngle(other.angle);
+        getMutableAngle().mergeFrom(other.angle);
       }
       return this;
     }
@@ -5445,7 +5465,7 @@ public final class Kinematics {
       cachedSize = -1;
       bitField0_ = 0;
       acceleration = 0D;
-      angle = 0D;
+      angle.clear();
       return this;
     }
 
@@ -5456,6 +5476,7 @@ public final class Kinematics {
       }
       cachedSize = -1;
       bitField0_ = 0;
+      angle.clearQuick();
       return this;
     }
 
@@ -5470,7 +5491,7 @@ public final class Kinematics {
       ProtobufSwerveModuleAccelerations other = (ProtobufSwerveModuleAccelerations) o;
       return bitField0_ == other.bitField0_
         && (!hasAcceleration() || ProtoUtil.isEqual(acceleration, other.acceleration))
-        && (!hasAngle() || ProtoUtil.isEqual(angle, other.angle));
+        && (!hasAngle() || angle.equals(other.angle));
     }
 
     @Override
@@ -5480,8 +5501,8 @@ public final class Kinematics {
         output.writeDoubleNoTag(acceleration);
       }
       if ((bitField0_ & 0x00000002) != 0) {
-        output.writeRawByte((byte) 17);
-        output.writeDoubleNoTag(angle);
+        output.writeRawByte((byte) 18);
+        output.writeMessageNoTag(angle);
       }
     }
 
@@ -5492,7 +5513,7 @@ public final class Kinematics {
         size += 9;
       }
       if ((bitField0_ & 0x00000002) != 0) {
-        size += 9;
+        size += 1 + ProtoSink.computeMessageSizeNoTag(angle);
       }
       return size;
     }
@@ -5509,13 +5530,13 @@ public final class Kinematics {
             acceleration = input.readDouble();
             bitField0_ |= 0x00000001;
             tag = input.readTag();
-            if (tag != 17) {
+            if (tag != 18) {
               break;
             }
           }
-          case 17: {
+          case 18: {
             // angle
-            angle = input.readDouble();
+            input.readMessage(angle);
             bitField0_ |= 0x00000002;
             tag = input.readTag();
             if (tag != 0) {
@@ -5543,7 +5564,7 @@ public final class Kinematics {
         output.writeDouble(FieldNames.acceleration, acceleration);
       }
       if ((bitField0_ & 0x00000002) != 0) {
-        output.writeDouble(FieldNames.angle, angle);
+        output.writeMessage(FieldNames.angle, angle);
       }
       output.endObject();
     }
@@ -5569,7 +5590,7 @@ public final class Kinematics {
           case 92960979: {
             if (input.isAtField(FieldNames.angle)) {
               if (!input.trySkipNullValue()) {
-                angle = input.readDouble();
+                input.readMessage(angle);
                 bitField0_ |= 0x00000002;
               }
             } else {

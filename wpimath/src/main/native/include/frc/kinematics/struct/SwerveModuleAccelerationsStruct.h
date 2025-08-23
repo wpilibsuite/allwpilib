@@ -12,9 +12,9 @@
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::SwerveModuleAccelerations> {
   static constexpr std::string_view GetTypeName() { return "SwerveModuleAccelerations"; }
-  static constexpr size_t GetSize() { return 16; }
+  static constexpr size_t GetSize() { return 8 + wpi::GetStructSize<frc::Rotation2d>(); }
   static constexpr std::string_view GetSchema() {
-    return "double acceleration;double angle";
+    return "double acceleration;Rotation2d angle";
   }
 
   static frc::SwerveModuleAccelerations Unpack(std::span<const uint8_t> data);

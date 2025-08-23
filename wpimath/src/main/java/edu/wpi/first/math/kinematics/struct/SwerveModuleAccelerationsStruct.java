@@ -22,24 +22,24 @@ public class SwerveModuleAccelerationsStruct implements Struct<SwerveModuleAccel
 
   @Override
   public int getSize() {
-    return kSizeDouble * 2;
+    return kSizeDouble + Rotation2d.struct.getSize();
   }
 
   @Override
   public String getSchema() {
-    return "double acceleration;double angle";
+    return "double acceleration;Rotation2d angle";
   }
 
   @Override
   public SwerveModuleAccelerations unpack(ByteBuffer bb) {
     double acceleration = bb.getDouble();
-    double angle = bb.getDouble();
-    return new SwerveModuleAccelerations(acceleration, new Rotation2d(angle));
+    Rotation2d angle = Rotation2d.struct.unpack(bb);
+    return new SwerveModuleAccelerations(acceleration, angle);
   }
 
   @Override
   public void pack(ByteBuffer bb, SwerveModuleAccelerations value) {
     bb.putDouble(value.acceleration);
-    bb.putDouble(value.angle.getRadians());
+    Rotation2d.struct.pack(bb, value.angle);
   }
 }
