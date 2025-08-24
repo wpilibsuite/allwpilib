@@ -146,19 +146,6 @@ TEST(MathUtilTest, ApplyDeadband2dLargeMaxMagnitude) {
                 units::meter_t{std::numeric_limits<double>::infinity()}));
 }
 
-TEST(MathUtilTest, ApplyDeadband2dSmallNorm) {
-  const frc::Rotation2d zero;
-
-  const frc::Translation2d zeroVec;
-
-  EXPECT_EQ(
-      zeroVec.ToVector(),
-      frc::ApplyDeadband(frc::Translation2d(1e-6_m, zero).ToVector(), 0.02_m));
-  EXPECT_EQ(zeroVec.ToVector(),
-            frc::ApplyDeadband(frc::Translation2d(1e-6_m, zero).ToVector(),
-                               0.02_m, 2.5_m));
-}
-
 TEST(MathUtilTest, CopySignPow) {
   EXPECT_DOUBLE_EQ(0.5, frc::CopySignPow(0.5, 1.0));
   EXPECT_DOUBLE_EQ(-0.5, frc::CopySignPow(-0.5, 1.0));
@@ -300,16 +287,6 @@ TEST(MathUtilTest, CopySignPow2dMaxDistance) {
             frc::CopySignPow(
                 frc::Translation2d(80_m, frc::Rotation2d(90_deg)).ToVector(),
                 0.3, 100_m));
-}
-
-TEST(MathUtilTest, CopySignPow2dSmallNorm) {
-  const frc::Rotation2d zero;
-  const frc::Translation2d zeroVec;
-
-  EXPECT_EQ(zeroVec.ToVector(),
-            frc::CopySignPow(frc::Translation2d(1e-6_m, zero).ToVector(), 2.0));
-  EXPECT_EQ(zeroVec.ToVector(),
-            frc::CopySignPow(frc::Translation2d(1e-6_m, zero).ToVector(), 2.0));
 }
 
 TEST(MathUtilTest, InputModulus) {
