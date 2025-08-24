@@ -121,10 +121,7 @@ Eigen::Matrix<double, N, 1> ApplyDeadband(
  * sign.
  *
  * The function normalizes the input value to the range [0, 1] based on the
- * maximum magnitude, raises it to the power of the exponent, then scales the
- * result back to the original range and copying the sign. This keeps the value
- * in the original range and gives consistent curve behavior regardless of the
- * input value's scale.
+ * maximum magnitude so that the output stays in the range.
  *
  * This is useful for applying smoother or more aggressive control response
  * curves (e.g. joystick input shaping).
@@ -156,11 +153,11 @@ constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
  * Raises the norm of the input to the power of the given exponent while
  * preserving its direction.
  *
- * The function normalizes the norm of the input to the range [0, 1] based on
- * the maximum distance, raises it to the power of the exponent, then scales the
- * result back to the original range. This keeps the value in the original max
- * distance and gives consistent curve behavior regardless of the input norm's
- * scale.
+ * The function normalizes the input value to the range [0, 1] based on the
+ * maximum magnitude so that the output stays in the range.
+ *
+ * This is useful for applying smoother or more aggressive control response
+ * curves (e.g. joystick input shaping).
  *
  * @param value The input vector to transform.
  * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared
