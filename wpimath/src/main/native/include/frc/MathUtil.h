@@ -101,7 +101,7 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
  *
  * @param value Value to clip.
  * @param deadband Distance from origin.
- * @param maxDistance The maximum distance from the origin of the input
+ * @param maxMagnitude The maximum distance from the origin of the input
  * (defaults to 1). Can be infinite.
  * @return The value after the deadband is applied.
  */
@@ -165,7 +165,7 @@ constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
  * @param value The input vector to transform.
  * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared
  * curve). Must be positive.
- * @param maxDistance The maximum expected distance from origin of input
+ * @param maxMagnitude The maximum expected distance from origin of input
  * (defaults to 1). Must be positive.
  * @return The transformed value with the same direction and norm scaled to
  * the input range.
