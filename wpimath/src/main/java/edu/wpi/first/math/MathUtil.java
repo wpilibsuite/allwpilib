@@ -115,10 +115,11 @@ public final class MathUtil {
    * @param value Value to clip.
    * @param deadband Distance from origin.
    * @param maxMagnitude The maximum distance from the origin of the input. Can be infinite.
+   * @param <R> The number of rows in the vector.
    * @return The value after the deadband is applied.
    */
-  public static <C extends Num> Vector<C> applyDeadband(
-      Vector<C> value, double deadband, double maxMagnitude) {
+  public static <R extends Num> Vector<R> applyDeadband(
+      Vector<R> value, double deadband, double maxMagnitude) {
     if (value.norm() < 1e-9) {
       return value.times(0);
     }
@@ -132,9 +133,10 @@ public final class MathUtil {
    *
    * @param value Value to clip.
    * @param deadband Distance from origin.
+   * @param <R> The number of rows in the vector.
    * @return The value after the deadband is applied.
    */
-  public static <C extends Num> Vector<C> applyDeadband(Vector<C> value, double deadband) {
+  public static <R extends Num> Vector<R> applyDeadband(Vector<R> value, double deadband) {
     return applyDeadband(value, deadband, 1);
   }
 
@@ -186,10 +188,11 @@ public final class MathUtil {
    * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be
    *     positive.
    * @param maxMagnitude The maximum expected distance from origin of input. Must be positive.
+   * @param <R> The number of rows in the vector.
    * @return The transformed value with the same direction and norm scaled to the input range.
    */
-  public static <C extends Num> Vector<C> copySignPow(
-      Vector<C> value, double exponent, double maxMagnitude) {
+  public static <R extends Num> Vector<R> copySignPow(
+      Vector<R> value, double exponent, double maxMagnitude) {
     if (value.norm() < 1e-9) {
       return value.times(0);
     }
@@ -202,9 +205,10 @@ public final class MathUtil {
    * @param value The input vector to transform.
    * @param exponent The exponent to apply (e.g. 1.0 = linear, 2.0 = squared curve). Must be
    *     positive.
+   * @param <R> The number of rows in the vector.
    * @return The transformed value with the same direction.
    */
-  public static <C extends Num> Vector<C> copySignPow(Vector<C> value, double exponent) {
+  public static <R extends Num> Vector<R> copySignPow(Vector<R> value, double exponent) {
     return copySignPow(value, exponent, 1);
   }
 
