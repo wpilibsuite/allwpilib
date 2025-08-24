@@ -66,41 +66,6 @@ TEST(MathUtilTest, ApplyDeadbandLargeMaxMagnitude) {
 }
 
 TEST(MathUtilTest, ApplyDeadband2dUnityScale) {
-  const frc::Rotation2d zero;
-  const frc::Rotation2d cwPiOver2{-90_deg};
-  const frc::Rotation2d ccwPiOver2{90_deg};
-  const frc::Rotation2d pi{180_deg};
-
-  const frc::Translation2d zeroVec;
-
-  // Angles
-  EXPECT_EQ(
-      frc::Translation2d(1, cwPiOver2).ToVector(),
-      frc::ApplyDeadband(frc::Translation2d(1, cwPiOver2).ToVector(), 0.02));
-  EXPECT_EQ(
-      frc::Translation2d(1, ccwPiOver2).ToVector(),
-      frc::ApplyDeadband(frc::Translation2d(1, ccwPiOver2).ToVector(), 0.02));
-  EXPECT_EQ(frc::Translation2d(1, pi).ToVector(),
-            frc::ApplyDeadband(frc::Translation2d(1, pi).ToVector(), 0.02));
-
-  // == 0
-  EXPECT_EQ(zeroVec.ToVector(), frc::ApplyDeadband(zeroVec.ToVector(), 0.02));
-
-  // > 0
-  EXPECT_EQ(
-      zeroVec.ToVector(),
-      frc::ApplyDeadband(frc::Translation2d(0.01, zero).ToVector(), 0.02));
-  EXPECT_EQ(
-      zeroVec.ToVector(),
-      frc::ApplyDeadband(frc::Translation2d(0.02, zero).ToVector(), 0.02));
-  EXPECT_EQ(
-      frc::Translation2d((0.03 - 0.02) / (1.0 - 0.02), zero).ToVector(),
-      frc::ApplyDeadband(frc::Translation2d(0.03, zero).ToVector(), 0.02));
-  EXPECT_EQ(frc::Translation2d(1, zero).ToVector(),
-            frc::ApplyDeadband(frc::Translation2d(1, zero).ToVector(), 0.02));
-}
-
-TESTTEST(MathUtilTest, ApplyDeadband2dUnityScale) {
   const Eigen::Vector2d zero{0.0, 0.0};
 
   EXPECT_EQ(Eigen::Vector2d{0.0, 1.0},
