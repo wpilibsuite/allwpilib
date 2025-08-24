@@ -66,58 +66,58 @@ TEST(MathUtilTest, ApplyDeadbandLargeMaxMagnitude) {
 }
 
 TEST(MathUtilTest, ApplyDeadband2dUnityScale) {
-  const Eigen::Vector2d zero{0.0, 0.0};
+  const Eigen::Vector2d zero(0.0, 0.0);
 
-  EXPECT_EQ(Eigen::Vector2d{0.0, 1.0},
-            frc::ApplyDeadband(Eigen::Vector2d{0.0, 1.0}, 0.02));
-  EXPECT_EQ(Eigen::Vector2d{0.0, -1.0},
-            frc::ApplyDeadband(Eigen::Vector2d{0.0, -1.0}, 0.02));
-  EXPECT_EQ(Eigen::Vector2d{-1.0, 0.0},
-            frc::ApplyDeadband(Eigen::Vector2d{-1.0, 0.0}, 0.02));
+  EXPECT_EQ((Eigen::Vector2d(0.0, 1.0)),
+            frc::ApplyDeadband(Eigen::Vector2d(0.0, 1.0), 0.02));
+  EXPECT_EQ((Eigen::Vector2d(0.0, -1.0)),
+            frc::ApplyDeadband(Eigen::Vector2d(0.0, -1.0), 0.02));
+  EXPECT_EQ((Eigen::Vector2d(-1.0, 0.0)),
+            frc::ApplyDeadband(Eigen::Vector2d(-1.0, 0.0), 0.02));
 
   // == 0
   EXPECT_EQ(zero, frc::ApplyDeadband(zero, 0.02));
 
   // > 0
-  EXPECT_EQ(zero, frc::ApplyDeadband(Eigen::Vector2d{0.01, 0.0}, 0.02));
-  EXPECT_EQ(zero, frc::ApplyDeadband(Eigen::Vector2d{0.02, 0.0}, 0.02));
-  EXPECT_EQ(Eigen::Vector2d{(0.03 - 0.02) / (1.0 - 0.02), 0.0},
-            frc::ApplyDeadband(Eigen::Vector2d{0.03, 0.0}, 0.02));
-  EXPECT_EQ(Eigen::Vector2d{1.0, 0.0},
-            frc::ApplyDeadband(Eigen::Vector2d{1.0, 0.0}, 0.02));
+  EXPECT_EQ(zero, frc::ApplyDeadband(Eigen::Vector2d(0.01, 0.0), 0.02));
+  EXPECT_EQ(zero, frc::ApplyDeadband(Eigen::Vector2d(0.02, 0.0), 0.02));
+  EXPECT_EQ((Eigen::Vector2d((0.03 - 0.02) / (1.0 - 0.02), 0.0)),
+            frc::ApplyDeadband(Eigen::Vector2d(0.03, 0.0), 0.02));
+  EXPECT_EQ((Eigen::Vector2d(1.0, 0.0)),
+            frc::ApplyDeadband(Eigen::Vector2d(1.0, 0.0), 0.02));
 }
 
 TEST(MathUtilTest, ApplyDeadband2dArbitraryScale) {
-  const Eigen::Vector2d zero{0.0, 0.0};
+  const Eigen::Vector2d zero(0.0, 0.0);
 
-  EXPECT_EQ(Eigen::Vector2d{0.0, 2.5},
-            frc::ApplyDeadband(Eigen::Vector2d{0.0, 2.5}, 0.02, 2.5));
-  EXPECT_EQ(Eigen::Vector2d{0.0, -2.5},
-            frc::ApplyDeadband(Eigen::Vector2d{0.0, -2.5}, 0.02, 2.5));
-  EXPECT_EQ(Eigen::Vector2d{-2.5, 0.0},
-            frc::ApplyDeadband(Eigen::Vector2d{-2.5, 0.0}, 0.02, 2.5));
+  EXPECT_EQ((Eigen::Vector2d(0.0, 2.5)),
+            frc::ApplyDeadband(Eigen::Vector2d(0.0, 2.5), 0.02, 2.5));
+  EXPECT_EQ((Eigen::Vector2d(0.0, -2.5)),
+            frc::ApplyDeadband(Eigen::Vector2d(0.0, -2.5), 0.02, 2.5));
+  EXPECT_EQ((Eigen::Vector2d(-2.5, 0.0)),
+            frc::ApplyDeadband(Eigen::Vector2d(-2.5, 0.0), 0.02, 2.5));
 
   // == 0
   EXPECT_EQ(zero, frc::ApplyDeadband(zero, 0.02, 2.5));
 
   // > 0
-  EXPECT_EQ(zero, frc::ApplyDeadband(Eigen::Vector2d{0.01, 0.0}, 0.02, 2.5));
-  EXPECT_EQ(zero, frc::ApplyDeadband(Eigen::Vector2d{0.02, 0.0}, 0.02, 2.5));
-  EXPECT_EQ(Eigen::Vector2d{2.5, 0.0},
-            frc::ApplyDeadband(Eigen::Vector2d{2.5, 0.0}, 0.02, 2.5));
+  EXPECT_EQ(zero, frc::ApplyDeadband(Eigen::Vector2d(0.01, 0.0), 0.02, 2.5));
+  EXPECT_EQ(zero, frc::ApplyDeadband(Eigen::Vector2d(0.02, 0.0), 0.02, 2.5));
+  EXPECT_EQ((Eigen::Vector2d(2.5, 0.0)),
+            frc::ApplyDeadband(Eigen::Vector2d(2.5, 0.0), 0.02, 2.5));
 }
 
 TEST(MathUtilTest, ApplyDeadband2dLargeMaxMagnitude) {
-  EXPECT_EQ(Eigen::Vector2d{80.0, 0.0},
-            frc::ApplyDeadband(Eigen::Vector2d{100.0, 0.0}, 20,
+  EXPECT_EQ((Eigen::Vector2d(80.0, 0.0)),
+            frc::ApplyDeadband(Eigen::Vector2d(100.0, 0.0), 20,
                                std::numeric_limits<double>::infinity()));
 }
 
 TEST(MathUtilTest, ApplyDeadband2dUnits) {
   EXPECT_EQ(
-      Eigen::Vector<unit::radians_t, 2>{-20_rad, 0_rad},
-      frc::ApplyDeadband<units::radian_t>(
-          Eigen::Vector<unit::radians_t, 2>{-20_rad, 0_rad}, 1_rad, 20_rad));
+      (Eigen::Vector<units::radian_t, 2>(-20_rad, 0_rad)),
+      (frc::ApplyDeadband<units::radian_t>(
+          Eigen::Vector<units::radian_t, 2>(-20_rad, 0_rad), 1_rad, 20_rad)));
 }
 
 TEST(MathUtilTest, CopySignPow) {
@@ -176,68 +176,68 @@ TEST(MathUtilTest, CopySignPowWithUnits) {
 }
 
 TEST(MathUtilTest, CopySignPow2d) {
-  const Eigen::Vector2d zero{0.0, 0.0};
+  const Eigen::Vector2d zero(0.0, 0.0);
 
-  EXPECT_EQ(Eigen::Vector2d{0.5, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{0.5, 0.0}, 1.0));
-  EXPECT_EQ(Eigen::Vector2d{-0.5, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{-0.5, 0.0}, 1.0));
+  EXPECT_EQ((Eigen::Vector2d(0.5, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(0.5, 0.0), 1.0));
+  EXPECT_EQ((Eigen::Vector2d(-0.5, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(-0.5, 0.0), 1.0));
 
-  EXPECT_EQ(Eigen::Vector2d{0.25, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{0.5, 0.0}, 2.0));
-  EXPECT_EQ(Eigen::Vector2d{-0.25, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{-0.5, 0.0}, 2.0));
+  EXPECT_EQ((Eigen::Vector2d(0.25, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(0.5, 0.0), 2.0));
+  EXPECT_EQ((Eigen::Vector2d(-0.25, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(-0.5, 0.0), 2.0));
 
-  EXPECT_EQ(Eigen::Vector2d{std::sqrt(0.5), 0.0},
-            frc::CopySignPow(Eigen::Vector2d{0.5, 0.0}, 0.5));
-  EXPECT_EQ(Eigen::Vector2d{-std::sqrt(0.5), 0.0},
-            frc::CopySignPow(Eigen::Vector2d{-0.5, 0.0}, 0.5));
+  EXPECT_EQ((Eigen::Vector2d(std::sqrt(0.5), 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(0.5, 0.0), 0.5));
+  EXPECT_EQ((Eigen::Vector2d(-std::sqrt(0.5), 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(-0.5, 0.0), 0.5));
 
   EXPECT_EQ(zero, frc::CopySignPow(zero, 2.0));
-  EXPECT_EQ(Eigen::Vector2d{1.0, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{1.0, 0.0}, 2.0));
-  EXPECT_EQ(Eigen::Vector2d{-1.0, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{-1.0, 0.0}, 2.0));
+  EXPECT_EQ((Eigen::Vector2d(1.0, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(1.0, 0.0), 2.0));
+  EXPECT_EQ((Eigen::Vector2d(-1.0, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(-1.0, 0.0), 2.0));
 
-  EXPECT_EQ(Eigen::Vector2d{0.0, std::pow(0.8, 0.3)},
-            frc::CopySignPow(Eigen::Vector2d{0.0, 0.8}, 0.3));
-  EXPECT_EQ(Eigen::Vector2d{0.0, -std::pow(0.8, 0.3)},
-            frc::CopySignPow(Eigen::Vector2d{0.0, -0.8}, 0.3));
+  EXPECT_EQ((Eigen::Vector2d(0.0, std::pow(0.8, 0.3))),
+            frc::CopySignPow(Eigen::Vector2d(0.0, 0.8), 0.3));
+  EXPECT_EQ((Eigen::Vector2d(0.0, -std::pow(0.8, 0.3))),
+            frc::CopySignPow(Eigen::Vector2d(0.0, -0.8), 0.3));
 }
 
 TEST(MathUtilTest, CopySignPow2dMaxDistance) {
-  EXPECT_EQ(Eigen::Vector2d{5.0, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{5.0, 0.0}, 1.0, 10.0));
-  EXPECT_EQ(Eigen::Vector2d{-5.0, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{-5.0, 0.0}, 1.0, 10.0));
+  EXPECT_EQ((Eigen::Vector2d(5.0, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(5.0, 0.0), 1.0, 10.0));
+  EXPECT_EQ((Eigen::Vector2d(-5.0, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(-5.0, 0.0), 1.0, 10.0));
 
-  EXPECT_EQ(Eigen::Vector2d{2.5, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{5.0, 0.0}, 2.0, 10.0));
-  EXPECT_EQ(Eigen::Vector2d{-2.5, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{-5.0, 0.0}, 2.0, 10.0));
+  EXPECT_EQ((Eigen::Vector2d(2.5, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(5.0, 0.0), 2.0, 10.0));
+  EXPECT_EQ((Eigen::Vector2d(-2.5, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(-5.0, 0.0), 2.0, 10.0));
 
-  EXPECT_EQ(Eigen::Vector2d{std::sqrt(0.5) * 10.0, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{5.0, 0.0}, 0.5, 10.0));
-  EXPECT_EQ(Eigen::Vector2d{-std::sqrt(0.5) * 10.0, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{-5.0, 0.0}, 0.5, 10.0));
+  EXPECT_EQ((Eigen::Vector2d(std::sqrt(0.5) * 10.0, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(5.0, 0.0), 0.5, 10.0));
+  EXPECT_EQ((Eigen::Vector2d(-std::sqrt(0.5) * 10.0, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(-5.0, 0.0), 0.5, 10.0));
 
-  EXPECT_EQ(Eigen::Vector2d{0.0, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{0.0, 0.0}, 2.0, 5.0));
-  EXPECT_EQ(Eigen::Vector2d{5.0, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{5.0, 0.0}, 2.0, 5.0));
-  EXPECT_EQ(Eigen::Vector2d{-5.0, 0.0},
-            frc::CopySignPow(Eigen::Vector2d{-5.0, 0.0}, 2.0, 5.0));
+  EXPECT_EQ((Eigen::Vector2d(0.0, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(0.0, 0.0), 2.0, 5.0));
+  EXPECT_EQ((Eigen::Vector2d(5.0, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(5.0, 0.0), 2.0, 5.0));
+  EXPECT_EQ((Eigen::Vector2d(-5.0, 0.0)),
+            frc::CopySignPow(Eigen::Vector2d(-5.0, 0.0), 2.0, 5.0));
 
-  EXPECT_EQ(Eigen::Vector2d{0.0, std::pow(0.8, 0.3) * 100.0},
-            frc::CopySignPow(Eigen::Vector2d{0.0, 80.0}, 0.3, 100.0));
-  EXPECT_EQ(Eigen::Vector2d{0.0, -std::pow(0.8, 0.3) * 100.0},
-            frc::CopySignPow(Eigen::Vector2d{0.0, -80.0}, 0.3, 100.0));
+  EXPECT_EQ((Eigen::Vector2d(0.0, std::pow(0.8, 0.3) * 100.0)),
+            frc::CopySignPow(Eigen::Vector2d(0.0, 80.0), 0.3, 100.0));
+  EXPECT_EQ((Eigen::Vector2d(0.0, -std::pow(0.8, 0.3) * 100.0)),
+            frc::CopySignPow(Eigen::Vector2d(0.0, -80.0), 0.3, 100.0));
 }
 
 TEST(MathUtilTest, CopySignPow2dUnits) {
-  EXPECT_EQ(Eigen::Vector<unit::radians_t, 2>{-20_rad, 0_rad},
-            frc::CopySignPow<units::radian_t>(
-                Eigen::Vector<unit::radians_t, 2>{-20_rad, 0_rad}, 2, 20_rad));
+  EXPECT_EQ((Eigen::Vector<units::radian_t, 2>(-20_rad, 0_rad)),
+            (frc::CopySignPow<units::radian_t>(
+                Eigen::Vector<units::radian_t, 2>(-20_rad, 0_rad), 2, 20_rad)));
 }
 
 TEST(MathUtilTest, InputModulus) {
