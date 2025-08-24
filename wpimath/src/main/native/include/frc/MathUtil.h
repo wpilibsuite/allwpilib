@@ -105,12 +105,12 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
  * (defaults to 1). Can be infinite.
  * @return The value after the deadband is applied.
  */
-template <int N>
-Eigen::Matrix<double, N, 1> ApplyDeadband(
-    const Eigen::Matrix<double, N, 1>& value, double deadband,
-    double maxMagnitude = 1.0) {
-  if (value.norm() < 1e-6) {
-    return Eigen::Matrix<double, N, 1>::Zero();
+template <typename T, int N>
+  requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
+Eigen::Vector<T, N> ApplyDeadband(const Eigen::Vector<T, N>& value, T deadband,
+                                  T maxMagnitude = T{1.0}) {
+  if (value.norm() < T{1e-6}) {
+    return Eigen::Vector<T, N>::Zero();
   }
   return value.normalized() *
          ApplyDeadband(value.norm(), deadband, maxMagnitude);
@@ -167,12 +167,12 @@ constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
  * @return The transformed value with the same direction and norm scaled to
  * the input range.
  */
-template <int N>
-Eigen::Matrix<double, N, 1> CopySignPow(
-    const Eigen::Matrix<double, N, 1>& value, double exponent,
-    double maxMagnitude = 1.0) {
-  if (value.norm() < 1e-6) {
-    return Eigen::Matrix<double, N, 1>::Zero();
+template <typename T, int N>
+  requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
+Eigen::Vector<T, N> CopySignPow(const Eigen::Vector<T, N>& value,
+                                double exponent, T maxMagnitude = T{1.0}) {
+  if (value.norm() < T{1e-6}) {
+    return Eigen::Vector<T, N>::Zero();
   }
   return value.normalized() * CopySignPow(value.norm(), exponent, maxMagnitude);
 }
