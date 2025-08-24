@@ -100,46 +100,51 @@ TEST(MathUtilTest, ApplyDeadband2dUnityScale) {
             frc::ApplyDeadband(frc::Translation2d(1, zero).ToVector(), 0.02));
 }
 
-TEST(MathUtilTest, ApplyDeadband2dArbitraryScale) {
-  const frc::Rotation2d zero;
-  const frc::Rotation2d cwPiOver2{-90_deg};
-  const frc::Rotation2d ccwPiOver2{90_deg};
-  const frc::Rotation2d pi{180_deg};
+TESTTEST(MathUtilTest, ApplyDeadband2dUnityScale) {
+  const Eigen::Vector2d zero{0.0, 0.0};
 
-  const frc::Translation2d zeroVec;
-
-  // Angles
-  EXPECT_EQ(frc::Translation2d(2.5, cwPiOver2).ToVector(),
-            frc::ApplyDeadband(frc::Translation2d(2.5, cwPiOver2).ToVector(),
-                               0.02, 2.5));
-  EXPECT_EQ(frc::Translation2d(2.5, ccwPiOver2).ToVector(),
-            frc::ApplyDeadband(frc::Translation2d(2.5, ccwPiOver2).ToVector(),
-                               0.02, 2.5));
-  EXPECT_EQ(
-      frc::Translation2d(2.5, pi).ToVector(),
-      frc::ApplyDeadband(frc::Translation2d(2.5, pi).ToVector(), 0.02, 2.5));
+  EXPECT_EQ(Eigen::Vector2d{0.0, 1.0},
+            frc::ApplyDeadband(Eigen::Vector2d{0.0, 1.0}, 0.02));
+  EXPECT_EQ(Eigen::Vector2d{0.0, -1.0},
+            frc::ApplyDeadband(Eigen::Vector2d{0.0, -1.0}, 0.02));
+  EXPECT_EQ(Eigen::Vector2d{-1.0, 0.0},
+            frc::ApplyDeadband(Eigen::Vector2d{-1.0, 0.0}, 0.02));
 
   // == 0
-  EXPECT_EQ(zeroVec.ToVector(),
-            frc::ApplyDeadband(zeroVec.ToVector(), 0.02, 2.5));
+  EXPECT_EQ(zero, frc::ApplyDeadband(zero, 0.02));
 
   // > 0
-  EXPECT_EQ(
-      zeroVec.ToVector(),
-      frc::ApplyDeadband(frc::Translation2d(0.01, zero).ToVector(), 0.02, 2.5));
-  EXPECT_EQ(
-      zeroVec.ToVector(),
-      frc::ApplyDeadband(frc::Translation2d(0.02, zero).ToVector(), 0.02, 2.5));
-  EXPECT_EQ(
-      frc::Translation2d(2.5, zero).ToVector(),
-      frc::ApplyDeadband(frc::Translation2d(2.5, zero).ToVector(), 0.02, 2.5));
+  EXPECT_EQ(zero, frc::ApplyDeadband(Eigen::Vector2d{0.01, 0.0}, 0.02));
+  EXPECT_EQ(zero, frc::ApplyDeadband(Eigen::Vector2d{0.02, 0.0}, 0.02));
+  EXPECT_EQ(Eigen::Vector2d{(0.03 - 0.02) / (1.0 - 0.02), 0.0},
+            frc::ApplyDeadband(Eigen::Vector2d{0.03, 0.0}, 0.02));
+  EXPECT_EQ(Eigen::Vector2d{1.0, 0.0},
+            frc::ApplyDeadband(Eigen::Vector2d{1.0, 0.0}, 0.02));
+}
+
+TEST(MathUtilTest, ApplyDeadband2dArbitraryScale) {
+  const Eigen::Vector2d zero{0.0, 0.0};
+
+  EXPECT_EQ(Eigen::Vector2d{0.0, 2.5},
+            frc::ApplyDeadband(Eigen::Vector2d{0.0, 2.5}, 0.02, 2.5));
+  EXPECT_EQ(Eigen::Vector2d{0.0, -2.5},
+            frc::ApplyDeadband(Eigen::Vector2d{0.0, -2.5}, 0.02, 2.5));
+  EXPECT_EQ(Eigen::Vector2d{-2.5, 0.0},
+            frc::ApplyDeadband(Eigen::Vector2d{-2.5, 0.0}, 0.02, 2.5));
+
+  // == 0
+  EXPECT_EQ(zero, frc::ApplyDeadband(zero, 0.02, 2.5));
+
+  // > 0
+  EXPECT_EQ(zero, frc::ApplyDeadband(Eigen::Vector2d{0.01, 0.0}, 0.02, 2.5));
+  EXPECT_EQ(zero, frc::ApplyDeadband(Eigen::Vector2d{0.02, 0.0}, 0.02, 2.5));
+  EXPECT_EQ(Eigen::Vector2d{2.5, 0.0},
+            frc::ApplyDeadband(Eigen::Vector2d{2.5, 0.0}, 0.02, 2.5));
 }
 
 TEST(MathUtilTest, ApplyDeadband2dLargeMaxMagnitude) {
-  const frc::Rotation2d zero;
-
-  EXPECT_EQ(frc::Translation2d(80, zero).ToVector(),
-            frc::ApplyDeadband(frc::Translation2d(100, zero).ToVector(), 20,
+  EXPECT_EQ(Eigen::Vector2d{80.0, 0.0},
+            frc::ApplyDeadband(Eigen::Vector2d{100.0, 0.0}, 20,
                                std::numeric_limits<double>::infinity()));
 }
 
@@ -206,81 +211,62 @@ TEST(MathUtilTest, CopySignPowWithUnits) {
 }
 
 TEST(MathUtilTest, CopySignPow2d) {
-  const frc::Rotation2d zero;
-  const frc::Rotation2d pi{180_deg};
+  const Eigen::Vector2d zero{0.0, 0.0};
 
-  EXPECT_EQ(frc::Translation2d(0.5, zero).ToVector(),
-            frc::CopySignPow(frc::Translation2d(0.5, zero).ToVector(), 1.0));
-  EXPECT_EQ(frc::Translation2d(0.5, pi).ToVector(),
-            frc::CopySignPow(frc::Translation2d(0.5, pi).ToVector(), 1.0));
+  EXPECT_EQ(Eigen::Vector2d{0.5, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{0.5, 0.0}, 1.0));
+  EXPECT_EQ(Eigen::Vector2d{-0.5, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{-0.5, 0.0}, 1.0));
 
-  EXPECT_EQ(frc::Translation2d(0.5 * 0.5, zero).ToVector(),
-            frc::CopySignPow(frc::Translation2d(0.5, zero).ToVector(), 2.0));
-  EXPECT_EQ(frc::Translation2d(0.5 * 0.5, pi).ToVector(),
-            frc::CopySignPow(frc::Translation2d(0.5, pi).ToVector(), 2.0));
+  EXPECT_EQ(Eigen::Vector2d{0.25, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{0.5, 0.0}, 2.0));
+  EXPECT_EQ(Eigen::Vector2d{-0.25, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{-0.5, 0.0}, 2.0));
 
-  EXPECT_EQ(frc::Translation2d(std::sqrt(0.5), zero).ToVector(),
-            frc::CopySignPow(frc::Translation2d(0.5, zero).ToVector(), 0.5));
-  EXPECT_EQ(frc::Translation2d(std::sqrt(0.5), pi).ToVector(),
-            frc::CopySignPow(frc::Translation2d(0.5, pi).ToVector(), 0.5));
+  EXPECT_EQ(Eigen::Vector2d{std::sqrt(0.5), 0.0},
+            frc::CopySignPow(Eigen::Vector2d{0.5, 0.0}, 0.5));
+  EXPECT_EQ(Eigen::Vector2d{-std::sqrt(0.5), 0.0},
+            frc::CopySignPow(Eigen::Vector2d{-0.5, 0.0}, 0.5));
 
-  EXPECT_EQ(frc::Translation2d().ToVector(),
-            frc::CopySignPow(frc::Translation2d().ToVector(), 2.0));
-  EXPECT_EQ(frc::Translation2d(1, zero).ToVector(),
-            frc::CopySignPow(frc::Translation2d(1, zero).ToVector(), 2.0));
-  EXPECT_EQ(frc::Translation2d(1, pi).ToVector(),
-            frc::CopySignPow(frc::Translation2d(1, pi).ToVector(), 2.0));
+  EXPECT_EQ(zero, frc::CopySignPow(zero, 2.0));
+  EXPECT_EQ(Eigen::Vector2d{1.0, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{1.0, 0.0}, 2.0));
+  EXPECT_EQ(Eigen::Vector2d{-1.0, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{-1.0, 0.0}, 2.0));
 
-  EXPECT_EQ(
-      frc::Translation2d(std::pow(0.8, 0.3), frc::Rotation2d(-90_deg))
-          .ToVector(),
-      frc::CopySignPow(
-          frc::Translation2d(0.8, frc::Rotation2d(-90_deg)).ToVector(), 0.3));
-  EXPECT_EQ(
-      frc::Translation2d(std::pow(0.8, 0.3), frc::Rotation2d(90_deg))
-          .ToVector(),
-      frc::CopySignPow(
-          frc::Translation2d(0.8, frc::Rotation2d(90_deg)).ToVector(), 0.3));
+  EXPECT_EQ(Eigen::Vector2d{0.0, std::pow(0.8, 0.3)},
+            frc::CopySignPow(Eigen::Vector2d{0.0, 0.8}, 0.3));
+  EXPECT_EQ(Eigen::Vector2d{0.0, -std::pow(0.8, 0.3)},
+            frc::CopySignPow(Eigen::Vector2d{0.0, -0.8}, 0.3));
 }
 
 TEST(MathUtilTest, CopySignPow2dMaxDistance) {
-  const frc::Rotation2d zero;
-  const frc::Rotation2d pi{180_deg};
+  EXPECT_EQ(Eigen::Vector2d{5.0, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{5.0, 0.0}, 1.0, 10.0));
+  EXPECT_EQ(Eigen::Vector2d{-5.0, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{-5.0, 0.0}, 1.0, 10.0));
 
-  EXPECT_EQ(frc::Translation2d(5, zero).ToVector(),
-            frc::CopySignPow(frc::Translation2d(5, zero).ToVector(), 1.0, 10));
-  EXPECT_EQ(frc::Translation2d(5, pi).ToVector(),
-            frc::CopySignPow(frc::Translation2d(5, pi).ToVector(), 1.0, 10));
+  EXPECT_EQ(Eigen::Vector2d{2.5, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{5.0, 0.0}, 2.0, 10.0));
+  EXPECT_EQ(Eigen::Vector2d{-2.5, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{-5.0, 0.0}, 2.0, 10.0));
 
-  EXPECT_EQ(frc::Translation2d(0.5 * 0.5 * 10.0, zero).ToVector(),
-            frc::CopySignPow(frc::Translation2d(5, zero).ToVector(), 2.0, 10));
-  EXPECT_EQ(frc::Translation2d(0.5 * 0.5 * 10.0, pi).ToVector(),
-            frc::CopySignPow(frc::Translation2d(5, pi).ToVector(), 2.0, 10));
+  EXPECT_EQ(Eigen::Vector2d{std::sqrt(0.5) * 10.0, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{5.0, 0.0}, 0.5, 10.0));
+  EXPECT_EQ(Eigen::Vector2d{-std::sqrt(0.5) * 10.0, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{-5.0, 0.0}, 0.5, 10.0));
 
-  EXPECT_EQ(frc::Translation2d(std::sqrt(0.5) * 10.0, zero).ToVector(),
-            frc::CopySignPow(frc::Translation2d(5, zero).ToVector(), 0.5, 10));
-  EXPECT_EQ(frc::Translation2d(std::sqrt(0.5) * 10.0, pi).ToVector(),
-            frc::CopySignPow(frc::Translation2d(5, pi).ToVector(), 0.5, 10));
+  EXPECT_EQ(Eigen::Vector2d{0.0, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{0.0, 0.0}, 2.0, 5.0));
+  EXPECT_EQ(Eigen::Vector2d{5.0, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{5.0, 0.0}, 2.0, 5.0));
+  EXPECT_EQ(Eigen::Vector2d{-5.0, 0.0},
+            frc::CopySignPow(Eigen::Vector2d{-5.0, 0.0}, 2.0, 5.0));
 
-  EXPECT_EQ(frc::Translation2d().ToVector(),
-            frc::CopySignPow(frc::Translation2d().ToVector(), 2.0, 5));
-  EXPECT_EQ(frc::Translation2d(5, zero).ToVector(),
-            frc::CopySignPow(frc::Translation2d(5, zero).ToVector(), 2.0, 5));
-  EXPECT_EQ(frc::Translation2d(5, pi).ToVector(),
-            frc::CopySignPow(frc::Translation2d(5, pi).ToVector(), 2.0, 5));
-
-  EXPECT_EQ(
-      frc::Translation2d(std::pow(0.8, 0.3) * 100.0, frc::Rotation2d(-90_deg))
-          .ToVector(),
-      frc::CopySignPow(
-          frc::Translation2d(80, frc::Rotation2d(-90_deg)).ToVector(), 0.3,
-          100));
-  EXPECT_EQ(
-      frc::Translation2d(std::pow(0.8, 0.3) * 100.0, frc::Rotation2d(90_deg))
-          .ToVector(),
-      frc::CopySignPow(
-          frc::Translation2d(80, frc::Rotation2d(90_deg)).ToVector(), 0.3,
-          100));
+  EXPECT_EQ(Eigen::Vector2d{0.0, std::pow(0.8, 0.3) * 100.0},
+            frc::CopySignPow(Eigen::Vector2d{0.0, 80.0}, 0.3, 100.0));
+  EXPECT_EQ(Eigen::Vector2d{0.0, -std::pow(0.8, 0.3) * 100.0},
+            frc::CopySignPow(Eigen::Vector2d{0.0, -80.0}, 0.3, 100.0));
 }
 
 TEST(MathUtilTest, CopySignPow2dUnits) {
