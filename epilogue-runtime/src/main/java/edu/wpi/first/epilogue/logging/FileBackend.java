@@ -23,7 +23,9 @@ import edu.wpi.first.datalog.StructArrayLogEntry;
 import edu.wpi.first.datalog.StructLogEntry;
 import edu.wpi.first.util.struct.Struct;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 /** A backend implementation that saves information to a WPILib {@link DataLog} file on disk. */
@@ -31,6 +33,7 @@ public class FileBackend implements EpilogueBackend {
   private final DataLog m_dataLog;
   private final Map<String, DataLogEntry> m_entries = new HashMap<>();
   private final Map<String, NestedBackend> m_subLoggers = new HashMap<>();
+  private final Set<Struct<?>> m_seenSchemas = new HashSet<>();
 
   /**
    * Creates a new file-based backend.
@@ -43,7 +46,13 @@ public class FileBackend implements EpilogueBackend {
 
   @Override
   public EpilogueBackend getNested(String path) {
-    return m_subLoggers.computeIfAbsent(path, k -> new NestedBackend(k, this));
+    if (!m_subLoggers.containsKey(path)) {
+      var nested = new NestedBackend(path, this);
+      m_subLoggers.put(path, nested);
+      return nested;
+    }
+
+    return m_subLoggers.get(path);
   }
 
   @SuppressWarnings("unchecked")
@@ -131,14 +140,30 @@ public class FileBackend implements EpilogueBackend {
   @Override
   @SuppressWarnings("unchecked")
   public <S> void log(String identifier, S value, Struct<S> struct) {
-    m_dataLog.addSchema(struct);
-    getEntry(identifier, (log, k) -> StructLogEntry.create(log, k, struct)).append(value);
+    // DataLog.addSchema has checks that we're able to skip, avoiding allocations
+    if (m_seenSchemas.add(struct)) {
+      m_dataLog.addSchema(struct);
+    }
+
+    if (!m_entries.containsKey(identifier)) {
+      m_entries.put(identifier, StructLogEntry.create(m_dataLog, identifier, struct));
+    }
+
+    ((StructLogEntry<S>) m_entries.get(identifier)).append(value);
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <S> void log(String identifier, S[] value, Struct<S> struct) {
-    m_dataLog.addSchema(struct);
-    getEntry(identifier, (log, k) -> StructArrayLogEntry.create(log, k, struct)).append(value);
+    // DataLog.addSchema has checks that we're able to skip, avoiding allocations
+    if (m_seenSchemas.add(struct)) {
+      m_dataLog.addSchema(struct);
+    }
+
+    if (!m_entries.containsKey(identifier)) {
+      m_entries.put(identifier, StructArrayLogEntry.create(m_dataLog, identifier, struct));
+    }
+
+    ((StructArrayLogEntry<S>) m_entries.get(identifier)).append(value);
   }
 }
