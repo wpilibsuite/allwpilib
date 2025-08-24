@@ -105,11 +105,11 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
  * (defaults to 1). Can be infinite.
  * @return The value after the deadband is applied.
  */
-template <int N, typename T>
+template <typename T, int N>
   requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
 Eigen::Matrix<T, N, 1> ApplyDeadband(const Eigen::Matrix<T, N, 1>& value,
                                      T deadband, T maxMagnitude = T{1.0}) {
-  if (value.norm() < 1e-6) {
+  if (value.norm() < T{1e-6}) {
     return Eigen::Matrix<T, N, 1>::Zero();
   }
   return value.normalized() *
@@ -170,11 +170,11 @@ constexpr T CopySignPow(T value, double exponent, T maxMagnitude = T{1.0}) {
  * @return The transformed value with the same direction and norm scaled to
  * the input range.
  */
-template <int N, typename T>
+template <typename T, int N>
   requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
-Eigen::Matrix<T, N, 1> CopySignPow(const Eigen::Matrix<double, N, 1>& value,
+Eigen::Matrix<T, N, 1> CopySignPow(const Eigen::Matrix<T, N, 1>& value,
                                    double exponent, T maxMagnitude = T{1.0}) {
-  if (value.norm() < 1e-6) {
+  if (value.norm() < T{1e-6}) {
     return Eigen::Matrix<T, N, 1>::Zero();
   }
   return value.normalized() * CopySignPow(value.norm(), exponent, maxMagnitude);

@@ -109,15 +109,14 @@ TEST(MathUtilTest, ApplyDeadband2dArbitraryScale) {
 
 TEST(MathUtilTest, ApplyDeadband2dLargeMaxMagnitude) {
   EXPECT_EQ((Eigen::Vector2d(80.0, 0.0)),
-            frc::ApplyDeadband(Eigen::Vector2d(100.0, 0.0), 20,
-                               std::numeric_limits<double>::infinity()));
+            (frc::ApplyDeadband(Eigen::Vector2d(100.0, 0.0), 20.0,
+                                std::numeric_limits<double>::infinity())));
 }
 
 TEST(MathUtilTest, ApplyDeadband2dUnits) {
-  EXPECT_EQ(
-      (Eigen::Vector<units::radian_t, 2>(-20_rad, 0_rad)),
-      (frc::ApplyDeadband<units::radian_t>(
-          Eigen::Vector<units::radian_t, 2>(-20_rad, 0_rad), 1_rad, 20_rad)));
+  EXPECT_EQ((Eigen::Vector2<units::radian_t>(-20_rad, 0_rad)),
+            (frc::ApplyDeadband(Eigen::Vector2<units::radian_t>(-20_rad, 0_rad),
+                                1_rad, 20_rad)));
 }
 
 TEST(MathUtilTest, CopySignPow) {
@@ -235,9 +234,9 @@ TEST(MathUtilTest, CopySignPow2dMaxDistance) {
 }
 
 TEST(MathUtilTest, CopySignPow2dUnits) {
-  EXPECT_EQ((Eigen::Vector<units::radian_t, 2>(-20_rad, 0_rad)),
+  EXPECT_EQ((Eigen::Vector2<units::radian_t>(-20_rad, 0_rad)),
             (frc::CopySignPow<units::radian_t>(
-                Eigen::Vector<units::radian_t, 2>(-20_rad, 0_rad), 2, 20_rad)));
+                Eigen::Vector2<units::radian_t>(-20_rad, 0_rad), 2, 20_rad)));
 }
 
 TEST(MathUtilTest, InputModulus) {
