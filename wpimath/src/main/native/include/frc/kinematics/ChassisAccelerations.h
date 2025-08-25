@@ -84,29 +84,31 @@ struct WPILIB_DLLEXPORT ChassisAccelerations {
   /**
    * Adds two ChassisAccelerations and returns the sum.
    *
-   * <p>For example, ChassisAccelerations{1.0, 0.5, 1.5} + ChassisAccelerations{2.0, 1.5, 0.5}
-   * = ChassisAccelerations{3.0, 2.0, 2.0}
+   * <p>For example, ChassisAccelerations{1.0, 0.5, 1.5} +
+   * ChassisAccelerations{2.0, 1.5, 0.5} = ChassisAccelerations{3.0, 2.0, 2.0}
    *
    * @param other The ChassisAccelerations to add.
    *
    * @return The sum of the ChassisAccelerations.
    */
-  constexpr ChassisAccelerations operator+(const ChassisAccelerations& other) const {
+  constexpr ChassisAccelerations operator+(
+      const ChassisAccelerations& other) const {
     return {ax + other.ax, ay + other.ay, alpha + other.alpha};
   }
 
   /**
-   * Subtracts the other ChassisAccelerations from the current ChassisAccelerations and
-   * returns the difference.
+   * Subtracts the other ChassisAccelerations from the current
+   * ChassisAccelerations and returns the difference.
    *
-   * <p>For example, ChassisAccelerations{5.0, 4.0, 2.0} - ChassisAccelerations{1.0, 2.0, 1.0}
-   * = ChassisAccelerations{4.0, 2.0, 1.0}
+   * <p>For example, ChassisAccelerations{5.0, 4.0, 2.0} -
+   * ChassisAccelerations{1.0, 2.0, 1.0} = ChassisAccelerations{4.0, 2.0, 1.0}
    *
    * @param other The ChassisAccelerations to subtract.
    *
    * @return The difference between the two ChassisAccelerations.
    */
-  constexpr ChassisAccelerations operator-(const ChassisAccelerations& other) const {
+  constexpr ChassisAccelerations operator-(
+      const ChassisAccelerations& other) const {
     return *this + -other;
   }
 
@@ -116,10 +118,13 @@ struct WPILIB_DLLEXPORT ChassisAccelerations {
    *
    * @return The inverse of the current ChassisAccelerations.
    */
-  constexpr ChassisAccelerations operator-() const { return {-ax, -ay, -alpha}; }
+  constexpr ChassisAccelerations operator-() const {
+    return {-ax, -ay, -alpha};
+  }
 
   /**
-   * Multiplies the ChassisAccelerations by a scalar and returns the new ChassisAccelerations.
+   * Multiplies the ChassisAccelerations by a scalar and returns the new
+   * ChassisAccelerations.
    *
    * <p>For example, ChassisAccelerations{2.0, 2.5, 1.0} * 2
    * = ChassisAccelerations{4.0, 5.0, 1.0}
@@ -133,7 +138,8 @@ struct WPILIB_DLLEXPORT ChassisAccelerations {
   }
 
   /**
-   * Divides the ChassisAccelerations by a scalar and returns the new ChassisAccelerations.
+   * Divides the ChassisAccelerations by a scalar and returns the new
+   * ChassisAccelerations.
    *
    * <p>For example, ChassisAccelerations{2.0, 2.5, 1.0} / 2
    * = ChassisAccelerations{1.0, 1.25, 0.5}

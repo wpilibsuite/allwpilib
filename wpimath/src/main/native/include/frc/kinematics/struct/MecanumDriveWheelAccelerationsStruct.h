@@ -11,14 +11,19 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::MecanumDriveWheelAccelerations> {
-  static constexpr std::string_view GetTypeName() { return "MecanumDriveWheelAccelerations"; }
+  static constexpr std::string_view GetTypeName() {
+    return "MecanumDriveWheelAccelerations";
+  }
   static constexpr size_t GetSize() { return 32; }
   static constexpr std::string_view GetSchema() {
-    return "double front_left;double front_right;double rear_left;double rear_right";
+    return "double front_left;double front_right;double rear_left;double "
+           "rear_right";
   }
 
-  static frc::MecanumDriveWheelAccelerations Unpack(std::span<const uint8_t> data);
-  static void Pack(std::span<uint8_t> data, const frc::MecanumDriveWheelAccelerations& value);
+  static frc::MecanumDriveWheelAccelerations Unpack(
+      std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data,
+                   const frc::MecanumDriveWheelAccelerations& value);
 };
 
 static_assert(wpi::StructSerializable<frc::MecanumDriveWheelAccelerations>);

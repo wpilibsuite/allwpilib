@@ -69,8 +69,8 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelAccelerations {
   }
 
   /**
-   * Multiplies the DifferentialDriveWheelAccelerations by a scalar and returns the new
-   * DifferentialDriveWheelAccelerations.
+   * Multiplies the DifferentialDriveWheelAccelerations by a scalar and returns
+   * the new DifferentialDriveWheelAccelerations.
    *
    * <p>For example, DifferentialDriveWheelAccelerations{2.0, 2.5} * 2
    * = DifferentialDriveWheelAccelerations{4.0, 5.0}
@@ -84,8 +84,8 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelAccelerations {
   }
 
   /**
-   * Divides the DifferentialDriveWheelAccelerations by a scalar and returns the new
-   * DifferentialDriveWheelAccelerations.
+   * Divides the DifferentialDriveWheelAccelerations by a scalar and returns the
+   * new DifferentialDriveWheelAccelerations.
    *
    * <p>For example, DifferentialDriveWheelAccelerations{2.0, 2.5} / 2
    * = DifferentialDriveWheelAccelerations{1.0, 1.25}
@@ -105,7 +105,8 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelAccelerations {
    *
    * @return True if the DifferentialDriveWheelAccelerations are equal.
    */
-  constexpr bool operator==(const DifferentialDriveWheelAccelerations& other) const = default;
+  constexpr bool operator==(
+      const DifferentialDriveWheelAccelerations& other) const = default;
 };
 }  // namespace frc
 

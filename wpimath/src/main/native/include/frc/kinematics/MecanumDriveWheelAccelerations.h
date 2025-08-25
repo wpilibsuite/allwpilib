@@ -82,8 +82,8 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelAccelerations {
   }
 
   /**
-   * Multiplies the MecanumDriveWheelAccelerations by a scalar and returns the new
-   * MecanumDriveWheelAccelerations.
+   * Multiplies the MecanumDriveWheelAccelerations by a scalar and returns the
+   * new MecanumDriveWheelAccelerations.
    *
    * <p>For example, MecanumDriveWheelAccelerations{2.0, 2.5, 3.0, 3.5} * 2 =
    * MecanumDriveWheelAccelerations{4.0, 5.0, 6.0, 7.0}
@@ -117,7 +117,8 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelAccelerations {
    *
    * @return True if the MecanumDriveWheelAccelerations are equal.
    */
-  constexpr bool operator==(const MecanumDriveWheelAccelerations& other) const = default;
+  constexpr bool operator==(const MecanumDriveWheelAccelerations& other) const =
+      default;
 };
 }  // namespace frc
 

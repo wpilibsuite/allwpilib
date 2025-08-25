@@ -8,7 +8,8 @@
 
 #include "frc/kinematics/MecanumDriveWheelAccelerations.h"
 
-frc::MecanumDriveWheelAccelerations wpi::Struct<frc::MecanumDriveWheelAccelerations>::Unpack(
+frc::MecanumDriveWheelAccelerations
+wpi::Struct<frc::MecanumDriveWheelAccelerations>::Unpack(
     std::span<const uint8_t> data) {
   constexpr size_t kFrontLeftOff = 0;
   constexpr size_t kFrontRightOff = kFrontLeftOff + 8;

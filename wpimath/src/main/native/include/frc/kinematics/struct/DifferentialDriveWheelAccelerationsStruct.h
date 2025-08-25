@@ -11,14 +11,19 @@
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<frc::DifferentialDriveWheelAccelerations> {
-  static constexpr std::string_view GetTypeName() { return "DifferentialDriveWheelAccelerations"; }
+  static constexpr std::string_view GetTypeName() {
+    return "DifferentialDriveWheelAccelerations";
+  }
   static constexpr size_t GetSize() { return 16; }
   static constexpr std::string_view GetSchema() {
     return "double left;double right";
   }
 
-  static frc::DifferentialDriveWheelAccelerations Unpack(std::span<const uint8_t> data);
-  static void Pack(std::span<uint8_t> data, const frc::DifferentialDriveWheelAccelerations& value);
+  static frc::DifferentialDriveWheelAccelerations Unpack(
+      std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data,
+                   const frc::DifferentialDriveWheelAccelerations& value);
 };
 
-static_assert(wpi::StructSerializable<frc::DifferentialDriveWheelAccelerations>);
+static_assert(
+    wpi::StructSerializable<frc::DifferentialDriveWheelAccelerations>);

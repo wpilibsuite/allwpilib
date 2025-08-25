@@ -43,7 +43,8 @@ struct WPILIB_DLLEXPORT SwerveModuleAccelerations {
    * @param other The SwerveModuleAccelerations to add.
    * @return The sum of the SwerveModuleAccelerations.
    */
-  SwerveModuleAccelerations operator+(const SwerveModuleAccelerations& other) const {
+  SwerveModuleAccelerations operator+(
+      const SwerveModuleAccelerations& other) const {
     // Convert to Cartesian coordinates, add, then convert back
     auto thisX = acceleration * angle.Cos();
     auto thisY = acceleration * angle.Sin();
@@ -66,7 +67,8 @@ struct WPILIB_DLLEXPORT SwerveModuleAccelerations {
    * @param other The SwerveModuleAccelerations to subtract.
    * @return The difference between the two SwerveModuleAccelerations.
    */
-  SwerveModuleAccelerations operator-(const SwerveModuleAccelerations& other) const {
+  SwerveModuleAccelerations operator-(
+      const SwerveModuleAccelerations& other) const {
     return *this + (-other);
   }
 

@@ -6,8 +6,8 @@
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<frc::ChassisAccelerations> wpi::Protobuf<frc::ChassisAccelerations>::Unpack(
-    InputStream& stream) {
+std::optional<frc::ChassisAccelerations>
+wpi::Protobuf<frc::ChassisAccelerations>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufChassisAccelerations msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -20,8 +20,8 @@ std::optional<frc::ChassisAccelerations> wpi::Protobuf<frc::ChassisAccelerations
   };
 }
 
-bool wpi::Protobuf<frc::ChassisAccelerations>::Pack(OutputStream& stream,
-                                                   const frc::ChassisAccelerations& value) {
+bool wpi::Protobuf<frc::ChassisAccelerations>::Pack(
+    OutputStream& stream, const frc::ChassisAccelerations& value) {
   wpi_proto_ProtobufChassisAccelerations msg{
       .ax = value.ax.value(),
       .ay = value.ay.value(),

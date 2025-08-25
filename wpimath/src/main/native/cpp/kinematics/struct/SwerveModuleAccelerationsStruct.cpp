@@ -8,15 +8,14 @@
 
 #include "frc/kinematics/SwerveModuleAccelerations.h"
 
-frc::SwerveModuleAccelerations wpi::Struct<frc::SwerveModuleAccelerations>::Unpack(
-    std::span<const uint8_t> data) {
+frc::SwerveModuleAccelerations wpi::Struct<
+    frc::SwerveModuleAccelerations>::Unpack(std::span<const uint8_t> data) {
   constexpr size_t kAccelerationOff = 0;
   constexpr size_t kAngleOff = kAccelerationOff + 8;
   return frc::SwerveModuleAccelerations{
       units::meters_per_second_squared_t{
           wpi::UnpackStruct<double, kAccelerationOff>(data)},
-      wpi::UnpackStruct<frc::Rotation2d, kAngleOff>(data)
-  };
+      wpi::UnpackStruct<frc::Rotation2d, kAngleOff>(data)};
 }
 
 void wpi::Struct<frc::SwerveModuleAccelerations>::Pack(

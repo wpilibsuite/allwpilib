@@ -11,10 +11,15 @@
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<frc::DifferentialDriveWheelAccelerations> {
+struct WPILIB_DLLEXPORT
+    wpi::Protobuf<frc::DifferentialDriveWheelAccelerations> {
   using MessageStruct = wpi_proto_ProtobufDifferentialDriveWheelAccelerations;
-  using InputStream = wpi::ProtoInputStream<frc::DifferentialDriveWheelAccelerations>;
-  using OutputStream = wpi::ProtoOutputStream<frc::DifferentialDriveWheelAccelerations>;
-  static std::optional<frc::DifferentialDriveWheelAccelerations> Unpack(InputStream& stream);
-  static bool Pack(OutputStream& stream, const frc::DifferentialDriveWheelAccelerations& value);
+  using InputStream =
+      wpi::ProtoInputStream<frc::DifferentialDriveWheelAccelerations>;
+  using OutputStream =
+      wpi::ProtoOutputStream<frc::DifferentialDriveWheelAccelerations>;
+  static std::optional<frc::DifferentialDriveWheelAccelerations> Unpack(
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
+                   const frc::DifferentialDriveWheelAccelerations& value);
 };

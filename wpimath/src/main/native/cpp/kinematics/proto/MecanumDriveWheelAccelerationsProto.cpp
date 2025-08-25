@@ -6,8 +6,8 @@
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<frc::MecanumDriveWheelAccelerations> wpi::Protobuf<frc::MecanumDriveWheelAccelerations>::Unpack(
-    InputStream& stream) {
+std::optional<frc::MecanumDriveWheelAccelerations> wpi::Protobuf<
+    frc::MecanumDriveWheelAccelerations>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufMecanumDriveWheelAccelerations msg;
   if (!stream.Decode(msg)) {
     return {};
@@ -21,8 +21,8 @@ std::optional<frc::MecanumDriveWheelAccelerations> wpi::Protobuf<frc::MecanumDri
   };
 }
 
-bool wpi::Protobuf<frc::MecanumDriveWheelAccelerations>::Pack(OutputStream& stream,
-                                                             const frc::MecanumDriveWheelAccelerations& value) {
+bool wpi::Protobuf<frc::MecanumDriveWheelAccelerations>::Pack(
+    OutputStream& stream, const frc::MecanumDriveWheelAccelerations& value) {
   wpi_proto_ProtobufMecanumDriveWheelAccelerations msg{
       .front_left = value.frontLeft.value(),
       .front_right = value.frontRight.value(),

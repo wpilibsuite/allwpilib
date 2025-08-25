@@ -15,6 +15,8 @@ struct WPILIB_DLLEXPORT wpi::Protobuf<frc::SwerveModuleAccelerations> {
   using MessageStruct = wpi_proto_ProtobufSwerveModuleAccelerations;
   using InputStream = wpi::ProtoInputStream<frc::SwerveModuleAccelerations>;
   using OutputStream = wpi::ProtoOutputStream<frc::SwerveModuleAccelerations>;
-  static std::optional<frc::SwerveModuleAccelerations> Unpack(InputStream& stream);
-  static bool Pack(OutputStream& stream, const frc::SwerveModuleAccelerations& value);
+  static std::optional<frc::SwerveModuleAccelerations> Unpack(
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
+                   const frc::SwerveModuleAccelerations& value);
 };

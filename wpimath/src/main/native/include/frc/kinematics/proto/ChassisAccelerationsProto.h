@@ -16,5 +16,6 @@ struct WPILIB_DLLEXPORT wpi::Protobuf<frc::ChassisAccelerations> {
   using InputStream = wpi::ProtoInputStream<frc::ChassisAccelerations>;
   using OutputStream = wpi::ProtoOutputStream<frc::ChassisAccelerations>;
   static std::optional<frc::ChassisAccelerations> Unpack(InputStream& stream);
-  static bool Pack(OutputStream& stream, const frc::ChassisAccelerations& value);
+  static bool Pack(OutputStream& stream,
+                   const frc::ChassisAccelerations& value);
 };
