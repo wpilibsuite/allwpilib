@@ -22,17 +22,17 @@ public class MecanumSample extends TrajectorySample<MecanumSample> {
    *
    * @param timestamp The timestamp of the sample.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param vel The robot velocity at this sample (in the robot's reference frame).
-   * @param accel The robot acceleration at this sample (in the robot's reference frame).
+   * @param velocity The robot velocity at this sample (in the robot's reference frame).
+   * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
    * @param speeds The mecanum wheel speeds.
    */
   public MecanumSample(
       Time timestamp,
       Pose2d pose,
-      ChassisSpeeds vel,
-      ChassisAccelerations accel,
+      ChassisSpeeds velocity,
+      ChassisAccelerations acceleration,
       MecanumDriveWheelSpeeds speeds) {
-    super(timestamp, pose, vel, accel);
+    super(timestamp, pose, velocity, acceleration);
 
     this.speeds = speeds;
   }
@@ -42,18 +42,18 @@ public class MecanumSample extends TrajectorySample<MecanumSample> {
    *
    * @param timeSeconds The timestamp of the sample in seconds.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param vel The robot velocity at this sample (in the robot's reference frame).
-   * @param accel The robot acceleration at this sample (in the robot's reference frame).
+   * @param velocity The robot velocity at this sample (in the robot's reference frame).
+   * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
    * @param speeds The mecanum wheel speeds.
    */
   @JsonCreator
   public MecanumSample(
       @JsonProperty("timestamp") double timeSeconds,
       @JsonProperty("pose") Pose2d pose,
-      @JsonProperty("vel") ChassisSpeeds vel,
-      @JsonProperty("accel") ChassisAccelerations accel,
+      @JsonProperty("velocity") ChassisSpeeds velocity,
+      @JsonProperty("acceleration") ChassisAccelerations acceleration,
       @JsonProperty("wheelSpeeds") MecanumDriveWheelSpeeds speeds) {
-    super(timeSeconds, pose, vel, accel);
+    super(timeSeconds, pose, velocity, acceleration);
 
     this.speeds = speeds;
   }
@@ -83,7 +83,7 @@ public class MecanumSample extends TrajectorySample<MecanumSample> {
    * @param speeds The mecanum wheel speeds.
    */
   public MecanumSample(TrajectorySample<?> sample, MecanumDriveWheelSpeeds speeds) {
-    this(sample.timestamp, sample.pose, sample.vel, sample.accel, speeds);
+    this(sample.timestamp, sample.pose, sample.velocity, sample.acceleration, speeds);
   }
 
   /**
@@ -93,7 +93,7 @@ public class MecanumSample extends TrajectorySample<MecanumSample> {
    * @param kinematics The mecanum drivetrain kinematics.
    */
   public MecanumSample(TrajectorySample<?> sample, MecanumDriveKinematics kinematics) {
-    this(sample.timestamp, sample.pose, sample.vel, sample.accel, kinematics);
+    this(sample.timestamp, sample.pose, sample.velocity, sample.acceleration, kinematics);
   }
 
   /**
@@ -108,8 +108,8 @@ public class MecanumSample extends TrajectorySample<MecanumSample> {
     return new MecanumSample(
         Seconds.of(MathUtil.interpolate(this.timestamp.in(Seconds), endValue.timestamp.in(Seconds), t)),
         this.pose.interpolate(endValue.pose, t),
-        this.vel.interpolate(endValue.vel, t),
-        this.accel.interpolate(endValue.accel, t),
+        this.velocity.interpolate(endValue.velocity, t),
+        this.acceleration.interpolate(endValue.acceleration, t),
         new MecanumDriveWheelSpeeds(
             MathUtil.interpolate(this.speeds.frontLeft, endValue.speeds.frontLeft, t),
             MathUtil.interpolate(this.speeds.frontRight, endValue.speeds.frontRight, t),
@@ -124,8 +124,8 @@ public class MecanumSample extends TrajectorySample<MecanumSample> {
     return new MecanumSample(
         this.timestamp,
         this.pose.transformBy(transform),
-        this.vel,
-        this.accel,
+        this.velocity,
+        this.acceleration,
         this.speeds
     );
   }

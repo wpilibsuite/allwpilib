@@ -48,7 +48,7 @@ public class TrajectorySampleStruct implements Struct<TrajectorySample.Base> {
   public void pack(ByteBuffer bb, TrajectorySample.Base value) {
     bb.putDouble(value.timestamp.in(Seconds));
     Pose2d.struct.pack(bb, value.pose);
-    ChassisSpeeds.struct.pack(bb, value.vel);
-    ChassisAccelerations.struct.pack(bb, value.accel);
+    ChassisSpeeds.struct.pack(bb, value.velocity);
+    ChassisAccelerations.struct.pack(bb, value.acceleration);
   }
 }

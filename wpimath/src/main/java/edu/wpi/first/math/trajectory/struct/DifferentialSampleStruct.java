@@ -43,8 +43,8 @@ public class DifferentialSampleStruct implements Struct<DifferentialSample> {
   public void pack(ByteBuffer bb, DifferentialSample value) {
     bb.putDouble(value.timestamp.in(Seconds));
     Pose2d.struct.pack(bb, value.pose);
-    ChassisSpeeds.struct.pack(bb, value.vel);
-    ChassisAccelerations.struct.pack(bb, value.accel);
+    ChassisSpeeds.struct.pack(bb, value.velocity);
+    ChassisAccelerations.struct.pack(bb, value.acceleration);
     bb.putDouble(value.leftSpeed);
     bb.putDouble(value.rightSpeed);
   }

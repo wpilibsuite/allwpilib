@@ -30,8 +30,8 @@ public class SplineSample extends TrajectorySample<SplineSample> {
 
   /** Constructs a SplineSample from another TrajectorySample, assuming the other sample's linear velocity is not zero. */
   public SplineSample(TrajectorySample<?> sample) {
-    super(sample.timestamp, sample.pose, sample.vel, sample.accel);
-    this.curvature = sample.vel.omega / (sample.vel.vx == 0.0 ? 1E-9 : sample.vel.vx);
+    super(sample.timestamp, sample.pose, sample.velocity, sample.acceleration);
+    this.curvature = sample.velocity.omega / (sample.velocity.vx == 0.0 ? 1E-9 : sample.velocity.vx);
   }
 
   public SplineSample() {
@@ -53,16 +53,16 @@ public class SplineSample extends TrajectorySample<SplineSample> {
     }
 
     // Check whether the robot is reversing at this stage.
-    final boolean reversing = vel.vx < 0 || Math.abs(vel.vx) < 1E-9 && accel.ax < 0;
+    final boolean reversing = velocity.vx < 0 || Math.abs(velocity.vx) < 1E-9 && acceleration.ax < 0;
 
     // Calculate the new velocity
     // v_f = v_0 + at
-    final double newV = vel.vx + (accel.ax * deltaT);
+    final double newV = velocity.vx + (acceleration.ax * deltaT);
 
     // Calculate the change in position.
     // delta_s = v_0 t + 0.5at²
     final double newS =
-        (vel.vx * deltaT + 0.5 * accel.ax * Math.pow(deltaT, 2)) * (reversing ? -1.0 : 1.0);
+        (velocity.vx * deltaT + 0.5 * acceleration.ax * Math.pow(deltaT, 2)) * (reversing ? -1.0 : 1.0);
 
     // Return the new state. To find the new position for the new state, we need
     // to interpolate between the two endpoint poses. The fraction for
@@ -75,13 +75,13 @@ public class SplineSample extends TrajectorySample<SplineSample> {
         newT,
         pose.plus(endValue.pose.minus(this.pose).times(interpolationFrac)),
         newV,
-        accel.ax + (endValue.accel.ax - accel.ax) * t,
+        acceleration.ax + (endValue.acceleration.ax - acceleration.ax) * t,
         MathUtil.interpolate(curvature, endValue.curvature, t));
   }
 
   @Override
   public SplineSample transform(Transform2d transform) {
     return new SplineSample(
-        timestamp, pose.transformBy(transform), vel, accel, curvature);
+        timestamp, pose.transformBy(transform), velocity, acceleration, curvature);
   }
 }

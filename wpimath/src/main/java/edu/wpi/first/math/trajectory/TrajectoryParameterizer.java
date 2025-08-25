@@ -215,7 +215,7 @@ public final class TrajectoryParameterizer {
       // Calculate dt
       double dt = 0.0;
       if (i > 0) {
-        states.get(i - 1).accel.ax = reversed ? -accel : accel;
+        states.get(i - 1).acceleration.ax = reversed ? -accel : accel;
         if (Math.abs(accel) > 1E-6) {
           // v_f = v_0 + a * t
           dt = (state.maxVelocity - velocity) / accel;

@@ -112,7 +112,7 @@ public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
                 s ->
                     s.fromSample(
                         new TrajectorySample.Base(
-                            s.timestamp.plus(this.duration), s.pose, s.vel, s.accel)))
+                            s.timestamp.plus(this.duration), s.pose, s.velocity, s.acceleration)))
             .toList());
 
     return new Trajectory<>(combinedSamples);

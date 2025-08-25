@@ -203,7 +203,7 @@ public class LTVUnicycleController {
    * @return The linear and angular velocity outputs of the LTV controller.
    */
   public ChassisSpeeds calculate(Pose2d currentPose, TrajectorySample<?> desiredState) {
-    return calculate(currentPose, desiredState.pose, desiredState.vel.vx, desiredState.vel.omega);
+    return calculate(currentPose, desiredState.pose, desiredState.velocity.vx, desiredState.velocity.omega);
   }
 
   /**

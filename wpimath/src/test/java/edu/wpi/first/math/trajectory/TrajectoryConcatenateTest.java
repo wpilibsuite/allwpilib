@@ -51,8 +51,8 @@ class TrajectoryConcatenateTest {
           // The concatenate method should handle timestamp adjustment automatically
           // We just verify the pose, velocity, and acceleration are preserved
           assertEquals(state.pose, st.pose);
-          assertEquals(state.vel, st.vel);
-          assertEquals(state.accel, st.accel);
+          assertEquals(state.velocity, st.velocity);
+          assertEquals(state.acceleration, st.acceleration);
         }
       }
     }

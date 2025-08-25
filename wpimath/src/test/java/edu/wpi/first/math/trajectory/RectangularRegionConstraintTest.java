@@ -32,8 +32,8 @@ class RectangularRegionConstraintTest {
     boolean exceededConstraintOutsideRegion = false;
     for (var point : trajectory.samples) {
       if (rectangle.contains(point.pose.getTranslation())) {
-        assertTrue(Math.abs(point.vel.vx) < maxVelocity + 0.05);
-      } else if (Math.abs(point.vel.vx) >= maxVelocity + 0.05) {
+        assertTrue(Math.abs(point.velocity.vx) < maxVelocity + 0.05);
+      } else if (Math.abs(point.velocity.vx) >= maxVelocity + 0.05) {
         exceededConstraintOutsideRegion = true;
       }
     }

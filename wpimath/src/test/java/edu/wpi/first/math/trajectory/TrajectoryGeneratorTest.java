@@ -60,8 +60,8 @@ class TrajectoryGeneratorTest {
       var point = trajectory.sampleAt(t);
       t += dt;
       assertAll(
-          () -> assertTrue(Math.abs(point.vel.vx) < feetToMeters(12.0) + 0.05),
-          () -> assertTrue(Math.abs(point.accel.ax) < feetToMeters(12.0) + 0.05));
+          () -> assertTrue(Math.abs(point.velocity.vx) < feetToMeters(12.0) + 0.05),
+          () -> assertTrue(Math.abs(point.acceleration.ax) < feetToMeters(12.0) + 0.05));
     }
   }
 

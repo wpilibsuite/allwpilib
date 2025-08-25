@@ -34,10 +34,10 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
   public final Pose2d pose;
 
   /** The robot velocity at this sample (in the robot's reference frame). */
-  public final ChassisSpeeds vel;
+  public final ChassisSpeeds velocity;
 
   /** The robot acceleration at this sample (in the robot's reference frame). */
-  public final ChassisAccelerations accel;
+  public final ChassisAccelerations acceleration;
 
   /** Base struct for serialization. */
   public static TrajectorySampleStruct struct = new TrajectorySampleStruct();
@@ -47,15 +47,15 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
    *
    * @param timestamp The timestamp of the sample relative to the trajectory start.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param vel The robot velocity at this sample (in the robot's reference frame).
-   * @param accel The robot acceleration at this sample (in the robot's reference frame).
+   * @param velocity The robot velocity at this sample (in the robot's reference frame).
+   * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
    */
   public TrajectorySample(
-      Time timestamp, Pose2d pose, ChassisSpeeds vel, ChassisAccelerations accel) {
+      Time timestamp, Pose2d pose, ChassisSpeeds velocity, ChassisAccelerations acceleration) {
     this.timestamp = timestamp;
     this.pose = pose;
-    this.vel = vel;
-    this.accel = accel;
+    this.velocity = velocity;
+    this.acceleration = acceleration;
 
     this.timeSeconds = timestamp.in(Seconds);
   }
@@ -65,18 +65,18 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
    *
    * @param timestamp The timestamp of the sample relative to the trajectory start, in seconds.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param vel The robot velocity at this sample (in the robot's reference frame).
-   * @param accel The robot acceleration at this sample (in the robot's reference frame).
+   * @param velocity The robot velocity at this sample (in the robot's reference frame).
+   * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
    */
   @JsonCreator
   public TrajectorySample(
-      double timestamp, Pose2d pose, ChassisSpeeds vel, ChassisAccelerations accel) {
-    this(Seconds.of(timestamp), pose, vel, accel);
+      double timestamp, Pose2d pose, ChassisSpeeds velocity, ChassisAccelerations acceleration) {
+    this(Seconds.of(timestamp), pose, velocity, acceleration);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(timestamp, pose, vel, accel);
+    return Objects.hash(timestamp, pose, velocity, acceleration);
   }
 
   @Override
@@ -87,8 +87,8 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
 
     return timestamp.equals(that.timestamp)
         && pose.equals(that.pose)
-        && vel.equals(that.vel)
-        && accel.equals(that.accel);
+        && velocity.equals(that.velocity)
+        && acceleration.equals(that.acceleration);
   }
 
   /**
@@ -102,11 +102,11 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
 
     var newVel =
         new ChassisSpeeds(
-            vel.vx + accel.ax * dts, vel.vy + accel.ay * dts, vel.omega + accel.alpha * dts);
+            velocity.vx + acceleration.ax * dts, velocity.vy + acceleration.ay * dts, velocity.omega + acceleration.alpha * dts);
 
     var newPose = pose.exp(new Twist2d(newVel.vx * dts, newVel.vy * dts, newVel.omega * dts));
 
-    return new Base(timestamp.plus(dt), newPose, newVel, accel);
+    return new Base(timestamp.plus(dt), newPose, newVel, acceleration);
   }
 
   public static Base kinematicInterpolate(
@@ -121,30 +121,30 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
 
     var newAccel =
         new ChassisAccelerations(
-            MathUtil.interpolate(start.accel.ax, end.accel.ax, t),
-            MathUtil.interpolate(start.accel.ay, end.accel.ay, t),
-            MathUtil.interpolate(start.accel.alpha, end.accel.alpha, t));
+            MathUtil.interpolate(start.acceleration.ax, end.acceleration.ax, t),
+            MathUtil.interpolate(start.acceleration.ay, end.acceleration.ay, t),
+            MathUtil.interpolate(start.acceleration.alpha, end.acceleration.alpha, t));
 
     // vₖ₊₁ = vₖ + aₖΔt
     var newVel =
         new ChassisSpeeds(
-            start.vel.vx + start.accel.ax * interpDt,
-            start.vel.vy + start.accel.ay * interpDt,
-            start.vel.omega + start.accel.alpha * interpDt);
+            start.velocity.vx + start.acceleration.ax * interpDt,
+            start.velocity.vy + start.acceleration.ay * interpDt,
+            start.velocity.omega + start.acceleration.alpha * interpDt);
 
     // xₖ₊₁ = xₖ + vₖΔt + ½a(Δt)²
     var newPose =
         new Pose2d(
             start.pose.getX()
-                + start.vel.vx * interpDt
-                + 0.5 * start.accel.ax * interpDt * interpDt,
+                + start.velocity.vx * interpDt
+                + 0.5 * start.acceleration.ax * interpDt * interpDt,
             start.pose.getY()
-                + start.vel.vy * interpDt
-                + 0.5 * start.accel.ay * interpDt * interpDt,
+                + start.velocity.vy * interpDt
+                + 0.5 * start.acceleration.ay * interpDt * interpDt,
             new Rotation2d(
                 start.pose.getRotation().getRadians()
-                    + start.vel.omega * interpDt
-                    + 0.5 * start.accel.alpha * interpDt * interpDt));
+                    + start.velocity.omega * interpDt
+                    + 0.5 * start.acceleration.alpha * interpDt * interpDt));
 
     return new Base(Seconds.of(interpDt), newPose, newVel, newAccel);
   }
@@ -163,9 +163,9 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
     public Base(
         @JsonProperty("timestamp") double timestamp,
         @JsonProperty("pose") Pose2d pose,
-        @JsonProperty("vel") ChassisSpeeds vel,
-        @JsonProperty("accel") ChassisAccelerations accel) {
-      super(timestamp, pose, vel, accel);
+        @JsonProperty("velocity") ChassisSpeeds velocity,
+        @JsonProperty("acceleration") ChassisAccelerations acceleration) {
+      super(timestamp, pose, velocity, acceleration);
     }
 
     public Base(Time timestamp, Pose2d pose, ChassisSpeeds vel, ChassisAccelerations accel) {
@@ -173,7 +173,7 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
     }
 
     public Base(TrajectorySample<?> sample) {
-      super(sample.timestamp, sample.pose, sample.vel, sample.accel);
+      super(sample.timestamp, sample.pose, sample.velocity, sample.acceleration);
     }
 
     /**
@@ -194,7 +194,7 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
       return new Base(
           timestamp,
           pose.transformBy(transform),
-          vel, accel);
+          velocity, acceleration);
     }
   }
 }

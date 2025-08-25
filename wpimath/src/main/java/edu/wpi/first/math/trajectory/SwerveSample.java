@@ -9,8 +9,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Time;
 
-import javax.xml.crypto.dsig.Transform;
-
 import static edu.wpi.first.units.Units.Seconds;
 
 public class SwerveSample extends TrajectorySample<SwerveSample> {
@@ -25,17 +23,17 @@ public class SwerveSample extends TrajectorySample<SwerveSample> {
    *
    * @param timestamp The timestamp of the sample.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param vel The robot velocity at this sample (in the robot's reference frame).
-   * @param accel The robot acceleration at this sample (in the robot's reference frame).
+   * @param velocity The robot velocity at this sample (in the robot's reference frame).
+   * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
    * @param states The swerve module states at this sample.
    */
   public SwerveSample(
       Time timestamp,
       Pose2d pose,
-      ChassisSpeeds vel,
-      ChassisAccelerations accel,
+      ChassisSpeeds velocity,
+      ChassisAccelerations acceleration,
       SwerveModuleState... states) {
-    super(timestamp, pose, vel, accel);
+    super(timestamp, pose, velocity, acceleration);
 
     this.states = states;
   }
@@ -45,19 +43,19 @@ public class SwerveSample extends TrajectorySample<SwerveSample> {
    *
    * @param timestamp The timestamp of the sample.
    * @param pose The robot pose at this sample (in the field reference frame).
-   * @param vel The robot velocity at this sample (in the robot's reference frame).
-   * @param accel The robot acceleration at this sample (in the robot's reference frame).
+   * @param velocity The robot velocity at this sample (in the robot's reference frame).
+   * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
    * @param kinematics The kinematics of the drivetrain.
    */
   public SwerveSample(
       Time timestamp,
       Pose2d pose,
-      ChassisSpeeds vel,
-      ChassisAccelerations accel,
+      ChassisSpeeds velocity,
+      ChassisAccelerations acceleration,
       SwerveDriveKinematics kinematics) {
-    super(timestamp, pose, vel, accel);
+    super(timestamp, pose, velocity, acceleration);
 
-    states = kinematics.toWheelSpeeds(vel);
+    states = kinematics.toWheelSpeeds(velocity);
   }
 
   /**
@@ -67,7 +65,7 @@ public class SwerveSample extends TrajectorySample<SwerveSample> {
    * @param kinematics The kinematics of the drivetrain.
    */
   public SwerveSample(TrajectorySample<?> sample, SwerveDriveKinematics kinematics) {
-    this(sample.timestamp, sample.pose, sample.vel, sample.accel, kinematics);
+    this(sample.timestamp, sample.pose, sample.velocity, sample.acceleration, kinematics);
   }
 
   /**
@@ -94,8 +92,8 @@ public class SwerveSample extends TrajectorySample<SwerveSample> {
     return new SwerveSample(
         Seconds.of(MathUtil.interpolate(timestamp.in(Seconds), endValue.timestamp.in(Seconds), t)),
         pose.interpolate(endValue.pose, t),
-        vel.interpolate(endValue.vel, t),
-        accel.interpolate(endValue.accel, t),
+        velocity.interpolate(endValue.velocity, t),
+        acceleration.interpolate(endValue.acceleration, t),
         newStates
     );
   }
@@ -105,6 +103,6 @@ public class SwerveSample extends TrajectorySample<SwerveSample> {
     return new SwerveSample(
         timestamp,
         pose.transformBy(transform),
-        vel, accel, states);
+        velocity, acceleration, states);
   }
 }

@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisAccelerations;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,8 +71,8 @@ public class SampleJsonTest {
             assertAll(
                 () -> assertEquals(sample.timestamp, deserializedSample.timestamp),
                 () -> assertEquals(sample.pose, deserializedSample.pose),
-                () -> assertEquals(sample.vel, deserializedSample.vel),
-                () -> assertEquals(sample.accel, deserializedSample.accel),
+                () -> assertEquals(sample.velocity, deserializedSample.velocity),
+                () -> assertEquals(sample.acceleration, deserializedSample.acceleration),
                 () -> assertEquals(sample.leftSpeed, deserializedSample.leftSpeed),
                 () -> assertEquals(sample.rightSpeed, deserializedSample.rightSpeed));
           } catch (JsonProcessingException e) {
@@ -97,8 +96,8 @@ public class SampleJsonTest {
             assertAll(
                 () -> assertEquals(sample.timestamp, deserializedSample.timestamp),
                 () -> assertEquals(sample.pose, deserializedSample.pose),
-                () -> assertEquals(sample.vel, deserializedSample.vel),
-                () -> assertEquals(sample.accel, deserializedSample.accel),
+                () -> assertEquals(sample.velocity, deserializedSample.velocity),
+                () -> assertEquals(sample.acceleration, deserializedSample.acceleration),
                 () -> assertEquals(sample.speeds.frontLeft, deserializedSample.speeds.frontLeft),
                 () -> assertEquals(sample.speeds.frontRight, deserializedSample.speeds.frontRight),
                 () -> assertEquals(sample.speeds.rearLeft, deserializedSample.speeds.rearLeft),

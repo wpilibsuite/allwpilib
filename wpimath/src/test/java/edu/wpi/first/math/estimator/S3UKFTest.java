@@ -168,8 +168,8 @@ class S3UKFTest {
     double totalTime = trajectory.duration.in(Seconds);
     for (int i = 0; i < (totalTime / dt); ++i) {
       var ref = trajectory.sampleAt(dt * i);
-      double vl = ref.vel.vx * (1 - (ref.curvature * rb));
-      double vr = ref.vel.vx * (1 + (ref.curvature * rb));
+      double vl = ref.velocity.vx * (1 - (ref.curvature * rb));
+      double vr = ref.velocity.vx * (1 + (ref.curvature * rb));
 
       var nextR =
           VecBuilder.fill(
