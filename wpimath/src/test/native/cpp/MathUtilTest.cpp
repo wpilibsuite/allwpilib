@@ -125,7 +125,7 @@ TEST(MathUtilTest, ApplyDeadband2dUnits) {
                 Eigen::Vector<units::meters_per_second_t, 2>(1_mps, 0_mps),
                 0.02_mps));
 
-  EXPECT_EQ(Eigen::Vector<units::meters_per_second_t, 2>(0_mps, 0_mps),
+  EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>(0_mps, 0_mps)),
             frc::ApplyDeadband(
                 Eigen::Vector<units::meters_per_second_t, 2>(0_mps, 0_mps),
                 0.02_mps, 2.5_mps));
@@ -259,7 +259,7 @@ TEST(MathUtilTest, CopySignPow2dUnits) {
       frc::CopySignPow(
           Eigen::Vector<units::meters_per_second_t, 2>(-1_mps, 0_mps), 2.0));
 
-  EXPECT_EQ(Eigen::Vector<units::meters_per_second_t, 2>(0_mps, 0_mps),
+  EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>(0_mps, 0_mps)),
             frc::CopySignPow(
                 Eigen::Vector<units::meters_per_second_t, 2>(0_mps, 0_mps), 2.0,
                 5_mps));
