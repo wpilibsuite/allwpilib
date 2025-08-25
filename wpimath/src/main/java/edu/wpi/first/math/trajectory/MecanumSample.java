@@ -1,5 +1,7 @@
 package edu.wpi.first.math.trajectory;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
@@ -10,8 +12,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.units.measure.Time;
-
-import static edu.wpi.first.units.Units.Seconds;
 
 public class MecanumSample extends TrajectorySample<MecanumSample> {
   /** The speeds of the wheels in the robot's reference frame, in meters per second. */
@@ -106,7 +106,8 @@ public class MecanumSample extends TrajectorySample<MecanumSample> {
   @Override
   public MecanumSample interpolate(MecanumSample endValue, double t) {
     return new MecanumSample(
-        Seconds.of(MathUtil.interpolate(this.timestamp.in(Seconds), endValue.timestamp.in(Seconds), t)),
+        Seconds.of(
+            MathUtil.interpolate(this.timestamp.in(Seconds), endValue.timestamp.in(Seconds), t)),
         this.pose.interpolate(endValue.pose, t),
         this.velocity.interpolate(endValue.velocity, t),
         this.acceleration.interpolate(endValue.acceleration, t),
@@ -114,9 +115,7 @@ public class MecanumSample extends TrajectorySample<MecanumSample> {
             MathUtil.interpolate(this.speeds.frontLeft, endValue.speeds.frontLeft, t),
             MathUtil.interpolate(this.speeds.frontRight, endValue.speeds.frontRight, t),
             MathUtil.interpolate(this.speeds.rearLeft, endValue.speeds.rearLeft, t),
-            MathUtil.interpolate(this.speeds.rearRight, endValue.speeds.rearRight, t)
-        )
-    );
+            MathUtil.interpolate(this.speeds.rearRight, endValue.speeds.rearRight, t)));
   }
 
   @Override
@@ -126,7 +125,17 @@ public class MecanumSample extends TrajectorySample<MecanumSample> {
         this.pose.transformBy(transform),
         this.velocity,
         this.acceleration,
-        this.speeds
-    );
+        this.speeds);
+  }
+
+  @Override
+  public MecanumSample relativeTo(Pose2d other) {
+    return new MecanumSample(
+        this.timestamp, this.pose.relativeTo(other), this.velocity, this.acceleration, this.speeds);
+  }
+
+  @Override
+  public MecanumSample withNewTimestamp(Time timestamp) {
+    return new MecanumSample(timestamp, pose, velocity, acceleration, speeds);
   }
 }

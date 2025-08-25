@@ -1,5 +1,7 @@
 package edu.wpi.first.math.trajectory;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -8,8 +10,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Time;
-
-import static edu.wpi.first.units.Units.Seconds;
+import java.util.Arrays;
 
 public class SwerveSample extends TrajectorySample<SwerveSample> {
   /**
@@ -35,7 +36,7 @@ public class SwerveSample extends TrajectorySample<SwerveSample> {
       SwerveModuleState... states) {
     super(timestamp, pose, velocity, acceleration);
 
-    this.states = states;
+    this.states = Arrays.copyOf(states, states.length);
   }
 
   /**
@@ -94,15 +95,21 @@ public class SwerveSample extends TrajectorySample<SwerveSample> {
         pose.interpolate(endValue.pose, t),
         velocity.interpolate(endValue.velocity, t),
         acceleration.interpolate(endValue.acceleration, t),
-        newStates
-    );
+        newStates);
   }
 
   @Override
   public SwerveSample transform(Transform2d transform) {
-    return new SwerveSample(
-        timestamp,
-        pose.transformBy(transform),
-        velocity, acceleration, states);
+    return new SwerveSample(timestamp, pose.transformBy(transform), velocity, acceleration, states);
+  }
+
+  @Override
+  public SwerveSample relativeTo(Pose2d other) {
+    return new SwerveSample(timestamp, pose.relativeTo(other), velocity, acceleration, states);
+  }
+
+  @Override
+  public SwerveSample withNewTimestamp(Time timestamp) {
+    return new SwerveSample(timestamp, pose, velocity, acceleration, states);
   }
 }

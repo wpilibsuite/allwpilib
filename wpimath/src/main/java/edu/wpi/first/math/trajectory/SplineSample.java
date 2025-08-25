@@ -23,15 +23,24 @@ public class SplineSample extends TrajectorySample<SplineSample> {
   }
 
   /** Constructs a SplineSample. */
-  public SplineSample(Time timestamp, Pose2d pose, ChassisSpeeds vel, ChassisAccelerations accel, double curvature) {
+  public SplineSample(
+      Time timestamp,
+      Pose2d pose,
+      ChassisSpeeds vel,
+      ChassisAccelerations accel,
+      double curvature) {
     super(timestamp, pose, vel, accel);
     this.curvature = curvature;
   }
 
-  /** Constructs a SplineSample from another TrajectorySample, assuming the other sample's linear velocity is not zero. */
+  /**
+   * Constructs a SplineSample from another TrajectorySample, assuming the other sample's linear
+   * velocity is not zero.
+   */
   public SplineSample(TrajectorySample<?> sample) {
     super(sample.timestamp, sample.pose, sample.velocity, sample.acceleration);
-    this.curvature = sample.velocity.omega / (sample.velocity.vx == 0.0 ? 1E-9 : sample.velocity.vx);
+    this.curvature =
+        sample.velocity.omega / (sample.velocity.vx == 0.0 ? 1E-9 : sample.velocity.vx);
   }
 
   public SplineSample() {
@@ -53,7 +62,8 @@ public class SplineSample extends TrajectorySample<SplineSample> {
     }
 
     // Check whether the robot is reversing at this stage.
-    final boolean reversing = velocity.vx < 0 || Math.abs(velocity.vx) < 1E-9 && acceleration.ax < 0;
+    final boolean reversing =
+        velocity.vx < 0 || Math.abs(velocity.vx) < 1E-9 && acceleration.ax < 0;
 
     // Calculate the new velocity
     // v_f = v_0 + at
@@ -62,7 +72,8 @@ public class SplineSample extends TrajectorySample<SplineSample> {
     // Calculate the change in position.
     // delta_s = v_0 t + 0.5at²
     final double newS =
-        (velocity.vx * deltaT + 0.5 * acceleration.ax * Math.pow(deltaT, 2)) * (reversing ? -1.0 : 1.0);
+        (velocity.vx * deltaT + 0.5 * acceleration.ax * Math.pow(deltaT, 2))
+            * (reversing ? -1.0 : 1.0);
 
     // Return the new state. To find the new position for the new state, we need
     // to interpolate between the two endpoint poses. The fraction for
@@ -83,5 +94,15 @@ public class SplineSample extends TrajectorySample<SplineSample> {
   public SplineSample transform(Transform2d transform) {
     return new SplineSample(
         timestamp, pose.transformBy(transform), velocity, acceleration, curvature);
+  }
+
+  @Override
+  public SplineSample relativeTo(Pose2d other) {
+    return new SplineSample(timestamp, pose.relativeTo(other), velocity, acceleration, curvature);
+  }
+
+  @Override
+  public SplineSample withNewTimestamp(Time timestamp) {
+    return new SplineSample(timestamp, pose, velocity, acceleration, curvature);
   }
 }

@@ -40,7 +40,7 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
   public final ChassisAccelerations acceleration;
 
   /** Base struct for serialization. */
-  public static TrajectorySampleStruct struct = new TrajectorySampleStruct();
+  public static final TrajectorySampleStruct struct = new TrajectorySampleStruct();
 
   /**
    * Constructs a TrajectorySample.
@@ -102,13 +102,23 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
 
     var newVel =
         new ChassisSpeeds(
-            velocity.vx + acceleration.ax * dts, velocity.vy + acceleration.ay * dts, velocity.omega + acceleration.alpha * dts);
+            velocity.vx + acceleration.ax * dts,
+            velocity.vy + acceleration.ay * dts,
+            velocity.omega + acceleration.alpha * dts);
 
     var newPose = pose.exp(new Twist2d(newVel.vx * dts, newVel.vy * dts, newVel.omega * dts));
 
     return new Base(timestamp.plus(dt), newPose, newVel, acceleration);
   }
 
+  /**
+   * Interpolates between two samples using constant-acceleratopm kinematic equations.
+   *
+   * @param start The start sample.
+   * @param end The end sample.
+   * @param t The time between the start and end samples. Should be in the range [0, 1].
+   * @return new sample.
+   */
   public static Base kinematicInterpolate(
       TrajectorySample<?> start, TrajectorySample<?> end, double t) {
     if (t <= 0) {
@@ -157,6 +167,22 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
    */
   public abstract SampleType transform(Transform2d transform);
 
+  /**
+   * Transforms this sample to be relative to the given pose.
+   *
+   * @param other The pose to make this sample relative to.
+   * @return A new sample with the relative pose.
+   */
+  public abstract SampleType relativeTo(Pose2d other);
+
+  /**
+   * Creates a new sample with the given timestamp.
+   *
+   * @param timestamp The new timestamp.
+   * @return A new sample with the given timestamp.
+   */
+  public abstract SampleType withNewTimestamp(Time timestamp);
+
   /** A base class for trajectory samples. */
   public static class Base extends TrajectorySample<Base> {
     @JsonCreator
@@ -181,7 +207,7 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
      * equations.
      *
      * @param endValue The end sample.
-     * @param t        The time between this sample and the end sample. Should be in the range [0, 1].
+     * @param t The time between this sample and the end sample. Should be in the range [0, 1].
      * @return new sample
      */
     @Override
@@ -191,10 +217,17 @@ public abstract class TrajectorySample<SampleType extends TrajectorySample<Sampl
 
     @Override
     public Base transform(Transform2d transform) {
-      return new Base(
-          timestamp,
-          pose.transformBy(transform),
-          velocity, acceleration);
+      return new Base(timestamp, pose.transformBy(transform), velocity, acceleration);
+    }
+
+    @Override
+    public Base relativeTo(Pose2d other) {
+      return new Base(timestamp, pose.relativeTo(other), velocity, acceleration);
+    }
+
+    @Override
+    public Base withNewTimestamp(Time timestamp) {
+      return new Base(timestamp, pose, velocity, acceleration);
     }
   }
 }

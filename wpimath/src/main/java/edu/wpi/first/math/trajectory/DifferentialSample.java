@@ -32,12 +32,12 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
   /**
    * Constructs a DifferentialSample.
    *
-   * @param timestamp    The timestamp of the sample relative to the trajectory start, in seconds.
-   * @param pose         The robot pose at this sample (in the field reference frame).
-   * @param velocity     The robot velocity at this sample (in the robot's reference frame).
+   * @param timestamp The timestamp of the sample relative to the trajectory start, in seconds.
+   * @param pose The robot pose at this sample (in the field reference frame).
+   * @param velocity The robot velocity at this sample (in the robot's reference frame).
    * @param acceleration The robot acceleration at this sample (in the robot's reference frame).
-   * @param leftSpeed    The left-wheel speed at this sample in meters per second.
-   * @param rightSpeed   The right-wheel speed at this sample in meters per second.
+   * @param leftSpeed The left-wheel speed at this sample in meters per second.
+   * @param rightSpeed The right-wheel speed at this sample in meters per second.
    */
   @JsonCreator
   public DifferentialSample(
@@ -94,7 +94,12 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
       LinearVelocity leftSpeed,
       LinearVelocity rightSpeed) {
     this(
-        timestamp, pose, velocity, acceleration, leftSpeed.in(MetersPerSecond), rightSpeed.in(MetersPerSecond));
+        timestamp,
+        pose,
+        velocity,
+        acceleration,
+        leftSpeed.in(MetersPerSecond),
+        rightSpeed.in(MetersPerSecond));
   }
 
   /**
@@ -127,7 +132,8 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
    * @param rightSpeed The right-wheel speed at this sample in meters per second.
    */
   public DifferentialSample(TrajectorySample<?> sample, double leftSpeed, double rightSpeed) {
-    this(sample.timestamp, sample.pose, sample.velocity, sample.acceleration, leftSpeed, rightSpeed);
+    this(
+        sample.timestamp, sample.pose, sample.velocity, sample.acceleration, leftSpeed, rightSpeed);
   }
 
   /**
@@ -141,7 +147,7 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
   }
 
   /**
-   * Computes the differential drive dynamics: ẋ = Ax + Bu
+   * Computes the differential drive dynamics: ẋ = Ax + Bu.
    *
    * @param state [x, y, θ, vₗ, vᵣ, ω]
    * @param input [aₗ, aᵣ, α]
@@ -163,8 +169,8 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
   }
 
   /**
-   * Matrix version of {@link #dynamics(Vector, Vector)} for use with {@link
-   * NumericalIntegration}'s rkdp method.
+   * Matrix version of {@link #dynamics(Vector, Vector)} for use with {@link NumericalIntegration}'s
+   * rkdp method.
    */
   private Matrix<N6, N1> dynamics(Matrix<N6, N1> state, Matrix<N3, N1> input) {
     return dynamics(
@@ -188,16 +194,18 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
 
     Matrix<N6, N1> initialState =
         VecBuilder.fill(
-            pose.getX(), pose.getY(), pose.getRotation().getRadians(), velocity.vx, velocity.vy, velocity.omega);
-
-
+            pose.getX(),
+            pose.getY(),
+            pose.getRotation().getRadians(),
+            velocity.vx,
+            velocity.vy,
+            velocity.omega);
 
     Vector<N3> initialInput = VecBuilder.fill(acceleration.ax, acceleration.ay, acceleration.alpha);
 
     // integrate state derivatives [vₗ, vᵣ, ω, aₗ, aᵣ, α] to new states [x, y, θ, vₗ, vᵣ, ω]
     Matrix<N6, N1> endState =
-        NumericalIntegration.rkdp(
-            this::dynamics, initialState, initialInput, interpDt);
+        NumericalIntegration.rkdp(this::dynamics, initialState, initialInput, interpDt);
 
     double x = endState.get(0, 0);
     double y = endState.get(1, 0);
@@ -225,7 +233,17 @@ public class DifferentialSample extends TrajectorySample<DifferentialSample>
   @Override
   public DifferentialSample transform(Transform2d transform) {
     return new DifferentialSample(
-        timestamp, pose.transformBy(transform), velocity, acceleration, leftSpeed, rightSpeed
-    );
+        timestamp, pose.transformBy(transform), velocity, acceleration, leftSpeed, rightSpeed);
+  }
+
+  @Override
+  public DifferentialSample relativeTo(Pose2d other) {
+    return new DifferentialSample(
+        timestamp, pose.relativeTo(other), velocity, acceleration, leftSpeed, rightSpeed);
+  }
+
+  @Override
+  public DifferentialSample withNewTimestamp(Time timestamp) {
+    return new DifferentialSample(timestamp, pose, velocity, acceleration, leftSpeed, rightSpeed);
   }
 }

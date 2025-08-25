@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.units.measure.Time;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -84,12 +85,7 @@ public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
    * @return The transformed trajectory.
    */
   public Trajectory<SampleType> transformBy(Transform2d transform) {
-    var newFirstSample = samples.getFirst().transform(transform);
-
-    return new Trajectory<>(
-        samples.stream()
-            .map(s -> s.transform(transform))
-            .toList());
+    return new Trajectory<>(samples.stream().map(s -> s.transform(transform)).toList());
   }
 
   /**
@@ -108,11 +104,7 @@ public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
     var combinedSamples = new ArrayList<>(this.samples);
     combinedSamples.addAll(
         other.samples.stream()
-            .map(
-                s ->
-                    s.fromSample(
-                        new TrajectorySample.Base(
-                            s.timestamp.plus(this.duration), s.pose, s.velocity, s.acceleration)))
+            .map(s -> s.withNewTimestamp(s.timestamp.plus(this.duration)))
             .toList());
 
     return new Trajectory<>(combinedSamples);
@@ -129,10 +121,7 @@ public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
    * @return a new trajectory that is relative to the given pose.
    */
   public Trajectory<SampleType> relativeTo(Pose2d other) {
-    return new Trajectory<>(
-        samples.stream()
-            .map(s -> s.relativeTo)
-            .toList());
+    return new Trajectory<>(samples.stream().map(s -> s.relativeTo(other)).toList());
   }
 
   /**
@@ -140,6 +129,7 @@ public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
    * differential drives.
    *
    * @param kinematics DifferentialDriveKinematics object representing the drivetrain.
+   * @return the trajectory with differential samples.
    */
   public Trajectory<DifferentialSample> toDifferentialTrajectory(
       DifferentialDriveKinematics kinematics) {
@@ -147,8 +137,25 @@ public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
         samples.stream().map(s -> new DifferentialSample(s, kinematics)).toList());
   }
 
+  /**
+   * Converts this trajectory to a mecanum trajectory, allowing for easier following by mecanum
+   * drives.
+   *
+   * @param kinematics MecanumDriveKinematics object representing the drivetrain.
+   * @return the trajectory with mecanum samples.
+   */
   public Trajectory<MecanumSample> toMecanumTrajectory(MecanumDriveKinematics kinematics) {
-    return new Trajectory<>(
-        samples.stream().map(s -> new MecanumSample(s, kinematics)).toList());
+    return new Trajectory<>(samples.stream().map(s -> new MecanumSample(s, kinematics)).toList());
+  }
+
+  /**
+   * Converts this trajectory to a swerve trajectory, allowing for easier following by swerve
+   * drives.
+   *
+   * @param kinematics SwerveDriveKinematics object representing the drivetrain.
+   * @return the trajectory with swerve samples.
+   */
+  public Trajectory<SwerveSample> toSwerveTrajectory(SwerveDriveKinematics kinematics) {
+    return new Trajectory<>(samples.stream().map(s -> new SwerveSample(s, kinematics)).toList());
   }
 }
