@@ -52,7 +52,7 @@ nanopb                wpiutil/src/main/native/thirdparty/nanopb
 upb                   wpiutil/src/main/native/thirdparty/upb
 mrcal                 wpical/src/main/native/thirdparty/mrcal
 libdogleg             wpical/src/main/native/thirdparty/libdogleg
-Simd                  hal/src/main/native/athena/simd
+Simd                  hal/src/main/native/systemcore/simd
 
 Additionally, glfw and nanopb were modified for use in WPILib.
 
