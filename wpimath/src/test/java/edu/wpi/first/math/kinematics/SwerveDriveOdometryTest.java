@@ -224,10 +224,14 @@ class SwerveDriveOdometryTest {
     while (t <= trajectory.duration.in(Seconds)) {
       var groundTruthState = trajectory.sampleAt(t);
 
-      fl.distance += groundTruthState.velocity.vx * dt + 0.5 * groundTruthState.acceleration.ax * dt * dt;
-      fr.distance += groundTruthState.velocity.vx * dt + 0.5 * groundTruthState.acceleration.ax * dt * dt;
-      bl.distance += groundTruthState.velocity.vx * dt + 0.5 * groundTruthState.acceleration.ax * dt * dt;
-      br.distance += groundTruthState.velocity.vx * dt + 0.5 * groundTruthState.acceleration.ax * dt * dt;
+      fl.distance +=
+          groundTruthState.velocity.vx * dt + 0.5 * groundTruthState.acceleration.ax * dt * dt;
+      fr.distance +=
+          groundTruthState.velocity.vx * dt + 0.5 * groundTruthState.acceleration.ax * dt * dt;
+      bl.distance +=
+          groundTruthState.velocity.vx * dt + 0.5 * groundTruthState.acceleration.ax * dt * dt;
+      br.distance +=
+          groundTruthState.velocity.vx * dt + 0.5 * groundTruthState.acceleration.ax * dt * dt;
 
       fl.angle = groundTruthState.pose.getRotation();
       fr.angle = groundTruthState.pose.getRotation();

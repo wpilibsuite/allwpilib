@@ -32,7 +32,8 @@ class DifferentialDriveKinematicsConstraintTest {
 
     for (double t = 0; t < duration; t += 0.02) {
       var point = trajectory.sampleAt(t);
-      var chassisSpeeds = new ChassisSpeeds(point.velocity.vx, 0, point.velocity.vx * point.curvature);
+      var chassisSpeeds =
+          new ChassisSpeeds(point.velocity.vx, 0, point.velocity.vx * point.curvature);
 
       var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
 

@@ -18,7 +18,10 @@ import java.util.Objects;
 
 /** Represents the state of one swerve module. */
 public class SwerveModuleState
-    implements Comparable<SwerveModuleState>, ProtobufSerializable, StructSerializable, Interpolatable<SwerveModuleState> {
+    implements Comparable<SwerveModuleState>,
+        ProtobufSerializable,
+        StructSerializable,
+        Interpolatable<SwerveModuleState> {
   /** Speed of the wheel of the module in meters per second. */
   public double speed;
 
@@ -141,8 +144,7 @@ public class SwerveModuleState
     } else {
       return new SwerveModuleState(
           MathUtil.interpolate(this.speed, endValue.speed, t),
-          this.angle.interpolate(endValue.angle, t)
-      );
+          this.angle.interpolate(endValue.angle, t));
     }
   }
 }

@@ -7,10 +7,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import java.util.ArrayList;
 import java.util.List;
-
-import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import org.junit.jupiter.api.Test;
 
 public class SampleJsonTest {
@@ -91,8 +90,7 @@ public class SampleJsonTest {
         sample -> {
           try {
             String json = mapper.writeValueAsString(sample);
-            MecanumSample deserializedSample =
-                mapper.readValue(json, MecanumSample.class);
+            MecanumSample deserializedSample = mapper.readValue(json, MecanumSample.class);
             assertAll(
                 () -> assertEquals(sample.timestamp, deserializedSample.timestamp),
                 () -> assertEquals(sample.pose, deserializedSample.pose),
