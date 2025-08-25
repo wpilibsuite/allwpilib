@@ -41,7 +41,7 @@ class LTVUnicycleControllerTest {
       var state = trajectory.sample(kDt * i);
 
       var output = controller.calculate(robotPose, state);
-      robotPose = robotPose.exp(new Twist2d(output.vx * kDt, 0, output.omega * kDt));
+      robotPose = robotPose.plus(new Twist2d(output.vx * kDt, 0, output.omega * kDt).exp());
     }
 
     final var states = trajectory.getStates();

@@ -16,23 +16,18 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_math_jni_Pose3dJNI
  * Method:    exp
- * Signature: (DDDDDDDDDDDDD)[D
+ * Signature: (DDDDDD)[D
  */
 JNIEXPORT jdoubleArray JNICALL
 Java_edu_wpi_first_math_jni_Pose3dJNI_exp
-  (JNIEnv* env, jclass, jdouble poseX, jdouble poseY, jdouble poseZ,
-   jdouble poseQw, jdouble poseQx, jdouble poseQy, jdouble poseQz,
-   jdouble twistDx, jdouble twistDy, jdouble twistDz, jdouble twistRx,
-   jdouble twistRy, jdouble twistRz)
+  (JNIEnv* env, jclass, jdouble twistDx, jdouble twistDy, jdouble twistDz,
+   jdouble twistRx, jdouble twistRy, jdouble twistRz)
 {
-  frc::Pose3d pose{
-      units::meter_t{poseX}, units::meter_t{poseY}, units::meter_t{poseZ},
-      frc::Rotation3d{frc::Quaternion{poseQw, poseQx, poseQy, poseQz}}};
   frc::Twist3d twist{units::meter_t{twistDx},  units::meter_t{twistDy},
                      units::meter_t{twistDz},  units::radian_t{twistRx},
                      units::radian_t{twistRy}, units::radian_t{twistRz}};
 
-  frc::Pose3d result = pose.Exp(twist);
+  frc::Transform3d result = twist.Exp();
 
   const auto& resultQuaternion = result.Rotation().GetQuaternion();
   return MakeJDoubleArray(
@@ -44,23 +39,18 @@ Java_edu_wpi_first_math_jni_Pose3dJNI_exp
 /*
  * Class:     edu_wpi_first_math_jni_Pose3dJNI
  * Method:    log
- * Signature: (DDDDDDDDDDDDDD)[D
+ * Signature: (DDDDDDD)[D
  */
 JNIEXPORT jdoubleArray JNICALL
 Java_edu_wpi_first_math_jni_Pose3dJNI_log
-  (JNIEnv* env, jclass, jdouble startX, jdouble startY, jdouble startZ,
-   jdouble startQw, jdouble startQx, jdouble startQy, jdouble startQz,
-   jdouble endX, jdouble endY, jdouble endZ, jdouble endQw, jdouble endQx,
-   jdouble endQy, jdouble endQz)
+  (JNIEnv* env, jclass, jdouble relX, jdouble relY, jdouble relZ, jdouble relQw,
+   jdouble relQx, jdouble relQy, jdouble relQz)
 {
-  frc::Pose3d startPose{
-      units::meter_t{startX}, units::meter_t{startY}, units::meter_t{startZ},
-      frc::Rotation3d{frc::Quaternion{startQw, startQx, startQy, startQz}}};
-  frc::Pose3d endPose{
-      units::meter_t{endX}, units::meter_t{endY}, units::meter_t{endZ},
-      frc::Rotation3d{frc::Quaternion{endQw, endQx, endQy, endQz}}};
+  frc::Transform3d transform3d{
+      units::meter_t{relX}, units::meter_t{relY}, units::meter_t{relZ},
+      frc::Rotation3d{frc::Quaternion{relQw, relQx, relQy, relQz}}};
 
-  frc::Twist3d result = startPose.Log(endPose);
+  frc::Twist3d result = transform3d.Log();
 
   return MakeJDoubleArray(
       env, {{result.dx.value(), result.dy.value(), result.dz.value(),

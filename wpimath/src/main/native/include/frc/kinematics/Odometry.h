@@ -122,7 +122,7 @@ class WPILIB_DLLEXPORT Odometry {
         m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
     twist.dtheta = (angle - m_previousAngle).Radians();
 
-    auto newPose = m_pose.Exp(twist);
+    auto newPose = m_pose + twist.Exp();
 
     m_previousAngle = angle;
     m_previousWheelPositions = wheelPositions;

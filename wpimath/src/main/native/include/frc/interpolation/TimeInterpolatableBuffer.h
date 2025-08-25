@@ -166,9 +166,9 @@ inline TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
         } else if (t >= 1) {
           return end;
         } else {
-          Twist2d twist = start.Log(end);
+          Twist2d twist = (end - start).Log();
           Twist2d scaledTwist = twist * t;
-          return start.Exp(scaledTwist);
+          return start + scaledTwist.Exp();
         }
       }) {}
 

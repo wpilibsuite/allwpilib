@@ -30,7 +30,7 @@ BENCHMARK(BM_Transform);
 
 void BM_Twist(benchmark::State& state) {
   frc::TravelingSalesman traveler{[](auto pose1, auto pose2) {
-    auto twist = pose1.Log(pose2);
+    auto twist = (pose2 - pose1).Log();
     return units::math::hypot(twist.dx, twist.dy).value();
   }};
   for (auto _ : state) {

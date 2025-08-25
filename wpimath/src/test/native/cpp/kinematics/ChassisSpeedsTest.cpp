@@ -20,7 +20,7 @@ TEST(ChassisSpeedsTest, Discretize) {
 
   frc::Pose2d pose;
   for (units::second_t time = 0_s; time < duration; time += dt) {
-    pose = pose.Exp(twist);
+    pose = pose + twist.Exp();
   }
 
   EXPECT_NEAR((target.vx * duration).value(), pose.X().value(), kEpsilon);
