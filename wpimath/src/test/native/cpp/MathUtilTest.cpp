@@ -260,7 +260,7 @@ TEST(MathUtilTest, CopySignPow2dUnits) {
           Eigen::Vector<units::meters_per_second_t, 2>(-1_mps, 0_mps), 2.0));
 
   EXPECT_EQ(zero, frc::CopySignPow(zero, 2.0, 5_mps));
-  
+
   EXPECT_EQ((Eigen::Vector<units::meters_per_second_t, 2>(5_mps, 0_mps)),
             frc::CopySignPow(
                 Eigen::Vector<units::meters_per_second_t, 2>(5_mps, 0_mps), 2.0,
