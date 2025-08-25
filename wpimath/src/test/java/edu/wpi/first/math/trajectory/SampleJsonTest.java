@@ -5,13 +5,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisAccelerations;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import org.junit.jupiter.api.Test;
 
 public class SampleJsonTest {
+  private final Translation2d m_fl = new Translation2d(12, 12);
+  private final Translation2d m_fr = new Translation2d(12, -12);
+  private final Translation2d m_bl = new Translation2d(-12, 12);
+  private final Translation2d m_br = new Translation2d(-12, -12);
+
   @Test
   public void testBaseSample() {
     ObjectMapper mapper = new ObjectMapper();
@@ -68,6 +76,33 @@ public class SampleJsonTest {
                 () -> assertEquals(sample.accel, deserializedSample.accel),
                 () -> assertEquals(sample.leftSpeed, deserializedSample.leftSpeed),
                 () -> assertEquals(sample.rightSpeed, deserializedSample.rightSpeed));
+          } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+          }
+        });
+  }
+
+  @Test
+  public void testMecanumSample() {
+    ObjectMapper mapper = new ObjectMapper();
+    Trajectory<MecanumSample> trajectory =
+        TrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
+            .toMecanumTrajectory(new MecanumDriveKinematics(m_fl, m_fr, m_bl, m_br));
+    trajectory.samples.forEach(
+        sample -> {
+          try {
+            String json = mapper.writeValueAsString(sample);
+            MecanumSample deserializedSample =
+                mapper.readValue(json, MecanumSample.class);
+            assertAll(
+                () -> assertEquals(sample.timestamp, deserializedSample.timestamp),
+                () -> assertEquals(sample.pose, deserializedSample.pose),
+                () -> assertEquals(sample.vel, deserializedSample.vel),
+                () -> assertEquals(sample.accel, deserializedSample.accel),
+                () -> assertEquals(sample.speeds.frontLeft, deserializedSample.speeds.frontLeft),
+                () -> assertEquals(sample.speeds.frontRight, deserializedSample.speeds.frontRight),
+                () -> assertEquals(sample.speeds.rearLeft, deserializedSample.speeds.rearLeft),
+                () -> assertEquals(sample.speeds.rearRight, deserializedSample.speeds.rearRight));
           } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
           }

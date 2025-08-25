@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.units.measure.Time;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -87,14 +88,7 @@ public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
 
     return new Trajectory<>(
         samples.stream()
-            .map(
-                sample ->
-                    sample.fromSample(
-                        new TrajectorySample.Base(
-                            sample.timestamp,
-                            newFirstSample.pose.plus(sample.pose.minus(samples.getFirst().pose)),
-                            sample.vel,
-                            sample.accel)))
+            .map(s -> s.transform(transform))
             .toList());
   }
 
@@ -137,11 +131,7 @@ public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
   public Trajectory<SampleType> relativeTo(Pose2d other) {
     return new Trajectory<>(
         samples.stream()
-            .map(
-                s ->
-                    s.fromSample(
-                        new TrajectorySample.Base(
-                            s.timestamp, s.pose.relativeTo(other), s.vel, s.accel)))
+            .map(s -> s.relativeTo)
             .toList());
   }
 
@@ -155,5 +145,10 @@ public class Trajectory<SampleType extends TrajectorySample<SampleType>> {
       DifferentialDriveKinematics kinematics) {
     return new Trajectory<>(
         samples.stream().map(s -> new DifferentialSample(s, kinematics)).toList());
+  }
+
+  public Trajectory<MecanumSample> toMecanumTrajectory(MecanumDriveKinematics kinematics) {
+    return new Trajectory<>(
+        samples.stream().map(s -> new MecanumSample(s, kinematics)).toList());
   }
 }

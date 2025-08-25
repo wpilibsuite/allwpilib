@@ -1,6 +1,8 @@
 package edu.wpi.first.math.trajectory;
 
-import edu.wpi.first.math.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisAccelerations;
@@ -38,6 +40,27 @@ public class MecanumSample extends TrajectorySample<MecanumSample> {
   /**
    * Constructs a MecanumSample.
    *
+   * @param timeSeconds The timestamp of the sample in seconds.
+   * @param pose The robot pose at this sample (in the field reference frame).
+   * @param vel The robot velocity at this sample (in the robot's reference frame).
+   * @param accel The robot acceleration at this sample (in the robot's reference frame).
+   * @param speeds The mecanum wheel speeds.
+   */
+  @JsonCreator
+  public MecanumSample(
+      @JsonProperty("timestamp") double timeSeconds,
+      @JsonProperty("pose") Pose2d pose,
+      @JsonProperty("vel") ChassisSpeeds vel,
+      @JsonProperty("accel") ChassisAccelerations accel,
+      @JsonProperty("wheelSpeeds") MecanumDriveWheelSpeeds speeds) {
+    super(timeSeconds, pose, vel, accel);
+
+    this.speeds = speeds;
+  }
+
+  /**
+   * Constructs a MecanumSample.
+   *
    * @param timestamp The timestamp of the sample.
    * @param pose The robot pose at this sample (in the field reference frame).
    * @param vel The robot velocity at this sample (in the robot's reference frame).
@@ -61,6 +84,16 @@ public class MecanumSample extends TrajectorySample<MecanumSample> {
    */
   public MecanumSample(TrajectorySample<?> sample, MecanumDriveWheelSpeeds speeds) {
     this(sample.timestamp, sample.pose, sample.vel, sample.accel, speeds);
+  }
+
+  /**
+   * Constructs a MecanumSample from another TrajectorySample.
+   *
+   * @param sample The TrajectorySample to copy.
+   * @param kinematics The mecanum drivetrain kinematics.
+   */
+  public MecanumSample(TrajectorySample<?> sample, MecanumDriveKinematics kinematics) {
+    this(sample.timestamp, sample.pose, sample.vel, sample.accel, kinematics);
   }
 
   /**
