@@ -50,7 +50,7 @@ public class Twist2d implements ProtobufSerializable, StructSerializable {
    * derivation.
    *
    * <p>The twist is a change in pose in the robot's coordinate frame since the previous pose
-   * update. When the user runs exp() the twist, the user will receive the pose delta.
+   * update. When the user runs exp() on the twist, the user will receive the pose delta.
    *
    * <p>"Exp" represents the pose exponential, which is solving a differential equation moving the
    * pose forward in time.

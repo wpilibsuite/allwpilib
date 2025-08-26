@@ -45,7 +45,7 @@ struct WPILIB_DLLEXPORT Twist2d {
    * "Pose exponential" for a derivation.
    *
    * The twist is a change in pose in the robot's coordinate frame since the
-   * previous pose update. When the user runs exp() the twist, the user will
+   * previous pose update. When the user runs Exp() on the twist, the user will
    * receive the pose delta.
    *
    * "Exp" represents the pose exponential, which is solving a differential

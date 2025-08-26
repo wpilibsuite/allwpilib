@@ -253,8 +253,8 @@ public class Transform3d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Returns a Twist3d of the current transform (pose delta). If b is the output of {@code a.Log()},
-   * then {@code b.Exp()} would yield a.
+   * Returns a Twist3d of the current transform (pose delta). If b is the output of {@code a.log()},
+   * then {@code b.exp()} would yield a.
    *
    * @return The twist that maps the current transform.
    */
