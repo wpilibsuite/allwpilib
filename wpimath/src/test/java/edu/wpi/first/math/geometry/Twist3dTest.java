@@ -15,27 +15,27 @@ class Twist3dTest {
   @Test
   void testStraightX() {
     var straight = new Twist3d(5.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-    var straightPose = Pose3d.kZero.exp(straight);
+    var straightPose = straight.exp();
 
-    var expected = new Pose3d(5.0, 0.0, 0.0, Rotation3d.kZero);
+    var expected = new Transform3d(5.0, 0.0, 0.0, Rotation3d.kZero);
     assertEquals(expected, straightPose);
   }
 
   @Test
   void testStraightY() {
     var straight = new Twist3d(0.0, 5.0, 0.0, 0.0, 0.0, 0.0);
-    var straightPose = Pose3d.kZero.exp(straight);
+    var straightPose = straight.exp();
 
-    var expected = new Pose3d(0.0, 5.0, 0.0, Rotation3d.kZero);
+    var expected = new Transform3d(0.0, 5.0, 0.0, Rotation3d.kZero);
     assertEquals(expected, straightPose);
   }
 
   @Test
   void testStraightZ() {
     var straight = new Twist3d(0.0, 0.0, 5.0, 0.0, 0.0, 0.0);
-    var straightPose = Pose3d.kZero.exp(straight);
+    var straightPose = straight.exp();
 
-    var expected = new Pose3d(0.0, 0.0, 5.0, Rotation3d.kZero);
+    var expected = new Transform3d(0.0, 0.0, 5.0, Rotation3d.kZero);
     assertEquals(expected, straightPose);
   }
 
@@ -44,18 +44,19 @@ class Twist3dTest {
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var quarterCircle = new Twist3d(5.0 / 2.0 * Math.PI, 0.0, 0.0, 0.0, 0.0, Math.PI / 2.0);
-    var quarterCirclePose = Pose3d.kZero.exp(quarterCircle);
+    var quarterCirclePose = quarterCircle.exp();
 
-    var expected = new Pose3d(5.0, 5.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(90.0)));
+    var expected =
+        new Transform3d(5.0, 5.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(90.0)));
     assertEquals(expected, quarterCirclePose);
   }
 
   @Test
   void testDiagonalNoDtheta() {
     var diagonal = new Twist3d(2.0, 2.0, 0.0, 0.0, 0.0, 0.0);
-    var diagonalPose = Pose3d.kZero.exp(diagonal);
+    var diagonalPose = diagonal.exp();
 
-    var expected = new Pose3d(2.0, 2.0, 0.0, Rotation3d.kZero);
+    var expected = new Transform3d(2.0, 2.0, 0.0, Rotation3d.kZero);
     assertEquals(expected, diagonalPose);
   }
 
@@ -79,14 +80,14 @@ class Twist3dTest {
     final var end =
         new Pose3d(0.0, 5.0, 5.0, new Rotation3d(Units.degreesToRadians(90.0), 0.0, 0.0));
 
-    final var twist = start.log(end);
+    final var twist = end.minus(start).log();
 
     var expected =
         new Twist3d(0.0, 5.0 / 2.0 * Math.PI, 0.0, Units.degreesToRadians(90.0), 0.0, 0.0);
     assertEquals(expected, twist);
 
     // Make sure computed twist gives back original end pose
-    final var reapplied = start.exp(twist);
+    final var reapplied = start.plus(twist.exp());
     assertEquals(end, reapplied);
   }
 
@@ -96,13 +97,13 @@ class Twist3dTest {
     final var end =
         new Pose3d(5.0, 0.0, 5.0, new Rotation3d(0.0, Units.degreesToRadians(90.0), 0.0));
 
-    final var twist = start.log(end);
+    final var twist = end.minus(start).log();
 
     var expected = new Twist3d(0.0, 0.0, 5.0 / 2.0 * Math.PI, 0.0, Math.PI / 2.0, 0.0);
     assertEquals(expected, twist);
 
     // Make sure computed twist gives back original end pose
-    final var reapplied = start.exp(twist);
+    final var reapplied = start.plus(twist.exp());
     assertEquals(end, reapplied);
   }
 
@@ -112,13 +113,13 @@ class Twist3dTest {
     final var end =
         new Pose3d(5.0, 5.0, 0.0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(90.0)));
 
-    final var twist = start.log(end);
+    final var twist = end.minus(start).log();
 
     var expected = new Twist3d(5.0 / 2.0 * Math.PI, 0.0, 0.0, 0.0, 0.0, Math.PI / 2.0);
     assertEquals(expected, twist);
 
     // Make sure computed twist gives back original end pose
-    final var reapplied = start.exp(twist);
+    final var reapplied = start.plus(twist.exp());
     assertEquals(end, reapplied);
   }
 }

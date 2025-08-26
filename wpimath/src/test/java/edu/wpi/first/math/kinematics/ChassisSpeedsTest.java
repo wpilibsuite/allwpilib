@@ -28,7 +28,7 @@ class ChassisSpeedsTest {
 
     var pose = Pose2d.kZero;
     for (double time = 0; time < duration; time += dt) {
-      pose = pose.exp(twist);
+      pose = pose.plus(twist.exp());
     }
 
     final var result = pose; // For lambda capture

@@ -134,7 +134,7 @@ public class Odometry3d<T> {
             angle_difference.get(1),
             angle_difference.get(2));
 
-    var newPose = m_pose.exp(twist);
+    var newPose = m_pose.plus(twist.exp());
 
     m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
     m_previousAngle = angle;

@@ -42,6 +42,39 @@ public class Twist2d implements ProtobufSerializable, StructSerializable {
     this.dtheta = dtheta;
   }
 
+  /**
+   * Obtain a new Transform2d from a (constant curvature) velocity.
+   *
+   * <p>See <a href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">Controls
+   * Engineering in the FIRST Robotics Competition</a> section 10.2 "Pose exponential" for a
+   * derivation.
+   *
+   * <p>The twist is a change in pose in the robot's coordinate frame since the previous pose
+   * update. When the user runs exp() on the twist, the user will receive the pose delta.
+   *
+   * <p>"Exp" represents the pose exponential, which is solving a differential equation moving the
+   * pose forward in time.
+   *
+   * @return The pose delta of the robot.
+   */
+  public Transform2d exp() {
+    double sinTheta = Math.sin(dtheta);
+    double cosTheta = Math.cos(dtheta);
+
+    double s;
+    double c;
+    if (Math.abs(dtheta) < 1E-9) {
+      s = 1.0 - 1.0 / 6.0 * dtheta * dtheta;
+      c = 0.5 * dtheta;
+    } else {
+      s = sinTheta / dtheta;
+      c = (1 - cosTheta) / dtheta;
+    }
+
+    return new Transform2d(
+        new Translation2d(dx * s - dy * c, dx * c + dy * s), new Rotation2d(cosTheta, sinTheta));
+  }
+
   @Override
   public String toString() {
     return String.format("Twist2d(dX: %.2f, dY: %.2f, dTheta: %.2f)", dx, dy, dtheta);

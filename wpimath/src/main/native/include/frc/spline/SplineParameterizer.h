@@ -106,7 +106,7 @@ class WPILIB_DLLEXPORT SplineParameterizer {
         throw MalformedSplineException(kMalformedSplineExceptionMsg);
       }
 
-      const auto twist = start.value().first.Log(end.value().first);
+      const auto twist = (end.value().first - start.value().first).Log();
 
       if (units::math::abs(twist.dy) > kMaxDy ||
           units::math::abs(twist.dx) > kMaxDx ||

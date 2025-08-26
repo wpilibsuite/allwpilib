@@ -39,7 +39,7 @@ public class Main {
   private static final TravelingSalesman twistTraveler =
       new TravelingSalesman(
           (pose1, pose2) -> {
-            var twist = pose1.log(pose2);
+            var twist = pose2.minus(pose1).log();
             return Math.hypot(twist.dx, twist.dy);
           });
 

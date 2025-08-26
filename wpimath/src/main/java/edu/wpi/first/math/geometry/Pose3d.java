@@ -16,7 +16,6 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.proto.Pose3dProto;
 import edu.wpi.first.math.geometry.struct.Pose3dStruct;
 import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.jni.Pose3dJNI;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
@@ -286,82 +285,6 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
   }
 
   /**
-   * Obtain a new Pose3d from a (constant curvature) velocity.
-   *
-   * <p>The twist is a change in pose in the robot's coordinate frame since the previous pose
-   * update. When the user runs exp() on the previous known field-relative pose with the argument
-   * being the twist, the user will receive the new field-relative pose.
-   *
-   * <p>"Exp" represents the pose exponential, which is solving a differential equation moving the
-   * pose forward in time.
-   *
-   * @param twist The change in pose in the robot's coordinate frame since the previous pose update.
-   *     For example, if a non-holonomic robot moves forward 0.01 meters and changes angle by 0.5
-   *     degrees since the previous pose update, the twist would be Twist3d(0.01, 0.0, 0.0, new new
-   *     Rotation3d(0.0, 0.0, Units.degreesToRadians(0.5))).
-   * @return The new pose of the robot.
-   */
-  public Pose3d exp(Twist3d twist) {
-    var quaternion = this.getRotation().getQuaternion();
-    double[] resultArray =
-        Pose3dJNI.exp(
-            this.getX(),
-            this.getY(),
-            this.getZ(),
-            quaternion.getW(),
-            quaternion.getX(),
-            quaternion.getY(),
-            quaternion.getZ(),
-            twist.dx,
-            twist.dy,
-            twist.dz,
-            twist.rx,
-            twist.ry,
-            twist.rz);
-    return new Pose3d(
-        resultArray[0],
-        resultArray[1],
-        resultArray[2],
-        new Rotation3d(
-            new Quaternion(resultArray[3], resultArray[4], resultArray[5], resultArray[6])));
-  }
-
-  /**
-   * Returns a Twist3d that maps this pose to the end pose. If c is the output of {@code a.Log(b)},
-   * then {@code a.Exp(c)} would yield b.
-   *
-   * @param end The end pose for the transformation.
-   * @return The twist that maps this to end.
-   */
-  public Twist3d log(Pose3d end) {
-    var thisQuaternion = this.getRotation().getQuaternion();
-    var endQuaternion = end.getRotation().getQuaternion();
-    double[] resultArray =
-        Pose3dJNI.log(
-            this.getX(),
-            this.getY(),
-            this.getZ(),
-            thisQuaternion.getW(),
-            thisQuaternion.getX(),
-            thisQuaternion.getY(),
-            thisQuaternion.getZ(),
-            end.getX(),
-            end.getY(),
-            end.getZ(),
-            endQuaternion.getW(),
-            endQuaternion.getX(),
-            endQuaternion.getY(),
-            endQuaternion.getZ());
-    return new Twist3d(
-        resultArray[0],
-        resultArray[1],
-        resultArray[2],
-        resultArray[3],
-        resultArray[4],
-        resultArray[5]);
-  }
-
-  /**
    * Returns an affine transformation matrix representation of this pose.
    *
    * @return An affine transformation matrix representation of this pose.
@@ -445,11 +368,11 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
     } else if (t >= 1) {
       return endValue;
     } else {
-      var twist = this.log(endValue);
+      var twist = endValue.minus(this).log();
       var scaledTwist =
           new Twist3d(
               twist.dx * t, twist.dy * t, twist.dz * t, twist.rx * t, twist.ry * t, twist.rz * t);
-      return this.exp(scaledTwist);
+      return this.plus(scaledTwist.exp());
     }
   }
 
