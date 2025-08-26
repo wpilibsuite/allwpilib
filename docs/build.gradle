@@ -168,6 +168,7 @@ doxygen.sourceSets.main {
 
 tasks.register("zipCppDocs", Zip) {
     archiveBaseName = zipBaseNameCpp
+    archiveVersion = ""
     destinationDirectory = outputsFolder
     dependsOn doxygenDox
     from ("$buildDir/docs/doxygen/html")
@@ -247,6 +248,7 @@ task generateJavaDocs(type: Javadoc) {
 
 tasks.register("zipJavaDocs", Zip) {
     archiveBaseName = zipBaseNameJava
+    archiveVersion = ""
     destinationDirectory = outputsFolder
     dependsOn generateJavaDocs
     from ("$buildDir/docs/javadoc")
