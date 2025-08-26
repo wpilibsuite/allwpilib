@@ -24,7 +24,13 @@ public class MultiBackend implements EpilogueBackend {
 
   @Override
   public EpilogueBackend getNested(String path) {
-    return m_nestedBackends.computeIfAbsent(path, k -> new NestedBackend(k, this));
+    if (!m_nestedBackends.containsKey(path)) {
+      var nested = new NestedBackend(path, this);
+      m_nestedBackends.put(path, nested);
+      return nested;
+    }
+
+    return m_nestedBackends.get(path);
   }
 
   @Override
