@@ -16,21 +16,21 @@ class NestedBackendTest {
     var root = new TestBackend();
     var nested = new NestedBackend("/Robot", root);
 
-    nested.log("i", 1);
-    nested.log("str", "hello");
+    nested.log("int", 1);
+    nested.log("string", "hello");
 
     var arm = nested.getNested("arm");
-    arm.log("pos", 2.0);
+    arm.log("position", 2.0);
     arm.log("enabled", true);
 
     assertEquals(4, root.getEntries().size());
-    assertEquals("/Robot/i", root.getEntries().get(0).identifier());
+    assertEquals("/Robot/int", root.getEntries().get(0).identifier());
     assertEquals(1, root.getEntries().get(0).value());
 
-    assertEquals("/Robot/str", root.getEntries().get(1).identifier());
+    assertEquals("/Robot/string", root.getEntries().get(1).identifier());
     assertEquals("hello", root.getEntries().get(1).value());
 
-    assertEquals("/Robot/arm/pos", root.getEntries().get(2).identifier());
+    assertEquals("/Robot/arm/position", root.getEntries().get(2).identifier());
     assertEquals(2.0, root.getEntries().get(2).value());
 
     assertEquals("/Robot/arm/enabled", root.getEntries().get(3).identifier());
@@ -81,8 +81,8 @@ class NestedBackendTest {
 
     // Also verify through a nested backend path
     var arm = nested.getNested("arm");
-    arm.log("pos", 0.0);
-    arm.log("pos", 1.0);
+    arm.log("position", 0.0);
+    arm.log("position", 1.0);
 
     String id2 = root.getEntries().get(2).identifier();
     String id3 = root.getEntries().get(3).identifier();
@@ -94,7 +94,7 @@ class NestedBackendTest {
 
     // Sanity check actual full values
     assertEquals("/Robot/x", id0);
-    assertEquals("/Robot/arm/pos", id2);
+    assertEquals("/Robot/arm/position", id2);
   }
 
   @Test
@@ -103,65 +103,67 @@ class NestedBackendTest {
     var nested = new NestedBackend("/Robot", root);
 
     // Scalars
-    nested.log("i", 1);
-    nested.log("l", 2L);
-    nested.log("f", 3.0f);
-    nested.log("d", 4.0);
-    nested.log("b", true);
-    nested.log("s", "hello");
+    nested.log("int", 1);
+    nested.log("long", 2L);
+    nested.log("float", 3.0f);
+    nested.log("double", 4.0);
+    nested.log("boolean", true);
+    nested.log("string", "hello");
 
     // Arrays
-    nested.log("ba", new byte[] {1, 2});
-    nested.log("ia", new int[] {3, 4});
-    nested.log("la", new long[] {5L, 6L});
-    nested.log("fa", new float[] {7.0f, 8.0f});
-    nested.log("da", new double[] {9.0, 10.0});
-    nested.log("bo", new boolean[] {true, false});
-    nested.log("sa", new String[] {"x", "y"});
+    nested.log("bytes", new byte[] {1, 2});
+    nested.log("ints", new int[] {3, 4});
+    nested.log("longs", new long[] {5L, 6L});
+    nested.log("floats", new float[] {7.0f, 8.0f});
+    nested.log("doubles", new double[] {9.0, 10.0});
+    nested.log("booleans", new boolean[] {true, false});
+    nested.log("strings", new String[] {"x", "y"});
 
     // Structs
-    nested.log("cs", new CustomStruct(7), CustomStruct.struct);
+    nested.log("customStruct", new CustomStruct(7), CustomStruct.struct);
     nested.log(
-        "csa", new CustomStruct[] {new CustomStruct(0), new CustomStruct(1)}, CustomStruct.struct);
+        "customStructs",
+        new CustomStruct[] {new CustomStruct(0), new CustomStruct(1)},
+        CustomStruct.struct);
 
     var entries = root.getEntries();
     int idx = 0;
 
     // Scalars
-    assertEquals(new TestBackend.LogEntry<>("/Robot/i", 1), entries.get(idx++));
-    assertEquals(new TestBackend.LogEntry<>("/Robot/l", 2L), entries.get(idx++));
-    assertEquals(new TestBackend.LogEntry<>("/Robot/f", 3.0f), entries.get(idx++));
-    assertEquals(new TestBackend.LogEntry<>("/Robot/d", 4.0), entries.get(idx++));
-    assertEquals(new TestBackend.LogEntry<>("/Robot/b", true), entries.get(idx++));
-    assertEquals(new TestBackend.LogEntry<>("/Robot/s", "hello"), entries.get(idx++));
+    assertEquals(new TestBackend.LogEntry<>("/Robot/int", 1), entries.get(idx++));
+    assertEquals(new TestBackend.LogEntry<>("/Robot/long", 2L), entries.get(idx++));
+    assertEquals(new TestBackend.LogEntry<>("/Robot/float", 3.0f), entries.get(idx++));
+    assertEquals(new TestBackend.LogEntry<>("/Robot/double", 4.0), entries.get(idx++));
+    assertEquals(new TestBackend.LogEntry<>("/Robot/boolean", true), entries.get(idx++));
+    assertEquals(new TestBackend.LogEntry<>("/Robot/string", "hello"), entries.get(idx++));
 
     // Arrays
-    assertEquals("/Robot/ba", entries.get(idx).identifier());
+    assertEquals("/Robot/bytes", entries.get(idx).identifier());
     assertArrayEquals(new byte[] {1, 2}, (byte[]) entries.get(idx++).value());
 
-    assertEquals("/Robot/ia", entries.get(idx).identifier());
+    assertEquals("/Robot/ints", entries.get(idx).identifier());
     assertArrayEquals(new int[] {3, 4}, (int[]) entries.get(idx++).value());
 
-    assertEquals("/Robot/la", entries.get(idx).identifier());
+    assertEquals("/Robot/longs", entries.get(idx).identifier());
     assertArrayEquals(new long[] {5L, 6L}, (long[]) entries.get(idx++).value());
 
-    assertEquals("/Robot/fa", entries.get(idx).identifier());
+    assertEquals("/Robot/floats", entries.get(idx).identifier());
     assertArrayEquals(new float[] {7.0f, 8.0f}, (float[]) entries.get(idx++).value());
 
-    assertEquals("/Robot/da", entries.get(idx).identifier());
+    assertEquals("/Robot/doubles", entries.get(idx).identifier());
     assertArrayEquals(new double[] {9.0, 10.0}, (double[]) entries.get(idx++).value());
 
-    assertEquals("/Robot/bo", entries.get(idx).identifier());
+    assertEquals("/Robot/booleans", entries.get(idx).identifier());
     assertArrayEquals(new boolean[] {true, false}, (boolean[]) entries.get(idx++).value());
 
-    assertEquals("/Robot/sa", entries.get(idx).identifier());
+    assertEquals("/Robot/strings", entries.get(idx).identifier());
     assertArrayEquals(new String[] {"x", "y"}, (String[]) entries.get(idx++).value());
 
     // Structs are serialized to bytes
-    assertEquals("/Robot/cs", entries.get(idx).identifier());
+    assertEquals("/Robot/customStruct", entries.get(idx).identifier());
     assertArrayEquals(new byte[] {0x07, 0x00, 0x00, 0x00}, (byte[]) entries.get(idx++).value());
 
-    assertEquals("/Robot/csa", entries.get(idx).identifier());
+    assertEquals("/Robot/customStructs", entries.get(idx).identifier());
     // two int32 values, little-endian
     assertArrayEquals(
         new byte[] {
