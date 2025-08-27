@@ -31,7 +31,7 @@ public class Robot extends RobotBase {
   public void startCompetition() {
     DriverStationModeThread modeThread = new DriverStationModeThread();
 
-    int event = WPIUtilJNI.createEvent(false, false);
+    int event = WPIUtilJNI.makeEvent(false, false);
 
     DriverStation.provideRefreshedDataEventHandle(event);
 
