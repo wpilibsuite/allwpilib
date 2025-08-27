@@ -245,6 +245,20 @@ public final class Coroutine {
    * Waits for some duration of time to elapse. Returns immediately if the given duration is zero or
    * negative. Call this within a command or command composition to introduce a simple delay.
    *
+   * <p>Note that the resolution of the wait period is equal to the period at which {@link
+   * Scheduler#run()} is called by the robot program. If using a 20 millisecond update period, the
+   * wait will be rounded up to the nearest 20 millisecond interval; in this scenario, calling
+   * {@code wait(Milliseconds.of(1))} and {@code wait(Milliseconds.of(19))} would have identical
+   * effects.
+   *
+   * <p>Very small loop times near the loop period are sensitive to the order in which commands are
+   * executed. If a command waits for 10 ms at the end of a scheduler cycle, and then all the
+   * commands that ran before it complete or exit, and then the next cycle starts immediately, the
+   * wait will be evaluated at the <i>start</i> of that next cycle, which occurred less than 10 ms
+   * later. Therefore the wait will see not enough time has passed and only exit after an additional
+   * cycle elapses, adding an unexpected extra 20 ms to the wait time. Note that this becomes less
+   * of a problem with smaller loop periods, as the extra 1-loop delay becomes smaller.
+   *
    * <p>For example, a basic autonomous routine that drives straight for 5 seconds:
    *
    * <pre>{@code
