@@ -131,12 +131,8 @@ class ParallelGroupTest {
       assertEquals(i, c2Count.get());
     }
     m_scheduler.run(); // complete c1
-    assertTrue(m_scheduler.isRunning(race));
-    assertFalse(m_scheduler.isRunning(c1));
-    assertTrue(m_scheduler.isRunning(c2));
-
-    m_scheduler.run(); // complete parallel and cleanup
     assertFalse(m_scheduler.isRunning(race));
+    assertFalse(m_scheduler.isRunning(c1));
     assertFalse(m_scheduler.isRunning(c2));
 
     // and final counts should be 5 and 5
@@ -188,20 +184,8 @@ class ParallelGroupTest {
 
     // Run 6: Command should have completed naturally
     m_scheduler.run();
-    assertTrue(m_scheduler.isRunning(outer), "Outer group should be running");
-    assertTrue(m_scheduler.isRunning(inner), "Inner group should be running");
-    assertFalse(m_scheduler.isRunning(command), "Command should have completed");
-
-    // Run 7: Having seen the command complete, inner group should exit
-    m_scheduler.run();
-    assertTrue(m_scheduler.isRunning(outer), "Outer group should be running");
-    assertFalse(m_scheduler.isRunning(inner), "Inner group should have completed");
-    assertFalse(m_scheduler.isRunning(command), "Command should have completed");
-
-    // Run 8: Having seen the inner group complete, outer group should now exit
-    m_scheduler.run();
     assertFalse(m_scheduler.isRunning(outer), "Outer group should be running");
-    assertFalse(m_scheduler.isRunning(inner), "Inner group should have completed");
+    assertFalse(m_scheduler.isRunning(inner), "Inner group should be running");
     assertFalse(m_scheduler.isRunning(command), "Command should have completed");
   }
 

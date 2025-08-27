@@ -235,13 +235,15 @@ class TriggerTest {
     m_scheduler.run();
     assertTrue(m_scheduler.isRunning(outer));
     assertTrue(m_scheduler.isRunning(awaited));
+    assertEquals(
+        List.of("Outer", "Awaited"),
+        m_scheduler.getRunningCommands().stream().map(Command::name).toList());
 
     // Second run: `awaited` resumes, sets the condition, exits. `outer` exits its final `yield`
     // and will exit on the next run. The trigger condition has been set, but the trigger is checked
     // on the next call to `run()`
     m_scheduler.run();
-    assertEquals(
-        List.of("Outer"), m_scheduler.getRunningCommands().stream().map(Command::name).toList());
+    assertEquals(List.of(), m_scheduler.getRunningCommands().stream().map(Command::name).toList());
     assertTrue(condition.get(), "Condition wasn't set");
     assertFalse(triggeredCommandRan.get(), "Command was unexpectedly triggered");
 

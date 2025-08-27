@@ -519,7 +519,10 @@ public class Scheduler implements ProtobufSerializable {
 
   private void runCommands() {
     // Tick every command that hasn't been completed yet
-    for (var state : List.copyOf(m_commandStates.values())) {
+    // Run in reverse so parent commands can resume in the same loop cycle an awaited child command
+    // completes. Otherwise, parents could only resume on the next loop cycle, introducing a delay
+    // at every layer of nesting.
+    for (var state : List.copyOf(m_commandStates.values()).reversed()) {
       runCommand(state);
     }
   }
