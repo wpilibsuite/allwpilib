@@ -8,20 +8,20 @@
 
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
+#include "frc/MathUtil.h"
 #include "units/acceleration.h"
 #include "units/angular_acceleration.h"
 
 namespace frc {
 /**
  * Represents the acceleration of a robot chassis. Although this struct contains
- * similar members compared to a Twist2d, they do NOT represent the same thing.
- * Whereas a Twist2d represents a change in pose w.r.t to the robot frame of
- * reference, a ChassisAccelerations struct represents a robot's acceleration.
+ * similar members compared to a ChassisSpeeds, they do NOT represent the same thing.
+ * Whereas a ChassisSpeeds object represents a robot's velocity, a ChassisAccelerations
+ * object represents a robot's acceleration.
  *
  * A strictly non-holonomic drivetrain, such as a differential drive, should
- * never have an ay component because it can never accelerate sideways.
- * Holonomic drivetrains such as swerve and mecanum will often have all three
- * components.
+ * never have an ay component because it can never move sideways. Holonomic
+ * drivetrains such as swerve and mecanum will often have all three components.
  */
 struct WPILIB_DLLEXPORT ChassisAccelerations {
   /**
@@ -35,7 +35,7 @@ struct WPILIB_DLLEXPORT ChassisAccelerations {
   units::meters_per_second_squared_t ay = 0_mps_sq;
 
   /**
-   * Represents the angular acceleration of the robot frame. (CCW is +)
+   * Angular acceleration of the robot frame. (CCW is +)
    */
   units::radians_per_second_squared_t alpha = 0_rad_per_s_sq;
 
@@ -127,7 +127,7 @@ struct WPILIB_DLLEXPORT ChassisAccelerations {
    * ChassisAccelerations.
    *
    * <p>For example, ChassisAccelerations{2.0, 2.5, 1.0} * 2
-   * = ChassisAccelerations{4.0, 5.0, 1.0}
+   * = ChassisAccelerations{4.0, 5.0, 2.0}
    *
    * @param scalar The scalar to multiply by.
    *
