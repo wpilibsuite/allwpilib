@@ -29,12 +29,24 @@ import org.wpilib.annotation.NoDiscard;
 /** Checks for usages of methods that require their return values to be used. */
 public class ReturnValueUsedListener implements TaskListener {
   private final JavacTask m_task;
+  private final Set<CompilationUnitTree> m_visitedCUs = new HashSet<>();
 
   public ReturnValueUsedListener(JavacTask task) {
     m_task = task;
   }
 
-  private class Scanner extends TreeScanner<Void, Void> {
+  @Override
+  public void finished(TaskEvent e) {
+    // We override `finished` instead of `started` because we want to run after the
+    // ANALYZE attribution phase has completed and assigned types to elements in the AST
+    // Track the visited CUs to avoid re-processing the same CU multiple times when we call
+    // `Trees.getElement()` on a tree path.
+    if (e.getKind() == TaskEvent.Kind.ANALYZE && m_visitedCUs.add(e.getCompilationUnit())) {
+      e.getCompilationUnit().accept(new Scanner(e.getCompilationUnit()), null);
+    }
+  }
+
+  private final class Scanner extends TreeScanner<Void, Void> {
     private final CompilationUnitTree m_root;
     private final Trees m_trees;
 
@@ -61,6 +73,26 @@ public class ReturnValueUsedListener implements TaskListener {
      */
     private void checkIgnoredExpression(Tree node) {
       var path = m_trees.getPath(m_root, node);
+
+      // Walk the tree upwards to see if the node is directly or indirectly annotated with
+      // @SuppressWarnings("NoDiscard") or @SuppressWarnings("all"). If so, then we ignore any
+      // @NoDiscard messages for this node
+      for (var currentPath = path; currentPath != null; currentPath = currentPath.getParentPath()) {
+        var element = m_trees.getElement(currentPath);
+        if (element == null) {
+          continue;
+        }
+
+        if (element.getAnnotation(SuppressWarnings.class) != null) {
+          String[] suppressions = element.getAnnotation(SuppressWarnings.class).value();
+          for (String suppression : suppressions) {
+            if ("NoDiscard".equals(suppression) || "all".equals(suppression)) {
+              return;
+            }
+          }
+        }
+      }
+
       var parentPath = (path == null) ? null : path.getParentPath();
       if (parentPath == null || parentPath.getLeaf().getKind() != Tree.Kind.EXPRESSION_STATEMENT) {
         // If the parent node is an expression statement, then the value is ignored.
@@ -187,15 +219,6 @@ public class ReturnValueUsedListener implements TaskListener {
           collectNoDiscardMessagesFromTypeHierarchy(ite, seen, out);
         }
       }
-    }
-  }
-
-  @Override
-  public void finished(TaskEvent e) {
-    // We override `finished` instead of `started` because we want to run after the
-    // ANALYZE attribution phase has completed and assigned types to elements in the AST
-    if (e.getKind() == TaskEvent.Kind.ANALYZE) {
-      e.getCompilationUnit().accept(new Scanner(e.getCompilationUnit()), null);
     }
   }
 }

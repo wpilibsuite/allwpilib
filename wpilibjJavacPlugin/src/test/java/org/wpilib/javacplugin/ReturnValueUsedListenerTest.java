@@ -346,6 +346,114 @@ class ReturnValueUsedListenerTest {
   }
 
   @Test
+  void suppressWarningsOnNoDiscardMethod() {
+    String source =
+        """
+        package frc.robot;
+
+        import org.wpilib.annotation.NoDiscard;
+
+        class Example {
+          @NoDiscard
+          Object get() { return null; }
+
+          @SuppressWarnings("NoDiscard")
+          void usage() {
+            get();
+          }
+        }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+
+    assertThat(compilation).succeededWithoutWarnings();
+  }
+
+  @Test
+  void suppressWarningsAllOnNoDiscardMethod() {
+    String source =
+        """
+        package frc.robot;
+
+        import org.wpilib.annotation.NoDiscard;
+
+        class Example {
+          @NoDiscard
+          Object get() { return null; }
+
+          @SuppressWarnings("all")
+          void usage() {
+            get();
+          }
+        }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+
+    assertThat(compilation).succeededWithoutWarnings();
+  }
+
+  @Test
+  void suppressWarningsOnNoDiscardClass() {
+    String source =
+        """
+        package frc.robot;
+
+        import org.wpilib.annotation.NoDiscard;
+
+        @SuppressWarnings("NoDiscard")
+        class Example {
+          @NoDiscard
+          Object get() { return null; }
+
+          void usage() {
+            get();
+          }
+        }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+
+    assertThat(compilation).succeededWithoutWarnings();
+  }
+
+  @Test
+  void suppressWarningsAllOnNoDiscardClass() {
+    String source =
+        """
+        package frc.robot;
+
+        import org.wpilib.annotation.NoDiscard;
+
+        @SuppressWarnings("all")
+        class Example {
+          @NoDiscard
+          Object get() { return null; }
+
+          void usage() {
+            get();
+          }
+        }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+
+    assertThat(compilation).succeededWithoutWarnings();
+  }
+
+  @Test
   void commandsv2CommandFactoryResultIsAssigned() {
     String source =
         """
