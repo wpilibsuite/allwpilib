@@ -47,6 +47,7 @@ java_library(
         "//wpinet:wpinet-java",
         "//wpiunits",
         "//wpiutil:wpiutil-java",
+        "//wpiannotations:wpiannotations-java",
     ],
 )
 
@@ -83,5 +84,6 @@ java_binary(
         "//ntcore:networktables-java",
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
+        "//wpiannotations:wpiannotations-java",
     ],
 )
