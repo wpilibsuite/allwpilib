@@ -5,10 +5,10 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
-#include <wpi/math/EigenCore.h>
-#include <wpi/math/controller/LinearPlantInversionFeedforward.h>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/controller/LinearPlantInversionFeedforward.hpp>
 
-#include "units/time.h"
+#include "units/time.hpp"
 
 namespace wpi::math {
 

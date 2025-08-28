@@ -3,10 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/EigenCore.h>
-#include <wpi/math/controller/ControlAffinePlantInversionFeedforward.h>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/controller/ControlAffinePlantInversionFeedforward.hpp>
 
-#include "units/time.h"
+#include "units/time.hpp"
 
 namespace wpi::math {
 

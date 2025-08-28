@@ -9,17 +9,17 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/math/StateSpaceUtil.h>
-#include <wpi/math/estimator/DifferentialDrivePoseEstimator3d.h>
-#include <wpi/math/geometry/Pose2d.h>
-#include <wpi/math/geometry/Rotation2d.h>
-#include <wpi/math/kinematics/DifferentialDriveKinematics.h>
-#include <wpi/math/trajectory/TrajectoryGenerator.h>
+#include <wpi/math/StateSpaceUtil.hpp>
+#include <wpi/math/estimator/DifferentialDrivePoseEstimator3d.hpp>
+#include <wpi/math/geometry/Pose2d.hpp>
+#include <wpi/math/geometry/Rotation2d.hpp>
+#include <wpi/math/kinematics/DifferentialDriveKinematics.hpp>
+#include <wpi/math/trajectory/TrajectoryGenerator.hpp>
 #include <wpi/print.h>
 
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/time.h"
+#include "units/angle.hpp"
+#include "units/length.hpp"
+#include "units/time.hpp"
 
 void testFollowTrajectory(
     const wpi::math::DifferentialDriveKinematics& kinematics,

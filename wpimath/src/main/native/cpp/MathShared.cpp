@@ -5,11 +5,11 @@
 #include <memory>
 #include <utility>
 
-#include <wpi/math/MathShared.h>
+#include <wpi/math/MathShared.hpp>
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
 
-#include "units/time.h"
+#include "units/time.hpp"
 
 using namespace wpi::math;
 

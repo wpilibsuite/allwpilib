@@ -4,7 +4,7 @@
 
 #include <Eigen/LU>
 #include <gtest/gtest.h>
-#include <wpi/math/EigenCore.h>
+#include <wpi/math/EigenCore.hpp>
 
 TEST(EigenTest, Multiplication) {
   wpi::math::Matrixd<2, 2> m1{{2, 1}, {0, 1}};

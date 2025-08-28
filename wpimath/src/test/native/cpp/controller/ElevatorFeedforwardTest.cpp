@@ -5,13 +5,13 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
-#include <wpi/math/EigenCore.h>
-#include <wpi/math/controller/ElevatorFeedforward.h>
-#include <wpi/math/controller/LinearPlantInversionFeedforward.h>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/controller/ElevatorFeedforward.hpp>
+#include <wpi/math/controller/LinearPlantInversionFeedforward.hpp>
 
-#include "units/acceleration.h"
-#include "units/length.h"
-#include "units/time.h"
+#include "units/acceleration.hpp"
+#include "units/length.hpp"
+#include "units/time.hpp"
 
 static constexpr auto Ks = 0.5_V;
 static constexpr auto Kv = 1.5_V * 1_s / 1_m;

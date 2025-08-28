@@ -6,7 +6,7 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/geometry/Rotation2d.hpp>
 
 using namespace wpi::math;
 

@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/EigenCore.h>
-#include <wpi/math/StateSpaceUtil.h>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/StateSpaceUtil.hpp>
 
 TEST(StateSpaceUtilTest, CostParameterPack) {
   constexpr wpi::math::Matrixd<3, 3> mat =

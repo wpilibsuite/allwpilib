@@ -5,10 +5,10 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/math/spline/SplineHelper.h>
-#include <wpi/math/spline/SplineParameterizer.h>
-#include <wpi/math/trajectory/TrajectoryGenerator.h>
-#include <wpi/math/trajectory/TrajectoryParameterizer.h>
+#include <wpi/math/spline/SplineHelper.hpp>
+#include <wpi/math/spline/SplineParameterizer.hpp>
+#include <wpi/math/trajectory/TrajectoryGenerator.hpp>
+#include <wpi/math/trajectory/TrajectoryParameterizer.hpp>
 #include <wpi/print.h>
 
 using namespace wpi::math;

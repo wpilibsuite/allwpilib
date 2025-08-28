@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/json.h>
-#include <wpi/math/geometry/Pose3d.h>
+#include <wpi/math/geometry/Pose3d.hpp>
 
 void wpi::math::to_json(wpi::json& json, const Pose3d& pose) {
   json = wpi::json{{"translation", pose.Translation()},

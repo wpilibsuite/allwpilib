@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/controller/BangBangController.h>
+#include <wpi/math/controller/BangBangController.hpp>
 
 TEST(BangBangInputOutputTest, ShouldOutput) {
   wpi::math::BangBangController controller;

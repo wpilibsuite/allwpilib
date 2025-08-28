@@ -4,9 +4,9 @@
 
 #include <optional>
 
-#include <wpi/math/controller/proto/ElevatorFeedforwardProto.h>
+#include <wpi/math/controller/proto/ElevatorFeedforwardProto.hpp>
 
-#include "wpimath/protobuf/controller.npb.h"
+#include "wpimath/protobuf/controller.npb.hpp"
 
 std::optional<wpi::math::ElevatorFeedforward>
 wpi::Protobuf<wpi::math::ElevatorFeedforward>::Unpack(InputStream& stream) {

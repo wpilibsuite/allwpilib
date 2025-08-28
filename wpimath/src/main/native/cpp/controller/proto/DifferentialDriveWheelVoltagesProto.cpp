@@ -4,9 +4,9 @@
 
 #include <optional>
 
-#include <wpi/math/controller/proto/DifferentialDriveWheelVoltagesProto.h>
+#include <wpi/math/controller/proto/DifferentialDriveWheelVoltagesProto.hpp>
 
-#include "wpimath/protobuf/controller.npb.h"
+#include "wpimath/protobuf/controller.npb.hpp"
 
 std::optional<wpi::math::DifferentialDriveWheelVoltages> wpi::Protobuf<
     wpi::math::DifferentialDriveWheelVoltages>::Unpack(InputStream& stream) {

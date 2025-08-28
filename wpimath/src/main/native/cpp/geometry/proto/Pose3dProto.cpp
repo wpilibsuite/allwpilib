@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/math/geometry/Pose3d.h>
-#include <wpi/math/geometry/proto/Pose3dProto.h>
+#include <wpi/math/geometry/Pose3d.hpp>
+#include <wpi/math/geometry/proto/Pose3dProto.hpp>
 #include <wpi/protobuf/Protobuf.h>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "wpimath/protobuf/geometry3d.npb.h"
+#include "wpimath/protobuf/geometry3d.npb.hpp"
 
 std::optional<wpi::math::Pose3d> wpi::Protobuf<wpi::math::Pose3d>::Unpack(
     InputStream& stream) {

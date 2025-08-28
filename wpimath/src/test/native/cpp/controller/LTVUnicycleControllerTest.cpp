@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/MathUtil.h>
-#include <wpi/math/controller/LTVUnicycleController.h>
-#include <wpi/math/trajectory/TrajectoryGenerator.h>
+#include <wpi/math/MathUtil.hpp>
+#include <wpi/math/controller/LTVUnicycleController.hpp>
+#include <wpi/math/trajectory/TrajectoryGenerator.hpp>
 
-#include "units/math.h"
+#include "units/math.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)

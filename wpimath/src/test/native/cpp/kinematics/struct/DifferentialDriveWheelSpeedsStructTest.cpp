@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/kinematics/DifferentialDriveWheelSpeeds.h>
+#include <wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp>
 
 using namespace wpi::math;
 

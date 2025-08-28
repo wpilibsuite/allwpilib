@@ -5,10 +5,10 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-#include <wpi/math/geometry/Quaternion.h>
+#include <wpi/math/geometry/Quaternion.hpp>
 
-#include "units/angle.h"
-#include "units/math.h"
+#include "units/angle.hpp"
+#include "units/math.hpp"
 
 using namespace wpi::math;
 

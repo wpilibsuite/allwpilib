@@ -5,8 +5,8 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
-#include <wpi/math/EigenCore.h>
-#include <wpi/math/system/NumericalIntegration.h>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/system/NumericalIntegration.hpp>
 
 // Test that integrating dx/dt = eˣ works
 TEST(NumericalIntegrationTest, Exponential) {

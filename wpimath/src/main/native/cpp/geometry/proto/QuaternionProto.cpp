@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/math/geometry/proto/QuaternionProto.h>
+#include <wpi/math/geometry/proto/QuaternionProto.hpp>
 
-#include "wpimath/protobuf/geometry3d.npb.h"
+#include "wpimath/protobuf/geometry3d.npb.hpp"
 
 std::optional<wpi::math::Quaternion>
 wpi::Protobuf<wpi::math::Quaternion>::Unpack(InputStream& stream) {

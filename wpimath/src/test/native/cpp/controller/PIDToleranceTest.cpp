@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/controller/PIDController.h>
+#include <wpi/math/controller/PIDController.hpp>
 
 static constexpr double kSetpoint = 50.0;
 static constexpr double kRange = 200;

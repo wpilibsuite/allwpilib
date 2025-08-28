@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/controller/PIDController.h>
+#include <wpi/math/controller/PIDController.hpp>
 
 TEST(PIDInputOutputTest, ContinuousInput) {
   wpi::math::PIDController controller{0.0, 0.0, 0.0};

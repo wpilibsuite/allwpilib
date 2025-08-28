@@ -4,10 +4,10 @@
 
 #include <utility>
 
-#include <wpi/math/trajectory/proto/TrajectoryStateProto.h>
+#include <wpi/math/trajectory/proto/TrajectoryStateProto.hpp>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "wpimath/protobuf/trajectory.npb.h"
+#include "wpimath/protobuf/trajectory.npb.hpp"
 
 std::optional<wpi::math::Trajectory::State>
 wpi::Protobuf<wpi::math::Trajectory::State>::Unpack(InputStream& stream) {

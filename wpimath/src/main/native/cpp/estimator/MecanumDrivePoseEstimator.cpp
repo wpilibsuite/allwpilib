@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/math/MathShared.h>
-#include <wpi/math/StateSpaceUtil.h>
-#include <wpi/math/estimator/AngleStatistics.h>
-#include <wpi/math/estimator/MecanumDrivePoseEstimator.h>
+#include <wpi/math/MathShared.hpp>
+#include <wpi/math/StateSpaceUtil.hpp>
+#include <wpi/math/estimator/AngleStatistics.hpp>
+#include <wpi/math/estimator/MecanumDrivePoseEstimator.hpp>
 #include <wpi/timestamp.h>
 
 using namespace wpi::math;

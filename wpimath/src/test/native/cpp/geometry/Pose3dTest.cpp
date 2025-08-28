@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <wpi/array.h>
-#include <wpi/math/geometry/Pose3d.h>
+#include <wpi/math/geometry/Pose3d.hpp>
 
 using namespace wpi::math;
 

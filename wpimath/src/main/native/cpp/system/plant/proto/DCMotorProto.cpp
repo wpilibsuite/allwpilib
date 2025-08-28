@@ -4,9 +4,9 @@
 
 #include <optional>
 
-#include <wpi/math/system/plant/proto/DCMotorProto.h>
+#include <wpi/math/system/plant/proto/DCMotorProto.hpp>
 
-#include "wpimath/protobuf/plant.npb.h"
+#include "wpimath/protobuf/plant.npb.hpp"
 
 std::optional<wpi::math::DCMotor> wpi::Protobuf<wpi::math::DCMotor>::Unpack(
     InputStream& stream) {

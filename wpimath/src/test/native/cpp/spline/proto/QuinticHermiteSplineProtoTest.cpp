@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/spline/QuinticHermiteSpline.h>
+#include <wpi/math/spline/QuinticHermiteSpline.hpp>
 
-#include "../../ProtoTestBase.h"
+#include "../../ProtoTestBase.hpp"
 
 using namespace wpi::math;
 

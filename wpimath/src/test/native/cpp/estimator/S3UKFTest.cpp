@@ -9,18 +9,18 @@
 
 #include <Eigen/QR>
 #include <gtest/gtest.h>
-#include <wpi/math/EigenCore.h>
-#include <wpi/math/StateSpaceUtil.h>
-#include <wpi/math/estimator/AngleStatistics.h>
-#include <wpi/math/estimator/S3UKF.h>
-#include <wpi/math/system/Discretization.h>
-#include <wpi/math/system/NumericalIntegration.h>
-#include <wpi/math/system/NumericalJacobian.h>
-#include <wpi/math/system/plant/DCMotor.h>
-#include <wpi/math/system/plant/LinearSystemId.h>
-#include <wpi/math/trajectory/TrajectoryGenerator.h>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/StateSpaceUtil.hpp>
+#include <wpi/math/estimator/AngleStatistics.hpp>
+#include <wpi/math/estimator/S3UKF.hpp>
+#include <wpi/math/system/Discretization.hpp>
+#include <wpi/math/system/NumericalIntegration.hpp>
+#include <wpi/math/system/NumericalJacobian.hpp>
+#include <wpi/math/system/plant/DCMotor.hpp>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
+#include <wpi/math/trajectory/TrajectoryGenerator.hpp>
 
-#include "units/moment_of_inertia.h"
+#include "units/moment_of_inertia.hpp"
 
 namespace {
 

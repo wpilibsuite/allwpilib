@@ -3,12 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/system/LinearSystem.h>
-#include <wpi/math/system/plant/DCMotor.h>
-#include <wpi/math/system/plant/LinearSystemId.h>
+#include <wpi/math/system/LinearSystem.hpp>
+#include <wpi/math/system/plant/DCMotor.hpp>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
 
-#include "units/length.h"
-#include "units/mass.h"
+#include "units/length.hpp"
+#include "units/mass.hpp"
 
 TEST(LinearSystemIDTest, IdentifyDrivetrainVelocitySystem) {
 #if __GNUC__ <= 11

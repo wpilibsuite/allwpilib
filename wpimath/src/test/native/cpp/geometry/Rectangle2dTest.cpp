@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/geometry/Rectangle2d.h>
+#include <wpi/math/geometry/Rectangle2d.hpp>
 
 TEST(Rectangle2dTest, NewWithCorners) {
   constexpr wpi::math::Translation2d cornerA{1_m, 2_m};

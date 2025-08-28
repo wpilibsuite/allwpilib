@@ -5,8 +5,8 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-#include <wpi/math/EigenCore.h>
-#include <wpi/math/estimator/AngleStatistics.h>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/estimator/AngleStatistics.hpp>
 
 TEST(AngleStatisticsTest, Mean) {
   wpi::math::Matrixd<3, 3> sigmas{

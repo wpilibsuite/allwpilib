@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
-#include <wpi/math/geometry/Transform3d.h>
+#include <wpi/math/geometry/Transform3d.hpp>
 
 using namespace wpi::math;
 

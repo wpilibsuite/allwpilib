@@ -4,10 +4,10 @@
 
 #include <vector>
 
-#include <wpi/math/trajectory/proto/TrajectoryProto.h>
+#include <wpi/math/trajectory/proto/TrajectoryProto.hpp>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "wpimath/protobuf/trajectory.npb.h"
+#include "wpimath/protobuf/trajectory.npb.hpp"
 
 std::optional<wpi::math::Trajectory>
 wpi::Protobuf<wpi::math::Trajectory>::Unpack(InputStream& stream) {

@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
-#include <wpi/math/controller/ElevatorFeedforward.h>
+#include <wpi/math/controller/ElevatorFeedforward.hpp>
 
 using namespace wpi::math;
 

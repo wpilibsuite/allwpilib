@@ -6,9 +6,9 @@
 
 #include <Eigen/Eigenvalues>
 #include <gtest/gtest.h>
-#include <wpi/math/EigenCore.h>
-#include <wpi/math/system/Discretization.h>
-#include <wpi/math/system/NumericalIntegration.h>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/system/Discretization.hpp>
+#include <wpi/math/system/NumericalIntegration.hpp>
 
 // Check that for a simple second-order system that we can easily analyze
 // analytically,

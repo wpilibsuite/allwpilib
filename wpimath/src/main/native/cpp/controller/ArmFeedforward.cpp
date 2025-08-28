@@ -7,9 +7,9 @@
 
 #include <sleipnir/autodiff/gradient.hpp>
 #include <sleipnir/autodiff/hessian.hpp>
-#include <wpi/math/EigenCore.h>
-#include <wpi/math/controller/ArmFeedforward.h>
-#include <wpi/math/system/NumericalIntegration.h>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/controller/ArmFeedforward.hpp>
+#include <wpi/math/system/NumericalIntegration.hpp>
 
 using namespace wpi::math;
 

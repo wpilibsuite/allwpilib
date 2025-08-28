@@ -8,9 +8,9 @@
 #include <Eigen/Eigenvalues>
 #include <gtest/gtest.h>
 #include <wpi/expected>
-#include <wpi/math/DARE.h>
-#include <wpi/math/EigenCore.h>
-#include <wpi/math/fmt/Eigen.h>
+#include <wpi/math/DARE.hpp>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/fmt/Eigen.hpp>
 #include <wpi/print.h>
 
 // 2x1

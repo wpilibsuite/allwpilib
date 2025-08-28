@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/math/kinematics/proto/MecanumDriveKinematicsProto.h>
+#include <wpi/math/kinematics/proto/MecanumDriveKinematicsProto.hpp>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "wpimath/protobuf/kinematics.npb.h"
+#include "wpimath/protobuf/kinematics.npb.hpp"
 
 std::optional<wpi::math::MecanumDriveKinematics>
 wpi::Protobuf<wpi::math::MecanumDriveKinematics>::Unpack(InputStream& stream) {

@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/controller/ArmFeedforward.h>
+#include <wpi/math/controller/ArmFeedforward.hpp>
 
 using namespace wpi::math;
 

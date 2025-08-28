@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
-#include <wpi/math/kinematics/ChassisSpeeds.h>
+#include <wpi/math/kinematics/ChassisSpeeds.hpp>
 
 using namespace wpi::math;
 

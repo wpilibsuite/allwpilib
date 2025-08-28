@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
-#include <wpi/math/kinematics/DifferentialDriveKinematics.h>
+#include <wpi/math/kinematics/DifferentialDriveKinematics.hpp>
 
 using namespace wpi::math;
 

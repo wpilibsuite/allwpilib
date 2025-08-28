@@ -3,10 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/controller/DifferentialDriveAccelerationLimiter.h>
-#include <wpi/math/system/plant/LinearSystemId.h>
+#include <wpi/math/controller/DifferentialDriveAccelerationLimiter.hpp>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
 
-#include "units/math.h"
+#include "units/math.hpp"
 
 namespace wpi::math {
 

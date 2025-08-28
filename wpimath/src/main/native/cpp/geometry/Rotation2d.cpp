@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/json.h>
-#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/geometry/Rotation2d.hpp>
 
 void wpi::math::to_json(wpi::json& json, const Rotation2d& rotation) {
   json = wpi::json{{"radians", rotation.Radians().value()}};

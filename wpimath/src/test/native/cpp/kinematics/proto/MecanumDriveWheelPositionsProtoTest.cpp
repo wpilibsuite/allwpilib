@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
-#include <wpi/math/kinematics/MecanumDriveWheelPositions.h>
+#include <wpi/math/kinematics/MecanumDriveWheelPositions.hpp>
 
 using namespace wpi::math;
 

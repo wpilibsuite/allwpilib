@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <sleipnir/optimization/problem.hpp>
-#include <wpi/math/geometry/Ellipse2d.h>
+#include <wpi/math/geometry/Ellipse2d.hpp>
 
 using namespace wpi::math;
 

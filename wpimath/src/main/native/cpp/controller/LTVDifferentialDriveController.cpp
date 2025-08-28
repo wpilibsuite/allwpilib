@@ -4,10 +4,10 @@
 
 #include <cmath>
 
-#include <wpi/math/DARE.h>
-#include <wpi/math/MathUtil.h>
-#include <wpi/math/controller/LTVDifferentialDriveController.h>
-#include <wpi/math/system/Discretization.h>
+#include <wpi/math/DARE.hpp>
+#include <wpi/math/MathUtil.hpp>
+#include <wpi/math/controller/LTVDifferentialDriveController.hpp>
+#include <wpi/math/system/Discretization.hpp>
 
 using namespace wpi::math;
 

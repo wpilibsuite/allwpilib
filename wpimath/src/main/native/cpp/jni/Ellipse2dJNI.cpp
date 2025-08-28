@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <jni.h>
+#include <jni.hpp>
 
 #include <wpi/array.h>
-#include <wpi/jni_util.h>
-#include <wpi/math/geometry/Ellipse2d.h>
+#include <wpi/jni_util.hpp>
+#include <wpi/math/geometry/Ellipse2d.hpp>
 
-#include "edu_wpi_first_math_jni_Ellipse2dJNI.h"
+#include "edu_wpi_first_math_jni_Ellipse2dJNI.hpp"
 
 using namespace wpi::java;
 

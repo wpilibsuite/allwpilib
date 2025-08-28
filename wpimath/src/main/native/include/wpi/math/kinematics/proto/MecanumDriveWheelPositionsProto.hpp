@@ -1,0 +1,24 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#pragma once
+
+#include <wpi/SymbolExports.h>
+#include <wpi/math/kinematics/MecanumDriveWheelPositions.hpp>
+#include <wpi/protobuf/Protobuf.h>
+
+#include "wpimath/protobuf/kinematics.npb.hpp"
+
+template <>
+struct WPILIB_DLLEXPORT wpi::Protobuf<wpi::math::MecanumDriveWheelPositions> {
+  using MessageStruct = wpi_proto_ProtobufMecanumDriveWheelPositions;
+  using InputStream =
+      wpi::ProtoInputStream<wpi::math::MecanumDriveWheelPositions>;
+  using OutputStream =
+      wpi::ProtoOutputStream<wpi::math::MecanumDriveWheelPositions>;
+  static std::optional<wpi::math::MecanumDriveWheelPositions> Unpack(
+      InputStream& stream);
+  static bool Pack(OutputStream& stream,
+                   const wpi::math::MecanumDriveWheelPositions& value);
+};

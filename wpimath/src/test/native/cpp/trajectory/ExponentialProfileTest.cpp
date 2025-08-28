@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/trajectory/ExponentialProfile.h"  // NOLINT(build/include_order)
+#include "wpi/math/trajectory/ExponentialProfile.hpp"  // NOLINT(build/include_order)
 
 #include <chrono>
 #include <cmath>
@@ -10,14 +10,14 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/math/controller/SimpleMotorFeedforward.h>
+#include <wpi/math/controller/SimpleMotorFeedforward.hpp>
 
-#include "units/acceleration.h"
-#include "units/frequency.h"
-#include "units/length.h"
-#include "units/math.h"
-#include "units/velocity.h"
-#include "units/voltage.h"
+#include "units/acceleration.hpp"
+#include "units/frequency.hpp"
+#include "units/length.hpp"
+#include "units/math.hpp"
+#include "units/velocity.hpp"
+#include "units/voltage.hpp"
 
 static constexpr auto kDt = 10_ms;
 static constexpr auto kV = 2.5629_V / 1_mps;

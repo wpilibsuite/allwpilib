@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/json.h>
-#include <wpi/math/trajectory/Trajectory.h>
+#include <wpi/math/trajectory/Trajectory.hpp>
 
 using namespace wpi::math;
 

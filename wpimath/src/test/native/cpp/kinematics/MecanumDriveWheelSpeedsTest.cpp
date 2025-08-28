@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/kinematics/MecanumDriveWheelSpeeds.h>
+#include <wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp>
 
 TEST(MecanumDriveWheelSpeedsTest, Plus) {
   const wpi::math::MecanumDriveWheelSpeeds left{1.0_mps, 0.5_mps, 2.0_mps,

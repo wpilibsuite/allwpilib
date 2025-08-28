@@ -6,14 +6,14 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.h>
-#include <wpi/math/trajectory/constraint/TrajectoryConstraint.h>
+#include <wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.hpp>
+#include <wpi/math/trajectory/constraint/TrajectoryConstraint.hpp>
 
-#include "trajectory/TestTrajectory.h"
-#include "units/acceleration.h"
-#include "units/angle.h"
-#include "units/math.h"
-#include "units/velocity.h"
+#include "trajectory/TestTrajectory.hpp"
+#include "units/acceleration.hpp"
+#include "units/angle.hpp"
+#include "units/math.hpp"
+#include "units/velocity.hpp"
 
 using namespace wpi::math;
 

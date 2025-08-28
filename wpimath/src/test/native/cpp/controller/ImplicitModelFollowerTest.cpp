@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/controller/ImplicitModelFollower.h>
-#include <wpi/math/system/plant/LinearSystemId.h>
+#include <wpi/math/controller/ImplicitModelFollower.hpp>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
 
 namespace wpi::math {
 

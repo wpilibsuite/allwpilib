@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <Eigen/Core>
-#include <wpi/math/controller/DifferentialDriveFeedforward.h>
-#include <wpi/math/controller/LinearPlantInversionFeedforward.h>
+#include <wpi/math/controller/DifferentialDriveFeedforward.hpp>
+#include <wpi/math/controller/LinearPlantInversionFeedforward.hpp>
 
 using namespace wpi::math;
 

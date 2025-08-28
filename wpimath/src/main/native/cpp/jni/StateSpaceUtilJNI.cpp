@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <jni.h>
+#include <jni.hpp>
 
 #include <Eigen/Core>
-#include <wpi/jni_util.h>
-#include <wpi/math/StateSpaceUtil.h>
+#include <wpi/jni_util.hpp>
+#include <wpi/math/StateSpaceUtil.hpp>
 
-#include "edu_wpi_first_math_jni_StateSpaceUtilJNI.h"
+#include "edu_wpi_first_math_jni_StateSpaceUtilJNI.hpp"
 
 using namespace wpi::java;
 

@@ -5,10 +5,10 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-#include <wpi/math/geometry/Translation2d.h>
-#include <wpi/math/kinematics/SwerveDriveKinematics.h>
+#include <wpi/math/geometry/Translation2d.hpp>
+#include <wpi/math/kinematics/SwerveDriveKinematics.hpp>
 
-#include "units/angular_velocity.h"
+#include "units/angular_velocity.hpp"
 
 using namespace wpi::math;
 

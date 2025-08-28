@@ -5,9 +5,9 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/math/trajectory/Trajectory.h>
-#include <wpi/math/trajectory/TrajectoryConfig.h>
-#include <wpi/math/trajectory/TrajectoryGenerator.h>
+#include <wpi/math/trajectory/Trajectory.hpp>
+#include <wpi/math/trajectory/TrajectoryConfig.hpp>
+#include <wpi/math/trajectory/TrajectoryGenerator.hpp>
 
 void TestSameShapedTrajectory(
     std::vector<wpi::math::Trajectory::State> statesA,

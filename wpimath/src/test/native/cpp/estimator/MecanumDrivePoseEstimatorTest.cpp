@@ -9,10 +9,10 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <wpi/math/estimator/MecanumDrivePoseEstimator.h>
-#include <wpi/math/geometry/Pose2d.h>
-#include <wpi/math/kinematics/MecanumDriveKinematics.h>
-#include <wpi/math/trajectory/TrajectoryGenerator.h>
+#include <wpi/math/estimator/MecanumDrivePoseEstimator.hpp>
+#include <wpi/math/geometry/Pose2d.hpp>
+#include <wpi/math/kinematics/MecanumDriveKinematics.hpp>
+#include <wpi/math/trajectory/TrajectoryGenerator.hpp>
 #include <wpi/print.h>
 
 void testFollowTrajectory(

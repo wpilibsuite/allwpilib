@@ -7,12 +7,12 @@
 
 #include <Eigen/Core>
 #include <gtest/gtest.h>
-#include <wpi/math/estimator/KalmanFilter.h>
-#include <wpi/math/system/plant/DCMotor.h>
-#include <wpi/math/system/plant/LinearSystemId.h>
+#include <wpi/math/estimator/KalmanFilter.hpp>
+#include <wpi/math/system/plant/DCMotor.hpp>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
 
-#include "units/moment_of_inertia.h"
-#include "units/time.h"
+#include "units/moment_of_inertia.hpp"
+#include "units/time.hpp"
 
 TEST(KalmanFilterTest, Flywheel) {
   auto motor = wpi::math::DCMotor::NEO();

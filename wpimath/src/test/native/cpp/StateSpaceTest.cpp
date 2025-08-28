@@ -6,16 +6,16 @@
 #include <random>
 
 #include <gtest/gtest.h>
-#include <wpi/math/EigenCore.h>
-#include <wpi/math/controller/LinearPlantInversionFeedforward.h>
-#include <wpi/math/controller/LinearQuadraticRegulator.h>
-#include <wpi/math/estimator/KalmanFilter.h>
-#include <wpi/math/system/LinearSystem.h>
-#include <wpi/math/system/LinearSystemLoop.h>
-#include <wpi/math/system/plant/DCMotor.h>
-#include <wpi/math/system/plant/LinearSystemId.h>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/controller/LinearPlantInversionFeedforward.hpp>
+#include <wpi/math/controller/LinearQuadraticRegulator.hpp>
+#include <wpi/math/estimator/KalmanFilter.hpp>
+#include <wpi/math/system/LinearSystem.hpp>
+#include <wpi/math/system/LinearSystemLoop.hpp>
+#include <wpi/math/system/plant/DCMotor.hpp>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
 
-#include "units/time.h"
+#include "units/time.hpp"
 
 namespace wpi::math {
 

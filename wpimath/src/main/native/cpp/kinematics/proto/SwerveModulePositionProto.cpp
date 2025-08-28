@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/math/kinematics/proto/SwerveModulePositionProto.h>
+#include <wpi/math/kinematics/proto/SwerveModulePositionProto.hpp>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "wpimath/protobuf/kinematics.npb.h"
+#include "wpimath/protobuf/kinematics.npb.hpp"
 
 std::optional<wpi::math::SwerveModulePosition>
 wpi::Protobuf<wpi::math::SwerveModulePosition>::Unpack(InputStream& stream) {

@@ -3,10 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/EigenCore.h>
-#include <wpi/math/proto/VectorProto.h>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/proto/VectorProto.hpp>
 
-#include "../ProtoTestBase.h"
+#include "../ProtoTestBase.hpp"
 
 using namespace wpi::math;
 

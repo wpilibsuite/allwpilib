@@ -4,9 +4,9 @@
 
 #include <optional>
 
-#include <wpi/math/controller/proto/ArmFeedforwardProto.h>
+#include <wpi/math/controller/proto/ArmFeedforwardProto.hpp>
 
-#include "wpimath/protobuf/controller.npb.h"
+#include "wpimath/protobuf/controller.npb.hpp"
 
 std::optional<wpi::math::ArmFeedforward>
 wpi::Protobuf<wpi::math::ArmFeedforward>::Unpack(InputStream& stream) {

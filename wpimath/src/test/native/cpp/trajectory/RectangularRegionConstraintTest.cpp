@@ -3,14 +3,14 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/trajectory/constraint/MaxVelocityConstraint.h>
-#include <wpi/math/trajectory/constraint/RectangularRegionConstraint.h>
+#include <wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp>
+#include <wpi/math/trajectory/constraint/RectangularRegionConstraint.hpp>
 
-#include "trajectory/TestTrajectory.h"
-#include "units/acceleration.h"
-#include "units/length.h"
-#include "units/math.h"
-#include "units/velocity.h"
+#include "trajectory/TestTrajectory.hpp"
+#include "units/acceleration.hpp"
+#include "units/length.hpp"
+#include "units/math.hpp"
+#include "units/velocity.hpp"
 
 using namespace wpi::math;
 

@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/trajectory/TrapezoidProfile.h"  // NOLINT(build/include_order)
+#include "wpi/math/trajectory/TrapezoidProfile.hpp"  // NOLINT(build/include_order)
 
 #include <chrono>
 #include <cmath>
 
 #include <gtest/gtest.h>
 
-#include "units/acceleration.h"
-#include "units/length.h"
-#include "units/math.h"
-#include "units/velocity.h"
+#include "units/acceleration.hpp"
+#include "units/length.hpp"
+#include "units/math.hpp"
+#include "units/velocity.hpp"
 
 static constexpr auto kDt = 10_ms;
 

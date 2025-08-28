@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/estimator/S3SigmaPoints.h>
+#include <wpi/math/estimator/S3SigmaPoints.hpp>
 
 TEST(S3SigmaPointsTest, Simplex) {
   constexpr double alpha = 1e-3;

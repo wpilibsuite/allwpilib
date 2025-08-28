@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include <wpi/math/estimator/DifferentialDrivePoseEstimator.h>
+#include <wpi/math/estimator/DifferentialDrivePoseEstimator.hpp>
 
 using namespace wpi::math;
 

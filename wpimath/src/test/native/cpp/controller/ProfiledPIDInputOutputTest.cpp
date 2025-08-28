@@ -5,11 +5,11 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-#include <wpi/math/controller/ProfiledPIDController.h>
+#include <wpi/math/controller/ProfiledPIDController.hpp>
 
-#include "units/angle.h"
-#include "units/angular_acceleration.h"
-#include "units/angular_velocity.h"
+#include "units/angle.hpp"
+#include "units/angular_acceleration.hpp"
+#include "units/angular_velocity.hpp"
 
 TEST(ProfiledPIDInputOutputTest, ContinuousInput1) {
   wpi::math::ProfiledPIDController<units::degree> controller{

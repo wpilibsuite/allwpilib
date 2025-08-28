@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/json.h>
-#include <wpi/math/geometry/Rotation3d.h>
+#include <wpi/math/geometry/Rotation3d.hpp>
 
 void wpi::math::to_json(wpi::json& json, const Rotation3d& rotation) {
   json = wpi::json{{"quaternion", rotation.GetQuaternion()}};

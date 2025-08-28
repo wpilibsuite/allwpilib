@@ -3,10 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/filter/Debouncer.h>
+#include <wpi/math/filter/Debouncer.hpp>
 #include <wpi/timestamp.h>
 
-#include "units/time.h"
+#include "units/time.hpp"
 
 static units::second_t now = 0_s;
 

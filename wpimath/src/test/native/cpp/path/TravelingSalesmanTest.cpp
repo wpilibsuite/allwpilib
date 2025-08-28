@@ -9,10 +9,10 @@
 #include <gtest/gtest.h>
 #include <wpi/array.h>
 #include <wpi/circular_buffer.h>
-#include <wpi/math/EigenCore.h>
-#include <wpi/math/geometry/Pose2d.h>
-#include <wpi/math/geometry/Rotation2d.h>
-#include <wpi/math/path/TravelingSalesman.h>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/geometry/Pose2d.hpp>
+#include <wpi/math/geometry/Rotation2d.hpp>
+#include <wpi/math/path/TravelingSalesman.hpp>
 
 /**
  * Returns true if the cycles represented by the two lists match.

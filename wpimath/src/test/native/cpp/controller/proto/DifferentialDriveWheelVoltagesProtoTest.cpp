@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
-#include <wpi/math/controller/DifferentialDriveWheelVoltages.h>
+#include <wpi/math/controller/DifferentialDriveWheelVoltages.hpp>
 
 using namespace wpi::math;
 

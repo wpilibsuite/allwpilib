@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/math/geometry/proto/Rotation3dProto.h>
+#include <wpi/math/geometry/proto/Rotation3dProto.hpp>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "wpimath/protobuf/geometry3d.npb.h"
+#include "wpimath/protobuf/geometry3d.npb.hpp"
 
 std::optional<wpi::math::Rotation3d>
 wpi::Protobuf<wpi::math::Rotation3d>::Unpack(InputStream& stream) {

@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
-#include <wpi/math/geometry/Quaternion.h>
+#include <wpi/math/geometry/Quaternion.hpp>
 
 using namespace wpi::math;
 

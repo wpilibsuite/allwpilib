@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/math/kinematics/proto/SwerveModuleStateProto.h>
+#include <wpi/math/kinematics/proto/SwerveModuleStateProto.hpp>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "wpimath/protobuf/kinematics.npb.h"
+#include "wpimath/protobuf/kinematics.npb.hpp"
 
 std::optional<wpi::math::SwerveModuleState>
 wpi::Protobuf<wpi::math::SwerveModuleState>::Unpack(InputStream& stream) {

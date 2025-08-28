@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
-#include <wpi/math/kinematics/SwerveModulePosition.h>
+#include <wpi/math/kinematics/SwerveModulePosition.hpp>
 
 using namespace wpi::math;
 

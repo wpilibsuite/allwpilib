@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/expected>
-#include <wpi/math/DARE.h>
+#include <wpi/math/DARE.hpp>
 
 template wpi::expected<Eigen::Matrix<double, 4, 4>, wpi::math::DAREError>
 wpi::math::DARE<4, 1>(const Eigen::Matrix<double, 4, 4>& A,

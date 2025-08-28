@@ -4,7 +4,7 @@
 
 #include <limits>
 
-#include <wpi/math/StateSpaceUtil.h>
+#include <wpi/math/StateSpaceUtil.hpp>
 
 namespace wpi::math {
 

@@ -6,8 +6,8 @@
 #include <random>
 
 #include <gtest/gtest.h>
-#include <wpi/math/kinematics/MecanumDriveOdometry3d.h>
-#include <wpi/math/trajectory/TrajectoryGenerator.h>
+#include <wpi/math/kinematics/MecanumDriveOdometry3d.hpp>
+#include <wpi/math/trajectory/TrajectoryGenerator.hpp>
 
 using namespace wpi::math;
 

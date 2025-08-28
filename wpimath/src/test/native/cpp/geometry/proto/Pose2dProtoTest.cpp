@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
-#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/geometry/Pose2d.hpp>
 
 using namespace wpi::math;
 

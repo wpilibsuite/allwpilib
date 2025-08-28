@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/ComputerVisionUtil.h>
+#include <wpi/math/ComputerVisionUtil.hpp>
 
 TEST(ComputerVisionUtilTest, ObjectToRobotPose) {
   wpi::math::Pose3d robot{1_m, 2_m, 0_m,

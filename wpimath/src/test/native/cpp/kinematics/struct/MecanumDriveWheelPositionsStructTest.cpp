@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/kinematics/MecanumDriveWheelPositions.h>
+#include <wpi/math/kinematics/MecanumDriveWheelPositions.hpp>
 
 using namespace wpi::math;
 

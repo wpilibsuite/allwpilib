@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <wpi/math/system/plant/DCMotor.h>
+#include <wpi/math/system/plant/DCMotor.hpp>
 
 using namespace wpi::math;
 

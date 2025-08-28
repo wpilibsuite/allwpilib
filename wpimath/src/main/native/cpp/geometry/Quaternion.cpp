@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/json.h>
-#include <wpi/math/geometry/Quaternion.h>
+#include <wpi/math/geometry/Quaternion.hpp>
 
 void wpi::math::to_json(wpi::json& json, const Quaternion& quaternion) {
   json = wpi::json{{"W", quaternion.W()},

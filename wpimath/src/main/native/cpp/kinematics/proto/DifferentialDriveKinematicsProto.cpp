@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/math/kinematics/proto/DifferentialDriveKinematicsProto.h>
+#include <wpi/math/kinematics/proto/DifferentialDriveKinematicsProto.hpp>
 
-#include "wpimath/protobuf/kinematics.npb.h"
+#include "wpimath/protobuf/kinematics.npb.hpp"
 
 std::optional<wpi::math::DifferentialDriveKinematics> wpi::Protobuf<
     wpi::math::DifferentialDriveKinematics>::Unpack(InputStream& stream) {

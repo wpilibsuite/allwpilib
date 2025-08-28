@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <Eigen/QR>
-#include <wpi/math/controller/DifferentialDriveAccelerationLimiter.h>
+#include <wpi/math/controller/DifferentialDriveAccelerationLimiter.hpp>
 
 using namespace wpi::math;
 

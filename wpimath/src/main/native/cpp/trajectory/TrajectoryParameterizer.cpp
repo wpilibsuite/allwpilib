@@ -29,9 +29,9 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/math/trajectory/TrajectoryParameterizer.h>
+#include <wpi/math/trajectory/TrajectoryParameterizer.hpp>
 
-#include "units/math.h"
+#include "units/math.hpp"
 
 using namespace wpi::math;
 
