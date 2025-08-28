@@ -42,7 +42,7 @@ java_library(
         "//cscore:cscore-java",
         "//hal:hal-java",
         "//ntcore:networktables-java",
-        "//wpiannotations:wpiannotations-java",
+        "//wpiannotations",
         "//wpilibj",
         "//wpimath:wpimath-java",
         "//wpinet:wpinet-java",
@@ -82,7 +82,7 @@ java_binary(
     deps = [
         "//hal:hal-java",
         "//ntcore:networktables-java",
-        "//wpiannotations:wpiannotations-java",
+        "//wpiannotations",
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
     ],
