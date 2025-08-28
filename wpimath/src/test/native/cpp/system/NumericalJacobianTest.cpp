@@ -3,8 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/system/NumericalJacobian.h"
+#include <wpi/math/system/NumericalJacobian.h>
 
 wpi::math::Matrixd<4, 4> A{
     {1, 2, 4, 1}, {5, 2, 3, 4}, {5, 1, 3, 2}, {1, 1, 3, 7}};
@@ -12,7 +11,7 @@ wpi::math::Matrixd<4, 2> B{{1, 1}, {2, 1}, {3, 2}, {3, 7}};
 
 // Function from which to recover A and B
 wpi::math::Vectord<4> AxBuFn(const wpi::math::Vectord<4>& x,
-                           const wpi::math::Vectord<2>& u) {
+                             const wpi::math::Vectord<2>& u) {
   return A * x + B * u;
 }
 
@@ -56,7 +55,7 @@ wpi::math::Matrixd<3, 2> D{{1, 1}, {2, 1}, {3, 2}};
 
 // Function from which to recover C and D
 wpi::math::Vectord<3> CxDuFn(const wpi::math::Vectord<4>& x,
-                           const wpi::math::Vectord<2>& u) {
+                             const wpi::math::Vectord<2>& u) {
   return C * x + D * u;
 }
 

@@ -10,12 +10,11 @@
 #include <vector>
 
 #include <wpi/SymbolExports.h>
-
-#include "wpi/math/spline/SplineParameterizer.h"
-#include "wpi/math/trajectory/Trajectory.h"
-#include "wpi/math/trajectory/TrajectoryConfig.h"
-#include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.h"
+#include <wpi/math/spline/SplineParameterizer.h>
+#include <wpi/math/trajectory/Trajectory.h>
+#include <wpi/math/trajectory/TrajectoryConfig.h>
+#include <wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.h>
+#include <wpi/math/trajectory/constraint/TrajectoryConstraint.h>
 
 namespace wpi::math {
 /**

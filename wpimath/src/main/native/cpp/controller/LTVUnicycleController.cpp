@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/controller/LTVUnicycleController.h"
+#include <wpi/math/DARE.h>
+#include <wpi/math/controller/LTVUnicycleController.h>
+#include <wpi/math/system/Discretization.h>
 
 #include "units/math.h"
-#include "wpi/math/DARE.h"
-#include "wpi/math/system/Discretization.h"
 
 using namespace wpi::math;
 

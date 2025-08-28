@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
+#include <wpi/math/MathUtil.h>
+#include <wpi/math/controller/LTVUnicycleController.h>
+#include <wpi/math/trajectory/TrajectoryGenerator.h>
 
 #include "units/math.h"
-#include "wpi/math/MathUtil.h"
-#include "wpi/math/controller/LTVUnicycleController.h"
-#include "wpi/math/trajectory/TrajectoryGenerator.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
@@ -41,6 +41,6 @@ TEST(LTVUnicycleControllerTest, ReachesReference) {
   EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
   EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
   EXPECT_NEAR_UNITS(wpi::math::AngleModulus(endPose.Rotation().Radians() -
-                                          robotPose.Rotation().Radians()),
+                                            robotPose.Rotation().Radians()),
                     0_rad, kAngularTolerance);
 }

@@ -14,12 +14,11 @@
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
-
-#include "wpi/math/ct_matrix.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/geometry/Rotation3d.h"
-#include "wpi/math/geometry/Translation3d.h"
-#include "wpi/math/geometry/Twist3d.h"
+#include <wpi/math/ct_matrix.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/geometry/Rotation3d.h>
+#include <wpi/math/geometry/Translation3d.h>
+#include <wpi/math/geometry/Twist3d.h>
 
 namespace wpi::math {
 

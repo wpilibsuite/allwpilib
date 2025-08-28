@@ -6,10 +6,9 @@
 
 #include <Eigen/Eigenvalues>
 #include <gtest/gtest.h>
-
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/system/Discretization.h"
-#include "wpi/math/system/NumericalIntegration.h"
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/system/Discretization.h>
+#include <wpi/math/system/NumericalIntegration.h>
 
 // Check that for a simple second-order system that we can easily analyze
 // analytically,
@@ -24,7 +23,7 @@ TEST(DiscretizationTest, DiscretizeA) {
 
   // We now have pos = vel = 1 and accel = 0, which should give us:
   wpi::math::Vectord<2> x1Truth{1.0 * x0(0) + 1.0 * x0(1),
-                              0.0 * x0(0) + 1.0 * x0(1)};
+                                0.0 * x0(0) + 1.0 * x0(1)};
 
   EXPECT_EQ(x1Truth, x1Discrete);
 }
@@ -45,7 +44,7 @@ TEST(DiscretizationTest, DiscretizeAB) {
 
   // We now have pos = vel = accel = 1, which should give us:
   wpi::math::Vectord<2> x1Truth{1.0 * x0(0) + 1.0 * x0(1) + 0.5 * u(0),
-                              0.0 * x0(0) + 1.0 * x0(1) + 1.0 * u(0)};
+                                0.0 * x0(0) + 1.0 * x0(1) + 1.0 * u(0)};
 
   EXPECT_EQ(x1Truth, x1Discrete);
 }
@@ -64,8 +63,8 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
   //       0
   wpi::math::Matrixd<2, 2> discQIntegrated =
       wpi::math::RKDP<std::function<wpi::math::Matrixd<2, 2>(
-                        units::second_t, const wpi::math::Matrixd<2, 2>&)>,
-                    wpi::math::Matrixd<2, 2>>(
+                          units::second_t, const wpi::math::Matrixd<2, 2>&)>,
+                      wpi::math::Matrixd<2, 2>>(
           [&](units::second_t t, const wpi::math::Matrixd<2, 2>&) {
             return wpi::math::Matrixd<2, 2>(
                 (contA * t.value()).exp() * contQ *
@@ -97,8 +96,8 @@ TEST(DiscretizationTest, DiscretizeFastModelAQ) {
   //       0
   wpi::math::Matrixd<2, 2> discQIntegrated =
       wpi::math::RKDP<std::function<wpi::math::Matrixd<2, 2>(
-                        units::second_t, const wpi::math::Matrixd<2, 2>&)>,
-                    wpi::math::Matrixd<2, 2>>(
+                          units::second_t, const wpi::math::Matrixd<2, 2>&)>,
+                      wpi::math::Matrixd<2, 2>>(
           [&](units::second_t t, const wpi::math::Matrixd<2, 2>&) {
             return wpi::math::Matrixd<2, 2>(
                 (contA * t.value()).exp() * contQ *

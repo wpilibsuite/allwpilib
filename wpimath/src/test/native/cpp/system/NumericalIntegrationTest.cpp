@@ -5,9 +5,8 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/system/NumericalIntegration.h"
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/system/NumericalIntegration.h>
 
 // Test that integrating dx/dt = eˣ works
 TEST(NumericalIntegrationTest, Exponential) {
@@ -43,12 +42,12 @@ TEST(NumericalIntegrationTest, ExponentialWithU) {
 //   x(t) = 12eᵗ/(eᵗ + 1)²
 TEST(NumericalIntegrationTest, RK4TimeVarying) {
   wpi::math::Vectord<1> y0{12.0 * std::exp(5.0) /
-                         std::pow(std::exp(5.0) + 1.0, 2.0)};
+                           std::pow(std::exp(5.0) + 1.0, 2.0)};
 
   wpi::math::Vectord<1> y1 = wpi::math::RK4(
       [](units::second_t t, const wpi::math::Vectord<1>& x) {
         return wpi::math::Vectord<1>{x(0) *
-                                   (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
+                                     (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
       },
       5_s, y0, 1_s);
   EXPECT_NEAR(y1(0), 12.0 * std::exp(6.0) / std::pow(std::exp(6.0) + 1.0, 2.0),
@@ -87,12 +86,12 @@ TEST(NumericalIntegrationTest, ExponentialRKDP) {
 //   x(t) = 12eᵗ/(eᵗ + 1)²
 TEST(NumericalIntegrationTest, RKDPTimeVarying) {
   wpi::math::Vectord<1> y0{12.0 * std::exp(5.0) /
-                         std::pow(std::exp(5.0) + 1.0, 2.0)};
+                           std::pow(std::exp(5.0) + 1.0, 2.0)};
 
   wpi::math::Vectord<1> y1 = wpi::math::RKDP(
       [](units::second_t t, const wpi::math::Vectord<1>& x) {
         return wpi::math::Vectord<1>{x(0) *
-                                   (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
+                                     (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
       },
       5_s, y0, 1_s, 1e-12);
   EXPECT_NEAR(y1(0), 12.0 * std::exp(6.0) / std::pow(std::exp(6.0) + 1.0, 2.0),

@@ -10,13 +10,12 @@
 
 #include <fmt/format.h>
 #include <gtest/gtest.h>
+#include <wpi/math/estimator/SwerveDrivePoseEstimator.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/kinematics/SwerveDriveKinematics.h>
+#include <wpi/math/trajectory/TrajectoryGenerator.h>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
-
-#include "wpi/math/estimator/SwerveDrivePoseEstimator.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/kinematics/SwerveDriveKinematics.h"
-#include "wpi/math/trajectory/TrajectoryGenerator.h"
 
 void testFollowTrajectory(
     const wpi::math::SwerveDriveKinematics<4>& kinematics,
@@ -61,7 +60,7 @@ void testFollowTrajectory(
           visionMeasurementGenerator(groundTruthState) +
           wpi::math::Transform2d{
               wpi::math::Translation2d{distribution(generator) * 0.1_m,
-                                     distribution(generator) * 0.1_m},
+                                       distribution(generator) * 0.1_m},
               wpi::math::Rotation2d{distribution(generator) * 0.05_rad}};
       visionPoses.push_back({t, visionPose});
     }
@@ -145,7 +144,8 @@ void testFollowTrajectory(
 TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
   wpi::math::SwerveDriveKinematics<4> kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
   wpi::math::SwerveModulePosition fl;
   wpi::math::SwerveModulePosition fr;
@@ -153,8 +153,8 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
   wpi::math::SwerveModulePosition br;
 
   wpi::math::SwerveDrivePoseEstimator<4> estimator{
-      kinematics,        wpi::math::Rotation2d{}, {fl, fr, bl, br},
-      wpi::math::Pose2d{}, {0.1, 0.1, 0.1},       {0.45, 0.45, 0.45}};
+      kinematics,          wpi::math::Rotation2d{}, {fl, fr, bl, br},
+      wpi::math::Pose2d{}, {0.1, 0.1, 0.1},         {0.45, 0.45, 0.45}};
 
   wpi::math::Trajectory trajectory =
       wpi::math::TrajectoryGenerator::GenerateTrajectory(
@@ -169,7 +169,7 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
       kinematics, estimator, trajectory,
       [&](wpi::math::Trajectory::State& state) {
         return wpi::math::ChassisSpeeds{state.velocity, 0_mps,
-                                      state.velocity * state.curvature};
+                                        state.velocity * state.curvature};
       },
       [&](wpi::math::Trajectory::State& state) { return state.pose; },
       {0_m, 0_m, wpi::math::Rotation2d{45_deg}},
@@ -180,7 +180,8 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
 TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
   wpi::math::SwerveDriveKinematics<4> kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
   wpi::math::SwerveModulePosition fl;
   wpi::math::SwerveModulePosition fr;
@@ -188,8 +189,8 @@ TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
   wpi::math::SwerveModulePosition br;
 
   wpi::math::SwerveDrivePoseEstimator<4> estimator{
-      kinematics,        wpi::math::Rotation2d{}, {fl, fr, bl, br},
-      wpi::math::Pose2d{}, {0.1, 0.1, 0.1},       {0.9, 0.9, 0.9}};
+      kinematics,          wpi::math::Rotation2d{}, {fl, fr, bl, br},
+      wpi::math::Pose2d{}, {0.1, 0.1, 0.1},         {0.9, 0.9, 0.9}};
 
   wpi::math::Trajectory trajectory =
       wpi::math::TrajectoryGenerator::GenerateTrajectory(
@@ -207,21 +208,21 @@ TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
       auto pose_offset = wpi::math::Rotation2d{offset_direction_degs};
       auto heading_offset = wpi::math::Rotation2d{offset_heading_degs};
 
-      auto initial_pose =
-          trajectory.InitialPose() +
-          wpi::math::Transform2d{wpi::math::Translation2d{pose_offset.Cos() * 1_m,
-                                                      pose_offset.Sin() * 1_m},
-                               heading_offset};
+      auto initial_pose = trajectory.InitialPose() +
+                          wpi::math::Transform2d{
+                              wpi::math::Translation2d{pose_offset.Cos() * 1_m,
+                                                       pose_offset.Sin() * 1_m},
+                              heading_offset};
 
       testFollowTrajectory(
           kinematics, estimator, trajectory,
           [&](wpi::math::Trajectory::State& state) {
             return wpi::math::ChassisSpeeds{state.velocity, 0_mps,
-                                          state.velocity * state.curvature};
+                                            state.velocity * state.curvature};
           },
           [&](wpi::math::Trajectory::State& state) { return state.pose; },
-          initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms, 100_ms,
-          250_ms, false, false);
+          initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,
+          100_ms, 250_ms, false, false);
     }
   }
 }
@@ -234,7 +235,8 @@ TEST(SwerveDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
   // pose would converge to that measurement.
   wpi::math::SwerveDriveKinematics<4> kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
   wpi::math::SwerveModulePosition fl;
   wpi::math::SwerveModulePosition fr;
@@ -242,9 +244,12 @@ TEST(SwerveDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
   wpi::math::SwerveModulePosition br;
 
   wpi::math::SwerveDrivePoseEstimator<4> estimator{
-      kinematics,       wpi::math::Rotation2d{},
-      {fl, fr, bl, br}, wpi::math::Pose2d{1_m, 2_m, wpi::math::Rotation2d{270_deg}},
-      {0.1, 0.1, 0.1},  {0.45, 0.45, 0.45}};
+      kinematics,
+      wpi::math::Rotation2d{},
+      {fl, fr, bl, br},
+      wpi::math::Pose2d{1_m, 2_m, wpi::math::Rotation2d{270_deg}},
+      {0.1, 0.1, 0.1},
+      {0.45, 0.45, 0.45}};
 
   estimator.UpdateWithTime(0_s, wpi::math::Rotation2d{}, {fl, fr, bl, br});
 
@@ -288,7 +293,8 @@ TEST(SwerveDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
 TEST(SwerveDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
   wpi::math::SwerveDriveKinematics<4> kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
   wpi::math::SwerveModulePosition fl;
   wpi::math::SwerveModulePosition fr;
@@ -296,8 +302,8 @@ TEST(SwerveDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
   wpi::math::SwerveModulePosition br;
 
   wpi::math::SwerveDrivePoseEstimator<4> estimator{
-      kinematics,        wpi::math::Rotation2d{}, {fl, fr, bl, br},
-      wpi::math::Pose2d{}, {0.1, 0.1, 0.1},       {0.45, 0.45, 0.45}};
+      kinematics,          wpi::math::Rotation2d{}, {fl, fr, bl, br},
+      wpi::math::Pose2d{}, {0.1, 0.1, 0.1},         {0.45, 0.45, 0.45}};
 
   // Add enough measurements to fill up the buffer
   for (auto time = 0_s; time < 4_s; time += 20_ms) {
@@ -309,7 +315,7 @@ TEST(SwerveDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
   // Apply a vision measurement from 3 seconds ago
   estimator.AddVisionMeasurement(
       wpi::math::Pose2d{wpi::math::Translation2d{10_m, 10_m},
-                      wpi::math::Rotation2d{0.1_rad}},
+                        wpi::math::Rotation2d{0.1_rad}},
       1_s, {0.1, 0.1, 0.1});
 
   EXPECT_NEAR(odometryPose.X().value(),
@@ -324,7 +330,8 @@ TEST(SwerveDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
 TEST(SwerveDrivePoseEstimatorTest, TestSampleAt) {
   wpi::math::SwerveDriveKinematics<4> kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
   wpi::math::SwerveDrivePoseEstimator estimator{
       kinematics,
       wpi::math::Rotation2d{},
@@ -343,23 +350,25 @@ TEST(SwerveDrivePoseEstimatorTest, TestSampleAt) {
   for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
     wpi::array<wpi::math::SwerveModulePosition, 4> wheelPositions{
         {wpi::math::SwerveModulePosition{units::meter_t{time},
-                                       wpi::math::Rotation2d{}},
+                                         wpi::math::Rotation2d{}},
          wpi::math::SwerveModulePosition{units::meter_t{time},
-                                       wpi::math::Rotation2d{}},
+                                         wpi::math::Rotation2d{}},
          wpi::math::SwerveModulePosition{units::meter_t{time},
-                                       wpi::math::Rotation2d{}},
+                                         wpi::math::Rotation2d{}},
          wpi::math::SwerveModulePosition{units::meter_t{time},
-                                       wpi::math::Rotation2d{}}}};
+                                         wpi::math::Rotation2d{}}}};
     estimator.UpdateWithTime(units::second_t{time}, wpi::math::Rotation2d{},
                              wheelPositions);
   }
 
   // Sample at an added time
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(1.02_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(1.02_s));
   // Sample between updates (test interpolation)
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(1.01_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(1.01_s));
   // Sampling before the oldest value returns the oldest value
   EXPECT_EQ(std::optional(wpi::math::Pose2d{1_m, 0_m, wpi::math::Rotation2d{}}),
             estimator.SampleAt(0.5_s));
@@ -373,10 +382,12 @@ TEST(SwerveDrivePoseEstimatorTest, TestSampleAt) {
       wpi::math::Pose2d{2_m, 0_m, wpi::math::Rotation2d{1_rad}}, 2.2_s);
 
   // Make sure nothing changed (except the newest value)
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(1.02_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(1.01_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(1.02_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(1.01_s));
   EXPECT_EQ(std::optional(wpi::math::Pose2d{1_m, 0_m, wpi::math::Rotation2d{}}),
             estimator.SampleAt(0.5_s));
 
@@ -392,16 +403,19 @@ TEST(SwerveDrivePoseEstimatorTest, TestSampleAt) {
   EXPECT_EQ(
       std::optional(wpi::math::Pose2d{1.01_m, 0.1_m, wpi::math::Rotation2d{}}),
       estimator.SampleAt(1.01_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1_m, 0.1_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(0.5_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{2_m, 0.1_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(2.5_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1_m, 0.1_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(0.5_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{2_m, 0.1_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(2.5_s));
 }
 
 TEST(SwerveDrivePoseEstimatorTest, TestReset) {
   wpi::math::SwerveDriveKinematics<4> kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
   wpi::math::SwerveDrivePoseEstimator estimator{
       kinematics,
       wpi::math::Rotation2d{},
@@ -419,7 +433,8 @@ TEST(SwerveDrivePoseEstimatorTest, TestReset) {
 
   // Test reset position
   {
-    wpi::math::SwerveModulePosition modulePosition{1_m, wpi::math::Rotation2d{}};
+    wpi::math::SwerveModulePosition modulePosition{1_m,
+                                                   wpi::math::Rotation2d{}};
     estimator.ResetPosition(
         wpi::math::Rotation2d{},
         {modulePosition, modulePosition, modulePosition, modulePosition},
@@ -433,9 +448,10 @@ TEST(SwerveDrivePoseEstimatorTest, TestReset) {
 
   // Test orientation and wheel positions
   {
-    wpi::math::SwerveModulePosition modulePosition{2_m, wpi::math::Rotation2d{}};
+    wpi::math::SwerveModulePosition modulePosition{2_m,
+                                                   wpi::math::Rotation2d{}};
     estimator.Update(wpi::math::Rotation2d{}, {modulePosition, modulePosition,
-                                             modulePosition, modulePosition});
+                                               modulePosition, modulePosition});
   }
 
   EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
@@ -454,9 +470,10 @@ TEST(SwerveDrivePoseEstimatorTest, TestReset) {
 
   // Test orientation
   {
-    wpi::math::SwerveModulePosition modulePosition{3_m, wpi::math::Rotation2d{}};
+    wpi::math::SwerveModulePosition modulePosition{3_m,
+                                                   wpi::math::Rotation2d{}};
     estimator.Update(wpi::math::Rotation2d{}, {modulePosition, modulePosition,
-                                             modulePosition, modulePosition});
+                                               modulePosition, modulePosition});
   }
 
   EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());

@@ -2,9 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/geometry/Translation3d.h"
-
 #include <wpi/json.h>
+#include <wpi/math/geometry/Translation3d.h>
 
 void wpi::math::to_json(wpi::json& json, const Translation3d& translation) {
   json = wpi::json{{"x", translation.X().value()},

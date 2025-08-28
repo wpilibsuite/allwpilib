@@ -10,15 +10,15 @@
 #include <Eigen/Cholesky>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/StateSpaceUtil.h>
+#include <wpi/math/estimator/SigmaPoints.h>
+#include <wpi/math/estimator/UnscentedTransform.h>
+#include <wpi/math/system/Discretization.h>
+#include <wpi/math/system/NumericalIntegration.h>
+#include <wpi/math/system/NumericalJacobian.h>
 
 #include "units/time.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/StateSpaceUtil.h"
-#include "wpi/math/estimator/SigmaPoints.h"
-#include "wpi/math/estimator/UnscentedTransform.h"
-#include "wpi/math/system/Discretization.h"
-#include "wpi/math/system/NumericalIntegration.h"
-#include "wpi/math/system/NumericalJacobian.h"
 
 namespace wpi::math {
 
@@ -44,8 +44,8 @@ namespace wpi::math {
  * true probability distribution.
  *
  * For more on the underlying math, read
- * https://file.tavsys.net/control/controls-engineering-in-wpi::math.pdf chapter 9
- * "Stochastic control theory".
+ * https://file.tavsys.net/control/controls-engineering-in-wpi::math.pdf chapter
+ * 9 "Stochastic control theory".
  *
  * <p> This class implements a square-root-form unscented Kalman filter
  * (SR-UKF). The main reason for this is to guarantee that the covariance

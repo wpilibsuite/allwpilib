@@ -12,14 +12,14 @@
 #include <gcem.hpp>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
+#include <wpi/math/MathShared.h>
+#include <wpi/math/ct_matrix.h>
+#include <wpi/math/fmt/Eigen.h>
+#include <wpi/math/geometry/Quaternion.h>
+#include <wpi/math/geometry/Rotation2d.h>
 
 #include "units/angle.h"
 #include "units/math.h"
-#include "wpi/math/MathShared.h"
-#include "wpi/math/ct_matrix.h"
-#include "wpi/math/fmt/Eigen.h"
-#include "wpi/math/geometry/Quaternion.h"
-#include "wpi/math/geometry/Rotation2d.h"
 
 namespace wpi::math {
 

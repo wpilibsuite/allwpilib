@@ -6,11 +6,11 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+#include <wpi/math/kinematics/DifferentialDriveKinematics.h>
+#include <wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.h>
 
 #include "trajectory/TestTrajectory.h"
 #include "units/time.h"
-#include "wpi/math/kinematics/DifferentialDriveKinematics.h"
-#include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 
 using namespace wpi::math;
 

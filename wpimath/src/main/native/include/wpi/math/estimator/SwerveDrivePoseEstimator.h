@@ -8,13 +8,13 @@
 
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/math/estimator/PoseEstimator.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/kinematics/SwerveDriveKinematics.h>
+#include <wpi/math/kinematics/SwerveDriveOdometry.h>
 
 #include "units/time.h"
-#include "wpi/math/estimator/PoseEstimator.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/geometry/Rotation2d.h"
-#include "wpi/math/kinematics/SwerveDriveKinematics.h"
-#include "wpi/math/kinematics/SwerveDriveOdometry.h"
 
 namespace wpi::math {
 

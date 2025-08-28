@@ -6,10 +6,9 @@
 
 #include <fmt/format.h>
 #include <wpi/ct_string.h>
+#include <wpi/math/struct/MatrixStruct.h>
+#include <wpi/math/system/LinearSystem.h>
 #include <wpi/struct/Struct.h>
-
-#include "wpi/math/struct/MatrixStruct.h"
-#include "wpi/math/system/LinearSystem.h"
 
 template <int States, int Inputs, int Outputs>
 struct wpi::Struct<wpi::math::LinearSystem<States, Inputs, Outputs>> {
@@ -24,13 +23,15 @@ struct wpi::Struct<wpi::math::LinearSystem<States, Inputs, Outputs>> {
            wpi::Struct<wpi::math::Matrixd<Outputs, States>>::GetSize() +
            wpi::Struct<wpi::math::Matrixd<Outputs, Inputs>>::GetSize();
   }
-  static constexpr ct_string kSchema = wpi::Concat(
-      wpi::Struct<wpi::math::Matrixd<States, States>>::kTypeName, " a;"_ct_string,
-      wpi::Struct<wpi::math::Matrixd<States, Inputs>>::kTypeName, " b;"_ct_string,
-      wpi::Struct<wpi::math::Matrixd<Outputs, States>>::kTypeName,
-      " c;"_ct_string,
-      wpi::Struct<wpi::math::Matrixd<Outputs, Inputs>>::kTypeName,
-      " d"_ct_string);
+  static constexpr ct_string kSchema =
+      wpi::Concat(wpi::Struct<wpi::math::Matrixd<States, States>>::kTypeName,
+                  " a;"_ct_string,
+                  wpi::Struct<wpi::math::Matrixd<States, Inputs>>::kTypeName,
+                  " b;"_ct_string,
+                  wpi::Struct<wpi::math::Matrixd<Outputs, States>>::kTypeName,
+                  " c;"_ct_string,
+                  wpi::Struct<wpi::math::Matrixd<Outputs, Inputs>>::kTypeName,
+                  " d"_ct_string);
   static constexpr std::string_view GetSchema() { return kSchema; }
 
   static wpi::math::LinearSystem<States, Inputs, Outputs> Unpack(

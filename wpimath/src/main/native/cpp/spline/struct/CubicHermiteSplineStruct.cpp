@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/spline/struct/CubicHermiteSplineStruct.h"
+#include <wpi/math/spline/struct/CubicHermiteSplineStruct.h>
 
 namespace {
 constexpr size_t kXInitialOff = 0;
@@ -11,8 +11,8 @@ constexpr size_t kYInitialOff = kXFinalOff + 2 * 8;
 constexpr size_t kYFinalOff = kYInitialOff + 2 * 8;
 }  // namespace
 
-wpi::math::CubicHermiteSpline wpi::Struct<wpi::math::CubicHermiteSpline>::Unpack(
-    std::span<const uint8_t> data) {
+wpi::math::CubicHermiteSpline wpi::Struct<
+    wpi::math::CubicHermiteSpline>::Unpack(std::span<const uint8_t> data) {
   return wpi::math::CubicHermiteSpline{
       wpi::UnpackStructArray<double, kXInitialOff, 2>(data),
       wpi::UnpackStructArray<double, kXFinalOff, 2>(data),

@@ -5,10 +5,10 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/system/plant/DCMotor.h>
 #include <wpi/protobuf/Protobuf.h>
 
 #include "wpimath/protobuf/plant.npb.h"
-#include "wpi/math/system/plant/DCMotor.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<wpi::math::DCMotor> {

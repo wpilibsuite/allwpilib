@@ -6,10 +6,10 @@
 
 #include <algorithm>
 
+#include <wpi/math/MathShared.h>
 #include <wpi/timestamp.h>
 
 #include "units/time.h"
-#include "wpi/math/MathShared.h"
 
 namespace wpi::math {
 /**

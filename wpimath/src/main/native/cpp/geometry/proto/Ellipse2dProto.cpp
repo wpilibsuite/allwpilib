@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/geometry/proto/Ellipse2dProto.h"
-
+#include <wpi/math/geometry/proto/Ellipse2dProto.h>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "wpimath/protobuf/geometry2d.npb.h"
@@ -33,8 +32,8 @@ std::optional<wpi::math::Ellipse2d> wpi::Protobuf<wpi::math::Ellipse2d>::Unpack(
   };
 }
 
-bool wpi::Protobuf<wpi::math::Ellipse2d>::Pack(OutputStream& stream,
-                                             const wpi::math::Ellipse2d& value) {
+bool wpi::Protobuf<wpi::math::Ellipse2d>::Pack(
+    OutputStream& stream, const wpi::math::Ellipse2d& value) {
   wpi::PackCallback pose{&value.Center()};
   wpi_proto_ProtobufEllipse2d msg{
       .center = pose.Callback(),

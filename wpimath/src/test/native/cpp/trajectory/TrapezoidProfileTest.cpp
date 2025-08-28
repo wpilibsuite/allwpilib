@@ -27,8 +27,8 @@ static constexpr auto kDt = 10_ms;
   }
 
 TEST(TrapezoidProfileTest, ReachesGoal) {
-  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{1.75_mps,
-                                                                   0.75_mps_sq};
+  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{
+      1.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<units::meter>::State goal{3_m, 0_mps};
   wpi::math::TrapezoidProfile<units::meter>::State state;
 
@@ -42,8 +42,8 @@ TEST(TrapezoidProfileTest, ReachesGoal) {
 // Tests that decreasing the maximum velocity in the middle when it is already
 // moving faster than the new max is handled correctly
 TEST(TrapezoidProfileTest, PosContinuousUnderVelChange) {
-  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{1.75_mps,
-                                                                   0.75_mps_sq};
+  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{
+      1.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<units::meter>::State goal{12_m, 0_mps};
 
   wpi::math::TrapezoidProfile<units::meter> profile{constraints};
@@ -76,8 +76,8 @@ TEST(TrapezoidProfileTest, PosContinuousUnderVelChange) {
 
 // There is some somewhat tricky code for dealing with going backwards
 TEST(TrapezoidProfileTest, Backwards) {
-  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
-                                                                   0.75_mps_sq};
+  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{
+      0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<units::meter>::State goal{-2_m, 0_mps};
   wpi::math::TrapezoidProfile<units::meter>::State state;
 
@@ -89,8 +89,8 @@ TEST(TrapezoidProfileTest, Backwards) {
 }
 
 TEST(TrapezoidProfileTest, SwitchGoalInMiddle) {
-  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
-                                                                   0.75_mps_sq};
+  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{
+      0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<units::meter>::State goal{-2_m, 0_mps};
   wpi::math::TrapezoidProfile<units::meter>::State state;
 
@@ -110,8 +110,8 @@ TEST(TrapezoidProfileTest, SwitchGoalInMiddle) {
 
 // Checks to make sure that it hits top speed
 TEST(TrapezoidProfileTest, TopSpeed) {
-  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
-                                                                   0.75_mps_sq};
+  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{
+      0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<units::meter>::State goal{4_m, 0_mps};
   wpi::math::TrapezoidProfile<units::meter>::State state;
 
@@ -129,8 +129,8 @@ TEST(TrapezoidProfileTest, TopSpeed) {
 }
 
 TEST(TrapezoidProfileTest, TimingToCurrent) {
-  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
-                                                                   0.75_mps_sq};
+  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{
+      0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<units::meter>::State goal{2_m, 0_mps};
   wpi::math::TrapezoidProfile<units::meter>::State state;
 
@@ -144,8 +144,8 @@ TEST(TrapezoidProfileTest, TimingToCurrent) {
 TEST(TrapezoidProfileTest, TimingToGoal) {
   using units::unit_cast;
 
-  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
-                                                                   0.75_mps_sq};
+  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{
+      0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<units::meter>::State goal{2_m, 0_mps};
 
   wpi::math::TrapezoidProfile<units::meter> profile{constraints};
@@ -168,8 +168,8 @@ TEST(TrapezoidProfileTest, TimingToGoal) {
 TEST(TrapezoidProfileTest, TimingBeforeGoal) {
   using units::unit_cast;
 
-  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
-                                                                   0.75_mps_sq};
+  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{
+      0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<units::meter>::State goal{2_m, 0_mps};
 
   wpi::math::TrapezoidProfile<units::meter> profile{constraints};
@@ -191,8 +191,8 @@ TEST(TrapezoidProfileTest, TimingBeforeGoal) {
 TEST(TrapezoidProfileTest, TimingToNegativeGoal) {
   using units::unit_cast;
 
-  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
-                                                                   0.75_mps_sq};
+  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{
+      0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<units::meter>::State goal{-2_m, 0_mps};
 
   wpi::math::TrapezoidProfile<units::meter> profile{constraints};
@@ -215,8 +215,8 @@ TEST(TrapezoidProfileTest, TimingToNegativeGoal) {
 TEST(TrapezoidProfileTest, TimingBeforeNegativeGoal) {
   using units::unit_cast;
 
-  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
-                                                                   0.75_mps_sq};
+  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{
+      0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<units::meter>::State goal{-2_m, 0_mps};
 
   wpi::math::TrapezoidProfile<units::meter> profile{constraints};
@@ -237,15 +237,15 @@ TEST(TrapezoidProfileTest, TimingBeforeNegativeGoal) {
 
 TEST(TrapezoidProfileTest, InitalizationOfCurrentState) {
   wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{1_mps,
-                                                                   1_mps_sq};
+                                                                     1_mps_sq};
   wpi::math::TrapezoidProfile<units::meter> profile{constraints};
   EXPECT_NEAR_UNITS(profile.TimeLeftUntil(0_m), 0_s, 1e-10_s);
   EXPECT_NEAR_UNITS(profile.TotalTime(), 0_s, 1e-10_s);
 }
 
 TEST(TrapezoidProfileTest, InitialVelocityConstraints) {
-  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
-                                                                   0.75_mps_sq};
+  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{
+      0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<units::meter>::State goal{10_m, 0_mps};
   wpi::math::TrapezoidProfile<units::meter>::State state{0_m, -10_mps};
 
@@ -259,8 +259,8 @@ TEST(TrapezoidProfileTest, InitialVelocityConstraints) {
 }
 
 TEST(TrapezoidProfileTest, GoalVelocityConstraints) {
-  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
-                                                                   0.75_mps_sq};
+  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{
+      0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<units::meter>::State goal{10_m, 5_mps};
   wpi::math::TrapezoidProfile<units::meter>::State state{0_m, 0.75_mps};
 
@@ -274,8 +274,8 @@ TEST(TrapezoidProfileTest, GoalVelocityConstraints) {
 }
 
 TEST(TrapezoidProfileTest, NegativeGoalVelocityConstraints) {
-  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
-                                                                   0.75_mps_sq};
+  wpi::math::TrapezoidProfile<units::meter>::Constraints constraints{
+      0.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<units::meter>::State goal{10_m, -5_mps};
   wpi::math::TrapezoidProfile<units::meter>::State state{0_m, 0.75_mps};
 

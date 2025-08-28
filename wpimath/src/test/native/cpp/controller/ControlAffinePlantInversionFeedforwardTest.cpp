@@ -3,10 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/controller/ControlAffinePlantInversionFeedforward.h>
 
 #include "units/time.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/controller/ControlAffinePlantInversionFeedforward.h"
 
 namespace wpi::math {
 
@@ -21,7 +21,7 @@ Vectord<2> StateDynamics(const Vectord<2>& x) {
 
 TEST(ControlAffinePlantInversionFeedforwardTest, Calculate) {
   wpi::math::ControlAffinePlantInversionFeedforward<2, 1> feedforward{&Dynamics,
-                                                                    20_ms};
+                                                                      20_ms};
 
   Vectord<2> r{2, 2};
   Vectord<2> nextR{3, 3};

@@ -5,10 +5,10 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/controller/ElevatorFeedforward.h>
 #include <wpi/protobuf/Protobuf.h>
 
 #include "pb.h"
-#include "wpi/math/controller/ElevatorFeedforward.h"
 #include "wpimath/protobuf/controller.npb.h"
 
 template <>

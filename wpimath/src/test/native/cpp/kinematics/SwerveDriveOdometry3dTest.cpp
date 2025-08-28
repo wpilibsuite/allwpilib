@@ -6,12 +6,11 @@
 #include <random>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/kinematics/SwerveDriveKinematics.h"
-#include "wpi/math/kinematics/SwerveDriveOdometry3d.h"
-#include "wpi/math/trajectory/Trajectory.h"
-#include "wpi/math/trajectory/TrajectoryConfig.h"
-#include "wpi/math/trajectory/TrajectoryGenerator.h"
+#include <wpi/math/kinematics/SwerveDriveKinematics.h>
+#include <wpi/math/kinematics/SwerveDriveOdometry3d.h>
+#include <wpi/math/trajectory/Trajectory.h>
+#include <wpi/math/trajectory/TrajectoryConfig.h>
+#include <wpi/math/trajectory/TrajectoryGenerator.h>
 
 using namespace wpi::math;
 
@@ -36,7 +35,7 @@ TEST_F(SwerveDriveOdometry3dTest, Initialize) {
       wpi::math::Rotation3d{},
       {zero, zero, zero, zero},
       wpi::math::Pose3d{1_m, 2_m, 0_m,
-                      wpi::math::Rotation3d{0_deg, 0_deg, 45_deg}}};
+                        wpi::math::Rotation3d{0_deg, 0_deg, 45_deg}}};
 
   const wpi::math::Pose3d& pose = odometry.GetPose();
 

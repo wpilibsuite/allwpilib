@@ -6,9 +6,8 @@
 
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
-
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/spline/Spline.h"
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/spline/Spline.h>
 
 namespace wpi::math {
 /**

@@ -12,11 +12,11 @@
 #include <gcem.hpp>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
+#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/geometry/Translation2d.h>
+#include <wpi/math/geometry/Twist2d.h>
 
 #include "units/length.h"
-#include "wpi/math/geometry/Rotation2d.h"
-#include "wpi/math/geometry/Translation2d.h"
-#include "wpi/math/geometry/Twist2d.h"
 
 namespace wpi::math {
 
@@ -318,7 +318,8 @@ constexpr Transform2d Pose2d::operator-(const Pose2d& other) const {
   return Transform2d{pose.Translation(), pose.Rotation()};
 }
 
-constexpr Pose2d Pose2d::TransformBy(const wpi::math::Transform2d& other) const {
+constexpr Pose2d Pose2d::TransformBy(
+    const wpi::math::Transform2d& other) const {
   return {m_translation + (other.Translation().RotateBy(m_rotation)),
           other.Rotation() + m_rotation};
 }

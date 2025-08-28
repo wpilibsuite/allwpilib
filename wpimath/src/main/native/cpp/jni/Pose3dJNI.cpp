@@ -5,9 +5,9 @@
 #include <jni.h>
 
 #include <wpi/jni_util.h>
+#include <wpi/math/geometry/Pose3d.h>
 
 #include "edu_wpi_first_math_jni_Pose3dJNI.h"
-#include "wpi/math/geometry/Pose3d.h"
 
 using namespace wpi::java;
 
@@ -25,12 +25,13 @@ Java_edu_wpi_first_math_jni_Pose3dJNI_exp
    jdouble twistDx, jdouble twistDy, jdouble twistDz, jdouble twistRx,
    jdouble twistRy, jdouble twistRz)
 {
-  wpi::math::Pose3d pose{
-      units::meter_t{poseX}, units::meter_t{poseY}, units::meter_t{poseZ},
-      wpi::math::Rotation3d{wpi::math::Quaternion{poseQw, poseQx, poseQy, poseQz}}};
+  wpi::math::Pose3d pose{units::meter_t{poseX}, units::meter_t{poseY},
+                         units::meter_t{poseZ},
+                         wpi::math::Rotation3d{wpi::math::Quaternion{
+                             poseQw, poseQx, poseQy, poseQz}}};
   wpi::math::Twist3d twist{units::meter_t{twistDx},  units::meter_t{twistDy},
-                         units::meter_t{twistDz},  units::radian_t{twistRx},
-                         units::radian_t{twistRy}, units::radian_t{twistRz}};
+                           units::meter_t{twistDz},  units::radian_t{twistRx},
+                           units::radian_t{twistRy}, units::radian_t{twistRz}};
 
   wpi::math::Pose3d result = pose.Exp(twist);
 
@@ -54,9 +55,9 @@ Java_edu_wpi_first_math_jni_Pose3dJNI_log
    jdouble endQy, jdouble endQz)
 {
   wpi::math::Pose3d startPose{units::meter_t{startX}, units::meter_t{startY},
-                            units::meter_t{startZ},
-                            wpi::math::Rotation3d{wpi::math::Quaternion{
-                                startQw, startQx, startQy, startQz}}};
+                              units::meter_t{startZ},
+                              wpi::math::Rotation3d{wpi::math::Quaternion{
+                                  startQw, startQx, startQy, startQz}}};
   wpi::math::Pose3d endPose{
       units::meter_t{endX}, units::meter_t{endY}, units::meter_t{endZ},
       wpi::math::Rotation3d{wpi::math::Quaternion{endQw, endQx, endQy, endQz}}};

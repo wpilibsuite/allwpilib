@@ -5,14 +5,15 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/controller/DifferentialDriveWheelVoltages.h>
 #include <wpi/protobuf/Protobuf.h>
 
 #include "pb.h"
-#include "wpi/math/controller/DifferentialDriveWheelVoltages.h"
 #include "wpimath/protobuf/controller.npb.h"
 
 template <>
-struct WPILIB_DLLEXPORT wpi::Protobuf<wpi::math::DifferentialDriveWheelVoltages> {
+struct WPILIB_DLLEXPORT
+    wpi::Protobuf<wpi::math::DifferentialDriveWheelVoltages> {
   using MessageStruct = wpi_proto_ProtobufDifferentialDriveWheelVoltages;
   using InputStream =
       wpi::ProtoInputStream<wpi::math::DifferentialDriveWheelVoltages>;

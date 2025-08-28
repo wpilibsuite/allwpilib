@@ -10,15 +10,15 @@
 
 #include <Eigen/Cholesky>
 #include <wpi/array.h>
+#include <wpi/math/DARE.h>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/StateSpaceUtil.h>
+#include <wpi/math/fmt/Eigen.h>
+#include <wpi/math/system/Discretization.h>
+#include <wpi/math/system/NumericalIntegration.h>
+#include <wpi/math/system/NumericalJacobian.h>
 
 #include "units/time.h"
-#include "wpi/math/DARE.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/StateSpaceUtil.h"
-#include "wpi/math/fmt/Eigen.h"
-#include "wpi/math/system/Discretization.h"
-#include "wpi/math/system/NumericalIntegration.h"
-#include "wpi/math/system/NumericalJacobian.h"
 
 namespace wpi::math {
 
@@ -39,8 +39,8 @@ namespace wpi::math {
  * estimate, then applying the linear Kalman filter equations.
  *
  * For more on the underlying math, read
- * https://file.tavsys.net/control/controls-engineering-in-wpi::math.pdf chapter 9
- * "Stochastic control theory".
+ * https://file.tavsys.net/control/controls-engineering-in-wpi::math.pdf chapter
+ * 9 "Stochastic control theory".
  *
  * @tparam States Number of states.
  * @tparam Inputs Number of inputs.

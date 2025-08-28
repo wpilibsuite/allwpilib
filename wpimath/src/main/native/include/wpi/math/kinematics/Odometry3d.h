@@ -5,14 +5,13 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
-
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/geometry/Pose3d.h"
-#include "wpi/math/geometry/Rotation2d.h"
-#include "wpi/math/geometry/Rotation3d.h"
-#include "wpi/math/geometry/Translation2d.h"
-#include "wpi/math/geometry/Translation3d.h"
-#include "wpi/math/kinematics/Kinematics.h"
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/geometry/Pose3d.h>
+#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/geometry/Rotation3d.h>
+#include <wpi/math/geometry/Translation2d.h>
+#include <wpi/math/geometry/Translation3d.h>
+#include <wpi/math/kinematics/Kinematics.h>
 
 namespace wpi::math {
 

@@ -5,13 +5,13 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/kinematics/DifferentialDriveKinematics.h>
+#include <wpi/math/kinematics/DifferentialDriveWheelPositions.h>
+#include <wpi/math/kinematics/DifferentialDriveWheelSpeeds.h>
+#include <wpi/math/kinematics/Odometry3d.h>
 
 #include "units/length.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/kinematics/DifferentialDriveKinematics.h"
-#include "wpi/math/kinematics/DifferentialDriveWheelPositions.h"
-#include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.h"
-#include "wpi/math/kinematics/Odometry3d.h"
 
 namespace wpi::math {
 /**

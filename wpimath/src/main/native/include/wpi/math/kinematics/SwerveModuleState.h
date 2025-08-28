@@ -5,11 +5,11 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/geometry/Rotation2d.h>
 
 #include "units/angle.h"
 #include "units/math.h"
 #include "units/velocity.h"
-#include "wpi/math/geometry/Rotation2d.h"
 
 namespace wpi::math {
 /**

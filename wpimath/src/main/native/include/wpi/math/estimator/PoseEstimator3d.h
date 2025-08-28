@@ -12,16 +12,16 @@
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/MathShared.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/geometry/Translation2d.h>
+#include <wpi/math/interpolation/TimeInterpolatableBuffer.h>
+#include <wpi/math/kinematics/Kinematics.h>
+#include <wpi/math/kinematics/Odometry3d.h>
 
 #include "units/time.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/MathShared.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/geometry/Rotation2d.h"
-#include "wpi/math/geometry/Translation2d.h"
-#include "wpi/math/interpolation/TimeInterpolatableBuffer.h"
-#include "wpi/math/kinematics/Kinematics.h"
-#include "wpi/math/kinematics/Odometry3d.h"
 
 namespace wpi::math {
 
@@ -279,8 +279,8 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     // measurements compared to our current pose.
     wpi::math::Vectord<6> k_times_twist =
         m_visionK * wpi::math::Vectord<6>{twist.dx.value(), twist.dy.value(),
-                                        twist.dz.value(), twist.rx.value(),
-                                        twist.ry.value(), twist.rz.value()};
+                                          twist.dz.value(), twist.rx.value(),
+                                          twist.ry.value(), twist.rz.value()};
 
     // Step 6: Convert back to Twist3d.
     Twist3d scaledTwist{

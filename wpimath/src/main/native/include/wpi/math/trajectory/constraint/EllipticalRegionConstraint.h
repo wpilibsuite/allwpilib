@@ -7,11 +7,12 @@
 #include <concepts>
 #include <limits>
 
+#include <wpi/math/geometry/Ellipse2d.h>
+#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/geometry/Translation2d.h>
+#include <wpi/math/trajectory/constraint/TrajectoryConstraint.h>
+
 #include "units/length.h"
-#include "wpi/math/geometry/Ellipse2d.h"
-#include "wpi/math/geometry/Rotation2d.h"
-#include "wpi/math/geometry/Translation2d.h"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.h"
 
 namespace wpi::math {
 

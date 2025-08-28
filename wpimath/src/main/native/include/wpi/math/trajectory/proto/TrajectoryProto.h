@@ -5,10 +5,10 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/trajectory/Trajectory.h>
 #include <wpi/protobuf/Protobuf.h>
 
 #include "wpimath/protobuf/trajectory.npb.h"
-#include "wpi/math/trajectory/Trajectory.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<wpi::math::Trajectory> {

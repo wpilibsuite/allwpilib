@@ -6,9 +6,10 @@
 
 #include <type_traits>
 
+#include <wpi/math/MathShared.h>
+
 #include "units/math.h"
 #include "units/time.h"
-#include "wpi/math/MathShared.h"
 
 namespace wpi::math {
 

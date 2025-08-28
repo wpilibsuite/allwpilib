@@ -14,9 +14,8 @@
 #include <Eigen/QR>
 #include <wpi/Algorithm.h>
 #include <wpi/SymbolExports.h>
-
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/geometry/Pose2d.h"
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/geometry/Pose2d.h>
 
 namespace wpi::math {
 

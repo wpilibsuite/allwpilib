@@ -9,24 +9,24 @@
 
 #include <Eigen/QR>
 #include <gtest/gtest.h>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/StateSpaceUtil.h>
+#include <wpi/math/estimator/AngleStatistics.h>
+#include <wpi/math/estimator/MerweUKF.h>
+#include <wpi/math/system/Discretization.h>
+#include <wpi/math/system/NumericalIntegration.h>
+#include <wpi/math/system/NumericalJacobian.h>
+#include <wpi/math/system/plant/DCMotor.h>
+#include <wpi/math/system/plant/LinearSystemId.h>
+#include <wpi/math/trajectory/TrajectoryGenerator.h>
 
 #include "units/moment_of_inertia.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/StateSpaceUtil.h"
-#include "wpi/math/estimator/AngleStatistics.h"
-#include "wpi/math/estimator/MerweUKF.h"
-#include "wpi/math/system/Discretization.h"
-#include "wpi/math/system/NumericalIntegration.h"
-#include "wpi/math/system/NumericalJacobian.h"
-#include "wpi/math/system/plant/DCMotor.h"
-#include "wpi/math/system/plant/LinearSystemId.h"
-#include "wpi/math/trajectory/TrajectoryGenerator.h"
 
 namespace {
 
 // First test system, differential drive
 wpi::math::Vectord<5> DriveDynamics(const wpi::math::Vectord<5>& x,
-                                  const wpi::math::Vectord<2>& u) {
+                                    const wpi::math::Vectord<2>& u) {
   auto motors = wpi::math::DCMotor::CIM(2);
 
   // constexpr double Glow = 15.32;    // Low gear ratio
@@ -73,15 +73,15 @@ TEST(MerweUKFTest, DriveInit) {
   constexpr auto dt = 5_ms;
 
   wpi::math::MerweUKF<5, 2, 3> observer{DriveDynamics,
-                                      DriveLocalMeasurementModel,
-                                      {0.5, 0.5, 10.0, 1.0, 1.0},
-                                      {0.0001, 0.01, 0.01},
-                                      wpi::math::AngleMean<5, 2 * 5 + 1>(2),
-                                      wpi::math::AngleMean<3, 2 * 5 + 1>(0),
-                                      wpi::math::AngleResidual<5>(2),
-                                      wpi::math::AngleResidual<3>(0),
-                                      wpi::math::AngleAdd<5>(2),
-                                      dt};
+                                        DriveLocalMeasurementModel,
+                                        {0.5, 0.5, 10.0, 1.0, 1.0},
+                                        {0.0001, 0.01, 0.01},
+                                        wpi::math::AngleMean<5, 2 * 5 + 1>(2),
+                                        wpi::math::AngleMean<3, 2 * 5 + 1>(0),
+                                        wpi::math::AngleResidual<5>(2),
+                                        wpi::math::AngleResidual<3>(0),
+                                        wpi::math::AngleAdd<5>(2),
+                                        dt};
   wpi::math::Vectord<2> u{12.0, 12.0};
   observer.Predict(u, dt);
 
@@ -90,10 +90,10 @@ TEST(MerweUKFTest, DriveInit) {
 
   auto globalY = DriveGlobalMeasurementModel(observer.Xhat(), u);
   auto R = wpi::math::MakeCovMatrix(0.01, 0.01, 0.0001, 0.01, 0.01);
-  observer.Correct<5>(u, globalY, DriveGlobalMeasurementModel, R,
-                      wpi::math::AngleMean<5, 2 * 5 + 1>(2),
-                      wpi::math::AngleResidual<5>(2),
-                      wpi::math::AngleResidual<5>(2), wpi::math::AngleAdd<5>(2));
+  observer.Correct<5>(
+      u, globalY, DriveGlobalMeasurementModel, R,
+      wpi::math::AngleMean<5, 2 * 5 + 1>(2), wpi::math::AngleResidual<5>(2),
+      wpi::math::AngleResidual<5>(2), wpi::math::AngleAdd<5>(2));
 }
 
 TEST(MerweUKFTest, DriveConvergence) {
@@ -101,15 +101,15 @@ TEST(MerweUKFTest, DriveConvergence) {
   constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
 
   wpi::math::MerweUKF<5, 2, 3> observer{DriveDynamics,
-                                      DriveLocalMeasurementModel,
-                                      {0.5, 0.5, 10.0, 1.0, 1.0},
-                                      {0.0001, 0.5, 0.5},
-                                      wpi::math::AngleMean<5, 2 * 5 + 1>(2),
-                                      wpi::math::AngleMean<3, 2 * 5 + 1>(0),
-                                      wpi::math::AngleResidual<5>(2),
-                                      wpi::math::AngleResidual<3>(0),
-                                      wpi::math::AngleAdd<5>(2),
-                                      dt};
+                                        DriveLocalMeasurementModel,
+                                        {0.5, 0.5, 10.0, 1.0, 1.0},
+                                        {0.0001, 0.5, 0.5},
+                                        wpi::math::AngleMean<5, 2 * 5 + 1>(2),
+                                        wpi::math::AngleMean<3, 2 * 5 + 1>(0),
+                                        wpi::math::AngleResidual<5>(2),
+                                        wpi::math::AngleResidual<3>(0),
+                                        wpi::math::AngleAdd<5>(2),
+                                        dt};
 
   auto waypoints = std::vector<wpi::math::Pose2d>{
       wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
@@ -121,7 +121,8 @@ TEST(MerweUKFTest, DriveConvergence) {
   wpi::math::Vectord<2> u = wpi::math::Vectord<2>::Zero();
 
   auto B = wpi::math::NumericalJacobianU<5, 5, 2>(
-      DriveDynamics, wpi::math::Vectord<5>::Zero(), wpi::math::Vectord<2>::Zero());
+      DriveDynamics, wpi::math::Vectord<5>::Zero(),
+      wpi::math::Vectord<2>::Zero());
 
   observer.SetXhat(wpi::math::Vectord<5>{
       trajectory.InitialPose().Translation().X().value(),
@@ -144,12 +145,12 @@ TEST(MerweUKFTest, DriveConvergence) {
 
     auto localY =
         DriveLocalMeasurementModel(trueXhat, wpi::math::Vectord<2>::Zero());
-    observer.Correct(u,
-                     localY + wpi::math::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
+    observer.Correct(
+        u, localY + wpi::math::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
     wpi::math::Vectord<5> rdot = (nextR - r) / dt.value();
-    u = B.householderQr().solve(rdot -
-                                DriveDynamics(r, wpi::math::Vectord<2>::Zero()));
+    u = B.householderQr().solve(
+        rdot - DriveDynamics(r, wpi::math::Vectord<2>::Zero()));
 
     observer.Predict(u, dt);
 
@@ -233,7 +234,7 @@ TEST(MerweUKFTest, RoundTripP) {
 
 // Second system, single motor feedforward estimator
 wpi::math::Vectord<4> MotorDynamics(const wpi::math::Vectord<4>& x,
-                                  const wpi::math::Vectord<1>& u) {
+                                    const wpi::math::Vectord<1>& u) {
   double v = x(1);
   double kV = x(2);
   double kA = x(3);
@@ -245,7 +246,7 @@ wpi::math::Vectord<4> MotorDynamics(const wpi::math::Vectord<4>& x,
 }
 
 wpi::math::Vectord<3> MotorMeasurementModel(const wpi::math::Vectord<4>& x,
-                                          const wpi::math::Vectord<1>& u) {
+                                            const wpi::math::Vectord<1>& u) {
   double p = x(0);
   double v = x(1);
   double kV = x(2);
@@ -281,9 +282,9 @@ TEST(MerweUKFTest, MotorConvergence) {
   states[0] = wpi::math::Vectord<4>{{0.0}, {0.0}, {true_kV}, {true_kA}};
 
   constexpr wpi::math::Matrixd<4, 4> A{{0.0, 1.0, 0.0, 0.0},
-                                     {0.0, -true_kV / true_kA, 0.0, 0.0},
-                                     {0.0, 0.0, 0.0, 0.0},
-                                     {0.0, 0.0, 0.0, 0.0}};
+                                       {0.0, -true_kV / true_kA, 0.0, 0.0},
+                                       {0.0, 0.0, 0.0, 0.0},
+                                       {0.0, 0.0, 0.0, 0.0}};
   constexpr wpi::math::Matrixd<4, 1> B{{0.0}, {1.0 / true_kA}, {0.0}, {0.0}};
 
   wpi::math::Matrixd<4, 4> discA;

@@ -6,9 +6,8 @@
 
 #include <fmt/format.h>
 #include <wpi/ct_string.h>
+#include <wpi/math/kinematics/SwerveDriveKinematics.h>
 #include <wpi/struct/Struct.h>
-
-#include "wpi/math/kinematics/SwerveDriveKinematics.h"
 
 template <size_t NumModules>
 struct wpi::Struct<wpi::math::SwerveDriveKinematics<NumModules>> {
@@ -27,8 +26,8 @@ struct wpi::Struct<wpi::math::SwerveDriveKinematics<NumModules>> {
       std::span<const uint8_t> data) {
     constexpr size_t kModulesOff = 0;
     return wpi::math::SwerveDriveKinematics<NumModules>{
-        wpi::UnpackStructArray<wpi::math::Translation2d, kModulesOff, NumModules>(
-            data)};
+        wpi::UnpackStructArray<wpi::math::Translation2d, kModulesOff,
+                               NumModules>(data)};
   }
 
   static void Pack(std::span<uint8_t> data,

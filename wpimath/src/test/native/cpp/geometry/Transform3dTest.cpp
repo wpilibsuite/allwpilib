@@ -5,11 +5,10 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/geometry/Pose3d.h"
-#include "wpi/math/geometry/Rotation3d.h"
-#include "wpi/math/geometry/Transform3d.h"
-#include "wpi/math/geometry/Translation3d.h"
+#include <wpi/math/geometry/Pose3d.h>
+#include <wpi/math/geometry/Rotation3d.h>
+#include <wpi/math/geometry/Transform3d.h>
+#include <wpi/math/geometry/Translation3d.h>
 
 using namespace wpi::math;
 

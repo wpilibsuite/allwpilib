@@ -3,9 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/trajectory/TrajectoryConfig.h"
-#include "wpi/math/trajectory/TrajectoryGenerator.h"
+#include <wpi/math/trajectory/TrajectoryConfig.h>
+#include <wpi/math/trajectory/TrajectoryGenerator.h>
 
 TEST(TrajectoryConcatenateTest, States) {
   auto t1 = wpi::math::TrajectoryGenerator::GenerateTrajectory(

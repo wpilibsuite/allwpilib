@@ -5,14 +5,14 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/controller/LinearPlantInversionFeedforward.h>
+#include <wpi/math/controller/SimpleMotorFeedforward.h>
 
 #include "units/acceleration.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "units/velocity.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/controller/LinearPlantInversionFeedforward.h"
-#include "wpi/math/controller/SimpleMotorFeedforward.h"
 
 namespace wpi::math {
 

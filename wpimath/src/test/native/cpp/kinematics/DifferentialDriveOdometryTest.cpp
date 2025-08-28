@@ -5,9 +5,8 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/kinematics/DifferentialDriveKinematics.h"
-#include "wpi/math/kinematics/DifferentialDriveOdometry.h"
+#include <wpi/math/kinematics/DifferentialDriveKinematics.h>
+#include <wpi/math/kinematics/DifferentialDriveOdometry.h>
 
 static constexpr double kEpsilon = 1E-9;
 

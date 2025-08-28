@@ -6,13 +6,13 @@
 
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/math/estimator/PoseEstimator3d.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/kinematics/DifferentialDriveKinematics.h>
+#include <wpi/math/kinematics/DifferentialDriveOdometry3d.h>
 
 #include "units/time.h"
-#include "wpi/math/estimator/PoseEstimator3d.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/geometry/Rotation2d.h"
-#include "wpi/math/kinematics/DifferentialDriveKinematics.h"
-#include "wpi/math/kinematics/DifferentialDriveOdometry3d.h"
 
 namespace wpi::math {
 /**

@@ -5,9 +5,8 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/geometry/Rectangle2d.h>
 #include <wpi/struct/Struct.h>
-
-#include "wpi/math/geometry/Rectangle2d.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<wpi::math::Rectangle2d> {
@@ -20,7 +19,8 @@ struct WPILIB_DLLEXPORT wpi::Struct<wpi::math::Rectangle2d> {
   }
 
   static wpi::math::Rectangle2d Unpack(std::span<const uint8_t> data);
-  static void Pack(std::span<uint8_t> data, const wpi::math::Rectangle2d& value);
+  static void Pack(std::span<uint8_t> data,
+                   const wpi::math::Rectangle2d& value);
   static void ForEachNested(
       std::invocable<std::string_view, std::string_view> auto fn) {
     wpi::ForEachStructSchema<wpi::math::Pose2d>(fn);

@@ -12,10 +12,10 @@
 #include <gcem.hpp>
 #include <wpi/Algorithm.h>
 #include <wpi/SmallVector.h>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/system/Discretization.h>
 
 #include "units/time.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/system/Discretization.h"
 
 namespace wpi::math {
 

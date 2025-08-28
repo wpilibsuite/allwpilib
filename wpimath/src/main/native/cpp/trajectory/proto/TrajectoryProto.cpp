@@ -2,16 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/trajectory/proto/TrajectoryProto.h"
-
 #include <vector>
 
+#include <wpi/math/trajectory/proto/TrajectoryProto.h>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "wpimath/protobuf/trajectory.npb.h"
 
-std::optional<wpi::math::Trajectory> wpi::Protobuf<wpi::math::Trajectory>::Unpack(
-    InputStream& stream) {
+std::optional<wpi::math::Trajectory>
+wpi::Protobuf<wpi::math::Trajectory>::Unpack(InputStream& stream) {
   wpi::StdVectorUnpackCallback<wpi::math::Trajectory::State, SIZE_MAX> states;
   wpi_proto_ProtobufTrajectory msg{
       .states = states.Callback(),

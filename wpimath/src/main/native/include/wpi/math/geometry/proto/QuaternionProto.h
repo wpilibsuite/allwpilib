@@ -5,9 +5,9 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/geometry/Quaternion.h>
 #include <wpi/protobuf/Protobuf.h>
 
-#include "wpi/math/geometry/Quaternion.h"
 #include "wpimath/protobuf/geometry3d.npb.h"
 
 template <>

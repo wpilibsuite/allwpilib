@@ -6,10 +6,11 @@
 
 #include <cmath>
 
+#include <wpi/math/kinematics/SwerveDriveKinematics.h>
+#include <wpi/math/trajectory/constraint/TrajectoryConstraint.h>
+
 #include "units/math.h"
 #include "units/velocity.h"
-#include "wpi/math/kinematics/SwerveDriveKinematics.h"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.h"
 
 namespace wpi::math {
 

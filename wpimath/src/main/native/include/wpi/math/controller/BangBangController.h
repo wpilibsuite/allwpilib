@@ -8,10 +8,9 @@
 
 #include <gcem.hpp>
 #include <wpi/SymbolExports.h>
+#include <wpi/math/MathShared.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
-
-#include "wpi/math/MathShared.h"
 
 namespace wpi::math {
 

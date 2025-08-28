@@ -9,6 +9,8 @@
 
 #include <gcem.hpp>
 #include <wpi/SymbolExports.h>
+#include <wpi/math/system/LinearSystem.h>
+#include <wpi/math/system/plant/DCMotor.h>
 
 #include "units/acceleration.h"
 #include "units/angular_acceleration.h"
@@ -17,8 +19,6 @@
 #include "units/moment_of_inertia.h"
 #include "units/velocity.h"
 #include "units/voltage.h"
-#include "wpi/math/system/LinearSystem.h"
-#include "wpi/math/system/plant/DCMotor.h"
 
 namespace wpi::math {
 /**

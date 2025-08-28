@@ -6,13 +6,13 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/spline/QuinticHermiteSpline.h>
+#include <wpi/math/spline/SplineHelper.h>
+#include <wpi/math/spline/SplineParameterizer.h>
 
 #include "units/length.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/geometry/Rotation2d.h"
-#include "wpi/math/spline/QuinticHermiteSpline.h"
-#include "wpi/math/spline/SplineHelper.h"
-#include "wpi/math/spline/SplineParameterizer.h"
 
 using namespace wpi::math;
 

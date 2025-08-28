@@ -5,9 +5,8 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/kinematics/DifferentialDriveKinematics.h"
-#include "wpi/math/kinematics/DifferentialDriveOdometry3d.h"
+#include <wpi/math/kinematics/DifferentialDriveKinematics.h>
+#include <wpi/math/kinematics/DifferentialDriveOdometry3d.h>
 
 static constexpr double kEpsilon = 1E-9;
 
@@ -17,7 +16,7 @@ TEST(DifferentialDriveOdometry3dTest, Initialize) {
   DifferentialDriveOdometry3d odometry{
       wpi::math::Rotation3d{0_deg, 0_deg, 90_deg}, 0_m, 0_m,
       wpi::math::Pose3d{1_m, 2_m, 0_m,
-                      wpi::math::Rotation3d{0_deg, 0_deg, 45_deg}}};
+                        wpi::math::Rotation3d{0_deg, 0_deg, 45_deg}}};
 
   const wpi::math::Pose3d& pose = odometry.GetPose();
 
@@ -31,8 +30,9 @@ TEST(DifferentialDriveOdometry3dTest, EncoderDistances) {
   DifferentialDriveOdometry3d odometry{
       wpi::math::Rotation3d{0_deg, 0_deg, 45_deg}, 0_m, 0_m};
 
-  const auto& pose = odometry.Update(wpi::math::Rotation3d{0_deg, 0_deg, 135_deg},
-                                     0_m, units::meter_t{5 * std::numbers::pi});
+  const auto& pose =
+      odometry.Update(wpi::math::Rotation3d{0_deg, 0_deg, 135_deg}, 0_m,
+                      units::meter_t{5 * std::numbers::pi});
 
   EXPECT_NEAR(pose.X().value(), 5.0, kEpsilon);
   EXPECT_NEAR(pose.Y().value(), 5.0, kEpsilon);

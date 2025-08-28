@@ -6,12 +6,11 @@
 #include <random>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/kinematics/SwerveDriveKinematics.h"
-#include "wpi/math/kinematics/SwerveDriveOdometry.h"
-#include "wpi/math/trajectory/Trajectory.h"
-#include "wpi/math/trajectory/TrajectoryConfig.h"
-#include "wpi/math/trajectory/TrajectoryGenerator.h"
+#include <wpi/math/kinematics/SwerveDriveKinematics.h>
+#include <wpi/math/kinematics/SwerveDriveOdometry.h>
+#include <wpi/math/trajectory/Trajectory.h>
+#include <wpi/math/trajectory/TrajectoryConfig.h>
+#include <wpi/math/trajectory/TrajectoryGenerator.h>
 
 using namespace wpi::math;
 
@@ -182,9 +181,9 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
     bl.angle = groundTruthState.pose.Rotation();
     br.angle = groundTruthState.pose.Rotation();
 
-    auto xhat =
-        odometry.Update(wpi::math::Rotation2d{distribution(generator) * 0.05_rad},
-                        {fl, fr, bl, br});
+    auto xhat = odometry.Update(
+        wpi::math::Rotation2d{distribution(generator) * 0.05_rad},
+        {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
                        .value();

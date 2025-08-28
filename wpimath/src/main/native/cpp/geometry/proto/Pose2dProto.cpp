@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/geometry/proto/Pose2dProto.h"
-
+#include <wpi/math/geometry/proto/Pose2dProto.h>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "wpimath/protobuf/geometry2d.npb.h"
@@ -34,7 +33,7 @@ std::optional<wpi::math::Pose2d> wpi::Protobuf<wpi::math::Pose2d>::Unpack(
 }
 
 bool wpi::Protobuf<wpi::math::Pose2d>::Pack(OutputStream& stream,
-                                          const wpi::math::Pose2d& value) {
+                                            const wpi::math::Pose2d& value) {
   wpi::PackCallback tsln{&value.Translation()};
   wpi::PackCallback rot{&value.Rotation()};
   wpi_proto_ProtobufPose2d msg{

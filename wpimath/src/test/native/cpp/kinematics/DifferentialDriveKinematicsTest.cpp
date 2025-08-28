@@ -5,12 +5,12 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
+#include <wpi/math/kinematics/ChassisSpeeds.h>
+#include <wpi/math/kinematics/DifferentialDriveKinematics.h>
 
 #include "units/angular_velocity.h"
 #include "units/length.h"
 #include "units/velocity.h"
-#include "wpi/math/kinematics/ChassisSpeeds.h"
-#include "wpi/math/kinematics/DifferentialDriveKinematics.h"
 
 using namespace wpi::math;
 

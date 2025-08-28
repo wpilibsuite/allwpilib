@@ -12,10 +12,10 @@
 #include <wpi/StackTrace.h>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
+#include <wpi/math/MathShared.h>
+#include <wpi/math/ct_matrix.h>
 
 #include "units/angle.h"
-#include "wpi/math/MathShared.h"
-#include "wpi/math/ct_matrix.h"
 
 namespace wpi::math {
 

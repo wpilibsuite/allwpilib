@@ -4,8 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
-
-#include "wpi/math/controller/ArmFeedforward.h"
+#include <wpi/math/controller/ArmFeedforward.h>
 
 using namespace wpi::math;
 

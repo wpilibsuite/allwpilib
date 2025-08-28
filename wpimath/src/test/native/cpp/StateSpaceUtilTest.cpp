@@ -3,12 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/StateSpaceUtil.h"
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/StateSpaceUtil.h>
 
 TEST(StateSpaceUtilTest, CostParameterPack) {
-  constexpr wpi::math::Matrixd<3, 3> mat = wpi::math::MakeCostMatrix(1.0, 2.0, 3.0);
+  constexpr wpi::math::Matrixd<3, 3> mat =
+      wpi::math::MakeCostMatrix(1.0, 2.0, 3.0);
   EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
   EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
   EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);
@@ -48,7 +48,8 @@ TEST(StateSpaceUtilTest, CostDynamic) {
 }
 
 TEST(StateSpaceUtilTest, CovParameterPack) {
-  constexpr wpi::math::Matrixd<3, 3> mat = wpi::math::MakeCovMatrix(1.0, 2.0, 3.0);
+  constexpr wpi::math::Matrixd<3, 3> mat =
+      wpi::math::MakeCovMatrix(1.0, 2.0, 3.0);
   EXPECT_NEAR(mat(0, 0), 1.0, 1e-3);
   EXPECT_NEAR(mat(0, 1), 0.0, 1e-3);
   EXPECT_NEAR(mat(0, 2), 0.0, 1e-3);

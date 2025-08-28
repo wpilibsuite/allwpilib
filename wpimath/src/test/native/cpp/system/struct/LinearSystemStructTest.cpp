@@ -3,10 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
+#include <wpi/math/system/LinearSystem.h>
+#include <wpi/math/system/struct/LinearSystemStruct.h>
 
 #include "../../StructTestBase.h"
-#include "wpi/math/system/LinearSystem.h"
-#include "wpi/math/system/struct/LinearSystemStruct.h"
 
 using namespace wpi::math;
 

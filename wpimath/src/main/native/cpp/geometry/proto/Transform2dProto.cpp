@@ -2,14 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/geometry/proto/Transform2dProto.h"
-
+#include <wpi/math/geometry/proto/Transform2dProto.h>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "wpimath/protobuf/geometry2d.npb.h"
 
-std::optional<wpi::math::Transform2d> wpi::Protobuf<wpi::math::Transform2d>::Unpack(
-    InputStream& stream) {
+std::optional<wpi::math::Transform2d>
+wpi::Protobuf<wpi::math::Transform2d>::Unpack(InputStream& stream) {
   wpi::UnpackCallback<wpi::math::Translation2d> tsln;
   wpi::UnpackCallback<wpi::math::Rotation2d> rot;
   wpi_proto_ProtobufTransform2d msg{

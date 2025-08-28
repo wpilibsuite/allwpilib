@@ -9,14 +9,14 @@
 #include <type_traits>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/MathUtil.h>
+#include <wpi/math/controller/PIDController.h>
+#include <wpi/math/trajectory/TrapezoidProfile.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "units/time.h"
-#include "wpi/math/MathUtil.h"
-#include "wpi/math/controller/PIDController.h"
-#include "wpi/math/trajectory/TrapezoidProfile.h"
 
 namespace wpi::math {
 namespace detail {

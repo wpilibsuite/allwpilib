@@ -3,9 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/geometry/Rotation2d.h"
-#include "wpi/math/kinematics/SwerveModuleState.h"
+#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/kinematics/SwerveModuleState.h>
 
 static constexpr double kEpsilon = 1E-9;
 

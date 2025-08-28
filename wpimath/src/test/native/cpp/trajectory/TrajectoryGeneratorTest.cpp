@@ -5,13 +5,13 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+#include <wpi/math/trajectory/Trajectory.h>
+#include <wpi/math/trajectory/TrajectoryGenerator.h>
+#include <wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.h>
+#include <wpi/math/trajectory/constraint/TrajectoryConstraint.h>
 
 #include "trajectory/TestTrajectory.h"
 #include "units/math.h"
-#include "wpi/math/trajectory/Trajectory.h"
-#include "wpi/math/trajectory/TrajectoryGenerator.h"
-#include "wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.h"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.h"
 
 using namespace wpi::math;
 

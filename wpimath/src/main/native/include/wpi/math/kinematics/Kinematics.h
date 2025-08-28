@@ -5,9 +5,8 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
-
-#include "wpi/math/geometry/Twist2d.h"
-#include "wpi/math/kinematics/ChassisSpeeds.h"
+#include <wpi/math/geometry/Twist2d.h>
+#include <wpi/math/kinematics/ChassisSpeeds.h>
 
 namespace wpi::math {
 /**

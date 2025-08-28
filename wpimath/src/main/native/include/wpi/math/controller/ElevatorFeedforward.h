@@ -5,14 +5,14 @@
 #pragma once
 
 #include <wpi/MathExtras.h>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/MathShared.h>
+#include <wpi/math/controller/LinearPlantInversionFeedforward.h>
+#include <wpi/math/system/plant/LinearSystemId.h>
 
 #include "units/length.h"
 #include "units/time.h"
 #include "units/voltage.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/MathShared.h"
-#include "wpi/math/controller/LinearPlantInversionFeedforward.h"
-#include "wpi/math/system/plant/LinearSystemId.h"
 
 namespace wpi::math {
 /**

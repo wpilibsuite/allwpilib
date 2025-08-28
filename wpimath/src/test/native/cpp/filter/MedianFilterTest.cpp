@@ -3,8 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/filter/MedianFilter.h"
+#include <wpi/math/filter/MedianFilter.h>
 
 TEST(MedianFilterTest, MedianFilterNotFullTestEven) {
   wpi::math::MedianFilter<double> filter{10};

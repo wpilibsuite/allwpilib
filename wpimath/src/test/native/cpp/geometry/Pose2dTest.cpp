@@ -6,8 +6,7 @@
 #include <cstdlib>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/geometry/Pose2d.h"
+#include <wpi/math/geometry/Pose2d.h>
 
 using namespace wpi::math;
 

@@ -3,8 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.h"
+#include <wpi/math/kinematics/DifferentialDriveWheelSpeeds.h>
 
 TEST(DifferentialDriveWheelSpeedsTest, Plus) {
   const wpi::math::DifferentialDriveWheelSpeeds left{1.0_mps, 0.5_mps};

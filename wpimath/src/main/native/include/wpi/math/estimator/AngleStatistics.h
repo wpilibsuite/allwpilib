@@ -7,8 +7,8 @@
 #include <functional>
 #include <numbers>
 
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/MathUtil.h"
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/MathUtil.h>
 
 namespace wpi::math {
 

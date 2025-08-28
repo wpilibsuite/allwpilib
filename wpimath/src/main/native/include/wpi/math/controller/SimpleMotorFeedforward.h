@@ -6,12 +6,12 @@
 
 #include <gcem.hpp>
 #include <wpi/MathExtras.h>
+#include <wpi/math/MathShared.h>
 
 #include "units/angle.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "units/voltage.h"
-#include "wpi/math/MathShared.h"
 
 namespace wpi::math {
 

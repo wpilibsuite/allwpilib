@@ -4,8 +4,7 @@
 
 #include <Eigen/LU>
 #include <gtest/gtest.h>
-
-#include "wpi/math/EigenCore.h"
+#include <wpi/math/EigenCore.h>
 
 TEST(EigenTest, Multiplication) {
   wpi::math::Matrixd<2, 2> m1{{2, 1}, {0, 1}};
@@ -24,7 +23,7 @@ TEST(EigenTest, Multiplication) {
   const auto result2 = m3 * m4;
 
   wpi::math::Matrixd<2, 4> expectedResult2{{12.5, 5.55, 7.8, 14.3},
-                                         {22.13, 9.82, 13.28, 23.53}};
+                                           {22.13, 9.82, 13.28, 23.53}};
 
   EXPECT_TRUE(expectedResult2.isApprox(result2));
 }

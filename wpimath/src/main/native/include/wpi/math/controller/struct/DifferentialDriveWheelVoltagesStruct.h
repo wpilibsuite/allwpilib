@@ -5,9 +5,8 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/controller/DifferentialDriveWheelVoltages.h>
 #include <wpi/struct/Struct.h>
-
-#include "wpi/math/controller/DifferentialDriveWheelVoltages.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<wpi::math::DifferentialDriveWheelVoltages> {
@@ -25,4 +24,5 @@ struct WPILIB_DLLEXPORT wpi::Struct<wpi::math::DifferentialDriveWheelVoltages> {
                    const math::DifferentialDriveWheelVoltages& value);
 };
 
-static_assert(wpi::StructSerializable<wpi::math::DifferentialDriveWheelVoltages>);
+static_assert(
+    wpi::StructSerializable<wpi::math::DifferentialDriveWheelVoltages>);

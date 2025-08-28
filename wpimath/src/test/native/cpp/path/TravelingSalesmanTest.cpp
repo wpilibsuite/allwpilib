@@ -9,11 +9,10 @@
 #include <gtest/gtest.h>
 #include <wpi/array.h>
 #include <wpi/circular_buffer.h>
-
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/geometry/Rotation2d.h"
-#include "wpi/math/path/TravelingSalesman.h"
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/path/TravelingSalesman.h>
 
 /**
  * Returns true if the cycles represented by the two lists match.
@@ -65,7 +64,7 @@ TEST(TravelingSalesmanTest, FiveLengthStaticPathWithDistanceCost) {
   wpi::array<wpi::math::Pose2d, 5> solution = traveler.Solve(poses, 500);
 
   wpi::array<wpi::math::Pose2d, 5> expected{poses[0], poses[2], poses[4],
-                                          poses[1], poses[3]};
+                                            poses[1], poses[3]};
 
   EXPECT_TRUE(IsMatchingCycle(expected, solution));
 }
@@ -88,7 +87,7 @@ TEST(TravelingSalesmanTest, FiveLengthDynamicPathWithDistanceCost) {
 
   ASSERT_EQ(5u, solution.size());
   wpi::array<wpi::math::Pose2d, 5> expected{poses[0], poses[2], poses[4],
-                                          poses[1], poses[3]};
+                                            poses[1], poses[3]};
 
   EXPECT_TRUE(IsMatchingCycle(expected, solution));
 }

@@ -6,9 +6,8 @@
 #include <random>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/kinematics/MecanumDriveOdometry3d.h"
-#include "wpi/math/trajectory/TrajectoryGenerator.h"
+#include <wpi/math/kinematics/MecanumDriveOdometry3d.h>
+#include <wpi/math/trajectory/TrajectoryGenerator.h>
 
 using namespace wpi::math;
 
@@ -29,7 +28,7 @@ TEST_F(MecanumDriveOdometry3dTest, Initialize) {
   MecanumDriveOdometry3d odometry{
       kinematics, wpi::math::Rotation3d{}, zero,
       wpi::math::Pose3d{1_m, 2_m, 0_m,
-                      wpi::math::Rotation3d{0_deg, 0_deg, 45_deg}}};
+                        wpi::math::Rotation3d{0_deg, 0_deg, 45_deg}}};
 
   const wpi::math::Pose3d& pose = odometry.GetPose();
 
@@ -101,12 +100,13 @@ TEST_F(MecanumDriveOdometry3dTest, GyroAngleReset) {
 TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
   wpi::math::MecanumDriveKinematics kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
   wpi::math::MecanumDriveWheelPositions wheelPositions;
 
-  wpi::math::MecanumDriveOdometry3d odometry{kinematics, wpi::math::Rotation3d{},
-                                           wheelPositions};
+  wpi::math::MecanumDriveOdometry3d odometry{
+      kinematics, wpi::math::Rotation3d{}, wheelPositions};
 
   wpi::math::Trajectory trajectory =
       wpi::math::TrajectoryGenerator::GenerateTrajectory(
@@ -167,12 +167,13 @@ TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingTrajectory) {
 TEST_F(MecanumDriveOdometry3dTest, AccuracyFacingXAxis) {
   wpi::math::MecanumDriveKinematics kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
   wpi::math::MecanumDriveWheelPositions wheelPositions;
 
-  wpi::math::MecanumDriveOdometry3d odometry{kinematics, wpi::math::Rotation3d{},
-                                           wheelPositions};
+  wpi::math::MecanumDriveOdometry3d odometry{
+      kinematics, wpi::math::Rotation3d{}, wheelPositions};
 
   wpi::math::Trajectory trajectory =
       wpi::math::TrajectoryGenerator::GenerateTrajectory(

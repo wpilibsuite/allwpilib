@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/system/plant/proto/DCMotorProto.h"
-
 #include <optional>
+
+#include <wpi/math/system/plant/proto/DCMotorProto.h>
 
 #include "wpimath/protobuf/plant.npb.h"
 
@@ -25,7 +25,7 @@ std::optional<wpi::math::DCMotor> wpi::Protobuf<wpi::math::DCMotor>::Unpack(
 }
 
 bool wpi::Protobuf<wpi::math::DCMotor>::Pack(OutputStream& stream,
-                                           const wpi::math::DCMotor& value) {
+                                             const wpi::math::DCMotor& value) {
   wpi_proto_ProtobufDCMotor msg{
       .nominal_voltage = value.nominalVoltage.value(),
       .stall_torque = value.stallTorque.value(),

@@ -7,14 +7,14 @@
 #include <functional>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/controller/LinearPlantInversionFeedforward.h>
+#include <wpi/math/controller/LinearQuadraticRegulator.h>
+#include <wpi/math/estimator/KalmanFilter.h>
+#include <wpi/math/system/LinearSystem.h>
 
 #include "units/time.h"
 #include "units/voltage.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/controller/LinearPlantInversionFeedforward.h"
-#include "wpi/math/controller/LinearQuadraticRegulator.h"
-#include "wpi/math/estimator/KalmanFilter.h"
-#include "wpi/math/system/LinearSystem.h"
 
 namespace wpi::math {
 
@@ -62,8 +62,8 @@ class LinearSystemLoop {
       : LinearSystemLoop(
             plant, controller, observer,
             [=](const InputVector& u) {
-              return wpi::math::DesaturateInputVector<Inputs>(u,
-                                                            maxVoltage.value());
+              return wpi::math::DesaturateInputVector<Inputs>(
+                  u, maxVoltage.value());
             },
             dt) {}
 

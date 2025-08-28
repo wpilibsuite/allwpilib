@@ -7,9 +7,8 @@
 #include <Eigen/Core>
 #include <gcem.hpp>
 #include <wpi/SymbolExports.h>
-
-#include "wpi/math/geometry/Pose3d.h"
-#include "wpi/math/geometry/Rotation3d.h"
+#include <wpi/math/geometry/Pose3d.h>
+#include <wpi/math/geometry/Rotation3d.h>
 
 namespace wpi::math {
 

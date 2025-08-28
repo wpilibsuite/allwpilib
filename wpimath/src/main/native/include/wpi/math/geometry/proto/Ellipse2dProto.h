@@ -5,9 +5,9 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/geometry/Ellipse2d.h>
 #include <wpi/protobuf/Protobuf.h>
 
-#include "wpi/math/geometry/Ellipse2d.h"
 #include "wpimath/protobuf/geometry2d.npb.h"
 
 template <>

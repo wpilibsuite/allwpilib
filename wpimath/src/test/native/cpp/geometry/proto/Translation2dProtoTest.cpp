@@ -4,8 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
-
-#include "wpi/math/geometry/Translation2d.h"
+#include <wpi/math/geometry/Translation2d.h>
 
 using namespace wpi::math;
 

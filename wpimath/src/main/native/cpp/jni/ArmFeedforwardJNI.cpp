@@ -5,9 +5,9 @@
 #include <jni.h>
 
 #include <wpi/jni_util.h>
+#include <wpi/math/controller/ArmFeedforward.h>
 
 #include "edu_wpi_first_math_jni_ArmFeedforwardJNI.h"
-#include "wpi/math/controller/ArmFeedforward.h"
 
 using namespace wpi::java;
 
@@ -27,7 +27,8 @@ Java_edu_wpi_first_math_jni_ArmFeedforwardJNI_calculate
   return wpi::math::ArmFeedforward{
       units::volt_t{ks}, units::volt_t{kg},
       units::unit_t<wpi::math::ArmFeedforward::kv_unit>{kv},
-      units::unit_t<wpi::math::ArmFeedforward::ka_unit>{ka}, units::second_t{dt}}
+      units::unit_t<wpi::math::ArmFeedforward::ka_unit>{ka},
+      units::second_t{dt}}
       .Calculate(units::radian_t{currentAngle},
                  units::radians_per_second_t{currentVelocity},
                  units::radians_per_second_t{nextVelocity})

@@ -10,8 +10,7 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 #include <wpi/expected>
-
-#include "wpi/math/StateSpaceUtil.h"
+#include <wpi/math/StateSpaceUtil.h>
 
 namespace wpi::math {
 

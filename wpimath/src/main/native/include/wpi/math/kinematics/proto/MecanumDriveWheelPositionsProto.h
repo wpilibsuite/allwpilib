@@ -5,9 +5,9 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/kinematics/MecanumDriveWheelPositions.h>
 #include <wpi/protobuf/Protobuf.h>
 
-#include "wpi/math/kinematics/MecanumDriveWheelPositions.h"
 #include "wpimath/protobuf/kinematics.npb.h"
 
 template <>

@@ -11,18 +11,18 @@
 #include <Eigen/QR>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/MathShared.h>
+#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/geometry/Translation2d.h>
+#include <wpi/math/geometry/Twist2d.h>
+#include <wpi/math/kinematics/ChassisSpeeds.h>
+#include <wpi/math/kinematics/Kinematics.h>
+#include <wpi/math/kinematics/SwerveModulePosition.h>
+#include <wpi/math/kinematics/SwerveModuleState.h>
 
 #include "units/math.h"
 #include "units/velocity.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/MathShared.h"
-#include "wpi/math/geometry/Rotation2d.h"
-#include "wpi/math/geometry/Translation2d.h"
-#include "wpi/math/geometry/Twist2d.h"
-#include "wpi/math/kinematics/ChassisSpeeds.h"
-#include "wpi/math/kinematics/Kinematics.h"
-#include "wpi/math/kinematics/SwerveModulePosition.h"
-#include "wpi/math/kinematics/SwerveModuleState.h"
 
 namespace wpi::math {
 

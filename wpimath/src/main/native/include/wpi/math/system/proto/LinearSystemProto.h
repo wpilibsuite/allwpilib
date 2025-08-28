@@ -8,12 +8,12 @@
 #include <utility>
 
 #include <fmt/format.h>
+#include <wpi/math/proto/MatrixProto.h>
+#include <wpi/math/system/LinearSystem.h>
 #include <wpi/protobuf/Protobuf.h>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "wpi/math/proto/MatrixProto.h"
 #include "wpimath/protobuf/system.npb.h"
-#include "wpi/math/system/LinearSystem.h"
 
 template <int States, int Inputs, int Outputs>
 struct wpi::Protobuf<wpi::math::LinearSystem<States, Inputs, Outputs>> {

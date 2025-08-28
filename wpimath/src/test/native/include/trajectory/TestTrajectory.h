@@ -8,9 +8,9 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/math/trajectory/Trajectory.h"
-#include "wpi/math/trajectory/TrajectoryGenerator.h"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.h"
+#include <wpi/math/trajectory/Trajectory.h>
+#include <wpi/math/trajectory/TrajectoryGenerator.h>
+#include <wpi/math/trajectory/constraint/TrajectoryConstraint.h>
 
 namespace wpi::math {
 class TestTrajectory {

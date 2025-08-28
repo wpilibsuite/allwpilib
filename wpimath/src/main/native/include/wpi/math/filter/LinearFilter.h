@@ -15,10 +15,10 @@
 #include <gcem.hpp>
 #include <wpi/array.h>
 #include <wpi/circular_buffer.h>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/MathShared.h>
 
 #include "units/time.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/MathShared.h"
 
 namespace wpi::math {
 

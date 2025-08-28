@@ -7,10 +7,10 @@
 #include <utility>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/kinematics/DifferentialDriveKinematics.h>
+#include <wpi/math/trajectory/constraint/TrajectoryConstraint.h>
 
 #include "units/velocity.h"
-#include "wpi/math/kinematics/DifferentialDriveKinematics.h"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.h"
 
 namespace wpi::math {
 /**

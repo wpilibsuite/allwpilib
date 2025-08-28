@@ -2,12 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/geometry/proto/Pose3dProto.h"
-
+#include <wpi/math/geometry/Pose3d.h>
+#include <wpi/math/geometry/proto/Pose3dProto.h>
 #include <wpi/protobuf/Protobuf.h>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "wpi/math/geometry/Pose3d.h"
 #include "wpimath/protobuf/geometry3d.npb.h"
 
 std::optional<wpi::math::Pose3d> wpi::Protobuf<wpi::math::Pose3d>::Unpack(
@@ -36,7 +35,7 @@ std::optional<wpi::math::Pose3d> wpi::Protobuf<wpi::math::Pose3d>::Unpack(
 }
 
 bool wpi::Protobuf<wpi::math::Pose3d>::Pack(OutputStream& stream,
-                                          const wpi::math::Pose3d& value) {
+                                            const wpi::math::Pose3d& value) {
   wpi::PackCallback tsln{&value.Translation()};
   wpi::PackCallback rot{&value.Rotation()};
   wpi_proto_ProtobufPose3d msg{

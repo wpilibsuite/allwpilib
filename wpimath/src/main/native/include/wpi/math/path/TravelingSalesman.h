@@ -11,10 +11,9 @@
 #include <vector>
 
 #include <wpi/array.h>
-
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/optimization/SimulatedAnnealing.h"
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/optimization/SimulatedAnnealing.h>
 
 namespace wpi::math {
 

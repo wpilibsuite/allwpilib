@@ -5,9 +5,8 @@
 #pragma once
 
 #include <wpi/array.h>
-
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/estimator/SigmaPoints.h"
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/estimator/SigmaPoints.h>
 
 namespace wpi::math {
 

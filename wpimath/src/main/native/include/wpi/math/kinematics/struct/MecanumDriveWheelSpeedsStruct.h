@@ -5,9 +5,8 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/kinematics/MecanumDriveWheelSpeeds.h>
 #include <wpi/struct/Struct.h>
-
-#include "wpi/math/kinematics/MecanumDriveWheelSpeeds.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<wpi::math::MecanumDriveWheelSpeeds> {
@@ -20,7 +19,8 @@ struct WPILIB_DLLEXPORT wpi::Struct<wpi::math::MecanumDriveWheelSpeeds> {
            "double rear_right";
   }
 
-  static wpi::math::MecanumDriveWheelSpeeds Unpack(std::span<const uint8_t> data);
+  static wpi::math::MecanumDriveWheelSpeeds Unpack(
+      std::span<const uint8_t> data);
   static void Pack(std::span<uint8_t> data,
                    const wpi::math::MecanumDriveWheelSpeeds& value);
 };

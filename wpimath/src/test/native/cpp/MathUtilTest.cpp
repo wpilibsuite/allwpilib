@@ -6,14 +6,14 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
+#include <wpi/math/MathUtil.h>
+#include <wpi/math/geometry/Translation2d.h>
+#include <wpi/math/geometry/Translation3d.h>
 
 #include "units/angle.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "units/velocity.h"
-#include "wpi/math/MathUtil.h"
-#include "wpi/math/geometry/Translation2d.h"
-#include "wpi/math/geometry/Translation3d.h"
 
 #define EXPECT_UNITS_EQ(a, b) EXPECT_DOUBLE_EQ((a).value(), (b).value())
 
@@ -56,14 +56,14 @@ TEST(MathUtilTest, ApplyDeadbandArbitraryScale) {
 TEST(MathUtilTest, ApplyDeadbandUnits) {
   // < 0
   EXPECT_DOUBLE_EQ(
-      -20,
-      wpi::math::ApplyDeadband<units::radian_t>(-20_rad, 1_rad, 20_rad).value());
+      -20, wpi::math::ApplyDeadband<units::radian_t>(-20_rad, 1_rad, 20_rad)
+               .value());
 }
 
 TEST(MathUtilTest, ApplyDeadbandLargeMaxMagnitude) {
   EXPECT_DOUBLE_EQ(
       80.0, wpi::math::ApplyDeadband(100.0, 20.0,
-                                   std::numeric_limits<double>::infinity()));
+                                     std::numeric_limits<double>::infinity()));
 }
 
 TEST(MathUtilTest, CopySignPow) {
@@ -92,7 +92,8 @@ TEST(MathUtilTest, CopySignPowWithMaxMagnitude) {
   EXPECT_DOUBLE_EQ(-0.5 * 0.5 * 10, wpi::math::CopySignPow(-5.0, 2.0, 10.0));
 
   EXPECT_DOUBLE_EQ(std::sqrt(0.5) * 10, wpi::math::CopySignPow(5.0, 0.5, 10.0));
-  EXPECT_DOUBLE_EQ(-std::sqrt(0.5) * 10, wpi::math::CopySignPow(-5.0, 0.5, 10.0));
+  EXPECT_DOUBLE_EQ(-std::sqrt(0.5) * 10,
+                   wpi::math::CopySignPow(-5.0, 0.5, 10.0));
 
   EXPECT_DOUBLE_EQ(0.0, wpi::math::CopySignPow(0.0, 2.0, 5.0));
   EXPECT_DOUBLE_EQ(5.0, wpi::math::CopySignPow(5.0, 2.0, 5.0));
@@ -106,9 +107,11 @@ TEST(MathUtilTest, CopySignPowWithMaxMagnitude) {
 
 TEST(MathUtilTest, CopySignPowWithUnits) {
   EXPECT_DOUBLE_EQ(
-      0, wpi::math::CopySignPow<units::meters_per_second_t>(0_mps, 2.0).value());
+      0,
+      wpi::math::CopySignPow<units::meters_per_second_t>(0_mps, 2.0).value());
   EXPECT_DOUBLE_EQ(
-      1, wpi::math::CopySignPow<units::meters_per_second_t>(1_mps, 2.0).value());
+      1,
+      wpi::math::CopySignPow<units::meters_per_second_t>(1_mps, 2.0).value());
   EXPECT_DOUBLE_EQ(
       -1,
       wpi::math::CopySignPow<units::meters_per_second_t>(-1_mps, 2.0).value());
@@ -134,7 +137,8 @@ TEST(MathUtilTest, InputModulus) {
       -20.0, wpi::math::InputModulus(170.0 + 360.0 - (-170.0), -180.0, 180.0));
   EXPECT_DOUBLE_EQ(
       -20.0, wpi::math::InputModulus(170.0 - (-170.0 + 360.0), -180.0, 180.0));
-  EXPECT_DOUBLE_EQ(20.0, wpi::math::InputModulus(-170.0 - 170.0, -180.0, 180.0));
+  EXPECT_DOUBLE_EQ(20.0,
+                   wpi::math::InputModulus(-170.0 - 170.0, -180.0, 180.0));
   EXPECT_DOUBLE_EQ(
       20.0, wpi::math::InputModulus(-170.0 + 360.0 - 170.0, -180.0, 180.0));
   EXPECT_DOUBLE_EQ(
@@ -144,8 +148,8 @@ TEST(MathUtilTest, InputModulus) {
   EXPECT_DOUBLE_EQ(340.0, wpi::math::InputModulus(170.0 - 190.0, 0.0, 360.0));
   EXPECT_DOUBLE_EQ(340.0,
                    wpi::math::InputModulus(170.0 + 360.0 - 190.0, 0.0, 360.0));
-  EXPECT_DOUBLE_EQ(340.0,
-                   wpi::math::InputModulus(170.0 - (190.0 + 360.0), 0.0, 360.0));
+  EXPECT_DOUBLE_EQ(
+      340.0, wpi::math::InputModulus(170.0 - (190.0 + 360.0), 0.0, 360.0));
 
   // Test asymmetric range that doesn't start at zero
   EXPECT_DOUBLE_EQ(-20.0,
@@ -177,14 +181,18 @@ TEST(MathUtilTest, AngleModulus) {
       wpi::math::AngleModulus(units::radian_t{2.0 * std::numbers::pi}), 0_rad,
       1e-10);
 
-  EXPECT_UNITS_EQ(wpi::math::AngleModulus(units::radian_t{5 * std::numbers::pi}),
-                  units::radian_t{std::numbers::pi});
-  EXPECT_UNITS_EQ(wpi::math::AngleModulus(units::radian_t{-5 * std::numbers::pi}),
-                  units::radian_t{std::numbers::pi});
-  EXPECT_UNITS_EQ(wpi::math::AngleModulus(units::radian_t{std::numbers::pi / 2}),
-                  units::radian_t{std::numbers::pi / 2});
-  EXPECT_UNITS_EQ(wpi::math::AngleModulus(units::radian_t{-std::numbers::pi / 2}),
-                  units::radian_t{-std::numbers::pi / 2});
+  EXPECT_UNITS_EQ(
+      wpi::math::AngleModulus(units::radian_t{5 * std::numbers::pi}),
+      units::radian_t{std::numbers::pi});
+  EXPECT_UNITS_EQ(
+      wpi::math::AngleModulus(units::radian_t{-5 * std::numbers::pi}),
+      units::radian_t{std::numbers::pi});
+  EXPECT_UNITS_EQ(
+      wpi::math::AngleModulus(units::radian_t{std::numbers::pi / 2}),
+      units::radian_t{std::numbers::pi / 2});
+  EXPECT_UNITS_EQ(
+      wpi::math::AngleModulus(units::radian_t{-std::numbers::pi / 2}),
+      units::radian_t{-std::numbers::pi / 2});
 }
 
 TEST(MathUtilTest, IsNear) {

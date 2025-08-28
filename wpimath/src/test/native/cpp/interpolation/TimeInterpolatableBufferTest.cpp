@@ -5,11 +5,11 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/interpolation/TimeInterpolatableBuffer.h>
 
 #include "units/time.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/geometry/Rotation2d.h"
-#include "wpi/math/interpolation/TimeInterpolatableBuffer.h"
 
 TEST(TimeInterpolatableBufferTest, AddSample) {
   wpi::math::TimeInterpolatableBuffer<wpi::math::Rotation2d> buffer{10_s};

@@ -5,11 +5,10 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/geometry/Rotation2d.h"
-#include "wpi/math/geometry/Transform2d.h"
-#include "wpi/math/geometry/Translation2d.h"
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/geometry/Transform2d.h>
+#include <wpi/math/geometry/Translation2d.h>
 
 using namespace wpi::math;
 

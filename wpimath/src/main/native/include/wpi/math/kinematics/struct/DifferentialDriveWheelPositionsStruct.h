@@ -5,12 +5,12 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/kinematics/DifferentialDriveWheelPositions.h>
 #include <wpi/struct/Struct.h>
 
-#include "wpi/math/kinematics/DifferentialDriveWheelPositions.h"
-
 template <>
-struct WPILIB_DLLEXPORT wpi::Struct<wpi::math::DifferentialDriveWheelPositions> {
+struct WPILIB_DLLEXPORT
+    wpi::Struct<wpi::math::DifferentialDriveWheelPositions> {
   static constexpr std::string_view GetTypeName() {
     return "DifferentialDriveWheelPositions";
   }

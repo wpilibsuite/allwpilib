@@ -33,9 +33,8 @@
 #include <vector>
 
 #include <wpi/SymbolExports.h>
-
-#include "wpi/math/trajectory/Trajectory.h"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.h"
+#include <wpi/math/trajectory/Trajectory.h>
+#include <wpi/math/trajectory/constraint/TrajectoryConstraint.h>
 
 namespace wpi::math {
 /**

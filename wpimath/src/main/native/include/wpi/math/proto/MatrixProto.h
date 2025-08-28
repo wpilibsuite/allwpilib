@@ -7,22 +7,24 @@
 #include <stdexcept>
 
 #include <fmt/format.h>
+#include <wpi/math/EigenCore.h>
 #include <wpi/protobuf/Protobuf.h>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
-#include "wpi/math/EigenCore.h"
 #include "wpimath/protobuf/wpimath.npb.h"
 
 template <int Rows, int Cols, int Options, int MaxRows, int MaxCols>
   requires(Cols != 1)
-struct wpi::Protobuf<wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
+struct wpi::Protobuf<
+    wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
   using MessageStruct = wpi_proto_ProtobufMatrix;
   using InputStream = wpi::ProtoInputStream<
       wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>;
   using OutputStream = wpi::ProtoOutputStream<
       wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>;
 
-  static std::optional<wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>
+  static std::optional<
+      wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>>
   Unpack(InputStream& stream) {
     constexpr bool isSmall = Rows * Cols * sizeof(double) < 256;
     using UnpackType =

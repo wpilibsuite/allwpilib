@@ -8,8 +8,7 @@
 #include <tuple>
 
 #include <Eigen/QR>
-
-#include "wpi/math/EigenCore.h"
+#include <wpi/math/EigenCore.h>
 
 namespace wpi::math {
 

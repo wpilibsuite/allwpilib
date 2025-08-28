@@ -10,16 +10,16 @@
 #include <vector>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/kinematics/DifferentialDriveKinematics.h>
+#include <wpi/math/kinematics/MecanumDriveKinematics.h>
+#include <wpi/math/kinematics/SwerveDriveKinematics.h>
+#include <wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.h>
+#include <wpi/math/trajectory/constraint/MecanumDriveKinematicsConstraint.h>
+#include <wpi/math/trajectory/constraint/SwerveDriveKinematicsConstraint.h>
+#include <wpi/math/trajectory/constraint/TrajectoryConstraint.h>
 
 #include "units/acceleration.h"
 #include "units/velocity.h"
-#include "wpi/math/kinematics/DifferentialDriveKinematics.h"
-#include "wpi/math/kinematics/MecanumDriveKinematics.h"
-#include "wpi/math/kinematics/SwerveDriveKinematics.h"
-#include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
-#include "wpi/math/trajectory/constraint/MecanumDriveKinematicsConstraint.h"
-#include "wpi/math/trajectory/constraint/SwerveDriveKinematicsConstraint.h"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.h"
 
 namespace wpi::math {
 /**

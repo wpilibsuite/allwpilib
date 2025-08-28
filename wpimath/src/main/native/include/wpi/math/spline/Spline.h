@@ -9,11 +9,11 @@
 
 #include <gcem.hpp>
 #include <wpi/array.h>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/geometry/Pose2d.h>
 
 #include "units/curvature.h"
 #include "units/length.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/geometry/Pose2d.h"
 
 namespace wpi::math {
 

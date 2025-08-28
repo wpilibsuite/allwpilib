@@ -2,14 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/geometry/proto/Transform3dProto.h"
-
+#include <wpi/math/geometry/proto/Transform3dProto.h>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "wpimath/protobuf/geometry3d.npb.h"
 
-std::optional<wpi::math::Transform3d> wpi::Protobuf<wpi::math::Transform3d>::Unpack(
-    InputStream& stream) {
+std::optional<wpi::math::Transform3d>
+wpi::Protobuf<wpi::math::Transform3d>::Unpack(InputStream& stream) {
   wpi::UnpackCallback<wpi::math::Translation3d> tsln;
   wpi::UnpackCallback<wpi::math::Rotation3d> rot;
   wpi_proto_ProtobufTransform3d msg{

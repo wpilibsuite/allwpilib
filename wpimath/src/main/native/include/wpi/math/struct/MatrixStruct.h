@@ -6,9 +6,8 @@
 
 #include <fmt/format.h>
 #include <wpi/ct_string.h>
+#include <wpi/math/EigenCore.h>
 #include <wpi/struct/Struct.h>
-
-#include "wpi/math/EigenCore.h"
 
 template <int Rows, int Cols, int Options, int MaxRows, int MaxCols>
   requires(Cols != 1)

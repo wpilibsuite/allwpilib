@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/controller/struct/ElevatorFeedforwardStruct.h"
+#include <wpi/math/controller/struct/ElevatorFeedforwardStruct.h>
 
 namespace {
 constexpr size_t kKsOff = 0;
@@ -13,7 +13,8 @@ constexpr size_t kKaOff = kKvOff + 8;
 
 using StructType = wpi::Struct<wpi::math::ElevatorFeedforward>;
 
-wpi::math::ElevatorFeedforward StructType::Unpack(std::span<const uint8_t> data) {
+wpi::math::ElevatorFeedforward StructType::Unpack(
+    std::span<const uint8_t> data) {
   return wpi::math::ElevatorFeedforward{
       units::volt_t{wpi::UnpackStruct<double, kKsOff>(data)},
       units::volt_t{wpi::UnpackStruct<double, kKgOff>(data)},

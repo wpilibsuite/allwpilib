@@ -5,9 +5,9 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/geometry/Twist3d.h>
 #include <wpi/protobuf/Protobuf.h>
 
-#include "wpi/math/geometry/Twist3d.h"
 #include "wpimath/protobuf/geometry3d.npb.h"
 
 template <>

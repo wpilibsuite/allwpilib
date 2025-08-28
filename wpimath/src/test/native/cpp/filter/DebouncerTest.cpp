@@ -3,10 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
+#include <wpi/math/filter/Debouncer.h>
 #include <wpi/timestamp.h>
 
 #include "units/time.h"
-#include "wpi/math/filter/Debouncer.h"
 
 static units::second_t now = 0_s;
 
@@ -32,7 +32,7 @@ TEST_F(DebouncerTest, DebounceRising) {
 
 TEST_F(DebouncerTest, DebounceFalling) {
   wpi::math::Debouncer debouncer{20_ms,
-                               wpi::math::Debouncer::DebounceType::kFalling};
+                                 wpi::math::Debouncer::DebounceType::kFalling};
 
   debouncer.Calculate(true);
   EXPECT_TRUE(debouncer.Calculate(false));
@@ -43,7 +43,8 @@ TEST_F(DebouncerTest, DebounceFalling) {
 }
 
 TEST_F(DebouncerTest, DebounceBoth) {
-  wpi::math::Debouncer debouncer{20_ms, wpi::math::Debouncer::DebounceType::kBoth};
+  wpi::math::Debouncer debouncer{20_ms,
+                                 wpi::math::Debouncer::DebounceType::kBoth};
 
   debouncer.Calculate(false);
   EXPECT_FALSE(debouncer.Calculate(true));
@@ -59,7 +60,8 @@ TEST_F(DebouncerTest, DebounceBoth) {
 }
 
 TEST_F(DebouncerTest, DebounceParams) {
-  wpi::math::Debouncer debouncer{20_ms, wpi::math::Debouncer::DebounceType::kBoth};
+  wpi::math::Debouncer debouncer{20_ms,
+                                 wpi::math::Debouncer::DebounceType::kBoth};
 
   EXPECT_TRUE(debouncer.GetDebounceTime() == 20_ms);
   EXPECT_TRUE(debouncer.GetDebounceType() ==

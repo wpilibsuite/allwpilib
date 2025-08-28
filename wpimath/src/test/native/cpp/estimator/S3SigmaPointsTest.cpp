@@ -3,8 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/estimator/S3SigmaPoints.h"
+#include <wpi/math/estimator/S3SigmaPoints.h>
 
 TEST(S3SigmaPointsTest, Simplex) {
   constexpr double alpha = 1e-3;
@@ -35,7 +34,7 @@ TEST(S3SigmaPointsTest, ZeroMean) {
   EXPECT_TRUE(
       (points -
        wpi::math::Matrixd<2, 4>{{0.0, -0.00122474, 0.00122474, 0.0},
-                              {0.0, -0.00070711, -0.00070711, 0.00141421}})
+                                {0.0, -0.00070711, -0.00070711, 0.00141421}})
           .norm() < 1e-7);
 }
 
@@ -48,6 +47,6 @@ TEST(S3SigmaPointsTest, NonzeroMean) {
   EXPECT_TRUE(
       (points -
        wpi::math::Matrixd<2, 4>{{1.0, 0.99877526, 1.00122474, 1.0},
-                              {2.0, 1.99776393, 1.99776393, 2.00447214}})
+                                {2.0, 1.99776393, 1.99776393, 2.00447214}})
           .norm() < 1e-7);
 }

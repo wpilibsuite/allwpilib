@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-#include "wpi/math/EigenCore.h"
+#include <wpi/math/EigenCore.h>
 
 namespace wpi::math {
 

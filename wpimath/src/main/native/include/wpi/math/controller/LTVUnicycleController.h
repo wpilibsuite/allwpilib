@@ -7,15 +7,15 @@
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/math/StateSpaceUtil.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/kinematics/ChassisSpeeds.h>
+#include <wpi/math/trajectory/Trajectory.h>
 
 #include "units/angular_velocity.h"
 #include "units/math.h"
 #include "units/time.h"
 #include "units/velocity.h"
-#include "wpi/math/StateSpaceUtil.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/kinematics/ChassisSpeeds.h"
-#include "wpi/math/trajectory/Trajectory.h"
 
 namespace wpi::math {
 

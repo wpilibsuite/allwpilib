@@ -5,9 +5,8 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/estimator/AngleStatistics.h"
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/estimator/AngleStatistics.h>
 
 TEST(AngleStatisticsTest, Mean) {
   wpi::math::Matrixd<3, 3> sigmas{
@@ -32,10 +31,11 @@ TEST(AngleStatisticsTest, Mean_DynamicSize) {
   Eigen::VectorXd weights{3};
   weights.fill(1.0 / sigmas.cols());
 
-  EXPECT_TRUE(Eigen::Vector3d(0.7333333, 0.01163323, 1)
-                  .isApprox(wpi::math::AngleMean<Eigen::Dynamic, Eigen::Dynamic>(
-                                sigmas, weights, 1),
-                            1e-3));
+  EXPECT_TRUE(
+      Eigen::Vector3d(0.7333333, 0.01163323, 1)
+          .isApprox(wpi::math::AngleMean<Eigen::Dynamic, Eigen::Dynamic>(
+                        sigmas, weights, 1),
+                    1e-3));
 }
 
 TEST(AngleStatisticsTest, Residual) {
@@ -58,7 +58,8 @@ TEST(AngleStatisticsTest, Add) {
   Eigen::Vector3d a{1, 1 * std::numbers::pi / 180, 2};
   Eigen::Vector3d b{1, 359 * std::numbers::pi / 180, 1};
 
-  EXPECT_TRUE(wpi::math::AngleAdd<3>(a, b, 1).isApprox(Eigen::Vector3d{2, 0, 3}));
+  EXPECT_TRUE(
+      wpi::math::AngleAdd<3>(a, b, 1).isApprox(Eigen::Vector3d{2, 0, 3}));
 }
 
 TEST(AngleStatisticsTest, Add_DynamicSize) {

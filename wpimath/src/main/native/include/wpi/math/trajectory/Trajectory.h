@@ -11,14 +11,14 @@
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/geometry/Transform2d.h>
 
 #include "units/acceleration.h"
 #include "units/curvature.h"
 #include "units/math.h"
 #include "units/time.h"
 #include "units/velocity.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/geometry/Transform2d.h"
 
 namespace wpi::math {
 /**

@@ -7,9 +7,9 @@
 #include <concepts>
 #include <limits>
 
-#include "wpi/math/geometry/Rectangle2d.h"
-#include "wpi/math/geometry/Translation2d.h"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.h"
+#include <wpi/math/geometry/Rectangle2d.h>
+#include <wpi/math/geometry/Translation2d.h>
+#include <wpi/math/trajectory/constraint/TrajectoryConstraint.h>
 
 namespace wpi::math {
 

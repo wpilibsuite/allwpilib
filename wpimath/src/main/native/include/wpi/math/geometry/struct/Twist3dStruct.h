@@ -5,9 +5,8 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/geometry/Twist3d.h>
 #include <wpi/struct/Struct.h>
-
-#include "wpi/math/geometry/Twist3d.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<wpi::math::Twist3d> {

@@ -4,12 +4,11 @@
 
 #pragma once
 
+#include <Eigen/QR>
+#include <wpi/math/EigenCore.h>
 #include <wpi/math/system/LinearSystem.h>
 
-#include <Eigen/QR>
-
 #include "units/time.h"
-#include "wpi/math/EigenCore.h"
 
 namespace wpi::math {
 

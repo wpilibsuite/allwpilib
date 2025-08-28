@@ -8,12 +8,12 @@
 
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
+#include <wpi/math/MathShared.h>
 
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/math.h"
 #include "units/voltage.h"
-#include "wpi/math/MathShared.h"
 
 namespace wpi::math {
 /**

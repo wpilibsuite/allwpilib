@@ -8,11 +8,11 @@
 #include <functional>
 
 #include <Eigen/QR>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/system/Discretization.h>
+#include <wpi/math/system/LinearSystem.h>
 
 #include "units/time.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/system/Discretization.h"
-#include "wpi/math/system/LinearSystem.h"
 
 namespace wpi::math {
 

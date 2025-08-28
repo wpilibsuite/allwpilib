@@ -8,14 +8,14 @@
 #include <ctime>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/MathShared.h>
+#include <wpi/math/geometry/Pose2d.h>
 #include <wpi/timestamp.h>
 
 #include "Odometry.h"
 #include "SwerveDriveKinematics.h"
 #include "SwerveModulePosition.h"
 #include "SwerveModuleState.h"
-#include "wpi/math/MathShared.h"
-#include "wpi/math/geometry/Pose2d.h"
 
 namespace wpi::math {
 

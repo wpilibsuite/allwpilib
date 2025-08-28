@@ -5,10 +5,10 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/controller/ArmFeedforward.h>
 #include <wpi/protobuf/Protobuf.h>
 
 #include "pb.h"
-#include "wpi/math/controller/ArmFeedforward.h"
 #include "wpimath/protobuf/controller.npb.h"
 
 template <>
@@ -17,5 +17,6 @@ struct WPILIB_DLLEXPORT wpi::Protobuf<wpi::math::ArmFeedforward> {
   using InputStream = wpi::ProtoInputStream<wpi::math::ArmFeedforward>;
   using OutputStream = wpi::ProtoOutputStream<wpi::math::ArmFeedforward>;
   static std::optional<wpi::math::ArmFeedforward> Unpack(InputStream& stream);
-  static bool Pack(OutputStream& stream, const wpi::math::ArmFeedforward& value);
+  static bool Pack(OutputStream& stream,
+                   const wpi::math::ArmFeedforward& value);
 };

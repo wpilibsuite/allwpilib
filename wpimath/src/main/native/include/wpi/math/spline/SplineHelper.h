@@ -9,9 +9,8 @@
 
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
-
-#include "wpi/math/spline/CubicHermiteSpline.h"
-#include "wpi/math/spline/QuinticHermiteSpline.h"
+#include <wpi/math/spline/CubicHermiteSpline.h>
+#include <wpi/math/spline/QuinticHermiteSpline.h>
 
 namespace wpi::math {
 /**

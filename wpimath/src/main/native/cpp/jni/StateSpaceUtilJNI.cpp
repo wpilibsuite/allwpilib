@@ -6,9 +6,9 @@
 
 #include <Eigen/Core>
 #include <wpi/jni_util.h>
+#include <wpi/math/StateSpaceUtil.h>
 
 #include "edu_wpi_first_math_jni_StateSpaceUtilJNI.h"
-#include "wpi/math/StateSpaceUtil.h"
 
 using namespace wpi::java;
 

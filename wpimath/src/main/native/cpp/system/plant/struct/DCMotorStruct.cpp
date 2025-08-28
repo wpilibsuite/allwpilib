@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/system/plant/struct/DCMotorStruct.h"
+#include <wpi/math/system/plant/struct/DCMotorStruct.h>
 
 namespace {
 constexpr size_t kNominalVoltageOff = 0;
@@ -25,7 +25,8 @@ wpi::math::DCMotor StructType::Unpack(std::span<const uint8_t> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const wpi::math::DCMotor& value) {
+void StructType::Pack(std::span<uint8_t> data,
+                      const wpi::math::DCMotor& value) {
   wpi::PackStruct<kNominalVoltageOff>(data, value.nominalVoltage.value());
   wpi::PackStruct<kStallTorqueOff>(data, value.stallTorque.value());
   wpi::PackStruct<kStallCurrentOff>(data, value.stallCurrent.value());

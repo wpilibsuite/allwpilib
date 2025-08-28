@@ -2,9 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/geometry/Ellipse2d.h"
-
 #include <sleipnir/optimization/problem.hpp>
+#include <wpi/math/geometry/Ellipse2d.h>
 
 using namespace wpi::math;
 
@@ -42,7 +41,7 @@ Translation2d Ellipse2d::Nearest(const Translation2d& point) const {
     problem.solve();
 
     rotPoint = wpi::math::Translation2d{units::meter_t{x.value()},
-                                      units::meter_t{y.value()}};
+                                        units::meter_t{y.value()}};
   }
 
   // Undo rotation

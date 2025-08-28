@@ -5,12 +5,12 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/trajectory/constraint/TrajectoryConstraint.h>
 
 #include "units/acceleration.h"
 #include "units/curvature.h"
 #include "units/math.h"
 #include "units/velocity.h"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.h"
 
 namespace wpi::math {
 

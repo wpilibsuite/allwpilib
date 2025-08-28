@@ -5,13 +5,13 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/controller/LinearQuadraticRegulator.h>
+#include <wpi/math/system/LinearSystem.h>
+#include <wpi/math/system/plant/DCMotor.h>
+#include <wpi/math/system/plant/LinearSystemId.h>
 
 #include "units/time.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/controller/LinearQuadraticRegulator.h"
-#include "wpi/math/system/LinearSystem.h"
-#include "wpi/math/system/plant/DCMotor.h"
-#include "wpi/math/system/plant/LinearSystemId.h"
 
 namespace wpi::math {
 

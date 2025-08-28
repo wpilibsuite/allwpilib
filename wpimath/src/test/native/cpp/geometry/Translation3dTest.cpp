@@ -5,8 +5,7 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/geometry/Translation3d.h"
+#include <wpi/math/geometry/Translation3d.h>
 
 using namespace wpi::math;
 

@@ -59,7 +59,7 @@ class LinearFilterOutputTest
         break;
       case kTestHighPass:
         return wpi::math::LinearFilter<double>::HighPass(kHighPassTimeConstant,
-                                                       kFilterStep);
+                                                         kFilterStep);
         break;
       case kTestMovAvg:
         return wpi::math::LinearFilter<double>::MovingAverage(kMovAvgTaps);
@@ -157,7 +157,7 @@ void AssertBackwardResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
                            double max) {
   auto filter =
       wpi::math::LinearFilter<double>::BackwardFiniteDifference<Derivative,
-                                                              Samples>(h);
+                                                                Samples>(h);
 
   for (int i = min / h.value(); i < max / h.value(); ++i) {
     // Let filter initialize

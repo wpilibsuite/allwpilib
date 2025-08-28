@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/math/geometry/struct/Twist3dStruct.h"
+#include <wpi/math/geometry/struct/Twist3dStruct.h>
 
 namespace {
 constexpr size_t kDxOff = 0;
@@ -26,7 +26,8 @@ wpi::math::Twist3d StructType::Unpack(std::span<const uint8_t> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const wpi::math::Twist3d& value) {
+void StructType::Pack(std::span<uint8_t> data,
+                      const wpi::math::Twist3d& value) {
   wpi::PackStruct<kDxOff>(data, value.dx.value());
   wpi::PackStruct<kDyOff>(data, value.dy.value());
   wpi::PackStruct<kDzOff>(data, value.dz.value());

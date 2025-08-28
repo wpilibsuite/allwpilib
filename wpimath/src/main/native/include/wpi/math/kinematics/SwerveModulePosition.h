@@ -6,10 +6,10 @@
 
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
+#include <wpi/math/geometry/Rotation2d.h>
 
 #include "units/length.h"
 #include "units/math.h"
-#include "wpi/math/geometry/Rotation2d.h"
 
 namespace wpi::math {
 /**

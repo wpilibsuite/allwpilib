@@ -9,6 +9,7 @@
 #include <ctime>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/geometry/Pose2d.h>
 #include <wpi/timestamp.h>
 
 #include "Odometry3d.h"
@@ -16,7 +17,6 @@
 #include "SwerveModulePosition.h"
 #include "SwerveModuleState.h"
 #include "units/time.h"
-#include "wpi/math/geometry/Pose2d.h"
 
 namespace wpi::math {
 

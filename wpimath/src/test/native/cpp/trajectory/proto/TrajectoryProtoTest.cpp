@@ -4,8 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
-
-#include "wpi/math/trajectory/Trajectory.h"
+#include <wpi/math/trajectory/Trajectory.h>
 
 using namespace wpi::math;
 

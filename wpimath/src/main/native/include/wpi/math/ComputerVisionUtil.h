@@ -5,9 +5,8 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
-
-#include "wpi/math/geometry/Pose3d.h"
-#include "wpi/math/geometry/Transform3d.h"
+#include <wpi/math/geometry/Pose3d.h>
+#include <wpi/math/geometry/Transform3d.h>
 
 namespace wpi::math {
 

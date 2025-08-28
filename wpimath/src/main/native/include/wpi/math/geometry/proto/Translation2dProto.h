@@ -5,10 +5,10 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/geometry/Translation2d.h>
 #include <wpi/protobuf/Protobuf.h>
 
 #include "pb.h"
-#include "wpi/math/geometry/Translation2d.h"
 #include "wpimath/protobuf/geometry2d.npb.h"
 
 template <>

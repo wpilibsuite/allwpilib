@@ -7,15 +7,15 @@
 #include <type_traits>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/MathShared.h>
+#include <wpi/math/geometry/Twist2d.h>
+#include <wpi/math/kinematics/ChassisSpeeds.h>
+#include <wpi/math/kinematics/DifferentialDriveWheelPositions.h>
+#include <wpi/math/kinematics/DifferentialDriveWheelSpeeds.h>
+#include <wpi/math/kinematics/Kinematics.h>
 
 #include "units/angle.h"
 #include "units/length.h"
-#include "wpi/math/MathShared.h"
-#include "wpi/math/geometry/Twist2d.h"
-#include "wpi/math/kinematics/ChassisSpeeds.h"
-#include "wpi/math/kinematics/DifferentialDriveWheelPositions.h"
-#include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.h"
-#include "wpi/math/kinematics/Kinematics.h"
 
 namespace wpi::math {
 /**

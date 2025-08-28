@@ -4,8 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
-
-#include "wpi/math/geometry/Rotation2d.h"
+#include <wpi/math/geometry/Rotation2d.h>
 
 using namespace wpi::math;
 

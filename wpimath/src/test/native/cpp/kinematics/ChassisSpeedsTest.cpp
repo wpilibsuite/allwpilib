@@ -5,8 +5,7 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/kinematics/ChassisSpeeds.h"
+#include <wpi/math/kinematics/ChassisSpeeds.h>
 
 static constexpr double kEpsilon = 1E-9;
 
@@ -17,7 +16,7 @@ TEST(ChassisSpeedsTest, Discretize) {
 
   const auto speeds = target.Discretize(duration);
   const wpi::math::Twist2d twist{speeds.vx * dt, speeds.vy * dt,
-                               speeds.omega * dt};
+                                 speeds.omega * dt};
 
   wpi::math::Pose2d pose;
   for (units::second_t time = 0_s; time < duration; time += dt) {

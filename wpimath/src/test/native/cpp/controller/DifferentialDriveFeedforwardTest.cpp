@@ -6,13 +6,13 @@
 
 #include <Eigen/Core>
 #include <gtest/gtest.h>
+#include <wpi/math/controller/DifferentialDriveFeedforward.h>
+#include <wpi/math/controller/LinearPlantInversionFeedforward.h>
+#include <wpi/math/system/plant/LinearSystemId.h>
 
 #include "units/acceleration.h"
 #include "units/length.h"
 #include "units/time.h"
-#include "wpi/math/controller/DifferentialDriveFeedforward.h"
-#include "wpi/math/controller/LinearPlantInversionFeedforward.h"
-#include "wpi/math/system/plant/LinearSystemId.h"
 
 TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
   constexpr auto kVLinear = 1_V / 1_mps;
@@ -60,7 +60,7 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
       kVLinear, kALinear, kVAngular, kAAngular};
   wpi::math::LinearSystem<2, 2, 2> plant =
       wpi::math::LinearSystemId::IdentifyDrivetrainSystem(kVLinear, kALinear,
-                                                        kVAngular, kAAngular);
+                                                          kVAngular, kAAngular);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
     for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;

@@ -26,11 +26,10 @@
  * SOFTWARE.
  */
 
-#include "wpi/math/trajectory/TrajectoryParameterizer.h"
-
 #include <vector>
 
 #include <fmt/format.h>
+#include <wpi/math/trajectory/TrajectoryParameterizer.h>
 
 #include "units/math.h"
 

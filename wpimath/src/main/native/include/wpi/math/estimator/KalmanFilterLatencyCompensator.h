@@ -10,9 +10,10 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/math/EigenCore.h>
+
 #include "units/math.h"
 #include "units/time.h"
-#include "wpi/math/EigenCore.h"
 
 namespace wpi::math {
 

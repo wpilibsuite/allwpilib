@@ -6,9 +6,8 @@
 
 #include <fmt/format.h>
 #include <wpi/ct_string.h>
+#include <wpi/math/EigenCore.h>
 #include <wpi/struct/Struct.h>
-
-#include "wpi/math/EigenCore.h"
 
 template <int Size, int Options, int MaxRows, int MaxCols>
 struct wpi::Struct<wpi::math::Matrixd<Size, 1, Options, MaxRows, MaxCols>> {

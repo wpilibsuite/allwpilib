@@ -7,9 +7,8 @@
 #include <utility>
 
 #include <wpi/SymbolExports.h>
-
-#include "wpi/math/geometry/Transform2d.h"
-#include "wpi/math/geometry/Translation3d.h"
+#include <wpi/math/geometry/Transform2d.h>
+#include <wpi/math/geometry/Translation3d.h>
 
 namespace wpi::math {
 

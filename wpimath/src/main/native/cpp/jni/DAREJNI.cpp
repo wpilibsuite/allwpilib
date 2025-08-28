@@ -8,11 +8,11 @@
 #include <string>
 
 #include <wpi/jni_util.h>
+#include <wpi/math/DARE.h>
+#include <wpi/math/fmt/Eigen.h>
 
 #include "Exceptions.h"
 #include "edu_wpi_first_math_jni_DAREJNI.h"
-#include "wpi/math/DARE.h"
-#include "wpi/math/fmt/Eigen.h"
 
 using namespace wpi::java;
 
@@ -46,8 +46,8 @@ Java_edu_wpi_first_math_jni_DAREJNI_dareNoPrecondABQR
                                  Eigen::RowMajor>>
       Rmat{nativeR.data(), inputs, inputs};
 
-  auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(Amat, Bmat, Qmat,
-                                                              Rmat, false)
+  auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(
+                    Amat, Bmat, Qmat, Rmat, false)
                     .value();
 
   env->SetDoubleArrayRegion(S, 0, states * states, result.data());
@@ -85,8 +85,8 @@ Java_edu_wpi_first_math_jni_DAREJNI_dareNoPrecondABQRN
                                  Eigen::RowMajor>>
       Nmat{nativeN.data(), states, inputs};
 
-  auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(Amat, Bmat, Qmat,
-                                                              Rmat, Nmat, false)
+  auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(
+                    Amat, Bmat, Qmat, Rmat, Nmat, false)
                     .value();
 
   env->SetDoubleArrayRegion(S, 0, states * states, result.data());
@@ -120,8 +120,8 @@ Java_edu_wpi_first_math_jni_DAREJNI_dareABQR
                                  Eigen::RowMajor>>
       Rmat{nativeR.data(), inputs, inputs};
 
-  if (auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(Amat, Bmat,
-                                                                  Qmat, Rmat)) {
+  if (auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(
+          Amat, Bmat, Qmat, Rmat)) {
     env->SetDoubleArrayRegion(S, 0, states * states, result.value().data());
     // K = (BᵀSB + R)⁻¹BᵀSA
   } else if (result.error() == wpi::math::DAREError::QNotSymmetric ||

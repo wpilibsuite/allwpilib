@@ -11,15 +11,15 @@
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/math/MathShared.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/geometry/Rotation2d.h>
+#include <wpi/math/geometry/Translation2d.h>
+#include <wpi/math/interpolation/TimeInterpolatableBuffer.h>
+#include <wpi/math/kinematics/Kinematics.h>
+#include <wpi/math/kinematics/Odometry.h>
 
 #include "units/time.h"
-#include "wpi/math/MathShared.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/geometry/Rotation2d.h"
-#include "wpi/math/geometry/Translation2d.h"
-#include "wpi/math/interpolation/TimeInterpolatableBuffer.h"
-#include "wpi/math/kinematics/Kinematics.h"
-#include "wpi/math/kinematics/Odometry.h"
 
 namespace wpi::math {
 

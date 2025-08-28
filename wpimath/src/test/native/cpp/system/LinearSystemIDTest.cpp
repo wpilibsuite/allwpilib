@@ -2,11 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
 #include <wpi/math/system/LinearSystem.h>
 #include <wpi/math/system/plant/DCMotor.h>
 #include <wpi/math/system/plant/LinearSystemId.h>
-
-#include <gtest/gtest.h>
 
 #include "units/length.h"
 #include "units/mass.h"
@@ -25,15 +24,15 @@ TEST(LinearSystemIDTest, IdentifyDrivetrainVelocitySystem) {
       0.001));
   ASSERT_TRUE(model.B().isApprox(
       wpi::math::Matrixd<2, 2>{{4.2590, -1.28762}, {-1.2876, 4.2590}}, 0.001));
-  ASSERT_TRUE(model.C().isApprox(wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}},
-                                 0.001));
-  ASSERT_TRUE(model.D().isApprox(wpi::math::Matrixd<2, 2>{{0.0, 0.0}, {0.0, 0.0}},
-                                 0.001));
+  ASSERT_TRUE(model.C().isApprox(
+      wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}}, 0.001));
+  ASSERT_TRUE(model.D().isApprox(
+      wpi::math::Matrixd<2, 2>{{0.0, 0.0}, {0.0, 0.0}}, 0.001));
 }
 
 TEST(LinearSystemIDTest, ElevatorSystem) {
-  auto model = wpi::math::LinearSystemId::ElevatorSystem(wpi::math::DCMotor::NEO(2),
-                                                       5_kg, 0.05_m, 12)
+  auto model = wpi::math::LinearSystemId::ElevatorSystem(
+                   wpi::math::DCMotor::NEO(2), 5_kg, 0.05_m, 12)
                    .Slice(0);
   ASSERT_TRUE(model.A().isApprox(
       wpi::math::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -99.05473}}, 0.001));
@@ -44,8 +43,8 @@ TEST(LinearSystemIDTest, ElevatorSystem) {
 
 TEST(LinearSystemIDTest, FlywheelSystem) {
 #if __GNUC__ <= 11
-  auto model = wpi::math::LinearSystemId::FlywheelSystem(wpi::math::DCMotor::NEO(2),
-                                                       0.00032_kg_sq_m, 1.0);
+  auto model = wpi::math::LinearSystemId::FlywheelSystem(
+      wpi::math::DCMotor::NEO(2), 0.00032_kg_sq_m, 1.0);
 #else
   constexpr auto model = wpi::math::LinearSystemId::FlywheelSystem(
       wpi::math::DCMotor::NEO(2), 0.00032_kg_sq_m, 1.0);
@@ -59,19 +58,19 @@ TEST(LinearSystemIDTest, FlywheelSystem) {
 
 TEST(LinearSystemIDTest, DCMotorSystem) {
 #if __GNUC__ <= 11
-  auto model = wpi::math::LinearSystemId::DCMotorSystem(wpi::math::DCMotor::NEO(2),
-                                                      0.00032_kg_sq_m, 1.0);
+  auto model = wpi::math::LinearSystemId::DCMotorSystem(
+      wpi::math::DCMotor::NEO(2), 0.00032_kg_sq_m, 1.0);
 #else
   constexpr auto model = wpi::math::LinearSystemId::DCMotorSystem(
       wpi::math::DCMotor::NEO(2), 0.00032_kg_sq_m, 1.0);
 #endif
 
-  ASSERT_TRUE(model.A().isApprox(wpi::math::Matrixd<2, 2>{{0, 1}, {0, -26.87032}},
-                                 0.001));
+  ASSERT_TRUE(model.A().isApprox(
+      wpi::math::Matrixd<2, 2>{{0, 1}, {0, -26.87032}}, 0.001));
   ASSERT_TRUE(
       model.B().isApprox(wpi::math::Matrixd<2, 1>{0, 1354.166667}, 0.001));
-  ASSERT_TRUE(model.C().isApprox(wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}},
-                                 0.001));
+  ASSERT_TRUE(model.C().isApprox(
+      wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}}, 0.001));
   ASSERT_TRUE(model.D().isApprox(wpi::math::Matrixd<2, 1>{0.0, 0.0}, 0.001));
 }
 
@@ -92,7 +91,8 @@ TEST(LinearSystemIDTest, IdentifyPositionSystem) {
 
   ASSERT_TRUE(model.A().isApprox(
       wpi::math::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -kv / ka}}, 0.001));
-  ASSERT_TRUE(model.B().isApprox(wpi::math::Matrixd<2, 1>{0.0, 1.0 / ka}, 0.001));
+  ASSERT_TRUE(
+      model.B().isApprox(wpi::math::Matrixd<2, 1>{0.0, 1.0 / ka}, 0.001));
 }
 
 TEST(LinearSystemIDTest, IdentifyVelocitySystem) {

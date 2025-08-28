@@ -7,11 +7,11 @@
 #include <limits>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/geometry/Pose2d.h>
 
 #include "units/acceleration.h"
 #include "units/curvature.h"
 #include "units/velocity.h"
-#include "wpi/math/geometry/Pose2d.h"
 
 namespace wpi::math {
 /**

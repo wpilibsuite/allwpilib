@@ -9,12 +9,11 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+#include <wpi/math/estimator/MecanumDrivePoseEstimator.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/kinematics/MecanumDriveKinematics.h>
+#include <wpi/math/trajectory/TrajectoryGenerator.h>
 #include <wpi/print.h>
-
-#include "wpi/math/estimator/MecanumDrivePoseEstimator.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/kinematics/MecanumDriveKinematics.h"
-#include "wpi/math/trajectory/TrajectoryGenerator.h"
 
 void testFollowTrajectory(
     const wpi::math::MecanumDriveKinematics& kinematics,
@@ -30,7 +29,8 @@ void testFollowTrajectory(
     const bool debug) {
   wpi::math::MecanumDriveWheelPositions wheelPositions{};
 
-  estimator.ResetPosition(wpi::math::Rotation2d{}, wheelPositions, startingPose);
+  estimator.ResetPosition(wpi::math::Rotation2d{}, wheelPositions,
+                          startingPose);
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -59,7 +59,7 @@ void testFollowTrajectory(
           visionMeasurementGenerator(groundTruthState) +
           wpi::math::Transform2d{
               wpi::math::Translation2d{distribution(generator) * 0.1_m,
-                                     distribution(generator) * 0.1_m},
+                                       distribution(generator) * 0.1_m},
               wpi::math::Rotation2d{distribution(generator) * 0.05_rad}};
       visionPoses.push_back({t, visionPose});
     }
@@ -143,13 +143,14 @@ void testFollowTrajectory(
 TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
   wpi::math::MecanumDriveKinematics kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
   wpi::math::MecanumDriveWheelPositions wheelPositions;
 
   wpi::math::MecanumDrivePoseEstimator estimator{
-      kinematics,        wpi::math::Rotation2d{}, wheelPositions,
-      wpi::math::Pose2d{}, {0.1, 0.1, 0.1},       {0.45, 0.45, 0.45}};
+      kinematics,          wpi::math::Rotation2d{}, wheelPositions,
+      wpi::math::Pose2d{}, {0.1, 0.1, 0.1},         {0.45, 0.45, 0.45}};
 
   wpi::math::Trajectory trajectory =
       wpi::math::TrajectoryGenerator::GenerateTrajectory(
@@ -164,23 +165,24 @@ TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
       kinematics, estimator, trajectory,
       [&](wpi::math::Trajectory::State& state) {
         return wpi::math::ChassisSpeeds{state.velocity, 0_mps,
-                                      state.velocity * state.curvature};
+                                        state.velocity * state.curvature};
       },
       [&](wpi::math::Trajectory::State& state) { return state.pose; },
-      trajectory.InitialPose(), {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,
-      100_ms, 250_ms, true, false);
+      trajectory.InitialPose(), {0_m, 0_m, wpi::math::Rotation2d{45_deg}},
+      20_ms, 100_ms, 250_ms, true, false);
 }
 
 TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
   wpi::math::MecanumDriveKinematics kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
   wpi::math::MecanumDriveWheelPositions wheelPositions;
 
   wpi::math::MecanumDrivePoseEstimator estimator{
-      kinematics,        wpi::math::Rotation2d{}, wheelPositions,
-      wpi::math::Pose2d{}, {0.1, 0.1, 0.1},       {0.45, 0.45, 0.1}};
+      kinematics,          wpi::math::Rotation2d{}, wheelPositions,
+      wpi::math::Pose2d{}, {0.1, 0.1, 0.1},         {0.45, 0.45, 0.1}};
 
   wpi::math::Trajectory trajectory =
       wpi::math::TrajectoryGenerator::GenerateTrajectory(
@@ -198,21 +200,21 @@ TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
       auto pose_offset = wpi::math::Rotation2d{offset_direction_degs};
       auto heading_offset = wpi::math::Rotation2d{offset_heading_degs};
 
-      auto initial_pose =
-          trajectory.InitialPose() +
-          wpi::math::Transform2d{wpi::math::Translation2d{pose_offset.Cos() * 1_m,
-                                                      pose_offset.Sin() * 1_m},
-                               heading_offset};
+      auto initial_pose = trajectory.InitialPose() +
+                          wpi::math::Transform2d{
+                              wpi::math::Translation2d{pose_offset.Cos() * 1_m,
+                                                       pose_offset.Sin() * 1_m},
+                              heading_offset};
 
       testFollowTrajectory(
           kinematics, estimator, trajectory,
           [&](wpi::math::Trajectory::State& state) {
             return wpi::math::ChassisSpeeds{state.velocity, 0_mps,
-                                          state.velocity * state.curvature};
+                                            state.velocity * state.curvature};
           },
           [&](wpi::math::Trajectory::State& state) { return state.pose; },
-          initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms, 100_ms,
-          250_ms, false, false);
+          initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,
+          100_ms, 250_ms, false, false);
     }
   }
 }
@@ -225,14 +227,18 @@ TEST(MecanumDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
   // pose would converge to that measurement.
   wpi::math::MecanumDriveKinematics kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
   wpi::math::MecanumDriveWheelPositions wheelPositions;
 
   wpi::math::MecanumDrivePoseEstimator estimator{
-      kinematics,      wpi::math::Rotation2d{},
-      wheelPositions,  wpi::math::Pose2d{1_m, 2_m, wpi::math::Rotation2d{270_deg}},
-      {0.1, 0.1, 0.1}, {0.45, 0.45, 0.1}};
+      kinematics,
+      wpi::math::Rotation2d{},
+      wheelPositions,
+      wpi::math::Pose2d{1_m, 2_m, wpi::math::Rotation2d{270_deg}},
+      {0.1, 0.1, 0.1},
+      {0.45, 0.45, 0.1}};
 
   estimator.UpdateWithTime(0_s, wpi::math::Rotation2d{}, wheelPositions);
 
@@ -276,7 +282,8 @@ TEST(MecanumDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
 TEST(MecanumDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
   wpi::math::MecanumDriveKinematics kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
 
   wpi::math::MecanumDrivePoseEstimator estimator{
       kinematics,
@@ -297,7 +304,7 @@ TEST(MecanumDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
   // Apply a vision measurement from 3 seconds ago
   estimator.AddVisionMeasurement(
       wpi::math::Pose2d{wpi::math::Translation2d{10_m, 10_m},
-                      wpi::math::Rotation2d{0.1_rad}},
+                        wpi::math::Rotation2d{0.1_rad}},
       1_s, {0.1, 0.1, 0.1});
 
   EXPECT_NEAR(odometryPose.X().value(),
@@ -312,7 +319,8 @@ TEST(MecanumDrivePoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
 TEST(MecanumDrivePoseEstimatorTest, TestSampleAt) {
   wpi::math::MecanumDriveKinematics kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
   wpi::math::MecanumDrivePoseEstimator estimator{
       kinematics,
       wpi::math::Rotation2d{},
@@ -336,11 +344,13 @@ TEST(MecanumDrivePoseEstimatorTest, TestSampleAt) {
   }
 
   // Sample at an added time
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(1.02_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(1.02_s));
   // Sample between updates (test interpolation)
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(1.01_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(1.01_s));
   // Sampling before the oldest value returns the oldest value
   EXPECT_EQ(std::optional(wpi::math::Pose2d{1_m, 0_m, wpi::math::Rotation2d{}}),
             estimator.SampleAt(0.5_s));
@@ -354,10 +364,12 @@ TEST(MecanumDrivePoseEstimatorTest, TestSampleAt) {
       wpi::math::Pose2d{2_m, 0_m, wpi::math::Rotation2d{1_rad}}, 2.2_s);
 
   // Make sure nothing changed (except the newest value)
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(1.02_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(1.01_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(1.02_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(1.01_s));
   EXPECT_EQ(std::optional(wpi::math::Pose2d{1_m, 0_m, wpi::math::Rotation2d{}}),
             estimator.SampleAt(0.5_s));
 
@@ -373,16 +385,19 @@ TEST(MecanumDrivePoseEstimatorTest, TestSampleAt) {
   EXPECT_EQ(
       std::optional(wpi::math::Pose2d{1.01_m, 0.1_m, wpi::math::Rotation2d{}}),
       estimator.SampleAt(1.01_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1_m, 0.1_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(0.5_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{2_m, 0.1_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(2.5_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{1_m, 0.1_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(0.5_s));
+  EXPECT_EQ(
+      std::optional(wpi::math::Pose2d{2_m, 0.1_m, wpi::math::Rotation2d{}}),
+      estimator.SampleAt(2.5_s));
 }
 
 TEST(MecanumDrivePoseEstimatorTest, TestReset) {
   wpi::math::MecanumDriveKinematics kinematics{
       wpi::math::Translation2d{1_m, 1_m}, wpi::math::Translation2d{1_m, -1_m},
-      wpi::math::Translation2d{-1_m, -1_m}, wpi::math::Translation2d{-1_m, 1_m}};
+      wpi::math::Translation2d{-1_m, -1_m},
+      wpi::math::Translation2d{-1_m, 1_m}};
   wpi::math::MecanumDrivePoseEstimator estimator{
       kinematics,
       wpi::math::Rotation2d{},

@@ -5,9 +5,8 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/controller/ElevatorFeedforward.h>
 #include <wpi/struct/Struct.h>
-
-#include "wpi/math/controller/ElevatorFeedforward.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<wpi::math::ElevatorFeedforward> {

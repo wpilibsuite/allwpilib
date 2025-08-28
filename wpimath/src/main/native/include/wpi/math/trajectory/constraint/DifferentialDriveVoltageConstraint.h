@@ -10,13 +10,13 @@
 
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
+#include <wpi/math/controller/SimpleMotorFeedforward.h>
+#include <wpi/math/kinematics/DifferentialDriveKinematics.h>
+#include <wpi/math/trajectory/constraint/TrajectoryConstraint.h>
 
 #include "units/length.h"
 #include "units/math.h"
 #include "units/voltage.h"
-#include "wpi/math/controller/SimpleMotorFeedforward.h"
-#include "wpi/math/kinematics/DifferentialDriveKinematics.h"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.h"
 
 namespace wpi::math {
 /**

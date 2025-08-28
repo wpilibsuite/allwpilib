@@ -8,8 +8,7 @@
 #include <Eigen/Core>
 #include <gtest/gtest.h>
 #include <wpi/MathExtras.h>
-
-#include "wpi/math/geometry/Rotation3d.h"
+#include <wpi/math/geometry/Rotation3d.h>
 
 using namespace wpi::math;
 

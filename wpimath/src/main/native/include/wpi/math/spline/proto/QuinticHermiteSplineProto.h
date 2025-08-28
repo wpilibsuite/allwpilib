@@ -5,10 +5,10 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/spline/QuinticHermiteSpline.h>
 #include <wpi/protobuf/Protobuf.h>
 
 #include "wpimath/protobuf/spline.npb.h"
-#include "wpi/math/spline/QuinticHermiteSpline.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Protobuf<wpi::math::QuinticHermiteSpline> {

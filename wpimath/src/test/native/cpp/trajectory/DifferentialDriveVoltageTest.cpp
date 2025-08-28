@@ -6,6 +6,10 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+#include <wpi/math/geometry/Pose2d.h>
+#include <wpi/math/kinematics/DifferentialDriveKinematics.h>
+#include <wpi/math/trajectory/TrajectoryGenerator.h>
+#include <wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.h>
 
 #include "trajectory/TestTrajectory.h"
 #include "units/acceleration.h"
@@ -13,10 +17,6 @@
 #include "units/time.h"
 #include "units/velocity.h"
 #include "units/voltage.h"
-#include "wpi/math/geometry/Pose2d.h"
-#include "wpi/math/kinematics/DifferentialDriveKinematics.h"
-#include "wpi/math/trajectory/TrajectoryGenerator.h"
-#include "wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.h"
 
 using namespace wpi::math;
 

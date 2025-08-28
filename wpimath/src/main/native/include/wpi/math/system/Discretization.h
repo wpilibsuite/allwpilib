@@ -5,9 +5,9 @@
 #pragma once
 
 #include <unsupported/Eigen/MatrixFunctions>
+#include <wpi/math/EigenCore.h>
 
 #include "units/time.h"
-#include "wpi/math/EigenCore.h"
 
 namespace wpi::math {
 

@@ -3,8 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/geometry/Pose2d.h"
+#include <wpi/math/geometry/Pose2d.h>
 
 using namespace wpi::math;
 

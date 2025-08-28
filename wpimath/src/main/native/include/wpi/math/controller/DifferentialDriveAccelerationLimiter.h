@@ -8,14 +8,14 @@
 
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
+#include <wpi/math/controller/DifferentialDriveWheelVoltages.h>
+#include <wpi/math/system/LinearSystem.h>
 
 #include "units/acceleration.h"
 #include "units/angular_acceleration.h"
 #include "units/length.h"
 #include "units/velocity.h"
 #include "units/voltage.h"
-#include "wpi/math/controller/DifferentialDriveWheelVoltages.h"
-#include "wpi/math/system/LinearSystem.h"
 
 namespace wpi::math {
 

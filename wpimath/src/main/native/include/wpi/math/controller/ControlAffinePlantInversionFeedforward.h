@@ -8,10 +8,10 @@
 #include <functional>
 
 #include <Eigen/QR>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/system/NumericalJacobian.h>
 
 #include "units/time.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/system/NumericalJacobian.h"
 
 namespace wpi::math {
 

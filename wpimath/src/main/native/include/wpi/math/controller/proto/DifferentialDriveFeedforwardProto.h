@@ -5,10 +5,10 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/controller/DifferentialDriveFeedforward.h>
 #include <wpi/protobuf/Protobuf.h>
 
 #include "pb.h"
-#include "wpi/math/controller/DifferentialDriveFeedforward.h"
 #include "wpimath/protobuf/controller.npb.h"
 
 template <>

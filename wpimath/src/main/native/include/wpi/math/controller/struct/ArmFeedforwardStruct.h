@@ -5,9 +5,8 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/controller/ArmFeedforward.h>
 #include <wpi/struct/Struct.h>
-
-#include "wpi/math/controller/ArmFeedforward.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<wpi::math::ArmFeedforward> {
@@ -18,8 +17,7 @@ struct WPILIB_DLLEXPORT wpi::Struct<wpi::math::ArmFeedforward> {
   }
 
   static math::ArmFeedforward Unpack(std::span<const uint8_t> data);
-  static void Pack(std::span<uint8_t> data,
-                   const math::ArmFeedforward& value);
+  static void Pack(std::span<uint8_t> data, const math::ArmFeedforward& value);
 };
 
 static_assert(wpi::StructSerializable<wpi::math::ArmFeedforward>);

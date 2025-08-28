@@ -7,19 +7,19 @@
 
 #include <Eigen/QR>
 #include <gtest/gtest.h>
+#include <wpi/math/EigenCore.h>
+#include <wpi/math/StateSpaceUtil.h>
+#include <wpi/math/estimator/ExtendedKalmanFilter.h>
+#include <wpi/math/system/NumericalJacobian.h>
+#include <wpi/math/system/plant/DCMotor.h>
+#include <wpi/math/trajectory/TrajectoryGenerator.h>
 
 #include "units/moment_of_inertia.h"
-#include "wpi/math/EigenCore.h"
-#include "wpi/math/StateSpaceUtil.h"
-#include "wpi/math/estimator/ExtendedKalmanFilter.h"
-#include "wpi/math/system/NumericalJacobian.h"
-#include "wpi/math/system/plant/DCMotor.h"
-#include "wpi/math/trajectory/TrajectoryGenerator.h"
 
 namespace {
 
 wpi::math::Vectord<5> Dynamics(const wpi::math::Vectord<5>& x,
-                             const wpi::math::Vectord<2>& u) {
+                               const wpi::math::Vectord<2>& u) {
   auto motors = wpi::math::DCMotor::CIM(2);
 
   // constexpr double Glow = 15.32;       // Low gear ratio
@@ -67,10 +67,10 @@ TEST(ExtendedKalmanFilterTest, Init) {
   constexpr auto dt = 0.00505_s;
 
   wpi::math::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
-                                                  LocalMeasurementModel,
-                                                  {0.5, 0.5, 10.0, 1.0, 1.0},
-                                                  {0.0001, 0.01, 0.01},
-                                                  dt};
+                                                    LocalMeasurementModel,
+                                                    {0.5, 0.5, 10.0, 1.0, 1.0},
+                                                    {0.0001, 0.01, 0.01},
+                                                    dt};
   wpi::math::Vectord<2> u{12.0, 12.0};
   observer.Predict(u, dt);
 
@@ -87,10 +87,10 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
 
   wpi::math::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
-                                                  LocalMeasurementModel,
-                                                  {0.5, 0.5, 10.0, 1.0, 1.0},
-                                                  {0.0001, 0.5, 0.5},
-                                                  dt};
+                                                    LocalMeasurementModel,
+                                                    {0.5, 0.5, 10.0, 1.0, 1.0},
+                                                    {0.0001, 0.5, 0.5},
+                                                    dt};
 
   auto waypoints = std::vector<wpi::math::Pose2d>{
       wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
@@ -122,8 +122,8 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
         ref.pose.Rotation().Radians().value(), vl.value(), vr.value()};
 
     auto localY = LocalMeasurementModel(nextR, wpi::math::Vectord<2>::Zero());
-    observer.Correct(u,
-                     localY + wpi::math::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
+    observer.Correct(
+        u, localY + wpi::math::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
     wpi::math::Vectord<5> rdot = (nextR - r) / dt.value();
     u = B.householderQr().solve(rdot -

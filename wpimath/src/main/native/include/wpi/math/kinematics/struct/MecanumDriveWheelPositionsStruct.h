@@ -5,9 +5,8 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/math/kinematics/MecanumDriveWheelPositions.h>
 #include <wpi/struct/Struct.h>
-
-#include "wpi/math/kinematics/MecanumDriveWheelPositions.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::Struct<wpi::math::MecanumDriveWheelPositions> {
