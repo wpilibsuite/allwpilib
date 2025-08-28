@@ -15,7 +15,11 @@ if(WITH_JAVA)
     set_property(TARGET wpiannotations_jar PROPERTY FOLDER "java")
 
     install_jar(wpiannotations_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(TARGETS wpiannotations_jar FILE wpiannotations.cmake DESTINATION share/wpiannotations)
+    install_jar_exports(
+        TARGETS wpiannotations_jar
+        FILE wpiannotations.cmake
+        DESTINATION share/wpiannotations
+    )
     install(FILES wpiannotations-config.cmake DESTINATION share/wpiannotations)
 endif()
 
@@ -26,7 +30,6 @@ if(WITH_JAVA_SOURCE)
         wpiannotations_src_jar
         BASE_DIRECTORIES
             ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/java
         OUTPUT_NAME wpiannotations-sources
     )
     set_property(TARGET wpiannotations_src_jar PROPERTY FOLDER "java")
