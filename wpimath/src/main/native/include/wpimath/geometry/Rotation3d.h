@@ -13,13 +13,13 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
+#include "units/angle.h"
+#include "units/math.h"
+#include "wpimath/MathShared.h"
 #include "wpimath/ct_matrix.h"
 #include "wpimath/fmt/Eigen.h"
 #include "wpimath/geometry/Quaternion.h"
 #include "wpimath/geometry/Rotation2d.h"
-#include "units/angle.h"
-#include "units/math.h"
-#include "wpimath/MathShared.h"
 
 namespace wpimath {
 

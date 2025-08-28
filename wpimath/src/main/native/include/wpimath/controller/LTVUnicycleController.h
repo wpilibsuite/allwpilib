@@ -8,14 +8,14 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "wpimath/StateSpaceUtil.h"
-#include "wpimath/geometry/Pose2d.h"
-#include "wpimath/kinematics/ChassisSpeeds.h"
-#include "wpimath/trajectory/Trajectory.h"
 #include "units/angular_velocity.h"
 #include "units/math.h"
 #include "units/time.h"
 #include "units/velocity.h"
+#include "wpimath/StateSpaceUtil.h"
+#include "wpimath/geometry/Pose2d.h"
+#include "wpimath/kinematics/ChassisSpeeds.h"
+#include "wpimath/trajectory/Trajectory.h"
 
 namespace wpimath {
 

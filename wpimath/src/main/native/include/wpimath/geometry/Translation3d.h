@@ -12,11 +12,11 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
-#include "wpimath/geometry/Rotation3d.h"
-#include "wpimath/geometry/Translation2d.h"
 #include "units/area.h"
 #include "units/length.h"
 #include "units/math.h"
+#include "wpimath/geometry/Rotation3d.h"
+#include "wpimath/geometry/Translation2d.h"
 
 namespace wpimath {
 

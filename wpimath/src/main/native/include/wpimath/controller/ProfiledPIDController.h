@@ -13,10 +13,10 @@
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableHelper.h>
 
+#include "units/time.h"
 #include "wpimath/MathUtil.h"
 #include "wpimath/controller/PIDController.h"
 #include "wpimath/trajectory/TrapezoidProfile.h"
-#include "units/time.h"
 
 namespace wpimath {
 namespace detail {

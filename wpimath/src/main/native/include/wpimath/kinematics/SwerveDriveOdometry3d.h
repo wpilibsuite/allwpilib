@@ -15,8 +15,8 @@
 #include "SwerveDriveKinematics.h"
 #include "SwerveModulePosition.h"
 #include "SwerveModuleState.h"
-#include "wpimath/geometry/Pose2d.h"
 #include "units/time.h"
+#include "wpimath/geometry/Pose2d.h"
 
 namespace wpimath {
 

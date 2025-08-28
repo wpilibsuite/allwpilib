@@ -7,8 +7,8 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/protobuf/Protobuf.h>
 
-#include "wpimath/controller/ArmFeedforward.h"
 #include "pb.h"
+#include "wpimath/controller/ArmFeedforward.h"
 #include "wpimath/protobuf/controller.npb.h"
 
 template <>

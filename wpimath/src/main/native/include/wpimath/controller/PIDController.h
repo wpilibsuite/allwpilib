@@ -15,9 +15,9 @@
 #include <wpi/sendable/SendableHelper.h>
 #include <wpi/sendable/SendableRegistry.h>
 
-#include "wpimath/MathUtil.h"
 #include "units/time.h"
 #include "wpimath/MathShared.h"
+#include "wpimath/MathUtil.h"
 
 namespace wpimath {
 
