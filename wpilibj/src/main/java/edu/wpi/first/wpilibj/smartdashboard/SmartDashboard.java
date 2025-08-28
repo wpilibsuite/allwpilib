@@ -10,6 +10,9 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableType;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.HashMap;
@@ -496,6 +499,65 @@ public final class SmartDashboard {
    */
   public static byte[] getRaw(String key, byte[] defaultValue) {
     return getEntry(key).getRaw(defaultValue);
+  }
+
+  /**
+   * Put a value with units in the table.
+   *
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
+   */
+  public static <U extends Unit> boolean putMeasure(String key, Measure<U> value, U unit) {
+    NetworkTableEntry entry = getEntry(key);
+    if (entry.getType() != NetworkTableType.kDouble) {
+      return false;
+    }
+    String publishedUnitSymbol = entry.getTopic().getProperty("unit");
+    if ("null".equals(publishedUnitSymbol)) {
+      entry.getTopic().setProperty("unit", unit.symbol());
+    } else if (!publishedUnitSymbol.equals(unit.symbol())) {
+      return false;
+    }
+    entry.setDouble(value.in(unit));
+    return true;
+  }
+
+  /**
+   * Put a value with units in the table.
+   *
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
+   */
+  public static <U extends Unit> boolean putMeasure(String key, Measure<U> value) {
+    return putMeasure(key, value, value.baseUnit());
+  }
+
+  /**
+   * Returns the value with units the key maps to. If the key does not exist or is of different
+   * type, it will return the default value.
+   *
+   * @param key the key to look up
+   * @param defaultValue the value to be returned if no value is found
+   * @return the value associated with the given key or the given default value if there is no value
+   *     associated with the key
+   */
+  @SuppressWarnings("unchecked")
+  public static <U extends Unit> Measure<U> getMeasure(String key, Measure<U> defaultValue) {
+    NetworkTableEntry entry = getEntry(key);
+    if (entry.getType() != NetworkTableType.kDouble) {
+      return defaultValue;
+    }
+    String publishedUnitSymbol = entry.getTopic().getProperty("unit");
+    if ("null".equals(publishedUnitSymbol)) {
+      return defaultValue;
+    }
+    U unit = defaultValue.baseUnit();
+    if (!publishedUnitSymbol.equals(unit.symbol())) {
+      return defaultValue;
+    }
+    return (Measure<U>) unit.of(entry.getDouble(defaultValue.in(unit)));
   }
 
   /**
