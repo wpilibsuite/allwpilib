@@ -4,7 +4,7 @@
 
 package org.wpilib.math.filter;
 
-import org.wpilib.math.MathSharedStore;
+import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 
 /**

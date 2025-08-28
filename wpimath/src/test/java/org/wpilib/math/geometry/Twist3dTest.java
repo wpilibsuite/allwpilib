@@ -7,7 +7,7 @@ package org.wpilib.math.geometry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import org.wpilib.math.VecBuilder;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.util.Units;
 import org.junit.jupiter.api.Test;
 

@@ -11,6 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import edu.wpi.first.wpilibj.UtilityClassTest;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.linalg.DARE;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.util.Num;
 
 class DARETest extends UtilityClassTest<DARE> {
   DARETest() {
@@ -18,7 +21,7 @@ class DARETest extends UtilityClassTest<DARE> {
   }
 
   public static <R extends Num, C extends Num> void assertMatrixEqual(
-      Matrix<R, C> A, Matrix<R, C> B) {
+          Matrix<R, C> A, Matrix<R, C> B) {
     for (int i = 0; i < A.getNumRows(); i++) {
       for (int j = 0; j < A.getNumCols(); j++) {
         assertEquals(A.get(i, j), B.get(i, j), 1e-4);

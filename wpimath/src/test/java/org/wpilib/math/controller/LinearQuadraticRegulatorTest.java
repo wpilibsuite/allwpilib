@@ -6,11 +6,11 @@ package org.wpilib.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.MatBuilder;
-import org.wpilib.math.Matrix;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.Nat;
-import org.wpilib.math.Num;
-import org.wpilib.math.VecBuilder;
+import org.wpilib.math.util.Num;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.plant.DCMotor;
 import org.wpilib.math.system.plant.LinearSystemId;

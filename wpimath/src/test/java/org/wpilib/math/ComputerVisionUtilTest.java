@@ -10,6 +10,7 @@ import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.util.ComputerVisionUtil;
 import org.wpilib.math.util.Units;
 import edu.wpi.first.wpilibj.UtilityClassTest;
 import org.junit.jupiter.api.Test;

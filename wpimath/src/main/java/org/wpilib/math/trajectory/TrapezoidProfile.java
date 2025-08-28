@@ -4,7 +4,7 @@
 
 package org.wpilib.math.trajectory;
 
-import org.wpilib.math.MathSharedStore;
+import org.wpilib.math.util.MathSharedStore;
 import java.util.Objects;
 
 /**

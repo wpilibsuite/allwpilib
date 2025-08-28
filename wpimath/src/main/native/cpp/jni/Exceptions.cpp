@@ -4,7 +4,7 @@
 
 #include "Exceptions.hpp"
 
-#include <jni.hpp>
+#include <jni.h>
 
 using namespace wpi::java;
 

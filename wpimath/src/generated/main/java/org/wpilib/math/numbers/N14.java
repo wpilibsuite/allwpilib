@@ -7,7 +7,7 @@
 package org.wpilib.math.numbers;
 
 import org.wpilib.math.Nat;
-import org.wpilib.math.Num;
+import org.wpilib.math.util.Num;
 
 /** A class representing the number 14. */
 public final class N14 extends Num implements Nat<N14> {

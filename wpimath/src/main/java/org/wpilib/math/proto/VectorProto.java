@@ -5,8 +5,8 @@
 package org.wpilib.math.proto;
 
 import org.wpilib.math.Nat;
-import org.wpilib.math.Num;
-import org.wpilib.math.Vector;
+import org.wpilib.math.util.Num;
+import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.proto.Wpimath.ProtobufVector;
 import edu.wpi.first.util.protobuf.Protobuf;
 import org.ejml.simple.SimpleMatrix;

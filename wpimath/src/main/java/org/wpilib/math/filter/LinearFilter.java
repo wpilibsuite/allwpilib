@@ -4,7 +4,7 @@
 
 package org.wpilib.math.filter;
 
-import org.wpilib.math.MathSharedStore;
+import org.wpilib.math.util.MathSharedStore;
 import edu.wpi.first.util.DoubleCircularBuffer;
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;

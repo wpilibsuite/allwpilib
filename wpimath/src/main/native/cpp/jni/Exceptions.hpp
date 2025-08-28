@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/jni_util.hpp>
+#include <wpi/jni_util.h>
 
 extern wpi::java::JException illegalArgEx;
 extern wpi::java::JException ioEx;

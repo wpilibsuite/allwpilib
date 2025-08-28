@@ -6,7 +6,7 @@ package org.wpilib.math.system.struct;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.MatBuilder;
+import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.Nat;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;

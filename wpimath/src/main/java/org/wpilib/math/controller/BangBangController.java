@@ -4,7 +4,7 @@
 
 package org.wpilib.math.controller;
 
-import org.wpilib.math.MathSharedStore;
+import org.wpilib.math.util.MathSharedStore;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;

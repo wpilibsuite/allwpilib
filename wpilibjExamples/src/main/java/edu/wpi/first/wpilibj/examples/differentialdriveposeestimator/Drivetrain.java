@@ -6,8 +6,8 @@ package edu.wpi.first.wpilibj.examples.differentialdriveposeestimator;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import org.wpilib.math.ComputerVisionUtil;
-import org.wpilib.math.VecBuilder;
+import org.wpilib.math.util.ComputerVisionUtil;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.estimator.DifferentialDrivePoseEstimator;

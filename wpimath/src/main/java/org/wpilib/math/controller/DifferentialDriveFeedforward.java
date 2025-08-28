@@ -4,7 +4,7 @@
 
 package org.wpilib.math.controller;
 
-import org.wpilib.math.VecBuilder;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.controller.proto.DifferentialDriveFeedforwardProto;
 import org.wpilib.math.controller.struct.DifferentialDriveFeedforwardStruct;
 import org.wpilib.math.numbers.N2;

@@ -2,10 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.math;
+package org.wpilib.math.util;
 
+import org.wpilib.math.Nat;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.jni.StateSpaceUtilJNI;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.numbers.N4;
@@ -33,7 +36,7 @@ public final class StateSpaceUtil {
    * @return Process noise or measurement noise covariance matrix.
    */
   public static <States extends Num> Matrix<States, States> makeCovarianceMatrix(
-      Nat<States> states, Matrix<States, N1> stdDevs) {
+          Nat<States> states, Matrix<States, N1> stdDevs) {
     var result = new Matrix<>(states, states);
     for (int i = 0; i < states.getNum(); i++) {
       result.set(i, i, Math.pow(stdDevs.get(i, 0), 2));

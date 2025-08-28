@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
-import org.wpilib.math.Pair;
+import org.wpilib.math.util.Pair;
 import edu.wpi.first.wpilibj.DriverStation.POVDirection;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.event.EventLoop;

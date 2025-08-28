@@ -4,7 +4,7 @@
 
 package org.wpilib.math.interpolation;
 
-import org.wpilib.math.MathUtil;
+import org.wpilib.math.util.MathUtil;
 
 /**
  * An interpolation function that returns a value interpolated between an upper and lower bound.

@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj.drive;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.HAL;
-import org.wpilib.math.MathUtil;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.Sendable;

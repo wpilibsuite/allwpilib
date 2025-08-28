@@ -4,7 +4,7 @@
 
 package org.wpilib.math.interpolation;
 
-import org.wpilib.math.MathUtil;
+import org.wpilib.math.util.MathUtil;
 
 /**
  * An inverse interpolation function which determines where within an interpolation range an object

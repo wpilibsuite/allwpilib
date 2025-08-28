@@ -4,9 +4,9 @@
 
 package org.wpilib.math.system;
 
-import org.wpilib.math.Matrix;
-import org.wpilib.math.Num;
-import org.wpilib.math.StateSpaceUtil;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.util.Num;
+import org.wpilib.math.util.StateSpaceUtil;
 import org.wpilib.math.controller.LinearPlantInversionFeedforward;
 import org.wpilib.math.controller.LinearQuadraticRegulator;
 import org.wpilib.math.estimator.KalmanFilter;

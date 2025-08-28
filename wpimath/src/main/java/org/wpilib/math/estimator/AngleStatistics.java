@@ -4,9 +4,9 @@
 
 package org.wpilib.math.estimator;
 
-import org.wpilib.math.MathUtil;
-import org.wpilib.math.Matrix;
-import org.wpilib.math.Num;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.util.Num;
 import org.wpilib.math.numbers.N1;
 import java.util.function.BiFunction;
 import org.ejml.simple.SimpleMatrix;

@@ -4,8 +4,8 @@
 
 package org.wpilib.math.path;
 
-import org.wpilib.math.Num;
-import org.wpilib.math.Vector;
+import org.wpilib.math.util.Num;
+import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.optimization.SimulatedAnnealing;
 import java.util.Arrays;

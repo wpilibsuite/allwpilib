@@ -10,12 +10,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 import edu.wpi.first.wpilibj.UtilityClassTest;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.util.StateSpaceUtil;
 
 class StateSpaceUtilTest extends UtilityClassTest<StateSpaceUtil> {
   StateSpaceUtilTest() {

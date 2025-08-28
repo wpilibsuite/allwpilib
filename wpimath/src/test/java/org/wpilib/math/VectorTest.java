@@ -7,6 +7,8 @@ package org.wpilib.math;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.linalg.Vector;
 
 class VectorTest {
   @Test

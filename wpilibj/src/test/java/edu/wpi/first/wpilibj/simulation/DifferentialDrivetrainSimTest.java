@@ -7,10 +7,10 @@ package edu.wpi.first.wpilibj.simulation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.math.Matrix;
+import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.Nat;
-import org.wpilib.math.VecBuilder;
-import org.wpilib.math.Vector;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.controller.LTVUnicycleController;
 import org.wpilib.math.controller.LinearPlantInversionFeedforward;
 import org.wpilib.math.geometry.Pose2d;

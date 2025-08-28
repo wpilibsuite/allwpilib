@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.differentialdriveposeestimator;
 
-import org.wpilib.math.StateSpaceUtil;
-import org.wpilib.math.VecBuilder;
+import org.wpilib.math.util.StateSpaceUtil;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.util.Units;

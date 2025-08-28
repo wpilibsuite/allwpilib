@@ -5,13 +5,13 @@
 #include <stdexcept>
 #include <string>
 
-#include <jni.hpp>
-#include <wpi/jni_util.hpp>
+#include <jni.h>
+#include <wpi/jni_util.h>
 #include <wpi/math/DARE.hpp>
 #include <wpi/math/fmt/Eigen.hpp>
 
 #include "Exceptions.hpp"
-#include "edu_wpi_first_math_jni_DAREJNI.hpp"
+#include "org_wpilib_math_jni_DAREJNI.h"
 
 using namespace wpi::java;
 

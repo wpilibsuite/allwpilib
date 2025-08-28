@@ -5,8 +5,8 @@
 package org.wpilib.math.struct;
 
 import org.wpilib.math.Nat;
-import org.wpilib.math.Num;
-import org.wpilib.math.Vector;
+import org.wpilib.math.util.Num;
+import org.wpilib.math.linalg.Vector;
 import edu.wpi.first.util.struct.Struct;
 import java.nio.ByteBuffer;
 import org.ejml.simple.SimpleMatrix;

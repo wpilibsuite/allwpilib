@@ -4,9 +4,9 @@
 
 package org.wpilib.math.system;
 
-import org.wpilib.math.Matrix;
-import org.wpilib.math.Num;
-import org.wpilib.math.Pair;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.util.Num;
+import org.wpilib.math.util.Pair;
 import org.ejml.simple.SimpleMatrix;
 
 /** Discretization helper functions. */

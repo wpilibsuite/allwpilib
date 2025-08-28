@@ -4,13 +4,13 @@
 
 package org.wpilib.math.controller;
 
-import org.wpilib.math.DARE;
-import org.wpilib.math.MatBuilder;
-import org.wpilib.math.Matrix;
+import org.wpilib.math.linalg.DARE;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.Nat;
-import org.wpilib.math.StateSpaceUtil;
-import org.wpilib.math.VecBuilder;
-import org.wpilib.math.Vector;
+import org.wpilib.math.util.StateSpaceUtil;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.math.numbers.N2;

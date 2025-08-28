@@ -4,7 +4,7 @@
 
 package org.wpilib.math.filter;
 
-import org.wpilib.math.MathSharedStore;
+import org.wpilib.math.util.MathSharedStore;
 
 /**
  * A simple debounce filter for boolean streams. Requires that the boolean change value from

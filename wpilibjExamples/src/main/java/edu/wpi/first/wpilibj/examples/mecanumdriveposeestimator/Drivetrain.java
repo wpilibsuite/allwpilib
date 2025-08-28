@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.mecanumdriveposeestimator;
 
-import org.wpilib.math.VecBuilder;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.estimator.MecanumDrivePoseEstimator;

@@ -4,11 +4,11 @@
 
 package org.wpilib.math.estimator;
 
-import org.wpilib.math.DARE;
-import org.wpilib.math.Matrix;
+import org.wpilib.math.linalg.DARE;
+import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.Nat;
-import org.wpilib.math.Num;
-import org.wpilib.math.StateSpaceUtil;
+import org.wpilib.math.util.Num;
+import org.wpilib.math.util.StateSpaceUtil;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.NumericalIntegration;

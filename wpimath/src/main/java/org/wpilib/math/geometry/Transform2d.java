@@ -6,8 +6,8 @@ package org.wpilib.math.geometry;
 
 import static edu.wpi.first.units.Units.Meters;
 
-import org.wpilib.math.MatBuilder;
-import org.wpilib.math.Matrix;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.Nat;
 import org.wpilib.math.geometry.proto.Transform2dProto;
 import org.wpilib.math.geometry.struct.Transform2dStruct;

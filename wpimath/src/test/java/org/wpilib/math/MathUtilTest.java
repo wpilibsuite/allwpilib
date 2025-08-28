@@ -12,6 +12,7 @@ import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.UtilityClassTest;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.util.MathUtil;
 
 class MathUtilTest extends UtilityClassTest<MathUtil> {
   MathUtilTest() {

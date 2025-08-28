@@ -4,9 +4,9 @@
 
 package org.wpilib.math.system.struct;
 
-import org.wpilib.math.Matrix;
+import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.Nat;
-import org.wpilib.math.Num;
+import org.wpilib.math.util.Num;
 import org.wpilib.math.struct.MatrixStruct;
 import org.wpilib.math.system.LinearSystem;
 import edu.wpi.first.util.struct.Struct;

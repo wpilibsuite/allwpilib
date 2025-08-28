@@ -7,8 +7,8 @@ package org.wpilib.math.struct;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.wpilib.math.Nat;
-import org.wpilib.math.VecBuilder;
-import org.wpilib.math.Vector;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N2;
 import edu.wpi.first.wpilibj.StructTestBase;
 

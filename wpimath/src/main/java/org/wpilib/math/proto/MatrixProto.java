@@ -4,10 +4,10 @@
 
 package org.wpilib.math.proto;
 
-import org.wpilib.math.MatBuilder;
-import org.wpilib.math.Matrix;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.Nat;
-import org.wpilib.math.Num;
+import org.wpilib.math.util.Num;
 import org.wpilib.math.proto.Wpimath.ProtobufMatrix;
 import edu.wpi.first.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;

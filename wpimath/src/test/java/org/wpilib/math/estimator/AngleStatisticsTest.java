@@ -6,10 +6,10 @@ package org.wpilib.math.estimator;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.math.MatBuilder;
-import org.wpilib.math.Matrix;
+import org.wpilib.math.linalg.MatBuilder;
+import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.Nat;
-import org.wpilib.math.VecBuilder;
+import org.wpilib.math.linalg.VecBuilder;
 import org.junit.jupiter.api.Test;
 
 class AngleStatisticsTest {

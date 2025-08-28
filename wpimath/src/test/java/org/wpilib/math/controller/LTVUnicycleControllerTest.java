@@ -7,8 +7,8 @@ package org.wpilib.math.controller;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.wpilib.math.MathUtil;
-import org.wpilib.math.VecBuilder;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Twist2d;

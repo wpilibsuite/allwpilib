@@ -7,9 +7,9 @@ package org.wpilib.math.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.wpilib.math.Matrix;
+import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.Nat;
-import org.wpilib.math.VecBuilder;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.estimator.KalmanFilter;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;

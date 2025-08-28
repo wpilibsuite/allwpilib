@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.drive;
 
 import edu.wpi.first.wpilibj.MotorSafety;
-import org.wpilib.math.MathUtil;
+import org.wpilib.math.util.MathUtil;
 
 /**
  * Common base class for drive platforms.

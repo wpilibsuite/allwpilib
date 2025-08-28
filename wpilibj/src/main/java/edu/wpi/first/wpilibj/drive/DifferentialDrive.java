@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj.drive;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.HAL;
-import org.wpilib.math.MathUtil;
+import org.wpilib.math.util.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;

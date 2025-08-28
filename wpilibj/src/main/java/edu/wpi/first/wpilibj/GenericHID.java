@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DriverStationJNI;
-import org.wpilib.math.Pair;
+import org.wpilib.math.util.Pair;
 import edu.wpi.first.wpilibj.DriverStation.POVDirection;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;

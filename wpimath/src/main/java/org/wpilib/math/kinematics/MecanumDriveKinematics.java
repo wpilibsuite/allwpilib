@@ -4,7 +4,7 @@
 
 package org.wpilib.math.kinematics;
 
-import org.wpilib.math.MathSharedStore;
+import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.kinematics.proto.MecanumDriveKinematicsProto;

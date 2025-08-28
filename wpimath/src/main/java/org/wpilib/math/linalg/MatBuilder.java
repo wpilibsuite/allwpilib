@@ -2,10 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.math;
+package org.wpilib.math.linalg;
 
 import java.util.Objects;
 import org.ejml.simple.SimpleMatrix;
+import org.wpilib.math.Nat;
+import org.wpilib.math.util.Num;
 
 /** A class for constructing arbitrary RxC matrices. */
 public final class MatBuilder {
@@ -25,7 +27,7 @@ public final class MatBuilder {
    * @return The constructed matrix.
    */
   public static <R extends Num, C extends Num> Matrix<R, C> fill(
-      Nat<R> rows, Nat<C> cols, double... data) {
+          Nat<R> rows, Nat<C> cols, double... data) {
     if (Objects.requireNonNull(data).length != rows.getNum() * cols.getNum()) {
       throw new IllegalArgumentException(
           "Invalid matrix data provided. Wanted "

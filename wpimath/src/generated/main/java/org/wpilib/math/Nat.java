@@ -29,6 +29,7 @@ import org.wpilib.math.numbers.N17;
 import org.wpilib.math.numbers.N18;
 import org.wpilib.math.numbers.N19;
 import org.wpilib.math.numbers.N20;
+import org.wpilib.math.util.Num;
 // CHECKSTYLE.ON
 
 /**

@@ -5,11 +5,11 @@
 #include <Eigen/Cholesky>
 #include <Eigen/Core>
 #include <Eigen/QR>
-#include <jni.hpp>
+#include <jni.h>
 #include <unsupported/Eigen/MatrixFunctions>
-#include <wpi/jni_util.hpp>
+#include <wpi/jni_util.h>
 
-#include "edu_wpi_first_math_jni_EigenJNI.hpp"
+#include "org_wpilib_math_jni_EigenJNI.h"
 
 using namespace wpi::java;
 

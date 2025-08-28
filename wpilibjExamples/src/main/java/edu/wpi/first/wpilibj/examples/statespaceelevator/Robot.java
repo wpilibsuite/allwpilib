@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.statespaceelevator;
 
 import org.wpilib.math.Nat;
-import org.wpilib.math.VecBuilder;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.controller.LinearQuadraticRegulator;
 import org.wpilib.math.estimator.KalmanFilter;
 import org.wpilib.math.numbers.N1;

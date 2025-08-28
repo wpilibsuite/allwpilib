@@ -4,10 +4,10 @@
 
 package org.wpilib.math.estimator;
 
-import org.wpilib.math.MathSharedStore;
-import org.wpilib.math.Matrix;
+import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.Nat;
-import org.wpilib.math.VecBuilder;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;

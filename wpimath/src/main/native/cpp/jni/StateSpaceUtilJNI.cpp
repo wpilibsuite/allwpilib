@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <Eigen/Core>
-#include <jni.hpp>
-#include <wpi/jni_util.hpp>
+#include <jni.h>
+#include <wpi/jni_util.h>
 #include <wpi/math/StateSpaceUtil.hpp>
 
-#include "edu_wpi_first_math_jni_StateSpaceUtilJNI.hpp"
+#include "org_wpilib_math_jni_StateSpaceUtilJNI.h"
 
 using namespace wpi::java;
 

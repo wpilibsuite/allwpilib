@@ -4,7 +4,7 @@
 
 package org.wpilib.math.interpolation;
 
-import org.wpilib.math.MathUtil;
+import org.wpilib.math.util.MathUtil;
 import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.TreeMap;

@@ -6,7 +6,7 @@ package org.wpilib.math.geometry;
 
 import static edu.wpi.first.units.Units.Meters;
 
-import org.wpilib.math.Pair;
+import org.wpilib.math.util.Pair;
 import org.wpilib.math.geometry.proto.Ellipse2dProto;
 import org.wpilib.math.geometry.struct.Ellipse2dStruct;
 import org.wpilib.math.jni.Ellipse2dJNI;
