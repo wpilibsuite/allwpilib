@@ -6,6 +6,8 @@ package edu.wpi.first.epilogue.logging;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.util.datalog.BooleanArrayLogEntry;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
@@ -31,6 +33,7 @@ public class FileBackend implements EpilogueBackend {
   private final DataLog m_dataLog;
   private final Map<String, DataLogEntry> m_entries = new HashMap<>();
   private final Map<String, NestedBackend> m_subLoggers = new HashMap<>();
+  private final Map<String, Unit> m_units = new HashMap<>();
 
   /**
    * Creates a new file-based backend.
@@ -140,5 +143,16 @@ public class FileBackend implements EpilogueBackend {
   public <S> void log(String identifier, S[] value, Struct<S> struct) {
     m_dataLog.addSchema(struct);
     getEntry(identifier, (log, k) -> StructArrayLogEntry.create(log, k, struct)).append(value);
+  }
+
+  @Override
+  public <U extends Unit> void log(String identifier, Measure<U> value, U unit) {
+    DoubleLogEntry entry = getEntry(identifier, DoubleLogEntry::new);
+    entry.append(value.in(unit));
+    Unit cachedUnit = m_units.get(identifier);
+    if (m_units.containsKey(identifier) || !cachedUnit.equivalent(unit)) {
+      entry.setMetadata("{ \"unit\": \"" + unit.symbol() + "\" }");
+      m_units.put(identifier, unit);
+    }
   }
 }
