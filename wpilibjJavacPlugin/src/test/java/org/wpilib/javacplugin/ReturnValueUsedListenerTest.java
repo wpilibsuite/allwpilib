@@ -321,7 +321,6 @@ class ReturnValueUsedListenerTest {
 
   @Test
   void nodiscardOnVoidMethod() {
-
     String source =
         """
         package frc.robot;
