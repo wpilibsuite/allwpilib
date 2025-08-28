@@ -12,11 +12,11 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <units/length.hpp>
+#include <wpi/math/geometry/Pose2d.hpp>
+#include <wpi/math/geometry/Rotation2d.hpp>
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableHelper.h>
 
-#include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/geometry/Rotation2d.hpp"
 #include "frc/smartdashboard/FieldObject2d.h"
 
 namespace wpi::math {
@@ -62,8 +62,7 @@ class Field2d : public nt::NTSendable, public SendableHelper<Field2d> {
    * @param y Y location
    * @param rotation rotation
    */
-  void SetRobotPose(units::meter_t x, units::meter_t y,
-                    Rotation2d rotation);
+  void SetRobotPose(units::meter_t x, units::meter_t y, Rotation2d rotation);
 
   /**
    * Get the robot pose.
@@ -95,4 +94,4 @@ class Field2d : public nt::NTSendable, public SendableHelper<Field2d> {
   std::vector<std::unique_ptr<FieldObject2d>> m_objects;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

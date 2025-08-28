@@ -4,10 +4,10 @@
 
 #include <gtest/gtest.h>
 #include <wpi/MathExtras.h>
+#include <wpi/math/MathUtil.hpp>
 #include <wpi/timestamp.h>
 
 #include "frc/LEDPattern.h"
-#include "wpi/math/MathUtil.hpp"
 
 namespace frc {
 

@@ -8,10 +8,10 @@
 
 #include <units/voltage.hpp>
 #include <wpi/MathExtras.h>
+#include <wpi/math/system/NumericalIntegration.hpp>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
 
 #include "frc/RobotController.h"
-#include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
 
 using namespace frc;
 using namespace wpi::math::sim;
@@ -76,8 +76,7 @@ units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output
   units::radians_per_second_t motorVelocity{m_x(1) * m_gearing};
-  return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) *
-         sgn(m_u(0));
+  return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) * sgn(m_u(0));
 }
 
 void SingleJointedArmSim::SetInputVoltage(units::volt_t voltage) {
@@ -85,9 +84,8 @@ void SingleJointedArmSim::SetInputVoltage(units::volt_t voltage) {
   ClampInput(RobotController::GetBatteryVoltage().value());
 }
 
-wpi::math::Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
-                                        const Vectord<1>& u,
-                                        units::second_t dt) {
+wpi::math::Vectord<2> SingleJointedArmSim::UpdateX(
+    const Vectord<2>& currentXhat, const Vectord<1>& u, units::second_t dt) {
   // The torque on the arm is given by τ = F⋅r, where F is the force applied by
   // gravity and r the distance from pivot to center of mass. Recall from
   // dynamics that the sum of torques for a rigid body is τ = J⋅α, were τ is

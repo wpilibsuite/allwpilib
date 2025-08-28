@@ -6,8 +6,7 @@
 
 #include <hal/SimDevice.h>
 #include <units/angle.hpp>
-
-#include "wpi/math/geometry/Rotation2d.hpp"
+#include <wpi/math/geometry/Rotation2d.hpp>
 
 namespace frc {
 

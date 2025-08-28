@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
+
 #include <wpi/jni_util.h>
 #include <wpi/math/geometry/Pose3d.hpp>
 

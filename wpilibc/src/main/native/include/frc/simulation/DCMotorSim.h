@@ -9,10 +9,10 @@
 #include <units/angular_velocity.hpp>
 #include <units/moment_of_inertia.hpp>
 #include <units/torque.hpp>
+#include <wpi/math/system/LinearSystem.hpp>
+#include <wpi/math/system/plant/DCMotor.hpp>
 
 #include "frc/simulation/LinearSystemSim.h"
-#include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
 
 namespace frc::sim {
 /**
@@ -31,7 +31,8 @@ class DCMotorSim : public wpi::math::LinearSystemSim<2, 1, 2> {
    * gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  DCMotorSim(const wpi::math::LinearSystem<2, 1, 2>& plant, const wpi::math::DCMotor& gearbox,
+  DCMotorSim(const wpi::math::LinearSystem<2, 1, 2>& plant,
+             const wpi::math::DCMotor& gearbox,
              const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   using LinearSystemSim::SetState;

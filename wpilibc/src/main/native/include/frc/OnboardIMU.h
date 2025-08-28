@@ -3,13 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
-#include <wpi/math/geometry/Quaternion.hpp>
-#include <wpi/math/geometry/Rotation2d.hpp>
-#include <wpi/math/geometry/Rotation3d.hpp>
-
 #include <units/acceleration.hpp>
 #include <units/angle.hpp>
 #include <units/angular_velocity.hpp>
+#include <wpi/math/geometry/Quaternion.hpp>
+#include <wpi/math/geometry/Rotation2d.hpp>
+#include <wpi/math/geometry/Rotation3d.hpp>
 
 namespace frc {
 

@@ -10,10 +10,10 @@
 #include <utility>
 
 #include <hal/UsageReporting.h>
+#include <wpi/math/MathUtil.hpp>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
-#include "wpi/math/MathUtil.hpp"
 #include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;

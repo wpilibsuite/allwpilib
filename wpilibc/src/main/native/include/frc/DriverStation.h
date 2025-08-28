@@ -4,14 +4,13 @@
 
 #pragma once
 
-#include <wpi/math/geometry/Rotation2d.hpp>
-
 #include <optional>
 #include <string>
 
 #include <hal/DriverStationTypes.h>
 #include <units/time.hpp>
 #include <wpi/Synchronization.h>
+#include <wpi/math/geometry/Rotation2d.hpp>
 
 namespace wpi::log {
 class DataLog;
@@ -80,7 +79,8 @@ class DriverStation final {
    * @return The angle clockwise from straight up, or std::nullopt if the
    * POVDirection is kCenter.
    */
-  static constexpr std::optional<wpi::math::Rotation2d> GetAngle(POVDirection angle) {
+  static constexpr std::optional<wpi::math::Rotation2d> GetAngle(
+      POVDirection angle) {
     switch (angle) {
       case kCenter:
         return std::nullopt;

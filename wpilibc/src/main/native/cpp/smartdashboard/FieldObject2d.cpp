@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/math/trajectory/Trajectory.hpp"
+#include <wpi/math/trajectory/Trajectory.hpp>
 
 using namespace wpi::math;
 

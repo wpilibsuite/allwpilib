@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
+
 #include <wpi/array.h>
 #include <wpi/jni_util.h>
 #include <wpi/math/geometry/Ellipse2d.hpp>

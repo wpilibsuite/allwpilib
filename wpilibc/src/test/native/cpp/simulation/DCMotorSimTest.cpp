@@ -3,16 +3,16 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
+#include <wpi/math/controller/PIDController.hpp>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
 
 #include "frc/Encoder.h"
 #include "frc/RobotController.h"
-#include "wpi/math/controller/PIDController.hpp"
 #include "frc/motorcontrol/PWMVictorSPX.h"
 #include "frc/simulation/BatterySim.h"
 #include "frc/simulation/DCMotorSim.h"
 #include "frc/simulation/EncoderSim.h"
 #include "frc/simulation/RoboRioSim.h"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
 
 TEST(DCMotorSimTest, VoltageSteadyState) {
   wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);

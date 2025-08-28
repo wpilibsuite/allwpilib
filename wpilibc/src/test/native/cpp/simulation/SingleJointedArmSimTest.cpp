@@ -11,8 +11,8 @@
 using namespace wpi::math;
 
 TEST(SingleJointedArmTest, Disabled) {
-  sim::SingleJointedArmSim sim(DCMotor::Vex775Pro(2), 300, 3_kg_sq_m,
-                                    30_in, -180_deg, 0_deg, true, 90_deg);
+  sim::SingleJointedArmSim sim(DCMotor::Vex775Pro(2), 300, 3_kg_sq_m, 30_in,
+                               -180_deg, 0_deg, true, 90_deg);
   sim.SetState(Vectord<2>{0.0, 0.0});
 
   for (size_t i = 0; i < 12 / 0.02; ++i) {
@@ -26,8 +26,8 @@ TEST(SingleJointedArmTest, Disabled) {
 
 TEST(SingleJointedArmTest, InitialState) {
   constexpr auto startingAngle = 45_deg;
-  sim::SingleJointedArmSim sim(DCMotor::KrakenX60(2), 125, 3_kg_sq_m,
-                                    30_in, 0_deg, 90_deg, true, startingAngle);
+  sim::SingleJointedArmSim sim(DCMotor::KrakenX60(2), 125, 3_kg_sq_m, 30_in,
+                               0_deg, 90_deg, true, startingAngle);
 
   EXPECT_EQ(startingAngle, sim.GetAngle());
   EXPECT_DOUBLE_EQ(0, sim.GetVelocity().value());

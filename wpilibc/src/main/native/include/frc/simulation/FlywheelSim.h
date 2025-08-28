@@ -8,10 +8,10 @@
 #include <units/angular_velocity.hpp>
 #include <units/moment_of_inertia.hpp>
 #include <units/torque.hpp>
+#include <wpi/math/system/LinearSystem.hpp>
+#include <wpi/math/system/plant/DCMotor.hpp>
 
 #include "frc/simulation/LinearSystemSim.h"
-#include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
 
 namespace wpi::math::sim {
 /**
@@ -104,4 +104,4 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   double m_gearing;
   units::kilogram_square_meter_t m_j;
 };
-}  // namespace frc::sim
+}  // namespace wpi::math::sim

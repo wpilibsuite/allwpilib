@@ -9,7 +9,8 @@
 
 using namespace wpi::math;
 
-frc::BooleanEvent::BooleanEvent(EventLoop* loop, std::function<bool()> condition)
+frc::BooleanEvent::BooleanEvent(EventLoop* loop,
+                                std::function<bool()> condition)
     : m_loop(loop), m_signal(std::move(condition)) {
   m_state = std::make_shared<bool>(m_signal());
   m_loop->Bind(
@@ -68,9 +69,9 @@ frc::BooleanEvent frc::BooleanEvent::Falling() {
 }
 
 frc::BooleanEvent frc::BooleanEvent::Debounce(units::second_t debounceTime,
-                                    Debouncer::DebounceType type) {
-  return BooleanEvent(
-      this->m_loop,
-      [debouncer = Debouncer(debounceTime, type),
-       state = m_state]() mutable { return debouncer.Calculate(*state); });
+                                              Debouncer::DebounceType type) {
+  return BooleanEvent(this->m_loop, [debouncer = Debouncer(debounceTime, type),
+                                     state = m_state]() mutable {
+    return debouncer.Calculate(*state);
+  });
 }

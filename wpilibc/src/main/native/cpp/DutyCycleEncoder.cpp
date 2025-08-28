@@ -8,11 +8,11 @@
 #include <utility>
 
 #include <wpi/NullDeleter.h>
+#include <wpi/math/MathUtil.hpp>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/DigitalInput.h"
 #include "frc/DutyCycle.h"
-#include "wpi/math/MathUtil.hpp"
 
 using namespace frc;
 

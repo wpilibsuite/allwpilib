@@ -6,16 +6,16 @@
 #include <units/current.hpp>
 #include <units/math.hpp>
 #include <units/moment_of_inertia.hpp>
+#include <wpi/math/controller/LTVUnicycleController.hpp>
+#include <wpi/math/controller/LinearPlantInversionFeedforward.hpp>
+#include <wpi/math/kinematics/DifferentialDriveKinematics.hpp>
+#include <wpi/math/system/NumericalIntegration.hpp>
+#include <wpi/math/system/plant/DCMotor.hpp>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
+#include <wpi/math/trajectory/TrajectoryGenerator.hpp>
+#include <wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp>
 
-#include "wpi/math/controller/LTVUnicycleController.hpp"
-#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
-#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "frc/simulation/DifferentialDrivetrainSim.h"
-#include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/system/plant/DCMotor.hpp"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
-#include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
 
 using namespace wpi::math;
 
@@ -49,19 +49,17 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
     auto feedbackOut = feedback.Calculate(sim.GetPose(), state);
 
     auto [l, r] = kinematics.ToWheelSpeeds(feedbackOut);
-    auto voltages =
-        feedforward.Calculate(Vectord<2>{l.value(), r.value()});
+    auto voltages = feedforward.Calculate(Vectord<2>{l.value(), r.value()});
 
     // Sim periodic code.
     sim.SetInputs(units::volt_t{voltages(0, 0)}, units::volt_t{voltages(1, 0)});
     sim.Update(20_ms);
 
     // Update ground truth.
-    groundTruthX = RKDP(
-        [&sim](const auto& x, const auto& u) -> Vectord<7> {
-          return sim.Dynamics(x, u);
-        },
-        groundTruthX, voltages, 20_ms);
+    groundTruthX =
+        RKDP([&sim](const auto& x,
+                    const auto& u) -> Vectord<7> { return sim.Dynamics(x, u); },
+             groundTruthX, voltages, 20_ms);
   }
 
   // 2 inch tolerance is OK since our ground truth is an approximation of the
@@ -100,8 +98,8 @@ TEST(DifferentialDrivetrainSimTest, Current) {
 
 TEST(DifferentialDrivetrainSimTest, ModelStability) {
   auto motor = DCMotor::NEO(2);
-  auto plant = LinearSystemId::DrivetrainVelocitySystem(
-      motor, 50_kg, 2_in, 12_in, 2_kg_sq_m, 5.0);
+  auto plant = LinearSystemId::DrivetrainVelocitySystem(motor, 50_kg, 2_in,
+                                                        12_in, 2_kg_sq_m, 5.0);
 
   DifferentialDriveKinematics kinematics{24_in};
   sim::DifferentialDrivetrainSim sim{plant, 24_in, motor, 1.0, 2_in};

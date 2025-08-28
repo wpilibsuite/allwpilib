@@ -9,9 +9,9 @@
 
 #include <frc/event/BooleanEvent.h>
 #include <frc/event/EventLoop.h>
-#include <wpi/math/filter/Debouncer.hpp>
 #include <units/time.hpp>
 #include <wpi/FunctionExtras.h>
+#include <wpi/math/filter/Debouncer.hpp>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandScheduler.h"

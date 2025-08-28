@@ -10,9 +10,9 @@
 #include <units/length.hpp>
 #include <units/mass.hpp>
 #include <units/moment_of_inertia.hpp>
+#include <wpi/math/system/plant/DCMotor.hpp>
 
 #include "frc/simulation/LinearSystemSim.h"
-#include "wpi/math/system/plant/DCMotor.hpp"
 
 namespace wpi::math::sim {
 /**
@@ -168,4 +168,4 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
   double m_gearing;
   bool m_simulateGravity;
 };
-}  // namespace frc::sim
+}  // namespace wpi::math::sim

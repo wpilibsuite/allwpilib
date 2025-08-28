@@ -5,11 +5,12 @@
 #include <gtest/gtest.h>
 #include <units/angular_acceleration.hpp>
 #include <units/angular_velocity.hpp>
+#include <wpi/math/controller/PIDController.hpp>
+#include <wpi/math/controller/SimpleMotorFeedforward.hpp>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
 
 #include "frc/Encoder.h"
 #include "frc/RobotController.h"
-#include "wpi/math/controller/PIDController.hpp"
-#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "frc/motorcontrol/PWMVictorSPX.h"
 #include "frc/simulation/BatterySim.h"
 #include "frc/simulation/DifferentialDrivetrainSim.h"
@@ -19,7 +20,6 @@
 #include "frc/simulation/LinearSystemSim.h"
 #include "frc/simulation/PWMSim.h"
 #include "frc/simulation/RoboRioSim.h"
-#include "wpi/math/system/plant/LinearSystemId.hpp"
 
 TEST(StateSpaceSimTest, FlywheelSim) {
   const wpi::math::LinearSystem<1, 1, 1> plant =
@@ -45,8 +45,8 @@ TEST(StateSpaceSimTest, FlywheelSim) {
     // Then, SimulationPeriodic runs
     frc::sim::RoboRioSim::SetVInVoltage(
         frc::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
-    sim.SetInput(
-        wpi::math::Vectord<1>{motor.Get() * frc::RobotController::GetInputVoltage()});
+    sim.SetInput(wpi::math::Vectord<1>{
+        motor.Get() * frc::RobotController::GetInputVoltage()});
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }

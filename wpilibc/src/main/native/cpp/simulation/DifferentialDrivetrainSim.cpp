@@ -4,15 +4,14 @@
 
 #include "frc/simulation/DifferentialDrivetrainSim.h"
 
-#include <wpi/math/system/plant/LinearSystemId.hpp>
-
 #include <utility>
 
 #include <wpi/MathExtras.h>
+#include <wpi/math/StateSpaceUtil.hpp>
+#include <wpi/math/system/NumericalIntegration.hpp>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
 
 #include "frc/RobotController.h"
-#include "wpi/math/StateSpaceUtil.hpp"
-#include "wpi/math/system/NumericalIntegration.hpp"
 
 using namespace frc;
 using namespace wpi::math;
@@ -45,8 +44,7 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
 
 Eigen::Vector2d DifferentialDrivetrainSim::ClampInput(
     const Eigen::Vector2d& u) {
-  return DesaturateInputVector<2>(u,
-                                       RobotController::GetInputVoltage());
+  return DesaturateInputVector<2>(u, RobotController::GetInputVoltage());
 }
 
 void DifferentialDrivetrainSim::SetInputs(units::volt_t leftVoltage,

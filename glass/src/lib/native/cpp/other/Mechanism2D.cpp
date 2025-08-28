@@ -14,7 +14,6 @@
 #include <vector>
 
 #include <frc/geometry/Pose2d.h>
-#include <wpi/math/geometry/Rotation2d.hpp>
 #include <frc/geometry/Transform2d.h>
 #include <frc/geometry/Translation2d.h>
 #include <imgui.h>
@@ -23,6 +22,7 @@
 #include <portable-file-dialogs.h>
 #include <units/angle.hpp>
 #include <units/length.hpp>
+#include <wpi/math/geometry/Rotation2d.hpp>
 #include <wpi/print.h>
 #include <wpigui.h>
 

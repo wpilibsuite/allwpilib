@@ -8,10 +8,10 @@
 
 #include <hal/UsageReporting.h>
 #include <wpi/NullDeleter.h>
+#include <wpi/math/MathUtil.hpp>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/AnalogInput.h"
-#include "wpi/math/MathUtil.hpp"
 #include "frc/RobotController.h"
 
 using namespace frc;

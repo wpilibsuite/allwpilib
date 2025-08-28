@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <wpi/math/geometry/Rotation2d.hpp>
 #include <frc/geometry/Translation2d.h>
 #include <imgui.h>
 #include <wpi/function_ref.h>
+#include <wpi/math/geometry/Rotation2d.hpp>
 
 #include "glass/Model.h"
 #include "glass/View.h"

@@ -15,7 +15,6 @@
 
 #include <fields/fields.h>
 #include <frc/geometry/Pose2d.h>
-#include <wpi/math/geometry/Rotation2d.hpp>
 #include <frc/geometry/Translation2d.h>
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -29,6 +28,7 @@
 #include <wpi/StringMap.h>
 #include <wpi/fs.h>
 #include <wpi/json.h>
+#include <wpi/math/geometry/Rotation2d.hpp>
 #include <wpi/print.h>
 #include <wpigui.h>
 

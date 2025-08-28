@@ -10,11 +10,11 @@
 
 #include <units/angle.hpp>
 #include <wpi/deprecated.h>
+#include <wpi/math/geometry/Rotation2d.hpp>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/drive/RobotDriveBase.h"
-#include "wpi/math/geometry/Rotation2d.hpp"
 
 namespace frc {
 
@@ -140,7 +140,8 @@ class MecanumDrive : public RobotDriveBase,
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
    *                  Counterclockwise is positive.
    */
-  void DrivePolar(double magnitude, wpi::math::Rotation2d angle, double zRotation);
+  void DrivePolar(double magnitude, wpi::math::Rotation2d angle,
+                  double zRotation);
 
   /**
    * Cartesian inverse kinematics for Mecanum platform.

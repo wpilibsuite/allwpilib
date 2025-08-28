@@ -4,13 +4,12 @@
 
 #pragma once
 
-#include <wpi/math/filter/Debouncer.hpp>
-
 #include <functional>
 #include <memory>
 
 #include <units/time.hpp>
 #include <wpi/FunctionExtras.h>
+#include <wpi/math/filter/Debouncer.hpp>
 
 #include "EventLoop.h"
 

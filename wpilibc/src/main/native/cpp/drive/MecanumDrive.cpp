@@ -9,11 +9,11 @@
 #include <utility>
 
 #include <hal/UsageReporting.h>
+#include <wpi/math/MathUtil.hpp>
+#include <wpi/math/geometry/Translation2d.hpp>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
-#include "wpi/math/MathUtil.hpp"
-#include "wpi/math/geometry/Translation2d.hpp"
 #include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;
@@ -101,16 +101,17 @@ void MecanumDrive::StopMotor() {
   Feed();
 }
 
-MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(double xSpeed,
-                                                         double ySpeed,
-                                                         double zRotation,
+MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(
+    double xSpeed, double ySpeed, double zRotation,
     wpi::math::Rotation2d gyroAngle) {
   xSpeed = std::clamp(xSpeed, -1.0, 1.0);
   ySpeed = std::clamp(ySpeed, -1.0, 1.0);
 
   // Compensate for gyro angle.
-  auto input = wpi::math::Translation2d{units::meter_t{xSpeed}, units::meter_t{ySpeed}}.RotateBy(
-          -gyroAngle);
+  auto input = wpi::math::Translation2d{
+      units::meter_t{xSpeed},
+      units::meter_t{
+          ySpeed}}.RotateBy(-gyroAngle);
 
   double wheelSpeeds[4];
   wheelSpeeds[kFrontLeft] = input.X().value() + input.Y().value() + zRotation;

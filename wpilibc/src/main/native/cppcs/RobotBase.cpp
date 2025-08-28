@@ -18,9 +18,9 @@
 #include <hal/UsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/math/MathShared.hpp>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
-#include <wpi/math/MathShared.hpp>
 
 #include "WPILibVersion.h"
 #include "frc/DriverStation.h"

@@ -8,10 +8,9 @@
 
 #include <units/current.hpp>
 #include <units/time.hpp>
-
-#include "wpi/math/EigenCore.hpp"
-#include "wpi/math/StateSpaceUtil.hpp"
-#include "wpi/math/system/LinearSystem.hpp"
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/StateSpaceUtil.hpp>
+#include <wpi/math/system/LinearSystem.hpp>
 
 namespace wpi::math {
 /**
@@ -164,4 +163,4 @@ class LinearSystemSim {
   /// measurements.
   std::array<double, Outputs> m_measurementStdDevs;
 };
-}  // namespace frc::sim
+}  // namespace wpi::math

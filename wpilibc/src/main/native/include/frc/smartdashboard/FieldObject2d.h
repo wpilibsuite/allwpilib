@@ -13,10 +13,9 @@
 #include <networktables/DoubleArrayTopic.h>
 #include <units/length.hpp>
 #include <wpi/SmallVector.h>
+#include <wpi/math/geometry/Pose2d.hpp>
+#include <wpi/math/geometry/Rotation2d.hpp>
 #include <wpi/mutex.h>
-
-#include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/geometry/Rotation2d.hpp"
 
 namespace wpi::math {
 
@@ -50,8 +49,7 @@ class FieldObject2d {
    * @param y Y location
    * @param rotation rotation
    */
-  void SetPose(units::meter_t x, units::meter_t y,
-               Rotation2d rotation);
+  void SetPose(units::meter_t x, units::meter_t y, Rotation2d rotation);
 
   /**
    * Get the pose.
@@ -108,4 +106,4 @@ class FieldObject2d {
   mutable SmallVector<Pose2d, 1> m_poses;
 };
 
-}  // namespace frc
+}  // namespace wpi::math

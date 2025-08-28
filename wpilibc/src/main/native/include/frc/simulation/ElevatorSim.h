@@ -9,9 +9,9 @@
 #include <units/length.hpp>
 #include <units/mass.hpp>
 #include <units/velocity.hpp>
+#include <wpi/math/system/plant/DCMotor.hpp>
 
 #include "frc/simulation/LinearSystemSim.h"
-#include "wpi/math/system/plant/DCMotor.hpp"
 
 namespace wpi::math::sim {
 /**
@@ -176,4 +176,4 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
   units::meter_t m_maxHeight;
   bool m_simulateGravity;
 };
-}  // namespace frc::sim
+}  // namespace wpi::math::sim

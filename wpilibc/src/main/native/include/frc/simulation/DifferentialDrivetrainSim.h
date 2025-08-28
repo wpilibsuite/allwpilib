@@ -4,15 +4,14 @@
 
 #pragma once
 
-#include <wpi/math/EigenCore.hpp>
-#include <wpi/math/kinematics/DifferentialDriveKinematics.hpp>
-#include <wpi/math/system/LinearSystem.hpp>
-#include <wpi/math/system/plant/DCMotor.hpp>
-
 #include <units/length.hpp>
 #include <units/moment_of_inertia.hpp>
 #include <units/time.hpp>
 #include <units/voltage.hpp>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/kinematics/DifferentialDriveKinematics.hpp>
+#include <wpi/math/system/LinearSystem.hpp>
+#include <wpi/math/system/plant/DCMotor.hpp>
 
 namespace wpi::math::sim {
 
@@ -239,16 +238,13 @@ class DifferentialDrivetrainSim {
     /// Two CIM motors per drive side.
     static constexpr DCMotor DualCIMPerSide = DCMotor::CIM(2);
     /// One Mini CIM motor per drive side.
-    static constexpr DCMotor SingleMiniCIMPerSide =
-        DCMotor::MiniCIM(1);
+    static constexpr DCMotor SingleMiniCIMPerSide = DCMotor::MiniCIM(1);
     /// Two Mini CIM motors per drive side.
     static constexpr DCMotor DualMiniCIMPerSide = DCMotor::MiniCIM(2);
     /// One Falcon 500 motor per drive side.
-    static constexpr DCMotor SingleFalcon500PerSide =
-        DCMotor::Falcon500(1);
+    static constexpr DCMotor SingleFalcon500PerSide = DCMotor::Falcon500(1);
     /// Two Falcon 500 motors per drive side.
-    static constexpr DCMotor DualFalcon500PerSide =
-        DCMotor::Falcon500(2);
+    static constexpr DCMotor DualFalcon500PerSide = DCMotor::Falcon500(2);
     /// One NEO motor per drive side.
     static constexpr DCMotor SingleNEOPerSide = DCMotor::NEO(1);
     /// Two NEO motors per drive side.
