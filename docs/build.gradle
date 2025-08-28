@@ -9,6 +9,7 @@ evaluationDependsOn(':cscore')
 evaluationDependsOn(':epilogue-runtime')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
+evaluationDependsOn(':wpiannotations')
 evaluationDependsOn(':wpilibNewCommands')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
@@ -221,6 +222,7 @@ task generateJavaDocs(type: Javadoc) {
     source project(':epilogue-runtime').sourceSets.main.java
     source project(':hal').sourceSets.main.java
     source project(':ntcore').sourceSets.main.java
+    source project(':wpiannotations').sourceSets.main.java
     source project(':wpilibNewCommands').sourceSets.main.java
     source project(':wpilibj').sourceSets.main.java
     source project(':wpimath').sourceSets.main.java
