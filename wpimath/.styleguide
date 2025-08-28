@@ -14,8 +14,8 @@ modifiableFileExclude {
 }
 
 generatedFileExclude {
-  src/main/native/include/units/base\.h$
-  src/main/native/include/units/units\.h$
+  src/main/native/include/units/base\.hpp$
+  src/main/native/include/units/units\.hpp$
   src/main/native/include/unsupported/
   src/main/native/thirdparty/
   src/test/native/cpp/UnitsTest\.cpp$
