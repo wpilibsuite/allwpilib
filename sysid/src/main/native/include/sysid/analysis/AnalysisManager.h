@@ -13,7 +13,7 @@
 #include <string_view>
 #include <vector>
 
-#include <units/time.h>
+#include <units/time.hpp>
 #include <wpi/Logger.h>
 #include <wpi/StringMap.h>
 #include <wpi/json.h>

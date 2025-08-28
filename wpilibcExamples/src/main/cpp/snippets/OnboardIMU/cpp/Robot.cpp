@@ -4,9 +4,9 @@
 
 #include <frc/OnboardIMU.h>
 #include <frc/TimedRobot.h>
-#include <frc/geometry/Rotation2d.h>
-#include <units/acceleration.h>
-#include <units/angle.h>
+#include <wpi/math/geometry/Rotation2d.hpp>
+#include <units/acceleration.hpp>
+#include <units/angle.hpp>
 
 /**
  * Onboard IMU snippets for frc-docs.

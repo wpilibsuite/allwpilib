@@ -12,8 +12,8 @@
 #include <frc/simulation/SimHooks.h>
 #include <gtest/gtest.h>
 #include <hal/simulation/MockHooks.h>
-#include <units/length.h>
-#include <units/time.h>
+#include <units/length.hpp>
+#include <units/time.hpp>
 
 #include "Constants.h"
 #include "Robot.h"

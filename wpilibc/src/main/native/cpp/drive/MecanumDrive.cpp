@@ -12,8 +12,8 @@
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
-#include "frc/MathUtil.h"
-#include "frc/geometry/Translation2d.h"
+#include "wpi/math/MathUtil.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;
@@ -50,14 +50,15 @@ MecanumDrive::MecanumDrive(std::function<void(double)> frontLeftMotor,
 }
 
 void MecanumDrive::DriveCartesian(double xSpeed, double ySpeed,
-                                  double zRotation, Rotation2d gyroAngle) {
+                                  double zRotation,
+                                  wpi::math::Rotation2d gyroAngle) {
   if (!reported) {
     HAL_ReportUsage("RobotDrive", "MecanumCartesian");
     reported = true;
   }
 
-  xSpeed = ApplyDeadband(xSpeed, m_deadband);
-  ySpeed = ApplyDeadband(ySpeed, m_deadband);
+  xSpeed = wpi::math::ApplyDeadband(xSpeed, m_deadband);
+  ySpeed = wpi::math::ApplyDeadband(ySpeed, m_deadband);
 
   auto [frontLeft, frontRight, rearLeft, rearRight] =
       DriveCartesianIK(xSpeed, ySpeed, zRotation, gyroAngle);
@@ -75,7 +76,7 @@ void MecanumDrive::DriveCartesian(double xSpeed, double ySpeed,
   Feed();
 }
 
-void MecanumDrive::DrivePolar(double magnitude, Rotation2d angle,
+void MecanumDrive::DrivePolar(double magnitude, wpi::math::Rotation2d angle,
                               double zRotation) {
   if (!reported) {
     HAL_ReportUsage("RobotDrive", "MecanumPolar");
@@ -103,13 +104,12 @@ void MecanumDrive::StopMotor() {
 MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(double xSpeed,
                                                          double ySpeed,
                                                          double zRotation,
-                                                         Rotation2d gyroAngle) {
+    wpi::math::Rotation2d gyroAngle) {
   xSpeed = std::clamp(xSpeed, -1.0, 1.0);
   ySpeed = std::clamp(ySpeed, -1.0, 1.0);
 
   // Compensate for gyro angle.
-  auto input =
-      Translation2d{units::meter_t{xSpeed}, units::meter_t{ySpeed}}.RotateBy(
+  auto input = wpi::math::Translation2d{units::meter_t{xSpeed}, units::meter_t{ySpeed}}.RotateBy(
           -gyroAngle);
 
   double wheelSpeeds[4];

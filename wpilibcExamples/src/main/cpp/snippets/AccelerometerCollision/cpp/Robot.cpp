@@ -5,7 +5,7 @@
 #include <frc/OnboardIMU.h>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <units/acceleration.h>
+#include <units/acceleration.hpp>
 
 /**
  * Collision detection snippets for frc-docs.

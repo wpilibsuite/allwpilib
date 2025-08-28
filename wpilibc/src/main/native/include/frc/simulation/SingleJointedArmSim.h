@@ -6,15 +6,15 @@
 
 #include <array>
 
-#include <units/angle.h>
-#include <units/length.h>
-#include <units/mass.h>
-#include <units/moment_of_inertia.h>
+#include <units/angle.hpp>
+#include <units/length.hpp>
+#include <units/mass.hpp>
+#include <units/moment_of_inertia.hpp>
 
 #include "frc/simulation/LinearSystemSim.h"
-#include "frc/system/plant/DCMotor.h"
+#include "wpi/math/system/plant/DCMotor.hpp"
 
-namespace frc::sim {
+namespace wpi::math::sim {
 /**
  * Represents a simulated arm mechanism.
  */

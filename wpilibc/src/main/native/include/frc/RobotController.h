@@ -9,8 +9,8 @@
 #include <functional>
 #include <string>
 
-#include <units/temperature.h>
-#include <units/voltage.h>
+#include <units/temperature.hpp>
+#include <units/voltage.hpp>
 
 namespace frc {
 

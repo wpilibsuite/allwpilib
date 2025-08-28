@@ -10,7 +10,7 @@
 #include <hal/AddressableLED.h>
 #include <hal/AddressableLEDTypes.h>
 #include <hal/Types.h>
-#include <units/time.h>
+#include <units/time.hpp>
 
 #include "util/Color.h"
 #include "util/Color8Bit.h"

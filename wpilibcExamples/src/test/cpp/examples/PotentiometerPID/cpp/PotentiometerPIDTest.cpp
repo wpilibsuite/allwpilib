@@ -15,9 +15,9 @@
 #include <frc/system/plant/DCMotor.h>
 #include <gtest/gtest.h>
 #include <hal/simulation/MockHooks.h>
-#include <units/length.h>
-#include <units/mass.h>
-#include <units/time.h>
+#include <units/length.hpp>
+#include <units/mass.hpp>
+#include <units/time.hpp>
 
 #include "Robot.h"
 

@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <frc/filter/Debouncer.h>
+#include <wpi/math/filter/Debouncer.hpp>
 
 #include <functional>
 #include <memory>
 
-#include <units/time.h>
+#include <units/time.hpp>
 #include <wpi/FunctionExtras.h>
 
 #include "EventLoop.h"
@@ -125,8 +125,8 @@ class BooleanEvent {
    * @return The debounced event.
    */
   BooleanEvent Debounce(units::second_t debounceTime,
-                        frc::Debouncer::DebounceType type =
-                            frc::Debouncer::DebounceType::kRising);
+                        wpi::math::Debouncer::DebounceType type =
+                            wpi::math::Debouncer::DebounceType::kRising);
 
  private:
   /// Poller loop.

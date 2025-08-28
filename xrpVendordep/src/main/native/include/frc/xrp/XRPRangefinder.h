@@ -6,7 +6,7 @@
 
 #include <frc/AnalogInput.h>
 
-#include <units/length.h>
+#include <units/length.hpp>
 
 namespace frc {
 

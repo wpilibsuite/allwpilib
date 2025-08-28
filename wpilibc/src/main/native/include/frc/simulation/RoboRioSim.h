@@ -7,9 +7,9 @@
 #include <memory>
 #include <string>
 
-#include <units/current.h>
-#include <units/temperature.h>
-#include <units/voltage.h>
+#include <units/current.hpp>
+#include <units/temperature.hpp>
+#include <units/voltage.hpp>
 
 #include "frc/RobotController.h"
 #include "frc/simulation/CallbackStore.h"

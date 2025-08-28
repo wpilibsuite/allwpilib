@@ -8,10 +8,10 @@
 #include <span>
 #include <utility>
 
-#include <units/frequency.h>
-#include <units/length.h>
-#include <units/time.h>
-#include <units/velocity.h>
+#include <units/frequency.hpp>
+#include <units/length.hpp>
+#include <units/time.hpp>
+#include <units/velocity.hpp>
 
 #include "frc/AddressableLED.h"
 #include "util/Color.h"

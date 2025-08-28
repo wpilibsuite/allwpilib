@@ -6,7 +6,7 @@
 
 #include <functional>
 
-#include <units/time.h>
+#include <units/time.hpp>
 
 #include "frc/TimedRobot.h"
 

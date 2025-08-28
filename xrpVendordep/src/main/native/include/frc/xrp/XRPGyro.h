@@ -7,8 +7,8 @@
 #include <frc/geometry/Rotation2d.h>
 
 #include <hal/SimDevice.h>
-#include <units/angle.h>
-#include <units/angular_velocity.h>
+#include <units/angle.hpp>
+#include <units/angular_velocity.hpp>
 
 namespace frc {
 

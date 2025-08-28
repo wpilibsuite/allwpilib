@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 #include <networktables/NetworkTableInstance.h>
-#include <units/angle.h>
+#include <units/angle.hpp>
 
 class Mechanism2dTest;
 

@@ -6,14 +6,14 @@
 
 #include <array>
 
-#include <units/current.h>
-#include <units/time.h>
+#include <units/current.hpp>
+#include <units/time.hpp>
 
-#include "frc/EigenCore.h"
-#include "frc/StateSpaceUtil.h"
-#include "frc/system/LinearSystem.h"
+#include "wpi/math/EigenCore.hpp"
+#include "wpi/math/StateSpaceUtil.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
 
-namespace frc::sim {
+namespace wpi::math {
 /**
  * This class helps simulate linear systems. To use this class, do the following
  * in the simulationPeriodic() method.
@@ -62,7 +62,7 @@ class LinearSystemSim {
     // Add noise. If the user did not pass a noise vector to the
     // constructor, then this method will not do anything because
     // the standard deviations default to zero.
-    m_y += frc::MakeWhiteNoiseVector<Outputs>(m_measurementStdDevs);
+    m_y += MakeWhiteNoiseVector<Outputs>(m_measurementStdDevs);
   }
 
   /**
@@ -145,7 +145,7 @@ class LinearSystemSim {
    * @param maxInput The maximum magnitude of the input vector after clamping.
    */
   void ClampInput(double maxInput) {
-    m_u = frc::DesaturateInputVector<Inputs>(m_u, maxInput);
+    m_u = DesaturateInputVector<Inputs>(m_u, maxInput);
   }
 
   /// The plant that represents the linear system.

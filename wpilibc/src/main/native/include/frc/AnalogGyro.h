@@ -10,7 +10,7 @@
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
-#include "frc/geometry/Rotation2d.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
 
 namespace frc {
 

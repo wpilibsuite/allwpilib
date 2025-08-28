@@ -7,7 +7,7 @@
 #include <functional>
 
 #include <frc/Notifier.h>
-#include <units/time.h>
+#include <units/time.hpp>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"

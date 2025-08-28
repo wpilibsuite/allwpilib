@@ -17,7 +17,7 @@
 #include <frc/smartdashboard/Mechanism2d.h>
 #include <frc/smartdashboard/MechanismLigament2d.h>
 #include <frc/smartdashboard/MechanismRoot2d.h>
-#include <units/length.h>
+#include <units/length.hpp>
 
 #include "Constants.h"
 

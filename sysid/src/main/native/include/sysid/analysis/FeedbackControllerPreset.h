@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <units/time.h>
+#include <units/time.hpp>
 
 namespace sysid {
 /**

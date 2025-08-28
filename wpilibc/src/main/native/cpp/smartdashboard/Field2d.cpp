@@ -11,7 +11,7 @@
 #include <networktables/NTSendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
-using namespace frc;
+using namespace wpi::math;
 
 Field2d::Field2d() {
   m_objects.emplace_back(

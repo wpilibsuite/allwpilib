@@ -9,7 +9,7 @@
 #include <frc/PneumaticsControlModule.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
-#include <units/pressure.h>
+#include <units/pressure.hpp>
 
 #include "Constants.h"
 

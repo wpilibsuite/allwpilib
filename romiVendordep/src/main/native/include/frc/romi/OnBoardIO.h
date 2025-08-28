@@ -8,7 +8,7 @@
 
 #include <frc/DigitalInput.h>
 #include <frc/DigitalOutput.h>
-#include <units/time.h>
+#include <units/time.hpp>
 
 namespace frc {
 

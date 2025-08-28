@@ -3,44 +3,46 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <units/current.h>
-#include <units/math.h>
-#include <units/moment_of_inertia.h>
+#include <units/current.hpp>
+#include <units/math.hpp>
+#include <units/moment_of_inertia.hpp>
 
-#include "frc/controller/LTVUnicycleController.h"
-#include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "frc/kinematics/DifferentialDriveKinematics.h"
+#include "wpi/math/controller/LTVUnicycleController.hpp"
+#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "frc/simulation/DifferentialDrivetrainSim.h"
-#include "frc/system/NumericalIntegration.h"
-#include "frc/system/plant/DCMotor.h"
-#include "frc/system/plant/LinearSystemId.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
-#include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
+#include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/math/system/plant/DCMotor.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
+#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
+
+using namespace wpi::math;
 
 TEST(DifferentialDrivetrainSimTest, Convergence) {
-  auto motor = frc::DCMotor::NEO(2);
-  auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
+  auto motor = DCMotor::NEO(2);
+  auto plant = LinearSystemId::DrivetrainVelocitySystem(
       motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
 
-  frc::DifferentialDriveKinematics kinematics{24_in};
-  frc::sim::DifferentialDrivetrainSim sim{
+  DifferentialDriveKinematics kinematics{24_in};
+  sim::DifferentialDrivetrainSim sim{
       plant, 24_in, motor,
       1.0,   2_in,  {0.001, 0.001, 0.0001, 0.1, 0.1, 0.005, 0.005}};
 
-  frc::LinearPlantInversionFeedforward feedforward{plant, 20_ms};
-  frc::LTVUnicycleController feedback{20_ms};
+  LinearPlantInversionFeedforward feedforward{plant, 20_ms};
+  LTVUnicycleController feedback{20_ms};
 
-  feedforward.Reset(frc::Vectord<2>{0.0, 0.0});
+  feedforward.Reset(Vectord<2>{0.0, 0.0});
 
   // Ground truth.
-  frc::Vectord<7> groundTruthX = frc::Vectord<7>::Zero();
+  Vectord<7> groundTruthX = Vectord<7>::Zero();
 
-  frc::TrajectoryConfig config{1_mps, 1_mps_sq};
+  TrajectoryConfig config{1_mps, 1_mps_sq};
   config.AddConstraint(
-      frc::DifferentialDriveKinematicsConstraint(kinematics, 1_mps));
+      DifferentialDriveKinematicsConstraint(kinematics, 1_mps));
 
-  auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      frc::Pose2d{}, {}, frc::Pose2d{2_m, 2_m, 0_rad}, config);
+  auto trajectory = TrajectoryGenerator::GenerateTrajectory(
+      Pose2d{}, {}, Pose2d{2_m, 2_m, 0_rad}, config);
 
   for (auto t = 0_s; t < trajectory.TotalTime(); t += 20_ms) {
     auto state = trajectory.Sample(t);
@@ -48,15 +50,15 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
 
     auto [l, r] = kinematics.ToWheelSpeeds(feedbackOut);
     auto voltages =
-        feedforward.Calculate(frc::Vectord<2>{l.value(), r.value()});
+        feedforward.Calculate(Vectord<2>{l.value(), r.value()});
 
     // Sim periodic code.
     sim.SetInputs(units::volt_t{voltages(0, 0)}, units::volt_t{voltages(1, 0)});
     sim.Update(20_ms);
 
     // Update ground truth.
-    groundTruthX = frc::RKDP(
-        [&sim](const auto& x, const auto& u) -> frc::Vectord<7> {
+    groundTruthX = RKDP(
+        [&sim](const auto& x, const auto& u) -> Vectord<7> {
           return sim.Dynamics(x, u);
         },
         groundTruthX, voltages, 20_ms);
@@ -70,12 +72,12 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
 }
 
 TEST(DifferentialDrivetrainSimTest, Current) {
-  auto motor = frc::DCMotor::NEO(2);
-  auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
+  auto motor = DCMotor::NEO(2);
+  auto plant = LinearSystemId::DrivetrainVelocitySystem(
       motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
 
-  frc::DifferentialDriveKinematics kinematics{24_in};
-  frc::sim::DifferentialDrivetrainSim sim{plant, 24_in, motor, 1.0, 2_in};
+  DifferentialDriveKinematics kinematics{24_in};
+  sim::DifferentialDrivetrainSim sim{plant, 24_in, motor, 1.0, 2_in};
 
   sim.SetInputs(-12_V, 12_V);
   for (int i = 0; i < 10; ++i) {
@@ -97,12 +99,12 @@ TEST(DifferentialDrivetrainSimTest, Current) {
 }
 
 TEST(DifferentialDrivetrainSimTest, ModelStability) {
-  auto motor = frc::DCMotor::NEO(2);
-  auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
+  auto motor = DCMotor::NEO(2);
+  auto plant = LinearSystemId::DrivetrainVelocitySystem(
       motor, 50_kg, 2_in, 12_in, 2_kg_sq_m, 5.0);
 
-  frc::DifferentialDriveKinematics kinematics{24_in};
-  frc::sim::DifferentialDrivetrainSim sim{plant, 24_in, motor, 1.0, 2_in};
+  DifferentialDriveKinematics kinematics{24_in};
+  sim::DifferentialDrivetrainSim sim{plant, 24_in, motor, 1.0, 2_in};
 
   sim.SetInputs(2_V, 4_V);
 

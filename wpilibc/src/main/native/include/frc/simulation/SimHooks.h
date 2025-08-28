@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #include <hal/HALBase.h>
-#include <units/time.h>
+#include <units/time.hpp>
 
 namespace frc::sim {
 

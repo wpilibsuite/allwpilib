@@ -20,8 +20,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <units/angle.h>
-#include <units/length.h>
+#include <units/angle.hpp>
+#include <units/length.hpp>
 
 /**
  * This is a demo program showing the detection of AprilTags.

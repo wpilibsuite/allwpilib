@@ -12,7 +12,7 @@
 #include <frc/simulation/FlywheelSim.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/system/plant/LinearSystemId.h>
-#include <units/moment_of_inertia.h>
+#include <units/moment_of_inertia.hpp>
 
 /**
  * This is a sample program to demonstrate the use of a BangBangController with

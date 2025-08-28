@@ -13,8 +13,8 @@
 #include <glass/View.h>
 #include <implot.h>
 #include <portable-file-dialogs.h>
-#include <units/time.h>
-#include <units/voltage.h>
+#include <units/time.hpp>
+#include <units/voltage.hpp>
 #include <wpi/Logger.h>
 #include <wpi/StringMap.h>
 

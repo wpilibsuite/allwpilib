@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <units/time.h>
+#include <units/time.hpp>
 #include <wpi/mutex.h>
 
 #include "frc/Timer.h"

@@ -6,11 +6,11 @@
 
 #include <numbers>
 
-#include <units/angle.h>
-#include <units/angular_velocity.h>
-#include <units/length.h>
-#include <units/time.h>
-#include <units/voltage.h>
+#include <units/angle.hpp>
+#include <units/angular_velocity.hpp>
+#include <units/length.hpp>
+#include <units/time.hpp>
+#include <units/voltage.hpp>
 
 namespace DriveConstants {
 inline constexpr int kLeftMotor1Port = 0;

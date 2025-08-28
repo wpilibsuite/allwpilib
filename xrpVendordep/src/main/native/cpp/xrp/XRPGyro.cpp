@@ -4,8 +4,8 @@
 
 #include "frc/xrp/XRPGyro.h"
 
-#include <units/angle.h>
-#include <units/angular_velocity.h>
+#include <units/angle.hpp>
+#include <units/angular_velocity.hpp>
 
 using namespace frc;
 

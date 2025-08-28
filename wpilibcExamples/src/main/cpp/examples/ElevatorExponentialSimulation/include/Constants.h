@@ -6,13 +6,13 @@
 
 #include <numbers>
 
-#include <units/acceleration.h>
-#include <units/angle.h>
-#include <units/length.h>
-#include <units/mass.h>
-#include <units/time.h>
-#include <units/velocity.h>
-#include <units/voltage.h>
+#include <units/acceleration.hpp>
+#include <units/angle.hpp>
+#include <units/length.hpp>
+#include <units/mass.hpp>
+#include <units/time.hpp>
+#include <units/velocity.hpp>
+#include <units/voltage.hpp>
 
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide

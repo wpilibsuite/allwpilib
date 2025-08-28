@@ -5,7 +5,7 @@
 #include "Robot.h"
 
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <units/pressure.h>
+#include <units/pressure.hpp>
 
 Robot::Robot() {
   // Publish elements to shuffleboard.

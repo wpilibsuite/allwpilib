@@ -5,8 +5,8 @@
 #pragma once
 
 #include <Eigen/Core>
-#include <units/time.h>
-#include <units/voltage.h>
+#include <units/time.hpp>
+#include <units/voltage.hpp>
 
 namespace sysid {
 

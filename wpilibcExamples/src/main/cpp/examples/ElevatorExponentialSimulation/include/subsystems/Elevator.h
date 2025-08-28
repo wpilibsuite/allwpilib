@@ -17,7 +17,7 @@
 #include <frc/smartdashboard/MechanismLigament2d.h>
 #include <frc/smartdashboard/MechanismRoot2d.h>
 #include <frc/trajectory/ExponentialProfile.h>
-#include <units/length.h>
+#include <units/length.hpp>
 
 #include "Constants.h"
 

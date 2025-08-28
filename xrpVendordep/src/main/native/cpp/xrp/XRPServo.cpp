@@ -11,7 +11,7 @@
 #include <set>
 #include <string>
 
-#include <units/angle.h>
+#include <units/angle.hpp>
 
 using namespace frc;
 

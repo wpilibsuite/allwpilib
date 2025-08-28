@@ -14,7 +14,7 @@
 #include <wpi/MathExtras.h>
 #include <wpi/timestamp.h>
 
-#include "frc/MathUtil.h"
+#include "wpi/math/MathUtil.hpp"
 
 using namespace frc;
 
@@ -55,7 +55,7 @@ LEDPattern LEDPattern::Reversed() {
 
 LEDPattern LEDPattern::OffsetBy(int offset) {
   return MapIndex([offset](size_t bufLen, size_t i) {
-    return frc::FloorMod(static_cast<int>(i) + offset,
+    return wpi::math::FloorMod(static_cast<int>(i) + offset,
                          static_cast<int>(bufLen));
   });
 }
@@ -74,7 +74,7 @@ LEDPattern LEDPattern::ScrollAtRelativeSpeed(units::hertz_t velocity) {
         (now % static_cast<int64_t>(std::floor(periodMicros))) / periodMicros;
     int offset = static_cast<int>(std::floor(t * bufLen));
 
-    return frc::FloorMod(static_cast<int>(i) + offset,
+    return wpi::math::FloorMod(static_cast<int>(i) + offset,
                          static_cast<int>(bufLen));
   });
 }
@@ -95,7 +95,7 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
     // offset values for negative velocities
     auto offset = static_cast<int64_t>(now) / microsPerLed;
 
-    return frc::FloorMod(static_cast<int>(i) + offset,
+    return wpi::math::FloorMod(static_cast<int>(i) + offset,
                          static_cast<int>(bufLen));
   });
 }

@@ -9,7 +9,7 @@
 #include "frc/RobotController.h"
 
 using namespace frc;
-using namespace frc::sim;
+using namespace wpi::math::sim;
 
 FlywheelSim::FlywheelSim(const LinearSystem<1, 1, 1>& plant,
                          const DCMotor& gearbox,

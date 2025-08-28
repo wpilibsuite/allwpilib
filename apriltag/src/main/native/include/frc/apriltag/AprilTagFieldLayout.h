@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <units/length.h>
+#include <units/length.hpp>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 

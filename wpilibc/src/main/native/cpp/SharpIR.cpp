@@ -7,7 +7,7 @@
 #include <algorithm>
 
 #include <hal/UsageReporting.h>
-#include <units/length.h>
+#include <units/length.hpp>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 

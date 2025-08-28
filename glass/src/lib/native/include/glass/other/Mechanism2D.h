@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <frc/geometry/Rotation2d.h>
+#include <wpi/math/geometry/Rotation2d.hpp>
 #include <frc/geometry/Translation2d.h>
 #include <imgui.h>
 #include <wpi/function_ref.h>

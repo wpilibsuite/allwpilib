@@ -6,7 +6,7 @@
 
 #include <frc/xrp/XRPServo.h>
 #include <frc2/command/SubsystemBase.h>
-#include <units/angle.h>
+#include <units/angle.hpp>
 
 class Arm : public frc2::SubsystemBase {
  public:

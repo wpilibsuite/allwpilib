@@ -11,7 +11,7 @@
 #include <string_view>
 #include <utility>
 
-#include <units/angle.h>
+#include <units/angle.hpp>
 #include <wpi/StringMap.h>
 #include <wpi/SymbolExports.h>
 

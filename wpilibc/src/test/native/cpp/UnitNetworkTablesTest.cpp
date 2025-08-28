@@ -6,7 +6,7 @@
 #include <networktables/DoubleTopic.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/UnitTopic.h>
-#include <units/length.h>
+#include <units/length.hpp>
 
 class UnitNetworkTablesTest : public ::testing::Test {
  public:

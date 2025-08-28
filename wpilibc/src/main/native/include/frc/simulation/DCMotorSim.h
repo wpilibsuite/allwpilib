@@ -4,21 +4,21 @@
 
 #pragma once
 
-#include <units/angle.h>
-#include <units/angular_acceleration.h>
-#include <units/angular_velocity.h>
-#include <units/moment_of_inertia.h>
-#include <units/torque.h>
+#include <units/angle.hpp>
+#include <units/angular_acceleration.hpp>
+#include <units/angular_velocity.hpp>
+#include <units/moment_of_inertia.hpp>
+#include <units/torque.hpp>
 
 #include "frc/simulation/LinearSystemSim.h"
-#include "frc/system/LinearSystem.h"
-#include "frc/system/plant/DCMotor.h"
+#include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/math/system/plant/DCMotor.hpp"
 
 namespace frc::sim {
 /**
  * Represents a simulated DC motor mechanism.
  */
-class DCMotorSim : public LinearSystemSim<2, 1, 2> {
+class DCMotorSim : public wpi::math::LinearSystemSim<2, 1, 2> {
  public:
   /**
    * Creates a simulated DC motor mechanism.
@@ -31,7 +31,7 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
    * gearbox.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
-  DCMotorSim(const LinearSystem<2, 1, 2>& plant, const DCMotor& gearbox,
+  DCMotorSim(const wpi::math::LinearSystem<2, 1, 2>& plant, const wpi::math::DCMotor& gearbox,
              const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   using LinearSystemSim::SetState;
@@ -111,7 +111,7 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Returns the gearbox.
    */
-  const DCMotor& GetGearbox() const;
+  const wpi::math::DCMotor& GetGearbox() const;
 
   /**
    * Returns the gearing;
@@ -124,7 +124,7 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   units::kilogram_square_meter_t GetJ() const;
 
  private:
-  DCMotor m_gearbox;
+  wpi::math::DCMotor m_gearbox;
   double m_gearing;
   units::kilogram_square_meter_t m_j;
 };

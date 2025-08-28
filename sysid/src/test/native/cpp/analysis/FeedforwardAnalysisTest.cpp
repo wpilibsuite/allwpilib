@@ -9,8 +9,8 @@
 #include <span>
 
 #include <gtest/gtest.h>
-#include <units/time.h>
-#include <units/voltage.h>
+#include <units/time.hpp>
+#include <units/voltage.hpp>
 
 #include "sysid/analysis/AnalysisManager.h"
 #include "sysid/analysis/AnalysisType.h"

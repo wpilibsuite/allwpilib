@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <frc/geometry/Rotation2d.h>
+#include <wpi/math/geometry/Rotation2d.hpp>
 
 #include <optional>
 #include <string>
 
 #include <hal/DriverStationTypes.h>
-#include <units/time.h>
+#include <units/time.hpp>
 #include <wpi/Synchronization.h>
 
 namespace wpi::log {
@@ -80,26 +80,26 @@ class DriverStation final {
    * @return The angle clockwise from straight up, or std::nullopt if the
    * POVDirection is kCenter.
    */
-  static constexpr std::optional<Rotation2d> GetAngle(POVDirection angle) {
+  static constexpr std::optional<wpi::math::Rotation2d> GetAngle(POVDirection angle) {
     switch (angle) {
       case kCenter:
         return std::nullopt;
       case kUp:
-        return Rotation2d{0_deg};
+        return wpi::math::Rotation2d{0_deg};
       case kUpRight:
-        return Rotation2d{45_deg};
+        return wpi::math::Rotation2d{45_deg};
       case kRight:
-        return Rotation2d{90_deg};
+        return wpi::math::Rotation2d{90_deg};
       case kDownRight:
-        return Rotation2d{135_deg};
+        return wpi::math::Rotation2d{135_deg};
       case kDown:
-        return Rotation2d{180_deg};
+        return wpi::math::Rotation2d{180_deg};
       case kDownLeft:
-        return Rotation2d{225_deg};
+        return wpi::math::Rotation2d{225_deg};
       case kLeft:
-        return Rotation2d{270_deg};
+        return wpi::math::Rotation2d{270_deg};
       case kUpLeft:
-        return Rotation2d{315_deg};
+        return wpi::math::Rotation2d{315_deg};
       default:
         return std::nullopt;
     }

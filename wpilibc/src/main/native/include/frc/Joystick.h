@@ -6,7 +6,7 @@
 
 #include <array>
 
-#include <units/angle.h>
+#include <units/angle.hpp>
 
 #include "frc/GenericHID.h"
 

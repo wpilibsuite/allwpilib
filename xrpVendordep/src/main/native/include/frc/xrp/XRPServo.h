@@ -9,7 +9,7 @@
 #include <string>
 
 #include <hal/SimDevice.h>
-#include <units/angle.h>
+#include <units/angle.hpp>
 
 namespace frc {
 

@@ -11,7 +11,7 @@
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/AnalogInput.h"
-#include "frc/MathUtil.h"
+#include "wpi/math/MathUtil.hpp"
 #include "frc/RobotController.h"
 
 using namespace frc;
@@ -89,7 +89,7 @@ double AnalogEncoder::Get() const {
   pos = pos * m_fullRange - m_expectedZero;
 
   // Map from 0 - Full Range
-  double result = InputModulus(pos, 0.0, m_fullRange);
+  double result = wpi::math::InputModulus(pos, 0.0, m_fullRange);
   // Invert if necessary
   if (m_isInverted) {
     return m_fullRange - result;

@@ -10,7 +10,7 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <units/angle.h>
+#include <units/angle.hpp>
 #include <wpi/MathExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>

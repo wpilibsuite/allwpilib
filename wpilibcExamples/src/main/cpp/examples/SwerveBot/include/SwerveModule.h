@@ -13,10 +13,10 @@
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <units/angular_velocity.h>
-#include <units/time.h>
-#include <units/velocity.h>
-#include <units/voltage.h>
+#include <units/angular_velocity.hpp>
+#include <units/time.hpp>
+#include <units/velocity.hpp>
+#include <units/voltage.hpp>
 
 class SwerveModule {
  public:

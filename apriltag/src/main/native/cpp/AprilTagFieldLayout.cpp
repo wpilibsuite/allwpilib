@@ -8,8 +8,8 @@
 #include <utility>
 #include <vector>
 
-#include <units/angle.h>
-#include <units/length.h>
+#include <units/angle.hpp>
+#include <units/length.hpp>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/json.h>
 #include <wpi/raw_ostream.h>

@@ -9,7 +9,7 @@
 #include <optional>
 #include <string>
 
-#include <units/time.h>
+#include <units/time.hpp>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
 #include <wpi/StackTrace.h>

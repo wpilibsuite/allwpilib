@@ -4,17 +4,17 @@
 
 #pragma once
 
-#include <frc/EigenCore.h>
-#include <frc/kinematics/DifferentialDriveKinematics.h>
-#include <frc/system/LinearSystem.h>
-#include <frc/system/plant/DCMotor.h>
+#include <wpi/math/EigenCore.hpp>
+#include <wpi/math/kinematics/DifferentialDriveKinematics.hpp>
+#include <wpi/math/system/LinearSystem.hpp>
+#include <wpi/math/system/plant/DCMotor.hpp>
 
-#include <units/length.h>
-#include <units/moment_of_inertia.h>
-#include <units/time.h>
-#include <units/voltage.h>
+#include <units/length.hpp>
+#include <units/moment_of_inertia.hpp>
+#include <units/time.hpp>
+#include <units/voltage.hpp>
 
-namespace frc::sim {
+namespace wpi::math::sim {
 
 class DifferentialDrivetrainSim {
  public:
@@ -68,7 +68,7 @@ class DifferentialDrivetrainSim {
    *                           starting point.
    */
   DifferentialDrivetrainSim(
-      frc::DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
+      DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
       units::kilogram_t mass, units::meter_t wheelRadius,
       units::meter_t trackwidth,
       const std::array<double, 7>& measurementStdDevs = {});
@@ -185,7 +185,7 @@ class DifferentialDrivetrainSim {
    *
    * @param pose The pose.
    */
-  void SetPose(const frc::Pose2d& pose);
+  void SetPose(const Pose2d& pose);
 
   /**
    * The differential drive dynamics function.
@@ -235,24 +235,24 @@ class DifferentialDrivetrainSim {
   class KitbotMotor {
    public:
     /// One CIM motor per drive side.
-    static constexpr frc::DCMotor SingleCIMPerSide = frc::DCMotor::CIM(1);
+    static constexpr DCMotor SingleCIMPerSide = DCMotor::CIM(1);
     /// Two CIM motors per drive side.
-    static constexpr frc::DCMotor DualCIMPerSide = frc::DCMotor::CIM(2);
+    static constexpr DCMotor DualCIMPerSide = DCMotor::CIM(2);
     /// One Mini CIM motor per drive side.
-    static constexpr frc::DCMotor SingleMiniCIMPerSide =
-        frc::DCMotor::MiniCIM(1);
+    static constexpr DCMotor SingleMiniCIMPerSide =
+        DCMotor::MiniCIM(1);
     /// Two Mini CIM motors per drive side.
-    static constexpr frc::DCMotor DualMiniCIMPerSide = frc::DCMotor::MiniCIM(2);
+    static constexpr DCMotor DualMiniCIMPerSide = DCMotor::MiniCIM(2);
     /// One Falcon 500 motor per drive side.
-    static constexpr frc::DCMotor SingleFalcon500PerSide =
-        frc::DCMotor::Falcon500(1);
+    static constexpr DCMotor SingleFalcon500PerSide =
+        DCMotor::Falcon500(1);
     /// Two Falcon 500 motors per drive side.
-    static constexpr frc::DCMotor DualFalcon500PerSide =
-        frc::DCMotor::Falcon500(2);
+    static constexpr DCMotor DualFalcon500PerSide =
+        DCMotor::Falcon500(2);
     /// One NEO motor per drive side.
-    static constexpr frc::DCMotor SingleNEOPerSide = frc::DCMotor::NEO(1);
+    static constexpr DCMotor SingleNEOPerSide = DCMotor::NEO(1);
     /// Two NEO motors per drive side.
-    static constexpr frc::DCMotor DualNEOPerSide = frc::DCMotor::NEO(2);
+    static constexpr DCMotor DualNEOPerSide = DCMotor::NEO(2);
   };
 
   /**
@@ -282,7 +282,7 @@ class DifferentialDrivetrainSim {
    * starting point.
    */
   static DifferentialDrivetrainSim CreateKitbotSim(
-      frc::DCMotor motor, double gearing, units::meter_t wheelSize,
+      DCMotor motor, double gearing, units::meter_t wheelSize,
       const std::array<double, 7>& measurementStdDevs = {}) {
     // MOI estimation -- note that I = mr² for point masses
     units::kilogram_square_meter_t batteryMoi = 12.5_lb * 10_in * 10_in;
@@ -311,7 +311,7 @@ class DifferentialDrivetrainSim {
    * starting point.
    */
   static DifferentialDrivetrainSim CreateKitbotSim(
-      frc::DCMotor motor, double gearing, units::meter_t wheelSize,
+      DCMotor motor, double gearing, units::meter_t wheelSize,
       units::kilogram_square_meter_t J,
       const std::array<double, 7>& measurementStdDevs = {}) {
     return DifferentialDrivetrainSim{
@@ -358,4 +358,4 @@ class DifferentialDrivetrainSim {
   Vectord<7> m_y;
   std::array<double, 7> m_measurementStdDevs;
 };
-}  // namespace frc::sim
+}  // namespace wpi::math::sim

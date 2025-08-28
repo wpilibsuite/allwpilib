@@ -6,7 +6,7 @@
 
 #include <span>
 
-#include <units/length.h>
+#include <units/length.hpp>
 #include <wpi/SymbolExports.h>
 
 #include "frc/apriltag/AprilTagPoseEstimate.h"

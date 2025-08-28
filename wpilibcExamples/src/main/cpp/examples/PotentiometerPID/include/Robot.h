@@ -11,7 +11,7 @@
 #include <frc/TimedRobot.h>
 #include <frc/controller/PIDController.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <units/length.h>
+#include <units/length.hpp>
 
 /**
  * This is a sample program to demonstrate how to use a soft potentiometer and a

@@ -13,7 +13,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/util/Color.h>
 #include <frc/util/Color8Bit.h>
-#include <units/angle.h>
+#include <units/angle.hpp>
 
 /**
  * This sample program shows how to use Mechanism2d - a visual representation of

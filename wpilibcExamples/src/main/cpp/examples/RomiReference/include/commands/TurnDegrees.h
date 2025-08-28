@@ -6,8 +6,8 @@
 
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandHelper.h>
-#include <units/angle.h>
-#include <units/length.h>
+#include <units/angle.hpp>
+#include <units/length.hpp>
 
 #include "subsystems/Drivetrain.h"
 

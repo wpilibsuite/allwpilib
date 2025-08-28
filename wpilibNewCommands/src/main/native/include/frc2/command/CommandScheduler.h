@@ -15,7 +15,7 @@
 #include <frc/Errors.h>
 #include <frc/Watchdog.h>
 #include <frc/event/EventLoop.h>
-#include <units/time.h>
+#include <units/time.hpp>
 #include <wpi/FunctionExtras.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>

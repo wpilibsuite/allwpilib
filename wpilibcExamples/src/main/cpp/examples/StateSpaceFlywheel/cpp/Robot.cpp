@@ -15,7 +15,7 @@
 #include <frc/system/LinearSystemLoop.h>
 #include <frc/system/plant/DCMotor.h>
 #include <frc/system/plant/LinearSystemId.h>
-#include <units/angular_velocity.h>
+#include <units/angular_velocity.hpp>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller

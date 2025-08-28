@@ -6,18 +6,18 @@
 
 #include "frc/Encoder.h"
 #include "frc/RobotController.h"
-#include "frc/controller/PIDController.h"
+#include "wpi/math/controller/PIDController.hpp"
 #include "frc/motorcontrol/PWMVictorSPX.h"
 #include "frc/simulation/BatterySim.h"
 #include "frc/simulation/DCMotorSim.h"
 #include "frc/simulation/EncoderSim.h"
 #include "frc/simulation/RoboRioSim.h"
-#include "frc/system/plant/LinearSystemId.h"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
 
 TEST(DCMotorSimTest, VoltageSteadyState) {
-  frc::DCMotor gearbox = frc::DCMotor::NEO(1);
-  auto plant = frc::LinearSystemId::DCMotorSystem(
-      frc::DCMotor::NEO(1), units::kilogram_square_meter_t{0.0005}, 1.0);
+  wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);
+  auto plant = wpi::math::LinearSystemId::DCMotorSystem(
+      wpi::math::DCMotor::NEO(1), units::kilogram_square_meter_t{0.0005}, 1.0);
   frc::sim::DCMotorSim sim{plant, gearbox};
 
   frc::Encoder encoder{0, 1};
@@ -61,12 +61,12 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
 }
 
 TEST(DCMotorSimTest, PositionFeedbackControl) {
-  frc::DCMotor gearbox = frc::DCMotor::NEO(1);
-  auto plant = frc::LinearSystemId::DCMotorSystem(
-      frc::DCMotor::NEO(1), units::kilogram_square_meter_t{0.0005}, 1.0);
+  wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);
+  auto plant = wpi::math::LinearSystemId::DCMotorSystem(
+      wpi::math::DCMotor::NEO(1), units::kilogram_square_meter_t{0.0005}, 1.0);
   frc::sim::DCMotorSim sim{plant, gearbox};
 
-  frc::PIDController controller{0.04, 0.0, 0.001};
+  wpi::math::PIDController controller{0.04, 0.0, 0.001};
 
   frc::Encoder encoder{0, 1};
   frc::sim::EncoderSim encoderSim{encoder};

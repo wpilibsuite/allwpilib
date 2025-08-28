@@ -15,8 +15,8 @@
 #include <frc/system/plant/DCMotor.h>
 #include <frc/system/plant/LinearSystemId.h>
 #include <frc/trajectory/TrapezoidProfile.h>
-#include <units/angle.h>
-#include <units/moment_of_inertia.h>
+#include <units/angle.hpp>
+#include <units/moment_of_inertia.hpp>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller

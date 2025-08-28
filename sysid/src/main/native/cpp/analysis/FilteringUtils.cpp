@@ -16,7 +16,7 @@
 #include <fmt/format.h>
 #include <frc/filter/LinearFilter.h>
 #include <frc/filter/MedianFilter.h>
-#include <units/math.h>
+#include <units/math.hpp>
 #include <wpi/MathExtras.h>
 #include <wpi/StringExtras.h>
 

@@ -13,7 +13,7 @@
 #include <vector>
 
 #include <hal/SimDevice.h>
-#include <units/voltage.h>
+#include <units/voltage.hpp>
 #include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>

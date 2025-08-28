@@ -7,9 +7,9 @@
 #include <utility>
 #include <vector>
 
-#include "frc/trajectory/Trajectory.h"
+#include "wpi/math/trajectory/Trajectory.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 FieldObject2d::FieldObject2d(FieldObject2d&& rhs) {
   std::swap(m_name, rhs.m_name);

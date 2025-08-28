@@ -7,12 +7,12 @@
 #include <array>
 #include <numbers>
 
-#include <units/angle.h>
-#include <units/angular_acceleration.h>
-#include <units/angular_velocity.h>
-#include <units/length.h>
-#include <units/time.h>
-#include <units/voltage.h>
+#include <units/angle.hpp>
+#include <units/angular_acceleration.hpp>
+#include <units/angular_velocity.hpp>
+#include <units/length.hpp>
+#include <units/time.hpp>
+#include <units/voltage.hpp>
 
 namespace constants {
 namespace drive {

@@ -20,7 +20,7 @@
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
-#include <wpimath/MathShared.h>
+#include <wpi/math/MathShared.hpp>
 
 #include "WPILibVersion.h"
 #include "frc/DriverStation.h"

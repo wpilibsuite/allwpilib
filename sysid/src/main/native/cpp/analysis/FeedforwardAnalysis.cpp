@@ -13,8 +13,8 @@
 #include <Eigen/Eigenvalues>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include <units/math.h>
-#include <units/time.h>
+#include <units/math.hpp>
+#include <units/time.hpp>
 
 #include "sysid/analysis/OLS.h"
 

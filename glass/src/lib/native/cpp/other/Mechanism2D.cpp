@@ -14,15 +14,15 @@
 #include <vector>
 
 #include <frc/geometry/Pose2d.h>
-#include <frc/geometry/Rotation2d.h>
+#include <wpi/math/geometry/Rotation2d.hpp>
 #include <frc/geometry/Transform2d.h>
 #include <frc/geometry/Translation2d.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
 #include <portable-file-dialogs.h>
-#include <units/angle.h>
-#include <units/length.h>
+#include <units/angle.hpp>
+#include <units/length.hpp>
 #include <wpi/print.h>
 #include <wpigui.h>
 

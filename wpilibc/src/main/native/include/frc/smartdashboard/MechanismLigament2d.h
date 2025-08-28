@@ -9,7 +9,7 @@
 
 #include <networktables/DoubleTopic.h>
 #include <networktables/StringTopic.h>
-#include <units/angle.h>
+#include <units/angle.hpp>
 
 #include "frc/smartdashboard/MechanismObject2d.h"
 #include "frc/util/Color8Bit.h"

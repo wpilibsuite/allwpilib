@@ -7,11 +7,11 @@
 #include <wpi/MathExtras.h>
 
 #include "frc/RobotController.h"
-#include "frc/system/NumericalIntegration.h"
-#include "frc/system/plant/LinearSystemId.h"
+#include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
 
 using namespace frc;
-using namespace frc::sim;
+using namespace wpi::math::sim;
 
 ElevatorSim::ElevatorSim(const LinearSystem<2, 1, 2>& plant,
                          const DCMotor& gearbox, units::meter_t minHeight,
@@ -42,7 +42,7 @@ template <typename Distance>
            std::same_as<units::radian, Distance>
 ElevatorSim::ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
                          decltype(1_V / Acceleration_t<Distance>(1)) kA,
-                         const DCMotor& gearbox, units::meter_t minHeight,
+                         const wpi::math::DCMotor& gearbox, units::meter_t minHeight,
                          units::meter_t maxHeight, bool simulateGravity,
                          units::meter_t startingHeight,
                          const std::array<double, 2>& measurementStdDevs)
@@ -102,7 +102,7 @@ void ElevatorSim::SetInputVoltage(units::volt_t voltage) {
   ClampInput(frc::RobotController::GetBatteryVoltage().value());
 }
 
-Vectord<2> ElevatorSim::UpdateX(const Vectord<2>& currentXhat,
+wpi::math::Vectord<2> ElevatorSim::UpdateX(const Vectord<2>& currentXhat,
                                 const Vectord<1>& u, units::second_t dt) {
   auto updatedXhat = RKDP(
       [&](const Vectord<2>& x, const Vectord<1>& u_) -> Vectord<2> {

@@ -13,7 +13,7 @@
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
-#include "frc/MathUtil.h"
+#include "wpi/math/MathUtil.hpp"
 #include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;
@@ -46,8 +46,8 @@ void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
     reported = true;
   }
 
-  xSpeed = ApplyDeadband(xSpeed, m_deadband);
-  zRotation = ApplyDeadband(zRotation, m_deadband);
+  xSpeed = wpi::math::ApplyDeadband(xSpeed, m_deadband);
+  zRotation = wpi::math::ApplyDeadband(zRotation, m_deadband);
 
   auto [left, right] = ArcadeDriveIK(xSpeed, zRotation, squareInputs);
 
@@ -68,8 +68,8 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
     reported = true;
   }
 
-  xSpeed = ApplyDeadband(xSpeed, m_deadband);
-  zRotation = ApplyDeadband(zRotation, m_deadband);
+  xSpeed = wpi::math::ApplyDeadband(xSpeed, m_deadband);
+  zRotation = wpi::math::ApplyDeadband(zRotation, m_deadband);
 
   auto [left, right] = CurvatureDriveIK(xSpeed, zRotation, allowTurnInPlace);
 
@@ -90,8 +90,8 @@ void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
     reported = true;
   }
 
-  leftSpeed = ApplyDeadband(leftSpeed, m_deadband);
-  rightSpeed = ApplyDeadband(rightSpeed, m_deadband);
+  leftSpeed = wpi::math::ApplyDeadband(leftSpeed, m_deadband);
+  rightSpeed = wpi::math::ApplyDeadband(rightSpeed, m_deadband);
 
   auto [left, right] = TankDriveIK(leftSpeed, rightSpeed, squareInputs);
 
@@ -112,8 +112,8 @@ DifferentialDrive::WheelSpeeds DifferentialDrive::ArcadeDriveIK(
   // Square the inputs (while preserving the sign) to increase fine control
   // while permitting full power.
   if (squareInputs) {
-    xSpeed = CopySignPow(xSpeed, 2);
-    zRotation = CopySignPow(zRotation, 2);
+    xSpeed = wpi::math::CopySignPow(xSpeed, 2);
+    zRotation = wpi::math::CopySignPow(zRotation, 2);
   }
 
   double leftSpeed = xSpeed - zRotation;
@@ -167,8 +167,8 @@ DifferentialDrive::WheelSpeeds DifferentialDrive::TankDriveIK(
   // Square the inputs (while preserving the sign) to increase fine control
   // while permitting full power.
   if (squareInputs) {
-    leftSpeed = CopySignPow(leftSpeed, 2);
-    rightSpeed = CopySignPow(rightSpeed, 2);
+    leftSpeed = wpi::math::CopySignPow(leftSpeed, 2);
+    rightSpeed = wpi::math::CopySignPow(rightSpeed, 2);
   }
 
   return {leftSpeed, rightSpeed};

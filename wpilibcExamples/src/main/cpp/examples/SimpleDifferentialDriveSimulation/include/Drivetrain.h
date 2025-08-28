@@ -18,10 +18,10 @@
 #include <frc/smartdashboard/Field2d.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/system/plant/LinearSystemId.h>
-#include <units/angle.h>
-#include <units/angular_velocity.h>
-#include <units/length.h>
-#include <units/velocity.h>
+#include <units/angle.hpp>
+#include <units/angular_velocity.hpp>
+#include <units/length.hpp>
+#include <units/velocity.hpp>
 
 /**
  * Represents a differential drive style drivetrain.

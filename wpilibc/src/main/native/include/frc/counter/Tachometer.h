@@ -8,9 +8,9 @@
 
 #include <hal/Counter.h>
 #include <hal/Types.h>
-#include <units/angular_velocity.h>
-#include <units/frequency.h>
-#include <units/time.h>
+#include <units/angular_velocity.hpp>
+#include <units/frequency.hpp>
+#include <units/time.hpp>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 

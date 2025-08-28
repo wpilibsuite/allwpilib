@@ -5,7 +5,7 @@
 #pragma once
 
 #include <hal/SimDevice.h>
-#include <units/length.h>
+#include <units/length.hpp>
 
 #include "frc/motorcontrol/PWMMotorController.h"
 

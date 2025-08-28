@@ -6,7 +6,7 @@
 #include <frc/TimedRobot.h>
 #include <frc/filter/LinearFilter.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <units/acceleration.h>
+#include <units/acceleration.hpp>
 
 /**
  * Accelerometer filtering snippets for frc-docs.

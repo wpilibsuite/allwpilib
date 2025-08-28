@@ -14,8 +14,8 @@
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
-#include <units/angle.h>
-#include <units/length.h>
+#include <units/angle.hpp>
+#include <units/length.hpp>
 
 #include "Constants.h"
 

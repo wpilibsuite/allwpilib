@@ -8,13 +8,13 @@
 #include <memory>
 #include <string>
 
-#include <units/angle.h>
+#include <units/angle.hpp>
 #include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/drive/RobotDriveBase.h"
-#include "frc/geometry/Rotation2d.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
 
 namespace frc {
 
@@ -126,7 +126,7 @@ class MecanumDrive : public RobotDriveBase,
    *                  field-oriented controls.
    */
   void DriveCartesian(double xSpeed, double ySpeed, double zRotation,
-                      Rotation2d gyroAngle = 0_rad);
+                      wpi::math::Rotation2d gyroAngle = 0_rad);
 
   /**
    * Drive method for Mecanum platform.
@@ -140,7 +140,7 @@ class MecanumDrive : public RobotDriveBase,
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
    *                  Counterclockwise is positive.
    */
-  void DrivePolar(double magnitude, Rotation2d angle, double zRotation);
+  void DrivePolar(double magnitude, wpi::math::Rotation2d angle, double zRotation);
 
   /**
    * Cartesian inverse kinematics for Mecanum platform.
@@ -160,7 +160,7 @@ class MecanumDrive : public RobotDriveBase,
    */
   static WheelSpeeds DriveCartesianIK(double xSpeed, double ySpeed,
                                       double zRotation,
-                                      Rotation2d gyroAngle = 0_rad);
+                                      wpi::math::Rotation2d gyroAngle = 0_rad);
 
   void StopMotor() override;
   std::string GetDescription() const override;

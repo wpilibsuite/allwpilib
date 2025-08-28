@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <hal/HAL.h>
-#include <units/math.h>
+#include <units/math.hpp>
 
 #include "frc/AnalogEncoder.h"
 #include "frc/AnalogInput.h"

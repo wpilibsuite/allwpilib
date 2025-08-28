@@ -7,14 +7,14 @@
 #include <string>
 #include <string_view>
 
-#include <units/acceleration.h>
-#include <units/angle.h>
-#include <units/angular_acceleration.h>
-#include <units/angular_velocity.h>
-#include <units/current.h>
-#include <units/length.h>
-#include <units/velocity.h>
-#include <units/voltage.h>
+#include <units/acceleration.hpp>
+#include <units/angle.hpp>
+#include <units/angular_acceleration.hpp>
+#include <units/angular_velocity.hpp>
+#include <units/current.hpp>
+#include <units/length.hpp>
+#include <units/velocity.hpp>
+#include <units/voltage.hpp>
 #include <wpi/datalog/DataLog.h>
 
 namespace frc::sysid {

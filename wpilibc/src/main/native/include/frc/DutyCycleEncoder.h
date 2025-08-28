@@ -8,8 +8,8 @@
 
 #include <hal/SimDevice.h>
 #include <hal/Types.h>
-#include <units/frequency.h>
-#include <units/time.h>
+#include <units/frequency.hpp>
+#include <units/time.hpp>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 

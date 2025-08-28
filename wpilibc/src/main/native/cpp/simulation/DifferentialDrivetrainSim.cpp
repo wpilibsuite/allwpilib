@@ -4,18 +4,19 @@
 
 #include "frc/simulation/DifferentialDrivetrainSim.h"
 
-#include <frc/system/plant/LinearSystemId.h>
+#include <wpi/math/system/plant/LinearSystemId.hpp>
 
 #include <utility>
 
 #include <wpi/MathExtras.h>
 
 #include "frc/RobotController.h"
-#include "frc/StateSpaceUtil.h"
-#include "frc/system/NumericalIntegration.h"
+#include "wpi/math/StateSpaceUtil.hpp"
+#include "wpi/math/system/NumericalIntegration.hpp"
 
 using namespace frc;
-using namespace frc::sim;
+using namespace wpi::math;
+using namespace wpi::math::sim;
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
     LinearSystem<2, 2, 2> plant, units::meter_t trackwidth, DCMotor driveMotor,
@@ -34,18 +35,18 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
 }
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
-    frc::DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
+    DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
     units::kilogram_t mass, units::meter_t wheelRadius,
     units::meter_t trackwidth, const std::array<double, 7>& measurementStdDevs)
     : DifferentialDrivetrainSim(
-          frc::LinearSystemId::DrivetrainVelocitySystem(
+          LinearSystemId::DrivetrainVelocitySystem(
               driveMotor, mass, wheelRadius, trackwidth / 2.0, J, gearing),
           trackwidth, driveMotor, gearing, wheelRadius, measurementStdDevs) {}
 
 Eigen::Vector2d DifferentialDrivetrainSim::ClampInput(
     const Eigen::Vector2d& u) {
-  return frc::DesaturateInputVector<2>(u,
-                                       frc::RobotController::GetInputVoltage());
+  return DesaturateInputVector<2>(u,
+                                       RobotController::GetInputVoltage());
 }
 
 void DifferentialDrivetrainSim::SetInputs(units::volt_t leftVoltage,
@@ -60,7 +61,7 @@ void DifferentialDrivetrainSim::SetGearing(double newGearing) {
 
 void DifferentialDrivetrainSim::Update(units::second_t dt) {
   m_x = RKDP([this](auto& x, auto& u) { return Dynamics(x, u); }, m_x, m_u, dt);
-  m_y = m_x + frc::MakeWhiteNoiseVector<7>(m_measurementStdDevs);
+  m_y = m_x + MakeWhiteNoiseVector<7>(m_measurementStdDevs);
 }
 
 double DifferentialDrivetrainSim::GetGearing() const {
@@ -97,7 +98,7 @@ units::ampere_t DifferentialDrivetrainSim::GetLeftCurrentDraw() const {
                                                      m_currentGearing /
                                                      m_wheelRadius.value()},
                          units::volt_t{m_u(0)}) *
-         wpi::sgn(m_u(0));
+         sgn(m_u(0));
 }
 
 units::ampere_t DifferentialDrivetrainSim::GetRightCurrentDraw() const {
@@ -106,7 +107,7 @@ units::ampere_t DifferentialDrivetrainSim::GetRightCurrentDraw() const {
                                          m_currentGearing /
                                          m_wheelRadius.value()},
              units::volt_t{m_u(1)}) *
-         wpi::sgn(m_u(1));
+         sgn(m_u(1));
 }
 
 units::ampere_t DifferentialDrivetrainSim::GetCurrentDraw() const {
@@ -117,7 +118,7 @@ void DifferentialDrivetrainSim::SetState(const Vectord<7>& state) {
   m_x = state;
 }
 
-void DifferentialDrivetrainSim::SetPose(const frc::Pose2d& pose) {
+void DifferentialDrivetrainSim::SetPose(const Pose2d& pose) {
   m_x(State::kX) = pose.X().value();
   m_x(State::kY) = pose.Y().value();
   m_x(State::kHeading) = pose.Rotation().Radians().value();

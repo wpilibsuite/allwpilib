@@ -9,9 +9,9 @@
 #include <frc/controller/LinearQuadraticRegulator.h>
 #include <frc/system/LinearSystem.h>
 #include <frc/system/plant/LinearSystemId.h>
-#include <units/acceleration.h>
-#include <units/velocity.h>
-#include <units/voltage.h>
+#include <units/acceleration.hpp>
+#include <units/velocity.hpp>
+#include <units/voltage.hpp>
 
 #include "sysid/analysis/FeedbackControllerPreset.h"
 

@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include <units/frequency.h>
+#include <units/frequency.hpp>
 
 #include "frc/simulation/CallbackStore.h"
 

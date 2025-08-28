@@ -9,7 +9,7 @@
 #include <frc/simulation/SimHooks.h>
 #include <gtest/gtest.h>
 #include <hal/simulation/I2CData.h>
-#include <units/time.h>
+#include <units/time.hpp>
 
 #include "Robot.h"
 

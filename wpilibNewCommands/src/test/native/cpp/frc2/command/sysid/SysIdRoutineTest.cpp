@@ -11,7 +11,7 @@
 #include <frc/Timer.h>
 #include <frc/simulation/SimHooks.h>
 #include <gtest/gtest.h>
-#include <units/math.h>
+#include <units/math.hpp>
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)

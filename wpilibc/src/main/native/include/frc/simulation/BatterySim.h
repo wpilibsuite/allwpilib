@@ -8,9 +8,9 @@
 #include <numeric>
 #include <span>
 
-#include <units/current.h>
-#include <units/impedance.h>
-#include <units/voltage.h>
+#include <units/current.hpp>
+#include <units/impedance.hpp>
+#include <units/voltage.hpp>
 
 namespace frc::sim {
 

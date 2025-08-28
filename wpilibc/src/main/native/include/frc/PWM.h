@@ -8,7 +8,7 @@
 
 #include <hal/PWM.h>
 #include <hal/Types.h>
-#include <units/time.h>
+#include <units/time.hpp>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 

@@ -3,13 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
-#include <units/angular_acceleration.h>
-#include <units/angular_velocity.h>
+#include <units/angular_acceleration.hpp>
+#include <units/angular_velocity.hpp>
 
 #include "frc/Encoder.h"
 #include "frc/RobotController.h"
-#include "frc/controller/PIDController.h"
-#include "frc/controller/SimpleMotorFeedforward.h"
+#include "wpi/math/controller/PIDController.hpp"
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "frc/motorcontrol/PWMVictorSPX.h"
 #include "frc/simulation/BatterySim.h"
 #include "frc/simulation/DifferentialDrivetrainSim.h"
@@ -19,15 +19,15 @@
 #include "frc/simulation/LinearSystemSim.h"
 #include "frc/simulation/PWMSim.h"
 #include "frc/simulation/RoboRioSim.h"
-#include "frc/system/plant/LinearSystemId.h"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
 
 TEST(StateSpaceSimTest, FlywheelSim) {
-  const frc::LinearSystem<1, 1, 1> plant =
-      frc::LinearSystemId::IdentifyVelocitySystem<units::radian>(
+  const wpi::math::LinearSystem<1, 1, 1> plant =
+      wpi::math::LinearSystemId::IdentifyVelocitySystem<units::radian>(
           0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq);
-  frc::sim::FlywheelSim sim{plant, frc::DCMotor::NEO(2)};
-  frc::PIDController controller{0.2, 0.0, 0.0};
-  frc::SimpleMotorFeedforward<units::radian> feedforward{
+  wpi::math::sim::FlywheelSim sim{plant, wpi::math::DCMotor::NEO(2)};
+  wpi::math::PIDController controller{0.2, 0.0, 0.0};
+  wpi::math::SimpleMotorFeedforward<units::radian> feedforward{
       0_V, 0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq};
   frc::Encoder encoder{0, 1};
   frc::sim::EncoderSim encoderSim{encoder};
@@ -46,7 +46,7 @@ TEST(StateSpaceSimTest, FlywheelSim) {
     frc::sim::RoboRioSim::SetVInVoltage(
         frc::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
     sim.SetInput(
-        frc::Vectord<1>{motor.Get() * frc::RobotController::GetInputVoltage()});
+        wpi::math::Vectord<1>{motor.Get() * frc::RobotController::GetInputVoltage()});
     sim.Update(20_ms);
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }

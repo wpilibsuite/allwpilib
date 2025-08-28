@@ -12,7 +12,7 @@
 
 #include "frc/DigitalInput.h"
 #include "frc/DutyCycle.h"
-#include "frc/MathUtil.h"
+#include "wpi/math/MathUtil.hpp"
 
 using namespace frc;
 
@@ -98,7 +98,7 @@ double DutyCycleEncoder::Get() const {
   pos = pos * m_fullRange - m_expectedZero;
 
   // Map from 0 - Full Range
-  double result = InputModulus(pos, 0.0, m_fullRange);
+  double result = wpi::math::InputModulus(pos, 0.0, m_fullRange);
   // Invert if necessary
   if (m_isInverted) {
     return m_fullRange - result;

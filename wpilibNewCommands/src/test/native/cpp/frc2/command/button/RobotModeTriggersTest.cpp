@@ -10,7 +10,7 @@
 #include "frc2/command/button/Trigger.h"
 
 using namespace frc2;
-using namespace frc::sim;
+using namespace wpi::math::sim;
 class RobotModeTriggersTest : public CommandTestBase {};
 
 TEST(RobotModeTriggersTest, Autonomous) {

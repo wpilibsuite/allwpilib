@@ -6,8 +6,8 @@
 #include <frc/geometry/Pose2d.h>
 #include <frc/path/TravelingSalesman.h>
 
-#include <units/angle.h>
-#include <units/length.h>
+#include <units/angle.hpp>
+#include <units/length.hpp>
 #include <wpi/array.h>
 
 static constexpr wpi::array<frc::Pose2d, 6> poses{

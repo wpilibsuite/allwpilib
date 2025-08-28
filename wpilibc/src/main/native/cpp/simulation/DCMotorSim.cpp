@@ -10,6 +10,7 @@
 
 using namespace frc;
 using namespace frc::sim;
+using namespace wpi::math;
 
 DCMotorSim::DCMotorSim(const LinearSystem<2, 1, 2>& plant,
                        const DCMotor& gearbox,

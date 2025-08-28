@@ -18,7 +18,7 @@
 #include <frc/estimator/DifferentialDrivePoseEstimator.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Pose3d.h>
-#include <frc/geometry/Quaternion.h>
+#include <wpi/math/geometry/Quaternion.hpp>
 #include <frc/geometry/Transform3d.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
@@ -29,10 +29,10 @@
 #include <frc/system/plant/LinearSystemId.h>
 #include <networktables/DoubleArrayTopic.h>
 #include <networktables/NetworkTableInstance.h>
-#include <units/angle.h>
-#include <units/angular_velocity.h>
-#include <units/length.h>
-#include <units/velocity.h>
+#include <units/angle.hpp>
+#include <units/angular_velocity.hpp>
+#include <units/length.hpp>
+#include <units/velocity.hpp>
 
 /**
  * Represents a differential drive style drivetrain.

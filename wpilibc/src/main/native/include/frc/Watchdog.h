@@ -8,7 +8,7 @@
 #include <string_view>
 #include <utility>
 
-#include <units/time.h>
+#include <units/time.hpp>
 
 #include "frc/Tracer.h"
 

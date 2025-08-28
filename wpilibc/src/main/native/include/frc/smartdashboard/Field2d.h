@@ -11,15 +11,15 @@
 #include <networktables/NTSendable.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
-#include <units/length.h>
+#include <units/length.hpp>
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableHelper.h>
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "frc/smartdashboard/FieldObject2d.h"
 
-namespace frc {
+namespace wpi::math {
 
 /**
  * 2D representation of game field for dashboards.
@@ -39,7 +39,7 @@ namespace frc {
  * also be shown by using the GetObject() function.  Other objects can
  * also have multiple poses (which will show the object at multiple locations).
  */
-class Field2d : public nt::NTSendable, public wpi::SendableHelper<Field2d> {
+class Field2d : public nt::NTSendable, public SendableHelper<Field2d> {
  public:
   using Entry = size_t;
 
@@ -62,7 +62,8 @@ class Field2d : public nt::NTSendable, public wpi::SendableHelper<Field2d> {
    * @param y Y location
    * @param rotation rotation
    */
-  void SetRobotPose(units::meter_t x, units::meter_t y, Rotation2d rotation);
+  void SetRobotPose(units::meter_t x, units::meter_t y,
+                    Rotation2d rotation);
 
   /**
    * Get the robot pose.
@@ -90,7 +91,7 @@ class Field2d : public nt::NTSendable, public wpi::SendableHelper<Field2d> {
  private:
   std::shared_ptr<nt::NetworkTable> m_table;
 
-  mutable wpi::mutex m_mutex;
+  mutable mutex m_mutex;
   std::vector<std::unique_ptr<FieldObject2d>> m_objects;
 };
 

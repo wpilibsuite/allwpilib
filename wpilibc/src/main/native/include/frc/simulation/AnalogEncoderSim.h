@@ -5,9 +5,9 @@
 #pragma once
 
 #include <hal/SimDevice.h>
-#include <units/angle.h>
+#include <units/angle.hpp>
 
-#include "frc/geometry/Rotation2d.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
 
 namespace frc {
 

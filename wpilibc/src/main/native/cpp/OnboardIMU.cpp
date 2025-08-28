@@ -42,20 +42,20 @@ void OnboardIMU::ResetYaw() {
   m_yawOffset = GetYawNoOffset();
 }
 
-Rotation2d OnboardIMU::GetRotation2d() {
-  return Rotation2d{GetYaw()};
+wpi::math::Rotation2d OnboardIMU::GetRotation2d() {
+  return wpi::math::Rotation2d{GetYaw()};
 }
 
-Rotation3d OnboardIMU::GetRotation3d() {
-  return Rotation3d{GetQuaternion()};
+wpi::math::Rotation3d OnboardIMU::GetRotation3d() {
+  return wpi::math::Rotation3d{GetQuaternion()};
 }
 
-Quaternion OnboardIMU::GetQuaternion() {
+wpi::math::Quaternion OnboardIMU::GetQuaternion() {
   HAL_Quaternion val;
   int32_t status = 0;
   HAL_GetIMUQuaternion(&val, &status);
   FRC_CheckErrorStatus(status, "Onboard IMU");
-  return Quaternion{val.w, val.x, val.y, val.z};
+  return wpi::math::Quaternion{val.w, val.x, val.y, val.z};
 }
 
 units::radian_t OnboardIMU::GetAngleX() {

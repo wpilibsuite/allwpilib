@@ -13,7 +13,7 @@
 
 #include <imgui.h>
 #include <implot.h>
-#include <units/time.h>
+#include <units/time.hpp>
 #include <wpi/Logger.h>
 #include <wpi/spinlock.h>
 

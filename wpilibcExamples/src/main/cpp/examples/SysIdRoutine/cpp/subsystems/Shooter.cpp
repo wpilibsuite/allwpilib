@@ -5,8 +5,8 @@
 #include "subsystems/Shooter.h"
 
 #include <frc2/command/Commands.h>
-#include <units/angle.h>
-#include <units/voltage.h>
+#include <units/angle.hpp>
+#include <units/voltage.hpp>
 
 Shooter::Shooter() {
   m_shooterEncoder.SetDistancePerPulse(

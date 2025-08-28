@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include <frc/filter/Debouncer.h>
+#include <wpi/math/filter/Debouncer.hpp>
 
 #include "frc2/command/CommandPtr.h"
 

@@ -10,10 +10,10 @@
 #include <frc/event/BooleanEvent.h>
 #include <frc/event/EventLoop.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <units/angular_velocity.h>
-#include <units/length.h>
-#include <units/time.h>
-#include <units/voltage.h>
+#include <units/angular_velocity.hpp>
+#include <units/length.hpp>
+#include <units/time.hpp>
+#include <units/voltage.hpp>
 
 static const auto SHOT_VELOCITY = 200_rpm;
 static const auto TOLERANCE = 8_rpm;

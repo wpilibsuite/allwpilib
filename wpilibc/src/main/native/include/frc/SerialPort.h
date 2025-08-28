@@ -9,7 +9,7 @@
 
 #include <hal/SerialPort.h>
 #include <hal/Types.h>
-#include <units/time.h>
+#include <units/time.hpp>
 
 namespace frc {
 

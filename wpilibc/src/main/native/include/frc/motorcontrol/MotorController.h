@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <units/voltage.h>
+#include <units/voltage.hpp>
 
 namespace frc {
 

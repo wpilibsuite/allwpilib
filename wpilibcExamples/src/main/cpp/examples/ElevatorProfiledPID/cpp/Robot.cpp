@@ -11,11 +11,11 @@
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/trajectory/TrapezoidProfile.h>
-#include <units/acceleration.h>
-#include <units/length.h>
-#include <units/time.h>
-#include <units/velocity.h>
-#include <units/voltage.h>
+#include <units/acceleration.hpp>
+#include <units/length.hpp>
+#include <units/time.hpp>
+#include <units/velocity.hpp>
+#include <units/voltage.hpp>
 
 class Robot : public frc::TimedRobot {
  public:

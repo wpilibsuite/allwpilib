@@ -7,10 +7,10 @@
 #include <memory>
 #include <string_view>
 
-#include <units/current.h>
-#include <units/pressure.h>
-#include <units/time.h>
-#include <units/voltage.h>
+#include <units/current.hpp>
+#include <units/pressure.hpp>
+#include <units/time.hpp>
+#include <units/voltage.hpp>
 
 #include "frc/CompressorConfigType.h"
 #include "frc/PneumaticsModuleType.h"

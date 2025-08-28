@@ -9,8 +9,8 @@
 
 using namespace frc::sim;
 
-AnalogEncoderSim::AnalogEncoderSim(const frc::AnalogEncoder& encoder) {
-  frc::sim::SimDeviceSim deviceSim{"AnalogEncoder", encoder.GetChannel()};
+AnalogEncoderSim::AnalogEncoderSim(const AnalogEncoder& encoder) {
+  SimDeviceSim deviceSim{"AnalogEncoder", encoder.GetChannel()};
   m_positionSim = deviceSim.GetDouble("Position");
 }
 

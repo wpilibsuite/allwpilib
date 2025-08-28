@@ -5,7 +5,7 @@
 #include "frc/simulation/PWMMotorControllerSim.h"
 
 #include <hal/SimDevice.h>
-#include <units/length.h>
+#include <units/length.hpp>
 
 #include "frc/simulation/SimDeviceSim.h"
 

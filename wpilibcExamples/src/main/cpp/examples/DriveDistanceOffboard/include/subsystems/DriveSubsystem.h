@@ -11,7 +11,7 @@
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
-#include <units/length.h>
+#include <units/length.hpp>
 
 #include "Constants.h"
 #include "ExampleSmartMotorController.h"

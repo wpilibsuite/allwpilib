@@ -14,7 +14,7 @@
 #include <utility>
 
 #include <hal/Types.h>
-#include <units/time.h>
+#include <units/time.hpp>
 #include <wpi/mutex.h>
 
 namespace frc {

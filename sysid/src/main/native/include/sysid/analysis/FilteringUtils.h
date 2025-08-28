@@ -15,7 +15,7 @@
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 #include <frc/filter/LinearFilter.h>
-#include <units/time.h>
+#include <units/time.hpp>
 #include <wpi/StringMap.h>
 #include <wpi/array.h>
 

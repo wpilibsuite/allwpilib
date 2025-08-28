@@ -6,15 +6,15 @@
 
 #include <cmath>
 
-#include <units/voltage.h>
+#include <units/voltage.hpp>
 #include <wpi/MathExtras.h>
 
 #include "frc/RobotController.h"
-#include "frc/system/NumericalIntegration.h"
-#include "frc/system/plant/LinearSystemId.h"
+#include "wpi/math/system/NumericalIntegration.hpp"
+#include "wpi/math/system/plant/LinearSystemId.hpp"
 
 using namespace frc;
-using namespace frc::sim;
+using namespace wpi::math::sim;
 
 SingleJointedArmSim::SingleJointedArmSim(
     const LinearSystem<2, 1, 2>& system, const DCMotor& gearbox, double gearing,
@@ -77,15 +77,15 @@ units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
   // is spinning 10x faster than the output
   units::radians_per_second_t motorVelocity{m_x(1) * m_gearing};
   return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) *
-         wpi::sgn(m_u(0));
+         sgn(m_u(0));
 }
 
 void SingleJointedArmSim::SetInputVoltage(units::volt_t voltage) {
   SetInput(Vectord<1>{voltage.value()});
-  ClampInput(frc::RobotController::GetBatteryVoltage().value());
+  ClampInput(RobotController::GetBatteryVoltage().value());
 }
 
-Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
+wpi::math::Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
                                         const Vectord<1>& u,
                                         units::second_t dt) {
   // The torque on the arm is given by τ = F⋅r, where F is the force applied by

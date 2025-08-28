@@ -6,14 +6,14 @@
 
 #include <array>
 
-#include <units/length.h>
-#include <units/mass.h>
-#include <units/velocity.h>
+#include <units/length.hpp>
+#include <units/mass.hpp>
+#include <units/velocity.hpp>
 
 #include "frc/simulation/LinearSystemSim.h"
-#include "frc/system/plant/DCMotor.h"
+#include "wpi/math/system/plant/DCMotor.hpp"
 
-namespace frc::sim {
+namespace wpi::math::sim {
 /**
  * Represents a simulated elevator mechanism.
  */
