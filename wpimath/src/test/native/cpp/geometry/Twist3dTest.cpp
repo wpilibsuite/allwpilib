@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/geometry/Pose3d.h"
+#include "wpi/math/geometry/Pose3d.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 TEST(Twist3dTest, StraightX) {
   const Twist3d straight{5_m, 0_m, 0_m, 0_rad, 0_rad, 0_rad};

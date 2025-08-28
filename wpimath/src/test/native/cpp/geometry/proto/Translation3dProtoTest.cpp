@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "wpimath/geometry/Translation3d.h"
+#include "wpi/math/geometry/Translation3d.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 namespace {
 

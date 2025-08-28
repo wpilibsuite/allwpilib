@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/filter/Debouncer.h"
+#include "wpi/math/filter/Debouncer.h"
 
-#include "wpimath/MathShared.h"
+#include "wpi/math/MathShared.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 Debouncer::Debouncer(units::second_t debounceTime, DebounceType type)
     : m_debounceTime(debounceTime), m_debounceType(type) {

@@ -8,12 +8,12 @@
 
 #include "trajectory/TestTrajectory.h"
 #include "units/math.h"
-#include "wpimath/trajectory/Trajectory.h"
-#include "wpimath/trajectory/TrajectoryGenerator.h"
-#include "wpimath/trajectory/constraint/CentripetalAccelerationConstraint.h"
-#include "wpimath/trajectory/constraint/TrajectoryConstraint.h"
+#include "wpi/math/trajectory/Trajectory.h"
+#include "wpi/math/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.h"
+#include "wpi/math/trajectory/constraint/TrajectoryConstraint.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 TEST(TrajectoryGenerationTest, ObeysConstraints) {
   TrajectoryConfig config{12_fps, 12_fps_sq};

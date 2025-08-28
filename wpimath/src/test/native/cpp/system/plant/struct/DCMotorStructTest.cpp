@@ -4,11 +4,11 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/system/plant/DCMotor.h"
+#include "wpi/math/system/plant/DCMotor.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
-using StructType = wpi::Struct<wpimath::DCMotor>;
+using StructType = wpi::Struct<wpi::math::DCMotor>;
 
 inline constexpr DCMotor kExpectedData =
     DCMotor{1.91_V, 19.1_Nm, 1.74_A, 2.29_A, 2.2_rad_per_s, 2};

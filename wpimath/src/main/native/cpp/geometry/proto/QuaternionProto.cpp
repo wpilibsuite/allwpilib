@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/geometry/proto/QuaternionProto.h"
+#include "wpi/math/geometry/proto/QuaternionProto.h"
 
 #include "wpimath/protobuf/geometry3d.npb.h"
 
-std::optional<wpimath::Quaternion> wpi::Protobuf<wpimath::Quaternion>::Unpack(
+std::optional<wpi::math::Quaternion> wpi::Protobuf<wpi::math::Quaternion>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufQuaternion msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return wpimath::Quaternion{
+  return wpi::math::Quaternion{
       msg.w,
       msg.x,
       msg.y,
@@ -21,8 +21,8 @@ std::optional<wpimath::Quaternion> wpi::Protobuf<wpimath::Quaternion>::Unpack(
   };
 }
 
-bool wpi::Protobuf<wpimath::Quaternion>::Pack(
-    OutputStream& stream, const wpimath::Quaternion& value) {
+bool wpi::Protobuf<wpi::math::Quaternion>::Pack(
+    OutputStream& stream, const wpi::math::Quaternion& value) {
   wpi_proto_ProtobufQuaternion msg{
       .w = value.W(),
       .x = value.X(),

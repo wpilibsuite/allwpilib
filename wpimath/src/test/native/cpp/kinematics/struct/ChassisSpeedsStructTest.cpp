@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/kinematics/ChassisSpeeds.h"
+#include "wpi/math/kinematics/ChassisSpeeds.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<wpimath::ChassisSpeeds>;
+using StructType = wpi::Struct<wpi::math::ChassisSpeeds>;
 const ChassisSpeeds kExpectedData{
     ChassisSpeeds{2.29_mps, 2.2_mps, 0.3504_rad_per_s}};
 }  // namespace

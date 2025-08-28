@@ -194,7 +194,7 @@ install(
     FILES_MATCHING
     PATTERN "*.h"
 )
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
+install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpi/math")
 target_include_directories(
     wpimath
     PUBLIC

@@ -4,18 +4,18 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/ComputerVisionUtil.h"
+#include "wpi/math/ComputerVisionUtil.h"
 
 TEST(ComputerVisionUtilTest, ObjectToRobotPose) {
-  wpimath::Pose3d robot{1_m, 2_m, 0_m,
-                        wpimath::Rotation3d{0_deg, 0_deg, 30_deg}};
-  wpimath::Transform3d cameraToObject{
-      wpimath::Translation3d{1_m, 1_m, 1_m},
-      wpimath::Rotation3d{0_deg, -20_deg, 45_deg}};
-  wpimath::Transform3d robotToCamera{wpimath::Translation3d{1_m, 0_m, 2_m},
-                                     wpimath::Rotation3d{0_deg, 0_deg, 25_deg}};
-  wpimath::Pose3d object = robot + robotToCamera + cameraToObject;
+  wpi::math::Pose3d robot{1_m, 2_m, 0_m,
+                        wpi::math::Rotation3d{0_deg, 0_deg, 30_deg}};
+  wpi::math::Transform3d cameraToObject{
+      wpi::math::Translation3d{1_m, 1_m, 1_m},
+      wpi::math::Rotation3d{0_deg, -20_deg, 45_deg}};
+  wpi::math::Transform3d robotToCamera{wpi::math::Translation3d{1_m, 0_m, 2_m},
+                                     wpi::math::Rotation3d{0_deg, 0_deg, 25_deg}};
+  wpi::math::Pose3d object = robot + robotToCamera + cameraToObject;
 
   EXPECT_EQ(robot,
-            wpimath::ObjectToRobotPose(object, cameraToObject, robotToCamera));
+            wpi::math::ObjectToRobotPose(object, cameraToObject, robotToCamera));
 }

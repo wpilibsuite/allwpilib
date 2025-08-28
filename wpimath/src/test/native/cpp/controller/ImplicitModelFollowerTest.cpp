@@ -4,10 +4,10 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/controller/ImplicitModelFollower.h"
-#include "wpimath/system/plant/LinearSystemId.h"
+#include "wpi/math/controller/ImplicitModelFollower.h"
+#include "wpi/math/system/plant/LinearSystemId.h"
 
-namespace wpimath {
+namespace wpi::math {
 
 TEST(ImplicitModelFollowerTest, SameModel) {
   constexpr auto dt = 5_ms;
@@ -106,4 +106,4 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
   }
 }
 
-}  // namespace wpimath
+}  // namespace wpi::math

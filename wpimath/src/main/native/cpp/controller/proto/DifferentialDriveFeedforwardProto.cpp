@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/controller/proto/DifferentialDriveFeedforwardProto.h"
+#include "wpi/math/controller/proto/DifferentialDriveFeedforwardProto.h"
 
 #include "wpimath/protobuf/controller.npb.h"
 
-std::optional<wpimath::DifferentialDriveFeedforward> wpi::Protobuf<
-    wpimath::DifferentialDriveFeedforward>::Unpack(InputStream& stream) {
+std::optional<wpi::math::DifferentialDriveFeedforward> wpi::Protobuf<
+    wpi::math::DifferentialDriveFeedforward>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufDifferentialDriveFeedforward msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return wpimath::DifferentialDriveFeedforward{
+  return wpi::math::DifferentialDriveFeedforward{
       decltype(1_V / 1_mps){msg.kv_linear},
       decltype(1_V / 1_mps_sq){msg.ka_linear},
       decltype(1_V / 1_mps){msg.kv_angular},
@@ -21,8 +21,8 @@ std::optional<wpimath::DifferentialDriveFeedforward> wpi::Protobuf<
   };
 }
 
-bool wpi::Protobuf<wpimath::DifferentialDriveFeedforward>::Pack(
-    OutputStream& stream, const wpimath::DifferentialDriveFeedforward& value) {
+bool wpi::Protobuf<wpi::math::DifferentialDriveFeedforward>::Pack(
+    OutputStream& stream, const wpi::math::DifferentialDriveFeedforward& value) {
   wpi_proto_ProtobufDifferentialDriveFeedforward msg{
       .kv_linear = value.m_kVLinear.value(),
       .ka_linear = value.m_kALinear.value(),

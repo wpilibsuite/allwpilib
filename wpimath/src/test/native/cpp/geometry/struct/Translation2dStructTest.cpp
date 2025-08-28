@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/geometry/Translation2d.h"
+#include "wpi/math/geometry/Translation2d.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<wpimath::Translation2d>;
+using StructType = wpi::Struct<wpi::math::Translation2d>;
 const Translation2d kExpectedData{Translation2d{3.504_m, 22.9_m}};
 }  // namespace
 

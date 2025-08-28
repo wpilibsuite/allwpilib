@@ -5,10 +5,10 @@
 #include <gtest/gtest.h>
 
 #include "../../ProtoTestBase.h"
-#include "wpimath/system/LinearSystem.h"
-#include "wpimath/system/proto/LinearSystemProto.h"
+#include "wpi/math/system/LinearSystem.h"
+#include "wpi/math/system/proto/LinearSystemProto.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 struct LinearSystemProtoTestData {
   using Type = LinearSystem<2, 3, 4>;

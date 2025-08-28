@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/kinematics/MecanumDriveWheelPositions.h"
+#include "wpi/math/kinematics/MecanumDriveWheelPositions.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<wpimath::MecanumDriveWheelPositions>;
+using StructType = wpi::Struct<wpi::math::MecanumDriveWheelPositions>;
 const MecanumDriveWheelPositions kExpectedData{
     MecanumDriveWheelPositions{17.4_m, 2.29_m, 22.9_m, 1.74_m}};
 }  // namespace

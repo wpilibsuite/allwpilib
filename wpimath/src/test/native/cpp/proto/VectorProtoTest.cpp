@@ -5,10 +5,10 @@
 #include <gtest/gtest.h>
 
 #include "../ProtoTestBase.h"
-#include "wpimath/EigenCore.h"
-#include "wpimath/proto/VectorProto.h"
+#include "wpi/math/EigenCore.h"
+#include "wpi/math/proto/VectorProto.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 struct VectorProtoTestData {
   using Type = Vectord<2>;

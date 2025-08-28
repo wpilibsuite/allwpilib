@@ -13,12 +13,12 @@
 #include "units/time.h"
 #include "units/velocity.h"
 #include "units/voltage.h"
-#include "wpimath/geometry/Pose2d.h"
-#include "wpimath/kinematics/DifferentialDriveKinematics.h"
-#include "wpimath/trajectory/TrajectoryGenerator.h"
-#include "wpimath/trajectory/constraint/DifferentialDriveVoltageConstraint.h"
+#include "wpi/math/geometry/Pose2d.h"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.h"
+#include "wpi/math/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
   // Pick an unreasonably large kA to ensure the constraint has to do some work

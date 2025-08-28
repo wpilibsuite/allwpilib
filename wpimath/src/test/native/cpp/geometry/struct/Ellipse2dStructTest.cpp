@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/geometry/Ellipse2d.h"
+#include "wpi/math/geometry/Ellipse2d.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<wpimath::Ellipse2d>;
+using StructType = wpi::Struct<wpi::math::Ellipse2d>;
 const Ellipse2d kExpectedData{
     Pose2d{Translation2d{0.191_m, 2.2_m}, Rotation2d{22.9_rad}}, 1.2_m, 2.3_m};
 }  // namespace

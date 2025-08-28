@@ -2,25 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/geometry/proto/Twist3dProto.h"
+#include "wpi/math/geometry/proto/Twist3dProto.h"
 
 #include "wpimath/protobuf/geometry3d.npb.h"
 
-std::optional<wpimath::Twist3d> wpi::Protobuf<wpimath::Twist3d>::Unpack(
+std::optional<wpi::math::Twist3d> wpi::Protobuf<wpi::math::Twist3d>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufTwist3d msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return wpimath::Twist3d{
+  return wpi::math::Twist3d{
       units::meter_t{msg.dx},  units::meter_t{msg.dy},  units::meter_t{msg.dz},
       units::radian_t{msg.rx}, units::radian_t{msg.ry}, units::radian_t{msg.rz},
   };
 }
 
-bool wpi::Protobuf<wpimath::Twist3d>::Pack(OutputStream& stream,
-                                           const wpimath::Twist3d& value) {
+bool wpi::Protobuf<wpi::math::Twist3d>::Pack(OutputStream& stream,
+                                           const wpi::math::Twist3d& value) {
   wpi_proto_ProtobufTwist3d msg{
       .dx = value.dx.value(),
       .dy = value.dy.value(),

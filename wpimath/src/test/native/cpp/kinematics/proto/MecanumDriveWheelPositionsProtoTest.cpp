@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "wpimath/kinematics/MecanumDriveWheelPositions.h"
+#include "wpi/math/kinematics/MecanumDriveWheelPositions.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 namespace {
 

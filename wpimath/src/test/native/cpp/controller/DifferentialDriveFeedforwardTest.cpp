@@ -10,9 +10,9 @@
 #include "units/acceleration.h"
 #include "units/length.h"
 #include "units/time.h"
-#include "wpimath/controller/DifferentialDriveFeedforward.h"
-#include "wpimath/controller/LinearPlantInversionFeedforward.h"
-#include "wpimath/system/plant/LinearSystemId.h"
+#include "wpi/math/controller/DifferentialDriveFeedforward.h"
+#include "wpi/math/controller/LinearPlantInversionFeedforward.h"
+#include "wpi/math/system/plant/LinearSystemId.h"
 
 TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
   constexpr auto kVLinear = 1_V / 1_mps;
@@ -22,10 +22,10 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
   constexpr auto trackwidth = 1_m;
   constexpr auto dt = 20_ms;
 
-  wpimath::DifferentialDriveFeedforward differentialDriveFeedforward{
+  wpi::math::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular, trackwidth};
-  wpimath::LinearSystem<2, 2, 2> plant =
-      wpimath::LinearSystemId::IdentifyDrivetrainSystem(
+  wpi::math::LinearSystem<2, 2, 2> plant =
+      wpi::math::LinearSystemId::IdentifyDrivetrainSystem(
           kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
@@ -56,10 +56,10 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
   constexpr auto kAAngular = 1_V / 1_mps_sq;
   constexpr auto dt = 20_ms;
 
-  wpimath::DifferentialDriveFeedforward differentialDriveFeedforward{
+  wpi::math::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular};
-  wpimath::LinearSystem<2, 2, 2> plant =
-      wpimath::LinearSystemId::IdentifyDrivetrainSystem(kVLinear, kALinear,
+  wpi::math::LinearSystem<2, 2, 2> plant =
+      wpi::math::LinearSystemId::IdentifyDrivetrainSystem(kVLinear, kALinear,
                                                         kVAngular, kAAngular);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {

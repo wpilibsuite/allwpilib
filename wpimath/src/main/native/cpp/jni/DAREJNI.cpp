@@ -11,8 +11,8 @@
 
 #include "Exceptions.h"
 #include "edu_wpi_first_math_jni_DAREJNI.h"
-#include "wpimath/DARE.h"
-#include "wpimath/fmt/Eigen.h"
+#include "wpi/math/DARE.h"
+#include "wpi/math/fmt/Eigen.h"
 
 using namespace wpi::java;
 
@@ -46,7 +46,7 @@ Java_edu_wpi_first_math_jni_DAREJNI_dareNoPrecondABQR
                                  Eigen::RowMajor>>
       Rmat{nativeR.data(), inputs, inputs};
 
-  auto result = wpimath::DARE<Eigen::Dynamic, Eigen::Dynamic>(Amat, Bmat, Qmat,
+  auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(Amat, Bmat, Qmat,
                                                               Rmat, false)
                     .value();
 
@@ -85,7 +85,7 @@ Java_edu_wpi_first_math_jni_DAREJNI_dareNoPrecondABQRN
                                  Eigen::RowMajor>>
       Nmat{nativeN.data(), states, inputs};
 
-  auto result = wpimath::DARE<Eigen::Dynamic, Eigen::Dynamic>(Amat, Bmat, Qmat,
+  auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(Amat, Bmat, Qmat,
                                                               Rmat, Nmat, false)
                     .value();
 
@@ -120,22 +120,22 @@ Java_edu_wpi_first_math_jni_DAREJNI_dareABQR
                                  Eigen::RowMajor>>
       Rmat{nativeR.data(), inputs, inputs};
 
-  if (auto result = wpimath::DARE<Eigen::Dynamic, Eigen::Dynamic>(Amat, Bmat,
+  if (auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(Amat, Bmat,
                                                                   Qmat, Rmat)) {
     env->SetDoubleArrayRegion(S, 0, states * states, result.value().data());
     // K = (BᵀSB + R)⁻¹BᵀSA
-  } else if (result.error() == wpimath::DAREError::QNotSymmetric ||
-             result.error() == wpimath::DAREError::QNotPositiveSemidefinite) {
+  } else if (result.error() == wpi::math::DAREError::QNotSymmetric ||
+             result.error() == wpi::math::DAREError::QNotPositiveSemidefinite) {
     illegalArgEx.Throw(
         env, fmt::format("{}\n\nQ =\n{}\n", to_string(result.error()), Qmat));
-  } else if (result.error() == wpimath::DAREError::RNotSymmetric ||
-             result.error() == wpimath::DAREError::RNotPositiveDefinite) {
+  } else if (result.error() == wpi::math::DAREError::RNotSymmetric ||
+             result.error() == wpi::math::DAREError::RNotPositiveDefinite) {
     illegalArgEx.Throw(
         env, fmt::format("{}\n\nR =\n{}\n", to_string(result.error()), Rmat));
-  } else if (result.error() == wpimath::DAREError::ABNotStabilizable) {
+  } else if (result.error() == wpi::math::DAREError::ABNotStabilizable) {
     illegalArgEx.Throw(env, fmt::format("{}\n\nA =\n{}\nB =\n{}\n",
                                         to_string(result.error()), Amat, Bmat));
-  } else if (result.error() == wpimath::DAREError::ACNotDetectable) {
+  } else if (result.error() == wpi::math::DAREError::ACNotDetectable) {
     illegalArgEx.Throw(env, fmt::format("{}\n\nA =\n{}\nQ =\n{}\n",
                                         to_string(result.error()), Amat, Qmat));
   }
@@ -173,23 +173,23 @@ Java_edu_wpi_first_math_jni_DAREJNI_dareABQRN
                                  Eigen::RowMajor>>
       Nmat{nativeN.data(), states, inputs};
 
-  if (auto result = wpimath::DARE<Eigen::Dynamic, Eigen::Dynamic>(
+  if (auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(
           Amat, Bmat, Qmat, Rmat, Nmat)) {
     env->SetDoubleArrayRegion(S, 0, states * states, result.value().data());
-  } else if (result.error() == wpimath::DAREError::QNotSymmetric ||
-             result.error() == wpimath::DAREError::QNotPositiveSemidefinite) {
+  } else if (result.error() == wpi::math::DAREError::QNotSymmetric ||
+             result.error() == wpi::math::DAREError::QNotPositiveSemidefinite) {
     illegalArgEx.Throw(
         env, fmt::format("{}\n\nQ =\n{}\n", to_string(result.error()), Qmat));
-  } else if (result.error() == wpimath::DAREError::RNotSymmetric ||
-             result.error() == wpimath::DAREError::RNotPositiveDefinite) {
+  } else if (result.error() == wpi::math::DAREError::RNotSymmetric ||
+             result.error() == wpi::math::DAREError::RNotPositiveDefinite) {
     illegalArgEx.Throw(
         env, fmt::format("{}\n\nR =\n{}\n", to_string(result.error()), Rmat));
-  } else if (result.error() == wpimath::DAREError::ABNotStabilizable) {
+  } else if (result.error() == wpi::math::DAREError::ABNotStabilizable) {
     illegalArgEx.Throw(
         env,
         fmt::format("{}\n\nA =\n{}\nB =\n{}\n", to_string(result.error()),
                     Amat - Bmat * Rmat.llt().solve(Nmat.transpose()), Bmat));
-  } else if (result.error() == wpimath::DAREError::ACNotDetectable) {
+  } else if (result.error() == wpi::math::DAREError::ACNotDetectable) {
     auto R_llt = Rmat.llt();
     illegalArgEx.Throw(
         env, fmt::format("{}\n\nA =\n{}\nQ =\n{}\n", to_string(result.error()),

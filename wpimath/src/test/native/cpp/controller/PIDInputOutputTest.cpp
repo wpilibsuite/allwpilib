@@ -4,10 +4,10 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/controller/PIDController.h"
+#include "wpi/math/controller/PIDController.h"
 
 TEST(PIDInputOutputTest, ContinuousInput) {
-  wpimath::PIDController controller{0.0, 0.0, 0.0};
+  wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetP(1);
   controller.EnableContinuousInput(-180, 180);
@@ -18,7 +18,7 @@ TEST(PIDInputOutputTest, ContinuousInput) {
 }
 
 TEST(PIDInputOutputTest, ProportionalGainOutput) {
-  wpimath::PIDController controller{0.0, 0.0, 0.0};
+  wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetP(4);
 
@@ -26,7 +26,7 @@ TEST(PIDInputOutputTest, ProportionalGainOutput) {
 }
 
 TEST(PIDInputOutputTest, IntegralGainOutput) {
-  wpimath::PIDController controller{0.0, 0.0, 0.0};
+  wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetI(4);
 
@@ -40,7 +40,7 @@ TEST(PIDInputOutputTest, IntegralGainOutput) {
 }
 
 TEST(PIDInputOutputTest, DerivativeGainOutput) {
-  wpimath::PIDController controller{0.0, 0.0, 0.0};
+  wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetD(4);
 
@@ -51,7 +51,7 @@ TEST(PIDInputOutputTest, DerivativeGainOutput) {
 }
 
 TEST(PIDInputOutputTest, IZoneNoOutput) {
-  wpimath::PIDController controller{0.0, 0.0, 0.0};
+  wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetI(1);
   controller.SetIZone(1);
@@ -62,7 +62,7 @@ TEST(PIDInputOutputTest, IZoneNoOutput) {
 }
 
 TEST(PIDInputOutputTest, IZoneOutput) {
-  wpimath::PIDController controller{0.0, 0.0, 0.0};
+  wpi::math::PIDController controller{0.0, 0.0, 0.0};
 
   controller.SetI(1);
   controller.SetIZone(1);

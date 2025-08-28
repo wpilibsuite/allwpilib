@@ -5,10 +5,10 @@
 #include <gtest/gtest.h>
 
 #include "units/math.h"
-#include "wpimath/controller/DifferentialDriveAccelerationLimiter.h"
-#include "wpimath/system/plant/LinearSystemId.h"
+#include "wpi/math/controller/DifferentialDriveAccelerationLimiter.h"
+#include "wpi/math/system/plant/LinearSystemId.h"
 
-namespace wpimath {
+namespace wpi::math {
 
 TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
   constexpr auto trackwidth = 0.9_m;
@@ -254,4 +254,4 @@ TEST(DifferentialDriveAccelerationLimiterTest, MinAccelGreaterThanMaxAccel) {
       std::invalid_argument);
 }
 
-}  // namespace wpimath
+}  // namespace wpi::math

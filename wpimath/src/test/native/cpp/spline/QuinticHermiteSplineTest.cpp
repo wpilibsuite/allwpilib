@@ -8,15 +8,15 @@
 
 #include "units/angle.h"
 #include "units/length.h"
-#include "wpimath/geometry/Pose2d.h"
-#include "wpimath/geometry/Rotation2d.h"
-#include "wpimath/spline/QuinticHermiteSpline.h"
-#include "wpimath/spline/SplineHelper.h"
-#include "wpimath/spline/SplineParameterizer.h"
+#include "wpi/math/geometry/Pose2d.h"
+#include "wpi/math/geometry/Rotation2d.h"
+#include "wpi/math/spline/QuinticHermiteSpline.h"
+#include "wpi/math/spline/SplineHelper.h"
+#include "wpi/math/spline/SplineParameterizer.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
-namespace wpimath {
+namespace wpi::math {
 class QuinticHermiteSplineTest : public ::testing::Test {
  protected:
   static void Run(const Pose2d& a, const Pose2d& b) {
@@ -51,7 +51,7 @@ class QuinticHermiteSplineTest : public ::testing::Test {
                 b.Rotation().Radians().value(), 1E-9);
   }
 };
-}  // namespace wpimath
+}  // namespace wpi::math
 
 TEST_F(QuinticHermiteSplineTest, StraightLine) {
   Run(Pose2d{}, Pose2d{3_m, 0_m, 0_deg});

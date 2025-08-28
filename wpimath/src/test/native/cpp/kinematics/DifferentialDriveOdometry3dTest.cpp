@@ -6,20 +6,20 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/kinematics/DifferentialDriveKinematics.h"
-#include "wpimath/kinematics/DifferentialDriveOdometry3d.h"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.h"
+#include "wpi/math/kinematics/DifferentialDriveOdometry3d.h"
 
 static constexpr double kEpsilon = 1E-9;
 
-using namespace wpimath;
+using namespace wpi::math;
 
 TEST(DifferentialDriveOdometry3dTest, Initialize) {
   DifferentialDriveOdometry3d odometry{
-      wpimath::Rotation3d{0_deg, 0_deg, 90_deg}, 0_m, 0_m,
-      wpimath::Pose3d{1_m, 2_m, 0_m,
-                      wpimath::Rotation3d{0_deg, 0_deg, 45_deg}}};
+      wpi::math::Rotation3d{0_deg, 0_deg, 90_deg}, 0_m, 0_m,
+      wpi::math::Pose3d{1_m, 2_m, 0_m,
+                      wpi::math::Rotation3d{0_deg, 0_deg, 45_deg}}};
 
-  const wpimath::Pose3d& pose = odometry.GetPose();
+  const wpi::math::Pose3d& pose = odometry.GetPose();
 
   EXPECT_NEAR(pose.X().value(), 1, kEpsilon);
   EXPECT_NEAR(pose.Y().value(), 2, kEpsilon);
@@ -29,9 +29,9 @@ TEST(DifferentialDriveOdometry3dTest, Initialize) {
 
 TEST(DifferentialDriveOdometry3dTest, EncoderDistances) {
   DifferentialDriveOdometry3d odometry{
-      wpimath::Rotation3d{0_deg, 0_deg, 45_deg}, 0_m, 0_m};
+      wpi::math::Rotation3d{0_deg, 0_deg, 45_deg}, 0_m, 0_m};
 
-  const auto& pose = odometry.Update(wpimath::Rotation3d{0_deg, 0_deg, 135_deg},
+  const auto& pose = odometry.Update(wpi::math::Rotation3d{0_deg, 0_deg, 135_deg},
                                      0_m, units::meter_t{5 * std::numbers::pi});
 
   EXPECT_NEAR(pose.X().value(), 5.0, kEpsilon);

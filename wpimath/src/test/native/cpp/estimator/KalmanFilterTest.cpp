@@ -10,13 +10,13 @@
 
 #include "units/moment_of_inertia.h"
 #include "units/time.h"
-#include "wpimath/estimator/KalmanFilter.h"
-#include "wpimath/system/plant/DCMotor.h"
-#include "wpimath/system/plant/LinearSystemId.h"
+#include "wpi/math/estimator/KalmanFilter.h"
+#include "wpi/math/system/plant/DCMotor.h"
+#include "wpi/math/system/plant/LinearSystemId.h"
 
 TEST(KalmanFilterTest, Flywheel) {
-  auto motor = wpimath::DCMotor::NEO();
+  auto motor = wpi::math::DCMotor::NEO();
   auto flywheel =
-      wpimath::LinearSystemId::FlywheelSystem(motor, 1_kg_sq_m, 1.0);
-  wpimath::KalmanFilter<1, 1, 1> kf{flywheel, {1}, {1}, 5_ms};
+      wpi::math::LinearSystemId::FlywheelSystem(motor, 1_kg_sq_m, 1.0);
+  wpi::math::KalmanFilter<1, 1, 1> kf{flywheel, {1}, {1}, 5_ms};
 }

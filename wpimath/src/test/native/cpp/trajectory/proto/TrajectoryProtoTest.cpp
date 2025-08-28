@@ -5,16 +5,16 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "wpimath/trajectory/Trajectory.h"
+#include "wpi/math/trajectory/Trajectory.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<wpimath::Trajectory>;
+using ProtoType = wpi::Protobuf<wpi::math::Trajectory>;
 
 const Trajectory kExpectedData =
-    Trajectory{std::vector<wpimath::Trajectory::State>{
+    Trajectory{std::vector<wpi::math::Trajectory::State>{
         Trajectory::State{
             1.1_s, 2.2_mps, 3.3_mps_sq,
             Pose2d(Translation2d(1.1_m, 2.2_m), Rotation2d(2.2_rad)),

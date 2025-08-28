@@ -6,20 +6,20 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/kinematics/ChassisSpeeds.h"
+#include "wpi/math/kinematics/ChassisSpeeds.h"
 
 static constexpr double kEpsilon = 1E-9;
 
 TEST(ChassisSpeedsTest, Discretize) {
-  constexpr wpimath::ChassisSpeeds target{1_mps, 0_mps, 0.5_rad_per_s};
+  constexpr wpi::math::ChassisSpeeds target{1_mps, 0_mps, 0.5_rad_per_s};
   constexpr units::second_t duration = 1_s;
   constexpr units::second_t dt = 10_ms;
 
   const auto speeds = target.Discretize(duration);
-  const wpimath::Twist2d twist{speeds.vx * dt, speeds.vy * dt,
+  const wpi::math::Twist2d twist{speeds.vx * dt, speeds.vy * dt,
                                speeds.omega * dt};
 
-  wpimath::Pose2d pose;
+  wpi::math::Pose2d pose;
   for (units::second_t time = 0_s; time < duration; time += dt) {
     pose = pose.Exp(twist);
   }
@@ -32,7 +32,7 @@ TEST(ChassisSpeedsTest, Discretize) {
 
 TEST(ChassisSpeedsTest, ToRobotRelative) {
   const auto chassisSpeeds =
-      wpimath::ChassisSpeeds{1_mps, 0_mps, 0.5_rad_per_s}.ToRobotRelative(
+      wpi::math::ChassisSpeeds{1_mps, 0_mps, 0.5_rad_per_s}.ToRobotRelative(
           -90.0_deg);
 
   EXPECT_NEAR(0.0, chassisSpeeds.vx.value(), kEpsilon);
@@ -42,7 +42,7 @@ TEST(ChassisSpeedsTest, ToRobotRelative) {
 
 TEST(ChassisSpeedsTest, ToFieldRelative) {
   const auto chassisSpeeds =
-      wpimath::ChassisSpeeds{1_mps, 0_mps, 0.5_rad_per_s}.ToFieldRelative(
+      wpi::math::ChassisSpeeds{1_mps, 0_mps, 0.5_rad_per_s}.ToFieldRelative(
           45.0_deg);
 
   EXPECT_NEAR(1.0 / std::sqrt(2.0), chassisSpeeds.vx.value(), kEpsilon);
@@ -51,10 +51,10 @@ TEST(ChassisSpeedsTest, ToFieldRelative) {
 }
 
 TEST(ChassisSpeedsTest, Plus) {
-  const wpimath::ChassisSpeeds left{1.0_mps, 0.5_mps, 0.75_rad_per_s};
-  const wpimath::ChassisSpeeds right{2.0_mps, 1.5_mps, 0.25_rad_per_s};
+  const wpi::math::ChassisSpeeds left{1.0_mps, 0.5_mps, 0.75_rad_per_s};
+  const wpi::math::ChassisSpeeds right{2.0_mps, 1.5_mps, 0.25_rad_per_s};
 
-  const wpimath::ChassisSpeeds result = left + right;
+  const wpi::math::ChassisSpeeds result = left + right;
 
   EXPECT_NEAR(3.0, result.vx.value(), kEpsilon);
   EXPECT_NEAR(2.0, result.vy.value(), kEpsilon);
@@ -62,10 +62,10 @@ TEST(ChassisSpeedsTest, Plus) {
 }
 
 TEST(ChassisSpeedsTest, Minus) {
-  const wpimath::ChassisSpeeds left{1.0_mps, 0.5_mps, 0.75_rad_per_s};
-  const wpimath::ChassisSpeeds right{2.0_mps, 0.5_mps, 0.25_rad_per_s};
+  const wpi::math::ChassisSpeeds left{1.0_mps, 0.5_mps, 0.75_rad_per_s};
+  const wpi::math::ChassisSpeeds right{2.0_mps, 0.5_mps, 0.25_rad_per_s};
 
-  const wpimath::ChassisSpeeds result = left - right;
+  const wpi::math::ChassisSpeeds result = left - right;
 
   EXPECT_NEAR(-1.0, result.vx.value(), kEpsilon);
   EXPECT_NEAR(0, result.vy.value(), kEpsilon);
@@ -73,9 +73,9 @@ TEST(ChassisSpeedsTest, Minus) {
 }
 
 TEST(ChassisSpeedsTest, UnaryMinus) {
-  const wpimath::ChassisSpeeds speeds{1.0_mps, 0.5_mps, 0.75_rad_per_s};
+  const wpi::math::ChassisSpeeds speeds{1.0_mps, 0.5_mps, 0.75_rad_per_s};
 
-  const wpimath::ChassisSpeeds result = -speeds;
+  const wpi::math::ChassisSpeeds result = -speeds;
 
   EXPECT_NEAR(-1.0, result.vx.value(), kEpsilon);
   EXPECT_NEAR(-0.5, result.vy.value(), kEpsilon);
@@ -83,9 +83,9 @@ TEST(ChassisSpeedsTest, UnaryMinus) {
 }
 
 TEST(ChassisSpeedsTest, Multiplication) {
-  const wpimath::ChassisSpeeds speeds{1.0_mps, 0.5_mps, 0.75_rad_per_s};
+  const wpi::math::ChassisSpeeds speeds{1.0_mps, 0.5_mps, 0.75_rad_per_s};
 
-  const wpimath::ChassisSpeeds result = speeds * 2;
+  const wpi::math::ChassisSpeeds result = speeds * 2;
 
   EXPECT_NEAR(2.0, result.vx.value(), kEpsilon);
   EXPECT_NEAR(1.0, result.vy.value(), kEpsilon);
@@ -93,9 +93,9 @@ TEST(ChassisSpeedsTest, Multiplication) {
 }
 
 TEST(ChassisSpeedsTest, Division) {
-  const wpimath::ChassisSpeeds speeds{1.0_mps, 0.5_mps, 0.75_rad_per_s};
+  const wpi::math::ChassisSpeeds speeds{1.0_mps, 0.5_mps, 0.75_rad_per_s};
 
-  const wpimath::ChassisSpeeds result = speeds / 2;
+  const wpi::math::ChassisSpeeds result = speeds / 2;
 
   EXPECT_NEAR(0.5, result.vx.value(), kEpsilon);
   EXPECT_NEAR(0.25, result.vy.value(), kEpsilon);

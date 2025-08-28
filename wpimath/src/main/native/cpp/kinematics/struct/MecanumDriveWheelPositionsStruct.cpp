@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/kinematics/struct/MecanumDriveWheelPositionsStruct.h"
+#include "wpi/math/kinematics/struct/MecanumDriveWheelPositionsStruct.h"
 
 namespace {
 constexpr size_t kFrontLeftOff = 0;
@@ -11,11 +11,11 @@ constexpr size_t kRearLeftOff = kFrontRightOff + 8;
 constexpr size_t kRearRightOff = kRearLeftOff + 8;
 }  // namespace
 
-using StructType = wpi::Struct<wpimath::MecanumDriveWheelPositions>;
+using StructType = wpi::Struct<wpi::math::MecanumDriveWheelPositions>;
 
-wpimath::MecanumDriveWheelPositions StructType::Unpack(
+wpi::math::MecanumDriveWheelPositions StructType::Unpack(
     std::span<const uint8_t> data) {
-  return wpimath::MecanumDriveWheelPositions{
+  return wpi::math::MecanumDriveWheelPositions{
       units::meter_t{wpi::UnpackStruct<double, kFrontLeftOff>(data)},
       units::meter_t{wpi::UnpackStruct<double, kFrontRightOff>(data)},
       units::meter_t{wpi::UnpackStruct<double, kRearLeftOff>(data)},
@@ -24,7 +24,7 @@ wpimath::MecanumDriveWheelPositions StructType::Unpack(
 }
 
 void StructType::Pack(std::span<uint8_t> data,
-                      const wpimath::MecanumDriveWheelPositions& value) {
+                      const wpi::math::MecanumDriveWheelPositions& value) {
   wpi::PackStruct<kFrontLeftOff>(data, value.frontLeft.value());
   wpi::PackStruct<kFrontRightOff>(data, value.frontRight.value());
   wpi::PackStruct<kRearLeftOff>(data, value.rearLeft.value());

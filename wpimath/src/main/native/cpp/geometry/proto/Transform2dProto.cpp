@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/geometry/proto/Transform2dProto.h"
+#include "wpi/math/geometry/proto/Transform2dProto.h"
 
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "wpimath/protobuf/geometry2d.npb.h"
 
-std::optional<wpimath::Transform2d> wpi::Protobuf<wpimath::Transform2d>::Unpack(
+std::optional<wpi::math::Transform2d> wpi::Protobuf<wpi::math::Transform2d>::Unpack(
     InputStream& stream) {
-  wpi::UnpackCallback<wpimath::Translation2d> tsln;
-  wpi::UnpackCallback<wpimath::Rotation2d> rot;
+  wpi::UnpackCallback<wpi::math::Translation2d> tsln;
+  wpi::UnpackCallback<wpi::math::Rotation2d> rot;
   wpi_proto_ProtobufTransform2d msg{
       .translation = tsln.Callback(),
       .rotation = rot.Callback(),
@@ -27,14 +27,14 @@ std::optional<wpimath::Transform2d> wpi::Protobuf<wpimath::Transform2d>::Unpack(
     return {};
   }
 
-  return wpimath::Transform2d{
+  return wpi::math::Transform2d{
       itsln[0],
       irot[0],
   };
 }
 
-bool wpi::Protobuf<wpimath::Transform2d>::Pack(
-    OutputStream& stream, const wpimath::Transform2d& value) {
+bool wpi::Protobuf<wpi::math::Transform2d>::Pack(
+    OutputStream& stream, const wpi::math::Transform2d& value) {
   wpi::PackCallback tsln{&value.Translation()};
   wpi::PackCallback rot{&value.Rotation()};
   wpi_proto_ProtobufTransform2d msg{

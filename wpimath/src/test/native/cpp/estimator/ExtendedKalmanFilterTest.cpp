@@ -9,18 +9,18 @@
 #include <gtest/gtest.h>
 
 #include "units/moment_of_inertia.h"
-#include "wpimath/EigenCore.h"
-#include "wpimath/StateSpaceUtil.h"
-#include "wpimath/estimator/ExtendedKalmanFilter.h"
-#include "wpimath/system/NumericalJacobian.h"
-#include "wpimath/system/plant/DCMotor.h"
-#include "wpimath/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/EigenCore.h"
+#include "wpi/math/StateSpaceUtil.h"
+#include "wpi/math/estimator/ExtendedKalmanFilter.h"
+#include "wpi/math/system/NumericalJacobian.h"
+#include "wpi/math/system/plant/DCMotor.h"
+#include "wpi/math/trajectory/TrajectoryGenerator.h"
 
 namespace {
 
-wpimath::Vectord<5> Dynamics(const wpimath::Vectord<5>& x,
-                             const wpimath::Vectord<2>& u) {
-  auto motors = wpimath::DCMotor::CIM(2);
+wpi::math::Vectord<5> Dynamics(const wpi::math::Vectord<5>& x,
+                             const wpi::math::Vectord<2>& u) {
+  auto motors = wpi::math::DCMotor::CIM(2);
 
   // constexpr double Glow = 15.32;       // Low gear ratio
   constexpr double Ghigh = 7.08;       // High gear ratio
@@ -41,7 +41,7 @@ wpimath::Vectord<5> Dynamics(const wpimath::Vectord<5>& x,
   units::volt_t Vr{u(1)};
 
   auto v = 0.5 * (vl + vr);
-  return wpimath::Vectord<5>{
+  return wpi::math::Vectord<5>{
       v.value() * std::cos(x(2)), v.value() * std::sin(x(2)),
       ((vr - vl) / (2.0 * rb)).value(),
       k1.value() * ((C1 * vl).value() + (C2 * Vl).value()) +
@@ -50,35 +50,35 @@ wpimath::Vectord<5> Dynamics(const wpimath::Vectord<5>& x,
           k1.value() * ((C1 * vr).value() + (C2 * Vr).value())};
 }
 
-wpimath::Vectord<3> LocalMeasurementModel(
-    const wpimath::Vectord<5>& x,
-    [[maybe_unused]] const wpimath::Vectord<2>& u) {
-  return wpimath::Vectord<3>{x(2), x(3), x(4)};
+wpi::math::Vectord<3> LocalMeasurementModel(
+    const wpi::math::Vectord<5>& x,
+    [[maybe_unused]] const wpi::math::Vectord<2>& u) {
+  return wpi::math::Vectord<3>{x(2), x(3), x(4)};
 }
 
-wpimath::Vectord<5> GlobalMeasurementModel(
-    const wpimath::Vectord<5>& x,
-    [[maybe_unused]] const wpimath::Vectord<2>& u) {
-  return wpimath::Vectord<5>{x(0), x(1), x(2), x(3), x(4)};
+wpi::math::Vectord<5> GlobalMeasurementModel(
+    const wpi::math::Vectord<5>& x,
+    [[maybe_unused]] const wpi::math::Vectord<2>& u) {
+  return wpi::math::Vectord<5>{x(0), x(1), x(2), x(3), x(4)};
 }
 }  // namespace
 
 TEST(ExtendedKalmanFilterTest, Init) {
   constexpr auto dt = 0.00505_s;
 
-  wpimath::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
+  wpi::math::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
                                                   LocalMeasurementModel,
                                                   {0.5, 0.5, 10.0, 1.0, 1.0},
                                                   {0.0001, 0.01, 0.01},
                                                   dt};
-  wpimath::Vectord<2> u{12.0, 12.0};
+  wpi::math::Vectord<2> u{12.0, 12.0};
   observer.Predict(u, dt);
 
   auto localY = LocalMeasurementModel(observer.Xhat(), u);
   observer.Correct(u, localY);
 
   auto globalY = GlobalMeasurementModel(observer.Xhat(), u);
-  auto R = wpimath::MakeCovMatrix(0.01, 0.01, 0.0001, 0.01, 0.01);
+  auto R = wpi::math::MakeCovMatrix(0.01, 0.01, 0.0001, 0.01, 0.01);
   observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
 }
 
@@ -86,25 +86,25 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   constexpr auto dt = 0.00505_s;
   constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
 
-  wpimath::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
+  wpi::math::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
                                                   LocalMeasurementModel,
                                                   {0.5, 0.5, 10.0, 1.0, 1.0},
                                                   {0.0001, 0.5, 0.5},
                                                   dt};
 
-  auto waypoints = std::vector<wpimath::Pose2d>{
-      wpimath::Pose2d{2.75_m, 22.521_m, 0_rad},
-      wpimath::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = wpimath::TrajectoryGenerator::GenerateTrajectory(
+  auto waypoints = std::vector<wpi::math::Pose2d>{
+      wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
+      wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
+  auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
-  wpimath::Vectord<5> r = wpimath::Vectord<5>::Zero();
-  wpimath::Vectord<2> u = wpimath::Vectord<2>::Zero();
+  wpi::math::Vectord<5> r = wpi::math::Vectord<5>::Zero();
+  wpi::math::Vectord<2> u = wpi::math::Vectord<2>::Zero();
 
-  auto B = wpimath::NumericalJacobianU<5, 5, 2>(
-      Dynamics, wpimath::Vectord<5>::Zero(), wpimath::Vectord<2>::Zero());
+  auto B = wpi::math::NumericalJacobianU<5, 5, 2>(
+      Dynamics, wpi::math::Vectord<5>::Zero(), wpi::math::Vectord<2>::Zero());
 
-  observer.SetXhat(wpimath::Vectord<5>{
+  observer.SetXhat(wpi::math::Vectord<5>{
       trajectory.InitialPose().Translation().X().value(),
       trajectory.InitialPose().Translation().Y().value(),
       trajectory.InitialPose().Rotation().Radians().value(), 0.0, 0.0});
@@ -117,17 +117,17 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
     units::meters_per_second_t vr =
         ref.velocity * (1 + (ref.curvature * rb).value());
 
-    wpimath::Vectord<5> nextR{
+    wpi::math::Vectord<5> nextR{
         ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
         ref.pose.Rotation().Radians().value(), vl.value(), vr.value()};
 
-    auto localY = LocalMeasurementModel(nextR, wpimath::Vectord<2>::Zero());
+    auto localY = LocalMeasurementModel(nextR, wpi::math::Vectord<2>::Zero());
     observer.Correct(u,
-                     localY + wpimath::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
+                     localY + wpi::math::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
-    wpimath::Vectord<5> rdot = (nextR - r) / dt.value();
+    wpi::math::Vectord<5> rdot = (nextR - r) / dt.value();
     u = B.householderQr().solve(rdot -
-                                Dynamics(r, wpimath::Vectord<2>::Zero()));
+                                Dynamics(r, wpi::math::Vectord<2>::Zero()));
 
     observer.Predict(u, dt);
 
@@ -138,7 +138,7 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   observer.Correct(u, localY);
 
   auto globalY = GlobalMeasurementModel(observer.Xhat(), u);
-  auto R = wpimath::MakeCovMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
+  auto R = wpi::math::MakeCovMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
   observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
 
   auto finalPosition = trajectory.Sample(trajectory.TotalTime());

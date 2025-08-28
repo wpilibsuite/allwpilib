@@ -9,10 +9,10 @@
 #include "units/angular_velocity.h"
 #include "units/length.h"
 #include "units/velocity.h"
-#include "wpimath/kinematics/ChassisSpeeds.h"
-#include "wpimath/kinematics/DifferentialDriveKinematics.h"
+#include "wpi/math/kinematics/ChassisSpeeds.h"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 static constexpr double kEpsilon = 1E-9;
 

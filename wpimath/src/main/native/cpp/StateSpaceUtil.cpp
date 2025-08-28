@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/StateSpaceUtil.h"
+#include "wpi/math/StateSpaceUtil.h"
 
 #include <limits>
 
-namespace wpimath {
+namespace wpi::math {
 
 template bool IsStabilizable<1, 1>(const Matrixd<1, 1>& A,
                                    const Matrixd<1, 1>& B);
@@ -68,4 +68,4 @@ Eigen::MatrixXd MakeCovMatrix(const std::span<const double> stdDevs) {
   return result;
 }
 
-}  // namespace wpimath
+}  // namespace wpi::math

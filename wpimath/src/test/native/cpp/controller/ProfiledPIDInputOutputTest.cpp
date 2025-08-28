@@ -9,10 +9,10 @@
 #include "units/angle.h"
 #include "units/angular_acceleration.h"
 #include "units/angular_velocity.h"
-#include "wpimath/controller/ProfiledPIDController.h"
+#include "wpi/math/controller/ProfiledPIDController.h"
 
 TEST(ProfiledPIDInputOutputTest, ContinuousInput1) {
-  wpimath::ProfiledPIDController<units::degree> controller{
+  wpi::math::ProfiledPIDController<units::degree> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetP(1);
@@ -31,7 +31,7 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput1) {
 }
 
 TEST(ProfiledPIDInputOutputTest, ContinuousInput2) {
-  wpimath::ProfiledPIDController<units::degree> controller{
+  wpi::math::ProfiledPIDController<units::degree> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetP(1);
@@ -51,7 +51,7 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput2) {
 }
 
 TEST(ProfiledPIDInputOutputTest, ContinuousInput3) {
-  wpimath::ProfiledPIDController<units::degree> controller{
+  wpi::math::ProfiledPIDController<units::degree> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetP(1);
@@ -71,7 +71,7 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput3) {
 }
 
 TEST(ProfiledPIDInputOutputTest, ContinuousInput4) {
-  wpimath::ProfiledPIDController<units::degree> controller{
+  wpi::math::ProfiledPIDController<units::degree> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetP(1);
@@ -91,7 +91,7 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput4) {
 }
 
 TEST(ProfiledPIDInputOutputTest, ProportionalGainOutput) {
-  wpimath::ProfiledPIDController<units::degree> controller{
+  wpi::math::ProfiledPIDController<units::degree> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetP(4);
@@ -100,7 +100,7 @@ TEST(ProfiledPIDInputOutputTest, ProportionalGainOutput) {
 }
 
 TEST(ProfiledPIDInputOutputTest, IntegralGainOutput) {
-  wpimath::ProfiledPIDController<units::degree> controller{
+  wpi::math::ProfiledPIDController<units::degree> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetI(4);
@@ -115,7 +115,7 @@ TEST(ProfiledPIDInputOutputTest, IntegralGainOutput) {
 }
 
 TEST(ProfiledPIDInputOutputTest, DerivativeGainOutput) {
-  wpimath::ProfiledPIDController<units::degree> controller{
+  wpi::math::ProfiledPIDController<units::degree> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetD(4);

@@ -4,15 +4,15 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/kinematics/MecanumDriveWheelSpeeds.h"
+#include "wpi/math/kinematics/MecanumDriveWheelSpeeds.h"
 
 TEST(MecanumDriveWheelSpeedsTest, Plus) {
-  const wpimath::MecanumDriveWheelSpeeds left{1.0_mps, 0.5_mps, 2.0_mps,
+  const wpi::math::MecanumDriveWheelSpeeds left{1.0_mps, 0.5_mps, 2.0_mps,
                                               1.5_mps};
-  const wpimath::MecanumDriveWheelSpeeds right{2.0_mps, 1.5_mps, 0.5_mps,
+  const wpi::math::MecanumDriveWheelSpeeds right{2.0_mps, 1.5_mps, 0.5_mps,
                                                1.0_mps};
 
-  const wpimath::MecanumDriveWheelSpeeds result = left + right;
+  const wpi::math::MecanumDriveWheelSpeeds result = left + right;
 
   EXPECT_EQ(3.0, result.frontLeft.value());
   EXPECT_EQ(2.0, result.frontRight.value());
@@ -21,12 +21,12 @@ TEST(MecanumDriveWheelSpeedsTest, Plus) {
 }
 
 TEST(MecanumDriveWheelSpeedsTest, Minus) {
-  const wpimath::MecanumDriveWheelSpeeds left{1.0_mps, 0.5_mps, 2.0_mps,
+  const wpi::math::MecanumDriveWheelSpeeds left{1.0_mps, 0.5_mps, 2.0_mps,
                                               1.5_mps};
-  const wpimath::MecanumDriveWheelSpeeds right{2.0_mps, 1.5_mps, 0.5_mps,
+  const wpi::math::MecanumDriveWheelSpeeds right{2.0_mps, 1.5_mps, 0.5_mps,
                                                1.0_mps};
 
-  const wpimath::MecanumDriveWheelSpeeds result = left - right;
+  const wpi::math::MecanumDriveWheelSpeeds result = left - right;
 
   EXPECT_EQ(-1.0, result.frontLeft.value());
   EXPECT_EQ(-1.0, result.frontRight.value());
@@ -35,10 +35,10 @@ TEST(MecanumDriveWheelSpeedsTest, Minus) {
 }
 
 TEST(MecanumDriveWheelSpeedsTest, UnaryMinus) {
-  const wpimath::MecanumDriveWheelSpeeds speeds{1.0_mps, 0.5_mps, 2.0_mps,
+  const wpi::math::MecanumDriveWheelSpeeds speeds{1.0_mps, 0.5_mps, 2.0_mps,
                                                 1.5_mps};
 
-  const wpimath::MecanumDriveWheelSpeeds result = -speeds;
+  const wpi::math::MecanumDriveWheelSpeeds result = -speeds;
 
   EXPECT_EQ(-1.0, result.frontLeft.value());
   EXPECT_EQ(-0.5, result.frontRight.value());
@@ -47,10 +47,10 @@ TEST(MecanumDriveWheelSpeedsTest, UnaryMinus) {
 }
 
 TEST(MecanumDriveWheelSpeedsTest, Multiplication) {
-  const wpimath::MecanumDriveWheelSpeeds speeds{1.0_mps, 0.5_mps, 2.0_mps,
+  const wpi::math::MecanumDriveWheelSpeeds speeds{1.0_mps, 0.5_mps, 2.0_mps,
                                                 1.5_mps};
 
-  const wpimath::MecanumDriveWheelSpeeds result = speeds * 2;
+  const wpi::math::MecanumDriveWheelSpeeds result = speeds * 2;
 
   EXPECT_EQ(2.0, result.frontLeft.value());
   EXPECT_EQ(1.0, result.frontRight.value());
@@ -59,10 +59,10 @@ TEST(MecanumDriveWheelSpeedsTest, Multiplication) {
 }
 
 TEST(MecanumDriveWheelSpeedsTest, Division) {
-  const wpimath::MecanumDriveWheelSpeeds speeds{1.0_mps, 0.5_mps, 2.0_mps,
+  const wpi::math::MecanumDriveWheelSpeeds speeds{1.0_mps, 0.5_mps, 2.0_mps,
                                                 1.5_mps};
 
-  const wpimath::MecanumDriveWheelSpeeds result = speeds / 2;
+  const wpi::math::MecanumDriveWheelSpeeds result = speeds / 2;
 
   EXPECT_EQ(0.5, result.frontLeft.value());
   EXPECT_EQ(0.25, result.frontRight.value());

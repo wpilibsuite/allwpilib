@@ -6,7 +6,7 @@
 #include <wpi/timestamp.h>
 
 #include "units/time.h"
-#include "wpimath/filter/Debouncer.h"
+#include "wpi/math/filter/Debouncer.h"
 
 static units::second_t now = 0_s;
 
@@ -20,7 +20,7 @@ class DebouncerTest : public ::testing::Test {
 };
 
 TEST_F(DebouncerTest, DebounceRising) {
-  wpimath::Debouncer debouncer{20_ms};
+  wpi::math::Debouncer debouncer{20_ms};
 
   debouncer.Calculate(false);
   EXPECT_FALSE(debouncer.Calculate(true));
@@ -31,8 +31,8 @@ TEST_F(DebouncerTest, DebounceRising) {
 }
 
 TEST_F(DebouncerTest, DebounceFalling) {
-  wpimath::Debouncer debouncer{20_ms,
-                               wpimath::Debouncer::DebounceType::kFalling};
+  wpi::math::Debouncer debouncer{20_ms,
+                               wpi::math::Debouncer::DebounceType::kFalling};
 
   debouncer.Calculate(true);
   EXPECT_TRUE(debouncer.Calculate(false));
@@ -43,7 +43,7 @@ TEST_F(DebouncerTest, DebounceFalling) {
 }
 
 TEST_F(DebouncerTest, DebounceBoth) {
-  wpimath::Debouncer debouncer{20_ms, wpimath::Debouncer::DebounceType::kBoth};
+  wpi::math::Debouncer debouncer{20_ms, wpi::math::Debouncer::DebounceType::kBoth};
 
   debouncer.Calculate(false);
   EXPECT_FALSE(debouncer.Calculate(true));
@@ -59,20 +59,20 @@ TEST_F(DebouncerTest, DebounceBoth) {
 }
 
 TEST_F(DebouncerTest, DebounceParams) {
-  wpimath::Debouncer debouncer{20_ms, wpimath::Debouncer::DebounceType::kBoth};
+  wpi::math::Debouncer debouncer{20_ms, wpi::math::Debouncer::DebounceType::kBoth};
 
   EXPECT_TRUE(debouncer.GetDebounceTime() == 20_ms);
   EXPECT_TRUE(debouncer.GetDebounceType() ==
-              wpimath::Debouncer::DebounceType::kBoth);
+              wpi::math::Debouncer::DebounceType::kBoth);
 
   debouncer.SetDebounceTime(100_ms);
 
   EXPECT_TRUE(debouncer.GetDebounceTime() == 100_ms);
 
-  debouncer.SetDebounceType(wpimath::Debouncer::DebounceType::kFalling);
+  debouncer.SetDebounceType(wpi::math::Debouncer::DebounceType::kFalling);
 
   EXPECT_TRUE(debouncer.GetDebounceType() ==
-              wpimath::Debouncer::DebounceType::kFalling);
+              wpi::math::Debouncer::DebounceType::kFalling);
 
   EXPECT_TRUE(debouncer.Calculate(false));
 }

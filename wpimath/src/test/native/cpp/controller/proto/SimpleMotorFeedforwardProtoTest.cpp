@@ -7,10 +7,10 @@
 #include "../../ProtoTestBase.h"
 #include "units/acceleration.h"
 #include "units/velocity.h"
-#include "wpimath/controller/SimpleMotorFeedforward.h"
-#include "wpimath/controller/proto/SimpleMotorFeedforwardProto.h"
+#include "wpi/math/controller/SimpleMotorFeedforward.h"
+#include "wpi/math/controller/proto/SimpleMotorFeedforwardProto.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 template <typename T>
 struct SimpleMotorFeedforwardProtoTestData {

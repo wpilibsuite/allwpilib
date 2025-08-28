@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "wpimath/controller/ArmFeedforward.h"
+#include "wpi/math/controller/ArmFeedforward.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 namespace {
 

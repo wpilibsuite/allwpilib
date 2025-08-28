@@ -7,10 +7,10 @@
 #include <gtest/gtest.h>
 
 #include "units/angular_velocity.h"
-#include "wpimath/geometry/Translation2d.h"
-#include "wpimath/kinematics/SwerveDriveKinematics.h"
+#include "wpi/math/geometry/Translation2d.h"
+#include "wpi/math/kinematics/SwerveDriveKinematics.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 static constexpr double kEpsilon = 0.1;
 

@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 
 #include "units/math.h"
-#include "wpimath/MathUtil.h"
-#include "wpimath/controller/LTVUnicycleController.h"
-#include "wpimath/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/MathUtil.h"
+#include "wpi/math/controller/LTVUnicycleController.h"
+#include "wpi/math/trajectory/TrajectoryGenerator.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
@@ -19,13 +19,13 @@ static constexpr units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
 TEST(LTVUnicycleControllerTest, ReachesReference) {
   constexpr units::second_t kDt = 20_ms;
 
-  wpimath::LTVUnicycleController controller{
+  wpi::math::LTVUnicycleController controller{
       {0.0625, 0.125, 2.5}, {4.0, 4.0}, kDt};
-  wpimath::Pose2d robotPose{2.7_m, 23_m, 0_deg};
+  wpi::math::Pose2d robotPose{2.7_m, 23_m, 0_deg};
 
-  auto waypoints = std::vector{wpimath::Pose2d{2.75_m, 22.521_m, 0_rad},
-                               wpimath::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = wpimath::TrajectoryGenerator::GenerateTrajectory(
+  auto waypoints = std::vector{wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
+                               wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
+  auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
   auto totalTime = trajectory.TotalTime();
@@ -34,13 +34,13 @@ TEST(LTVUnicycleControllerTest, ReachesReference) {
     auto [vx, vy, omega] = controller.Calculate(robotPose, state);
     static_cast<void>(vy);
 
-    robotPose = robotPose.Exp(wpimath::Twist2d{vx * kDt, 0_m, omega * kDt});
+    robotPose = robotPose.Exp(wpi::math::Twist2d{vx * kDt, 0_m, omega * kDt});
   }
 
   auto& endPose = trajectory.States().back().pose;
   EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
   EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
-  EXPECT_NEAR_UNITS(wpimath::AngleModulus(endPose.Rotation().Radians() -
+  EXPECT_NEAR_UNITS(wpi::math::AngleModulus(endPose.Rotation().Radians() -
                                           robotPose.Rotation().Radians()),
                     0_rad, kAngularTolerance);
 }

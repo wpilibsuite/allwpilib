@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/geometry/Twist3d.h"
+#include "wpi/math/geometry/Twist3d.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<wpimath::Twist3d>;
+using StructType = wpi::Struct<wpi::math::Twist3d>;
 const Twist3d kExpectedData{
     Twist3d{1.1_m, 2.29_m, 35.04_m, 0.174_rad, 19.1_rad, 4.4_rad}};
 }  // namespace

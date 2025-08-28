@@ -7,13 +7,13 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/kinematics/SwerveDriveKinematics.h"
-#include "wpimath/kinematics/SwerveDriveOdometry3d.h"
-#include "wpimath/trajectory/Trajectory.h"
-#include "wpimath/trajectory/TrajectoryConfig.h"
-#include "wpimath/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/kinematics/SwerveDriveKinematics.h"
+#include "wpi/math/kinematics/SwerveDriveOdometry3d.h"
+#include "wpi/math/trajectory/Trajectory.h"
+#include "wpi/math/trajectory/TrajectoryConfig.h"
+#include "wpi/math/trajectory/TrajectoryGenerator.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 static constexpr double kEpsilon = 0.01;
 
@@ -27,18 +27,18 @@ class SwerveDriveOdometry3dTest : public ::testing::Test {
   SwerveDriveKinematics<4> m_kinematics{m_fl, m_fr, m_bl, m_br};
   SwerveModulePosition zero;
   SwerveDriveOdometry3d<4> m_odometry{
-      m_kinematics, wpimath::Rotation3d{}, {zero, zero, zero, zero}};
+      m_kinematics, wpi::math::Rotation3d{}, {zero, zero, zero, zero}};
 };
 
 TEST_F(SwerveDriveOdometry3dTest, Initialize) {
   SwerveDriveOdometry3d odometry{
       m_kinematics,
-      wpimath::Rotation3d{},
+      wpi::math::Rotation3d{},
       {zero, zero, zero, zero},
-      wpimath::Pose3d{1_m, 2_m, 0_m,
-                      wpimath::Rotation3d{0_deg, 0_deg, 45_deg}}};
+      wpi::math::Pose3d{1_m, 2_m, 0_m,
+                      wpi::math::Rotation3d{0_deg, 0_deg, 45_deg}}};
 
-  const wpimath::Pose3d& pose = odometry.GetPose();
+  const wpi::math::Pose3d& pose = odometry.GetPose();
 
   EXPECT_NEAR(pose.X().value(), 1, kEpsilon);
   EXPECT_NEAR(pose.Y().value(), 2, kEpsilon);
@@ -49,12 +49,12 @@ TEST_F(SwerveDriveOdometry3dTest, Initialize) {
 TEST_F(SwerveDriveOdometry3dTest, TwoIterations) {
   SwerveModulePosition position{0.5_m, 0_deg};
 
-  m_odometry.ResetPosition(wpimath::Rotation3d{}, {zero, zero, zero, zero},
+  m_odometry.ResetPosition(wpi::math::Rotation3d{}, {zero, zero, zero, zero},
                            Pose3d{});
 
-  m_odometry.Update(wpimath::Rotation3d{}, {zero, zero, zero, zero});
+  m_odometry.Update(wpi::math::Rotation3d{}, {zero, zero, zero, zero});
 
-  auto pose = m_odometry.Update(wpimath::Rotation3d{},
+  auto pose = m_odometry.Update(wpi::math::Rotation3d{},
                                 {position, position, position, position});
 
   EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
@@ -69,9 +69,9 @@ TEST_F(SwerveDriveOdometry3dTest, 90DegreeTurn) {
   SwerveModulePosition bl{18.85_m, -90_deg};
   SwerveModulePosition br{42.15_m, -26.565_deg};
 
-  m_odometry.ResetPosition(wpimath::Rotation3d{}, {zero, zero, zero, zero},
+  m_odometry.ResetPosition(wpi::math::Rotation3d{}, {zero, zero, zero, zero},
                            Pose3d{});
-  auto pose = m_odometry.Update(wpimath::Rotation3d{0_deg, 0_deg, 90_deg},
+  auto pose = m_odometry.Update(wpi::math::Rotation3d{0_deg, 0_deg, 90_deg},
                                 {fl, fr, bl, br});
 
   EXPECT_NEAR(12.0, pose.X().value(), kEpsilon);
@@ -81,12 +81,12 @@ TEST_F(SwerveDriveOdometry3dTest, 90DegreeTurn) {
 }
 
 TEST_F(SwerveDriveOdometry3dTest, GyroAngleReset) {
-  m_odometry.ResetPosition(wpimath::Rotation3d{0_deg, 0_deg, 90_deg},
+  m_odometry.ResetPosition(wpi::math::Rotation3d{0_deg, 0_deg, 90_deg},
                            {zero, zero, zero, zero}, Pose3d{});
 
   SwerveModulePosition position{0.5_m, 0_deg};
 
-  auto pose = m_odometry.Update(wpimath::Rotation3d{0_deg, 0_deg, 90_deg},
+  auto pose = m_odometry.Update(wpi::math::Rotation3d{0_deg, 0_deg, 90_deg},
                                 {position, position, position, position});
 
   EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
@@ -101,7 +101,7 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingTrajectory) {
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
 
   SwerveDriveOdometry3d<4> odometry{
-      kinematics, wpimath::Rotation3d{}, {zero, zero, zero, zero}};
+      kinematics, wpi::math::Rotation3d{}, {zero, zero, zero, zero}};
 
   SwerveModulePosition fl;
   SwerveModulePosition fr;
@@ -141,9 +141,9 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingTrajectory) {
     br.angle = moduleStates[3].angle;
 
     auto xhat = odometry.Update(
-        wpimath::Rotation3d{
+        wpi::math::Rotation3d{
             groundTruthState.pose.Rotation() +
-            wpimath::Rotation2d{distribution(generator) * 0.05_rad}},
+            wpi::math::Rotation2d{distribution(generator) * 0.05_rad}},
         {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation().ToTranslation2d())
@@ -167,7 +167,7 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingXAxis) {
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
 
   SwerveDriveOdometry3d<4> odometry{
-      kinematics, wpimath::Rotation3d{}, {zero, zero, zero, zero}};
+      kinematics, wpi::math::Rotation3d{}, {zero, zero, zero, zero}};
 
   SwerveModulePosition fl;
   SwerveModulePosition fr;
@@ -207,7 +207,7 @@ TEST_F(SwerveDriveOdometry3dTest, AccuracyFacingXAxis) {
     br.angle = groundTruthState.pose.Rotation();
 
     auto xhat = odometry.Update(
-        wpimath::Rotation3d{0_rad, 0_rad, distribution(generator) * 0.05_rad},
+        wpi::math::Rotation3d{0_rad, 0_rad, distribution(generator) * 0.05_rad},
         {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation().ToTranslation2d())

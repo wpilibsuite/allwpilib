@@ -8,7 +8,7 @@
 #include <wpi/jni_util.h>
 
 #include "edu_wpi_first_math_jni_Ellipse2dJNI.h"
-#include "wpimath/geometry/Ellipse2d.h"
+#include "wpi/math/geometry/Ellipse2d.h"
 
 using namespace wpi::java;
 
@@ -26,8 +26,8 @@ Java_edu_wpi_first_math_jni_Ellipse2dJNI_nearest
    jdoubleArray nearestPoint)
 {
   auto point =
-      wpimath::Ellipse2d{
-          wpimath::Pose2d{units::meter_t{centerX}, units::meter_t{centerY},
+      wpi::math::Ellipse2d{
+          wpi::math::Pose2d{units::meter_t{centerX}, units::meter_t{centerY},
                           units::radian_t{centerHeading}},
           units::meter_t{xSemiAxis}, units::meter_t{ySemiAxis}}
           .Nearest({units::meter_t{pointX}, units::meter_t{pointY}});

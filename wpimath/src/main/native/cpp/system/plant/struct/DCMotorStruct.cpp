@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/system/plant/struct/DCMotorStruct.h"
+#include "wpi/math/system/plant/struct/DCMotorStruct.h"
 
 namespace {
 constexpr size_t kNominalVoltageOff = 0;
@@ -12,10 +12,10 @@ constexpr size_t kFreeCurrentOff = kStallCurrentOff + 8;
 constexpr size_t kFreeSpeedOff = kFreeCurrentOff + 8;
 }  // namespace
 
-using StructType = wpi::Struct<wpimath::DCMotor>;
+using StructType = wpi::Struct<wpi::math::DCMotor>;
 
-wpimath::DCMotor StructType::Unpack(std::span<const uint8_t> data) {
-  return wpimath::DCMotor{
+wpi::math::DCMotor StructType::Unpack(std::span<const uint8_t> data) {
+  return wpi::math::DCMotor{
       units::volt_t{wpi::UnpackStruct<double, kNominalVoltageOff>(data)},
       units::newton_meter_t{wpi::UnpackStruct<double, kStallTorqueOff>(data)},
       units::ampere_t{wpi::UnpackStruct<double, kStallCurrentOff>(data)},
@@ -25,7 +25,7 @@ wpimath::DCMotor StructType::Unpack(std::span<const uint8_t> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const wpimath::DCMotor& value) {
+void StructType::Pack(std::span<uint8_t> data, const wpi::math::DCMotor& value) {
   wpi::PackStruct<kNominalVoltageOff>(data, value.nominalVoltage.value());
   wpi::PackStruct<kStallTorqueOff>(data, value.stallTorque.value());
   wpi::PackStruct<kStallCurrentOff>(data, value.stallCurrent.value());

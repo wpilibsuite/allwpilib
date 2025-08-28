@@ -4,10 +4,10 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/controller/BangBangController.h"
+#include "wpi/math/controller/BangBangController.h"
 
 TEST(BangBangToleranceTest, InTolerance) {
-  wpimath::BangBangController controller{0.1};
+  wpi::math::BangBangController controller{0.1};
 
   controller.SetSetpoint(1);
   controller.Calculate(1);
@@ -15,7 +15,7 @@ TEST(BangBangToleranceTest, InTolerance) {
 }
 
 TEST(BangBangToleranceTest, OutOfTolerance) {
-  wpimath::BangBangController controller{0.1};
+  wpi::math::BangBangController controller{0.1};
 
   controller.SetSetpoint(1);
   controller.Calculate(0);

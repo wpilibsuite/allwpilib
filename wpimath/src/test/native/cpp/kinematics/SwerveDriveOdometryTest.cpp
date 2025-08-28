@@ -7,13 +7,13 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/kinematics/SwerveDriveKinematics.h"
-#include "wpimath/kinematics/SwerveDriveOdometry.h"
-#include "wpimath/trajectory/Trajectory.h"
-#include "wpimath/trajectory/TrajectoryConfig.h"
-#include "wpimath/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/kinematics/SwerveDriveKinematics.h"
+#include "wpi/math/kinematics/SwerveDriveOdometry.h"
+#include "wpi/math/trajectory/Trajectory.h"
+#include "wpi/math/trajectory/TrajectoryConfig.h"
+#include "wpi/math/trajectory/TrajectoryGenerator.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 static constexpr double kEpsilon = 0.01;
 
@@ -78,7 +78,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
 
   SwerveDriveOdometry<4> odometry{
-      kinematics, wpimath::Rotation2d{}, {zero, zero, zero, zero}};
+      kinematics, wpi::math::Rotation2d{}, {zero, zero, zero, zero}};
 
   SwerveModulePosition fl;
   SwerveModulePosition fr;
@@ -119,7 +119,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
 
     auto xhat = odometry.Update(
         groundTruthState.pose.Rotation() +
-            wpimath::Rotation2d{distribution(generator) * 0.05_rad},
+            wpi::math::Rotation2d{distribution(generator) * 0.05_rad},
         {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
@@ -143,7 +143,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
 
   SwerveDriveOdometry<4> odometry{
-      kinematics, wpimath::Rotation2d{}, {zero, zero, zero, zero}};
+      kinematics, wpi::math::Rotation2d{}, {zero, zero, zero, zero}};
 
   SwerveModulePosition fl;
   SwerveModulePosition fr;
@@ -183,7 +183,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
     br.angle = groundTruthState.pose.Rotation();
 
     auto xhat =
-        odometry.Update(wpimath::Rotation2d{distribution(generator) * 0.05_rad},
+        odometry.Update(wpi::math::Rotation2d{distribution(generator) * 0.05_rad},
                         {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())

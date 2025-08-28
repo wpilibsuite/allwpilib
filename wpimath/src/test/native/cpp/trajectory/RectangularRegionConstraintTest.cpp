@@ -9,14 +9,14 @@
 #include "units/length.h"
 #include "units/math.h"
 #include "units/velocity.h"
-#include "wpimath/trajectory/constraint/MaxVelocityConstraint.h"
-#include "wpimath/trajectory/constraint/RectangularRegionConstraint.h"
+#include "wpi/math/trajectory/constraint/MaxVelocityConstraint.h"
+#include "wpi/math/trajectory/constraint/RectangularRegionConstraint.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 TEST(RectangularRegionConstraintTest, Constraint) {
   constexpr auto maxVelocity = 2_fps;
-  constexpr wpimath::Rectangle2d rectangle{{1_ft, 1_ft}, {5_ft, 27_ft}};
+  constexpr wpi::math::Rectangle2d rectangle{{1_ft, 1_ft}, {5_ft, 27_ft}};
 
   auto config = TrajectoryConfig(13_fps, 13_fps_sq);
   config.AddConstraint(RectangularRegionConstraint{

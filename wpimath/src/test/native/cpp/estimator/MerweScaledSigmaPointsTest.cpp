@@ -4,28 +4,28 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/estimator/MerweScaledSigmaPoints.h"
+#include "wpi/math/estimator/MerweScaledSigmaPoints.h"
 
 TEST(MerweScaledSigmaPointsTest, ZeroMean) {
-  wpimath::MerweScaledSigmaPoints<2> sigmaPoints;
+  wpi::math::MerweScaledSigmaPoints<2> sigmaPoints;
   auto points = sigmaPoints.SquareRootSigmaPoints(
-      wpimath::Vectord<2>{0.0, 0.0},
-      wpimath::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}});
+      wpi::math::Vectord<2>{0.0, 0.0},
+      wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}});
 
   EXPECT_TRUE((points -
-               wpimath::Matrixd<2, 5>{{0.0, 0.00173205, 0.0, -0.00173205, 0.0},
+               wpi::math::Matrixd<2, 5>{{0.0, 0.00173205, 0.0, -0.00173205, 0.0},
                                       {0.0, 0.0, 0.00173205, 0.0, -0.00173205}})
                   .norm() < 1e-3);
 }
 
 TEST(MerweScaledSigmaPointsTest, NonzeroMean) {
-  wpimath::MerweScaledSigmaPoints<2> sigmaPoints;
+  wpi::math::MerweScaledSigmaPoints<2> sigmaPoints;
   auto points = sigmaPoints.SquareRootSigmaPoints(
-      wpimath::Vectord<2>{1.0, 2.0},
-      wpimath::Matrixd<2, 2>{{1.0, 0.0}, {0.0, std::sqrt(10.0)}});
+      wpi::math::Vectord<2>{1.0, 2.0},
+      wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, std::sqrt(10.0)}});
 
   EXPECT_TRUE(
-      (points - wpimath::Matrixd<2, 5>{{1.0, 1.00173205, 1.0, 0.998268, 1.0},
+      (points - wpi::math::Matrixd<2, 5>{{1.0, 1.00173205, 1.0, 0.998268, 1.0},
                                        {2.0, 2.0, 2.00548, 2.0, 1.99452}})
           .norm() < 1e-3);
 }

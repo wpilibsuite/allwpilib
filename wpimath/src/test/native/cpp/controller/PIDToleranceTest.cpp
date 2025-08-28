@@ -4,21 +4,21 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/controller/PIDController.h"
+#include "wpi/math/controller/PIDController.h"
 
 static constexpr double kSetpoint = 50.0;
 static constexpr double kRange = 200;
 static constexpr double kTolerance = 10.0;
 
 TEST(PIDToleranceTest, InitialTolerance) {
-  wpimath::PIDController controller{0.5, 0.0, 0.0};
+  wpi::math::PIDController controller{0.5, 0.0, 0.0};
   controller.EnableContinuousInput(-kRange / 2, kRange / 2);
 
   EXPECT_FALSE(controller.AtSetpoint());
 }
 
 TEST(PIDToleranceTest, AbsoluteTolerance) {
-  wpimath::PIDController controller{0.5, 0.0, 0.0};
+  wpi::math::PIDController controller{0.5, 0.0, 0.0};
   controller.EnableContinuousInput(-kRange / 2, kRange / 2);
 
   EXPECT_FALSE(controller.AtSetpoint());

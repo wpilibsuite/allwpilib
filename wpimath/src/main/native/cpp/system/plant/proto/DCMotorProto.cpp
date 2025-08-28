@@ -2,20 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/system/plant/proto/DCMotorProto.h"
+#include "wpi/math/system/plant/proto/DCMotorProto.h"
 
 #include <optional>
 
 #include "wpimath/protobuf/plant.npb.h"
 
-std::optional<wpimath::DCMotor> wpi::Protobuf<wpimath::DCMotor>::Unpack(
+std::optional<wpi::math::DCMotor> wpi::Protobuf<wpi::math::DCMotor>::Unpack(
     InputStream& stream) {
   wpi_proto_ProtobufDCMotor msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return wpimath::DCMotor{
+  return wpi::math::DCMotor{
       units::volt_t{msg.nominal_voltage},
       units::newton_meter_t{msg.stall_torque},
       units::ampere_t{msg.stall_current},
@@ -24,8 +24,8 @@ std::optional<wpimath::DCMotor> wpi::Protobuf<wpimath::DCMotor>::Unpack(
   };
 }
 
-bool wpi::Protobuf<wpimath::DCMotor>::Pack(OutputStream& stream,
-                                           const wpimath::DCMotor& value) {
+bool wpi::Protobuf<wpi::math::DCMotor>::Pack(OutputStream& stream,
+                                           const wpi::math::DCMotor& value) {
   wpi_proto_ProtobufDCMotor msg{
       .nominal_voltage = value.nominalVoltage.value(),
       .stall_torque = value.stallTorque.value(),

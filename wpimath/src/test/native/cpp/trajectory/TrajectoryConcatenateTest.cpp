@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/trajectory/TrajectoryConfig.h"
-#include "wpimath/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/trajectory/TrajectoryConfig.h"
+#include "wpi/math/trajectory/TrajectoryGenerator.h"
 
 TEST(TrajectoryConcatenateTest, States) {
-  auto t1 = wpimath::TrajectoryGenerator::GenerateTrajectory(
+  auto t1 = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       {}, {}, {1_m, 1_m, 0_deg}, {2_mps, 2_mps_sq});
-  auto t2 = wpimath::TrajectoryGenerator::GenerateTrajectory(
+  auto t2 = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       {1_m, 1_m, 0_deg}, {}, {2_m, 2_m, 45_deg}, {2_mps, 2_mps_sq});
 
   auto t = t1 + t2;

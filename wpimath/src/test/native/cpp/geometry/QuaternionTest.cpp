@@ -8,9 +8,9 @@
 
 #include "units/angle.h"
 #include "units/math.h"
-#include "wpimath/geometry/Quaternion.h"
+#include "wpi/math/geometry/Quaternion.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 TEST(QuaternionTest, Init) {
   // Identity

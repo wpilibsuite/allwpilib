@@ -6,12 +6,12 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/geometry/Pose2d.h"
-#include "wpimath/geometry/Rotation2d.h"
-#include "wpimath/geometry/Transform2d.h"
-#include "wpimath/geometry/Translation2d.h"
+#include "wpi/math/geometry/Pose2d.h"
+#include "wpi/math/geometry/Rotation2d.h"
+#include "wpi/math/geometry/Transform2d.h"
+#include "wpi/math/geometry/Translation2d.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 TEST(Transform2dTest, ToMatrix) {
   Transform2d before{1_m, 2_m, 20_deg};

@@ -2,24 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/estimator/MecanumDrivePoseEstimator.h"
+#include "wpi/math/estimator/MecanumDrivePoseEstimator.h"
 
 #include <wpi/timestamp.h>
 
-#include "wpimath/MathShared.h"
-#include "wpimath/StateSpaceUtil.h"
-#include "wpimath/estimator/AngleStatistics.h"
+#include "wpi/math/MathShared.h"
+#include "wpi/math/StateSpaceUtil.h"
+#include "wpi/math/estimator/AngleStatistics.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
-wpimath::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
+wpi::math::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose)
     : MecanumDrivePoseEstimator{kinematics,      gyroAngle,
                                 wheelPositions,  initialPose,
                                 {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}} {}
 
-wpimath::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
+wpi::math::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose,
     const wpi::array<double, 3>& stateStdDevs,

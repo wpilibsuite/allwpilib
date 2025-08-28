@@ -5,10 +5,10 @@
 #include <gtest/gtest.h>
 
 #include "../ProtoTestBase.h"
-#include "wpimath/EigenCore.h"
-#include "wpimath/proto/MatrixProto.h"
+#include "wpi/math/EigenCore.h"
+#include "wpi/math/proto/MatrixProto.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 struct MatrixProtoTestData {
   using Type = Matrixd<2, 3>;

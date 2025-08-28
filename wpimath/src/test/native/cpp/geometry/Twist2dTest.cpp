@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/geometry/Pose2d.h"
+#include "wpi/math/geometry/Pose2d.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 TEST(Twist2dTest, Straight) {
   const Twist2d straight{5_m, 0_m, 0_rad};

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/trajectory/proto/TrajectoryProto.h"
+#include "wpi/math/trajectory/proto/TrajectoryProto.h"
 
 #include <vector>
 
@@ -10,9 +10,9 @@
 
 #include "wpimath/protobuf/trajectory.npb.h"
 
-std::optional<wpimath::Trajectory> wpi::Protobuf<wpimath::Trajectory>::Unpack(
+std::optional<wpi::math::Trajectory> wpi::Protobuf<wpi::math::Trajectory>::Unpack(
     InputStream& stream) {
-  wpi::StdVectorUnpackCallback<wpimath::Trajectory::State, SIZE_MAX> states;
+  wpi::StdVectorUnpackCallback<wpi::math::Trajectory::State, SIZE_MAX> states;
   wpi_proto_ProtobufTrajectory msg{
       .states = states.Callback(),
   };
@@ -20,12 +20,12 @@ std::optional<wpimath::Trajectory> wpi::Protobuf<wpimath::Trajectory>::Unpack(
     return {};
   }
 
-  return wpimath::Trajectory{states.Vec()};
+  return wpi::math::Trajectory{states.Vec()};
 }
 
-bool wpi::Protobuf<wpimath::Trajectory>::Pack(
-    OutputStream& stream, const wpimath::Trajectory& value) {
-  wpi::PackCallback<wpimath::Trajectory::State> states{value.States()};
+bool wpi::Protobuf<wpi::math::Trajectory>::Pack(
+    OutputStream& stream, const wpi::math::Trajectory& value) {
+  wpi::PackCallback<wpi::math::Trajectory::State> states{value.States()};
   wpi_proto_ProtobufTrajectory msg{
       .states = states.Callback(),
   };

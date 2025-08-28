@@ -9,14 +9,14 @@
 #include "units/angle.h"
 #include "units/length.h"
 #include "units/velocity.h"
-#include "wpimath/trajectory/constraint/EllipticalRegionConstraint.h"
-#include "wpimath/trajectory/constraint/MaxVelocityConstraint.h"
+#include "wpi/math/trajectory/constraint/EllipticalRegionConstraint.h"
+#include "wpi/math/trajectory/constraint/MaxVelocityConstraint.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 TEST(EllipticalRegionConstraintTest, Constraint) {
   constexpr auto maxVelocity = 2_fps;
-  constexpr wpimath::Ellipse2d ellipse{{5_ft, 2.5_ft, 180_deg}, 5_ft, 2.5_ft};
+  constexpr wpi::math::Ellipse2d ellipse{{5_ft, 2.5_ft, 180_deg}, 5_ft, 2.5_ft};
 
   auto config = TrajectoryConfig(13_fps, 13_fps_sq);
   config.AddConstraint(

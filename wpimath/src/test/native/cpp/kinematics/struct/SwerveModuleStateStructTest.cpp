@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/kinematics/SwerveModuleState.h"
+#include "wpi/math/kinematics/SwerveModuleState.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<wpimath::SwerveModuleState>;
+using StructType = wpi::Struct<wpi::math::SwerveModuleState>;
 const SwerveModuleState kExpectedData{
     SwerveModuleState{22.9_mps, Rotation2d{3.3_rad}}};
 }  // namespace

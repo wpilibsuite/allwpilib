@@ -9,10 +9,10 @@
 
 #include "trajectory/TestTrajectory.h"
 #include "units/time.h"
-#include "wpimath/kinematics/DifferentialDriveKinematics.h"
-#include "wpimath/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.h"
+#include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 TEST(DifferentialDriveKinematicsConstraintTest, Constraint) {
   const auto maxVelocity = 12_fps;

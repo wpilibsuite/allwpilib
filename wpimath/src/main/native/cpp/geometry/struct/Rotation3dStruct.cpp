@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/geometry/struct/Rotation3dStruct.h"
+#include "wpi/math/geometry/struct/Rotation3dStruct.h"
 
 namespace {
 constexpr size_t kQOff = 0;
 }  // namespace
 
-using StructType = wpi::Struct<wpimath::Rotation3d>;
+using StructType = wpi::Struct<wpi::math::Rotation3d>;
 
-wpimath::Rotation3d StructType::Unpack(std::span<const uint8_t> data) {
-  return wpimath::Rotation3d{
-      wpi::UnpackStruct<wpimath::Quaternion, kQOff>(data),
+wpi::math::Rotation3d StructType::Unpack(std::span<const uint8_t> data) {
+  return wpi::math::Rotation3d{
+      wpi::UnpackStruct<wpi::math::Quaternion, kQOff>(data),
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
-                      const wpimath::Rotation3d& value) {
+                      const wpi::math::Rotation3d& value) {
   wpi::PackStruct<kQOff>(data, value.GetQuaternion());
 }

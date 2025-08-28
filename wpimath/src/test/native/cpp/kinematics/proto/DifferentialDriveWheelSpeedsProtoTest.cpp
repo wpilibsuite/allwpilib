@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "wpimath/kinematics/DifferentialDriveWheelSpeeds.h"
+#include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 namespace {
 

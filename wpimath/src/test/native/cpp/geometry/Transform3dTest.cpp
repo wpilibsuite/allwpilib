@@ -6,12 +6,12 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/geometry/Pose3d.h"
-#include "wpimath/geometry/Rotation3d.h"
-#include "wpimath/geometry/Transform3d.h"
-#include "wpimath/geometry/Translation3d.h"
+#include "wpi/math/geometry/Pose3d.h"
+#include "wpi/math/geometry/Rotation3d.h"
+#include "wpi/math/geometry/Transform3d.h"
+#include "wpi/math/geometry/Translation3d.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 TEST(Transform3dTest, ToMatrix) {
   Transform3d before{1_m, 2_m, 3_m, Rotation3d{10_deg, 20_deg, 30_deg}};

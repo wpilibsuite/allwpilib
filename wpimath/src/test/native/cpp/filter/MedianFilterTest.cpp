@@ -4,10 +4,10 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/filter/MedianFilter.h"
+#include "wpi/math/filter/MedianFilter.h"
 
 TEST(MedianFilterTest, MedianFilterNotFullTestEven) {
-  wpimath::MedianFilter<double> filter{10};
+  wpi::math::MedianFilter<double> filter{10};
 
   filter.Calculate(3);
   filter.Calculate(0);
@@ -17,7 +17,7 @@ TEST(MedianFilterTest, MedianFilterNotFullTestEven) {
 }
 
 TEST(MedianFilterTest, MedianFilterNotFullTestOdd) {
-  wpimath::MedianFilter<double> filter{10};
+  wpi::math::MedianFilter<double> filter{10};
 
   filter.Calculate(3);
   filter.Calculate(0);
@@ -28,7 +28,7 @@ TEST(MedianFilterTest, MedianFilterNotFullTestOdd) {
 }
 
 TEST(MedianFilterTest, MedianFilterFullTestEven) {
-  wpimath::MedianFilter<double> filter{6};
+  wpi::math::MedianFilter<double> filter{6};
 
   filter.Calculate(3);
   filter.Calculate(0);
@@ -41,7 +41,7 @@ TEST(MedianFilterTest, MedianFilterFullTestEven) {
 }
 
 TEST(MedianFilterTest, MedianFilterFullTestOdd) {
-  wpimath::MedianFilter<double> filter{5};
+  wpi::math::MedianFilter<double> filter{5};
 
   filter.Calculate(3);
   filter.Calculate(0);

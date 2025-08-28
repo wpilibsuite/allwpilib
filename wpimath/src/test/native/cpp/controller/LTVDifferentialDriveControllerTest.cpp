@@ -7,11 +7,11 @@
 #include <gtest/gtest.h>
 
 #include "units/math.h"
-#include "wpimath/MathUtil.h"
-#include "wpimath/controller/LTVDifferentialDriveController.h"
-#include "wpimath/system/NumericalIntegration.h"
-#include "wpimath/system/plant/LinearSystemId.h"
-#include "wpimath/trajectory/TrajectoryGenerator.h"
+#include "wpi/math/MathUtil.h"
+#include "wpi/math/controller/LTVDifferentialDriveController.h"
+#include "wpi/math/system/NumericalIntegration.h"
+#include "wpi/math/system/plant/LinearSystemId.h"
+#include "wpi/math/trajectory/TrajectoryGenerator.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
@@ -45,15 +45,15 @@ static constexpr auto kLinearV = 3.02_V / 1_mps;
 static constexpr auto kLinearA = 0.642_V / 1_mps_sq;
 static constexpr auto kAngularV = 1.382_V / 1_mps;
 static constexpr auto kAngularA = 0.08495_V / 1_mps_sq;
-static auto plant = wpimath::LinearSystemId::IdentifyDrivetrainSystem(
+static auto plant = wpi::math::LinearSystemId::IdentifyDrivetrainSystem(
     kLinearV, kLinearA, kAngularV, kAngularA);
 static constexpr auto kTrackwidth = 0.9_m;
 
-wpimath::Vectord<5> Dynamics(const wpimath::Vectord<5>& x,
-                             const wpimath::Vectord<2>& u) {
+wpi::math::Vectord<5> Dynamics(const wpi::math::Vectord<5>& x,
+                             const wpi::math::Vectord<2>& u) {
   double v = (x(State::kLeftVelocity) + x(State::kRightVelocity)) / 2.0;
 
-  wpimath::Vectord<5> xdot;
+  wpi::math::Vectord<5> xdot;
   xdot(0) = v * std::cos(x(State::kHeading));
   xdot(1) = v * std::sin(x(State::kHeading));
   xdot(2) = ((x(State::kRightVelocity) - x(State::kLeftVelocity)) / kTrackwidth)
@@ -65,16 +65,16 @@ wpimath::Vectord<5> Dynamics(const wpimath::Vectord<5>& x,
 TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
   constexpr units::second_t kDt = 20_ms;
 
-  wpimath::LTVDifferentialDriveController controller{
+  wpi::math::LTVDifferentialDriveController controller{
       plant, kTrackwidth, {0.0625, 0.125, 2.5, 0.95, 0.95}, {12.0, 12.0}, kDt};
-  wpimath::Pose2d robotPose{2.7_m, 23_m, 0_deg};
+  wpi::math::Pose2d robotPose{2.7_m, 23_m, 0_deg};
 
-  auto waypoints = std::vector{wpimath::Pose2d{2.75_m, 22.521_m, 0_rad},
-                               wpimath::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = wpimath::TrajectoryGenerator::GenerateTrajectory(
+  auto waypoints = std::vector{wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
+                               wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
+  auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
-  wpimath::Vectord<5> x = wpimath::Vectord<5>::Zero();
+  wpi::math::Vectord<5> x = wpi::math::Vectord<5>::Zero();
   x(State::kX) = robotPose.X().value();
   x(State::kY) = robotPose.Y().value();
   x(State::kHeading) = robotPose.Rotation().Radians().value();
@@ -82,22 +82,22 @@ TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
   auto totalTime = trajectory.TotalTime();
   for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
     auto state = trajectory.Sample(kDt * i);
-    robotPose = wpimath::Pose2d{units::meter_t{x(State::kX)},
+    robotPose = wpi::math::Pose2d{units::meter_t{x(State::kX)},
                                 units::meter_t{x(State::kY)},
                                 units::radian_t{x(State::kHeading)}};
     auto [leftVoltage, rightVoltage] = controller.Calculate(
         robotPose, units::meters_per_second_t{x(State::kLeftVelocity)},
         units::meters_per_second_t{x(State::kRightVelocity)}, state);
 
-    x = wpimath::RKDP(
+    x = wpi::math::RKDP(
         &Dynamics, x,
-        wpimath::Vectord<2>{leftVoltage.value(), rightVoltage.value()}, kDt);
+        wpi::math::Vectord<2>{leftVoltage.value(), rightVoltage.value()}, kDt);
   }
 
   auto& endPose = trajectory.States().back().pose;
   EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
   EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
-  EXPECT_NEAR_UNITS(wpimath::AngleModulus(endPose.Rotation().Radians() -
+  EXPECT_NEAR_UNITS(wpi::math::AngleModulus(endPose.Rotation().Radians() -
                                           robotPose.Rotation().Radians()),
                     0_rad, kAngularTolerance);
 }

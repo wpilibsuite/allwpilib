@@ -8,7 +8,7 @@
 #include "units/length.h"
 #include "units/time.h"
 #include "units/velocity.h"
-#include "wpimath/filter/SlewRateLimiter.h"
+#include "wpi/math/filter/SlewRateLimiter.h"
 
 static units::second_t now = 0_s;
 
@@ -24,7 +24,7 @@ class SlewRateLimiterTest : public ::testing::Test {
 TEST_F(SlewRateLimiterTest, SlewRateLimit) {
   WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
 
-  wpimath::SlewRateLimiter<units::meters> limiter(1_mps);
+  wpi::math::SlewRateLimiter<units::meters> limiter(1_mps);
 
   now += 1_s;
 
@@ -32,7 +32,7 @@ TEST_F(SlewRateLimiterTest, SlewRateLimit) {
 }
 
 TEST_F(SlewRateLimiterTest, SlewRateNoLimit) {
-  wpimath::SlewRateLimiter<units::meters> limiter(1_mps);
+  wpi::math::SlewRateLimiter<units::meters> limiter(1_mps);
 
   now += 1_s;
 
@@ -40,7 +40,7 @@ TEST_F(SlewRateLimiterTest, SlewRateNoLimit) {
 }
 
 TEST_F(SlewRateLimiterTest, SlewRatePositiveNegativeLimit) {
-  wpimath::SlewRateLimiter<units::meters> limiter(1_mps, -0.5_mps);
+  wpi::math::SlewRateLimiter<units::meters> limiter(1_mps, -0.5_mps);
 
   now += 1_s;
 

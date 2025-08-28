@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/geometry/Rectangle2d.h"
+#include "wpi/math/geometry/Rectangle2d.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<wpimath::Rectangle2d>;
+using StructType = wpi::Struct<wpi::math::Rectangle2d>;
 const Rectangle2d kExpectedData{
     Pose2d{Translation2d{0.191_m, 2.2_m}, Rotation2d{22.9_rad}}, 1.2_m, 2.3_m};
 }  // namespace

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/controller/ArmFeedforward.h"
+#include "wpi/math/controller/ArmFeedforward.h"
 
 #include <algorithm>
 #include <limits>
@@ -10,10 +10,10 @@
 #include <sleipnir/autodiff/gradient.hpp>
 #include <sleipnir/autodiff/hessian.hpp>
 
-#include "wpimath/EigenCore.h"
-#include "wpimath/system/NumericalIntegration.h"
+#include "wpi/math/EigenCore.h"
+#include "wpi/math/system/NumericalIntegration.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 units::volt_t ArmFeedforward::Calculate(
     units::unit_t<Angle> currentAngle, units::unit_t<Velocity> currentVelocity,

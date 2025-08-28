@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "wpimath/geometry/Transform2d.h"
+#include "wpi/math/geometry/Transform2d.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 namespace {
 
-using StructType = wpi::Struct<wpimath::Transform2d>;
+using StructType = wpi::Struct<wpi::math::Transform2d>;
 const Transform2d kExpectedData{
     Transform2d{Translation2d{0.191_m, 2.2_m}, Rotation2d{4.4_rad}}};
 }  // namespace

@@ -7,9 +7,9 @@
 #include <gtest/gtest.h>
 #include <wpi/array.h>
 
-#include "wpimath/geometry/Pose3d.h"
+#include "wpi/math/geometry/Pose3d.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 TEST(Pose3dTest, RotateBy) {
   constexpr auto x = 1_m;

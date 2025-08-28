@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpimath/spline/proto/QuinticHermiteSplineProto.h"
+#include "wpi/math/spline/proto/QuinticHermiteSplineProto.h"
 
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "wpimath/protobuf/spline.npb.h"
 
-std::optional<wpimath::QuinticHermiteSpline>
-wpi::Protobuf<wpimath::QuinticHermiteSpline>::Unpack(InputStream& stream) {
+std::optional<wpi::math::QuinticHermiteSpline>
+wpi::Protobuf<wpi::math::QuinticHermiteSpline>::Unpack(InputStream& stream) {
   wpi::WpiArrayUnpackCallback<double, 3> xInitial;
   wpi::WpiArrayUnpackCallback<double, 3> xFinal;
   wpi::WpiArrayUnpackCallback<double, 3> yInitial;
@@ -29,7 +29,7 @@ wpi::Protobuf<wpimath::QuinticHermiteSpline>::Unpack(InputStream& stream) {
     return {};
   }
 
-  return wpimath::QuinticHermiteSpline{
+  return wpi::math::QuinticHermiteSpline{
       xInitial.Array(),
       xFinal.Array(),
       yInitial.Array(),
@@ -37,8 +37,8 @@ wpi::Protobuf<wpimath::QuinticHermiteSpline>::Unpack(InputStream& stream) {
   };
 }
 
-bool wpi::Protobuf<wpimath::QuinticHermiteSpline>::Pack(
-    OutputStream& stream, const wpimath::QuinticHermiteSpline& value) {
+bool wpi::Protobuf<wpi::math::QuinticHermiteSpline>::Pack(
+    OutputStream& stream, const wpi::math::QuinticHermiteSpline& value) {
   wpi::PackCallback<double> xInitial{value.GetInitialControlVector().x};
   wpi::PackCallback<double> xFinal{value.GetFinalControlVector().x};
   wpi::PackCallback<double> yInitial{value.GetInitialControlVector().y};

@@ -7,10 +7,10 @@
 #include <gtest/gtest.h>
 
 #include "units/angular_velocity.h"
-#include "wpimath/geometry/Translation2d.h"
-#include "wpimath/kinematics/MecanumDriveKinematics.h"
+#include "wpi/math/geometry/Translation2d.h"
+#include "wpi/math/kinematics/MecanumDriveKinematics.h"
 
-using namespace wpimath;
+using namespace wpi::math;
 
 class MecanumDriveKinematicsTest : public ::testing::Test {
  protected:
