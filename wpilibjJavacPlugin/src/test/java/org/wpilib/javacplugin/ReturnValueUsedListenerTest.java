@@ -70,6 +70,198 @@ class ReturnValueUsedListenerTest {
   }
 
   @Test
+  void nodiscardOnClass() {
+    String source =
+        """
+        package frc.robot;
+
+        import org.wpilib.annotation.NoDiscard;
+
+        @NoDiscard
+        class Example {
+          Example getExample() { return new Example(); }
+
+          void usage() {
+            getExample();
+          }
+        }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+
+    assertThat(compilation).failed();
+    assertEquals(1, compilation.errors().size());
+    var error = compilation.errors().get(0);
+    assertEquals(
+        "Result of method returning @NoDiscard type frc.robot.Example is ignored",
+        error.getMessage(null));
+  }
+
+  @Test
+  void nodiscardOnClassCustomMessage() {
+    String source =
+        """
+        package frc.robot;
+
+        import org.wpilib.annotation.NoDiscard;
+
+        @NoDiscard("Custom message")
+        class Example {
+          Example getExample() { return new Example(); }
+
+          void usage() {
+            getExample();
+          }
+        }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+
+    assertThat(compilation).failed();
+    assertEquals(1, compilation.errors().size());
+    var error = compilation.errors().get(0);
+    assertEquals("Custom message", error.getMessage(null));
+  }
+
+  @Test
+  void nodiscardOnClassAndMethod() {
+    String source =
+        """
+        package frc.robot;
+
+        import org.wpilib.annotation.NoDiscard;
+
+        @NoDiscard
+        class Example {
+          @NoDiscard
+          Example getExample() { return new Example(); }
+
+          void usage() {
+            getExample();
+          }
+        }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+
+    assertThat(compilation).failed();
+    assertEquals(2, compilation.errors().size());
+    var error1 = compilation.errors().get(0);
+    var error2 = compilation.errors().get(1);
+    assertEquals("Result of @NoDiscard method is ignored", error1.getMessage(null));
+    assertEquals(
+        "Result of method returning @NoDiscard type frc.robot.Example is ignored",
+        error2.getMessage(null));
+  }
+
+  @Test
+  void nodiscardOnInheritedClass() {
+    String source =
+        """
+        package frc.robot;
+
+        import org.wpilib.annotation.NoDiscard;
+
+        @NoDiscard("Objects of type `Base` must be used")
+        abstract class Base { }
+
+        class Example extends Base {
+          Example getExample() { return new Example(); }
+
+          void usage() {
+            getExample();
+          }
+        }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+
+    assertThat(compilation).failed();
+    assertEquals(1, compilation.errors().size());
+    var error = compilation.errors().get(0);
+    assertEquals("Objects of type `Base` must be used", error.getMessage(null));
+  }
+
+  @Test
+  void nodiscardOnSingleInterface() {
+    String source =
+        """
+        package frc.robot;
+
+        import org.wpilib.annotation.NoDiscard;
+
+        @NoDiscard("Objects implementing `I` must be used")
+        interface I { }
+
+        class Example implements I {
+          Example getExample() { return new Example(); }
+
+          void usage() {
+            getExample();
+          }
+        }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+
+    assertThat(compilation).failed();
+    assertEquals(1, compilation.errors().size());
+    var error = compilation.errors().get(0);
+    assertEquals("Objects implementing `I` must be used", error.getMessage(null));
+  }
+
+  @Test
+  void nodiscardOnMultipleInterfaces() {
+    String source =
+        """
+        package frc.robot;
+
+        import org.wpilib.annotation.NoDiscard;
+
+        @NoDiscard("Objects implementing `I` must be used")
+        interface I { }
+
+        @NoDiscard("Objects implementing `I2` must be used")
+        interface I2 { }
+
+        class Example implements I, I2 {
+          Example getExample() { return new Example(); }
+
+          void usage() {
+            getExample();
+          }
+        }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(kJavaVersionOptions)
+            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
+
+    assertThat(compilation).failed();
+    assertEquals(2, compilation.errors().size());
+    var error1 = compilation.errors().get(0);
+    var error2 = compilation.errors().get(1);
+    assertEquals("Objects implementing `I` must be used", error1.getMessage(null));
+    assertEquals("Objects implementing `I2` must be used", error2.getMessage(null));
+  }
+
+  @Test
   void nodiscardCustomMessage() {
     String source =
         """
@@ -95,7 +287,7 @@ class ReturnValueUsedListenerTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Result of @NoDiscard method is ignored: Custom message", error.getMessage(null));
+    assertEquals("Custom message", error.getMessage(null));
   }
 
   @Test

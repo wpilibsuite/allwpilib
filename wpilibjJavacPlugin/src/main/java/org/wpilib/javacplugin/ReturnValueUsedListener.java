@@ -13,14 +13,19 @@ import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskListener;
 import com.sun.source.util.TreeScanner;
 import com.sun.source.util.Trees;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import javax.lang.model.element.AnnotationValue;
+import java.util.Set;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
+import org.wpilib.annotation.NoDiscard;
 
 /**
  * Checks for usages of methods that require their return values to be used. Some return types are
@@ -40,7 +45,6 @@ public class ReturnValueUsedListener implements TaskListener {
     private final Trees m_trees;
     private final Map<TypeElement, String> m_specialTypes;
 
-    private static final String kNoDiscardFqn = "org.wpilib.annotation.NoDiscard";
     private static final String kCommands2CommandFqn = "edu.wpi.first.wpilibj2.command.Command";
     private static final String kCommands3CommandFqn = "org.wpilib.commands3.Command";
 
@@ -76,31 +80,26 @@ public class ReturnValueUsedListener implements TaskListener {
       var path = m_trees.getPath(m_root, node);
       var parentPath = (path == null) ? null : path.getParentPath();
       if (parentPath == null || parentPath.getLeaf().getKind() != Tree.Kind.EXPRESSION_STATEMENT) {
-        // If the parent node is an expression statement, then the return value is ignored.
-        // Otherwise, the return value is used and we can ignore this site.
+        // If the parent node is an expression statement, then the value is ignored.
+        // Otherwise, the value is used and we can ignore this site.
         return;
       }
 
       // Resolve the static type of the expression
-      TypeMirror returnType = getType(node);
-      if (returnType == null || returnType.getKind() == TypeKind.VOID) {
-        // Skip void since there's nothing to return.
-        // Maybe this should be a compiler error, but it might be bad library code and we shouldn't
-        // have it break users.
+      TypeMirror type = getType(node);
+      if (type == null || type.getKind() == TypeKind.VOID) {
+        // Skip void (e.g., void-returning methods)
         return;
       }
 
+      // Special type checks (also applies to subtypes)
       m_specialTypes.forEach(
-          (type, msg) -> {
-            if (type == null) {
-              // This type is not on the classpath in this compilation unit (i.e., users are not
-              // using it); skip.
+          (specialType, msg) -> {
+            if (specialType == null) {
+              // Not on classpath for this compilation unit
               return;
             }
-
-            // Also applies to subtypes
-            boolean isSpecial = m_task.getTypes().isAssignable(returnType, type.asType());
-            if (isSpecial) {
+            if (m_task.getTypes().isAssignable(type, specialType.asType())) {
               m_trees.printMessage(Diagnostic.Kind.ERROR, msg, node, m_root);
             }
           });
@@ -108,8 +107,8 @@ public class ReturnValueUsedListener implements TaskListener {
       // Check @NoDiscard on the invoked executable (method or constructor)
       var invoked = getInvokedExecutable(node);
       if (invoked != null) {
-        String msg = getNoDiscardMessage(invoked);
-        if (msg != null) {
+        List<String> messages = getNoDiscardMessages(invoked);
+        for (String msg : messages) {
           m_trees.printMessage(Diagnostic.Kind.ERROR, msg, node, m_root);
         }
       }
@@ -133,32 +132,74 @@ public class ReturnValueUsedListener implements TaskListener {
       return (el instanceof ExecutableElement ee) ? ee : null;
     }
 
-    private String getNoDiscardMessage(ExecutableElement method) {
-      for (var mirror : method.getAnnotationMirrors()) {
-        var annoType = mirror.getAnnotationType();
-        if (annoType == null) {
-          continue;
-        }
+    /**
+     * Collects all @NoDiscard messages applicable to the given executable: - The method/constructor
+     * itself (if annotated) - The return type (if declared) including its superclasses and all
+     * implemented interfaces Returns formatted diagnostics messages ready to print.
+     */
+    private List<String> getNoDiscardMessages(ExecutableElement method) {
+      List<String> messages = new ArrayList<>();
 
-        if (kNoDiscardFqn.equals(annoType.toString())) {
-          return mirror.getElementValues().entrySet().stream()
-              .filter(e -> e.getKey().getSimpleName().contentEquals("value"))
-              .findFirst()
-              .map(Map.Entry::getValue)
-              .map(AnnotationValue::getValue)
-              .map(
-                  msg -> {
-                    if ("".equals(msg)) {
-                      return null;
-                    } else {
-                      return "Result of @NoDiscard method is ignored: " + msg;
-                    }
-                  })
-              .orElse("Result of @NoDiscard method is ignored");
+      // 1) Method-level @NoDiscard
+      var methodNoDiscard = method.getAnnotation(NoDiscard.class);
+      if (methodNoDiscard != null) {
+        String msg = methodNoDiscard.value();
+        if (msg.isEmpty()) {
+          messages.add("Result of @NoDiscard method is ignored");
+        } else {
+          messages.add(msg);
         }
       }
 
-      return null;
+      // 2) Type-level @NoDiscard (classes and interfaces, recursively)
+      var returnType = method.getReturnType();
+      if (returnType instanceof DeclaredType dt && dt.asElement() instanceof TypeElement te) {
+        Set<TypeElement> seen = new HashSet<>();
+        collectNoDiscardMessagesFromTypeHierarchy(te, seen, messages);
+      }
+
+      return messages;
+    }
+
+    /**
+     * Searches for @NoDiscard on the provided type element, its superclasses, and all implemented
+     * interfaces (recursively). Appends formatted messages to the provided list for every match.
+     */
+    private void collectNoDiscardMessagesFromTypeHierarchy(
+        TypeElement type, Set<TypeElement> seen, List<String> out) {
+      if (type == null || !seen.add(type)) {
+        return;
+      }
+
+      // Check this type directly
+      var typeNoDiscard = type.getAnnotation(NoDiscard.class);
+      if (typeNoDiscard != null) {
+        String message = typeNoDiscard.value();
+        if (message.isEmpty()) {
+          out.add(
+              "Result of method returning @NoDiscard type %s is ignored"
+                  .formatted(type.getQualifiedName()));
+        } else {
+          out.add(message);
+        }
+      }
+
+      // Check superclass chain
+      var superMirror = type.getSuperclass();
+      if (superMirror != null && superMirror.getKind() != TypeKind.NONE) {
+        var superEl = m_task.getTypes().asElement(superMirror);
+        if (superEl instanceof TypeElement ste) {
+          collectNoDiscardMessagesFromTypeHierarchy(ste, seen, out);
+        }
+      }
+
+      // Check all implemented interfaces (recursively)
+      for (var iface : type.getInterfaces()) {
+        var ifaceEl = m_task.getTypes().asElement(iface);
+        if (ifaceEl instanceof TypeElement ite) {
+          collectNoDiscardMessagesFromTypeHierarchy(ite, seen, out);
+        }
+      }
     }
   }
 
