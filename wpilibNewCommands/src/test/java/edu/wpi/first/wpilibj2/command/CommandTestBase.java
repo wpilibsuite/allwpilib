@@ -7,8 +7,8 @@ package edu.wpi.first.wpilibj2.command;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
+import org.wpilib.DriverStation;
+import org.wpilib.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;

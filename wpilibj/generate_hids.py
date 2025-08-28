@@ -27,7 +27,7 @@ def generate_hids(output_directory: Path, template_directory: Path):
         autoescape=False,
         keep_trailing_newline=True,
     )
-    rootPath = output_directory / "main/java/edu/wpi/first/wpilibj"
+    rootPath = output_directory / "main/java/org/wpilib"
     template = env.get_template("hid.java.jinja")
     for controller in controllers:
         controllerName = f"{controller['ConsoleName']}Controller.java"
@@ -35,7 +35,7 @@ def generate_hids(output_directory: Path, template_directory: Path):
         write_controller_file(rootPath, controllerName, output)
 
     # Java simulation files
-    rootPath = output_directory / "main/java/edu/wpi/first/wpilibj/simulation"
+    rootPath = output_directory / "main/java/org/wpilib/simulation"
     template = env.get_template("hidsim.java.jinja")
     for controller in controllers:
         controllerName = f"{controller['ConsoleName']}ControllerSim.java"

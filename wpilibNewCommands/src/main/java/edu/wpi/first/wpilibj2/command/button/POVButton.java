@@ -6,8 +6,8 @@ package edu.wpi.first.wpilibj2.command.button;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.wpilibj.DriverStation.POVDirection;
-import edu.wpi.first.wpilibj.GenericHID;
+import org.wpilib.DriverStation.POVDirection;
+import org.wpilib.GenericHID;
 
 /**
  * A {@link Trigger} that gets its state from a POV on a {@link GenericHID}.

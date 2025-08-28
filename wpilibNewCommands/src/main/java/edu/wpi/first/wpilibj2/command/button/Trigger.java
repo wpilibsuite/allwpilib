@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj2.command.button;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import org.wpilib.math.filter.Debouncer;
-import edu.wpi.first.wpilibj.event.EventLoop;
+import org.wpilib.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import java.util.function.BooleanSupplier;

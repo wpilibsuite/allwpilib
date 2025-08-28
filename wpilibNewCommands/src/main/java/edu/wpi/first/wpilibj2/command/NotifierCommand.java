@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import edu.wpi.first.wpilibj.Notifier;
+import org.wpilib.Notifier;
 
 /**
  * A command that starts a notifier to run the given runnable periodically in a separate thread. Has

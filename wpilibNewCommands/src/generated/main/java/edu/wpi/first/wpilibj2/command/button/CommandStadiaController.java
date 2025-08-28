@@ -6,8 +6,8 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
-import edu.wpi.first.wpilibj.StadiaController;
-import edu.wpi.first.wpilibj.event.EventLoop;
+import org.wpilib.StadiaController;
+import org.wpilib.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**

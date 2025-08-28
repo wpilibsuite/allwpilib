@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.RobotBase;
+import org.wpilib.RobotBase;
 
 public final class Main {
   private Main() {}

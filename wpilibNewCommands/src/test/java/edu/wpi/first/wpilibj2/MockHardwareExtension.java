@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj2;
 
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
+import org.wpilib.simulation.DriverStationSim;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;

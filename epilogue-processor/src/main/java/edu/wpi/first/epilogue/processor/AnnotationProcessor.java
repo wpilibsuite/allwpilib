@@ -387,7 +387,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     // Used to check for a main robot class
     var robotBaseClass =
-        processingEnv.getElementUtils().getTypeElement("edu.wpi.first.wpilibj.TimedRobot").asType();
+        processingEnv.getElementUtils().getTypeElement("org.wpilib.TimedRobot").asType();
 
     boolean validFields = validateFields(annotatedElements);
     boolean validMethods = validateMethods(annotatedElements);

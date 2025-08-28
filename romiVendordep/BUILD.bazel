@@ -88,7 +88,7 @@ cc_binary(
 java_binary(
     name = "DevMain-Java",
     srcs = ["src/dev/java/edu/wpi/first/wpilibj/romi/DevMain.java"],
-    main_class = "edu.wpi.first.wpilibj.romi.DevMain",
+    main_class = "romi.org.wpilib.DevMain",
     deps = [
         "//hal:hal-java",
         "//ntcore:ntcore-java",

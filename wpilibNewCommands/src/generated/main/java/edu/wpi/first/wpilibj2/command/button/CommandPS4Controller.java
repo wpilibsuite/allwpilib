@@ -6,8 +6,8 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
-import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.event.EventLoop;
+import org.wpilib.PS4Controller;
+import org.wpilib.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**

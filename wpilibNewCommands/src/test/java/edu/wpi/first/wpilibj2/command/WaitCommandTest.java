@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.simulation.SimHooks;
+import org.wpilib.simulation.SimHooks;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

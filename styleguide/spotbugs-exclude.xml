@@ -2,7 +2,7 @@
 <FindBugsFilter>
   <Match>
     <Bug pattern="AT_NONATOMIC_64BIT_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.DriverStation" />
+    <Class name="org.wpilib.DriverStation" />
   </Match>
   <Match>
     <Bug pattern="AT_NONATOMIC_64BIT_PRIMITIVE" />
@@ -10,7 +10,7 @@
   </Match>
   <Match>
     <Bug pattern="AT_NONATOMIC_64BIT_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.Watchdog" />
+    <Class name="org.wpilib.Watchdog" />
   </Match>
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
@@ -22,11 +22,11 @@
   </Match>
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.DriverStation" />
+    <Class name="org.wpilib.DriverStation" />
   </Match>
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
-    <Class name="edu.wpi.first.wpilibj.GenericHID" />
+    <Class name="org.wpilib.GenericHID" />
   </Match>
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
@@ -49,7 +49,7 @@
   </Match>
   <Match>
     <Bug pattern="DE_MIGHT_IGNORE" />
-    <Class name="edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl$Property" />
+    <Class name="smartdashboard.org.wpilib.SendableBuilderImpl$Property" />
   </Match>
   <Match>
     <Bug pattern="DM_DEFAULT_ENCODING" />
@@ -84,7 +84,7 @@
   </Match>
   <Match>
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
-    <Class name="edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d" />
+    <Class name="smartdashboard.org.wpilib.MechanismLigament2d" />
   </Match>
   <Match>
     <Bug pattern="MS_EXPOSE_REP" />
@@ -172,23 +172,23 @@
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.romitimed.Robot" />
+    <Class name="romitimed.templates.org.wpilib.Robot" />
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.xrptimed.Robot" />
+    <Class name="xrptimed.templates.org.wpilib.Robot" />
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timed.Robot" />
+    <Class name="timed.templates.org.wpilib.Robot" />
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timeslice.Robot" />
+    <Class name="timeslice.templates.org.wpilib.Robot" />
   </Match>
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
-    <Class name="edu.wpi.first.wpilibj.templates.timesliceskeleton.Robot" />
+    <Class name="timesliceskeleton.templates.org.wpilib.Robot" />
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_FIELD" />

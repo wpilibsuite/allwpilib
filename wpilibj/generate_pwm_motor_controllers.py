@@ -32,7 +32,7 @@ def generate_pwm_motor_controllers(output_root, template_root):
         keep_trailing_newline=True,
     )
 
-    root_path = Path(output_root) / "main/java/edu/wpi/first/wpilibj/motorcontrol"
+    root_path = Path(output_root) / "main/java/org/wpilib/motorcontrol"
     template = env.get_template("pwm_motor_controller.java.jinja")
 
     for controller in controllers:

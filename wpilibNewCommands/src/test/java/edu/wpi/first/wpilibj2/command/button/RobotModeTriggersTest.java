@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj2.command.button;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
+import org.wpilib.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.CommandTestBase;
 import org.junit.jupiter.api.Test;
 

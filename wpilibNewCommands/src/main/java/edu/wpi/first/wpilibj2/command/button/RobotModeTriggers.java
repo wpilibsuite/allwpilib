@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
-import edu.wpi.first.wpilibj.DriverStation;
+import org.wpilib.DriverStation;
 
 /**
  * A class containing static {@link Trigger} factories for running callbacks when the robot mode

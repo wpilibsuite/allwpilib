@@ -5,9 +5,9 @@
 package edu.wpi.first.wpilibj2.command.button;
 
 import org.wpilib.math.util.Pair;
-import edu.wpi.first.wpilibj.DriverStation.POVDirection;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.event.EventLoop;
+import org.wpilib.DriverStation.POVDirection;
+import org.wpilib.GenericHID;
+import org.wpilib.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import java.util.HashMap;
 import java.util.Map;
