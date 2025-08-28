@@ -11,7 +11,7 @@ import com.sun.source.util.Plugin;
  * A javac compiler plugin that adds compiler warnings for incorrect usage of WPILib types. Also
  * supports WPILib's custom annotations like @NoDiscard.
  */
-public class WPIlibJavacPlugin implements Plugin {
+public class WPILibJavacPlugin implements Plugin {
   @Override
   public String getName() {
     return "WPILib";
