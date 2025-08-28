@@ -38,6 +38,7 @@ java_library(
     name = "wpilibNewCommands-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
     visibility = ["//visibility:public"],
+    plugins = ["//wpilibjJavacPlugin:plugin"],
     deps = [
         "//cscore:cscore-java",
         "//hal:hal-java",
@@ -80,6 +81,7 @@ java_binary(
     srcs = ["src/dev/java/edu/wpi/first/wpilibj2/commands/DevMain.java"],
     main_class = "edu.wpi.first.wpilibj2.commands.DevMain",
     deps = [
+        ":wpilibNewCommands-java",
         "//hal:hal-java",
         "//ntcore:networktables-java",
         "//wpiannotations",

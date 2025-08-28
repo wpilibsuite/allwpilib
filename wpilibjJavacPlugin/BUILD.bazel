@@ -1,17 +1,11 @@
-load("@rules_java//java:defs.bzl", "java_library", "java_plugin")
+load("@rules_java//java:defs.bzl", "java_plugin")
 
-java_library(
-    name = "wpilibjJavacPlugin",
+java_plugin(
+    name = "plugin",
     srcs = glob(["src/main/java/**/*.java"]),
+    resources = glob(["src/main/resources/**"]),
     visibility = ["//visibility:public"],
     deps = [
         "//wpiannotations",
     ],
-)
-
-java_plugin(
-    name = "plugin",
-    plugins = ["WPILib"],
-    visibility = ["//visibility:public"],
-    deps = [],
 )
