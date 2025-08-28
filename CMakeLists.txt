@@ -311,7 +311,6 @@ endif()
 
 if(WITH_JAVA)
     add_subdirectory(wpiannotations)
-    add_subdirectory(wpilibjJavacPlugin)
 endif()
 
 if(WITH_WPIUNITS AND NOT WITH_WPIMATH)
