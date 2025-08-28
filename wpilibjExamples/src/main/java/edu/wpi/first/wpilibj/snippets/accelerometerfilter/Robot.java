@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.snippets.accelerometerfilter;
 
-import edu.wpi.first.math.filter.LinearFilter;
+import org.wpilib.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.OnboardIMU;
 import edu.wpi.first.wpilibj.OnboardIMU.MountOrientation;
 import edu.wpi.first.wpilibj.TimedRobot;

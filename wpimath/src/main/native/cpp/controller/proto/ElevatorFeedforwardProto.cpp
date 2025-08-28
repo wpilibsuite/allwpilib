@@ -2,29 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/controller/proto/ElevatorFeedforwardProto.h"
+#include "wpimath/controller/proto/ElevatorFeedforwardProto.h"
 
 #include <optional>
 
 #include "wpimath/protobuf/controller.npb.h"
 
-std::optional<frc::ElevatorFeedforward>
-wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(InputStream& stream) {
+std::optional<wpimath::ElevatorFeedforward>
+wpi::Protobuf<wpimath::ElevatorFeedforward>::Unpack(InputStream& stream) {
   wpi_proto_ProtobufElevatorFeedforward msg;
   if (!stream.Decode(msg)) {
     return {};
   }
 
-  return frc::ElevatorFeedforward{
+  return wpimath::ElevatorFeedforward{
       units::volt_t{msg.ks},
       units::volt_t{msg.kg},
-      units::unit_t<frc::ElevatorFeedforward::kv_unit>{msg.kv},
-      units::unit_t<frc::ElevatorFeedforward::ka_unit>{msg.ka},
+      units::unit_t<wpimath::ElevatorFeedforward::kv_unit>{msg.kv},
+      units::unit_t<wpimath::ElevatorFeedforward::ka_unit>{msg.ka},
   };
 }
 
-bool wpi::Protobuf<frc::ElevatorFeedforward>::Pack(
-    OutputStream& stream, const frc::ElevatorFeedforward& value) {
+bool wpi::Protobuf<wpimath::ElevatorFeedforward>::Pack(
+    OutputStream& stream, const wpimath::ElevatorFeedforward& value) {
   wpi_proto_ProtobufElevatorFeedforward msg{
       .ks = value.GetKs().value(),
       .kg = value.GetKg().value(),

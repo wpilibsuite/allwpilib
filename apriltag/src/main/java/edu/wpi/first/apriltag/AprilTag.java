@@ -7,9 +7,9 @@ package edu.wpi.first.apriltag;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.apriltag.jni.AprilTagJNI;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.util.RawFrame;
 import java.util.Objects;
+import org.wpilib.math.geometry.Pose3d;
 
 /** Represents an AprilTag's metadata. */
 @SuppressWarnings("MemberName")

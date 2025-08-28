@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/kinematics/proto/SwerveModulePositionProto.h"
+#include "wpimath/kinematics/proto/SwerveModulePositionProto.h"
 
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "wpimath/protobuf/kinematics.npb.h"
 
-std::optional<frc::SwerveModulePosition>
-wpi::Protobuf<frc::SwerveModulePosition>::Unpack(InputStream& stream) {
-  wpi::UnpackCallback<frc::Rotation2d> angle;
+std::optional<wpimath::SwerveModulePosition>
+wpi::Protobuf<wpimath::SwerveModulePosition>::Unpack(InputStream& stream) {
+  wpi::UnpackCallback<wpimath::Rotation2d> angle;
   wpi_proto_ProtobufSwerveModulePosition msg{
       .distance = 0,
       .angle = angle.Callback(),
@@ -25,14 +25,14 @@ wpi::Protobuf<frc::SwerveModulePosition>::Unpack(InputStream& stream) {
     return {};
   }
 
-  return frc::SwerveModulePosition{
+  return wpimath::SwerveModulePosition{
       units::meter_t{msg.distance},
       iangle[0],
   };
 }
 
-bool wpi::Protobuf<frc::SwerveModulePosition>::Pack(
-    OutputStream& stream, const frc::SwerveModulePosition& value) {
+bool wpi::Protobuf<wpimath::SwerveModulePosition>::Pack(
+    OutputStream& stream, const wpimath::SwerveModulePosition& value) {
   wpi::PackCallback angle{&value.angle};
   wpi_proto_ProtobufSwerveModulePosition msg{
       .distance = value.distance.value(),

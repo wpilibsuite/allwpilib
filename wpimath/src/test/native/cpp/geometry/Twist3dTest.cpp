@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose3d.h"
+#include "wpimath/geometry/Pose3d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(Twist3dTest, StraightX) {
   const Twist3d straight{5_m, 0_m, 0_m, 0_rad, 0_rad, 0_rad};

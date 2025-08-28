@@ -4,14 +4,14 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.NumericalIntegration;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
+import org.wpilib.math.Matrix;
+import org.wpilib.math.VecBuilder;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N2;
+import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.system.NumericalIntegration;
+import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated single jointed arm mechanism. */
@@ -38,7 +38,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
    * Creates a simulated arm mechanism.
    *
    * @param plant The linear system that represents the arm. This system can be created with {@link
-   *     edu.wpi.first.math.system.plant.LinearSystemId#createSingleJointedArmSystem(DCMotor,
+   *     LinearSystemId#createSingleJointedArmSystem(DCMotor,
    *     double, double)}.
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).

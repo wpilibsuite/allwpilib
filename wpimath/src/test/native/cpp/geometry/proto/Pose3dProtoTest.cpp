@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "frc/geometry/Pose3d.h"
+#include "wpimath/geometry/Pose3d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 

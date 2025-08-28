@@ -6,11 +6,11 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Translation2d.h"
-#include "frc/kinematics/SwerveDriveKinematics.h"
 #include "units/angular_velocity.h"
+#include "wpimath/geometry/Translation2d.h"
+#include "wpimath/kinematics/SwerveDriveKinematics.h"
 
-using namespace frc;
+using namespace wpimath;
 
 static constexpr double kEpsilon = 0.1;
 

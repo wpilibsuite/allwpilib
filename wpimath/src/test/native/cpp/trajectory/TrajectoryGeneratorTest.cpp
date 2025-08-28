@@ -6,14 +6,14 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/trajectory/Trajectory.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
-#include "frc/trajectory/constraint/CentripetalAccelerationConstraint.h"
-#include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "trajectory/TestTrajectory.h"
 #include "units/math.h"
+#include "wpimath/trajectory/Trajectory.h"
+#include "wpimath/trajectory/TrajectoryGenerator.h"
+#include "wpimath/trajectory/constraint/CentripetalAccelerationConstraint.h"
+#include "wpimath/trajectory/constraint/TrajectoryConstraint.h"
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(TrajectoryGenerationTest, ObeysConstraints) {
   TrajectoryConfig config{12_fps, 12_fps_sq};

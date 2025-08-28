@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj.examples.mecanumdriveposeestimator;
 
-import edu.wpi.first.math.StateSpaceUtil;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
+import org.wpilib.math.StateSpaceUtil;
+import org.wpilib.math.VecBuilder;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.util.Units;
 
 /** This dummy class represents a global measurement sensor, such as a computer vision solution. */
 public final class ExampleGlobalMeasurementSensor {

@@ -7,13 +7,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/SwerveDriveKinematics.h"
-#include "frc/kinematics/SwerveDriveOdometry.h"
-#include "frc/trajectory/Trajectory.h"
-#include "frc/trajectory/TrajectoryConfig.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
+#include "wpimath/kinematics/SwerveDriveKinematics.h"
+#include "wpimath/kinematics/SwerveDriveOdometry.h"
+#include "wpimath/trajectory/Trajectory.h"
+#include "wpimath/trajectory/TrajectoryConfig.h"
+#include "wpimath/trajectory/TrajectoryGenerator.h"
 
-using namespace frc;
+using namespace wpimath;
 
 static constexpr double kEpsilon = 0.01;
 
@@ -78,7 +78,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
 
   SwerveDriveOdometry<4> odometry{
-      kinematics, frc::Rotation2d{}, {zero, zero, zero, zero}};
+      kinematics, wpimath::Rotation2d{}, {zero, zero, zero, zero}};
 
   SwerveModulePosition fl;
   SwerveModulePosition fr;
@@ -117,10 +117,10 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
     bl.angle = moduleStates[2].angle;
     br.angle = moduleStates[3].angle;
 
-    auto xhat =
-        odometry.Update(groundTruthState.pose.Rotation() +
-                            frc::Rotation2d{distribution(generator) * 0.05_rad},
-                        {fl, fr, bl, br});
+    auto xhat = odometry.Update(
+        groundTruthState.pose.Rotation() +
+            wpimath::Rotation2d{distribution(generator) * 0.05_rad},
+        {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
                        .value();
@@ -143,7 +143,7 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
       Translation2d{-1_m, -1_m}, Translation2d{-1_m, 1_m}};
 
   SwerveDriveOdometry<4> odometry{
-      kinematics, frc::Rotation2d{}, {zero, zero, zero, zero}};
+      kinematics, wpimath::Rotation2d{}, {zero, zero, zero, zero}};
 
   SwerveModulePosition fl;
   SwerveModulePosition fr;
@@ -182,8 +182,9 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
     bl.angle = groundTruthState.pose.Rotation();
     br.angle = groundTruthState.pose.Rotation();
 
-    auto xhat = odometry.Update(
-        frc::Rotation2d{distribution(generator) * 0.05_rad}, {fl, fr, bl, br});
+    auto xhat =
+        odometry.Update(wpimath::Rotation2d{distribution(generator) * 0.05_rad},
+                        {fl, fr, bl, br});
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
                        .value();

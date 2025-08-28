@@ -4,16 +4,16 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/controller/BangBangController.h"
+#include "wpimath/controller/BangBangController.h"
 
 TEST(BangBangInputOutputTest, ShouldOutput) {
-  frc::BangBangController controller;
+  wpimath::BangBangController controller;
 
   EXPECT_DOUBLE_EQ(controller.Calculate(0, 1), 1);
 }
 
 TEST(BangBangInputOutputTest, ShouldNotOutput) {
-  frc::BangBangController controller;
+  wpimath::BangBangController controller;
 
   EXPECT_DOUBLE_EQ(controller.Calculate(1, 0), 0);
 }

@@ -4,11 +4,11 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/controller/DifferentialDriveAccelerationLimiter.h"
-#include "frc/system/plant/LinearSystemId.h"
 #include "units/math.h"
+#include "wpimath/controller/DifferentialDriveAccelerationLimiter.h"
+#include "wpimath/system/plant/LinearSystemId.h"
 
-namespace frc {
+namespace wpimath {
 
 TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
   constexpr auto trackwidth = 0.9_m;
@@ -254,4 +254,4 @@ TEST(DifferentialDriveAccelerationLimiterTest, MinAccelGreaterThanMaxAccel) {
       std::invalid_argument);
 }
 
-}  // namespace frc
+}  // namespace wpimath

@@ -7,15 +7,15 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/trajectory/constraint/CentripetalAccelerationConstraint.h"
-#include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "trajectory/TestTrajectory.h"
 #include "units/acceleration.h"
 #include "units/angle.h"
 #include "units/math.h"
 #include "units/velocity.h"
+#include "wpimath/trajectory/constraint/CentripetalAccelerationConstraint.h"
+#include "wpimath/trajectory/constraint/TrajectoryConstraint.h"
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(CentripetalAccelerationConstraintTest, Constraint) {
   const auto maxCentripetalAcceleration = 7_fps_sq;

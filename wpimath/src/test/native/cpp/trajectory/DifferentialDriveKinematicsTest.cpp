@@ -7,12 +7,12 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 #include "trajectory/TestTrajectory.h"
 #include "units/time.h"
+#include "wpimath/kinematics/DifferentialDriveKinematics.h"
+#include "wpimath/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(DifferentialDriveKinematicsConstraintTest, Constraint) {
   const auto maxVelocity = 12_fps;

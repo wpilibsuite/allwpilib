@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/geometry/struct/Twist3dStruct.h"
+#include "wpimath/geometry/struct/Twist3dStruct.h"
 
 namespace {
 constexpr size_t kDxOff = 0;
@@ -13,10 +13,10 @@ constexpr size_t kRyOff = kRxOff + 8;
 constexpr size_t kRzOff = kRyOff + 8;
 }  // namespace
 
-using StructType = wpi::Struct<frc::Twist3d>;
+using StructType = wpi::Struct<wpimath::Twist3d>;
 
-frc::Twist3d StructType::Unpack(std::span<const uint8_t> data) {
-  return frc::Twist3d{
+wpimath::Twist3d StructType::Unpack(std::span<const uint8_t> data) {
+  return wpimath::Twist3d{
       units::meter_t{wpi::UnpackStruct<double, kDxOff>(data)},
       units::meter_t{wpi::UnpackStruct<double, kDyOff>(data)},
       units::meter_t{wpi::UnpackStruct<double, kDzOff>(data)},
@@ -26,7 +26,7 @@ frc::Twist3d StructType::Unpack(std::span<const uint8_t> data) {
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const frc::Twist3d& value) {
+void StructType::Pack(std::span<uint8_t> data, const wpimath::Twist3d& value) {
   wpi::PackStruct<kDxOff>(data, value.dx.value());
   wpi::PackStruct<kDyOff>(data, value.dy.value());
   wpi::PackStruct<kDzOff>(data, value.dz.value());

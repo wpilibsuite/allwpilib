@@ -6,9 +6,9 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Translation2d.h"
+#include "wpimath/geometry/Translation2d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(Translation2dTest, Sum) {
   const Translation2d one{1_m, 3_m};

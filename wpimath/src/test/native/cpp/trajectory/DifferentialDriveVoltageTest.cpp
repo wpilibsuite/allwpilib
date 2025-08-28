@@ -7,18 +7,18 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
-#include "frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h"
 #include "trajectory/TestTrajectory.h"
 #include "units/acceleration.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "units/velocity.h"
 #include "units/voltage.h"
+#include "wpimath/geometry/Pose2d.h"
+#include "wpimath/kinematics/DifferentialDriveKinematics.h"
+#include "wpimath/trajectory/TrajectoryGenerator.h"
+#include "wpimath/trajectory/constraint/DifferentialDriveVoltageConstraint.h"
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
   // Pick an unreasonably large kA to ensure the constraint has to do some work

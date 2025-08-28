@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "frc/geometry/Ellipse2d.h"
+#include "wpimath/geometry/Ellipse2d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 

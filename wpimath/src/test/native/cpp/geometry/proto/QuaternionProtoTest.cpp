@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "frc/geometry/Quaternion.h"
+#include "wpimath/geometry/Quaternion.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 

@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.swervebot;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.SlewRateLimiter;
+import org.wpilib.math.MathUtil;
+import org.wpilib.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 

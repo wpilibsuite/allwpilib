@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Quaternion.h"
+#include "wpimath/geometry/Quaternion.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 
-using StructType = wpi::Struct<frc::Quaternion>;
+using StructType = wpi::Struct<wpimath::Quaternion>;
 const Quaternion kExpectedData{Quaternion{1.1, 0.191, 35.04, 19.1}};
 }  // namespace
 

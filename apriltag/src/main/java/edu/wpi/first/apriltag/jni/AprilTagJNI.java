@@ -7,11 +7,11 @@ package edu.wpi.first.apriltag.jni;
 import edu.wpi.first.apriltag.AprilTagDetection;
 import edu.wpi.first.apriltag.AprilTagDetector;
 import edu.wpi.first.apriltag.AprilTagPoseEstimate;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.util.RawFrame;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.wpilib.math.geometry.Transform3d;
 
 /** AprilTag JNI. */
 public class AprilTagJNI {

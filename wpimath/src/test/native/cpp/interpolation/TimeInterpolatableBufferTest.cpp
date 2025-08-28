@@ -6,13 +6,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "units/time.h"
+#include "wpimath/geometry/Pose2d.h"
+#include "wpimath/geometry/Rotation2d.h"
+#include "wpimath/interpolation/TimeInterpolatableBuffer.h"
 
 TEST(TimeInterpolatableBufferTest, AddSample) {
-  frc::TimeInterpolatableBuffer<frc::Rotation2d> buffer{10_s};
+  wpimath::TimeInterpolatableBuffer<wpimath::Rotation2d> buffer{10_s};
 
   // No entries
   buffer.AddSample(1_s, 0_rad);
@@ -32,7 +32,7 @@ TEST(TimeInterpolatableBufferTest, AddSample) {
 }
 
 TEST(TimeInterpolatableBufferTest, Interpolation) {
-  frc::TimeInterpolatableBuffer<frc::Rotation2d> buffer{10_s};
+  wpimath::TimeInterpolatableBuffer<wpimath::Rotation2d> buffer{10_s};
 
   buffer.AddSample(0_s, 0_rad);
   EXPECT_TRUE(buffer.Sample(0_s).value() == 0_rad);
@@ -47,12 +47,12 @@ TEST(TimeInterpolatableBufferTest, Interpolation) {
 }
 
 TEST(TimeInterpolatableBufferTest, Pose2d) {
-  frc::TimeInterpolatableBuffer<frc::Pose2d> buffer{10_s};
+  wpimath::TimeInterpolatableBuffer<wpimath::Pose2d> buffer{10_s};
 
   // We expect to be at (1 - 1/std::sqrt(2), 1/std::sqrt(2), 45deg) at t=0.5
-  buffer.AddSample(0_s, frc::Pose2d{0_m, 0_m, 90_deg});
-  buffer.AddSample(1_s, frc::Pose2d{1_m, 1_m, 0_deg});
-  frc::Pose2d sample = buffer.Sample(0.5_s).value();
+  buffer.AddSample(0_s, wpimath::Pose2d{0_m, 0_m, 90_deg});
+  buffer.AddSample(1_s, wpimath::Pose2d{1_m, 1_m, 0_deg});
+  wpimath::Pose2d sample = buffer.Sample(0.5_s).value();
 
   EXPECT_TRUE(std::abs(sample.X().value() - (1.0 - 1.0 / std::sqrt(2.0))) <
               0.01);

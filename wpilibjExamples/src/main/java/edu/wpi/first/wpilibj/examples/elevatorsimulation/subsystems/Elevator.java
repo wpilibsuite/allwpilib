@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj.examples.elevatorsimulation.subsystems;
 
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import org.wpilib.math.controller.ElevatorFeedforward;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.examples.elevatorsimulation.Constants;

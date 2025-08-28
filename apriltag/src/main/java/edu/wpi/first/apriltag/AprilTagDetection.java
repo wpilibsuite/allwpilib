@@ -4,11 +4,11 @@
 
 package edu.wpi.first.apriltag;
 
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.numbers.N3;
 import java.util.Arrays;
+import org.wpilib.math.MatBuilder;
+import org.wpilib.math.Matrix;
+import org.wpilib.math.Nat;
+import org.wpilib.math.numbers.N3;
 
 /** A detection of an AprilTag tag. */
 public class AprilTagDetection {

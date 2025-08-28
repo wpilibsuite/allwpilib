@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Num;
-import edu.wpi.first.math.StateSpaceUtil;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.system.LinearSystem;
+import org.wpilib.math.Matrix;
+import org.wpilib.math.Num;
+import org.wpilib.math.StateSpaceUtil;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.system.LinearSystem;
 import org.ejml.MatrixDimensionException;
 import org.ejml.simple.SimpleMatrix;
 

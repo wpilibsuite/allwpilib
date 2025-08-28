@@ -6,9 +6,9 @@ package edu.wpi.first.wpilibj.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
+import org.wpilib.math.VecBuilder;
+import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.math.util.Units;
 import org.junit.jupiter.api.Test;
 
 class SingleJointedArmSimTest {

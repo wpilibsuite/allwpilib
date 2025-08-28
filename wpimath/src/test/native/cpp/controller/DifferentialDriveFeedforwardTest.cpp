@@ -7,12 +7,12 @@
 #include <Eigen/Core>
 #include <gtest/gtest.h>
 
-#include "frc/controller/DifferentialDriveFeedforward.h"
-#include "frc/controller/LinearPlantInversionFeedforward.h"
-#include "frc/system/plant/LinearSystemId.h"
 #include "units/acceleration.h"
 #include "units/length.h"
 #include "units/time.h"
+#include "wpimath/controller/DifferentialDriveFeedforward.h"
+#include "wpimath/controller/LinearPlantInversionFeedforward.h"
+#include "wpimath/system/plant/LinearSystemId.h"
 
 TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
   constexpr auto kVLinear = 1_V / 1_mps;
@@ -22,10 +22,10 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
   constexpr auto trackwidth = 1_m;
   constexpr auto dt = 20_ms;
 
-  frc::DifferentialDriveFeedforward differentialDriveFeedforward{
+  wpimath::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular, trackwidth};
-  frc::LinearSystem<2, 2, 2> plant =
-      frc::LinearSystemId::IdentifyDrivetrainSystem(
+  wpimath::LinearSystem<2, 2, 2> plant =
+      wpimath::LinearSystemId::IdentifyDrivetrainSystem(
           kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
@@ -56,11 +56,11 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
   constexpr auto kAAngular = 1_V / 1_mps_sq;
   constexpr auto dt = 20_ms;
 
-  frc::DifferentialDriveFeedforward differentialDriveFeedforward{
+  wpimath::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular};
-  frc::LinearSystem<2, 2, 2> plant =
-      frc::LinearSystemId::IdentifyDrivetrainSystem(kVLinear, kALinear,
-                                                    kVAngular, kAAngular);
+  wpimath::LinearSystem<2, 2, 2> plant =
+      wpimath::LinearSystemId::IdentifyDrivetrainSystem(kVLinear, kALinear,
+                                                        kVAngular, kAAngular);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
     for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;

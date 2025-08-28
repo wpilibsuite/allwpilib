@@ -62,7 +62,7 @@
   </Match>
   <Match>
     <Bug pattern="EC_BAD_ARRAY_COMPARE" />
-    <Class name="edu.wpi.first.math.estimator.SwerveDrivePoseEstimator$InterpolationRecord" />
+    <Class name="estimator.org.wpilib.math.SwerveDrivePoseEstimator$InterpolationRecord" />
   </Match>
   <Match>
     <Bug pattern="EI_EXPOSE_REP" />
@@ -152,11 +152,11 @@
   </Match>
   <Match>
     <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    <Class name="edu.wpi.first.math.geometry.CoordinateAxis" />
+    <Class name="geometry.org.wpilib.math.CoordinateAxis" />
   </Match>
   <Match>
     <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
-    <Class name="edu.wpi.first.math.geometry.CoordinateSystem" />
+    <Class name="geometry.org.wpilib.math.CoordinateSystem" />
   </Match>
   <Match>
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />

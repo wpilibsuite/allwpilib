@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
+#include "wpimath/geometry/Pose2d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(Pose2dTest, RotateBy) {
   constexpr auto x = 1_m;

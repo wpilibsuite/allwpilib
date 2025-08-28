@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/controller/DifferentialDriveWheelVoltages.h"
+#include "wpimath/controller/DifferentialDriveWheelVoltages.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 
-using StructType = wpi::Struct<frc::DifferentialDriveWheelVoltages>;
+using StructType = wpi::Struct<wpimath::DifferentialDriveWheelVoltages>;
 const DifferentialDriveWheelVoltages kExpectedData{
     DifferentialDriveWheelVoltages{0.174_V, 0.191_V}};
 }  // namespace

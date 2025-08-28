@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/spline/proto/CubicHermiteSplineProto.h"
+#include "wpimath/spline/proto/CubicHermiteSplineProto.h"
 
 #include <wpi/protobuf/ProtobufCallbacks.h>
 
 #include "wpimath/protobuf/spline.npb.h"
 
-std::optional<frc::CubicHermiteSpline>
-wpi::Protobuf<frc::CubicHermiteSpline>::Unpack(InputStream& stream) {
+std::optional<wpimath::CubicHermiteSpline>
+wpi::Protobuf<wpimath::CubicHermiteSpline>::Unpack(InputStream& stream) {
   wpi::WpiArrayUnpackCallback<double, 2> xInitial;
   wpi::WpiArrayUnpackCallback<double, 2> xFinal;
   wpi::WpiArrayUnpackCallback<double, 2> yInitial;
@@ -29,7 +29,7 @@ wpi::Protobuf<frc::CubicHermiteSpline>::Unpack(InputStream& stream) {
     return {};
   }
 
-  return frc::CubicHermiteSpline{
+  return wpimath::CubicHermiteSpline{
       xInitial.Array(),
       xFinal.Array(),
       yInitial.Array(),
@@ -37,8 +37,8 @@ wpi::Protobuf<frc::CubicHermiteSpline>::Unpack(InputStream& stream) {
   };
 }
 
-bool wpi::Protobuf<frc::CubicHermiteSpline>::Pack(
-    OutputStream& stream, const frc::CubicHermiteSpline& value) {
+bool wpi::Protobuf<wpimath::CubicHermiteSpline>::Pack(
+    OutputStream& stream, const wpimath::CubicHermiteSpline& value) {
   wpi::PackCallback<double> xInitial{value.GetInitialControlVector().x};
   wpi::PackCallback<double> xFinal{value.GetFinalControlVector().x};
   wpi::PackCallback<double> yInitial{value.GetInitialControlVector().y};

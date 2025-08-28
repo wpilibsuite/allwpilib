@@ -5,8 +5,8 @@
 #include <gtest/gtest.h>
 #include <wpi/timestamp.h>
 
-#include "frc/filter/Debouncer.h"
 #include "units/time.h"
+#include "wpimath/filter/Debouncer.h"
 
 static units::second_t now = 0_s;
 
@@ -20,7 +20,7 @@ class DebouncerTest : public ::testing::Test {
 };
 
 TEST_F(DebouncerTest, DebounceRising) {
-  frc::Debouncer debouncer{20_ms};
+  wpimath::Debouncer debouncer{20_ms};
 
   debouncer.Calculate(false);
   EXPECT_FALSE(debouncer.Calculate(true));
@@ -31,7 +31,8 @@ TEST_F(DebouncerTest, DebounceRising) {
 }
 
 TEST_F(DebouncerTest, DebounceFalling) {
-  frc::Debouncer debouncer{20_ms, frc::Debouncer::DebounceType::kFalling};
+  wpimath::Debouncer debouncer{20_ms,
+                               wpimath::Debouncer::DebounceType::kFalling};
 
   debouncer.Calculate(true);
   EXPECT_TRUE(debouncer.Calculate(false));
@@ -42,7 +43,7 @@ TEST_F(DebouncerTest, DebounceFalling) {
 }
 
 TEST_F(DebouncerTest, DebounceBoth) {
-  frc::Debouncer debouncer{20_ms, frc::Debouncer::DebounceType::kBoth};
+  wpimath::Debouncer debouncer{20_ms, wpimath::Debouncer::DebounceType::kBoth};
 
   debouncer.Calculate(false);
   EXPECT_FALSE(debouncer.Calculate(true));
@@ -58,20 +59,20 @@ TEST_F(DebouncerTest, DebounceBoth) {
 }
 
 TEST_F(DebouncerTest, DebounceParams) {
-  frc::Debouncer debouncer{20_ms, frc::Debouncer::DebounceType::kBoth};
+  wpimath::Debouncer debouncer{20_ms, wpimath::Debouncer::DebounceType::kBoth};
 
   EXPECT_TRUE(debouncer.GetDebounceTime() == 20_ms);
   EXPECT_TRUE(debouncer.GetDebounceType() ==
-              frc::Debouncer::DebounceType::kBoth);
+              wpimath::Debouncer::DebounceType::kBoth);
 
   debouncer.SetDebounceTime(100_ms);
 
   EXPECT_TRUE(debouncer.GetDebounceTime() == 100_ms);
 
-  debouncer.SetDebounceType(frc::Debouncer::DebounceType::kFalling);
+  debouncer.SetDebounceType(wpimath::Debouncer::DebounceType::kFalling);
 
   EXPECT_TRUE(debouncer.GetDebounceType() ==
-              frc::Debouncer::DebounceType::kFalling);
+              wpimath::Debouncer::DebounceType::kFalling);
 
   EXPECT_TRUE(debouncer.Calculate(false));
 }

@@ -4,19 +4,19 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/trajectory/constraint/MaxVelocityConstraint.h"
-#include "frc/trajectory/constraint/RectangularRegionConstraint.h"
 #include "trajectory/TestTrajectory.h"
 #include "units/acceleration.h"
 #include "units/length.h"
 #include "units/math.h"
 #include "units/velocity.h"
+#include "wpimath/trajectory/constraint/MaxVelocityConstraint.h"
+#include "wpimath/trajectory/constraint/RectangularRegionConstraint.h"
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(RectangularRegionConstraintTest, Constraint) {
   constexpr auto maxVelocity = 2_fps;
-  constexpr frc::Rectangle2d rectangle{{1_ft, 1_ft}, {5_ft, 27_ft}};
+  constexpr wpimath::Rectangle2d rectangle{{1_ft, 1_ft}, {5_ft, 27_ft}};
 
   auto config = TrajectoryConfig(13_fps, 13_fps_sq);
   config.AddConstraint(RectangularRegionConstraint{

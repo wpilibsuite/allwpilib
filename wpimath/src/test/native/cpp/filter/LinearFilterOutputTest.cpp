@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/filter/LinearFilter.h"  // NOLINT(build/include_order)
+#include "wpimath/filter/LinearFilter.h"  // NOLINT(build/include_order)
 
 #include <cmath>
 #include <functional>
@@ -51,21 +51,21 @@ static double GetPulseData(double t) {
 class LinearFilterOutputTest
     : public testing::TestWithParam<LinearFilterOutputTestType> {
  protected:
-  frc::LinearFilter<double> m_filter = [=] {
+  wpimath::LinearFilter<double> m_filter = [=] {
     switch (GetParam()) {
       case kTestSinglePoleIIR:
-        return frc::LinearFilter<double>::SinglePoleIIR(
+        return wpimath::LinearFilter<double>::SinglePoleIIR(
             kSinglePoleIIRTimeConstant, kFilterStep);
         break;
       case kTestHighPass:
-        return frc::LinearFilter<double>::HighPass(kHighPassTimeConstant,
-                                                   kFilterStep);
+        return wpimath::LinearFilter<double>::HighPass(kHighPassTimeConstant,
+                                                       kFilterStep);
         break;
       case kTestMovAvg:
-        return frc::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+        return wpimath::LinearFilter<double>::MovingAverage(kMovAvgTaps);
         break;
       default:
-        return frc::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+        return wpimath::LinearFilter<double>::MovingAverage(kMovAvgTaps);
         break;
     }
   }();
@@ -132,8 +132,8 @@ void AssertCentralResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
   }
 
   auto filter =
-      frc::LinearFilter<double>::FiniteDifference<Derivative, Samples>(stencil,
-                                                                       h);
+      wpimath::LinearFilter<double>::FiniteDifference<Derivative, Samples>(
+          stencil, h);
 
   for (int i = min / h.value(); i < max / h.value(); ++i) {
     // Let filter initialize
@@ -156,8 +156,8 @@ template <int Derivative, int Samples, typename F, typename DfDx>
 void AssertBackwardResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
                            double max) {
   auto filter =
-      frc::LinearFilter<double>::BackwardFiniteDifference<Derivative, Samples>(
-          h);
+      wpimath::LinearFilter<double>::BackwardFiniteDifference<Derivative,
+                                                              Samples>(h);
 
   for (int i = min / h.value(); i < max / h.value(); ++i) {
     // Let filter initialize

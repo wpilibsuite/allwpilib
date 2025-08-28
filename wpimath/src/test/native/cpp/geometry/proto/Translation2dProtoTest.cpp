@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "frc/geometry/Translation2d.h"
+#include "wpimath/geometry/Translation2d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 

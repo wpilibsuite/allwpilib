@@ -4,19 +4,19 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/trajectory/constraint/EllipticalRegionConstraint.h"
-#include "frc/trajectory/constraint/MaxVelocityConstraint.h"
 #include "trajectory/TestTrajectory.h"
 #include "units/acceleration.h"
 #include "units/angle.h"
 #include "units/length.h"
 #include "units/velocity.h"
+#include "wpimath/trajectory/constraint/EllipticalRegionConstraint.h"
+#include "wpimath/trajectory/constraint/MaxVelocityConstraint.h"
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(EllipticalRegionConstraintTest, Constraint) {
   constexpr auto maxVelocity = 2_fps;
-  constexpr frc::Ellipse2d ellipse{{5_ft, 2.5_ft, 180_deg}, 5_ft, 2.5_ft};
+  constexpr wpimath::Ellipse2d ellipse{{5_ft, 2.5_ft, 180_deg}, 5_ft, 2.5_ft};
 
   auto config = TrajectoryConfig(13_fps, 13_fps_sq);
   config.AddConstraint(

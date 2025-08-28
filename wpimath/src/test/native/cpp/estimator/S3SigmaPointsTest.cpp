@@ -4,16 +4,16 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/estimator/S3SigmaPoints.h"
+#include "wpimath/estimator/S3SigmaPoints.h"
 
 TEST(S3SigmaPointsTest, Simplex) {
   constexpr double alpha = 1e-3;
   constexpr double beta = 2;
   constexpr size_t N = 2;
 
-  frc::S3SigmaPoints<N> sigmaPoints{alpha, beta};
+  wpimath::S3SigmaPoints<N> sigmaPoints{alpha, beta};
   auto points = sigmaPoints.SquareRootSigmaPoints(
-      frc::Vectord<N>::Zero(), frc::Matrixd<N, N>::Identity());
+      wpimath::Vectord<N>::Zero(), wpimath::Matrixd<N, N>::Identity());
 
   auto v1 = points.template block<2, 1>(0, 1);
   auto v2 = points.template block<2, 1>(0, 2);
@@ -27,24 +27,27 @@ TEST(S3SigmaPointsTest, Simplex) {
 }
 
 TEST(S3SigmaPointsTest, ZeroMean) {
-  frc::S3SigmaPoints<2> sigmaPoints;
+  wpimath::S3SigmaPoints<2> sigmaPoints;
   auto points = sigmaPoints.SquareRootSigmaPoints(
-      frc::Vectord<2>{0.0, 0.0}, frc::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}});
+      wpimath::Vectord<2>{0.0, 0.0},
+      wpimath::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}});
 
   EXPECT_TRUE(
-      (points - frc::Matrixd<2, 4>{{0.0, -0.00122474, 0.00122474, 0.0},
-                                   {0.0, -0.00070711, -0.00070711, 0.00141421}})
+      (points -
+       wpimath::Matrixd<2, 4>{{0.0, -0.00122474, 0.00122474, 0.0},
+                              {0.0, -0.00070711, -0.00070711, 0.00141421}})
           .norm() < 1e-7);
 }
 
 TEST(S3SigmaPointsTest, NonzeroMean) {
-  frc::S3SigmaPoints<2> sigmaPoints;
+  wpimath::S3SigmaPoints<2> sigmaPoints;
   auto points = sigmaPoints.SquareRootSigmaPoints(
-      frc::Vectord<2>{1.0, 2.0},
-      frc::Matrixd<2, 2>{{1.0, 0.0}, {0.0, std::sqrt(10.0)}});
+      wpimath::Vectord<2>{1.0, 2.0},
+      wpimath::Matrixd<2, 2>{{1.0, 0.0}, {0.0, std::sqrt(10.0)}});
 
   EXPECT_TRUE(
-      (points - frc::Matrixd<2, 4>{{1.0, 0.99877526, 1.00122474, 1.0},
-                                   {2.0, 1.99776393, 1.99776393, 2.00447214}})
+      (points -
+       wpimath::Matrixd<2, 4>{{1.0, 0.99877526, 1.00122474, 1.0},
+                              {2.0, 1.99776393, 1.99776393, 2.00447214}})
           .norm() < 1e-7);
 }

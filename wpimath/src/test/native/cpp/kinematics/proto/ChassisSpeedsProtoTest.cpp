@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "frc/kinematics/ChassisSpeeds.h"
+#include "wpimath/kinematics/ChassisSpeeds.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 

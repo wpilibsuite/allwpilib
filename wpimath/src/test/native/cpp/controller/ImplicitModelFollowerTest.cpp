@@ -4,10 +4,10 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/controller/ImplicitModelFollower.h"
-#include "frc/system/plant/LinearSystemId.h"
+#include "wpimath/controller/ImplicitModelFollower.h"
+#include "wpimath/system/plant/LinearSystemId.h"
 
-namespace frc {
+namespace wpimath {
 
 TEST(ImplicitModelFollowerTest, SameModel) {
   constexpr auto dt = 5_ms;
@@ -106,4 +106,4 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
   }
 }
 
-}  // namespace frc
+}  // namespace wpimath

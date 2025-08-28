@@ -5,13 +5,13 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "frc/controller/DifferentialDriveWheelVoltages.h"
+#include "wpimath/controller/DifferentialDriveWheelVoltages.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::DifferentialDriveWheelVoltages>;
+using ProtoType = wpi::Protobuf<wpimath::DifferentialDriveWheelVoltages>;
 
 const DifferentialDriveWheelVoltages kExpectedData =
     DifferentialDriveWheelVoltages{0.174_V, 0.191_V};

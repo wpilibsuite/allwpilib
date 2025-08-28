@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "frc/kinematics/DifferentialDriveKinematics.h"
+#include "wpimath/kinematics/DifferentialDriveKinematics.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 

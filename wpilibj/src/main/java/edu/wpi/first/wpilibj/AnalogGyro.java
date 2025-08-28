@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -42,7 +42,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
   public void calibrate() {}
 
   /**
-   * Return the heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
+   * Return the heading of the robot as a {@link Rotation2d}.
    *
    * <p>The angle is continuous, that is it will continue from 360 to 361 degrees. This allows
    * algorithms that wouldn't want to see a discontinuity in the gyro output as it sweeps past from
@@ -53,7 +53,7 @@ public class AnalogGyro implements Sendable, AutoCloseable {
    *
    * <p>This heading is based on integration of the returned rate from the gyro.
    *
-   * @return the current heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
+   * @return the current heading of the robot as a {@link Rotation2d}.
    */
   public Rotation2d getRotation2d() {
     return Rotation2d.fromDegrees(-getAngle());

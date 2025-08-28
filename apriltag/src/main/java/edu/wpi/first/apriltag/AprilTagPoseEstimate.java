@@ -4,7 +4,7 @@
 
 package edu.wpi.first.apriltag;
 
-import edu.wpi.first.math.geometry.Transform3d;
+import org.wpilib.math.geometry.Transform3d;
 
 /** A pair of AprilTag pose estimates. */
 @SuppressWarnings("MemberName")

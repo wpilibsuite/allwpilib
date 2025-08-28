@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/filter/LinearFilter.h"  // NOLINT(build/include_order)
+#include "wpimath/filter/LinearFilter.h"  // NOLINT(build/include_order)
 
 #include <cmath>
 #include <numbers>
@@ -27,14 +27,14 @@ static double GetData(double t) {
 class LinearFilterNoiseTest
     : public testing::TestWithParam<LinearFilterNoiseTestType> {
  protected:
-  frc::LinearFilter<double> m_filter = [=] {
+  wpimath::LinearFilter<double> m_filter = [=] {
     switch (GetParam()) {
       case kTestSinglePoleIIR:
-        return frc::LinearFilter<double>::SinglePoleIIR(
+        return wpimath::LinearFilter<double>::SinglePoleIIR(
             kSinglePoleIIRTimeConstant, kFilterStep);
         break;
       default:
-        return frc::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+        return wpimath::LinearFilter<double>::MovingAverage(kMovAvgTaps);
         break;
     }
   }();

@@ -5,10 +5,10 @@
 #include <gtest/gtest.h>
 #include <wpi/timestamp.h>
 
-#include "frc/filter/SlewRateLimiter.h"
 #include "units/length.h"
 #include "units/time.h"
 #include "units/velocity.h"
+#include "wpimath/filter/SlewRateLimiter.h"
 
 static units::second_t now = 0_s;
 
@@ -24,7 +24,7 @@ class SlewRateLimiterTest : public ::testing::Test {
 TEST_F(SlewRateLimiterTest, SlewRateLimit) {
   WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
 
-  frc::SlewRateLimiter<units::meters> limiter(1_mps);
+  wpimath::SlewRateLimiter<units::meters> limiter(1_mps);
 
   now += 1_s;
 
@@ -32,7 +32,7 @@ TEST_F(SlewRateLimiterTest, SlewRateLimit) {
 }
 
 TEST_F(SlewRateLimiterTest, SlewRateNoLimit) {
-  frc::SlewRateLimiter<units::meters> limiter(1_mps);
+  wpimath::SlewRateLimiter<units::meters> limiter(1_mps);
 
   now += 1_s;
 
@@ -40,7 +40,7 @@ TEST_F(SlewRateLimiterTest, SlewRateNoLimit) {
 }
 
 TEST_F(SlewRateLimiterTest, SlewRatePositiveNegativeLimit) {
-  frc::SlewRateLimiter<units::meters> limiter(1_mps, -0.5_mps);
+  wpimath::SlewRateLimiter<units::meters> limiter(1_mps, -0.5_mps);
 
   now += 1_s;
 

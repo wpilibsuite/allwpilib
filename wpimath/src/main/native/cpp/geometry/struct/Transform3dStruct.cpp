@@ -2,24 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/geometry/struct/Transform3dStruct.h"
+#include "wpimath/geometry/struct/Transform3dStruct.h"
 
 namespace {
 constexpr size_t kTranslationOff = 0;
 constexpr size_t kRotationOff =
-    kTranslationOff + wpi::GetStructSize<frc::Translation3d>();
+    kTranslationOff + wpi::GetStructSize<wpimath::Translation3d>();
 }  // namespace
 
-using StructType = wpi::Struct<frc::Transform3d>;
+using StructType = wpi::Struct<wpimath::Transform3d>;
 
-frc::Transform3d StructType::Unpack(std::span<const uint8_t> data) {
-  return frc::Transform3d{
-      wpi::UnpackStruct<frc::Translation3d, kTranslationOff>(data),
-      wpi::UnpackStruct<frc::Rotation3d, kRotationOff>(data),
+wpimath::Transform3d StructType::Unpack(std::span<const uint8_t> data) {
+  return wpimath::Transform3d{
+      wpi::UnpackStruct<wpimath::Translation3d, kTranslationOff>(data),
+      wpi::UnpackStruct<wpimath::Rotation3d, kRotationOff>(data),
   };
 }
 
-void StructType::Pack(std::span<uint8_t> data, const frc::Transform3d& value) {
+void StructType::Pack(std::span<uint8_t> data,
+                      const wpimath::Transform3d& value) {
   wpi::PackStruct<kTranslationOff>(data, value.Translation());
   wpi::PackStruct<kRotationOff>(data, value.Rotation());
 }

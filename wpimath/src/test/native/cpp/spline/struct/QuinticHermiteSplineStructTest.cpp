@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 
 #include "../../StructTestBase.h"
-#include "frc/spline/QuinticHermiteSpline.h"
+#include "wpimath/spline/QuinticHermiteSpline.h"
 
-using namespace frc;
+using namespace wpimath;
 
 struct QuinticHermiteSplineStructTestData {
   using Type = QuinticHermiteSpline;

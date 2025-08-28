@@ -5,10 +5,10 @@
 #include <gtest/gtest.h>
 
 #include "../../StructTestBase.h"
-#include "frc/system/LinearSystem.h"
-#include "frc/system/struct/LinearSystemStruct.h"
+#include "wpimath/system/LinearSystem.h"
+#include "wpimath/system/struct/LinearSystemStruct.h"
 
-using namespace frc;
+using namespace wpimath;
 
 struct LinearSystemStructTestData {
   using Type = LinearSystem<2, 3, 4>;

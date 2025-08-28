@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/controller/ElevatorFeedforward.h"
+#include "wpimath/controller/ElevatorFeedforward.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 
-using StructType = wpi::Struct<frc::ElevatorFeedforward>;
+using StructType = wpi::Struct<wpimath::ElevatorFeedforward>;
 
 static constexpr auto Ks = 1.91_V;
 static constexpr auto Kg = 2.29_V;

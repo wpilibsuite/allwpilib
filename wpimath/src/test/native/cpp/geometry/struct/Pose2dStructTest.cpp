@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
+#include "wpimath/geometry/Pose2d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 
-using StructType = wpi::Struct<frc::Pose2d>;
+using StructType = wpi::Struct<wpimath::Pose2d>;
 const Pose2d kExpectedData{
     Pose2d{Translation2d{0.191_m, 2.2_m}, Rotation2d{22.9_rad}}};
 }  // namespace

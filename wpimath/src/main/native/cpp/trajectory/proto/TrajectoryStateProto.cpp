@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/trajectory/proto/TrajectoryStateProto.h"
+#include "wpimath/trajectory/proto/TrajectoryStateProto.h"
 
 #include <utility>
 
@@ -10,9 +10,9 @@
 
 #include "wpimath/protobuf/trajectory.npb.h"
 
-std::optional<frc::Trajectory::State>
-wpi::Protobuf<frc::Trajectory::State>::Unpack(InputStream& stream) {
-  wpi::UnpackCallback<frc::Pose2d> pose;
+std::optional<wpimath::Trajectory::State>
+wpi::Protobuf<wpimath::Trajectory::State>::Unpack(InputStream& stream) {
+  wpi::UnpackCallback<wpimath::Pose2d> pose;
   wpi_proto_ProtobufTrajectoryState msg;
   msg.pose = pose.Callback();
 
@@ -26,7 +26,7 @@ wpi::Protobuf<frc::Trajectory::State>::Unpack(InputStream& stream) {
     return {};
   }
 
-  return frc::Trajectory::State{
+  return wpimath::Trajectory::State{
       units::second_t{msg.time},
       units::meters_per_second_t{msg.velocity},
       units::meters_per_second_squared_t{msg.acceleration},
@@ -35,8 +35,8 @@ wpi::Protobuf<frc::Trajectory::State>::Unpack(InputStream& stream) {
   };
 }
 
-bool wpi::Protobuf<frc::Trajectory::State>::Pack(
-    OutputStream& stream, const frc::Trajectory::State& value) {
+bool wpi::Protobuf<wpimath::Trajectory::State>::Pack(
+    OutputStream& stream, const wpimath::Trajectory::State& value) {
   wpi::PackCallback pose{&value.pose};
   wpi_proto_ProtobufTrajectoryState msg{
       .time = value.t.value(),

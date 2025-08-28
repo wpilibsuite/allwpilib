@@ -5,24 +5,28 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "frc/trajectory/Trajectory.h"
+#include "wpimath/trajectory/Trajectory.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 
-using ProtoType = wpi::Protobuf<frc::Trajectory>;
+using ProtoType = wpi::Protobuf<wpimath::Trajectory>;
 
-const Trajectory kExpectedData = Trajectory{std::vector<frc::Trajectory::State>{
-    Trajectory::State{1.1_s, 2.2_mps, 3.3_mps_sq,
-                      Pose2d(Translation2d(1.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}},
-    Trajectory::State{2.1_s, 2.2_mps, 3.3_mps_sq,
-                      Pose2d(Translation2d(2.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}},
-    Trajectory::State{3.1_s, 2.2_mps, 3.3_mps_sq,
-                      Pose2d(Translation2d(3.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}}}};
+const Trajectory kExpectedData =
+    Trajectory{std::vector<wpimath::Trajectory::State>{
+        Trajectory::State{
+            1.1_s, 2.2_mps, 3.3_mps_sq,
+            Pose2d(Translation2d(1.1_m, 2.2_m), Rotation2d(2.2_rad)),
+            units::curvature_t{6.6}},
+        Trajectory::State{
+            2.1_s, 2.2_mps, 3.3_mps_sq,
+            Pose2d(Translation2d(2.1_m, 2.2_m), Rotation2d(2.2_rad)),
+            units::curvature_t{6.6}},
+        Trajectory::State{
+            3.1_s, 2.2_mps, 3.3_mps_sq,
+            Pose2d(Translation2d(3.1_m, 2.2_m), Rotation2d(2.2_rad)),
+            units::curvature_t{6.6}}}};
 }  // namespace
 
 TEST(TrajectoryProtoTest, Roundtrip) {

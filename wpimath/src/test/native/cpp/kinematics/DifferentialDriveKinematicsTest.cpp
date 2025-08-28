@@ -6,13 +6,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/ChassisSpeeds.h"
-#include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "units/angular_velocity.h"
 #include "units/length.h"
 #include "units/velocity.h"
+#include "wpimath/kinematics/ChassisSpeeds.h"
+#include "wpimath/kinematics/DifferentialDriveKinematics.h"
 
-using namespace frc;
+using namespace wpimath;
 
 static constexpr double kEpsilon = 1E-9;
 

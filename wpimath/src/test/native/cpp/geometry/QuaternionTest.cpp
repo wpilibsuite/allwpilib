@@ -6,11 +6,11 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Quaternion.h"
 #include "units/angle.h"
 #include "units/math.h"
+#include "wpimath/geometry/Quaternion.h"
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(QuaternionTest, Init) {
   // Identity

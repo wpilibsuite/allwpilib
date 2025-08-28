@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/MecanumDriveWheelSpeeds.h"
+#include "wpimath/kinematics/MecanumDriveWheelSpeeds.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 
-using StructType = wpi::Struct<frc::MecanumDriveWheelSpeeds>;
+using StructType = wpi::Struct<wpimath::MecanumDriveWheelSpeeds>;
 const MecanumDriveWheelSpeeds kExpectedData{
     MecanumDriveWheelSpeeds{2.29_mps, 17.4_mps, 4.4_mps, 0.229_mps}};
 }  // namespace

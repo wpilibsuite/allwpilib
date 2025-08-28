@@ -26,7 +26,7 @@
  * SOFTWARE.
  */
 
-#include "frc/trajectory/TrajectoryParameterizer.h"
+#include "wpimath/trajectory/TrajectoryParameterizer.h"
 
 #include <vector>
 
@@ -34,7 +34,7 @@
 
 #include "units/math.h"
 
-using namespace frc;
+using namespace wpimath;
 
 Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
     const std::vector<PoseWithCurvature>& points,

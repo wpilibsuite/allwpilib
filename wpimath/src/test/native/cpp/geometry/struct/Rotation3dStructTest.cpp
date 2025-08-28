@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Rotation3d.h"
+#include "wpimath/geometry/Rotation3d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 
-using StructType = wpi::Struct<frc::Rotation3d>;
+using StructType = wpi::Struct<wpimath::Rotation3d>;
 const Rotation3d kExpectedData{
     Rotation3d{Quaternion{2.29, 0.191, 0.191, 17.4}}};
 }  // namespace

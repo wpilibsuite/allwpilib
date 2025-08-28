@@ -8,11 +8,11 @@
 #include <utility>
 #include <vector>
 
-#include "frc/trajectory/Trajectory.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
-#include "frc/trajectory/constraint/TrajectoryConstraint.h"
+#include "wpimath/trajectory/Trajectory.h"
+#include "wpimath/trajectory/TrajectoryGenerator.h"
+#include "wpimath/trajectory/constraint/TrajectoryConstraint.h"
 
-namespace frc {
+namespace wpimath {
 class TestTrajectory {
  public:
   static Trajectory GetTrajectory(TrajectoryConfig& config) {
@@ -33,4 +33,4 @@ class TestTrajectory {
   }
 };
 
-}  // namespace frc
+}  // namespace wpimath

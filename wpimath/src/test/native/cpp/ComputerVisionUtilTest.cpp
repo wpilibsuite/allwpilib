@@ -4,16 +4,18 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/ComputerVisionUtil.h"
+#include "wpimath/ComputerVisionUtil.h"
 
 TEST(ComputerVisionUtilTest, ObjectToRobotPose) {
-  frc::Pose3d robot{1_m, 2_m, 0_m, frc::Rotation3d{0_deg, 0_deg, 30_deg}};
-  frc::Transform3d cameraToObject{frc::Translation3d{1_m, 1_m, 1_m},
-                                  frc::Rotation3d{0_deg, -20_deg, 45_deg}};
-  frc::Transform3d robotToCamera{frc::Translation3d{1_m, 0_m, 2_m},
-                                 frc::Rotation3d{0_deg, 0_deg, 25_deg}};
-  frc::Pose3d object = robot + robotToCamera + cameraToObject;
+  wpimath::Pose3d robot{1_m, 2_m, 0_m,
+                        wpimath::Rotation3d{0_deg, 0_deg, 30_deg}};
+  wpimath::Transform3d cameraToObject{
+      wpimath::Translation3d{1_m, 1_m, 1_m},
+      wpimath::Rotation3d{0_deg, -20_deg, 45_deg}};
+  wpimath::Transform3d robotToCamera{wpimath::Translation3d{1_m, 0_m, 2_m},
+                                     wpimath::Rotation3d{0_deg, 0_deg, 25_deg}};
+  wpimath::Pose3d object = robot + robotToCamera + cameraToObject;
 
   EXPECT_EQ(robot,
-            frc::ObjectToRobotPose(object, cameraToObject, robotToCamera));
+            wpimath::ObjectToRobotPose(object, cameraToObject, robotToCamera));
 }

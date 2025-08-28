@@ -6,12 +6,12 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "frc/kinematics/DifferentialDriveOdometry.h"
+#include "wpimath/kinematics/DifferentialDriveKinematics.h"
+#include "wpimath/kinematics/DifferentialDriveOdometry.h"
 
 static constexpr double kEpsilon = 1E-9;
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(DifferentialDriveOdometryTest, EncoderDistances) {
   DifferentialDriveOdometry odometry{45_deg, 0_m, 0_m};

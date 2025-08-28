@@ -6,12 +6,12 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/geometry/Transform2d.h"
-#include "frc/geometry/Translation2d.h"
+#include "wpimath/geometry/Pose2d.h"
+#include "wpimath/geometry/Rotation2d.h"
+#include "wpimath/geometry/Transform2d.h"
+#include "wpimath/geometry/Translation2d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(Transform2dTest, ToMatrix) {
   Transform2d before{1_m, 2_m, 20_deg};

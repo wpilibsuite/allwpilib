@@ -5,11 +5,11 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "frc/system/plant/DCMotor.h"
+#include "wpimath/system/plant/DCMotor.h"
 
-using namespace frc;
+using namespace wpimath;
 
-using ProtoType = wpi::Protobuf<frc::DCMotor>;
+using ProtoType = wpi::Protobuf<wpimath::DCMotor>;
 
 inline constexpr DCMotor kExpectedData =
     DCMotor{1.91_V, 19.1_Nm, 1.74_A, 2.29_A, 2.2_rad_per_s, 2};

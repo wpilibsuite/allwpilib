@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/MecanumDriveWheelPositions.h"
+#include "wpimath/kinematics/MecanumDriveWheelPositions.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 
-using StructType = wpi::Struct<frc::MecanumDriveWheelPositions>;
+using StructType = wpi::Struct<wpimath::MecanumDriveWheelPositions>;
 const MecanumDriveWheelPositions kExpectedData{
     MecanumDriveWheelPositions{17.4_m, 2.29_m, 22.9_m, 1.74_m}};
 }  // namespace

@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 
 #include "../../StructTestBase.h"
-#include "frc/controller/DifferentialDriveFeedforward.h"
+#include "wpimath/controller/DifferentialDriveFeedforward.h"
 
-using namespace frc;
+using namespace wpimath;
 
 struct DifferentialDriveFeedforwardStructTestData {
   using Type = DifferentialDriveFeedforward;

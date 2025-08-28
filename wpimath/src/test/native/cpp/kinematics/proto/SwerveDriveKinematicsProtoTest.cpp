@@ -5,17 +5,18 @@
 #include <gtest/gtest.h>
 
 #include "../../ProtoTestBase.h"
-#include "frc/kinematics/SwerveDriveKinematics.h"
-#include "frc/kinematics/proto/SwerveDriveKinematicsProto.h"
+#include "wpimath/kinematics/SwerveDriveKinematics.h"
+#include "wpimath/kinematics/proto/SwerveDriveKinematicsProto.h"
 
-using namespace frc;
+using namespace wpimath;
 
 struct SwerveDriveKinematicsProtoTestData {
   using Type = SwerveDriveKinematics<4>;
 
-  inline static const Type kTestData{
-      frc::Translation2d{1.0_m, 0.9_m}, frc::Translation2d{1.1_m, -0.8_m},
-      frc::Translation2d{-1.2_m, 0.7_m}, frc::Translation2d{-1.3_m, -0.6_m}};
+  inline static const Type kTestData{wpimath::Translation2d{1.0_m, 0.9_m},
+                                     wpimath::Translation2d{1.1_m, -0.8_m},
+                                     wpimath::Translation2d{-1.2_m, 0.7_m},
+                                     wpimath::Translation2d{-1.3_m, -0.6_m}};
 
   static void CheckEq(const Type& testData, const Type& data) {
     EXPECT_EQ(testData.GetModules(), data.GetModules());

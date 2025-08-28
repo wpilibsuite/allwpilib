@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Rotation2d.h"
+#include "wpimath/geometry/Rotation2d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(Rotation2dTest, RadiansToDegrees) {
   const Rotation2d rot1{units::radian_t{std::numbers::pi / 3.0}};

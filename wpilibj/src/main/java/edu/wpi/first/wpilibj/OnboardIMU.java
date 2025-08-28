@@ -5,9 +5,9 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.IMUJNI;
-import edu.wpi.first.math.geometry.Quaternion;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Quaternion;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation3d;
 
 /** SystemCore onboard IMU. */
 public class OnboardIMU {

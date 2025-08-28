@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.armsimulation.subsystems;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
+import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.system.plant.DCMotor;
+import org.wpilib.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.RobotController;

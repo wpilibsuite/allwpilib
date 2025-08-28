@@ -8,8 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.RuntimeLoader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,6 +21,8 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.math.util.Units;
 
 class AprilTagDetectorTest {
   @SuppressWarnings("MemberName")

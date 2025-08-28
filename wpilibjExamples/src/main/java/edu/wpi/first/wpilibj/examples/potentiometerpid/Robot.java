@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.potentiometerpid;
 
-import edu.wpi.first.math.controller.PIDController;
+import org.wpilib.math.controller.PIDController;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;

@@ -7,16 +7,16 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/spline/QuinticHermiteSpline.h"
-#include "frc/spline/SplineHelper.h"
-#include "frc/spline/SplineParameterizer.h"
 #include "units/length.h"
+#include "wpimath/geometry/Pose2d.h"
+#include "wpimath/geometry/Rotation2d.h"
+#include "wpimath/spline/QuinticHermiteSpline.h"
+#include "wpimath/spline/SplineHelper.h"
+#include "wpimath/spline/SplineParameterizer.h"
 
-using namespace frc;
+using namespace wpimath;
 
-namespace frc {
+namespace wpimath {
 class CubicHermiteSplineTest : public ::testing::Test {
  protected:
   static void Run(const Pose2d& a, const std::vector<Translation2d>& waypoints,
@@ -79,7 +79,7 @@ class CubicHermiteSplineTest : public ::testing::Test {
                 b.Rotation().Radians().value(), 1E-9);
   }
 };
-}  // namespace frc
+}  // namespace wpimath
 
 TEST_F(CubicHermiteSplineTest, StraightLine) {
   Run(Pose2d{}, std::vector<Translation2d>(), Pose2d{3_m, 0_m, 0_deg});

@@ -5,12 +5,12 @@
 #include <gtest/gtest.h>
 
 #include "../../ProtoTestBase.h"
-#include "frc/controller/SimpleMotorFeedforward.h"
-#include "frc/controller/proto/SimpleMotorFeedforwardProto.h"
 #include "units/acceleration.h"
 #include "units/velocity.h"
+#include "wpimath/controller/SimpleMotorFeedforward.h"
+#include "wpimath/controller/proto/SimpleMotorFeedforwardProto.h"
 
-using namespace frc;
+using namespace wpimath;
 
 template <typename T>
 struct SimpleMotorFeedforwardProtoTestData {

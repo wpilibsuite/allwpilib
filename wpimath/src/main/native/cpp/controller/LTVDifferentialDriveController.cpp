@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/controller/LTVDifferentialDriveController.h"
+#include "wpimath/controller/LTVDifferentialDriveController.h"
 
 #include <cmath>
 
-#include "frc/DARE.h"
-#include "frc/MathUtil.h"
-#include "frc/system/Discretization.h"
+#include "wpimath/DARE.h"
+#include "wpimath/MathUtil.h"
+#include "wpimath/system/Discretization.h"
 
-using namespace frc;
+using namespace wpimath;
 
 DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
     const Pose2d& currentPose, units::meters_per_second_t leftVelocity,
@@ -18,7 +18,7 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
     units::meters_per_second_t leftVelocityRef,
     units::meters_per_second_t rightVelocityRef) {
   // This implements the linear time-varying differential drive controller in
-  // theorem 8.7.4 of https://controls-in-frc.link/
+  // theorem 8.7.4 of https://controls-in-wpimath.link/
   //
   //     [x ]
   //     [y ]       [Vₗ]
@@ -42,7 +42,7 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
                              leftVelocity.value(), rightVelocity.value()};
 
   m_error = r - x;
-  m_error(2) = frc::AngleModulus(units::radian_t{m_error(2)}).value();
+  m_error(2) = wpimath::AngleModulus(units::radian_t{m_error(2)}).value();
 
   Eigen::Matrix<double, 5, 5> A{
       {0.0, 0.0, 0.0, 0.5, 0.5},

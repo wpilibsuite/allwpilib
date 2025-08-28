@@ -4,50 +4,50 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
+#include "wpimath/kinematics/DifferentialDriveWheelSpeeds.h"
 
 TEST(DifferentialDriveWheelSpeedsTest, Plus) {
-  const frc::DifferentialDriveWheelSpeeds left{1.0_mps, 0.5_mps};
-  const frc::DifferentialDriveWheelSpeeds right{2.0_mps, 1.5_mps};
+  const wpimath::DifferentialDriveWheelSpeeds left{1.0_mps, 0.5_mps};
+  const wpimath::DifferentialDriveWheelSpeeds right{2.0_mps, 1.5_mps};
 
-  const frc::DifferentialDriveWheelSpeeds result = left + right;
+  const wpimath::DifferentialDriveWheelSpeeds result = left + right;
 
   EXPECT_EQ(3.0, result.left.value());
   EXPECT_EQ(2.0, result.right.value());
 }
 
 TEST(DifferentialDriveWheelSpeedsTest, Minus) {
-  const frc::DifferentialDriveWheelSpeeds left{1.0_mps, 0.5_mps};
-  const frc::DifferentialDriveWheelSpeeds right{2.0_mps, 0.5_mps};
+  const wpimath::DifferentialDriveWheelSpeeds left{1.0_mps, 0.5_mps};
+  const wpimath::DifferentialDriveWheelSpeeds right{2.0_mps, 0.5_mps};
 
-  const frc::DifferentialDriveWheelSpeeds result = left - right;
+  const wpimath::DifferentialDriveWheelSpeeds result = left - right;
 
   EXPECT_EQ(-1.0, result.left.value());
   EXPECT_EQ(0, result.right.value());
 }
 
 TEST(DifferentialDriveWheelSpeedsTest, UnaryMinus) {
-  const frc::DifferentialDriveWheelSpeeds speeds{1.0_mps, 0.5_mps};
+  const wpimath::DifferentialDriveWheelSpeeds speeds{1.0_mps, 0.5_mps};
 
-  const frc::DifferentialDriveWheelSpeeds result = -speeds;
+  const wpimath::DifferentialDriveWheelSpeeds result = -speeds;
 
   EXPECT_EQ(-1.0, result.left.value());
   EXPECT_EQ(-0.5, result.right.value());
 }
 
 TEST(DifferentialDriveWheelSpeedsTest, Multiplication) {
-  const frc::DifferentialDriveWheelSpeeds speeds{1.0_mps, 0.5_mps};
+  const wpimath::DifferentialDriveWheelSpeeds speeds{1.0_mps, 0.5_mps};
 
-  const frc::DifferentialDriveWheelSpeeds result = speeds * 2;
+  const wpimath::DifferentialDriveWheelSpeeds result = speeds * 2;
 
   EXPECT_EQ(2.0, result.left.value());
   EXPECT_EQ(1.0, result.right.value());
 }
 
 TEST(DifferentialDriveWheelSpeedsTest, Division) {
-  const frc::DifferentialDriveWheelSpeeds speeds{1.0_mps, 0.5_mps};
+  const wpimath::DifferentialDriveWheelSpeeds speeds{1.0_mps, 0.5_mps};
 
-  const frc::DifferentialDriveWheelSpeeds result = speeds / 2;
+  const wpimath::DifferentialDriveWheelSpeeds result = speeds / 2;
 
   EXPECT_EQ(0.5, result.left.value());
   EXPECT_EQ(0.25, result.right.value());

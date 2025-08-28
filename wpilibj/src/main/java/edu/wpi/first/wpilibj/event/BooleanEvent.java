@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.event;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.math.filter.Debouncer;
+import org.wpilib.math.filter.Debouncer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;

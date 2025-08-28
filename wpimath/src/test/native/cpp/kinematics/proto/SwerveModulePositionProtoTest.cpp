@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 #include <wpi/SmallVector.h>
 
-#include "frc/kinematics/SwerveModulePosition.h"
+#include "wpimath/kinematics/SwerveModulePosition.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/controller/ArmFeedforward.h"
+#include "wpimath/controller/ArmFeedforward.h"
 
 #include <algorithm>
 #include <limits>
@@ -10,10 +10,10 @@
 #include <sleipnir/autodiff/gradient.hpp>
 #include <sleipnir/autodiff/hessian.hpp>
 
-#include "frc/EigenCore.h"
-#include "frc/system/NumericalIntegration.h"
+#include "wpimath/EigenCore.h"
+#include "wpimath/system/NumericalIntegration.h"
 
-using namespace frc;
+using namespace wpimath;
 
 units::volt_t ArmFeedforward::Calculate(
     units::unit_t<Angle> currentAngle, units::unit_t<Velocity> currentVelocity,

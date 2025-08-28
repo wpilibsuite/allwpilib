@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/DifferentialDriveKinematics.h"
+#include "wpimath/kinematics/DifferentialDriveKinematics.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 
-using StructType = wpi::Struct<frc::DifferentialDriveKinematics>;
+using StructType = wpi::Struct<wpimath::DifferentialDriveKinematics>;
 const DifferentialDriveKinematics kExpectedData{
     DifferentialDriveKinematics{1.74_m}};
 }  // namespace

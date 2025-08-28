@@ -9,9 +9,9 @@
 #include <gtest/gtest.h>
 #include <wpi/MathExtras.h>
 
-#include "frc/geometry/Rotation3d.h"
+#include "wpimath/geometry/Rotation3d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(Rotation3dTest, GimbalLockAccuracy) {
   auto rot1 = Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}};

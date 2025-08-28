@@ -4,11 +4,11 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/CoordinateSystem.h"
-#include "frc/geometry/Pose3d.h"
-#include "frc/geometry/Transform3d.h"
+#include "wpimath/geometry/CoordinateSystem.h"
+#include "wpimath/geometry/Pose3d.h"
+#include "wpimath/geometry/Transform3d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 void CheckPose3dConvert(const Pose3d& poseFrom, const Pose3d& poseTo,
                         const CoordinateSystem& coordFrom,

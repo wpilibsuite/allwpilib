@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/kinematics/MecanumDriveKinematics.h"
+#include "wpimath/kinematics/MecanumDriveKinematics.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 
-using StructType = wpi::Struct<frc::MecanumDriveKinematics>;
+using StructType = wpi::Struct<wpimath::MecanumDriveKinematics>;
 const MecanumDriveKinematics kExpectedData{MecanumDriveKinematics{
     Translation2d{19.1_m, 2.2_m}, Translation2d{35.04_m, 1.91_m},
     Translation2d{1.74_m, 3.504_m}, Translation2d{3.504_m, 1.91_m}}};

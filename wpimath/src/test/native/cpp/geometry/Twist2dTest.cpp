@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Pose2d.h"
+#include "wpimath/geometry/Pose2d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 TEST(Twist2dTest, Straight) {
   const Twist2d straight{5_m, 0_m, 0_rad};

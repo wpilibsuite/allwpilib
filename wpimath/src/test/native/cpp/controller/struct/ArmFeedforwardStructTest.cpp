@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/controller/ArmFeedforward.h"
+#include "wpimath/controller/ArmFeedforward.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 
-using StructType = wpi::Struct<frc::ArmFeedforward>;
+using StructType = wpi::Struct<wpimath::ArmFeedforward>;
 
 static constexpr auto Ks = 1.91_V;
 static constexpr auto Kg = 2.29_V;

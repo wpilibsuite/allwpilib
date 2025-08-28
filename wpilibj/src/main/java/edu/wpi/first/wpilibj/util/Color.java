@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.util;
 
-import edu.wpi.first.math.MathUtil;
+import org.wpilib.math.MathUtil;
 import java.util.Objects;
 
 /**

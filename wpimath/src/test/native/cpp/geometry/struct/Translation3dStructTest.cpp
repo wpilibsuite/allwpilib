@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Translation3d.h"
+#include "wpimath/geometry/Translation3d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 namespace {
 
-using StructType = wpi::Struct<frc::Translation3d>;
+using StructType = wpi::Struct<wpimath::Translation3d>;
 const Translation3d kExpectedData{Translation3d{35.04_m, 22.9_m, 3.504_m}};
 }  // namespace
 

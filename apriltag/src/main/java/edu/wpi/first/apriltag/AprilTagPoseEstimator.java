@@ -5,7 +5,7 @@
 package edu.wpi.first.apriltag;
 
 import edu.wpi.first.apriltag.jni.AprilTagJNI;
-import edu.wpi.first.math.geometry.Transform3d;
+import org.wpilib.math.geometry.Transform3d;
 
 /** Pose estimators for AprilTag tags. */
 public class AprilTagPoseEstimator {

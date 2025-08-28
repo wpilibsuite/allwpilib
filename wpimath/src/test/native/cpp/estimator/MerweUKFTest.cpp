@@ -10,24 +10,24 @@
 #include <Eigen/QR>
 #include <gtest/gtest.h>
 
-#include "frc/EigenCore.h"
-#include "frc/StateSpaceUtil.h"
-#include "frc/estimator/AngleStatistics.h"
-#include "frc/estimator/MerweUKF.h"
-#include "frc/system/Discretization.h"
-#include "frc/system/NumericalIntegration.h"
-#include "frc/system/NumericalJacobian.h"
-#include "frc/system/plant/DCMotor.h"
-#include "frc/system/plant/LinearSystemId.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
 #include "units/moment_of_inertia.h"
+#include "wpimath/EigenCore.h"
+#include "wpimath/StateSpaceUtil.h"
+#include "wpimath/estimator/AngleStatistics.h"
+#include "wpimath/estimator/MerweUKF.h"
+#include "wpimath/system/Discretization.h"
+#include "wpimath/system/NumericalIntegration.h"
+#include "wpimath/system/NumericalJacobian.h"
+#include "wpimath/system/plant/DCMotor.h"
+#include "wpimath/system/plant/LinearSystemId.h"
+#include "wpimath/trajectory/TrajectoryGenerator.h"
 
 namespace {
 
 // First test system, differential drive
-frc::Vectord<5> DriveDynamics(const frc::Vectord<5>& x,
-                              const frc::Vectord<2>& u) {
-  auto motors = frc::DCMotor::CIM(2);
+wpimath::Vectord<5> DriveDynamics(const wpimath::Vectord<5>& x,
+                                  const wpimath::Vectord<2>& u) {
+  auto motors = wpimath::DCMotor::CIM(2);
 
   // constexpr double Glow = 15.32;    // Low gear ratio
   constexpr double Ghigh = 7.08;       // High gear ratio
@@ -48,7 +48,7 @@ frc::Vectord<5> DriveDynamics(const frc::Vectord<5>& x,
   units::volt_t Vr{u(1)};
 
   auto v = 0.5 * (vl + vr);
-  return frc::Vectord<5>{
+  return wpimath::Vectord<5>{
       v.value() * std::cos(x(2)), v.value() * std::sin(x(2)),
       ((vr - vl) / (2.0 * rb)).value(),
       k1.value() * ((C1 * vl).value() + (C2 * Vl).value()) +
@@ -57,70 +57,73 @@ frc::Vectord<5> DriveDynamics(const frc::Vectord<5>& x,
           k1.value() * ((C1 * vr).value() + (C2 * Vr).value())};
 }
 
-frc::Vectord<3> DriveLocalMeasurementModel(
-    const frc::Vectord<5>& x, [[maybe_unused]] const frc::Vectord<2>& u) {
-  return frc::Vectord<3>{x(2), x(3), x(4)};
+wpimath::Vectord<3> DriveLocalMeasurementModel(
+    const wpimath::Vectord<5>& x,
+    [[maybe_unused]] const wpimath::Vectord<2>& u) {
+  return wpimath::Vectord<3>{x(2), x(3), x(4)};
 }
 
-frc::Vectord<5> DriveGlobalMeasurementModel(
-    const frc::Vectord<5>& x, [[maybe_unused]] const frc::Vectord<2>& u) {
-  return frc::Vectord<5>{x(0), x(1), x(2), x(3), x(4)};
+wpimath::Vectord<5> DriveGlobalMeasurementModel(
+    const wpimath::Vectord<5>& x,
+    [[maybe_unused]] const wpimath::Vectord<2>& u) {
+  return wpimath::Vectord<5>{x(0), x(1), x(2), x(3), x(4)};
 }
 
 TEST(MerweUKFTest, DriveInit) {
   constexpr auto dt = 5_ms;
 
-  frc::MerweUKF<5, 2, 3> observer{DriveDynamics,
-                                  DriveLocalMeasurementModel,
-                                  {0.5, 0.5, 10.0, 1.0, 1.0},
-                                  {0.0001, 0.01, 0.01},
-                                  frc::AngleMean<5, 2 * 5 + 1>(2),
-                                  frc::AngleMean<3, 2 * 5 + 1>(0),
-                                  frc::AngleResidual<5>(2),
-                                  frc::AngleResidual<3>(0),
-                                  frc::AngleAdd<5>(2),
-                                  dt};
-  frc::Vectord<2> u{12.0, 12.0};
+  wpimath::MerweUKF<5, 2, 3> observer{DriveDynamics,
+                                      DriveLocalMeasurementModel,
+                                      {0.5, 0.5, 10.0, 1.0, 1.0},
+                                      {0.0001, 0.01, 0.01},
+                                      wpimath::AngleMean<5, 2 * 5 + 1>(2),
+                                      wpimath::AngleMean<3, 2 * 5 + 1>(0),
+                                      wpimath::AngleResidual<5>(2),
+                                      wpimath::AngleResidual<3>(0),
+                                      wpimath::AngleAdd<5>(2),
+                                      dt};
+  wpimath::Vectord<2> u{12.0, 12.0};
   observer.Predict(u, dt);
 
   auto localY = DriveLocalMeasurementModel(observer.Xhat(), u);
   observer.Correct(u, localY);
 
   auto globalY = DriveGlobalMeasurementModel(observer.Xhat(), u);
-  auto R = frc::MakeCovMatrix(0.01, 0.01, 0.0001, 0.01, 0.01);
+  auto R = wpimath::MakeCovMatrix(0.01, 0.01, 0.0001, 0.01, 0.01);
   observer.Correct<5>(u, globalY, DriveGlobalMeasurementModel, R,
-                      frc::AngleMean<5, 2 * 5 + 1>(2), frc::AngleResidual<5>(2),
-                      frc::AngleResidual<5>(2), frc::AngleAdd<5>(2));
+                      wpimath::AngleMean<5, 2 * 5 + 1>(2),
+                      wpimath::AngleResidual<5>(2),
+                      wpimath::AngleResidual<5>(2), wpimath::AngleAdd<5>(2));
 }
 
 TEST(MerweUKFTest, DriveConvergence) {
   constexpr auto dt = 5_ms;
   constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
 
-  frc::MerweUKF<5, 2, 3> observer{DriveDynamics,
-                                  DriveLocalMeasurementModel,
-                                  {0.5, 0.5, 10.0, 1.0, 1.0},
-                                  {0.0001, 0.5, 0.5},
-                                  frc::AngleMean<5, 2 * 5 + 1>(2),
-                                  frc::AngleMean<3, 2 * 5 + 1>(0),
-                                  frc::AngleResidual<5>(2),
-                                  frc::AngleResidual<3>(0),
-                                  frc::AngleAdd<5>(2),
-                                  dt};
+  wpimath::MerweUKF<5, 2, 3> observer{DriveDynamics,
+                                      DriveLocalMeasurementModel,
+                                      {0.5, 0.5, 10.0, 1.0, 1.0},
+                                      {0.0001, 0.5, 0.5},
+                                      wpimath::AngleMean<5, 2 * 5 + 1>(2),
+                                      wpimath::AngleMean<3, 2 * 5 + 1>(0),
+                                      wpimath::AngleResidual<5>(2),
+                                      wpimath::AngleResidual<3>(0),
+                                      wpimath::AngleAdd<5>(2),
+                                      dt};
 
-  auto waypoints =
-      std::vector<frc::Pose2d>{frc::Pose2d{2.75_m, 22.521_m, 0_rad},
-                               frc::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
+  auto waypoints = std::vector<wpimath::Pose2d>{
+      wpimath::Pose2d{2.75_m, 22.521_m, 0_rad},
+      wpimath::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
+  auto trajectory = wpimath::TrajectoryGenerator::GenerateTrajectory(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
-  frc::Vectord<5> r = frc::Vectord<5>::Zero();
-  frc::Vectord<2> u = frc::Vectord<2>::Zero();
+  wpimath::Vectord<5> r = wpimath::Vectord<5>::Zero();
+  wpimath::Vectord<2> u = wpimath::Vectord<2>::Zero();
 
-  auto B = frc::NumericalJacobianU<5, 5, 2>(
-      DriveDynamics, frc::Vectord<5>::Zero(), frc::Vectord<2>::Zero());
+  auto B = wpimath::NumericalJacobianU<5, 5, 2>(
+      DriveDynamics, wpimath::Vectord<5>::Zero(), wpimath::Vectord<2>::Zero());
 
-  observer.SetXhat(frc::Vectord<5>{
+  observer.SetXhat(wpimath::Vectord<5>{
       trajectory.InitialPose().Translation().X().value(),
       trajectory.InitialPose().Translation().Y().value(),
       trajectory.InitialPose().Rotation().Radians().value(), 0.0, 0.0});
@@ -135,31 +138,34 @@ TEST(MerweUKFTest, DriveConvergence) {
     units::meters_per_second_t vr =
         ref.velocity * (1 + (ref.curvature * rb).value());
 
-    frc::Vectord<5> nextR{
+    wpimath::Vectord<5> nextR{
         ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
         ref.pose.Rotation().Radians().value(), vl.value(), vr.value()};
 
-    auto localY = DriveLocalMeasurementModel(trueXhat, frc::Vectord<2>::Zero());
-    observer.Correct(u, localY + frc::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
+    auto localY =
+        DriveLocalMeasurementModel(trueXhat, wpimath::Vectord<2>::Zero());
+    observer.Correct(u,
+                     localY + wpimath::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
-    frc::Vectord<5> rdot = (nextR - r) / dt.value();
+    wpimath::Vectord<5> rdot = (nextR - r) / dt.value();
     u = B.householderQr().solve(rdot -
-                                DriveDynamics(r, frc::Vectord<2>::Zero()));
+                                DriveDynamics(r, wpimath::Vectord<2>::Zero()));
 
     observer.Predict(u, dt);
 
     r = nextR;
-    trueXhat = frc::RK4(DriveDynamics, trueXhat, u, dt);
+    trueXhat = wpimath::RK4(DriveDynamics, trueXhat, u, dt);
   }
 
   auto localY = DriveLocalMeasurementModel(trueXhat, u);
   observer.Correct(u, localY);
 
   auto globalY = DriveGlobalMeasurementModel(trueXhat, u);
-  auto R = frc::MakeCovMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
+  auto R = wpimath::MakeCovMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
   observer.Correct<5>(u, globalY, DriveGlobalMeasurementModel, R,
-                      frc::AngleMean<5, 2 * 5 + 1>(2), frc::AngleResidual<5>(2),
-                      frc::AngleResidual<5>(2), frc::AngleAdd<5>(2)
+                      wpimath::AngleMean<5, 2 * 5 + 1>(2),
+                      wpimath::AngleResidual<5>(2),
+                      wpimath::AngleResidual<5>(2), wpimath::AngleAdd<5>(2)
 
   );
 
@@ -176,25 +182,25 @@ TEST(MerweUKFTest, DriveConvergence) {
 
 TEST(MerweUKFTest, LinearUKF) {
   constexpr units::second_t dt = 20_ms;
-  auto plant = frc::LinearSystemId::IdentifyVelocitySystem<units::meters>(
+  auto plant = wpimath::LinearSystemId::IdentifyVelocitySystem<units::meters>(
       0.02_V / 1_mps, 0.006_V / 1_mps_sq);
-  frc::MerweUKF<1, 1, 1> observer{
-      [&](const frc::Vectord<1>& x, const frc::Vectord<1>& u) {
+  wpimath::MerweUKF<1, 1, 1> observer{
+      [&](const wpimath::Vectord<1>& x, const wpimath::Vectord<1>& u) {
         return plant.A() * x + plant.B() * u;
       },
-      [&](const frc::Vectord<1>& x, const frc::Vectord<1>& u) {
+      [&](const wpimath::Vectord<1>& x, const wpimath::Vectord<1>& u) {
         return plant.CalculateY(x, u);
       },
       {0.05},
       {1.0},
       dt};
 
-  frc::Matrixd<1, 1> discA;
-  frc::Matrixd<1, 1> discB;
-  frc::DiscretizeAB<1, 1>(plant.A(), plant.B(), dt, &discA, &discB);
+  wpimath::Matrixd<1, 1> discA;
+  wpimath::Matrixd<1, 1> discB;
+  wpimath::DiscretizeAB<1, 1>(plant.A(), plant.B(), dt, &discA, &discB);
 
-  frc::Vectord<1> ref{100.0};
-  frc::Vectord<1> u{0.0};
+  wpimath::Vectord<1> ref{100.0};
+  wpimath::Vectord<1> u{0.0};
 
   for (int i = 0; i < 2.0 / dt.value(); ++i) {
     observer.Predict(u, dt);
@@ -208,22 +214,26 @@ TEST(MerweUKFTest, LinearUKF) {
 TEST(MerweUKFTest, RoundTripP) {
   constexpr auto dt = 5_ms;
 
-  frc::MerweUKF<2, 2, 2> observer{
-      [](const frc::Vectord<2>& x, const frc::Vectord<2>& u) { return x; },
-      [](const frc::Vectord<2>& x, const frc::Vectord<2>& u) { return x; },
+  wpimath::MerweUKF<2, 2, 2> observer{
+      [](const wpimath::Vectord<2>& x, const wpimath::Vectord<2>& u) {
+        return x;
+      },
+      [](const wpimath::Vectord<2>& x, const wpimath::Vectord<2>& u) {
+        return x;
+      },
       {0.0, 0.0},
       {0.0, 0.0},
       dt};
 
-  frc::Matrixd<2, 2> P({{2, 1}, {1, 2}});
+  wpimath::Matrixd<2, 2> P({{2, 1}, {1, 2}});
   observer.SetP(P);
 
   ASSERT_TRUE(observer.P().isApprox(P));
 }
 
 // Second system, single motor feedforward estimator
-frc::Vectord<4> MotorDynamics(const frc::Vectord<4>& x,
-                              const frc::Vectord<1>& u) {
+wpimath::Vectord<4> MotorDynamics(const wpimath::Vectord<4>& x,
+                                  const wpimath::Vectord<1>& u) {
   double v = x(1);
   double kV = x(2);
   double kA = x(3);
@@ -231,11 +241,11 @@ frc::Vectord<4> MotorDynamics(const frc::Vectord<4>& x,
   double V = u(0);
 
   double a = -kV / kA * v + 1.0 / kA * V;
-  return frc::Vectord<4>{v, a, 0.0, 0.0};
+  return wpimath::Vectord<4>{v, a, 0.0, 0.0};
 }
 
-frc::Vectord<3> MotorMeasurementModel(const frc::Vectord<4>& x,
-                                      const frc::Vectord<1>& u) {
+wpimath::Vectord<3> MotorMeasurementModel(const wpimath::Vectord<4>& x,
+                                          const wpimath::Vectord<1>& u) {
   double p = x(0);
   double v = x(1);
   double kV = x(2);
@@ -244,11 +254,11 @@ frc::Vectord<3> MotorMeasurementModel(const frc::Vectord<4>& x,
   double V = u(0);
 
   double a = -kV / kA * v + 1.0 / kA * V;
-  return frc::Vectord<3>{p, v, a};
+  return wpimath::Vectord<3>{p, v, a};
 }
 
-frc::Vectord<1> MotorControlInput(double t) {
-  return frc::Vectord<1>{
+wpimath::Vectord<1> MotorControlInput(double t) {
+  return wpimath::Vectord<1>{
       std::clamp(8 * std::sin(std::numbers::pi * std::sqrt(2.0) * t) +
                      6 * std::sin(std::numbers::pi * std::sqrt(3.0) * t) +
                      4 * std::sin(std::numbers::pi * std::sqrt(5.0) * t),
@@ -265,36 +275,36 @@ TEST(MerweUKFTest, MotorConvergence) {
   constexpr double vel_stddev = 0.1;
   constexpr double accel_stddev = 0.1;
 
-  std::vector<frc::Vectord<4>> states(steps + 1);
-  std::vector<frc::Vectord<1>> inputs(steps);
-  std::vector<frc::Vectord<3>> measurements(steps);
-  states[0] = frc::Vectord<4>{{0.0}, {0.0}, {true_kV}, {true_kA}};
+  std::vector<wpimath::Vectord<4>> states(steps + 1);
+  std::vector<wpimath::Vectord<1>> inputs(steps);
+  std::vector<wpimath::Vectord<3>> measurements(steps);
+  states[0] = wpimath::Vectord<4>{{0.0}, {0.0}, {true_kV}, {true_kA}};
 
-  constexpr frc::Matrixd<4, 4> A{{0.0, 1.0, 0.0, 0.0},
-                                 {0.0, -true_kV / true_kA, 0.0, 0.0},
-                                 {0.0, 0.0, 0.0, 0.0},
-                                 {0.0, 0.0, 0.0, 0.0}};
-  constexpr frc::Matrixd<4, 1> B{{0.0}, {1.0 / true_kA}, {0.0}, {0.0}};
+  constexpr wpimath::Matrixd<4, 4> A{{0.0, 1.0, 0.0, 0.0},
+                                     {0.0, -true_kV / true_kA, 0.0, 0.0},
+                                     {0.0, 0.0, 0.0, 0.0},
+                                     {0.0, 0.0, 0.0, 0.0}};
+  constexpr wpimath::Matrixd<4, 1> B{{0.0}, {1.0 / true_kA}, {0.0}, {0.0}};
 
-  frc::Matrixd<4, 4> discA;
-  frc::Matrixd<4, 1> discB;
-  frc::DiscretizeAB(A, B, dt, &discA, &discB);
+  wpimath::Matrixd<4, 4> discA;
+  wpimath::Matrixd<4, 1> discB;
+  wpimath::DiscretizeAB(A, B, dt, &discA, &discB);
 
   for (int i = 0; i < steps; ++i) {
     inputs[i] = MotorControlInput(i * dt.value());
     states[i + 1] = discA * states[i] + discB * inputs[i];
     measurements[i] =
         MotorMeasurementModel(states[i + 1], inputs[i]) +
-        frc::MakeWhiteNoiseVector(pos_stddev, vel_stddev, accel_stddev);
+        wpimath::MakeWhiteNoiseVector(pos_stddev, vel_stddev, accel_stddev);
   }
 
-  frc::Vectord<4> P0{0.001, 0.001, 10, 10};
+  wpimath::Vectord<4> P0{0.001, 0.001, 10, 10};
 
-  frc::MerweUKF<4, 1, 3> observer{
+  wpimath::MerweUKF<4, 1, 3> observer{
       MotorDynamics, MotorMeasurementModel, wpi::array{0.1, 1.0, 1e-10, 1e-10},
       wpi::array{pos_stddev, vel_stddev, accel_stddev}, dt};
 
-  observer.SetXhat(frc::Vectord<4>{0.0, 0.0, 2.0, 2.0});
+  observer.SetXhat(wpimath::Vectord<4>{0.0, 0.0, 2.0, 2.0});
   observer.SetP(P0.asDiagonal());
 
   for (int i = 0; i < steps; ++i) {

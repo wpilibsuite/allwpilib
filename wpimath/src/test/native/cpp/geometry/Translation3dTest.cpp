@@ -6,9 +6,9 @@
 
 #include <gtest/gtest.h>
 
-#include "frc/geometry/Translation3d.h"
+#include "wpimath/geometry/Translation3d.h"
 
-using namespace frc;
+using namespace wpimath;
 
 static constexpr double kEpsilon = 1E-9;
 

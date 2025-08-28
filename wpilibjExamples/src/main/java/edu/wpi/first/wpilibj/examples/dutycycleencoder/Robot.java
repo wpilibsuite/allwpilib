@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.dutycycleencoder;
 
-import edu.wpi.first.math.MathUtil;
+import org.wpilib.math.MathUtil;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
