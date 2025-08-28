@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * any subclass or implementor of that type has been marked with {@code @NoDiscard}.
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
-@Retention(RetentionPolicy.SOURCE) // only needed at compile time
+@Retention(RetentionPolicy.CLASS) // needs to be stored in the class for libraries to be able to use it
 public @interface NoDiscard {
   /**
    * An error message to display if the return value is not used.

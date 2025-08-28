@@ -462,7 +462,8 @@ class ReturnValueUsedListenerTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Return value of Command-returning method is ignored", error.getMessage(null));
+    assertEquals(
+        "Commands must be used! Did you mean to bind it to a trigger?", error.getMessage(null));
   }
 
   @Test
@@ -494,7 +495,8 @@ class ReturnValueUsedListenerTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Return value of Command-returning method is ignored", error.getMessage(null));
+    assertEquals(
+        "Commands must be used! Did you mean to bind it to a trigger?", error.getMessage(null));
   }
 
   @Test
@@ -523,6 +525,7 @@ class ReturnValueUsedListenerTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Return value of Command-returning method is ignored", error.getMessage(null));
+    assertEquals(
+        "Commands must be used! Did you mean to bind it to a trigger?", error.getMessage(null));
   }
 }

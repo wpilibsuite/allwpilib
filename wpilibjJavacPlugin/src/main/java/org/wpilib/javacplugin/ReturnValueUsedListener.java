@@ -14,11 +14,10 @@ import com.sun.source.util.TaskListener;
 import com.sun.source.util.TreeScanner;
 import com.sun.source.util.Trees;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
@@ -27,12 +26,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import org.wpilib.annotation.NoDiscard;
 
-/**
- * Checks for usages of methods that require their return values to be used. Some return types are
- * special cased, like Command; however, any method annotated with @NoDiscard will also be checked.
- * Special cased return types are useful for user code to get the benefits for free, without having
- * to manually opt into them.
- */
+/** Checks for usages of methods that require their return values to be used. */
 public class ReturnValueUsedListener implements TaskListener {
   private final JavacTask m_task;
 
@@ -43,21 +37,10 @@ public class ReturnValueUsedListener implements TaskListener {
   private class Scanner extends TreeScanner<Void, Void> {
     private final CompilationUnitTree m_root;
     private final Trees m_trees;
-    private final Map<TypeElement, String> m_specialTypes;
-
-    private static final String kCommands2CommandFqn = "edu.wpi.first.wpilibj2.command.Command";
-    private static final String kCommands3CommandFqn = "org.wpilib.commands3.Command";
-
-    private static final String kCommandMsg = "Return value of Command-returning method is ignored";
 
     Scanner(CompilationUnitTree compilationUnit) {
       m_root = compilationUnit;
       m_trees = Trees.instance(m_task);
-
-      // Can't use Map.of because it prohibits null keys
-      m_specialTypes = new HashMap<>();
-      m_specialTypes.put(m_task.getElements().getTypeElement(kCommands2CommandFqn), kCommandMsg);
-      m_specialTypes.put(m_task.getElements().getTypeElement(kCommands3CommandFqn), kCommandMsg);
     }
 
     @Override
@@ -91,18 +74,6 @@ public class ReturnValueUsedListener implements TaskListener {
         // Skip void (e.g., void-returning methods)
         return;
       }
-
-      // Special type checks (also applies to subtypes)
-      m_specialTypes.forEach(
-          (specialType, msg) -> {
-            if (specialType == null) {
-              // Not on classpath for this compilation unit
-              return;
-            }
-            if (m_task.getTypes().isAssignable(type, specialType.asType())) {
-              m_trees.printMessage(Diagnostic.Kind.ERROR, msg, node, m_root);
-            }
-          });
 
       // Check @NoDiscard on the invoked executable (method or constructor)
       var invoked = getInvokedExecutable(node);
@@ -151,11 +122,23 @@ public class ReturnValueUsedListener implements TaskListener {
         }
       }
 
-      // 2) Type-level @NoDiscard (classes and interfaces, recursively)
-      var returnType = method.getReturnType();
-      if (returnType instanceof DeclaredType dt && dt.asElement() instanceof TypeElement te) {
+      // 2) Type-level @NoDiscard (classes + interfaces recursively)
+      TypeElement targetType = null;
+      if (method.getKind() == ElementKind.CONSTRUCTOR) {
+        // For constructors, the "return type" is the enclosing type
+        var enclosing = method.getEnclosingElement();
+        if (enclosing instanceof TypeElement te) {
+          targetType = te;
+        }
+      } else {
+        var returnType = method.getReturnType();
+        if (returnType instanceof DeclaredType dt && dt.asElement() instanceof TypeElement te) {
+          targetType = te;
+        }
+      }
+      if (targetType != null) {
         Set<TypeElement> seen = new HashSet<>();
-        collectNoDiscardMessagesFromTypeHierarchy(te, seen, messages);
+        collectNoDiscardMessagesFromTypeHierarchy(targetType, seen, messages);
       }
 
       return messages;
@@ -164,6 +147,10 @@ public class ReturnValueUsedListener implements TaskListener {
     /**
      * Searches for @NoDiscard on the provided type element, its superclasses, and all implemented
      * interfaces (recursively). Appends formatted messages to the provided list for every match.
+     *
+     * @param type The type element to search
+     * @param seen A set of type elements that have already been searched
+     * @param out The list to append messages to
      */
     private void collectNoDiscardMessagesFromTypeHierarchy(
         TypeElement type, Set<TypeElement> seen, List<String> out) {
