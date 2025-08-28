@@ -28,8 +28,7 @@ if(WITH_JAVA_SOURCE)
     include(CreateSourceJar)
     add_source_jar(
         wpiannotations_src_jar
-        BASE_DIRECTORIES
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
+        BASE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java
         OUTPUT_NAME wpiannotations-sources
     )
     set_property(TARGET wpiannotations_src_jar PROPERTY FOLDER "java")
