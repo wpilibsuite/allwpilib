@@ -6,18 +6,18 @@
 
 #include <wpi/SymbolExports.h>
 
+#include "frc/MathUtil.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
-#include "frc/MathUtil.h"
 #include "units/acceleration.h"
 #include "units/angular_acceleration.h"
 
 namespace frc {
 /**
  * Represents the acceleration of a robot chassis. Although this struct contains
- * similar members compared to a ChassisSpeeds, they do NOT represent the same thing.
- * Whereas a ChassisSpeeds object represents a robot's velocity, a ChassisAccelerations
- * object represents a robot's acceleration.
+ * similar members compared to a ChassisSpeeds, they do NOT represent the same
+ * thing. Whereas a ChassisSpeeds object represents a robot's velocity, a
+ * ChassisAccelerations object represents a robot's acceleration.
  *
  * A strictly non-holonomic drivetrain, such as a differential drive, should
  * never have an ay component because it can never move sideways. Holonomic
