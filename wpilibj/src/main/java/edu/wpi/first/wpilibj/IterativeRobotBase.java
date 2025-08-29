@@ -99,7 +99,10 @@ public abstract class IterativeRobotBase extends RobotBase {
    *
    * <p>Note: This method is functionally identical to the class constructor so that should be used
    * instead.
+   *
+   * @deprecated Use robot class constructor instead.
    */
+  @Deprecated(forRemoval = true, since = "2026")
   public void robotInit() {}
 
   /**
@@ -115,7 +118,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    *
    * <p>Users should override this method for default Robot-wide simulation related initialization
    * which will be called when the robot is first started. It will be called exactly one time after
-   * RobotInit is called only when the robot is in simulation.
+   * the robot class constructor is called only when the robot is in simulation.
    */
   public void simulationInit() {}
 
