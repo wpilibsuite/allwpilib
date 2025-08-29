@@ -60,8 +60,8 @@ HAL_ENUM(HAL_CANDeviceType) {
 HAL_ENUM(HAL_CANManufacturer) {
   /// Broadcast.
   HAL_CAN_Man_kBroadcast = 0,
-  /// Official FIRST Mobile Robot Controller.
-  HAL_CAN_Man_kMRC = 1,
+  /// National Instruments.
+  HAL_CAN_Man_kNI = 1,
   /// Luminary Micro.
   HAL_CAN_Man_kLM = 2,
   /// DEKA Research and Development Corp.
