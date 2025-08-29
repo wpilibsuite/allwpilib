@@ -32,10 +32,10 @@ HAL_ENUM(HAL_CANDeviceType) {
   HAL_CAN_Dev_kGyroSensor = 4,
   /// Accelerometer.
   HAL_CAN_Dev_kAccelerometer = 5,
-  /// Ultrasonic sensor.
-  HAL_CAN_Dev_kUltrasonicSensor = 6,
-  /// Gear tooth sensor.
-  HAL_CAN_Dev_kGearToothSensor = 7,
+  /// Distance sensor.
+  HAL_CAN_Dev_kDistanceSensor = 6,
+  /// Encoder.
+  HAL_CAN_Dev_kEncoder = 7,
   /// Power distribution.
   HAL_CAN_Dev_kPowerDistribution = 8,
   /// Pneumatics.
@@ -44,8 +44,10 @@ HAL_ENUM(HAL_CANDeviceType) {
   HAL_CAN_Dev_kMiscellaneous = 10,
   /// IO breakout.
   HAL_CAN_Dev_kIOBreakout = 11,
-  // Servo controller.
+  /// Servo controller.
   HAL_CAN_Dev_kServoController = 12,
+  /// Color Sensor.
+  HAL_CAN_Dev_ColorSensor = 13,
   /// Firmware update.
   HAL_CAN_Dev_kFirmwareUpdate = 31
 };
@@ -58,8 +60,8 @@ HAL_ENUM(HAL_CANDeviceType) {
 HAL_ENUM(HAL_CANManufacturer) {
   /// Broadcast.
   HAL_CAN_Man_kBroadcast = 0,
-  /// National Instruments.
-  HAL_CAN_Man_kNI = 1,
+  /// Official FIRST Mobile Robot Controller.
+  HAL_CAN_Man_kMRC = 1,
   /// Luminary Micro.
   HAL_CAN_Man_kLM = 2,
   /// DEKA Research and Development Corp.
@@ -89,6 +91,14 @@ HAL_ENUM(HAL_CANManufacturer) {
   /// AndyMark.
   HAL_CAN_Man_kAndyMark = 15,
   /// Vivid-Hosting.
-  HAL_CAN_Man_kVividHosting = 16
+  HAL_CAN_Man_kVividHosting = 16,
+  /// Vertos Robotics.
+  HAL_CAN_Man_kVertosRobotics = 17,
+  /// SWYFT Robotics.
+  HAL_CAN_Man_kSWYFTRobotics = 18,
+  /// Lumyn Labs.
+  HAL_CAN_Man_kLumynLabs = 19,
+  /// Brushland Labs
+  HAL_CAN_Man_kBrushlandLabs = 20
 };
 /** @} */
