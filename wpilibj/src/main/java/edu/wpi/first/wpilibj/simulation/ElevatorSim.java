@@ -13,7 +13,12 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.RobotController;
+
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
 
 /** Represents a simulated elevator mechanism. */
 public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
@@ -125,6 +130,111 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
         simulateGravity,
         startingHeightMeters,
         measurementStdDevs);
+  }
+
+  /**
+   * Creates a simulated elevator mechanism.
+   *
+   * @param plant The linear system that represents the elevator. This system can be created with
+   *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
+   *     double, double)}.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param minHeight The min allowable height of the elevator.
+   * @param maxHeight The max allowable height of the elevator.
+   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingHeightMeters The starting height of the elevator.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for position.
+   */
+  @SuppressWarnings("this-escape")
+  public ElevatorSim(
+          LinearSystem<N2, N1, N2> plant,
+          DCMotor gearbox,
+          Distance minHeight,
+          Distance maxHeight,
+          boolean simulateGravity,
+          Distance startingHeightMeters,
+          double... measurementStdDevs) {
+    this(
+            plant,
+            gearbox,
+            minHeight.in(Meters),
+            maxHeight.in(Meters),
+            simulateGravity,
+            startingHeightMeters.in(Meters),
+            measurementStdDevs
+    );
+  }
+
+  /**
+   * Creates a simulated elevator mechanism.
+   *
+   * @param kV The velocity gain.
+   * @param kA The acceleration gain.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param minHeight The min allowable height of the elevator.
+   * @param maxHeight The max allowable height of the elevator.
+   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingHeight The starting height of the elevator.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for position.
+   */
+  public ElevatorSim(
+          double kV,
+          double kA,
+          DCMotor gearbox,
+          Distance minHeight,
+          Distance maxHeight,
+          boolean simulateGravity,
+          Distance startingHeight,
+          double... measurementStdDevs) {
+    this(
+        kV,
+        kA,
+        gearbox,
+        minHeight.in(Meters),
+        maxHeight.in(Meters),
+        simulateGravity,
+        startingHeight.in(Meters),
+        measurementStdDevs
+    );
+  }
+
+  /**
+   * Creates a simulated elevator mechanism.
+   *
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
+   * @param carriageMass The mass of the elevator carriage.
+   * @param drumRadius The radius of the drum that the elevator spool is wrapped around.
+   * @param minHeight The min allowable height of the elevator.
+   * @param maxHeight The max allowable height of the elevator.
+   * @param simulateGravity Whether gravity should be simulated or not.
+   * @param startingHeight The starting height of the elevator.
+   * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
+   *     noise is desired. If present must have 1 element for position.
+   */
+  public ElevatorSim(
+          DCMotor gearbox,
+          double gearing,
+          Mass carriageMass,
+          Distance drumRadius,
+          Distance minHeight,
+          Distance maxHeight,
+          boolean simulateGravity,
+          Distance startingHeight,
+          double... measurementStdDevs) {
+    this(
+        gearbox,
+        gearing,
+        carriageMass.in(Kilograms),
+        drumRadius.in(Meters),
+        minHeight.in(Meters),
+        maxHeight.in(Meters),
+        simulateGravity,
+        startingHeight.in(Meters),
+        measurementStdDevs
+    );
   }
 
   /**
