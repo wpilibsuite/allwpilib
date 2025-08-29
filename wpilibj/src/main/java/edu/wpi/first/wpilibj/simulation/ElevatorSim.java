@@ -153,7 +153,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
           Distance minHeight,
           Distance maxHeight,
           boolean simulateGravity,
-          Distance startingHeightMeters,
+          Distance startingHeight,
           double... measurementStdDevs) {
     this(
             plant,
