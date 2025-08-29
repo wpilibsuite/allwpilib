@@ -14,11 +14,11 @@ import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.RobotController;
 
-import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.*;
 
 /** Represents a simulated elevator mechanism. */
 public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
@@ -298,12 +298,30 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
+   * Returns the position of the elevator.
+   *
+   * @return The position of the elevator.
+   */
+  public Distance getPosition() {
+    return Meters.of(getPositionMeters());
+  }
+
+  /**
    * Returns the velocity of the elevator.
    *
    * @return The velocity of the elevator.
    */
   public double getVelocityMetersPerSecond() {
     return getOutput(1);
+  }
+
+  /**
+   * Returns the velocity of the elevator.
+   *
+   * @return The velocity of the elevator.
+   */
+  public LinearVelocity getVelocity() {
+    return MetersPerSecond.of(getVelocityMetersPerSecond());
   }
 
   /**
