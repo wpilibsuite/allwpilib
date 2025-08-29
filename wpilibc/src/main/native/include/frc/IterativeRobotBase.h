@@ -21,8 +21,6 @@ namespace frc {
  * This class provides the following functions which are called by the main
  * loop, StartCompetition(), at the appropriate times:
  *
- * RobotInit() -- provide for initialization at robot power-on
- *
  * DriverStationConnected() -- provide for initialization the first time the DS
  * is connected
  *
@@ -57,18 +55,6 @@ namespace frc {
 class IterativeRobotBase : public RobotBase {
  public:
   /**
-   * Robot-wide initialization code should go here.
-   *
-   * Users should override this method for default Robot-wide initialization
-   * which will be called when the robot is first powered on. It will be called
-   * exactly one time.
-   *
-   * Note: This method is functionally identical to the class constructor so
-   * that should be used instead.
-   */
-  virtual void RobotInit();
-
-  /**
    * Code that needs to know the DS state should go here.
    *
    * Users should override this method for initialization that needs to occur
@@ -81,8 +67,8 @@ class IterativeRobotBase : public RobotBase {
    *
    * Users should override this method for default Robot-wide simulation
    * related initialization which will be called when the robot is first
-   * started. It will be called exactly one time after RobotInit is called
-   * only when the robot is in simulation.
+   * started. It will be called exactly one time after the robot class
+   * constructor is called only when the robot is in simulation.
    */
   virtual void SimulationInit();
 

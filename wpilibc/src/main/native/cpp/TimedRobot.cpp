@@ -18,8 +18,6 @@
 using namespace frc;
 
 void TimedRobot::StartCompetition() {
-  RobotInit();
-
   if constexpr (IsSimulation()) {
     SimulationInit();
   }
