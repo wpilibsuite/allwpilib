@@ -1,65 +1,24 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
+load("//shared/bazel/rules:halsim_library.bzl", "wpilib_halsim_extension")
 
-wpilib_cc_library(
+wpilib_halsim_extension(
     name = "halsim_gui",
     srcs = glob([
         "src/main/native/cpp/*",
         "src/main/native/include/*.h",
     ]),
-    include_license_files = True,
+    dynamic_deps = [
+        "//hal:shared/wpiHal",
+        "//wpimath:shared/wpimath",
+        "//datalog:shared/datalog",
+        "//ntcore:shared/ntcore",
+    ],
     includes = ["src/main/native/include"],
     linkopts = [
         "-lm",
     ],
-    tags = [
-        "wpi-cpp-gui",
-    ],
-    target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-    visibility = ["//visibility:public"],
-    deps = [
-        "//glass:glassnt",
-        "//hal:wpiHal",
-    ],
-)
-
-wpilib_cc_library(
-    name = "halsim_gui_static",
-    srcs = glob([
-        "src/main/native/cpp/*",
-        "src/main/native/include/*.h",
-    ]),
-    copts = [
-        "-DHALSIM_InitExtension=HALSIM_InitExtension_GUI",
-    ],
-    include_license_files = True,
-    includes = ["src/main/native/include"],
-    linkopts = [
-        "-lm",
-    ],
-    tags = [
-        "wpi-cpp-gui",
-    ],
-    target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-    visibility = ["//visibility:public"],
-    deps = [
-        "//glass:glassnt",
-        "//hal:wpiHal",
-    ],
-)
-
-wpilib_cc_shared_library(
-    name = "shared/halsim_gui",
-    additional_linker_inputs = select({
+    # https://github.com/bazelbuild/bazel/issues/21893
+    shared_additional_linker_inputs = select({
         "@platforms//os:osx": [
             "//thirdparty/imgui_suite:glfw_src_darwin",
             "//thirdparty/imgui_suite:imgui_src_darwin",
@@ -67,13 +26,8 @@ wpilib_cc_shared_library(
         ],
         "//conditions:default": [],
     }),
-    dynamic_deps = [
-        "//hal:shared/wpiHal",
-        "//wpimath:shared/wpimath",
-        "//datalog:shared/datalog",
-        "//ntcore:shared/ntcore",
-    ],
-    user_link_flags = select({
+    # https://github.com/bazelbuild/bazel/issues/21893
+    shared_user_link_flags = select({
         "@platforms//os:osx": [
             "-Wl,-force_load,$(location //thirdparty/imgui_suite:glfw_src_darwin)",
             "-Wl,-force_load,$(location //thirdparty/imgui_suite:imgui_src_darwin)",
@@ -95,14 +49,6 @@ wpilib_cc_shared_library(
         ],
         "//conditions:default": [],
     }),
-    visibility = ["//visibility:public"],
-    deps = [
-        ":halsim_gui",
-    ],
-)
-
-wpilib_cc_static_library(
-    name = "static/halsim_gui",
     static_deps = [
         "//hal:static/wpiHal",
         "//wpimath:static/wpimath",
@@ -110,9 +56,13 @@ wpilib_cc_static_library(
         "//ntcore:static/ntcore",
         "//glass:static/glassnt",
     ],
-    visibility = ["//visibility:public"],
+    static_init_extension_name = "HALSIM_InitExtension_GUI",
+    tags = [
+        "wpi-cpp-gui",
+    ],
     deps = [
-        ":halsim_gui_static",
+        "//glass:glassnt",
+        "//hal:wpiHal",
     ],
 )
 
@@ -139,10 +89,4 @@ cc_binary(
     deps = [
         ":halsim_gui",
     ],
-)
-
-package_minimal_cc_project(
-    name = "halsim_gui",
-    maven_artifact_name = "halsim_gui",
-    maven_group_id = "edu.wpi.first.halsim",
 )
