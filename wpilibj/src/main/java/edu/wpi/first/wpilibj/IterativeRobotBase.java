@@ -19,8 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * <p>This class provides the following functions which are called by the main loop,
  * startCompetition(), at the appropriate times:
  *
- * <p>robotInit() -- provide for initialization at robot power-on
- *
  * <p>driverStationConnected() -- provide for initialization the first time the DS is connected
  *
  * <p>init() functions -- each of the following functions is called once when the appropriate mode
@@ -86,17 +84,6 @@ public abstract class IterativeRobotBase extends RobotBase {
   /* ----------- Overridable initialization code ----------------- */
 
   /**
-   * Robot-wide initialization code should go here.
-   *
-   * <p>Users should override this method for default Robot-wide initialization which will be called
-   * when the robot is first powered on. It will be called exactly one time.
-   *
-   * <p>Note: This method is functionally identical to the class constructor so that should be used
-   * instead.
-   */
-  public void robotInit() {}
-
-  /**
    * Code that needs to know the DS state should go here.
    *
    * <p>Users should override this method for initialization that needs to occur after the DS is
@@ -109,7 +96,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    *
    * <p>Users should override this method for default Robot-wide simulation related initialization
    * which will be called when the robot is first started. It will be called exactly one time after
-   * RobotInit is called only when the robot is in simulation.
+   * the robot class constructor is called only when the robot is in simulation.
    */
   public void simulationInit() {}
 
