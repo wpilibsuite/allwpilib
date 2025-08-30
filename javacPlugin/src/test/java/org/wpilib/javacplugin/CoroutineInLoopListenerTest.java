@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package org.wpilib.javacplugin;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
@@ -36,8 +40,7 @@ class CoroutineInLoopListenerTest {
     Compilation compilation =
         javac()
             .withOptions(kJavaVersionOptions)
-            .compile(
-                JavaFileObjects.forSourceString("frc.robot.Example", source));
+            .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
   }

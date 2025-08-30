@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package org.wpilib.javacplugin;
 
 import com.sun.source.tree.CompilationUnitTree;
@@ -280,8 +284,9 @@ public class CoroutineYieldInLoopDetector implements TaskListener {
       }
 
       var sel = node.getMethodSelect();
-      if (sel instanceof MemberSelectTree ms && ms.getIdentifier().contentEquals("yield")) {
-        // calling yield() on something (may not be a coroutine object)
+      if (sel instanceof MemberSelectTree ms && isPermittedCoroutineFunction(ms)) {
+        // calling a method on something (may not be a coroutine object) with the same name as a
+        // permitted coroutine function name
         var recv = ms.getExpression();
         if (recv instanceof IdentifierTree id) {
           var idPath = m_trees.getPath(m_root, id);
@@ -295,5 +300,21 @@ public class CoroutineYieldInLoopDetector implements TaskListener {
 
       return super.visitMethodInvocation(node, loopState);
     }
+  }
+
+  private boolean isPermittedCoroutineFunction(MemberSelectTree tree) {
+    /*
+     * Loops MUST either call yield() or a blocking coroutine function like await() or waitFor()
+     * that call yield() internally. Nonblocking coroutine functions like fork() aren't enough.
+     */
+
+    var identifier = tree.getIdentifier();
+    return identifier.contentEquals("yield")
+        || identifier.contentEquals("park")
+        || identifier.contentEquals("wait")
+        || identifier.contentEquals("waitUntil")
+        || identifier.contentEquals("await")
+        || identifier.contentEquals("awaitAll")
+        || identifier.contentEquals("awaitAny");
   }
 }
