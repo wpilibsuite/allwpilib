@@ -21,6 +21,7 @@ public class WPILibJavacPlugin implements Plugin {
   public void init(JavacTask task, String... args) {
     task.addTaskListener(new ReturnValueUsedListener(task));
     task.addTaskListener(new CoroutineYieldInLoopDetector(task));
+    task.addTaskListener(new CodeAfterCoroutineParkDetector(task));
   }
 
   @Override
