@@ -406,4 +406,89 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(-1.0, arr[2].speed, kEpsilon),
         () -> assertEquals(-1.0, arr[3].speed, kEpsilon));
   }
+
+  @Test
+  void testTurnInPlaceInverseAccelerations() {
+    ChassisAccelerations accelerations = new ChassisAccelerations(0, 0, 2 * Math.PI);
+    double angularVelocity = 2 * Math.PI;
+    var moduleAccelerations =
+        m_kinematics.toSwerveModuleAccelerations(accelerations, angularVelocity);
+
+    /*
+    For turn-in-place with angular acceleration of 2π rad/s² and angular velocity of 2π rad/s,
+    each module has both tangential acceleration (from angular acceleration) and centripetal
+    acceleration (from angular velocity). The total acceleration magnitude is approximately 678.4.
+
+    The acceleration angles are not simply tangential (as in pure rotation) because the
+    centripetal component from the existing angular velocity affects the direction:
+    FL: -144°, FR: 126°, BL: -54°, BR: 36°
+
+    These angles reflect the combination of:
+    - Tangential acceleration from angular acceleration (2π rad/s²)
+    - Centripetal acceleration from angular velocity (2π rad/s)
+    */
+
+    assertAll(
+        () -> assertEquals(678.4, moduleAccelerations[0].acceleration, 0.1),
+        () -> assertEquals(678.4, moduleAccelerations[1].acceleration, 0.1),
+        () -> assertEquals(678.4, moduleAccelerations[2].acceleration, 0.1),
+        () -> assertEquals(678.4, moduleAccelerations[3].acceleration, 0.1),
+        () -> assertEquals(-144.0, moduleAccelerations[0].angle.getDegrees(), 0.1),
+        () -> assertEquals(126.0, moduleAccelerations[1].angle.getDegrees(), 0.1),
+        () -> assertEquals(-54.0, moduleAccelerations[2].angle.getDegrees(), 0.1),
+        () -> assertEquals(36.0, moduleAccelerations[3].angle.getDegrees(), 0.1));
+  }
+
+  @Test
+  void testTurnInPlaceForwardAccelerations() {
+    SwerveModuleAccelerations flAccel =
+        new SwerveModuleAccelerations(106.629, Rotation2d.fromDegrees(135));
+    SwerveModuleAccelerations frAccel =
+        new SwerveModuleAccelerations(106.629, Rotation2d.fromDegrees(45));
+    SwerveModuleAccelerations blAccel =
+        new SwerveModuleAccelerations(106.629, Rotation2d.fromDegrees(-135));
+    SwerveModuleAccelerations brAccel =
+        new SwerveModuleAccelerations(106.629, Rotation2d.fromDegrees(-45));
+
+    var chassisAccelerations =
+        m_kinematics.toChassisAccelerations(flAccel, frAccel, blAccel, brAccel);
+
+    assertAll(
+        () -> assertEquals(0.0, chassisAccelerations.ax, 0.1),
+        () -> assertEquals(0.0, chassisAccelerations.ay, 0.1),
+        () -> assertEquals(2 * Math.PI, chassisAccelerations.alpha, 0.1));
+  }
+
+  @Test
+  void testOffCenterRotationInverseAccelerations() {
+    ChassisAccelerations accelerations = new ChassisAccelerations(0, 0, 1);
+    // For this test, assume an angular velocity of 1 rad/s
+    double angularVelocity = 1.0;
+    var moduleAccelerations =
+        m_kinematics.toSwerveModuleAccelerations(accelerations, angularVelocity, m_fl);
+
+    /*
+    When rotating about the front-left module position with both angular acceleration (1 rad/s²)
+    and angular velocity (1 rad/s), each module experiences both tangential and centripetal
+    accelerations that combine vectorially.
+
+    FL: at center of rotation (0 acceleration)
+    FR: 24 units from center, experiences combined acceleration → ~33.94
+    BL: 24 units from center, experiences combined acceleration → ~33.94
+    BR: ~33.94 units from center, experiences combined acceleration → ~48.0
+
+    Angles reflect the vector combination of tangential and centripetal components:
+    FL: -45° (though magnitude is 0), FR: 45°, BL: -45°, BR: 0°
+    */
+
+    assertAll(
+        () -> assertEquals(0, moduleAccelerations[0].acceleration, 0.1),
+        () -> assertEquals(33.94, moduleAccelerations[1].acceleration, 0.1),
+        () -> assertEquals(33.94, moduleAccelerations[2].acceleration, 0.1),
+        () -> assertEquals(48.0, moduleAccelerations[3].acceleration, 0.1),
+        () -> assertEquals(0.0, moduleAccelerations[0].angle.getDegrees(), 0.1),
+        () -> assertEquals(45.0, moduleAccelerations[1].angle.getDegrees(), 0.1),
+        () -> assertEquals(-45.0, moduleAccelerations[2].angle.getDegrees(), 0.1),
+        () -> assertEquals(0.0, moduleAccelerations[3].angle.getDegrees(), 0.1));
+  }
 }
