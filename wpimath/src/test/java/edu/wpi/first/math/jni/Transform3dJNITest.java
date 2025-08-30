@@ -8,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import org.junit.jupiter.api.Test;
 
-public class Pose3dJNITest {
+public class Transform3dJNITest {
   @Test
   public void testLink() {
-    assertDoesNotThrow(Pose3dJNI::forceLoad);
+    assertDoesNotThrow(Transform3dJNI::forceLoad);
   }
 }

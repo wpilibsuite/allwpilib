@@ -15,7 +15,6 @@
 
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
-#include "frc/geometry/Twist2d.h"
 #include "units/length.h"
 
 namespace frc {
@@ -198,39 +197,6 @@ class WPILIB_DLLEXPORT Pose2d {
   }
 
   /**
-   * Obtain a new Pose2d from a (constant curvature) velocity.
-   *
-   * See https://file.tavsys.net/control/controls-engineering-in-frc.pdf section
-   * 10.2 "Pose exponential" for a derivation.
-   *
-   * The twist is a change in pose in the robot's coordinate frame since the
-   * previous pose update. When the user runs exp() on the previous known
-   * field-relative pose with the argument being the twist, the user will
-   * receive the new field-relative pose.
-   *
-   * "Exp" represents the pose exponential, which is solving a differential
-   * equation moving the pose forward in time.
-   *
-   * @param twist The change in pose in the robot's coordinate frame since the
-   * previous pose update. For example, if a non-holonomic robot moves forward
-   * 0.01 meters and changes angle by 0.5 degrees since the previous pose
-   * update, the twist would be Twist2d{0.01_m, 0_m, 0.5_deg}.
-   *
-   * @return The new pose of the robot.
-   */
-  constexpr Pose2d Exp(const Twist2d& twist) const;
-
-  /**
-   * Returns a Twist2d that maps this pose to the end pose. If c is the output
-   * of a.Log(b), then a.Exp(c) would yield b.
-   *
-   * @param end The end pose for the transformation.
-   *
-   * @return The twist that maps this to end.
-   */
-  constexpr Twist2d Log(const Pose2d& end) const;
-
-  /**
    * Returns an affine transformation matrix representation of this pose.
    */
   constexpr Eigen::Matrix3d ToMatrix() const {
@@ -326,53 +292,6 @@ constexpr Pose2d Pose2d::TransformBy(const frc::Transform2d& other) const {
 constexpr Pose2d Pose2d::RelativeTo(const Pose2d& other) const {
   const Transform2d transform{other, *this};
   return {transform.Translation(), transform.Rotation()};
-}
-
-constexpr Pose2d Pose2d::Exp(const Twist2d& twist) const {
-  const auto dx = twist.dx;
-  const auto dy = twist.dy;
-  const auto dtheta = twist.dtheta.value();
-
-  const auto sinTheta = gcem::sin(dtheta);
-  const auto cosTheta = gcem::cos(dtheta);
-
-  double s, c;
-  if (gcem::abs(dtheta) < 1E-9) {
-    s = 1.0 - 1.0 / 6.0 * dtheta * dtheta;
-    c = 0.5 * dtheta;
-  } else {
-    s = sinTheta / dtheta;
-    c = (1 - cosTheta) / dtheta;
-  }
-
-  const Transform2d transform{Translation2d{dx * s - dy * c, dx * c + dy * s},
-                              Rotation2d{cosTheta, sinTheta}};
-
-  return *this + transform;
-}
-
-constexpr Twist2d Pose2d::Log(const Pose2d& end) const {
-  const auto transform = end.RelativeTo(*this);
-  const auto dtheta = transform.Rotation().Radians().value();
-  const auto halfDtheta = dtheta / 2.0;
-
-  const auto cosMinusOne = transform.Rotation().Cos() - 1;
-
-  double halfThetaByTanOfHalfDtheta;
-
-  if (gcem::abs(cosMinusOne) < 1E-9) {
-    halfThetaByTanOfHalfDtheta = 1.0 - 1.0 / 12.0 * dtheta * dtheta;
-  } else {
-    halfThetaByTanOfHalfDtheta =
-        -(halfDtheta * transform.Rotation().Sin()) / cosMinusOne;
-  }
-
-  const Translation2d translationPart =
-      transform.Translation().RotateBy(
-          {halfThetaByTanOfHalfDtheta, -halfDtheta}) *
-      gcem::hypot(halfThetaByTanOfHalfDtheta, halfDtheta);
-
-  return {translationPart.X(), translationPart.Y(), units::radian_t{dtheta}};
 }
 
 }  // namespace frc
