@@ -74,12 +74,12 @@ struct WPILIB_DLLEXPORT SwerveModuleAccelerations {
 
   /**
    * Returns the inverse of the current SwerveModuleAccelerations.
-   * This is equivalent to negating the acceleration magnitude.
+   * This is equivalent to rotating the acceleration by pi (or 180 degrees).
    *
    * @return The inverse of the current SwerveModuleAccelerations.
    */
   constexpr SwerveModuleAccelerations operator-() const {
-    return {-acceleration, angle + Rotation2d{180_deg}};
+    return {acceleration, angle + Rotation2d{180_deg}};
   }
 
   /**

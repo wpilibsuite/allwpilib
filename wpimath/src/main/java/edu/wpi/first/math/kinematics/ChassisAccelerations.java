@@ -20,9 +20,7 @@ import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
 /**
- * Represents the acceleration of a robot chassis. Although this class contains similar members
- * compared to a ChassisSpeeds, they do NOT represent the same thing. Whereas a ChassisSpeeds object
- * represents a robot's velocity, a ChassisAccelerations object represents a robot's acceleration.
+ * Represents the acceleration of a robot chassis.
  *
  * <p>A strictly non-holonomic drivetrain, such as a differential drive, should never have an ay
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
