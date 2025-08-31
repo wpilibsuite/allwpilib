@@ -27,7 +27,6 @@ public abstract class ClassSpecificLogger<T> {
   // Linked hashmap to maintain insert order
   private final Map<Sendable, SendableBuilder> m_sendables = new LinkedHashMap<>();
 
-  @SuppressWarnings("PMD.RedundantFieldInitializer")
   private boolean m_disabled = false;
 
   /**
