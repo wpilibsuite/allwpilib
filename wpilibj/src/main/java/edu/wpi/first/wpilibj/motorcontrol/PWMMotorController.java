@@ -38,6 +38,7 @@ public abstract class PWMMotorController extends MotorSafety
   /** Free the resource associated with the PWM channel and set the value to 0. */
   @Override
   public void close() {
+    super.close();
     SendableRegistry.remove(this);
     m_pwm.close();
   }

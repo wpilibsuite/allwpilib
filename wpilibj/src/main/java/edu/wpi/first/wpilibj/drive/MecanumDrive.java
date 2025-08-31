@@ -163,6 +163,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
 
   @Override
   public void close() {
+    super.close();
     SendableRegistry.remove(this);
   }
 

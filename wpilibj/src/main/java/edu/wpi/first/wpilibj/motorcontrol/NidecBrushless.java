@@ -51,6 +51,7 @@ public class NidecBrushless extends MotorSafety
 
   @Override
   public void close() {
+    super.close();
     SendableRegistry.remove(this);
     m_dio.close();
     m_pwm.close();
