@@ -242,7 +242,7 @@ public class Trigger implements BooleanSupplier {
     // and those scopes may become inactive.
     clearStaleBindings();
 
-    var signal = signal();
+    var signal = readSignal();
 
     if (signal == m_previousSignal) {
       // No change in the signal. Nothing to do
@@ -268,7 +268,7 @@ public class Trigger implements BooleanSupplier {
     m_previousSignal = signal;
   }
 
-  private Signal signal() {
+  private Signal readSignal() {
     if (m_condition.getAsBoolean()) {
       return Signal.HIGH;
     } else {
@@ -283,9 +283,11 @@ public class Trigger implements BooleanSupplier {
           for (var iterator = bindings.iterator(); iterator.hasNext(); ) {
             var binding = iterator.next();
             if (binding.scope().active()) {
+              // This binding's scope is still active, leave it running
               continue;
             }
 
+            // The scope is no long active. Remove the binding and immediately cancel its command.
             iterator.remove();
             m_scheduler.cancel(binding.command());
           }

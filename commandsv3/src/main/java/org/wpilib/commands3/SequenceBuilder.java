@@ -7,6 +7,7 @@ package org.wpilib.commands3;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
@@ -34,9 +35,26 @@ public class SequenceBuilder {
    * @return The builder object, for chaining
    */
   public SequenceBuilder andThen(Command next) {
-    requireNonNullParam(next, "next", "Sequence.Builder.andThen");
+    requireNonNullParam(next, "next", "SequenceBuilder.andThen");
 
     m_steps.add(next);
+    return this;
+  }
+
+  /**
+   * Adds commands to the sequence. Commands will be added to the sequence in the order they are
+   * passed to this method.
+   *
+   * @param nextCommands The next commands in the sequence
+   * @return The builder object, for chaining
+   */
+  public SequenceBuilder andThen(Command... nextCommands) {
+    requireNonNullParam(nextCommands, "nextCommands", "SequenceBuilder.andThen");
+    for (int i = 0; i < nextCommands.length; i++) {
+      requireNonNullParam(nextCommands[i], "nextCommands[" + i + "]", "SequenceBuilder.andThen");
+    }
+
+    m_steps.addAll(Arrays.asList(nextCommands));
     return this;
   }
 

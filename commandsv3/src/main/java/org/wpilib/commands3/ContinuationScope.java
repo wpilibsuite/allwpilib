@@ -12,6 +12,7 @@ import java.util.Objects;
 /** A continuation scope. */
 public final class ContinuationScope {
   // The underlying jdk.internal.vm.ContinuationScope object
+  // https://github.com/openjdk/jdk/blob/jdk-21%2B35/src/java.base/share/classes/jdk/internal/vm/ContinuationScope.java
   final Object m_continuationScope;
 
   static final Class<?> jdk_internal_vm_ContinuationScope;

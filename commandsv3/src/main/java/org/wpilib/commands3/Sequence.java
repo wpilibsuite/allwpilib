@@ -4,6 +4,8 @@
 
 package org.wpilib.commands3;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +34,12 @@ public class Sequence implements Command {
    * @param commands the commands to execute within the sequence
    */
   public Sequence(String name, List<Command> commands) {
+    requireNonNullParam(name, "name", "Sequence");
+    requireNonNullParam(commands, "commands", "Sequence");
+    for (int i = 0; i < commands.size(); i++) {
+      requireNonNullParam(commands.get(i), "commands[" + i + "]", "Sequence");
+    }
+
     m_name = name;
     m_commands.addAll(commands);
 
@@ -82,11 +90,7 @@ public class Sequence implements Command {
    * @return A builder for further configuration
    */
   public static SequenceBuilder sequence(Command... commands) {
-    var builder = new SequenceBuilder();
-    for (var command : commands) {
-      builder.andThen(command);
-    }
-    return builder;
+    return new SequenceBuilder().andThen(commands);
   }
 
   /**

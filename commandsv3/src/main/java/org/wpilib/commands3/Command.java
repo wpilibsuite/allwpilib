@@ -4,6 +4,8 @@
 
 package org.wpilib.commands3;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.units.measure.Time;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,13 +15,12 @@ import java.util.function.Consumer;
 
 /**
  * Performs some task using one or more {@link Mechanism mechanisms}. Commands are fundamentally
- * backed by a {@link Coroutine} that can be used to write normal-looking code that runs
- * asynchronously.
+ * backed by a {@link Coroutine} that can be used to write imperative code that runs asynchronously.
  *
  * <p>Programmers familiar with the earlier versions of the command framework can think of a v3
- * command similar to a v1 or v2 command that executes the lifecycle methods in a single method.
- * (Note, however, that more complex logic can be written than only what the v1 and v2 frameworks
- * allowed for!)
+ * command similar to a v1 or v2 command that executes the lifecycle methods in a single method, as
+ * demonstrated in the example below. (Note, however, that more sophisticated code than this is
+ * possible!
  *
  * <pre>{@code
  * coroutine -> {
@@ -51,7 +52,7 @@ import java.util.function.Consumer;
  * of fundamental building blocks. These built-in compositions will require every mechanism used by
  * every command in them, even if those commands aren't always running, and thus can leave certain
  * required mechanisms in an <i>uncommanded</i> state: owned, but not used, this can lead to
- * mechanisms sagging under gravity or running the motor control request they were given.
+ * mechanisms sagging under gravity or running the previous motor control request they were given.
  *
  * <h2>Advanced Usage</h2>
  *
@@ -82,10 +83,10 @@ import java.util.function.Consumer;
  *   // to run when not in use. Interrupting one of the inner commands while it's
  *   // running will cancel the entire sequence.
  *   private Command advancedScoringSequence() {
- *     return Command.noRequirements().executing(co -> {
- *       co.await(drivetrain.driveToScoringLocation());
- *       co.await(elevator.moveToScoringHeight());
- *       co.await(gripper.release());
+ *     return Command.noRequirements().executing(coroutine -> {
+ *       coroutine.await(drivetrain.driveToScoringLocation());
+ *       coroutine.await(elevator.moveToScoringHeight());
+ *       coroutine.await(gripper.release());
  *     }).named("Scoring Sequence (Advanced)");
  *   }
  * }
@@ -109,7 +110,8 @@ public interface Command {
 
   /**
    * Runs the command. Commands that need to periodically run until a goal state is reached should
-   * simply run a while loop like {@code while (!atGoal() && coroutine.yield()) { ... } }.
+   * simply run a while loop like {@code while (!atGoal()) { ... } } and call {@link
+   * Coroutine#yield()} at the end of the loop.
    *
    * <p><strong>Warning:</strong> any loops in a command must call {@code coroutine.yield()}.
    * Failure to do so will prevent anything else in your robot code from running. Commands are
@@ -137,8 +139,8 @@ public interface Command {
 
   /**
    * The mechanisms required by the command. This is used by the scheduler to determine if two
-   * commands conflict with each other. Any singular mechanism may only be required by a single
-   * running command at a time.
+   * commands conflict with each other. No mechanism may be required by more than one running
+   * command at a time.
    *
    * @return the set of mechanisms required by the command
    */
@@ -146,10 +148,10 @@ public interface Command {
 
   /**
    * The priority of the command. If a command is scheduled that conflicts with another running or
-   * pending command, the relative priority values are compared. If the scheduled command is lower
-   * priority than the running command, then it will not be scheduled and the running command will
-   * continue to run. If it is the same or higher priority, then the running command will be
-   * canceled and the scheduled command will start to run.
+   * pending command, their priority values are compared to determine which should run. If the
+   * scheduled command is lower priority than the running command, then it will not be scheduled and
+   * the running command will continue to run. If it is the same or higher priority, then the
+   * running command will be canceled and the scheduled command will start to run.
    *
    * @return the priority of the command
    */
@@ -164,14 +166,16 @@ public interface Command {
    * @return true if this command has a lower priority than the other one, false otherwise
    */
   default boolean isLowerPriorityThan(Command other) {
-    return other != null && priority() < other.priority();
+    requireNonNullParam(other, "other", "Command.isLowerPriorityThan");
+
+    return priority() < other.priority();
   }
 
   /**
    * Checks if this command requires a particular mechanism.
    *
    * @param mechanism the mechanism to check
-   * @return true if the mechanism is a member of the required mechanisms, false if not
+   * @return true if the mechanism is required, false if not
    */
   default boolean requires(Mechanism mechanism) {
     return requirements().contains(mechanism);
@@ -185,6 +189,8 @@ public interface Command {
    *     commands have completely different requirements
    */
   default boolean conflictsWith(Command other) {
+    requireNonNullParam(other, "other", "Command.conflictsWith");
+
     return !Collections.disjoint(requirements(), other.requirements());
   }
 
@@ -193,22 +199,28 @@ public interface Command {
    * canceled. This is particularly useful for autonomous routines where you want to prevent your
    * entire autonomous period spent stuck on a single action because a mechanism doesn't quite reach
    * its setpoint (for example, spinning up a flywheel or driving to a particular location on the
-   * field). The resulting command will have the same name as this one.
+   * field). The resulting command will have the same name as this one, with the timeout period
+   * appended.
    *
    * @param timeout the maximum duration that the command is permitted to run. Negative or zero
    *     values will result in the command running only once before being canceled.
    * @return the timed out command.
    */
   default Command withTimeout(Time timeout) {
-    return ParallelGroup.race(this, new WaitCommand(timeout))
+    requireNonNullParam(timeout, "timeout", "Command.withTimeout");
+
+    return race(this, new WaitCommand(timeout))
         .named(name() + " [" + timeout.toLongString() + " timeout]");
   }
 
   /**
    * Creates a command that does not require any hardware; that is, it does not affect the state of
-   * any physical objects. This is useful for commands that do some house cleaning work like
-   * resetting odometry and sensors that you don't want to interrupt a command that's controlling
-   * the mechanisms it affects.
+   * any physical objects. This is useful for commands that do some cleanup or state management,
+   * such as resetting odometry or sensors, that you don't want to interrupt a command that's
+   * controlling the mechanisms it affects.
+   *
+   * <p>More configuration options are needed after calling this function before the command can be
+   * created. See {@link StagedCommandBuilder} for details.
    *
    * @return a builder that can be used to configure the resulting command
    */
@@ -217,23 +229,31 @@ public interface Command {
   }
 
   /**
-   * Starts creating a command that requires one or more mechanisms.
+   * Creates a command that requires one or more mechanisms.
+   *
+   * <p>More configuration options are needed after calling this function before the command can be
+   * created. See {@link StagedCommandBuilder} for details.
    *
    * @param requirement The first required mechanism
    * @param rest Any other required mechanisms
    * @return A command builder
    */
   static NeedsExecutionBuilderStage requiring(Mechanism requirement, Mechanism... rest) {
+    // parameters will be null checked by the builder
     return new StagedCommandBuilder().requiring(requirement, rest);
   }
 
   /**
-   * Starts creating a command that requires some number of mechanisms.
+   * Creates command that requires some number of mechanisms.
+   *
+   * <p>More configuration options are needed after calling this function before the command can be
+   * created. See {@link StagedCommandBuilder} for details.
    *
    * @param requirements The required mechanisms. May be empty, but cannot contain null values.
    * @return A command builder
    */
   static NeedsExecutionBuilderStage requiring(Collection<Mechanism> requirements) {
+    // parameters will be null checked by the builder
     return new StagedCommandBuilder().requiring(requirements);
   }
 
@@ -241,11 +261,15 @@ public interface Command {
    * Starts creating a command that runs a group of multiple commands in parallel. The command will
    * complete when every command in the group has completed naturally.
    *
+   * <p>More configuration options are needed after calling this function before the command can be
+   * created. See {@link ParallelGroupBuilder} for details.
+   *
    * @param commands The commands to run in parallel
    * @return A command builder
    */
   static ParallelGroupBuilder parallel(Command... commands) {
-    return ParallelGroup.all(commands);
+    // parameters will be null checked by the builder
+    return new ParallelGroupBuilder().requiring(commands);
   }
 
   /**
@@ -253,11 +277,15 @@ public interface Command {
    * complete when any command in the group has completed naturally; all other commands in the group
    * will be canceled.
    *
+   * <p>More configuration options are needed after calling this function before the command can be
+   * created. See {@link ParallelGroupBuilder} for details.
+   *
    * @param commands The commands to run in parallel
    * @return A command builder
    */
   static ParallelGroupBuilder race(Command... commands) {
-    return ParallelGroup.race(commands);
+    // parameters will be null checked by the builder
+    return new ParallelGroupBuilder().optional(commands);
   }
 
   /**
@@ -265,21 +293,30 @@ public interface Command {
    * complete when the last command in the group has completed naturally. Commands in the group will
    * run in the order they're passed to this method.
    *
+   * <p>More configuration options are needed after calling this function before the command can be
+   * created. See {@link SequenceBuilder} for details.
+   *
    * @param commands The commands to run in sequence.
    * @return A command builder
    */
   static SequenceBuilder sequence(Command... commands) {
-    return Sequence.sequence(commands);
+    // parameters will be null checked by the builder
+    return new SequenceBuilder().andThen(commands);
   }
 
   /**
    * Starts creating a command that simply waits for some condition to be met. The command will not
    * require any mechanisms.
    *
+   * <p>More configuration options are needed after calling this function before the command can be
+   * created. See {@link StagedCommandBuilder} for details.
+   *
    * @param condition The condition to wait for
    * @return A command builder
    */
   static NeedsNameBuilderStage waitUntil(BooleanSupplier condition) {
+    requireNonNullParam(condition, "condition", "Command.waitUntil");
+
     return noRequirements().executing(coroutine -> coroutine.waitUntil(condition));
   }
 
@@ -287,17 +324,22 @@ public interface Command {
    * Creates a command that runs this one and ends when the end condition is met (if this command
    * has not already exited by then).
    *
+   * <p>More configuration options are needed after calling this function before the command can be
+   * created. See {@link ParallelGroupBuilder} for details.
+   *
    * @param endCondition The end condition to wait for.
    * @return The waiting command
    */
   default ParallelGroupBuilder until(BooleanSupplier endCondition) {
-    return ParallelGroup.builder()
+    requireNonNullParam(endCondition, "endCondition", "Command.until");
+
+    return new ParallelGroupBuilder()
         .optional(this, Command.waitUntil(endCondition).named("Until Condition"));
   }
 
   /**
-   * Starts creating a command sequence, starting from this command and then running the next one.
-   * More commands can be added with the builder before naming and creating the sequence.
+   * Creates a command sequence, starting from this command and then running the next one. More
+   * commands can be added with the builder before naming and creating the sequence.
    *
    * <pre>{@code
    * Sequence aThenBThenC =
@@ -311,12 +353,16 @@ public interface Command {
    * @return A sequence builder
    */
   default SequenceBuilder andThen(Command next) {
-    return Sequence.builder().andThen(this).andThen(next);
+    // parameter will be null checked by the builder
+    return new SequenceBuilder().andThen(this).andThen(next);
   }
 
   /**
-   * Starts creating a parallel command group, running this command alongside one or more other
-   * commands. The group will exit once every command has finished.
+   * Creates a parallel command group, running this command alongside one or more other commands.
+   * The group will exit once every command has finished.
+   *
+   * <p>More configuration options are needed after calling this function before the command can be
+   * created. See {@link ParallelGroupBuilder} for details.
    *
    * <pre>{@code
    * ParallelGroup abc =
@@ -329,17 +375,20 @@ public interface Command {
    * @return A parallel group builder
    */
   default ParallelGroupBuilder alongWith(Command... parallel) {
-    return ParallelGroup.builder().requiring(this).requiring(parallel);
+    return new ParallelGroupBuilder().requiring(this).requiring(parallel);
   }
 
   /**
-   * Starts creating a parallel command group, running this command alongside one or more other
-   * commands. The group will exit after any command finishes.
+   * Creates a parallel command group, running this command alongside one or more other commands.
+   * The group will exit after any command finishes.
+   *
+   * <p>More configuration options are needed after calling this function before the command can be
+   * created. See {@link ParallelGroupBuilder} for details.
    *
    * @param parallel The commands to run in parallel with this one
    * @return A parallel group builder
    */
   default ParallelGroupBuilder raceWith(Command... parallel) {
-    return ParallelGroup.builder().optional(this).optional(parallel);
+    return new ParallelGroupBuilder().optional(this).optional(parallel);
   }
 }

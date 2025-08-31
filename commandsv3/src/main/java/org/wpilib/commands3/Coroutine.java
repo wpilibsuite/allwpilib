@@ -4,6 +4,8 @@
 
 package org.wpilib.commands3;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.units.measure.Time;
 import java.util.Arrays;
 import java.util.Collection;
@@ -49,9 +51,10 @@ public final class Coroutine {
       return m_backingContinuation.yield();
     } catch (IllegalStateException e) {
       if ("Pinned: MONITOR".equals(e.getMessage())) {
+        // Raised when a continuation yields inside a synchronized block or method:
+        // https://github.com/openjdk/jdk/blob/jdk-21%2B35/src/java.base/share/classes/jdk/internal/vm/Continuation.java#L396-L402
         // Note: Not a thing in Java 24+
-        // Yielding inside a synchronized block or method
-        // Throw with an error message that's more helpful for our users
+        // Rethrow with an error message that's more helpful for our users
         throw new IllegalStateException(
             "Coroutine.yield() cannot be called inside a synchronized block or method. "
                 + "Consider using a Lock instead of synchronized, "
@@ -106,8 +109,58 @@ public final class Coroutine {
   public void fork(Command... commands) {
     requireMounted();
 
+    requireNonNullParam(commands, "commands", "Coroutine.fork");
+    for (int i = 0; i < commands.length; i++) {
+      requireNonNullParam(commands[i], "commands[" + i + "]", "Coroutine.fork");
+    }
+
     // Check for user error; there's no reason to fork conflicting commands simultaneously
     validateNoConflicts(List.of(commands));
+
+    // Shorthand; this is handy for user-defined compositions
+    for (var command : commands) {
+      m_scheduler.schedule(command);
+    }
+  }
+
+  /**
+   * Forks off some commands. Each command will run until its natural completion, the parent command
+   * exits, or the parent command cancels it. The parent command will continue executing while the
+   * forked commands run, and can resync with the forked commands using {@link
+   * #awaitAll(Collection)}.
+   *
+   * <pre>{@code
+   * Command example() {
+   *   return Command.noRequirements().executing(coroutine -> {
+   *     Collection<Command> innerCommands = ...;
+   *     coroutine.fork(innerCommands);
+   *     // ... do more things
+   *     // then sync back up with the inner commands
+   *     coroutine.awaitAll(innerCommands);
+   *   }).named("Example");
+   * }
+   * }</pre>
+   *
+   * <p>Note: forking a command that conflicts with a higher-priority command will fail. The forked
+   * command will not be scheduled, and the existing command will continue to run.
+   *
+   * @param commands The commands to fork.
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
+   */
+  public void forkAll(Collection<Command> commands) {
+    requireMounted();
+
+    validateNoConflicts(commands);
+
+    requireNonNullParam(commands, "commands", "Coroutine.fork");
+    int i = 0;
+    for (Command command : commands) {
+      requireNonNullParam(command, "commands[" + i + "]", "Coroutine.fork");
+      i++;
+    }
+
+    // Check for user error; there's no reason to fork conflicting commands simultaneously
+    validateNoConflicts(commands);
 
     // Shorthand; this is handy for user-defined compositions
     for (var command : commands) {
@@ -124,6 +177,8 @@ public final class Coroutine {
    */
   public void await(Command command) {
     requireMounted();
+
+    requireNonNullParam(command, "command", "Coroutine.await");
 
     m_scheduler.schedule(command);
 
@@ -145,6 +200,13 @@ public final class Coroutine {
   public void awaitAll(Collection<Command> commands) {
     requireMounted();
 
+    requireNonNullParam(commands, "commands", "Coroutine.awaitAll");
+    int i = 0;
+    for (Command command : commands) {
+      requireNonNullParam(command, "commands[" + i + "]", "Coroutine.awaitAll");
+      i++;
+    }
+
     validateNoConflicts(commands);
 
     for (var command : commands) {
@@ -154,8 +216,6 @@ public final class Coroutine {
     while (commands.stream().anyMatch(m_scheduler::isScheduledOrRunning)) {
       this.yield();
     }
-
-    // The scheduler will clean up anything that's still running at this point
   }
 
   /**
@@ -180,6 +240,13 @@ public final class Coroutine {
    */
   public void awaitAny(Collection<Command> commands) {
     requireMounted();
+
+    requireNonNullParam(commands, "commands", "Coroutine.awaitAny");
+    int i = 0;
+    for (Command command : commands) {
+      requireNonNullParam(command, "commands[" + i + "]", "Coroutine.awaitAny");
+      i++;
+    }
 
     validateNoConflicts(commands);
 
@@ -245,20 +312,6 @@ public final class Coroutine {
    * Waits for some duration of time to elapse. Returns immediately if the given duration is zero or
    * negative. Call this within a command or command composition to introduce a simple delay.
    *
-   * <p>Note that the resolution of the wait period is equal to the period at which {@link
-   * Scheduler#run()} is called by the robot program. If using a 20 millisecond update period, the
-   * wait will be rounded up to the nearest 20 millisecond interval; in this scenario, calling
-   * {@code wait(Milliseconds.of(1))} and {@code wait(Milliseconds.of(19))} would have identical
-   * effects.
-   *
-   * <p>Very small loop times near the loop period are sensitive to the order in which commands are
-   * executed. If a command waits for 10 ms at the end of a scheduler cycle, and then all the
-   * commands that ran before it complete or exit, and then the next cycle starts immediately, the
-   * wait will be evaluated at the <i>start</i> of that next cycle, which occurred less than 10 ms
-   * later. Therefore the wait will see not enough time has passed and only exit after an additional
-   * cycle elapses, adding an unexpected extra 20 ms to the wait time. Note that this becomes less
-   * of a problem with smaller loop periods, as the extra 1-loop delay becomes smaller.
-   *
    * <p>For example, a basic autonomous routine that drives straight for 5 seconds:
    *
    * <pre>{@code
@@ -271,11 +324,27 @@ public final class Coroutine {
    * }
    * }</pre>
    *
+   * <p>Note that the resolution of the wait period is equal to the period at which {@link
+   * Scheduler#run()} is called by the robot program. If using a 20 millisecond update period, the
+   * wait will be rounded up to the nearest 20 millisecond interval; in this scenario, calling
+   * {@code wait(Milliseconds.of(1))} and {@code wait(Milliseconds.of(19))} would have identical
+   * effects.
+   *
+   * <p>Very small loop times near the loop period are sensitive to the order in which commands are
+   * executed. If a command waits for 10 ms at the end of a scheduler cycle, and then all the
+   * commands that ran before it complete or exit, and then the next cycle starts immediately, the
+   * wait will be evaluated at the <i>start</i> of that next cycle, which occurred less than 10 ms
+   * later. Therefore, the wait will see not enough time has passed and only exit after an
+   * additional cycle elapses, adding an unexpected extra 20 ms to the wait time. This becomes less
+   * of a problem with smaller loop periods, as the extra 1-loop delay becomes smaller.
+   *
    * @param duration the duration of time to wait
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
   public void wait(Time duration) {
     requireMounted();
+
+    requireNonNullParam(duration, "duration", "Coroutine.wait");
 
     await(new WaitCommand(duration));
   }
@@ -288,6 +357,8 @@ public final class Coroutine {
    */
   public void waitUntil(BooleanSupplier condition) {
     requireMounted();
+
+    requireNonNullParam(condition, "condition", "Coroutine.waitUntil");
 
     while (!condition.getAsBoolean()) {
       this.yield();

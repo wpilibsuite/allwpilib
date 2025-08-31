@@ -4,6 +4,8 @@
 
 package org.wpilib.commands3;
 
+import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -35,6 +37,11 @@ public class ParallelGroupBuilder {
    * @return The builder object, for chaining
    */
   public ParallelGroupBuilder optional(Command... commands) {
+    requireNonNullParam(commands, "commands", "ParallelGroupBuilder.optional");
+    for (int i = 0; i < commands.length; i++) {
+      requireNonNullParam(commands[i], "commands[" + i + "]", "ParallelGroupBuilder.optional");
+    }
+
     m_commands.addAll(Arrays.asList(commands));
     return this;
   }
@@ -47,6 +54,11 @@ public class ParallelGroupBuilder {
    * @return The builder object, for chaining
    */
   public ParallelGroupBuilder requiring(Command... commands) {
+    requireNonNullParam(commands, "commands", "ParallelGroupBuilder.requiring");
+    for (int i = 0; i < commands.length; i++) {
+      requireNonNullParam(commands[i], "commands[" + i + "]", "ParallelGroupBuilder.requiring");
+    }
+
     m_requiredCommands.addAll(Arrays.asList(commands));
     m_commands.addAll(m_requiredCommands);
     return this;
@@ -93,7 +105,7 @@ public class ParallelGroupBuilder {
    * {@code .until(() -> conditionA()).until(() -> conditionB())}), then the last end condition
    * added will be used and any previously configured condition will be overridden.
    *
-   * @param condition The end condition for the group
+   * @param condition The end condition for the group. May be null.
    * @return The builder object, for chaining
    */
   public ParallelGroupBuilder until(BooleanSupplier condition) {
@@ -110,6 +122,8 @@ public class ParallelGroupBuilder {
    * @return The built group
    */
   public ParallelGroup named(String name) {
+    requireNonNullParam(name, "name", "ParallelGroupBuilder.named");
+
     var group = new ParallelGroup(name, m_commands, m_requiredCommands);
     if (m_endCondition == null) {
       // No custom end condition, return the group as is

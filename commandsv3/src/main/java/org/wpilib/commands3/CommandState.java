@@ -4,6 +4,8 @@
 
 package org.wpilib.commands3;
 
+import static java.util.Objects.requireNonNull;
+
 /** Represents the state of a command as it is executed by the scheduler. */
 final class CommandState {
   // Two billion unique IDs should be enough for anybody.
@@ -31,10 +33,10 @@ final class CommandState {
    * @param binding The binding that caused the command to be scheduled.
    */
   CommandState(Command command, Command parent, Coroutine coroutine, Binding binding) {
-    m_command = command;
-    m_parent = parent;
-    m_coroutine = coroutine;
-    m_binding = binding;
+    m_command = requireNonNull(command, "WPILib bug: command state given null command");
+    m_parent = parent; // allowed to be null
+    m_coroutine = requireNonNull(coroutine, "WPILib bug: command state given null coroutine");
+    m_binding = requireNonNull(binding, "WPILib bug: command state given null binding");
 
     // This is incredibly non-thread safe, but nobody should be using the command framework across
     // multiple threads anyway. Worst case scenario, we'll get duplicate IDs for commands scheduled
@@ -54,7 +56,6 @@ final class CommandState {
     return m_coroutine;
   }
 
-  // may return null
   public Binding binding() {
     return m_binding;
   }

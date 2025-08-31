@@ -28,6 +28,7 @@ import java.lang.invoke.WrongMethodTypeException;
  */
 public final class Continuation {
   // The underlying jdk.internal.vm.Continuation object
+  // https://github.com/openjdk/jdk/blob/jdk-21%2B35/src/java.base/share/classes/jdk/internal/vm/Continuation.java
   private final Object m_continuation;
 
   static final Class<?> jdk_internal_vm_Continuation;
@@ -91,6 +92,20 @@ public final class Continuation {
     }
   }
 
+  /**
+   * Used to wrap any checked exceptions bubbled from when calling the internal continuation methods
+   * via reflection. Per the Continuation API as of Java 21, none of the methods we're calling will
+   * throw unchecked exceptions (IllegalState or other runtime exceptions, yes, and we bubble those
+   * up directly); however, the MethodHandle API's `invoke` method has `throws Throwable` in its
+   * signature and we have to handle it.
+   */
+  @SuppressWarnings("PMD.DoNotExtendJavaLangError")
+  static final class InternalContinuationError extends Error {
+    InternalContinuationError(String message, Throwable cause) {
+      super(message, cause);
+    }
+  }
+
   private final ContinuationScope m_scope;
 
   /**
@@ -121,15 +136,17 @@ public final class Continuation {
   public boolean yield() {
     try {
       return (boolean) YIELD.invoke(m_scope.m_continuationScope);
-    } catch (RuntimeException e) {
+    } catch (RuntimeException | Error e) {
       throw e;
     } catch (Throwable t) {
-      throw new Error(t);
+      throw new InternalContinuationError(
+          "Continuation.yield() encountered an unexpected error", t);
     }
   }
 
   /**
-   * Mounts and runs the continuation body. If suspended, continues it from the last suspend point.
+   * Mounts and runs the continuation body until the body calls {@link #yield()}. If the
+   * continuation is suspended, it will continue from the most recent yield point.
    */
   @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.AvoidCatchingGenericException"})
   public void run() {
@@ -141,7 +158,7 @@ public final class Continuation {
       // The bound task threw an exception; re-throw it
       throw e;
     } catch (Throwable t) {
-      throw new RuntimeException(t);
+      throw new InternalContinuationError("Continuation.run() encountered an unexpected error", t);
     }
   }
 
@@ -157,7 +174,8 @@ public final class Continuation {
     } catch (RuntimeException | Error e) {
       throw e;
     } catch (Throwable t) {
-      throw new RuntimeException(t);
+      throw new InternalContinuationError(
+          "Continuation.isDone() encountered an unexpected error", t);
     }
   }
 
@@ -185,7 +203,8 @@ public final class Continuation {
       // It only assigns to a field, no way to throw
       // However, if the invocation fails for some reason, we'll end up with an
       // IllegalStateException when attempting to run an unmounted continuation
-      throw new RuntimeException(t);
+      throw new InternalContinuationError(
+          "Continuation.mountContinuation() encountered an unexpected error", t);
     }
   }
 

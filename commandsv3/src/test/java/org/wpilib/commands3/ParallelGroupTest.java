@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -114,7 +115,7 @@ class ParallelGroupTest {
                 })
             .named("C2");
 
-    var race = new ParallelGroup("Race", List.of(c1, c2), List.of());
+    var race = new ParallelGroup("Race", List.of(), List.of(c1, c2));
     m_scheduler.schedule(race);
 
     // First call to run() should schedule the commands
@@ -157,7 +158,7 @@ class ParallelGroupTest {
                 })
             .named("Command");
 
-    var inner = ParallelGroup.all(command).named("Inner");
+    var inner = new ParallelGroup("Inner", Set.of(command), Set.of());
     var outer = ParallelGroup.all(inner).named("Outer");
 
     // Scheduling: Outer group should be on deck

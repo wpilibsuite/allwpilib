@@ -6,6 +6,7 @@ package org.wpilib.commands3;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -18,8 +19,8 @@ import java.util.Set;
  * has reached its completion condition will be cancelled.
  */
 public class ParallelGroup implements Command {
-  private final Collection<Command> m_commands = new LinkedHashSet<>();
   private final Collection<Command> m_requiredCommands = new HashSet<>();
+  private final Collection<Command> m_optionalCommands = new LinkedHashSet<>();
   private final Set<Mechanism> m_requirements = new HashSet<>();
   private final String m_name;
   private final int m_priority;
@@ -28,29 +29,33 @@ public class ParallelGroup implements Command {
    * Creates a new parallel group.
    *
    * @param name The name of the group.
-   * @param allCommands All the commands to run in parallel.
-   * @param requiredCommands The commands that are required to completed for the group to finish. If
-   *     this is empty, then the group will finish when <i>any</i> command in it has completed.
+   * @param requiredCommands The commands that are required to complete for the group to finish. If
+   *     this is empty, then the group will finish when <i>any</i> optional command completes.
+   * @param optionalCommands The commands that do not need to complete for the group to finish. If
+   *     this is empty, then the group will finish when <i>all</i> required commands complete.
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public ParallelGroup(
-      String name, Collection<Command> allCommands, Collection<Command> requiredCommands) {
+      String name, Collection<Command> requiredCommands, Collection<Command> optionalCommands) {
     requireNonNullParam(name, "name", "ParallelGroup");
-    requireNonNullParam(allCommands, "allCommands", "ParallelGroup");
     requireNonNullParam(requiredCommands, "requiredCommands", "ParallelGroup");
+    requireNonNullParam(optionalCommands, "optionalCommands", "ParallelGroup");
 
-    allCommands.forEach(
-        c -> {
-          requireNonNullParam(c, "allCommands[x]", "ParallelGroup");
-        });
-    requiredCommands.forEach(
-        c -> {
-          requireNonNullParam(c, "requiredCommands[x]", "ParallelGroup");
-        });
-
-    if (!allCommands.containsAll(requiredCommands)) {
-      throw new IllegalArgumentException("Required commands must also be composed");
+    int i = 0;
+    for (Command requiredCommand : requiredCommands) {
+      requireNonNullParam(requiredCommand, "requiredCommands[" + i + "]", "ParallelGroup");
+      i++;
     }
+
+    i = 0;
+    for (Command c : optionalCommands) {
+      requireNonNullParam(c, "optionalCommands[" + i + "]", "ParallelGroup");
+      i++;
+    }
+
+    var allCommands = new ArrayList<Command>();
+    allCommands.addAll(requiredCommands);
+    allCommands.addAll(optionalCommands);
 
     for (Command c1 : allCommands) {
       for (Command c2 : allCommands) {
@@ -70,7 +75,7 @@ public class ParallelGroup implements Command {
     }
 
     m_name = name;
-    m_commands.addAll(allCommands);
+    m_optionalCommands.addAll(optionalCommands);
     m_requiredCommands.addAll(requiredCommands);
 
     for (var command : allCommands) {
@@ -104,17 +109,17 @@ public class ParallelGroup implements Command {
 
   @Override
   public void run(Coroutine coroutine) {
+    coroutine.forkAll(m_optionalCommands);
+
     if (m_requiredCommands.isEmpty()) {
-      // No command is explicitly required to complete
-      // Schedule everything and wait for the first one to complete
-      coroutine.awaitAny(m_commands);
+      // No required commands - just wait for the first optional command to finish
+      coroutine.awaitAny(m_optionalCommands);
     } else {
-      // At least one command is required to complete
-      // Schedule all the non-required commands (the scheduler will automatically cancel them
-      // when this group completes), and await completion of all the required commands
-      m_commands.forEach(coroutine.scheduler()::schedule);
+      // Wait for every required command to finish
       coroutine.awaitAll(m_requiredCommands);
     }
+
+    // The scheduler will cancel any optional child commands that are still running when
   }
 
   @Override
