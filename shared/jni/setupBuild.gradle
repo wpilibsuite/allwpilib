@@ -203,6 +203,7 @@ model {
                     source {
                         srcDirs 'src/test/native/cpp'
                         include '**/*.cpp'
+                        exclude '**/TestCatch2.cpp', '**/catch2main.cpp'
                     }
                     exportedHeaders {
                         srcDirs 'src/test/native/include', 'src/main/native/cpp', "$buildDir/generated/source/proto/main/cpp"
@@ -270,11 +271,6 @@ apply from: "${rootDir}/shared/cppJavaDesktopTestTask.gradle"
 
 ext.getJniSpecClass = {
     return JniNativeLibrarySpec
-}
-
-tasks.withType(RunTestExecutable) {
-    args "--gtest_output=xml:test_detail.xml"
-    outputs.dir outputDir
 }
 
 apply from: "${rootDir}/shared/jni/publish.gradle"

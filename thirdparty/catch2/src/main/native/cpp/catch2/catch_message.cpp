@@ -7,7 +7,6 @@
 // SPDX-License-Identifier: BSL-1.0
 #include <catch2/catch_message.hpp>
 #include <catch2/interfaces/catch_interfaces_capture.hpp>
-#include <catch2/internal/catch_uncaught_exceptions.hpp>
 #include <catch2/internal/catch_enforce.hpp>
 #include <catch2/internal/catch_move_and_forward.hpp>
 
@@ -31,7 +30,7 @@ namespace Catch {
     }
 
     ScopedMessage::~ScopedMessage() {
-        if ( !uncaught_exceptions() && !m_moved ){
+        if ( !m_moved ){
             getResultCapture().popScopedMessage(m_info);
         }
     }
@@ -101,10 +100,9 @@ namespace Catch {
         m_messages.back().message += " := ";
     }
     Capturer::~Capturer() {
-        if ( !uncaught_exceptions() ){
-            assert( m_captured == m_messages.size() );
-            for( size_t i = 0; i < m_captured; ++i  )
-                m_resultCapture.popScopedMessage( m_messages[i] );
+        assert( m_captured == m_messages.size() );
+        for ( size_t i = 0; i < m_captured; ++i ) {
+            m_resultCapture.popScopedMessage( m_messages[i] );
         }
     }
 

@@ -278,20 +278,41 @@ cc_library(
     strip_include_prefix = "src/generated/test/native/cpp",
 )
 
+CATCH2_SRCS = [
+    "src/test/native/cpp/TestCatch2.cpp",
+    "src/test/native/cpp/catch2main.cpp",
+]
+
 cc_test(
-    name = "wpiutil-cpp-test",
+    name = "wpiutil-gtest-cpp-test",
     size = "small",
-    srcs = glob([
-        "src/test/native/cpp/**",
-        "src/generated/test/native/cpp/*",
-    ]),
+    srcs = glob(
+        [
+            "src/test/native/cpp/**",
+            "src/generated/test/native/cpp/*",
+        ],
+        exclude = CATCH2_SRCS,
+    ),
     linkstatic = True,
     tags = ["no-tsan"],  # TODO(pj.reiniger) Find problem
     deps = [
         ":nanopb-test-headers",
         ":wpiutil",
         ":wpiutil-testlib",
+        "//thirdparty/catch2:catch2.static",
         "//thirdparty/googletest",
+    ],
+)
+
+cc_test(
+    name = "wpiutil-catch2-cpp-test",
+    size = "small",
+    srcs = CATCH2_SRCS,
+    linkstatic = True,
+    deps = [
+        ":wpiutil",
+        ":wpiutil-testlib",
+        "//thirdparty/catch2:catch2.static",
     ],
 )
 

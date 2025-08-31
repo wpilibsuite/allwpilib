@@ -37,6 +37,7 @@
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/catch_test_case_info.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_test_run_info.hpp>
 #include <catch2/catch_test_spec.hpp>
 #include <catch2/catch_timer.hpp>
 #include <catch2/catch_tostring.hpp>
@@ -65,6 +66,7 @@
 #include <catch2/internal/catch_debug_console.hpp>
 #include <catch2/internal/catch_debugger.hpp>
 #include <catch2/internal/catch_decomposer.hpp>
+#include <catch2/internal/catch_deprecation_macro.hpp>
 #include <catch2/internal/catch_enforce.hpp>
 #include <catch2/internal/catch_enum_values_registry.hpp>
 #include <catch2/internal/catch_errno_guard.hpp>
@@ -117,15 +119,16 @@
 #include <catch2/internal/catch_test_failure_exception.hpp>
 #include <catch2/internal/catch_test_macro_impl.hpp>
 #include <catch2/internal/catch_test_registry.hpp>
-#include <catch2/internal/catch_test_run_info.hpp>
 #include <catch2/internal/catch_test_spec_parser.hpp>
 #include <catch2/internal/catch_textflow.hpp>
+#include <catch2/internal/catch_thread_support.hpp>
 #include <catch2/internal/catch_to_string.hpp>
 #include <catch2/internal/catch_uncaught_exceptions.hpp>
 #include <catch2/internal/catch_uniform_floating_point_distribution.hpp>
 #include <catch2/internal/catch_uniform_integer_distribution.hpp>
 #include <catch2/internal/catch_unique_name.hpp>
 #include <catch2/internal/catch_unique_ptr.hpp>
+#include <catch2/internal/catch_unreachable.hpp>
 #include <catch2/internal/catch_void_type.hpp>
 #include <catch2/internal/catch_wildcard_pattern.hpp>
 #include <catch2/internal/catch_xmlwriter.hpp>

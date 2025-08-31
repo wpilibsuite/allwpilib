@@ -93,9 +93,7 @@ namespace Catch {
                     AssertionReaction &reaction ) = 0;
 
 
-
         virtual bool lastAssertionPassed() = 0;
-        virtual void assertionPassed() = 0;
 
         // Deprecated, do not use:
         virtual std::string getCurrentTestName() const = 0;

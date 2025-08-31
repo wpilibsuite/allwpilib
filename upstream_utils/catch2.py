@@ -2,57 +2,54 @@
 
 import os
 import shutil
+from pathlib import Path
 
-from upstream_utils import Lib, comment_out_invalid_includes, walk_cwd_and_copy_if
+from upstream_utils import Lib, walk_cwd_and_copy_if
 
 
-def copy_upstream_src(wpilib_root):
-    upstream_root = os.path.abspath(".")
-    catch2 = os.path.join(wpilib_root, "thirdparty/catch2")
+def copy_upstream_src(wpilib_root: Path):
+    upstream_root = Path(".").absolute()
+    catch2 = wpilib_root / "thirdparty/catch2"
 
     # Delete old install
-    shutil.rmtree(
-        os.path.join(catch2, "src/main/native"),
-        ignore_errors=True,
-    )
-    shutil.rmtree(
-        os.path.join(catch2, "cmake/"),
-        ignore_errors=True,
-    )
+    for d in ["src/main/native", "extras"]:
+        shutil.rmtree(catch2 / d, ignore_errors=True)
 
     # Copy Catch2 source files into allwpilib
-    src_files = walk_cwd_and_copy_if(
-        lambda dp, f: f == "Catch.cmake",
-        os.path.join(catch2, "cmake/modules"),
+    walk_cwd_and_copy_if(
+        lambda dp, f: f == "Catch.cmake" or f == "CatchAddTests.cmake",
+        catch2,
     )
-    src_files = walk_cwd_and_copy_if(
-        lambda dp, f: f == "Clara.hpp",
-        os.path.join(catch2, "src/main/native/include/third_party"),
+    os.chdir(upstream_root / "src")
+    walk_cwd_and_copy_if(
+        lambda dp, f: f.endswith(".cpp")
+        and "catch2" in dp.parts
+        and f != "catch_main.cpp",
+        catch2 / "src/main/native/cpp",
     )
-    os.chdir(os.path.join(upstream_root, "src"))
-    src_files = walk_cwd_and_copy_if(
-        lambda dp, f: f.endswith(".cpp") and dp.startswith("./catch2"),
-        os.path.join(catch2, "src/main/native/cpp"),
-    )
-    src_files = walk_cwd_and_copy_if(
-        lambda dp, f: (f.endswith(".hpp") or f.endswith(".hpp.in"))
-        and (dp.startswith("./third_party") or dp.startswith("./catch2")),
-        os.path.join(catch2, "src/main/native/include"),
+    walk_cwd_and_copy_if(
+        lambda dp, f: f.endswith(".hpp")
+        and ("third_party" in dp.parts or "catch2" in dp.parts),
+        catch2 / "src/main/native/include",
     )
 
-    for f in src_files:
-        comment_out_invalid_includes(
-            f,
-            [
-                os.path.join(catch2, "src/main/native/include"),
-            ],
-        )
+    # Configure the user config as Catch2's CMake system would've, which is to not define anything
+    with open(upstream_root / "src/catch2/catch_user_config.hpp.in") as f:
+        content = f.read()
+        content = content.replace("#cmakedefine", "// #undef")
+        content = content.replace("@CATCH_CONFIG_DEFAULT_REPORTER@", "console")
+        content = content.replace("@CATCH_CONFIG_CONSOLE_WIDTH@", "80")
+
+    with open(
+        catch2 / "src/main/native/include/catch2/catch_user_config.hpp", "w"
+    ) as f:
+        f.write(content)
 
 
 def main():
     name = "catch2"
     url = "https://github.com/catchorg/Catch2.git"
-    tag = "0321d2fce328b5e2ad106a8230ff20e0d5bf5501"
+    tag = "v3.10.0"
 
     patch_options = {
         "ignore_whitespace": True,

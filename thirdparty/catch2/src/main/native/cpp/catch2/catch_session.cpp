@@ -25,7 +25,6 @@
 #include <catch2/internal/catch_stdstreams.hpp>
 #include <catch2/internal/catch_istream.hpp>
 
-#include <algorithm>
 #include <cassert>
 #include <exception>
 #include <iomanip>
@@ -34,14 +33,6 @@
 namespace Catch {
 
     namespace {
-        static constexpr int TestFailureExitCode = 42;
-        static constexpr int UnspecifiedErrorExitCode = 1;
-        static constexpr int AllTestsSkippedExitCode = 4;
-        static constexpr int NoTestsRunExitCode = 2;
-        static constexpr int UnmatchedTestSpecExitCode = 3;
-        static constexpr int InvalidTestSpecExitCode = 5;
-
-
         IEventListenerPtr createReporter(std::string const& reporterName, ReporterConfig&& config) {
             auto reporter = Catch::getRegistryHub().getReporterRegistry().create(reporterName, CATCH_MOVE(config));
             CATCH_ENFORCE(reporter, "No reporter registered with name: '" << reporterName << '\'');

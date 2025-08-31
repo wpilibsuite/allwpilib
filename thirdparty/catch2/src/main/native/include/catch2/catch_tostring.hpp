@@ -64,18 +64,14 @@ namespace Catch {
           return rawMemoryToString( &object, sizeof(object) );
         }
 
-        template<typename T>
-        class IsStreamInsertable {
-            template<typename Stream, typename U>
-            static auto test(int)
-                -> decltype(std::declval<Stream&>() << std::declval<U>(), std::true_type());
+        template<typename T,typename = void>
+        static constexpr bool IsStreamInsertable_v = false;
 
-            template<typename, typename>
-            static auto test(...)->std::false_type;
-
-        public:
-            static const bool value = decltype(test<std::ostream, const T&>(0))::value;
-        };
+        template <typename T>
+        static constexpr bool IsStreamInsertable_v<
+            T,
+            decltype( void( std::declval<std::ostream&>() << std::declval<T>() ) )> =
+            true;
 
         template<typename E>
         std::string convertUnknownEnumToString( E e );
@@ -120,7 +116,7 @@ namespace Catch {
     struct StringMaker {
         template <typename Fake = T>
         static
-        std::enable_if_t<::Catch::Detail::IsStreamInsertable<Fake>::value, std::string>
+        std::enable_if_t<::Catch::Detail::IsStreamInsertable_v<Fake>, std::string>
             convert(const Fake& value) {
                 ReusableStringStream rss;
                 // NB: call using the function-like syntax to avoid ambiguity with
@@ -131,7 +127,7 @@ namespace Catch {
 
         template <typename Fake = T>
         static
-        std::enable_if_t<!::Catch::Detail::IsStreamInsertable<Fake>::value, std::string>
+        std::enable_if_t<!::Catch::Detail::IsStreamInsertable_v<Fake>, std::string>
             convert( const Fake& value ) {
 #if !defined(CATCH_CONFIG_FALLBACK_STRINGIFIER)
             return Detail::convertUnstreamable(value);
@@ -143,11 +139,17 @@ namespace Catch {
 
     namespace Detail {
 
+        std::string makeExceptionHappenedString();
+
         // This function dispatches all stringification requests inside of Catch.
         // Should be preferably called fully qualified, like ::Catch::Detail::stringify
         template <typename T>
-        std::string stringify(const T& e) {
-            return ::Catch::StringMaker<std::remove_cv_t<std::remove_reference_t<T>>>::convert(e);
+        std::string stringify( const T& e ) {
+            CATCH_TRY {
+                return ::Catch::StringMaker<
+                    std::remove_cv_t<std::remove_reference_t<T>>>::convert( e );
+            }
+            CATCH_CATCH_ALL { return makeExceptionHappenedString(); }
         }
 
         template<typename E>
@@ -523,7 +525,7 @@ namespace Catch {
     }
 
     template<typename R>
-    struct StringMaker<R, std::enable_if_t<is_range<R>::value && !::Catch::Detail::IsStreamInsertable<R>::value>> {
+    struct StringMaker<R, std::enable_if_t<is_range<R>::value && !::Catch::Detail::IsStreamInsertable_v<R>>> {
         static std::string convert( R const& range ) {
             return rangeToString( range );
         }
@@ -630,13 +632,19 @@ struct ratio_string<std::milli> {
     template<typename Duration>
     struct StringMaker<std::chrono::time_point<std::chrono::system_clock, Duration>> {
         static std::string convert(std::chrono::time_point<std::chrono::system_clock, Duration> const& time_point) {
-            auto converted = std::chrono::system_clock::to_time_t(time_point);
+            const auto systemish = std::chrono::time_point_cast<
+                std::chrono::system_clock::duration>( time_point );
+            const auto as_time_t = std::chrono::system_clock::to_time_t( systemish );
 
 #ifdef _MSC_VER
             std::tm timeInfo = {};
-            gmtime_s(&timeInfo, &converted);
+            const auto err = gmtime_s( &timeInfo, &as_time_t );
+            if ( err ) {
+                return "gmtime from provided timepoint has failed. This "
+                       "happens e.g. with pre-1970 dates using Microsoft libc";
+            }
 #else
-            std::tm* timeInfo = std::gmtime(&converted);
+            std::tm* timeInfo = std::gmtime( &as_time_t );
 #endif
 
             auto const timeStampSize = sizeof("2017-01-16T17:06:45Z");

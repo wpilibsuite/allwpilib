@@ -12,7 +12,6 @@
 #include <catch2/internal/catch_stringref.hpp>
 
 #include <chrono>
-#include <iosfwd>
 #include <string>
 #include <vector>
 

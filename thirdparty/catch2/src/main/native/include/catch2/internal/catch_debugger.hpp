@@ -14,6 +14,17 @@ namespace Catch {
     bool isDebuggerActive();
 }
 
+#if !defined( CATCH_TRAP ) && defined( __clang__ ) && defined( __has_builtin )
+#    if __has_builtin( __builtin_debugtrap )
+#        define CATCH_TRAP() __builtin_debugtrap()
+#    endif
+#endif
+
+#if !defined( CATCH_TRAP ) && defined( _MSC_VER )
+#    define CATCH_TRAP() __debugbreak()
+#endif
+
+#if !defined(CATCH_TRAP) // If we couldn't use compiler-specific impl from above, we get into platform-specific options
 #ifdef CATCH_PLATFORM_MAC
 
     #if defined(__i386__) || defined(__x86_64__)
@@ -49,15 +60,15 @@ namespace Catch {
 
         #define CATCH_TRAP() raise(SIGTRAP)
     #endif
-#elif defined(_MSC_VER)
-    #define CATCH_TRAP() __debugbreak()
 #elif defined(__MINGW32__)
     extern "C" __declspec(dllimport) void __stdcall DebugBreak();
     #define CATCH_TRAP() DebugBreak()
 #endif
+#endif // ^^ CATCH_TRAP is not defined yet, so we define it
 
-#ifndef CATCH_BREAK_INTO_DEBUGGER
-    #ifdef CATCH_TRAP
+
+#if !defined(CATCH_BREAK_INTO_DEBUGGER)
+    #if defined(CATCH_TRAP)
         #define CATCH_BREAK_INTO_DEBUGGER() []{ if( Catch::isDebuggerActive() ) { CATCH_TRAP(); } }()
     #else
         #define CATCH_BREAK_INTO_DEBUGGER() []{}()
