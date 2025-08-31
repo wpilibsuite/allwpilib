@@ -137,32 +137,6 @@ subprojects {
         options.addStringOption("docencoding", "utf-8")
         options.addStringOption("encoding", "utf-8")
     }
-
-    // Sign outputs with Developer ID
-    tasks.withType(AbstractLinkTask) { task ->
-        task.inputs.property "HasDeveloperId", project.hasProperty("developerID")
-
-        if (project.hasProperty("developerID")) {
-            // Don't sign any executables because codesign complains
-            // about relative rpath.
-            if (!(task instanceof LinkExecutable)) {
-                doLast {
-                    // Get path to binary.
-                    String path = task.getLinkedFile().getAsFile().get().getAbsolutePath()
-                    exec {
-                        workingDir rootDir
-                        def args = [
-                            "sh",
-                            "-c",
-                            "codesign --force --strict --timestamp --options=runtime " +
-                            "--verbose -s ${project.findProperty("developerID")} ${path}"
-                        ]
-                        commandLine args
-                    }
-                }
-            }
-        }
-    }
 }
 
 ext.getCurrentArch = {
