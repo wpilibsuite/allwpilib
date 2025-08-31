@@ -246,12 +246,6 @@ model {
 }
 
 apply from: "${rootDir}/shared/cppDesktopTestTask.gradle"
-
-tasks.withType(RunTestExecutable) {
-    args "--gtest_output=xml:test_detail.xml"
-    outputs.dir outputDir
-}
-
 apply from: 'publish.gradle'
 
 def oldWpilibVersionFile = file('src/main/native/cpp/WPILibVersion.cpp')

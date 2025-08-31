@@ -1,0 +1,10 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "catch2.static",
+    srcs = glob(["src/main/native/cpp/**"]),
+    hdrs = glob(["src/main/native/include/**"]),
+    includes = ["src/main/native/include"],
+    strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
+)
