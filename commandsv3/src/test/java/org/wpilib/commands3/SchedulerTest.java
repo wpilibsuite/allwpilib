@@ -647,6 +647,19 @@ class SchedulerTest {
   }
 
   @Test
+  void periodicSideload() {
+    AtomicInteger count = new AtomicInteger(0);
+    m_scheduler.addPeriodic(count::incrementAndGet);
+    assertEquals(0, count.get());
+
+    m_scheduler.run();
+    assertEquals(1, count.get());
+
+    m_scheduler.run();
+    assertEquals(2, count.get());
+  }
+
+  @Test
   void nestedMechanisms() {
     var superstructure =
         new Mechanism("Superstructure", m_scheduler) {

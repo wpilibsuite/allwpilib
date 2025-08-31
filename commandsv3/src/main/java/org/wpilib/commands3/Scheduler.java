@@ -226,8 +226,9 @@ public class Scheduler implements ProtobufSerializable {
     // TODO: Add a unit test for this
     sideload(
         coroutine -> {
-          while (coroutine.yield()) {
+          while (true) {
             callback.run();
+            coroutine.yield();
           }
         });
   }
