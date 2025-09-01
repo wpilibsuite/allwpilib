@@ -49,7 +49,7 @@ class FsEvent final : public HandleImpl<FsEvent, uv_fs_event_t> {
    * Start watching the specified path for changes.
    *
    * @param path Path to watch for changes
-   * @param events Bitmask of event flags.  Only UV_FS_EVENT_RECURSIVE is
+   * @param flags Bitmask of event flags.  Only UV_FS_EVENT_RECURSIVE is
    *               supported (and only on OSX and Windows).
    */
   void Start(std::string_view path, unsigned int flags = 0);
