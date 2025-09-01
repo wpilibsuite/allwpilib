@@ -15,12 +15,12 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
-import org.wpilib.commands3.button.CommandXboxController;
 
 /**
  * Triggers allow users to specify conditions for when commands should run. Triggers can be set up
- * to read from joystick and controller buttons (eg {@link CommandXboxController#x()}) or be
- * customized to read sensor values or any other arbitrary true/false condition.
+ * to read from joystick and controller buttons (eg {@link
+ * org.wpilib.commands3.button.CommandXboxController#x()}) or be customized to read sensor values or
+ * any other arbitrary true/false condition.
  *
  * <p>It is very easy to link a button to a command. For instance, you could link the trigger button
  * of a joystick to a "score" command.
@@ -30,7 +30,8 @@ import org.wpilib.commands3.button.CommandXboxController;
  *
  * <p>Trigger bindings created inside a running command will only be active while that command is
  * running. This is useful for defining trigger-based behavior only in a certain scope and avoids
- * needing to create dozens of global triggers.
+ * needing to create dozens of global triggers. Any commands scheduled by these triggers will be
+ * canceled when the enclosing command exits.
  *
  * <pre>{@code
  * Command shootWhileAiming = Command.noRequirements().executing(co -> {
