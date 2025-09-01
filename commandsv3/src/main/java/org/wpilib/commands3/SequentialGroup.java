@@ -21,7 +21,7 @@ import java.util.Set;
  * entire duration of the sequence. This means that a mechanism owned by one command in the
  * sequence, but not by a later one, will be <i>uncommanded</i> while that later command executes.
  */
-public final class Sequence implements Command {
+public final class SequentialGroup implements Command {
   private final String m_name;
   private final List<Command> m_commands = new ArrayList<>();
   private final Set<Mechanism> m_requirements = new HashSet<>();
@@ -33,11 +33,11 @@ public final class Sequence implements Command {
    * @param name the name of the sequence
    * @param commands the commands to execute within the sequence
    */
-  Sequence(String name, List<Command> commands) {
-    requireNonNullParam(name, "name", "Sequence");
-    requireNonNullParam(commands, "commands", "Sequence");
+  SequentialGroup(String name, List<Command> commands) {
+    requireNonNullParam(name, "name", "SequentialGroup");
+    requireNonNullParam(commands, "commands", "SequentialGroup");
     for (int i = 0; i < commands.size(); i++) {
-      requireNonNullParam(commands.get(i), "commands[" + i + "]", "Sequence");
+      requireNonNullParam(commands.get(i), "commands[" + i + "]", "SequentialGroup");
     }
 
     m_name = name;
@@ -75,6 +75,6 @@ public final class Sequence implements Command {
 
   @Override
   public String toString() {
-    return "Sequence[name=" + m_name + "]";
+    return "SequentialGroup[name=" + m_name + "]";
   }
 }

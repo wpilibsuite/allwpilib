@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class SequenceTest {
+class SequentialGroupTest {
   private Scheduler m_scheduler;
 
   @BeforeEach
@@ -23,7 +23,7 @@ class SequenceTest {
   void single() {
     var command = Command.noRequirements().executing(Coroutine::yield).named("The Command");
 
-    var sequence = new Sequence("The Sequence", List.of(command));
+    var sequence = new SequentialGroup("The Sequence", List.of(command));
     m_scheduler.schedule(sequence);
 
     // First run - the composed command starts and yields; sequence yields
@@ -42,7 +42,7 @@ class SequenceTest {
     var c1 = Command.noRequirements().executing(Coroutine::yield).named("C1");
     var c2 = Command.noRequirements().executing(Coroutine::yield).named("C2");
 
-    var sequence = new Sequence("C1 > C2", List.of(c1, c2));
+    var sequence = new SequentialGroup("C1 > C2", List.of(c1, c2));
     m_scheduler.schedule(sequence);
 
     // First run - c1 is scheduled and starts

@@ -653,7 +653,7 @@ class SchedulerTest {
     var mechanism = new Mechanism("The mechanism", m_scheduler);
     var cmd = mechanism.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
 
-    var group = new Sequence("Seq", Collections.singletonList(cmd));
+    var group = new SequentialGroup("Seq", Collections.singletonList(cmd));
     m_scheduler.schedule(group);
     m_scheduler.run();
     m_scheduler.cancel(group);

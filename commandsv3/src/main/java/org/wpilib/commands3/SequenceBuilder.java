@@ -13,7 +13,7 @@ import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 /**
- * A builder class to configure and then create a {@link Sequence}. Like {@link
+ * A builder class to configure and then create a {@link SequentialGroup}. Like {@link
  * StagedCommandBuilder}, the final command is created by calling the terminal {@link
  * #named(String)} method, or with an automatically generated name using {@link
  * #withAutomaticName()}.
@@ -79,7 +79,7 @@ public class SequenceBuilder {
    * @return The built command
    */
   public Command named(String name) {
-    var seq = new Sequence(name, m_steps);
+    var seq = new SequentialGroup(name, m_steps);
     if (m_endCondition != null) {
       // No custom end condition, return the group as is
       return seq;
