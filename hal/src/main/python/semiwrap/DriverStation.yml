@@ -1,0 +1,42 @@
+strip_prefixes:
+- HAL_
+
+functions:
+  HAL_SendError:
+  HAL_SetPrintErrorImpl:
+    ignore: true
+  HAL_SendConsoleLine:
+  HAL_GetControlWord:
+  HAL_GetAllianceStation:
+  HAL_GetJoystickAxes:
+  HAL_GetJoystickPOVs:
+  HAL_GetJoystickButtons:
+  HAL_GetAllJoystickData:
+  HAL_GetJoystickDescriptor:
+  HAL_GetJoystickType:
+  HAL_GetJoystickName:
+    param_override:
+      name:
+        ignore: true
+    cpp_code: |
+      [](int32_t joystickNum) {
+        WPI_String name;
+        HAL_GetJoystickName(&name, joystickNum);
+        std::string sname(wpi::to_string_view(&name));
+        WPI_FreeString(&name);
+        return sname;
+      }
+  HAL_GetJoystickAxisType:
+  HAL_SetJoystickOutputs:
+  HAL_GetMatchTime:
+  HAL_GetOutputsEnabled:
+  HAL_GetMatchInfo:
+  HAL_RefreshDSData:
+  HAL_ProvideNewDataEventHandle:
+  HAL_RemoveNewDataEventHandle:
+  HAL_ObserveUserProgramStarting:
+  HAL_ObserveUserProgramDisabled:
+  HAL_ObserveUserProgramAutonomous:
+  HAL_ObserveUserProgramTeleop:
+  HAL_ObserveUserProgramTest:
+  HAL_GetJoystickIsGamepad:

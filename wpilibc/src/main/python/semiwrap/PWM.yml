@@ -1,0 +1,28 @@
+extra_includes:
+- wpi/sendable/SendableBuilder.h
+- frc/AddressableLED.h
+- wpi/SmallString.h
+
+classes:
+  frc::PWM:
+    ignored_bases:
+    - wpi::SendableHelper<PWM>
+    enums:
+      OutputPeriod:
+    methods:
+      PWM:
+      SetPulseTime:
+      GetPulseTime:
+      SetDisabled:
+      GetChannel:
+      InitSendable:
+      SetOutputPeriod:
+      SetSimDevice:
+
+inline_code: |
+  cls_PWM
+    .def("__repr__", [](py::handle self) {
+      py::object type_name = self.get_type().attr("__qualname__");
+      int channel = self.cast<PWM&>().GetChannel();
+      return py::str("<{} {}>").format(type_name, channel);
+    });

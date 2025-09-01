@@ -1,0 +1,10 @@
+classes:
+  frc::RobotState:
+    nodelete: true
+    methods:
+      IsDisabled:
+      IsEnabled:
+      IsEStopped:
+      IsTeleop:
+      IsAutonomous:
+      IsTest:

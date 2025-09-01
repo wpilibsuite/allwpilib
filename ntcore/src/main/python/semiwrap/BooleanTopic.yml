@@ -1,0 +1,107 @@
+classes:
+  nt::BooleanSubscriber:
+    methods:
+      BooleanSubscriber:
+        overloads:
+          '':
+            ignore: true
+          NT_Subscriber, ParamType:
+            ignore: true
+      Get:
+        overloads:
+          '[const]':
+          ParamType [const]:
+      GetAtomic:
+        overloads:
+          '[const]':
+          ParamType [const]:
+      ReadQueue:
+      GetTopic:
+    inline_code: |
+      .def("close", [](BooleanSubscriber *self) {
+        py::gil_scoped_release release;
+        *self = BooleanSubscriber();
+      }, py::doc("Destroys the subscriber"))
+      .def("__enter__", [](BooleanSubscriber *self) {
+        return self;
+      })
+      .def("__exit__", [](BooleanSubscriber *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = BooleanSubscriber();
+      })
+  nt::BooleanPublisher:
+    methods:
+      BooleanPublisher:
+        overloads:
+          '':
+            ignore: true
+          NT_Publisher:
+            ignore: true
+      Set:
+      SetDefault:
+      GetTopic:
+    inline_code: |
+      .def("close", [](BooleanPublisher *self) {
+        py::gil_scoped_release release;
+        *self = BooleanPublisher();
+      }, py::doc("Destroys the publisher"))
+      .def("__enter__", [](BooleanPublisher *self) {
+        return self;
+      })
+      .def("__exit__", [](BooleanPublisher *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = BooleanPublisher();
+      })
+  nt::BooleanEntry:
+    methods:
+      BooleanEntry:
+        overloads:
+          '':
+            ignore: true
+          NT_Entry, ParamType:
+            ignore: true
+      GetHandle:
+        ignore: true
+      GetTopic:
+      Unpublish:
+    inline_code: |
+      .def("close", [](BooleanEntry *self) {
+        py::gil_scoped_release release;
+        *self = BooleanEntry();
+      }, py::doc("Destroys the entry"))
+      .def("__enter__", [](BooleanEntry *self) {
+        return self;
+      })
+      .def("__exit__", [](BooleanEntry *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = BooleanEntry();
+      })
+  nt::BooleanTopic:
+    attributes:
+      kTypeString:
+    methods:
+      BooleanTopic:
+        overloads:
+          '':
+            ignore: true
+          NT_Topic:
+            ignore: true
+          Topic:
+      Subscribe:
+      SubscribeEx:
+      Publish:
+      PublishEx:
+      GetEntry:
+      GetEntryEx:
+    inline_code: |-
+      .def("close", [](BooleanTopic *self) {
+        py::gil_scoped_release release;
+        *self = BooleanTopic();
+      }, py::doc("Destroys the topic"))
+      .def("__enter__", [](BooleanTopic *self) {
+        return self;
+      })
+      .def("__exit__", [](BooleanTopic *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = BooleanTopic();
+      })

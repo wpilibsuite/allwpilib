@@ -1,0 +1,19 @@
+defaults:
+  subpackage: constraint
+
+classes:
+  frc::MecanumDriveKinematicsConstraint:
+    typealias:
+    - frc::TrajectoryConstraint::MinMax
+    methods:
+      MecanumDriveKinematicsConstraint:
+      MaxVelocity:
+      MinMaxAcceleration:
+
+inline_code: |-
+  cls_MecanumDriveKinematicsConstraint
+    .def_static("fromFps", [](const frc::MecanumDriveKinematics& kinematics,
+                              units::feet_per_second_t maxSpeed) {
+      return std::make_shared<frc::MecanumDriveKinematicsConstraint>(kinematics, maxSpeed);
+    }, py::arg("kinematics"), py::arg("maxSpeed"))
+  ;

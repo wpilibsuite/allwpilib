@@ -1,0 +1,317 @@
+defaults:
+  ignore: true
+  report_ignored_missing: false
+
+extra_includes:
+- pybind11/stl.h
+- networktables/Topic.h
+
+functions:
+  RemoveListener:
+    internal: true
+  Now:
+    internal: true
+  SetNow:
+    internal: true
+  AddPolledLogger:
+    internal: true
+  HasSchema:
+    ignore: true
+  DecodeTopicPublishers:
+    subpackage: meta
+  DecodeTopicSubscribers:
+    subpackage: meta
+  DecodeClientPublishers:
+    subpackage: meta
+  DecodeClientSubscribers:
+    subpackage: meta
+  DecodeClients:
+    subpackage: meta
+classes:
+  nt::EventFlags:
+    attributes:
+      kNone:
+      kImmediate:
+      kConnected:
+      kDisconnected:
+      kConnection:
+      kPublish:
+      kUnpublish:
+      kProperties:
+      kTopic:
+      kValueRemote:
+      kValueLocal:
+      kValueAll:
+      kLogMessage:
+      kTimeSync:
+  nt::TopicInfo:
+    attributes:
+      name:
+      type_str:
+      properties:
+      topic:
+        ignore: true
+      type:
+        ignore: true
+    methods:
+      GetProperties:
+    inline_code: |
+      .def_property_readonly("topic", [](const TopicInfo &self) {
+        return std::make_shared<nt::Topic>(self.topic);
+      })
+      .def_property_readonly("type", [](const TopicInfo &self) {
+        return nt::NetworkTableType(self.type);
+      })
+      .def("__repr__", [](const TopicInfo &self) -> py::str {
+        return py::str("<TopicInfo name={} type={}>")
+          .format(self.name, self.type_str);
+      })
+  nt::ConnectionInfo:
+    attributes:
+      remote_id:
+      remote_ip:
+      remote_port:
+      last_update:
+      protocol_version:
+    inline_code: |
+      .def("__repr__", [](const ConnectionInfo &self) -> py::str {
+        return py::str("<ConnectionInfo id={} addr={}:{} last_update={} protocol={}>")
+          .format(self.remote_id, self.remote_ip, self.remote_port, 
+                  self.last_update, self.protocol_version);
+      })
+  nt::ValueEventData:
+    attributes:
+      topic:
+        ignore: true
+      subentry:
+        ignore: true
+      value:
+    methods:
+      ValueEventData:
+        overloads:
+          '':
+            ignore: true
+          NT_Topic, NT_Handle, Value:
+            ignore: true
+    inline_code: |
+      .def_property_readonly("topic", [](const ValueEventData &self) {
+        return std::make_shared<nt::Topic>(self.topic);
+      })
+      .def("__repr__", [](const ValueEventData &self) -> py::str {
+        auto topicInfo = nt::GetTopicInfo(self.topic);
+        return py::str("<ValueEventData topic_name=\"{}\" topic_type={} value={}>")
+          .format(topicInfo.name, topicInfo.type_str, self.value);
+      })
+  nt::LogMessage:
+    attributes:
+      level:
+      filename:
+      line:
+      message:
+    methods:
+      LogMessage:
+        overloads:
+          '':
+            ignore: true
+          unsigned int, std::string_view, unsigned int, std::string_view:
+            ignore: true
+  nt::TimeSyncEventData:
+    attributes:
+      serverTimeOffset:
+      rtt2:
+      valid:
+    methods:
+      TimeSyncEventData:
+        overloads:
+          '':
+            ignore: true
+          int64_t, int64_t, bool:
+  nt::Event:
+    attributes:
+      listener:
+      flags:
+      data:
+        ignore: true
+    methods:
+      Event:
+        overloads:
+          '':
+            ignore: true
+          NT_Listener, unsigned int, ConnectionInfo:
+            ignore: true
+          NT_Listener, unsigned int, TopicInfo:
+            ignore: true
+          NT_Listener, unsigned int, ValueEventData:
+            ignore: true
+          NT_Listener, unsigned int, LogMessage:
+            ignore: true
+          NT_Listener, unsigned int, NT_Topic, NT_Handle, Value:
+            ignore: true
+          NT_Listener, unsigned int, unsigned int, std::string_view, unsigned int, std::string_view:
+            ignore: true
+          NT_Listener, unsigned int, int64_t, int64_t, bool:
+            ignore: true
+      Is:
+        rename: is_
+      GetConnectionInfo:
+        overloads:
+          '[const]':
+            ignore: true
+          '':
+            ignore: true
+      GetTopicInfo:
+        overloads:
+          '[const]':
+            ignore: true
+          '':
+            ignore: true
+      GetValueEventData:
+        overloads:
+          '[const]':
+            ignore: true
+          '':
+            ignore: true
+      GetLogMessage:
+        overloads:
+          '[const]':
+            ignore: true
+          '':
+            ignore: true
+      GetTimeSyncEventData:
+        overloads:
+          '[const]':
+            ignore: true
+          '':
+            ignore: true
+    inline_code: |
+      .def_property_readonly("data", [](nt::Event *self){
+        return self->data;
+      })
+      .def("__repr__", [](const nt::Event &self) -> py::str {
+        return py::str("<Event listener={} flags={} data={}>")
+          .format(self.listener, self.flags, self.data);
+      })
+  nt::PubSubOptions:
+    force_no_default_constructor: true
+    attributes:
+      kDefaultPeriodic:
+      structSize:
+        ignore: true
+      pollStorage:
+      periodic:
+      excludePublisher:
+      sendAll:
+      topicsOnly:
+      keepDuplicates:
+      prefixMatch:
+      disableRemote:
+      disableLocal:
+      excludeSelf:
+      hidden:
+    inline_code: |
+      // autogenerated by gen-pubsub.py
+      .def(py::init([](
+        unsigned int pollStorage,
+        double periodic,
+        std::optional<std::shared_ptr<nt::Publisher>> excludePublisher,
+        bool sendAll,
+        bool topicsOnly,
+        bool keepDuplicates,
+        bool prefixMatch,
+        bool disableRemote,
+        bool disableLocal,
+        bool excludeSelf,
+        bool hidden
+      ) -> nt::PubSubOptions {
+        return nt::PubSubOptions{
+          .pollStorage = pollStorage,
+          .periodic = periodic,
+          .excludePublisher = excludePublisher.has_value() ? excludePublisher.value()->GetHandle() : 0,
+          .sendAll = sendAll,
+          .topicsOnly = topicsOnly,
+          .keepDuplicates = keepDuplicates,
+          .prefixMatch = prefixMatch,
+          .disableRemote = disableRemote,
+          .disableLocal = disableLocal,
+          .excludeSelf = excludeSelf,
+          .hidden = hidden
+        };
+      }),
+        py::kw_only(),
+        py::arg("pollStorage") = 0,
+        py::arg("periodic") = nt::PubSubOptions::kDefaultPeriodic,
+        py::arg("excludePublisher") = std::nullopt,
+        py::arg("sendAll") = false,
+        py::arg("topicsOnly") = false,
+        py::arg("keepDuplicates") = false,
+        py::arg("prefixMatch") = false,
+        py::arg("disableRemote") = false,
+        py::arg("disableLocal") = false,
+        py::arg("excludeSelf") = false,
+        py::arg("hidden") = false,
+        R"(
+            
+            
+            :param pollStorage:      Polling storage size for a subscription. Specifies the maximum number of
+                                     updates NetworkTables should store between calls to the subscriber's
+                                     ReadQueue() function. If zero, defaults to 1 if sendAll is false, 20 if
+                                     sendAll is true.
+            :param periodic:         How frequently changes will be sent over the network, in seconds.
+                                     NetworkTables may send more frequently than this (e.g. use a combined
+                                     minimum period for all values) or apply a restricted range to this value.
+                                     The default is 100 ms.
+            :param excludePublisher: For subscriptions, if non-zero, value updates for ReadQueue() are not
+                                     queued for this publisher.
+            :param sendAll:          Send all value changes over the network.
+            :param topicsOnly:       For subscriptions, don't ask for value changes (only topic announcements).
+            :param keepDuplicates:   Preserve duplicate value changes (rather than ignoring them).
+            :param prefixMatch:      Perform prefix match on subscriber topic names. Is ignored/overridden by
+                                     Subscribe() functions; only present in struct for the purposes of getting
+                                     information about subscriptions.
+            :param disableRemote:    For subscriptions, if remote value updates should not be queued for
+                                     ReadQueue(). See also disableLocal.
+            :param disableLocal:     For subscriptions, if local value updates should not be queued for
+                                     ReadQueue(). See also disableRemote.
+            :param excludeSelf:      For entries, don't queue (for ReadQueue) value updates for the entry's
+                                     internal publisher.
+            :param hidden:           For subscriptions, don't share the existence of the subscription with the
+                                     network. Note this means updates will not be received from the network
+                                     unless another subscription overlaps with this one, and the subscription
+                                     will not appear in metatopics.
+        )"
+      )
+  nt::meta::SubscriberOptions:
+    subpackage: meta
+    attributes:
+      periodic:
+      topicsOnly:
+      sendAll:
+      prefixMatch:
+  nt::meta::TopicPublisher:
+    subpackage: meta
+    attributes:
+      client:
+      pubuid:
+  nt::meta::TopicSubscriber:
+    subpackage: meta
+    attributes:
+      client:
+      subuid:
+      options:
+  nt::meta::ClientPublisher:
+    subpackage: meta
+    attributes:
+      uid:
+      topic:
+  nt::meta::ClientSubscriber:
+    subpackage: meta
+    attributes:
+      uid:
+      topics:
+      options:
+  nt::meta::Client:
+    subpackage: meta
+    attributes:
+      id:
+      conn:
+      version:

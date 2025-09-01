@@ -1,0 +1,92 @@
+extra_includes:
+- wpi/sendable/SendableBuilder.h
+- frc/DriverStation.h
+- frc/event/BooleanEvent.h
+
+classes:
+  frc::XboxController:
+    ignored_bases:
+    - wpi::SendableHelper<XboxController>
+    methods:
+      XboxController:
+      GetLeftX:
+      GetRightX:
+      GetLeftY:
+      GetRightY:
+      GetLeftTriggerAxis:
+      GetRightTriggerAxis:
+      GetLeftBumper:
+      GetRightBumper:
+      GetLeftBumperPressed:
+      GetRightBumperPressed:
+      GetLeftBumperReleased:
+      GetRightBumperReleased:
+      LeftBumper:
+      RightBumper:
+      GetLeftStickButton:
+      GetRightStickButton:
+      GetLeftStickButtonPressed:
+      GetRightStickButtonPressed:
+      GetLeftStickButtonReleased:
+      GetRightStickButtonReleased:
+      LeftStick:
+      RightStick:
+      GetAButton:
+      GetAButtonPressed:
+      GetAButtonReleased:
+      A:
+      GetBButton:
+      GetBButtonPressed:
+      GetBButtonReleased:
+      B:
+      GetXButton:
+      GetXButtonPressed:
+      GetXButtonReleased:
+      X:
+      GetYButton:
+      GetYButtonPressed:
+      GetYButtonReleased:
+      Y:
+      GetBackButton:
+      GetBackButtonPressed:
+      GetBackButtonReleased:
+      Back:
+      GetStartButton:
+      GetStartButtonPressed:
+      GetStartButtonReleased:
+      Start:
+      LeftTrigger:
+        overloads:
+          double, EventLoop* [const]:
+          EventLoop* [const]:
+      RightTrigger:
+        overloads:
+          double, EventLoop* [const]:
+          EventLoop* [const]:
+      GetLeftBumperButton:
+      GetLeftBumperButtonPressed:
+      GetLeftBumperButtonReleased:
+      GetRightBumperButton:
+      GetRightBumperButtonPressed:
+      GetRightBumperButtonReleased:
+      InitSendable:
+  frc::XboxController::Button:
+    attributes:
+      kLeftBumper:
+      kRightBumper:
+      kLeftStick:
+      kRightStick:
+      kA:
+      kB:
+      kX:
+      kY:
+      kBack:
+      kStart:
+  frc::XboxController::Axis:
+    attributes:
+      kLeftX:
+      kRightX:
+      kLeftY:
+      kRightY:
+      kLeftTrigger:
+      kRightTrigger:

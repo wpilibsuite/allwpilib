@@ -1,0 +1,31 @@
+strip_prefixes:
+- HAL_
+
+enums:
+  HAL_EncoderIndexingType:
+    value_prefix: HAL
+  HAL_EncoderEncodingType:
+    value_prefix: HAL
+functions:
+  HAL_InitializeEncoder:
+  HAL_FreeEncoder:
+  HAL_SetEncoderSimDevice:
+  HAL_GetEncoder:
+  HAL_GetEncoderRaw:
+  HAL_GetEncoderEncodingScale:
+  HAL_ResetEncoder:
+  HAL_GetEncoderPeriod:
+  HAL_SetEncoderMaxPeriod:
+  HAL_GetEncoderStopped:
+  HAL_GetEncoderDirection:
+  HAL_GetEncoderDistance:
+  HAL_GetEncoderRate:
+  HAL_SetEncoderMinRate:
+  HAL_SetEncoderDistancePerPulse:
+  HAL_SetEncoderReverseDirection:
+  HAL_SetEncoderSamplesToAverage:
+  HAL_GetEncoderSamplesToAverage:
+  HAL_GetEncoderFPGAIndex:
+  HAL_GetEncoderDecodingScaleFactor:
+  HAL_GetEncoderDistancePerPulse:
+  HAL_GetEncoderEncodingType:

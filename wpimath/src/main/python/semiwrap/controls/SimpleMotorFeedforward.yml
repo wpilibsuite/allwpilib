@@ -1,0 +1,57 @@
+defaults:
+  subpackage: controller
+
+extra_includes:
+- units/dimensionless.h
+
+classes:
+  frc::SimpleMotorFeedforward:
+    force_type_casters:
+    - units::meters_per_second
+    - units::meters_per_second_squared
+    - units::radians_per_second
+    - units::radians_per_second_squared
+    typealias:
+    - typename frc::SimpleMotorFeedforward<Distance>::Velocity
+    - typename frc::SimpleMotorFeedforward<Distance>::Acceleration
+    - typename frc::SimpleMotorFeedforward<Distance>::kv_unit
+    - typename frc::SimpleMotorFeedforward<Distance>::ka_unit
+    template_params:
+    - Distance
+    methods:
+      SimpleMotorFeedforward:
+        overloads:
+          '':
+          units::volt_t, units::unit_t<kv_unit>, units::unit_t<ka_unit>:
+      Calculate:
+        overloads:
+          units::unit_t<Velocity> [const]:
+          units::unit_t<Velocity>, units::unit_t<Velocity> [const]:
+      MaxAchievableVelocity:
+      MinAchievableVelocity:
+      MaxAchievableAcceleration:
+      MinAchievableAcceleration:
+      GetKs:
+      GetKv:
+      GetKa:
+      GetDt:
+      SetKs:
+      SetKv:
+      SetKa:
+
+templates:
+  # Unfortunately this is broken because calculate requires an SI unit
+  # SimpleMotorFeedforward:
+  #   qualname: frc::SimpleMotorFeedforward
+  #   params:
+  #     - units::dimensionless::scalar
+
+  SimpleMotorFeedforwardMeters:
+    qualname: frc::SimpleMotorFeedforward
+    params:
+    - units::meter
+
+  SimpleMotorFeedforwardRadians:
+    qualname: frc::SimpleMotorFeedforward
+    params:
+    - units::radian

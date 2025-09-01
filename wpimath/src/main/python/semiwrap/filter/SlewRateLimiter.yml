@@ -1,0 +1,21 @@
+classes:
+  frc::SlewRateLimiter:
+    template_params:
+    - Unit
+    typealias:
+    - Unit_t = units::unit_t<Unit>
+    - Rate = units::compound_unit<Unit, units::inverse<units::seconds>>
+    methods:
+      SlewRateLimiter:
+        overloads:
+          Rate_t, Rate_t, Unit_t:
+          Rate_t:
+      Calculate:
+      LastValue:
+      Reset:
+
+templates:
+  SlewRateLimiter:
+    qualname: frc::SlewRateLimiter
+    params:
+    - units::dimensionless::scalar

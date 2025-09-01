@@ -1,0 +1,19 @@
+classes:
+  frc::Tachometer:
+    ignored_bases:
+    - wpi::SendableHelper<Tachometer>
+    methods:
+      Tachometer:
+        overloads:
+          DigitalSource&:
+          std::shared_ptr<DigitalSource>:
+      GetFrequency:
+      GetPeriod:
+      GetEdgesPerRevolution:
+      SetEdgesPerRevolution:
+      GetRevolutionsPerSecond:
+      GetRevolutionsPerMinute:
+      GetStopped:
+      SetMaxPeriod:
+      InitSendable:
+      SetEdgeConfiguration:

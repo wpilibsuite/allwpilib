@@ -1,0 +1,46 @@
+defaults:
+  subpackage: plant
+
+extra_includes:
+- wpystruct.h
+
+classes:
+  frc::DCMotor:
+    attributes:
+      nominalVoltage:
+      stallTorque:
+      stallCurrent:
+      freeCurrent:
+      freeSpeed:
+      R:
+      Kv:
+      Kt:
+    methods:
+      DCMotor:
+      Current:
+        overloads:
+          units::radians_per_second_t, units::volt_t [const]:
+          units::newton_meter_t [const]:
+      Torque:
+      Voltage:
+      Speed:
+      WithReduction:
+      CIM:
+      MiniCIM:
+      Bag:
+      Vex775Pro:
+      RS775_125:
+      BanebotsRS775:
+      Andymark9015:
+      BanebotsRS550:
+      NEO:
+      NEO550:
+      Falcon500:
+      Falcon500FOC:
+      RomiBuiltIn:
+      KrakenX60:
+      KrakenX60FOC:
+      NeoVortex:
+
+inline_code: |
+  SetupWPyStruct<frc::DCMotor>(cls_DCMotor);
