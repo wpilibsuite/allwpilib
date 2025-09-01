@@ -159,7 +159,7 @@ class ParallelGroupTest {
             .named("Command");
 
     var inner = new ParallelGroup("Inner", Set.of(command), Set.of());
-    var outer = ParallelGroup.all(inner).named("Outer");
+    var outer = new ParallelGroup("Outer", Set.of(), Set.of(inner));
 
     // Scheduling: Outer group should be on deck
     m_scheduler.schedule(outer);
@@ -196,7 +196,7 @@ class ParallelGroupTest {
     var b = Command.noRequirements().executing(coroutine -> {}).named("B");
     var c = Command.noRequirements().executing(coroutine -> {}).named("C");
 
-    var group = ParallelGroup.builder().optional(a, b, c).withAutomaticName();
+    var group = new ParallelGroupBuilder().optional(a, b, c).withAutomaticName();
     assertEquals("(A | B | C)", group.name());
   }
 
@@ -206,7 +206,7 @@ class ParallelGroupTest {
     var b = Command.noRequirements().executing(coroutine -> {}).named("B");
     var c = Command.noRequirements().executing(coroutine -> {}).named("C");
 
-    var group = ParallelGroup.builder().requiring(a, b, c).withAutomaticName();
+    var group = new ParallelGroupBuilder().requiring(a, b, c).withAutomaticName();
     assertEquals("(A & B & C)", group.name());
   }
 
@@ -216,7 +216,7 @@ class ParallelGroupTest {
     var b = Command.noRequirements().executing(coroutine -> {}).named("B");
     var c = Command.noRequirements().executing(coroutine -> {}).named("C");
 
-    var group = ParallelGroup.builder().requiring(a).optional(b, c).withAutomaticName();
+    var group = new ParallelGroupBuilder().requiring(a).optional(b, c).withAutomaticName();
     assertEquals("[(A) * (B | C)]", group.name());
   }
 }

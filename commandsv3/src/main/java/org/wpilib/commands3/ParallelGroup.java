@@ -18,7 +18,7 @@ import java.util.Set;
  * group will end after any command in the group finishes. Any commands still running when the group
  * has reached its completion condition will be canceled.
  */
-public class ParallelGroup implements Command {
+public final class ParallelGroup implements Command {
   private final Collection<Command> m_requiredCommands = new HashSet<>();
   private final Collection<Command> m_optionalCommands = new LinkedHashSet<>();
   private final Set<Mechanism> m_requirements = new HashSet<>();
@@ -35,7 +35,7 @@ public class ParallelGroup implements Command {
    *     this is empty, then the group will finish when <i>all</i> required commands complete.
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
-  public ParallelGroup(
+  ParallelGroup(
       String name, Collection<Command> requiredCommands, Collection<Command> optionalCommands) {
     requireNonNullParam(name, "name", "ParallelGroup");
     requireNonNullParam(requiredCommands, "requiredCommands", "ParallelGroup");
@@ -86,27 +86,6 @@ public class ParallelGroup implements Command {
         allCommands.stream().mapToInt(Command::priority).max().orElse(Command.DEFAULT_PRIORITY);
   }
 
-  /**
-   * Creates a parallel group that runs all the given commands until any of them finish.
-   *
-   * @param commands the commands to run in parallel
-   * @return the group
-   */
-  public static ParallelGroupBuilder race(Command... commands) {
-    return builder().optional(commands);
-  }
-
-  /**
-   * Creates a parallel group that runs all the given commands until they all finish. If a command
-   * finishes early, its required mechanisms will be idle (uncommanded) until the group completes.
-   *
-   * @param commands the commands to run in parallel
-   * @return the group
-   */
-  public static ParallelGroupBuilder all(Command... commands) {
-    return builder().requiring(commands);
-  }
-
   @Override
   public void run(Coroutine coroutine) {
     coroutine.forkAll(m_optionalCommands);
@@ -120,6 +99,7 @@ public class ParallelGroup implements Command {
     }
 
     // The scheduler will cancel any optional child commands that are still running when
+    // the `run` method returns
   }
 
   @Override
@@ -140,14 +120,5 @@ public class ParallelGroup implements Command {
   @Override
   public String toString() {
     return "ParallelGroup[name=" + m_name + "]";
-  }
-
-  /**
-   * Creates a new parallel group builder with no commands or configurations applied.
-   *
-   * @return A new builder.
-   */
-  public static ParallelGroupBuilder builder() {
-    return new ParallelGroupBuilder();
   }
 }

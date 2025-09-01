@@ -86,7 +86,7 @@ public class SequenceBuilder {
     }
 
     // We have a custom end condition, so we need to wrap the group in a race
-    return ParallelGroup.builder()
+    return new ParallelGroupBuilder()
         .optional(seq, Command.waitUntil(m_endCondition).named("Until Condition"))
         .named(name);
   }

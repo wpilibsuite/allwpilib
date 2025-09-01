@@ -21,7 +21,7 @@ import java.util.Set;
  * entire duration of the sequence. This means that a mechanism owned by one command in the
  * sequence, but not by a later one, will be <i>uncommanded</i> while that later command executes.
  */
-public class Sequence implements Command {
+public final class Sequence implements Command {
   private final String m_name;
   private final List<Command> m_commands = new ArrayList<>();
   private final Set<Mechanism> m_requirements = new HashSet<>();
@@ -33,7 +33,7 @@ public class Sequence implements Command {
    * @param name the name of the sequence
    * @param commands the commands to execute within the sequence
    */
-  public Sequence(String name, List<Command> commands) {
+  Sequence(String name, List<Command> commands) {
     requireNonNullParam(name, "name", "Sequence");
     requireNonNullParam(commands, "commands", "Sequence");
     for (int i = 0; i < commands.size(); i++) {
@@ -73,35 +73,8 @@ public class Sequence implements Command {
     return m_priority;
   }
 
-  /**
-   * Creates a new sequence builder to start building a new sequence of commands.
-   *
-   * @return A new builder
-   */
-  public static SequenceBuilder builder() {
-    return new SequenceBuilder();
-  }
-
-  /**
-   * Starts creating a sequence of the given commands. The commands will execute in the order in
-   * which they are passed to this function.
-   *
-   * @param commands The commands to execute in sequence
-   * @return A builder for further configuration
-   */
-  public static SequenceBuilder sequence(Command... commands) {
-    return new SequenceBuilder().andThen(commands);
-  }
-
-  /**
-   * Creates a command that executes the given commands in sequence. The returned command will
-   * require all the mechanisms required by every command in the sequence, and will have a priority
-   * equal to the highest priority of all the given commands.
-   *
-   * @param commands The commands to execute in sequence
-   * @return The sequence command
-   */
-  public static Command of(Command... commands) {
-    return sequence(commands).withAutomaticName();
+  @Override
+  public String toString() {
+    return "Sequence[name=" + m_name + "]";
   }
 }
