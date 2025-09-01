@@ -35,7 +35,7 @@ public interface NeedsNameBuilderStage {
   /**
    * Optionally sets an end condition for the command. If the end condition returns {@code true}
    * before the command body set in {@link NeedsExecutionBuilderStage#executing(Consumer)} would
-   * exit, the command will be cancelled by the scheduler.
+   * exit, the command will be canceled by the scheduler.
    *
    * @param endCondition An optional end condition for the command. May be null.
    * @return This builder object, for chaining.

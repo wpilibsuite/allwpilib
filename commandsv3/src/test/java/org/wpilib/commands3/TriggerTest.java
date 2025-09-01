@@ -71,7 +71,7 @@ class TriggerTest {
 
     signal.set(false);
     m_scheduler.run();
-    assertFalse(m_scheduler.isRunning(command), "Command should be cancelled on falling edge");
+    assertFalse(m_scheduler.isRunning(command), "Command should be canceled on falling edge");
   }
 
   @Test
@@ -87,7 +87,7 @@ class TriggerTest {
 
     signal.set(true);
     m_scheduler.run();
-    assertFalse(m_scheduler.isRunning(command), "Command should be cancelled on rising edge");
+    assertFalse(m_scheduler.isRunning(command), "Command should be canceled on rising edge");
   }
 
   @Test
@@ -191,7 +191,7 @@ class TriggerTest {
     m_scheduler.run();
     assertFalse(
         m_scheduler.isRunning(command),
-        "Command should have been cancelled when scope became inactive");
+        "Command should have been canceled when scope became inactive");
   }
 
   // The scheduler lifecycle polls triggers at the start of `run()`

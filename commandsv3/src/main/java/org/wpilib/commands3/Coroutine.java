@@ -71,7 +71,7 @@ public final class Coroutine {
 
   /**
    * Parks the current command. No code in a command declared after calling {@code park()} will be
-   * executed. A parked command will never complete naturally and must be interrupted or cancelled.
+   * executed. A parked command will never complete naturally and must be interrupted or canceled.
    *
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
@@ -382,7 +382,7 @@ public final class Coroutine {
   /**
    * Advanced users only: this permits access to the backing command scheduler to run custom logic
    * not provided by the standard coroutine methods. Any commands manually scheduled through this
-   * will be cancelled when the parent command exits - it's not possible to "fork" a command that
+   * will be canceled when the parent command exits - it's not possible to "fork" a command that
    * lives longer than the command that scheduled it.
    *
    * @return the command scheduler backing this coroutine

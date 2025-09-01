@@ -123,7 +123,7 @@ public interface Command {
 
   /**
    * An optional lifecycle hook that can be implemented to execute some code whenever this command
-   * is cancelled before it naturally completes. Commands should be careful to do a single-shot
+   * is canceled before it naturally completes. Commands should be careful to do a single-shot
    * cleanup (for example, setting a motor to zero volts) and not do any complex looping logic here.
    */
   default void onCancel() {

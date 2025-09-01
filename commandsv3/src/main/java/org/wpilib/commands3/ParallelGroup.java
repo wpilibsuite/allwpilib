@@ -16,7 +16,7 @@ import java.util.Set;
  * A type of command that runs multiple other commands in parallel. The group will end after all
  * required commands have completed; if no command is explicitly required for completion, then the
  * group will end after any command in the group finishes. Any commands still running when the group
- * has reached its completion condition will be cancelled.
+ * has reached its completion condition will be canceled.
  */
 public class ParallelGroup implements Command {
   private final Collection<Command> m_requiredCommands = new HashSet<>();

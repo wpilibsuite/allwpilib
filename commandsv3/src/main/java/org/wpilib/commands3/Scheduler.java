@@ -50,7 +50,7 @@ import org.wpilib.commands3.proto.SchedulerProto;
  * <h2>Danger</h2>
  *
  * <p>The scheduler <i>must</i> be used in a single-threaded program. Commands must be scheduled and
- * cancelled by the same thread that runs the scheduler, and cannot be run in a virtual thread.
+ * canceled by the same thread that runs the scheduler, and cannot be run in a virtual thread.
  *
  * <p><strong>Using the commands framework in a multithreaded environment can cause crashes in the
  * Java virtual machine at any time, including on an official field during a match.</strong> The
@@ -889,7 +889,7 @@ public class Scheduler implements ProtobufSerializable {
 
   private void emitEvent(SchedulerEvent event) {
     // TODO: Prevent listeners from interacting with the scheduler.
-    //       Scheduling or cancelling commands while the scheduler is processing will probably cause
+    //       Scheduling or canceling commands while the scheduler is processing will probably cause
     //       bugs in user code or even a program crash.
     for (var listener : m_eventListeners) {
       listener.accept(event);

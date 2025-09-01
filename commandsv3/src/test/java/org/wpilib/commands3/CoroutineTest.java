@@ -192,7 +192,7 @@ class CoroutineTest {
     assertTrue(secondRan.get());
     assertTrue(ranAfterAwait.get());
 
-    // But only the outer command should still be running; secondInner should have been cancelled
+    // But only the outer command should still be running; secondInner should have been canceled
     assertEquals(Set.of(outer), m_scheduler.getRunningCommands());
   }
 }

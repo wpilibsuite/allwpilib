@@ -278,7 +278,7 @@ public class Trigger implements BooleanSupplier {
     }
   }
 
-  /** Removes bindings in inactive scopes. Running commands tied to those bindings are cancelled. */
+  /** Removes bindings in inactive scopes. Running commands tied to those bindings are canceled. */
   private void clearStaleBindings() {
     m_bindings.forEach(
         (_bindingType, bindings) -> {

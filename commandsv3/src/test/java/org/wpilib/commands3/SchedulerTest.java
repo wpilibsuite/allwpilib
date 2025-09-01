@@ -416,7 +416,7 @@ class SchedulerTest {
     // Then running should get it into the set of running commands
     m_scheduler.run();
 
-    // Cancelling should clear out the set of running commands
+    // Canceling should clear out the set of running commands
     m_scheduler.cancelAll();
 
     // Then ticking the scheduler once to fully remove the command and schedule the defaults
@@ -591,13 +591,13 @@ class SchedulerTest {
   }
 
   @Test
-  void doesNotRunOnCancelWhenCancellingOnDeck() {
+  void doesNotRunOnCancelWhenCancelingOnDeck() {
     var ran = new AtomicBoolean(false);
 
     var mechanism = new Mechanism("The mechanism", m_scheduler);
     var cmd = mechanism.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
     m_scheduler.schedule(cmd);
-    // cancelling before calling .run()
+    // canceling before calling .run()
     m_scheduler.cancel(cmd);
     m_scheduler.run();
 
@@ -634,7 +634,7 @@ class SchedulerTest {
   }
 
   @Test
-  void runsOnCancelWhenCancelling() {
+  void runsOnCancelWhenCanceling() {
     var ran = new AtomicBoolean(false);
 
     var mechanism = new Mechanism("The mechanism", m_scheduler);
@@ -647,7 +647,7 @@ class SchedulerTest {
   }
 
   @Test
-  void runsOnCancelWhenCancellingParent() {
+  void runsOnCancelWhenCancelingParent() {
     var ran = new AtomicBoolean(false);
 
     var mechanism = new Mechanism("The mechanism", m_scheduler);
@@ -1015,8 +1015,8 @@ class SchedulerTest {
     // Then sees command2 mount, check for command1, then also yield.
     // This is like two threads spinwaiting for the other to exit.
     //
-    // Externally cancelling command2 allows command1 to continue
-    // Externally cancelling command1 cancels both
+    // Externally canceling command2 allows command1 to continue
+    // Externally canceling command1 cancels both
     var command1 =
         Command.noRequirements().executing(co -> co.await(ref2.get())).named("Command 1");
     var command2 =
