@@ -687,6 +687,52 @@ class SchedulerTest {
   }
 
   @Test
+  void sideloadSchedulingCommand() {
+    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    // one-shot sideload forks a command and immediately exits
+    m_scheduler.sideload(co -> co.fork(command));
+    m_scheduler.run();
+    assertTrue(
+        m_scheduler.isRunning(command), "command should have started and outlasted the sideload");
+  }
+
+  @Test
+  void childCommandEscapesViaSideload() {
+    var child = Command.noRequirements().executing(Coroutine::park).named("Child");
+    var parent =
+        Command.noRequirements()
+            .executing(
+                parentCoroutine -> {
+                  m_scheduler.sideload(sidelodCoroutine -> sidelodCoroutine.fork(child));
+                })
+            .named("Parent");
+
+    m_scheduler.schedule(parent);
+    m_scheduler.run();
+    assertFalse(m_scheduler.isScheduledOrRunning(parent), "parent should have exited");
+    assertFalse(
+        m_scheduler.isScheduledOrRunning(child),
+        "the sideload to schedule the child should not have run yet");
+
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(child), "child should have started running");
+  }
+
+  @Test
+  void sideloadCancelingCommand() {
+    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command), "command should have started");
+
+    m_scheduler.sideload(co -> m_scheduler.cancel(command));
+    assertTrue(m_scheduler.isRunning(command), "sideload should not have run yet");
+
+    m_scheduler.run();
+    assertFalse(m_scheduler.isRunning(command), "sideload should have canceled the command");
+  }
+
+  @Test
   void nestedMechanisms() {
     var superstructure =
         new Mechanism("Superstructure", m_scheduler) {
