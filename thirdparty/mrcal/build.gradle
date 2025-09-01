@@ -57,10 +57,10 @@ nativeUtils.platformConfigs.each {
 model {
     components {
         "${nativeName}"(NativeLibrarySpec) {
-            sources.c {
+            sources.cpp {
                 source {
                     srcDirs 'src/main/native/thirdparty/src'
-                    include '*.c'
+                    include '*.c', '*.cpp'
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/thirdparty/include', 'src/main/native/thirdparty/generated'
@@ -70,4 +70,4 @@ model {
     }
 }
 
-// apply from: 'publish.gradle'
+apply from: 'publish.gradle'
