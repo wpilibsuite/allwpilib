@@ -13,6 +13,7 @@ ext {
 
 apply from: "${rootDir}/shared/config.gradle"
 apply from: "${rootDir}/shared/ceres.gradle"
+apply from: "${rootDir}/shared/opencv.gradle"
 
 nativeUtils.exportsConfigs {
     mrcal {
@@ -96,6 +97,7 @@ model {
                     return
                 }
                 nativeUtils.useRequiredLibrary(it, 'ceres')
+                nativeUtils.useRequiredLibrary(it, 'opencv_shared')
             }
         }
     }
