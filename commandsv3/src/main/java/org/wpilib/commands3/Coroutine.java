@@ -86,18 +86,23 @@ public final class Coroutine {
   }
 
   /**
-   * Forks off a command. It will run until its natural completion, the parent command exits, or the
-   * parent command cancels it. The parent command will continue executing while the forked command
-   * runs, and can resync with the forked command using {@link #await(Command)}.
+   * Schedules a child command and then immediately returns. The child command will run until its
+   * natural completion, the parent command exits, or the parent command cancels it.
+   *
+   * <p>This is a nonblocking operation. To fork and then wait for the child command to complete,
+   * use {@link #await(Command)}.
+   *
+   * <p>The parent command will continue executing while the child command runs, and can resync with
+   * the child command using {@link #await(Command)}.
    *
    * <pre>{@code
    * Command example() {
    *   return Command.noRequirements().executing(coroutine -> {
-   *     Command inner = ...;
-   *     coroutine.fork(inner);
+   *     Command child = ...;
+   *     coroutine.fork(child);
    *     // ... do more things
-   *     // then sync back up with the inner command
-   *     coroutine.await(inner);
+   *     // then sync back up with the child command
+   *     coroutine.await(child);
    *   }).named("Example");
    * }
    * }</pre>
@@ -107,6 +112,7 @@ public final class Coroutine {
    *
    * @param commands The commands to fork.
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
+   * @see #await(Command)
    */
   public void fork(Command... commands) {
     requireMounted();
@@ -172,10 +178,12 @@ public final class Coroutine {
 
   /**
    * Awaits completion of a command. If the command is not currently scheduled or running, it will
-   * be scheduled automatically.
+   * be scheduled automatically. This is a blocking operation and will not return until the command
+   * completes or has been interrupted by another command scheduled by the same parent.
    *
    * @param command the command to await
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
+   * @see #fork(Command...)
    */
   public void await(Command command) {
     requireMounted();
