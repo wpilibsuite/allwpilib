@@ -118,5 +118,13 @@ inline WPI_String alloc_wpi_string(std::string_view view) {
   std::memcpy(WPI_AllocateString(&out, len), view.data(), len);
   return out;
 }
+
+/** Allocates a copy of a WPI_String */
+inline WPI_String copy_wpi_string(const WPI_String& str) {
+  if (str.str == nullptr || str.len == 0) {
+    return WPI_String{nullptr, 0};
+  }
+  return alloc_wpi_string(to_string_view(&str));
+}
 }  // namespace wpi
 #endif
