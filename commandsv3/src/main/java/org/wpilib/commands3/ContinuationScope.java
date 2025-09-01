@@ -10,7 +10,7 @@ import java.lang.invoke.MethodType;
 import java.util.Objects;
 
 /** A continuation scope. */
-public final class ContinuationScope {
+final class ContinuationScope {
   // The underlying jdk.internal.vm.ContinuationScope object
   // https://github.com/openjdk/jdk/blob/jdk-21%2B35/src/java.base/share/classes/jdk/internal/vm/ContinuationScope.java
   final Object m_continuationScope;
@@ -38,7 +38,7 @@ public final class ContinuationScope {
    *
    * @param name The scope's name
    */
-  public ContinuationScope(String name) {
+  ContinuationScope(String name) {
     Objects.requireNonNull(name);
     try {
       m_continuationScope = CONSTRUCTOR.invoke(name);

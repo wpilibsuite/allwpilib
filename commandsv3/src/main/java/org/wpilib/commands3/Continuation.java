@@ -26,7 +26,7 @@ import java.lang.invoke.WrongMethodTypeException;
  * <p>Teams don't need to use continuations directly with the commands framework; all mounting and
  * unmounting is handled by the command scheduler and a coroutine wrapper.
  */
-public final class Continuation {
+final class Continuation {
   // The underlying jdk.internal.vm.Continuation object
   // https://github.com/openjdk/jdk/blob/jdk-21%2B35/src/java.base/share/classes/jdk/internal/vm/Continuation.java
   private final Object m_continuation;
@@ -115,7 +115,7 @@ public final class Continuation {
    * @param target the continuation's body
    */
   @SuppressWarnings({"PMD.AvoidRethrowingException", "PMD.AvoidCatchingGenericException"})
-  public Continuation(ContinuationScope scope, Runnable target) {
+  Continuation(ContinuationScope scope, Runnable target) {
     try {
       m_continuation = CONSTRUCTOR.invoke(scope.m_continuationScope, target);
       m_scope = scope;
