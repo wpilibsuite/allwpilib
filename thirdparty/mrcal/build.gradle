@@ -1,12 +1,25 @@
 apply plugin: 'c'
+apply plugin: 'cpp'
 apply plugin: 'visual-studio'
 apply plugin: 'edu.wpi.first.NativeUtils'
+
+if (project.hasProperty('onlylinuxathena')) {
+    return;
+}
 
 ext {
     nativeName = 'mrcal'
 }
 
 apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/ceres.gradle"
+
+nativeUtils.exportsConfigs {
+    mrcal {
+    }
+}
+
+project(':').libraryBuild.dependsOn build
 
 // Suppress warnings
 nativeUtils.platformConfigs.each {
@@ -57,14 +70,32 @@ nativeUtils.platformConfigs.each {
 model {
     components {
         "${nativeName}"(NativeLibrarySpec) {
-            sources.cpp {
-                source {
-                    srcDirs 'src/main/native/thirdparty/src'
-                    include '*.c', '*.cpp'
+            sources {
+                c {
+                    source {
+                        srcDirs 'src/main/native/thirdparty/src'
+                        include '*.c'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/thirdparty/include', 'src/main/native/thirdparty/generated'
+                    }
                 }
-                exportedHeaders {
-                    srcDirs 'src/main/native/thirdparty/include', 'src/main/native/thirdparty/generated'
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/thirdparty/src', 'src/main/native/src', 'src/main/native/thirdparty/libdogleg/src'
+                        include '*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/thirdparty/include', 'src/main/native/thirdparty/generated', 'src/main/native/include', 'src/main/native/thirdparty/libdogleg/include'
+                    }
                 }
+            }
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    it.buildable = false
+                    return
+                }
+                nativeUtils.useRequiredLibrary(it, 'ceres')
             }
         }
     }
