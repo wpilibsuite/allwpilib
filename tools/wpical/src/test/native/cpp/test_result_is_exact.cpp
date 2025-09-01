@@ -15,7 +15,7 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <mrcal_wrapper.h>
+#include <mrcal_wrapper.hpp>
 
 #include "path_lookup.hpp"
 #include "wpi/util/print.hpp"
@@ -101,7 +101,7 @@ std::vector<double> calibrate(const std::string& fname, cv::Size boardSize,
 
   for (const auto& [key, value] : points) {
     if (value.size()) {
-      auto ret = getSeedPose(value.data(), boardSize, imagerSize, 0.03, 1200);
+      auto ret = getSeedPose(value.data(), boardSize, imagerSize, 0.0254, 1200);
 
       // Append to the Big List of board corners/levels
       observations_board.insert(observations_board.end(), value.begin(),
@@ -120,7 +120,7 @@ std::vector<double> calibrate(const std::string& fname, cv::Size boardSize,
           .count());
 
   auto cal_result = mrcal_main(observations_board, frames_rt_toref, boardSize,
-                               0.030, imagerSize, 1200);
+                               0.0254, imagerSize, 1200);
 
   auto dt = std::chrono::steady_clock::now() - start;
   int dt_ms = dt.count();

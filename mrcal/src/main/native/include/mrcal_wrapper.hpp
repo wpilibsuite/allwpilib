@@ -1,28 +1,17 @@
-/*
- * Copyright (C) Photon Vision.
- *
- * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
- * SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
- * OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <mrcal.h>
-
 #include <memory>
-#include <opencv2/core/mat.hpp>
-#include <opencv2/core/types.hpp>
 #include <span>
 #include <utility>
 #include <vector>
+
+#include <mrcal.h>
+#include <opencv2/core/mat.hpp>
+#include <opencv2/core/types.hpp>
 
 struct mrcal_result {
   bool success;
@@ -37,10 +26,13 @@ struct mrcal_result {
   mrcal_result(bool success_, std::vector<double> intrinsics_,
                double rms_error_, std::vector<double> residuals_,
                mrcal_calobject_warp_t calobject_warp_, int Noutliers_board_)
-      : success{success_}, intrinsics{std::move(intrinsics_)},
-        rms_error{rms_error_}, residuals{std::move(residuals_)},
-        calobject_warp{calobject_warp_}, Noutliers_board{Noutliers_board_} {}
-  mrcal_result(mrcal_result &&) = delete;
+      : success{success_},
+        intrinsics{std::move(intrinsics_)},
+        rms_error{rms_error_},
+        residuals{std::move(residuals_)},
+        calobject_warp{calobject_warp_},
+        Noutliers_board{Noutliers_board_} {}
+  mrcal_result(mrcal_result&&) = delete;
   ~mrcal_result() = default;
 };
 
@@ -53,7 +45,7 @@ struct mrcal_result {
  * @param squareSize The size of the squares in a physical distance unit.
  * @param focal_len_guess A focal length guess in pixels.
  */
-mrcal_pose_t getSeedPose(const mrcal_point3_t *c_observations_board_pool,
+mrcal_pose_t getSeedPose(const mrcal_point3_t* c_observations_board_pool,
                          cv::Size boardSize, cv::Size imagerSize,
                          double squareSize, double focal_len_guess);
 
@@ -77,8 +69,8 @@ enum class CameraLensModel {
   LENSMODEL_SPLINED_STEREOGRAPHIC
 };
 
-bool undistort_mrcal(cv::Mat *dst, const cv::Mat *cameraMat,
-                     const cv::Mat *distCoeffs, CameraLensModel lensModel,
+bool undistort_mrcal(cv::Mat* dst, const cv::Mat* cameraMat,
+                     const cv::Mat* distCoeffs, CameraLensModel lensModel,
                      // Extra stuff for splined stereographic models
                      uint16_t order, uint16_t Nx, uint16_t Ny,
                      uint16_t fov_x_deg);

@@ -12,7 +12,7 @@
 #include <vector>
 
 #include <Eigen/Core>
-#include <mrcal_wrapper.h>
+#include <mrcal_wrapper.hpp>
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/objdetect/aruco_board.hpp>
 #include <opencv2/opencv.hpp>
