@@ -128,11 +128,11 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp', 'src/main/native/thirdparty/mrcal_java/src', "$buildDir/generated/main/cpp"
+                        srcDirs 'src/main/native/cpp', "$buildDir/generated/main/cpp"
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/mrcal_java/include'
+                        srcDirs 'src/main/native/include'
                     }
                 }
                 if (OperatingSystem.current().isWindows()) {
