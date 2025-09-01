@@ -4,6 +4,10 @@
 
 package edu.wpi.first.math;
 
+import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.Feet;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -145,6 +149,28 @@ class MathUtilTest extends UtilityClassTest<MathUtil> {
     assertEquals(25, MathUtil.interpolate(-50, 50, 0.75));
 
     assertEquals(0, MathUtil.interpolate(0, -100, -0.5));
+  }
+
+  @Test
+  void testInterpolateWithSameUnits() {
+    assertEquals(Meters.of(50), MathUtil.interpolate(Meters.of(0), Meters.of(100), 0.5));
+    assertEquals(Meters.of(-50), MathUtil.interpolate(Meters.of(0), Meters.of(-100), 0.5));
+    assertEquals(Meters.of(0), MathUtil.interpolate(Meters.of(-50), Meters.of(50), 0.5));
+    assertEquals(Meters.of(-25), MathUtil.interpolate(Meters.of(-50), Meters.of(50), 0.25));
+    assertEquals(Meters.of(25), MathUtil.interpolate(Meters.of(-50), Meters.of(50), 0.75));
+
+    assertEquals(Meters.of(0), MathUtil.interpolate(Meters.of(0), Meters.of(-100), -0.5));
+  }
+
+  @Test
+  void testInterpolateWithDifferentUnits() {
+    assertEquals(Inches.of(6), MathUtil.interpolate(Meters.of(0), Feet.of(1), 0.5));
+    assertEquals(Inches.of(-6), MathUtil.interpolate(Meters.of(0), Feet.of(-1), 0.5));
+    assertEquals(Inches.of(0), MathUtil.interpolate(Centimeters.of(-500), Meters.of(5), 0.5));
+    assertEquals(Inches.of(-6), MathUtil.interpolate(Feet.of(-1), Inches.of(12), 0.25));
+    assertEquals(Inches.of(6), MathUtil.interpolate(Feet.of(-1), Inches.of(12), 0.75));
+
+    assertEquals(Inches.of(0), MathUtil.interpolate(Inches.of(0), Feet.of(-1), -0.5));
   }
 
   @Test
