@@ -365,6 +365,7 @@ public class Scheduler implements ProtobufSerializable {
         // meaning it hasn't had a chance to schedule any children
         iterator.remove();
         emitInterruptedEvent(scheduledCommand, command);
+        emitCanceledEvent(scheduledCommand);
       }
     }
   }
@@ -451,7 +452,7 @@ public class Scheduler implements ProtobufSerializable {
       // Only run the hook if the command was running. If it was on deck or not
       // even in the scheduler at the time, then there's nothing to do
       command.onCancel();
-      emitEvictedEvent(command);
+      emitCanceledEvent(command);
     }
 
     // Clean up any orphaned child commands; their lifespan must not exceed the parent's
@@ -714,13 +715,13 @@ public class Scheduler implements ProtobufSerializable {
     for (var onDeckIter = m_queuedToRun.iterator(); onDeckIter.hasNext(); ) {
       var state = onDeckIter.next();
       onDeckIter.remove();
-      emitEvictedEvent(state.command());
+      emitCanceledEvent(state.command());
     }
 
     for (var liveIter = m_runningCommands.entrySet().iterator(); liveIter.hasNext(); ) {
       var entry = liveIter.next();
       liveIter.remove();
-      emitEvictedEvent(entry.getKey());
+      emitCanceledEvent(entry.getKey());
     }
   }
 
@@ -852,8 +853,8 @@ public class Scheduler implements ProtobufSerializable {
     emitEvent(event);
   }
 
-  private void emitEvictedEvent(Command command) {
-    var event = new SchedulerEvent.Evicted(command, RobotController.getTime());
+  private void emitCanceledEvent(Command command) {
+    var event = new SchedulerEvent.Canceled(command, RobotController.getTime());
     emitEvent(event);
   }
 

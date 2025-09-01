@@ -67,20 +67,16 @@ public sealed interface SchedulerEvent {
       implements SchedulerEvent {}
 
   /**
-   * An event marking when a command was evicted from the scheduler. Commands may be evicted when
-   * they've been scheduled, then another command requiring a shared mechanism is scheduled
-   * afterward; when cancelled via {@link Scheduler#cancel(Command)} or {@link
-   * Scheduler#cancelAll()}; or when they're running and interrupted by another command requiring a
-   * shared mechanism.
+   * An event marking when a command was canceled.
    *
-   * @param command The command that was evicted
-   * @param timestampMicros When the command was evicted
+   * @param command The command that was canceled
+   * @param timestampMicros When the command was canceled
    */
-  record Evicted(Command command, long timestampMicros) implements SchedulerEvent {}
+  record Canceled(Command command, long timestampMicros) implements SchedulerEvent {}
 
   /**
    * An event marking when a command was interrupted by another. Typically followed by an {@link
-   * Evicted} event.
+   * Canceled} event.
    *
    * @param command The command that was interrupted
    * @param interrupter The interrupting command
