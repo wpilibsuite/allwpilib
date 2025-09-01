@@ -130,7 +130,7 @@ public class Mechanism {
    * @return A new idle command.
    */
   public Command idle() {
-    return new IdleCommand(this);
+    return run(Coroutine::park).withPriority(Command.LOWEST_PRIORITY).named(getName() + "[IDLE]");
   }
 
   /**
@@ -139,7 +139,7 @@ public class Mechanism {
    * @param duration How long the mechanism should idle for.
    * @return A new idle command.
    */
-  public Command idle(Time duration) {
+  public Command idleFor(Time duration) {
     return idle().withTimeout(duration);
   }
 

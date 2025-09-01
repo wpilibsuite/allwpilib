@@ -4,9 +4,11 @@
 
 package org.wpilib.commands3;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -346,7 +348,11 @@ public final class Coroutine {
 
     requireNonNullParam(duration, "duration", "Coroutine.wait");
 
-    await(new WaitCommand(duration));
+    var timer = new Timer();
+    timer.start();
+    while (!timer.hasElapsed(duration.in(Seconds))) {
+      this.yield();
+    }
   }
 
   /**

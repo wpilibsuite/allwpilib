@@ -209,7 +209,7 @@ public interface Command {
   default Command withTimeout(Time timeout) {
     requireNonNullParam(timeout, "timeout", "Command.withTimeout");
 
-    return race(this, new WaitCommand(timeout))
+    return race(this, waitFor(timeout).named("Timeout: " + timeout.toLongString()))
         .named(name() + " [" + timeout.toLongString() + " timeout]");
   }
 
@@ -318,6 +318,19 @@ public interface Command {
     requireNonNullParam(condition, "condition", "Command.waitUntil");
 
     return noRequirements().executing(coroutine -> coroutine.waitUntil(condition));
+  }
+
+  /**
+   * Creates a command that simply waits for a given duration. The command will not require any
+   * mechanisms.
+   *
+   * @param duration How long to wait
+   * @return A command builder
+   */
+  static NeedsNameBuilderStage waitFor(Time duration) {
+    requireNonNullParam(duration, "duration", "Command.waitFor");
+
+    return noRequirements().executing(coroutine -> coroutine.wait(duration));
   }
 
   /**

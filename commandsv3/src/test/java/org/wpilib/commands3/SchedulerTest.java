@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -409,8 +408,8 @@ class SchedulerTest {
           1,
           runningCommands.size(),
           "mechanism " + mechanism + " should have exactly one running command");
-      assertInstanceOf(
-          IdleCommand.class,
+      assertEquals(
+          mechanism.getDefaultCommand(),
           runningCommands.getFirst(),
           "mechanism " + mechanism + " is not running the default command");
     }
