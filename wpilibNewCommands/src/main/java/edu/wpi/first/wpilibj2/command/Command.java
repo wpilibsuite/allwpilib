@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import org.wpilib.annotation.NoDiscard;
 
 /**
  * A state machine representing a complete action to be performed by the robot. Commands are run by
@@ -27,6 +28,7 @@ import java.util.function.BooleanSupplier;
  *
  * <p>This class is provided by the NewCommands VendorDep
  */
+@NoDiscard("Commands must be used! Did you mean to bind it to a trigger?")
 public abstract class Command implements Sendable {
   /** Requirements set. */
   private final Set<Subsystem> m_requirements = new HashSet<>();
