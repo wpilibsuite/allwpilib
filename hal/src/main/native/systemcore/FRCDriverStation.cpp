@@ -20,6 +20,7 @@
 #include <networktables/ProtobufTopic.h>
 #include <networktables/StringArrayTopic.h>
 #include <networktables/StringTopic.h>
+#include <wpi/DenseMap.h>
 #include <wpi/EventVector.h>
 #include <wpi/SafeThread.h>
 #include <wpi/SmallVector.h>
@@ -85,9 +86,17 @@ struct SystemServerDriverStation {
              MRC_MAX_NUM_JOYSTICKS>
       joystickRumbleTopics;
 
-  nt::ProtobufPublisher<std::vector<mrc::OpMode>> teleopOpModes;
-  nt::ProtobufPublisher<std::vector<mrc::OpMode>> autoOpModes;
-  nt::ProtobufPublisher<std::vector<mrc::OpMode>> testOpModes;
+  wpi::DenseMap<int64_t, uint32_t> autoOpModesMap;
+  wpi::DenseMap<int64_t, uint32_t> teleopOpModesMap;
+  wpi::DenseMap<int64_t, uint32_t> testOpModesMap;
+
+  std::vector<mrc::OpMode> autoOpModes;
+  std::vector<mrc::OpMode> teleopOpModes;
+  std::vector<mrc::OpMode> testOpModes;
+
+  nt::ProtobufPublisher<std::vector<mrc::OpMode>> autoOpModesPublisher;
+  nt::ProtobufPublisher<std::vector<mrc::OpMode>> teleopOpModesPublisher;
+  nt::ProtobufPublisher<std::vector<mrc::OpMode>> testOpModesPublisher;
   nt::IntegerPublisher traceOpModePublisher;
 
   NT_Listener controlDataListener;
@@ -150,33 +159,22 @@ struct SystemServerDriverStation {
           ntInst.GetProtobufTopic<mrc::JoystickDescriptor>(name).Subscribe({});
     }
 
-    teleopOpModes = ntInst
-                        .GetProtobufTopic<std::vector<mrc::OpMode>>(
-                            ROBOT_TELEOP_OP_MODES_PATH)
-                        .Publish();
-    autoOpModes = ntInst
-                      .GetProtobufTopic<std::vector<mrc::OpMode>>(
-                          ROBOT_AUTO_OP_MODES_PATH)
-                      .Publish();
-    testOpModes = ntInst
-                      .GetProtobufTopic<std::vector<mrc::OpMode>>(
-                          ROBOT_TEST_OP_MODES_PATH)
-                      .Publish();
+    autoOpModesPublisher = ntInst
+                               .GetProtobufTopic<std::vector<mrc::OpMode>>(
+                                   ROBOT_AUTO_OP_MODES_PATH)
+                               .Publish();
+    teleopOpModesPublisher = ntInst
+                                 .GetProtobufTopic<std::vector<mrc::OpMode>>(
+                                     ROBOT_TELEOP_OP_MODES_PATH)
+                                 .Publish();
+    testOpModesPublisher = ntInst
+                               .GetProtobufTopic<std::vector<mrc::OpMode>>(
+                                   ROBOT_TEST_OP_MODES_PATH)
+                               .Publish();
 
-    std::vector<mrc::OpMode> staticTeleopOpModes;
-    staticTeleopOpModes.emplace_back(
-        mrc::OpMode{"TeleOp", mrc::OpModeHash::MakeTele(2)});
-    teleopOpModes.Set(staticTeleopOpModes);
-
-    std::vector<mrc::OpMode> staticAutoOpModes;
-    staticAutoOpModes.emplace_back(
-        mrc::OpMode{"Auto", mrc::OpModeHash::MakeAuto(1)});
-    autoOpModes.Set(staticAutoOpModes);
-
-    std::vector<mrc::OpMode> staticTestOpModes;
-    staticTestOpModes.emplace_back(
-        mrc::OpMode{"Test", mrc::OpModeHash::MakeTest(3)});
-    testOpModes.Set(staticTestOpModes);
+    autoOpModesPublisher.Set(autoOpModes);
+    teleopOpModesPublisher.Set(teleopOpModes);
+    testOpModesPublisher.Set(testOpModes);
 
     ntInst.AddListener(
         controlDataSubscriber, NT_EVENT_VALUE_REMOTE | NT_EVENT_UNPUBLISH,
@@ -479,8 +477,6 @@ int64_t HAL_AddOpMode(int32_t mode, const struct WPI_String* name,
                       const struct WPI_String* group,
                       const struct WPI_String* description, int32_t textColor,
                       int32_t backgroundColor);
-
-int64_t HAL_RemoveOpMode(int32_t mode, const struct WPI_String* name);
 
 void HAL_ClearOpModes(void);
 

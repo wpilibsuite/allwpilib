@@ -98,26 +98,6 @@ public class DriverStationJNI extends JNIWrapper {
     return nativeAddOpMode(mode.getValue(), name, group, description, textColor, backgroundColor);
   }
 
-  /**
-   * Removes an operating mode option.
-   *
-   * @param mode robot mode (HAL_RobotMode enum value)
-   * @param name name of the operating mode
-   * @return unique ID, 0 if not present
-   */
-  private static native long nativeRemoveOpMode(int mode, String name);
-
-  /**
-   * Removes an operating mode option.
-   *
-   * @param mode robot mode
-   * @param name name of the operating mode
-   * @return unique ID, 0 if not present
-   */
-  public static long removeOpMode(RobotMode mode, String name) {
-    return nativeRemoveOpMode(mode.getValue(), name);
-  }
-
   /** Clears all operating mode options. */
   public static native void clearOpModes();
 

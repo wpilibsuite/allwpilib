@@ -149,42 +149,6 @@ int64_t DriverStationData::AddOpMode(HAL_RobotMode mode, std::string_view name,
   return h;
 }
 
-int64_t DriverStationData::RemoveOpMode(HAL_RobotMode mode,
-                                        std::string_view name) {
-  wpi::DenseMap<int64_t, uint32_t>* map;
-  std::vector<HALSIM_OpModeOption>* vec;
-  int64_t baseVal;
-  if (!GetOpModeMapVec(mode, &map, &vec, &baseVal)) {
-    return 0;
-  }
-  std::string nameCopy{name};
-  int64_t h;
-  std::scoped_lock lock{m_opModeMutex};
-  for (;;) {
-    h = baseVal | (std::hash<std::string_view>{}(nameCopy)&kOpModeHashMask);
-    auto it = map->find(h);
-    if (it == map->end()) {
-      return 0;  // no match
-    }
-    if (wpi::to_string_view(&(*vec)[it->first].name) == name) {
-      // found match; erase it
-      map->erase(it);
-      HALSIM_OpModeOption& data = (*vec)[it->first];
-      data.id = 0;
-      WPI_FreeString(&data.name);
-      data.name.str = nullptr;
-      WPI_FreeString(&data.group);
-      data.group.str = nullptr;
-      WPI_FreeString(&data.description);
-      data.description.str = nullptr;
-      CallOpModesCallbacks(mode);
-      return h;
-    }
-    // try again with a space appended to name
-    nameCopy += ' ';
-  }
-}
-
 void DriverStationData::ClearOpModes() {
   std::scoped_lock lock{m_opModeMutex};
 

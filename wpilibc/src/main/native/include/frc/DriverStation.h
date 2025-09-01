@@ -260,7 +260,7 @@ class DriverStation final {
 
   /**
    * Gets the current robot mode.
-   * 
+   *
    * <p>Note that this does not indicate whether the robot is enabled or disabled.
    *
    * @return robot mode
@@ -345,16 +345,6 @@ class DriverStation final {
   static int64_t AddOpMode(DSControlWord::RobotMode mode, std::string_view name,
                            std::string_view group = {},
                            std::string_view description = {});
-
-  /**
-   * Removes an operating mode option.
-   *
-   * @param mode robot mode
-   * @param name name of the operating mode
-   * @return unique ID, 0 if not present
-   */
-  static int64_t RemoveOpMode(DSControlWord::RobotMode mode,
-                              std::string_view name);
 
   /**
    * Clears all operating mode options.

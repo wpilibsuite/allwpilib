@@ -103,20 +103,6 @@ Java_edu_wpi_first_hal_DriverStationJNI_nativeAddOpMode
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    nativeRemoveOpMode
- * Signature: (Ijava/lang/String;)J
- */
-JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_nativeRemoveOpMode
-  (JNIEnv* env, jclass, jint mode, jstring name)
-{
-  JStringRef nameStr{env, name};
-  WPI_String nameWpiStr = wpi::make_string(nameStr);
-  return HAL_RemoveOpMode(mode, &nameWpiStr);
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
  * Method:    clearOpModes
  * Signature: ()V
  */

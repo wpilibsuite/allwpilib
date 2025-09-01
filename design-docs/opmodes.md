@@ -359,9 +359,8 @@ public final class DriverStation {
   public static String getSelectedTestOpMode() {...}
 
   // add/remove opmodes
-  public static int addOpModeOption(String name, String group, String description, int flags) {...}
-  public static int removeOpModeOption(String name) {...}
-  public static void clearOpModeOptions() {...}
+  public static int addOpMode(RobotMode mode, String name, String group, String description, int flags) {...}
+  public static void clearOpModes() {...}
 }
 ```
 
@@ -460,10 +459,9 @@ Should be able to be annotation (decorator) based, similar to Java.
 At the HAL level, Control Word bits indicate enabled state and teleop/auto/test selection (identical to current WPILib).  What needs to be added are functions to maintain the list of available opmodes and get the selected opmode as communicated by the DS.
 
 Adding the following functions provides all the required functionality:
-- `long AddOpMode(int mode, string name, string group, string description, int textColor, int backgroundColor)` – returns a unique ID identifying the opmode (robot mode, name) pair.  The mode is the robot mode the opmode mode should be visible for (auto/teleop/test).  The textColor and backgroundColor are optionally used to set the text and background color for the option in the DS GUI.
-- `long RemoveOpMode(int mode, string name)` – returns the unique ID previously associated to that opmode name
-- `void ClearOpModes()` – clears all opmodes
-- `long GetOpMode()` - gets the opmode ID selected to execute on the DS (the robot may or may not be enabled)
+- `long HAL_AddOpMode(int mode, string name, string group, string description, int textColor, int backgroundColor)` – returns a unique ID identifying the opmode (robot mode, name) pair.  The mode is the robot mode the opmode mode should be visible for (auto/teleop/test).  The textColor and backgroundColor are optionally used to set the text and background color for the option in the DS GUI.
+- `void HAL_ClearOpModes()` – clears all opmodes
+- `long HAL_GetOpMode()` - gets the opmode ID selected to execute on the DS (the robot may or may not be enabled)
 
 The user program observe functions also need to be updated:
 - Replace `HAL_ObserveUserProgramDisabled()`, `HAL_ObserveUserProgramAutonomous()`, `HAL_ObserveUserProgramTeleop()`, and `HAL_ObserveUserProgramTest()` with `HAL_ObserveUserProgramOpMode(long id, bool enabled)`

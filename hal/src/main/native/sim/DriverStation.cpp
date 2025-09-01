@@ -245,14 +245,6 @@ int64_t HAL_AddOpMode(int32_t mode, const struct WPI_String* name,
       backgroundColor);
 }
 
-int64_t HAL_RemoveOpMode(int32_t mode, const struct WPI_String* name) {
-  if (gShutdown) {
-    return 0;
-  }
-  return SimDriverStationData->RemoveOpMode(static_cast<HAL_RobotMode>(mode),
-                                            wpi::to_string_view(name));
-}
-
 void HAL_ClearOpModes(void) {
   if (gShutdown) {
     return;

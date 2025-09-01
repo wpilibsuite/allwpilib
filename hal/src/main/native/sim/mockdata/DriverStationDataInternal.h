@@ -60,8 +60,6 @@ class DriverStationData {
                     std::string_view group, std::string_view description,
                     int32_t textColor, int32_t backgroundColor);
 
-  int64_t RemoveOpMode(HAL_RobotMode mode, std::string_view name);
-
   void ClearOpModes();
 
   int32_t RegisterAutoOpModesCallback(HAL_OpModeOptionsCallback callback,

@@ -1148,19 +1148,6 @@ public final class DriverStation {
     return addOpMode(mode, name, "");
   }
 
-  /**
-   * Removes an operating mode option.
-   *
-   * @param mode robot mode
-   * @param name name of the operating mode
-   * @return unique ID, 0 if not present
-   */
-  public static long removeOpMode(RobotMode mode, String name) {
-    long id = DriverStationJNI.removeOpMode(mode, name);
-    m_opModes.remove(id);
-    return id;
-  }
-
   /** Clears all operating mode options. */
   public static void clearOpModes() {
     m_opModes.clear();

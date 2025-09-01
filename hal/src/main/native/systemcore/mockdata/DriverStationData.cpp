@@ -4,6 +4,7 @@
 
 #include "hal/simulation/DriverStationData.h"
 
+#include "hal/DriverStationTypes.h"
 #include "hal/simulation/SimDataValue.h"
 
 extern "C" {
@@ -14,14 +15,34 @@ void HALSIM_ResetDriverStationData(void) {}
                                      RETURN)
 
 DEFINE_CAPI(HAL_Bool, Enabled, false)
-DEFINE_CAPI(HAL_Bool, Autonomous, false)
-DEFINE_CAPI(HAL_Bool, Test, false)
+DEFINE_CAPI(HAL_RobotMode, RobotMode, HAL_ROBOTMODE_UNKNOWN)
 DEFINE_CAPI(HAL_Bool, EStop, false)
 DEFINE_CAPI(HAL_Bool, FmsAttached, false)
 DEFINE_CAPI(HAL_Bool, DsAttached, false)
 DEFINE_CAPI(HAL_AllianceStationID, AllianceStationId,
             HAL_AllianceStationID_kRed1)
 DEFINE_CAPI(double, MatchTime, 0)
+DEFINE_CAPI(int64_t, OpMode, 0)
+
+#undef DEFINE_CAPI
+#define DEFINE_CAPI(name)                                               \
+  int32_t HALSIM_Register##name##OpModesCallback(                       \
+      HAL_OpModeOptionsCallback callback, void* param,                  \
+      HAL_Bool initialNotify) {                                         \
+    return 0;                                                           \
+  }                                                                     \
+                                                                        \
+  void HALSIM_Cancel##name##OpModesCallback(int32_t uid) {}             \
+                                                                        \
+  struct HALSIM_OpModeOption* HALSIM_Get##name##OpModes(int32_t* len) { \
+    return nullptr;                                                     \
+  }
+
+DEFINE_CAPI(Auto)
+DEFINE_CAPI(Teleop)
+DEFINE_CAPI(Test)
+
+void HALSIM_FreeOpModeOptionsArray(HALSIM_OpModeOption* arr, size_t length) {}
 
 #undef DEFINE_CAPI
 #define DEFINE_CAPI(name, data)                                                \

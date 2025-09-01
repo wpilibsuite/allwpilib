@@ -86,15 +86,6 @@ int64_t HAL_AddOpMode(int32_t mode, const struct WPI_String* name,
                       int32_t backgroundColor);
 
 /**
- * Removes an operating mode option.
- *
- * @param mode robot mode (HAL_RobotMode enum)
- * @param name name of the operating mode
- * @return unique ID, 0 if not present
- */
-int64_t HAL_RemoveOpMode(int32_t mode, const struct WPI_String* name);
-
-/**
  * Clears all operating mode options.
  */
 void HAL_ClearOpModes(void);

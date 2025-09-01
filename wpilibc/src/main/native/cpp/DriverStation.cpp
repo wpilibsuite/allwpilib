@@ -579,16 +579,6 @@ int64_t DriverStation::AddOpMode(DSControlWord::RobotMode mode,
   return DoAddOpMode(mode, name, group, description, -1, -1);
 }
 
-int64_t DriverStation::RemoveOpMode(DSControlWord::RobotMode mode,
-                                    std::string_view name) {
-  WPI_String nameWpi = wpi::make_string(name);
-  int64_t id = HAL_RemoveOpMode(mode, &nameWpi);
-  auto& inst = ::GetInstance();
-  std::scoped_lock lock{inst.opModeMutex};
-  inst.opModes.erase(id);
-  return id;
-}
-
 void DriverStation::ClearOpModes() {
   auto& inst = ::GetInstance();
   std::scoped_lock lock{inst.opModeMutex};
