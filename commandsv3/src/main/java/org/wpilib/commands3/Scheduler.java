@@ -721,7 +721,9 @@ public class Scheduler implements ProtobufSerializable {
     for (var liveIter = m_runningCommands.entrySet().iterator(); liveIter.hasNext(); ) {
       var entry = liveIter.next();
       liveIter.remove();
-      emitCanceledEvent(entry.getKey());
+      Command canceledCommand = entry.getKey();
+      canceledCommand.onCancel();
+      emitCanceledEvent(canceledCommand);
     }
   }
 

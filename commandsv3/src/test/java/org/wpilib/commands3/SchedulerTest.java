@@ -350,7 +350,7 @@ class SchedulerTest {
   }
 
   @Test
-  void cancelAlEvictsOnDeck() {
+  void cancelAllEvictsOnDeck() {
     var command = Command.noRequirements().executing(Coroutine::park).named("Command");
     m_scheduler.schedule(command);
     m_scheduler.cancelAll();
@@ -371,6 +371,34 @@ class SchedulerTest {
         fail(command.name() + " was not canceled by cancelAll()");
       }
     }
+  }
+
+  @Test
+  void cancelAllCallsOnCancelHookForRunningCommands() {
+    AtomicBoolean ranHook = new AtomicBoolean(false);
+    var command =
+        Command.noRequirements()
+            .executing(Coroutine::park)
+            .whenCanceled(() -> ranHook.set(true))
+            .named("Command");
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+    m_scheduler.cancelAll();
+    assertTrue(ranHook.get(), "onCancel hook was not called");
+  }
+
+  @Test
+  void cancelAllDoesNotCallOnCancelHookForQueuedCommands() {
+    AtomicBoolean ranHook = new AtomicBoolean(false);
+    var command =
+        Command.noRequirements()
+            .executing(Coroutine::park)
+            .whenCanceled(() -> ranHook.set(true))
+            .named("Command");
+    m_scheduler.schedule(command);
+    // no call to run before cancelAll()
+    m_scheduler.cancelAll();
+    assertFalse(ranHook.get(), "onCancel hook was not called");
   }
 
   @Test
