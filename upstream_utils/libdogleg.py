@@ -7,18 +7,18 @@ from upstream_utils import Lib, walk_cwd_and_copy_if
 
 
 def copy_upstream_src(wpilib_root: Path):
-    wpical = wpilib_root / "wpical"
+    mrcal = wpilib_root / "thirdparty/mrcal"
 
     # Delete old install
     for d in [
         "src/main/native/thirdparty/libdogleg/src",
         "src/main/native/thirdparty/libdogleg/include",
     ]:
-        shutil.rmtree(wpical / d, ignore_errors=True)
+        shutil.rmtree(mrcal / d, ignore_errors=True)
 
     files = walk_cwd_and_copy_if(
         lambda dp, f: f == "dogleg.h",
-        wpical / "src/main/native/thirdparty/libdogleg/include",
+        mrcal / "src/main/native/thirdparty/libdogleg/include",
     )
     for f in files:
         with open(f) as file:
@@ -31,7 +31,7 @@ def copy_upstream_src(wpilib_root: Path):
 
     files = walk_cwd_and_copy_if(
         lambda dp, f: f == "dogleg.cpp",
-        wpical / "src/main/native/thirdparty/libdogleg/src",
+        mrcal / "src/main/native/thirdparty/libdogleg/src",
     )
     for f in files:
         with open(f) as file:
