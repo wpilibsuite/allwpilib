@@ -77,29 +77,6 @@ public class ParallelGroupBuilder {
   }
 
   /**
-   * Forces the group to be a pure race, where the group will finish after the first command in the
-   * group completes. All other commands in the group will be canceled.
-   *
-   * @return The builder object, for chaining
-   */
-  public ParallelGroupBuilder racing() {
-    m_requiredCommands.clear();
-    return this;
-  }
-
-  /**
-   * Forces the group to require all its commands to complete, overriding any configured race or
-   * deadline behaviors. The group will only exit once every command has completed.
-   *
-   * @return The builder object, for chaining
-   */
-  public ParallelGroupBuilder requireAll() {
-    m_requiredCommands.clear();
-    m_requiredCommands.addAll(m_commands);
-    return this;
-  }
-
-  /**
    * Adds an end condition to the command group. If this condition is met before all required
    * commands have completed, the group will exit early. If multiple end conditions are added (e.g.
    * {@code .until(() -> conditionA()).until(() -> conditionB())}), then the last end condition
