@@ -10,8 +10,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.OnboardIMU;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 /** Represents a differential drive style drivetrain. */
@@ -31,7 +31,7 @@ public class Drivetrain {
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
 
-  private final AnalogGyro m_gyro = new AnalogGyro(0);
+  private final OnboardIMU m_imu = new OnboardIMU(OnboardIMU.MountOrientation.kFlat);
 
   private final PIDController m_leftPIDController = new PIDController(1, 0, 0);
   private final PIDController m_rightPIDController = new PIDController(1, 0, 0);
@@ -49,7 +49,7 @@ public class Drivetrain {
    * gyro.
    */
   public Drivetrain() {
-    m_gyro.reset();
+    m_imu.resetYaw();
 
     m_leftLeader.addFollower(m_leftFollower);
     m_rightLeader.addFollower(m_rightFollower);
@@ -70,7 +70,7 @@ public class Drivetrain {
 
     m_odometry =
         new DifferentialDriveOdometry(
-            m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
+            m_imu.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
   }
 
   /**
@@ -103,6 +103,6 @@ public class Drivetrain {
   /** Updates the field-relative position. */
   public void updateOdometry() {
     m_odometry.update(
-        m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
+        m_imu.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
   }
 }
