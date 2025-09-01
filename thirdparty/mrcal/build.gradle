@@ -96,8 +96,14 @@ model {
                     it.buildable = false
                     return
                 }
+
+                if (it in SharedLibraryBinarySpec) {
+                    it.buildable = false
+                    return
+                }
+
                 nativeUtils.useRequiredLibrary(it, 'ceres')
-                nativeUtils.useRequiredLibrary(it, 'opencv_shared')
+                nativeUtils.useRequiredLibrary(it, 'opencv_static')
             }
         }
     }
