@@ -334,9 +334,9 @@ std::optional<std::vector<uint8_t>> WireDecoder3::ReadRaw(
   }
 
   // string data
-  size_t toCopy = (std::min)(static_cast<size_t>(in->size()),
-                             static_cast<size_t>(m_rawReader.len.value() -
-                                                 m_rawReader.buf.size()));
+  size_t toCopy = (std::min)(
+      static_cast<size_t>(in->size()),
+      static_cast<size_t>(m_rawReader.len.value() - m_rawReader.buf.size()));
   m_rawReader.buf.insert(m_rawReader.buf.end(), in->begin(),
                          in->begin() + toCopy);
   *in = wpi::drop_front(*in, toCopy);
