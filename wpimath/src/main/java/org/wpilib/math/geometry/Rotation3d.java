@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.avaje.jsonb.Json;
 import java.util.Objects;
 import org.wpilib.math.geometry.proto.Rotation3dProto;
 import org.wpilib.math.geometry.struct.Rotation3dStruct;
@@ -68,6 +69,7 @@ import org.wpilib.util.struct.StructSerializable;
  * rotation. A neat property is that applying a series of rotations extrinsically is the same as
  * applying the same series in the opposite order intrinsically.
  */
+@Json
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation3d
@@ -79,6 +81,9 @@ public class Rotation3d
    */
   public static final Rotation3d kZero = new Rotation3d();
 
+  // @Json.Property("quaternion")
+  // @Json.Alias("quaternion")
+  @Json.Ignore
   private final Quaternion m_q;
 
   /** Constructs a Rotation3d representing no rotation. */
@@ -92,7 +97,8 @@ public class Rotation3d
    * @param q The quaternion.
    */
   @JsonCreator
-  public Rotation3d(@JsonProperty(required = true, value = "quaternion") Quaternion q) {
+  @Json.Creator
+  public Rotation3d(@JsonProperty(required = true, value = "quaternion") @Json.Alias("quaternion") Quaternion q) {
     m_q = q.normalize();
   }
 

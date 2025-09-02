@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.avaje.jsonb.Json;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,6 +32,7 @@ import org.wpilib.util.struct.StructSerializable;
  * <p>This assumes that you are using conventional mathematical axes. When the robot is at the
  * origin facing in the positive X direction, forward is positive X and left is positive Y.
  */
+@Json
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Translation2d
@@ -42,7 +44,9 @@ public class Translation2d
    */
   public static final Translation2d kZero = new Translation2d();
 
+  @Json.Property("x")
   private final double m_x;
+  @Json.Property("y")
   private final double m_y;
 
   /** Constructs a Translation2d with X and Y components equal to zero. */
@@ -57,6 +61,7 @@ public class Translation2d
    * @param y The y component of the translation.
    */
   @JsonCreator
+  @Json.Creator
   public Translation2d(
       @JsonProperty(required = true, value = "x") double x,
       @JsonProperty(required = true, value = "y") double y) {

@@ -6,6 +6,7 @@ package org.wpilib.vision.apriltag;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.avaje.jsonb.Json;
 import java.util.Objects;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.util.RawFrame;
@@ -13,6 +14,7 @@ import org.wpilib.vision.apriltag.jni.AprilTagJNI;
 
 /** Represents an AprilTag's metadata. */
 @SuppressWarnings("MemberName")
+@Json
 public class AprilTag {
   /** The tag's ID. */
   @JsonProperty(value = "ID")

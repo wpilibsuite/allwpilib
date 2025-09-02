@@ -46,6 +46,7 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 dependencies {
     implementation project(':wpimath')
+    annotationProcessor "io.avaje:avaje-jsonb-generator:3.7"
 }
 
 sourceSets {

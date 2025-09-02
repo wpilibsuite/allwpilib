@@ -92,6 +92,8 @@ dependencies {
     api libs.bundles.ejml
     api libs.bundles.jackson
     api libs.quickbuf.runtime
+    api "io.avaje:avaje-jsonb:3.7"
+    annotationProcessor "io.avaje:avaje-jsonb-generator:3.7"
 }
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"

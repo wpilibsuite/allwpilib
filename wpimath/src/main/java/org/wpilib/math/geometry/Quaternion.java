@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.avaje.jsonb.Json;
 import java.util.Objects;
 import org.wpilib.math.geometry.proto.QuaternionProto;
 import org.wpilib.math.geometry.struct.QuaternionStruct;
@@ -18,15 +19,20 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a quaternion. */
+@Json
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Quaternion implements ProtobufSerializable, StructSerializable {
   // Scalar r in versor form
+  @Json.Ignore
   private final double m_w;
 
   // Vector v in versor form
+  @Json.Ignore
   private final double m_x;
+  @Json.Ignore
   private final double m_y;
+  @Json.Ignore
   private final double m_z;
 
   /** Constructs a quaternion with a default angle of 0 degrees. */
@@ -46,11 +52,12 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    * @param z Z component of the quaternion.
    */
   @JsonCreator
+  @Json.Creator
   public Quaternion(
-      @JsonProperty(required = true, value = "W") double w,
-      @JsonProperty(required = true, value = "X") double x,
-      @JsonProperty(required = true, value = "Y") double y,
-      @JsonProperty(required = true, value = "Z") double z) {
+      @JsonProperty(required = true, value = "W") @Json.Alias("W") double w,
+      @JsonProperty(required = true, value = "X") @Json.Alias("X") double x,
+      @JsonProperty(required = true, value = "Y") @Json.Alias("Y") double y,
+      @JsonProperty(required = true, value = "Z") @Json.Alias("Z") double z) {
     m_w = w;
     m_x = x;
     m_y = y;

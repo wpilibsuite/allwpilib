@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.avaje.jsonb.Json;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,6 +46,7 @@ import org.wpilib.math.geometry.Translation3d;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
+@Json
 public class AprilTagFieldLayout {
   /** Common origin positions for the AprilTag coordinate system. */
   public enum OriginPosition {
@@ -54,11 +56,14 @@ public class AprilTagFieldLayout {
     kRedAllianceWallRightSide,
   }
 
+  @Json.Ignore
   private final Map<Integer, AprilTag> m_apriltags = new HashMap<>();
 
   @JsonProperty(value = "field")
-  private FieldDimensions m_fieldDimensions;
+  @Json.Ignore
+  FieldDimensions m_fieldDimensions;
 
+  @Json.Ignore
   private Pose3d m_origin;
 
   /**
@@ -97,7 +102,8 @@ public class AprilTagFieldLayout {
   }
 
   @JsonCreator
-  private AprilTagFieldLayout(
+  @Json.Creator
+  AprilTagFieldLayout(
       @JsonProperty(required = true, value = "tags") List<AprilTag> apriltags,
       @JsonProperty(required = true, value = "field") FieldDimensions fieldDimensions) {
     // To ensure the underlying semantics don't change with what kind of list is passed in
@@ -114,6 +120,7 @@ public class AprilTagFieldLayout {
    * @return The {@link AprilTag AprilTags} used in this layout.
    */
   @JsonProperty("tags")
+  @Json.Property("tags")
   public List<AprilTag> getTags() {
     return new ArrayList<>(m_apriltags.values());
   }
@@ -280,7 +287,7 @@ public class AprilTagFieldLayout {
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-  private static class FieldDimensions {
+  static class FieldDimensions {
     @SuppressWarnings("MemberName")
     @JsonProperty(value = "length")
     public final double fieldLength;
