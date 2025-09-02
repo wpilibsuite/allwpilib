@@ -6,7 +6,6 @@ package org.wpilib.commands3;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -34,7 +33,6 @@ public final class ParallelGroup implements Command {
    * @param optionalCommands The commands that do not need to complete for the group to finish. If
    *     this is empty, then the group will finish when <i>all</i> required commands complete.
    */
-  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   ParallelGroup(
       String name, Collection<Command> requiredCommands, Collection<Command> optionalCommands) {
     requireNonNullParam(name, "name", "ParallelGroup");
@@ -53,26 +51,11 @@ public final class ParallelGroup implements Command {
       i++;
     }
 
-    var allCommands = new ArrayList<Command>();
+    var allCommands = new LinkedHashSet<Command>();
     allCommands.addAll(requiredCommands);
     allCommands.addAll(optionalCommands);
 
-    for (Command c1 : allCommands) {
-      for (Command c2 : allCommands) {
-        if (c1 == c2) {
-          // Commands can't conflict with themselves
-          continue;
-        }
-        if (c1.conflictsWith(c2)) {
-          throw new IllegalArgumentException(
-              "Commands in a parallel composition cannot require the same mechanisms. "
-                  + c1.name()
-                  + " and "
-                  + c2.name()
-                  + " conflict.");
-        }
-      }
-    }
+    ConflictDetector.throwIfConflicts(allCommands);
 
     m_name = name;
     m_optionalCommands.addAll(optionalCommands);

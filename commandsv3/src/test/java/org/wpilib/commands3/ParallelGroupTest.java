@@ -49,7 +49,7 @@ class ParallelGroupTest {
                 })
             .named("C2");
 
-    var parallel = new ParallelGroup("Parallel", List.of(c1, c2), List.of(c1, c2));
+    var parallel = new ParallelGroup("Parallel", List.of(c1, c2), List.of());
     m_scheduler.schedule(parallel);
 
     // First call to run() should schedule and start the commands

@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * A coroutine object is injected into command's {@link Command#run(Coroutine)} method to allow
@@ -123,7 +122,7 @@ public final class Coroutine {
     }
 
     // Check for user error; there's no reason to fork conflicting commands simultaneously
-    validateNoConflicts(List.of(commands));
+    ConflictDetector.throwIfConflicts(List.of(commands));
 
     // Shorthand; this is handy for user-defined compositions
     for (var command : commands) {
@@ -158,7 +157,7 @@ public final class Coroutine {
   public void forkAll(Collection<Command> commands) {
     requireMounted();
 
-    validateNoConflicts(commands);
+    ConflictDetector.throwIfConflicts(commands);
 
     requireNonNullParam(commands, "commands", "Coroutine.fork");
     int i = 0;
@@ -168,7 +167,7 @@ public final class Coroutine {
     }
 
     // Check for user error; there's no reason to fork conflicting commands simultaneously
-    validateNoConflicts(commands);
+    ConflictDetector.throwIfConflicts(commands);
 
     // Shorthand; this is handy for user-defined compositions
     for (var command : commands) {
@@ -217,7 +216,7 @@ public final class Coroutine {
       i++;
     }
 
-    validateNoConflicts(commands);
+    ConflictDetector.throwIfConflicts(commands);
 
     for (var command : commands) {
       m_scheduler.schedule(command);
@@ -258,7 +257,7 @@ public final class Coroutine {
       i++;
     }
 
-    validateNoConflicts(commands);
+    ConflictDetector.throwIfConflicts(commands);
 
     // Schedule anything that's not already queued or running
     for (var command : commands) {
@@ -283,39 +282,6 @@ public final class Coroutine {
    */
   public void awaitAny(Command... commands) {
     awaitAny(Arrays.asList(commands));
-  }
-
-  /**
-   * Validates that a set of commands have no internal requirement conflicts. An error is thrown if
-   * a conflict is detected.
-   *
-   * @param commands The commands to validate
-   * @throws IllegalArgumentException If at least one pair of commands is found in the input where
-   *     both commands have at least one required mechanism in common
-   */
-  @SuppressWarnings("PMD.CompareObjectsWithEquals")
-  private static void validateNoConflicts(Collection<Command> commands) {
-    for (var c1 : commands) {
-      for (var c2 : commands) {
-        if (c1 == c2) {
-          // Commands can't conflict with themselves
-          continue;
-        }
-
-        // TODO: Report all pairs of conflicting commands? Instead of just the first one we find
-        if (c1.conflictsWith(c2)) {
-          var conflictNames =
-              c1.requirements().stream()
-                  .filter(c2::requires)
-                  .map(Mechanism::getName)
-                  .collect(Collectors.joining(", "));
-
-          throw new IllegalArgumentException(
-              "Command %s requires mechanisms that are already used by %s. Both require %s"
-                  .formatted(c2.name(), c1.name(), conflictNames));
-        }
-      }
-    }
   }
 
   /**

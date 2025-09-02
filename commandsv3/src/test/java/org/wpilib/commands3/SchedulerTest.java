@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -546,9 +547,8 @@ class SchedulerTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   void compositionsCannotAwaitConflictingCommands() {
-    var mech = new Mechanism("The mechanism", m_scheduler);
+    var mech = new Mechanism("The Mechanism", m_scheduler);
 
     var group =
         Command.noRequirements()
@@ -563,17 +563,11 @@ class SchedulerTest {
     m_scheduler.schedule(group);
 
     // Running should attempt to schedule multiple conflicting commands
-    try {
-      m_scheduler.run();
-      fail("An exception should have been thrown");
-    } catch (IllegalArgumentException iae) {
-      assertEquals(
-          "Command Second requires mechanisms that are already used by First. "
-              + "Both require The mechanism",
-          iae.getMessage());
-    } catch (Exception e) {
-      fail("Unexpected exception: " + e);
-    }
+    var exception = assertThrows(IllegalArgumentException.class, m_scheduler::run);
+    assertEquals(
+        "Commands running in parallel cannot share requirements: "
+            + "First and Second both require The Mechanism",
+        exception.getMessage());
   }
 
   @Test
