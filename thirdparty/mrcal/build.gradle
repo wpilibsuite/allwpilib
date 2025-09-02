@@ -1,7 +1,9 @@
 apply plugin: 'c'
 apply plugin: 'cpp'
+apply plugin: 'java'
 apply plugin: 'visual-studio'
 apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'edu.wpi.first.GradleJni'
 
 if (project.hasProperty('onlylinuxathena')) {
     return;
@@ -19,8 +21,6 @@ nativeUtils.exportsConfigs {
     mrcal {
     }
 }
-
-project(':').libraryBuild.dependsOn build
 
 // Suppress warnings
 nativeUtils.platformConfigs.each {
@@ -67,6 +67,7 @@ nativeUtils.platformConfigs.each {
     }
 }
 
+project(':').libraryBuild.dependsOn build
 
 model {
     components {
@@ -85,6 +86,7 @@ model {
                     source {
                         srcDirs 'src/main/native/thirdparty/src', 'src/main/native/src', 'src/main/native/thirdparty/libdogleg/src'
                         include '*.cpp'
+                        exclude '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/thirdparty/include', 'src/main/native/thirdparty/generated', 'src/main/native/include', 'src/main/native/thirdparty/libdogleg/include'
@@ -96,7 +98,6 @@ model {
                     it.buildable = false
                     return
                 }
-
                 if (it in SharedLibraryBinarySpec) {
                     it.buildable = false
                     return
@@ -107,7 +108,38 @@ model {
                 nativeUtils.useRequiredLibrary(it, 'ceres')
             }
         }
+        "${nativeName}JNIShared"(JniNativeLibrarySpec) {
+            if (project.hasProperty('skipJniSymbols')) {
+                checkSkipSymbols = skipJniSymbols
+            }
+
+            enableCheckTask !project.hasProperty('skipJniCheck')
+            javaCompileTasks << compileJava
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp'
+                        include '**/jni/**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        include '**/*.h'
+                    }
+                }
+            }
+            binaries.all {
+                if (it instanceof StaticLibraryBinarySpec) {
+                    it.buildable = false
+                    return
+                }
+                lib library: "${nativeName}", linkage: 'shared'
+                if (!project.hasProperty('noWpiutil')) {
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                }
+            }
+        }
     }
 }
-
 apply from: 'publish.gradle'
