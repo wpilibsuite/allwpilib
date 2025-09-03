@@ -10,6 +10,8 @@
 #include <span>
 #include <stdexcept>
 #include <vector>
+#include <memory>
+#include <iostream>
 
 #include <wpi/jni_util.h>
 
@@ -157,7 +159,7 @@ Java_edu_wpi_first_mrcal_MrCalJNI_mrcal_1calibrate_1camera
     std::cerr << "Calibration exception: " << what() << std::endl;
 
     static char buff[512];
-    std::strcpy(buff, what().c_str());
+    std::snprintf(buff, what().size(), "%s", what().c_str());
     env->ThrowNew(env->FindClass("java/lang/Exception"), buff);
     return NULL;
   }
