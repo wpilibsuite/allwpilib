@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.mrcal;
 
 import java.util.Arrays;
@@ -102,7 +106,6 @@ public class MrCalJNI {
 
       // Assume that we're correct in terms of row/column major-ness (lol)
       for (int c = 0; c < corners.length; c++) {
-
         var corner = corners[c];
         float level = levels[c];
 

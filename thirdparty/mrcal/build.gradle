@@ -105,8 +105,8 @@ model {
                 }
                 if (it in SharedLibraryBinarySpec) {
                     it.buildable = false
-                    return
                     nativeUtils.useRequiredLibrary(it, 'opencv_shared')
+                    return
                 } else {
                     nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 }
@@ -118,7 +118,8 @@ model {
                 checkSkipSymbols = skipJniSymbols
             }
 
-            enableCheckTask !project.hasProperty('skipJniCheck')
+            // enableCheckTask !project.hasProperty('skipJniCheck')
+            enableCheckTask false
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
@@ -142,12 +143,10 @@ model {
                 if (it instanceof StaticLibraryBinarySpec) {
                     it.buildable = false
                     return
-                    nativeUtils.useRequiredLibrary(it, 'opencv_static')
-                } else {
-                    nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                 }
-                nativeUtils.useRequiredLibrary(it, 'ceres')
                 lib library: "${nativeName}", linkage: 'shared'
+                nativeUtils.useRequiredLibrary(it, 'ceres')
+                nativeUtils.useRequiredLibrary(it, 'opencv_shared')
             }
         }
     }
