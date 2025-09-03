@@ -8,7 +8,7 @@ import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,7 +36,10 @@ public final class ConflictDetector {
      */
     public String description() {
       var shared =
-          sharedRequirements.stream().map(Mechanism::getName).collect(Collectors.joining(", "));
+          sharedRequirements.stream()
+              .map(Mechanism::getName)
+              .sorted()
+              .collect(Collectors.joining(", "));
       return "%s and %s both require %s".formatted(a.name(), b.name(), shared);
     }
   }
@@ -112,8 +115,7 @@ public final class ConflictDetector {
   }
 
   private static Conflict findConflict(Command a, Command b) {
-    // using a LinkedHashSet for consistent ordering
-    Set<Mechanism> sharedRequirements = new LinkedHashSet<>(a.requirements());
+    Set<Mechanism> sharedRequirements = new HashSet<>(a.requirements());
     sharedRequirements.retainAll(b.requirements());
     return new Conflict(a, b, Set.copyOf(sharedRequirements));
   }
