@@ -7,11 +7,12 @@
 #include <algorithm>
 #include <cstdio>
 #include <exception>
+#include <iostream>
+#include <memory>
 #include <span>
 #include <stdexcept>
+#include <string>
 #include <vector>
-#include <memory>
-#include <iostream>
 
 #include <wpi/jni_util.h>
 
