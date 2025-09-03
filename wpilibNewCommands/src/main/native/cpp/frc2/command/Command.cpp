@@ -153,6 +153,21 @@ CommandPtr Command::WithName(std::string_view name) && {
   return std::move(*this).ToPtr().WithName(name);
 }
 
+CommandPtr Command::WithRequirements(Requirements requirements) && {
+  this->AddRequirements(std::move(requirements));
+  return std::move(*this).ToPtr();
+}
+
+CommandPtr Command::WithRequirements(wpi::SmallSet<Subsystem*, 4> requirements) && {
+  this->AddRequirements(std::move(requirements));
+  return std::move(*this).ToPtr();
+}
+
+CommandPtr Command::WithRequirements(Subsystem* requirement) && {
+  this->AddRequirements(requirement);
+  return std::move(*this).ToPtr();
+}
+
 void Command::Schedule() {
   CommandScheduler::GetInstance().Schedule(this);
 }
