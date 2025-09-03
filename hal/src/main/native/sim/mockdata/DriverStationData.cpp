@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "hal/simulation/DriverStationData.h"
+
+#include <algorithm>
 #include <cstring>
 
 #include <fmt/format.h>
@@ -26,9 +28,7 @@ DriverStationData::DriverStationData() {
 }
 
 DriverStationData::~DriverStationData() {
-  HALSIM_FreeOpModeOptionsArray(m_autoOpModes.data(), m_autoOpModes.size());
-  HALSIM_FreeOpModeOptionsArray(m_teleopOpModes.data(), m_teleopOpModes.size());
-  HALSIM_FreeOpModeOptionsArray(m_testOpModes.data(), m_testOpModes.size());
+  HALSIM_FreeOpModeOptionsArray(m_opModeOptions.data(), m_opModeOptions.size());
 }
 
 void DriverStationData::ResetData() {
@@ -64,56 +64,30 @@ void DriverStationData::ResetData() {
   }
   {
     std::scoped_lock lock{m_opModeMutex};
-    m_autoOpModesCallbacks.Reset();
-    m_teleopOpModesCallbacks.Reset();
-    m_testOpModesCallbacks.Reset();
-    // XXX: do not clear options vectors as they come from robot code?
+    m_opModeOptionsCallbacks.Reset();
+    // XXX: do not clear options vector as it comes from robot code?
   }
   m_newDataCallbacks.Reset();
 }
 
-bool DriverStationData::GetOpModeMapVec(HAL_RobotMode mode,
-                                        wpi::DenseMap<int64_t, uint32_t>** map,
-                                        std::vector<HALSIM_OpModeOption>** vec,
-                                        int64_t* hashBase) {
-  switch (mode) {
-    case HAL_ROBOTMODE_AUTONOMOUS:
-      *map = &m_autoOpModesMap;
-      *vec = &m_autoOpModes;
-      *hashBase = 0x0100000000000000;
-      return true;
-    case HAL_ROBOTMODE_TELEOPERATED:
-      *map = &m_teleopOpModesMap;
-      *vec = &m_teleopOpModes;
-      *hashBase = 0;
-      return true;
-    case HAL_ROBOTMODE_TEST:
-      *map = &m_testOpModesMap;
-      *vec = &m_testOpModes;
-      *hashBase = 0x0200000000000000;
-      return true;
-    default:
-      return false;
+void DriverStationData::SetOpModeOptions(
+    std::span<const HAL_OpModeOption> options) {
+  std::scoped_lock lock{m_opModeMutex};
+
+  HALSIM_FreeOpModeOptionsArray(m_opModeOptions.data(), m_opModeOptions.size());
+  m_opModeOptions.clear();
+  m_opModeOptions.reserve(options.size());
+  for (const auto& option : options) {
+    m_opModeOptions.emplace_back(option.id, wpi::copy_wpi_string(option.name),
+                                 wpi::copy_wpi_string(option.group),
+                                 wpi::copy_wpi_string(option.description),
+                                 option.textColor, option.backgroundColor);
   }
+  m_opModeOptionsCallbacks.Invoke(m_opModeOptions.data(),
+                                  m_opModeOptions.size());
 }
 
-void DriverStationData::CallOpModesCallbacks(HAL_RobotMode mode) {
-  switch (mode) {
-    case HAL_ROBOTMODE_AUTONOMOUS:
-      m_autoOpModesCallbacks.Invoke(m_autoOpModes.data(), m_autoOpModes.size());
-      break;
-    case HAL_ROBOTMODE_TELEOPERATED:
-      m_teleopOpModesCallbacks.Invoke(m_teleopOpModes.data(),
-                                      m_teleopOpModes.size());
-      break;
-    case HAL_ROBOTMODE_TEST:
-      m_testOpModesCallbacks.Invoke(m_testOpModes.data(), m_testOpModes.size());
-      break;
-    default:
-      break;
-  }
-}
-
+#if 0
 int64_t DriverStationData::AddOpMode(HAL_RobotMode mode, std::string_view name,
                                      std::string_view group,
                                      std::string_view description,
@@ -148,97 +122,39 @@ int64_t DriverStationData::AddOpMode(HAL_RobotMode mode, std::string_view name,
   CallOpModesCallbacks(mode);
   return h;
 }
-
-void DriverStationData::ClearOpModes() {
-  std::scoped_lock lock{m_opModeMutex};
-
-  bool hasAutoOpModes = !m_autoOpModesMap.empty();
-  HALSIM_FreeOpModeOptionsArray(m_autoOpModes.data(), m_autoOpModes.size());
-  m_autoOpModes.clear();
-  m_autoOpModesMap.clear();
-
-  bool hasTeleopOpModes = !m_teleopOpModesMap.empty();
-  HALSIM_FreeOpModeOptionsArray(m_teleopOpModes.data(), m_teleopOpModes.size());
-  m_teleopOpModes.clear();
-  m_teleopOpModesMap.clear();
-
-  bool hasTestOpModes = !m_testOpModesMap.empty();
-  HALSIM_FreeOpModeOptionsArray(m_testOpModes.data(), m_testOpModes.size());
-  m_testOpModes.clear();
-  m_testOpModesMap.clear();
-
-  if (hasAutoOpModes) {
-    m_autoOpModesCallbacks.Invoke(m_autoOpModes.data(), m_autoOpModes.size());
+#endif
+int32_t DriverStationData::RegisterOpModeOptionsCallback(
+    HAL_OpModeOptionsCallback callback, void* param, HAL_Bool initialNotify) {
+  std::scoped_lock lock(m_opModeMutex);
+  int32_t uid = m_opModeOptionsCallbacks.Register(callback, param);
+  if (initialNotify) {
+    callback(GetOpModeOptionsName(), param, m_opModeOptions.data(),
+             m_opModeOptions.size());
   }
-  if (hasTeleopOpModes) {
-    m_teleopOpModesCallbacks.Invoke(m_teleopOpModes.data(),
-                                    m_teleopOpModes.size());
-  }
-  if (hasTestOpModes) {
-    m_testOpModesCallbacks.Invoke(m_testOpModes.data(), m_testOpModes.size());
-  }
+  return uid;
 }
 
-#define DEFINE_CPPAPI_CALLBACKS(Upper, lower)                               \
-  int32_t DriverStationData::Register##Upper##OpModesCallback(              \
-      HAL_OpModeOptionsCallback callback, void* param,                      \
-      HAL_Bool initialNotify) {                                             \
-    std::scoped_lock lock(m_opModeMutex);                                   \
-    int32_t uid = m_##lower##OpModesCallbacks.Register(callback, param);    \
-    if (initialNotify) {                                                    \
-      callback(Get##Upper##OpModesName(), param, m_##lower##OpModes.data(), \
-               m_##lower##OpModes.size());                                  \
-    }                                                                       \
-    return uid;                                                             \
-  }                                                                         \
-                                                                            \
-  void DriverStationData::Cancel##Upper##OpModesCallback(int32_t uid) {     \
-    m_##lower##OpModesCallbacks.Cancel(uid);                                \
+void DriverStationData::CancelOpModeOptionsCallback(int32_t uid) {
+  m_opModeOptionsCallbacks.Cancel(uid);
+}
+
+HAL_OpModeOption* DriverStationData::GetOpModeOptions(int32_t* len) {
+  std::scoped_lock lock(m_opModeMutex);
+  *len = 0;
+  if (m_opModeOptions.empty()) {
+    return nullptr;
   }
 
-#define DEFINE_CPPAPI(Upper, lower)                                            \
-  DEFINE_CPPAPI_CALLBACKS(Upper, lower)                                        \
-                                                                               \
-  HALSIM_OpModeOption* DriverStationData::Get##Upper##OpModes(int32_t* len) {  \
-    std::scoped_lock lock(m_opModeMutex);                                      \
-    *len = 0;                                                                  \
-    if (m_##lower##OpModes.empty()) {                                          \
-      return nullptr;                                                          \
-    }                                                                          \
-                                                                               \
-    auto options = static_cast<HALSIM_OpModeOption*>(                          \
-        std::malloc(sizeof(HALSIM_OpModeOption) * m_##lower##OpModes.size())); \
-    auto end =                                                                 \
-        std::copy_if(m_##lower##OpModes.begin(), m_##lower##OpModes.end(),     \
-                     options, [](const auto& data) { return data.id != 0; });  \
-    *len = end - options;                                                      \
-    if (*len == 0) {                                                           \
-      std::free(options);                                                      \
-      return nullptr;                                                          \
-    }                                                                          \
-    for (auto option = options; option != end; ++option) {                     \
-      if (option->name.str) {                                                  \
-        option->name =                                                         \
-            wpi::alloc_wpi_string(wpi::to_string_view(&option->name));         \
-      }                                                                        \
-      if (option->group.str) {                                                 \
-        option->group =                                                        \
-            wpi::alloc_wpi_string(wpi::to_string_view(&option->group));        \
-      }                                                                        \
-      if (option->description.str) {                                           \
-        option->description =                                                  \
-            wpi::alloc_wpi_string(wpi::to_string_view(&option->description));  \
-      }                                                                        \
-    }                                                                          \
-    return options;                                                            \
+  auto options = static_cast<HAL_OpModeOption*>(
+      std::malloc(sizeof(HAL_OpModeOption) * m_opModeOptions.size()));
+  std::copy(m_opModeOptions.begin(), m_opModeOptions.end(), options);
+  for (auto&& option : std::span{options, m_opModeOptions.size()}) {
+    option.name = wpi::copy_wpi_string(option.name);
+    option.group = wpi::copy_wpi_string(option.group);
+    option.description = wpi::copy_wpi_string(option.description);
   }
-
-DEFINE_CPPAPI(Auto, auto)
-DEFINE_CPPAPI(Teleop, teleop)
-DEFINE_CPPAPI(Test, test)
-
-#undef DEFINE_CPPAPI_CALLBACKS
-#undef DEFINE_CPPAPI
+  return options;
+}
 
 #define DEFINE_CPPAPI_CALLBACKS(name, data, data2)                             \
   int32_t DriverStationData::RegisterJoystick##name##Callback(                 \
@@ -601,28 +517,23 @@ DEFINE_CAPI(HAL_AllianceStationID, AllianceStationId, allianceStationId)
 DEFINE_CAPI(double, MatchTime, matchTime)
 DEFINE_CAPI(int64_t, OpMode, opMode)
 
-#undef DEFINE_CAPI
-#define DEFINE_CAPI(name)                                               \
-  int32_t HALSIM_Register##name##OpModesCallback(                       \
-      HAL_OpModeOptionsCallback callback, void* param,                  \
-      HAL_Bool initialNotify) {                                         \
-    return SimDriverStationData->Register##name##OpModesCallback(       \
-        callback, param, initialNotify);                                \
-  }                                                                     \
-                                                                        \
-  void HALSIM_Cancel##name##OpModesCallback(int32_t uid) {              \
-    return SimDriverStationData->Cancel##name##OpModesCallback(uid);    \
-  }                                                                     \
-                                                                        \
-  struct HALSIM_OpModeOption* HALSIM_Get##name##OpModes(int32_t* len) { \
-    return SimDriverStationData->Get##name##OpModes(len);               \
-  }
+int32_t HALSIM_RegisterOpModeOptionsCallback(HAL_OpModeOptionsCallback callback,
+                                             void* param,
+                                             HAL_Bool initialNotify) {
+  return SimDriverStationData->RegisterOpModeOptionsCallback(callback, param,
+                                                             initialNotify);
+}
 
-DEFINE_CAPI(Auto)
-DEFINE_CAPI(Teleop)
-DEFINE_CAPI(Test)
+void HALSIM_CancelOpModeOptionsCallback(int32_t uid) {
+  return SimDriverStationData->CancelOpModeOptionsCallback(uid);
+}
 
-void HALSIM_FreeOpModeOptionsArray(HALSIM_OpModeOption* arr, size_t length) {
+struct HAL_OpModeOption* HALSIM_GetOpModeOptions(int32_t* len) {
+  return SimDriverStationData->GetOpModeOptions(len);
+}
+
+void HALSIM_FreeOpModeOptionsArray(struct HAL_OpModeOption* arr,
+                                   size_t length) {
   for (size_t i = 0; i < length; ++i) {
     WPI_FreeString(&arr[i].name);
     WPI_FreeString(&arr[i].group);

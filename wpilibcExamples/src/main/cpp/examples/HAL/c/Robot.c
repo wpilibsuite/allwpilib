@@ -40,13 +40,15 @@ int main(void) {
   int32_t status = 0;
 
   // Create an opmode per robot mode
-  struct WPI_String name;
-  WPI_InitString(&name, "Auto");
-  HAL_AddOpMode(HAL_ROBOTMODE_AUTONOMOUS, &name, NULL, NULL, -1, -1);
-  WPI_InitString(&name, "Teleop");
-  HAL_AddOpMode(HAL_ROBOTMODE_TELEOPERATED, &name, NULL, NULL, -1, -1);
-  WPI_InitString(&name, "Test");
-  HAL_AddOpMode(HAL_ROBOTMODE_TEST, &name, NULL, NULL, -1, -1);
+  static struct HAL_OpModeOption opmodes[] = {
+    {HAL_OPMODE_MAKE_ID(HAL_ROBOTMODE_AUTONOMOUS, 0), {"Auto", 4}, {"", 0},
+     {"", 0}, -1, -1},
+    {HAL_OPMODE_MAKE_ID(HAL_ROBOTMODE_TELEOPERATED, 0), {"Teleop", 6}, {"", 0},
+     {"", 0}, -1, -1},
+    {HAL_OPMODE_MAKE_ID(HAL_ROBOTMODE_TEST, 0), {"Test", 4}, {"", 0}, {"", 0},
+     -1, -1}
+  };
+  HAL_SetOpModeOptions(opmodes, sizeof(opmodes) / sizeof(opmodes[0]));
 
   // For DS to see valid robot code
   HAL_ObserveUserProgramStarting();

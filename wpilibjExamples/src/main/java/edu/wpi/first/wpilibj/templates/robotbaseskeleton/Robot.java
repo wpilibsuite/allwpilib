@@ -34,6 +34,7 @@ public class Robot extends RobotBase {
     DriverStation.addOpMode(RobotMode.AUTONOMOUS, "Auto");
     DriverStation.addOpMode(RobotMode.TELEOPERATED, "Teleop");
     DriverStation.addOpMode(RobotMode.TEST, "Test");
+    DriverStation.publishOpModes();
 
     DriverStationModeThread modeThread = new DriverStationModeThread();
 

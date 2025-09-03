@@ -24,25 +24,21 @@ DEFINE_CAPI(HAL_AllianceStationID, AllianceStationId,
 DEFINE_CAPI(double, MatchTime, 0)
 DEFINE_CAPI(int64_t, OpMode, 0)
 
-#undef DEFINE_CAPI
-#define DEFINE_CAPI(name)                                               \
-  int32_t HALSIM_Register##name##OpModesCallback(                       \
-      HAL_OpModeOptionsCallback callback, void* param,                  \
-      HAL_Bool initialNotify) {                                         \
-    return 0;                                                           \
-  }                                                                     \
-                                                                        \
-  void HALSIM_Cancel##name##OpModesCallback(int32_t uid) {}             \
-                                                                        \
-  struct HALSIM_OpModeOption* HALSIM_Get##name##OpModes(int32_t* len) { \
-    return nullptr;                                                     \
-  }
+int32_t HALSIM_RegisterOpModeOptionsCallback(HAL_OpModeOptionsCallback callback,
+                                             void* param,
+                                             HAL_Bool initialNotify) {
+  return 0;
+}
 
-DEFINE_CAPI(Auto)
-DEFINE_CAPI(Teleop)
-DEFINE_CAPI(Test)
+void HALSIM_CancelOpModeOptionsCallback(int32_t uid) {}
 
-void HALSIM_FreeOpModeOptionsArray(HALSIM_OpModeOption* arr, size_t length) {}
+struct HAL_OpModeOption* HALSIM_GetOpModeOptions(int32_t* len) {
+  *len = 0;
+  return nullptr;
+}
+
+void HALSIM_FreeOpModeOptionsArray(struct HAL_OpModeOption* arr,
+                                   size_t length) {}
 
 #undef DEFINE_CAPI
 #define DEFINE_CAPI(name, data)                                                \

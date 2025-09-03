@@ -14,6 +14,7 @@ import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.MatchInfoData;
+import edu.wpi.first.hal.OpModeOption;
 import edu.wpi.first.hal.RobotMode;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.BooleanPublisher;
@@ -26,11 +27,10 @@ import edu.wpi.first.util.EventVector;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.util.Color;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Provide access to the network communication data to / from the Driver Station. */
@@ -175,9 +175,14 @@ public final class DriverStation {
     if (id == 0) {
       return "";
     }
-    String str = m_opModes.get(id);
-    if (str != null) {
-      return str;
+    m_opModesMutex.lock();
+    try {
+      OpModeOption option = m_opModes.get(id);
+      if (option != null) {
+        return option.name;
+      }
+    } finally {
+      m_opModesMutex.unlock();
     }
     return "<" + id + ">";
   }
@@ -489,7 +494,8 @@ public final class DriverStation {
 
   private static boolean m_silenceJoystickWarning;
 
-  private static final ConcurrentMap<Long, String> m_opModes = new ConcurrentHashMap<>();
+  private static final Map<Long, OpModeOption> m_opModes = new HashMap<>();
+  private static final ReentrantLock m_opModesMutex = new ReentrantLock();
 
   /**
    * DriverStation constructor.
@@ -1073,7 +1079,8 @@ public final class DriverStation {
   }
 
   /**
-   * Adds an operating mode option.
+   * Adds an operating mode option. It's necessary to call publishOpModes() to make the added modes
+   * visible to the driver station.
    *
    * @param mode robot mode
    * @param name name of the operating mode
@@ -1081,9 +1088,11 @@ public final class DriverStation {
    * @param description description of the operating mode
    * @param textColor text color, or null for default
    * @param backgroundColor background color, or null for default
-   * @return unique ID used to later identify the operating mode; if an empty string is passed, 0 is
-   *     returned; identical names for the same robot mode result in identical unique IDs
+   * @return unique ID used to later identify the operating mode
+   * @throws IllegalArgumentException if name is empty or an operating mode with the same name
+   *     already exists
    */
+  @SuppressWarnings("PMD.UseStringBufferForStringAppends")
   public static long addOpMode(
       RobotMode mode,
       String name,
@@ -1092,66 +1101,104 @@ public final class DriverStation {
       Color textColor,
       Color backgroundColor) {
     if (name.isEmpty()) {
-      return 0;
+      throw new IllegalArgumentException("OpMode name must be non-empty");
     }
-    long id =
-        DriverStationJNI.addOpMode(
-            mode,
-            name,
-            group,
-            description,
-            convertColorToInt(textColor),
-            convertColorToInt(backgroundColor));
-    if (id == 0) {
-      return 0;
+    // find unique ID
+    m_opModesMutex.lock();
+    try {
+      String nameCopy = name;
+      for (; ; ) {
+        long id = OpModeOption.makeId(mode, nameCopy.hashCode());
+        OpModeOption existing = m_opModes.get(id);
+        if (existing == null) {
+          m_opModes.put(
+              id,
+              new OpModeOption(
+                  id,
+                  nameCopy,
+                  group,
+                  description,
+                  convertColorToInt(textColor),
+                  convertColorToInt(backgroundColor)));
+          return id;
+        }
+        if (existing.name.equals(nameCopy)) {
+          // already exists
+          throw new IllegalArgumentException("OpMode " + name + " already exists");
+        }
+        // collision, try again with space appended
+        nameCopy += ' ';
+      }
+    } finally {
+      m_opModesMutex.unlock();
     }
-    m_opModes.put(id, name);
-    return id;
   }
 
   /**
-   * Adds an operating mode option.
+   * Adds an operating mode option. It's necessary to call publishOpModes() to make the added modes
+   * visible to the driver station.
    *
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
-   * @return unique ID used to later identify the operating mode; if an empty string is passed, 0 is
-   *     returned; identical names for the same robot mode result in identical unique IDs
+   * @return unique ID used to later identify the operating mode
+   * @throws IllegalArgumentException if name is empty or an operating mode with the same name
+   *     already exists
    */
   public static long addOpMode(RobotMode mode, String name, String group, String description) {
     return addOpMode(mode, name, group, description, null, null);
   }
 
   /**
-   * Adds an operating mode option.
+   * Adds an operating mode option. It's necessary to call publishOpModes() to make the added modes
+   * visible to the driver station.
    *
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
-   * @return unique ID used to later identify the operating mode; if an empty string is passed, 0 is
-   *     returned; identical names for the same robot mode result in identical unique IDs
+   * @return unique ID used to later identify the operating mode
+   * @throws IllegalArgumentException if name is empty or an operating mode with the same name
+   *     already exists
    */
   public static long addOpMode(RobotMode mode, String name, String group) {
     return addOpMode(mode, name, group, "");
   }
 
   /**
-   * Adds an operating mode option.
+   * Adds an operating mode option. It's necessary to call publishOpModes() to make the added modes
+   * visible to the driver station.
    *
    * @param mode robot mode
    * @param name name of the operating mode
-   * @return unique ID used to later identify the operating mode; if an empty string is passed, 0 is
-   *     returned; identical names for the same robot mode result in identical unique IDs
+   * @return unique ID used to later identify the operating mode
+   * @throws IllegalArgumentException if name is empty or an operating mode with the same name
+   *     already exists
    */
   public static long addOpMode(RobotMode mode, String name) {
     return addOpMode(mode, name, "");
   }
 
+  /** Publishes the operating mode options to the driver station. */
+  public static void publishOpModes() {
+    m_opModesMutex.lock();
+    try {
+      OpModeOption[] options = new OpModeOption[m_opModes.size()];
+      DriverStationJNI.setOpModeOptions(m_opModes.values().toArray(options));
+    } finally {
+      m_opModesMutex.unlock();
+    }
+  }
+
   /** Clears all operating mode options. */
   public static void clearOpModes() {
-    m_opModes.clear();
-    DriverStationJNI.clearOpModes();
+    m_opModesMutex.lock();
+    try {
+      m_opModes.clear();
+      DriverStationJNI.setOpModeOptions(new OpModeOption[0]);
+    } finally {
+      m_opModesMutex.unlock();
+    }
   }
 
   /**

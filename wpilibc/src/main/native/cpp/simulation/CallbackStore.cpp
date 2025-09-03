@@ -21,9 +21,9 @@ void frc::sim::ConstBufferCallbackStoreThunk(const char* name, void* param,
                                                                count);
 }
 
-void frc::sim::OpModeOptionsCallbackStoreThunk(
-    const char* name, void* param, const HALSIM_OpModeOption* opmodes,
-    int32_t count) {
+void frc::sim::OpModeOptionsCallbackStoreThunk(const char* name, void* param,
+                                               const HAL_OpModeOption* opmodes,
+                                               int32_t count) {
   reinterpret_cast<CallbackStore*>(param)->opModeOptionsCallback(
       name, {opmodes, opmodes + count});
 }

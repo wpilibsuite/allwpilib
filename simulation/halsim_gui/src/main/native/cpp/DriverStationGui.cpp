@@ -304,18 +304,41 @@ static OpModes gTeleopOpModes;
 static OpModes gTestOpModes;
 
 static void UpdateOpModes(const char* name, void* param,
-                          const HALSIM_OpModeOption* opmodes, int32_t count) {
-  auto* vec = static_cast<OpModes*>(param);
+                          const HAL_OpModeOption* opmodes, int32_t count) {
   std::scoped_lock lock(gOpModeOptionsMutex);
-  vec->ids.clear();
-  vec->groups.clear();
+  gAutoOpModes.ids.clear();
+  gAutoOpModes.groups.clear();
+  gTeleopOpModes.ids.clear();
+  gTeleopOpModes.groups.clear();
+  gTestOpModes.ids.clear();
+  gTestOpModes.groups.clear();
   for (auto&& o : std::span{opmodes, opmodes + count}) {
-    if (o.id != 0) {
-      vec->ids[o.id] = wpi::to_string_view(&o.name);
-      vec->groups[o.group.str].emplace_back(
-          OpModeOption{o.id, std::string{wpi::to_string_view(&o.name)},
-                       std::string{wpi::to_string_view(&o.description)},
-                       o.textColor, o.backgroundColor});
+    OpModes* vec;
+    switch (HAL_OPMODE_GET_MODE(o.id)) {
+      case HAL_ROBOTMODE_AUTONOMOUS:
+        vec = &gAutoOpModes;
+        break;
+      case HAL_ROBOTMODE_TELEOPERATED:
+        vec = &gTeleopOpModes;
+        break;
+      case HAL_ROBOTMODE_TEST:
+        vec = &gTestOpModes;
+        break;
+      default:
+        continue;
+    }
+    vec->ids[o.id] = wpi::to_string_view(&o.name);
+    vec->groups[wpi::to_string_view(&o.group)].emplace_back(
+        OpModeOption{o.id, std::string{wpi::to_string_view(&o.name)},
+                     std::string{wpi::to_string_view(&o.description)},
+                     o.textColor, o.backgroundColor});
+  }
+  for (auto&& vec : {&gAutoOpModes, &gTeleopOpModes, &gTestOpModes}) {
+    for (auto&& [group, options] : vec->groups) {
+      std::sort(options.begin(), options.end(),
+                [](const OpModeOption& a, const OpModeOption& b) {
+                  return a.name < b.name;
+                });
     }
   }
 }
@@ -1492,9 +1515,7 @@ void DriverStationGui::GlobalInit() {
 
   gFMSModel = std::make_unique<FMSSimModel>();
 
-  HALSIM_RegisterAutoOpModesCallback(UpdateOpModes, &gAutoOpModes, true);
-  HALSIM_RegisterTeleopOpModesCallback(UpdateOpModes, &gTeleopOpModes, true);
-  HALSIM_RegisterTestOpModesCallback(UpdateOpModes, &gTestOpModes, true);
+  HALSIM_RegisterOpModeOptionsCallback(UpdateOpModes, nullptr, true);
 
   wpi::gui::AddEarlyExecute(DriverStationExecute);
 

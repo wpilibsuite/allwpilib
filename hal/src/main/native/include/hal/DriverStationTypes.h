@@ -8,6 +8,7 @@
 
 #include "hal/Types.h"
 
+#include <wpi/string.h>
 #ifdef __cplusplus
 #include <wpi/struct/Struct.h>
 #endif  // __cplusplus
@@ -136,6 +137,26 @@ struct HAL_MatchInfo {
   uint16_t gameSpecificMessageSize;
 };
 typedef struct HAL_MatchInfo HAL_MatchInfo;
+
+#define HAL_OPMODE_ROBOT_MODE_MASK 0x0300000000000000LL
+#define HAL_OPMODE_ROBOT_MODE_SHIFT 56
+#define HAL_OPMODE_HASH_MASK 0x00FFFFFFFFFFFFFFLL
+#define HAL_OPMODE_MAKE_ID(mode, hash)                        \
+  (((int64_t)((mode) & 0x3) << HAL_OPMODE_ROBOT_MODE_SHIFT) | \
+   ((hash) & HAL_OPMODE_HASH_MASK))
+#define HAL_OPMODE_GET_MODE(id)                          \
+  (HAL_RobotMode)(((id) & HAL_OPMODE_ROBOT_MODE_MASK) >> \
+                  HAL_OPMODE_ROBOT_MODE_SHIFT)
+
+struct HAL_OpModeOption {
+  int64_t id;  // encodes robot mode in bits 57-56, LSB 56 bits is hash of name
+  struct WPI_String name;
+  struct WPI_String group;
+  struct WPI_String description;
+  int32_t textColor;
+  int32_t backgroundColor;
+};
+typedef struct HAL_OpModeOption HAL_OpModeOption;
 /** @} */
 
 #ifdef __cplusplus

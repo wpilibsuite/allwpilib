@@ -24,13 +24,26 @@ void Robot::StartCompetition() {
   frc::internal::DriverStationModeThread modeThread;
 
   // Create an opmode per robot mode
-  WPI_String name;
-  WPI_InitString(&name, "Auto");
-  HAL_AddOpMode(HAL_ROBOTMODE_AUTONOMOUS, &name, nullptr, nullptr, -1, -1);
-  WPI_InitString(&name, "Teleop");
-  HAL_AddOpMode(HAL_ROBOTMODE_TELEOPERATED, &name, nullptr, nullptr, -1, -1);
-  WPI_InitString(&name, "Test");
-  HAL_AddOpMode(HAL_ROBOTMODE_TEST, &name, nullptr, nullptr, -1, -1);
+  static struct HAL_OpModeOption opmodes[] = {
+      {HAL_OPMODE_MAKE_ID(HAL_ROBOTMODE_AUTONOMOUS, 0),
+       wpi::make_string("Auto"),
+       {},
+       {},
+       -1,
+       -1},
+      {HAL_OPMODE_MAKE_ID(HAL_ROBOTMODE_TELEOPERATED, 0),
+       wpi::make_string("Teleop"),
+       {},
+       {},
+       -1,
+       -1},
+      {HAL_OPMODE_MAKE_ID(HAL_ROBOTMODE_TEST, 0),
+       wpi::make_string("Test"),
+       {},
+       {},
+       -1,
+       -1}};
+  HAL_SetOpModeOptions(opmodes, sizeof(opmodes) / sizeof(opmodes[0]));
 
   wpi::Event event{false, false};
   frc::DriverStation::ProvideRefreshedDataEventHandle(event.GetHandle());

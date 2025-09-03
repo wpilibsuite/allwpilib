@@ -24,7 +24,7 @@ enum class RobotMode : uint8_t {
   Test = 3
 };
 
-  struct OpModeHash {
+struct OpModeHash {
   uint64_t Hash : 56 = 0;
   uint64_t RobotMode : 2 = 0;
   uint64_t IsEnabled : 1 = 0;

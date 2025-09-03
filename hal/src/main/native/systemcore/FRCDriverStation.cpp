@@ -20,12 +20,12 @@
 #include <networktables/ProtobufTopic.h>
 #include <networktables/StringArrayTopic.h>
 #include <networktables/StringTopic.h>
-#include <wpi/DenseMap.h>
 #include <wpi/EventVector.h>
 #include <wpi/SafeThread.h>
 #include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/string.h>
 #include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
@@ -86,17 +86,7 @@ struct SystemServerDriverStation {
              MRC_MAX_NUM_JOYSTICKS>
       joystickRumbleTopics;
 
-  wpi::DenseMap<int64_t, uint32_t> autoOpModesMap;
-  wpi::DenseMap<int64_t, uint32_t> teleopOpModesMap;
-  wpi::DenseMap<int64_t, uint32_t> testOpModesMap;
-
-  std::vector<mrc::OpMode> autoOpModes;
-  std::vector<mrc::OpMode> teleopOpModes;
-  std::vector<mrc::OpMode> testOpModes;
-
-  nt::ProtobufPublisher<std::vector<mrc::OpMode>> autoOpModesPublisher;
-  nt::ProtobufPublisher<std::vector<mrc::OpMode>> teleopOpModesPublisher;
-  nt::ProtobufPublisher<std::vector<mrc::OpMode>> testOpModesPublisher;
+  nt::ProtobufPublisher<std::vector<mrc::OpMode>> opModeOptionsPublisher;
   nt::IntegerPublisher traceOpModePublisher;
 
   NT_Listener controlDataListener;
@@ -159,22 +149,11 @@ struct SystemServerDriverStation {
           ntInst.GetProtobufTopic<mrc::JoystickDescriptor>(name).Subscribe({});
     }
 
-    autoOpModesPublisher = ntInst
-                               .GetProtobufTopic<std::vector<mrc::OpMode>>(
-                                   ROBOT_AUTO_OP_MODES_PATH)
-                               .Publish();
-    teleopOpModesPublisher = ntInst
+    opModeOptionsPublisher = ntInst
                                  .GetProtobufTopic<std::vector<mrc::OpMode>>(
-                                     ROBOT_TELEOP_OP_MODES_PATH)
+                                     ROBOT_OP_MODE_OPTIONS_PATH)
                                  .Publish();
-    testOpModesPublisher = ntInst
-                               .GetProtobufTopic<std::vector<mrc::OpMode>>(
-                                   ROBOT_TEST_OP_MODES_PATH)
-                               .Publish();
-
-    autoOpModesPublisher.Set(autoOpModes);
-    teleopOpModesPublisher.Set(teleopOpModes);
-    testOpModesPublisher.Set(testOpModes);
+    opModeOptionsPublisher.Set({});
 
     ntInst.AddListener(
         controlDataSubscriber, NT_EVENT_VALUE_REMOTE | NT_EVENT_UNPUBLISH,
@@ -242,8 +221,7 @@ void JoystickDataCache::Update(const mrc::ControlData& data) {
 
   std::memset(&controlWord, 0, sizeof(controlWord));
   controlWord.enabled = data.ControlWord.Enabled;
-  controlWord.autonomous = data.ControlWord.Autonomous;
-  controlWord.test = data.ControlWord.Test;
+  controlWord.robotMode = data.ControlWord.RobotMode;
   controlWord.fmsAttached = data.ControlWord.FmsConnected;
   controlWord.dsAttached = data.ControlWord.DsConnected;
   controlWord.eStop = data.ControlWord.EStop;
@@ -473,12 +451,31 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   return 0;
 }
 
-int64_t HAL_AddOpMode(int32_t mode, const struct WPI_String* name,
-                      const struct WPI_String* group,
-                      const struct WPI_String* description, int32_t textColor,
-                      int32_t backgroundColor);
+int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
+                             int32_t count) {
+  if (count < 0 || count > 1000 || (count != 0 && !options)) {
+    return PARAMETER_OUT_OF_RANGE;
+  }
 
-void HAL_ClearOpModes(void);
+  std::vector<mrc::OpMode> newOptions;
+  newOptions.reserve(count);
+  if (count != 0) {
+    for (auto&& option : std::span{options, options + count}) {
+      newOptions.emplace_back(mrc::OpModeHash::FromValue(option.id),
+                              wpi::to_string_view(&option.name),
+                              wpi::to_string_view(&option.group),
+                              wpi::to_string_view(&option.description),
+                              option.textColor, option.backgroundColor);
+    }
+  }
+
+  {
+    std::scoped_lock lock{tcpCacheMutex};
+    systemServerDs->opModeOptionsPublisher.Set(newOptions);
+  }
+
+  return 0;
+}
 
 int64_t HAL_GetOpMode(void) {
   std::scoped_lock lock{cacheMutex};
@@ -601,7 +598,8 @@ void HAL_ObserveUserProgramStarting(void) {
 }
 
 void HAL_ObserveUserProgramOpMode(int64_t hash, HAL_Bool enabled) {
-  auto tVal = mrc::OpModeHash::FromValue(hash).IsEnabled = enabled ? 1 : 0;
+  auto tVal = mrc::OpModeHash::FromValue(hash);
+  tVal.IsEnabled = enabled ? 1 : 0;
   systemServerDs->traceOpModePublisher.Set(tVal.ToValue());
 }
 

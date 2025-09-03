@@ -232,24 +232,16 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   return 0;
 }
 
-int64_t HAL_AddOpMode(int32_t mode, const struct WPI_String* name,
-                      const struct WPI_String* group,
-                      const struct WPI_String* description, int32_t textColor,
-                      int32_t backgroundColor) {
+int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
+                             int32_t count) {
   if (gShutdown) {
     return 0;
   }
-  return SimDriverStationData->AddOpMode(
-      static_cast<HAL_RobotMode>(mode), wpi::to_string_view(name),
-      wpi::to_string_view(group), wpi::to_string_view(description), textColor,
-      backgroundColor);
-}
-
-void HAL_ClearOpModes(void) {
-  if (gShutdown) {
-    return;
+  if (count < 0 || count > 1000 || (count != 0 && !options)) {
+    return PARAMETER_OUT_OF_RANGE;
   }
-  SimDriverStationData->ClearOpModes();
+  SimDriverStationData->SetOpModeOptions({options, options + count});
+  return 0;
 }
 
 int64_t HAL_GetOpMode(void) {

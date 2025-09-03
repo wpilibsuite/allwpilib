@@ -5,6 +5,7 @@
 package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
+import edu.wpi.first.hal.OpModeOption;
 import edu.wpi.first.hal.RobotMode;
 import java.util.function.BiConsumer;
 
@@ -87,26 +88,12 @@ public class DriverStationDataJNI extends JNIWrapper {
 
   public static native void setOpMode(long opMode);
 
-  public static native int registerAutoOpModesCallback(
+  public static native int registerOpModeOptionsCallback(
       BiConsumer<String, OpModeOption[]> callback, boolean initialNotify);
 
-  public static native void cancelAutoOpModesCallback(int uid);
+  public static native void cancelOpModeOptionsCallback(int uid);
 
-  public static native OpModeOption[] getAutoOpModes();
-
-  public static native int registerTeleopOpModesCallback(
-      BiConsumer<String, OpModeOption[]> callback, boolean initialNotify);
-
-  public static native void cancelTeleopOpModesCallback(int uid);
-
-  public static native OpModeOption[] getTeleopOpModes();
-
-  public static native int registerTestOpModesCallback(
-      BiConsumer<String, OpModeOption[]> callback, boolean initialNotify);
-
-  public static native void cancelTestOpModesCallback(int uid);
-
-  public static native OpModeOption[] getTestOpModes();
+  public static native OpModeOption[] getOpModeOptions();
 
   public static native void setJoystickAxes(byte joystickNum, float[] axesArray);
 

@@ -261,7 +261,8 @@ class DriverStation final {
   /**
    * Gets the current robot mode.
    *
-   * <p>Note that this does not indicate whether the robot is enabled or disabled.
+   * <p>Note that this does not indicate whether the robot is enabled or
+   * disabled.
    *
    * @return robot mode
    */
@@ -314,7 +315,8 @@ class DriverStation final {
   static bool IsTestEnabled();
 
   /**
-   * Adds an operating mode option.
+   * Adds an operating mode option. It's necessary to call PublishOpModes() to
+   * make the added modes visible to the driver station.
    *
    * @param mode robot mode
    * @param name name of the operating mode
@@ -332,7 +334,8 @@ class DriverStation final {
                            const Color& backgroundColor);
 
   /**
-   * Adds an operating mode option.
+   * Adds an operating mode option. It's necessary to call PublishOpModes() to
+   * make the added modes visible to the driver station.
    *
    * @param mode robot mode
    * @param name name of the operating mode
@@ -345,6 +348,11 @@ class DriverStation final {
   static int64_t AddOpMode(DSControlWord::RobotMode mode, std::string_view name,
                            std::string_view group = {},
                            std::string_view description = {});
+
+  /**
+   * Publishes the operating mode options to the driver station.
+   */
+  static void PublishOpModes();
 
   /**
    * Clears all operating mode options.

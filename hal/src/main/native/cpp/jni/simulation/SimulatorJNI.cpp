@@ -13,9 +13,7 @@
 #include "SimDeviceDataJNI.h"
 #include "edu_wpi_first_hal_simulation_SimulatorJNI.h"
 #include "hal/handles/HandlesInternal.h"
-#include "hal/simulation/DriverStationData.h"
 #include "hal/simulation/MockHooks.h"
-#include "wpi/string.h"
 
 using namespace wpi::java;
 
@@ -23,7 +21,6 @@ static JavaVM* jvm = nullptr;
 static JClass notifyCallbackCls;
 static JClass bufferCallbackCls;
 static JClass constBufferCallbackCls;
-static JClass opModeOptionCls;
 static JClass biConsumerCls;
 static jmethodID notifyCallbackCallback;
 static jmethodID bufferCallbackCallback;
@@ -35,7 +32,6 @@ static const JClassInit classes[] = {
      &notifyCallbackCls},
     {"edu/wpi/first/hal/simulation/BufferCallback", &bufferCallbackCls},
     {"edu/wpi/first/hal/simulation/ConstBufferCallback", &constBufferCallbackCls},
-    {"edu/wpi/first/hal/simulation/OpModeOption", &opModeOptionCls},
     {"java/util/function/BiConsumer", &biConsumerCls},
 };
 
@@ -94,7 +90,6 @@ void SimOnUnload(JavaVM* vm, void* reserved) {
   notifyCallbackCls.free(env);
   bufferCallbackCls.free(env);
   constBufferCallbackCls.free(env);
-  opModeOptionCls.free(env);
   biConsumerCls.free(env);
   FreeSimDeviceDataJNI(env);
   jvm = nullptr;
@@ -118,31 +113,6 @@ jmethodID GetConstBufferCallback() {
 
 jmethodID GetBiConsumerCallback() {
   return biConsumerCallback;
-}
-
-jobject CreateOpModeOption(JNIEnv* env, const HALSIM_OpModeOption& option) {
-  static jmethodID constructor =
-      env->GetMethodID(opModeOptionCls, "<init>", "(JLjava/lang/String;L/java/lang/String;Ljava/lang/String;II)V");
-  JLocal<jstring> name{env, MakeJString(env, wpi::to_string_view(&option.name))};
-  JLocal<jstring> group{env, MakeJString(env, wpi::to_string_view(&option.group))};
-  JLocal<jstring> desc{env, MakeJString(env, wpi::to_string_view(&option.description))};
-  return env->NewObject(
-      opModeOptionCls, constructor, static_cast<jlong>(option.id),
-      name.obj(), group.obj(), desc.obj(), static_cast<jint>(option.textColor),
-      static_cast<jint>(option.backgroundColor));
-}
-
-jobjectArray CreateOpModeOptionArray(JNIEnv* env, std::span<const HALSIM_OpModeOption> options) {
-  jobjectArray arr = env->NewObjectArray(options.size(), opModeOptionCls, nullptr);
-  if (!arr) {
-    return nullptr;
-  }
-  size_t i = 0;
-  for (auto& option : options) {
-    JLocal<jobject> elem{env, CreateOpModeOption(env, option)};
-    env->SetObjectArrayElement(arr, i++, elem);
-  }
-  return arr;
 }
 }  // namespace hal::sim
 

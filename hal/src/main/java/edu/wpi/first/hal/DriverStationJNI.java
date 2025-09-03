@@ -62,51 +62,18 @@ public class DriverStationJNI extends JNIWrapper {
   }
 
   /**
-   * Adds an operating mode option.
+   * Sets operating mode options.
    *
-   * @param mode robot mode (HAL_RobotMode enum value)
-   * @param name name of the operating mode
-   * @param group group of the operating mode
-   * @param description description of the operating mode
-   * @param textColor text color, in 0xRRGGBB format, or -1 for default
-   * @param backgroundColor background color, in 0xRRGGBB format, or -1 for default
-   * @return unique ID used to later identify the operating mode; if an empty string is passed, 0 is
-   *     returned; identical names for the same robot mode result in identical unique IDs
+   * @param options operating mode options
    */
-  private static native long nativeAddOpMode(
-      int mode, String name, String group, String description, int textColor, int backgroundColor);
-
-  /**
-   * Adds an operating mode option.
-   *
-   * @param mode robot mode
-   * @param name name of the operating mode
-   * @param group group of the operating mode
-   * @param description description of the operating mode
-   * @param textColor text color, in 0xRRGGBB format, or -1 for default
-   * @param backgroundColor background color, in 0xRRGGBB format, or -1 for default
-   * @return unique ID used to later identify the operating mode; if an empty string is passed, 0 is
-   *     returned; identical names for the same robot mode result in identical unique IDs
-   */
-  public static long addOpMode(
-      RobotMode mode,
-      String name,
-      String group,
-      String description,
-      int textColor,
-      int backgroundColor) {
-    return nativeAddOpMode(mode.getValue(), name, group, description, textColor, backgroundColor);
-  }
-
-  /** Clears all operating mode options. */
-  public static native void clearOpModes();
+  public static native void setOpModeOptions(OpModeOption[] options);
 
   /**
    * Gets the currently selected operating mode of the driver station. Note this does not mean the
    * robot is enabled; use the control word for that.
    *
-   * @return the unique ID provided by the addOpMode() function; may return 0 or a unique ID not
-   *     added, so callers should be prepared to handle that case
+   * @return the unique ID in the OpModeOption; may return 0 or a unique ID not added, so callers
+   *     should be prepared to handle that case
    */
   public static native long getOpMode();
 

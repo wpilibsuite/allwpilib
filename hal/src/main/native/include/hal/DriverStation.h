@@ -67,28 +67,14 @@ int32_t HAL_SendConsoleLine(const char* line);
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord);
 
 /**
- * Adds an operating mode option.
+ * Sets operating mode options.
  *
- * @param mode robot mode (HAL_RobotMode enum)
- * @param name name of the operating mode
- * @param group group of the operating mode
- * @param description description of the operating mode
- * @param textColor text color, in 0xRRGGBB format, or -1 for default
- * @param backgroundColor background color, in 0xRRGGBB format, or -1 for
- *                        default
- * @return unique ID used to later identify the operating mode; if an empty
- *         string is passed, 0 is returned; identical names for the same robot
- *         mode result in identical unique IDs
+ * @param options array of operating mode options
+ * @param count number of options in the array
+ * @return the error code, or 0 for success
  */
-int64_t HAL_AddOpMode(int32_t mode, const struct WPI_String* name,
-                      const struct WPI_String* group,
-                      const struct WPI_String* description, int32_t textColor,
-                      int32_t backgroundColor);
-
-/**
- * Clears all operating mode options.
- */
-void HAL_ClearOpModes(void);
+int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
+                             int32_t count);
 
 /**
  * Gets the currently selected operating mode of the driver station.
@@ -96,7 +82,7 @@ void HAL_ClearOpModes(void);
  * While it's possible to use the unique ID to determine the robot mode, it's
  * recommended the control word also be used for that purpose.
  *
- * @return the unique ID provided by the HAL_AddOpMode() function; may return 0
+ * @return the unique ID provided in the HAL_OpModeOption; may return 0
  *         or a unique ID not added, so callers should be prepared to handle
  *         that case
  */

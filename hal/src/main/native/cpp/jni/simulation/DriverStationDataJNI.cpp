@@ -10,6 +10,7 @@
 #include "CallbackStore.h"
 #include "OpModeOptionsCallbackStore.h"
 #include "SimulatorJNI.h"
+#include "../HALUtil.h"
 #include "edu_wpi_first_hal_simulation_DriverStationDataJNI.h"
 #include "hal/simulation/DriverStationData.h"
 #include "hal/simulation/MockHooks.h"
@@ -429,120 +430,40 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setOpMode
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    registerAutoOpModesCallback
+ * Method:    registerOpModeOptionsCallback
  * Signature: (Ljava/util/function/Consumer;Z)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerAutoOpModesCallback
+JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerOpModeOptionsCallback
   (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateOpModeOptionsCallback(
       env, callback, initialNotify,
-      &HALSIM_RegisterAutoOpModesCallback);
+      &HALSIM_RegisterOpModeOptionsCallback);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    cancelAutoOpModesCallback
+ * Method:    cancelOpModeOptionsCallback
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelAutoOpModesCallback
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelOpModeOptionsCallback
   (JNIEnv* env, jclass, jint handle)
 {
   sim::FreeOpModeOptionsCallback(
-      env, handle, &HALSIM_CancelAutoOpModesCallback);
+      env, handle, &HALSIM_CancelOpModeOptionsCallback);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    getAutoOpModes
+ * Method:    getOpModeOptions
  * Signature: ()[Ledu/wpi/first/hal/simulation/OpModeOption;
  */
-JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getAutoOpModes
+JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getOpModeOptions
   (JNIEnv* env, jclass)
 {
   int32_t count;
-  HALSIM_OpModeOption* options = HALSIM_GetAutoOpModes(&count);
-  auto rv = sim::CreateOpModeOptionArray(env, {options, options + count});
-  HALSIM_FreeOpModeOptionsArray(options, count);
-  return rv;
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    registerTeleopOpModesCallback
- * Signature: (Ljava/util/function/Consumer;Z)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerTeleopOpModesCallback
-  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateOpModeOptionsCallback(
-      env, callback, initialNotify,
-      &HALSIM_RegisterTeleopOpModesCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    cancelTeleopOpModesCallback
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelTeleopOpModesCallback
-  (JNIEnv* env, jclass, jint handle)
-{
-  sim::FreeOpModeOptionsCallback(
-      env, handle, &HALSIM_CancelTeleopOpModesCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    getTeleopOpModes
- * Signature: ()[Ledu/wpi/first/hal/simulation/OpModeOption;
- */
-JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getTeleopOpModes
-  (JNIEnv* env, jclass)
-{
-  int32_t count;
-  HALSIM_OpModeOption* options = HALSIM_GetTeleopOpModes(&count);
-  auto rv = sim::CreateOpModeOptionArray(env, {options, options + count});
-  HALSIM_FreeOpModeOptionsArray(options, count);
-  return rv;
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    registerTestOpModesCallback
- * Signature: (Ljava/util/function/Consumer;Z)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerTestOpModesCallback
-  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateOpModeOptionsCallback(
-      env, callback, initialNotify,
-      &HALSIM_RegisterTestOpModesCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    cancelTestOpModesCallback
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelTestOpModesCallback
-  (JNIEnv* env, jclass, jint handle)
-{
-  sim::FreeOpModeOptionsCallback(
-      env, handle, &HALSIM_CancelTestOpModesCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
- * Method:    getTestOpModes
- * Signature: ()[Ledu/wpi/first/hal/simulation/OpModeOption;
- */
-JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getTestOpModes
-  (JNIEnv* env, jclass)
-{
-  int32_t count;
-  HALSIM_OpModeOption* options = HALSIM_GetTestOpModes(&count);
-  auto rv = sim::CreateOpModeOptionArray(env, {options, options + count});
+  HAL_OpModeOption* options = HALSIM_GetOpModeOptions(&count);
+  auto rv = CreateOpModeOptionArray(env, {options, options + count});
   HALSIM_FreeOpModeOptionsArray(options, count);
   return rv;
 }

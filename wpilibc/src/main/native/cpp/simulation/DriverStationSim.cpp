@@ -153,48 +153,18 @@ void DriverStationSim::SetOpMode(int64_t opmode) {
   HALSIM_SetDriverStationOpMode(opmode);
 }
 
-std::unique_ptr<CallbackStore> DriverStationSim::RegisterAutoOpModesCallback(
+std::unique_ptr<CallbackStore> DriverStationSim::RegisterOpModeOptionsCallback(
     OpModeOptionsCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      -1, callback, &HALSIM_CancelAutoOpModesCallback);
-  store->SetUid(HALSIM_RegisterAutoOpModesCallback(
+      -1, callback, &HALSIM_CancelOpModeOptionsCallback);
+  store->SetUid(HALSIM_RegisterOpModeOptionsCallback(
       &OpModeOptionsCallbackStoreThunk, store.get(), initialNotify));
   return store;
 }
 
-OpModeOptions DriverStationSim::GetAutoOpModes() {
+OpModeOptions DriverStationSim::GetOpModeOptions() {
   int32_t len;
-  auto options = HALSIM_GetAutoOpModes(&len);
-  return {options, len};
-}
-
-std::unique_ptr<CallbackStore> DriverStationSim::RegisterTeleopOpModesCallback(
-    OpModeOptionsCallback callback, bool initialNotify) {
-  auto store = std::make_unique<CallbackStore>(
-      -1, callback, &HALSIM_CancelTeleopOpModesCallback);
-  store->SetUid(HALSIM_RegisterTeleopOpModesCallback(
-      &OpModeOptionsCallbackStoreThunk, store.get(), initialNotify));
-  return store;
-}
-
-OpModeOptions DriverStationSim::GetTeleopOpModes() {
-  int32_t len;
-  auto options = HALSIM_GetTeleopOpModes(&len);
-  return {options, len};
-}
-
-std::unique_ptr<CallbackStore> DriverStationSim::RegisterTestOpModesCallback(
-    OpModeOptionsCallback callback, bool initialNotify) {
-  auto store = std::make_unique<CallbackStore>(
-      -1, callback, &HALSIM_CancelTestOpModesCallback);
-  store->SetUid(HALSIM_RegisterTestOpModesCallback(
-      &OpModeOptionsCallbackStoreThunk, store.get(), initialNotify));
-  return store;
-}
-
-OpModeOptions DriverStationSim::GetTestOpModes() {
-  int32_t len;
-  auto options = HALSIM_GetTestOpModes(&len);
+  auto options = HALSIM_GetOpModeOptions(&len);
   return {options, len};
 }
 

@@ -12,7 +12,6 @@
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_DriverStationJNI.h"
 #include "hal/DriverStation.h"
-#include "hal/HALBase.h"
 
 static_assert(edu_wpi_first_hal_DriverStationJNI_kUnknownAllianceStation ==
               HAL_AllianceStationID_kUnknown);
@@ -85,32 +84,32 @@ Java_edu_wpi_first_hal_DriverStationJNI_nativeGetControlWord
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    nativeAddOpMode
- * Signature: (Ijava/lang/String;java/lang/String;java/lang/String;II)J
- */
-JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_nativeAddOpMode
-  (JNIEnv* env, jclass, jint mode, jstring name, jstring group, jstring description, jint textColor, jint backgroundColor)
-{
-  JStringRef nameStr{env, name};
-  WPI_String nameWpiStr = wpi::make_string(nameStr);
-  JStringRef groupStr{env, group};
-  WPI_String groupWpiStr = wpi::make_string(groupStr);
-  JStringRef descStr{env, description};
-  WPI_String descWpiStr = wpi::make_string(descStr);
-  return HAL_AddOpMode(mode, &nameWpiStr, &groupWpiStr, &descWpiStr, textColor, backgroundColor);
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    clearOpModes
- * Signature: ()V
+ * Method:    setOpModeOptions
+ * Signature: ([wpi/edu/first/hal/OpModeOption;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_clearOpModes
-  (JNIEnv*, jclass)
-{
-  HAL_ClearOpModes();
+Java_edu_wpi_first_hal_DriverStationJNI_setOpModeOptions
+  (JNIEnv* env, jclass, jobjectArray options) {
+  std::vector<HAL_OpModeOption> coptions;
+  if (options != nullptr) {
+    jsize length = env->GetArrayLength(options);
+    coptions.reserve(length);
+    for (jsize i = 0; i < length; i++) {
+      JLocal<jobject> option{env, env->GetObjectArrayElement(options, i)};
+      if (!option) {
+        ThrowIllegalArgumentException(env, "Null OpModeOption passed in array");
+        return;
+      }
+      auto coption = CreateOpModeOptionFromJava(env, option);
+      if (coption.id == 0) {
+        // exception thrown
+        return;
+      }
+      coptions.emplace_back(std::move(coption));
+    }
+  }
+  int32_t status = HAL_SetOpModeOptions(coptions.data(), coptions.size());
+  CheckStatusForceThrow(env, status);
 }
 
 /*

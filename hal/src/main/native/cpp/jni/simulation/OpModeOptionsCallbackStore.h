@@ -16,7 +16,7 @@ namespace hal::sim {
 class OpModeOptionsCallbackStore {
  public:
   void create(JNIEnv* env, jobject obj);
-  void performCallback(const char* name, const HALSIM_OpModeOption* opmodes,
+  void performCallback(const char* name, const HAL_OpModeOption* opmodes,
                        int32_t count);
   void free(JNIEnv* env);
   void setCallbackId(int32_t id) { callbackId = id; }

@@ -8,6 +8,7 @@
 
 #include <array>
 #include <atomic>
+#include <functional>
 #include <memory>
 #include <span>
 #include <string>
@@ -158,7 +159,7 @@ struct Instance {
 
   // Op mode lookup
   wpi::mutex opModeMutex;
-  wpi::DenseMap<int64_t, std::string> opModes;
+  wpi::DenseMap<int64_t, HAL_OpModeOption> opModes;
 
   // Robot state status variables
   int userOpMode = 0;
@@ -172,7 +173,7 @@ struct Instance {
     }
     auto it = opModes.find(id);
     if (it != opModes.end()) {
-      return it->second;
+      return std::string{wpi::to_string_view(&it->second.name)};
     }
     return fmt::format("<{}>", id);
   }
@@ -545,16 +546,23 @@ static int64_t DoAddOpMode(DSControlWord::RobotMode mode, std::string_view name,
   WPI_String groupWpi = wpi::make_string(group);
   WPI_String descriptionWpi = wpi::make_string(description);
 
-  int64_t id = HAL_AddOpMode(static_cast<int32_t>(mode), &nameWpi, &groupWpi,
-                             &descriptionWpi, textColor, backgroundColor);
-  if (id == 0) {
-    return 0;
-  }
-
   auto& inst = ::GetInstance();
   std::scoped_lock lock{inst.opModeMutex};
-  inst.opModes[id] = name;
-  return id;
+  std::string nameCopy{name};
+  for (;;) {
+    int64_t id =
+        HAL_OPMODE_MAKE_ID(mode, std::hash<std::string_view>{}(nameCopy));
+    auto [it, isNew] = inst.opModes.try_emplace(
+        id, id, nameWpi, groupWpi, descriptionWpi, textColor, backgroundColor);
+    if (isNew) {
+      return id;
+    }
+    if (wpi::to_string_view(&it->getSecond().name) == name) {
+      return 0;  // can't insert duplicate name
+    }
+    // collision, try again with space appended
+    nameCopy += ' ';
+  }
 }
 
 static int32_t ConvertColorToInt(const Color& color) {
@@ -579,11 +587,22 @@ int64_t DriverStation::AddOpMode(DSControlWord::RobotMode mode,
   return DoAddOpMode(mode, name, group, description, -1, -1);
 }
 
+void DriverStation::PublishOpModes() {
+  auto& inst = ::GetInstance();
+  std::scoped_lock lock{inst.opModeMutex};
+  std::vector<HAL_OpModeOption> options;
+  options.reserve(inst.opModes.size());
+  for (auto&& [id, option] : inst.opModes) {
+    options.emplace_back(option);
+  }
+  HAL_SetOpModeOptions(options.data(), options.size());
+}
+
 void DriverStation::ClearOpModes() {
   auto& inst = ::GetInstance();
   std::scoped_lock lock{inst.opModeMutex};
   inst.opModes.clear();
-  HAL_ClearOpModes();
+  HAL_SetOpModeOptions(nullptr, 0);
 }
 
 int64_t DriverStation::GetOpModeId() {

@@ -7,9 +7,10 @@
 #include <functional>
 #include <span>
 #include <string_view>
-#include "hal/simulation/DriverStationData.h"
 
 #include <hal/Value.h>
+
+#include "hal/DriverStationTypes.h"
 
 namespace frc::sim {
 
@@ -17,7 +18,7 @@ using NotifyCallback = std::function<void(std::string_view, const HAL_Value*)>;
 using ConstBufferCallback = std::function<void(
     std::string_view, const unsigned char* buffer, unsigned int count)>;
 using OpModeOptionsCallback =
-    std::function<void(std::string_view, std::span<const HALSIM_OpModeOption>)>;
+    std::function<void(std::string_view, std::span<const HAL_OpModeOption>)>;
 using CancelCallbackFunc = void (*)(int32_t index, int32_t uid);
 using CancelCallbackNoIndexFunc = void (*)(int32_t uid);
 using CancelCallbackChannelFunc = void (*)(int32_t index, int32_t channel,
@@ -28,7 +29,7 @@ void ConstBufferCallbackStoreThunk(const char* name, void* param,
                                    const unsigned char* buffer,
                                    unsigned int count);
 void OpModeOptionsCallbackStoreThunk(const char* name, void* param,
-                                     const HALSIM_OpModeOption* opmodes,
+                                     const HAL_OpModeOption* opmodes,
                                      int32_t count);
 
 /**
@@ -53,7 +54,8 @@ class CallbackStore {
   CallbackStore(int32_t i, int32_t c, int32_t u, ConstBufferCallback cb,
                 CancelCallbackChannelFunc ccf);
 
-  CallbackStore(int32_t u, OpModeOptionsCallback cb, CancelCallbackNoIndexFunc ccf);
+  CallbackStore(int32_t u, OpModeOptionsCallback cb,
+                CancelCallbackNoIndexFunc ccf);
 
   CallbackStore(const CallbackStore&) = delete;
   CallbackStore& operator=(const CallbackStore&) = delete;
@@ -69,9 +71,9 @@ class CallbackStore {
                                             const unsigned char* buffer,
                                             unsigned int count);
 
-  friend void OpModeOptionsCallbackStoreThunk(
-      const char* name, void* param, const HALSIM_OpModeOption* opmodes,
-      int32_t count);
+  friend void OpModeOptionsCallbackStoreThunk(const char* name, void* param,
+                                              const HAL_OpModeOption* opmodes,
+                                              int32_t count);
 
  private:
   int32_t index;

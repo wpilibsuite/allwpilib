@@ -5,13 +5,11 @@
 #pragma once
 
 #include <cstdint>
-#include <memory>
-#include <string>
+#include <span>
 #include <string_view>
 #include <vector>
 
 #include <wpi/spinlock.h>
-#include <wpi/DenseMap.h>
 
 #include "hal/DriverStationTypes.h"
 #include "hal/simulation/DriverStationData.h"
@@ -29,9 +27,7 @@ class DriverStationData {
   HAL_SIMDATAVALUE_DEFINE_NAME(AllianceStationId)
   HAL_SIMDATAVALUE_DEFINE_NAME(MatchTime)
   HAL_SIMDATAVALUE_DEFINE_NAME(OpMode)
-  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(AutoOpModes)
-  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(TeleopOpModes)
-  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(TestOpModes)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(OpModeOptions)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickAxes)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickPOVs)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickButtons)
@@ -56,26 +52,12 @@ class DriverStationData {
   DriverStationData& operator=(const DriverStationData&) = delete;
   void ResetData();
 
-  int64_t AddOpMode(HAL_RobotMode mode, std::string_view name,
-                    std::string_view group, std::string_view description,
-                    int32_t textColor, int32_t backgroundColor);
+  void SetOpModeOptions(std::span<const HAL_OpModeOption> options);
 
-  void ClearOpModes();
-
-  int32_t RegisterAutoOpModesCallback(HAL_OpModeOptionsCallback callback,
+  int32_t RegisterOpModeOptionsCallback(HAL_OpModeOptionsCallback callback,
                                       void* param, HAL_Bool initialNotify);
-  void CancelAutoOpModesCallback(int32_t uid);
-  HALSIM_OpModeOption* GetAutoOpModes(int32_t* len);
-
-  int32_t RegisterTeleopOpModesCallback(HAL_OpModeOptionsCallback callback,
-                                        void* param, HAL_Bool initialNotify);
-  void CancelTeleopOpModesCallback(int32_t uid);
-  HALSIM_OpModeOption* GetTeleopOpModes(int32_t* len);
-
-  int32_t RegisterTestOpModesCallback(HAL_OpModeOptionsCallback callback,
-                                      void* param, HAL_Bool initialNotify);
-  void CancelTestOpModesCallback(int32_t uid);
-  HALSIM_OpModeOption* GetTestOpModes(int32_t* len);
+  void CancelOpModeOptionsCallback(int32_t uid);
+  HAL_OpModeOption* GetOpModeOptions(int32_t* len);
 
   int32_t RegisterJoystickAxesCallback(int32_t joystickNum,
                                        HAL_JoystickAxesCallback callback,
@@ -167,12 +149,8 @@ class DriverStationData {
   SimDataValue<int64_t, HAL_MakeLong, GetOpModeName> opMode{0};
 
  private:
-  SimCallbackRegistry<HAL_OpModeOptionsCallback, GetAutoOpModesName>
-      m_autoOpModesCallbacks;
-  SimCallbackRegistry<HAL_OpModeOptionsCallback, GetTeleopOpModesName>
-      m_teleopOpModesCallbacks;
-  SimCallbackRegistry<HAL_OpModeOptionsCallback, GetTestOpModesName>
-      m_testOpModesCallbacks;
+  SimCallbackRegistry<HAL_OpModeOptionsCallback, GetOpModeOptionsName>
+      m_opModeOptionsCallbacks;
   SimCallbackRegistry<HAL_JoystickAxesCallback, GetJoystickAxesName>
       m_joystickAxesCallbacks;
   SimCallbackRegistry<HAL_JoystickPOVsCallback, GetJoystickPOVsName>
@@ -209,21 +187,7 @@ class DriverStationData {
   HAL_MatchInfo m_matchInfo;
 
   wpi::spinlock m_opModeMutex;
-  wpi::DenseMap<int64_t, uint32_t> m_autoOpModesMap;
-  std::vector<HALSIM_OpModeOption> m_autoOpModes;
-
-  wpi::DenseMap<int64_t, uint32_t> m_teleopOpModesMap;
-  std::vector<HALSIM_OpModeOption> m_teleopOpModes;
-
-  wpi::DenseMap<int64_t, uint32_t> m_testOpModesMap;
-  std::vector<HALSIM_OpModeOption> m_testOpModes;
-
-  static constexpr int64_t kOpModeHashMask = 0x00FFFFFFFFFFFFFF;
-  bool GetOpModeMapVec(HAL_RobotMode mode,
-                       wpi::DenseMap<int64_t, uint32_t>** map,
-                       std::vector<HALSIM_OpModeOption>** vec,
-                       int64_t* hashBase);
-  void CallOpModesCallbacks(HAL_RobotMode mode);
+  std::vector<HAL_OpModeOption> m_opModeOptions;
 };
 extern DriverStationData* SimDriverStationData;
 }  // namespace hal

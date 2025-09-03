@@ -11,6 +11,7 @@
 
 #include <wpi/jni_util.h>
 
+#include "../HALUtil.h"
 #include "SimulatorJNI.h"
 #include "hal/Types.h"
 #include "hal/handles/UnlimitedHandleResource.h"
@@ -37,7 +38,7 @@ void OpModeOptionsCallbackStore::create(JNIEnv* env, jobject obj) {
 }
 
 void OpModeOptionsCallbackStore::performCallback(
-    const char* name, const HALSIM_OpModeOption* opmodes, int32_t count) {
+    const char* name, const HAL_OpModeOption* opmodes, int32_t count) {
   JNIEnv* env;
   JavaVM* vm = sim::GetJVM();
   bool didAttachThread = false;
@@ -92,7 +93,7 @@ SIM_JniHandle sim::AllocateOpModeOptionsCallback(
   callbackStore->create(env, callback);
 
   auto callbackFunc = [](const char* name, void* param,
-                         const HALSIM_OpModeOption* opmodes, int32_t count) {
+                         const HAL_OpModeOption* opmodes, int32_t count) {
     uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
     SIM_JniHandle handle = static_cast<SIM_JniHandle>(handleTmp);
     auto data = callbackHandles->Get(handle);

@@ -6,10 +6,10 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.hal.OpModeOption;
 import edu.wpi.first.hal.RobotMode;
 import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
-import edu.wpi.first.hal.simulation.OpModeOption;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.function.BiConsumer;
@@ -288,69 +288,25 @@ public final class DriverStationSim {
   }
 
   /**
-   * Register a callback on autonomous opmode list changes.
+   * Register a callback on opmode options changes.
    *
    * @param callback the callback that will be called when the list of opmodes changes
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback.
    */
-  public static CallbackStore registerAutoOpModesCallback(
+  public static CallbackStore registerOpModeOptionsCallback(
       BiConsumer<String, OpModeOption[]> callback, boolean initialNotify) {
-    int uid = DriverStationDataJNI.registerAutoOpModesCallback(callback, initialNotify);
-    return new CallbackStore(uid, DriverStationDataJNI::cancelAutoOpModesCallback);
+    int uid = DriverStationDataJNI.registerOpModeOptionsCallback(callback, initialNotify);
+    return new CallbackStore(uid, DriverStationDataJNI::cancelOpModeOptionsCallback);
   }
 
   /**
-   * Gets the list of autonomous opmodes.
+   * Gets the list of opmode options.
    *
    * @return opmodes list
    */
-  public static OpModeOption[] getAutoOpModes() {
-    return DriverStationDataJNI.getAutoOpModes();
-  }
-
-  /**
-   * Register a callback on teleoperated opmode list changes.
-   *
-   * @param callback the callback that will be called when the list of opmodes changes
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public static CallbackStore registerTeleopOpModesCallback(
-      BiConsumer<String, OpModeOption[]> callback, boolean initialNotify) {
-    int uid = DriverStationDataJNI.registerAutoOpModesCallback(callback, initialNotify);
-    return new CallbackStore(uid, DriverStationDataJNI::cancelTeleopOpModesCallback);
-  }
-
-  /**
-   * Gets the list of teleoperated opmodes.
-   *
-   * @return opmodes list
-   */
-  public static OpModeOption[] getTeleopOpModes() {
-    return DriverStationDataJNI.getTeleopOpModes();
-  }
-
-  /**
-   * Register a callback on test opmode list changes.
-   *
-   * @param callback the callback that will be called when the list of opmodes changes
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public static CallbackStore registerTestOpModesCallback(
-      BiConsumer<String, OpModeOption[]> callback, boolean initialNotify) {
-    int uid = DriverStationDataJNI.registerTestOpModesCallback(callback, initialNotify);
-    return new CallbackStore(uid, DriverStationDataJNI::cancelTestOpModesCallback);
-  }
-
-  /**
-   * Gets the list of test opmodes.
-   *
-   * @return opmodes list
-   */
-  public static OpModeOption[] getTestOpModes() {
-    return DriverStationDataJNI.getTestOpModes();
+  public static OpModeOption[] getOpModeOptions() {
+    return DriverStationDataJNI.getOpModeOptions();
   }
 
   /** Updates DriverStation data so that new values are visible to the user program. */

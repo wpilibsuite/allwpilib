@@ -12,18 +12,8 @@
 #include "hal/Types.h"
 #include "hal/simulation/NotifyListener.h"
 
-struct HALSIM_OpModeOption {
-  int64_t id;
-  WPI_String name;
-  WPI_String group;
-  WPI_String description;
-  int32_t textColor;
-  int32_t backgroundColor;
-};
-typedef struct HALSIM_OpModeOption HALSIM_OpModeOption;
-
 typedef void (*HAL_OpModeOptionsCallback)(const char* name, void* param,
-                                          const HALSIM_OpModeOption* opmodes,
+                                          const HAL_OpModeOption* opmodes,
                                           int32_t count);
 typedef void (*HAL_JoystickAxesCallback)(const char* name, void* param,
                                          int32_t joystickNum,
@@ -102,24 +92,12 @@ void HALSIM_CancelDriverStationOpModeCallback(int32_t uid);
 int64_t HALSIM_GetDriverStationOpMode(void);
 void HALSIM_SetDriverStationOpMode(int64_t opmode);
 
-int32_t HALSIM_RegisterAutoOpModesCallback(HAL_OpModeOptionsCallback callback,
+int32_t HALSIM_RegisterOpModeOptionsCallback(HAL_OpModeOptionsCallback callback,
                                            void* param, HAL_Bool initialNotify);
-void HALSIM_CancelAutoOpModesCallback(int32_t uid);
-struct HALSIM_OpModeOption* HALSIM_GetAutoOpModes(int32_t* len);
+void HALSIM_CancelOpModeOptionsCallback(int32_t uid);
+struct HAL_OpModeOption* HALSIM_GetOpModeOptions(int32_t* len);
 
-int32_t HALSIM_RegisterTeleopOpModesCallback(HAL_OpModeOptionsCallback callback,
-                                             void* param,
-                                             HAL_Bool initialNotify);
-void HALSIM_CancelTeleopOpModesCallback(int32_t uid);
-struct HALSIM_OpModeOption* HALSIM_GetTeleopOpModes(int32_t* len);
-
-int32_t HALSIM_RegisterTestOpModesCallback(HAL_OpModeOptionsCallback callback,
-                                           void* param, HAL_Bool initialNotify);
-void HALSIM_CancelTestOpModesCallback(int32_t uid);
-struct HALSIM_OpModeOption* HALSIM_GetTestOpModes(int32_t* len);
-
-void HALSIM_FreeOpModeOptionsArray(struct HALSIM_OpModeOption* arr,
-                                   size_t length);
+void HALSIM_FreeOpModeOptionsArray(struct HAL_OpModeOption* arr, size_t length);
 
 int32_t HALSIM_RegisterJoystickAxesCallback(int32_t joystickNum,
                                             HAL_JoystickAxesCallback callback,

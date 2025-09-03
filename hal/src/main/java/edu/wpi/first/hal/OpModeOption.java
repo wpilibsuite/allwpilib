@@ -2,10 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.hal.simulation;
+package edu.wpi.first.hal;
 
 /** An individual opmode option. */
 public class OpModeOption {
+  /** Unique id. Encodes robot mode in bits 57-56, LSB 56 bits is hash of name. */
   @SuppressWarnings("MemberName")
   public final long id;
 
@@ -42,5 +43,25 @@ public class OpModeOption {
     this.description = description;
     this.textColor = textColor;
     this.backgroundColor = backgroundColor;
+  }
+
+  /**
+   * Gets the robot mode encoded in the ID.
+   *
+   * @return robot mode
+   */
+  public RobotMode getMode() {
+    return RobotMode.fromInt((int) ((id >> 56) & 0x3));
+  }
+
+  /**
+   * Makes an ID from a robot mode and a hash.
+   *
+   * @param mode robot mode
+   * @param hash hash of name
+   * @return ID
+   */
+  public static long makeId(RobotMode mode, long hash) {
+    return ((mode.getValue() & 0x3L) << 56) | (hash & 0x00FFFFFFFFFFFFFFL);
   }
 }

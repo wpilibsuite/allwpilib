@@ -16,10 +16,10 @@
 
 namespace frc::sim {
 
-class OpModeOptions : public std::span<HALSIM_OpModeOption> {
+class OpModeOptions : public std::span<HAL_OpModeOption> {
  public:
   OpModeOptions() = default;
-  OpModeOptions(HALSIM_OpModeOption* options, int32_t len)
+  OpModeOptions(HAL_OpModeOption* options, int32_t len)
       : span{options, options + len} {}
   OpModeOptions(const OpModeOptions&) = delete;
 
@@ -257,58 +257,22 @@ class DriverStationSim {
   static void SetOpMode(int64_t opmode);
 
   /**
-   * Register a callback on autonomous opmode list changes.
+   * Register a callback on opmode options changes.
    *
    * @param callback the callback that will be called when the list of opmodes
    * changes
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback.
    */
-  static std::unique_ptr<CallbackStore> RegisterAutoOpModesCallback(
+  static std::unique_ptr<CallbackStore> RegisterOpModeOptionsCallback(
       OpModeOptionsCallback callback, bool initialNotify);
 
   /**
-   * Gets the list of autonomous opmodes.
+   * Gets the list of opmode options.
    *
    * @return opmodes list
    */
-  static OpModeOptions GetAutoOpModes();
-
-  /**
-   * Register a callback on teleoperated opmode list changes.
-   *
-   * @param callback the callback that will be called when the list of opmodes
-   * changes
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  static std::unique_ptr<CallbackStore> RegisterTeleopOpModesCallback(
-      OpModeOptionsCallback callback, bool initialNotify);
-
-  /**
-   * Gets the list of teleoperated opmodes.
-   *
-   * @return opmodes list
-   */
-  static OpModeOptions GetTeleopOpModes();
-
-  /**
-   * Register a callback on test opmode list changes.
-   *
-   * @param callback the callback that will be called when the list of opmodes
-   * changes
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  static std::unique_ptr<CallbackStore> RegisterTestOpModesCallback(
-      OpModeOptionsCallback callback, bool initialNotify);
-
-  /**
-   * Gets the list of test opmodes.
-   *
-   * @return opmodes list
-   */
-  static OpModeOptions GetTestOpModes();
+  static OpModeOptions GetOpModeOptions();
 
   /**
    * Updates DriverStation data so that new values are visible to the user
