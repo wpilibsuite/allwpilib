@@ -7,67 +7,15 @@
 #include <algorithm>
 #include <cstdio>
 #include <exception>
-#include <iostream>
 #include <span>
 #include <stdexcept>
-#include <string>
 #include <vector>
+
+#include <wpi/jni_util.h>
 
 #include "mrcal_wrapper.h"
 
-// JClass helper from wpilib
-#define WPI_JNI_MAKEJARRAY(T, F)                                       \
-  inline T##Array MakeJ##F##Array(JNIEnv* env, T* data, size_t size) { \
-    T##Array jarr = env->New##F##Array(size);                          \
-    if (!jarr) {                                                       \
-      return nullptr;                                                  \
-    }                                                                  \
-    env->Set##F##ArrayRegion(jarr, 0, size, data);                     \
-    return jarr;                                                       \
-  }
-
-WPI_JNI_MAKEJARRAY(jboolean, Boolean)
-WPI_JNI_MAKEJARRAY(jbyte, Byte)
-WPI_JNI_MAKEJARRAY(jshort, Short)
-WPI_JNI_MAKEJARRAY(jlong, Long)
-WPI_JNI_MAKEJARRAY(jfloat, Float)
-WPI_JNI_MAKEJARRAY(jdouble, Double)
-
-#undef WPI_JNI_MAKEJARRAY
-
-/**
- * Finds a class and keeps it as a global reference.
- *
- * Use with caution, as the destructor does NOT call DeleteGlobalRef due to
- * potential shutdown issues with doing so.
- */
-class JClass {
- public:
-  JClass() = default;
-
-  JClass(JNIEnv* env, const char* name) {
-    jclass local = env->FindClass(name);
-    if (!local) {
-      return;
-    }
-    m_cls = static_cast<jclass>(env->NewGlobalRef(local));
-    env->DeleteLocalRef(local);
-  }
-
-  void free(JNIEnv* env) {
-    if (m_cls) {
-      env->DeleteGlobalRef(m_cls);
-    }
-    m_cls = nullptr;
-  }
-
-  explicit operator bool() const { return m_cls; }
-
-  operator jclass() const { return m_cls; }
-
- protected:
-  jclass m_cls = nullptr;
-};
+using namespace wpi::java;
 
 // Cache MrCalResult class
 JClass detectionClass;
@@ -79,7 +27,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
   }
 
-  detectionClass = JClass(env, "edu/first/wpi/mrcal/MrCalJNI$MrCalResult");
+  detectionClass = JClass(env, "org/photonvision/mrcal/MrCalJNI$MrCalResult");
 
   if (!detectionClass) {
     std::printf("Couldn't find class!");
@@ -111,15 +59,16 @@ static std::string what(
 }
 
 /*
- * Class:     edu.first.wpi.mrcal_MrCalJNI_mrcal_1calibrate
+ * Class:     edu_wpi_first_mrcal_MrCalJNI_mrcal_1calibrate
  * Method:    1camera
  * Signature: ([DIIDIID)Ljava/lang/Object;
  */
 JNIEXPORT jobject JNICALL
-    Java_edu.first.wpi.mrcal_MrCalJNI_mrcal_1calibrate_1camera(
-        JNIEnv* env, jclass, jdoubleArray observations_board, jint boardWidth,
-        jint boardHeight, jdouble boardSpacing, jint imageWidth,
-        jint imageHeight, jdouble focalLenGuessMM) {
+Java_edu_wpi_first_mrcal_MrCalJNI_mrcal_1calibrate_1camera
+  (JNIEnv* env, jclass, jdoubleArray observations_board, jint boardWidth,
+   jint boardHeight, jdouble boardSpacing, jint imageWidth, jint imageHeight,
+   jdouble focalLenGuessMM)
+{
   try {
     // Pull out arrays. We rely on data being packed and aligned to make this
     // work! Observations should be [x, y, level]
@@ -191,19 +140,17 @@ JNIEXPORT jobject JNICALL
     size_t Nintrinsics = stats.intrinsics.size();
     size_t Nresid = stats.residuals.size();
 
-    jdoubleArray intrinsics =
-        MakeJDoubleArray(env, stats.intrinsics.data(), Nintrinsics);
-    jdoubleArray residuals =
-        MakeJDoubleArray(env, stats.residuals.data(), Nresid);
+    jdoubleArray intrinsics = MakeJDoubleArray(env, stats.intrinsics);
+    jdoubleArray residuals = MakeJDoubleArray(env, stats.residuals);
     jboolean success = stats.success;
     jdouble rms_err = stats.rms_error;
     jdouble warp_x = stats.calobject_warp.x2;
     jdouble warp_y = stats.calobject_warp.y2;
-    jint nOutliers = stats.Noutliers_board;
+    jint Noutliers = stats.Noutliers_board;
 
     // Actually call the constructor (TODO)
     auto ret = env->NewObject(detectionClass, constructor, success, intrinsics,
-                              rms_err, residuals, warp_x, warp_y, nOutliers);
+                              rms_err, residuals, warp_x, warp_y, Noutliers);
 
     return ret;
   } catch (...) {
@@ -212,17 +159,20 @@ JNIEXPORT jobject JNICALL
     static char buff[512];
     std::strcpy(buff, what().c_str());
     env->ThrowNew(env->FindClass("java/lang/Exception"), buff);
+    return NULL;
   }
 }
 
 /*
- * Class:     edu.first.wpi.mrcal_MrCalJNI_undistort
+ * Class:     edu_wpi_first_mrcal_MrCalJNI_undistort
  * Method:    1mrcal
  * Signature: (JJJJIIIII)Z
  */
-JNIEXPORT jboolean JNICALL Java_edu.first.wpi.mrcal_MrCalJNI_undistort_1mrcal(
-    JNIEnv*, jclass, jlong srcMat, jlong dstMat, jlong camMat, jlong distCoeffs,
-    jint lensModelOrdinal, jint order, jint Nx, jint Ny, jint fov_x_deg) {
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_mrcal_MrCalJNI_undistort_1mrcal
+  (JNIEnv*, jclass, jlong srcMat, jlong dstMat, jlong camMat, jlong distCoeffs,
+   jint lensModelOrdinal, jint order, jint Nx, jint Ny, jint fov_x_deg)
+{
   return undistort_mrcal(
       reinterpret_cast<cv::Mat*>(srcMat), reinterpret_cast<cv::Mat*>(dstMat),
       reinterpret_cast<cv::Mat*>(camMat),

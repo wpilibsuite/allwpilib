@@ -103,10 +103,9 @@ model {
                     it.buildable = false
                     return
                 }
+
                 if (it in SharedLibraryBinarySpec) {
-                    it.buildable = false
                     nativeUtils.useRequiredLibrary(it, 'opencv_shared')
-                    return
                 } else {
                     nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 }
@@ -114,23 +113,24 @@ model {
             }
         }
         "${nativeName}JNIShared"(JniNativeLibrarySpec) {
+            baseName = nativeName + 'jni'
+
             if (project.hasProperty('skipJniSymbols')) {
                 checkSkipSymbols = skipJniSymbols
             }
 
-            // enableCheckTask !project.hasProperty('skipJniCheck')
-            enableCheckTask false
+            enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp'
-                        include '**/jni/**/*.cpp'
+                        srcDirs 'src/main/native/src'
+                        include '**/jni/*.cpp'
                     }
                     exportedHeaders {
-                        srcDir 'src/main/native/include'
+                        srcDir 'src/main/native/include/jni'
                         include '**/*.h'
                     }
                 }
@@ -140,9 +140,13 @@ model {
                     it.buildable = false
                     return
                 }
+
                 if (it instanceof StaticLibraryBinarySpec) {
                     it.buildable = false
                     return
+                }
+                if (!project.hasProperty('noWpiutil')) {
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 }
                 lib library: "${nativeName}", linkage: 'shared'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
