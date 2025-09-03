@@ -16,9 +16,10 @@
 
 TEST(DCMotorSimTest, VoltageSteadyState) {
   frc::DCMotor gearbox = frc::DCMotor::NEO(1);
+  auto ks = units::volt_t{0.12};
   auto plant = frc::LinearSystemId::DCMotorSystem(
       frc::DCMotor::NEO(1), units::kilogram_square_meter_t{0.0005}, 1.0);
-  frc::sim::DCMotorSim sim{plant, gearbox};
+  frc::sim::DCMotorSim sim{ks, plant, gearbox};
 
   frc::Encoder encoder{0, 1};
   frc::sim::EncoderSim encoderSim{encoder};
@@ -41,7 +42,7 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
     encoderSim.SetRate(sim.GetAngularVelocity().value());
   }
 
-  EXPECT_NEAR((gearbox.Kv * 12_V).value(), encoder.GetRate(), 0.1);
+  EXPECT_NEAR((gearbox.Kv * (12_V - ks)).value(), encoder.GetRate(), 0.1);
 
   // Decay
   for (int i = 0; i < 100; i++) {
@@ -62,9 +63,10 @@ TEST(DCMotorSimTest, VoltageSteadyState) {
 
 TEST(DCMotorSimTest, PositionFeedbackControl) {
   frc::DCMotor gearbox = frc::DCMotor::NEO(1);
+  auto ks = units::volt_t{0.12};
   auto plant = frc::LinearSystemId::DCMotorSystem(
       frc::DCMotor::NEO(1), units::kilogram_square_meter_t{0.0005}, 1.0);
-  frc::sim::DCMotorSim sim{plant, gearbox};
+  frc::sim::DCMotorSim sim{ks, plant, gearbox};
 
   frc::PIDController controller{0.04, 0.0, 0.001};
 
