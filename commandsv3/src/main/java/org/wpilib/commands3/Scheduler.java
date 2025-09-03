@@ -66,16 +66,16 @@ import org.wpilib.commands3.proto.SchedulerProto;
  * <p>The {@link #run()} method runs five steps:
  *
  * <ol>
- *   <li>Poll all registered triggers to queue and cancel commands
  *   <li>Call {@link #sideload(Consumer) periodic sideload functions}
+ *   <li>Poll all registered triggers to queue and cancel commands
+ *   <li>Queue default commands for any mechanisms without a running command. The queued commands
+ *       can be superseded by any manual scheduling or commands scheduled by triggers in the next
+ *       run.
  *   <li>Start all queued commands. This happens after all triggers are checked in case multiple
  *       commands with conflicting requirements are queued in the same update; the last command to
  *       be queued takes precedence over the rest.
  *   <li>Loop over all running commands, mounting and calling each in turn until they either exit or
  *       call {@link Coroutine#yield()}. Commands run in the order in which they were scheduled.
- *   <li>Queue default commands for any mechanisms without a running command. The queued commands
- *       can be superseded by any manual scheduling or commands scheduled by triggers in the next
- *       run.
  * </ol>
  *
  * <h2>Telemetry</h2>
@@ -162,7 +162,7 @@ public class Scheduler implements ProtobufSerializable {
    * @throws IllegalArgumentException if the command does not meet the requirements for being a
    *     default command
    */
-  public void scheduleAsDefaultCommand(Mechanism mechanism, Command defaultCommand) {
+  public void setDefaultCommand(Mechanism mechanism, Command defaultCommand) {
     if (!defaultCommand.requires(mechanism)) {
       throw new IllegalArgumentException(
           "A mechanism's default command must require that mechanism");
@@ -174,7 +174,6 @@ public class Scheduler implements ProtobufSerializable {
     }
 
     m_defaultCommands.put(mechanism, defaultCommand);
-    schedule(defaultCommand);
   }
 
   /**
@@ -223,7 +222,6 @@ public class Scheduler implements ProtobufSerializable {
    * @param callback the periodic function to run
    */
   public void addPeriodic(Runnable callback) {
-    // TODO: Add a unit test for this
     sideload(
         coroutine -> {
           while (true) {
@@ -460,11 +458,17 @@ public class Scheduler implements ProtobufSerializable {
   }
 
   /**
-   * Updates the command scheduler. This will process trigger bindings on anything attached to the
-   * {@link #getDefaultEventLoop() default event loop}, begin running any commands scheduled since
-   * the previous call to {@code run()}, process periodic callbacks added with {@link
-   * #addPeriodic(Runnable)} and {@link #sideload(Consumer)}, update running commands, and schedule
-   * default commands for any mechanisms that are not owned by a running command.
+   * Updates the command scheduler. This will run operations in the following order:
+   *
+   * <ol>
+   *   <li>Run sideloaded functions from {@link #sideload(Consumer)} and {@link
+   *       #addPeriodic(Runnable)}
+   *   <li>Update trigger bindings to queue and cancel bound commands
+   *   <li>Queue default commands for mechanisms that do not have a queued or running command
+   *   <li>Promote queued commands to the running set
+   *   <li>For every command in the running set, mount and run that command until it calls {@link
+   *       Coroutine#yield()} or exits
+   * </ol>
    *
    * <p>This method is intended to be called in a periodic loop like {@link
    * TimedRobot#robotPeriodic()}
@@ -472,13 +476,21 @@ public class Scheduler implements ProtobufSerializable {
   public void run() {
     final long startMicros = RobotController.getTime();
 
-    // Process triggers first; these tend to queue and cancel commands
+    // Sideloads may change some state that affects triggers. Run them first.
+    runPeriodicSideloads();
+
+    // Poll triggers next to schedule and cancel commands
     m_eventLoop.poll();
 
-    runPeriodicSideloads();
-    promoteScheduledCommands();
-    runCommands();
+    // Schedule default commands for any mechanisms that don't have a running command and didn't
+    // have a new command scheduled by a sideload function or a trigger
     scheduleDefaultCommands();
+
+    // Move all scheduled commands to the running set
+    promoteScheduledCommands();
+
+    // Run every command in order until they call Coroutine.yield() or exit
+    runCommands();
 
     final long endMicros = RobotController.getTime();
     m_lastRunTimeMs = Milliseconds.convertFrom(endMicros - startMicros, Microseconds);

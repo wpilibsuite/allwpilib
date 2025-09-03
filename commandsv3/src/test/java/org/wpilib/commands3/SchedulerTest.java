@@ -727,6 +727,19 @@ class SchedulerTest {
   }
 
   @Test
+  void sideloadAffectsStateForTriggerInSameCycle() {
+    AtomicBoolean signal = new AtomicBoolean(false);
+    var trigger = new Trigger(m_scheduler, signal::get);
+    var command = Command.noRequirements().executing(Coroutine::park).named("Command");
+    trigger.onTrue(command);
+    m_scheduler.sideload(co -> signal.set(true));
+
+    m_scheduler.run();
+    assertTrue(signal.get(), "Sideload should have run and set the signal");
+    assertTrue(m_scheduler.isRunning(command), "Command should have started");
+  }
+
+  @Test
   void nestedMechanisms() {
     var superstructure =
         new Mechanism("Superstructure", m_scheduler) {

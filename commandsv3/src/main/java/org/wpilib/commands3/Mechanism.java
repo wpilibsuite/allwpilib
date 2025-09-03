@@ -78,7 +78,7 @@ public class Mechanism {
    * @param defaultCommand the new default command
    */
   public void setDefaultCommand(Command defaultCommand) {
-    m_registeredScheduler.scheduleAsDefaultCommand(this, defaultCommand);
+    m_registeredScheduler.setDefaultCommand(this, defaultCommand);
   }
 
   /**
