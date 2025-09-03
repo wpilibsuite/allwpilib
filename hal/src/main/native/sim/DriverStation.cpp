@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "hal/DriverStation.h"
+#include "hal/DriverStationTypes.h"
+#include "wpi/string.h"
 
 #ifdef __APPLE__
 #include <pthread.h>
@@ -16,6 +18,7 @@
 
 #include <fmt/format.h>
 #include <wpi/EventVector.h>
+#include <wpi/StringMap.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
@@ -45,6 +48,7 @@ struct JoystickDataCache {
   HAL_AllianceStationID allianceStation;
   double matchTime;
   HAL_ControlWord controlWord;
+  int64_t opModeId;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 // static_assert(std::is_trivial_v<JoystickDataCache>);
@@ -71,12 +75,13 @@ void JoystickDataCache::Update() {
   HAL_ControlWord tmpControlWord;
   std::memset(&tmpControlWord, 0, sizeof(tmpControlWord));
   tmpControlWord.enabled = SimDriverStationData->enabled;
-  tmpControlWord.autonomous = SimDriverStationData->autonomous;
-  tmpControlWord.test = SimDriverStationData->test;
+  tmpControlWord.robotMode = SimDriverStationData->robotMode;
   tmpControlWord.eStop = SimDriverStationData->eStop;
   tmpControlWord.fmsAttached = SimDriverStationData->fmsAttached;
   tmpControlWord.dsAttached = SimDriverStationData->dsAttached;
   this->controlWord = tmpControlWord;
+
+  opModeId = SimDriverStationData->opMode;
 }
 
 #define CHECK_JOYSTICK_NUMBER(stickNum)                  \
@@ -227,6 +232,26 @@ int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   return 0;
 }
 
+int32_t HAL_SetOpModeOptions(const struct HAL_OpModeOption* options,
+                             int32_t count) {
+  if (gShutdown) {
+    return 0;
+  }
+  if (count < 0 || count > 1000 || (count != 0 && !options)) {
+    return PARAMETER_OUT_OF_RANGE;
+  }
+  SimDriverStationData->SetOpModeOptions({options, options + count});
+  return 0;
+}
+
+int64_t HAL_GetOpMode(void) {
+  if (gShutdown) {
+    return 0;
+  }
+  std::scoped_lock lock{driverStation->cacheMutex};
+  return currentRead->opModeId;
+}
+
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
   if (gShutdown) {
     return HAL_AllianceStationID_kUnknown;
@@ -348,19 +373,7 @@ void HAL_ObserveUserProgramStarting(void) {
   HALSIM_SetProgramStarted();
 }
 
-void HAL_ObserveUserProgramDisabled(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramAutonomous(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramTeleop(void) {
-  // TODO
-}
-
-void HAL_ObserveUserProgramTest(void) {
+void HAL_ObserveUserProgramOpMode(int64_t id, HAL_Bool enabled) {
   // TODO
 }
 

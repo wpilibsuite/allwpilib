@@ -8,6 +8,7 @@
 #include <frc/internal/DriverStationModeThread.h>
 #include <hal/DriverStation.h>
 #include <networktables/NetworkTable.h>
+#include "hal/DriverStationTypes.h"
 
 Robot::Robot() {}
 
@@ -22,6 +23,28 @@ void Robot::Test() {}
 void Robot::StartCompetition() {
   frc::internal::DriverStationModeThread modeThread;
 
+  // Create an opmode per robot mode
+  static struct HAL_OpModeOption opmodes[] = {
+      {HAL_OPMODE_MAKE_ID(HAL_ROBOTMODE_AUTONOMOUS, 0),
+       wpi::make_string("Auto"),
+       {},
+       {},
+       -1,
+       -1},
+      {HAL_OPMODE_MAKE_ID(HAL_ROBOTMODE_TELEOPERATED, 0),
+       wpi::make_string("Teleop"),
+       {},
+       {},
+       -1,
+       -1},
+      {HAL_OPMODE_MAKE_ID(HAL_ROBOTMODE_TEST, 0),
+       wpi::make_string("Test"),
+       {},
+       {},
+       -1,
+       -1}};
+  HAL_SetOpModeOptions(opmodes, sizeof(opmodes) / sizeof(opmodes[0]));
+
   wpi::Event event{false, false};
   frc::DriverStation::ProvideRefreshedDataEventHandle(event.GetHandle());
 
@@ -29,31 +52,26 @@ void Robot::StartCompetition() {
   HAL_ObserveUserProgramStarting();
 
   while (!m_exit) {
-    if (IsDisabled()) {
-      modeThread.InDisabled(true);
+    int64_t opMode = GetOpModeId();
+    bool enabled = IsEnabled();
+    modeThread.InOpMode(opMode, enabled);
+    if (!enabled) {
       Disabled();
-      modeThread.InDisabled(false);
       while (IsDisabled()) {
         wpi::WaitForObject(event.GetHandle());
       }
     } else if (IsAutonomous()) {
-      modeThread.InAutonomous(true);
       Autonomous();
-      modeThread.InAutonomous(false);
       while (IsAutonomousEnabled()) {
         wpi::WaitForObject(event.GetHandle());
       }
     } else if (IsTest()) {
-      modeThread.InTest(true);
       Test();
-      modeThread.InTest(false);
       while (IsTest() && IsEnabled()) {
         wpi::WaitForObject(event.GetHandle());
       }
     } else {
-      modeThread.InTeleop(true);
       Teleop();
-      modeThread.InTeleop(false);
       while (IsTeleopEnabled()) {
         wpi::WaitForObject(event.GetHandle());
       }

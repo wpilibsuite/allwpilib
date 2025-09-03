@@ -4,31 +4,40 @@
 
 package edu.wpi.first.hal;
 
+import edu.wpi.first.hal.struct.ControlWordStruct;
+import java.util.Objects;
+
 /** A wrapper for the HALControlWord bitfield. */
 public class ControlWord {
   private boolean m_enabled;
-  private boolean m_autonomous;
-  private boolean m_test;
   private boolean m_emergencyStop;
   private boolean m_fmsAttached;
   private boolean m_dsAttached;
+  private RobotMode m_robotMode = RobotMode.UNKNOWN;
 
   /** Default constructor. */
   public ControlWord() {}
 
-  void update(
+  /**
+   * Updates from state values.
+   *
+   * @param enabled enabled
+   * @param emergencyStop emergency stopped
+   * @param fmsAttached FMS attached
+   * @param dsAttached DS attached
+   * @param robotMode robot mode
+   */
+  public void update(
       boolean enabled,
-      boolean autonomous,
-      boolean test,
       boolean emergencyStop,
       boolean fmsAttached,
-      boolean dsAttached) {
+      boolean dsAttached,
+      RobotMode robotMode) {
     m_enabled = enabled;
-    m_autonomous = autonomous;
-    m_test = test;
     m_emergencyStop = emergencyStop;
     m_fmsAttached = fmsAttached;
     m_dsAttached = dsAttached;
+    m_robotMode = robotMode;
   }
 
   /**
@@ -38,8 +47,7 @@ public class ControlWord {
    */
   public void update(ControlWord word) {
     m_enabled = word.m_enabled;
-    m_autonomous = word.m_autonomous;
-    m_test = word.m_test;
+    m_robotMode = word.m_robotMode;
     m_emergencyStop = word.m_emergencyStop;
     m_fmsAttached = word.m_fmsAttached;
     m_dsAttached = word.m_dsAttached;
@@ -55,21 +63,12 @@ public class ControlWord {
   }
 
   /**
-   * Gets the Autonomous mode flag.
+   * Gets the robot mode.
    *
-   * @return the Autonomous mode flag
+   * @return the robot mode
    */
-  public boolean getAutonomous() {
-    return m_autonomous;
-  }
-
-  /**
-   * Gets the Test mode flag.
-   *
-   * @return the Test mode flag
-   */
-  public boolean getTest() {
-    return m_test;
+  public RobotMode getMode() {
+    return m_robotMode;
   }
 
   /**
@@ -98,4 +97,21 @@ public class ControlWord {
   public boolean getDSAttached() {
     return m_dsAttached;
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof ControlWord word
+        && m_enabled == word.m_enabled
+        && m_emergencyStop == word.m_emergencyStop
+        && m_fmsAttached == word.m_fmsAttached
+        && m_dsAttached == word.m_dsAttached
+        && m_robotMode.equals(word.m_robotMode);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_enabled, m_emergencyStop, m_dsAttached, m_fmsAttached, m_robotMode);
+  }
+
+  public static final ControlWordStruct struct = new ControlWordStruct();
 }

@@ -14,6 +14,20 @@ namespace frc {
 class DSControlWord {
  public:
   /**
+   * The overall robot mode (not including enabled state).
+   */
+  enum RobotMode {
+    /// Unknown.
+    kUnknown = HAL_ROBOTMODE_UNKNOWN,
+    /// Autonomous.
+    kAutonomous = HAL_ROBOTMODE_AUTONOMOUS,
+    /// Qualification.
+    kTeleoperated = HAL_ROBOTMODE_TELEOPERATED,
+    /// Elimination.
+    kTest = HAL_ROBOTMODE_TEST
+  };
+
+  /**
    * DSControlWord constructor.
    *
    * Upon construction, the current Driver Station control word is read and
@@ -41,6 +55,15 @@ class DSControlWord {
    * @return True if the robot is e-stopped
    */
   bool IsEStopped() const;
+
+  /**
+   * Gets the current robot mode.
+   * 
+   * <p>Note that this does not indicate whether the robot is enabled or disabled.
+   *
+   * @return robot mode
+   */
+  RobotMode GetRobotMode() const;
 
   /**
    * Check if the DS is commanding autonomous mode.
@@ -79,6 +102,14 @@ class DSControlWord {
    * @return True if the robot is being commanded to be in test mode
    */
   bool IsTest() const;
+
+  /**
+   * Check if the DS is commanding test mode and if it has enabled the robot.
+   *
+   * @return True if the robot is being commanded to be in test mode and
+   * enabled.
+   */
+  bool IsTestEnabled() const;
 
   /**
    * Check if the DS is attached.

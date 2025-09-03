@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.RobotMode;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.JoystickSim;
@@ -63,7 +64,7 @@ class ElevatorSimulationTest {
   void teleopTest() {
     // teleop init
     {
-      DriverStationSim.setAutonomous(false);
+      DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
       DriverStationSim.setEnabled(true);
       DriverStationSim.notifyNewData();
 
@@ -123,7 +124,6 @@ class ElevatorSimulationTest {
 
     {
       // Disable
-      DriverStationSim.setAutonomous(false);
       DriverStationSim.setEnabled(false);
       DriverStationSim.notifyNewData();
 

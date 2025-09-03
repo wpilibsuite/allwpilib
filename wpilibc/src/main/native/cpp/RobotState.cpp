@@ -4,6 +4,7 @@
 
 #include "frc/RobotState.h"
 
+#include "frc/DSControlWord.h"
 #include "frc/DriverStation.h"
 
 using namespace frc;
@@ -20,6 +21,10 @@ bool RobotState::IsEStopped() {
   return DriverStation::IsEStopped();
 }
 
+DSControlWord::RobotMode RobotState::GetRobotMode() {
+  return DriverStation::GetRobotMode();
+}
+
 bool RobotState::IsTeleop() {
   return DriverStation::IsTeleop();
 }
@@ -30,4 +35,8 @@ bool RobotState::IsAutonomous() {
 
 bool RobotState::IsTest() {
   return DriverStation::IsTest();
+}
+
+int64_t RobotState::GetOpModeId() {
+  return DriverStation::GetOpModeId();
 }
