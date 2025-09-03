@@ -77,7 +77,7 @@ Java_edu_wpi_first_mrcal_MrCalJNI_mrcal_1calibrate_1camera
     // work! Observations should be [x, y, level]
     std::span<mrcal_point3_t> observations{
         reinterpret_cast<mrcal_point3_t*>(
-            env->GetDoubleArrayElements(observations_board, 0)),
+            env->GetDoubleArrayElements(observations_board, nullptr)),
         env->GetArrayLength(observations_board) / 3lu};
 
     size_t points_in_board = boardWidth * boardHeight;

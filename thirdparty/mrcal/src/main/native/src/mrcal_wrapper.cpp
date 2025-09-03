@@ -245,16 +245,21 @@ static mrcal_problem_selections_t construct_problem_selections(
     MrcalSolveOptions s, int Ncameras_intrinsics, int Ncameras_extrinsics,
     int Nframes, int Nobservations_board) {
   // By default we optimize everything we can
-  if (s.do_optimize_intrinsics_core < 0)
+  if (s.do_optimize_intrinsics_core < 0) {
     s.do_optimize_intrinsics_core = Ncameras_intrinsics > 0;
-  if (s.do_optimize_intrinsics_distortions < 0)
+  }
+  if (s.do_optimize_intrinsics_distortions < 0) {
     s.do_optimize_intrinsics_core = Ncameras_intrinsics > 0;
-  if (s.do_optimize_extrinsics < 0)
+  }
+  if (s.do_optimize_extrinsics < 0) {
     s.do_optimize_extrinsics = Ncameras_extrinsics > 0;
-  if (s.do_optimize_frames < 0)
+  }
+  if (s.do_optimize_frames < 0) {
     s.do_optimize_frames = Nframes > 0;
-  if (s.do_optimize_calobject_warp < 0)
+  }
+  if (s.do_optimize_calobject_warp < 0) {
     s.do_optimize_calobject_warp = Nobservations_board > 0;
+  }
   return {
       .do_optimize_intrinsics_core =
           static_cast<bool>(s.do_optimize_intrinsics_core),
@@ -457,10 +462,11 @@ std::unique_ptr<mrcal_result> mrcal_main(
     std::vector<double> seedDistortions(nDistortion);
 
     for (int j = 0; j < seedDistortions.size(); j++) {
-      if (j < 5)
+      if (j < 5) {
         seedDistortions[j] = dis(gen) * 2.0 * 1e-6;
-      else
+      } else {
         seedDistortions[j] = dis(gen) * 2.0 * 1e-9;
+      }
     }
 
     // copy distortion into our big intrinsics array
