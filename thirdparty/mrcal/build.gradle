@@ -110,6 +110,10 @@ model {
                     nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 }
                 nativeUtils.useRequiredLibrary(it, 'ceres')
+
+                if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.linker.args  << '-framework' << 'Accelerate'
+                }
             }
         }
         "${nativeName}JNIShared"(JniNativeLibrarySpec) {
@@ -151,10 +155,6 @@ model {
                 lib library: "${nativeName}", linkage: 'shared'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_shared')
-
-                if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                    it.linker.args  << '-framework' << 'Accelerate'
-                }
             }
         }
     }
