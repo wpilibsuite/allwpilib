@@ -11,9 +11,14 @@ if (project.hasProperty('onlylinuxathena')) {
 
 ext {
     nativeName = 'mrcal'
+    baseId = nativeName
+    groupId = 'edu.wpi.first.mrcal'
+    devMain = 'edu.wpi.first.mrcal.DevMain'
+    useJava = true;
 }
 
 apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/java/javacommon.gradle"
 apply from: "${rootDir}/shared/ceres.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
 
@@ -130,14 +135,19 @@ model {
                 }
             }
             binaries.all {
-                if (it instanceof StaticLibraryBinarySpec) {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     it.buildable = false
                     return
                 }
-                lib library: "${nativeName}", linkage: 'shared'
-                if (!project.hasProperty('noWpiutil')) {
-                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                if (it instanceof StaticLibraryBinarySpec) {
+                    it.buildable = false
+                    return
+                    nativeUtils.useRequiredLibrary(it, 'opencv_static')
+                } else {
+                    nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                 }
+                nativeUtils.useRequiredLibrary(it, 'ceres')
+                lib library: "${nativeName}", linkage: 'shared'
             }
         }
     }

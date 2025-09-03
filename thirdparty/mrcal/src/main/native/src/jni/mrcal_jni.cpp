@@ -197,11 +197,11 @@ JNIEXPORT jobject JNICALL
     jdouble rms_err = stats.rms_error;
     jdouble warp_x = stats.calobject_warp.x2;
     jdouble warp_y = stats.calobject_warp.y2;
-    jint Noutliers = stats.Noutliers_board;
+    jint nOutliers = stats.Noutliers_board;
 
     // Actually call the constructor (TODO)
     auto ret = env->NewObject(detectionClass, constructor, success, intrinsics,
-                              rms_err, residuals, warp_x, warp_y, Noutliers);
+                              rms_err, residuals, warp_x, warp_y, nOutliers);
 
     return ret;
   } catch (...) {

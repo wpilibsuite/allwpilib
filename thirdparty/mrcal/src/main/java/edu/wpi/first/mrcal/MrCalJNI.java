@@ -6,6 +6,7 @@ import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfPoint2f;
 
 public class MrCalJNI {
+  @SuppressWarnings("MemberName")
   public static class MrCalResult {
     public boolean success;
     public double[] intrinsics;
@@ -13,7 +14,7 @@ public class MrCalJNI {
     public double[] residuals;
     public double warp_x;
     public double warp_y;
-    public int Noutliers;
+    public int nOutliers;
 
     public MrCalResult(boolean success) {
       this.success = success;
@@ -26,14 +27,14 @@ public class MrCalJNI {
         double[] residuals,
         double warp_x,
         double warp_y,
-        int Noutliers) {
+        int nOutliers) {
       this.success = success;
       this.intrinsics = intrinsics;
       this.rms_error = rms_error;
       this.residuals = residuals;
       this.warp_x = warp_x;
       this.warp_y = warp_y;
-      this.Noutliers = Noutliers;
+      this.nOutliers = nOutliers;
     }
 
     @Override
@@ -48,8 +49,8 @@ public class MrCalJNI {
           + warp_x
           + ", warp_y="
           + warp_y
-          + ", Noutliers="
-          + Noutliers
+          + ", nOutliers="
+          + nOutliers
           + "]";
     }
   }
