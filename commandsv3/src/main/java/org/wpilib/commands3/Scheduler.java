@@ -438,6 +438,11 @@ public class Scheduler implements ProtobufSerializable {
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public void cancel(Command command) {
+    if (command == currentCommand()) {
+      throw new IllegalArgumentException(
+          "Command `" + command.name() + "` is mounted and cannot be canceled");
+    }
+
     boolean running = isRunning(command);
 
     // Evict the command. The next call to run() will schedule the default command for all its
@@ -561,10 +566,19 @@ public class Scheduler implements ProtobufSerializable {
     try {
       coroutine.runToYieldPoint();
     } catch (RuntimeException e) {
+      // Command encountered an uncaught exception.
+      // Remove it from the running set.
+      m_runningCommands.remove(command);
+
       // Intercept the exception, inject stack frames from the schedule site, and rethrow it
       var binding = state.binding();
       e.setStackTrace(CommandTraceHelper.modifyTrace(e.getStackTrace(), binding.frames()));
       emitCompletedWithErrorEvent(command, e);
+      // Clean up child commands after emitting the event so child Canceled events are emitted
+      // after the parent's CompletedWithError
+      removeOrphanedChildren(command);
+
+      // Then rethrow the exception
       throw e;
     } finally {
       long endMicros = RobotController.getTime();

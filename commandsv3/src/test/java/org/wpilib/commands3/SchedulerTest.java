@@ -252,6 +252,54 @@ class SchedulerTest {
   }
 
   @Test
+  void commandEncounteringErrorCancelsChildren() {
+    var child = Command.noRequirements().executing(Coroutine::park).named("Child 1");
+    var command =
+        Command.noRequirements()
+            .executing(
+                co -> {
+                  co.fork(child);
+                  throw new RuntimeException("The exception");
+                })
+            .named("Bad Behavior");
+
+    m_scheduler.schedule(command);
+    assertThrows(RuntimeException.class, m_scheduler::run);
+    assertFalse(
+        m_scheduler.isScheduledOrRunning(command),
+        "Command should have been removed from the scheduler");
+    assertFalse(
+        m_scheduler.isScheduledOrRunning(child),
+        "Child should have been removed from the scheduler");
+  }
+
+  @Test
+  void childCommandEncounteringErrorCancelsParent() {
+    var child =
+        Command.noRequirements()
+            .executing(
+                co -> {
+                  throw new RuntimeException("The exception"); // note: bubbles up to the parent
+                })
+            .named("Child 1");
+    var command =
+        Command.noRequirements()
+            .executing(
+                co -> {
+                  co.await(child);
+                  co.park(); // pretend other things would happen after the child
+                })
+            .named("Parent");
+
+    m_scheduler.schedule(command);
+    assertThrows(RuntimeException.class, m_scheduler::run);
+    assertFalse(
+        m_scheduler.isRunning(command),
+        "Parent command should have been removed from the scheduler");
+    assertFalse(m_scheduler.isRunning(child), "Child should have been removed from the scheduler");
+  }
+
+  @Test
   @SuppressWarnings({"PMD.RedundantFieldInitializer", "PMD.ImmutableField"}) // PMD bugs
   void runMechanism() {
     var example =
@@ -348,6 +396,29 @@ class SchedulerTest {
     m_scheduler.schedule(command);
     m_scheduler.cancel(command);
     assertFalse(m_scheduler.isScheduledOrRunning(command));
+  }
+
+  @Test
+  void commandCancelingSelf() {
+    var ranAfterCancel = new AtomicBoolean(false);
+    var commandRef = new AtomicReference<Command>(null);
+    var command =
+        Command.noRequirements()
+            .executing(
+                co -> {
+                  co.scheduler().cancel(commandRef.get());
+                  ranAfterCancel.set(true);
+                })
+            .named("Command");
+    commandRef.set(command);
+    m_scheduler.schedule(command);
+
+    var error = assertThrows(IllegalArgumentException.class, () -> m_scheduler.run());
+    assertEquals("Command `Command` is mounted and cannot be canceled", error.getMessage());
+    assertFalse(ranAfterCancel.get(), "Command should have stopped after encountering an error");
+    assertFalse(
+        m_scheduler.isScheduledOrRunning(command),
+        "Command should have been removed from the scheduler");
   }
 
   @Test
