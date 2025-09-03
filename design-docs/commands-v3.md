@@ -354,17 +354,17 @@ caused by loop timings for deeply nested commands.
 
 ### Scheduler `run()` Cycle
 
-1. Poll the event loop for triggers (which may queue or cancel commands)
-2. Run periodic sideload functions
-3. Promote scheduled commands to running
+1. Run periodic sideload functions
+2. Poll the event loop for triggers (which may queue or cancel commands)
+3. Schedule default commands for the next iteration to pick up and start running
+4. Promote scheduled commands to running
     1. Cancels any running commands that conflict with scheduled ones
-4. Iterate over running commands
+5. Iterate over running commands
     1. Mount
     2. Run until yield point is reached or an error is raised
     3. Unmount
     4. Evict if the command finished
         1. Any inner command still running is canceled
-5. Schedule default commands for the next iteration to pick up and start running
 
 ### Interruption
 
