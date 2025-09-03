@@ -104,6 +104,13 @@ model {
                     return
                 }
 
+                it.cppCompiler.define 'GLOG_USE_GLOG_EXPORT'
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    it.cppCompiler.define('GLOG_DEPRECATED', '__declspec(deprecated)')
+                } else {
+                    it.cppCompiler.define('GLOG_DEPRECATED', '[[deprecated]]')
+                }
+
                 if (it in SharedLibraryBinarySpec) {
                     nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                 } else {
