@@ -151,6 +151,10 @@ model {
                 lib library: "${nativeName}", linkage: 'shared'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 nativeUtils.useRequiredLibrary(it, 'opencv_shared')
+
+                if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.linker.args  << '-framework' << 'Accelerate'
+                }
             }
         }
     }
