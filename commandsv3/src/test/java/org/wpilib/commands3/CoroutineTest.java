@@ -8,25 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import edu.wpi.first.wpilibj.RobotController;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class CoroutineTest {
-  Scheduler m_scheduler;
-
-  @BeforeEach
-  void setup() {
-    m_scheduler = new Scheduler();
-    RobotController.setTimeSource(() -> System.nanoTime() / 1000L);
-  }
-
+class CoroutineTest extends CommandTestBase {
   @Test
   void forkMany() {
     var a = new NullCommand();

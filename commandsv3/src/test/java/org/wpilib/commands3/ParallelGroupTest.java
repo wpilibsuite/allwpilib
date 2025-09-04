@@ -11,17 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ParallelGroupTest {
-  private Scheduler m_scheduler;
-
-  @BeforeEach
-  void setup() {
-    m_scheduler = new Scheduler();
-  }
-
+class ParallelGroupTest extends CommandTestBase {
   @Test
   void parallelAll() {
     var r1 = new Mechanism("R1", m_scheduler);

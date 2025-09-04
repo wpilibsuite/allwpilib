@@ -8,21 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.wpilibj.RobotController;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class TriggerTest {
-  private Scheduler m_scheduler;
-
-  @BeforeEach
-  void setup() {
-    m_scheduler = new Scheduler();
-    RobotController.setTimeSource(() -> System.nanoTime() / 1000);
-  }
-
+class TriggerTest extends CommandTestBase {
   @Test
   void onTrue() {
     var signal = new AtomicBoolean(false);

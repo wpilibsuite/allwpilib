@@ -9,22 +9,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.wpilib.commands3.ConflictDetector.findAllConflicts;
 import static org.wpilib.commands3.ConflictDetector.throwIfConflicts;
 
-import edu.wpi.first.wpilibj.RobotController;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.wpilib.commands3.ConflictDetector.Conflict;
 
-class ConflictDetectorTest {
-  private Scheduler m_scheduler;
-
-  @BeforeEach
-  void setup() {
-    RobotController.setTimeSource(() -> System.nanoTime() / 1000L);
-    m_scheduler = new Scheduler();
-  }
-
+class ConflictDetectorTest extends CommandTestBase {
   @Test
   void emptyInputHasNoConflicts() {
     var conflicts = findAllConflicts(List.of());

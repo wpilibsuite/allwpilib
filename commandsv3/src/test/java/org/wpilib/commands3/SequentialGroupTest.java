@@ -8,17 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class SequentialGroupTest {
-  private Scheduler m_scheduler;
-
-  @BeforeEach
-  void setup() {
-    m_scheduler = new Scheduler();
-  }
-
+class SequentialGroupTest extends CommandTestBase {
   @Test
   void single() {
     var command = Command.noRequirements().executing(Coroutine::yield).named("The Command");
