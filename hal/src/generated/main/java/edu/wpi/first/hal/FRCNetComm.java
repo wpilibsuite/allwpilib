@@ -321,6 +321,8 @@ public final class FRCNetComm {
     public static final int kFramework_KitBotTraditional = 9;
     /** kFramework_KitBotInline = 10. */
     public static final int kFramework_KitBotInline = 10;
+    /** kFramework_YAMS = 11. */
+    public static final int kFramework_YAMS = 11;
     /** kRobotDrive_ArcadeStandard = 1. */
     public static final int kRobotDrive_ArcadeStandard = 1;
     /** kRobotDrive_ArcadeButtonSpin = 2. */
