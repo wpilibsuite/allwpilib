@@ -567,19 +567,7 @@ public class Scheduler implements ProtobufSerializable {
       coroutine.runToYieldPoint();
     } catch (RuntimeException e) {
       // Command encountered an uncaught exception.
-      // Remove it from the running set.
-      m_runningCommands.remove(command);
-
-      // Intercept the exception, inject stack frames from the schedule site, and rethrow it
-      var binding = state.binding();
-      e.setStackTrace(CommandTraceHelper.modifyTrace(e.getStackTrace(), binding.frames()));
-      emitCompletedWithErrorEvent(command, e);
-      // Clean up child commands after emitting the event so child Canceled events are emitted
-      // after the parent's CompletedWithError
-      removeOrphanedChildren(command);
-
-      // Then rethrow the exception
-      throw e;
+      handleCommandException(state, e);
     } finally {
       long endMicros = RobotController.getTime();
       double elapsedMs = Milliseconds.convertFrom(endMicros - startMicros, Microseconds);
@@ -608,6 +596,50 @@ public class Scheduler implements ProtobufSerializable {
       // Yielded
       emitYieldedEvent(command);
     }
+  }
+
+  /**
+   * Handles uncaught runtime exceptions from a mounted and running command. The command's ancestor
+   * and child commands will all be canceled and the exception's backtrace will be modified to
+   * include the stack frames of the schedule call site.
+   *
+   * @param state The state of the command that encountered the exception.
+   * @param e The exception that was thrown.
+   * @throws RuntimeException rethrows the exception, with a modified backtrace pointing to the
+   *     schedule site
+   */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  private void handleCommandException(CommandState state, RuntimeException e) {
+    var command = state.command();
+
+    // Fetch the root command
+    // (needs to be done before removing the failed command from the running set)
+    Command root = command;
+    while (getParentOf(root) != null) {
+      root = getParentOf(root);
+    }
+
+    // Remove it from the running set.
+    m_runningCommands.remove(command);
+
+    // Intercept the exception, inject stack frames from the schedule site, and rethrow it
+    var binding = state.binding();
+    e.setStackTrace(CommandTraceHelper.modifyTrace(e.getStackTrace(), binding.frames()));
+    emitCompletedWithErrorEvent(command, e);
+
+    // Clean up child commands after emitting the event so child Canceled events are emitted
+    // after the parent's CompletedWithError
+    removeOrphanedChildren(command);
+
+    // Bubble up to the root and cancel all commands between the root and this one
+    // Note: Because we remove the command from the running set above, we still need to
+    //       clean up all the failed command's children
+    if (root != null && root != command) {
+      cancel(root);
+    }
+
+    // Then rethrow the exception
+    throw e;
   }
 
   /**

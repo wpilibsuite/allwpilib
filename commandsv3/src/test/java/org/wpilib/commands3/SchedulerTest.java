@@ -13,6 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.wpilib.commands3.SchedulerEvent.Canceled;
+import static org.wpilib.commands3.SchedulerEvent.CompletedWithError;
+import static org.wpilib.commands3.SchedulerEvent.Mounted;
+import static org.wpilib.commands3.SchedulerEvent.Scheduled;
+import static org.wpilib.commands3.SchedulerEvent.Yielded;
 
 import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
@@ -31,11 +36,14 @@ import org.junit.jupiter.api.Timeout;
 @Timeout(5)
 class SchedulerTest {
   private Scheduler m_scheduler;
+  private List<SchedulerEvent> m_events;
 
   @BeforeEach
   void setup() {
     RobotController.setTimeSource(() -> System.nanoTime() / 1000L);
     m_scheduler = new Scheduler();
+    m_events = new ArrayList<>();
+    m_scheduler.addEventListener(m_events::add);
   }
 
   @Test
@@ -297,6 +305,71 @@ class SchedulerTest {
         m_scheduler.isRunning(command),
         "Parent command should have been removed from the scheduler");
     assertFalse(m_scheduler.isRunning(child), "Child should have been removed from the scheduler");
+  }
+
+  @Test
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  void childCommandEncounteringErrorAfterRemountCancelsParent() {
+    var child =
+        Command.noRequirements()
+            .executing(
+                co -> {
+                  co.yield();
+                  throw new RuntimeException("The exception"); // does not bubble up to the parent
+                })
+            .named("Child 1");
+    var command =
+        Command.noRequirements()
+            .executing(
+                co -> {
+                  co.await(child);
+                  co.park(); // pretend other things would happen after the child
+                })
+            .named("Parent");
+
+    m_scheduler.schedule(command);
+
+    // first run schedules the child and adds it to the running set
+    m_scheduler.run();
+
+    // second run encounters the error in the child
+    final var error = assertThrows(RuntimeException.class, m_scheduler::run);
+    assertFalse(
+        m_scheduler.isRunning(command),
+        "Parent command should have been removed from the scheduler");
+    assertFalse(m_scheduler.isRunning(child), "Child should have been removed from the scheduler");
+
+    // Full event history
+    assertEquals(9, m_events.size());
+    assertTrue(
+        m_events.get(0) instanceof Scheduled s && s.command() == command,
+        "First event should be parent scheduled");
+    assertTrue(
+        m_events.get(1) instanceof Mounted m && m.command() == command,
+        "Second event should be parent mounted");
+    assertTrue(
+        m_events.get(2) instanceof Scheduled s && s.command() == child,
+        "Third event should be child scheduled");
+    assertTrue(
+        m_events.get(3) instanceof Mounted m && m.command() == child,
+        "Fourth event should be child mounted");
+    assertTrue(
+        m_events.get(4) instanceof Yielded y && y.command() == child,
+        "Fifth event should be child yielded");
+    assertTrue(
+        m_events.get(5) instanceof Yielded y && y.command() == command,
+        "Sixth event should be parent yielded");
+    assertTrue(
+        m_events.get(6) instanceof Mounted m && m.command() == child,
+        "Seventh event should be child remounted");
+    assertTrue(
+        m_events.get(7) instanceof CompletedWithError c
+            && c.command() == child
+            && c.error() == error,
+        "Eighth event should be child completed with error");
+    assertTrue(
+        m_events.get(8) instanceof Canceled c && c.command() == command,
+        "Ninth event should be parent canceled");
   }
 
   @Test
