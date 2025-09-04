@@ -295,14 +295,14 @@ public interface Command {
    * run in the order they're passed to this method.
    *
    * <p>More configuration options are needed after calling this function before the command can be
-   * created. See {@link SequenceBuilder} for details.
+   * created. See {@link SequentialGroupBuilder} for details.
    *
    * @param commands The commands to run in sequence.
    * @return A command builder
    */
-  static SequenceBuilder sequence(Command... commands) {
+  static SequentialGroupBuilder sequence(Command... commands) {
     // parameters will be null checked by the builder
-    return new SequenceBuilder().andThen(commands);
+    return new SequentialGroupBuilder().andThen(commands);
   }
 
   /**
@@ -366,9 +366,9 @@ public interface Command {
    * @param next The command to run after this one in the sequence
    * @return A sequence builder
    */
-  default SequenceBuilder andThen(Command next) {
+  default SequentialGroupBuilder andThen(Command next) {
     // parameter will be null checked by the builder
-    return new SequenceBuilder().andThen(this).andThen(next);
+    return new SequentialGroupBuilder().andThen(this).andThen(next);
   }
 
   /**

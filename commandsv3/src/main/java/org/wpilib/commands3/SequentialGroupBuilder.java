@@ -18,15 +18,15 @@ import java.util.stream.Collectors;
  * #named(String)} method, or with an automatically generated name using {@link
  * #withAutomaticName()}.
  */
-public class SequenceBuilder {
+public class SequentialGroupBuilder {
   private final List<Command> m_steps = new ArrayList<>();
   private BooleanSupplier m_endCondition;
 
   /**
-   * Creates new SequenceBuilder. The builder will have no commands and have no preapplied
+   * Creates new SequentialGroupBuilder. The builder will have no commands and have no preapplied
    * configuration options. Use {@link #andThen(Command)} to add commands to the sequence.
    */
-  public SequenceBuilder() {}
+  public SequentialGroupBuilder() {}
 
   /**
    * Adds a command to the sequence.
@@ -34,8 +34,8 @@ public class SequenceBuilder {
    * @param next The next command in the sequence
    * @return The builder object, for chaining
    */
-  public SequenceBuilder andThen(Command next) {
-    requireNonNullParam(next, "next", "SequenceBuilder.andThen");
+  public SequentialGroupBuilder andThen(Command next) {
+    requireNonNullParam(next, "next", "SequentialGroupBuilder.andThen");
 
     m_steps.add(next);
     return this;
@@ -48,10 +48,11 @@ public class SequenceBuilder {
    * @param nextCommands The next commands in the sequence
    * @return The builder object, for chaining
    */
-  public SequenceBuilder andThen(Command... nextCommands) {
-    requireNonNullParam(nextCommands, "nextCommands", "SequenceBuilder.andThen");
+  public SequentialGroupBuilder andThen(Command... nextCommands) {
+    requireNonNullParam(nextCommands, "nextCommands", "SequentialGroupBuilder.andThen");
     for (int i = 0; i < nextCommands.length; i++) {
-      requireNonNullParam(nextCommands[i], "nextCommands[" + i + "]", "SequenceBuilder.andThen");
+      requireNonNullParam(
+          nextCommands[i], "nextCommands[" + i + "]", "SequentialGroupBuilder.andThen");
     }
 
     m_steps.addAll(Arrays.asList(nextCommands));
@@ -67,7 +68,7 @@ public class SequenceBuilder {
    * @param endCondition The end condition for the group
    * @return The builder object, for chaining
    */
-  public SequenceBuilder until(BooleanSupplier endCondition) {
+  public SequentialGroupBuilder until(BooleanSupplier endCondition) {
     m_endCondition = endCondition;
     return this;
   }
