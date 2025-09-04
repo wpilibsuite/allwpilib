@@ -90,7 +90,7 @@ WindowsMessagePump::WindowsMessagePump(
     std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> callback) {
   m_callback = callback;
   auto handle = CreateEventA(NULL, true, false, NULL);
-  m_mainThread = std::thread([=] { ThreadMain(handle); });
+  m_mainThread = std::thread([this, handle] { ThreadMain(handle); });
   auto waitResult = WaitForSingleObject(handle, 1000);
   if (waitResult == WAIT_OBJECT_0) {
     CloseHandle(handle);
