@@ -273,6 +273,9 @@ public final class FRCNetComm {
     public static final int kResourceType_PWFSEN36005 = 125;
     /** kResourceType_LaserShark = 126. */
     public static final int kResourceType_LaserShark = 126;
+    /** kResourceType_YAMS = 127. */
+    public static final int kResourceType_YAMS = 127;
+
   }
 
   /**
