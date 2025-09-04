@@ -53,6 +53,11 @@ runs:
         ./wpimath/generate_quickbuf.py --quickbuf_plugin protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
       shell: bash
 
+    - name: Regenerate Commands v3
+      run: |
+        ./commandsv3/generate_files.py --quickbuf_plugin protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
+      shell: bash
+
     - name: Regenerate wpiunits
       run: ./wpiunits/generate_units.py
       shell: bash

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
-class SchedulerTest extends CommandTestBase {
+class CommandSchedulerTest extends CommandTestBase {
   @Test
   void schedulerLambdaTestNoInterrupt() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
