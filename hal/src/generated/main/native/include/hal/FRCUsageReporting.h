@@ -178,6 +178,7 @@ namespace HALUsageReporting {
     kResourceType_RevServoHub = 124,
     kResourceType_PWFSEN36005 = 125,
     kResourceType_LaserShark = 126,
+    kResourceType_YAMS = 127,
   };
   enum tInstances : int32_t {
     kLanguage_LabVIEW = 1,
@@ -199,7 +200,6 @@ namespace HALUsageReporting {
     kFramework_MagicBot = 8,
     kFramework_KitBotTraditional = 9,
     kFramework_KitBotInline = 10,
-    kFramework_YAMS = 11,
     kRobotDrive_ArcadeStandard = 1,
     kRobotDrive_ArcadeButtonSpin = 2,
     kRobotDrive_ArcadeRatioCurve = 3,
