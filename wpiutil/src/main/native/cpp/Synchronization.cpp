@@ -29,7 +29,7 @@ struct State {
 
 struct HandleManager {
   ~HandleManager() {
-    int numActive = gActive.exchange(-1000);
+    int numActive = gActive.exchange(INT_MIN / 2);
     if (numActive <= 0) {
       return;
     }
@@ -47,7 +47,7 @@ struct HandleManager {
     // wait for other threads to finish
     for (;;) {
       int nowActive = gActive.load(std::memory_order_acquire);
-      if (nowActive == (-1000 - numActive)) {
+      if (nowActive == (INT_MIN / 2 - numActive)) {
         break;
       }
       gActive.wait(nowActive, std::memory_order_acquire);
