@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj.shuffleboard;
  *
  * @see BuiltInWidgets the built-in widget types
  */
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface LayoutType {
   /**
    * Gets the string type of the layout as defined by that layout in Shuffleboard.

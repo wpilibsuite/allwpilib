@@ -1,6 +1,5 @@
 import org.gradle.nativeplatform.toolchain.internal.msvcpp.VisualStudioLocator
 import org.gradle.internal.os.OperatingSystem
-import org.gradle.util.VersionNumber
 
 plugins {
     id 'cpp'

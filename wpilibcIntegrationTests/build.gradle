@@ -94,7 +94,7 @@ model {
                     }
                 }
             }
-            destinationDir testOutputFolder
+            destinationDir = testOutputFolder
         }
         // This is in a separate if statement because of what I would assume is a bug in grade.
         // Will file an issue on their side.

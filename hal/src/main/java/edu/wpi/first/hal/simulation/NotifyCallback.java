@@ -6,6 +6,7 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.HALValue;
 
+@FunctionalInterface
 public interface NotifyCallback {
   void callback(String name, HALValue value);
 

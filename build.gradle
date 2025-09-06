@@ -17,10 +17,10 @@ plugins {
     id 'edu.wpi.first.GradleVsCode'
     id 'idea'
     id 'visual-studio'
-    id 'net.ltgt.errorprone' version '3.1.0' apply false
-    id 'com.gradleup.shadow' version '8.3.4' apply false
-    id 'com.diffplug.spotless' version '6.20.0' apply false
-    id 'com.github.spotbugs' version '6.0.2' apply false
+    id 'net.ltgt.errorprone' version '4.3.0' apply false
+    id 'com.gradleup.shadow' version '9.0.0' apply false
+    id 'com.diffplug.spotless' version '7.2.1' apply false
+    id 'com.github.spotbugs' version '6.2.3' apply false
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')
@@ -81,7 +81,7 @@ task libraryBuild() {}
 build.dependsOn outputVersions
 
 task copyAllOutputs(type: Copy) {
-    destinationDir outputsFolder
+    destinationDir = outputsFolder
 }
 
 build.dependsOn copyAllOutputs
@@ -170,5 +170,5 @@ ext.getCurrentArch = {
 }
 
 wrapper {
-    gradleVersion = '8.11'
+    gradleVersion = '8.14.3'
 }

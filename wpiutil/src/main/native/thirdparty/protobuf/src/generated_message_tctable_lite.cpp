@@ -47,6 +47,10 @@
 #pragma GCC diagnostic ignored "-Wunused-function"
 #endif
 
+#if __GNUC__ >= 15
+#pragma GCC diagnostic ignored "-Wmaybe-musttail-local-addr"
+#endif
+
 namespace google {
 namespace protobuf {
 namespace internal {

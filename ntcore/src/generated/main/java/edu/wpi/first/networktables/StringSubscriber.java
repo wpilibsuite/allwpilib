@@ -9,7 +9,6 @@ package edu.wpi.first.networktables;
 import java.util.function.Supplier;
 
 /** NetworkTables String subscriber. */
-@SuppressWarnings("PMD.MissingOverride")
 public interface StringSubscriber extends Subscriber, Supplier<String> {
   /**
    * Get the corresponding topic.

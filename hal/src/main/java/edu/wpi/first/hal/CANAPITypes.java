@@ -35,10 +35,10 @@ public final class CANAPITypes {
     kGyroSensor(4),
     /** Accelerometer. */
     kAccelerometer(5),
-    /** Ultrasonic sensor. */
-    kUltrasonicSensor(6),
-    /** Gear tooth sensor. */
-    kGearToothSensor(7),
+    /** Distance sensor. */
+    kDistanceSensor(6),
+    /** Encoder. */
+    kEncoder(7),
     /** Power distribution. */
     kPowerDistribution(8),
     /** Pneumatics. */
@@ -49,11 +49,13 @@ public final class CANAPITypes {
     kIOBreakout(11),
     /** Servo Controller. */
     kServoController(12),
+    /** Color Sensor. */
+    kColorSensor(13),
     /** Firmware update. */
     kFirmwareUpdate(31);
 
     /** The device type ID. */
-    @SuppressWarnings("PMD.MemberName")
+    @SuppressWarnings("MemberName")
     public final int id;
 
     CANDeviceType(int id) {
@@ -105,10 +107,18 @@ public final class CANAPITypes {
     /** AndyMark. */
     kAndyMark(15),
     /** Vivid-Hosting. */
-    kVividHosting(16);
+    kVividHosting(16),
+    /** Vertos Robotics. */
+    kVertosRobotics(17),
+    /** SWYFT Robotics. */
+    kSWYFTRobotics(18),
+    /** Lumyn Labs. */
+    kLumynLabs(19),
+    /** Brushland Labs. */
+    kBrushlandLabs(20);
 
     /** The manufacturer ID. */
-    @SuppressWarnings("PMD.MemberName")
+    @SuppressWarnings("MemberName")
     public final int id;
 
     CANManufacturer(int id) {

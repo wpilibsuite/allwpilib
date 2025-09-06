@@ -29,7 +29,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 // CHECKSTYLE.OFF: EmptyCatchBlock
 
 /** This class is for the ADIS16448 IMU that connects to the RoboRIO MXP port. */
-@SuppressWarnings({"PMD.RedundantFieldInitializer", "PMD.ImmutableField"})
+@SuppressWarnings({"PMD.RedundantFieldInitializer", "PMD.ImmutableField", "PMD.UnusedPrivateField"})
 public class ADIS16448_IMU implements AutoCloseable, Sendable {
   // ADIS16448 Register Map Declaration
   private static final int FLASH_CNT = 0x00; // Flash memory write count

@@ -1,6 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
   <Match>
+    <Bug pattern="AT_NONATOMIC_64BIT_PRIMITIVE" />
+    <Class name="edu.wpi.first.wpilibj.DriverStation" />
+  </Match>
+  <Match>
+    <Bug pattern="AT_NONATOMIC_64BIT_PRIMITIVE" />
+    <Class name="edu.wpi.first.wpilibj.Ultrasonic" />
+  </Match>
+  <Match>
+    <Bug pattern="AT_NONATOMIC_64BIT_PRIMITIVE" />
+    <Class name="edu.wpi.first.wpilibj.Watchdog" />
+  </Match>
+  <Match>
+    <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
+    <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
+  </Match>
+  <Match>
+    <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
+    <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
+  </Match>
+  <Match>
+    <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
+    <Class name="edu.wpi.first.wpilibj.DriverStation" />
+  </Match>
+  <Match>
+    <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
+    <Class name="edu.wpi.first.wpilibj.GenericHID" />
+  </Match>
+  <Match>
+    <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
+    <Class name="edu.wpi.first.wpilibj.Ultrasonic" />
+  </Match>
+  <Match>
+    <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
+    <Class name="edu.wpi.first.wpilibj.motorcontrol.NidecBrushless" />
+  </Match>
+  <Match>
+    <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
+    <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
+  </Match>
+  <Match>
     <Bug pattern="CT_CONSTRUCTOR_THROW" />
   </Match>
   <Match>
@@ -30,12 +70,21 @@
   <Match>
     <Bug pattern="EI_EXPOSE_REP2" />
   </Match>
+  <!--
+  Strict reading of Object.equals() contract means that whenever equals() behaviour is defined, all implementations
+  need to adhere to it. The only reason to override the method (assuming correct API design, of course) is to provide
+  a more efficient implementation. This rule would be forcing a @SuppressFBWarnings on perfectly compliant classes.
+  More information at https://github.com/spotbugs/spotbugs/issues/511
+  -->
+  <Match>
+    <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
+  </Match>
   <Match>
     <Bug pattern="FL_FLOATS_AS_LOOP_COUNTERS" />
   </Match>
   <Match>
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
-    <Source name="MechanismLigament2d.java" />
+    <Class name="edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d" />
   </Match>
   <Match>
     <Bug pattern="MS_CANNOT_BE_FINAL" />
@@ -49,50 +98,81 @@
   </Match>
   <Match>
     <Bug pattern="NM_CLASS_NAMING_CONVENTION" />
-    <Source name="FRCNetComm.java" />
+    <Class name="edu.wpi.first.hal.FRCNetComm$tInstances" />
+  </Match>
+  <Match>
+    <Bug pattern="NM_CLASS_NAMING_CONVENTION" />
+    <Class name="edu.wpi.first.hal.FRCNetComm$tResourceType" />
   </Match>
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Source name="ParallelCommandGroup.java" />
+    <Class name="edu.wpi.first.wpilibj2.command.ParallelCommandGroup" />
   </Match>
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Source name="ParallelDeadlineGroup.java" />
+    <Class name="edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup" />
   </Match>
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Source name="ParallelRaceGroup.java" />
+    <Class name="edu.wpi.first.wpilibj2.command.ParallelRaceGroup" />
   </Match>
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Source name="ProxyScheduleCommand.java" />
+    <Class name="edu.wpi.first.wpilibj2.command.ProxyScheduleCommand" />
   </Match>
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Source name="SequentialCommandGroup.java" />
+    <Class name="edu.wpi.first.wpilibj2.command.SequentialCommandGroup" />
   </Match>
   <Match>
     <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
-    <Source name="SelectCommand.java" />
+    <Class name="edu.wpi.first.wpilibj2.command.SelectCommand" />
   </Match>
   <Match>
     <Bug pattern="PA_PUBLIC_PRIMITIVE_ATTRIBUTE" />
   </Match>
   <Match>
     <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
-    <Source name="AntJunitLauncher.java" />
+    <Class name="edu.wpi.first.wpilibj.test.AntJunitLauncher" />
   </Match>
   <Match>
     <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
-    <Source name="CombinedRuntimeLoader.java" />
+    <Class name="edu.wpi.first.util.CombinedRuntimeLoader" />
+  </Match>
+  <Match>
+    <Bug pattern="RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED" />
+    <Class name="edu.wpi.first.networktables.NetworkTableInstance" />
+  </Match>
+  <Match>
+    <Bug pattern="SC_START_IN_CTOR" />
   </Match>
   <Match>
     <Bug pattern="SF_SWITCH_FALLTHROUGH" />
-    <Source name="CameraServer.java" />
+    <Class name="edu.wpi.first.cameraserver.CameraServer$PropertyPublisher" />
+  </Match>
+  <Match>
+    <Bug pattern="SING_SINGLETON_GETTER_NOT_SYNCHRONIZED" />
+    <Class name="edu.wpi.first.wpilibj.test.TestSuite" />
+  </Match>
+  <Match>
+    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
+    <Class name="edu.wpi.first.wpilibj.test.TestSuite" />
+  </Match>
+  <Match>
+    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
+    <Class name="edu.wpi.first.wpilibj2.command.CommandScheduler" />
+  </Match>
+  <Match>
+    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
+    <Class name="edu.wpi.first.math.geometry.CoordinateAxis" />
+  </Match>
+  <Match>
+    <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR" />
+    <Class name="edu.wpi.first.math.geometry.CoordinateSystem" />
   </Match>
   <Match>
     <Bug pattern="SSD_DO_NOT_USE_INSTANCE_LOCK_ON_SHARED_STATIC_DATA" />
-    <Source name="Ultrasonic.java" />
+    <Class name="edu.wpi.first.wpilibj.Ultrasonic" />
   </Match>
   <Match>
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
@@ -142,26 +222,10 @@
     <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
   </Match>
   <Match>
-    <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
-  </Match>
-  <Match>
-    <Bug pattern="SC_START_IN_CTOR" />
-  </Match>
-  <Match>
-    <Bug pattern="RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED" />
-    <Class name="edu.wpi.first.networktables.NetworkTableInstance" />
-  </Match>
-  <!--
-  Strict reading of Object.equals() contract means that whenever equals() behaviour is defined, all implementations
-  need to adhere to it. The only reason to override the method (assuming correct API design, of course) is to provide
-  a more efficient implementation. This rule would be forcing a @SuppressFBWarnings on perfectly compliant classes.
-  More information at https://github.com/spotbugs/spotbugs/issues/511
-  -->
-  <Match>
-    <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
-  </Match>
-  <Match>
     <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
     <Class name="edu.wpi.first.epilogue.EpilogueConfiguration" />
+  </Match>
+  <Match>
+    <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
   </Match>
 </FindBugsFilter>

@@ -128,7 +128,11 @@ Eigen::Matrix<double, States, States> DARE(
     //
     // V₂ᵀ = W.solve(Gₖᵀ)
     // V₂ = W.solve(Gₖᵀ)ᵀ
-    StateMatrix V_2 = W_solver.solve(G_k.transpose()).transpose();
+    //
+    // Since W, Gₖ, and Hₖ are symmetric, drop the transposes on Gₖ and V₂.
+    //
+    // V₂ = W.solve(Gₖ)
+    StateMatrix V_2 = W_solver.solve(G_k);
 
     // Gₖ₊₁ = Gₖ + AₖV₂Aₖᵀ
     // Hₖ₊₁ = Hₖ + V₁ᵀHₖAₖ
