@@ -17,6 +17,16 @@
 
 using namespace wpi;
 
+// Count of active threads using the handle manager singleton. A negative value
+// indicates that the manager is being destroyed. When the manager is being
+// destroyed, it first biases the count negative by adding INT_MIN / 2, and then
+// waits for the count to return to INT_MIN / 2 before exiting.  Any active
+// threads will eventually decrement the count, and new threads will see the
+// negative count and re-decrement it immediately; in either case the atomic
+// will be notified so the destructor can continue running.
+//
+// This allows us both to detect in callers if destruction is in progress (value
+// < 0) and also to detect when all threads have finished.
 static std::atomic_int gActive{0};
 
 namespace {
@@ -29,10 +39,7 @@ struct State {
 
 struct HandleManager {
   ~HandleManager() {
-    int numActive = gActive.exchange(INT_MIN / 2);
-    if (numActive <= 0) {
-      return;
-    }
+    gActive.fetch_add(INT_MIN / 2);
 
     // wake up all waiters
     {
@@ -46,11 +53,12 @@ struct HandleManager {
 
     // wait for other threads to finish
     for (;;) {
-      int nowActive = gActive.load(std::memory_order_acquire);
-      if (nowActive == (INT_MIN / 2 - numActive)) {
+      int nowActive = gActive.load();
+      if (nowActive == INT_MIN / 2) {
         break;
       }
-      gActive.wait(nowActive, std::memory_order_acquire);
+      // wait for active count to change
+      gActive.wait(nowActive);
     }
   }
 
@@ -228,7 +236,9 @@ std::span<WPI_Handle> wpi::WaitForObjects(std::span<const WPI_Handle> handles,
                                           double timeout, bool* timedOut) {
   ManagerGuard guard;
   if (!guard) {
-    *timedOut = false;
+    if (timedOut) {
+      *timedOut = false;
+    }
     return {};
   }
   auto& manager = guard.GetManager();
@@ -281,6 +291,8 @@ std::span<WPI_Handle> wpi::WaitForObjects(std::span<const WPI_Handle> handles,
 
     if (gActive.load(std::memory_order_acquire) < 0) {
       // shutting down
+      timedOutVal = false;
+      count = 0;
       break;
     }
     if (timeout < 0) {
@@ -294,6 +306,8 @@ std::span<WPI_Handle> wpi::WaitForObjects(std::span<const WPI_Handle> handles,
     }
     if (gActive.load(std::memory_order_acquire) < 0) {
       // shutting down
+      timedOutVal = false;
+      count = 0;
       break;
     }
   }
