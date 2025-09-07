@@ -30,6 +30,7 @@ void __asan_on_error(void) {
   FAIL() << "Encountered an address sanitizer error";
 }
 void __tsan_on_report(void) {
-  FAIL() << "Encountered a thread sanitizer error";
+  std::puts("Encountered a thread sanitizer error");
+  std::_Exit(EXIT_FAILURE);
 }
 }  // extern "C"
