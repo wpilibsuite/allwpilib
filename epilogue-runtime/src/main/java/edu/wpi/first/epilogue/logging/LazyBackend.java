@@ -40,7 +40,13 @@ public class LazyBackend implements EpilogueBackend {
 
   @Override
   public EpilogueBackend getNested(String path) {
-    return m_subLoggers.computeIfAbsent(path, k -> new NestedBackend(k, this));
+    if (!m_subLoggers.containsKey(path)) {
+      var nested = new NestedBackend(path, this);
+      m_subLoggers.put(path, nested);
+      return nested;
+    }
+
+    return m_subLoggers.get(path);
   }
 
   @Override
