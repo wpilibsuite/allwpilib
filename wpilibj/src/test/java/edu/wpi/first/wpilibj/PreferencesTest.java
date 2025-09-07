@@ -12,7 +12,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.parallel.ExecutionMode.SAME_THREAD;
 
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableListener;
 import edu.wpi.first.networktables.Topic;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +23,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +37,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @Execution(SAME_THREAD)
 class PreferencesTest {
@@ -69,6 +76,7 @@ class PreferencesTest {
 
   @AfterEach
   void cleanup() {
+    m_inst.waitForListenerQueue(0.1);
     m_inst.close();
   }
 
@@ -119,6 +127,40 @@ class PreferencesTest {
         () -> assertEquals(2, Preferences.getInt("checkedValueInt", 0)),
         () -> assertEquals(3.4, Preferences.getFloat("checkedValueFloat", 0), 1e-6),
         () -> assertFalse(Preferences.getBoolean("checkedValueBoolean", true)));
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  void enableLegacyDashboardSupportTest(boolean enable) throws InterruptedException {
+    // Publish a value, wait until we are sure the listener would have fired, and verify that the
+    // topic is persistant only if legacy dashboard support is enabled.
+    boolean wasEnabled = Preferences.enableLegacyDashboardSupport(enable);
+    Semaphore semaphore = new Semaphore(0);
+    NetworkTableEntry entry = m_table.getEntry("legacyDashboardValueLong");
+    try (NetworkTableListener listener =
+        NetworkTableListener.createListener(
+            entry,
+            EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll),
+            event -> {
+              if (event.valueData != null) {
+                semaphore.release();
+              }
+            })) {
+      // Publish a value, wait for listeners to fire, and do that again. This ensures any listener
+      // installed by Preferences would have been called at least once.
+      for (int value = 1; value < 3; value++) {
+        entry.setInteger(value);
+        m_inst.waitForListenerQueue(0.5);
+        if (!semaphore.tryAcquire(100, TimeUnit.MILLISECONDS)) {
+          fail("timed out waiting for event listener");
+        }
+      }
+      assertEquals(enable, entry.isPersistent());
+    } finally {
+      if (wasEnabled != enable) {
+        Preferences.enableLegacyDashboardSupport(wasEnabled);
+      }
+    }
   }
 
   @Nested
