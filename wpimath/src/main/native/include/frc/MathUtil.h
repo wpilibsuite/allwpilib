@@ -116,10 +116,10 @@ Eigen::Vector<T, N> ApplyDeadband(const Eigen::Vector<T, N>& value, T deadband,
     return value.normalized() *
            ApplyDeadband(value.norm(), deadband, maxMagnitude);
   } else {
-    Eigen::Vector<double, N> doubleValue = value.cast<double>();
+    Eigen::Vector<double, N> doubleValue = value.template cast<double>();
     Eigen::Vector<double, N> processedDoubleValue =
         ApplyDeadband(doubleValue, deadband.value(), maxMagnitude.value());
-    return processedDoubleValue.cast<T>();
+    return processedDoubleValue.template cast<T>();
   }
 }
 
@@ -185,10 +185,10 @@ Eigen::Vector<T, N> CopySignPow(const Eigen::Vector<T, N>& value,
     return value.normalized() *
            CopySignPow(value.norm(), deadband, maxMagnitude);
   } else {
-    Eigen::Vector<double, N> doubleValue = value.cast<double>();
+    Eigen::Vector<double, N> doubleValue = value.template cast<double>();
     Eigen::Vector<double, N> processedDoubleValue =
         CopySignPow(doubleValue, deadband.value(), maxMagnitude.value());
-    return processedDoubleValue.cast<T>();
+    return processedDoubleValue.template cast<T>();
   }
 }
 
