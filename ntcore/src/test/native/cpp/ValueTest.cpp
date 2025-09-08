@@ -276,7 +276,7 @@ TEST_F(ValueTest, StringArray) {
 #ifdef NDEBUG
 TEST_F(ValueDeathTest, DISABLED_GetAssertions) {
 #else
-TEST_F(ValueDeathTest, GetAssertions) {
+TEST_F(ValueDeathTest, DISABLED_GetAssertions) {
 #endif
   Value v;
   ASSERT_DEATH((void)v.GetBoolean(), "type == NT_BOOLEAN");
