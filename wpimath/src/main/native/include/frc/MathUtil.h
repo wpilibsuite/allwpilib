@@ -183,11 +183,11 @@ Eigen::Vector<T, N> CopySignPow(const Eigen::Vector<T, N>& value,
       return Eigen::Vector<T, N>::Zero();
     }
     return value.normalized() *
-           CopySignPow(value.norm(), deadband, maxMagnitude);
+           CopySignPow(value.norm(), exponent, maxMagnitude);
   } else {
     Eigen::Vector<double, N> doubleValue = value.template cast<double>();
     Eigen::Vector<double, N> processedDoubleValue =
-        CopySignPow(doubleValue, deadband.value(), maxMagnitude.value());
+        CopySignPow(doubleValue, exponent, maxMagnitude.value());
     return processedDoubleValue.template cast<T>();
   }
 }
