@@ -754,8 +754,3 @@ auto fma(const UnitTypeLhs x, const UnitMultiply y, const UnitAdd z) noexcept
   return resultType(std::fma(x(), y(), resultType(z)()));
 }
 }  // namespace units::math
-
-// For math function ADL
-namespace units {
-using units::math::sqrt;
-}  // namespace units
