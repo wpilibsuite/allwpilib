@@ -27,7 +27,13 @@ using namespace wpi;
 //
 // This allows us both to detect in callers if destruction is in progress (value
 // < 0) and also to detect when all threads have finished.
+//
+// We don't use this logic on Windows, because Windows automatically kills all
+// threads on process exit, so this actually can result in deadlocks because the
+// other threads never decrement the count.
+#ifndef _WIN32
 static std::atomic_int gActive{0};
+#endif
 
 namespace {
 
@@ -38,6 +44,7 @@ struct State {
 };
 
 struct HandleManager {
+#ifndef _WIN32
   ~HandleManager() {
     gActive.fetch_add(INT_MIN / 2);
 
@@ -61,7 +68,7 @@ struct HandleManager {
       gActive.wait(nowActive);
     }
   }
-
+#endif
   wpi::mutex mutex;
   wpi::UidVector<int, 8> eventIds;
   wpi::UidVector<int, 8> semaphoreIds;
@@ -70,6 +77,9 @@ struct HandleManager {
 
 class ManagerGuard {
  public:
+#ifdef _WIN32
+  ManagerGuard() : m_active{true} {}
+#else
   ManagerGuard()
       : m_active{gActive.fetch_add(1, std::memory_order_acquire) >= 0} {}
 
@@ -78,6 +88,7 @@ class ManagerGuard {
       gActive.notify_all();
     }
   }
+#endif
 
   explicit operator bool() const { return m_active; }
 
