@@ -299,13 +299,14 @@ std::span<WPI_Handle> wpi::WaitForObjects(std::span<const WPI_Handle> handles,
         state.waiters.emplace_back(&cv);
       }
     }
-
+#ifndef _WIN32
     if (gActive.load(std::memory_order_acquire) < 0) {
       // shutting down
       timedOutVal = false;
       count = 0;
       break;
     }
+#endif
     if (timeout < 0) {
       cv.wait(lock);
     } else {
@@ -315,12 +316,14 @@ std::span<WPI_Handle> wpi::WaitForObjects(std::span<const WPI_Handle> handles,
         timedOutVal = true;
       }
     }
+#ifndef _WIN32
     if (gActive.load(std::memory_order_acquire) < 0) {
       // shutting down
       timedOutVal = false;
       count = 0;
       break;
     }
+#endif
   }
 
   if (addedWaiters) {
