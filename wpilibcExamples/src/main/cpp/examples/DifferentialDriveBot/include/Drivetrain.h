@@ -6,8 +6,8 @@
 
 #include <numbers>
 
-#include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
+#include <frc/OnboardIMU.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
@@ -32,7 +32,7 @@ class Drivetrain {
     // gearbox is constructed, you might have to invert the left side instead.
     m_rightLeader.SetInverted(true);
 
-    m_gyro.Reset();
+    m_imu.ResetYaw();
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
@@ -71,11 +71,11 @@ class Drivetrain {
   frc::PIDController m_leftPIDController{1.0, 0.0, 0.0};
   frc::PIDController m_rightPIDController{1.0, 0.0, 0.0};
 
-  frc::AnalogGyro m_gyro{0};
+  frc::OnboardIMU m_imu{frc::OnboardIMU::kFlat};
 
   frc::DifferentialDriveKinematics m_kinematics{kTrackwidth};
   frc::DifferentialDriveOdometry m_odometry{
-      m_gyro.GetRotation2d(), units::meter_t{m_leftEncoder.GetDistance()},
+      m_imu.GetRotation2d(), units::meter_t{m_leftEncoder.GetDistance()},
       units::meter_t{m_rightEncoder.GetDistance()}};
 
   // Gains are for example purposes only - must be determined for your own

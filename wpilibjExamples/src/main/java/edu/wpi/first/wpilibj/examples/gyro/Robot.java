@@ -5,8 +5,8 @@
 package edu.wpi.first.wpilibj.examples.gyro;
 
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.OnboardIMU;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
@@ -20,20 +20,17 @@ public class Robot extends TimedRobot {
   private static final double kAngleSetpoint = 0.0;
   private static final double kP = 0.005; // proportional turning constant
 
-  // gyro calibration constant, may need to be adjusted;
-  // gyro value of 360 is set to correspond to one full revolution
-  private static final double kVoltsPerDegreePerSecond = 0.0128;
-
   private static final int kLeftMotorPort = 0;
   private static final int kRightMotorPort = 1;
-  private static final int kGyroPort = 0;
+  private static final OnboardIMU.MountOrientation kIMUMountOrientation =
+      OnboardIMU.MountOrientation.kFlat;
   private static final int kJoystickPort = 0;
 
   private final PWMSparkMax m_leftDrive = new PWMSparkMax(kLeftMotorPort);
   private final PWMSparkMax m_rightDrive = new PWMSparkMax(kRightMotorPort);
   private final DifferentialDrive m_robotDrive =
       new DifferentialDrive(m_leftDrive::set, m_rightDrive::set);
-  private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
+  private final OnboardIMU m_imu = new OnboardIMU(kIMUMountOrientation);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
   /** Called once at the beginning of the robot program. */
@@ -41,7 +38,6 @@ public class Robot extends TimedRobot {
     SendableRegistry.addChild(m_robotDrive, m_leftDrive);
     SendableRegistry.addChild(m_robotDrive, m_rightDrive);
 
-    m_gyro.setSensitivity(kVoltsPerDegreePerSecond);
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
@@ -54,7 +50,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    double turningValue = (kAngleSetpoint - m_gyro.getAngle()) * kP;
+    double turningValue = (kAngleSetpoint - m_imu.getRotation2d().getDegrees()) * kP;
     m_robotDrive.arcadeDrive(-m_joystick.getY(), -turningValue);
   }
 }
