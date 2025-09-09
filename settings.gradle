@@ -63,6 +63,7 @@ include 'epilogue-processor'
 include 'epilogue-runtime'
 include 'thirdparty:googletest'
 include 'thirdparty:imgui_suite'
+include 'thirdparty:mrcal'
 include 'wpical'
 
 buildCache {
