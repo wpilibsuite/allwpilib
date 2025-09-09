@@ -51,39 +51,6 @@ Have an idea to make WPILib better? Here's some steps to go from idea to impleme
 WPILib uses modified Google style guides for both C++ and Java, which can be found in the [styleguide repository](https://github.com/wpilibsuite/styleguide). Autoformatters are available for many popular editors at https://github.com/google/styleguide. Running wpiformat is required for all contributions and is enforced by our continuous integration system.
 While the library should be fully formatted according to the styles, additional elements of the style guide were not followed when the library was initially created. All new code should follow the guidelines. If you are looking for some easy ramp-up tasks, finding areas that don't follow the style guide and fixing them is very welcome.
 
-### Math documentation
-
-When writing math expressions in documentation, use https://www.unicodeit.net/ to convert LaTeX to a Unicode equivalent that's easier to read. Not all expressions will translate (e.g., superscripts of superscripts) so focus on making it readable by someone who isn't familiar with LaTeX. If content on multiple lines needs to be aligned in Doxygen/Javadoc comments (e.g., integration/summation limits, matrices packed with square brackets and superscripts for them), put them in @verbatim/@endverbatim blocks in Doxygen or `<pre>` tags in Javadoc so they render with monospace font.
-
-The LaTeX to Unicode conversions can also be done locally via the unicodeit Python package. To install it, execute:
-```bash
-pip install --user unicodeit
-```
-
-Here's example usage:
-```bash
-$ python -m unicodeit.cli 'x_{k+1} = Ax_k + Bu_k'
-xₖ₊₁ = Axₖ + Buₖ
-```
-
-On Linux, this process can be streamlined further by adding the following Bash function to your .bashrc (requires `wl-clipboard` on Wayland or `xclip` on X11):
-```bash
-# Converts LaTeX to Unicode, prints the result, and copies it to the clipboard
-uc() {
-  if [ $WAYLAND_DISPLAY ]; then
-    python -m unicodeit.cli $@ | tee >(wl-copy -n)
-  else
-    python -m unicodeit.cli $@ | tee >(xclip -sel)
-  fi
-}
-```
-
-Here's example usage:
-```bash
-$ uc 'x_{k+1} = Ax_k + Bu_k'
-xₖ₊₁ = Axₖ + Buₖ
-```
-
 ## Submitting Changes
 
 ### Pull Request Format
