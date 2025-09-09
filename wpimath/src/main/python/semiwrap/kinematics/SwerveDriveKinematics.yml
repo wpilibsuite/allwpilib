@@ -1,0 +1,108 @@
+classes:
+  frc::SwerveDriveKinematics:
+    force_type_casters:
+    - wpi::array
+    template_params:
+    - size_t NumModules
+    methods:
+      SwerveDriveKinematics:
+        overloads:
+          ModuleTranslations&&...:
+            ignore: true
+          const wpi::array<Translation2d, NumModules>&:
+            ignore: true
+
+      ResetHeadings:
+        overloads:
+          ModuleHeadings&&...:
+            ignore: true
+          wpi::array<Rotation2d, NumModules>:
+
+      ToSwerveModuleStates:
+        doc: |
+          Performs inverse kinematics to return the module states from a desired
+          chassis velocity. This method is often used to convert joystick values into
+          module speeds and angles.
+
+          This function also supports variable centers of rotation. During normal
+          operations, the center of rotation is usually the same as the physical
+          center of the robot; therefore, the argument is defaulted to that use case.
+          However, if you wish to change the center of rotation for evasive
+          maneuvers, vision alignment, or for any other use case, you can do so.
+
+          :param chassisSpeeds:    The desired chassis speed.
+          :param centerOfRotation: The center of rotation. For example, if you set the
+           center of rotation at one corner of the robot and provide a chassis speed
+           that only has a dtheta component, the robot will rotate around that corner.
+
+          :returns: An array containing the module states. Use caution because these
+                    module states are not normalized. Sometimes, a user input may cause one of
+                    the module speeds to go above the attainable max velocity. Use the
+                    :meth:`desaturateWheelSpeeds` function to rectify this issue.
+                    In addition, you can use Python unpacking syntax
+                    to directly assign the module states to variables::
+
+                      fl, fr, bl, br = kinematics.toSwerveModuleStates(chassisSpeeds)
+      ToWheelSpeeds:
+      ToChassisSpeeds:
+        overloads:
+          ModuleStates&&... [const]:
+            ignore: true
+          const wpi::array<SwerveModuleState, NumModules>& [const]:
+      ToTwist2d:
+        overloads:
+          ModuleDeltas&&... [const]:
+            ignore: true
+          wpi::array<SwerveModulePosition, NumModules> [const]:
+          const wpi::array<SwerveModulePosition, NumModules>&, const wpi::array<SwerveModulePosition, NumModules>& [const]:
+      DesaturateWheelSpeeds:
+        overloads:
+          wpi::array<SwerveModuleState, NumModules>*, units::meters_per_second_t:
+            cpp_code: |
+              [](wpi::array<SwerveModuleState, NumModules> moduleStates, units::meters_per_second_t attainableMaxSpeed) {
+                frc::SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(&moduleStates, attainableMaxSpeed);
+                return moduleStates;
+              }
+          ? wpi::array<SwerveModuleState, NumModules>*, ChassisSpeeds, units::meters_per_second_t, units::meters_per_second_t, units::radians_per_second_t
+          : cpp_code: |
+              [](wpi::array<SwerveModuleState, NumModules> moduleStates,
+                  ChassisSpeeds currentChassisSpeed,
+                  units::meters_per_second_t attainableMaxModuleSpeed,
+                  units::meters_per_second_t attainableMaxRobotTranslationSpeed,
+                  units::radians_per_second_t attainableMaxRobotRotationSpeed) {
+                frc::SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(&moduleStates, currentChassisSpeed, attainableMaxModuleSpeed, attainableMaxRobotTranslationSpeed, attainableMaxRobotRotationSpeed);
+                return moduleStates;
+              }
+
+      Interpolate:
+      GetModules:
+
+    template_inline_code: |
+      if constexpr (NumModules == 2) {
+        cls_SwerveDriveKinematics.def(py::init<Translation2d, Translation2d>());
+      } else if constexpr (NumModules == 3) {
+        cls_SwerveDriveKinematics.def(py::init<Translation2d, Translation2d, Translation2d>());
+      } else if constexpr (NumModules == 4) {
+        cls_SwerveDriveKinematics.def(py::init<Translation2d, Translation2d, Translation2d, Translation2d>());
+      } else if constexpr (NumModules == 6) {
+        cls_SwerveDriveKinematics.def(py::init<Translation2d, Translation2d, Translation2d, Translation2d, Translation2d, Translation2d>());
+      }
+
+
+templates:
+  SwerveDrive2Kinematics:
+    qualname: frc::SwerveDriveKinematics
+    params:
+    - 2
+  SwerveDrive3Kinematics:
+    qualname: frc::SwerveDriveKinematics
+    params:
+    - 3
+  SwerveDrive4Kinematics:
+    qualname: frc::SwerveDriveKinematics
+    params:
+    - 4
+  SwerveDrive6Kinematics:
+    qualname: frc::SwerveDriveKinematics
+    params:
+    - 6

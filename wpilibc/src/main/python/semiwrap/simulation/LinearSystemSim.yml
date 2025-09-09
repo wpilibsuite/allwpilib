@@ -1,0 +1,75 @@
+classes:
+  frc::sim::LinearSystemSim:
+    typealias:
+    - template <int S, int I, int O> using LinearSystem = frc::LinearSystem<S, I, O>
+    - template <int I> using Vectord = frc::Vectord<I>
+    template_params:
+    - int States
+    - int Inputs
+    - int Outputs
+    attributes:
+      m_plant:
+      m_x:
+      m_y:
+      m_u:
+      m_measurementStdDevs:
+    methods:
+      LinearSystemSim:
+        param_override:
+          measurementStdDevs:
+            default: std::array<double, Outputs>{}
+      Update:
+      GetOutput:
+        overloads:
+          '[const]':
+          int [const]:
+      SetInput:
+        overloads:
+          const Vectord<Inputs>&:
+          int, double:
+      GetInput:
+        overloads:
+          '[const]':
+          int [const]:
+      SetState:
+      UpdateX:
+      ClampInput:
+
+
+templates:
+  LinearSystemSim_1_1_1:
+    qualname: frc::sim::LinearSystemSim
+    params:
+    - 1
+    - 1
+    - 1
+  LinearSystemSim_1_1_2:
+    qualname: frc::sim::LinearSystemSim
+    params:
+    - 1
+    - 1
+    - 2
+  LinearSystemSim_2_1_1:
+    qualname: frc::sim::LinearSystemSim
+    params:
+    - 2
+    - 1
+    - 1
+  LinearSystemSim_2_1_2:
+    qualname: frc::sim::LinearSystemSim
+    params:
+    - 2
+    - 1
+    - 2
+  LinearSystemSim_2_2_1:
+    qualname: frc::sim::LinearSystemSim
+    params:
+    - 2
+    - 2
+    - 1
+  LinearSystemSim_2_2_2:
+    qualname: frc::sim::LinearSystemSim
+    params:
+    - 2
+    - 2
+    - 2

@@ -1,0 +1,38 @@
+extra_includes:
+- wpi/sendable/SendableBuilder.h
+- frc/motorcontrol/MotorController.h
+
+classes:
+  frc::MecanumDrive:
+    force_type_casters:
+    - units::radian_t
+    ignored_bases:
+    - wpi::SendableHelper<MecanumDrive>
+    methods:
+      MecanumDrive:
+        overloads:
+          MotorController&, MotorController&, MotorController&, MotorController&:
+            keepalive:
+            - [1, 2]
+            - [1, 3]
+            - [1, 4]
+            - [1, 5]
+          std::function<void (double)>, std::function<void (double)>, std::function<void (double)>, std::function<void (double)>:
+      DriveCartesian:
+        param_override:
+          gyroAngle:
+            default: frc::Rotation2d(0_rad)
+      DrivePolar:
+      DriveCartesianIK:
+        param_override:
+          gyroAngle:
+            default: frc::Rotation2d(0_rad)
+      StopMotor:
+      GetDescription:
+      InitSendable:
+  frc::MecanumDrive::WheelSpeeds:
+    attributes:
+      frontLeft:
+      frontRight:
+      rearLeft:
+      rearRight:

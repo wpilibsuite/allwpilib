@@ -1,0 +1,85 @@
+extra_includes:
+- pybind11/stl.h
+
+classes:
+  frc::sim::SimDeviceSim:
+    doc: |
+      Interact with a generic simulated device
+
+      Any devices that support simulation but don't have a dedicated sim
+      object associated with it can be interacted with via this object.
+      You just need to know the name of the associated object.
+
+      Here are two ways to find the names of available devices:
+
+      * The static function :meth:`.enumerateDevices` can give you a list of
+        all available devices -- note that the device must be created first
+        before this will return any results!
+      * When running the WPILib simulation GUI, the names of the 'Other Devices'
+        panel are names of devices that you can interact with via this class.
+
+      Once you've created a simulated device, you can use the :meth:`.enumerateValues`
+      method to determine what values you can interact with.
+
+
+      .. note:: WPILib has simulation support for all of its devices. Some
+                vendors may only have limited support for simulation -- read
+                the vendor's documentation or contact them for more information.
+    force_type_casters:
+    - std::function
+    - std::string_view
+    methods:
+      SimDeviceSim:
+        overloads:
+          const char*:
+          const char*, int:
+          const char*, int, int:
+          HAL_SimDeviceHandle:
+      GetName:
+      GetValue:
+        doc: |
+          Provides a readonly mechanism to retrieve all types of device values
+      GetInt:
+        doc: |
+          Retrieves an object that allows you to interact with simulated values
+          represented as an integer.
+      GetLong:
+        doc: |
+          Retrieves an object that allows you to interact with simulated values
+          represented as a long.
+      GetDouble:
+        doc: |
+          Retrieves an object that allows you to interact with simulated values
+          represented as a double.
+      GetEnum:
+      GetBoolean:
+        doc: |
+          Retrieves an object that allows you to interact with simulated values
+          represented as a boolean.
+      GetEnumOptions:
+      EnumerateValues:
+        ignore: true
+      EnumerateDevices:
+        ignore: true
+      ResetData:
+
+inline_code: |
+  cls_SimDeviceSim
+    .def("enumerateValues", [](frc::sim::SimDeviceSim * that) {
+      std::vector<std::pair<std::string, bool>> values;
+      that->EnumerateValues([&values](const char * name, HAL_SimValueHandle handle,
+                               HAL_Bool readonly, const struct HAL_Value * value){
+        values.push_back(std::pair<std::string, bool>(name, readonly));
+      });
+      return values;
+    }, release_gil(),
+    "Returns a list of (name, readonly) tuples of available values for this device")
+    .def_static("enumerateDevices", [](const char * prefix) {
+      std::vector<std::string> devices;
+      frc::sim::SimDeviceSim::EnumerateDevices(prefix, [&devices](const char * name, HAL_SimDeviceHandle handle) {
+        devices.push_back(std::string(name));
+      });
+      return devices;
+    }, release_gil(),
+    py::arg("prefix")="",
+    "Returns a list of available device names\n");

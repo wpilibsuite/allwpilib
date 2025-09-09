@@ -1,0 +1,19 @@
+extra_includes:
+- networktables/NTSendableBuilder.h
+
+classes:
+  frc::Field2d:
+    ignored_bases:
+    - wpi::SendableHelper<Field2d>
+    methods:
+      Field2d:
+      SetRobotPose:
+        overloads:
+          const Pose2d&:
+          units::meter_t, units::meter_t, Rotation2d:
+      GetRobotPose:
+      GetObject:
+        return_value_policy: reference_internal
+      GetRobotObject:
+        return_value_policy: reference_internal
+      InitSendable:

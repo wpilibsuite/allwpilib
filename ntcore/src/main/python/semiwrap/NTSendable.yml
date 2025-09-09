@@ -1,0 +1,20 @@
+extra_includes:
+- networktables/NTSendableBuilder.h
+
+classes:
+  nt::NTSendable:
+    methods:
+      InitSendable:
+        overloads:
+          NTSendableBuilder&:
+            virtual_xform: |
+              [&](py::function fn) {
+                auto builderHandle = py::cast(builder, py::return_value_policy::reference);
+                fn(builderHandle);
+              }
+          wpi::SendableBuilder&:
+            virtual_xform: |
+              [&](py::function fn) {
+                auto builderHandle = py::cast(builder, py::return_value_policy::reference);
+                fn(builderHandle);
+              }

@@ -1,0 +1,52 @@
+defaults:
+  subpackage: controller
+
+classes:
+  frc::LinearPlantInversionFeedforward:
+    template_params:
+    - int States
+    - int Inputs
+    methods:
+      LinearPlantInversionFeedforward:
+        overloads:
+          const LinearSystem<States, Inputs, Outputs>&, units::second_t:
+            ignore: true
+          const Matrixd<States, States>&, const Matrixd<States, Inputs>&, units::second_t:
+      Uff:
+        overloads:
+          '[const]':
+          int [const]:
+      R:
+        overloads:
+          '[const]':
+          int [const]:
+      Reset:
+        overloads:
+          const StateVector&:
+          '':
+      Calculate:
+        overloads:
+          const StateVector&:
+          const StateVector&, const StateVector&:
+
+templates:
+  LinearPlantInversionFeedforward_1_1:
+    qualname: frc::LinearPlantInversionFeedforward
+    params:
+    - 1
+    - 1
+  LinearPlantInversionFeedforward_2_1:
+    qualname: frc::LinearPlantInversionFeedforward
+    params:
+    - 2
+    - 1
+  LinearPlantInversionFeedforward_2_2:
+    qualname: frc::LinearPlantInversionFeedforward
+    params:
+    - 2
+    - 2
+  LinearPlantInversionFeedforward_3_2:
+    qualname: frc::LinearPlantInversionFeedforward
+    params:
+    - 3
+    - 2

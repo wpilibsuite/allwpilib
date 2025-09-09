@@ -1,0 +1,53 @@
+defaults:
+  subpackage: estimator
+
+extra_includes:
+- frc/kinematics/SwerveModuleState.h
+
+classes:
+  frc::SwerveDrivePoseEstimator:
+    force_no_trampoline: true
+    doc: |
+      This class wraps Swerve Drive Odometry to fuse latency-compensated
+      vision measurements with swerve drive encoder distance measurements. It is
+      intended to be a drop-in for :class:`SwerveDriveOdometry`.
+
+      :meth:`update` should be called every robot loop.
+
+      :meth:`addVisionMeasurement` can be called as infrequently as you want; if you
+      never call it, then this class will behave as regular encoder odometry.
+
+      The state-space system used internally has the following states (x) and outputs (y):
+
+      :math:`x = [x, y, \theta]^T` in the field-coordinate system
+      containing x position, y position, and heading.
+
+      :math:`y = [x, y, \theta]^T` from vision containing x position, y
+      position, and heading; or :math:`y = [theta]^T` containing gyro
+      heading.
+    template_params:
+    - size_t NumModules
+    methods:
+      SwerveDrivePoseEstimator:
+        overloads:
+          SwerveDriveKinematics<NumModules>&, const Rotation2d&, const wpi::array<SwerveModulePosition, NumModules>&, const Pose2d&:
+          ? SwerveDriveKinematics<NumModules>&, const Rotation2d&, const wpi::array<SwerveModulePosition, NumModules>&, const Pose2d&, const wpi::array<double, 3>&, const wpi::array<double, 3>&
+          :
+
+templates:
+  SwerveDrive2PoseEstimator:
+    qualname: frc::SwerveDrivePoseEstimator
+    params:
+    - 2
+  SwerveDrive3PoseEstimator:
+    qualname: frc::SwerveDrivePoseEstimator
+    params:
+    - 3
+  SwerveDrive4PoseEstimator:
+    qualname: frc::SwerveDrivePoseEstimator
+    params:
+    - 4
+  SwerveDrive6PoseEstimator:
+    qualname: frc::SwerveDrivePoseEstimator
+    params:
+    - 6

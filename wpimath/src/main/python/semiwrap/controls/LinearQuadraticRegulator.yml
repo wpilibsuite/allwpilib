@@ -1,0 +1,66 @@
+defaults:
+  subpackage: controller
+
+classes:
+  frc::LinearQuadraticRegulator:
+    template_params:
+    - int States
+    - int Inputs
+    methods:
+      LinearQuadraticRegulator:
+        overloads:
+          const LinearSystem<States, Inputs, Outputs>&, const StateArray&, const InputArray&, units::second_t:
+            ignore: true
+          const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const StateArray&, const InputArray&, units::second_t:
+          ? const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const Matrixd<States, States>&, const Matrixd<Inputs, Inputs>&, units::second_t
+          :
+          ? const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const Matrixd<States, States>&, const Matrixd<Inputs, Inputs>&, const Matrixd<States, Inputs>&, units::second_t
+          :
+      K:
+        overloads:
+          '[const]':
+          int, int [const]:
+      R:
+        overloads:
+          '[const]':
+          int [const]:
+      U:
+        overloads:
+          '[const]':
+          int [const]:
+      Reset:
+      Calculate:
+        overloads:
+          const StateVector&:
+          const StateVector&, const StateVector&:
+      LatencyCompensate:
+        template_impls:
+        - ['1']
+        - ['2']
+    template_inline_code: |
+      cls_LinearQuadraticRegulator
+        .def(py::init<const frc::LinearSystem<States, Inputs, 1>&, const wpi::array<double, States>&, const wpi::array<double, Inputs>&, units::second_t>())
+        .def(py::init<const frc::LinearSystem<States, Inputs, 2>&, const wpi::array<double, States>&, const wpi::array<double, Inputs>&, units::second_t>())
+        .def(py::init<const frc::LinearSystem<States, Inputs, 3>&, const wpi::array<double, States>&, const wpi::array<double, Inputs>&, units::second_t>());
+
+templates:
+  LinearQuadraticRegulator_1_1:
+    qualname: frc::LinearQuadraticRegulator
+    params:
+    - 1
+    - 1
+  LinearQuadraticRegulator_2_1:
+    qualname: frc::LinearQuadraticRegulator
+    params:
+    - 2
+    - 1
+  LinearQuadraticRegulator_2_2:
+    qualname: frc::LinearQuadraticRegulator
+    params:
+    - 2
+    - 2
+  LinearQuadraticRegulator_3_2:
+    qualname: frc::LinearQuadraticRegulator
+    params:
+    - 3
+    - 2

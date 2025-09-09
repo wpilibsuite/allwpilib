@@ -1,0 +1,9 @@
+strip_prefixes:
+- HAL_
+
+functions:
+  HAL_SetMain:
+    ignore: true # TODO
+  HAL_HasMain:
+  HAL_RunMain:
+  HAL_ExitMain:

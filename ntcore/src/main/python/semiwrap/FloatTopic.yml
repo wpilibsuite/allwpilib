@@ -1,0 +1,107 @@
+classes:
+  nt::FloatSubscriber:
+    methods:
+      FloatSubscriber:
+        overloads:
+          '':
+            ignore: true
+          NT_Subscriber, ParamType:
+            ignore: true
+      Get:
+        overloads:
+          '[const]':
+          ParamType [const]:
+      GetAtomic:
+        overloads:
+          '[const]':
+          ParamType [const]:
+      ReadQueue:
+      GetTopic:
+    inline_code: |
+      .def("close", [](FloatSubscriber *self) {
+        py::gil_scoped_release release;
+        *self = FloatSubscriber();
+      }, py::doc("Destroys the subscriber"))
+      .def("__enter__", [](FloatSubscriber *self) {
+        return self;
+      })
+      .def("__exit__", [](FloatSubscriber *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = FloatSubscriber();
+      })
+  nt::FloatPublisher:
+    methods:
+      FloatPublisher:
+        overloads:
+          '':
+            ignore: true
+          NT_Publisher:
+            ignore: true
+      Set:
+      SetDefault:
+      GetTopic:
+    inline_code: |
+      .def("close", [](FloatPublisher *self) {
+        py::gil_scoped_release release;
+        *self = FloatPublisher();
+      }, py::doc("Destroys the publisher"))
+      .def("__enter__", [](FloatPublisher *self) {
+        return self;
+      })
+      .def("__exit__", [](FloatPublisher *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = FloatPublisher();
+      })
+  nt::FloatEntry:
+    methods:
+      FloatEntry:
+        overloads:
+          '':
+            ignore: true
+          NT_Entry, ParamType:
+            ignore: true
+      GetHandle:
+        ignore: true
+      GetTopic:
+      Unpublish:
+    inline_code: |
+      .def("close", [](FloatEntry *self) {
+        py::gil_scoped_release release;
+        *self = FloatEntry();
+      }, py::doc("Destroys the entry"))
+      .def("__enter__", [](FloatEntry *self) {
+        return self;
+      })
+      .def("__exit__", [](FloatEntry *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = FloatEntry();
+      })
+  nt::FloatTopic:
+    attributes:
+      kTypeString:
+    methods:
+      FloatTopic:
+        overloads:
+          '':
+            ignore: true
+          NT_Topic:
+            ignore: true
+          Topic:
+      Subscribe:
+      SubscribeEx:
+      Publish:
+      PublishEx:
+      GetEntry:
+      GetEntryEx:
+    inline_code: |
+      .def("close", [](FloatTopic *self) {
+        py::gil_scoped_release release;
+        *self = FloatTopic();
+      }, py::doc("Destroys the topic"))
+      .def("__enter__", [](FloatTopic *self) {
+        return self;
+      })
+      .def("__exit__", [](FloatTopic *self, py::args args) {
+        py::gil_scoped_release release;
+        *self = FloatTopic();
+      })

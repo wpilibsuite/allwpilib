@@ -1,0 +1,81 @@
+extra_includes:
+- wpystruct.h
+
+classes:
+  frc::MecanumDriveWheelSpeeds:
+    force_no_default_constructor: true
+    attributes:
+      frontLeft:
+      frontRight:
+      rearLeft:
+      rearRight:
+    methods:
+      Desaturate:
+      operator+:
+      operator-:
+        overloads:
+          const MecanumDriveWheelSpeeds& [const]:
+          '[const]':
+      operator*:
+      operator/:
+
+inline_code: |
+  cls_MecanumDriveWheelSpeeds
+    .def(
+      py::init<
+        units::meters_per_second_t, units::meters_per_second_t,
+        units::meters_per_second_t, units::meters_per_second_t
+      >(),
+      py::arg("frontLeft") = 0, py::arg("frontRight") = 0,
+      py::arg("rearLeft") = 0, py::arg("rearRight") = 0
+    )
+    .def_static("fromFeet", [](
+        units::feet_per_second_t frontLeft,
+        units::feet_per_second_t frontRight,
+        units::feet_per_second_t rearLeft,
+        units::feet_per_second_t rearRight
+    ){
+      return MecanumDriveWheelSpeeds{frontLeft, frontRight, rearLeft, rearRight};
+    }, py::arg("frontLeft"), py::arg("frontRight"),
+       py::arg("rearLeft"), py::arg("rearRight"))
+    .def_property("frontLeft_fps",
+      [](MecanumDriveWheelSpeeds * self) -> units::feet_per_second_t {
+        return self->frontLeft;
+      },
+      [](MecanumDriveWheelSpeeds * self, units::feet_per_second_t fps) {
+        self->frontLeft = fps;
+      }
+    )
+    .def_property("frontRight_fps", 
+      [](MecanumDriveWheelSpeeds * self) -> units::feet_per_second_t {
+        return self->frontRight;
+      },
+      [](MecanumDriveWheelSpeeds * self, units::feet_per_second_t fps) {
+        self->frontRight = fps;
+      }
+    )
+    .def_property("rearLeft_fps",
+      [](MecanumDriveWheelSpeeds * self) -> units::feet_per_second_t {
+        return self->rearLeft;
+      },
+      [](MecanumDriveWheelSpeeds * self, units::feet_per_second_t fps) {
+        self->rearLeft = fps;
+      }
+    )
+    .def_property("rearRight_fps", 
+      [](MecanumDriveWheelSpeeds * self) -> units::feet_per_second_t {
+        return self->rearRight;
+      },
+      [](MecanumDriveWheelSpeeds * self, units::feet_per_second_t fps) {
+        self->rearRight = fps;
+      }
+    )
+    .def("__repr__", [](const MecanumDriveWheelSpeeds &ms) -> std::string {
+      return "MecanumDriveWheelSpeeds(frontLeft=" + std::to_string(ms.frontLeft()) + ", "
+                                     "frontRight=" + std::to_string(ms.frontRight()) + ", "
+                                     "rearLeft=" + std::to_string(ms.rearLeft()) + ", "
+                                     "rearRight=" + std::to_string(ms.rearRight()) + ")";
+    })
+  ;
+
+  SetupWPyStruct<frc::MecanumDriveWheelSpeeds>(cls_MecanumDriveWheelSpeeds);

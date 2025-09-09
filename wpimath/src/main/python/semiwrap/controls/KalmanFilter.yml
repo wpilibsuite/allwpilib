@@ -1,0 +1,62 @@
+defaults:
+  subpackage: estimator
+
+classes:
+  frc::KalmanFilter:
+    template_params:
+    - int States
+    - int Inputs
+    - int Outputs
+    methods:
+      KalmanFilter:
+      P:
+        overloads:
+          '[const]':
+          int, int [const]:
+      SetP:
+      Xhat:
+        overloads:
+          '[const]':
+          int [const]:
+      SetXhat:
+        overloads:
+          const StateVector&:
+          int, double:
+      Reset:
+      Predict:
+      Correct:
+        overloads:
+          const InputVector&, const OutputVector&:
+          const InputVector&, const OutputVector&, const Matrixd<Outputs, Outputs>&:
+
+templates:
+  KalmanFilter_1_1_1:
+    qualname: frc::KalmanFilter
+    params:
+    - 1
+    - 1
+    - 1
+  KalmanFilter_2_1_1:
+    qualname: frc::KalmanFilter
+    params:
+    - 2
+    - 1
+    - 1
+  KalmanFilter_2_1_2:
+    qualname: frc::KalmanFilter
+    params:
+    - 2
+    - 1
+    - 2
+  KalmanFilter_2_2_2:
+    qualname: frc::KalmanFilter
+    params:
+    - 2
+    - 2
+    - 2
+  KalmanFilter_3_2_3:
+    qualname: frc::KalmanFilter
+    params:
+    - 3
+    - 2
+    - 3
