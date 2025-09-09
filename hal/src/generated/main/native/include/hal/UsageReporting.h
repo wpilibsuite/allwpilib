@@ -147,6 +147,7 @@ typedef enum
     kResourceType_RevServoHub = 124,
     kResourceType_PWFSEN36005 = 125,
     kResourceType_LaserShark = 126,
+    kResourceType_YAMS = 127,
 
 //    kResourceType_MaximumID = 255,
 } tResourceType;
