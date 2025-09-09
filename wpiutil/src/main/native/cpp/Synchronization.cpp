@@ -27,13 +27,7 @@ using namespace wpi;
 //
 // This allows us both to detect in callers if destruction is in progress (value
 // < 0) and also to detect when all threads have finished.
-//
-// We don't use this logic on Windows, because Windows automatically kills all
-// threads on process exit, so this actually can result in deadlocks because the
-// other threads never decrement the count.
-#ifndef _WIN32
 static std::atomic_int gActive{0};
-#endif
 
 namespace {
 
@@ -44,7 +38,6 @@ struct State {
 };
 
 struct HandleManager {
-#ifndef _WIN32
   ~HandleManager() {
     gActive.fetch_add(INT_MIN / 2);
 
@@ -59,6 +52,11 @@ struct HandleManager {
     }
 
     // wait for other threads to finish
+    //
+    // We don't use this logic on Windows, because Windows automatically kills
+    // all threads on process exit, so this actually can result in deadlocks
+    // because the other threads never decrement the count.
+#ifndef _WIN32
     for (;;) {
       int nowActive = gActive.load();
       if (nowActive == INT_MIN / 2) {
@@ -67,8 +65,8 @@ struct HandleManager {
       // wait for active count to change
       gActive.wait(nowActive);
     }
-  }
 #endif
+  }
   wpi::mutex mutex;
   wpi::UidVector<int, 8> eventIds;
   wpi::UidVector<int, 8> semaphoreIds;
@@ -77,9 +75,6 @@ struct HandleManager {
 
 class ManagerGuard {
  public:
-#ifdef _WIN32
-  ManagerGuard() : m_active{true} {}
-#else
   ManagerGuard()
       : m_active{gActive.fetch_add(1, std::memory_order_acquire) >= 0} {}
 
@@ -88,7 +83,6 @@ class ManagerGuard {
       gActive.notify_all();
     }
   }
-#endif
 
   explicit operator bool() const { return m_active; }
 
@@ -299,14 +293,14 @@ std::span<WPI_Handle> wpi::WaitForObjects(std::span<const WPI_Handle> handles,
         state.waiters.emplace_back(&cv);
       }
     }
-#ifndef _WIN32
+
     if (gActive.load(std::memory_order_acquire) < 0) {
       // shutting down
       timedOutVal = false;
       count = 0;
       break;
     }
-#endif
+
     if (timeout < 0) {
       cv.wait(lock);
     } else {
@@ -316,14 +310,13 @@ std::span<WPI_Handle> wpi::WaitForObjects(std::span<const WPI_Handle> handles,
         timedOutVal = true;
       }
     }
-#ifndef _WIN32
+
     if (gActive.load(std::memory_order_acquire) < 0) {
       // shutting down
       timedOutVal = false;
       count = 0;
       break;
     }
-#endif
   }
 
   if (addedWaiters) {
