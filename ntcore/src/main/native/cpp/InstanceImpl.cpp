@@ -76,12 +76,10 @@ int InstanceImpl::AllocImpl() {
 }
 
 void InstanceImpl::Destroy(int inst) {
-  std::scoped_lock lock(s_mutex);
-  if (inst < 0 || inst >= kNumInstances) {
-    return;
+  if (auto impl = Get(inst)) {
+    impl->listenerStorage.Stop();
+    delete s_instances[inst].exchange(nullptr);
   }
-
-  delete s_instances[inst].exchange(nullptr);
 }
 
 void InstanceImpl::StartLocal() {
@@ -231,6 +229,9 @@ void InstanceImpl::AddTimeSyncListener(NT_Listener listener,
 
 void InstanceImpl::Reset() {
   std::scoped_lock lock{m_mutex};
+  // Listeners sometimes call NetworkTables APIs, so reset listenerStorage first
+  listenerStorage.Reset();
+
   m_networkServer.reset();
   m_networkClient.reset();
   m_servers.clear();
@@ -238,7 +239,6 @@ void InstanceImpl::Reset() {
   m_serverTimeOffset.reset();
   m_rtt2 = 0;
 
-  listenerStorage.Reset();
   // connectionList should have been cleared by destroying networkClient/server
   localStorage.Reset();
 }
