@@ -190,7 +190,7 @@ class StructFieldDescriptor {
    *
    * @return set of enumerated values
    */
-  const EnumValues& GetEnumValues() { return m_enum; }
+  const EnumValues& GetEnumValues() const { return m_enum; }
 
   /**
    * Gets the struct descriptor for a struct data type.
