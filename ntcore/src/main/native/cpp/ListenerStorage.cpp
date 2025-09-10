@@ -346,16 +346,29 @@ bool ListenerStorage::WaitForListenerQueue(double timeout) {
 }
 
 void ListenerStorage::Reset() {
+  Stop();  // If a callback is currently running, wait for it to complete.
+
+  std::scoped_lock lock{m_mutex};
+  m_pollers.clear();
+  m_listeners.clear();
+  m_connListeners.clear();
+  m_topicListeners.clear();
+  m_valueListeners.clear();
+  m_logListeners.clear();
+  m_timeSyncListeners.clear();
+}
+
+void ListenerStorage::Stop() {
   {
     std::scoped_lock lock{m_mutex};
-    m_pollers.clear();
-    m_listeners.clear();
-    m_connListeners.clear();
-    m_topicListeners.clear();
-    m_valueListeners.clear();
-    m_logListeners.clear();
-    m_timeSyncListeners.clear();
+    if (auto thr = m_thread.GetThread()) {
+      // Prevent future callbacks from running.
+      thr->m_callbacks.clear();
+    } else {
+      return;
+    }
   }
+
   m_thread.Join();
 }
 
