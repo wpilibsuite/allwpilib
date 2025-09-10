@@ -66,6 +66,8 @@ class ListenerStorage final : public IListenerStorage {
 
   void Reset();
 
+  void Stop();
+
  private:
   // these assume the mutex is already held
   NT_Listener DoAddListener(NT_ListenerPoller pollerHandle);
@@ -110,10 +112,19 @@ class ListenerStorage final : public IListenerStorage {
 
     void Main() final;
 
+    // Stops running callbacks.
+    // Returns true if successful, or false if the caller should wait for the
+    // queue to empty. Assumes the mutex is already held.
+
+    bool Shutdown();
+
     NT_ListenerPoller m_poller;
     wpi::DenseMap<NT_Listener, ListenerCallback> m_callbacks;
     wpi::Event m_waitQueueWakeup;
     wpi::Event m_waitQueueWaiter;
+
+   private:
+    bool m_shutdown;
   };
   wpi::SafeThreadOwner<Thread> m_thread;
 };
