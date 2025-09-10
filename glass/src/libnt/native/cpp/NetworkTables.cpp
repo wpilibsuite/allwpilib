@@ -233,6 +233,17 @@ static void UpdateMsgpackValueSource(NetworkTablesModel& model,
   }
 }
 
+static std::string GetEnumValue(const wpi::StructFieldDescriptor& field,
+                                int64_t val) {
+  auto& enumValues = field.GetEnumValues();
+  for (auto&& ev : enumValues) {
+    if (ev.second == val) {
+      return ev.first;
+    }
+  }
+  return fmt::format("<{}>", val);
+}
+
 static void UpdateStructValueSource(NetworkTablesModel& model,
                                     NetworkTablesModel::ValueSource* out,
                                     const wpi::DynamicStruct& s,
@@ -281,6 +292,30 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
       case wpi::StructFieldType::kUint32:
       case wpi::StructFieldType::kUint64: {
         bool isUint = field.IsUint();
+        if (field.HasEnum()) {
+          if (field.IsArray()) {
+            std::vector<std::string> v;
+            v.reserve(field.GetArraySize());
+            for (size_t i = 0; i < field.GetArraySize(); ++i) {
+              if (isUint) {
+                v.emplace_back(GetEnumValue(field, s.GetUintField(&field, i)));
+              } else {
+                v.emplace_back(GetEnumValue(field, s.GetIntField(&field, i)));
+              }
+            }
+            child.UpdateFromEnum(child.path, std::move(v), time);
+          } else {
+            if (isUint) {
+              child.UpdateFromEnum(child.path,
+                                   GetEnumValue(field, s.GetUintField(&field)),
+                                   time);
+            } else {
+              child.UpdateFromEnum(
+                  child.path, GetEnumValue(field, s.GetIntField(&field)), time);
+            }
+          }
+          break;
+        }
         if (field.IsArray()) {
           std::vector<int64_t> v;
           v.reserve(field.GetArraySize());
@@ -539,22 +574,21 @@ static void UpdateProtobufValueSource(NetworkTablesModel& model,
               const char* name = upb_EnumValueDef_Name(enumValueDef);
               v.emplace_back(name);
             } else {
-              v.emplace_back(fmt::format("{}", value));
+              v.emplace_back(fmt::format("<{}>", value));
             }
           }
-          child.value = nt::Value::MakeStringArray(std::move(v), time);
+          child.UpdateFromEnum(child.path, std::move(v), time);
         } else {
           int32_t value = upb_Message_GetFieldByDef(msg, field).int32_val;
           const upb_EnumValueDef* enumValueDef =
               upb_EnumDef_FindValueByNumber(enumDef, value);
           if (enumValueDef) {
             const char* name = upb_EnumValueDef_Name(enumValueDef);
-            child.value = nt::Value::MakeString(name, time);
+            child.UpdateFromEnum(child.path, name, time);
           } else {
-            child.value = nt::Value::MakeString(fmt::format("{}", value), time);
+            child.UpdateFromEnum(child.path, fmt::format("<{}>", value), time);
           }
         }
-        child.UpdateFromValue(model, child.path, "");
         break;
       }
       case kUpb_CType_Message: {
@@ -676,6 +710,38 @@ static void UpdateJsonValueSource(NetworkTablesModel& model,
       out->value = {};
       break;
   }
+}
+
+void NetworkTablesModel::ValueSource::UpdateFromEnum(std::string_view name,
+                                                     std::string_view v,
+                                                     int64_t time) {
+  valueChildren.clear();
+  value = nt::Value::MakeString(v, time);
+  valueStr = v;
+  auto s = dynamic_cast<StringSource*>(source.get());
+  if (!s) {
+    source = std::make_unique<StringSource>(fmt::format("NT:{}", name));
+    s = static_cast<StringSource*>(source.get());
+  }
+  s->SetValue(v, time);
+}
+
+void NetworkTablesModel::ValueSource::UpdateFromEnum(
+    std::string_view name, std::vector<std::string> arr, int64_t time) {
+  if (valueChildrenMap) {
+    valueChildren.clear();
+    valueChildrenMap = false;
+  }
+  valueChildren.resize(arr.size());
+  unsigned int i = 0;
+  for (auto&& child : valueChildren) {
+    if (child.name.empty()) {
+      child.name = fmt::format("[{}]", i);
+      child.path = fmt::format("{}{}", name, child.name);
+    }
+    child.UpdateFromEnum(child.path, arr[i++], time);
+  }
+  value = nt::Value::MakeStringArray(std::move(arr), time);
 }
 
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
