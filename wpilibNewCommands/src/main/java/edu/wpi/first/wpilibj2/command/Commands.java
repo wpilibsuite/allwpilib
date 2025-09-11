@@ -167,6 +167,21 @@ public final class Commands {
   }
 
   /**
+   * Runs a command if the boolean condition function is true. Otherwise it does nothing and exits
+   * (but still has the same requirements as the command, interrupting any commands with shared
+   * requirements).
+   *
+   * @param condition the condition function
+   * @param onTrue the command to run if the condition function returns true
+   * @return the command
+   * @see ConditionalCommand
+   * @see Commands#none()
+   */
+  public static Command runIf(BooleanSupplier condition, Command onTrue) {
+    return onTrue.onlyIf(condition);
+  }
+
+  /**
    * Runs one of several commands, based on the selector function.
    *
    * @param <K> The type of key used to select the command
