@@ -5,6 +5,7 @@
 #include "frc/DSControlWord.h"
 
 #include <hal/DriverStation.h>
+#include <hal/DriverStationTypes.h>
 
 using namespace frc;
 
@@ -24,26 +25,35 @@ bool DSControlWord::IsEStopped() const {
   return m_controlWord.eStop;
 }
 
+RobotMode DSControlWord::GetRobotMode() const {
+  return static_cast<RobotMode>(m_controlWord.robotMode);
+}
+
 bool DSControlWord::IsAutonomous() const {
-  return m_controlWord.autonomous;
+  return m_controlWord.robotMode == HAL_ROBOTMODE_AUTONOMOUS;
 }
 
 bool DSControlWord::IsAutonomousEnabled() const {
-  return m_controlWord.autonomous && m_controlWord.enabled &&
-         m_controlWord.dsAttached;
+  return m_controlWord.robotMode == HAL_ROBOTMODE_AUTONOMOUS &&
+         m_controlWord.enabled && m_controlWord.dsAttached;
 }
 
 bool DSControlWord::IsTeleop() const {
-  return !(m_controlWord.autonomous || m_controlWord.test);
+  return m_controlWord.robotMode == HAL_ROBOTMODE_TELEOPERATED;
 }
 
 bool DSControlWord::IsTeleopEnabled() const {
-  return !m_controlWord.autonomous && !m_controlWord.test &&
+  return m_controlWord.robotMode == HAL_ROBOTMODE_TELEOPERATED &&
          m_controlWord.enabled && m_controlWord.dsAttached;
 }
 
 bool DSControlWord::IsTest() const {
-  return m_controlWord.test;
+  return m_controlWord.robotMode == HAL_ROBOTMODE_TEST;
+}
+
+bool DSControlWord::IsTestEnabled() const {
+  return m_controlWord.robotMode == HAL_ROBOTMODE_TEST &&
+         m_controlWord.enabled && m_controlWord.dsAttached;
 }
 
 bool DSControlWord::IsDSAttached() const {

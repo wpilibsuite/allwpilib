@@ -23,20 +23,9 @@ DriverStationModeThread::~DriverStationModeThread() {
   }
 }
 
-void DriverStationModeThread::InDisabled(bool entering) {
-  m_userInDisabled = entering;
-}
-
-void DriverStationModeThread::InAutonomous(bool entering) {
-  m_userInAutonomous = entering;
-}
-
-void DriverStationModeThread::InTeleop(bool entering) {
-  m_userInTeleop = entering;
-}
-
-void DriverStationModeThread::InTest(bool entering) {
-  m_userInTest = entering;
+void DriverStationModeThread::InOpMode(int64_t id, bool enabled) {
+  m_userOpMode = id;
+  m_userEnabled = enabled;
 }
 
 void DriverStationModeThread::Run() {
@@ -47,18 +36,7 @@ void DriverStationModeThread::Run() {
     bool timedOut = false;
     wpi::WaitForObject(event.GetHandle(), 0.1, &timedOut);
     frc::DriverStation::RefreshData();
-    if (m_userInDisabled) {
-      HAL_ObserveUserProgramDisabled();
-    }
-    if (m_userInAutonomous) {
-      HAL_ObserveUserProgramAutonomous();
-    }
-    if (m_userInTeleop) {
-      HAL_ObserveUserProgramTeleop();
-    }
-    if (m_userInTest) {
-      HAL_ObserveUserProgramTest();
-    }
+    HAL_ObserveUserProgramOpMode(m_userOpMode, m_userEnabled);
   }
 
   HAL_RemoveNewDataEventHandle(event.GetHandle());

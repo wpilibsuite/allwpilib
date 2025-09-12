@@ -6,6 +6,12 @@
 
 #include <stdint.h>
 
+#include <wpi/string.h>
+
+#ifdef __cplusplus
+#include <wpi/struct/Struct.h>
+#endif  // __cplusplus
+
 #include "hal/Types.h"
 
 /**
@@ -16,8 +22,7 @@
 
 struct HAL_ControlWord {
   uint32_t enabled : 1;
-  uint32_t autonomous : 1;
-  uint32_t test : 1;
+  uint32_t robotMode : 2;  // HAL_RobotMode enum
   uint32_t eStop : 1;
   uint32_t fmsAttached : 1;
   uint32_t dsAttached : 1;
@@ -47,6 +52,13 @@ HAL_ENUM(HAL_MatchType) {
   HAL_kMatchType_practice,
   HAL_kMatchType_qualification,
   HAL_kMatchType_elimination,
+};
+
+HAL_ENUM(HAL_RobotMode) {
+  HAL_ROBOTMODE_UNKNOWN = 0,
+  HAL_ROBOTMODE_AUTONOMOUS,
+  HAL_ROBOTMODE_TELEOPERATED,
+  HAL_ROBOTMODE_TEST,
 };
 
 /**
@@ -126,4 +138,59 @@ struct HAL_MatchInfo {
   uint16_t gameSpecificMessageSize;
 };
 typedef struct HAL_MatchInfo HAL_MatchInfo;
+
+#define HAL_OPMODE_ROBOT_MODE_MASK 0x0300000000000000LL
+#define HAL_OPMODE_ROBOT_MODE_SHIFT 56
+#define HAL_OPMODE_HASH_MASK 0x00FFFFFFFFFFFFFFLL
+// NOLINTBEGIN
+#define HAL_OPMODE_MAKE_ID(mode, hash)                        \
+  (((int64_t)((mode) & 0x3) << HAL_OPMODE_ROBOT_MODE_SHIFT) | \
+   ((hash) & HAL_OPMODE_HASH_MASK))
+#define HAL_OPMODE_GET_MODE(id)                          \
+  (HAL_RobotMode)(((id) & HAL_OPMODE_ROBOT_MODE_MASK) >> \
+                  HAL_OPMODE_ROBOT_MODE_SHIFT)
+// NOLINTEND
+
+struct HAL_OpModeOption {
+  int64_t id;  // encodes robot mode in bits 57-56, LSB 56 bits is hash of name
+  struct WPI_String name;
+  struct WPI_String group;
+  struct WPI_String description;
+  int32_t textColor;        // 0x00RRGGBB or -1 for default
+  int32_t backgroundColor;  // 0x00RRGGBB or -1 for default
+};
+typedef struct HAL_OpModeOption HAL_OpModeOption;
 /** @} */
+
+#ifdef __cplusplus
+template <>
+struct wpi::Struct<HAL_ControlWord> {
+  static constexpr std::string_view GetTypeName() { return "ControlWord"; }
+  static constexpr size_t GetSize() { return 1; }
+  static constexpr std::string_view GetSchema() {
+    return "bool enabled:1;"
+           "enum{unknown=0,autonomous=1,teleoperated=2,test=3}"
+           "int8 robotMode:2;"
+           "bool eStop:1;bool fmsAttached:1;"
+           "bool dsAttached:1";
+  }
+
+  static inline HAL_ControlWord Unpack(std::span<const uint8_t> data) {
+    uint8_t b = data[0];
+    return {.enabled = static_cast<uint32_t>(b),
+            .robotMode = static_cast<uint32_t>(b >> 1),
+            .eStop = static_cast<uint32_t>(b >> 3),
+            .fmsAttached = static_cast<uint32_t>(b >> 4),
+            .dsAttached = static_cast<uint32_t>(b >> 5),
+            .control_reserved = 0};
+  }
+  static inline void Pack(std::span<uint8_t> data,
+                          const HAL_ControlWord& value) {
+    data[0] = (value.enabled ? 0x01u : 0u) | (value.robotMode << 1) |
+              (value.eStop ? 0x08u : 0u) | (value.fmsAttached ? 0x10u : 0u) |
+              (value.dsAttached ? 0x20u : 0u);
+  }
+};
+
+static_assert(wpi::StructSerializable<HAL_ControlWord>);
+#endif  // __cplusplus

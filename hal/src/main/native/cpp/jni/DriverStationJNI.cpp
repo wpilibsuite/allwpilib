@@ -5,6 +5,8 @@
 #include <jni.h>
 
 #include <cassert>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <wpi/jni_util.h>
@@ -12,7 +14,6 @@
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_DriverStationJNI.h"
 #include "hal/DriverStation.h"
-#include "hal/HALBase.h"
 
 static_assert(edu_wpi_first_hal_DriverStationJNI_kUnknownAllianceStation ==
               HAL_AllianceStationID_kUnknown);
@@ -55,50 +56,14 @@ Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramStarting
 
 /*
  * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    observeUserProgramDisabled
- * Signature: ()V
+ * Method:    observeUserProgramOpMode
+ * Signature: (JZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramDisabled
-  (JNIEnv*, jclass)
+Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramOpMode
+  (JNIEnv*, jclass, jlong id, jboolean enabled)
 {
-  HAL_ObserveUserProgramDisabled();
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    observeUserProgramAutonomous
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramAutonomous
-  (JNIEnv*, jclass)
-{
-  HAL_ObserveUserProgramAutonomous();
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    observeUserProgramTeleop
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramTeleop
-  (JNIEnv*, jclass)
-{
-  HAL_ObserveUserProgramTeleop();
-}
-
-/*
- * Class:     edu_wpi_first_hal_DriverStationJNI
- * Method:    observeUserProgramTest
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DriverStationJNI_observeUserProgramTest
-  (JNIEnv*, jclass)
-{
-  HAL_ObserveUserProgramTest();
+  HAL_ObserveUserProgramOpMode(id, enabled);
 }
 
 /*
@@ -117,6 +82,49 @@ Java_edu_wpi_first_hal_DriverStationJNI_nativeGetControlWord
   jint retVal = 0;
   std::memcpy(&retVal, &controlWord, sizeof(HAL_ControlWord));
   return retVal;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Method:    setOpModeOptions
+ * Signature: ([Ljava/lang/Object;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_setOpModeOptions
+  (JNIEnv* env, jclass, jobjectArray options)
+{
+  std::vector<HAL_OpModeOption> coptions;
+  if (options != nullptr) {
+    jsize length = env->GetArrayLength(options);
+    coptions.reserve(length);
+    for (jsize i = 0; i < length; i++) {
+      JLocal<jobject> option{env, env->GetObjectArrayElement(options, i)};
+      if (!option) {
+        ThrowIllegalArgumentException(env, "Null OpModeOption passed in array");
+        return;
+      }
+      auto coption = CreateOpModeOptionFromJava(env, option);
+      if (coption.id == 0) {
+        // exception thrown
+        return;
+      }
+      coptions.emplace_back(std::move(coption));
+    }
+  }
+  int32_t status = HAL_SetOpModeOptions(coptions.data(), coptions.size());
+  CheckStatusForceThrow(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DriverStationJNI
+ * Method:    getOpMode
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_hal_DriverStationJNI_getOpMode
+  (JNIEnv*, jclass)
+{
+  return HAL_GetOpMode();
 }
 
 /*
