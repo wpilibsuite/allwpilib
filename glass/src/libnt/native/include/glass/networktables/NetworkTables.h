@@ -37,6 +37,11 @@ class NetworkTablesModel : public Model {
     void UpdateFromValue(NetworkTablesModel& model, std::string_view name,
                          std::string_view typeStr);
 
+    void UpdateFromEnum(std::string_view name, std::string_view v,
+                        int64_t time);
+    void UpdateFromEnum(std::string_view name, std::vector<std::string> arr,
+                        int64_t time);
+
     /** The latest value. */
     nt::Value value;
 
